@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_FIRMWARE_VOLUME_EXT_HEADER Struct Reference</title>
+<title>MdePkg[ALL]: EFI_DEV_PATH_PTR Union Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,48 +21,489 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_FIRMWARE_VOLUME_EXT_HEADER Struct Reference</h1><!-- doxytag: class="EFI_FIRMWARE_VOLUME_EXT_HEADER" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_DEV_PATH_PTR Union Reference</h1><!-- doxytag: class="EFI_DEV_PATH_PTR" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/db6/a00427.html#9beaf49f9597737dea53100d72e87988">FvName</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/db6/a00427.html#113ef2474cd0de690883e24de210c188">DevPath</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/db6/a00427.html#1d661d864bb1d966a325761a81263d71">ExtHeaderSize</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dd4/a00776.html">PCI_DEVICE_PATH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/db6/a00427.html#4ab8c56882489b8bbd83ec647d4b2973">Pci</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/d2c/a00764.html">PCCARD_DEVICE_PATH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/db6/a00427.html#4ede691d9e508d830993949f002052ab">PcCard</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/dd8/a00719.html">MEMMAP_DEVICE_PATH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/db6/a00427.html#db57dffbf730c4d6894e97cf4c26fa24">MemMap</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/d59/a01001.html">VENDOR_DEVICE_PATH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/db6/a00427.html#4e17089db99a4b087cd5e5ae55783411">Vendor</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/db3/a00313.html">CONTROLLER_DEVICE_PATH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/db6/a00427.html#03326e8ec24e9d1a200009ae20a49b44">Controller</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d6/d7f/a00287.html">ACPI_HID_DEVICE_PATH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/db6/a00427.html#564ac07625de5286d1533085b8459fb6">Acpi</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d5/d7b/a00286.html">ACPI_EXTENDED_HID_DEVICE_PATH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/db6/a00427.html#3acbbd01771d58d0b9ba9e52127c0a05">ExtendedAcpi</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/d25/a00290.html">ATAPI_DEVICE_PATH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/db6/a00427.html#fe0dc30e888d45832aa027c74b9c3313">Atapi</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d61/a00840.html">SCSI_DEVICE_PATH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/db6/a00427.html#1cad1912450dbe179eb6ef8543748fef">Scsi</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/df1/a00685.html">FIBRECHANNEL_DEVICE_PATH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/db6/a00427.html#72fd6070f33569b340336a0baf666e81">FibreChannel</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/db4/a00684.html">F1394_DEVICE_PATH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/db6/a00427.html#d316774e6f3e9b874329b1ee0187d551">F1394</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/daa/a00996.html">USB_DEVICE_PATH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/db6/a00427.html#24c08ff8dba036a0573fee82fe705149">Usb</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/de8/a00839.html">SATA_DEVICE_PATH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/db6/a00427.html#0f96eb13321b1044816e9020fed24623">Sata</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../da/d0a/a00993.html">USB_CLASS_DEVICE_PATH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/db6/a00427.html#3e383fb65e71e04f66b4dc280dfcf0fb">UsbClass</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/dd2/a00693.html">I2O_DEVICE_PATH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/db6/a00427.html#a218c917cc8e3061b405b156d77d5b45">I2O</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/deb/a00710.html">MAC_ADDR_DEVICE_PATH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/db6/a00427.html#cf7419e1ab76f9f98a7eeded4077c4c4">MacAddr</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d56/a00707.html">IPv4_DEVICE_PATH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/db6/a00427.html#e57af0aca90f0b84f2ff341045039f28">Ipv4</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../da/d6b/a00708.html">IPv6_DEVICE_PATH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/db6/a00427.html#0221c06b5c01a42f8840834da7f71218">Ipv6</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d7/df1/a00705.html">INFINIBAND_DEVICE_PATH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/db6/a00427.html#7ed0b46de2c840d569faa42aa35be19c">InfiniBand</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/d95/a00989.html">UART_DEVICE_PATH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/db6/a00427.html#4f8eadee013391e123f4629519bb645c">Uart</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../da/dd4/a00690.html">HARDDRIVE_DEVICE_PATH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/db6/a00427.html#ece45b6c832bb78a80872aad662bedd3">HardDrive</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d5/d0f/a00308.html">CDROM_DEVICE_PATH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/db6/a00427.html#3455421cb057f9f2bf6f0a0b9759f5fc">CD</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/d9e/a00686.html">FILEPATH_DEVICE_PATH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/db6/a00427.html#e62d0f34ec3f94083bbe07542a5aedd2">FilePath</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/d82/a00717.html">MEDIA_PROTOCOL_DEVICE_PATH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/db6/a00427.html#1918bb0afd11f6838d649193d78251f8">MediaProtocol</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d8f/a00718.html">MEDIA_RELATIVE_OFFSET_RANGE_DEVICE_PATH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/db6/a00427.html#207766da3cef38e2125a2495ef45bd49">Offset</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/de3/a00306.html">BBS_BBS_DEVICE_PATH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/db6/a00427.html#d227a0f225de910c13bab46e7b0a72e7">Bbs</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/db6/a00427.html#b03d5547363a0a00c0583e4616d5331f">Raw</a></td></tr>
 
 </table>
-<hr><a name="_details"></a><h2>Detailed Description</h2>
-Extension header pointed by ExtHeaderOffset of volume header. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="1d661d864bb1d966a325761a81263d71"></a><!-- doxytag: member="EFI_FIRMWARE_VOLUME_EXT_HEADER::ExtHeaderSize" ref="1d661d864bb1d966a325761a81263d71" args="" -->
+<hr><h2>Field Documentation</h2>
+<a class="anchor" name="564ac07625de5286d1533085b8459fb6"></a><!-- doxytag: member="EFI_DEV_PATH_PTR::Acpi" ref="564ac07625de5286d1533085b8459fb6" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../da/db6/a00427.html#1d661d864bb1d966a325761a81263d71">EFI_FIRMWARE_VOLUME_EXT_HEADER::ExtHeaderSize</a>          </td>
+          <td class="memname"><a class="el" href="../../d6/d7f/a00287.html">ACPI_HID_DEVICE_PATH</a>* <a class="el" href="../../da/db6/a00427.html#564ac07625de5286d1533085b8459fb6">EFI_DEV_PATH_PTR::Acpi</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Size of the rest of the extension header, including this structure. 
+
 </div>
 </div><p>
-<a class="anchor" name="9beaf49f9597737dea53100d72e87988"></a><!-- doxytag: member="EFI_FIRMWARE_VOLUME_EXT_HEADER::FvName" ref="9beaf49f9597737dea53100d72e87988" args="" -->
+<a class="anchor" name="fe0dc30e888d45832aa027c74b9c3313"></a><!-- doxytag: member="EFI_DEV_PATH_PTR::Atapi" ref="fe0dc30e888d45832aa027c74b9c3313" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../da/db6/a00427.html#9beaf49f9597737dea53100d72e87988">EFI_FIRMWARE_VOLUME_EXT_HEADER::FvName</a>          </td>
+          <td class="memname"><a class="el" href="../../de/d25/a00290.html">ATAPI_DEVICE_PATH</a>* <a class="el" href="../../da/db6/a00427.html#fe0dc30e888d45832aa027c74b9c3313">EFI_DEV_PATH_PTR::Atapi</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Firmware volume name. 
+
+</div>
+</div><p>
+<a class="anchor" name="d227a0f225de910c13bab46e7b0a72e7"></a><!-- doxytag: member="EFI_DEV_PATH_PTR::Bbs" ref="d227a0f225de910c13bab46e7b0a72e7" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d1/de3/a00306.html">BBS_BBS_DEVICE_PATH</a>* <a class="el" href="../../da/db6/a00427.html#d227a0f225de910c13bab46e7b0a72e7">EFI_DEV_PATH_PTR::Bbs</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="3455421cb057f9f2bf6f0a0b9759f5fc"></a><!-- doxytag: member="EFI_DEV_PATH_PTR::CD" ref="3455421cb057f9f2bf6f0a0b9759f5fc" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d5/d0f/a00308.html">CDROM_DEVICE_PATH</a>* <a class="el" href="../../da/db6/a00427.html#3455421cb057f9f2bf6f0a0b9759f5fc">EFI_DEV_PATH_PTR::CD</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="03326e8ec24e9d1a200009ae20a49b44"></a><!-- doxytag: member="EFI_DEV_PATH_PTR::Controller" ref="03326e8ec24e9d1a200009ae20a49b44" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dd/db3/a00313.html">CONTROLLER_DEVICE_PATH</a>* <a class="el" href="../../da/db6/a00427.html#03326e8ec24e9d1a200009ae20a49b44">EFI_DEV_PATH_PTR::Controller</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="113ef2474cd0de690883e24de210c188"></a><!-- doxytag: member="EFI_DEV_PATH_PTR::DevPath" ref="113ef2474cd0de690883e24de210c188" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a>* <a class="el" href="../../da/db6/a00427.html#113ef2474cd0de690883e24de210c188">EFI_DEV_PATH_PTR::DevPath</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="3acbbd01771d58d0b9ba9e52127c0a05"></a><!-- doxytag: member="EFI_DEV_PATH_PTR::ExtendedAcpi" ref="3acbbd01771d58d0b9ba9e52127c0a05" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d5/d7b/a00286.html">ACPI_EXTENDED_HID_DEVICE_PATH</a>* <a class="el" href="../../da/db6/a00427.html#3acbbd01771d58d0b9ba9e52127c0a05">EFI_DEV_PATH_PTR::ExtendedAcpi</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="d316774e6f3e9b874329b1ee0187d551"></a><!-- doxytag: member="EFI_DEV_PATH_PTR::F1394" ref="d316774e6f3e9b874329b1ee0187d551" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d3/db4/a00684.html">F1394_DEVICE_PATH</a>* <a class="el" href="../../da/db6/a00427.html#d316774e6f3e9b874329b1ee0187d551">EFI_DEV_PATH_PTR::F1394</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="72fd6070f33569b340336a0baf666e81"></a><!-- doxytag: member="EFI_DEV_PATH_PTR::FibreChannel" ref="72fd6070f33569b340336a0baf666e81" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/df1/a00685.html">FIBRECHANNEL_DEVICE_PATH</a>* <a class="el" href="../../da/db6/a00427.html#72fd6070f33569b340336a0baf666e81">EFI_DEV_PATH_PTR::FibreChannel</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="e62d0f34ec3f94083bbe07542a5aedd2"></a><!-- doxytag: member="EFI_DEV_PATH_PTR::FilePath" ref="e62d0f34ec3f94083bbe07542a5aedd2" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../df/d9e/a00686.html">FILEPATH_DEVICE_PATH</a>* <a class="el" href="../../da/db6/a00427.html#e62d0f34ec3f94083bbe07542a5aedd2">EFI_DEV_PATH_PTR::FilePath</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="ece45b6c832bb78a80872aad662bedd3"></a><!-- doxytag: member="EFI_DEV_PATH_PTR::HardDrive" ref="ece45b6c832bb78a80872aad662bedd3" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../da/dd4/a00690.html">HARDDRIVE_DEVICE_PATH</a>* <a class="el" href="../../da/db6/a00427.html#ece45b6c832bb78a80872aad662bedd3">EFI_DEV_PATH_PTR::HardDrive</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="a218c917cc8e3061b405b156d77d5b45"></a><!-- doxytag: member="EFI_DEV_PATH_PTR::I2O" ref="a218c917cc8e3061b405b156d77d5b45" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d3/dd2/a00693.html">I2O_DEVICE_PATH</a>* <a class="el" href="../../da/db6/a00427.html#a218c917cc8e3061b405b156d77d5b45">EFI_DEV_PATH_PTR::I2O</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="7ed0b46de2c840d569faa42aa35be19c"></a><!-- doxytag: member="EFI_DEV_PATH_PTR::InfiniBand" ref="7ed0b46de2c840d569faa42aa35be19c" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d7/df1/a00705.html">INFINIBAND_DEVICE_PATH</a>* <a class="el" href="../../da/db6/a00427.html#7ed0b46de2c840d569faa42aa35be19c">EFI_DEV_PATH_PTR::InfiniBand</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="e57af0aca90f0b84f2ff341045039f28"></a><!-- doxytag: member="EFI_DEV_PATH_PTR::Ipv4" ref="e57af0aca90f0b84f2ff341045039f28" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d1/d56/a00707.html">IPv4_DEVICE_PATH</a>* <a class="el" href="../../da/db6/a00427.html#e57af0aca90f0b84f2ff341045039f28">EFI_DEV_PATH_PTR::Ipv4</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="0221c06b5c01a42f8840834da7f71218"></a><!-- doxytag: member="EFI_DEV_PATH_PTR::Ipv6" ref="0221c06b5c01a42f8840834da7f71218" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../da/d6b/a00708.html">IPv6_DEVICE_PATH</a>* <a class="el" href="../../da/db6/a00427.html#0221c06b5c01a42f8840834da7f71218">EFI_DEV_PATH_PTR::Ipv6</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="cf7419e1ab76f9f98a7eeded4077c4c4"></a><!-- doxytag: member="EFI_DEV_PATH_PTR::MacAddr" ref="cf7419e1ab76f9f98a7eeded4077c4c4" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d4/deb/a00710.html">MAC_ADDR_DEVICE_PATH</a>* <a class="el" href="../../da/db6/a00427.html#cf7419e1ab76f9f98a7eeded4077c4c4">EFI_DEV_PATH_PTR::MacAddr</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="1918bb0afd11f6838d649193d78251f8"></a><!-- doxytag: member="EFI_DEV_PATH_PTR::MediaProtocol" ref="1918bb0afd11f6838d649193d78251f8" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d3/d82/a00717.html">MEDIA_PROTOCOL_DEVICE_PATH</a>* <a class="el" href="../../da/db6/a00427.html#1918bb0afd11f6838d649193d78251f8">EFI_DEV_PATH_PTR::MediaProtocol</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="db57dffbf730c4d6894e97cf4c26fa24"></a><!-- doxytag: member="EFI_DEV_PATH_PTR::MemMap" ref="db57dffbf730c4d6894e97cf4c26fa24" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dd/dd8/a00719.html">MEMMAP_DEVICE_PATH</a>* <a class="el" href="../../da/db6/a00427.html#db57dffbf730c4d6894e97cf4c26fa24">EFI_DEV_PATH_PTR::MemMap</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="207766da3cef38e2125a2495ef45bd49"></a><!-- doxytag: member="EFI_DEV_PATH_PTR::Offset" ref="207766da3cef38e2125a2495ef45bd49" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/d8f/a00718.html">MEDIA_RELATIVE_OFFSET_RANGE_DEVICE_PATH</a>* <a class="el" href="../../da/db6/a00427.html#207766da3cef38e2125a2495ef45bd49">EFI_DEV_PATH_PTR::Offset</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="4ede691d9e508d830993949f002052ab"></a><!-- doxytag: member="EFI_DEV_PATH_PTR::PcCard" ref="4ede691d9e508d830993949f002052ab" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d3/d2c/a00764.html">PCCARD_DEVICE_PATH</a>* <a class="el" href="../../da/db6/a00427.html#4ede691d9e508d830993949f002052ab">EFI_DEV_PATH_PTR::PcCard</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="4ab8c56882489b8bbd83ec647d4b2973"></a><!-- doxytag: member="EFI_DEV_PATH_PTR::Pci" ref="4ab8c56882489b8bbd83ec647d4b2973" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d9/dd4/a00776.html">PCI_DEVICE_PATH</a>* <a class="el" href="../../da/db6/a00427.html#4ab8c56882489b8bbd83ec647d4b2973">EFI_DEV_PATH_PTR::Pci</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="b03d5547363a0a00c0583e4616d5331f"></a><!-- doxytag: member="EFI_DEV_PATH_PTR::Raw" ref="b03d5547363a0a00c0583e4616d5331f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>* <a class="el" href="../../da/db6/a00427.html#b03d5547363a0a00c0583e4616d5331f">EFI_DEV_PATH_PTR::Raw</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="0f96eb13321b1044816e9020fed24623"></a><!-- doxytag: member="EFI_DEV_PATH_PTR::Sata" ref="0f96eb13321b1044816e9020fed24623" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../df/de8/a00839.html">SATA_DEVICE_PATH</a>* <a class="el" href="../../da/db6/a00427.html#0f96eb13321b1044816e9020fed24623">EFI_DEV_PATH_PTR::Sata</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="1cad1912450dbe179eb6ef8543748fef"></a><!-- doxytag: member="EFI_DEV_PATH_PTR::Scsi" ref="1cad1912450dbe179eb6ef8543748fef" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d9/d61/a00840.html">SCSI_DEVICE_PATH</a>* <a class="el" href="../../da/db6/a00427.html#1cad1912450dbe179eb6ef8543748fef">EFI_DEV_PATH_PTR::Scsi</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="4f8eadee013391e123f4629519bb645c"></a><!-- doxytag: member="EFI_DEV_PATH_PTR::Uart" ref="4f8eadee013391e123f4629519bb645c" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d4/d95/a00989.html">UART_DEVICE_PATH</a>* <a class="el" href="../../da/db6/a00427.html#4f8eadee013391e123f4629519bb645c">EFI_DEV_PATH_PTR::Uart</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="24c08ff8dba036a0573fee82fe705149"></a><!-- doxytag: member="EFI_DEV_PATH_PTR::Usb" ref="24c08ff8dba036a0573fee82fe705149" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d3/daa/a00996.html">USB_DEVICE_PATH</a>* <a class="el" href="../../da/db6/a00427.html#24c08ff8dba036a0573fee82fe705149">EFI_DEV_PATH_PTR::Usb</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="3e383fb65e71e04f66b4dc280dfcf0fb"></a><!-- doxytag: member="EFI_DEV_PATH_PTR::UsbClass" ref="3e383fb65e71e04f66b4dc280dfcf0fb" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../da/d0a/a00993.html">USB_CLASS_DEVICE_PATH</a>* <a class="el" href="../../da/db6/a00427.html#3e383fb65e71e04f66b4dc280dfcf0fb">EFI_DEV_PATH_PTR::UsbClass</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="4e17089db99a4b087cd5e5ae55783411"></a><!-- doxytag: member="EFI_DEV_PATH_PTR::Vendor" ref="4e17089db99a4b087cd5e5ae55783411" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../df/d59/a01001.html">VENDOR_DEVICE_PATH</a>* <a class="el" href="../../da/db6/a00427.html#4e17089db99a4b087cd5e5ae55783411">EFI_DEV_PATH_PTR::Vendor</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:30 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

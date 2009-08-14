@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_PCI_CAPABILITY_PCIX_BRDG Struct Reference</title>
+<title>MdePkg[ALL]: EFI_LOADED_IMAGE_PROTOCOL Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,28 +21,251 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_PCI_CAPABILITY_PCIX_BRDG Struct Reference</h1><!-- doxytag: class="EFI_PCI_CAPABILITY_PCIX_BRDG" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_LOADED_IMAGE_PROTOCOL Struct Reference</h1><!-- doxytag: class="EFI_LOADED_IMAGE_PROTOCOL" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d72/a00541.html">EFI_PCI_CAPABILITY_HDR</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2b/a00546.html#3eebee702cbb1c5e9fafbdca1b6da3ab">Hdr</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2b/a00546.html#6b0ddaba01d4136da11f30772d583c85">Revision</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2b/a00546.html#bd813ee7e6165002c2e76348de1aa371">SecStatusReg</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2b/a00546.html#d99992b13b44e601714b2b7a4aa35099">ParentHandle</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2b/a00546.html#56cd632328696ae682604e232e14d351">StatusReg</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d6/dcf/a00645.html">EFI_SYSTEM_TABLE</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2b/a00546.html#db5f97bd37bebafaeaac74ca4e3a17ab">SystemTable</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2b/a00546.html#0c4670a04b60b4811b7e8e95844aaffe">SplitTransCtrlRegUp</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">the image's EFI system table pointer.  <a href="#db5f97bd37bebafaeaac74ca4e3a17ab"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2b/a00546.html#553847c3bcc0f8dbf525f0ac706c460f">DeviceHandle</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2b/a00546.html#0820d564926635eff02a6a82dc72d7a8">SplitTransCtrlRegDn</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The device handle that the EFI Image was loaded from.  <a href="#553847c3bcc0f8dbf525f0ac706c460f"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2b/a00546.html#12fde063d40994d91e74b4d284ef2409">FilePath</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2b/a00546.html#acbde63178293ed6fe1ce11c923eb7df">Reserved</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Reserved. DO NOT USE.  <a href="#acbde63178293ed6fe1ce11c923eb7df"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2b/a00546.html#5e9540c6774ba9911d04affe40df3a62">LoadOptionsSize</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The size in bytes of LoadOptions.  <a href="#5e9540c6774ba9911d04affe40df3a62"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2b/a00546.html#50ab8b290b68f20afe05705106a802e3">LoadOptions</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">A pointer to the image's binary load options.  <a href="#50ab8b290b68f20afe05705106a802e3"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2b/a00546.html#f9f43dabda8fdd671a4da01fbbc923f9">ImageBase</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The base address at which the image was loaded.  <a href="#f9f43dabda8fdd671a4da01fbbc923f9"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2b/a00546.html#d19421d1e2c3aa4d40d7c92c1455cd44">ImageSize</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The size in bytes of the loaded image.  <a href="#d19421d1e2c3aa4d40d7c92c1455cd44"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/d22/a01250.html#0e2cdd0290e753cca604d3977cbe8bb9">EFI_MEMORY_TYPE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2b/a00546.html#6007e874d69173f0e9d1fcd1382d0bd0">ImageCodeType</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The memory type that the code sections were loaded as.  <a href="#6007e874d69173f0e9d1fcd1382d0bd0"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/d22/a01250.html#0e2cdd0290e753cca604d3977cbe8bb9">EFI_MEMORY_TYPE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2b/a00546.html#3ed2c9a4f34701e6f6c13816b0d318bd">ImageDataType</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The memory type that the data sections were loaded as.  <a href="#3ed2c9a4f34701e6f6c13816b0d318bd"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d33/a01252.html#157a6d673850d8441f8386f3789b5f07">EFI_IMAGE_UNLOAD</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2b/a00546.html#ab351cf572de7dad9cf2eed1734f5838">Unload</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-PCI-X Bridge Capabilities List, Section 8.6.2, PCI-X Addendum to the PCI Local Bus Specification, Revision 1.0b <hr><h2>Field Documentation</h2>
-<a class="anchor" name="3eebee702cbb1c5e9fafbdca1b6da3ab"></a><!-- doxytag: member="EFI_PCI_CAPABILITY_PCIX_BRDG::Hdr" ref="3eebee702cbb1c5e9fafbdca1b6da3ab" args="" -->
+Can be used on any image handle to obtain information about the loaded image. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="553847c3bcc0f8dbf525f0ac706c460f"></a><!-- doxytag: member="EFI_LOADED_IMAGE_PROTOCOL::DeviceHandle" ref="553847c3bcc0f8dbf525f0ac706c460f" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dd/d72/a00541.html">EFI_PCI_CAPABILITY_HDR</a> <a class="el" href="../../dc/d2b/a00546.html#3eebee702cbb1c5e9fafbdca1b6da3ab">EFI_PCI_CAPABILITY_PCIX_BRDG::Hdr</a>          </td>
+          <td class="memname"><a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> <a class="el" href="../../dc/d2b/a00546.html#553847c3bcc0f8dbf525f0ac706c460f">EFI_LOADED_IMAGE_PROTOCOL::DeviceHandle</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+The device handle that the EFI Image was loaded from. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="12fde063d40994d91e74b4d284ef2409"></a><!-- doxytag: member="EFI_LOADED_IMAGE_PROTOCOL::FilePath" ref="12fde063d40994d91e74b4d284ef2409" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a>* <a class="el" href="../../dc/d2b/a00546.html#12fde063d40994d91e74b4d284ef2409">EFI_LOADED_IMAGE_PROTOCOL::FilePath</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+A pointer to the file path portion specific to DeviceHandle that the EFI Image was loaded from. 
+</div>
+</div><p>
+<a class="anchor" name="f9f43dabda8fdd671a4da01fbbc923f9"></a><!-- doxytag: member="EFI_LOADED_IMAGE_PROTOCOL::ImageBase" ref="f9f43dabda8fdd671a4da01fbbc923f9" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">VOID* <a class="el" href="../../dc/d2b/a00546.html#f9f43dabda8fdd671a4da01fbbc923f9">EFI_LOADED_IMAGE_PROTOCOL::ImageBase</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+The base address at which the image was loaded. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="6007e874d69173f0e9d1fcd1382d0bd0"></a><!-- doxytag: member="EFI_LOADED_IMAGE_PROTOCOL::ImageCodeType" ref="6007e874d69173f0e9d1fcd1382d0bd0" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d4/d22/a01250.html#0e2cdd0290e753cca604d3977cbe8bb9">EFI_MEMORY_TYPE</a> <a class="el" href="../../dc/d2b/a00546.html#6007e874d69173f0e9d1fcd1382d0bd0">EFI_LOADED_IMAGE_PROTOCOL::ImageCodeType</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+The memory type that the code sections were loaded as. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="3ed2c9a4f34701e6f6c13816b0d318bd"></a><!-- doxytag: member="EFI_LOADED_IMAGE_PROTOCOL::ImageDataType" ref="3ed2c9a4f34701e6f6c13816b0d318bd" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d4/d22/a01250.html#0e2cdd0290e753cca604d3977cbe8bb9">EFI_MEMORY_TYPE</a> <a class="el" href="../../dc/d2b/a00546.html#3ed2c9a4f34701e6f6c13816b0d318bd">EFI_LOADED_IMAGE_PROTOCOL::ImageDataType</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+The memory type that the data sections were loaded as. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="d19421d1e2c3aa4d40d7c92c1455cd44"></a><!-- doxytag: member="EFI_LOADED_IMAGE_PROTOCOL::ImageSize" ref="d19421d1e2c3aa4d40d7c92c1455cd44" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dc/d2b/a00546.html#d19421d1e2c3aa4d40d7c92c1455cd44">EFI_LOADED_IMAGE_PROTOCOL::ImageSize</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+The size in bytes of the loaded image. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="50ab8b290b68f20afe05705106a802e3"></a><!-- doxytag: member="EFI_LOADED_IMAGE_PROTOCOL::LoadOptions" ref="50ab8b290b68f20afe05705106a802e3" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">VOID* <a class="el" href="../../dc/d2b/a00546.html#50ab8b290b68f20afe05705106a802e3">EFI_LOADED_IMAGE_PROTOCOL::LoadOptions</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+A pointer to the image's binary load options. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="5e9540c6774ba9911d04affe40df3a62"></a><!-- doxytag: member="EFI_LOADED_IMAGE_PROTOCOL::LoadOptionsSize" ref="5e9540c6774ba9911d04affe40df3a62" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../dc/d2b/a00546.html#5e9540c6774ba9911d04affe40df3a62">EFI_LOADED_IMAGE_PROTOCOL::LoadOptionsSize</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+The size in bytes of LoadOptions. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="d99992b13b44e601714b2b7a4aa35099"></a><!-- doxytag: member="EFI_LOADED_IMAGE_PROTOCOL::ParentHandle" ref="d99992b13b44e601714b2b7a4aa35099" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> <a class="el" href="../../dc/d2b/a00546.html#d99992b13b44e601714b2b7a4aa35099">EFI_LOADED_IMAGE_PROTOCOL::ParentHandle</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Parent image's image handle. NULL if the image is loaded directly from the firmware's boot manager. 
+</div>
+</div><p>
+<a class="anchor" name="acbde63178293ed6fe1ce11c923eb7df"></a><!-- doxytag: member="EFI_LOADED_IMAGE_PROTOCOL::Reserved" ref="acbde63178293ed6fe1ce11c923eb7df" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">VOID* <a class="el" href="../../dc/d2b/a00546.html#acbde63178293ed6fe1ce11c923eb7df">EFI_LOADED_IMAGE_PROTOCOL::Reserved</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Reserved. DO NOT USE. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="6b0ddaba01d4136da11f30772d583c85"></a><!-- doxytag: member="EFI_LOADED_IMAGE_PROTOCOL::Revision" ref="6b0ddaba01d4136da11f30772d583c85" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../dc/d2b/a00546.html#6b0ddaba01d4136da11f30772d583c85">EFI_LOADED_IMAGE_PROTOCOL::Revision</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Defines the revision of the <a class="el" href="../../dc/d2b/a00546.html">EFI_LOADED_IMAGE_PROTOCOL</a> structure. All future revisions will be backward compatible to the current revision. 
+</div>
+</div><p>
+<a class="anchor" name="db5f97bd37bebafaeaac74ca4e3a17ab"></a><!-- doxytag: member="EFI_LOADED_IMAGE_PROTOCOL::SystemTable" ref="db5f97bd37bebafaeaac74ca4e3a17ab" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d6/dcf/a00645.html">EFI_SYSTEM_TABLE</a>* <a class="el" href="../../dc/d2b/a00546.html#db5f97bd37bebafaeaac74ca4e3a17ab">EFI_LOADED_IMAGE_PROTOCOL::SystemTable</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+the image's EFI system table pointer. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="ab351cf572de7dad9cf2eed1734f5838"></a><!-- doxytag: member="EFI_LOADED_IMAGE_PROTOCOL::Unload" ref="ab351cf572de7dad9cf2eed1734f5838" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d33/a01252.html#157a6d673850d8441f8386f3789b5f07">EFI_IMAGE_UNLOAD</a> <a class="el" href="../../dc/d2b/a00546.html#ab351cf572de7dad9cf2eed1734f5838">EFI_LOADED_IMAGE_PROTOCOL::Unload</a>          </td>
         </tr>
       </table>
 </div>
@@ -52,68 +275,8 @@ PCI-X Bridge Capabilities List, Section 8.6.2, PCI-X Addendum to the PCI Local B
 
 </div>
 </div><p>
-<a class="anchor" name="bd813ee7e6165002c2e76348de1aa371"></a><!-- doxytag: member="EFI_PCI_CAPABILITY_PCIX_BRDG::SecStatusReg" ref="bd813ee7e6165002c2e76348de1aa371" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dc/d2b/a00546.html#bd813ee7e6165002c2e76348de1aa371">EFI_PCI_CAPABILITY_PCIX_BRDG::SecStatusReg</a>          </td>
-        </tr>
-      </table>
 </div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="0820d564926635eff02a6a82dc72d7a8"></a><!-- doxytag: member="EFI_PCI_CAPABILITY_PCIX_BRDG::SplitTransCtrlRegDn" ref="0820d564926635eff02a6a82dc72d7a8" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../dc/d2b/a00546.html#0820d564926635eff02a6a82dc72d7a8">EFI_PCI_CAPABILITY_PCIX_BRDG::SplitTransCtrlRegDn</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="0c4670a04b60b4811b7e8e95844aaffe"></a><!-- doxytag: member="EFI_PCI_CAPABILITY_PCIX_BRDG::SplitTransCtrlRegUp" ref="0c4670a04b60b4811b7e8e95844aaffe" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../dc/d2b/a00546.html#0c4670a04b60b4811b7e8e95844aaffe">EFI_PCI_CAPABILITY_PCIX_BRDG::SplitTransCtrlRegUp</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="56cd632328696ae682604e232e14d351"></a><!-- doxytag: member="EFI_PCI_CAPABILITY_PCIX_BRDG::StatusReg" ref="56cd632328696ae682604e232e14d351" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../dc/d2b/a00546.html#56cd632328696ae682604e232e14d351">EFI_PCI_CAPABILITY_PCIX_BRDG::StatusReg</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-</div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:37 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

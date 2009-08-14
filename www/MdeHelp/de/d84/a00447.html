@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_HII_KEYBOARD_LAYOUT Struct Reference</title>
+<title>MdePkg[ALL]: EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,81 +21,217 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_HII_KEYBOARD_LAYOUT Struct Reference</h1><!-- doxytag: class="EFI_HII_KEYBOARD_LAYOUT" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET Struct Reference</h1><!-- doxytag: class="EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d84/a00447.html#4dfe2ffd193d37b25511ca1f7d21eb62">LayoutLength</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d84/a00447.html#7f575756b1c8dcaf4c3186e1fc23826b">Timeout</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d84/a00447.html#a3af7ada66f9a6059993e35f373da48c">Guid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d84/a00447.html#0e4f07e45e9f68af33e1e640d4d81be9">InDataBuffer</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d84/a00447.html#ef8da88ac1c8fc4fb076f1198c964e3a">LayoutDescriptorStringOffset</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d84/a00447.html#b609ab8d21902e2f73acef3d6d7e0a7c">OutDataBuffer</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d84/a00447.html#3e93acf4abe3dd33d624657f49d4816b">DescriptorCount</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d84/a00447.html#17eb9f2d073b0f65b49d6dd1c0be1fed">SenseData</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d84/a00447.html#3e4fd64ddd27b46e0587527eb530080f">Cdb</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d84/a00447.html#dc7c00e3a79ecb2101144db79e529eaf">InTransferLength</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d84/a00447.html#1993cc2dd526901b9cf409ee360f0e72">OutTransferLength</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d84/a00447.html#9923ddc491108ad51782da822ec1ab82">CdbLength</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d84/a00447.html#e47ce252912b4549930a607e5646f3d9">DataDirection</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d84/a00447.html#f3bc7535b46ddefdef522bb06688ee03">HostAdapterStatus</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d84/a00447.html#9c515569fc0566f5cfc9a869a48f58e8">TargetStatus</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d84/a00447.html#38c0d427e286eb8e1e4a436504e1af98">SenseDataLength</a></td></tr>
 
 </table>
 <hr><h2>Field Documentation</h2>
-<a class="anchor" name="3e93acf4abe3dd33d624657f49d4816b"></a><!-- doxytag: member="EFI_HII_KEYBOARD_LAYOUT::DescriptorCount" ref="3e93acf4abe3dd33d624657f49d4816b" args="" -->
+<a class="anchor" name="3e4fd64ddd27b46e0587527eb530080f"></a><!-- doxytag: member="EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET::Cdb" ref="3e4fd64ddd27b46e0587527eb530080f" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/d84/a00447.html#3e93acf4abe3dd33d624657f49d4816b">EFI_HII_KEYBOARD_LAYOUT::DescriptorCount</a>          </td>
+          <td class="memname">VOID* <a class="el" href="../../de/d84/a00447.html#3e4fd64ddd27b46e0587527eb530080f">EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET::Cdb</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+A pointer to buffer that contains the Command Data Block to send to the SCSI device specified by Target and Lun. 
 </div>
 </div><p>
-<a class="anchor" name="a3af7ada66f9a6059993e35f373da48c"></a><!-- doxytag: member="EFI_HII_KEYBOARD_LAYOUT::Guid" ref="a3af7ada66f9a6059993e35f373da48c" args="" -->
+<a class="anchor" name="9923ddc491108ad51782da822ec1ab82"></a><!-- doxytag: member="EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET::CdbLength" ref="9923ddc491108ad51782da822ec1ab82" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../de/d84/a00447.html#a3af7ada66f9a6059993e35f373da48c">EFI_HII_KEYBOARD_LAYOUT::Guid</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/d84/a00447.html#9923ddc491108ad51782da822ec1ab82">EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET::CdbLength</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The length, in bytes, of the buffer Cdb. The standard values are 6, 10, 12, and 16, but other values are possible if a variable length CDB is used. 
 </div>
 </div><p>
-<a class="anchor" name="ef8da88ac1c8fc4fb076f1198c964e3a"></a><!-- doxytag: member="EFI_HII_KEYBOARD_LAYOUT::LayoutDescriptorStringOffset" ref="ef8da88ac1c8fc4fb076f1198c964e3a" args="" -->
+<a class="anchor" name="e47ce252912b4549930a607e5646f3d9"></a><!-- doxytag: member="EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET::DataDirection" ref="e47ce252912b4549930a607e5646f3d9" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../de/d84/a00447.html#ef8da88ac1c8fc4fb076f1198c964e3a">EFI_HII_KEYBOARD_LAYOUT::LayoutDescriptorStringOffset</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/d84/a00447.html#e47ce252912b4549930a607e5646f3d9">EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET::DataDirection</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The direction of the data transfer. 0 for reads, 1 for writes. A value of 2 is Reserved for Bi-Directional SCSI commands. 
 </div>
 </div><p>
-<a class="anchor" name="4dfe2ffd193d37b25511ca1f7d21eb62"></a><!-- doxytag: member="EFI_HII_KEYBOARD_LAYOUT::LayoutLength" ref="4dfe2ffd193d37b25511ca1f7d21eb62" args="" -->
+<a class="anchor" name="f3bc7535b46ddefdef522bb06688ee03"></a><!-- doxytag: member="EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET::HostAdapterStatus" ref="f3bc7535b46ddefdef522bb06688ee03" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../de/d84/a00447.html#4dfe2ffd193d37b25511ca1f7d21eb62">EFI_HII_KEYBOARD_LAYOUT::LayoutLength</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/d84/a00447.html#f3bc7535b46ddefdef522bb06688ee03">EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET::HostAdapterStatus</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+The status of the host adapter specified by This when the SCSI Request Packet was executed on the target device. 
+</div>
+</div><p>
+<a class="anchor" name="0e4f07e45e9f68af33e1e640d4d81be9"></a><!-- doxytag: member="EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET::InDataBuffer" ref="0e4f07e45e9f68af33e1e640d4d81be9" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">VOID* <a class="el" href="../../de/d84/a00447.html#0e4f07e45e9f68af33e1e640d4d81be9">EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET::InDataBuffer</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
 
+<p>
+A pointer to the data buffer to transfer between the SCSI controller and the SCSI device for read and bidirectional commands. 
+</div>
+</div><p>
+<a class="anchor" name="dc7c00e3a79ecb2101144db79e529eaf"></a><!-- doxytag: member="EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET::InTransferLength" ref="dc7c00e3a79ecb2101144db79e529eaf" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../de/d84/a00447.html#dc7c00e3a79ecb2101144db79e529eaf">EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET::InTransferLength</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+On Input, the size, in bytes, of InDataBuffer. On output, the number of bytes transferred between the SCSI controller and the SCSI device. 
+</div>
+</div><p>
+<a class="anchor" name="b609ab8d21902e2f73acef3d6d7e0a7c"></a><!-- doxytag: member="EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET::OutDataBuffer" ref="b609ab8d21902e2f73acef3d6d7e0a7c" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">VOID* <a class="el" href="../../de/d84/a00447.html#b609ab8d21902e2f73acef3d6d7e0a7c">EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET::OutDataBuffer</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+A pointer to the data buffer to transfer between the SCSI controller and the SCSI device for write or bidirectional commands. 
+</div>
+</div><p>
+<a class="anchor" name="1993cc2dd526901b9cf409ee360f0e72"></a><!-- doxytag: member="EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET::OutTransferLength" ref="1993cc2dd526901b9cf409ee360f0e72" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../de/d84/a00447.html#1993cc2dd526901b9cf409ee360f0e72">EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET::OutTransferLength</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+On Input, the size, in bytes of OutDataBuffer. On Output, the Number of bytes transferred between SCSI Controller and the SCSI device. 
+</div>
+</div><p>
+<a class="anchor" name="17eb9f2d073b0f65b49d6dd1c0be1fed"></a><!-- doxytag: member="EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET::SenseData" ref="17eb9f2d073b0f65b49d6dd1c0be1fed" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">VOID* <a class="el" href="../../de/d84/a00447.html#17eb9f2d073b0f65b49d6dd1c0be1fed">EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET::SenseData</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+A pointer to the sense data that was generated by the execution of the SCSI Request Packet. 
+</div>
+</div><p>
+<a class="anchor" name="38c0d427e286eb8e1e4a436504e1af98"></a><!-- doxytag: member="EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET::SenseDataLength" ref="38c0d427e286eb8e1e4a436504e1af98" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/d84/a00447.html#38c0d427e286eb8e1e4a436504e1af98">EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET::SenseDataLength</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+On input, the length in bytes of the SenseData buffer. On output, the number of bytes written to the SenseData buffer. 
+</div>
+</div><p>
+<a class="anchor" name="9c515569fc0566f5cfc9a869a48f58e8"></a><!-- doxytag: member="EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET::TargetStatus" ref="9c515569fc0566f5cfc9a869a48f58e8" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/d84/a00447.html#9c515569fc0566f5cfc9a869a48f58e8">EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET::TargetStatus</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+The status returned by the device specified by Target and Lun when the SCSI Request Packet was executed. 
+</div>
+</div><p>
+<a class="anchor" name="7f575756b1c8dcaf4c3186e1fc23826b"></a><!-- doxytag: member="EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET::Timeout" ref="7f575756b1c8dcaf4c3186e1fc23826b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../de/d84/a00447.html#7f575756b1c8dcaf4c3186e1fc23826b">EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET::Timeout</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+The timeout, in 100 ns units, to use for the execution of this SCSI Request Packet. A Timeout value of 0 means that this function will wait indefinitely for the SCSI Request Packet to execute. If Timeout is greater than zero, then this function will return EFI_TIMEOUT if the time required to execute the SCSI Request Packet is greater than Timeout. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:31 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

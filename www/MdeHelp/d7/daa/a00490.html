@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_IMAGE_SECTION_HEADER Struct Reference</title>
+<title>MdePkg[ALL]: EFI_HOB_MEMORY_ALLOCATION_MODULE Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,220 +21,82 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_IMAGE_SECTION_HEADER Struct Reference</h1><!-- doxytag: class="EFI_IMAGE_SECTION_HEADER" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_HOB_MEMORY_ALLOCATION_MODULE Struct Reference</h1><!-- doxytag: class="EFI_HOB_MEMORY_ALLOCATION_MODULE" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daa/a00490.html#04e48a0272f26e250f2aa1e66e39b88d">Name</a> [EFI_IMAGE_SIZEOF_SHORT_NAME]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d89/a00484.html">EFI_HOB_GENERIC_HEADER</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daa/a00490.html#b4174fe471d57a37255e3d3fd7ef2f1f">Header</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap>union {</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../da/d05/a00489.html">EFI_HOB_MEMORY_ALLOCATION_HEADER</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daa/a00490.html#fca26a0c58a30e10078e6588e2c5bcff">MemoryAllocationHeader</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d7/daa/a00490.html#9dccbee31f42a1e94fbc458b5fe8d3a0">PhysicalAddress</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daa/a00490.html#c38e1e07c9d680617d305f1210362c85">ModuleName</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d7/daa/a00490.html#545286ffee59a1ebde5cfc0098b68040">VirtualSize</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap valign="top">}&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daa/a00490.html#d62bc4f4962c0b9a785db1b1c6b5b549">Misc</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daa/a00490.html#20668536d8a8d9698ef3707c723f32ac">VirtualAddress</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daa/a00490.html#760dba67bb281cfc35691ca280b5b123">SizeOfRawData</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daa/a00490.html#30fd0f907ed011a3cf9d77ab77eea95c">PointerToRawData</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daa/a00490.html#84c6bc13835146c3d5b3c7d706a0e1fa">PointerToRelocations</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daa/a00490.html#893caf163179c3780f8d37b28f5b9a97">PointerToLinenumbers</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daa/a00490.html#8bd76a2fc0265a9dc40fafac088ab63a">NumberOfRelocations</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daa/a00490.html#66a38e5c11244df561d8d3efa19f417e">NumberOfLinenumbers</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daa/a00490.html#b0ead5a3bfdfd338041db04fdca59619">Characteristics</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d95/a01247.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daa/a00490.html#7224011f60c43acc745daadf9a449e8d">EntryPoint</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Section Table, this table immediately follows the optional header <hr><h2>Field Documentation</h2>
-<a class="anchor" name="b0ead5a3bfdfd338041db04fdca59619"></a><!-- doxytag: member="EFI_IMAGE_SECTION_HEADER::Characteristics" ref="b0ead5a3bfdfd338041db04fdca59619" args="" -->
+Defines the location and entry point of the HOB consumer phase. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="7224011f60c43acc745daadf9a449e8d"></a><!-- doxytag: member="EFI_HOB_MEMORY_ALLOCATION_MODULE::EntryPoint" ref="7224011f60c43acc745daadf9a449e8d" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/daa/a00490.html#b0ead5a3bfdfd338041db04fdca59619">EFI_IMAGE_SECTION_HEADER::Characteristics</a>          </td>
+          <td class="memname"><a class="el" href="../../dd/d95/a01247.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> <a class="el" href="../../d7/daa/a00490.html#7224011f60c43acc745daadf9a449e8d">EFI_HOB_MEMORY_ALLOCATION_MODULE::EntryPoint</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The address of the memory-mapped firmware volume that contains the HOB consumer phase firmware file. 
 </div>
 </div><p>
-<a class="anchor" name="d62bc4f4962c0b9a785db1b1c6b5b549"></a><!-- doxytag: member="EFI_IMAGE_SECTION_HEADER::Misc" ref="d62bc4f4962c0b9a785db1b1c6b5b549" args="" -->
+<a class="anchor" name="b4174fe471d57a37255e3d3fd7ef2f1f"></a><!-- doxytag: member="EFI_HOB_MEMORY_ALLOCATION_MODULE::Header" ref="b4174fe471d57a37255e3d3fd7ef2f1f" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">union { ... }   <a class="el" href="../../d7/daa/a00490.html#d62bc4f4962c0b9a785db1b1c6b5b549">EFI_IMAGE_SECTION_HEADER::Misc</a>          </td>
+          <td class="memname"><a class="el" href="../../d8/d89/a00484.html">EFI_HOB_GENERIC_HEADER</a> <a class="el" href="../../d7/daa/a00490.html#b4174fe471d57a37255e3d3fd7ef2f1f">EFI_HOB_MEMORY_ALLOCATION_MODULE::Header</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The HOB generic header. Header.HobType = EFI_HOB_TYPE_MEMORY_ALLOCATION. 
 </div>
 </div><p>
-<a class="anchor" name="04e48a0272f26e250f2aa1e66e39b88d"></a><!-- doxytag: member="EFI_IMAGE_SECTION_HEADER::Name" ref="04e48a0272f26e250f2aa1e66e39b88d" args="[EFI_IMAGE_SIZEOF_SHORT_NAME]" -->
+<a class="anchor" name="fca26a0c58a30e10078e6588e2c5bcff"></a><!-- doxytag: member="EFI_HOB_MEMORY_ALLOCATION_MODULE::MemoryAllocationHeader" ref="fca26a0c58a30e10078e6588e2c5bcff" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d7/daa/a00490.html#04e48a0272f26e250f2aa1e66e39b88d">EFI_IMAGE_SECTION_HEADER::Name</a>[EFI_IMAGE_SIZEOF_SHORT_NAME]          </td>
+          <td class="memname"><a class="el" href="../../da/d05/a00489.html">EFI_HOB_MEMORY_ALLOCATION_HEADER</a> <a class="el" href="../../d7/daa/a00490.html#fca26a0c58a30e10078e6588e2c5bcff">EFI_HOB_MEMORY_ALLOCATION_MODULE::MemoryAllocationHeader</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+An instance of the <a class="el" href="../../da/d05/a00489.html">EFI_HOB_MEMORY_ALLOCATION_HEADER</a> that describes the various attributes of the logical memory allocation. 
 </div>
 </div><p>
-<a class="anchor" name="66a38e5c11244df561d8d3efa19f417e"></a><!-- doxytag: member="EFI_IMAGE_SECTION_HEADER::NumberOfLinenumbers" ref="66a38e5c11244df561d8d3efa19f417e" args="" -->
+<a class="anchor" name="c38e1e07c9d680617d305f1210362c85"></a><!-- doxytag: member="EFI_HOB_MEMORY_ALLOCATION_MODULE::ModuleName" ref="c38e1e07c9d680617d305f1210362c85" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d7/daa/a00490.html#66a38e5c11244df561d8d3efa19f417e">EFI_IMAGE_SECTION_HEADER::NumberOfLinenumbers</a>          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../d7/daa/a00490.html#c38e1e07c9d680617d305f1210362c85">EFI_HOB_MEMORY_ALLOCATION_MODULE::ModuleName</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<a class="anchor" name="8bd76a2fc0265a9dc40fafac088ab63a"></a><!-- doxytag: member="EFI_IMAGE_SECTION_HEADER::NumberOfRelocations" ref="8bd76a2fc0265a9dc40fafac088ab63a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d7/daa/a00490.html#8bd76a2fc0265a9dc40fafac088ab63a">EFI_IMAGE_SECTION_HEADER::NumberOfRelocations</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="9dccbee31f42a1e94fbc458b5fe8d3a0"></a><!-- doxytag: member="EFI_IMAGE_SECTION_HEADER::PhysicalAddress" ref="9dccbee31f42a1e94fbc458b5fe8d3a0" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/daa/a00490.html#9dccbee31f42a1e94fbc458b5fe8d3a0">EFI_IMAGE_SECTION_HEADER::PhysicalAddress</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="893caf163179c3780f8d37b28f5b9a97"></a><!-- doxytag: member="EFI_IMAGE_SECTION_HEADER::PointerToLinenumbers" ref="893caf163179c3780f8d37b28f5b9a97" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/daa/a00490.html#893caf163179c3780f8d37b28f5b9a97">EFI_IMAGE_SECTION_HEADER::PointerToLinenumbers</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="30fd0f907ed011a3cf9d77ab77eea95c"></a><!-- doxytag: member="EFI_IMAGE_SECTION_HEADER::PointerToRawData" ref="30fd0f907ed011a3cf9d77ab77eea95c" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/daa/a00490.html#30fd0f907ed011a3cf9d77ab77eea95c">EFI_IMAGE_SECTION_HEADER::PointerToRawData</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="84c6bc13835146c3d5b3c7d706a0e1fa"></a><!-- doxytag: member="EFI_IMAGE_SECTION_HEADER::PointerToRelocations" ref="84c6bc13835146c3d5b3c7d706a0e1fa" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/daa/a00490.html#84c6bc13835146c3d5b3c7d706a0e1fa">EFI_IMAGE_SECTION_HEADER::PointerToRelocations</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="760dba67bb281cfc35691ca280b5b123"></a><!-- doxytag: member="EFI_IMAGE_SECTION_HEADER::SizeOfRawData" ref="760dba67bb281cfc35691ca280b5b123" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/daa/a00490.html#760dba67bb281cfc35691ca280b5b123">EFI_IMAGE_SECTION_HEADER::SizeOfRawData</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="20668536d8a8d9698ef3707c723f32ac"></a><!-- doxytag: member="EFI_IMAGE_SECTION_HEADER::VirtualAddress" ref="20668536d8a8d9698ef3707c723f32ac" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/daa/a00490.html#20668536d8a8d9698ef3707c723f32ac">EFI_IMAGE_SECTION_HEADER::VirtualAddress</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="545286ffee59a1ebde5cfc0098b68040"></a><!-- doxytag: member="EFI_IMAGE_SECTION_HEADER::VirtualSize" ref="545286ffee59a1ebde5cfc0098b68040" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/daa/a00490.html#545286ffee59a1ebde5cfc0098b68040">EFI_IMAGE_SECTION_HEADER::VirtualSize</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
+The <a class="el" href="../../d1/d87/a00689.html">GUID</a> specifying the values of the firmware file system name that contains the HOB consumer phase component. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:33 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

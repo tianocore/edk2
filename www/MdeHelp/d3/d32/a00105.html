@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: _EFI_HII_STRING_PROTOCOL Struct Reference</title>
+<title>MdePkg[ALL]: _EFI_HII_STRING_PACKAGE_HDR Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,28 +21,30 @@
   </div>
 </div>
 <div class="contents">
-<h1>_EFI_HII_STRING_PROTOCOL Struct Reference</h1><!-- doxytag: class="_EFI_HII_STRING_PROTOCOL" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>_EFI_HII_STRING_PACKAGE_HDR Struct Reference</h1><!-- doxytag: class="_EFI_HII_STRING_PACKAGE_HDR" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d39/a01138.html#d81a059f43f1d884e3dcf628b3939a96">EFI_HII_NEW_STRING</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d32/a00105.html#6a05930c5ca04569ce60766ce9dd2e9f">NewString</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dca/a00477.html">EFI_HII_PACKAGE_HEADER</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d32/a00105.html#6cf0d3cb4976dcd52543f77c0aae47ab">Header</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d39/a01138.html#dcdae45a154b13d2f2f817a73ecc4a23">EFI_HII_GET_STRING</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d32/a00105.html#1a9cae1976c6424cf2715eb37c4a0397">GetString</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d32/a00105.html#a11d4b60d8c26739cbcdd4af8e166fa0">HdrSize</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d39/a01138.html#512ec3fc0bf1f6eef3ef7e84ad65fb5b">EFI_HII_SET_STRING</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d32/a00105.html#a9e1116d09e69137ca3dce0076f51c88">SetString</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d32/a00105.html#3fd5eb866585a9afcddaf7e0b0c3969a">StringInfoOffset</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d39/a01138.html#4af028cf55f8c27be1f4c4ed5eb8cf96">EFI_HII_GET_LANGUAGES</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d32/a00105.html#3e12c4d2e1ff4161e2302d4237a6513b">GetLanguages</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d32/a00105.html#83b5a0bbc0e8bcdeb08f056d4a568a95">LanguageWindow</a> [16]</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d39/a01138.html#e2b4a098f73d7526550c32c85e5e21cf">EFI_HII_GET_2ND_LANGUAGES</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d32/a00105.html#905928674b351984172d7c69a3c3b579">GetSecondaryLanguages</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/d7b/a01249.html#ed584a1cd697a25504fd17a5c82dc1d7">EFI_STRING_ID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d32/a00105.html#9a20d2cff160de8fc0e0debda38c06c1">LanguageName</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d32/a00105.html#84837dc2e28209863b68ce797761e4d4">Language</a> [1]</td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Services to manipulate the string. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="3e12c4d2e1ff4161e2302d4237a6513b"></a><!-- doxytag: member="_EFI_HII_STRING_PROTOCOL::GetLanguages" ref="3e12c4d2e1ff4161e2302d4237a6513b" args="" -->
+The fixed header consists of a standard record header and then the string identifiers contained in this section and the offsets of the string and language information. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="a11d4b60d8c26739cbcdd4af8e166fa0"></a><!-- doxytag: member="_EFI_HII_STRING_PACKAGE_HDR::HdrSize" ref="a11d4b60d8c26739cbcdd4af8e166fa0" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d39/a01138.html#4af028cf55f8c27be1f4c4ed5eb8cf96">EFI_HII_GET_LANGUAGES</a> <a class="el" href="../../d3/d32/a00105.html#3e12c4d2e1ff4161e2302d4237a6513b">_EFI_HII_STRING_PROTOCOL::GetLanguages</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d3/d32/a00105.html#a11d4b60d8c26739cbcdd4af8e166fa0">_EFI_HII_STRING_PACKAGE_HDR::HdrSize</a>          </td>
         </tr>
       </table>
 </div>
@@ -52,12 +54,12 @@ Services to manipulate the string. <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="905928674b351984172d7c69a3c3b579"></a><!-- doxytag: member="_EFI_HII_STRING_PROTOCOL::GetSecondaryLanguages" ref="905928674b351984172d7c69a3c3b579" args="" -->
+<a class="anchor" name="6cf0d3cb4976dcd52543f77c0aae47ab"></a><!-- doxytag: member="_EFI_HII_STRING_PACKAGE_HDR::Header" ref="6cf0d3cb4976dcd52543f77c0aae47ab" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d39/a01138.html#e2b4a098f73d7526550c32c85e5e21cf">EFI_HII_GET_2ND_LANGUAGES</a> <a class="el" href="../../d3/d32/a00105.html#905928674b351984172d7c69a3c3b579">_EFI_HII_STRING_PROTOCOL::GetSecondaryLanguages</a>          </td>
+          <td class="memname"><a class="el" href="../../d9/dca/a00477.html">EFI_HII_PACKAGE_HEADER</a> <a class="el" href="../../d3/d32/a00105.html#6cf0d3cb4976dcd52543f77c0aae47ab">_EFI_HII_STRING_PACKAGE_HDR::Header</a>          </td>
         </tr>
       </table>
 </div>
@@ -67,12 +69,12 @@ Services to manipulate the string. <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="1a9cae1976c6424cf2715eb37c4a0397"></a><!-- doxytag: member="_EFI_HII_STRING_PROTOCOL::GetString" ref="1a9cae1976c6424cf2715eb37c4a0397" args="" -->
+<a class="anchor" name="84837dc2e28209863b68ce797761e4d4"></a><!-- doxytag: member="_EFI_HII_STRING_PACKAGE_HDR::Language" ref="84837dc2e28209863b68ce797761e4d4" args="[1]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d39/a01138.html#dcdae45a154b13d2f2f817a73ecc4a23">EFI_HII_GET_STRING</a> <a class="el" href="../../d3/d32/a00105.html#1a9cae1976c6424cf2715eb37c4a0397">_EFI_HII_STRING_PROTOCOL::GetString</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> <a class="el" href="../../d3/d32/a00105.html#84837dc2e28209863b68ce797761e4d4">_EFI_HII_STRING_PACKAGE_HDR::Language</a>[1]          </td>
         </tr>
       </table>
 </div>
@@ -82,12 +84,12 @@ Services to manipulate the string. <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="6a05930c5ca04569ce60766ce9dd2e9f"></a><!-- doxytag: member="_EFI_HII_STRING_PROTOCOL::NewString" ref="6a05930c5ca04569ce60766ce9dd2e9f" args="" -->
+<a class="anchor" name="9a20d2cff160de8fc0e0debda38c06c1"></a><!-- doxytag: member="_EFI_HII_STRING_PACKAGE_HDR::LanguageName" ref="9a20d2cff160de8fc0e0debda38c06c1" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d39/a01138.html#d81a059f43f1d884e3dcf628b3939a96">EFI_HII_NEW_STRING</a> <a class="el" href="../../d3/d32/a00105.html#6a05930c5ca04569ce60766ce9dd2e9f">_EFI_HII_STRING_PROTOCOL::NewString</a>          </td>
+          <td class="memname"><a class="el" href="../../d3/d7b/a01249.html#ed584a1cd697a25504fd17a5c82dc1d7">EFI_STRING_ID</a> <a class="el" href="../../d3/d32/a00105.html#9a20d2cff160de8fc0e0debda38c06c1">_EFI_HII_STRING_PACKAGE_HDR::LanguageName</a>          </td>
         </tr>
       </table>
 </div>
@@ -97,12 +99,27 @@ Services to manipulate the string. <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="a9e1116d09e69137ca3dce0076f51c88"></a><!-- doxytag: member="_EFI_HII_STRING_PROTOCOL::SetString" ref="a9e1116d09e69137ca3dce0076f51c88" args="" -->
+<a class="anchor" name="83b5a0bbc0e8bcdeb08f056d4a568a95"></a><!-- doxytag: member="_EFI_HII_STRING_PACKAGE_HDR::LanguageWindow" ref="83b5a0bbc0e8bcdeb08f056d4a568a95" args="[16]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d39/a01138.html#512ec3fc0bf1f6eef3ef7e84ad65fb5b">EFI_HII_SET_STRING</a> <a class="el" href="../../d3/d32/a00105.html#a9e1116d09e69137ca3dce0076f51c88">_EFI_HII_STRING_PROTOCOL::SetString</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> <a class="el" href="../../d3/d32/a00105.html#83b5a0bbc0e8bcdeb08f056d4a568a95">_EFI_HII_STRING_PACKAGE_HDR::LanguageWindow</a>[16]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="3fd5eb866585a9afcddaf7e0b0c3969a"></a><!-- doxytag: member="_EFI_HII_STRING_PACKAGE_HDR::StringInfoOffset" ref="3fd5eb866585a9afcddaf7e0b0c3969a" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d3/d32/a00105.html#3fd5eb866585a9afcddaf7e0b0c3969a">_EFI_HII_STRING_PACKAGE_HDR::StringInfoOffset</a>          </td>
         </tr>
       </table>
 </div>
@@ -113,7 +130,7 @@ Services to manipulate the string. <hr><h2>Field Documentation</h2>
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:12 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:08 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

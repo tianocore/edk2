@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: _EFI_PEI_SECURITY2_PPI Struct Reference</title>
+<title>MdePkg[ALL]: _EFI_PEI_DEVICE_RECOVERY_MODULE_PPI Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,31 +21,74 @@
   </div>
 </div>
 <div class="contents">
-<h1>_EFI_PEI_SECURITY2_PPI Struct Reference</h1><!-- doxytag: class="_EFI_PEI_SECURITY2_PPI" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>_EFI_PEI_DEVICE_RECOVERY_MODULE_PPI Struct Reference</h1><!-- doxytag: class="_EFI_PEI_DEVICE_RECOVERY_MODULE_PPI" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/dc4/a01089.html#5ad86bfecf7c5f00d536db580feb4f35">EFI_PEI_SECURITY_AUTHENTICATION_STATE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dc2/a00228.html#29e66d27b74d7e623cc82195a7f703b3">AuthenticationState</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../db/d32/a01122.html#3d25b7ce0cda39be368ce5cc45cf53b0">EFI_PEI_DEVICE_GET_NUMBER_RECOVERY_CAPSULE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dc2/a00228.html#2755e864b97611dac05691587f9ae011">GetNumberRecoveryCapsules</a></td></tr>
 
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Returns the number of DXE capsules residing on the device.  <a href="#2755e864b97611dac05691587f9ae011"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../db/d32/a01122.html#174c9e6eda82b2fc8c26e9a67fd0dd63">EFI_PEI_DEVICE_GET_RECOVERY_CAPSULE_INFO</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dc2/a00228.html#ddc549c3ec0ec1368597dd7e9fcd8ec1">GetRecoveryCapsuleInfo</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Returns the size and type of the requested recovery capsule.  <a href="#ddc549c3ec0ec1368597dd7e9fcd8ec1"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../db/d32/a01122.html#3bd93eda997442b6d0143e4329dd514c">EFI_PEI_DEVICE_LOAD_RECOVERY_CAPSULE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dc2/a00228.html#5741deda1cc126da13875803e35f7429">LoadRecoveryCapsule</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Loads a DXE capsule from some media into memory.  <a href="#5741deda1cc126da13875803e35f7429"></a><br></td></tr>
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-This PPI is a means by which the platform builder can indicate a response to a PEIM's authentication state. This can be in the form of a requirement for the PEI Foundation to skip a module using the DeferExecution Boolean output in the <a class="el" href="../../de/dc2/a00228.html#29e66d27b74d7e623cc82195a7f703b3">AuthenticationState()</a> member function. Alternately, the Security PPI can invoke something like a cryptographic PPI that hashes the PEIM contents to log attestations, for which the FileHandle parameter in <a class="el" href="../../de/dc2/a00228.html#29e66d27b74d7e623cc82195a7f703b3">AuthenticationState()</a> will be useful. If this PPI does not exist, PEIMs will be considered trusted. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="29e66d27b74d7e623cc82195a7f703b3"></a><!-- doxytag: member="_EFI_PEI_SECURITY2_PPI::AuthenticationState" ref="29e66d27b74d7e623cc82195a7f703b3" args="" -->
+Presents a standard interface to EFI_PEI_DEVICE_RECOVERY_MODULE_PPI, regardless of the underlying device(s). <hr><h2>Field Documentation</h2>
+<a class="anchor" name="2755e864b97611dac05691587f9ae011"></a><!-- doxytag: member="_EFI_PEI_DEVICE_RECOVERY_MODULE_PPI::GetNumberRecoveryCapsules" ref="2755e864b97611dac05691587f9ae011" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d3/dc4/a01089.html#5ad86bfecf7c5f00d536db580feb4f35">EFI_PEI_SECURITY_AUTHENTICATION_STATE</a> <a class="el" href="../../de/dc2/a00228.html#29e66d27b74d7e623cc82195a7f703b3">_EFI_PEI_SECURITY2_PPI::AuthenticationState</a>          </td>
+          <td class="memname"><a class="el" href="../../db/d32/a01122.html#3d25b7ce0cda39be368ce5cc45cf53b0">EFI_PEI_DEVICE_GET_NUMBER_RECOVERY_CAPSULE</a> <a class="el" href="../../de/dc2/a00228.html#2755e864b97611dac05691587f9ae011">_EFI_PEI_DEVICE_RECOVERY_MODULE_PPI::GetNumberRecoveryCapsules</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+Returns the number of DXE capsules residing on the device. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="ddc549c3ec0ec1368597dd7e9fcd8ec1"></a><!-- doxytag: member="_EFI_PEI_DEVICE_RECOVERY_MODULE_PPI::GetRecoveryCapsuleInfo" ref="ddc549c3ec0ec1368597dd7e9fcd8ec1" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../db/d32/a01122.html#174c9e6eda82b2fc8c26e9a67fd0dd63">EFI_PEI_DEVICE_GET_RECOVERY_CAPSULE_INFO</a> <a class="el" href="../../de/dc2/a00228.html#ddc549c3ec0ec1368597dd7e9fcd8ec1">_EFI_PEI_DEVICE_RECOVERY_MODULE_PPI::GetRecoveryCapsuleInfo</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Returns the size and type of the requested recovery capsule. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="5741deda1cc126da13875803e35f7429"></a><!-- doxytag: member="_EFI_PEI_DEVICE_RECOVERY_MODULE_PPI::LoadRecoveryCapsule" ref="5741deda1cc126da13875803e35f7429" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../db/d32/a01122.html#3bd93eda997442b6d0143e4329dd514c">EFI_PEI_DEVICE_LOAD_RECOVERY_CAPSULE</a> <a class="el" href="../../de/dc2/a00228.html#5741deda1cc126da13875803e35f7429">_EFI_PEI_DEVICE_RECOVERY_MODULE_PPI::LoadRecoveryCapsule</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Loads a DXE capsule from some media into memory. 
+<p>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:13 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:16 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

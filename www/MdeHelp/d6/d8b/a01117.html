@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Protocol/DriverConfiguration.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Protocol/BlockIo.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,38 +21,83 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Protocol/DriverConfiguration.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Protocol/BlockIo.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d11/a00021.html">_EFI_DRIVER_CONFIGURATION_PROTOCOL</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de8/a00405.html">EFI_BLOCK_IO_MEDIA</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d5e/a00007.html">_EFI_BLOCK_IO_PROTOCOL</a></td></tr>
 
 <tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d8b/a01117.html#e811859185b517e7afb6146bfa422f64">EFI_DRIVER_CONFIGURATION_PROTOCOL_GUID</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d8b/a01117.html#8350b9f7cba606d10dbd79eb534f8699">EFI_BLOCK_IO_PROTOCOL_GUID</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d8b/a01117.html#f77eec10d0ff1c1d581ecc7404d239bb">BLOCK_IO_PROTOCOL</a>&nbsp;&nbsp;&nbsp;EFI_BLOCK_IO_PROTOCOL_GUID</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d8b/a01117.html#70776bda8f7bf7995af819d25863ce5b">EFI_BLOCK_IO_PROTOCOL_REVISION</a>&nbsp;&nbsp;&nbsp;0x00010000</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d8b/a01117.html#d4e8020520c5d8b94dff6ae91fab8b19">EFI_BLOCK_IO_PROTOCOL_REVISION2</a>&nbsp;&nbsp;&nbsp;0x00020001</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d8b/a01117.html#cfbbdcc56db2cb09ce44e401dbcf8f07">EFI_BLOCK_IO_INTERFACE_REVISION</a>&nbsp;&nbsp;&nbsp;EFI_BLOCK_IO_PROTOCOL_REVISION</td></tr>
 
 <tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
-<a class="el" href="../../de/d11/a00021.html">_EFI_DRIVER_CONFIGURATION_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d8b/a01117.html#d0c4d44cf16410f08412c9b9908c7569">EFI_DRIVER_CONFIGURATION_PROTOCOL</a></td></tr>
+<a class="el" href="../../de/d5e/a00007.html">_EFI_BLOCK_IO_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d8b/a01117.html#ffa68eab6f051542c0a574c24591f183">EFI_BLOCK_IO_PROTOCOL</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d8b/a01117.html#6c1f98f4eb7c7faa3e492f8a07504942">EFI_DRIVER_CONFIGURATION_SET_OPTIONS</a> )(IN <a class="el" href="../../de/d11/a00021.html">EFI_DRIVER_CONFIGURATION_PROTOCOL</a> *This, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ControllerHandle, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ChildHandle, IN <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Language, OUT <a class="el" href="../../dd/d09/a01118.html#6a909a927a91f9f2e7b25d05c51e35a2">EFI_DRIVER_CONFIGURATION_ACTION_REQUIRED</a> *ActionRequired)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../de/d5e/a00007.html">EFI_BLOCK_IO_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d8b/a01117.html#0b1d66f1cd207006df62ab9f1073fae8">EFI_BLOCK_IO</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d8b/a01117.html#ddec3ef05f7b773469cde934f0c05cc2">EFI_DRIVER_CONFIGURATION_OPTIONS_VALID</a> )(IN <a class="el" href="../../de/d11/a00021.html">EFI_DRIVER_CONFIGURATION_PROTOCOL</a> *This, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ControllerHandle, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ChildHandle)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d8b/a01117.html#1cca179d8e424e01e1c4e497158a3982">EFI_BLOCK_RESET</a> )(IN <a class="el" href="../../de/d5e/a00007.html">EFI_BLOCK_IO_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> ExtendedVerification)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d8b/a01117.html#911786bcae93ce69494222b6af5a29df">EFI_DRIVER_CONFIGURATION_FORCE_DEFAULTS</a> )(IN <a class="el" href="../../de/d11/a00021.html">EFI_DRIVER_CONFIGURATION_PROTOCOL</a> *This, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ControllerHandle, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ChildHandle, IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> DefaultType, OUT <a class="el" href="../../dd/d09/a01118.html#6a909a927a91f9f2e7b25d05c51e35a2">EFI_DRIVER_CONFIGURATION_ACTION_REQUIRED</a> *ActionRequired)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d8b/a01117.html#8dd77a48d990df6f2a54c8c9ab045246">EFI_BLOCK_READ</a> )(IN <a class="el" href="../../de/d5e/a00007.html">EFI_BLOCK_IO_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> MediaId, IN <a class="el" href="../../dd/d95/a01247.html#3495b0e526b2172f98d5bde00bf28b72">EFI_LBA</a> Lba, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> BufferSize, OUT VOID *Buffer)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d8b/a01117.html#437d961c74a2852519f7477a73760960">EFI_BLOCK_WRITE</a> )(IN <a class="el" href="../../de/d5e/a00007.html">EFI_BLOCK_IO_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> MediaId, IN <a class="el" href="../../dd/d95/a01247.html#3495b0e526b2172f98d5bde00bf28b72">EFI_LBA</a> Lba, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> BufferSize, IN VOID *Buffer)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d8b/a01117.html#e7ac46896ca89c7b374d5ac65403ea34">EFI_BLOCK_FLUSH</a> )(IN <a class="el" href="../../de/d5e/a00007.html">EFI_BLOCK_IO_PROTOCOL</a> *This)</td></tr>
 
 <tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d8b/a01117.html#46433ad0eb22c60f37ca2a103a6cfc71">gEfiDriverConfigurationProtocolGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d8b/a01117.html#d936b0f426d9f7b83637f5469c26fabc">gEfiBlockIoProtocolGuid</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-EFI Driver Configuration Protocol<p>
+Block IO protocol as defined in the UEFI 2.0 specification.<p>
+The Block IO protocol is used to abstract block devices like hard drives, DVD-ROMs and floppy drives.<p>
 Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
-<a class="anchor" name="e811859185b517e7afb6146bfa422f64"></a><!-- doxytag: member="DriverConfiguration.h::EFI_DRIVER_CONFIGURATION_PROTOCOL_GUID" ref="e811859185b517e7afb6146bfa422f64" args="" -->
+<a class="anchor" name="f77eec10d0ff1c1d581ecc7404d239bb"></a><!-- doxytag: member="BlockIo.h::BLOCK_IO_PROTOCOL" ref="f77eec10d0ff1c1d581ecc7404d239bb" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_DRIVER_CONFIGURATION_PROTOCOL_GUID          </td>
+          <td class="memname">#define BLOCK_IO_PROTOCOL&nbsp;&nbsp;&nbsp;EFI_BLOCK_IO_PROTOCOL_GUID          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Protocol <a class="el" href="../../d1/d87/a00689.html">GUID</a> name defined in EFI1.1. 
+</div>
+</div><p>
+<a class="anchor" name="cfbbdcc56db2cb09ce44e401dbcf8f07"></a><!-- doxytag: member="BlockIo.h::EFI_BLOCK_IO_INTERFACE_REVISION" ref="cfbbdcc56db2cb09ce44e401dbcf8f07" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_BLOCK_IO_INTERFACE_REVISION&nbsp;&nbsp;&nbsp;EFI_BLOCK_IO_PROTOCOL_REVISION          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Revision defined in EFI1.1. 
+</div>
+</div><p>
+<a class="anchor" name="8350b9f7cba606d10dbd79eb534f8699"></a><!-- doxytag: member="BlockIo.h::EFI_BLOCK_IO_PROTOCOL_GUID" ref="8350b9f7cba606d10dbd79eb534f8699" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_BLOCK_IO_PROTOCOL_GUID          </td>
         </tr>
       </table>
 </div>
@@ -60,87 +105,91 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 <p>
 <b>Value:</b><div class="fragment"><pre class="fragment">{ \
-    0x107a772b, 0xd5e1, 0x11d4, {0x9a, 0x46, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d } \
+    0x964e5b21, 0x6459, 0x11d2, {0x8e, 0x39, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b } \
   }
-</pre></div>Global ID for the Driver Configuration Protocol defined in EFI 1.1 
+</pre></div>
+</div>
+</div><p>
+<a class="anchor" name="70776bda8f7bf7995af819d25863ce5b"></a><!-- doxytag: member="BlockIo.h::EFI_BLOCK_IO_PROTOCOL_REVISION" ref="70776bda8f7bf7995af819d25863ce5b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_BLOCK_IO_PROTOCOL_REVISION&nbsp;&nbsp;&nbsp;0x00010000          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="d4e8020520c5d8b94dff6ae91fab8b19"></a><!-- doxytag: member="BlockIo.h::EFI_BLOCK_IO_PROTOCOL_REVISION2" ref="d4e8020520c5d8b94dff6ae91fab8b19" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_BLOCK_IO_PROTOCOL_REVISION2&nbsp;&nbsp;&nbsp;0x00020001          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
 </div>
 </div><p>
 <hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="911786bcae93ce69494222b6af5a29df"></a><!-- doxytag: member="DriverConfiguration.h::EFI_DRIVER_CONFIGURATION_FORCE_DEFAULTS" ref="911786bcae93ce69494222b6af5a29df" args=")(IN EFI_DRIVER_CONFIGURATION_PROTOCOL *This, IN EFI_HANDLE ControllerHandle, IN EFI_HANDLE ChildHandle, IN UINT32 DefaultType, OUT EFI_DRIVER_CONFIGURATION_ACTION_REQUIRED *ActionRequired)" -->
+<a class="anchor" name="e7ac46896ca89c7b374d5ac65403ea34"></a><!-- doxytag: member="BlockIo.h::EFI_BLOCK_FLUSH" ref="e7ac46896ca89c7b374d5ac65403ea34" args=")(IN EFI_BLOCK_IO_PROTOCOL *This)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d6/d8b/a01117.html#911786bcae93ce69494222b6af5a29df">EFI_DRIVER_CONFIGURATION_FORCE_DEFAULTS</a>)(IN <a class="el" href="../../de/d11/a00021.html">EFI_DRIVER_CONFIGURATION_PROTOCOL</a> *This, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ControllerHandle, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ChildHandle, IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> DefaultType, OUT <a class="el" href="../../dd/d09/a01118.html#6a909a927a91f9f2e7b25d05c51e35a2">EFI_DRIVER_CONFIGURATION_ACTION_REQUIRED</a> *ActionRequired)          </td>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d6/d8b/a01117.html#e7ac46896ca89c7b374d5ac65403ea34">EFI_BLOCK_FLUSH</a>)(IN <a class="el" href="../../de/d5e/a00007.html">EFI_BLOCK_IO_PROTOCOL</a> *This)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Forces a driver to set the default configuration options for a controller.<p>
+Flush the Block Device.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_DRIVER_CONFIGURATION_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ControllerHandle</em>&nbsp;</td><td>The handle of the controller to force default configuration options on. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ChildHandle</em>&nbsp;</td><td>The handle of the child controller to force default configuration options on This is an optional parameter that may be NULL. It will be NULL for device drivers. It will also be NULL for bus drivers that wish to force default configuration options for the bus controller. It will not be NULL for a bus driver that wishes to force default configuration options for one of its child controllers. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DefaultType</em>&nbsp;</td><td>The type of default configuration options to force on the controller specified by ControllerHandle and ChildHandle. See Table 9-1 for legal values. A DefaultType of 0x00000000 must be supported by this protocol. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ActionRequired</em>&nbsp;</td><td>A pointer to the action that the calling agent is required to perform when this function returns. See "Related Definitions" in Section 9.1 for a list of the actions that the calling agent is required to perform prior to accessing ControllerHandle again.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Indicates a pointer to the calling context.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The driver specified by This successfully forced the default configuration options on the controller specified by ControllerHandle and ChildHandle. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>ControllerHandle is not a valid EFI_HANDLE. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>ChildHandle is not NULL and it is not a valid EFI_HANDLE. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>ActionRequired is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The driver specified by This does not support forcing the default configuration options on the controller specified by ControllerHandle and ChildHandle. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The driver specified by This does not support the configuration type specified by DefaultType. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>A device error occurred while attempt to force the default configuration options on the controller specified by ControllerHandle and ChildHandle. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_RESOURCES</em>&nbsp;</td><td>There are not enough resources available to force the default configuration options on the controller specified by ControllerHandle and ChildHandle. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>All outstanding data was written to the device </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The device reported an error while writting back the data </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NO_MEDIA</em>&nbsp;</td><td>There is no media in the device. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
-<a class="anchor" name="ddec3ef05f7b773469cde934f0c05cc2"></a><!-- doxytag: member="DriverConfiguration.h::EFI_DRIVER_CONFIGURATION_OPTIONS_VALID" ref="ddec3ef05f7b773469cde934f0c05cc2" args=")(IN EFI_DRIVER_CONFIGURATION_PROTOCOL *This, IN EFI_HANDLE ControllerHandle, IN EFI_HANDLE ChildHandle)" -->
+<a class="anchor" name="0b1d66f1cd207006df62ab9f1073fae8"></a><!-- doxytag: member="BlockIo.h::EFI_BLOCK_IO" ref="0b1d66f1cd207006df62ab9f1073fae8" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d6/d8b/a01117.html#ddec3ef05f7b773469cde934f0c05cc2">EFI_DRIVER_CONFIGURATION_OPTIONS_VALID</a>)(IN <a class="el" href="../../de/d11/a00021.html">EFI_DRIVER_CONFIGURATION_PROTOCOL</a> *This, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ControllerHandle, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ChildHandle)          </td>
+          <td class="memname">typedef <a class="el" href="../../de/d5e/a00007.html">EFI_BLOCK_IO_PROTOCOL</a> <a class="el" href="../../de/d5e/a00007.html">EFI_BLOCK_IO</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Tests to see if a controller's current configuration options are valid.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_DRIVER_CONFIGURATION_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ControllerHandle</em>&nbsp;</td><td>The handle of the controller to test if it's current configuration options are valid. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ChildHandle</em>&nbsp;</td><td>The handle of the child controller to test if it's current configuration options are valid. This is an optional parameter that may be NULL. It will be NULL for device drivers. It will also be NULL for bus drivers that wish to test the configuration options for the bus controller. It will not be NULL for a bus driver that wishes to test configuration options for one of its child controllers.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The controller specified by ControllerHandle and ChildHandle that is being managed by the driver specified by This has a valid set of configuration options. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>ControllerHandle is not a valid EFI_HANDLE. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>ChildHandle is not NULL and it is not a valid EFI_HANDLE. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The driver specified by This is not currently managing the controller specified by ControllerHandle and ChildHandle. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The controller specified by ControllerHandle and ChildHandle that is being managed by the driver specified by This has an invalid set of configuration options. </td></tr>
-  </table>
-</dl>
-
+Protocol defined in EFI1.1. 
 </div>
 </div><p>
-<a class="anchor" name="d0c4d44cf16410f08412c9b9908c7569"></a><!-- doxytag: member="DriverConfiguration.h::EFI_DRIVER_CONFIGURATION_PROTOCOL" ref="d0c4d44cf16410f08412c9b9908c7569" args="" -->
+<a class="anchor" name="ffa68eab6f051542c0a574c24591f183"></a><!-- doxytag: member="BlockIo.h::EFI_BLOCK_IO_PROTOCOL" ref="ffa68eab6f051542c0a574c24591f183" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef struct <a class="el" href="../../de/d11/a00021.html">_EFI_DRIVER_CONFIGURATION_PROTOCOL</a> <a class="el" href="../../de/d11/a00021.html">EFI_DRIVER_CONFIGURATION_PROTOCOL</a>          </td>
+          <td class="memname">typedef struct <a class="el" href="../../de/d5e/a00007.html">_EFI_BLOCK_IO_PROTOCOL</a> <a class="el" href="../../de/d5e/a00007.html">EFI_BLOCK_IO_PROTOCOL</a>          </td>
         </tr>
       </table>
 </div>
@@ -150,50 +199,112 @@ Tests to see if a controller's current configuration options are valid.<p>
 
 </div>
 </div><p>
-<a class="anchor" name="6c1f98f4eb7c7faa3e492f8a07504942"></a><!-- doxytag: member="DriverConfiguration.h::EFI_DRIVER_CONFIGURATION_SET_OPTIONS" ref="6c1f98f4eb7c7faa3e492f8a07504942" args=")(IN EFI_DRIVER_CONFIGURATION_PROTOCOL *This, IN EFI_HANDLE ControllerHandle, IN EFI_HANDLE ChildHandle, IN CHAR8 *Language, OUT EFI_DRIVER_CONFIGURATION_ACTION_REQUIRED *ActionRequired)" -->
+<a class="anchor" name="8dd77a48d990df6f2a54c8c9ab045246"></a><!-- doxytag: member="BlockIo.h::EFI_BLOCK_READ" ref="8dd77a48d990df6f2a54c8c9ab045246" args=")(IN EFI_BLOCK_IO_PROTOCOL *This, IN UINT32 MediaId, IN EFI_LBA Lba, IN UINTN BufferSize, OUT VOID *Buffer)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d6/d8b/a01117.html#6c1f98f4eb7c7faa3e492f8a07504942">EFI_DRIVER_CONFIGURATION_SET_OPTIONS</a>)(IN <a class="el" href="../../de/d11/a00021.html">EFI_DRIVER_CONFIGURATION_PROTOCOL</a> *This, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ControllerHandle, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ChildHandle, IN <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Language, OUT <a class="el" href="../../dd/d09/a01118.html#6a909a927a91f9f2e7b25d05c51e35a2">EFI_DRIVER_CONFIGURATION_ACTION_REQUIRED</a> *ActionRequired)          </td>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d6/d8b/a01117.html#8dd77a48d990df6f2a54c8c9ab045246">EFI_BLOCK_READ</a>)(IN <a class="el" href="../../de/d5e/a00007.html">EFI_BLOCK_IO_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> MediaId, IN <a class="el" href="../../dd/d95/a01247.html#3495b0e526b2172f98d5bde00bf28b72">EFI_LBA</a> Lba, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> BufferSize, OUT VOID *Buffer)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Allows the user to set controller specific options for a controller that a driver is currently managing.<p>
+Read BufferSize bytes from Lba into Buffer.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_DRIVER_CONFIGURATION_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ControllerHandle</em>&nbsp;</td><td>The handle of the controller to set options on. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ChildHandle</em>&nbsp;</td><td>The handle of the child controller to set options on. This is an optional parameter that may be NULL. It will be NULL for device drivers, and for bus drivers that wish to set options for the bus controller. It will not be NULL for a bus driver that wishes to set options for one of its child controllers. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Language</em>&nbsp;</td><td>A pointer to a three character ISO 639-2 language identifier. This is the language of the user interface that should be presented to the user, and it must match one of the languages specified in SupportedLanguages. The number of languages supported by a driver is up to the driver writer. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ActionRequired</em>&nbsp;</td><td>A pointer to the action that the calling agent is required to perform when this function returns. See "Related Definitions" for a list of the actions that the calling agent is required to perform prior to accessing ControllerHandle again.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Indicates a pointer to the calling context. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>MediaId</em>&nbsp;</td><td>Id of the media, changes every time the media is replaced. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Lba</em>&nbsp;</td><td>The starting Logical Block Address to read from </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>BufferSize</em>&nbsp;</td><td>Size of Buffer, must be a multiple of device block size. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>A pointer to the destination buffer for the data. The caller is responsible for either having implicit or explicit ownership of the buffer.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The driver specified by This successfully set the configuration options for the controller specified by ControllerHandle.. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>ControllerHandle is not a valid EFI_HANDLE. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>ChildHandle is not NULL and it is not a valid EFI_HANDLE. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>ActionRequired is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The driver specified by This does not support setting configuration options for the controller specified by ControllerHandle and ChildHandle. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The driver specified by This does not support the language specified by Language. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>A device error occurred while attempt to set the configuration options for the controller specified by ControllerHandle and ChildHandle. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_RESOURCES</em>&nbsp;</td><td>There are not enough resources available to set the configuration options for the controller specified by ControllerHandle and ChildHandle. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The data was read correctly from the device. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The device reported an error while performing the read. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NO_MEDIA</em>&nbsp;</td><td>There is no media in the device. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_MEDIA_CHANGED</em>&nbsp;</td><td>The MediaId does not matched the current device. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_BAD_BUFFER_SIZE</em>&nbsp;</td><td>The Buffer was not a multiple of the block size of the device. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The read request contains LBAs that are not valid, or the buffer is not on proper alignment. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="1cca179d8e424e01e1c4e497158a3982"></a><!-- doxytag: member="BlockIo.h::EFI_BLOCK_RESET" ref="1cca179d8e424e01e1c4e497158a3982" args=")(IN EFI_BLOCK_IO_PROTOCOL *This, IN BOOLEAN ExtendedVerification)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d6/d8b/a01117.html#1cca179d8e424e01e1c4e497158a3982">EFI_BLOCK_RESET</a>)(IN <a class="el" href="../../de/d5e/a00007.html">EFI_BLOCK_IO_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> ExtendedVerification)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Reset the Block Device.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Indicates a pointer to the calling context. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ExtendedVerification</em>&nbsp;</td><td>Driver may perform diagnostics on reset.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The device was reset. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The device is not functioning properly and could not be reset. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="437d961c74a2852519f7477a73760960"></a><!-- doxytag: member="BlockIo.h::EFI_BLOCK_WRITE" ref="437d961c74a2852519f7477a73760960" args=")(IN EFI_BLOCK_IO_PROTOCOL *This, IN UINT32 MediaId, IN EFI_LBA Lba, IN UINTN BufferSize, IN VOID *Buffer)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d6/d8b/a01117.html#437d961c74a2852519f7477a73760960">EFI_BLOCK_WRITE</a>)(IN <a class="el" href="../../de/d5e/a00007.html">EFI_BLOCK_IO_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> MediaId, IN <a class="el" href="../../dd/d95/a01247.html#3495b0e526b2172f98d5bde00bf28b72">EFI_LBA</a> Lba, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> BufferSize, IN VOID *Buffer)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Write BufferSize bytes from Lba into Buffer.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Indicates a pointer to the calling context. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>MediaId</em>&nbsp;</td><td>The media ID that the write request is for. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Lba</em>&nbsp;</td><td>The starting logical block address to be written. The caller is responsible for writing to only legitimate locations. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>BufferSize</em>&nbsp;</td><td>Size of Buffer, must be a multiple of device block size. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>A pointer to the source buffer for the data.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The data was written correctly to the device. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_WRITE_PROTECTED</em>&nbsp;</td><td>The device can not be written to. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The device reported an error while performing the write. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NO_MEDIA</em>&nbsp;</td><td>There is no media in the device. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_MEDIA_CHNAGED</em>&nbsp;</td><td>The MediaId does not matched the current device. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_BAD_BUFFER_SIZE</em>&nbsp;</td><td>The Buffer was not a multiple of the block size of the device. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The write request contains LBAs that are not valid, or the buffer is not on proper alignment. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
 <hr><h2>Variable Documentation</h2>
-<a class="anchor" name="46433ad0eb22c60f37ca2a103a6cfc71"></a><!-- doxytag: member="DriverConfiguration.h::gEfiDriverConfigurationProtocolGuid" ref="46433ad0eb22c60f37ca2a103a6cfc71" args="" -->
+<a class="anchor" name="d936b0f426d9f7b83637f5469c26fabc"></a><!-- doxytag: member="BlockIo.h::gEfiBlockIoProtocolGuid" ref="d936b0f426d9f7b83637f5469c26fabc" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../d6/d8b/a01117.html#46433ad0eb22c60f37ca2a103a6cfc71">gEfiDriverConfigurationProtocolGuid</a>          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../d6/d8b/a01117.html#d936b0f426d9f7b83637f5469c26fabc">gEfiBlockIoProtocolGuid</a>          </td>
         </tr>
       </table>
 </div>
@@ -204,7 +315,7 @@ Allows the user to set controller specific options for a controller that a drive
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:10 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:26 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

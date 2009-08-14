@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: tdTPM_PERMANENT_FLAGS Struct Reference</title>
+<title>MdePkg[ALL]: tdTPM_CONTEXT_BLOB Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,58 +21,38 @@
   </div>
 </div>
 <div class="contents">
-<h1>tdTPM_PERMANENT_FLAGS Struct Reference</h1><!-- doxytag: class="tdTPM_PERMANENT_FLAGS" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>tdTPM_CONTEXT_BLOB Struct Reference</h1><!-- doxytag: class="tdTPM_CONTEXT_BLOB" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/d59/a01001.html#69f3eb3e40aee2061dba5f9202fac1a2">TPM_STRUCTURE_TAG</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d12/a00910.html#fc2e9c4988624cb150381d9399f18396">tag</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d8e/a01050.html#69f3eb3e40aee2061dba5f9202fac1a2">TPM_STRUCTURE_TAG</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d12/a00910.html#7bd0d3eada9da831dffe98979e36e0d0">tag</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d12/a00910.html#169c7db8091b49d91fda4cd0056b3890">disable</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d8e/a01050.html#16a1d7631c9a6cd7501a995aea711a91">TPM_RESOURCE_TYPE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d12/a00910.html#8ed606bfd5c3a8f92a8a3509e8a13ac0">resourceType</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d12/a00910.html#678d5883342a6029f55e8d35b46421de">ownership</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d8e/a01050.html#ed4331501236f24213dba953e3f34643">TPM_HANDLE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d12/a00910.html#de64e4e762b2c8ad2a767f063b6f07b9">handle</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d12/a00910.html#ee06644c265bcbbd7ad64ea46023d27e">deactivated</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d12/a00910.html#858104f3fe92df2ec86cffc1001b71ba">label</a> [16]</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d12/a00910.html#6ffe0e965f240109d1fdfb55deae04a5">readPubek</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d12/a00910.html#e4cdbda961317096b6a0829dd067a6ac">contextCount</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d12/a00910.html#7e1791192878382f1388dfe9cbeb91d1">disableOwnerClear</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/dbc/a00931.html">TPM_DIGEST</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d12/a00910.html#124479e72fb41c0f50228e3743b8ec4c">integrityDigest</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d12/a00910.html#9863fb3d09b2ae70eae5d15c73fece6b">allowMaintenance</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d12/a00910.html#c7d0ad0a6eeaaec895cc580c11c86a81">additionalSize</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d12/a00910.html#34ef513aafe5015d019044356de16a7a">physicalPresenceLifetimeLock</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d12/a00910.html#ca9ab01b88c5b578230339737345d89a">additionalData</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d12/a00910.html#82a172b1e2ff1be6f14291f1267ec3ee">physicalPresenceHWEnable</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d12/a00910.html#6ebb1dd0d26e5e632e60ca4822ab892a">sensitiveSize</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d12/a00910.html#2d5c130788f2e75d6b33b34a627e19c5">physicalPresenceCMDEnable</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d12/a00910.html#5183fc64c78fd5c16c238ba460c28216">CEKPUsed</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d12/a00910.html#d5dd1353c08fb9c9be73f28a8a3eae7a">TPMpost</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d12/a00910.html#446e54ad9b4a614b1fffa4f8938afafc">TPMpostLock</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d12/a00910.html#a02fe7b64bdd6a8464845b2e9c43e95a">FIPS</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d12/a00910.html#9b2ea4a97a0ca23bb612f8c506dd266e">operator</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d12/a00910.html#580bb960ce8ba2ca25f5eb8451460fa8">enableRevokeEK</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d12/a00910.html#2670729a45d736392c44c7ae6ac71048">nvLocked</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d12/a00910.html#1aca89c4e1423999c76ff489283a03fb">readSRKPub</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d12/a00910.html#bb0827e34cff968c655ef1a0f532c6b8">tpmEstablished</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d12/a00910.html#d5395cc3360fb11b5a0c35bc5b852c74">maintenanceDone</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d12/a00910.html#59eb74f21e4c1915d3ec3f777a2d1a13">sensitiveData</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Part 2, section 7.1: TPM_PERMANENT_FLAGS <hr><h2>Field Documentation</h2>
-<a class="anchor" name="9863fb3d09b2ae70eae5d15c73fece6b"></a><!-- doxytag: member="tdTPM_PERMANENT_FLAGS::allowMaintenance" ref="9863fb3d09b2ae70eae5d15c73fece6b" args="" -->
+Part 2, section 18.1: TPM_CONTEXT_BLOB <hr><h2>Field Documentation</h2>
+<a class="anchor" name="ca9ab01b88c5b578230339737345d89a"></a><!-- doxytag: member="tdTPM_CONTEXT_BLOB::additionalData" ref="ca9ab01b88c5b578230339737345d89a" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d4/d12/a00910.html#9863fb3d09b2ae70eae5d15c73fece6b">tdTPM_PERMANENT_FLAGS::allowMaintenance</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>* <a class="el" href="../../d4/d12/a00910.html#ca9ab01b88c5b578230339737345d89a">tdTPM_CONTEXT_BLOB::additionalData</a>          </td>
         </tr>
       </table>
 </div>
@@ -82,12 +62,12 @@ Part 2, section 7.1: TPM_PERMANENT_FLAGS <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="5183fc64c78fd5c16c238ba460c28216"></a><!-- doxytag: member="tdTPM_PERMANENT_FLAGS::CEKPUsed" ref="5183fc64c78fd5c16c238ba460c28216" args="" -->
+<a class="anchor" name="c7d0ad0a6eeaaec895cc580c11c86a81"></a><!-- doxytag: member="tdTPM_CONTEXT_BLOB::additionalSize" ref="c7d0ad0a6eeaaec895cc580c11c86a81" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d4/d12/a00910.html#5183fc64c78fd5c16c238ba460c28216">tdTPM_PERMANENT_FLAGS::CEKPUsed</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d4/d12/a00910.html#c7d0ad0a6eeaaec895cc580c11c86a81">tdTPM_CONTEXT_BLOB::additionalSize</a>          </td>
         </tr>
       </table>
 </div>
@@ -97,12 +77,12 @@ Part 2, section 7.1: TPM_PERMANENT_FLAGS <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="ee06644c265bcbbd7ad64ea46023d27e"></a><!-- doxytag: member="tdTPM_PERMANENT_FLAGS::deactivated" ref="ee06644c265bcbbd7ad64ea46023d27e" args="" -->
+<a class="anchor" name="e4cdbda961317096b6a0829dd067a6ac"></a><!-- doxytag: member="tdTPM_CONTEXT_BLOB::contextCount" ref="e4cdbda961317096b6a0829dd067a6ac" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d4/d12/a00910.html#ee06644c265bcbbd7ad64ea46023d27e">tdTPM_PERMANENT_FLAGS::deactivated</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d4/d12/a00910.html#e4cdbda961317096b6a0829dd067a6ac">tdTPM_CONTEXT_BLOB::contextCount</a>          </td>
         </tr>
       </table>
 </div>
@@ -112,12 +92,12 @@ Part 2, section 7.1: TPM_PERMANENT_FLAGS <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="169c7db8091b49d91fda4cd0056b3890"></a><!-- doxytag: member="tdTPM_PERMANENT_FLAGS::disable" ref="169c7db8091b49d91fda4cd0056b3890" args="" -->
+<a class="anchor" name="de64e4e762b2c8ad2a767f063b6f07b9"></a><!-- doxytag: member="tdTPM_CONTEXT_BLOB::handle" ref="de64e4e762b2c8ad2a767f063b6f07b9" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d4/d12/a00910.html#169c7db8091b49d91fda4cd0056b3890">tdTPM_PERMANENT_FLAGS::disable</a>          </td>
+          <td class="memname"><a class="el" href="../../d9/d8e/a01050.html#ed4331501236f24213dba953e3f34643">TPM_HANDLE</a> <a class="el" href="../../d4/d12/a00910.html#de64e4e762b2c8ad2a767f063b6f07b9">tdTPM_CONTEXT_BLOB::handle</a>          </td>
         </tr>
       </table>
 </div>
@@ -127,12 +107,12 @@ Part 2, section 7.1: TPM_PERMANENT_FLAGS <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="7e1791192878382f1388dfe9cbeb91d1"></a><!-- doxytag: member="tdTPM_PERMANENT_FLAGS::disableOwnerClear" ref="7e1791192878382f1388dfe9cbeb91d1" args="" -->
+<a class="anchor" name="124479e72fb41c0f50228e3743b8ec4c"></a><!-- doxytag: member="tdTPM_CONTEXT_BLOB::integrityDigest" ref="124479e72fb41c0f50228e3743b8ec4c" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d4/d12/a00910.html#7e1791192878382f1388dfe9cbeb91d1">tdTPM_PERMANENT_FLAGS::disableOwnerClear</a>          </td>
+          <td class="memname"><a class="el" href="../../df/dbc/a00931.html">TPM_DIGEST</a> <a class="el" href="../../d4/d12/a00910.html#124479e72fb41c0f50228e3743b8ec4c">tdTPM_CONTEXT_BLOB::integrityDigest</a>          </td>
         </tr>
       </table>
 </div>
@@ -142,12 +122,12 @@ Part 2, section 7.1: TPM_PERMANENT_FLAGS <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="580bb960ce8ba2ca25f5eb8451460fa8"></a><!-- doxytag: member="tdTPM_PERMANENT_FLAGS::enableRevokeEK" ref="580bb960ce8ba2ca25f5eb8451460fa8" args="" -->
+<a class="anchor" name="858104f3fe92df2ec86cffc1001b71ba"></a><!-- doxytag: member="tdTPM_CONTEXT_BLOB::label" ref="858104f3fe92df2ec86cffc1001b71ba" args="[16]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d4/d12/a00910.html#580bb960ce8ba2ca25f5eb8451460fa8">tdTPM_PERMANENT_FLAGS::enableRevokeEK</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d12/a00910.html#858104f3fe92df2ec86cffc1001b71ba">tdTPM_CONTEXT_BLOB::label</a>[16]          </td>
         </tr>
       </table>
 </div>
@@ -157,12 +137,12 @@ Part 2, section 7.1: TPM_PERMANENT_FLAGS <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="a02fe7b64bdd6a8464845b2e9c43e95a"></a><!-- doxytag: member="tdTPM_PERMANENT_FLAGS::FIPS" ref="a02fe7b64bdd6a8464845b2e9c43e95a" args="" -->
+<a class="anchor" name="8ed606bfd5c3a8f92a8a3509e8a13ac0"></a><!-- doxytag: member="tdTPM_CONTEXT_BLOB::resourceType" ref="8ed606bfd5c3a8f92a8a3509e8a13ac0" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d4/d12/a00910.html#a02fe7b64bdd6a8464845b2e9c43e95a">tdTPM_PERMANENT_FLAGS::FIPS</a>          </td>
+          <td class="memname"><a class="el" href="../../d9/d8e/a01050.html#16a1d7631c9a6cd7501a995aea711a91">TPM_RESOURCE_TYPE</a> <a class="el" href="../../d4/d12/a00910.html#8ed606bfd5c3a8f92a8a3509e8a13ac0">tdTPM_CONTEXT_BLOB::resourceType</a>          </td>
         </tr>
       </table>
 </div>
@@ -172,12 +152,12 @@ Part 2, section 7.1: TPM_PERMANENT_FLAGS <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="d5395cc3360fb11b5a0c35bc5b852c74"></a><!-- doxytag: member="tdTPM_PERMANENT_FLAGS::maintenanceDone" ref="d5395cc3360fb11b5a0c35bc5b852c74" args="" -->
+<a class="anchor" name="59eb74f21e4c1915d3ec3f777a2d1a13"></a><!-- doxytag: member="tdTPM_CONTEXT_BLOB::sensitiveData" ref="59eb74f21e4c1915d3ec3f777a2d1a13" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d4/d12/a00910.html#d5395cc3360fb11b5a0c35bc5b852c74">tdTPM_PERMANENT_FLAGS::maintenanceDone</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>* <a class="el" href="../../d4/d12/a00910.html#59eb74f21e4c1915d3ec3f777a2d1a13">tdTPM_CONTEXT_BLOB::sensitiveData</a>          </td>
         </tr>
       </table>
 </div>
@@ -187,12 +167,12 @@ Part 2, section 7.1: TPM_PERMANENT_FLAGS <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="2670729a45d736392c44c7ae6ac71048"></a><!-- doxytag: member="tdTPM_PERMANENT_FLAGS::nvLocked" ref="2670729a45d736392c44c7ae6ac71048" args="" -->
+<a class="anchor" name="6ebb1dd0d26e5e632e60ca4822ab892a"></a><!-- doxytag: member="tdTPM_CONTEXT_BLOB::sensitiveSize" ref="6ebb1dd0d26e5e632e60ca4822ab892a" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d4/d12/a00910.html#2670729a45d736392c44c7ae6ac71048">tdTPM_PERMANENT_FLAGS::nvLocked</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d4/d12/a00910.html#6ebb1dd0d26e5e632e60ca4822ab892a">tdTPM_CONTEXT_BLOB::sensitiveSize</a>          </td>
         </tr>
       </table>
 </div>
@@ -202,162 +182,12 @@ Part 2, section 7.1: TPM_PERMANENT_FLAGS <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="9b2ea4a97a0ca23bb612f8c506dd266e"></a><!-- doxytag: member="tdTPM_PERMANENT_FLAGS::operator" ref="9b2ea4a97a0ca23bb612f8c506dd266e" args="" -->
+<a class="anchor" name="7bd0d3eada9da831dffe98979e36e0d0"></a><!-- doxytag: member="tdTPM_CONTEXT_BLOB::tag" ref="7bd0d3eada9da831dffe98979e36e0d0" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d4/d12/a00910.html#9b2ea4a97a0ca23bb612f8c506dd266e">tdTPM_PERMANENT_FLAGS::operator</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="678d5883342a6029f55e8d35b46421de"></a><!-- doxytag: member="tdTPM_PERMANENT_FLAGS::ownership" ref="678d5883342a6029f55e8d35b46421de" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d4/d12/a00910.html#678d5883342a6029f55e8d35b46421de">tdTPM_PERMANENT_FLAGS::ownership</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="2d5c130788f2e75d6b33b34a627e19c5"></a><!-- doxytag: member="tdTPM_PERMANENT_FLAGS::physicalPresenceCMDEnable" ref="2d5c130788f2e75d6b33b34a627e19c5" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d4/d12/a00910.html#2d5c130788f2e75d6b33b34a627e19c5">tdTPM_PERMANENT_FLAGS::physicalPresenceCMDEnable</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="82a172b1e2ff1be6f14291f1267ec3ee"></a><!-- doxytag: member="tdTPM_PERMANENT_FLAGS::physicalPresenceHWEnable" ref="82a172b1e2ff1be6f14291f1267ec3ee" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d4/d12/a00910.html#82a172b1e2ff1be6f14291f1267ec3ee">tdTPM_PERMANENT_FLAGS::physicalPresenceHWEnable</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="34ef513aafe5015d019044356de16a7a"></a><!-- doxytag: member="tdTPM_PERMANENT_FLAGS::physicalPresenceLifetimeLock" ref="34ef513aafe5015d019044356de16a7a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d4/d12/a00910.html#34ef513aafe5015d019044356de16a7a">tdTPM_PERMANENT_FLAGS::physicalPresenceLifetimeLock</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="6ffe0e965f240109d1fdfb55deae04a5"></a><!-- doxytag: member="tdTPM_PERMANENT_FLAGS::readPubek" ref="6ffe0e965f240109d1fdfb55deae04a5" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d4/d12/a00910.html#6ffe0e965f240109d1fdfb55deae04a5">tdTPM_PERMANENT_FLAGS::readPubek</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="1aca89c4e1423999c76ff489283a03fb"></a><!-- doxytag: member="tdTPM_PERMANENT_FLAGS::readSRKPub" ref="1aca89c4e1423999c76ff489283a03fb" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d4/d12/a00910.html#1aca89c4e1423999c76ff489283a03fb">tdTPM_PERMANENT_FLAGS::readSRKPub</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="fc2e9c4988624cb150381d9399f18396"></a><!-- doxytag: member="tdTPM_PERMANENT_FLAGS::tag" ref="fc2e9c4988624cb150381d9399f18396" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../df/d59/a01001.html#69f3eb3e40aee2061dba5f9202fac1a2">TPM_STRUCTURE_TAG</a> <a class="el" href="../../d4/d12/a00910.html#fc2e9c4988624cb150381d9399f18396">tdTPM_PERMANENT_FLAGS::tag</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="bb0827e34cff968c655ef1a0f532c6b8"></a><!-- doxytag: member="tdTPM_PERMANENT_FLAGS::tpmEstablished" ref="bb0827e34cff968c655ef1a0f532c6b8" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d4/d12/a00910.html#bb0827e34cff968c655ef1a0f532c6b8">tdTPM_PERMANENT_FLAGS::tpmEstablished</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="d5dd1353c08fb9c9be73f28a8a3eae7a"></a><!-- doxytag: member="tdTPM_PERMANENT_FLAGS::TPMpost" ref="d5dd1353c08fb9c9be73f28a8a3eae7a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d4/d12/a00910.html#d5dd1353c08fb9c9be73f28a8a3eae7a">tdTPM_PERMANENT_FLAGS::TPMpost</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="446e54ad9b4a614b1fffa4f8938afafc"></a><!-- doxytag: member="tdTPM_PERMANENT_FLAGS::TPMpostLock" ref="446e54ad9b4a614b1fffa4f8938afafc" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d4/d12/a00910.html#446e54ad9b4a614b1fffa4f8938afafc">tdTPM_PERMANENT_FLAGS::TPMpostLock</a>          </td>
+          <td class="memname"><a class="el" href="../../d9/d8e/a01050.html#69f3eb3e40aee2061dba5f9202fac1a2">TPM_STRUCTURE_TAG</a> <a class="el" href="../../d4/d12/a00910.html#7bd0d3eada9da831dffe98979e36e0d0">tdTPM_CONTEXT_BLOB::tag</a>          </td>
         </tr>
       </table>
 </div>
@@ -368,7 +198,7 @@ Part 2, section 7.1: TPM_PERMANENT_FLAGS <hr><h2>Field Documentation</h2>
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:23 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:08 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

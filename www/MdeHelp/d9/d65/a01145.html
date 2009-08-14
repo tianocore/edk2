@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Protocol/Metronome.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Ppi/Stall.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,95 +21,96 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Protocol/Metronome.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Ppi/Stall.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dc1/a00212.html">_EFI_METRONOME_ARCH_PROTOCOL</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d82/a00243.html">_EFI_PEI_STALL_PPI</a></td></tr>
 
 <tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d65/a01145.html#8b43b17d140d533e5fb0abe42e34aeba">EFI_METRONOME_ARCH_PROTOCOL_GUID</a>&nbsp;&nbsp;&nbsp;{ 0x26baccb2, 0x6f42, 0x11d4, {0xbc, 0xe7, 0x0, 0x80, 0xc7, 0x3c, 0x88, 0x81 } }</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d65/a01145.html#0885dca264a3462a8504b1247249f1df">EFI_PEI_STALL_PPI_GUID</a>&nbsp;&nbsp;&nbsp;{ 0x1f4c6f90, 0xb06b, 0x48d8, {0xa2, 0x01, 0xba, 0xe5, 0xf1, 0xcd, 0x7d, 0x56 } }</td></tr>
 
 <tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
-<a class="el" href="../../dd/dc1/a00212.html">_EFI_METRONOME_ARCH_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d65/a01145.html#65d8891ae770feab2390999d7593984a">EFI_METRONOME_ARCH_PROTOCOL</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <a class="el" href="../../d6/d82/a00243.html">_EFI_PEI_STALL_PPI</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d65/a01145.html#b1e6c58a3224fe1cffa5b2d2c75a8ccc">EFI_PEI_STALL_PPI</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d65/a01145.html#9ee7627d2974d6339800ab425b73777c">EFI_METRONOME_WAIT_FOR_TICK</a> )(IN <a class="el" href="../../dd/dc1/a00212.html">EFI_METRONOME_ARCH_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> TickNumber)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d65/a01145.html#a0b70ccce88204e634cc0013a25cc55c">EFI_PEI_STALL</a> )(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../d6/d82/a00243.html">EFI_PEI_STALL_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Microseconds)</td></tr>
 
 <tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d65/a01145.html#d0c41cfb797c6aa32a02f3eefba1b96f">gEfiMetronomeArchProtocolGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d65/a01145.html#0cca54d6ade97fb480f50254eeea3020">gEfiPeiStallPpiGuid</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Metronome Architectural Protocol as defined in PI SPEC VOLUME 2 DXE<p>
-This code abstracts the DXE core to provide delay services.<p>
+This file declares Stall PPI.<p>
+This ppi abstracts the blocking stall service to other agents.<p>
 Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
-<a class="anchor" name="8b43b17d140d533e5fb0abe42e34aeba"></a><!-- doxytag: member="Metronome.h::EFI_METRONOME_ARCH_PROTOCOL_GUID" ref="8b43b17d140d533e5fb0abe42e34aeba" args="" -->
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
+<dl class="user" compact><dt><b>Revision Reference:</b></dt><dd>This PPI is introduced in PI Version 1.0. </dd></dl>
+<hr><h2>Define Documentation</h2>
+<a class="anchor" name="0885dca264a3462a8504b1247249f1df"></a><!-- doxytag: member="Stall.h::EFI_PEI_STALL_PPI_GUID" ref="0885dca264a3462a8504b1247249f1df" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_METRONOME_ARCH_PROTOCOL_GUID&nbsp;&nbsp;&nbsp;{ 0x26baccb2, 0x6f42, 0x11d4, {0xbc, 0xe7, 0x0, 0x80, 0xc7, 0x3c, 0x88, 0x81 } }          </td>
+          <td class="memname">#define EFI_PEI_STALL_PPI_GUID&nbsp;&nbsp;&nbsp;{ 0x1f4c6f90, 0xb06b, 0x48d8, {0xa2, 0x01, 0xba, 0xe5, 0xf1, 0xcd, 0x7d, 0x56 } }          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Global ID for the Metronome Architectural Protocol 
+
 </div>
 </div><p>
 <hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="65d8891ae770feab2390999d7593984a"></a><!-- doxytag: member="Metronome.h::EFI_METRONOME_ARCH_PROTOCOL" ref="65d8891ae770feab2390999d7593984a" args="" -->
+<a class="anchor" name="a0b70ccce88204e634cc0013a25cc55c"></a><!-- doxytag: member="Stall.h::EFI_PEI_STALL" ref="a0b70ccce88204e634cc0013a25cc55c" args=")(IN CONST EFI_PEI_SERVICES **PeiServices, IN CONST EFI_PEI_STALL_PPI *This, IN UINTN Microseconds)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef struct <a class="el" href="../../dd/dc1/a00212.html">_EFI_METRONOME_ARCH_PROTOCOL</a> <a class="el" href="../../dd/dc1/a00212.html">EFI_METRONOME_ARCH_PROTOCOL</a>          </td>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d9/d65/a01145.html#a0b70ccce88204e634cc0013a25cc55c">EFI_PEI_STALL</a>)(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../d6/d82/a00243.html">EFI_PEI_STALL_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Microseconds)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Declare forward reference for the Metronome Architectural Protocol 
-</div>
-</div><p>
-<a class="anchor" name="9ee7627d2974d6339800ab425b73777c"></a><!-- doxytag: member="Metronome.h::EFI_METRONOME_WAIT_FOR_TICK" ref="9ee7627d2974d6339800ab425b73777c" args=")(IN EFI_METRONOME_ARCH_PROTOCOL *This, IN UINT32 TickNumber)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d9/d65/a01145.html#9ee7627d2974d6339800ab425b73777c">EFI_METRONOME_WAIT_FOR_TICK</a>)(IN <a class="el" href="../../dd/dc1/a00212.html">EFI_METRONOME_ARCH_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> TickNumber)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-The WaitForTick() function waits for the number of ticks specified by TickNumber from a known time source in the platform. If TickNumber of ticks are detected, then EFI_SUCCESS is returned. The actual time passed between entry of this function and the first tick is between 0 and TickPeriod 100 nS units. To guarantee that at least TickPeriod time has elapsed, wait for two ticks. This function waits for a hardware event to determine when a tick occurs. It is possible for interrupt processing, or exception processing to interrupt the execution of the WaitForTick() function. Depending on the hardware source for the ticks, it is possible for a tick to be missed. This function cannot guarantee that ticks will not be missed. If a timeout occurs waiting for the specified number of ticks, then EFI_TIMEOUT is returned.<p>
+The Stall() function provides a blocking stall for at least the number of microseconds stipulated in the final argument of the API.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>The EFI_METRONOME_ARCH_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>TickNumber</em>&nbsp;</td><td>Number of ticks to wait.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>PeiServices</em>&nbsp;</td><td>An indirect pointer to the PEI Services Table published by the PEI Foundation. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the local data for the interface. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Microseconds</em>&nbsp;</td><td>Number of microseconds for which to stall.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The wait for the number of ticks specified by TickNumber succeeded. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_TIMEOUT</em>&nbsp;</td><td>A timeout occurred waiting for the specified number of ticks. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The service provided at least the required delay. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
-<hr><h2>Variable Documentation</h2>
-<a class="anchor" name="d0c41cfb797c6aa32a02f3eefba1b96f"></a><!-- doxytag: member="Metronome.h::gEfiMetronomeArchProtocolGuid" ref="d0c41cfb797c6aa32a02f3eefba1b96f" args="" -->
+<a class="anchor" name="b1e6c58a3224fe1cffa5b2d2c75a8ccc"></a><!-- doxytag: member="Stall.h::EFI_PEI_STALL_PPI" ref="b1e6c58a3224fe1cffa5b2d2c75a8ccc" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../d9/d65/a01145.html#d0c41cfb797c6aa32a02f3eefba1b96f">gEfiMetronomeArchProtocolGuid</a>          </td>
+          <td class="memname">typedef struct <a class="el" href="../../d6/d82/a00243.html">_EFI_PEI_STALL_PPI</a> <a class="el" href="../../d6/d82/a00243.html">EFI_PEI_STALL_PPI</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<hr><h2>Variable Documentation</h2>
+<a class="anchor" name="0cca54d6ade97fb480f50254eeea3020"></a><!-- doxytag: member="Stall.h::gEfiPeiStallPpiGuid" ref="0cca54d6ade97fb480f50254eeea3020" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../d9/d65/a01145.html#0cca54d6ade97fb480f50254eeea3020">gEfiPeiStallPpiGuid</a>          </td>
         </tr>
       </table>
 </div>
@@ -120,7 +121,7 @@ The WaitForTick() function waits for the number of ticks specified by TickNumber
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:10 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:29 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

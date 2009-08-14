@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE Struct Reference</title>
+<title>MdePkg[ALL]: CDROM_VOLUME_DESCRIPTOR Union Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,32 +21,142 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE Struct Reference</h1><!-- doxytag: class="EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>CDROM_VOLUME_DESCRIPTOR Union Reference</h1><!-- doxytag: class="CDROM_VOLUME_DESCRIPTOR" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a00309.html#838b10fee3738838494fa2af9bdfd80f">Signature</a></td></tr>
+<tr><td class="memItemLeft" nowrap>struct {</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a00309.html#0fe7b020baccc5ff3ac0abb931bf11f4">Length</a></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d2/d71/a00309.html#e27a6327f296d5b7c9bdf09e29d6180f">Type</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a00309.html#8d24335528470ba4b1da2ce9ebf41b2a">HardwareSignature</a></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d2/d71/a00309.html#2df6318a6d298af4f1d9a14fd4908e05">Id</a> [5]</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a00309.html#e93356a9a5427ba318b4c71b2d665353">FirmwareWakingVector</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">"CD001"  <a href="#f08fe165ded79cfb555da87bfa49e2c5"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d2/d71/a00309.html#bfcf25cca45bd8e52bc671609644e151">Reserved</a> [82]</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a00309.html#1c669992b95f9d417243d535defba575">GlobalLock</a></td></tr>
+<tr><td class="memItemLeft" nowrap valign="top">}&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a00309.html#8044c962fc4cf1512d0d1ea68f115ddb">Unknown</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a00309.html#22ea81468001fc89ce23a5a1d21095c5">Flags</a></td></tr>
+<tr><td class="memItemLeft" nowrap>struct {</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a00309.html#6f39e94e15cd9edcca4fc76927a9331c">Reserved</a> [40]</td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d2/d71/a00309.html#e27a6327f296d5b7c9bdf09e29d6180f">Type</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Must be 0.  <a href="#cea7a59e6bd5fbbdbbff182773086b74"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d2/d71/a00309.html#2df6318a6d298af4f1d9a14fd4908e05">Id</a> [5]</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">"CD001"  <a href="#2d20569859d635b705e906fd4bdcdea6"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d2/d71/a00309.html#c97842185b6ed84c84f8c4ea9118ff3c">Version</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Must be 1.  <a href="#b8218693e297e38946b2ddcf9999a992"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d2/d71/a00309.html#5b582c84e2802b4f265935232130e736">SystemId</a> [32]</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">"EL TORITO SPECIFICATION"  <a href="#156d98d56872ea5a84088308ea4ae8f2"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d2/d71/a00309.html#84b2cd6cab7cd1c2802ef8d237977b83">Unused</a> [32]</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Must be 0.  <a href="#49b46262789fcf1946cd9e8e3f22b05f"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d2/d71/a00309.html#5d8add3b90e946f9824c297507aef8d3">EltCatalog</a> [4]</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Absolute pointer to first sector of Boot Catalog.  <a href="#a49b99a441724da90ba9b7f7a7fb2374"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d2/d71/a00309.html#0f36903df3c6a45dd783b698ef87ffc4">Unused2</a> [13]</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Must be 0.  <a href="#1082d0c7a914c8e34b560774d36f24ea"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap valign="top">}&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a00309.html#d8b7cdb29d84348772f12bbf07594fa6">BootRecordVolume</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap>struct {</td></tr>
+
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d2/d71/a00309.html#e27a6327f296d5b7c9bdf09e29d6180f">Type</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d2/d71/a00309.html#2df6318a6d298af4f1d9a14fd4908e05">Id</a> [5]</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">"CD001"  <a href="#6a9267d5b78753a4a406cf4c9188dfea"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d2/d71/a00309.html#c97842185b6ed84c84f8c4ea9118ff3c">Version</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d2/d71/a00309.html#7d10d51cbb8b048a7ef13ef4d7d0cca9">Unused</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Must be 0.  <a href="#c271e23c309ca3e7f6635bfbb8f35ceb"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d2/d71/a00309.html#5b582c84e2802b4f265935232130e736">SystemId</a> [32]</td></tr>
+
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d2/d71/a00309.html#b0039030e152d6604cd598380233759e">VolumeId</a> [32]</td></tr>
+
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d2/d71/a00309.html#dffc499a1a4a44aac17419d92699b6f8">Unused2</a> [8]</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Must be 0.  <a href="#f1eb30eb3ee27b39985c1ab0c8b6d3b6"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d2/d71/a00309.html#2414890a563f4dd47d7801a8e16bfdc4">VolSpaceSize</a> [2]</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">the number of Logical Blocks  <a href="#569fcba842c77a0da17b837bbc47b3d4"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap valign="top">}&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a00309.html#ed0e9f9dc2459df2f5baffeedc17d2d1">PrimaryVolume</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Firmware ACPI Control Structure <hr><h2>Field Documentation</h2>
-<a class="anchor" name="e93356a9a5427ba318b4c71b2d665353"></a><!-- doxytag: member="EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE::FirmwareWakingVector" ref="e93356a9a5427ba318b4c71b2d665353" args="" -->
+CD-ROM Volume Descriptor <hr><h2>Field Documentation</h2>
+<a class="anchor" name="d8b7cdb29d84348772f12bbf07594fa6"></a><!-- doxytag: member="CDROM_VOLUME_DESCRIPTOR::BootRecordVolume" ref="d8b7cdb29d84348772f12bbf07594fa6" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d2/d71/a00309.html#e93356a9a5427ba318b4c71b2d665353">EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE::FirmwareWakingVector</a>          </td>
+          <td class="memname">struct { ... }   <a class="el" href="../../d2/d71/a00309.html#d8b7cdb29d84348772f12bbf07594fa6">CDROM_VOLUME_DESCRIPTOR::BootRecordVolume</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Boot Record Volume Descriptor, defined in "El Torito" Specification. 
+</div>
+</div><p>
+<a class="anchor" name="5d8add3b90e946f9824c297507aef8d3"></a><!-- doxytag: member="CDROM_VOLUME_DESCRIPTOR::EltCatalog" ref="5d8add3b90e946f9824c297507aef8d3" args="[4]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d2/d71/a00309.html#5d8add3b90e946f9824c297507aef8d3">CDROM_VOLUME_DESCRIPTOR::EltCatalog</a>[4]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Absolute pointer to first sector of Boot Catalog. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="2df6318a6d298af4f1d9a14fd4908e05"></a><!-- doxytag: member="CDROM_VOLUME_DESCRIPTOR::Id" ref="2df6318a6d298af4f1d9a14fd4908e05" args="[5]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> <a class="el" href="../../d2/d71/a00309.html#2df6318a6d298af4f1d9a14fd4908e05">CDROM_VOLUME_DESCRIPTOR::Id</a>[5]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+"CD001" 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="ed0e9f9dc2459df2f5baffeedc17d2d1"></a><!-- doxytag: member="CDROM_VOLUME_DESCRIPTOR::PrimaryVolume" ref="ed0e9f9dc2459df2f5baffeedc17d2d1" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct { ... }   <a class="el" href="../../d2/d71/a00309.html#ed0e9f9dc2459df2f5baffeedc17d2d1">CDROM_VOLUME_DESCRIPTOR::PrimaryVolume</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Primary Volumn Descriptor, defined in ISO 9660. 
+</div>
+</div><p>
+<a class="anchor" name="bfcf25cca45bd8e52bc671609644e151"></a><!-- doxytag: member="CDROM_VOLUME_DESCRIPTOR::Reserved" ref="bfcf25cca45bd8e52bc671609644e151" args="[82]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> <a class="el" href="../../d2/d71/a00309.html#bfcf25cca45bd8e52bc671609644e151">CDROM_VOLUME_DESCRIPTOR::Reserved</a>[82]          </td>
         </tr>
       </table>
 </div>
@@ -56,12 +166,46 @@ Firmware ACPI Control Structure <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="22ea81468001fc89ce23a5a1d21095c5"></a><!-- doxytag: member="EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE::Flags" ref="22ea81468001fc89ce23a5a1d21095c5" args="" -->
+<a class="anchor" name="5b582c84e2802b4f265935232130e736"></a><!-- doxytag: member="CDROM_VOLUME_DESCRIPTOR::SystemId" ref="5b582c84e2802b4f265935232130e736" args="[32]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d2/d71/a00309.html#22ea81468001fc89ce23a5a1d21095c5">EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE::Flags</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> <a class="el" href="../../d2/d71/a00309.html#5b582c84e2802b4f265935232130e736">CDROM_VOLUME_DESCRIPTOR::SystemId</a>[32]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+"EL TORITO SPECIFICATION" 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="e27a6327f296d5b7c9bdf09e29d6180f"></a><!-- doxytag: member="CDROM_VOLUME_DESCRIPTOR::Type" ref="e27a6327f296d5b7c9bdf09e29d6180f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d2/d71/a00309.html#e27a6327f296d5b7c9bdf09e29d6180f">CDROM_VOLUME_DESCRIPTOR::Type</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Must be 0. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="8044c962fc4cf1512d0d1ea68f115ddb"></a><!-- doxytag: member="CDROM_VOLUME_DESCRIPTOR::Unknown" ref="8044c962fc4cf1512d0d1ea68f115ddb" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct { ... }   <a class="el" href="../../d2/d71/a00309.html#8044c962fc4cf1512d0d1ea68f115ddb">CDROM_VOLUME_DESCRIPTOR::Unknown</a>          </td>
         </tr>
       </table>
 </div>
@@ -71,12 +215,114 @@ Firmware ACPI Control Structure <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="1c669992b95f9d417243d535defba575"></a><!-- doxytag: member="EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE::GlobalLock" ref="1c669992b95f9d417243d535defba575" args="" -->
+<a class="anchor" name="7d10d51cbb8b048a7ef13ef4d7d0cca9"></a><!-- doxytag: member="CDROM_VOLUME_DESCRIPTOR::Unused" ref="7d10d51cbb8b048a7ef13ef4d7d0cca9" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d2/d71/a00309.html#1c669992b95f9d417243d535defba575">EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE::GlobalLock</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d2/d71/a00309.html#84b2cd6cab7cd1c2802ef8d237977b83">CDROM_VOLUME_DESCRIPTOR::Unused</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Must be 0. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="84b2cd6cab7cd1c2802ef8d237977b83"></a><!-- doxytag: member="CDROM_VOLUME_DESCRIPTOR::Unused" ref="84b2cd6cab7cd1c2802ef8d237977b83" args="[32]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> <a class="el" href="../../d2/d71/a00309.html#84b2cd6cab7cd1c2802ef8d237977b83">CDROM_VOLUME_DESCRIPTOR::Unused</a>[32]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Must be 0. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="dffc499a1a4a44aac17419d92699b6f8"></a><!-- doxytag: member="CDROM_VOLUME_DESCRIPTOR::Unused2" ref="dffc499a1a4a44aac17419d92699b6f8" args="[8]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d2/d71/a00309.html#0f36903df3c6a45dd783b698ef87ffc4">CDROM_VOLUME_DESCRIPTOR::Unused2</a>[8]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Must be 0. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="0f36903df3c6a45dd783b698ef87ffc4"></a><!-- doxytag: member="CDROM_VOLUME_DESCRIPTOR::Unused2" ref="0f36903df3c6a45dd783b698ef87ffc4" args="[13]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> <a class="el" href="../../d2/d71/a00309.html#0f36903df3c6a45dd783b698ef87ffc4">CDROM_VOLUME_DESCRIPTOR::Unused2</a>[13]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Must be 0. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="c97842185b6ed84c84f8c4ea9118ff3c"></a><!-- doxytag: member="CDROM_VOLUME_DESCRIPTOR::Version" ref="c97842185b6ed84c84f8c4ea9118ff3c" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d2/d71/a00309.html#c97842185b6ed84c84f8c4ea9118ff3c">CDROM_VOLUME_DESCRIPTOR::Version</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Must be 1. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="2414890a563f4dd47d7801a8e16bfdc4"></a><!-- doxytag: member="CDROM_VOLUME_DESCRIPTOR::VolSpaceSize" ref="2414890a563f4dd47d7801a8e16bfdc4" args="[2]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d2/d71/a00309.html#2414890a563f4dd47d7801a8e16bfdc4">CDROM_VOLUME_DESCRIPTOR::VolSpaceSize</a>[2]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+the number of Logical Blocks 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="b0039030e152d6604cd598380233759e"></a><!-- doxytag: member="CDROM_VOLUME_DESCRIPTOR::VolumeId" ref="b0039030e152d6604cd598380233759e" args="[32]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> <a class="el" href="../../d2/d71/a00309.html#b0039030e152d6604cd598380233759e">CDROM_VOLUME_DESCRIPTOR::VolumeId</a>[32]          </td>
         </tr>
       </table>
 </div>
@@ -86,68 +332,8 @@ Firmware ACPI Control Structure <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="8d24335528470ba4b1da2ce9ebf41b2a"></a><!-- doxytag: member="EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE::HardwareSignature" ref="8d24335528470ba4b1da2ce9ebf41b2a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d2/d71/a00309.html#8d24335528470ba4b1da2ce9ebf41b2a">EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE::HardwareSignature</a>          </td>
-        </tr>
-      </table>
 </div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="0fe7b020baccc5ff3ac0abb931bf11f4"></a><!-- doxytag: member="EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE::Length" ref="0fe7b020baccc5ff3ac0abb931bf11f4" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d2/d71/a00309.html#0fe7b020baccc5ff3ac0abb931bf11f4">EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE::Length</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="6f39e94e15cd9edcca4fc76927a9331c"></a><!-- doxytag: member="EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE::Reserved" ref="6f39e94e15cd9edcca4fc76927a9331c" args="[40]" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d2/d71/a00309.html#6f39e94e15cd9edcca4fc76927a9331c">EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE::Reserved</a>[40]          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="838b10fee3738838494fa2af9bdfd80f"></a><!-- doxytag: member="EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE::Signature" ref="838b10fee3738838494fa2af9bdfd80f" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d2/d71/a00309.html#838b10fee3738838494fa2af9bdfd80f">EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE::Signature</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-</div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:15 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:21 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Protocol/SimplePointer.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Protocol/DevicePathUtilities.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,41 +21,57 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Protocol/SimplePointer.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Protocol/DevicePathUtilities.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/da3/a00589.html">EFI_SIMPLE_POINTER_STATE</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d2e/a00588.html">EFI_SIMPLE_POINTER_MODE</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dd7/a00248.html">_EFI_SIMPLE_POINTER_PROTOCOL</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d07/a00433.html">EFI_DEVICE_PATH_UTILITIES_PROTOCOL</a></td></tr>
 
 <tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/dee/a01166.html#9f22b4f3d115b41a68654af245fbace1">EFI_SIMPLE_POINTER_PROTOCOL_GUID</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/dee/a01166.html#9282df68c887d5d72311659e23e2f995">EFI_DEVICE_PATH_UTILITIES_PROTOCOL_GUID</a></td></tr>
 
 <tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
-<a class="el" href="../../dd/dd7/a00248.html">_EFI_SIMPLE_POINTER_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/dee/a01166.html#ba40ee4dfd58163150a118d7d726ab23">EFI_SIMPLE_POINTER_PROTOCOL</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/dee/a01166.html#0bb12981cd84bb7a1677a2a0c23f7956">EFI_DEVICE_PATH_UTILS_GET_DEVICE_PATH_SIZE</a> )(IN CONST <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> *DevicePath)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/dee/a01166.html#f492e3d8a4ec78be1c4a562fec14dcc8">EFI_SIMPLE_POINTER_RESET</a> )(IN <a class="el" href="../../dd/dd7/a00248.html">EFI_SIMPLE_POINTER_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> ExtendedVerification)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <br class="typebreak">
+<a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> <br class="typebreak">
+*(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/dee/a01166.html#b6fa3d88c7ff200eaab3cb626e1324ff">EFI_DEVICE_PATH_UTILS_DUP_DEVICE_PATH</a> )(IN CONST <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> *DevicePath)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/dee/a01166.html#b0895954e614f91c5fbcba7066ac9972">EFI_SIMPLE_POINTER_GET_STATE</a> )(IN <a class="el" href="../../dd/dd7/a00248.html">EFI_SIMPLE_POINTER_PROTOCOL</a> *This, IN OUT <a class="el" href="../../d6/da3/a00589.html">EFI_SIMPLE_POINTER_STATE</a> *State)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <br class="typebreak">
+<a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> <br class="typebreak">
+*(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/dee/a01166.html#b6e88992eb6aca1bbc3bf5af62e07d0e">EFI_DEVICE_PATH_UTILS_APPEND_PATH</a> )(IN CONST <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> *Src1, IN CONST <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> *Src2)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <br class="typebreak">
+<a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> <br class="typebreak">
+*(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/dee/a01166.html#43b7080af34fac6484e8deda2262afb7">EFI_DEVICE_PATH_UTILS_APPEND_NODE</a> )(IN CONST <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> *DevicePath, IN CONST <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> *DeviceNode)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <br class="typebreak">
+<a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> <br class="typebreak">
+*(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/dee/a01166.html#3bd2560f03e58a11f8d6f159b4c71494">EFI_DEVICE_PATH_UTILS_APPEND_INSTANCE</a> )(IN CONST <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> *DevicePath, IN CONST <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> *DevicePathInstance)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <br class="typebreak">
+<a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> <br class="typebreak">
+*(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/dee/a01166.html#cb2e9d288b4ffa9486c73ef956af3f11">EFI_DEVICE_PATH_UTILS_GET_NEXT_INSTANCE</a> )(IN OUT <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> **DevicePathInstance, OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *DevicePathInstanceSize)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <br class="typebreak">
+<a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> <br class="typebreak">
+*(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/dee/a01166.html#5b234f2a1f4c314e78677f8eaab22cab">EFI_DEVICE_PATH_CREATE_NODE</a> )(IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> NodeType, IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> NodeSubType, IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> NodeLength)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/dee/a01166.html#12d59e5771d3dc07a3fa1412d2838745">EFI_DEVICE_PATH_UTILS_IS_MULTI_INSTANCE</a> )(IN CONST <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> *DevicePath)</td></tr>
 
 <tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/dee/a01166.html#e1d8798c9965b29ac47ca57ff15d3e2a">gEfiSimplePointerProtocolGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/dee/a01166.html#09685acbb85c7f5c3ff3548880b39e37">gEfiDevicePathUtilitiesProtocolGuid</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Simple Pointer protocol from the UEFI 2.0 specification.<p>
-Abstraction of a very simple pointer device like a mouse or trackball.<p>
+<a class="el" href="../../dd/d07/a00433.html">EFI_DEVICE_PATH_UTILITIES_PROTOCOL</a> as defined in UEFI 2.0. Use to create and manipulate device paths and device nodes.<p>
 Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
-<a class="anchor" name="9f22b4f3d115b41a68654af245fbace1"></a><!-- doxytag: member="SimplePointer.h::EFI_SIMPLE_POINTER_PROTOCOL_GUID" ref="9f22b4f3d115b41a68654af245fbace1" args="" -->
+<a class="anchor" name="9282df68c887d5d72311659e23e2f995"></a><!-- doxytag: member="DevicePathUtilities.h::EFI_DEVICE_PATH_UTILITIES_PROTOCOL_GUID" ref="9282df68c887d5d72311659e23e2f995" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_SIMPLE_POINTER_PROTOCOL_GUID          </td>
+          <td class="memname">#define EFI_DEVICE_PATH_UTILITIES_PROTOCOL_GUID          </td>
         </tr>
       </table>
 </div>
@@ -63,91 +79,241 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 <p>
 <b>Value:</b><div class="fragment"><pre class="fragment">{ \
-    0x31878c87, 0xb75, 0x11d5, {0x9a, 0x4f, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d } \
+    0x379be4e, 0xd706, 0x437d, {0xb0, 0x37, 0xed, 0xb8, 0x2f, 0xb7, 0x72, 0xa4 } \
   }
-</pre></div>
+</pre></div>Device Path Utilities protocol 
 </div>
 </div><p>
 <hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="b0895954e614f91c5fbcba7066ac9972"></a><!-- doxytag: member="SimplePointer.h::EFI_SIMPLE_POINTER_GET_STATE" ref="b0895954e614f91c5fbcba7066ac9972" args=")(IN EFI_SIMPLE_POINTER_PROTOCOL *This, IN OUT EFI_SIMPLE_POINTER_STATE *State)" -->
+<a class="anchor" name="5b234f2a1f4c314e78677f8eaab22cab"></a><!-- doxytag: member="DevicePathUtilities.h::EFI_DEVICE_PATH_CREATE_NODE" ref="5b234f2a1f4c314e78677f8eaab22cab" args=")(IN UINT8 NodeType, IN UINT8 NodeSubType, IN UINT16 NodeLength)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../dc/dee/a01166.html#b0895954e614f91c5fbcba7066ac9972">EFI_SIMPLE_POINTER_GET_STATE</a>)(IN <a class="el" href="../../dd/dd7/a00248.html">EFI_SIMPLE_POINTER_PROTOCOL</a> *This, IN OUT <a class="el" href="../../d6/da3/a00589.html">EFI_SIMPLE_POINTER_STATE</a> *State)          </td>
+          <td class="memname">typedef <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a>*(EFIAPI * <a class="el" href="../../dc/dee/a01166.html#5b234f2a1f4c314e78677f8eaab22cab">EFI_DEVICE_PATH_CREATE_NODE</a>)(IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> NodeType, IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> NodeSubType, IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> NodeLength)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Retrieves the current state of a pointer device.<p>
+Creates a device node<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_SIMPLE_POINTER_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>State</em>&nbsp;</td><td>A pointer to the state information on the pointer device.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>NodeType</em>&nbsp;</td><td>NodeType is the device node type (<a class="el" href="../../df/d70/a00431.html#73ca54766487d7bd7f8d99eedae537d1">EFI_DEVICE_PATH.Type</a>) for the new device node. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>NodeSubType</em>&nbsp;</td><td>NodeSubType is the device node sub-type <a class="el" href="../../df/d70/a00431.html#cd47ce00df91a29caf6cba0d313ea98e">EFI_DEVICE_PATH.SubType</a>) for the new device node. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>NodeLength</em>&nbsp;</td><td>NodeLength is the length of the device node (<a class="el" href="../../df/d70/a00431.html#92e6fd3a9b5ce5f46e01a716ee35f824">EFI_DEVICE_PATH.Length</a>) for the new device node.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The state of the pointer device was returned in State. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_READY</em>&nbsp;</td><td>The state of the pointer device has not changed since the last call to GetState(). </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>A device error occurred while attempting to retrieve the pointer device's current state. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Pointer</em>&nbsp;</td><td>A pointer to the newly created device node. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>NULL</em>&nbsp;</td><td>NodeLength is less than the size of the header or there was insufficient memory. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
-<a class="anchor" name="ba40ee4dfd58163150a118d7d726ab23"></a><!-- doxytag: member="SimplePointer.h::EFI_SIMPLE_POINTER_PROTOCOL" ref="ba40ee4dfd58163150a118d7d726ab23" args="" -->
+<a class="anchor" name="3bd2560f03e58a11f8d6f159b4c71494"></a><!-- doxytag: member="DevicePathUtilities.h::EFI_DEVICE_PATH_UTILS_APPEND_INSTANCE" ref="3bd2560f03e58a11f8d6f159b4c71494" args=")(IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePath, IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePathInstance)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef struct <a class="el" href="../../dd/dd7/a00248.html">_EFI_SIMPLE_POINTER_PROTOCOL</a> <a class="el" href="../../dd/dd7/a00248.html">EFI_SIMPLE_POINTER_PROTOCOL</a>          </td>
+          <td class="memname">typedef <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a>*(EFIAPI * <a class="el" href="../../dc/dee/a01166.html#3bd2560f03e58a11f8d6f159b4c71494">EFI_DEVICE_PATH_UTILS_APPEND_INSTANCE</a>)(IN CONST <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> *DevicePath, IN CONST <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> *DevicePathInstance)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<a class="anchor" name="f492e3d8a4ec78be1c4a562fec14dcc8"></a><!-- doxytag: member="SimplePointer.h::EFI_SIMPLE_POINTER_RESET" ref="f492e3d8a4ec78be1c4a562fec14dcc8" args=")(IN EFI_SIMPLE_POINTER_PROTOCOL *This, IN BOOLEAN ExtendedVerification)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../dc/dee/a01166.html#f492e3d8a4ec78be1c4a562fec14dcc8">EFI_SIMPLE_POINTER_RESET</a>)(IN <a class="el" href="../../dd/dd7/a00248.html">EFI_SIMPLE_POINTER_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> ExtendedVerification)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Resets the pointer device hardware.<p>
+Creates a new path by appending the specified device path instance to the specified device path.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_SIMPLE_POINTER_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ExtendedVerification</em>&nbsp;</td><td>Indicates that the driver may perform a more exhaustive verification operation of the device during reset.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>DevicePath</em>&nbsp;</td><td>Points to the device path. If NULL, then ignored. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>DevicePathInstance</em>&nbsp;</td><td>Points to the device path instance.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The device was reset. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The device is not functioning correctly and could not be reset. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Pointer</em>&nbsp;</td><td>A pointer to the newly created device path </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>NULL</em>&nbsp;</td><td>Memory could not be allocated or DevicePathInstance is NULL. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="43b7080af34fac6484e8deda2262afb7"></a><!-- doxytag: member="DevicePathUtilities.h::EFI_DEVICE_PATH_UTILS_APPEND_NODE" ref="43b7080af34fac6484e8deda2262afb7" args=")(IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePath, IN CONST EFI_DEVICE_PATH_PROTOCOL *DeviceNode)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a>*(EFIAPI * <a class="el" href="../../dc/dee/a01166.html#43b7080af34fac6484e8deda2262afb7">EFI_DEVICE_PATH_UTILS_APPEND_NODE</a>)(IN CONST <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> *DevicePath, IN CONST <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> *DeviceNode)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Creates a new path by appending the device node to the device path. If DeviceNode is NULL then a copy of DevicePath is returned. If DevicePath is NULL then a copy of DeviceNode, followed by an end-of-device path device node is returned. If both DeviceNode and DevicePath are NULL then a copy of an end-of-device-path device node is returned.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>DevicePath</em>&nbsp;</td><td>Points to the device path. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>DeviceNode</em>&nbsp;</td><td>Points to the device node.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Pointer</em>&nbsp;</td><td>A pointer to the allocated device node. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>NULL</em>&nbsp;</td><td>There was insufficient memory. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="b6e88992eb6aca1bbc3bf5af62e07d0e"></a><!-- doxytag: member="DevicePathUtilities.h::EFI_DEVICE_PATH_UTILS_APPEND_PATH" ref="b6e88992eb6aca1bbc3bf5af62e07d0e" args=")(IN CONST EFI_DEVICE_PATH_PROTOCOL *Src1, IN CONST EFI_DEVICE_PATH_PROTOCOL *Src2)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a>*(EFIAPI * <a class="el" href="../../dc/dee/a01166.html#b6e88992eb6aca1bbc3bf5af62e07d0e">EFI_DEVICE_PATH_UTILS_APPEND_PATH</a>)(IN CONST <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> *Src1, IN CONST <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> *Src2)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Create a new path by appending the second device path to the first. If Src1 is NULL and Src2 is non-NULL, then a duplicate of Src2 is returned. If Src1 is non-NULL and Src2 is NULL, then a duplicate of Src1 is returned. If Src1 and Src2 are both NULL, then a copy of an end-of-device-path is returned.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Src1</em>&nbsp;</td><td>Points to the first device path. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Src2</em>&nbsp;</td><td>Points to the second device path.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Pointer</em>&nbsp;</td><td>A pointer to the newly created device path. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>NULL</em>&nbsp;</td><td>Memory could not be allocated </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="b6fa3d88c7ff200eaab3cb626e1324ff"></a><!-- doxytag: member="DevicePathUtilities.h::EFI_DEVICE_PATH_UTILS_DUP_DEVICE_PATH" ref="b6fa3d88c7ff200eaab3cb626e1324ff" args=")(IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePath)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a>*(EFIAPI * <a class="el" href="../../dc/dee/a01166.html#b6fa3d88c7ff200eaab3cb626e1324ff">EFI_DEVICE_PATH_UTILS_DUP_DEVICE_PATH</a>)(IN CONST <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> *DevicePath)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Create a duplicate of the specified path.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>DevicePath</em>&nbsp;</td><td>Points to the source EFI device path.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Pointer</em>&nbsp;</td><td>A pointer to the duplicate device path. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>NULL</em>&nbsp;</td><td>insufficient memory or DevicePath is NULL </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="0bb12981cd84bb7a1677a2a0c23f7956"></a><!-- doxytag: member="DevicePathUtilities.h::EFI_DEVICE_PATH_UTILS_GET_DEVICE_PATH_SIZE" ref="0bb12981cd84bb7a1677a2a0c23f7956" args=")(IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePath)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>(EFIAPI * <a class="el" href="../../dc/dee/a01166.html#0bb12981cd84bb7a1677a2a0c23f7956">EFI_DEVICE_PATH_UTILS_GET_DEVICE_PATH_SIZE</a>)(IN CONST <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> *DevicePath)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Returns the size of the device path, in bytes.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>DevicePath</em>&nbsp;</td><td>Points to the start of the EFI device path.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Size Size of the specified device path, in bytes, including the end-of-path tag. </dd></dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>0</em>&nbsp;</td><td>DevicePath is NULL </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="cb2e9d288b4ffa9486c73ef956af3f11"></a><!-- doxytag: member="DevicePathUtilities.h::EFI_DEVICE_PATH_UTILS_GET_NEXT_INSTANCE" ref="cb2e9d288b4ffa9486c73ef956af3f11" args=")(IN OUT EFI_DEVICE_PATH_PROTOCOL **DevicePathInstance, OUT UINTN *DevicePathInstanceSize)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a>*(EFIAPI * <a class="el" href="../../dc/dee/a01166.html#cb2e9d288b4ffa9486c73ef956af3f11">EFI_DEVICE_PATH_UTILS_GET_NEXT_INSTANCE</a>)(IN OUT <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> **DevicePathInstance, OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *DevicePathInstanceSize)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Creates a copy of the current device path instance and returns a pointer to the next device path instance.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>DevicePathInstance</em>&nbsp;</td><td>On input, this holds the pointer to the current device path instance. On output, this holds the pointer to the next device path instance or NULL if there are no more device path instances in the device path. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>DevicePathInstanceSize</em>&nbsp;</td><td>On output, this holds the size of the device path instance, in bytes or zero, if DevicePathInstance is NULL. If NULL, then the instance size is not output.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Pointer</em>&nbsp;</td><td>A pointer to the copy of the current device path instance. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>NULL</em>&nbsp;</td><td>DevicePathInstace was NULL on entry or there was insufficient memory. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="12d59e5771d3dc07a3fa1412d2838745"></a><!-- doxytag: member="DevicePathUtilities.h::EFI_DEVICE_PATH_UTILS_IS_MULTI_INSTANCE" ref="12d59e5771d3dc07a3fa1412d2838745" args=")(IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePath)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>(EFIAPI * <a class="el" href="../../dc/dee/a01166.html#12d59e5771d3dc07a3fa1412d2838745">EFI_DEVICE_PATH_UTILS_IS_MULTI_INSTANCE</a>)(IN CONST <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> *DevicePath)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Returns whether a device path is multi-instance.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>DevicePath</em>&nbsp;</td><td>Points to the device path. If NULL, then ignored.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TRUE</em>&nbsp;</td><td>The device path has more than one instance </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>FALSE</em>&nbsp;</td><td>The device path is empty or contains only a single instance. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
 <hr><h2>Variable Documentation</h2>
-<a class="anchor" name="e1d8798c9965b29ac47ca57ff15d3e2a"></a><!-- doxytag: member="SimplePointer.h::gEfiSimplePointerProtocolGuid" ref="e1d8798c9965b29ac47ca57ff15d3e2a" args="" -->
+<a class="anchor" name="09685acbb85c7f5c3ff3548880b39e37"></a><!-- doxytag: member="DevicePathUtilities.h::gEfiDevicePathUtilitiesProtocolGuid" ref="09685acbb85c7f5c3ff3548880b39e37" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../dc/dee/a01166.html#e1d8798c9965b29ac47ca57ff15d3e2a">gEfiSimplePointerProtocolGuid</a>          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../dc/dee/a01166.html#09685acbb85c7f5c3ff3548880b39e37">gEfiDevicePathUtilitiesProtocolGuid</a>          </td>
         </tr>
       </table>
 </div>
@@ -158,7 +324,7 @@ Resets the pointer device hardware.<p>
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:10 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:31 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

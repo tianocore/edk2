@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MEDIA_FW_VOL_DEVICE_PATH Struct Reference</title>
+<title>MdePkg[ALL]: EFI_UDP4_TRANSMIT_DATA Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,37 +21,27 @@
   </div>
 </div>
 <div class="contents">
-<h1>MEDIA_FW_VOL_DEVICE_PATH Struct Reference</h1><!-- doxytag: class="MEDIA_FW_VOL_DEVICE_PATH" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_UDP4_TRANSMIT_DATA Struct Reference</h1><!-- doxytag: class="EFI_UDP4_TRANSMIT_DATA" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/de6/a00404.html">EFI_DEVICE_PATH_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d97/a00670.html#0e65d924713f27e94718257a6ff423f2">Header</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d7a/a00669.html">EFI_UDP4_SESSION_DATA</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d97/a00670.html#1c45b54c727ddd653e44c02b14f6e9ab">UdpSessionData</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d97/a00670.html#4defd01775012abd177df1d3c895350c">FvName</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/d87/a00539.html">EFI_IPv4_ADDRESS</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d97/a00670.html#99600a2e3f6636fb1fe0c246206af287">GatewayAddress</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d97/a00670.html#00c814358424aa2e9e90b2149f2d65dc">DataLength</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d97/a00670.html#f01a7bc9085b659225e9fb4418588a7b">FragmentCount</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d41/a00666.html">EFI_UDP4_FRAGMENT_DATA</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d97/a00670.html#8b4d4c7b91fdcbb918b7bde3c766334e">FragmentTable</a> [1]</td></tr>
 
 </table>
-<hr><a name="_details"></a><h2>Detailed Description</h2>
-This device path is used by systems implementing the UEFI PI Specification 1.0 to describe a firmware volume. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="4defd01775012abd177df1d3c895350c"></a><!-- doxytag: member="MEDIA_FW_VOL_DEVICE_PATH::FvName" ref="4defd01775012abd177df1d3c895350c" args="" -->
+<hr><h2>Field Documentation</h2>
+<a class="anchor" name="00c814358424aa2e9e90b2149f2d65dc"></a><!-- doxytag: member="EFI_UDP4_TRANSMIT_DATA::DataLength" ref="00c814358424aa2e9e90b2149f2d65dc" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../d1/d97/a00670.html#4defd01775012abd177df1d3c895350c">MEDIA_FW_VOL_DEVICE_PATH::FvName</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Firmware volume name. 
-</div>
-</div><p>
-<a class="anchor" name="0e65d924713f27e94718257a6ff423f2"></a><!-- doxytag: member="MEDIA_FW_VOL_DEVICE_PATH::Header" ref="0e65d924713f27e94718257a6ff423f2" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/de6/a00404.html">EFI_DEVICE_PATH_PROTOCOL</a> <a class="el" href="../../d1/d97/a00670.html#0e65d924713f27e94718257a6ff423f2">MEDIA_FW_VOL_DEVICE_PATH::Header</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d1/d97/a00670.html#00c814358424aa2e9e90b2149f2d65dc">EFI_UDP4_TRANSMIT_DATA::DataLength</a>          </td>
         </tr>
       </table>
 </div>
@@ -61,8 +51,68 @@ Firmware volume name.
 
 </div>
 </div><p>
+<a class="anchor" name="f01a7bc9085b659225e9fb4418588a7b"></a><!-- doxytag: member="EFI_UDP4_TRANSMIT_DATA::FragmentCount" ref="f01a7bc9085b659225e9fb4418588a7b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d1/d97/a00670.html#f01a7bc9085b659225e9fb4418588a7b">EFI_UDP4_TRANSMIT_DATA::FragmentCount</a>          </td>
+        </tr>
+      </table>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:19 2009 for MdePkg[ALL] by&nbsp;
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="8b4d4c7b91fdcbb918b7bde3c766334e"></a><!-- doxytag: member="EFI_UDP4_TRANSMIT_DATA::FragmentTable" ref="8b4d4c7b91fdcbb918b7bde3c766334e" args="[1]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d9/d41/a00666.html">EFI_UDP4_FRAGMENT_DATA</a> <a class="el" href="../../d1/d97/a00670.html#8b4d4c7b91fdcbb918b7bde3c766334e">EFI_UDP4_TRANSMIT_DATA::FragmentTable</a>[1]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="99600a2e3f6636fb1fe0c246206af287"></a><!-- doxytag: member="EFI_UDP4_TRANSMIT_DATA::GatewayAddress" ref="99600a2e3f6636fb1fe0c246206af287" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d3/d87/a00539.html">EFI_IPv4_ADDRESS</a>* <a class="el" href="../../d1/d97/a00670.html#99600a2e3f6636fb1fe0c246206af287">EFI_UDP4_TRANSMIT_DATA::GatewayAddress</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="1c45b54c727ddd653e44c02b14f6e9ab"></a><!-- doxytag: member="EFI_UDP4_TRANSMIT_DATA::UdpSessionData" ref="1c45b54c727ddd653e44c02b14f6e9ab" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d8/d7a/a00669.html">EFI_UDP4_SESSION_DATA</a>* <a class="el" href="../../d1/d97/a00670.html#1c45b54c727ddd653e44c02b14f6e9ab">EFI_UDP4_TRANSMIT_DATA::UdpSessionData</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+</div>
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:49 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

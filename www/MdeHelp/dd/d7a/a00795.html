@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: SATA_DEVICE_PATH Struct Reference</title>
+<title>MdePkg[ALL]: s_pxe_cpb_receive Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,81 +21,64 @@
   </div>
 </div>
 <div class="contents">
-<h1>SATA_DEVICE_PATH Struct Reference</h1><!-- doxytag: class="SATA_DEVICE_PATH" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>s_pxe_cpb_receive Struct Reference</h1><!-- doxytag: class="s_pxe_cpb_receive" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/de6/a00404.html">EFI_DEVICE_PATH_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d7a/a00795.html#9987af7a854df7abddac274ba7c01406">Header</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#46095e9a84c0bc88f934110dbca0993f">PXE_UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d7a/a00795.html#b8e8780edd15e153ab7b74eee3589401">BufferAddr</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d7a/a00795.html#e218dfca50c0ee5eb6f0defc828b6e66">HBAPortNumber</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d7a/a00795.html#b1a43f86d027ecb2a4d12ec59e86f4ed">BufferLen</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d7a/a00795.html#78f920246259896f492f169d67ea48bd">PortMultiplierPortNumber</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d7a/a00795.html#e702659141f194a79afa54d4afd054a1">Lun</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d7a/a00795.html#8632a0a3bbbb3bbe41e7b6d764d537b2">reserved</a></td></tr>
 
 </table>
 <hr><h2>Field Documentation</h2>
-<a class="anchor" name="e218dfca50c0ee5eb6f0defc828b6e66"></a><!-- doxytag: member="SATA_DEVICE_PATH::HBAPortNumber" ref="e218dfca50c0ee5eb6f0defc828b6e66" args="" -->
+<a class="anchor" name="b8e8780edd15e153ab7b74eee3589401"></a><!-- doxytag: member="s_pxe_cpb_receive::BufferAddr" ref="b8e8780edd15e153ab7b74eee3589401" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dd/d7a/a00795.html#e218dfca50c0ee5eb6f0defc828b6e66">SATA_DEVICE_PATH::HBAPortNumber</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#46095e9a84c0bc88f934110dbca0993f">PXE_UINT64</a> <a class="el" href="../../dd/d7a/a00795.html#b8e8780edd15e153ab7b74eee3589401">s_pxe_cpb_receive::BufferAddr</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The HBA port number that facilitates the connection to the device or a port multiplier. The value 0xFFFF is reserved. 
+Address of first byte of receive buffer. This is also the first byte of the frame header. 
 </div>
 </div><p>
-<a class="anchor" name="9987af7a854df7abddac274ba7c01406"></a><!-- doxytag: member="SATA_DEVICE_PATH::Header" ref="9987af7a854df7abddac274ba7c01406" args="" -->
+<a class="anchor" name="b1a43f86d027ecb2a4d12ec59e86f4ed"></a><!-- doxytag: member="s_pxe_cpb_receive::BufferLen" ref="b1a43f86d027ecb2a4d12ec59e86f4ed" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/de6/a00404.html">EFI_DEVICE_PATH_PROTOCOL</a> <a class="el" href="../../dd/d7a/a00795.html#9987af7a854df7abddac274ba7c01406">SATA_DEVICE_PATH::Header</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a> <a class="el" href="../../dd/d7a/a00795.html#b1a43f86d027ecb2a4d12ec59e86f4ed">s_pxe_cpb_receive::BufferLen</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+Length of receive buffer. This must be large enough to hold the received frame (media header + data). If the length of smaller than the received frame, data will be lost. 
 </div>
 </div><p>
-<a class="anchor" name="e702659141f194a79afa54d4afd054a1"></a><!-- doxytag: member="SATA_DEVICE_PATH::Lun" ref="e702659141f194a79afa54d4afd054a1" args="" -->
+<a class="anchor" name="8632a0a3bbbb3bbe41e7b6d764d537b2"></a><!-- doxytag: member="s_pxe_cpb_receive::reserved" ref="8632a0a3bbbb3bbe41e7b6d764d537b2" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dd/d7a/a00795.html#e702659141f194a79afa54d4afd054a1">SATA_DEVICE_PATH::Lun</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a> <a class="el" href="../../dd/d7a/a00795.html#8632a0a3bbbb3bbe41e7b6d764d537b2">s_pxe_cpb_receive::reserved</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Logical Unit Number. 
-</div>
-</div><p>
-<a class="anchor" name="78f920246259896f492f169d67ea48bd"></a><!-- doxytag: member="SATA_DEVICE_PATH::PortMultiplierPortNumber" ref="78f920246259896f492f169d67ea48bd" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dd/d7a/a00795.html#78f920246259896f492f169d67ea48bd">SATA_DEVICE_PATH::PortMultiplierPortNumber</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-The Port multiplier port number that facilitates the connection to the device. Bit 15 should be set if the device is directly connected to the HBA. 
+Reserved, must be set to zero. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:21 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:00 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

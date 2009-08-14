@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Guid/DebugImageInfoTable.h File Reference</title>
+<title>MdePkg[ALL]: tdTPM_QUOTE_INFO Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -9,72 +9,38 @@
   <div class="tabs">
     <ul>
       <li><a href="../../main.html"><span>Main&nbsp;Page</span></a></li>
-      <li><a href="../../annotated.html"><span>Data&nbsp;Structures</span></a></li>
-      <li class="current"><a href="../../files.html"><span>Files</span></a></li>
+      <li class="current"><a href="../../annotated.html"><span>Data&nbsp;Structures</span></a></li>
+      <li><a href="../../files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div class="tabs">
     <ul>
-      <li><a href="../../files.html"><span>File&nbsp;List</span></a></li>
-      <li><a href="../../globals.html"><span>Globals</span></a></li>
+      <li><a href="../../annotated.html"><span>Data&nbsp;Structures</span></a></li>
+      <li><a href="../../functions.html"><span>Data&nbsp;Fields</span></a></li>
     </ul>
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Guid/DebugImageInfoTable.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>tdTPM_QUOTE_INFO Struct Reference</h1><!-- doxytag: class="tdTPM_QUOTE_INFO" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
-<tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/db2/a00601.html">EFI_SYSTEM_TABLE_POINTER</a></td></tr>
+<tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/dce/a00974.html">TPM_STRUCT_VER</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d40/a00959.html#170348367887a523d16184b6a0233fcf">version</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d53/a00399.html">EFI_DEBUG_IMAGE_INFO_NORMAL</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d40/a00959.html#d7fb99d76c992ff1d09dd077ae61db44">fixed</a> [4]</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">union &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dd1/a00398.html">EFI_DEBUG_IMAGE_INFO</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/dbc/a00931.html">TPM_COMPOSITE_HASH</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d40/a00959.html#b359c8446d5feb921a6e2ba6710de8dd">digestValue</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d95/a00400.html">EFI_DEBUG_IMAGE_INFO_TABLE_HEADER</a></td></tr>
-
-<tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d40/a00959.html#69815210bfe81ded2fe50d7ecbf33d1e">EFI_DEBUG_IMAGE_INFO_TABLE_GUID</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d40/a00959.html#83f0ad0423a3be36eb492ba2529fb140">EFI_DEBUG_IMAGE_INFO_UPDATE_IN_PROGRESS</a>&nbsp;&nbsp;&nbsp;0x01</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d40/a00959.html#01fd4fa6c88adb4afe4b028521b9bf6d">EFI_DEBUG_IMAGE_INFO_TABLE_MODIFIED</a>&nbsp;&nbsp;&nbsp;0x02</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d40/a00959.html#244417cd89b916676d39923211a72312">EFI_DEBUG_IMAGE_INFO_TYPE_NORMAL</a>&nbsp;&nbsp;&nbsp;0x01</td></tr>
-
-<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d40/a00959.html#d4d1efc632faf7f5ff47b1c4323362eb">gEfiDebugImageInfoTableGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d18/a00948.html">TPM_NONCE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d40/a00959.html#0834d951919acdda3538a06732dc9fec">externalData</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-<a class="el" href="../../d9/d0f/a00644.html">GUID</a> and related data structures used with the Debug Image Info Table.<p>
-Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
-<dl class="user" compact><dt><b>Revision Reference:</b></dt><dd><a class="el" href="../../d9/d0f/a00644.html">GUID</a> defined in UEFI 2.0 spec. </dd></dl>
-<hr><h2>Define Documentation</h2>
-<a class="anchor" name="69815210bfe81ded2fe50d7ecbf33d1e"></a><!-- doxytag: member="DebugImageInfoTable.h::EFI_DEBUG_IMAGE_INFO_TABLE_GUID" ref="69815210bfe81ded2fe50d7ecbf33d1e" args="" -->
+Part 2, section 11.3 TPM_QUOTE_INFO Structure <hr><h2>Field Documentation</h2>
+<a class="anchor" name="b359c8446d5feb921a6e2ba6710de8dd"></a><!-- doxytag: member="tdTPM_QUOTE_INFO::digestValue" ref="b359c8446d5feb921a6e2ba6710de8dd" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_DEBUG_IMAGE_INFO_TABLE_GUID          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-<b>Value:</b><div class="fragment"><pre class="fragment">{ \
-    0x49152e77, 0x1ada, 0x4764, {0xb7, 0xa2, 0x7a, 0xfe, 0xfe, 0xd9, 0x5e, 0x8b } \
-  }
-</pre></div>EFI_DEBUG_IMAGE_INFO_TABLE configuration table <a class="el" href="../../d9/d0f/a00644.html">GUID</a> declaration. 
-</div>
-</div><p>
-<a class="anchor" name="01fd4fa6c88adb4afe4b028521b9bf6d"></a><!-- doxytag: member="DebugImageInfoTable.h::EFI_DEBUG_IMAGE_INFO_TABLE_MODIFIED" ref="01fd4fa6c88adb4afe4b028521b9bf6d" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_DEBUG_IMAGE_INFO_TABLE_MODIFIED&nbsp;&nbsp;&nbsp;0x02          </td>
+          <td class="memname"><a class="el" href="../../df/dbc/a00931.html">TPM_COMPOSITE_HASH</a> <a class="el" href="../../db/d40/a00959.html#b359c8446d5feb921a6e2ba6710de8dd">tdTPM_QUOTE_INFO::digestValue</a>          </td>
         </tr>
       </table>
 </div>
@@ -84,12 +50,12 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 </div>
 </div><p>
-<a class="anchor" name="244417cd89b916676d39923211a72312"></a><!-- doxytag: member="DebugImageInfoTable.h::EFI_DEBUG_IMAGE_INFO_TYPE_NORMAL" ref="244417cd89b916676d39923211a72312" args="" -->
+<a class="anchor" name="0834d951919acdda3538a06732dc9fec"></a><!-- doxytag: member="tdTPM_QUOTE_INFO::externalData" ref="0834d951919acdda3538a06732dc9fec" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_DEBUG_IMAGE_INFO_TYPE_NORMAL&nbsp;&nbsp;&nbsp;0x01          </td>
+          <td class="memname"><a class="el" href="../../d8/d18/a00948.html">TPM_NONCE</a> <a class="el" href="../../db/d40/a00959.html#0834d951919acdda3538a06732dc9fec">tdTPM_QUOTE_INFO::externalData</a>          </td>
         </tr>
       </table>
 </div>
@@ -99,12 +65,12 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 </div>
 </div><p>
-<a class="anchor" name="83f0ad0423a3be36eb492ba2529fb140"></a><!-- doxytag: member="DebugImageInfoTable.h::EFI_DEBUG_IMAGE_INFO_UPDATE_IN_PROGRESS" ref="83f0ad0423a3be36eb492ba2529fb140" args="" -->
+<a class="anchor" name="d7fb99d76c992ff1d09dd077ae61db44"></a><!-- doxytag: member="tdTPM_QUOTE_INFO::fixed" ref="d7fb99d76c992ff1d09dd077ae61db44" args="[4]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_DEBUG_IMAGE_INFO_UPDATE_IN_PROGRESS&nbsp;&nbsp;&nbsp;0x01          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../db/d40/a00959.html#d7fb99d76c992ff1d09dd077ae61db44">tdTPM_QUOTE_INFO::fixed</a>[4]          </td>
         </tr>
       </table>
 </div>
@@ -114,13 +80,12 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 </div>
 </div><p>
-<hr><h2>Variable Documentation</h2>
-<a class="anchor" name="d4d1efc632faf7f5ff47b1c4323362eb"></a><!-- doxytag: member="DebugImageInfoTable.h::gEfiDebugImageInfoTableGuid" ref="d4d1efc632faf7f5ff47b1c4323362eb" args="" -->
+<a class="anchor" name="170348367887a523d16184b6a0233fcf"></a><!-- doxytag: member="tdTPM_QUOTE_INFO::version" ref="170348367887a523d16184b6a0233fcf" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../db/d40/a00959.html#d4d1efc632faf7f5ff47b1c4323362eb">gEfiDebugImageInfoTableGuid</a>          </td>
+          <td class="memname"><a class="el" href="../../df/dce/a00974.html">TPM_STRUCT_VER</a> <a class="el" href="../../db/d40/a00959.html#170348367887a523d16184b6a0233fcf">tdTPM_QUOTE_INFO::version</a>          </td>
         </tr>
       </table>
 </div>
@@ -131,7 +96,7 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:07 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:11 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

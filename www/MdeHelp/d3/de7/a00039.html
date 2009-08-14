@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: _EFI_HII_CONFIG_ACCESS_PROTOCOL Struct Reference</title>
+<title>MdePkg[ALL]: _EFI_HASH_PROTOCOL Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,24 +21,22 @@
   </div>
 </div>
 <div class="contents">
-<h1>_EFI_HII_CONFIG_ACCESS_PROTOCOL Struct Reference</h1><!-- doxytag: class="_EFI_HII_CONFIG_ACCESS_PROTOCOL" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>_EFI_HASH_PROTOCOL Struct Reference</h1><!-- doxytag: class="_EFI_HASH_PROTOCOL" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d6/de6/a01132.html#7946bf3122406e6b115faa0a200b224e">EFI_HII_ACCESS_EXTRACT_CONFIG</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/de7/a00039.html#e76c72576f28f1faa8de76c7a88b9a09">ExtractConfig</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/dd3/a01185.html#f59f25c891faefe6ab098d52509b7f99">EFI_HASH_GET_HASH_SIZE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/de7/a00039.html#833e069a2bf7095d6e767332059424d6">GetHashSize</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d6/de6/a01132.html#bfa7901e53696c1c4b7069cd1d1c0285">EFI_HII_ACCESS_ROUTE_CONFIG</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/de7/a00039.html#bd2dc831158eec15888d7fa5e6264c99">RouteConfig</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d6/de6/a01132.html#fbaeb5e29e396f70938e43eeb99da41a">EFI_HII_ACCESS_FORM_CALLBACK</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/de7/a00039.html#45643095ebd52cc5023e2faf921b2900">Callback</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/dd3/a01185.html#4922c3082a8bb682a1a80ab7e2269458">EFI_HASH_HASH</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/de7/a00039.html#5f6a3256e339d54d4656f33f65ecb817">Hash</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-This protocol provides a callable interface between the HII and drivers. Only drivers which provide IFR data to HII are required to publish this protocol. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="45643095ebd52cc5023e2faf921b2900"></a><!-- doxytag: member="_EFI_HII_CONFIG_ACCESS_PROTOCOL::Callback" ref="45643095ebd52cc5023e2faf921b2900" args="" -->
+This protocol allows creating a hash of an arbitrary message digest using one or more hash algorithms. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="833e069a2bf7095d6e767332059424d6"></a><!-- doxytag: member="_EFI_HASH_PROTOCOL::GetHashSize" ref="833e069a2bf7095d6e767332059424d6" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d6/de6/a01132.html#fbaeb5e29e396f70938e43eeb99da41a">EFI_HII_ACCESS_FORM_CALLBACK</a> <a class="el" href="../../d3/de7/a00039.html#45643095ebd52cc5023e2faf921b2900">_EFI_HII_CONFIG_ACCESS_PROTOCOL::Callback</a>          </td>
+          <td class="memname"><a class="el" href="../../d3/dd3/a01185.html#f59f25c891faefe6ab098d52509b7f99">EFI_HASH_GET_HASH_SIZE</a> <a class="el" href="../../d3/de7/a00039.html#833e069a2bf7095d6e767332059424d6">_EFI_HASH_PROTOCOL::GetHashSize</a>          </td>
         </tr>
       </table>
 </div>
@@ -48,27 +46,12 @@ This protocol provides a callable interface between the HII and drivers. Only dr
 
 </div>
 </div><p>
-<a class="anchor" name="e76c72576f28f1faa8de76c7a88b9a09"></a><!-- doxytag: member="_EFI_HII_CONFIG_ACCESS_PROTOCOL::ExtractConfig" ref="e76c72576f28f1faa8de76c7a88b9a09" args="" -->
+<a class="anchor" name="5f6a3256e339d54d4656f33f65ecb817"></a><!-- doxytag: member="_EFI_HASH_PROTOCOL::Hash" ref="5f6a3256e339d54d4656f33f65ecb817" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d6/de6/a01132.html#7946bf3122406e6b115faa0a200b224e">EFI_HII_ACCESS_EXTRACT_CONFIG</a> <a class="el" href="../../d3/de7/a00039.html#e76c72576f28f1faa8de76c7a88b9a09">_EFI_HII_CONFIG_ACCESS_PROTOCOL::ExtractConfig</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="bd2dc831158eec15888d7fa5e6264c99"></a><!-- doxytag: member="_EFI_HII_CONFIG_ACCESS_PROTOCOL::RouteConfig" ref="bd2dc831158eec15888d7fa5e6264c99" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d6/de6/a01132.html#bfa7901e53696c1c4b7069cd1d1c0285">EFI_HII_ACCESS_ROUTE_CONFIG</a> <a class="el" href="../../d3/de7/a00039.html#bd2dc831158eec15888d7fa5e6264c99">_EFI_HII_CONFIG_ACCESS_PROTOCOL::RouteConfig</a>          </td>
+          <td class="memname"><a class="el" href="../../d3/dd3/a01185.html#4922c3082a8bb682a1a80ab7e2269458">EFI_HASH_HASH</a> <a class="el" href="../../d3/de7/a00039.html#5f6a3256e339d54d4656f33f65ecb817">_EFI_HASH_PROTOCOL::Hash</a>          </td>
         </tr>
       </table>
 </div>
@@ -79,7 +62,7 @@ This protocol provides a callable interface between the HII and drivers. Only dr
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:12 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:03 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

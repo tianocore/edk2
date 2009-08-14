@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: SAL_SEC_HEADER Struct Reference</title>
+<title>MdePkg[ALL]: PEI_APRIORI_FILE_CONTENTS Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,99 +21,31 @@
   </div>
 </div>
 <div class="contents">
-<h1>SAL_SEC_HEADER Struct Reference</h1><!-- doxytag: class="SAL_SEC_HEADER" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>PEI_APRIORI_FILE_CONTENTS Struct Reference</h1><!-- doxytag: class="PEI_APRIORI_FILE_CONTENTS" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d96/a00782.html#5869ab7cf1747fc3c29862ead16e53e8">Guid</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d96/a00782.html#9ffe02c31e81a6d46de0defa5658fbbc">Revision</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d96/a00782.html#3f11aa16dfb9adc265a3e7cf33b9cc50">ErrorRecoveryInfo</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d96/a00782.html#3bf7e156bd421c392e5eea80108d855d">Reserved</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d96/a00782.html#6b6427f33ca612d11c65323f0f32d7a7">SectionLength</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d96/a00782.html#7766ea03c82902a1e01eae9fd60bc2a7">FileNamesWithinVolume</a> [1]</td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Definition of Section Header <hr><h2>Field Documentation</h2>
-<a class="anchor" name="3f11aa16dfb9adc265a3e7cf33b9cc50"></a><!-- doxytag: member="SAL_SEC_HEADER::ErrorRecoveryInfo" ref="3f11aa16dfb9adc265a3e7cf33b9cc50" args="" -->
+This file must be of type EFI_FV_FILETYPE_FREEFORM and must contain a single section of type EFI_SECTION_RAW. For details on firmware volumes, firmware file types, and firmware file section types. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="7766ea03c82902a1e01eae9fd60bc2a7"></a><!-- doxytag: member="PEI_APRIORI_FILE_CONTENTS::FileNamesWithinVolume" ref="7766ea03c82902a1e01eae9fd60bc2a7" args="[1]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../da/d96/a00782.html#3f11aa16dfb9adc265a3e7cf33b9cc50">SAL_SEC_HEADER::ErrorRecoveryInfo</a>          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../da/d96/a00782.html#7766ea03c82902a1e01eae9fd60bc2a7">PEI_APRIORI_FILE_CONTENTS::FileNamesWithinVolume</a>[1]          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<a class="anchor" name="5869ab7cf1747fc3c29862ead16e53e8"></a><!-- doxytag: member="SAL_SEC_HEADER::Guid" ref="5869ab7cf1747fc3c29862ead16e53e8" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">GUID</a> <a class="el" href="../../da/d96/a00782.html#5869ab7cf1747fc3c29862ead16e53e8">SAL_SEC_HEADER::Guid</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="3bf7e156bd421c392e5eea80108d855d"></a><!-- doxytag: member="SAL_SEC_HEADER::Reserved" ref="3bf7e156bd421c392e5eea80108d855d" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../da/d96/a00782.html#3bf7e156bd421c392e5eea80108d855d">SAL_SEC_HEADER::Reserved</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="9ffe02c31e81a6d46de0defa5658fbbc"></a><!-- doxytag: member="SAL_SEC_HEADER::Revision" ref="9ffe02c31e81a6d46de0defa5658fbbc" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../da/d96/a00782.html#9ffe02c31e81a6d46de0defa5658fbbc">SAL_SEC_HEADER::Revision</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="6b6427f33ca612d11c65323f0f32d7a7"></a><!-- doxytag: member="SAL_SEC_HEADER::SectionLength" ref="6b6427f33ca612d11c65323f0f32d7a7" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../da/d96/a00782.html#6b6427f33ca612d11c65323f0f32d7a7">SAL_SEC_HEADER::SectionLength</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
+An array of zero or more EFI_GUID type entries that match the file names of PEIM modules in the same Firmware Volume. The maximum number of entries. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:21 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:59 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

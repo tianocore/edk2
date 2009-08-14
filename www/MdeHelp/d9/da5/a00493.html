@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_IO_ACCESS Struct Reference</title>
+<title>MdePkg[ALL]: EFI_HOB_RESOURCE_DESCRIPTOR Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,47 +21,116 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_IO_ACCESS Struct Reference</h1><!-- doxytag: class="EFI_IO_ACCESS" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_HOB_RESOURCE_DESCRIPTOR Struct Reference</h1><!-- doxytag: class="EFI_HOB_RESOURCE_DESCRIPTOR" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/dbf/a01109.html#5285affbe6c3603a35a4b3292ceb9154">EFI_DEVICE_IO</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da5/a00493.html#7aa1bb488a3b349395b26ce1629280de">Read</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d89/a00484.html">EFI_HOB_GENERIC_HEADER</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da5/a00493.html#592b9e16eaae2113d0ab501829ce9367">Header</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/dbf/a01109.html#5285affbe6c3603a35a4b3292ceb9154">EFI_DEVICE_IO</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da5/a00493.html#ebccdb614f035d15e069180d87ed4d44">Write</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da5/a00493.html#ed147056742e43bdd78d5f56d12335d3">Owner</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d3d/a01110.html#a563162fa97b4bc5982d15494ada4404">EFI_RESOURCE_TYPE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da5/a00493.html#9b84af216f0ad2aac759b610424be055">ResourceType</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d3d/a01110.html#ff111c6b72dc92e8b7df7afe295c2ff0">EFI_RESOURCE_ATTRIBUTE_TYPE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da5/a00493.html#a4b1684b3c5f69a11316bdf3a075d5ca">ResourceAttribute</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d95/a01247.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da5/a00493.html#781594e9ed4d9ea3746eb079dea6ec50">PhysicalStart</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da5/a00493.html#2c0df9c1c5a3711369163a2e3d8d4806">ResourceLength</a></td></tr>
 
 </table>
-<hr><h2>Field Documentation</h2>
-<a class="anchor" name="7aa1bb488a3b349395b26ce1629280de"></a><!-- doxytag: member="EFI_IO_ACCESS::Read" ref="7aa1bb488a3b349395b26ce1629280de" args="" -->
+<hr><a name="_details"></a><h2>Detailed Description</h2>
+Describes the resource properties of all fixed, nonrelocatable resource ranges found on the processor host bus during the HOB producer phase. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="592b9e16eaae2113d0ab501829ce9367"></a><!-- doxytag: member="EFI_HOB_RESOURCE_DESCRIPTOR::Header" ref="592b9e16eaae2113d0ab501829ce9367" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d8/dbf/a01109.html#5285affbe6c3603a35a4b3292ceb9154">EFI_DEVICE_IO</a> <a class="el" href="../../d9/da5/a00493.html#7aa1bb488a3b349395b26ce1629280de">EFI_IO_ACCESS::Read</a>          </td>
+          <td class="memname"><a class="el" href="../../d8/d89/a00484.html">EFI_HOB_GENERIC_HEADER</a> <a class="el" href="../../d9/da5/a00493.html#592b9e16eaae2113d0ab501829ce9367">EFI_HOB_RESOURCE_DESCRIPTOR::Header</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The HOB generic header. Header.HobType = EFI_HOB_TYPE_RESOURCE_DESCRIPTOR. 
 </div>
 </div><p>
-<a class="anchor" name="ebccdb614f035d15e069180d87ed4d44"></a><!-- doxytag: member="EFI_IO_ACCESS::Write" ref="ebccdb614f035d15e069180d87ed4d44" args="" -->
+<a class="anchor" name="ed147056742e43bdd78d5f56d12335d3"></a><!-- doxytag: member="EFI_HOB_RESOURCE_DESCRIPTOR::Owner" ref="ed147056742e43bdd78d5f56d12335d3" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d8/dbf/a01109.html#5285affbe6c3603a35a4b3292ceb9154">EFI_DEVICE_IO</a> <a class="el" href="../../d9/da5/a00493.html#ebccdb614f035d15e069180d87ed4d44">EFI_IO_ACCESS::Write</a>          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../d9/da5/a00493.html#ed147056742e43bdd78d5f56d12335d3">EFI_HOB_RESOURCE_DESCRIPTOR::Owner</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+A <a class="el" href="../../d1/d87/a00689.html">GUID</a> representing the owner of the resource. This <a class="el" href="../../d1/d87/a00689.html">GUID</a> is used by HOB consumer phase components to correlate device ownership of a resource. 
+</div>
+</div><p>
+<a class="anchor" name="781594e9ed4d9ea3746eb079dea6ec50"></a><!-- doxytag: member="EFI_HOB_RESOURCE_DESCRIPTOR::PhysicalStart" ref="781594e9ed4d9ea3746eb079dea6ec50" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dd/d95/a01247.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> <a class="el" href="../../d9/da5/a00493.html#781594e9ed4d9ea3746eb079dea6ec50">EFI_HOB_RESOURCE_DESCRIPTOR::PhysicalStart</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
 
+<p>
+Physical start address of the resource region. 
+</div>
+</div><p>
+<a class="anchor" name="a4b1684b3c5f69a11316bdf3a075d5ca"></a><!-- doxytag: member="EFI_HOB_RESOURCE_DESCRIPTOR::ResourceAttribute" ref="a4b1684b3c5f69a11316bdf3a075d5ca" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d1/d3d/a01110.html#ff111c6b72dc92e8b7df7afe295c2ff0">EFI_RESOURCE_ATTRIBUTE_TYPE</a> <a class="el" href="../../d9/da5/a00493.html#a4b1684b3c5f69a11316bdf3a075d5ca">EFI_HOB_RESOURCE_DESCRIPTOR::ResourceAttribute</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Resource attributes as defined by EFI_RESOURCE_ATTRIBUTE_TYPE. 
+</div>
+</div><p>
+<a class="anchor" name="2c0df9c1c5a3711369163a2e3d8d4806"></a><!-- doxytag: member="EFI_HOB_RESOURCE_DESCRIPTOR::ResourceLength" ref="2c0df9c1c5a3711369163a2e3d8d4806" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d9/da5/a00493.html#2c0df9c1c5a3711369163a2e3d8d4806">EFI_HOB_RESOURCE_DESCRIPTOR::ResourceLength</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Number of bytes of the resource region. 
+</div>
+</div><p>
+<a class="anchor" name="9b84af216f0ad2aac759b610424be055"></a><!-- doxytag: member="EFI_HOB_RESOURCE_DESCRIPTOR::ResourceType" ref="9b84af216f0ad2aac759b610424be055" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d1/d3d/a01110.html#a563162fa97b4bc5982d15494ada4404">EFI_RESOURCE_TYPE</a> <a class="el" href="../../d9/da5/a00493.html#9b84af216f0ad2aac759b610424be055">EFI_HOB_RESOURCE_DESCRIPTOR::ResourceType</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Resource type enumeration as defined by EFI_RESOURCE_TYPE. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:33 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

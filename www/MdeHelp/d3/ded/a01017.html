@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Library/DxeCoreEntryPoint.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Guid/HardwareErrorVariable.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,161 +21,57 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Library/DxeCoreEntryPoint.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Guid/HardwareErrorVariable.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
-<tr><td colspan="2"><br><h2>Functions</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/ded/a01017.html#43f1da4ebdcfb71480bc45d8939b7874">_ModuleEntryPoint</a> (IN VOID *HobStart)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/ded/a01017.html#9118ea177b7922e76805663e6f1e430d">EfiMain</a> (IN VOID *HobStart)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/ded/a01017.html#cc49b16375e37b32cbed1d337c8bc257">ProcessLibraryConstructorList</a> (IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ImageHandle, IN <a class="el" href="../../d1/d8c/a00600.html">EFI_SYSTEM_TABLE</a> *SystemTable)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/ded/a01017.html#a091d526aa9a254679bbf7886e77921e">ProcessModuleEntryPointList</a> (IN VOID *HobStart)</td></tr>
+<tr><td colspan="2"><br><h2>Defines</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/ded/a01017.html#204c92755dcc0622e4e3efa938f93495">EFI_HARDWARE_ERROR_VARIABLE</a></td></tr>
 
 <tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/ded/a01017.html#93621d963fbc6b1dcb8089c9ae1e34b8">gHobList</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/ded/a01017.html#da150ae8c31df0402d227d0d3e1a5069">gEfiHardwareErrorVariableGuid</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Module entry point library for DXE core.<p>
-Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Function Documentation</h2>
-<a class="anchor" name="43f1da4ebdcfb71480bc45d8939b7874"></a><!-- doxytag: member="DxeCoreEntryPoint.h::_ModuleEntryPoint" ref="43f1da4ebdcfb71480bc45d8939b7874" args="(IN VOID *HobStart)" -->
+<a class="el" href="../../d1/d87/a00689.html">GUID</a> for hardware error record variables.<p>
+Copyright (c) 2007 - 2009, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
+<dl class="user" compact><dt><b>Revision Reference:</b></dt><dd><a class="el" href="../../d1/d87/a00689.html">GUID</a> defined in UEFI 2.1. </dd></dl>
+<hr><h2>Define Documentation</h2>
+<a class="anchor" name="204c92755dcc0622e4e3efa938f93495"></a><!-- doxytag: member="HardwareErrorVariable.h::EFI_HARDWARE_ERROR_VARIABLE" ref="204c92755dcc0622e4e3efa938f93495" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">VOID EFIAPI _ModuleEntryPoint           </td>
-          <td>(</td>
-          <td class="paramtype">IN VOID *&nbsp;</td>
-          <td class="paramname"> <em>HobStart</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
+          <td class="memname">#define EFI_HARDWARE_ERROR_VARIABLE          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The entry point of PE/COFF Image for the DXE Core.<p>
-This function is the entry point for the DXE Core. This function is required to call <a class="el" href="../../d3/ded/a01017.html#a091d526aa9a254679bbf7886e77921e">ProcessModuleEntryPointList()</a> and <a class="el" href="../../d3/ded/a01017.html#a091d526aa9a254679bbf7886e77921e">ProcessModuleEntryPointList()</a> is never expected to return. The DXE Core is responsible for calling <a class="el" href="../../d3/ded/a01017.html#cc49b16375e37b32cbed1d337c8bc257">ProcessLibraryConstructorList()</a> as soon as the EFI System Table and the image handle for the DXE Core itself have been established. If <a class="el" href="../../d3/ded/a01017.html#a091d526aa9a254679bbf7886e77921e">ProcessModuleEntryPointList()</a> returns, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a> and halt the system.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>HobStart</em>&nbsp;</td><td>Pointer to the beginning of the HOB List passed in from the PEI Phase. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="9118ea177b7922e76805663e6f1e430d"></a><!-- doxytag: member="DxeCoreEntryPoint.h::EfiMain" ref="9118ea177b7922e76805663e6f1e430d" args="(IN VOID *HobStart)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VOID EFIAPI EfiMain           </td>
-          <td>(</td>
-          <td class="paramtype">IN VOID *&nbsp;</td>
-          <td class="paramname"> <em>HobStart</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Required by the EBC compiler and identical in functionality to <a class="el" href="../../d3/ded/a01017.html#43f1da4ebdcfb71480bc45d8939b7874">_ModuleEntryPoint()</a>.<p>
-This function is required to call <a class="el" href="../../d3/ded/a01017.html#43f1da4ebdcfb71480bc45d8939b7874">_ModuleEntryPoint()</a> passing in HobStart.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>HobStart</em>&nbsp;</td><td>Pointer to the beginning of the HOB List passed in from the PEI Phase. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="cc49b16375e37b32cbed1d337c8bc257"></a><!-- doxytag: member="DxeCoreEntryPoint.h::ProcessLibraryConstructorList" ref="cc49b16375e37b32cbed1d337c8bc257" args="(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE *SystemTable)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VOID EFIAPI ProcessLibraryConstructorList           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>&nbsp;</td>
-          <td class="paramname"> <em>ImageHandle</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d1/d8c/a00600.html">EFI_SYSTEM_TABLE</a> *&nbsp;</td>
-          <td class="paramname"> <em>SystemTable</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Autogenerated function that calls the library constructors for all of the module's dependent libraries.<p>
-This function must be called by <a class="el" href="../../d3/ded/a01017.html#43f1da4ebdcfb71480bc45d8939b7874">_ModuleEntryPoint()</a>. This function calls the set of library constructors for the set of library instances that a module depends on. This includes library instances that a module depends on directly and library instances that a module depends on indirectly through other libraries. This function is autogenerated by build tools and those build tools are responsible for collecting the set of library instances, determine which ones have constructors, and calling the library constructors in the proper order based upon each of the library instances own dependencies.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>ImageHandle</em>&nbsp;</td><td>The image handle of the DXE Core. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SystemTable</em>&nbsp;</td><td>A pointer to the EFI System Table. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="a091d526aa9a254679bbf7886e77921e"></a><!-- doxytag: member="DxeCoreEntryPoint.h::ProcessModuleEntryPointList" ref="a091d526aa9a254679bbf7886e77921e" args="(IN VOID *HobStart)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VOID EFIAPI ProcessModuleEntryPointList           </td>
-          <td>(</td>
-          <td class="paramtype">IN VOID *&nbsp;</td>
-          <td class="paramname"> <em>HobStart</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Autogenerated function that calls a set of module entry points.<p>
-This function must be called by <a class="el" href="../../d3/ded/a01017.html#43f1da4ebdcfb71480bc45d8939b7874">_ModuleEntryPoint()</a>. This function calls the set of module entry points. This function is autogenerated by build tools and those build tools are responsible for collecting the module entry points and calling them in a specified order.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>HobStart</em>&nbsp;</td><td>Pointer to the beginning of the HOB List passed in from the PEI Phase. </td></tr>
-  </table>
-</dl>
-
+<b>Value:</b><div class="fragment"><pre class="fragment">{ \
+    0x414E6BDD, 0xE47B, 0x47cc, {0xB2, 0x44, 0xBB, 0x61, 0x02, 0x0C, 0xF5, 0x16} \
+  }
+</pre></div>
 </div>
 </div><p>
 <hr><h2>Variable Documentation</h2>
-<a class="anchor" name="93621d963fbc6b1dcb8089c9ae1e34b8"></a><!-- doxytag: member="DxeCoreEntryPoint.h::gHobList" ref="93621d963fbc6b1dcb8089c9ae1e34b8" args="" -->
+<a class="anchor" name="da150ae8c31df0402d227d0d3e1a5069"></a><!-- doxytag: member="HardwareErrorVariable.h::gEfiHardwareErrorVariableGuid" ref="da150ae8c31df0402d227d0d3e1a5069" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">VOID* <a class="el" href="../../d3/ded/a01017.html#93621d963fbc6b1dcb8089c9ae1e34b8">gHobList</a>          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../d3/ded/a01017.html#da150ae8c31df0402d227d0d3e1a5069">gEfiHardwareErrorVariableGuid</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Global variable that contains a pointer to the Hob List passed into the DXE Core entry point. 
+
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:08 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:13 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

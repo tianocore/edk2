@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Guid/GlobalVariable.h File Reference</title>
+<title>MdePkg[ALL]: tdTPM_STCLEAR_DATA Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -9,58 +9,44 @@
   <div class="tabs">
     <ul>
       <li><a href="../../main.html"><span>Main&nbsp;Page</span></a></li>
-      <li><a href="../../annotated.html"><span>Data&nbsp;Structures</span></a></li>
-      <li class="current"><a href="../../files.html"><span>Files</span></a></li>
+      <li class="current"><a href="../../annotated.html"><span>Data&nbsp;Structures</span></a></li>
+      <li><a href="../../files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div class="tabs">
     <ul>
-      <li><a href="../../files.html"><span>File&nbsp;List</span></a></li>
-      <li><a href="../../globals.html"><span>Globals</span></a></li>
+      <li><a href="../../annotated.html"><span>Data&nbsp;Structures</span></a></li>
+      <li><a href="../../functions.html"><span>Data&nbsp;Fields</span></a></li>
     </ul>
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Guid/GlobalVariable.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>tdTPM_STCLEAR_DATA Struct Reference</h1><!-- doxytag: class="tdTPM_STCLEAR_DATA" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
-<tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d94/a00967.html#aa8bacccdf943c9c21b44fba872b242d">EFI_GLOBAL_VARIABLE</a></td></tr>
+<tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d8e/a01050.html#69f3eb3e40aee2061dba5f9202fac1a2">TPM_STRUCTURE_TAG</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d94/a00967.html#d3c3073ae96b992f14876eb9b614250e">tag</a></td></tr>
 
-<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d94/a00967.html#972bbf386450a245fe00d23fa08ddd92">gEfiGlobalVariableGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d18/a00948.html">TPM_NONCE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d94/a00967.html#8821ab14c11c9f7e1eff97487f918f45">contextNonceKey</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d8e/a01050.html#a7d2651d768622ea91e02e6345860574">TPM_COUNT_ID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d94/a00967.html#a63e79c2ac442c5b3f3197157d3d03a6">countID</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d94/a00967.html#28ec56cc34df0b7a0bdea710eed3dcf0">ownerReference</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d94/a00967.html#63a9f7674a9328cef89a4e1549c3fc7e">disableResetLock</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/dbc/a00931.html">TPM_PCRVALUE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d94/a00967.html#394f2161bfe02da986c9ead90ffb8769">PCR</a> [TPM_NUM_PCR]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d94/a00967.html#5ccfd88e2c915bb550742d5d386be495">deferredPhysicalPresence</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-<a class="el" href="../../d9/d0f/a00644.html">GUID</a> for EFI (NVRAM) Variables.<p>
-Copyright (c) 2006 - 2009, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
-<dl class="user" compact><dt><b>Revision Reference:</b></dt><dd><a class="el" href="../../d9/d0f/a00644.html">GUID</a> defined in UEFI 2.1 </dd></dl>
-<hr><h2>Define Documentation</h2>
-<a class="anchor" name="aa8bacccdf943c9c21b44fba872b242d"></a><!-- doxytag: member="GlobalVariable.h::EFI_GLOBAL_VARIABLE" ref="aa8bacccdf943c9c21b44fba872b242d" args="" -->
+Part 2, section 7.5: TPM_STCLEAR_DATA available inside TPM only <hr><h2>Field Documentation</h2>
+<a class="anchor" name="8821ab14c11c9f7e1eff97487f918f45"></a><!-- doxytag: member="tdTPM_STCLEAR_DATA::contextNonceKey" ref="8821ab14c11c9f7e1eff97487f918f45" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_GLOBAL_VARIABLE          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-<b>Value:</b><div class="fragment"><pre class="fragment">{ \
-    0x8BE4DF61, 0x93CA, 0x11d2, {0xAA, 0x0D, 0x00, 0xE0, 0x98, 0x03, 0x2B, 0x8C } \
-  }
-</pre></div>
-</div>
-</div><p>
-<hr><h2>Variable Documentation</h2>
-<a class="anchor" name="972bbf386450a245fe00d23fa08ddd92"></a><!-- doxytag: member="GlobalVariable.h::gEfiGlobalVariableGuid" ref="972bbf386450a245fe00d23fa08ddd92" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../d4/d94/a00967.html#972bbf386450a245fe00d23fa08ddd92">gEfiGlobalVariableGuid</a>          </td>
+          <td class="memname"><a class="el" href="../../d8/d18/a00948.html">TPM_NONCE</a> <a class="el" href="../../d4/d94/a00967.html#8821ab14c11c9f7e1eff97487f918f45">tdTPM_STCLEAR_DATA::contextNonceKey</a>          </td>
         </tr>
       </table>
 </div>
@@ -70,8 +56,98 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 </div>
 </div><p>
+<a class="anchor" name="a63e79c2ac442c5b3f3197157d3d03a6"></a><!-- doxytag: member="tdTPM_STCLEAR_DATA::countID" ref="a63e79c2ac442c5b3f3197157d3d03a6" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d9/d8e/a01050.html#a7d2651d768622ea91e02e6345860574">TPM_COUNT_ID</a> <a class="el" href="../../d4/d94/a00967.html#a63e79c2ac442c5b3f3197157d3d03a6">tdTPM_STCLEAR_DATA::countID</a>          </td>
+        </tr>
+      </table>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:07 2009 for MdePkg[ALL] by&nbsp;
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="5ccfd88e2c915bb550742d5d386be495"></a><!-- doxytag: member="tdTPM_STCLEAR_DATA::deferredPhysicalPresence" ref="5ccfd88e2c915bb550742d5d386be495" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d4/d94/a00967.html#5ccfd88e2c915bb550742d5d386be495">tdTPM_STCLEAR_DATA::deferredPhysicalPresence</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="63a9f7674a9328cef89a4e1549c3fc7e"></a><!-- doxytag: member="tdTPM_STCLEAR_DATA::disableResetLock" ref="63a9f7674a9328cef89a4e1549c3fc7e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d4/d94/a00967.html#63a9f7674a9328cef89a4e1549c3fc7e">tdTPM_STCLEAR_DATA::disableResetLock</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="28ec56cc34df0b7a0bdea710eed3dcf0"></a><!-- doxytag: member="tdTPM_STCLEAR_DATA::ownerReference" ref="28ec56cc34df0b7a0bdea710eed3dcf0" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d4/d94/a00967.html#28ec56cc34df0b7a0bdea710eed3dcf0">tdTPM_STCLEAR_DATA::ownerReference</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="394f2161bfe02da986c9ead90ffb8769"></a><!-- doxytag: member="tdTPM_STCLEAR_DATA::PCR" ref="394f2161bfe02da986c9ead90ffb8769" args="[TPM_NUM_PCR]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../df/dbc/a00931.html">TPM_PCRVALUE</a> <a class="el" href="../../d4/d94/a00967.html#394f2161bfe02da986c9ead90ffb8769">tdTPM_STCLEAR_DATA::PCR</a>[TPM_NUM_PCR]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="d3c3073ae96b992f14876eb9b614250e"></a><!-- doxytag: member="tdTPM_STCLEAR_DATA::tag" ref="d3c3073ae96b992f14876eb9b614250e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d9/d8e/a01050.html#69f3eb3e40aee2061dba5f9202fac1a2">TPM_STRUCTURE_TAG</a> <a class="el" href="../../d4/d94/a00967.html#d3c3073ae96b992f14876eb9b614250e">tdTPM_STCLEAR_DATA::tag</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+</div>
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:12 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

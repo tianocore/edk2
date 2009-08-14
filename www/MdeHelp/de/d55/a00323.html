@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_ACPI_2_0_GENERIC_ADDRESS_STRUCTURE Struct Reference</title>
+<title>MdePkg[ALL]: EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,28 +21,30 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_ACPI_2_0_GENERIC_ADDRESS_STRUCTURE Struct Reference</h1><!-- doxytag: class="EFI_ACPI_2_0_GENERIC_ADDRESS_STRUCTURE" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE Struct Reference</h1><!-- doxytag: class="EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d55/a00323.html#ff52be4b3da8098cc59ebdaeb3df0cad">AddressSpaceId</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d55/a00323.html#817cd44136468ec5cfb50fef4450393a">Type</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d55/a00323.html#304915b93a381766218a0511bcfbdded">RegisterBitWidth</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d55/a00323.html#1dab278363b6675d054e9c311b9e643c">Length</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d55/a00323.html#858af1d955dbc114892d7a37c29b60db">RegisterBitOffset</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d55/a00323.html#c2347125f87e4d14bdb67264df2a130a">Bus</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d55/a00323.html#3aeae6fe619c1ed18f8c910ce59812c2">Reserved</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d55/a00323.html#43748aae562787eb866c18a42e938cf2">Source</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d55/a00323.html#0d085e5635e0e15abf609e7adb54ceca">Address</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d55/a00323.html#a16df99e14636c3a45681c77f27eca94">GlobalSystemInterruptVector</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d55/a00323.html#dcf0b9c02ff9340b42e71ca217bc1c53">Flags</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-ACPI 2.0 Generic Address Space definition <hr><h2>Field Documentation</h2>
-<a class="anchor" name="0d085e5635e0e15abf609e7adb54ceca"></a><!-- doxytag: member="EFI_ACPI_2_0_GENERIC_ADDRESS_STRUCTURE::Address" ref="0d085e5635e0e15abf609e7adb54ceca" args="" -->
+Interrupt Source Override Structure <hr><h2>Field Documentation</h2>
+<a class="anchor" name="c2347125f87e4d14bdb67264df2a130a"></a><!-- doxytag: member="EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE::Bus" ref="c2347125f87e4d14bdb67264df2a130a" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../de/d55/a00323.html#0d085e5635e0e15abf609e7adb54ceca">EFI_ACPI_2_0_GENERIC_ADDRESS_STRUCTURE::Address</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/d55/a00323.html#c2347125f87e4d14bdb67264df2a130a">EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE::Bus</a>          </td>
         </tr>
       </table>
 </div>
@@ -52,12 +54,12 @@ ACPI 2.0 Generic Address Space definition <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="ff52be4b3da8098cc59ebdaeb3df0cad"></a><!-- doxytag: member="EFI_ACPI_2_0_GENERIC_ADDRESS_STRUCTURE::AddressSpaceId" ref="ff52be4b3da8098cc59ebdaeb3df0cad" args="" -->
+<a class="anchor" name="dcf0b9c02ff9340b42e71ca217bc1c53"></a><!-- doxytag: member="EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE::Flags" ref="dcf0b9c02ff9340b42e71ca217bc1c53" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/d55/a00323.html#ff52be4b3da8098cc59ebdaeb3df0cad">EFI_ACPI_2_0_GENERIC_ADDRESS_STRUCTURE::AddressSpaceId</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../de/d55/a00323.html#dcf0b9c02ff9340b42e71ca217bc1c53">EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE::Flags</a>          </td>
         </tr>
       </table>
 </div>
@@ -67,12 +69,12 @@ ACPI 2.0 Generic Address Space definition <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="858af1d955dbc114892d7a37c29b60db"></a><!-- doxytag: member="EFI_ACPI_2_0_GENERIC_ADDRESS_STRUCTURE::RegisterBitOffset" ref="858af1d955dbc114892d7a37c29b60db" args="" -->
+<a class="anchor" name="a16df99e14636c3a45681c77f27eca94"></a><!-- doxytag: member="EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE::GlobalSystemInterruptVector" ref="a16df99e14636c3a45681c77f27eca94" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/d55/a00323.html#858af1d955dbc114892d7a37c29b60db">EFI_ACPI_2_0_GENERIC_ADDRESS_STRUCTURE::RegisterBitOffset</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../de/d55/a00323.html#a16df99e14636c3a45681c77f27eca94">EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE::GlobalSystemInterruptVector</a>          </td>
         </tr>
       </table>
 </div>
@@ -82,12 +84,12 @@ ACPI 2.0 Generic Address Space definition <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="304915b93a381766218a0511bcfbdded"></a><!-- doxytag: member="EFI_ACPI_2_0_GENERIC_ADDRESS_STRUCTURE::RegisterBitWidth" ref="304915b93a381766218a0511bcfbdded" args="" -->
+<a class="anchor" name="1dab278363b6675d054e9c311b9e643c"></a><!-- doxytag: member="EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE::Length" ref="1dab278363b6675d054e9c311b9e643c" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/d55/a00323.html#304915b93a381766218a0511bcfbdded">EFI_ACPI_2_0_GENERIC_ADDRESS_STRUCTURE::RegisterBitWidth</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/d55/a00323.html#1dab278363b6675d054e9c311b9e643c">EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE::Length</a>          </td>
         </tr>
       </table>
 </div>
@@ -97,12 +99,27 @@ ACPI 2.0 Generic Address Space definition <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="3aeae6fe619c1ed18f8c910ce59812c2"></a><!-- doxytag: member="EFI_ACPI_2_0_GENERIC_ADDRESS_STRUCTURE::Reserved" ref="3aeae6fe619c1ed18f8c910ce59812c2" args="" -->
+<a class="anchor" name="43748aae562787eb866c18a42e938cf2"></a><!-- doxytag: member="EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE::Source" ref="43748aae562787eb866c18a42e938cf2" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/d55/a00323.html#3aeae6fe619c1ed18f8c910ce59812c2">EFI_ACPI_2_0_GENERIC_ADDRESS_STRUCTURE::Reserved</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/d55/a00323.html#43748aae562787eb866c18a42e938cf2">EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE::Source</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="817cd44136468ec5cfb50fef4450393a"></a><!-- doxytag: member="EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE::Type" ref="817cd44136468ec5cfb50fef4450393a" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/d55/a00323.html#817cd44136468ec5cfb50fef4450393a">EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE::Type</a>          </td>
         </tr>
       </table>
 </div>
@@ -113,7 +130,7 @@ ACPI 2.0 Generic Address Space definition <hr><h2>Field Documentation</h2>
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:16 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:22 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

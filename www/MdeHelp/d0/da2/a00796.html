@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: SCSI_DEVICE_PATH Struct Reference</title>
+<title>MdePkg[ALL]: s_pxe_cpb_receive_filters Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,64 +21,30 @@
   </div>
 </div>
 <div class="contents">
-<h1>SCSI_DEVICE_PATH Struct Reference</h1><!-- doxytag: class="SCSI_DEVICE_PATH" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>s_pxe_cpb_receive_filters Struct Reference</h1><!-- doxytag: class="s_pxe_cpb_receive_filters" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/de6/a00404.html">EFI_DEVICE_PATH_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/da2/a00796.html#447b60e2bdea1ee2b1ce12f1fed1b2e1">Header</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/da2/a00796.html#b48c334bbbc40d54e023f4acb2e73c08">Pun</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/da2/a00796.html#499ea40d827d53f85712e6849dea3089">Lun</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#01790f21199edcd6a8dd02d270c05f4f">PXE_MAC_ADDR</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/da2/a00796.html#ed7255f8be4a14c476b84f3e1f1f8ac9">MCastList</a> [MAX_MCAST_ADDRESS_CNT]</td></tr>
 
 </table>
 <hr><h2>Field Documentation</h2>
-<a class="anchor" name="447b60e2bdea1ee2b1ce12f1fed1b2e1"></a><!-- doxytag: member="SCSI_DEVICE_PATH::Header" ref="447b60e2bdea1ee2b1ce12f1fed1b2e1" args="" -->
+<a class="anchor" name="ed7255f8be4a14c476b84f3e1f1f8ac9"></a><!-- doxytag: member="s_pxe_cpb_receive_filters::MCastList" ref="ed7255f8be4a14c476b84f3e1f1f8ac9" args="[MAX_MCAST_ADDRESS_CNT]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/de6/a00404.html">EFI_DEVICE_PATH_PROTOCOL</a> <a class="el" href="../../d0/da2/a00796.html#447b60e2bdea1ee2b1ce12f1fed1b2e1">SCSI_DEVICE_PATH::Header</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#01790f21199edcd6a8dd02d270c05f4f">PXE_MAC_ADDR</a> <a class="el" href="../../d0/da2/a00796.html#ed7255f8be4a14c476b84f3e1f1f8ac9">s_pxe_cpb_receive_filters::MCastList</a>[MAX_MCAST_ADDRESS_CNT]          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<a class="anchor" name="499ea40d827d53f85712e6849dea3089"></a><!-- doxytag: member="SCSI_DEVICE_PATH::Lun" ref="499ea40d827d53f85712e6849dea3089" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d0/da2/a00796.html#499ea40d827d53f85712e6849dea3089">SCSI_DEVICE_PATH::Lun</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Logical Unit Number (LUN) 
-</div>
-</div><p>
-<a class="anchor" name="b48c334bbbc40d54e023f4acb2e73c08"></a><!-- doxytag: member="SCSI_DEVICE_PATH::Pun" ref="b48c334bbbc40d54e023f4acb2e73c08" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d0/da2/a00796.html#b48c334bbbc40d54e023f4acb2e73c08">SCSI_DEVICE_PATH::Pun</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Target ID on the SCSI bus (PUN) 
+List of multicast MAC addresses. This list, if present, will replace the existing multicast MAC address filter list. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:21 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:00 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

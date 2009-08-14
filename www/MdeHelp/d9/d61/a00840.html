@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: SMBIOS_TABLE_TYPE6 Struct Reference</title>
+<title>MdePkg[ALL]: SCSI_DEVICE_PATH Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,35 +21,23 @@
   </div>
 </div>
 <div class="contents">
-<h1>SMBIOS_TABLE_TYPE6 Struct Reference</h1><!-- doxytag: class="SMBIOS_TABLE_TYPE6" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>SCSI_DEVICE_PATH Struct Reference</h1><!-- doxytag: class="SCSI_DEVICE_PATH" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../da/db8/a00797.html">SMBIOS_STRUCTURE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d61/a00840.html#e9af0c745ae9b4b0cb8cf9960e52d3ff">Hdr</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d61/a00840.html#447b60e2bdea1ee2b1ce12f1fed1b2e1">Header</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d49/a00979.html#bd86e1460ed2b924b45d2fa3c883e6b0">SMBIOS_TABLE_STRING</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d61/a00840.html#ae62b24ef28d45a0be64b3f6aa1d34e7">SocketDesignation</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d61/a00840.html#b48c334bbbc40d54e023f4acb2e73c08">Pun</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d61/a00840.html#4352e30e8a057af3f1e20f33af4fd559">BankConnections</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d61/a00840.html#962703a990b85ebb0871f95cc3e73dad">CurrentSpeed</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d6/da1/a00675.html">MEMORY_CURRENT_TYPE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d61/a00840.html#f943015fbc838594568f145a7658eb34">CurrentMemoryType</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d2/d85/a00679.html">MEMORY_INSTALLED_ENABLED_SIZE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d61/a00840.html#c240d08be6583b4244fdccaf59e7eb7c">InstalledSize</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d2/d85/a00679.html">MEMORY_INSTALLED_ENABLED_SIZE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d61/a00840.html#26b5493c48ee4db0760c0bba64e47203">EnabledSize</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d61/a00840.html#a17234aaf2b6f784d73cf01f443efc8d">ErrorStatus</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d61/a00840.html#499ea40d827d53f85712e6849dea3089">Lun</a></td></tr>
 
 </table>
-<hr><a name="_details"></a><h2>Detailed Description</h2>
-Memory Module Information (Type 6, Obsolete)<p>
-One Memory Module Information structure is included for each memory-module socket in the system. The structure describes the speed, type, size, and error status of each system memory module. The supported attributes of each module are described by the "owning" Memory Controller Information structure. Note: This structure, and its companion Memory Controller Information (Type 5, Obsolete), are obsolete starting with version 2.1 of this specification; the Physical Memory Array (Type 16) and Memory Device (Type 17) structures should be used instead. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="4352e30e8a057af3f1e20f33af4fd559"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE6::BankConnections" ref="4352e30e8a057af3f1e20f33af4fd559" args="" -->
+<hr><h2>Field Documentation</h2>
+<a class="anchor" name="447b60e2bdea1ee2b1ce12f1fed1b2e1"></a><!-- doxytag: member="SCSI_DEVICE_PATH::Header" ref="447b60e2bdea1ee2b1ce12f1fed1b2e1" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d9/d61/a00840.html#4352e30e8a057af3f1e20f33af4fd559">SMBIOS_TABLE_TYPE6::BankConnections</a>          </td>
+          <td class="memname"><a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> <a class="el" href="../../d9/d61/a00840.html#447b60e2bdea1ee2b1ce12f1fed1b2e1">SCSI_DEVICE_PATH::Header</a>          </td>
         </tr>
       </table>
 </div>
@@ -59,113 +47,38 @@ One Memory Module Information structure is included for each memory-module socke
 
 </div>
 </div><p>
-<a class="anchor" name="f943015fbc838594568f145a7658eb34"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE6::CurrentMemoryType" ref="f943015fbc838594568f145a7658eb34" args="" -->
+<a class="anchor" name="499ea40d827d53f85712e6849dea3089"></a><!-- doxytag: member="SCSI_DEVICE_PATH::Lun" ref="499ea40d827d53f85712e6849dea3089" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d6/da1/a00675.html">MEMORY_CURRENT_TYPE</a> <a class="el" href="../../d9/d61/a00840.html#f943015fbc838594568f145a7658eb34">SMBIOS_TABLE_TYPE6::CurrentMemoryType</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d9/d61/a00840.html#499ea40d827d53f85712e6849dea3089">SCSI_DEVICE_PATH::Lun</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+Logical Unit Number (LUN) 
 </div>
 </div><p>
-<a class="anchor" name="962703a990b85ebb0871f95cc3e73dad"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE6::CurrentSpeed" ref="962703a990b85ebb0871f95cc3e73dad" args="" -->
+<a class="anchor" name="b48c334bbbc40d54e023f4acb2e73c08"></a><!-- doxytag: member="SCSI_DEVICE_PATH::Pun" ref="b48c334bbbc40d54e023f4acb2e73c08" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d9/d61/a00840.html#962703a990b85ebb0871f95cc3e73dad">SMBIOS_TABLE_TYPE6::CurrentSpeed</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d9/d61/a00840.html#b48c334bbbc40d54e023f4acb2e73c08">SCSI_DEVICE_PATH::Pun</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<a class="anchor" name="26b5493c48ee4db0760c0bba64e47203"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE6::EnabledSize" ref="26b5493c48ee4db0760c0bba64e47203" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d2/d85/a00679.html">MEMORY_INSTALLED_ENABLED_SIZE</a> <a class="el" href="../../d9/d61/a00840.html#26b5493c48ee4db0760c0bba64e47203">SMBIOS_TABLE_TYPE6::EnabledSize</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="a17234aaf2b6f784d73cf01f443efc8d"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE6::ErrorStatus" ref="a17234aaf2b6f784d73cf01f443efc8d" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d9/d61/a00840.html#a17234aaf2b6f784d73cf01f443efc8d">SMBIOS_TABLE_TYPE6::ErrorStatus</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="e9af0c745ae9b4b0cb8cf9960e52d3ff"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE6::Hdr" ref="e9af0c745ae9b4b0cb8cf9960e52d3ff" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../da/db8/a00797.html">SMBIOS_STRUCTURE</a> <a class="el" href="../../d9/d61/a00840.html#e9af0c745ae9b4b0cb8cf9960e52d3ff">SMBIOS_TABLE_TYPE6::Hdr</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="c240d08be6583b4244fdccaf59e7eb7c"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE6::InstalledSize" ref="c240d08be6583b4244fdccaf59e7eb7c" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d2/d85/a00679.html">MEMORY_INSTALLED_ENABLED_SIZE</a> <a class="el" href="../../d9/d61/a00840.html#c240d08be6583b4244fdccaf59e7eb7c">SMBIOS_TABLE_TYPE6::InstalledSize</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="ae62b24ef28d45a0be64b3f6aa1d34e7"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE6::SocketDesignation" ref="ae62b24ef28d45a0be64b3f6aa1d34e7" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d8/d49/a00979.html#bd86e1460ed2b924b45d2fa3c883e6b0">SMBIOS_TABLE_STRING</a> <a class="el" href="../../d9/d61/a00840.html#ae62b24ef28d45a0be64b3f6aa1d34e7">SMBIOS_TABLE_TYPE6::SocketDesignation</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
+Target ID on the SCSI bus (PUN) 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:22 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:03 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_PEI_RESET_PPI Struct Reference</title>
+<title>MdePkg[ALL]: EFI_MTFTP4_DATA8_HEADER Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,20 +21,53 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_PEI_RESET_PPI Struct Reference</h1><!-- doxytag: class="EFI_PEI_RESET_PPI" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_MTFTP4_DATA8_HEADER Struct Reference</h1><!-- doxytag: class="EFI_MTFTP4_DATA8_HEADER" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/de6/a01063.html#7b07f5892b93ec4d7b475f0ae098022a">EFI_PEI_RESET_SYSTEM</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d50/a00561.html#38fa60c89aae41bf5ba471716ff51051">ResetSystem</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d50/a00561.html#f3cca54f9b981d4906f776326b71e054">OpCode</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d50/a00561.html#8e6bd30f918273e2be3346a07f7c3b9b">Block</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d50/a00561.html#abb9a54eee026d04f09f9f0c6be04143">Data</a> [1]</td></tr>
 
 </table>
-<hr><a name="_details"></a><h2>Detailed Description</h2>
-This PPI provides provide a simple reset service. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="38fa60c89aae41bf5ba471716ff51051"></a><!-- doxytag: member="EFI_PEI_RESET_PPI::ResetSystem" ref="38fa60c89aae41bf5ba471716ff51051" args="" -->
+<hr><h2>Field Documentation</h2>
+<a class="anchor" name="8e6bd30f918273e2be3346a07f7c3b9b"></a><!-- doxytag: member="EFI_MTFTP4_DATA8_HEADER::Block" ref="8e6bd30f918273e2be3346a07f7c3b9b" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../de/de6/a01063.html#7b07f5892b93ec4d7b475f0ae098022a">EFI_PEI_RESET_SYSTEM</a> <a class="el" href="../../d2/d50/a00561.html#38fa60c89aae41bf5ba471716ff51051">EFI_PEI_RESET_PPI::ResetSystem</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d2/d50/a00561.html#8e6bd30f918273e2be3346a07f7c3b9b">EFI_MTFTP4_DATA8_HEADER::Block</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="abb9a54eee026d04f09f9f0c6be04143"></a><!-- doxytag: member="EFI_MTFTP4_DATA8_HEADER::Data" ref="abb9a54eee026d04f09f9f0c6be04143" args="[1]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d2/d50/a00561.html#abb9a54eee026d04f09f9f0c6be04143">EFI_MTFTP4_DATA8_HEADER::Data</a>[1]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="f3cca54f9b981d4906f776326b71e054"></a><!-- doxytag: member="EFI_MTFTP4_DATA8_HEADER::OpCode" ref="f3cca54f9b981d4906f776326b71e054" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d2/d50/a00561.html#f3cca54f9b981d4906f776326b71e054">EFI_MTFTP4_DATA8_HEADER::OpCode</a>          </td>
         </tr>
       </table>
 </div>
@@ -45,7 +78,7 @@ This PPI provides provide a simple reset service. <hr><h2>Field Documentation</h
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:38 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

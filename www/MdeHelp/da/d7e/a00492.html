@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_INPUT_KEY Struct Reference</title>
+<title>MdePkg[ALL]: EFI_HOB_MEMORY_POOL Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,48 +21,31 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_INPUT_KEY Struct Reference</h1><!-- doxytag: class="EFI_INPUT_KEY" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_HOB_MEMORY_POOL Struct Reference</h1><!-- doxytag: class="EFI_HOB_MEMORY_POOL" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d7e/a00492.html#519ee07cba9dd7c65cab49d7fb6bfd4f">ScanCode</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d7e/a00492.html#c8469ccf86ce42a5e7f72c319d1ea3c7">UnicodeChar</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d89/a00484.html">EFI_HOB_GENERIC_HEADER</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d7e/a00492.html#1a66dbd462776669a79382a0a358b9d7">Header</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-The keystroke information for the key that was pressed. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="519ee07cba9dd7c65cab49d7fb6bfd4f"></a><!-- doxytag: member="EFI_INPUT_KEY::ScanCode" ref="519ee07cba9dd7c65cab49d7fb6bfd4f" args="" -->
+Describes pool memory allocations. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="1a66dbd462776669a79382a0a358b9d7"></a><!-- doxytag: member="EFI_HOB_MEMORY_POOL::Header" ref="1a66dbd462776669a79382a0a358b9d7" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../da/d7e/a00492.html#519ee07cba9dd7c65cab49d7fb6bfd4f">EFI_INPUT_KEY::ScanCode</a>          </td>
+          <td class="memname"><a class="el" href="../../d8/d89/a00484.html">EFI_HOB_GENERIC_HEADER</a> <a class="el" href="../../da/d7e/a00492.html#1a66dbd462776669a79382a0a358b9d7">EFI_HOB_MEMORY_POOL::Header</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<a class="anchor" name="c8469ccf86ce42a5e7f72c319d1ea3c7"></a><!-- doxytag: member="EFI_INPUT_KEY::UnicodeChar" ref="c8469ccf86ce42a5e7f72c319d1ea3c7" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> <a class="el" href="../../da/d7e/a00492.html#c8469ccf86ce42a5e7f72c319d1ea3c7">EFI_INPUT_KEY::UnicodeChar</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
+The HOB generic header. Header.HobType = EFI_HOB_TYPE_MEMORY_POOL. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:33 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

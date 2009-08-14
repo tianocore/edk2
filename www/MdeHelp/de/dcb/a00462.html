@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_HOB_MEMORY_ALLOCATION_MODULE Struct Reference</title>
+<title>MdePkg[ALL]: EFI_FV_WRITE_FILE_DATA Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,82 +21,98 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_HOB_MEMORY_ALLOCATION_MODULE Struct Reference</h1><!-- doxytag: class="EFI_HOB_MEMORY_ALLOCATION_MODULE" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_FV_WRITE_FILE_DATA Struct Reference</h1><!-- doxytag: class="EFI_FV_WRITE_FILE_DATA" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/d87/a00456.html">EFI_HOB_GENERIC_HEADER</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dcb/a00462.html#b4174fe471d57a37255e3d3fd7ef2f1f">Header</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dcb/a00462.html#f9aba995d6d3ada445efd66b059374f4">NameGuid</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d5/d5f/a00461.html">EFI_HOB_MEMORY_ALLOCATION_HEADER</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dcb/a00462.html#fca26a0c58a30e10078e6588e2c5bcff">MemoryAllocationHeader</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d2/dd7/a01108.html#a8c9898a7322417d167ff078bcde1f2b">EFI_FV_FILETYPE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dcb/a00462.html#75e091704702f23a50d0338c1581a85d">Type</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dcb/a00462.html#c38e1e07c9d680617d305f1210362c85">ModuleName</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/dbf/a01109.html#56c78b5eb5f41551eafafdcf8e6c519d">EFI_FV_FILE_ATTRIBUTES</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dcb/a00462.html#ce76c57bd5ce6870483c65942496b094">FileAttributes</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dcb/a00462.html#7224011f60c43acc745daadf9a449e8d">EntryPoint</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dcb/a00462.html#0574511dd5804ae34e941192cee14a0f">Buffer</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dcb/a00462.html#6ae992d7ead41f453d76833413d93585">BufferSize</a></td></tr>
 
 </table>
-<hr><a name="_details"></a><h2>Detailed Description</h2>
-Defines the location and entry point of the HOB consumer phase. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="7224011f60c43acc745daadf9a449e8d"></a><!-- doxytag: member="EFI_HOB_MEMORY_ALLOCATION_MODULE::EntryPoint" ref="7224011f60c43acc745daadf9a449e8d" args="" -->
+<hr><h2>Field Documentation</h2>
+<a class="anchor" name="0574511dd5804ae34e941192cee14a0f"></a><!-- doxytag: member="EFI_FV_WRITE_FILE_DATA::Buffer" ref="0574511dd5804ae34e941192cee14a0f" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> <a class="el" href="../../de/dcb/a00462.html#7224011f60c43acc745daadf9a449e8d">EFI_HOB_MEMORY_ALLOCATION_MODULE::EntryPoint</a>          </td>
+          <td class="memname">VOID* <a class="el" href="../../de/dcb/a00462.html#0574511dd5804ae34e941192cee14a0f">EFI_FV_WRITE_FILE_DATA::Buffer</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The address of the memory-mapped firmware volume that contains the HOB consumer phase firmware file. 
+Pointer to a buffer containing the file to be written. 
 </div>
 </div><p>
-<a class="anchor" name="b4174fe471d57a37255e3d3fd7ef2f1f"></a><!-- doxytag: member="EFI_HOB_MEMORY_ALLOCATION_MODULE::Header" ref="b4174fe471d57a37255e3d3fd7ef2f1f" args="" -->
+<a class="anchor" name="6ae992d7ead41f453d76833413d93585"></a><!-- doxytag: member="EFI_FV_WRITE_FILE_DATA::BufferSize" ref="6ae992d7ead41f453d76833413d93585" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../de/d87/a00456.html">EFI_HOB_GENERIC_HEADER</a> <a class="el" href="../../de/dcb/a00462.html#b4174fe471d57a37255e3d3fd7ef2f1f">EFI_HOB_MEMORY_ALLOCATION_MODULE::Header</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../de/dcb/a00462.html#6ae992d7ead41f453d76833413d93585">EFI_FV_WRITE_FILE_DATA::BufferSize</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The HOB generic header. Header.HobType = EFI_HOB_TYPE_MEMORY_ALLOCATION. 
+Indicates the size of the file image contained in Buffer. 
 </div>
 </div><p>
-<a class="anchor" name="fca26a0c58a30e10078e6588e2c5bcff"></a><!-- doxytag: member="EFI_HOB_MEMORY_ALLOCATION_MODULE::MemoryAllocationHeader" ref="fca26a0c58a30e10078e6588e2c5bcff" args="" -->
+<a class="anchor" name="ce76c57bd5ce6870483c65942496b094"></a><!-- doxytag: member="EFI_FV_WRITE_FILE_DATA::FileAttributes" ref="ce76c57bd5ce6870483c65942496b094" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d5/d5f/a00461.html">EFI_HOB_MEMORY_ALLOCATION_HEADER</a> <a class="el" href="../../de/dcb/a00462.html#fca26a0c58a30e10078e6588e2c5bcff">EFI_HOB_MEMORY_ALLOCATION_MODULE::MemoryAllocationHeader</a>          </td>
+          <td class="memname"><a class="el" href="../../d8/dbf/a01109.html#56c78b5eb5f41551eafafdcf8e6c519d">EFI_FV_FILE_ATTRIBUTES</a> <a class="el" href="../../de/dcb/a00462.html#ce76c57bd5ce6870483c65942496b094">EFI_FV_WRITE_FILE_DATA::FileAttributes</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-An instance of the <a class="el" href="../../d5/d5f/a00461.html">EFI_HOB_MEMORY_ALLOCATION_HEADER</a> that describes the various attributes of the logical memory allocation. 
+Indicates the attributes for the file to be written. 
 </div>
 </div><p>
-<a class="anchor" name="c38e1e07c9d680617d305f1210362c85"></a><!-- doxytag: member="EFI_HOB_MEMORY_ALLOCATION_MODULE::ModuleName" ref="c38e1e07c9d680617d305f1210362c85" args="" -->
+<a class="anchor" name="f9aba995d6d3ada445efd66b059374f4"></a><!-- doxytag: member="EFI_FV_WRITE_FILE_DATA::NameGuid" ref="f9aba995d6d3ada445efd66b059374f4" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../de/dcb/a00462.html#c38e1e07c9d680617d305f1210362c85">EFI_HOB_MEMORY_ALLOCATION_MODULE::ModuleName</a>          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>* <a class="el" href="../../de/dcb/a00462.html#f9aba995d6d3ada445efd66b059374f4">EFI_FV_WRITE_FILE_DATA::NameGuid</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The <a class="el" href="../../d9/d0f/a00644.html">GUID</a> specifying the values of the firmware file system name that contains the HOB consumer phase component. 
+Pointer to a <a class="el" href="../../d1/d87/a00689.html">GUID</a>, which is the file name to be written. 
+</div>
+</div><p>
+<a class="anchor" name="75e091704702f23a50d0338c1581a85d"></a><!-- doxytag: member="EFI_FV_WRITE_FILE_DATA::Type" ref="75e091704702f23a50d0338c1581a85d" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d2/dd7/a01108.html#a8c9898a7322417d167ff078bcde1f2b">EFI_FV_FILETYPE</a> <a class="el" href="../../de/dcb/a00462.html#75e091704702f23a50d0338c1581a85d">EFI_FV_WRITE_FILE_DATA::Type</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Indicates the type of file to be written. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:31 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

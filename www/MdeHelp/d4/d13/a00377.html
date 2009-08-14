@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER Struct Reference</title>
+<title>MdePkg[ALL]: EFI_ACPI_ASF_RECORD_HEADER Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,22 +21,24 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER Struct Reference</h1><!-- doxytag: class="EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_ACPI_ASF_RECORD_HEADER Struct Reference</h1><!-- doxytag: class="EFI_ACPI_ASF_RECORD_HEADER" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d21/a00368.html">EFI_ACPI_DESCRIPTION_HEADER</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d13/a00377.html#cf4546d7ef8146cafee30918d3f7d70e">Header</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d13/a00377.html#bd6006dbc20e5940d8f043fa20b9054e">Type</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d13/a00377.html#47937b0bf4056cba139f46100be904fb">Reserved</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d13/a00377.html#69e8296fc865ee8e95a8bce42814acc7">Reserved</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d13/a00377.html#b12fbf4eab5c0754f876b7596e3bef0b">RecordLength</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-MCFG Table header definition. The rest of the table must be defined in a platform specific manner. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="cf4546d7ef8146cafee30918d3f7d70e"></a><!-- doxytag: member="EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER::Header" ref="cf4546d7ef8146cafee30918d3f7d70e" args="" -->
+Information Record header that appears at the beginning of each record <hr><h2>Field Documentation</h2>
+<a class="anchor" name="b12fbf4eab5c0754f876b7596e3bef0b"></a><!-- doxytag: member="EFI_ACPI_ASF_RECORD_HEADER::RecordLength" ref="b12fbf4eab5c0754f876b7596e3bef0b" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d8/d21/a00368.html">EFI_ACPI_DESCRIPTION_HEADER</a> <a class="el" href="../../d4/d13/a00377.html#cf4546d7ef8146cafee30918d3f7d70e">EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER::Header</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d13/a00377.html#b12fbf4eab5c0754f876b7596e3bef0b">EFI_ACPI_ASF_RECORD_HEADER::RecordLength</a>          </td>
         </tr>
       </table>
 </div>
@@ -46,12 +48,27 @@ MCFG Table header definition. The rest of the table must be defined in a platfor
 
 </div>
 </div><p>
-<a class="anchor" name="47937b0bf4056cba139f46100be904fb"></a><!-- doxytag: member="EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER::Reserved" ref="47937b0bf4056cba139f46100be904fb" args="" -->
+<a class="anchor" name="69e8296fc865ee8e95a8bce42814acc7"></a><!-- doxytag: member="EFI_ACPI_ASF_RECORD_HEADER::Reserved" ref="69e8296fc865ee8e95a8bce42814acc7" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d4/d13/a00377.html#47937b0bf4056cba139f46100be904fb">EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER::Reserved</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d13/a00377.html#69e8296fc865ee8e95a8bce42814acc7">EFI_ACPI_ASF_RECORD_HEADER::Reserved</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="bd6006dbc20e5940d8f043fa20b9054e"></a><!-- doxytag: member="EFI_ACPI_ASF_RECORD_HEADER::Type" ref="bd6006dbc20e5940d8f043fa20b9054e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d13/a00377.html#bd6006dbc20e5940d8f043fa20b9054e">EFI_ACPI_ASF_RECORD_HEADER::Type</a>          </td>
         </tr>
       </table>
 </div>
@@ -62,7 +79,7 @@ MCFG Table header definition. The rest of the table must be defined in a platfor
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:17 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:27 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

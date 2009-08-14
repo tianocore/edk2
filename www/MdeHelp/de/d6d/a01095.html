@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Protocol/AbsolutePointer.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Library/TimerLib.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,208 +21,141 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Protocol/AbsolutePointer.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Library/TimerLib.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
-<tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/da2/a00307.html">EFI_ABSOLUTE_POINTER_MODE</a></td></tr>
+<tr><td colspan="2"><br><h2>Functions</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d6d/a01095.html#d969489f6101915f665ab1d486095154">MicroSecondDelay</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> MicroSeconds)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d0f/a00308.html">EFI_ABSOLUTE_POINTER_STATE</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d6d/a01095.html#fabc69290941653676712638bc04963c">NanoSecondDelay</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> NanoSeconds)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d84/a00001.html">_EFI_ABSOLUTE_POINTER_PROTOCOL</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d6d/a01095.html#d5f71529693c6852476460040c4ee974">GetPerformanceCounter</a> (VOID)</td></tr>
 
-<tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d6d/a01095.html#5ab748617235bdd1ff4725906c53fedc">EFI_ABSOLUTE_POINTER_PROTOCOL_GUID</a>&nbsp;&nbsp;&nbsp;{ 0x8D59D32B, 0xC655, 0x4AE9, { 0x9B, 0x15, 0xF2, 0x59, 0x04, 0x99, 0x2A, 0x43 } }</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d6d/a01095.html#bfb9e00b072b37c15eb937b5e5c0f4fe">EFI_ABSP_SupportsAltActive</a>&nbsp;&nbsp;&nbsp;0x00000001</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d6d/a01095.html#21f584977149e26ec50c5305a83f3cbe">EFI_ABSP_SupportsPressureAsZ</a>&nbsp;&nbsp;&nbsp;0x00000002</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d6d/a01095.html#b4e7a5b381e5d73c0a83ebf7bf392253">EFI_ABSP_TouchActive</a>&nbsp;&nbsp;&nbsp;0x00000001</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d6d/a01095.html#3282322a60d479c885b1a0c2c0ff43f7">EFI_ABS_AltActive</a>&nbsp;&nbsp;&nbsp;0x00000002</td></tr>
-
-<tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
-<a class="el" href="../../d8/d84/a00001.html">_EFI_ABSOLUTE_POINTER_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d6d/a01095.html#92a467486eb507f899a66353decf8e05">EFI_ABSOLUTE_POINTER_PROTOCOL</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d6d/a01095.html#7cdd29244e6499008598706cc8d55891">EFI_ABSOLUTE_POINTER_RESET</a> )(IN <a class="el" href="../../d8/d84/a00001.html">EFI_ABSOLUTE_POINTER_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> ExtendedVerification)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d6d/a01095.html#cdea42274e239a8a7baf0aaa110d6012">EFI_ABSOLUTE_POINTER_GET_STATE</a> )(IN <a class="el" href="../../d8/d84/a00001.html">EFI_ABSOLUTE_POINTER_PROTOCOL</a> *This, IN OUT <a class="el" href="../../d5/d0f/a00308.html">EFI_ABSOLUTE_POINTER_STATE</a> *State)</td></tr>
-
-<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d6d/a01095.html#ae68c10aad450a8612a4e09c7fb3b892">gEfiAbsolutePointerProtocolGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d6d/a01095.html#9357bed83d38aeb42c518e445b5a86fc">GetPerformanceCounterProperties</a> (OUT <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> *StartValue, OUT <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> *EndValue)</td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-The file provides services that allow information about an absolute pointer device to be retrieved.<p>
+Provides calibrated delay and performance counter services.<p>
 Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
-<a class="anchor" name="3282322a60d479c885b1a0c2c0ff43f7"></a><!-- doxytag: member="AbsolutePointer.h::EFI_ABS_AltActive" ref="3282322a60d479c885b1a0c2c0ff43f7" args="" -->
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Function Documentation</h2>
+<a class="anchor" name="d5f71529693c6852476460040c4ee974"></a><!-- doxytag: member="TimerLib.h::GetPerformanceCounter" ref="d5f71529693c6852476460040c4ee974" args="(VOID)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_ABS_AltActive&nbsp;&nbsp;&nbsp;0x00000002          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> EFIAPI GetPerformanceCounter           </td>
+          <td>(</td>
+          <td class="paramtype">VOID&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-This bit is set if the alt sensor, such as pen-side button, is active 
-</div>
-</div><p>
-<a class="anchor" name="5ab748617235bdd1ff4725906c53fedc"></a><!-- doxytag: member="AbsolutePointer.h::EFI_ABSOLUTE_POINTER_PROTOCOL_GUID" ref="5ab748617235bdd1ff4725906c53fedc" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_ABSOLUTE_POINTER_PROTOCOL_GUID&nbsp;&nbsp;&nbsp;{ 0x8D59D32B, 0xC655, 0x4AE9, { 0x9B, 0x15, 0xF2, 0x59, 0x04, 0x99, 0x2A, 0x43 } }          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
+Retrieves the current value of a 64-bit free running performance counter.<p>
+The counter can either count up by 1 or count down by 1. If the physical performance counter counts by a larger increment, then the counter values must be translated. The properties of the counter can be retrieved from <a class="el" href="../../de/d6d/a01095.html#9357bed83d38aeb42c518e445b5a86fc">GetPerformanceCounterProperties()</a>.<p>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The current value of the free running performance counter. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="bfb9e00b072b37c15eb937b5e5c0f4fe"></a><!-- doxytag: member="AbsolutePointer.h::EFI_ABSP_SupportsAltActive" ref="bfb9e00b072b37c15eb937b5e5c0f4fe" args="" -->
+<a class="anchor" name="9357bed83d38aeb42c518e445b5a86fc"></a><!-- doxytag: member="TimerLib.h::GetPerformanceCounterProperties" ref="9357bed83d38aeb42c518e445b5a86fc" args="(OUT UINT64 *StartValue, OUT UINT64 *EndValue)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_ABSP_SupportsAltActive&nbsp;&nbsp;&nbsp;0x00000001          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> EFIAPI GetPerformanceCounterProperties           </td>
+          <td>(</td>
+          <td class="paramtype">OUT <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> *&nbsp;</td>
+          <td class="paramname"> <em>StartValue</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">OUT <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> *&nbsp;</td>
+          <td class="paramname"> <em>EndValue</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-If set, indicates this device supports an alternate button input. 
-</div>
-</div><p>
-<a class="anchor" name="21f584977149e26ec50c5305a83f3cbe"></a><!-- doxytag: member="AbsolutePointer.h::EFI_ABSP_SupportsPressureAsZ" ref="21f584977149e26ec50c5305a83f3cbe" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_ABSP_SupportsPressureAsZ&nbsp;&nbsp;&nbsp;0x00000002          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-If set, indicates this device returns pressure data in parameter CurrentZ. 
-</div>
-</div><p>
-<a class="anchor" name="b4e7a5b381e5d73c0a83ebf7bf392253"></a><!-- doxytag: member="AbsolutePointer.h::EFI_ABSP_TouchActive" ref="b4e7a5b381e5d73c0a83ebf7bf392253" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_ABSP_TouchActive&nbsp;&nbsp;&nbsp;0x00000001          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This bit is set if the touch sensor is active. 
-</div>
-</div><p>
-<hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="cdea42274e239a8a7baf0aaa110d6012"></a><!-- doxytag: member="AbsolutePointer.h::EFI_ABSOLUTE_POINTER_GET_STATE" ref="cdea42274e239a8a7baf0aaa110d6012" args=")(IN EFI_ABSOLUTE_POINTER_PROTOCOL *This, IN OUT EFI_ABSOLUTE_POINTER_STATE *State)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/d6d/a01095.html#cdea42274e239a8a7baf0aaa110d6012">EFI_ABSOLUTE_POINTER_GET_STATE</a>)(IN <a class="el" href="../../d8/d84/a00001.html">EFI_ABSOLUTE_POINTER_PROTOCOL</a> *This, IN OUT <a class="el" href="../../d5/d0f/a00308.html">EFI_ABSOLUTE_POINTER_STATE</a> *State)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-The GetState() function retrieves the current state of a pointer device. This includes information on the active state associated with the pointer device and the current position of the axes associated with the pointer device. If the state of the pointer device has not changed since the last call to GetState(), then EFI_NOT_READY is returned. If the state of the pointer device has changed since the last call to GetState(), then the state information is placed in State, and EFI_SUCCESS is returned. If a device error occurs while attempting to retrieve the state information, then EFI_DEVICE_ERROR is returned.<p>
+Retrieves the 64-bit frequency in Hz and the range of performance counter values.<p>
+If StartValue is not NULL, then the value that the performance counter starts with immediately after is it rolls over is returned in StartValue. If EndValue is not NULL, then the value that the performance counter end with immediately before it rolls over is returned in EndValue. The 64-bit frequency of the performance counter in Hz is always returned. If StartValue is less than EndValue, then the performance counter counts up. If StartValue is greater than EndValue, then the performance counter counts down. For example, a 64-bit free running counter that counts up would have a StartValue of 0 and an EndValue of 0xFFFFFFFFFFFFFFFF. A 24-bit free running counter that counts down would have a StartValue of 0xFFFFFF and an EndValue of 0.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_ABSOLUTE_POINTER_PROTOCOL instance.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>State</em>&nbsp;</td><td>A pointer to the state information on the pointer device.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>StartValue</em>&nbsp;</td><td>The value the performance counter starts with when it rolls over. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EndValue</em>&nbsp;</td><td>The value that the performance counter ends with before it rolls over.</td></tr>
   </table>
 </dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The state of the pointer device was returned in State.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_READY</em>&nbsp;</td><td>The state of the pointer device has not changed since the last call to GetState().</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>A device error occurred while attempting to retrieve the pointer device's current state. </td></tr>
-  </table>
-</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The frequency in Hz. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="92a467486eb507f899a66353decf8e05"></a><!-- doxytag: member="AbsolutePointer.h::EFI_ABSOLUTE_POINTER_PROTOCOL" ref="92a467486eb507f899a66353decf8e05" args="" -->
+<a class="anchor" name="d969489f6101915f665ab1d486095154"></a><!-- doxytag: member="TimerLib.h::MicroSecondDelay" ref="d969489f6101915f665ab1d486095154" args="(IN UINTN MicroSeconds)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef struct <a class="el" href="../../d8/d84/a00001.html">_EFI_ABSOLUTE_POINTER_PROTOCOL</a> <a class="el" href="../../d8/d84/a00001.html">EFI_ABSOLUTE_POINTER_PROTOCOL</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI MicroSecondDelay           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>MicroSeconds</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<a class="anchor" name="7cdd29244e6499008598706cc8d55891"></a><!-- doxytag: member="AbsolutePointer.h::EFI_ABSOLUTE_POINTER_RESET" ref="7cdd29244e6499008598706cc8d55891" args=")(IN EFI_ABSOLUTE_POINTER_PROTOCOL *This, IN BOOLEAN ExtendedVerification)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/d6d/a01095.html#7cdd29244e6499008598706cc8d55891">EFI_ABSOLUTE_POINTER_RESET</a>)(IN <a class="el" href="../../d8/d84/a00001.html">EFI_ABSOLUTE_POINTER_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> ExtendedVerification)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This function resets the pointer device hardware. As part of initialization process, the firmware/device will make a quick but reasonable attempt to verify that the device is functioning. If the ExtendedVerification flag is TRUE the firmware may take an extended amount of time to verify the device is operating on reset. Otherwise the reset operation is to occur as quickly as possible. The hardware verification process is not defined by this specification and is left up to the platform firmware or driver to implement.<p>
+Stalls the CPU for at least the given number of microseconds.<p>
+Stalls the CPU for the number of microseconds specified by MicroSeconds.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_ABSOLUTE_POINTER_PROTOCOL instance.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ExtendedVerification</em>&nbsp;</td><td>Indicates that the driver may perform a more exhaustive verification operation of the device during reset.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>MicroSeconds</em>&nbsp;</td><td>The minimum number of microseconds to delay.</td></tr>
   </table>
 </dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The device was reset.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The device is not functioning correctly and could not be reset. </td></tr>
-  </table>
-</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value of MicroSeconds inputted. </dd></dl>
 
 </div>
 </div><p>
-<hr><h2>Variable Documentation</h2>
-<a class="anchor" name="ae68c10aad450a8612a4e09c7fb3b892"></a><!-- doxytag: member="AbsolutePointer.h::gEfiAbsolutePointerProtocolGuid" ref="ae68c10aad450a8612a4e09c7fb3b892" args="" -->
+<a class="anchor" name="fabc69290941653676712638bc04963c"></a><!-- doxytag: member="TimerLib.h::NanoSecondDelay" ref="fabc69290941653676712638bc04963c" args="(IN UINTN NanoSeconds)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../de/d6d/a01095.html#ae68c10aad450a8612a4e09c7fb3b892">gEfiAbsolutePointerProtocolGuid</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI NanoSecondDelay           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>NanoSeconds</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+Stalls the CPU for at least the given number of nanoseconds.<p>
+Stalls the CPU for the number of nanoseconds specified by NanoSeconds.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>NanoSeconds</em>&nbsp;</td><td>The minimum number of nanoseconds to delay.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value of NanoSeconds inputted. </dd></dl>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:09 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:24 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

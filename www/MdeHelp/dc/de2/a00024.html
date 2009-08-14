@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: _EFI_DRIVER_FAMILY_OVERRIDE_PROTOCOL Struct Reference</title>
+<title>MdePkg[ALL]: _EFI_DRIVER_DIAGNOSTICS_PROTOCOL Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,20 +21,22 @@
   </div>
 </div>
 <div class="contents">
-<h1>_EFI_DRIVER_FAMILY_OVERRIDE_PROTOCOL Struct Reference</h1><!-- doxytag: class="_EFI_DRIVER_FAMILY_OVERRIDE_PROTOCOL" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>_EFI_DRIVER_DIAGNOSTICS_PROTOCOL Struct Reference</h1><!-- doxytag: class="_EFI_DRIVER_DIAGNOSTICS_PROTOCOL" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/de4/a01121.html#6804c710d0d7a8cbfa3a782880b37fa0">EFI_DRIVER_FAMILY_OVERRIDE_GET_VERSION</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/de2/a00024.html#a39502603483b196d498b8100f173085">GetVersion</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d7/d0c/a01173.html#db77ff2a93d1e759cb73c56d081c7122">EFI_DRIVER_DIAGNOSTICS_RUN_DIAGNOSTICS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/de2/a00024.html#faeecd4d97a574250d50781a80c0ffe6">RunDiagnostics</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/de2/a00024.html#908a22ab204d96631857e45388f8d4f1">SupportedLanguages</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-When installed, the Driver Family Override Protocol produces a <a class="el" href="../../d9/d0f/a00644.html">GUID</a> that represets a family of drivers. Drivers with the same <a class="el" href="../../d9/d0f/a00644.html">GUID</a> are members of the same family When drivers are connected to controllers, drivers with a higher revision value in the same driver family are connected with a higher priority than drivers with a lower revision value in the same driver family. The EFI Boot Service Connect Controller uses five rules to build a prioritied list of drivers when a request is made to connect a driver to a controller. The Driver Family Protocol rule is between the Platform Specific Driver Override Protocol and above the Bus Specific Driver Override Protocol. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="a39502603483b196d498b8100f173085"></a><!-- doxytag: member="_EFI_DRIVER_FAMILY_OVERRIDE_PROTOCOL::GetVersion" ref="a39502603483b196d498b8100f173085" args="" -->
+Used to perform diagnostics on a controller that an EFI Driver is managing. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="faeecd4d97a574250d50781a80c0ffe6"></a><!-- doxytag: member="_EFI_DRIVER_DIAGNOSTICS_PROTOCOL::RunDiagnostics" ref="faeecd4d97a574250d50781a80c0ffe6" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dd/de4/a01121.html#6804c710d0d7a8cbfa3a782880b37fa0">EFI_DRIVER_FAMILY_OVERRIDE_GET_VERSION</a> <a class="el" href="../../dc/de2/a00024.html#a39502603483b196d498b8100f173085">_EFI_DRIVER_FAMILY_OVERRIDE_PROTOCOL::GetVersion</a>          </td>
+          <td class="memname"><a class="el" href="../../d7/d0c/a01173.html#db77ff2a93d1e759cb73c56d081c7122">EFI_DRIVER_DIAGNOSTICS_RUN_DIAGNOSTICS</a> <a class="el" href="../../dc/de2/a00024.html#faeecd4d97a574250d50781a80c0ffe6">_EFI_DRIVER_DIAGNOSTICS_PROTOCOL::RunDiagnostics</a>          </td>
         </tr>
       </table>
 </div>
@@ -44,8 +46,23 @@ When installed, the Driver Family Override Protocol produces a <a class="el" hre
 
 </div>
 </div><p>
+<a class="anchor" name="908a22ab204d96631857e45388f8d4f1"></a><!-- doxytag: member="_EFI_DRIVER_DIAGNOSTICS_PROTOCOL::SupportedLanguages" ref="908a22ab204d96631857e45388f8d4f1" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a>* <a class="el" href="../../dc/de2/a00024.html#908a22ab204d96631857e45388f8d4f1">_EFI_DRIVER_DIAGNOSTICS_PROTOCOL::SupportedLanguages</a>          </td>
+        </tr>
+      </table>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:12 2009 for MdePkg[ALL] by&nbsp;
+<div class="memdoc">
+
+<p>
+A Null-terminated ASCII string that contains one or more RFC 4646 language codes. This is the list of language codes that this protocol supports. 
+</div>
+</div><p>
+</div>
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:02 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

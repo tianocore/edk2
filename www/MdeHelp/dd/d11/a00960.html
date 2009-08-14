@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Guid/DxeServices.h File Reference</title>
+<title>MdePkg[ALL]: tdTPM_QUOTE_INFO2 Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -9,58 +9,38 @@
   <div class="tabs">
     <ul>
       <li><a href="../../main.html"><span>Main&nbsp;Page</span></a></li>
-      <li><a href="../../annotated.html"><span>Data&nbsp;Structures</span></a></li>
-      <li class="current"><a href="../../files.html"><span>Files</span></a></li>
+      <li class="current"><a href="../../annotated.html"><span>Data&nbsp;Structures</span></a></li>
+      <li><a href="../../files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div class="tabs">
     <ul>
-      <li><a href="../../files.html"><span>File&nbsp;List</span></a></li>
-      <li><a href="../../globals.html"><span>Globals</span></a></li>
+      <li><a href="../../annotated.html"><span>Data&nbsp;Structures</span></a></li>
+      <li><a href="../../functions.html"><span>Data&nbsp;Fields</span></a></li>
     </ul>
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Guid/DxeServices.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>tdTPM_QUOTE_INFO2 Struct Reference</h1><!-- doxytag: class="tdTPM_QUOTE_INFO2" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
-<tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d11/a00960.html#df81a7319a1c69e32ee0808fcde70cf1">DXE_SERVICES_TABLE_GUID</a></td></tr>
+<tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d8e/a01050.html#69f3eb3e40aee2061dba5f9202fac1a2">TPM_STRUCTURE_TAG</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d11/a00960.html#47e3ea85254bc83bc92db8a97060fb37">tag</a></td></tr>
 
-<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d11/a00960.html#8778ab5abe3c3edabfbbe7e6691a3689">gEfiDxeServicesTableGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d11/a00960.html#9f40e77aa7e244dffd41d53ab5c373ba">fixed</a> [4]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d18/a00948.html">TPM_NONCE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d11/a00960.html#57225a2a66b4f217fa79c5c81bf3bef8">externalData</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/db6/a00955.html">TPM_PCR_INFO_SHORT</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d11/a00960.html#9ab9aeccf7c78ae6ea5854c7c0902982">infoShort</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-<a class="el" href="../../d9/d0f/a00644.html">GUID</a> used to identify the DXE Services Table<p>
-Copyright (c) 2006 - 2009, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
-<dl class="user" compact><dt><b>Revision Reference:</b></dt><dd><a class="el" href="../../d9/d0f/a00644.html">GUID</a> introduced in PI Version 1.0. </dd></dl>
-<hr><h2>Define Documentation</h2>
-<a class="anchor" name="df81a7319a1c69e32ee0808fcde70cf1"></a><!-- doxytag: member="DxeServices.h::DXE_SERVICES_TABLE_GUID" ref="df81a7319a1c69e32ee0808fcde70cf1" args="" -->
+Part 2, section 11.4 TPM_QUOTE_INFO2 Structure <hr><h2>Field Documentation</h2>
+<a class="anchor" name="57225a2a66b4f217fa79c5c81bf3bef8"></a><!-- doxytag: member="tdTPM_QUOTE_INFO2::externalData" ref="57225a2a66b4f217fa79c5c81bf3bef8" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define DXE_SERVICES_TABLE_GUID          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-<b>Value:</b><div class="fragment"><pre class="fragment">{ \
-    0x5ad34ba, 0x6f02, 0x4214, {0x95, 0x2e, 0x4d, 0xa0, 0x39, 0x8e, 0x2b, 0xb9 } \
-  }
-</pre></div>
-</div>
-</div><p>
-<hr><h2>Variable Documentation</h2>
-<a class="anchor" name="8778ab5abe3c3edabfbbe7e6691a3689"></a><!-- doxytag: member="DxeServices.h::gEfiDxeServicesTableGuid" ref="8778ab5abe3c3edabfbbe7e6691a3689" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../dd/d11/a00960.html#8778ab5abe3c3edabfbbe7e6691a3689">gEfiDxeServicesTableGuid</a>          </td>
+          <td class="memname"><a class="el" href="../../d8/d18/a00948.html">TPM_NONCE</a> <a class="el" href="../../dd/d11/a00960.html#57225a2a66b4f217fa79c5c81bf3bef8">tdTPM_QUOTE_INFO2::externalData</a>          </td>
         </tr>
       </table>
 </div>
@@ -70,8 +50,53 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 </div>
 </div><p>
+<a class="anchor" name="9f40e77aa7e244dffd41d53ab5c373ba"></a><!-- doxytag: member="tdTPM_QUOTE_INFO2::fixed" ref="9f40e77aa7e244dffd41d53ab5c373ba" args="[4]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../dd/d11/a00960.html#9f40e77aa7e244dffd41d53ab5c373ba">tdTPM_QUOTE_INFO2::fixed</a>[4]          </td>
+        </tr>
+      </table>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:07 2009 for MdePkg[ALL] by&nbsp;
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="9ab9aeccf7c78ae6ea5854c7c0902982"></a><!-- doxytag: member="tdTPM_QUOTE_INFO2::infoShort" ref="9ab9aeccf7c78ae6ea5854c7c0902982" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/db6/a00955.html">TPM_PCR_INFO_SHORT</a> <a class="el" href="../../dd/d11/a00960.html#9ab9aeccf7c78ae6ea5854c7c0902982">tdTPM_QUOTE_INFO2::infoShort</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="47e3ea85254bc83bc92db8a97060fb37"></a><!-- doxytag: member="tdTPM_QUOTE_INFO2::tag" ref="47e3ea85254bc83bc92db8a97060fb37" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d9/d8e/a01050.html#69f3eb3e40aee2061dba5f9202fac1a2">TPM_STRUCTURE_TAG</a> <a class="el" href="../../dd/d11/a00960.html#47e3ea85254bc83bc92db8a97060fb37">tdTPM_QUOTE_INFO2::tag</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+</div>
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:11 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

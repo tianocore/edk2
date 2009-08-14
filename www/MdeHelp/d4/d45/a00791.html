@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: SAL_SYSTEM_TABLE_HEADER Struct Reference</title>
+<title>MdePkg[ALL]: s_pxe_cpb_fill_header_fragmented Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,201 +21,202 @@
   </div>
 </div>
 <div class="contents">
-<h1>SAL_SYSTEM_TABLE_HEADER Struct Reference</h1><!-- doxytag: class="SAL_SYSTEM_TABLE_HEADER" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>s_pxe_cpb_fill_header_fragmented Struct Reference</h1><!-- doxytag: class="s_pxe_cpb_fill_header_fragmented" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d45/a00791.html#ceca986269f02a5b2ad8e034bc400469">Signature</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#01790f21199edcd6a8dd02d270c05f4f">PXE_MAC_ADDR</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d45/a00791.html#bda375c7389944f8a7f80de9dba647ce">SrcAddr</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d45/a00791.html#f1d51c0e1cde07a4915b2408b4de2919">Length</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#01790f21199edcd6a8dd02d270c05f4f">PXE_MAC_ADDR</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d45/a00791.html#7a352c39376464a3e464e3c79ca2f6a4">DestAddr</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d45/a00791.html#225763a5c06fdc2ed75fc785fb18acc3">SalRevision</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d45/a00791.html#9d2b892919b1331617d66a58d04b8a10">PacketLen</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d45/a00791.html#1fd8b7af7f8210a3a0e92e08022d7179">EntryCount</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#31b571e2b70d4bb221ea67177361c779">PXE_MEDIA_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d45/a00791.html#7f5ee4f3617c422164081f76d6bedf64">Protocol</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d45/a00791.html#f9ae419a1b1c1f2fb5ac384c02ede4bf">CheckSum</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d45/a00791.html#01a6d7d29da65b664e463db372516077">MediaHeaderLen</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d45/a00791.html#edc07c32957117970c68ecdebf3a9187">Reserved</a> [7]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d45/a00791.html#3c93826cf45f901f61c82af9eaaed442">FragCnt</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d45/a00791.html#e066f3ad0305c65d08bf1189c668be6f">SalAVersion</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d45/a00791.html#ed36b6b737d28e476cc02d7cb1545693">reserved</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d45/a00791.html#61751154ef9c6d275e08af8912e1cc2d">SalBVersion</a></td></tr>
+<tr><td class="memItemLeft" nowrap>struct {</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d45/a00791.html#039a71453daaf232860bdc3f63aed1d9">OemId</a> [32]</td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../dc/dc2/a01251.html#46095e9a84c0bc88f934110dbca0993f">PXE_UINT64</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d4/d45/a00791.html#5a6b4e79b9a09f0942442bfc563bb344">FragAddr</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d45/a00791.html#7728b21f77832345865b58a84b0274a5">ProductId</a> [32]</td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../dc/dc2/a01251.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d4/d45/a00791.html#158abbcd9ac3fcd27f26279e9f68c479">FragLen</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d45/a00791.html#21f2a68c8bdf52bd1bee8f3a14922865">Reserved2</a> [8]</td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../dc/dc2/a01251.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d4/d45/a00791.html#3b8ce56cde2499c48fd35c806045a863">reserved</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap valign="top">}&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d45/a00791.html#bb3c5e868f0ef7ebe2da0c8c68607454">FragDesc</a> [MAX_XMIT_FRAGMENTS]</td></tr>
 
 </table>
-<hr><a name="_details"></a><h2>Detailed Description</h2>
-SAL System Table Definitions <hr><h2>Field Documentation</h2>
-<a class="anchor" name="f9ae419a1b1c1f2fb5ac384c02ede4bf"></a><!-- doxytag: member="SAL_SYSTEM_TABLE_HEADER::CheckSum" ref="f9ae419a1b1c1f2fb5ac384c02ede4bf" args="" -->
+<hr><h2>Field Documentation</h2>
+<a class="anchor" name="7a352c39376464a3e464e3c79ca2f6a4"></a><!-- doxytag: member="s_pxe_cpb_fill_header_fragmented::DestAddr" ref="7a352c39376464a3e464e3c79ca2f6a4" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d45/a00791.html#f9ae419a1b1c1f2fb5ac384c02ede4bf">SAL_SYSTEM_TABLE_HEADER::CheckSum</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#01790f21199edcd6a8dd02d270c05f4f">PXE_MAC_ADDR</a> <a class="el" href="../../d4/d45/a00791.html#7a352c39376464a3e464e3c79ca2f6a4">s_pxe_cpb_fill_header_fragmented::DestAddr</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-A modulo checksum of the entire table and the entries following this table. 
+
 </div>
 </div><p>
-<a class="anchor" name="1fd8b7af7f8210a3a0e92e08022d7179"></a><!-- doxytag: member="SAL_SYSTEM_TABLE_HEADER::EntryCount" ref="1fd8b7af7f8210a3a0e92e08022d7179" args="" -->
+<a class="anchor" name="5a6b4e79b9a09f0942442bfc563bb344"></a><!-- doxytag: member="s_pxe_cpb_fill_header_fragmented::FragAddr" ref="5a6b4e79b9a09f0942442bfc563bb344" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d45/a00791.html#1fd8b7af7f8210a3a0e92e08022d7179">SAL_SYSTEM_TABLE_HEADER::EntryCount</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#46095e9a84c0bc88f934110dbca0993f">PXE_UINT64</a> <a class="el" href="../../d4/d45/a00791.html#5a6b4e79b9a09f0942442bfc563bb344">s_pxe_cpb_fill_header_fragmented::FragAddr</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The number of entries in the variable portion of the table. 
+Address of this packet fragment. 
 </div>
 </div><p>
-<a class="anchor" name="f1d51c0e1cde07a4915b2408b4de2919"></a><!-- doxytag: member="SAL_SYSTEM_TABLE_HEADER::Length" ref="f1d51c0e1cde07a4915b2408b4de2919" args="" -->
+<a class="anchor" name="3c93826cf45f901f61c82af9eaaed442"></a><!-- doxytag: member="s_pxe_cpb_fill_header_fragmented::FragCnt" ref="3c93826cf45f901f61c82af9eaaed442" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d4/d45/a00791.html#f1d51c0e1cde07a4915b2408b4de2919">SAL_SYSTEM_TABLE_HEADER::Length</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a> <a class="el" href="../../d4/d45/a00791.html#3c93826cf45f901f61c82af9eaaed442">s_pxe_cpb_fill_header_fragmented::FragCnt</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The length of the entire table in bytes, starting from offset zero and including the header and all entries indicated by the EntryCount field. 
+Number of packet fragment descriptors. 
 </div>
 </div><p>
-<a class="anchor" name="039a71453daaf232860bdc3f63aed1d9"></a><!-- doxytag: member="SAL_SYSTEM_TABLE_HEADER::OemId" ref="039a71453daaf232860bdc3f63aed1d9" args="[32]" -->
+<a class="anchor" name="bb3c5e868f0ef7ebe2da0c8c68607454"></a><!-- doxytag: member="s_pxe_cpb_fill_header_fragmented::FragDesc" ref="bb3c5e868f0ef7ebe2da0c8c68607454" args="[MAX_XMIT_FRAGMENTS]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d45/a00791.html#039a71453daaf232860bdc3f63aed1d9">SAL_SYSTEM_TABLE_HEADER::OemId</a>[32]          </td>
+          <td class="memname">struct { ... }   <a class="el" href="../../d4/d45/a00791.html#bb3c5e868f0ef7ebe2da0c8c68607454">s_pxe_cpb_fill_header_fragmented::FragDesc</a>[MAX_XMIT_FRAGMENTS]          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-An ASCII identification string which uniquely identifies the manufacturer of the system hardware. 
+Array of packet fragment descriptors. The first byte of the media header is the first byte of the first fragment. 
 </div>
 </div><p>
-<a class="anchor" name="7728b21f77832345865b58a84b0274a5"></a><!-- doxytag: member="SAL_SYSTEM_TABLE_HEADER::ProductId" ref="7728b21f77832345865b58a84b0274a5" args="[32]" -->
+<a class="anchor" name="158abbcd9ac3fcd27f26279e9f68c479"></a><!-- doxytag: member="s_pxe_cpb_fill_header_fragmented::FragLen" ref="158abbcd9ac3fcd27f26279e9f68c479" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d45/a00791.html#7728b21f77832345865b58a84b0274a5">SAL_SYSTEM_TABLE_HEADER::ProductId</a>[32]          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a> <a class="el" href="../../d4/d45/a00791.html#158abbcd9ac3fcd27f26279e9f68c479">s_pxe_cpb_fill_header_fragmented::FragLen</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-An ASCII identification string which uniquely identifies a family of compatible products from the manufacturer. 
+Length of this packet fragment. 
 </div>
 </div><p>
-<a class="anchor" name="edc07c32957117970c68ecdebf3a9187"></a><!-- doxytag: member="SAL_SYSTEM_TABLE_HEADER::Reserved" ref="edc07c32957117970c68ecdebf3a9187" args="[7]" -->
+<a class="anchor" name="01a6d7d29da65b664e463db372516077"></a><!-- doxytag: member="s_pxe_cpb_fill_header_fragmented::MediaHeaderLen" ref="01a6d7d29da65b664e463db372516077" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d45/a00791.html#edc07c32957117970c68ecdebf3a9187">SAL_SYSTEM_TABLE_HEADER::Reserved</a>[7]          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a> <a class="el" href="../../d4/d45/a00791.html#01a6d7d29da65b664e463db372516077">s_pxe_cpb_fill_header_fragmented::MediaHeaderLen</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Unused, must be zero. 
+Length of the media header in bytes. 
 </div>
 </div><p>
-<a class="anchor" name="21f2a68c8bdf52bd1bee8f3a14922865"></a><!-- doxytag: member="SAL_SYSTEM_TABLE_HEADER::Reserved2" ref="21f2a68c8bdf52bd1bee8f3a14922865" args="[8]" -->
+<a class="anchor" name="9d2b892919b1331617d66a58d04b8a10"></a><!-- doxytag: member="s_pxe_cpb_fill_header_fragmented::PacketLen" ref="9d2b892919b1331617d66a58d04b8a10" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d45/a00791.html#21f2a68c8bdf52bd1bee8f3a14922865">SAL_SYSTEM_TABLE_HEADER::Reserved2</a>[8]          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a> <a class="el" href="../../d4/d45/a00791.html#9d2b892919b1331617d66a58d04b8a10">s_pxe_cpb_fill_header_fragmented::PacketLen</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Unused, must be zero. 
+Length of packet data in bytes (not including the media header). 
 </div>
 </div><p>
-<a class="anchor" name="e066f3ad0305c65d08bf1189c668be6f"></a><!-- doxytag: member="SAL_SYSTEM_TABLE_HEADER::SalAVersion" ref="e066f3ad0305c65d08bf1189c668be6f" args="" -->
+<a class="anchor" name="7f5ee4f3617c422164081f76d6bedf64"></a><!-- doxytag: member="s_pxe_cpb_fill_header_fragmented::Protocol" ref="7f5ee4f3617c422164081f76d6bedf64" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d45/a00791.html#e066f3ad0305c65d08bf1189c668be6f">SAL_SYSTEM_TABLE_HEADER::SalAVersion</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#31b571e2b70d4bb221ea67177361c779">PXE_MEDIA_PROTOCOL</a> <a class="el" href="../../d4/d45/a00791.html#7f5ee4f3617c422164081f76d6bedf64">s_pxe_cpb_fill_header_fragmented::Protocol</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Version Number of the SAL_A firmware implementation in BCD format. 
+Protocol type. This will be copied into the media header without doing byte swapping. Protocol type numbers can be obtained from the Assigned Numbers RFC 1700. 
 </div>
 </div><p>
-<a class="anchor" name="61751154ef9c6d275e08af8912e1cc2d"></a><!-- doxytag: member="SAL_SYSTEM_TABLE_HEADER::SalBVersion" ref="61751154ef9c6d275e08af8912e1cc2d" args="" -->
+<a class="anchor" name="3b8ce56cde2499c48fd35c806045a863"></a><!-- doxytag: member="s_pxe_cpb_fill_header_fragmented::reserved" ref="3b8ce56cde2499c48fd35c806045a863" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d45/a00791.html#61751154ef9c6d275e08af8912e1cc2d">SAL_SYSTEM_TABLE_HEADER::SalBVersion</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a> <a class="el" href="../../d4/d45/a00791.html#ed36b6b737d28e476cc02d7cb1545693">s_pxe_cpb_fill_header_fragmented::reserved</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Version Number of the SAL_B firmware implementation in BCD format. 
+Reserved, must be set to zero. 
 </div>
 </div><p>
-<a class="anchor" name="225763a5c06fdc2ed75fc785fb18acc3"></a><!-- doxytag: member="SAL_SYSTEM_TABLE_HEADER::SalRevision" ref="225763a5c06fdc2ed75fc785fb18acc3" args="" -->
+<a class="anchor" name="ed36b6b737d28e476cc02d7cb1545693"></a><!-- doxytag: member="s_pxe_cpb_fill_header_fragmented::reserved" ref="ed36b6b737d28e476cc02d7cb1545693" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d45/a00791.html#225763a5c06fdc2ed75fc785fb18acc3">SAL_SYSTEM_TABLE_HEADER::SalRevision</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a> <a class="el" href="../../d4/d45/a00791.html#ed36b6b737d28e476cc02d7cb1545693">s_pxe_cpb_fill_header_fragmented::reserved</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The revision number of the Itanium Processor Family System Abstraction Layer Specification supported by the SAL implementation in binary coded decimal (BCD) format. 
+Reserved, must be set to zero. 
 </div>
 </div><p>
-<a class="anchor" name="ceca986269f02a5b2ad8e034bc400469"></a><!-- doxytag: member="SAL_SYSTEM_TABLE_HEADER::Signature" ref="ceca986269f02a5b2ad8e034bc400469" args="" -->
+<a class="anchor" name="bda375c7389944f8a7f80de9dba647ce"></a><!-- doxytag: member="s_pxe_cpb_fill_header_fragmented::SrcAddr" ref="bda375c7389944f8a7f80de9dba647ce" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d4/d45/a00791.html#ceca986269f02a5b2ad8e034bc400469">SAL_SYSTEM_TABLE_HEADER::Signature</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#01790f21199edcd6a8dd02d270c05f4f">PXE_MAC_ADDR</a> <a class="el" href="../../d4/d45/a00791.html#bda375c7389944f8a7f80de9dba647ce">s_pxe_cpb_fill_header_fragmented::SrcAddr</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The ASCII string representation of "SST_" which confirms the presence of the table. 
+Source and destination MAC addresses. These will be copied into the media header without doing byte swapping. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:21 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:00 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

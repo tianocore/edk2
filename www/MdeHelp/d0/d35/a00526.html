@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_MTFTP4_DATA8_HEADER Struct Reference</title>
+<title>MdePkg[ALL]: EFI_IP4_COMPLETION_TOKEN Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,23 +21,44 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_MTFTP4_DATA8_HEADER Struct Reference</h1><!-- doxytag: class="EFI_MTFTP4_DATA8_HEADER" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_IP4_COMPLETION_TOKEN Struct Reference</h1><!-- doxytag: class="EFI_IP4_COMPLETION_TOKEN" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d35/a00526.html#f3cca54f9b981d4906f776326b71e054">OpCode</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d95/a01247.html#7f3111de303d836d8d3711c39363f81a">EFI_EVENT</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d35/a00526.html#1d3d8f9e9a70a179afd8c2531cfbd1ce">Event</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d35/a00526.html#8e6bd30f918273e2be3346a07f7c3b9b">Block</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d35/a00526.html#3b8b00dffe1c32d8b6454f0a554132cc">Status</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d35/a00526.html#abb9a54eee026d04f09f9f0c6be04143">Data</a> [1]</td></tr>
+<tr><td class="memItemLeft" nowrap>union {</td></tr>
+
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../dc/d20/a00534.html">EFI_IP4_RECEIVE_DATA</a> *&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d35/a00526.html#2d889ccddae1e3d694ce2c8c554678d2">RxData</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d4/d33/a00536.html">EFI_IP4_TRANSMIT_DATA</a> *&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d35/a00526.html#9bb699d2b0e7b9a50f3122ef4eb4c8e9">TxData</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap valign="top">}&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d35/a00526.html#86f4c8f9a1ace469476154217cc50037">Packet</a></td></tr>
 
 </table>
 <hr><h2>Field Documentation</h2>
-<a class="anchor" name="8e6bd30f918273e2be3346a07f7c3b9b"></a><!-- doxytag: member="EFI_MTFTP4_DATA8_HEADER::Block" ref="8e6bd30f918273e2be3346a07f7c3b9b" args="" -->
+<a class="anchor" name="1d3d8f9e9a70a179afd8c2531cfbd1ce"></a><!-- doxytag: member="EFI_IP4_COMPLETION_TOKEN::Event" ref="1d3d8f9e9a70a179afd8c2531cfbd1ce" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d0/d35/a00526.html#8e6bd30f918273e2be3346a07f7c3b9b">EFI_MTFTP4_DATA8_HEADER::Block</a>          </td>
+          <td class="memname"><a class="el" href="../../dd/d95/a01247.html#7f3111de303d836d8d3711c39363f81a">EFI_EVENT</a> <a class="el" href="../../d0/d35/a00526.html#1d3d8f9e9a70a179afd8c2531cfbd1ce">EFI_IP4_COMPLETION_TOKEN::Event</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This Event will be signaled after the Status field is updated by the EFI IPv4 Protocol driver. The type of Event must be EFI_NOTIFY_SIGNAL. The Task Priority Level (TPL) of Event must be lower than or equal to TPL_CALLBACK. 
+</div>
+</div><p>
+<a class="anchor" name="86f4c8f9a1ace469476154217cc50037"></a><!-- doxytag: member="EFI_IP4_COMPLETION_TOKEN::Packet" ref="86f4c8f9a1ace469476154217cc50037" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">union { ... }   <a class="el" href="../../d0/d35/a00526.html#86f4c8f9a1ace469476154217cc50037">EFI_IP4_COMPLETION_TOKEN::Packet</a>          </td>
         </tr>
       </table>
 </div>
@@ -47,38 +68,53 @@
 
 </div>
 </div><p>
-<a class="anchor" name="abb9a54eee026d04f09f9f0c6be04143"></a><!-- doxytag: member="EFI_MTFTP4_DATA8_HEADER::Data" ref="abb9a54eee026d04f09f9f0c6be04143" args="[1]" -->
+<a class="anchor" name="2d889ccddae1e3d694ce2c8c554678d2"></a><!-- doxytag: member="EFI_IP4_COMPLETION_TOKEN::RxData" ref="2d889ccddae1e3d694ce2c8c554678d2" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d0/d35/a00526.html#abb9a54eee026d04f09f9f0c6be04143">EFI_MTFTP4_DATA8_HEADER::Data</a>[1]          </td>
+          <td class="memname"><a class="el" href="../../dc/d20/a00534.html">EFI_IP4_RECEIVE_DATA</a>* <a class="el" href="../../d0/d35/a00526.html#2d889ccddae1e3d694ce2c8c554678d2">EFI_IP4_COMPLETION_TOKEN::RxData</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+When this token is used for receiving, RxData is a pointer to the <a class="el" href="../../dc/d20/a00534.html">EFI_IP4_RECEIVE_DATA</a>. 
 </div>
 </div><p>
-<a class="anchor" name="f3cca54f9b981d4906f776326b71e054"></a><!-- doxytag: member="EFI_MTFTP4_DATA8_HEADER::OpCode" ref="f3cca54f9b981d4906f776326b71e054" args="" -->
+<a class="anchor" name="3b8b00dffe1c32d8b6454f0a554132cc"></a><!-- doxytag: member="EFI_IP4_COMPLETION_TOKEN::Status" ref="3b8b00dffe1c32d8b6454f0a554132cc" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d0/d35/a00526.html#f3cca54f9b981d4906f776326b71e054">EFI_MTFTP4_DATA8_HEADER::OpCode</a>          </td>
+          <td class="memname"><a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> <a class="el" href="../../d0/d35/a00526.html#3b8b00dffe1c32d8b6454f0a554132cc">EFI_IP4_COMPLETION_TOKEN::Status</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+The status that is returned to the caller at the end of the operation to indicate whether this operation completed successfully. 
+</div>
+</div><p>
+<a class="anchor" name="9bb699d2b0e7b9a50f3122ef4eb4c8e9"></a><!-- doxytag: member="EFI_IP4_COMPLETION_TOKEN::TxData" ref="9bb699d2b0e7b9a50f3122ef4eb4c8e9" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d4/d33/a00536.html">EFI_IP4_TRANSMIT_DATA</a>* <a class="el" href="../../d0/d35/a00526.html#9bb699d2b0e7b9a50f3122ef4eb4c8e9">EFI_IP4_COMPLETION_TOKEN::TxData</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
 
+<p>
+When this token is used for transmitting, TxData is a pointer to the <a class="el" href="../../d4/d33/a00536.html">EFI_IP4_TRANSMIT_DATA</a>. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:35 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

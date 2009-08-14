@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: _EFI_HII_SIMPLE_FONT_PACKAGE_HDR Struct Reference</title>
+<title>MdePkg[ALL]: _EFI_HII_SIBT_STRINGS_UCS2_FONT_BLOCK Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,24 +21,25 @@
   </div>
 </div>
 <div class="contents">
-<h1>_EFI_HII_SIMPLE_FONT_PACKAGE_HDR Struct Reference</h1><!-- doxytag: class="_EFI_HII_SIMPLE_FONT_PACKAGE_HDR" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>_EFI_HII_SIBT_STRINGS_UCS2_FONT_BLOCK Struct Reference</h1><!-- doxytag: class="_EFI_HII_SIBT_STRINGS_UCS2_FONT_BLOCK" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d10/a00449.html">EFI_HII_PACKAGE_HEADER</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d1e/a00103.html#749f4b918f4271f6e67ad9f8a8f6141d">Header</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d4a/a00479.html">EFI_HII_STRING_BLOCK</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d1e/a00103.html#50bb8c4732b316a3a8c659c06c9798ca">Header</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d1e/a00103.html#9236f3fe6e2c842e745651bc3b931cf7">NumberOfNarrowGlyphs</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d1e/a00103.html#a3fe7bc058ca4d5c283f9d9cfd84e464">FontIdentifier</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d1e/a00103.html#621e7dfd9449b3404dd00568669f4820">NumberOfWideGlyphs</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d1e/a00103.html#e4a79301049e5e1712986cda389e73b2">StringCount</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d1e/a00103.html#b047b7862cc5f56c88779ec1f482cebd">StringText</a> [1]</td></tr>
 
 </table>
-<hr><a name="_details"></a><h2>Detailed Description</h2>
-A simplified font package consists of a font header followed by a series of glyph structures. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="749f4b918f4271f6e67ad9f8a8f6141d"></a><!-- doxytag: member="_EFI_HII_SIMPLE_FONT_PACKAGE_HDR::Header" ref="749f4b918f4271f6e67ad9f8a8f6141d" args="" -->
+<hr><h2>Field Documentation</h2>
+<a class="anchor" name="a3fe7bc058ca4d5c283f9d9cfd84e464"></a><!-- doxytag: member="_EFI_HII_SIBT_STRINGS_UCS2_FONT_BLOCK::FontIdentifier" ref="a3fe7bc058ca4d5c283f9d9cfd84e464" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d10/a00449.html">EFI_HII_PACKAGE_HEADER</a> <a class="el" href="../../d5/d1e/a00103.html#749f4b918f4271f6e67ad9f8a8f6141d">_EFI_HII_SIMPLE_FONT_PACKAGE_HDR::Header</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d5/d1e/a00103.html#a3fe7bc058ca4d5c283f9d9cfd84e464">_EFI_HII_SIBT_STRINGS_UCS2_FONT_BLOCK::FontIdentifier</a>          </td>
         </tr>
       </table>
 </div>
@@ -48,12 +49,12 @@ A simplified font package consists of a font header followed by a series of glyp
 
 </div>
 </div><p>
-<a class="anchor" name="9236f3fe6e2c842e745651bc3b931cf7"></a><!-- doxytag: member="_EFI_HII_SIMPLE_FONT_PACKAGE_HDR::NumberOfNarrowGlyphs" ref="9236f3fe6e2c842e745651bc3b931cf7" args="" -->
+<a class="anchor" name="50bb8c4732b316a3a8c659c06c9798ca"></a><!-- doxytag: member="_EFI_HII_SIBT_STRINGS_UCS2_FONT_BLOCK::Header" ref="50bb8c4732b316a3a8c659c06c9798ca" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d5/d1e/a00103.html#9236f3fe6e2c842e745651bc3b931cf7">_EFI_HII_SIMPLE_FONT_PACKAGE_HDR::NumberOfNarrowGlyphs</a>          </td>
+          <td class="memname"><a class="el" href="../../d9/d4a/a00479.html">EFI_HII_STRING_BLOCK</a> <a class="el" href="../../d5/d1e/a00103.html#50bb8c4732b316a3a8c659c06c9798ca">_EFI_HII_SIBT_STRINGS_UCS2_FONT_BLOCK::Header</a>          </td>
         </tr>
       </table>
 </div>
@@ -63,12 +64,27 @@ A simplified font package consists of a font header followed by a series of glyp
 
 </div>
 </div><p>
-<a class="anchor" name="621e7dfd9449b3404dd00568669f4820"></a><!-- doxytag: member="_EFI_HII_SIMPLE_FONT_PACKAGE_HDR::NumberOfWideGlyphs" ref="621e7dfd9449b3404dd00568669f4820" args="" -->
+<a class="anchor" name="e4a79301049e5e1712986cda389e73b2"></a><!-- doxytag: member="_EFI_HII_SIBT_STRINGS_UCS2_FONT_BLOCK::StringCount" ref="e4a79301049e5e1712986cda389e73b2" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d5/d1e/a00103.html#621e7dfd9449b3404dd00568669f4820">_EFI_HII_SIMPLE_FONT_PACKAGE_HDR::NumberOfWideGlyphs</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d5/d1e/a00103.html#e4a79301049e5e1712986cda389e73b2">_EFI_HII_SIBT_STRINGS_UCS2_FONT_BLOCK::StringCount</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="b047b7862cc5f56c88779ec1f482cebd"></a><!-- doxytag: member="_EFI_HII_SIBT_STRINGS_UCS2_FONT_BLOCK::StringText" ref="b047b7862cc5f56c88779ec1f482cebd" args="[1]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> <a class="el" href="../../d5/d1e/a00103.html#b047b7862cc5f56c88779ec1f482cebd">_EFI_HII_SIBT_STRINGS_UCS2_FONT_BLOCK::StringText</a>[1]          </td>
         </tr>
       </table>
 </div>
@@ -79,7 +95,7 @@ A simplified font package consists of a font header followed by a series of glyp
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:12 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:08 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

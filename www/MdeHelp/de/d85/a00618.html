@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_TIME_CAPABILITIES Struct Reference</title>
+<title>MdePkg[ALL]: EFI_SCSI_INQUIRY_DATA Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,65 +21,150 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_TIME_CAPABILITIES Struct Reference</h1><!-- doxytag: class="EFI_TIME_CAPABILITIES" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_SCSI_INQUIRY_DATA Struct Reference</h1><!-- doxytag: class="EFI_SCSI_INQUIRY_DATA" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d85/a00618.html#5e302cf166017eacf05df9de37f09338">Resolution</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d85/a00618.html#7960bbd32b1998d0d2105641e74f8bcb">Peripheral_Type</a>: 5</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d85/a00618.html#a0b470bb2621aad93ca9d510b0c2571e">Accuracy</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d85/a00618.html#8dbf2b97f3459e9ae0f6b8fb6d5fc0db">Peripheral_Qualifier</a>: 3</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d85/a00618.html#b2dce3f0b8c903fb192b57d2b9b3df47">SetsToZero</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d85/a00618.html#9f058102809eec2216322ae5c6199e27">DeviceType_Modifier</a>: 7</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d85/a00618.html#d50f1f144de1a111226402c10245770d">Rmb</a>: 1</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d85/a00618.html#90cf169c6d346c980a664f0a12f1a6c3">Version</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d85/a00618.html#8e923743a3ea1439479ab5f6d5703d30">Response_Data_Format</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d85/a00618.html#e03e330d9e8bb9f96a8b61c7d56b54c7">Addnl_Length</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d85/a00618.html#ce76666240820f4f60beb22dde828c65">Reserved_5_95</a> [95-5+1]</td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-This provides the capabilities of the real time clock device as exposed through the EFI interfaces. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="a0b470bb2621aad93ca9d510b0c2571e"></a><!-- doxytag: member="EFI_TIME_CAPABILITIES::Accuracy" ref="a0b470bb2621aad93ca9d510b0c2571e" args="" -->
+Standard INQUIRY data format <hr><h2>Field Documentation</h2>
+<a class="anchor" name="e03e330d9e8bb9f96a8b61c7d56b54c7"></a><!-- doxytag: member="EFI_SCSI_INQUIRY_DATA::Addnl_Length" ref="e03e330d9e8bb9f96a8b61c7d56b54c7" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../de/d85/a00618.html#a0b470bb2621aad93ca9d510b0c2571e">EFI_TIME_CAPABILITIES::Accuracy</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/d85/a00618.html#e03e330d9e8bb9f96a8b61c7d56b54c7">EFI_SCSI_INQUIRY_DATA::Addnl_Length</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Provides the timekeeping accuracy of the real-time clock in an error rate of 1E-6 parts per million. For a clock with an accuracy of 50 parts per million, the value in this field would be 50,000,000. 
+
 </div>
 </div><p>
-<a class="anchor" name="5e302cf166017eacf05df9de37f09338"></a><!-- doxytag: member="EFI_TIME_CAPABILITIES::Resolution" ref="5e302cf166017eacf05df9de37f09338" args="" -->
+<a class="anchor" name="9f058102809eec2216322ae5c6199e27"></a><!-- doxytag: member="EFI_SCSI_INQUIRY_DATA::DeviceType_Modifier" ref="9f058102809eec2216322ae5c6199e27" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../de/d85/a00618.html#5e302cf166017eacf05df9de37f09338">EFI_TIME_CAPABILITIES::Resolution</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/d85/a00618.html#9f058102809eec2216322ae5c6199e27">EFI_SCSI_INQUIRY_DATA::DeviceType_Modifier</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Provides the reporting resolution of the real-time clock device in counts per second. For a normal PC-AT CMOS RTC device, this value would be 1 Hz, or 1, to indicate that the device only reports the time to the resolution of 1 second. 
+
 </div>
 </div><p>
-<a class="anchor" name="b2dce3f0b8c903fb192b57d2b9b3df47"></a><!-- doxytag: member="EFI_TIME_CAPABILITIES::SetsToZero" ref="b2dce3f0b8c903fb192b57d2b9b3df47" args="" -->
+<a class="anchor" name="8dbf2b97f3459e9ae0f6b8fb6d5fc0db"></a><!-- doxytag: member="EFI_SCSI_INQUIRY_DATA::Peripheral_Qualifier" ref="8dbf2b97f3459e9ae0f6b8fb6d5fc0db" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../de/d85/a00618.html#b2dce3f0b8c903fb192b57d2b9b3df47">EFI_TIME_CAPABILITIES::SetsToZero</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/d85/a00618.html#8dbf2b97f3459e9ae0f6b8fb6d5fc0db">EFI_SCSI_INQUIRY_DATA::Peripheral_Qualifier</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-A TRUE indicates that a time set operation clears the device's time below the Resolution reporting level. A FALSE indicates that the state below the Resolution level of the device is not cleared when the time is set. Normal PC-AT CMOS RTC devices set this value to FALSE. 
+
+</div>
+</div><p>
+<a class="anchor" name="7960bbd32b1998d0d2105641e74f8bcb"></a><!-- doxytag: member="EFI_SCSI_INQUIRY_DATA::Peripheral_Type" ref="7960bbd32b1998d0d2105641e74f8bcb" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/d85/a00618.html#7960bbd32b1998d0d2105641e74f8bcb">EFI_SCSI_INQUIRY_DATA::Peripheral_Type</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="ce76666240820f4f60beb22dde828c65"></a><!-- doxytag: member="EFI_SCSI_INQUIRY_DATA::Reserved_5_95" ref="ce76666240820f4f60beb22dde828c65" args="[95&#45;5+1]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/d85/a00618.html#ce76666240820f4f60beb22dde828c65">EFI_SCSI_INQUIRY_DATA::Reserved_5_95</a>[95-5+1]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="8e923743a3ea1439479ab5f6d5703d30"></a><!-- doxytag: member="EFI_SCSI_INQUIRY_DATA::Response_Data_Format" ref="8e923743a3ea1439479ab5f6d5703d30" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/d85/a00618.html#8e923743a3ea1439479ab5f6d5703d30">EFI_SCSI_INQUIRY_DATA::Response_Data_Format</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="d50f1f144de1a111226402c10245770d"></a><!-- doxytag: member="EFI_SCSI_INQUIRY_DATA::Rmb" ref="d50f1f144de1a111226402c10245770d" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/d85/a00618.html#d50f1f144de1a111226402c10245770d">EFI_SCSI_INQUIRY_DATA::Rmb</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="90cf169c6d346c980a664f0a12f1a6c3"></a><!-- doxytag: member="EFI_SCSI_INQUIRY_DATA::Version" ref="90cf169c6d346c980a664f0a12f1a6c3" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/d85/a00618.html#90cf169c6d346c980a664f0a12f1a6c3">EFI_SCSI_INQUIRY_DATA::Version</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:19 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:44 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_USB2_HC_TRANSACTION_TRANSLATOR Struct Reference</title>
+<title>MdePkg[ALL]: EFI_SMBUS_DEVICE_MAP Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,53 +21,47 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_USB2_HC_TRANSACTION_TRANSLATOR Struct Reference</h1><!-- doxytag: class="EFI_USB2_HC_TRANSACTION_TRANSLATOR" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_SMBUS_DEVICE_MAP Struct Reference</h1><!-- doxytag: class="EFI_SMBUS_DEVICE_MAP" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d66/a00630.html#3c55898a9296f61ee5f4314e799fe289">TranslatorHubAddress</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../da/dd1/a00629.html">EFI_SMBUS_DEVICE_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d66/a00630.html#88cb2dcbb7d772ba7cadc61ebd442448">SmbusDeviceAddress</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">device address  <a href="#3c55898a9296f61ee5f4314e799fe289"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d66/a00630.html#a23f4f46cfc2c0ec1037eed5f291a4b9">TranslatorPortNumber</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d5/de3/a00631.html">EFI_SMBUS_UDID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d66/a00630.html#52e599c307918f3bca66638a3896dac7">SmbusDeviceUdid</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">the port number of the hub that device is connected to.  <a href="#a23f4f46cfc2c0ec1037eed5f291a4b9"></a><br></td></tr>
 </table>
 <hr><h2>Field Documentation</h2>
-<a class="anchor" name="3c55898a9296f61ee5f4314e799fe289"></a><!-- doxytag: member="EFI_USB2_HC_TRANSACTION_TRANSLATOR::TranslatorHubAddress" ref="3c55898a9296f61ee5f4314e799fe289" args="" -->
+<a class="anchor" name="88cb2dcbb7d772ba7cadc61ebd442448"></a><!-- doxytag: member="EFI_SMBUS_DEVICE_MAP::SmbusDeviceAddress" ref="88cb2dcbb7d772ba7cadc61ebd442448" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../dc/d66/a00630.html#3c55898a9296f61ee5f4314e799fe289">EFI_USB2_HC_TRANSACTION_TRANSLATOR::TranslatorHubAddress</a>          </td>
+          <td class="memname"><a class="el" href="../../da/dd1/a00629.html">EFI_SMBUS_DEVICE_ADDRESS</a> <a class="el" href="../../dc/d66/a00630.html#88cb2dcbb7d772ba7cadc61ebd442448">EFI_SMBUS_DEVICE_MAP::SmbusDeviceAddress</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-device address 
-<p>
-
+The SMBUS hardware address to which the SMBUS device is preassigned or allocated. Type <a class="el" href="../../da/dd1/a00629.html">EFI_SMBUS_DEVICE_ADDRESS</a> is defined in <a class="el" href="../../d2/dc8/a00242.html#81b51390680c4ee9556edc15371858a3">EFI_PEI_SMBUS2_PPI.Execute()</a>. 
 </div>
 </div><p>
-<a class="anchor" name="a23f4f46cfc2c0ec1037eed5f291a4b9"></a><!-- doxytag: member="EFI_USB2_HC_TRANSACTION_TRANSLATOR::TranslatorPortNumber" ref="a23f4f46cfc2c0ec1037eed5f291a4b9" args="" -->
+<a class="anchor" name="52e599c307918f3bca66638a3896dac7"></a><!-- doxytag: member="EFI_SMBUS_DEVICE_MAP::SmbusDeviceUdid" ref="52e599c307918f3bca66638a3896dac7" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../dc/d66/a00630.html#a23f4f46cfc2c0ec1037eed5f291a4b9">EFI_USB2_HC_TRANSACTION_TRANSLATOR::TranslatorPortNumber</a>          </td>
+          <td class="memname"><a class="el" href="../../d5/de3/a00631.html">EFI_SMBUS_UDID</a> <a class="el" href="../../dc/d66/a00630.html#52e599c307918f3bca66638a3896dac7">EFI_SMBUS_DEVICE_MAP::SmbusDeviceUdid</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-the port number of the hub that device is connected to. 
-<p>
-
+The SMBUS Unique Device Identifier (UDID) as defined in <a class="el" href="../../d5/de3/a00631.html">EFI_SMBUS_UDID</a>. Type <a class="el" href="../../d5/de3/a00631.html">EFI_SMBUS_UDID</a> is defined in <a class="el" href="../../d2/dc8/a00242.html#e1651f9e58e2267855d59de2f297a3dd">EFI_PEI_SMBUS2_PPI.ArpDevice()</a>. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:19 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:45 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

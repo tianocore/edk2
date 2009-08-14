@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_IMAGE_OPTIONAL_HEADER64 Struct Reference</title>
+<title>MdePkg[ALL]: EFI_HOB_FIRMWARE_VOLUME Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,524 +21,65 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_IMAGE_OPTIONAL_HEADER64 Struct Reference</h1><!-- doxytag: class="EFI_IMAGE_OPTIONAL_HEADER64" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_HOB_FIRMWARE_VOLUME Struct Reference</h1><!-- doxytag: class="EFI_HOB_FIRMWARE_VOLUME" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#7e71fbe95a4d922f23c5081ed50f69de">Magic</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d89/a00484.html">EFI_HOB_GENERIC_HEADER</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#8305a8837bb09018de3727dd52972af6">Header</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#1a91ed09191242c62897bb8193fa7150">MajorLinkerVersion</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d95/a01247.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#a14e73cfe07059d25980bbe00ddf41a5">BaseAddress</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#501917e17ce493f88e252653cfc88a59">MinorLinkerVersion</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#c881370f7e9c51b0e47893b459cea9c0">SizeOfCode</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#f8e04f8390a7da28340794ce269b0af5">SizeOfInitializedData</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#8988469042a7b90dbd49ad34beec7237">SizeOfUninitializedData</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#bac04f0b32459b03e5eb77d0d434eb33">AddressOfEntryPoint</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#f5e135630723d963db5bb0891cabbe54">BaseOfCode</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#1c56136b039e9a01ab8ecf558e8fa160">ImageBase</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#5d73d261477fcc8a1899962c88a68a57">SectionAlignment</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#ee21261700933b661791951bb0247dba">FileAlignment</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#fd7e590baa9bd2eecc43248f74c4220a">MajorOperatingSystemVersion</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#2201c3603c0bf000763804e4df680223">MinorOperatingSystemVersion</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#89cdcbcc6fcee1d66a4d74a2c14278d3">MajorImageVersion</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#38c2e22b55a3db41f09fe5052d6d2f96">MinorImageVersion</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#1d7aa1594868e3656bbd07beacdd8ac8">MajorSubsystemVersion</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#e4ed4c46b3cfbf1c59b3dddb5058e179">MinorSubsystemVersion</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#e82c28ff914b856e70aa17930a6c10cc">Win32VersionValue</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#f1b8e117865616a216800813307cc233">SizeOfImage</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#8f9e0a74e113595d1483ef313eb84751">SizeOfHeaders</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#42002f709c77fe5c7450703fbe04eb22">CheckSum</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#ba75b8bb32c040c85a6d3c0eaef4c36c">Subsystem</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#fce71fe06d384da87731876eed0b6dbe">DllCharacteristics</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#8c7655f6c4a9d241ceecf04faa6ea394">SizeOfStackReserve</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#b39fa77f26eded97d00b48010ae88e27">SizeOfStackCommit</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#7fbd6d64cff813ce61685f4c5c7703f5">SizeOfHeapReserve</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#44add96deb3183c59964b73de28073f4">SizeOfHeapCommit</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#fa8b7508da4dfad3ff22f7096ef84d71">LoaderFlags</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#0a0695a4d7162aa2bf65d745444a3603">NumberOfRvaAndSizes</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/ddf/a00469.html">EFI_IMAGE_DATA_DIRECTORY</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#f5a97f66c5246cfcb8db3e2a6e0666d3">DataDirectory</a> [EFI_IMAGE_NUMBER_OF_DIRECTORY_ENTRIES]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html#b33b9b3091f5a2d231e955de52592695">Length</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Optional Header Standard Fields for PE32+ <hr><h2>Field Documentation</h2>
-<a class="anchor" name="bac04f0b32459b03e5eb77d0d434eb33"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER64::AddressOfEntryPoint" ref="bac04f0b32459b03e5eb77d0d434eb33" args="" -->
+Details the location of firmware volumes that contain firmware files. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="a14e73cfe07059d25980bbe00ddf41a5"></a><!-- doxytag: member="EFI_HOB_FIRMWARE_VOLUME::BaseAddress" ref="a14e73cfe07059d25980bbe00ddf41a5" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../db/d8e/a00482.html#bac04f0b32459b03e5eb77d0d434eb33">EFI_IMAGE_OPTIONAL_HEADER64::AddressOfEntryPoint</a>          </td>
+          <td class="memname"><a class="el" href="../../dd/d95/a01247.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> <a class="el" href="../../db/d8e/a00482.html#a14e73cfe07059d25980bbe00ddf41a5">EFI_HOB_FIRMWARE_VOLUME::BaseAddress</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The physical memory-mapped base address of the firmware volume. 
 </div>
 </div><p>
-<a class="anchor" name="f5e135630723d963db5bb0891cabbe54"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER64::BaseOfCode" ref="f5e135630723d963db5bb0891cabbe54" args="" -->
+<a class="anchor" name="8305a8837bb09018de3727dd52972af6"></a><!-- doxytag: member="EFI_HOB_FIRMWARE_VOLUME::Header" ref="8305a8837bb09018de3727dd52972af6" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../db/d8e/a00482.html#f5e135630723d963db5bb0891cabbe54">EFI_IMAGE_OPTIONAL_HEADER64::BaseOfCode</a>          </td>
+          <td class="memname"><a class="el" href="../../d8/d89/a00484.html">EFI_HOB_GENERIC_HEADER</a> <a class="el" href="../../db/d8e/a00482.html#8305a8837bb09018de3727dd52972af6">EFI_HOB_FIRMWARE_VOLUME::Header</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The HOB generic header. Header.HobType = EFI_HOB_TYPE_FV. 
 </div>
 </div><p>
-<a class="anchor" name="42002f709c77fe5c7450703fbe04eb22"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER64::CheckSum" ref="42002f709c77fe5c7450703fbe04eb22" args="" -->
+<a class="anchor" name="b33b9b3091f5a2d231e955de52592695"></a><!-- doxytag: member="EFI_HOB_FIRMWARE_VOLUME::Length" ref="b33b9b3091f5a2d231e955de52592695" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../db/d8e/a00482.html#42002f709c77fe5c7450703fbe04eb22">EFI_IMAGE_OPTIONAL_HEADER64::CheckSum</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../db/d8e/a00482.html#b33b9b3091f5a2d231e955de52592695">EFI_HOB_FIRMWARE_VOLUME::Length</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<a class="anchor" name="f5a97f66c5246cfcb8db3e2a6e0666d3"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER64::DataDirectory" ref="f5a97f66c5246cfcb8db3e2a6e0666d3" args="[EFI_IMAGE_NUMBER_OF_DIRECTORY_ENTRIES]" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../dc/ddf/a00469.html">EFI_IMAGE_DATA_DIRECTORY</a> <a class="el" href="../../db/d8e/a00482.html#f5a97f66c5246cfcb8db3e2a6e0666d3">EFI_IMAGE_OPTIONAL_HEADER64::DataDirectory</a>[EFI_IMAGE_NUMBER_OF_DIRECTORY_ENTRIES]          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="fce71fe06d384da87731876eed0b6dbe"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER64::DllCharacteristics" ref="fce71fe06d384da87731876eed0b6dbe" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../db/d8e/a00482.html#fce71fe06d384da87731876eed0b6dbe">EFI_IMAGE_OPTIONAL_HEADER64::DllCharacteristics</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="ee21261700933b661791951bb0247dba"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER64::FileAlignment" ref="ee21261700933b661791951bb0247dba" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../db/d8e/a00482.html#ee21261700933b661791951bb0247dba">EFI_IMAGE_OPTIONAL_HEADER64::FileAlignment</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="1c56136b039e9a01ab8ecf558e8fa160"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER64::ImageBase" ref="1c56136b039e9a01ab8ecf558e8fa160" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../db/d8e/a00482.html#1c56136b039e9a01ab8ecf558e8fa160">EFI_IMAGE_OPTIONAL_HEADER64::ImageBase</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Optional Header Windows-Specific Fields. 
-</div>
-</div><p>
-<a class="anchor" name="fa8b7508da4dfad3ff22f7096ef84d71"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER64::LoaderFlags" ref="fa8b7508da4dfad3ff22f7096ef84d71" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../db/d8e/a00482.html#fa8b7508da4dfad3ff22f7096ef84d71">EFI_IMAGE_OPTIONAL_HEADER64::LoaderFlags</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="7e71fbe95a4d922f23c5081ed50f69de"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER64::Magic" ref="7e71fbe95a4d922f23c5081ed50f69de" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../db/d8e/a00482.html#7e71fbe95a4d922f23c5081ed50f69de">EFI_IMAGE_OPTIONAL_HEADER64::Magic</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Standard fields. 
-</div>
-</div><p>
-<a class="anchor" name="89cdcbcc6fcee1d66a4d74a2c14278d3"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER64::MajorImageVersion" ref="89cdcbcc6fcee1d66a4d74a2c14278d3" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../db/d8e/a00482.html#89cdcbcc6fcee1d66a4d74a2c14278d3">EFI_IMAGE_OPTIONAL_HEADER64::MajorImageVersion</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="1a91ed09191242c62897bb8193fa7150"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER64::MajorLinkerVersion" ref="1a91ed09191242c62897bb8193fa7150" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../db/d8e/a00482.html#1a91ed09191242c62897bb8193fa7150">EFI_IMAGE_OPTIONAL_HEADER64::MajorLinkerVersion</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="fd7e590baa9bd2eecc43248f74c4220a"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER64::MajorOperatingSystemVersion" ref="fd7e590baa9bd2eecc43248f74c4220a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../db/d8e/a00482.html#fd7e590baa9bd2eecc43248f74c4220a">EFI_IMAGE_OPTIONAL_HEADER64::MajorOperatingSystemVersion</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="1d7aa1594868e3656bbd07beacdd8ac8"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER64::MajorSubsystemVersion" ref="1d7aa1594868e3656bbd07beacdd8ac8" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../db/d8e/a00482.html#1d7aa1594868e3656bbd07beacdd8ac8">EFI_IMAGE_OPTIONAL_HEADER64::MajorSubsystemVersion</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="38c2e22b55a3db41f09fe5052d6d2f96"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER64::MinorImageVersion" ref="38c2e22b55a3db41f09fe5052d6d2f96" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../db/d8e/a00482.html#38c2e22b55a3db41f09fe5052d6d2f96">EFI_IMAGE_OPTIONAL_HEADER64::MinorImageVersion</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="501917e17ce493f88e252653cfc88a59"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER64::MinorLinkerVersion" ref="501917e17ce493f88e252653cfc88a59" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../db/d8e/a00482.html#501917e17ce493f88e252653cfc88a59">EFI_IMAGE_OPTIONAL_HEADER64::MinorLinkerVersion</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="2201c3603c0bf000763804e4df680223"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER64::MinorOperatingSystemVersion" ref="2201c3603c0bf000763804e4df680223" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../db/d8e/a00482.html#2201c3603c0bf000763804e4df680223">EFI_IMAGE_OPTIONAL_HEADER64::MinorOperatingSystemVersion</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="e4ed4c46b3cfbf1c59b3dddb5058e179"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER64::MinorSubsystemVersion" ref="e4ed4c46b3cfbf1c59b3dddb5058e179" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../db/d8e/a00482.html#e4ed4c46b3cfbf1c59b3dddb5058e179">EFI_IMAGE_OPTIONAL_HEADER64::MinorSubsystemVersion</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="0a0695a4d7162aa2bf65d745444a3603"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER64::NumberOfRvaAndSizes" ref="0a0695a4d7162aa2bf65d745444a3603" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../db/d8e/a00482.html#0a0695a4d7162aa2bf65d745444a3603">EFI_IMAGE_OPTIONAL_HEADER64::NumberOfRvaAndSizes</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="5d73d261477fcc8a1899962c88a68a57"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER64::SectionAlignment" ref="5d73d261477fcc8a1899962c88a68a57" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../db/d8e/a00482.html#5d73d261477fcc8a1899962c88a68a57">EFI_IMAGE_OPTIONAL_HEADER64::SectionAlignment</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="c881370f7e9c51b0e47893b459cea9c0"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER64::SizeOfCode" ref="c881370f7e9c51b0e47893b459cea9c0" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../db/d8e/a00482.html#c881370f7e9c51b0e47893b459cea9c0">EFI_IMAGE_OPTIONAL_HEADER64::SizeOfCode</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="8f9e0a74e113595d1483ef313eb84751"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER64::SizeOfHeaders" ref="8f9e0a74e113595d1483ef313eb84751" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../db/d8e/a00482.html#8f9e0a74e113595d1483ef313eb84751">EFI_IMAGE_OPTIONAL_HEADER64::SizeOfHeaders</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="44add96deb3183c59964b73de28073f4"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER64::SizeOfHeapCommit" ref="44add96deb3183c59964b73de28073f4" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../db/d8e/a00482.html#44add96deb3183c59964b73de28073f4">EFI_IMAGE_OPTIONAL_HEADER64::SizeOfHeapCommit</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="7fbd6d64cff813ce61685f4c5c7703f5"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER64::SizeOfHeapReserve" ref="7fbd6d64cff813ce61685f4c5c7703f5" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../db/d8e/a00482.html#7fbd6d64cff813ce61685f4c5c7703f5">EFI_IMAGE_OPTIONAL_HEADER64::SizeOfHeapReserve</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="f1b8e117865616a216800813307cc233"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER64::SizeOfImage" ref="f1b8e117865616a216800813307cc233" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../db/d8e/a00482.html#f1b8e117865616a216800813307cc233">EFI_IMAGE_OPTIONAL_HEADER64::SizeOfImage</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="f8e04f8390a7da28340794ce269b0af5"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER64::SizeOfInitializedData" ref="f8e04f8390a7da28340794ce269b0af5" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../db/d8e/a00482.html#f8e04f8390a7da28340794ce269b0af5">EFI_IMAGE_OPTIONAL_HEADER64::SizeOfInitializedData</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="b39fa77f26eded97d00b48010ae88e27"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER64::SizeOfStackCommit" ref="b39fa77f26eded97d00b48010ae88e27" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../db/d8e/a00482.html#b39fa77f26eded97d00b48010ae88e27">EFI_IMAGE_OPTIONAL_HEADER64::SizeOfStackCommit</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="8c7655f6c4a9d241ceecf04faa6ea394"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER64::SizeOfStackReserve" ref="8c7655f6c4a9d241ceecf04faa6ea394" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../db/d8e/a00482.html#8c7655f6c4a9d241ceecf04faa6ea394">EFI_IMAGE_OPTIONAL_HEADER64::SizeOfStackReserve</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="8988469042a7b90dbd49ad34beec7237"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER64::SizeOfUninitializedData" ref="8988469042a7b90dbd49ad34beec7237" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../db/d8e/a00482.html#8988469042a7b90dbd49ad34beec7237">EFI_IMAGE_OPTIONAL_HEADER64::SizeOfUninitializedData</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="ba75b8bb32c040c85a6d3c0eaef4c36c"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER64::Subsystem" ref="ba75b8bb32c040c85a6d3c0eaef4c36c" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../db/d8e/a00482.html#ba75b8bb32c040c85a6d3c0eaef4c36c">EFI_IMAGE_OPTIONAL_HEADER64::Subsystem</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="e82c28ff914b856e70aa17930a6c10cc"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER64::Win32VersionValue" ref="e82c28ff914b856e70aa17930a6c10cc" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../db/d8e/a00482.html#e82c28ff914b856e70aa17930a6c10cc">EFI_IMAGE_OPTIONAL_HEADER64::Win32VersionValue</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
+The length in bytes of the firmware volume. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:33 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EVENT_LOG_TYPE Struct Reference</title>
+<title>MdePkg[ALL]: EFI_STATUS_CODE_STRING_DATA Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,48 +21,65 @@
   </div>
 </div>
 <div class="contents">
-<h1>EVENT_LOG_TYPE Struct Reference</h1><!-- doxytag: class="EVENT_LOG_TYPE" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_STATUS_CODE_STRING_DATA Struct Reference</h1><!-- doxytag: class="EFI_STATUS_CODE_STRING_DATA" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d49/a00979.html#fa202c6eb3b756fa6eec2fad7fbfe986">EVENT_LOG_TYPE_DATA</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/daa/a00638.html#54fa80fe22859cc7ce9dd60803382e6d">LogType</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/d2a/a00632.html">EFI_STATUS_CODE_DATA</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/daa/a00638.html#ff1c7129397b0833b097cadf78c89985">DataHeader</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/daa/a00638.html#24318cd24ad44a38e279dcfc3a60da9e">DataFormatType</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../db/d08/a01028.html#b3f2bab21bc1b8e988622e3a106f05bb">EFI_STRING_TYPE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/daa/a00638.html#4da7b08a3ea0edc407e50e419b33fb31">StringType</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/dbb/a00637.html">EFI_STATUS_CODE_STRING</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/daa/a00638.html#8730f95f648db47cb37c2f4f9e785b0a">String</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Event Log Type Descriptors <hr><h2>Field Documentation</h2>
-<a class="anchor" name="24318cd24ad44a38e279dcfc3a60da9e"></a><!-- doxytag: member="EVENT_LOG_TYPE::DataFormatType" ref="24318cd24ad44a38e279dcfc3a60da9e" args="" -->
+This data type defines a string type of extended data. A string can accompany any status code. The string can provide additional information about the status code. The string can be ASCII, Unicode, or a Human Interface Infrastructure (HII) token/GUID pair. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="ff1c7129397b0833b097cadf78c89985"></a><!-- doxytag: member="EFI_STATUS_CODE_STRING_DATA::DataHeader" ref="ff1c7129397b0833b097cadf78c89985" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d1/daa/a00638.html#24318cd24ad44a38e279dcfc3a60da9e">EVENT_LOG_TYPE::DataFormatType</a>          </td>
+          <td class="memname"><a class="el" href="../../d4/d2a/a00632.html">EFI_STATUS_CODE_DATA</a> <a class="el" href="../../d1/daa/a00638.html#ff1c7129397b0833b097cadf78c89985">EFI_STATUS_CODE_STRING_DATA::DataHeader</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The data header identifying the data. DataHeader.HeaderSize should be sizeof (<a class="el" href="../../d4/d2a/a00632.html">EFI_STATUS_CODE_DATA</a>), DataHeader.Size should be sizeof (<a class="el" href="../../d1/daa/a00638.html">EFI_STATUS_CODE_STRING_DATA</a>) - HeaderSize, and DataHeader.Type should be EFI_STATUS_CODE_DATA_TYPE_STRING_GUID. 
 </div>
 </div><p>
-<a class="anchor" name="54fa80fe22859cc7ce9dd60803382e6d"></a><!-- doxytag: member="EVENT_LOG_TYPE::LogType" ref="54fa80fe22859cc7ce9dd60803382e6d" args="" -->
+<a class="anchor" name="8730f95f648db47cb37c2f4f9e785b0a"></a><!-- doxytag: member="EFI_STATUS_CODE_STRING_DATA::String" ref="8730f95f648db47cb37c2f4f9e785b0a" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d8/d49/a00979.html#fa202c6eb3b756fa6eec2fad7fbfe986">EVENT_LOG_TYPE_DATA</a> <a class="el" href="../../d1/daa/a00638.html#54fa80fe22859cc7ce9dd60803382e6d">EVENT_LOG_TYPE::LogType</a>          </td>
+          <td class="memname"><a class="el" href="../../de/dbb/a00637.html">EFI_STATUS_CODE_STRING</a> <a class="el" href="../../d1/daa/a00638.html#8730f95f648db47cb37c2f4f9e785b0a">EFI_STATUS_CODE_STRING_DATA::String</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+A pointer to the extended data. The data follows the format specified by StringType. 
+</div>
+</div><p>
+<a class="anchor" name="4da7b08a3ea0edc407e50e419b33fb31"></a><!-- doxytag: member="EFI_STATUS_CODE_STRING_DATA::StringType" ref="4da7b08a3ea0edc407e50e419b33fb31" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../db/d08/a01028.html#b3f2bab21bc1b8e988622e3a106f05bb">EFI_STRING_TYPE</a> <a class="el" href="../../d1/daa/a00638.html#4da7b08a3ea0edc407e50e419b33fb31">EFI_STATUS_CODE_STRING_DATA::StringType</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
 
+<p>
+Specifies the format of the data in String. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:19 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:46 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

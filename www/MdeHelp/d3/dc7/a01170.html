@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Protocol/SmbusHc.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Protocol/DriverBinding.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,231 +21,167 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Protocol/SmbusHc.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Protocol/DriverBinding.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/ded/a00252.html">_EFI_SMBUS_HC_PROTOCOL</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db2/a00020.html">_EFI_DRIVER_BINDING_PROTOCOL</a></td></tr>
 
 <tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dc7/a01170.html#7d4c74e0673537e950ae7508151ddc8d">EFI_SMBUS_HC_PROTOCOL_GUID</a>&nbsp;&nbsp;&nbsp;{0xe49d33ed, 0x513d, 0x4634, { 0xb6, 0x98, 0x6f, 0x55, 0xaa, 0x75, 0x1c, 0x1b} }</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dc7/a01170.html#7772d8413bb151a59688a6d679198ac4">EFI_DRIVER_BINDING_PROTOCOL_GUID</a></td></tr>
 
 <tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
-<a class="el" href="../../dc/ded/a00252.html">_EFI_SMBUS_HC_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dc7/a01170.html#8413349c5c5ab96895ae43fecb113558">EFI_SMBUS_HC_PROTOCOL</a></td></tr>
+<a class="el" href="../../db/db2/a00020.html">_EFI_DRIVER_BINDING_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dc7/a01170.html#e405748766385623110e2553c5eada18">EFI_DRIVER_BINDING_PROTOCOL</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dc7/a01170.html#8f15dec79b97c129211a6d8de625b5fa">EFI_SMBUS_HC_EXECUTE_OPERATION</a> )(IN CONST <a class="el" href="../../dc/ded/a00252.html">EFI_SMBUS_HC_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d9/dad/a00591.html">EFI_SMBUS_DEVICE_ADDRESS</a> SlaveAddress, IN CONST <a class="el" href="../../d7/df2/a01000.html#0e036b8292641b19ce16792acbde35ba">EFI_SMBUS_DEVICE_COMMAND</a> Command, IN CONST <a class="el" href="../../d7/df2/a01000.html#a8b213cf201989c6b42291855b32db41">EFI_SMBUS_OPERATION</a> Operation, IN CONST <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> PecCheck, IN OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *Length, IN OUT VOID *Buffer)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dc7/a01170.html#69fa28f889a84cd11d031137433c0e8b">EFI_DRIVER_BINDING_SUPPORTED</a> )(IN <a class="el" href="../../db/db2/a00020.html">EFI_DRIVER_BINDING_PROTOCOL</a> *This, IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ControllerHandle, IN <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> *RemainingDevicePath)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dc7/a01170.html#f985566caf7ed74785c1b0bbcf30a1dc">EFI_SMBUS_HC_PROTOCOL_ARP_DEVICE</a> )(IN CONST <a class="el" href="../../dc/ded/a00252.html">EFI_SMBUS_HC_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> ArpAll, IN CONST <a class="el" href="../../d2/da3/a00593.html">EFI_SMBUS_UDID</a> *SmbusUdid, IN OUT <a class="el" href="../../d9/dad/a00591.html">EFI_SMBUS_DEVICE_ADDRESS</a> *SlaveAddress)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dc7/a01170.html#40b5262ed68f77f5b18cedb926a6646a">EFI_DRIVER_BINDING_START</a> )(IN <a class="el" href="../../db/db2/a00020.html">EFI_DRIVER_BINDING_PROTOCOL</a> *This, IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ControllerHandle, IN <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> *RemainingDevicePath)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dc7/a01170.html#55b39769a1231e5c2e2ed43062ac8009">EFI_SMBUS_HC_PROTOCOL_GET_ARP_MAP</a> )(IN CONST <a class="el" href="../../dc/ded/a00252.html">EFI_SMBUS_HC_PROTOCOL</a> *This, IN OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *Length, IN OUT <a class="el" href="../../d0/dec/a00592.html">EFI_SMBUS_DEVICE_MAP</a> **SmbusDeviceMap)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dc7/a01170.html#d651305c27a3e37f5f706c04b39df430">EFI_SMBUS_NOTIFY_FUNCTION</a> )(IN CONST <a class="el" href="../../d9/dad/a00591.html">EFI_SMBUS_DEVICE_ADDRESS</a> SlaveAddress, IN CONST <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Data)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dc7/a01170.html#716c15421076057ce87eff4d7c9dd910">EFI_SMBUS_HC_PROTOCOL_NOTIFY</a> )(IN CONST <a class="el" href="../../dc/ded/a00252.html">EFI_SMBUS_HC_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d9/dad/a00591.html">EFI_SMBUS_DEVICE_ADDRESS</a> SlaveAddress, IN CONST <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Data, IN CONST <a class="el" href="../../d3/dc7/a01170.html#d651305c27a3e37f5f706c04b39df430">EFI_SMBUS_NOTIFY_FUNCTION</a> NotifyFunction)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dc7/a01170.html#909abfff42bf5f5342db312542b44be6">EFI_DRIVER_BINDING_STOP</a> )(IN <a class="el" href="../../db/db2/a00020.html">EFI_DRIVER_BINDING_PROTOCOL</a> *This, IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ControllerHandle, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> NumberOfChildren, IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> *ChildHandleBuffer)</td></tr>
 
 <tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dc7/a01170.html#c19e0ec1457ef3880b89af60010fef65">gEfiSmbusHcProtocolGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dc7/a01170.html#28c565ce727b8661523ea1718e32ee8c">gEfiDriverBindingProtocolGuid</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-The file provides basic SMBus host controller management and basic data transactions over the SMBus.<p>
+UEFI DriverBinding Protocol is defined in UEFI specification.<p>
+This protocol is produced by every driver that follows the UEFI Driver Model, and it is the central component that allows drivers and controllers to be managed.<p>
 Copyright (c) 2006 - 2009, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
-<dl class="user" compact><dt><b>Revision Reference: PI</b></dt><dd>Version 1.00. </dd></dl>
-<hr><h2>Define Documentation</h2>
-<a class="anchor" name="7d4c74e0673537e950ae7508151ddc8d"></a><!-- doxytag: member="SmbusHc.h::EFI_SMBUS_HC_PROTOCOL_GUID" ref="7d4c74e0673537e950ae7508151ddc8d" args="" -->
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
+<a class="anchor" name="7772d8413bb151a59688a6d679198ac4"></a><!-- doxytag: member="DriverBinding.h::EFI_DRIVER_BINDING_PROTOCOL_GUID" ref="7772d8413bb151a59688a6d679198ac4" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_SMBUS_HC_PROTOCOL_GUID&nbsp;&nbsp;&nbsp;{0xe49d33ed, 0x513d, 0x4634, { 0xb6, 0x98, 0x6f, 0x55, 0xaa, 0x75, 0x1c, 0x1b} }          </td>
+          <td class="memname">#define EFI_DRIVER_BINDING_PROTOCOL_GUID          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+<b>Value:</b><div class="fragment"><pre class="fragment">{ \
+    0x18a031ab, 0xb443, 0x4d1a, {0xa5, 0xc0, 0xc, 0x9, 0x26, 0x1e, 0x9f, 0x71 } \
+  }
+</pre></div>Global ID for the ControllerHandle Driver Protocol 
 </div>
 </div><p>
 <hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="8f15dec79b97c129211a6d8de625b5fa"></a><!-- doxytag: member="SmbusHc.h::EFI_SMBUS_HC_EXECUTE_OPERATION" ref="8f15dec79b97c129211a6d8de625b5fa" args=")(IN CONST EFI_SMBUS_HC_PROTOCOL *This, IN CONST EFI_SMBUS_DEVICE_ADDRESS SlaveAddress, IN CONST EFI_SMBUS_DEVICE_COMMAND Command, IN CONST EFI_SMBUS_OPERATION Operation, IN CONST BOOLEAN PecCheck, IN OUT UINTN *Length, IN OUT VOID *Buffer)" -->
+<a class="anchor" name="e405748766385623110e2553c5eada18"></a><!-- doxytag: member="DriverBinding.h::EFI_DRIVER_BINDING_PROTOCOL" ref="e405748766385623110e2553c5eada18" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d3/dc7/a01170.html#8f15dec79b97c129211a6d8de625b5fa">EFI_SMBUS_HC_EXECUTE_OPERATION</a>)(IN CONST <a class="el" href="../../dc/ded/a00252.html">EFI_SMBUS_HC_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d9/dad/a00591.html">EFI_SMBUS_DEVICE_ADDRESS</a> SlaveAddress, IN CONST <a class="el" href="../../d7/df2/a01000.html#0e036b8292641b19ce16792acbde35ba">EFI_SMBUS_DEVICE_COMMAND</a> Command, IN CONST <a class="el" href="../../d7/df2/a01000.html#a8b213cf201989c6b42291855b32db41">EFI_SMBUS_OPERATION</a> Operation, IN CONST <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> PecCheck, IN OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *Length, IN OUT VOID *Buffer)          </td>
+          <td class="memname">typedef struct <a class="el" href="../../db/db2/a00020.html">_EFI_DRIVER_BINDING_PROTOCOL</a> <a class="el" href="../../db/db2/a00020.html">EFI_DRIVER_BINDING_PROTOCOL</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The Execute() function provides a standard way to execute an operation as defined in the System Management Bus (SMBus) Specification. The resulting transaction will be either that the SMBus slave devices accept this transaction or that this function returns with error.<p>
+
+</div>
+</div><p>
+<a class="anchor" name="40b5262ed68f77f5b18cedb926a6646a"></a><!-- doxytag: member="DriverBinding.h::EFI_DRIVER_BINDING_START" ref="40b5262ed68f77f5b18cedb926a6646a" args=")(IN EFI_DRIVER_BINDING_PROTOCOL *This, IN EFI_HANDLE ControllerHandle, IN EFI_DEVICE_PATH_PROTOCOL *RemainingDevicePath)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d3/dc7/a01170.html#40b5262ed68f77f5b18cedb926a6646a">EFI_DRIVER_BINDING_START</a>)(IN <a class="el" href="../../db/db2/a00020.html">EFI_DRIVER_BINDING_PROTOCOL</a> *This, IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ControllerHandle, IN <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> *RemainingDevicePath)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Start this driver on ControllerHandle. The Start() function is designed to be invoked from the EFI boot service ConnectController(). As a result, much of the error checking on the parameters to Start() has been moved into this common boot service. It is legal to call Start() from other locations, but the following calling restrictions must be followed or the system behavior will not be deterministic. 1. ControllerHandle must be a valid EFI_HANDLE. 2. If RemainingDevicePath is not NULL, then it must be a pointer to a naturally aligned <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a>. 3. Prior to calling Start(), the Supported() function for the driver specified by This must have been called with the same calling parameters, and Supported() must have returned EFI_SUCCESS.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_SMBUS_HC_PROTOCOL instance. SlaveAddress The SMBus slave address of the device with which to communicate. Type <a class="el" href="../../d9/dad/a00591.html">EFI_SMBUS_DEVICE_ADDRESS</a> is defined in EFI_PEI_SMBUS_PPI.Execute() in the Platform Initialization SMBus PPI Specification.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Command</em>&nbsp;</td><td>This command is transmitted by the SMBus host controller to the SMBus slave device and the interpretation is SMBus slave device specific. It can mean the offset to a list of functions inside an SMBus slave device. Not all operations or slave devices support this command's registers. Type EFI_SMBUS_DEVICE_COMMAND is defined in EFI_PEI_SMBUS_PPI.Execute() in the Platform Initialization SMBus PPI Specification. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Operation</em>&nbsp;</td><td>Signifies the particular SMBus hardware protocol instance it will use to execute the SMBus transactions. This SMBus hardware protocol is defined by the SMBus Specification and is not related to PI Architecture. Type EFI_SMBUS_OPERATION is defined in EFI_PEI_SMBUS_PPI.Execute() in the Platform Initialization SMBus PPI Specification.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>PecCheck</em>&nbsp;</td><td>Defines if Packet Error Code (PEC) checking is required for this operation. SMBus Host Controller Code Definitions Version 1.0 August 21, 2006 13</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Length</em>&nbsp;</td><td>Signifies the number of bytes that this operation will do. The maximum number of bytes can be revision specific and operation specific. This field will contain the actual number of bytes that are executed for this operation. Not all operations require this argument.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>Contains the value of data to execute to the SMBus slave device. Not all operations require this argument. The length of this buffer is identified by Length.</td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>ControllerHandle</em>&nbsp;</td><td>The handle of the controller to start. This handle must support a protocol interface that supplies an I/O abstraction to the driver. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>RemainingDevicePath</em>&nbsp;</td><td>A pointer to the remaining portion of a device path. This parameter is ignored by device drivers, and is optional for bus drivers.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The last data that was returned from the access matched the poll exit criteria.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_CRC_ERROR</em>&nbsp;</td><td>Checksum is not correct (PEC is incorrect).</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_TIMEOUT</em>&nbsp;</td><td>Timeout expired before the operation was completed. Timeout is determined by the SMBus host controller device.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>The request could not be completed due to a lack of resources.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The request was not completed because a failure that was reflected in the Host Status Register bit. Device errors are a result of a transaction collision, illegal command field, unclaimed cycle (host initiated), or bus errors (collisions).</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Operation is not defined in EFI_SMBUS_OPERATION.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Length/Buffer is NULL for operations except for EfiSmbusQuickRead and EfiSmbusQuickWrite. Length is outside the range of valid values.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The SMBus operation or PEC is not supported.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_BUFFER_TOO_SMALL</em>&nbsp;</td><td>Buffer is not sufficient for this operation. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The device was started. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The device could not be started due to a device error.Currently not implemented. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>The request could not be completed due to a lack of resources. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Others</em>&nbsp;</td><td>The driver failded to start the device. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
-<a class="anchor" name="8413349c5c5ab96895ae43fecb113558"></a><!-- doxytag: member="SmbusHc.h::EFI_SMBUS_HC_PROTOCOL" ref="8413349c5c5ab96895ae43fecb113558" args="" -->
+<a class="anchor" name="909abfff42bf5f5342db312542b44be6"></a><!-- doxytag: member="DriverBinding.h::EFI_DRIVER_BINDING_STOP" ref="909abfff42bf5f5342db312542b44be6" args=")(IN EFI_DRIVER_BINDING_PROTOCOL *This, IN EFI_HANDLE ControllerHandle, IN UINTN NumberOfChildren, IN EFI_HANDLE *ChildHandleBuffer)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef struct <a class="el" href="../../dc/ded/a00252.html">_EFI_SMBUS_HC_PROTOCOL</a> <a class="el" href="../../dc/ded/a00252.html">EFI_SMBUS_HC_PROTOCOL</a>          </td>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d3/dc7/a01170.html#909abfff42bf5f5342db312542b44be6">EFI_DRIVER_BINDING_STOP</a>)(IN <a class="el" href="../../db/db2/a00020.html">EFI_DRIVER_BINDING_PROTOCOL</a> *This, IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ControllerHandle, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> NumberOfChildren, IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> *ChildHandleBuffer)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<a class="anchor" name="f985566caf7ed74785c1b0bbcf30a1dc"></a><!-- doxytag: member="SmbusHc.h::EFI_SMBUS_HC_PROTOCOL_ARP_DEVICE" ref="f985566caf7ed74785c1b0bbcf30a1dc" args=")(IN CONST EFI_SMBUS_HC_PROTOCOL *This, IN CONST BOOLEAN ArpAll, IN CONST EFI_SMBUS_UDID *SmbusUdid, IN OUT EFI_SMBUS_DEVICE_ADDRESS *SlaveAddress)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d3/dc7/a01170.html#f985566caf7ed74785c1b0bbcf30a1dc">EFI_SMBUS_HC_PROTOCOL_ARP_DEVICE</a>)(IN CONST <a class="el" href="../../dc/ded/a00252.html">EFI_SMBUS_HC_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> ArpAll, IN CONST <a class="el" href="../../d2/da3/a00593.html">EFI_SMBUS_UDID</a> *SmbusUdid, IN OUT <a class="el" href="../../d9/dad/a00591.html">EFI_SMBUS_DEVICE_ADDRESS</a> *SlaveAddress)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-The ArpDevice() function provides a standard way for a device driver to enumerate the entire SMBus or specific devices on the bus.<p>
+Stop this driver on ControllerHandle.<p>
+Release the control of this controller and remove the IScsi functions. The Stop() function is designed to be invoked from the EFI boot service DisconnectController(). As a result, much of the error checking on the parameters to Stop() has been moved into this common boot service. It is legal to call Stop() from other locations, but the following calling restrictions must be followed or the system behavior will not be deterministic. 1. ControllerHandle must be a valid EFI_HANDLE that was used on a previous call to this same driver's Start() function. 2. The first NumberOfChildren handles of ChildHandleBuffer must all be a valid EFI_HANDLE. In addition, all of these handles must have been created in this driver's Start() function, and the Start() function must have called OpenProtocol() on ControllerHandle with an Attribute of EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_SMBUS_HC_PROTOCOL instance.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ArpAll</em>&nbsp;</td><td>A Boolean expression that indicates if the host drivers need to enumerate all the devices or enumerate only the device that is identified by SmbusUdid. If ArpAll is TRUE, SmbusUdid and SlaveAddress are optional. If ArpAll is FALSE, ArpDevice will enumerate SmbusUdid and the address will be at SlaveAddress.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SmbusUdid</em>&nbsp;</td><td>The Unique Device Identifier (UDID) that is associated with this device. Type <a class="el" href="../../d2/da3/a00593.html">EFI_SMBUS_UDID</a> is defined in EFI_PEI_SMBUS_PPI.ArpDevice() in the Platform Initialization SMBus PPI Specification.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SlaveAddress</em>&nbsp;</td><td>The SMBus slave address that is associated with an SMBus UDID.</td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>ControllerHandle</em>&nbsp;</td><td>A handle to the device being stopped. The handle must support a bus specific I/O protocol for the driver to use to stop the device. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>NumberOfChildren</em>&nbsp;</td><td>The number of child device handles in ChildHandleBuffer.Not used. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>ChildHandleBuffer</em>&nbsp;</td><td>An array of child handles to be freed. May be NULL if NumberOfChildren is 0.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The last data that was returned from the access matched the poll exit criteria.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_CRC_ERROR</em>&nbsp;</td><td>Checksum is not correct (PEC is incorrect).</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_TIMEOUT</em>&nbsp;</td><td>Timeout expired before the operation was completed. Timeout is determined by the SMBus host controller device.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>The request could not be completed due to a lack of resources.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The request was not completed because a failure was reflected in the Host Status Register bit. Device Errors are a result of a transaction collision, illegal command field, unclaimed cycle (host initiated), or bus errors (collisions).</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>ArpDevice, GetArpMap, and Notify are not implemented by this driver. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The device was stopped. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The device could not be stopped due to a device error. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
-<a class="anchor" name="55b39769a1231e5c2e2ed43062ac8009"></a><!-- doxytag: member="SmbusHc.h::EFI_SMBUS_HC_PROTOCOL_GET_ARP_MAP" ref="55b39769a1231e5c2e2ed43062ac8009" args=")(IN CONST EFI_SMBUS_HC_PROTOCOL *This, IN OUT UINTN *Length, IN OUT EFI_SMBUS_DEVICE_MAP **SmbusDeviceMap)" -->
+<a class="anchor" name="69fa28f889a84cd11d031137433c0e8b"></a><!-- doxytag: member="DriverBinding.h::EFI_DRIVER_BINDING_SUPPORTED" ref="69fa28f889a84cd11d031137433c0e8b" args=")(IN EFI_DRIVER_BINDING_PROTOCOL *This, IN EFI_HANDLE ControllerHandle, IN EFI_DEVICE_PATH_PROTOCOL *RemainingDevicePath)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d3/dc7/a01170.html#55b39769a1231e5c2e2ed43062ac8009">EFI_SMBUS_HC_PROTOCOL_GET_ARP_MAP</a>)(IN CONST <a class="el" href="../../dc/ded/a00252.html">EFI_SMBUS_HC_PROTOCOL</a> *This, IN OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *Length, IN OUT <a class="el" href="../../d0/dec/a00592.html">EFI_SMBUS_DEVICE_MAP</a> **SmbusDeviceMap)          </td>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d3/dc7/a01170.html#69fa28f889a84cd11d031137433c0e8b">EFI_DRIVER_BINDING_SUPPORTED</a>)(IN <a class="el" href="../../db/db2/a00020.html">EFI_DRIVER_BINDING_PROTOCOL</a> *This, IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ControllerHandle, IN <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> *RemainingDevicePath)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The GetArpMap() function returns the mapping of all the SMBus devices that were enumerated by the SMBus host driver.<p>
+Tests to see if this driver supports a given controller. If a child device is provided, it further tests to see if this driver supports creating a handle for the specified child device.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_SMBUS_HC_PROTOCOL instance.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Length</em>&nbsp;</td><td>Size of the buffer that contains the SMBus device map.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SmbusDeviceMap</em>&nbsp;</td><td>The pointer to the device map as enumerated by the SMBus controller driver.</td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>ControllerHandle</em>&nbsp;</td><td>The handle of the controller to test. This handle must support a protocol interface that supplies an I/O abstraction to the driver. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>RemainingDevicePath</em>&nbsp;</td><td>A pointer to the remaining portion of a device path. This parameter is ignored by device drivers, and is optional for bus drivers.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The SMBus returned the current device map.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>ArpDevice, GetArpMap, and Notify are not implemented by this driver. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The device specified by ControllerHandle and RemainingDevicePath is supported by the driver specified by This. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_ALREADY_STARTED</em>&nbsp;</td><td>The device specified by ControllerHandle and RemainingDevicePath is already being managed by the driver specified by This. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_ACCESS_DENIED</em>&nbsp;</td><td>The device specified by ControllerHandle and RemainingDevicePath is already being managed by a different driver or an application that requires exclusive acces. Currently not implemented. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The device specified by ControllerHandle and RemainingDevicePath is not supported by the driver specified by This. </td></tr>
   </table>
 </dl>
-
-</div>
-</div><p>
-<a class="anchor" name="716c15421076057ce87eff4d7c9dd910"></a><!-- doxytag: member="SmbusHc.h::EFI_SMBUS_HC_PROTOCOL_NOTIFY" ref="716c15421076057ce87eff4d7c9dd910" args=")(IN CONST EFI_SMBUS_HC_PROTOCOL *This, IN CONST EFI_SMBUS_DEVICE_ADDRESS SlaveAddress, IN CONST UINTN Data, IN CONST EFI_SMBUS_NOTIFY_FUNCTION NotifyFunction)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d3/dc7/a01170.html#716c15421076057ce87eff4d7c9dd910">EFI_SMBUS_HC_PROTOCOL_NOTIFY</a>)(IN CONST <a class="el" href="../../dc/ded/a00252.html">EFI_SMBUS_HC_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d9/dad/a00591.html">EFI_SMBUS_DEVICE_ADDRESS</a> SlaveAddress, IN CONST <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Data, IN CONST <a class="el" href="../../d3/dc7/a01170.html#d651305c27a3e37f5f706c04b39df430">EFI_SMBUS_NOTIFY_FUNCTION</a> NotifyFunction)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-The Notify() function registers all the callback functions to allow the bus driver to call these functions when the SlaveAddress/Data pair happens.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_SMBUS_HC_PROTOCOL instance.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SlaveAddress</em>&nbsp;</td><td>Address that the host controller detects as sending a message, and that calls all the registered function.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Data</em>&nbsp;</td><td>Data that the host controller detects as sending message, and that calls all the registered function.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>NotifyFunction</em>&nbsp;</td><td>The function to call when the bus driver detects the SlaveAddress and Data pair.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>NotifyFunction was registered.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>ArpDevice, GetArpMap, and Notify are not implemented by this driver. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="d651305c27a3e37f5f706c04b39df430"></a><!-- doxytag: member="SmbusHc.h::EFI_SMBUS_NOTIFY_FUNCTION" ref="d651305c27a3e37f5f706c04b39df430" args=")(IN CONST EFI_SMBUS_DEVICE_ADDRESS SlaveAddress, IN CONST UINTN Data)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d3/dc7/a01170.html#d651305c27a3e37f5f706c04b39df430">EFI_SMBUS_NOTIFY_FUNCTION</a>)(IN CONST <a class="el" href="../../d9/dad/a00591.html">EFI_SMBUS_DEVICE_ADDRESS</a> SlaveAddress, IN CONST <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Data)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-The notify function does some actions.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>SlaveAddress</em>&nbsp;</td><td>The SMBUS hardware address to which the SMBUS device is preassigned or allocated.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Data</em>&nbsp;</td><td>Data of the SMBus host notify command that the caller wants to be called.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>EFI_STATUS </dd></dl>
 
 </div>
 </div><p>
 <hr><h2>Variable Documentation</h2>
-<a class="anchor" name="c19e0ec1457ef3880b89af60010fef65"></a><!-- doxytag: member="SmbusHc.h::gEfiSmbusHcProtocolGuid" ref="c19e0ec1457ef3880b89af60010fef65" args="" -->
+<a class="anchor" name="28c565ce727b8661523ea1718e32ee8c"></a><!-- doxytag: member="DriverBinding.h::gEfiDriverBindingProtocolGuid" ref="28c565ce727b8661523ea1718e32ee8c" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../d3/dc7/a01170.html#c19e0ec1457ef3880b89af60010fef65">gEfiSmbusHcProtocolGuid</a>          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../d3/dc7/a01170.html#28c565ce727b8661523ea1718e32ee8c">gEfiDriverBindingProtocolGuid</a>          </td>
         </tr>
       </table>
 </div>
@@ -256,7 +192,7 @@ The notify function does some actions.<p>
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:10 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:32 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

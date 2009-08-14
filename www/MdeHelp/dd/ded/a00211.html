@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: _EFI_MANAGED_NETWORK_PROTOCOL Struct Reference</title>
+<title>MdePkg[ALL]: _EFI_KEY_STATE Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,150 +21,47 @@
   </div>
 </div>
 <div class="contents">
-<h1>_EFI_MANAGED_NETWORK_PROTOCOL Struct Reference</h1><!-- doxytag: class="_EFI_MANAGED_NETWORK_PROTOCOL" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>_EFI_KEY_STATE Struct Reference</h1><!-- doxytag: class="_EFI_KEY_STATE" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../db/d51/a01144.html#a6cf9a7964e640fb65d77e13ccf2e7b2">EFI_MANAGED_NETWORK_GET_MODE_DATA</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/ded/a00211.html#ca7f5ce0f92a65851dbc0ad30b7b0234">GetModeData</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/ded/a00211.html#6ccbb753cd1bfa372cfb703159f2c6fe">KeyShiftState</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../db/d51/a01144.html#01190856415da77751dfa7ec518e88d7">EFI_MANAGED_NETWORK_CONFIGURE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/ded/a00211.html#8e824d2f405f556acfda58b6c49e95bc">Configure</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../db/d51/a01144.html#c72f6d2259b2a48cb0e6a7a7f0d9e67b">EFI_MANAGED_NETWORK_MCAST_IP_TO_MAC</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/ded/a00211.html#6fb457ee03567276e5a6804137c25926">McastIpToMac</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../db/d51/a01144.html#adb1490ad758b9cdf069a1f05139a41f">EFI_MANAGED_NETWORK_GROUPS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/ded/a00211.html#42c6acf18c486875a34c27849bdf27ae">Groups</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../db/d51/a01144.html#fd5d94ca0f4d3c663b4d08544e05c5be">EFI_MANAGED_NETWORK_TRANSMIT</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/ded/a00211.html#d5341522bb82eb68824071c2427714cd">Transmit</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../db/d51/a01144.html#bf9d241bec650d4b250b0d339d9a3d7c">EFI_MANAGED_NETWORK_RECEIVE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/ded/a00211.html#54e3554bad24c61206a9bf79c9d82090">Receive</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../db/d51/a01144.html#78420e9c8b4239f79d86980b369a6b81">EFI_MANAGED_NETWORK_CANCEL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/ded/a00211.html#548ee3350c2f9370a6b20ae84d912fbf">Cancel</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../db/d51/a01144.html#15c789713491a96680b827aff8960bc8">EFI_MANAGED_NETWORK_POLL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/ded/a00211.html#3bf0dc4f671686a4bfb466455e821e07">Poll</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../db/d1c/a01229.html#5c5344195ec40b3af99801ca3ccd6b2a">EFI_KEY_TOGGLE_STATE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/ded/a00211.html#5c0e0c6c75d3fcece61be5d3281a7ad4">KeyToggleState</a></td></tr>
 
 </table>
-<hr><a name="_details"></a><h2>Detailed Description</h2>
-The MNP is used by network applications (and drivers) to perform raw (unformatted) asynchronous network packet I/O. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="548ee3350c2f9370a6b20ae84d912fbf"></a><!-- doxytag: member="_EFI_MANAGED_NETWORK_PROTOCOL::Cancel" ref="548ee3350c2f9370a6b20ae84d912fbf" args="" -->
+<hr><h2>Field Documentation</h2>
+<a class="anchor" name="6ccbb753cd1bfa372cfb703159f2c6fe"></a><!-- doxytag: member="_EFI_KEY_STATE::KeyShiftState" ref="6ccbb753cd1bfa372cfb703159f2c6fe" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../db/d51/a01144.html#78420e9c8b4239f79d86980b369a6b81">EFI_MANAGED_NETWORK_CANCEL</a> <a class="el" href="../../dd/ded/a00211.html#548ee3350c2f9370a6b20ae84d912fbf">_EFI_MANAGED_NETWORK_PROTOCOL::Cancel</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../dd/ded/a00211.html#6ccbb753cd1bfa372cfb703159f2c6fe">_EFI_KEY_STATE::KeyShiftState</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+Reflects the currently pressed shift modifiers for the input device. The returned value is valid only if the high order bit has been set. 
 </div>
 </div><p>
-<a class="anchor" name="8e824d2f405f556acfda58b6c49e95bc"></a><!-- doxytag: member="_EFI_MANAGED_NETWORK_PROTOCOL::Configure" ref="8e824d2f405f556acfda58b6c49e95bc" args="" -->
+<a class="anchor" name="5c0e0c6c75d3fcece61be5d3281a7ad4"></a><!-- doxytag: member="_EFI_KEY_STATE::KeyToggleState" ref="5c0e0c6c75d3fcece61be5d3281a7ad4" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../db/d51/a01144.html#01190856415da77751dfa7ec518e88d7">EFI_MANAGED_NETWORK_CONFIGURE</a> <a class="el" href="../../dd/ded/a00211.html#8e824d2f405f556acfda58b6c49e95bc">_EFI_MANAGED_NETWORK_PROTOCOL::Configure</a>          </td>
+          <td class="memname"><a class="el" href="../../db/d1c/a01229.html#5c5344195ec40b3af99801ca3ccd6b2a">EFI_KEY_TOGGLE_STATE</a> <a class="el" href="../../dd/ded/a00211.html#5c0e0c6c75d3fcece61be5d3281a7ad4">_EFI_KEY_STATE::KeyToggleState</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<a class="anchor" name="ca7f5ce0f92a65851dbc0ad30b7b0234"></a><!-- doxytag: member="_EFI_MANAGED_NETWORK_PROTOCOL::GetModeData" ref="ca7f5ce0f92a65851dbc0ad30b7b0234" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../db/d51/a01144.html#a6cf9a7964e640fb65d77e13ccf2e7b2">EFI_MANAGED_NETWORK_GET_MODE_DATA</a> <a class="el" href="../../dd/ded/a00211.html#ca7f5ce0f92a65851dbc0ad30b7b0234">_EFI_MANAGED_NETWORK_PROTOCOL::GetModeData</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="42c6acf18c486875a34c27849bdf27ae"></a><!-- doxytag: member="_EFI_MANAGED_NETWORK_PROTOCOL::Groups" ref="42c6acf18c486875a34c27849bdf27ae" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../db/d51/a01144.html#adb1490ad758b9cdf069a1f05139a41f">EFI_MANAGED_NETWORK_GROUPS</a> <a class="el" href="../../dd/ded/a00211.html#42c6acf18c486875a34c27849bdf27ae">_EFI_MANAGED_NETWORK_PROTOCOL::Groups</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="6fb457ee03567276e5a6804137c25926"></a><!-- doxytag: member="_EFI_MANAGED_NETWORK_PROTOCOL::McastIpToMac" ref="6fb457ee03567276e5a6804137c25926" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../db/d51/a01144.html#c72f6d2259b2a48cb0e6a7a7f0d9e67b">EFI_MANAGED_NETWORK_MCAST_IP_TO_MAC</a> <a class="el" href="../../dd/ded/a00211.html#6fb457ee03567276e5a6804137c25926">_EFI_MANAGED_NETWORK_PROTOCOL::McastIpToMac</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="3bf0dc4f671686a4bfb466455e821e07"></a><!-- doxytag: member="_EFI_MANAGED_NETWORK_PROTOCOL::Poll" ref="3bf0dc4f671686a4bfb466455e821e07" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../db/d51/a01144.html#15c789713491a96680b827aff8960bc8">EFI_MANAGED_NETWORK_POLL</a> <a class="el" href="../../dd/ded/a00211.html#3bf0dc4f671686a4bfb466455e821e07">_EFI_MANAGED_NETWORK_PROTOCOL::Poll</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="54e3554bad24c61206a9bf79c9d82090"></a><!-- doxytag: member="_EFI_MANAGED_NETWORK_PROTOCOL::Receive" ref="54e3554bad24c61206a9bf79c9d82090" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../db/d51/a01144.html#bf9d241bec650d4b250b0d339d9a3d7c">EFI_MANAGED_NETWORK_RECEIVE</a> <a class="el" href="../../dd/ded/a00211.html#54e3554bad24c61206a9bf79c9d82090">_EFI_MANAGED_NETWORK_PROTOCOL::Receive</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="d5341522bb82eb68824071c2427714cd"></a><!-- doxytag: member="_EFI_MANAGED_NETWORK_PROTOCOL::Transmit" ref="d5341522bb82eb68824071c2427714cd" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../db/d51/a01144.html#fd5d94ca0f4d3c663b4d08544e05c5be">EFI_MANAGED_NETWORK_TRANSMIT</a> <a class="el" href="../../dd/ded/a00211.html#d5341522bb82eb68824071c2427714cd">_EFI_MANAGED_NETWORK_PROTOCOL::Transmit</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
+Reflects the current internal state of various toggled attributes. The returned value is valid only if the high order bit has been set. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:13 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:15 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

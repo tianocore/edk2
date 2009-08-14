@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: SMBIOS_TABLE_TYPE10 Struct Reference</title>
+<title>MdePkg[ALL]: s_pxe_db_get_init_info Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,23 +21,183 @@
   </div>
 </div>
 <div class="contents">
-<h1>SMBIOS_TABLE_TYPE10 Struct Reference</h1><!-- doxytag: class="SMBIOS_TABLE_TYPE10" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>s_pxe_db_get_init_info Struct Reference</h1><!-- doxytag: class="s_pxe_db_get_init_info" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../da/db8/a00797.html">SMBIOS_STRUCTURE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/dcd/a00802.html#9c5af0fb6df5a7bde9f4ce2ce4641bca">Hdr</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/dcd/a00802.html#1b9e2302b81f5fe2db72094388b28c70">MemoryRequired</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/d07/a00305.html">DEVICE_STRUCT</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/dcd/a00802.html#41e59633d78adc11c9f1604440cff3fd">Device</a> [1]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/dcd/a00802.html#35509cd95b2b9b24586e225cdb4732f0">FrameDataLen</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/dcd/a00802.html#e279b27b66cc6f34bff907e9f3c1b939">LinkSpeeds</a> [4]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/dcd/a00802.html#872d1fdec2694666ef28ba1032d9f487">NvCount</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/dcd/a00802.html#10d8f22735f8c17cc81d0a7e5dfe77b6">NvWidth</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/dcd/a00802.html#f219ee5a294920998907a9afe245df33">MediaHeaderLen</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/dcd/a00802.html#a7a831610e61404bca30e7d893603f8b">HWaddrLen</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/dcd/a00802.html#d12ba8b9111f184d3c116f96e1a77275">MCastFilterCnt</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/dcd/a00802.html#ab8e0d699673780adcda23e5f848696c">TxBufCnt</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/dcd/a00802.html#702f7e85a2862ba24a2b816ab417153e">TxBufSize</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/dcd/a00802.html#1576cfe22f0ea6845761ff92bd57add1">RxBufCnt</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/dcd/a00802.html#9f2e32a9ba22de88fbfa5edb692570e7">RxBufSize</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/dcd/a00802.html#0f4fc8cdc5086eaba309a706eaad7f59">IFtype</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/dcd/a00802.html#d6a4260fa9cb01b112089b3a50840642">SupportedDuplexModes</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/dcd/a00802.html#19d38e17c7826f442a016e439a15b91c">SupportedLoopBackModes</a></td></tr>
 
 </table>
-<hr><a name="_details"></a><h2>Detailed Description</h2>
-On Board Devices Information (Type 10, obsolete)<p>
-Note: This structure is obsolete starting with version 2.6 specification; the Onboard Devices Extended Information (Type 41) structure should be used instead . BIOS providers can choose to implement both types to allow existing SMBIOS browsers to properly display the system's onboard devices information. The information in this structure defines the attributes of devices that are onboard (soldered onto) a system element, usually the baseboard. In general, an entry in this table implies that the BIOS has some level of control over the enabling of the associated device for use by the system. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="41e59633d78adc11c9f1604440cff3fd"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE10::Device" ref="41e59633d78adc11c9f1604440cff3fd" args="[1]" -->
+<hr><h2>Field Documentation</h2>
+<a class="anchor" name="35509cd95b2b9b24586e225cdb4732f0"></a><!-- doxytag: member="s_pxe_db_get_init_info::FrameDataLen" ref="35509cd95b2b9b24586e225cdb4732f0" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d3/d07/a00305.html">DEVICE_STRUCT</a> <a class="el" href="../../d5/dcd/a00802.html#41e59633d78adc11c9f1604440cff3fd">SMBIOS_TABLE_TYPE10::Device</a>[1]          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a> <a class="el" href="../../d5/dcd/a00802.html#35509cd95b2b9b24586e225cdb4732f0">s_pxe_db_get_init_info::FrameDataLen</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Maximum frame data length for Tx/Rx excluding the media header. 
+</div>
+</div><p>
+<a class="anchor" name="a7a831610e61404bca30e7d893603f8b"></a><!-- doxytag: member="s_pxe_db_get_init_info::HWaddrLen" ref="a7a831610e61404bca30e7d893603f8b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a> <a class="el" href="../../d5/dcd/a00802.html#a7a831610e61404bca30e7d893603f8b">s_pxe_db_get_init_info::HWaddrLen</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Number of bytes in the NIC hardware (MAC) address. 
+</div>
+</div><p>
+<a class="anchor" name="0f4fc8cdc5086eaba309a706eaad7f59"></a><!-- doxytag: member="s_pxe_db_get_init_info::IFtype" ref="0f4fc8cdc5086eaba309a706eaad7f59" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a> <a class="el" href="../../d5/dcd/a00802.html#0f4fc8cdc5086eaba309a706eaad7f59">s_pxe_db_get_init_info::IFtype</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Hardware interface types defined in the Assigned Numbers RFC and used in DHCP and ARP packets. See the PXE_IFTYPE typedef and PXE_IFTYPE_xxx macros. 
+</div>
+</div><p>
+<a class="anchor" name="e279b27b66cc6f34bff907e9f3c1b939"></a><!-- doxytag: member="s_pxe_db_get_init_info::LinkSpeeds" ref="e279b27b66cc6f34bff907e9f3c1b939" args="[4]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a> <a class="el" href="../../d5/dcd/a00802.html#e279b27b66cc6f34bff907e9f3c1b939">s_pxe_db_get_init_info::LinkSpeeds</a>[4]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Supported link speeds are in units of mega bits. Common ethernet values are 10, 100 and 1000. Unused LinkSpeeds[] entries are zero filled. 
+</div>
+</div><p>
+<a class="anchor" name="d12ba8b9111f184d3c116f96e1a77275"></a><!-- doxytag: member="s_pxe_db_get_init_info::MCastFilterCnt" ref="d12ba8b9111f184d3c116f96e1a77275" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a> <a class="el" href="../../d5/dcd/a00802.html#d12ba8b9111f184d3c116f96e1a77275">s_pxe_db_get_init_info::MCastFilterCnt</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Maximum number of multicast MAC addresses in the multicast MAC address filter list. 
+</div>
+</div><p>
+<a class="anchor" name="f219ee5a294920998907a9afe245df33"></a><!-- doxytag: member="s_pxe_db_get_init_info::MediaHeaderLen" ref="f219ee5a294920998907a9afe245df33" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a> <a class="el" href="../../d5/dcd/a00802.html#f219ee5a294920998907a9afe245df33">s_pxe_db_get_init_info::MediaHeaderLen</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Media header length. This is the typical media header length for this UNDI. This information is needed when allocating receive and transmit buffers. 
+</div>
+</div><p>
+<a class="anchor" name="1b9e2302b81f5fe2db72094388b28c70"></a><!-- doxytag: member="s_pxe_db_get_init_info::MemoryRequired" ref="1b9e2302b81f5fe2db72094388b28c70" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a> <a class="el" href="../../d5/dcd/a00802.html#1b9e2302b81f5fe2db72094388b28c70">s_pxe_db_get_init_info::MemoryRequired</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Minimum length of locked memory buffer that must be given to the Initialize command. Giving UNDI more memory will generally give better performance.<p>
+If MemoryRequired is zero, the UNDI does not need and will not use system memory to receive and transmit packets. 
+</div>
+</div><p>
+<a class="anchor" name="872d1fdec2694666ef28ba1032d9f487"></a><!-- doxytag: member="s_pxe_db_get_init_info::NvCount" ref="872d1fdec2694666ef28ba1032d9f487" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a> <a class="el" href="../../d5/dcd/a00802.html#872d1fdec2694666ef28ba1032d9f487">s_pxe_db_get_init_info::NvCount</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Number of non-volatile storage items. 
+</div>
+</div><p>
+<a class="anchor" name="10d8f22735f8c17cc81d0a7e5dfe77b6"></a><!-- doxytag: member="s_pxe_db_get_init_info::NvWidth" ref="10d8f22735f8c17cc81d0a7e5dfe77b6" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a> <a class="el" href="../../d5/dcd/a00802.html#10d8f22735f8c17cc81d0a7e5dfe77b6">s_pxe_db_get_init_info::NvWidth</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Width of non-volatile storage item in bytes. 0, 1, 2 or 4 
+</div>
+</div><p>
+<a class="anchor" name="1576cfe22f0ea6845761ff92bd57add1"></a><!-- doxytag: member="s_pxe_db_get_init_info::RxBufCnt" ref="1576cfe22f0ea6845761ff92bd57add1" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a> <a class="el" href="../../d5/dcd/a00802.html#1576cfe22f0ea6845761ff92bd57add1">s_pxe_db_get_init_info::RxBufCnt</a>          </td>
         </tr>
       </table>
 </div>
@@ -47,12 +207,72 @@ Note: This structure is obsolete starting with version 2.6 specification; the On
 
 </div>
 </div><p>
-<a class="anchor" name="9c5af0fb6df5a7bde9f4ce2ce4641bca"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE10::Hdr" ref="9c5af0fb6df5a7bde9f4ce2ce4641bca" args="" -->
+<a class="anchor" name="9f2e32a9ba22de88fbfa5edb692570e7"></a><!-- doxytag: member="s_pxe_db_get_init_info::RxBufSize" ref="9f2e32a9ba22de88fbfa5edb692570e7" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../da/db8/a00797.html">SMBIOS_STRUCTURE</a> <a class="el" href="../../d5/dcd/a00802.html#9c5af0fb6df5a7bde9f4ce2ce4641bca">SMBIOS_TABLE_TYPE10::Hdr</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a> <a class="el" href="../../d5/dcd/a00802.html#9f2e32a9ba22de88fbfa5edb692570e7">s_pxe_db_get_init_info::RxBufSize</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="d6a4260fa9cb01b112089b3a50840642"></a><!-- doxytag: member="s_pxe_db_get_init_info::SupportedDuplexModes" ref="d6a4260fa9cb01b112089b3a50840642" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a> <a class="el" href="../../d5/dcd/a00802.html#d6a4260fa9cb01b112089b3a50840642">s_pxe_db_get_init_info::SupportedDuplexModes</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Supported duplex. See PXE_DUPLEX_xxxxx defines below. 
+</div>
+</div><p>
+<a class="anchor" name="19d38e17c7826f442a016e439a15b91c"></a><!-- doxytag: member="s_pxe_db_get_init_info::SupportedLoopBackModes" ref="19d38e17c7826f442a016e439a15b91c" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a> <a class="el" href="../../d5/dcd/a00802.html#19d38e17c7826f442a016e439a15b91c">s_pxe_db_get_init_info::SupportedLoopBackModes</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Supported loopback options. See PXE_LOOPBACK_xxxxx defines below. 
+</div>
+</div><p>
+<a class="anchor" name="ab8e0d699673780adcda23e5f848696c"></a><!-- doxytag: member="s_pxe_db_get_init_info::TxBufCnt" ref="ab8e0d699673780adcda23e5f848696c" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a> <a class="el" href="../../d5/dcd/a00802.html#ab8e0d699673780adcda23e5f848696c">s_pxe_db_get_init_info::TxBufCnt</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Default number and size of transmit and receive buffers that will be allocated by the UNDI. If MemoryRequired is non-zero, this allocation will come out of the memory buffer given to the Initialize command. If MemoryRequired is zero, this allocation will come out of memory on the NIC. 
+</div>
+</div><p>
+<a class="anchor" name="702f7e85a2862ba24a2b816ab417153e"></a><!-- doxytag: member="s_pxe_db_get_init_info::TxBufSize" ref="702f7e85a2862ba24a2b816ab417153e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a> <a class="el" href="../../d5/dcd/a00802.html#702f7e85a2862ba24a2b816ab417153e">s_pxe_db_get_init_info::TxBufSize</a>          </td>
         </tr>
       </table>
 </div>
@@ -63,7 +283,7 @@ Note: This structure is obsolete starting with version 2.6 specification; the On
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:21 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:01 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

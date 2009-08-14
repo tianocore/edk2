@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_BIS_SIGNATURE_INFO Struct Reference</title>
+<title>MdePkg[ALL]: EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,74 +21,235 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_BIS_SIGNATURE_INFO Struct Reference</h1><!-- doxytag: class="EFI_BIS_SIGNATURE_INFO" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE Struct Reference</h1><!-- doxytag: class="EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/dbd/a01100.html#baafb705b367ccd7da8afcbeec84904f">BIS_CERT_ID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/df5/a00386.html#f114cee81fed7e614d98d1e7308068a0">CertificateID</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../db/db9/a00387.html">EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_STRUCTURE_HEADER</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/df5/a00386.html#99d16d68c2d148a1b87c9b9ada5885ca">Header</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Truncated hash of platform Boot Object.  <a href="#f114cee81fed7e614d98d1e7308068a0"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/dbd/a01100.html#2199a608621925a982e4f7c04c592a86">BIS_ALG_ID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/df5/a00386.html#4dbf5d11c7355ca3194147488586d02c">AlgorithmID</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/d79/a00540.html">EFI_IPv6_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/df5/a00386.html#3ecc62d85a0616ad1454a0cab5c3b2de">Ip</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">A signature algorithm number.  <a href="#4dbf5d11c7355ca3194147488586d02c"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/df5/a00386.html#dc5ff40d57f04623be4c872b53f26a9e">KeyLength</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/df5/a00386.html#6b0065d281d93d306463568684fb5660">SubnetMaskPrefixLength</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Length of alg. keys in bits.  <a href="#dc5ff40d57f04623be4c872b53f26a9e"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/df5/a00386.html#c07af4066bcf8c2e5481bc8ff2558fb7">Origin</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/d79/a00540.html">EFI_IPv6_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/df5/a00386.html#7fe1a24535edb61f97d835c163a8dcd0">Gateway</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/d79/a00540.html">EFI_IPv6_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/df5/a00386.html#abd5308bbb358f70f03b404776a344ef">PrimaryDns</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/d79/a00540.html">EFI_IPv6_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/df5/a00386.html#14e96422922c3b290a620307efd9ea44">SecondaryDns</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/d79/a00540.html">EFI_IPv6_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/df5/a00386.html#b5cf49479b6f3ae74df31ce3c38abea1">DhcpServer</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/df5/a00386.html#d93501ca439928ac767d33f580007bd7">VLanTag</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/df5/a00386.html#e617feea255b3845963d90dcb55be46e">Mac</a> [6]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/df5/a00386.html#8a1c3fbc9024ef301c20406fde10f726">PciLocation</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/df5/a00386.html#79fc508a606ada0835f6f6158e44ea1e">HostNameLength</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/df5/a00386.html#b38b5a364b2998274285fa59bf6f5772">HostNameOffset</a></td></tr>
+
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-<a class="el" href="../../dd/df5/a00386.html">EFI_BIS_SIGNATURE_INFO</a> type. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="4dbf5d11c7355ca3194147488586d02c"></a><!-- doxytag: member="EFI_BIS_SIGNATURE_INFO::AlgorithmID" ref="4dbf5d11c7355ca3194147488586d02c" args="" -->
+NIC Structure <hr><h2>Field Documentation</h2>
+<a class="anchor" name="b5cf49479b6f3ae74df31ce3c38abea1"></a><!-- doxytag: member="EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE::DhcpServer" ref="b5cf49479b6f3ae74df31ce3c38abea1" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d3/dbd/a01100.html#2199a608621925a982e4f7c04c592a86">BIS_ALG_ID</a> <a class="el" href="../../dd/df5/a00386.html#4dbf5d11c7355ca3194147488586d02c">EFI_BIS_SIGNATURE_INFO::AlgorithmID</a>          </td>
+          <td class="memname"><a class="el" href="../../d4/d79/a00540.html">EFI_IPv6_ADDRESS</a> <a class="el" href="../../dd/df5/a00386.html#b5cf49479b6f3ae74df31ce3c38abea1">EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE::DhcpServer</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-A signature algorithm number. 
-<p>
 
 </div>
 </div><p>
-<a class="anchor" name="f114cee81fed7e614d98d1e7308068a0"></a><!-- doxytag: member="EFI_BIS_SIGNATURE_INFO::CertificateID" ref="f114cee81fed7e614d98d1e7308068a0" args="" -->
+<a class="anchor" name="7fe1a24535edb61f97d835c163a8dcd0"></a><!-- doxytag: member="EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE::Gateway" ref="7fe1a24535edb61f97d835c163a8dcd0" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d3/dbd/a01100.html#baafb705b367ccd7da8afcbeec84904f">BIS_CERT_ID</a> <a class="el" href="../../dd/df5/a00386.html#f114cee81fed7e614d98d1e7308068a0">EFI_BIS_SIGNATURE_INFO::CertificateID</a>          </td>
+          <td class="memname"><a class="el" href="../../d4/d79/a00540.html">EFI_IPv6_ADDRESS</a> <a class="el" href="../../dd/df5/a00386.html#7fe1a24535edb61f97d835c163a8dcd0">EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE::Gateway</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Truncated hash of platform Boot Object. 
-<p>
 
 </div>
 </div><p>
-<a class="anchor" name="dc5ff40d57f04623be4c872b53f26a9e"></a><!-- doxytag: member="EFI_BIS_SIGNATURE_INFO::KeyLength" ref="dc5ff40d57f04623be4c872b53f26a9e" args="" -->
+<a class="anchor" name="99d16d68c2d148a1b87c9b9ada5885ca"></a><!-- doxytag: member="EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE::Header" ref="99d16d68c2d148a1b87c9b9ada5885ca" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dd/df5/a00386.html#dc5ff40d57f04623be4c872b53f26a9e">EFI_BIS_SIGNATURE_INFO::KeyLength</a>          </td>
+          <td class="memname"><a class="el" href="../../db/db9/a00387.html">EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_STRUCTURE_HEADER</a> <a class="el" href="../../dd/df5/a00386.html#99d16d68c2d148a1b87c9b9ada5885ca">EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE::Header</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Length of alg. keys in bits. 
+
+</div>
+</div><p>
+<a class="anchor" name="79fc508a606ada0835f6f6158e44ea1e"></a><!-- doxytag: member="EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE::HostNameLength" ref="79fc508a606ada0835f6f6158e44ea1e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dd/df5/a00386.html#79fc508a606ada0835f6f6158e44ea1e">EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE::HostNameLength</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="b38b5a364b2998274285fa59bf6f5772"></a><!-- doxytag: member="EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE::HostNameOffset" ref="b38b5a364b2998274285fa59bf6f5772" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dd/df5/a00386.html#b38b5a364b2998274285fa59bf6f5772">EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE::HostNameOffset</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="3ecc62d85a0616ad1454a0cab5c3b2de"></a><!-- doxytag: member="EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE::Ip" ref="3ecc62d85a0616ad1454a0cab5c3b2de" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d4/d79/a00540.html">EFI_IPv6_ADDRESS</a> <a class="el" href="../../dd/df5/a00386.html#3ecc62d85a0616ad1454a0cab5c3b2de">EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE::Ip</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="e617feea255b3845963d90dcb55be46e"></a><!-- doxytag: member="EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE::Mac" ref="e617feea255b3845963d90dcb55be46e" args="[6]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../dd/df5/a00386.html#e617feea255b3845963d90dcb55be46e">EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE::Mac</a>[6]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="c07af4066bcf8c2e5481bc8ff2558fb7"></a><!-- doxytag: member="EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE::Origin" ref="c07af4066bcf8c2e5481bc8ff2558fb7" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../dd/df5/a00386.html#c07af4066bcf8c2e5481bc8ff2558fb7">EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE::Origin</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="8a1c3fbc9024ef301c20406fde10f726"></a><!-- doxytag: member="EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE::PciLocation" ref="8a1c3fbc9024ef301c20406fde10f726" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dd/df5/a00386.html#8a1c3fbc9024ef301c20406fde10f726">EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE::PciLocation</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="abd5308bbb358f70f03b404776a344ef"></a><!-- doxytag: member="EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE::PrimaryDns" ref="abd5308bbb358f70f03b404776a344ef" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d4/d79/a00540.html">EFI_IPv6_ADDRESS</a> <a class="el" href="../../dd/df5/a00386.html#abd5308bbb358f70f03b404776a344ef">EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE::PrimaryDns</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="14e96422922c3b290a620307efd9ea44"></a><!-- doxytag: member="EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE::SecondaryDns" ref="14e96422922c3b290a620307efd9ea44" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d4/d79/a00540.html">EFI_IPv6_ADDRESS</a> <a class="el" href="../../dd/df5/a00386.html#14e96422922c3b290a620307efd9ea44">EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE::SecondaryDns</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="6b0065d281d93d306463568684fb5660"></a><!-- doxytag: member="EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE::SubnetMaskPrefixLength" ref="6b0065d281d93d306463568684fb5660" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../dd/df5/a00386.html#6b0065d281d93d306463568684fb5660">EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE::SubnetMaskPrefixLength</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="d93501ca439928ac767d33f580007bd7"></a><!-- doxytag: member="EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE::VLanTag" ref="d93501ca439928ac767d33f580007bd7" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dd/df5/a00386.html#d93501ca439928ac767d33f580007bd7">EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_NIC_STRUCTURE::VLanTag</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
 <p>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:28 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

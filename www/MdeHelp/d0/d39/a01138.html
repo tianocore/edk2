@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Protocol/HiiString.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Ppi/RecoveryModule.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,232 +21,87 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Protocol/HiiString.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Ppi/RecoveryModule.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d32/a00105.html">_EFI_HII_STRING_PROTOCOL</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d2e/a00238.html">_EFI_PEI_RECOVERY_MODULE_PPI</a></td></tr>
 
 <tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d39/a01138.html#091bc41c09d99e401cb0b558dfdf1005">EFI_HII_STRING_PROTOCOL_GUID</a>&nbsp;&nbsp;&nbsp;{ 0xfd96974, 0x23aa, 0x4cdc, { 0xb9, 0xcb, 0x98, 0xd1, 0x77, 0x50, 0x32, 0x2a } }</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d39/a01138.html#01d54ddcc58bfdf8d9f691e2a267683c">EFI_PEI_RECOVERY_MODULE_PPI_GUID</a></td></tr>
 
 <tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
-<a class="el" href="../../d3/d32/a00105.html">_EFI_HII_STRING_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d39/a01138.html#28aa19e6ede7f944ce021c8955cba2c8">EFI_HII_STRING_PROTOCOL</a></td></tr>
+<a class="el" href="../../da/d2e/a00238.html">_EFI_PEI_RECOVERY_MODULE_PPI</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d39/a01138.html#6479c9b9734714912e7c9ef329d227e2">EFI_PEI_RECOVERY_MODULE_PPI</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d39/a01138.html#d81a059f43f1d884e3dcf628b3939a96">EFI_HII_NEW_STRING</a> )(IN CONST <a class="el" href="../../d3/d32/a00105.html">EFI_HII_STRING_PROTOCOL</a> *This, IN <a class="el" href="../../d6/d97/a01188.html#ea5ce95a55f97b2ee1e77092a15290a2">EFI_HII_HANDLE</a> PackageList, OUT <a class="el" href="../../d6/d97/a01188.html#ed584a1cd697a25504fd17a5c82dc1d7">EFI_STRING_ID</a> *StringId, IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Language, IN CONST <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> *LanguageName, IN CONST <a class="el" href="../../d6/d97/a01188.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> String, IN CONST <a class="el" href="../../d4/d53/a00429.html">EFI_FONT_INFO</a> *StringFontInfo)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d39/a01138.html#dcdae45a154b13d2f2f817a73ecc4a23">EFI_HII_GET_STRING</a> )(IN CONST <a class="el" href="../../d3/d32/a00105.html">EFI_HII_STRING_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Language, IN <a class="el" href="../../d6/d97/a01188.html#ea5ce95a55f97b2ee1e77092a15290a2">EFI_HII_HANDLE</a> PackageList, IN <a class="el" href="../../d6/d97/a01188.html#ed584a1cd697a25504fd17a5c82dc1d7">EFI_STRING_ID</a> StringId, OUT <a class="el" href="../../d6/d97/a01188.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> String, IN OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *StringSize, OUT <a class="el" href="../../d4/d53/a00429.html">EFI_FONT_INFO</a> **StringFontInfo)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d39/a01138.html#512ec3fc0bf1f6eef3ef7e84ad65fb5b">EFI_HII_SET_STRING</a> )(IN CONST <a class="el" href="../../d3/d32/a00105.html">EFI_HII_STRING_PROTOCOL</a> *This, IN <a class="el" href="../../d6/d97/a01188.html#ea5ce95a55f97b2ee1e77092a15290a2">EFI_HII_HANDLE</a> PackageList, IN <a class="el" href="../../d6/d97/a01188.html#ed584a1cd697a25504fd17a5c82dc1d7">EFI_STRING_ID</a> StringId, IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Language, IN <a class="el" href="../../d6/d97/a01188.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> String, IN CONST <a class="el" href="../../d4/d53/a00429.html">EFI_FONT_INFO</a> *StringFontInfo)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d39/a01138.html#4af028cf55f8c27be1f4c4ed5eb8cf96">EFI_HII_GET_LANGUAGES</a> )(IN CONST <a class="el" href="../../d3/d32/a00105.html">EFI_HII_STRING_PROTOCOL</a> *This, IN <a class="el" href="../../d6/d97/a01188.html#ea5ce95a55f97b2ee1e77092a15290a2">EFI_HII_HANDLE</a> PackageList, IN OUT <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Languages, IN OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *LanguagesSize)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d39/a01138.html#e2b4a098f73d7526550c32c85e5e21cf">EFI_HII_GET_2ND_LANGUAGES</a> )(IN CONST <a class="el" href="../../d3/d32/a00105.html">EFI_HII_STRING_PROTOCOL</a> *This, IN <a class="el" href="../../d6/d97/a01188.html#ea5ce95a55f97b2ee1e77092a15290a2">EFI_HII_HANDLE</a> PackageList, IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *FirstLanguage, IN OUT <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *SecondLanguages, IN OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *SecondLanguagesSize)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d39/a01138.html#f27e1f0831aae6d59440131d040a9101">EFI_PEI_LOAD_RECOVERY_CAPSULE</a> )(IN <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN <a class="el" href="../../da/d2e/a00238.html">EFI_PEI_RECOVERY_MODULE_PPI</a> *This)</td></tr>
 
 <tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d39/a01138.html#5478fd8b78e34e74964a0ae697469f68">gEfiHiiStringProtocolGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d39/a01138.html#86c55cce3ae0c9fabcebfa8a12df2c4a">gEfiPeiRecoveryModulePpiGuid</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-The file provides services to manipulate string data.<p>
-Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
-<a class="anchor" name="091bc41c09d99e401cb0b558dfdf1005"></a><!-- doxytag: member="HiiString.h::EFI_HII_STRING_PROTOCOL_GUID" ref="091bc41c09d99e401cb0b558dfdf1005" args="" -->
+This file declares Recovery Module PPI. This PPI is used to find and load the recovery files.<p>
+A module that produces this PPI has many roles and is responsible for the following:<ol type=1>
+<li>Calling the driver recovery PPI EFI_PEI_DEVICE_RECOVERY_MODULE_PPI. GetNumberRecoveryCapsules() to determine if one or more DXE recovery entities exist.</li><li>If no capsules exist, then performing appropriate error handling.</li><li>Allocating a buffer of MaxRecoveryCapsuleSize as determined by <a class="el" href="../../de/dc2/a00228.html#2755e864b97611dac05691587f9ae011" title="Returns the number of DXE capsules residing on the device.">EFI_PEI_DEVICE_RECOVERY_MODULE_PPI.GetNumberRecoveryCapsules()</a> or larger.</li><li>Determining the policy in which DXE recovery capsules are loaded.</li><li>Calling the driver recovery PPI EFI_PEI_DEVICE_RECOVERY_MODULE_PPI. LoadRecoveryCapsule() for capsule number x.</li><li>If the load failed, performing appropriate error handling.</li><li>Performing security checks for a loaded DXE recovery capsule.</li><li>If the security checks failed, then logging the failure in a data HOB.</li><li>If the security checks failed, then determining the next <a class="el" href="../../de/dc2/a00228.html#5741deda1cc126da13875803e35f7429" title="Loads a DXE capsule from some media into memory.">EFI_PEI_DEVICE_RECOVERY_MODULE_PPI.LoadRecoveryCapsule()</a>capsule number; otherwise, go to step 11.</li><li>If more DXE recovery capsules exist, then go to step 5; otherwise, perform error handling.</li><li>Decomposing the capsule loaded by EFI_PEI_DEVICE_RECOVERY_MODULE_PPI. LoadRecoveryCapsule() into its components. It is assumed that the path parameters are redundant for recovery and Setup parameters are either redundant or canned.</li><li>Invalidating all HOB entries for updateable firmware volume entries. This invalidation prevents possible errant drivers from being executed.</li><li>Updating the HOB table with the recovery DXE firmware volume information generated from the capsule decomposition.</li><li>Returning to the PEI Dispatcher.</li></ol>
+<p>
+Copyright (c) 2007 - 2009, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
+<dl class="user" compact><dt><b>Revision Reference:</b></dt><dd>This PPI is defined in UEFI Platform Initialization Specification 1.2 Volume 1: Pre-EFI Initalization Core Interface </dd></dl>
+<hr><h2>Define Documentation</h2>
+<a class="anchor" name="01d54ddcc58bfdf8d9f691e2a267683c"></a><!-- doxytag: member="RecoveryModule.h::EFI_PEI_RECOVERY_MODULE_PPI_GUID" ref="01d54ddcc58bfdf8d9f691e2a267683c" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_HII_STRING_PROTOCOL_GUID&nbsp;&nbsp;&nbsp;{ 0xfd96974, 0x23aa, 0x4cdc, { 0xb9, 0xcb, 0x98, 0xd1, 0x77, 0x50, 0x32, 0x2a } }          </td>
+          <td class="memname">#define EFI_PEI_RECOVERY_MODULE_PPI_GUID          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+<b>Value:</b><div class="fragment"><pre class="fragment">{ \
+    0xFB6D9542, 0x612D, 0x4f45, {0x87, 0x2F, 0x5C, 0xFF, 0x52, 0xE9, 0x3D, 0xCF } \
+  }
+</pre></div>
 </div>
 </div><p>
 <hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="e2b4a098f73d7526550c32c85e5e21cf"></a><!-- doxytag: member="HiiString.h::EFI_HII_GET_2ND_LANGUAGES" ref="e2b4a098f73d7526550c32c85e5e21cf" args=")(IN CONST EFI_HII_STRING_PROTOCOL *This, IN EFI_HII_HANDLE PackageList, IN CONST CHAR8 *FirstLanguage, IN OUT CHAR8 *SecondLanguages, IN OUT UINTN *SecondLanguagesSize)" -->
+<a class="anchor" name="f27e1f0831aae6d59440131d040a9101"></a><!-- doxytag: member="RecoveryModule.h::EFI_PEI_LOAD_RECOVERY_CAPSULE" ref="f27e1f0831aae6d59440131d040a9101" args=")(IN EFI_PEI_SERVICES **PeiServices, IN EFI_PEI_RECOVERY_MODULE_PPI *This)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d0/d39/a01138.html#e2b4a098f73d7526550c32c85e5e21cf">EFI_HII_GET_2ND_LANGUAGES</a>)(IN CONST <a class="el" href="../../d3/d32/a00105.html">EFI_HII_STRING_PROTOCOL</a> *This, IN <a class="el" href="../../d6/d97/a01188.html#ea5ce95a55f97b2ee1e77092a15290a2">EFI_HII_HANDLE</a> PackageList, IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *FirstLanguage, IN OUT <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *SecondLanguages, IN OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *SecondLanguagesSize)          </td>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d0/d39/a01138.html#f27e1f0831aae6d59440131d040a9101">EFI_PEI_LOAD_RECOVERY_CAPSULE</a>)(IN <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN <a class="el" href="../../da/d2e/a00238.html">EFI_PEI_RECOVERY_MODULE_PPI</a> *This)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Each string package has associated with it a single primary language and zero or more secondary languages. This routine returns the secondary languages associated with a package list.<p>
+Loads a DXE capsule from some media into memory and updates the HOB table with the DXE firmware volume information.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_HII_STRING_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>PackageList</em>&nbsp;</td><td>The package list to examine. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>FirstLanguage</em>&nbsp;</td><td>Points to the primary language. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SecondaryLanguages</em>&nbsp;</td><td>Points to the buffer to hold the returned list of secondary languages for the specified FirstLanguage. If there are no secondary languages, the function returns successfully, but this is set to NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SecondaryLanguagesSize</em>&nbsp;</td><td>On entry, points to the size of the buffer pointed to by SecondaryLanguages, in bytes. On return, points to the length of SecondaryLanguages in bytes.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>PeiServices</em>&nbsp;</td><td>General-purpose services that are available to every PEIM. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Indicates the EFI_PEI_RECOVERY_MODULE_PPI instance.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Secondary languages were correctly returned. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>FirstLanguage or SecondaryLanguages or SecondaryLanguagesSize was NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_BUFFER_TOO_SMALL</em>&nbsp;</td><td>The buffer specified by SecondaryLanguagesSize is too small to hold the returned information. SecondLanguageSize is updated to hold the size of the buffer required. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_LANGUAGE</em>&nbsp;</td><td>The language specified by FirstLanguage is not present in the specified package list. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The specified PackageList is not in the Database. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The capsule was loaded correctly. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>A device error occurred. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>A recovery DXE capsule cannot be found. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
-<a class="anchor" name="4af028cf55f8c27be1f4c4ed5eb8cf96"></a><!-- doxytag: member="HiiString.h::EFI_HII_GET_LANGUAGES" ref="4af028cf55f8c27be1f4c4ed5eb8cf96" args=")(IN CONST EFI_HII_STRING_PROTOCOL *This, IN EFI_HII_HANDLE PackageList, IN OUT CHAR8 *Languages, IN OUT UINTN *LanguagesSize)" -->
+<a class="anchor" name="6479c9b9734714912e7c9ef329d227e2"></a><!-- doxytag: member="RecoveryModule.h::EFI_PEI_RECOVERY_MODULE_PPI" ref="6479c9b9734714912e7c9ef329d227e2" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d0/d39/a01138.html#4af028cf55f8c27be1f4c4ed5eb8cf96">EFI_HII_GET_LANGUAGES</a>)(IN CONST <a class="el" href="../../d3/d32/a00105.html">EFI_HII_STRING_PROTOCOL</a> *This, IN <a class="el" href="../../d6/d97/a01188.html#ea5ce95a55f97b2ee1e77092a15290a2">EFI_HII_HANDLE</a> PackageList, IN OUT <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Languages, IN OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *LanguagesSize)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This function returns the list of supported languages.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_HII_STRING_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>PackageList</em>&nbsp;</td><td>The package list to examine. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Languages</em>&nbsp;</td><td>Points to the buffer to hold the returned string. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>LanguagesSize</em>&nbsp;</td><td>On entry, points to the size of the buffer pointed to by Languages, in bytes. On return, points to the length of Languages, in bytes.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The languages were returned successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The Languages or LanguagesSize was NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_BUFFER_TOO_SMALL</em>&nbsp;</td><td>The LanguagesSize is too small to hold the list of supported languages. LanguageSize is updated to contain the required size. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>Could not find string package in specified packagelist. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="dcdae45a154b13d2f2f817a73ecc4a23"></a><!-- doxytag: member="HiiString.h::EFI_HII_GET_STRING" ref="dcdae45a154b13d2f2f817a73ecc4a23" args=")(IN CONST EFI_HII_STRING_PROTOCOL *This, IN CONST CHAR8 *Language, IN EFI_HII_HANDLE PackageList, IN EFI_STRING_ID StringId, OUT EFI_STRING String, IN OUT UINTN *StringSize, OUT EFI_FONT_INFO **StringFontInfo)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d0/d39/a01138.html#dcdae45a154b13d2f2f817a73ecc4a23">EFI_HII_GET_STRING</a>)(IN CONST <a class="el" href="../../d3/d32/a00105.html">EFI_HII_STRING_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Language, IN <a class="el" href="../../d6/d97/a01188.html#ea5ce95a55f97b2ee1e77092a15290a2">EFI_HII_HANDLE</a> PackageList, IN <a class="el" href="../../d6/d97/a01188.html#ed584a1cd697a25504fd17a5c82dc1d7">EFI_STRING_ID</a> StringId, OUT <a class="el" href="../../d6/d97/a01188.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> String, IN OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *StringSize, OUT <a class="el" href="../../d4/d53/a00429.html">EFI_FONT_INFO</a> **StringFontInfo)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This function retrieves the string specified by StringId which is associated with the specified PackageList in the language Language and copies it into the buffer specified by String.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_HII_STRING_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Language</em>&nbsp;</td><td>Points to the language for the retrieved string. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>PackageList</em>&nbsp;</td><td>The package list in the HII database to search for the specified string. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>StringId</em>&nbsp;</td><td>The string's id, which is unique within PackageList. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>String</em>&nbsp;</td><td>Points to the new null-terminated string. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>StringSize</em>&nbsp;</td><td>On entry, points to the size of the buffer pointed to by String, in bytes. On return, points to the length of the string, in bytes. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>StringFontInfo</em>&nbsp;</td><td>If not NULL, points to the string's font information. It's caller's responsibility to free this buffer.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The string was returned successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The string specified by StringId is not available. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The string specified by StringId is available but not in the specified language. The specified PackageList is not in the database. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_BUFFER_TOO_SMALL</em>&nbsp;</td><td>The buffer specified by StringSize is too small to hold the string. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The String or Language or StringSize was NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There were insufficient resources to complete the request. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="d81a059f43f1d884e3dcf628b3939a96"></a><!-- doxytag: member="HiiString.h::EFI_HII_NEW_STRING" ref="d81a059f43f1d884e3dcf628b3939a96" args=")(IN CONST EFI_HII_STRING_PROTOCOL *This, IN EFI_HII_HANDLE PackageList, OUT EFI_STRING_ID *StringId, IN CONST CHAR8 *Language, IN CONST CHAR16 *LanguageName, IN CONST EFI_STRING String, IN CONST EFI_FONT_INFO *StringFontInfo)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d0/d39/a01138.html#d81a059f43f1d884e3dcf628b3939a96">EFI_HII_NEW_STRING</a>)(IN CONST <a class="el" href="../../d3/d32/a00105.html">EFI_HII_STRING_PROTOCOL</a> *This, IN <a class="el" href="../../d6/d97/a01188.html#ea5ce95a55f97b2ee1e77092a15290a2">EFI_HII_HANDLE</a> PackageList, OUT <a class="el" href="../../d6/d97/a01188.html#ed584a1cd697a25504fd17a5c82dc1d7">EFI_STRING_ID</a> *StringId, IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Language, IN CONST <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> *LanguageName, IN CONST <a class="el" href="../../d6/d97/a01188.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> String, IN CONST <a class="el" href="../../d4/d53/a00429.html">EFI_FONT_INFO</a> *StringFontInfo)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This function adds the string String to the group of strings owned by PackageList, with the specified font information StringFontInfo and returns a new string id.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_HII_STRING_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>PackageList</em>&nbsp;</td><td>Handle of the package list where this string will be added. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>StringId</em>&nbsp;</td><td>On return, contains the new strings id, which is unique within PackageList. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Language</em>&nbsp;</td><td>Points to the language for the new string. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>LanguageName</em>&nbsp;</td><td>Points to the printable language name to associate with the passed in Language field.If LanguageName is not NULL and the string package header's LanguageName associated with a given Language is not zero, the LanguageName being passed in will be ignored. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>String</em>&nbsp;</td><td>Points to the new null-terminated string. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>StringFontInfo</em>&nbsp;</td><td>Points to the new string's font information or NULL if the string should have the default system font, size and style.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The new string was added successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The specified PackageList could not be found in database. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>Could not add the string due to lack of resources. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>String is NULL or StringId is NULL or Language is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The specified StringFontInfo does not exist in current database. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="512ec3fc0bf1f6eef3ef7e84ad65fb5b"></a><!-- doxytag: member="HiiString.h::EFI_HII_SET_STRING" ref="512ec3fc0bf1f6eef3ef7e84ad65fb5b" args=")(IN CONST EFI_HII_STRING_PROTOCOL *This, IN EFI_HII_HANDLE PackageList, IN EFI_STRING_ID StringId, IN CONST CHAR8 *Language, IN EFI_STRING String, IN CONST EFI_FONT_INFO *StringFontInfo)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d0/d39/a01138.html#512ec3fc0bf1f6eef3ef7e84ad65fb5b">EFI_HII_SET_STRING</a>)(IN CONST <a class="el" href="../../d3/d32/a00105.html">EFI_HII_STRING_PROTOCOL</a> *This, IN <a class="el" href="../../d6/d97/a01188.html#ea5ce95a55f97b2ee1e77092a15290a2">EFI_HII_HANDLE</a> PackageList, IN <a class="el" href="../../d6/d97/a01188.html#ed584a1cd697a25504fd17a5c82dc1d7">EFI_STRING_ID</a> StringId, IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Language, IN <a class="el" href="../../d6/d97/a01188.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> String, IN CONST <a class="el" href="../../d4/d53/a00429.html">EFI_FONT_INFO</a> *StringFontInfo)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This function updates the string specified by StringId in the specified PackageList to the text specified by String and, optionally, the font information specified by StringFontInfo.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_HII_STRING_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>PackageList</em>&nbsp;</td><td>The package list containing the strings. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>StringId</em>&nbsp;</td><td>The string's id, which is unique within PackageList. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Language</em>&nbsp;</td><td>Points to the language for the updated string. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>String</em>&nbsp;</td><td>Points to the new null-terminated string. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>StringFontInfo</em>&nbsp;</td><td>Points to the string's font information or NULL if the string font information is not changed.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The string was updated successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The string specified by StringId is not in the database. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The String or Language was NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The specified StringFontInfo does not exist in current database. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>The system is out of resources to accomplish the task. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="28aa19e6ede7f944ce021c8955cba2c8"></a><!-- doxytag: member="HiiString.h::EFI_HII_STRING_PROTOCOL" ref="28aa19e6ede7f944ce021c8955cba2c8" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct <a class="el" href="../../d3/d32/a00105.html">_EFI_HII_STRING_PROTOCOL</a> <a class="el" href="../../d3/d32/a00105.html">EFI_HII_STRING_PROTOCOL</a>          </td>
+          <td class="memname">typedef struct <a class="el" href="../../da/d2e/a00238.html">_EFI_PEI_RECOVERY_MODULE_PPI</a> <a class="el" href="../../da/d2e/a00238.html">EFI_PEI_RECOVERY_MODULE_PPI</a>          </td>
         </tr>
       </table>
 </div>
@@ -257,12 +112,12 @@ This function updates the string specified by StringId in the specified PackageL
 </div>
 </div><p>
 <hr><h2>Variable Documentation</h2>
-<a class="anchor" name="5478fd8b78e34e74964a0ae697469f68"></a><!-- doxytag: member="HiiString.h::gEfiHiiStringProtocolGuid" ref="5478fd8b78e34e74964a0ae697469f68" args="" -->
+<a class="anchor" name="86c55cce3ae0c9fabcebfa8a12df2c4a"></a><!-- doxytag: member="RecoveryModule.h::gEfiPeiRecoveryModulePpiGuid" ref="86c55cce3ae0c9fabcebfa8a12df2c4a" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../d0/d39/a01138.html#5478fd8b78e34e74964a0ae697469f68">gEfiHiiStringProtocolGuid</a>          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../d0/d39/a01138.html#86c55cce3ae0c9fabcebfa8a12df2c4a">gEfiPeiRecoveryModulePpiGuid</a>          </td>
         </tr>
       </table>
 </div>
@@ -273,7 +128,7 @@ This function updates the string specified by StringId in the specified PackageL
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:10 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:29 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

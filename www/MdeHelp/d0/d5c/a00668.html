@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MBCE_SYSTEM_RESERVED Struct Reference</title>
+<title>MdePkg[ALL]: EFI_UDP4_SERVICE_POINT Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,26 +21,27 @@
   </div>
 </div>
 <div class="contents">
-<h1>MBCE_SYSTEM_RESERVED Struct Reference</h1><!-- doxytag: class="MBCE_SYSTEM_RESERVED" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_UDP4_SERVICE_POINT Struct Reference</h1><!-- doxytag: class="EFI_UDP4_SERVICE_POINT" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d5c/a00668.html#09bbe42cd60ff721549417ee381b4271">BiosBootSpecIsSupported</a>:1</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d5c/a00668.html#b89f27ddd64ce74bd33978c0075a8dda">InstanceHandle</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d5c/a00668.html#6c0c0b78428aaa2eeda02a370b5a6d2f">FunctionKeyNetworkBootIsSupported</a>:1</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/d87/a00539.html">EFI_IPv4_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d5c/a00668.html#c44814437595891ec1ab39e86c76fc48">LocalAddress</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d5c/a00668.html#8823a4206c0341f70e5b4760ade5bc66">TargetContentDistributionEnabled</a>:1</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d5c/a00668.html#c489831b20cb0f17a107dd66d9aa2ec8">LocalPort</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d5c/a00668.html#d4818bd807efc593f39021a24445805c">ExtensionByte2Reserved</a>:1</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/d87/a00539.html">EFI_IPv4_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d5c/a00668.html#761e1d95594c31ecaf309b7ed0acee44">RemoteAddress</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d5c/a00668.html#2a0b9d7ecf1167880bf8d0bebed72b6d">RemotePort</a></td></tr>
 
 </table>
-<hr><a name="_details"></a><h2>Detailed Description</h2>
-BIOS Characteristics Extension Byte 2 This information, available for SMBIOS version 2.3 and later, appears at offset 13h within the BIOS Information structure. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="09bbe42cd60ff721549417ee381b4271"></a><!-- doxytag: member="MBCE_SYSTEM_RESERVED::BiosBootSpecIsSupported" ref="09bbe42cd60ff721549417ee381b4271" args="" -->
+<hr><h2>Field Documentation</h2>
+<a class="anchor" name="b89f27ddd64ce74bd33978c0075a8dda"></a><!-- doxytag: member="EFI_UDP4_SERVICE_POINT::InstanceHandle" ref="b89f27ddd64ce74bd33978c0075a8dda" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d0/d5c/a00668.html#09bbe42cd60ff721549417ee381b4271">MBCE_SYSTEM_RESERVED::BiosBootSpecIsSupported</a>          </td>
+          <td class="memname"><a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> <a class="el" href="../../d0/d5c/a00668.html#b89f27ddd64ce74bd33978c0075a8dda">EFI_UDP4_SERVICE_POINT::InstanceHandle</a>          </td>
         </tr>
       </table>
 </div>
@@ -50,12 +51,12 @@ BIOS Characteristics Extension Byte 2 This information, available for SMBIOS ver
 
 </div>
 </div><p>
-<a class="anchor" name="d4818bd807efc593f39021a24445805c"></a><!-- doxytag: member="MBCE_SYSTEM_RESERVED::ExtensionByte2Reserved" ref="d4818bd807efc593f39021a24445805c" args="" -->
+<a class="anchor" name="c44814437595891ec1ab39e86c76fc48"></a><!-- doxytag: member="EFI_UDP4_SERVICE_POINT::LocalAddress" ref="c44814437595891ec1ab39e86c76fc48" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d0/d5c/a00668.html#d4818bd807efc593f39021a24445805c">MBCE_SYSTEM_RESERVED::ExtensionByte2Reserved</a>          </td>
+          <td class="memname"><a class="el" href="../../d3/d87/a00539.html">EFI_IPv4_ADDRESS</a> <a class="el" href="../../d0/d5c/a00668.html#c44814437595891ec1ab39e86c76fc48">EFI_UDP4_SERVICE_POINT::LocalAddress</a>          </td>
         </tr>
       </table>
 </div>
@@ -65,12 +66,12 @@ BIOS Characteristics Extension Byte 2 This information, available for SMBIOS ver
 
 </div>
 </div><p>
-<a class="anchor" name="6c0c0b78428aaa2eeda02a370b5a6d2f"></a><!-- doxytag: member="MBCE_SYSTEM_RESERVED::FunctionKeyNetworkBootIsSupported" ref="6c0c0b78428aaa2eeda02a370b5a6d2f" args="" -->
+<a class="anchor" name="c489831b20cb0f17a107dd66d9aa2ec8"></a><!-- doxytag: member="EFI_UDP4_SERVICE_POINT::LocalPort" ref="c489831b20cb0f17a107dd66d9aa2ec8" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d0/d5c/a00668.html#6c0c0b78428aaa2eeda02a370b5a6d2f">MBCE_SYSTEM_RESERVED::FunctionKeyNetworkBootIsSupported</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d0/d5c/a00668.html#c489831b20cb0f17a107dd66d9aa2ec8">EFI_UDP4_SERVICE_POINT::LocalPort</a>          </td>
         </tr>
       </table>
 </div>
@@ -80,12 +81,27 @@ BIOS Characteristics Extension Byte 2 This information, available for SMBIOS ver
 
 </div>
 </div><p>
-<a class="anchor" name="8823a4206c0341f70e5b4760ade5bc66"></a><!-- doxytag: member="MBCE_SYSTEM_RESERVED::TargetContentDistributionEnabled" ref="8823a4206c0341f70e5b4760ade5bc66" args="" -->
+<a class="anchor" name="761e1d95594c31ecaf309b7ed0acee44"></a><!-- doxytag: member="EFI_UDP4_SERVICE_POINT::RemoteAddress" ref="761e1d95594c31ecaf309b7ed0acee44" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d0/d5c/a00668.html#8823a4206c0341f70e5b4760ade5bc66">MBCE_SYSTEM_RESERVED::TargetContentDistributionEnabled</a>          </td>
+          <td class="memname"><a class="el" href="../../d3/d87/a00539.html">EFI_IPv4_ADDRESS</a> <a class="el" href="../../d0/d5c/a00668.html#761e1d95594c31ecaf309b7ed0acee44">EFI_UDP4_SERVICE_POINT::RemoteAddress</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="2a0b9d7ecf1167880bf8d0bebed72b6d"></a><!-- doxytag: member="EFI_UDP4_SERVICE_POINT::RemotePort" ref="2a0b9d7ecf1167880bf8d0bebed72b6d" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d0/d5c/a00668.html#2a0b9d7ecf1167880bf8d0bebed72b6d">EFI_UDP4_SERVICE_POINT::RemotePort</a>          </td>
         </tr>
       </table>
 </div>
@@ -96,7 +112,7 @@ BIOS Characteristics Extension Byte 2 This information, available for SMBIOS ver
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:19 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:49 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

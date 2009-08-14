@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Protocol/SecurityPolicy.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Protocol/DebugSupport.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,41 +21,1641 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Protocol/SecurityPolicy.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Protocol/DebugSupport.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
+<tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d5d/a00463.html">EFI_FX_SAVE_STATE_IA32</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/dcf/a00642.html">EFI_SYSTEM_CONTEXT_IA32</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d9d/a00464.html">EFI_FX_SAVE_STATE_X64</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d0f/a00644.html">EFI_SYSTEM_CONTEXT_X64</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d19/a00643.html">EFI_SYSTEM_CONTEXT_IPF</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d3a/a00641.html">EFI_SYSTEM_CONTEXT_EBC</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">union &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d62/a00640.html">EFI_SYSTEM_CONTEXT</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dd4/a00013.html">_EFI_DEBUG_SUPPORT_PROTOCOL</a></td></tr>
+
 <tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#f88b28c15aa400a29d70c8413da9a396">EFI_SECURITY_POLICY_PROTOCOL_GUID</a>&nbsp;&nbsp;&nbsp;{0x78E4D245, 0xCD4D, 0x4a05, {0xA2, 0xBA, 0x47, 0x43, 0xE8, 0x6C, 0xFC, 0xAB} }</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#1695f69a99d0cce4eaa8c0e844e16e20">EFI_DEBUG_SUPPORT_PROTOCOL_GUID</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#e0e0200d14d1bc65da78728815c11592">EXCEPT_IA32_DIVIDE_ERROR</a>&nbsp;&nbsp;&nbsp;0</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#844aa3cbb8b86b211673f82f1c6455a3">EXCEPT_IA32_DEBUG</a>&nbsp;&nbsp;&nbsp;1</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#37916f2d822ec7c08e97f07a60b928ce">EXCEPT_IA32_NMI</a>&nbsp;&nbsp;&nbsp;2</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#f569004f9917f4c507fe5f0d852b808f">EXCEPT_IA32_BREAKPOINT</a>&nbsp;&nbsp;&nbsp;3</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#a50431779efd091efb6ae7b10d5fb598">EXCEPT_IA32_OVERFLOW</a>&nbsp;&nbsp;&nbsp;4</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#ce50cea0f3f0e49cf27f27f1ffb30f41">EXCEPT_IA32_BOUND</a>&nbsp;&nbsp;&nbsp;5</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#5e41c8aeee8ed4b43d68ed50be2c84eb">EXCEPT_IA32_INVALID_OPCODE</a>&nbsp;&nbsp;&nbsp;6</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#b3110a4f22d6a3de3eba681f9926c14f">EXCEPT_IA32_DOUBLE_FAULT</a>&nbsp;&nbsp;&nbsp;8</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#9a686fc45f947ad2594b25e31678c466">EXCEPT_IA32_INVALID_TSS</a>&nbsp;&nbsp;&nbsp;10</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#7dc2488c5fbbc65e3b9a7c9dd3e3ee31">EXCEPT_IA32_SEG_NOT_PRESENT</a>&nbsp;&nbsp;&nbsp;11</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#a96684d96a490bdce21fe07baa68cdeb">EXCEPT_IA32_STACK_FAULT</a>&nbsp;&nbsp;&nbsp;12</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#ee0c043f31962c6b164fe4610e713ef0">EXCEPT_IA32_GP_FAULT</a>&nbsp;&nbsp;&nbsp;13</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#cc6ea7586e591e2193a2271f84886d10">EXCEPT_IA32_PAGE_FAULT</a>&nbsp;&nbsp;&nbsp;14</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#a010151bdf38677f4668c9c0b32c07d5">EXCEPT_IA32_FP_ERROR</a>&nbsp;&nbsp;&nbsp;16</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#556ed838e1a8610ebb8b8cdb6a528968">EXCEPT_IA32_ALIGNMENT_CHECK</a>&nbsp;&nbsp;&nbsp;17</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#3e8591009da88aa35b9571106e6f86d2">EXCEPT_IA32_MACHINE_CHECK</a>&nbsp;&nbsp;&nbsp;18</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#1296099c98c477d1ef6e402a16550706">EXCEPT_IA32_SIMD</a>&nbsp;&nbsp;&nbsp;19</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#ad802d91682da47c3f1f597eecd48e11">EXCEPT_X64_DIVIDE_ERROR</a>&nbsp;&nbsp;&nbsp;0</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#b86199a1493b2e7ac4ee05f9ea20332f">EXCEPT_X64_DEBUG</a>&nbsp;&nbsp;&nbsp;1</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#ea4c2ecf93e426dcb80cdb3e646f5d2e">EXCEPT_X64_NMI</a>&nbsp;&nbsp;&nbsp;2</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#1aae09970d90592a9e05b8e685c23dff">EXCEPT_X64_BREAKPOINT</a>&nbsp;&nbsp;&nbsp;3</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#c8453e4bc245447d805807874ed99da0">EXCEPT_X64_OVERFLOW</a>&nbsp;&nbsp;&nbsp;4</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#a0c5b5c949333337d50075a18c2652f5">EXCEPT_X64_BOUND</a>&nbsp;&nbsp;&nbsp;5</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#fed1a18c62ab3fe67a3ece3c9b89c1c1">EXCEPT_X64_INVALID_OPCODE</a>&nbsp;&nbsp;&nbsp;6</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#b29c9887429ba13dd55cc435d112bd21">EXCEPT_X64_DOUBLE_FAULT</a>&nbsp;&nbsp;&nbsp;8</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#2689792f1b1c70f80cb4327695b2a9b0">EXCEPT_X64_INVALID_TSS</a>&nbsp;&nbsp;&nbsp;10</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#bba9afd62c34d32dd6311543c9bc9441">EXCEPT_X64_SEG_NOT_PRESENT</a>&nbsp;&nbsp;&nbsp;11</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#e858ad98feae706e3698b169e60fe773">EXCEPT_X64_STACK_FAULT</a>&nbsp;&nbsp;&nbsp;12</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#c43e66057cd55bd0008b93bf3b55f640">EXCEPT_X64_GP_FAULT</a>&nbsp;&nbsp;&nbsp;13</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#dc60424dc9caadbf0dc611254e1f4648">EXCEPT_X64_PAGE_FAULT</a>&nbsp;&nbsp;&nbsp;14</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#00fa2190b754c16ededc0bec89e8095e">EXCEPT_X64_FP_ERROR</a>&nbsp;&nbsp;&nbsp;16</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#20521fd84a14dc31e20555689c554dbb">EXCEPT_X64_ALIGNMENT_CHECK</a>&nbsp;&nbsp;&nbsp;17</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#5f4431f4680dab3d461a0d7e3561c020">EXCEPT_X64_MACHINE_CHECK</a>&nbsp;&nbsp;&nbsp;18</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#fcb5d10e20d11e6cbd1ea97a3291f5f4">EXCEPT_X64_SIMD</a>&nbsp;&nbsp;&nbsp;19</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#da506cf4db70175ea62538ba871e9993">EXCEPT_IPF_VHTP_TRANSLATION</a>&nbsp;&nbsp;&nbsp;0</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#4ff9a42e1188cea05ffcfca1c4d68996">EXCEPT_IPF_INSTRUCTION_TLB</a>&nbsp;&nbsp;&nbsp;1</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#250cad4d76e73799afca9fe50f0ef506">EXCEPT_IPF_DATA_TLB</a>&nbsp;&nbsp;&nbsp;2</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#7b5dc17b6487316d10ec77b5dddeb0be">EXCEPT_IPF_ALT_INSTRUCTION_TLB</a>&nbsp;&nbsp;&nbsp;3</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#bedad7b6e48767a899b9dd3b10e58340">EXCEPT_IPF_ALT_DATA_TLB</a>&nbsp;&nbsp;&nbsp;4</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#30e70eeae6a8e5baa1841f971b00cc91">EXCEPT_IPF_DATA_NESTED_TLB</a>&nbsp;&nbsp;&nbsp;5</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#e74c23814b65ddd067fb160ea268de73">EXCEPT_IPF_INSTRUCTION_KEY_MISSED</a>&nbsp;&nbsp;&nbsp;6</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#a9c237205f8e323021a2b04a2ee5706b">EXCEPT_IPF_DATA_KEY_MISSED</a>&nbsp;&nbsp;&nbsp;7</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#5c1de0b61254f03ab4c789605ecaafaf">EXCEPT_IPF_DIRTY_BIT</a>&nbsp;&nbsp;&nbsp;8</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#9cc1d436f30fb2f9cbc6ac1f3a16581c">EXCEPT_IPF_INSTRUCTION_ACCESS_BIT</a>&nbsp;&nbsp;&nbsp;9</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#949ca243184bec13de79a0eb9e61e5b9">EXCEPT_IPF_DATA_ACCESS_BIT</a>&nbsp;&nbsp;&nbsp;10</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#1b2d060ac22d7dce2f61359e0e5d6536">EXCEPT_IPF_BREAKPOINT</a>&nbsp;&nbsp;&nbsp;11</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#c846fc8a1375fdef5399db95d18a62df">EXCEPT_IPF_EXTERNAL_INTERRUPT</a>&nbsp;&nbsp;&nbsp;12</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#700a3380681c8c3c8424ee5d5b1e2a90">EXCEPT_IPF_PAGE_NOT_PRESENT</a>&nbsp;&nbsp;&nbsp;20</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#adfd59616b32e555a2bddcaf10ce762b">EXCEPT_IPF_KEY_PERMISSION</a>&nbsp;&nbsp;&nbsp;21</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#a4d422b2ad5b76fc38b3d4bc624a3886">EXCEPT_IPF_INSTRUCTION_ACCESS_RIGHTS</a>&nbsp;&nbsp;&nbsp;22</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#d31e88c4b7e843f27e010fed00615671">EXCEPT_IPF_DATA_ACCESS_RIGHTS</a>&nbsp;&nbsp;&nbsp;23</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#3871f0a6791ccf262460d27f72d9e44d">EXCEPT_IPF_GENERAL_EXCEPTION</a>&nbsp;&nbsp;&nbsp;24</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#78d0dcf3d1769556250b1fe6420c3ff5">EXCEPT_IPF_DISABLED_FP_REGISTER</a>&nbsp;&nbsp;&nbsp;25</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#0893b282729f228240b2f4ce65be8af9">EXCEPT_IPF_NAT_CONSUMPTION</a>&nbsp;&nbsp;&nbsp;26</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#e8ef270ea7733fe3958b7debd4b44471">EXCEPT_IPF_SPECULATION</a>&nbsp;&nbsp;&nbsp;27</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#2d4c5fdc580e9fa05c466ac79cc187e6">EXCEPT_IPF_DEBUG</a>&nbsp;&nbsp;&nbsp;29</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#196109e3d899e32412cb0fa788fbaddd">EXCEPT_IPF_UNALIGNED_REFERENCE</a>&nbsp;&nbsp;&nbsp;30</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#9e022580ae0246ba7c00674dc01a7d37">EXCEPT_IPF_UNSUPPORTED_DATA_REFERENCE</a>&nbsp;&nbsp;&nbsp;31</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#66d9b00630b68e1583a2540b797130d9">EXCEPT_IPF_FP_FAULT</a>&nbsp;&nbsp;&nbsp;32</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#786f0900c887294dd5fbe5c85b6f8666">EXCEPT_IPF_FP_TRAP</a>&nbsp;&nbsp;&nbsp;33</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#503bde1c343edbc6bc5845e73cfa2034">EXCEPT_IPF_LOWER_PRIVILEGE_TRANSFER_TRAP</a>&nbsp;&nbsp;&nbsp;34</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#ae1a9d2118031e80c0ded6c38027877b">EXCEPT_IPF_TAKEN_BRANCH</a>&nbsp;&nbsp;&nbsp;35</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#1b71e75150995e1a6cf64692a936870b">EXCEPT_IPF_SINGLE_STEP</a>&nbsp;&nbsp;&nbsp;36</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#f1e1a1036d434e209ebdcd4c3b7d8398">EXCEPT_IPF_IA32_EXCEPTION</a>&nbsp;&nbsp;&nbsp;45</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#8c08caa9cc6e9a15172795b5e275c0af">EXCEPT_IPF_IA32_INTERCEPT</a>&nbsp;&nbsp;&nbsp;46</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#d70611fa211f7966e0236f8c4855079e">EXCEPT_IPF_IA32_INTERRUPT</a>&nbsp;&nbsp;&nbsp;47</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#0da31425c569cb35967714814683c375">EXCEPT_EBC_UNDEFINED</a>&nbsp;&nbsp;&nbsp;0</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#4818b6d7eff9a95e89340d1ba1d66ff5">EXCEPT_EBC_DIVIDE_ERROR</a>&nbsp;&nbsp;&nbsp;1</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#db5522994b4c23127dac9faa26d72600">EXCEPT_EBC_DEBUG</a>&nbsp;&nbsp;&nbsp;2</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#1500244135e95b72a98d953a95eba647">EXCEPT_EBC_BREAKPOINT</a>&nbsp;&nbsp;&nbsp;3</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#d040afb5ea7c1c2a35142502c7987a23">EXCEPT_EBC_OVERFLOW</a>&nbsp;&nbsp;&nbsp;4</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#5b7e1dd769c0216d26cdea3d2fcd1196">EXCEPT_EBC_INVALID_OPCODE</a>&nbsp;&nbsp;&nbsp;5</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">opcode out of range  <a href="#5b7e1dd769c0216d26cdea3d2fcd1196"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#7b19c932ae85e4b0063b180ffc469eeb">EXCEPT_EBC_STACK_FAULT</a>&nbsp;&nbsp;&nbsp;6</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#ecdc514f8ab449b54e27d4187e17cdaf">EXCEPT_EBC_ALIGNMENT_CHECK</a>&nbsp;&nbsp;&nbsp;7</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#ffbab1365882cb34de158118670a58f7">EXCEPT_EBC_INSTRUCTION_ENCODING</a>&nbsp;&nbsp;&nbsp;8</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">malformed instruction  <a href="#ffbab1365882cb34de158118670a58f7"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#19aac21d710ac173391ee13775ca53df">EXCEPT_EBC_BAD_BREAK</a>&nbsp;&nbsp;&nbsp;9</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">BREAK 0 or undefined BREAK.  <a href="#19aac21d710ac173391ee13775ca53df"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#6314116c11d754509b4d857ea64adc0a">EXCEPT_EBC_STEP</a>&nbsp;&nbsp;&nbsp;10</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#a37c55ab6e4e84aaee89cd1455e33535">MAX_EBC_EXCEPTION</a>&nbsp;&nbsp;&nbsp;EXCEPT_EBC_STEP</td></tr>
+
+<tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
+<a class="el" href="../../d7/dd4/a00013.html">_EFI_DEBUG_SUPPORT_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#a37ebf29224283028a7d2e191efd9a8f">EFI_DEBUG_SUPPORT_PROTOCOL</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#88c67527ff19b831c672f11fc131ee53">INTN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#406cd3b8e734b4c7b144232bae800bfb">EFI_EXCEPTION_TYPE</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef VOID(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#764febe01cd0951dbd6c562a28c1fdd2">EFI_EXCEPTION_CALLBACK</a> )(IN <a class="el" href="../../dc/d81/a01161.html#406cd3b8e734b4c7b144232bae800bfb">EFI_EXCEPTION_TYPE</a> ExceptionType, IN OUT <a class="el" href="../../dc/d62/a00640.html">EFI_SYSTEM_CONTEXT</a> SystemContext)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef VOID(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#1aa1fc696dfe16e0f1157862b1cc1d80">EFI_PERIODIC_CALLBACK</a> )(IN OUT <a class="el" href="../../dc/d62/a00640.html">EFI_SYSTEM_CONTEXT</a> SystemContext)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#b2df5ad6b1be2e268ac7fbb9f2e4933d">EFI_GET_MAXIMUM_PROCESSOR_INDEX</a> )(IN <a class="el" href="../../d7/dd4/a00013.html">EFI_DEBUG_SUPPORT_PROTOCOL</a> *This, OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *MaxProcessorIndex)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#653814b6d0b8041ec6f6df08c4422b5a">EFI_REGISTER_PERIODIC_CALLBACK</a> )(IN <a class="el" href="../../d7/dd4/a00013.html">EFI_DEBUG_SUPPORT_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> ProcessorIndex, IN <a class="el" href="../../dc/d81/a01161.html#1aa1fc696dfe16e0f1157862b1cc1d80">EFI_PERIODIC_CALLBACK</a> PeriodicCallback)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#8d434389eceb8b692eab143afd7e1b83">EFI_REGISTER_EXCEPTION_CALLBACK</a> )(IN <a class="el" href="../../d7/dd4/a00013.html">EFI_DEBUG_SUPPORT_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> ProcessorIndex, IN <a class="el" href="../../dc/d81/a01161.html#764febe01cd0951dbd6c562a28c1fdd2">EFI_EXCEPTION_CALLBACK</a> ExceptionCallback, IN <a class="el" href="../../dc/d81/a01161.html#406cd3b8e734b4c7b144232bae800bfb">EFI_EXCEPTION_TYPE</a> ExceptionType)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#a2bbd6b07caa0517300ad9a681064a51">EFI_INVALIDATE_INSTRUCTION_CACHE</a> )(IN <a class="el" href="../../d7/dd4/a00013.html">EFI_DEBUG_SUPPORT_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> ProcessorIndex, IN VOID *Start, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Length)</td></tr>
+
+<tr><td colspan="2"><br><h2>Enumerations</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#6c348ee17919492a72606323b341188a">EFI_INSTRUCTION_SET_ARCHITECTURE</a> { <a class="el" href="../../dc/d81/a01161.html#6c348ee17919492a72606323b341188a0e81be5c33b8ecdb6c4ad7592f12a97d">IsaIa32</a> =  IMAGE_FILE_MACHINE_I386, 
+<a class="el" href="../../dc/d81/a01161.html#6c348ee17919492a72606323b341188ac48c3c3ea1f766e51457967a17475cb9">IsaX64</a> =  IMAGE_FILE_MACHINE_X64, 
+<a class="el" href="../../dc/d81/a01161.html#6c348ee17919492a72606323b341188a4e24ca00edb367eeb03446dd23c534fa">IsaIpf</a> =  IMAGE_FILE_MACHINE_IA64, 
+<a class="el" href="../../dc/d81/a01161.html#6c348ee17919492a72606323b341188a72396fa951adeff73c75d43ff780f8b0">IsaEbc</a> =  IMAGE_FILE_MACHINE_EBC
+ }</td></tr>
 
 <tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#807f51aaf5f2469a02f2762ed4bb24b2">gEfiSecurityPolicyProtocolGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d81/a01161.html#e563035d2b1a6e2c13f9886fb176c1c7">gEfiDebugSupportProtocolGuid</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Security Policy protocol as defined in PI Specification VOLUME 2 DXE<p>
-Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
+DebugSupport protocol and supporting definitions as defined in the UEFI2.0 specification.<p>
+The DebugSupport protocol is used by source level debuggers to abstract the processor and handle context save and restore operations.<p>
+Copyright (c) 2006 - 2009, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
-<a class="anchor" name="f88b28c15aa400a29d70c8413da9a396"></a><!-- doxytag: member="SecurityPolicy.h::EFI_SECURITY_POLICY_PROTOCOL_GUID" ref="f88b28c15aa400a29d70c8413da9a396" args="" -->
+<a class="anchor" name="1695f69a99d0cce4eaa8c0e844e16e20"></a><!-- doxytag: member="DebugSupport.h::EFI_DEBUG_SUPPORT_PROTOCOL_GUID" ref="1695f69a99d0cce4eaa8c0e844e16e20" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_SECURITY_POLICY_PROTOCOL_GUID&nbsp;&nbsp;&nbsp;{0x78E4D245, 0xCD4D, 0x4a05, {0xA2, 0xBA, 0x47, 0x43, 0xE8, 0x6C, 0xFC, 0xAB} }          </td>
+          <td class="memname">#define EFI_DEBUG_SUPPORT_PROTOCOL_GUID          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Security policy protocol <a class="el" href="../../d9/d0f/a00644.html">GUID</a> definition 
+<b>Value:</b><div class="fragment"><pre class="fragment">{ \
+    0x2755590C, 0x6F3C, 0x42FA, {0x9E, 0xA4, 0xA3, 0xBA, 0x54, 0x3C, 0xDA, 0x25 } \
+  }
+</pre></div>Debug Support protocol {2755590C-6F3C-42FA-9EA4-A3BA543CDA25} 
+</div>
+</div><p>
+<a class="anchor" name="ecdc514f8ab449b54e27d4187e17cdaf"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_EBC_ALIGNMENT_CHECK" ref="ecdc514f8ab449b54e27d4187e17cdaf" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_EBC_ALIGNMENT_CHECK&nbsp;&nbsp;&nbsp;7          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="19aac21d710ac173391ee13775ca53df"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_EBC_BAD_BREAK" ref="19aac21d710ac173391ee13775ca53df" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_EBC_BAD_BREAK&nbsp;&nbsp;&nbsp;9          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+BREAK 0 or undefined BREAK. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="1500244135e95b72a98d953a95eba647"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_EBC_BREAKPOINT" ref="1500244135e95b72a98d953a95eba647" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_EBC_BREAKPOINT&nbsp;&nbsp;&nbsp;3          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="db5522994b4c23127dac9faa26d72600"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_EBC_DEBUG" ref="db5522994b4c23127dac9faa26d72600" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_EBC_DEBUG&nbsp;&nbsp;&nbsp;2          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="4818b6d7eff9a95e89340d1ba1d66ff5"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_EBC_DIVIDE_ERROR" ref="4818b6d7eff9a95e89340d1ba1d66ff5" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_EBC_DIVIDE_ERROR&nbsp;&nbsp;&nbsp;1          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="ffbab1365882cb34de158118670a58f7"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_EBC_INSTRUCTION_ENCODING" ref="ffbab1365882cb34de158118670a58f7" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_EBC_INSTRUCTION_ENCODING&nbsp;&nbsp;&nbsp;8          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+malformed instruction 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="5b7e1dd769c0216d26cdea3d2fcd1196"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_EBC_INVALID_OPCODE" ref="5b7e1dd769c0216d26cdea3d2fcd1196" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_EBC_INVALID_OPCODE&nbsp;&nbsp;&nbsp;5          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+opcode out of range 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="d040afb5ea7c1c2a35142502c7987a23"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_EBC_OVERFLOW" ref="d040afb5ea7c1c2a35142502c7987a23" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_EBC_OVERFLOW&nbsp;&nbsp;&nbsp;4          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="7b19c932ae85e4b0063b180ffc469eeb"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_EBC_STACK_FAULT" ref="7b19c932ae85e4b0063b180ffc469eeb" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_EBC_STACK_FAULT&nbsp;&nbsp;&nbsp;6          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="6314116c11d754509b4d857ea64adc0a"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_EBC_STEP" ref="6314116c11d754509b4d857ea64adc0a" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_EBC_STEP&nbsp;&nbsp;&nbsp;10          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+to support debug stepping 
+</div>
+</div><p>
+<a class="anchor" name="0da31425c569cb35967714814683c375"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_EBC_UNDEFINED" ref="0da31425c569cb35967714814683c375" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_EBC_UNDEFINED&nbsp;&nbsp;&nbsp;0          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+EBC processor exception types 
+</div>
+</div><p>
+<a class="anchor" name="556ed838e1a8610ebb8b8cdb6a528968"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IA32_ALIGNMENT_CHECK" ref="556ed838e1a8610ebb8b8cdb6a528968" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IA32_ALIGNMENT_CHECK&nbsp;&nbsp;&nbsp;17          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="ce50cea0f3f0e49cf27f27f1ffb30f41"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IA32_BOUND" ref="ce50cea0f3f0e49cf27f27f1ffb30f41" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IA32_BOUND&nbsp;&nbsp;&nbsp;5          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="f569004f9917f4c507fe5f0d852b808f"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IA32_BREAKPOINT" ref="f569004f9917f4c507fe5f0d852b808f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IA32_BREAKPOINT&nbsp;&nbsp;&nbsp;3          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="844aa3cbb8b86b211673f82f1c6455a3"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IA32_DEBUG" ref="844aa3cbb8b86b211673f82f1c6455a3" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IA32_DEBUG&nbsp;&nbsp;&nbsp;1          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="e0e0200d14d1bc65da78728815c11592"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IA32_DIVIDE_ERROR" ref="e0e0200d14d1bc65da78728815c11592" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IA32_DIVIDE_ERROR&nbsp;&nbsp;&nbsp;0          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+IA-32 processor exception types 
+</div>
+</div><p>
+<a class="anchor" name="b3110a4f22d6a3de3eba681f9926c14f"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IA32_DOUBLE_FAULT" ref="b3110a4f22d6a3de3eba681f9926c14f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IA32_DOUBLE_FAULT&nbsp;&nbsp;&nbsp;8          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="a010151bdf38677f4668c9c0b32c07d5"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IA32_FP_ERROR" ref="a010151bdf38677f4668c9c0b32c07d5" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IA32_FP_ERROR&nbsp;&nbsp;&nbsp;16          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="ee0c043f31962c6b164fe4610e713ef0"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IA32_GP_FAULT" ref="ee0c043f31962c6b164fe4610e713ef0" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IA32_GP_FAULT&nbsp;&nbsp;&nbsp;13          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="5e41c8aeee8ed4b43d68ed50be2c84eb"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IA32_INVALID_OPCODE" ref="5e41c8aeee8ed4b43d68ed50be2c84eb" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IA32_INVALID_OPCODE&nbsp;&nbsp;&nbsp;6          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="9a686fc45f947ad2594b25e31678c466"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IA32_INVALID_TSS" ref="9a686fc45f947ad2594b25e31678c466" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IA32_INVALID_TSS&nbsp;&nbsp;&nbsp;10          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="3e8591009da88aa35b9571106e6f86d2"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IA32_MACHINE_CHECK" ref="3e8591009da88aa35b9571106e6f86d2" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IA32_MACHINE_CHECK&nbsp;&nbsp;&nbsp;18          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="37916f2d822ec7c08e97f07a60b928ce"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IA32_NMI" ref="37916f2d822ec7c08e97f07a60b928ce" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IA32_NMI&nbsp;&nbsp;&nbsp;2          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="a50431779efd091efb6ae7b10d5fb598"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IA32_OVERFLOW" ref="a50431779efd091efb6ae7b10d5fb598" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IA32_OVERFLOW&nbsp;&nbsp;&nbsp;4          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="cc6ea7586e591e2193a2271f84886d10"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IA32_PAGE_FAULT" ref="cc6ea7586e591e2193a2271f84886d10" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IA32_PAGE_FAULT&nbsp;&nbsp;&nbsp;14          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="7dc2488c5fbbc65e3b9a7c9dd3e3ee31"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IA32_SEG_NOT_PRESENT" ref="7dc2488c5fbbc65e3b9a7c9dd3e3ee31" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IA32_SEG_NOT_PRESENT&nbsp;&nbsp;&nbsp;11          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="1296099c98c477d1ef6e402a16550706"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IA32_SIMD" ref="1296099c98c477d1ef6e402a16550706" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IA32_SIMD&nbsp;&nbsp;&nbsp;19          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="a96684d96a490bdce21fe07baa68cdeb"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IA32_STACK_FAULT" ref="a96684d96a490bdce21fe07baa68cdeb" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IA32_STACK_FAULT&nbsp;&nbsp;&nbsp;12          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="bedad7b6e48767a899b9dd3b10e58340"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_ALT_DATA_TLB" ref="bedad7b6e48767a899b9dd3b10e58340" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_ALT_DATA_TLB&nbsp;&nbsp;&nbsp;4          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="7b5dc17b6487316d10ec77b5dddeb0be"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_ALT_INSTRUCTION_TLB" ref="7b5dc17b6487316d10ec77b5dddeb0be" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_ALT_INSTRUCTION_TLB&nbsp;&nbsp;&nbsp;3          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="1b2d060ac22d7dce2f61359e0e5d6536"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_BREAKPOINT" ref="1b2d060ac22d7dce2f61359e0e5d6536" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_BREAKPOINT&nbsp;&nbsp;&nbsp;11          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="949ca243184bec13de79a0eb9e61e5b9"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_DATA_ACCESS_BIT" ref="949ca243184bec13de79a0eb9e61e5b9" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_DATA_ACCESS_BIT&nbsp;&nbsp;&nbsp;10          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="d31e88c4b7e843f27e010fed00615671"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_DATA_ACCESS_RIGHTS" ref="d31e88c4b7e843f27e010fed00615671" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_DATA_ACCESS_RIGHTS&nbsp;&nbsp;&nbsp;23          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="a9c237205f8e323021a2b04a2ee5706b"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_DATA_KEY_MISSED" ref="a9c237205f8e323021a2b04a2ee5706b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_DATA_KEY_MISSED&nbsp;&nbsp;&nbsp;7          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="30e70eeae6a8e5baa1841f971b00cc91"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_DATA_NESTED_TLB" ref="30e70eeae6a8e5baa1841f971b00cc91" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_DATA_NESTED_TLB&nbsp;&nbsp;&nbsp;5          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="250cad4d76e73799afca9fe50f0ef506"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_DATA_TLB" ref="250cad4d76e73799afca9fe50f0ef506" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_DATA_TLB&nbsp;&nbsp;&nbsp;2          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="2d4c5fdc580e9fa05c466ac79cc187e6"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_DEBUG" ref="2d4c5fdc580e9fa05c466ac79cc187e6" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_DEBUG&nbsp;&nbsp;&nbsp;29          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="5c1de0b61254f03ab4c789605ecaafaf"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_DIRTY_BIT" ref="5c1de0b61254f03ab4c789605ecaafaf" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_DIRTY_BIT&nbsp;&nbsp;&nbsp;8          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="78d0dcf3d1769556250b1fe6420c3ff5"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_DISABLED_FP_REGISTER" ref="78d0dcf3d1769556250b1fe6420c3ff5" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_DISABLED_FP_REGISTER&nbsp;&nbsp;&nbsp;25          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="c846fc8a1375fdef5399db95d18a62df"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_EXTERNAL_INTERRUPT" ref="c846fc8a1375fdef5399db95d18a62df" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_EXTERNAL_INTERRUPT&nbsp;&nbsp;&nbsp;12          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="66d9b00630b68e1583a2540b797130d9"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_FP_FAULT" ref="66d9b00630b68e1583a2540b797130d9" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_FP_FAULT&nbsp;&nbsp;&nbsp;32          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="786f0900c887294dd5fbe5c85b6f8666"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_FP_TRAP" ref="786f0900c887294dd5fbe5c85b6f8666" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_FP_TRAP&nbsp;&nbsp;&nbsp;33          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="3871f0a6791ccf262460d27f72d9e44d"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_GENERAL_EXCEPTION" ref="3871f0a6791ccf262460d27f72d9e44d" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_GENERAL_EXCEPTION&nbsp;&nbsp;&nbsp;24          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="f1e1a1036d434e209ebdcd4c3b7d8398"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_IA32_EXCEPTION" ref="f1e1a1036d434e209ebdcd4c3b7d8398" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_IA32_EXCEPTION&nbsp;&nbsp;&nbsp;45          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="8c08caa9cc6e9a15172795b5e275c0af"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_IA32_INTERCEPT" ref="8c08caa9cc6e9a15172795b5e275c0af" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_IA32_INTERCEPT&nbsp;&nbsp;&nbsp;46          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="d70611fa211f7966e0236f8c4855079e"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_IA32_INTERRUPT" ref="d70611fa211f7966e0236f8c4855079e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_IA32_INTERRUPT&nbsp;&nbsp;&nbsp;47          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="9cc1d436f30fb2f9cbc6ac1f3a16581c"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_INSTRUCTION_ACCESS_BIT" ref="9cc1d436f30fb2f9cbc6ac1f3a16581c" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_INSTRUCTION_ACCESS_BIT&nbsp;&nbsp;&nbsp;9          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="a4d422b2ad5b76fc38b3d4bc624a3886"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_INSTRUCTION_ACCESS_RIGHTS" ref="a4d422b2ad5b76fc38b3d4bc624a3886" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_INSTRUCTION_ACCESS_RIGHTS&nbsp;&nbsp;&nbsp;22          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="e74c23814b65ddd067fb160ea268de73"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_INSTRUCTION_KEY_MISSED" ref="e74c23814b65ddd067fb160ea268de73" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_INSTRUCTION_KEY_MISSED&nbsp;&nbsp;&nbsp;6          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="4ff9a42e1188cea05ffcfca1c4d68996"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_INSTRUCTION_TLB" ref="4ff9a42e1188cea05ffcfca1c4d68996" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_INSTRUCTION_TLB&nbsp;&nbsp;&nbsp;1          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="adfd59616b32e555a2bddcaf10ce762b"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_KEY_PERMISSION" ref="adfd59616b32e555a2bddcaf10ce762b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_KEY_PERMISSION&nbsp;&nbsp;&nbsp;21          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="503bde1c343edbc6bc5845e73cfa2034"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_LOWER_PRIVILEGE_TRANSFER_TRAP" ref="503bde1c343edbc6bc5845e73cfa2034" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_LOWER_PRIVILEGE_TRANSFER_TRAP&nbsp;&nbsp;&nbsp;34          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="0893b282729f228240b2f4ce65be8af9"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_NAT_CONSUMPTION" ref="0893b282729f228240b2f4ce65be8af9" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_NAT_CONSUMPTION&nbsp;&nbsp;&nbsp;26          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="700a3380681c8c3c8424ee5d5b1e2a90"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_PAGE_NOT_PRESENT" ref="700a3380681c8c3c8424ee5d5b1e2a90" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_PAGE_NOT_PRESENT&nbsp;&nbsp;&nbsp;20          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="1b71e75150995e1a6cf64692a936870b"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_SINGLE_STEP" ref="1b71e75150995e1a6cf64692a936870b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_SINGLE_STEP&nbsp;&nbsp;&nbsp;36          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="e8ef270ea7733fe3958b7debd4b44471"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_SPECULATION" ref="e8ef270ea7733fe3958b7debd4b44471" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_SPECULATION&nbsp;&nbsp;&nbsp;27          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="ae1a9d2118031e80c0ded6c38027877b"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_TAKEN_BRANCH" ref="ae1a9d2118031e80c0ded6c38027877b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_TAKEN_BRANCH&nbsp;&nbsp;&nbsp;35          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="196109e3d899e32412cb0fa788fbaddd"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_UNALIGNED_REFERENCE" ref="196109e3d899e32412cb0fa788fbaddd" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_UNALIGNED_REFERENCE&nbsp;&nbsp;&nbsp;30          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="9e022580ae0246ba7c00674dc01a7d37"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_UNSUPPORTED_DATA_REFERENCE" ref="9e022580ae0246ba7c00674dc01a7d37" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_UNSUPPORTED_DATA_REFERENCE&nbsp;&nbsp;&nbsp;31          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="da506cf4db70175ea62538ba871e9993"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_IPF_VHTP_TRANSLATION" ref="da506cf4db70175ea62538ba871e9993" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_IPF_VHTP_TRANSLATION&nbsp;&nbsp;&nbsp;0          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Itanium Processor Family Exception types 
+</div>
+</div><p>
+<a class="anchor" name="20521fd84a14dc31e20555689c554dbb"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_X64_ALIGNMENT_CHECK" ref="20521fd84a14dc31e20555689c554dbb" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_X64_ALIGNMENT_CHECK&nbsp;&nbsp;&nbsp;17          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="a0c5b5c949333337d50075a18c2652f5"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_X64_BOUND" ref="a0c5b5c949333337d50075a18c2652f5" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_X64_BOUND&nbsp;&nbsp;&nbsp;5          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="1aae09970d90592a9e05b8e685c23dff"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_X64_BREAKPOINT" ref="1aae09970d90592a9e05b8e685c23dff" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_X64_BREAKPOINT&nbsp;&nbsp;&nbsp;3          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="b86199a1493b2e7ac4ee05f9ea20332f"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_X64_DEBUG" ref="b86199a1493b2e7ac4ee05f9ea20332f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_X64_DEBUG&nbsp;&nbsp;&nbsp;1          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="ad802d91682da47c3f1f597eecd48e11"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_X64_DIVIDE_ERROR" ref="ad802d91682da47c3f1f597eecd48e11" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_X64_DIVIDE_ERROR&nbsp;&nbsp;&nbsp;0          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+x64 processor exception types 
+</div>
+</div><p>
+<a class="anchor" name="b29c9887429ba13dd55cc435d112bd21"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_X64_DOUBLE_FAULT" ref="b29c9887429ba13dd55cc435d112bd21" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_X64_DOUBLE_FAULT&nbsp;&nbsp;&nbsp;8          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="00fa2190b754c16ededc0bec89e8095e"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_X64_FP_ERROR" ref="00fa2190b754c16ededc0bec89e8095e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_X64_FP_ERROR&nbsp;&nbsp;&nbsp;16          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="c43e66057cd55bd0008b93bf3b55f640"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_X64_GP_FAULT" ref="c43e66057cd55bd0008b93bf3b55f640" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_X64_GP_FAULT&nbsp;&nbsp;&nbsp;13          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="fed1a18c62ab3fe67a3ece3c9b89c1c1"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_X64_INVALID_OPCODE" ref="fed1a18c62ab3fe67a3ece3c9b89c1c1" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_X64_INVALID_OPCODE&nbsp;&nbsp;&nbsp;6          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="2689792f1b1c70f80cb4327695b2a9b0"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_X64_INVALID_TSS" ref="2689792f1b1c70f80cb4327695b2a9b0" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_X64_INVALID_TSS&nbsp;&nbsp;&nbsp;10          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="5f4431f4680dab3d461a0d7e3561c020"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_X64_MACHINE_CHECK" ref="5f4431f4680dab3d461a0d7e3561c020" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_X64_MACHINE_CHECK&nbsp;&nbsp;&nbsp;18          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="ea4c2ecf93e426dcb80cdb3e646f5d2e"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_X64_NMI" ref="ea4c2ecf93e426dcb80cdb3e646f5d2e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_X64_NMI&nbsp;&nbsp;&nbsp;2          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="c8453e4bc245447d805807874ed99da0"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_X64_OVERFLOW" ref="c8453e4bc245447d805807874ed99da0" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_X64_OVERFLOW&nbsp;&nbsp;&nbsp;4          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="dc60424dc9caadbf0dc611254e1f4648"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_X64_PAGE_FAULT" ref="dc60424dc9caadbf0dc611254e1f4648" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_X64_PAGE_FAULT&nbsp;&nbsp;&nbsp;14          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="bba9afd62c34d32dd6311543c9bc9441"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_X64_SEG_NOT_PRESENT" ref="bba9afd62c34d32dd6311543c9bc9441" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_X64_SEG_NOT_PRESENT&nbsp;&nbsp;&nbsp;11          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="fcb5d10e20d11e6cbd1ea97a3291f5f4"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_X64_SIMD" ref="fcb5d10e20d11e6cbd1ea97a3291f5f4" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_X64_SIMD&nbsp;&nbsp;&nbsp;19          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="e858ad98feae706e3698b169e60fe773"></a><!-- doxytag: member="DebugSupport.h::EXCEPT_X64_STACK_FAULT" ref="e858ad98feae706e3698b169e60fe773" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXCEPT_X64_STACK_FAULT&nbsp;&nbsp;&nbsp;12          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="a37c55ab6e4e84aaee89cd1455e33535"></a><!-- doxytag: member="DebugSupport.h::MAX_EBC_EXCEPTION" ref="a37c55ab6e4e84aaee89cd1455e33535" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define MAX_EBC_EXCEPTION&nbsp;&nbsp;&nbsp;EXCEPT_EBC_STEP          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+For coding convenience, define the maximum valid EBC exception. 
+</div>
+</div><p>
+<hr><h2>Typedef Documentation</h2>
+<a class="anchor" name="a37ebf29224283028a7d2e191efd9a8f"></a><!-- doxytag: member="DebugSupport.h::EFI_DEBUG_SUPPORT_PROTOCOL" ref="a37ebf29224283028a7d2e191efd9a8f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct <a class="el" href="../../d7/dd4/a00013.html">_EFI_DEBUG_SUPPORT_PROTOCOL</a> <a class="el" href="../../d7/dd4/a00013.html">EFI_DEBUG_SUPPORT_PROTOCOL</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="764febe01cd0951dbd6c562a28c1fdd2"></a><!-- doxytag: member="DebugSupport.h::EFI_EXCEPTION_CALLBACK" ref="764febe01cd0951dbd6c562a28c1fdd2" args=")(IN EFI_EXCEPTION_TYPE ExceptionType, IN OUT EFI_SYSTEM_CONTEXT SystemContext)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef VOID(EFIAPI * <a class="el" href="../../dc/d81/a01161.html#764febe01cd0951dbd6c562a28c1fdd2">EFI_EXCEPTION_CALLBACK</a>)(IN <a class="el" href="../../dc/d81/a01161.html#406cd3b8e734b4c7b144232bae800bfb">EFI_EXCEPTION_TYPE</a> ExceptionType, IN OUT <a class="el" href="../../dc/d62/a00640.html">EFI_SYSTEM_CONTEXT</a> SystemContext)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Registers and enables an exception callback function for the specified exception.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>ExceptionType</em>&nbsp;</td><td>Exception types in EBC, IA-32, x64, or IPF </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>SystemContext</em>&nbsp;</td><td>Exception content. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="406cd3b8e734b4c7b144232bae800bfb"></a><!-- doxytag: member="DebugSupport.h::EFI_EXCEPTION_TYPE" ref="406cd3b8e734b4c7b144232bae800bfb" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#88c67527ff19b831c672f11fc131ee53">INTN</a> <a class="el" href="../../dc/d81/a01161.html#406cd3b8e734b4c7b144232bae800bfb">EFI_EXCEPTION_TYPE</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Processor exception to be hooked. All exception types for IA32, X64, Itanium and EBC processors are defined. 
+</div>
+</div><p>
+<a class="anchor" name="b2df5ad6b1be2e268ac7fbb9f2e4933d"></a><!-- doxytag: member="DebugSupport.h::EFI_GET_MAXIMUM_PROCESSOR_INDEX" ref="b2df5ad6b1be2e268ac7fbb9f2e4933d" args=")(IN EFI_DEBUG_SUPPORT_PROTOCOL *This, OUT UINTN *MaxProcessorIndex)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../dc/d81/a01161.html#b2df5ad6b1be2e268ac7fbb9f2e4933d">EFI_GET_MAXIMUM_PROCESSOR_INDEX</a>)(IN <a class="el" href="../../d7/dd4/a00013.html">EFI_DEBUG_SUPPORT_PROTOCOL</a> *This, OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *MaxProcessorIndex)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Returns the maximum value that may be used for the ProcessorIndex parameter in RegisterPeriodicCallback() and RegisterExceptionCallback().<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_DEBUG_SUPPORT_PROTOCOL instance. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>MaxProcessorIndex</em>&nbsp;</td><td>Pointer to a caller-allocated UINTN in which the maximum supported processor index is returned.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The function completed successfully. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="a2bbd6b07caa0517300ad9a681064a51"></a><!-- doxytag: member="DebugSupport.h::EFI_INVALIDATE_INSTRUCTION_CACHE" ref="a2bbd6b07caa0517300ad9a681064a51" args=")(IN EFI_DEBUG_SUPPORT_PROTOCOL *This, IN UINTN ProcessorIndex, IN VOID *Start, IN UINT64 Length)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../dc/d81/a01161.html#a2bbd6b07caa0517300ad9a681064a51">EFI_INVALIDATE_INSTRUCTION_CACHE</a>)(IN <a class="el" href="../../d7/dd4/a00013.html">EFI_DEBUG_SUPPORT_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> ProcessorIndex, IN VOID *Start, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Length)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Invalidates processor instruction cache for a memory range. Subsequent execution in this range causes a fresh memory fetch to retrieve code to be executed.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_DEBUG_SUPPORT_PROTOCOL instance. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ProcessorIndex</em>&nbsp;</td><td>Specifies which processor's instruction cache is to be invalidated. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Start</em>&nbsp;</td><td>Specifies the physical base of the memory range to be invalidated. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Length</em>&nbsp;</td><td>Specifies the minimum number of bytes in the processor's instruction cache to invalidate.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The function completed successfully. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="1aa1fc696dfe16e0f1157862b1cc1d80"></a><!-- doxytag: member="DebugSupport.h::EFI_PERIODIC_CALLBACK" ref="1aa1fc696dfe16e0f1157862b1cc1d80" args=")(IN OUT EFI_SYSTEM_CONTEXT SystemContext)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef VOID(EFIAPI * <a class="el" href="../../dc/d81/a01161.html#1aa1fc696dfe16e0f1157862b1cc1d80">EFI_PERIODIC_CALLBACK</a>)(IN OUT <a class="el" href="../../dc/d62/a00640.html">EFI_SYSTEM_CONTEXT</a> SystemContext)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Registers and enables the on-target debug agent's periodic entry point.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>SystemContext</em>&nbsp;</td><td>Exception content. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="8d434389eceb8b692eab143afd7e1b83"></a><!-- doxytag: member="DebugSupport.h::EFI_REGISTER_EXCEPTION_CALLBACK" ref="8d434389eceb8b692eab143afd7e1b83" args=")(IN EFI_DEBUG_SUPPORT_PROTOCOL *This, IN UINTN ProcessorIndex, IN EFI_EXCEPTION_CALLBACK ExceptionCallback, IN EFI_EXCEPTION_TYPE ExceptionType)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../dc/d81/a01161.html#8d434389eceb8b692eab143afd7e1b83">EFI_REGISTER_EXCEPTION_CALLBACK</a>)(IN <a class="el" href="../../d7/dd4/a00013.html">EFI_DEBUG_SUPPORT_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> ProcessorIndex, IN <a class="el" href="../../dc/d81/a01161.html#764febe01cd0951dbd6c562a28c1fdd2">EFI_EXCEPTION_CALLBACK</a> ExceptionCallback, IN <a class="el" href="../../dc/d81/a01161.html#406cd3b8e734b4c7b144232bae800bfb">EFI_EXCEPTION_TYPE</a> ExceptionType)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Registers a function to be called when a given processor exception occurs.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_DEBUG_SUPPORT_PROTOCOL instance. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ProcessorIndex</em>&nbsp;</td><td>Specifies which processor the callback function applies to. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ExceptionCallback</em>&nbsp;</td><td>A pointer to a function of type EXCEPTION_CALLBACK that is called when the processor exception specified by ExceptionType occurs. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ExceptionType</em>&nbsp;</td><td>Specifies which processor exception to hook.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The function completed successfully. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_ALREADY_STARTED</em>&nbsp;</td><td>Non-NULL PeriodicCallback parameter when a callback function was previously registered. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>System has insufficient memory resources to register new callback function. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="653814b6d0b8041ec6f6df08c4422b5a"></a><!-- doxytag: member="DebugSupport.h::EFI_REGISTER_PERIODIC_CALLBACK" ref="653814b6d0b8041ec6f6df08c4422b5a" args=")(IN EFI_DEBUG_SUPPORT_PROTOCOL *This, IN UINTN ProcessorIndex, IN EFI_PERIODIC_CALLBACK PeriodicCallback)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../dc/d81/a01161.html#653814b6d0b8041ec6f6df08c4422b5a">EFI_REGISTER_PERIODIC_CALLBACK</a>)(IN <a class="el" href="../../d7/dd4/a00013.html">EFI_DEBUG_SUPPORT_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> ProcessorIndex, IN <a class="el" href="../../dc/d81/a01161.html#1aa1fc696dfe16e0f1157862b1cc1d80">EFI_PERIODIC_CALLBACK</a> PeriodicCallback)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Registers a function to be called back periodically in interrupt context.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_DEBUG_SUPPORT_PROTOCOL instance. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ProcessorIndex</em>&nbsp;</td><td>Specifies which processor the callback function applies to. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>PeriodicCallback</em>&nbsp;</td><td>A pointer to a function of type PERIODIC_CALLBACK that is the main periodic entry point of the debug agent.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The function completed successfully. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_ALREADY_STARTED</em>&nbsp;</td><td>Non-NULL PeriodicCallback parameter when a callback function was previously registered. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>System has insufficient memory resources to register new callback function. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<hr><h2>Enumeration Type Documentation</h2>
+<a class="anchor" name="6c348ee17919492a72606323b341188a"></a><!-- doxytag: member="DebugSupport.h::EFI_INSTRUCTION_SET_ARCHITECTURE" ref="6c348ee17919492a72606323b341188a" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="../../dc/d81/a01161.html#6c348ee17919492a72606323b341188a">EFI_INSTRUCTION_SET_ARCHITECTURE</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Machine type definition <dl compact><dt><b>Enumerator: </b></dt><dd>
+<table border="0" cellspacing="2" cellpadding="0">
+<tr><td valign="top"><em><a class="anchor" name="6c348ee17919492a72606323b341188a0e81be5c33b8ecdb6c4ad7592f12a97d"></a><!-- doxytag: member="IsaIa32" ref="6c348ee17919492a72606323b341188a0e81be5c33b8ecdb6c4ad7592f12a97d" args="" -->IsaIa32</em>&nbsp;</td><td>
+0x014C </td></tr>
+<tr><td valign="top"><em><a class="anchor" name="6c348ee17919492a72606323b341188ac48c3c3ea1f766e51457967a17475cb9"></a><!-- doxytag: member="IsaX64" ref="6c348ee17919492a72606323b341188ac48c3c3ea1f766e51457967a17475cb9" args="" -->IsaX64</em>&nbsp;</td><td>
+0x8664 </td></tr>
+<tr><td valign="top"><em><a class="anchor" name="6c348ee17919492a72606323b341188a4e24ca00edb367eeb03446dd23c534fa"></a><!-- doxytag: member="IsaIpf" ref="6c348ee17919492a72606323b341188a4e24ca00edb367eeb03446dd23c534fa" args="" -->IsaIpf</em>&nbsp;</td><td>
+0x0200 </td></tr>
+<tr><td valign="top"><em><a class="anchor" name="6c348ee17919492a72606323b341188a72396fa951adeff73c75d43ff780f8b0"></a><!-- doxytag: member="IsaEbc" ref="6c348ee17919492a72606323b341188a72396fa951adeff73c75d43ff780f8b0" args="" -->IsaEbc</em>&nbsp;</td><td>
+0x0EBC </td></tr>
+</table>
+</dl>
+
 </div>
 </div><p>
 <hr><h2>Variable Documentation</h2>
-<a class="anchor" name="807f51aaf5f2469a02f2762ed4bb24b2"></a><!-- doxytag: member="SecurityPolicy.h::gEfiSecurityPolicyProtocolGuid" ref="807f51aaf5f2469a02f2762ed4bb24b2" args="" -->
+<a class="anchor" name="e563035d2b1a6e2c13f9886fb176c1c7"></a><!-- doxytag: member="DebugSupport.h::gEfiDebugSupportProtocolGuid" ref="e563035d2b1a6e2c13f9886fb176c1c7" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../dc/d81/a01161.html#807f51aaf5f2469a02f2762ed4bb24b2">gEfiSecurityPolicyProtocolGuid</a>          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../dc/d81/a01161.html#e563035d2b1a6e2c13f9886fb176c1c7">gEfiDebugSupportProtocolGuid</a>          </td>
         </tr>
       </table>
 </div>
@@ -66,7 +1666,7 @@ Security policy protocol <a class="el" href="../../d9/d0f/a00644.html">GUID</a> 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:10 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:31 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

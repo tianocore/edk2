@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Guid/SalSystemTable.h File Reference</title>
+<title>MdePkg[ALL]: tdTPM_TRANSPORT_AUTH Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -9,59 +9,49 @@
   <div class="tabs">
     <ul>
       <li><a href="../../main.html"><span>Main&nbsp;Page</span></a></li>
-      <li><a href="../../annotated.html"><span>Data&nbsp;Structures</span></a></li>
-      <li class="current"><a href="../../files.html"><span>Files</span></a></li>
+      <li class="current"><a href="../../annotated.html"><span>Data&nbsp;Structures</span></a></li>
+      <li><a href="../../files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div class="tabs">
     <ul>
-      <li><a href="../../files.html"><span>File&nbsp;List</span></a></li>
-      <li><a href="../../globals.html"><span>Globals</span></a></li>
+      <li><a href="../../annotated.html"><span>Data&nbsp;Structures</span></a></li>
+      <li><a href="../../functions.html"><span>Data&nbsp;Fields</span></a></li>
     </ul>
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Guid/SalSystemTable.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>tdTPM_TRANSPORT_AUTH Struct Reference</h1><!-- doxytag: class="tdTPM_TRANSPORT_AUTH" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
-<tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d6c/a00977.html#27ef1ff53fba7d4677ff18b1bb26a7f9">SAL_SYSTEM_TABLE_GUID</a></td></tr>
+<tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d8e/a01050.html#69f3eb3e40aee2061dba5f9202fac1a2">TPM_STRUCTURE_TAG</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d6c/a00977.html#37997d2cd8b9cb3d660e1829ed31ce0b">tag</a></td></tr>
 
-<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d6c/a00977.html#e6b6b9abc634a979ff98d2d9f5c3df81">gEfiSalSystemTableGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d8e/a01050.html#6fe9a4836cfdea2a17effdbdfc689f15">TPM_AUTHDATA</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d6c/a00977.html#2f9d7f373bf06b8e8913adcdc1019fa6">authData</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-GUIDs used for SAL system table entries in the EFI system table.<p>
-SAL System Table contains Itanium-based processor centric information about the system.<p>
-Copyright (c) 2006 - 2009, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
-<dl class="user" compact><dt><b>Revision Reference:</b></dt><dd>GUIDs defined in UEFI 2.0 spec. </dd></dl>
-<hr><h2>Define Documentation</h2>
-<a class="anchor" name="27ef1ff53fba7d4677ff18b1bb26a7f9"></a><!-- doxytag: member="SalSystemTable.h::SAL_SYSTEM_TABLE_GUID" ref="27ef1ff53fba7d4677ff18b1bb26a7f9" args="" -->
+Part 2, section 13.5 TPM_TRANSPORT_AUTH structure <hr><h2>Field Documentation</h2>
+<a class="anchor" name="2f9d7f373bf06b8e8913adcdc1019fa6"></a><!-- doxytag: member="tdTPM_TRANSPORT_AUTH::authData" ref="2f9d7f373bf06b8e8913adcdc1019fa6" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define SAL_SYSTEM_TABLE_GUID          </td>
+          <td class="memname"><a class="el" href="../../d9/d8e/a01050.html#6fe9a4836cfdea2a17effdbdfc689f15">TPM_AUTHDATA</a> <a class="el" href="../../d5/d6c/a00977.html#2f9d7f373bf06b8e8913adcdc1019fa6">tdTPM_TRANSPORT_AUTH::authData</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-<b>Value:</b><div class="fragment"><pre class="fragment">{ \
-    0xeb9d2d32, 0x2d88, 0x11d3, {0x9a, 0x16, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d } \
-  }
-</pre></div>
+
 </div>
 </div><p>
-<hr><h2>Variable Documentation</h2>
-<a class="anchor" name="e6b6b9abc634a979ff98d2d9f5c3df81"></a><!-- doxytag: member="SalSystemTable.h::gEfiSalSystemTableGuid" ref="e6b6b9abc634a979ff98d2d9f5c3df81" args="" -->
+<a class="anchor" name="37997d2cd8b9cb3d660e1829ed31ce0b"></a><!-- doxytag: member="tdTPM_TRANSPORT_AUTH::tag" ref="37997d2cd8b9cb3d660e1829ed31ce0b" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../d5/d6c/a00977.html#e6b6b9abc634a979ff98d2d9f5c3df81">gEfiSalSystemTableGuid</a>          </td>
+          <td class="memname"><a class="el" href="../../d9/d8e/a01050.html#69f3eb3e40aee2061dba5f9202fac1a2">TPM_STRUCTURE_TAG</a> <a class="el" href="../../d5/d6c/a00977.html#37997d2cd8b9cb3d660e1829ed31ce0b">tdTPM_TRANSPORT_AUTH::tag</a>          </td>
         </tr>
       </table>
 </div>
@@ -72,7 +62,7 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:07 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:12 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

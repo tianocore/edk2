@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: _EFI_SIMPLE_TEXT_INPUT_PROTOCOL Struct Reference</title>
+<title>MdePkg[ALL]: _EFI_RUNTIME_IMAGE_ENTRY Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,65 +21,99 @@
   </div>
 </div>
 <div class="contents">
-<h1>_EFI_SIMPLE_TEXT_INPUT_PROTOCOL Struct Reference</h1><!-- doxytag: class="_EFI_SIMPLE_TEXT_INPUT_PROTOCOL" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>_EFI_RUNTIME_IMAGE_ENTRY Struct Reference</h1><!-- doxytag: class="_EFI_RUNTIME_IMAGE_ENTRY" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d7/dd6/a01167.html#0a84de026a36f98cd49be84ae4b3bbbb">EFI_INPUT_RESET</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/da7/a00250.html#715d127e4c4b66bfa7a8328b55458430">Reset</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/da7/a00250.html#9870d6c8a82e0ef0fe2ae06cecf4d813">ImageBase</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d7/dd6/a01167.html#cd3e273d2d466b001218cf781435e1ee">EFI_INPUT_READ_KEY</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/da7/a00250.html#3743cac86d06a5c36a227ad475e69701">ReadKeyStroke</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/da7/a00250.html#96af64c37129caa40c675bdf08f3e862">ImageSize</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#7f3111de303d836d8d3711c39363f81a">EFI_EVENT</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/da7/a00250.html#bb6bc8cb1551b10c69563126524a1775">WaitForKey</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/da7/a00250.html#a9b91c2a1e982e3c86103c373d3b01b9">RelocationData</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/da7/a00250.html#4d57d4c91c6550bfcf5c224749c61712">Handle</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d5d/a00278.html">EFI_LIST_ENTRY</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/da7/a00250.html#342a4ee6eec0ac969710bec3bc0b0b03">Link</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-The EFI_SIMPLE_TEXT_INPUT_PROTOCOL is used on the ConsoleIn device. It is the minimum required protocol for ConsoleIn. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="3743cac86d06a5c36a227ad475e69701"></a><!-- doxytag: member="_EFI_SIMPLE_TEXT_INPUT_PROTOCOL::ReadKeyStroke" ref="3743cac86d06a5c36a227ad475e69701" args="" -->
+EFI_RUNTIME_IMAGE_ENTRY <hr><h2>Field Documentation</h2>
+<a class="anchor" name="4d57d4c91c6550bfcf5c224749c61712"></a><!-- doxytag: member="_EFI_RUNTIME_IMAGE_ENTRY::Handle" ref="4d57d4c91c6550bfcf5c224749c61712" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d7/dd6/a01167.html#cd3e273d2d466b001218cf781435e1ee">EFI_INPUT_READ_KEY</a> <a class="el" href="../../d0/da7/a00250.html#3743cac86d06a5c36a227ad475e69701">_EFI_SIMPLE_TEXT_INPUT_PROTOCOL::ReadKeyStroke</a>          </td>
+          <td class="memname"><a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> <a class="el" href="../../d0/da7/a00250.html#4d57d4c91c6550bfcf5c224749c61712">_EFI_RUNTIME_IMAGE_ENTRY::Handle</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The ImageHandle passed into ImageBase when it was loaded. 
 </div>
 </div><p>
-<a class="anchor" name="715d127e4c4b66bfa7a8328b55458430"></a><!-- doxytag: member="_EFI_SIMPLE_TEXT_INPUT_PROTOCOL::Reset" ref="715d127e4c4b66bfa7a8328b55458430" args="" -->
+<a class="anchor" name="9870d6c8a82e0ef0fe2ae06cecf4d813"></a><!-- doxytag: member="_EFI_RUNTIME_IMAGE_ENTRY::ImageBase" ref="9870d6c8a82e0ef0fe2ae06cecf4d813" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d7/dd6/a01167.html#0a84de026a36f98cd49be84ae4b3bbbb">EFI_INPUT_RESET</a> <a class="el" href="../../d0/da7/a00250.html#715d127e4c4b66bfa7a8328b55458430">_EFI_SIMPLE_TEXT_INPUT_PROTOCOL::Reset</a>          </td>
+          <td class="memname">VOID* <a class="el" href="../../d0/da7/a00250.html#9870d6c8a82e0ef0fe2ae06cecf4d813">_EFI_RUNTIME_IMAGE_ENTRY::ImageBase</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+Start of image that has been loaded in memory. It is a pointer to either the DOS header or PE header of the image. 
 </div>
 </div><p>
-<a class="anchor" name="bb6bc8cb1551b10c69563126524a1775"></a><!-- doxytag: member="_EFI_SIMPLE_TEXT_INPUT_PROTOCOL::WaitForKey" ref="bb6bc8cb1551b10c69563126524a1775" args="" -->
+<a class="anchor" name="96af64c37129caa40c675bdf08f3e862"></a><!-- doxytag: member="_EFI_RUNTIME_IMAGE_ENTRY::ImageSize" ref="96af64c37129caa40c675bdf08f3e862" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#7f3111de303d836d8d3711c39363f81a">EFI_EVENT</a> <a class="el" href="../../d0/da7/a00250.html#bb6bc8cb1551b10c69563126524a1775">_EFI_SIMPLE_TEXT_INPUT_PROTOCOL::WaitForKey</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d0/da7/a00250.html#96af64c37129caa40c675bdf08f3e862">_EFI_RUNTIME_IMAGE_ENTRY::ImageSize</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Event to use with WaitForEvent() to wait for a key to be available 
+Size in bytes of the image represented by ImageBase. 
+</div>
+</div><p>
+<a class="anchor" name="342a4ee6eec0ac969710bec3bc0b0b03"></a><!-- doxytag: member="_EFI_RUNTIME_IMAGE_ENTRY::Link" ref="342a4ee6eec0ac969710bec3bc0b0b03" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/d5d/a00278.html">EFI_LIST_ENTRY</a> <a class="el" href="../../d0/da7/a00250.html#342a4ee6eec0ac969710bec3bc0b0b03">_EFI_RUNTIME_IMAGE_ENTRY::Link</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Entry for this node in the EFI_RUNTIME_ARCHITECTURE_PROTOCOL.ImageHead list. 
+</div>
+</div><p>
+<a class="anchor" name="a9b91c2a1e982e3c86103c373d3b01b9"></a><!-- doxytag: member="_EFI_RUNTIME_IMAGE_ENTRY::RelocationData" ref="a9b91c2a1e982e3c86103c373d3b01b9" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">VOID* <a class="el" href="../../d0/da7/a00250.html#a9b91c2a1e982e3c86103c373d3b01b9">_EFI_RUNTIME_IMAGE_ENTRY::RelocationData</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Information about the fix-ups that were performed on ImageBase when it was loaded into memory. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:13 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:17 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

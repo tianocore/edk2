@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_LOCK Struct Reference</title>
+<title>MdePkg[ALL]: EFI_IMAGE_OPTIONAL_HEADER_UNION Union Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,24 +21,24 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_LOCK Struct Reference</h1><!-- doxytag: class="EFI_LOCK" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_IMAGE_OPTIONAL_HEADER_UNION Union Reference</h1><!-- doxytag: class="EFI_IMAGE_OPTIONAL_HEADER_UNION" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#b998e5f7da4a664eaa86252ab16e459a">EFI_TPL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d19/a00515.html#01a1719a2176d97fb66be837c589b134">Tpl</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d6/d52/a00510.html">EFI_IMAGE_NT_HEADERS32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d19/a00515.html#7a42a97dc0d24ff56a7c0a825ff4a8f6">Pe32</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#b998e5f7da4a664eaa86252ab16e459a">EFI_TPL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d19/a00515.html#5199c83f5af11fa47a0a59387371d62c">OwnerTpl</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d6/d10/a00511.html">EFI_IMAGE_NT_HEADERS64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d19/a00515.html#074d929e023f38d91672762d03a250e8">Pe32Plus</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/d42/a01051.html#a203aa49ae2c8d8da4bced018056d250">EFI_LOCK_STATE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d19/a00515.html#a798c2310eb3da138615f2ef8eeb2cd6">Lock</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d50/a00661.html">EFI_TE_IMAGE_HEADER</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d19/a00515.html#3db0c7ffdff6c85c95f1c9a74b73b62b">Te</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-EFI Lock <hr><h2>Field Documentation</h2>
-<a class="anchor" name="a798c2310eb3da138615f2ef8eeb2cd6"></a><!-- doxytag: member="EFI_LOCK::Lock" ref="a798c2310eb3da138615f2ef8eeb2cd6" args="" -->
+Union of PE32, PE32+, and TE headers <hr><h2>Field Documentation</h2>
+<a class="anchor" name="7a42a97dc0d24ff56a7c0a825ff4a8f6"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER_UNION::Pe32" ref="7a42a97dc0d24ff56a7c0a825ff4a8f6" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d3/d42/a01051.html#a203aa49ae2c8d8da4bced018056d250">EFI_LOCK_STATE</a> <a class="el" href="../../dc/d19/a00515.html#a798c2310eb3da138615f2ef8eeb2cd6">EFI_LOCK::Lock</a>          </td>
+          <td class="memname"><a class="el" href="../../d6/d52/a00510.html">EFI_IMAGE_NT_HEADERS32</a> <a class="el" href="../../dc/d19/a00515.html#7a42a97dc0d24ff56a7c0a825ff4a8f6">EFI_IMAGE_OPTIONAL_HEADER_UNION::Pe32</a>          </td>
         </tr>
       </table>
 </div>
@@ -48,12 +48,12 @@ EFI Lock <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="5199c83f5af11fa47a0a59387371d62c"></a><!-- doxytag: member="EFI_LOCK::OwnerTpl" ref="5199c83f5af11fa47a0a59387371d62c" args="" -->
+<a class="anchor" name="074d929e023f38d91672762d03a250e8"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER_UNION::Pe32Plus" ref="074d929e023f38d91672762d03a250e8" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#b998e5f7da4a664eaa86252ab16e459a">EFI_TPL</a> <a class="el" href="../../dc/d19/a00515.html#5199c83f5af11fa47a0a59387371d62c">EFI_LOCK::OwnerTpl</a>          </td>
+          <td class="memname"><a class="el" href="../../d6/d10/a00511.html">EFI_IMAGE_NT_HEADERS64</a> <a class="el" href="../../dc/d19/a00515.html#074d929e023f38d91672762d03a250e8">EFI_IMAGE_OPTIONAL_HEADER_UNION::Pe32Plus</a>          </td>
         </tr>
       </table>
 </div>
@@ -63,12 +63,12 @@ EFI Lock <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="01a1719a2176d97fb66be837c589b134"></a><!-- doxytag: member="EFI_LOCK::Tpl" ref="01a1719a2176d97fb66be837c589b134" args="" -->
+<a class="anchor" name="3db0c7ffdff6c85c95f1c9a74b73b62b"></a><!-- doxytag: member="EFI_IMAGE_OPTIONAL_HEADER_UNION::Te" ref="3db0c7ffdff6c85c95f1c9a74b73b62b" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#b998e5f7da4a664eaa86252ab16e459a">EFI_TPL</a> <a class="el" href="../../dc/d19/a00515.html#01a1719a2176d97fb66be837c589b134">EFI_LOCK::Tpl</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d50/a00661.html">EFI_TE_IMAGE_HEADER</a> <a class="el" href="../../dc/d19/a00515.html#3db0c7ffdff6c85c95f1c9a74b73b62b">EFI_IMAGE_OPTIONAL_HEADER_UNION::Te</a>          </td>
         </tr>
       </table>
 </div>
@@ -79,7 +79,7 @@ EFI Lock <hr><h2>Field Documentation</h2>
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:35 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: SMBIOS_TABLE_TYPE19 Struct Reference</title>
+<title>MdePkg[ALL]: s_pxe_pci_config_info Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,29 +21,65 @@
   </div>
 </div>
 <div class="contents">
-<h1>SMBIOS_TABLE_TYPE19 Struct Reference</h1><!-- doxytag: class="SMBIOS_TABLE_TYPE19" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>s_pxe_pci_config_info Struct Reference</h1><!-- doxytag: class="s_pxe_pci_config_info" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../da/db8/a00797.html">SMBIOS_STRUCTURE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d9d/a00813.html#381699fd655edd45593fbd7e78c85f1d">Hdr</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d9d/a00813.html#56d1632297cae455d768a897004596d9">BusType</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d9d/a00813.html#9e1b4c17cdec41ff2b37479e63e7df3a">StartingAddress</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d9d/a00813.html#b8c3275d89c49240a5686078e30940b1">Bus</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d9d/a00813.html#faeeabb6e02011052afb97731c75b3bb">EndingAddress</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d9d/a00813.html#285a872a1a02a41a8c825aa577785e7b">Device</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d9d/a00813.html#c8a20b54c61b4cc25c9c23b4d5b08be9">MemoryArrayHandle</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d9d/a00813.html#d6a09b7d82e3537e271f66c5f5669727">Function</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d9d/a00813.html#200d27eb43fa49e21a17c3b549ec3927">PartitionWidth</a></td></tr>
+<tr><td class="memItemLeft" nowrap>union {</td></tr>
+
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../de/d9d/a00813.html#d33244a998532e0d95be76809ced551d">Byte</a> [256]</td></tr>
+
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../de/d9d/a00813.html#28ad251332ad5f6f867babc33939e0c6">Word</a> [128]</td></tr>
+
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../de/d9d/a00813.html#4796b44702672ef7612ef6160ba6aa29">Dword</a> [64]</td></tr>
+
+<tr><td class="memItemLeft" nowrap valign="top">}&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d9d/a00813.html#4ab3757a779b49467af0d8520eea03c1">Config</a></td></tr>
 
 </table>
-<hr><a name="_details"></a><h2>Detailed Description</h2>
-Memory Array Mapped Address (Type 19)<p>
-This structure provides the address mapping for a Physical Memory Array. One structure is present for each contiguous address range described. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="faeeabb6e02011052afb97731c75b3bb"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE19::EndingAddress" ref="faeeabb6e02011052afb97731c75b3bb" args="" -->
+<hr><h2>Field Documentation</h2>
+<a class="anchor" name="b8c3275d89c49240a5686078e30940b1"></a><!-- doxytag: member="s_pxe_pci_config_info::Bus" ref="b8c3275d89c49240a5686078e30940b1" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../de/d9d/a00813.html#faeeabb6e02011052afb97731c75b3bb">SMBIOS_TABLE_TYPE19::EndingAddress</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../de/d9d/a00813.html#b8c3275d89c49240a5686078e30940b1">s_pxe_pci_config_info::Bus</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This identifies the PCI network device that this UNDI interface is bound to. 
+</div>
+</div><p>
+<a class="anchor" name="56d1632297cae455d768a897004596d9"></a><!-- doxytag: member="s_pxe_pci_config_info::BusType" ref="56d1632297cae455d768a897004596d9" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../de/d9d/a00813.html#56d1632297cae455d768a897004596d9">s_pxe_pci_config_info::BusType</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This is the flag field for the PXE_DB_GET_CONFIG_INFO union. For PCI bus devices, this field is set to PXE_BUSTYPE_PCI. 
+</div>
+</div><p>
+<a class="anchor" name="d33244a998532e0d95be76809ced551d"></a><!-- doxytag: member="s_pxe_pci_config_info::Byte" ref="d33244a998532e0d95be76809ced551d" args="[256]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/d9d/a00813.html#d33244a998532e0d95be76809ced551d">s_pxe_pci_config_info::Byte</a>[256]          </td>
         </tr>
       </table>
 </div>
@@ -53,12 +89,27 @@ This structure provides the address mapping for a Physical Memory Array. One str
 
 </div>
 </div><p>
-<a class="anchor" name="381699fd655edd45593fbd7e78c85f1d"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE19::Hdr" ref="381699fd655edd45593fbd7e78c85f1d" args="" -->
+<a class="anchor" name="4ab3757a779b49467af0d8520eea03c1"></a><!-- doxytag: member="s_pxe_pci_config_info::Config" ref="4ab3757a779b49467af0d8520eea03c1" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../da/db8/a00797.html">SMBIOS_STRUCTURE</a> <a class="el" href="../../de/d9d/a00813.html#381699fd655edd45593fbd7e78c85f1d">SMBIOS_TABLE_TYPE19::Hdr</a>          </td>
+          <td class="memname">union { ... }   <a class="el" href="../../de/d9d/a00813.html#4ab3757a779b49467af0d8520eea03c1">s_pxe_pci_config_info::Config</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This is a copy of the PCI configuration space for this network device. 
+</div>
+</div><p>
+<a class="anchor" name="285a872a1a02a41a8c825aa577785e7b"></a><!-- doxytag: member="s_pxe_pci_config_info::Device" ref="285a872a1a02a41a8c825aa577785e7b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/d9d/a00813.html#285a872a1a02a41a8c825aa577785e7b">s_pxe_pci_config_info::Device</a>          </td>
         </tr>
       </table>
 </div>
@@ -68,12 +119,12 @@ This structure provides the address mapping for a Physical Memory Array. One str
 
 </div>
 </div><p>
-<a class="anchor" name="c8a20b54c61b4cc25c9c23b4d5b08be9"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE19::MemoryArrayHandle" ref="c8a20b54c61b4cc25c9c23b4d5b08be9" args="" -->
+<a class="anchor" name="4796b44702672ef7612ef6160ba6aa29"></a><!-- doxytag: member="s_pxe_pci_config_info::Dword" ref="4796b44702672ef7612ef6160ba6aa29" args="[64]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../de/d9d/a00813.html#c8a20b54c61b4cc25c9c23b4d5b08be9">SMBIOS_TABLE_TYPE19::MemoryArrayHandle</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../de/d9d/a00813.html#4796b44702672ef7612ef6160ba6aa29">s_pxe_pci_config_info::Dword</a>[64]          </td>
         </tr>
       </table>
 </div>
@@ -83,12 +134,12 @@ This structure provides the address mapping for a Physical Memory Array. One str
 
 </div>
 </div><p>
-<a class="anchor" name="200d27eb43fa49e21a17c3b549ec3927"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE19::PartitionWidth" ref="200d27eb43fa49e21a17c3b549ec3927" args="" -->
+<a class="anchor" name="d6a09b7d82e3537e271f66c5f5669727"></a><!-- doxytag: member="s_pxe_pci_config_info::Function" ref="d6a09b7d82e3537e271f66c5f5669727" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/d9d/a00813.html#200d27eb43fa49e21a17c3b549ec3927">SMBIOS_TABLE_TYPE19::PartitionWidth</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/d9d/a00813.html#d6a09b7d82e3537e271f66c5f5669727">s_pxe_pci_config_info::Function</a>          </td>
         </tr>
       </table>
 </div>
@@ -98,12 +149,12 @@ This structure provides the address mapping for a Physical Memory Array. One str
 
 </div>
 </div><p>
-<a class="anchor" name="9e1b4c17cdec41ff2b37479e63e7df3a"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE19::StartingAddress" ref="9e1b4c17cdec41ff2b37479e63e7df3a" args="" -->
+<a class="anchor" name="28ad251332ad5f6f867babc33939e0c6"></a><!-- doxytag: member="s_pxe_pci_config_info::Word" ref="28ad251332ad5f6f867babc33939e0c6" args="[128]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../de/d9d/a00813.html#9e1b4c17cdec41ff2b37479e63e7df3a">SMBIOS_TABLE_TYPE19::StartingAddress</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../de/d9d/a00813.html#28ad251332ad5f6f867babc33939e0c6">s_pxe_pci_config_info::Word</a>[128]          </td>
         </tr>
       </table>
 </div>
@@ -114,7 +165,7 @@ This structure provides the address mapping for a Physical Memory Array. One str
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:22 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:01 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

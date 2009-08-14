@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: s_pxe_cpb_mcast_ip_to_mac Struct Reference</title>
+<title>MdePkg[ALL]: PAL_PCOC_N_CACHE_INFO1 Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,30 +21,81 @@
   </div>
 </div>
 <div class="contents">
-<h1>s_pxe_cpb_mcast_ip_to_mac Struct Reference</h1><!-- doxytag: class="s_pxe_cpb_mcast_ip_to_mac" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>PAL_PCOC_N_CACHE_INFO1 Struct Reference</h1><!-- doxytag: class="PAL_PCOC_N_CACHE_INFO1" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d20/a00939.html">PXE_IP_ADDR</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/de8/a00749.html#c470305f88143a19dbab9b262106f0d9">IP</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/de8/a00749.html#3c4ed9de8187b4654947e0d57641269b">ThreadId</a>: 16</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/de8/a00749.html#54958f2f1471b33105a656822f3aab53">Reserved1</a>: 16</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/de8/a00749.html#7c0e46cfc1d4faab41dfef6320c79115">CoreId</a>: 16</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/de8/a00749.html#3ede097cb7ca48d88dacd52043b59fa0">Reserved2</a>: 16</td></tr>
 
 </table>
 <hr><h2>Field Documentation</h2>
-<a class="anchor" name="c470305f88143a19dbab9b262106f0d9"></a><!-- doxytag: member="s_pxe_cpb_mcast_ip_to_mac::IP" ref="c470305f88143a19dbab9b262106f0d9" args="" -->
+<a class="anchor" name="7c0e46cfc1d4faab41dfef6320c79115"></a><!-- doxytag: member="PAL_PCOC_N_CACHE_INFO1::CoreId" ref="7c0e46cfc1d4faab41dfef6320c79115" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dd/d20/a00939.html">PXE_IP_ADDR</a> <a class="el" href="../../d5/de8/a00749.html#c470305f88143a19dbab9b262106f0d9">s_pxe_cpb_mcast_ip_to_mac::IP</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d5/de8/a00749.html#7c0e46cfc1d4faab41dfef6320c79115">PAL_PCOC_N_CACHE_INFO1::CoreId</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Multicast IP address to be converted to multicast MAC address. 
+The core identifier of the logical processor for which information is being returned. This value will be unique on a per physical processor package basis. 
+</div>
+</div><p>
+<a class="anchor" name="54958f2f1471b33105a656822f3aab53"></a><!-- doxytag: member="PAL_PCOC_N_CACHE_INFO1::Reserved1" ref="54958f2f1471b33105a656822f3aab53" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d5/de8/a00749.html#54958f2f1471b33105a656822f3aab53">PAL_PCOC_N_CACHE_INFO1::Reserved1</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="3ede097cb7ca48d88dacd52043b59fa0"></a><!-- doxytag: member="PAL_PCOC_N_CACHE_INFO1::Reserved2" ref="3ede097cb7ca48d88dacd52043b59fa0" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d5/de8/a00749.html#3ede097cb7ca48d88dacd52043b59fa0">PAL_PCOC_N_CACHE_INFO1::Reserved2</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="3c4ed9de8187b4654947e0d57641269b"></a><!-- doxytag: member="PAL_PCOC_N_CACHE_INFO1::ThreadId" ref="3c4ed9de8187b4654947e0d57641269b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d5/de8/a00749.html#3c4ed9de8187b4654947e0d57641269b">PAL_PCOC_N_CACHE_INFO1::ThreadId</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+The thread identifier of the logical processor for which information is being returned. This value will be unique on a per core basis. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:21 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:56 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: u_pxe_cpb_nvdata_bulk Union Reference</title>
+<title>MdePkg[ALL]: tdTPM_FAMILY_TABLE_ENTRY Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,65 +21,99 @@
   </div>
 </div>
 <div class="contents">
-<h1>u_pxe_cpb_nvdata_bulk Union Reference</h1><!-- doxytag: class="u_pxe_cpb_nvdata_bulk" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>tdTPM_FAMILY_TABLE_ENTRY Struct Reference</h1><!-- doxytag: class="tdTPM_FAMILY_TABLE_ENTRY" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d19/a01190.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db9/a00937.html#a3700ea007b17c69edf9dcedab8f60db">Byte</a> [MAX_EEPROM_LEN&lt;&lt; 2]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d8e/a01050.html#69f3eb3e40aee2061dba5f9202fac1a2">TPM_STRUCTURE_TAG</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db9/a00937.html#017fcd45f6c07e4fa3797e73139de1b1">tag</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d19/a01190.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db9/a00937.html#e706c015dbcc1e10ac0c66dd057e8212">Word</a> [MAX_EEPROM_LEN&lt;&lt; 1]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d19/a00935.html">TPM_FAMILY_LABEL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db9/a00937.html#eae9e4d0891b643b3dd27a92105fe703">label</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d19/a01190.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db9/a00937.html#9cd1fb0430ee5b9dad045b5a9154c911">Dword</a> [MAX_EEPROM_LEN]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d8e/a01050.html#5d15fc9ef2bbb99d3baf5c371e895eef">TPM_FAMILY_ID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db9/a00937.html#eadf591750b74a3c64e57cf7864b799d">familyID</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d8e/a01050.html#f423240924821a0467ba36beef323d4b">TPM_FAMILY_VERIFICATION</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db9/a00937.html#dcc235fdbebb7429b4231158b46cf54a">verificationCount</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d8e/a01050.html#9263fa08281ed83765a9c683391227ae">TPM_FAMILY_FLAGS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db9/a00937.html#9e9634f0b12e1abda01f5e2c31b0b392">flags</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-When using bulk update, the size of the CPB structure must be the same size as the non-volatile NIC storage. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="a3700ea007b17c69edf9dcedab8f60db"></a><!-- doxytag: member="u_pxe_cpb_nvdata_bulk::Byte" ref="a3700ea007b17c69edf9dcedab8f60db" args="[MAX_EEPROM_LEN&lt;&lt; 2]" -->
+Part 2, section 20.5: TPM_FAMILY_TABLE_ENTRY <hr><h2>Field Documentation</h2>
+<a class="anchor" name="eadf591750b74a3c64e57cf7864b799d"></a><!-- doxytag: member="tdTPM_FAMILY_TABLE_ENTRY::familyID" ref="eadf591750b74a3c64e57cf7864b799d" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d19/a01190.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a> <a class="el" href="../../de/db9/a00937.html#a3700ea007b17c69edf9dcedab8f60db">u_pxe_cpb_nvdata_bulk::Byte</a>[MAX_EEPROM_LEN&lt;&lt; 2]          </td>
+          <td class="memname"><a class="el" href="../../d9/d8e/a01050.html#5d15fc9ef2bbb99d3baf5c371e895eef">TPM_FAMILY_ID</a> <a class="el" href="../../de/db9/a00937.html#eadf591750b74a3c64e57cf7864b799d">tdTPM_FAMILY_TABLE_ENTRY::familyID</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Array of byte-wide data items. 
+
 </div>
 </div><p>
-<a class="anchor" name="9cd1fb0430ee5b9dad045b5a9154c911"></a><!-- doxytag: member="u_pxe_cpb_nvdata_bulk::Dword" ref="9cd1fb0430ee5b9dad045b5a9154c911" args="[MAX_EEPROM_LEN]" -->
+<a class="anchor" name="9e9634f0b12e1abda01f5e2c31b0b392"></a><!-- doxytag: member="tdTPM_FAMILY_TABLE_ENTRY::flags" ref="9e9634f0b12e1abda01f5e2c31b0b392" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d19/a01190.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a> <a class="el" href="../../de/db9/a00937.html#9cd1fb0430ee5b9dad045b5a9154c911">u_pxe_cpb_nvdata_bulk::Dword</a>[MAX_EEPROM_LEN]          </td>
+          <td class="memname"><a class="el" href="../../d9/d8e/a01050.html#9263fa08281ed83765a9c683391227ae">TPM_FAMILY_FLAGS</a> <a class="el" href="../../de/db9/a00937.html#9e9634f0b12e1abda01f5e2c31b0b392">tdTPM_FAMILY_TABLE_ENTRY::flags</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Array of dword-wide data items. 
+
 </div>
 </div><p>
-<a class="anchor" name="e706c015dbcc1e10ac0c66dd057e8212"></a><!-- doxytag: member="u_pxe_cpb_nvdata_bulk::Word" ref="e706c015dbcc1e10ac0c66dd057e8212" args="[MAX_EEPROM_LEN&lt;&lt; 1]" -->
+<a class="anchor" name="eae9e4d0891b643b3dd27a92105fe703"></a><!-- doxytag: member="tdTPM_FAMILY_TABLE_ENTRY::label" ref="eae9e4d0891b643b3dd27a92105fe703" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d19/a01190.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a> <a class="el" href="../../de/db9/a00937.html#e706c015dbcc1e10ac0c66dd057e8212">u_pxe_cpb_nvdata_bulk::Word</a>[MAX_EEPROM_LEN&lt;&lt; 1]          </td>
+          <td class="memname"><a class="el" href="../../d8/d19/a00935.html">TPM_FAMILY_LABEL</a> <a class="el" href="../../de/db9/a00937.html#eae9e4d0891b643b3dd27a92105fe703">tdTPM_FAMILY_TABLE_ENTRY::label</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Array of word-wide data items. 
+
+</div>
+</div><p>
+<a class="anchor" name="017fcd45f6c07e4fa3797e73139de1b1"></a><!-- doxytag: member="tdTPM_FAMILY_TABLE_ENTRY::tag" ref="017fcd45f6c07e4fa3797e73139de1b1" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d9/d8e/a01050.html#69f3eb3e40aee2061dba5f9202fac1a2">TPM_STRUCTURE_TAG</a> <a class="el" href="../../de/db9/a00937.html#017fcd45f6c07e4fa3797e73139de1b1">tdTPM_FAMILY_TABLE_ENTRY::tag</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="dcc235fdbebb7429b4231158b46cf54a"></a><!-- doxytag: member="tdTPM_FAMILY_TABLE_ENTRY::verificationCount" ref="dcc235fdbebb7429b4231158b46cf54a" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d9/d8e/a01050.html#f423240924821a0467ba36beef323d4b">TPM_FAMILY_VERIFICATION</a> <a class="el" href="../../de/db9/a00937.html#dcc235fdbebb7429b4231158b46cf54a">tdTPM_FAMILY_TABLE_ENTRY::verificationCount</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:23 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:09 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

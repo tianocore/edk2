@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Guid/Acpi.h File Reference</title>
+<title>MdePkg[ALL]: tdTPM_PCR_INFO_SHORT Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -9,50 +9,36 @@
   <div class="tabs">
     <ul>
       <li><a href="../../main.html"><span>Main&nbsp;Page</span></a></li>
-      <li><a href="../../annotated.html"><span>Data&nbsp;Structures</span></a></li>
-      <li class="current"><a href="../../files.html"><span>Files</span></a></li>
+      <li class="current"><a href="../../annotated.html"><span>Data&nbsp;Structures</span></a></li>
+      <li><a href="../../files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div class="tabs">
     <ul>
-      <li><a href="../../files.html"><span>File&nbsp;List</span></a></li>
-      <li><a href="../../globals.html"><span>Globals</span></a></li>
+      <li><a href="../../annotated.html"><span>Data&nbsp;Structures</span></a></li>
+      <li><a href="../../functions.html"><span>Data&nbsp;Fields</span></a></li>
     </ul>
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Guid/Acpi.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>tdTPM_PCR_INFO_SHORT Struct Reference</h1><!-- doxytag: class="tdTPM_PCR_INFO_SHORT" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
-<tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/db6/a00955.html#50a528da5aa77cd9b6fd6d630b19aa6b">ACPI_TABLE_GUID</a></td></tr>
+<tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/de5/a00956.html">TPM_PCR_SELECTION</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/db6/a00955.html#723f2a19994df9322bb7b4f2ad369a99">pcrSelection</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/db6/a00955.html#9563147a6dd5e2316a9ca3ab8f9c3282">EFI_ACPI_TABLE_GUID</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d8e/a01050.html#6cae4116d5019cac895375106a47f8c9">TPM_LOCALITY_SELECTION</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/db6/a00955.html#304655550fe976a3c52598f7b531bd94">localityAtRelease</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/db6/a00955.html#ed73b80e97643a64958aae9e2d7e7740">ACPI_10_TABLE_GUID</a>&nbsp;&nbsp;&nbsp;ACPI_TABLE_GUID</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/db6/a00955.html#c2fea1641e55c1e7b878d2b508a9f0d3">EFI_ACPI_20_TABLE_GUID</a>&nbsp;&nbsp;&nbsp;EFI_ACPI_TABLE_GUID</td></tr>
-
-<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/db6/a00955.html#be6036a50fd61228a0003d77b9d90376">gEfiAcpiTableGuid</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/db6/a00955.html#b8c5cf5d23f50ab23da071ccbb41e292">gEfiAcpi10TableGuid</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/db6/a00955.html#bce95c3a582bb1685b2b43b2ab86456f">gEfiAcpi20TableGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/dbc/a00931.html">TPM_COMPOSITE_HASH</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/db6/a00955.html#b2a0ca3a86bea83536c2f5f3d864b592">digestAtRelease</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-GUIDs used for ACPI entries in the EFI system table<p>
-These GUIDs point the ACPI tables as defined in the ACPI specifications. ACPI 2.0 specification defines the ACPI 2.0 <a class="el" href="../../d9/d0f/a00644.html">GUID</a>. UEFI 2.0 defines the ACPI 2.0 Table <a class="el" href="../../d9/d0f/a00644.html">GUID</a> and ACPI Table <a class="el" href="../../d9/d0f/a00644.html">GUID</a>.<p>
-Copyright (c) 2006 - 2009, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
-<dl class="user" compact><dt><b>Revision Reference:</b></dt><dd>GUIDs defined in UEFI 2.0 spec. </dd></dl>
-<hr><h2>Define Documentation</h2>
-<a class="anchor" name="ed73b80e97643a64958aae9e2d7e7740"></a><!-- doxytag: member="Acpi.h::ACPI_10_TABLE_GUID" ref="ed73b80e97643a64958aae9e2d7e7740" args="" -->
+Part 2, section 8.5: TPM_PCR_INFO_SHORT <hr><h2>Field Documentation</h2>
+<a class="anchor" name="b2a0ca3a86bea83536c2f5f3d864b592"></a><!-- doxytag: member="tdTPM_PCR_INFO_SHORT::digestAtRelease" ref="b2a0ca3a86bea83536c2f5f3d864b592" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ACPI_10_TABLE_GUID&nbsp;&nbsp;&nbsp;ACPI_TABLE_GUID          </td>
+          <td class="memname"><a class="el" href="../../df/dbc/a00931.html">TPM_COMPOSITE_HASH</a> <a class="el" href="../../dc/db6/a00955.html#b2a0ca3a86bea83536c2f5f3d864b592">tdTPM_PCR_INFO_SHORT::digestAtRelease</a>          </td>
         </tr>
       </table>
 </div>
@@ -62,30 +48,12 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 </div>
 </div><p>
-<a class="anchor" name="50a528da5aa77cd9b6fd6d630b19aa6b"></a><!-- doxytag: member="Acpi.h::ACPI_TABLE_GUID" ref="50a528da5aa77cd9b6fd6d630b19aa6b" args="" -->
+<a class="anchor" name="304655550fe976a3c52598f7b531bd94"></a><!-- doxytag: member="tdTPM_PCR_INFO_SHORT::localityAtRelease" ref="304655550fe976a3c52598f7b531bd94" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ACPI_TABLE_GUID          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-<b>Value:</b><div class="fragment"><pre class="fragment">{ \
-    0xeb9d2d30, 0x2d88, 0x11d3, {0x9a, 0x16, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d } \
-  }
-</pre></div>
-</div>
-</div><p>
-<a class="anchor" name="c2fea1641e55c1e7b878d2b508a9f0d3"></a><!-- doxytag: member="Acpi.h::EFI_ACPI_20_TABLE_GUID" ref="c2fea1641e55c1e7b878d2b508a9f0d3" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_ACPI_20_TABLE_GUID&nbsp;&nbsp;&nbsp;EFI_ACPI_TABLE_GUID          </td>
+          <td class="memname"><a class="el" href="../../d9/d8e/a01050.html#6cae4116d5019cac895375106a47f8c9">TPM_LOCALITY_SELECTION</a> <a class="el" href="../../dc/db6/a00955.html#304655550fe976a3c52598f7b531bd94">tdTPM_PCR_INFO_SHORT::localityAtRelease</a>          </td>
         </tr>
       </table>
 </div>
@@ -95,61 +63,12 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 </div>
 </div><p>
-<a class="anchor" name="9563147a6dd5e2316a9ca3ab8f9c3282"></a><!-- doxytag: member="Acpi.h::EFI_ACPI_TABLE_GUID" ref="9563147a6dd5e2316a9ca3ab8f9c3282" args="" -->
+<a class="anchor" name="723f2a19994df9322bb7b4f2ad369a99"></a><!-- doxytag: member="tdTPM_PCR_INFO_SHORT::pcrSelection" ref="723f2a19994df9322bb7b4f2ad369a99" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_ACPI_TABLE_GUID          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-<b>Value:</b><div class="fragment"><pre class="fragment">{ \
-    0x8868e871, 0xe4f1, 0x11d3, {0xbc, 0x22, 0x0, 0x80, 0xc7, 0x3c, 0x88, 0x81 } \
-  }
-</pre></div>
-</div>
-</div><p>
-<hr><h2>Variable Documentation</h2>
-<a class="anchor" name="b8c5cf5d23f50ab23da071ccbb41e292"></a><!-- doxytag: member="Acpi.h::gEfiAcpi10TableGuid" ref="b8c5cf5d23f50ab23da071ccbb41e292" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../dc/db6/a00955.html#b8c5cf5d23f50ab23da071ccbb41e292">gEfiAcpi10TableGuid</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="bce95c3a582bb1685b2b43b2ab86456f"></a><!-- doxytag: member="Acpi.h::gEfiAcpi20TableGuid" ref="bce95c3a582bb1685b2b43b2ab86456f" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../dc/db6/a00955.html#bce95c3a582bb1685b2b43b2ab86456f">gEfiAcpi20TableGuid</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="be6036a50fd61228a0003d77b9d90376"></a><!-- doxytag: member="Acpi.h::gEfiAcpiTableGuid" ref="be6036a50fd61228a0003d77b9d90376" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../dc/db6/a00955.html#be6036a50fd61228a0003d77b9d90376">gEfiAcpiTableGuid</a>          </td>
+          <td class="memname"><a class="el" href="../../d3/de5/a00956.html">TPM_PCR_SELECTION</a> <a class="el" href="../../dc/db6/a00955.html#723f2a19994df9322bb7b4f2ad369a99">tdTPM_PCR_INFO_SHORT::pcrSelection</a>          </td>
         </tr>
       </table>
 </div>
@@ -160,7 +79,7 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:07 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:11 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

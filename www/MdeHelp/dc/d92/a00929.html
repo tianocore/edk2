@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: tdTPM_TRANSPORT_AUTH Struct Reference</title>
+<title>MdePkg[ALL]: tdTPM_DELEGATE_TABLE_ROW Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,22 +21,24 @@
   </div>
 </div>
 <div class="contents">
-<h1>tdTPM_TRANSPORT_AUTH Struct Reference</h1><!-- doxytag: class="tdTPM_TRANSPORT_AUTH" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>tdTPM_DELEGATE_TABLE_ROW Struct Reference</h1><!-- doxytag: class="tdTPM_DELEGATE_TABLE_ROW" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/d59/a01001.html#69f3eb3e40aee2061dba5f9202fac1a2">TPM_STRUCTURE_TAG</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d92/a00929.html#37997d2cd8b9cb3d660e1829ed31ce0b">tag</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d8e/a01050.html#69f3eb3e40aee2061dba5f9202fac1a2">TPM_STRUCTURE_TAG</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d92/a00929.html#d4570a6107073be3e294661497f649b0">tag</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/d59/a01001.html#6fe9a4836cfdea2a17effdbdfc689f15">TPM_AUTHDATA</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d92/a00929.html#2f9d7f373bf06b8e8913adcdc1019fa6">authData</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d38/a00926.html">TPM_DELEGATE_PUBLIC</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d92/a00929.html#746988ee21ffaf55a5e6160240c14511">pub</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d8e/a01050.html#06f4454a3bdd9176d98c4d188aa22b31">TPM_SECRET</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d92/a00929.html#ff24e69bbb0d100b0bc7eeca1a808289">authValue</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Part 2, section 13.5 TPM_TRANSPORT_AUTH structure <hr><h2>Field Documentation</h2>
-<a class="anchor" name="2f9d7f373bf06b8e8913adcdc1019fa6"></a><!-- doxytag: member="tdTPM_TRANSPORT_AUTH::authData" ref="2f9d7f373bf06b8e8913adcdc1019fa6" args="" -->
+Part 2, section 20.9: TPM_DELEGATE_TABLE_ROW <hr><h2>Field Documentation</h2>
+<a class="anchor" name="ff24e69bbb0d100b0bc7eeca1a808289"></a><!-- doxytag: member="tdTPM_DELEGATE_TABLE_ROW::authValue" ref="ff24e69bbb0d100b0bc7eeca1a808289" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../df/d59/a01001.html#6fe9a4836cfdea2a17effdbdfc689f15">TPM_AUTHDATA</a> <a class="el" href="../../dc/d92/a00929.html#2f9d7f373bf06b8e8913adcdc1019fa6">tdTPM_TRANSPORT_AUTH::authData</a>          </td>
+          <td class="memname"><a class="el" href="../../d9/d8e/a01050.html#06f4454a3bdd9176d98c4d188aa22b31">TPM_SECRET</a> <a class="el" href="../../dc/d92/a00929.html#ff24e69bbb0d100b0bc7eeca1a808289">tdTPM_DELEGATE_TABLE_ROW::authValue</a>          </td>
         </tr>
       </table>
 </div>
@@ -46,12 +48,27 @@ Part 2, section 13.5 TPM_TRANSPORT_AUTH structure <hr><h2>Field Documentation</h
 
 </div>
 </div><p>
-<a class="anchor" name="37997d2cd8b9cb3d660e1829ed31ce0b"></a><!-- doxytag: member="tdTPM_TRANSPORT_AUTH::tag" ref="37997d2cd8b9cb3d660e1829ed31ce0b" args="" -->
+<a class="anchor" name="746988ee21ffaf55a5e6160240c14511"></a><!-- doxytag: member="tdTPM_DELEGATE_TABLE_ROW::pub" ref="746988ee21ffaf55a5e6160240c14511" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../df/d59/a01001.html#69f3eb3e40aee2061dba5f9202fac1a2">TPM_STRUCTURE_TAG</a> <a class="el" href="../../dc/d92/a00929.html#37997d2cd8b9cb3d660e1829ed31ce0b">tdTPM_TRANSPORT_AUTH::tag</a>          </td>
+          <td class="memname"><a class="el" href="../../d8/d38/a00926.html">TPM_DELEGATE_PUBLIC</a> <a class="el" href="../../dc/d92/a00929.html#746988ee21ffaf55a5e6160240c14511">tdTPM_DELEGATE_TABLE_ROW::pub</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="d4570a6107073be3e294661497f649b0"></a><!-- doxytag: member="tdTPM_DELEGATE_TABLE_ROW::tag" ref="d4570a6107073be3e294661497f649b0" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d9/d8e/a01050.html#69f3eb3e40aee2061dba5f9202fac1a2">TPM_STRUCTURE_TAG</a> <a class="el" href="../../dc/d92/a00929.html#d4570a6107073be3e294661497f649b0">tdTPM_DELEGATE_TABLE_ROW::tag</a>          </td>
         </tr>
       </table>
 </div>
@@ -62,7 +79,7 @@ Part 2, section 13.5 TPM_TRANSPORT_AUTH structure <hr><h2>Field Documentation</h
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:23 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:09 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

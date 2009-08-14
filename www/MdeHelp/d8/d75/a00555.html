@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_PCI_ADDRESS Struct Reference</title>
+<title>MdePkg[ALL]: EFI_MEMORY_EXTENDED_ERROR_DATA Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,98 +21,116 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_PCI_ADDRESS Struct Reference</h1><!-- doxytag: class="EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_PCI_ADDRESS" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_MEMORY_EXTENDED_ERROR_DATA Struct Reference</h1><!-- doxytag: class="EFI_MEMORY_EXTENDED_ERROR_DATA" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d75/a00555.html#4d0e3317b285b2c798082de5a09a5110">Register</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/d2a/a00632.html">EFI_STATUS_CODE_DATA</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d75/a00555.html#fe453262dafe155208648a86773781c5">DataHeader</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d75/a00555.html#4b910f570f21db41e3462ac6dc96e4aa">Function</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../db/d08/a01028.html#1aa743409acf3b991bda829b0a1b47d7">EFI_MEMORY_ERROR_GRANULARITY</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d75/a00555.html#ab17f14f58661beca9a1bd889a48845f">Granularity</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d75/a00555.html#724042de94efc5d224c0a0b41755a32e">Device</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../db/d08/a01028.html#ec9f1b6c7d6c7abf7aa8f54fcbcff553">EFI_MEMORY_ERROR_OPERATION</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d75/a00555.html#d0dfc43d1a782c16213ffb12188cc84b">Operation</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d75/a00555.html#de866bd3af7cb2197b7ee11c5d18af0a">Bus</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d75/a00555.html#49fde495889d885953074273fea6ef88">Syndrome</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d75/a00555.html#f127e77ed3724137fd54626d8849910b">ExtendedRegister</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d95/a01247.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d75/a00555.html#3d13ac56e5d20783b978867fdea762db">Address</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d75/a00555.html#3a43edaa83601f853aeaab0f8d92f60d">Resolution</a></td></tr>
 
 </table>
-<hr><h2>Field Documentation</h2>
-<a class="anchor" name="de866bd3af7cb2197b7ee11c5d18af0a"></a><!-- doxytag: member="EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_PCI_ADDRESS::Bus" ref="de866bd3af7cb2197b7ee11c5d18af0a" args="" -->
+<hr><a name="_details"></a><h2>Detailed Description</h2>
+This structure provides specific details about the memory error that was detected. It provides enough information so that consumers can identify the exact failure and provides enough information to enable corrective action if necessary. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="3d13ac56e5d20783b978867fdea762db"></a><!-- doxytag: member="EFI_MEMORY_EXTENDED_ERROR_DATA::Address" ref="3d13ac56e5d20783b978867fdea762db" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d75/a00555.html#de866bd3af7cb2197b7ee11c5d18af0a">EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_PCI_ADDRESS::Bus</a>          </td>
+          <td class="memname"><a class="el" href="../../dd/d95/a01247.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> <a class="el" href="../../d8/d75/a00555.html#3d13ac56e5d20783b978867fdea762db">EFI_MEMORY_EXTENDED_ERROR_DATA::Address</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The physical address of the error. 
 </div>
 </div><p>
-<a class="anchor" name="724042de94efc5d224c0a0b41755a32e"></a><!-- doxytag: member="EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_PCI_ADDRESS::Device" ref="724042de94efc5d224c0a0b41755a32e" args="" -->
+<a class="anchor" name="fe453262dafe155208648a86773781c5"></a><!-- doxytag: member="EFI_MEMORY_EXTENDED_ERROR_DATA::DataHeader" ref="fe453262dafe155208648a86773781c5" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d75/a00555.html#724042de94efc5d224c0a0b41755a32e">EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_PCI_ADDRESS::Device</a>          </td>
+          <td class="memname"><a class="el" href="../../d4/d2a/a00632.html">EFI_STATUS_CODE_DATA</a> <a class="el" href="../../d8/d75/a00555.html#fe453262dafe155208648a86773781c5">EFI_MEMORY_EXTENDED_ERROR_DATA::DataHeader</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The data header identifying the data. DataHeader.HeaderSize should be sizeof (<a class="el" href="../../d4/d2a/a00632.html">EFI_STATUS_CODE_DATA</a>), DataHeader.Size should be sizeof (<a class="el" href="../../d8/d75/a00555.html">EFI_MEMORY_EXTENDED_ERROR_DATA</a>) - HeaderSize, and DataHeader.Type should be EFI_STATUS_CODE_SPECIFIC_DATA_GUID. 
 </div>
 </div><p>
-<a class="anchor" name="f127e77ed3724137fd54626d8849910b"></a><!-- doxytag: member="EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_PCI_ADDRESS::ExtendedRegister" ref="f127e77ed3724137fd54626d8849910b" args="" -->
+<a class="anchor" name="ab17f14f58661beca9a1bd889a48845f"></a><!-- doxytag: member="EFI_MEMORY_EXTENDED_ERROR_DATA::Granularity" ref="ab17f14f58661beca9a1bd889a48845f" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d8/d75/a00555.html#f127e77ed3724137fd54626d8849910b">EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_PCI_ADDRESS::ExtendedRegister</a>          </td>
+          <td class="memname"><a class="el" href="../../db/d08/a01028.html#1aa743409acf3b991bda829b0a1b47d7">EFI_MEMORY_ERROR_GRANULARITY</a> <a class="el" href="../../d8/d75/a00555.html#ab17f14f58661beca9a1bd889a48845f">EFI_MEMORY_EXTENDED_ERROR_DATA::Granularity</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The error granularity type. 
 </div>
 </div><p>
-<a class="anchor" name="4b910f570f21db41e3462ac6dc96e4aa"></a><!-- doxytag: member="EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_PCI_ADDRESS::Function" ref="4b910f570f21db41e3462ac6dc96e4aa" args="" -->
+<a class="anchor" name="d0dfc43d1a782c16213ffb12188cc84b"></a><!-- doxytag: member="EFI_MEMORY_EXTENDED_ERROR_DATA::Operation" ref="d0dfc43d1a782c16213ffb12188cc84b" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d75/a00555.html#4b910f570f21db41e3462ac6dc96e4aa">EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_PCI_ADDRESS::Function</a>          </td>
+          <td class="memname"><a class="el" href="../../db/d08/a01028.html#ec9f1b6c7d6c7abf7aa8f54fcbcff553">EFI_MEMORY_ERROR_OPERATION</a> <a class="el" href="../../d8/d75/a00555.html#d0dfc43d1a782c16213ffb12188cc84b">EFI_MEMORY_EXTENDED_ERROR_DATA::Operation</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The operation that resulted in the error being detected. 
 </div>
 </div><p>
-<a class="anchor" name="4d0e3317b285b2c798082de5a09a5110"></a><!-- doxytag: member="EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_PCI_ADDRESS::Register" ref="4d0e3317b285b2c798082de5a09a5110" args="" -->
+<a class="anchor" name="3a43edaa83601f853aeaab0f8d92f60d"></a><!-- doxytag: member="EFI_MEMORY_EXTENDED_ERROR_DATA::Resolution" ref="3a43edaa83601f853aeaab0f8d92f60d" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d75/a00555.html#4d0e3317b285b2c798082de5a09a5110">EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_PCI_ADDRESS::Register</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> <a class="el" href="../../d8/d75/a00555.html#3a43edaa83601f853aeaab0f8d92f60d">EFI_MEMORY_EXTENDED_ERROR_DATA::Resolution</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+The range, in bytes, within which the error address can be determined. 
+</div>
+</div><p>
+<a class="anchor" name="49fde495889d885953074273fea6ef88"></a><!-- doxytag: member="EFI_MEMORY_EXTENDED_ERROR_DATA::Syndrome" ref="49fde495889d885953074273fea6ef88" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> <a class="el" href="../../d8/d75/a00555.html#49fde495889d885953074273fea6ef88">EFI_MEMORY_EXTENDED_ERROR_DATA::Syndrome</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
 
+<p>
+The error syndrome, vendor-specific ECC syndrome, or CRC data associated with the error. If unknown, should be initialized to 0. Inconsistent with specification here: This field in StatusCodes spec0.9 is defined as UINT32, keep code unchanged. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:38 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

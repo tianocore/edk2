@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: _EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI Struct Reference</title>
+<title>MdePkg[ALL]: _EFI_PCI_HOTPLUG_REQUEST_PROTOCOL Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,31 +21,31 @@
   </div>
 </div>
 <div class="contents">
-<h1>_EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI Struct Reference</h1><!-- doxytag: class="_EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>_EFI_PCI_HOTPLUG_REQUEST_PROTOCOL Struct Reference</h1><!-- doxytag: class="_EFI_PCI_HOTPLUG_REQUEST_PROTOCOL" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d80/a01075.html#caeaf28c07bd47337f2cc876c60be878">EFI_PEI_EXTRACT_GUIDED_SECTION</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d24/a00222.html#b3af3858fd2637af9b0cd96cd185ac08">ExtractSection</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d31/a01208.html#af7cbb67687dd7128bcbc3803bab1509">EFI_PCI_HOTPLUG_REQUEST_NOTIFY</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d24/a00222.html#9925c0956c32b6386acf6979944a9a07">Notify</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-If a GUID-defined section is encountered when doing section extraction, the PEI Foundation or the EFI_PEI_FILE_LOADER_PPI instance calls the appropriate instance of the GUIDed Section Extraction PPI to extract the section stream contained therein. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="b3af3858fd2637af9b0cd96cd185ac08"></a><!-- doxytag: member="_EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI::ExtractSection" ref="b3af3858fd2637af9b0cd96cd185ac08" args="" -->
+Provides services to notify PCI bus driver that some events have happened in a hot-plug controller (for example, PC Card socket, or PHPC), and ask PCI bus driver to create or destroy handles for the PCI-like devices. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="9925c0956c32b6386acf6979944a9a07"></a><!-- doxytag: member="_EFI_PCI_HOTPLUG_REQUEST_PROTOCOL::Notify" ref="9925c0956c32b6386acf6979944a9a07" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dd/d80/a01075.html#caeaf28c07bd47337f2cc876c60be878">EFI_PEI_EXTRACT_GUIDED_SECTION</a> <a class="el" href="../../d0/d24/a00222.html#b3af3858fd2637af9b0cd96cd185ac08">_EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI::ExtractSection</a>          </td>
+          <td class="memname"><a class="el" href="../../d9/d31/a01208.html#af7cbb67687dd7128bcbc3803bab1509">EFI_PCI_HOTPLUG_REQUEST_NOTIFY</a> <a class="el" href="../../d0/d24/a00222.html#9925c0956c32b6386acf6979944a9a07">_EFI_PCI_HOTPLUG_REQUEST_PROTOCOL::Notify</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+Notify the PCI bus driver that some events have happened in a hot-plug controller (for example, PC Card socket, or PHPC), and ask PCI bus driver to create or destroy handles for the PCI-like devices. See Section 0 for a detailed description. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:13 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:16 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

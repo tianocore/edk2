@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: ATAPI_PACKET_COMMAND Union Reference</title>
+<title>MdePkg[ALL]: _WIN_CERTIFICATE_EFI_PKCS1_15 Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,133 +21,49 @@
   </div>
 </div>
 <div class="contents">
-<h1>ATAPI_PACKET_COMMAND Union Reference</h1><!-- doxytag: class="ATAPI_PACKET_COMMAND" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>_WIN_CERTIFICATE_EFI_PKCS1_15 Struct Reference</h1><!-- doxytag: class="_WIN_CERTIFICATE_EFI_PKCS1_15" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dfe/a00283.html#913ee8592424e2c85c3fe4a25a8bf703">Data16</a> [6]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc9/a00282.html">WIN_CERTIFICATE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dfe/a00283.html#c311c8583804989b7ef05177032387e3">Hdr</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/d25/a00290.html">ATAPI_TEST_UNIT_READY_CMD</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dfe/a00283.html#d6e7214c11d6d961dcf37d726eaada6e">TestUnitReady</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../db/dc3/a00284.html">ATAPI_READ10_CMD</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dfe/a00283.html#7cfb67ae0c7f30acdf11af17090250f3">Read10</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../da/ddc/a00288.html">ATAPI_REQUEST_SENSE_CMD</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dfe/a00283.html#05fe32f2fa5e19fd49a842020df27efb">RequestSence</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/dcd/a00280.html">ATAPI_INQUIRY_CMD</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dfe/a00283.html#452b163e5ee1c958e2ec2c127ff8436d">Inquiry</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc9/a00282.html">ATAPI_MODE_SENSE_CMD</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dfe/a00283.html#c3ef07e2b2fddbdd03c6fc9296280669">ModeSense</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d5/d7b/a00286.html">ATAPI_READ_FORMAT_CAP_CMD</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dfe/a00283.html#0470098fa2e1e2e6879b8efbbf2c8eaa">ReadFormatCapacity</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dfe/a00283.html#da2a3f8b801550fc9f550af6c5cb9bc7">HashAlgorithm</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-<a class="el" href="../../dd/dfe/a00283.html">ATAPI_PACKET_COMMAND</a> is not defined in ATA specification. We add it here for the convenience for ATA/ATAPI module writer. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="913ee8592424e2c85c3fe4a25a8bf703"></a><!-- doxytag: member="ATAPI_PACKET_COMMAND::Data16" ref="913ee8592424e2c85c3fe4a25a8bf703" args="[6]" -->
+Certificate which encapsulates the RSASSA_PKCS1-v1_5 digital signature.<p>
+The WIN_CERTIFICATE_UEFI_PKCS1_15 structure is derived from WIN_CERTIFICATE and encapsulate the information needed to implement the RSASSA-PKCS1-v1_5 digital signature algorithm as specified in RFC2437. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="da2a3f8b801550fc9f550af6c5cb9bc7"></a><!-- doxytag: member="_WIN_CERTIFICATE_EFI_PKCS1_15::HashAlgorithm" ref="da2a3f8b801550fc9f550af6c5cb9bc7" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dd/dfe/a00283.html#913ee8592424e2c85c3fe4a25a8bf703">ATAPI_PACKET_COMMAND::Data16</a>[6]          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../dd/dfe/a00283.html#da2a3f8b801550fc9f550af6c5cb9bc7">_WIN_CERTIFICATE_EFI_PKCS1_15::HashAlgorithm</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+This is the hashing algorithm which was performed on the UEFI executable when creating the digital signature. 
 </div>
 </div><p>
-<a class="anchor" name="452b163e5ee1c958e2ec2c127ff8436d"></a><!-- doxytag: member="ATAPI_PACKET_COMMAND::Inquiry" ref="452b163e5ee1c958e2ec2c127ff8436d" args="" -->
+<a class="anchor" name="c311c8583804989b7ef05177032387e3"></a><!-- doxytag: member="_WIN_CERTIFICATE_EFI_PKCS1_15::Hdr" ref="c311c8583804989b7ef05177032387e3" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/dcd/a00280.html">ATAPI_INQUIRY_CMD</a> <a class="el" href="../../dd/dfe/a00283.html#452b163e5ee1c958e2ec2c127ff8436d">ATAPI_PACKET_COMMAND::Inquiry</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc9/a00282.html">WIN_CERTIFICATE</a> <a class="el" href="../../dd/dfe/a00283.html#c311c8583804989b7ef05177032387e3">_WIN_CERTIFICATE_EFI_PKCS1_15::Hdr</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<a class="anchor" name="c3ef07e2b2fddbdd03c6fc9296280669"></a><!-- doxytag: member="ATAPI_PACKET_COMMAND::ModeSense" ref="c3ef07e2b2fddbdd03c6fc9296280669" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../dc/dc9/a00282.html">ATAPI_MODE_SENSE_CMD</a> <a class="el" href="../../dd/dfe/a00283.html#c3ef07e2b2fddbdd03c6fc9296280669">ATAPI_PACKET_COMMAND::ModeSense</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="7cfb67ae0c7f30acdf11af17090250f3"></a><!-- doxytag: member="ATAPI_PACKET_COMMAND::Read10" ref="7cfb67ae0c7f30acdf11af17090250f3" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../db/dc3/a00284.html">ATAPI_READ10_CMD</a> <a class="el" href="../../dd/dfe/a00283.html#7cfb67ae0c7f30acdf11af17090250f3">ATAPI_PACKET_COMMAND::Read10</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="0470098fa2e1e2e6879b8efbbf2c8eaa"></a><!-- doxytag: member="ATAPI_PACKET_COMMAND::ReadFormatCapacity" ref="0470098fa2e1e2e6879b8efbbf2c8eaa" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d5/d7b/a00286.html">ATAPI_READ_FORMAT_CAP_CMD</a> <a class="el" href="../../dd/dfe/a00283.html#0470098fa2e1e2e6879b8efbbf2c8eaa">ATAPI_PACKET_COMMAND::ReadFormatCapacity</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="05fe32f2fa5e19fd49a842020df27efb"></a><!-- doxytag: member="ATAPI_PACKET_COMMAND::RequestSence" ref="05fe32f2fa5e19fd49a842020df27efb" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../da/ddc/a00288.html">ATAPI_REQUEST_SENSE_CMD</a> <a class="el" href="../../dd/dfe/a00283.html#05fe32f2fa5e19fd49a842020df27efb">ATAPI_PACKET_COMMAND::RequestSence</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="d6e7214c11d6d961dcf37d726eaada6e"></a><!-- doxytag: member="ATAPI_PACKET_COMMAND::TestUnitReady" ref="d6e7214c11d6d961dcf37d726eaada6e" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../de/d25/a00290.html">ATAPI_TEST_UNIT_READY_CMD</a> <a class="el" href="../../dd/dfe/a00283.html#d6e7214c11d6d961dcf37d726eaada6e">ATAPI_PACKET_COMMAND::TestUnitReady</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
+This is the standard WIN_CERTIFICATE header, where wCertificateType is set to WIN_CERT_TYPE_UEFI_PKCS1_15. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:14 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:19 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

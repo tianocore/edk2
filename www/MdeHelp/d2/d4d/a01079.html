@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Ppi/LoadImage.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Library/PeCoffExtraActionLib.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,77 +21,75 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Ppi/LoadImage.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Library/PeCoffExtraActionLib.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
-<tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/ddf/a00224.html">_EFI_PEI_LOADED_IMAGE_PPI</a></td></tr>
+<tr><td colspan="2"><br><h2>Functions</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d4d/a01079.html#9695495ab0c3d5f0f569ceb2cf5021cf">PeCoffLoaderRelocateImageExtraAction</a> (IN OUT <a class="el" href="../../d6/d86/a00781.html">PE_COFF_LOADER_IMAGE_CONTEXT</a> *ImageContext)</td></tr>
 
-<tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d4d/a01079.html#b90b7056914bbaff295793e2e64b97c5">EFI_PEI_LOADED_IMAGE_PPI_GUID</a>&nbsp;&nbsp;&nbsp;{ 0xc1fcd448, 0x6300, 0x4458, { 0xb8, 0x64, 0x28, 0xdf, 0x1, 0x53, 0x64, 0xbc } }</td></tr>
-
-<tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
-<a class="el" href="../../d5/ddf/a00224.html">_EFI_PEI_LOADED_IMAGE_PPI</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d4d/a01079.html#77dffe027dff3d9ed00f026e7c0848b3">EFI_PEI_LOADED_IMAGE_PPI</a></td></tr>
-
-<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d4d/a01079.html#57211dc5411aae9a4862ea07e894c256">gEfiPeiLoadedImagePpiGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d4d/a01079.html#6efe0fb49a1cfcb84fe2700e67be2ee0">PeCoffLoaderUnloadImageExtraAction</a> (IN OUT <a class="el" href="../../d6/d86/a00781.html">PE_COFF_LOADER_IMAGE_CONTEXT</a> *ImageContext)</td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-The file describes the PPI which notifies other drivers of the PEIM being initialized by the PEI Dispatcher.<p>
-Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
-<dl class="user" compact><dt><b>Revision Reference:</b></dt><dd>This PPI is introduced in PI Version 1.0. </dd></dl>
-<hr><h2>Define Documentation</h2>
-<a class="anchor" name="b90b7056914bbaff295793e2e64b97c5"></a><!-- doxytag: member="LoadImage.h::EFI_PEI_LOADED_IMAGE_PPI_GUID" ref="b90b7056914bbaff295793e2e64b97c5" args="" -->
+Provides services to perform additional actions when a PE/COFF image is loaded or unloaded. This is useful for environment where symbols need to be loaded and unloaded to support source level debugging.<p>
+Copyright (c) 2009, Intel Corporation<br>
+ All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Function Documentation</h2>
+<a class="anchor" name="9695495ab0c3d5f0f569ceb2cf5021cf"></a><!-- doxytag: member="PeCoffExtraActionLib.h::PeCoffLoaderRelocateImageExtraAction" ref="9695495ab0c3d5f0f569ceb2cf5021cf" args="(IN OUT PE_COFF_LOADER_IMAGE_CONTEXT *ImageContext)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_PEI_LOADED_IMAGE_PPI_GUID&nbsp;&nbsp;&nbsp;{ 0xc1fcd448, 0x6300, 0x4458, { 0xb8, 0x64, 0x28, 0xdf, 0x1, 0x53, 0x64, 0xbc } }          </td>
+          <td class="memname">VOID EFIAPI PeCoffLoaderRelocateImageExtraAction           </td>
+          <td>(</td>
+          <td class="paramtype">IN OUT <a class="el" href="../../d6/d86/a00781.html">PE_COFF_LOADER_IMAGE_CONTEXT</a> *&nbsp;</td>
+          <td class="paramname"> <em>ImageContext</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+Performs additional actions after a PE/COFF image has been loaded and relocated.<p>
+If ImageContext is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>ImageContext</em>&nbsp;</td><td>Pointer to the image context structure that describes the PE/COFF image that has already been loaded and relocated. </td></tr>
+  </table>
+</dl>
 
 </div>
 </div><p>
-<hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="77dffe027dff3d9ed00f026e7c0848b3"></a><!-- doxytag: member="LoadImage.h::EFI_PEI_LOADED_IMAGE_PPI" ref="77dffe027dff3d9ed00f026e7c0848b3" args="" -->
+<a class="anchor" name="6efe0fb49a1cfcb84fe2700e67be2ee0"></a><!-- doxytag: member="PeCoffExtraActionLib.h::PeCoffLoaderUnloadImageExtraAction" ref="6efe0fb49a1cfcb84fe2700e67be2ee0" args="(IN OUT PE_COFF_LOADER_IMAGE_CONTEXT *ImageContext)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef struct <a class="el" href="../../d5/ddf/a00224.html">_EFI_PEI_LOADED_IMAGE_PPI</a> <a class="el" href="../../d5/ddf/a00224.html">EFI_PEI_LOADED_IMAGE_PPI</a>          </td>
+          <td class="memname">VOID EFIAPI PeCoffLoaderUnloadImageExtraAction           </td>
+          <td>(</td>
+          <td class="paramtype">IN OUT <a class="el" href="../../d6/d86/a00781.html">PE_COFF_LOADER_IMAGE_CONTEXT</a> *&nbsp;</td>
+          <td class="paramname"> <em>ImageContext</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<hr><h2>Variable Documentation</h2>
-<a class="anchor" name="57211dc5411aae9a4862ea07e894c256"></a><!-- doxytag: member="LoadImage.h::gEfiPeiLoadedImagePpiGuid" ref="57211dc5411aae9a4862ea07e894c256" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../d2/d4d/a01079.html#57211dc5411aae9a4862ea07e894c256">gEfiPeiLoadedImagePpiGuid</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
+Performs additional actions just before a PE/COFF image is unloaded. Any resources that were allocated by <a class="el" href="../../d2/d4d/a01079.html#9695495ab0c3d5f0f569ceb2cf5021cf">PeCoffLoaderRelocateImageExtraAction()</a> must be freed.<p>
+If ImageContext is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>ImageContext</em>&nbsp;</td><td>Pointer to the image context structure that describes the PE/COFF image that is being unloaded. </td></tr>
+  </table>
+</dl>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:09 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:22 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

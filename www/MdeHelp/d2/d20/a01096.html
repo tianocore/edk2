@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Protocol/AcpiTable.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Library/UefiApplicationEntryPoint.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,139 +21,278 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Protocol/AcpiTable.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Library/UefiApplicationEntryPoint.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
-<tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d46/a00002.html">_EFI_ACPI_TABLE_PROTOCOL</a></td></tr>
+<tr><td colspan="2"><br><h2>Functions</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d20/a01096.html#7622e83f4bd6513fba3be378b881f5ac">_ModuleEntryPoint</a> (IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ImageHandle, IN <a class="el" href="../../d6/dcf/a00645.html">EFI_SYSTEM_TABLE</a> *SystemTable)</td></tr>
 
-<tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d20/a01096.html#2a0575492c9afce99df854e4437a2362">EFI_ACPI_TABLE_PROTOCOL_GUID</a>&nbsp;&nbsp;&nbsp;{ 0xffe06bdd, 0x6107, 0x46a6, { 0x7b, 0xb2, 0x5a, 0x9c, 0x7e, 0xc5, 0x27, 0x5c }}</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d20/a01096.html#db5f47969c4b05d408b1afb127598fc4">EfiMain</a> (IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ImageHandle, IN <a class="el" href="../../d6/dcf/a00645.html">EFI_SYSTEM_TABLE</a> *SystemTable)</td></tr>
 
-<tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
-<a class="el" href="../../d7/d46/a00002.html">_EFI_ACPI_TABLE_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d20/a01096.html#d0b1d1b633b85274326cd7e1066085b4">EFI_ACPI_TABLE_PROTOCOL</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d20/a01096.html#b46cf12426652c38141c12d282c2c9a8">Exit</a> (IN <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> Status)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d20/a01096.html#36be692428f38f3758d27325b9ffe9aa">EFI_ACPI_TABLE_INSTALL_ACPI_TABLE</a> )(IN CONST <a class="el" href="../../d7/d46/a00002.html">EFI_ACPI_TABLE_PROTOCOL</a> *This, IN CONST VOID *AcpiTableBuffer, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> AcpiTableBufferSize, OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *TableKey)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d20/a01096.html#cc49b16375e37b32cbed1d337c8bc257">ProcessLibraryConstructorList</a> (IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ImageHandle, IN <a class="el" href="../../d6/dcf/a00645.html">EFI_SYSTEM_TABLE</a> *SystemTable)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d20/a01096.html#7017e9322e2586571acfb3240725b712">EFI_ACPI_TABLE_UNINSTALL_ACPI_TABLE</a> )(IN CONST <a class="el" href="../../d7/d46/a00002.html">EFI_ACPI_TABLE_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TableKey)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d20/a01096.html#2fab933ac696811d7b309613c76aef61">ProcessLibraryDestructorList</a> (IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ImageHandle, IN <a class="el" href="../../d6/dcf/a00645.html">EFI_SYSTEM_TABLE</a> *SystemTable)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d20/a01096.html#c5da97ff69e146c7fe54851c016af6b9">ProcessModuleEntryPointList</a> (IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ImageHandle, IN <a class="el" href="../../d6/dcf/a00645.html">EFI_SYSTEM_TABLE</a> *SystemTable)</td></tr>
 
 <tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d20/a01096.html#fd5b88213bc4aeb13b69e2c12f6eb558">gEfiAcpiTableProtocolGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">CONST <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d20/a01096.html#11df2ecfb51936897668dbae420bea14">_gUefiDriverRevision</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-The file provides the protocol to install or remove an ACPI table from a platform.<p>
-Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
-<a class="anchor" name="2a0575492c9afce99df854e4437a2362"></a><!-- doxytag: member="AcpiTable.h::EFI_ACPI_TABLE_PROTOCOL_GUID" ref="2a0575492c9afce99df854e4437a2362" args="" -->
+Module entry point library for UEFI Applications.<p>
+Copyright (c) 2007 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Function Documentation</h2>
+<a class="anchor" name="7622e83f4bd6513fba3be378b881f5ac"></a><!-- doxytag: member="UefiApplicationEntryPoint.h::_ModuleEntryPoint" ref="7622e83f4bd6513fba3be378b881f5ac" args="(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE *SystemTable)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_ACPI_TABLE_PROTOCOL_GUID&nbsp;&nbsp;&nbsp;{ 0xffe06bdd, 0x6107, 0x46a6, { 0x7b, 0xb2, 0x5a, 0x9c, 0x7e, 0xc5, 0x27, 0x5c }}          </td>
+          <td class="memname"><a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI _ModuleEntryPoint           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>&nbsp;</td>
+          <td class="paramname"> <em>ImageHandle</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d6/dcf/a00645.html">EFI_SYSTEM_TABLE</a> *&nbsp;</td>
+          <td class="paramname"> <em>SystemTable</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="36be692428f38f3758d27325b9ffe9aa"></a><!-- doxytag: member="AcpiTable.h::EFI_ACPI_TABLE_INSTALL_ACPI_TABLE" ref="36be692428f38f3758d27325b9ffe9aa" args=")(IN CONST EFI_ACPI_TABLE_PROTOCOL *This, IN CONST VOID *AcpiTableBuffer, IN UINTN AcpiTableBufferSize, OUT UINTN *TableKey)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d2/d20/a01096.html#36be692428f38f3758d27325b9ffe9aa">EFI_ACPI_TABLE_INSTALL_ACPI_TABLE</a>)(IN CONST <a class="el" href="../../d7/d46/a00002.html">EFI_ACPI_TABLE_PROTOCOL</a> *This, IN CONST VOID *AcpiTableBuffer, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> AcpiTableBufferSize, OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *TableKey)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-The InstallAcpiTable() function allows a caller to install an ACPI table. When successful, the table will be linked by the RSDT/XSDT. AcpiTableBuffer specifies the table to be installed. InstallAcpiTable() will make a copy of the table and insert the copy into the RSDT/XSDT. InstallAcpiTable() must insert the new table at the end of the RSDT/XSDT. To prevent namespace collision, ACPI tables may be created using UEFI ACPI table format. On successful output, TableKey is initialized with a unique key. Its value may be used in a subsequent call to UninstallAcpiTable to remove an ACPI table. If an EFI application is running at the time of this call, the relevant <a class="el" href="../../d9/da1/a00396.html">EFI_CONFIGURATION_TABLE</a> pointer to the RSDT is no longer considered valid.<p>
+Entry point to UEFI Application.<p>
+This function is the entry point for a UEFI Application. This function must call <a class="el" href="../../d0/dfb/a01066.html#cc49b16375e37b32cbed1d337c8bc257">ProcessLibraryConstructorList()</a>, <a class="el" href="../../d0/dfb/a01066.html#a091d526aa9a254679bbf7886e77921e">ProcessModuleEntryPointList()</a>, and <a class="el" href="../../d2/d20/a01096.html#2fab933ac696811d7b309613c76aef61">ProcessLibraryDestructorList()</a>. The return value from <a class="el" href="../../d0/dfb/a01066.html#a091d526aa9a254679bbf7886e77921e">ProcessModuleEntryPointList()</a> is returned. If _gUefiDriverRevision is not zero and SystemTable-&gt;Hdr.Revision is less than _gUefiDriverRevison, then return EFI_INCOMPATIBLE_VERSION.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to a EFI_ACPI_TABLE_PROTOCOL.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>AcpiTableBuffer</em>&nbsp;</td><td>A pointer to a buffer containing the ACPI table to be installed.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>AcpiTableBufferSize</em>&nbsp;</td><td>Specifies the size, in bytes, of the AcpiTableBuffer buffer.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>TableKey</em>&nbsp;</td><td>Returns a key to refer to the ACPI table.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ImageHandle</em>&nbsp;</td><td>The image handle of the UEFI Application. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>SystemTable</em>&nbsp;</td><td>A pointer to the EFI System Table.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The table was successfully inserted</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Either AcpiTableBuffer is NULL, TableKey is NULL, or AcpiTableBufferSize and the size field embedded in the ACPI table pointed to by AcpiTableBuffer are not in sync.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>Insufficient resources exist to complete the request. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The UEFI Application exited normally. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INCOMPATIBLE_VERSION</em>&nbsp;</td><td>_gUefiDriverRevision is greater than SystemTable-&gt;Hdr.Revision. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Other</em>&nbsp;</td><td>Return value from <a class="el" href="../../d0/dfb/a01066.html#a091d526aa9a254679bbf7886e77921e">ProcessModuleEntryPointList()</a>. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
-<a class="anchor" name="d0b1d1b633b85274326cd7e1066085b4"></a><!-- doxytag: member="AcpiTable.h::EFI_ACPI_TABLE_PROTOCOL" ref="d0b1d1b633b85274326cd7e1066085b4" args="" -->
+<a class="anchor" name="db5f47969c4b05d408b1afb127598fc4"></a><!-- doxytag: member="UefiApplicationEntryPoint.h::EfiMain" ref="db5f47969c4b05d408b1afb127598fc4" args="(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE *SystemTable)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef struct <a class="el" href="../../d7/d46/a00002.html">_EFI_ACPI_TABLE_PROTOCOL</a> <a class="el" href="../../d7/d46/a00002.html">EFI_ACPI_TABLE_PROTOCOL</a>          </td>
+          <td class="memname"><a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI EfiMain           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>&nbsp;</td>
+          <td class="paramname"> <em>ImageHandle</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d6/dcf/a00645.html">EFI_SYSTEM_TABLE</a> *&nbsp;</td>
+          <td class="paramname"> <em>SystemTable</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<a class="anchor" name="7017e9322e2586571acfb3240725b712"></a><!-- doxytag: member="AcpiTable.h::EFI_ACPI_TABLE_UNINSTALL_ACPI_TABLE" ref="7017e9322e2586571acfb3240725b712" args=")(IN CONST EFI_ACPI_TABLE_PROTOCOL *This, IN UINTN TableKey)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d2/d20/a01096.html#7017e9322e2586571acfb3240725b712">EFI_ACPI_TABLE_UNINSTALL_ACPI_TABLE</a>)(IN CONST <a class="el" href="../../d7/d46/a00002.html">EFI_ACPI_TABLE_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TableKey)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-The UninstallAcpiTable() function allows a caller to remove an ACPI table. The routine will remove its reference from the RSDT/XSDT. A table is referenced by the TableKey parameter returned from a prior call to InstallAcpiTable(). If an EFI application is running at the time of this call, the relevant <a class="el" href="../../d9/da1/a00396.html">EFI_CONFIGURATION_TABLE</a> pointer to the RSDT is no longer considered valid.<p>
+Required by the EBC compiler and identical in functionality to <a class="el" href="../../d0/dfb/a01066.html#43f1da4ebdcfb71480bc45d8939b7874">_ModuleEntryPoint()</a>.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to a EFI_ACPI_TABLE_PROTOCOL.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>TableKey</em>&nbsp;</td><td>Specifies the table to uninstall. The key was returned from InstallAcpiTable().</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ImageHandle</em>&nbsp;</td><td>The image handle of the UEFI Application. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>SystemTable</em>&nbsp;</td><td>A pointer to the EFI System Table.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The table was successfully inserted</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>TableKey does not refer to a valid key for a table entry.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>Insufficient resources exist to complete the request. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The UEFI Application exited normally. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INCOMPATIBLE_VERSION</em>&nbsp;</td><td>_gUefiDriverRevision is greater than SystemTable-&gt;Hdr.Revision. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Other</em>&nbsp;</td><td>Return value from <a class="el" href="../../d0/dfb/a01066.html#a091d526aa9a254679bbf7886e77921e">ProcessModuleEntryPointList()</a>. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="b46cf12426652c38141c12d282c2c9a8"></a><!-- doxytag: member="UefiApplicationEntryPoint.h::Exit" ref="b46cf12426652c38141c12d282c2c9a8" args="(IN EFI_STATUS Status)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">VOID EFIAPI Exit           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>&nbsp;</td>
+          <td class="paramname"> <em>Status</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Invokes the library destructors for all dependent libraries and terminates the UEFI Application.<p>
+This function calls <a class="el" href="../../d2/d20/a01096.html#2fab933ac696811d7b309613c76aef61">ProcessLibraryDestructorList()</a> and the EFI Boot Service <a class="el" href="../../d2/d20/a01096.html#b46cf12426652c38141c12d282c2c9a8">Exit()</a> with a status specified by Status.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Status</em>&nbsp;</td><td>Status returned by the application that is exiting. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="cc49b16375e37b32cbed1d337c8bc257"></a><!-- doxytag: member="UefiApplicationEntryPoint.h::ProcessLibraryConstructorList" ref="cc49b16375e37b32cbed1d337c8bc257" args="(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE *SystemTable)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">VOID EFIAPI ProcessLibraryConstructorList           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>&nbsp;</td>
+          <td class="paramname"> <em>ImageHandle</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d6/dcf/a00645.html">EFI_SYSTEM_TABLE</a> *&nbsp;</td>
+          <td class="paramname"> <em>SystemTable</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Autogenerated function that calls the library constructors for all of the module's dependent libraries.<p>
+This function must be called by <a class="el" href="../../d0/dfb/a01066.html#43f1da4ebdcfb71480bc45d8939b7874">_ModuleEntryPoint()</a>. This function calls the set of library constructors for the set of library instances that a module depends on. This includes library instances that a module depends on directly and library instances that a module depends on indirectly through other libraries. This function is autogenerated by build tools and those build tools are responsible for collecting the set of library instances, determine which ones have constructors, and calling the library constructors in the proper order based upon each of the library instances own dependencies.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>ImageHandle</em>&nbsp;</td><td>The image handle of the UEFI Application. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>SystemTable</em>&nbsp;</td><td>A pointer to the EFI System Table. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="2fab933ac696811d7b309613c76aef61"></a><!-- doxytag: member="UefiApplicationEntryPoint.h::ProcessLibraryDestructorList" ref="2fab933ac696811d7b309613c76aef61" args="(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE *SystemTable)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">VOID EFIAPI ProcessLibraryDestructorList           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>&nbsp;</td>
+          <td class="paramname"> <em>ImageHandle</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d6/dcf/a00645.html">EFI_SYSTEM_TABLE</a> *&nbsp;</td>
+          <td class="paramname"> <em>SystemTable</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Autogenerated function that calls the library descructors for all of the module's dependent libraries.<p>
+This function may be called by <a class="el" href="../../d0/dfb/a01066.html#43f1da4ebdcfb71480bc45d8939b7874">_ModuleEntryPoint()</a>or <a class="el" href="../../d2/d20/a01096.html#b46cf12426652c38141c12d282c2c9a8">Exit()</a>. This function calls the set of library destructors for the set of library instances that a module depends on. This includes library instances that a module depends on directly and library instances that a module depends on indirectly through other libraries. This function is autogenerated by build tools and those build tools are responsible for collecting the set of library instances, determine which ones have destructors, and calling the library destructors in the proper order based upon each of the library instances own dependencies.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>ImageHandle</em>&nbsp;</td><td>The image handle of the UEFI Application. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>SystemTable</em>&nbsp;</td><td>A pointer to the EFI System Table. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="c5da97ff69e146c7fe54851c016af6b9"></a><!-- doxytag: member="UefiApplicationEntryPoint.h::ProcessModuleEntryPointList" ref="c5da97ff69e146c7fe54851c016af6b9" args="(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE *SystemTable)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI ProcessModuleEntryPointList           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>&nbsp;</td>
+          <td class="paramname"> <em>ImageHandle</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d6/dcf/a00645.html">EFI_SYSTEM_TABLE</a> *&nbsp;</td>
+          <td class="paramname"> <em>SystemTable</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function calls the set of module entry points. It must be called by <a class="el" href="../../d0/dfb/a01066.html#43f1da4ebdcfb71480bc45d8939b7874">_ModuleEntryPoint()</a>.<p>
+This function is autogenerated by build tools and those build tools are responsible for collecting the module entry points and calling them in a specified order.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>ImageHandle</em>&nbsp;</td><td>The image handle of the UEFI Application. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>SystemTable</em>&nbsp;</td><td>A pointer to the EFI System Table.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The UEFI Application executed normally. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>!EFI_SUCCESS</em>&nbsp;</td><td>The UEFI Application failed to execute normally. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
 <hr><h2>Variable Documentation</h2>
-<a class="anchor" name="fd5b88213bc4aeb13b69e2c12f6eb558"></a><!-- doxytag: member="AcpiTable.h::gEfiAcpiTableProtocolGuid" ref="fd5b88213bc4aeb13b69e2c12f6eb558" args="" -->
+<a class="anchor" name="11df2ecfb51936897668dbae420bea14"></a><!-- doxytag: member="UefiApplicationEntryPoint.h::_gUefiDriverRevision" ref="11df2ecfb51936897668dbae420bea14" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../d2/d20/a01096.html#fd5b88213bc4aeb13b69e2c12f6eb558">gEfiAcpiTableProtocolGuid</a>          </td>
+          <td class="memname">CONST <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d6/dbc/a01099.html#11df2ecfb51936897668dbae420bea14">_gUefiDriverRevision</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+Declare the EFI/UEFI Specification Revision to which this driver is implemented 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:09 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:24 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

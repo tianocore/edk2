@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_PCI_CAPABILITY_HDR Struct Reference</title>
+<title>MdePkg[ALL]: EFI_KEY_DATA Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,48 +21,47 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_PCI_CAPABILITY_HDR Struct Reference</h1><!-- doxytag: class="EFI_PCI_CAPABILITY_HDR" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_KEY_DATA Struct Reference</h1><!-- doxytag: class="EFI_KEY_DATA" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d72/a00541.html#7b95bceb321a719915c7f817323398d5">CapabilityID</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/de7/a00523.html">EFI_INPUT_KEY</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d72/a00541.html#820292c57a8737fe2cbae05d847d3657">Key</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d72/a00541.html#77cc198a82165ec88c3de59398a6872c">NextItemPtr</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/ded/a00211.html">EFI_KEY_STATE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d72/a00541.html#d3c7e272c50ae718fa27bab09ec7b96f">KeyState</a></td></tr>
 
 </table>
-<hr><a name="_details"></a><h2>Detailed Description</h2>
-Capabilities List Header Section 6.7, PCI Local Bus Specification, 2.2 <hr><h2>Field Documentation</h2>
-<a class="anchor" name="7b95bceb321a719915c7f817323398d5"></a><!-- doxytag: member="EFI_PCI_CAPABILITY_HDR::CapabilityID" ref="7b95bceb321a719915c7f817323398d5" args="" -->
+<hr><h2>Field Documentation</h2>
+<a class="anchor" name="820292c57a8737fe2cbae05d847d3657"></a><!-- doxytag: member="EFI_KEY_DATA::Key" ref="820292c57a8737fe2cbae05d847d3657" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../dd/d72/a00541.html#7b95bceb321a719915c7f817323398d5">EFI_PCI_CAPABILITY_HDR::CapabilityID</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/de7/a00523.html">EFI_INPUT_KEY</a> <a class="el" href="../../dd/d72/a00541.html#820292c57a8737fe2cbae05d847d3657">EFI_KEY_DATA::Key</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The EFI scan code and Unicode value returned from the input device. 
 </div>
 </div><p>
-<a class="anchor" name="77cc198a82165ec88c3de59398a6872c"></a><!-- doxytag: member="EFI_PCI_CAPABILITY_HDR::NextItemPtr" ref="77cc198a82165ec88c3de59398a6872c" args="" -->
+<a class="anchor" name="d3c7e272c50ae718fa27bab09ec7b96f"></a><!-- doxytag: member="EFI_KEY_DATA::KeyState" ref="d3c7e272c50ae718fa27bab09ec7b96f" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../dd/d72/a00541.html#77cc198a82165ec88c3de59398a6872c">EFI_PCI_CAPABILITY_HDR::NextItemPtr</a>          </td>
+          <td class="memname"><a class="el" href="../../dd/ded/a00211.html">EFI_KEY_STATE</a> <a class="el" href="../../dd/d72/a00541.html#d3c7e272c50ae718fa27bab09ec7b96f">EFI_KEY_DATA::KeyState</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The current state of various toggled attributes as well as input modifier values. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:37 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

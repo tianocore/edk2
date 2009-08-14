@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Pi/PiDependency.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Ia32/ProcessorBind.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,87 +21,88 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Pi/PiDependency.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Ia32/ProcessorBind.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#130cdd2b4b40b196ae25bce78c8f608e">EFI_DEP_BEFORE</a>&nbsp;&nbsp;&nbsp;0x00</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#25c69e5c8ae1aaebf18b951971c09103">MDE_CPU_IA32</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#e1e2f466457803724ddf3c4a02677cf5">EFI_DEP_AFTER</a>&nbsp;&nbsp;&nbsp;0x01</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#2137fc5695cbd81598a4dba1ac6fab31">MAX_BIT</a>&nbsp;&nbsp;&nbsp;0x80000000</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#d2fab8455fb2100a32cfe9f656a5432d">EFI_DEP_PUSH</a>&nbsp;&nbsp;&nbsp;0x02</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#60bb431495193072cc1abf0c2452e18a">MAX_2_BITS</a>&nbsp;&nbsp;&nbsp;0xC0000000</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#340cc39b65bbcfa040f5ba509d7a4871">EFI_DEP_AND</a>&nbsp;&nbsp;&nbsp;0x03</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#aba07841c3e227bc8bdd8ccdad149349">MAX_ADDRESS</a>&nbsp;&nbsp;&nbsp;0xFFFFFFFF</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#8d60729dc64dcc11562d50c4e600b6e1">EFI_DEP_OR</a>&nbsp;&nbsp;&nbsp;0x04</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#8aed43eb1b3c346772c127482b4b5372">CPU_STACK_ALIGNMENT</a>&nbsp;&nbsp;&nbsp;sizeof(<a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#295980891b14ab82242675ad293560c3">EFI_DEP_NOT</a>&nbsp;&nbsp;&nbsp;0x05</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#a3998ed6456694d79e9a45f821f379ed">EFIAPI</a>&nbsp;&nbsp;&nbsp;__cdecl</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#c2a18f3a3b8ef25a9180d525267cb6ad">EFI_DEP_TRUE</a>&nbsp;&nbsp;&nbsp;0x06</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#f5aee859ec14423bc427edf78c30d083">GLOBAL_REMOVE_IF_UNREFERENCED</a>&nbsp;&nbsp;&nbsp;__declspec(selectany)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#ed0b1fe984181517b6630326cbdca27a">EFI_DEP_FALSE</a>&nbsp;&nbsp;&nbsp;0x07</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#e9afc8cd486fce6bb6886e40d9d25464">ASM_PFX</a>(name)&nbsp;&nbsp;&nbsp;_##name</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#ab6e1097c5d5e1675e474c005983dc6f">EFI_DEP_END</a>&nbsp;&nbsp;&nbsp;0x08</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#5aa6f079bee6dca6c38ac1cda056b168">ASM_GLOBAL</a>&nbsp;&nbsp;&nbsp;.globl</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#0701da336aefc4bf0c9d34dd0c702027">EFI_DEP_SOR</a>&nbsp;&nbsp;&nbsp;0x09</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#7e840a4e1d7fbaf630dc62358d80a845">FUNCTION_ENTRY_POINT</a>(FunctionPointer)&nbsp;&nbsp;&nbsp;(VOID *)(<a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>)(FunctionPointer)</td></tr>
+
+<tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef uint8_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef int8_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#0e16e07c1525c9688ca6fbd34f334ec8">INT8</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef uint8_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef int16_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#ca6c48234f001fdbd6597515a4cc088d">INT16</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef uint16_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef int32_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#2c951cf9402cd61f04b43789471dbe7c">INT32</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef uint32_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef int64_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#296e89aa9d3de65d9ba04e7060118260">INT64</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef uint64_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef char&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef uint16_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#c0b1ca9b01db611e0f7f2080a2699135">UINTN</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#2c951cf9402cd61f04b43789471dbe7c">INT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/db8/a01057.html#59476e90445b371742c3c324e065e5d4">INTN</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Present the dependency expression values in PI.<p>
-Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
-<dl class="user" compact><dt><b>Revision Reference:</b></dt><dd>PI Version 1.0 </dd></dl>
-<hr><h2>Define Documentation</h2>
-<a class="anchor" name="e1e2f466457803724ddf3c4a02677cf5"></a><!-- doxytag: member="PiDependency.h::EFI_DEP_AFTER" ref="e1e2f466457803724ddf3c4a02677cf5" args="" -->
+Processor or Compiler specific defines and types for IA-32 architecture.<p>
+Copyright (c) 2006 - 2009, Intel Corporation<br>
+ All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
+<a class="anchor" name="5aa6f079bee6dca6c38ac1cda056b168"></a><!-- doxytag: member="ProcessorBind.h::ASM_GLOBAL" ref="5aa6f079bee6dca6c38ac1cda056b168" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_DEP_AFTER&nbsp;&nbsp;&nbsp;0x01          </td>
+          <td class="memname">#define ASM_GLOBAL&nbsp;&nbsp;&nbsp;.globl          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-If present, this must be the first and only opcode, EFI_DEP_AFTER is only used by DXE driver. 
+For GNU assembly code, .global or .globl can declare global symbols. Define this macro to unify the usage. 
 </div>
 </div><p>
-<a class="anchor" name="340cc39b65bbcfa040f5ba509d7a4871"></a><!-- doxytag: member="PiDependency.h::EFI_DEP_AND" ref="340cc39b65bbcfa040f5ba509d7a4871" args="" -->
+<a class="anchor" name="e9afc8cd486fce6bb6886e40d9d25464"></a><!-- doxytag: member="ProcessorBind.h::ASM_PFX" ref="e9afc8cd486fce6bb6886e40d9d25464" args="(name)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_DEP_AND&nbsp;&nbsp;&nbsp;0x03          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="130cdd2b4b40b196ae25bce78c8f608e"></a><!-- doxytag: member="PiDependency.h::EFI_DEP_BEFORE" ref="130cdd2b4b40b196ae25bce78c8f608e" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_DEP_BEFORE&nbsp;&nbsp;&nbsp;0x00          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-If present, this must be the first and only opcode, EFI_DEP_BEFORE is only used by DXE driver. 
-</div>
-</div><p>
-<a class="anchor" name="ab6e1097c5d5e1675e474c005983dc6f"></a><!-- doxytag: member="PiDependency.h::EFI_DEP_END" ref="ab6e1097c5d5e1675e474c005983dc6f" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_DEP_END&nbsp;&nbsp;&nbsp;0x08          </td>
+          <td class="memname">#define ASM_PFX          </td>
+          <td>(</td>
+          <td class="paramtype">name&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;_##name</td>
         </tr>
       </table>
 </div>
@@ -111,98 +112,336 @@ If present, this must be the first and only opcode, EFI_DEP_BEFORE is only used 
 
 </div>
 </div><p>
-<a class="anchor" name="ed0b1fe984181517b6630326cbdca27a"></a><!-- doxytag: member="PiDependency.h::EFI_DEP_FALSE" ref="ed0b1fe984181517b6630326cbdca27a" args="" -->
+<a class="anchor" name="8aed43eb1b3c346772c127482b4b5372"></a><!-- doxytag: member="ProcessorBind.h::CPU_STACK_ALIGNMENT" ref="8aed43eb1b3c346772c127482b4b5372" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_DEP_FALSE&nbsp;&nbsp;&nbsp;0x07          </td>
+          <td class="memname">#define CPU_STACK_ALIGNMENT&nbsp;&nbsp;&nbsp;sizeof(<a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The stack alignment required for IA-32 
 </div>
 </div><p>
-<a class="anchor" name="295980891b14ab82242675ad293560c3"></a><!-- doxytag: member="PiDependency.h::EFI_DEP_NOT" ref="295980891b14ab82242675ad293560c3" args="" -->
+<a class="anchor" name="a3998ed6456694d79e9a45f821f379ed"></a><!-- doxytag: member="ProcessorBind.h::EFIAPI" ref="a3998ed6456694d79e9a45f821f379ed" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_DEP_NOT&nbsp;&nbsp;&nbsp;0x05          </td>
+          <td class="memname">#define EFIAPI&nbsp;&nbsp;&nbsp;__cdecl          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+Microsoft* compiler specific method for EFIAPI calling convension 
 </div>
 </div><p>
-<a class="anchor" name="8d60729dc64dcc11562d50c4e600b6e1"></a><!-- doxytag: member="PiDependency.h::EFI_DEP_OR" ref="8d60729dc64dcc11562d50c4e600b6e1" args="" -->
+<a class="anchor" name="7e840a4e1d7fbaf630dc62358d80a845"></a><!-- doxytag: member="ProcessorBind.h::FUNCTION_ENTRY_POINT" ref="7e840a4e1d7fbaf630dc62358d80a845" args="(FunctionPointer)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_DEP_OR&nbsp;&nbsp;&nbsp;0x04          </td>
+          <td class="memname">#define FUNCTION_ENTRY_POINT          </td>
+          <td>(</td>
+          <td class="paramtype">FunctionPointer&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;(VOID *)(<a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>)(FunctionPointer)</td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+Return the pointer to the first instruction of a function given a function pointer. On IA-32 CPU architectures, these two pointer values are the same, so the implementation of this macro is very simple.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>FunctionPointer</em>&nbsp;</td><td>A pointer to a function.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The pointer to the first instruction of a function given a function pointer. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="d2fab8455fb2100a32cfe9f656a5432d"></a><!-- doxytag: member="PiDependency.h::EFI_DEP_PUSH" ref="d2fab8455fb2100a32cfe9f656a5432d" args="" -->
+<a class="anchor" name="f5aee859ec14423bc427edf78c30d083"></a><!-- doxytag: member="ProcessorBind.h::GLOBAL_REMOVE_IF_UNREFERENCED" ref="f5aee859ec14423bc427edf78c30d083" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_DEP_PUSH&nbsp;&nbsp;&nbsp;0x02          </td>
+          <td class="memname">#define GLOBAL_REMOVE_IF_UNREFERENCED&nbsp;&nbsp;&nbsp;__declspec(selectany)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+Remove global variable from the linked image if there are no references to it after all compiler and linker optimizations have been performed. 
 </div>
 </div><p>
-<a class="anchor" name="0701da336aefc4bf0c9d34dd0c702027"></a><!-- doxytag: member="PiDependency.h::EFI_DEP_SOR" ref="0701da336aefc4bf0c9d34dd0c702027" args="" -->
+<a class="anchor" name="60bb431495193072cc1abf0c2452e18a"></a><!-- doxytag: member="ProcessorBind.h::MAX_2_BITS" ref="60bb431495193072cc1abf0c2452e18a" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_DEP_SOR&nbsp;&nbsp;&nbsp;0x09          </td>
+          <td class="memname">#define MAX_2_BITS&nbsp;&nbsp;&nbsp;0xC0000000          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-If present, this must be the first opcode, EFI_DEP_SOR is only used by DXE driver. 
+A value of native width with the two highest bits set. 
 </div>
 </div><p>
-<a class="anchor" name="c2a18f3a3b8ef25a9180d525267cb6ad"></a><!-- doxytag: member="PiDependency.h::EFI_DEP_TRUE" ref="c2a18f3a3b8ef25a9180d525267cb6ad" args="" -->
+<a class="anchor" name="aba07841c3e227bc8bdd8ccdad149349"></a><!-- doxytag: member="ProcessorBind.h::MAX_ADDRESS" ref="aba07841c3e227bc8bdd8ccdad149349" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_DEP_TRUE&nbsp;&nbsp;&nbsp;0x06          </td>
+          <td class="memname">#define MAX_ADDRESS&nbsp;&nbsp;&nbsp;0xFFFFFFFF          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+Maximum legal IA-32 address 
+</div>
+</div><p>
+<a class="anchor" name="2137fc5695cbd81598a4dba1ac6fab31"></a><!-- doxytag: member="ProcessorBind.h::MAX_BIT" ref="2137fc5695cbd81598a4dba1ac6fab31" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define MAX_BIT&nbsp;&nbsp;&nbsp;0x80000000          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
 
+<p>
+A value of native width with the highest bit set. 
+</div>
+</div><p>
+<a class="anchor" name="25c69e5c8ae1aaebf18b951971c09103"></a><!-- doxytag: member="ProcessorBind.h::MDE_CPU_IA32" ref="25c69e5c8ae1aaebf18b951971c09103" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define MDE_CPU_IA32          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Define the processor type so other code can make processor based choices 
+</div>
+</div><p>
+<hr><h2>Typedef Documentation</h2>
+<a class="anchor" name="000dc5dbcb0d4ba7b6f12c577bc56fba"></a><!-- doxytag: member="ProcessorBind.h::BOOLEAN" ref="000dc5dbcb0d4ba7b6f12c577bc56fba" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef uint8_t <a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Logical Boolean. 1-byte value containing 0 for FALSE or a 1 for TRUE. Other values are undefined. 
+</div>
+</div><p>
+<a class="anchor" name="8a79e1974f247348d08f0ad87ccfe7a4"></a><!-- doxytag: member="ProcessorBind.h::CHAR16" ref="8a79e1974f247348d08f0ad87ccfe7a4" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef uint16_t <a class="el" href="../../d0/d90/a01059.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+2-byte Character. Unless otherwise specified all strings are stored in the UTF-16 encoding format as defined by Unicode 2.1 and ISO/IEC 10646 standards. 
+</div>
+</div><p>
+<a class="anchor" name="2f68f0189367ead40015f7c0ec68eb9e"></a><!-- doxytag: member="ProcessorBind.h::CHAR8" ref="2f68f0189367ead40015f7c0ec68eb9e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef char <a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+1-byte Character 
+</div>
+</div><p>
+<a class="anchor" name="ca6c48234f001fdbd6597515a4cc088d"></a><!-- doxytag: member="ProcessorBind.h::INT16" ref="ca6c48234f001fdbd6597515a4cc088d" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef int16_t <a class="el" href="../../d0/d90/a01059.html#ca6c48234f001fdbd6597515a4cc088d">INT16</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+2-byte signed value 
+</div>
+</div><p>
+<a class="anchor" name="2c951cf9402cd61f04b43789471dbe7c"></a><!-- doxytag: member="ProcessorBind.h::INT32" ref="2c951cf9402cd61f04b43789471dbe7c" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef int32_t <a class="el" href="../../d0/d90/a01059.html#2c951cf9402cd61f04b43789471dbe7c">INT32</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+4-byte signed value 
+</div>
+</div><p>
+<a class="anchor" name="296e89aa9d3de65d9ba04e7060118260"></a><!-- doxytag: member="ProcessorBind.h::INT64" ref="296e89aa9d3de65d9ba04e7060118260" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef int64_t <a class="el" href="../../d0/d90/a01059.html#296e89aa9d3de65d9ba04e7060118260">INT64</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+8-byte signed value 
+</div>
+</div><p>
+<a class="anchor" name="0e16e07c1525c9688ca6fbd34f334ec8"></a><!-- doxytag: member="ProcessorBind.h::INT8" ref="0e16e07c1525c9688ca6fbd34f334ec8" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef int8_t <a class="el" href="../../d0/d90/a01059.html#0e16e07c1525c9688ca6fbd34f334ec8">INT8</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+1-byte signed value 
+</div>
+</div><p>
+<a class="anchor" name="59476e90445b371742c3c324e065e5d4"></a><!-- doxytag: member="ProcessorBind.h::INTN" ref="59476e90445b371742c3c324e065e5d4" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#2c951cf9402cd61f04b43789471dbe7c">INT32</a> <a class="el" href="../../d0/d90/a01059.html#88c67527ff19b831c672f11fc131ee53">INTN</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Signed value of native width. (4 bytes on supported 32-bit processor instructions, 8 bytes on supported 64-bit processor instructions) 
+</div>
+</div><p>
+<a class="anchor" name="cbc04026a2008f7c2fccf01718291c20"></a><!-- doxytag: member="ProcessorBind.h::UINT16" ref="cbc04026a2008f7c2fccf01718291c20" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef uint16_t <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+2-byte unsigned value 
+</div>
+</div><p>
+<a class="anchor" name="dfe04a44baaebba6143c3a23507ff85b"></a><!-- doxytag: member="ProcessorBind.h::UINT32" ref="dfe04a44baaebba6143c3a23507ff85b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef uint32_t <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+4-byte unsigned value 
+</div>
+</div><p>
+<a class="anchor" name="95df6cdb32afc350ff070f2fe8a54a67"></a><!-- doxytag: member="ProcessorBind.h::UINT64" ref="95df6cdb32afc350ff070f2fe8a54a67" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef uint64_t <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+8-byte unsigned value 
+</div>
+</div><p>
+<a class="anchor" name="f3037cbae2cdbc45fb75983c08b87935"></a><!-- doxytag: member="ProcessorBind.h::UINT8" ref="f3037cbae2cdbc45fb75983c08b87935" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef uint8_t <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+1-byte unsigned value 
+</div>
+</div><p>
+<a class="anchor" name="c0b1ca9b01db611e0f7f2080a2699135"></a><!-- doxytag: member="ProcessorBind.h::UINTN" ref="c0b1ca9b01db611e0f7f2080a2699135" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Unsigned value of native width. (4 bytes on supported 32-bit processor instructions, 8 bytes on supported 64-bit processor instructions) 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:09 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:19 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

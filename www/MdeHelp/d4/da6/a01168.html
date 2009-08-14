@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Protocol/SimpleTextInEx.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Protocol/DiskInfo.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,902 +21,352 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Protocol/SimpleTextInEx.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Protocol/DiskInfo.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d31/a00208.html">_EFI_KEY_STATE</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d52/a00510.html">EFI_KEY_DATA</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dbc/a00249.html">_EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d2b/a00018.html">_EFI_DISK_INFO_PROTOCOL</a></td></tr>
 
 <tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#54577348bf9f3cdb807c2e4093f330bd">EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL_GUID</a>&nbsp;&nbsp;&nbsp;{0xdd9e7534, 0x7762, 0x4698, { 0x8c, 0x14, 0xf5, 0x85, 0x17, 0xa6, 0x25, 0xaa } }</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#53c709888973de7f945cfe0d03dc93d4">EFI_DISK_INFO_PROTOCOL_GUID</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#0bb3e801d99893e9d9749a8202517a5e">EFI_SHIFT_STATE_VALID</a>&nbsp;&nbsp;&nbsp;0x80000000</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#dc6cb1d84232db0ed9ac19c91bff0c5d">EFI_DISK_INFO_IDE_INTERFACE_GUID</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#125eeb18ba51d87883a0c5fef3b8baa5">EFI_RIGHT_SHIFT_PRESSED</a>&nbsp;&nbsp;&nbsp;0x00000001</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#e357728bfae499818e21621e82de9080">EFI_DISK_INFO_SCSI_INTERFACE_GUID</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#8888a2dd7b099357e1a7fab11f5fbc79">EFI_LEFT_SHIFT_PRESSED</a>&nbsp;&nbsp;&nbsp;0x00000002</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#b0705b252444d0d0ea908bcca11faf84">EFI_DISK_INFO_USB_INTERFACE_GUID</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#996cd745ec35cc9af91c4c907700da5a">EFI_RIGHT_CONTROL_PRESSED</a>&nbsp;&nbsp;&nbsp;0x00000004</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#6abff52ff24d2efe7be02c2364ab16ee">EFI_LEFT_CONTROL_PRESSED</a>&nbsp;&nbsp;&nbsp;0x00000008</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#330eaabd16354e4e4cd2b45c91ca4357">EFI_RIGHT_ALT_PRESSED</a>&nbsp;&nbsp;&nbsp;0x00000010</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#6fced2a32b4abb3d53bae947ce11d151">EFI_LEFT_ALT_PRESSED</a>&nbsp;&nbsp;&nbsp;0x00000020</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#f6c5f90e52d19db2d41a655f91415c35">EFI_RIGHT_LOGO_PRESSED</a>&nbsp;&nbsp;&nbsp;0x00000040</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#645e7e8339e2d337ab79245bd66bc2e1">EFI_LEFT_LOGO_PRESSED</a>&nbsp;&nbsp;&nbsp;0x00000080</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#bf44caf0bac88b3bcd97435beec7e33a">EFI_MENU_KEY_PRESSED</a>&nbsp;&nbsp;&nbsp;0x00000100</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#b8dc2f7234fa26f8892d183b50b800db">EFI_SYS_REQ_PRESSED</a>&nbsp;&nbsp;&nbsp;0x00000200</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#fa9433c543b37e7e62aeb2a3393251b6">EFI_TOGGLE_STATE_VALID</a>&nbsp;&nbsp;&nbsp;0x80</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#9222dbdd9718697137f2ed02b23b441d">EFI_SCROLL_LOCK_ACTIVE</a>&nbsp;&nbsp;&nbsp;0x01</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#04d4bc6883e1b6d1c308cd2df6570226">EFI_NUM_LOCK_ACTIVE</a>&nbsp;&nbsp;&nbsp;0x02</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#3e5796638d1c105133f7dc4ad6d2b4ab">EFI_CAPS_LOCK_ACTIVE</a>&nbsp;&nbsp;&nbsp;0x04</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#42fe8674d9e72ab8dad83375eb5c9d3c">SCAN_F13</a>&nbsp;&nbsp;&nbsp;0x0068</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#876c119ba2fe5a5ff163b19d4540ebf9">SCAN_F14</a>&nbsp;&nbsp;&nbsp;0x0069</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#5c0b45bd0cad96994d4c20abf2d6a5c9">SCAN_F15</a>&nbsp;&nbsp;&nbsp;0x006A</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#a0fff73b94b03d5bd406b1fef6e3a749">SCAN_F16</a>&nbsp;&nbsp;&nbsp;0x006B</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#fb68f0058473ddc9dd2a3d95088bb583">SCAN_F17</a>&nbsp;&nbsp;&nbsp;0x006C</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#e153af190e04be120dca5e0e247fb883">SCAN_F18</a>&nbsp;&nbsp;&nbsp;0x006D</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#5a9863fa5e062f18a77a29d310e93aee">SCAN_F19</a>&nbsp;&nbsp;&nbsp;0x006E</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#ca1e32c7daddb0659bfdadbd5f11c5e4">SCAN_F20</a>&nbsp;&nbsp;&nbsp;0x006F</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#026ade5253321e17ba897fc3aef39d38">SCAN_F21</a>&nbsp;&nbsp;&nbsp;0x0070</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#27780b42afb13d9478696b18b4a66e5c">SCAN_F22</a>&nbsp;&nbsp;&nbsp;0x0071</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#e4d8b8e00a2567f48695cae626764672">SCAN_F23</a>&nbsp;&nbsp;&nbsp;0x0072</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#56391764a53e20e3f7e159173da59ce1">SCAN_F24</a>&nbsp;&nbsp;&nbsp;0x0073</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#3f39a1096b3a05ae034e342aaba346d0">SCAN_MUTE</a>&nbsp;&nbsp;&nbsp;0x007F</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#7b63d43f489d45258c40969793f33302">SCAN_VOLUME_UP</a>&nbsp;&nbsp;&nbsp;0x0080</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#17a82e32246951f14ea9ee6be6a69e2b">SCAN_VOLUME_DOWN</a>&nbsp;&nbsp;&nbsp;0x0081</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#6a4abe3669b7eb9575ea2bd721053d08">SCAN_BRIGHTNESS_UP</a>&nbsp;&nbsp;&nbsp;0x0100</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#4c2438213cd824fef34ad6735cae21b7">SCAN_BRIGHTNESS_DOWN</a>&nbsp;&nbsp;&nbsp;0x0101</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#576b84453947192f130e37635105a046">SCAN_SUSPEND</a>&nbsp;&nbsp;&nbsp;0x0102</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#d4b9a29d711db0db2c8251a3fe1b36b2">SCAN_HIBERNATE</a>&nbsp;&nbsp;&nbsp;0x0103</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#78581bb8ed9c4e8dc7e294a6f470e055">SCAN_TOGGLE_DISPLAY</a>&nbsp;&nbsp;&nbsp;0x0104</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#912e5b3d2bd5fcb87d1bf5422cc34b09">SCAN_RECOVERY</a>&nbsp;&nbsp;&nbsp;0x0105</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#44b1b051bb5c72c57d06743692b9de2c">SCAN_EJECT</a>&nbsp;&nbsp;&nbsp;0x0106</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#47f39400d86fdc0f9f1f05aba25d377d">EFI_DISK_INFO_AHCI_INTERFACE_GUID</a></td></tr>
 
 <tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
-<a class="el" href="../../de/dbc/a00249.html">_EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#637a72253d199a1fdcfd92d4fc91a20a">EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL</a></td></tr>
+<a class="el" href="../../d1/d2b/a00018.html">_EFI_DISK_INFO_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#e6bdcb74e96fb72116c0c69cf0854770">EFI_DISK_INFO_PROTOCOL</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#04998967506e2a98c62c9cf0e9fc5d14">EFI_INPUT_RESET_EX</a> )(IN <a class="el" href="../../de/dbc/a00249.html">EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> ExtendedVerification)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#154c630c1c4be4fb5cafe0af9ca6a54e">EFI_DISK_INFO_INQUIRY</a> )(IN <a class="el" href="../../d1/d2b/a00018.html">EFI_DISK_INFO_PROTOCOL</a> *This, IN OUT VOID *InquiryData, IN OUT <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *InquiryDataSize)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#5c5344195ec40b3af99801ca3ccd6b2a">EFI_KEY_TOGGLE_STATE</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#c1ce22c7bc90c810cd1990f405f19dd0">EFI_DISK_INFO_IDENTIFY</a> )(IN <a class="el" href="../../d1/d2b/a00018.html">EFI_DISK_INFO_PROTOCOL</a> *This, IN OUT VOID *IdentifyData, IN OUT <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *IdentifyDataSize)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <a class="el" href="../../dc/d31/a00208.html">_EFI_KEY_STATE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#fd972f7bc8e0cfea6591e0dd139e4377">EFI_KEY_STATE</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#655b6d2d597b4d2ecac052c3d1e98fe5">EFI_DISK_INFO_SENSE_DATA</a> )(IN <a class="el" href="../../d1/d2b/a00018.html">EFI_DISK_INFO_PROTOCOL</a> *This, IN OUT VOID *SenseData, IN OUT <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *SenseDataSize, OUT <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *SenseDataNumber)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#7a3cf3cda091a07c90c37507610fd31a">EFI_INPUT_READ_KEY_EX</a> )(IN <a class="el" href="../../de/dbc/a00249.html">EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL</a> *This, OUT <a class="el" href="../../d6/d52/a00510.html">EFI_KEY_DATA</a> *KeyData)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#ebe93fb3f4a6565b1ad4c329b6d0802d">EFI_SET_STATE</a> )(IN <a class="el" href="../../de/dbc/a00249.html">EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL</a> *This, IN <a class="el" href="../../d4/da6/a01168.html#5c5344195ec40b3af99801ca3ccd6b2a">EFI_KEY_TOGGLE_STATE</a> *KeyToggleState)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#f1cbc173689220727e0f0bd21907d0cb">EFI_KEY_NOTIFY_FUNCTION</a> )(IN <a class="el" href="../../d6/d52/a00510.html">EFI_KEY_DATA</a> *KeyData)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#5d5487bbce200d7f324c15c608a03297">EFI_REGISTER_KEYSTROKE_NOTIFY</a> )(IN <a class="el" href="../../de/dbc/a00249.html">EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL</a> *This, IN <a class="el" href="../../d6/d52/a00510.html">EFI_KEY_DATA</a> *KeyData, IN <a class="el" href="../../d4/da6/a01168.html#f1cbc173689220727e0f0bd21907d0cb">EFI_KEY_NOTIFY_FUNCTION</a> KeyNotificationFunction, OUT <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> *NotifyHandle)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#73e6a9943a615bdf03066ef064fee4a0">EFI_UNREGISTER_KEYSTROKE_NOTIFY</a> )(IN <a class="el" href="../../de/dbc/a00249.html">EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL</a> *This, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> NotificationHandle)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#b023b9f79c7c19736ba3a37c42f4321d">EFI_DISK_INFO_WHICH_IDE</a> )(IN <a class="el" href="../../d1/d2b/a00018.html">EFI_DISK_INFO_PROTOCOL</a> *This, OUT <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *IdeChannel, OUT <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *IdeDevice)</td></tr>
 
 <tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#07c4e41443e49d5439b52e002e319248">gEfiSimpleTextInputExProtocolGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#cac9073285ee87d92ed6e48c649e21e8">gEfiDiskInfoProtocolGuid</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#2922216d354203753c084e9c4d937a45">gEfiDiskInfoIdeInterfaceGuid</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#83d6f576a03a69573832db62a40816a0">gEfiDiskInfoScsiInterfaceGuid</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#79882475cc6cf5c3998664654b6a15e2">gEfiDiskInfoUsbInterfaceGuid</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da6/a01168.html#a8dee95074aacf507eb8986f28e977c6">gEfiDiskInfoAhciInterfaceGuid</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Simple Text Input Ex protocol from the UEFI 2.0 specification.<p>
-This protocol defines an extension to the EFI_SIMPLE_TEXT_INPUT_PROTOCOL which exposes much more state and modifier information from the input device, also allows one to register a notification for a particular keystroke.<p>
-Copyright (c) 2006 - 2009, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
-<a class="anchor" name="3e5796638d1c105133f7dc4ad6d2b4ab"></a><!-- doxytag: member="SimpleTextInEx.h::EFI_CAPS_LOCK_ACTIVE" ref="3e5796638d1c105133f7dc4ad6d2b4ab" args="" -->
+Provides the basic interfaces to abstract platform information regarding an IDE controller.<p>
+Copyright (c) 2006 - 2009, Intel Corporation. <br>
+ All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
+<dl class="user" compact><dt><b>Revision Reference:</b></dt><dd>This Protocol is defined in UEFI Platform Initialization Specification 1.2 Volume 5: Standards </dd></dl>
+<hr><h2>Define Documentation</h2>
+<a class="anchor" name="47f39400d86fdc0f9f1f05aba25d377d"></a><!-- doxytag: member="DiskInfo.h::EFI_DISK_INFO_AHCI_INTERFACE_GUID" ref="47f39400d86fdc0f9f1f05aba25d377d" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_CAPS_LOCK_ACTIVE&nbsp;&nbsp;&nbsp;0x04          </td>
+          <td class="memname">#define EFI_DISK_INFO_AHCI_INTERFACE_GUID          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+<b>Value:</b><div class="fragment"><pre class="fragment">{ \
+    0x9e498932, 0x4abc, 0x45af, {0xa3, 0x4d, 0x2, 0x47, 0x78, 0x7b, 0xe7, 0xc6} \
+  }
+</pre></div>Global ID for an AHCI interface. Used to fill in <a class="el" href="../../d1/d2b/a00018.html#18dba65f044083a9f072c0fb684a35a9">EFI_DISK_INFO_PROTOCOL.Interface</a> 
 </div>
 </div><p>
-<a class="anchor" name="6fced2a32b4abb3d53bae947ce11d151"></a><!-- doxytag: member="SimpleTextInEx.h::EFI_LEFT_ALT_PRESSED" ref="6fced2a32b4abb3d53bae947ce11d151" args="" -->
+<a class="anchor" name="dc6cb1d84232db0ed9ac19c91bff0c5d"></a><!-- doxytag: member="DiskInfo.h::EFI_DISK_INFO_IDE_INTERFACE_GUID" ref="dc6cb1d84232db0ed9ac19c91bff0c5d" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_LEFT_ALT_PRESSED&nbsp;&nbsp;&nbsp;0x00000020          </td>
+          <td class="memname">#define EFI_DISK_INFO_IDE_INTERFACE_GUID          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+<b>Value:</b><div class="fragment"><pre class="fragment">{ \
+    0x5e948fe3, 0x26d3, 0x42b5, {0xaf, 0x17, 0x61, 0x2, 0x87, 0x18, 0x8d, 0xec } \
+  }
+</pre></div>Global ID for an IDE interface. Used to fill in <a class="el" href="../../d1/d2b/a00018.html#18dba65f044083a9f072c0fb684a35a9">EFI_DISK_INFO_PROTOCOL.Interface</a> 
 </div>
 </div><p>
-<a class="anchor" name="6abff52ff24d2efe7be02c2364ab16ee"></a><!-- doxytag: member="SimpleTextInEx.h::EFI_LEFT_CONTROL_PRESSED" ref="6abff52ff24d2efe7be02c2364ab16ee" args="" -->
+<a class="anchor" name="53c709888973de7f945cfe0d03dc93d4"></a><!-- doxytag: member="DiskInfo.h::EFI_DISK_INFO_PROTOCOL_GUID" ref="53c709888973de7f945cfe0d03dc93d4" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_LEFT_CONTROL_PRESSED&nbsp;&nbsp;&nbsp;0x00000008          </td>
+          <td class="memname">#define EFI_DISK_INFO_PROTOCOL_GUID          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+<b>Value:</b><div class="fragment"><pre class="fragment">{ \
+    0xd432a67f, 0x14dc, 0x484b, {0xb3, 0xbb, 0x3f, 0x2, 0x91, 0x84, 0x93, 0x27 } \
+  }
+</pre></div>Global ID for EFI_DISK_INFO_PROTOCOL 
 </div>
 </div><p>
-<a class="anchor" name="645e7e8339e2d337ab79245bd66bc2e1"></a><!-- doxytag: member="SimpleTextInEx.h::EFI_LEFT_LOGO_PRESSED" ref="645e7e8339e2d337ab79245bd66bc2e1" args="" -->
+<a class="anchor" name="e357728bfae499818e21621e82de9080"></a><!-- doxytag: member="DiskInfo.h::EFI_DISK_INFO_SCSI_INTERFACE_GUID" ref="e357728bfae499818e21621e82de9080" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_LEFT_LOGO_PRESSED&nbsp;&nbsp;&nbsp;0x00000080          </td>
+          <td class="memname">#define EFI_DISK_INFO_SCSI_INTERFACE_GUID          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+<b>Value:</b><div class="fragment"><pre class="fragment">{ \
+    0x8f74baa, 0xea36, 0x41d9, {0x95, 0x21, 0x21, 0xa7, 0xf, 0x87, 0x80, 0xbc } \
+  }
+</pre></div>Global ID for a SCSI interface. Used to fill in <a class="el" href="../../d1/d2b/a00018.html#18dba65f044083a9f072c0fb684a35a9">EFI_DISK_INFO_PROTOCOL.Interface</a> 
 </div>
 </div><p>
-<a class="anchor" name="8888a2dd7b099357e1a7fab11f5fbc79"></a><!-- doxytag: member="SimpleTextInEx.h::EFI_LEFT_SHIFT_PRESSED" ref="8888a2dd7b099357e1a7fab11f5fbc79" args="" -->
+<a class="anchor" name="b0705b252444d0d0ea908bcca11faf84"></a><!-- doxytag: member="DiskInfo.h::EFI_DISK_INFO_USB_INTERFACE_GUID" ref="b0705b252444d0d0ea908bcca11faf84" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_LEFT_SHIFT_PRESSED&nbsp;&nbsp;&nbsp;0x00000002          </td>
+          <td class="memname">#define EFI_DISK_INFO_USB_INTERFACE_GUID          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<a class="anchor" name="bf44caf0bac88b3bcd97435beec7e33a"></a><!-- doxytag: member="SimpleTextInEx.h::EFI_MENU_KEY_PRESSED" ref="bf44caf0bac88b3bcd97435beec7e33a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_MENU_KEY_PRESSED&nbsp;&nbsp;&nbsp;0x00000100          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="04d4bc6883e1b6d1c308cd2df6570226"></a><!-- doxytag: member="SimpleTextInEx.h::EFI_NUM_LOCK_ACTIVE" ref="04d4bc6883e1b6d1c308cd2df6570226" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_NUM_LOCK_ACTIVE&nbsp;&nbsp;&nbsp;0x02          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="330eaabd16354e4e4cd2b45c91ca4357"></a><!-- doxytag: member="SimpleTextInEx.h::EFI_RIGHT_ALT_PRESSED" ref="330eaabd16354e4e4cd2b45c91ca4357" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_RIGHT_ALT_PRESSED&nbsp;&nbsp;&nbsp;0x00000010          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="996cd745ec35cc9af91c4c907700da5a"></a><!-- doxytag: member="SimpleTextInEx.h::EFI_RIGHT_CONTROL_PRESSED" ref="996cd745ec35cc9af91c4c907700da5a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_RIGHT_CONTROL_PRESSED&nbsp;&nbsp;&nbsp;0x00000004          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="f6c5f90e52d19db2d41a655f91415c35"></a><!-- doxytag: member="SimpleTextInEx.h::EFI_RIGHT_LOGO_PRESSED" ref="f6c5f90e52d19db2d41a655f91415c35" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_RIGHT_LOGO_PRESSED&nbsp;&nbsp;&nbsp;0x00000040          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="125eeb18ba51d87883a0c5fef3b8baa5"></a><!-- doxytag: member="SimpleTextInEx.h::EFI_RIGHT_SHIFT_PRESSED" ref="125eeb18ba51d87883a0c5fef3b8baa5" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_RIGHT_SHIFT_PRESSED&nbsp;&nbsp;&nbsp;0x00000001          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="9222dbdd9718697137f2ed02b23b441d"></a><!-- doxytag: member="SimpleTextInEx.h::EFI_SCROLL_LOCK_ACTIVE" ref="9222dbdd9718697137f2ed02b23b441d" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_SCROLL_LOCK_ACTIVE&nbsp;&nbsp;&nbsp;0x01          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="0bb3e801d99893e9d9749a8202517a5e"></a><!-- doxytag: member="SimpleTextInEx.h::EFI_SHIFT_STATE_VALID" ref="0bb3e801d99893e9d9749a8202517a5e" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_SHIFT_STATE_VALID&nbsp;&nbsp;&nbsp;0x80000000          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="54577348bf9f3cdb807c2e4093f330bd"></a><!-- doxytag: member="SimpleTextInEx.h::EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL_GUID" ref="54577348bf9f3cdb807c2e4093f330bd" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL_GUID&nbsp;&nbsp;&nbsp;{0xdd9e7534, 0x7762, 0x4698, { 0x8c, 0x14, 0xf5, 0x85, 0x17, 0xa6, 0x25, 0xaa } }          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="b8dc2f7234fa26f8892d183b50b800db"></a><!-- doxytag: member="SimpleTextInEx.h::EFI_SYS_REQ_PRESSED" ref="b8dc2f7234fa26f8892d183b50b800db" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_SYS_REQ_PRESSED&nbsp;&nbsp;&nbsp;0x00000200          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="fa9433c543b37e7e62aeb2a3393251b6"></a><!-- doxytag: member="SimpleTextInEx.h::EFI_TOGGLE_STATE_VALID" ref="fa9433c543b37e7e62aeb2a3393251b6" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_TOGGLE_STATE_VALID&nbsp;&nbsp;&nbsp;0x80          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="4c2438213cd824fef34ad6735cae21b7"></a><!-- doxytag: member="SimpleTextInEx.h::SCAN_BRIGHTNESS_DOWN" ref="4c2438213cd824fef34ad6735cae21b7" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SCAN_BRIGHTNESS_DOWN&nbsp;&nbsp;&nbsp;0x0101          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="6a4abe3669b7eb9575ea2bd721053d08"></a><!-- doxytag: member="SimpleTextInEx.h::SCAN_BRIGHTNESS_UP" ref="6a4abe3669b7eb9575ea2bd721053d08" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SCAN_BRIGHTNESS_UP&nbsp;&nbsp;&nbsp;0x0100          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="44b1b051bb5c72c57d06743692b9de2c"></a><!-- doxytag: member="SimpleTextInEx.h::SCAN_EJECT" ref="44b1b051bb5c72c57d06743692b9de2c" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SCAN_EJECT&nbsp;&nbsp;&nbsp;0x0106          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="42fe8674d9e72ab8dad83375eb5c9d3c"></a><!-- doxytag: member="SimpleTextInEx.h::SCAN_F13" ref="42fe8674d9e72ab8dad83375eb5c9d3c" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SCAN_F13&nbsp;&nbsp;&nbsp;0x0068          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="876c119ba2fe5a5ff163b19d4540ebf9"></a><!-- doxytag: member="SimpleTextInEx.h::SCAN_F14" ref="876c119ba2fe5a5ff163b19d4540ebf9" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SCAN_F14&nbsp;&nbsp;&nbsp;0x0069          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="5c0b45bd0cad96994d4c20abf2d6a5c9"></a><!-- doxytag: member="SimpleTextInEx.h::SCAN_F15" ref="5c0b45bd0cad96994d4c20abf2d6a5c9" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SCAN_F15&nbsp;&nbsp;&nbsp;0x006A          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="a0fff73b94b03d5bd406b1fef6e3a749"></a><!-- doxytag: member="SimpleTextInEx.h::SCAN_F16" ref="a0fff73b94b03d5bd406b1fef6e3a749" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SCAN_F16&nbsp;&nbsp;&nbsp;0x006B          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="fb68f0058473ddc9dd2a3d95088bb583"></a><!-- doxytag: member="SimpleTextInEx.h::SCAN_F17" ref="fb68f0058473ddc9dd2a3d95088bb583" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SCAN_F17&nbsp;&nbsp;&nbsp;0x006C          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="e153af190e04be120dca5e0e247fb883"></a><!-- doxytag: member="SimpleTextInEx.h::SCAN_F18" ref="e153af190e04be120dca5e0e247fb883" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SCAN_F18&nbsp;&nbsp;&nbsp;0x006D          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="5a9863fa5e062f18a77a29d310e93aee"></a><!-- doxytag: member="SimpleTextInEx.h::SCAN_F19" ref="5a9863fa5e062f18a77a29d310e93aee" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SCAN_F19&nbsp;&nbsp;&nbsp;0x006E          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="ca1e32c7daddb0659bfdadbd5f11c5e4"></a><!-- doxytag: member="SimpleTextInEx.h::SCAN_F20" ref="ca1e32c7daddb0659bfdadbd5f11c5e4" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SCAN_F20&nbsp;&nbsp;&nbsp;0x006F          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="026ade5253321e17ba897fc3aef39d38"></a><!-- doxytag: member="SimpleTextInEx.h::SCAN_F21" ref="026ade5253321e17ba897fc3aef39d38" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SCAN_F21&nbsp;&nbsp;&nbsp;0x0070          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="27780b42afb13d9478696b18b4a66e5c"></a><!-- doxytag: member="SimpleTextInEx.h::SCAN_F22" ref="27780b42afb13d9478696b18b4a66e5c" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SCAN_F22&nbsp;&nbsp;&nbsp;0x0071          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="e4d8b8e00a2567f48695cae626764672"></a><!-- doxytag: member="SimpleTextInEx.h::SCAN_F23" ref="e4d8b8e00a2567f48695cae626764672" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SCAN_F23&nbsp;&nbsp;&nbsp;0x0072          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="56391764a53e20e3f7e159173da59ce1"></a><!-- doxytag: member="SimpleTextInEx.h::SCAN_F24" ref="56391764a53e20e3f7e159173da59ce1" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SCAN_F24&nbsp;&nbsp;&nbsp;0x0073          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="d4b9a29d711db0db2c8251a3fe1b36b2"></a><!-- doxytag: member="SimpleTextInEx.h::SCAN_HIBERNATE" ref="d4b9a29d711db0db2c8251a3fe1b36b2" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SCAN_HIBERNATE&nbsp;&nbsp;&nbsp;0x0103          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="3f39a1096b3a05ae034e342aaba346d0"></a><!-- doxytag: member="SimpleTextInEx.h::SCAN_MUTE" ref="3f39a1096b3a05ae034e342aaba346d0" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SCAN_MUTE&nbsp;&nbsp;&nbsp;0x007F          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="912e5b3d2bd5fcb87d1bf5422cc34b09"></a><!-- doxytag: member="SimpleTextInEx.h::SCAN_RECOVERY" ref="912e5b3d2bd5fcb87d1bf5422cc34b09" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SCAN_RECOVERY&nbsp;&nbsp;&nbsp;0x0105          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="576b84453947192f130e37635105a046"></a><!-- doxytag: member="SimpleTextInEx.h::SCAN_SUSPEND" ref="576b84453947192f130e37635105a046" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SCAN_SUSPEND&nbsp;&nbsp;&nbsp;0x0102          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="78581bb8ed9c4e8dc7e294a6f470e055"></a><!-- doxytag: member="SimpleTextInEx.h::SCAN_TOGGLE_DISPLAY" ref="78581bb8ed9c4e8dc7e294a6f470e055" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SCAN_TOGGLE_DISPLAY&nbsp;&nbsp;&nbsp;0x0104          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="17a82e32246951f14ea9ee6be6a69e2b"></a><!-- doxytag: member="SimpleTextInEx.h::SCAN_VOLUME_DOWN" ref="17a82e32246951f14ea9ee6be6a69e2b" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SCAN_VOLUME_DOWN&nbsp;&nbsp;&nbsp;0x0081          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="7b63d43f489d45258c40969793f33302"></a><!-- doxytag: member="SimpleTextInEx.h::SCAN_VOLUME_UP" ref="7b63d43f489d45258c40969793f33302" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SCAN_VOLUME_UP&nbsp;&nbsp;&nbsp;0x0080          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
+<b>Value:</b><div class="fragment"><pre class="fragment">{ \
+    0xcb871572, 0xc11a, 0x47b5, {0xb4, 0x92, 0x67, 0x5e, 0xaf, 0xa7, 0x77, 0x27 } \
+  }
+</pre></div>Global ID for a USB interface. Used to fill in <a class="el" href="../../d1/d2b/a00018.html#18dba65f044083a9f072c0fb684a35a9">EFI_DISK_INFO_PROTOCOL.Interface</a> 
 </div>
 </div><p>
 <hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="7a3cf3cda091a07c90c37507610fd31a"></a><!-- doxytag: member="SimpleTextInEx.h::EFI_INPUT_READ_KEY_EX" ref="7a3cf3cda091a07c90c37507610fd31a" args=")(IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This, OUT EFI_KEY_DATA *KeyData)" -->
+<a class="anchor" name="c1ce22c7bc90c810cd1990f405f19dd0"></a><!-- doxytag: member="DiskInfo.h::EFI_DISK_INFO_IDENTIFY" ref="c1ce22c7bc90c810cd1990f405f19dd0" args=")(IN EFI_DISK_INFO_PROTOCOL *This, IN OUT VOID *IdentifyData, IN OUT UINT32 *IdentifyDataSize)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d4/da6/a01168.html#7a3cf3cda091a07c90c37507610fd31a">EFI_INPUT_READ_KEY_EX</a>)(IN <a class="el" href="../../de/dbc/a00249.html">EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL</a> *This, OUT <a class="el" href="../../d6/d52/a00510.html">EFI_KEY_DATA</a> *KeyData)          </td>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d4/da6/a01168.html#c1ce22c7bc90c810cd1990f405f19dd0">EFI_DISK_INFO_IDENTIFY</a>)(IN <a class="el" href="../../d1/d2b/a00018.html">EFI_DISK_INFO_PROTOCOL</a> *This, IN OUT VOID *IdentifyData, IN OUT <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *IdentifyDataSize)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The function reads the next keystroke from the input device. If there is no pending keystroke the function returns EFI_NOT_READY. If there is a pending keystroke, then KeyData.Key.ScanCode is the EFI scan code defined in Error! Reference source not found. The KeyData.Key.UnicodeChar is the actual printable character, or is zero if the key does not represent a printable character (control key, function key, etc.). The KeyData.KeyState is shift state for the character reflected in KeyData.Key.UnicodeChar or KeyData.Key.ScanCode . When interpreting the data from this function, printable characters that are normally adjusted by shift modifiers (e.g. Shift Key + "f" key) are presented solely as a KeyData.Key.UnicodeChar without the associated shift state. For example, if Shift Key + "f" key are pressed, the only pertinent data returned would be KeyData.Key.UnicodeChar with the value of "F". This would not typically be the case for non-printable characters such as pressing the Right Shift Key + F10 key, since the corresponding returned data would be reflected both in the KeyData.KeyState.KeyShiftState and KeyData.Key.ScanCode values. UEFI drivers which implement the EFI_SIMPLE_TEXT_INPUT_EX protocol are required to return KeyData.Key and KeyData.KeyState values. These drivers must always return the most current state of KeyData.KeyState.KeyShiftState and KeyData.KeyState.KeyToggleState. Certain input devices may not be able to produce shift or toggle state information, and in those cases the high order bit in the respective Toggle and Shift state fields should not be active.<p>
+Provides identify information for the controller type.<p>
+This function is used by the IDE bus driver to get identify data. Data format of Identify data is defined by the Interface <a class="el" href="../../d1/d87/a00689.html">GUID</a>.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL instance.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>KeyData</em>&nbsp;</td><td>A pointer to a buffer that is filled in with the keystroke state data for the key that was pressed.</td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the EFI_DISK_INFO_PROTOCOL instance. </td></tr>
+    <tr><td valign="top"><tt>[in,out]</tt>&nbsp;</td><td valign="top"><em>IdentifyData</em>&nbsp;</td><td>Pointer to a buffer for the identify data. </td></tr>
+    <tr><td valign="top"><tt>[in,out]</tt>&nbsp;</td><td valign="top"><em>IdentifyDataSize</em>&nbsp;</td><td>Pointer to the value for the identify data size.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The keystroke information was returned.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_READY</em>&nbsp;</td><td>There was no keystroke data available. EFI_DEVICE_ERROR The keystroke information was not returned due to hardware errors. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The command was accepted without any errors. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>Device does not support this data class </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>Error reading IdentifyData from device </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_BUFFER_TOO_SMALL</em>&nbsp;</td><td>IdentifyDataSize not big enough </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
-<a class="anchor" name="04998967506e2a98c62c9cf0e9fc5d14"></a><!-- doxytag: member="SimpleTextInEx.h::EFI_INPUT_RESET_EX" ref="04998967506e2a98c62c9cf0e9fc5d14" args=")(IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This, IN BOOLEAN ExtendedVerification)" -->
+<a class="anchor" name="154c630c1c4be4fb5cafe0af9ca6a54e"></a><!-- doxytag: member="DiskInfo.h::EFI_DISK_INFO_INQUIRY" ref="154c630c1c4be4fb5cafe0af9ca6a54e" args=")(IN EFI_DISK_INFO_PROTOCOL *This, IN OUT VOID *InquiryData, IN OUT UINT32 *InquiryDataSize)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d4/da6/a01168.html#04998967506e2a98c62c9cf0e9fc5d14">EFI_INPUT_RESET_EX</a>)(IN <a class="el" href="../../de/dbc/a00249.html">EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> ExtendedVerification)          </td>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d4/da6/a01168.html#154c630c1c4be4fb5cafe0af9ca6a54e">EFI_DISK_INFO_INQUIRY</a>)(IN <a class="el" href="../../d1/d2b/a00018.html">EFI_DISK_INFO_PROTOCOL</a> *This, IN OUT VOID *InquiryData, IN OUT <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *InquiryDataSize)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The Reset() function resets the input device hardware. As part of initialization process, the firmware/device will make a quick but reasonable attempt to verify that the device is functioning. If the ExtendedVerification flag is TRUE the firmware may take an extended amount of time to verify the device is operating on reset. Otherwise the reset operation is to occur as quickly as possible. The hardware verification process is not defined by this specification and is left up to the platform firmware or driver to implement.<p>
+Provides inquiry information for the controller type.<p>
+This function is used by the IDE bus driver to get inquiry data. Data format of Identify data is defined by the Interface <a class="el" href="../../d1/d87/a00689.html">GUID</a>.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL instance.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ExtendedVerification</em>&nbsp;</td><td>Indicates that the driver may perform a more exhaustive verification operation of the device during reset.</td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the EFI_DISK_INFO_PROTOCOL instance. </td></tr>
+    <tr><td valign="top"><tt>[in,out]</tt>&nbsp;</td><td valign="top"><em>InquiryData</em>&nbsp;</td><td>Pointer to a buffer for the inquiry data. </td></tr>
+    <tr><td valign="top"><tt>[in,out]</tt>&nbsp;</td><td valign="top"><em>InquiryDataSize</em>&nbsp;</td><td>Pointer to the value for the inquiry data size.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The device was reset.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The device is not functioning correctly and could not be reset. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The command was accepted without any errors. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>Device does not support this data class </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>Error reading InquiryData from device </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_BUFFER_TOO_SMALL</em>&nbsp;</td><td>InquiryDataSize not big enough </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
-<a class="anchor" name="f1cbc173689220727e0f0bd21907d0cb"></a><!-- doxytag: member="SimpleTextInEx.h::EFI_KEY_NOTIFY_FUNCTION" ref="f1cbc173689220727e0f0bd21907d0cb" args=")(IN EFI_KEY_DATA *KeyData)" -->
+<a class="anchor" name="e6bdcb74e96fb72116c0c69cf0854770"></a><!-- doxytag: member="DiskInfo.h::EFI_DISK_INFO_PROTOCOL" ref="e6bdcb74e96fb72116c0c69cf0854770" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d4/da6/a01168.html#f1cbc173689220727e0f0bd21907d0cb">EFI_KEY_NOTIFY_FUNCTION</a>)(IN <a class="el" href="../../d6/d52/a00510.html">EFI_KEY_DATA</a> *KeyData)          </td>
+          <td class="memname">typedef struct <a class="el" href="../../d1/d2b/a00018.html">_EFI_DISK_INFO_PROTOCOL</a> <a class="el" href="../../d1/d2b/a00018.html">EFI_DISK_INFO_PROTOCOL</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The function will be called when the key sequence is typed specified by KeyData. 
+Forward declaration for EFI_DISK_INFO_PROTOCOL 
 </div>
 </div><p>
-<a class="anchor" name="fd972f7bc8e0cfea6591e0dd139e4377"></a><!-- doxytag: member="SimpleTextInEx.h::EFI_KEY_STATE" ref="fd972f7bc8e0cfea6591e0dd139e4377" args="" -->
+<a class="anchor" name="655b6d2d597b4d2ecac052c3d1e98fe5"></a><!-- doxytag: member="DiskInfo.h::EFI_DISK_INFO_SENSE_DATA" ref="655b6d2d597b4d2ecac052c3d1e98fe5" args=")(IN EFI_DISK_INFO_PROTOCOL *This, IN OUT VOID *SenseData, IN OUT UINT32 *SenseDataSize, OUT UINT8 *SenseDataNumber)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef struct <a class="el" href="../../dc/d31/a00208.html">_EFI_KEY_STATE</a>  <a class="el" href="../../dc/d31/a00208.html">EFI_KEY_STATE</a>          </td>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d4/da6/a01168.html#655b6d2d597b4d2ecac052c3d1e98fe5">EFI_DISK_INFO_SENSE_DATA</a>)(IN <a class="el" href="../../d1/d2b/a00018.html">EFI_DISK_INFO_PROTOCOL</a> *This, IN OUT VOID *SenseData, IN OUT <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *SenseDataSize, OUT <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *SenseDataNumber)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<a class="anchor" name="5c5344195ec40b3af99801ca3ccd6b2a"></a><!-- doxytag: member="SimpleTextInEx.h::EFI_KEY_TOGGLE_STATE" ref="5c5344195ec40b3af99801ca3ccd6b2a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/da6/a01168.html#5c5344195ec40b3af99801ca3ccd6b2a">EFI_KEY_TOGGLE_STATE</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-EFI_KEY_TOGGLE_STATE. The toggle states are defined. They are: EFI_TOGGLE_STATE_VALID, EFI_SCROLL_LOCK_ACTIVE EFI_NUM_LOCK_ACTIVE, EFI_CAPS_LOCK_ACTIVE 
-</div>
-</div><p>
-<a class="anchor" name="5d5487bbce200d7f324c15c608a03297"></a><!-- doxytag: member="SimpleTextInEx.h::EFI_REGISTER_KEYSTROKE_NOTIFY" ref="5d5487bbce200d7f324c15c608a03297" args=")(IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This, IN EFI_KEY_DATA *KeyData, IN EFI_KEY_NOTIFY_FUNCTION KeyNotificationFunction, OUT EFI_HANDLE *NotifyHandle)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d4/da6/a01168.html#5d5487bbce200d7f324c15c608a03297">EFI_REGISTER_KEYSTROKE_NOTIFY</a>)(IN <a class="el" href="../../de/dbc/a00249.html">EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL</a> *This, IN <a class="el" href="../../d6/d52/a00510.html">EFI_KEY_DATA</a> *KeyData, IN <a class="el" href="../../d4/da6/a01168.html#f1cbc173689220727e0f0bd21907d0cb">EFI_KEY_NOTIFY_FUNCTION</a> KeyNotificationFunction, OUT <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> *NotifyHandle)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-The RegisterKeystrokeNotify() function registers a function to be called when a specified keystroke will occur.<p>
+Provides sense data information for the controller type.<p>
+This function is used by the IDE bus driver to get sense data. Data format of Sense data is defined by the Interface <a class="el" href="../../d1/d87/a00689.html">GUID</a>.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL instance.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>KeyData</em>&nbsp;</td><td>A pointer to a buffer that is filled in with the keystroke information for the key that was pressed.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>KeyNotificationFunction</em>&nbsp;</td><td>Points to the function to be called when the key sequence is typed specified by KeyData.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>NotifyHandle</em>&nbsp;</td><td>Points to the unique handle assigned to the registered notification.</td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the EFI_DISK_INFO_PROTOCOL instance. </td></tr>
+    <tr><td valign="top"><tt>[in,out]</tt>&nbsp;</td><td valign="top"><em>SenseData</em>&nbsp;</td><td>Pointer to the SenseData. </td></tr>
+    <tr><td valign="top"><tt>[in,out]</tt>&nbsp;</td><td valign="top"><em>SenseDataSize</em>&nbsp;</td><td>Size of SenseData in bytes. </td></tr>
+    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>SenseDataNumber</em>&nbsp;</td><td>Pointer to the value for the sense data size.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The device state was set appropriately.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>Unable to allocate necessary data structures. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The command was accepted without any errors. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>Device does not support this data class. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>Error reading SenseData from device. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_BUFFER_TOO_SMALL</em>&nbsp;</td><td>SenseDataSize not big enough. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
-<a class="anchor" name="ebe93fb3f4a6565b1ad4c329b6d0802d"></a><!-- doxytag: member="SimpleTextInEx.h::EFI_SET_STATE" ref="ebe93fb3f4a6565b1ad4c329b6d0802d" args=")(IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This, IN EFI_KEY_TOGGLE_STATE *KeyToggleState)" -->
+<a class="anchor" name="b023b9f79c7c19736ba3a37c42f4321d"></a><!-- doxytag: member="DiskInfo.h::EFI_DISK_INFO_WHICH_IDE" ref="b023b9f79c7c19736ba3a37c42f4321d" args=")(IN EFI_DISK_INFO_PROTOCOL *This, OUT UINT32 *IdeChannel, OUT UINT32 *IdeDevice)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d4/da6/a01168.html#ebe93fb3f4a6565b1ad4c329b6d0802d">EFI_SET_STATE</a>)(IN <a class="el" href="../../de/dbc/a00249.html">EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL</a> *This, IN <a class="el" href="../../d4/da6/a01168.html#5c5344195ec40b3af99801ca3ccd6b2a">EFI_KEY_TOGGLE_STATE</a> *KeyToggleState)          </td>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d4/da6/a01168.html#b023b9f79c7c19736ba3a37c42f4321d">EFI_DISK_INFO_WHICH_IDE</a>)(IN <a class="el" href="../../d1/d2b/a00018.html">EFI_DISK_INFO_PROTOCOL</a> *This, OUT <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *IdeChannel, OUT <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *IdeDevice)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The SetState() function allows the input device hardware to have state settings adjusted.<p>
+This function is used by the IDE bus driver to get controller information.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL instance.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>KeyToggleState</em>&nbsp;</td><td>Pointer to the EFI_KEY_TOGGLE_STATE to set the state for the input device.</td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the EFI_DISK_INFO_PROTOCOL instance. </td></tr>
+    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>IdeChannel</em>&nbsp;</td><td>Pointer to the Ide Channel number. Primary or secondary. </td></tr>
+    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>IdeDevice</em>&nbsp;</td><td>Pointer to the Ide Device number. Master or slave.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The device state was set appropriately.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The device is not functioning correctly and could not have the setting adjusted.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The device does not support the ability to have its state set. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="637a72253d199a1fdcfd92d4fc91a20a"></a><!-- doxytag: member="SimpleTextInEx.h::EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL" ref="637a72253d199a1fdcfd92d4fc91a20a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct <a class="el" href="../../de/dbc/a00249.html">_EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL</a> <a class="el" href="../../de/dbc/a00249.html">EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="73e6a9943a615bdf03066ef064fee4a0"></a><!-- doxytag: member="SimpleTextInEx.h::EFI_UNREGISTER_KEYSTROKE_NOTIFY" ref="73e6a9943a615bdf03066ef064fee4a0" args=")(IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This, IN EFI_HANDLE NotificationHandle)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d4/da6/a01168.html#73e6a9943a615bdf03066ef064fee4a0">EFI_UNREGISTER_KEYSTROKE_NOTIFY</a>)(IN <a class="el" href="../../de/dbc/a00249.html">EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL</a> *This, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> NotificationHandle)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-The UnregisterKeystrokeNotify() function removes a notification that was previously registered.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL instance.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>NotificationHandle</em>&nbsp;</td><td>The handle of the notification function being unregistered.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The device state was set appropriately.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The NotificationHandle is invalid. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>IdeChannel and IdeDevice are valid. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>This is not an IDE device. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
 <hr><h2>Variable Documentation</h2>
-<a class="anchor" name="07c4e41443e49d5439b52e002e319248"></a><!-- doxytag: member="SimpleTextInEx.h::gEfiSimpleTextInputExProtocolGuid" ref="07c4e41443e49d5439b52e002e319248" args="" -->
+<a class="anchor" name="a8dee95074aacf507eb8986f28e977c6"></a><!-- doxytag: member="DiskInfo.h::gEfiDiskInfoAhciInterfaceGuid" ref="a8dee95074aacf507eb8986f28e977c6" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../d4/da6/a01168.html#07c4e41443e49d5439b52e002e319248">gEfiSimpleTextInputExProtocolGuid</a>          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../d4/da6/a01168.html#a8dee95074aacf507eb8986f28e977c6">gEfiDiskInfoAhciInterfaceGuid</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="2922216d354203753c084e9c4d937a45"></a><!-- doxytag: member="DiskInfo.h::gEfiDiskInfoIdeInterfaceGuid" ref="2922216d354203753c084e9c4d937a45" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../d4/da6/a01168.html#2922216d354203753c084e9c4d937a45">gEfiDiskInfoIdeInterfaceGuid</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="cac9073285ee87d92ed6e48c649e21e8"></a><!-- doxytag: member="DiskInfo.h::gEfiDiskInfoProtocolGuid" ref="cac9073285ee87d92ed6e48c649e21e8" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../d4/da6/a01168.html#cac9073285ee87d92ed6e48c649e21e8">gEfiDiskInfoProtocolGuid</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="83d6f576a03a69573832db62a40816a0"></a><!-- doxytag: member="DiskInfo.h::gEfiDiskInfoScsiInterfaceGuid" ref="83d6f576a03a69573832db62a40816a0" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../d4/da6/a01168.html#83d6f576a03a69573832db62a40816a0">gEfiDiskInfoScsiInterfaceGuid</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="79882475cc6cf5c3998664654b6a15e2"></a><!-- doxytag: member="DiskInfo.h::gEfiDiskInfoUsbInterfaceGuid" ref="79882475cc6cf5c3998664654b6a15e2" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../d4/da6/a01168.html#79882475cc6cf5c3998664654b6a15e2">gEfiDiskInfoUsbInterfaceGuid</a>          </td>
         </tr>
       </table>
 </div>
@@ -927,7 +377,7 @@ The UnregisterKeystrokeNotify() function removes a notification that was previou
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:10 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:31 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

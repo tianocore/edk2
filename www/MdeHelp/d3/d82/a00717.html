@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: PAL_VM_INFO2 Struct Reference</title>
+<title>MdePkg[ALL]: MEDIA_PROTOCOL_DEVICE_PATH Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,40 +21,22 @@
   </div>
 </div>
 <div class="contents">
-<h1>PAL_VM_INFO2 Struct Reference</h1><!-- doxytag: class="PAL_VM_INFO2" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>MEDIA_PROTOCOL_DEVICE_PATH Struct Reference</h1><!-- doxytag: class="MEDIA_PROTOCOL_DEVICE_PATH" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d82/a00717.html#4668a0246f0afc45888692092d3b4c36">WidthOfVirtualAddress</a>:8</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d82/a00717.html#9b7ecfff82194c82c4214109086b5573">Header</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d82/a00717.html#cafdabe50267f63eba6998e531c61c4e">WidthOfRid</a>:8</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d82/a00717.html#6add3549ec808015c067a616173009ee">MaxPurgedTlbs</a>:16</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d82/a00717.html#2700a414dc25eb756156e61215da10ce">Reserved</a>:32</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d82/a00717.html#45597acbb55c84cf0ec4b45be1c5934c">Protocol</a></td></tr>
 
 </table>
-<hr><h2>Field Documentation</h2>
-<a class="anchor" name="6add3549ec808015c067a616173009ee"></a><!-- doxytag: member="PAL_VM_INFO2::MaxPurgedTlbs" ref="6add3549ec808015c067a616173009ee" args="" -->
+<hr><a name="_details"></a><h2>Detailed Description</h2>
+The Media Protocol Device Path is used to denote the protocol that is being used in a device path at the location of the path specified. Many protocols are inherent to the style of device path. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="9b7ecfff82194c82c4214109086b5573"></a><!-- doxytag: member="MEDIA_PROTOCOL_DEVICE_PATH::Header" ref="9b7ecfff82194c82c4214109086b5573" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d82/a00717.html#6add3549ec808015c067a616173009ee">PAL_VM_INFO2::MaxPurgedTlbs</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Unsigned 16 bit integer denoting the maximum number of concurrent outstanding TLB purges allowed by the processor. A value of 0 indicates one outstanding purge allowed. A value of 216-1 indicates no limit on outstanding purges. All other values indicate the actual number of concurrent outstanding purges allowed. 
-</div>
-</div><p>
-<a class="anchor" name="2700a414dc25eb756156e61215da10ce"></a><!-- doxytag: member="PAL_VM_INFO2::Reserved" ref="2700a414dc25eb756156e61215da10ce" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d82/a00717.html#2700a414dc25eb756156e61215da10ce">PAL_VM_INFO2::Reserved</a>          </td>
+          <td class="memname"><a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> <a class="el" href="../../d3/d82/a00717.html#9b7ecfff82194c82c4214109086b5573">MEDIA_PROTOCOL_DEVICE_PATH::Header</a>          </td>
         </tr>
       </table>
 </div>
@@ -64,38 +46,23 @@ Unsigned 16 bit integer denoting the maximum number of concurrent outstanding TL
 
 </div>
 </div><p>
-<a class="anchor" name="cafdabe50267f63eba6998e531c61c4e"></a><!-- doxytag: member="PAL_VM_INFO2::WidthOfRid" ref="cafdabe50267f63eba6998e531c61c4e" args="" -->
+<a class="anchor" name="45597acbb55c84cf0ec4b45be1c5934c"></a><!-- doxytag: member="MEDIA_PROTOCOL_DEVICE_PATH::Protocol" ref="45597acbb55c84cf0ec4b45be1c5934c" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d82/a00717.html#cafdabe50267f63eba6998e531c61c4e">PAL_VM_INFO2::WidthOfRid</a>          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../d3/d82/a00717.html#45597acbb55c84cf0ec4b45be1c5934c">MEDIA_PROTOCOL_DEVICE_PATH::Protocol</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Unsigned 8-bit integer denoting the number of bits implemented in the RR.rid field. 
-</div>
-</div><p>
-<a class="anchor" name="4668a0246f0afc45888692092d3b4c36"></a><!-- doxytag: member="PAL_VM_INFO2::WidthOfVirtualAddress" ref="4668a0246f0afc45888692092d3b4c36" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d82/a00717.html#4668a0246f0afc45888692092d3b4c36">PAL_VM_INFO2::WidthOfVirtualAddress</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Unsigned 8-bit integer denoting is the total number of virtual address bits - 1. 
+The ID of the protocol. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:20 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:54 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

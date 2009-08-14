@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_IP4_ROUTE_TABLE Struct Reference</title>
+<title>MdePkg[ALL]: EFI_IMAGE_DOS_HEADER Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,64 +21,394 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_IP4_ROUTE_TABLE Struct Reference</h1><!-- doxytag: class="EFI_IP4_ROUTE_TABLE" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_IMAGE_DOS_HEADER Struct Reference</h1><!-- doxytag: class="EFI_IMAGE_DOS_HEADER" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d30/a00508.html">EFI_IPv4_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d1c/a00504.html#659273a43d664b4d4e7723a85e74687b">SubnetAddress</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d1c/a00504.html#6368bda7824fa903c5dc3dcae0101cf1">e_magic</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d30/a00508.html">EFI_IPv4_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d1c/a00504.html#d37f5a0765b79311e710d933141a296e">SubnetMask</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Magic number.  <a href="#6368bda7824fa903c5dc3dcae0101cf1"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d1c/a00504.html#8687dd911d0313c0e09cea6c5dea5595">e_cblp</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d30/a00508.html">EFI_IPv4_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d1c/a00504.html#ae87a1894f715dea88ebbb32482549d5">GatewayAddress</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Bytes on last page of file.  <a href="#8687dd911d0313c0e09cea6c5dea5595"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d1c/a00504.html#da284f5c898028ea12ddf7fe5cd49632">e_cp</a></td></tr>
 
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Pages in file.  <a href="#da284f5c898028ea12ddf7fe5cd49632"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d1c/a00504.html#46bd66029530ac2d0844b0f38fa1b42a">e_crlc</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Relocations.  <a href="#46bd66029530ac2d0844b0f38fa1b42a"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d1c/a00504.html#5b2131cd3219f01c8dfcb6075a801e4b">e_cparhdr</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Size of header in paragraphs.  <a href="#5b2131cd3219f01c8dfcb6075a801e4b"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d1c/a00504.html#6d817125728aa96422f15e8dd9012a62">e_minalloc</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Minimum extra paragraphs needed.  <a href="#6d817125728aa96422f15e8dd9012a62"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d1c/a00504.html#2684b6962a1b9c7e22cd7a1c686dff60">e_maxalloc</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Maximum extra paragraphs needed.  <a href="#2684b6962a1b9c7e22cd7a1c686dff60"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d1c/a00504.html#c4aec5cb184186287e1ed7e94cbd85e7">e_ss</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Initial (relative) SS value.  <a href="#c4aec5cb184186287e1ed7e94cbd85e7"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d1c/a00504.html#7e7841892ad853b860a31b282ed0c2ee">e_sp</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Initial SP value.  <a href="#7e7841892ad853b860a31b282ed0c2ee"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d1c/a00504.html#763b32a279e643e9e12d82d5955e1d4a">e_csum</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Checksum.  <a href="#763b32a279e643e9e12d82d5955e1d4a"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d1c/a00504.html#58daf09e8c24765742ebafe9837f8e6f">e_ip</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Initial IP value.  <a href="#58daf09e8c24765742ebafe9837f8e6f"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d1c/a00504.html#fd518f3c2568936dbaeb589442ee91e8">e_cs</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Initial (relative) CS value.  <a href="#fd518f3c2568936dbaeb589442ee91e8"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d1c/a00504.html#ebd2101195012125e10534ab312fb799">e_lfarlc</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">File address of relocation table.  <a href="#ebd2101195012125e10534ab312fb799"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d1c/a00504.html#d2b192575c19e87e3efb8eaba9742277">e_ovno</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Overlay number.  <a href="#d2b192575c19e87e3efb8eaba9742277"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d1c/a00504.html#a079f76d52ce4840bac09fe0ed2ab5f9">e_res</a> [4]</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Reserved words.  <a href="#a079f76d52ce4840bac09fe0ed2ab5f9"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d1c/a00504.html#0a8936191cb79f26e7726c442f5fd1e1">e_oemid</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">OEM identifier (for e_oeminfo).  <a href="#0a8936191cb79f26e7726c442f5fd1e1"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d1c/a00504.html#2554b377deb461ecb4832d8fdf067374">e_oeminfo</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">OEM information; e_oemid specific.  <a href="#2554b377deb461ecb4832d8fdf067374"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d1c/a00504.html#fe4c0a8fb8159e66db8831a3a640cf38">e_res2</a> [10]</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Reserved words.  <a href="#fe4c0a8fb8159e66db8831a3a640cf38"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d1c/a00504.html#2a0e43686de96ee9a7a1a560e9855cb0">e_lfanew</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">File address of new exe header.  <a href="#2a0e43686de96ee9a7a1a560e9855cb0"></a><br></td></tr>
 </table>
-<hr><h2>Field Documentation</h2>
-<a class="anchor" name="ae87a1894f715dea88ebbb32482549d5"></a><!-- doxytag: member="EFI_IP4_ROUTE_TABLE::GatewayAddress" ref="ae87a1894f715dea88ebbb32482549d5" args="" -->
+<hr><a name="_details"></a><h2>Detailed Description</h2>
+PE images can start with an optional DOS header, so if an image is run under DOS it can print an error message. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="8687dd911d0313c0e09cea6c5dea5595"></a><!-- doxytag: member="EFI_IMAGE_DOS_HEADER::e_cblp" ref="8687dd911d0313c0e09cea6c5dea5595" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d30/a00508.html">EFI_IPv4_ADDRESS</a> <a class="el" href="../../dc/d1c/a00504.html#ae87a1894f715dea88ebbb32482549d5">EFI_IP4_ROUTE_TABLE::GatewayAddress</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dc/d1c/a00504.html#8687dd911d0313c0e09cea6c5dea5595">EFI_IMAGE_DOS_HEADER::e_cblp</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+Bytes on last page of file. 
+<p>
 
 </div>
 </div><p>
-<a class="anchor" name="659273a43d664b4d4e7723a85e74687b"></a><!-- doxytag: member="EFI_IP4_ROUTE_TABLE::SubnetAddress" ref="659273a43d664b4d4e7723a85e74687b" args="" -->
+<a class="anchor" name="da284f5c898028ea12ddf7fe5cd49632"></a><!-- doxytag: member="EFI_IMAGE_DOS_HEADER::e_cp" ref="da284f5c898028ea12ddf7fe5cd49632" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d30/a00508.html">EFI_IPv4_ADDRESS</a> <a class="el" href="../../dc/d1c/a00504.html#659273a43d664b4d4e7723a85e74687b">EFI_IP4_ROUTE_TABLE::SubnetAddress</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dc/d1c/a00504.html#da284f5c898028ea12ddf7fe5cd49632">EFI_IMAGE_DOS_HEADER::e_cp</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+Pages in file. 
+<p>
 
 </div>
 </div><p>
-<a class="anchor" name="d37f5a0765b79311e710d933141a296e"></a><!-- doxytag: member="EFI_IP4_ROUTE_TABLE::SubnetMask" ref="d37f5a0765b79311e710d933141a296e" args="" -->
+<a class="anchor" name="5b2131cd3219f01c8dfcb6075a801e4b"></a><!-- doxytag: member="EFI_IMAGE_DOS_HEADER::e_cparhdr" ref="5b2131cd3219f01c8dfcb6075a801e4b" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d30/a00508.html">EFI_IPv4_ADDRESS</a> <a class="el" href="../../dc/d1c/a00504.html#d37f5a0765b79311e710d933141a296e">EFI_IP4_ROUTE_TABLE::SubnetMask</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dc/d1c/a00504.html#5b2131cd3219f01c8dfcb6075a801e4b">EFI_IMAGE_DOS_HEADER::e_cparhdr</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+Size of header in paragraphs. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="46bd66029530ac2d0844b0f38fa1b42a"></a><!-- doxytag: member="EFI_IMAGE_DOS_HEADER::e_crlc" ref="46bd66029530ac2d0844b0f38fa1b42a" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dc/d1c/a00504.html#46bd66029530ac2d0844b0f38fa1b42a">EFI_IMAGE_DOS_HEADER::e_crlc</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Relocations. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="fd518f3c2568936dbaeb589442ee91e8"></a><!-- doxytag: member="EFI_IMAGE_DOS_HEADER::e_cs" ref="fd518f3c2568936dbaeb589442ee91e8" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dc/d1c/a00504.html#fd518f3c2568936dbaeb589442ee91e8">EFI_IMAGE_DOS_HEADER::e_cs</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Initial (relative) CS value. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="763b32a279e643e9e12d82d5955e1d4a"></a><!-- doxytag: member="EFI_IMAGE_DOS_HEADER::e_csum" ref="763b32a279e643e9e12d82d5955e1d4a" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dc/d1c/a00504.html#763b32a279e643e9e12d82d5955e1d4a">EFI_IMAGE_DOS_HEADER::e_csum</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Checksum. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="58daf09e8c24765742ebafe9837f8e6f"></a><!-- doxytag: member="EFI_IMAGE_DOS_HEADER::e_ip" ref="58daf09e8c24765742ebafe9837f8e6f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dc/d1c/a00504.html#58daf09e8c24765742ebafe9837f8e6f">EFI_IMAGE_DOS_HEADER::e_ip</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Initial IP value. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="2a0e43686de96ee9a7a1a560e9855cb0"></a><!-- doxytag: member="EFI_IMAGE_DOS_HEADER::e_lfanew" ref="2a0e43686de96ee9a7a1a560e9855cb0" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../dc/d1c/a00504.html#2a0e43686de96ee9a7a1a560e9855cb0">EFI_IMAGE_DOS_HEADER::e_lfanew</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+File address of new exe header. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="ebd2101195012125e10534ab312fb799"></a><!-- doxytag: member="EFI_IMAGE_DOS_HEADER::e_lfarlc" ref="ebd2101195012125e10534ab312fb799" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dc/d1c/a00504.html#ebd2101195012125e10534ab312fb799">EFI_IMAGE_DOS_HEADER::e_lfarlc</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+File address of relocation table. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="6368bda7824fa903c5dc3dcae0101cf1"></a><!-- doxytag: member="EFI_IMAGE_DOS_HEADER::e_magic" ref="6368bda7824fa903c5dc3dcae0101cf1" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dc/d1c/a00504.html#6368bda7824fa903c5dc3dcae0101cf1">EFI_IMAGE_DOS_HEADER::e_magic</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Magic number. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="2684b6962a1b9c7e22cd7a1c686dff60"></a><!-- doxytag: member="EFI_IMAGE_DOS_HEADER::e_maxalloc" ref="2684b6962a1b9c7e22cd7a1c686dff60" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dc/d1c/a00504.html#2684b6962a1b9c7e22cd7a1c686dff60">EFI_IMAGE_DOS_HEADER::e_maxalloc</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Maximum extra paragraphs needed. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="6d817125728aa96422f15e8dd9012a62"></a><!-- doxytag: member="EFI_IMAGE_DOS_HEADER::e_minalloc" ref="6d817125728aa96422f15e8dd9012a62" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dc/d1c/a00504.html#6d817125728aa96422f15e8dd9012a62">EFI_IMAGE_DOS_HEADER::e_minalloc</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Minimum extra paragraphs needed. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="0a8936191cb79f26e7726c442f5fd1e1"></a><!-- doxytag: member="EFI_IMAGE_DOS_HEADER::e_oemid" ref="0a8936191cb79f26e7726c442f5fd1e1" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dc/d1c/a00504.html#0a8936191cb79f26e7726c442f5fd1e1">EFI_IMAGE_DOS_HEADER::e_oemid</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+OEM identifier (for e_oeminfo). 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="2554b377deb461ecb4832d8fdf067374"></a><!-- doxytag: member="EFI_IMAGE_DOS_HEADER::e_oeminfo" ref="2554b377deb461ecb4832d8fdf067374" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dc/d1c/a00504.html#2554b377deb461ecb4832d8fdf067374">EFI_IMAGE_DOS_HEADER::e_oeminfo</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+OEM information; e_oemid specific. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="d2b192575c19e87e3efb8eaba9742277"></a><!-- doxytag: member="EFI_IMAGE_DOS_HEADER::e_ovno" ref="d2b192575c19e87e3efb8eaba9742277" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dc/d1c/a00504.html#d2b192575c19e87e3efb8eaba9742277">EFI_IMAGE_DOS_HEADER::e_ovno</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Overlay number. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="a079f76d52ce4840bac09fe0ed2ab5f9"></a><!-- doxytag: member="EFI_IMAGE_DOS_HEADER::e_res" ref="a079f76d52ce4840bac09fe0ed2ab5f9" args="[4]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dc/d1c/a00504.html#a079f76d52ce4840bac09fe0ed2ab5f9">EFI_IMAGE_DOS_HEADER::e_res</a>[4]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Reserved words. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="fe4c0a8fb8159e66db8831a3a640cf38"></a><!-- doxytag: member="EFI_IMAGE_DOS_HEADER::e_res2" ref="fe4c0a8fb8159e66db8831a3a640cf38" args="[10]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dc/d1c/a00504.html#fe4c0a8fb8159e66db8831a3a640cf38">EFI_IMAGE_DOS_HEADER::e_res2</a>[10]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Reserved words. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="7e7841892ad853b860a31b282ed0c2ee"></a><!-- doxytag: member="EFI_IMAGE_DOS_HEADER::e_sp" ref="7e7841892ad853b860a31b282ed0c2ee" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dc/d1c/a00504.html#7e7841892ad853b860a31b282ed0c2ee">EFI_IMAGE_DOS_HEADER::e_sp</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Initial SP value. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="c4aec5cb184186287e1ed7e94cbd85e7"></a><!-- doxytag: member="EFI_IMAGE_DOS_HEADER::e_ss" ref="c4aec5cb184186287e1ed7e94cbd85e7" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dc/d1c/a00504.html#c4aec5cb184186287e1ed7e94cbd85e7">EFI_IMAGE_DOS_HEADER::e_ss</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Initial (relative) SS value. 
+<p>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:34 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

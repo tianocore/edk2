@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_HII_PACKAGE_HEADER Struct Reference</title>
+<title>MdePkg[ALL]: EFI_FFS_INTEGRITY_CHECK Union Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,22 +21,28 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_HII_PACKAGE_HEADER Struct Reference</h1><!-- doxytag: class="EFI_HII_PACKAGE_HEADER" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_FFS_INTEGRITY_CHECK Union Reference</h1><!-- doxytag: class="EFI_FFS_INTEGRITY_CHECK" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d10/a00449.html#0e280705ec1359481f9a856020c5d700">Length</a>:24</td></tr>
+<tr><td class="memItemLeft" nowrap>struct {</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d10/a00449.html#69f866fe1ef732a1650b76b9654c5faa">Type</a>:8</td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d9/d10/a00449.html#6f00433aa335a89c9976e8c8126e4ce6">Header</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d9/d10/a00449.html#7d7eafd7c9cd69c413b8fb8873c3f633">File</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap valign="top">}&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d10/a00449.html#b51d2036aff153fe27e43f850e04bfb6">Checksum</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d10/a00449.html#9976b8e6bf2b47f7481565a0be99d073">Checksum16</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-The header found at the start of each package. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="0e280705ec1359481f9a856020c5d700"></a><!-- doxytag: member="EFI_HII_PACKAGE_HEADER::Length" ref="0e280705ec1359481f9a856020c5d700" args="" -->
+Used to verify the integrity of the file. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="b51d2036aff153fe27e43f850e04bfb6"></a><!-- doxytag: member="EFI_FFS_INTEGRITY_CHECK::Checksum" ref="b51d2036aff153fe27e43f850e04bfb6" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d9/d10/a00449.html#0e280705ec1359481f9a856020c5d700">EFI_HII_PACKAGE_HEADER::Length</a>          </td>
+          <td class="memname">struct { ... }   <a class="el" href="../../d9/d10/a00449.html#b51d2036aff153fe27e43f850e04bfb6">EFI_FFS_INTEGRITY_CHECK::Checksum</a>          </td>
         </tr>
       </table>
 </div>
@@ -46,23 +52,53 @@ The header found at the start of each package. <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="69f866fe1ef732a1650b76b9654c5faa"></a><!-- doxytag: member="EFI_HII_PACKAGE_HEADER::Type" ref="69f866fe1ef732a1650b76b9654c5faa" args="" -->
+<a class="anchor" name="9976b8e6bf2b47f7481565a0be99d073"></a><!-- doxytag: member="EFI_FFS_INTEGRITY_CHECK::Checksum16" ref="9976b8e6bf2b47f7481565a0be99d073" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d9/d10/a00449.html#69f866fe1ef732a1650b76b9654c5faa">EFI_HII_PACKAGE_HEADER::Type</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d9/d10/a00449.html#9976b8e6bf2b47f7481565a0be99d073">EFI_FFS_INTEGRITY_CHECK::Checksum16</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+This is the full 16 bits of the IntegrityCheck field. 
+</div>
+</div><p>
+<a class="anchor" name="7d7eafd7c9cd69c413b8fb8873c3f633"></a><!-- doxytag: member="EFI_FFS_INTEGRITY_CHECK::File" ref="7d7eafd7c9cd69c413b8fb8873c3f633" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d9/d10/a00449.html#7d7eafd7c9cd69c413b8fb8873c3f633">EFI_FFS_INTEGRITY_CHECK::File</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
 
+<p>
+If the FFS_ATTRIB_CHECKSUM (see definition below) bit of the Attributes field is set to one, the IntegrityCheck.Checksum.File field is an 8-bit checksum of the entire file The State field and the file tail are assumed to be zero and the checksum is calculated such that the entire file sums to zero. If the FFS_ATTRIB_CHECKSUM bit of the Attributes field is cleared to zero, the IntegrityCheck.Checksum.File field must be initialized with a value of 0x55AA. The IntegrityCheck.Checksum.File field is valid any time the EFI_FILE_DATA_VALID bit is set in the State field. 
+</div>
+</div><p>
+<a class="anchor" name="6f00433aa335a89c9976e8c8126e4ce6"></a><!-- doxytag: member="EFI_FFS_INTEGRITY_CHECK::Header" ref="6f00433aa335a89c9976e8c8126e4ce6" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d9/d10/a00449.html#6f00433aa335a89c9976e8c8126e4ce6">EFI_FFS_INTEGRITY_CHECK::Header</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+The IntegrityCheck.Checksum.Header field is an 8-bit checksum of the file header. The State and IntegrityCheck.Checksum.File fields are assumed to be zero and the checksum is calculated such that the entire header sums to zero. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:31 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

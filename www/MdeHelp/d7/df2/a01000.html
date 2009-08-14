@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/IndustryStandard/SmBus.h File Reference</title>
+<title>MdePkg[ALL]: USB_WWID_DEVICE_PATH Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -9,132 +9,94 @@
   <div class="tabs">
     <ul>
       <li><a href="../../main.html"><span>Main&nbsp;Page</span></a></li>
-      <li><a href="../../annotated.html"><span>Data&nbsp;Structures</span></a></li>
-      <li class="current"><a href="../../files.html"><span>Files</span></a></li>
+      <li class="current"><a href="../../annotated.html"><span>Data&nbsp;Structures</span></a></li>
+      <li><a href="../../files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div class="tabs">
     <ul>
-      <li><a href="../../files.html"><span>File&nbsp;List</span></a></li>
-      <li><a href="../../globals.html"><span>Globals</span></a></li>
+      <li><a href="../../annotated.html"><span>Data&nbsp;Structures</span></a></li>
+      <li><a href="../../functions.html"><span>Data&nbsp;Fields</span></a></li>
     </ul>
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/IndustryStandard/SmBus.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>USB_WWID_DEVICE_PATH Struct Reference</h1><!-- doxytag: class="USB_WWID_DEVICE_PATH" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
-<tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/da3/a00593.html">EFI_SMBUS_UDID</a></td></tr>
+<tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df2/a01000.html#1a381ab11350372ec730bfbb91557e7e">Header</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dad/a00591.html">EFI_SMBUS_DEVICE_ADDRESS</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df2/a01000.html#eb6736f787b363d572cd23d3568ac108">InterfaceNumber</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/dec/a00592.html">EFI_SMBUS_DEVICE_MAP</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df2/a01000.html#ac7aee63e909b9e5c013494e3147985b">VendorId</a></td></tr>
 
-<tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef enum <a class="el" href="../../d7/df2/a01000.html#84044358a09f0103cb2b495d46076060">_EFI_SMBUS_OPERATION</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df2/a01000.html#a8b213cf201989c6b42291855b32db41">EFI_SMBUS_OPERATION</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df2/a01000.html#0e036b8292641b19ce16792acbde35ba">EFI_SMBUS_DEVICE_COMMAND</a></td></tr>
-
-<tr><td colspan="2"><br><h2>Enumerations</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df2/a01000.html#84044358a09f0103cb2b495d46076060">_EFI_SMBUS_OPERATION</a> { <br>
-&nbsp;&nbsp;<a class="el" href="../../d7/df2/a01000.html#84044358a09f0103cb2b495d460760604f59e2034dc1b7f64b2e733696552a39">EfiSmbusQuickRead</a>, 
-<a class="el" href="../../d7/df2/a01000.html#84044358a09f0103cb2b495d46076060e8712c303cee83a47c14073de4177893">EfiSmbusQuickWrite</a>, 
-<a class="el" href="../../d7/df2/a01000.html#84044358a09f0103cb2b495d4607606081e5f2e5e4c9bcd87b812b9d264cb389">EfiSmbusReceiveByte</a>, 
-<a class="el" href="../../d7/df2/a01000.html#84044358a09f0103cb2b495d46076060b3ffa4512f094ac980e404172761430c">EfiSmbusSendByte</a>, 
-<br>
-&nbsp;&nbsp;<a class="el" href="../../d7/df2/a01000.html#84044358a09f0103cb2b495d460760600de5f9ca7208893cdead9d7eea2ce552">EfiSmbusReadByte</a>, 
-<a class="el" href="../../d7/df2/a01000.html#84044358a09f0103cb2b495d460760607c965f85a4c67bab812016c69d0b1a5d">EfiSmbusWriteByte</a>, 
-<a class="el" href="../../d7/df2/a01000.html#84044358a09f0103cb2b495d46076060a334bad3480b6d8acbe34999128ab08f">EfiSmbusReadWord</a>, 
-<a class="el" href="../../d7/df2/a01000.html#84044358a09f0103cb2b495d46076060a25069d9f1877c9bca63857e79c5da04">EfiSmbusWriteWord</a>, 
-<br>
-&nbsp;&nbsp;<a class="el" href="../../d7/df2/a01000.html#84044358a09f0103cb2b495d46076060334aa678357865469a2b325545dc6ec4">EfiSmbusReadBlock</a>, 
-<a class="el" href="../../d7/df2/a01000.html#84044358a09f0103cb2b495d46076060cea7fcb22e3ade3c7b76a91622f9b4ae">EfiSmbusWriteBlock</a>, 
-<a class="el" href="../../d7/df2/a01000.html#84044358a09f0103cb2b495d4607606041d6526c47f9e94a64c6d7f056e43840">EfiSmbusProcessCall</a>, 
-<a class="el" href="../../d7/df2/a01000.html#84044358a09f0103cb2b495d460760603f0df7914057977fdbbc0c0f3a562819">EfiSmbusBWBRProcessCall</a>
-<br>
- }</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df2/a01000.html#4c6a4534c5e2023d00878108ffe7a21a">ProductId</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-This file declares the SMBus definitions defined in SmBus Specifciation V2.0 and defined in PI1.0 specification volume 5.<p>
-Copyright (c) 2007 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="0e036b8292641b19ce16792acbde35ba"></a><!-- doxytag: member="SmBus.h::EFI_SMBUS_DEVICE_COMMAND" ref="0e036b8292641b19ce16792acbde35ba" args="" -->
+This device path describes a USB device using its serial number. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="1a381ab11350372ec730bfbb91557e7e"></a><!-- doxytag: member="USB_WWID_DEVICE_PATH::Header" ref="1a381ab11350372ec730bfbb91557e7e" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> <a class="el" href="../../d7/df2/a01000.html#0e036b8292641b19ce16792acbde35ba">EFI_SMBUS_DEVICE_COMMAND</a>          </td>
+          <td class="memname"><a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> <a class="el" href="../../d7/df2/a01000.html#1a381ab11350372ec730bfbb91557e7e">USB_WWID_DEVICE_PATH::Header</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-EFI_SMBUS_DEVICE_COMMAND 
+
 </div>
 </div><p>
-<a class="anchor" name="a8b213cf201989c6b42291855b32db41"></a><!-- doxytag: member="SmBus.h::EFI_SMBUS_OPERATION" ref="a8b213cf201989c6b42291855b32db41" args="" -->
+<a class="anchor" name="eb6736f787b363d572cd23d3568ac108"></a><!-- doxytag: member="USB_WWID_DEVICE_PATH::InterfaceNumber" ref="eb6736f787b363d572cd23d3568ac108" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef enum <a class="el" href="../../d7/df2/a01000.html#84044358a09f0103cb2b495d46076060">_EFI_SMBUS_OPERATION</a>  <a class="el" href="../../d7/df2/a01000.html#a8b213cf201989c6b42291855b32db41">EFI_SMBUS_OPERATION</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d7/df2/a01000.html#eb6736f787b363d572cd23d3568ac108">USB_WWID_DEVICE_PATH::InterfaceNumber</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Smbus Operations 
+USB interface number 
 </div>
 </div><p>
-<hr><h2>Enumeration Type Documentation</h2>
-<a class="anchor" name="84044358a09f0103cb2b495d46076060"></a><!-- doxytag: member="SmBus.h::_EFI_SMBUS_OPERATION" ref="84044358a09f0103cb2b495d46076060" args="" -->
+<a class="anchor" name="4c6a4534c5e2023d00878108ffe7a21a"></a><!-- doxytag: member="USB_WWID_DEVICE_PATH::ProductId" ref="4c6a4534c5e2023d00878108ffe7a21a" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="../../d7/df2/a01000.html#84044358a09f0103cb2b495d46076060">_EFI_SMBUS_OPERATION</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d7/df2/a01000.html#4c6a4534c5e2023d00878108ffe7a21a">USB_WWID_DEVICE_PATH::ProductId</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Smbus Operations <dl compact><dt><b>Enumerator: </b></dt><dd>
-<table border="0" cellspacing="2" cellpadding="0">
-<tr><td valign="top"><em><a class="anchor" name="84044358a09f0103cb2b495d460760604f59e2034dc1b7f64b2e733696552a39"></a><!-- doxytag: member="EfiSmbusQuickRead" ref="84044358a09f0103cb2b495d460760604f59e2034dc1b7f64b2e733696552a39" args="" -->EfiSmbusQuickRead</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" name="84044358a09f0103cb2b495d46076060e8712c303cee83a47c14073de4177893"></a><!-- doxytag: member="EfiSmbusQuickWrite" ref="84044358a09f0103cb2b495d46076060e8712c303cee83a47c14073de4177893" args="" -->EfiSmbusQuickWrite</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" name="84044358a09f0103cb2b495d4607606081e5f2e5e4c9bcd87b812b9d264cb389"></a><!-- doxytag: member="EfiSmbusReceiveByte" ref="84044358a09f0103cb2b495d4607606081e5f2e5e4c9bcd87b812b9d264cb389" args="" -->EfiSmbusReceiveByte</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" name="84044358a09f0103cb2b495d46076060b3ffa4512f094ac980e404172761430c"></a><!-- doxytag: member="EfiSmbusSendByte" ref="84044358a09f0103cb2b495d46076060b3ffa4512f094ac980e404172761430c" args="" -->EfiSmbusSendByte</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" name="84044358a09f0103cb2b495d460760600de5f9ca7208893cdead9d7eea2ce552"></a><!-- doxytag: member="EfiSmbusReadByte" ref="84044358a09f0103cb2b495d460760600de5f9ca7208893cdead9d7eea2ce552" args="" -->EfiSmbusReadByte</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" name="84044358a09f0103cb2b495d460760607c965f85a4c67bab812016c69d0b1a5d"></a><!-- doxytag: member="EfiSmbusWriteByte" ref="84044358a09f0103cb2b495d460760607c965f85a4c67bab812016c69d0b1a5d" args="" -->EfiSmbusWriteByte</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" name="84044358a09f0103cb2b495d46076060a334bad3480b6d8acbe34999128ab08f"></a><!-- doxytag: member="EfiSmbusReadWord" ref="84044358a09f0103cb2b495d46076060a334bad3480b6d8acbe34999128ab08f" args="" -->EfiSmbusReadWord</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" name="84044358a09f0103cb2b495d46076060a25069d9f1877c9bca63857e79c5da04"></a><!-- doxytag: member="EfiSmbusWriteWord" ref="84044358a09f0103cb2b495d46076060a25069d9f1877c9bca63857e79c5da04" args="" -->EfiSmbusWriteWord</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" name="84044358a09f0103cb2b495d46076060334aa678357865469a2b325545dc6ec4"></a><!-- doxytag: member="EfiSmbusReadBlock" ref="84044358a09f0103cb2b495d46076060334aa678357865469a2b325545dc6ec4" args="" -->EfiSmbusReadBlock</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" name="84044358a09f0103cb2b495d46076060cea7fcb22e3ade3c7b76a91622f9b4ae"></a><!-- doxytag: member="EfiSmbusWriteBlock" ref="84044358a09f0103cb2b495d46076060cea7fcb22e3ade3c7b76a91622f9b4ae" args="" -->EfiSmbusWriteBlock</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" name="84044358a09f0103cb2b495d4607606041d6526c47f9e94a64c6d7f056e43840"></a><!-- doxytag: member="EfiSmbusProcessCall" ref="84044358a09f0103cb2b495d4607606041d6526c47f9e94a64c6d7f056e43840" args="" -->EfiSmbusProcessCall</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" name="84044358a09f0103cb2b495d460760603f0df7914057977fdbbc0c0f3a562819"></a><!-- doxytag: member="EfiSmbusBWBRProcessCall" ref="84044358a09f0103cb2b495d460760603f0df7914057977fdbbc0c0f3a562819" args="" -->EfiSmbusBWBRProcessCall</em>&nbsp;</td><td>
-</td></tr>
-</table>
-</dl>
+USB product id of the device 
+</div>
+</div><p>
+<a class="anchor" name="ac7aee63e909b9e5c013494e3147985b"></a><!-- doxytag: member="USB_WWID_DEVICE_PATH::VendorId" ref="ac7aee63e909b9e5c013494e3147985b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d7/df2/a01000.html#ac7aee63e909b9e5c013494e3147985b">USB_WWID_DEVICE_PATH::VendorId</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
 
+<p>
+USB vendor id of the device 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:07 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:14 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

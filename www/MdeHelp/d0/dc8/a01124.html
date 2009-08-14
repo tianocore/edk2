@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Protocol/EdidActive.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Ppi/EndOfPeiPhase.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,29 +21,27 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Protocol/EdidActive.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Ppi/EndOfPeiPhase.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
-<tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/d15/a00416.html">EFI_EDID_ACTIVE_PROTOCOL</a></td></tr>
-
 <tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/dc8/a01124.html#55c7fb7c1917e461d8f57dad4046b14f">EFI_EDID_ACTIVE_PROTOCOL_GUID</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/dc8/a01124.html#a27edc992ad38982fad37af974d3482c">EFI_PEI_END_OF_PEI_PHASE_PPI_GUID</a></td></tr>
 
 <tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/dc8/a01124.html#e1417e95b28d37a9f69c60d3d9f16c19">gEfiEdidActiveProtocolGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/dc8/a01124.html#92dbc35d9a9422e9891e84d2a1705cb7">gEfiEndOfPeiSignalPpiGuid</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-EDID Active Protocol from the UEFI 2.0 specification.<p>
-Placed on the video output device child handle that is actively displaying output.<p>
+This PPI will be installed at the end of PEI for all boot paths, including normal, recovery, and S3. It allows for PEIMs to possibly quiesce hardware, build handoff information for the next phase of execution, or provide some terminal processing behavior.<p>
 Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
-<a class="anchor" name="55c7fb7c1917e461d8f57dad4046b14f"></a><!-- doxytag: member="EdidActive.h::EFI_EDID_ACTIVE_PROTOCOL_GUID" ref="55c7fb7c1917e461d8f57dad4046b14f" args="" -->
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
+<dl class="user" compact><dt><b>Revision Reference:</b></dt><dd>This PPI is introduced in PI Version 1.0. </dd></dl>
+<hr><h2>Define Documentation</h2>
+<a class="anchor" name="a27edc992ad38982fad37af974d3482c"></a><!-- doxytag: member="EndOfPeiPhase.h::EFI_PEI_END_OF_PEI_PHASE_PPI_GUID" ref="a27edc992ad38982fad37af974d3482c" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_EDID_ACTIVE_PROTOCOL_GUID          </td>
+          <td class="memname">#define EFI_PEI_END_OF_PEI_PHASE_PPI_GUID          </td>
         </tr>
       </table>
 </div>
@@ -51,18 +49,18 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 <p>
 <b>Value:</b><div class="fragment"><pre class="fragment">{ \
-    0xbd8c1056, 0x9f36, 0x44ec, {0x92, 0xa8, 0xa6, 0x33, 0x7f, 0x81, 0x79, 0x86 } \
+    0x605EA650, 0xC65C, 0x42e1, {0xBA, 0x80, 0x91, 0xA5, 0x2A, 0xB6, 0x18, 0xC6 } \
   }
 </pre></div>
 </div>
 </div><p>
 <hr><h2>Variable Documentation</h2>
-<a class="anchor" name="e1417e95b28d37a9f69c60d3d9f16c19"></a><!-- doxytag: member="EdidActive.h::gEfiEdidActiveProtocolGuid" ref="e1417e95b28d37a9f69c60d3d9f16c19" args="" -->
+<a class="anchor" name="92dbc35d9a9422e9891e84d2a1705cb7"></a><!-- doxytag: member="EndOfPeiPhase.h::gEfiEndOfPeiSignalPpiGuid" ref="92dbc35d9a9422e9891e84d2a1705cb7" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../d0/dc8/a01124.html#e1417e95b28d37a9f69c60d3d9f16c19">gEfiEdidActiveProtocolGuid</a>          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../d0/dc8/a01124.html#92dbc35d9a9422e9891e84d2a1705cb7">gEfiEndOfPeiSignalPpiGuid</a>          </td>
         </tr>
       </table>
 </div>
@@ -73,7 +71,7 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:10 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:27 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

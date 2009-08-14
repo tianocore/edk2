@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Protocol/ComponentName2.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Pi/PiBootMode.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,146 +21,224 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Protocol/ComponentName2.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Pi/PiBootMode.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
-<tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dec/a00010.html">_EFI_COMPONENT_NAME2_PROTOCOL</a></td></tr>
-
 <tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d1d/a01105.html#562f4b4866b912215b2e7fa07d3d4821">EFI_COMPONENT_NAME2_PROTOCOL_GUID</a>&nbsp;&nbsp;&nbsp;{0x6a7a5cff, 0xe8d9, 0x4f70, { 0xba, 0xda, 0x75, 0xab, 0x30, 0x25, 0xce, 0x14 } }</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d1d/a01105.html#fdb0035a3b4ff3ca39d060f74c86dfd6">BOOT_WITH_FULL_CONFIGURATION</a>&nbsp;&nbsp;&nbsp;0x00</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d1d/a01105.html#04357072fd26c0c45c5918055743312a">BOOT_WITH_MINIMAL_CONFIGURATION</a>&nbsp;&nbsp;&nbsp;0x01</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d1d/a01105.html#9b5c0be77df31f539df8ce941c44c468">BOOT_ASSUMING_NO_CONFIGURATION_CHANGES</a>&nbsp;&nbsp;&nbsp;0x02</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d1d/a01105.html#4481e4ddf179f0732c5805ec4f80d2dd">BOOT_WITH_FULL_CONFIGURATION_PLUS_DIAGNOSTICS</a>&nbsp;&nbsp;&nbsp;0x03</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d1d/a01105.html#c5ccb41013983f7c7ed407ba4e061f78">BOOT_WITH_DEFAULT_SETTINGS</a>&nbsp;&nbsp;&nbsp;0x04</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d1d/a01105.html#cb8923d39e14ec2acd8771d4957f535c">BOOT_ON_S4_RESUME</a>&nbsp;&nbsp;&nbsp;0x05</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d1d/a01105.html#b8e44be80e7d08b1d98bf924633b5b1f">BOOT_ON_S5_RESUME</a>&nbsp;&nbsp;&nbsp;0x06</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d1d/a01105.html#860c1e4d888259ee05783f9517dddf71">BOOT_ON_S2_RESUME</a>&nbsp;&nbsp;&nbsp;0x10</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d1d/a01105.html#c42e38d7667a65ae261593d818f11333">BOOT_ON_S3_RESUME</a>&nbsp;&nbsp;&nbsp;0x11</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d1d/a01105.html#6407bbc0a1c81712be90d411ec831b12">BOOT_ON_FLASH_UPDATE</a>&nbsp;&nbsp;&nbsp;0x12</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d1d/a01105.html#4518a202624c87fd9f87d451664d4716">BOOT_IN_RECOVERY_MODE</a>&nbsp;&nbsp;&nbsp;0x20</td></tr>
 
 <tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
-<a class="el" href="../../d7/dec/a00010.html">_EFI_COMPONENT_NAME2_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d1d/a01105.html#896e1eb12dcdb9ce58a3eee8a3d2eb80">EFI_COMPONENT_NAME2_PROTOCOL</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d1d/a01105.html#18760674d2de1242b8bfd8fd035cd390">EFI_COMPONENT_NAME2_GET_DRIVER_NAME</a> )(IN <a class="el" href="../../d7/dec/a00010.html">EFI_COMPONENT_NAME2_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Language, OUT <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> **DriverName)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d1d/a01105.html#2f25ceb4e5e778a675a69399ccf8105b">EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME</a> )(IN <a class="el" href="../../d7/dec/a00010.html">EFI_COMPONENT_NAME2_PROTOCOL</a> *This, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ControllerHandle, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ChildHandle, IN <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Language, OUT <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> **ControllerName)</td></tr>
-
-<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d1d/a01105.html#ce687d10b1be9693a9965ae09a990484">gEfiComponentName2ProtocolGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d1d/a01105.html#30cd764e34dd311a5197ea5bcd09b579">EFI_BOOT_MODE</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-UEFI Component Name 2 Protocol as defined in the UEFI 2.1 specification. This protocol is used to retrieve user readable names of drivers and controllers managed by UEFI Drivers.<p>
-Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
-<a class="anchor" name="562f4b4866b912215b2e7fa07d3d4821"></a><!-- doxytag: member="ComponentName2.h::EFI_COMPONENT_NAME2_PROTOCOL_GUID" ref="562f4b4866b912215b2e7fa07d3d4821" args="" -->
+Present the boot mode values in PI.<p>
+Copyright (c) 2006 - 2009, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
+<dl class="user" compact><dt><b>Revision Reference:</b></dt><dd>PI Version 1.0 </dd></dl>
+<hr><h2>Define Documentation</h2>
+<a class="anchor" name="9b5c0be77df31f539df8ce941c44c468"></a><!-- doxytag: member="PiBootMode.h::BOOT_ASSUMING_NO_CONFIGURATION_CHANGES" ref="9b5c0be77df31f539df8ce941c44c468" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_COMPONENT_NAME2_PROTOCOL_GUID&nbsp;&nbsp;&nbsp;{0x6a7a5cff, 0xe8d9, 0x4f70, { 0xba, 0xda, 0x75, 0xab, 0x30, 0x25, 0xce, 0x14 } }          </td>
+          <td class="memname">#define BOOT_ASSUMING_NO_CONFIGURATION_CHANGES&nbsp;&nbsp;&nbsp;0x02          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Global ID for the Component Name Protocol 
+
+</div>
+</div><p>
+<a class="anchor" name="4518a202624c87fd9f87d451664d4716"></a><!-- doxytag: member="PiBootMode.h::BOOT_IN_RECOVERY_MODE" ref="4518a202624c87fd9f87d451664d4716" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define BOOT_IN_RECOVERY_MODE&nbsp;&nbsp;&nbsp;0x20          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="6407bbc0a1c81712be90d411ec831b12"></a><!-- doxytag: member="PiBootMode.h::BOOT_ON_FLASH_UPDATE" ref="6407bbc0a1c81712be90d411ec831b12" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define BOOT_ON_FLASH_UPDATE&nbsp;&nbsp;&nbsp;0x12          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="860c1e4d888259ee05783f9517dddf71"></a><!-- doxytag: member="PiBootMode.h::BOOT_ON_S2_RESUME" ref="860c1e4d888259ee05783f9517dddf71" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define BOOT_ON_S2_RESUME&nbsp;&nbsp;&nbsp;0x10          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="c42e38d7667a65ae261593d818f11333"></a><!-- doxytag: member="PiBootMode.h::BOOT_ON_S3_RESUME" ref="c42e38d7667a65ae261593d818f11333" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define BOOT_ON_S3_RESUME&nbsp;&nbsp;&nbsp;0x11          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="cb8923d39e14ec2acd8771d4957f535c"></a><!-- doxytag: member="PiBootMode.h::BOOT_ON_S4_RESUME" ref="cb8923d39e14ec2acd8771d4957f535c" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define BOOT_ON_S4_RESUME&nbsp;&nbsp;&nbsp;0x05          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="b8e44be80e7d08b1d98bf924633b5b1f"></a><!-- doxytag: member="PiBootMode.h::BOOT_ON_S5_RESUME" ref="b8e44be80e7d08b1d98bf924633b5b1f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define BOOT_ON_S5_RESUME&nbsp;&nbsp;&nbsp;0x06          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="c5ccb41013983f7c7ed407ba4e061f78"></a><!-- doxytag: member="PiBootMode.h::BOOT_WITH_DEFAULT_SETTINGS" ref="c5ccb41013983f7c7ed407ba4e061f78" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define BOOT_WITH_DEFAULT_SETTINGS&nbsp;&nbsp;&nbsp;0x04          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="fdb0035a3b4ff3ca39d060f74c86dfd6"></a><!-- doxytag: member="PiBootMode.h::BOOT_WITH_FULL_CONFIGURATION" ref="fdb0035a3b4ff3ca39d060f74c86dfd6" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define BOOT_WITH_FULL_CONFIGURATION&nbsp;&nbsp;&nbsp;0x00          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="4481e4ddf179f0732c5805ec4f80d2dd"></a><!-- doxytag: member="PiBootMode.h::BOOT_WITH_FULL_CONFIGURATION_PLUS_DIAGNOSTICS" ref="4481e4ddf179f0732c5805ec4f80d2dd" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define BOOT_WITH_FULL_CONFIGURATION_PLUS_DIAGNOSTICS&nbsp;&nbsp;&nbsp;0x03          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="04357072fd26c0c45c5918055743312a"></a><!-- doxytag: member="PiBootMode.h::BOOT_WITH_MINIMAL_CONFIGURATION" ref="04357072fd26c0c45c5918055743312a" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define BOOT_WITH_MINIMAL_CONFIGURATION&nbsp;&nbsp;&nbsp;0x01          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
 </div>
 </div><p>
 <hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="2f25ceb4e5e778a675a69399ccf8105b"></a><!-- doxytag: member="ComponentName2.h::EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME" ref="2f25ceb4e5e778a675a69399ccf8105b" args=")(IN EFI_COMPONENT_NAME2_PROTOCOL *This, IN EFI_HANDLE ControllerHandle, IN EFI_HANDLE ChildHandle, IN CHAR8 *Language, OUT CHAR16 **ControllerName)" -->
+<a class="anchor" name="30cd764e34dd311a5197ea5bcd09b579"></a><!-- doxytag: member="PiBootMode.h::EFI_BOOT_MODE" ref="30cd764e34dd311a5197ea5bcd09b579" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/d1d/a01105.html#2f25ceb4e5e778a675a69399ccf8105b">EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME</a>)(IN <a class="el" href="../../d7/dec/a00010.html">EFI_COMPONENT_NAME2_PROTOCOL</a> *This, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ControllerHandle, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ChildHandle, IN <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Language, OUT <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> **ControllerName)          </td>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../de/d1d/a01105.html#30cd764e34dd311a5197ea5bcd09b579">EFI_BOOT_MODE</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Retrieves a Unicode string that is the user readable name of the controller that is being managed by an EFI Driver.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_COMPONENT_NAME2_PROTOCOL instance.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ControllerHandle</em>&nbsp;</td><td>The handle of a controller that the driver specified by This is managing. This handle specifies the controller whose name is to be returned.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ChildHandle</em>&nbsp;</td><td>The handle of the child controller to retrieve the name of. This is an optional parameter that may be NULL. It will be NULL for device drivers. It will also be NULL for bus drivers that wish to retrieve the name of the bus controller. It will not be NULL for a bus driver that wishes to retrieve the name of a child controller.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Language</em>&nbsp;</td><td>A pointer to a Null-terminated ASCII string array indicating the language. This is the language of the driver name that the caller is requesting, and it must match one of the languages specified in SupportedLanguages. The number of languages supported by a driver is up to the driver writer. Language is specified in RFC 4646 language code format.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ControllerName</em>&nbsp;</td><td>A pointer to the Unicode string to return. This Unicode string is the name of the controller specified by ControllerHandle and ChildHandle in the language specified by Language from the point of view of the driver specified by This.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The Unicode string for the user readable name in the language specified by Language for the driver specified by This was returned in DriverName.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>ControllerHandle is not a valid EFI_HANDLE.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>ChildHandle is not NULL and it is not a valid EFI_HANDLE.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Language is NULL.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>ControllerName is NULL.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The driver specified by This is not currently managing the controller specified by ControllerHandle and ChildHandle.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The driver specified by This does not support the language specified by Language. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="18760674d2de1242b8bfd8fd035cd390"></a><!-- doxytag: member="ComponentName2.h::EFI_COMPONENT_NAME2_GET_DRIVER_NAME" ref="18760674d2de1242b8bfd8fd035cd390" args=")(IN EFI_COMPONENT_NAME2_PROTOCOL *This, IN CHAR8 *Language, OUT CHAR16 **DriverName)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/d1d/a01105.html#18760674d2de1242b8bfd8fd035cd390">EFI_COMPONENT_NAME2_GET_DRIVER_NAME</a>)(IN <a class="el" href="../../d7/dec/a00010.html">EFI_COMPONENT_NAME2_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Language, OUT <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> **DriverName)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Retrieves a Unicode string that is the user-readable name of the EFI Driver.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_COMPONENT_NAME2_PROTOCOL instance.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Language</em>&nbsp;</td><td>A pointer to a Null-terminated ASCII string array indicating the language. This is the language of the driver name that the caller is requesting, and it must match one of the languages specified in SupportedLanguages. The number of languages supported by a driver is up to the driver writer. Language is specified in RFC 4646 language code format.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DriverName</em>&nbsp;</td><td>A pointer to the Unicode string to return. This Unicode string is the name of the driver specified by This in the language specified by Language.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The Unicode string for the Driver specified by This and the language specified by Language was returned in DriverName.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Language is NULL.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>DriverName is NULL.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The driver specified by This does not support the language specified by Language. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="896e1eb12dcdb9ce58a3eee8a3d2eb80"></a><!-- doxytag: member="ComponentName2.h::EFI_COMPONENT_NAME2_PROTOCOL" ref="896e1eb12dcdb9ce58a3eee8a3d2eb80" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct <a class="el" href="../../d7/dec/a00010.html">_EFI_COMPONENT_NAME2_PROTOCOL</a> <a class="el" href="../../d7/dec/a00010.html">EFI_COMPONENT_NAME2_PROTOCOL</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<hr><h2>Variable Documentation</h2>
-<a class="anchor" name="ce687d10b1be9693a9965ae09a990484"></a><!-- doxytag: member="ComponentName2.h::gEfiComponentName2ProtocolGuid" ref="ce687d10b1be9693a9965ae09a990484" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../de/d1d/a01105.html#ce687d10b1be9693a9965ae09a990484">gEfiComponentName2ProtocolGuid</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
+EFI boot mode 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:09 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:24 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

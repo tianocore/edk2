@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: SAL_PCI_EXTENDED_REGISTER_ADDRESS Struct Reference</title>
+<title>MdePkg[ALL]: PCI_EXPANSION_ROM_HEADER Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,32 +21,25 @@
   </div>
 </div>
 <div class="contents">
-<h1>SAL_PCI_EXTENDED_REGISTER_ADDRESS Struct Reference</h1><!-- doxytag: class="SAL_PCI_EXTENDED_REGISTER_ADDRESS" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>PCI_EXPANSION_ROM_HEADER Struct Reference</h1><!-- doxytag: class="PCI_EXPANSION_ROM_HEADER" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d02/a00777.html#d8378dbd6f5b61bf10f188cf9d8caea1">Register</a>: 8</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d02/a00777.html#0cb3a20db5942f00e7dac4cbfac423e6">Signature</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d02/a00777.html#f2fea90f4615a73010dbd77a73150f0b">ExtendedRegister</a>: 4</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">0xaa55  <a href="#0cb3a20db5942f00e7dac4cbfac423e6"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d02/a00777.html#a13a038dd9af99ef3339b03c260eb3ae">Reserved</a> [0x16]</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d02/a00777.html#fb00c3d316cd68eac70abff645db9d62">Function</a>: 3</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d02/a00777.html#7dc301034ed227c4eda2ed37dc970088">Device</a>: 5</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d02/a00777.html#7b40ed79e86b1e6a1960f77ea4052bfd">Bus</a>: 8</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d02/a00777.html#73c8852affc92480642ae4ad564ee01f">Segment</a>: 16</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d02/a00777.html#8e378ab42f2e774eaba92810d9a315b5">Reserved</a>: 20</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d02/a00777.html#a31c7a1b05a1dd20a232fa9b4bf4c4b4">PcirOffset</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Format of Extended Register Address <hr><h2>Field Documentation</h2>
-<a class="anchor" name="7b40ed79e86b1e6a1960f77ea4052bfd"></a><!-- doxytag: member="SAL_PCI_EXTENDED_REGISTER_ADDRESS::Bus" ref="7b40ed79e86b1e6a1960f77ea4052bfd" args="" -->
+Standard PCI Expansion ROM Header Section 13.4.2, Unified Extensible Firmware Interface Specification, Version 2.1 <hr><h2>Field Documentation</h2>
+<a class="anchor" name="a31c7a1b05a1dd20a232fa9b4bf4c4b4"></a><!-- doxytag: member="PCI_EXPANSION_ROM_HEADER::PcirOffset" ref="a31c7a1b05a1dd20a232fa9b4bf4c4b4" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d2/d02/a00777.html#7b40ed79e86b1e6a1960f77ea4052bfd">SAL_PCI_EXTENDED_REGISTER_ADDRESS::Bus</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d2/d02/a00777.html#a31c7a1b05a1dd20a232fa9b4bf4c4b4">PCI_EXPANSION_ROM_HEADER::PcirOffset</a>          </td>
         </tr>
       </table>
 </div>
@@ -56,12 +49,12 @@ Format of Extended Register Address <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="7dc301034ed227c4eda2ed37dc970088"></a><!-- doxytag: member="SAL_PCI_EXTENDED_REGISTER_ADDRESS::Device" ref="7dc301034ed227c4eda2ed37dc970088" args="" -->
+<a class="anchor" name="a13a038dd9af99ef3339b03c260eb3ae"></a><!-- doxytag: member="PCI_EXPANSION_ROM_HEADER::Reserved" ref="a13a038dd9af99ef3339b03c260eb3ae" args="[0x16]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d2/d02/a00777.html#7dc301034ed227c4eda2ed37dc970088">SAL_PCI_EXTENDED_REGISTER_ADDRESS::Device</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d2/d02/a00777.html#a13a038dd9af99ef3339b03c260eb3ae">PCI_EXPANSION_ROM_HEADER::Reserved</a>[0x16]          </td>
         </tr>
       </table>
 </div>
@@ -71,83 +64,25 @@ Format of Extended Register Address <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="f2fea90f4615a73010dbd77a73150f0b"></a><!-- doxytag: member="SAL_PCI_EXTENDED_REGISTER_ADDRESS::ExtendedRegister" ref="f2fea90f4615a73010dbd77a73150f0b" args="" -->
+<a class="anchor" name="0cb3a20db5942f00e7dac4cbfac423e6"></a><!-- doxytag: member="PCI_EXPANSION_ROM_HEADER::Signature" ref="0cb3a20db5942f00e7dac4cbfac423e6" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d2/d02/a00777.html#f2fea90f4615a73010dbd77a73150f0b">SAL_PCI_EXTENDED_REGISTER_ADDRESS::ExtendedRegister</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d2/d02/a00777.html#0cb3a20db5942f00e7dac4cbfac423e6">PCI_EXPANSION_ROM_HEADER::Signature</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<a class="anchor" name="fb00c3d316cd68eac70abff645db9d62"></a><!-- doxytag: member="SAL_PCI_EXTENDED_REGISTER_ADDRESS::Function" ref="fb00c3d316cd68eac70abff645db9d62" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d2/d02/a00777.html#fb00c3d316cd68eac70abff645db9d62">SAL_PCI_EXTENDED_REGISTER_ADDRESS::Function</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="d8378dbd6f5b61bf10f188cf9d8caea1"></a><!-- doxytag: member="SAL_PCI_EXTENDED_REGISTER_ADDRESS::Register" ref="d8378dbd6f5b61bf10f188cf9d8caea1" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d2/d02/a00777.html#d8378dbd6f5b61bf10f188cf9d8caea1">SAL_PCI_EXTENDED_REGISTER_ADDRESS::Register</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="8e378ab42f2e774eaba92810d9a315b5"></a><!-- doxytag: member="SAL_PCI_EXTENDED_REGISTER_ADDRESS::Reserved" ref="8e378ab42f2e774eaba92810d9a315b5" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d2/d02/a00777.html#8e378ab42f2e774eaba92810d9a315b5">SAL_PCI_EXTENDED_REGISTER_ADDRESS::Reserved</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="73c8852affc92480642ae4ad564ee01f"></a><!-- doxytag: member="SAL_PCI_EXTENDED_REGISTER_ADDRESS::Segment" ref="73c8852affc92480642ae4ad564ee01f" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d2/d02/a00777.html#73c8852affc92480642ae4ad564ee01f">SAL_PCI_EXTENDED_REGISTER_ADDRESS::Segment</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
+0xaa55 
 <p>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:21 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:59 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

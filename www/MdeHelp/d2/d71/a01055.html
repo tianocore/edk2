@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Library/UefiUsbLib.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Ipf/IpfMacro.i File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,1136 +21,138 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Library/UefiUsbLib.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Ipf/IpfMacro.i File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
-<tr><td colspan="2"><br><h2>Functions</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a01055.html#8c451f9eff9b570dd103ad6d8b85f4e0">UsbGetHidDescriptor</a> (IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *UsbIo, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> Interface, OUT <a class="el" href="../../d3/d8e/a00647.html">EFI_USB_HID_DESCRIPTOR</a> *HidDescriptor)</td></tr>
+<tr><td colspan="2"><br><h2>Defines</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a01055.html#5cfbb5a60d05d0f87e01df41d03d0b94">PROCEDURE_ENTRY</a>(name)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a01055.html#2b3c0c3edab1841ac76989699e2b8d1d">UsbGetReportDescriptor</a> (IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *UsbIo, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> Interface, IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> DescriptorLength, OUT <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *DescriptorBuffer)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a01055.html#c76936ff2599dacff4a4e91b22679c21">PROCEDURE_EXIT</a>(name)&nbsp;&nbsp;&nbsp;.##endp name</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a01055.html#6b9badb4da6a85dac8fa66e8f6b8d5ae">UsbGetProtocolRequest</a> (IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *UsbIo, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> Interface, OUT <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *Protocol)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a01055.html#2468851c9ee456b8dfd91a2b6a3de7c7">NESTED_SETUP</a>(i, l, o, r)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a01055.html#49f54cc0d5412c31176e20ac2c1fe7ce">UsbSetProtocolRequest</a> (IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *UsbIo, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> Interface, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> Protocol)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a01055.html#0d3ca6427b0d95139b71c081215dc0c9">NESTED_RETURN</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a01055.html#83f6706d37b7ee650a223a621ccec8bb">UsbSetIdleRequest</a> (IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *UsbIo, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> Interface, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> ReportId, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> Duration)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a01055.html#f9442605d9fb5b46ffda3ffbd694ba04">UsbGetIdleRequest</a> (IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *UsbIo, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> Interface, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> ReportId, OUT <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *Duration)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a01055.html#2db8ddd076dd12676fa206ca82adcaad">UsbSetReportRequest</a> (IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *UsbIo, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> Interface, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> ReportId, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> ReportType, IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> ReportLen, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *Report)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a01055.html#502c435c84f22a182d2166b05275e6d9">UsbGetReportRequest</a> (IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *UsbIo, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> Interface, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> ReportId, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> ReportType, IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> ReportLen, OUT <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *Report)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a01055.html#c39a18f9cb9dab3f3a618b4ba9e8e81b">UsbGetDescriptor</a> (IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *UsbIo, IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> Value, IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> Index, IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> DescriptorLength, OUT VOID *Descriptor, OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *Status)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a01055.html#61f69ba5e93f2952742f4f28ab90051d">UsbSetDescriptor</a> (IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *UsbIo, IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> Value, IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> Index, IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> DescriptorLength, IN VOID *Descriptor, OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *Status)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a01055.html#871ea10b4ee4715c4f2eeaec7faaf1d9">UsbGetInterface</a> (IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *UsbIo, IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> Interface, OUT <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> *AlternateSetting, OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *Status)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a01055.html#7ed6271d61506a0c7603fd1402135961">UsbSetInterface</a> (IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *UsbIo, IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> Interface, IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> AlternateSetting, OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *Status)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a01055.html#35d4f1e319b88d5f2b57d4509b8c6a17">UsbGetConfiguration</a> (IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *UsbIo, OUT <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> *ConfigurationValue, OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *Status)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a01055.html#a3e91c96b99373d43d3dc65a9f23855e">UsbSetConfiguration</a> (IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *UsbIo, IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> ConfigurationValue, OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *Status)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a01055.html#a4f4ca1111622cfae1d4fddc4e83e9ec">UsbSetFeature</a> (IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *UsbIo, IN <a class="el" href="../../dc/d10/a01003.html#e7595fa191500f169f4a6c21e94397e9">USB_TYPES_DEFINITION</a> Recipient, IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> Value, IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> Target, OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *Status)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a01055.html#7c7d120400ebdb9cae53d810fda373bc">UsbClearFeature</a> (IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *UsbIo, IN <a class="el" href="../../dc/d10/a01003.html#e7595fa191500f169f4a6c21e94397e9">USB_TYPES_DEFINITION</a> Recipient, IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> Value, IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> Target, OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *Status)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a01055.html#b3d21a9e614bbe90907eb7e92246ac4a">UsbGetStatus</a> (IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *UsbIo, IN <a class="el" href="../../dc/d10/a01003.html#e7595fa191500f169f4a6c21e94397e9">USB_TYPES_DEFINITION</a> Recipient, IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> Target, OUT <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> *DeviceStatus, OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *Status)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a01055.html#82c12067886ad5771d63bb9f9913f6bd">UsbClearEndpointHalt</a> (IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *UsbIo, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> Endpoint, OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *Status)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d71/a01055.html#2c707ab9fcd73f3ec0edfeae1886dfe6">GLOBAL_FUNCTION</a>(Function)</td></tr>
 
 </table>
-<hr><a name="_details"></a><h2>Detailed Description</h2>
-Provides most USB APIs to support the Hid requests defined in USB Hid 1.1 spec and the standard requests defined in USB 1.1 spec.<p>
-Copyright (c) 2006 - 2008, Intel Corporation<br>
- All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Function Documentation</h2>
-<a class="anchor" name="82c12067886ad5771d63bb9f9913f6bd"></a><!-- doxytag: member="UefiUsbLib.h::UsbClearEndpointHalt" ref="82c12067886ad5771d63bb9f9913f6bd" args="(IN EFI_USB_IO_PROTOCOL *UsbIo, IN UINT8 Endpoint, OUT UINT32 *Status)" -->
+<hr><h2>Define Documentation</h2>
+<a class="anchor" name="2c707ab9fcd73f3ec0edfeae1886dfe6"></a><!-- doxytag: member="IpfMacro.i::GLOBAL_FUNCTION" ref="2c707ab9fcd73f3ec0edfeae1886dfe6" args="(Function)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI UsbClearEndpointHalt           </td>
+          <td class="memname">#define GLOBAL_FUNCTION          </td>
           <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>UsbIo</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramtype">Function&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
           <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
-          <td class="paramname"> <em>Endpoint</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *&nbsp;</td>
-          <td class="paramname"> <em>Status</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Clear halt feature of the specified usb endpoint.<p>
-Retrieve the USB endpoint descriptor specified by UsbIo and EndPoint. If the USB endpoint descriptor can not be retrieved, then return EFI_NOT_FOUND. If the endpoint descriptor is found, then clear the halt feature of this USB endpoint. The status of the transfer is returned in Status. If UsbIo is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Status is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>UsbIo</em>&nbsp;</td><td>A pointer to the USB I/O Protocol instance for the specific USB target. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Endpoint</em>&nbsp;</td><td>The endpoint address. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Status</em>&nbsp;</td><td>A pointer to the status of the transfer.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The request executed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_TIMEOUT</em>&nbsp;</td><td>A timeout occurred executing the request. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The request failed due to a device error. The transfer status is returned in Status. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The specified USB endpoint descriptor can not be found </td></tr>
-  </table>
-</dl>
-
+<b>Value:</b><div class="fragment"><pre class="fragment">.##type   Function, @function; \
+         .##globl Function
+</pre></div>
 </div>
 </div><p>
-<a class="anchor" name="7c7d120400ebdb9cae53d810fda373bc"></a><!-- doxytag: member="UefiUsbLib.h::UsbClearFeature" ref="7c7d120400ebdb9cae53d810fda373bc" args="(IN EFI_USB_IO_PROTOCOL *UsbIo, IN USB_TYPES_DEFINITION Recipient, IN UINT16 Value, IN UINT16 Target, OUT UINT32 *Status)" -->
+<a class="anchor" name="0d3ca6427b0d95139b71c081215dc0c9"></a><!-- doxytag: member="IpfMacro.i::NESTED_RETURN" ref="0d3ca6427b0d95139b71c081215dc0c9" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI UsbClearFeature           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>UsbIo</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../dc/d10/a01003.html#e7595fa191500f169f4a6c21e94397e9">USB_TYPES_DEFINITION</a>&nbsp;</td>
-          <td class="paramname"> <em>Recipient</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
-          <td class="paramname"> <em>Value</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
-          <td class="paramname"> <em>Target</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *&nbsp;</td>
-          <td class="paramname"> <em>Status</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define NESTED_RETURN          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Clear the specified feature of the specified device.<p>
-Submit a USB clear device feature request for the USB device specified by UsbIo, Recipient, and Target to the value specified by Value. The status of the transfer is returned in Status. If UsbIo is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Status is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>UsbIo</em>&nbsp;</td><td>A pointer to the USB I/O Protocol instance for the specific USB target. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Recipient</em>&nbsp;</td><td>The USB data recipient type (i.e. Device, Interface, Endpoint). Type USB_TYPES_DEFINITION is defined in the MDE Package Industry Standard include file <a class="el" href="../../dc/d10/a01003.html">Usb.h</a>. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>The value of the feature to be cleared. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Target</em>&nbsp;</td><td>The index of the device to be cleared. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Status</em>&nbsp;</td><td>A pointer to the status of the transfer.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The request executed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_TIMEOUT</em>&nbsp;</td><td>A timeout occurred executing the request. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The request failed due to a device error. The transfer status is returned in Status. </td></tr>
-  </table>
-</dl>
-
+<b>Value:</b><div class="fragment"><pre class="fragment">mov b0=loc0 ;\
+         mov ar##.##pfs=loc1 ;;\
+         br##.##ret##.##dpnt  b0;;
+</pre></div>
 </div>
 </div><p>
-<a class="anchor" name="35d4f1e319b88d5f2b57d4509b8c6a17"></a><!-- doxytag: member="UefiUsbLib.h::UsbGetConfiguration" ref="35d4f1e319b88d5f2b57d4509b8c6a17" args="(IN EFI_USB_IO_PROTOCOL *UsbIo, OUT UINT16 *ConfigurationValue, OUT UINT32 *Status)" -->
+<a class="anchor" name="2468851c9ee456b8dfd91a2b6a3de7c7"></a><!-- doxytag: member="IpfMacro.i::NESTED_SETUP" ref="2468851c9ee456b8dfd91a2b6a3de7c7" args="(i, l, o, r)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI UsbGetConfiguration           </td>
+          <td class="memname">#define NESTED_SETUP          </td>
           <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>UsbIo</em>, </td>
-        </tr>
-        <tr>
+          <td class="paramtype">i,         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">OUT <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> *&nbsp;</td>
-          <td class="paramname"> <em>ConfigurationValue</em>, </td>
-        </tr>
-        <tr>
+          <td class="paramtype">l,         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *&nbsp;</td>
-          <td class="paramname"> <em>Status</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
+          <td class="paramtype">o,         <tr>
+          <td class="paramkey"></td>
           <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="paramtype">r&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Get the device configuration.<p>
-Submit a USB get configuration request for the USB device specified by UsbIo and place the result in the buffer specified by ConfigurationValue. The status of the transfer is returned in Status. If UsbIo is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If ConfigurationValue is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Status is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>UsbIo</em>&nbsp;</td><td>A pointer to the USB I/O Protocol instance for the specific USB target. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ConfigurationValue</em>&nbsp;</td><td>A pointer to the device configuration to be retrieved. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Status</em>&nbsp;</td><td>A pointer to the status of the transfer.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The request executed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_TIMEOUT</em>&nbsp;</td><td>A timeout occurred executing the request. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The request failed due to a device error. The transfer status is returned in Status. </td></tr>
-  </table>
-</dl>
-
+<b>Value:</b><div class="fragment"><pre class="fragment">alloc loc1=ar##.##pfs,i,l,o,r ;\
+         mov loc0=b0
+</pre></div>
 </div>
 </div><p>
-<a class="anchor" name="c39a18f9cb9dab3f3a618b4ba9e8e81b"></a><!-- doxytag: member="UefiUsbLib.h::UsbGetDescriptor" ref="c39a18f9cb9dab3f3a618b4ba9e8e81b" args="(IN EFI_USB_IO_PROTOCOL *UsbIo, IN UINT16 Value, IN UINT16 Index, IN UINT16 DescriptorLength, OUT VOID *Descriptor, OUT UINT32 *Status)" -->
+<a class="anchor" name="5cfbb5a60d05d0f87e01df41d03d0b94"></a><!-- doxytag: member="IpfMacro.i::PROCEDURE_ENTRY" ref="5cfbb5a60d05d0f87e01df41d03d0b94" args="(name)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI UsbGetDescriptor           </td>
+          <td class="memname">#define PROCEDURE_ENTRY          </td>
           <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>UsbIo</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramtype">name&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
           <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
-          <td class="paramname"> <em>Value</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
-          <td class="paramname"> <em>Index</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
-          <td class="paramname"> <em>DescriptorLength</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT VOID *&nbsp;</td>
-          <td class="paramname"> <em>Descriptor</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *&nbsp;</td>
-          <td class="paramname"> <em>Status</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Get the descriptor of the specified USB device.<p>
-Submit a USB get descriptor request for the USB device specified by UsbIo, Value, and Index, and return the descriptor in the buffer specified by Descriptor. The status of the transfer is returned in Status. If UsbIo is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Descriptor is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Status is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>UsbIo</em>&nbsp;</td><td>A pointer to the USB I/O Protocol instance for the specific USB target. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>The device request value. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Index</em>&nbsp;</td><td>The device request index. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DescriptorLength</em>&nbsp;</td><td>The size, in bytes, of Descriptor. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Descriptor</em>&nbsp;</td><td>A pointer to the descriptor buffer to get. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Status</em>&nbsp;</td><td>A pointer to the status of the transfer.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The request executed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>The request could not be completed because the buffer specified by DescriptorLength and Descriptor is not large enough to hold the result of the request. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_TIMEOUT</em>&nbsp;</td><td>A timeout occurred executing the request. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The request failed due to a device error. The transfer status is returned in Status. </td></tr>
-  </table>
-</dl>
-
+<b>Value:</b><div class="fragment"><pre class="fragment">.##text;            \
+                                .##type name, @function;    \
+                                .##proc name;           \
+name::
+</pre></div>
 </div>
 </div><p>
-<a class="anchor" name="8c451f9eff9b570dd103ad6d8b85f4e0"></a><!-- doxytag: member="UefiUsbLib.h::UsbGetHidDescriptor" ref="8c451f9eff9b570dd103ad6d8b85f4e0" args="(IN EFI_USB_IO_PROTOCOL *UsbIo, IN UINT8 Interface, OUT EFI_USB_HID_DESCRIPTOR *HidDescriptor)" -->
+<a class="anchor" name="c76936ff2599dacff4a4e91b22679c21"></a><!-- doxytag: member="IpfMacro.i::PROCEDURE_EXIT" ref="c76936ff2599dacff4a4e91b22679c21" args="(name)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI UsbGetHidDescriptor           </td>
+          <td class="memname">#define PROCEDURE_EXIT          </td>
           <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>UsbIo</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
-          <td class="paramname"> <em>Interface</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT <a class="el" href="../../d3/d8e/a00647.html">EFI_USB_HID_DESCRIPTOR</a> *&nbsp;</td>
-          <td class="paramname"> <em>HidDescriptor</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="paramtype">name&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;.##endp name</td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Get the descriptor of the specified USB HID interface.<p>
-Submit a <a class="el" href="../../d2/d71/a01055.html#8c451f9eff9b570dd103ad6d8b85f4e0">UsbGetHidDescriptor()</a> request for the USB device specified by UsbIo and Interface, and return the HID descriptor in HidDescriptor. If UsbIo is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If HidDescriptor is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>UsbIo</em>&nbsp;</td><td>A pointer to the USB I/O Protocol instance for the specific USB target. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Interface</em>&nbsp;</td><td>The index of the HID interface on the USB target. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>HidDescriptor</em>&nbsp;</td><td>Pointer to the USB HID descriptor that was retrieved from the specified USB target and interface. Type EFI_USB_HID_DESCRIPTOR is defined in the MDE Package Industry Standard include file <a class="el" href="../../dc/d10/a01003.html">Usb.h</a>.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The request executed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_TIMEOUT</em>&nbsp;</td><td>A timeout occurred executing the request. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The request failed due to a device error. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="f9442605d9fb5b46ffda3ffbd694ba04"></a><!-- doxytag: member="UefiUsbLib.h::UsbGetIdleRequest" ref="f9442605d9fb5b46ffda3ffbd694ba04" args="(IN EFI_USB_IO_PROTOCOL *UsbIo, IN UINT8 Interface, IN UINT8 ReportId, OUT UINT8 *Duration)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI UsbGetIdleRequest           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>UsbIo</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
-          <td class="paramname"> <em>Interface</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
-          <td class="paramname"> <em>ReportId</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *&nbsp;</td>
-          <td class="paramname"> <em>Duration</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Get the idle rate of the specified USB HID report.<p>
-Submit a USB get HID report idle request for the USB device specified by UsbIo, Interface, and ReportId, and return the ide rate in Duration. If UsbIo is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Duration is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>UsbIo</em>&nbsp;</td><td>A pointer to the USB I/O Protocol instance for the specific USB target. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Interface</em>&nbsp;</td><td>The index of the report interface on the USB target. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ReportId</em>&nbsp;</td><td>The identifier of the report to retrieve. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Duration</em>&nbsp;</td><td>A pointer to the idle rate retrieved from the specified USB target.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The request executed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_TIMEOUT</em>&nbsp;</td><td>A timeout occurred executing the request. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The request failed due to a device error. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="871ea10b4ee4715c4f2eeaec7faaf1d9"></a><!-- doxytag: member="UefiUsbLib.h::UsbGetInterface" ref="871ea10b4ee4715c4f2eeaec7faaf1d9" args="(IN EFI_USB_IO_PROTOCOL *UsbIo, IN UINT16 Interface, OUT UINT16 *AlternateSetting, OUT UINT32 *Status)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI UsbGetInterface           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>UsbIo</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
-          <td class="paramname"> <em>Interface</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> *&nbsp;</td>
-          <td class="paramname"> <em>AlternateSetting</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *&nbsp;</td>
-          <td class="paramname"> <em>Status</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Get the interface setting of the specified USB device.<p>
-Submit a USB get interface request for the USB device specified by UsbIo, and Interface, and place the result in the buffer specified by AlternateSetting. The status of the transfer is returned in Status. If UsbIo is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If AlternateSetting is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Status is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>UsbIo</em>&nbsp;</td><td>A pointer to the USB I/O Protocol instance for the specific USB target. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Interface</em>&nbsp;</td><td>The interface index value. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>AlternateSetting</em>&nbsp;</td><td>A pointer to the alternate setting to be retrieved. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Status</em>&nbsp;</td><td>A pointer to the status of the transfer.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The request executed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_TIMEOUT</em>&nbsp;</td><td>A timeout occurred executing the request. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The request failed due to a device error. The transfer status is returned in Status. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="6b9badb4da6a85dac8fa66e8f6b8d5ae"></a><!-- doxytag: member="UefiUsbLib.h::UsbGetProtocolRequest" ref="6b9badb4da6a85dac8fa66e8f6b8d5ae" args="(IN EFI_USB_IO_PROTOCOL *UsbIo, IN UINT8 Interface, OUT UINT8 *Protocol)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI UsbGetProtocolRequest           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>UsbIo</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
-          <td class="paramname"> <em>Interface</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *&nbsp;</td>
-          <td class="paramname"> <em>Protocol</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Get the HID protocol of the specified USB HID interface.<p>
-Submit a USB get HID protocol request for the USB device specified by UsbIo and Interface, and return the protocol retrieved in Protocol. If UsbIo is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Protocol is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>UsbIo</em>&nbsp;</td><td>A pointer to the USB I/O Protocol instance for the specific USB target. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Interface</em>&nbsp;</td><td>The index of the report interface on the USB target. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Protocol</em>&nbsp;</td><td>A pointer to the protocol for the specified USB target.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The request executed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_TIMEOUT</em>&nbsp;</td><td>A timeout occurred executing the request. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The request failed due to a device error. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="2b3c0c3edab1841ac76989699e2b8d1d"></a><!-- doxytag: member="UefiUsbLib.h::UsbGetReportDescriptor" ref="2b3c0c3edab1841ac76989699e2b8d1d" args="(IN EFI_USB_IO_PROTOCOL *UsbIo, IN UINT8 Interface, IN UINT16 DescriptorLength, OUT UINT8 *DescriptorBuffer)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI UsbGetReportDescriptor           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>UsbIo</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
-          <td class="paramname"> <em>Interface</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
-          <td class="paramname"> <em>DescriptorLength</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *&nbsp;</td>
-          <td class="paramname"> <em>DescriptorBuffer</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Get the report descriptor of the specified USB HID interface.<p>
-Submit a USB get HID report descriptor request for the USB device specified by UsbIo and Interface, and return the report descriptor in DescriptorBuffer. If UsbIo is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If DescriptorBuffer is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>UsbIo</em>&nbsp;</td><td>A pointer to the USB I/O Protocol instance for the specific USB target. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Interface</em>&nbsp;</td><td>The index of the report interface on the USB target. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DescriptorLength</em>&nbsp;</td><td>The size, in bytes, of DescriptorBuffer. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DescriptorBuffer</em>&nbsp;</td><td>A pointer to the buffer to store the report class descriptor.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The request executed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>The request could not be completed because the buffer specified by DescriptorLength and DescriptorBuffer is not large enough to hold the result of the request. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_TIMEOUT</em>&nbsp;</td><td>A timeout occurred executing the request. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The request failed due to a device error. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="502c435c84f22a182d2166b05275e6d9"></a><!-- doxytag: member="UefiUsbLib.h::UsbGetReportRequest" ref="502c435c84f22a182d2166b05275e6d9" args="(IN EFI_USB_IO_PROTOCOL *UsbIo, IN UINT8 Interface, IN UINT8 ReportId, IN UINT8 ReportType, IN UINT16 ReportLen, OUT UINT8 *Report)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI UsbGetReportRequest           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>UsbIo</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
-          <td class="paramname"> <em>Interface</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
-          <td class="paramname"> <em>ReportId</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
-          <td class="paramname"> <em>ReportType</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
-          <td class="paramname"> <em>ReportLen</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *&nbsp;</td>
-          <td class="paramname"> <em>Report</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Get the report descriptor of the specified USB HID interface.<p>
-Submit a USB get HID report request for the USB device specified by UsbIo, Interface, ReportId, and ReportType, and return the report in the buffer specified by Report. If UsbIo is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Report is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>UsbIo</em>&nbsp;</td><td>A pointer to the USB I/O Protocol instance for the specific USB target. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Interface</em>&nbsp;</td><td>The index of the report interface on the USB target. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ReportId</em>&nbsp;</td><td>The identifier of the report to retrieve. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ReportType</em>&nbsp;</td><td>The type of report to retrieve. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ReportLength</em>&nbsp;</td><td>The size, in bytes, of Report. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Report</em>&nbsp;</td><td>A pointer to the buffer to store the report descriptor.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The request executed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>The request could not be completed because the buffer specified by ReportLength and Report is not large enough to hold the result of the request. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_TIMEOUT</em>&nbsp;</td><td>A timeout occurred executing the request. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The request failed due to a device error. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="b3d21a9e614bbe90907eb7e92246ac4a"></a><!-- doxytag: member="UefiUsbLib.h::UsbGetStatus" ref="b3d21a9e614bbe90907eb7e92246ac4a" args="(IN EFI_USB_IO_PROTOCOL *UsbIo, IN USB_TYPES_DEFINITION Recipient, IN UINT16 Target, OUT UINT16 *DeviceStatus, OUT UINT32 *Status)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI UsbGetStatus           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>UsbIo</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../dc/d10/a01003.html#e7595fa191500f169f4a6c21e94397e9">USB_TYPES_DEFINITION</a>&nbsp;</td>
-          <td class="paramname"> <em>Recipient</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
-          <td class="paramname"> <em>Target</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> *&nbsp;</td>
-          <td class="paramname"> <em>DeviceStatus</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *&nbsp;</td>
-          <td class="paramname"> <em>Status</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Get the status of the specified device.<p>
-Submit a USB device get status request for the USB device specified by UsbIo, Recipient, and Target, and place the result in the buffer specified by DeviceStatus. The status of the transfer is returned in Status. If UsbIo is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If DeviceStatus is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Status is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>UsbIo</em>&nbsp;</td><td>A pointer to the USB I/O Protocol instance for the specific USB target. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Recipient</em>&nbsp;</td><td>The USB data recipient type (i.e. Device, Interface, Endpoint). Type USB_TYPES_DEFINITION is defined in the MDE Package Industry Standard include file <a class="el" href="../../dc/d10/a01003.html">Usb.h</a>. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Target</em>&nbsp;</td><td>The index of the device to be get the status of. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DeviceStatus</em>&nbsp;</td><td>A pointer to the device status to be retrieved. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Status</em>&nbsp;</td><td>A pointer to the status of the transfer.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The request executed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_TIMEOUT</em>&nbsp;</td><td>A timeout occurred executing the request. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The request failed due to a device error. The transfer status is returned in Status. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="a3e91c96b99373d43d3dc65a9f23855e"></a><!-- doxytag: member="UefiUsbLib.h::UsbSetConfiguration" ref="a3e91c96b99373d43d3dc65a9f23855e" args="(IN EFI_USB_IO_PROTOCOL *UsbIo, IN UINT16 ConfigurationValue, OUT UINT32 *Status)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI UsbSetConfiguration           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>UsbIo</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
-          <td class="paramname"> <em>ConfigurationValue</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *&nbsp;</td>
-          <td class="paramname"> <em>Status</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Set the device configuration.<p>
-Submit a USB set configuration request for the USB device specified by UsbIo and set the device configuration to the value specified by ConfigurationValue. The status of the transfer is returned in Status. If UsbIo is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Status is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>UsbIo</em>&nbsp;</td><td>A pointer to the USB I/O Protocol instance for the specific USB target. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ConfigurationValue</em>&nbsp;</td><td>The device configuration value to be set. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Status</em>&nbsp;</td><td>A pointer to the status of the transfer.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The request executed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_TIMEOUT</em>&nbsp;</td><td>A timeout occurred executing the request. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The request failed due to a device error. The transfer status is returned in Status. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="61f69ba5e93f2952742f4f28ab90051d"></a><!-- doxytag: member="UefiUsbLib.h::UsbSetDescriptor" ref="61f69ba5e93f2952742f4f28ab90051d" args="(IN EFI_USB_IO_PROTOCOL *UsbIo, IN UINT16 Value, IN UINT16 Index, IN UINT16 DescriptorLength, IN VOID *Descriptor, OUT UINT32 *Status)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI UsbSetDescriptor           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>UsbIo</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
-          <td class="paramname"> <em>Value</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
-          <td class="paramname"> <em>Index</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
-          <td class="paramname"> <em>DescriptorLength</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN VOID *&nbsp;</td>
-          <td class="paramname"> <em>Descriptor</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *&nbsp;</td>
-          <td class="paramname"> <em>Status</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Set the descriptor of the specified USB device.<p>
-Submit a USB set descriptor request for the USB device specified by UsbIo, Value, and Index, and set the descriptor using the buffer specified by DesriptorLength and Descriptor. The status of the transfer is returned in Status. If UsbIo is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Descriptor is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Status is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>UsbIo</em>&nbsp;</td><td>A pointer to the USB I/O Protocol instance for the specific USB target. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>The device request value. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Index</em>&nbsp;</td><td>The device request index. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DescriptorLength</em>&nbsp;</td><td>The size, in bytes, of Descriptor. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Descriptor</em>&nbsp;</td><td>A pointer to the descriptor buffer to set. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Status</em>&nbsp;</td><td>A pointer to the status of the transfer.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The request executed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_TIMEOUT</em>&nbsp;</td><td>A timeout occurred executing the request. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The request failed due to a device error. The transfer status is returned in Status. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="a4f4ca1111622cfae1d4fddc4e83e9ec"></a><!-- doxytag: member="UefiUsbLib.h::UsbSetFeature" ref="a4f4ca1111622cfae1d4fddc4e83e9ec" args="(IN EFI_USB_IO_PROTOCOL *UsbIo, IN USB_TYPES_DEFINITION Recipient, IN UINT16 Value, IN UINT16 Target, OUT UINT32 *Status)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI UsbSetFeature           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>UsbIo</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../dc/d10/a01003.html#e7595fa191500f169f4a6c21e94397e9">USB_TYPES_DEFINITION</a>&nbsp;</td>
-          <td class="paramname"> <em>Recipient</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
-          <td class="paramname"> <em>Value</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
-          <td class="paramname"> <em>Target</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *&nbsp;</td>
-          <td class="paramname"> <em>Status</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Set the specified feature of the specified device.<p>
-Submit a USB set device feature request for the USB device specified by UsbIo, Recipient, and Target to the value specified by Value. The status of the transfer is returned in Status. If UsbIo is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Status is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>UsbIo</em>&nbsp;</td><td>A pointer to the USB I/O Protocol instance for the specific USB target. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Recipient</em>&nbsp;</td><td>The USB data recipient type (i.e. Device, Interface, Endpoint). Type USB_TYPES_DEFINITION is defined in the MDE Package Industry Standard include file <a class="el" href="../../dc/d10/a01003.html">Usb.h</a>. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>The value of the feature to be set. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Target</em>&nbsp;</td><td>The index of the device to be set. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Status</em>&nbsp;</td><td>A pointer to the status of the transfer.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The request executed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_TIMEOUT</em>&nbsp;</td><td>A timeout occurred executing the request. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The request failed due to a device error. The transfer status is returned in Status. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="83f6706d37b7ee650a223a621ccec8bb"></a><!-- doxytag: member="UefiUsbLib.h::UsbSetIdleRequest" ref="83f6706d37b7ee650a223a621ccec8bb" args="(IN EFI_USB_IO_PROTOCOL *UsbIo, IN UINT8 Interface, IN UINT8 ReportId, IN UINT8 Duration)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI UsbSetIdleRequest           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>UsbIo</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
-          <td class="paramname"> <em>Interface</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
-          <td class="paramname"> <em>ReportId</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
-          <td class="paramname"> <em>Duration</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Set the idle rate of the specified USB HID report.<p>
-Submit a USB set HID report idle request for the USB device specified by UsbIo, Interface, and ReportId, and set the idle rate to the value specified by Duration. If UsbIo is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>UsbIo</em>&nbsp;</td><td>A pointer to the USB I/O Protocol instance for the specific USB target. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Interface</em>&nbsp;</td><td>The index of the report interface on the USB target. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ReportId</em>&nbsp;</td><td>The identifier of the report to retrieve. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Duration</em>&nbsp;</td><td>The idle rate to set for the specified USB target.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The request executed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_TIMEOUT</em>&nbsp;</td><td>A timeout occurred executing the request. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The request failed due to a device error. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="7ed6271d61506a0c7603fd1402135961"></a><!-- doxytag: member="UefiUsbLib.h::UsbSetInterface" ref="7ed6271d61506a0c7603fd1402135961" args="(IN EFI_USB_IO_PROTOCOL *UsbIo, IN UINT16 Interface, IN UINT16 AlternateSetting, OUT UINT32 *Status)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI UsbSetInterface           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>UsbIo</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
-          <td class="paramname"> <em>Interface</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
-          <td class="paramname"> <em>AlternateSetting</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *&nbsp;</td>
-          <td class="paramname"> <em>Status</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Set the interface setting of the specified USB device.<p>
-Submit a USB set interface request for the USB device specified by UsbIo, and Interface, and set the alternate setting to the value specified by AlternateSetting. The status of the transfer is returned in Status. If UsbIo is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Status is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>UsbIo</em>&nbsp;</td><td>A pointer to the USB I/O Protocol instance for the specific USB target. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Interface</em>&nbsp;</td><td>The interface index value. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>AlternateSetting</em>&nbsp;</td><td>The alternate setting to be set. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Status</em>&nbsp;</td><td>A pointer to the status of the transfer.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The request executed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_TIMEOUT</em>&nbsp;</td><td>A timeout occurred executing the request. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The request failed due to a device error. The transfer status is returned in Status. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="49f54cc0d5412c31176e20ac2c1fe7ce"></a><!-- doxytag: member="UefiUsbLib.h::UsbSetProtocolRequest" ref="49f54cc0d5412c31176e20ac2c1fe7ce" args="(IN EFI_USB_IO_PROTOCOL *UsbIo, IN UINT8 Interface, IN UINT8 Protocol)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI UsbSetProtocolRequest           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>UsbIo</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
-          <td class="paramname"> <em>Interface</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
-          <td class="paramname"> <em>Protocol</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Set the HID protocol of the specified USB HID interface.<p>
-Submit a USB set HID protocol request for the USB device specified by UsbIo and Interface, and set the protocol to the value specified by Protocol. If UsbIo is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>UsbIo</em>&nbsp;</td><td>A pointer to the USB I/O Protocol instance for the specific USB target. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Interface</em>&nbsp;</td><td>The index of the report interface on the USB target. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Protocol</em>&nbsp;</td><td>The protocol value to set for the specified USB target.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The request executed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_TIMEOUT</em>&nbsp;</td><td>A timeout occurred executing the request. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The request failed due to a device error. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="2db8ddd076dd12676fa206ca82adcaad"></a><!-- doxytag: member="UefiUsbLib.h::UsbSetReportRequest" ref="2db8ddd076dd12676fa206ca82adcaad" args="(IN EFI_USB_IO_PROTOCOL *UsbIo, IN UINT8 Interface, IN UINT8 ReportId, IN UINT8 ReportType, IN UINT16 ReportLen, IN UINT8 *Report)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI UsbSetReportRequest           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>UsbIo</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
-          <td class="paramname"> <em>Interface</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
-          <td class="paramname"> <em>ReportId</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
-          <td class="paramname"> <em>ReportType</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
-          <td class="paramname"> <em>ReportLen</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *&nbsp;</td>
-          <td class="paramname"> <em>Report</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Set the report descriptor of the specified USB HID interface.<p>
-Submit a USB set HID report request for the USB device specified by UsbIo, Interface, ReportId, and ReportType, and set the report descriptor using the buffer specified by ReportLength and Report. If UsbIo is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Report is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>UsbIo</em>&nbsp;</td><td>A pointer to the USB I/O Protocol instance for the specific USB target. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Interface</em>&nbsp;</td><td>The index of the report interface on the USB target. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ReportId</em>&nbsp;</td><td>The identifier of the report to retrieve. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ReportType</em>&nbsp;</td><td>The type of report to retrieve. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ReportLength</em>&nbsp;</td><td>The size, in bytes, of Report. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Report</em>&nbsp;</td><td>A pointer to the report descriptor buffer to set.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The request executed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_TIMEOUT</em>&nbsp;</td><td>A timeout occurred executing the request. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The request failed due to a device error. </td></tr>
-  </table>
-</dl>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:09 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:19 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

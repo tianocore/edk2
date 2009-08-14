@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Ppi/FirmwareVolumeInfo.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Library/PcdLib.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,77 +21,2822 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Ppi/FirmwareVolumeInfo.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Library/PcdLib.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
-<tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d0b/a00220.html">_EFI_PEI_FIRMWARE_VOLUME_INFO_PPI</a></td></tr>
-
 <tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#66d61de9b8583c409883d1cef3a0e55a">EFI_PEI_FIRMWARE_VOLUME_INFO_PPI_GUID</a>&nbsp;&nbsp;&nbsp;{ 0x49edb1c1, 0xbf21, 0x4761, { 0xbb, 0x12, 0xeb, 0x0, 0x31, 0xaa, 0xbb, 0x39 } }</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#16d775ebf94ceba5c19c94402926f022">PCD_MAX_SKU_ID</a>&nbsp;&nbsp;&nbsp;0x100</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#39a60e4572301516d24f1b934bdcfade">PcdToken</a>(TokenName)&nbsp;&nbsp;&nbsp;_PCD_TOKEN_##TokenName</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#f23c310bc1e95e7584de366ad82817a6">FeaturePcdGet</a>(TokenName)&nbsp;&nbsp;&nbsp;_PCD_GET_MODE_BOOL_##TokenName</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#91ee0b430d3a00800fe883a166f7334f">FixedPcdGet8</a>(TokenName)&nbsp;&nbsp;&nbsp;_PCD_VALUE_##TokenName</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#a5e9abbbdb7e9c557b7cafc3e338c024">FixedPcdGet16</a>(TokenName)&nbsp;&nbsp;&nbsp;_PCD_VALUE_##TokenName</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#557aafaa1b924bfaddf7bf8cd5fc3a65">FixedPcdGet32</a>(TokenName)&nbsp;&nbsp;&nbsp;_PCD_VALUE_##TokenName</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#5d85fee4a68860e7433423d4b6ae52e5">FixedPcdGet64</a>(TokenName)&nbsp;&nbsp;&nbsp;_PCD_VALUE_##TokenName</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#623740a206ed9ef6e342abb693c67c2d">FixedPcdGetBool</a>(TokenName)&nbsp;&nbsp;&nbsp;_PCD_VALUE_##TokenName</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#c478be49e4e556cb637af29a82b181a5">FixedPcdGetPtr</a>(TokenName)&nbsp;&nbsp;&nbsp;((VOID *)_PCD_VALUE_##TokenName)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#ac3aed16138bbabf63521edec6b6a811">PatchPcdGet8</a>(TokenName)&nbsp;&nbsp;&nbsp;_gPcd_BinaryPatch_##TokenName</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#09990e1ad2e4cad957aa8efd3a5463f3">PatchPcdGet16</a>(TokenName)&nbsp;&nbsp;&nbsp;_gPcd_BinaryPatch_##TokenName</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#b85029d32a66d229ca0e210d3300f0a9">PatchPcdGet32</a>(TokenName)&nbsp;&nbsp;&nbsp;_gPcd_BinaryPatch_##TokenName</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#38dd4f9350badc1cd0a5ea0cec535461">PatchPcdGet64</a>(TokenName)&nbsp;&nbsp;&nbsp;_gPcd_BinaryPatch_##TokenName</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#f2bca8449527a934a9a9dc2030659413">PatchPcdGetBool</a>(TokenName)&nbsp;&nbsp;&nbsp;_gPcd_BinaryPatch_##TokenName</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#f5937976902f5b3335e047dc006ce51b">PatchPcdGetPtr</a>(TokenName)&nbsp;&nbsp;&nbsp;((VOID *)_gPcd_BinaryPatch_##TokenName)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#84611ca2e160ecf24a62e1315c693619">PatchPcdSet8</a>(TokenName, Value)&nbsp;&nbsp;&nbsp;(_gPcd_BinaryPatch_##TokenName = (Value))</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#cf5ff29272b2d30fa0b0b8437faff272">PatchPcdSet16</a>(TokenName, Value)&nbsp;&nbsp;&nbsp;(_gPcd_BinaryPatch_##TokenName = (Value))</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#983e614ee8be6aa188efaec96285036d">PatchPcdSet32</a>(TokenName, Value)&nbsp;&nbsp;&nbsp;(_gPcd_BinaryPatch_##TokenName = (Value))</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#c87a5e2d5389582710c6d5594d5a757b">PatchPcdSet64</a>(TokenName, Value)&nbsp;&nbsp;&nbsp;(_gPcd_BinaryPatch_##TokenName = (Value))</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#3c74a89c03b0f28886ca72afbd314586">PatchPcdSetBool</a>(TokenName, Value)&nbsp;&nbsp;&nbsp;(_gPcd_BinaryPatch_##TokenName = (Value))</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#728550ddc1c2a480a432bedb6ed8040a">PatchPcdSetPtr</a>(TokenName, Size, Buffer)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#579570a1dad85680d55cfdaf9f514d49">PcdGet8</a>(TokenName)&nbsp;&nbsp;&nbsp;_PCD_GET_MODE_8_##TokenName</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#2740b6772a75da7a05e9c4159110ae89">PcdGet16</a>(TokenName)&nbsp;&nbsp;&nbsp;_PCD_GET_MODE_16_##TokenName</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#818a44c4b9a878d39c0e71f70d8c3814">PcdGet32</a>(TokenName)&nbsp;&nbsp;&nbsp;_PCD_GET_MODE_32_##TokenName</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#2f5a43ee09855aa9897fbf638ca2f91d">PcdGet64</a>(TokenName)&nbsp;&nbsp;&nbsp;_PCD_GET_MODE_64_##TokenName</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#e66fef9528b17267401c27e3f9b0eb46">PcdGetPtr</a>(TokenName)&nbsp;&nbsp;&nbsp;_PCD_GET_MODE_PTR_##TokenName</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#85abf65f7d22a61d42eb9177c3a5bd01">PcdGetBool</a>(TokenName)&nbsp;&nbsp;&nbsp;_PCD_GET_MODE_BOOL_##TokenName</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#7b7eaf0c1b4f5084784bdaf2e2bff7eb">PcdSet8</a>(TokenName, Value)&nbsp;&nbsp;&nbsp;_PCD_SET_MODE_8_##TokenName     ((Value))</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#914e554043e01eb1c24ad7e23bb9c7d1">PcdSet16</a>(TokenName, Value)&nbsp;&nbsp;&nbsp;_PCD_SET_MODE_16_##TokenName    ((Value))</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#c02cc9db5b693af1aebbb456e2f99706">PcdSet32</a>(TokenName, Value)&nbsp;&nbsp;&nbsp;_PCD_SET_MODE_32_##TokenName    ((Value))</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#abbc9237977840829a3545619a219a57">PcdSet64</a>(TokenName, Value)&nbsp;&nbsp;&nbsp;_PCD_SET_MODE_64_##TokenName    ((Value))</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#17a32244959d0525b891ee2973d93be1">PcdSetPtr</a>(TokenName, SizeOfBuffer, Buffer)&nbsp;&nbsp;&nbsp;_PCD_SET_MODE_PTR_##TokenName   ((SizeOfBuffer), (Buffer))</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#18503ffa09b62d8d86963fc9c98998c8">PcdSetBool</a>(TokenName, Value)&nbsp;&nbsp;&nbsp;_PCD_SET_MODE_BOOL_##TokenName  ((Value))</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#2830597104b21b79ddb80c3f845903c2">PcdGetEx8</a>(Guid, TokenName)&nbsp;&nbsp;&nbsp;LibPcdGetEx8    ((Guid), _PCD_TOKEN_##TokenName)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#f61c77238765c4d12ba07ab32a2b01b2">PcdGetEx16</a>(Guid, TokenName)&nbsp;&nbsp;&nbsp;LibPcdGetEx16   ((Guid), _PCD_TOKEN_##TokenName)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#34b42d737acbf5a73f1d0801fec298c8">PcdGetEx32</a>(Guid, TokenName)&nbsp;&nbsp;&nbsp;LibPcdGetEx32   ((Guid), _PCD_TOKEN_##TokenName)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#30629dcaa1317728e1e999799d0c080b">PcdGetEx64</a>(Guid, TokenName)&nbsp;&nbsp;&nbsp;LibPcdGetEx64   ((Guid), _PCD_TOKEN_##TokenName)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#5487271087fde50d66cbf7563cf1261c">PcdGetExPtr</a>(Guid, TokenName)&nbsp;&nbsp;&nbsp;LibPcdGetExPtr  ((Guid), _PCD_TOKEN_##TokenName)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#ad4a881ae9cbae38362b5cfb4b3f1895">PcdGetExBool</a>(Guid, TokenName)&nbsp;&nbsp;&nbsp;LibPcdGetExBool ((Guid), _PCD_TOKEN_##TokenName)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#7db0635a6fee668a9315f760965bcf5d">PcdSetEx8</a>(Guid, TokenName, Value)&nbsp;&nbsp;&nbsp;LibPcdSetEx8   ((Guid), _PCD_TOKEN_##TokenName, (Value))</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#6e18a8fd46dca3de0417fdb7a0b4cb4e">PcdSetEx16</a>(Guid, TokenName, Value)&nbsp;&nbsp;&nbsp;LibPcdSetEx16  ((Guid), _PCD_TOKEN_##TokenName, (Value))</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#aaeb791af5d528e00b2f320d51399f5f">PcdSetEx32</a>(Guid, TokenName, Value)&nbsp;&nbsp;&nbsp;LibPcdSetEx32  ((Guid), _PCD_TOKEN_##TokenName, (Value))</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#7f654121280dd2ce6b2bbfd19eea8730">PcdSetEx64</a>(Guid, TokenName, Value)&nbsp;&nbsp;&nbsp;LibPcdSetEx64  ((Guid), _PCD_TOKEN_##TokenName, (Value))</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#ca77afa15f2a65894bc51db7ac592328">PcdSetExPtr</a>(Guid, TokenName, SizeOfBuffer, Buffer)&nbsp;&nbsp;&nbsp;LibPcdSetExPtr ((Guid), _PCD_TOKEN_##TokenName, (SizeOfBuffer), (Buffer))</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#f67c800dc2dba14f0abb4523a3fc6c88">PcdSetExBool</a>(Guid, TokenName, Value)&nbsp;&nbsp;&nbsp;LibPcdSetExBool((Guid), _PCD_TOKEN_##TokenName, (Value))</td></tr>
 
 <tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
-<a class="el" href="../../d5/d0b/a00220.html">_EFI_PEI_FIRMWARE_VOLUME_INFO_PPI</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#771f70c0b07556b090b52fffaa885b45">EFI_PEI_FIRMWARE_VOLUME_INFO_PPI</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef VOID(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#debb479ac4bf97b66fef6fd2b6b4fa14">PCD_CALLBACK</a> )(IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *CallBackGuid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> CallBackToken, IN OUT VOID *TokenData, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenDataSize)</td></tr>
 
-<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#4571711da37d199ca5386e9d9e5424c8">gEfiPeiFirmwareVolumeInfoPpiGuid</a></td></tr>
+<tr><td colspan="2"><br><h2>Functions</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#dcc91354e1f3b76d9f78b7d590da2603">LibPcdSetSku</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> SkuId)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#9f10ff7580ad6c1f864da38183fe97a3">LibPcdGet8</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#2e5a682dc90a352636078be5610f6922">LibPcdGet16</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#b4bdfbfadd382d3764abc39902e3debd">LibPcdGet32</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#78a3feccdec7d208165efda245eec132">LibPcdGet64</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#2b3a1c1a1a10d12a1efa500d73e4aab9">LibPcdGetPtr</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#fc93513e25ac91e2fc64a9024b98ee6d">LibPcdGetBool</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#6903a9d3db121587bc0de23fc6e5fed0">LibPcdGetSize</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#2788a5fafc1b34ed60749ade26973a09">LibPcdGetEx8</a> (IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#54a8e3d09aa4374a0ac91200eea935f2">LibPcdGetEx16</a> (IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#25e63b1718bda9d9bedda6148d566f19">LibPcdGetEx32</a> (IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#4ec27078725c77034fab6d61d8242dcb">LibPcdGetEx64</a> (IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#3aa9f7311cc43b6d560460421308706e">LibPcdGetExPtr</a> (IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#fdde8a50b93f70d0e55d77a94aaaff7d">LibPcdGetExBool</a> (IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#da1c4462bbe518eefee5c4460df2874c">LibPcdGetExSize</a> (IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#e21a5b06557145e8e55ccef7d471cfbf">LibPcdSet8</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> Value)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#05ca0ff4a6974a5ea031169c3ed9d7f6">LibPcdSet16</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> Value)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#f31ba98ac3e16c7f962b0f5a8bfae73a">LibPcdSet32</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> Value)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#72c2c1a88a126c9d36dc7e2ca35019bf">LibPcdSet64</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Value)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#cd6a08eb67a1fa7c60e96ddca7a0439e">LibPcdSetPtr</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *SizeOfBuffer, IN CONST VOID *Buffer)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#091f5fb064a2cf057464d40a29921172">LibPcdSetBool</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> Value)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#7459ee6bc8eb893efa8cd95e446ee7cf">LibPcdSetEx8</a> (IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> Value)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#afd2c5d7992cfa4f4e9d25eb0fcd6857">LibPcdSetEx16</a> (IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> Value)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#d822e6a2bc29e825d5c7dbbe70038ef9">LibPcdSetEx32</a> (IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> Value)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#d7de6516c9f9a88e1b2f46a1c976124c">LibPcdSetEx64</a> (IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Value)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#252d4e0f95c968c6e883c54e8b9a7e37">LibPcdSetExPtr</a> (IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *SizeOfBuffer, IN VOID *Buffer)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#9100ea766ba420e3bbb58a5051fbaed0">LibPcdSetExBool</a> (IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> Value)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#e4308379c194579a5fa76dd70f230afa">LibPcdCallbackOnSet</a> (IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d7/df7/a01074.html#debb479ac4bf97b66fef6fd2b6b4fa14">PCD_CALLBACK</a> NotificationFunction)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#f117395d9154f5a1c116556aa1f08e40">LibPcdCancelCallback</a> (IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d7/df7/a01074.html#debb479ac4bf97b66fef6fd2b6b4fa14">PCD_CALLBACK</a> NotificationFunction)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#2259a95653405a2c350abf1bfd798347">LibPcdGetNextToken</a> (IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">GUID</a> *EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#1c139ccab66de7ce727f223cd2f2cea0">LibPcdGetNextTokenSpace</a> (IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *TokenSpaceGuid)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/df7/a01074.html#89d4b9e4a95c97b115dec76443ff3287">LibPatchPcdSetPtr</a> (IN VOID *PatchVariable, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> MaximumDatumSize, IN OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *SizeOfBuffer, IN CONST VOID *Buffer)</td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-This file provides location and format of a firmware volume.<p>
+Provides library services to get and set Platform Configuration Database entries.<p>
+PCD Library Class provides a PCD usage macro interface for all PCD types. It should be included in any module that uses PCD. If a module uses dynamic/dynamicex PCD, module should be linked to a PEIM/DXE library instance to access that PCD. If a module uses PatchableInModule type PCD, it also needs the library instance to produce <a class="el" href="../../d7/df7/a01074.html#89d4b9e4a95c97b115dec76443ff3287">LibPatchPcdSetPtr()</a> interface. For FeatureFlag/Fixed PCD, the macro interface is translated to a variable or macro that is auto-generated by build tool in module's autogen.h/autogen.c. The PcdGetXX(), PcdSetXX(), <a class="el" href="../../d7/df7/a01074.html#39a60e4572301516d24f1b934bdcfade">PcdToken()</a>, and PcdGetNextTokenSpace() operations are only available prior to ExitBootServices(). If access to PCD values are required at runtime, then their values must be collected prior to ExitBootServices(). There are no restrictions on the use of FeaturePcd(), FixedPcdGetXX(), PatchPcdGetXX(), and PatchPcdSetXX().<p>
 Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
-<dl class="user" compact><dt><b>Revision Reference:</b></dt><dd>This PPI is introduced in PI Version 1.0. </dd></dl>
-<hr><h2>Define Documentation</h2>
-<a class="anchor" name="66d61de9b8583c409883d1cef3a0e55a"></a><!-- doxytag: member="FirmwareVolumeInfo.h::EFI_PEI_FIRMWARE_VOLUME_INFO_PPI_GUID" ref="66d61de9b8583c409883d1cef3a0e55a" args="" -->
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
+<a class="anchor" name="f23c310bc1e95e7584de366ad82817a6"></a><!-- doxytag: member="PcdLib.h::FeaturePcdGet" ref="f23c310bc1e95e7584de366ad82817a6" args="(TokenName)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_PEI_FIRMWARE_VOLUME_INFO_PPI_GUID&nbsp;&nbsp;&nbsp;{ 0x49edb1c1, 0xbf21, 0x4761, { 0xbb, 0x12, 0xeb, 0x0, 0x31, 0xaa, 0xbb, 0x39 } }          </td>
+          <td class="memname">#define FeaturePcdGet          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;_PCD_GET_MODE_BOOL_##TokenName</td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+Retrieves a Boolean PCD feature flag based on a token name.<p>
+Returns the Boolean value for the PCD feature flag specified by TokenName. If TokenName is not a valid token in the token space, then the module will not build. If TokenName is not a feature flag, then the module will not build.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Boolean value for the PCD feature flag. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="a5e9abbbdb7e9c557b7cafc3e338c024"></a><!-- doxytag: member="PcdLib.h::FixedPcdGet16" ref="a5e9abbbdb7e9c557b7cafc3e338c024" args="(TokenName)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define FixedPcdGet16          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;_PCD_VALUE_##TokenName</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves a 16-bit fixed PCD token value based on a token name.<p>
+Returns the 16-bit value for the token specified by TokenName. If TokenName is not a valid token in the token space, then the module will not build. If TokenName is not a feature flag, then the module will not build.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>16-bit value for the token specified by TokenName. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="557aafaa1b924bfaddf7bf8cd5fc3a65"></a><!-- doxytag: member="PcdLib.h::FixedPcdGet32" ref="557aafaa1b924bfaddf7bf8cd5fc3a65" args="(TokenName)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define FixedPcdGet32          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;_PCD_VALUE_##TokenName</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves a 32-bit fixed PCD token value based on a token name.<p>
+Returns the 32-bit value for the token specified by TokenName. If TokenName is not a valid token in the token space, then the module will not build. If TokenName is not a feature flag, then the module will not build.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>32-bit value for the token specified by TokenName. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="5d85fee4a68860e7433423d4b6ae52e5"></a><!-- doxytag: member="PcdLib.h::FixedPcdGet64" ref="5d85fee4a68860e7433423d4b6ae52e5" args="(TokenName)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define FixedPcdGet64          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;_PCD_VALUE_##TokenName</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves a 64-bit fixed PCD token value based on a token name.<p>
+Returns the 64-bit value for the token specified by TokenName. If TokenName is not a valid token in the token space, then the module will not build. If TokenName is not a feature flag, then the module will not build.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>64-bit value for the token specified by TokenName. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="91ee0b430d3a00800fe883a166f7334f"></a><!-- doxytag: member="PcdLib.h::FixedPcdGet8" ref="91ee0b430d3a00800fe883a166f7334f" args="(TokenName)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define FixedPcdGet8          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;_PCD_VALUE_##TokenName</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves an 8-bit fixed PCD token value based on a token name.<p>
+Returns the 8-bit value for the token specified by TokenName. If TokenName is not a valid token in the token space, then the module will not build. If TokenName is not a feature flag, then the module will not build.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>8-bit value for the token specified by TokenName. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="623740a206ed9ef6e342abb693c67c2d"></a><!-- doxytag: member="PcdLib.h::FixedPcdGetBool" ref="623740a206ed9ef6e342abb693c67c2d" args="(TokenName)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define FixedPcdGetBool          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;_PCD_VALUE_##TokenName</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves a Boolean fixed PCD token value based on a token name.<p>
+Returns the Boolean value for the token specified by TokenName. If TokenName is not a valid token in the token space, then the module will not build. If TokenName is not a feature flag, then the module will not build.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The Boolean value for the token. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="c478be49e4e556cb637af29a82b181a5"></a><!-- doxytag: member="PcdLib.h::FixedPcdGetPtr" ref="c478be49e4e556cb637af29a82b181a5" args="(TokenName)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define FixedPcdGetPtr          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;((VOID *)_PCD_VALUE_##TokenName)</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves a pointer to a fixed PCD token buffer based on a token name.<p>
+Returns a pointer to the buffer for the token specified by TokenName. If TokenName is not a valid token in the token space, then the module will not build. If TokenName is not a feature flag, then the module will not build.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A pointer to the buffer. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="09990e1ad2e4cad957aa8efd3a5463f3"></a><!-- doxytag: member="PcdLib.h::PatchPcdGet16" ref="09990e1ad2e4cad957aa8efd3a5463f3" args="(TokenName)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PatchPcdGet16          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;_gPcd_BinaryPatch_##TokenName</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves a 16-bit binary patchable PCD token value based on a token name.<p>
+Returns the 16-bit value for the token specified by TokenName. If TokenName is not a valid token in the token space, then the module will not build. If TokenName is not a feature flag, then the module will not build.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A 16-bit binary patchable PCD token value. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="b85029d32a66d229ca0e210d3300f0a9"></a><!-- doxytag: member="PcdLib.h::PatchPcdGet32" ref="b85029d32a66d229ca0e210d3300f0a9" args="(TokenName)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PatchPcdGet32          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;_gPcd_BinaryPatch_##TokenName</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves a 32-bit binary patchable PCD token value based on a token name.<p>
+Returns the 32-bit value for the token specified by TokenName. If TokenName is not a valid token in the token space, then the module will not build. If TokenName is not a feature flag, then the module will not build.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A 32-bit binary patchable PCD token value. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="38dd4f9350badc1cd0a5ea0cec535461"></a><!-- doxytag: member="PcdLib.h::PatchPcdGet64" ref="38dd4f9350badc1cd0a5ea0cec535461" args="(TokenName)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PatchPcdGet64          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;_gPcd_BinaryPatch_##TokenName</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves a 64-bit binary patchable PCD token value based on a token name.<p>
+Returns the 64-bit value for the token specified by TokenName. If TokenName is not a valid token in the token space, then the module will not build. If TokenName is not a feature flag, then the module will not build.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A 64-bit binary patchable PCD token value. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="ac3aed16138bbabf63521edec6b6a811"></a><!-- doxytag: member="PcdLib.h::PatchPcdGet8" ref="ac3aed16138bbabf63521edec6b6a811" args="(TokenName)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PatchPcdGet8          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;_gPcd_BinaryPatch_##TokenName</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves an 8-bit binary patchable PCD token value based on a token name.<p>
+Returns the 8-bit value for the token specified by TokenName. If TokenName is not a valid token in the token space, then the module will not build. If TokenName is not a feature flag, then the module will not build.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>An 8-bit binary patchable PCD token value. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="f2bca8449527a934a9a9dc2030659413"></a><!-- doxytag: member="PcdLib.h::PatchPcdGetBool" ref="f2bca8449527a934a9a9dc2030659413" args="(TokenName)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PatchPcdGetBool          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;_gPcd_BinaryPatch_##TokenName</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves a Boolean binary patchable PCD token value based on a token name.<p>
+Returns the Boolean value for the token specified by TokenName. If TokenName is not a valid token in the token space, then the module will not build. If TokenName is not a feature flag, then the module will not build.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The Boolean value for the token. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="f5937976902f5b3335e047dc006ce51b"></a><!-- doxytag: member="PcdLib.h::PatchPcdGetPtr" ref="f5937976902f5b3335e047dc006ce51b" args="(TokenName)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PatchPcdGetPtr          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;((VOID *)_gPcd_BinaryPatch_##TokenName)</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves a pointer to a binary patchable PCD token buffer based on a token name.<p>
+Returns a pointer to the buffer for the token specified by TokenName. If TokenName is not a valid token in the token space, then the module will not build. If TokenName is not a feature flag, then the module will not build.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A pointer to the buffer for the token. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="cf5ff29272b2d30fa0b0b8437faff272"></a><!-- doxytag: member="PcdLib.h::PatchPcdSet16" ref="cf5ff29272b2d30fa0b0b8437faff272" args="(TokenName, Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PatchPcdSet16          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Value&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;(_gPcd_BinaryPatch_##TokenName = (Value))</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sets a 16-bit binary patchable PCD token value based on a token name.<p>
+Sets the 16-bit value for the token specified by TokenName. Value is returned. If TokenName is not a valid token in the token space, then the module will not build. If TokenName is not a feature flag, then the module will not build.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the binary patchable PCD token to set the current value for. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>The 16-bit value to set.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the Value that was set. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="983e614ee8be6aa188efaec96285036d"></a><!-- doxytag: member="PcdLib.h::PatchPcdSet32" ref="983e614ee8be6aa188efaec96285036d" args="(TokenName, Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PatchPcdSet32          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Value&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;(_gPcd_BinaryPatch_##TokenName = (Value))</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sets a 32-bit binary patchable PCD token value based on a token name.<p>
+Sets the 32-bit value for the token specified by TokenName. Value is returned. If TokenName is not a valid token in the token space, then the module will not build. If TokenName is not a feature flag, then the module will not build.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the binary patchable PCD token to set the current value for. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>The 32-bit value to set.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the Value that was set. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="c87a5e2d5389582710c6d5594d5a757b"></a><!-- doxytag: member="PcdLib.h::PatchPcdSet64" ref="c87a5e2d5389582710c6d5594d5a757b" args="(TokenName, Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PatchPcdSet64          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Value&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;(_gPcd_BinaryPatch_##TokenName = (Value))</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sets a 64-bit binary patchable PCD token value based on a token name.<p>
+Sets the 64-bit value for the token specified by TokenName. Value is returned. If TokenName is not a valid token in the token space, then the module will not build. If TokenName is not a feature flag, then the module will not build.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the binary patchable PCD token to set the current value for. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>The 64-bit value to set.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the Value that was set. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="84611ca2e160ecf24a62e1315c693619"></a><!-- doxytag: member="PcdLib.h::PatchPcdSet8" ref="84611ca2e160ecf24a62e1315c693619" args="(TokenName, Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PatchPcdSet8          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Value&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;(_gPcd_BinaryPatch_##TokenName = (Value))</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sets an 8-bit binary patchable PCD token value based on a token name.<p>
+Sets the 8-bit value for the token specified by TokenName. Value is returned. If TokenName is not a valid token in the token space, then the module will not build. If TokenName is not a feature flag, then the module will not build.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the binary patchable PCD token to set the current value for. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>The 8-bit value to set.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the Value that was set. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="3c74a89c03b0f28886ca72afbd314586"></a><!-- doxytag: member="PcdLib.h::PatchPcdSetBool" ref="3c74a89c03b0f28886ca72afbd314586" args="(TokenName, Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PatchPcdSetBool          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Value&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;(_gPcd_BinaryPatch_##TokenName = (Value))</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sets a Boolean binary patchable PCD token value based on a token name.<p>
+Sets the Boolean value for the token specified by TokenName. Value is returned. If TokenName is not a valid token in the token space, then the module will not build. If TokenName is not a feature flag, then the module will not build.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the binary patchable PCD token to set the current value for. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>The boolean value to set.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the Value that was set. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="728550ddc1c2a480a432bedb6ed8040a"></a><!-- doxytag: member="PcdLib.h::PatchPcdSetPtr" ref="728550ddc1c2a480a432bedb6ed8040a" args="(TokenName, Size, Buffer)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PatchPcdSetPtr          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Size,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Buffer&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+<b>Value:</b><div class="fragment"><pre class="fragment"><a class="code" href="../../d7/df7/a01074.html#89d4b9e4a95c97b115dec76443ff3287">LibPatchPcdSetPtr</a> (                        \
+                                              _gPcd_BinaryPatch_##TokenName,           \
+                                              (<a class="code" href="../../dc/d19/a01056.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>)_PCD_PATCHABLE_##TokenName##_SIZE, \
+                                              (Size),                                  \
+                                              (Buffer)                                 \
+                                              )
+</pre></div>Sets a pointer to a binary patchable PCD token buffer based on a token name.<p>
+Sets the buffer for the token specified by TokenName. Buffer is returned. If SizeOfBuffer is greater than the maximum size supported by TokenName, then set SizeOfBuffer to the maximum size supported by TokenName and return NULL to indicate that the set operation was not actually performed. If SizeOfBuffer is set to MAX_ADDRESS, then SizeOfBuffer must be set to the maximum size supported by TokenName and NULL must be returned. If TokenName is not a valid token in the token space, then the module will not build. If TokenName is not a feature flag, then the module will not build.<p>
+If SizeOfBuffer is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If SizeOfBuffer &gt; 0 and Buffer is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the binary patchable PCD token to set the current value for. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>SizeOfBuffer</em>&nbsp;</td><td>A pointer to the size, in bytes, of Buffer. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>Pointer to the value to set.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the pointer to the Buffer that was set. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="16d775ebf94ceba5c19c94402926f022"></a><!-- doxytag: member="PcdLib.h::PCD_MAX_SKU_ID" ref="16d775ebf94ceba5c19c94402926f022" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PCD_MAX_SKU_ID&nbsp;&nbsp;&nbsp;0x100          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="2740b6772a75da7a05e9c4159110ae89"></a><!-- doxytag: member="PcdLib.h::PcdGet16" ref="2740b6772a75da7a05e9c4159110ae89" args="(TokenName)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PcdGet16          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;_PCD_GET_MODE_16_##TokenName</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves a 16-bit PCD token value based on a token name.<p>
+Returns the 16-bit value for the token specified by TokenName. If TokenName is not a valid token in the token space, then the module will not build.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>16-bit value for the token specified by TokenName. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="818a44c4b9a878d39c0e71f70d8c3814"></a><!-- doxytag: member="PcdLib.h::PcdGet32" ref="818a44c4b9a878d39c0e71f70d8c3814" args="(TokenName)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PcdGet32          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;_PCD_GET_MODE_32_##TokenName</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves a 32-bit PCD token value based on a token name.<p>
+Returns the 32-bit value for the token specified by TokenName. If TokenName is not a valid token in the token space, then the module will not build.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>32-bit value for the token specified by TokenName. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="2f5a43ee09855aa9897fbf638ca2f91d"></a><!-- doxytag: member="PcdLib.h::PcdGet64" ref="2f5a43ee09855aa9897fbf638ca2f91d" args="(TokenName)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PcdGet64          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;_PCD_GET_MODE_64_##TokenName</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves a 64-bit PCD token value based on a token name.<p>
+Returns the 64-bit value for the token specified by TokenName. If TokenName is not a valid token in the token space, then the module will not build.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>64-bit value for the token specified by TokenName. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="579570a1dad85680d55cfdaf9f514d49"></a><!-- doxytag: member="PcdLib.h::PcdGet8" ref="579570a1dad85680d55cfdaf9f514d49" args="(TokenName)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PcdGet8          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;_PCD_GET_MODE_8_##TokenName</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves an 8-bit PCD token value based on a token name.<p>
+Returns the 8-bit value for the token specified by TokenName. If TokenName is not a valid token in the token space, then the module will not build.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>8-bit value for the token specified by TokenName. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="85abf65f7d22a61d42eb9177c3a5bd01"></a><!-- doxytag: member="PcdLib.h::PcdGetBool" ref="85abf65f7d22a61d42eb9177c3a5bd01" args="(TokenName)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PcdGetBool          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;_PCD_GET_MODE_BOOL_##TokenName</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves a Boolean PCD token value based on a token name.<p>
+Returns the Boolean value for the token specified by TokenName. If TokenName is not a valid token in the token space, then the module will not build.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A Boolean PCD token value. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="f61c77238765c4d12ba07ab32a2b01b2"></a><!-- doxytag: member="PcdLib.h::PcdGetEx16" ref="f61c77238765c4d12ba07ab32a2b01b2" args="(Guid, TokenName)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PcdGetEx16          </td>
+          <td>(</td>
+          <td class="paramtype">Guid,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TokenName&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;LibPcdGetEx16   ((Guid), _PCD_TOKEN_##TokenName)</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves a 16-bit PCD token value based on a <a class="el" href="../../d1/d87/a00689.html">GUID</a> and a token name.<p>
+Returns the 16-bit value for the token specified by Guid and TokenName. If TokenName is not a valid token in the token space specified by Guid, then the module will not build.<p>
+If Guid is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Guid</em>&nbsp;</td><td>Pointer to a 128-bit unique value that designates which namespace to retrieve a value from. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A 16-bit PCD token value. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="34b42d737acbf5a73f1d0801fec298c8"></a><!-- doxytag: member="PcdLib.h::PcdGetEx32" ref="34b42d737acbf5a73f1d0801fec298c8" args="(Guid, TokenName)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PcdGetEx32          </td>
+          <td>(</td>
+          <td class="paramtype">Guid,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TokenName&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;LibPcdGetEx32   ((Guid), _PCD_TOKEN_##TokenName)</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves a 32-bit PCD token value based on a <a class="el" href="../../d1/d87/a00689.html">GUID</a> and a token name.<p>
+Returns the 32-bit value for the token specified by Guid and TokenName. If TokenName is not a valid token in the token space specified by Guid, then the module will not build.<p>
+If Guid is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Guid</em>&nbsp;</td><td>Pointer to a 128-bit unique value that designates which namespace to retrieve a value from. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A 32-bit PCD token value. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="30629dcaa1317728e1e999799d0c080b"></a><!-- doxytag: member="PcdLib.h::PcdGetEx64" ref="30629dcaa1317728e1e999799d0c080b" args="(Guid, TokenName)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PcdGetEx64          </td>
+          <td>(</td>
+          <td class="paramtype">Guid,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TokenName&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;LibPcdGetEx64   ((Guid), _PCD_TOKEN_##TokenName)</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves a 64-bit PCD token value based on a <a class="el" href="../../d1/d87/a00689.html">GUID</a> and a token name.<p>
+Returns the 64-bit value for the token specified by Guid and TokenName. If TokenName is not a valid token in the token space specified by Guid, then the module will not build.<p>
+If Guid is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Guid</em>&nbsp;</td><td>Pointer to a 128-bit unique value that designates which namespace to retrieve a value from. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A 64-bit PCD token value. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="2830597104b21b79ddb80c3f845903c2"></a><!-- doxytag: member="PcdLib.h::PcdGetEx8" ref="2830597104b21b79ddb80c3f845903c2" args="(Guid, TokenName)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PcdGetEx8          </td>
+          <td>(</td>
+          <td class="paramtype">Guid,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TokenName&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;LibPcdGetEx8    ((Guid), _PCD_TOKEN_##TokenName)</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves an 8-bit PCD token value based on a <a class="el" href="../../d1/d87/a00689.html">GUID</a> and a token name.<p>
+Returns the 8-bit value for the token specified by Guid and TokenName. If TokenName is not a valid token in the token space specified by Guid, then the module will not build.<p>
+If Guid is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Guid</em>&nbsp;</td><td>Pointer to a 128-bit unique value that designates which namespace to retrieve a value from. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>An 8-bit PCD token value. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="ad4a881ae9cbae38362b5cfb4b3f1895"></a><!-- doxytag: member="PcdLib.h::PcdGetExBool" ref="ad4a881ae9cbae38362b5cfb4b3f1895" args="(Guid, TokenName)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PcdGetExBool          </td>
+          <td>(</td>
+          <td class="paramtype">Guid,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TokenName&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;LibPcdGetExBool ((Guid), _PCD_TOKEN_##TokenName)</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves a Boolean PCD token value based on a <a class="el" href="../../d1/d87/a00689.html">GUID</a> and a token name.<p>
+Returns the Boolean value for the token specified by Guid and TokenName. If TokenName is not a valid token in the token space specified by Guid, then the module will not build.<p>
+If Guid is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Guid</em>&nbsp;</td><td>Pointer to a 128-bit unique value that designates which namespace to retrieve a value from. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A Boolean PCD token value. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="5487271087fde50d66cbf7563cf1261c"></a><!-- doxytag: member="PcdLib.h::PcdGetExPtr" ref="5487271087fde50d66cbf7563cf1261c" args="(Guid, TokenName)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PcdGetExPtr          </td>
+          <td>(</td>
+          <td class="paramtype">Guid,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TokenName&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;LibPcdGetExPtr  ((Guid), _PCD_TOKEN_##TokenName)</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves a pointer to a PCD token buffer based on a <a class="el" href="../../d1/d87/a00689.html">GUID</a> and a token name.<p>
+Returns a pointer to the buffer for the token specified by Guid and TokenName. If TokenName is not a valid token in the token space specified by Guid, then the module will not build.<p>
+If Guid is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Guid</em>&nbsp;</td><td>Pointer to a 128-bit unique value that designates which namespace to retrieve a value from. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A pointer to a PCD token buffer. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="e66fef9528b17267401c27e3f9b0eb46"></a><!-- doxytag: member="PcdLib.h::PcdGetPtr" ref="e66fef9528b17267401c27e3f9b0eb46" args="(TokenName)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PcdGetPtr          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;_PCD_GET_MODE_PTR_##TokenName</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves a pointer to a PCD token buffer based on a token name.<p>
+Returns a pointer to the buffer for the token specified by TokenName. If TokenName is not a valid token in the token space, then the module will not build.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A pointer to the buffer. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="914e554043e01eb1c24ad7e23bb9c7d1"></a><!-- doxytag: member="PcdLib.h::PcdSet16" ref="914e554043e01eb1c24ad7e23bb9c7d1" args="(TokenName, Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PcdSet16          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Value&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;_PCD_SET_MODE_16_##TokenName    ((Value))</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sets a 16-bit PCD token value based on a token name.<p>
+Sets the 16-bit value for the token specified by TokenName. Value is returned. If TokenName is not a valid token in the token space, then the module will not build.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to retrieve a current value for. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>The 16-bit value to set.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the Value that was set. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="c02cc9db5b693af1aebbb456e2f99706"></a><!-- doxytag: member="PcdLib.h::PcdSet32" ref="c02cc9db5b693af1aebbb456e2f99706" args="(TokenName, Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PcdSet32          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Value&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;_PCD_SET_MODE_32_##TokenName    ((Value))</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sets a 32-bit PCD token value based on a token name.<p>
+Sets the 32-bit value for the token specified by TokenName. Value is returned. If TokenName is not a valid token in the token space, then the module will not build.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to retrieve a current value for. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>The 32-bit value to set.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the Value that was set. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="abbc9237977840829a3545619a219a57"></a><!-- doxytag: member="PcdLib.h::PcdSet64" ref="abbc9237977840829a3545619a219a57" args="(TokenName, Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PcdSet64          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Value&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;_PCD_SET_MODE_64_##TokenName    ((Value))</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sets a 64-bit PCD token value based on a token name.<p>
+Sets the 64-bit value for the token specified by TokenName. Value is returned. If TokenName is not a valid token in the token space, then the module will not build.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to retrieve a current value for. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>The 64-bit value to set.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the Value that was set. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="7b7eaf0c1b4f5084784bdaf2e2bff7eb"></a><!-- doxytag: member="PcdLib.h::PcdSet8" ref="7b7eaf0c1b4f5084784bdaf2e2bff7eb" args="(TokenName, Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PcdSet8          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Value&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;_PCD_SET_MODE_8_##TokenName     ((Value))</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sets an 8-bit PCD token value based on a token name.<p>
+Sets the 8-bit value for the token specified by TokenName. Value is returned. If TokenName is not a valid token in the token space, then the module will not build.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to retrieve a current value for. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>The 8-bit value to set.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the Value that was set. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="18503ffa09b62d8d86963fc9c98998c8"></a><!-- doxytag: member="PcdLib.h::PcdSetBool" ref="18503ffa09b62d8d86963fc9c98998c8" args="(TokenName, Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PcdSetBool          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Value&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;_PCD_SET_MODE_BOOL_##TokenName  ((Value))</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sets a Boolean PCD token value based on a token name.<p>
+Sets the Boolean value for the token specified by TokenName. Value is returned. If TokenName is not a valid token in the token space, then the module will not build.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to set the current value for. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>The Boolean value to set.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the Value that was set. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="6e18a8fd46dca3de0417fdb7a0b4cb4e"></a><!-- doxytag: member="PcdLib.h::PcdSetEx16" ref="6e18a8fd46dca3de0417fdb7a0b4cb4e" args="(Guid, TokenName, Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PcdSetEx16          </td>
+          <td>(</td>
+          <td class="paramtype">Guid,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TokenName,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Value&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;LibPcdSetEx16  ((Guid), _PCD_TOKEN_##TokenName, (Value))</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sets a 16-bit PCD token value based on a <a class="el" href="../../d1/d87/a00689.html">GUID</a> and a token name.<p>
+Sets the 16-bit value for the token specified by Guid and TokenName. Value is returned. If TokenName is not a valid token in the token space specified by Guid, then the module will not build.<p>
+If Guid is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Guid</em>&nbsp;</td><td>Pointer to a 128-bit unique value that designates which namespace to retrieve a value from. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to set the current value for. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>The 16-bit value to set.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the Value that was set. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="aaeb791af5d528e00b2f320d51399f5f"></a><!-- doxytag: member="PcdLib.h::PcdSetEx32" ref="aaeb791af5d528e00b2f320d51399f5f" args="(Guid, TokenName, Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PcdSetEx32          </td>
+          <td>(</td>
+          <td class="paramtype">Guid,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TokenName,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Value&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;LibPcdSetEx32  ((Guid), _PCD_TOKEN_##TokenName, (Value))</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sets a 32-bit PCD token value based on a <a class="el" href="../../d1/d87/a00689.html">GUID</a> and a token name.<p>
+Sets the 32-bit value for the token specified by Guid and TokenName. Value is returned. If TokenName is not a valid token in the token space specified by Guid, then the module will not build.<p>
+If Guid is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Guid</em>&nbsp;</td><td>Pointer to a 128-bit unique value that designates which namespace to retrieve a value from. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to set the current value for. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>The 32-bit value to set.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the Value that was set. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="7f654121280dd2ce6b2bbfd19eea8730"></a><!-- doxytag: member="PcdLib.h::PcdSetEx64" ref="7f654121280dd2ce6b2bbfd19eea8730" args="(Guid, TokenName, Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PcdSetEx64          </td>
+          <td>(</td>
+          <td class="paramtype">Guid,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TokenName,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Value&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;LibPcdSetEx64  ((Guid), _PCD_TOKEN_##TokenName, (Value))</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sets a 64-bit PCD token value based on a <a class="el" href="../../d1/d87/a00689.html">GUID</a> and a token name.<p>
+Sets the 64-bit value for the token specified by Guid and TokenName. Value is returned. If TokenName is not a valid token in the token space specified by Guid, then the module will not build.<p>
+If Guid is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Guid</em>&nbsp;</td><td>Pointer to a 128-bit unique value that designates which namespace to retrieve a value from. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to set the current value for. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>The 64-bit value to set.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the Value that was set. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="7db0635a6fee668a9315f760965bcf5d"></a><!-- doxytag: member="PcdLib.h::PcdSetEx8" ref="7db0635a6fee668a9315f760965bcf5d" args="(Guid, TokenName, Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PcdSetEx8          </td>
+          <td>(</td>
+          <td class="paramtype">Guid,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TokenName,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Value&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;LibPcdSetEx8   ((Guid), _PCD_TOKEN_##TokenName, (Value))</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sets an 8-bit PCD token value based on a <a class="el" href="../../d1/d87/a00689.html">GUID</a> and a token name.<p>
+Sets the 8-bit value for the token specified by Guid and TokenName. Value is returned. If TokenName is not a valid token in the token space specified by Guid, then the module will not build.<p>
+If Guid is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Guid</em>&nbsp;</td><td>Pointer to a 128-bit unique value that designates which namespace to retrieve a value from. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to set the current value for. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>The 8-bit value to set.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the Value that was set. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="f67c800dc2dba14f0abb4523a3fc6c88"></a><!-- doxytag: member="PcdLib.h::PcdSetExBool" ref="f67c800dc2dba14f0abb4523a3fc6c88" args="(Guid, TokenName, Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PcdSetExBool          </td>
+          <td>(</td>
+          <td class="paramtype">Guid,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TokenName,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Value&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;LibPcdSetExBool((Guid), _PCD_TOKEN_##TokenName, (Value))</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sets a Boolean PCD token value based on a <a class="el" href="../../d1/d87/a00689.html">GUID</a> and a token name.<p>
+Sets the Boolean value for the token specified by Guid and TokenName. Value is returned. If TokenName is not a valid token in the token space specified by Guid, then the module will not build.<p>
+If Guid is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Guid</em>&nbsp;</td><td>Pointer to a 128-bit unique value that designates which namespace to retrieve a value from. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to set the current value for. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>The Boolean value to set.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the Value that was set. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="ca77afa15f2a65894bc51db7ac592328"></a><!-- doxytag: member="PcdLib.h::PcdSetExPtr" ref="ca77afa15f2a65894bc51db7ac592328" args="(Guid, TokenName, SizeOfBuffer, Buffer)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PcdSetExPtr          </td>
+          <td>(</td>
+          <td class="paramtype">Guid,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TokenName,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SizeOfBuffer,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Buffer&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;LibPcdSetExPtr ((Guid), _PCD_TOKEN_##TokenName, (SizeOfBuffer), (Buffer))</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sets a pointer to a PCD token buffer based on a <a class="el" href="../../d1/d87/a00689.html">GUID</a> and a token name.<p>
+Sets the buffer for the token specified by Guid and TokenName. Buffer is returned. If SizeOfBuffer is greater than the maximum size supported by Guid and TokenName, then set SizeOfBuffer to the maximum size supported by Guid and TokenName and return NULL to indicate that the set operation was not actually performed. If SizeOfBuffer is set to MAX_ADDRESS, then SizeOfBuffer must be set to the maximum size supported by Guid and TokenName and NULL must be returned. If TokenName is not a valid token in the token space specified by Guid, then the module will not build.<p>
+If Guid is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If SizeOfBuffer is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If SizeOfBuffer &gt; 0 and Buffer is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Guid</em>&nbsp;</td><td>Pointer to a 128-bit unique value that designates which namespace to retrieve a value from. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to set the current value for. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>SizeOfBuffer</em>&nbsp;</td><td>A pointer to the size, in bytes, of Buffer. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>Pointer to the buffer to set.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the pointer to the Buffer that was set. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="17a32244959d0525b891ee2973d93be1"></a><!-- doxytag: member="PcdLib.h::PcdSetPtr" ref="17a32244959d0525b891ee2973d93be1" args="(TokenName, SizeOfBuffer, Buffer)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PcdSetPtr          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SizeOfBuffer,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Buffer&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;_PCD_SET_MODE_PTR_##TokenName   ((SizeOfBuffer), (Buffer))</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sets a pointer to a PCD token buffer based on a token name.<p>
+Sets the buffer for the token specified by TokenName. Buffer is returned. If SizeOfBuffer is greater than the maximum size supported by TokenName, then set SizeOfBuffer to the maximum size supported by TokenName and return NULL to indicate that the set operation was not actually performed. If SizeOfBuffer is set to MAX_ADDRESS, then SizeOfBuffer must be set to the maximum size supported by TokenName and NULL must be returned. If TokenName is not a valid token in the token space, then the module will not build.<p>
+If SizeOfBuffer is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If SizeOfBuffer &gt; 0 and Buffer is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to set the current value for. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>SizeOfBuffer</em>&nbsp;</td><td>A pointer to the size, in bytes, of Buffer. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>A pointer to the buffer to set.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the pointer to the Buffer that was set. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="39a60e4572301516d24f1b934bdcfade"></a><!-- doxytag: member="PcdLib.h::PcdToken" ref="39a60e4572301516d24f1b934bdcfade" args="(TokenName)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PcdToken          </td>
+          <td>(</td>
+          <td class="paramtype">TokenName&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;_PCD_TOKEN_##TokenName</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves a token number based on a token name.<p>
+Returns the token number associated with the PCD token specified by TokenName. If TokenName is not a valid token in the token space, then the module will not build. If TokenName is not a feature flag, then the module will not build.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenName</em>&nbsp;</td><td>The name of the PCD token to retrieve the token number for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The token number associated with the PCD. </dd></dl>
 
 </div>
 </div><p>
 <hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="771f70c0b07556b090b52fffaa885b45"></a><!-- doxytag: member="FirmwareVolumeInfo.h::EFI_PEI_FIRMWARE_VOLUME_INFO_PPI" ref="771f70c0b07556b090b52fffaa885b45" args="" -->
+<a class="anchor" name="debb479ac4bf97b66fef6fd2b6b4fa14"></a><!-- doxytag: member="PcdLib.h::PCD_CALLBACK" ref="debb479ac4bf97b66fef6fd2b6b4fa14" args=")(IN CONST GUID *CallBackGuid, IN UINTN CallBackToken, IN OUT VOID *TokenData, IN UINTN TokenDataSize)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef struct <a class="el" href="../../d5/d0b/a00220.html">_EFI_PEI_FIRMWARE_VOLUME_INFO_PPI</a> <a class="el" href="../../d5/d0b/a00220.html">EFI_PEI_FIRMWARE_VOLUME_INFO_PPI</a>          </td>
+          <td class="memname">typedef VOID(EFIAPI * <a class="el" href="../../d7/df7/a01074.html#debb479ac4bf97b66fef6fd2b6b4fa14">PCD_CALLBACK</a>)(IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *CallBackGuid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> CallBackToken, IN OUT VOID *TokenData, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenDataSize)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+This notification function serves two purposes.<p>
+Firstly, it notifies the module that did the registration that the value of this PCD token has been set. Secondly, it provides a mechanism for the module that did the registration to intercept the set operation and override the value been set if necessary. After the invocation of the callback function, TokenData will be used by PCD service PEIM or driver to modify th internal data in PCD database.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>CallBackGuid</em>&nbsp;</td><td>The PCD token <a class="el" href="../../d1/d87/a00689.html">GUID</a> being set. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>CallBackToken</em>&nbsp;</td><td>The PCD token number being set. </td></tr>
+    <tr><td valign="top"><tt>[in,out]</tt>&nbsp;</td><td valign="top"><em>TokenData</em>&nbsp;</td><td>A pointer to the token data being set. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenDataSize</em>&nbsp;</td><td>The size, in bytes, of the data being set. </td></tr>
+  </table>
+</dl>
 
 </div>
 </div><p>
-<hr><h2>Variable Documentation</h2>
-<a class="anchor" name="4571711da37d199ca5386e9d9e5424c8"></a><!-- doxytag: member="FirmwareVolumeInfo.h::gEfiPeiFirmwareVolumeInfoPpiGuid" ref="4571711da37d199ca5386e9d9e5424c8" args="" -->
+<hr><h2>Function Documentation</h2>
+<a class="anchor" name="89d4b9e4a95c97b115dec76443ff3287"></a><!-- doxytag: member="PcdLib.h::LibPatchPcdSetPtr" ref="89d4b9e4a95c97b115dec76443ff3287" args="(IN VOID *PatchVariable, IN UINTN MaximumDatumSize, IN OUT UINTN *SizeOfBuffer, IN CONST VOID *Buffer)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../d7/df7/a01074.html#4571711da37d199ca5386e9d9e5424c8">gEfiPeiFirmwareVolumeInfoPpiGuid</a>          </td>
+          <td class="memname">VOID* EFIAPI LibPatchPcdSetPtr           </td>
+          <td>(</td>
+          <td class="paramtype">IN VOID *&nbsp;</td>
+          <td class="paramname"> <em>PatchVariable</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>MaximumDatumSize</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *&nbsp;</td>
+          <td class="paramname"> <em>SizeOfBuffer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN CONST VOID *&nbsp;</td>
+          <td class="paramname"> <em>Buffer</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+Sets a value of a patchable PCD entry that is type pointer.<p>
+Sets the PCD entry specified by PatchVariable to the value specified by Buffer and SizeOfBuffer. Buffer is returned. If SizeOfBuffer is greater than MaximumDatumSize, then set SizeOfBuffer to MaximumDatumSize and return NULL to indicate that the set operation was not actually performed. If SizeOfBuffer is set to MAX_ADDRESS, then SizeOfBuffer must be set to MaximumDatumSize and NULL must be returned.<p>
+If PatchVariable is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If SizeOfBuffer is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If SizeOfBuffer &gt; 0 and Buffer is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>PatchVariable</em>&nbsp;</td><td>A pointer to the global variable in a module that is the target of the set operation. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>MaximumDatumSize</em>&nbsp;</td><td>The maximum size allowed for the PCD entry specified by PatchVariable. </td></tr>
+    <tr><td valign="top"><tt>[in,out]</tt>&nbsp;</td><td valign="top"><em>SizeOfBuffer</em>&nbsp;</td><td>A pointer to the size, in bytes, of Buffer. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Buffer</em>&nbsp;</td><td>A pointer to the buffer to used to set the target variable.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the pointer to the Buffer that was set. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="e4308379c194579a5fa76dd70f230afa"></a><!-- doxytag: member="PcdLib.h::LibPcdCallbackOnSet" ref="e4308379c194579a5fa76dd70f230afa" args="(IN CONST GUID *Guid, IN UINTN TokenNumber, IN PCD_CALLBACK NotificationFunction)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">VOID EFIAPI LibPcdCallbackOnSet           </td>
+          <td>(</td>
+          <td class="paramtype">IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *&nbsp;</td>
+          <td class="paramname"> <em>Guid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>TokenNumber</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d7/df7/a01074.html#debb479ac4bf97b66fef6fd2b6b4fa14">PCD_CALLBACK</a>&nbsp;</td>
+          <td class="paramname"> <em>NotificationFunction</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Set up a notification function that is called when a specified token is set.<p>
+When the token specified by TokenNumber and Guid is set, then notification function specified by NotificationFunction is called. If Guid is NULL, then the default token space is used. If NotificationFunction is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>Pointer to a 128-bit unique value that designates which namespace to set a value from. If NULL, then the default token space is used. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number to monitor. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>NotificationFunction</em>&nbsp;</td><td>The function to call when the token specified by Guid and TokenNumber is set. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="f117395d9154f5a1c116556aa1f08e40"></a><!-- doxytag: member="PcdLib.h::LibPcdCancelCallback" ref="f117395d9154f5a1c116556aa1f08e40" args="(IN CONST GUID *Guid, IN UINTN TokenNumber, IN PCD_CALLBACK NotificationFunction)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">VOID EFIAPI LibPcdCancelCallback           </td>
+          <td>(</td>
+          <td class="paramtype">IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *&nbsp;</td>
+          <td class="paramname"> <em>Guid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>TokenNumber</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d7/df7/a01074.html#debb479ac4bf97b66fef6fd2b6b4fa14">PCD_CALLBACK</a>&nbsp;</td>
+          <td class="paramname"> <em>NotificationFunction</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Disable a notification function that was established with LibPcdCallbackonSet().<p>
+Disable a notification function that was previously established with <a class="el" href="../../d7/df7/a01074.html#e4308379c194579a5fa76dd70f230afa">LibPcdCallbackOnSet()</a>. If NotificationFunction is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If <a class="el" href="../../d7/df7/a01074.html#e4308379c194579a5fa76dd70f230afa">LibPcdCallbackOnSet()</a> was not previously called with Guid, TokenNumber, and NotificationFunction, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>Specify the <a class="el" href="../../d1/d87/a00689.html">GUID</a> token space. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>Specify the token number. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>NotificationFunction</em>&nbsp;</td><td>The callback function to be unregistered. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="2e5a682dc90a352636078be5610f6922"></a><!-- doxytag: member="PcdLib.h::LibPcdGet16" ref="2e5a682dc90a352636078be5610f6922" args="(IN UINTN TokenNumber)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI LibPcdGet16           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>TokenNumber</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function provides a means by which to retrieve a value for a given PCD token.<p>
+Returns the 16-bit value for the token specified by TokenNumber.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Returns the 16-bit value for the token specified by TokenNumber. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="b4bdfbfadd382d3764abc39902e3debd"></a><!-- doxytag: member="PcdLib.h::LibPcdGet32" ref="b4bdfbfadd382d3764abc39902e3debd" args="(IN UINTN TokenNumber)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI LibPcdGet32           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>TokenNumber</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function provides a means by which to retrieve a value for a given PCD token.<p>
+Returns the 32-bit value for the token specified by TokenNumber.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Returns the 32-bit value for the token specified by TokenNumber. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="78a3feccdec7d208165efda245eec132"></a><!-- doxytag: member="PcdLib.h::LibPcdGet64" ref="78a3feccdec7d208165efda245eec132" args="(IN UINTN TokenNumber)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> EFIAPI LibPcdGet64           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>TokenNumber</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function provides a means by which to retrieve a value for a given PCD token.<p>
+Returns the 64-bit value for the token specified by TokenNumber.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Returns the 64-bit value for the token specified by TokenNumber. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="9f10ff7580ad6c1f864da38183fe97a3"></a><!-- doxytag: member="PcdLib.h::LibPcdGet8" ref="9f10ff7580ad6c1f864da38183fe97a3" args="(IN UINTN TokenNumber)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI LibPcdGet8           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>TokenNumber</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function provides a means by which to retrieve a value for a given PCD token.<p>
+Returns the 8-bit value for the token specified by TokenNumber.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Returns the 8-bit value for the token specified by TokenNumber. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="fc93513e25ac91e2fc64a9024b98ee6d"></a><!-- doxytag: member="PcdLib.h::LibPcdGetBool" ref="fc93513e25ac91e2fc64a9024b98ee6d" args="(IN UINTN TokenNumber)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> EFIAPI LibPcdGetBool           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>TokenNumber</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function provides a means by which to retrieve a value for a given PCD token.<p>
+Returns the Boolean value of the token specified by TokenNumber.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Returns the Boolean value of the token specified by TokenNumber. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="54a8e3d09aa4374a0ac91200eea935f2"></a><!-- doxytag: member="PcdLib.h::LibPcdGetEx16" ref="54a8e3d09aa4374a0ac91200eea935f2" args="(IN CONST GUID *Guid, IN UINTN TokenNumber)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI LibPcdGetEx16           </td>
+          <td>(</td>
+          <td class="paramtype">IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *&nbsp;</td>
+          <td class="paramname"> <em>Guid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>TokenNumber</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function provides a means by which to retrieve a value for a given PCD token.<p>
+Returns the 16-bit value for the token specified by TokenNumber and Guid.<p>
+If Guid is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>Pointer to a 128-bit unique value that designates which namespace to retrieve a value from. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the UINT16. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="25e63b1718bda9d9bedda6148d566f19"></a><!-- doxytag: member="PcdLib.h::LibPcdGetEx32" ref="25e63b1718bda9d9bedda6148d566f19" args="(IN CONST GUID *Guid, IN UINTN TokenNumber)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI LibPcdGetEx32           </td>
+          <td>(</td>
+          <td class="paramtype">IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *&nbsp;</td>
+          <td class="paramname"> <em>Guid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>TokenNumber</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Returns the 32-bit value for the token specified by TokenNumber and Guid. If Guid is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>Pointer to a 128-bit unique value that designates which namespace to retrieve a value from. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the UINT32. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="4ec27078725c77034fab6d61d8242dcb"></a><!-- doxytag: member="PcdLib.h::LibPcdGetEx64" ref="4ec27078725c77034fab6d61d8242dcb" args="(IN CONST GUID *Guid, IN UINTN TokenNumber)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> EFIAPI LibPcdGetEx64           </td>
+          <td>(</td>
+          <td class="paramtype">IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *&nbsp;</td>
+          <td class="paramname"> <em>Guid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>TokenNumber</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function provides a means by which to retrieve a value for a given PCD token.<p>
+Returns the 64-bit value for the token specified by TokenNumber and Guid.<p>
+If Guid is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>Pointer to a 128-bit unique value that designates which namespace to retrieve a value from. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the UINT64. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="2788a5fafc1b34ed60749ade26973a09"></a><!-- doxytag: member="PcdLib.h::LibPcdGetEx8" ref="2788a5fafc1b34ed60749ade26973a09" args="(IN CONST GUID *Guid, IN UINTN TokenNumber)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI LibPcdGetEx8           </td>
+          <td>(</td>
+          <td class="paramtype">IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *&nbsp;</td>
+          <td class="paramname"> <em>Guid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>TokenNumber</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function provides a means by which to retrieve a value for a given PCD token.<p>
+Returns the 8-bit value for the token specified by TokenNumber and Guid.<p>
+If Guid is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>Pointer to a 128-bit unique value that designates which namespace to retrieve a value from. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the UINT8. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="fdde8a50b93f70d0e55d77a94aaaff7d"></a><!-- doxytag: member="PcdLib.h::LibPcdGetExBool" ref="fdde8a50b93f70d0e55d77a94aaaff7d" args="(IN CONST GUID *Guid, IN UINTN TokenNumber)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> EFIAPI LibPcdGetExBool           </td>
+          <td>(</td>
+          <td class="paramtype">IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *&nbsp;</td>
+          <td class="paramname"> <em>Guid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>TokenNumber</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function provides a means by which to retrieve a value for a given PCD token.<p>
+Returns the Boolean value of the token specified by TokenNumber and Guid.<p>
+If Guid is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>Pointer to a 128-bit unique value that designates which namespace to retrieve a value from. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the BOOLEAN. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="3aa9f7311cc43b6d560460421308706e"></a><!-- doxytag: member="PcdLib.h::LibPcdGetExPtr" ref="3aa9f7311cc43b6d560460421308706e" args="(IN CONST GUID *Guid, IN UINTN TokenNumber)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">VOID* EFIAPI LibPcdGetExPtr           </td>
+          <td>(</td>
+          <td class="paramtype">IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *&nbsp;</td>
+          <td class="paramname"> <em>Guid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>TokenNumber</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function provides a means by which to retrieve a value for a given PCD token.<p>
+Returns the pointer to the buffer of token specified by TokenNumber and Guid.<p>
+If Guid is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>Pointer to a 128-bit unique value that designates which namespace to retrieve a value from. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the VOID* pointer. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="da1c4462bbe518eefee5c4460df2874c"></a><!-- doxytag: member="PcdLib.h::LibPcdGetExSize" ref="da1c4462bbe518eefee5c4460df2874c" args="(IN CONST GUID *Guid, IN UINTN TokenNumber)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI LibPcdGetExSize           </td>
+          <td>(</td>
+          <td class="paramtype">IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *&nbsp;</td>
+          <td class="paramname"> <em>Guid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>TokenNumber</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function provides a means by which to retrieve the size of a given PCD token.<p>
+Returns the size of the token specified by TokenNumber and Guid.<p>
+If Guid is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>Pointer to a 128-bit unique value that designates which namespace to retrieve a value from. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the size. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="2259a95653405a2c350abf1bfd798347"></a><!-- doxytag: member="PcdLib.h::LibPcdGetNextToken" ref="2259a95653405a2c350abf1bfd798347" args="(IN CONST GUID *Guid, IN UINTN TokenNumber)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI LibPcdGetNextToken           </td>
+          <td>(</td>
+          <td class="paramtype">IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *&nbsp;</td>
+          <td class="paramname"> <em>Guid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>TokenNumber</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves the next token in a token space.<p>
+Retrieves the next PCD token number from the token space specified by Guid. If Guid is NULL, then the default token space is used. If TokenNumber is 0, then the first token number is returned. Otherwise, the token number that follows TokenNumber in the token space is returned. If TokenNumber is the last token number in the token space, then 0 is returned.<p>
+If TokenNumber is not 0 and is not in the token space specified by Guid, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>Pointer to a 128-bit unique value that designates which namespace to set a value from. If NULL, then the default token space is used. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The previous PCD token number. If 0, then retrieves the first PCD token number.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The next valid token number. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="1c139ccab66de7ce727f223cd2f2cea0"></a><!-- doxytag: member="PcdLib.h::LibPcdGetNextTokenSpace" ref="1c139ccab66de7ce727f223cd2f2cea0" args="(IN CONST GUID *TokenSpaceGuid)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">GUID</a>* EFIAPI LibPcdGetNextTokenSpace           </td>
+          <td>(</td>
+          <td class="paramtype">IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *&nbsp;</td>
+          <td class="paramname"> <em>TokenSpaceGuid</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Used to retrieve the list of available PCD token space GUIDs.<p>
+Returns the PCD token space <a class="el" href="../../d1/d87/a00689.html">GUID</a> that follows TokenSpaceGuid in the list of token spaces in the platform. If TokenSpaceGuid is NULL, then a pointer to the first PCD token spaces returned. If TokenSpaceGuid is the last PCD token space <a class="el" href="../../d1/d87/a00689.html">GUID</a> in the list, then NULL is returned.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TokenSpaceGuid</em>&nbsp;</td><td>Pointer to the a PCD token space <a class="el" href="../../d1/d87/a00689.html">GUID</a></td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The next valid token namespace. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="2b3a1c1a1a10d12a1efa500d73e4aab9"></a><!-- doxytag: member="PcdLib.h::LibPcdGetPtr" ref="2b3a1c1a1a10d12a1efa500d73e4aab9" args="(IN UINTN TokenNumber)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">VOID* EFIAPI LibPcdGetPtr           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>TokenNumber</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function provides a means by which to retrieve a value for a given PCD token.<p>
+Returns the pointer to the buffer of the token specified by TokenNumber.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Returns the pointer to the token specified by TokenNumber. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="6903a9d3db121587bc0de23fc6e5fed0"></a><!-- doxytag: member="PcdLib.h::LibPcdGetSize" ref="6903a9d3db121587bc0de23fc6e5fed0" args="(IN UINTN TokenNumber)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI LibPcdGetSize           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>TokenNumber</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function provides a means by which to retrieve the size of a given PCD token.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number to retrieve a current value for.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Returns the size of the token specified by TokenNumber. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="05ca0ff4a6974a5ea031169c3ed9d7f6"></a><!-- doxytag: member="PcdLib.h::LibPcdSet16" ref="05ca0ff4a6974a5ea031169c3ed9d7f6" args="(IN UINTN TokenNumber, IN UINT16 Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI LibPcdSet16           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>TokenNumber</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
+          <td class="paramname"> <em>Value</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function provides a means by which to set a value for a given PCD token.<p>
+Sets the 16-bit value for the token specified by TokenNumber to the value specified by Value. Value is returned.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number to set a current value for. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Value</em>&nbsp;</td><td>The 16-bit value to set.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the Value that was set. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="f31ba98ac3e16c7f962b0f5a8bfae73a"></a><!-- doxytag: member="PcdLib.h::LibPcdSet32" ref="f31ba98ac3e16c7f962b0f5a8bfae73a" args="(IN UINTN TokenNumber, IN UINT32 Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI LibPcdSet32           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>TokenNumber</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td>
+          <td class="paramname"> <em>Value</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function provides a means by which to set a value for a given PCD token.<p>
+Sets the 32-bit value for the token specified by TokenNumber to the value specified by Value. Value is returned.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number to set a current value for. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Value</em>&nbsp;</td><td>The 32-bit value to set.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the Value that was set. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="72c2c1a88a126c9d36dc7e2ca35019bf"></a><!-- doxytag: member="PcdLib.h::LibPcdSet64" ref="72c2c1a88a126c9d36dc7e2ca35019bf" args="(IN UINTN TokenNumber, IN UINT64 Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> EFIAPI LibPcdSet64           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>TokenNumber</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
+          <td class="paramname"> <em>Value</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function provides a means by which to set a value for a given PCD token.<p>
+Sets the 64-bit value for the token specified by TokenNumber to the value specified by Value. Value is returned.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number to set a current value for. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Value</em>&nbsp;</td><td>The 64-bit value to set.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the Value that was set. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="e21a5b06557145e8e55ccef7d471cfbf"></a><!-- doxytag: member="PcdLib.h::LibPcdSet8" ref="e21a5b06557145e8e55ccef7d471cfbf" args="(IN UINTN TokenNumber, IN UINT8 Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI LibPcdSet8           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>TokenNumber</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
+          <td class="paramname"> <em>Value</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function provides a means by which to set a value for a given PCD token.<p>
+Sets the 8-bit value for the token specified by TokenNumber to the value specified by Value. Value is returned.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number to set a current value for. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Value</em>&nbsp;</td><td>The 8-bit value to set.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the Value that was set. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="091f5fb064a2cf057464d40a29921172"></a><!-- doxytag: member="PcdLib.h::LibPcdSetBool" ref="091f5fb064a2cf057464d40a29921172" args="(IN UINTN TokenNumber, IN BOOLEAN Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> EFIAPI LibPcdSetBool           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>TokenNumber</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td>
+          <td class="paramname"> <em>Value</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function provides a means by which to set a value for a given PCD token.<p>
+Sets the Boolean value for the token specified by TokenNumber to the value specified by Value. Value is returned.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number to set a current value for. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Value</em>&nbsp;</td><td>The boolean value to set.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the Value that was set. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="afd2c5d7992cfa4f4e9d25eb0fcd6857"></a><!-- doxytag: member="PcdLib.h::LibPcdSetEx16" ref="afd2c5d7992cfa4f4e9d25eb0fcd6857" args="(IN CONST GUID *Guid, IN UINTN TokenNumber, IN UINT16 Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI LibPcdSetEx16           </td>
+          <td>(</td>
+          <td class="paramtype">IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *&nbsp;</td>
+          <td class="paramname"> <em>Guid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>TokenNumber</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
+          <td class="paramname"> <em>Value</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function provides a means by which to set a value for a given PCD token.<p>
+Sets the 16-bit value for the token specified by TokenNumber and Guid to the value specified by Value. Value is returned.<p>
+If Guid is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>Pointer to a 128-bit unique value that designates which namespace to set a value from. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number to set a current value for. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Value</em>&nbsp;</td><td>The 16-bit value to set.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the Value that was set. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="d822e6a2bc29e825d5c7dbbe70038ef9"></a><!-- doxytag: member="PcdLib.h::LibPcdSetEx32" ref="d822e6a2bc29e825d5c7dbbe70038ef9" args="(IN CONST GUID *Guid, IN UINTN TokenNumber, IN UINT32 Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI LibPcdSetEx32           </td>
+          <td>(</td>
+          <td class="paramtype">IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *&nbsp;</td>
+          <td class="paramname"> <em>Guid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>TokenNumber</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td>
+          <td class="paramname"> <em>Value</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function provides a means by which to set a value for a given PCD token.<p>
+Sets the 32-bit value for the token specified by TokenNumber and Guid to the value specified by Value. Value is returned.<p>
+If Guid is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>Pointer to a 128-bit unique value that designates which namespace to set a value from. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number to set a current value for. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Value</em>&nbsp;</td><td>The 32-bit value to set.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the Value that was set. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="d7de6516c9f9a88e1b2f46a1c976124c"></a><!-- doxytag: member="PcdLib.h::LibPcdSetEx64" ref="d7de6516c9f9a88e1b2f46a1c976124c" args="(IN CONST GUID *Guid, IN UINTN TokenNumber, IN UINT64 Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> EFIAPI LibPcdSetEx64           </td>
+          <td>(</td>
+          <td class="paramtype">IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *&nbsp;</td>
+          <td class="paramname"> <em>Guid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>TokenNumber</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
+          <td class="paramname"> <em>Value</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function provides a means by which to set a value for a given PCD token.<p>
+Sets the 64-bit value for the token specified by TokenNumber and Guid to the value specified by Value. Value is returned. If Guid is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>Pointer to a 128-bit unique value that designates which namespace to set a value from. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number to set a current value for. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Value</em>&nbsp;</td><td>The 64-bit value to set.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the Value that was set. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="7459ee6bc8eb893efa8cd95e446ee7cf"></a><!-- doxytag: member="PcdLib.h::LibPcdSetEx8" ref="7459ee6bc8eb893efa8cd95e446ee7cf" args="(IN CONST GUID *Guid, IN UINTN TokenNumber, IN UINT8 Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI LibPcdSetEx8           </td>
+          <td>(</td>
+          <td class="paramtype">IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *&nbsp;</td>
+          <td class="paramname"> <em>Guid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>TokenNumber</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
+          <td class="paramname"> <em>Value</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function provides a means by which to set a value for a given PCD token.<p>
+Sets the 8-bit value for the token specified by TokenNumber and Guid to the value specified by Value. Value is returned.<p>
+If Guid is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>Pointer to a 128-bit unique value that designates which namespace to set a value from. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number to set a current value for. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Value</em>&nbsp;</td><td>The 8-bit value to set.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the Value that was set. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="9100ea766ba420e3bbb58a5051fbaed0"></a><!-- doxytag: member="PcdLib.h::LibPcdSetExBool" ref="9100ea766ba420e3bbb58a5051fbaed0" args="(IN CONST GUID *Guid, IN UINTN TokenNumber, IN BOOLEAN Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> EFIAPI LibPcdSetExBool           </td>
+          <td>(</td>
+          <td class="paramtype">IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *&nbsp;</td>
+          <td class="paramname"> <em>Guid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>TokenNumber</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td>
+          <td class="paramname"> <em>Value</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function provides a means by which to set a value for a given PCD token.<p>
+Sets the Boolean value for the token specified by TokenNumber and Guid to the value specified by Value. Value is returned.<p>
+If Guid is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>Pointer to a 128-bit unique value that designates which namespace to set a value from. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number to set a current value for. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Value</em>&nbsp;</td><td>The Boolean value to set.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the Value that was set. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="252d4e0f95c968c6e883c54e8b9a7e37"></a><!-- doxytag: member="PcdLib.h::LibPcdSetExPtr" ref="252d4e0f95c968c6e883c54e8b9a7e37" args="(IN CONST GUID *Guid, IN UINTN TokenNumber, IN OUT UINTN *SizeOfBuffer, IN VOID *Buffer)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">VOID* EFIAPI LibPcdSetExPtr           </td>
+          <td>(</td>
+          <td class="paramtype">IN CONST <a class="el" href="../../d1/d87/a00689.html">GUID</a> *&nbsp;</td>
+          <td class="paramname"> <em>Guid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>TokenNumber</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *&nbsp;</td>
+          <td class="paramname"> <em>SizeOfBuffer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN VOID *&nbsp;</td>
+          <td class="paramname"> <em>Buffer</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function provides a means by which to set a value for a given PCD token.<p>
+Sets a buffer for the token specified by TokenNumber to the value specified by Buffer and SizeOfBuffer. Buffer is returned. If SizeOfBuffer is greater than the maximum size support by TokenNumber, then set SizeOfBuffer to the maximum size supported by TokenNumber and return NULL to indicate that the set operation was not actually performed.<p>
+If Guid is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If SizeOfBuffer is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If SizeOfBuffer &gt; 0 and Buffer is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>Pointer to a 128-bit unique value that designates which namespace to set a value from. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number to set a current value for. </td></tr>
+    <tr><td valign="top"><tt>[in,out]</tt>&nbsp;</td><td valign="top"><em>SizeOfBuffer</em>&nbsp;</td><td>The size, in bytes, of Buffer. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Buffer</em>&nbsp;</td><td>A pointer to the buffer to set.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the pointer to the Buffer that was set. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="cd6a08eb67a1fa7c60e96ddca7a0439e"></a><!-- doxytag: member="PcdLib.h::LibPcdSetPtr" ref="cd6a08eb67a1fa7c60e96ddca7a0439e" args="(IN UINTN TokenNumber, IN OUT UINTN *SizeOfBuffer, IN CONST VOID *Buffer)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">VOID* EFIAPI LibPcdSetPtr           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>TokenNumber</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *&nbsp;</td>
+          <td class="paramname"> <em>SizeOfBuffer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN CONST VOID *&nbsp;</td>
+          <td class="paramname"> <em>Buffer</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function provides a means by which to set a value for a given PCD token.<p>
+Sets a buffer for the token specified by TokenNumber to the value specified by Buffer and SizeOfBuffer. Buffer is returned. If SizeOfBuffer is greater than the maximum size support by TokenNumber, then set SizeOfBuffer to the maximum size supported by TokenNumber and return NULL to indicate that the set operation was not actually performed.<p>
+If SizeOfBuffer is set to MAX_ADDRESS, then SizeOfBuffer must be set to the maximum size supported by TokenName and NULL must be returned.<p>
+If SizeOfBuffer is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If SizeOfBuffer &gt; 0 and Buffer is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number to set a current value for. </td></tr>
+    <tr><td valign="top"><tt>[in,out]</tt>&nbsp;</td><td valign="top"><em>SizeOfBuffer</em>&nbsp;</td><td>The size, in bytes, of Buffer. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Buffer</em>&nbsp;</td><td>A pointer to the buffer to set.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the pointer for the Buffer that was set. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="dcc91354e1f3b76d9f78b7d590da2603"></a><!-- doxytag: member="PcdLib.h::LibPcdSetSku" ref="dcc91354e1f3b76d9f78b7d590da2603" args="(IN UINTN SkuId)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI LibPcdSetSku           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>SkuId</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function provides a means by which SKU support can be established in the PCD infrastructure.<p>
+Sets the current SKU in the PCD database to the value specified by SkuId. SkuId is returned. If SkuId &gt;= PCD_MAX_SKU_ID, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>SkuId</em>&nbsp;</td><td>The SKU value that will be used when the PCD service retrieves and sets values associated with a PCD token.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Return the SKU ID that was set. </dd></dl>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:09 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:22 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: _LIST_ENTRY Struct Reference</title>
+<title>MdePkg[ALL]: _EFI_TAPE_IO_PROTOCOL Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,22 +21,30 @@
   </div>
 </div>
 <div class="contents">
-<h1>_LIST_ENTRY Struct Reference</h1><!-- doxytag: class="_LIST_ENTRY" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>_EFI_TAPE_IO_PROTOCOL Struct Reference</h1><!-- doxytag: class="_EFI_TAPE_IO_PROTOCOL" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d5/d35/a00266.html">LIST_ENTRY</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d35/a00266.html#179152166b9fe3bea33e8bdf3cdb2c66">ForwardLink</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d67/a01232.html#5209ff4f1a0c416d7ac9436ce4b868ca">EFI_TAPE_READ</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d35/a00266.html#ecc643d474243c058020ab9f9ced223f">TapeRead</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d5/d35/a00266.html">LIST_ENTRY</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d35/a00266.html#35151395fe898ffbbe3815bd050da497">BackLink</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d67/a01232.html#f8a8a788f4e3500bbfced4fb0599c245">EFI_TAPE_WRITE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d35/a00266.html#407730efd5cbb6794f100e9c997e75ed">TapeWrite</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d67/a01232.html#fd3b506bf3a2dbeb9a722890937c61d6">EFI_TAPE_REWIND</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d35/a00266.html#c454fec5ccf00a97490e4200d2991c54">TapeRewind</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d67/a01232.html#51af3f8814157d3599d096e5004a49bf">EFI_TAPE_SPACE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d35/a00266.html#42fdd3ba28d380aa850399f9db53d4d6">TapeSpace</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d67/a01232.html#decee9b2f4ba71c32c6f606345e25795">EFI_TAPE_WRITEFM</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d35/a00266.html#7040079a4c1862f76af27b6679bd282a">TapeWriteFM</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d67/a01232.html#509a6e251f31a02b81d8fc0008dcaeb6">EFI_TAPE_RESET</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d35/a00266.html#dc3541f94b891324f86295a0eb1bdfb7">TapeReset</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-<a class="el" href="../../d5/d35/a00266.html">_LIST_ENTRY</a> structure definition. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="35151395fe898ffbbe3815bd050da497"></a><!-- doxytag: member="_LIST_ENTRY::BackLink" ref="35151395fe898ffbbe3815bd050da497" args="" -->
+The EFI_TAPE_IO_PROTOCOL provides basic sequential operations for tape devices. These include read, write, rewind, space, write filemarks and reset functions. Per this specification, a boot application uses the services of this protocol to load the bootloader image from tape. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="ecc643d474243c058020ab9f9ced223f"></a><!-- doxytag: member="_EFI_TAPE_IO_PROTOCOL::TapeRead" ref="ecc643d474243c058020ab9f9ced223f" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d5/d35/a00266.html">LIST_ENTRY</a>* <a class="el" href="../../d5/d35/a00266.html#35151395fe898ffbbe3815bd050da497">_LIST_ENTRY::BackLink</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d67/a01232.html#5209ff4f1a0c416d7ac9436ce4b868ca">EFI_TAPE_READ</a> <a class="el" href="../../d5/d35/a00266.html#ecc643d474243c058020ab9f9ced223f">_EFI_TAPE_IO_PROTOCOL::TapeRead</a>          </td>
         </tr>
       </table>
 </div>
@@ -46,12 +54,72 @@
 
 </div>
 </div><p>
-<a class="anchor" name="179152166b9fe3bea33e8bdf3cdb2c66"></a><!-- doxytag: member="_LIST_ENTRY::ForwardLink" ref="179152166b9fe3bea33e8bdf3cdb2c66" args="" -->
+<a class="anchor" name="dc3541f94b891324f86295a0eb1bdfb7"></a><!-- doxytag: member="_EFI_TAPE_IO_PROTOCOL::TapeReset" ref="dc3541f94b891324f86295a0eb1bdfb7" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d5/d35/a00266.html">LIST_ENTRY</a>* <a class="el" href="../../d5/d35/a00266.html#179152166b9fe3bea33e8bdf3cdb2c66">_LIST_ENTRY::ForwardLink</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d67/a01232.html#509a6e251f31a02b81d8fc0008dcaeb6">EFI_TAPE_RESET</a> <a class="el" href="../../d5/d35/a00266.html#dc3541f94b891324f86295a0eb1bdfb7">_EFI_TAPE_IO_PROTOCOL::TapeReset</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="c454fec5ccf00a97490e4200d2991c54"></a><!-- doxytag: member="_EFI_TAPE_IO_PROTOCOL::TapeRewind" ref="c454fec5ccf00a97490e4200d2991c54" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d67/a01232.html#fd3b506bf3a2dbeb9a722890937c61d6">EFI_TAPE_REWIND</a> <a class="el" href="../../d5/d35/a00266.html#c454fec5ccf00a97490e4200d2991c54">_EFI_TAPE_IO_PROTOCOL::TapeRewind</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="42fdd3ba28d380aa850399f9db53d4d6"></a><!-- doxytag: member="_EFI_TAPE_IO_PROTOCOL::TapeSpace" ref="42fdd3ba28d380aa850399f9db53d4d6" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d67/a01232.html#51af3f8814157d3599d096e5004a49bf">EFI_TAPE_SPACE</a> <a class="el" href="../../d5/d35/a00266.html#42fdd3ba28d380aa850399f9db53d4d6">_EFI_TAPE_IO_PROTOCOL::TapeSpace</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="407730efd5cbb6794f100e9c997e75ed"></a><!-- doxytag: member="_EFI_TAPE_IO_PROTOCOL::TapeWrite" ref="407730efd5cbb6794f100e9c997e75ed" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d67/a01232.html#f8a8a788f4e3500bbfced4fb0599c245">EFI_TAPE_WRITE</a> <a class="el" href="../../d5/d35/a00266.html#407730efd5cbb6794f100e9c997e75ed">_EFI_TAPE_IO_PROTOCOL::TapeWrite</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="7040079a4c1862f76af27b6679bd282a"></a><!-- doxytag: member="_EFI_TAPE_IO_PROTOCOL::TapeWriteFM" ref="7040079a4c1862f76af27b6679bd282a" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d67/a01232.html#decee9b2f4ba71c32c6f606345e25795">EFI_TAPE_WRITEFM</a> <a class="el" href="../../d5/d35/a00266.html#7040079a4c1862f76af27b6679bd282a">_EFI_TAPE_IO_PROTOCOL::TapeWriteFM</a>          </td>
         </tr>
       </table>
 </div>
@@ -62,7 +130,7 @@
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:14 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:18 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

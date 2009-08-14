@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: tdTPM_BOUND_DATA Struct Reference</title>
+<title>MdePkg[ALL]: SMBIOS_TABLE_TYPE19 Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,24 +21,29 @@
   </div>
 </div>
 <div class="contents">
-<h1>tdTPM_BOUND_DATA Struct Reference</h1><!-- doxytag: class="tdTPM_BOUND_DATA" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>SMBIOS_TABLE_TYPE19 Struct Reference</h1><!-- doxytag: class="SMBIOS_TABLE_TYPE19" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d38/a00926.html">TPM_STRUCT_VER</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d82/a00857.html#cd4cafceac79b3df8252a5d6422818f5">ver</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d5/dac/a00841.html">SMBIOS_STRUCTURE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d82/a00857.html#381699fd655edd45593fbd7e78c85f1d">Hdr</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/d59/a01001.html#851ca56c93bc8149f9f17e9562f63e6a">TPM_PAYLOAD_TYPE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d82/a00857.html#2841cfb7a7d145ac8880bd2b538e1a0f">payload</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d82/a00857.html#9e1b4c17cdec41ff2b37479e63e7df3a">StartingAddress</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d82/a00857.html#c8b40fe62728e69772cbabbca0bec6ed">payloadData</a> [1]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d82/a00857.html#faeeabb6e02011052afb97731c75b3bb">EndingAddress</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d82/a00857.html#c8a20b54c61b4cc25c9c23b4d5b08be9">MemoryArrayHandle</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d82/a00857.html#200d27eb43fa49e21a17c3b549ec3927">PartitionWidth</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Part 2, section 9.5: TPM_BOUND_DATA <hr><h2>Field Documentation</h2>
-<a class="anchor" name="2841cfb7a7d145ac8880bd2b538e1a0f"></a><!-- doxytag: member="tdTPM_BOUND_DATA::payload" ref="2841cfb7a7d145ac8880bd2b538e1a0f" args="" -->
+Memory Array Mapped Address (Type 19)<p>
+This structure provides the address mapping for a Physical Memory Array. One structure is present for each contiguous address range described. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="faeeabb6e02011052afb97731c75b3bb"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE19::EndingAddress" ref="faeeabb6e02011052afb97731c75b3bb" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../df/d59/a01001.html#851ca56c93bc8149f9f17e9562f63e6a">TPM_PAYLOAD_TYPE</a> <a class="el" href="../../d0/d82/a00857.html#2841cfb7a7d145ac8880bd2b538e1a0f">tdTPM_BOUND_DATA::payload</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d0/d82/a00857.html#faeeabb6e02011052afb97731c75b3bb">SMBIOS_TABLE_TYPE19::EndingAddress</a>          </td>
         </tr>
       </table>
 </div>
@@ -48,12 +53,12 @@ Part 2, section 9.5: TPM_BOUND_DATA <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="c8b40fe62728e69772cbabbca0bec6ed"></a><!-- doxytag: member="tdTPM_BOUND_DATA::payloadData" ref="c8b40fe62728e69772cbabbca0bec6ed" args="[1]" -->
+<a class="anchor" name="381699fd655edd45593fbd7e78c85f1d"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE19::Hdr" ref="381699fd655edd45593fbd7e78c85f1d" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d0/d82/a00857.html#c8b40fe62728e69772cbabbca0bec6ed">tdTPM_BOUND_DATA::payloadData</a>[1]          </td>
+          <td class="memname"><a class="el" href="../../d5/dac/a00841.html">SMBIOS_STRUCTURE</a> <a class="el" href="../../d0/d82/a00857.html#381699fd655edd45593fbd7e78c85f1d">SMBIOS_TABLE_TYPE19::Hdr</a>          </td>
         </tr>
       </table>
 </div>
@@ -63,12 +68,42 @@ Part 2, section 9.5: TPM_BOUND_DATA <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="cd4cafceac79b3df8252a5d6422818f5"></a><!-- doxytag: member="tdTPM_BOUND_DATA::ver" ref="cd4cafceac79b3df8252a5d6422818f5" args="" -->
+<a class="anchor" name="c8a20b54c61b4cc25c9c23b4d5b08be9"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE19::MemoryArrayHandle" ref="c8a20b54c61b4cc25c9c23b4d5b08be9" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d8/d38/a00926.html">TPM_STRUCT_VER</a> <a class="el" href="../../d0/d82/a00857.html#cd4cafceac79b3df8252a5d6422818f5">tdTPM_BOUND_DATA::ver</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d0/d82/a00857.html#c8a20b54c61b4cc25c9c23b4d5b08be9">SMBIOS_TABLE_TYPE19::MemoryArrayHandle</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="200d27eb43fa49e21a17c3b549ec3927"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE19::PartitionWidth" ref="200d27eb43fa49e21a17c3b549ec3927" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d0/d82/a00857.html#200d27eb43fa49e21a17c3b549ec3927">SMBIOS_TABLE_TYPE19::PartitionWidth</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="9e1b4c17cdec41ff2b37479e63e7df3a"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE19::StartingAddress" ref="9e1b4c17cdec41ff2b37479e63e7df3a" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d0/d82/a00857.html#9e1b4c17cdec41ff2b37479e63e7df3a">SMBIOS_TABLE_TYPE19::StartingAddress</a>          </td>
         </tr>
       </table>
 </div>
@@ -79,7 +114,7 @@ Part 2, section 9.5: TPM_BOUND_DATA <hr><h2>Field Documentation</h2>
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:22 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:04 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_UDP4_TRANSMIT_DATA Struct Reference</title>
+<title>MdePkg[ALL]: EFI_SIMPLE_NETWORK_MODE Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,98 +21,336 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_UDP4_TRANSMIT_DATA Struct Reference</h1><!-- doxytag: class="EFI_UDP4_TRANSMIT_DATA" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_SIMPLE_NETWORK_MODE Struct Reference</h1><!-- doxytag: class="EFI_SIMPLE_NETWORK_MODE" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/dd6/a00624.html">EFI_UDP4_SESSION_DATA</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d34/a00625.html#1c45b54c727ddd653e44c02b14f6e9ab">UdpSessionData</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d34/a00625.html#82920f782cd8042d0e1241fc740b1705">State</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d30/a00508.html">EFI_IPv4_ADDRESS</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d34/a00625.html#99600a2e3f6636fb1fe0c246206af287">GatewayAddress</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d34/a00625.html#f82f55499938ab28d6c5b2f18edee8ed">HwAddressSize</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d34/a00625.html#00c814358424aa2e9e90b2149f2d65dc">DataLength</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d34/a00625.html#708cbcd085d1bbe9d5aa3fc86e8585d5">MediaHeaderSize</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d34/a00625.html#f01a7bc9085b659225e9fb4418588a7b">FragmentCount</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d34/a00625.html#b147104355b60f0ab2370e7b33b0f4a9">MaxPacketSize</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/db1/a00621.html">EFI_UDP4_FRAGMENT_DATA</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d34/a00625.html#8b4d4c7b91fdcbb918b7bde3c766334e">FragmentTable</a> [1]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d34/a00625.html#6e050551a8e2f0e3634f2e001b4341e4">NvRamSize</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d34/a00625.html#2c5caad9fbc0051f3f45f8d6c232f5be">NvRamAccessSize</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d34/a00625.html#49a3f28639cf1631cb98d2d352c8e3bf">ReceiveFilterMask</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d34/a00625.html#fbebd499594f614f8f95ad11896878d1">ReceiveFilterSetting</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d34/a00625.html#82a46c719cecef16eb45f61353071c05">MaxMCastFilterCount</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d34/a00625.html#a9d73b7487f795b74d4fcf30c4b50431">MCastFilterCount</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/de6/a00548.html">EFI_MAC_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d34/a00625.html#21b0dd7a45c40bb1333c9c83a99fc7d4">MCastFilter</a> [MAX_MCAST_FILTER_CNT]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/de6/a00548.html">EFI_MAC_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d34/a00625.html#205ffc1108121118131109e71e01b0d8">CurrentAddress</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/de6/a00548.html">EFI_MAC_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d34/a00625.html#b8d8fc23d24b9471292da8ae57f047aa">BroadcastAddress</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/de6/a00548.html">EFI_MAC_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d34/a00625.html#8bc8fae01106cd5b739e8b861090bc40">PermanentAddress</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d34/a00625.html#8073de31d627c12269a3eb5d01e8b2d5">IfType</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d34/a00625.html#005f6ef34ced17d32c767a6dd43b63fb">MacAddressChangeable</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d34/a00625.html#3aa2d0310b0ec0c7437d14a93e011927">MultipleTxSupported</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d34/a00625.html#89b3f35badbd9bc81651d9b9aa6fe0f9">MediaPresentSupported</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d34/a00625.html#71fa11da8ce31f5a2f688a0cab5b543d">MediaPresent</a></td></tr>
 
 </table>
 <hr><h2>Field Documentation</h2>
-<a class="anchor" name="00c814358424aa2e9e90b2149f2d65dc"></a><!-- doxytag: member="EFI_UDP4_TRANSMIT_DATA::DataLength" ref="00c814358424aa2e9e90b2149f2d65dc" args="" -->
+<a class="anchor" name="b8d8fc23d24b9471292da8ae57f047aa"></a><!-- doxytag: member="EFI_SIMPLE_NETWORK_MODE::BroadcastAddress" ref="b8d8fc23d24b9471292da8ae57f047aa" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d2/d34/a00625.html#00c814358424aa2e9e90b2149f2d65dc">EFI_UDP4_TRANSMIT_DATA::DataLength</a>          </td>
+          <td class="memname"><a class="el" href="../../dd/de6/a00548.html">EFI_MAC_ADDRESS</a> <a class="el" href="../../d2/d34/a00625.html#b8d8fc23d24b9471292da8ae57f047aa">EFI_SIMPLE_NETWORK_MODE::BroadcastAddress</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The current HW MAC address for broadcast packets. 
 </div>
 </div><p>
-<a class="anchor" name="f01a7bc9085b659225e9fb4418588a7b"></a><!-- doxytag: member="EFI_UDP4_TRANSMIT_DATA::FragmentCount" ref="f01a7bc9085b659225e9fb4418588a7b" args="" -->
+<a class="anchor" name="205ffc1108121118131109e71e01b0d8"></a><!-- doxytag: member="EFI_SIMPLE_NETWORK_MODE::CurrentAddress" ref="205ffc1108121118131109e71e01b0d8" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d2/d34/a00625.html#f01a7bc9085b659225e9fb4418588a7b">EFI_UDP4_TRANSMIT_DATA::FragmentCount</a>          </td>
+          <td class="memname"><a class="el" href="../../dd/de6/a00548.html">EFI_MAC_ADDRESS</a> <a class="el" href="../../d2/d34/a00625.html#205ffc1108121118131109e71e01b0d8">EFI_SIMPLE_NETWORK_MODE::CurrentAddress</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The current HW MAC address for the network interface. 
 </div>
 </div><p>
-<a class="anchor" name="8b4d4c7b91fdcbb918b7bde3c766334e"></a><!-- doxytag: member="EFI_UDP4_TRANSMIT_DATA::FragmentTable" ref="8b4d4c7b91fdcbb918b7bde3c766334e" args="[1]" -->
+<a class="anchor" name="f82f55499938ab28d6c5b2f18edee8ed"></a><!-- doxytag: member="EFI_SIMPLE_NETWORK_MODE::HwAddressSize" ref="f82f55499938ab28d6c5b2f18edee8ed" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/db1/a00621.html">EFI_UDP4_FRAGMENT_DATA</a> <a class="el" href="../../d2/d34/a00625.html#8b4d4c7b91fdcbb918b7bde3c766334e">EFI_UDP4_TRANSMIT_DATA::FragmentTable</a>[1]          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d2/d34/a00625.html#f82f55499938ab28d6c5b2f18edee8ed">EFI_SIMPLE_NETWORK_MODE::HwAddressSize</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The size, in bytes, of the network interface's HW address. 
 </div>
 </div><p>
-<a class="anchor" name="99600a2e3f6636fb1fe0c246206af287"></a><!-- doxytag: member="EFI_UDP4_TRANSMIT_DATA::GatewayAddress" ref="99600a2e3f6636fb1fe0c246206af287" args="" -->
+<a class="anchor" name="8073de31d627c12269a3eb5d01e8b2d5"></a><!-- doxytag: member="EFI_SIMPLE_NETWORK_MODE::IfType" ref="8073de31d627c12269a3eb5d01e8b2d5" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d30/a00508.html">EFI_IPv4_ADDRESS</a>* <a class="el" href="../../d2/d34/a00625.html#99600a2e3f6636fb1fe0c246206af287">EFI_UDP4_TRANSMIT_DATA::GatewayAddress</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d2/d34/a00625.html#8073de31d627c12269a3eb5d01e8b2d5">EFI_SIMPLE_NETWORK_MODE::IfType</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The interface type of the network interface. 
 </div>
 </div><p>
-<a class="anchor" name="1c45b54c727ddd653e44c02b14f6e9ab"></a><!-- doxytag: member="EFI_UDP4_TRANSMIT_DATA::UdpSessionData" ref="1c45b54c727ddd653e44c02b14f6e9ab" args="" -->
+<a class="anchor" name="005f6ef34ced17d32c767a6dd43b63fb"></a><!-- doxytag: member="EFI_SIMPLE_NETWORK_MODE::MacAddressChangeable" ref="005f6ef34ced17d32c767a6dd43b63fb" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d3/dd6/a00624.html">EFI_UDP4_SESSION_DATA</a>* <a class="el" href="../../d2/d34/a00625.html#1c45b54c727ddd653e44c02b14f6e9ab">EFI_UDP4_TRANSMIT_DATA::UdpSessionData</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d2/d34/a00625.html#005f6ef34ced17d32c767a6dd43b63fb">EFI_SIMPLE_NETWORK_MODE::MacAddressChangeable</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+TRUE if the HW MAC address can be changed. 
+</div>
+</div><p>
+<a class="anchor" name="82a46c719cecef16eb45f61353071c05"></a><!-- doxytag: member="EFI_SIMPLE_NETWORK_MODE::MaxMCastFilterCount" ref="82a46c719cecef16eb45f61353071c05" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d2/d34/a00625.html#82a46c719cecef16eb45f61353071c05">EFI_SIMPLE_NETWORK_MODE::MaxMCastFilterCount</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
 
+<p>
+The maximum number of multicast address receive filters supported by the driver. 
+</div>
+</div><p>
+<a class="anchor" name="b147104355b60f0ab2370e7b33b0f4a9"></a><!-- doxytag: member="EFI_SIMPLE_NETWORK_MODE::MaxPacketSize" ref="b147104355b60f0ab2370e7b33b0f4a9" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d2/d34/a00625.html#b147104355b60f0ab2370e7b33b0f4a9">EFI_SIMPLE_NETWORK_MODE::MaxPacketSize</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+The maximum size, in bytes, of the packets supported by the network interface. 
+</div>
+</div><p>
+<a class="anchor" name="21b0dd7a45c40bb1333c9c83a99fc7d4"></a><!-- doxytag: member="EFI_SIMPLE_NETWORK_MODE::MCastFilter" ref="21b0dd7a45c40bb1333c9c83a99fc7d4" args="[MAX_MCAST_FILTER_CNT]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dd/de6/a00548.html">EFI_MAC_ADDRESS</a> <a class="el" href="../../d2/d34/a00625.html#21b0dd7a45c40bb1333c9c83a99fc7d4">EFI_SIMPLE_NETWORK_MODE::MCastFilter</a>[MAX_MCAST_FILTER_CNT]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Array containing the addresses of the current multicast address receive filters. 
+</div>
+</div><p>
+<a class="anchor" name="a9d73b7487f795b74d4fcf30c4b50431"></a><!-- doxytag: member="EFI_SIMPLE_NETWORK_MODE::MCastFilterCount" ref="a9d73b7487f795b74d4fcf30c4b50431" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d2/d34/a00625.html#a9d73b7487f795b74d4fcf30c4b50431">EFI_SIMPLE_NETWORK_MODE::MCastFilterCount</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+The current number of multicast address receive filters. 
+</div>
+</div><p>
+<a class="anchor" name="708cbcd085d1bbe9d5aa3fc86e8585d5"></a><!-- doxytag: member="EFI_SIMPLE_NETWORK_MODE::MediaHeaderSize" ref="708cbcd085d1bbe9d5aa3fc86e8585d5" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d2/d34/a00625.html#708cbcd085d1bbe9d5aa3fc86e8585d5">EFI_SIMPLE_NETWORK_MODE::MediaHeaderSize</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+The size, in bytes, of the network interface's media header. 
+</div>
+</div><p>
+<a class="anchor" name="71fa11da8ce31f5a2f688a0cab5b543d"></a><!-- doxytag: member="EFI_SIMPLE_NETWORK_MODE::MediaPresent" ref="71fa11da8ce31f5a2f688a0cab5b543d" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d2/d34/a00625.html#71fa11da8ce31f5a2f688a0cab5b543d">EFI_SIMPLE_NETWORK_MODE::MediaPresent</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+TRUE if media are connected to the network interface; otherwise FALSE. 
+</div>
+</div><p>
+<a class="anchor" name="89b3f35badbd9bc81651d9b9aa6fe0f9"></a><!-- doxytag: member="EFI_SIMPLE_NETWORK_MODE::MediaPresentSupported" ref="89b3f35badbd9bc81651d9b9aa6fe0f9" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d2/d34/a00625.html#89b3f35badbd9bc81651d9b9aa6fe0f9">EFI_SIMPLE_NETWORK_MODE::MediaPresentSupported</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+TRUE if the presence of media can be determined; otherwise FALSE. 
+</div>
+</div><p>
+<a class="anchor" name="3aa2d0310b0ec0c7437d14a93e011927"></a><!-- doxytag: member="EFI_SIMPLE_NETWORK_MODE::MultipleTxSupported" ref="3aa2d0310b0ec0c7437d14a93e011927" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d2/d34/a00625.html#3aa2d0310b0ec0c7437d14a93e011927">EFI_SIMPLE_NETWORK_MODE::MultipleTxSupported</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+TRUE if the network interface can transmit more than one packet at a time. 
+</div>
+</div><p>
+<a class="anchor" name="2c5caad9fbc0051f3f45f8d6c232f5be"></a><!-- doxytag: member="EFI_SIMPLE_NETWORK_MODE::NvRamAccessSize" ref="2c5caad9fbc0051f3f45f8d6c232f5be" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d2/d34/a00625.html#2c5caad9fbc0051f3f45f8d6c232f5be">EFI_SIMPLE_NETWORK_MODE::NvRamAccessSize</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+The size that must be used for all NVRAM reads and writes. The start address for NVRAM read and write operations and the total length of those operations, must be a multiple of this value. The legal values for this field are 0, 1, 2, 4, and 8. 
+</div>
+</div><p>
+<a class="anchor" name="6e050551a8e2f0e3634f2e001b4341e4"></a><!-- doxytag: member="EFI_SIMPLE_NETWORK_MODE::NvRamSize" ref="6e050551a8e2f0e3634f2e001b4341e4" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d2/d34/a00625.html#6e050551a8e2f0e3634f2e001b4341e4">EFI_SIMPLE_NETWORK_MODE::NvRamSize</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+The size, in bytes, of the NVRAM device attached to the network interface. 
+</div>
+</div><p>
+<a class="anchor" name="8bc8fae01106cd5b739e8b861090bc40"></a><!-- doxytag: member="EFI_SIMPLE_NETWORK_MODE::PermanentAddress" ref="8bc8fae01106cd5b739e8b861090bc40" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dd/de6/a00548.html">EFI_MAC_ADDRESS</a> <a class="el" href="../../d2/d34/a00625.html#8bc8fae01106cd5b739e8b861090bc40">EFI_SIMPLE_NETWORK_MODE::PermanentAddress</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+The permanent HW MAC address for the network interface. 
+</div>
+</div><p>
+<a class="anchor" name="49a3f28639cf1631cb98d2d352c8e3bf"></a><!-- doxytag: member="EFI_SIMPLE_NETWORK_MODE::ReceiveFilterMask" ref="49a3f28639cf1631cb98d2d352c8e3bf" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d2/d34/a00625.html#49a3f28639cf1631cb98d2d352c8e3bf">EFI_SIMPLE_NETWORK_MODE::ReceiveFilterMask</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+The multicast receive filter settings supported by the network interface. 
+</div>
+</div><p>
+<a class="anchor" name="fbebd499594f614f8f95ad11896878d1"></a><!-- doxytag: member="EFI_SIMPLE_NETWORK_MODE::ReceiveFilterSetting" ref="fbebd499594f614f8f95ad11896878d1" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d2/d34/a00625.html#fbebd499594f614f8f95ad11896878d1">EFI_SIMPLE_NETWORK_MODE::ReceiveFilterSetting</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+The current multicast receive filter settings. 
+</div>
+</div><p>
+<a class="anchor" name="82920f782cd8042d0e1241fc740b1705"></a><!-- doxytag: member="EFI_SIMPLE_NETWORK_MODE::State" ref="82920f782cd8042d0e1241fc740b1705" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d2/d34/a00625.html#82920f782cd8042d0e1241fc740b1705">EFI_SIMPLE_NETWORK_MODE::State</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Reports the current state of the network interface. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:19 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:44 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

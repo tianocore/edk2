@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Ppi/Reset.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Library/PerformanceLib.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,61 +21,405 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Ppi/Reset.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Library/PerformanceLib.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
-<tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d50/a00561.html">EFI_PEI_RESET_PPI</a></td></tr>
-
 <tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/df5/a01086.html#182806973b96300aefbadc0ccdc16310">EFI_PEI_RESET_PPI_GUID</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/df5/a01086.html#8e97fa56b586a41d07ec5653cd152078">PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED</a>&nbsp;&nbsp;&nbsp;0x00000001</td></tr>
 
-<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/df5/a01086.html#595620542975484113b9ff6dc08dcf48">gEfiPeiResetPpiGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/df5/a01086.html#4738981d5ffe54cb0c35593b74b4bddf">PERF_END</a>(Handle, Token, Module, TimeStamp)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/df5/a01086.html#ab3c3218a440a189e76e3c379fb53f50">PERF_START</a>(Handle, Token, Module, TimeStamp)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/df5/a01086.html#743962f672e627da3bfdb04705f6f2a7">PERF_CODE_BEGIN</a>()&nbsp;&nbsp;&nbsp;do { if (PerformanceMeasurementEnabled ()) { <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>  __PerformanceCodeLocal</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/df5/a01086.html#3c69cfd0c183445073847447ce3bec1f">PERF_CODE_END</a>()&nbsp;&nbsp;&nbsp;__PerformanceCodeLocal = 0; __PerformanceCodeLocal++; } } while (FALSE)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/df5/a01086.html#a7dc530eefab087c49efc3dd77f4f100">PERF_CODE</a>(Expression)</td></tr>
+
+<tr><td colspan="2"><br><h2>Functions</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d2/dd5/a01002.html#f3519a25bfa97c295fb23ffec95b1cb1">RETURN_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/df5/a01086.html#e3f7d58ae0dc99d9b31debc5d100ac64">StartPerformanceMeasurement</a> (IN CONST VOID *Handle, IN CONST <a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Token, IN CONST <a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Module, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> TimeStamp)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d2/dd5/a01002.html#f3519a25bfa97c295fb23ffec95b1cb1">RETURN_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/df5/a01086.html#29b8ec825efb588b19906b62b8023fee">EndPerformanceMeasurement</a> (IN CONST VOID *Handle, IN CONST <a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Token, IN CONST <a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Module, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> TimeStamp)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/df5/a01086.html#5f50cffacafeea3caf0e0a1eaa010b7a">GetPerformanceMeasurement</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> LogEntryKey, OUT CONST VOID **Handle, OUT CONST <a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> **Token, OUT CONST <a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> **Module, OUT <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> *StartTimeStamp, OUT <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> *EndTimeStamp)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/df5/a01086.html#cb74c0e16276fe4f9485d26fdec75de9">PerformanceMeasurementEnabled</a> (VOID)</td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-This file declares Reset PPI used to reset the platform.<p>
-This PPI is installed by some platform- or chipset-specific PEIM that abstracts the Reset Service to other agents.<p>
-Copyright (c) 2006 - 2009, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
-<dl class="user" compact><dt><b>Revision Reference:</b></dt><dd>This PPI is introduced in PI Version 1.0. </dd></dl>
-<hr><h2>Define Documentation</h2>
-<a class="anchor" name="182806973b96300aefbadc0ccdc16310"></a><!-- doxytag: member="Reset.h::EFI_PEI_RESET_PPI_GUID" ref="182806973b96300aefbadc0ccdc16310" args="" -->
+Provides services to log the execution times and retrieve them later.<p>
+Copyright (c) 2006 - 2008 Intel Corporation. All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
+<a class="anchor" name="a7dc530eefab087c49efc3dd77f4f100"></a><!-- doxytag: member="PerformanceLib.h::PERF_CODE" ref="a7dc530eefab087c49efc3dd77f4f100" args="(Expression)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_PEI_RESET_PPI_GUID          </td>
+          <td class="memname">#define PERF_CODE          </td>
+          <td>(</td>
+          <td class="paramtype">Expression&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-<b>Value:</b><div class="fragment"><pre class="fragment">{ \
-    0xef398d58, 0x9dfd, 0x4103, {0xbf, 0x94, 0x78, 0xc6, 0xf4, 0xfe, 0x71, 0x2f } \
-  }
-</pre></div>
+<b>Value:</b><div class="fragment"><pre class="fragment"><a class="code" href="../../d9/df5/a01086.html#743962f672e627da3bfdb04705f6f2a7">PERF_CODE_BEGIN</a> ();          \
+  Expression                   \
+  <a class="code" href="../../d9/df5/a01086.html#3c69cfd0c183445073847447ce3bec1f">PERF_CODE_END</a> ()
+</pre></div>Macro that declares a section of performance measurement source code.<p>
+If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set, then the source code specified by Expression is included in a module. Otherwise, the source specified by Expression is not included in a module.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Expression</em>&nbsp;</td><td>Performance measurement source code to include in a module. </td></tr>
+  </table>
+</dl>
+
 </div>
 </div><p>
-<hr><h2>Variable Documentation</h2>
-<a class="anchor" name="595620542975484113b9ff6dc08dcf48"></a><!-- doxytag: member="Reset.h::gEfiPeiResetPpiGuid" ref="595620542975484113b9ff6dc08dcf48" args="" -->
+<a class="anchor" name="743962f672e627da3bfdb04705f6f2a7"></a><!-- doxytag: member="PerformanceLib.h::PERF_CODE_BEGIN" ref="743962f672e627da3bfdb04705f6f2a7" args="()" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../d9/df5/a01086.html#595620542975484113b9ff6dc08dcf48">gEfiPeiResetPpiGuid</a>          </td>
+          <td class="memname">#define PERF_CODE_BEGIN          </td>
+          <td>(</td>
+&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;do { if (PerformanceMeasurementEnabled ()) { <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>  __PerformanceCodeLocal</td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+Macro that marks the beginning of performance measurement source code.<p>
+If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set, then this macro marks the beginning of source code that is included in a module. Otherwise, the source lines between <a class="el" href="../../d9/df5/a01086.html#743962f672e627da3bfdb04705f6f2a7">PERF_CODE_BEGIN()</a> and <a class="el" href="../../d9/df5/a01086.html#3c69cfd0c183445073847447ce3bec1f">PERF_CODE_END()</a> are not included in a module. 
+</div>
+</div><p>
+<a class="anchor" name="3c69cfd0c183445073847447ce3bec1f"></a><!-- doxytag: member="PerformanceLib.h::PERF_CODE_END" ref="3c69cfd0c183445073847447ce3bec1f" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PERF_CODE_END          </td>
+          <td>(</td>
+&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;__PerformanceCodeLocal = 0; __PerformanceCodeLocal++; } } while (FALSE)</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Macro that marks the end of performance measurement source code.<p>
+If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set, then this macro marks the end of source code that is included in a module. Otherwise, the source lines between <a class="el" href="../../d9/df5/a01086.html#743962f672e627da3bfdb04705f6f2a7">PERF_CODE_BEGIN()</a> and <a class="el" href="../../d9/df5/a01086.html#3c69cfd0c183445073847447ce3bec1f">PERF_CODE_END()</a> are not included in a module. 
+</div>
+</div><p>
+<a class="anchor" name="4738981d5ffe54cb0c35593b74b4bddf"></a><!-- doxytag: member="PerformanceLib.h::PERF_END" ref="4738981d5ffe54cb0c35593b74b4bddf" args="(Handle, Token, Module, TimeStamp)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PERF_END          </td>
+          <td>(</td>
+          <td class="paramtype">Handle,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Token,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Module,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TimeStamp&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+<b>Value:</b><div class="fragment"><pre class="fragment"><span class="keywordflow">do</span> {                                                                \
+    <span class="keywordflow">if</span> (<a class="code" href="../../d9/df5/a01086.html#cb74c0e16276fe4f9485d26fdec75de9">PerformanceMeasurementEnabled</a> ()) {                           \
+      <a class="code" href="../../d9/df5/a01086.html#29b8ec825efb588b19906b62b8023fee">EndPerformanceMeasurement</a> (Handle, Token, Module, TimeStamp);   \
+    }                                                                 \
+  } <span class="keywordflow">while</span> (<a class="code" href="../../d2/dd5/a01002.html#a93f0eb578d23995850d61f7d61c55c1">FALSE</a>)
+</pre></div>Macro that calls <a class="el" href="../../d9/df5/a01086.html#29b8ec825efb588b19906b62b8023fee">EndPerformanceMeasurement()</a>.<p>
+If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set, then <a class="el" href="../../d9/df5/a01086.html#29b8ec825efb588b19906b62b8023fee">EndPerformanceMeasurement()</a> is called. 
+</div>
+</div><p>
+<a class="anchor" name="ab3c3218a440a189e76e3c379fb53f50"></a><!-- doxytag: member="PerformanceLib.h::PERF_START" ref="ab3c3218a440a189e76e3c379fb53f50" args="(Handle, Token, Module, TimeStamp)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PERF_START          </td>
+          <td>(</td>
+          <td class="paramtype">Handle,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Token,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Module,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TimeStamp&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+<b>Value:</b><div class="fragment"><pre class="fragment"><span class="keywordflow">do</span> {                                                                \
+    <span class="keywordflow">if</span> (<a class="code" href="../../d9/df5/a01086.html#cb74c0e16276fe4f9485d26fdec75de9">PerformanceMeasurementEnabled</a> ()) {                           \
+      <a class="code" href="../../d9/df5/a01086.html#e3f7d58ae0dc99d9b31debc5d100ac64">StartPerformanceMeasurement</a> (Handle, Token, Module, TimeStamp); \
+    }                                                                 \
+  } <span class="keywordflow">while</span> (<a class="code" href="../../d2/dd5/a01002.html#a93f0eb578d23995850d61f7d61c55c1">FALSE</a>)
+</pre></div>Macro that calls <a class="el" href="../../d9/df5/a01086.html#e3f7d58ae0dc99d9b31debc5d100ac64">StartPerformanceMeasurement()</a>.<p>
+If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set, then <a class="el" href="../../d9/df5/a01086.html#e3f7d58ae0dc99d9b31debc5d100ac64">StartPerformanceMeasurement()</a> is called. 
+</div>
+</div><p>
+<a class="anchor" name="8e97fa56b586a41d07ec5653cd152078"></a><!-- doxytag: member="PerformanceLib.h::PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED" ref="8e97fa56b586a41d07ec5653cd152078" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED&nbsp;&nbsp;&nbsp;0x00000001          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Performance library propery mask bits 
+</div>
+</div><p>
+<hr><h2>Function Documentation</h2>
+<a class="anchor" name="29b8ec825efb588b19906b62b8023fee"></a><!-- doxytag: member="PerformanceLib.h::EndPerformanceMeasurement" ref="29b8ec825efb588b19906b62b8023fee" args="(IN CONST VOID *Handle, IN CONST CHAR8 *Token, IN CONST CHAR8 *Module, IN UINT64 TimeStamp)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d2/dd5/a01002.html#f3519a25bfa97c295fb23ffec95b1cb1">RETURN_STATUS</a> EFIAPI EndPerformanceMeasurement           </td>
+          <td>(</td>
+          <td class="paramtype">IN CONST VOID *&nbsp;</td>
+          <td class="paramname"> <em>Handle</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN CONST <a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *&nbsp;</td>
+          <td class="paramname"> <em>Token</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN CONST <a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *&nbsp;</td>
+          <td class="paramname"> <em>Module</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
+          <td class="paramname"> <em>TimeStamp</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Fills in the end time of a performance measurement.<p>
+Looks up the record that matches Handle, Token, and Module. If the record can not be found then return RETURN_NOT_FOUND. If the record is found and TimeStamp is not zero, then TimeStamp is added to the record as the end time. If the record is found and TimeStamp is zero, then this function reads the current time stamp and adds that time stamp value to the record as the end time. If this function is called multiple times for the same record, then the end time is overwritten.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Handle</em>&nbsp;</td><td>Pointer to environment specific context used to identify the component being measured. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Token</em>&nbsp;</td><td>Pointer to a Null-terminated ASCII string that identifies the component being measured. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Module</em>&nbsp;</td><td>Pointer to a Null-terminated ASCII string that identifies the module being measured. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>TimeStamp</em>&nbsp;</td><td>64-bit time stamp.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>RETURN_SUCCESS</em>&nbsp;</td><td>The end of the measurement was recorded. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>RETURN_NOT_FOUND</em>&nbsp;</td><td>The specified measurement record could not be found. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>RETURN_DEVICE_ERROR</em>&nbsp;</td><td>A device error reading the time stamp. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="5f50cffacafeea3caf0e0a1eaa010b7a"></a><!-- doxytag: member="PerformanceLib.h::GetPerformanceMeasurement" ref="5f50cffacafeea3caf0e0a1eaa010b7a" args="(IN UINTN LogEntryKey, OUT CONST VOID **Handle, OUT CONST CHAR8 **Token, OUT CONST CHAR8 **Module, OUT UINT64 *StartTimeStamp, OUT UINT64 *EndTimeStamp)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI GetPerformanceMeasurement           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>LogEntryKey</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">OUT CONST VOID **&nbsp;</td>
+          <td class="paramname"> <em>Handle</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">OUT CONST <a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> **&nbsp;</td>
+          <td class="paramname"> <em>Token</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">OUT CONST <a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> **&nbsp;</td>
+          <td class="paramname"> <em>Module</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">OUT <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> *&nbsp;</td>
+          <td class="paramname"> <em>StartTimeStamp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">OUT <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> *&nbsp;</td>
+          <td class="paramname"> <em>EndTimeStamp</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Attempts to retrieve a performance measurement log entry from the performance measurement log.<p>
+Attempts to retrieve the performance log entry specified by LogEntryKey. If LogEntryKey is zero on entry, then an attempt is made to retrieve the first entry from the performance log, and the key for the second entry in the log is returned. If the performance log is empty, then no entry is retrieved and zero is returned. If LogEntryKey is not zero, then the performance log entry associated with LogEntryKey is retrieved, and the key for the next entry in the log is returned. If LogEntryKey is the key for the last entry in the log, then the last log entry is retrieved and an implementation specific non-zero key value that specifies the end of the performance log is returned. If LogEntryKey is equal this implementation specific non-zero key value, then no entry is retrieved and zero is returned. In the cases where a performance log entry can be returned, the log entry is returned in Handle, Token, Module, StartTimeStamp, and EndTimeStamp. If LogEntryKey is not a valid log entry key for the performance measurement log, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Handle is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Token is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Module is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If StartTimeStamp is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndTimeStamp is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>LogEntryKey</em>&nbsp;</td><td>On entry, the key of the performance measurement log entry to retrieve. 0, then the first performance measurement log entry is retrieved. On exit, the key of the next performance lof entry entry. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Handle</em>&nbsp;</td><td>Pointer to environment specific context used to identify the component being measured. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Token</em>&nbsp;</td><td>Pointer to a Null-terminated ASCII string that identifies the component being measured. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Module</em>&nbsp;</td><td>Pointer to a Null-terminated ASCII string that identifies the module being measured. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>StartTimeStamp</em>&nbsp;</td><td>Pointer to the 64-bit time stamp that was recorded when the measurement was started. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EndTimeStamp</em>&nbsp;</td><td>Pointer to the 64-bit time stamp that was recorded when the measurement was ended.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The key for the next performance log entry (in general case). </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="cb74c0e16276fe4f9485d26fdec75de9"></a><!-- doxytag: member="PerformanceLib.h::PerformanceMeasurementEnabled" ref="cb74c0e16276fe4f9485d26fdec75de9" args="(VOID)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> EFIAPI PerformanceMeasurementEnabled           </td>
+          <td>(</td>
+          <td class="paramtype">VOID&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Returns TRUE if the performance measurement macros are enabled.<p>
+This function returns TRUE if the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set. Otherwise FALSE is returned.<p>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>TRUE</em>&nbsp;</td><td>The PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>FALSE</em>&nbsp;</td><td>The PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is clear. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="e3f7d58ae0dc99d9b31debc5d100ac64"></a><!-- doxytag: member="PerformanceLib.h::StartPerformanceMeasurement" ref="e3f7d58ae0dc99d9b31debc5d100ac64" args="(IN CONST VOID *Handle, IN CONST CHAR8 *Token, IN CONST CHAR8 *Module, IN UINT64 TimeStamp)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d2/dd5/a01002.html#f3519a25bfa97c295fb23ffec95b1cb1">RETURN_STATUS</a> EFIAPI StartPerformanceMeasurement           </td>
+          <td>(</td>
+          <td class="paramtype">IN CONST VOID *&nbsp;</td>
+          <td class="paramname"> <em>Handle</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN CONST <a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *&nbsp;</td>
+          <td class="paramname"> <em>Token</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN CONST <a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *&nbsp;</td>
+          <td class="paramname"> <em>Module</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
+          <td class="paramname"> <em>TimeStamp</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Creates a record for the beginning of a performance measurement.<p>
+Creates a record that contains the Handle, Token, and Module. If TimeStamp is not zero, then TimeStamp is added to the record as the start time. If TimeStamp is zero, then this function reads the current time stamp and adds that time stamp value to the record as the start time.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Handle</em>&nbsp;</td><td>Pointer to environment specific context used to identify the component being measured. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Token</em>&nbsp;</td><td>Pointer to a Null-terminated ASCII string that identifies the component being measured. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Module</em>&nbsp;</td><td>Pointer to a Null-terminated ASCII string that identifies the module being measured. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>TimeStamp</em>&nbsp;</td><td>64-bit time stamp.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>RETURN_SUCCESS</em>&nbsp;</td><td>The start of the measurement was recorded. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>RETURN_OUT_OF_RESOURCES</em>&nbsp;</td><td>There are not enough resources to record the measurement. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>RETURN_DEVICE_ERROR</em>&nbsp;</td><td>A device error reading the time stamp. </td></tr>
+  </table>
+</dl>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:09 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:23 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

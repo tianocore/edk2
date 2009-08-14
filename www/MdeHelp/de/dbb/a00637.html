@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: ELTORITO_CATALOG Union Reference</title>
+<title>MdePkg[ALL]: EFI_STATUS_CODE_STRING Union Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,383 +21,64 @@
   </div>
 </div>
 <div class="contents">
-<h1>ELTORITO_CATALOG Union Reference</h1><!-- doxytag: class="ELTORITO_CATALOG" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_STATUS_CODE_STRING Union Reference</h1><!-- doxytag: class="EFI_STATUS_CODE_STRING" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap>struct {</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dbb/a00637.html#2731fa98e25695919d36b9a666071dbb">Ascii</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../de/dbb/a00637.html#1c86c427499a71e95bcecae3120f1dd6">Reserved</a> [0x20]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dbb/a00637.html#37e635425d407160bfedcffffabca969">Unicode</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap valign="top">}&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dbb/a00637.html#289980b5f7b3d569a76d2f1464c5c051">Unknown</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap>struct {</td></tr>
-
-<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../de/dbb/a00637.html#da753e44605784e380043da935a4ead7">Indicator</a></td></tr>
-
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Must be 01.  <a href="#64163441636986f7b9f26753dda0ad67"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../de/dbb/a00637.html#877cffe97cae095af58c3abb8ef7c894">PlatformId</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../de/dbb/a00637.html#3970e70929fdc4255ca2e7713feb8f7e">Reserved</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../de/dbb/a00637.html#58fe917da08c0ae5dab6ef7d5685df3d">ManufacId</a> [24]</td></tr>
-
-<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../de/dbb/a00637.html#f0452e987182b3607ea0fd80e308ab71">Checksum</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../de/dbb/a00637.html#0dbd5faf592c618bac4d6b84decc9e18">Id55AA</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap valign="top">}&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dbb/a00637.html#e92f54088428611c9662670c4c5479df">Catalog</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap>struct {</td></tr>
-
-<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../de/dbb/a00637.html#da753e44605784e380043da935a4ead7">Indicator</a></td></tr>
-
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">88 = Bootable, 00 = Not Bootable  <a href="#556d78067b066f8bb6ebc05de96b91e5"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../de/dbb/a00637.html#436d01a9ebfae5d49328dd32292def56">MediaType</a>: 4</td></tr>
-
-<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../de/dbb/a00637.html#b8f8c24023234631f44f7c914b149632">Reserved1</a>: 4</td></tr>
-
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Must be 0.  <a href="#6875ebdea8c3a220931f6bc7cad89728"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../de/dbb/a00637.html#19e254000a7e3279f2d7a3d946aa075b">LoadSegment</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../de/dbb/a00637.html#a1c00a874e3c087bbd823bd7e7d81995">SystemType</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../de/dbb/a00637.html#5e964137cef738288f2cb6dfb061bb73">Reserved2</a></td></tr>
-
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Must be 0.  <a href="#465f17517f04b9097da1c5832f31b247"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../de/dbb/a00637.html#8167bb2376d9e59b8d5ace954d6b7fa6">SectorCount</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../de/dbb/a00637.html#d4d1345656a89ed9e0a3d1c68e8648c4">Lba</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap valign="top">}&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dbb/a00637.html#4f45e14e257e4e3f2b5a6959920df59f">Boot</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap>struct {</td></tr>
-
-<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../de/dbb/a00637.html#da753e44605784e380043da935a4ead7">Indicator</a></td></tr>
-
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">90 - Header, more header follw, 91 - Final Header  <a href="#9b6801858ed308c5f4d99a56af4dfd31"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../de/dbb/a00637.html#877cffe97cae095af58c3abb8ef7c894">PlatformId</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../de/dbb/a00637.html#a988e85df3cb17f8139a3e263fc3738f">SectionEntries</a></td></tr>
-
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Number of section entries following this header.  <a href="#5b93f35adf7b4b716654d553edb26eb6"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../de/dbb/a00637.html#0d57445216fea84cc82655e9f3a3a0c2">Id</a> [28]</td></tr>
-
-<tr><td class="memItemLeft" nowrap valign="top">}&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dbb/a00637.html#d7382a021ab7e7d0d882d5e22fb1348c">Section</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/db6/a00639.html">EFI_STATUS_CODE_STRING_TOKEN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dbb/a00637.html#7efc1b96779d465bad882b4ab6333f81">Hii</a></td></tr>
 
 </table>
-<hr><a name="_details"></a><h2>Detailed Description</h2>
-Catalog Entry <hr><h2>Field Documentation</h2>
-<a class="anchor" name="4f45e14e257e4e3f2b5a6959920df59f"></a><!-- doxytag: member="ELTORITO_CATALOG::Boot" ref="4f45e14e257e4e3f2b5a6959920df59f" args="" -->
+<hr><h2>Field Documentation</h2>
+<a class="anchor" name="2731fa98e25695919d36b9a666071dbb"></a><!-- doxytag: member="EFI_STATUS_CODE_STRING::Ascii" ref="2731fa98e25695919d36b9a666071dbb" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">struct { ... }   <a class="el" href="../../de/dbb/a00637.html#4f45e14e257e4e3f2b5a6959920df59f">ELTORITO_CATALOG::Boot</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a>* <a class="el" href="../../de/dbb/a00637.html#2731fa98e25695919d36b9a666071dbb">EFI_STATUS_CODE_STRING::Ascii</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Initial/Default Entry or Section Entry 
+ASCII formatted string. 
 </div>
 </div><p>
-<a class="anchor" name="e92f54088428611c9662670c4c5479df"></a><!-- doxytag: member="ELTORITO_CATALOG::Catalog" ref="e92f54088428611c9662670c4c5479df" args="" -->
+<a class="anchor" name="7efc1b96779d465bad882b4ab6333f81"></a><!-- doxytag: member="EFI_STATUS_CODE_STRING::Hii" ref="7efc1b96779d465bad882b4ab6333f81" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">struct { ... }   <a class="el" href="../../de/dbb/a00637.html#e92f54088428611c9662670c4c5479df">ELTORITO_CATALOG::Catalog</a>          </td>
+          <td class="memname"><a class="el" href="../../dd/db6/a00639.html">EFI_STATUS_CODE_STRING_TOKEN</a> <a class="el" href="../../de/dbb/a00637.html#7efc1b96779d465bad882b4ab6333f81">EFI_STATUS_CODE_STRING::Hii</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Catalog validation entry (Catalog header) 
+HII handle/token pair. 
 </div>
 </div><p>
-<a class="anchor" name="f0452e987182b3607ea0fd80e308ab71"></a><!-- doxytag: member="ELTORITO_CATALOG::Checksum" ref="f0452e987182b3607ea0fd80e308ab71" args="" -->
+<a class="anchor" name="37e635425d407160bfedcffffabca969"></a><!-- doxytag: member="EFI_STATUS_CODE_STRING::Unicode" ref="37e635425d407160bfedcffffabca969" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../de/dbb/a00637.html#f0452e987182b3607ea0fd80e308ab71">ELTORITO_CATALOG::Checksum</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a>* <a class="el" href="../../de/dbb/a00637.html#37e635425d407160bfedcffffabca969">EFI_STATUS_CODE_STRING::Unicode</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<a class="anchor" name="0d57445216fea84cc82655e9f3a3a0c2"></a><!-- doxytag: member="ELTORITO_CATALOG::Id" ref="0d57445216fea84cc82655e9f3a3a0c2" args="[28]" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> <a class="el" href="../../de/dbb/a00637.html#0d57445216fea84cc82655e9f3a3a0c2">ELTORITO_CATALOG::Id</a>[28]          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="0dbd5faf592c618bac4d6b84decc9e18"></a><!-- doxytag: member="ELTORITO_CATALOG::Id55AA" ref="0dbd5faf592c618bac4d6b84decc9e18" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../de/dbb/a00637.html#0dbd5faf592c618bac4d6b84decc9e18">ELTORITO_CATALOG::Id55AA</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="da753e44605784e380043da935a4ead7"></a><!-- doxytag: member="ELTORITO_CATALOG::Indicator" ref="da753e44605784e380043da935a4ead7" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/dbb/a00637.html#da753e44605784e380043da935a4ead7">ELTORITO_CATALOG::Indicator</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Must be 01. 
-<p>
-90 - Header, more header follw, 91 - Final Header<p>
-88 = Bootable, 00 = Not Bootable 
-</div>
-</div><p>
-<a class="anchor" name="d4d1345656a89ed9e0a3d1c68e8648c4"></a><!-- doxytag: member="ELTORITO_CATALOG::Lba" ref="d4d1345656a89ed9e0a3d1c68e8648c4" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../de/dbb/a00637.html#d4d1345656a89ed9e0a3d1c68e8648c4">ELTORITO_CATALOG::Lba</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="19e254000a7e3279f2d7a3d946aa075b"></a><!-- doxytag: member="ELTORITO_CATALOG::LoadSegment" ref="19e254000a7e3279f2d7a3d946aa075b" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../de/dbb/a00637.html#19e254000a7e3279f2d7a3d946aa075b">ELTORITO_CATALOG::LoadSegment</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="58fe917da08c0ae5dab6ef7d5685df3d"></a><!-- doxytag: member="ELTORITO_CATALOG::ManufacId" ref="58fe917da08c0ae5dab6ef7d5685df3d" args="[24]" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> <a class="el" href="../../de/dbb/a00637.html#58fe917da08c0ae5dab6ef7d5685df3d">ELTORITO_CATALOG::ManufacId</a>[24]          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="436d01a9ebfae5d49328dd32292def56"></a><!-- doxytag: member="ELTORITO_CATALOG::MediaType" ref="436d01a9ebfae5d49328dd32292def56" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/dbb/a00637.html#436d01a9ebfae5d49328dd32292def56">ELTORITO_CATALOG::MediaType</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="877cffe97cae095af58c3abb8ef7c894"></a><!-- doxytag: member="ELTORITO_CATALOG::PlatformId" ref="877cffe97cae095af58c3abb8ef7c894" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/dbb/a00637.html#877cffe97cae095af58c3abb8ef7c894">ELTORITO_CATALOG::PlatformId</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="3970e70929fdc4255ca2e7713feb8f7e"></a><!-- doxytag: member="ELTORITO_CATALOG::Reserved" ref="3970e70929fdc4255ca2e7713feb8f7e" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../de/dbb/a00637.html#1c86c427499a71e95bcecae3120f1dd6">ELTORITO_CATALOG::Reserved</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="1c86c427499a71e95bcecae3120f1dd6"></a><!-- doxytag: member="ELTORITO_CATALOG::Reserved" ref="1c86c427499a71e95bcecae3120f1dd6" args="[0x20]" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> <a class="el" href="../../de/dbb/a00637.html#1c86c427499a71e95bcecae3120f1dd6">ELTORITO_CATALOG::Reserved</a>[0x20]          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="b8f8c24023234631f44f7c914b149632"></a><!-- doxytag: member="ELTORITO_CATALOG::Reserved1" ref="b8f8c24023234631f44f7c914b149632" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/dbb/a00637.html#b8f8c24023234631f44f7c914b149632">ELTORITO_CATALOG::Reserved1</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Must be 0. 
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="5e964137cef738288f2cb6dfb061bb73"></a><!-- doxytag: member="ELTORITO_CATALOG::Reserved2" ref="5e964137cef738288f2cb6dfb061bb73" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/dbb/a00637.html#5e964137cef738288f2cb6dfb061bb73">ELTORITO_CATALOG::Reserved2</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Must be 0. 
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="d7382a021ab7e7d0d882d5e22fb1348c"></a><!-- doxytag: member="ELTORITO_CATALOG::Section" ref="d7382a021ab7e7d0d882d5e22fb1348c" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">struct { ... }   <a class="el" href="../../de/dbb/a00637.html#d7382a021ab7e7d0d882d5e22fb1348c">ELTORITO_CATALOG::Section</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Section Header Entry 
-</div>
-</div><p>
-<a class="anchor" name="a988e85df3cb17f8139a3e263fc3738f"></a><!-- doxytag: member="ELTORITO_CATALOG::SectionEntries" ref="a988e85df3cb17f8139a3e263fc3738f" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../de/dbb/a00637.html#a988e85df3cb17f8139a3e263fc3738f">ELTORITO_CATALOG::SectionEntries</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Number of section entries following this header. 
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="8167bb2376d9e59b8d5ace954d6b7fa6"></a><!-- doxytag: member="ELTORITO_CATALOG::SectorCount" ref="8167bb2376d9e59b8d5ace954d6b7fa6" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../de/dbb/a00637.html#8167bb2376d9e59b8d5ace954d6b7fa6">ELTORITO_CATALOG::SectorCount</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="a1c00a874e3c087bbd823bd7e7d81995"></a><!-- doxytag: member="ELTORITO_CATALOG::SystemType" ref="a1c00a874e3c087bbd823bd7e7d81995" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/dbb/a00637.html#a1c00a874e3c087bbd823bd7e7d81995">ELTORITO_CATALOG::SystemType</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="289980b5f7b3d569a76d2f1464c5c051"></a><!-- doxytag: member="ELTORITO_CATALOG::Unknown" ref="289980b5f7b3d569a76d2f1464c5c051" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">struct { ... }   <a class="el" href="../../de/dbb/a00637.html#289980b5f7b3d569a76d2f1464c5c051">ELTORITO_CATALOG::Unknown</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
+Unicode formatted string. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:19 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:45 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

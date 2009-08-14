@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: _EFI_HII_FORM_PACKAGE Struct Reference</title>
+<title>MdePkg[ALL]: _EFI_HII_FONT_PROTOCOL Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,20 +21,71 @@
   </div>
 </div>
 <div class="contents">
-<h1>_EFI_HII_FORM_PACKAGE Struct Reference</h1><!-- doxytag: class="_EFI_HII_FORM_PACKAGE" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>_EFI_HII_FONT_PROTOCOL Struct Reference</h1><!-- doxytag: class="_EFI_HII_FONT_PROTOCOL" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d10/a00449.html">EFI_HII_PACKAGE_HEADER</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d97/a00045.html#59c7421cefd86b24efbb7354df564bf5">Header</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/d10/a01189.html#bc575c417a60424048d5750f4c66d870">EFI_HII_STRING_TO_IMAGE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d97/a00045.html#67fd792af1edec6189f64263ed37977f">StringToImage</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/d10/a01189.html#91fc04cc4d1981e260750065425ec785">EFI_HII_STRING_ID_TO_IMAGE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d97/a00045.html#8efce54c7a018ca95b85152eaa5cb09b">StringIdToImage</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/d10/a01189.html#8e56dd31905307ef523d2c195d75d0d3">EFI_HII_GET_GLYPH</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d97/a00045.html#afc8069f4e7408a5e519158e7dd74c8f">GetGlyph</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/d10/a01189.html#9c9d120aab389d109ebe518a96a3230e">EFI_HII_GET_FONT_INFO</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d97/a00045.html#8e73efeb405581d34ea47893adacc083">GetFontInfo</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-The Forms package is used to carry forms-based encoding data. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="59c7421cefd86b24efbb7354df564bf5"></a><!-- doxytag: member="_EFI_HII_FORM_PACKAGE::Header" ref="59c7421cefd86b24efbb7354df564bf5" args="" -->
+The protocol provides the service to retrieve the font informations. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="8e73efeb405581d34ea47893adacc083"></a><!-- doxytag: member="_EFI_HII_FONT_PROTOCOL::GetFontInfo" ref="8e73efeb405581d34ea47893adacc083" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d10/a00449.html">EFI_HII_PACKAGE_HEADER</a> <a class="el" href="../../d6/d97/a00045.html#59c7421cefd86b24efbb7354df564bf5">_EFI_HII_FORM_PACKAGE::Header</a>          </td>
+          <td class="memname"><a class="el" href="../../d3/d10/a01189.html#9c9d120aab389d109ebe518a96a3230e">EFI_HII_GET_FONT_INFO</a> <a class="el" href="../../d6/d97/a00045.html#8e73efeb405581d34ea47893adacc083">_EFI_HII_FONT_PROTOCOL::GetFontInfo</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="afc8069f4e7408a5e519158e7dd74c8f"></a><!-- doxytag: member="_EFI_HII_FONT_PROTOCOL::GetGlyph" ref="afc8069f4e7408a5e519158e7dd74c8f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d3/d10/a01189.html#8e56dd31905307ef523d2c195d75d0d3">EFI_HII_GET_GLYPH</a> <a class="el" href="../../d6/d97/a00045.html#afc8069f4e7408a5e519158e7dd74c8f">_EFI_HII_FONT_PROTOCOL::GetGlyph</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="8efce54c7a018ca95b85152eaa5cb09b"></a><!-- doxytag: member="_EFI_HII_FONT_PROTOCOL::StringIdToImage" ref="8efce54c7a018ca95b85152eaa5cb09b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d3/d10/a01189.html#91fc04cc4d1981e260750065425ec785">EFI_HII_STRING_ID_TO_IMAGE</a> <a class="el" href="../../d6/d97/a00045.html#8efce54c7a018ca95b85152eaa5cb09b">_EFI_HII_FONT_PROTOCOL::StringIdToImage</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="67fd792af1edec6189f64263ed37977f"></a><!-- doxytag: member="_EFI_HII_FONT_PROTOCOL::StringToImage" ref="67fd792af1edec6189f64263ed37977f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d3/d10/a01189.html#bc575c417a60424048d5750f4c66d870">EFI_HII_STRING_TO_IMAGE</a> <a class="el" href="../../d6/d97/a00045.html#67fd792af1edec6189f64263ed37977f">_EFI_HII_FONT_PROTOCOL::StringToImage</a>          </td>
         </tr>
       </table>
 </div>
@@ -45,7 +96,7 @@ The Forms package is used to carry forms-based encoding data. <hr><h2>Field Docu
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:12 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:03 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

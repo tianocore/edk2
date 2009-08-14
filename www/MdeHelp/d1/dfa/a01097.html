@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Protocol/Arp.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Library/UefiBootServicesTableLib.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,364 +21,67 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Protocol/Arp.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Library/UefiBootServicesTableLib.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
-<tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d56/a00384.html">EFI_ARP_FIND_DATA</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/dee/a00383.html">EFI_ARP_CONFIG_DATA</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d7c/a00003.html">_EFI_ARP_PROTOCOL</a></td></tr>
-
-<tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/dfa/a01097.html#a3e3499bf5ab5bf1ceb8cf917bf9dff7">EFI_ARP_SERVICE_BINDING_PROTOCOL_GUID</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/dfa/a01097.html#c149b9154fad6e2805c7c2175b1bbdf7">EFI_ARP_PROTOCOL_GUID</a></td></tr>
-
-<tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <a class="el" href="../../d1/d7c/a00003.html">_EFI_ARP_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/dfa/a01097.html#56ff80d47fc228e33f2ed440b66236bc">EFI_ARP_PROTOCOL</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/dfa/a01097.html#908f65dbdcc2aa53327dcd11889f849c">EFI_ARP_CONFIGURE</a> )(IN <a class="el" href="../../d1/d7c/a00003.html">EFI_ARP_PROTOCOL</a> *This, IN <a class="el" href="../../da/dee/a00383.html">EFI_ARP_CONFIG_DATA</a> *ConfigData)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/dfa/a01097.html#c4d56feac098677af155fbfb132e4863">EFI_ARP_ADD</a> )(IN <a class="el" href="../../d1/d7c/a00003.html">EFI_ARP_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> DenyFlag, IN VOID *TargetSwAddress, IN VOID *TargetHwAddress, IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> TimeoutValue, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> Overwrite)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/dfa/a01097.html#20b3f1b01bd26f7d2df56ba9fdbc0f90">EFI_ARP_FIND</a> )(IN <a class="el" href="../../d1/d7c/a00003.html">EFI_ARP_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> BySwAddress, IN VOID *AddressBuffer, OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *EntryLength, OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *EntryCount, OUT <a class="el" href="../../d2/d56/a00384.html">EFI_ARP_FIND_DATA</a> **Entries, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> Refresh)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/dfa/a01097.html#63ecef5d737a67ec7763329db4750039">EFI_ARP_DELETE</a> )(IN <a class="el" href="../../d1/d7c/a00003.html">EFI_ARP_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> BySwAddress, IN VOID *AddressBuffer)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/dfa/a01097.html#dc2c2a5569f16cad589374a83679d6d9">EFI_ARP_FLUSH</a> )(IN <a class="el" href="../../d1/d7c/a00003.html">EFI_ARP_PROTOCOL</a> *This)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/dfa/a01097.html#fee421066f5e56c11f61338a2eafcc6b">EFI_ARP_REQUEST</a> )(IN <a class="el" href="../../d1/d7c/a00003.html">EFI_ARP_PROTOCOL</a> *This, IN VOID *TargetSwAddress, IN <a class="el" href="../../d9/dbb/a01186.html#7f3111de303d836d8d3711c39363f81a">EFI_EVENT</a> ResolvedEvent, OUT VOID *TargetHwAddress)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/dfa/a01097.html#42015ee68dbace1508d7443ad6e9b377">EFI_ARP_CANCEL</a> )(IN <a class="el" href="../../d1/d7c/a00003.html">EFI_ARP_PROTOCOL</a> *This, IN VOID *TargetSwAddress, IN <a class="el" href="../../d9/dbb/a01186.html#7f3111de303d836d8d3711c39363f81a">EFI_EVENT</a> ResolvedEvent)</td></tr>
-
 <tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/dfa/a01097.html#16e4d8785e73b0d0e5c129005e008581">gEfiArpServiceBindingProtocolGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/dfa/a01097.html#4ddb8b250620227b29328eda639cdc94">gImageHandle</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/dfa/a01097.html#55840b30d3396cf94216e36f2e1f7316">gEfiArpProtocolGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d6/dcf/a00645.html">EFI_SYSTEM_TABLE</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/dfa/a01097.html#05bd8dac1521b1345fbd9dd7ad021c4c">gST</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d98/a00407.html">EFI_BOOT_SERVICES</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/dfa/a01097.html#f32fbb72596f40e20b8aba6ba4b4feab">gBS</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-EFI ARP Protocol Definition<p>
-The EFI ARP Service Binding Protocol is used to locate EFI ARP Protocol drivers to create and destroy child of the driver to communicate with other host using ARP protocol. The EFI ARP Protocol provides services to map IP network address to hardware address used by a data link protocol.<p>
-Copyright (c) 2006 - 2008, Intel Corporation.<br>
- All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at<br>
- <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
-<a class="anchor" name="c149b9154fad6e2805c7c2175b1bbdf7"></a><!-- doxytag: member="Arp.h::EFI_ARP_PROTOCOL_GUID" ref="c149b9154fad6e2805c7c2175b1bbdf7" args="" -->
+Provides a service to retrieve a pointer to the EFI Boot Services Table. Only available to DXE and UEFI module types.<p>
+Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Variable Documentation</h2>
+<a class="anchor" name="f32fbb72596f40e20b8aba6ba4b4feab"></a><!-- doxytag: member="UefiBootServicesTableLib.h::gBS" ref="f32fbb72596f40e20b8aba6ba4b4feab" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_ARP_PROTOCOL_GUID          </td>
+          <td class="memname"><a class="el" href="../../d1/d98/a00407.html">EFI_BOOT_SERVICES</a>* <a class="el" href="../../d1/dfa/a01097.html#f32fbb72596f40e20b8aba6ba4b4feab">gBS</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-<b>Value:</b><div class="fragment"><pre class="fragment">{ \
-    0xf4b427bb, 0xba21, 0x4f16, {0xbc, 0x4e, 0x43, 0xe4, 0x16, 0xab, 0x61, 0x9c } \
-  }
-</pre></div>
+Cache pointer to the EFI Boot Services Table 
 </div>
 </div><p>
-<a class="anchor" name="a3e3499bf5ab5bf1ceb8cf917bf9dff7"></a><!-- doxytag: member="Arp.h::EFI_ARP_SERVICE_BINDING_PROTOCOL_GUID" ref="a3e3499bf5ab5bf1ceb8cf917bf9dff7" args="" -->
+<a class="anchor" name="4ddb8b250620227b29328eda639cdc94"></a><!-- doxytag: member="UefiBootServicesTableLib.h::gImageHandle" ref="4ddb8b250620227b29328eda639cdc94" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_ARP_SERVICE_BINDING_PROTOCOL_GUID          </td>
+          <td class="memname"><a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> <a class="el" href="../../d1/dfa/a01097.html#4ddb8b250620227b29328eda639cdc94">gImageHandle</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-<b>Value:</b><div class="fragment"><pre class="fragment">{ \
-    0xf44c00ee, 0x1f2c, 0x4a00, {0xaa, 0x9, 0x1c, 0x9f, 0x3e, 0x8, 0x0, 0xa3 } \
-  }
-</pre></div>
+Cache the Image Handle 
 </div>
 </div><p>
-<hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="c4d56feac098677af155fbfb132e4863"></a><!-- doxytag: member="Arp.h::EFI_ARP_ADD" ref="c4d56feac098677af155fbfb132e4863" args=")(IN EFI_ARP_PROTOCOL *This, IN BOOLEAN DenyFlag, IN VOID *TargetSwAddress, IN VOID *TargetHwAddress, IN UINT32 TimeoutValue, IN BOOLEAN Overwrite)" -->
+<a class="anchor" name="05bd8dac1521b1345fbd9dd7ad021c4c"></a><!-- doxytag: member="UefiBootServicesTableLib.h::gST" ref="05bd8dac1521b1345fbd9dd7ad021c4c" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d1/dfa/a01097.html#c4d56feac098677af155fbfb132e4863">EFI_ARP_ADD</a>)(IN <a class="el" href="../../d1/d7c/a00003.html">EFI_ARP_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> DenyFlag, IN VOID *TargetSwAddress, IN VOID *TargetHwAddress, IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> TimeoutValue, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> Overwrite)          </td>
+          <td class="memname"><a class="el" href="../../d6/dcf/a00645.html">EFI_SYSTEM_TABLE</a>* <a class="el" href="../../d1/dfa/a01097.html#05bd8dac1521b1345fbd9dd7ad021c4c">gST</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-This function is used to insert entries into the ARP cache.<p>
-ARP cache entries are typically inserted and updated by network protocol drivers as network traffic is processed. Most ARP cache entries will time out and be deleted if the network traffic stops. ARP cache entries that were inserted by the Add() function may be static (will not time out) or dynamic (will time out). Default ARP cache timeout values are not covered in most network protocol specifications (although RFC 1122 comes pretty close) and will only be discussed in general in this specification. The timeout values that are used in the EFI Sample Implementation should be used only as a guideline. Final product implementations of the EFI network stack should be tuned for their expected network environments.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the EFI_ARP_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DenyFlag</em>&nbsp;</td><td>Set to TRUE if this entry is a deny entry. Set to FALSE if this entry is a normal entry. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>TargetSwAddress</em>&nbsp;</td><td>Pointer to a protocol address to add (or deny). May be set to NULL if DenyFlag is TRUE. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>TargetHwAddress</em>&nbsp;</td><td>Pointer to a hardware address to add (or deny). May be set to NULL if DenyFlag is TRUE. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>TimeoutValue</em>&nbsp;</td><td>Time in 100-ns units that this entry will remain in the ARP cache. A value of zero means that the entry is permanent. A nonzero value will override the one given by Configure() if the entry to be added is a dynamic entry. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Overwrite</em>&nbsp;</td><td>If TRUE, the matching cache entry will be overwritten with the supplied parameters. If FALSE, EFI_ACCESS_DENIED is returned if the corresponding cache entry already exists.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The entry has been added or updated. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>One or more of the following conditions is TRUE: This is NULL. DenyFlag is FALSE and TargetHwAddress is NULL. DenyFlag is FALSE and TargetSwAddress is NULL. TargetHwAddress is NULL and TargetSwAddress is NULL. Neither TargetSwAddress nor TargetHwAddress are NULL when DenyFlag is TRUE. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>The new ARP cache entry could not be allocated. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ACCESS_DENIED</em>&nbsp;</td><td>The ARP cache entry already exists and Overwrite is not true. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_STARTED</em>&nbsp;</td><td>The ARP driver instance has not been configured. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="42015ee68dbace1508d7443ad6e9b377"></a><!-- doxytag: member="Arp.h::EFI_ARP_CANCEL" ref="42015ee68dbace1508d7443ad6e9b377" args=")(IN EFI_ARP_PROTOCOL *This, IN VOID *TargetSwAddress, IN EFI_EVENT ResolvedEvent)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d1/dfa/a01097.html#42015ee68dbace1508d7443ad6e9b377">EFI_ARP_CANCEL</a>)(IN <a class="el" href="../../d1/d7c/a00003.html">EFI_ARP_PROTOCOL</a> *This, IN VOID *TargetSwAddress, IN <a class="el" href="../../d9/dbb/a01186.html#7f3111de303d836d8d3711c39363f81a">EFI_EVENT</a> ResolvedEvent)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This function aborts the previous ARP request (identified by This, TargetSwAddress and ResolvedEvent) that is issued by <a class="el" href="../../d1/d7c/a00003.html#f8c32472a8c5ea480d99c85054c3bee8">EFI_ARP_PROTOCOL.Request()</a>.<p>
-If the request is in the internal ARP request queue, the request is aborted immediately and its ResolvedEvent is signaled. Only an asynchronous address request needs to be canceled. If TargeSwAddress and ResolveEvent are both NULL, all the pending asynchronous requests that have been issued by This instance will be cancelled and their corresponding events will be signaled.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the EFI_ARP_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>TargetSwAddress</em>&nbsp;</td><td>Pointer to the protocol address in previous request session. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ResolvedEvent</em>&nbsp;</td><td>Pointer to the event that is used as the notification event in previous request session.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The pending request session(s) is/are aborted and corresponding event(s) is/are signaled. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>One or more of the following conditions is TRUE: This is NULL. TargetSwAddress is not NULL and ResolvedEvent is NULL. TargetSwAddress is NULL and ResolvedEvent is not NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_STARTED</em>&nbsp;</td><td>The ARP driver instance has not been configured. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The request is not issued by <a class="el" href="../../d1/d7c/a00003.html#f8c32472a8c5ea480d99c85054c3bee8">EFI_ARP_PROTOCOL.Request()</a>. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="908f65dbdcc2aa53327dcd11889f849c"></a><!-- doxytag: member="Arp.h::EFI_ARP_CONFIGURE" ref="908f65dbdcc2aa53327dcd11889f849c" args=")(IN EFI_ARP_PROTOCOL *This, IN EFI_ARP_CONFIG_DATA *ConfigData)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d1/dfa/a01097.html#908f65dbdcc2aa53327dcd11889f849c">EFI_ARP_CONFIGURE</a>)(IN <a class="el" href="../../d1/d7c/a00003.html">EFI_ARP_PROTOCOL</a> *This, IN <a class="el" href="../../da/dee/a00383.html">EFI_ARP_CONFIG_DATA</a> *ConfigData)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This function is used to assign a station address to the ARP cache for this instance of the ARP driver.<p>
-Each ARP instance has one station address. The EFI_ARP_PROTOCOL driver will respond to ARP requests that match this registered station address. A call to this function with the ConfigData field set to NULL will reset this ARP instance.<p>
-Once a protocol type and station address have been assigned to this ARP instance, all the following ARP functions will use this information. Attempting to change the protocol type or station address to a configured ARP instance will result in errors.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the EFI_ARP_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ConfigData</em>&nbsp;</td><td>Pointer to the <a class="el" href="../../da/dee/a00383.html">EFI_ARP_CONFIG_DATA</a> structure.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The new station address was successfully registered. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>One or more of the following conditions is TRUE: This is NULL. SwAddressLength is zero when ConfigData is not NULL. StationAddress is NULL when ConfigData is not NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ACCESS_DENIED</em>&nbsp;</td><td>The SwAddressType, SwAddressLength, or StationAddress is different from the one that is already registered. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>Storage for the new StationAddress could not be allocated. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="63ecef5d737a67ec7763329db4750039"></a><!-- doxytag: member="Arp.h::EFI_ARP_DELETE" ref="63ecef5d737a67ec7763329db4750039" args=")(IN EFI_ARP_PROTOCOL *This, IN BOOLEAN BySwAddress, IN VOID *AddressBuffer)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d1/dfa/a01097.html#63ecef5d737a67ec7763329db4750039">EFI_ARP_DELETE</a>)(IN <a class="el" href="../../d1/d7c/a00003.html">EFI_ARP_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> BySwAddress, IN VOID *AddressBuffer)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This function removes specified ARP cache entries.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the EFI_ARP_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>BySwAddress</em>&nbsp;</td><td>Set to TRUE to delete matching protocol addresses. Set to FALSE to delete matching hardware addresses. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>AddressBuffer</em>&nbsp;</td><td>Pointer to the address buffer that is used as a key to look for the cache entry. Set to NULL to delete all entries.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The entry was removed from the ARP cache. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>This is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The specified deletion key was not found. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_STARTED</em>&nbsp;</td><td>The ARP driver instance has not been configured. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="20b3f1b01bd26f7d2df56ba9fdbc0f90"></a><!-- doxytag: member="Arp.h::EFI_ARP_FIND" ref="20b3f1b01bd26f7d2df56ba9fdbc0f90" args=")(IN EFI_ARP_PROTOCOL *This, IN BOOLEAN BySwAddress, IN VOID *AddressBuffer, OUT UINT32 *EntryLength, OUT UINT32 *EntryCount, OUT EFI_ARP_FIND_DATA **Entries, IN BOOLEAN Refresh)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d1/dfa/a01097.html#20b3f1b01bd26f7d2df56ba9fdbc0f90">EFI_ARP_FIND</a>)(IN <a class="el" href="../../d1/d7c/a00003.html">EFI_ARP_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> BySwAddress, IN VOID *AddressBuffer, OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *EntryLength, OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *EntryCount, OUT <a class="el" href="../../d2/d56/a00384.html">EFI_ARP_FIND_DATA</a> **Entries, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> Refresh)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This function searches the ARP cache for matching entries and allocates a buffer into which those entries are copied.<p>
-The first part of the allocated buffer is <a class="el" href="../../d2/d56/a00384.html">EFI_ARP_FIND_DATA</a>, following which are protocol address pairs and hardware address pairs. When finding a specific protocol address (BySwAddress is TRUE and AddressBuffer is not NULL), the ARP cache timeout for the found entry is reset if Refresh is set to TRUE. If the found ARP cache entry is a permanent entry, it is not affected by Refresh.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the EFI_ARP_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>BySwAddress</em>&nbsp;</td><td>Set to TRUE to look for matching software protocol addresses. Set to FALSE to look for matching hardware protocol addresses. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>AddressBuffer</em>&nbsp;</td><td>Pointer to address buffer. Set to NULL to match all addresses. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EntryLength</em>&nbsp;</td><td>The size of an entry in the entries buffer. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EntryCount</em>&nbsp;</td><td>The number of ARP cache entries that are found by the specified criteria. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Entries</em>&nbsp;</td><td>Pointer to the buffer that will receive the ARP cache entries. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Refresh</em>&nbsp;</td><td>Set to TRUE to refresh the timeout value of the matching ARP cache entry.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The requested ARP cache entries were copied into the buffer. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>One or more of the following conditions is TRUE: This is NULL. Both EntryCount and EntryLength are NULL, when Refresh is FALSE. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>No matching entries were found. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_STARTED</em>&nbsp;</td><td>The ARP driver instance has not been configured. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="dc2c2a5569f16cad589374a83679d6d9"></a><!-- doxytag: member="Arp.h::EFI_ARP_FLUSH" ref="dc2c2a5569f16cad589374a83679d6d9" args=")(IN EFI_ARP_PROTOCOL *This)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d1/dfa/a01097.html#dc2c2a5569f16cad589374a83679d6d9">EFI_ARP_FLUSH</a>)(IN <a class="el" href="../../d1/d7c/a00003.html">EFI_ARP_PROTOCOL</a> *This)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This function delete all dynamic entries from the ARP cache that match the specified software protocol type.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the EFI_ARP_PROTOCOL instance.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The cache has been flushed. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>This is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>There are no matching dynamic cache entries. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_STARTED</em>&nbsp;</td><td>The ARP driver instance has not been configured. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="56ff80d47fc228e33f2ed440b66236bc"></a><!-- doxytag: member="Arp.h::EFI_ARP_PROTOCOL" ref="56ff80d47fc228e33f2ed440b66236bc" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct <a class="el" href="../../d1/d7c/a00003.html">_EFI_ARP_PROTOCOL</a> <a class="el" href="../../d1/d7c/a00003.html">EFI_ARP_PROTOCOL</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="fee421066f5e56c11f61338a2eafcc6b"></a><!-- doxytag: member="Arp.h::EFI_ARP_REQUEST" ref="fee421066f5e56c11f61338a2eafcc6b" args=")(IN EFI_ARP_PROTOCOL *This, IN VOID *TargetSwAddress, IN EFI_EVENT ResolvedEvent, OUT VOID *TargetHwAddress)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d1/dfa/a01097.html#fee421066f5e56c11f61338a2eafcc6b">EFI_ARP_REQUEST</a>)(IN <a class="el" href="../../d1/d7c/a00003.html">EFI_ARP_PROTOCOL</a> *This, IN VOID *TargetSwAddress, IN <a class="el" href="../../d9/dbb/a01186.html#7f3111de303d836d8d3711c39363f81a">EFI_EVENT</a> ResolvedEvent, OUT VOID *TargetHwAddress)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This function tries to resolve the TargetSwAddress and optionally returns a TargetHwAddress if it already exists in the ARP cache.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the EFI_ARP_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>TargetSwAddress</em>&nbsp;</td><td>Pointer to the protocol address to resolve. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ResolvedEvent</em>&nbsp;</td><td>Pointer to the event that will be signaled when the address is resolved or some error occurs. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>TargetHwAddress</em>&nbsp;</td><td>Pointer to the buffer for the resolved hardware address in network byte order.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The data is copied from the ARP cache into the TargetHwAddress buffer. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>One or more of the following conditions is TRUE: This is NULL. TargetHwAddress is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ACCESS_DENIED</em>&nbsp;</td><td>The requested address is not present in the normal ARP cache but is present in the deny address list. Outgoing traffic to that address is forbidden. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_STARTED</em>&nbsp;</td><td>The ARP driver instance has not been configured. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_READY</em>&nbsp;</td><td>The request has been started and is not finished. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<hr><h2>Variable Documentation</h2>
-<a class="anchor" name="55840b30d3396cf94216e36f2e1f7316"></a><!-- doxytag: member="Arp.h::gEfiArpProtocolGuid" ref="55840b30d3396cf94216e36f2e1f7316" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../d1/dfa/a01097.html#55840b30d3396cf94216e36f2e1f7316">gEfiArpProtocolGuid</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="16e4d8785e73b0d0e5c129005e008581"></a><!-- doxytag: member="Arp.h::gEfiArpServiceBindingProtocolGuid" ref="16e4d8785e73b0d0e5c129005e008581" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../d1/dfa/a01097.html#16e4d8785e73b0d0e5c129005e008581">gEfiArpServiceBindingProtocolGuid</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
+Cache pointer to the EFI System Table 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:09 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:24 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

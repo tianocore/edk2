@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: _EFI_STATUS_CODE_PROTOCOL Struct Reference</title>
+<title>MdePkg[ALL]: _EFI_SEC_PEI_HAND_OFF Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,31 +21,167 @@
   </div>
 </div>
 <div class="contents">
-<h1>_EFI_STATUS_CODE_PROTOCOL Struct Reference</h1><!-- doxytag: class="_EFI_STATUS_CODE_PROTOCOL" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>_EFI_SEC_PEI_HAND_OFF Struct Reference</h1><!-- doxytag: class="_EFI_SEC_PEI_HAND_OFF" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/d1c/a01093.html#5f58105154417ae7b94cbaf552fdc67a">EFI_REPORT_STATUS_CODE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d3e/a00253.html#96ddf828185b460c0cab794ebb71adac">ReportStatusCode</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d3e/a00253.html#a29f6636843ebed44c713cd839d7f904">DataSize</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d3e/a00253.html#3fd12bca349d0eb10e67ad97060235b7">BootFirmwareVolumeBase</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d3e/a00253.html#b4bdc306404151388d3694dda926f925">BootFirmwareVolumeSize</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d3e/a00253.html#e6be96fd71d9431ce0e650edeed658d6">TemporaryRamBase</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d3e/a00253.html#2a46092fa239297e8734ad870ae5fe8f">TemporaryRamSize</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d3e/a00253.html#ffbaf333a57ac8c430bad6d18ceacf86">PeiTemporaryRamBase</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d3e/a00253.html#344b7f2ce9be62d4525aaa77138d03b9">PeiTemporaryRamSize</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d3e/a00253.html#0bba9529016a03fe1c0dd69cbdf1fcc5">StackBase</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d3e/a00253.html#9472f13944e100f402ae3053ec5279ca">StackSize</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Provides the service required to report a status code to the platform firmware. This protocol must be produced by a runtime DXE driver and may be consumed only by the DXE Foundation. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="96ddf828185b460c0cab794ebb71adac"></a><!-- doxytag: member="_EFI_STATUS_CODE_PROTOCOL::ReportStatusCode" ref="96ddf828185b460c0cab794ebb71adac" args="" -->
+EFI_SEC_PEI_HAND_OFF structure hold information about PEI core's operating environment, such as the size of location of temporary RAM, the stack location and BFV location. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="3fd12bca349d0eb10e67ad97060235b7"></a><!-- doxytag: member="_EFI_SEC_PEI_HAND_OFF::BootFirmwareVolumeBase" ref="3fd12bca349d0eb10e67ad97060235b7" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../de/d1c/a01093.html#5f58105154417ae7b94cbaf552fdc67a">EFI_REPORT_STATUS_CODE</a> <a class="el" href="../../d0/d3e/a00253.html#96ddf828185b460c0cab794ebb71adac">_EFI_STATUS_CODE_PROTOCOL::ReportStatusCode</a>          </td>
+          <td class="memname">VOID* <a class="el" href="../../d0/d3e/a00253.html#3fd12bca349d0eb10e67ad97060235b7">_EFI_SEC_PEI_HAND_OFF::BootFirmwareVolumeBase</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+Points to the first byte of the boot firmware volume, which the PEI Dispatcher should search for PEI modules. 
+</div>
+</div><p>
+<a class="anchor" name="b4bdc306404151388d3694dda926f925"></a><!-- doxytag: member="_EFI_SEC_PEI_HAND_OFF::BootFirmwareVolumeSize" ref="b4bdc306404151388d3694dda926f925" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> <a class="el" href="../../d0/d3e/a00253.html#b4bdc306404151388d3694dda926f925">_EFI_SEC_PEI_HAND_OFF::BootFirmwareVolumeSize</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
 
+<p>
+Size of the boot firmware volume, in bytes. 
+</div>
+</div><p>
+<a class="anchor" name="a29f6636843ebed44c713cd839d7f904"></a><!-- doxytag: member="_EFI_SEC_PEI_HAND_OFF::DataSize" ref="a29f6636843ebed44c713cd839d7f904" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d0/d3e/a00253.html#a29f6636843ebed44c713cd839d7f904">_EFI_SEC_PEI_HAND_OFF::DataSize</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Size of the data structure. 
+</div>
+</div><p>
+<a class="anchor" name="ffbaf333a57ac8c430bad6d18ceacf86"></a><!-- doxytag: member="_EFI_SEC_PEI_HAND_OFF::PeiTemporaryRamBase" ref="ffbaf333a57ac8c430bad6d18ceacf86" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">VOID* <a class="el" href="../../d0/d3e/a00253.html#ffbaf333a57ac8c430bad6d18ceacf86">_EFI_SEC_PEI_HAND_OFF::PeiTemporaryRamBase</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Points to the first byte of the temporary RAM available for use by the PEI Foundation. The area described by PeiTemporaryRamBase and PeiTemporaryRamSize must not extend outside beyond the area described by TemporaryRamBase &amp; TemporaryRamSize. This area should not overlap with the area reported by StackBase and StackSize. 
+</div>
+</div><p>
+<a class="anchor" name="344b7f2ce9be62d4525aaa77138d03b9"></a><!-- doxytag: member="_EFI_SEC_PEI_HAND_OFF::PeiTemporaryRamSize" ref="344b7f2ce9be62d4525aaa77138d03b9" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> <a class="el" href="../../d0/d3e/a00253.html#344b7f2ce9be62d4525aaa77138d03b9">_EFI_SEC_PEI_HAND_OFF::PeiTemporaryRamSize</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Size of the available temporary RAM available for use by the PEI Foundation, in bytes. 
+</div>
+</div><p>
+<a class="anchor" name="0bba9529016a03fe1c0dd69cbdf1fcc5"></a><!-- doxytag: member="_EFI_SEC_PEI_HAND_OFF::StackBase" ref="0bba9529016a03fe1c0dd69cbdf1fcc5" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">VOID* <a class="el" href="../../d0/d3e/a00253.html#0bba9529016a03fe1c0dd69cbdf1fcc5">_EFI_SEC_PEI_HAND_OFF::StackBase</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Points to the first byte of the stack. This are may be part of the memory described by TemporaryRamBase and TemporaryRamSize or may be an entirely separate area. 
+</div>
+</div><p>
+<a class="anchor" name="9472f13944e100f402ae3053ec5279ca"></a><!-- doxytag: member="_EFI_SEC_PEI_HAND_OFF::StackSize" ref="9472f13944e100f402ae3053ec5279ca" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> <a class="el" href="../../d0/d3e/a00253.html#9472f13944e100f402ae3053ec5279ca">_EFI_SEC_PEI_HAND_OFF::StackSize</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Size of the stack, in bytes. 
+</div>
+</div><p>
+<a class="anchor" name="e6be96fd71d9431ce0e650edeed658d6"></a><!-- doxytag: member="_EFI_SEC_PEI_HAND_OFF::TemporaryRamBase" ref="e6be96fd71d9431ce0e650edeed658d6" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">VOID* <a class="el" href="../../d0/d3e/a00253.html#e6be96fd71d9431ce0e650edeed658d6">_EFI_SEC_PEI_HAND_OFF::TemporaryRamBase</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Points to the first byte of the temporary RAM. 
+</div>
+</div><p>
+<a class="anchor" name="2a46092fa239297e8734ad870ae5fe8f"></a><!-- doxytag: member="_EFI_SEC_PEI_HAND_OFF::TemporaryRamSize" ref="2a46092fa239297e8734ad870ae5fe8f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> <a class="el" href="../../d0/d3e/a00253.html#2a46092fa239297e8734ad870ae5fe8f">_EFI_SEC_PEI_HAND_OFF::TemporaryRamSize</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Size of the temporary RAM, in bytes. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:13 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:17 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

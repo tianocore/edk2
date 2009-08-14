@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: _EFI_MTFTP4_PROTOCOL Struct Reference</title>
+<title>MdePkg[ALL]: _EFI_LOAD_FILE_PROTOCOL Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,139 +21,20 @@
   </div>
 </div>
 <div class="contents">
-<h1>_EFI_MTFTP4_PROTOCOL Struct Reference</h1><!-- doxytag: class="_EFI_MTFTP4_PROTOCOL" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>_EFI_LOAD_FILE_PROTOCOL Struct Reference</h1><!-- doxytag: class="_EFI_LOAD_FILE_PROTOCOL" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/ddb/a01147.html#3808b395e260721a4c64c617fca3d1ac">EFI_MTFTP4_GET_MODE_DATA</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/de1/a00213.html#092620bbf08aad9aec04006aeef153bd">GetModeData</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/ddb/a01147.html#c0c82ca678f750f2da1c556f5efedcc6">EFI_MTFTP4_CONFIGURE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/de1/a00213.html#1c91f2ba2f4442c448951b7c018c9b2f">Configure</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/ddb/a01147.html#2733a4cd580d99212a6951123fe6c6a1">EFI_MTFTP4_GET_INFO</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/de1/a00213.html#d373289073b7b95efedc0500e7c55d07">GetInfo</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/ddb/a01147.html#29eb57517186b4f208cfb03aa3f24507">EFI_MTFTP4_PARSE_OPTIONS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/de1/a00213.html#5e1ff91ffab29f9194220baf02eee1b0">ParseOptions</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/ddb/a01147.html#0f9867f69db0dc1ca4380571f3481679">EFI_MTFTP4_READ_FILE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/de1/a00213.html#8804eb363ae3a7bccbff85cc26e00aff">ReadFile</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/ddb/a01147.html#74fef35010135c3eefeb04fce9d5bc42">EFI_MTFTP4_WRITE_FILE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/de1/a00213.html#e440ca10a3982b7156e99e49a357f636">WriteFile</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/ddb/a01147.html#d282437f7410cc4a4ea2771701c897fb">EFI_MTFTP4_READ_DIRECTORY</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/de1/a00213.html#c092ffe6d71fb719a6b42453599ae097">ReadDirectory</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/ddb/a01147.html#848ba4c31f53ee91682d806ad8e3a030">EFI_MTFTP4_POLL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/de1/a00213.html#ff60aa426d3d835da69ca02945a5983d">Poll</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d61/a01130.html#3e6742de9c1a8a34235b3b010abf48e7">EFI_LOAD_FILE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/de1/a00213.html#925d34e497601e45d5d1fb825bd125a6">LoadFile</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-The EFI_MTFTP4_PROTOCOL is designed to be used by UEFI drivers and applications to transmit and receive data files. The EFI MTFTPv4 Protocol driver uses the underlying EFI UDPv4 Protocol driver and EFI IPv4 Protocol driver. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="1c91f2ba2f4442c448951b7c018c9b2f"></a><!-- doxytag: member="_EFI_MTFTP4_PROTOCOL::Configure" ref="1c91f2ba2f4442c448951b7c018c9b2f" args="" -->
+The EFI_LOAD_FILE_PROTOCOL is a simple protocol used to obtain files from arbitrary devices. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="925d34e497601e45d5d1fb825bd125a6"></a><!-- doxytag: member="_EFI_LOAD_FILE_PROTOCOL::LoadFile" ref="925d34e497601e45d5d1fb825bd125a6" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d8/ddb/a01147.html#c0c82ca678f750f2da1c556f5efedcc6">EFI_MTFTP4_CONFIGURE</a> <a class="el" href="../../d1/de1/a00213.html#1c91f2ba2f4442c448951b7c018c9b2f">_EFI_MTFTP4_PROTOCOL::Configure</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="d373289073b7b95efedc0500e7c55d07"></a><!-- doxytag: member="_EFI_MTFTP4_PROTOCOL::GetInfo" ref="d373289073b7b95efedc0500e7c55d07" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d8/ddb/a01147.html#2733a4cd580d99212a6951123fe6c6a1">EFI_MTFTP4_GET_INFO</a> <a class="el" href="../../d1/de1/a00213.html#d373289073b7b95efedc0500e7c55d07">_EFI_MTFTP4_PROTOCOL::GetInfo</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="092620bbf08aad9aec04006aeef153bd"></a><!-- doxytag: member="_EFI_MTFTP4_PROTOCOL::GetModeData" ref="092620bbf08aad9aec04006aeef153bd" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d8/ddb/a01147.html#3808b395e260721a4c64c617fca3d1ac">EFI_MTFTP4_GET_MODE_DATA</a> <a class="el" href="../../d1/de1/a00213.html#092620bbf08aad9aec04006aeef153bd">_EFI_MTFTP4_PROTOCOL::GetModeData</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="5e1ff91ffab29f9194220baf02eee1b0"></a><!-- doxytag: member="_EFI_MTFTP4_PROTOCOL::ParseOptions" ref="5e1ff91ffab29f9194220baf02eee1b0" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d8/ddb/a01147.html#29eb57517186b4f208cfb03aa3f24507">EFI_MTFTP4_PARSE_OPTIONS</a> <a class="el" href="../../d1/de1/a00213.html#5e1ff91ffab29f9194220baf02eee1b0">_EFI_MTFTP4_PROTOCOL::ParseOptions</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="ff60aa426d3d835da69ca02945a5983d"></a><!-- doxytag: member="_EFI_MTFTP4_PROTOCOL::Poll" ref="ff60aa426d3d835da69ca02945a5983d" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d8/ddb/a01147.html#848ba4c31f53ee91682d806ad8e3a030">EFI_MTFTP4_POLL</a> <a class="el" href="../../d1/de1/a00213.html#ff60aa426d3d835da69ca02945a5983d">_EFI_MTFTP4_PROTOCOL::Poll</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="c092ffe6d71fb719a6b42453599ae097"></a><!-- doxytag: member="_EFI_MTFTP4_PROTOCOL::ReadDirectory" ref="c092ffe6d71fb719a6b42453599ae097" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d8/ddb/a01147.html#d282437f7410cc4a4ea2771701c897fb">EFI_MTFTP4_READ_DIRECTORY</a> <a class="el" href="../../d1/de1/a00213.html#c092ffe6d71fb719a6b42453599ae097">_EFI_MTFTP4_PROTOCOL::ReadDirectory</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="8804eb363ae3a7bccbff85cc26e00aff"></a><!-- doxytag: member="_EFI_MTFTP4_PROTOCOL::ReadFile" ref="8804eb363ae3a7bccbff85cc26e00aff" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d8/ddb/a01147.html#0f9867f69db0dc1ca4380571f3481679">EFI_MTFTP4_READ_FILE</a> <a class="el" href="../../d1/de1/a00213.html#8804eb363ae3a7bccbff85cc26e00aff">_EFI_MTFTP4_PROTOCOL::ReadFile</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="e440ca10a3982b7156e99e49a357f636"></a><!-- doxytag: member="_EFI_MTFTP4_PROTOCOL::WriteFile" ref="e440ca10a3982b7156e99e49a357f636" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d8/ddb/a01147.html#74fef35010135c3eefeb04fce9d5bc42">EFI_MTFTP4_WRITE_FILE</a> <a class="el" href="../../d1/de1/a00213.html#e440ca10a3982b7156e99e49a357f636">_EFI_MTFTP4_PROTOCOL::WriteFile</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d61/a01130.html#3e6742de9c1a8a34235b3b010abf48e7">EFI_LOAD_FILE</a> <a class="el" href="../../d1/de1/a00213.html#925d34e497601e45d5d1fb825bd125a6">_EFI_LOAD_FILE_PROTOCOL::LoadFile</a>          </td>
         </tr>
       </table>
 </div>
@@ -164,7 +45,7 @@ The EFI_MTFTP4_PROTOCOL is designed to be used by UEFI drivers and applications 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:13 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:15 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

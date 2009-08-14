@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: _EFI_WATCHDOG_TIMER_ARCH_PROTOCOL Struct Reference</title>
+<title>MdePkg[ALL]: _EFI_STATUS_CODE_PROTOCOL Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,54 +21,20 @@
   </div>
 </div>
 <div class="contents">
-<h1>_EFI_WATCHDOG_TIMER_ARCH_PROTOCOL Struct Reference</h1><!-- doxytag: class="_EFI_WATCHDOG_TIMER_ARCH_PROTOCOL" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>_EFI_STATUS_CODE_PROTOCOL Struct Reference</h1><!-- doxytag: class="_EFI_STATUS_CODE_PROTOCOL" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d35/a01184.html#72c3546a876b9d272450045f55ac541a">EFI_WATCHDOG_TIMER_REGISTER_HANDLER</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d53/a00265.html#c3f35b7bee04c8ec58e7c6a9b9989177">RegisterHandler</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d35/a01184.html#843af5b9d8e7c700d84d8920900359b3">EFI_WATCHDOG_TIMER_SET_TIMER_PERIOD</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d53/a00265.html#733d39ac9d8ba1da80805dec2be0cd11">SetTimerPeriod</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d35/a01184.html#7fe2cc31ce44acce8da409d3d6ef1231">EFI_WATCHDOG_TIMER_GET_TIMER_PERIOD</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d53/a00265.html#ed889d65119baaffa114cfe63a7d3c56">GetTimerPeriod</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/ddb/a01147.html#5f58105154417ae7b94cbaf552fdc67a">EFI_REPORT_STATUS_CODE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d53/a00265.html#96ddf828185b460c0cab794ebb71adac">ReportStatusCode</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-This protocol provides the services required to implement the Boot Service SetWatchdogTimer(). It provides a service to set the amount of time to wait before firing the watchdog timer, and it also provides a service to register a handler that is invoked when the watchdog timer fires. This protocol can implement the watchdog timer by using the event and timer Boot Services, or it can make use of custom hardware. When the watchdog timer fires, control will be passed to a handler if one has been registered. If no handler has been registered, or the registered handler returns, then the system will be reset by calling the Runtime Service ResetSystem(). <hr><h2>Field Documentation</h2>
-<a class="anchor" name="ed889d65119baaffa114cfe63a7d3c56"></a><!-- doxytag: member="_EFI_WATCHDOG_TIMER_ARCH_PROTOCOL::GetTimerPeriod" ref="ed889d65119baaffa114cfe63a7d3c56" args="" -->
+Provides the service required to report a status code to the platform firmware. This protocol must be produced by a runtime DXE driver and may be consumed only by the DXE Foundation. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="96ddf828185b460c0cab794ebb71adac"></a><!-- doxytag: member="_EFI_STATUS_CODE_PROTOCOL::ReportStatusCode" ref="96ddf828185b460c0cab794ebb71adac" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d1/d35/a01184.html#7fe2cc31ce44acce8da409d3d6ef1231">EFI_WATCHDOG_TIMER_GET_TIMER_PERIOD</a> <a class="el" href="../../da/d53/a00265.html#ed889d65119baaffa114cfe63a7d3c56">_EFI_WATCHDOG_TIMER_ARCH_PROTOCOL::GetTimerPeriod</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="c3f35b7bee04c8ec58e7c6a9b9989177"></a><!-- doxytag: member="_EFI_WATCHDOG_TIMER_ARCH_PROTOCOL::RegisterHandler" ref="c3f35b7bee04c8ec58e7c6a9b9989177" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d1/d35/a01184.html#72c3546a876b9d272450045f55ac541a">EFI_WATCHDOG_TIMER_REGISTER_HANDLER</a> <a class="el" href="../../da/d53/a00265.html#c3f35b7bee04c8ec58e7c6a9b9989177">_EFI_WATCHDOG_TIMER_ARCH_PROTOCOL::RegisterHandler</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="733d39ac9d8ba1da80805dec2be0cd11"></a><!-- doxytag: member="_EFI_WATCHDOG_TIMER_ARCH_PROTOCOL::SetTimerPeriod" ref="733d39ac9d8ba1da80805dec2be0cd11" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d1/d35/a01184.html#843af5b9d8e7c700d84d8920900359b3">EFI_WATCHDOG_TIMER_SET_TIMER_PERIOD</a> <a class="el" href="../../da/d53/a00265.html#733d39ac9d8ba1da80805dec2be0cd11">_EFI_WATCHDOG_TIMER_ARCH_PROTOCOL::SetTimerPeriod</a>          </td>
+          <td class="memname"><a class="el" href="../../d8/ddb/a01147.html#5f58105154417ae7b94cbaf552fdc67a">EFI_REPORT_STATUS_CODE</a> <a class="el" href="../../da/d53/a00265.html#96ddf828185b460c0cab794ebb71adac">_EFI_STATUS_CODE_PROTOCOL::ReportStatusCode</a>          </td>
         </tr>
       </table>
 </div>
@@ -79,7 +45,7 @@ This protocol provides the services required to implement the Boot Service SetWa
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:14 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:18 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: THUNK_CONTEXT Struct Reference</title>
+<title>MdePkg[ALL]: tdTPM_FAMILY_TABLE Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,71 +21,19 @@
   </div>
 </div>
 <div class="contents">
-<h1>THUNK_CONTEXT Struct Reference</h1><!-- doxytag: class="THUNK_CONTEXT" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>tdTPM_FAMILY_TABLE Struct Reference</h1><!-- doxytag: class="tdTPM_FAMILY_TABLE" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/db8/a00658.html">IA32_REGISTER_SET</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2b/a00936.html#dd1b9a82cf724c61f374d3a33e36a0a9">RealModeState</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2b/a00936.html#89d399dcb494961db2709879c7bdc517">RealModeBuffer</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2b/a00936.html#64700d80bde6155b2f98ed0e4910f421">RealModeBufferSize</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2b/a00936.html#401d7a486816409f5163daa7b775f765">ThunkAttributes</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/db9/a00937.html">TPM_FAMILY_TABLE_ENTRY</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2b/a00936.html#e3bfa2170760b1d6bde051a48793b584">famTableRow</a> [TPM_NUM_FAMILY_TABLE_ENTRY_MIN]</td></tr>
 
 </table>
-<hr><a name="_details"></a><h2>Detailed Description</h2>
-Byte packed structure for an 16-bit real mode thunks <hr><h2>Field Documentation</h2>
-<a class="anchor" name="89d399dcb494961db2709879c7bdc517"></a><!-- doxytag: member="THUNK_CONTEXT::RealModeBuffer" ref="89d399dcb494961db2709879c7bdc517" args="" -->
+<hr><h2>Field Documentation</h2>
+<a class="anchor" name="e3bfa2170760b1d6bde051a48793b584"></a><!-- doxytag: member="tdTPM_FAMILY_TABLE::famTableRow" ref="e3bfa2170760b1d6bde051a48793b584" args="[TPM_NUM_FAMILY_TABLE_ENTRY_MIN]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">VOID* <a class="el" href="../../dc/d2b/a00936.html#89d399dcb494961db2709879c7bdc517">THUNK_CONTEXT::RealModeBuffer</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="64700d80bde6155b2f98ed0e4910f421"></a><!-- doxytag: member="THUNK_CONTEXT::RealModeBufferSize" ref="64700d80bde6155b2f98ed0e4910f421" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../dc/d2b/a00936.html#64700d80bde6155b2f98ed0e4910f421">THUNK_CONTEXT::RealModeBufferSize</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="dd1b9a82cf724c61f374d3a33e36a0a9"></a><!-- doxytag: member="THUNK_CONTEXT::RealModeState" ref="dd1b9a82cf724c61f374d3a33e36a0a9" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/db8/a00658.html">IA32_REGISTER_SET</a>* <a class="el" href="../../dc/d2b/a00936.html#dd1b9a82cf724c61f374d3a33e36a0a9">THUNK_CONTEXT::RealModeState</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="401d7a486816409f5163daa7b775f765"></a><!-- doxytag: member="THUNK_CONTEXT::ThunkAttributes" ref="401d7a486816409f5163daa7b775f765" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../dc/d2b/a00936.html#401d7a486816409f5163daa7b775f765">THUNK_CONTEXT::ThunkAttributes</a>          </td>
+          <td class="memname"><a class="el" href="../../de/db9/a00937.html">TPM_FAMILY_TABLE_ENTRY</a> <a class="el" href="../../dc/d2b/a00936.html#e3bfa2170760b1d6bde051a48793b584">tdTPM_FAMILY_TABLE::famTableRow</a>[TPM_NUM_FAMILY_TABLE_ENTRY_MIN]          </td>
         </tr>
       </table>
 </div>
@@ -96,7 +44,7 @@ Byte packed structure for an 16-bit real mode thunks <hr><h2>Field Documentation
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:23 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:09 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

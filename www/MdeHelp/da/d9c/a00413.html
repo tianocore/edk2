@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN Struct Reference</title>
+<title>MdePkg[ALL]: EFI_COMPRESSION_SECTION Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,200 +21,65 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN Struct Reference</h1><!-- doxytag: class="EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_COMPRESSION_SECTION Struct Reference</h1><!-- doxytag: class="EFI_COMPRESSION_SECTION" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d9c/a00413.html#26d94f725654f7957d18fe94cae46d8b">Status</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d72/a00412.html">EFI_COMMON_SECTION_HEADER</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d9c/a00413.html#bdec8813ca5b56ae5ff39f2e1079f761">CommonHeader</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#7f3111de303d836d8d3711c39363f81a">EFI_EVENT</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d9c/a00413.html#fa7f5136b3e58e06a48ddd9dd926380c">CompletionEvent</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d9c/a00413.html#e4ffefeb08a1288ea249b242819d7452">UncompressedLength</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d30/a00508.html">EFI_IPv4_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d9c/a00413.html#01644b2b150baaf8c6b761626caa36b2">RemoteAddress</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d9c/a00413.html#7679e1153e5278fdb99e3a0111c304d8">RemotePort</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d30/a00508.html">EFI_IPv4_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d9c/a00413.html#3fc15f4f369d5505d249a3ebcab07521">GatewayAddress</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d9c/a00413.html#095d8013fa01776b2725f917f104ab81">ListenPointCount</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/d3d/a00409.html">EFI_DHCP4_LISTEN_POINT</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d9c/a00413.html#1a8f61d2aa8132014369aba611ce7317">ListenPoints</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d9c/a00413.html#0b69fc0db15792fa7e707c0a3fae2a58">TimeoutValue</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d2/db6/a00411.html">EFI_DHCP4_PACKET</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d9c/a00413.html#20da14b3fdefbb1801481d2ccfa6e725">Packet</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d9c/a00413.html#71f2721a5defb15a4151378fca598bb2">ResponseCount</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d2/db6/a00411.html">EFI_DHCP4_PACKET</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d9c/a00413.html#9511941b8dd12f7c5d9fb745a80c891c">ResponseList</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d9c/a00413.html#e0694bad52dea84813f747f186b42a77">CompressionType</a></td></tr>
 
 </table>
-<hr><h2>Field Documentation</h2>
-<a class="anchor" name="fa7f5136b3e58e06a48ddd9dd926380c"></a><!-- doxytag: member="EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN::CompletionEvent" ref="fa7f5136b3e58e06a48ddd9dd926380c" args="" -->
+<hr><a name="_details"></a><h2>Detailed Description</h2>
+An encapsulation section type in which the section data is compressed. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="bdec8813ca5b56ae5ff39f2e1079f761"></a><!-- doxytag: member="EFI_COMPRESSION_SECTION::CommonHeader" ref="bdec8813ca5b56ae5ff39f2e1079f761" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#7f3111de303d836d8d3711c39363f81a">EFI_EVENT</a> <a class="el" href="../../da/d9c/a00413.html#fa7f5136b3e58e06a48ddd9dd926380c">EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN::CompletionEvent</a>          </td>
+          <td class="memname"><a class="el" href="../../d9/d72/a00412.html">EFI_COMMON_SECTION_HEADER</a> <a class="el" href="../../da/d9c/a00413.html#bdec8813ca5b56ae5ff39f2e1079f761">EFI_COMPRESSION_SECTION::CommonHeader</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-If not NULL, the event that will be signaled when the collection process completes. If NULL, this function will busy-wait until the collection process competes. 
+Usual common section header. CommonHeader.Type = EFI_SECTION_COMPRESSION. 
 </div>
 </div><p>
-<a class="anchor" name="3fc15f4f369d5505d249a3ebcab07521"></a><!-- doxytag: member="EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN::GatewayAddress" ref="3fc15f4f369d5505d249a3ebcab07521" args="" -->
+<a class="anchor" name="e0694bad52dea84813f747f186b42a77"></a><!-- doxytag: member="EFI_COMPRESSION_SECTION::CompressionType" ref="e0694bad52dea84813f747f186b42a77" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d30/a00508.html">EFI_IPv4_ADDRESS</a> <a class="el" href="../../da/d9c/a00413.html#3fc15f4f369d5505d249a3ebcab07521">EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN::GatewayAddress</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../da/d9c/a00413.html#e0694bad52dea84813f747f186b42a77">EFI_COMPRESSION_SECTION::CompressionType</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Pointer to the gateway address to override the existing setting. 
+Indicates which compression algorithm is used. 
 </div>
 </div><p>
-<a class="anchor" name="095d8013fa01776b2725f917f104ab81"></a><!-- doxytag: member="EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN::ListenPointCount" ref="095d8013fa01776b2725f917f104ab81" args="" -->
+<a class="anchor" name="e4ffefeb08a1288ea249b242819d7452"></a><!-- doxytag: member="EFI_COMPRESSION_SECTION::UncompressedLength" ref="e4ffefeb08a1288ea249b242819d7452" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../da/d9c/a00413.html#095d8013fa01776b2725f917f104ab81">EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN::ListenPointCount</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../da/d9c/a00413.html#e4ffefeb08a1288ea249b242819d7452">EFI_COMPRESSION_SECTION::UncompressedLength</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The number of entries in ListenPoints. If zero, the default station address and port number 68 are used. 
-</div>
-</div><p>
-<a class="anchor" name="1a8f61d2aa8132014369aba611ce7317"></a><!-- doxytag: member="EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN::ListenPoints" ref="1a8f61d2aa8132014369aba611ce7317" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../de/d3d/a00409.html">EFI_DHCP4_LISTEN_POINT</a>* <a class="el" href="../../da/d9c/a00413.html#1a8f61d2aa8132014369aba611ce7317">EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN::ListenPoints</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-An array of station address and port number pairs that are used as receiving filters. The first entry is also used as the source address and source port of the outgoing packet. 
-</div>
-</div><p>
-<a class="anchor" name="20da14b3fdefbb1801481d2ccfa6e725"></a><!-- doxytag: member="EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN::Packet" ref="20da14b3fdefbb1801481d2ccfa6e725" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d2/db6/a00411.html">EFI_DHCP4_PACKET</a>* <a class="el" href="../../da/d9c/a00413.html#20da14b3fdefbb1801481d2ccfa6e725">EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN::Packet</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Pointer to the packet to be transmitted. 
-</div>
-</div><p>
-<a class="anchor" name="01644b2b150baaf8c6b761626caa36b2"></a><!-- doxytag: member="EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN::RemoteAddress" ref="01644b2b150baaf8c6b761626caa36b2" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../dc/d30/a00508.html">EFI_IPv4_ADDRESS</a> <a class="el" href="../../da/d9c/a00413.html#01644b2b150baaf8c6b761626caa36b2">EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN::RemoteAddress</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Pointer to the server IP address. This address may be a unicast, multicast, or broadcast address. 
-</div>
-</div><p>
-<a class="anchor" name="7679e1153e5278fdb99e3a0111c304d8"></a><!-- doxytag: member="EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN::RemotePort" ref="7679e1153e5278fdb99e3a0111c304d8" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../da/d9c/a00413.html#7679e1153e5278fdb99e3a0111c304d8">EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN::RemotePort</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Server listening port number. If zero, the default server listening port number (67) will be used. 
-</div>
-</div><p>
-<a class="anchor" name="71f2721a5defb15a4151378fca598bb2"></a><!-- doxytag: member="EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN::ResponseCount" ref="71f2721a5defb15a4151378fca598bb2" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../da/d9c/a00413.html#71f2721a5defb15a4151378fca598bb2">EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN::ResponseCount</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Number of received packets. 
-</div>
-</div><p>
-<a class="anchor" name="9511941b8dd12f7c5d9fb745a80c891c"></a><!-- doxytag: member="EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN::ResponseList" ref="9511941b8dd12f7c5d9fb745a80c891c" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d2/db6/a00411.html">EFI_DHCP4_PACKET</a>* <a class="el" href="../../da/d9c/a00413.html#9511941b8dd12f7c5d9fb745a80c891c">EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN::ResponseList</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Pointer to the allocated list of received packets. 
-</div>
-</div><p>
-<a class="anchor" name="26d94f725654f7957d18fe94cae46d8b"></a><!-- doxytag: member="EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN::Status" ref="26d94f725654f7957d18fe94cae46d8b" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> <a class="el" href="../../da/d9c/a00413.html#26d94f725654f7957d18fe94cae46d8b">EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN::Status</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-The completion status of transmitting and receiving. 
-</div>
-</div><p>
-<a class="anchor" name="0b69fc0db15792fa7e707c0a3fae2a58"></a><!-- doxytag: member="EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN::TimeoutValue" ref="0b69fc0db15792fa7e707c0a3fae2a58" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../da/d9c/a00413.html#0b69fc0db15792fa7e707c0a3fae2a58">EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN::TimeoutValue</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Number of seconds to collect responses. Zero is invalid. 
+UINT32 that indicates the size of the section data after decompression. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:29 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

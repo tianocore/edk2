@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: PAL_MC_ERROR_TYPE_INFO Struct Reference</title>
+<title>MdePkg[ALL]: IA32_IDT_GATE_DESCRIPTOR Union Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,91 +21,75 @@
   </div>
 </div>
 <div class="contents">
-<h1>PAL_MC_ERROR_TYPE_INFO Struct Reference</h1><!-- doxytag: class="PAL_MC_ERROR_TYPE_INFO" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>IA32_IDT_GATE_DESCRIPTOR Union Reference</h1><!-- doxytag: class="IA32_IDT_GATE_DESCRIPTOR" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d85/a00702.html#ba1f6dde116425cf89106c84ef008acb">Mode</a>:3</td></tr>
+<tr><td colspan="2"><br><h2>Data Fields For IA32</h2></td></tr>
+<tr><td class="memItemLeft" nowrap>struct {</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d85/a00702.html#8484082f03be0ab1203c4ca91973ef9b">ErrorInjection</a>:3</td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../dd/d85/a00702.html#06206d14912ebec886ab3f9088f257b0">OffsetLow</a>:16</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d85/a00702.html#fc28bb2b7abeda4fd940901214d43476">ErrorSeverity</a>:2</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Offset bits 15..0.  <a href="#e763290d9105e7966fdcf1c6edc49bad"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../dd/d85/a00702.html#029bdb4b4fd8ce2f4d7b31a8c993d5ee">Selector</a>:16</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d85/a00702.html#c095f25714b074683e210676bfb89e8c">ErrorStructure</a>:5</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Selector.  <a href="#852caadbc23acdc0898ce448141bcd29"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../dd/d85/a00702.html#e67d07e553584c3c02ea6f989ffb47e4">Reserved_0</a>:8</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d85/a00702.html#449f77ad0060a02eb82af7be70b59a5e">StructureHierarchy</a>:3</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Reserved.  <a href="#40d6349054da28a63c52014691a23506"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../dd/d85/a00702.html#39e12cd2ed71678f954386778eebffc6">GateType</a>:8</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d85/a00702.html#1fdb283bf0e830af74b054df0572a27d">Reserved</a>:48</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gate Type. See defines above.  <a href="#bd6935af766a90cd910a72c0a9766f77"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../dd/d85/a00702.html#108c2ab52813053f16112baf0b746b03">OffsetHigh</a>:16</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Offset bits 31..16.  <a href="#e2f432e9710893bebfe8ea27b5415d06"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap valign="top">}&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d85/a00702.html#bcd126338d89063fa86b68f25d2f7268">Bits</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d85/a00702.html#d782fba9b0bde2feaa57acf0688bd1d2">Uint64</a></td></tr>
+
+<tr><td colspan="2"><br><h2>Data Fields For X64</h2></td></tr>
+<tr><td class="memItemLeft" nowrap>struct {</td></tr>
+
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../dd/d85/a00702.html#06206d14912ebec886ab3f9088f257b0">OffsetLow</a>:16</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Offset bits 15..0.  <a href="#c7a1284fbf6a4432886555fe8ef8aba9"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../dd/d85/a00702.html#029bdb4b4fd8ce2f4d7b31a8c993d5ee">Selector</a>:16</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Selector.  <a href="#945dd6679b5dba488956e720cd2752c6"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../dd/d85/a00702.html#e67d07e553584c3c02ea6f989ffb47e4">Reserved_0</a>:8</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Reserved.  <a href="#183fc328211d8b44d525c7b34e3770b6"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../dd/d85/a00702.html#39e12cd2ed71678f954386778eebffc6">GateType</a>:8</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gate Type. See defines above.  <a href="#8b098630a93575b1312d48cccdb0674d"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../dd/d85/a00702.html#108c2ab52813053f16112baf0b746b03">OffsetHigh</a>:16</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Offset bits 31..16.  <a href="#ba4d6ffb3d0e0042b4988170b368cc13"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../dd/d85/a00702.html#1dfc1bdebac7ec04b9e49e41dffa9f28">OffsetUpper</a>:32</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Offset bits 63..32.  <a href="#25cc75b3ac820bdd61700ef2d33db17f"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../dd/d85/a00702.html#f45baa109c3374f8241a83ee806968fb">Reserved_1</a>:32</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Reserved.  <a href="#3001e06f7f94adc98223589f26aa0003"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap valign="top">}&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d85/a00702.html#399182bbd6fb1843be95875d64768188">Bits</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap>struct {</td></tr>
+
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../dd/d85/a00702.html#d782fba9b0bde2feaa57acf0688bd1d2">Uint64</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../dd/d85/a00702.html#20405e784615781522c4de66b79ae479">Uint64_1</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap valign="top">}&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d85/a00702.html#2c01ad6272c96ed5c0a588985ce0e6d4">Uint128</a></td></tr>
 
 </table>
-<hr><h2>Field Documentation</h2>
-<a class="anchor" name="8484082f03be0ab1203c4ca91973ef9b"></a><!-- doxytag: member="PAL_MC_ERROR_TYPE_INFO::ErrorInjection" ref="8484082f03be0ab1203c4ca91973ef9b" args="" -->
+<hr><a name="_details"></a><h2>Detailed Description</h2>
+Byte packed structure for an IA-32 Interrupt Gate Descriptor<p>
+Byte packed structure for an x64 Interrupt Gate Descriptor <hr><h2>Field Documentation</h2>
+<a class="anchor" name="399182bbd6fb1843be95875d64768188"></a><!-- doxytag: member="IA32_IDT_GATE_DESCRIPTOR::Bits" ref="399182bbd6fb1843be95875d64768188" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dd/d85/a00702.html#8484082f03be0ab1203c4ca91973ef9b">PAL_MC_ERROR_TYPE_INFO::ErrorInjection</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Bit5:3, indicates the mode of error injection: 0 - Error inject only (no error consumption) 1 - Error inject and consume All other values are reserved. 
-</div>
-</div><p>
-<a class="anchor" name="fc28bb2b7abeda4fd940901214d43476"></a><!-- doxytag: member="PAL_MC_ERROR_TYPE_INFO::ErrorSeverity" ref="fc28bb2b7abeda4fd940901214d43476" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dd/d85/a00702.html#fc28bb2b7abeda4fd940901214d43476">PAL_MC_ERROR_TYPE_INFO::ErrorSeverity</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Bit7:6, indicates the severity desired for error injection/query. Definitions of the different error severity types 0 - Corrected error 1 - Recoverable error 2 - Fatal error 3 - Reserved 
-</div>
-</div><p>
-<a class="anchor" name="c095f25714b074683e210676bfb89e8c"></a><!-- doxytag: member="PAL_MC_ERROR_TYPE_INFO::ErrorStructure" ref="c095f25714b074683e210676bfb89e8c" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dd/d85/a00702.html#c095f25714b074683e210676bfb89e8c">PAL_MC_ERROR_TYPE_INFO::ErrorStructure</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Bit12:8, Indicates the structure identification for error injection/query: 0 - Any structure (cannot be used during query mode). When selected, the structure type used for error injection is determined by PAL. 1 - Cache 2 - TLB 3 - Register file 4 - Bus/System interconnect 5-15<ul>
-<li>Reserved 16-31 - Processor specific error injection capabilities.ErrorDataBuffer is used to specify error types. Please refer to the processor specific documentation for additional details. </li></ul>
-
-</div>
-</div><p>
-<a class="anchor" name="ba1f6dde116425cf89106c84ef008acb"></a><!-- doxytag: member="PAL_MC_ERROR_TYPE_INFO::Mode" ref="ba1f6dde116425cf89106c84ef008acb" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dd/d85/a00702.html#ba1f6dde116425cf89106c84ef008acb">PAL_MC_ERROR_TYPE_INFO::Mode</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Bit2:0, Indicates the mode of operation for this procedure: 0 - Query mode 1 - Error inject mode (err_inj should also be specified) 2 - Cancel outstanding trigger. All other fields in <a class="el" href="../../dd/d85/a00702.html">PAL_MC_ERROR_TYPE_INFO</a>, PAL_MC_ERROR_STRUCTURE_INFO and PAL_MC_ERROR_DATA_BUFFER are ignored. All other values are reserved. 
-</div>
-</div><p>
-<a class="anchor" name="1fdb283bf0e830af74b054df0572a27d"></a><!-- doxytag: member="PAL_MC_ERROR_TYPE_INFO::Reserved" ref="1fdb283bf0e830af74b054df0572a27d" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dd/d85/a00702.html#1fdb283bf0e830af74b054df0572a27d">PAL_MC_ERROR_TYPE_INFO::Reserved</a>          </td>
+          <td class="memname">struct { ... }   <a class="el" href="../../dd/d85/a00702.html#bcd126338d89063fa86b68f25d2f7268">IA32_IDT_GATE_DESCRIPTOR::Bits</a>          </td>
         </tr>
       </table>
 </div>
@@ -115,25 +99,187 @@ Bit2:0, Indicates the mode of operation for this procedure: 0 - Query mode 1 - E
 
 </div>
 </div><p>
-<a class="anchor" name="449f77ad0060a02eb82af7be70b59a5e"></a><!-- doxytag: member="PAL_MC_ERROR_TYPE_INFO::StructureHierarchy" ref="449f77ad0060a02eb82af7be70b59a5e" args="" -->
+<a class="anchor" name="bcd126338d89063fa86b68f25d2f7268"></a><!-- doxytag: member="IA32_IDT_GATE_DESCRIPTOR::Bits" ref="bcd126338d89063fa86b68f25d2f7268" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dd/d85/a00702.html#449f77ad0060a02eb82af7be70b59a5e">PAL_MC_ERROR_TYPE_INFO::StructureHierarchy</a>          </td>
+          <td class="memname">struct { ... }   <a class="el" href="../../dd/d85/a00702.html#bcd126338d89063fa86b68f25d2f7268">IA32_IDT_GATE_DESCRIPTOR::Bits</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Bit15:13, Indicates the structure hierarchy for error injection/query: 0 - Any level of hierarchy (cannot be used during query mode). When selected, the structure hierarchy used for error injection is determined by PAL. 1<ul>
-<li>Error structure hierarchy level-1 2 - Error structure hierarchy level-2 3 - Error structure hierarchy level-3 4 - Error structure hierarchy level-4 All other values are reserved. Reserved 63:16 Reserved </li></ul>
+
+</div>
+</div><p>
+<a class="anchor" name="39e12cd2ed71678f954386778eebffc6"></a><!-- doxytag: member="IA32_IDT_GATE_DESCRIPTOR::GateType" ref="39e12cd2ed71678f954386778eebffc6" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../dd/d85/a00702.html#39e12cd2ed71678f954386778eebffc6">IA32_IDT_GATE_DESCRIPTOR::GateType</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Gate Type. See defines above. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="108c2ab52813053f16112baf0b746b03"></a><!-- doxytag: member="IA32_IDT_GATE_DESCRIPTOR::OffsetHigh" ref="108c2ab52813053f16112baf0b746b03" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../dd/d85/a00702.html#108c2ab52813053f16112baf0b746b03">IA32_IDT_GATE_DESCRIPTOR::OffsetHigh</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Offset bits 31..16. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="06206d14912ebec886ab3f9088f257b0"></a><!-- doxytag: member="IA32_IDT_GATE_DESCRIPTOR::OffsetLow" ref="06206d14912ebec886ab3f9088f257b0" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../dd/d85/a00702.html#06206d14912ebec886ab3f9088f257b0">IA32_IDT_GATE_DESCRIPTOR::OffsetLow</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Offset bits 15..0. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="1dfc1bdebac7ec04b9e49e41dffa9f28"></a><!-- doxytag: member="IA32_IDT_GATE_DESCRIPTOR::OffsetUpper" ref="1dfc1bdebac7ec04b9e49e41dffa9f28" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../dd/d85/a00702.html#1dfc1bdebac7ec04b9e49e41dffa9f28">IA32_IDT_GATE_DESCRIPTOR::OffsetUpper</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Offset bits 63..32. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="e67d07e553584c3c02ea6f989ffb47e4"></a><!-- doxytag: member="IA32_IDT_GATE_DESCRIPTOR::Reserved_0" ref="e67d07e553584c3c02ea6f989ffb47e4" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../dd/d85/a00702.html#e67d07e553584c3c02ea6f989ffb47e4">IA32_IDT_GATE_DESCRIPTOR::Reserved_0</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Reserved. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="f45baa109c3374f8241a83ee806968fb"></a><!-- doxytag: member="IA32_IDT_GATE_DESCRIPTOR::Reserved_1" ref="f45baa109c3374f8241a83ee806968fb" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../dd/d85/a00702.html#f45baa109c3374f8241a83ee806968fb">IA32_IDT_GATE_DESCRIPTOR::Reserved_1</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Reserved. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="029bdb4b4fd8ce2f4d7b31a8c993d5ee"></a><!-- doxytag: member="IA32_IDT_GATE_DESCRIPTOR::Selector" ref="029bdb4b4fd8ce2f4d7b31a8c993d5ee" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../dd/d85/a00702.html#029bdb4b4fd8ce2f4d7b31a8c993d5ee">IA32_IDT_GATE_DESCRIPTOR::Selector</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Selector. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="2c01ad6272c96ed5c0a588985ce0e6d4"></a><!-- doxytag: member="IA32_IDT_GATE_DESCRIPTOR::Uint128" ref="2c01ad6272c96ed5c0a588985ce0e6d4" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct { ... }   <a class="el" href="../../dd/d85/a00702.html#2c01ad6272c96ed5c0a588985ce0e6d4">IA32_IDT_GATE_DESCRIPTOR::Uint128</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="d782fba9b0bde2feaa57acf0688bd1d2"></a><!-- doxytag: member="IA32_IDT_GATE_DESCRIPTOR::Uint64" ref="d782fba9b0bde2feaa57acf0688bd1d2" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dd/d85/a00702.html#d782fba9b0bde2feaa57acf0688bd1d2">IA32_IDT_GATE_DESCRIPTOR::Uint64</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="20405e784615781522c4de66b79ae479"></a><!-- doxytag: member="IA32_IDT_GATE_DESCRIPTOR::Uint64_1" ref="20405e784615781522c4de66b79ae479" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dd/d85/a00702.html#20405e784615781522c4de66b79ae479">IA32_IDT_GATE_DESCRIPTOR::Uint64_1</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:20 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:52 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

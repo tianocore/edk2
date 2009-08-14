@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Protocol/AuthenticationInfo.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Library/UefiDecompressLib.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,223 +21,130 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Protocol/AuthenticationInfo.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Library/UefiDecompressLib.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
-<tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/dd4/a00291.html">AUTH_NODE_HEADER</a></td></tr>
+<tr><td colspan="2"><br><h2>Functions</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d2/dd5/a01002.html#f3519a25bfa97c295fb23ffec95b1cb1">RETURN_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d17/a01098.html#ce48b4ac263bda2025190b3b88b6669a">UefiDecompressGetInfo</a> (IN CONST VOID *Source, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> SourceSize, OUT <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *DestinationSize, OUT <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *ScratchSize)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/d95/a00299.html">CHAP_RADIUS_AUTH_NODE</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d0d/a00298.html">CHAP_LOCAL_AUTH_NODE</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d0b/a00004.html">_EFI_AUTHENTICATION_INFO_PROTOCOL</a></td></tr>
-
-<tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d17/a01098.html#21793c7ead86383c92b0979d66fd7af3">EFI_AUTHENTICATION_INFO_PROTOCOL_GUID</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d17/a01098.html#537a75a238085ebb7b801f627fae7b68">EFI_AUTHENTICATION_CHAP_RADIUS_GUID</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d17/a01098.html#33a086dbb86b373d9a0dc82b63c79d07">EFI_AUTHENTICATION_CHAP_LOCAL_GUID</a></td></tr>
-
-<tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
-<a class="el" href="../../d0/d0b/a00004.html">_EFI_AUTHENTICATION_INFO_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d17/a01098.html#22c05b89054810931d9cc8ab48a8faaa">EFI_AUTHENTICATION_INFO_PROTOCOL</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d17/a01098.html#aa01d09eb65a125ba2e379f24c66a924">EFI_AUTHENTICATION_PROTOCOL_INFO_GET</a> )(IN <a class="el" href="../../d0/d0b/a00004.html">EFI_AUTHENTICATION_INFO_PROTOCOL</a> *This, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> *ControllerHandle, OUT VOID *Buffer)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d17/a01098.html#e04a397fc34bfbc5d894d03bc8fcf7ec">EFI_AUTHENTICATION_PROTOCOL_INFO_SET</a> )(IN <a class="el" href="../../d0/d0b/a00004.html">EFI_AUTHENTICATION_INFO_PROTOCOL</a> *This, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> *ControllerHandle, IN VOID *Buffer)</td></tr>
-
-<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d17/a01098.html#673378cd4455e8c9cf218e35ca0cf55b">gEfiAuthenticationInfoProtocolGuid</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d17/a01098.html#7873accb85b350601dc3f7c12b9e2aab">gEfiAuthenticationChapRadiusGuid</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d17/a01098.html#1fd55c394a8d14f57c8a84b84f81bbeb">gEfiAuthenticationChapLocalGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d2/dd5/a01002.html#f3519a25bfa97c295fb23ffec95b1cb1">RETURN_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d17/a01098.html#9efc5ecb55afd84aeccc974d6e1ca243">UefiDecompress</a> (IN CONST VOID *Source, IN OUT VOID *Destination, IN OUT VOID *Scratch)</td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-EFI_AUTHENTICATION_INFO_PROTOCOL as defined in UEFI 2.0. This protocol is used on any device handle to obtain authentication information associated with the physical or logical device.<p>
+Provides services to decompress a buffer using the UEFI Decompress algorithm.<p>
+The UEFI Decompress Library enables the decompression of objects that were compressed using the UEFI compression scheme. The UEFI Decompress Library is independent of environment and requires the caller to allocate all required memory buffers.<p>
 Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
-<a class="anchor" name="33a086dbb86b373d9a0dc82b63c79d07"></a><!-- doxytag: member="AuthenticationInfo.h::EFI_AUTHENTICATION_CHAP_LOCAL_GUID" ref="33a086dbb86b373d9a0dc82b63c79d07" args="" -->
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Function Documentation</h2>
+<a class="anchor" name="9efc5ecb55afd84aeccc974d6e1ca243"></a><!-- doxytag: member="UefiDecompressLib.h::UefiDecompress" ref="9efc5ecb55afd84aeccc974d6e1ca243" args="(IN CONST VOID *Source, IN OUT VOID *Destination, IN OUT VOID *Scratch)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_AUTHENTICATION_CHAP_LOCAL_GUID          </td>
+          <td class="memname"><a class="el" href="../../d2/dd5/a01002.html#f3519a25bfa97c295fb23ffec95b1cb1">RETURN_STATUS</a> EFIAPI UefiDecompress           </td>
+          <td>(</td>
+          <td class="paramtype">IN CONST VOID *&nbsp;</td>
+          <td class="paramname"> <em>Source</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN OUT VOID *&nbsp;</td>
+          <td class="paramname"> <em>Destination</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN OUT VOID *&nbsp;</td>
+          <td class="paramname"> <em>Scratch</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-<b>Value:</b><div class="fragment"><pre class="fragment">{ \
-    0xc280c73e, 0x15ca, 0x11da, {0xb0, 0xca, 0x00, 0x10, 0x83, 0xff, 0xca, 0x4d } \
-  }
-</pre></div>
-</div>
-</div><p>
-<a class="anchor" name="537a75a238085ebb7b801f627fae7b68"></a><!-- doxytag: member="AuthenticationInfo.h::EFI_AUTHENTICATION_CHAP_RADIUS_GUID" ref="537a75a238085ebb7b801f627fae7b68" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_AUTHENTICATION_CHAP_RADIUS_GUID          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-<b>Value:</b><div class="fragment"><pre class="fragment">{ \
-    0xd6062b50, 0x15ca, 0x11da, {0x92, 0x19, 0x00, 0x10, 0x83, 0xff, 0xca, 0x4d } \
-  }
-</pre></div>
-</div>
-</div><p>
-<a class="anchor" name="21793c7ead86383c92b0979d66fd7af3"></a><!-- doxytag: member="AuthenticationInfo.h::EFI_AUTHENTICATION_INFO_PROTOCOL_GUID" ref="21793c7ead86383c92b0979d66fd7af3" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_AUTHENTICATION_INFO_PROTOCOL_GUID          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-<b>Value:</b><div class="fragment"><pre class="fragment">{ \
-    0x7671d9d0, 0x53db, 0x4173, {0xaa, 0x69, 0x23, 0x27, 0xf2, 0x1f, 0x0b, 0xc7 } \
-  }
-</pre></div>
-</div>
-</div><p>
-<hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="22c05b89054810931d9cc8ab48a8faaa"></a><!-- doxytag: member="AuthenticationInfo.h::EFI_AUTHENTICATION_INFO_PROTOCOL" ref="22c05b89054810931d9cc8ab48a8faaa" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct <a class="el" href="../../d0/d0b/a00004.html">_EFI_AUTHENTICATION_INFO_PROTOCOL</a> <a class="el" href="../../d0/d0b/a00004.html">EFI_AUTHENTICATION_INFO_PROTOCOL</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="aa01d09eb65a125ba2e379f24c66a924"></a><!-- doxytag: member="AuthenticationInfo.h::EFI_AUTHENTICATION_PROTOCOL_INFO_GET" ref="aa01d09eb65a125ba2e379f24c66a924" args=")(IN EFI_AUTHENTICATION_INFO_PROTOCOL *This, IN EFI_HANDLE *ControllerHandle, OUT VOID *Buffer)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d5/d17/a01098.html#aa01d09eb65a125ba2e379f24c66a924">EFI_AUTHENTICATION_PROTOCOL_INFO_GET</a>)(IN <a class="el" href="../../d0/d0b/a00004.html">EFI_AUTHENTICATION_INFO_PROTOCOL</a> *This, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> *ControllerHandle, OUT VOID *Buffer)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Retrieves the authentication information associated with a particular controller handle.<p>
+Decompresses a compressed source buffer.<p>
+Extracts decompressed data to its original form. This function is designed so that the decompression algorithm can be implemented without using any memory services. As a result, this function is not allowed to call any memory allocation services in its implementation. It is the caller's responsibility to allocate and free the Destination and Scratch buffers. If the compressed source data specified by Source is successfully decompressed into Destination, then RETURN_SUCCESS is returned. If the compressed source data specified by Source is not in a valid compressed data format, then RETURN_INVALID_PARAMETER is returned.<p>
+If Source is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Destination is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the required scratch buffer size &gt; 0 and Scratch is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the EFI_AUTHENTICATION_INFO_PROTOCOL </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ControllerHandle</em>&nbsp;</td><td>Handle to the Controller </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>Pointer to the authentication information.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Source</em>&nbsp;</td><td>The source buffer containing the compressed data. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Destination</em>&nbsp;</td><td>The destination buffer to store the decompressed data </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Scratch</em>&nbsp;</td><td>A temporary scratch buffer that is used to perform the decompression. This is an optional parameter that may be NULL if the required scratch buffer size is 0.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Successfully retrieved authentication information for the given ControllerHandle </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>No matching authentication information found for the given ControllerHandle </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The authentication information could not be retrieved due to a hardware error. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>RETURN_SUCCESS</em>&nbsp;</td><td>Decompression completed successfully, and the uncompressed buffer is returned in Destination. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>RETURN_INVALID_PARAMETER</em>&nbsp;</td><td>The source buffer specified by Source is corrupted (not in a valid compressed format). </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
-<a class="anchor" name="e04a397fc34bfbc5d894d03bc8fcf7ec"></a><!-- doxytag: member="AuthenticationInfo.h::EFI_AUTHENTICATION_PROTOCOL_INFO_SET" ref="e04a397fc34bfbc5d894d03bc8fcf7ec" args=")(IN EFI_AUTHENTICATION_INFO_PROTOCOL *This, IN EFI_HANDLE *ControllerHandle, IN VOID *Buffer)" -->
+<a class="anchor" name="ce48b4ac263bda2025190b3b88b6669a"></a><!-- doxytag: member="UefiDecompressLib.h::UefiDecompressGetInfo" ref="ce48b4ac263bda2025190b3b88b6669a" args="(IN CONST VOID *Source, IN UINT32 SourceSize, OUT UINT32 *DestinationSize, OUT UINT32 *ScratchSize)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d5/d17/a01098.html#e04a397fc34bfbc5d894d03bc8fcf7ec">EFI_AUTHENTICATION_PROTOCOL_INFO_SET</a>)(IN <a class="el" href="../../d0/d0b/a00004.html">EFI_AUTHENTICATION_INFO_PROTOCOL</a> *This, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> *ControllerHandle, IN VOID *Buffer)          </td>
+          <td class="memname"><a class="el" href="../../d2/dd5/a01002.html#f3519a25bfa97c295fb23ffec95b1cb1">RETURN_STATUS</a> EFIAPI UefiDecompressGetInfo           </td>
+          <td>(</td>
+          <td class="paramtype">IN CONST VOID *&nbsp;</td>
+          <td class="paramname"> <em>Source</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td>
+          <td class="paramname"> <em>SourceSize</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">OUT <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *&nbsp;</td>
+          <td class="paramname"> <em>DestinationSize</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">OUT <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *&nbsp;</td>
+          <td class="paramname"> <em>ScratchSize</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Set the authentication information for a given controller handle.<p>
+Given a compressed source buffer, this function retrieves the size of the uncompressed buffer and the size of the scratch buffer required to decompress the compressed source buffer.<p>
+Retrieves the size of the uncompressed buffer and the temporary scratch buffer required to decompress the buffer specified by Source and SourceSize. If the size of the uncompressed buffer or the size of the scratch buffer cannot be determined from the compressed data specified by Source and SourceData, then RETURN_INVALID_PARAMETER is returned. Otherwise, the size of the uncompressed buffer is returned in DestinationSize, the size of the scratch buffer is returned in ScratchSize, and RETURN_SUCCESS is returned. This function does not have scratch buffer available to perform a thorough checking of the validity of the source data. It just retrieves the "Original Size" field from the beginning bytes of the source data and output it as DestinationSize. And ScratchSize is specific to the decompression implementation.<p>
+If Source is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If DestinationSize is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If ScratchSize is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the EFI_AUTHENTICATION_INFO_PROTOCOL </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ControllerHandle</em>&nbsp;</td><td>Handle to the Controller </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>Pointer to the authentication information.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Source</em>&nbsp;</td><td>The source buffer containing the compressed data. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>SourceSize</em>&nbsp;</td><td>The size, in bytes, of the source buffer. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>DestinationSize</em>&nbsp;</td><td>A pointer to the size, in bytes, of the uncompressed buffer that will be generated when the compressed buffer specified by Source and SourceSize is decompressed. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ScratchSize</em>&nbsp;</td><td>A pointer to the size, in bytes, of the scratch buffer that is required to decompress the compressed buffer specified by Source and SourceSize.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Successfully set authentication information for the given ControllerHandle </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>If the platform policies do not allow setting of the authentication information. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The authentication information could not be configured due to a hardware error. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>Not enough storage is available to hold the data. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>RETURN_SUCCESS</em>&nbsp;</td><td>The size of the uncompressed data was returned in DestinationSize and the size of the scratch buffer was returned in ScratchSize. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>RETURN_INVALID_PARAMETER</em>&nbsp;</td><td>The size of the uncompressed data or the size of the scratch buffer cannot be determined from the compressed data specified by Source and SourceSize. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
-<hr><h2>Variable Documentation</h2>
-<a class="anchor" name="1fd55c394a8d14f57c8a84b84f81bbeb"></a><!-- doxytag: member="AuthenticationInfo.h::gEfiAuthenticationChapLocalGuid" ref="1fd55c394a8d14f57c8a84b84f81bbeb" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../d5/d17/a01098.html#1fd55c394a8d14f57c8a84b84f81bbeb">gEfiAuthenticationChapLocalGuid</a>          </td>
-        </tr>
-      </table>
 </div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="7873accb85b350601dc3f7c12b9e2aab"></a><!-- doxytag: member="AuthenticationInfo.h::gEfiAuthenticationChapRadiusGuid" ref="7873accb85b350601dc3f7c12b9e2aab" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../d5/d17/a01098.html#7873accb85b350601dc3f7c12b9e2aab">gEfiAuthenticationChapRadiusGuid</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="673378cd4455e8c9cf218e35ca0cf55b"></a><!-- doxytag: member="AuthenticationInfo.h::gEfiAuthenticationInfoProtocolGuid" ref="673378cd4455e8c9cf218e35ca0cf55b" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../d5/d17/a01098.html#673378cd4455e8c9cf218e35ca0cf55b">gEfiAuthenticationInfoProtocolGuid</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-</div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:09 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:24 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

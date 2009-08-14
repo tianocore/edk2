@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Protocol/Tcp4.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Protocol/DriverDiagnostics.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,150 +21,41 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Protocol/Tcp4.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Protocol/DriverDiagnostics.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d6e/a00613.html">EFI_TCP4_SERVICE_POINT</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/dd8/a00615.html">EFI_TCP4_VARIABLE_DATA</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d94/a00603.html">EFI_TCP4_ACCESS_POINT</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dc0/a00611.html">EFI_TCP4_OPTION</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html">EFI_TCP4_CONFIG_DATA</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d1c/a00605.html">EFI_TCP4_COMPLETION_TOKEN</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d07/a00607.html">EFI_TCP4_CONNECTION_TOKEN</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d6e/a00610.html">EFI_TCP4_LISTEN_TOKEN</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d14/a00608.html">EFI_TCP4_FRAGMENT_DATA</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d8d/a00612.html">EFI_TCP4_RECEIVE_DATA</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d80/a00614.html">EFI_TCP4_TRANSMIT_DATA</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d3f/a00609.html">EFI_TCP4_IO_TOKEN</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d75/a00604.html">EFI_TCP4_CLOSE_TOKEN</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/def/a00256.html">_EFI_TCP4_PROTOCOL</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/de2/a00024.html">_EFI_DRIVER_DIAGNOSTICS_PROTOCOL</a></td></tr>
 
 <tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d0c/a01173.html#4617d8a7ba938bb63caca301330e059e">EFI_TCP4_SERVICE_BINDING_PROTOCOL_GUID</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d0c/a01173.html#cbe9bf0fce46d5a75d4986e4d3a1ad5a">EFI_TCP4_PROTOCOL_GUID</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d0c/a01173.html#24acd46d6627bac0513cd22c20360f35">EFI_CONNECTION_FIN</a>&nbsp;&nbsp;&nbsp;EFIERR (104)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d0c/a01173.html#4a45eb8659bd382763bb1b2d79d7df9d">EFI_CONNECTION_RESET</a>&nbsp;&nbsp;&nbsp;EFIERR (105)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d0c/a01173.html#18d4b500f6ca5ce4360b7f1a1568c971">EFI_CONNECTION_REFUSED</a>&nbsp;&nbsp;&nbsp;EFIERR (106)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d0c/a01173.html#f9fbeb0d44788c91bad2794718f77ffa">EFI_DRIVER_DIAGNOSTICS_PROTOCOL_GUID</a></td></tr>
 
 <tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <a class="el" href="../../d0/def/a00256.html">_EFI_TCP4_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d0c/a01173.html#8da6207d05fe4bf88d8d9826a2c18696">EFI_TCP4_PROTOCOL</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
+<a class="el" href="../../dc/de2/a00024.html">_EFI_DRIVER_DIAGNOSTICS_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d0c/a01173.html#d4c636c5bf5d7aaa8782329437d764dc">EFI_DRIVER_DIAGNOSTICS_PROTOCOL</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d0c/a01173.html#6a9946d3d5fcc25c3fbdbd5fcf9b4c4e">EFI_TCP4_GET_MODE_DATA</a> )(IN CONST <a class="el" href="../../d0/def/a00256.html">EFI_TCP4_PROTOCOL</a> *This, OUT <a class="el" href="../../d7/d0c/a01173.html#55cffeba5078b614f4400b63bccd79fb">EFI_TCP4_CONNECTION_STATE</a> *Tcp4State, OUT <a class="el" href="../../d8/d00/a00606.html">EFI_TCP4_CONFIG_DATA</a> *Tcp4ConfigData, OUT <a class="el" href="../../d8/db6/a00501.html">EFI_IP4_MODE_DATA</a> *Ip4ModeData, OUT <a class="el" href="../../d5/dee/a00518.html">EFI_MANAGED_NETWORK_CONFIG_DATA</a> *MnpConfigData, OUT <a class="el" href="../../de/dde/a00587.html">EFI_SIMPLE_NETWORK_MODE</a> *SnpModeData)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d0c/a01173.html#b39a1bfc6262ddc3d343072f37130ccd">EFI_TCP4_CONFIGURE</a> )(IN <a class="el" href="../../d0/def/a00256.html">EFI_TCP4_PROTOCOL</a> *This, IN <a class="el" href="../../d8/d00/a00606.html">EFI_TCP4_CONFIG_DATA</a> *TcpConfigData)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d0c/a01173.html#41418937d1f1ae057a4e98fba3fbafee">EFI_TCP4_ROUTES</a> )(IN <a class="el" href="../../d0/def/a00256.html">EFI_TCP4_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> DeleteRoute, IN <a class="el" href="../../dc/d30/a00508.html">EFI_IPv4_ADDRESS</a> *SubnetAddress, IN <a class="el" href="../../dc/d30/a00508.html">EFI_IPv4_ADDRESS</a> *SubnetMask, IN <a class="el" href="../../dc/d30/a00508.html">EFI_IPv4_ADDRESS</a> *GatewayAddress)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d0c/a01173.html#f32e377e475aaa175a950c320e4dfdc7">EFI_TCP4_CONNECT</a> )(IN <a class="el" href="../../d0/def/a00256.html">EFI_TCP4_PROTOCOL</a> *This, IN <a class="el" href="../../d9/d07/a00607.html">EFI_TCP4_CONNECTION_TOKEN</a> *ConnectionToken)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d0c/a01173.html#df1fdf572535c422664252e0a505fc9f">EFI_TCP4_ACCEPT</a> )(IN <a class="el" href="../../d0/def/a00256.html">EFI_TCP4_PROTOCOL</a> *This, IN <a class="el" href="../../da/d6e/a00610.html">EFI_TCP4_LISTEN_TOKEN</a> *ListenToken)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d0c/a01173.html#ef88e382b916748de906e96b04fb9f2f">EFI_TCP4_TRANSMIT</a> )(IN <a class="el" href="../../d0/def/a00256.html">EFI_TCP4_PROTOCOL</a> *This, IN <a class="el" href="../../db/d3f/a00609.html">EFI_TCP4_IO_TOKEN</a> *Token)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d0c/a01173.html#b6c3de797f45b51670e6cc2b45361fce">EFI_TCP4_RECEIVE</a> )(IN <a class="el" href="../../d0/def/a00256.html">EFI_TCP4_PROTOCOL</a> *This, IN <a class="el" href="../../db/d3f/a00609.html">EFI_TCP4_IO_TOKEN</a> *Token)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d0c/a01173.html#787f2a8859dbdc4aecfb7040a083b5ad">EFI_TCP4_CLOSE</a> )(IN <a class="el" href="../../d0/def/a00256.html">EFI_TCP4_PROTOCOL</a> *This, IN <a class="el" href="../../d6/d75/a00604.html">EFI_TCP4_CLOSE_TOKEN</a> *CloseToken)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d0c/a01173.html#8897cffd50aa4f6d2546097df4349f23">EFI_TCP4_CANCEL</a> )(IN <a class="el" href="../../d0/def/a00256.html">EFI_TCP4_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d1c/a00605.html">EFI_TCP4_COMPLETION_TOKEN</a> *Token)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d0c/a01173.html#fe0ddbd27cec6983b60cb32d8594ce17">EFI_TCP4_POLL</a> )(IN <a class="el" href="../../d0/def/a00256.html">EFI_TCP4_PROTOCOL</a> *This)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d0c/a01173.html#db77ff2a93d1e759cb73c56d081c7122">EFI_DRIVER_DIAGNOSTICS_RUN_DIAGNOSTICS</a> )(IN <a class="el" href="../../dc/de2/a00024.html">EFI_DRIVER_DIAGNOSTICS_PROTOCOL</a> *This, IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ControllerHandle, IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ChildHandle, IN <a class="el" href="../../d7/d0c/a01173.html#8896a1bb82ebed42766744a282c6ba50">EFI_DRIVER_DIAGNOSTIC_TYPE</a> DiagnosticType, IN <a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Language, OUT <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> **ErrorType, OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *BufferSize, OUT <a class="el" href="../../d0/d90/a01059.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> **Buffer)</td></tr>
 
 <tr><td colspan="2"><br><h2>Enumerations</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d0c/a01173.html#55cffeba5078b614f4400b63bccd79fb">EFI_TCP4_CONNECTION_STATE</a> { <br>
-&nbsp;&nbsp;<a class="el" href="../../d7/d0c/a01173.html#55cffeba5078b614f4400b63bccd79fb31c1c89914dfdbe0a619479299e1fb4c">Tcp4StateClosed</a> =  0, 
-<a class="el" href="../../d7/d0c/a01173.html#55cffeba5078b614f4400b63bccd79fbda89c334083f941fad0a897d94e4e19c">Tcp4StateListen</a> =  1, 
-<a class="el" href="../../d7/d0c/a01173.html#55cffeba5078b614f4400b63bccd79fbfeac8c71b87a57758098fe33c6782a19">Tcp4StateSynSent</a> =  2, 
-<a class="el" href="../../d7/d0c/a01173.html#55cffeba5078b614f4400b63bccd79fb6a3ba7c141ad68a2197b0b9703386311">Tcp4StateSynReceived</a> =  3, 
-<br>
-&nbsp;&nbsp;<a class="el" href="../../d7/d0c/a01173.html#55cffeba5078b614f4400b63bccd79fbc033c282bc3c57b0a52427f3652760ff">Tcp4StateEstablished</a> =  4, 
-<a class="el" href="../../d7/d0c/a01173.html#55cffeba5078b614f4400b63bccd79fb4f2126085b44ccd8dd5cc2bf9b58490e">Tcp4StateFinWait1</a> =  5, 
-<a class="el" href="../../d7/d0c/a01173.html#55cffeba5078b614f4400b63bccd79fb043226bdd2564ec18626f13b410a612c">Tcp4StateFinWait2</a> =  6, 
-<a class="el" href="../../d7/d0c/a01173.html#55cffeba5078b614f4400b63bccd79fb4626d32190b2e4d1eda4e5dec5d873bf">Tcp4StateClosing</a> =  7, 
-<br>
-&nbsp;&nbsp;<a class="el" href="../../d7/d0c/a01173.html#55cffeba5078b614f4400b63bccd79fb90cf5dbeed8653934cc35206f6d439b1">Tcp4StateTimeWait</a> =  8, 
-<a class="el" href="../../d7/d0c/a01173.html#55cffeba5078b614f4400b63bccd79fbbc917238c7d5dc890a848d766b73e1e9">Tcp4StateCloseWait</a> =  9, 
-<a class="el" href="../../d7/d0c/a01173.html#55cffeba5078b614f4400b63bccd79fbd0913390a5c0e2b0efc482a769e6efd8">Tcp4StateLastAck</a> =  10
-<br>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d0c/a01173.html#8896a1bb82ebed42766744a282c6ba50">EFI_DRIVER_DIAGNOSTIC_TYPE</a> { <a class="el" href="../../d7/d0c/a01173.html#8896a1bb82ebed42766744a282c6ba50b6962d1adb100651378d5c8a03f3a71d">EfiDriverDiagnosticTypeStandard</a> =  0, 
+<a class="el" href="../../d7/d0c/a01173.html#8896a1bb82ebed42766744a282c6ba505db8324c69634ecb6352a1730e350554">EfiDriverDiagnosticTypeExtended</a> =  1, 
+<a class="el" href="../../d7/d0c/a01173.html#8896a1bb82ebed42766744a282c6ba506caef3ef086f421fda7e0170284320e2">EfiDriverDiagnosticTypeManufacturing</a> =  2, 
+<a class="el" href="../../d7/d0c/a01173.html#8896a1bb82ebed42766744a282c6ba501318539223330aab64019c7710f900ca">EfiDriverDiagnosticTypeMaximum</a>
  }</td></tr>
 
 <tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d0c/a01173.html#672a4dda4763269940dd583b08bdfff0">gEfiTcp4ServiceBindingProtocolGuid</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d0c/a01173.html#465ffb7fe40e1194a1be351a6b36cff0">gEfiTcp4ProtocolGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d0c/a01173.html#52d922d56bb7ac4f6d89f139f07890ba">gEfiDriverDiagnosticsProtocolGuid</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-EFI TCPv4 Protocol Definition The EFI TCPv4 Service Binding Protocol is used to locate EFI TCPv4 Protocol drivers to create and destroy child of the driver to communicate with other host using TCP protocol. The EFI TCPv4 Protocol provides services to send and receive data stream.<p>
+EFI Driver Diagnostics Protocol<p>
 Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
-<a class="anchor" name="24acd46d6627bac0513cd22c20360f35"></a><!-- doxytag: member="Tcp4.h::EFI_CONNECTION_FIN" ref="24acd46d6627bac0513cd22c20360f35" args="" -->
+<a class="anchor" name="f9fbeb0d44788c91bad2794718f77ffa"></a><!-- doxytag: member="DriverDiagnostics.h::EFI_DRIVER_DIAGNOSTICS_PROTOCOL_GUID" ref="f9fbeb0d44788c91bad2794718f77ffa" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_CONNECTION_FIN&nbsp;&nbsp;&nbsp;EFIERR (104)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="18d4b500f6ca5ce4360b7f1a1568c971"></a><!-- doxytag: member="Tcp4.h::EFI_CONNECTION_REFUSED" ref="18d4b500f6ca5ce4360b7f1a1568c971" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_CONNECTION_REFUSED&nbsp;&nbsp;&nbsp;EFIERR (106)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="4a45eb8659bd382763bb1b2d79d7df9d"></a><!-- doxytag: member="Tcp4.h::EFI_CONNECTION_RESET" ref="4a45eb8659bd382763bb1b2d79d7df9d" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_CONNECTION_RESET&nbsp;&nbsp;&nbsp;EFIERR (105)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="cbe9bf0fce46d5a75d4986e4d3a1ad5a"></a><!-- doxytag: member="Tcp4.h::EFI_TCP4_PROTOCOL_GUID" ref="cbe9bf0fce46d5a75d4986e4d3a1ad5a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_TCP4_PROTOCOL_GUID          </td>
+          <td class="memname">#define EFI_DRIVER_DIAGNOSTICS_PROTOCOL_GUID          </td>
         </tr>
       </table>
 </div>
@@ -172,273 +63,18 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 <p>
 <b>Value:</b><div class="fragment"><pre class="fragment">{ \
-    0x65530BC7, 0xA359, 0x410f, {0xB0, 0x10, 0x5A, 0xAD, 0xC7, 0xEC, 0x2B, 0x62 } \
+    0x0784924f, 0xe296, 0x11d4, {0x9a, 0x49, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d } \
   }
-</pre></div>
-</div>
-</div><p>
-<a class="anchor" name="4617d8a7ba938bb63caca301330e059e"></a><!-- doxytag: member="Tcp4.h::EFI_TCP4_SERVICE_BINDING_PROTOCOL_GUID" ref="4617d8a7ba938bb63caca301330e059e" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_TCP4_SERVICE_BINDING_PROTOCOL_GUID          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-<b>Value:</b><div class="fragment"><pre class="fragment">{ \
-    0x00720665, 0x67EB, 0x4a99, {0xBA, 0xF7, 0xD3, 0xC3, 0x3A, 0x1C, 0x7C, 0xC9 } \
-  }
-</pre></div>
+</pre></div>Global ID for the Driver Diagnostics Protocol as defined in EFI 1.1. 
 </div>
 </div><p>
 <hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="df1fdf572535c422664252e0a505fc9f"></a><!-- doxytag: member="Tcp4.h::EFI_TCP4_ACCEPT" ref="df1fdf572535c422664252e0a505fc9f" args=")(IN EFI_TCP4_PROTOCOL *This, IN EFI_TCP4_LISTEN_TOKEN *ListenToken)" -->
+<a class="anchor" name="d4c636c5bf5d7aaa8782329437d764dc"></a><!-- doxytag: member="DriverDiagnostics.h::EFI_DRIVER_DIAGNOSTICS_PROTOCOL" ref="d4c636c5bf5d7aaa8782329437d764dc" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d7/d0c/a01173.html#df1fdf572535c422664252e0a505fc9f">EFI_TCP4_ACCEPT</a>)(IN <a class="el" href="../../d0/def/a00256.html">EFI_TCP4_PROTOCOL</a> *This, IN <a class="el" href="../../da/d6e/a00610.html">EFI_TCP4_LISTEN_TOKEN</a> *ListenToken)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Listen on the passive instance to accept an incoming connection request. This is a nonblocking operation.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the EFI_TCP4_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ListenToken</em>&nbsp;</td><td>Pointer to the listen token to return when operation finishes.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The listen token has been queued successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_STARTED</em>&nbsp;</td><td>This EFI TCPv4 Protocol instance has not been configured. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ACCESS_DENIED</em>&nbsp;</td><td>One or more of the following are TRUE:<ul>
-<li>This instance is not a passive instance.</li><li>This instance is not in Tcp4StateListen state.</li><li>The same listen token has already existed in the listen token queue of this TCP instance. </li></ul>
-</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>One or more of the following are TRUE:<ul>
-<li>This is NULL.</li><li>ListenToken is NULL.</li><li>ListentToken-&gt;CompletionToken.Event is NULL. </li></ul>
-</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>Could not allocate enough resources to finish the operation. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>Any unexpected error not covered by another error. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="8897cffd50aa4f6d2546097df4349f23"></a><!-- doxytag: member="Tcp4.h::EFI_TCP4_CANCEL" ref="8897cffd50aa4f6d2546097df4349f23" args=")(IN EFI_TCP4_PROTOCOL *This, IN EFI_TCP4_COMPLETION_TOKEN *Token)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d7/d0c/a01173.html#8897cffd50aa4f6d2546097df4349f23">EFI_TCP4_CANCEL</a>)(IN <a class="el" href="../../d0/def/a00256.html">EFI_TCP4_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d1c/a00605.html">EFI_TCP4_COMPLETION_TOKEN</a> *Token)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Abort an asynchronous connection, listen, transmission or receive request.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the EFI_TCP4_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Token</em>&nbsp;</td><td>Pointer to a token that has been issued by <a class="el" href="../../d0/def/a00256.html#18d77ff631d4dcde93b2b0c197c39cf4">EFI_TCP4_PROTOCOL.Connect()</a>, <a class="el" href="../../d0/def/a00256.html#0eac0f7f0fa299c739c7a78a26009930">EFI_TCP4_PROTOCOL.Accept()</a>, <a class="el" href="../../d0/def/a00256.html#e54e67ddb3a670a76c0c0ea70da85b3f">EFI_TCP4_PROTOCOL.Transmit()</a> or <a class="el" href="../../d0/def/a00256.html#6c07313001238bb7ee53d4268b6dca55">EFI_TCP4_PROTOCOL.Receive()</a>. If NULL, all pending tokens issued by above four functions will be aborted. Type <a class="el" href="../../d0/d1c/a00605.html">EFI_TCP4_COMPLETION_TOKEN</a> is defined in <a class="el" href="../../d0/def/a00256.html#18d77ff631d4dcde93b2b0c197c39cf4">EFI_TCP4_PROTOCOL.Connect()</a>.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Incoming or outgoing data was processed. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>This is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>An unexpected system or network error occurred. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_READY</em>&nbsp;</td><td>No incoming or outgoing data is processed. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_TIMEOUT</em>&nbsp;</td><td>Data was dropped out of the transmission or receive queue. Consider increasing the polling rate. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="787f2a8859dbdc4aecfb7040a083b5ad"></a><!-- doxytag: member="Tcp4.h::EFI_TCP4_CLOSE" ref="787f2a8859dbdc4aecfb7040a083b5ad" args=")(IN EFI_TCP4_PROTOCOL *This, IN EFI_TCP4_CLOSE_TOKEN *CloseToken)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d7/d0c/a01173.html#787f2a8859dbdc4aecfb7040a083b5ad">EFI_TCP4_CLOSE</a>)(IN <a class="el" href="../../d0/def/a00256.html">EFI_TCP4_PROTOCOL</a> *This, IN <a class="el" href="../../d6/d75/a00604.html">EFI_TCP4_CLOSE_TOKEN</a> *CloseToken)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Disconnecting a TCP connection gracefully or reset a TCP connection. This function is a nonblocking operation.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the EFI_TCP4_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>CloseToken</em>&nbsp;</td><td>Pointer to the close token to return when operation finishes.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The Close() is called successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_STARTED</em>&nbsp;</td><td>This EFI TCPv4 Protocol instance has not been configured. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ACCESS_DENIED</em>&nbsp;</td><td>One or more of the following are TRUE:<ul>
-<li>Configure() has been called with TcpConfigData set to NULL and this function has not returned.</li><li>Previous Close() call on this instance has not finished. </li></ul>
-</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>One or more of the following are TRUE:<ul>
-<li>This is NULL.</li><li>CloseToken is NULL.</li><li>CloseToken-&gt;CompletionToken.Event is NULL. </li></ul>
-</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>Could not allocate enough resources to finish the operation. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>Any unexpected error not covered by another error. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="b39a1bfc6262ddc3d343072f37130ccd"></a><!-- doxytag: member="Tcp4.h::EFI_TCP4_CONFIGURE" ref="b39a1bfc6262ddc3d343072f37130ccd" args=")(IN EFI_TCP4_PROTOCOL *This, IN EFI_TCP4_CONFIG_DATA *TcpConfigData)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d7/d0c/a01173.html#b39a1bfc6262ddc3d343072f37130ccd">EFI_TCP4_CONFIGURE</a>)(IN <a class="el" href="../../d0/def/a00256.html">EFI_TCP4_PROTOCOL</a> *This, IN <a class="el" href="../../d8/d00/a00606.html">EFI_TCP4_CONFIG_DATA</a> *TcpConfigData)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Initialize or brutally reset the operational parameters for this EFI TCPv4 instance.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the EFI_TCP4_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Tcp4ConfigData</em>&nbsp;</td><td>Pointer to the configure data to configure the instance.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The operational settings are set, changed, or reset successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Some parameter is invalid. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NO_MAPPING</em>&nbsp;</td><td>When using a default address, configuration (through DHCP, BOOTP, RARP, etc.) is not finished yet. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ACCESS_DENIED</em>&nbsp;</td><td>Configuring TCP instance when it is configured without calling Configure() with NULL to reset it. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>An unexpected network or system error occurred. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>One or more of the control options are not supported in the implementation. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>Could not allocate enough system resources when executing Configure(). </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="f32e377e475aaa175a950c320e4dfdc7"></a><!-- doxytag: member="Tcp4.h::EFI_TCP4_CONNECT" ref="f32e377e475aaa175a950c320e4dfdc7" args=")(IN EFI_TCP4_PROTOCOL *This, IN EFI_TCP4_CONNECTION_TOKEN *ConnectionToken)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d7/d0c/a01173.html#f32e377e475aaa175a950c320e4dfdc7">EFI_TCP4_CONNECT</a>)(IN <a class="el" href="../../d0/def/a00256.html">EFI_TCP4_PROTOCOL</a> *This, IN <a class="el" href="../../d9/d07/a00607.html">EFI_TCP4_CONNECTION_TOKEN</a> *ConnectionToken)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Initiate a nonblocking TCP connection request for an active TCP instance.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the EFI_TCP4_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ConnectionToken</em>&nbsp;</td><td>Pointer to the connection token to return when the TCP three way handshake finishes.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The connection request is successfully initiated and the state<ul>
-<li>of this TCPv4 instance has been changed to</li><li>Tcp4StateSynSent. </li></ul>
-</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_STARTED</em>&nbsp;</td><td>This EFI TCPv4 Protocol instance has not been configured. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ACCESS_DENIED</em>&nbsp;</td><td>One or more of the following conditions are TRUE:<ul>
-<li>This instance is not configured as an active one.</li><li>This instance is not in Tcp4StateClosed state. </li></ul>
-</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>One or more of the following are TRUE:<ul>
-<li>This is NULL.</li><li>ConnectionToken is NULL.</li><li>ConnectionToken-&gt;CompletionToken.Event is NULL. </li></ul>
-</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>The driver can't allocate enough resources to initiate the activeopen. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>An unexpected system or network error occurred. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="6a9946d3d5fcc25c3fbdbd5fcf9b4c4e"></a><!-- doxytag: member="Tcp4.h::EFI_TCP4_GET_MODE_DATA" ref="6a9946d3d5fcc25c3fbdbd5fcf9b4c4e" args=")(IN CONST EFI_TCP4_PROTOCOL *This, OUT EFI_TCP4_CONNECTION_STATE *Tcp4State, OUT EFI_TCP4_CONFIG_DATA *Tcp4ConfigData, OUT EFI_IP4_MODE_DATA *Ip4ModeData, OUT EFI_MANAGED_NETWORK_CONFIG_DATA *MnpConfigData, OUT EFI_SIMPLE_NETWORK_MODE *SnpModeData)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d7/d0c/a01173.html#6a9946d3d5fcc25c3fbdbd5fcf9b4c4e">EFI_TCP4_GET_MODE_DATA</a>)(IN CONST <a class="el" href="../../d0/def/a00256.html">EFI_TCP4_PROTOCOL</a> *This, OUT <a class="el" href="../../d7/d0c/a01173.html#55cffeba5078b614f4400b63bccd79fb">EFI_TCP4_CONNECTION_STATE</a> *Tcp4State, OUT <a class="el" href="../../d8/d00/a00606.html">EFI_TCP4_CONFIG_DATA</a> *Tcp4ConfigData, OUT <a class="el" href="../../d8/db6/a00501.html">EFI_IP4_MODE_DATA</a> *Ip4ModeData, OUT <a class="el" href="../../d5/dee/a00518.html">EFI_MANAGED_NETWORK_CONFIG_DATA</a> *MnpConfigData, OUT <a class="el" href="../../de/dde/a00587.html">EFI_SIMPLE_NETWORK_MODE</a> *SnpModeData)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Get the current operational status.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the EFI_TCP4_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Tcp4State</em>&nbsp;</td><td>Pointer to the buffer to receive the current TCP state. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Tcp4ConfigData</em>&nbsp;</td><td>Pointer to the buffer to receive the current TCP configuration. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Ip4ModeData</em>&nbsp;</td><td>Pointer to the buffer to receive the current IPv4 configuration data used by the TCPv4 instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>MnpConfigData</em>&nbsp;</td><td>Pointer to the buffer to receive the current MNP configuration data used indirectly by the TCPv4 instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SnpModeData</em>&nbsp;</td><td>Pointer to the buffer to receive the current SNP configuration data used indirectly by the TCPv4 instance.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The mode data was read. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>This is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_STARTED</em>&nbsp;</td><td>No configuration data is available because this instance hasn't been started. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="fe0ddbd27cec6983b60cb32d8594ce17"></a><!-- doxytag: member="Tcp4.h::EFI_TCP4_POLL" ref="fe0ddbd27cec6983b60cb32d8594ce17" args=")(IN EFI_TCP4_PROTOCOL *This)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d7/d0c/a01173.html#fe0ddbd27cec6983b60cb32d8594ce17">EFI_TCP4_POLL</a>)(IN <a class="el" href="../../d0/def/a00256.html">EFI_TCP4_PROTOCOL</a> *This)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Poll to receive incoming data and transmit outgoing segments.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the EFI_TCP4_PROTOCOL instance.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Incoming or outgoing data was processed. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>This is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>An unexpected system or network error occurred. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_READY</em>&nbsp;</td><td>No incoming or outgoing data is processed. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_TIMEOUT</em>&nbsp;</td><td>Data was dropped out of the transmission or receive queue. Consider increasing the polling rate. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="8da6207d05fe4bf88d8d9826a2c18696"></a><!-- doxytag: member="Tcp4.h::EFI_TCP4_PROTOCOL" ref="8da6207d05fe4bf88d8d9826a2c18696" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct <a class="el" href="../../d0/def/a00256.html">_EFI_TCP4_PROTOCOL</a> <a class="el" href="../../d0/def/a00256.html">EFI_TCP4_PROTOCOL</a>          </td>
+          <td class="memname">typedef struct <a class="el" href="../../dc/de2/a00024.html">_EFI_DRIVER_DIAGNOSTICS_PROTOCOL</a> <a class="el" href="../../dc/de2/a00024.html">EFI_DRIVER_DIAGNOSTICS_PROTOCOL</a>          </td>
         </tr>
       </table>
 </div>
@@ -448,158 +84,73 @@ Poll to receive incoming data and transmit outgoing segments.<p>
 
 </div>
 </div><p>
-<a class="anchor" name="b6c3de797f45b51670e6cc2b45361fce"></a><!-- doxytag: member="Tcp4.h::EFI_TCP4_RECEIVE" ref="b6c3de797f45b51670e6cc2b45361fce" args=")(IN EFI_TCP4_PROTOCOL *This, IN EFI_TCP4_IO_TOKEN *Token)" -->
+<a class="anchor" name="db77ff2a93d1e759cb73c56d081c7122"></a><!-- doxytag: member="DriverDiagnostics.h::EFI_DRIVER_DIAGNOSTICS_RUN_DIAGNOSTICS" ref="db77ff2a93d1e759cb73c56d081c7122" args=")(IN EFI_DRIVER_DIAGNOSTICS_PROTOCOL *This, IN EFI_HANDLE ControllerHandle, IN EFI_HANDLE ChildHandle, IN EFI_DRIVER_DIAGNOSTIC_TYPE DiagnosticType, IN CHAR8 *Language, OUT EFI_GUID **ErrorType, OUT UINTN *BufferSize, OUT CHAR16 **Buffer)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d7/d0c/a01173.html#b6c3de797f45b51670e6cc2b45361fce">EFI_TCP4_RECEIVE</a>)(IN <a class="el" href="../../d0/def/a00256.html">EFI_TCP4_PROTOCOL</a> *This, IN <a class="el" href="../../db/d3f/a00609.html">EFI_TCP4_IO_TOKEN</a> *Token)          </td>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d7/d0c/a01173.html#db77ff2a93d1e759cb73c56d081c7122">EFI_DRIVER_DIAGNOSTICS_RUN_DIAGNOSTICS</a>)(IN <a class="el" href="../../dc/de2/a00024.html">EFI_DRIVER_DIAGNOSTICS_PROTOCOL</a> *This, IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ControllerHandle, IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ChildHandle, IN <a class="el" href="../../d7/d0c/a01173.html#8896a1bb82ebed42766744a282c6ba50">EFI_DRIVER_DIAGNOSTIC_TYPE</a> DiagnosticType, IN <a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Language, OUT <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> **ErrorType, OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *BufferSize, OUT <a class="el" href="../../d0/d90/a01059.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> **Buffer)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Places an asynchronous receive request into the receiving queue.<p>
+Runs diagnostics on a controller.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the EFI_TCP4_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Token</em>&nbsp;</td><td>Pointer to a token that is associated with the receive data descriptor.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_DRIVER_DIAGNOSTICS_PROTOCOL instance. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ControllerHandle</em>&nbsp;</td><td>The handle of the controller to run diagnostics on. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ChildHandle</em>&nbsp;</td><td>The handle of the child controller to run diagnostics on This is an optional parameter that may be NULL. It will be NULL for device drivers. It will also be NULL for a bus drivers that wish to run diagnostics on the bus controller. It will not be NULL for a bus driver that wishes to run diagnostics on one of its child controllers. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>DiagnosticType</em>&nbsp;</td><td>Indicates type of diagnostics to perform on the controller specified by ControllerHandle and ChildHandle. See "Related Definitions" for the list of supported types. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Language</em>&nbsp;</td><td>A pointer to a three character ISO 639-2 language identifier. This is the language in which the optional error message should be returned in Buffer, and it must match one of the languages specified in SupportedLanguages. The number of languages supported by a driver is up to the driver writer. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ErrorType</em>&nbsp;</td><td>A <a class="el" href="../../d1/d87/a00689.html">GUID</a> that defines the format of the data returned in Buffer. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>BufferSize</em>&nbsp;</td><td>The size, in bytes, of the data returned in Buffer. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>A buffer that contains a Null-terminated Unicode string plus some additional data whose format is defined by ErrorType. Buffer is allocated by this function with <a class="el" href="../../d6/d6a/a01072.html#646c0f82c2a35557dda175dbfcd26e96">AllocatePool()</a>, and it is the caller's responsibility to free it with a call to <a class="el" href="../../d6/d6a/a01072.html#8b1cbc21e0cebcfc6a992546ec9b4941">FreePool()</a>.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The receive completion token was cached. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_STARTED</em>&nbsp;</td><td>This EFI TCPv4 Protocol instance has not been configured. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NO_MAPPING</em>&nbsp;</td><td>When using a default address, configuration (DHCP, BOOTP, RARP, etc.) is not finished yet. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>One or more of the following conditions is TRUE:<ul>
-<li>This is NULL.</li><li>Token is NULL.</li><li>Token-&gt;CompletionToken.Event is NULL.</li><li>Token-&gt;Packet.RxData is NULL.</li><li>Token-&gt;Packet.RxData-&gt;DataLength is 0.</li><li>The Token-&gt;Packet.RxData-&gt;DataLength is not the sum of all FragmentBuffer length in FragmentTable. </li></ul>
-</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>The receive completion token could not be queued due to a lack of system resources (usually memory). </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>An unexpected system or network error occurred. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ACCESS_DENIED</em>&nbsp;</td><td>One or more of the following conditions is TRUE:<ul>
-<li>A receive completion token with the same Token- &gt;CompletionToken.Event was already in the receive queue.</li><li>The current instance is in Tcp4StateClosed state.</li><li>The current instance is a passive one and it is in Tcp4StateListen state.</li><li>User has called Close() to disconnect this connection. </li></ul>
-</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_CONNECTION_FIN</em>&nbsp;</td><td>The communication peer has closed the connection and there is no buffered data in the receive buffer of this instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_READY</em>&nbsp;</td><td>The receive request could not be queued because the receive queue is full. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="41418937d1f1ae057a4e98fba3fbafee"></a><!-- doxytag: member="Tcp4.h::EFI_TCP4_ROUTES" ref="41418937d1f1ae057a4e98fba3fbafee" args=")(IN EFI_TCP4_PROTOCOL *This, IN BOOLEAN DeleteRoute, IN EFI_IPv4_ADDRESS *SubnetAddress, IN EFI_IPv4_ADDRESS *SubnetMask, IN EFI_IPv4_ADDRESS *GatewayAddress)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d7/d0c/a01173.html#41418937d1f1ae057a4e98fba3fbafee">EFI_TCP4_ROUTES</a>)(IN <a class="el" href="../../d0/def/a00256.html">EFI_TCP4_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> DeleteRoute, IN <a class="el" href="../../dc/d30/a00508.html">EFI_IPv4_ADDRESS</a> *SubnetAddress, IN <a class="el" href="../../dc/d30/a00508.html">EFI_IPv4_ADDRESS</a> *SubnetMask, IN <a class="el" href="../../dc/d30/a00508.html">EFI_IPv4_ADDRESS</a> *GatewayAddress)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Add or delete a route entry to the route table<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the EFI_TCP4_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DeleteRoute</em>&nbsp;</td><td>Set it to TRUE to delete this route from the routing table. Set it to FALSE to add this route to the routing table. DestinationAddress and SubnetMask are used as the keywords to search route entry. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SubnetAddress</em>&nbsp;</td><td>The destination network. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SubnetMask</em>&nbsp;</td><td>The subnet mask of the destination network. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>GatewayAddress</em>&nbsp;</td><td>The gateway address for this route. It must be on the same subnet with the station address unless a direct route is specified.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The operation completed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_STARTED</em>&nbsp;</td><td>The EFI TCPv4 Protocol instance has not been configured. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NO_MAPPING</em>&nbsp;</td><td>When using a default address, configuration (DHCP, BOOTP, RARP, etc.) is not finished yet. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>One or more of the following conditions is TRUE:<ul>
-<li>This is NULL.</li><li>SubnetAddress is NULL.</li><li>SubnetMask is NULL.</li><li>GatewayAddress is NULL.</li><li>*SubnetAddress is not NULL a valid subnet address.</li><li>*SubnetMask is not a valid subnet mask.</li><li>*GatewayAddress is not a valid unicast IP address or it is not in the same subnet. </li></ul>
-</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>Could not allocate enough resources to add the entry to the routing table. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>This route is not in the routing table. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ACCESS_DENIED</em>&nbsp;</td><td>The route is already defined in the routing table. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The TCP driver does not support this operation. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="ef88e382b916748de906e96b04fb9f2f"></a><!-- doxytag: member="Tcp4.h::EFI_TCP4_TRANSMIT" ref="ef88e382b916748de906e96b04fb9f2f" args=")(IN EFI_TCP4_PROTOCOL *This, IN EFI_TCP4_IO_TOKEN *Token)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d7/d0c/a01173.html#ef88e382b916748de906e96b04fb9f2f">EFI_TCP4_TRANSMIT</a>)(IN <a class="el" href="../../d0/def/a00256.html">EFI_TCP4_PROTOCOL</a> *This, IN <a class="el" href="../../db/d3f/a00609.html">EFI_TCP4_IO_TOKEN</a> *Token)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Queues outgoing data into the transmit queue.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the EFI_TCP4_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Token</em>&nbsp;</td><td>Pointer to the completion token to queue to the transmit queue.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The data has been queued for transmission. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_STARTED</em>&nbsp;</td><td>This EFI TCPv4 Protocol instance has not been configured. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NO_MAPPING</em>&nbsp;</td><td>When using a default address, configuration (DHCP, BOOTP, RARP, etc.) is not finished yet. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>One or more of the following are TRUE:<ul>
-<li>This is NULL.</li><li>Token is NULL.</li><li>Token-&gt;CompletionToken.Event is NULL.</li><li>Token-&gt;Packet.TxData is NULL L.</li><li>Token-&gt;Packet.FragmentCount is zero.</li><li>Token-&gt;Packet.DataLength is not equal to the sum of fragment lengths. </li></ul>
-</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ACCESS_DENIED</em>&nbsp;</td><td>One or more of the following conditions is TRUE:<ul>
-<li>A transmit completion token with the same Token-&gt;CompletionToken.Event was already in the transmission queue.</li><li>The current instance is in Tcp4StateClosed state.</li><li>The current instance is a passive one and it is in Tcp4StateListen state.</li><li>User has called Close() to disconnect this connection. </li></ul>
-</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_READY</em>&nbsp;</td><td>The completion token could not be queued because the transmit queue is full. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>Could not queue the transmit data because of resource shortage. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NETWORK_UNREACHABLE</em>&nbsp;</td><td>There is no route to the destination network or address. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The controller specified by ControllerHandle and ChildHandle passed the diagnostic. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>ControllerHandle is not a valid EFI_HANDLE. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>ChildHandle is not NULL and it is not a valid EFI_HANDLE. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Language is NULL. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>ErrorType is NULL. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>BufferType is NULL. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Buffer is NULL. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The driver specified by This does not support running diagnostics for the controller specified by ControllerHandle and ChildHandle. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The driver specified by This does not support the type of diagnostic specified by DiagnosticType. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The driver specified by This does not support the language specified by Language. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There are not enough resources available to complete the diagnostics. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There are not enough resources available to return the status information in ErrorType, BufferSize, and Buffer. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The controller specified by ControllerHandle and ChildHandle did not pass the diagnostic. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
 <hr><h2>Enumeration Type Documentation</h2>
-<a class="anchor" name="55cffeba5078b614f4400b63bccd79fb"></a><!-- doxytag: member="Tcp4.h::EFI_TCP4_CONNECTION_STATE" ref="55cffeba5078b614f4400b63bccd79fb" args="" -->
+<a class="anchor" name="8896a1bb82ebed42766744a282c6ba50"></a><!-- doxytag: member="DriverDiagnostics.h::EFI_DRIVER_DIAGNOSTIC_TYPE" ref="8896a1bb82ebed42766744a282c6ba50" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="../../d7/d0c/a01173.html#55cffeba5078b614f4400b63bccd79fb">EFI_TCP4_CONNECTION_STATE</a>          </td>
+          <td class="memname">enum <a class="el" href="../../d7/d0c/a01173.html#8896a1bb82ebed42766744a282c6ba50">EFI_DRIVER_DIAGNOSTIC_TYPE</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-TCP4 connnection state <dl compact><dt><b>Enumerator: </b></dt><dd>
+<dl compact><dt><b>Enumerator: </b></dt><dd>
 <table border="0" cellspacing="2" cellpadding="0">
-<tr><td valign="top"><em><a class="anchor" name="55cffeba5078b614f4400b63bccd79fb31c1c89914dfdbe0a619479299e1fb4c"></a><!-- doxytag: member="Tcp4StateClosed" ref="55cffeba5078b614f4400b63bccd79fb31c1c89914dfdbe0a619479299e1fb4c" args="" -->Tcp4StateClosed</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" name="55cffeba5078b614f4400b63bccd79fbda89c334083f941fad0a897d94e4e19c"></a><!-- doxytag: member="Tcp4StateListen" ref="55cffeba5078b614f4400b63bccd79fbda89c334083f941fad0a897d94e4e19c" args="" -->Tcp4StateListen</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" name="55cffeba5078b614f4400b63bccd79fbfeac8c71b87a57758098fe33c6782a19"></a><!-- doxytag: member="Tcp4StateSynSent" ref="55cffeba5078b614f4400b63bccd79fbfeac8c71b87a57758098fe33c6782a19" args="" -->Tcp4StateSynSent</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" name="55cffeba5078b614f4400b63bccd79fb6a3ba7c141ad68a2197b0b9703386311"></a><!-- doxytag: member="Tcp4StateSynReceived" ref="55cffeba5078b614f4400b63bccd79fb6a3ba7c141ad68a2197b0b9703386311" args="" -->Tcp4StateSynReceived</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" name="55cffeba5078b614f4400b63bccd79fbc033c282bc3c57b0a52427f3652760ff"></a><!-- doxytag: member="Tcp4StateEstablished" ref="55cffeba5078b614f4400b63bccd79fbc033c282bc3c57b0a52427f3652760ff" args="" -->Tcp4StateEstablished</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" name="55cffeba5078b614f4400b63bccd79fb4f2126085b44ccd8dd5cc2bf9b58490e"></a><!-- doxytag: member="Tcp4StateFinWait1" ref="55cffeba5078b614f4400b63bccd79fb4f2126085b44ccd8dd5cc2bf9b58490e" args="" -->Tcp4StateFinWait1</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" name="55cffeba5078b614f4400b63bccd79fb043226bdd2564ec18626f13b410a612c"></a><!-- doxytag: member="Tcp4StateFinWait2" ref="55cffeba5078b614f4400b63bccd79fb043226bdd2564ec18626f13b410a612c" args="" -->Tcp4StateFinWait2</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" name="55cffeba5078b614f4400b63bccd79fb4626d32190b2e4d1eda4e5dec5d873bf"></a><!-- doxytag: member="Tcp4StateClosing" ref="55cffeba5078b614f4400b63bccd79fb4626d32190b2e4d1eda4e5dec5d873bf" args="" -->Tcp4StateClosing</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" name="55cffeba5078b614f4400b63bccd79fb90cf5dbeed8653934cc35206f6d439b1"></a><!-- doxytag: member="Tcp4StateTimeWait" ref="55cffeba5078b614f4400b63bccd79fb90cf5dbeed8653934cc35206f6d439b1" args="" -->Tcp4StateTimeWait</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" name="55cffeba5078b614f4400b63bccd79fbbc917238c7d5dc890a848d766b73e1e9"></a><!-- doxytag: member="Tcp4StateCloseWait" ref="55cffeba5078b614f4400b63bccd79fbbc917238c7d5dc890a848d766b73e1e9" args="" -->Tcp4StateCloseWait</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" name="55cffeba5078b614f4400b63bccd79fbd0913390a5c0e2b0efc482a769e6efd8"></a><!-- doxytag: member="Tcp4StateLastAck" ref="55cffeba5078b614f4400b63bccd79fbd0913390a5c0e2b0efc482a769e6efd8" args="" -->Tcp4StateLastAck</em>&nbsp;</td><td>
+<tr><td valign="top"><em><a class="anchor" name="8896a1bb82ebed42766744a282c6ba50b6962d1adb100651378d5c8a03f3a71d"></a><!-- doxytag: member="EfiDriverDiagnosticTypeStandard" ref="8896a1bb82ebed42766744a282c6ba50b6962d1adb100651378d5c8a03f3a71d" args="" -->EfiDriverDiagnosticTypeStandard</em>&nbsp;</td><td>
+Performs standard diagnostics on the controller. </td></tr>
+<tr><td valign="top"><em><a class="anchor" name="8896a1bb82ebed42766744a282c6ba505db8324c69634ecb6352a1730e350554"></a><!-- doxytag: member="EfiDriverDiagnosticTypeExtended" ref="8896a1bb82ebed42766744a282c6ba505db8324c69634ecb6352a1730e350554" args="" -->EfiDriverDiagnosticTypeExtended</em>&nbsp;</td><td>
+This is an optional diagnostic type that performs diagnostics on the controller that may take an extended amount of time to execute. </td></tr>
+<tr><td valign="top"><em><a class="anchor" name="8896a1bb82ebed42766744a282c6ba506caef3ef086f421fda7e0170284320e2"></a><!-- doxytag: member="EfiDriverDiagnosticTypeManufacturing" ref="8896a1bb82ebed42766744a282c6ba506caef3ef086f421fda7e0170284320e2" args="" -->EfiDriverDiagnosticTypeManufacturing</em>&nbsp;</td><td>
+This is an optional diagnostic type that performs diagnostics on the controller that are suitable for a manufacturing and test environment. </td></tr>
+<tr><td valign="top"><em><a class="anchor" name="8896a1bb82ebed42766744a282c6ba501318539223330aab64019c7710f900ca"></a><!-- doxytag: member="EfiDriverDiagnosticTypeMaximum" ref="8896a1bb82ebed42766744a282c6ba501318539223330aab64019c7710f900ca" args="" -->EfiDriverDiagnosticTypeMaximum</em>&nbsp;</td><td>
 </td></tr>
 </table>
 </dl>
@@ -607,27 +158,12 @@ TCP4 connnection state <dl compact><dt><b>Enumerator: </b></dt><dd>
 </div>
 </div><p>
 <hr><h2>Variable Documentation</h2>
-<a class="anchor" name="465ffb7fe40e1194a1be351a6b36cff0"></a><!-- doxytag: member="Tcp4.h::gEfiTcp4ProtocolGuid" ref="465ffb7fe40e1194a1be351a6b36cff0" args="" -->
+<a class="anchor" name="52d922d56bb7ac4f6d89f139f07890ba"></a><!-- doxytag: member="DriverDiagnostics.h::gEfiDriverDiagnosticsProtocolGuid" ref="52d922d56bb7ac4f6d89f139f07890ba" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../d7/d0c/a01173.html#465ffb7fe40e1194a1be351a6b36cff0">gEfiTcp4ProtocolGuid</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="672a4dda4763269940dd583b08bdfff0"></a><!-- doxytag: member="Tcp4.h::gEfiTcp4ServiceBindingProtocolGuid" ref="672a4dda4763269940dd583b08bdfff0" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../d7/d0c/a01173.html#672a4dda4763269940dd583b08bdfff0">gEfiTcp4ServiceBindingProtocolGuid</a>          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../d7/d0c/a01173.html#52d922d56bb7ac4f6d89f139f07890ba">gEfiDriverDiagnosticsProtocolGuid</a>          </td>
         </tr>
       </table>
 </div>
@@ -638,7 +174,7 @@ TCP4 connnection state <dl compact><dt><b>Enumerator: </b></dt><dd>
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:11 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:32 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: tdTPM_RSP_COMMAND_HDR Struct Reference</title>
+<title>MdePkg[ALL]: tdTPM_DA_INFO Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,24 +21,34 @@
   </div>
 </div>
 <div class="contents">
-<h1>tdTPM_RSP_COMMAND_HDR Struct Reference</h1><!-- doxytag: class="tdTPM_RSP_COMMAND_HDR" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>tdTPM_DA_INFO Struct Reference</h1><!-- doxytag: class="tdTPM_DA_INFO" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/d59/a01001.html#69f3eb3e40aee2061dba5f9202fac1a2">TPM_STRUCTURE_TAG</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d5e/a00915.html#23c84353c2f2d5f44571ec7a020afaa0">tag</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d8e/a01050.html#69f3eb3e40aee2061dba5f9202fac1a2">TPM_STRUCTURE_TAG</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d5e/a00915.html#7e69f7797e73851c3dc13b1e015a673c">tag</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d5e/a00915.html#7a4c1c9843465bb31975014d727ba1bf">paramSize</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d8e/a01050.html#5b5f9c2232b669ad3a78b80e6a2f9e55">TPM_DA_STATE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d5e/a00915.html#62a72c1b3c931119c96e25c729577e90">state</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/d59/a01001.html#9cb980a84ff57b294910cf4b8f073882">TPM_RESULT</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d5e/a00915.html#6b6a794bbd5418203fb42538148020f9">returnCode</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d5e/a00915.html#32c561ffb983628aa4fcc33434fdff51">currentCount</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d5e/a00915.html#baedc10f1b3ad97c346a9ce0981a48b8">thresholdCount</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/dd1/a00914.html">TPM_DA_ACTION_TYPE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d5e/a00915.html#df2f634b7dd42e7b6f668e47ae0c724a">actionAtThreshold</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d5e/a00915.html#a5a9e6ef8de6426413092b990784b56f">actionDependValue</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d5e/a00915.html#1ebe06d74e7ed37d27abbb574895f4f9">vendorDataSize</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d5e/a00915.html#794e4f1a686cd727ca1cc5de48728df9">vendorData</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-TPM Response Headers defined in Part 3 <hr><h2>Field Documentation</h2>
-<a class="anchor" name="7a4c1c9843465bb31975014d727ba1bf"></a><!-- doxytag: member="tdTPM_RSP_COMMAND_HDR::paramSize" ref="7a4c1c9843465bb31975014d727ba1bf" args="" -->
+Part 2, section 21.7: TPM_DA_INFO <hr><h2>Field Documentation</h2>
+<a class="anchor" name="df2f634b7dd42e7b6f668e47ae0c724a"></a><!-- doxytag: member="tdTPM_DA_INFO::actionAtThreshold" ref="df2f634b7dd42e7b6f668e47ae0c724a" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d2/d5e/a00915.html#7a4c1c9843465bb31975014d727ba1bf">tdTPM_RSP_COMMAND_HDR::paramSize</a>          </td>
+          <td class="memname"><a class="el" href="../../d3/dd1/a00914.html">TPM_DA_ACTION_TYPE</a> <a class="el" href="../../d2/d5e/a00915.html#df2f634b7dd42e7b6f668e47ae0c724a">tdTPM_DA_INFO::actionAtThreshold</a>          </td>
         </tr>
       </table>
 </div>
@@ -48,12 +58,12 @@ TPM Response Headers defined in Part 3 <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="6b6a794bbd5418203fb42538148020f9"></a><!-- doxytag: member="tdTPM_RSP_COMMAND_HDR::returnCode" ref="6b6a794bbd5418203fb42538148020f9" args="" -->
+<a class="anchor" name="a5a9e6ef8de6426413092b990784b56f"></a><!-- doxytag: member="tdTPM_DA_INFO::actionDependValue" ref="a5a9e6ef8de6426413092b990784b56f" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../df/d59/a01001.html#9cb980a84ff57b294910cf4b8f073882">TPM_RESULT</a> <a class="el" href="../../d2/d5e/a00915.html#6b6a794bbd5418203fb42538148020f9">tdTPM_RSP_COMMAND_HDR::returnCode</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d2/d5e/a00915.html#a5a9e6ef8de6426413092b990784b56f">tdTPM_DA_INFO::actionDependValue</a>          </td>
         </tr>
       </table>
 </div>
@@ -63,12 +73,87 @@ TPM Response Headers defined in Part 3 <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="23c84353c2f2d5f44571ec7a020afaa0"></a><!-- doxytag: member="tdTPM_RSP_COMMAND_HDR::tag" ref="23c84353c2f2d5f44571ec7a020afaa0" args="" -->
+<a class="anchor" name="32c561ffb983628aa4fcc33434fdff51"></a><!-- doxytag: member="tdTPM_DA_INFO::currentCount" ref="32c561ffb983628aa4fcc33434fdff51" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../df/d59/a01001.html#69f3eb3e40aee2061dba5f9202fac1a2">TPM_STRUCTURE_TAG</a> <a class="el" href="../../d2/d5e/a00915.html#23c84353c2f2d5f44571ec7a020afaa0">tdTPM_RSP_COMMAND_HDR::tag</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d2/d5e/a00915.html#32c561ffb983628aa4fcc33434fdff51">tdTPM_DA_INFO::currentCount</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="62a72c1b3c931119c96e25c729577e90"></a><!-- doxytag: member="tdTPM_DA_INFO::state" ref="62a72c1b3c931119c96e25c729577e90" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d9/d8e/a01050.html#5b5f9c2232b669ad3a78b80e6a2f9e55">TPM_DA_STATE</a> <a class="el" href="../../d2/d5e/a00915.html#62a72c1b3c931119c96e25c729577e90">tdTPM_DA_INFO::state</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="7e69f7797e73851c3dc13b1e015a673c"></a><!-- doxytag: member="tdTPM_DA_INFO::tag" ref="7e69f7797e73851c3dc13b1e015a673c" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d9/d8e/a01050.html#69f3eb3e40aee2061dba5f9202fac1a2">TPM_STRUCTURE_TAG</a> <a class="el" href="../../d2/d5e/a00915.html#7e69f7797e73851c3dc13b1e015a673c">tdTPM_DA_INFO::tag</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="baedc10f1b3ad97c346a9ce0981a48b8"></a><!-- doxytag: member="tdTPM_DA_INFO::thresholdCount" ref="baedc10f1b3ad97c346a9ce0981a48b8" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d2/d5e/a00915.html#baedc10f1b3ad97c346a9ce0981a48b8">tdTPM_DA_INFO::thresholdCount</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="794e4f1a686cd727ca1cc5de48728df9"></a><!-- doxytag: member="tdTPM_DA_INFO::vendorData" ref="794e4f1a686cd727ca1cc5de48728df9" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>* <a class="el" href="../../d2/d5e/a00915.html#794e4f1a686cd727ca1cc5de48728df9">tdTPM_DA_INFO::vendorData</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="1ebe06d74e7ed37d27abbb574895f4f9"></a><!-- doxytag: member="tdTPM_DA_INFO::vendorDataSize" ref="1ebe06d74e7ed37d27abbb574895f4f9" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d2/d5e/a00915.html#1ebe06d74e7ed37d27abbb574895f4f9">tdTPM_DA_INFO::vendorDataSize</a>          </td>
         </tr>
       </table>
 </div>
@@ -79,7 +164,7 @@ TPM Response Headers defined in Part 3 <hr><h2>Field Documentation</h2>
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:23 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:08 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

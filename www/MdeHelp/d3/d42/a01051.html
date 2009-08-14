@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Library/UefiLib.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/IndustryStandard/UefiTcgPlatform.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,2187 +21,550 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Library/UefiLib.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/IndustryStandard/UefiTcgPlatform.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/dd1/a00629.html">EFI_UNICODE_STRING_TABLE</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/dd6/a00896.html">tdTCG_PCR_EVENT</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d19/a00515.html">EFI_LOCK</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d01/a00897.html">tdTCG_PCR_EVENT_HDR</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/dfa/a00894.html">tdEFI_PLATFORM_FIRMWARE_BLOB</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2c/a00893.html">tdEFI_IMAGE_LOAD_EVENT</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/de2/a00892.html">tdEFI_HANDOFF_TABLE_POINTERS</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d21/a00895.html">tdEFI_VARIABLE_DATA</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dfc/a00891.html">tdEFI_GPT_DATA</a></td></tr>
 
 <tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#5e2c8b167cb65e72bcabd276ec3cc4b9">EFI_TIMER_PERIOD_MICROSECONDS</a>(Microseconds)&nbsp;&nbsp;&nbsp;MultU64x32((<a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>)(Microseconds), 10)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#b0ad37dff2622269e6e6624a5c0968cd">EV_POST_CODE</a>&nbsp;&nbsp;&nbsp;((<a class="el" href="../../d3/d42/a01051.html#42994a2f67dbb35bbe7a4e10b1e709d4">TCG_EVENTTYPE</a>) 0x00000001)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#802dc7f43c21fa3fb615eac5f8ee7800">EFI_TIMER_PERIOD_MILLISECONDS</a>(Milliseconds)&nbsp;&nbsp;&nbsp;MultU64x32((<a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>)(Milliseconds), 10000)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#a4ae6faf5b4405e388c4d1365c0cb1cb">EV_SEPARATOR</a>&nbsp;&nbsp;&nbsp;((<a class="el" href="../../d3/d42/a01051.html#42994a2f67dbb35bbe7a4e10b1e709d4">TCG_EVENTTYPE</a>) 0x00000004)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#2f8d8cf76b3bb13531a2dcc5b39107ec">EFI_TIMER_PERIOD_SECONDS</a>(Seconds)&nbsp;&nbsp;&nbsp;MultU64x32((<a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>)(Seconds), 10000000)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#50b9a75f729c9cc789efa735bb4e394a">EV_S_CRTM_CONTENTS</a>&nbsp;&nbsp;&nbsp;((<a class="el" href="../../d3/d42/a01051.html#42994a2f67dbb35bbe7a4e10b1e709d4">TCG_EVENTTYPE</a>) 0x00000007)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#fc2c1558d93f53c8f2cca518445024ef">NEXT_MEMORY_DESCRIPTOR</a>(MemoryDescriptor, Size)&nbsp;&nbsp;&nbsp;((<a class="el" href="../../d8/d14/a00522.html">EFI_MEMORY_DESCRIPTOR</a> *)((<a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *)(MemoryDescriptor) + (Size)))</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#fe48cbada2ca6af39d614abe75ea25ff">EV_S_CRTM_VERSION</a>&nbsp;&nbsp;&nbsp;((<a class="el" href="../../d3/d42/a01051.html#42994a2f67dbb35bbe7a4e10b1e709d4">TCG_EVENTTYPE</a>) 0x00000008)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#03c09f50c92711bab7072165659ada6d">EFI_INITIALIZE_LOCK_VARIABLE</a>(Priority)&nbsp;&nbsp;&nbsp;{Priority, TPL_APPLICATION, EfiLockReleased }</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#d02f98fffb36e8d5ec52f2b8b0a4ea53">EV_EFI_EVENT_BASE</a>&nbsp;&nbsp;&nbsp;((<a class="el" href="../../d3/d42/a01051.html#42994a2f67dbb35bbe7a4e10b1e709d4">TCG_EVENTTYPE</a>) 0x80000000)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#ff28b1dea65cf289c203275708dcf3cc">ASSERT_LOCKED</a>(LockParameter)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#4997de759925d4989e6782e5c41183cc">EV_EFI_VARIABLE_DRIVER_CONFIG</a>&nbsp;&nbsp;&nbsp;(EV_EFI_EVENT_BASE + 1)</td></tr>
 
-<tr><td colspan="2"><br><h2>Enumerations</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#a203aa49ae2c8d8da4bced018056d250">EFI_LOCK_STATE</a> { <a class="el" href="../../d3/d42/a01051.html#a203aa49ae2c8d8da4bced018056d2500b4248219b4bdad3fe1b43bf3da690ab">EfiLockUninitialized</a> =  0, 
-<a class="el" href="../../d3/d42/a01051.html#a203aa49ae2c8d8da4bced018056d250c30657f3426d65520ab844b560b13b1f">EfiLockReleased</a> =  1, 
-<a class="el" href="../../d3/d42/a01051.html#a203aa49ae2c8d8da4bced018056d2508765cb2bfe309eec87c8a5ff79b790d3">EfiLockAcquired</a> =  2
- }</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#9e54c10a74c6559b3358f726c8b87769">EV_EFI_VARIABLE_BOOT</a>&nbsp;&nbsp;&nbsp;(EV_EFI_EVENT_BASE + 2)</td></tr>
 
-<tr><td colspan="2"><br><h2>Functions</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#64b39aedc0fdb2e9377fdd2436c91246">EfiGetSystemConfigurationTable</a> (IN <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *TableGuid, OUT VOID **Table)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#6b55145d45123a33bcbdb3bbc7728936">EV_EFI_BOOT_SERVICES_APPLICATION</a>&nbsp;&nbsp;&nbsp;(EV_EFI_EVENT_BASE + 3)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#7f3111de303d836d8d3711c39363f81a">EFI_EVENT</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#0e16309b53db00616996155c0d083041">EfiCreateProtocolNotifyEvent</a> (IN <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *ProtocolGuid, IN <a class="el" href="../../d9/dbb/a01186.html#b998e5f7da4a664eaa86252ab16e459a">EFI_TPL</a> NotifyTpl, IN <a class="el" href="../../d1/d0d/a01191.html#0232efb36b3e8c42740d8f54dd737105">EFI_EVENT_NOTIFY</a> NotifyFunction, IN VOID *NotifyContext, OUT VOID **Registration)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#1bc34f23e5a2e5c8021c6a366e91505f">EV_EFI_BOOT_SERVICES_DRIVER</a>&nbsp;&nbsp;&nbsp;(EV_EFI_EVENT_BASE + 4)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#45f26824d7bb48276efdda796162599a">EfiNamedEventListen</a> (IN CONST <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *Name, IN <a class="el" href="../../d9/dbb/a01186.html#b998e5f7da4a664eaa86252ab16e459a">EFI_TPL</a> NotifyTpl, IN <a class="el" href="../../d1/d0d/a01191.html#0232efb36b3e8c42740d8f54dd737105">EFI_EVENT_NOTIFY</a> NotifyFunction, IN CONST VOID *NotifyContext, OUT VOID *Registration)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#8ec19655f41ae96a0a9f9d36787bd5a2">EV_EFI_RUNTIME_SERVICES_DRIVER</a>&nbsp;&nbsp;&nbsp;(EV_EFI_EVENT_BASE + 5)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#6cbe623f8261b392d114211f400456bf">EfiNamedEventSignal</a> (IN CONST <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *Name)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#01ab4f9ee348a31f05c97413a348c845">EV_EFI_GPT_EVENT</a>&nbsp;&nbsp;&nbsp;(EV_EFI_EVENT_BASE + 6)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#b998e5f7da4a664eaa86252ab16e459a">EFI_TPL</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#23e3b23d43884278f8da0326341dfb22">EfiGetCurrentTpl</a> (VOID)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#4a4e953cd6fb847cfac034a8266be55b">EV_EFI_ACTION</a>&nbsp;&nbsp;&nbsp;(EV_EFI_EVENT_BASE + 7)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d19/a00515.html">EFI_LOCK</a> *EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#7504eda86463550e59dc580f54927da8">EfiInitializeLock</a> (IN OUT <a class="el" href="../../dc/d19/a00515.html">EFI_LOCK</a> *Lock, IN <a class="el" href="../../d9/dbb/a01186.html#b998e5f7da4a664eaa86252ab16e459a">EFI_TPL</a> Priority)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#5bb885ba21309c28501781d172209a89">EV_EFI_PLATFORM_FIRMWARE_BLOB</a>&nbsp;&nbsp;&nbsp;(EV_EFI_EVENT_BASE + 8)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#882c8709d2db575069423a679596c29f">EfiAcquireLock</a> (IN <a class="el" href="../../dc/d19/a00515.html">EFI_LOCK</a> *Lock)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#9358119fa13e6f78d7db52995efc35cb">EV_EFI_HANDOFF_TABLES</a>&nbsp;&nbsp;&nbsp;(EV_EFI_EVENT_BASE + 9)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#5d3177f5fe0e69a86365ddc87b3a3467">EfiAcquireLockOrFail</a> (IN <a class="el" href="../../dc/d19/a00515.html">EFI_LOCK</a> *Lock)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#7e461e72fe6fcbd7061e7dea3c68b98f">EFI_CALLING_EFI_APPLICATION</a>&nbsp;&nbsp;&nbsp;&quot;Calling EFI Application from Boot Option&quot;</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#30fe35b9cd501f362b40b70e7ed0b570">EfiReleaseLock</a> (IN <a class="el" href="../../dc/d19/a00515.html">EFI_LOCK</a> *Lock)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#e285ddb7efd2dd0e31a4b98ac5855f1d">EFI_RETURNING_FROM_EFI_APPLICATOIN</a>&nbsp;&nbsp;&nbsp;&quot;Returning from EFI Application from Boot Option&quot;</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#c291677079261b2c921cec184ecf2460">EfiTestManagedDevice</a> (IN CONST <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ControllerHandle, IN CONST <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> DriverBindingHandle, IN CONST <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *ProtocolGuid)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#ea98f86b065298cbcd9144009771ba06">EFI_EXIT_BOOT_SERVICES_INVOCATION</a>&nbsp;&nbsp;&nbsp;&quot;Exit Boot Services Invocation&quot;</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#5cf535eb783a2e2b3e1635e03eeb7e0c">EfiTestChildHandle</a> (IN CONST <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ControllerHandle, IN CONST <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ChildHandle, IN CONST <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *ProtocolGuid)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#4616ebd2db679ea559049499ac2147d4">EFI_EXIT_BOOT_SERVICES_FAILED</a>&nbsp;&nbsp;&nbsp;&quot;Exit Boot Services Returned with Failure&quot;</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#6a7713ed6500d4da5ab25d08f9dfb94f">LookupUnicodeString</a> (IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Language, IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *SupportedLanguages, IN CONST <a class="el" href="../../da/dd1/a00629.html">EFI_UNICODE_STRING_TABLE</a> *UnicodeStringTable, OUT <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> **UnicodeString)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#57826ea278edfcce385fb1f077a1b987">EFI_EXIT_BOOT_SERVICES_SUCCEEDED</a>&nbsp;&nbsp;&nbsp;&quot;Exit Boot Services Returned with Success&quot;</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#b73d369fd5e6aac52e87e6a47e6bbc9e">LookupUnicodeString2</a> (IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Language, IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *SupportedLanguages, IN CONST <a class="el" href="../../da/dd1/a00629.html">EFI_UNICODE_STRING_TABLE</a> *UnicodeStringTable, OUT <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> **UnicodeString, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> Iso639Language)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#88a9c250e4fca341f5203f548f6a4b0d">TSS_EVENT_DATA_MAX_SIZE</a>&nbsp;&nbsp;&nbsp;256</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#e331dc39b7ece908513941c8c8ef7bfc">AddUnicodeString</a> (IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Language, IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *SupportedLanguages, IN <a class="el" href="../../da/dd1/a00629.html">EFI_UNICODE_STRING_TABLE</a> **UnicodeStringTable, IN CONST <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> *UnicodeString)</td></tr>
+<tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#42994a2f67dbb35bbe7a4e10b1e709d4">TCG_EVENTTYPE</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#f80caf22edb6b705234411bfc563d3d4">AddUnicodeString2</a> (IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Language, IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *SupportedLanguages, IN <a class="el" href="../../da/dd1/a00629.html">EFI_UNICODE_STRING_TABLE</a> **UnicodeStringTable, IN CONST <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> *UnicodeString, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> Iso639Language)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/d8e/a01050.html#3fbec19a92a1a56e34778a6a38a421f7">TPM_PCRINDEX</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#72c5682bce258499e5d8052339051f47">TCG_PCRINDEX</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#f2984d6c15394a1c21bf3f37e62c2c7b">FreeUnicodeStringTable</a> (IN <a class="el" href="../../da/dd1/a00629.html">EFI_UNICODE_STRING_TABLE</a> *UnicodeStringTable)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../df/dbc/a00931.html">TPM_DIGEST</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#4bd692039fcad06280b790e47b517e5e">TCG_DIGEST</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#271f3e023dee65a16e84147d7325d786">GetVariable</a> (IN CONST <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> *Name, IN CONST <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *Guid)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <a class="el" href="../../da/dd6/a00896.html">tdTCG_PCR_EVENT</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#dc3c94ba267d8825eb98c263be2a3319">TCG_PCR_EVENT</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#2a8817b96785e81a792273caa20bcf19">GetEfiGlobalVariable</a> (IN CONST <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> *Name)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <a class="el" href="../../de/d01/a00897.html">tdTCG_PCR_EVENT_HDR</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#3fc9b116963cb88d2e30b3167b04d73d">TCG_PCR_EVENT_HDR</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#954c438b7efb6abbe1cdba2a61a43c86">GetBestLanguage</a> (IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *SupportedLanguages, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> Iso639Language,...)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
+<a class="el" href="../../dc/dfa/a00894.html">tdEFI_PLATFORM_FIRMWARE_BLOB</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#4b146c72712fdc31374d8edc1faf5d42">EFI_PLATFORM_FIRMWARE_BLOB</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#8ea873f98019c10e6a24e045e7e3aab0">CreatePopUp</a> (IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Attribute, OUT <a class="el" href="../../da/d7e/a00492.html">EFI_INPUT_KEY</a> *Key,...)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
+<a class="el" href="../../dc/d2c/a00893.html">tdEFI_IMAGE_LOAD_EVENT</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#76e6e1c8ddbbe9d621b8f1e581ec5fbb">EFI_IMAGE_LOAD_EVENT</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#e2a80f4b3989493e43afb5c3dad9f610">GetGlyphWidth</a> (IN <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> UnicodeChar)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
+<a class="el" href="../../d0/de2/a00892.html">tdEFI_HANDOFF_TABLE_POINTERS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#13010a1e71f9ad405d35cb622f108baa">EFI_HANDOFF_TABLE_POINTERS</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#4a16ee34fa912ac36eeb52964d8d0f6f">UnicodeStringDisplayLength</a> (IN CONST <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> *String)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <a class="el" href="../../d2/d21/a00895.html">tdEFI_VARIABLE_DATA</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#3a36ff2a4d2d613c2b2d4cfa5367569c">EFI_VARIABLE_DATA</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#cd5ecd5e57260db21efc0a3abc8f9b7b">EfiSignalEventReadyToBoot</a> (VOID)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#c0c1bed57c209c8cd5f351491b1f22f6">EfiSignalEventLegacyBoot</a> (VOID)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#756084495f0009b819eefb5a82d47382">EfiCreateEventLegacyBoot</a> (OUT <a class="el" href="../../d9/dbb/a01186.html#7f3111de303d836d8d3711c39363f81a">EFI_EVENT</a> *LegacyBootEvent)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#1e20b3b96f89c611cada1d6c743ef185">EfiCreateEventLegacyBootEx</a> (IN <a class="el" href="../../d9/dbb/a01186.html#b998e5f7da4a664eaa86252ab16e459a">EFI_TPL</a> NotifyTpl, IN <a class="el" href="../../d1/d0d/a01191.html#0232efb36b3e8c42740d8f54dd737105">EFI_EVENT_NOTIFY</a> NotifyFunction, IN VOID *NotifyContext, OUT <a class="el" href="../../d9/dbb/a01186.html#7f3111de303d836d8d3711c39363f81a">EFI_EVENT</a> *LegacyBootEvent)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#65373f46f60a73101b90acc11d11eaab">EfiCreateEventReadyToBoot</a> (OUT <a class="el" href="../../d9/dbb/a01186.html#7f3111de303d836d8d3711c39363f81a">EFI_EVENT</a> *ReadyToBootEvent)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#c992b00ba6a658dadc724c645896e26f">EfiCreateEventReadyToBootEx</a> (IN <a class="el" href="../../d9/dbb/a01186.html#b998e5f7da4a664eaa86252ab16e459a">EFI_TPL</a> NotifyTpl, IN <a class="el" href="../../d1/d0d/a01191.html#0232efb36b3e8c42740d8f54dd737105">EFI_EVENT_NOTIFY</a> NotifyFunction, IN VOID *NotifyContext, OUT <a class="el" href="../../d9/dbb/a01186.html#7f3111de303d836d8d3711c39363f81a">EFI_EVENT</a> *ReadyToBootEvent)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#a6227cd72e7eb0467195c375f57c0a4f">EfiInitializeFwVolDevicepathNode</a> (IN OUT <a class="el" href="../../d8/d13/a00671.html">MEDIA_FW_VOL_FILEPATH_DEVICE_PATH</a> *FvDevicePathNode, IN CONST <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *NameGuid)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#37ae153ec43595869e7d979330161da1">EfiGetNameGuidFromFwVolDevicePathNode</a> (IN CONST <a class="el" href="../../d8/d13/a00671.html">MEDIA_FW_VOL_FILEPATH_DEVICE_PATH</a> *FvDevicePathNode)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#ef8e616b24a037e33f0a3472b3531cc6">Print</a> (IN CONST <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> *Format,...)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#7fda8c3ee0996a766348a8c80e1de489">ErrorPrint</a> (IN CONST <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> *Format,...)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#607406a7eac9276bae5a584e66b4520f">AsciiPrint</a> (IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Format,...)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#496ddd6bcfd755039e43e9854e86593a">AsciiErrorPrint</a> (IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Format,...)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#09ec670e96bb745072a4b8d3e687592e">PrintXY</a> (IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> PointX, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> PointY, IN <a class="el" href="../../d9/d3a/a00439.html">EFI_GRAPHICS_OUTPUT_BLT_PIXEL</a> *ForeGround, IN <a class="el" href="../../d9/d3a/a00439.html">EFI_GRAPHICS_OUTPUT_BLT_PIXEL</a> *BackGround, IN CONST <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> *Format,...)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#ea780943414c08e969066a55b533ac09">AsciiPrintXY</a> (IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> PointX, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> PointY, IN <a class="el" href="../../d9/d3a/a00439.html">EFI_GRAPHICS_OUTPUT_BLT_PIXEL</a> *ForeGround, IN <a class="el" href="../../d9/d3a/a00439.html">EFI_GRAPHICS_OUTPUT_BLT_PIXEL</a> *BackGround, IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Format,...)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#d14956cfd9ca514c63ce37c33fb97212">EfiLibInstallDriverBinding</a> (IN CONST <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ImageHandle, IN CONST <a class="el" href="../../d1/d8c/a00600.html">EFI_SYSTEM_TABLE</a> *SystemTable, IN <a class="el" href="../../dd/da2/a00019.html">EFI_DRIVER_BINDING_PROTOCOL</a> *DriverBinding, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> DriverBindingHandle)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#db61d37e97048bf4b7ee0d48f2968168">EfiLibInstallAllDriverProtocols</a> (IN CONST <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ImageHandle, IN CONST <a class="el" href="../../d1/d8c/a00600.html">EFI_SYSTEM_TABLE</a> *SystemTable, IN <a class="el" href="../../dd/da2/a00019.html">EFI_DRIVER_BINDING_PROTOCOL</a> *DriverBinding, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> DriverBindingHandle, IN CONST <a class="el" href="../../da/d45/a00011.html">EFI_COMPONENT_NAME_PROTOCOL</a> *ComponentName, IN CONST <a class="el" href="../../de/d11/a00021.html">EFI_DRIVER_CONFIGURATION_PROTOCOL</a> *DriverConfiguration, IN CONST <a class="el" href="../../d3/d52/a00023.html">EFI_DRIVER_DIAGNOSTICS_PROTOCOL</a> *DriverDiagnostics)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#66fb29c2bbafaecc615506dd358f55ab">EfiLibInstallDriverBindingComponentName2</a> (IN CONST <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ImageHandle, IN CONST <a class="el" href="../../d1/d8c/a00600.html">EFI_SYSTEM_TABLE</a> *SystemTable, IN <a class="el" href="../../dd/da2/a00019.html">EFI_DRIVER_BINDING_PROTOCOL</a> *DriverBinding, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> DriverBindingHandle, IN CONST <a class="el" href="../../da/d45/a00011.html">EFI_COMPONENT_NAME_PROTOCOL</a> *ComponentName, IN CONST <a class="el" href="../../d7/dec/a00010.html">EFI_COMPONENT_NAME2_PROTOCOL</a> *ComponentName2)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#ac0e3a03e5bbd506be45f2d4b24ad583">EfiLibInstallAllDriverProtocols2</a> (IN CONST <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ImageHandle, IN CONST <a class="el" href="../../d1/d8c/a00600.html">EFI_SYSTEM_TABLE</a> *SystemTable, IN <a class="el" href="../../dd/da2/a00019.html">EFI_DRIVER_BINDING_PROTOCOL</a> *DriverBinding, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> DriverBindingHandle, IN CONST <a class="el" href="../../da/d45/a00011.html">EFI_COMPONENT_NAME_PROTOCOL</a> *ComponentName, IN CONST <a class="el" href="../../d7/dec/a00010.html">EFI_COMPONENT_NAME2_PROTOCOL</a> *ComponentName2, IN CONST <a class="el" href="../../de/d11/a00021.html">EFI_DRIVER_CONFIGURATION_PROTOCOL</a> *DriverConfiguration, IN CONST <a class="el" href="../../db/db2/a00020.html">EFI_DRIVER_CONFIGURATION2_PROTOCOL</a> *DriverConfiguration2, IN CONST <a class="el" href="../../d3/d52/a00023.html">EFI_DRIVER_DIAGNOSTICS_PROTOCOL</a> *DriverDiagnostics, IN CONST <a class="el" href="../../d7/de0/a00022.html">EFI_DRIVER_DIAGNOSTICS2_PROTOCOL</a> *DriverDiagnostics2)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <a class="el" href="../../de/dfc/a00891.html">tdEFI_GPT_DATA</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d42/a01051.html#edfd1d680891721009b15ad9eefe228d">EFI_GPT_DATA</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Provides library functions for common UEFI operations. Only available to DXE and UEFI module types.<p>
-The UEFI Library provides functions and macros that simplify the development of UEFI Drivers and UEFI Applications. These functions and macros help manage EFI events, build simple locks utilizing EFI Task Priority Levels (TPLs), install EFI Driver Model related protocols, manage Unicode string tables for UEFI Drivers, and print messages on the console output and standard error devices.<p>
-Copyright (c) 2006 - 2008, Intel Corporation<br>
- All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
+TCG EFI Platform Definition in TCG_EFI_Platform_1_20_Final<p>
+Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
-<a class="anchor" name="ff28b1dea65cf289c203275708dcf3cc"></a><!-- doxytag: member="UefiLib.h::ASSERT_LOCKED" ref="ff28b1dea65cf289c203275708dcf3cc" args="(LockParameter)" -->
+<a class="anchor" name="7e461e72fe6fcbd7061e7dea3c68b98f"></a><!-- doxytag: member="UefiTcgPlatform.h::EFI_CALLING_EFI_APPLICATION" ref="7e461e72fe6fcbd7061e7dea3c68b98f" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ASSERT_LOCKED          </td>
-          <td>(</td>
-          <td class="paramtype">LockParameter&nbsp;</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
+          <td class="memname">#define EFI_CALLING_EFI_APPLICATION&nbsp;&nbsp;&nbsp;&quot;Calling EFI Application from Boot Option&quot;          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-<b>Value:</b><div class="fragment"><pre class="fragment"><span class="keywordflow">do</span> {                                                \
-    <span class="keywordflow">if</span> (<a class="code" href="../../d1/dac/a01015.html#f8d4c199495e8d7164f5395069d93a8f">DebugAssertEnabled</a> ()) {                      \
-      <a class="code" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT</a> (LockParameter != <a class="code" href="../../d3/dca/a00954.html#070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>);                 \
-      <span class="keywordflow">if</span> ((LockParameter)-&gt;Lock != <a class="code" href="../../d3/d42/a01051.html#a203aa49ae2c8d8da4bced018056d2508765cb2bfe309eec87c8a5ff79b790d3">EfiLockAcquired</a>) { \
-        <a class="code" href="../../d1/dac/a01015.html#23917dced363c4500b9a6c90aedded63">_ASSERT</a> (LockParameter not locked);           \
-      }                                               \
-    }                                                 \
-  } <span class="keywordflow">while</span> (<a class="code" href="../../d3/dca/a00954.html#a93f0eb578d23995850d61f7d61c55c1">FALSE</a>)
-</pre></div>Macro that calls <a class="el" href="../../d1/dac/a01015.html#069b0ba2a096d9e604cf2eb483ce4155">DebugAssert()</a> if an <a class="el" href="../../dc/d19/a00515.html">EFI_LOCK</a> structure is not in the locked state.<p>
-If the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of PcdDebugProperyMask is set, then this macro evaluates the <a class="el" href="../../dc/d19/a00515.html">EFI_LOCK</a> structure specified by Lock. If Lock is not in the locked state, then <a class="el" href="../../d1/dac/a01015.html#069b0ba2a096d9e604cf2eb483ce4155">DebugAssert()</a> is called passing in the source filename, source line number, and Lock. If Lock is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>LockParameter</em>&nbsp;</td><td>A pointer to the lock to acquire. </td></tr>
-  </table>
-</dl>
 
 </div>
 </div><p>
-<a class="anchor" name="03c09f50c92711bab7072165659ada6d"></a><!-- doxytag: member="UefiLib.h::EFI_INITIALIZE_LOCK_VARIABLE" ref="03c09f50c92711bab7072165659ada6d" args="(Priority)" -->
+<a class="anchor" name="4616ebd2db679ea559049499ac2147d4"></a><!-- doxytag: member="UefiTcgPlatform.h::EFI_EXIT_BOOT_SERVICES_FAILED" ref="4616ebd2db679ea559049499ac2147d4" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_INITIALIZE_LOCK_VARIABLE          </td>
-          <td>(</td>
-          <td class="paramtype">Priority&nbsp;</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td>&nbsp;&nbsp;&nbsp;{Priority, TPL_APPLICATION, EfiLockReleased }</td>
+          <td class="memname">#define EFI_EXIT_BOOT_SERVICES_FAILED&nbsp;&nbsp;&nbsp;&quot;Exit Boot Services Returned with Failure&quot;          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Initializes a basic mutual exclusion lock.<p>
-This macro initializes the contents of a basic mutual exclusion lock to the released state. Each lock provides mutual exclusion access at its task priority level. Since there is no preemption or multiprocessor support in EFI, acquiring the lock only consists of raising to the locks TPL.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Priority</em>&nbsp;</td><td>The task priority level of the lock.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The lock. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="5e2c8b167cb65e72bcabd276ec3cc4b9"></a><!-- doxytag: member="UefiLib.h::EFI_TIMER_PERIOD_MICROSECONDS" ref="5e2c8b167cb65e72bcabd276ec3cc4b9" args="(Microseconds)" -->
+<a class="anchor" name="ea98f86b065298cbcd9144009771ba06"></a><!-- doxytag: member="UefiTcgPlatform.h::EFI_EXIT_BOOT_SERVICES_INVOCATION" ref="ea98f86b065298cbcd9144009771ba06" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_TIMER_PERIOD_MICROSECONDS          </td>
-          <td>(</td>
-          <td class="paramtype">Microseconds&nbsp;</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td>&nbsp;&nbsp;&nbsp;MultU64x32((<a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>)(Microseconds), 10)</td>
+          <td class="memname">#define EFI_EXIT_BOOT_SERVICES_INVOCATION&nbsp;&nbsp;&nbsp;&quot;Exit Boot Services Invocation&quot;          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Macro that returns the number of 100 ns units for a specified number of microseconds. Useful for managing EFI timer events.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Microseconds</em>&nbsp;</td><td>Number of microseconds.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The number of 100 ns units equivalent to the number of microseconds specified by Microseconds. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="802dc7f43c21fa3fb615eac5f8ee7800"></a><!-- doxytag: member="UefiLib.h::EFI_TIMER_PERIOD_MILLISECONDS" ref="802dc7f43c21fa3fb615eac5f8ee7800" args="(Milliseconds)" -->
+<a class="anchor" name="57826ea278edfcce385fb1f077a1b987"></a><!-- doxytag: member="UefiTcgPlatform.h::EFI_EXIT_BOOT_SERVICES_SUCCEEDED" ref="57826ea278edfcce385fb1f077a1b987" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_TIMER_PERIOD_MILLISECONDS          </td>
-          <td>(</td>
-          <td class="paramtype">Milliseconds&nbsp;</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td>&nbsp;&nbsp;&nbsp;MultU64x32((<a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>)(Milliseconds), 10000)</td>
+          <td class="memname">#define EFI_EXIT_BOOT_SERVICES_SUCCEEDED&nbsp;&nbsp;&nbsp;&quot;Exit Boot Services Returned with Success&quot;          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Macro that returns the number of 100 ns units for a specified number of milliseconds. Useful for managing EFI timer events.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Milliseconds</em>&nbsp;</td><td>Number of milliseconds.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The number of 100 ns units equivalent to the number of milliseconds specified by Milliseconds. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="2f8d8cf76b3bb13531a2dcc5b39107ec"></a><!-- doxytag: member="UefiLib.h::EFI_TIMER_PERIOD_SECONDS" ref="2f8d8cf76b3bb13531a2dcc5b39107ec" args="(Seconds)" -->
+<a class="anchor" name="e285ddb7efd2dd0e31a4b98ac5855f1d"></a><!-- doxytag: member="UefiTcgPlatform.h::EFI_RETURNING_FROM_EFI_APPLICATOIN" ref="e285ddb7efd2dd0e31a4b98ac5855f1d" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_TIMER_PERIOD_SECONDS          </td>
-          <td>(</td>
-          <td class="paramtype">Seconds&nbsp;</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td>&nbsp;&nbsp;&nbsp;MultU64x32((<a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>)(Seconds), 10000000)</td>
+          <td class="memname">#define EFI_RETURNING_FROM_EFI_APPLICATOIN&nbsp;&nbsp;&nbsp;&quot;Returning from EFI Application from Boot Option&quot;          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Macro that returns the number of 100 ns units for a specified number of seconds. Useful for managing EFI timer events.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Seconds</em>&nbsp;</td><td>Number of seconds.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The number of 100 ns units equivalent to the number of seconds specified by Seconds. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="fc2c1558d93f53c8f2cca518445024ef"></a><!-- doxytag: member="UefiLib.h::NEXT_MEMORY_DESCRIPTOR" ref="fc2c1558d93f53c8f2cca518445024ef" args="(MemoryDescriptor, Size)" -->
+<a class="anchor" name="4a4e953cd6fb847cfac034a8266be55b"></a><!-- doxytag: member="UefiTcgPlatform.h::EV_EFI_ACTION" ref="4a4e953cd6fb847cfac034a8266be55b" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define NEXT_MEMORY_DESCRIPTOR          </td>
-          <td>(</td>
-          <td class="paramtype">MemoryDescriptor,         <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Size&nbsp;</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td>&nbsp;&nbsp;&nbsp;((<a class="el" href="../../d8/d14/a00522.html">EFI_MEMORY_DESCRIPTOR</a> *)((<a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *)(MemoryDescriptor) + (Size)))</td>
+          <td class="memname">#define EV_EFI_ACTION&nbsp;&nbsp;&nbsp;(EV_EFI_EVENT_BASE + 7)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Macro that returns the a pointer to the next <a class="el" href="../../d8/d14/a00522.html">EFI_MEMORY_DESCRIPTOR</a> in an array returned from GetMemoryMap().<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>MemoryDescriptor</em>&nbsp;</td><td>A pointer to an <a class="el" href="../../d8/d14/a00522.html">EFI_MEMORY_DESCRIPTOR</a>.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Size</em>&nbsp;</td><td>The size, in bytes, of the current <a class="el" href="../../d8/d14/a00522.html">EFI_MEMORY_DESCRIPTOR</a>.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>A pointer to the next <a class="el" href="../../d8/d14/a00522.html">EFI_MEMORY_DESCRIPTOR</a>. </dd></dl>
 
 </div>
 </div><p>
-<hr><h2>Enumeration Type Documentation</h2>
-<a class="anchor" name="a203aa49ae2c8d8da4bced018056d250"></a><!-- doxytag: member="UefiLib.h::EFI_LOCK_STATE" ref="a203aa49ae2c8d8da4bced018056d250" args="" -->
+<a class="anchor" name="6b55145d45123a33bcbdb3bbc7728936"></a><!-- doxytag: member="UefiTcgPlatform.h::EV_EFI_BOOT_SERVICES_APPLICATION" ref="6b55145d45123a33bcbdb3bbc7728936" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="../../d3/d42/a01051.html#a203aa49ae2c8d8da4bced018056d250">EFI_LOCK_STATE</a>          </td>
+          <td class="memname">#define EV_EFI_BOOT_SERVICES_APPLICATION&nbsp;&nbsp;&nbsp;(EV_EFI_EVENT_BASE + 3)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-EFI Lock Status <dl compact><dt><b>Enumerator: </b></dt><dd>
-<table border="0" cellspacing="2" cellpadding="0">
-<tr><td valign="top"><em><a class="anchor" name="a203aa49ae2c8d8da4bced018056d2500b4248219b4bdad3fe1b43bf3da690ab"></a><!-- doxytag: member="EfiLockUninitialized" ref="a203aa49ae2c8d8da4bced018056d2500b4248219b4bdad3fe1b43bf3da690ab" args="" -->EfiLockUninitialized</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" name="a203aa49ae2c8d8da4bced018056d250c30657f3426d65520ab844b560b13b1f"></a><!-- doxytag: member="EfiLockReleased" ref="a203aa49ae2c8d8da4bced018056d250c30657f3426d65520ab844b560b13b1f" args="" -->EfiLockReleased</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" name="a203aa49ae2c8d8da4bced018056d2508765cb2bfe309eec87c8a5ff79b790d3"></a><!-- doxytag: member="EfiLockAcquired" ref="a203aa49ae2c8d8da4bced018056d2508765cb2bfe309eec87c8a5ff79b790d3" args="" -->EfiLockAcquired</em>&nbsp;</td><td>
-</td></tr>
-</table>
-</dl>
 
 </div>
 </div><p>
-<hr><h2>Function Documentation</h2>
-<a class="anchor" name="e331dc39b7ece908513941c8c8ef7bfc"></a><!-- doxytag: member="UefiLib.h::AddUnicodeString" ref="e331dc39b7ece908513941c8c8ef7bfc" args="(IN CONST CHAR8 *Language, IN CONST CHAR8 *SupportedLanguages, IN EFI_UNICODE_STRING_TABLE **UnicodeStringTable, IN CONST CHAR16 *UnicodeString)" -->
+<a class="anchor" name="1bc34f23e5a2e5c8021c6a366e91505f"></a><!-- doxytag: member="UefiTcgPlatform.h::EV_EFI_BOOT_SERVICES_DRIVER" ref="1bc34f23e5a2e5c8021c6a366e91505f" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI AddUnicodeString           </td>
-          <td>(</td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *&nbsp;</td>
-          <td class="paramname"> <em>Language</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *&nbsp;</td>
-          <td class="paramname"> <em>SupportedLanguages</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../da/dd1/a00629.html">EFI_UNICODE_STRING_TABLE</a> **&nbsp;</td>
-          <td class="paramname"> <em>UnicodeStringTable</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> *&nbsp;</td>
-          <td class="paramname"> <em>UnicodeString</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EV_EFI_BOOT_SERVICES_DRIVER&nbsp;&nbsp;&nbsp;(EV_EFI_EVENT_BASE + 4)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-This function adds a Unicode string to UnicodeStringTable.<p>
-If Language is a member of SupportedLanguages then UnicodeString is added to UnicodeStringTable. New buffers are allocated for both Language and UnicodeString. The contents of Language and UnicodeString are copied into these new buffers. These buffers are automatically freed when <a class="el" href="../../d3/d42/a01051.html#f2984d6c15394a1c21bf3f37e62c2c7b">FreeUnicodeStringTable()</a> is called.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Language</em>&nbsp;</td><td>A pointer to the ISO 639-2 language code for the Unicode string to add. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SupportedLanguages</em>&nbsp;</td><td>A pointer to the set of ISO 639-2 language codes that the Unicode string table supports. Language must be a member of this set. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>UnicodeStringTable</em>&nbsp;</td><td>A pointer to the table of Unicode strings. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>UnicodeString</em>&nbsp;</td><td>A pointer to the Unicode string to add.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The Unicode string that matches the language specified by Language was found in the table of Unicode strings UnicodeStringTable, and it was returned in UnicodeString. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Language is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>UnicodeString is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>UnicodeString is an empty string. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>SupportedLanguages is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ALREADY_STARTED</em>&nbsp;</td><td>A Unicode string with language Language is already present in UnicodeStringTable. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There is not enough memory to add another Unicode string to UnicodeStringTable. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The language specified by Language is not a member of SupportedLanguages. </td></tr>
-  </table>
-</dl>
 
 </div>
 </div><p>
-<a class="anchor" name="f80caf22edb6b705234411bfc563d3d4"></a><!-- doxytag: member="UefiLib.h::AddUnicodeString2" ref="f80caf22edb6b705234411bfc563d3d4" args="(IN CONST CHAR8 *Language, IN CONST CHAR8 *SupportedLanguages, IN EFI_UNICODE_STRING_TABLE **UnicodeStringTable, IN CONST CHAR16 *UnicodeString, IN BOOLEAN Iso639Language)" -->
+<a class="anchor" name="d02f98fffb36e8d5ec52f2b8b0a4ea53"></a><!-- doxytag: member="UefiTcgPlatform.h::EV_EFI_EVENT_BASE" ref="d02f98fffb36e8d5ec52f2b8b0a4ea53" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI AddUnicodeString2           </td>
-          <td>(</td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *&nbsp;</td>
-          <td class="paramname"> <em>Language</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *&nbsp;</td>
-          <td class="paramname"> <em>SupportedLanguages</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../da/dd1/a00629.html">EFI_UNICODE_STRING_TABLE</a> **&nbsp;</td>
-          <td class="paramname"> <em>UnicodeStringTable</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> *&nbsp;</td>
-          <td class="paramname"> <em>UnicodeString</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td>
-          <td class="paramname"> <em>Iso639Language</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EV_EFI_EVENT_BASE&nbsp;&nbsp;&nbsp;((<a class="el" href="../../d3/d42/a01051.html#42994a2f67dbb35bbe7a4e10b1e709d4">TCG_EVENTTYPE</a>) 0x80000000)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-This function adds the Null-terminated Unicode string specified by UnicodeString to UnicodeStringTable.<p>
-If Language is a member of SupportedLanguages then UnicodeString is added to UnicodeStringTable. New buffers are allocated for both Language and UnicodeString. The contents of Language and UnicodeString are copied into these new buffers. These buffers are automatically freed when EfiLibFreeUnicodeStringTable() is called.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Language</em>&nbsp;</td><td>A pointer to an ASCII string containing the ISO 639-2 or the RFC 4646 language code for the Unicode string to add. If Iso639Language is TRUE, then this ASCII string is not assumed to be Null-terminated, and only the first three chacters are used. If Iso639Language is FALSE, then this ASCII string must be Null-terminated. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SupportedLanguages</em>&nbsp;</td><td>A pointer to a Null-terminated ASCII string that contains a set of ISO 639-2 or RFC 4646 language codes that the Unicode string table supports. Language must be a member of this set. If Iso639Language is TRUE, then this string contains one or more ISO 639-2 language codes with no separator characters. If Iso639Language is FALSE, then is string contains one or more RFC 4646 language codes separated by ';'. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>UnicodeStringTable</em>&nbsp;</td><td>A pointer to the table of Unicode strings. Type <a class="el" href="../../da/dd1/a00629.html">EFI_UNICODE_STRING_TABLE</a> is defined in "Related Definitions". </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>UnicodeString</em>&nbsp;</td><td>A pointer to the Unicode string to add. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Iso639Language</em>&nbsp;</td><td>Specifies the supported language code format. If it is TRUE, then Language and SupportedLanguages follow ISO 639-2 language code format. Otherwise, they follow RFC 4646 language code format.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The Unicode string that matches the language specified by Language was found in the table of Unicode strings UnicodeStringTable, and it was returned in UnicodeString. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Language is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>UnicodeString is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>UnicodeString is an empty string. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>SupportedLanguages is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ALREADY_STARTED</em>&nbsp;</td><td>A Unicode string with language Language is already present in UnicodeStringTable. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There is not enough memory to add another Unicode string UnicodeStringTable. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The language specified by Language is not a member of SupportedLanguages. </td></tr>
-  </table>
-</dl>
 
 </div>
 </div><p>
-<a class="anchor" name="496ddd6bcfd755039e43e9854e86593a"></a><!-- doxytag: member="UefiLib.h::AsciiErrorPrint" ref="496ddd6bcfd755039e43e9854e86593a" args="(IN CONST CHAR8 *Format,...)" -->
+<a class="anchor" name="01ab4f9ee348a31f05c97413a348c845"></a><!-- doxytag: member="UefiTcgPlatform.h::EV_EFI_GPT_EVENT" ref="01ab4f9ee348a31f05c97413a348c845" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI AsciiErrorPrint           </td>
-          <td>(</td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *&nbsp;</td>
-          <td class="paramname"> <em>Format</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&nbsp;</td>
-          <td class="paramname"> <em>...</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EV_EFI_GPT_EVENT&nbsp;&nbsp;&nbsp;(EV_EFI_EVENT_BASE + 6)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Prints a formatted ASCII string to the console output device specified by StdErr defined in the <a class="el" href="../../d1/d8c/a00600.html">EFI_SYSTEM_TABLE</a>.<p>
-This function prints a formatted ASCII string to the console output device specified by StdErr in <a class="el" href="../../d1/d8c/a00600.html">EFI_SYSTEM_TABLE</a> and returns the number of ASCII characters that printed to StdErr. If the length of the formatted ASCII string is greater than PcdUefiLibMaxPrintBufferSize, then only the first PcdUefiLibMaxPrintBufferSize characters are sent to StdErr. If Format is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Format</em>&nbsp;</td><td>Null-terminated ASCII format string. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>...</em>&nbsp;</td><td>Variable argument list whose contents are accessed based on the format string specified by Format.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>Number of ASCII characters printed to ConErr. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="607406a7eac9276bae5a584e66b4520f"></a><!-- doxytag: member="UefiLib.h::AsciiPrint" ref="607406a7eac9276bae5a584e66b4520f" args="(IN CONST CHAR8 *Format,...)" -->
+<a class="anchor" name="9358119fa13e6f78d7db52995efc35cb"></a><!-- doxytag: member="UefiTcgPlatform.h::EV_EFI_HANDOFF_TABLES" ref="9358119fa13e6f78d7db52995efc35cb" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI AsciiPrint           </td>
-          <td>(</td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *&nbsp;</td>
-          <td class="paramname"> <em>Format</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&nbsp;</td>
-          <td class="paramname"> <em>...</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EV_EFI_HANDOFF_TABLES&nbsp;&nbsp;&nbsp;(EV_EFI_EVENT_BASE + 9)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Prints a formatted ASCII string to the console output device specified by ConOut defined in the <a class="el" href="../../d1/d8c/a00600.html">EFI_SYSTEM_TABLE</a>.<p>
-This function prints a formatted ASCII string to the console output device specified by ConOut in <a class="el" href="../../d1/d8c/a00600.html">EFI_SYSTEM_TABLE</a> and returns the number of ASCII characters that printed to ConOut. If the length of the formatted ASCII string is greater than PcdUefiLibMaxPrintBufferSize, then only the first PcdUefiLibMaxPrintBufferSize characters are sent to ConOut. If Format is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Format</em>&nbsp;</td><td>Null-terminated ASCII format string. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>...</em>&nbsp;</td><td>Variable argument list whose contents are accessed based on the format string specified by Format.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>Number of ASCII characters printed to ConOut. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="ea780943414c08e969066a55b533ac09"></a><!-- doxytag: member="UefiLib.h::AsciiPrintXY" ref="ea780943414c08e969066a55b533ac09" args="(IN UINTN PointX, IN UINTN PointY, IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL *ForeGround, IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL *BackGround, IN CONST CHAR8 *Format,...)" -->
+<a class="anchor" name="5bb885ba21309c28501781d172209a89"></a><!-- doxytag: member="UefiTcgPlatform.h::EV_EFI_PLATFORM_FIRMWARE_BLOB" ref="5bb885ba21309c28501781d172209a89" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI AsciiPrintXY           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>PointX</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>PointY</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d9/d3a/a00439.html">EFI_GRAPHICS_OUTPUT_BLT_PIXEL</a> *&nbsp;</td>
-          <td class="paramname"> <em>ForeGround</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d9/d3a/a00439.html">EFI_GRAPHICS_OUTPUT_BLT_PIXEL</a> *&nbsp;</td>
-          <td class="paramname"> <em>BackGround</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *&nbsp;</td>
-          <td class="paramname"> <em>Format</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&nbsp;</td>
-          <td class="paramname"> <em>...</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EV_EFI_PLATFORM_FIRMWARE_BLOB&nbsp;&nbsp;&nbsp;(EV_EFI_EVENT_BASE + 8)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Prints a formatted ASCII string to a graphics console device specified by ConsoleOutputHandle defined in the <a class="el" href="../../d1/d8c/a00600.html">EFI_SYSTEM_TABLE</a> at the given (X,Y) coordinates.<p>
-This function prints a formatted ASCII string to the graphics console device specified by ConsoleOutputHandle in <a class="el" href="../../d1/d8c/a00600.html">EFI_SYSTEM_TABLE</a> and returns the number of ASCII characters displayed, not including partial characters that may be clipped by the right edge of the display. If the length of the formatted ASCII string is greater than PcdUefiLibMaxPrintBufferSize, then at most the first PcdUefiLibMaxPrintBufferSize characters are printed. The EFI_HII_FONT_PROTOCOL is used to convert the string to a bitmap using the glyphs registered with the HII database. No wrapping is performed, so any portions of the string the fall outside the active display region will not be displayed.<p>
-If a graphics console device is not associated with the ConsoleOutputHandle defined in the <a class="el" href="../../d1/d8c/a00600.html">EFI_SYSTEM_TABLE</a> then no string is printed, and 0 is returned. If the EFI_HII_FONT_PROTOCOL is not present in the handle database, then no string is printed, and 0 is returned. If Format is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>PointX</em>&nbsp;</td><td>X coordinate to print the string. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>PointY</em>&nbsp;</td><td>Y coordinate to print the string. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ForeGround</em>&nbsp;</td><td>The foreground color of the string being printed. This is an optional parameter that may be NULL. If it is NULL, then the foreground color of the current ConOut device in the <a class="el" href="../../d1/d8c/a00600.html">EFI_SYSTEM_TABLE</a> is used. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>BackGround</em>&nbsp;</td><td>The background color of the string being printed. This is an optional parameter that may be NULL. If it is NULL, then the background color of the current ConOut device in the <a class="el" href="../../d1/d8c/a00600.html">EFI_SYSTEM_TABLE</a> is used. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Format</em>&nbsp;</td><td>Null-terminated ASCII format string. See Print Library for the supported format string syntax. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>...</em>&nbsp;</td><td>Variable argument list whose contents are accessed based on the format string specified by Format.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The number of ASCII characters printed. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="8ea873f98019c10e6a24e045e7e3aab0"></a><!-- doxytag: member="UefiLib.h::CreatePopUp" ref="8ea873f98019c10e6a24e045e7e3aab0" args="(IN UINTN Attribute, OUT EFI_INPUT_KEY *Key,...)" -->
+<a class="anchor" name="8ec19655f41ae96a0a9f9d36787bd5a2"></a><!-- doxytag: member="UefiTcgPlatform.h::EV_EFI_RUNTIME_SERVICES_DRIVER" ref="8ec19655f41ae96a0a9f9d36787bd5a2" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">VOID EFIAPI CreatePopUp           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>Attribute</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT <a class="el" href="../../da/d7e/a00492.html">EFI_INPUT_KEY</a> *&nbsp;</td>
-          <td class="paramname"> <em>Key</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&nbsp;</td>
-          <td class="paramname"> <em>...</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EV_EFI_RUNTIME_SERVICES_DRIVER&nbsp;&nbsp;&nbsp;(EV_EFI_EVENT_BASE + 5)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Draws a dialog box to the console output device specified by ConOut defined in the <a class="el" href="../../d1/d8c/a00600.html">EFI_SYSTEM_TABLE</a> and waits for a keystroke from the console input device specified by ConIn defined in the <a class="el" href="../../d1/d8c/a00600.html">EFI_SYSTEM_TABLE</a>.<p>
-If there are no strings in the variable argument list, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If all the strings in the variable argument list are empty, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Attribute</em>&nbsp;</td><td>Specifies the foreground and background color of the popup. </td></tr>
-    <tr><td valign="top"><tt>[out]</tt>&nbsp;</td><td valign="top"><em>Key</em>&nbsp;</td><td>A pointer to the EFI_KEY value of the key that was pressed. This is an optional parameter that may be NULL. If it is NULL then no wait for a keypress will be performed. </td></tr>
-    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>...</em>&nbsp;</td><td>The variable argument list that contains pointers to Null- terminated Unicode strings to display in the dialog box. The variable argument list is terminated by a NULL. </td></tr>
-  </table>
-</dl>
 
 </div>
 </div><p>
-<a class="anchor" name="882c8709d2db575069423a679596c29f"></a><!-- doxytag: member="UefiLib.h::EfiAcquireLock" ref="882c8709d2db575069423a679596c29f" args="(IN EFI_LOCK *Lock)" -->
+<a class="anchor" name="9e54c10a74c6559b3358f726c8b87769"></a><!-- doxytag: member="UefiTcgPlatform.h::EV_EFI_VARIABLE_BOOT" ref="9e54c10a74c6559b3358f726c8b87769" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">VOID EFIAPI EfiAcquireLock           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../dc/d19/a00515.html">EFI_LOCK</a> *&nbsp;</td>
-          <td class="paramname"> <em>Lock</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
+          <td class="memname">#define EV_EFI_VARIABLE_BOOT&nbsp;&nbsp;&nbsp;(EV_EFI_EVENT_BASE + 2)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Acquires ownership of a lock.<p>
-This function raises the system's current task priority level to the task priority level of the mutual exclusion lock. Then, it places the lock in the acquired state. If Lock is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Lock is not initialized, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Lock is already in the acquired state, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Lock</em>&nbsp;</td><td>A pointer to the lock to acquire. </td></tr>
-  </table>
-</dl>
 
 </div>
 </div><p>
-<a class="anchor" name="5d3177f5fe0e69a86365ddc87b3a3467"></a><!-- doxytag: member="UefiLib.h::EfiAcquireLockOrFail" ref="5d3177f5fe0e69a86365ddc87b3a3467" args="(IN EFI_LOCK *Lock)" -->
+<a class="anchor" name="4997de759925d4989e6782e5c41183cc"></a><!-- doxytag: member="UefiTcgPlatform.h::EV_EFI_VARIABLE_DRIVER_CONFIG" ref="4997de759925d4989e6782e5c41183cc" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI EfiAcquireLockOrFail           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../dc/d19/a00515.html">EFI_LOCK</a> *&nbsp;</td>
-          <td class="paramname"> <em>Lock</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
+          <td class="memname">#define EV_EFI_VARIABLE_DRIVER_CONFIG&nbsp;&nbsp;&nbsp;(EV_EFI_EVENT_BASE + 1)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Acquires ownership of a lock.<p>
-This function raises the system's current task priority level to the task priority level of the mutual exclusion lock. Then, it attempts to place the lock in the acquired state. If the lock is already in the acquired state, then EFI_ACCESS_DENIED is returned. Otherwise, EFI_SUCCESS is returned. If Lock is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Lock is not initialized, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Lock</em>&nbsp;</td><td>A pointer to the lock to acquire.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The lock was acquired. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ACCESS_DENIED</em>&nbsp;</td><td>The lock could not be acquired because it is already owned. </td></tr>
-  </table>
-</dl>
 
 </div>
 </div><p>
-<a class="anchor" name="756084495f0009b819eefb5a82d47382"></a><!-- doxytag: member="UefiLib.h::EfiCreateEventLegacyBoot" ref="756084495f0009b819eefb5a82d47382" args="(OUT EFI_EVENT *LegacyBootEvent)" -->
+<a class="anchor" name="b0ad37dff2622269e6e6624a5c0968cd"></a><!-- doxytag: member="UefiTcgPlatform.h::EV_POST_CODE" ref="b0ad37dff2622269e6e6624a5c0968cd" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI EfiCreateEventLegacyBoot           </td>
-          <td>(</td>
-          <td class="paramtype">OUT <a class="el" href="../../d9/dbb/a01186.html#7f3111de303d836d8d3711c39363f81a">EFI_EVENT</a> *&nbsp;</td>
-          <td class="paramname"> <em>LegacyBootEvent</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
+          <td class="memname">#define EV_POST_CODE&nbsp;&nbsp;&nbsp;((<a class="el" href="../../d3/d42/a01051.html#42994a2f67dbb35bbe7a4e10b1e709d4">TCG_EVENTTYPE</a>) 0x00000001)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Creates an EFI event in the Legacy Boot Event Group.<p>
-Prior to UEFI 2.0 this was done via a non blessed UEFI extensions and this library abstracts the implementation mechanism of this event from the caller. This function abstracts the creation of the Legacy Boot Event. The Framework moved from a proprietary to UEFI 2.0 based mechanism. This library abstracts the caller from how this event is created to prevent to code form having to change with the version of the specification supported. If LegacyBootEvent is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>LegacyBootEvent</em>&nbsp;</td><td>Returns the EFI event returned from gBS-&gt;CreateEvent(Ex).</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Event was created. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Other</em>&nbsp;</td><td>Event was not created. </td></tr>
-  </table>
-</dl>
 
 </div>
 </div><p>
-<a class="anchor" name="1e20b3b96f89c611cada1d6c743ef185"></a><!-- doxytag: member="UefiLib.h::EfiCreateEventLegacyBootEx" ref="1e20b3b96f89c611cada1d6c743ef185" args="(IN EFI_TPL NotifyTpl, IN EFI_EVENT_NOTIFY NotifyFunction, IN VOID *NotifyContext, OUT EFI_EVENT *LegacyBootEvent)" -->
+<a class="anchor" name="50b9a75f729c9cc789efa735bb4e394a"></a><!-- doxytag: member="UefiTcgPlatform.h::EV_S_CRTM_CONTENTS" ref="50b9a75f729c9cc789efa735bb4e394a" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI EfiCreateEventLegacyBootEx           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d9/dbb/a01186.html#b998e5f7da4a664eaa86252ab16e459a">EFI_TPL</a>&nbsp;</td>
-          <td class="paramname"> <em>NotifyTpl</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d1/d0d/a01191.html#0232efb36b3e8c42740d8f54dd737105">EFI_EVENT_NOTIFY</a>&nbsp;</td>
-          <td class="paramname"> <em>NotifyFunction</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN VOID *&nbsp;</td>
-          <td class="paramname"> <em>NotifyContext</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT <a class="el" href="../../d9/dbb/a01186.html#7f3111de303d836d8d3711c39363f81a">EFI_EVENT</a> *&nbsp;</td>
-          <td class="paramname"> <em>LegacyBootEvent</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EV_S_CRTM_CONTENTS&nbsp;&nbsp;&nbsp;((<a class="el" href="../../d3/d42/a01051.html#42994a2f67dbb35bbe7a4e10b1e709d4">TCG_EVENTTYPE</a>) 0x00000007)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Create an EFI event in the Legacy Boot Event Group and allows the caller to specify a notification function.<p>
-This function abstracts the creation of the Legacy Boot Event. The Framework moved from a proprietary to UEFI 2.0 based mechanism. This library abstracts the caller from how this event is created to prevent to code form having to change with the version of the specification supported. If LegacyBootEvent is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>NotifyTpl</em>&nbsp;</td><td>The task priority level of the event. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>NotifyFunction</em>&nbsp;</td><td>The notification function to call when the event is signaled. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>NotifyContext</em>&nbsp;</td><td>The content to pass to NotifyFunction when the event is signaled. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>LegacyBootEvent</em>&nbsp;</td><td>Returns the EFI event returned from gBS-&gt;CreateEvent(Ex).</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Event was created. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Other</em>&nbsp;</td><td>Event was not created. </td></tr>
-  </table>
-</dl>
 
 </div>
 </div><p>
-<a class="anchor" name="65373f46f60a73101b90acc11d11eaab"></a><!-- doxytag: member="UefiLib.h::EfiCreateEventReadyToBoot" ref="65373f46f60a73101b90acc11d11eaab" args="(OUT EFI_EVENT *ReadyToBootEvent)" -->
+<a class="anchor" name="fe48cbada2ca6af39d614abe75ea25ff"></a><!-- doxytag: member="UefiTcgPlatform.h::EV_S_CRTM_VERSION" ref="fe48cbada2ca6af39d614abe75ea25ff" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI EfiCreateEventReadyToBoot           </td>
-          <td>(</td>
-          <td class="paramtype">OUT <a class="el" href="../../d9/dbb/a01186.html#7f3111de303d836d8d3711c39363f81a">EFI_EVENT</a> *&nbsp;</td>
-          <td class="paramname"> <em>ReadyToBootEvent</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
+          <td class="memname">#define EV_S_CRTM_VERSION&nbsp;&nbsp;&nbsp;((<a class="el" href="../../d3/d42/a01051.html#42994a2f67dbb35bbe7a4e10b1e709d4">TCG_EVENTTYPE</a>) 0x00000008)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Create an EFI event in the Ready To Boot Event Group.<p>
-Prior to UEFI 2.0 this was done via a non-standard UEFI extension, and this library abstracts the implementation mechanism of this event from the caller. This function abstracts the creation of the Ready to Boot Event. The Framework moved from a proprietary to UEFI 2.0-based mechanism. This library abstracts the caller from how this event is created to prevent the code form having to change with the version of the specification supported. If ReadyToBootEvent is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>ReadyToBootEvent</em>&nbsp;</td><td>Returns the EFI event returned from gBS-&gt;CreateEvent(Ex).</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Event was created. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Other</em>&nbsp;</td><td>Event was not created. </td></tr>
-  </table>
-</dl>
 
 </div>
 </div><p>
-<a class="anchor" name="c992b00ba6a658dadc724c645896e26f"></a><!-- doxytag: member="UefiLib.h::EfiCreateEventReadyToBootEx" ref="c992b00ba6a658dadc724c645896e26f" args="(IN EFI_TPL NotifyTpl, IN EFI_EVENT_NOTIFY NotifyFunction, IN VOID *NotifyContext, OUT EFI_EVENT *ReadyToBootEvent)" -->
+<a class="anchor" name="a4ae6faf5b4405e388c4d1365c0cb1cb"></a><!-- doxytag: member="UefiTcgPlatform.h::EV_SEPARATOR" ref="a4ae6faf5b4405e388c4d1365c0cb1cb" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI EfiCreateEventReadyToBootEx           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d9/dbb/a01186.html#b998e5f7da4a664eaa86252ab16e459a">EFI_TPL</a>&nbsp;</td>
-          <td class="paramname"> <em>NotifyTpl</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d1/d0d/a01191.html#0232efb36b3e8c42740d8f54dd737105">EFI_EVENT_NOTIFY</a>&nbsp;</td>
-          <td class="paramname"> <em>NotifyFunction</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN VOID *&nbsp;</td>
-          <td class="paramname"> <em>NotifyContext</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT <a class="el" href="../../d9/dbb/a01186.html#7f3111de303d836d8d3711c39363f81a">EFI_EVENT</a> *&nbsp;</td>
-          <td class="paramname"> <em>ReadyToBootEvent</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EV_SEPARATOR&nbsp;&nbsp;&nbsp;((<a class="el" href="../../d3/d42/a01051.html#42994a2f67dbb35bbe7a4e10b1e709d4">TCG_EVENTTYPE</a>) 0x00000004)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Create an EFI event in the Ready To Boot Event Group and allows the caller to specify a notification function.<p>
-This function abstracts the creation of the Ready to Boot Event. The Framework moved from a proprietary to UEFI 2.0 based mechanism. This library abstracts the caller from how this event is created to prevent to code form having to change with the version of the specification supported. If ReadyToBootEvent is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>NotifyTpl</em>&nbsp;</td><td>The task priority level of the event. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>NotifyFunction</em>&nbsp;</td><td>The notification function to call when the event is signaled. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>NotifyContext</em>&nbsp;</td><td>The content to pass to NotifyFunction when the event is signaled. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ReadyToBootEvent</em>&nbsp;</td><td>Returns the EFI event returned from gBS-&gt;CreateEvent(Ex).</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Event was created. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Other</em>&nbsp;</td><td>Event was not created. </td></tr>
-  </table>
-</dl>
 
 </div>
 </div><p>
-<a class="anchor" name="0e16309b53db00616996155c0d083041"></a><!-- doxytag: member="UefiLib.h::EfiCreateProtocolNotifyEvent" ref="0e16309b53db00616996155c0d083041" args="(IN EFI_GUID *ProtocolGuid, IN EFI_TPL NotifyTpl, IN EFI_EVENT_NOTIFY NotifyFunction, IN VOID *NotifyContext, OUT VOID **Registration)" -->
+<a class="anchor" name="88a9c250e4fca341f5203f548f6a4b0d"></a><!-- doxytag: member="UefiTcgPlatform.h::TSS_EVENT_DATA_MAX_SIZE" ref="88a9c250e4fca341f5203f548f6a4b0d" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#7f3111de303d836d8d3711c39363f81a">EFI_EVENT</a> EFIAPI EfiCreateProtocolNotifyEvent           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *&nbsp;</td>
-          <td class="paramname"> <em>ProtocolGuid</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d9/dbb/a01186.html#b998e5f7da4a664eaa86252ab16e459a">EFI_TPL</a>&nbsp;</td>
-          <td class="paramname"> <em>NotifyTpl</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d1/d0d/a01191.html#0232efb36b3e8c42740d8f54dd737105">EFI_EVENT_NOTIFY</a>&nbsp;</td>
-          <td class="paramname"> <em>NotifyFunction</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN VOID *&nbsp;</td>
-          <td class="paramname"> <em>NotifyContext</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT VOID **&nbsp;</td>
-          <td class="paramname"> <em>Registration</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define TSS_EVENT_DATA_MAX_SIZE&nbsp;&nbsp;&nbsp;256          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Creates and returns a notification event and registers that event with all the protocol instances specified by ProtocolGuid.<p>
-This function causes the notification function to be executed for every protocol of type ProtocolGuid instance that exists in the system when this function is invoked. If there are no instances of ProtocolGuid in the handle database at the time this function is invoked, then the notification function is still executed one time. In addition, every time a protocol of type ProtocolGuid instance is installed or reinstalled, the notification function is also executed. This function returns the notification event that was created. If ProtocolGuid is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If NotifyTpl is not a legal TPL value, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If NotifyFunction is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Registration is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>ProtocolGuid</em>&nbsp;</td><td>Supplies <a class="el" href="../../d9/d0f/a00644.html">GUID</a> of the protocol upon whose installation the event is fired. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>NotifyTpl</em>&nbsp;</td><td>Supplies the task priority level of the event notifications. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>NotifyFunction</em>&nbsp;</td><td>Supplies the function to notify when the event is signaled. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>NotifyContext</em>&nbsp;</td><td>The context parameter to pass to NotifyFunction. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Registration</em>&nbsp;</td><td>A pointer to a memory location to receive the registration value. This value is passed to LocateHandle() to obtain new handles that have been added that support the ProtocolGuid-specified protocol.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The notification event that was created. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="23e3b23d43884278f8da0326341dfb22"></a><!-- doxytag: member="UefiLib.h::EfiGetCurrentTpl" ref="23e3b23d43884278f8da0326341dfb22" args="(VOID)" -->
+<hr><h2>Typedef Documentation</h2>
+<a class="anchor" name="edfd1d680891721009b15ad9eefe228d"></a><!-- doxytag: member="UefiTcgPlatform.h::EFI_GPT_DATA" ref="edfd1d680891721009b15ad9eefe228d" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#b998e5f7da4a664eaa86252ab16e459a">EFI_TPL</a> EFIAPI EfiGetCurrentTpl           </td>
-          <td>(</td>
-          <td class="paramtype">VOID&nbsp;</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
+          <td class="memname">typedef struct <a class="el" href="../../de/dfc/a00891.html">tdEFI_GPT_DATA</a>  <a class="el" href="../../de/dfc/a00891.html">EFI_GPT_DATA</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Returns the current TPL.<p>
-This function returns the current TPL. There is no EFI service to directly retrieve the current TPL. Instead, the RaiseTPL() function is used to raise the TPL to TPL_HIGH_LEVEL. This will return the current TPL. The TPL level can then immediately be restored back to the current TPL level with a call to RestoreTPL().<p>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The current TPL. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="37ae153ec43595869e7d979330161da1"></a><!-- doxytag: member="UefiLib.h::EfiGetNameGuidFromFwVolDevicePathNode" ref="37ae153ec43595869e7d979330161da1" args="(IN CONST MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *FvDevicePathNode)" -->
+<a class="anchor" name="13010a1e71f9ad405d35cb622f108baa"></a><!-- doxytag: member="UefiTcgPlatform.h::EFI_HANDOFF_TABLE_POINTERS" ref="13010a1e71f9ad405d35cb622f108baa" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>* EFIAPI EfiGetNameGuidFromFwVolDevicePathNode           </td>
-          <td>(</td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d8/d13/a00671.html">MEDIA_FW_VOL_FILEPATH_DEVICE_PATH</a> *&nbsp;</td>
-          <td class="paramname"> <em>FvDevicePathNode</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
+          <td class="memname">typedef struct <a class="el" href="../../d0/de2/a00892.html">tdEFI_HANDOFF_TABLE_POINTERS</a>  <a class="el" href="../../d0/de2/a00892.html">EFI_HANDOFF_TABLE_POINTERS</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Check to see if the Firmware Volume (FV) Media Device Path is valid<p>
-The Framework FwVol Device Path changed to conform to the UEFI 2.0 specification. This library function abstracts validating a device path node. Check the <a class="el" href="../../d8/d13/a00671.html">MEDIA_FW_VOL_FILEPATH_DEVICE_PATH</a> data structure to see if it's valid. If it is valid, then return the <a class="el" href="../../d9/d0f/a00644.html">GUID</a> file name from the device path node. Otherwise, return NULL. This device path changed in the DXE CIS version 0.92 in a non backward compatible way to not conflict with the UEFI 2.0 specification. This function abstracts the differences from the caller. If FvDevicePathNode is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>FvDevicePathNode</em>&nbsp;</td><td>Pointer to FV device path to check.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>NULL</em>&nbsp;</td><td>FvDevicePathNode is not valid. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Other</em>&nbsp;</td><td>FvDevicePathNode is valid and pointer to NameGuid was returned. </td></tr>
-  </table>
-</dl>
-
+EFI_HANDOFF_TABLE_POINTERS<p>
+This structure is used in EV_EFI_HANDOFF_TABLES event to facilitate the measurement of given configuration tables. 
 </div>
 </div><p>
-<a class="anchor" name="64b39aedc0fdb2e9377fdd2436c91246"></a><!-- doxytag: member="UefiLib.h::EfiGetSystemConfigurationTable" ref="64b39aedc0fdb2e9377fdd2436c91246" args="(IN EFI_GUID *TableGuid, OUT VOID **Table)" -->
+<a class="anchor" name="76e6e1c8ddbbe9d621b8f1e581ec5fbb"></a><!-- doxytag: member="UefiTcgPlatform.h::EFI_IMAGE_LOAD_EVENT" ref="76e6e1c8ddbbe9d621b8f1e581ec5fbb" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI EfiGetSystemConfigurationTable           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *&nbsp;</td>
-          <td class="paramname"> <em>TableGuid</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT VOID **&nbsp;</td>
-          <td class="paramname"> <em>Table</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">typedef struct <a class="el" href="../../dc/d2c/a00893.html">tdEFI_IMAGE_LOAD_EVENT</a>  <a class="el" href="../../dc/d2c/a00893.html">EFI_IMAGE_LOAD_EVENT</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Retrieves a pointer to the system configuration table from the EFI System Table based on a specified <a class="el" href="../../d9/d0f/a00644.html">GUID</a>.<p>
-This function searches the list of configuration tables stored in the EFI System Table for a table with a <a class="el" href="../../d9/d0f/a00644.html">GUID</a> that matches TableGuid. If a match is found, then a pointer to the configuration table is returned in Table, and EFI_SUCCESS is returned. If a matching <a class="el" href="../../d9/d0f/a00644.html">GUID</a> is not found, then EFI_NOT_FOUND is returned. If TableGuid is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Table is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>TableGuid</em>&nbsp;</td><td>Pointer to table's <a class="el" href="../../d9/d0f/a00644.html">GUID</a> type.. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Table</em>&nbsp;</td><td>Pointer to the table associated with TableGuid in the EFI System Table.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>A configuration table matching TableGuid was found. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>A configuration table matching TableGuid could not be found. </td></tr>
-  </table>
-</dl>
-
+EFI_IMAGE_LOAD_EVENT<p>
+This structure is used in EV_EFI_BOOT_SERVICES_APPLICATION, EV_EFI_BOOT_SERVICES_DRIVER and EV_EFI_RUNTIME_SERVICES_DRIVER 
 </div>
 </div><p>
-<a class="anchor" name="a6227cd72e7eb0467195c375f57c0a4f"></a><!-- doxytag: member="UefiLib.h::EfiInitializeFwVolDevicepathNode" ref="a6227cd72e7eb0467195c375f57c0a4f" args="(IN OUT MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *FvDevicePathNode, IN CONST EFI_GUID *NameGuid)" -->
+<a class="anchor" name="4b146c72712fdc31374d8edc1faf5d42"></a><!-- doxytag: member="UefiTcgPlatform.h::EFI_PLATFORM_FIRMWARE_BLOB" ref="4b146c72712fdc31374d8edc1faf5d42" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">VOID EFIAPI EfiInitializeFwVolDevicepathNode           </td>
-          <td>(</td>
-          <td class="paramtype">IN OUT <a class="el" href="../../d8/d13/a00671.html">MEDIA_FW_VOL_FILEPATH_DEVICE_PATH</a> *&nbsp;</td>
-          <td class="paramname"> <em>FvDevicePathNode</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *&nbsp;</td>
-          <td class="paramname"> <em>NameGuid</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">typedef struct <a class="el" href="../../dc/dfa/a00894.html">tdEFI_PLATFORM_FIRMWARE_BLOB</a>  <a class="el" href="../../dc/dfa/a00894.html">EFI_PLATFORM_FIRMWARE_BLOB</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Initialize a Firmware Volume (FV) Media Device Path node.<p>
-The Framework FwVol Device Path changed to conform to the UEFI 2.0 specification. This library function abstracts initializing a device path node. Initialize the <a class="el" href="../../d8/d13/a00671.html">MEDIA_FW_VOL_FILEPATH_DEVICE_PATH</a> data structure. This device path changed in the DXE CIS version 0.92 in a non back ward compatible way to not conflict with the UEFI 2.0 specification. This function abstracts the differences from the caller. If FvDevicePathNode is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If NameGuid is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>FvDevicePathNode</em>&nbsp;</td><td>Pointer to a FV device path node to initialize </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>NameGuid</em>&nbsp;</td><td>FV file name to use in FvDevicePathNode </td></tr>
-  </table>
-</dl>
-
+EFI_PLATFORM_FIRMWARE_BLOB<p>
+BlobLength should be of type UINTN but we use UINT64 here because PEI is 32-bit while DXE is 64-bit on x64 platforms 
 </div>
 </div><p>
-<a class="anchor" name="7504eda86463550e59dc580f54927da8"></a><!-- doxytag: member="UefiLib.h::EfiInitializeLock" ref="7504eda86463550e59dc580f54927da8" args="(IN OUT EFI_LOCK *Lock, IN EFI_TPL Priority)" -->
+<a class="anchor" name="3a36ff2a4d2d613c2b2d4cfa5367569c"></a><!-- doxytag: member="UefiTcgPlatform.h::EFI_VARIABLE_DATA" ref="3a36ff2a4d2d613c2b2d4cfa5367569c" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d19/a00515.html">EFI_LOCK</a>* EFIAPI EfiInitializeLock           </td>
-          <td>(</td>
-          <td class="paramtype">IN OUT <a class="el" href="../../dc/d19/a00515.html">EFI_LOCK</a> *&nbsp;</td>
-          <td class="paramname"> <em>Lock</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d9/dbb/a01186.html#b998e5f7da4a664eaa86252ab16e459a">EFI_TPL</a>&nbsp;</td>
-          <td class="paramname"> <em>Priority</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">typedef struct <a class="el" href="../../d2/d21/a00895.html">tdEFI_VARIABLE_DATA</a>  <a class="el" href="../../d2/d21/a00895.html">EFI_VARIABLE_DATA</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Initializes a basic mutual exclusion lock.<p>
-This function initializes a basic mutual exclusion lock to the released state and returns the lock. Each lock provides mutual exclusion access at its task priority level. Since there is no preemption or multiprocessor support in EFI, acquiring the lock only consists of raising to the locks TPL. If Lock is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Priority is not a valid TPL value, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Lock</em>&nbsp;</td><td>A pointer to the lock data structure to initialize. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Priority</em>&nbsp;</td><td>EFI TPL associated with the lock.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The lock. </dd></dl>
-
+EFI_VARIABLE_DATA<p>
+This structure serves as the header for measuring variables. The name of the variable (in Unicode format) should immediately follow, then the variable data. 
 </div>
 </div><p>
-<a class="anchor" name="db61d37e97048bf4b7ee0d48f2968168"></a><!-- doxytag: member="UefiLib.h::EfiLibInstallAllDriverProtocols" ref="db61d37e97048bf4b7ee0d48f2968168" args="(IN CONST EFI_HANDLE ImageHandle, IN CONST EFI_SYSTEM_TABLE *SystemTable, IN EFI_DRIVER_BINDING_PROTOCOL *DriverBinding, IN EFI_HANDLE DriverBindingHandle, IN CONST EFI_COMPONENT_NAME_PROTOCOL *ComponentName, IN CONST EFI_DRIVER_CONFIGURATION_PROTOCOL *DriverConfiguration, IN CONST EFI_DRIVER_DIAGNOSTICS_PROTOCOL *DriverDiagnostics)" -->
+<a class="anchor" name="4bd692039fcad06280b790e47b517e5e"></a><!-- doxytag: member="UefiTcgPlatform.h::TCG_DIGEST" ref="4bd692039fcad06280b790e47b517e5e" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI EfiLibInstallAllDriverProtocols           </td>
-          <td>(</td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>&nbsp;</td>
-          <td class="paramname"> <em>ImageHandle</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d1/d8c/a00600.html">EFI_SYSTEM_TABLE</a> *&nbsp;</td>
-          <td class="paramname"> <em>SystemTable</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../dd/da2/a00019.html">EFI_DRIVER_BINDING_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>DriverBinding</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>&nbsp;</td>
-          <td class="paramname"> <em>DriverBindingHandle</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../da/d45/a00011.html">EFI_COMPONENT_NAME_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>ComponentName</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../de/d11/a00021.html">EFI_DRIVER_CONFIGURATION_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>DriverConfiguration</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d3/d52/a00023.html">EFI_DRIVER_DIAGNOSTICS_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>DriverDiagnostics</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">typedef <a class="el" href="../../df/dbc/a00931.html">TPM_DIGEST</a> <a class="el" href="../../df/dbc/a00931.html">TCG_DIGEST</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Installs and completes the initialization of a Driver Binding Protocol instance and optionally installs the Component Name, Driver Configuration and Driver Diagnostics Protocols.<p>
-Initializes a driver by installing the Driver Binding Protocol together with the optional Component Name, optional Driver Configure and optional Driver Diagnostic Protocols onto the driver's DriverBindingHandle. If DriverBindingHandle is NULL, then the protocols are installed onto a newly created handle. DriverBindingHandle is typically the same as the driver's ImageHandle, but it can be different if the driver produces multiple Driver Binding Protocols. If DriverBinding is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the installation fails, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>ImageHandle</em>&nbsp;</td><td>The image handle of the driver. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SystemTable</em>&nbsp;</td><td>The EFI System Table that was passed to the driver's entry point. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DriverBinding</em>&nbsp;</td><td>A Driver Binding Protocol instance that this driver is producing. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DriverBindingHandle</em>&nbsp;</td><td>The handle that DriverBinding is to be installed onto. If this parameter is NULL, then a new handle is created. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ComponentName</em>&nbsp;</td><td>A Component Name Protocol instance that this driver is producing. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DriverConfiguration</em>&nbsp;</td><td>A Driver Configuration Protocol instance that this driver is producing. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DriverDiagnostics</em>&nbsp;</td><td>A Driver Diagnostics Protocol instance that this driver is producing.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The protocol installation is completed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There was not enough memory in pool to install all the protocols. </td></tr>
-  </table>
-</dl>
 
 </div>
 </div><p>
-<a class="anchor" name="ac0e3a03e5bbd506be45f2d4b24ad583"></a><!-- doxytag: member="UefiLib.h::EfiLibInstallAllDriverProtocols2" ref="ac0e3a03e5bbd506be45f2d4b24ad583" args="(IN CONST EFI_HANDLE ImageHandle, IN CONST EFI_SYSTEM_TABLE *SystemTable, IN EFI_DRIVER_BINDING_PROTOCOL *DriverBinding, IN EFI_HANDLE DriverBindingHandle, IN CONST EFI_COMPONENT_NAME_PROTOCOL *ComponentName, IN CONST EFI_COMPONENT_NAME2_PROTOCOL *ComponentName2, IN CONST EFI_DRIVER_CONFIGURATION_PROTOCOL *DriverConfiguration, IN CONST EFI_DRIVER_CONFIGURATION2_PROTOCOL *DriverConfiguration2, IN CONST EFI_DRIVER_DIAGNOSTICS_PROTOCOL *DriverDiagnostics, IN CONST EFI_DRIVER_DIAGNOSTICS2_PROTOCOL *DriverDiagnostics2)" -->
+<a class="anchor" name="42994a2f67dbb35bbe7a4e10b1e709d4"></a><!-- doxytag: member="UefiTcgPlatform.h::TCG_EVENTTYPE" ref="42994a2f67dbb35bbe7a4e10b1e709d4" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI EfiLibInstallAllDriverProtocols2           </td>
-          <td>(</td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>&nbsp;</td>
-          <td class="paramname"> <em>ImageHandle</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d1/d8c/a00600.html">EFI_SYSTEM_TABLE</a> *&nbsp;</td>
-          <td class="paramname"> <em>SystemTable</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../dd/da2/a00019.html">EFI_DRIVER_BINDING_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>DriverBinding</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>&nbsp;</td>
-          <td class="paramname"> <em>DriverBindingHandle</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../da/d45/a00011.html">EFI_COMPONENT_NAME_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>ComponentName</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d7/dec/a00010.html">EFI_COMPONENT_NAME2_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>ComponentName2</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../de/d11/a00021.html">EFI_DRIVER_CONFIGURATION_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>DriverConfiguration</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../db/db2/a00020.html">EFI_DRIVER_CONFIGURATION2_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>DriverConfiguration2</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d3/d52/a00023.html">EFI_DRIVER_DIAGNOSTICS_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>DriverDiagnostics</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d7/de0/a00022.html">EFI_DRIVER_DIAGNOSTICS2_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>DriverDiagnostics2</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d3/d42/a01051.html#42994a2f67dbb35bbe7a4e10b1e709d4">TCG_EVENTTYPE</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Installs Driver Binding Protocol with optional Component Name, Component Name 2, Driver Configuration, Driver Configuration 2, Driver Diagnostics, and Driver Diagnostics 2 Protocols.<p>
-Initializes a driver by installing the Driver Binding Protocol together with the optional Component Name, optional Component Name 2, optional Driver Configuration, optional Driver Configuration 2, optional Driver Diagnostic, and optional Driver Diagnostic 2 Protocols onto the driver's DriverBindingHandle. DriverBindingHandle is typically the same as the driver's ImageHandle, but it can be different if the driver produces multiple Driver Binding Protocols. If DriverBinding is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the installation fails, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>ImageHandle</em>&nbsp;</td><td>The image handle of the driver. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SystemTable</em>&nbsp;</td><td>The EFI System Table that was passed to the driver's entry point. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DriverBinding</em>&nbsp;</td><td>A Driver Binding Protocol instance that this driver is producing. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DriverBindingHandle</em>&nbsp;</td><td>The handle that DriverBinding is to be installed onto. If this parameter is NULL, then a new handle is created. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ComponentName</em>&nbsp;</td><td>A Component Name Protocol instance that this driver is producing. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ComponentName2</em>&nbsp;</td><td>A Component Name 2 Protocol instance that this driver is producing. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DriverConfiguration</em>&nbsp;</td><td>A Driver Configuration Protocol instance that this driver is producing. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DriverConfiguration2</em>&nbsp;</td><td>A Driver Configuration Protocol 2 instance that this driver is producing. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DriverDiagnostics</em>&nbsp;</td><td>A Driver Diagnostics Protocol instance that this driver is producing. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DriverDiagnostics2</em>&nbsp;</td><td>A Driver Diagnostics Protocol 2 instance that this driver is producing.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The protocol installation is completed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There was not enough memory in pool to install all the protocols. </td></tr>
-  </table>
-</dl>
 
 </div>
 </div><p>
-<a class="anchor" name="d14956cfd9ca514c63ce37c33fb97212"></a><!-- doxytag: member="UefiLib.h::EfiLibInstallDriverBinding" ref="d14956cfd9ca514c63ce37c33fb97212" args="(IN CONST EFI_HANDLE ImageHandle, IN CONST EFI_SYSTEM_TABLE *SystemTable, IN EFI_DRIVER_BINDING_PROTOCOL *DriverBinding, IN EFI_HANDLE DriverBindingHandle)" -->
+<a class="anchor" name="dc3c94ba267d8825eb98c263be2a3319"></a><!-- doxytag: member="UefiTcgPlatform.h::TCG_PCR_EVENT" ref="dc3c94ba267d8825eb98c263be2a3319" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI EfiLibInstallDriverBinding           </td>
-          <td>(</td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>&nbsp;</td>
-          <td class="paramname"> <em>ImageHandle</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d1/d8c/a00600.html">EFI_SYSTEM_TABLE</a> *&nbsp;</td>
-          <td class="paramname"> <em>SystemTable</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../dd/da2/a00019.html">EFI_DRIVER_BINDING_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>DriverBinding</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>&nbsp;</td>
-          <td class="paramname"> <em>DriverBindingHandle</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">typedef struct <a class="el" href="../../da/dd6/a00896.html">tdTCG_PCR_EVENT</a>  <a class="el" href="../../da/dd6/a00896.html">TCG_PCR_EVENT</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Installs and completes the initialization of a Driver Binding Protocol instance.<p>
-Installs the Driver Binding Protocol specified by DriverBinding onto the handle specified by DriverBindingHandle. If DriverBindingHandle is NULL, then DriverBinding is installed onto a newly created handle. DriverBindingHandle is typically the same as the driver's ImageHandle, but it can be different if the driver produces multiple Driver Binding Protocols. If DriverBinding is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If DriverBinding can not be installed onto a handle, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>ImageHandle</em>&nbsp;</td><td>The image handle of the driver. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SystemTable</em>&nbsp;</td><td>The EFI System Table that was passed to the driver's entry point. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DriverBinding</em>&nbsp;</td><td>A Driver Binding Protocol instance that this driver is producing. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DriverBindingHandle</em>&nbsp;</td><td>The handle that DriverBinding is to be installed onto. If this parameter is NULL, then a new handle is created.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The protocol installation is completed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There was not enough system resources to install the protocol. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Others</em>&nbsp;</td><td>Status from gBS-&gt;InstallMultipleProtocolInterfaces(). </td></tr>
-  </table>
-</dl>
-
+Event Log Entry Structure Definition 
 </div>
 </div><p>
-<a class="anchor" name="66fb29c2bbafaecc615506dd358f55ab"></a><!-- doxytag: member="UefiLib.h::EfiLibInstallDriverBindingComponentName2" ref="66fb29c2bbafaecc615506dd358f55ab" args="(IN CONST EFI_HANDLE ImageHandle, IN CONST EFI_SYSTEM_TABLE *SystemTable, IN EFI_DRIVER_BINDING_PROTOCOL *DriverBinding, IN EFI_HANDLE DriverBindingHandle, IN CONST EFI_COMPONENT_NAME_PROTOCOL *ComponentName, IN CONST EFI_COMPONENT_NAME2_PROTOCOL *ComponentName2)" -->
+<a class="anchor" name="3fc9b116963cb88d2e30b3167b04d73d"></a><!-- doxytag: member="UefiTcgPlatform.h::TCG_PCR_EVENT_HDR" ref="3fc9b116963cb88d2e30b3167b04d73d" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI EfiLibInstallDriverBindingComponentName2           </td>
-          <td>(</td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>&nbsp;</td>
-          <td class="paramname"> <em>ImageHandle</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d1/d8c/a00600.html">EFI_SYSTEM_TABLE</a> *&nbsp;</td>
-          <td class="paramname"> <em>SystemTable</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../dd/da2/a00019.html">EFI_DRIVER_BINDING_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>DriverBinding</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>&nbsp;</td>
-          <td class="paramname"> <em>DriverBindingHandle</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../da/d45/a00011.html">EFI_COMPONENT_NAME_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>ComponentName</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d7/dec/a00010.html">EFI_COMPONENT_NAME2_PROTOCOL</a> *&nbsp;</td>
-          <td class="paramname"> <em>ComponentName2</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">typedef struct <a class="el" href="../../de/d01/a00897.html">tdTCG_PCR_EVENT_HDR</a>  <a class="el" href="../../de/d01/a00897.html">TCG_PCR_EVENT_HDR</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Installs Driver Binding Protocol with optional Component Name and Component Name 2 Protocols.<p>
-Initializes a driver by installing the Driver Binding Protocol together with the optional Component Name and optional Component Name 2 protocols onto the driver's DriverBindingHandle. If DriverBindingHandle is NULL, then the protocols are installed onto a newly created handle. DriverBindingHandle is typically the same as the driver's ImageHandle, but it can be different if the driver produces multiple Driver Binding Protocols. If DriverBinding is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the installation fails, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>ImageHandle</em>&nbsp;</td><td>The image handle of the driver. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SystemTable</em>&nbsp;</td><td>The EFI System Table that was passed to the driver's entry point. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DriverBinding</em>&nbsp;</td><td>A Driver Binding Protocol instance that this driver is producing. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DriverBindingHandle</em>&nbsp;</td><td>The handle that DriverBinding is to be installed onto. If this parameter is NULL, then a new handle is created. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ComponentName</em>&nbsp;</td><td>A Component Name Protocol instance that this driver is producing. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ComponentName2</em>&nbsp;</td><td>A Component Name 2 Protocol instance that this driver is producing.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The protocol installation is completed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There was not enough memory in pool to install all the protocols. </td></tr>
-  </table>
-</dl>
-
+TCG_PCR_EVENT_HDR 
 </div>
 </div><p>
-<a class="anchor" name="45f26824d7bb48276efdda796162599a"></a><!-- doxytag: member="UefiLib.h::EfiNamedEventListen" ref="45f26824d7bb48276efdda796162599a" args="(IN CONST EFI_GUID *Name, IN EFI_TPL NotifyTpl, IN EFI_EVENT_NOTIFY NotifyFunction, IN CONST VOID *NotifyContext, OUT VOID *Registration)" -->
+<a class="anchor" name="72c5682bce258499e5d8052339051f47"></a><!-- doxytag: member="UefiTcgPlatform.h::TCG_PCRINDEX" ref="72c5682bce258499e5d8052339051f47" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI EfiNamedEventListen           </td>
-          <td>(</td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *&nbsp;</td>
-          <td class="paramname"> <em>Name</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d9/dbb/a01186.html#b998e5f7da4a664eaa86252ab16e459a">EFI_TPL</a>&nbsp;</td>
-          <td class="paramname"> <em>NotifyTpl</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d1/d0d/a01191.html#0232efb36b3e8c42740d8f54dd737105">EFI_EVENT_NOTIFY</a>&nbsp;</td>
-          <td class="paramname"> <em>NotifyFunction</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST VOID *&nbsp;</td>
-          <td class="paramname"> <em>NotifyContext</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT VOID *&nbsp;</td>
-          <td class="paramname"> <em>Registration</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">typedef <a class="el" href="../../d9/d8e/a01050.html#3fbec19a92a1a56e34778a6a38a421f7">TPM_PCRINDEX</a> <a class="el" href="../../d3/d42/a01051.html#72c5682bce258499e5d8052339051f47">TCG_PCRINDEX</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Creates a named event that can be signaled with <a class="el" href="../../d3/d42/a01051.html#6cbe623f8261b392d114211f400456bf">EfiNamedEventSignal()</a>.<p>
-This function creates an event using NotifyTpl, NoifyFunction, and NotifyContext. This event is signaled with <a class="el" href="../../d3/d42/a01051.html#6cbe623f8261b392d114211f400456bf">EfiNamedEventSignal()</a>. This provides the ability for one or more listeners on the same event named by the <a class="el" href="../../d9/d0f/a00644.html">GUID</a> specified by Name. If Name is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If NotifyTpl is not a legal TPL value, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If NotifyFunction is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Name</em>&nbsp;</td><td>Supplies <a class="el" href="../../d9/d0f/a00644.html">GUID</a> name of the event. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>NotifyTpl</em>&nbsp;</td><td>Supplies the task priority level of the event notifications. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>NotifyFunction</em>&nbsp;</td><td>Supplies the function to notify when the event is signaled. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>NotifyContext</em>&nbsp;</td><td>The context parameter to pass to NotifyFunction. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Registration</em>&nbsp;</td><td>A pointer to a memory location to receive the registration value.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>A named event was created. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There are not enough resource to create the named event. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="6cbe623f8261b392d114211f400456bf"></a><!-- doxytag: member="UefiLib.h::EfiNamedEventSignal" ref="6cbe623f8261b392d114211f400456bf" args="(IN CONST EFI_GUID *Name)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI EfiNamedEventSignal           </td>
-          <td>(</td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *&nbsp;</td>
-          <td class="paramname"> <em>Name</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Signals a named event created with <a class="el" href="../../d3/d42/a01051.html#45f26824d7bb48276efdda796162599a">EfiNamedEventListen()</a>.<p>
-This function signals the named event specified by Name. The named event must have been created with <a class="el" href="../../d3/d42/a01051.html#45f26824d7bb48276efdda796162599a">EfiNamedEventListen()</a>. If Name is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Name</em>&nbsp;</td><td>Supplies <a class="el" href="../../d9/d0f/a00644.html">GUID</a> name of the event.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>A named event was signaled. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There are not enough resource to signal the named event. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="30fe35b9cd501f362b40b70e7ed0b570"></a><!-- doxytag: member="UefiLib.h::EfiReleaseLock" ref="30fe35b9cd501f362b40b70e7ed0b570" args="(IN EFI_LOCK *Lock)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VOID EFIAPI EfiReleaseLock           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../dc/d19/a00515.html">EFI_LOCK</a> *&nbsp;</td>
-          <td class="paramname"> <em>Lock</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Releases ownership of a lock.<p>
-This function transitions a mutual exclusion lock from the acquired state to the released state, and restores the system's task priority level to its previous level. If Lock is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Lock is not initialized, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Lock is already in the released state, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Lock</em>&nbsp;</td><td>A pointer to the lock to release. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="c0c1bed57c209c8cd5f351491b1f22f6"></a><!-- doxytag: member="UefiLib.h::EfiSignalEventLegacyBoot" ref="c0c1bed57c209c8cd5f351491b1f22f6" args="(VOID)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VOID EFIAPI EfiSignalEventLegacyBoot           </td>
-          <td>(</td>
-          <td class="paramtype">VOID&nbsp;</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Create, Signal, and Close the Ready to Boot event using <a class="el" href="../../d3/d42/a01051.html#c0c1bed57c209c8cd5f351491b1f22f6">EfiSignalEventLegacyBoot()</a>.<p>
-This function abstracts the signaling of the Legacy Boot Event. The Framework moved from a proprietary to UEFI 2.0 based mechanism. This library abstracts the caller from how this event is created to prevent to code form having to change with the version of the specification supported. 
-</div>
-</div><p>
-<a class="anchor" name="cd5ecd5e57260db21efc0a3abc8f9b7b"></a><!-- doxytag: member="UefiLib.h::EfiSignalEventReadyToBoot" ref="cd5ecd5e57260db21efc0a3abc8f9b7b" args="(VOID)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VOID EFIAPI EfiSignalEventReadyToBoot           </td>
-          <td>(</td>
-          <td class="paramtype">VOID&nbsp;</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Create, Signal, and Close the Ready to Boot event using <a class="el" href="../../d3/d42/a01051.html#cd5ecd5e57260db21efc0a3abc8f9b7b">EfiSignalEventReadyToBoot()</a>.<p>
-This function abstracts the signaling of the Ready to Boot Event. The Framework moved from a proprietary to UEFI 2.0 based mechanism. This library abstracts the caller from how this event is created to prevent to code form having to change with the version of the specification supported. 
-</div>
-</div><p>
-<a class="anchor" name="5cf535eb783a2e2b3e1635e03eeb7e0c"></a><!-- doxytag: member="UefiLib.h::EfiTestChildHandle" ref="5cf535eb783a2e2b3e1635e03eeb7e0c" args="(IN CONST EFI_HANDLE ControllerHandle, IN CONST EFI_HANDLE ChildHandle, IN CONST EFI_GUID *ProtocolGuid)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI EfiTestChildHandle           </td>
-          <td>(</td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>&nbsp;</td>
-          <td class="paramname"> <em>ControllerHandle</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>&nbsp;</td>
-          <td class="paramname"> <em>ChildHandle</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *&nbsp;</td>
-          <td class="paramname"> <em>ProtocolGuid</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Tests whether a child handle is a child device of the controller.<p>
-This function tests whether ChildHandle is one of the children of ControllerHandle. This test is performed by checking to see if the protocol specified by ProtocolGuid is present on ControllerHandle and opened by ChildHandle with an attribute of EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER. If ProtocolGuid is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>ControllerHandle</em>&nbsp;</td><td>A handle for a (parent) controller to test. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ChildHandle</em>&nbsp;</td><td>A child handle to test. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ProtocolGuid</em>&nbsp;</td><td>Supplies the protocol that the child controller opens on its parent controller.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>ChildHandle is a child of the ControllerHandle. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>ChildHandle is not a child of the ControllerHandle. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="c291677079261b2c921cec184ecf2460"></a><!-- doxytag: member="UefiLib.h::EfiTestManagedDevice" ref="c291677079261b2c921cec184ecf2460" args="(IN CONST EFI_HANDLE ControllerHandle, IN CONST EFI_HANDLE DriverBindingHandle, IN CONST EFI_GUID *ProtocolGuid)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI EfiTestManagedDevice           </td>
-          <td>(</td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>&nbsp;</td>
-          <td class="paramname"> <em>ControllerHandle</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>&nbsp;</td>
-          <td class="paramname"> <em>DriverBindingHandle</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *&nbsp;</td>
-          <td class="paramname"> <em>ProtocolGuid</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Tests whether a controller handle is being managed by a specific driver.<p>
-This function tests whether the driver specified by DriverBindingHandle is currently managing the controller specified by ControllerHandle. This test is performed by evaluating if the the protocol specified by ProtocolGuid is present on ControllerHandle and is was opened by DriverBindingHandle with an attribute of EFI_OPEN_PROTOCOL_BY_DRIVER. If ProtocolGuid is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>ControllerHandle</em>&nbsp;</td><td>A handle for a controller to test. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DriverBindingHandle</em>&nbsp;</td><td>Specifies the driver binding handle for the driver. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ProtocolGuid</em>&nbsp;</td><td>Specifies the protocol that the driver specified by DriverBindingHandle opens in its Start() function.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>ControllerHandle is managed by the driver specified by DriverBindingHandle. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>ControllerHandle is not managed by the driver specified by DriverBindingHandle. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="7fda8c3ee0996a766348a8c80e1de489"></a><!-- doxytag: member="UefiLib.h::ErrorPrint" ref="7fda8c3ee0996a766348a8c80e1de489" args="(IN CONST CHAR16 *Format,...)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI ErrorPrint           </td>
-          <td>(</td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> *&nbsp;</td>
-          <td class="paramname"> <em>Format</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&nbsp;</td>
-          <td class="paramname"> <em>...</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Prints a formatted Unicode string to the console output device specified by StdErr defined in the <a class="el" href="../../d1/d8c/a00600.html">EFI_SYSTEM_TABLE</a>.<p>
-This function prints a formatted Unicode string to the console output device specified by StdErr in <a class="el" href="../../d1/d8c/a00600.html">EFI_SYSTEM_TABLE</a> and returns the number of Unicode characters that printed to StdErr. If the length of the formatted Unicode string is greater than PcdUefiLibMaxPrintBufferSize, then only the first PcdUefiLibMaxPrintBufferSize characters are sent to StdErr. If Format is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Format is not aligned on a 16-bit boundary, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Format</em>&nbsp;</td><td>Null-terminated Unicode format string. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>...</em>&nbsp;</td><td>Variable argument list whose contents are accessed based on the format string specified by Format.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>Number of Unicode characters printed to StdErr. </dd></dl>
-
-</div>
-</div><p>
-<a class="anchor" name="f2984d6c15394a1c21bf3f37e62c2c7b"></a><!-- doxytag: member="UefiLib.h::FreeUnicodeStringTable" ref="f2984d6c15394a1c21bf3f37e62c2c7b" args="(IN EFI_UNICODE_STRING_TABLE *UnicodeStringTable)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI FreeUnicodeStringTable           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../da/dd1/a00629.html">EFI_UNICODE_STRING_TABLE</a> *&nbsp;</td>
-          <td class="paramname"> <em>UnicodeStringTable</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This function frees the table of Unicode strings in UnicodeStringTable.<p>
-If UnicodeStringTable is NULL, then EFI_SUCCESS is returned. Otherwise, each language code, and each Unicode string in the Unicode string table are freed, and EFI_SUCCESS is returned.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>UnicodeStringTable</em>&nbsp;</td><td>A pointer to the table of Unicode strings.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The Unicode string table was freed. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="954c438b7efb6abbe1cdba2a61a43c86"></a><!-- doxytag: member="UefiLib.h::GetBestLanguage" ref="954c438b7efb6abbe1cdba2a61a43c86" args="(IN CONST CHAR8 *SupportedLanguages, IN BOOLEAN Iso639Language,...)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a>* EFIAPI GetBestLanguage           </td>
-          <td>(</td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *&nbsp;</td>
-          <td class="paramname"> <em>SupportedLanguages</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td>
-          <td class="paramname"> <em>Iso639Language</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&nbsp;</td>
-          <td class="paramname"> <em>...</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Returns a pointer to an allocated buffer that contains the best matching language from a set of supported languages.<p>
-This function supports both ISO 639-2 and RFC 4646 language codes, but language code types may not be mixed in a single call to this function. The language code returned is allocated using <a class="el" href="../../d6/dcd/a01023.html#646c0f82c2a35557dda175dbfcd26e96">AllocatePool()</a>. The caller is responsible for freeing the allocated buffer using <a class="el" href="../../d6/dcd/a01023.html#8b1cbc21e0cebcfc6a992546ec9b4941">FreePool()</a>. This function supports a variable argument list that allows the caller to pass in a prioritized list of language codes to test against all the language codes in SupportedLanguages.<p>
-If SupportedLanguages is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>SupportedLanguages</em>&nbsp;</td><td>A pointer to a Null-terminated ASCII string that contains a set of language codes in the format specified by Iso639Language. </td></tr>
-    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Iso639Language</em>&nbsp;</td><td>If TRUE, then all language codes are assumed to be in ISO 639-2 format. If FALSE, then all language codes are assumed to be in RFC 4646 language format </td></tr>
-    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>...</em>&nbsp;</td><td>A variable argument list that contains pointers to Null-terminated ASCII strings that contain one or more language codes in the format specified by Iso639Language. The first language code from each of these language code lists is used to determine if it is an exact or close match to any of the language codes in SupportedLanguages. Close matches only apply to RFC 4646 language codes, and the matching algorithm from RFC 4647 is used to determine if a close match is present. If an exact or close match is found, then the matching language code from SupportedLanguages is returned. If no matches are found, then the next variable argument parameter is evaluated. The variable argument list is terminated by a NULL.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>NULL</em>&nbsp;</td><td>The best matching language could not be found in SupportedLanguages. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>NULL</em>&nbsp;</td><td>There are not enough resources available to return the best matching language. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Other</em>&nbsp;</td><td>A pointer to a Null-terminated ASCII string that is the best matching language in SupportedLanguages. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="2a8817b96785e81a792273caa20bcf19"></a><!-- doxytag: member="UefiLib.h::GetEfiGlobalVariable" ref="2a8817b96785e81a792273caa20bcf19" args="(IN CONST CHAR16 *Name)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VOID* EFIAPI GetEfiGlobalVariable           </td>
-          <td>(</td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> *&nbsp;</td>
-          <td class="paramname"> <em>Name</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Returns a pointer to an allocated buffer that contains the contents of a variable retrieved through the UEFI Runtime Service <a class="el" href="../../d3/d42/a01051.html#271f3e023dee65a16e84147d7325d786">GetVariable()</a>. This function always uses the EFI_GLOBAL_VARIABLE <a class="el" href="../../d9/d0f/a00644.html">GUID</a> to retrieve variables. The returned buffer is allocated using <a class="el" href="../../d6/dcd/a01023.html#646c0f82c2a35557dda175dbfcd26e96">AllocatePool()</a>. The caller is responsible for freeing this buffer with <a class="el" href="../../d6/dcd/a01023.html#8b1cbc21e0cebcfc6a992546ec9b4941">FreePool()</a>.<p>
-If Name is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Name</em>&nbsp;</td><td>Pointer to a Null-terminated Unicode string.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>NULL</em>&nbsp;</td><td>The variable could not be retrieved. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>NULL</em>&nbsp;</td><td>There are not enough resources available for the variable contents. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Other</em>&nbsp;</td><td>A pointer to allocated buffer containing the variable contents. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="e2a80f4b3989493e43afb5c3dad9f610"></a><!-- doxytag: member="UefiLib.h::GetGlyphWidth" ref="e2a80f4b3989493e43afb5c3dad9f610" args="(IN CHAR16 UnicodeChar)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI GetGlyphWidth           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a>&nbsp;</td>
-          <td class="paramname"> <em>UnicodeChar</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Retrieves the width of a Unicode character.<p>
-This function computes and returns the width of the Unicode character specified by UnicodeChar.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>UnicodeChar</em>&nbsp;</td><td>A Unicode character.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>0</em>&nbsp;</td><td>The width if UnicodeChar could not be determined. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>1</em>&nbsp;</td><td>UnicodeChar is a narrow glyph. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>2</em>&nbsp;</td><td>UnicodeChar is a wide glyph. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="271f3e023dee65a16e84147d7325d786"></a><!-- doxytag: member="UefiLib.h::GetVariable" ref="271f3e023dee65a16e84147d7325d786" args="(IN CONST CHAR16 *Name, IN CONST EFI_GUID *Guid)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VOID* EFIAPI GetVariable           </td>
-          <td>(</td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> *&nbsp;</td>
-          <td class="paramname"> <em>Name</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *&nbsp;</td>
-          <td class="paramname"> <em>Guid</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Returns a pointer to an allocated buffer that contains the contents of a variable retrieved through the UEFI Runtime Service <a class="el" href="../../d3/d42/a01051.html#271f3e023dee65a16e84147d7325d786">GetVariable()</a>. The returned buffer is allocated using <a class="el" href="../../d6/dcd/a01023.html#646c0f82c2a35557dda175dbfcd26e96">AllocatePool()</a>. The caller is responsible for freeing this buffer with <a class="el" href="../../d6/dcd/a01023.html#8b1cbc21e0cebcfc6a992546ec9b4941">FreePool()</a>.<p>
-If Name is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Guid is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Name</em>&nbsp;</td><td>Pointer to a Null-terminated Unicode string. </td></tr>
-    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>Pointer to an EFI_GUID structure</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>NULL</em>&nbsp;</td><td>The variable could not be retrieved. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>NULL</em>&nbsp;</td><td>There are not enough resources available for the variable contents. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Other</em>&nbsp;</td><td>A pointer to allocated buffer containing the variable contents. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="6a7713ed6500d4da5ab25d08f9dfb94f"></a><!-- doxytag: member="UefiLib.h::LookupUnicodeString" ref="6a7713ed6500d4da5ab25d08f9dfb94f" args="(IN CONST CHAR8 *Language, IN CONST CHAR8 *SupportedLanguages, IN CONST EFI_UNICODE_STRING_TABLE *UnicodeStringTable, OUT CHAR16 **UnicodeString)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI LookupUnicodeString           </td>
-          <td>(</td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *&nbsp;</td>
-          <td class="paramname"> <em>Language</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *&nbsp;</td>
-          <td class="paramname"> <em>SupportedLanguages</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../da/dd1/a00629.html">EFI_UNICODE_STRING_TABLE</a> *&nbsp;</td>
-          <td class="paramname"> <em>UnicodeStringTable</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> **&nbsp;</td>
-          <td class="paramname"> <em>UnicodeString</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This function looks up a Unicode string in UnicodeStringTable.<p>
-If Language is a member of SupportedLanguages and a Unicode string is found in UnicodeStringTable that matches the language code specified by Language, then it is returned in UnicodeString.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Language</em>&nbsp;</td><td>A pointer to the ISO 639-2 language code for the Unicode string to look up and return. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SupportedLanguages</em>&nbsp;</td><td>A pointer to the set of ISO 639-2 language codes that the Unicode string table supports. Language must be a member of this set. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>UnicodeStringTable</em>&nbsp;</td><td>A pointer to the table of Unicode strings. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>UnicodeString</em>&nbsp;</td><td>A pointer to the Unicode string from UnicodeStringTable that matches the language specified by Language.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The Unicode string that matches the language specified by Language was found in the table of Unicode strings UnicodeStringTable, and it was returned in UnicodeString. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Language is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>UnicodeString is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>SupportedLanguages is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>UnicodeStringTable is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The language specified by Language is not a member of SupportedLanguages. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The language specified by Language is not supported by UnicodeStringTable. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="b73d369fd5e6aac52e87e6a47e6bbc9e"></a><!-- doxytag: member="UefiLib.h::LookupUnicodeString2" ref="b73d369fd5e6aac52e87e6a47e6bbc9e" args="(IN CONST CHAR8 *Language, IN CONST CHAR8 *SupportedLanguages, IN CONST EFI_UNICODE_STRING_TABLE *UnicodeStringTable, OUT CHAR16 **UnicodeString, IN BOOLEAN Iso639Language)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI LookupUnicodeString2           </td>
-          <td>(</td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *&nbsp;</td>
-          <td class="paramname"> <em>Language</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *&nbsp;</td>
-          <td class="paramname"> <em>SupportedLanguages</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../da/dd1/a00629.html">EFI_UNICODE_STRING_TABLE</a> *&nbsp;</td>
-          <td class="paramname"> <em>UnicodeStringTable</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> **&nbsp;</td>
-          <td class="paramname"> <em>UnicodeString</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td>
-          <td class="paramname"> <em>Iso639Language</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This function looks up a Unicode string in UnicodeStringTable.<p>
-If Language is a member of SupportedLanguages and a Unicode string is found in UnicodeStringTable that matches the language code specified by Language, then it is returned in UnicodeString.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Language</em>&nbsp;</td><td>A pointer to an ASCII string containing the ISO 639-2 or the RFC 4646 language code for the Unicode string to look up and return. If Iso639Language is TRUE, then this ASCII string is not assumed to be Null-terminated, and only the first three characters are used. If Iso639Language is FALSE, then this ASCII string must be Null-terminated. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SupportedLanguages</em>&nbsp;</td><td>A pointer to a Null-terminated ASCII string that contains a set of ISO 639-2 or RFC 4646 language codes that the Unicode string table supports. Language must be a member of this set. If Iso639Language is TRUE, then this string contains one or more ISO 639-2 language codes with no separator characters. If Iso639Language is FALSE, then is string contains one or more RFC 4646 language codes separated by ';'. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>UnicodeStringTable</em>&nbsp;</td><td>A pointer to the table of Unicode strings. Type <a class="el" href="../../da/dd1/a00629.html">EFI_UNICODE_STRING_TABLE</a> is defined in "Related Definitions". </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>UnicodeString</em>&nbsp;</td><td>A pointer to the Null-terminated Unicode string from UnicodeStringTable that matches the language specified by Language. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Iso639Language</em>&nbsp;</td><td>Specifies the supported language code format. If it is TRUE, then Language and SupportedLanguages follow ISO 639-2 language code format. Otherwise, they follow RFC 4646 language code format.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The Unicode string that matches the language specified by Language was found in the table of Unicode strings UnicodeStringTable, and it was returned in UnicodeString. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Language is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>UnicodeString is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>SupportedLanguages is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>UnicodeStringTable is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The language specified by Language is not a member of SupportedLanguages. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The language specified by Language is not supported by UnicodeStringTable. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="ef8e616b24a037e33f0a3472b3531cc6"></a><!-- doxytag: member="UefiLib.h::Print" ref="ef8e616b24a037e33f0a3472b3531cc6" args="(IN CONST CHAR16 *Format,...)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI Print           </td>
-          <td>(</td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> *&nbsp;</td>
-          <td class="paramname"> <em>Format</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&nbsp;</td>
-          <td class="paramname"> <em>...</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Prints a formatted Unicode string to the console output device specified by ConOut defined in the <a class="el" href="../../d1/d8c/a00600.html">EFI_SYSTEM_TABLE</a>.<p>
-This function prints a formatted Unicode string to the console output device specified by ConOut in <a class="el" href="../../d1/d8c/a00600.html">EFI_SYSTEM_TABLE</a> and returns the number of Unicode characters that printed to ConOut. If the length of the formatted Unicode string is greater than PcdUefiLibMaxPrintBufferSize, then only the first PcdUefiLibMaxPrintBufferSize characters are sent to ConOut. If Format is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Format is not aligned on a 16-bit boundary, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Format</em>&nbsp;</td><td>Null-terminated Unicode format string. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>...</em>&nbsp;</td><td>Variable argument list whose contents are accessed based on the format string specified by Format.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>Number of Unicode characters printed to ConOut. </dd></dl>
-
-</div>
-</div><p>
-<a class="anchor" name="09ec670e96bb745072a4b8d3e687592e"></a><!-- doxytag: member="UefiLib.h::PrintXY" ref="09ec670e96bb745072a4b8d3e687592e" args="(IN UINTN PointX, IN UINTN PointY, IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL *ForeGround, IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL *BackGround, IN CONST CHAR16 *Format,...)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI PrintXY           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>PointX</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>PointY</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d9/d3a/a00439.html">EFI_GRAPHICS_OUTPUT_BLT_PIXEL</a> *&nbsp;</td>
-          <td class="paramname"> <em>ForeGround</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d9/d3a/a00439.html">EFI_GRAPHICS_OUTPUT_BLT_PIXEL</a> *&nbsp;</td>
-          <td class="paramname"> <em>BackGround</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> *&nbsp;</td>
-          <td class="paramname"> <em>Format</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&nbsp;</td>
-          <td class="paramname"> <em>...</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Prints a formatted Unicode string to a graphics console device specified by ConsoleOutputHandle defined in the <a class="el" href="../../d1/d8c/a00600.html">EFI_SYSTEM_TABLE</a> at the given (X,Y) coordinates.<p>
-This function prints a formatted Unicode string to the graphics console device specified by ConsoleOutputHandle in <a class="el" href="../../d1/d8c/a00600.html">EFI_SYSTEM_TABLE</a> and returns the number of Unicode characters displayed, not including partial characters that may be clipped by the right edge of the display. If the length of the formatted Unicode string is greater than PcdUefiLibMaxPrintBufferSize, then at most the first PcdUefiLibMaxPrintBufferSize characters are printed. The EFI_HII_FONT_PROTOCOL is used to convert the string to a bitmap using the glyphs registered with the HII database. No wrapping is performed, so any portions of the string the fall outside the active display region will not be displayed.<p>
-If a graphics console device is not associated with the ConsoleOutputHandle defined in the <a class="el" href="../../d1/d8c/a00600.html">EFI_SYSTEM_TABLE</a> then no string is printed, and 0 is returned. If the EFI_HII_FONT_PROTOCOL is not present in the handle database, then no string is printed, and 0 is returned. If Format is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Format is not aligned on a 16-bit boundary, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>PointX</em>&nbsp;</td><td>X coordinate to print the string. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>PointY</em>&nbsp;</td><td>Y coordinate to print the string. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ForeGround</em>&nbsp;</td><td>The foreground color of the string being printed. This is an optional parameter that may be NULL. If it is NULL, then the foreground color of the current ConOut device in the <a class="el" href="../../d1/d8c/a00600.html">EFI_SYSTEM_TABLE</a> is used. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>BackGround</em>&nbsp;</td><td>The background color of the string being printed. This is an optional parameter that may be NULL. If it is NULL, then the background color of the current ConOut device in the <a class="el" href="../../d1/d8c/a00600.html">EFI_SYSTEM_TABLE</a> is used. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Format</em>&nbsp;</td><td>Null-terminated Unicode format string. See Print Library for the supported format string syntax. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>...</em>&nbsp;</td><td>Variable argument list whose contents are accessed based on the format string specified by Format.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The number of Unicode characters printed. </dd></dl>
-
-</div>
-</div><p>
-<a class="anchor" name="4a16ee34fa912ac36eeb52964d8d0f6f"></a><!-- doxytag: member="UefiLib.h::UnicodeStringDisplayLength" ref="4a16ee34fa912ac36eeb52964d8d0f6f" args="(IN CONST CHAR16 *String)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI UnicodeStringDisplayLength           </td>
-          <td>(</td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> *&nbsp;</td>
-          <td class="paramname"> <em>String</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Computes the display length of a Null-terminated Unicode String.<p>
-This function computes and returns the display length of the Null-terminated Unicode string specified by String. If String is NULL then 0 is returned. If any of the widths of the Unicode characters in String can not be determined, then 0 is returned. The display width of String can be computed by summing the display widths of each Unicode character in String. Unicode characters that are narrow glyphs have a width of 1, and Unicode characters that are width glyphs have a width of 2. If String is not aligned on a 16-bit boundary, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>String</em>&nbsp;</td><td>A pointer to a Null-terminated Unicode string.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The display length of the Null-terminated Unicode string specified by String. </dd></dl>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:09 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:19 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

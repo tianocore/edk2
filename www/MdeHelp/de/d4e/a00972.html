@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Guid/HobList.h File Reference</title>
+<title>MdePkg[ALL]: tdTPM_STORED_DATA Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -9,59 +9,40 @@
   <div class="tabs">
     <ul>
       <li><a href="../../main.html"><span>Main&nbsp;Page</span></a></li>
-      <li><a href="../../annotated.html"><span>Data&nbsp;Structures</span></a></li>
-      <li class="current"><a href="../../files.html"><span>Files</span></a></li>
+      <li class="current"><a href="../../annotated.html"><span>Data&nbsp;Structures</span></a></li>
+      <li><a href="../../files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div class="tabs">
     <ul>
-      <li><a href="../../files.html"><span>File&nbsp;List</span></a></li>
-      <li><a href="../../globals.html"><span>Globals</span></a></li>
+      <li><a href="../../annotated.html"><span>Data&nbsp;Structures</span></a></li>
+      <li><a href="../../functions.html"><span>Data&nbsp;Fields</span></a></li>
     </ul>
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Guid/HobList.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>tdTPM_STORED_DATA Struct Reference</h1><!-- doxytag: class="tdTPM_STORED_DATA" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
-<tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d4e/a00972.html#580530ac48a0c8cbaf395fe342e4abdd">HOB_LIST_GUID</a></td></tr>
+<tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/dce/a00974.html">TPM_STRUCT_VER</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d4e/a00972.html#d3388707548baa078dad90fc02b33d6c">ver</a></td></tr>
 
-<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d4e/a00972.html#242814a443bcafea18e8549ec17f0c1b">gEfiHobListGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d4e/a00972.html#af204e5aea914bcd2b17a80f726b1688">sealInfoSize</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d4e/a00972.html#16142beeb57427d78a19c339f3da7719">sealInfo</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d4e/a00972.html#ad95b260cd586acf84228946f6ed67bc">encDataSize</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d4e/a00972.html#d13077bf7a4973a69a9338a022fc296c">encData</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-GUIDs used for HOB List entries<p>
-These GUIDs point the HOB List passed from PEI to DXE.<p>
-Copyright (c) 2006 - 2009, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
-<dl class="user" compact><dt><b>Revision Reference:</b></dt><dd><a class="el" href="../../d9/d0f/a00644.html">GUID</a> introduced in PI Version 1.0. </dd></dl>
-<hr><h2>Define Documentation</h2>
-<a class="anchor" name="580530ac48a0c8cbaf395fe342e4abdd"></a><!-- doxytag: member="HobList.h::HOB_LIST_GUID" ref="580530ac48a0c8cbaf395fe342e4abdd" args="" -->
+Part 2, section 9.1: TPM_STORED_DATA [size_is(sealInfoSize)] BYTE* sealInfo; [size_is(encDataSize)] BYTE* encData; <hr><h2>Field Documentation</h2>
+<a class="anchor" name="d13077bf7a4973a69a9338a022fc296c"></a><!-- doxytag: member="tdTPM_STORED_DATA::encData" ref="d13077bf7a4973a69a9338a022fc296c" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define HOB_LIST_GUID          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-<b>Value:</b><div class="fragment"><pre class="fragment">{ \
-    0x7739f24c, 0x93d7, 0x11d4, {0x9a, 0x3a, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d } \
-  }
-</pre></div>
-</div>
-</div><p>
-<hr><h2>Variable Documentation</h2>
-<a class="anchor" name="242814a443bcafea18e8549ec17f0c1b"></a><!-- doxytag: member="HobList.h::gEfiHobListGuid" ref="242814a443bcafea18e8549ec17f0c1b" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../de/d4e/a00972.html#242814a443bcafea18e8549ec17f0c1b">gEfiHobListGuid</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>* <a class="el" href="../../de/d4e/a00972.html#d13077bf7a4973a69a9338a022fc296c">tdTPM_STORED_DATA::encData</a>          </td>
         </tr>
       </table>
 </div>
@@ -71,8 +52,68 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 </div>
 </div><p>
+<a class="anchor" name="ad95b260cd586acf84228946f6ed67bc"></a><!-- doxytag: member="tdTPM_STORED_DATA::encDataSize" ref="ad95b260cd586acf84228946f6ed67bc" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../de/d4e/a00972.html#ad95b260cd586acf84228946f6ed67bc">tdTPM_STORED_DATA::encDataSize</a>          </td>
+        </tr>
+      </table>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:07 2009 for MdePkg[ALL] by&nbsp;
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="16142beeb57427d78a19c339f3da7719"></a><!-- doxytag: member="tdTPM_STORED_DATA::sealInfo" ref="16142beeb57427d78a19c339f3da7719" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>* <a class="el" href="../../de/d4e/a00972.html#16142beeb57427d78a19c339f3da7719">tdTPM_STORED_DATA::sealInfo</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="af204e5aea914bcd2b17a80f726b1688"></a><!-- doxytag: member="tdTPM_STORED_DATA::sealInfoSize" ref="af204e5aea914bcd2b17a80f726b1688" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../de/d4e/a00972.html#af204e5aea914bcd2b17a80f726b1688">tdTPM_STORED_DATA::sealInfoSize</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="d3388707548baa078dad90fc02b33d6c"></a><!-- doxytag: member="tdTPM_STORED_DATA::ver" ref="d3388707548baa078dad90fc02b33d6c" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../df/dce/a00974.html">TPM_STRUCT_VER</a> <a class="el" href="../../de/d4e/a00972.html#d3388707548baa078dad90fc02b33d6c">tdTPM_STORED_DATA::ver</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+</div>
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:12 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

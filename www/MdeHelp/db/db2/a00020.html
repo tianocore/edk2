@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: _EFI_DRIVER_CONFIGURATION2_PROTOCOL Struct Reference</title>
+<title>MdePkg[ALL]: _EFI_DRIVER_BINDING_PROTOCOL Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,26 +21,60 @@
   </div>
 </div>
 <div class="contents">
-<h1>_EFI_DRIVER_CONFIGURATION2_PROTOCOL Struct Reference</h1><!-- doxytag: class="_EFI_DRIVER_CONFIGURATION2_PROTOCOL" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>_EFI_DRIVER_BINDING_PROTOCOL Struct Reference</h1><!-- doxytag: class="_EFI_DRIVER_BINDING_PROTOCOL" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d09/a01118.html#7514ab17de0391340b77c03791e5dd9a">EFI_DRIVER_CONFIGURATION2_SET_OPTIONS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db2/a00020.html#88f7aa3c108447f7b0334b3ecf9e9cac">SetOptions</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/dc7/a01170.html#69fa28f889a84cd11d031137433c0e8b">EFI_DRIVER_BINDING_SUPPORTED</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db2/a00020.html#fdc59c1db25b2d0aecce6c7e3e90ffcc">Supported</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d09/a01118.html#06b93aff80b688c6f0e0a029508da5f1">EFI_DRIVER_CONFIGURATION2_OPTIONS_VALID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db2/a00020.html#a60178eff9e6a15926b4ffa82e14c68e">OptionsValid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/dc7/a01170.html#40b5262ed68f77f5b18cedb926a6646a">EFI_DRIVER_BINDING_START</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db2/a00020.html#31a3bc340f183ac925ddda6819d15aa6">Start</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d09/a01118.html#b85d27998296804124296f12b2fcbdd6">EFI_DRIVER_CONFIGURATION2_FORCE_DEFAULTS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db2/a00020.html#896a40abee9a62bd6dbfbdceb295c3fc">ForceDefaults</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/dc7/a01170.html#909abfff42bf5f5342db312542b44be6">EFI_DRIVER_BINDING_STOP</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db2/a00020.html#1666399ede5916da5bd3df87d193ad15">Stop</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db2/a00020.html#51983fb11770ac027a092be1dbaf8aaa">SupportedLanguages</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db2/a00020.html#780c79498c90eed41aac3197314a3e8d">Version</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db2/a00020.html#104c790cf71e67f3a008a42e7bf341c1">ImageHandle</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db2/a00020.html#b9a010c9ca07ee62f3b0ecd01a355ab2">DriverBindingHandle</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Used to set configuration options for a controller that an EFI Driver is managing. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="896a40abee9a62bd6dbfbdceb295c3fc"></a><!-- doxytag: member="_EFI_DRIVER_CONFIGURATION2_PROTOCOL::ForceDefaults" ref="896a40abee9a62bd6dbfbdceb295c3fc" args="" -->
+This protocol provides the services required to determine if a driver supports a given controller. If a controller is supported, then it also provides routines to start and stop the controller. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="b9a010c9ca07ee62f3b0ecd01a355ab2"></a><!-- doxytag: member="_EFI_DRIVER_BINDING_PROTOCOL::DriverBindingHandle" ref="b9a010c9ca07ee62f3b0ecd01a355ab2" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dd/d09/a01118.html#b85d27998296804124296f12b2fcbdd6">EFI_DRIVER_CONFIGURATION2_FORCE_DEFAULTS</a> <a class="el" href="../../db/db2/a00020.html#896a40abee9a62bd6dbfbdceb295c3fc">_EFI_DRIVER_CONFIGURATION2_PROTOCOL::ForceDefaults</a>          </td>
+          <td class="memname"><a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> <a class="el" href="../../db/db2/a00020.html#b9a010c9ca07ee62f3b0ecd01a355ab2">_EFI_DRIVER_BINDING_PROTOCOL::DriverBindingHandle</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+The handle on which this instance of the EFI_DRIVER_BINDING_PROTOCOL is installed. In most cases, this is the same handle as ImageHandle. However, for UEFI drivers that produce more than one instance of the EFI_DRIVER_BINDING_PROTOCOL, this value may not be the same as ImageHandle. 
+</div>
+</div><p>
+<a class="anchor" name="104c790cf71e67f3a008a42e7bf341c1"></a><!-- doxytag: member="_EFI_DRIVER_BINDING_PROTOCOL::ImageHandle" ref="104c790cf71e67f3a008a42e7bf341c1" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> <a class="el" href="../../db/db2/a00020.html#104c790cf71e67f3a008a42e7bf341c1">_EFI_DRIVER_BINDING_PROTOCOL::ImageHandle</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+The image handle of the UEFI driver that produced this instance of the EFI_DRIVER_BINDING_PROTOCOL. 
+</div>
+</div><p>
+<a class="anchor" name="31a3bc340f183ac925ddda6819d15aa6"></a><!-- doxytag: member="_EFI_DRIVER_BINDING_PROTOCOL::Start" ref="31a3bc340f183ac925ddda6819d15aa6" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d3/dc7/a01170.html#40b5262ed68f77f5b18cedb926a6646a">EFI_DRIVER_BINDING_START</a> <a class="el" href="../../db/db2/a00020.html#31a3bc340f183ac925ddda6819d15aa6">_EFI_DRIVER_BINDING_PROTOCOL::Start</a>          </td>
         </tr>
       </table>
 </div>
@@ -50,12 +84,12 @@ Used to set configuration options for a controller that an EFI Driver is managin
 
 </div>
 </div><p>
-<a class="anchor" name="a60178eff9e6a15926b4ffa82e14c68e"></a><!-- doxytag: member="_EFI_DRIVER_CONFIGURATION2_PROTOCOL::OptionsValid" ref="a60178eff9e6a15926b4ffa82e14c68e" args="" -->
+<a class="anchor" name="1666399ede5916da5bd3df87d193ad15"></a><!-- doxytag: member="_EFI_DRIVER_BINDING_PROTOCOL::Stop" ref="1666399ede5916da5bd3df87d193ad15" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dd/d09/a01118.html#06b93aff80b688c6f0e0a029508da5f1">EFI_DRIVER_CONFIGURATION2_OPTIONS_VALID</a> <a class="el" href="../../db/db2/a00020.html#a60178eff9e6a15926b4ffa82e14c68e">_EFI_DRIVER_CONFIGURATION2_PROTOCOL::OptionsValid</a>          </td>
+          <td class="memname"><a class="el" href="../../d3/dc7/a01170.html#909abfff42bf5f5342db312542b44be6">EFI_DRIVER_BINDING_STOP</a> <a class="el" href="../../db/db2/a00020.html#1666399ede5916da5bd3df87d193ad15">_EFI_DRIVER_BINDING_PROTOCOL::Stop</a>          </td>
         </tr>
       </table>
 </div>
@@ -65,12 +99,12 @@ Used to set configuration options for a controller that an EFI Driver is managin
 
 </div>
 </div><p>
-<a class="anchor" name="88f7aa3c108447f7b0334b3ecf9e9cac"></a><!-- doxytag: member="_EFI_DRIVER_CONFIGURATION2_PROTOCOL::SetOptions" ref="88f7aa3c108447f7b0334b3ecf9e9cac" args="" -->
+<a class="anchor" name="fdc59c1db25b2d0aecce6c7e3e90ffcc"></a><!-- doxytag: member="_EFI_DRIVER_BINDING_PROTOCOL::Supported" ref="fdc59c1db25b2d0aecce6c7e3e90ffcc" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dd/d09/a01118.html#7514ab17de0391340b77c03791e5dd9a">EFI_DRIVER_CONFIGURATION2_SET_OPTIONS</a> <a class="el" href="../../db/db2/a00020.html#88f7aa3c108447f7b0334b3ecf9e9cac">_EFI_DRIVER_CONFIGURATION2_PROTOCOL::SetOptions</a>          </td>
+          <td class="memname"><a class="el" href="../../d3/dc7/a01170.html#69fa28f889a84cd11d031137433c0e8b">EFI_DRIVER_BINDING_SUPPORTED</a> <a class="el" href="../../db/db2/a00020.html#fdc59c1db25b2d0aecce6c7e3e90ffcc">_EFI_DRIVER_BINDING_PROTOCOL::Supported</a>          </td>
         </tr>
       </table>
 </div>
@@ -80,23 +114,23 @@ Used to set configuration options for a controller that an EFI Driver is managin
 
 </div>
 </div><p>
-<a class="anchor" name="51983fb11770ac027a092be1dbaf8aaa"></a><!-- doxytag: member="_EFI_DRIVER_CONFIGURATION2_PROTOCOL::SupportedLanguages" ref="51983fb11770ac027a092be1dbaf8aaa" args="" -->
+<a class="anchor" name="780c79498c90eed41aac3197314a3e8d"></a><!-- doxytag: member="_EFI_DRIVER_BINDING_PROTOCOL::Version" ref="780c79498c90eed41aac3197314a3e8d" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a>* <a class="el" href="../../db/db2/a00020.html#51983fb11770ac027a092be1dbaf8aaa">_EFI_DRIVER_CONFIGURATION2_PROTOCOL::SupportedLanguages</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../db/db2/a00020.html#780c79498c90eed41aac3197314a3e8d">_EFI_DRIVER_BINDING_PROTOCOL::Version</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-A Null-terminated ASCII string that contains one or more RFC 4646 language codes. This is the list of language codes that this protocol supports. 
+The version number of the UEFI driver that produced the EFI_DRIVER_BINDING_PROTOCOL. This field is used by the EFI boot service ConnectController() to determine the order that driver's <a class="el" href="../../db/db2/a00020.html#fdc59c1db25b2d0aecce6c7e3e90ffcc">Supported()</a> service will be used when a controller needs to be started. EFI Driver Binding Protocol instances with higher Version values will be used before ones with lower Version values. The Version values of 0x0- 0x0f and 0xfffffff0-0xffffffff are reserved for platform/OEM specific drivers. The Version values of 0x10- 0xffffffef are reserved for IHV-developed drivers. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:12 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:02 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

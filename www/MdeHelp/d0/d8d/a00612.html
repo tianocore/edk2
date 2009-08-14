@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_TCP4_RECEIVE_DATA Struct Reference</title>
+<title>MdePkg[ALL]: EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,81 +21,152 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_TCP4_RECEIVE_DATA Struct Reference</h1><!-- doxytag: class="EFI_TCP4_RECEIVE_DATA" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA Struct Reference</h1><!-- doxytag: class="EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d8d/a00612.html#4eebccde0ba83ef5aa031421d95fe761">UrgentFlag</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/d2a/a00632.html">EFI_STATUS_CODE_DATA</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d8d/a00612.html#369f5daa36e66f3c0fdbdd62f8448fc6">DataHeader</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d8d/a00612.html#6f21bb0a0ef987de74ad1600fce39e79">DataLength</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d8d/a00612.html#72993947aecc9901c7d8a48c2f6a3fca">Bar</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d8d/a00612.html#90ce77ccd81f79bb47e5ddf1a4865d63">FragmentCount</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d8d/a00612.html#2a52c0efcb8413efcdc9e50963ad2b1e">DevicePathSize</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/d14/a00608.html">EFI_TCP4_FRAGMENT_DATA</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d8d/a00612.html#e83bb6dc3dd3628e5b36c9d76ce2bdf3">FragmentTable</a> [1]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d8d/a00612.html#9bb2724866f0d0fb679a5a01490636fd">ReqResSize</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d8d/a00612.html#25476a1f896ec7e44f60beba78e06b83">AllocResSize</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d8d/a00612.html#124032e4009d4f8e5e8ef28560e54947">DevicePath</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d8d/a00612.html#9a7eda92de09681bc8873fa69ad5e9c4">ReqRes</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d8d/a00612.html#650046962a0467e36c8122ac8fa46049">AllocRes</a></td></tr>
 
 </table>
-<hr><h2>Field Documentation</h2>
-<a class="anchor" name="6f21bb0a0ef987de74ad1600fce39e79"></a><!-- doxytag: member="EFI_TCP4_RECEIVE_DATA::DataLength" ref="6f21bb0a0ef987de74ad1600fce39e79" args="" -->
+<hr><a name="_details"></a><h2>Detailed Description</h2>
+This structure defines extended data describing a PCI resource allocation error.<p>
+<dl class="user" compact><dt><b>Note: </b></dt><dd>The following structure contains variable-length fields and cannot be defined as a C-style structure.</dd></dl>
+This extended data conveys details for a PCI resource allocation failure error. See the PCI specification and the ACPI specification for details on PCI resource allocations and the format for resource descriptors. This error does not detail why the resource allocation failed. It may be due to a bad resource request or a lack of available resources to satisfy a valid request. The variable device path structure and the resource structures are included in this structure to make it self sufficient. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="650046962a0467e36c8122ac8fa46049"></a><!-- doxytag: member="EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA::AllocRes" ref="650046962a0467e36c8122ac8fa46049" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d0/d8d/a00612.html#6f21bb0a0ef987de74ad1600fce39e79">EFI_TCP4_RECEIVE_DATA::DataLength</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>* <a class="el" href="../../d0/d8d/a00612.html#650046962a0467e36c8122ac8fa46049">EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA::AllocRes</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The allocated resources in the format of an ACPI 2.0 resource descriptor. This parameter is not a pointer; it is the complete resource descriptor. 
 </div>
 </div><p>
-<a class="anchor" name="90ce77ccd81f79bb47e5ddf1a4865d63"></a><!-- doxytag: member="EFI_TCP4_RECEIVE_DATA::FragmentCount" ref="90ce77ccd81f79bb47e5ddf1a4865d63" args="" -->
+<a class="anchor" name="25476a1f896ec7e44f60beba78e06b83"></a><!-- doxytag: member="EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA::AllocResSize" ref="25476a1f896ec7e44f60beba78e06b83" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d0/d8d/a00612.html#90ce77ccd81f79bb47e5ddf1a4865d63">EFI_TCP4_RECEIVE_DATA::FragmentCount</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d0/d8d/a00612.html#25476a1f896ec7e44f60beba78e06b83">EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA::AllocResSize</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+Represents the size the AllocRes parameter. AllocResSize should be zero if the allocated resources are not provided as a part of extended data. 
 </div>
 </div><p>
-<a class="anchor" name="e83bb6dc3dd3628e5b36c9d76ce2bdf3"></a><!-- doxytag: member="EFI_TCP4_RECEIVE_DATA::FragmentTable" ref="e83bb6dc3dd3628e5b36c9d76ce2bdf3" args="[1]" -->
+<a class="anchor" name="72993947aecc9901c7d8a48c2f6a3fca"></a><!-- doxytag: member="EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA::Bar" ref="72993947aecc9901c7d8a48c2f6a3fca" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d4/d14/a00608.html">EFI_TCP4_FRAGMENT_DATA</a> <a class="el" href="../../d0/d8d/a00612.html#e83bb6dc3dd3628e5b36c9d76ce2bdf3">EFI_TCP4_RECEIVE_DATA::FragmentTable</a>[1]          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d0/d8d/a00612.html#72993947aecc9901c7d8a48c2f6a3fca">EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA::Bar</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The PCI BAR. Applicable only for PCI devices. Ignored for all other devices. 
 </div>
 </div><p>
-<a class="anchor" name="4eebccde0ba83ef5aa031421d95fe761"></a><!-- doxytag: member="EFI_TCP4_RECEIVE_DATA::UrgentFlag" ref="4eebccde0ba83ef5aa031421d95fe761" args="" -->
+<a class="anchor" name="369f5daa36e66f3c0fdbdd62f8448fc6"></a><!-- doxytag: member="EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA::DataHeader" ref="369f5daa36e66f3c0fdbdd62f8448fc6" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d0/d8d/a00612.html#4eebccde0ba83ef5aa031421d95fe761">EFI_TCP4_RECEIVE_DATA::UrgentFlag</a>          </td>
+          <td class="memname"><a class="el" href="../../d4/d2a/a00632.html">EFI_STATUS_CODE_DATA</a> <a class="el" href="../../d0/d8d/a00612.html#369f5daa36e66f3c0fdbdd62f8448fc6">EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA::DataHeader</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+The data header identifying the data. DataHeader.HeaderSize should be sizeof (<a class="el" href="../../d4/d2a/a00632.html">EFI_STATUS_CODE_DATA</a>), DataHeader.Size should be (DevicePathSize + DevicePathSize + DevicePathSize + sizeof(UINT32) + 3 * sizeof (UINT16) ), and DataHeader.Type should be EFI_STATUS_CODE_SPECIFIC_DATA_GUID. 
+</div>
+</div><p>
+<a class="anchor" name="124032e4009d4f8e5e8ef28560e54947"></a><!-- doxytag: member="EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA::DevicePath" ref="124032e4009d4f8e5e8ef28560e54947" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>* <a class="el" href="../../d0/d8d/a00612.html#124032e4009d4f8e5e8ef28560e54947">EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA::DevicePath</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
 
+<p>
+The device path to the controller or the hardware device that did not get the requested resources. Note that this parameter is the variable-length device path structure and not a pointer to this structure. 
+</div>
+</div><p>
+<a class="anchor" name="2a52c0efcb8413efcdc9e50963ad2b1e"></a><!-- doxytag: member="EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA::DevicePathSize" ref="2a52c0efcb8413efcdc9e50963ad2b1e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d0/d8d/a00612.html#2a52c0efcb8413efcdc9e50963ad2b1e">EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA::DevicePathSize</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+DevicePathSize should be zero if it is a virtual device that is not associated with a device path. Otherwise, this parameter is the length of the variable-length DevicePath. 
+</div>
+</div><p>
+<a class="anchor" name="9a7eda92de09681bc8873fa69ad5e9c4"></a><!-- doxytag: member="EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA::ReqRes" ref="9a7eda92de09681bc8873fa69ad5e9c4" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>* <a class="el" href="../../d0/d8d/a00612.html#9a7eda92de09681bc8873fa69ad5e9c4">EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA::ReqRes</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+The requested resources in the format of an ACPI 2.0 resource descriptor. This parameter is not a pointer; it is the complete resource descriptor. 
+</div>
+</div><p>
+<a class="anchor" name="9bb2724866f0d0fb679a5a01490636fd"></a><!-- doxytag: member="EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA::ReqResSize" ref="9bb2724866f0d0fb679a5a01490636fd" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d0/d8d/a00612.html#9bb2724866f0d0fb679a5a01490636fd">EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA::ReqResSize</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Represents the size the ReqRes parameter. ReqResSize should be zero if the requested resources are not provided as a part of extended data. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:19 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:43 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

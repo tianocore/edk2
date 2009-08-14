@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: _EFI_HII_CONFIG_ROUTING_PROTOCOL Struct Reference</title>
+<title>MdePkg[ALL]: _EFI_HII_CONFIG_ACCESS_PROTOCOL Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,30 +21,24 @@
   </div>
 </div>
 <div class="contents">
-<h1>_EFI_HII_CONFIG_ROUTING_PROTOCOL Struct Reference</h1><!-- doxytag: class="_EFI_HII_CONFIG_ROUTING_PROTOCOL" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>_EFI_HII_CONFIG_ACCESS_PROTOCOL Struct Reference</h1><!-- doxytag: class="_EFI_HII_CONFIG_ACCESS_PROTOCOL" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../db/d28/a01133.html#25cc349dd172b46748de4bb9ac830f99">EFI_HII_EXTRACT_CONFIG</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d3a/a00040.html#a1260e02b6cbc5650471bcc21a56a859">ExtractConfig</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#7946bf3122406e6b115faa0a200b224e">EFI_HII_ACCESS_EXTRACT_CONFIG</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d3a/a00040.html#e76c72576f28f1faa8de76c7a88b9a09">ExtractConfig</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../db/d28/a01133.html#4838472facb5f1e3f3a556a2311ce68d">EFI_HII_EXPORT_CONFIG</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d3a/a00040.html#1bae1ec1524d48903376a2f4a453cd44">ExportConfig</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#bfa7901e53696c1c4b7069cd1d1c0285">EFI_HII_ACCESS_ROUTE_CONFIG</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d3a/a00040.html#bd2dc831158eec15888d7fa5e6264c99">RouteConfig</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../db/d28/a01133.html#2faeac3173240a15246f4978eedfa647">EFI_HII_ROUTE_CONFIG</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d3a/a00040.html#da7f3010f2b95a6ed194a08bf5416ded">RouteConfig</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../db/d28/a01133.html#207cee8ba580de1b89f9c3eb1b1ad232">EFI_HII_BLOCK_TO_CONFIG</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d3a/a00040.html#6b0786cef3ba87adb29fb1df4ea26662">BlockToConfig</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../db/d28/a01133.html#a931c51de84dea080c6efaeeb8ab1ab5">EFI_HII_CONFIG_TO_BLOCK</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d3a/a00040.html#cfac7a9ca0727b6c55213751febb95ce">ConfigToBlock</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../db/d28/a01133.html#6e858bb02ff5bdde0d360d729d4bffaf">EFI_HII_GET_ALT_CFG</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d3a/a00040.html#f981ebe6b8ca97889950753f653fc8b4">GetAltConfig</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#fbaeb5e29e396f70938e43eeb99da41a">EFI_HII_ACCESS_FORM_CALLBACK</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d3a/a00040.html#45643095ebd52cc5023e2faf921b2900">Callback</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-This protocol defines the configuration routing interfaces between external applications and the HII. There may only be one instance of this protocol in the system. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="6b0786cef3ba87adb29fb1df4ea26662"></a><!-- doxytag: member="_EFI_HII_CONFIG_ROUTING_PROTOCOL::BlockToConfig" ref="6b0786cef3ba87adb29fb1df4ea26662" args="" -->
+This protocol provides a callable interface between the HII and drivers. Only drivers which provide IFR data to HII are required to publish this protocol. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="45643095ebd52cc5023e2faf921b2900"></a><!-- doxytag: member="_EFI_HII_CONFIG_ACCESS_PROTOCOL::Callback" ref="45643095ebd52cc5023e2faf921b2900" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../db/d28/a01133.html#207cee8ba580de1b89f9c3eb1b1ad232">EFI_HII_BLOCK_TO_CONFIG</a> <a class="el" href="../../db/d3a/a00040.html#6b0786cef3ba87adb29fb1df4ea26662">_EFI_HII_CONFIG_ROUTING_PROTOCOL::BlockToConfig</a>          </td>
+          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#fbaeb5e29e396f70938e43eeb99da41a">EFI_HII_ACCESS_FORM_CALLBACK</a> <a class="el" href="../../db/d3a/a00040.html#45643095ebd52cc5023e2faf921b2900">_EFI_HII_CONFIG_ACCESS_PROTOCOL::Callback</a>          </td>
         </tr>
       </table>
 </div>
@@ -54,12 +48,12 @@ This protocol defines the configuration routing interfaces between external appl
 
 </div>
 </div><p>
-<a class="anchor" name="cfac7a9ca0727b6c55213751febb95ce"></a><!-- doxytag: member="_EFI_HII_CONFIG_ROUTING_PROTOCOL::ConfigToBlock" ref="cfac7a9ca0727b6c55213751febb95ce" args="" -->
+<a class="anchor" name="e76c72576f28f1faa8de76c7a88b9a09"></a><!-- doxytag: member="_EFI_HII_CONFIG_ACCESS_PROTOCOL::ExtractConfig" ref="e76c72576f28f1faa8de76c7a88b9a09" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../db/d28/a01133.html#a931c51de84dea080c6efaeeb8ab1ab5">EFI_HII_CONFIG_TO_BLOCK</a> <a class="el" href="../../db/d3a/a00040.html#cfac7a9ca0727b6c55213751febb95ce">_EFI_HII_CONFIG_ROUTING_PROTOCOL::ConfigToBlock</a>          </td>
+          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#7946bf3122406e6b115faa0a200b224e">EFI_HII_ACCESS_EXTRACT_CONFIG</a> <a class="el" href="../../db/d3a/a00040.html#e76c72576f28f1faa8de76c7a88b9a09">_EFI_HII_CONFIG_ACCESS_PROTOCOL::ExtractConfig</a>          </td>
         </tr>
       </table>
 </div>
@@ -69,57 +63,12 @@ This protocol defines the configuration routing interfaces between external appl
 
 </div>
 </div><p>
-<a class="anchor" name="1bae1ec1524d48903376a2f4a453cd44"></a><!-- doxytag: member="_EFI_HII_CONFIG_ROUTING_PROTOCOL::ExportConfig" ref="1bae1ec1524d48903376a2f4a453cd44" args="" -->
+<a class="anchor" name="bd2dc831158eec15888d7fa5e6264c99"></a><!-- doxytag: member="_EFI_HII_CONFIG_ACCESS_PROTOCOL::RouteConfig" ref="bd2dc831158eec15888d7fa5e6264c99" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../db/d28/a01133.html#4838472facb5f1e3f3a556a2311ce68d">EFI_HII_EXPORT_CONFIG</a> <a class="el" href="../../db/d3a/a00040.html#1bae1ec1524d48903376a2f4a453cd44">_EFI_HII_CONFIG_ROUTING_PROTOCOL::ExportConfig</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="a1260e02b6cbc5650471bcc21a56a859"></a><!-- doxytag: member="_EFI_HII_CONFIG_ROUTING_PROTOCOL::ExtractConfig" ref="a1260e02b6cbc5650471bcc21a56a859" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../db/d28/a01133.html#25cc349dd172b46748de4bb9ac830f99">EFI_HII_EXTRACT_CONFIG</a> <a class="el" href="../../db/d3a/a00040.html#a1260e02b6cbc5650471bcc21a56a859">_EFI_HII_CONFIG_ROUTING_PROTOCOL::ExtractConfig</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="f981ebe6b8ca97889950753f653fc8b4"></a><!-- doxytag: member="_EFI_HII_CONFIG_ROUTING_PROTOCOL::GetAltConfig" ref="f981ebe6b8ca97889950753f653fc8b4" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../db/d28/a01133.html#6e858bb02ff5bdde0d360d729d4bffaf">EFI_HII_GET_ALT_CFG</a> <a class="el" href="../../db/d3a/a00040.html#f981ebe6b8ca97889950753f653fc8b4">_EFI_HII_CONFIG_ROUTING_PROTOCOL::GetAltConfig</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="da7f3010f2b95a6ed194a08bf5416ded"></a><!-- doxytag: member="_EFI_HII_CONFIG_ROUTING_PROTOCOL::RouteConfig" ref="da7f3010f2b95a6ed194a08bf5416ded" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../db/d28/a01133.html#2faeac3173240a15246f4978eedfa647">EFI_HII_ROUTE_CONFIG</a> <a class="el" href="../../db/d3a/a00040.html#da7f3010f2b95a6ed194a08bf5416ded">_EFI_HII_CONFIG_ROUTING_PROTOCOL::RouteConfig</a>          </td>
+          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#bfa7901e53696c1c4b7069cd1d1c0285">EFI_HII_ACCESS_ROUTE_CONFIG</a> <a class="el" href="../../db/d3a/a00040.html#bd2dc831158eec15888d7fa5e6264c99">_EFI_HII_CONFIG_ACCESS_PROTOCOL::RouteConfig</a>          </td>
         </tr>
       </table>
 </div>
@@ -130,7 +79,7 @@ This protocol defines the configuration routing interfaces between external appl
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:12 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:03 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

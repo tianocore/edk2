@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: SMBIOS_TABLE_TYPE13 Struct Reference</title>
+<title>MdePkg[ALL]: s_pxe_db_receive Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,29 +21,31 @@
   </div>
 </div>
 <div class="contents">
-<h1>SMBIOS_TABLE_TYPE13 Struct Reference</h1><!-- doxytag: class="SMBIOS_TABLE_TYPE13" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>s_pxe_db_receive Struct Reference</h1><!-- doxytag: class="s_pxe_db_receive" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../da/db8/a00797.html">SMBIOS_STRUCTURE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/dc7/a00807.html#dc1a3ccf27ccc10a989e0db1540547ee">Hdr</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#01790f21199edcd6a8dd02d270c05f4f">PXE_MAC_ADDR</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/dc7/a00807.html#15408f30842b4af1e971ae501e445183">SrcAddr</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/dc7/a00807.html#a7b228684da30140be27323241e54fd2">InstallableLanguages</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#01790f21199edcd6a8dd02d270c05f4f">PXE_MAC_ADDR</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/dc7/a00807.html#9aa7d7bc480f0c633cc3759e5eb1d759">DestAddr</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/dc7/a00807.html#341090c54bedfa3ce44f49e7cf988ec6">Flags</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/dc7/a00807.html#35d6dfa0fb97091e017e7f9a545f60a3">FrameLen</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/dc7/a00807.html#dc7fcc94d33b04a31a0b7ca480e74e19">Reserved</a> [15]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#31b571e2b70d4bb221ea67177361c779">PXE_MEDIA_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/dc7/a00807.html#8942059af4838decb5acf63dbcbffbf2">Protocol</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d49/a00979.html#bd86e1460ed2b924b45d2fa3c883e6b0">SMBIOS_TABLE_STRING</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/dc7/a00807.html#940c9e12de3b8e27dbdb34167334d260">CurrentLanguages</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/dc7/a00807.html#7fcd459875dc23fa695418368162f1e0">MediaHeaderLen</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#364c906a0211894cc0ed994ec55a3f4a">PXE_FRAME_TYPE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/dc7/a00807.html#7c40a3163ea81182d01420523f1ae3a1">Type</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/dc7/a00807.html#444a4296989b76eb444bc7cd7175950a">reserved</a> [7]</td></tr>
 
 </table>
-<hr><a name="_details"></a><h2>Detailed Description</h2>
-BIOS Language Information (Type 13)<p>
-The information in this structure defines the installable language attributes of the BIOS. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="940c9e12de3b8e27dbdb34167334d260"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE13::CurrentLanguages" ref="940c9e12de3b8e27dbdb34167334d260" args="" -->
+<hr><h2>Field Documentation</h2>
+<a class="anchor" name="9aa7d7bc480f0c633cc3759e5eb1d759"></a><!-- doxytag: member="s_pxe_db_receive::DestAddr" ref="9aa7d7bc480f0c633cc3759e5eb1d759" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d8/d49/a00979.html#bd86e1460ed2b924b45d2fa3c883e6b0">SMBIOS_TABLE_STRING</a> <a class="el" href="../../df/dc7/a00807.html#940c9e12de3b8e27dbdb34167334d260">SMBIOS_TABLE_TYPE13::CurrentLanguages</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#01790f21199edcd6a8dd02d270c05f4f">PXE_MAC_ADDR</a> <a class="el" href="../../df/dc7/a00807.html#9aa7d7bc480f0c633cc3759e5eb1d759">s_pxe_db_receive::DestAddr</a>          </td>
         </tr>
       </table>
 </div>
@@ -53,68 +55,98 @@ The information in this structure defines the installable language attributes of
 
 </div>
 </div><p>
-<a class="anchor" name="341090c54bedfa3ce44f49e7cf988ec6"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE13::Flags" ref="341090c54bedfa3ce44f49e7cf988ec6" args="" -->
+<a class="anchor" name="35d6dfa0fb97091e017e7f9a545f60a3"></a><!-- doxytag: member="s_pxe_db_receive::FrameLen" ref="35d6dfa0fb97091e017e7f9a545f60a3" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../df/dc7/a00807.html#341090c54bedfa3ce44f49e7cf988ec6">SMBIOS_TABLE_TYPE13::Flags</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a> <a class="el" href="../../df/dc7/a00807.html#35d6dfa0fb97091e017e7f9a545f60a3">s_pxe_db_receive::FrameLen</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+Length of received frame. May be larger than receive buffer size. The receive buffer will not be overwritten. This is how to tell if data was lost because the receive buffer was too small. 
 </div>
 </div><p>
-<a class="anchor" name="dc1a3ccf27ccc10a989e0db1540547ee"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE13::Hdr" ref="dc1a3ccf27ccc10a989e0db1540547ee" args="" -->
+<a class="anchor" name="7fcd459875dc23fa695418368162f1e0"></a><!-- doxytag: member="s_pxe_db_receive::MediaHeaderLen" ref="7fcd459875dc23fa695418368162f1e0" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../da/db8/a00797.html">SMBIOS_STRUCTURE</a> <a class="el" href="../../df/dc7/a00807.html#dc1a3ccf27ccc10a989e0db1540547ee">SMBIOS_TABLE_TYPE13::Hdr</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a> <a class="el" href="../../df/dc7/a00807.html#7fcd459875dc23fa695418368162f1e0">s_pxe_db_receive::MediaHeaderLen</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+Length of media header in received frame. 
 </div>
 </div><p>
-<a class="anchor" name="a7b228684da30140be27323241e54fd2"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE13::InstallableLanguages" ref="a7b228684da30140be27323241e54fd2" args="" -->
+<a class="anchor" name="8942059af4838decb5acf63dbcbffbf2"></a><!-- doxytag: member="s_pxe_db_receive::Protocol" ref="8942059af4838decb5acf63dbcbffbf2" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../df/dc7/a00807.html#a7b228684da30140be27323241e54fd2">SMBIOS_TABLE_TYPE13::InstallableLanguages</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#31b571e2b70d4bb221ea67177361c779">PXE_MEDIA_PROTOCOL</a> <a class="el" href="../../df/dc7/a00807.html#8942059af4838decb5acf63dbcbffbf2">s_pxe_db_receive::Protocol</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+Protocol type from media header. 
 </div>
 </div><p>
-<a class="anchor" name="dc7fcc94d33b04a31a0b7ca480e74e19"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE13::Reserved" ref="dc7fcc94d33b04a31a0b7ca480e74e19" args="[15]" -->
+<a class="anchor" name="444a4296989b76eb444bc7cd7175950a"></a><!-- doxytag: member="s_pxe_db_receive::reserved" ref="444a4296989b76eb444bc7cd7175950a" args="[7]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../df/dc7/a00807.html#dc7fcc94d33b04a31a0b7ca480e74e19">SMBIOS_TABLE_TYPE13::Reserved</a>[15]          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a> <a class="el" href="../../df/dc7/a00807.html#444a4296989b76eb444bc7cd7175950a">s_pxe_db_receive::reserved</a>[7]          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+Reserved, must be zero. 
+</div>
+</div><p>
+<a class="anchor" name="15408f30842b4af1e971ae501e445183"></a><!-- doxytag: member="s_pxe_db_receive::SrcAddr" ref="15408f30842b4af1e971ae501e445183" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#01790f21199edcd6a8dd02d270c05f4f">PXE_MAC_ADDR</a> <a class="el" href="../../df/dc7/a00807.html#15408f30842b4af1e971ae501e445183">s_pxe_db_receive::SrcAddr</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
 
+<p>
+Source and destination MAC addresses from media header. 
+</div>
+</div><p>
+<a class="anchor" name="7c40a3163ea81182d01420523f1ae3a1"></a><!-- doxytag: member="s_pxe_db_receive::Type" ref="7c40a3163ea81182d01420523f1ae3a1" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#364c906a0211894cc0ed994ec55a3f4a">PXE_FRAME_TYPE</a> <a class="el" href="../../df/dc7/a00807.html#7c40a3163ea81182d01420523f1ae3a1">s_pxe_db_receive::Type</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Type of receive frame. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:21 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:01 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

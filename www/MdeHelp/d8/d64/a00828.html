@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: SMBIOS_TABLE_TYPE32 Struct Reference</title>
+<title>MdePkg[ALL]: SAL_SET_VECTORS_CS_N Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,25 +21,28 @@
   </div>
 </div>
 <div class="contents">
-<h1>SMBIOS_TABLE_TYPE32 Struct Reference</h1><!-- doxytag: class="SMBIOS_TABLE_TYPE32" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>SAL_SET_VECTORS_CS_N Struct Reference</h1><!-- doxytag: class="SAL_SET_VECTORS_CS_N" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../da/db8/a00797.html">SMBIOS_STRUCTURE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d64/a00828.html#0d8af2d028fc7efbfdb930ee2241b588">Hdr</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d64/a00828.html#cc9088805d8133b0a4580fde11f8e68c">Length</a>: 32</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d64/a00828.html#a6706cd7108b990519c5a565f1cf0c2d">Reserved</a> [6]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d64/a00828.html#01b7e18ce3defce18780e87cb4227d0f">ChecksumValid</a>: 1</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d49/a00979.html#6c66616038c144ad7e1931dcc4b4f001">MISC_BOOT_INFORMATION_STATUS_DATA_TYPE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d64/a00828.html#cf6428a9c97b62c6ab1a62ad94a493e2">BootStatus</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d64/a00828.html#bbff06d89b3e0fd6de5a58bbb0ea835e">Reserved1</a>: 7</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d64/a00828.html#0986aa79d0b4be1a34cacc851ca977d5">ByteChecksum</a>: 8</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d64/a00828.html#51907618ce6dab22884ca3fbf2c52f02">Reserved2</a>: 16</td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-System Boot Information (Type 32)<p>
-The client system firmware, e.g. BIOS, communicates the System Boot Status to the client's Pre-boot Execution Environment (PXE) boot image or OS-present management application via this structure. When used in the PXE environment, for example, this code identifies the reason the PXE was initiated and can be used by boot-image software to further automate an enterprise's PXE sessions. For example, an enterprise could choose to automatically download a hardware-diagnostic image to a client whose reason code indicated either a firmware- or operating system-detected hardware failure. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="cf6428a9c97b62c6ab1a62ad94a493e2"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE32::BootStatus" ref="cf6428a9c97b62c6ab1a62ad94a493e2" args="" -->
+Format of length_cs_n argument. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="0986aa79d0b4be1a34cacc851ca977d5"></a><!-- doxytag: member="SAL_SET_VECTORS_CS_N::ByteChecksum" ref="0986aa79d0b4be1a34cacc851ca977d5" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d8/d49/a00979.html#6c66616038c144ad7e1931dcc4b4f001">MISC_BOOT_INFORMATION_STATUS_DATA_TYPE</a> <a class="el" href="../../d8/d64/a00828.html#cf6428a9c97b62c6ab1a62ad94a493e2">SMBIOS_TABLE_TYPE32::BootStatus</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d8/d64/a00828.html#0986aa79d0b4be1a34cacc851ca977d5">SAL_SET_VECTORS_CS_N::ByteChecksum</a>          </td>
         </tr>
       </table>
 </div>
@@ -49,12 +52,12 @@ The client system firmware, e.g. BIOS, communicates the System Boot Status to th
 
 </div>
 </div><p>
-<a class="anchor" name="0d8af2d028fc7efbfdb930ee2241b588"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE32::Hdr" ref="0d8af2d028fc7efbfdb930ee2241b588" args="" -->
+<a class="anchor" name="01b7e18ce3defce18780e87cb4227d0f"></a><!-- doxytag: member="SAL_SET_VECTORS_CS_N::ChecksumValid" ref="01b7e18ce3defce18780e87cb4227d0f" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../da/db8/a00797.html">SMBIOS_STRUCTURE</a> <a class="el" href="../../d8/d64/a00828.html#0d8af2d028fc7efbfdb930ee2241b588">SMBIOS_TABLE_TYPE32::Hdr</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d8/d64/a00828.html#01b7e18ce3defce18780e87cb4227d0f">SAL_SET_VECTORS_CS_N::ChecksumValid</a>          </td>
         </tr>
       </table>
 </div>
@@ -64,12 +67,42 @@ The client system firmware, e.g. BIOS, communicates the System Boot Status to th
 
 </div>
 </div><p>
-<a class="anchor" name="a6706cd7108b990519c5a565f1cf0c2d"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE32::Reserved" ref="a6706cd7108b990519c5a565f1cf0c2d" args="[6]" -->
+<a class="anchor" name="cc9088805d8133b0a4580fde11f8e68c"></a><!-- doxytag: member="SAL_SET_VECTORS_CS_N::Length" ref="cc9088805d8133b0a4580fde11f8e68c" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d64/a00828.html#a6706cd7108b990519c5a565f1cf0c2d">SMBIOS_TABLE_TYPE32::Reserved</a>[6]          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d8/d64/a00828.html#cc9088805d8133b0a4580fde11f8e68c">SAL_SET_VECTORS_CS_N::Length</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="bbff06d89b3e0fd6de5a58bbb0ea835e"></a><!-- doxytag: member="SAL_SET_VECTORS_CS_N::Reserved1" ref="bbff06d89b3e0fd6de5a58bbb0ea835e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d8/d64/a00828.html#bbff06d89b3e0fd6de5a58bbb0ea835e">SAL_SET_VECTORS_CS_N::Reserved1</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="51907618ce6dab22884ca3fbf2c52f02"></a><!-- doxytag: member="SAL_SET_VECTORS_CS_N::Reserved2" ref="51907618ce6dab22884ca3fbf2c52f02" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d8/d64/a00828.html#51907618ce6dab22884ca3fbf2c52f02">SAL_SET_VECTORS_CS_N::Reserved2</a>          </td>
         </tr>
       </table>
 </div>
@@ -80,7 +113,7 @@ The client system firmware, e.g. BIOS, communicates the System Boot Status to th
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:22 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:02 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: u_pxe_db_get_config_info Union Reference</title>
+<title>MdePkg[ALL]: tdTPM_IDENTITY_CONTENTS Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,21 +21,26 @@
   </div>
 </div>
 <div class="contents">
-<h1>u_pxe_db_get_config_info Union Reference</h1><!-- doxytag: class="u_pxe_db_get_config_info" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>tdTPM_IDENTITY_CONTENTS Struct Reference</h1><!-- doxytag: class="tdTPM_IDENTITY_CONTENTS" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d51/a00769.html">PXE_PCI_CONFIG_INFO</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d54/a00938.html#be357e5d9f0d2c9be6956d07c95553b9">pci</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/dce/a00974.html">TPM_STRUCT_VER</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d54/a00938.html#5bc9a14011fb0d0d6e1478d68dcfc156">ver</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d20/a00768.html">PXE_PCC_CONFIG_INFO</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d54/a00938.html#1042a89df28045560ece3b11dc31104f">pcc</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d54/a00938.html#bb2a038dd171c2141796b17310c33ee4">ordinal</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/dbc/a00931.html">TPM_CHOSENID_HASH</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d54/a00938.html#a244619c9e854140039e107bb8daa157">labelPrivCADigest</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/d9c/a00958.html">TPM_PUBKEY</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d54/a00938.html#3281a8ffdc334a1ee9628fed5e490ff1">identityPubKey</a></td></tr>
 
 </table>
-<hr><h2>Field Documentation</h2>
-<a class="anchor" name="1042a89df28045560ece3b11dc31104f"></a><!-- doxytag: member="u_pxe_db_get_config_info::pcc" ref="1042a89df28045560ece3b11dc31104f" args="" -->
+<hr><a name="_details"></a><h2>Detailed Description</h2>
+Part 2, section 12.5 TPM_IDENTITY_CONTENTS <hr><h2>Field Documentation</h2>
+<a class="anchor" name="3281a8ffdc334a1ee9628fed5e490ff1"></a><!-- doxytag: member="tdTPM_IDENTITY_CONTENTS::identityPubKey" ref="3281a8ffdc334a1ee9628fed5e490ff1" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d8/d20/a00768.html">PXE_PCC_CONFIG_INFO</a> <a class="el" href="../../d5/d54/a00938.html#1042a89df28045560ece3b11dc31104f">u_pxe_db_get_config_info::pcc</a>          </td>
+          <td class="memname"><a class="el" href="../../df/d9c/a00958.html">TPM_PUBKEY</a> <a class="el" href="../../d5/d54/a00938.html#3281a8ffdc334a1ee9628fed5e490ff1">tdTPM_IDENTITY_CONTENTS::identityPubKey</a>          </td>
         </tr>
       </table>
 </div>
@@ -45,12 +50,42 @@
 
 </div>
 </div><p>
-<a class="anchor" name="be357e5d9f0d2c9be6956d07c95553b9"></a><!-- doxytag: member="u_pxe_db_get_config_info::pci" ref="be357e5d9f0d2c9be6956d07c95553b9" args="" -->
+<a class="anchor" name="a244619c9e854140039e107bb8daa157"></a><!-- doxytag: member="tdTPM_IDENTITY_CONTENTS::labelPrivCADigest" ref="a244619c9e854140039e107bb8daa157" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dd/d51/a00769.html">PXE_PCI_CONFIG_INFO</a> <a class="el" href="../../d5/d54/a00938.html#be357e5d9f0d2c9be6956d07c95553b9">u_pxe_db_get_config_info::pci</a>          </td>
+          <td class="memname"><a class="el" href="../../df/dbc/a00931.html">TPM_CHOSENID_HASH</a> <a class="el" href="../../d5/d54/a00938.html#a244619c9e854140039e107bb8daa157">tdTPM_IDENTITY_CONTENTS::labelPrivCADigest</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="bb2a038dd171c2141796b17310c33ee4"></a><!-- doxytag: member="tdTPM_IDENTITY_CONTENTS::ordinal" ref="bb2a038dd171c2141796b17310c33ee4" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d5/d54/a00938.html#bb2a038dd171c2141796b17310c33ee4">tdTPM_IDENTITY_CONTENTS::ordinal</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="5bc9a14011fb0d0d6e1478d68dcfc156"></a><!-- doxytag: member="tdTPM_IDENTITY_CONTENTS::ver" ref="5bc9a14011fb0d0d6e1478d68dcfc156" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../df/dce/a00974.html">TPM_STRUCT_VER</a> <a class="el" href="../../d5/d54/a00938.html#5bc9a14011fb0d0d6e1478d68dcfc156">tdTPM_IDENTITY_CONTENTS::ver</a>          </td>
         </tr>
       </table>
 </div>
@@ -61,7 +96,7 @@
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:23 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:09 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

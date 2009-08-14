@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_PEI_PPI_DESCRIPTOR Struct Reference</title>
+<title>MdePkg[ALL]: EFI_MTFTP4_ACK_HEADER Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,65 +21,47 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_PEI_PPI_DESCRIPTOR Struct Reference</h1><!-- doxytag: class="EFI_PEI_PPI_DESCRIPTOR" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_MTFTP4_ACK_HEADER Struct Reference</h1><!-- doxytag: class="EFI_MTFTP4_ACK_HEADER" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d50/a00559.html#e26e5fc27a10105e42512d891a17e1b2">Flags</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d50/a00559.html#e2938de3626fab0ffc679d2019beba5a">OpCode</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d50/a00559.html#879e1f16b049075abff779d4eabcf00b">Guid</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d50/a00559.html#070226cdd7e3dca9b58907bb5b5e3866">Ppi</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d50/a00559.html#bacbebe2415a6bc2220dbc28abafc6e5">Block</a> [1]</td></tr>
 
 </table>
-<hr><a name="_details"></a><h2>Detailed Description</h2>
-The data structure through which a PEIM describes available services to the PEI Foundation. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="e26e5fc27a10105e42512d891a17e1b2"></a><!-- doxytag: member="EFI_PEI_PPI_DESCRIPTOR::Flags" ref="e26e5fc27a10105e42512d891a17e1b2" args="" -->
+<hr><h2>Field Documentation</h2>
+<a class="anchor" name="bacbebe2415a6bc2220dbc28abafc6e5"></a><!-- doxytag: member="EFI_MTFTP4_ACK_HEADER::Block" ref="bacbebe2415a6bc2220dbc28abafc6e5" args="[1]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> <a class="el" href="../../d2/d50/a00559.html#e26e5fc27a10105e42512d891a17e1b2">EFI_PEI_PPI_DESCRIPTOR::Flags</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d2/d50/a00559.html#bacbebe2415a6bc2220dbc28abafc6e5">EFI_MTFTP4_ACK_HEADER::Block</a>[1]          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-This field is a set of flags describing the characteristics of this imported table entry. All flags are defined as EFI_PEI_PPI_DESCRIPTOR_***, which can also be combined into one. 
+
 </div>
 </div><p>
-<a class="anchor" name="879e1f16b049075abff779d4eabcf00b"></a><!-- doxytag: member="EFI_PEI_PPI_DESCRIPTOR::Guid" ref="879e1f16b049075abff779d4eabcf00b" args="" -->
+<a class="anchor" name="e2938de3626fab0ffc679d2019beba5a"></a><!-- doxytag: member="EFI_MTFTP4_ACK_HEADER::OpCode" ref="e2938de3626fab0ffc679d2019beba5a" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>* <a class="el" href="../../d2/d50/a00559.html#879e1f16b049075abff779d4eabcf00b">EFI_PEI_PPI_DESCRIPTOR::Guid</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d2/d50/a00559.html#e2938de3626fab0ffc679d2019beba5a">EFI_MTFTP4_ACK_HEADER::OpCode</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The address of the EFI_GUID that names the interface. 
-</div>
-</div><p>
-<a class="anchor" name="070226cdd7e3dca9b58907bb5b5e3866"></a><!-- doxytag: member="EFI_PEI_PPI_DESCRIPTOR::Ppi" ref="070226cdd7e3dca9b58907bb5b5e3866" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VOID* <a class="el" href="../../d2/d50/a00559.html#070226cdd7e3dca9b58907bb5b5e3866">EFI_PEI_PPI_DESCRIPTOR::Ppi</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
 
-<p>
-A pointer to the PPI. It contains the information necessary to install a service. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:38 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

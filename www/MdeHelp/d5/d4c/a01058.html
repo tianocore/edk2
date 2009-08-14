@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Pi/PiDxeCis.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Ebc/ProcessorBind.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,762 +21,372 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Pi/PiDxeCis.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Ebc/ProcessorBind.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
-<tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dfd/a00438.html">EFI_GCD_MEMORY_SPACE_DESCRIPTOR</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/da8/a00437.html">EFI_GCD_IO_SPACE_DESCRIPTOR</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/de3/a00306.html">DXE_SERVICES</a></td></tr>
-
 <tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#a17551c9449516d7efa1890b6654c91d">DXE_SERVICES_SIGNATURE</a>&nbsp;&nbsp;&nbsp;0x565245535f455844ULL</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#68147285bdc4404f85af351bbf3a5968">MDE_CPU_EBC</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#ad0c4c3623d48d225b9e4b2cee8f6527">DXE_SERVICES_REVISION</a>&nbsp;&nbsp;&nbsp;((1&lt;&lt;16) | (00))</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#2137fc5695cbd81598a4dba1ac6fab31">MAX_BIT</a>&nbsp;&nbsp;&nbsp;(1ULL &lt;&lt; (sizeof (INTN) * 8 - 1))</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#60bb431495193072cc1abf0c2452e18a">MAX_2_BITS</a>&nbsp;&nbsp;&nbsp;(3ULL &lt;&lt; (sizeof (INTN) * 8 - 2))</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#aba07841c3e227bc8bdd8ccdad149349">MAX_ADDRESS</a>&nbsp;&nbsp;&nbsp;((<a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>) ~0)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#8aed43eb1b3c346772c127482b4b5372">CPU_STACK_ALIGNMENT</a>&nbsp;&nbsp;&nbsp;sizeof(<a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#f5aee859ec14423bc427edf78c30d083">GLOBAL_REMOVE_IF_UNREFERENCED</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#7e840a4e1d7fbaf630dc62358d80a845">FUNCTION_ENTRY_POINT</a>(FunctionPointer)&nbsp;&nbsp;&nbsp;(VOID *)(<a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>)(FunctionPointer)</td></tr>
 
 <tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#c6ae83404605259cfdf461bbf42a9b0f">EFI_ADD_MEMORY_SPACE</a> )(IN <a class="el" href="../../d5/d4c/a01058.html#263eaceeed25e0fe0dfebd217a85f4f9">EFI_GCD_MEMORY_TYPE</a> GcdMemoryType, IN <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> BaseAddress, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Length, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Capabilities)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef char&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#307b8734c020247f6bac4fcde0dcfbb9">INT8</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#2a8514cb3974c1073c487496a6d8bf05">EFI_ALLOCATE_MEMORY_SPACE</a> )(IN <a class="el" href="../../d5/d4c/a01058.html#67d2ef57c1e9bc0f5bd6131bb99f5e06">EFI_GCD_ALLOCATE_TYPE</a> GcdAllocateType, IN <a class="el" href="../../d5/d4c/a01058.html#263eaceeed25e0fe0dfebd217a85f4f9">EFI_GCD_MEMORY_TYPE</a> GcdMemoryType, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Alignment, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Length, IN OUT <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> *BaseAddress, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ImageHandle, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> DeviceHandle)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef unsigned char&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#112e3146cb38b6ee95e64d85842e380a">BOOLEAN</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#33917315b77ea4aca31755f81f53ead5">EFI_FREE_MEMORY_SPACE</a> )(IN <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> BaseAddress, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Length)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef unsigned char&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#b27e9918b538ce9d8ca692479b375b6a">UINT8</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#a4d71448807f5117f4dd67c5a3b28ac0">EFI_REMOVE_MEMORY_SPACE</a> )(IN <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> BaseAddress, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Length)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef char&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#7e41c835ae33299b0933552e4f5105b1">EFI_GET_MEMORY_SPACE_DESCRIPTOR</a> )(IN <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> BaseAddress, OUT <a class="el" href="../../dd/dfd/a00438.html">EFI_GCD_MEMORY_SPACE_DESCRIPTOR</a> *Descriptor)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef short&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#57de7cb8e702b1746127a4d5137fa455">INT16</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#16c5c2944974b723de3dfbce451b0acf">EFI_SET_MEMORY_SPACE_ATTRIBUTES</a> )(IN <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> BaseAddress, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Length, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Attributes)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef unsigned short&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#09f1a1fb2293e33483cc8d44aefb1eb1">UINT16</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#c84a15a86956eb32962f8b619e218a06">EFI_GET_MEMORY_SPACE_MAP</a> )(OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *NumberOfDescriptors, OUT <a class="el" href="../../dd/dfd/a00438.html">EFI_GCD_MEMORY_SPACE_DESCRIPTOR</a> **MemorySpaceMap)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef unsigned short&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#7ae886893bd2a2ae253eb2b021a48724">CHAR16</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#f67f883a31e208b40584e352cc648954">EFI_ADD_IO_SPACE</a> )(IN <a class="el" href="../../d5/d4c/a01058.html#9ff34c627835f9a1dd8c165472aadaa4">EFI_GCD_IO_TYPE</a> GcdIoType, IN <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> BaseAddress, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Length)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#63021d67d54286c2163bcdb43a6f2569">INT32</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#fed77e825a9eeff93f7a3909edfc3dca">EFI_ALLOCATE_IO_SPACE</a> )(IN <a class="el" href="../../d5/d4c/a01058.html#67d2ef57c1e9bc0f5bd6131bb99f5e06">EFI_GCD_ALLOCATE_TYPE</a> GcdAllocateType, IN <a class="el" href="../../d5/d4c/a01058.html#9ff34c627835f9a1dd8c165472aadaa4">EFI_GCD_IO_TYPE</a> GcdIoType, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Alignment, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Length, IN OUT <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> *BaseAddress, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ImageHandle, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> DeviceHandle)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef unsigned int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#e1e6edbbc26d6fbc71a90190d0266018">UINT32</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#e8b9e8f4a015ca8e5400272d8073fde2">EFI_FREE_IO_SPACE</a> )(IN <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> BaseAddress, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Length)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef __int64&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#1e9aeaef48b6012036cbbcf0f6614eaa">INT64</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#6facd746a6e93229c907d7735227c47f">EFI_REMOVE_IO_SPACE</a> )(IN <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> BaseAddress, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Length)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef unsigned __int64&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#ae17ebb9ef7279d026817fb22f8aebe9">UINT64</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#7b5b86a83eb3a39285de44079415bd9b">EFI_GET_IO_SPACE_DESCRIPTOR</a> )(IN <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> BaseAddress, OUT <a class="el" href="../../d4/da8/a00437.html">EFI_GCD_IO_SPACE_DESCRIPTOR</a> *Descriptor)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef long&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#8693e3bedb91ab009b6b7e6ec9aa179c">INTN</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#c463c237ce5e74e51aaeafe89292afeb">EFI_GET_IO_SPACE_MAP</a> )(OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *NumberOfDescriptors, OUT <a class="el" href="../../d4/da8/a00437.html">EFI_GCD_IO_SPACE_DESCRIPTOR</a> **IoSpaceMap)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#0fb5c1c5a41e460bf5197e0f285bc25d">EFI_DISPATCH</a> )(VOID)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#017dbdc2ae4f3f85d700644b855c2cba">EFI_SCHEDULE</a> )(IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> FirmwareVolumeHandle, IN CONST <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *FileName)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#0453aef38aa1a1b20681a00f772538e4">EFI_TRUST</a> )(IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> FirmwareVolumeHandle, IN CONST <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *FileName)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#9c20ccdc56b332f665960fb9ac8b2340">EFI_PROCESS_FIRMWARE_VOLUME</a> )(IN CONST VOID *FirmwareVolumeHeader, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Size, OUT <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> *FirmwareVolumeHandle)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d1/de3/a00306.html">DXE_SERVICES</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#49e89b9044b9027faf316e780d2a2a52">EFI_DXE_SERVICES</a></td></tr>
-
-<tr><td colspan="2"><br><h2>Enumerations</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#263eaceeed25e0fe0dfebd217a85f4f9">EFI_GCD_MEMORY_TYPE</a> { <br>
-&nbsp;&nbsp;<a class="el" href="../../d5/d4c/a01058.html#263eaceeed25e0fe0dfebd217a85f4f958a6c65f65623581eb7697d21db3d56f">EfiGcdMemoryTypeNonExistent</a>, 
-<a class="el" href="../../d5/d4c/a01058.html#263eaceeed25e0fe0dfebd217a85f4f923f0a24695d11552cdb4bf1c2bbe5950">EfiGcdMemoryTypeReserved</a>, 
-<a class="el" href="../../d5/d4c/a01058.html#263eaceeed25e0fe0dfebd217a85f4f9e8a8dca513bbab11db4a77040a0853c2">EfiGcdMemoryTypeSystemMemory</a>, 
-<a class="el" href="../../d5/d4c/a01058.html#263eaceeed25e0fe0dfebd217a85f4f9ef7d29167bb0c213dafac9ecc7d8dd23">EfiGcdMemoryTypeMemoryMappedIo</a>, 
-<br>
-&nbsp;&nbsp;<a class="el" href="../../d5/d4c/a01058.html#263eaceeed25e0fe0dfebd217a85f4f9ab4c110cc212c1d57214accb152b17c8">EfiGcdMemoryTypeMaximum</a>
-<br>
- }</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#9ff34c627835f9a1dd8c165472aadaa4">EFI_GCD_IO_TYPE</a> { <a class="el" href="../../d5/d4c/a01058.html#9ff34c627835f9a1dd8c165472aadaa456660201e4efe8aef385db035d94f3b2">EfiGcdIoTypeNonExistent</a>, 
-<a class="el" href="../../d5/d4c/a01058.html#9ff34c627835f9a1dd8c165472aadaa4d650cc0c0fbe4d593f7a557ad2c886e4">EfiGcdIoTypeReserved</a>, 
-<a class="el" href="../../d5/d4c/a01058.html#9ff34c627835f9a1dd8c165472aadaa4f0784df447aa4453cc9364eb5d3e0c12">EfiGcdIoTypeIo</a>, 
-<a class="el" href="../../d5/d4c/a01058.html#9ff34c627835f9a1dd8c165472aadaa48ac4a9ae4fcf153824f29b21bc0942fd">EfiGcdIoTypeMaximum</a>
- }</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#67d2ef57c1e9bc0f5bd6131bb99f5e06">EFI_GCD_ALLOCATE_TYPE</a> { <br>
-&nbsp;&nbsp;<a class="el" href="../../d5/d4c/a01058.html#67d2ef57c1e9bc0f5bd6131bb99f5e06d3b656c3a6de3422159971850b0bc1d8">EfiGcdAllocateAnySearchBottomUp</a>, 
-<a class="el" href="../../d5/d4c/a01058.html#67d2ef57c1e9bc0f5bd6131bb99f5e061bbb43d032b56d8f69bcec510dd68979">EfiGcdAllocateMaxAddressSearchBottomUp</a>, 
-<a class="el" href="../../d5/d4c/a01058.html#67d2ef57c1e9bc0f5bd6131bb99f5e06cc1fdb7458e268050b67015d344831bd">EfiGcdAllocateAddress</a>, 
-<a class="el" href="../../d5/d4c/a01058.html#67d2ef57c1e9bc0f5bd6131bb99f5e064947e9a9cc8d732f129b42ac13882972">EfiGcdAllocateAnySearchTopDown</a>, 
-<br>
-&nbsp;&nbsp;<a class="el" href="../../d5/d4c/a01058.html#67d2ef57c1e9bc0f5bd6131bb99f5e062a51e038a3e31d166de22035c7962bdf">EfiGcdAllocateMaxAddressSearchTopDown</a>, 
-<a class="el" href="../../d5/d4c/a01058.html#67d2ef57c1e9bc0f5bd6131bb99f5e06ea65b03aaa6026be199d976d466d04d0">EfiGcdMaxAllocateType</a>
-<br>
- }</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef unsigned long&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4c/a01058.html#888294298ab5799dc811a39558c2aa2b">UINTN</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Include file matches things in PI.<p>
-Copyright (c) 2006 - 2009, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
-<dl class="user" compact><dt><b>Revision Reference:</b></dt><dd>PI Version 1.0 </dd></dl>
-<hr><h2>Define Documentation</h2>
-<a class="anchor" name="ad0c4c3623d48d225b9e4b2cee8f6527"></a><!-- doxytag: member="PiDxeCis.h::DXE_SERVICES_REVISION" ref="ad0c4c3623d48d225b9e4b2cee8f6527" args="" -->
+Processor or compiler specific defines and types for EBC.<p>
+We currently only have one EBC compiler so there may be some Intel compiler specific functions in this file.<p>
+Copyright (c) 2006 - 2009, Intel Corporation<br>
+ All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
+<a class="anchor" name="8aed43eb1b3c346772c127482b4b5372"></a><!-- doxytag: member="ProcessorBind.h::CPU_STACK_ALIGNMENT" ref="8aed43eb1b3c346772c127482b4b5372" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define DXE_SERVICES_REVISION&nbsp;&nbsp;&nbsp;((1&lt;&lt;16) | (00))          </td>
+          <td class="memname">#define CPU_STACK_ALIGNMENT&nbsp;&nbsp;&nbsp;sizeof(<a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+The stack alignment required for EBC 
+</div>
+</div><p>
+<a class="anchor" name="7e840a4e1d7fbaf630dc62358d80a845"></a><!-- doxytag: member="ProcessorBind.h::FUNCTION_ENTRY_POINT" ref="7e840a4e1d7fbaf630dc62358d80a845" args="(FunctionPointer)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define FUNCTION_ENTRY_POINT          </td>
+          <td>(</td>
+          <td class="paramtype">FunctionPointer&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;(VOID *)(<a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>)(FunctionPointer)</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Return the pointer to the first instruction of a function given a function pointer. On EBC architectures, these two pointer values are the same, so the implementation of this macro is very simple.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>FunctionPointer</em>&nbsp;</td><td>A pointer to a function.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The pointer to the first instruction of a function given a function pointer. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="a17551c9449516d7efa1890b6654c91d"></a><!-- doxytag: member="PiDxeCis.h::DXE_SERVICES_SIGNATURE" ref="a17551c9449516d7efa1890b6654c91d" args="" -->
+<a class="anchor" name="f5aee859ec14423bc427edf78c30d083"></a><!-- doxytag: member="ProcessorBind.h::GLOBAL_REMOVE_IF_UNREFERENCED" ref="f5aee859ec14423bc427edf78c30d083" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define DXE_SERVICES_SIGNATURE&nbsp;&nbsp;&nbsp;0x565245535f455844ULL          </td>
+          <td class="memname">#define GLOBAL_REMOVE_IF_UNREFERENCED          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+Modifier to ensure that all protocol member functions and EFI intrinsics use the correct C calling convention. All protocol member functions and EFI intrinsics are required to modify their member functions with EFIAPI. The Microsoft* C compiler can removed references to unreferenced data items if the /OPT:REF linker option is used. We defined a macro as this is a a non standard extension. Currently not supported by the EBC compiler 
+</div>
+</div><p>
+<a class="anchor" name="60bb431495193072cc1abf0c2452e18a"></a><!-- doxytag: member="ProcessorBind.h::MAX_2_BITS" ref="60bb431495193072cc1abf0c2452e18a" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define MAX_2_BITS&nbsp;&nbsp;&nbsp;(3ULL &lt;&lt; (sizeof (INTN) * 8 - 2))          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
 
+<p>
+A value of native width with the two highest bits set. Scalable macro to set the most 2 significant bits in a natural number 
+</div>
+</div><p>
+<a class="anchor" name="aba07841c3e227bc8bdd8ccdad149349"></a><!-- doxytag: member="ProcessorBind.h::MAX_ADDRESS" ref="aba07841c3e227bc8bdd8ccdad149349" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define MAX_ADDRESS&nbsp;&nbsp;&nbsp;((<a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>) ~0)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Maximum legal EBC address 
+</div>
+</div><p>
+<a class="anchor" name="2137fc5695cbd81598a4dba1ac6fab31"></a><!-- doxytag: member="ProcessorBind.h::MAX_BIT" ref="2137fc5695cbd81598a4dba1ac6fab31" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define MAX_BIT&nbsp;&nbsp;&nbsp;(1ULL &lt;&lt; (sizeof (INTN) * 8 - 1))          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+A value of native width with the highest bit set. Scalable macro to set the most significant bit in a natural number 
+</div>
+</div><p>
+<a class="anchor" name="68147285bdc4404f85af351bbf3a5968"></a><!-- doxytag: member="ProcessorBind.h::MDE_CPU_EBC" ref="68147285bdc4404f85af351bbf3a5968" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define MDE_CPU_EBC          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Define the processor type so other code can make processor based choices 
 </div>
 </div><p>
 <hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="f67f883a31e208b40584e352cc648954"></a><!-- doxytag: member="PiDxeCis.h::EFI_ADD_IO_SPACE" ref="f67f883a31e208b40584e352cc648954" args=")(IN EFI_GCD_IO_TYPE GcdIoType, IN EFI_PHYSICAL_ADDRESS BaseAddress, IN UINT64 Length)" -->
+<a class="anchor" name="112e3146cb38b6ee95e64d85842e380a"></a><!-- doxytag: member="ProcessorBind.h::BOOLEAN" ref="112e3146cb38b6ee95e64d85842e380a" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d5/d4c/a01058.html#f67f883a31e208b40584e352cc648954">EFI_ADD_IO_SPACE</a>)(IN <a class="el" href="../../d5/d4c/a01058.html#9ff34c627835f9a1dd8c165472aadaa4">EFI_GCD_IO_TYPE</a> GcdIoType, IN <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> BaseAddress, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Length)          </td>
+          <td class="memname">typedef unsigned char <a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Adds reserved I/O or I/O resources to the global coherency domain of the processor.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>GcdIoType</em>&nbsp;</td><td>The type of I/O resource being added. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>BaseAddress</em>&nbsp;</td><td>The physical address that is the start address of the I/O resource being added. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Length</em>&nbsp;</td><td>The size in bytes of the I/O resource that is being added.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The I/O resource was added to the global coherency domain of the processor. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>GcdIoType is invalid. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Length is zero. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There are not enough system resources to add the I/O resource to the global coherency domain of the processor. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The processor does not support one or more bytes of the I/O resource range specified by BaseAddress and Length. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ACCESS_DENIED</em>&nbsp;</td><td>One or more bytes of the I/O resource range specified by BaseAddress and Length conflicts with an I/O resource range that was previously added to the global coherency domain of the processor. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ACCESS_DENIED</em>&nbsp;</td><td>One or more bytes of the I/O resource range specified by BaseAddress and Length was allocated in a prior call to AllocateIoSpace(). </td></tr>
-  </table>
-</dl>
-
+Logical Boolean. 1-byte value containing 0 for FALSE or a 1 for TRUE. Other values are undefined. 
 </div>
 </div><p>
-<a class="anchor" name="c6ae83404605259cfdf461bbf42a9b0f"></a><!-- doxytag: member="PiDxeCis.h::EFI_ADD_MEMORY_SPACE" ref="c6ae83404605259cfdf461bbf42a9b0f" args=")(IN EFI_GCD_MEMORY_TYPE GcdMemoryType, IN EFI_PHYSICAL_ADDRESS BaseAddress, IN UINT64 Length, IN UINT64 Capabilities)" -->
+<a class="anchor" name="7ae886893bd2a2ae253eb2b021a48724"></a><!-- doxytag: member="ProcessorBind.h::CHAR16" ref="7ae886893bd2a2ae253eb2b021a48724" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d5/d4c/a01058.html#c6ae83404605259cfdf461bbf42a9b0f">EFI_ADD_MEMORY_SPACE</a>)(IN <a class="el" href="../../d5/d4c/a01058.html#263eaceeed25e0fe0dfebd217a85f4f9">EFI_GCD_MEMORY_TYPE</a> GcdMemoryType, IN <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> BaseAddress, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Length, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Capabilities)          </td>
+          <td class="memname">typedef unsigned short <a class="el" href="../../d0/d90/a01059.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Adds reserved memory, system memory, or memory-mapped I/O resources to the global coherency domain of the processor.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>GcdMemoryType</em>&nbsp;</td><td>The type of memory resource being added. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>BaseAddress</em>&nbsp;</td><td>The physical address that is the start address of the memory resource being added. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Length</em>&nbsp;</td><td>The size, in bytes, of the memory resource that is being added. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Capabilities</em>&nbsp;</td><td>The bit mask of attributes that the memory resource region supports.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The memory resource was added to the global coherency domain of the processor. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>GcdMemoryType is invalid. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Length is zero. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There are not enough system resources to add the memory resource to the global coherency domain of the processor. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The processor does not support one or more bytes of the memory resource range specified by BaseAddress and Length. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ACCESS_DENIED</em>&nbsp;</td><td>One or more bytes of the memory resource range specified by BaseAddress and Length conflicts with a memory resource range that was previously added to the global coherency domain of the processor. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ACCESS_DENIED</em>&nbsp;</td><td>One or more bytes of the memory resource range specified by BaseAddress and Length was allocated in a prior call to AllocateMemorySpace().. </td></tr>
-  </table>
-</dl>
-
+2-byte Character. Unless otherwise specified all strings are stored in the UTF-16 encoding format as defined by Unicode 2.1 and ISO/IEC 10646 standards. 
 </div>
 </div><p>
-<a class="anchor" name="fed77e825a9eeff93f7a3909edfc3dca"></a><!-- doxytag: member="PiDxeCis.h::EFI_ALLOCATE_IO_SPACE" ref="fed77e825a9eeff93f7a3909edfc3dca" args=")(IN EFI_GCD_ALLOCATE_TYPE GcdAllocateType, IN EFI_GCD_IO_TYPE GcdIoType, IN UINTN Alignment, IN UINT64 Length, IN OUT EFI_PHYSICAL_ADDRESS *BaseAddress, IN EFI_HANDLE ImageHandle, IN EFI_HANDLE DeviceHandle)" -->
+<a class="anchor" name="2f68f0189367ead40015f7c0ec68eb9e"></a><!-- doxytag: member="ProcessorBind.h::CHAR8" ref="2f68f0189367ead40015f7c0ec68eb9e" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d5/d4c/a01058.html#fed77e825a9eeff93f7a3909edfc3dca">EFI_ALLOCATE_IO_SPACE</a>)(IN <a class="el" href="../../d5/d4c/a01058.html#67d2ef57c1e9bc0f5bd6131bb99f5e06">EFI_GCD_ALLOCATE_TYPE</a> GcdAllocateType, IN <a class="el" href="../../d5/d4c/a01058.html#9ff34c627835f9a1dd8c165472aadaa4">EFI_GCD_IO_TYPE</a> GcdIoType, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Alignment, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Length, IN OUT <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> *BaseAddress, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ImageHandle, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> DeviceHandle)          </td>
+          <td class="memname">typedef char <a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Allocates nonexistent I/O, reserved I/O, or I/O resources from the global coherency domain of the processor.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>GcdAllocateType</em>&nbsp;</td><td>The type of allocation to perform. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>GcdIoType</em>&nbsp;</td><td>The type of I/O resource being allocated. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Alignment</em>&nbsp;</td><td>The log base 2 of the boundary that BaseAddress must be aligned on output. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Length</em>&nbsp;</td><td>The size in bytes of the I/O resource range that is being allocated. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>BaseAddress</em>&nbsp;</td><td>A pointer to a physical address. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Imagehandle</em>&nbsp;</td><td>The image handle of the agent that is allocating the I/O resource. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DeviceHandle</em>&nbsp;</td><td>The device handle for which the I/O resource is being allocated.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The I/O resource was allocated from the global coherency domain of the processor. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>GcdAllocateType is invalid. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>GcdIoType is invalid. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Length is zero. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>BaseAddress is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>ImageHandle is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There are not enough system resources to allocate the I/O resource from the global coherency domain of the processor. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The I/O resource request could not be satisfied. </td></tr>
-  </table>
-</dl>
-
+1-byte Character 
 </div>
 </div><p>
-<a class="anchor" name="2a8514cb3974c1073c487496a6d8bf05"></a><!-- doxytag: member="PiDxeCis.h::EFI_ALLOCATE_MEMORY_SPACE" ref="2a8514cb3974c1073c487496a6d8bf05" args=")(IN EFI_GCD_ALLOCATE_TYPE GcdAllocateType, IN EFI_GCD_MEMORY_TYPE GcdMemoryType, IN UINTN Alignment, IN UINT64 Length, IN OUT EFI_PHYSICAL_ADDRESS *BaseAddress, IN EFI_HANDLE ImageHandle, IN EFI_HANDLE DeviceHandle)" -->
+<a class="anchor" name="57de7cb8e702b1746127a4d5137fa455"></a><!-- doxytag: member="ProcessorBind.h::INT16" ref="57de7cb8e702b1746127a4d5137fa455" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d5/d4c/a01058.html#2a8514cb3974c1073c487496a6d8bf05">EFI_ALLOCATE_MEMORY_SPACE</a>)(IN <a class="el" href="../../d5/d4c/a01058.html#67d2ef57c1e9bc0f5bd6131bb99f5e06">EFI_GCD_ALLOCATE_TYPE</a> GcdAllocateType, IN <a class="el" href="../../d5/d4c/a01058.html#263eaceeed25e0fe0dfebd217a85f4f9">EFI_GCD_MEMORY_TYPE</a> GcdMemoryType, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Alignment, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Length, IN OUT <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> *BaseAddress, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ImageHandle, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> DeviceHandle)          </td>
+          <td class="memname">typedef short <a class="el" href="../../d0/d90/a01059.html#ca6c48234f001fdbd6597515a4cc088d">INT16</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Allocates nonexistent memory, reserved memory, system memory, or memorymapped I/O resources from the global coherency domain of the processor.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>GcdAllocateType</em>&nbsp;</td><td>The type of allocation to perform. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>GcdMemoryType</em>&nbsp;</td><td>The type of memory resource being allocated. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Alignment</em>&nbsp;</td><td>The log base 2 of the boundary that BaseAddress must be aligned on output. Align with 2^Alignment. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Length</em>&nbsp;</td><td>The size in bytes of the memory resource range that is being allocated. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>BaseAddress</em>&nbsp;</td><td>A pointer to a physical address to allocate. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Imagehandle</em>&nbsp;</td><td>The image handle of the agent that is allocating the memory resource. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DeviceHandle</em>&nbsp;</td><td>The device handle for which the memory resource is being allocated.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>GcdAllocateType is invalid. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>GcdMemoryType is invalid. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Length is zero. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>BaseAddress is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>ImageHandle is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The memory resource request could not be satisfied. No descriptor contains the desired space. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There are not enough system resources to allocate the memory resource from the global coherency domain of the processor. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The memory resource was allocated from the global coherency domain of the processor. </td></tr>
-  </table>
-</dl>
-
+2-byte signed value 
 </div>
 </div><p>
-<a class="anchor" name="0fb5c1c5a41e460bf5197e0f285bc25d"></a><!-- doxytag: member="PiDxeCis.h::EFI_DISPATCH" ref="0fb5c1c5a41e460bf5197e0f285bc25d" args=")(VOID)" -->
+<a class="anchor" name="63021d67d54286c2163bcdb43a6f2569"></a><!-- doxytag: member="ProcessorBind.h::INT32" ref="63021d67d54286c2163bcdb43a6f2569" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d5/d4c/a01058.html#0fb5c1c5a41e460bf5197e0f285bc25d">EFI_DISPATCH</a>)(VOID)          </td>
+          <td class="memname">typedef int <a class="el" href="../../d0/d90/a01059.html#2c951cf9402cd61f04b43789471dbe7c">INT32</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Loads and executed DXE drivers from firmware volumes.<p>
-The Dispatch() function searches for DXE drivers in firmware volumes that have been installed since the last time the Dispatch() service was called. It then evaluates the dependency expressions of all the DXE drivers and loads and executes those DXE drivers whose dependency expression evaluate to TRUE. This service must interact with the Security Architectural Protocol to authenticate DXE drivers before they are executed. This process is continued until no more DXE drivers can be executed.<p>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>One or more DXE driver were dispatched. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>No DXE drivers were dispatched. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ALREADY_STARTED</em>&nbsp;</td><td>An attempt is being made to start the DXE Dispatcher recursively. Thus no action was taken. </td></tr>
-  </table>
-</dl>
-
+4-byte signed value 
 </div>
 </div><p>
-<a class="anchor" name="49e89b9044b9027faf316e780d2a2a52"></a><!-- doxytag: member="PiDxeCis.h::EFI_DXE_SERVICES" ref="49e89b9044b9027faf316e780d2a2a52" args="" -->
+<a class="anchor" name="1e9aeaef48b6012036cbbcf0f6614eaa"></a><!-- doxytag: member="ProcessorBind.h::INT64" ref="1e9aeaef48b6012036cbbcf0f6614eaa" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d1/de3/a00306.html">DXE_SERVICES</a> <a class="el" href="../../d1/de3/a00306.html">EFI_DXE_SERVICES</a>          </td>
+          <td class="memname">typedef __int64 <a class="el" href="../../d0/d90/a01059.html#296e89aa9d3de65d9ba04e7060118260">INT64</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+8-byte signed value 
 </div>
 </div><p>
-<a class="anchor" name="e8b9e8f4a015ca8e5400272d8073fde2"></a><!-- doxytag: member="PiDxeCis.h::EFI_FREE_IO_SPACE" ref="e8b9e8f4a015ca8e5400272d8073fde2" args=")(IN EFI_PHYSICAL_ADDRESS BaseAddress, IN UINT64 Length)" -->
+<a class="anchor" name="307b8734c020247f6bac4fcde0dcfbb9"></a><!-- doxytag: member="ProcessorBind.h::INT8" ref="307b8734c020247f6bac4fcde0dcfbb9" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d5/d4c/a01058.html#e8b9e8f4a015ca8e5400272d8073fde2">EFI_FREE_IO_SPACE</a>)(IN <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> BaseAddress, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Length)          </td>
+          <td class="memname">typedef char <a class="el" href="../../d0/d90/a01059.html#0e16e07c1525c9688ca6fbd34f334ec8">INT8</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Frees nonexistent I/O, reserved I/O, or I/O resources from the global coherency domain of the processor.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>BaseAddress</em>&nbsp;</td><td>The physical address that is the start address of the I/O resource being freed. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Length</em>&nbsp;</td><td>The size in bytes of the I/O resource range that is being freed.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The I/O resource was freed from the global coherency domain of the processor. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Length is zero. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The processor does not support one or more bytes of the I/O resource range specified by BaseAddress and Length. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The I/O resource range specified by BaseAddress and Length was not allocated with previous calls to AllocateIoSpace(). </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There are not enough system resources to free the I/O resource from the global coherency domain of the processor. </td></tr>
-  </table>
-</dl>
-
+1-byte signed value 
 </div>
 </div><p>
-<a class="anchor" name="33917315b77ea4aca31755f81f53ead5"></a><!-- doxytag: member="PiDxeCis.h::EFI_FREE_MEMORY_SPACE" ref="33917315b77ea4aca31755f81f53ead5" args=")(IN EFI_PHYSICAL_ADDRESS BaseAddress, IN UINT64 Length)" -->
+<a class="anchor" name="8693e3bedb91ab009b6b7e6ec9aa179c"></a><!-- doxytag: member="ProcessorBind.h::INTN" ref="8693e3bedb91ab009b6b7e6ec9aa179c" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d5/d4c/a01058.html#33917315b77ea4aca31755f81f53ead5">EFI_FREE_MEMORY_SPACE</a>)(IN <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> BaseAddress, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Length)          </td>
+          <td class="memname">typedef long <a class="el" href="../../d0/d90/a01059.html#88c67527ff19b831c672f11fc131ee53">INTN</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Frees nonexistent memory, reserved memory, system memory, or memory-mapped I/O resources from the global coherency domain of the processor.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>BaseAddress</em>&nbsp;</td><td>The physical address that is the start address of the memory resource being freed. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Length</em>&nbsp;</td><td>The size in bytes of the memory resource range that is being freed.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The memory resource was freed from the global coherency domain of the processor. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Length is zero. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The processor does not support one or more bytes of the memory resource range specified by BaseAddress and Length. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The memory resource range specified by BaseAddress and Length was not allocated with previous calls to AllocateMemorySpace(). </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There are not enough system resources to free the memory resource from the global coherency domain of the processor. </td></tr>
-  </table>
-</dl>
-
+Signed value of native width. (4 bytes on supported 32-bit processor instructions, 8 bytes on supported 64-bit processor instructions) "long" type scales to the processor native size with EBC compiler 
 </div>
 </div><p>
-<a class="anchor" name="7b5b86a83eb3a39285de44079415bd9b"></a><!-- doxytag: member="PiDxeCis.h::EFI_GET_IO_SPACE_DESCRIPTOR" ref="7b5b86a83eb3a39285de44079415bd9b" args=")(IN EFI_PHYSICAL_ADDRESS BaseAddress, OUT EFI_GCD_IO_SPACE_DESCRIPTOR *Descriptor)" -->
+<a class="anchor" name="09f1a1fb2293e33483cc8d44aefb1eb1"></a><!-- doxytag: member="ProcessorBind.h::UINT16" ref="09f1a1fb2293e33483cc8d44aefb1eb1" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d5/d4c/a01058.html#7b5b86a83eb3a39285de44079415bd9b">EFI_GET_IO_SPACE_DESCRIPTOR</a>)(IN <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> BaseAddress, OUT <a class="el" href="../../d4/da8/a00437.html">EFI_GCD_IO_SPACE_DESCRIPTOR</a> *Descriptor)          </td>
+          <td class="memname">typedef unsigned short <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Retrieves the descriptor for an I/O region containing a specified address.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>BaseAddress</em>&nbsp;</td><td>The physical address that is the start address of an I/O region. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Descriptor</em>&nbsp;</td><td>A pointer to a caller allocated descriptor.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The descriptor for the I/O resource region containing BaseAddress was returned in Descriptor. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Descriptor is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>An I/O resource range containing BaseAddress was not found. </td></tr>
-  </table>
-</dl>
-
+2-byte unsigned value 
 </div>
 </div><p>
-<a class="anchor" name="c463c237ce5e74e51aaeafe89292afeb"></a><!-- doxytag: member="PiDxeCis.h::EFI_GET_IO_SPACE_MAP" ref="c463c237ce5e74e51aaeafe89292afeb" args=")(OUT UINTN *NumberOfDescriptors, OUT EFI_GCD_IO_SPACE_DESCRIPTOR **IoSpaceMap)" -->
+<a class="anchor" name="e1e6edbbc26d6fbc71a90190d0266018"></a><!-- doxytag: member="ProcessorBind.h::UINT32" ref="e1e6edbbc26d6fbc71a90190d0266018" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d5/d4c/a01058.html#c463c237ce5e74e51aaeafe89292afeb">EFI_GET_IO_SPACE_MAP</a>)(OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *NumberOfDescriptors, OUT <a class="el" href="../../d4/da8/a00437.html">EFI_GCD_IO_SPACE_DESCRIPTOR</a> **IoSpaceMap)          </td>
+          <td class="memname">typedef unsigned int <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Returns a map of the I/O resources in the global coherency domain of the processor.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>NumberOfDescriptors</em>&nbsp;</td><td>A pointer to number of descriptors returned in the IoSpaceMap buffer. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>MemorySpaceMap</em>&nbsp;</td><td>A pointer to the array of EFI_GCD_IO_SPACE_DESCRIPTORs.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The I/O space map was returned in the IoSpaceMap buffer, and the number of descriptors in IoSpaceMap was returned in NumberOfDescriptors. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>NumberOfDescriptors is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>IoSpaceMap is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There are not enough resources to allocate IoSpaceMap. </td></tr>
-  </table>
-</dl>
-
+4-byte unsigned value 
 </div>
 </div><p>
-<a class="anchor" name="7e41c835ae33299b0933552e4f5105b1"></a><!-- doxytag: member="PiDxeCis.h::EFI_GET_MEMORY_SPACE_DESCRIPTOR" ref="7e41c835ae33299b0933552e4f5105b1" args=")(IN EFI_PHYSICAL_ADDRESS BaseAddress, OUT EFI_GCD_MEMORY_SPACE_DESCRIPTOR *Descriptor)" -->
+<a class="anchor" name="ae17ebb9ef7279d026817fb22f8aebe9"></a><!-- doxytag: member="ProcessorBind.h::UINT64" ref="ae17ebb9ef7279d026817fb22f8aebe9" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d5/d4c/a01058.html#7e41c835ae33299b0933552e4f5105b1">EFI_GET_MEMORY_SPACE_DESCRIPTOR</a>)(IN <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> BaseAddress, OUT <a class="el" href="../../dd/dfd/a00438.html">EFI_GCD_MEMORY_SPACE_DESCRIPTOR</a> *Descriptor)          </td>
+          <td class="memname">typedef unsigned __int64 <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Retrieves the descriptor for a memory region containing a specified address.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>BaseAddress</em>&nbsp;</td><td>The physical address that is the start address of a memory region. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Descriptor</em>&nbsp;</td><td>A pointer to a caller allocated descriptor.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The descriptor for the memory resource region containing BaseAddress was returned in Descriptor. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Descriptor is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>A memory resource range containing BaseAddress was not found. </td></tr>
-  </table>
-</dl>
-
+8-byte unsigned value 
 </div>
 </div><p>
-<a class="anchor" name="c84a15a86956eb32962f8b619e218a06"></a><!-- doxytag: member="PiDxeCis.h::EFI_GET_MEMORY_SPACE_MAP" ref="c84a15a86956eb32962f8b619e218a06" args=")(OUT UINTN *NumberOfDescriptors, OUT EFI_GCD_MEMORY_SPACE_DESCRIPTOR **MemorySpaceMap)" -->
+<a class="anchor" name="b27e9918b538ce9d8ca692479b375b6a"></a><!-- doxytag: member="ProcessorBind.h::UINT8" ref="b27e9918b538ce9d8ca692479b375b6a" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d5/d4c/a01058.html#c84a15a86956eb32962f8b619e218a06">EFI_GET_MEMORY_SPACE_MAP</a>)(OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *NumberOfDescriptors, OUT <a class="el" href="../../dd/dfd/a00438.html">EFI_GCD_MEMORY_SPACE_DESCRIPTOR</a> **MemorySpaceMap)          </td>
+          <td class="memname">typedef unsigned char <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Returns a map of the memory resources in the global coherency domain of the processor.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>NumberOfDescriptors</em>&nbsp;</td><td>A pointer to number of descriptors returned in the MemorySpaceMap buffer. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>MemorySpaceMap</em>&nbsp;</td><td>A pointer to the array of EFI_GCD_MEMORY_SPACE_DESCRIPTORs.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The memory space map was returned in the MemorySpaceMap buffer, and the number of descriptors in MemorySpaceMap was returned in NumberOfDescriptors. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>NumberOfDescriptors is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>MemorySpaceMap is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There are not enough resources to allocate MemorySpaceMap. </td></tr>
-  </table>
-</dl>
-
+1-byte unsigned value 
 </div>
 </div><p>
-<a class="anchor" name="9c20ccdc56b332f665960fb9ac8b2340"></a><!-- doxytag: member="PiDxeCis.h::EFI_PROCESS_FIRMWARE_VOLUME" ref="9c20ccdc56b332f665960fb9ac8b2340" args=")(IN CONST VOID *FirmwareVolumeHeader, IN UINTN Size, OUT EFI_HANDLE *FirmwareVolumeHandle)" -->
+<a class="anchor" name="888294298ab5799dc811a39558c2aa2b"></a><!-- doxytag: member="ProcessorBind.h::UINTN" ref="888294298ab5799dc811a39558c2aa2b" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d5/d4c/a01058.html#9c20ccdc56b332f665960fb9ac8b2340">EFI_PROCESS_FIRMWARE_VOLUME</a>)(IN CONST VOID *FirmwareVolumeHeader, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Size, OUT <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> *FirmwareVolumeHandle)          </td>
+          <td class="memname">typedef unsigned long <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Creates a firmware volume handle for a firmware volume that is present in system memory.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>FirmwareVolumeHeader</em>&nbsp;</td><td>A pointer to the header of the firmware volume. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Size</em>&nbsp;</td><td>The size, in bytes, of the firmware volume. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>FirmwareVolumeHandle</em>&nbsp;</td><td>On output, a pointer to the created handle.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The EFI_FIRMWARE_VOLUME_PROTOCOL and <a class="el" href="../../d9/de6/a00404.html">EFI_DEVICE_PATH_PROTOCOL</a> were installed onto FirmwareVolumeHandle for the firmware volume described by FirmwareVolumeHeader and Size. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_VOLUME_CORRUPTED</em>&nbsp;</td><td>The firmware volume described by FirmwareVolumeHeader and Size is corrupted. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There are not enough system resources available to produce the EFI_FIRMWARE_VOLUME_PROTOCOL and <a class="el" href="../../d9/de6/a00404.html">EFI_DEVICE_PATH_PROTOCOL</a> for the firmware volume described by FirmwareVolumeHeader and Size. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="6facd746a6e93229c907d7735227c47f"></a><!-- doxytag: member="PiDxeCis.h::EFI_REMOVE_IO_SPACE" ref="6facd746a6e93229c907d7735227c47f" args=")(IN EFI_PHYSICAL_ADDRESS BaseAddress, IN UINT64 Length)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d5/d4c/a01058.html#6facd746a6e93229c907d7735227c47f">EFI_REMOVE_IO_SPACE</a>)(IN <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> BaseAddress, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Length)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Removes reserved I/O or I/O resources from the global coherency domain of the processor.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>BaseAddress</em>&nbsp;</td><td>A pointer to a physical address that is the start address of the I/O resource being removed. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Length</em>&nbsp;</td><td>The size in bytes of the I/O resource that is being removed.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The I/O resource was removed from the global coherency domain of the processor. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Length is zero. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The processor does not support one or more bytes of the I/O resource range specified by BaseAddress and Length. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>One or more bytes of the I/O resource range specified by BaseAddress and Length was not added with previous calls to AddIoSpace(). </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ACCESS_DENIED</em>&nbsp;</td><td>One or more bytes of the I/O resource range specified by BaseAddress and Length has been allocated with AllocateIoSpace(). </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There are not enough system resources to remove the I/O resource from the global coherency domain of the processor. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="a4d71448807f5117f4dd67c5a3b28ac0"></a><!-- doxytag: member="PiDxeCis.h::EFI_REMOVE_MEMORY_SPACE" ref="a4d71448807f5117f4dd67c5a3b28ac0" args=")(IN EFI_PHYSICAL_ADDRESS BaseAddress, IN UINT64 Length)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d5/d4c/a01058.html#a4d71448807f5117f4dd67c5a3b28ac0">EFI_REMOVE_MEMORY_SPACE</a>)(IN <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> BaseAddress, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Length)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Removes reserved memory, system memory, or memory-mapped I/O resources from the global coherency domain of the processor.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>BaseAddress</em>&nbsp;</td><td>The physical address that is the start address of the memory resource being removed. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Length</em>&nbsp;</td><td>The size in bytes of the memory resource that is being removed.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The memory resource was removed from the global coherency domain of the processor. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Length is zero. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The processor does not support one or more bytes of the memory resource range specified by BaseAddress and Length. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>One or more bytes of the memory resource range specified by BaseAddress and Length was not added with previous calls to AddMemorySpace(). </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ACCESS_DEFINED</em>&nbsp;</td><td>One or more bytes of the memory resource range specified by BaseAddress and Length has been allocated with AllocateMemorySpace(). </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There are not enough system resources to remove the memory resource from the global coherency domain of the processor. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="017dbdc2ae4f3f85d700644b855c2cba"></a><!-- doxytag: member="PiDxeCis.h::EFI_SCHEDULE" ref="017dbdc2ae4f3f85d700644b855c2cba" args=")(IN EFI_HANDLE FirmwareVolumeHandle, IN CONST EFI_GUID *FileName)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d5/d4c/a01058.html#017dbdc2ae4f3f85d700644b855c2cba">EFI_SCHEDULE</a>)(IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> FirmwareVolumeHandle, IN CONST <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *FileName)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Clears the Schedule on Request (SOR) flag for a component that is stored in a firmware volume.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>FirmwareVolumeHandle</em>&nbsp;</td><td>The handle of the firmware volume that contains the file specified by FileName. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>FileName</em>&nbsp;</td><td>A pointer to the name of the file in a firmware volume.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The DXE driver was found and its SOR bit was cleared. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The DXE driver does not exist, or the DXE driver exists and its SOR bit is not set. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="16c5c2944974b723de3dfbce451b0acf"></a><!-- doxytag: member="PiDxeCis.h::EFI_SET_MEMORY_SPACE_ATTRIBUTES" ref="16c5c2944974b723de3dfbce451b0acf" args=")(IN EFI_PHYSICAL_ADDRESS BaseAddress, IN UINT64 Length, IN UINT64 Attributes)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d5/d4c/a01058.html#16c5c2944974b723de3dfbce451b0acf">EFI_SET_MEMORY_SPACE_ATTRIBUTES</a>)(IN <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> BaseAddress, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Length, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Attributes)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Modifies the attributes for a memory region in the global coherency domain of the processor.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>BaseAddress</em>&nbsp;</td><td>The physical address that is the start address of a memory region. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Length</em>&nbsp;</td><td>The size in bytes of the memory region. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Attributes</em>&nbsp;</td><td>The bit mask of attributes to set for the memory region.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The attributes were set for the memory region. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Length is zero. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The processor does not support one or more bytes of the memory resource range specified by BaseAddress and Length. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The bit mask of attributes is not support for the memory resource range specified by BaseAddress and Length. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ACCESS_DEFINED</em>&nbsp;</td><td>The attributes for the memory resource range specified by BaseAddress and Length cannot be modified. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There are not enough system resources to modify the attributes of the memory resource range. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="0453aef38aa1a1b20681a00f772538e4"></a><!-- doxytag: member="PiDxeCis.h::EFI_TRUST" ref="0453aef38aa1a1b20681a00f772538e4" args=")(IN EFI_HANDLE FirmwareVolumeHandle, IN CONST EFI_GUID *FileName)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d5/d4c/a01058.html#0453aef38aa1a1b20681a00f772538e4">EFI_TRUST</a>)(IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> FirmwareVolumeHandle, IN CONST <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *FileName)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Promotes a file stored in a firmware volume from the untrusted to the trusted state.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>FirmwareVolumeHandle</em>&nbsp;</td><td>The handle of the firmware volume that contains the file specified by FileName. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DriverName</em>&nbsp;</td><td>A pointer to the name of the file in a firmware volume.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>Status of promoting FFS from untrusted to trusted state. </dd></dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The file was not found in the untrusted state. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<hr><h2>Enumeration Type Documentation</h2>
-<a class="anchor" name="67d2ef57c1e9bc0f5bd6131bb99f5e06"></a><!-- doxytag: member="PiDxeCis.h::EFI_GCD_ALLOCATE_TYPE" ref="67d2ef57c1e9bc0f5bd6131bb99f5e06" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">enum <a class="el" href="../../d5/d4c/a01058.html#67d2ef57c1e9bc0f5bd6131bb99f5e06">EFI_GCD_ALLOCATE_TYPE</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-The type of allocation to perform. <dl compact><dt><b>Enumerator: </b></dt><dd>
-<table border="0" cellspacing="2" cellpadding="0">
-<tr><td valign="top"><em><a class="anchor" name="67d2ef57c1e9bc0f5bd6131bb99f5e06d3b656c3a6de3422159971850b0bc1d8"></a><!-- doxytag: member="EfiGcdAllocateAnySearchBottomUp" ref="67d2ef57c1e9bc0f5bd6131bb99f5e06d3b656c3a6de3422159971850b0bc1d8" args="" -->EfiGcdAllocateAnySearchBottomUp</em>&nbsp;</td><td>
-The GCD memory space map is searched from the lowest address up to the highest address looking for unallocated memory ranges. </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="67d2ef57c1e9bc0f5bd6131bb99f5e061bbb43d032b56d8f69bcec510dd68979"></a><!-- doxytag: member="EfiGcdAllocateMaxAddressSearchBottomUp" ref="67d2ef57c1e9bc0f5bd6131bb99f5e061bbb43d032b56d8f69bcec510dd68979" args="" -->EfiGcdAllocateMaxAddressSearchBottomUp</em>&nbsp;</td><td>
-The GCD memory space map is searched from the lowest address up to the specified MaxAddress looking for unallocated memory ranges. </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="67d2ef57c1e9bc0f5bd6131bb99f5e06cc1fdb7458e268050b67015d344831bd"></a><!-- doxytag: member="EfiGcdAllocateAddress" ref="67d2ef57c1e9bc0f5bd6131bb99f5e06cc1fdb7458e268050b67015d344831bd" args="" -->EfiGcdAllocateAddress</em>&nbsp;</td><td>
-The GCD memory space map is checked to see if the memory range starting at the specified Address is available. </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="67d2ef57c1e9bc0f5bd6131bb99f5e064947e9a9cc8d732f129b42ac13882972"></a><!-- doxytag: member="EfiGcdAllocateAnySearchTopDown" ref="67d2ef57c1e9bc0f5bd6131bb99f5e064947e9a9cc8d732f129b42ac13882972" args="" -->EfiGcdAllocateAnySearchTopDown</em>&nbsp;</td><td>
-The GCD memory space map is searched from the highest address down to the lowest address looking for unallocated memory ranges. </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="67d2ef57c1e9bc0f5bd6131bb99f5e062a51e038a3e31d166de22035c7962bdf"></a><!-- doxytag: member="EfiGcdAllocateMaxAddressSearchTopDown" ref="67d2ef57c1e9bc0f5bd6131bb99f5e062a51e038a3e31d166de22035c7962bdf" args="" -->EfiGcdAllocateMaxAddressSearchTopDown</em>&nbsp;</td><td>
-The GCD memory space map is searched from the specified MaxAddress down to the lowest address looking for unallocated memory ranges. </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="67d2ef57c1e9bc0f5bd6131bb99f5e06ea65b03aaa6026be199d976d466d04d0"></a><!-- doxytag: member="EfiGcdMaxAllocateType" ref="67d2ef57c1e9bc0f5bd6131bb99f5e06ea65b03aaa6026be199d976d466d04d0" args="" -->EfiGcdMaxAllocateType</em>&nbsp;</td><td>
-</td></tr>
-</table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="9ff34c627835f9a1dd8c165472aadaa4"></a><!-- doxytag: member="PiDxeCis.h::EFI_GCD_IO_TYPE" ref="9ff34c627835f9a1dd8c165472aadaa4" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">enum <a class="el" href="../../d5/d4c/a01058.html#9ff34c627835f9a1dd8c165472aadaa4">EFI_GCD_IO_TYPE</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Global Coherencey Domain types - IO type <dl compact><dt><b>Enumerator: </b></dt><dd>
-<table border="0" cellspacing="2" cellpadding="0">
-<tr><td valign="top"><em><a class="anchor" name="9ff34c627835f9a1dd8c165472aadaa456660201e4efe8aef385db035d94f3b2"></a><!-- doxytag: member="EfiGcdIoTypeNonExistent" ref="9ff34c627835f9a1dd8c165472aadaa456660201e4efe8aef385db035d94f3b2" args="" -->EfiGcdIoTypeNonExistent</em>&nbsp;</td><td>
-An I/O region that is visible to the boot processor. However, there are no system components that are currently decoding this I/O region. </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="9ff34c627835f9a1dd8c165472aadaa4d650cc0c0fbe4d593f7a557ad2c886e4"></a><!-- doxytag: member="EfiGcdIoTypeReserved" ref="9ff34c627835f9a1dd8c165472aadaa4d650cc0c0fbe4d593f7a557ad2c886e4" args="" -->EfiGcdIoTypeReserved</em>&nbsp;</td><td>
-An I/O region that is visible to the boot processor. This I/O region is currently being decoded by a system component, but the I/O region cannot be used to access I/O devices. </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="9ff34c627835f9a1dd8c165472aadaa4f0784df447aa4453cc9364eb5d3e0c12"></a><!-- doxytag: member="EfiGcdIoTypeIo" ref="9ff34c627835f9a1dd8c165472aadaa4f0784df447aa4453cc9364eb5d3e0c12" args="" -->EfiGcdIoTypeIo</em>&nbsp;</td><td>
-An I/O region that is visible to the boot processor. This I/O region is currently being decoded by a system component that is producing I/O ports that can be used to access I/O devices. </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="9ff34c627835f9a1dd8c165472aadaa48ac4a9ae4fcf153824f29b21bc0942fd"></a><!-- doxytag: member="EfiGcdIoTypeMaximum" ref="9ff34c627835f9a1dd8c165472aadaa48ac4a9ae4fcf153824f29b21bc0942fd" args="" -->EfiGcdIoTypeMaximum</em>&nbsp;</td><td>
-</td></tr>
-</table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="263eaceeed25e0fe0dfebd217a85f4f9"></a><!-- doxytag: member="PiDxeCis.h::EFI_GCD_MEMORY_TYPE" ref="263eaceeed25e0fe0dfebd217a85f4f9" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">enum <a class="el" href="../../d5/d4c/a01058.html#263eaceeed25e0fe0dfebd217a85f4f9">EFI_GCD_MEMORY_TYPE</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Global Coherencey Domain types - Memory type <dl compact><dt><b>Enumerator: </b></dt><dd>
-<table border="0" cellspacing="2" cellpadding="0">
-<tr><td valign="top"><em><a class="anchor" name="263eaceeed25e0fe0dfebd217a85f4f958a6c65f65623581eb7697d21db3d56f"></a><!-- doxytag: member="EfiGcdMemoryTypeNonExistent" ref="263eaceeed25e0fe0dfebd217a85f4f958a6c65f65623581eb7697d21db3d56f" args="" -->EfiGcdMemoryTypeNonExistent</em>&nbsp;</td><td>
-A memory region that is visible to the boot processor. However, there are no system components that are currently decoding this memory region. </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="263eaceeed25e0fe0dfebd217a85f4f923f0a24695d11552cdb4bf1c2bbe5950"></a><!-- doxytag: member="EfiGcdMemoryTypeReserved" ref="263eaceeed25e0fe0dfebd217a85f4f923f0a24695d11552cdb4bf1c2bbe5950" args="" -->EfiGcdMemoryTypeReserved</em>&nbsp;</td><td>
-A memory region that is visible to the boot processor. This memory region is being decoded by a system component, but the memory region is not considered to be either system memory or memory-mapped I/O. </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="263eaceeed25e0fe0dfebd217a85f4f9e8a8dca513bbab11db4a77040a0853c2"></a><!-- doxytag: member="EfiGcdMemoryTypeSystemMemory" ref="263eaceeed25e0fe0dfebd217a85f4f9e8a8dca513bbab11db4a77040a0853c2" args="" -->EfiGcdMemoryTypeSystemMemory</em>&nbsp;</td><td>
-A memory region that is visible to the boot processor. A memory controller is currently decoding this memory region and the memory controller is producing a tested system memory region that is available to the memory services. </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="263eaceeed25e0fe0dfebd217a85f4f9ef7d29167bb0c213dafac9ecc7d8dd23"></a><!-- doxytag: member="EfiGcdMemoryTypeMemoryMappedIo" ref="263eaceeed25e0fe0dfebd217a85f4f9ef7d29167bb0c213dafac9ecc7d8dd23" args="" -->EfiGcdMemoryTypeMemoryMappedIo</em>&nbsp;</td><td>
-A memory region that is visible to the boot processor. This memory region is currently being decoded by a component as memory-mapped I/O that can be used to access I/O devices in the platform. </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="263eaceeed25e0fe0dfebd217a85f4f9ab4c110cc212c1d57214accb152b17c8"></a><!-- doxytag: member="EfiGcdMemoryTypeMaximum" ref="263eaceeed25e0fe0dfebd217a85f4f9ab4c110cc212c1d57214accb152b17c8" args="" -->EfiGcdMemoryTypeMaximum</em>&nbsp;</td><td>
-</td></tr>
-</table>
-</dl>
-
+Unsigned value of native width. (4 bytes on supported 32-bit processor instructions, 8 bytes on supported 64-bit processor instructions) "long" type scales to the processor native size with EBC compiler 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:09 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:20 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

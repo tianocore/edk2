@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_HII_KEYBOARD_PACKAGE_HDR Struct Reference</title>
+<title>MdePkg[ALL]: EFI_FFS_FILE_HEADER Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,47 +21,116 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_HII_KEYBOARD_PACKAGE_HDR Struct Reference</h1><!-- doxytag: class="EFI_HII_KEYBOARD_PACKAGE_HDR" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_FFS_FILE_HEADER Struct Reference</h1><!-- doxytag: class="EFI_FFS_FILE_HEADER" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d10/a00449.html">EFI_HII_PACKAGE_HEADER</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dfe/a00448.html#4cebec78118bb1770d913ef8873ada4e">Header</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dfe/a00448.html#3dfb1be84b4f3fed5ff93e35f10f196b">Name</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dfe/a00448.html#8ac3147bd1d30f7cbe7a1196dc429349">LayoutCount</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d10/a00449.html">EFI_FFS_INTEGRITY_CHECK</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dfe/a00448.html#454f5f262ee4871ed9e1f2a6e82b621e">IntegrityCheck</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d2/dd7/a01108.html#a8c9898a7322417d167ff078bcde1f2b">EFI_FV_FILETYPE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dfe/a00448.html#c8483e236c89be2603f6af2114e6edd1">Type</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d2/dd7/a01108.html#ba29d3c881fb222d310983a1276ab141">EFI_FFS_FILE_ATTRIBUTES</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dfe/a00448.html#e9e2e60283e82c692e4107737377e07f">Attributes</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dfe/a00448.html#ce653e9c66d78cda5c09dbe6b8e490ba">Size</a> [3]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d2/dd7/a01108.html#bc8129350680eb1d1bcded9f448ac819">EFI_FFS_FILE_STATE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dfe/a00448.html#f0ba7fc37ef2bb2c58204c682068e7d2">State</a></td></tr>
 
 </table>
-<hr><h2>Field Documentation</h2>
-<a class="anchor" name="4cebec78118bb1770d913ef8873ada4e"></a><!-- doxytag: member="EFI_HII_KEYBOARD_PACKAGE_HDR::Header" ref="4cebec78118bb1770d913ef8873ada4e" args="" -->
+<hr><a name="_details"></a><h2>Detailed Description</h2>
+Each file begins with the header that describe the contents and state of the files. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="e9e2e60283e82c692e4107737377e07f"></a><!-- doxytag: member="EFI_FFS_FILE_HEADER::Attributes" ref="e9e2e60283e82c692e4107737377e07f" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d10/a00449.html">EFI_HII_PACKAGE_HEADER</a> <a class="el" href="../../de/dfe/a00448.html#4cebec78118bb1770d913ef8873ada4e">EFI_HII_KEYBOARD_PACKAGE_HDR::Header</a>          </td>
+          <td class="memname"><a class="el" href="../../d2/dd7/a01108.html#ba29d3c881fb222d310983a1276ab141">EFI_FFS_FILE_ATTRIBUTES</a> <a class="el" href="../../de/dfe/a00448.html#e9e2e60283e82c692e4107737377e07f">EFI_FFS_FILE_HEADER::Attributes</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+Declares various file attribute bits. 
 </div>
 </div><p>
-<a class="anchor" name="8ac3147bd1d30f7cbe7a1196dc429349"></a><!-- doxytag: member="EFI_HII_KEYBOARD_PACKAGE_HDR::LayoutCount" ref="8ac3147bd1d30f7cbe7a1196dc429349" args="" -->
+<a class="anchor" name="454f5f262ee4871ed9e1f2a6e82b621e"></a><!-- doxytag: member="EFI_FFS_FILE_HEADER::IntegrityCheck" ref="454f5f262ee4871ed9e1f2a6e82b621e" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../de/dfe/a00448.html#8ac3147bd1d30f7cbe7a1196dc429349">EFI_HII_KEYBOARD_PACKAGE_HDR::LayoutCount</a>          </td>
+          <td class="memname"><a class="el" href="../../d9/d10/a00449.html">EFI_FFS_INTEGRITY_CHECK</a> <a class="el" href="../../de/dfe/a00448.html#454f5f262ee4871ed9e1f2a6e82b621e">EFI_FFS_FILE_HEADER::IntegrityCheck</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+Used to verify the integrity of the file. 
+</div>
+</div><p>
+<a class="anchor" name="3dfb1be84b4f3fed5ff93e35f10f196b"></a><!-- doxytag: member="EFI_FFS_FILE_HEADER::Name" ref="3dfb1be84b4f3fed5ff93e35f10f196b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../de/dfe/a00448.html#3dfb1be84b4f3fed5ff93e35f10f196b">EFI_FFS_FILE_HEADER::Name</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
 
+<p>
+This <a class="el" href="../../d1/d87/a00689.html">GUID</a> is the file name. It is used to uniquely identify the file. 
+</div>
+</div><p>
+<a class="anchor" name="ce653e9c66d78cda5c09dbe6b8e490ba"></a><!-- doxytag: member="EFI_FFS_FILE_HEADER::Size" ref="ce653e9c66d78cda5c09dbe6b8e490ba" args="[3]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../de/dfe/a00448.html#ce653e9c66d78cda5c09dbe6b8e490ba">EFI_FFS_FILE_HEADER::Size</a>[3]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+The length of the file in bytes, including the FFS header. 
+</div>
+</div><p>
+<a class="anchor" name="f0ba7fc37ef2bb2c58204c682068e7d2"></a><!-- doxytag: member="EFI_FFS_FILE_HEADER::State" ref="f0ba7fc37ef2bb2c58204c682068e7d2" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d2/dd7/a01108.html#bc8129350680eb1d1bcded9f448ac819">EFI_FFS_FILE_STATE</a> <a class="el" href="../../de/dfe/a00448.html#f0ba7fc37ef2bb2c58204c682068e7d2">EFI_FFS_FILE_HEADER::State</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Used to track the state of the file throughout the life of the file from creation to deletion. 
+</div>
+</div><p>
+<a class="anchor" name="c8483e236c89be2603f6af2114e6edd1"></a><!-- doxytag: member="EFI_FFS_FILE_HEADER::Type" ref="c8483e236c89be2603f6af2114e6edd1" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d2/dd7/a01108.html#a8c9898a7322417d167ff078bcde1f2b">EFI_FV_FILETYPE</a> <a class="el" href="../../de/dfe/a00448.html#c8483e236c89be2603f6af2114e6edd1">EFI_FFS_FILE_HEADER::Type</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Identifies the type of file. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:31 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

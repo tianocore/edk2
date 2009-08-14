@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: USB_CONFIG_DESCRIPTOR Struct Reference</title>
+<title>MdePkg[ALL]: tdTPM_MIGRATIONKEYAUTH Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,34 +21,24 @@
   </div>
 </div>
 <div class="contents">
-<h1>USB_CONFIG_DESCRIPTOR Struct Reference</h1><!-- doxytag: class="USB_CONFIG_DESCRIPTOR" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>tdTPM_MIGRATIONKEYAUTH Struct Reference</h1><!-- doxytag: class="tdTPM_MIGRATIONKEYAUTH" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d40/a00946.html#f91401112c9099d66d6bbf2c859ff43c">Length</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/d9c/a00958.html">TPM_PUBKEY</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d40/a00946.html#da5c7ea0fcff2a6f1c06f244e46eb3a9">migrationKey</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d40/a00946.html#802bdd937d427bd68c97e94f5d628933">DescriptorType</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d8e/a01050.html#193c52e82e906b67df4b9ddea4dc9bf6">TPM_MIGRATE_SCHEME</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d40/a00946.html#394479ff3665b8a1b6d2546b27a010db">migrationScheme</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d40/a00946.html#225c492ab73f838663bb3e342cb45548">TotalLength</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d40/a00946.html#aa878f0d29431ecb1ef9500fb3484f8b">NumInterfaces</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d40/a00946.html#13e12120cb7fcc75468604f4d7fe3399">ConfigurationValue</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d40/a00946.html#2e884db69b6657f320d4619a96198d64">Configuration</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d40/a00946.html#f63dc3f977fa2d1ff5e492ec363038c4">Attributes</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d40/a00946.html#6af6e0d68e6394f448a54634e7f6343f">MaxPower</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/dbc/a00931.html">TPM_DIGEST</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d40/a00946.html#01938e63fbf223b686e34cd7908fce7d">digest</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Standard Configuration Descriptor USB 2.0 spec, Section 9.6.3 <hr><h2>Field Documentation</h2>
-<a class="anchor" name="f63dc3f977fa2d1ff5e492ec363038c4"></a><!-- doxytag: member="USB_CONFIG_DESCRIPTOR::Attributes" ref="f63dc3f977fa2d1ff5e492ec363038c4" args="" -->
+Part 2, section 5.12: TPM_MIGRATIONKEYAUTH <hr><h2>Field Documentation</h2>
+<a class="anchor" name="01938e63fbf223b686e34cd7908fce7d"></a><!-- doxytag: member="tdTPM_MIGRATIONKEYAUTH::digest" ref="01938e63fbf223b686e34cd7908fce7d" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../da/d40/a00946.html#f63dc3f977fa2d1ff5e492ec363038c4">USB_CONFIG_DESCRIPTOR::Attributes</a>          </td>
+          <td class="memname"><a class="el" href="../../df/dbc/a00931.html">TPM_DIGEST</a> <a class="el" href="../../da/d40/a00946.html#01938e63fbf223b686e34cd7908fce7d">tdTPM_MIGRATIONKEYAUTH::digest</a>          </td>
         </tr>
       </table>
 </div>
@@ -58,12 +48,12 @@ Standard Configuration Descriptor USB 2.0 spec, Section 9.6.3 <hr><h2>Field Docu
 
 </div>
 </div><p>
-<a class="anchor" name="2e884db69b6657f320d4619a96198d64"></a><!-- doxytag: member="USB_CONFIG_DESCRIPTOR::Configuration" ref="2e884db69b6657f320d4619a96198d64" args="" -->
+<a class="anchor" name="da5c7ea0fcff2a6f1c06f244e46eb3a9"></a><!-- doxytag: member="tdTPM_MIGRATIONKEYAUTH::migrationKey" ref="da5c7ea0fcff2a6f1c06f244e46eb3a9" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../da/d40/a00946.html#2e884db69b6657f320d4619a96198d64">USB_CONFIG_DESCRIPTOR::Configuration</a>          </td>
+          <td class="memname"><a class="el" href="../../df/d9c/a00958.html">TPM_PUBKEY</a> <a class="el" href="../../da/d40/a00946.html#da5c7ea0fcff2a6f1c06f244e46eb3a9">tdTPM_MIGRATIONKEYAUTH::migrationKey</a>          </td>
         </tr>
       </table>
 </div>
@@ -73,87 +63,12 @@ Standard Configuration Descriptor USB 2.0 spec, Section 9.6.3 <hr><h2>Field Docu
 
 </div>
 </div><p>
-<a class="anchor" name="13e12120cb7fcc75468604f4d7fe3399"></a><!-- doxytag: member="USB_CONFIG_DESCRIPTOR::ConfigurationValue" ref="13e12120cb7fcc75468604f4d7fe3399" args="" -->
+<a class="anchor" name="394479ff3665b8a1b6d2546b27a010db"></a><!-- doxytag: member="tdTPM_MIGRATIONKEYAUTH::migrationScheme" ref="394479ff3665b8a1b6d2546b27a010db" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../da/d40/a00946.html#13e12120cb7fcc75468604f4d7fe3399">USB_CONFIG_DESCRIPTOR::ConfigurationValue</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="802bdd937d427bd68c97e94f5d628933"></a><!-- doxytag: member="USB_CONFIG_DESCRIPTOR::DescriptorType" ref="802bdd937d427bd68c97e94f5d628933" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../da/d40/a00946.html#802bdd937d427bd68c97e94f5d628933">USB_CONFIG_DESCRIPTOR::DescriptorType</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="f91401112c9099d66d6bbf2c859ff43c"></a><!-- doxytag: member="USB_CONFIG_DESCRIPTOR::Length" ref="f91401112c9099d66d6bbf2c859ff43c" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../da/d40/a00946.html#f91401112c9099d66d6bbf2c859ff43c">USB_CONFIG_DESCRIPTOR::Length</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="6af6e0d68e6394f448a54634e7f6343f"></a><!-- doxytag: member="USB_CONFIG_DESCRIPTOR::MaxPower" ref="6af6e0d68e6394f448a54634e7f6343f" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../da/d40/a00946.html#6af6e0d68e6394f448a54634e7f6343f">USB_CONFIG_DESCRIPTOR::MaxPower</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="aa878f0d29431ecb1ef9500fb3484f8b"></a><!-- doxytag: member="USB_CONFIG_DESCRIPTOR::NumInterfaces" ref="aa878f0d29431ecb1ef9500fb3484f8b" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../da/d40/a00946.html#aa878f0d29431ecb1ef9500fb3484f8b">USB_CONFIG_DESCRIPTOR::NumInterfaces</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="225c492ab73f838663bb3e342cb45548"></a><!-- doxytag: member="USB_CONFIG_DESCRIPTOR::TotalLength" ref="225c492ab73f838663bb3e342cb45548" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../da/d40/a00946.html#225c492ab73f838663bb3e342cb45548">USB_CONFIG_DESCRIPTOR::TotalLength</a>          </td>
+          <td class="memname"><a class="el" href="../../d9/d8e/a01050.html#193c52e82e906b67df4b9ddea4dc9bf6">TPM_MIGRATE_SCHEME</a> <a class="el" href="../../da/d40/a00946.html#394479ff3665b8a1b6d2546b27a010db">tdTPM_MIGRATIONKEYAUTH::migrationScheme</a>          </td>
         </tr>
       </table>
 </div>
@@ -164,7 +79,7 @@ Standard Configuration Descriptor USB 2.0 spec, Section 9.6.3 <hr><h2>Field Docu
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:23 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:10 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: tdTPM_MIGRATE_ASYMKEY Struct Reference</title>
+<title>MdePkg[ALL]: tdTPM_ASYM_CA_CONTENTS Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,28 +21,22 @@
   </div>
 </div>
 <div class="contents">
-<h1>tdTPM_MIGRATE_ASYMKEY Struct Reference</h1><!-- doxytag: class="tdTPM_MIGRATE_ASYMKEY" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>tdTPM_ASYM_CA_CONTENTS Struct Reference</h1><!-- doxytag: class="tdTPM_ASYM_CA_CONTENTS" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/d59/a01001.html#851ca56c93bc8149f9f17e9562f63e6a">TPM_PAYLOAD_TYPE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d79/a00898.html#207312b8019d72c543238b3f82846382">payload</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d85/a00976.html">TPM_SYMMETRIC_KEY</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d79/a00898.html#05013fba89981a2a3a6430d00b3516c2">sessionKey</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/d59/a01001.html#06f4454a3bdd9176d98c4d188aa22b31">TPM_SECRET</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d79/a00898.html#e8e0c5e7d4162c4d7143b28df37f8cc0">usageAuth</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d08/a00884.html">TPM_DIGEST</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d79/a00898.html#52af4a584345f69bfb5dcda9702e87eb">pubDataDigest</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d79/a00898.html#86e7e89bcfd45fa6614a634aa39ac841">partPrivKeyLen</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d79/a00898.html#8530138f5623f43d602224d08f8e50ee">partPrivKey</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/dbc/a00931.html">TPM_DIGEST</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d79/a00898.html#b20f4604fe40790b8619fd08c43633a7">idDigest</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Part 2, section 10.8: TPM_MIGRATE_ASYMKEY [size_is(partPrivKeyLen)] BYTE* partPrivKey; <hr><h2>Field Documentation</h2>
-<a class="anchor" name="8530138f5623f43d602224d08f8e50ee"></a><!-- doxytag: member="tdTPM_MIGRATE_ASYMKEY::partPrivKey" ref="8530138f5623f43d602224d08f8e50ee" args="" -->
+Part 2, section 12.8 TPM_ASYM_CA_CONTENTS <hr><h2>Field Documentation</h2>
+<a class="anchor" name="b20f4604fe40790b8619fd08c43633a7"></a><!-- doxytag: member="tdTPM_ASYM_CA_CONTENTS::idDigest" ref="b20f4604fe40790b8619fd08c43633a7" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>* <a class="el" href="../../d2/d79/a00898.html#8530138f5623f43d602224d08f8e50ee">tdTPM_MIGRATE_ASYMKEY::partPrivKey</a>          </td>
+          <td class="memname"><a class="el" href="../../df/dbc/a00931.html">TPM_DIGEST</a> <a class="el" href="../../d2/d79/a00898.html#b20f4604fe40790b8619fd08c43633a7">tdTPM_ASYM_CA_CONTENTS::idDigest</a>          </td>
         </tr>
       </table>
 </div>
@@ -52,57 +46,12 @@ Part 2, section 10.8: TPM_MIGRATE_ASYMKEY [size_is(partPrivKeyLen)] BYTE* partPr
 
 </div>
 </div><p>
-<a class="anchor" name="86e7e89bcfd45fa6614a634aa39ac841"></a><!-- doxytag: member="tdTPM_MIGRATE_ASYMKEY::partPrivKeyLen" ref="86e7e89bcfd45fa6614a634aa39ac841" args="" -->
+<a class="anchor" name="05013fba89981a2a3a6430d00b3516c2"></a><!-- doxytag: member="tdTPM_ASYM_CA_CONTENTS::sessionKey" ref="05013fba89981a2a3a6430d00b3516c2" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d2/d79/a00898.html#86e7e89bcfd45fa6614a634aa39ac841">tdTPM_MIGRATE_ASYMKEY::partPrivKeyLen</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="207312b8019d72c543238b3f82846382"></a><!-- doxytag: member="tdTPM_MIGRATE_ASYMKEY::payload" ref="207312b8019d72c543238b3f82846382" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../df/d59/a01001.html#851ca56c93bc8149f9f17e9562f63e6a">TPM_PAYLOAD_TYPE</a> <a class="el" href="../../d2/d79/a00898.html#207312b8019d72c543238b3f82846382">tdTPM_MIGRATE_ASYMKEY::payload</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="52af4a584345f69bfb5dcda9702e87eb"></a><!-- doxytag: member="tdTPM_MIGRATE_ASYMKEY::pubDataDigest" ref="52af4a584345f69bfb5dcda9702e87eb" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../dd/d08/a00884.html">TPM_DIGEST</a> <a class="el" href="../../d2/d79/a00898.html#52af4a584345f69bfb5dcda9702e87eb">tdTPM_MIGRATE_ASYMKEY::pubDataDigest</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="e8e0c5e7d4162c4d7143b28df37f8cc0"></a><!-- doxytag: member="tdTPM_MIGRATE_ASYMKEY::usageAuth" ref="e8e0c5e7d4162c4d7143b28df37f8cc0" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../df/d59/a01001.html#06f4454a3bdd9176d98c4d188aa22b31">TPM_SECRET</a> <a class="el" href="../../d2/d79/a00898.html#e8e0c5e7d4162c4d7143b28df37f8cc0">tdTPM_MIGRATE_ASYMKEY::usageAuth</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d85/a00976.html">TPM_SYMMETRIC_KEY</a> <a class="el" href="../../d2/d79/a00898.html#05013fba89981a2a3a6430d00b3516c2">tdTPM_ASYM_CA_CONTENTS::sessionKey</a>          </td>
         </tr>
       </table>
 </div>
@@ -113,7 +62,7 @@ Part 2, section 10.8: TPM_MIGRATE_ASYMKEY [size_is(partPrivKeyLen)] BYTE* partPr
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:23 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:07 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

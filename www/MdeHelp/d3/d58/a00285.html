@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: ATAPI_READ_CAPACITY_DATA Struct Reference</title>
+<title>MdePkg[ALL]: ACPI_ADR_DEVICE_PATH Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,139 +21,37 @@
   </div>
 </div>
 <div class="contents">
-<h1>ATAPI_READ_CAPACITY_DATA Struct Reference</h1><!-- doxytag: class="ATAPI_READ_CAPACITY_DATA" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>ACPI_ADR_DEVICE_PATH Struct Reference</h1><!-- doxytag: class="ACPI_ADR_DEVICE_PATH" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d58/a00285.html#d02af2cfcbb84ffdbafd9c3c4d868228">LastLba3</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d58/a00285.html#2d5b040ed6970979409ae95d15be07d6">Header</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d58/a00285.html#51f3ef3f83a5bd32e39c52ffa18badc8">LastLba2</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d58/a00285.html#7cacabb69aa68ada1089108075784908">LastLba1</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d58/a00285.html#ad466a75d786943c7e09a804d320ca32">LastLba0</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d58/a00285.html#71f8bfb8313bf982c06d282f9d68558d">BlockSize3</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d58/a00285.html#86f1e926e70d9ae071d7e04bbbd2fb8b">BlockSize2</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d58/a00285.html#43138e48d6777d6b476e3e05f5184f9d">BlockSize1</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d58/a00285.html#3926e5537cfc545af123ff6ca231316c">BlockSize0</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d58/a00285.html#ad681f28f998a96df8bdd5d4cb611115">ADR</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-READ CAPACITY Data, defined in SFF-8070i(ATAPI Removable Rewritable Specification) <hr><h2>Field Documentation</h2>
-<a class="anchor" name="3926e5537cfc545af123ff6ca231316c"></a><!-- doxytag: member="ATAPI_READ_CAPACITY_DATA::BlockSize0" ref="3926e5537cfc545af123ff6ca231316c" args="" -->
+The _ADR device path is used to contain video output device attributes to support the Graphics Output Protocol. The device path can contain multiple _ADR entries if multiple video output devices are displaying the same output. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="ad681f28f998a96df8bdd5d4cb611115"></a><!-- doxytag: member="ACPI_ADR_DEVICE_PATH::ADR" ref="ad681f28f998a96df8bdd5d4cb611115" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d3/d58/a00285.html#3926e5537cfc545af123ff6ca231316c">ATAPI_READ_CAPACITY_DATA::BlockSize0</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d3/d58/a00285.html#ad681f28f998a96df8bdd5d4cb611115">ACPI_ADR_DEVICE_PATH::ADR</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+_ADR value. For video output devices the value of this field comes from Table B-2 ACPI 3.0 specification. At least one _ADR value is required. 
 </div>
 </div><p>
-<a class="anchor" name="43138e48d6777d6b476e3e05f5184f9d"></a><!-- doxytag: member="ATAPI_READ_CAPACITY_DATA::BlockSize1" ref="43138e48d6777d6b476e3e05f5184f9d" args="" -->
+<a class="anchor" name="2d5b040ed6970979409ae95d15be07d6"></a><!-- doxytag: member="ACPI_ADR_DEVICE_PATH::Header" ref="2d5b040ed6970979409ae95d15be07d6" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d3/d58/a00285.html#43138e48d6777d6b476e3e05f5184f9d">ATAPI_READ_CAPACITY_DATA::BlockSize1</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="86f1e926e70d9ae071d7e04bbbd2fb8b"></a><!-- doxytag: member="ATAPI_READ_CAPACITY_DATA::BlockSize2" ref="86f1e926e70d9ae071d7e04bbbd2fb8b" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d3/d58/a00285.html#86f1e926e70d9ae071d7e04bbbd2fb8b">ATAPI_READ_CAPACITY_DATA::BlockSize2</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="71f8bfb8313bf982c06d282f9d68558d"></a><!-- doxytag: member="ATAPI_READ_CAPACITY_DATA::BlockSize3" ref="71f8bfb8313bf982c06d282f9d68558d" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d3/d58/a00285.html#71f8bfb8313bf982c06d282f9d68558d">ATAPI_READ_CAPACITY_DATA::BlockSize3</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="ad466a75d786943c7e09a804d320ca32"></a><!-- doxytag: member="ATAPI_READ_CAPACITY_DATA::LastLba0" ref="ad466a75d786943c7e09a804d320ca32" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d3/d58/a00285.html#ad466a75d786943c7e09a804d320ca32">ATAPI_READ_CAPACITY_DATA::LastLba0</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="7cacabb69aa68ada1089108075784908"></a><!-- doxytag: member="ATAPI_READ_CAPACITY_DATA::LastLba1" ref="7cacabb69aa68ada1089108075784908" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d3/d58/a00285.html#7cacabb69aa68ada1089108075784908">ATAPI_READ_CAPACITY_DATA::LastLba1</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="51f3ef3f83a5bd32e39c52ffa18badc8"></a><!-- doxytag: member="ATAPI_READ_CAPACITY_DATA::LastLba2" ref="51f3ef3f83a5bd32e39c52ffa18badc8" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d3/d58/a00285.html#51f3ef3f83a5bd32e39c52ffa18badc8">ATAPI_READ_CAPACITY_DATA::LastLba2</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="d02af2cfcbb84ffdbafd9c3c4d868228"></a><!-- doxytag: member="ATAPI_READ_CAPACITY_DATA::LastLba3" ref="d02af2cfcbb84ffdbafd9c3c4d868228" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d3/d58/a00285.html#d02af2cfcbb84ffdbafd9c3c4d868228">ATAPI_READ_CAPACITY_DATA::LastLba3</a>          </td>
+          <td class="memname"><a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> <a class="el" href="../../d3/d58/a00285.html#2d5b040ed6970979409ae95d15be07d6">ACPI_ADR_DEVICE_PATH::Header</a>          </td>
         </tr>
       </table>
 </div>
@@ -164,7 +62,7 @@ READ CAPACITY Data, defined in SFF-8070i(ATAPI Removable Rewritable Specificatio
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:14 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:20 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

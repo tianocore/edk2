@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_FILE_INFO Struct Reference</title>
+<title>MdePkg[ALL]: EFI_DEBUG_ASSERT_DATA Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,149 +21,83 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_FILE_INFO Struct Reference</h1><!-- doxytag: class="EFI_FILE_INFO" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_DEBUG_ASSERT_DATA Struct Reference</h1><!-- doxytag: class="EFI_DEBUG_ASSERT_DATA" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d43/a00422.html#3e90ba9e84338dcb3efeb7fd6e1232bb">Size</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/d2a/a00632.html">EFI_STATUS_CODE_DATA</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d43/a00422.html#7b010007afd729267c04b825949975b4">DataHeader</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d43/a00422.html#f27d7b44fe24553d4d0a0ce6478b8ffd">FileSize</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d43/a00422.html#ec35c636c3633347c950b98329e324e1">LineNumber</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d43/a00422.html#1674334d9099e6750665195e272c6c40">PhysicalSize</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d43/a00422.html#9a28fa247ed7122ed6cd490834e5eac2">FileNameSize</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/dc4/a00617.html">EFI_TIME</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d43/a00422.html#2078b47c309f0618867e46fd83303328">CreateTime</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/dc4/a00617.html">EFI_TIME</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d43/a00422.html#b2ecc23cb52a19081afe45c249446851">LastAccessTime</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/dc4/a00617.html">EFI_TIME</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d43/a00422.html#0219e1ea4a0ece13bd082b43a4644c85">ModificationTime</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d43/a00422.html#438b80b3e008a110ce9c8b86af5a36f5">Attribute</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d43/a00422.html#af234ad9b78525ea342159bce0c435ae">FileName</a> [1]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/daa/a00638.html">EFI_STATUS_CODE_STRING_DATA</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d43/a00422.html#f7e68d113ac080314ec3b03c32ab30a8">FileName</a></td></tr>
 
 </table>
-<hr><h2>Field Documentation</h2>
-<a class="anchor" name="438b80b3e008a110ce9c8b86af5a36f5"></a><!-- doxytag: member="EFI_FILE_INFO::Attribute" ref="438b80b3e008a110ce9c8b86af5a36f5" args="" -->
+<hr><a name="_details"></a><h2>Detailed Description</h2>
+This structure provides the assert information that is typically associated with a debug assertion failing.<p>
+The data indicates the location of the assertion that failed in the source code. This information includes the file name and line number that are necessary to find the failing assertion in source code. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="7b010007afd729267c04b825949975b4"></a><!-- doxytag: member="EFI_DEBUG_ASSERT_DATA::DataHeader" ref="7b010007afd729267c04b825949975b4" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../db/d43/a00422.html#438b80b3e008a110ce9c8b86af5a36f5">EFI_FILE_INFO::Attribute</a>          </td>
+          <td class="memname"><a class="el" href="../../d4/d2a/a00632.html">EFI_STATUS_CODE_DATA</a> <a class="el" href="../../db/d43/a00422.html#7b010007afd729267c04b825949975b4">EFI_DEBUG_ASSERT_DATA::DataHeader</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The attribute bits for the file. 
+The data header identifying the data. DataHeader.HeaderSize should be sizeof (<a class="el" href="../../d4/d2a/a00632.html">EFI_STATUS_CODE_DATA</a>), DataHeader.Size should be sizeof (<a class="el" href="../../db/d43/a00422.html">EFI_DEBUG_ASSERT_DATA</a>) - HeaderSize , and DataHeader.Type should be EFI_STATUS_CODE_SPECIFIC_DATA_GUID. 
 </div>
 </div><p>
-<a class="anchor" name="2078b47c309f0618867e46fd83303328"></a><!-- doxytag: member="EFI_FILE_INFO::CreateTime" ref="2078b47c309f0618867e46fd83303328" args="" -->
+<a class="anchor" name="f7e68d113ac080314ec3b03c32ab30a8"></a><!-- doxytag: member="EFI_DEBUG_ASSERT_DATA::FileName" ref="f7e68d113ac080314ec3b03c32ab30a8" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d4/dc4/a00617.html">EFI_TIME</a> <a class="el" href="../../db/d43/a00422.html#2078b47c309f0618867e46fd83303328">EFI_FILE_INFO::CreateTime</a>          </td>
+          <td class="memname"><a class="el" href="../../d1/daa/a00638.html">EFI_STATUS_CODE_STRING_DATA</a>* <a class="el" href="../../db/d43/a00422.html#f7e68d113ac080314ec3b03c32ab30a8">EFI_DEBUG_ASSERT_DATA::FileName</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The time the file was created. 
+A pointer to a NULL-terminated ASCII or Unicode string that represents the file name of the source file where the fault was generated. 
 </div>
 </div><p>
-<a class="anchor" name="af234ad9b78525ea342159bce0c435ae"></a><!-- doxytag: member="EFI_FILE_INFO::FileName" ref="af234ad9b78525ea342159bce0c435ae" args="[1]" -->
+<a class="anchor" name="9a28fa247ed7122ed6cd490834e5eac2"></a><!-- doxytag: member="EFI_DEBUG_ASSERT_DATA::FileNameSize" ref="9a28fa247ed7122ed6cd490834e5eac2" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> <a class="el" href="../../db/d43/a00422.html#af234ad9b78525ea342159bce0c435ae">EFI_FILE_INFO::FileName</a>[1]          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../db/d43/a00422.html#9a28fa247ed7122ed6cd490834e5eac2">EFI_DEBUG_ASSERT_DATA::FileNameSize</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The Null-terminated Unicode name of the file. 
+The size in bytes of FileName. 
 </div>
 </div><p>
-<a class="anchor" name="f27d7b44fe24553d4d0a0ce6478b8ffd"></a><!-- doxytag: member="EFI_FILE_INFO::FileSize" ref="f27d7b44fe24553d4d0a0ce6478b8ffd" args="" -->
+<a class="anchor" name="ec35c636c3633347c950b98329e324e1"></a><!-- doxytag: member="EFI_DEBUG_ASSERT_DATA::LineNumber" ref="ec35c636c3633347c950b98329e324e1" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../db/d43/a00422.html#f27d7b44fe24553d4d0a0ce6478b8ffd">EFI_FILE_INFO::FileSize</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../db/d43/a00422.html#ec35c636c3633347c950b98329e324e1">EFI_DEBUG_ASSERT_DATA::LineNumber</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The size of the file in bytes. 
-</div>
-</div><p>
-<a class="anchor" name="b2ecc23cb52a19081afe45c249446851"></a><!-- doxytag: member="EFI_FILE_INFO::LastAccessTime" ref="b2ecc23cb52a19081afe45c249446851" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d4/dc4/a00617.html">EFI_TIME</a> <a class="el" href="../../db/d43/a00422.html#b2ecc23cb52a19081afe45c249446851">EFI_FILE_INFO::LastAccessTime</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-The time when the file was last accessed. 
-</div>
-</div><p>
-<a class="anchor" name="0219e1ea4a0ece13bd082b43a4644c85"></a><!-- doxytag: member="EFI_FILE_INFO::ModificationTime" ref="0219e1ea4a0ece13bd082b43a4644c85" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d4/dc4/a00617.html">EFI_TIME</a> <a class="el" href="../../db/d43/a00422.html#0219e1ea4a0ece13bd082b43a4644c85">EFI_FILE_INFO::ModificationTime</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-The time when the file's contents were last modified. 
-</div>
-</div><p>
-<a class="anchor" name="1674334d9099e6750665195e272c6c40"></a><!-- doxytag: member="EFI_FILE_INFO::PhysicalSize" ref="1674334d9099e6750665195e272c6c40" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../db/d43/a00422.html#1674334d9099e6750665195e272c6c40">EFI_FILE_INFO::PhysicalSize</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-PhysicalSize The amount of physical space the file consumes on the file system volume. 
-</div>
-</div><p>
-<a class="anchor" name="3e90ba9e84338dcb3efeb7fd6e1232bb"></a><!-- doxytag: member="EFI_FILE_INFO::Size" ref="3e90ba9e84338dcb3efeb7fd6e1232bb" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../db/d43/a00422.html#3e90ba9e84338dcb3efeb7fd6e1232bb">EFI_FILE_INFO::Size</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Size of the <a class="el" href="../../db/d43/a00422.html">EFI_FILE_INFO</a> structure, including the Nullterminated Unicode FileName string. 
+The line number of the source file where the fault was generated. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:30 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

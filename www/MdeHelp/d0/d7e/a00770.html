@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: s_pxe_sw_undi Struct Reference</title>
+<title>MdePkg[ALL]: PCI_CARDBUS_CONTROL_REGISTER Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,273 +21,376 @@
   </div>
 </div>
 <div class="contents">
-<h1>s_pxe_sw_undi Struct Reference</h1><!-- doxytag: class="s_pxe_sw_undi" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>PCI_CARDBUS_CONTROL_REGISTER Struct Reference</h1><!-- doxytag: class="PCI_CARDBUS_CONTROL_REGISTER" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d19/a01190.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#69c6ab7f50af7fec06f5d3a434526eef">Signature</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#5b78718e0b12d62df9dc685446d35bf5">CardBusSocketReg</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">PXE_ROMID_SIGNATURE.  <a href="#69c6ab7f50af7fec06f5d3a434526eef"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d19/a01190.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#b332d9652e09b8fd09308d79c9e32a6c">Len</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Cardus Socket/ExCA Base.  <a href="#5b78718e0b12d62df9dc685446d35bf5"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#cd9a38858cf2dece31817677ba4af6ce">Cap_Ptr</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">sizeof(PXE_SW_UNDI)  <a href="#b332d9652e09b8fd09308d79c9e32a6c"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d19/a01190.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#f2b4cbd9a668a65dedd86a416de1de49">Fudge</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#4a850abb57037cd3d641370b67398db1">Reserved</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">makes 8-bit cksum zero  <a href="#f2b4cbd9a668a65dedd86a416de1de49"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d19/a01190.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#0f43d53d4c307590edc576930f327e0f">Rev</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#8920258b218067955861166adc4de87b">SecondaryStatus</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">PXE_ROMID_REV.  <a href="#0f43d53d4c307590edc576930f327e0f"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d19/a01190.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#6fdb544332de73ae57c24eec29977a16">IFcnt</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Secondary Status.  <a href="#8920258b218067955861166adc4de87b"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#74c2b3cd09bdb544406517c0cb1004a5">PciBusNumber</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">physical connector count  <a href="#6fdb544332de73ae57c24eec29977a16"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d19/a01190.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#38c1e184c2d30002ed991d5af8747b71">MajorVer</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">PCI Bus Number.  <a href="#74c2b3cd09bdb544406517c0cb1004a5"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#0197898947c3467145bc6b0bc3670a24">CardBusBusNumber</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">PXE_ROMID_MAJORVER.  <a href="#38c1e184c2d30002ed991d5af8747b71"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d19/a01190.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#577175e0ad4969a83a832e59075dd5ae">MinorVer</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">CardBus Bus Number.  <a href="#0197898947c3467145bc6b0bc3670a24"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#ffb069d0222f1e628bd0e543390f2c13">SubordinateBusNumber</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">PXE_ROMID_MINORVER.  <a href="#577175e0ad4969a83a832e59075dd5ae"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d19/a01190.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#147fdd004a9728ebe870bf73c7b592ec">reserved1</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Subordinate Bus Number.  <a href="#ffb069d0222f1e628bd0e543390f2c13"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#f24aa00977cebe63a6cc5f4c4e4220a3">CardBusLatencyTimer</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">zero, not used  <a href="#147fdd004a9728ebe870bf73c7b592ec"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d19/a01190.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#0192d816418645ff4373f581f11ac985">Implementation</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">CardBus Latency Timer.  <a href="#f24aa00977cebe63a6cc5f4c4e4220a3"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#e226cc713130efb4e8ca56108761dc28">MemoryBase0</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Implementation flags.  <a href="#0192d816418645ff4373f581f11ac985"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d19/a01190.html#46095e9a84c0bc88f934110dbca0993f">PXE_UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#3601a62ca3d47c486965c6f679f38417">EntryPoint</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Memory Base Register 0.  <a href="#e226cc713130efb4e8ca56108761dc28"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#27c45c1e6646ab66c32dde36bb24d607">MemoryLimit0</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">API entry point.  <a href="#3601a62ca3d47c486965c6f679f38417"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d19/a01190.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#8d93d90185cd3011e299cf6d5e7c7c76">reserved2</a> [3]</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Memory Limit Register 0.  <a href="#27c45c1e6646ab66c32dde36bb24d607"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#fee554a2d6b979db171b4f345105ca77">MemoryBase1</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">zero, not used  <a href="#8d93d90185cd3011e299cf6d5e7c7c76"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d19/a01190.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#e43ca5a24ded72e8644399b50b6ee8da">BusCnt</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#ba9524ca8b588294462638470cfdeb7e">MemoryLimit1</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">number of bustypes supported  <a href="#e43ca5a24ded72e8644399b50b6ee8da"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d19/a01190.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#d3eb59c8ae202ab9192baa302b42207c">BusType</a> [1]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#f0ff7228d8cdcb7064c79fed97e67e91">IoBase0</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">list of supported bustypes  <a href="#d3eb59c8ae202ab9192baa302b42207c"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#f27f5813b780b72ef33434c929ac1620">IoLimit0</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">I/O Base Register 0.  <a href="#f27f5813b780b72ef33434c929ac1620"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#3721217faeec4b5f66e131cbe99c843f">IoBase1</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">I/O Limit Register 0.  <a href="#3721217faeec4b5f66e131cbe99c843f"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#04d79e1cc703cbb04b02d1ec5726fc0e">IoLimit1</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#c5ea5b7a5d388a1bcbb547a8ffb6ebe0">InterruptLine</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Interrupt Line.  <a href="#c5ea5b7a5d388a1bcbb547a8ffb6ebe0"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#f2eb1240c66dbea2f8cde0d675d72b7d">InterruptPin</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Interrupt Pin.  <a href="#f2eb1240c66dbea2f8cde0d675d72b7d"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d7e/a00770.html#e3e8441f656ccb4329a54c361bfd8cc8">BridgeControl</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Bridge Control.  <a href="#e3e8441f656ccb4329a54c361bfd8cc8"></a><br></td></tr>
 </table>
-<hr><h2>Field Documentation</h2>
-<a class="anchor" name="e43ca5a24ded72e8644399b50b6ee8da"></a><!-- doxytag: member="s_pxe_sw_undi::BusCnt" ref="e43ca5a24ded72e8644399b50b6ee8da" args="" -->
+<hr><a name="_details"></a><h2>Detailed Description</h2>
+CardBus Conroller Configuration Space, Section 4.5.1, PC Card Standard. 8.0 <hr><h2>Field Documentation</h2>
+<a class="anchor" name="e3e8441f656ccb4329a54c361bfd8cc8"></a><!-- doxytag: member="PCI_CARDBUS_CONTROL_REGISTER::BridgeControl" ref="e3e8441f656ccb4329a54c361bfd8cc8" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d19/a01190.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a> <a class="el" href="../../d0/d7e/a00770.html#e43ca5a24ded72e8644399b50b6ee8da">s_pxe_sw_undi::BusCnt</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d0/d7e/a00770.html#e3e8441f656ccb4329a54c361bfd8cc8">PCI_CARDBUS_CONTROL_REGISTER::BridgeControl</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-number of bustypes supported 
+Bridge Control. 
 <p>
 
 </div>
 </div><p>
-<a class="anchor" name="d3eb59c8ae202ab9192baa302b42207c"></a><!-- doxytag: member="s_pxe_sw_undi::BusType" ref="d3eb59c8ae202ab9192baa302b42207c" args="[1]" -->
+<a class="anchor" name="cd9a38858cf2dece31817677ba4af6ce"></a><!-- doxytag: member="PCI_CARDBUS_CONTROL_REGISTER::Cap_Ptr" ref="cd9a38858cf2dece31817677ba4af6ce" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d19/a01190.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a> <a class="el" href="../../d0/d7e/a00770.html#d3eb59c8ae202ab9192baa302b42207c">s_pxe_sw_undi::BusType</a>[1]          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d0/d7e/a00770.html#cd9a38858cf2dece31817677ba4af6ce">PCI_CARDBUS_CONTROL_REGISTER::Cap_Ptr</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-list of supported bustypes 
-<p>
 
 </div>
 </div><p>
-<a class="anchor" name="3601a62ca3d47c486965c6f679f38417"></a><!-- doxytag: member="s_pxe_sw_undi::EntryPoint" ref="3601a62ca3d47c486965c6f679f38417" args="" -->
+<a class="anchor" name="0197898947c3467145bc6b0bc3670a24"></a><!-- doxytag: member="PCI_CARDBUS_CONTROL_REGISTER::CardBusBusNumber" ref="0197898947c3467145bc6b0bc3670a24" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d19/a01190.html#46095e9a84c0bc88f934110dbca0993f">PXE_UINT64</a> <a class="el" href="../../d0/d7e/a00770.html#3601a62ca3d47c486965c6f679f38417">s_pxe_sw_undi::EntryPoint</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d0/d7e/a00770.html#0197898947c3467145bc6b0bc3670a24">PCI_CARDBUS_CONTROL_REGISTER::CardBusBusNumber</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-API entry point. 
+CardBus Bus Number. 
 <p>
 
 </div>
 </div><p>
-<a class="anchor" name="f2b4cbd9a668a65dedd86a416de1de49"></a><!-- doxytag: member="s_pxe_sw_undi::Fudge" ref="f2b4cbd9a668a65dedd86a416de1de49" args="" -->
+<a class="anchor" name="f24aa00977cebe63a6cc5f4c4e4220a3"></a><!-- doxytag: member="PCI_CARDBUS_CONTROL_REGISTER::CardBusLatencyTimer" ref="f24aa00977cebe63a6cc5f4c4e4220a3" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d19/a01190.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a> <a class="el" href="../../d0/d7e/a00770.html#f2b4cbd9a668a65dedd86a416de1de49">s_pxe_sw_undi::Fudge</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d0/d7e/a00770.html#f24aa00977cebe63a6cc5f4c4e4220a3">PCI_CARDBUS_CONTROL_REGISTER::CardBusLatencyTimer</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-makes 8-bit cksum zero 
+CardBus Latency Timer. 
 <p>
 
 </div>
 </div><p>
-<a class="anchor" name="6fdb544332de73ae57c24eec29977a16"></a><!-- doxytag: member="s_pxe_sw_undi::IFcnt" ref="6fdb544332de73ae57c24eec29977a16" args="" -->
+<a class="anchor" name="5b78718e0b12d62df9dc685446d35bf5"></a><!-- doxytag: member="PCI_CARDBUS_CONTROL_REGISTER::CardBusSocketReg" ref="5b78718e0b12d62df9dc685446d35bf5" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d19/a01190.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a> <a class="el" href="../../d0/d7e/a00770.html#6fdb544332de73ae57c24eec29977a16">s_pxe_sw_undi::IFcnt</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d0/d7e/a00770.html#5b78718e0b12d62df9dc685446d35bf5">PCI_CARDBUS_CONTROL_REGISTER::CardBusSocketReg</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-physical connector count 
+Cardus Socket/ExCA Base. 
 <p>
 
 </div>
 </div><p>
-<a class="anchor" name="0192d816418645ff4373f581f11ac985"></a><!-- doxytag: member="s_pxe_sw_undi::Implementation" ref="0192d816418645ff4373f581f11ac985" args="" -->
+<a class="anchor" name="c5ea5b7a5d388a1bcbb547a8ffb6ebe0"></a><!-- doxytag: member="PCI_CARDBUS_CONTROL_REGISTER::InterruptLine" ref="c5ea5b7a5d388a1bcbb547a8ffb6ebe0" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d19/a01190.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a> <a class="el" href="../../d0/d7e/a00770.html#0192d816418645ff4373f581f11ac985">s_pxe_sw_undi::Implementation</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d0/d7e/a00770.html#c5ea5b7a5d388a1bcbb547a8ffb6ebe0">PCI_CARDBUS_CONTROL_REGISTER::InterruptLine</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Implementation flags. 
+Interrupt Line. 
 <p>
 
 </div>
 </div><p>
-<a class="anchor" name="b332d9652e09b8fd09308d79c9e32a6c"></a><!-- doxytag: member="s_pxe_sw_undi::Len" ref="b332d9652e09b8fd09308d79c9e32a6c" args="" -->
+<a class="anchor" name="f2eb1240c66dbea2f8cde0d675d72b7d"></a><!-- doxytag: member="PCI_CARDBUS_CONTROL_REGISTER::InterruptPin" ref="f2eb1240c66dbea2f8cde0d675d72b7d" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d19/a01190.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a> <a class="el" href="../../d0/d7e/a00770.html#b332d9652e09b8fd09308d79c9e32a6c">s_pxe_sw_undi::Len</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d0/d7e/a00770.html#f2eb1240c66dbea2f8cde0d675d72b7d">PCI_CARDBUS_CONTROL_REGISTER::InterruptPin</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-sizeof(PXE_SW_UNDI) 
+Interrupt Pin. 
 <p>
 
 </div>
 </div><p>
-<a class="anchor" name="38c1e184c2d30002ed991d5af8747b71"></a><!-- doxytag: member="s_pxe_sw_undi::MajorVer" ref="38c1e184c2d30002ed991d5af8747b71" args="" -->
+<a class="anchor" name="f0ff7228d8cdcb7064c79fed97e67e91"></a><!-- doxytag: member="PCI_CARDBUS_CONTROL_REGISTER::IoBase0" ref="f0ff7228d8cdcb7064c79fed97e67e91" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d19/a01190.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a> <a class="el" href="../../d0/d7e/a00770.html#38c1e184c2d30002ed991d5af8747b71">s_pxe_sw_undi::MajorVer</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d0/d7e/a00770.html#f0ff7228d8cdcb7064c79fed97e67e91">PCI_CARDBUS_CONTROL_REGISTER::IoBase0</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-PXE_ROMID_MAJORVER. 
-<p>
 
 </div>
 </div><p>
-<a class="anchor" name="577175e0ad4969a83a832e59075dd5ae"></a><!-- doxytag: member="s_pxe_sw_undi::MinorVer" ref="577175e0ad4969a83a832e59075dd5ae" args="" -->
+<a class="anchor" name="3721217faeec4b5f66e131cbe99c843f"></a><!-- doxytag: member="PCI_CARDBUS_CONTROL_REGISTER::IoBase1" ref="3721217faeec4b5f66e131cbe99c843f" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d19/a01190.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a> <a class="el" href="../../d0/d7e/a00770.html#577175e0ad4969a83a832e59075dd5ae">s_pxe_sw_undi::MinorVer</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d0/d7e/a00770.html#3721217faeec4b5f66e131cbe99c843f">PCI_CARDBUS_CONTROL_REGISTER::IoBase1</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-PXE_ROMID_MINORVER. 
+I/O Limit Register 0. 
 <p>
 
 </div>
 </div><p>
-<a class="anchor" name="147fdd004a9728ebe870bf73c7b592ec"></a><!-- doxytag: member="s_pxe_sw_undi::reserved1" ref="147fdd004a9728ebe870bf73c7b592ec" args="" -->
+<a class="anchor" name="f27f5813b780b72ef33434c929ac1620"></a><!-- doxytag: member="PCI_CARDBUS_CONTROL_REGISTER::IoLimit0" ref="f27f5813b780b72ef33434c929ac1620" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d19/a01190.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a> <a class="el" href="../../d0/d7e/a00770.html#147fdd004a9728ebe870bf73c7b592ec">s_pxe_sw_undi::reserved1</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d0/d7e/a00770.html#f27f5813b780b72ef33434c929ac1620">PCI_CARDBUS_CONTROL_REGISTER::IoLimit0</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-zero, not used 
+I/O Base Register 0. 
 <p>
 
 </div>
 </div><p>
-<a class="anchor" name="8d93d90185cd3011e299cf6d5e7c7c76"></a><!-- doxytag: member="s_pxe_sw_undi::reserved2" ref="8d93d90185cd3011e299cf6d5e7c7c76" args="[3]" -->
+<a class="anchor" name="04d79e1cc703cbb04b02d1ec5726fc0e"></a><!-- doxytag: member="PCI_CARDBUS_CONTROL_REGISTER::IoLimit1" ref="04d79e1cc703cbb04b02d1ec5726fc0e" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d19/a01190.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a> <a class="el" href="../../d0/d7e/a00770.html#8d93d90185cd3011e299cf6d5e7c7c76">s_pxe_sw_undi::reserved2</a>[3]          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d0/d7e/a00770.html#04d79e1cc703cbb04b02d1ec5726fc0e">PCI_CARDBUS_CONTROL_REGISTER::IoLimit1</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-zero, not used 
-<p>
 
 </div>
 </div><p>
-<a class="anchor" name="0f43d53d4c307590edc576930f327e0f"></a><!-- doxytag: member="s_pxe_sw_undi::Rev" ref="0f43d53d4c307590edc576930f327e0f" args="" -->
+<a class="anchor" name="e226cc713130efb4e8ca56108761dc28"></a><!-- doxytag: member="PCI_CARDBUS_CONTROL_REGISTER::MemoryBase0" ref="e226cc713130efb4e8ca56108761dc28" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d19/a01190.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a> <a class="el" href="../../d0/d7e/a00770.html#0f43d53d4c307590edc576930f327e0f">s_pxe_sw_undi::Rev</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d0/d7e/a00770.html#e226cc713130efb4e8ca56108761dc28">PCI_CARDBUS_CONTROL_REGISTER::MemoryBase0</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-PXE_ROMID_REV. 
+Memory Base Register 0. 
 <p>
 
 </div>
 </div><p>
-<a class="anchor" name="69c6ab7f50af7fec06f5d3a434526eef"></a><!-- doxytag: member="s_pxe_sw_undi::Signature" ref="69c6ab7f50af7fec06f5d3a434526eef" args="" -->
+<a class="anchor" name="fee554a2d6b979db171b4f345105ca77"></a><!-- doxytag: member="PCI_CARDBUS_CONTROL_REGISTER::MemoryBase1" ref="fee554a2d6b979db171b4f345105ca77" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d19/a01190.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a> <a class="el" href="../../d0/d7e/a00770.html#69c6ab7f50af7fec06f5d3a434526eef">s_pxe_sw_undi::Signature</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d0/d7e/a00770.html#fee554a2d6b979db171b4f345105ca77">PCI_CARDBUS_CONTROL_REGISTER::MemoryBase1</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-PXE_ROMID_SIGNATURE. 
+
+</div>
+</div><p>
+<a class="anchor" name="27c45c1e6646ab66c32dde36bb24d607"></a><!-- doxytag: member="PCI_CARDBUS_CONTROL_REGISTER::MemoryLimit0" ref="27c45c1e6646ab66c32dde36bb24d607" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d0/d7e/a00770.html#27c45c1e6646ab66c32dde36bb24d607">PCI_CARDBUS_CONTROL_REGISTER::MemoryLimit0</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Memory Limit Register 0. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="ba9524ca8b588294462638470cfdeb7e"></a><!-- doxytag: member="PCI_CARDBUS_CONTROL_REGISTER::MemoryLimit1" ref="ba9524ca8b588294462638470cfdeb7e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d0/d7e/a00770.html#ba9524ca8b588294462638470cfdeb7e">PCI_CARDBUS_CONTROL_REGISTER::MemoryLimit1</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="74c2b3cd09bdb544406517c0cb1004a5"></a><!-- doxytag: member="PCI_CARDBUS_CONTROL_REGISTER::PciBusNumber" ref="74c2b3cd09bdb544406517c0cb1004a5" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d0/d7e/a00770.html#74c2b3cd09bdb544406517c0cb1004a5">PCI_CARDBUS_CONTROL_REGISTER::PciBusNumber</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+PCI Bus Number. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="4a850abb57037cd3d641370b67398db1"></a><!-- doxytag: member="PCI_CARDBUS_CONTROL_REGISTER::Reserved" ref="4a850abb57037cd3d641370b67398db1" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d0/d7e/a00770.html#4a850abb57037cd3d641370b67398db1">PCI_CARDBUS_CONTROL_REGISTER::Reserved</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="8920258b218067955861166adc4de87b"></a><!-- doxytag: member="PCI_CARDBUS_CONTROL_REGISTER::SecondaryStatus" ref="8920258b218067955861166adc4de87b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d0/d7e/a00770.html#8920258b218067955861166adc4de87b">PCI_CARDBUS_CONTROL_REGISTER::SecondaryStatus</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Secondary Status. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="ffb069d0222f1e628bd0e543390f2c13"></a><!-- doxytag: member="PCI_CARDBUS_CONTROL_REGISTER::SubordinateBusNumber" ref="ffb069d0222f1e628bd0e543390f2c13" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d0/d7e/a00770.html#ffb069d0222f1e628bd0e543390f2c13">PCI_CARDBUS_CONTROL_REGISTER::SubordinateBusNumber</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Subordinate Bus Number. 
 <p>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:21 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:58 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

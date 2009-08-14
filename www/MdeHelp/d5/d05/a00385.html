@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_BIS_DATA Struct Reference</title>
+<title>MdePkg[ALL]: EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_INITIATOR_STRUCTURE Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,54 +21,133 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_BIS_DATA Struct Reference</h1><!-- doxytag: class="EFI_BIS_DATA" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_INITIATOR_STRUCTURE Struct Reference</h1><!-- doxytag: class="EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_INITIATOR_STRUCTURE" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d05/a00385.html#83f56ed245d71544b1930f478f23e884">Length</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../db/db9/a00387.html">EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_STRUCTURE_HEADER</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d05/a00385.html#e2259492af87b105df3c9725825b3992">Header</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Length of Data in 8 bit bytes.  <a href="#83f56ed245d71544b1930f478f23e884"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d05/a00385.html#c05634f49dc3f823a2d7e9c2c7422dfe">Data</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/d79/a00540.html">EFI_IPv6_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d05/a00385.html#fb8fd70adefdf3769f318bbd03415e76">ISnsServer</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">32 Bit Flat Address of data.  <a href="#c05634f49dc3f823a2d7e9c2c7422dfe"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/d79/a00540.html">EFI_IPv6_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d05/a00385.html#8d55fb752999f87282607b1d90aa82e2">SlpServer</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/d79/a00540.html">EFI_IPv6_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d05/a00385.html#1fd6111cf167eecd557af2bfff7fe519">PrimaryRadiusServer</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/d79/a00540.html">EFI_IPv6_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d05/a00385.html#1979c1273800a53c1941a492b299f382">SecondaryRadiusServer</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d05/a00385.html#7e37950ca14383744721bad3adbda772">IScsiNameLength</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d05/a00385.html#b76f003618ab9906d05249c3540c8a4e">IScsiNameOffset</a></td></tr>
+
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-<a class="el" href="../../d5/d05/a00385.html">EFI_BIS_DATA</a> instances obtained from BIS must be freed by calling Free( ). <hr><h2>Field Documentation</h2>
-<a class="anchor" name="c05634f49dc3f823a2d7e9c2c7422dfe"></a><!-- doxytag: member="EFI_BIS_DATA::Data" ref="c05634f49dc3f823a2d7e9c2c7422dfe" args="" -->
+Initiator Structure <hr><h2>Field Documentation</h2>
+<a class="anchor" name="e2259492af87b105df3c9725825b3992"></a><!-- doxytag: member="EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_INITIATOR_STRUCTURE::Header" ref="e2259492af87b105df3c9725825b3992" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>* <a class="el" href="../../d5/d05/a00385.html#c05634f49dc3f823a2d7e9c2c7422dfe">EFI_BIS_DATA::Data</a>          </td>
+          <td class="memname"><a class="el" href="../../db/db9/a00387.html">EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_STRUCTURE_HEADER</a> <a class="el" href="../../d5/d05/a00385.html#e2259492af87b105df3c9725825b3992">EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_INITIATOR_STRUCTURE::Header</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-32 Bit Flat Address of data. 
-<p>
 
 </div>
 </div><p>
-<a class="anchor" name="83f56ed245d71544b1930f478f23e884"></a><!-- doxytag: member="EFI_BIS_DATA::Length" ref="83f56ed245d71544b1930f478f23e884" args="" -->
+<a class="anchor" name="7e37950ca14383744721bad3adbda772"></a><!-- doxytag: member="EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_INITIATOR_STRUCTURE::IScsiNameLength" ref="7e37950ca14383744721bad3adbda772" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d5/d05/a00385.html#83f56ed245d71544b1930f478f23e884">EFI_BIS_DATA::Length</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d5/d05/a00385.html#7e37950ca14383744721bad3adbda772">EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_INITIATOR_STRUCTURE::IScsiNameLength</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Length of Data in 8 bit bytes. 
+
+</div>
+</div><p>
+<a class="anchor" name="b76f003618ab9906d05249c3540c8a4e"></a><!-- doxytag: member="EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_INITIATOR_STRUCTURE::IScsiNameOffset" ref="b76f003618ab9906d05249c3540c8a4e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d5/d05/a00385.html#b76f003618ab9906d05249c3540c8a4e">EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_INITIATOR_STRUCTURE::IScsiNameOffset</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="fb8fd70adefdf3769f318bbd03415e76"></a><!-- doxytag: member="EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_INITIATOR_STRUCTURE::ISnsServer" ref="fb8fd70adefdf3769f318bbd03415e76" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d4/d79/a00540.html">EFI_IPv6_ADDRESS</a> <a class="el" href="../../d5/d05/a00385.html#fb8fd70adefdf3769f318bbd03415e76">EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_INITIATOR_STRUCTURE::ISnsServer</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="1fd6111cf167eecd557af2bfff7fe519"></a><!-- doxytag: member="EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_INITIATOR_STRUCTURE::PrimaryRadiusServer" ref="1fd6111cf167eecd557af2bfff7fe519" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d4/d79/a00540.html">EFI_IPv6_ADDRESS</a> <a class="el" href="../../d5/d05/a00385.html#1fd6111cf167eecd557af2bfff7fe519">EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_INITIATOR_STRUCTURE::PrimaryRadiusServer</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="1979c1273800a53c1941a492b299f382"></a><!-- doxytag: member="EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_INITIATOR_STRUCTURE::SecondaryRadiusServer" ref="1979c1273800a53c1941a492b299f382" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d4/d79/a00540.html">EFI_IPv6_ADDRESS</a> <a class="el" href="../../d5/d05/a00385.html#1979c1273800a53c1941a492b299f382">EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_INITIATOR_STRUCTURE::SecondaryRadiusServer</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="8d55fb752999f87282607b1d90aa82e2"></a><!-- doxytag: member="EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_INITIATOR_STRUCTURE::SlpServer" ref="8d55fb752999f87282607b1d90aa82e2" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d4/d79/a00540.html">EFI_IPv6_ADDRESS</a> <a class="el" href="../../d5/d05/a00385.html#8d55fb752999f87282607b1d90aa82e2">EFI_ACPI_ISCSI_BOOT_FIRMWARE_TABLE_INITIATOR_STRUCTURE::SlpServer</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
 <p>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:28 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

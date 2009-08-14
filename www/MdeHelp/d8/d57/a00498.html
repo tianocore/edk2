@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_IP4_HEADER Struct Reference</title>
+<title>MdePkg[ALL]: EFI_IMAGE_ARCHIVE_MEMBER_HEADER Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,200 +21,154 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_IP4_HEADER Struct Reference</h1><!-- doxytag: class="EFI_IP4_HEADER" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_IMAGE_ARCHIVE_MEMBER_HEADER Struct Reference</h1><!-- doxytag: class="EFI_IMAGE_ARCHIVE_MEMBER_HEADER" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d57/a00498.html#3475330e9f0a1cfe3375130735c74d43">HeaderLength</a>:4</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d57/a00498.html#7fd915a081ed5d2cee358bbf77eb7031">Name</a> [16]</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d57/a00498.html#210e2262be75cef062ade8dc9768b2de">Version</a>:4</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">File member name - `/' terminated.  <a href="#7fd915a081ed5d2cee358bbf77eb7031"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d57/a00498.html#e18f6752cc8c8e1e6bdebef7d20507fc">Date</a> [12]</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d57/a00498.html#5936d76cd1029ee6a29fd15a25e5f045">TypeOfService</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">File member date - decimal.  <a href="#e18f6752cc8c8e1e6bdebef7d20507fc"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d57/a00498.html#a006e192e1ec56e5545c32b9ebd10185">UserID</a> [6]</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d57/a00498.html#efe883619271e34384470d525ecf4c89">TotalLength</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">File member user id - decimal.  <a href="#a006e192e1ec56e5545c32b9ebd10185"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d57/a00498.html#692cfef57c7fe7bb750b3092b069d4f7">GroupID</a> [6]</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d57/a00498.html#5b9c9c3ad1ebcf55e7d86cebf803a67e">Identification</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">File member group id - decimal.  <a href="#692cfef57c7fe7bb750b3092b069d4f7"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d57/a00498.html#893c86f356f5916fe7894af308d88739">Mode</a> [8]</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d57/a00498.html#efd48608ba649ebf5b26ba5dc16b64a5">Fragmentation</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">File member mode - octal.  <a href="#893c86f356f5916fe7894af308d88739"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d57/a00498.html#149791d9220aec0dd86cd59f827f62f5">Size</a> [10]</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d57/a00498.html#40db7d62ec4459f49fc4e629f156d50c">TimeToLive</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">File member size - decimal.  <a href="#149791d9220aec0dd86cd59f827f62f5"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d57/a00498.html#fe21e86ed4eb2e753ccee4248222ac48">EndHeader</a> [2]</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d57/a00498.html#b47d445e7910c6f8b8a1ca51826d5fef">Protocol</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d57/a00498.html#44771e339c2e31adb72767f11ff2d5a8">Checksum</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d30/a00508.html">EFI_IPv4_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d57/a00498.html#10ff884368185acdeba54dbd6b3cc488">SourceAddress</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d30/a00508.html">EFI_IPv4_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d57/a00498.html#b5f01d574dabbe6f666f2f79ec2394cd">DestinationAddress</a></td></tr>
-
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">String to end header. (0x60 0x0A).  <a href="#fe21e86ed4eb2e753ccee4248222ac48"></a><br></td></tr>
 </table>
-<hr><h2>Field Documentation</h2>
-<a class="anchor" name="44771e339c2e31adb72767f11ff2d5a8"></a><!-- doxytag: member="EFI_IP4_HEADER::Checksum" ref="44771e339c2e31adb72767f11ff2d5a8" args="" -->
+<hr><a name="_details"></a><h2>Detailed Description</h2>
+Archive Member Headers <hr><h2>Field Documentation</h2>
+<a class="anchor" name="e18f6752cc8c8e1e6bdebef7d20507fc"></a><!-- doxytag: member="EFI_IMAGE_ARCHIVE_MEMBER_HEADER::Date" ref="e18f6752cc8c8e1e6bdebef7d20507fc" args="[12]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d8/d57/a00498.html#44771e339c2e31adb72767f11ff2d5a8">EFI_IP4_HEADER::Checksum</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d57/a00498.html#e18f6752cc8c8e1e6bdebef7d20507fc">EFI_IMAGE_ARCHIVE_MEMBER_HEADER::Date</a>[12]          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+File member date - decimal. 
+<p>
 
 </div>
 </div><p>
-<a class="anchor" name="b5f01d574dabbe6f666f2f79ec2394cd"></a><!-- doxytag: member="EFI_IP4_HEADER::DestinationAddress" ref="b5f01d574dabbe6f666f2f79ec2394cd" args="" -->
+<a class="anchor" name="fe21e86ed4eb2e753ccee4248222ac48"></a><!-- doxytag: member="EFI_IMAGE_ARCHIVE_MEMBER_HEADER::EndHeader" ref="fe21e86ed4eb2e753ccee4248222ac48" args="[2]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d30/a00508.html">EFI_IPv4_ADDRESS</a> <a class="el" href="../../d8/d57/a00498.html#b5f01d574dabbe6f666f2f79ec2394cd">EFI_IP4_HEADER::DestinationAddress</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d57/a00498.html#fe21e86ed4eb2e753ccee4248222ac48">EFI_IMAGE_ARCHIVE_MEMBER_HEADER::EndHeader</a>[2]          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+String to end header. (0x60 0x0A). 
+<p>
 
 </div>
 </div><p>
-<a class="anchor" name="efd48608ba649ebf5b26ba5dc16b64a5"></a><!-- doxytag: member="EFI_IP4_HEADER::Fragmentation" ref="efd48608ba649ebf5b26ba5dc16b64a5" args="" -->
+<a class="anchor" name="692cfef57c7fe7bb750b3092b069d4f7"></a><!-- doxytag: member="EFI_IMAGE_ARCHIVE_MEMBER_HEADER::GroupID" ref="692cfef57c7fe7bb750b3092b069d4f7" args="[6]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d8/d57/a00498.html#efd48608ba649ebf5b26ba5dc16b64a5">EFI_IP4_HEADER::Fragmentation</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d57/a00498.html#692cfef57c7fe7bb750b3092b069d4f7">EFI_IMAGE_ARCHIVE_MEMBER_HEADER::GroupID</a>[6]          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+File member group id - decimal. 
+<p>
 
 </div>
 </div><p>
-<a class="anchor" name="3475330e9f0a1cfe3375130735c74d43"></a><!-- doxytag: member="EFI_IP4_HEADER::HeaderLength" ref="3475330e9f0a1cfe3375130735c74d43" args="" -->
+<a class="anchor" name="893c86f356f5916fe7894af308d88739"></a><!-- doxytag: member="EFI_IMAGE_ARCHIVE_MEMBER_HEADER::Mode" ref="893c86f356f5916fe7894af308d88739" args="[8]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d57/a00498.html#3475330e9f0a1cfe3375130735c74d43">EFI_IP4_HEADER::HeaderLength</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d57/a00498.html#893c86f356f5916fe7894af308d88739">EFI_IMAGE_ARCHIVE_MEMBER_HEADER::Mode</a>[8]          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+File member mode - octal. 
+<p>
 
 </div>
 </div><p>
-<a class="anchor" name="5b9c9c3ad1ebcf55e7d86cebf803a67e"></a><!-- doxytag: member="EFI_IP4_HEADER::Identification" ref="5b9c9c3ad1ebcf55e7d86cebf803a67e" args="" -->
+<a class="anchor" name="7fd915a081ed5d2cee358bbf77eb7031"></a><!-- doxytag: member="EFI_IMAGE_ARCHIVE_MEMBER_HEADER::Name" ref="7fd915a081ed5d2cee358bbf77eb7031" args="[16]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d8/d57/a00498.html#5b9c9c3ad1ebcf55e7d86cebf803a67e">EFI_IP4_HEADER::Identification</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d57/a00498.html#7fd915a081ed5d2cee358bbf77eb7031">EFI_IMAGE_ARCHIVE_MEMBER_HEADER::Name</a>[16]          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+File member name - `/' terminated. 
+<p>
 
 </div>
 </div><p>
-<a class="anchor" name="b47d445e7910c6f8b8a1ca51826d5fef"></a><!-- doxytag: member="EFI_IP4_HEADER::Protocol" ref="b47d445e7910c6f8b8a1ca51826d5fef" args="" -->
+<a class="anchor" name="149791d9220aec0dd86cd59f827f62f5"></a><!-- doxytag: member="EFI_IMAGE_ARCHIVE_MEMBER_HEADER::Size" ref="149791d9220aec0dd86cd59f827f62f5" args="[10]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d57/a00498.html#b47d445e7910c6f8b8a1ca51826d5fef">EFI_IP4_HEADER::Protocol</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d57/a00498.html#149791d9220aec0dd86cd59f827f62f5">EFI_IMAGE_ARCHIVE_MEMBER_HEADER::Size</a>[10]          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+File member size - decimal. 
+<p>
 
 </div>
 </div><p>
-<a class="anchor" name="10ff884368185acdeba54dbd6b3cc488"></a><!-- doxytag: member="EFI_IP4_HEADER::SourceAddress" ref="10ff884368185acdeba54dbd6b3cc488" args="" -->
+<a class="anchor" name="a006e192e1ec56e5545c32b9ebd10185"></a><!-- doxytag: member="EFI_IMAGE_ARCHIVE_MEMBER_HEADER::UserID" ref="a006e192e1ec56e5545c32b9ebd10185" args="[6]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d30/a00508.html">EFI_IPv4_ADDRESS</a> <a class="el" href="../../d8/d57/a00498.html#10ff884368185acdeba54dbd6b3cc488">EFI_IP4_HEADER::SourceAddress</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d57/a00498.html#a006e192e1ec56e5545c32b9ebd10185">EFI_IMAGE_ARCHIVE_MEMBER_HEADER::UserID</a>[6]          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<a class="anchor" name="40db7d62ec4459f49fc4e629f156d50c"></a><!-- doxytag: member="EFI_IP4_HEADER::TimeToLive" ref="40db7d62ec4459f49fc4e629f156d50c" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d57/a00498.html#40db7d62ec4459f49fc4e629f156d50c">EFI_IP4_HEADER::TimeToLive</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="efe883619271e34384470d525ecf4c89"></a><!-- doxytag: member="EFI_IP4_HEADER::TotalLength" ref="efe883619271e34384470d525ecf4c89" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d8/d57/a00498.html#efe883619271e34384470d525ecf4c89">EFI_IP4_HEADER::TotalLength</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="5936d76cd1029ee6a29fd15a25e5f045"></a><!-- doxytag: member="EFI_IP4_HEADER::TypeOfService" ref="5936d76cd1029ee6a29fd15a25e5f045" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d57/a00498.html#5936d76cd1029ee6a29fd15a25e5f045">EFI_IP4_HEADER::TypeOfService</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="210e2262be75cef062ade8dc9768b2de"></a><!-- doxytag: member="EFI_IP4_HEADER::Version" ref="210e2262be75cef062ade8dc9768b2de" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d57/a00498.html#210e2262be75cef062ade8dc9768b2de">EFI_IP4_HEADER::Version</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
+File member user id - decimal. 
 <p>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:34 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

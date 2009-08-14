@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: s_pxe_db_nvdata Struct Reference</title>
+<title>MdePkg[ALL]: PAL_VM_INFO2 Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,83 +21,81 @@
   </div>
 </div>
 <div class="contents">
-<h1>s_pxe_db_nvdata Struct Reference</h1><!-- doxytag: class="s_pxe_db_nvdata" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>PAL_VM_INFO2 Struct Reference</h1><!-- doxytag: class="PAL_VM_INFO2" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap>union {</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/d5f/a00762.html#4668a0246f0afc45888692092d3b4c36">WidthOfVirtualAddress</a>:8</td></tr>
 
-<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../dc/d19/a01190.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../df/d5f/a00762.html#8cec342cd26e03e17592a5789e843483">Byte</a> [MAX_EEPROM_LEN&lt;&lt; 2]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/d5f/a00762.html#cafdabe50267f63eba6998e531c61c4e">WidthOfRid</a>:8</td></tr>
 
-<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../dc/d19/a01190.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../df/d5f/a00762.html#cb063f1b472c316672a86f69618be271">Word</a> [MAX_EEPROM_LEN&lt;&lt; 1]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/d5f/a00762.html#6add3549ec808015c067a616173009ee">MaxPurgedTlbs</a>:16</td></tr>
 
-<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../dc/d19/a01190.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../df/d5f/a00762.html#581e2f9fadbff0b1bfc03161d1c7b6d3">Dword</a> [MAX_EEPROM_LEN]</td></tr>
-
-<tr><td class="memItemLeft" nowrap valign="top">}&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/d5f/a00762.html#40294541d9a4a03d7a96be526c1b5fc1">Data</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/d5f/a00762.html#2700a414dc25eb756156e61215da10ce">Reserved</a>:32</td></tr>
 
 </table>
 <hr><h2>Field Documentation</h2>
-<a class="anchor" name="8cec342cd26e03e17592a5789e843483"></a><!-- doxytag: member="s_pxe_db_nvdata::Byte" ref="8cec342cd26e03e17592a5789e843483" args="[MAX_EEPROM_LEN&lt;&lt; 2]" -->
+<a class="anchor" name="6add3549ec808015c067a616173009ee"></a><!-- doxytag: member="PAL_VM_INFO2::MaxPurgedTlbs" ref="6add3549ec808015c067a616173009ee" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d19/a01190.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a> <a class="el" href="../../df/d5f/a00762.html#8cec342cd26e03e17592a5789e843483">s_pxe_db_nvdata::Byte</a>[MAX_EEPROM_LEN&lt;&lt; 2]          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../df/d5f/a00762.html#6add3549ec808015c067a616173009ee">PAL_VM_INFO2::MaxPurgedTlbs</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Array of byte-wide data items. 
+Unsigned 16 bit integer denoting the maximum number of concurrent outstanding TLB purges allowed by the processor. A value of 0 indicates one outstanding purge allowed. A value of 216-1 indicates no limit on outstanding purges. All other values indicate the actual number of concurrent outstanding purges allowed. 
 </div>
 </div><p>
-<a class="anchor" name="40294541d9a4a03d7a96be526c1b5fc1"></a><!-- doxytag: member="s_pxe_db_nvdata::Data" ref="40294541d9a4a03d7a96be526c1b5fc1" args="" -->
+<a class="anchor" name="2700a414dc25eb756156e61215da10ce"></a><!-- doxytag: member="PAL_VM_INFO2::Reserved" ref="2700a414dc25eb756156e61215da10ce" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">union { ... }   <a class="el" href="../../df/d5f/a00762.html#40294541d9a4a03d7a96be526c1b5fc1">s_pxe_db_nvdata::Data</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../df/d5f/a00762.html#2700a414dc25eb756156e61215da10ce">PAL_VM_INFO2::Reserved</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Arrays of data items from non-volatile storage. 
+
 </div>
 </div><p>
-<a class="anchor" name="581e2f9fadbff0b1bfc03161d1c7b6d3"></a><!-- doxytag: member="s_pxe_db_nvdata::Dword" ref="581e2f9fadbff0b1bfc03161d1c7b6d3" args="[MAX_EEPROM_LEN]" -->
+<a class="anchor" name="cafdabe50267f63eba6998e531c61c4e"></a><!-- doxytag: member="PAL_VM_INFO2::WidthOfRid" ref="cafdabe50267f63eba6998e531c61c4e" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d19/a01190.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a> <a class="el" href="../../df/d5f/a00762.html#581e2f9fadbff0b1bfc03161d1c7b6d3">s_pxe_db_nvdata::Dword</a>[MAX_EEPROM_LEN]          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../df/d5f/a00762.html#cafdabe50267f63eba6998e531c61c4e">PAL_VM_INFO2::WidthOfRid</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Array of dword-wide data items. 
+Unsigned 8-bit integer denoting the number of bits implemented in the RR.rid field. 
 </div>
 </div><p>
-<a class="anchor" name="cb063f1b472c316672a86f69618be271"></a><!-- doxytag: member="s_pxe_db_nvdata::Word" ref="cb063f1b472c316672a86f69618be271" args="[MAX_EEPROM_LEN&lt;&lt; 1]" -->
+<a class="anchor" name="4668a0246f0afc45888692092d3b4c36"></a><!-- doxytag: member="PAL_VM_INFO2::WidthOfVirtualAddress" ref="4668a0246f0afc45888692092d3b4c36" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d19/a01190.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a> <a class="el" href="../../df/d5f/a00762.html#cb063f1b472c316672a86f69618be271">s_pxe_db_nvdata::Word</a>[MAX_EEPROM_LEN&lt;&lt; 1]          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../df/d5f/a00762.html#4668a0246f0afc45888692092d3b4c36">PAL_VM_INFO2::WidthOfVirtualAddress</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Array of word-wide data items. 
+Unsigned 8-bit integer denoting is the total number of virtual address bits - 1. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:21 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:58 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

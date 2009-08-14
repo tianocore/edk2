@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Protocol/TcgService.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Protocol/DriverConfiguration2.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,50 +21,120 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Protocol/TcgService.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Protocol/DriverConfiguration2.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d87/a00846.html">TCG_VERSION</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d12/a00268.html">_TCG_EFI_BOOT_SERVICE_CAPABILITY</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d04/a00255.html">_EFI_TCG_PROTOCOL</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d11/a00021.html">_EFI_DRIVER_CONFIGURATION2_PROTOCOL</a></td></tr>
 
 <tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/db6/a01172.html#f47378653bb83c2a37a038480b504935">EFI_TCG_PROTOCOL_GUID</a>&nbsp;&nbsp;&nbsp;{0xf541796d, 0xa62e, 0x4954, { 0xa7, 0x75, 0x95, 0x84, 0xf6, 0x1b, 0x9c, 0xdd } }</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/db6/a01172.html#d53931376084a508f95132f6c00ac32d">EFI_DRIVER_CONFIGURATION2_PROTOCOL_GUID</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/db6/a01172.html#ce8577d2699e8138e6f3713d2694b0ae">EFI_DRIVER_CONFIGURATION_SAFE_DEFAULTS</a>&nbsp;&nbsp;&nbsp;0x00000000</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/db6/a01172.html#573d78806976b4c15f26af8eb5a56aee">EFI_DRIVER_CONFIGURATION_MANUFACTURING_DEFAULTS</a>&nbsp;&nbsp;&nbsp;0x00000001</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/db6/a01172.html#c60a305d592ad6354b86420025db36c1">EFI_DRIVER_CONFIGURATION_CUSTOM_DEFAULTS</a>&nbsp;&nbsp;&nbsp;0x00000002</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/db6/a01172.html#a3a5541a9937d299d69707c24bc67337">EFI_DRIVER_CONFIGURATION_PERORMANCE_DEFAULTS</a>&nbsp;&nbsp;&nbsp;0x00000003</td></tr>
 
 <tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <a class="el" href="../../d4/d04/a00255.html">_EFI_TCG_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/db6/a01172.html#bfb7839925fe057c2dd722c7358b7e2e">EFI_TCG_PROTOCOL</a></td></tr>
-
 <tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
-<a class="el" href="../../db/d12/a00268.html">_TCG_EFI_BOOT_SERVICE_CAPABILITY</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/db6/a01172.html#27d3a38139c4a45478f9c721a7da17eb">TCG_EFI_BOOT_SERVICE_CAPABILITY</a></td></tr>
+<a class="el" href="../../de/d11/a00021.html">_EFI_DRIVER_CONFIGURATION2_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/db6/a01172.html#b05f050862f1a793971baebfc85eb2ed">EFI_DRIVER_CONFIGURATION2_PROTOCOL</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/db6/a01172.html#759e207d9c1c2162195cba39fddc62af">TCG_ALGORITHM_ID</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/db6/a01172.html#7514ab17de0391340b77c03791e5dd9a">EFI_DRIVER_CONFIGURATION2_SET_OPTIONS</a> )(IN <a class="el" href="../../de/d11/a00021.html">EFI_DRIVER_CONFIGURATION2_PROTOCOL</a> *This, IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ControllerHandle, IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ChildHandle, IN <a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Language, OUT <a class="el" href="../../d6/db6/a01172.html#6a909a927a91f9f2e7b25d05c51e35a2">EFI_DRIVER_CONFIGURATION_ACTION_REQUIRED</a> *ActionRequired)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/db6/a01172.html#d87761ce4d12a4c38a9d547de1dfff17">EFI_TCG_STATUS_CHECK</a> )(IN <a class="el" href="../../d4/d04/a00255.html">EFI_TCG_PROTOCOL</a> *This, OUT <a class="el" href="../../db/d12/a00268.html">TCG_EFI_BOOT_SERVICE_CAPABILITY</a> *ProtocolCapability, OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *TCGFeatureFlags, OUT <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> *EventLogLocation, OUT <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> *EventLogLastEntry)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/db6/a01172.html#06b93aff80b688c6f0e0a029508da5f1">EFI_DRIVER_CONFIGURATION2_OPTIONS_VALID</a> )(IN <a class="el" href="../../de/d11/a00021.html">EFI_DRIVER_CONFIGURATION2_PROTOCOL</a> *This, IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ControllerHandle, IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ChildHandle)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/db6/a01172.html#b54c14d1d886f6995ec286743b065d90">EFI_TCG_HASH_ALL</a> )(IN <a class="el" href="../../d4/d04/a00255.html">EFI_TCG_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *HashData, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> HashDataLen, IN <a class="el" href="../../d6/db6/a01172.html#759e207d9c1c2162195cba39fddc62af">TCG_ALGORITHM_ID</a> AlgorithmId, IN OUT <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> *HashedDataLen, IN OUT <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> **HashedDataResult)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/db6/a01172.html#b85d27998296804124296f12b2fcbdd6">EFI_DRIVER_CONFIGURATION2_FORCE_DEFAULTS</a> )(IN <a class="el" href="../../de/d11/a00021.html">EFI_DRIVER_CONFIGURATION2_PROTOCOL</a> *This, IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ControllerHandle, IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ChildHandle, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> DefaultType, OUT <a class="el" href="../../d6/db6/a01172.html#6a909a927a91f9f2e7b25d05c51e35a2">EFI_DRIVER_CONFIGURATION_ACTION_REQUIRED</a> *ActionRequired)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/db6/a01172.html#326d69b2caaf6373f603950dbe4793c8">EFI_TCG_LOG_EVENT</a> )(IN <a class="el" href="../../d4/d04/a00255.html">EFI_TCG_PROTOCOL</a> *This, IN <a class="el" href="../../d9/dbb/a00852.html">TCG_PCR_EVENT</a> *TCGLogData, IN OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *EventNumber, IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> Flags)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/db6/a01172.html#7d44481a012a3f8c6c10a283a54971d5">EFI_TCG_PASS_THROUGH_TO_TPM</a> )(IN <a class="el" href="../../d4/d04/a00255.html">EFI_TCG_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> TpmInputParamterBlockSize, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *TpmInputParamterBlock, IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> TpmOutputParameterBlockSize, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *TpmOutputParameterBlock)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/db6/a01172.html#cbf41c76ddfaa010ff6254f87edff0c8">EFI_TCG_HASH_LOG_EXTEND_EVENT</a> )(IN <a class="el" href="../../d4/d04/a00255.html">EFI_TCG_PROTOCOL</a> *This, IN <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> HashData, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> HashDataLen, IN <a class="el" href="../../d6/db6/a01172.html#759e207d9c1c2162195cba39fddc62af">TCG_ALGORITHM_ID</a> AlgorithmId, IN OUT <a class="el" href="../../d9/dbb/a00852.html">TCG_PCR_EVENT</a> *TCGLogData, IN OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *EventNumber, OUT <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> *EventLogLastEntry)</td></tr>
+<tr><td colspan="2"><br><h2>Enumerations</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/db6/a01172.html#6a909a927a91f9f2e7b25d05c51e35a2">EFI_DRIVER_CONFIGURATION_ACTION_REQUIRED</a> { <br>
+&nbsp;&nbsp;<a class="el" href="../../d6/db6/a01172.html#6a909a927a91f9f2e7b25d05c51e35a283e5843576a1130368c4a5dacd60269b">EfiDriverConfigurationActionNone</a> =  0, 
+<a class="el" href="../../d6/db6/a01172.html#6a909a927a91f9f2e7b25d05c51e35a2ca57c48407111decbe22704d956a6a8c">EfiDriverConfigurationActionStopController</a> =  1, 
+<a class="el" href="../../d6/db6/a01172.html#6a909a927a91f9f2e7b25d05c51e35a2aa6d75624571ab1689920ad4403e472e">EfiDriverConfigurationActionRestartController</a> =  2, 
+<a class="el" href="../../d6/db6/a01172.html#6a909a927a91f9f2e7b25d05c51e35a28bfeb060c47cbe0a004528bd70311501">EfiDriverConfigurationActionRestartPlatform</a> =  3, 
+<br>
+&nbsp;&nbsp;<a class="el" href="../../d6/db6/a01172.html#6a909a927a91f9f2e7b25d05c51e35a26c9737bea64b68abbcc1a0c0cfae2883">EfiDriverConfigurationActionMaximum</a>
+<br>
+ }</td></tr>
 
 <tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/db6/a01172.html#4d277482e2c60b776373ae63c31f1b9a">gEfiTcgProtocolGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/db6/a01172.html#3f6bfd79bf6cd221ac99ea644c1e9c59">gEfiDriverConfiguration2ProtocolGuid</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-TCG Service Protocol as defined in TCG_EFI_Protocol_1_20_Final See <a href="http://trustedcomputinggroup.org">http://trustedcomputinggroup.org</a> for the latest specification<p>
-Copyright (c) 2007 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
+UEFI Driver Configuration2 Protocol<p>
+Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
-<a class="anchor" name="f47378653bb83c2a37a038480b504935"></a><!-- doxytag: member="TcgService.h::EFI_TCG_PROTOCOL_GUID" ref="f47378653bb83c2a37a038480b504935" args="" -->
+<a class="anchor" name="d53931376084a508f95132f6c00ac32d"></a><!-- doxytag: member="DriverConfiguration2.h::EFI_DRIVER_CONFIGURATION2_PROTOCOL_GUID" ref="d53931376084a508f95132f6c00ac32d" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_TCG_PROTOCOL_GUID&nbsp;&nbsp;&nbsp;{0xf541796d, 0xa62e, 0x4954, { 0xa7, 0x75, 0x95, 0x84, 0xf6, 0x1b, 0x9c, 0xdd } }          </td>
+          <td class="memname">#define EFI_DRIVER_CONFIGURATION2_PROTOCOL_GUID          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+<b>Value:</b><div class="fragment"><pre class="fragment">{ \
+    0xbfd7dc1d, 0x24f1, 0x40d9, {0x82, 0xe7, 0x2e, 0x09, 0xbb, 0x6b, 0x4e, 0xbe } \
+  }
+</pre></div>Global ID for the Driver Configuration Protocol defined in UEFI 2.0 
+</div>
+</div><p>
+<a class="anchor" name="c60a305d592ad6354b86420025db36c1"></a><!-- doxytag: member="DriverConfiguration2.h::EFI_DRIVER_CONFIGURATION_CUSTOM_DEFAULTS" ref="c60a305d592ad6354b86420025db36c1" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_DRIVER_CONFIGURATION_CUSTOM_DEFAULTS&nbsp;&nbsp;&nbsp;0x00000002          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="573d78806976b4c15f26af8eb5a56aee"></a><!-- doxytag: member="DriverConfiguration2.h::EFI_DRIVER_CONFIGURATION_MANUFACTURING_DEFAULTS" ref="573d78806976b4c15f26af8eb5a56aee" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_DRIVER_CONFIGURATION_MANUFACTURING_DEFAULTS&nbsp;&nbsp;&nbsp;0x00000001          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="a3a5541a9937d299d69707c24bc67337"></a><!-- doxytag: member="DriverConfiguration2.h::EFI_DRIVER_CONFIGURATION_PERORMANCE_DEFAULTS" ref="a3a5541a9937d299d69707c24bc67337" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_DRIVER_CONFIGURATION_PERORMANCE_DEFAULTS&nbsp;&nbsp;&nbsp;0x00000003          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="ce8577d2699e8138e6f3713d2694b0ae"></a><!-- doxytag: member="DriverConfiguration2.h::EFI_DRIVER_CONFIGURATION_SAFE_DEFAULTS" ref="ce8577d2699e8138e6f3713d2694b0ae" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_DRIVER_CONFIGURATION_SAFE_DEFAULTS&nbsp;&nbsp;&nbsp;0x00000000          </td>
         </tr>
       </table>
 </div>
@@ -75,230 +145,164 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 </div>
 </div><p>
 <hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="b54c14d1d886f6995ec286743b065d90"></a><!-- doxytag: member="TcgService.h::EFI_TCG_HASH_ALL" ref="b54c14d1d886f6995ec286743b065d90" args=")(IN EFI_TCG_PROTOCOL *This, IN UINT8 *HashData, IN UINT64 HashDataLen, IN TCG_ALGORITHM_ID AlgorithmId, IN OUT UINT64 *HashedDataLen, IN OUT UINT8 **HashedDataResult)" -->
+<a class="anchor" name="b85d27998296804124296f12b2fcbdd6"></a><!-- doxytag: member="DriverConfiguration2.h::EFI_DRIVER_CONFIGURATION2_FORCE_DEFAULTS" ref="b85d27998296804124296f12b2fcbdd6" args=")(IN EFI_DRIVER_CONFIGURATION2_PROTOCOL *This, IN EFI_HANDLE ControllerHandle, IN EFI_HANDLE ChildHandle, IN UINT32 DefaultType, OUT EFI_DRIVER_CONFIGURATION_ACTION_REQUIRED *ActionRequired)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d6/db6/a01172.html#b54c14d1d886f6995ec286743b065d90">EFI_TCG_HASH_ALL</a>)(IN <a class="el" href="../../d4/d04/a00255.html">EFI_TCG_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *HashData, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> HashDataLen, IN <a class="el" href="../../d6/db6/a01172.html#759e207d9c1c2162195cba39fddc62af">TCG_ALGORITHM_ID</a> AlgorithmId, IN OUT <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> *HashedDataLen, IN OUT <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> **HashedDataResult)          </td>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d6/db6/a01172.html#b85d27998296804124296f12b2fcbdd6">EFI_DRIVER_CONFIGURATION2_FORCE_DEFAULTS</a>)(IN <a class="el" href="../../de/d11/a00021.html">EFI_DRIVER_CONFIGURATION2_PROTOCOL</a> *This, IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ControllerHandle, IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ChildHandle, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> DefaultType, OUT <a class="el" href="../../d6/db6/a01172.html#6a909a927a91f9f2e7b25d05c51e35a2">EFI_DRIVER_CONFIGURATION_ACTION_REQUIRED</a> *ActionRequired)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-This service abstracts the capability to do a hash operation on a data buffer.<p>
+Forces a driver to set the default configuration options for a controller.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Indicates the calling context </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>HashData</em>&nbsp;</td><td>Pointer to the data buffer to be hashed </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>HashDataLen</em>&nbsp;</td><td>Length of the data buffer to be hashed </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>AlgorithmId</em>&nbsp;</td><td>Identification of the Algorithm to use for the hashing operation </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>HashedDataLen</em>&nbsp;</td><td>Resultant length of the hashed data </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>HashedDataResult</em>&nbsp;</td><td>Resultant buffer of the hashed data</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_DRIVER_CONFIGURATION2_PROTOCOL instance. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ControllerHandle</em>&nbsp;</td><td>The handle of the controller to force default configuration options on. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ChildHandle</em>&nbsp;</td><td>The handle of the child controller to force default configuration options on This is an optional parameter that may be NULL. It will be NULL for device drivers. It will also be NULL for bus drivers that wish to force default configuration options for the bus controller. It will not be NULL for a bus driver that wishes to force default configuration options for one of its child controllers. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>DefaultType</em>&nbsp;</td><td>The type of default configuration options to force on the controller specified by ControllerHandle and ChildHandle. See Table 9-1 for legal values. A DefaultType of 0x00000000 must be supported by this protocol. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ActionRequired</em>&nbsp;</td><td>A pointer to the action that the calling agent is required to perform when this function returns. See "Related Definitions" in Section 9.1 for a list of the actions that the calling agent is required to perform prior to accessing ControllerHandle again.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Operation completed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The command was unsuccessful. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>One or more of the parameters are incorrect. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_BUFFER_TOO_SMALL</em>&nbsp;</td><td>The receive buffer is too small. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The component was not running </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The driver specified by This successfully forced the default configuration options on the controller specified by ControllerHandle and ChildHandle. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>ControllerHandle is not a valid EFI_HANDLE. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>ChildHandle is not NULL and it is not a valid EFI_HANDLE. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>ActionRequired is NULL. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The driver specified by This does not support forcing the default configuration options on the controller specified by ControllerHandle and ChildHandle. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The driver specified by This does not support the configuration type specified by DefaultType. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>A device error occurred while attempt to force the default configuration options on the controller specified by ControllerHandle and ChildHandle. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_RESOURCES</em>&nbsp;</td><td>There are not enough resources available to force the default configuration options on the controller specified by ControllerHandle and ChildHandle. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
-<a class="anchor" name="cbf41c76ddfaa010ff6254f87edff0c8"></a><!-- doxytag: member="TcgService.h::EFI_TCG_HASH_LOG_EXTEND_EVENT" ref="cbf41c76ddfaa010ff6254f87edff0c8" args=")(IN EFI_TCG_PROTOCOL *This, IN EFI_PHYSICAL_ADDRESS HashData, IN UINT64 HashDataLen, IN TCG_ALGORITHM_ID AlgorithmId, IN OUT TCG_PCR_EVENT *TCGLogData, IN OUT UINT32 *EventNumber, OUT EFI_PHYSICAL_ADDRESS *EventLogLastEntry)" -->
+<a class="anchor" name="06b93aff80b688c6f0e0a029508da5f1"></a><!-- doxytag: member="DriverConfiguration2.h::EFI_DRIVER_CONFIGURATION2_OPTIONS_VALID" ref="06b93aff80b688c6f0e0a029508da5f1" args=")(IN EFI_DRIVER_CONFIGURATION2_PROTOCOL *This, IN EFI_HANDLE ControllerHandle, IN EFI_HANDLE ChildHandle)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d6/db6/a01172.html#cbf41c76ddfaa010ff6254f87edff0c8">EFI_TCG_HASH_LOG_EXTEND_EVENT</a>)(IN <a class="el" href="../../d4/d04/a00255.html">EFI_TCG_PROTOCOL</a> *This, IN <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> HashData, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> HashDataLen, IN <a class="el" href="../../d6/db6/a01172.html#759e207d9c1c2162195cba39fddc62af">TCG_ALGORITHM_ID</a> AlgorithmId, IN OUT <a class="el" href="../../d9/dbb/a00852.html">TCG_PCR_EVENT</a> *TCGLogData, IN OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *EventNumber, OUT <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> *EventLogLastEntry)          </td>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d6/db6/a01172.html#06b93aff80b688c6f0e0a029508da5f1">EFI_DRIVER_CONFIGURATION2_OPTIONS_VALID</a>)(IN <a class="el" href="../../de/d11/a00021.html">EFI_DRIVER_CONFIGURATION2_PROTOCOL</a> *This, IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ControllerHandle, IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ChildHandle)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-This service abstracts the capability to do a hash operation on a data buffer, extend a specific TPM PCR with the hash result, and add an entry to the Event Log<p>
+Tests to see if a controller's current configuration options are valid.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Indicates the calling context </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>HashData</em>&nbsp;</td><td>Physical address of the start of the data buffer to be hashed, extended, and logged. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>HashDataLen</em>&nbsp;</td><td>The length, in bytes, of the buffer referenced by HashData </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>AlgorithmId</em>&nbsp;</td><td>Identification of the Algorithm to use for the hashing operation </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>TCGLogData</em>&nbsp;</td><td>The physical address of the start of the data buffer containing the TCG_PCR_EVENT data structure. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EventNumber</em>&nbsp;</td><td>The event number of the event just logged. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EventLogLastEntry</em>&nbsp;</td><td>Physical address of the first byte of the entry just placed in the Event Log. If the Event Log was empty when this function was called then this physical address will be the same as the physical address of the start of the Event Log.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_DRIVER_CONFIGURATION2_PROTOCOL instance. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ControllerHandle</em>&nbsp;</td><td>The handle of the controller to test if it's current configuration options are valid. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ChildHandle</em>&nbsp;</td><td>The handle of the child controller to test if it's current configuration options are valid. This is an optional parameter that may be NULL. It will be NULL for device drivers. It will also be NULL for bus drivers that wish to test the configuration options for the bus controller. It will not be NULL for a bus driver that wishes to test configuration options for one of its child controllers.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Operation completed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The command was unsuccessful. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>One or more of the parameters are incorrect. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_BUFFER_TOO_SMALL</em>&nbsp;</td><td>The receive buffer is too small. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The component was not running </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The controller specified by ControllerHandle and ChildHandle that is being managed by the driver specified by This has a valid set of configuration options. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>ControllerHandle is not a valid EFI_HANDLE. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>ChildHandle is not NULL and it is not a valid EFI_HANDLE. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The driver specified by This is not currently managing the controller specified by ControllerHandle and ChildHandle. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The controller specified by ControllerHandle and ChildHandle that is being managed by the driver specified by This has an invalid set of configuration options. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
-<a class="anchor" name="326d69b2caaf6373f603950dbe4793c8"></a><!-- doxytag: member="TcgService.h::EFI_TCG_LOG_EVENT" ref="326d69b2caaf6373f603950dbe4793c8" args=")(IN EFI_TCG_PROTOCOL *This, IN TCG_PCR_EVENT *TCGLogData, IN OUT UINT32 *EventNumber, IN UINT32 Flags)" -->
+<a class="anchor" name="b05f050862f1a793971baebfc85eb2ed"></a><!-- doxytag: member="DriverConfiguration2.h::EFI_DRIVER_CONFIGURATION2_PROTOCOL" ref="b05f050862f1a793971baebfc85eb2ed" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d6/db6/a01172.html#326d69b2caaf6373f603950dbe4793c8">EFI_TCG_LOG_EVENT</a>)(IN <a class="el" href="../../d4/d04/a00255.html">EFI_TCG_PROTOCOL</a> *This, IN <a class="el" href="../../d9/dbb/a00852.html">TCG_PCR_EVENT</a> *TCGLogData, IN OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *EventNumber, IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> Flags)          </td>
+          <td class="memname">typedef struct <a class="el" href="../../de/d11/a00021.html">_EFI_DRIVER_CONFIGURATION2_PROTOCOL</a> <a class="el" href="../../de/d11/a00021.html">EFI_DRIVER_CONFIGURATION2_PROTOCOL</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-This service abstracts the capability to add an entry to the Event Log.<p>
+
+</div>
+</div><p>
+<a class="anchor" name="7514ab17de0391340b77c03791e5dd9a"></a><!-- doxytag: member="DriverConfiguration2.h::EFI_DRIVER_CONFIGURATION2_SET_OPTIONS" ref="7514ab17de0391340b77c03791e5dd9a" args=")(IN EFI_DRIVER_CONFIGURATION2_PROTOCOL *This, IN EFI_HANDLE ControllerHandle, IN EFI_HANDLE ChildHandle, IN CHAR8 *Language, OUT EFI_DRIVER_CONFIGURATION_ACTION_REQUIRED *ActionRequired)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d6/db6/a01172.html#7514ab17de0391340b77c03791e5dd9a">EFI_DRIVER_CONFIGURATION2_SET_OPTIONS</a>)(IN <a class="el" href="../../de/d11/a00021.html">EFI_DRIVER_CONFIGURATION2_PROTOCOL</a> *This, IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ControllerHandle, IN <a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ChildHandle, IN <a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Language, OUT <a class="el" href="../../d6/db6/a01172.html#6a909a927a91f9f2e7b25d05c51e35a2">EFI_DRIVER_CONFIGURATION_ACTION_REQUIRED</a> *ActionRequired)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Allows the user to set controller specific options for a controller that a driver is currently managing.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Indicates the calling context </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>TCGLogData</em>&nbsp;</td><td>Pointer to the start of the data buffer containing the TCG_PCR_EVENT data structure. All fields in this structure are properly filled by the caller. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EventNumber</em>&nbsp;</td><td>The event number of the event just logged </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Flags</em>&nbsp;</td><td>Indicate additional flags. Only one flag has been defined at this time, which is 0x01 and means the extend operation should not be performed. All other bits are reserved.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_DRIVER_CONFIGURATION2_PROTOCOL instance. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ControllerHandle</em>&nbsp;</td><td>The handle of the controller to set options on. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ChildHandle</em>&nbsp;</td><td>The handle of the child controller to set options on. This is an optional parameter that may be NULL. It will be NULL for device drivers, and for bus drivers that wish to set options for the bus controller. It will not be NULL for a bus driver that wishes to set options for one of its child controllers. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Language</em>&nbsp;</td><td>A Null-terminated ASCII string that contains one or more RFC 4646 language codes. This is the list of language codes that this protocol supports. The number of languages supported by a driver is up to the driver writer. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ActionRequired</em>&nbsp;</td><td>A pointer to the action that the calling agent is required to perform when this function returns. See "Related Definitions" for a list of the actions that the calling agent is required to perform prior to accessing ControllerHandle again.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Operation completed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The command was unsuccessful. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>One or more of the parameters are incorrect. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_BUFFER_TOO_SMALL</em>&nbsp;</td><td>The receive buffer is too small. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The component was not running </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The driver specified by This successfully set the configuration options for the controller specified by ControllerHandle. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>ControllerHandle is not a valid EFI_HANDLE. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>ChildHandle is not NULL and it is not a valid EFI_HANDLE. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>ActionRequired is NULL. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The driver specified by This does not support setting configuration options for the controller specified by ControllerHandle and ChildHandle. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The driver specified by This does not support the language specified by Language. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>A device error occurred while attempting to set the configuration options for the controller specified by ControllerHandle and ChildHandle. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_RESOURCES</em>&nbsp;</td><td>There are not enough resources available to set the configuration options for the controller specified by ControllerHandle and ChildHandle. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
-<a class="anchor" name="7d44481a012a3f8c6c10a283a54971d5"></a><!-- doxytag: member="TcgService.h::EFI_TCG_PASS_THROUGH_TO_TPM" ref="7d44481a012a3f8c6c10a283a54971d5" args=")(IN EFI_TCG_PROTOCOL *This, IN UINT32 TpmInputParamterBlockSize, IN UINT8 *TpmInputParamterBlock, IN UINT32 TpmOutputParameterBlockSize, IN UINT8 *TpmOutputParameterBlock)" -->
+<hr><h2>Enumeration Type Documentation</h2>
+<a class="anchor" name="6a909a927a91f9f2e7b25d05c51e35a2"></a><!-- doxytag: member="DriverConfiguration2.h::EFI_DRIVER_CONFIGURATION_ACTION_REQUIRED" ref="6a909a927a91f9f2e7b25d05c51e35a2" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d6/db6/a01172.html#7d44481a012a3f8c6c10a283a54971d5">EFI_TCG_PASS_THROUGH_TO_TPM</a>)(IN <a class="el" href="../../d4/d04/a00255.html">EFI_TCG_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> TpmInputParamterBlockSize, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *TpmInputParamterBlock, IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> TpmOutputParameterBlockSize, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *TpmOutputParameterBlock)          </td>
+          <td class="memname">enum <a class="el" href="../../d6/db6/a01172.html#6a909a927a91f9f2e7b25d05c51e35a2">EFI_DRIVER_CONFIGURATION_ACTION_REQUIRED</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-This service is a proxy for commands to the TPM.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Indicates the calling context </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>TpmInputParameterBlockSize</em>&nbsp;</td><td>Size of the TPM input parameter block </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>TpmInputParameterBlock</em>&nbsp;</td><td>Pointer to the TPM input parameter block </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>TpmOutputParameterBlockSize</em>&nbsp;</td><td>Size of the TPM output parameter block </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>TpmOutputParameterBlock</em>&nbsp;</td><td>Pointer to the TPM output parameter block</td></tr>
-  </table>
+<dl compact><dt><b>Enumerator: </b></dt><dd>
+<table border="0" cellspacing="2" cellpadding="0">
+<tr><td valign="top"><em><a class="anchor" name="6a909a927a91f9f2e7b25d05c51e35a283e5843576a1130368c4a5dacd60269b"></a><!-- doxytag: member="EfiDriverConfigurationActionNone" ref="6a909a927a91f9f2e7b25d05c51e35a283e5843576a1130368c4a5dacd60269b" args="" -->EfiDriverConfigurationActionNone</em>&nbsp;</td><td>
+The controller is still in a usable state. No actions are required before this controller can be used again. </td></tr>
+<tr><td valign="top"><em><a class="anchor" name="6a909a927a91f9f2e7b25d05c51e35a2ca57c48407111decbe22704d956a6a8c"></a><!-- doxytag: member="EfiDriverConfigurationActionStopController" ref="6a909a927a91f9f2e7b25d05c51e35a2ca57c48407111decbe22704d956a6a8c" args="" -->EfiDriverConfigurationActionStopController</em>&nbsp;</td><td>
+The driver has detected that the controller is not in a usable state, and it needs to be stopped. </td></tr>
+<tr><td valign="top"><em><a class="anchor" name="6a909a927a91f9f2e7b25d05c51e35a2aa6d75624571ab1689920ad4403e472e"></a><!-- doxytag: member="EfiDriverConfigurationActionRestartController" ref="6a909a927a91f9f2e7b25d05c51e35a2aa6d75624571ab1689920ad4403e472e" args="" -->EfiDriverConfigurationActionRestartController</em>&nbsp;</td><td>
+This controller needs to be stopped and restarted before it can be used again. </td></tr>
+<tr><td valign="top"><em><a class="anchor" name="6a909a927a91f9f2e7b25d05c51e35a28bfeb060c47cbe0a004528bd70311501"></a><!-- doxytag: member="EfiDriverConfigurationActionRestartPlatform" ref="6a909a927a91f9f2e7b25d05c51e35a28bfeb060c47cbe0a004528bd70311501" args="" -->EfiDriverConfigurationActionRestartPlatform</em>&nbsp;</td><td>
+A configuration change has been made that requires the platform to be restarted before the controller can be used again. </td></tr>
+<tr><td valign="top"><em><a class="anchor" name="6a909a927a91f9f2e7b25d05c51e35a26c9737bea64b68abbcc1a0c0cfae2883"></a><!-- doxytag: member="EfiDriverConfigurationActionMaximum" ref="6a909a927a91f9f2e7b25d05c51e35a26c9737bea64b68abbcc1a0c0cfae2883" args="" -->EfiDriverConfigurationActionMaximum</em>&nbsp;</td><td>
+</td></tr>
+</table>
 </dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Operation completed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The command was unsuccessful. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>One or more of the parameters are incorrect. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_BUFFER_TOO_SMALL</em>&nbsp;</td><td>The receive buffer is too small. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The component was not running </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="bfb7839925fe057c2dd722c7358b7e2e"></a><!-- doxytag: member="TcgService.h::EFI_TCG_PROTOCOL" ref="bfb7839925fe057c2dd722c7358b7e2e" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct <a class="el" href="../../d4/d04/a00255.html">_EFI_TCG_PROTOCOL</a> <a class="el" href="../../d4/d04/a00255.html">EFI_TCG_PROTOCOL</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="d87761ce4d12a4c38a9d547de1dfff17"></a><!-- doxytag: member="TcgService.h::EFI_TCG_STATUS_CHECK" ref="d87761ce4d12a4c38a9d547de1dfff17" args=")(IN EFI_TCG_PROTOCOL *This, OUT TCG_EFI_BOOT_SERVICE_CAPABILITY *ProtocolCapability, OUT UINT32 *TCGFeatureFlags, OUT EFI_PHYSICAL_ADDRESS *EventLogLocation, OUT EFI_PHYSICAL_ADDRESS *EventLogLastEntry)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d6/db6/a01172.html#d87761ce4d12a4c38a9d547de1dfff17">EFI_TCG_STATUS_CHECK</a>)(IN <a class="el" href="../../d4/d04/a00255.html">EFI_TCG_PROTOCOL</a> *This, OUT <a class="el" href="../../db/d12/a00268.html">TCG_EFI_BOOT_SERVICE_CAPABILITY</a> *ProtocolCapability, OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *TCGFeatureFlags, OUT <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> *EventLogLocation, OUT <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> *EventLogLastEntry)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This service provides EFI protocol capability information, state information about the TPM, and Event Log state information.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Indicates the calling context </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ProtocolCapability</em>&nbsp;</td><td>The callee allocates memory for a TCG_BOOT_SERVICE_CAPABILITY structure and fills in the fields with the EFI protocol capability information and the current TPM state information. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>TCGFeatureFlags</em>&nbsp;</td><td>This is a pointer to the feature flags. No feature flags are currently defined so this parameter MUST be set to 0. However, in the future, feature flags may be defined that, for example, enable hash algorithm agility. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EventLogLocation</em>&nbsp;</td><td>This is a pointer to the address of the event log in memory. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EventLogLastEntry</em>&nbsp;</td><td>If the Event Log contains more than one entry, this is a pointer to the address of the start of the last entry in the event log in memory.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Operation completed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The command was unsuccessful. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>One or more of the parameters are incorrect. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_BUFFER_TOO_SMALL</em>&nbsp;</td><td>The receive buffer is too small. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The component was not running </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="759e207d9c1c2162195cba39fddc62af"></a><!-- doxytag: member="TcgService.h::TCG_ALGORITHM_ID" ref="759e207d9c1c2162195cba39fddc62af" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d6/db6/a01172.html#759e207d9c1c2162195cba39fddc62af">TCG_ALGORITHM_ID</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="27d3a38139c4a45478f9c721a7da17eb"></a><!-- doxytag: member="TcgService.h::TCG_EFI_BOOT_SERVICE_CAPABILITY" ref="27d3a38139c4a45478f9c721a7da17eb" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct <a class="el" href="../../db/d12/a00268.html">_TCG_EFI_BOOT_SERVICE_CAPABILITY</a>  <a class="el" href="../../db/d12/a00268.html">TCG_EFI_BOOT_SERVICE_CAPABILITY</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
 
 </div>
 </div><p>
 <hr><h2>Variable Documentation</h2>
-<a class="anchor" name="4d277482e2c60b776373ae63c31f1b9a"></a><!-- doxytag: member="TcgService.h::gEfiTcgProtocolGuid" ref="4d277482e2c60b776373ae63c31f1b9a" args="" -->
+<a class="anchor" name="3f6bfd79bf6cd221ac99ea644c1e9c59"></a><!-- doxytag: member="DriverConfiguration2.h::gEfiDriverConfiguration2ProtocolGuid" ref="3f6bfd79bf6cd221ac99ea644c1e9c59" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../d6/db6/a01172.html#4d277482e2c60b776373ae63c31f1b9a">gEfiTcgProtocolGuid</a>          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../d6/db6/a01172.html#3f6bfd79bf6cd221ac99ea644c1e9c59">gEfiDriverConfiguration2ProtocolGuid</a>          </td>
         </tr>
       </table>
 </div>
@@ -309,7 +313,7 @@ This service provides EFI protocol capability information, state information abo
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:11 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:32 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

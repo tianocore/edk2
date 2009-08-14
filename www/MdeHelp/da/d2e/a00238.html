@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: _EFI_RUNTIME_IMAGE_ENTRY Struct Reference</title>
+<title>MdePkg[ALL]: _EFI_PEI_RECOVERY_MODULE_PPI Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,99 +21,34 @@
   </div>
 </div>
 <div class="contents">
-<h1>_EFI_RUNTIME_IMAGE_ENTRY Struct Reference</h1><!-- doxytag: class="_EFI_RUNTIME_IMAGE_ENTRY" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>_EFI_PEI_RECOVERY_MODULE_PPI Struct Reference</h1><!-- doxytag: class="_EFI_PEI_RECOVERY_MODULE_PPI" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d2e/a00238.html#9870d6c8a82e0ef0fe2ae06cecf4d813">ImageBase</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d39/a01138.html#f27e1f0831aae6d59440131d040a9101">EFI_PEI_LOAD_RECOVERY_CAPSULE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d2e/a00238.html#8de6957a8b69816f34bcb6aaf6c8b5e8">LoadRecoveryCapsule</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d2e/a00238.html#96af64c37129caa40c675bdf08f3e862">ImageSize</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d2e/a00238.html#a9b91c2a1e982e3c86103c373d3b01b9">RelocationData</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d2e/a00238.html#4d57d4c91c6550bfcf5c224749c61712">Handle</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d5/d35/a00266.html">EFI_LIST_ENTRY</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d2e/a00238.html#342a4ee6eec0ac969710bec3bc0b0b03">Link</a></td></tr>
-
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Loads a DXE binary capsule into memory.  <a href="#8de6957a8b69816f34bcb6aaf6c8b5e8"></a><br></td></tr>
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-EFI_RUNTIME_IMAGE_ENTRY <hr><h2>Field Documentation</h2>
-<a class="anchor" name="4d57d4c91c6550bfcf5c224749c61712"></a><!-- doxytag: member="_EFI_RUNTIME_IMAGE_ENTRY::Handle" ref="4d57d4c91c6550bfcf5c224749c61712" args="" -->
+Finds and loads the recovery files. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="8de6957a8b69816f34bcb6aaf6c8b5e8"></a><!-- doxytag: member="_EFI_PEI_RECOVERY_MODULE_PPI::LoadRecoveryCapsule" ref="8de6957a8b69816f34bcb6aaf6c8b5e8" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> <a class="el" href="../../da/d2e/a00238.html#4d57d4c91c6550bfcf5c224749c61712">_EFI_RUNTIME_IMAGE_ENTRY::Handle</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d39/a01138.html#f27e1f0831aae6d59440131d040a9101">EFI_PEI_LOAD_RECOVERY_CAPSULE</a> <a class="el" href="../../da/d2e/a00238.html#8de6957a8b69816f34bcb6aaf6c8b5e8">_EFI_PEI_RECOVERY_MODULE_PPI::LoadRecoveryCapsule</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The ImageHandle passed into ImageBase when it was loaded. 
-</div>
-</div><p>
-<a class="anchor" name="9870d6c8a82e0ef0fe2ae06cecf4d813"></a><!-- doxytag: member="_EFI_RUNTIME_IMAGE_ENTRY::ImageBase" ref="9870d6c8a82e0ef0fe2ae06cecf4d813" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VOID* <a class="el" href="../../da/d2e/a00238.html#9870d6c8a82e0ef0fe2ae06cecf4d813">_EFI_RUNTIME_IMAGE_ENTRY::ImageBase</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
+Loads a DXE binary capsule into memory. 
 <p>
-Start of image that has been loaded in memory. It is a pointer to either the DOS header or PE header of the image. 
-</div>
-</div><p>
-<a class="anchor" name="96af64c37129caa40c675bdf08f3e862"></a><!-- doxytag: member="_EFI_RUNTIME_IMAGE_ENTRY::ImageSize" ref="96af64c37129caa40c675bdf08f3e862" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../da/d2e/a00238.html#96af64c37129caa40c675bdf08f3e862">_EFI_RUNTIME_IMAGE_ENTRY::ImageSize</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
 
-<p>
-Size in bytes of the image represented by ImageBase. 
-</div>
-</div><p>
-<a class="anchor" name="342a4ee6eec0ac969710bec3bc0b0b03"></a><!-- doxytag: member="_EFI_RUNTIME_IMAGE_ENTRY::Link" ref="342a4ee6eec0ac969710bec3bc0b0b03" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d5/d35/a00266.html">EFI_LIST_ENTRY</a> <a class="el" href="../../da/d2e/a00238.html#342a4ee6eec0ac969710bec3bc0b0b03">_EFI_RUNTIME_IMAGE_ENTRY::Link</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Entry for this node in the EFI_RUNTIME_ARCHITECTURE_PROTOCOL.ImageHead list. 
-</div>
-</div><p>
-<a class="anchor" name="a9b91c2a1e982e3c86103c373d3b01b9"></a><!-- doxytag: member="_EFI_RUNTIME_IMAGE_ENTRY::RelocationData" ref="a9b91c2a1e982e3c86103c373d3b01b9" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VOID* <a class="el" href="../../da/d2e/a00238.html#a9b91c2a1e982e3c86103c373d3b01b9">_EFI_RUNTIME_IMAGE_ENTRY::RelocationData</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Information about the fix-ups that were performed on ImageBase when it was loaded into memory. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:13 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:16 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

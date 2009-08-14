@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Protocol/Ip4.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Ppi/Reset.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,77 +21,31 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Protocol/Ip4.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Ppi/Reset.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d0f/a00494.html">EFI_IP4_ADDRESS_PAIR</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d1f/a00506.html">EFI_IP4_VARIABLE_DATA</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dad/a00496.html">EFI_IP4_CONFIG_DATA</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d1c/a00504.html">EFI_IP4_ROUTE_TABLE</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d67/a00499.html">EFI_IP4_ICMP_TYPE</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/db6/a00501.html">EFI_IP4_MODE_DATA</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d57/a00498.html">EFI_IP4_HEADER</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d1e/a00497.html">EFI_IP4_FRAGMENT_DATA</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/de5/a00503.html">EFI_IP4_RECEIVE_DATA</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/da2/a00502.html">EFI_IP4_OVERRIDE_DATA</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d37/a00505.html">EFI_IP4_TRANSMIT_DATA</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/dc4/a00495.html">EFI_IP4_COMPLETION_TOKEN</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/df1/a00206.html">_EFI_IP4_PROTOCOL</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/dbd/a00597.html">EFI_PEI_RESET_PPI</a></td></tr>
 
 <tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d3e/a01139.html#15f3ae5152a43c8fc78c9ac38b7a6487">EFI_IP4_SERVICE_BINDING_PROTOCOL_GUID</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d3e/a01139.html#6e583b6a0fb12da5a4be86ce10e9ef06">EFI_IP4_PROTOCOL_GUID</a></td></tr>
-
-<tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <a class="el" href="../../d5/df1/a00206.html">_EFI_IP4_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d3e/a01139.html#aa0f2780b539cb4e0b2ff3c0c3495085">EFI_IP4_PROTOCOL</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d3e/a01139.html#3ca1831a68fde1f75b11dd1d36e295ef">EFI_IP4_GET_MODE_DATA</a> )(IN CONST <a class="el" href="../../d5/df1/a00206.html">EFI_IP4_PROTOCOL</a> *This, OUT <a class="el" href="../../d8/db6/a00501.html">EFI_IP4_MODE_DATA</a> *Ip4ModeData, OUT <a class="el" href="../../d5/dee/a00518.html">EFI_MANAGED_NETWORK_CONFIG_DATA</a> *MnpConfigData, OUT <a class="el" href="../../de/dde/a00587.html">EFI_SIMPLE_NETWORK_MODE</a> *SnpModeData)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d3e/a01139.html#2aa500c8756c49fd16b577f4989386ce">EFI_IP4_CONFIGURE</a> )(IN <a class="el" href="../../d5/df1/a00206.html">EFI_IP4_PROTOCOL</a> *This, IN <a class="el" href="../../d3/dad/a00496.html">EFI_IP4_CONFIG_DATA</a> *IpConfigData)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d3e/a01139.html#7995826a3420bcb07c089658dbb1cf02">EFI_IP4_GROUPS</a> )(IN <a class="el" href="../../d5/df1/a00206.html">EFI_IP4_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> JoinFlag, IN <a class="el" href="../../dc/d30/a00508.html">EFI_IPv4_ADDRESS</a> *GroupAddress)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d3e/a01139.html#c1a65461a3c09b4fb05731a3422386b0">EFI_IP4_ROUTES</a> )(IN <a class="el" href="../../d5/df1/a00206.html">EFI_IP4_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> DeleteRoute, IN <a class="el" href="../../dc/d30/a00508.html">EFI_IPv4_ADDRESS</a> *SubnetAddress, IN <a class="el" href="../../dc/d30/a00508.html">EFI_IPv4_ADDRESS</a> *SubnetMask, IN <a class="el" href="../../dc/d30/a00508.html">EFI_IPv4_ADDRESS</a> *GatewayAddress)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d3e/a01139.html#d5963768f2b7cc006e94dd982a81f0ae">EFI_IP4_TRANSMIT</a> )(IN <a class="el" href="../../d5/df1/a00206.html">EFI_IP4_PROTOCOL</a> *This, IN <a class="el" href="../../db/dc4/a00495.html">EFI_IP4_COMPLETION_TOKEN</a> *Token)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d3e/a01139.html#d84255af0c8d00f5c212010a591143dc">EFI_IP4_RECEIVE</a> )(IN <a class="el" href="../../d5/df1/a00206.html">EFI_IP4_PROTOCOL</a> *This, IN <a class="el" href="../../db/dc4/a00495.html">EFI_IP4_COMPLETION_TOKEN</a> *Token)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d3e/a01139.html#67cd952f8e3b4dbe4c1f049cd4c6d329">EFI_IP4_CANCEL</a> )(IN <a class="el" href="../../d5/df1/a00206.html">EFI_IP4_PROTOCOL</a> *This, IN <a class="el" href="../../db/dc4/a00495.html">EFI_IP4_COMPLETION_TOKEN</a> *Token)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d3e/a01139.html#63e3a3775e45db6ebd7d6ad555fd54b2">EFI_IP4_POLL</a> )(IN <a class="el" href="../../d5/df1/a00206.html">EFI_IP4_PROTOCOL</a> *This)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d3e/a01139.html#182806973b96300aefbadc0ccdc16310">EFI_PEI_RESET_PPI_GUID</a></td></tr>
 
 <tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d3e/a01139.html#9ea8e560d9dd3d678f20ca1cb67ec059">gEfiIp4ServiceBindingProtocolGuid</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d3e/a01139.html#a77e6359386777beb701aa8782a96a94">gEfiIp4ProtocolGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d3e/a01139.html#595620542975484113b9ff6dc08dcf48">gEfiPeiResetPpiGuid</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-This file defines the EFI IPv4 (Internet Protocol version 4) Protocol interface. It is split into the following three main sections:<ul>
-<li>EFI IPv4 Service Binding Protocol</li><li>EFI IPv4 Variable</li><li>EFI IPv4 Protocol The EFI IPv4 Protocol provides basic network IPv4 packet I/O services, which includes support for a subset of the Internet Control Message Protocol (ICMP) and may include support for the Internet Group Management Protocol (IGMP).</li></ul>
-<p>
+This file declares Reset PPI used to reset the platform.<p>
+This PPI is installed by some platform- or chipset-specific PEIM that abstracts the Reset Service to other agents.<p>
 Copyright (c) 2006 - 2009, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
-<a class="anchor" name="6e583b6a0fb12da5a4be86ce10e9ef06"></a><!-- doxytag: member="Ip4.h::EFI_IP4_PROTOCOL_GUID" ref="6e583b6a0fb12da5a4be86ce10e9ef06" args="" -->
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
+<dl class="user" compact><dt><b>Revision Reference:</b></dt><dd>This PPI is introduced in PI Version 1.0. </dd></dl>
+<hr><h2>Define Documentation</h2>
+<a class="anchor" name="182806973b96300aefbadc0ccdc16310"></a><!-- doxytag: member="Reset.h::EFI_PEI_RESET_PPI_GUID" ref="182806973b96300aefbadc0ccdc16310" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_IP4_PROTOCOL_GUID          </td>
+          <td class="memname">#define EFI_PEI_RESET_PPI_GUID          </td>
         </tr>
       </table>
 </div>
@@ -99,359 +53,18 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 <p>
 <b>Value:</b><div class="fragment"><pre class="fragment">{ \
-    0x41d94cd2, 0x35b6, 0x455a, {0x82, 0x58, 0xd4, 0xe5, 0x13, 0x34, 0xaa, 0xdd } \
+    0xef398d58, 0x9dfd, 0x4103, {0xbf, 0x94, 0x78, 0xc6, 0xf4, 0xfe, 0x71, 0x2f } \
   }
 </pre></div>
-</div>
-</div><p>
-<a class="anchor" name="15f3ae5152a43c8fc78c9ac38b7a6487"></a><!-- doxytag: member="Ip4.h::EFI_IP4_SERVICE_BINDING_PROTOCOL_GUID" ref="15f3ae5152a43c8fc78c9ac38b7a6487" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_IP4_SERVICE_BINDING_PROTOCOL_GUID          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-<b>Value:</b><div class="fragment"><pre class="fragment">{ \
-    0xc51711e7, 0xb4bf, 0x404a, {0xbf, 0xb8, 0x0a, 0x04, 0x8e, 0xf1, 0xff, 0xe4 } \
-  }
-</pre></div>
-</div>
-</div><p>
-<hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="67cd952f8e3b4dbe4c1f049cd4c6d329"></a><!-- doxytag: member="Ip4.h::EFI_IP4_CANCEL" ref="67cd952f8e3b4dbe4c1f049cd4c6d329" args=")(IN EFI_IP4_PROTOCOL *This, IN EFI_IP4_COMPLETION_TOKEN *Token)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d5/d3e/a01139.html#67cd952f8e3b4dbe4c1f049cd4c6d329">EFI_IP4_CANCEL</a>)(IN <a class="el" href="../../d5/df1/a00206.html">EFI_IP4_PROTOCOL</a> *This, IN <a class="el" href="../../db/dc4/a00495.html">EFI_IP4_COMPLETION_TOKEN</a> *Token)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Abort an asynchronous transmit or receive request.<p>
-The Cancel() function is used to abort a pending transmit or receive request. If the token is in the transmit or receive request queues, then after calling this function, Token-&gt;Status will be set to EFI_ABORTED and then Token-&gt;Event will be signaled. If the token is not in one of the queues, which usually means the asynchronous operation has completed, this function will not signal the token and EFI_NOT_FOUND is returned.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the EFI_IP4_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Token</em>&nbsp;</td><td>Pointer to a token that has been issued by <a class="el" href="../../d5/df1/a00206.html#9f9745e972710c39281edf10f094b973">EFI_IP4_PROTOCOL.Transmit()</a> or <a class="el" href="../../d5/df1/a00206.html#8b2e6d168694e8dc0d5fd51b2359e77b">EFI_IP4_PROTOCOL.Receive()</a>. If NULL, all pending tokens are aborted. Type <a class="el" href="../../db/dc4/a00495.html">EFI_IP4_COMPLETION_TOKEN</a> is defined in <a class="el" href="../../d5/df1/a00206.html#9f9745e972710c39281edf10f094b973">EFI_IP4_PROTOCOL.Transmit()</a>.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The asynchronous I/O request was aborted and Token.-&gt;Event was signaled. When Token is NULL, all pending requests were aborted and their events were signaled. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>This is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_STARTED</em>&nbsp;</td><td>This instance has not been started. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NO_MAPPING</em>&nbsp;</td><td>When using the default address, configuration (DHCP, BOOTP, RARP, etc.) is not finished yet. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>When Token is not NULL, the asynchronous I/O request was not found in the transmit or receive queue. It has either completed or was not issued by Transmit() and Receive(). </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="2aa500c8756c49fd16b577f4989386ce"></a><!-- doxytag: member="Ip4.h::EFI_IP4_CONFIGURE" ref="2aa500c8756c49fd16b577f4989386ce" args=")(IN EFI_IP4_PROTOCOL *This, IN EFI_IP4_CONFIG_DATA *IpConfigData)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d5/d3e/a01139.html#2aa500c8756c49fd16b577f4989386ce">EFI_IP4_CONFIGURE</a>)(IN <a class="el" href="../../d5/df1/a00206.html">EFI_IP4_PROTOCOL</a> *This, IN <a class="el" href="../../d3/dad/a00496.html">EFI_IP4_CONFIG_DATA</a> *IpConfigData)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Assigns an IPv4 address and subnet mask to this EFI IPv4 Protocol driver instance.<p>
-The Configure() function is used to set, change, or reset the operational parameters and filter settings for this EFI IPv4 Protocol instance. Until these parameters have been set, no network traffic can be sent or received by this instance. Once the parameters have been reset (by calling this function with IpConfigData set to NULL), no more traffic can be sent or received until these parameters have been set again. Each EFI IPv4 Protocol instance can be started and stopped independently of each other by enabling or disabling their receive filter settings with the Configure() function.<p>
-When IpConfigData.UseDefaultAddress is set to FALSE, the new station address will be appended as an alias address into the addresses list in the EFI IPv4 Protocol driver. While set to TRUE, Configure() will trigger the EFI_IP4_CONFIG_PROTOCOL to retrieve the default IPv4 address if it is not available yet. Clients could frequently call GetModeData() to check the status to ensure that the default IPv4 address is ready.<p>
-If operational parameters are reset or changed, any pending transmit and receive requests will be cancelled. Their completion token status will be set to EFI_ABORTED and their events will be signaled.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the EFI_IP4_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>IpConfigData</em>&nbsp;</td><td>Pointer to the EFI IPv4 Protocol configuration data structure.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The driver instance was successfully opened. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NO_MAPPING</em>&nbsp;</td><td>When using the default address, configuration (DHCP, BOOTP, RARP, etc.) is not finished yet. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>One or more of the following conditions is TRUE: This is NULL. IpConfigData.StationAddress is not a unicast IPv4 address. IpConfigData.SubnetMask is not a valid IPv4 subnet </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>One or more of the following conditions is TRUE: A configuration protocol (DHCP, BOOTP, RARP, etc.) could not be located when clients choose to use the default IPv4 address. This EFI IPv4 Protocol implementation does not support this requested filter or timeout setting. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>The EFI IPv4 Protocol driver instance data could not be allocated. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ALREADY_STARTED</em>&nbsp;</td><td>The interface is already open and must be stopped before the IPv4 address or subnet mask can be changed. The interface must also be stopped when switching to/from raw packet mode. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>An unexpected system or network error occurred. The EFI IPv4 Protocol driver instance is not opened. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="3ca1831a68fde1f75b11dd1d36e295ef"></a><!-- doxytag: member="Ip4.h::EFI_IP4_GET_MODE_DATA" ref="3ca1831a68fde1f75b11dd1d36e295ef" args=")(IN CONST EFI_IP4_PROTOCOL *This, OUT EFI_IP4_MODE_DATA *Ip4ModeData, OUT EFI_MANAGED_NETWORK_CONFIG_DATA *MnpConfigData, OUT EFI_SIMPLE_NETWORK_MODE *SnpModeData)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d5/d3e/a01139.html#3ca1831a68fde1f75b11dd1d36e295ef">EFI_IP4_GET_MODE_DATA</a>)(IN CONST <a class="el" href="../../d5/df1/a00206.html">EFI_IP4_PROTOCOL</a> *This, OUT <a class="el" href="../../d8/db6/a00501.html">EFI_IP4_MODE_DATA</a> *Ip4ModeData, OUT <a class="el" href="../../d5/dee/a00518.html">EFI_MANAGED_NETWORK_CONFIG_DATA</a> *MnpConfigData, OUT <a class="el" href="../../de/dde/a00587.html">EFI_SIMPLE_NETWORK_MODE</a> *SnpModeData)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Gets the current operational settings for this instance of the EFI IPv4 Protocol driver.<p>
-The GetModeData() function returns the current operational mode data for this driver instance. The data fields in <a class="el" href="../../d8/db6/a00501.html">EFI_IP4_MODE_DATA</a> are read only. This function is used optionally to retrieve the operational mode data of underlying networks or drivers.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the EFI_IP4_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Ip4ModeData</em>&nbsp;</td><td>Pointer to the EFI IPv4 Protocol mode data structure. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>MnpConfigData</em>&nbsp;</td><td>Pointer to the managed network configuration data structure. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SnpModeData</em>&nbsp;</td><td>Pointer to the simple network mode data structure.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The operation completed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>This is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>The required mode data could not be allocated. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="7995826a3420bcb07c089658dbb1cf02"></a><!-- doxytag: member="Ip4.h::EFI_IP4_GROUPS" ref="7995826a3420bcb07c089658dbb1cf02" args=")(IN EFI_IP4_PROTOCOL *This, IN BOOLEAN JoinFlag, IN EFI_IPv4_ADDRESS *GroupAddress)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d5/d3e/a01139.html#7995826a3420bcb07c089658dbb1cf02">EFI_IP4_GROUPS</a>)(IN <a class="el" href="../../d5/df1/a00206.html">EFI_IP4_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> JoinFlag, IN <a class="el" href="../../dc/d30/a00508.html">EFI_IPv4_ADDRESS</a> *GroupAddress)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Joins and leaves multicast groups.<p>
-The Groups() function is used to join and leave multicast group sessions. Joining a group will enable reception of matching multicast packets. Leaving a group will disable the multicast packet reception.<p>
-If JoinFlag is FALSE and GroupAddress is NULL, all joined groups will be left.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the EFI_IP4_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>JoinFlag</em>&nbsp;</td><td>Set to TRUE to join the multicast group session and FALSE to leave. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>GroupAddress</em>&nbsp;</td><td>Pointer to the IPv4 multicast address.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The operation completed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>One or more of the following is TRUE:<ul>
-<li>This is NULL.</li><li>JoinFlag is TRUE and GroupAddress is NULL.</li><li>GroupAddress is not NULL and *GroupAddress is not a multicast IPv4 address. </li></ul>
-</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_STARTED</em>&nbsp;</td><td>This instance has not been started. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NO_MAPPING</em>&nbsp;</td><td>When using the default address, configuration (DHCP, BOOTP, RARP, etc.) is not finished yet. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>System resources could not be allocated. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>This EFI IPv4 Protocol implementation does not support multicast groups. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ALREADY_STARTED</em>&nbsp;</td><td>The group address is already in the group table (when JoinFlag is TRUE). </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The group address is not in the group table (when JoinFlag is FALSE). </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>An unexpected system or network error occurred. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="63e3a3775e45db6ebd7d6ad555fd54b2"></a><!-- doxytag: member="Ip4.h::EFI_IP4_POLL" ref="63e3a3775e45db6ebd7d6ad555fd54b2" args=")(IN EFI_IP4_PROTOCOL *This)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d5/d3e/a01139.html#63e3a3775e45db6ebd7d6ad555fd54b2">EFI_IP4_POLL</a>)(IN <a class="el" href="../../d5/df1/a00206.html">EFI_IP4_PROTOCOL</a> *This)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Polls for incoming data packets and processes outgoing data packets.<p>
-The Poll() function polls for incoming data packets and processes outgoing data packets. Network drivers and applications can call the <a class="el" href="../../d5/df1/a00206.html#3169e3912f88f774f77929863d12c826">EFI_IP4_PROTOCOL.Poll()</a> function to increase the rate that data packets are moved between the communications device and the transmit and receive queues.<p>
-In some systems the periodic timer event may not poll the underlying communications device fast enough to transmit and/or receive all data packets without missing incoming packets or dropping outgoing packets. Drivers and applications that are experiencing packet loss should try calling the <a class="el" href="../../d5/df1/a00206.html#3169e3912f88f774f77929863d12c826">EFI_IP4_PROTOCOL.Poll()</a> function more often.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the EFI_IP4_PROTOCOL instance.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Incoming or outgoing data was processed. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_STARTED</em>&nbsp;</td><td>This EFI IPv4 Protocol instance has not been started. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NO_MAPPING</em>&nbsp;</td><td>When using the default address, configuration (DHCP, BOOTP, RARP, etc.) is not finished yet. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>This is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>An unexpected system or network error occurred. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_READY</em>&nbsp;</td><td>No incoming or outgoing data is processed. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_TIMEOUT</em>&nbsp;</td><td>Data was dropped out of the transmit and/or receive queue. Consider increasing the polling rate. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="aa0f2780b539cb4e0b2ff3c0c3495085"></a><!-- doxytag: member="Ip4.h::EFI_IP4_PROTOCOL" ref="aa0f2780b539cb4e0b2ff3c0c3495085" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct <a class="el" href="../../d5/df1/a00206.html">_EFI_IP4_PROTOCOL</a> <a class="el" href="../../d5/df1/a00206.html">EFI_IP4_PROTOCOL</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="d84255af0c8d00f5c212010a591143dc"></a><!-- doxytag: member="Ip4.h::EFI_IP4_RECEIVE" ref="d84255af0c8d00f5c212010a591143dc" args=")(IN EFI_IP4_PROTOCOL *This, IN EFI_IP4_COMPLETION_TOKEN *Token)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d5/d3e/a01139.html#d84255af0c8d00f5c212010a591143dc">EFI_IP4_RECEIVE</a>)(IN <a class="el" href="../../d5/df1/a00206.html">EFI_IP4_PROTOCOL</a> *This, IN <a class="el" href="../../db/dc4/a00495.html">EFI_IP4_COMPLETION_TOKEN</a> *Token)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Places a receiving request into the receiving queue.<p>
-The Receive() function places a completion token into the receive packet queue. This function is always asynchronous.<p>
-The Token.Event field in the completion token must be filled in by the caller and cannot be NULL. When the receive operation completes, the EFI IPv4 Protocol driver updates the Token.Status and Token.Packet.RxData fields and the Token.Event is signaled.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the EFI_IP4_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Token</em>&nbsp;</td><td>Pointer to a token that is associated with the receive data descriptor.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The receive completion token was cached. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_STARTED</em>&nbsp;</td><td>This EFI IPv4 Protocol instance has not been started. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NO_MAPPING</em>&nbsp;</td><td>When using the default address, configuration (DHCP, BOOTP, RARP, etc.) is not finished yet. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>One or more of the following conditions is TRUE:<ul>
-<li>This is NULL.</li><li>Token is NULL.</li><li>Token.Event is NULL. </li></ul>
-</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>The receive completion token could not be queued due to a lack of system resources (usually memory). </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>An unexpected system or network error occurred. The EFI IPv4 Protocol instance has been reset to startup defaults. EFI_ACCESS_DENIED The receive completion token with the same Token.Event was already in the receive queue. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_READY</em>&nbsp;</td><td>The receive request could not be queued because the receive queue is full. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ICMP_ERROR</em>&nbsp;</td><td>An ICMP error packet was received. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="c1a65461a3c09b4fb05731a3422386b0"></a><!-- doxytag: member="Ip4.h::EFI_IP4_ROUTES" ref="c1a65461a3c09b4fb05731a3422386b0" args=")(IN EFI_IP4_PROTOCOL *This, IN BOOLEAN DeleteRoute, IN EFI_IPv4_ADDRESS *SubnetAddress, IN EFI_IPv4_ADDRESS *SubnetMask, IN EFI_IPv4_ADDRESS *GatewayAddress)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d5/d3e/a01139.html#c1a65461a3c09b4fb05731a3422386b0">EFI_IP4_ROUTES</a>)(IN <a class="el" href="../../d5/df1/a00206.html">EFI_IP4_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> DeleteRoute, IN <a class="el" href="../../dc/d30/a00508.html">EFI_IPv4_ADDRESS</a> *SubnetAddress, IN <a class="el" href="../../dc/d30/a00508.html">EFI_IPv4_ADDRESS</a> *SubnetMask, IN <a class="el" href="../../dc/d30/a00508.html">EFI_IPv4_ADDRESS</a> *GatewayAddress)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Adds and deletes routing table entries.<p>
-The Routes() function adds a route to or deletes a route from the routing table.<p>
-Routes are determined by comparing the SubnetAddress with the destination IPv4 address arithmetically AND-ed with the SubnetMask. The gateway address must be on the same subnet as the configured station address.<p>
-The default route is added with SubnetAddress and SubnetMask both set to 0.0.0.0. The default route matches all destination IPv4 addresses that do not match any other routes.<p>
-A GatewayAddress that is zero is a nonroute. Packets are sent to the destination IP address if it can be found in the ARP cache or on the local subnet. One automatic nonroute entry will be inserted into the routing table for outgoing packets that are addressed to a local subnet (gateway address of 0.0.0.0).<p>
-Each EFI IPv4 Protocol instance has its own independent routing table. Those EFI IPv4 Protocol instances that use the default IPv4 address will also have copies of the routing table that was provided by the EFI_IP4_CONFIG_PROTOCOL, and these copies will be updated whenever the EIF IPv4 Protocol driver reconfigures its instances. As a result, client modification to the routing table will be lost.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the EFI_IP4_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DeleteRoute</em>&nbsp;</td><td>Set to TRUE to delete this route from the routing table. Set to FALSE to add this route to the routing table. SubnetAddress and SubnetMask are used as the key to each route entry. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SubnetAddress</em>&nbsp;</td><td>The address of the subnet that needs to be routed. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SubnetMask</em>&nbsp;</td><td>The subnet mask of SubnetAddress. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>GatewayAddress</em>&nbsp;</td><td>The unicast gateway IPv4 address for this route.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The operation completed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_STARTED</em>&nbsp;</td><td>The driver instance has not been started. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NO_MAPPING</em>&nbsp;</td><td>When using the default address, configuration (DHCP, BOOTP, RARP, etc.) is not finished yet. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>One or more of the following conditions is TRUE:<ul>
-<li>This is NULL.</li><li>SubnetAddress is NULL.</li><li>SubnetMask is NULL.</li><li>GatewayAddress is NULL.</li><li>*SubnetAddress is not a valid subnet address.</li><li>*SubnetMask is not a valid subnet mask.</li><li>*GatewayAddress is not a valid unicast IPv4 address. </li></ul>
-</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>Could not add the entry to the routing table. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>This route is not in the routing table (when DeleteRoute is TRUE). </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ACCESS_DENIED</em>&nbsp;</td><td>The route is already defined in the routing table (when DeleteRoute is FALSE). </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="d5963768f2b7cc006e94dd982a81f0ae"></a><!-- doxytag: member="Ip4.h::EFI_IP4_TRANSMIT" ref="d5963768f2b7cc006e94dd982a81f0ae" args=")(IN EFI_IP4_PROTOCOL *This, IN EFI_IP4_COMPLETION_TOKEN *Token)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d5/d3e/a01139.html#d5963768f2b7cc006e94dd982a81f0ae">EFI_IP4_TRANSMIT</a>)(IN <a class="el" href="../../d5/df1/a00206.html">EFI_IP4_PROTOCOL</a> *This, IN <a class="el" href="../../db/dc4/a00495.html">EFI_IP4_COMPLETION_TOKEN</a> *Token)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Places outgoing data packets into the transmit queue.<p>
-The Transmit() function places a sending request in the transmit queue of this EFI IPv4 Protocol instance. Whenever the packet in the token is sent out or some errors occur, the event in the token will be signaled and the status is updated.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to the EFI_IP4_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Token</em>&nbsp;</td><td>Pointer to the transmit token.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The data has been queued for transmission. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_STARTED</em>&nbsp;</td><td>This instance has not been started. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NO_MAPPING</em>&nbsp;</td><td>When using the default address, configuration (DHCP, BOOTP, RARP, etc.) is not finished yet. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>One or more pameters are invalid. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ACCESS_DENIED</em>&nbsp;</td><td>The transmit completion token with the same Token.Event was already in the transmit queue. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_READY</em>&nbsp;</td><td>The completion token could not be queued because the transmit queue is full. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>Not route is found to destination address. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>Could not queue the transmit data. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_BUFFER_TOO_SMALL</em>&nbsp;</td><td>Token.Packet.TxData.TotalDataLength is too short to transmit. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_BAD_BUFFER_SIZE</em>&nbsp;</td><td>The length of the IPv4 header + option length + total data length is greater than MTU (or greater than the maximum packet size if Token.Packet.TxData.OverrideData. DoNotFragment is TRUE.) </td></tr>
-  </table>
-</dl>
-
 </div>
 </div><p>
 <hr><h2>Variable Documentation</h2>
-<a class="anchor" name="a77e6359386777beb701aa8782a96a94"></a><!-- doxytag: member="Ip4.h::gEfiIp4ProtocolGuid" ref="a77e6359386777beb701aa8782a96a94" args="" -->
+<a class="anchor" name="595620542975484113b9ff6dc08dcf48"></a><!-- doxytag: member="Reset.h::gEfiPeiResetPpiGuid" ref="595620542975484113b9ff6dc08dcf48" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../d5/d3e/a01139.html#a77e6359386777beb701aa8782a96a94">gEfiIp4ProtocolGuid</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="9ea8e560d9dd3d678f20ca1cb67ec059"></a><!-- doxytag: member="Ip4.h::gEfiIp4ServiceBindingProtocolGuid" ref="9ea8e560d9dd3d678f20ca1cb67ec059" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../d5/d3e/a01139.html#9ea8e560d9dd3d678f20ca1cb67ec059">gEfiIp4ServiceBindingProtocolGuid</a>          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../d5/d3e/a01139.html#595620542975484113b9ff6dc08dcf48">gEfiPeiResetPpiGuid</a>          </td>
         </tr>
       </table>
 </div>
@@ -462,7 +75,7 @@ The Transmit() function places a sending request in the transmit queue of this E
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:10 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:29 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

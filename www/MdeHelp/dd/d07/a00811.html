@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: SMBIOS_TABLE_TYPE17 Struct Reference</title>
+<title>MdePkg[ALL]: s_pxe_hw_undi Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,321 +21,190 @@
   </div>
 </div>
 <div class="contents">
-<h1>SMBIOS_TABLE_TYPE17 Struct Reference</h1><!-- doxytag: class="SMBIOS_TABLE_TYPE17" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>s_pxe_hw_undi Struct Reference</h1><!-- doxytag: class="s_pxe_hw_undi" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../da/db8/a00797.html">SMBIOS_STRUCTURE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d07/a00811.html#72f4162d63765f724f67a4c5da5acfaf">Hdr</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d07/a00811.html#aa8fda9ee76f5d544ff77357d78fe6c7">Signature</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d07/a00811.html#677a1d659bc69a2dfbbb87e2e8ceb261">MemoryArrayHandle</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">PXE_ROMID_SIGNATURE.  <a href="#aa8fda9ee76f5d544ff77357d78fe6c7"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d07/a00811.html#589a68cb48cf492414c42c6fab5289f1">Len</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d07/a00811.html#77222805849acd399ba0f8b65e5d127b">MemoryErrorInformationHandle</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">sizeof(PXE_HW_UNDI)  <a href="#589a68cb48cf492414c42c6fab5289f1"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d07/a00811.html#af7a557345b8a04f998654643aab5b3e">Fudge</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d07/a00811.html#c0d3c07c087b6be1eacf369599956a0f">TotalWidth</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">makes 8-bit cksum equal zero  <a href="#af7a557345b8a04f998654643aab5b3e"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d07/a00811.html#ad1fe670c2635fab80351020773e7098">Rev</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d07/a00811.html#78a25f340a7c04fe43449649e2d7d23e">DataWidth</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">PXE_ROMID_REV.  <a href="#ad1fe670c2635fab80351020773e7098"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d07/a00811.html#e399fbba1ae64477c8df88069eb15172">IFcnt</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d07/a00811.html#fbe97c2bc29966e1e1131238223b716e">Size</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">physical connector count  <a href="#e399fbba1ae64477c8df88069eb15172"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d07/a00811.html#f8c45ca066a83c3bd20ca3d2f9187368">MajorVer</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d49/a00979.html#ed4282b6029fdadac38ba060ec5741fe">MEMORY_FORM_FACTOR</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d07/a00811.html#51285a257996e11eda774b49d8c691cf">FormFactor</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">PXE_ROMID_MAJORVER.  <a href="#f8c45ca066a83c3bd20ca3d2f9187368"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d07/a00811.html#d202c08d9ec5cd6211a7d5e64810e922">MinorVer</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d07/a00811.html#698d0f3719bff19b79e6aad6700755c8">DeviceSet</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">PXE_ROMID_MINORVER.  <a href="#d202c08d9ec5cd6211a7d5e64810e922"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d07/a00811.html#b80b65d27c5174b6457f66422af77f91">reserved</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d49/a00979.html#bd86e1460ed2b924b45d2fa3c883e6b0">SMBIOS_TABLE_STRING</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d07/a00811.html#cc95f67d0d9ba1be1aa06562146af0dd">DeviceLocator</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d49/a00979.html#bd86e1460ed2b924b45d2fa3c883e6b0">SMBIOS_TABLE_STRING</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d07/a00811.html#299655da48ef90f3248f4117f222f722">BankLocator</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d49/a00979.html#30cd1d7c1f1db9a6e56218ab7f2ad1a1">MEMORY_DEVICE_TYPE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d07/a00811.html#f58b9d29c6fe9d0482312b8e4234101e">MemoryType</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/de4/a00677.html">MEMORY_DEVICE_TYPE_DETAIL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d07/a00811.html#d5e7d68c2cc8093587b71554fd6bf856">TypeDetail</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d07/a00811.html#c0e5b5bf1b75c499a18e4d0b3a678593">Speed</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d49/a00979.html#bd86e1460ed2b924b45d2fa3c883e6b0">SMBIOS_TABLE_STRING</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d07/a00811.html#b9dd7ab7f1e03973e5b78d1aff3de12e">Manufacturer</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d49/a00979.html#bd86e1460ed2b924b45d2fa3c883e6b0">SMBIOS_TABLE_STRING</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d07/a00811.html#1060043cdcd46f8b7e794555a9c9792a">SerialNumber</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d49/a00979.html#bd86e1460ed2b924b45d2fa3c883e6b0">SMBIOS_TABLE_STRING</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d07/a00811.html#3c3e25b3683f5bc7a806e92b19d58a4f">AssetTag</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d49/a00979.html#bd86e1460ed2b924b45d2fa3c883e6b0">SMBIOS_TABLE_STRING</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d07/a00811.html#b7b83ea54ec3c7896244494340c74f4b">PartNumber</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d07/a00811.html#f6197bf4414100f8b4c77216d2220b59">Attributes</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">zero, not used  <a href="#b80b65d27c5174b6457f66422af77f91"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d07/a00811.html#0015d596a88ffbf77d6d74efff513d77">Implementation</a></td></tr>
 
 </table>
-<hr><a name="_details"></a><h2>Detailed Description</h2>
-Memory Device (Type 17)<p>
-This structure describes a single memory device that is part of a larger Physical Memory Array (Type 16). Note: If a system includes memory-device sockets, the SMBIOS implementation includes a Memory Device structure instance for each slot whether or not the socket is currently populated. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="3c3e25b3683f5bc7a806e92b19d58a4f"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE17::AssetTag" ref="3c3e25b3683f5bc7a806e92b19d58a4f" args="" -->
+<hr><h2>Field Documentation</h2>
+<a class="anchor" name="af7a557345b8a04f998654643aab5b3e"></a><!-- doxytag: member="s_pxe_hw_undi::Fudge" ref="af7a557345b8a04f998654643aab5b3e" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d8/d49/a00979.html#bd86e1460ed2b924b45d2fa3c883e6b0">SMBIOS_TABLE_STRING</a> <a class="el" href="../../dd/d07/a00811.html#3c3e25b3683f5bc7a806e92b19d58a4f">SMBIOS_TABLE_TYPE17::AssetTag</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a> <a class="el" href="../../dd/d07/a00811.html#af7a557345b8a04f998654643aab5b3e">s_pxe_hw_undi::Fudge</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+makes 8-bit cksum equal zero 
+<p>
 
 </div>
 </div><p>
-<a class="anchor" name="f6197bf4414100f8b4c77216d2220b59"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE17::Attributes" ref="f6197bf4414100f8b4c77216d2220b59" args="" -->
+<a class="anchor" name="e399fbba1ae64477c8df88069eb15172"></a><!-- doxytag: member="s_pxe_hw_undi::IFcnt" ref="e399fbba1ae64477c8df88069eb15172" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../dd/d07/a00811.html#f6197bf4414100f8b4c77216d2220b59">SMBIOS_TABLE_TYPE17::Attributes</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a> <a class="el" href="../../dd/d07/a00811.html#e399fbba1ae64477c8df88069eb15172">s_pxe_hw_undi::IFcnt</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+physical connector count 
+<p>
 
 </div>
 </div><p>
-<a class="anchor" name="299655da48ef90f3248f4117f222f722"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE17::BankLocator" ref="299655da48ef90f3248f4117f222f722" args="" -->
+<a class="anchor" name="0015d596a88ffbf77d6d74efff513d77"></a><!-- doxytag: member="s_pxe_hw_undi::Implementation" ref="0015d596a88ffbf77d6d74efff513d77" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d8/d49/a00979.html#bd86e1460ed2b924b45d2fa3c883e6b0">SMBIOS_TABLE_STRING</a> <a class="el" href="../../dd/d07/a00811.html#299655da48ef90f3248f4117f222f722">SMBIOS_TABLE_TYPE17::BankLocator</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a> <a class="el" href="../../dd/d07/a00811.html#0015d596a88ffbf77d6d74efff513d77">s_pxe_hw_undi::Implementation</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+implementation flags reserved ///&lt; vendor use UINT32 Status; ///&lt; status port UINT32 Command; ///&lt; command port UINT64 CDBaddr; ///&lt; CDB address port 
 </div>
 </div><p>
-<a class="anchor" name="78a25f340a7c04fe43449649e2d7d23e"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE17::DataWidth" ref="78a25f340a7c04fe43449649e2d7d23e" args="" -->
+<a class="anchor" name="589a68cb48cf492414c42c6fab5289f1"></a><!-- doxytag: member="s_pxe_hw_undi::Len" ref="589a68cb48cf492414c42c6fab5289f1" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dd/d07/a00811.html#78a25f340a7c04fe43449649e2d7d23e">SMBIOS_TABLE_TYPE17::DataWidth</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a> <a class="el" href="../../dd/d07/a00811.html#589a68cb48cf492414c42c6fab5289f1">s_pxe_hw_undi::Len</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+sizeof(PXE_HW_UNDI) 
+<p>
 
 </div>
 </div><p>
-<a class="anchor" name="cc95f67d0d9ba1be1aa06562146af0dd"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE17::DeviceLocator" ref="cc95f67d0d9ba1be1aa06562146af0dd" args="" -->
+<a class="anchor" name="f8c45ca066a83c3bd20ca3d2f9187368"></a><!-- doxytag: member="s_pxe_hw_undi::MajorVer" ref="f8c45ca066a83c3bd20ca3d2f9187368" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d8/d49/a00979.html#bd86e1460ed2b924b45d2fa3c883e6b0">SMBIOS_TABLE_STRING</a> <a class="el" href="../../dd/d07/a00811.html#cc95f67d0d9ba1be1aa06562146af0dd">SMBIOS_TABLE_TYPE17::DeviceLocator</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a> <a class="el" href="../../dd/d07/a00811.html#f8c45ca066a83c3bd20ca3d2f9187368">s_pxe_hw_undi::MajorVer</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+PXE_ROMID_MAJORVER. 
+<p>
 
 </div>
 </div><p>
-<a class="anchor" name="698d0f3719bff19b79e6aad6700755c8"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE17::DeviceSet" ref="698d0f3719bff19b79e6aad6700755c8" args="" -->
+<a class="anchor" name="d202c08d9ec5cd6211a7d5e64810e922"></a><!-- doxytag: member="s_pxe_hw_undi::MinorVer" ref="d202c08d9ec5cd6211a7d5e64810e922" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../dd/d07/a00811.html#698d0f3719bff19b79e6aad6700755c8">SMBIOS_TABLE_TYPE17::DeviceSet</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a> <a class="el" href="../../dd/d07/a00811.html#d202c08d9ec5cd6211a7d5e64810e922">s_pxe_hw_undi::MinorVer</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+PXE_ROMID_MINORVER. 
+<p>
 
 </div>
 </div><p>
-<a class="anchor" name="51285a257996e11eda774b49d8c691cf"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE17::FormFactor" ref="51285a257996e11eda774b49d8c691cf" args="" -->
+<a class="anchor" name="b80b65d27c5174b6457f66422af77f91"></a><!-- doxytag: member="s_pxe_hw_undi::reserved" ref="b80b65d27c5174b6457f66422af77f91" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d8/d49/a00979.html#ed4282b6029fdadac38ba060ec5741fe">MEMORY_FORM_FACTOR</a> <a class="el" href="../../dd/d07/a00811.html#51285a257996e11eda774b49d8c691cf">SMBIOS_TABLE_TYPE17::FormFactor</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a> <a class="el" href="../../dd/d07/a00811.html#b80b65d27c5174b6457f66422af77f91">s_pxe_hw_undi::reserved</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+zero, not used 
+<p>
 
 </div>
 </div><p>
-<a class="anchor" name="72f4162d63765f724f67a4c5da5acfaf"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE17::Hdr" ref="72f4162d63765f724f67a4c5da5acfaf" args="" -->
+<a class="anchor" name="ad1fe670c2635fab80351020773e7098"></a><!-- doxytag: member="s_pxe_hw_undi::Rev" ref="ad1fe670c2635fab80351020773e7098" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../da/db8/a00797.html">SMBIOS_STRUCTURE</a> <a class="el" href="../../dd/d07/a00811.html#72f4162d63765f724f67a4c5da5acfaf">SMBIOS_TABLE_TYPE17::Hdr</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a> <a class="el" href="../../dd/d07/a00811.html#ad1fe670c2635fab80351020773e7098">s_pxe_hw_undi::Rev</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+PXE_ROMID_REV. 
+<p>
 
 </div>
 </div><p>
-<a class="anchor" name="b9dd7ab7f1e03973e5b78d1aff3de12e"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE17::Manufacturer" ref="b9dd7ab7f1e03973e5b78d1aff3de12e" args="" -->
+<a class="anchor" name="aa8fda9ee76f5d544ff77357d78fe6c7"></a><!-- doxytag: member="s_pxe_hw_undi::Signature" ref="aa8fda9ee76f5d544ff77357d78fe6c7" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d8/d49/a00979.html#bd86e1460ed2b924b45d2fa3c883e6b0">SMBIOS_TABLE_STRING</a> <a class="el" href="../../dd/d07/a00811.html#b9dd7ab7f1e03973e5b78d1aff3de12e">SMBIOS_TABLE_TYPE17::Manufacturer</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a> <a class="el" href="../../dd/d07/a00811.html#aa8fda9ee76f5d544ff77357d78fe6c7">s_pxe_hw_undi::Signature</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<a class="anchor" name="677a1d659bc69a2dfbbb87e2e8ceb261"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE17::MemoryArrayHandle" ref="677a1d659bc69a2dfbbb87e2e8ceb261" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dd/d07/a00811.html#677a1d659bc69a2dfbbb87e2e8ceb261">SMBIOS_TABLE_TYPE17::MemoryArrayHandle</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="77222805849acd399ba0f8b65e5d127b"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE17::MemoryErrorInformationHandle" ref="77222805849acd399ba0f8b65e5d127b" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dd/d07/a00811.html#77222805849acd399ba0f8b65e5d127b">SMBIOS_TABLE_TYPE17::MemoryErrorInformationHandle</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="f58b9d29c6fe9d0482312b8e4234101e"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE17::MemoryType" ref="f58b9d29c6fe9d0482312b8e4234101e" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d8/d49/a00979.html#30cd1d7c1f1db9a6e56218ab7f2ad1a1">MEMORY_DEVICE_TYPE</a> <a class="el" href="../../dd/d07/a00811.html#f58b9d29c6fe9d0482312b8e4234101e">SMBIOS_TABLE_TYPE17::MemoryType</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="b7b83ea54ec3c7896244494340c74f4b"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE17::PartNumber" ref="b7b83ea54ec3c7896244494340c74f4b" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d8/d49/a00979.html#bd86e1460ed2b924b45d2fa3c883e6b0">SMBIOS_TABLE_STRING</a> <a class="el" href="../../dd/d07/a00811.html#b7b83ea54ec3c7896244494340c74f4b">SMBIOS_TABLE_TYPE17::PartNumber</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="1060043cdcd46f8b7e794555a9c9792a"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE17::SerialNumber" ref="1060043cdcd46f8b7e794555a9c9792a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d8/d49/a00979.html#bd86e1460ed2b924b45d2fa3c883e6b0">SMBIOS_TABLE_STRING</a> <a class="el" href="../../dd/d07/a00811.html#1060043cdcd46f8b7e794555a9c9792a">SMBIOS_TABLE_TYPE17::SerialNumber</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="fbe97c2bc29966e1e1131238223b716e"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE17::Size" ref="fbe97c2bc29966e1e1131238223b716e" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dd/d07/a00811.html#fbe97c2bc29966e1e1131238223b716e">SMBIOS_TABLE_TYPE17::Size</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="c0e5b5bf1b75c499a18e4d0b3a678593"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE17::Speed" ref="c0e5b5bf1b75c499a18e4d0b3a678593" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dd/d07/a00811.html#c0e5b5bf1b75c499a18e4d0b3a678593">SMBIOS_TABLE_TYPE17::Speed</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="c0d3c07c087b6be1eacf369599956a0f"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE17::TotalWidth" ref="c0d3c07c087b6be1eacf369599956a0f" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dd/d07/a00811.html#c0d3c07c087b6be1eacf369599956a0f">SMBIOS_TABLE_TYPE17::TotalWidth</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="d5e7d68c2cc8093587b71554fd6bf856"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE17::TypeDetail" ref="d5e7d68c2cc8093587b71554fd6bf856" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../dc/de4/a00677.html">MEMORY_DEVICE_TYPE_DETAIL</a> <a class="el" href="../../dd/d07/a00811.html#d5e7d68c2cc8093587b71554fd6bf856">SMBIOS_TABLE_TYPE17::TypeDetail</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
+PXE_ROMID_SIGNATURE. 
 <p>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:21 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:01 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

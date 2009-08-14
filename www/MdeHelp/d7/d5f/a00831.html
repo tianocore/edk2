@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: SMBIOS_TABLE_TYPE35 Struct Reference</title>
+<title>MdePkg[ALL]: SAL_ST_CACHE_COHERENCE_DECRIPTOR Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,29 +21,27 @@
   </div>
 </div>
 <div class="contents">
-<h1>SMBIOS_TABLE_TYPE35 Struct Reference</h1><!-- doxytag: class="SMBIOS_TABLE_TYPE35" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>SAL_ST_CACHE_COHERENCE_DECRIPTOR Struct Reference</h1><!-- doxytag: class="SAL_ST_CACHE_COHERENCE_DECRIPTOR" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../da/db8/a00797.html">SMBIOS_STRUCTURE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d5f/a00831.html#f0920166fef54a23e8b2ae28ea6bd736">Hdr</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d5f/a00831.html#fb2e12814b4e47e4dea100636274f129">Type</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d49/a00979.html#bd86e1460ed2b924b45d2fa3c883e6b0">SMBIOS_TABLE_STRING</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d5f/a00831.html#8f62fc7e3d56ce697b61ba7b3afc6ea1">Description</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Type here should be 4.  <a href="#fb2e12814b4e47e4dea100636274f129"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d5f/a00831.html#f8bf79982a1b94116f2da4ae74fec236">Reserved</a> [3]</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d5f/a00831.html#650e90970cdb95516cf166152b4e8d7a">ManagementDeviceHandle</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d5f/a00831.html#fcb1caac2e710d27dafb8452c430b2d2">NumberOfDomains</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d5f/a00831.html#058e0d6efd160f7a20faa9db88680845">ComponentHandle</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d5f/a00831.html#aa791ca496a0455d789f7a133c14efe5">ThresholdHandle</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d2d/a00815.html">SAL_COHERENCE_DOMAIN_INFO</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d5f/a00831.html#4ea6ac7c923bf4659950fd17d5bec069">DomainInformation</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Management Device Component (Type 35)<p>
-This structure associates a cooling device or environmental probe with structures that define the controlling hardware device and (optionally) the component's thresholds. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="058e0d6efd160f7a20faa9db88680845"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE35::ComponentHandle" ref="058e0d6efd160f7a20faa9db88680845" args="" -->
+Format of Purge Translation Cache Coherence Domain Entry <hr><h2>Field Documentation</h2>
+<a class="anchor" name="4ea6ac7c923bf4659950fd17d5bec069"></a><!-- doxytag: member="SAL_ST_CACHE_COHERENCE_DECRIPTOR::DomainInformation" ref="4ea6ac7c923bf4659950fd17d5bec069" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d7/d5f/a00831.html#058e0d6efd160f7a20faa9db88680845">SMBIOS_TABLE_TYPE35::ComponentHandle</a>          </td>
+          <td class="memname"><a class="el" href="../../d8/d2d/a00815.html">SAL_COHERENCE_DOMAIN_INFO</a>* <a class="el" href="../../d7/d5f/a00831.html#4ea6ac7c923bf4659950fd17d5bec069">SAL_ST_CACHE_COHERENCE_DECRIPTOR::DomainInformation</a>          </td>
         </tr>
       </table>
 </div>
@@ -53,12 +51,12 @@ This structure associates a cooling device or environmental probe with structure
 
 </div>
 </div><p>
-<a class="anchor" name="8f62fc7e3d56ce697b61ba7b3afc6ea1"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE35::Description" ref="8f62fc7e3d56ce697b61ba7b3afc6ea1" args="" -->
+<a class="anchor" name="fcb1caac2e710d27dafb8452c430b2d2"></a><!-- doxytag: member="SAL_ST_CACHE_COHERENCE_DECRIPTOR::NumberOfDomains" ref="fcb1caac2e710d27dafb8452c430b2d2" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d8/d49/a00979.html#bd86e1460ed2b924b45d2fa3c883e6b0">SMBIOS_TABLE_STRING</a> <a class="el" href="../../d7/d5f/a00831.html#8f62fc7e3d56ce697b61ba7b3afc6ea1">SMBIOS_TABLE_TYPE35::Description</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/d5f/a00831.html#fcb1caac2e710d27dafb8452c430b2d2">SAL_ST_CACHE_COHERENCE_DECRIPTOR::NumberOfDomains</a>          </td>
         </tr>
       </table>
 </div>
@@ -68,12 +66,12 @@ This structure associates a cooling device or environmental probe with structure
 
 </div>
 </div><p>
-<a class="anchor" name="f0920166fef54a23e8b2ae28ea6bd736"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE35::Hdr" ref="f0920166fef54a23e8b2ae28ea6bd736" args="" -->
+<a class="anchor" name="f8bf79982a1b94116f2da4ae74fec236"></a><!-- doxytag: member="SAL_ST_CACHE_COHERENCE_DECRIPTOR::Reserved" ref="f8bf79982a1b94116f2da4ae74fec236" args="[3]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../da/db8/a00797.html">SMBIOS_STRUCTURE</a> <a class="el" href="../../d7/d5f/a00831.html#f0920166fef54a23e8b2ae28ea6bd736">SMBIOS_TABLE_TYPE35::Hdr</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d7/d5f/a00831.html#f8bf79982a1b94116f2da4ae74fec236">SAL_ST_CACHE_COHERENCE_DECRIPTOR::Reserved</a>[3]          </td>
         </tr>
       </table>
 </div>
@@ -83,38 +81,25 @@ This structure associates a cooling device or environmental probe with structure
 
 </div>
 </div><p>
-<a class="anchor" name="650e90970cdb95516cf166152b4e8d7a"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE35::ManagementDeviceHandle" ref="650e90970cdb95516cf166152b4e8d7a" args="" -->
+<a class="anchor" name="fb2e12814b4e47e4dea100636274f129"></a><!-- doxytag: member="SAL_ST_CACHE_COHERENCE_DECRIPTOR::Type" ref="fb2e12814b4e47e4dea100636274f129" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d7/d5f/a00831.html#650e90970cdb95516cf166152b4e8d7a">SMBIOS_TABLE_TYPE35::ManagementDeviceHandle</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d7/d5f/a00831.html#fb2e12814b4e47e4dea100636274f129">SAL_ST_CACHE_COHERENCE_DECRIPTOR::Type</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<a class="anchor" name="aa791ca496a0455d789f7a133c14efe5"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE35::ThresholdHandle" ref="aa791ca496a0455d789f7a133c14efe5" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d7/d5f/a00831.html#aa791ca496a0455d789f7a133c14efe5">SMBIOS_TABLE_TYPE35::ThresholdHandle</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
+Type here should be 4. 
 <p>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:22 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:02 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

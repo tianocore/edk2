@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: PE_COFF_LOADER_IMAGE_CONTEXT Struct Reference</title>
+<title>MdePkg[ALL]: PAL_CACHE_CHECK_INFO Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,388 +21,447 @@
   </div>
 </div>
 <div class="contents">
-<h1>PE_COFF_LOADER_IMAGE_CONTEXT Struct Reference</h1><!-- doxytag: class="PE_COFF_LOADER_IMAGE_CONTEXT" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>PAL_CACHE_CHECK_INFO Struct Reference</h1><!-- doxytag: class="PAL_CACHE_CHECK_INFO" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/dca/a00954.html#8557e721a169e9f286709e9b55a64559">PHYSICAL_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#ed3fea3ea50348a15cab3c38e3519991">ImageAddress</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#1766701280508acab5d0686f62ea81e9">Operation</a>:4</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#9610f6ba291d41b5d2b397df75ada0f2">ImageSize</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#0b1a88f88bdd4d2b36b409d33e0081f9">FailedCacheLevel</a>:2</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/dca/a00954.html#8557e721a169e9f286709e9b55a64559">PHYSICAL_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#1152a2d8bc284cea77a4eb4a09066a8f">DestinationAddress</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#b898a2b07d23f42a35fc1dfdad3c2464">Reserved1</a>:2</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/dca/a00954.html#8557e721a169e9f286709e9b55a64559">PHYSICAL_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#b46cadb242cc292471681ba8b8667c6f">EntryPoint</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#048e8091b3cef1b7e1ce83fce0fd69c5">FailedInDataPart</a>:1</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/d89/a01032.html#5e79e54d0a98d4ca1edd0dd3b9427443">PE_COFF_LOADER_READ_FILE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#5f554754244fe5676c79a020a9b84152">ImageRead</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Bit8, Failure located in the data part of the cache line.  <a href="#048e8091b3cef1b7e1ce83fce0fd69c5"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#c56f87c94f7dae721e6635ea94157297">FailedInTagPart</a>:1</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#1f40afa61eb3d8becceda4880f6b4727">Handle</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Bit9, Failure located in the tag part of the cache line.  <a href="#c56f87c94f7dae721e6635ea94157297"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#ebe94b17d9b91849258910cbc06cff2f">FailedInDataCache</a>:1</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#ccdb90395a75c5a53f2626318a1f2ad2">FixupData</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Bit10, Failure located in the data cache.  <a href="#ebe94b17d9b91849258910cbc06cff2f"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#2b04d5096fcfce1692711d392ecbe5d1">FailedInInsCache</a>:1</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#d59cf9e7af15c0468fa49f082d56cf69">SectionAlignment</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#f6a79847980fadd68d9bce0d73c9d11e">Mesi</a>:3</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#cc14f49b222d213bcb0d3077a75d03b3">PeCoffHeaderOffset</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#fea2aa50dfef4e4b1743f1eb15f088fc">MesiIsValid</a>:1</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#3e3274e6653d861a0178185f5f63de6e">DebugDirectoryEntryRva</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#17eb09807723054ba4137eb7b2d39e2f">FailedWay</a>:5</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#d0bcdb45047cf537529f27cbcbd2999d">CodeView</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#b8d3e5398a80d97772d21454c7d1a159">WayIndexIsValid</a>:1</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#e0b2c84a6639efd67301b9355805329f">PdbPointer</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#916dbdce1a02a668ba1af15133e82780">Reserved2</a>:1</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#0bad35ec5ef92db7d83f4946232878e1">SizeOfHeaders</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#03ea379310a73e019af118de40c5e8a7">MultipleBitsError</a>:1</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#1e196327b8f64ccbe4c61a74ff1ad66f">ImageCodeMemoryType</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#e8462bc64f9f9d1455d6fd34517e8b51">Reserved3</a>:8</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#c396f4d302172647cd60187bb4021035">ImageDataMemoryType</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#a7453993b005f0d28ad965a5a76ec8e3">IndexOfCacheLineError</a>:20</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#46ce894f0cb4ce39d777fe296e5d51ca">ImageError</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#6c1a14c0a31f800e11b6cdf136bbca5b">Reserved4</a>:2</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#9369cc84b880f4c3150342f4a99ddf30">FixupDataSize</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#6b9ca832c277a06a0c541bec4885fa8c">InstructionSet</a>:1</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#87156e2ad912c1caa5b187564df97f79">Machine</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#dc28eed97debfc126f98a4f4399bb688">InstructionSetIsValid</a>:1</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#b7ec7777f0aa17271fc54589c02d28af">ImageType</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#3c2196023cfd3b80743e2639de0babc1">PrivilegeLevel</a>:2</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#2c08a4bf884840e7034f18922721b176">RelocationsStripped</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#cda004e1b64fe9266536baba2c3a75ff">PrivilegeLevelIsValide</a>:1</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#1f39b07650620139f5aa2f57785c39a9">IsTeImage</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#d92509aa9b43bd388fa71ce888a2b24e">McCorrected</a>:1</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/dca/a00954.html#8557e721a169e9f286709e9b55a64559">PHYSICAL_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#e7171f1598b6f348743b3aa0b11915b5">HiiResourceData</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#af5d81aeb872bb596ec21a6e7716102f">TargetAddressIsValid</a>:1</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#109c675a6c96c7808cce8047db49573f">RequesterIdentifier</a>:1</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#6785562bd06cc91a8ad84642807e6988">ResponserIdentifier</a>:1</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d85/a00736.html#d97f90dc5c8c41d276d4f1334dab5ed0">PreciseInsPointer</a>:1</td></tr>
 
 </table>
-<hr><a name="_details"></a><h2>Detailed Description</h2>
-Context structure used while PE/COFF image is being loaded and relocated <hr><h2>Field Documentation</h2>
-<a class="anchor" name="d0bcdb45047cf537529f27cbcbd2999d"></a><!-- doxytag: member="PE_COFF_LOADER_IMAGE_CONTEXT::CodeView" ref="d0bcdb45047cf537529f27cbcbd2999d" args="" -->
+<hr><h2>Field Documentation</h2>
+<a class="anchor" name="0b1a88f88bdd4d2b36b409d33e0081f9"></a><!-- doxytag: member="PAL_CACHE_CHECK_INFO::FailedCacheLevel" ref="0b1a88f88bdd4d2b36b409d33e0081f9" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">VOID* <a class="el" href="../../dc/d85/a00736.html#d0bcdb45047cf537529f27cbcbd2999d">PE_COFF_LOADER_IMAGE_CONTEXT::CodeView</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dc/d85/a00736.html#0b1a88f88bdd4d2b36b409d33e0081f9">PAL_CACHE_CHECK_INFO::FailedCacheLevel</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Set by <a class="el" href="../../df/d89/a01032.html#2003fb97c41baf50162901cbe9e0f988">PeCoffLoaderLoadImage()</a> to CodeView area of the PE/COFF Debug directory. 
+Bit5:4 Level of cache where the error occurred. A value of 0 indicates the first level of cache. 
 </div>
 </div><p>
-<a class="anchor" name="3e3274e6653d861a0178185f5f63de6e"></a><!-- doxytag: member="PE_COFF_LOADER_IMAGE_CONTEXT::DebugDirectoryEntryRva" ref="3e3274e6653d861a0178185f5f63de6e" args="" -->
+<a class="anchor" name="ebe94b17d9b91849258910cbc06cff2f"></a><!-- doxytag: member="PAL_CACHE_CHECK_INFO::FailedInDataCache" ref="ebe94b17d9b91849258910cbc06cff2f" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../dc/d85/a00736.html#3e3274e6653d861a0178185f5f63de6e">PE_COFF_LOADER_IMAGE_CONTEXT::DebugDirectoryEntryRva</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dc/d85/a00736.html#ebe94b17d9b91849258910cbc06cff2f">PAL_CACHE_CHECK_INFO::FailedInDataCache</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Set by <a class="el" href="../../df/d89/a01032.html#b5c5bcd17794b6de4bb93a8eb2129b94">PeCoffLoaderGetImageInfo()</a> to the Relative Virtual Address of the debug directory if it exists in the image 
+Bit10, Failure located in the data cache. 
+<p>
+
 </div>
 </div><p>
-<a class="anchor" name="1152a2d8bc284cea77a4eb4a09066a8f"></a><!-- doxytag: member="PE_COFF_LOADER_IMAGE_CONTEXT::DestinationAddress" ref="1152a2d8bc284cea77a4eb4a09066a8f" args="" -->
+<a class="anchor" name="048e8091b3cef1b7e1ce83fce0fd69c5"></a><!-- doxytag: member="PAL_CACHE_CHECK_INFO::FailedInDataPart" ref="048e8091b3cef1b7e1ce83fce0fd69c5" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d3/dca/a00954.html#8557e721a169e9f286709e9b55a64559">PHYSICAL_ADDRESS</a> <a class="el" href="../../dc/d85/a00736.html#1152a2d8bc284cea77a4eb4a09066a8f">PE_COFF_LOADER_IMAGE_CONTEXT::DestinationAddress</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dc/d85/a00736.html#048e8091b3cef1b7e1ce83fce0fd69c5">PAL_CACHE_CHECK_INFO::FailedInDataPart</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Is set to zero by <a class="el" href="../../df/d89/a01032.html#b5c5bcd17794b6de4bb93a8eb2129b94">PeCoffLoaderGetImageInfo()</a>. If DestinationAddress is non zero, <a class="el" href="../../df/d89/a01032.html#2a50888c6100c2d1374d71668a59303f">PeCoffLoaderRelocateImage()</a> will relocate the image using this base address. If the DestinationAddress is zero, the ImageAddress will be used as the base address of relocation. 
+Bit8, Failure located in the data part of the cache line. 
+<p>
+
 </div>
 </div><p>
-<a class="anchor" name="b46cadb242cc292471681ba8b8667c6f"></a><!-- doxytag: member="PE_COFF_LOADER_IMAGE_CONTEXT::EntryPoint" ref="b46cadb242cc292471681ba8b8667c6f" args="" -->
+<a class="anchor" name="2b04d5096fcfce1692711d392ecbe5d1"></a><!-- doxytag: member="PAL_CACHE_CHECK_INFO::FailedInInsCache" ref="2b04d5096fcfce1692711d392ecbe5d1" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d3/dca/a00954.html#8557e721a169e9f286709e9b55a64559">PHYSICAL_ADDRESS</a> <a class="el" href="../../dc/d85/a00736.html#b46cadb242cc292471681ba8b8667c6f">PE_COFF_LOADER_IMAGE_CONTEXT::EntryPoint</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dc/d85/a00736.html#2b04d5096fcfce1692711d392ecbe5d1">PAL_CACHE_CHECK_INFO::FailedInInsCache</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-<a class="el" href="../../df/d89/a01032.html#2003fb97c41baf50162901cbe9e0f988">PeCoffLoaderLoadImage()</a> sets EntryPoint to to the entry point of the PE/COFF image. 
+Bit11, Failure located in the instruction cache. 
 </div>
 </div><p>
-<a class="anchor" name="ccdb90395a75c5a53f2626318a1f2ad2"></a><!-- doxytag: member="PE_COFF_LOADER_IMAGE_CONTEXT::FixupData" ref="ccdb90395a75c5a53f2626318a1f2ad2" args="" -->
+<a class="anchor" name="c56f87c94f7dae721e6635ea94157297"></a><!-- doxytag: member="PAL_CACHE_CHECK_INFO::FailedInTagPart" ref="c56f87c94f7dae721e6635ea94157297" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">VOID* <a class="el" href="../../dc/d85/a00736.html#ccdb90395a75c5a53f2626318a1f2ad2">PE_COFF_LOADER_IMAGE_CONTEXT::FixupData</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dc/d85/a00736.html#c56f87c94f7dae721e6635ea94157297">PAL_CACHE_CHECK_INFO::FailedInTagPart</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Caller allocated buffer of size FixupDataSize that can be optionally allocated prior to calling <a class="el" href="../../df/d89/a01032.html#2a50888c6100c2d1374d71668a59303f">PeCoffLoaderRelocateImage()</a>. This buffer is filled with the information used to fix up the image. The fixups have been applied to the image and this entry is just for information. 
+Bit9, Failure located in the tag part of the cache line. 
+<p>
+
 </div>
 </div><p>
-<a class="anchor" name="9369cc84b880f4c3150342f4a99ddf30"></a><!-- doxytag: member="PE_COFF_LOADER_IMAGE_CONTEXT::FixupDataSize" ref="9369cc84b880f4c3150342f4a99ddf30" args="" -->
+<a class="anchor" name="17eb09807723054ba4137eb7b2d39e2f"></a><!-- doxytag: member="PAL_CACHE_CHECK_INFO::FailedWay" ref="17eb09807723054ba4137eb7b2d39e2f" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> <a class="el" href="../../dc/d85/a00736.html#9369cc84b880f4c3150342f4a99ddf30">PE_COFF_LOADER_IMAGE_CONTEXT::FixupDataSize</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dc/d85/a00736.html#17eb09807723054ba4137eb7b2d39e2f">PAL_CACHE_CHECK_INFO::FailedWay</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Set by <a class="el" href="../../df/d89/a01032.html#2003fb97c41baf50162901cbe9e0f988">PeCoffLoaderLoadImage()</a> to indicate the size of FixupData that the caller must allocate before calling <a class="el" href="../../df/d89/a01032.html#2a50888c6100c2d1374d71668a59303f">PeCoffLoaderRelocateImage()</a> 
+Bit20:16, Failure located in the way of the cache indicated by this value. 
 </div>
 </div><p>
-<a class="anchor" name="1f40afa61eb3d8becceda4880f6b4727"></a><!-- doxytag: member="PE_COFF_LOADER_IMAGE_CONTEXT::Handle" ref="1f40afa61eb3d8becceda4880f6b4727" args="" -->
+<a class="anchor" name="a7453993b005f0d28ad965a5a76ec8e3"></a><!-- doxytag: member="PAL_CACHE_CHECK_INFO::IndexOfCacheLineError" ref="a7453993b005f0d28ad965a5a76ec8e3" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">VOID* <a class="el" href="../../dc/d85/a00736.html#1f40afa61eb3d8becceda4880f6b4727">PE_COFF_LOADER_IMAGE_CONTEXT::Handle</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dc/d85/a00736.html#a7453993b005f0d28ad965a5a76ec8e3">PAL_CACHE_CHECK_INFO::IndexOfCacheLineError</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Used as the FileHandle passed into the ImageRead function when it's called. 
+Bit51:32, Index of the cache line where the error occurred. 
 </div>
 </div><p>
-<a class="anchor" name="e7171f1598b6f348743b3aa0b11915b5"></a><!-- doxytag: member="PE_COFF_LOADER_IMAGE_CONTEXT::HiiResourceData" ref="e7171f1598b6f348743b3aa0b11915b5" args="" -->
+<a class="anchor" name="6b9ca832c277a06a0c541bec4885fa8c"></a><!-- doxytag: member="PAL_CACHE_CHECK_INFO::InstructionSet" ref="6b9ca832c277a06a0c541bec4885fa8c" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d3/dca/a00954.html#8557e721a169e9f286709e9b55a64559">PHYSICAL_ADDRESS</a> <a class="el" href="../../dc/d85/a00736.html#e7171f1598b6f348743b3aa0b11915b5">PE_COFF_LOADER_IMAGE_CONTEXT::HiiResourceData</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dc/d85/a00736.html#6b9ca832c277a06a0c541bec4885fa8c">PAL_CACHE_CHECK_INFO::InstructionSet</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Set by <a class="el" href="../../df/d89/a01032.html#2003fb97c41baf50162901cbe9e0f988">PeCoffLoaderLoadImage()</a> to the HII resource offset if the image contains a custom PE/COFF resource with the type 'HII'; otherwise, the entry remains to be 0. 
+Bit54, Instruction set. If this value is set to zero, the instruction that generated the machine check was an Intel Itanium instruction. If this bit is set to one, the instruction that generated the machine check was IA-32 instruction. 
 </div>
 </div><p>
-<a class="anchor" name="ed3fea3ea50348a15cab3c38e3519991"></a><!-- doxytag: member="PE_COFF_LOADER_IMAGE_CONTEXT::ImageAddress" ref="ed3fea3ea50348a15cab3c38e3519991" args="" -->
+<a class="anchor" name="dc28eed97debfc126f98a4f4399bb688"></a><!-- doxytag: member="PAL_CACHE_CHECK_INFO::InstructionSetIsValid" ref="dc28eed97debfc126f98a4f4399bb688" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d3/dca/a00954.html#8557e721a169e9f286709e9b55a64559">PHYSICAL_ADDRESS</a> <a class="el" href="../../dc/d85/a00736.html#ed3fea3ea50348a15cab3c38e3519991">PE_COFF_LOADER_IMAGE_CONTEXT::ImageAddress</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dc/d85/a00736.html#dc28eed97debfc126f98a4f4399bb688">PAL_CACHE_CHECK_INFO::InstructionSetIsValid</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Is set by <a class="el" href="../../df/d89/a01032.html#b5c5bcd17794b6de4bb93a8eb2129b94">PeCoffLoaderGetImageInfo()</a> to the ImageBase in the PE/COFF header 
+Bit55, The is field in the cache_check parameter is valid. 
 </div>
 </div><p>
-<a class="anchor" name="1e196327b8f64ccbe4c61a74ff1ad66f"></a><!-- doxytag: member="PE_COFF_LOADER_IMAGE_CONTEXT::ImageCodeMemoryType" ref="1e196327b8f64ccbe4c61a74ff1ad66f" args="" -->
+<a class="anchor" name="d92509aa9b43bd388fa71ce888a2b24e"></a><!-- doxytag: member="PAL_CACHE_CHECK_INFO::McCorrected" ref="d92509aa9b43bd388fa71ce888a2b24e" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../dc/d85/a00736.html#1e196327b8f64ccbe4c61a74ff1ad66f">PE_COFF_LOADER_IMAGE_CONTEXT::ImageCodeMemoryType</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dc/d85/a00736.html#d92509aa9b43bd388fa71ce888a2b24e">PAL_CACHE_CHECK_INFO::McCorrected</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Not used by this library class. Other library classes that layer on top of this library class fill in this value as part of their GetImageInfo call. This allows the caller of the library to know what type of memory needs to be allocated to load and relocate the image. 
+Bit59, Machine check corrected: This bit is set to one to indicate that the machine check has been corrected. 
 </div>
 </div><p>
-<a class="anchor" name="c396f4d302172647cd60187bb4021035"></a><!-- doxytag: member="PE_COFF_LOADER_IMAGE_CONTEXT::ImageDataMemoryType" ref="c396f4d302172647cd60187bb4021035" args="" -->
+<a class="anchor" name="f6a79847980fadd68d9bce0d73c9d11e"></a><!-- doxytag: member="PAL_CACHE_CHECK_INFO::Mesi" ref="f6a79847980fadd68d9bce0d73c9d11e" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../dc/d85/a00736.html#c396f4d302172647cd60187bb4021035">PE_COFF_LOADER_IMAGE_CONTEXT::ImageDataMemoryType</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dc/d85/a00736.html#f6a79847980fadd68d9bce0d73c9d11e">PAL_CACHE_CHECK_INFO::Mesi</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Not used by this library class. Other library classes that layer on top of this library class fill in this value as part of their GetImageInfo call. This allows the caller of the library to know what type of memory needs to be allocated to load and relocate the image 
+Bit14:12, 0 - cache line is invalid. 1 - cache line is held shared. 2 - cache line is held exclusive. 3 - cache line is modified. All other values are reserved. 
 </div>
 </div><p>
-<a class="anchor" name="46ce894f0cb4ce39d777fe296e5d51ca"></a><!-- doxytag: member="PE_COFF_LOADER_IMAGE_CONTEXT::ImageError" ref="46ce894f0cb4ce39d777fe296e5d51ca" args="" -->
+<a class="anchor" name="fea2aa50dfef4e4b1743f1eb15f088fc"></a><!-- doxytag: member="PAL_CACHE_CHECK_INFO::MesiIsValid" ref="fea2aa50dfef4e4b1743f1eb15f088fc" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../dc/d85/a00736.html#46ce894f0cb4ce39d777fe296e5d51ca">PE_COFF_LOADER_IMAGE_CONTEXT::ImageError</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dc/d85/a00736.html#fea2aa50dfef4e4b1743f1eb15f088fc">PAL_CACHE_CHECK_INFO::MesiIsValid</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Set by any of the library functions if they encounter an error. 
+Bit15, The mesi field in the cache_check parameter is valid. 
 </div>
 </div><p>
-<a class="anchor" name="5f554754244fe5676c79a020a9b84152"></a><!-- doxytag: member="PE_COFF_LOADER_IMAGE_CONTEXT::ImageRead" ref="5f554754244fe5676c79a020a9b84152" args="" -->
+<a class="anchor" name="03ea379310a73e019af118de40c5e8a7"></a><!-- doxytag: member="PAL_CACHE_CHECK_INFO::MultipleBitsError" ref="03ea379310a73e019af118de40c5e8a7" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../df/d89/a01032.html#5e79e54d0a98d4ca1edd0dd3b9427443">PE_COFF_LOADER_READ_FILE</a> <a class="el" href="../../dc/d85/a00736.html#5f554754244fe5676c79a020a9b84152">PE_COFF_LOADER_IMAGE_CONTEXT::ImageRead</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dc/d85/a00736.html#03ea379310a73e019af118de40c5e8a7">PAL_CACHE_CHECK_INFO::MultipleBitsError</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Passed in by the caller to <a class="el" href="../../df/d89/a01032.html#b5c5bcd17794b6de4bb93a8eb2129b94">PeCoffLoaderGetImageInfo()</a> and <a class="el" href="../../df/d89/a01032.html#2003fb97c41baf50162901cbe9e0f988">PeCoffLoaderLoadImage()</a> to abstract accessing the image from the library. 
+Bit23, A multiple-bit error was detected, and data was poisoned for the corresponding cache line during castout. 
 </div>
 </div><p>
-<a class="anchor" name="9610f6ba291d41b5d2b397df75ada0f2"></a><!-- doxytag: member="PE_COFF_LOADER_IMAGE_CONTEXT::ImageSize" ref="9610f6ba291d41b5d2b397df75ada0f2" args="" -->
+<a class="anchor" name="1766701280508acab5d0686f62ea81e9"></a><!-- doxytag: member="PAL_CACHE_CHECK_INFO::Operation" ref="1766701280508acab5d0686f62ea81e9" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dc/d85/a00736.html#9610f6ba291d41b5d2b397df75ada0f2">PE_COFF_LOADER_IMAGE_CONTEXT::ImageSize</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dc/d85/a00736.html#1766701280508acab5d0686f62ea81e9">PAL_CACHE_CHECK_INFO::Operation</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Is set by <a class="el" href="../../df/d89/a01032.html#b5c5bcd17794b6de4bb93a8eb2129b94">PeCoffLoaderGetImageInfo()</a> to the SizeOfImage in the PE/COFF header. Image size includes the size of Debug Entry if it is present. 
+Bit3:0, Type of cache operation that caused the machine check: 0 - unknown or internal error 1 - load 2 - store 3 - instruction fetch or instruction prefetch 4 - data prefetch (both hardware and software) 5 - snoop (coherency check) 6 - cast out (explicit or implicit write-back of a cache line) 7 - move in (cache line fill) 
 </div>
 </div><p>
-<a class="anchor" name="b7ec7777f0aa17271fc54589c02d28af"></a><!-- doxytag: member="PE_COFF_LOADER_IMAGE_CONTEXT::ImageType" ref="b7ec7777f0aa17271fc54589c02d28af" args="" -->
+<a class="anchor" name="d97f90dc5c8c41d276d4f1334dab5ed0"></a><!-- doxytag: member="PAL_CACHE_CHECK_INFO::PreciseInsPointer" ref="d97f90dc5c8c41d276d4f1334dab5ed0" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dc/d85/a00736.html#b7ec7777f0aa17271fc54589c02d28af">PE_COFF_LOADER_IMAGE_CONTEXT::ImageType</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dc/d85/a00736.html#d97f90dc5c8c41d276d4f1334dab5ed0">PAL_CACHE_CHECK_INFO::PreciseInsPointer</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Set by <a class="el" href="../../df/d89/a01032.html#b5c5bcd17794b6de4bb93a8eb2129b94">PeCoffLoaderGetImageInfo()</a> to the subsystem type stored in the PE/COFF header. 
+Bit63, Precise instruction pointer. This bit is set to one to indicate that a valid precise instruction pointer has been logged. 
 </div>
 </div><p>
-<a class="anchor" name="1f39b07650620139f5aa2f57785c39a9"></a><!-- doxytag: member="PE_COFF_LOADER_IMAGE_CONTEXT::IsTeImage" ref="1f39b07650620139f5aa2f57785c39a9" args="" -->
+<a class="anchor" name="3c2196023cfd3b80743e2639de0babc1"></a><!-- doxytag: member="PAL_CACHE_CHECK_INFO::PrivilegeLevel" ref="3c2196023cfd3b80743e2639de0babc1" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../dc/d85/a00736.html#1f39b07650620139f5aa2f57785c39a9">PE_COFF_LOADER_IMAGE_CONTEXT::IsTeImage</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dc/d85/a00736.html#3c2196023cfd3b80743e2639de0babc1">PAL_CACHE_CHECK_INFO::PrivilegeLevel</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Set by <a class="el" href="../../df/d89/a01032.html#b5c5bcd17794b6de4bb93a8eb2129b94">PeCoffLoaderGetImageInfo()</a> to TRUE if the image is a TE image. For a definition of the TE Image format, see the Platform Initialization Pre-EFI Initialization Core Interface Specification. 
+Bit57:56, Privilege level. The privilege level of the instruction bundle responsible for generating the machine check. 
 </div>
 </div><p>
-<a class="anchor" name="87156e2ad912c1caa5b187564df97f79"></a><!-- doxytag: member="PE_COFF_LOADER_IMAGE_CONTEXT::Machine" ref="87156e2ad912c1caa5b187564df97f79" args="" -->
+<a class="anchor" name="cda004e1b64fe9266536baba2c3a75ff"></a><!-- doxytag: member="PAL_CACHE_CHECK_INFO::PrivilegeLevelIsValide" ref="cda004e1b64fe9266536baba2c3a75ff" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dc/d85/a00736.html#87156e2ad912c1caa5b187564df97f79">PE_COFF_LOADER_IMAGE_CONTEXT::Machine</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dc/d85/a00736.html#cda004e1b64fe9266536baba2c3a75ff">PAL_CACHE_CHECK_INFO::PrivilegeLevelIsValide</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Set by <a class="el" href="../../df/d89/a01032.html#b5c5bcd17794b6de4bb93a8eb2129b94">PeCoffLoaderGetImageInfo()</a> to the machine type stored in the PE/COFF header 
+Bit58, The pl field of the cache_check parameter is valid. 
 </div>
 </div><p>
-<a class="anchor" name="e0b2c84a6639efd67301b9355805329f"></a><!-- doxytag: member="PE_COFF_LOADER_IMAGE_CONTEXT::PdbPointer" ref="e0b2c84a6639efd67301b9355805329f" args="" -->
+<a class="anchor" name="109c675a6c96c7808cce8047db49573f"></a><!-- doxytag: member="PAL_CACHE_CHECK_INFO::RequesterIdentifier" ref="109c675a6c96c7808cce8047db49573f" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a>* <a class="el" href="../../dc/d85/a00736.html#e0b2c84a6639efd67301b9355805329f">PE_COFF_LOADER_IMAGE_CONTEXT::PdbPointer</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dc/d85/a00736.html#109c675a6c96c7808cce8047db49573f">PAL_CACHE_CHECK_INFO::RequesterIdentifier</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Set by <a class="el" href="../../df/d89/a01032.html#2003fb97c41baf50162901cbe9e0f988">PeCoffLoaderLoadImage()</a> to point to the PDB entry contained in the CodeView area. The PdbPointer points to the filename of the PDB file used for source-level debug of the image by a debugger. 
+Bit61, Requester identifier: This bit is set to one to indicate that a valid requester identifier has been logged. 
 </div>
 </div><p>
-<a class="anchor" name="cc14f49b222d213bcb0d3077a75d03b3"></a><!-- doxytag: member="PE_COFF_LOADER_IMAGE_CONTEXT::PeCoffHeaderOffset" ref="cc14f49b222d213bcb0d3077a75d03b3" args="" -->
+<a class="anchor" name="b898a2b07d23f42a35fc1dfdad3c2464"></a><!-- doxytag: member="PAL_CACHE_CHECK_INFO::Reserved1" ref="b898a2b07d23f42a35fc1dfdad3c2464" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../dc/d85/a00736.html#cc14f49b222d213bcb0d3077a75d03b3">PE_COFF_LOADER_IMAGE_CONTEXT::PeCoffHeaderOffset</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dc/d85/a00736.html#b898a2b07d23f42a35fc1dfdad3c2464">PAL_CACHE_CHECK_INFO::Reserved1</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Set by <a class="el" href="../../df/d89/a01032.html#b5c5bcd17794b6de4bb93a8eb2129b94">PeCoffLoaderGetImageInfo()</a> to offset to the PE/COFF header. If the PE/COFF image does not start with a DOS header, this value is zero; otherwise, it's the offset to the PE/COFF header. 
+
 </div>
 </div><p>
-<a class="anchor" name="2c08a4bf884840e7034f18922721b176"></a><!-- doxytag: member="PE_COFF_LOADER_IMAGE_CONTEXT::RelocationsStripped" ref="2c08a4bf884840e7034f18922721b176" args="" -->
+<a class="anchor" name="916dbdce1a02a668ba1af15133e82780"></a><!-- doxytag: member="PAL_CACHE_CHECK_INFO::Reserved2" ref="916dbdce1a02a668ba1af15133e82780" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../dc/d85/a00736.html#2c08a4bf884840e7034f18922721b176">PE_COFF_LOADER_IMAGE_CONTEXT::RelocationsStripped</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dc/d85/a00736.html#916dbdce1a02a668ba1af15133e82780">PAL_CACHE_CHECK_INFO::Reserved2</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Set by <a class="el" href="../../df/d89/a01032.html#b5c5bcd17794b6de4bb93a8eb2129b94">PeCoffLoaderGetImageInfo()</a> to TRUE if the PE/COFF image does not contain relocation information. 
+
 </div>
 </div><p>
-<a class="anchor" name="d59cf9e7af15c0468fa49f082d56cf69"></a><!-- doxytag: member="PE_COFF_LOADER_IMAGE_CONTEXT::SectionAlignment" ref="d59cf9e7af15c0468fa49f082d56cf69" args="" -->
+<a class="anchor" name="e8462bc64f9f9d1455d6fd34517e8b51"></a><!-- doxytag: member="PAL_CACHE_CHECK_INFO::Reserved3" ref="e8462bc64f9f9d1455d6fd34517e8b51" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../dc/d85/a00736.html#d59cf9e7af15c0468fa49f082d56cf69">PE_COFF_LOADER_IMAGE_CONTEXT::SectionAlignment</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dc/d85/a00736.html#e8462bc64f9f9d1455d6fd34517e8b51">PAL_CACHE_CHECK_INFO::Reserved3</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Is set by <a class="el" href="../../df/d89/a01032.html#b5c5bcd17794b6de4bb93a8eb2129b94">PeCoffLoaderGetImageInfo()</a> to the Section Alignment in the PE/COFF header If the image is a TE image, then this field is set to 0. 
+
 </div>
 </div><p>
-<a class="anchor" name="0bad35ec5ef92db7d83f4946232878e1"></a><!-- doxytag: member="PE_COFF_LOADER_IMAGE_CONTEXT::SizeOfHeaders" ref="0bad35ec5ef92db7d83f4946232878e1" args="" -->
+<a class="anchor" name="6c1a14c0a31f800e11b6cdf136bbca5b"></a><!-- doxytag: member="PAL_CACHE_CHECK_INFO::Reserved4" ref="6c1a14c0a31f800e11b6cdf136bbca5b" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> <a class="el" href="../../dc/d85/a00736.html#0bad35ec5ef92db7d83f4946232878e1">PE_COFF_LOADER_IMAGE_CONTEXT::SizeOfHeaders</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dc/d85/a00736.html#6c1a14c0a31f800e11b6cdf136bbca5b">PAL_CACHE_CHECK_INFO::Reserved4</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Is set by <a class="el" href="../../df/d89/a01032.html#b5c5bcd17794b6de4bb93a8eb2129b94">PeCoffLoaderGetImageInfo()</a> to the Section Alignment in the PE/COFF header. 
+
+</div>
+</div><p>
+<a class="anchor" name="6785562bd06cc91a8ad84642807e6988"></a><!-- doxytag: member="PAL_CACHE_CHECK_INFO::ResponserIdentifier" ref="6785562bd06cc91a8ad84642807e6988" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dc/d85/a00736.html#6785562bd06cc91a8ad84642807e6988">PAL_CACHE_CHECK_INFO::ResponserIdentifier</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Bit62, Responder identifier: This bit is set to one to indicate that a valid responder identifier has been logged. 
+</div>
+</div><p>
+<a class="anchor" name="af5d81aeb872bb596ec21a6e7716102f"></a><!-- doxytag: member="PAL_CACHE_CHECK_INFO::TargetAddressIsValid" ref="af5d81aeb872bb596ec21a6e7716102f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dc/d85/a00736.html#af5d81aeb872bb596ec21a6e7716102f">PAL_CACHE_CHECK_INFO::TargetAddressIsValid</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Bit60, Target address is valid: This bit is set to one to indicate that a valid target address has been logged. 
+</div>
+</div><p>
+<a class="anchor" name="b8d3e5398a80d97772d21454c7d1a159"></a><!-- doxytag: member="PAL_CACHE_CHECK_INFO::WayIndexIsValid" ref="b8d3e5398a80d97772d21454c7d1a159" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dc/d85/a00736.html#b8d3e5398a80d97772d21454c7d1a159">PAL_CACHE_CHECK_INFO::WayIndexIsValid</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Bit21, The way and index field in the cache_check parameter is valid. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:20 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:55 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

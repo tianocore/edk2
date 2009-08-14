@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Protocol/LoadFile2.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Ppi/Security2.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,126 +21,102 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Protocol/LoadFile2.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Ppi/Security2.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/de5/a00209.html">_EFI_LOAD_FILE2_PROTOCOL</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d21/a00240.html">_EFI_PEI_SECURITY2_PPI</a></td></tr>
 
 <tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db2/a01143.html#04f965b925ce9b94fa3d2b189741c08f">EFI_LOAD_FILE2_PROTOCOL_GUID</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db2/a01143.html#bdd1dc619c7afdb0ba5a389134aa7715">LOAD_FILE2_PROTOCOL</a>&nbsp;&nbsp;&nbsp;EFI_LOAD_FILE2_PROTOCOL_GUID</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db2/a01143.html#53cdbd738e7c97c7e001adb98d26a3a7">EFI_PEI_SECURITY2_PPI_GUID</a>&nbsp;&nbsp;&nbsp;{ 0xdcd0be23, 0x9586, 0x40f4, { 0xb6, 0x43, 0x6, 0x52, 0x2c, 0xed, 0x4e, 0xde } }</td></tr>
 
 <tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
-<a class="el" href="../../d3/de5/a00209.html">_EFI_LOAD_FILE2_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db2/a01143.html#69558cad83427328aa264197622f2580">EFI_LOAD_FILE2_PROTOCOL</a></td></tr>
+<a class="el" href="../../d9/d21/a00240.html">_EFI_PEI_SECURITY2_PPI</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db2/a01143.html#3a006d2cd413b3e82379fa30b5fea6ed">EFI_PEI_SECURITY2_PPI</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db2/a01143.html#7b0ef37ab11973cb482288aa6b4bd14b">EFI_LOAD_FILE2</a> )(IN <a class="el" href="../../d3/de5/a00209.html">EFI_LOAD_FILE2_PROTOCOL</a> *This, IN <a class="el" href="../../d9/de6/a00404.html">EFI_DEVICE_PATH_PROTOCOL</a> *FilePath, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> BootPolicy, IN OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *BufferSize, IN VOID *Buffer)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db2/a01143.html#5ad86bfecf7c5f00d536db580feb4f35">EFI_PEI_SECURITY_AUTHENTICATION_STATE</a> )(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../d9/d21/a00240.html">EFI_PEI_SECURITY2_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> AuthenticationStatus, IN <a class="el" href="../../d0/d39/a01112.html#a91cb3539cfb2742ee94c7bd0ab1e702">EFI_PEI_FV_HANDLE</a> FvHandle, IN <a class="el" href="../../d0/d39/a01112.html#a91cb3539cfb2742ee94c7bd0ab1e702">EFI_PEI_FV_HANDLE</a> FileHandle, IN OUT <a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> *DeferExecution)</td></tr>
 
 <tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db2/a01143.html#f6edd11cd4d74998d7ae60b80a5f9371">gEfiLoadFile2ProtocolGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db2/a01143.html#b9da91ab2a7eb38144371fca71199475">gEfiPeiSecurity2PpiGuid</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Load File protocol as defined in the UEFI 2.0 specification.<p>
-Load file protocol exists to supports the addition of new boot devices, and to support booting from devices that do not map well to file system. Network boot is done via a LoadFile protocol.<p>
-UEFI 2.0 can boot from any device that produces a LoadFile protocol.<p>
+This file declares Pei Security2 PPI.<p>
+This PPI is installed by some platform PEIM that abstracts the security policy to the PEI Foundation, namely the case of a PEIM's authentication state being returned during the PEI section extraction process.<p>
 Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
-<a class="anchor" name="04f965b925ce9b94fa3d2b189741c08f"></a><!-- doxytag: member="LoadFile2.h::EFI_LOAD_FILE2_PROTOCOL_GUID" ref="04f965b925ce9b94fa3d2b189741c08f" args="" -->
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
+<dl class="user" compact><dt><b>Revision Reference:</b></dt><dd>This PPI is introduced in PI Version 1.0. </dd></dl>
+<hr><h2>Define Documentation</h2>
+<a class="anchor" name="53cdbd738e7c97c7e001adb98d26a3a7"></a><!-- doxytag: member="Security2.h::EFI_PEI_SECURITY2_PPI_GUID" ref="53cdbd738e7c97c7e001adb98d26a3a7" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_LOAD_FILE2_PROTOCOL_GUID          </td>
+          <td class="memname">#define EFI_PEI_SECURITY2_PPI_GUID&nbsp;&nbsp;&nbsp;{ 0xdcd0be23, 0x9586, 0x40f4, { 0xb6, 0x43, 0x6, 0x52, 0x2c, 0xed, 0x4e, 0xde } }          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-<b>Value:</b><div class="fragment"><pre class="fragment">{ \
-    0x4006c0c1, 0xfcb3, 0x403e, {0x99, 0x6d, 0x4a, 0x6c, 0x87, 0x24, 0xe0, 0x6d } \
-  }
-</pre></div>
-</div>
-</div><p>
-<a class="anchor" name="bdd1dc619c7afdb0ba5a389134aa7715"></a><!-- doxytag: member="LoadFile2.h::LOAD_FILE2_PROTOCOL" ref="bdd1dc619c7afdb0ba5a389134aa7715" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define LOAD_FILE2_PROTOCOL&nbsp;&nbsp;&nbsp;EFI_LOAD_FILE2_PROTOCOL_GUID          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
 
-<p>
-Protocol Guid defined by UEFI2.1. 
 </div>
 </div><p>
 <hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="7b0ef37ab11973cb482288aa6b4bd14b"></a><!-- doxytag: member="LoadFile2.h::EFI_LOAD_FILE2" ref="7b0ef37ab11973cb482288aa6b4bd14b" args=")(IN EFI_LOAD_FILE2_PROTOCOL *This, IN EFI_DEVICE_PATH_PROTOCOL *FilePath, IN BOOLEAN BootPolicy, IN OUT UINTN *BufferSize, IN VOID *Buffer)" -->
+<a class="anchor" name="3a006d2cd413b3e82379fa30b5fea6ed"></a><!-- doxytag: member="Security2.h::EFI_PEI_SECURITY2_PPI" ref="3a006d2cd413b3e82379fa30b5fea6ed" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../db/db2/a01143.html#7b0ef37ab11973cb482288aa6b4bd14b">EFI_LOAD_FILE2</a>)(IN <a class="el" href="../../d3/de5/a00209.html">EFI_LOAD_FILE2_PROTOCOL</a> *This, IN <a class="el" href="../../d9/de6/a00404.html">EFI_DEVICE_PATH_PROTOCOL</a> *FilePath, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> BootPolicy, IN OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *BufferSize, IN VOID *Buffer)          </td>
+          <td class="memname">typedef struct <a class="el" href="../../d9/d21/a00240.html">_EFI_PEI_SECURITY2_PPI</a> <a class="el" href="../../d9/d21/a00240.html">EFI_PEI_SECURITY2_PPI</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Causes the driver to load a specified file.<p>
+
+</div>
+</div><p>
+<a class="anchor" name="5ad86bfecf7c5f00d536db580feb4f35"></a><!-- doxytag: member="Security2.h::EFI_PEI_SECURITY_AUTHENTICATION_STATE" ref="5ad86bfecf7c5f00d536db580feb4f35" args=")(IN CONST EFI_PEI_SERVICES **PeiServices, IN CONST EFI_PEI_SECURITY2_PPI *This, IN UINT32 AuthenticationStatus, IN EFI_PEI_FV_HANDLE FvHandle, IN EFI_PEI_FV_HANDLE FileHandle, IN OUT BOOLEAN *DeferExecution)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../db/db2/a01143.html#5ad86bfecf7c5f00d536db580feb4f35">EFI_PEI_SECURITY_AUTHENTICATION_STATE</a>)(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../d9/d21/a00240.html">EFI_PEI_SECURITY2_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> AuthenticationStatus, IN <a class="el" href="../../d0/d39/a01112.html#a91cb3539cfb2742ee94c7bd0ab1e702">EFI_PEI_FV_HANDLE</a> FvHandle, IN <a class="el" href="../../d0/d39/a01112.html#a91cb3539cfb2742ee94c7bd0ab1e702">EFI_PEI_FV_HANDLE</a> FileHandle, IN OUT <a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> *DeferExecution)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Allows the platform builder to implement a security policy in response to varying file authentication states.<p>
+This service is published by some platform PEIM. The purpose of this service is to expose a given platform's policy-based response to the PEI Foundation. For example, if there is a PEIM in a GUIDed encapsulation section and the extraction of the PEI file section yields an authentication failure, there is no a priori policy in the PEI Foundation. Specifically, this situation leads to the question whether PEIMs that are either not in GUIDed sections or are in sections whose authentication fails should still be executed.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Protocol instance pointer. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>FilePath</em>&nbsp;</td><td>The device specific path of the file to load. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>BootPolicy</em>&nbsp;</td><td>Should always be FALSE. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>BufferSize</em>&nbsp;</td><td>On input the size of Buffer in bytes. On output with a return code of EFI_SUCCESS, the amount of data transferred to Buffer. On output with a return code of EFI_BUFFER_TOO_SMALL, the size of Buffer required to retrieve the requested file. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>The memory buffer to transfer the file to. IF Buffer is NULL, then no the size of the requested file is returned in BufferSize.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>PeiServices</em>&nbsp;</td><td>An indirect pointer to the PEI Services Table published by the PEI Foundation. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Interface pointer that implements the particular EFI_PEI_SECURITY2_PPI instance. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>AuthenticationStatus</em>&nbsp;</td><td>Authentication status of the file. xx00 Image was not signed. xxx1 Platform security policy override. Assumes same meaning as 0010 (the image was signed, the signature was tested, and the signature passed authentication test). 0010 Image was signed, the signature was tested, and the signature passed authentication test. 0110 Image was signed and the signature was not tested. 1010 Image was signed, the signature was tested, and the signature failed the authentication test. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>FvHandle</em>&nbsp;</td><td>Handle of the volume in which the file resides. This allows different policies depending on different firmware volumes. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>FileHandle</em>&nbsp;</td><td>Handle of the file under review. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>DeferExecution</em>&nbsp;</td><td>Pointer to a variable that alerts the PEI Foundation to defer execution of a PEIM.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The file was loaded. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>BootPolicy is TRUE. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>FilePath is not a valid device path, or BufferSize is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NO_MEDIA</em>&nbsp;</td><td>No medium was present to load the file. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The file was not loaded due to a device error. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NO_RESPONSE</em>&nbsp;</td><td>The remote system did not respond. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The file was not found </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ABORTED</em>&nbsp;</td><td>The file load process was manually canceled. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_BUFFER_TOO_SMALL</em>&nbsp;</td><td>The BufferSize is too small to read the current directory entry. BufferSize has been updated with the size needed to complete the request. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The service performed its action successfully. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SECURITY_VIOLATION</em>&nbsp;</td><td>The object cannot be trusted. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
-<a class="anchor" name="69558cad83427328aa264197622f2580"></a><!-- doxytag: member="LoadFile2.h::EFI_LOAD_FILE2_PROTOCOL" ref="69558cad83427328aa264197622f2580" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct <a class="el" href="../../d3/de5/a00209.html">_EFI_LOAD_FILE2_PROTOCOL</a> <a class="el" href="../../d3/de5/a00209.html">EFI_LOAD_FILE2_PROTOCOL</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
 <hr><h2>Variable Documentation</h2>
-<a class="anchor" name="f6edd11cd4d74998d7ae60b80a5f9371"></a><!-- doxytag: member="LoadFile2.h::gEfiLoadFile2ProtocolGuid" ref="f6edd11cd4d74998d7ae60b80a5f9371" args="" -->
+<a class="anchor" name="b9da91ab2a7eb38144371fca71199475"></a><!-- doxytag: member="Security2.h::gEfiPeiSecurity2PpiGuid" ref="b9da91ab2a7eb38144371fca71199475" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../db/db2/a01143.html#f6edd11cd4d74998d7ae60b80a5f9371">gEfiLoadFile2ProtocolGuid</a>          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../db/db2/a01143.html#b9da91ab2a7eb38144371fca71199475">gEfiPeiSecurity2PpiGuid</a>          </td>
         </tr>
       </table>
 </div>
@@ -151,7 +127,7 @@ Causes the driver to load a specified file.<p>
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:10 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:29 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

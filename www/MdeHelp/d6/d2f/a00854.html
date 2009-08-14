@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: tdTPM_ASYM_CA_CONTENTS Struct Reference</title>
+<title>MdePkg[ALL]: SMBIOS_TABLE_TYPE16 Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,22 +21,36 @@
   </div>
 </div>
 <div class="contents">
-<h1>tdTPM_ASYM_CA_CONTENTS Struct Reference</h1><!-- doxytag: class="tdTPM_ASYM_CA_CONTENTS" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>SMBIOS_TABLE_TYPE16 Struct Reference</h1><!-- doxytag: class="SMBIOS_TABLE_TYPE16" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d38/a00928.html">TPM_SYMMETRIC_KEY</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d2f/a00854.html#05013fba89981a2a3a6430d00b3516c2">sessionKey</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d5/dac/a00841.html">SMBIOS_STRUCTURE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d2f/a00854.html#6e6186c1db7608fa811597c0801a0928">Hdr</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d08/a00884.html">TPM_DIGEST</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d2f/a00854.html#b20f4604fe40790b8619fd08c43633a7">idDigest</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d2f/a00854.html#b42c4cdf484f463598b933da210a63e2">Location</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">enumeration value from MEMORY_ARRAY_LOCATION  <a href="#b42c4cdf484f463598b933da210a63e2"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d2f/a00854.html#4c5973e3958fc37aa23cd9fb0a77c8e5">Use</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">enumeration value from MEMORY_ARRAY_USE  <a href="#4c5973e3958fc37aa23cd9fb0a77c8e5"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d2f/a00854.html#711daaf85fe3597a7007b650f95e6b9c">MemoryErrorCorrection</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">enumeration value from MEMORY_ERROR_CORRECTION  <a href="#711daaf85fe3597a7007b650f95e6b9c"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d2f/a00854.html#761ba948de53f9d4c2ca7a8fa363aaea">MaximumCapacity</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d2f/a00854.html#72a91c028cf6c6c2b7e4522f3b4f2e33">MemoryErrorInformationHandle</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d2f/a00854.html#2b15d6150cdc07d902ca4056cc1a20e5">NumberOfMemoryDevices</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Part 2, section 12.8 TPM_ASYM_CA_CONTENTS <hr><h2>Field Documentation</h2>
-<a class="anchor" name="b20f4604fe40790b8619fd08c43633a7"></a><!-- doxytag: member="tdTPM_ASYM_CA_CONTENTS::idDigest" ref="b20f4604fe40790b8619fd08c43633a7" args="" -->
+Physical Memory Array (Type 16)<p>
+This structure describes a collection of memory devices that operate together to form a memory address space. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="6e6186c1db7608fa811597c0801a0928"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE16::Hdr" ref="6e6186c1db7608fa811597c0801a0928" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dd/d08/a00884.html">TPM_DIGEST</a> <a class="el" href="../../d6/d2f/a00854.html#b20f4604fe40790b8619fd08c43633a7">tdTPM_ASYM_CA_CONTENTS::idDigest</a>          </td>
+          <td class="memname"><a class="el" href="../../d5/dac/a00841.html">SMBIOS_STRUCTURE</a> <a class="el" href="../../d6/d2f/a00854.html#6e6186c1db7608fa811597c0801a0928">SMBIOS_TABLE_TYPE16::Hdr</a>          </td>
         </tr>
       </table>
 </div>
@@ -46,12 +60,29 @@ Part 2, section 12.8 TPM_ASYM_CA_CONTENTS <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="05013fba89981a2a3a6430d00b3516c2"></a><!-- doxytag: member="tdTPM_ASYM_CA_CONTENTS::sessionKey" ref="05013fba89981a2a3a6430d00b3516c2" args="" -->
+<a class="anchor" name="b42c4cdf484f463598b933da210a63e2"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE16::Location" ref="b42c4cdf484f463598b933da210a63e2" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dd/d38/a00928.html">TPM_SYMMETRIC_KEY</a> <a class="el" href="../../d6/d2f/a00854.html#05013fba89981a2a3a6430d00b3516c2">tdTPM_ASYM_CA_CONTENTS::sessionKey</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d6/d2f/a00854.html#b42c4cdf484f463598b933da210a63e2">SMBIOS_TABLE_TYPE16::Location</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+enumeration value from MEMORY_ARRAY_LOCATION 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="761ba948de53f9d4c2ca7a8fa363aaea"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE16::MaximumCapacity" ref="761ba948de53f9d4c2ca7a8fa363aaea" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d6/d2f/a00854.html#761ba948de53f9d4c2ca7a8fa363aaea">SMBIOS_TABLE_TYPE16::MaximumCapacity</a>          </td>
         </tr>
       </table>
 </div>
@@ -61,8 +92,72 @@ Part 2, section 12.8 TPM_ASYM_CA_CONTENTS <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
+<a class="anchor" name="711daaf85fe3597a7007b650f95e6b9c"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE16::MemoryErrorCorrection" ref="711daaf85fe3597a7007b650f95e6b9c" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d6/d2f/a00854.html#711daaf85fe3597a7007b650f95e6b9c">SMBIOS_TABLE_TYPE16::MemoryErrorCorrection</a>          </td>
+        </tr>
+      </table>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:22 2009 for MdePkg[ALL] by&nbsp;
+<div class="memdoc">
+
+<p>
+enumeration value from MEMORY_ERROR_CORRECTION 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="72a91c028cf6c6c2b7e4522f3b4f2e33"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE16::MemoryErrorInformationHandle" ref="72a91c028cf6c6c2b7e4522f3b4f2e33" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d6/d2f/a00854.html#72a91c028cf6c6c2b7e4522f3b4f2e33">SMBIOS_TABLE_TYPE16::MemoryErrorInformationHandle</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="2b15d6150cdc07d902ca4056cc1a20e5"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE16::NumberOfMemoryDevices" ref="2b15d6150cdc07d902ca4056cc1a20e5" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d6/d2f/a00854.html#2b15d6150cdc07d902ca4056cc1a20e5">SMBIOS_TABLE_TYPE16::NumberOfMemoryDevices</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="4c5973e3958fc37aa23cd9fb0a77c8e5"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE16::Use" ref="4c5973e3958fc37aa23cd9fb0a77c8e5" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d6/d2f/a00854.html#4c5973e3958fc37aa23cd9fb0a77c8e5">SMBIOS_TABLE_TYPE16::Use</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+enumeration value from MEMORY_ARRAY_USE 
+<p>
+
+</div>
+</div><p>
+</div>
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:04 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

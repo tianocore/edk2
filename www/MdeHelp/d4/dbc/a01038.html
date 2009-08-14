@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Library/PostCodeLib.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/IndustryStandard/MemoryMappedConfigurationSpaceAccessTable.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,253 +21,38 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Library/PostCodeLib.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/IndustryStandard/MemoryMappedConfigurationSpaceAccessTable.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
+<tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d0a/a00390.html">EFI_ACPI_MEMORY_MAPPED_ENHANCED_CONFIGURATION_SPACE_BASE_ADDRESS_ALLOCATION_STRUCTURE</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/dc9/a00389.html">EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER</a></td></tr>
+
 <tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/dbc/a01038.html#e3dac37088e7cb163745d26e5b288b63">POST_CODE_PROPERTY_POST_CODE_ENABLED</a>&nbsp;&nbsp;&nbsp;0x00000008</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/dbc/a01038.html#acd962af01feea6e0dab6ebd9c40215e">POST_CODE_PROPERTY_POST_CODE_DESCRIPTION_ENABLED</a>&nbsp;&nbsp;&nbsp;0x00000010</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/dbc/a01038.html#639471bed643ecd4acf214ea760748d9">POST_CODE</a>(Value)&nbsp;&nbsp;&nbsp;PostCodeEnabled() ? PostCode(Value) : Value</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/dbc/a01038.html#967922b0e7610885023b7a70cc5b9585">POST_CODE_WITH_DESCRIPTION</a>(Value, Description)</td></tr>
-
-<tr><td colspan="2"><br><h2>Functions</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/dbc/a01038.html#365f22efd10b3f50c4d6f6b678c9c483">PostCode</a> (IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> Value)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/dbc/a01038.html#38566976f7017365e1934878ffc959e0">PostCodeWithDescription</a> (IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> Value, IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Description)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/dbc/a01038.html#9f91b8a4490a317962865cba44212f18">PostCodeEnabled</a> (VOID)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/dbc/a01038.html#566397e1e8b358ce2538241f24e523ef">PostCodeDescriptionEnabled</a> (VOID)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/dbc/a01038.html#a74956c8b1cac99348e3cdbe38b95072">EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_TABLE_REVISION</a>&nbsp;&nbsp;&nbsp;0x01</td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Provides services to send progress/error codes to a POST card.<p>
-Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
+ACPI memory mapped configuration space access table definition, defined at in the PCI Firmware Specification, version 3.0. Specification is available at <a href="http://www.pcisig.com.">http://www.pcisig.com.</a><p>
+Copyright (c) 2007 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
-<a class="anchor" name="639471bed643ecd4acf214ea760748d9"></a><!-- doxytag: member="PostCodeLib.h::POST_CODE" ref="639471bed643ecd4acf214ea760748d9" args="(Value)" -->
+<a class="anchor" name="a74956c8b1cac99348e3cdbe38b95072"></a><!-- doxytag: member="MemoryMappedConfigurationSpaceAccessTable.h::EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_TABLE_REVISION" ref="a74956c8b1cac99348e3cdbe38b95072" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define POST_CODE          </td>
-          <td>(</td>
-          <td class="paramtype">Value&nbsp;</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td>&nbsp;&nbsp;&nbsp;PostCodeEnabled() ? PostCode(Value) : Value</td>
+          <td class="memname">#define EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_TABLE_REVISION&nbsp;&nbsp;&nbsp;0x01          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Sends a 32-bit value to a POST card.<p>
-If POST codes are enabled in PcdPostCodeProperyMask, then call <a class="el" href="../../d4/dbc/a01038.html#365f22efd10b3f50c4d6f6b678c9c483">PostCode()</a> passing in Value. Value is returned.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>The 32-bit value to write to the POST card.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>Value The 32-bit value to write to the POST card. </dd></dl>
-
-</div>
-</div><p>
-<a class="anchor" name="acd962af01feea6e0dab6ebd9c40215e"></a><!-- doxytag: member="PostCodeLib.h::POST_CODE_PROPERTY_POST_CODE_DESCRIPTION_ENABLED" ref="acd962af01feea6e0dab6ebd9c40215e" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define POST_CODE_PROPERTY_POST_CODE_DESCRIPTION_ENABLED&nbsp;&nbsp;&nbsp;0x00000010          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="e3dac37088e7cb163745d26e5b288b63"></a><!-- doxytag: member="PostCodeLib.h::POST_CODE_PROPERTY_POST_CODE_ENABLED" ref="e3dac37088e7cb163745d26e5b288b63" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define POST_CODE_PROPERTY_POST_CODE_ENABLED&nbsp;&nbsp;&nbsp;0x00000008          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="967922b0e7610885023b7a70cc5b9585"></a><!-- doxytag: member="PostCodeLib.h::POST_CODE_WITH_DESCRIPTION" ref="967922b0e7610885023b7a70cc5b9585" args="(Value, Description)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define POST_CODE_WITH_DESCRIPTION          </td>
-          <td>(</td>
-          <td class="paramtype">Value,         <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Description&nbsp;</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-<b>Value:</b><div class="fragment"><pre class="fragment"><a class="code" href="../../d4/dbc/a01038.html#9f91b8a4490a317962865cba44212f18">PostCodeEnabled</a>()                              ?     \
-    (<a class="code" href="../../d4/dbc/a01038.html#566397e1e8b358ce2538241f24e523ef">PostCodeDescriptionEnabled</a>()                ?     \
-      <a class="code" href="../../d4/dbc/a01038.html#38566976f7017365e1934878ffc959e0">PostCodeWithDescription</a>(Value,Description) :     \
-      <a class="code" href="../../d4/dbc/a01038.html#365f22efd10b3f50c4d6f6b678c9c483">PostCode</a>(Value))                           :     \
-    Value
-</pre></div>Sends a 32-bit value to a POST and associated ASCII string.<p>
-If POST codes and POST code descriptions are enabled in PcdPostCodeProperyMask, then call <a class="el" href="../../d4/dbc/a01038.html#38566976f7017365e1934878ffc959e0">PostCodeWithDescription()</a> passing in Value and Description. If only POST codes are enabled, then call <a class="el" href="../../d4/dbc/a01038.html#365f22efd10b3f50c4d6f6b678c9c483">PostCode()</a> passing in Value. Value is returned.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>The 32-bit value to write to the POST card. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Description</em>&nbsp;</td><td>Pointer to an ASCII string that is a description of the POST code value.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>Value The 32-bit value to write to the POST card. </dd></dl>
-
-</div>
-</div><p>
-<hr><h2>Function Documentation</h2>
-<a class="anchor" name="365f22efd10b3f50c4d6f6b678c9c483"></a><!-- doxytag: member="PostCodeLib.h::PostCode" ref="365f22efd10b3f50c4d6f6b678c9c483" args="(IN UINT32 Value)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI PostCode           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td>
-          <td class="paramname"> <em>Value</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Sends a 32-bit value to a POST card.<p>
-Sends the 32-bit value specified by Value to a POST card, and returns Value. Some implementations of this library function may perform I/O operations directly to a POST card device. Other implementations may send Value to <a class="el" href="../../db/d14/a01040.html#d3409c6da81a08ba877fe6c28b45c645">ReportStatusCode()</a>, and the status code reporting mechanism will eventually display the 32-bit value on the status reporting device.<p>
-<a class="el" href="../../d4/dbc/a01038.html#365f22efd10b3f50c4d6f6b678c9c483">PostCode()</a> must actively prevent recursion. If <a class="el" href="../../d4/dbc/a01038.html#365f22efd10b3f50c4d6f6b678c9c483">PostCode()</a> is called while processing another Post Code Library function, then <a class="el" href="../../d4/dbc/a01038.html#365f22efd10b3f50c4d6f6b678c9c483">PostCode()</a> must return Value immediately.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>The 32-bit value to write to the POST card.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The 32-bit value to write to the POST card. </dd></dl>
-
-</div>
-</div><p>
-<a class="anchor" name="566397e1e8b358ce2538241f24e523ef"></a><!-- doxytag: member="PostCodeLib.h::PostCodeDescriptionEnabled" ref="566397e1e8b358ce2538241f24e523ef" args="(VOID)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> EFIAPI PostCodeDescriptionEnabled           </td>
-          <td>(</td>
-          <td class="paramtype">VOID&nbsp;</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Returns TRUE if POST code descriptions are enabled.<p>
-This function returns TRUE if the POST_CODE_PROPERTY_POST_CODE_DESCRIPTION_ENABLED bit of PcdPostCodePropertyMask is set. Otherwise FALSE is returned.<p>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>TRUE</em>&nbsp;</td><td>The POST_CODE_PROPERTY_POST_CODE_DESCRIPTION_ENABLED bit of PcdPostCodeProperyMask is set. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>FALSE</em>&nbsp;</td><td>The POST_CODE_PROPERTY_POST_CODE_DESCRIPTION_ENABLED bit of PcdPostCodeProperyMask is clear. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="9f91b8a4490a317962865cba44212f18"></a><!-- doxytag: member="PostCodeLib.h::PostCodeEnabled" ref="9f91b8a4490a317962865cba44212f18" args="(VOID)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> EFIAPI PostCodeEnabled           </td>
-          <td>(</td>
-          <td class="paramtype">VOID&nbsp;</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Returns TRUE if POST Codes are enabled.<p>
-This function returns TRUE if the POST_CODE_PROPERTY_POST_CODE_ENABLED bit of PcdPostCodePropertyMask is set. Otherwise FALSE is returned.<p>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>TRUE</em>&nbsp;</td><td>The POST_CODE_PROPERTY_POST_CODE_ENABLED bit of PcdPostCodeProperyMask is set. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>FALSE</em>&nbsp;</td><td>The POST_CODE_PROPERTY_POST_CODE_ENABLED bit of PcdPostCodeProperyMask is clear. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="38566976f7017365e1934878ffc959e0"></a><!-- doxytag: member="PostCodeLib.h::PostCodeWithDescription" ref="38566976f7017365e1934878ffc959e0" args="(IN UINT32 Value, IN CONST CHAR8 *Description)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI PostCodeWithDescription           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td>
-          <td class="paramname"> <em>Value</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *&nbsp;</td>
-          <td class="paramname"> <em>Description</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Sends a 32-bit value to a POST and associated ASCII string.<p>
-Sends the 32-bit value specified by Value to a POST card, and returns Value. If Description is not NULL, then the ASCII string specified by Description is also passed to the handler that displays the POST card value. Some implementations of this library function may perform I/O operations directly to a POST card device. Other implementations may send Value to <a class="el" href="../../db/d14/a01040.html#d3409c6da81a08ba877fe6c28b45c645">ReportStatusCode()</a>, and the status code reporting mechanism will eventually display the 32-bit value on the status reporting device.<p>
-<a class="el" href="../../d4/dbc/a01038.html#38566976f7017365e1934878ffc959e0">PostCodeWithDescription()</a>must actively prevent recursion. If <a class="el" href="../../d4/dbc/a01038.html#38566976f7017365e1934878ffc959e0">PostCodeWithDescription()</a> is called while processing another any other Post Code Library function, then <a class="el" href="../../d4/dbc/a01038.html#38566976f7017365e1934878ffc959e0">PostCodeWithDescription()</a> must return Value immediately.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>The 32-bit value to write to the POST card. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Description</em>&nbsp;</td><td>Pointer to an ASCII string that is a description of the POST code value. This is an optional parameter that may be NULL.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The 32-bit value to write to the POST card. </dd></dl>
-
+MCFG Revision (defined in spec) 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:09 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:16 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

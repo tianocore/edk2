@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_HOB_FIRMWARE_VOLUME2 Struct Reference</title>
+<title>MdePkg[ALL]: EFI_FIRMWARE_VOLUME_EXT_HEADER Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,99 +21,48 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_HOB_FIRMWARE_VOLUME2 Struct Reference</h1><!-- doxytag: class="EFI_HOB_FIRMWARE_VOLUME2" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_FIRMWARE_VOLUME_EXT_HEADER Struct Reference</h1><!-- doxytag: class="EFI_FIRMWARE_VOLUME_EXT_HEADER" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/d87/a00456.html">EFI_HOB_GENERIC_HEADER</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d63/a00455.html#b3287ab4c91f95e30b889917ee7a9247">Header</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d63/a00455.html#9beaf49f9597737dea53100d72e87988">FvName</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d63/a00455.html#75710534f459aaf059803145e8212263">BaseAddress</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d63/a00455.html#1fcfaa0b811d5107674452704970eed8">Length</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d63/a00455.html#6494c4b14ffd6859f29bef8264d75e29">FvName</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d63/a00455.html#9c90163ea15c8cc0d7a5e3d79ee5569b">FileName</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d63/a00455.html#1d661d864bb1d966a325761a81263d71">ExtHeaderSize</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Details the location of a firmware volume which was extracted from a file within another firmware volume. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="75710534f459aaf059803145e8212263"></a><!-- doxytag: member="EFI_HOB_FIRMWARE_VOLUME2::BaseAddress" ref="75710534f459aaf059803145e8212263" args="" -->
+Extension header pointed by ExtHeaderOffset of volume header. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="1d661d864bb1d966a325761a81263d71"></a><!-- doxytag: member="EFI_FIRMWARE_VOLUME_EXT_HEADER::ExtHeaderSize" ref="1d661d864bb1d966a325761a81263d71" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> <a class="el" href="../../dd/d63/a00455.html#75710534f459aaf059803145e8212263">EFI_HOB_FIRMWARE_VOLUME2::BaseAddress</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../dd/d63/a00455.html#1d661d864bb1d966a325761a81263d71">EFI_FIRMWARE_VOLUME_EXT_HEADER::ExtHeaderSize</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The physical memory-mapped base address of the firmware volume. 
+Size of the rest of the extension header, including this structure. 
 </div>
 </div><p>
-<a class="anchor" name="9c90163ea15c8cc0d7a5e3d79ee5569b"></a><!-- doxytag: member="EFI_HOB_FIRMWARE_VOLUME2::FileName" ref="9c90163ea15c8cc0d7a5e3d79ee5569b" args="" -->
+<a class="anchor" name="9beaf49f9597737dea53100d72e87988"></a><!-- doxytag: member="EFI_FIRMWARE_VOLUME_EXT_HEADER::FvName" ref="9beaf49f9597737dea53100d72e87988" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../dd/d63/a00455.html#9c90163ea15c8cc0d7a5e3d79ee5569b">EFI_HOB_FIRMWARE_VOLUME2::FileName</a>          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../dd/d63/a00455.html#9beaf49f9597737dea53100d72e87988">EFI_FIRMWARE_VOLUME_EXT_HEADER::FvName</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The name of the firmware file which contained this firmware volume. 
-</div>
-</div><p>
-<a class="anchor" name="6494c4b14ffd6859f29bef8264d75e29"></a><!-- doxytag: member="EFI_HOB_FIRMWARE_VOLUME2::FvName" ref="6494c4b14ffd6859f29bef8264d75e29" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../dd/d63/a00455.html#6494c4b14ffd6859f29bef8264d75e29">EFI_HOB_FIRMWARE_VOLUME2::FvName</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-The name of the firmware volume. 
-</div>
-</div><p>
-<a class="anchor" name="b3287ab4c91f95e30b889917ee7a9247"></a><!-- doxytag: member="EFI_HOB_FIRMWARE_VOLUME2::Header" ref="b3287ab4c91f95e30b889917ee7a9247" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../de/d87/a00456.html">EFI_HOB_GENERIC_HEADER</a> <a class="el" href="../../dd/d63/a00455.html#b3287ab4c91f95e30b889917ee7a9247">EFI_HOB_FIRMWARE_VOLUME2::Header</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-The HOB generic header. Header.HobType = EFI_HOB_TYPE_FV2. 
-</div>
-</div><p>
-<a class="anchor" name="1fcfaa0b811d5107674452704970eed8"></a><!-- doxytag: member="EFI_HOB_FIRMWARE_VOLUME2::Length" ref="1fcfaa0b811d5107674452704970eed8" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dd/d63/a00455.html#1fcfaa0b811d5107674452704970eed8">EFI_HOB_FIRMWARE_VOLUME2::Length</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-The length in bytes of the firmware volume. 
+Firmware volume name. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:31 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

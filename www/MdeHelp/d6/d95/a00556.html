@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_PEI_CPU_IO_PPI_ACCESS Struct Reference</title>
+<title>MdePkg[ALL]: EFI_MEMORY_MODULE_MISMATCH_ERROR_DATA Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,48 +21,49 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_PEI_CPU_IO_PPI_ACCESS Struct Reference</h1><!-- doxytag: class="EFI_PEI_CPU_IO_PPI_ACCESS" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_MEMORY_MODULE_MISMATCH_ERROR_DATA Struct Reference</h1><!-- doxytag: class="EFI_MEMORY_MODULE_MISMATCH_ERROR_DATA" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/de6/a01068.html#9effaa5afe37da24bae879943027483d">EFI_PEI_CPU_IO_PPI_IO_MEM</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d95/a00556.html#eadc1c86a419556a9945f9bfeec1f144">Read</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/d2a/a00632.html">EFI_STATUS_CODE_DATA</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d95/a00556.html#ff1d7c567634d9ea0e32814efee6ff06">DataHeader</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/de6/a01068.html#9effaa5afe37da24bae879943027483d">EFI_PEI_CPU_IO_PPI_IO_MEM</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d95/a00556.html#65fd35bd5f7cdd4d64a45efe4f07a1cf">Write</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d1d/a00633.html">EFI_STATUS_CODE_DIMM_NUMBER</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d95/a00556.html#42ba52c9639ee71515f526d8ebc6e101">Instance</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-<a class="el" href="../../d6/d95/a00556.html">EFI_PEI_CPU_IO_PPI_ACCESS</a> <hr><h2>Field Documentation</h2>
-<a class="anchor" name="eadc1c86a419556a9945f9bfeec1f144"></a><!-- doxytag: member="EFI_PEI_CPU_IO_PPI_ACCESS::Read" ref="eadc1c86a419556a9945f9bfeec1f144" args="" -->
+This structure defines extended data describing memory modules that do not match.<p>
+This extended data may be used to convey the specifics of memory modules that do not match. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="ff1d7c567634d9ea0e32814efee6ff06"></a><!-- doxytag: member="EFI_MEMORY_MODULE_MISMATCH_ERROR_DATA::DataHeader" ref="ff1d7c567634d9ea0e32814efee6ff06" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d1/de6/a01068.html#9effaa5afe37da24bae879943027483d">EFI_PEI_CPU_IO_PPI_IO_MEM</a> <a class="el" href="../../d6/d95/a00556.html#eadc1c86a419556a9945f9bfeec1f144">EFI_PEI_CPU_IO_PPI_ACCESS::Read</a>          </td>
+          <td class="memname"><a class="el" href="../../d4/d2a/a00632.html">EFI_STATUS_CODE_DATA</a> <a class="el" href="../../d6/d95/a00556.html#ff1d7c567634d9ea0e32814efee6ff06">EFI_MEMORY_MODULE_MISMATCH_ERROR_DATA::DataHeader</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-This service provides the various modalities of memory and I/O read. 
+The data header identifying the data. DataHeader.HeaderSize should be sizeof (<a class="el" href="../../d4/d2a/a00632.html">EFI_STATUS_CODE_DATA</a>), DataHeader.Size should be sizeof (<a class="el" href="../../d6/d95/a00556.html">EFI_MEMORY_MODULE_MISMATCH_ERROR_DATA</a>) - HeaderSize, and DataHeader.Type should be EFI_STATUS_CODE_SPECIFIC_DATA_GUID. 
 </div>
 </div><p>
-<a class="anchor" name="65fd35bd5f7cdd4d64a45efe4f07a1cf"></a><!-- doxytag: member="EFI_PEI_CPU_IO_PPI_ACCESS::Write" ref="65fd35bd5f7cdd4d64a45efe4f07a1cf" args="" -->
+<a class="anchor" name="42ba52c9639ee71515f526d8ebc6e101"></a><!-- doxytag: member="EFI_MEMORY_MODULE_MISMATCH_ERROR_DATA::Instance" ref="42ba52c9639ee71515f526d8ebc6e101" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d1/de6/a01068.html#9effaa5afe37da24bae879943027483d">EFI_PEI_CPU_IO_PPI_IO_MEM</a> <a class="el" href="../../d6/d95/a00556.html#65fd35bd5f7cdd4d64a45efe4f07a1cf">EFI_PEI_CPU_IO_PPI_ACCESS::Write</a>          </td>
+          <td class="memname"><a class="el" href="../../d9/d1d/a00633.html">EFI_STATUS_CODE_DIMM_NUMBER</a> <a class="el" href="../../d6/d95/a00556.html#42ba52c9639ee71515f526d8ebc6e101">EFI_MEMORY_MODULE_MISMATCH_ERROR_DATA::Instance</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-This service provides the various modalities of memory and I/O write. 
+The instance number of the memory module that does not match. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:38 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

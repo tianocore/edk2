@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_IMAGE_DEBUG_DIRECTORY_ENTRY Struct Reference</title>
+<title>MdePkg[ALL]: EFI_HASH_OUTPUT Union Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,36 +21,29 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_IMAGE_DEBUG_DIRECTORY_ENTRY Struct Reference</h1><!-- doxytag: class="EFI_IMAGE_DEBUG_DIRECTORY_ENTRY" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_HASH_OUTPUT Union Reference</h1><!-- doxytag: class="EFI_HASH_OUTPUT" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/db5/a00472.html#3bb0b018e69b2e90c7582920c6d03655">Characteristics</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/dd3/a01185.html#3f9c88c48081a1bd99d89cea0e8138ee">EFI_MD5_HASH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/db5/a00472.html#eb72ec73a5dda8ab4086659628282d3e">Md5Hash</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/db5/a00472.html#86040386341acc896d91c6feb70cb9c7">TimeDateStamp</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/dd3/a01185.html#991b40fe22e6d1f6f465b0ad15760d7b">EFI_SHA1_HASH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/db5/a00472.html#38e47ba79c3cf25647b9bb0040d96cf4">Sha1Hash</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/db5/a00472.html#5e7aa410c1ad87dcbb9bc3400079a8d3">MajorVersion</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/dd3/a01185.html#de2c185be98f99bd6604a7e6e757e089">EFI_SHA224_HASH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/db5/a00472.html#69a24bea93141fc1f32ee78dc8fdbbcd">Sha224Hash</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/db5/a00472.html#bc745c588ee5529dd7b980cb73dd1a61">MinorVersion</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/dd3/a01185.html#61b9e517c659249c9a7e5bfb029e66fa">EFI_SHA256_HASH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/db5/a00472.html#7d3c0d471563372d605403802e483adf">Sha256Hash</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/db5/a00472.html#200c043cd43dd866decfdaed12f1ad0a">Type</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/dd3/a01185.html#c7ac494280ef3ddc8c3a48c854655a86">EFI_SHA384_HASH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/db5/a00472.html#f7a8b28dfa6c0b8903eb0d5dd6935ea0">Sha384Hash</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/db5/a00472.html#74214a6f28f9b46d3866f0ecf8432b3c">SizeOfData</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/dd3/a01185.html#97ffa753b04858282cf83dfd3bf96402">EFI_SHA512_HASH</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/db5/a00472.html#b03d4bfc016f100c485de8cb442b3285">Sha512Hash</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/db5/a00472.html#dd4c3570b00acb2cc27ac8ef667bce25">RVA</a></td></tr>
-
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The address of the debug data when loaded, relative to the image base.  <a href="#dd4c3570b00acb2cc27ac8ef667bce25"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/db5/a00472.html#cc70a4563634c330a3bb62438c1d7c8d">FileOffset</a></td></tr>
-
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The file pointer to the debug data.  <a href="#cc70a4563634c330a3bb62438c1d7c8d"></a><br></td></tr>
 </table>
-<hr><a name="_details"></a><h2>Detailed Description</h2>
-Debug Directory Format <hr><h2>Field Documentation</h2>
-<a class="anchor" name="3bb0b018e69b2e90c7582920c6d03655"></a><!-- doxytag: member="EFI_IMAGE_DEBUG_DIRECTORY_ENTRY::Characteristics" ref="3bb0b018e69b2e90c7582920c6d03655" args="" -->
+<hr><h2>Field Documentation</h2>
+<a class="anchor" name="eb72ec73a5dda8ab4086659628282d3e"></a><!-- doxytag: member="EFI_HASH_OUTPUT::Md5Hash" ref="eb72ec73a5dda8ab4086659628282d3e" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/db5/a00472.html#3bb0b018e69b2e90c7582920c6d03655">EFI_IMAGE_DEBUG_DIRECTORY_ENTRY::Characteristics</a>          </td>
+          <td class="memname"><a class="el" href="../../d3/dd3/a01185.html#3f9c88c48081a1bd99d89cea0e8138ee">EFI_MD5_HASH</a>* <a class="el" href="../../d7/db5/a00472.html#eb72ec73a5dda8ab4086659628282d3e">EFI_HASH_OUTPUT::Md5Hash</a>          </td>
         </tr>
       </table>
 </div>
@@ -60,29 +53,12 @@ Debug Directory Format <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="cc70a4563634c330a3bb62438c1d7c8d"></a><!-- doxytag: member="EFI_IMAGE_DEBUG_DIRECTORY_ENTRY::FileOffset" ref="cc70a4563634c330a3bb62438c1d7c8d" args="" -->
+<a class="anchor" name="38e47ba79c3cf25647b9bb0040d96cf4"></a><!-- doxytag: member="EFI_HASH_OUTPUT::Sha1Hash" ref="38e47ba79c3cf25647b9bb0040d96cf4" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/db5/a00472.html#cc70a4563634c330a3bb62438c1d7c8d">EFI_IMAGE_DEBUG_DIRECTORY_ENTRY::FileOffset</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-The file pointer to the debug data. 
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="5e7aa410c1ad87dcbb9bc3400079a8d3"></a><!-- doxytag: member="EFI_IMAGE_DEBUG_DIRECTORY_ENTRY::MajorVersion" ref="5e7aa410c1ad87dcbb9bc3400079a8d3" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d7/db5/a00472.html#5e7aa410c1ad87dcbb9bc3400079a8d3">EFI_IMAGE_DEBUG_DIRECTORY_ENTRY::MajorVersion</a>          </td>
+          <td class="memname"><a class="el" href="../../d3/dd3/a01185.html#991b40fe22e6d1f6f465b0ad15760d7b">EFI_SHA1_HASH</a>* <a class="el" href="../../d7/db5/a00472.html#38e47ba79c3cf25647b9bb0040d96cf4">EFI_HASH_OUTPUT::Sha1Hash</a>          </td>
         </tr>
       </table>
 </div>
@@ -92,12 +68,12 @@ The file pointer to the debug data.
 
 </div>
 </div><p>
-<a class="anchor" name="bc745c588ee5529dd7b980cb73dd1a61"></a><!-- doxytag: member="EFI_IMAGE_DEBUG_DIRECTORY_ENTRY::MinorVersion" ref="bc745c588ee5529dd7b980cb73dd1a61" args="" -->
+<a class="anchor" name="69a24bea93141fc1f32ee78dc8fdbbcd"></a><!-- doxytag: member="EFI_HASH_OUTPUT::Sha224Hash" ref="69a24bea93141fc1f32ee78dc8fdbbcd" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d7/db5/a00472.html#bc745c588ee5529dd7b980cb73dd1a61">EFI_IMAGE_DEBUG_DIRECTORY_ENTRY::MinorVersion</a>          </td>
+          <td class="memname"><a class="el" href="../../d3/dd3/a01185.html#de2c185be98f99bd6604a7e6e757e089">EFI_SHA224_HASH</a>* <a class="el" href="../../d7/db5/a00472.html#69a24bea93141fc1f32ee78dc8fdbbcd">EFI_HASH_OUTPUT::Sha224Hash</a>          </td>
         </tr>
       </table>
 </div>
@@ -107,29 +83,12 @@ The file pointer to the debug data.
 
 </div>
 </div><p>
-<a class="anchor" name="dd4c3570b00acb2cc27ac8ef667bce25"></a><!-- doxytag: member="EFI_IMAGE_DEBUG_DIRECTORY_ENTRY::RVA" ref="dd4c3570b00acb2cc27ac8ef667bce25" args="" -->
+<a class="anchor" name="7d3c0d471563372d605403802e483adf"></a><!-- doxytag: member="EFI_HASH_OUTPUT::Sha256Hash" ref="7d3c0d471563372d605403802e483adf" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/db5/a00472.html#dd4c3570b00acb2cc27ac8ef667bce25">EFI_IMAGE_DEBUG_DIRECTORY_ENTRY::RVA</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-The address of the debug data when loaded, relative to the image base. 
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="74214a6f28f9b46d3866f0ecf8432b3c"></a><!-- doxytag: member="EFI_IMAGE_DEBUG_DIRECTORY_ENTRY::SizeOfData" ref="74214a6f28f9b46d3866f0ecf8432b3c" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/db5/a00472.html#74214a6f28f9b46d3866f0ecf8432b3c">EFI_IMAGE_DEBUG_DIRECTORY_ENTRY::SizeOfData</a>          </td>
+          <td class="memname"><a class="el" href="../../d3/dd3/a01185.html#61b9e517c659249c9a7e5bfb029e66fa">EFI_SHA256_HASH</a>* <a class="el" href="../../d7/db5/a00472.html#7d3c0d471563372d605403802e483adf">EFI_HASH_OUTPUT::Sha256Hash</a>          </td>
         </tr>
       </table>
 </div>
@@ -139,12 +98,12 @@ The address of the debug data when loaded, relative to the image base.
 
 </div>
 </div><p>
-<a class="anchor" name="86040386341acc896d91c6feb70cb9c7"></a><!-- doxytag: member="EFI_IMAGE_DEBUG_DIRECTORY_ENTRY::TimeDateStamp" ref="86040386341acc896d91c6feb70cb9c7" args="" -->
+<a class="anchor" name="f7a8b28dfa6c0b8903eb0d5dd6935ea0"></a><!-- doxytag: member="EFI_HASH_OUTPUT::Sha384Hash" ref="f7a8b28dfa6c0b8903eb0d5dd6935ea0" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/db5/a00472.html#86040386341acc896d91c6feb70cb9c7">EFI_IMAGE_DEBUG_DIRECTORY_ENTRY::TimeDateStamp</a>          </td>
+          <td class="memname"><a class="el" href="../../d3/dd3/a01185.html#c7ac494280ef3ddc8c3a48c854655a86">EFI_SHA384_HASH</a>* <a class="el" href="../../d7/db5/a00472.html#f7a8b28dfa6c0b8903eb0d5dd6935ea0">EFI_HASH_OUTPUT::Sha384Hash</a>          </td>
         </tr>
       </table>
 </div>
@@ -154,12 +113,12 @@ The address of the debug data when loaded, relative to the image base.
 
 </div>
 </div><p>
-<a class="anchor" name="200c043cd43dd866decfdaed12f1ad0a"></a><!-- doxytag: member="EFI_IMAGE_DEBUG_DIRECTORY_ENTRY::Type" ref="200c043cd43dd866decfdaed12f1ad0a" args="" -->
+<a class="anchor" name="b03d4bfc016f100c485de8cb442b3285"></a><!-- doxytag: member="EFI_HASH_OUTPUT::Sha512Hash" ref="b03d4bfc016f100c485de8cb442b3285" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/db5/a00472.html#200c043cd43dd866decfdaed12f1ad0a">EFI_IMAGE_DEBUG_DIRECTORY_ENTRY::Type</a>          </td>
+          <td class="memname"><a class="el" href="../../d3/dd3/a01185.html#97ffa753b04858282cf83dfd3bf96402">EFI_SHA512_HASH</a>* <a class="el" href="../../d7/db5/a00472.html#b03d4bfc016f100c485de8cb442b3285">EFI_HASH_OUTPUT::Sha512Hash</a>          </td>
         </tr>
       </table>
 </div>
@@ -170,7 +129,7 @@ The address of the debug data when loaded, relative to the image base.
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:32 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

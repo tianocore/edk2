@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: SMBIOS_TABLE_TYPE14 Struct Reference</title>
+<title>MdePkg[ALL]: s_pxe_db_receive_filters Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,66 +21,30 @@
   </div>
 </div>
 <div class="contents">
-<h1>SMBIOS_TABLE_TYPE14 Struct Reference</h1><!-- doxytag: class="SMBIOS_TABLE_TYPE14" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>s_pxe_db_receive_filters Struct Reference</h1><!-- doxytag: class="s_pxe_db_receive_filters" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../da/db8/a00797.html">SMBIOS_STRUCTURE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc8/a00808.html#d7c41342cd07240d88095bc6f6d7e1c0">Hdr</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d49/a00979.html#bd86e1460ed2b924b45d2fa3c883e6b0">SMBIOS_TABLE_STRING</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc8/a00808.html#49402368c02b3647782c4117f6b71f80">GroupName</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/d19/a00643.html">GROUP_STRUCT</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc8/a00808.html#a5d818f4df93ef6bf0a7c181e9eae948">Group</a> [1]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#01790f21199edcd6a8dd02d270c05f4f">PXE_MAC_ADDR</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc8/a00808.html#5c60ead315bb5b8ab02782392db7eeb4">MCastList</a> [MAX_MCAST_ADDRESS_CNT]</td></tr>
 
 </table>
-<hr><a name="_details"></a><h2>Detailed Description</h2>
-Group Associations (Type 14)<p>
-The Group Associations structure is provided for OEMs who want to specify the arrangement or hierarchy of certain components (including other Group Associations) within the system. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="a5d818f4df93ef6bf0a7c181e9eae948"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE14::Group" ref="a5d818f4df93ef6bf0a7c181e9eae948" args="[1]" -->
+<hr><h2>Field Documentation</h2>
+<a class="anchor" name="5c60ead315bb5b8ab02782392db7eeb4"></a><!-- doxytag: member="s_pxe_db_receive_filters::MCastList" ref="5c60ead315bb5b8ab02782392db7eeb4" args="[MAX_MCAST_ADDRESS_CNT]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../de/d19/a00643.html">GROUP_STRUCT</a> <a class="el" href="../../d7/dc8/a00808.html#a5d818f4df93ef6bf0a7c181e9eae948">SMBIOS_TABLE_TYPE14::Group</a>[1]          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#01790f21199edcd6a8dd02d270c05f4f">PXE_MAC_ADDR</a> <a class="el" href="../../d7/dc8/a00808.html#5c60ead315bb5b8ab02782392db7eeb4">s_pxe_db_receive_filters::MCastList</a>[MAX_MCAST_ADDRESS_CNT]          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<a class="anchor" name="49402368c02b3647782c4117f6b71f80"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE14::GroupName" ref="49402368c02b3647782c4117f6b71f80" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d8/d49/a00979.html#bd86e1460ed2b924b45d2fa3c883e6b0">SMBIOS_TABLE_STRING</a> <a class="el" href="../../d7/dc8/a00808.html#49402368c02b3647782c4117f6b71f80">SMBIOS_TABLE_TYPE14::GroupName</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="d7c41342cd07240d88095bc6f6d7e1c0"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE14::Hdr" ref="d7c41342cd07240d88095bc6f6d7e1c0" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../da/db8/a00797.html">SMBIOS_STRUCTURE</a> <a class="el" href="../../d7/dc8/a00808.html#d7c41342cd07240d88095bc6f6d7e1c0">SMBIOS_TABLE_TYPE14::Hdr</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
+Filtered multicast MAC address list. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:21 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:01 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

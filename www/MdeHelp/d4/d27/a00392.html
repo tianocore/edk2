@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_CAPSULE_HEADER Struct Reference</title>
+<title>MdePkg[ALL]: EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,82 +21,235 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_CAPSULE_HEADER Struct Reference</h1><!-- doxytag: class="EFI_CAPSULE_HEADER" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE Struct Reference</h1><!-- doxytag: class="EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d27/a00392.html#abd13044b99cd939d06eeb3241ccc7a7">CapsuleGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/ddd/a00380.html">EFI_ACPI_DESCRIPTION_HEADER</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d27/a00392.html#b298bd5bcda9ef71ea89779a26a8197e">Header</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d27/a00392.html#65fcb1130a6eb453f0a1345f776d96a7">HeaderSize</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d27/a00392.html#56ae5876b00c46a3e376770229da6fab">WatchdogHeaderLength</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d27/a00392.html#81f79a67900df424a151f58ddf5e0130">Flags</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d27/a00392.html#1369bd8a8d1a41524ad3574ffa0843ce">PCISegment</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d27/a00392.html#2240cf8de0ac77d08ffafb21acd95d79">CapsuleImageSize</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d27/a00392.html#e6b53a18e443e3b5d05fd26cb12ddf2b">PCIBusNumber</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d27/a00392.html#f59ecae29684fe5fb11cee4c767b748f">PCIDeviceNumber</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d27/a00392.html#3775d23af251ca6fbf782992fd3aaf8b">PCIFunctionNumber</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d27/a00392.html#b1317b058b7beb746f678608e329aee6">Reserved_45</a> [3]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d27/a00392.html#0bde1701da626f9cfc976c8b182ed77f">TimerPeriod</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d27/a00392.html#9b0ef78abddab711cc7fe5486a19dd66">MaxCount</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d27/a00392.html#041125117fd85a09b22b4938bb126a3c">MinCount</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d27/a00392.html#de0e71bb93105027222b6756de5ae486">WatchdogFlags</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d27/a00392.html#ee1cd6241ac6638249d0ff208e9e1387">Reserved_61</a> [3]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d27/a00392.html#460de710a7021085e1e09f3e81abf877">NumberWatchdogInstructionEntries</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-EFI Capsule Header <hr><h2>Field Documentation</h2>
-<a class="anchor" name="abd13044b99cd939d06eeb3241ccc7a7"></a><!-- doxytag: member="EFI_CAPSULE_HEADER::CapsuleGuid" ref="abd13044b99cd939d06eeb3241ccc7a7" args="" -->
+Watchdog Action Table definition. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="b298bd5bcda9ef71ea89779a26a8197e"></a><!-- doxytag: member="EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE::Header" ref="b298bd5bcda9ef71ea89779a26a8197e" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../d4/d27/a00392.html#abd13044b99cd939d06eeb3241ccc7a7">EFI_CAPSULE_HEADER::CapsuleGuid</a>          </td>
+          <td class="memname"><a class="el" href="../../d8/ddd/a00380.html">EFI_ACPI_DESCRIPTION_HEADER</a> <a class="el" href="../../d4/d27/a00392.html#b298bd5bcda9ef71ea89779a26a8197e">EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE::Header</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-A <a class="el" href="../../d9/d0f/a00644.html">GUID</a> that defines the contents of a capsule. 
+
 </div>
 </div><p>
-<a class="anchor" name="2240cf8de0ac77d08ffafb21acd95d79"></a><!-- doxytag: member="EFI_CAPSULE_HEADER::CapsuleImageSize" ref="2240cf8de0ac77d08ffafb21acd95d79" args="" -->
+<a class="anchor" name="9b0ef78abddab711cc7fe5486a19dd66"></a><!-- doxytag: member="EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE::MaxCount" ref="9b0ef78abddab711cc7fe5486a19dd66" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d4/d27/a00392.html#2240cf8de0ac77d08ffafb21acd95d79">EFI_CAPSULE_HEADER::CapsuleImageSize</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d4/d27/a00392.html#9b0ef78abddab711cc7fe5486a19dd66">EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE::MaxCount</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Size in bytes of the capsule. 
+
 </div>
 </div><p>
-<a class="anchor" name="81f79a67900df424a151f58ddf5e0130"></a><!-- doxytag: member="EFI_CAPSULE_HEADER::Flags" ref="81f79a67900df424a151f58ddf5e0130" args="" -->
+<a class="anchor" name="041125117fd85a09b22b4938bb126a3c"></a><!-- doxytag: member="EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE::MinCount" ref="041125117fd85a09b22b4938bb126a3c" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d4/d27/a00392.html#81f79a67900df424a151f58ddf5e0130">EFI_CAPSULE_HEADER::Flags</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d4/d27/a00392.html#041125117fd85a09b22b4938bb126a3c">EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE::MinCount</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Bit-mapped list describing the capsule attributes. The Flag values of 0x0000 - 0xFFFF are defined by CapsuleGuid. Flag values of 0x10000 - 0xFFFFFFFF are defined by this specification 
+
 </div>
 </div><p>
-<a class="anchor" name="65fcb1130a6eb453f0a1345f776d96a7"></a><!-- doxytag: member="EFI_CAPSULE_HEADER::HeaderSize" ref="65fcb1130a6eb453f0a1345f776d96a7" args="" -->
+<a class="anchor" name="460de710a7021085e1e09f3e81abf877"></a><!-- doxytag: member="EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE::NumberWatchdogInstructionEntries" ref="460de710a7021085e1e09f3e81abf877" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d4/d27/a00392.html#65fcb1130a6eb453f0a1345f776d96a7">EFI_CAPSULE_HEADER::HeaderSize</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d4/d27/a00392.html#460de710a7021085e1e09f3e81abf877">EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE::NumberWatchdogInstructionEntries</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The size of the capsule header. This may be larger than the size of the <a class="el" href="../../d4/d27/a00392.html">EFI_CAPSULE_HEADER</a> since CapsuleGuid may imply extended header entries 
+
+</div>
+</div><p>
+<a class="anchor" name="e6b53a18e443e3b5d05fd26cb12ddf2b"></a><!-- doxytag: member="EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE::PCIBusNumber" ref="e6b53a18e443e3b5d05fd26cb12ddf2b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d27/a00392.html#e6b53a18e443e3b5d05fd26cb12ddf2b">EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE::PCIBusNumber</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="f59ecae29684fe5fb11cee4c767b748f"></a><!-- doxytag: member="EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE::PCIDeviceNumber" ref="f59ecae29684fe5fb11cee4c767b748f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d27/a00392.html#f59ecae29684fe5fb11cee4c767b748f">EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE::PCIDeviceNumber</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="3775d23af251ca6fbf782992fd3aaf8b"></a><!-- doxytag: member="EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE::PCIFunctionNumber" ref="3775d23af251ca6fbf782992fd3aaf8b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d27/a00392.html#3775d23af251ca6fbf782992fd3aaf8b">EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE::PCIFunctionNumber</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="1369bd8a8d1a41524ad3574ffa0843ce"></a><!-- doxytag: member="EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE::PCISegment" ref="1369bd8a8d1a41524ad3574ffa0843ce" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d27/a00392.html#1369bd8a8d1a41524ad3574ffa0843ce">EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE::PCISegment</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="b1317b058b7beb746f678608e329aee6"></a><!-- doxytag: member="EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE::Reserved_45" ref="b1317b058b7beb746f678608e329aee6" args="[3]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d27/a00392.html#b1317b058b7beb746f678608e329aee6">EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE::Reserved_45</a>[3]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="ee1cd6241ac6638249d0ff208e9e1387"></a><!-- doxytag: member="EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE::Reserved_61" ref="ee1cd6241ac6638249d0ff208e9e1387" args="[3]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d27/a00392.html#ee1cd6241ac6638249d0ff208e9e1387">EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE::Reserved_61</a>[3]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="0bde1701da626f9cfc976c8b182ed77f"></a><!-- doxytag: member="EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE::TimerPeriod" ref="0bde1701da626f9cfc976c8b182ed77f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d4/d27/a00392.html#0bde1701da626f9cfc976c8b182ed77f">EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE::TimerPeriod</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="de0e71bb93105027222b6756de5ae486"></a><!-- doxytag: member="EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE::WatchdogFlags" ref="de0e71bb93105027222b6756de5ae486" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d27/a00392.html#de0e71bb93105027222b6756de5ae486">EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE::WatchdogFlags</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="56ae5876b00c46a3e376770229da6fab"></a><!-- doxytag: member="EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE::WatchdogHeaderLength" ref="56ae5876b00c46a3e376770229da6fab" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d4/d27/a00392.html#56ae5876b00c46a3e376770229da6fab">EFI_ACPI_WATCHDOG_ACTION_1_0_TABLE::WatchdogHeaderLength</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:28 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

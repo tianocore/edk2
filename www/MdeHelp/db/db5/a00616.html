@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_TE_IMAGE_HEADER Struct Reference</title>
+<title>MdePkg[ALL]: EFI_SCSI_DISK_CAPACITY_DATA Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,194 +21,150 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_TE_IMAGE_HEADER Struct Reference</h1><!-- doxytag: class="EFI_TE_IMAGE_HEADER" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_SCSI_DISK_CAPACITY_DATA Struct Reference</h1><!-- doxytag: class="EFI_SCSI_DISK_CAPACITY_DATA" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db5/a00616.html#3d3936e43ecd7a6871d92b68965cf31c">Signature</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db5/a00616.html#198fdd209c6c4754d0510e9c4042e739">LastLba3</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">signature for TE format = "VZ"  <a href="#3d3936e43ecd7a6871d92b68965cf31c"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db5/a00616.html#fbd7559d912a032e8f591e9031d40649">Machine</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db5/a00616.html#0cb2dc52228afff2edc18f12b8e6d0bf">LastLba2</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">from the original file header  <a href="#fbd7559d912a032e8f591e9031d40649"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db5/a00616.html#eefb9c67eab8d65fffb5f027325b7c27">NumberOfSections</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db5/a00616.html#5035e35c9aba9edf751911e00c62aa68">LastLba1</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">from the original file header  <a href="#eefb9c67eab8d65fffb5f027325b7c27"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db5/a00616.html#4740575f896296017908f8b4e5fb480d">Subsystem</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db5/a00616.html#2e480efda75131e3d4a225b1b80197ea">LastLba0</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">from original optional header  <a href="#4740575f896296017908f8b4e5fb480d"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db5/a00616.html#e44da0f0fba5ecdce80f528d3c7dfa35">StrippedSize</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db5/a00616.html#b709556d7019854844c93cc01b5f9158">BlockSize3</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">how many bytes we removed from the header  <a href="#e44da0f0fba5ecdce80f528d3c7dfa35"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db5/a00616.html#3144223ff11b3bde328f40141ab244bc">AddressOfEntryPoint</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db5/a00616.html#53d2cc86b1cf246bae0ec0e7d0d57e10">BlockSize2</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">offset to entry point -- from original optional header  <a href="#3144223ff11b3bde328f40141ab244bc"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db5/a00616.html#76d3ad95a960a85ede59fba0f846cf13">BaseOfCode</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db5/a00616.html#5b3663f2754e4cea4ffdd6c3a79b7198">BlockSize1</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">from original image -- required for ITP debug  <a href="#76d3ad95a960a85ede59fba0f846cf13"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db5/a00616.html#7035bdf4962ed300b5e40be94d9747fa">ImageBase</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db5/a00616.html#87109e7129761567b6423dd10f9199dd">BlockSize0</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">from original file header  <a href="#7035bdf4962ed300b5e40be94d9747fa"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/ddf/a00469.html">EFI_IMAGE_DATA_DIRECTORY</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db5/a00616.html#d090195a15bb2a82ff6da4503ac72d1e">DataDirectory</a> [2]</td></tr>
-
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">only base relocation and debug directory  <a href="#d090195a15bb2a82ff6da4503ac72d1e"></a><br></td></tr>
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Header format for TE images, defined in PI Specification, 1.0 <hr><h2>Field Documentation</h2>
-<a class="anchor" name="3144223ff11b3bde328f40141ab244bc"></a><!-- doxytag: member="EFI_TE_IMAGE_HEADER::AddressOfEntryPoint" ref="3144223ff11b3bde328f40141ab244bc" args="" -->
+SCSI Disk READ CAPACITY Data <hr><h2>Field Documentation</h2>
+<a class="anchor" name="87109e7129761567b6423dd10f9199dd"></a><!-- doxytag: member="EFI_SCSI_DISK_CAPACITY_DATA::BlockSize0" ref="87109e7129761567b6423dd10f9199dd" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../db/db5/a00616.html#3144223ff11b3bde328f40141ab244bc">EFI_TE_IMAGE_HEADER::AddressOfEntryPoint</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../db/db5/a00616.html#87109e7129761567b6423dd10f9199dd">EFI_SCSI_DISK_CAPACITY_DATA::BlockSize0</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-offset to entry point -- from original optional header 
-<p>
 
 </div>
 </div><p>
-<a class="anchor" name="76d3ad95a960a85ede59fba0f846cf13"></a><!-- doxytag: member="EFI_TE_IMAGE_HEADER::BaseOfCode" ref="76d3ad95a960a85ede59fba0f846cf13" args="" -->
+<a class="anchor" name="5b3663f2754e4cea4ffdd6c3a79b7198"></a><!-- doxytag: member="EFI_SCSI_DISK_CAPACITY_DATA::BlockSize1" ref="5b3663f2754e4cea4ffdd6c3a79b7198" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../db/db5/a00616.html#76d3ad95a960a85ede59fba0f846cf13">EFI_TE_IMAGE_HEADER::BaseOfCode</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../db/db5/a00616.html#5b3663f2754e4cea4ffdd6c3a79b7198">EFI_SCSI_DISK_CAPACITY_DATA::BlockSize1</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-from original image -- required for ITP debug 
-<p>
 
 </div>
 </div><p>
-<a class="anchor" name="d090195a15bb2a82ff6da4503ac72d1e"></a><!-- doxytag: member="EFI_TE_IMAGE_HEADER::DataDirectory" ref="d090195a15bb2a82ff6da4503ac72d1e" args="[2]" -->
+<a class="anchor" name="53d2cc86b1cf246bae0ec0e7d0d57e10"></a><!-- doxytag: member="EFI_SCSI_DISK_CAPACITY_DATA::BlockSize2" ref="53d2cc86b1cf246bae0ec0e7d0d57e10" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/ddf/a00469.html">EFI_IMAGE_DATA_DIRECTORY</a> <a class="el" href="../../db/db5/a00616.html#d090195a15bb2a82ff6da4503ac72d1e">EFI_TE_IMAGE_HEADER::DataDirectory</a>[2]          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../db/db5/a00616.html#53d2cc86b1cf246bae0ec0e7d0d57e10">EFI_SCSI_DISK_CAPACITY_DATA::BlockSize2</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-only base relocation and debug directory 
-<p>
 
 </div>
 </div><p>
-<a class="anchor" name="7035bdf4962ed300b5e40be94d9747fa"></a><!-- doxytag: member="EFI_TE_IMAGE_HEADER::ImageBase" ref="7035bdf4962ed300b5e40be94d9747fa" args="" -->
+<a class="anchor" name="b709556d7019854844c93cc01b5f9158"></a><!-- doxytag: member="EFI_SCSI_DISK_CAPACITY_DATA::BlockSize3" ref="b709556d7019854844c93cc01b5f9158" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../db/db5/a00616.html#7035bdf4962ed300b5e40be94d9747fa">EFI_TE_IMAGE_HEADER::ImageBase</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../db/db5/a00616.html#b709556d7019854844c93cc01b5f9158">EFI_SCSI_DISK_CAPACITY_DATA::BlockSize3</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-from original file header 
-<p>
 
 </div>
 </div><p>
-<a class="anchor" name="fbd7559d912a032e8f591e9031d40649"></a><!-- doxytag: member="EFI_TE_IMAGE_HEADER::Machine" ref="fbd7559d912a032e8f591e9031d40649" args="" -->
+<a class="anchor" name="2e480efda75131e3d4a225b1b80197ea"></a><!-- doxytag: member="EFI_SCSI_DISK_CAPACITY_DATA::LastLba0" ref="2e480efda75131e3d4a225b1b80197ea" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../db/db5/a00616.html#fbd7559d912a032e8f591e9031d40649">EFI_TE_IMAGE_HEADER::Machine</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../db/db5/a00616.html#2e480efda75131e3d4a225b1b80197ea">EFI_SCSI_DISK_CAPACITY_DATA::LastLba0</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-from the original file header 
-<p>
 
 </div>
 </div><p>
-<a class="anchor" name="eefb9c67eab8d65fffb5f027325b7c27"></a><!-- doxytag: member="EFI_TE_IMAGE_HEADER::NumberOfSections" ref="eefb9c67eab8d65fffb5f027325b7c27" args="" -->
+<a class="anchor" name="5035e35c9aba9edf751911e00c62aa68"></a><!-- doxytag: member="EFI_SCSI_DISK_CAPACITY_DATA::LastLba1" ref="5035e35c9aba9edf751911e00c62aa68" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../db/db5/a00616.html#eefb9c67eab8d65fffb5f027325b7c27">EFI_TE_IMAGE_HEADER::NumberOfSections</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../db/db5/a00616.html#5035e35c9aba9edf751911e00c62aa68">EFI_SCSI_DISK_CAPACITY_DATA::LastLba1</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-from the original file header 
-<p>
 
 </div>
 </div><p>
-<a class="anchor" name="3d3936e43ecd7a6871d92b68965cf31c"></a><!-- doxytag: member="EFI_TE_IMAGE_HEADER::Signature" ref="3d3936e43ecd7a6871d92b68965cf31c" args="" -->
+<a class="anchor" name="0cb2dc52228afff2edc18f12b8e6d0bf"></a><!-- doxytag: member="EFI_SCSI_DISK_CAPACITY_DATA::LastLba2" ref="0cb2dc52228afff2edc18f12b8e6d0bf" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../db/db5/a00616.html#3d3936e43ecd7a6871d92b68965cf31c">EFI_TE_IMAGE_HEADER::Signature</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../db/db5/a00616.html#0cb2dc52228afff2edc18f12b8e6d0bf">EFI_SCSI_DISK_CAPACITY_DATA::LastLba2</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-signature for TE format = "VZ" 
-<p>
 
 </div>
 </div><p>
-<a class="anchor" name="e44da0f0fba5ecdce80f528d3c7dfa35"></a><!-- doxytag: member="EFI_TE_IMAGE_HEADER::StrippedSize" ref="e44da0f0fba5ecdce80f528d3c7dfa35" args="" -->
+<a class="anchor" name="198fdd209c6c4754d0510e9c4042e739"></a><!-- doxytag: member="EFI_SCSI_DISK_CAPACITY_DATA::LastLba3" ref="198fdd209c6c4754d0510e9c4042e739" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../db/db5/a00616.html#e44da0f0fba5ecdce80f528d3c7dfa35">EFI_TE_IMAGE_HEADER::StrippedSize</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../db/db5/a00616.html#198fdd209c6c4754d0510e9c4042e739">EFI_SCSI_DISK_CAPACITY_DATA::LastLba3</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-how many bytes we removed from the header 
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="4740575f896296017908f8b4e5fb480d"></a><!-- doxytag: member="EFI_TE_IMAGE_HEADER::Subsystem" ref="4740575f896296017908f8b4e5fb480d" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../db/db5/a00616.html#4740575f896296017908f8b4e5fb480d">EFI_TE_IMAGE_HEADER::Subsystem</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-from original optional header 
-<p>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:19 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:43 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

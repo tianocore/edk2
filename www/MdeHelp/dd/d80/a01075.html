@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Ppi/GuidedSectionExtraction.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Library/PciCf8Lib.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,74 +21,1627 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Ppi/GuidedSectionExtraction.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Library/PciCf8Lib.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
-<tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d24/a00222.html">_EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI</a></td></tr>
+<tr><td colspan="2"><br><h2>Defines</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#0c2c1ea0b44d6f3b6c90967642e63282">PCI_CF8_LIB_ADDRESS</a>(Bus, Device, Function, Offset)&nbsp;&nbsp;&nbsp;(((Offset) &amp; 0xfff) | (((Function) &amp; 0x07) &lt;&lt; 12) | (((Device) &amp; 0x1f) &lt;&lt; 15) | (((Bus) &amp; 0xff) &lt;&lt; 20))</td></tr>
 
-<tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
-<a class="el" href="../../d0/d24/a00222.html">_EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#fbcea9999dd493ad3a366a9e033529c5">EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI</a></td></tr>
+<tr><td colspan="2"><br><h2>Functions</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d2/dd5/a01002.html#f3519a25bfa97c295fb23ffec95b1cb1">RETURN_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#96414ed7f0ab9508502b8c86e734b22e">PciCf8RegisterForRuntimeAccess</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#caeaf28c07bd47337f2cc876c60be878">EFI_PEI_EXTRACT_GUIDED_SECTION</a> )(IN CONST <a class="el" href="../../d0/d24/a00222.html">EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI</a> *This, IN CONST VOID *InputSection, OUT VOID **OutputBuffer, OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *OutputSize, OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *AuthenticationStatus)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#00835264e4d9ebb843b40fa282137e89">PciCf8Read8</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#8b8253f6c1f10c5d77804141dc7df6e5">PciCf8Write8</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> Value)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#6772ede07ddca5a366a30c945c1f62c9">PciCf8Or8</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> OrData)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#358cb32bee99a4343e08e072d1dbf9f0">PciCf8And8</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> AndData)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#4a4cbfc2ed13b96e35986f0281724cf3">PciCf8AndThenOr8</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> AndData, IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> OrData)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#61869f96654dba6abb2209bce2bea055">PciCf8BitFieldRead8</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartBit, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EndBit)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#4016fe718d17c07a5cd5cafca74ab6e8">PciCf8BitFieldWrite8</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartBit, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EndBit, IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> Value)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#e0167a68f14610d84e0f6cfcff711b2f">PciCf8BitFieldOr8</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartBit, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EndBit, IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> OrData)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#c6e1e4b8172fee052c0400b2cff4b301">PciCf8BitFieldAnd8</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartBit, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EndBit, IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> AndData)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#8afd69f4dadf3e9e279c5829434a7418">PciCf8BitFieldAndThenOr8</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartBit, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EndBit, IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> AndData, IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> OrData)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#a643d11a638f2094d04158e022024158">PciCf8Read16</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#764c29fe56f7328503a1d2fab5ed4a86">PciCf8Write16</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> Value)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#b69b5b88d2346a62749facc4ec9c2679">PciCf8Or16</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> OrData)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#7e0f5be692ceb91479a7532bddf35fae">PciCf8And16</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> AndData)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#cc3679d90cca412ab466a4ba4ef20b9a">PciCf8AndThenOr16</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> AndData, IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> OrData)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#fed1feb9bd22e17435f0133ca4b7c76d">PciCf8BitFieldRead16</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartBit, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EndBit)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#dbcb2a0f24406b93376668c0dcc3811b">PciCf8BitFieldWrite16</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartBit, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EndBit, IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> Value)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#67fb3fdde7f49e09a23cdb7334d4a597">PciCf8BitFieldOr16</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartBit, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EndBit, IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> OrData)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#c61f2bc4620a10902907e4212553f7e9">PciCf8BitFieldAnd16</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartBit, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EndBit, IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> AndData)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#bdbe9725e3934cec61446c78e8f34f71">PciCf8BitFieldAndThenOr16</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartBit, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EndBit, IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> AndData, IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> OrData)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#43e51c4df1d0775582bda4e47360885d">PciCf8Read32</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#35e00f9073a42aa2c5348f15e92cb100">PciCf8Write32</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> Value)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#4205e1eb741bfdbccacddd0481ffdb36">PciCf8Or32</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> OrData)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#37dfda501b79f53dadf087da59c47826">PciCf8And32</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> AndData)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#9620af752d8f51168b664c4303ed5a29">PciCf8AndThenOr32</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> AndData, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> OrData)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#13bc120871b91ad626d351e3531e48ed">PciCf8BitFieldRead32</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartBit, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EndBit)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#34c1e0462d78ccd1ea35548b3612c149">PciCf8BitFieldWrite32</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartBit, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EndBit, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> Value)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#00e66a64c80296a4d6ad48a024e06c28">PciCf8BitFieldOr32</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartBit, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EndBit, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> OrData)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#fa96f6b882b9c37e923886122bd40a42">PciCf8BitFieldAnd32</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartBit, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EndBit, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> AndData)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#98df166e66e75fb945246ec38f80e005">PciCf8BitFieldAndThenOr32</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartBit, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EndBit, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> AndData, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> OrData)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#f75ce601d3e4f0205f3e28e5e6e689c0">PciCf8ReadBuffer</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartAddress, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Size, OUT VOID *Buffer)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d80/a01075.html#3815f243893a770a633e73f4cda8eeeb">PciCf8WriteBuffer</a> (IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartAddress, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Size, IN VOID *Buffer)</td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-If a GUID-defined section is encountered when doing section extraction, the PEI Foundation or the EFI_PEI_FILE_LOADER_PPI instance calls the appropriate instance of the GUIDed Section Extraction PPI to extract the section stream contained therein.<p>
-Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
-<dl class="user" compact><dt><b>Revision Reference:</b></dt><dd>This PPI is introduced in PI Version 1.0. </dd></dl>
-<hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="caeaf28c07bd47337f2cc876c60be878"></a><!-- doxytag: member="GuidedSectionExtraction.h::EFI_PEI_EXTRACT_GUIDED_SECTION" ref="caeaf28c07bd47337f2cc876c60be878" args=")(IN CONST EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI *This, IN CONST VOID *InputSection, OUT VOID **OutputBuffer, OUT UINTN *OutputSize, OUT UINT32 *AuthenticationStatus)" -->
+Provides services to access PCI Configuration Space using the I/O ports 0xCF8 and 0xCFC.<p>
+This library is identical to the PCI Library, except the access method for performing PCI configuration cycles must be through I/O ports 0xCF8 and 0xCFC. This library only allows access to PCI Segment #0.<p>
+Copyright (c) 2006 - 2009, Intel Corporation<br>
+ All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
+<a class="anchor" name="0c2c1ea0b44d6f3b6c90967642e63282"></a><!-- doxytag: member="PciCf8Lib.h::PCI_CF8_LIB_ADDRESS" ref="0c2c1ea0b44d6f3b6c90967642e63282" args="(Bus, Device, Function, Offset)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../dd/d80/a01075.html#caeaf28c07bd47337f2cc876c60be878">EFI_PEI_EXTRACT_GUIDED_SECTION</a>)(IN CONST <a class="el" href="../../d0/d24/a00222.html">EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI</a> *This, IN CONST VOID *InputSection, OUT VOID **OutputBuffer, OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *OutputSize, OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *AuthenticationStatus)          </td>
+          <td class="memname">#define PCI_CF8_LIB_ADDRESS          </td>
+          <td>(</td>
+          <td class="paramtype">Bus,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Device,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Function,         <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Offset&nbsp;</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td>&nbsp;&nbsp;&nbsp;(((Offset) &amp; 0xfff) | (((Function) &amp; 0x07) &lt;&lt; 12) | (((Device) &amp; 0x1f) &lt;&lt; 15) | (((Bus) &amp; 0xff) &lt;&lt; 20))</td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Processes the input section and returns the data contained therein along with the authentication status.<p>
-The ExtractSection() function processes the input section and returns a pointer to the section contents. If the section being extracted does not require processing (if the section GuidedSectionHeader.Attributes has the EFI_GUIDED_SECTION_PROCESSING_REQUIRED field cleared), then OutputBuffer is just updated to point to the start of the section's contents. Otherwise, *Buffer must be allocated from PEI permanent memory.<p>
+Macro that converts PCI Bus, PCI Device, PCI Function and PCI Register to an address that can be passed to the PCI Library functions.<p>
+Computes an address that is compatible with the PCI Library functions. The unused upper bits of Bus, Device, Function and Register are stripped prior to the generation of the address.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Indicates the EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>InputSection</em>&nbsp;</td><td>Buffer containing the input GUIDed section to be processed. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>OutputBuffer</em>&nbsp;</td><td>*OutputBuffer is allocated from PEI permanent memory and contains the new section stream. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>OutputSize</em>&nbsp;</td><td>A pointer to a caller-allocated UINTN in which the size of *OutputBuffer allocation is stored. If the function returns anything other than EFI_SUCCESS, the value of *OutputSize is undefined. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>AuthenticationStatus</em>&nbsp;</td><td>A pointer to a caller-allocated UINT32 that indicates the authentication status of the output buffer. If the input section's GuidedSectionHeader.Attributes field has the EFI_GUIDED_SECTION_AUTH_STATUS_VALID bit as clear, AuthenticationStatus must return zero. These bits reflect the status of the extraction operation. If the function returns anything other than EFI_SUCCESS, the value of *AuthenticationStatus is undefined.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Bus</em>&nbsp;</td><td>PCI Bus number. Range 0..255. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Device</em>&nbsp;</td><td>PCI Device number. Range 0..31. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Function</em>&nbsp;</td><td>PCI Function number. Range 0..7. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Register</em>&nbsp;</td><td>PCI Register number. Range 0..255.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The encode PCI address. </dd></dl>
+
+</div>
+</div><p>
+<hr><h2>Function Documentation</h2>
+<a class="anchor" name="7e0f5be692ceb91479a7532bddf35fae"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8And16" ref="7e0f5be692ceb91479a7532bddf35fae" args="(IN UINTN Address, IN UINT16 AndData)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI PciCf8And16           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
+          <td class="paramname"> <em>AndData</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Performs a bitwise AND of a 16-bit PCI configuration register with a 16-bit value.<p>
+Reads the 16-bit PCI configuration register specified by Address, performs a bitwise AND between the read result and the value specified by AndData, and writes the result to the 16-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized.<p>
+If Address &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 16-bit boundary, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by Address &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Bus, Device, Function and Register. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>AndData</em>&nbsp;</td><td>The value to AND with the PCI configuration register.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="37dfda501b79f53dadf087da59c47826"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8And32" ref="37dfda501b79f53dadf087da59c47826" args="(IN UINTN Address, IN UINT32 AndData)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI PciCf8And32           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td>
+          <td class="paramname"> <em>AndData</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Performs a bitwise AND of a 32-bit PCI configuration register with a 32-bit value.<p>
+Reads the 32-bit PCI configuration register specified by Address, performs a bitwise AND between the read result and the value specified by AndData, and writes the result to the 32-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized.<p>
+If Address &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 32-bit boundary, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by Address &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Bus, Device, Function and Register. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>AndData</em>&nbsp;</td><td>The value to AND with the PCI configuration register.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="358cb32bee99a4343e08e072d1dbf9f0"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8And8" ref="358cb32bee99a4343e08e072d1dbf9f0" args="(IN UINTN Address, IN UINT8 AndData)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI PciCf8And8           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
+          <td class="paramname"> <em>AndData</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Performs a bitwise AND of an 8-bit PCI configuration register with an 8-bit value.<p>
+Reads the 8-bit PCI configuration register specified by Address, performs a bitwise AND between the read result and the value specified by AndData, and writes the result to the 8-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized.<p>
+If Address &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by Address &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Bus, Device, Function and Register. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>AndData</em>&nbsp;</td><td>The value to AND with the PCI configuration register.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="cc3679d90cca412ab466a4ba4ef20b9a"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8AndThenOr16" ref="cc3679d90cca412ab466a4ba4ef20b9a" args="(IN UINTN Address, IN UINT16 AndData, IN UINT16 OrData)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI PciCf8AndThenOr16           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
+          <td class="paramname"> <em>AndData</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
+          <td class="paramname"> <em>OrData</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Performs a bitwise AND of a 16-bit PCI configuration register with a 16-bit value, followed a bitwise OR with another 16-bit value.<p>
+Reads the 16-bit PCI configuration register specified by Address, performs a bitwise AND between the read result and the value specified by AndData, performs a bitwise OR between the result of the AND operation and the value specified by OrData, and writes the result to the 16-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized.<p>
+If Address &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 16-bit boundary, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by Address &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Bus, Device, Function and Register. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>AndData</em>&nbsp;</td><td>The value to AND with the PCI configuration register. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>OrData</em>&nbsp;</td><td>The value to OR with the result of the AND operation.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="9620af752d8f51168b664c4303ed5a29"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8AndThenOr32" ref="9620af752d8f51168b664c4303ed5a29" args="(IN UINTN Address, IN UINT32 AndData, IN UINT32 OrData)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI PciCf8AndThenOr32           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td>
+          <td class="paramname"> <em>AndData</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td>
+          <td class="paramname"> <em>OrData</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Performs a bitwise AND of a 32-bit PCI configuration register with a 32-bit value, followed a bitwise OR with another 32-bit value.<p>
+Reads the 32-bit PCI configuration register specified by Address, performs a bitwise AND between the read result and the value specified by AndData, performs a bitwise OR between the result of the AND operation and the value specified by OrData, and writes the result to the 32-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized.<p>
+If Address &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 32-bit boundary, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by Address &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Bus, Device, Function and Register. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>AndData</em>&nbsp;</td><td>The value to AND with the PCI configuration register. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>OrData</em>&nbsp;</td><td>The value to OR with the result of the AND operation.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="4a4cbfc2ed13b96e35986f0281724cf3"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8AndThenOr8" ref="4a4cbfc2ed13b96e35986f0281724cf3" args="(IN UINTN Address, IN UINT8 AndData, IN UINT8 OrData)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI PciCf8AndThenOr8           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
+          <td class="paramname"> <em>AndData</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
+          <td class="paramname"> <em>OrData</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Performs a bitwise AND of an 8-bit PCI configuration register with an 8-bit value, followed a bitwise OR with another 8-bit value.<p>
+Reads the 8-bit PCI configuration register specified by Address, performs a bitwise AND between the read result and the value specified by AndData, performs a bitwise OR between the result of the AND operation and the value specified by OrData, and writes the result to the 8-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized.<p>
+If Address &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by Address &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Bus, Device, Function and Register. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>AndData</em>&nbsp;</td><td>The value to AND with the PCI configuration register. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>OrData</em>&nbsp;</td><td>The value to OR with the result of the AND operation.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="c61f2bc4620a10902907e4212553f7e9"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8BitFieldAnd16" ref="c61f2bc4620a10902907e4212553f7e9" args="(IN UINTN Address, IN UINTN StartBit, IN UINTN EndBit, IN UINT16 AndData)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI PciCf8BitFieldAnd16           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>StartBit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>EndBit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
+          <td class="paramname"> <em>AndData</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Reads a bit field in a 16-bit PCI configuration register, performs a bitwise AND, and writes the result back to the bit field in the 16-bit register.<p>
+Reads the 16-bit PCI configuration register specified by Address, performs a bitwise AND between the read result and the value specified by AndData, and writes the result to the 16-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized. Extra left bits in AndData are stripped.<p>
+If Address &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 16-bit boundary, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by Address &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If StartBit is greater than 15, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is greater than 15, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is less than StartBit, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>PCI configuration register to write. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>StartBit</em>&nbsp;</td><td>The ordinal of the least significant bit in the bit field. Range 0..15. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EndBit</em>&nbsp;</td><td>The ordinal of the most significant bit in the bit field. Range 0..15. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>AndData</em>&nbsp;</td><td>The value to AND with the PCI configuration register.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="fa96f6b882b9c37e923886122bd40a42"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8BitFieldAnd32" ref="fa96f6b882b9c37e923886122bd40a42" args="(IN UINTN Address, IN UINTN StartBit, IN UINTN EndBit, IN UINT32 AndData)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI PciCf8BitFieldAnd32           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>StartBit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>EndBit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td>
+          <td class="paramname"> <em>AndData</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Reads a bit field in a 32-bit PCI configuration register, performs a bitwise AND, and writes the result back to the bit field in the 32-bit register.<p>
+Reads the 32-bit PCI configuration register specified by Address, performs a bitwise AND between the read result and the value specified by AndData, and writes the result to the 32-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized. Extra left bits in AndData are stripped.<p>
+If Address &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 32-bit boundary, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by Address &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If StartBit is greater than 31, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is greater than 31, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is less than StartBit, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>PCI configuration register to write. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>StartBit</em>&nbsp;</td><td>The ordinal of the least significant bit in the bit field. Range 0..31. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EndBit</em>&nbsp;</td><td>The ordinal of the most significant bit in the bit field. Range 0..31. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>AndData</em>&nbsp;</td><td>The value to AND with the PCI configuration register.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="c6e1e4b8172fee052c0400b2cff4b301"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8BitFieldAnd8" ref="c6e1e4b8172fee052c0400b2cff4b301" args="(IN UINTN Address, IN UINTN StartBit, IN UINTN EndBit, IN UINT8 AndData)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI PciCf8BitFieldAnd8           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>StartBit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>EndBit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
+          <td class="paramname"> <em>AndData</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Reads a bit field in an 8-bit PCI configuration register, performs a bitwise AND, and writes the result back to the bit field in the 8-bit register.<p>
+Reads the 8-bit PCI configuration register specified by Address, performs a bitwise AND between the read result and the value specified by AndData, and writes the result to the 8-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized. Extra left bits in AndData are stripped.<p>
+If Address &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by Address &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If StartBit is greater than 7, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is greater than 7, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is less than StartBit, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>PCI configuration register to write. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>StartBit</em>&nbsp;</td><td>The ordinal of the least significant bit in the bit field. Range 0..7. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EndBit</em>&nbsp;</td><td>The ordinal of the most significant bit in the bit field. Range 0..7. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>AndData</em>&nbsp;</td><td>The value to AND with the PCI configuration register.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="bdbe9725e3934cec61446c78e8f34f71"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8BitFieldAndThenOr16" ref="bdbe9725e3934cec61446c78e8f34f71" args="(IN UINTN Address, IN UINTN StartBit, IN UINTN EndBit, IN UINT16 AndData, IN UINT16 OrData)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI PciCf8BitFieldAndThenOr16           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>StartBit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>EndBit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
+          <td class="paramname"> <em>AndData</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
+          <td class="paramname"> <em>OrData</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Reads a bit field in a 16-bit port, performs a bitwise AND followed by a bitwise OR, and writes the result back to the bit field in the 16-bit port.<p>
+Reads the 16-bit PCI configuration register specified by Address, performs a bitwise AND followed by a bitwise OR between the read result and the value specified by AndData, and writes the result to the 16-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized. Extra left bits in both AndData and OrData are stripped.<p>
+If Address &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 16-bit boundary, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by Address &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If StartBit is greater than 15, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is greater than 15, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is less than StartBit, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>PCI configuration register to write. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>StartBit</em>&nbsp;</td><td>The ordinal of the least significant bit in the bit field. Range 0..15. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EndBit</em>&nbsp;</td><td>The ordinal of the most significant bit in the bit field. Range 0..15. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>AndData</em>&nbsp;</td><td>The value to AND with the PCI configuration register. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>OrData</em>&nbsp;</td><td>The value to OR with the result of the AND operation.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="98df166e66e75fb945246ec38f80e005"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8BitFieldAndThenOr32" ref="98df166e66e75fb945246ec38f80e005" args="(IN UINTN Address, IN UINTN StartBit, IN UINTN EndBit, IN UINT32 AndData, IN UINT32 OrData)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI PciCf8BitFieldAndThenOr32           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>StartBit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>EndBit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td>
+          <td class="paramname"> <em>AndData</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td>
+          <td class="paramname"> <em>OrData</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Reads a bit field in a 32-bit port, performs a bitwise AND followed by a bitwise OR, and writes the result back to the bit field in the 32-bit port.<p>
+Reads the 32-bit PCI configuration register specified by Address, performs a bitwise AND followed by a bitwise OR between the read result and the value specified by AndData, and writes the result to the 32-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized. Extra left bits in both AndData and OrData are stripped.<p>
+If Address &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 32-bit boundary, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by Address &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If StartBit is greater than 31, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is greater than 31, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is less than StartBit, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>PCI configuration register to write. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>StartBit</em>&nbsp;</td><td>The ordinal of the least significant bit in the bit field. Range 0..31. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EndBit</em>&nbsp;</td><td>The ordinal of the most significant bit in the bit field. Range 0..31. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>AndData</em>&nbsp;</td><td>The value to AND with the PCI configuration register. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>OrData</em>&nbsp;</td><td>The value to OR with the result of the AND operation.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="8afd69f4dadf3e9e279c5829434a7418"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8BitFieldAndThenOr8" ref="8afd69f4dadf3e9e279c5829434a7418" args="(IN UINTN Address, IN UINTN StartBit, IN UINTN EndBit, IN UINT8 AndData, IN UINT8 OrData)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI PciCf8BitFieldAndThenOr8           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>StartBit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>EndBit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
+          <td class="paramname"> <em>AndData</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
+          <td class="paramname"> <em>OrData</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Reads a bit field in an 8-bit port, performs a bitwise AND followed by a bitwise OR, and writes the result back to the bit field in the 8-bit port.<p>
+Reads the 8-bit PCI configuration register specified by Address, performs a bitwise AND followed by a bitwise OR between the read result and the value specified by AndData, and writes the result to the 8-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized. Extra left bits in both AndData and OrData are stripped.<p>
+If Address &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by Address &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If StartBit is greater than 7, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is greater than 7, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is less than StartBit, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>PCI configuration register to write. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>StartBit</em>&nbsp;</td><td>The ordinal of the least significant bit in the bit field. Range 0..7. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EndBit</em>&nbsp;</td><td>The ordinal of the most significant bit in the bit field. Range 0..7. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>AndData</em>&nbsp;</td><td>The value to AND with the PCI configuration register. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>OrData</em>&nbsp;</td><td>The value to OR with the result of the AND operation.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="67fb3fdde7f49e09a23cdb7334d4a597"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8BitFieldOr16" ref="67fb3fdde7f49e09a23cdb7334d4a597" args="(IN UINTN Address, IN UINTN StartBit, IN UINTN EndBit, IN UINT16 OrData)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI PciCf8BitFieldOr16           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>StartBit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>EndBit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
+          <td class="paramname"> <em>OrData</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Reads a bit field in a 16-bit PCI configuration, performs a bitwise OR, and writes the result back to the bit field in the 16-bit port.<p>
+Reads the 16-bit PCI configuration register specified by Address, performs a bitwise OR between the read result and the value specified by OrData, and writes the result to the 16-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized. Extra left bits in OrData are stripped.<p>
+If Address &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 16-bit boundary, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by Address &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If StartBit is greater than 15, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is greater than 15, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is less than StartBit, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>PCI configuration register to write. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>StartBit</em>&nbsp;</td><td>The ordinal of the least significant bit in the bit field. Range 0..15. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EndBit</em>&nbsp;</td><td>The ordinal of the most significant bit in the bit field. Range 0..15. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>OrData</em>&nbsp;</td><td>The value to OR with the PCI configuration register.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="00e66a64c80296a4d6ad48a024e06c28"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8BitFieldOr32" ref="00e66a64c80296a4d6ad48a024e06c28" args="(IN UINTN Address, IN UINTN StartBit, IN UINTN EndBit, IN UINT32 OrData)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI PciCf8BitFieldOr32           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>StartBit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>EndBit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td>
+          <td class="paramname"> <em>OrData</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Reads a bit field in a 32-bit PCI configuration, performs a bitwise OR, and writes the result back to the bit field in the 32-bit port.<p>
+Reads the 32-bit PCI configuration register specified by Address, performs a bitwise OR between the read result and the value specified by OrData, and writes the result to the 32-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized. Extra left bits in OrData are stripped.<p>
+If Address &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 32-bit boundary, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by Address &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If StartBit is greater than 31, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is greater than 31, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is less than StartBit, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>PCI configuration register to write. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>StartBit</em>&nbsp;</td><td>The ordinal of the least significant bit in the bit field. Range 0..31. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EndBit</em>&nbsp;</td><td>The ordinal of the most significant bit in the bit field. Range 0..31. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>OrData</em>&nbsp;</td><td>The value to OR with the PCI configuration register.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="e0167a68f14610d84e0f6cfcff711b2f"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8BitFieldOr8" ref="e0167a68f14610d84e0f6cfcff711b2f" args="(IN UINTN Address, IN UINTN StartBit, IN UINTN EndBit, IN UINT8 OrData)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI PciCf8BitFieldOr8           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>StartBit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>EndBit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
+          <td class="paramname"> <em>OrData</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Reads a bit field in an 8-bit PCI configuration, performs a bitwise OR, and writes the result back to the bit field in the 8-bit port.<p>
+Reads the 8-bit PCI configuration register specified by Address, performs a bitwise OR between the read result and the value specified by OrData, and writes the result to the 8-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized. Extra left bits in OrData are stripped.<p>
+If Address &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by Address &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If StartBit is greater than 7, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is greater than 7, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is less than StartBit, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>PCI configuration register to write. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>StartBit</em>&nbsp;</td><td>The ordinal of the least significant bit in the bit field. Range 0..7. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EndBit</em>&nbsp;</td><td>The ordinal of the most significant bit in the bit field. Range 0..7. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>OrData</em>&nbsp;</td><td>The value to OR with the PCI configuration register.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="fed1feb9bd22e17435f0133ca4b7c76d"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8BitFieldRead16" ref="fed1feb9bd22e17435f0133ca4b7c76d" args="(IN UINTN Address, IN UINTN StartBit, IN UINTN EndBit)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI PciCf8BitFieldRead16           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>StartBit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>EndBit</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Reads a bit field of a PCI configuration register.<p>
+Reads the bit field in a 16-bit PCI configuration register. The bit field is specified by the StartBit and the EndBit. The value of the bit field is returned.<p>
+If Address &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 16-bit boundary, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by Address &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If StartBit is greater than 15, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is greater than 15, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is less than StartBit, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>PCI configuration register to read. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>StartBit</em>&nbsp;</td><td>The ordinal of the least significant bit in the bit field. Range 0..15. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EndBit</em>&nbsp;</td><td>The ordinal of the most significant bit in the bit field. Range 0..15.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value of the bit field read from the PCI configuration register. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="13bc120871b91ad626d351e3531e48ed"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8BitFieldRead32" ref="13bc120871b91ad626d351e3531e48ed" args="(IN UINTN Address, IN UINTN StartBit, IN UINTN EndBit)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI PciCf8BitFieldRead32           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>StartBit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>EndBit</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Reads a bit field of a PCI configuration register.<p>
+Reads the bit field in a 32-bit PCI configuration register. The bit field is specified by the StartBit and the EndBit. The value of the bit field is returned.<p>
+If Address &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 32-bit boundary, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by Address &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If StartBit is greater than 31, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is greater than 31, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is less than StartBit, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>PCI configuration register to read. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>StartBit</em>&nbsp;</td><td>The ordinal of the least significant bit in the bit field. Range 0..31. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EndBit</em>&nbsp;</td><td>The ordinal of the most significant bit in the bit field. Range 0..31.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value of the bit field read from the PCI configuration register. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="61869f96654dba6abb2209bce2bea055"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8BitFieldRead8" ref="61869f96654dba6abb2209bce2bea055" args="(IN UINTN Address, IN UINTN StartBit, IN UINTN EndBit)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI PciCf8BitFieldRead8           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>StartBit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>EndBit</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Reads a bit field of a PCI configuration register.<p>
+Reads the bit field in an 8-bit PCI configuration register. The bit field is specified by the StartBit and the EndBit. The value of the bit field is returned.<p>
+If Address &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by Address &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If StartBit is greater than 7, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is greater than 7, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is less than StartBit, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>PCI configuration register to read. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>StartBit</em>&nbsp;</td><td>The ordinal of the least significant bit in the bit field. Range 0..7. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EndBit</em>&nbsp;</td><td>The ordinal of the most significant bit in the bit field. Range 0..7.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value of the bit field read from the PCI configuration register. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="dbcb2a0f24406b93376668c0dcc3811b"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8BitFieldWrite16" ref="dbcb2a0f24406b93376668c0dcc3811b" args="(IN UINTN Address, IN UINTN StartBit, IN UINTN EndBit, IN UINT16 Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI PciCf8BitFieldWrite16           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>StartBit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>EndBit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
+          <td class="paramname"> <em>Value</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Writes a bit field to a PCI configuration register.<p>
+Writes Value to the bit field of the PCI configuration register. The bit field is specified by the StartBit and the EndBit. All other bits in the destination PCI configuration register are preserved. The new value of the 16-bit register is returned.<p>
+If Address &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 16-bit boundary, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by Address &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If StartBit is greater than 15, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is greater than 15, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is less than StartBit, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>PCI configuration register to write. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>StartBit</em>&nbsp;</td><td>The ordinal of the least significant bit in the bit field. Range 0..15. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EndBit</em>&nbsp;</td><td>The ordinal of the most significant bit in the bit field. Range 0..15. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>New value of the bit field.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="34c1e0462d78ccd1ea35548b3612c149"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8BitFieldWrite32" ref="34c1e0462d78ccd1ea35548b3612c149" args="(IN UINTN Address, IN UINTN StartBit, IN UINTN EndBit, IN UINT32 Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI PciCf8BitFieldWrite32           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>StartBit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>EndBit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td>
+          <td class="paramname"> <em>Value</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Writes a bit field to a PCI configuration register.<p>
+Writes Value to the bit field of the PCI configuration register. The bit field is specified by the StartBit and the EndBit. All other bits in the destination PCI configuration register are preserved. The new value of the 32-bit register is returned.<p>
+If Address &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 32-bit boundary, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by Address &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If StartBit is greater than 31, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is greater than 31, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is less than StartBit, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>PCI configuration register to write. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>StartBit</em>&nbsp;</td><td>The ordinal of the least significant bit in the bit field. Range 0..31. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EndBit</em>&nbsp;</td><td>The ordinal of the most significant bit in the bit field. Range 0..31. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>New value of the bit field.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="4016fe718d17c07a5cd5cafca74ab6e8"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8BitFieldWrite8" ref="4016fe718d17c07a5cd5cafca74ab6e8" args="(IN UINTN Address, IN UINTN StartBit, IN UINTN EndBit, IN UINT8 Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI PciCf8BitFieldWrite8           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>StartBit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>EndBit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
+          <td class="paramname"> <em>Value</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Writes a bit field to a PCI configuration register.<p>
+Writes Value to the bit field of the PCI configuration register. The bit field is specified by the StartBit and the EndBit. All other bits in the destination PCI configuration register are preserved. The new value of the 8-bit register is returned.<p>
+If Address &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by Address &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If StartBit is greater than 7, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is greater than 7, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is less than StartBit, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>PCI configuration register to write. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>StartBit</em>&nbsp;</td><td>The ordinal of the least significant bit in the bit field. Range 0..7. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EndBit</em>&nbsp;</td><td>The ordinal of the most significant bit in the bit field. Range 0..7. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>New value of the bit field.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="b69b5b88d2346a62749facc4ec9c2679"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8Or16" ref="b69b5b88d2346a62749facc4ec9c2679" args="(IN UINTN Address, IN UINT16 OrData)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI PciCf8Or16           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
+          <td class="paramname"> <em>OrData</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Performs a bitwise OR of a 16-bit PCI configuration register with a 16-bit value.<p>
+Reads the 16-bit PCI configuration register specified by Address, performs a bitwise OR between the read result and the value specified by OrData, and writes the result to the 16-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized.<p>
+If Address &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 16-bit boundary, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by Address &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Bus, Device, Function and Register. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>OrData</em>&nbsp;</td><td>The value to OR with the PCI configuration register.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="4205e1eb741bfdbccacddd0481ffdb36"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8Or32" ref="4205e1eb741bfdbccacddd0481ffdb36" args="(IN UINTN Address, IN UINT32 OrData)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI PciCf8Or32           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td>
+          <td class="paramname"> <em>OrData</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Performs a bitwise OR of a 32-bit PCI configuration register with a 32-bit value.<p>
+Reads the 32-bit PCI configuration register specified by Address, performs a bitwise OR between the read result and the value specified by OrData, and writes the result to the 32-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized.<p>
+If Address &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 32-bit boundary, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by Address &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Bus, Device, Function and Register. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>OrData</em>&nbsp;</td><td>The value to OR with the PCI configuration register.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="6772ede07ddca5a366a30c945c1f62c9"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8Or8" ref="6772ede07ddca5a366a30c945c1f62c9" args="(IN UINTN Address, IN UINT8 OrData)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI PciCf8Or8           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
+          <td class="paramname"> <em>OrData</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Performs a bitwise OR of an 8-bit PCI configuration register with an 8-bit value.<p>
+Reads the 8-bit PCI configuration register specified by Address, performs a bitwise OR between the read result and the value specified by OrData, and writes the result to the 8-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized.<p>
+If Address &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by Address &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Bus, Device, Function and Register. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>OrData</em>&nbsp;</td><td>The value to OR with the PCI configuration register.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="a643d11a638f2094d04158e022024158"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8Read16" ref="a643d11a638f2094d04158e022024158" args="(IN UINTN Address)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI PciCf8Read16           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Address</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Reads a 16-bit PCI configuration register.<p>
+Reads and returns the 16-bit PCI configuration register specified by Address. This function must guarantee that all PCI read and write operations are serialized.<p>
+If Address &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 16-bit boundary, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by Address &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Bus, Device, Function and Register.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The read value from the PCI configuration register. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="43e51c4df1d0775582bda4e47360885d"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8Read32" ref="43e51c4df1d0775582bda4e47360885d" args="(IN UINTN Address)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI PciCf8Read32           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Address</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Reads a 32-bit PCI configuration register.<p>
+Reads and returns the 32-bit PCI configuration register specified by Address. This function must guarantee that all PCI read and write operations are serialized.<p>
+If Address &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 32-bit boundary, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by Address &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Bus, Device, Function and Register.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The read value from the PCI configuration register. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="00835264e4d9ebb843b40fa282137e89"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8Read8" ref="00835264e4d9ebb843b40fa282137e89" args="(IN UINTN Address)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI PciCf8Read8           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Address</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Reads an 8-bit PCI configuration register.<p>
+Reads and returns the 8-bit PCI configuration register specified by Address. This function must guarantee that all PCI read and write operations are serialized.<p>
+If Address &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by Address &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Bus, Device, Function and Register.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The read value from the PCI configuration register. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="f75ce601d3e4f0205f3e28e5e6e689c0"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8ReadBuffer" ref="f75ce601d3e4f0205f3e28e5e6e689c0" args="(IN UINTN StartAddress, IN UINTN Size, OUT VOID *Buffer)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI PciCf8ReadBuffer           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>StartAddress</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">OUT VOID *&nbsp;</td>
+          <td class="paramname"> <em>Buffer</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Reads a range of PCI configuration registers into a caller supplied buffer.<p>
+Reads the range of PCI configuration registers specified by StartAddress and Size into the buffer specified by Buffer. This function only allows the PCI configuration registers from a single PCI function to be read. Size is returned. When possible 32-bit PCI configuration read cycles are used to read from StartAdress to StartAddress + Size. Due to alignment restrictions, 8-bit and 16-bit PCI configuration read cycles may be used at the beginning and the end of the range.<p>
+If StartAddress &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by StartAddress &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If ((StartAddress &amp; 0xFFF) + Size) &gt; 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Size &gt; 0 and Buffer is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>StartAddress</em>&nbsp;</td><td>Starting address that encodes the PCI Bus, Device, Function and Register. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Size</em>&nbsp;</td><td>Size in bytes of the transfer. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>Pointer to a buffer receiving the data read.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Size read from StartAddress. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="96414ed7f0ab9508502b8c86e734b22e"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8RegisterForRuntimeAccess" ref="96414ed7f0ab9508502b8c86e734b22e" args="(IN UINTN Address)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d2/dd5/a01002.html#f3519a25bfa97c295fb23ffec95b1cb1">RETURN_STATUS</a> EFIAPI PciCf8RegisterForRuntimeAccess           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Address</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Registers a PCI device so PCI configuration registers may be accessed after SetVirtualAddressMap().<p>
+Registers the PCI device specified by Address so all the PCI configuration registers associated with that PCI device may be accessed after SetVirtualAddressMap() is called.<p>
+If Address &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by Address &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Bus, Device, Function and Register.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The InputSection was successfully processed and the section contents were returned. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>The system has insufficient resources to process the request. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The <a class="el" href="../../d9/d0f/a00644.html">GUID</a> in InputSection does not match this instance of the GUIDed Section Extraction PPI. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>RETURN_SUCCESS</em>&nbsp;</td><td>The PCI device was registered for runtime access. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>RETURN_UNSUPPORTED</em>&nbsp;</td><td>An attempt was made to call this function after ExitBootServices(). </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>RETURN_UNSUPPORTED</em>&nbsp;</td><td>The resources required to access the PCI device at runtime could not be mapped. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>RETURN_OUT_OF_RESOURCES</em>&nbsp;</td><td>There are not enough resources available to complete the registration. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
-<a class="anchor" name="fbcea9999dd493ad3a366a9e033529c5"></a><!-- doxytag: member="GuidedSectionExtraction.h::EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI" ref="fbcea9999dd493ad3a366a9e033529c5" args="" -->
+<a class="anchor" name="764c29fe56f7328503a1d2fab5ed4a86"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8Write16" ref="764c29fe56f7328503a1d2fab5ed4a86" args="(IN UINTN Address, IN UINT16 Value)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef struct <a class="el" href="../../d0/d24/a00222.html">_EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI</a> <a class="el" href="../../d0/d24/a00222.html">EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI PciCf8Write16           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
+          <td class="paramname"> <em>Value</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+Writes a 16-bit PCI configuration register.<p>
+Writes the 16-bit PCI configuration register specified by Address with the value specified by Value. Value is returned. This function must guarantee that all PCI read and write operations are serialized.<p>
+If Address &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 16-bit boundary, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by Address &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Bus, Device, Function and Register. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>The value to write.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written to the PCI configuration register. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="35e00f9073a42aa2c5348f15e92cb100"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8Write32" ref="35e00f9073a42aa2c5348f15e92cb100" args="(IN UINTN Address, IN UINT32 Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI PciCf8Write32           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td>
+          <td class="paramname"> <em>Value</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Writes a 32-bit PCI configuration register.<p>
+Writes the 32-bit PCI configuration register specified by Address with the value specified by Value. Value is returned. This function must guarantee that all PCI read and write operations are serialized.<p>
+If Address &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 32-bit boundary, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by Address &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Bus, Device, Function and Register. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>The value to write.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written to the PCI configuration register. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="8b8253f6c1f10c5d77804141dc7df6e5"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8Write8" ref="8b8253f6c1f10c5d77804141dc7df6e5" args="(IN UINTN Address, IN UINT8 Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI PciCf8Write8           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
+          <td class="paramname"> <em>Value</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Writes an 8-bit PCI configuration register.<p>
+Writes the 8-bit PCI configuration register specified by Address with the value specified by Value. Value is returned. This function must guarantee that all PCI read and write operations are serialized.<p>
+If Address &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by Address &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Bus, Device, Function and Register. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>The value to write.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written to the PCI configuration register. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="3815f243893a770a633e73f4cda8eeeb"></a><!-- doxytag: member="PciCf8Lib.h::PciCf8WriteBuffer" ref="3815f243893a770a633e73f4cda8eeeb" args="(IN UINTN StartAddress, IN UINTN Size, IN VOID *Buffer)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI PciCf8WriteBuffer           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>StartAddress</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>Size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN VOID *&nbsp;</td>
+          <td class="paramname"> <em>Buffer</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Copies the data in a caller supplied buffer to a specified range of PCI configuration space.<p>
+Writes the range of PCI configuration registers specified by StartAddress and Size from the buffer specified by Buffer. This function only allows the PCI configuration registers from a single PCI function to be written. Size is returned. When possible 32-bit PCI configuration write cycles are used to write from StartAdress to StartAddress + Size. Due to alignment restrictions, 8-bit and 16-bit PCI configuration write cycles may be used at the beginning and the end of the range.<p>
+If StartAddress &gt; 0x0FFFFFFF, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the register specified by StartAddress &gt;= 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If ((StartAddress &amp; 0xFFF) + Size) &gt; 0x100, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Size &gt; 0 and Buffer is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>StartAddress</em>&nbsp;</td><td>Starting address that encodes the PCI Bus, Device, Function and Register. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Size</em>&nbsp;</td><td>Size in bytes of the transfer. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>Pointer to a buffer containing the data to write.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>Size written to StartAddress. </dd></dl>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:09 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:22 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

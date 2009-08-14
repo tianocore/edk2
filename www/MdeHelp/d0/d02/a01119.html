@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Protocol/DriverDiagnostics.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Ppi/CpuIo.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,60 +21,106 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Protocol/DriverDiagnostics.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Ppi/CpuIo.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d52/a00023.html">_EFI_DRIVER_DIAGNOSTICS_PROTOCOL</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/dec/a00592.html">EFI_PEI_CPU_IO_PPI_ACCESS</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d55/a00226.html">_EFI_PEI_CPU_IO_PPI</a></td></tr>
 
 <tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d02/a01119.html#f9fbeb0d44788c91bad2794718f77ffa">EFI_DRIVER_DIAGNOSTICS_PROTOCOL_GUID</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d02/a01119.html#c5bf20b41bc03c63e6e93f00ec7c34ff">EFI_PEI_CPU_IO_PPI_INSTALLED_GUID</a>&nbsp;&nbsp;&nbsp;{ 0xe6af1f7b, 0xfc3f, 0x46da, {0xa8, 0x28, 0xa3, 0xb4, 0x57, 0xa4, 0x42, 0x82 } }</td></tr>
 
 <tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
-<a class="el" href="../../d3/d52/a00023.html">_EFI_DRIVER_DIAGNOSTICS_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d02/a01119.html#d4c636c5bf5d7aaa8782329437d764dc">EFI_DRIVER_DIAGNOSTICS_PROTOCOL</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <a class="el" href="../../dc/d55/a00226.html">_EFI_PEI_CPU_IO_PPI</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d02/a01119.html#8202315a83758398c6a2201c991e4b1f">EFI_PEI_CPU_IO_PPI</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d02/a01119.html#db77ff2a93d1e759cb73c56d081c7122">EFI_DRIVER_DIAGNOSTICS_RUN_DIAGNOSTICS</a> )(IN <a class="el" href="../../d3/d52/a00023.html">EFI_DRIVER_DIAGNOSTICS_PROTOCOL</a> *This, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ControllerHandle, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ChildHandle, IN <a class="el" href="../../d0/d02/a01119.html#8896a1bb82ebed42766744a282c6ba50">EFI_DRIVER_DIAGNOSTIC_TYPE</a> DiagnosticType, IN <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Language, OUT <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> **ErrorType, OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *BufferSize, OUT <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> **Buffer)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d02/a01119.html#9effaa5afe37da24bae879943027483d">EFI_PEI_CPU_IO_PPI_IO_MEM</a> )(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d02/a01119.html#af2c2f892b0ce03ae52b747733b62b7b">EFI_PEI_CPU_IO_PPI_WIDTH</a> Width, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Count, IN OUT VOID *Buffer)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d02/a01119.html#de85130ca1ed42550490a5ebe535a9af">EFI_PEI_CPU_IO_PPI_IO_READ8</a> )(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d02/a01119.html#f826cdc2c8396a0b9c003afbd4f84370">EFI_PEI_CPU_IO_PPI_IO_READ16</a> )(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d02/a01119.html#10fbb6a4eea8c94df398b3678221a096">EFI_PEI_CPU_IO_PPI_IO_READ32</a> )(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d02/a01119.html#c01c6ff9c880860cb588aec258be16c3">EFI_PEI_CPU_IO_PPI_IO_READ64</a> )(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef VOID(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d02/a01119.html#3b37059e1892bc28bd417ad5ab670c5e">EFI_PEI_CPU_IO_PPI_IO_WRITE8</a> )(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> Data)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef VOID(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d02/a01119.html#5fccedf877bc166306fa7fe06ae5216a">EFI_PEI_CPU_IO_PPI_IO_WRITE16</a> )(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> Data)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef VOID(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d02/a01119.html#45a49dadbd6f9ffcbeab3fc941ea76e2">EFI_PEI_CPU_IO_PPI_IO_WRITE32</a> )(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> Data)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef VOID(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d02/a01119.html#15e6eaabd4fcf55017fec066abf569c2">EFI_PEI_CPU_IO_PPI_IO_WRITE64</a> )(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Data)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d02/a01119.html#531c7a321167ba7bd866db97d1cf5c6a">EFI_PEI_CPU_IO_PPI_MEM_READ8</a> )(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d02/a01119.html#e1f19e79ad9147928e3bc85ad1c04fe0">EFI_PEI_CPU_IO_PPI_MEM_READ16</a> )(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d02/a01119.html#44592a5409584d6335aa68694bbc704b">EFI_PEI_CPU_IO_PPI_MEM_READ32</a> )(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d02/a01119.html#3e2768ea5d6abc4154c110c8cf4cb527">EFI_PEI_CPU_IO_PPI_MEM_READ64</a> )(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef VOID(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d02/a01119.html#c3107429d358deb7eb9d2921cb88fea7">EFI_PEI_CPU_IO_PPI_MEM_WRITE8</a> )(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> Data)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef VOID(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d02/a01119.html#fe02ee00db8700e6fd91906dc575cfa3">EFI_PEI_CPU_IO_PPI_MEM_WRITE16</a> )(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> Data)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef VOID(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d02/a01119.html#33d2d4a80231ceee375293ab1b2041ad">EFI_PEI_CPU_IO_PPI_MEM_WRITE32</a> )(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> Data)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef VOID(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d02/a01119.html#b361bd512450593be4642913fe462c87">EFI_PEI_CPU_IO_PPI_MEM_WRITE64</a> )(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Data)</td></tr>
 
 <tr><td colspan="2"><br><h2>Enumerations</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d02/a01119.html#8896a1bb82ebed42766744a282c6ba50">EFI_DRIVER_DIAGNOSTIC_TYPE</a> { <a class="el" href="../../d0/d02/a01119.html#8896a1bb82ebed42766744a282c6ba50b6962d1adb100651378d5c8a03f3a71d">EfiDriverDiagnosticTypeStandard</a> =  0, 
-<a class="el" href="../../d0/d02/a01119.html#8896a1bb82ebed42766744a282c6ba505db8324c69634ecb6352a1730e350554">EfiDriverDiagnosticTypeExtended</a> =  1, 
-<a class="el" href="../../d0/d02/a01119.html#8896a1bb82ebed42766744a282c6ba506caef3ef086f421fda7e0170284320e2">EfiDriverDiagnosticTypeManufacturing</a> =  2, 
-<a class="el" href="../../d0/d02/a01119.html#8896a1bb82ebed42766744a282c6ba501318539223330aab64019c7710f900ca">EfiDriverDiagnosticTypeMaximum</a>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d02/a01119.html#af2c2f892b0ce03ae52b747733b62b7b">EFI_PEI_CPU_IO_PPI_WIDTH</a> { <br>
+&nbsp;&nbsp;<a class="el" href="../../d0/d02/a01119.html#af2c2f892b0ce03ae52b747733b62b7be3ead85d46bdaba41457b4c41a04df71">EfiPeiCpuIoWidthUint8</a>, 
+<a class="el" href="../../d0/d02/a01119.html#af2c2f892b0ce03ae52b747733b62b7b5d6e6b5833f9fa5de30e70f8d15a5184">EfiPeiCpuIoWidthUint16</a>, 
+<a class="el" href="../../d0/d02/a01119.html#af2c2f892b0ce03ae52b747733b62b7b168c46381297b30c4c44bc78f41cab02">EfiPeiCpuIoWidthUint32</a>, 
+<a class="el" href="../../d0/d02/a01119.html#af2c2f892b0ce03ae52b747733b62b7ba4dac5da8a1fa29ad68cfbb6ac4cff7b">EfiPeiCpuIoWidthUint64</a>, 
+<br>
+&nbsp;&nbsp;<a class="el" href="../../d0/d02/a01119.html#af2c2f892b0ce03ae52b747733b62b7bdbc5ad82292bcf0fa01db0aee3172746">EfiPeiCpuIoWidthFifoUint8</a>, 
+<a class="el" href="../../d0/d02/a01119.html#af2c2f892b0ce03ae52b747733b62b7b207f1cb27be2e6230ed0979de7946417">EfiPeiCpuIoWidthFifoUint16</a>, 
+<a class="el" href="../../d0/d02/a01119.html#af2c2f892b0ce03ae52b747733b62b7ba4b7991aa36f52e3c7a94f3554075b40">EfiPeiCpuIoWidthFifoUint32</a>, 
+<a class="el" href="../../d0/d02/a01119.html#af2c2f892b0ce03ae52b747733b62b7b985a822e6b38f96619c6f4b49aee4498">EfiPeiCpuIoWidthFifoUint64</a>, 
+<br>
+&nbsp;&nbsp;<a class="el" href="../../d0/d02/a01119.html#af2c2f892b0ce03ae52b747733b62b7bd61180a3126dbfc0e6e04273e07b514d">EfiPeiCpuIoWidthFillUint8</a>, 
+<a class="el" href="../../d0/d02/a01119.html#af2c2f892b0ce03ae52b747733b62b7b265ed32299cfa1ef0583e4fb5730df32">EfiPeiCpuIoWidthFillUint16</a>, 
+<a class="el" href="../../d0/d02/a01119.html#af2c2f892b0ce03ae52b747733b62b7b51b15dd6e4737452aadd0cf6b9d24554">EfiPeiCpuIoWidthFillUint32</a>, 
+<a class="el" href="../../d0/d02/a01119.html#af2c2f892b0ce03ae52b747733b62b7be93bb49b0400eabcb269cdd67beacf86">EfiPeiCpuIoWidthFillUint64</a>, 
+<br>
+&nbsp;&nbsp;<a class="el" href="../../d0/d02/a01119.html#af2c2f892b0ce03ae52b747733b62b7b4a95233ead53b791bd7b845bb010bd66">EfiPeiCpuIoWidthMaximum</a>
+<br>
  }</td></tr>
 
 <tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d02/a01119.html#52d922d56bb7ac4f6d89f139f07890ba">gEfiDriverDiagnosticsProtocolGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d02/a01119.html#3b10b7e55f599766616b42e3bbbff56f">gEfiPeiCpuIoPpiInstalledGuid</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-EFI Driver Diagnostics Protocol<p>
-Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
-<a class="anchor" name="f9fbeb0d44788c91bad2794718f77ffa"></a><!-- doxytag: member="DriverDiagnostics.h::EFI_DRIVER_DIAGNOSTICS_PROTOCOL_GUID" ref="f9fbeb0d44788c91bad2794718f77ffa" args="" -->
+This PPI provides a set of memory- and I/O-based services. The perspective of the services is that of the processor, not the bus or system.<p>
+Copyright (c) 2006 - 2009, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
+<dl class="user" compact><dt><b>Revision Reference:</b></dt><dd>This PPI is introduced in PI Version 1.0. </dd></dl>
+<hr><h2>Define Documentation</h2>
+<a class="anchor" name="c5bf20b41bc03c63e6e93f00ec7c34ff"></a><!-- doxytag: member="CpuIo.h::EFI_PEI_CPU_IO_PPI_INSTALLED_GUID" ref="c5bf20b41bc03c63e6e93f00ec7c34ff" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_DRIVER_DIAGNOSTICS_PROTOCOL_GUID          </td>
+          <td class="memname">#define EFI_PEI_CPU_IO_PPI_INSTALLED_GUID&nbsp;&nbsp;&nbsp;{ 0xe6af1f7b, 0xfc3f, 0x46da, {0xa8, 0x28, 0xa3, 0xb4, 0x57, 0xa4, 0x42, 0x82 } }          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-<b>Value:</b><div class="fragment"><pre class="fragment">{ \
-    0x0784924f, 0xe296, 0x11d4, {0x9a, 0x49, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d } \
-  }
-</pre></div>Global ID for the Driver Diagnostics Protocol as defined in EFI 1.1. 
+
 </div>
 </div><p>
 <hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="d4c636c5bf5d7aaa8782329437d764dc"></a><!-- doxytag: member="DriverDiagnostics.h::EFI_DRIVER_DIAGNOSTICS_PROTOCOL" ref="d4c636c5bf5d7aaa8782329437d764dc" args="" -->
+<a class="anchor" name="8202315a83758398c6a2201c991e4b1f"></a><!-- doxytag: member="CpuIo.h::EFI_PEI_CPU_IO_PPI" ref="8202315a83758398c6a2201c991e4b1f" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef struct <a class="el" href="../../d3/d52/a00023.html">_EFI_DRIVER_DIAGNOSTICS_PROTOCOL</a> <a class="el" href="../../d3/d52/a00023.html">EFI_DRIVER_DIAGNOSTICS_PROTOCOL</a>          </td>
+          <td class="memname">typedef struct <a class="el" href="../../dc/d55/a00226.html">_EFI_PEI_CPU_IO_PPI</a> <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a>          </td>
         </tr>
       </table>
 </div>
@@ -84,73 +130,462 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 </div>
 </div><p>
-<a class="anchor" name="db77ff2a93d1e759cb73c56d081c7122"></a><!-- doxytag: member="DriverDiagnostics.h::EFI_DRIVER_DIAGNOSTICS_RUN_DIAGNOSTICS" ref="db77ff2a93d1e759cb73c56d081c7122" args=")(IN EFI_DRIVER_DIAGNOSTICS_PROTOCOL *This, IN EFI_HANDLE ControllerHandle, IN EFI_HANDLE ChildHandle, IN EFI_DRIVER_DIAGNOSTIC_TYPE DiagnosticType, IN CHAR8 *Language, OUT EFI_GUID **ErrorType, OUT UINTN *BufferSize, OUT CHAR16 **Buffer)" -->
+<a class="anchor" name="9effaa5afe37da24bae879943027483d"></a><!-- doxytag: member="CpuIo.h::EFI_PEI_CPU_IO_PPI_IO_MEM" ref="9effaa5afe37da24bae879943027483d" args=")(IN CONST EFI_PEI_SERVICES **PeiServices, IN CONST EFI_PEI_CPU_IO_PPI *This, IN EFI_PEI_CPU_IO_PPI_WIDTH Width, IN UINT64 Address, IN UINTN Count, IN OUT VOID *Buffer)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d0/d02/a01119.html#db77ff2a93d1e759cb73c56d081c7122">EFI_DRIVER_DIAGNOSTICS_RUN_DIAGNOSTICS</a>)(IN <a class="el" href="../../d3/d52/a00023.html">EFI_DRIVER_DIAGNOSTICS_PROTOCOL</a> *This, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ControllerHandle, IN <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> ChildHandle, IN <a class="el" href="../../d0/d02/a01119.html#8896a1bb82ebed42766744a282c6ba50">EFI_DRIVER_DIAGNOSTIC_TYPE</a> DiagnosticType, IN <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Language, OUT <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> **ErrorType, OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *BufferSize, OUT <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> **Buffer)          </td>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d0/d02/a01119.html#9effaa5afe37da24bae879943027483d">EFI_PEI_CPU_IO_PPI_IO_MEM</a>)(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d02/a01119.html#af2c2f892b0ce03ae52b747733b62b7b">EFI_PEI_CPU_IO_PPI_WIDTH</a> Width, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Count, IN OUT VOID *Buffer)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Runs diagnostics on a controller.<p>
+Memory-based access services and I/O-based access services.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_DRIVER_DIAGNOSTICS_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ControllerHandle</em>&nbsp;</td><td>The handle of the controller to run diagnostics on. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ChildHandle</em>&nbsp;</td><td>The handle of the child controller to run diagnostics on This is an optional parameter that may be NULL. It will be NULL for device drivers. It will also be NULL for a bus drivers that wish to run diagnostics on the bus controller. It will not be NULL for a bus driver that wishes to run diagnostics on one of its child controllers. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DiagnosticType</em>&nbsp;</td><td>Indicates type of diagnostics to perform on the controller specified by ControllerHandle and ChildHandle. See "Related Definitions" for the list of supported types. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Language</em>&nbsp;</td><td>A pointer to a three character ISO 639-2 language identifier. This is the language in which the optional error message should be returned in Buffer, and it must match one of the languages specified in SupportedLanguages. The number of languages supported by a driver is up to the driver writer. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ErrorType</em>&nbsp;</td><td>A <a class="el" href="../../d9/d0f/a00644.html">GUID</a> that defines the format of the data returned in Buffer. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>BufferSize</em>&nbsp;</td><td>The size, in bytes, of the data returned in Buffer. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>A buffer that contains a Null-terminated Unicode string plus some additional data whose format is defined by ErrorType. Buffer is allocated by this function with <a class="el" href="../../d6/dcd/a01023.html#646c0f82c2a35557dda175dbfcd26e96">AllocatePool()</a>, and it is the caller's responsibility to free it with a call to <a class="el" href="../../d6/dcd/a01023.html#8b1cbc21e0cebcfc6a992546ec9b4941">FreePool()</a>.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>PeiServices</em>&nbsp;</td><td>An indirect pointer to the PEI Services Table published by the PEI Foundation. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to local data for the interface. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Width</em>&nbsp;</td><td>The width of the access. Enumerated in bytes. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>The physical address of the access. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Count</em>&nbsp;</td><td>The number of accesses to perform. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>A pointer to the buffer of data.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The controller specified by ControllerHandle and ChildHandle passed the diagnostic. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>ControllerHandle is not a valid EFI_HANDLE. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>ChildHandle is not NULL and it is not a valid EFI_HANDLE. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Language is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>ErrorType is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>BufferType is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Buffer is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The driver specified by This does not support running diagnostics for the controller specified by ControllerHandle and ChildHandle. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The driver specified by This does not support the type of diagnostic specified by DiagnosticType. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The driver specified by This does not support the language specified by Language. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There are not enough resources available to complete the diagnostics. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There are not enough resources available to return the status information in ErrorType, BufferSize, and Buffer. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The controller specified by ControllerHandle and ChildHandle did not pass the diagnostic. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The function completed successfully. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_YET_AVAILABLE</em>&nbsp;</td><td>The service has not been installed. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="f826cdc2c8396a0b9c003afbd4f84370"></a><!-- doxytag: member="CpuIo.h::EFI_PEI_CPU_IO_PPI_IO_READ16" ref="f826cdc2c8396a0b9c003afbd4f84370" args=")(IN CONST EFI_PEI_SERVICES **PeiServices, IN CONST EFI_PEI_CPU_IO_PPI *This, IN UINT64 Address)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>(EFIAPI * <a class="el" href="../../d0/d02/a01119.html#f826cdc2c8396a0b9c003afbd4f84370">EFI_PEI_CPU_IO_PPI_IO_READ16</a>)(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+16-bit I/O read operations.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>PeiServices</em>&nbsp;</td><td>An indirect pointer to the PEI Services Table published by the PEI Foundation. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to local data for the interface. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>The physical address of the access.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A 16-bit value returned from the I/O space. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="10fbb6a4eea8c94df398b3678221a096"></a><!-- doxytag: member="CpuIo.h::EFI_PEI_CPU_IO_PPI_IO_READ32" ref="10fbb6a4eea8c94df398b3678221a096" args=")(IN CONST EFI_PEI_SERVICES **PeiServices, IN CONST EFI_PEI_CPU_IO_PPI *This, IN UINT64 Address)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>(EFIAPI * <a class="el" href="../../d0/d02/a01119.html#10fbb6a4eea8c94df398b3678221a096">EFI_PEI_CPU_IO_PPI_IO_READ32</a>)(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+32-bit I/O read operations.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>PeiServices</em>&nbsp;</td><td>An indirect pointer to the PEI Services Table published by the PEI Foundation. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to local data for the interface. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>The physical address of the access.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A 32-bit value returned from the I/O space. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="c01c6ff9c880860cb588aec258be16c3"></a><!-- doxytag: member="CpuIo.h::EFI_PEI_CPU_IO_PPI_IO_READ64" ref="c01c6ff9c880860cb588aec258be16c3" args=")(IN CONST EFI_PEI_SERVICES **PeiServices, IN CONST EFI_PEI_CPU_IO_PPI *This, IN UINT64 Address)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>(EFIAPI * <a class="el" href="../../d0/d02/a01119.html#c01c6ff9c880860cb588aec258be16c3">EFI_PEI_CPU_IO_PPI_IO_READ64</a>)(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+64-bit I/O read operations.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>PeiServices</em>&nbsp;</td><td>An indirect pointer to the PEI Services Table published by the PEI Foundation. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to local data for the interface. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>The physical address of the access.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A 64-bit value returned from the I/O space. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="de85130ca1ed42550490a5ebe535a9af"></a><!-- doxytag: member="CpuIo.h::EFI_PEI_CPU_IO_PPI_IO_READ8" ref="de85130ca1ed42550490a5ebe535a9af" args=")(IN CONST EFI_PEI_SERVICES **PeiServices, IN CONST EFI_PEI_CPU_IO_PPI *This, IN UINT64 Address)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>(EFIAPI * <a class="el" href="../../d0/d02/a01119.html#de85130ca1ed42550490a5ebe535a9af">EFI_PEI_CPU_IO_PPI_IO_READ8</a>)(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+8-bit I/O read operations.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>PeiServices</em>&nbsp;</td><td>An indirect pointer to the PEI Services Table published by the PEI Foundation. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to local data for the interface. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>The physical address of the access.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>An 8-bit value returned from the I/O space. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="5fccedf877bc166306fa7fe06ae5216a"></a><!-- doxytag: member="CpuIo.h::EFI_PEI_CPU_IO_PPI_IO_WRITE16" ref="5fccedf877bc166306fa7fe06ae5216a" args=")(IN CONST EFI_PEI_SERVICES **PeiServices, IN CONST EFI_PEI_CPU_IO_PPI *This, IN UINT64 Address, IN UINT16 Data)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef VOID(EFIAPI * <a class="el" href="../../d0/d02/a01119.html#5fccedf877bc166306fa7fe06ae5216a">EFI_PEI_CPU_IO_PPI_IO_WRITE16</a>)(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> Data)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+16-bit I/O write operations.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>PeiServices</em>&nbsp;</td><td>An indirect pointer to the PEI Services Table published by the PEI Foundation. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to local data for the interface. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>The physical address of the access. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Data</em>&nbsp;</td><td>The data to write. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="45a49dadbd6f9ffcbeab3fc941ea76e2"></a><!-- doxytag: member="CpuIo.h::EFI_PEI_CPU_IO_PPI_IO_WRITE32" ref="45a49dadbd6f9ffcbeab3fc941ea76e2" args=")(IN CONST EFI_PEI_SERVICES **PeiServices, IN CONST EFI_PEI_CPU_IO_PPI *This, IN UINT64 Address, IN UINT32 Data)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef VOID(EFIAPI * <a class="el" href="../../d0/d02/a01119.html#45a49dadbd6f9ffcbeab3fc941ea76e2">EFI_PEI_CPU_IO_PPI_IO_WRITE32</a>)(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> Data)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+32-bit I/O write operations.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>PeiServices</em>&nbsp;</td><td>An indirect pointer to the PEI Services Table published by the PEI Foundation. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to local data for the interface. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>The physical address of the access. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Data</em>&nbsp;</td><td>The data to write. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="15e6eaabd4fcf55017fec066abf569c2"></a><!-- doxytag: member="CpuIo.h::EFI_PEI_CPU_IO_PPI_IO_WRITE64" ref="15e6eaabd4fcf55017fec066abf569c2" args=")(IN CONST EFI_PEI_SERVICES **PeiServices, IN CONST EFI_PEI_CPU_IO_PPI *This, IN UINT64 Address, IN UINT64 Data)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef VOID(EFIAPI * <a class="el" href="../../d0/d02/a01119.html#15e6eaabd4fcf55017fec066abf569c2">EFI_PEI_CPU_IO_PPI_IO_WRITE64</a>)(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Data)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+64-bit I/O write operations.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>PeiServices</em>&nbsp;</td><td>An indirect pointer to the PEI Services Table published by the PEI Foundation. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to local data for the interface. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>The physical address of the access. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Data</em>&nbsp;</td><td>The data to write. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="3b37059e1892bc28bd417ad5ab670c5e"></a><!-- doxytag: member="CpuIo.h::EFI_PEI_CPU_IO_PPI_IO_WRITE8" ref="3b37059e1892bc28bd417ad5ab670c5e" args=")(IN CONST EFI_PEI_SERVICES **PeiServices, IN CONST EFI_PEI_CPU_IO_PPI *This, IN UINT64 Address, IN UINT8 Data)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef VOID(EFIAPI * <a class="el" href="../../d0/d02/a01119.html#3b37059e1892bc28bd417ad5ab670c5e">EFI_PEI_CPU_IO_PPI_IO_WRITE8</a>)(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> Data)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+8-bit I/O write operations.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>PeiServices</em>&nbsp;</td><td>An indirect pointer to the PEI Services Table published by the PEI Foundation. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to local data for the interface. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>The physical address of the access. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Data</em>&nbsp;</td><td>The data to write. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="e1f19e79ad9147928e3bc85ad1c04fe0"></a><!-- doxytag: member="CpuIo.h::EFI_PEI_CPU_IO_PPI_MEM_READ16" ref="e1f19e79ad9147928e3bc85ad1c04fe0" args=")(IN CONST EFI_PEI_SERVICES **PeiServices, IN CONST EFI_PEI_CPU_IO_PPI *This, IN UINT64 Address)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>(EFIAPI * <a class="el" href="../../d0/d02/a01119.html#e1f19e79ad9147928e3bc85ad1c04fe0">EFI_PEI_CPU_IO_PPI_MEM_READ16</a>)(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+16-bit memory read operations.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>PeiServices</em>&nbsp;</td><td>An indirect pointer to the PEI Services Table published by the PEI Foundation. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to local data for the interface. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>The physical address of the access.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A 16-bit value returned from the memory space. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="44592a5409584d6335aa68694bbc704b"></a><!-- doxytag: member="CpuIo.h::EFI_PEI_CPU_IO_PPI_MEM_READ32" ref="44592a5409584d6335aa68694bbc704b" args=")(IN CONST EFI_PEI_SERVICES **PeiServices, IN CONST EFI_PEI_CPU_IO_PPI *This, IN UINT64 Address)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>(EFIAPI * <a class="el" href="../../d0/d02/a01119.html#44592a5409584d6335aa68694bbc704b">EFI_PEI_CPU_IO_PPI_MEM_READ32</a>)(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+32-bit memory read operations.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>PeiServices</em>&nbsp;</td><td>An indirect pointer to the PEI Services Table published by the PEI Foundation. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to local data for the interface. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>The physical address of the access.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A 32-bit value returned from the memory space. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="3e2768ea5d6abc4154c110c8cf4cb527"></a><!-- doxytag: member="CpuIo.h::EFI_PEI_CPU_IO_PPI_MEM_READ64" ref="3e2768ea5d6abc4154c110c8cf4cb527" args=")(IN CONST EFI_PEI_SERVICES **PeiServices, IN CONST EFI_PEI_CPU_IO_PPI *This, IN UINT64 Address)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>(EFIAPI * <a class="el" href="../../d0/d02/a01119.html#3e2768ea5d6abc4154c110c8cf4cb527">EFI_PEI_CPU_IO_PPI_MEM_READ64</a>)(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+64-bit memory read operations.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>PeiServices</em>&nbsp;</td><td>An indirect pointer to the PEI Services Table published by the PEI Foundation. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to local data for the interface. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>The physical address of the access.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>A 64-bit value returned from the memory space. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="531c7a321167ba7bd866db97d1cf5c6a"></a><!-- doxytag: member="CpuIo.h::EFI_PEI_CPU_IO_PPI_MEM_READ8" ref="531c7a321167ba7bd866db97d1cf5c6a" args=")(IN CONST EFI_PEI_SERVICES **PeiServices, IN CONST EFI_PEI_CPU_IO_PPI *This, IN UINT64 Address)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>(EFIAPI * <a class="el" href="../../d0/d02/a01119.html#531c7a321167ba7bd866db97d1cf5c6a">EFI_PEI_CPU_IO_PPI_MEM_READ8</a>)(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+8-bit memory read operations.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>PeiServices</em>&nbsp;</td><td>An indirect pointer to the PEI Services Table published by the PEI Foundation. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to local data for the interface. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>The physical address of the access.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>An 8-bit value returned from the memory space. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="fe02ee00db8700e6fd91906dc575cfa3"></a><!-- doxytag: member="CpuIo.h::EFI_PEI_CPU_IO_PPI_MEM_WRITE16" ref="fe02ee00db8700e6fd91906dc575cfa3" args=")(IN CONST EFI_PEI_SERVICES **PeiServices, IN CONST EFI_PEI_CPU_IO_PPI *This, IN UINT64 Address, IN UINT16 Data)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef VOID(EFIAPI * <a class="el" href="../../d0/d02/a01119.html#fe02ee00db8700e6fd91906dc575cfa3">EFI_PEI_CPU_IO_PPI_MEM_WRITE16</a>)(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> Data)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+16-bit memory write operations.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>PeiServices</em>&nbsp;</td><td>An indirect pointer to the PEI Services Table published by the PEI Foundation. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to local data for the interface. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>The physical address of the access. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Data</em>&nbsp;</td><td>The data to write. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="33d2d4a80231ceee375293ab1b2041ad"></a><!-- doxytag: member="CpuIo.h::EFI_PEI_CPU_IO_PPI_MEM_WRITE32" ref="33d2d4a80231ceee375293ab1b2041ad" args=")(IN CONST EFI_PEI_SERVICES **PeiServices, IN CONST EFI_PEI_CPU_IO_PPI *This, IN UINT64 Address, IN UINT32 Data)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef VOID(EFIAPI * <a class="el" href="../../d0/d02/a01119.html#33d2d4a80231ceee375293ab1b2041ad">EFI_PEI_CPU_IO_PPI_MEM_WRITE32</a>)(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> Data)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+32-bit memory write operations.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>PeiServices</em>&nbsp;</td><td>An indirect pointer to the PEI Services Table published by the PEI Foundation. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to local data for the interface. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>The physical address of the access. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Data</em>&nbsp;</td><td>The data to write. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="b361bd512450593be4642913fe462c87"></a><!-- doxytag: member="CpuIo.h::EFI_PEI_CPU_IO_PPI_MEM_WRITE64" ref="b361bd512450593be4642913fe462c87" args=")(IN CONST EFI_PEI_SERVICES **PeiServices, IN CONST EFI_PEI_CPU_IO_PPI *This, IN UINT64 Address, IN UINT64 Data)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef VOID(EFIAPI * <a class="el" href="../../d0/d02/a01119.html#b361bd512450593be4642913fe462c87">EFI_PEI_CPU_IO_PPI_MEM_WRITE64</a>)(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Data)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+64-bit memory write operations.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>PeiServices</em>&nbsp;</td><td>An indirect pointer to the PEI Services Table published by the PEI Foundation. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to local data for the interface. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>The physical address of the access. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Data</em>&nbsp;</td><td>The data to write. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="c3107429d358deb7eb9d2921cb88fea7"></a><!-- doxytag: member="CpuIo.h::EFI_PEI_CPU_IO_PPI_MEM_WRITE8" ref="c3107429d358deb7eb9d2921cb88fea7" args=")(IN CONST EFI_PEI_SERVICES **PeiServices, IN CONST EFI_PEI_CPU_IO_PPI *This, IN UINT64 Address, IN UINT8 Data)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef VOID(EFIAPI * <a class="el" href="../../d0/d02/a01119.html#c3107429d358deb7eb9d2921cb88fea7">EFI_PEI_CPU_IO_PPI_MEM_WRITE8</a>)(IN CONST <a class="el" href="../../d6/db6/a00241.html">EFI_PEI_SERVICES</a> **PeiServices, IN CONST <a class="el" href="../../dc/d55/a00226.html">EFI_PEI_CPU_IO_PPI</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> Data)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+8-bit memory write operations.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>PeiServices</em>&nbsp;</td><td>An indirect pointer to the PEI Services Table published by the PEI Foundation. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Pointer to local data for the interface. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>The physical address of the access. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Data</em>&nbsp;</td><td>The data to write. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
 <hr><h2>Enumeration Type Documentation</h2>
-<a class="anchor" name="8896a1bb82ebed42766744a282c6ba50"></a><!-- doxytag: member="DriverDiagnostics.h::EFI_DRIVER_DIAGNOSTIC_TYPE" ref="8896a1bb82ebed42766744a282c6ba50" args="" -->
+<a class="anchor" name="af2c2f892b0ce03ae52b747733b62b7b"></a><!-- doxytag: member="CpuIo.h::EFI_PEI_CPU_IO_PPI_WIDTH" ref="af2c2f892b0ce03ae52b747733b62b7b" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="../../d0/d02/a01119.html#8896a1bb82ebed42766744a282c6ba50">EFI_DRIVER_DIAGNOSTIC_TYPE</a>          </td>
+          <td class="memname">enum <a class="el" href="../../d0/d02/a01119.html#af2c2f892b0ce03ae52b747733b62b7b">EFI_PEI_CPU_IO_PPI_WIDTH</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-<dl compact><dt><b>Enumerator: </b></dt><dd>
+EFI_PEI_CPU_IO_PPI_WIDTH <dl compact><dt><b>Enumerator: </b></dt><dd>
 <table border="0" cellspacing="2" cellpadding="0">
-<tr><td valign="top"><em><a class="anchor" name="8896a1bb82ebed42766744a282c6ba50b6962d1adb100651378d5c8a03f3a71d"></a><!-- doxytag: member="EfiDriverDiagnosticTypeStandard" ref="8896a1bb82ebed42766744a282c6ba50b6962d1adb100651378d5c8a03f3a71d" args="" -->EfiDriverDiagnosticTypeStandard</em>&nbsp;</td><td>
-Performs standard diagnostics on the controller. </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="8896a1bb82ebed42766744a282c6ba505db8324c69634ecb6352a1730e350554"></a><!-- doxytag: member="EfiDriverDiagnosticTypeExtended" ref="8896a1bb82ebed42766744a282c6ba505db8324c69634ecb6352a1730e350554" args="" -->EfiDriverDiagnosticTypeExtended</em>&nbsp;</td><td>
-This is an optional diagnostic type that performs diagnostics on the controller that may take an extended amount of time to execute. </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="8896a1bb82ebed42766744a282c6ba506caef3ef086f421fda7e0170284320e2"></a><!-- doxytag: member="EfiDriverDiagnosticTypeManufacturing" ref="8896a1bb82ebed42766744a282c6ba506caef3ef086f421fda7e0170284320e2" args="" -->EfiDriverDiagnosticTypeManufacturing</em>&nbsp;</td><td>
-This is an optional diagnostic type that performs diagnostics on the controller that are suitable for a manufacturing and test environment. </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="8896a1bb82ebed42766744a282c6ba501318539223330aab64019c7710f900ca"></a><!-- doxytag: member="EfiDriverDiagnosticTypeMaximum" ref="8896a1bb82ebed42766744a282c6ba501318539223330aab64019c7710f900ca" args="" -->EfiDriverDiagnosticTypeMaximum</em>&nbsp;</td><td>
+<tr><td valign="top"><em><a class="anchor" name="af2c2f892b0ce03ae52b747733b62b7be3ead85d46bdaba41457b4c41a04df71"></a><!-- doxytag: member="EfiPeiCpuIoWidthUint8" ref="af2c2f892b0ce03ae52b747733b62b7be3ead85d46bdaba41457b4c41a04df71" args="" -->EfiPeiCpuIoWidthUint8</em>&nbsp;</td><td>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" name="af2c2f892b0ce03ae52b747733b62b7b5d6e6b5833f9fa5de30e70f8d15a5184"></a><!-- doxytag: member="EfiPeiCpuIoWidthUint16" ref="af2c2f892b0ce03ae52b747733b62b7b5d6e6b5833f9fa5de30e70f8d15a5184" args="" -->EfiPeiCpuIoWidthUint16</em>&nbsp;</td><td>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" name="af2c2f892b0ce03ae52b747733b62b7b168c46381297b30c4c44bc78f41cab02"></a><!-- doxytag: member="EfiPeiCpuIoWidthUint32" ref="af2c2f892b0ce03ae52b747733b62b7b168c46381297b30c4c44bc78f41cab02" args="" -->EfiPeiCpuIoWidthUint32</em>&nbsp;</td><td>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" name="af2c2f892b0ce03ae52b747733b62b7ba4dac5da8a1fa29ad68cfbb6ac4cff7b"></a><!-- doxytag: member="EfiPeiCpuIoWidthUint64" ref="af2c2f892b0ce03ae52b747733b62b7ba4dac5da8a1fa29ad68cfbb6ac4cff7b" args="" -->EfiPeiCpuIoWidthUint64</em>&nbsp;</td><td>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" name="af2c2f892b0ce03ae52b747733b62b7bdbc5ad82292bcf0fa01db0aee3172746"></a><!-- doxytag: member="EfiPeiCpuIoWidthFifoUint8" ref="af2c2f892b0ce03ae52b747733b62b7bdbc5ad82292bcf0fa01db0aee3172746" args="" -->EfiPeiCpuIoWidthFifoUint8</em>&nbsp;</td><td>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" name="af2c2f892b0ce03ae52b747733b62b7b207f1cb27be2e6230ed0979de7946417"></a><!-- doxytag: member="EfiPeiCpuIoWidthFifoUint16" ref="af2c2f892b0ce03ae52b747733b62b7b207f1cb27be2e6230ed0979de7946417" args="" -->EfiPeiCpuIoWidthFifoUint16</em>&nbsp;</td><td>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" name="af2c2f892b0ce03ae52b747733b62b7ba4b7991aa36f52e3c7a94f3554075b40"></a><!-- doxytag: member="EfiPeiCpuIoWidthFifoUint32" ref="af2c2f892b0ce03ae52b747733b62b7ba4b7991aa36f52e3c7a94f3554075b40" args="" -->EfiPeiCpuIoWidthFifoUint32</em>&nbsp;</td><td>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" name="af2c2f892b0ce03ae52b747733b62b7b985a822e6b38f96619c6f4b49aee4498"></a><!-- doxytag: member="EfiPeiCpuIoWidthFifoUint64" ref="af2c2f892b0ce03ae52b747733b62b7b985a822e6b38f96619c6f4b49aee4498" args="" -->EfiPeiCpuIoWidthFifoUint64</em>&nbsp;</td><td>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" name="af2c2f892b0ce03ae52b747733b62b7bd61180a3126dbfc0e6e04273e07b514d"></a><!-- doxytag: member="EfiPeiCpuIoWidthFillUint8" ref="af2c2f892b0ce03ae52b747733b62b7bd61180a3126dbfc0e6e04273e07b514d" args="" -->EfiPeiCpuIoWidthFillUint8</em>&nbsp;</td><td>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" name="af2c2f892b0ce03ae52b747733b62b7b265ed32299cfa1ef0583e4fb5730df32"></a><!-- doxytag: member="EfiPeiCpuIoWidthFillUint16" ref="af2c2f892b0ce03ae52b747733b62b7b265ed32299cfa1ef0583e4fb5730df32" args="" -->EfiPeiCpuIoWidthFillUint16</em>&nbsp;</td><td>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" name="af2c2f892b0ce03ae52b747733b62b7b51b15dd6e4737452aadd0cf6b9d24554"></a><!-- doxytag: member="EfiPeiCpuIoWidthFillUint32" ref="af2c2f892b0ce03ae52b747733b62b7b51b15dd6e4737452aadd0cf6b9d24554" args="" -->EfiPeiCpuIoWidthFillUint32</em>&nbsp;</td><td>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" name="af2c2f892b0ce03ae52b747733b62b7be93bb49b0400eabcb269cdd67beacf86"></a><!-- doxytag: member="EfiPeiCpuIoWidthFillUint64" ref="af2c2f892b0ce03ae52b747733b62b7be93bb49b0400eabcb269cdd67beacf86" args="" -->EfiPeiCpuIoWidthFillUint64</em>&nbsp;</td><td>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" name="af2c2f892b0ce03ae52b747733b62b7b4a95233ead53b791bd7b845bb010bd66"></a><!-- doxytag: member="EfiPeiCpuIoWidthMaximum" ref="af2c2f892b0ce03ae52b747733b62b7b4a95233ead53b791bd7b845bb010bd66" args="" -->EfiPeiCpuIoWidthMaximum</em>&nbsp;</td><td>
 </td></tr>
 </table>
 </dl>
@@ -158,12 +593,12 @@ This is an optional diagnostic type that performs diagnostics on the controller 
 </div>
 </div><p>
 <hr><h2>Variable Documentation</h2>
-<a class="anchor" name="52d922d56bb7ac4f6d89f139f07890ba"></a><!-- doxytag: member="DriverDiagnostics.h::gEfiDriverDiagnosticsProtocolGuid" ref="52d922d56bb7ac4f6d89f139f07890ba" args="" -->
+<a class="anchor" name="3b10b7e55f599766616b42e3bbbff56f"></a><!-- doxytag: member="CpuIo.h::gEfiPeiCpuIoPpiInstalledGuid" ref="3b10b7e55f599766616b42e3bbbff56f" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../d0/d02/a01119.html#52d922d56bb7ac4f6d89f139f07890ba">gEfiDriverDiagnosticsProtocolGuid</a>          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../d0/d02/a01119.html#3b10b7e55f599766616b42e3bbbff56f">gEfiPeiCpuIoPpiInstalledGuid</a>          </td>
         </tr>
       </table>
 </div>
@@ -174,7 +609,7 @@ This is an optional diagnostic type that performs diagnostics on the controller 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:10 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:26 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

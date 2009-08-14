@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Guid/Mps.h File Reference</title>
+<title>MdePkg[ALL]: tdTPM_SYM_CA_ATTESTATION Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -9,59 +9,36 @@
   <div class="tabs">
     <ul>
       <li><a href="../../main.html"><span>Main&nbsp;Page</span></a></li>
-      <li><a href="../../annotated.html"><span>Data&nbsp;Structures</span></a></li>
-      <li class="current"><a href="../../files.html"><span>Files</span></a></li>
+      <li class="current"><a href="../../annotated.html"><span>Data&nbsp;Structures</span></a></li>
+      <li><a href="../../files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div class="tabs">
     <ul>
-      <li><a href="../../files.html"><span>File&nbsp;List</span></a></li>
-      <li><a href="../../globals.html"><span>Globals</span></a></li>
+      <li><a href="../../annotated.html"><span>Data&nbsp;Structures</span></a></li>
+      <li><a href="../../functions.html"><span>Data&nbsp;Fields</span></a></li>
     </ul>
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Guid/Mps.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>tdTPM_SYM_CA_ATTESTATION Struct Reference</h1><!-- doxytag: class="tdTPM_SYM_CA_ATTESTATION" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
-<tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/dbf/a00975.html#c2cc3821b52b5b16a7437b59fd63f110">EFI_MPS_TABLE_GUID</a></td></tr>
+<tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/dbf/a00975.html#c8927d7ed5adfeb2e6e9f9dfb076983a">credSize</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/dbf/a00975.html#3f487b70040caa0cf6f6d235a21da918">MPS_TABLE_GUID</a>&nbsp;&nbsp;&nbsp;EFI_MPS_TABLE_GUID</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dce/a00944.html">TPM_KEY_PARMS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/dbf/a00975.html#80efd2f02631352ebcc6e26481e1c13f">algorithm</a></td></tr>
 
-<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/dbf/a00975.html#d1ca81e3527976615460a25cb8ddd474">gEfiMpsTableGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/dbf/a00975.html#1182126e67bff3f41cc8e83c0210894f">credential</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-GUIDs used for MPS entries in the UEFI 2.0 system table ACPI is the primary means of exporting MPS information to the OS. MPS only was included to support Itanium-based platform power on. So don't use it if you don't have too.<p>
-Copyright (c) 2006, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
-<dl class="user" compact><dt><b>Revision Reference:</b></dt><dd>GUIDs defined in UEFI 2.0 spec. </dd></dl>
-<hr><h2>Define Documentation</h2>
-<a class="anchor" name="c2cc3821b52b5b16a7437b59fd63f110"></a><!-- doxytag: member="Mps.h::EFI_MPS_TABLE_GUID" ref="c2cc3821b52b5b16a7437b59fd63f110" args="" -->
+Part 2, section 12.9 TPM_SYM_CA_ATTESTATION <hr><h2>Field Documentation</h2>
+<a class="anchor" name="80efd2f02631352ebcc6e26481e1c13f"></a><!-- doxytag: member="tdTPM_SYM_CA_ATTESTATION::algorithm" ref="80efd2f02631352ebcc6e26481e1c13f" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_MPS_TABLE_GUID          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-<b>Value:</b><div class="fragment"><pre class="fragment">{ \
-    0xeb9d2d2f, 0x2d88, 0x11d3, {0x9a, 0x16, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d } \
-  }
-</pre></div>
-</div>
-</div><p>
-<a class="anchor" name="3f487b70040caa0cf6f6d235a21da918"></a><!-- doxytag: member="Mps.h::MPS_TABLE_GUID" ref="3f487b70040caa0cf6f6d235a21da918" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define MPS_TABLE_GUID&nbsp;&nbsp;&nbsp;EFI_MPS_TABLE_GUID          </td>
+          <td class="memname"><a class="el" href="../../d9/dce/a00944.html">TPM_KEY_PARMS</a> <a class="el" href="../../db/dbf/a00975.html#80efd2f02631352ebcc6e26481e1c13f">tdTPM_SYM_CA_ATTESTATION::algorithm</a>          </td>
         </tr>
       </table>
 </div>
@@ -71,13 +48,27 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 </div>
 </div><p>
-<hr><h2>Variable Documentation</h2>
-<a class="anchor" name="d1ca81e3527976615460a25cb8ddd474"></a><!-- doxytag: member="Mps.h::gEfiMpsTableGuid" ref="d1ca81e3527976615460a25cb8ddd474" args="" -->
+<a class="anchor" name="1182126e67bff3f41cc8e83c0210894f"></a><!-- doxytag: member="tdTPM_SYM_CA_ATTESTATION::credential" ref="1182126e67bff3f41cc8e83c0210894f" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../db/dbf/a00975.html#d1ca81e3527976615460a25cb8ddd474">gEfiMpsTableGuid</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>* <a class="el" href="../../db/dbf/a00975.html#1182126e67bff3f41cc8e83c0210894f">tdTPM_SYM_CA_ATTESTATION::credential</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="c8927d7ed5adfeb2e6e9f9dfb076983a"></a><!-- doxytag: member="tdTPM_SYM_CA_ATTESTATION::credSize" ref="c8927d7ed5adfeb2e6e9f9dfb076983a" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../db/dbf/a00975.html#c8927d7ed5adfeb2e6e9f9dfb076983a">tdTPM_SYM_CA_ATTESTATION::credSize</a>          </td>
         </tr>
       </table>
 </div>
@@ -88,7 +79,7 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:07 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:12 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Protocol/DevicePath.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Pi/PiHob.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,943 +21,177 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Protocol/DevicePath.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Pi/PiHob.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/de6/a00404.html">EFI_DEVICE_PATH_PROTOCOL</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d89/a00484.html">EFI_HOB_GENERIC_HEADER</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/df7/a00731.html">PCI_DEVICE_PATH</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/df1/a00486.html">EFI_HOB_HANDOFF_INFO_TABLE</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dd8/a00719.html">PCCARD_DEVICE_PATH</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d05/a00489.html">EFI_HOB_MEMORY_ALLOCATION_HEADER</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d73/a00674.html">MEMMAP_DEVICE_PATH</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d9c/a00487.html">EFI_HOB_MEMORY_ALLOCATION</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/da3/a00953.html">VENDOR_DEVICE_PATH</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d60/a00491.html">EFI_HOB_MEMORY_ALLOCATION_STACK</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d50/a00301.html">CONTROLLER_DEVICE_PATH</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/ddf/a00488.html">EFI_HOB_MEMORY_ALLOCATION_BSP_STORE</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d5e/a00275.html">ACPI_HID_DEVICE_PATH</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daa/a00490.html">EFI_HOB_MEMORY_ALLOCATION_MODULE</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d56/a00274.html">ACPI_EXTENDED_HID_DEVICE_PATH</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/da5/a00493.html">EFI_HOB_RESOURCE_DESCRIPTOR</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d19/a00273.html">ACPI_ADR_DEVICE_PATH</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d1a/a00485.html">EFI_HOB_GUID_TYPE</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d5d/a00278.html">ATAPI_DEVICE_PATH</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d8e/a00482.html">EFI_HOB_FIRMWARE_VOLUME</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/da2/a00796.html">SCSI_DEVICE_PATH</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/da0/a00483.html">EFI_HOB_FIRMWARE_VOLUME2</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d62/a00640.html">FIBRECHANNEL_DEVICE_PATH</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d58/a00481.html">EFI_HOB_CPU</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/db6/a00639.html">F1394_DEVICE_PATH</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d7e/a00492.html">EFI_HOB_MEMORY_POOL</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d18/a00948.html">USB_DEVICE_PATH</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/db0/a00945.html">USB_CLASS_DEVICE_PATH</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d49/a00952.html">USB_WWID_DEVICE_PATH</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d17/a00304.html">DEVICE_LOGICAL_UNIT_DEVICE_PATH</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d7a/a00795.html">SATA_DEVICE_PATH</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d1f/a00648.html">I2O_DEVICE_PATH</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d46/a00665.html">MAC_ADDR_DEVICE_PATH</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/df1/a00662.html">IPv4_DEVICE_PATH</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d5f/a00663.html">IPv6_DEVICE_PATH</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d4e/a00660.html">INFINIBAND_DEVICE_PATH</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dad/a00941.html">UART_DEVICE_PATH</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/d12/a00942.html">UART_FLOW_CONTROL_DEVICE_PATH</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d12/a00794.html">SAS_DEVICE_PATH</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/d46/a00664.html">ISCSI_DEVICE_PATH</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dcf/a00645.html">HARDDRIVE_DEVICE_PATH</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d7b/a00296.html">CDROM_DEVICE_PATH</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d3a/a00641.html">FILEPATH_DEVICE_PATH</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d40/a00672.html">MEDIA_PROTOCOL_DEVICE_PATH</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d97/a00670.html">MEDIA_FW_VOL_DEVICE_PATH</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d13/a00671.html">MEDIA_FW_VOL_FILEPATH_DEVICE_PATH</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d4f/a00673.html">MEDIA_RELATIVE_OFFSET_RANGE_DEVICE_PATH</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d5b/a00294.html">BBS_BBS_DEVICE_PATH</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">union &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d00/a00401.html">EFI_DEV_PATH</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">union &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d6d/a00402.html">EFI_DEV_PATH_PTR</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">union &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/da3/a00593.html">EFI_PEI_HOB_POINTERS</a></td></tr>
 
 <tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#7144a55b87de3a877e89f6cf85063e4a">EFI_DEVICE_PATH_PROTOCOL_GUID</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#cb43ab3a727008400ace084365251e21">EFI_HOB_TYPE_HANDOFF</a>&nbsp;&nbsp;&nbsp;0x0001</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#4c1021bf9dd55184ffe605fa7c6b9b6b">DEVICE_PATH_PROTOCOL</a>&nbsp;&nbsp;&nbsp;EFI_DEVICE_PATH_PROTOCOL_GUID</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#173b32a0e4c52d3c829ad2e9a53d4f40">EFI_HOB_TYPE_MEMORY_ALLOCATION</a>&nbsp;&nbsp;&nbsp;0x0002</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#0ffd59c1a36c1c28ee2e03cf9a0e1c6b">HARDWARE_DEVICE_PATH</a>&nbsp;&nbsp;&nbsp;0x01</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#2c8911bbf21e0c06aee875ce1a465928">EFI_HOB_TYPE_RESOURCE_DESCRIPTOR</a>&nbsp;&nbsp;&nbsp;0x0003</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#d1c904324cb6c08fa4864392e66738f8">HW_PCI_DP</a>&nbsp;&nbsp;&nbsp;0x01</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#0f49e01bf61356aa86455630329ebb2c">EFI_HOB_TYPE_GUID_EXTENSION</a>&nbsp;&nbsp;&nbsp;0x0004</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#4471125161067b50d0ce79afa356c334">HW_PCCARD_DP</a>&nbsp;&nbsp;&nbsp;0x02</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#8de69789ee15e354f65f6551a2255b72">EFI_HOB_TYPE_FV</a>&nbsp;&nbsp;&nbsp;0x0005</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#dec20375f286447ca03240140b59e9b6">HW_MEMMAP_DP</a>&nbsp;&nbsp;&nbsp;0x03</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#5355ec47db1154164e61094820860e5c">EFI_HOB_TYPE_CPU</a>&nbsp;&nbsp;&nbsp;0x0006</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#23c0021121250be0b069cad1ecf11d36">HW_VENDOR_DP</a>&nbsp;&nbsp;&nbsp;0x04</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#d9011e2b11279f81887f92b2f1526df6">EFI_HOB_TYPE_MEMORY_POOL</a>&nbsp;&nbsp;&nbsp;0x0007</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#fb466821f9592c635c739dc09e8a2f12">HW_CONTROLLER_DP</a>&nbsp;&nbsp;&nbsp;0x05</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#aa438eae264700072375faaebaa13975">EFI_HOB_TYPE_FV2</a>&nbsp;&nbsp;&nbsp;0x0009</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#4860d1be838d0e1e1d4ef8b5ead83600">ACPI_DEVICE_PATH</a>&nbsp;&nbsp;&nbsp;0x02</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#5455bd051eb2785f52c8e7194bef96a6">EFI_HOB_TYPE_LOAD_PEIM</a>&nbsp;&nbsp;&nbsp;0x000A</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#8c4782524dbc4302432f3a85013ae80b">ACPI_DP</a>&nbsp;&nbsp;&nbsp;0x01</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#dd8a386294b8378e0077a13e06c7dc1b">EFI_HOB_TYPE_UNUSED</a>&nbsp;&nbsp;&nbsp;0xFFFE</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#92223797847d1a20b6b5275b43aa7507">ACPI_EXTENDED_DP</a>&nbsp;&nbsp;&nbsp;0x02</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#f458bf7f65aed5d2da11d7a2512ce516">EFI_HOB_TYPE_END_OF_HOB_LIST</a>&nbsp;&nbsp;&nbsp;0xFFFF</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#534745f638e9911a9e5b428a1bd4b53c">PNP_EISA_ID_CONST</a>&nbsp;&nbsp;&nbsp;0x41d0</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#f17a5345e70c179e3b6897da18799bb7">EFI_HOB_HANDOFF_TABLE_VERSION</a>&nbsp;&nbsp;&nbsp;0x0009</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#d704f2ee29264fdd1dbe8f3e065a7148">EISA_ID</a>(_Name, _Num)&nbsp;&nbsp;&nbsp;((<a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>)((_Name) | (_Num) &lt;&lt; 16))</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#9830fd31eecda05b323cc45a53745f56">EFI_RESOURCE_SYSTEM_MEMORY</a>&nbsp;&nbsp;&nbsp;0x00000000</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#ad16f37b7bf3225255d31df001f4c3dd">EISA_PNP_ID</a>(_PNPId)&nbsp;&nbsp;&nbsp;(EISA_ID(PNP_EISA_ID_CONST, (_PNPId)))</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#b11f0dadd06c7d83074b12e749a959e2">EFI_RESOURCE_MEMORY_MAPPED_IO</a>&nbsp;&nbsp;&nbsp;0x00000001</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#38ba3473f6a926ae9aad1a71c94a90a5">EFI_PNP_ID</a>(_PNPId)&nbsp;&nbsp;&nbsp;(EISA_ID(PNP_EISA_ID_CONST, (_PNPId)))</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#692c619888062bfce1415fcb55acfb35">EFI_RESOURCE_IO</a>&nbsp;&nbsp;&nbsp;0x00000002</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#55ed7fd5504df31cabff55b2cb2268c3">PNP_EISA_ID_MASK</a>&nbsp;&nbsp;&nbsp;0xffff</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#6249127e8be8b0b2020df80dec51b44d">EFI_RESOURCE_FIRMWARE_DEVICE</a>&nbsp;&nbsp;&nbsp;0x00000003</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#b8f28a8aed5d24e1f69f2db2a24f3a3c">EISA_ID_TO_NUM</a>(_Id)&nbsp;&nbsp;&nbsp;((_Id) &gt;&gt; 16)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#133d6627460c19484bba0920c6d2e1ed">EFI_RESOURCE_MEMORY_MAPPED_IO_PORT</a>&nbsp;&nbsp;&nbsp;0x00000004</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#fc15db1ca6a4f9661f436054332e2169">ACPI_ADR_DP</a>&nbsp;&nbsp;&nbsp;0x03</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#7a2a12ef7b4971f52192ff7f2d5e1121">EFI_RESOURCE_MEMORY_RESERVED</a>&nbsp;&nbsp;&nbsp;0x00000005</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#dd92b0ecfebc276fb482d91b2c00cd5f">ACPI_ADR_DISPLAY_TYPE_OTHER</a>&nbsp;&nbsp;&nbsp;0</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#c5814da46d910485dc45a40d1fa19b39">EFI_RESOURCE_IO_RESERVED</a>&nbsp;&nbsp;&nbsp;0x00000006</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#44611ae6c4956f6072ef7c08a871590a">ACPI_ADR_DISPLAY_TYPE_VGA</a>&nbsp;&nbsp;&nbsp;1</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#e0edc3a804d7218a0381577dbfb1ad60">EFI_RESOURCE_MAX_MEMORY_TYPE</a>&nbsp;&nbsp;&nbsp;0x00000007</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#e9846d443ca81a435dd8a47ec91998c9">ACPI_ADR_DISPLAY_TYPE_TV</a>&nbsp;&nbsp;&nbsp;2</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#b4c94442976d600b76784ccde063bb83">EFI_RESOURCE_ATTRIBUTE_PRESENT</a>&nbsp;&nbsp;&nbsp;0x00000001</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#275a5fde40af43b2840a84be86115a9d">ACPI_ADR_DISPLAY_TYPE_EXTERNAL_DIGITAL</a>&nbsp;&nbsp;&nbsp;3</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#8e7289a108db68fc0230ce6042d372b7">EFI_RESOURCE_ATTRIBUTE_INITIALIZED</a>&nbsp;&nbsp;&nbsp;0x00000002</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#3c71bdb00f9f324f3e882e63446ad575">ACPI_ADR_DISPLAY_TYPE_INTERNAL_DIGITAL</a>&nbsp;&nbsp;&nbsp;4</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#304f78a58a2a1d962b24f8f53d75edcd">EFI_RESOURCE_ATTRIBUTE_TESTED</a>&nbsp;&nbsp;&nbsp;0x00000004</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#7a8be15ac159c5b5ba1bd92185a94dbc">ACPI_DISPLAY_ADR</a>(_DeviceIdScheme, _HeadId, _NonVgaOutput, _BiosCanDetect, _VendorInfo, _Type, _Port, _Index)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#6c5fe327763b1a15f3799279e02c4934">EFI_RESOURCE_ATTRIBUTE_SINGLE_BIT_ECC</a>&nbsp;&nbsp;&nbsp;0x00000008</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#e134bb09d8091114c1d7e68e8662c7db">MESSAGING_DEVICE_PATH</a>&nbsp;&nbsp;&nbsp;0x03</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#53d33fc9fe4e9fea265d0cb7e32bec52">EFI_RESOURCE_ATTRIBUTE_MULTIPLE_BIT_ECC</a>&nbsp;&nbsp;&nbsp;0x00000010</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#3fecced657c18b58898eee0f320d0627">MSG_ATAPI_DP</a>&nbsp;&nbsp;&nbsp;0x01</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#c6aeec948b2a78da38b04dc1ff40c39d">EFI_RESOURCE_ATTRIBUTE_ECC_RESERVED_1</a>&nbsp;&nbsp;&nbsp;0x00000020</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#13f05aaeef962c5fc2be69796cbbfbb4">MSG_SCSI_DP</a>&nbsp;&nbsp;&nbsp;0x02</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#49c6b92cebc8f02e8a2c6177c731cc37">EFI_RESOURCE_ATTRIBUTE_ECC_RESERVED_2</a>&nbsp;&nbsp;&nbsp;0x00000040</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#ff716647485225fa30d34d68a60c6d1e">MSG_FIBRECHANNEL_DP</a>&nbsp;&nbsp;&nbsp;0x03</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#7a1e5f954150911d127e0b6c2e8a9834">EFI_RESOURCE_ATTRIBUTE_READ_PROTECTED</a>&nbsp;&nbsp;&nbsp;0x00000080</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#e067c957b14018e89a9d9ab30e8e2dad">MSG_1394_DP</a>&nbsp;&nbsp;&nbsp;0x04</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#72e42e7403c5cf3c014fb580f14f8715">EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTED</a>&nbsp;&nbsp;&nbsp;0x00000100</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#787b8d7f76c742019ff822289beded9c">MSG_USB_DP</a>&nbsp;&nbsp;&nbsp;0x05</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#0660e7b0988ad73d847a95190768c228">EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTED</a>&nbsp;&nbsp;&nbsp;0x00000200</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#c3ba1540debc8c03b10f563ceec075c2">MSG_USB_CLASS_DP</a>&nbsp;&nbsp;&nbsp;0x0f</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#f518f616f3cc213d5aff385a84b53d35">EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE</a>&nbsp;&nbsp;&nbsp;0x00000400</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#780128900d95db31d07b4bf7f3d6d650">MSG_USB_WWID_DP</a>&nbsp;&nbsp;&nbsp;0x10</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#868f71cfd47bb473a6ee9880f363c208">EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE</a>&nbsp;&nbsp;&nbsp;0x00000800</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#2c83b0d3abe3534f87d0751f45814057">MSG_DEVICE_LOGICAL_UNIT_DP</a>&nbsp;&nbsp;&nbsp;0x11</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#fa39ae6a76434f0b721bf9487ecfe1b8">EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE</a>&nbsp;&nbsp;&nbsp;0x00001000</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#a30fa4a3ec89df899311e27fa5f3ff91">MSG_SATA_DP</a>&nbsp;&nbsp;&nbsp;0x12</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#4097d059cf8312d1422ee4433bfb6f29">EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE</a>&nbsp;&nbsp;&nbsp;0x00002000</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#fa09de2b303f9558d3a260ba98c3cea2">SATA_HBA_DIRECT_CONNECT_FLAG</a>&nbsp;&nbsp;&nbsp;0x8000</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#30a3ecc78b030f6eedad2fda40b09af1">EFI_RESOURCE_ATTRIBUTE_16_BIT_IO</a>&nbsp;&nbsp;&nbsp;0x00004000</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#4bd566eff8dd7f063a3bd8211a565e3d">MSG_I2O_DP</a>&nbsp;&nbsp;&nbsp;0x06</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#a67277b2a4475b458a684587cbd3136a">EFI_RESOURCE_ATTRIBUTE_32_BIT_IO</a>&nbsp;&nbsp;&nbsp;0x00008000</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#848bee9a0b674e42467f28f1259fc3b6">MSG_MAC_ADDR_DP</a>&nbsp;&nbsp;&nbsp;0x0b</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#74f7fd4859200a4c357f5a1e4ccebd1e">EFI_RESOURCE_ATTRIBUTE_64_BIT_IO</a>&nbsp;&nbsp;&nbsp;0x00010000</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#094aacd12c1a1d5195717d0bbcd3e75a">MSG_IPv4_DP</a>&nbsp;&nbsp;&nbsp;0x0c</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#08286cb8384ab814372c6657d1636958">MSG_IPv6_DP</a>&nbsp;&nbsp;&nbsp;0x0d</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#123bb8ec265b44e93c96a7e34b2e9326">MSG_INFINIBAND_DP</a>&nbsp;&nbsp;&nbsp;0x09</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#af23e1f5dab3f32d61d31d0ec1bf16f0">INFINIBAND_RESOURCE_FLAG_IOC_SERVICE</a>&nbsp;&nbsp;&nbsp;0x01</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#f17c8794277c2296fe452d64c0247082">INFINIBAND_RESOURCE_FLAG_EXTENDED_BOOT_ENVIRONMENT</a>&nbsp;&nbsp;&nbsp;0x02</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#f39cce8a89e10db9999198f4ff89ae56">INFINIBAND_RESOURCE_FLAG_CONSOLE_PROTOCOL</a>&nbsp;&nbsp;&nbsp;0x04</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#04653ce8db34029b89054527161c109f">INFINIBAND_RESOURCE_FLAG_STORAGE_PROTOCOL</a>&nbsp;&nbsp;&nbsp;0x08</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#ae95403d7f453b142d2aa8c43f861279">INFINIBAND_RESOURCE_FLAG_NETWORK_PROTOCOL</a>&nbsp;&nbsp;&nbsp;0x10</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#986fb2dd6a0ae7d3ae2c1c923591869d">MSG_UART_DP</a>&nbsp;&nbsp;&nbsp;0x0e</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#45c2263e73f8f9e6ffd60ff2df5607e9">MSG_VENDOR_DP</a>&nbsp;&nbsp;&nbsp;0x0a</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#943ed5fcf342200cc39b7e5ffed20602">DEVICE_PATH_MESSAGING_PC_ANSI</a>&nbsp;&nbsp;&nbsp;EFI_PC_ANSI_GUID</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#99f92b9baa47b247369fbd761cd3bc0f">DEVICE_PATH_MESSAGING_VT_100</a>&nbsp;&nbsp;&nbsp;EFI_VT_100_GUID</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#58cb47f03929aa0240e06fc721383868">DEVICE_PATH_MESSAGING_VT_100_PLUS</a>&nbsp;&nbsp;&nbsp;EFI_VT_100_PLUS_GUID</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#a3671f06e4463dbe782c2b85173c9eca">DEVICE_PATH_MESSAGING_VT_UTF8</a>&nbsp;&nbsp;&nbsp;EFI_VT_UTF8_GUID</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#b28ce875e862808ea4e1d1dfc3dcc553">DEVICE_PATH_MESSAGING_SAS</a>&nbsp;&nbsp;&nbsp;EFI_SAS_DEVICE_PATH_GUID</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#7aa43719f9128ae3adf7fb58f9cebf60">MSG_ISCSI_DP</a>&nbsp;&nbsp;&nbsp;0x13</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#b1297b6e2a7839e0a6cce476eb18cac5">ISCSI_LOGIN_OPTION_NO_HEADER_DIGEST</a>&nbsp;&nbsp;&nbsp;0x0000</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#462ed8c98286de1ffaadce550c94235e">ISCSI_LOGIN_OPTION_HEADER_DIGEST_USING_CRC32C</a>&nbsp;&nbsp;&nbsp;0x0002</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#7dc42ab5359cc53d99b73ea996dc8218">ISCSI_LOGIN_OPTION_NO_DATA_DIGEST</a>&nbsp;&nbsp;&nbsp;0x0000</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#5e48012399b3cd8445174905e91c070d">ISCSI_LOGIN_OPTION_DATA_DIGEST_USING_CRC32C</a>&nbsp;&nbsp;&nbsp;0x0008</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#ba45b409599b0fa6aa207a03931f2e3c">ISCSI_LOGIN_OPTION_AUTHMETHOD_CHAP</a>&nbsp;&nbsp;&nbsp;0x0000</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#0338b361ac1363cd56f09b79ebbe48e7">ISCSI_LOGIN_OPTION_AUTHMETHOD_NON</a>&nbsp;&nbsp;&nbsp;0x1000</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#8f7d085e19d0fda41435f08c1a213acf">ISCSI_LOGIN_OPTION_CHAP_BI</a>&nbsp;&nbsp;&nbsp;0x0000</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#56de4242cac9f2ad3dec8108f27d841b">ISCSI_LOGIN_OPTION_CHAP_UNI</a>&nbsp;&nbsp;&nbsp;0x2000</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#2ab17e60081fe400b81e0b0ff94821aa">MEDIA_DEVICE_PATH</a>&nbsp;&nbsp;&nbsp;0x04</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#66fdc06570920e7b02952c42846f0abe">MEDIA_HARDDRIVE_DP</a>&nbsp;&nbsp;&nbsp;0x01</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#3b737e53f49913ce7bc9aaf03176aff9">MBR_TYPE_PCAT</a>&nbsp;&nbsp;&nbsp;0x01</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#cd8e46568a8aa8f31e17a3db86b16963">MBR_TYPE_EFI_PARTITION_TABLE_HEADER</a>&nbsp;&nbsp;&nbsp;0x02</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#7ce201230973e90a3dd3c28c41e2c7ae">NO_DISK_SIGNATURE</a>&nbsp;&nbsp;&nbsp;0x00</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#79b9707850d0ab5b31297ff0fb9bb9ba">SIGNATURE_TYPE_MBR</a>&nbsp;&nbsp;&nbsp;0x01</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#53d62df1238178a124e8211c927f05ab">SIGNATURE_TYPE_GUID</a>&nbsp;&nbsp;&nbsp;0x02</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#34a77c5d9a1b72f53fea40ae0343e3b0">MEDIA_CDROM_DP</a>&nbsp;&nbsp;&nbsp;0x02</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#ff1b16b361ff7922dbe68cea28e66254">MEDIA_VENDOR_DP</a>&nbsp;&nbsp;&nbsp;0x03</td></tr>
-
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Media vendor device path subtype.  <a href="#ff1b16b361ff7922dbe68cea28e66254"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#0b23b5deecd36a52d464052821b76b6b">MEDIA_FILEPATH_DP</a>&nbsp;&nbsp;&nbsp;0x04</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#0eb07f87cd88307c99dcb122bfde9805">SIZE_OF_FILEPATH_DEVICE_PATH</a>&nbsp;&nbsp;&nbsp;OFFSET_OF(<a class="el" href="../../db/d3a/a00641.html">FILEPATH_DEVICE_PATH</a>,PathName)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#6bee9b9d096789b7b48d402c01cb1498">MEDIA_PROTOCOL_DP</a>&nbsp;&nbsp;&nbsp;0x05</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#82c430bec15e372246efd2c38535c77b">MEDIA_PIWG_FW_VOL_DP</a>&nbsp;&nbsp;&nbsp;0x7</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#4fdfee980a7aeac99823011bd2433ac9">MEDIA_PIWG_FW_FILE_DP</a>&nbsp;&nbsp;&nbsp;0x6</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#ba576db127fb0cfa3172cd90d8dcb70a">MEDIA_RELATIVE_OFFSET_RANGE_DP</a>&nbsp;&nbsp;&nbsp;0x08</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#45832e0d33a0c490262949af8fbb7bc2">BBS_DEVICE_PATH</a>&nbsp;&nbsp;&nbsp;0x05</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#01b634f3c64e0d2ab60e399c6b581c4a">BBS_BBS_DP</a>&nbsp;&nbsp;&nbsp;0x01</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#d90bbef92adcf277d74781afeab2a3de">BBS_TYPE_FLOPPY</a>&nbsp;&nbsp;&nbsp;0x01</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#2d5de4fc5fe91ad150621af227995c23">BBS_TYPE_HARDDRIVE</a>&nbsp;&nbsp;&nbsp;0x02</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#3ff9b05d5d7254f8594ba732c8f4385a">BBS_TYPE_CDROM</a>&nbsp;&nbsp;&nbsp;0x03</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#66e18c7307ef7633d75eda3fb6b7d133">BBS_TYPE_PCMCIA</a>&nbsp;&nbsp;&nbsp;0x04</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#3560ea05a3e7c0a7a078df173626927c">BBS_TYPE_USB</a>&nbsp;&nbsp;&nbsp;0x05</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#9e4bf5cee23a44bc28992946e6b6eea2">BBS_TYPE_EMBEDDED_NETWORK</a>&nbsp;&nbsp;&nbsp;0x06</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#5935dd388c86daa6992665f98185f415">BBS_TYPE_BEV</a>&nbsp;&nbsp;&nbsp;0x80</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#33490a67c9d400fddb0655580550a589">BBS_TYPE_UNKNOWN</a>&nbsp;&nbsp;&nbsp;0xFF</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#90ddf9cdc77b5c3a9f8c3fd9cd73924a">END_DEVICE_PATH_TYPE</a>&nbsp;&nbsp;&nbsp;0x7f</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#2f1e01d5ea1c8c2285d3c2630f163a45">END_ENTIRE_DEVICE_PATH_SUBTYPE</a>&nbsp;&nbsp;&nbsp;0xFF</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#d2de24cedc764ce62610bb79d74186a4">END_INSTANCE_DEVICE_PATH_SUBTYPE</a>&nbsp;&nbsp;&nbsp;0x01</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#a387f11936f83214924a0584f4548a66">EFI_RESOURCE_ATTRIBUTE_UNCACHED_EXPORTED</a>&nbsp;&nbsp;&nbsp;0x00020000</td></tr>
 
 <tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/de6/a00404.html">EFI_DEVICE_PATH_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#fe8b366b9b7268c496b371ae81eeeaf2">EFI_DEVICE_PATH</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#a563162fa97b4bc5982d15494ada4404">EFI_RESOURCE_TYPE</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d5/da3/a00953.html">VENDOR_DEVICE_PATH</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#2cb0a0ea94a4309359735ee0223302d1">VENDOR_DEFINED_DEVICE_PATH</a></td></tr>
-
-<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#f05431bb7fccdfef6a9375516254b66d">gEfiDevicePathProtocolGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3d/a01110.html#ff111c6b72dc92e8b7df7afe295c2ff0">EFI_RESOURCE_ATTRIBUTE_TYPE</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-The device path protocol as defined in UEFI 2.0.<p>
-The device path represents a programmatic path to a device, from a software point of view. The path must persist from boot to boot, so it can not contain things like PCI bus numbers that change from boot to boot.<p>
+HOB related definitions in PI.<p>
 Copyright (c) 2006 - 2009, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
-<a class="anchor" name="275a5fde40af43b2840a84be86115a9d"></a><!-- doxytag: member="DevicePath.h::ACPI_ADR_DISPLAY_TYPE_EXTERNAL_DIGITAL" ref="275a5fde40af43b2840a84be86115a9d" args="" -->
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
+<dl class="user" compact><dt><b>Revision Reference:</b></dt><dd>PI Version 1.0 </dd></dl>
+<hr><h2>Define Documentation</h2>
+<a class="anchor" name="f17a5345e70c179e3b6897da18799bb7"></a><!-- doxytag: member="PiHob.h::EFI_HOB_HANDOFF_TABLE_VERSION" ref="f17a5345e70c179e3b6897da18799bb7" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ACPI_ADR_DISPLAY_TYPE_EXTERNAL_DIGITAL&nbsp;&nbsp;&nbsp;3          </td>
+          <td class="memname">#define EFI_HOB_HANDOFF_TABLE_VERSION&nbsp;&nbsp;&nbsp;0x0009          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<a class="anchor" name="3c71bdb00f9f324f3e882e63446ad575"></a><!-- doxytag: member="DevicePath.h::ACPI_ADR_DISPLAY_TYPE_INTERNAL_DIGITAL" ref="3c71bdb00f9f324f3e882e63446ad575" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ACPI_ADR_DISPLAY_TYPE_INTERNAL_DIGITAL&nbsp;&nbsp;&nbsp;4          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="dd92b0ecfebc276fb482d91b2c00cd5f"></a><!-- doxytag: member="DevicePath.h::ACPI_ADR_DISPLAY_TYPE_OTHER" ref="dd92b0ecfebc276fb482d91b2c00cd5f" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ACPI_ADR_DISPLAY_TYPE_OTHER&nbsp;&nbsp;&nbsp;0          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="e9846d443ca81a435dd8a47ec91998c9"></a><!-- doxytag: member="DevicePath.h::ACPI_ADR_DISPLAY_TYPE_TV" ref="e9846d443ca81a435dd8a47ec91998c9" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ACPI_ADR_DISPLAY_TYPE_TV&nbsp;&nbsp;&nbsp;2          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="44611ae6c4956f6072ef7c08a871590a"></a><!-- doxytag: member="DevicePath.h::ACPI_ADR_DISPLAY_TYPE_VGA" ref="44611ae6c4956f6072ef7c08a871590a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ACPI_ADR_DISPLAY_TYPE_VGA&nbsp;&nbsp;&nbsp;1          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="fc15db1ca6a4f9661f436054332e2169"></a><!-- doxytag: member="DevicePath.h::ACPI_ADR_DP" ref="fc15db1ca6a4f9661f436054332e2169" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ACPI_ADR_DP&nbsp;&nbsp;&nbsp;0x03          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-ACPI _ADR Device Path SubType 
-</div>
-</div><p>
-<a class="anchor" name="4860d1be838d0e1e1d4ef8b5ead83600"></a><!-- doxytag: member="DevicePath.h::ACPI_DEVICE_PATH" ref="4860d1be838d0e1e1d4ef8b5ead83600" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ACPI_DEVICE_PATH&nbsp;&nbsp;&nbsp;0x02          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-ACPI Device Paths 
-</div>
-</div><p>
-<a class="anchor" name="7a8be15ac159c5b5ba1bd92185a94dbc"></a><!-- doxytag: member="DevicePath.h::ACPI_DISPLAY_ADR" ref="7a8be15ac159c5b5ba1bd92185a94dbc" args="(_DeviceIdScheme, _HeadId, _NonVgaOutput, _BiosCanDetect, _VendorInfo, _Type, _Port, _Index)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ACPI_DISPLAY_ADR          </td>
-          <td>(</td>
-          <td class="paramtype">_DeviceIdScheme,         <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">_HeadId,         <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">_NonVgaOutput,         <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">_BiosCanDetect,         <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">_VendorInfo,         <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">_Type,         <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">_Port,         <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">_Index&nbsp;</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-<b>Value:</b><div class="fragment"><pre class="fragment">((<a class="code" href="../../d6/d8d/a01007.html#a3f529997f999e2b7a3db6a453c0999b">UINT32</a>)( (((_DeviceIdScheme) &amp; 0x1) &lt;&lt; 31) |  \
-                      (((_HeadId)         &amp; 0x7) &lt;&lt; 18) |  \
-                      (((_NonVgaOutput)   &amp; 0x1) &lt;&lt; 17) |  \
-                      (((_BiosCanDetect)  &amp; 0x1) &lt;&lt; 16) |  \
-                      (((_VendorInfo)     &amp; 0xf) &lt;&lt; 12) |  \
-                      (((_Type)           &amp; 0xf) &lt;&lt; 8)  |  \
-                      (((_Port)           &amp; 0xf) &lt;&lt; 4)  |  \
-                       ((_Index)          &amp; 0xf) ))
-</pre></div>
-</div>
-</div><p>
-<a class="anchor" name="8c4782524dbc4302432f3a85013ae80b"></a><!-- doxytag: member="DevicePath.h::ACPI_DP" ref="8c4782524dbc4302432f3a85013ae80b" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ACPI_DP&nbsp;&nbsp;&nbsp;0x01          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-ACPI Device Path SubType 
-</div>
-</div><p>
-<a class="anchor" name="92223797847d1a20b6b5275b43aa7507"></a><!-- doxytag: member="DevicePath.h::ACPI_EXTENDED_DP" ref="92223797847d1a20b6b5275b43aa7507" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ACPI_EXTENDED_DP&nbsp;&nbsp;&nbsp;0x02          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Expanded ACPI Device Path SubType 
-</div>
-</div><p>
-<a class="anchor" name="01b634f3c64e0d2ab60e399c6b581c4a"></a><!-- doxytag: member="DevicePath.h::BBS_BBS_DP" ref="01b634f3c64e0d2ab60e399c6b581c4a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BBS_BBS_DP&nbsp;&nbsp;&nbsp;0x01          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-BIOS Boot Specification Device Path SubType 
-</div>
-</div><p>
-<a class="anchor" name="45832e0d33a0c490262949af8fbb7bc2"></a><!-- doxytag: member="DevicePath.h::BBS_DEVICE_PATH" ref="45832e0d33a0c490262949af8fbb7bc2" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BBS_DEVICE_PATH&nbsp;&nbsp;&nbsp;0x05          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-BIOS Boot Specification Device Path 
-</div>
-</div><p>
-<a class="anchor" name="5935dd388c86daa6992665f98185f415"></a><!-- doxytag: member="DevicePath.h::BBS_TYPE_BEV" ref="5935dd388c86daa6992665f98185f415" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BBS_TYPE_BEV&nbsp;&nbsp;&nbsp;0x80          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="3ff9b05d5d7254f8594ba732c8f4385a"></a><!-- doxytag: member="DevicePath.h::BBS_TYPE_CDROM" ref="3ff9b05d5d7254f8594ba732c8f4385a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BBS_TYPE_CDROM&nbsp;&nbsp;&nbsp;0x03          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="9e4bf5cee23a44bc28992946e6b6eea2"></a><!-- doxytag: member="DevicePath.h::BBS_TYPE_EMBEDDED_NETWORK" ref="9e4bf5cee23a44bc28992946e6b6eea2" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BBS_TYPE_EMBEDDED_NETWORK&nbsp;&nbsp;&nbsp;0x06          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="d90bbef92adcf277d74781afeab2a3de"></a><!-- doxytag: member="DevicePath.h::BBS_TYPE_FLOPPY" ref="d90bbef92adcf277d74781afeab2a3de" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BBS_TYPE_FLOPPY&nbsp;&nbsp;&nbsp;0x01          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="2d5de4fc5fe91ad150621af227995c23"></a><!-- doxytag: member="DevicePath.h::BBS_TYPE_HARDDRIVE" ref="2d5de4fc5fe91ad150621af227995c23" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BBS_TYPE_HARDDRIVE&nbsp;&nbsp;&nbsp;0x02          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="66e18c7307ef7633d75eda3fb6b7d133"></a><!-- doxytag: member="DevicePath.h::BBS_TYPE_PCMCIA" ref="66e18c7307ef7633d75eda3fb6b7d133" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BBS_TYPE_PCMCIA&nbsp;&nbsp;&nbsp;0x04          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="33490a67c9d400fddb0655580550a589"></a><!-- doxytag: member="DevicePath.h::BBS_TYPE_UNKNOWN" ref="33490a67c9d400fddb0655580550a589" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BBS_TYPE_UNKNOWN&nbsp;&nbsp;&nbsp;0xFF          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="3560ea05a3e7c0a7a078df173626927c"></a><!-- doxytag: member="DevicePath.h::BBS_TYPE_USB" ref="3560ea05a3e7c0a7a078df173626927c" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BBS_TYPE_USB&nbsp;&nbsp;&nbsp;0x05          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="943ed5fcf342200cc39b7e5ffed20602"></a><!-- doxytag: member="DevicePath.h::DEVICE_PATH_MESSAGING_PC_ANSI" ref="943ed5fcf342200cc39b7e5ffed20602" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DEVICE_PATH_MESSAGING_PC_ANSI&nbsp;&nbsp;&nbsp;EFI_PC_ANSI_GUID          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="b28ce875e862808ea4e1d1dfc3dcc553"></a><!-- doxytag: member="DevicePath.h::DEVICE_PATH_MESSAGING_SAS" ref="b28ce875e862808ea4e1d1dfc3dcc553" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DEVICE_PATH_MESSAGING_SAS&nbsp;&nbsp;&nbsp;EFI_SAS_DEVICE_PATH_GUID          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="99f92b9baa47b247369fbd761cd3bc0f"></a><!-- doxytag: member="DevicePath.h::DEVICE_PATH_MESSAGING_VT_100" ref="99f92b9baa47b247369fbd761cd3bc0f" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DEVICE_PATH_MESSAGING_VT_100&nbsp;&nbsp;&nbsp;EFI_VT_100_GUID          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="58cb47f03929aa0240e06fc721383868"></a><!-- doxytag: member="DevicePath.h::DEVICE_PATH_MESSAGING_VT_100_PLUS" ref="58cb47f03929aa0240e06fc721383868" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DEVICE_PATH_MESSAGING_VT_100_PLUS&nbsp;&nbsp;&nbsp;EFI_VT_100_PLUS_GUID          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="a3671f06e4463dbe782c2b85173c9eca"></a><!-- doxytag: member="DevicePath.h::DEVICE_PATH_MESSAGING_VT_UTF8" ref="a3671f06e4463dbe782c2b85173c9eca" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DEVICE_PATH_MESSAGING_VT_UTF8&nbsp;&nbsp;&nbsp;EFI_VT_UTF8_GUID          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="4c1021bf9dd55184ffe605fa7c6b9b6b"></a><!-- doxytag: member="DevicePath.h::DEVICE_PATH_PROTOCOL" ref="4c1021bf9dd55184ffe605fa7c6b9b6b" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DEVICE_PATH_PROTOCOL&nbsp;&nbsp;&nbsp;EFI_DEVICE_PATH_PROTOCOL_GUID          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Device Path guid definition for backward-compatible with EFI1.1. 
-</div>
-</div><p>
-<a class="anchor" name="7144a55b87de3a877e89f6cf85063e4a"></a><!-- doxytag: member="DevicePath.h::EFI_DEVICE_PATH_PROTOCOL_GUID" ref="7144a55b87de3a877e89f6cf85063e4a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_DEVICE_PATH_PROTOCOL_GUID          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-<b>Value:</b><div class="fragment"><pre class="fragment">{ \
-    0x9576e91, 0x6d3f, 0x11d2, {0x8e, 0x39, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b } \
-  }
-</pre></div>Device Path protocol 
-</div>
-</div><p>
-<a class="anchor" name="38ba3473f6a926ae9aad1a71c94a90a5"></a><!-- doxytag: member="DevicePath.h::EFI_PNP_ID" ref="38ba3473f6a926ae9aad1a71c94a90a5" args="(_PNPId)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_PNP_ID          </td>
-          <td>(</td>
-          <td class="paramtype">_PNPId&nbsp;</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td>&nbsp;&nbsp;&nbsp;(EISA_ID(PNP_EISA_ID_CONST, (_PNPId)))</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="d704f2ee29264fdd1dbe8f3e065a7148"></a><!-- doxytag: member="DevicePath.h::EISA_ID" ref="d704f2ee29264fdd1dbe8f3e065a7148" args="(_Name, _Num)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EISA_ID          </td>
-          <td>(</td>
-          <td class="paramtype">_Name,         <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">_Num&nbsp;</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td>&nbsp;&nbsp;&nbsp;((<a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>)((_Name) | (_Num) &lt;&lt; 16))</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="b8f28a8aed5d24e1f69f2db2a24f3a3c"></a><!-- doxytag: member="DevicePath.h::EISA_ID_TO_NUM" ref="b8f28a8aed5d24e1f69f2db2a24f3a3c" args="(_Id)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EISA_ID_TO_NUM          </td>
-          <td>(</td>
-          <td class="paramtype">_Id&nbsp;</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td>&nbsp;&nbsp;&nbsp;((_Id) &gt;&gt; 16)</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="ad16f37b7bf3225255d31df001f4c3dd"></a><!-- doxytag: member="DevicePath.h::EISA_PNP_ID" ref="ad16f37b7bf3225255d31df001f4c3dd" args="(_PNPId)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EISA_PNP_ID          </td>
-          <td>(</td>
-          <td class="paramtype">_PNPId&nbsp;</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td>&nbsp;&nbsp;&nbsp;(EISA_ID(PNP_EISA_ID_CONST, (_PNPId)))</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="90ddf9cdc77b5c3a9f8c3fd9cd73924a"></a><!-- doxytag: member="DevicePath.h::END_DEVICE_PATH_TYPE" ref="90ddf9cdc77b5c3a9f8c3fd9cd73924a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define END_DEVICE_PATH_TYPE&nbsp;&nbsp;&nbsp;0x7f          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="2f1e01d5ea1c8c2285d3c2630f163a45"></a><!-- doxytag: member="DevicePath.h::END_ENTIRE_DEVICE_PATH_SUBTYPE" ref="2f1e01d5ea1c8c2285d3c2630f163a45" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define END_ENTIRE_DEVICE_PATH_SUBTYPE&nbsp;&nbsp;&nbsp;0xFF          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="d2de24cedc764ce62610bb79d74186a4"></a><!-- doxytag: member="DevicePath.h::END_INSTANCE_DEVICE_PATH_SUBTYPE" ref="d2de24cedc764ce62610bb79d74186a4" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define END_INSTANCE_DEVICE_PATH_SUBTYPE&nbsp;&nbsp;&nbsp;0x01          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="0ffd59c1a36c1c28ee2e03cf9a0e1c6b"></a><!-- doxytag: member="DevicePath.h::HARDWARE_DEVICE_PATH" ref="0ffd59c1a36c1c28ee2e03cf9a0e1c6b" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define HARDWARE_DEVICE_PATH&nbsp;&nbsp;&nbsp;0x01          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Hardware Device Paths 
-</div>
-</div><p>
-<a class="anchor" name="fb466821f9592c635c739dc09e8a2f12"></a><!-- doxytag: member="DevicePath.h::HW_CONTROLLER_DP" ref="fb466821f9592c635c739dc09e8a2f12" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define HW_CONTROLLER_DP&nbsp;&nbsp;&nbsp;0x05          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Controller Device Path SubType 
+Value of version ofinEFI_HOB_HANDOFF_INFO_TABLE. 
 </div>
 </div><p>
-<a class="anchor" name="dec20375f286447ca03240140b59e9b6"></a><!-- doxytag: member="DevicePath.h::HW_MEMMAP_DP" ref="dec20375f286447ca03240140b59e9b6" args="" -->
+<a class="anchor" name="5355ec47db1154164e61094820860e5c"></a><!-- doxytag: member="PiHob.h::EFI_HOB_TYPE_CPU" ref="5355ec47db1154164e61094820860e5c" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define HW_MEMMAP_DP&nbsp;&nbsp;&nbsp;0x03          </td>
+          <td class="memname">#define EFI_HOB_TYPE_CPU&nbsp;&nbsp;&nbsp;0x0006          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Memory Mapped Device Path SubType 
-</div>
-</div><p>
-<a class="anchor" name="4471125161067b50d0ce79afa356c334"></a><!-- doxytag: member="DevicePath.h::HW_PCCARD_DP" ref="4471125161067b50d0ce79afa356c334" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define HW_PCCARD_DP&nbsp;&nbsp;&nbsp;0x02          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
 
-<p>
-PCCARD Device Path SubType 
 </div>
 </div><p>
-<a class="anchor" name="d1c904324cb6c08fa4864392e66738f8"></a><!-- doxytag: member="DevicePath.h::HW_PCI_DP" ref="d1c904324cb6c08fa4864392e66738f8" args="" -->
+<a class="anchor" name="f458bf7f65aed5d2da11d7a2512ce516"></a><!-- doxytag: member="PiHob.h::EFI_HOB_TYPE_END_OF_HOB_LIST" ref="f458bf7f65aed5d2da11d7a2512ce516" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define HW_PCI_DP&nbsp;&nbsp;&nbsp;0x01          </td>
+          <td class="memname">#define EFI_HOB_TYPE_END_OF_HOB_LIST&nbsp;&nbsp;&nbsp;0xFFFF          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-PCI Device Path SubType 
-</div>
-</div><p>
-<a class="anchor" name="23c0021121250be0b069cad1ecf11d36"></a><!-- doxytag: member="DevicePath.h::HW_VENDOR_DP" ref="23c0021121250be0b069cad1ecf11d36" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define HW_VENDOR_DP&nbsp;&nbsp;&nbsp;0x04          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
 
-<p>
-Hardware Vendor Device Path SubType 
 </div>
 </div><p>
-<a class="anchor" name="f39cce8a89e10db9999198f4ff89ae56"></a><!-- doxytag: member="DevicePath.h::INFINIBAND_RESOURCE_FLAG_CONSOLE_PROTOCOL" ref="f39cce8a89e10db9999198f4ff89ae56" args="" -->
+<a class="anchor" name="8de69789ee15e354f65f6551a2255b72"></a><!-- doxytag: member="PiHob.h::EFI_HOB_TYPE_FV" ref="8de69789ee15e354f65f6551a2255b72" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define INFINIBAND_RESOURCE_FLAG_CONSOLE_PROTOCOL&nbsp;&nbsp;&nbsp;0x04          </td>
+          <td class="memname">#define EFI_HOB_TYPE_FV&nbsp;&nbsp;&nbsp;0x0005          </td>
         </tr>
       </table>
 </div>
@@ -967,12 +201,12 @@ Hardware Vendor Device Path SubType
 
 </div>
 </div><p>
-<a class="anchor" name="f17c8794277c2296fe452d64c0247082"></a><!-- doxytag: member="DevicePath.h::INFINIBAND_RESOURCE_FLAG_EXTENDED_BOOT_ENVIRONMENT" ref="f17c8794277c2296fe452d64c0247082" args="" -->
+<a class="anchor" name="aa438eae264700072375faaebaa13975"></a><!-- doxytag: member="PiHob.h::EFI_HOB_TYPE_FV2" ref="aa438eae264700072375faaebaa13975" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define INFINIBAND_RESOURCE_FLAG_EXTENDED_BOOT_ENVIRONMENT&nbsp;&nbsp;&nbsp;0x02          </td>
+          <td class="memname">#define EFI_HOB_TYPE_FV2&nbsp;&nbsp;&nbsp;0x0009          </td>
         </tr>
       </table>
 </div>
@@ -982,12 +216,12 @@ Hardware Vendor Device Path SubType
 
 </div>
 </div><p>
-<a class="anchor" name="af23e1f5dab3f32d61d31d0ec1bf16f0"></a><!-- doxytag: member="DevicePath.h::INFINIBAND_RESOURCE_FLAG_IOC_SERVICE" ref="af23e1f5dab3f32d61d31d0ec1bf16f0" args="" -->
+<a class="anchor" name="0f49e01bf61356aa86455630329ebb2c"></a><!-- doxytag: member="PiHob.h::EFI_HOB_TYPE_GUID_EXTENSION" ref="0f49e01bf61356aa86455630329ebb2c" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define INFINIBAND_RESOURCE_FLAG_IOC_SERVICE&nbsp;&nbsp;&nbsp;0x01          </td>
+          <td class="memname">#define EFI_HOB_TYPE_GUID_EXTENSION&nbsp;&nbsp;&nbsp;0x0004          </td>
         </tr>
       </table>
 </div>
@@ -997,12 +231,12 @@ Hardware Vendor Device Path SubType
 
 </div>
 </div><p>
-<a class="anchor" name="ae95403d7f453b142d2aa8c43f861279"></a><!-- doxytag: member="DevicePath.h::INFINIBAND_RESOURCE_FLAG_NETWORK_PROTOCOL" ref="ae95403d7f453b142d2aa8c43f861279" args="" -->
+<a class="anchor" name="cb43ab3a727008400ace084365251e21"></a><!-- doxytag: member="PiHob.h::EFI_HOB_TYPE_HANDOFF" ref="cb43ab3a727008400ace084365251e21" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define INFINIBAND_RESOURCE_FLAG_NETWORK_PROTOCOL&nbsp;&nbsp;&nbsp;0x10          </td>
+          <td class="memname">#define EFI_HOB_TYPE_HANDOFF&nbsp;&nbsp;&nbsp;0x0001          </td>
         </tr>
       </table>
 </div>
@@ -1012,12 +246,12 @@ Hardware Vendor Device Path SubType
 
 </div>
 </div><p>
-<a class="anchor" name="04653ce8db34029b89054527161c109f"></a><!-- doxytag: member="DevicePath.h::INFINIBAND_RESOURCE_FLAG_STORAGE_PROTOCOL" ref="04653ce8db34029b89054527161c109f" args="" -->
+<a class="anchor" name="5455bd051eb2785f52c8e7194bef96a6"></a><!-- doxytag: member="PiHob.h::EFI_HOB_TYPE_LOAD_PEIM" ref="5455bd051eb2785f52c8e7194bef96a6" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define INFINIBAND_RESOURCE_FLAG_STORAGE_PROTOCOL&nbsp;&nbsp;&nbsp;0x08          </td>
+          <td class="memname">#define EFI_HOB_TYPE_LOAD_PEIM&nbsp;&nbsp;&nbsp;0x000A          </td>
         </tr>
       </table>
 </div>
@@ -1027,12 +261,12 @@ Hardware Vendor Device Path SubType
 
 </div>
 </div><p>
-<a class="anchor" name="ba45b409599b0fa6aa207a03931f2e3c"></a><!-- doxytag: member="DevicePath.h::ISCSI_LOGIN_OPTION_AUTHMETHOD_CHAP" ref="ba45b409599b0fa6aa207a03931f2e3c" args="" -->
+<a class="anchor" name="173b32a0e4c52d3c829ad2e9a53d4f40"></a><!-- doxytag: member="PiHob.h::EFI_HOB_TYPE_MEMORY_ALLOCATION" ref="173b32a0e4c52d3c829ad2e9a53d4f40" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ISCSI_LOGIN_OPTION_AUTHMETHOD_CHAP&nbsp;&nbsp;&nbsp;0x0000          </td>
+          <td class="memname">#define EFI_HOB_TYPE_MEMORY_ALLOCATION&nbsp;&nbsp;&nbsp;0x0002          </td>
         </tr>
       </table>
 </div>
@@ -1042,12 +276,12 @@ Hardware Vendor Device Path SubType
 
 </div>
 </div><p>
-<a class="anchor" name="0338b361ac1363cd56f09b79ebbe48e7"></a><!-- doxytag: member="DevicePath.h::ISCSI_LOGIN_OPTION_AUTHMETHOD_NON" ref="0338b361ac1363cd56f09b79ebbe48e7" args="" -->
+<a class="anchor" name="d9011e2b11279f81887f92b2f1526df6"></a><!-- doxytag: member="PiHob.h::EFI_HOB_TYPE_MEMORY_POOL" ref="d9011e2b11279f81887f92b2f1526df6" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ISCSI_LOGIN_OPTION_AUTHMETHOD_NON&nbsp;&nbsp;&nbsp;0x1000          </td>
+          <td class="memname">#define EFI_HOB_TYPE_MEMORY_POOL&nbsp;&nbsp;&nbsp;0x0007          </td>
         </tr>
       </table>
 </div>
@@ -1057,12 +291,12 @@ Hardware Vendor Device Path SubType
 
 </div>
 </div><p>
-<a class="anchor" name="8f7d085e19d0fda41435f08c1a213acf"></a><!-- doxytag: member="DevicePath.h::ISCSI_LOGIN_OPTION_CHAP_BI" ref="8f7d085e19d0fda41435f08c1a213acf" args="" -->
+<a class="anchor" name="2c8911bbf21e0c06aee875ce1a465928"></a><!-- doxytag: member="PiHob.h::EFI_HOB_TYPE_RESOURCE_DESCRIPTOR" ref="2c8911bbf21e0c06aee875ce1a465928" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ISCSI_LOGIN_OPTION_CHAP_BI&nbsp;&nbsp;&nbsp;0x0000          </td>
+          <td class="memname">#define EFI_HOB_TYPE_RESOURCE_DESCRIPTOR&nbsp;&nbsp;&nbsp;0x0003          </td>
         </tr>
       </table>
 </div>
@@ -1072,12 +306,12 @@ Hardware Vendor Device Path SubType
 
 </div>
 </div><p>
-<a class="anchor" name="56de4242cac9f2ad3dec8108f27d841b"></a><!-- doxytag: member="DevicePath.h::ISCSI_LOGIN_OPTION_CHAP_UNI" ref="56de4242cac9f2ad3dec8108f27d841b" args="" -->
+<a class="anchor" name="dd8a386294b8378e0077a13e06c7dc1b"></a><!-- doxytag: member="PiHob.h::EFI_HOB_TYPE_UNUSED" ref="dd8a386294b8378e0077a13e06c7dc1b" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ISCSI_LOGIN_OPTION_CHAP_UNI&nbsp;&nbsp;&nbsp;0x2000          </td>
+          <td class="memname">#define EFI_HOB_TYPE_UNUSED&nbsp;&nbsp;&nbsp;0xFFFE          </td>
         </tr>
       </table>
 </div>
@@ -1087,12 +321,12 @@ Hardware Vendor Device Path SubType
 
 </div>
 </div><p>
-<a class="anchor" name="5e48012399b3cd8445174905e91c070d"></a><!-- doxytag: member="DevicePath.h::ISCSI_LOGIN_OPTION_DATA_DIGEST_USING_CRC32C" ref="5e48012399b3cd8445174905e91c070d" args="" -->
+<a class="anchor" name="30a3ecc78b030f6eedad2fda40b09af1"></a><!-- doxytag: member="PiHob.h::EFI_RESOURCE_ATTRIBUTE_16_BIT_IO" ref="30a3ecc78b030f6eedad2fda40b09af1" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ISCSI_LOGIN_OPTION_DATA_DIGEST_USING_CRC32C&nbsp;&nbsp;&nbsp;0x0008          </td>
+          <td class="memname">#define EFI_RESOURCE_ATTRIBUTE_16_BIT_IO&nbsp;&nbsp;&nbsp;0x00004000          </td>
         </tr>
       </table>
 </div>
@@ -1102,12 +336,12 @@ Hardware Vendor Device Path SubType
 
 </div>
 </div><p>
-<a class="anchor" name="462ed8c98286de1ffaadce550c94235e"></a><!-- doxytag: member="DevicePath.h::ISCSI_LOGIN_OPTION_HEADER_DIGEST_USING_CRC32C" ref="462ed8c98286de1ffaadce550c94235e" args="" -->
+<a class="anchor" name="a67277b2a4475b458a684587cbd3136a"></a><!-- doxytag: member="PiHob.h::EFI_RESOURCE_ATTRIBUTE_32_BIT_IO" ref="a67277b2a4475b458a684587cbd3136a" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ISCSI_LOGIN_OPTION_HEADER_DIGEST_USING_CRC32C&nbsp;&nbsp;&nbsp;0x0002          </td>
+          <td class="memname">#define EFI_RESOURCE_ATTRIBUTE_32_BIT_IO&nbsp;&nbsp;&nbsp;0x00008000          </td>
         </tr>
       </table>
 </div>
@@ -1117,12 +351,12 @@ Hardware Vendor Device Path SubType
 
 </div>
 </div><p>
-<a class="anchor" name="7dc42ab5359cc53d99b73ea996dc8218"></a><!-- doxytag: member="DevicePath.h::ISCSI_LOGIN_OPTION_NO_DATA_DIGEST" ref="7dc42ab5359cc53d99b73ea996dc8218" args="" -->
+<a class="anchor" name="74f7fd4859200a4c357f5a1e4ccebd1e"></a><!-- doxytag: member="PiHob.h::EFI_RESOURCE_ATTRIBUTE_64_BIT_IO" ref="74f7fd4859200a4c357f5a1e4ccebd1e" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ISCSI_LOGIN_OPTION_NO_DATA_DIGEST&nbsp;&nbsp;&nbsp;0x0000          </td>
+          <td class="memname">#define EFI_RESOURCE_ATTRIBUTE_64_BIT_IO&nbsp;&nbsp;&nbsp;0x00010000          </td>
         </tr>
       </table>
 </div>
@@ -1132,12 +366,12 @@ Hardware Vendor Device Path SubType
 
 </div>
 </div><p>
-<a class="anchor" name="b1297b6e2a7839e0a6cce476eb18cac5"></a><!-- doxytag: member="DevicePath.h::ISCSI_LOGIN_OPTION_NO_HEADER_DIGEST" ref="b1297b6e2a7839e0a6cce476eb18cac5" args="" -->
+<a class="anchor" name="c6aeec948b2a78da38b04dc1ff40c39d"></a><!-- doxytag: member="PiHob.h::EFI_RESOURCE_ATTRIBUTE_ECC_RESERVED_1" ref="c6aeec948b2a78da38b04dc1ff40c39d" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ISCSI_LOGIN_OPTION_NO_HEADER_DIGEST&nbsp;&nbsp;&nbsp;0x0000          </td>
+          <td class="memname">#define EFI_RESOURCE_ATTRIBUTE_ECC_RESERVED_1&nbsp;&nbsp;&nbsp;0x00000020          </td>
         </tr>
       </table>
 </div>
@@ -1147,12 +381,12 @@ Hardware Vendor Device Path SubType
 
 </div>
 </div><p>
-<a class="anchor" name="cd8e46568a8aa8f31e17a3db86b16963"></a><!-- doxytag: member="DevicePath.h::MBR_TYPE_EFI_PARTITION_TABLE_HEADER" ref="cd8e46568a8aa8f31e17a3db86b16963" args="" -->
+<a class="anchor" name="49c6b92cebc8f02e8a2c6177c731cc37"></a><!-- doxytag: member="PiHob.h::EFI_RESOURCE_ATTRIBUTE_ECC_RESERVED_2" ref="49c6b92cebc8f02e8a2c6177c731cc37" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define MBR_TYPE_EFI_PARTITION_TABLE_HEADER&nbsp;&nbsp;&nbsp;0x02          </td>
+          <td class="memname">#define EFI_RESOURCE_ATTRIBUTE_ECC_RESERVED_2&nbsp;&nbsp;&nbsp;0x00000040          </td>
         </tr>
       </table>
 </div>
@@ -1162,42 +396,27 @@ Hardware Vendor Device Path SubType
 
 </div>
 </div><p>
-<a class="anchor" name="3b737e53f49913ce7bc9aaf03176aff9"></a><!-- doxytag: member="DevicePath.h::MBR_TYPE_PCAT" ref="3b737e53f49913ce7bc9aaf03176aff9" args="" -->
+<a class="anchor" name="0660e7b0988ad73d847a95190768c228"></a><!-- doxytag: member="PiHob.h::EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTED" ref="0660e7b0988ad73d847a95190768c228" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define MBR_TYPE_PCAT&nbsp;&nbsp;&nbsp;0x01          </td>
+          <td class="memname">#define EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTED&nbsp;&nbsp;&nbsp;0x00000200          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<a class="anchor" name="34a77c5d9a1b72f53fea40ae0343e3b0"></a><!-- doxytag: member="DevicePath.h::MEDIA_CDROM_DP" ref="34a77c5d9a1b72f53fea40ae0343e3b0" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define MEDIA_CDROM_DP&nbsp;&nbsp;&nbsp;0x02          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
 
-<p>
-CD-ROM Media Device Path SubType 
 </div>
 </div><p>
-<a class="anchor" name="2ab17e60081fe400b81e0b0ff94821aa"></a><!-- doxytag: member="DevicePath.h::MEDIA_DEVICE_PATH" ref="2ab17e60081fe400b81e0b0ff94821aa" args="" -->
+<a class="anchor" name="8e7289a108db68fc0230ce6042d372b7"></a><!-- doxytag: member="PiHob.h::EFI_RESOURCE_ATTRIBUTE_INITIALIZED" ref="8e7289a108db68fc0230ce6042d372b7" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define MEDIA_DEVICE_PATH&nbsp;&nbsp;&nbsp;0x04          </td>
+          <td class="memname">#define EFI_RESOURCE_ATTRIBUTE_INITIALIZED&nbsp;&nbsp;&nbsp;0x00000002          </td>
         </tr>
       </table>
 </div>
@@ -1207,374 +426,192 @@ CD-ROM Media Device Path SubType
 
 </div>
 </div><p>
-<a class="anchor" name="0b23b5deecd36a52d464052821b76b6b"></a><!-- doxytag: member="DevicePath.h::MEDIA_FILEPATH_DP" ref="0b23b5deecd36a52d464052821b76b6b" args="" -->
+<a class="anchor" name="53d33fc9fe4e9fea265d0cb7e32bec52"></a><!-- doxytag: member="PiHob.h::EFI_RESOURCE_ATTRIBUTE_MULTIPLE_BIT_ECC" ref="53d33fc9fe4e9fea265d0cb7e32bec52" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define MEDIA_FILEPATH_DP&nbsp;&nbsp;&nbsp;0x04          </td>
+          <td class="memname">#define EFI_RESOURCE_ATTRIBUTE_MULTIPLE_BIT_ECC&nbsp;&nbsp;&nbsp;0x00000010          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-File Path Media Device Path SubType 
-</div>
-</div><p>
-<a class="anchor" name="66fdc06570920e7b02952c42846f0abe"></a><!-- doxytag: member="DevicePath.h::MEDIA_HARDDRIVE_DP" ref="66fdc06570920e7b02952c42846f0abe" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define MEDIA_HARDDRIVE_DP&nbsp;&nbsp;&nbsp;0x01          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
 
-<p>
-Hard Drive Media Device Path SubType 
 </div>
 </div><p>
-<a class="anchor" name="4fdfee980a7aeac99823011bd2433ac9"></a><!-- doxytag: member="DevicePath.h::MEDIA_PIWG_FW_FILE_DP" ref="4fdfee980a7aeac99823011bd2433ac9" args="" -->
+<a class="anchor" name="b4c94442976d600b76784ccde063bb83"></a><!-- doxytag: member="PiHob.h::EFI_RESOURCE_ATTRIBUTE_PRESENT" ref="b4c94442976d600b76784ccde063bb83" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define MEDIA_PIWG_FW_FILE_DP&nbsp;&nbsp;&nbsp;0x6          </td>
+          <td class="memname">#define EFI_RESOURCE_ATTRIBUTE_PRESENT&nbsp;&nbsp;&nbsp;0x00000001          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-PIWG Firmware Volume Device Path SubType 
-</div>
-</div><p>
-<a class="anchor" name="82c430bec15e372246efd2c38535c77b"></a><!-- doxytag: member="DevicePath.h::MEDIA_PIWG_FW_VOL_DP" ref="82c430bec15e372246efd2c38535c77b" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define MEDIA_PIWG_FW_VOL_DP&nbsp;&nbsp;&nbsp;0x7          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
 
-<p>
-PIWG Firmware Volume Device Path SubType 
 </div>
 </div><p>
-<a class="anchor" name="6bee9b9d096789b7b48d402c01cb1498"></a><!-- doxytag: member="DevicePath.h::MEDIA_PROTOCOL_DP" ref="6bee9b9d096789b7b48d402c01cb1498" args="" -->
+<a class="anchor" name="7a1e5f954150911d127e0b6c2e8a9834"></a><!-- doxytag: member="PiHob.h::EFI_RESOURCE_ATTRIBUTE_READ_PROTECTED" ref="7a1e5f954150911d127e0b6c2e8a9834" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define MEDIA_PROTOCOL_DP&nbsp;&nbsp;&nbsp;0x05          </td>
+          <td class="memname">#define EFI_RESOURCE_ATTRIBUTE_READ_PROTECTED&nbsp;&nbsp;&nbsp;0x00000080          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Media Protocol Device Path SubType 
-</div>
-</div><p>
-<a class="anchor" name="ba576db127fb0cfa3172cd90d8dcb70a"></a><!-- doxytag: member="DevicePath.h::MEDIA_RELATIVE_OFFSET_RANGE_DP" ref="ba576db127fb0cfa3172cd90d8dcb70a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define MEDIA_RELATIVE_OFFSET_RANGE_DP&nbsp;&nbsp;&nbsp;0x08          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
 
-<p>
-Media relative offset range device path 
 </div>
 </div><p>
-<a class="anchor" name="ff1b16b361ff7922dbe68cea28e66254"></a><!-- doxytag: member="DevicePath.h::MEDIA_VENDOR_DP" ref="ff1b16b361ff7922dbe68cea28e66254" args="" -->
+<a class="anchor" name="6c5fe327763b1a15f3799279e02c4934"></a><!-- doxytag: member="PiHob.h::EFI_RESOURCE_ATTRIBUTE_SINGLE_BIT_ECC" ref="6c5fe327763b1a15f3799279e02c4934" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define MEDIA_VENDOR_DP&nbsp;&nbsp;&nbsp;0x03          </td>
+          <td class="memname">#define EFI_RESOURCE_ATTRIBUTE_SINGLE_BIT_ECC&nbsp;&nbsp;&nbsp;0x00000008          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Media vendor device path subtype. 
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="e134bb09d8091114c1d7e68e8662c7db"></a><!-- doxytag: member="DevicePath.h::MESSAGING_DEVICE_PATH" ref="e134bb09d8091114c1d7e68e8662c7db" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define MESSAGING_DEVICE_PATH&nbsp;&nbsp;&nbsp;0x03          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
 
-<p>
-Messaging Device Paths This Device Path is used to describe the connection of devices outside the resource domain of the system. This Device Path can describe physical messaging information like SCSI ID, or abstract information like networking protocol IP addresses. 
 </div>
 </div><p>
-<a class="anchor" name="e067c957b14018e89a9d9ab30e8e2dad"></a><!-- doxytag: member="DevicePath.h::MSG_1394_DP" ref="e067c957b14018e89a9d9ab30e8e2dad" args="" -->
+<a class="anchor" name="304f78a58a2a1d962b24f8f53d75edcd"></a><!-- doxytag: member="PiHob.h::EFI_RESOURCE_ATTRIBUTE_TESTED" ref="304f78a58a2a1d962b24f8f53d75edcd" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define MSG_1394_DP&nbsp;&nbsp;&nbsp;0x04          </td>
+          <td class="memname">#define EFI_RESOURCE_ATTRIBUTE_TESTED&nbsp;&nbsp;&nbsp;0x00000004          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-1394 Device Path SubType 
-</div>
-</div><p>
-<a class="anchor" name="3fecced657c18b58898eee0f320d0627"></a><!-- doxytag: member="DevicePath.h::MSG_ATAPI_DP" ref="3fecced657c18b58898eee0f320d0627" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define MSG_ATAPI_DP&nbsp;&nbsp;&nbsp;0x01          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
 
-<p>
-ATAPI Device Path SubType 
 </div>
 </div><p>
-<a class="anchor" name="2c83b0d3abe3534f87d0751f45814057"></a><!-- doxytag: member="DevicePath.h::MSG_DEVICE_LOGICAL_UNIT_DP" ref="2c83b0d3abe3534f87d0751f45814057" args="" -->
+<a class="anchor" name="f518f616f3cc213d5aff385a84b53d35"></a><!-- doxytag: member="PiHob.h::EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE" ref="f518f616f3cc213d5aff385a84b53d35" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define MSG_DEVICE_LOGICAL_UNIT_DP&nbsp;&nbsp;&nbsp;0x11          </td>
+          <td class="memname">#define EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE&nbsp;&nbsp;&nbsp;0x00000400          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Device Logical Unit SubType 
-</div>
-</div><p>
-<a class="anchor" name="ff716647485225fa30d34d68a60c6d1e"></a><!-- doxytag: member="DevicePath.h::MSG_FIBRECHANNEL_DP" ref="ff716647485225fa30d34d68a60c6d1e" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define MSG_FIBRECHANNEL_DP&nbsp;&nbsp;&nbsp;0x03          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
 
-<p>
-Fibre Channel SubType 
 </div>
 </div><p>
-<a class="anchor" name="4bd566eff8dd7f063a3bd8211a565e3d"></a><!-- doxytag: member="DevicePath.h::MSG_I2O_DP" ref="4bd566eff8dd7f063a3bd8211a565e3d" args="" -->
+<a class="anchor" name="a387f11936f83214924a0584f4548a66"></a><!-- doxytag: member="PiHob.h::EFI_RESOURCE_ATTRIBUTE_UNCACHED_EXPORTED" ref="a387f11936f83214924a0584f4548a66" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define MSG_I2O_DP&nbsp;&nbsp;&nbsp;0x06          </td>
+          <td class="memname">#define EFI_RESOURCE_ATTRIBUTE_UNCACHED_EXPORTED&nbsp;&nbsp;&nbsp;0x00020000          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-I2O Device Path SubType 
-</div>
-</div><p>
-<a class="anchor" name="123bb8ec265b44e93c96a7e34b2e9326"></a><!-- doxytag: member="DevicePath.h::MSG_INFINIBAND_DP" ref="123bb8ec265b44e93c96a7e34b2e9326" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define MSG_INFINIBAND_DP&nbsp;&nbsp;&nbsp;0x09          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
 
-<p>
-InfiniBand Device Path SubType 
 </div>
 </div><p>
-<a class="anchor" name="094aacd12c1a1d5195717d0bbcd3e75a"></a><!-- doxytag: member="DevicePath.h::MSG_IPv4_DP" ref="094aacd12c1a1d5195717d0bbcd3e75a" args="" -->
+<a class="anchor" name="4097d059cf8312d1422ee4433bfb6f29"></a><!-- doxytag: member="PiHob.h::EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE" ref="4097d059cf8312d1422ee4433bfb6f29" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define MSG_IPv4_DP&nbsp;&nbsp;&nbsp;0x0c          </td>
+          <td class="memname">#define EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE&nbsp;&nbsp;&nbsp;0x00002000          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-IPv4 Device Path SubType 
-</div>
-</div><p>
-<a class="anchor" name="08286cb8384ab814372c6657d1636958"></a><!-- doxytag: member="DevicePath.h::MSG_IPv6_DP" ref="08286cb8384ab814372c6657d1636958" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define MSG_IPv6_DP&nbsp;&nbsp;&nbsp;0x0d          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
 
-<p>
-IPv6 Device Path SubType 
 </div>
 </div><p>
-<a class="anchor" name="7aa43719f9128ae3adf7fb58f9cebf60"></a><!-- doxytag: member="DevicePath.h::MSG_ISCSI_DP" ref="7aa43719f9128ae3adf7fb58f9cebf60" args="" -->
+<a class="anchor" name="868f71cfd47bb473a6ee9880f363c208"></a><!-- doxytag: member="PiHob.h::EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE" ref="868f71cfd47bb473a6ee9880f363c208" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define MSG_ISCSI_DP&nbsp;&nbsp;&nbsp;0x13          </td>
+          <td class="memname">#define EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE&nbsp;&nbsp;&nbsp;0x00000800          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-iSCSI Device Path SubType 
-</div>
-</div><p>
-<a class="anchor" name="848bee9a0b674e42467f28f1259fc3b6"></a><!-- doxytag: member="DevicePath.h::MSG_MAC_ADDR_DP" ref="848bee9a0b674e42467f28f1259fc3b6" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define MSG_MAC_ADDR_DP&nbsp;&nbsp;&nbsp;0x0b          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
 
-<p>
-MAC Address Device Path SubType 
 </div>
 </div><p>
-<a class="anchor" name="a30fa4a3ec89df899311e27fa5f3ff91"></a><!-- doxytag: member="DevicePath.h::MSG_SATA_DP" ref="a30fa4a3ec89df899311e27fa5f3ff91" args="" -->
+<a class="anchor" name="72e42e7403c5cf3c014fb580f14f8715"></a><!-- doxytag: member="PiHob.h::EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTED" ref="72e42e7403c5cf3c014fb580f14f8715" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define MSG_SATA_DP&nbsp;&nbsp;&nbsp;0x12          </td>
+          <td class="memname">#define EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTED&nbsp;&nbsp;&nbsp;0x00000100          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-SATA Device Path SubType 
-</div>
-</div><p>
-<a class="anchor" name="13f05aaeef962c5fc2be69796cbbfbb4"></a><!-- doxytag: member="DevicePath.h::MSG_SCSI_DP" ref="13f05aaeef962c5fc2be69796cbbfbb4" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define MSG_SCSI_DP&nbsp;&nbsp;&nbsp;0x02          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
 
-<p>
-SCSI Device Path SubType 
 </div>
 </div><p>
-<a class="anchor" name="986fb2dd6a0ae7d3ae2c1c923591869d"></a><!-- doxytag: member="DevicePath.h::MSG_UART_DP" ref="986fb2dd6a0ae7d3ae2c1c923591869d" args="" -->
+<a class="anchor" name="fa39ae6a76434f0b721bf9487ecfe1b8"></a><!-- doxytag: member="PiHob.h::EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE" ref="fa39ae6a76434f0b721bf9487ecfe1b8" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define MSG_UART_DP&nbsp;&nbsp;&nbsp;0x0e          </td>
+          <td class="memname">#define EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE&nbsp;&nbsp;&nbsp;0x00001000          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-UART Device Path SubType 
-</div>
-</div><p>
-<a class="anchor" name="c3ba1540debc8c03b10f563ceec075c2"></a><!-- doxytag: member="DevicePath.h::MSG_USB_CLASS_DP" ref="c3ba1540debc8c03b10f563ceec075c2" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define MSG_USB_CLASS_DP&nbsp;&nbsp;&nbsp;0x0f          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
 
-<p>
-USB Class Device Path SubType 
 </div>
 </div><p>
-<a class="anchor" name="787b8d7f76c742019ff822289beded9c"></a><!-- doxytag: member="DevicePath.h::MSG_USB_DP" ref="787b8d7f76c742019ff822289beded9c" args="" -->
+<a class="anchor" name="6249127e8be8b0b2020df80dec51b44d"></a><!-- doxytag: member="PiHob.h::EFI_RESOURCE_FIRMWARE_DEVICE" ref="6249127e8be8b0b2020df80dec51b44d" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define MSG_USB_DP&nbsp;&nbsp;&nbsp;0x05          </td>
+          <td class="memname">#define EFI_RESOURCE_FIRMWARE_DEVICE&nbsp;&nbsp;&nbsp;0x00000003          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-USB Device Path SubType 
-</div>
-</div><p>
-<a class="anchor" name="780128900d95db31d07b4bf7f3d6d650"></a><!-- doxytag: member="DevicePath.h::MSG_USB_WWID_DP" ref="780128900d95db31d07b4bf7f3d6d650" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define MSG_USB_WWID_DP&nbsp;&nbsp;&nbsp;0x10          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
 
-<p>
-USB WWID Device Path SubType 
 </div>
 </div><p>
-<a class="anchor" name="45c2263e73f8f9e6ffd60ff2df5607e9"></a><!-- doxytag: member="DevicePath.h::MSG_VENDOR_DP" ref="45c2263e73f8f9e6ffd60ff2df5607e9" args="" -->
+<a class="anchor" name="692c619888062bfce1415fcb55acfb35"></a><!-- doxytag: member="PiHob.h::EFI_RESOURCE_IO" ref="692c619888062bfce1415fcb55acfb35" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define MSG_VENDOR_DP&nbsp;&nbsp;&nbsp;0x0a          </td>
+          <td class="memname">#define EFI_RESOURCE_IO&nbsp;&nbsp;&nbsp;0x00000002          </td>
         </tr>
       </table>
 </div>
@@ -1584,12 +621,12 @@ USB WWID Device Path SubType
 
 </div>
 </div><p>
-<a class="anchor" name="7ce201230973e90a3dd3c28c41e2c7ae"></a><!-- doxytag: member="DevicePath.h::NO_DISK_SIGNATURE" ref="7ce201230973e90a3dd3c28c41e2c7ae" args="" -->
+<a class="anchor" name="c5814da46d910485dc45a40d1fa19b39"></a><!-- doxytag: member="PiHob.h::EFI_RESOURCE_IO_RESERVED" ref="c5814da46d910485dc45a40d1fa19b39" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define NO_DISK_SIGNATURE&nbsp;&nbsp;&nbsp;0x00          </td>
+          <td class="memname">#define EFI_RESOURCE_IO_RESERVED&nbsp;&nbsp;&nbsp;0x00000006          </td>
         </tr>
       </table>
 </div>
@@ -1599,12 +636,12 @@ USB WWID Device Path SubType
 
 </div>
 </div><p>
-<a class="anchor" name="534745f638e9911a9e5b428a1bd4b53c"></a><!-- doxytag: member="DevicePath.h::PNP_EISA_ID_CONST" ref="534745f638e9911a9e5b428a1bd4b53c" args="" -->
+<a class="anchor" name="e0edc3a804d7218a0381577dbfb1ad60"></a><!-- doxytag: member="PiHob.h::EFI_RESOURCE_MAX_MEMORY_TYPE" ref="e0edc3a804d7218a0381577dbfb1ad60" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define PNP_EISA_ID_CONST&nbsp;&nbsp;&nbsp;0x41d0          </td>
+          <td class="memname">#define EFI_RESOURCE_MAX_MEMORY_TYPE&nbsp;&nbsp;&nbsp;0x00000007          </td>
         </tr>
       </table>
 </div>
@@ -1614,42 +651,27 @@ USB WWID Device Path SubType
 
 </div>
 </div><p>
-<a class="anchor" name="55ed7fd5504df31cabff55b2cb2268c3"></a><!-- doxytag: member="DevicePath.h::PNP_EISA_ID_MASK" ref="55ed7fd5504df31cabff55b2cb2268c3" args="" -->
+<a class="anchor" name="b11f0dadd06c7d83074b12e749a959e2"></a><!-- doxytag: member="PiHob.h::EFI_RESOURCE_MEMORY_MAPPED_IO" ref="b11f0dadd06c7d83074b12e749a959e2" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define PNP_EISA_ID_MASK&nbsp;&nbsp;&nbsp;0xffff          </td>
+          <td class="memname">#define EFI_RESOURCE_MEMORY_MAPPED_IO&nbsp;&nbsp;&nbsp;0x00000001          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<a class="anchor" name="fa09de2b303f9558d3a260ba98c3cea2"></a><!-- doxytag: member="DevicePath.h::SATA_HBA_DIRECT_CONNECT_FLAG" ref="fa09de2b303f9558d3a260ba98c3cea2" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SATA_HBA_DIRECT_CONNECT_FLAG&nbsp;&nbsp;&nbsp;0x8000          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
 
-<p>
-Flag for if the device is directly connected to the HBA. 
 </div>
 </div><p>
-<a class="anchor" name="53d62df1238178a124e8211c927f05ab"></a><!-- doxytag: member="DevicePath.h::SIGNATURE_TYPE_GUID" ref="53d62df1238178a124e8211c927f05ab" args="" -->
+<a class="anchor" name="133d6627460c19484bba0920c6d2e1ed"></a><!-- doxytag: member="PiHob.h::EFI_RESOURCE_MEMORY_MAPPED_IO_PORT" ref="133d6627460c19484bba0920c6d2e1ed" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define SIGNATURE_TYPE_GUID&nbsp;&nbsp;&nbsp;0x02          </td>
+          <td class="memname">#define EFI_RESOURCE_MEMORY_MAPPED_IO_PORT&nbsp;&nbsp;&nbsp;0x00000004          </td>
         </tr>
       </table>
 </div>
@@ -1659,12 +681,12 @@ Flag for if the device is directly connected to the HBA.
 
 </div>
 </div><p>
-<a class="anchor" name="79b9707850d0ab5b31297ff0fb9bb9ba"></a><!-- doxytag: member="DevicePath.h::SIGNATURE_TYPE_MBR" ref="79b9707850d0ab5b31297ff0fb9bb9ba" args="" -->
+<a class="anchor" name="7a2a12ef7b4971f52192ff7f2d5e1121"></a><!-- doxytag: member="PiHob.h::EFI_RESOURCE_MEMORY_RESERVED" ref="7a2a12ef7b4971f52192ff7f2d5e1121" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define SIGNATURE_TYPE_MBR&nbsp;&nbsp;&nbsp;0x01          </td>
+          <td class="memname">#define EFI_RESOURCE_MEMORY_RESERVED&nbsp;&nbsp;&nbsp;0x00000005          </td>
         </tr>
       </table>
 </div>
@@ -1674,12 +696,12 @@ Flag for if the device is directly connected to the HBA.
 
 </div>
 </div><p>
-<a class="anchor" name="0eb07f87cd88307c99dcb122bfde9805"></a><!-- doxytag: member="DevicePath.h::SIZE_OF_FILEPATH_DEVICE_PATH" ref="0eb07f87cd88307c99dcb122bfde9805" args="" -->
+<a class="anchor" name="9830fd31eecda05b323cc45a53745f56"></a><!-- doxytag: member="PiHob.h::EFI_RESOURCE_SYSTEM_MEMORY" ref="9830fd31eecda05b323cc45a53745f56" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define SIZE_OF_FILEPATH_DEVICE_PATH&nbsp;&nbsp;&nbsp;OFFSET_OF(<a class="el" href="../../db/d3a/a00641.html">FILEPATH_DEVICE_PATH</a>,PathName)          </td>
+          <td class="memname">#define EFI_RESOURCE_SYSTEM_MEMORY&nbsp;&nbsp;&nbsp;0x00000000          </td>
         </tr>
       </table>
 </div>
@@ -1690,54 +712,38 @@ Flag for if the device is directly connected to the HBA.
 </div>
 </div><p>
 <hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="fe8b366b9b7268c496b371ae81eeeaf2"></a><!-- doxytag: member="DevicePath.h::EFI_DEVICE_PATH" ref="fe8b366b9b7268c496b371ae81eeeaf2" args="" -->
+<a class="anchor" name="ff111c6b72dc92e8b7df7afe295c2ff0"></a><!-- doxytag: member="PiHob.h::EFI_RESOURCE_ATTRIBUTE_TYPE" ref="ff111c6b72dc92e8b7df7afe295c2ff0" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/de6/a00404.html">EFI_DEVICE_PATH_PROTOCOL</a> <a class="el" href="../../d9/de6/a00404.html">EFI_DEVICE_PATH</a>          </td>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d1/d3d/a01110.html#ff111c6b72dc92e8b7df7afe295c2ff0">EFI_RESOURCE_ATTRIBUTE_TYPE</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Device Path protocol definition for backward-compatible with EFI1.1. 
+type of recount attribute type 
 </div>
 </div><p>
-<a class="anchor" name="2cb0a0ea94a4309359735ee0223302d1"></a><!-- doxytag: member="DevicePath.h::VENDOR_DEFINED_DEVICE_PATH" ref="2cb0a0ea94a4309359735ee0223302d1" args="" -->
+<a class="anchor" name="a563162fa97b4bc5982d15494ada4404"></a><!-- doxytag: member="PiHob.h::EFI_RESOURCE_TYPE" ref="a563162fa97b4bc5982d15494ada4404" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d5/da3/a00953.html">VENDOR_DEVICE_PATH</a> <a class="el" href="../../d5/da3/a00953.html">VENDOR_DEFINED_DEVICE_PATH</a>          </td>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d1/d3d/a01110.html#a563162fa97b4bc5982d15494ada4404">EFI_RESOURCE_TYPE</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<hr><h2>Variable Documentation</h2>
-<a class="anchor" name="f05431bb7fccdfef6a9375516254b66d"></a><!-- doxytag: member="DevicePath.h::gEfiDevicePathProtocolGuid" ref="f05431bb7fccdfef6a9375516254b66d" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../d1/d3d/a01110.html#f05431bb7fccdfef6a9375516254b66d">gEfiDevicePathProtocolGuid</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
+Resource type 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:10 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:25 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

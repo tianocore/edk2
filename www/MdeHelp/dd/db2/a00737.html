@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: PEI_APRIORI_FILE_CONTENTS Struct Reference</title>
+<title>MdePkg[ALL]: PAL_CACHE_INFO_RETURN1 Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,31 +21,150 @@
   </div>
 </div>
 <div class="contents">
-<h1>PEI_APRIORI_FILE_CONTENTS Struct Reference</h1><!-- doxytag: class="PEI_APRIORI_FILE_CONTENTS" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>PAL_CACHE_INFO_RETURN1 Struct Reference</h1><!-- doxytag: class="PAL_CACHE_INFO_RETURN1" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/db2/a00737.html#7766ea03c82902a1e01eae9fd60bc2a7">FileNamesWithinVolume</a> [1]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/db2/a00737.html#d195ee777ad2ffae01aa3391081c813b">IsUnified</a>: 1</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/db2/a00737.html#3f5c9eee5f21886b9751669a9d95689e">Attributes</a>: 2</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/db2/a00737.html#18183c26708a9240702701fe926504f5">Associativity</a>:8</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/db2/a00737.html#32d1a189f9fc30091fb05749a237f7e0">LineSize</a>:8</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/db2/a00737.html#ea491d4647795857cc3e8f11e8cbb8ce">Stride</a>:8</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/db2/a00737.html#c473dfd26d65e000022f6bafbb61c5e3">StoreLatency</a>:8</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/db2/a00737.html#85ba6d0daf72bfd0b3fb3041bcad18ad">StoreHint</a>:8</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/db2/a00737.html#a17ef2906649072afb2b05e36714ed37">LoadHint</a>:8</td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-This file must be of type EFI_FV_FILETYPE_FREEFORM and must contain a single section of type EFI_SECTION_RAW. For details on firmware volumes, firmware file types, and firmware file section types. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="7766ea03c82902a1e01eae9fd60bc2a7"></a><!-- doxytag: member="PEI_APRIORI_FILE_CONTENTS::FileNamesWithinVolume" ref="7766ea03c82902a1e01eae9fd60bc2a7" args="[1]" -->
+Detail the characteristics of a given processor controlled cache in the cache hierarchy. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="18183c26708a9240702701fe926504f5"></a><!-- doxytag: member="PAL_CACHE_INFO_RETURN1::Associativity" ref="18183c26708a9240702701fe926504f5" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../dd/db2/a00737.html#7766ea03c82902a1e01eae9fd60bc2a7">PEI_APRIORI_FILE_CONTENTS::FileNamesWithinVolume</a>[1]          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dd/db2/a00737.html#18183c26708a9240702701fe926504f5">PAL_CACHE_INFO_RETURN1::Associativity</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-An array of zero or more EFI_GUID type entries that match the file names of PEIM modules in the same Firmware Volume. The maximum number of entries. 
+
+</div>
+</div><p>
+<a class="anchor" name="3f5c9eee5f21886b9751669a9d95689e"></a><!-- doxytag: member="PAL_CACHE_INFO_RETURN1::Attributes" ref="3f5c9eee5f21886b9751669a9d95689e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dd/db2/a00737.html#3f5c9eee5f21886b9751669a9d95689e">PAL_CACHE_INFO_RETURN1::Attributes</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="d195ee777ad2ffae01aa3391081c813b"></a><!-- doxytag: member="PAL_CACHE_INFO_RETURN1::IsUnified" ref="d195ee777ad2ffae01aa3391081c813b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dd/db2/a00737.html#d195ee777ad2ffae01aa3391081c813b">PAL_CACHE_INFO_RETURN1::IsUnified</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="32d1a189f9fc30091fb05749a237f7e0"></a><!-- doxytag: member="PAL_CACHE_INFO_RETURN1::LineSize" ref="32d1a189f9fc30091fb05749a237f7e0" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dd/db2/a00737.html#32d1a189f9fc30091fb05749a237f7e0">PAL_CACHE_INFO_RETURN1::LineSize</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="a17ef2906649072afb2b05e36714ed37"></a><!-- doxytag: member="PAL_CACHE_INFO_RETURN1::LoadHint" ref="a17ef2906649072afb2b05e36714ed37" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dd/db2/a00737.html#a17ef2906649072afb2b05e36714ed37">PAL_CACHE_INFO_RETURN1::LoadHint</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="85ba6d0daf72bfd0b3fb3041bcad18ad"></a><!-- doxytag: member="PAL_CACHE_INFO_RETURN1::StoreHint" ref="85ba6d0daf72bfd0b3fb3041bcad18ad" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dd/db2/a00737.html#85ba6d0daf72bfd0b3fb3041bcad18ad">PAL_CACHE_INFO_RETURN1::StoreHint</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="c473dfd26d65e000022f6bafbb61c5e3"></a><!-- doxytag: member="PAL_CACHE_INFO_RETURN1::StoreLatency" ref="c473dfd26d65e000022f6bafbb61c5e3" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dd/db2/a00737.html#c473dfd26d65e000022f6bafbb61c5e3">PAL_CACHE_INFO_RETURN1::StoreLatency</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="ea491d4647795857cc3e8f11e8cbb8ce"></a><!-- doxytag: member="PAL_CACHE_INFO_RETURN1::Stride" ref="ea491d4647795857cc3e8f11e8cbb8ce" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../dd/db2/a00737.html#ea491d4647795857cc3e8f11e8cbb8ce">PAL_CACHE_INFO_RETURN1::Stride</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:20 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:55 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

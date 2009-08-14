@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: _WIN_CERTIFICATE_UEFI_GUID Struct Reference</title>
+<title>MdePkg[ALL]: _EFI_UGA_IO_PROTOCOL Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,48 +21,65 @@
   </div>
 </div>
 <div class="contents">
-<h1>_WIN_CERTIFICATE_UEFI_GUID Struct Reference</h1><!-- doxytag: class="_WIN_CERTIFICATE_UEFI_GUID" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>_EFI_UGA_IO_PROTOCOL Struct Reference</h1><!-- doxytag: class="_EFI_UGA_IO_PROTOCOL" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d2a/a00270.html">WIN_CERTIFICATE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dd6/a00272.html#01adfe37d90b1b96ffab4e23b3fe96bc">Hdr</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/ddf/a01238.html#5f543d5fc5fc74c5a5776539ebfd1af6">EFI_UGA_IO_PROTOCOL_CREATE_DEVICE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dd6/a00272.html#10c25e5eceda8f422f073397ebe2ac1f">CreateDevice</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dd6/a00272.html#927ae45f559db75188d27e563d4da8e2">CertType</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/ddf/a01238.html#2d1ee3807a0002a3f7704002d2db28c4">EFI_UGA_IO_PROTOCOL_DELETE_DEVICE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dd6/a00272.html#a18298afeb41f2b70f6fcf295a7cbf09">DeleteDevice</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/ddf/a01238.html#583a5a7ee23d3fd0a5f725884be8b3af">PUGA_FW_SERVICE_DISPATCH</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dd6/a00272.html#5df7ac853ca4ad85b60315fb0ede5f5b">DispatchService</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Certificate which encapsulates a GUID-specific digital signature <hr><h2>Field Documentation</h2>
-<a class="anchor" name="927ae45f559db75188d27e563d4da8e2"></a><!-- doxytag: member="_WIN_CERTIFICATE_UEFI_GUID::CertType" ref="927ae45f559db75188d27e563d4da8e2" args="" -->
+Provides a basic abstraction to send I/O requests to the graphics device and any of its children. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="10c25e5eceda8f422f073397ebe2ac1f"></a><!-- doxytag: member="_EFI_UGA_IO_PROTOCOL::CreateDevice" ref="10c25e5eceda8f422f073397ebe2ac1f" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../d9/dd6/a00272.html#927ae45f559db75188d27e563d4da8e2">_WIN_CERTIFICATE_UEFI_GUID::CertType</a>          </td>
+          <td class="memname"><a class="el" href="../../d8/ddf/a01238.html#5f543d5fc5fc74c5a5776539ebfd1af6">EFI_UGA_IO_PROTOCOL_CREATE_DEVICE</a> <a class="el" href="../../d9/dd6/a00272.html#10c25e5eceda8f422f073397ebe2ac1f">_EFI_UGA_IO_PROTOCOL::CreateDevice</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-This is the unique id which determines the format of the CertData. In this case, the value is EFI_CERT_TYPE_RSA2048_SHA256_GUID. 
+
 </div>
 </div><p>
-<a class="anchor" name="01adfe37d90b1b96ffab4e23b3fe96bc"></a><!-- doxytag: member="_WIN_CERTIFICATE_UEFI_GUID::Hdr" ref="01adfe37d90b1b96ffab4e23b3fe96bc" args="" -->
+<a class="anchor" name="a18298afeb41f2b70f6fcf295a7cbf09"></a><!-- doxytag: member="_EFI_UGA_IO_PROTOCOL::DeleteDevice" ref="a18298afeb41f2b70f6fcf295a7cbf09" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d2a/a00270.html">WIN_CERTIFICATE</a> <a class="el" href="../../d9/dd6/a00272.html#01adfe37d90b1b96ffab4e23b3fe96bc">_WIN_CERTIFICATE_UEFI_GUID::Hdr</a>          </td>
+          <td class="memname"><a class="el" href="../../d8/ddf/a01238.html#2d1ee3807a0002a3f7704002d2db28c4">EFI_UGA_IO_PROTOCOL_DELETE_DEVICE</a> <a class="el" href="../../d9/dd6/a00272.html#a18298afeb41f2b70f6fcf295a7cbf09">_EFI_UGA_IO_PROTOCOL::DeleteDevice</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-This is the standard WIN_CERTIFICATE header, where wCertificateType is set to WIN_CERT_TYPE_UEFI_GUID. 
+
+</div>
+</div><p>
+<a class="anchor" name="5df7ac853ca4ad85b60315fb0ede5f5b"></a><!-- doxytag: member="_EFI_UGA_IO_PROTOCOL::DispatchService" ref="5df7ac853ca4ad85b60315fb0ede5f5b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d8/ddf/a01238.html#583a5a7ee23d3fd0a5f725884be8b3af">PUGA_FW_SERVICE_DISPATCH</a> <a class="el" href="../../d9/dd6/a00272.html#5df7ac853ca4ad85b60315fb0ede5f5b">_EFI_UGA_IO_PROTOCOL::DispatchService</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:14 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:19 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

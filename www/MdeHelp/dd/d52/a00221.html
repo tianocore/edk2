@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: _EFI_PEI_FIRMWARE_VOLUME_PPI Struct Reference</title>
+<title>MdePkg[ALL]: _EFI_PCI_HOT_PLUG_INIT_PROTOCOL Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,116 +21,65 @@
   </div>
 </div>
 <div class="contents">
-<h1>_EFI_PEI_FIRMWARE_VOLUME_PPI Struct Reference</h1><!-- doxytag: class="_EFI_PEI_FIRMWARE_VOLUME_PPI" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>_EFI_PCI_HOT_PLUG_INIT_PROTOCOL Struct Reference</h1><!-- doxytag: class="_EFI_PCI_HOT_PLUG_INIT_PROTOCOL" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d7c/a01073.html#22aba72b3619e71ba6a90adb668d25a1">EFI_PEI_FV_PROCESS_FV</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d52/a00221.html#e619a9a7dbd274fd38b341612275d671">ProcessVolume</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d5/dad/a01207.html#332bbee9eb0ed8f8543bb594c93b5c8d">EFI_GET_ROOT_HPC_LIST</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d52/a00221.html#5e889ee25e73576080c3f2837584965f">GetRootHpcList</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d7c/a01073.html#fa96e69547197784ac34ee460bc349ac">EFI_PEI_FV_FIND_FILE_TYPE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d52/a00221.html#4a719b120aef3c7041df32099d3a0232">FindFileByType</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d5/dad/a01207.html#1038c0667319274655db108531a17731">EFI_INITIALIZE_ROOT_HPC</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d52/a00221.html#5533c227c9e21a50db40d4c479df5a55">InitializeRootHpc</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d7c/a01073.html#f0ca6f2bf0fe889b5c4949a34b6b8961">EFI_PEI_FV_FIND_FILE_NAME</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d52/a00221.html#9733bd5bfc81dff17ebd9e8f474e3951">FindFileByName</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d7c/a01073.html#0f1cb7c28d35f8a5df225871e809eb01">EFI_PEI_FV_GET_FILE_INFO</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d52/a00221.html#ce2ef27774c9c08c0ef636448959ee79">GetFileInfo</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d7c/a01073.html#68e6e5fa61978120373b54c2b80ffdb5">EFI_PEI_FV_GET_INFO</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d52/a00221.html#162b747784e0232456b2b517914479b8">GetVolumeInfo</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d7c/a01073.html#481a04935a189f40dd52a26b2cf6bb2d">EFI_PEI_FV_FIND_SECTION</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d52/a00221.html#d71775b22277058d232b8c220c0a3798">FindSectionByType</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d5/dad/a01207.html#12fb5cfce7654bd11e4fee5c4cf07bf0">EFI_GET_HOT_PLUG_PADDING</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d52/a00221.html#67165503219c7113a30cd9cc41fafb32">GetResourcePadding</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-This PPI provides functions for accessing a memory-mapped firmware volume of a specific format. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="9733bd5bfc81dff17ebd9e8f474e3951"></a><!-- doxytag: member="_EFI_PEI_FIRMWARE_VOLUME_PPI::FindFileByName" ref="9733bd5bfc81dff17ebd9e8f474e3951" args="" -->
+This protocol provides the necessary functionality to initialize the Hot Plug Controllers (HPCs) and the buses that they control. This protocol also provides information regarding resource padding. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="67165503219c7113a30cd9cc41fafb32"></a><!-- doxytag: member="_EFI_PCI_HOT_PLUG_INIT_PROTOCOL::GetResourcePadding" ref="67165503219c7113a30cd9cc41fafb32" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d7c/a01073.html#f0ca6f2bf0fe889b5c4949a34b6b8961">EFI_PEI_FV_FIND_FILE_NAME</a> <a class="el" href="../../dd/d52/a00221.html#9733bd5bfc81dff17ebd9e8f474e3951">_EFI_PEI_FIRMWARE_VOLUME_PPI::FindFileByName</a>          </td>
+          <td class="memname"><a class="el" href="../../d5/dad/a01207.html#12fb5cfce7654bd11e4fee5c4cf07bf0">EFI_GET_HOT_PLUG_PADDING</a> <a class="el" href="../../dd/d52/a00221.html#67165503219c7113a30cd9cc41fafb32">_EFI_PCI_HOT_PLUG_INIT_PROTOCOL::GetResourcePadding</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+Returns the resource padding that is required by the HPC. 
 </div>
 </div><p>
-<a class="anchor" name="4a719b120aef3c7041df32099d3a0232"></a><!-- doxytag: member="_EFI_PEI_FIRMWARE_VOLUME_PPI::FindFileByType" ref="4a719b120aef3c7041df32099d3a0232" args="" -->
+<a class="anchor" name="5e889ee25e73576080c3f2837584965f"></a><!-- doxytag: member="_EFI_PCI_HOT_PLUG_INIT_PROTOCOL::GetRootHpcList" ref="5e889ee25e73576080c3f2837584965f" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d7c/a01073.html#fa96e69547197784ac34ee460bc349ac">EFI_PEI_FV_FIND_FILE_TYPE</a> <a class="el" href="../../dd/d52/a00221.html#4a719b120aef3c7041df32099d3a0232">_EFI_PEI_FIRMWARE_VOLUME_PPI::FindFileByType</a>          </td>
+          <td class="memname"><a class="el" href="../../d5/dad/a01207.html#332bbee9eb0ed8f8543bb594c93b5c8d">EFI_GET_ROOT_HPC_LIST</a> <a class="el" href="../../dd/d52/a00221.html#5e889ee25e73576080c3f2837584965f">_EFI_PCI_HOT_PLUG_INIT_PROTOCOL::GetRootHpcList</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+Returns a list of root HPCs and the buses that they control. 
 </div>
 </div><p>
-<a class="anchor" name="d71775b22277058d232b8c220c0a3798"></a><!-- doxytag: member="_EFI_PEI_FIRMWARE_VOLUME_PPI::FindSectionByType" ref="d71775b22277058d232b8c220c0a3798" args="" -->
+<a class="anchor" name="5533c227c9e21a50db40d4c479df5a55"></a><!-- doxytag: member="_EFI_PCI_HOT_PLUG_INIT_PROTOCOL::InitializeRootHpc" ref="5533c227c9e21a50db40d4c479df5a55" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d7c/a01073.html#481a04935a189f40dd52a26b2cf6bb2d">EFI_PEI_FV_FIND_SECTION</a> <a class="el" href="../../dd/d52/a00221.html#d71775b22277058d232b8c220c0a3798">_EFI_PEI_FIRMWARE_VOLUME_PPI::FindSectionByType</a>          </td>
+          <td class="memname"><a class="el" href="../../d5/dad/a01207.html#1038c0667319274655db108531a17731">EFI_INITIALIZE_ROOT_HPC</a> <a class="el" href="../../dd/d52/a00221.html#5533c227c9e21a50db40d4c479df5a55">_EFI_PCI_HOT_PLUG_INIT_PROTOCOL::InitializeRootHpc</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<a class="anchor" name="ce2ef27774c9c08c0ef636448959ee79"></a><!-- doxytag: member="_EFI_PEI_FIRMWARE_VOLUME_PPI::GetFileInfo" ref="ce2ef27774c9c08c0ef636448959ee79" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/d7c/a01073.html#0f1cb7c28d35f8a5df225871e809eb01">EFI_PEI_FV_GET_FILE_INFO</a> <a class="el" href="../../dd/d52/a00221.html#ce2ef27774c9c08c0ef636448959ee79">_EFI_PEI_FIRMWARE_VOLUME_PPI::GetFileInfo</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="162b747784e0232456b2b517914479b8"></a><!-- doxytag: member="_EFI_PEI_FIRMWARE_VOLUME_PPI::GetVolumeInfo" ref="162b747784e0232456b2b517914479b8" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/d7c/a01073.html#68e6e5fa61978120373b54c2b80ffdb5">EFI_PEI_FV_GET_INFO</a> <a class="el" href="../../dd/d52/a00221.html#162b747784e0232456b2b517914479b8">_EFI_PEI_FIRMWARE_VOLUME_PPI::GetVolumeInfo</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="e619a9a7dbd274fd38b341612275d671"></a><!-- doxytag: member="_EFI_PEI_FIRMWARE_VOLUME_PPI::ProcessVolume" ref="e619a9a7dbd274fd38b341612275d671" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/d7c/a01073.html#22aba72b3619e71ba6a90adb668d25a1">EFI_PEI_FV_PROCESS_FV</a> <a class="el" href="../../dd/d52/a00221.html#e619a9a7dbd274fd38b341612275d671">_EFI_PEI_FIRMWARE_VOLUME_PPI::ProcessVolume</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
+Initializes the specified root HPC. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:13 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:15 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

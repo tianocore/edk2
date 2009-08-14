@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Uefi/UefiMultiPhase.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Protocol/HiiFont.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,114 +21,93 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Uefi/UefiMultiPhase.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Protocol/HiiFont.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d0a/a00602.html">EFI_TABLE_HEADER</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d1e/a00087.html">_EFI_HII_ROW_INFO</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d2a/a00270.html">_WIN_CERTIFICATE</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/dbd/a00457.html">EFI_FONT_INFO</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/da0/a00009.html">_EFI_CERT_BLOCK_RSA_2048_SHA256</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/df3/a00034.html">_EFI_FONT_DISPLAY_INFO</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dd6/a00272.html">_WIN_CERTIFICATE_UEFI_GUID</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d86/a00271.html">_WIN_CERTIFICATE_EFI_PKCS1_15</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/de4/a00634.html">EFI_VARIABLE_AUTHENTICATION</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d97/a00045.html">_EFI_HII_FONT_PROTOCOL</a></td></tr>
 
 <tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#b783ffa0716f4afddce2e7a535932138">EFI_VARIABLE_NON_VOLATILE</a>&nbsp;&nbsp;&nbsp;0x00000001</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#5946ed98c3177a54fa5722afdd8f9231">EFI_HII_FONT_PROTOCOL_GUID</a>&nbsp;&nbsp;&nbsp;{ 0xe9ca4775, 0x8657, 0x47fc, { 0x97, 0xe7, 0x7e, 0xd6, 0x5a, 0x8, 0x43, 0x24 } }</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#1b49ee7a89382e9146ece45b42473383">EFI_VARIABLE_BOOTSERVICE_ACCESS</a>&nbsp;&nbsp;&nbsp;0x00000002</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#2e33055ab18cfdaff6ffd665d355dd06">EFI_HII_OUT_FLAG_CLIP</a>&nbsp;&nbsp;&nbsp;0x00000001</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#8d5b311f343edc2c17731adf10bd5a0a">EFI_VARIABLE_RUNTIME_ACCESS</a>&nbsp;&nbsp;&nbsp;0x00000004</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#d582554af81643b6eea3e2e324e179cf">EFI_HII_OUT_FLAG_WRAP</a>&nbsp;&nbsp;&nbsp;0x00000002</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#590d68a0d5d03c7a5df159debee4510e">EFI_VARIABLE_HARDWARE_ERROR_RECORD</a>&nbsp;&nbsp;&nbsp;0x00000008</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#95d1578d87b9737ae7c5a8edc68cb3d7">EFI_HII_OUT_FLAG_CLIP_CLEAN_Y</a>&nbsp;&nbsp;&nbsp;0x00000004</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#13283eb95b95e4376d3d74284150c09b">EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS</a>&nbsp;&nbsp;&nbsp;0x00000010</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#31b93f8b6d1cfe4613aceb5d8b6cf43d">EFI_HII_OUT_FLAG_CLIP_CLEAN_X</a>&nbsp;&nbsp;&nbsp;0x00000008</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#92548138edddae50ee37b513bc0a4648">WIN_CERT_TYPE_EFI_PKCS115</a>&nbsp;&nbsp;&nbsp;0x0EF0</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#028ab6b97d9319f67d3b0e9edcffe837">EFI_HII_OUT_FLAG_TRANSPARENT</a>&nbsp;&nbsp;&nbsp;0x00000010</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#43cf9f1b801fe772eaad5a4730726b0f">WIN_CERT_TYPE_EFI_GUID</a>&nbsp;&nbsp;&nbsp;0x0EF1</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#8da26bf963a8d0d4a020ac012ce77244">EFI_HII_IGNORE_IF_NO_GLYPH</a>&nbsp;&nbsp;&nbsp;0x00000020</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#b171c23ccc15cd5c78970421b9bbf3f5">EFI_CERT_TYPE_RSA2048_SHA256_GUID</a>&nbsp;&nbsp;&nbsp;{0xa7717414, 0xc616, 0x4977, {0x94, 0x20, 0x84, 0x47, 0x12, 0xa7, 0x35, 0xbf } }</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#81a1e7c44ebdef98030180ceeb31c043">EFI_HII_IGNORE_LINE_BREAK</a>&nbsp;&nbsp;&nbsp;0x00000040</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#839efca2363f775a6ee3f6848894716c">EFI_HII_DIRECT_TO_SCREEN</a>&nbsp;&nbsp;&nbsp;0x00000080</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#47fc86cdf9ad43f0731396bc3ce26209">EFI_FONT_INFO_SYS_FONT</a>&nbsp;&nbsp;&nbsp;0x00000001</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#e2bf94869d36c3e6e53974e179e741dd">EFI_FONT_INFO_SYS_SIZE</a>&nbsp;&nbsp;&nbsp;0x00000002</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#43f4657452521d2222b3115af2845ff9">EFI_FONT_INFO_SYS_STYLE</a>&nbsp;&nbsp;&nbsp;0x00000004</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#5d90bb8df9b4990248704bc9b6562236">EFI_FONT_INFO_SYS_FORE_COLOR</a>&nbsp;&nbsp;&nbsp;0x00000010</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#7a238678d39376ef02593d0e47a598a5">EFI_FONT_INFO_SYS_BACK_COLOR</a>&nbsp;&nbsp;&nbsp;0x00000020</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#3d943714aaaf65f8442f3fb155199af2">EFI_FONT_INFO_RESIZE</a>&nbsp;&nbsp;&nbsp;0x00001000</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#a3474fa33062289b1e28b3fa8b0ae3dc">EFI_FONT_INFO_RESTYLE</a>&nbsp;&nbsp;&nbsp;0x00002000</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#c80432ec2859e6bc44756d45ab10aca6">EFI_FONT_INFO_ANY_FONT</a>&nbsp;&nbsp;&nbsp;0x00010000</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#620f0dc9f759ee4df1ae99c530765007">EFI_FONT_INFO_ANY_SIZE</a>&nbsp;&nbsp;&nbsp;0x00020000</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#aa7db0674f9ecf2e49f7f14f00fcf04b">EFI_FONT_INFO_ANY_STYLE</a>&nbsp;&nbsp;&nbsp;0x00040000</td></tr>
 
 <tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <a class="el" href="../../d9/d2a/a00270.html">_WIN_CERTIFICATE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#8220575f8da0298ed15af204626e9fe4">WIN_CERTIFICATE</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
+<a class="el" href="../../d6/d97/a00045.html">_EFI_HII_FONT_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#118e8c24eea65a6b60842773e353f875">EFI_HII_FONT_PROTOCOL</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef VOID *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#ac691711608720c9707c80f2d6ea5031">EFI_FONT_HANDLE</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#d2f8cc35bfa1ea86bae909f18d09c4d4">EFI_HII_OUT_FLAGS</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <a class="el" href="../../d1/d1e/a00087.html">_EFI_HII_ROW_INFO</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#3221ee3972a4c2b716a4254978b54f47">EFI_HII_ROW_INFO</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#0236ebbbba2d6f95d4106692c2cf97c7">EFI_FONT_INFO_MASK</a></td></tr>
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
-<a class="el" href="../../da/da0/a00009.html">_EFI_CERT_BLOCK_RSA_2048_SHA256</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#a7b731d0fe26a090419839aee05c1e38">EFI_CERT_BLOCK_RSA_2048_SHA256</a></td></tr>
+<a class="el" href="../../db/df3/a00034.html">_EFI_FONT_DISPLAY_INFO</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#92287bec04af8008fb3915df78f970b4">EFI_FONT_DISPLAY_INFO</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
-<a class="el" href="../../d9/dd6/a00272.html">_WIN_CERTIFICATE_UEFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#8ecf378d7d3829de0bf331d1c8fcc57d">WIN_CERTIFICATE_UEFI_GUID</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#bc575c417a60424048d5750f4c66d870">EFI_HII_STRING_TO_IMAGE</a> )(IN CONST <a class="el" href="../../d6/d97/a00045.html">EFI_HII_FONT_PROTOCOL</a> *This, IN <a class="el" href="../../d3/d10/a01189.html#d2f8cc35bfa1ea86bae909f18d09c4d4">EFI_HII_OUT_FLAGS</a> Flags, IN CONST <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> String, IN CONST <a class="el" href="../../db/df3/a00034.html">EFI_FONT_DISPLAY_INFO</a> *StringInfo, IN OUT <a class="el" href="../../d5/df1/a00206.html">EFI_IMAGE_OUTPUT</a> **Blt, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> BltX, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> BltY, OUT <a class="el" href="../../d1/d1e/a00087.html">EFI_HII_ROW_INFO</a> **RowInfoArray, OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *RowInfoArraySize, OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *ColumnInfoArray)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
-<a class="el" href="../../dd/d86/a00271.html">_WIN_CERTIFICATE_EFI_PKCS1_15</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#8aab334bccd8dff34001a1c4d5167c96">WIN_CERTIFICATE_EFI_PKCS1_15</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#91fc04cc4d1981e260750065425ec785">EFI_HII_STRING_ID_TO_IMAGE</a> )(IN CONST <a class="el" href="../../d6/d97/a00045.html">EFI_HII_FONT_PROTOCOL</a> *This, IN <a class="el" href="../../d3/d10/a01189.html#d2f8cc35bfa1ea86bae909f18d09c4d4">EFI_HII_OUT_FLAGS</a> Flags, IN <a class="el" href="../../d3/d7b/a01249.html#ea5ce95a55f97b2ee1e77092a15290a2">EFI_HII_HANDLE</a> PackageList, IN <a class="el" href="../../d3/d7b/a01249.html#ed584a1cd697a25504fd17a5c82dc1d7">EFI_STRING_ID</a> StringId, IN CONST <a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Language, IN CONST <a class="el" href="../../db/df3/a00034.html">EFI_FONT_DISPLAY_INFO</a> *StringInfo, IN OUT <a class="el" href="../../d5/df1/a00206.html">EFI_IMAGE_OUTPUT</a> **Blt, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> BltX, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> BltY, OUT <a class="el" href="../../d1/d1e/a00087.html">EFI_HII_ROW_INFO</a> **RowInfoArray, OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *RowInfoArraySize, OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *ColumnInfoArray)</td></tr>
 
-<tr><td colspan="2"><br><h2>Enumerations</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#0e2cdd0290e753cca604d3977cbe8bb9">EFI_MEMORY_TYPE</a> { <br>
-&nbsp;&nbsp;<a class="el" href="../../d3/d10/a01189.html#0e2cdd0290e753cca604d3977cbe8bb92dcfe6887a5a7e78344d7b5aa0799adf">EfiReservedMemoryType</a>, 
-<a class="el" href="../../d3/d10/a01189.html#0e2cdd0290e753cca604d3977cbe8bb9bf71319747323abe8c0aa4253588f49a">EfiLoaderCode</a>, 
-<a class="el" href="../../d3/d10/a01189.html#0e2cdd0290e753cca604d3977cbe8bb94896def316fb5a157dc02c9571ee43db">EfiLoaderData</a>, 
-<a class="el" href="../../d3/d10/a01189.html#0e2cdd0290e753cca604d3977cbe8bb93527bf982297d34fe0a8aaa8bc087d82">EfiBootServicesCode</a>, 
-<br>
-&nbsp;&nbsp;<a class="el" href="../../d3/d10/a01189.html#0e2cdd0290e753cca604d3977cbe8bb9111e9c32ba00e989ee6d356bc46a572b">EfiBootServicesData</a>, 
-<a class="el" href="../../d3/d10/a01189.html#0e2cdd0290e753cca604d3977cbe8bb9f39d90a15a64282255a96a3d665ff165">EfiRuntimeServicesCode</a>, 
-<a class="el" href="../../d3/d10/a01189.html#0e2cdd0290e753cca604d3977cbe8bb9f7b09f731fa6f3cd90c019d0f52e29cb">EfiRuntimeServicesData</a>, 
-<a class="el" href="../../d3/d10/a01189.html#0e2cdd0290e753cca604d3977cbe8bb93606d9045f535adda54e5f1448211718">EfiConventionalMemory</a>, 
-<br>
-&nbsp;&nbsp;<a class="el" href="../../d3/d10/a01189.html#0e2cdd0290e753cca604d3977cbe8bb90343d670021aa14e784b345ea5ed2d49">EfiUnusableMemory</a>, 
-<a class="el" href="../../d3/d10/a01189.html#0e2cdd0290e753cca604d3977cbe8bb9b8cd8f20847ddf6580ee3477bee4a86c">EfiACPIReclaimMemory</a>, 
-<a class="el" href="../../d3/d10/a01189.html#0e2cdd0290e753cca604d3977cbe8bb986f1b80e03e6705be56d024782b9169a">EfiACPIMemoryNVS</a>, 
-<a class="el" href="../../d3/d10/a01189.html#0e2cdd0290e753cca604d3977cbe8bb9c04ba41d1e215972b683e9fecb84a406">EfiMemoryMappedIO</a>, 
-<br>
-&nbsp;&nbsp;<a class="el" href="../../d3/d10/a01189.html#0e2cdd0290e753cca604d3977cbe8bb99de7c4958790d373fa9c16e5884c611f">EfiMemoryMappedIOPortSpace</a>, 
-<a class="el" href="../../d3/d10/a01189.html#0e2cdd0290e753cca604d3977cbe8bb9e2aac81fe88eda95e04b49b798945cfe">EfiPalCode</a>, 
-<a class="el" href="../../d3/d10/a01189.html#0e2cdd0290e753cca604d3977cbe8bb92139957bd5f8c3067730c1e902d2a98c">EfiMaxMemoryType</a>
-<br>
- }</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#8e56dd31905307ef523d2c195d75d0d3">EFI_HII_GET_GLYPH</a> )(IN CONST <a class="el" href="../../d6/d97/a00045.html">EFI_HII_FONT_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d0/d90/a01059.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> Char, IN CONST <a class="el" href="../../db/df3/a00034.html">EFI_FONT_DISPLAY_INFO</a> *StringInfo, OUT <a class="el" href="../../d5/df1/a00206.html">EFI_IMAGE_OUTPUT</a> **Blt, OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *Baseline)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#9c9d120aab389d109ebe518a96a3230e">EFI_HII_GET_FONT_INFO</a> )(IN CONST <a class="el" href="../../d6/d97/a00045.html">EFI_HII_FONT_PROTOCOL</a> *This, IN OUT <a class="el" href="../../d3/d10/a01189.html#ac691711608720c9707c80f2d6ea5031">EFI_FONT_HANDLE</a> *FontHandle, IN CONST <a class="el" href="../../db/df3/a00034.html">EFI_FONT_DISPLAY_INFO</a> *StringInfoIn, OUT <a class="el" href="../../db/df3/a00034.html">EFI_FONT_DISPLAY_INFO</a> **StringInfoOut, IN CONST <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> String)</td></tr>
+
+<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d10/a01189.html#46104dddf358e7e90cd370fb03ffbf52">gEfiHiiFontProtocolGuid</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-This includes some definitions introduced in UEFI that will be used in both PEI and DXE phases.<p>
+The file provides services to retrieve font information.<p>
 Copyright (c) 2006 - 2009, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
-<a class="anchor" name="b171c23ccc15cd5c78970421b9bbf3f5"></a><!-- doxytag: member="UefiMultiPhase.h::EFI_CERT_TYPE_RSA2048_SHA256_GUID" ref="b171c23ccc15cd5c78970421b9bbf3f5" args="" -->
+<a class="anchor" name="c80432ec2859e6bc44756d45ab10aca6"></a><!-- doxytag: member="HiiFont.h::EFI_FONT_INFO_ANY_FONT" ref="c80432ec2859e6bc44756d45ab10aca6" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_CERT_TYPE_RSA2048_SHA256_GUID&nbsp;&nbsp;&nbsp;{0xa7717414, 0xc616, 0x4977, {0x94, 0x20, 0x84, 0x47, 0x12, 0xa7, 0x35, 0xbf } }          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-<a class="el" href="../../d9/dd6/a00272.html#927ae45f559db75188d27e563d4da8e2">WIN_CERTIFICATE_UEFI_GUID.CertType</a> 
-</div>
-</div><p>
-<a class="anchor" name="13283eb95b95e4376d3d74284150c09b"></a><!-- doxytag: member="UefiMultiPhase.h::EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS" ref="13283eb95b95e4376d3d74284150c09b" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS&nbsp;&nbsp;&nbsp;0x00000010          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This attribute is identified by the mnemonic 'HR' elsewhere in this specification. 
-</div>
-</div><p>
-<a class="anchor" name="1b49ee7a89382e9146ece45b42473383"></a><!-- doxytag: member="UefiMultiPhase.h::EFI_VARIABLE_BOOTSERVICE_ACCESS" ref="1b49ee7a89382e9146ece45b42473383" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_VARIABLE_BOOTSERVICE_ACCESS&nbsp;&nbsp;&nbsp;0x00000002          </td>
+          <td class="memname">#define EFI_FONT_INFO_ANY_FONT&nbsp;&nbsp;&nbsp;0x00010000          </td>
         </tr>
       </table>
 </div>
@@ -138,12 +117,12 @@ This attribute is identified by the mnemonic 'HR' elsewhere in this specificatio
 
 </div>
 </div><p>
-<a class="anchor" name="590d68a0d5d03c7a5df159debee4510e"></a><!-- doxytag: member="UefiMultiPhase.h::EFI_VARIABLE_HARDWARE_ERROR_RECORD" ref="590d68a0d5d03c7a5df159debee4510e" args="" -->
+<a class="anchor" name="620f0dc9f759ee4df1ae99c530765007"></a><!-- doxytag: member="HiiFont.h::EFI_FONT_INFO_ANY_SIZE" ref="620f0dc9f759ee4df1ae99c530765007" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_VARIABLE_HARDWARE_ERROR_RECORD&nbsp;&nbsp;&nbsp;0x00000008          </td>
+          <td class="memname">#define EFI_FONT_INFO_ANY_SIZE&nbsp;&nbsp;&nbsp;0x00020000          </td>
         </tr>
       </table>
 </div>
@@ -153,27 +132,12 @@ This attribute is identified by the mnemonic 'HR' elsewhere in this specificatio
 
 </div>
 </div><p>
-<a class="anchor" name="b783ffa0716f4afddce2e7a535932138"></a><!-- doxytag: member="UefiMultiPhase.h::EFI_VARIABLE_NON_VOLATILE" ref="b783ffa0716f4afddce2e7a535932138" args="" -->
+<a class="anchor" name="aa7db0674f9ecf2e49f7f14f00fcf04b"></a><!-- doxytag: member="HiiFont.h::EFI_FONT_INFO_ANY_STYLE" ref="aa7db0674f9ecf2e49f7f14f00fcf04b" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_VARIABLE_NON_VOLATILE&nbsp;&nbsp;&nbsp;0x00000001          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Attributes of variable. 
-</div>
-</div><p>
-<a class="anchor" name="8d5b311f343edc2c17731adf10bd5a0a"></a><!-- doxytag: member="UefiMultiPhase.h::EFI_VARIABLE_RUNTIME_ACCESS" ref="8d5b311f343edc2c17731adf10bd5a0a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_VARIABLE_RUNTIME_ACCESS&nbsp;&nbsp;&nbsp;0x00000004          </td>
+          <td class="memname">#define EFI_FONT_INFO_ANY_STYLE&nbsp;&nbsp;&nbsp;0x00040000          </td>
         </tr>
       </table>
 </div>
@@ -183,12 +147,12 @@ Attributes of variable.
 
 </div>
 </div><p>
-<a class="anchor" name="43cf9f1b801fe772eaad5a4730726b0f"></a><!-- doxytag: member="UefiMultiPhase.h::WIN_CERT_TYPE_EFI_GUID" ref="43cf9f1b801fe772eaad5a4730726b0f" args="" -->
+<a class="anchor" name="3d943714aaaf65f8442f3fb155199af2"></a><!-- doxytag: member="HiiFont.h::EFI_FONT_INFO_RESIZE" ref="3d943714aaaf65f8442f3fb155199af2" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define WIN_CERT_TYPE_EFI_GUID&nbsp;&nbsp;&nbsp;0x0EF1          </td>
+          <td class="memname">#define EFI_FONT_INFO_RESIZE&nbsp;&nbsp;&nbsp;0x00001000          </td>
         </tr>
       </table>
 </div>
@@ -198,12 +162,222 @@ Attributes of variable.
 
 </div>
 </div><p>
-<a class="anchor" name="92548138edddae50ee37b513bc0a4648"></a><!-- doxytag: member="UefiMultiPhase.h::WIN_CERT_TYPE_EFI_PKCS115" ref="92548138edddae50ee37b513bc0a4648" args="" -->
+<a class="anchor" name="a3474fa33062289b1e28b3fa8b0ae3dc"></a><!-- doxytag: member="HiiFont.h::EFI_FONT_INFO_RESTYLE" ref="a3474fa33062289b1e28b3fa8b0ae3dc" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define WIN_CERT_TYPE_EFI_PKCS115&nbsp;&nbsp;&nbsp;0x0EF0          </td>
+          <td class="memname">#define EFI_FONT_INFO_RESTYLE&nbsp;&nbsp;&nbsp;0x00002000          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="7a238678d39376ef02593d0e47a598a5"></a><!-- doxytag: member="HiiFont.h::EFI_FONT_INFO_SYS_BACK_COLOR" ref="7a238678d39376ef02593d0e47a598a5" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FONT_INFO_SYS_BACK_COLOR&nbsp;&nbsp;&nbsp;0x00000020          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="47fc86cdf9ad43f0731396bc3ce26209"></a><!-- doxytag: member="HiiFont.h::EFI_FONT_INFO_SYS_FONT" ref="47fc86cdf9ad43f0731396bc3ce26209" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FONT_INFO_SYS_FONT&nbsp;&nbsp;&nbsp;0x00000001          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="5d90bb8df9b4990248704bc9b6562236"></a><!-- doxytag: member="HiiFont.h::EFI_FONT_INFO_SYS_FORE_COLOR" ref="5d90bb8df9b4990248704bc9b6562236" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FONT_INFO_SYS_FORE_COLOR&nbsp;&nbsp;&nbsp;0x00000010          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="e2bf94869d36c3e6e53974e179e741dd"></a><!-- doxytag: member="HiiFont.h::EFI_FONT_INFO_SYS_SIZE" ref="e2bf94869d36c3e6e53974e179e741dd" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FONT_INFO_SYS_SIZE&nbsp;&nbsp;&nbsp;0x00000002          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="43f4657452521d2222b3115af2845ff9"></a><!-- doxytag: member="HiiFont.h::EFI_FONT_INFO_SYS_STYLE" ref="43f4657452521d2222b3115af2845ff9" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FONT_INFO_SYS_STYLE&nbsp;&nbsp;&nbsp;0x00000004          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="839efca2363f775a6ee3f6848894716c"></a><!-- doxytag: member="HiiFont.h::EFI_HII_DIRECT_TO_SCREEN" ref="839efca2363f775a6ee3f6848894716c" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_HII_DIRECT_TO_SCREEN&nbsp;&nbsp;&nbsp;0x00000080          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="5946ed98c3177a54fa5722afdd8f9231"></a><!-- doxytag: member="HiiFont.h::EFI_HII_FONT_PROTOCOL_GUID" ref="5946ed98c3177a54fa5722afdd8f9231" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_HII_FONT_PROTOCOL_GUID&nbsp;&nbsp;&nbsp;{ 0xe9ca4775, 0x8657, 0x47fc, { 0x97, 0xe7, 0x7e, 0xd6, 0x5a, 0x8, 0x43, 0x24 } }          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="8da26bf963a8d0d4a020ac012ce77244"></a><!-- doxytag: member="HiiFont.h::EFI_HII_IGNORE_IF_NO_GLYPH" ref="8da26bf963a8d0d4a020ac012ce77244" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_HII_IGNORE_IF_NO_GLYPH&nbsp;&nbsp;&nbsp;0x00000020          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="81a1e7c44ebdef98030180ceeb31c043"></a><!-- doxytag: member="HiiFont.h::EFI_HII_IGNORE_LINE_BREAK" ref="81a1e7c44ebdef98030180ceeb31c043" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_HII_IGNORE_LINE_BREAK&nbsp;&nbsp;&nbsp;0x00000040          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="2e33055ab18cfdaff6ffd665d355dd06"></a><!-- doxytag: member="HiiFont.h::EFI_HII_OUT_FLAG_CLIP" ref="2e33055ab18cfdaff6ffd665d355dd06" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_HII_OUT_FLAG_CLIP&nbsp;&nbsp;&nbsp;0x00000001          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="31b93f8b6d1cfe4613aceb5d8b6cf43d"></a><!-- doxytag: member="HiiFont.h::EFI_HII_OUT_FLAG_CLIP_CLEAN_X" ref="31b93f8b6d1cfe4613aceb5d8b6cf43d" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_HII_OUT_FLAG_CLIP_CLEAN_X&nbsp;&nbsp;&nbsp;0x00000008          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="95d1578d87b9737ae7c5a8edc68cb3d7"></a><!-- doxytag: member="HiiFont.h::EFI_HII_OUT_FLAG_CLIP_CLEAN_Y" ref="95d1578d87b9737ae7c5a8edc68cb3d7" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_HII_OUT_FLAG_CLIP_CLEAN_Y&nbsp;&nbsp;&nbsp;0x00000004          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="028ab6b97d9319f67d3b0e9edcffe837"></a><!-- doxytag: member="HiiFont.h::EFI_HII_OUT_FLAG_TRANSPARENT" ref="028ab6b97d9319f67d3b0e9edcffe837" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_HII_OUT_FLAG_TRANSPARENT&nbsp;&nbsp;&nbsp;0x00000010          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="d582554af81643b6eea3e2e324e179cf"></a><!-- doxytag: member="HiiFont.h::EFI_HII_OUT_FLAG_WRAP" ref="d582554af81643b6eea3e2e324e179cf" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_HII_OUT_FLAG_WRAP&nbsp;&nbsp;&nbsp;0x00000002          </td>
         </tr>
       </table>
 </div>
@@ -214,119 +388,258 @@ Attributes of variable.
 </div>
 </div><p>
 <hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="a7b731d0fe26a090419839aee05c1e38"></a><!-- doxytag: member="UefiMultiPhase.h::EFI_CERT_BLOCK_RSA_2048_SHA256" ref="a7b731d0fe26a090419839aee05c1e38" args="" -->
+<a class="anchor" name="92287bec04af8008fb3915df78f970b4"></a><!-- doxytag: member="HiiFont.h::EFI_FONT_DISPLAY_INFO" ref="92287bec04af8008fb3915df78f970b4" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef struct <a class="el" href="../../da/da0/a00009.html">_EFI_CERT_BLOCK_RSA_2048_SHA256</a>  <a class="el" href="../../da/da0/a00009.html">EFI_CERT_BLOCK_RSA_2048_SHA256</a>          </td>
+          <td class="memname">typedef struct <a class="el" href="../../db/df3/a00034.html">_EFI_FONT_DISPLAY_INFO</a>  <a class="el" href="../../db/df3/a00034.html">EFI_FONT_DISPLAY_INFO</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-WIN_CERTIFICATE_UEFI_GUID.CertData 
+Describes font output-related information.<p>
+This structure is used for describing the way in which a string should be rendered in a particular font. FontInfo specifies the basic font information and ForegroundColor and BackgroundColor specify the color in which they should be displayed. The flags in FontInfoMask describe where the system default should be supplied instead of the specified information. The flags also describe what options can be used to make a match between the font requested and the font available. 
 </div>
 </div><p>
-<a class="anchor" name="8220575f8da0298ed15af204626e9fe4"></a><!-- doxytag: member="UefiMultiPhase.h::WIN_CERTIFICATE" ref="8220575f8da0298ed15af204626e9fe4" args="" -->
+<a class="anchor" name="ac691711608720c9707c80f2d6ea5031"></a><!-- doxytag: member="HiiFont.h::EFI_FONT_HANDLE" ref="ac691711608720c9707c80f2d6ea5031" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef struct <a class="el" href="../../d9/d2a/a00270.html">_WIN_CERTIFICATE</a>  <a class="el" href="../../d9/d2a/a00270.html">WIN_CERTIFICATE</a>          </td>
+          <td class="memname">typedef VOID* <a class="el" href="../../d3/d10/a01189.html#ac691711608720c9707c80f2d6ea5031">EFI_FONT_HANDLE</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The WIN_CERTIFICATE structure is part of the PE/COFF specification. 
+
 </div>
 </div><p>
-<a class="anchor" name="8aab334bccd8dff34001a1c4d5167c96"></a><!-- doxytag: member="UefiMultiPhase.h::WIN_CERTIFICATE_EFI_PKCS1_15" ref="8aab334bccd8dff34001a1c4d5167c96" args="" -->
+<a class="anchor" name="0236ebbbba2d6f95d4106692c2cf97c7"></a><!-- doxytag: member="HiiFont.h::EFI_FONT_INFO_MASK" ref="0236ebbbba2d6f95d4106692c2cf97c7" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef struct <a class="el" href="../../dd/d86/a00271.html">_WIN_CERTIFICATE_EFI_PKCS1_15</a>  <a class="el" href="../../dd/d86/a00271.html">WIN_CERTIFICATE_EFI_PKCS1_15</a>          </td>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d3/d10/a01189.html#0236ebbbba2d6f95d4106692c2cf97c7">EFI_FONT_INFO_MASK</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Certificate which encapsulates the RSASSA_PKCS1-v1_5 digital signature.<p>
-The WIN_CERTIFICATE_UEFI_PKCS1_15 structure is derived from WIN_CERTIFICATE and encapsulate the information needed to implement the RSASSA-PKCS1-v1_5 digital signature algorithm as specified in RFC2437. 
+Font info flag. All flags (FONT, SIZE, STYLE, and COLOR) are defined. They are defined as EFI_FONT_INFO_*** 
 </div>
 </div><p>
-<a class="anchor" name="8ecf378d7d3829de0bf331d1c8fcc57d"></a><!-- doxytag: member="UefiMultiPhase.h::WIN_CERTIFICATE_UEFI_GUID" ref="8ecf378d7d3829de0bf331d1c8fcc57d" args="" -->
+<a class="anchor" name="118e8c24eea65a6b60842773e353f875"></a><!-- doxytag: member="HiiFont.h::EFI_HII_FONT_PROTOCOL" ref="118e8c24eea65a6b60842773e353f875" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef struct <a class="el" href="../../d9/dd6/a00272.html">_WIN_CERTIFICATE_UEFI_GUID</a>  <a class="el" href="../../d9/dd6/a00272.html">WIN_CERTIFICATE_UEFI_GUID</a>          </td>
+          <td class="memname">typedef struct <a class="el" href="../../d6/d97/a00045.html">_EFI_HII_FONT_PROTOCOL</a> <a class="el" href="../../d6/d97/a00045.html">EFI_HII_FONT_PROTOCOL</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Certificate which encapsulates a GUID-specific digital signature 
+
 </div>
 </div><p>
-<hr><h2>Enumeration Type Documentation</h2>
-<a class="anchor" name="0e2cdd0290e753cca604d3977cbe8bb9"></a><!-- doxytag: member="UefiMultiPhase.h::EFI_MEMORY_TYPE" ref="0e2cdd0290e753cca604d3977cbe8bb9" args="" -->
+<a class="anchor" name="9c9d120aab389d109ebe518a96a3230e"></a><!-- doxytag: member="HiiFont.h::EFI_HII_GET_FONT_INFO" ref="9c9d120aab389d109ebe518a96a3230e" args=")(IN CONST EFI_HII_FONT_PROTOCOL *This, IN OUT EFI_FONT_HANDLE *FontHandle, IN CONST EFI_FONT_DISPLAY_INFO *StringInfoIn, OUT EFI_FONT_DISPLAY_INFO **StringInfoOut, IN CONST EFI_STRING String)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="../../d3/d10/a01189.html#0e2cdd0290e753cca604d3977cbe8bb9">EFI_MEMORY_TYPE</a>          </td>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d3/d10/a01189.html#9c9d120aab389d109ebe518a96a3230e">EFI_HII_GET_FONT_INFO</a>)(IN CONST <a class="el" href="../../d6/d97/a00045.html">EFI_HII_FONT_PROTOCOL</a> *This, IN OUT <a class="el" href="../../d3/d10/a01189.html#ac691711608720c9707c80f2d6ea5031">EFI_FONT_HANDLE</a> *FontHandle, IN CONST <a class="el" href="../../db/df3/a00034.html">EFI_FONT_DISPLAY_INFO</a> *StringInfoIn, OUT <a class="el" href="../../db/df3/a00034.html">EFI_FONT_DISPLAY_INFO</a> **StringInfoOut, IN CONST <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> String)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Enumeration of memory types introduced in UEFI. <dl compact><dt><b>Enumerator: </b></dt><dd>
-<table border="0" cellspacing="2" cellpadding="0">
-<tr><td valign="top"><em><a class="anchor" name="0e2cdd0290e753cca604d3977cbe8bb92dcfe6887a5a7e78344d7b5aa0799adf"></a><!-- doxytag: member="EfiReservedMemoryType" ref="0e2cdd0290e753cca604d3977cbe8bb92dcfe6887a5a7e78344d7b5aa0799adf" args="" -->EfiReservedMemoryType</em>&nbsp;</td><td>
-Not used. </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="0e2cdd0290e753cca604d3977cbe8bb9bf71319747323abe8c0aa4253588f49a"></a><!-- doxytag: member="EfiLoaderCode" ref="0e2cdd0290e753cca604d3977cbe8bb9bf71319747323abe8c0aa4253588f49a" args="" -->EfiLoaderCode</em>&nbsp;</td><td>
-The code portions of a loaded application. (Note that UEFI OS loaders are UEFI applications.) </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="0e2cdd0290e753cca604d3977cbe8bb94896def316fb5a157dc02c9571ee43db"></a><!-- doxytag: member="EfiLoaderData" ref="0e2cdd0290e753cca604d3977cbe8bb94896def316fb5a157dc02c9571ee43db" args="" -->EfiLoaderData</em>&nbsp;</td><td>
-The data portions of a loaded application and the default data allocation type used by an application to allocate pool memory. </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="0e2cdd0290e753cca604d3977cbe8bb93527bf982297d34fe0a8aaa8bc087d82"></a><!-- doxytag: member="EfiBootServicesCode" ref="0e2cdd0290e753cca604d3977cbe8bb93527bf982297d34fe0a8aaa8bc087d82" args="" -->EfiBootServicesCode</em>&nbsp;</td><td>
-The code portions of a loaded Boot Services Driver </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="0e2cdd0290e753cca604d3977cbe8bb9111e9c32ba00e989ee6d356bc46a572b"></a><!-- doxytag: member="EfiBootServicesData" ref="0e2cdd0290e753cca604d3977cbe8bb9111e9c32ba00e989ee6d356bc46a572b" args="" -->EfiBootServicesData</em>&nbsp;</td><td>
-The data portions of a loaded Boot Serves Driver, and the default data allocation type used by a Boot Services Driver to allocate pool memory. </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="0e2cdd0290e753cca604d3977cbe8bb9f39d90a15a64282255a96a3d665ff165"></a><!-- doxytag: member="EfiRuntimeServicesCode" ref="0e2cdd0290e753cca604d3977cbe8bb9f39d90a15a64282255a96a3d665ff165" args="" -->EfiRuntimeServicesCode</em>&nbsp;</td><td>
-The code portions of a loaded Runtime Services Driver. </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="0e2cdd0290e753cca604d3977cbe8bb9f7b09f731fa6f3cd90c019d0f52e29cb"></a><!-- doxytag: member="EfiRuntimeServicesData" ref="0e2cdd0290e753cca604d3977cbe8bb9f7b09f731fa6f3cd90c019d0f52e29cb" args="" -->EfiRuntimeServicesData</em>&nbsp;</td><td>
-The data portions of a loaded Runtime Services Driver and the default data allocation type used by a Runtime Services Driver to allocate pool memory. </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="0e2cdd0290e753cca604d3977cbe8bb93606d9045f535adda54e5f1448211718"></a><!-- doxytag: member="EfiConventionalMemory" ref="0e2cdd0290e753cca604d3977cbe8bb93606d9045f535adda54e5f1448211718" args="" -->EfiConventionalMemory</em>&nbsp;</td><td>
-Free (unallocated) memory. </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="0e2cdd0290e753cca604d3977cbe8bb90343d670021aa14e784b345ea5ed2d49"></a><!-- doxytag: member="EfiUnusableMemory" ref="0e2cdd0290e753cca604d3977cbe8bb90343d670021aa14e784b345ea5ed2d49" args="" -->EfiUnusableMemory</em>&nbsp;</td><td>
-Memory in which errors have been detected. </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="0e2cdd0290e753cca604d3977cbe8bb9b8cd8f20847ddf6580ee3477bee4a86c"></a><!-- doxytag: member="EfiACPIReclaimMemory" ref="0e2cdd0290e753cca604d3977cbe8bb9b8cd8f20847ddf6580ee3477bee4a86c" args="" -->EfiACPIReclaimMemory</em>&nbsp;</td><td>
-Memory that holds the ACPI tables. </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="0e2cdd0290e753cca604d3977cbe8bb986f1b80e03e6705be56d024782b9169a"></a><!-- doxytag: member="EfiACPIMemoryNVS" ref="0e2cdd0290e753cca604d3977cbe8bb986f1b80e03e6705be56d024782b9169a" args="" -->EfiACPIMemoryNVS</em>&nbsp;</td><td>
-Address space reserved for use by the firmware. </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="0e2cdd0290e753cca604d3977cbe8bb9c04ba41d1e215972b683e9fecb84a406"></a><!-- doxytag: member="EfiMemoryMappedIO" ref="0e2cdd0290e753cca604d3977cbe8bb9c04ba41d1e215972b683e9fecb84a406" args="" -->EfiMemoryMappedIO</em>&nbsp;</td><td>
-Used by system firmware to request that a memory-mapped IO region be mapped by the OS to a virtual address so it can be accessed by EFI runtime services. </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="0e2cdd0290e753cca604d3977cbe8bb99de7c4958790d373fa9c16e5884c611f"></a><!-- doxytag: member="EfiMemoryMappedIOPortSpace" ref="0e2cdd0290e753cca604d3977cbe8bb99de7c4958790d373fa9c16e5884c611f" args="" -->EfiMemoryMappedIOPortSpace</em>&nbsp;</td><td>
-System memory-mapped IO region that is used to translate memory cycles to IO cycles by the processor. </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="0e2cdd0290e753cca604d3977cbe8bb9e2aac81fe88eda95e04b49b798945cfe"></a><!-- doxytag: member="EfiPalCode" ref="0e2cdd0290e753cca604d3977cbe8bb9e2aac81fe88eda95e04b49b798945cfe" args="" -->EfiPalCode</em>&nbsp;</td><td>
-Address space reserved by the firmware for code that is part of the processor. </td></tr>
-<tr><td valign="top"><em><a class="anchor" name="0e2cdd0290e753cca604d3977cbe8bb92139957bd5f8c3067730c1e902d2a98c"></a><!-- doxytag: member="EfiMaxMemoryType" ref="0e2cdd0290e753cca604d3977cbe8bb92139957bd5f8c3067730c1e902d2a98c" args="" -->EfiMaxMemoryType</em>&nbsp;</td><td>
-</td></tr>
-</table>
+This function iterates through fonts which match the specified font, using the specified criteria. If String is non-NULL, then all of the characters in the string must exist in order for a candidate font to be returned.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_HII_FONT_PROTOCOL instance.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>FontHandle</em>&nbsp;</td><td>On entry, points to the font handle returned by a previous call to GetFontInfo() or NULL to start with the first font. On return, points to the returned font handle or points to NULL if there are no more matching fonts.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>StringInfoIn</em>&nbsp;</td><td>Upon entry, points to the font to return information about. If NULL, then the information about the system default font will be returned.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>StringInfoOut</em>&nbsp;</td><td>Upon return, contains the matching font's information. If NULL, then no information is returned.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>String</em>&nbsp;</td><td>Points to the string which will be tested to determine if all characters are available. If NULL, then any font is acceptable.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Matching font returned successfully.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>No matching font was found.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There were insufficient resources to complete the request. </td></tr>
+  </table>
 </dl>
 
 </div>
 </div><p>
+<a class="anchor" name="8e56dd31905307ef523d2c195d75d0d3"></a><!-- doxytag: member="HiiFont.h::EFI_HII_GET_GLYPH" ref="8e56dd31905307ef523d2c195d75d0d3" args=")(IN CONST EFI_HII_FONT_PROTOCOL *This, IN CONST CHAR16 Char, IN CONST EFI_FONT_DISPLAY_INFO *StringInfo, OUT EFI_IMAGE_OUTPUT **Blt, OUT UINTN *Baseline)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d3/d10/a01189.html#8e56dd31905307ef523d2c195d75d0d3">EFI_HII_GET_GLYPH</a>)(IN CONST <a class="el" href="../../d6/d97/a00045.html">EFI_HII_FONT_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d0/d90/a01059.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> Char, IN CONST <a class="el" href="../../db/df3/a00034.html">EFI_FONT_DISPLAY_INFO</a> *StringInfo, OUT <a class="el" href="../../d5/df1/a00206.html">EFI_IMAGE_OUTPUT</a> **Blt, OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *Baseline)          </td>
+        </tr>
+      </table>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:11 2009 for MdePkg[ALL] by&nbsp;
+<div class="memdoc">
+
+<p>
+Convert the glyph for a single character into a bitmap.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_HII_FONT_PROTOCOL instance.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Char</em>&nbsp;</td><td>Character to retrieve.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>StringInfo</em>&nbsp;</td><td>Points to the string font and color information or NULL if the string should use the default system font and color.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Blt</em>&nbsp;</td><td>Thus must point to a NULL on entry. A buffer will be allocated to hold the output and the pointer updated on exit. It is the caller's responsibility to free this buffer.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Baseline</em>&nbsp;</td><td>Number of pixels from the bottom of the bitmap to the baseline.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Glyph bitmap created.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>Unable to allocate the output buffer Blt.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_WARN_UNKNOWN_GLYPH</em>&nbsp;</td><td>The glyph was unknown and was replaced with the glyph for Unicode character 0xFFFD.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Blt is NULL or Width is NULL or Height is NULL </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="d2f8cc35bfa1ea86bae909f18d09c4d4"></a><!-- doxytag: member="HiiFont.h::EFI_HII_OUT_FLAGS" ref="d2f8cc35bfa1ea86bae909f18d09c4d4" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d3/d10/a01189.html#d2f8cc35bfa1ea86bae909f18d09c4d4">EFI_HII_OUT_FLAGS</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+EFI_HII_OUT_FLAGS 
+</div>
+</div><p>
+<a class="anchor" name="3221ee3972a4c2b716a4254978b54f47"></a><!-- doxytag: member="HiiFont.h::EFI_HII_ROW_INFO" ref="3221ee3972a4c2b716a4254978b54f47" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct <a class="el" href="../../d1/d1e/a00087.html">_EFI_HII_ROW_INFO</a>  <a class="el" href="../../d1/d1e/a00087.html">EFI_HII_ROW_INFO</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Definition of EFI_HII_ROW_INFO. 
+</div>
+</div><p>
+<a class="anchor" name="91fc04cc4d1981e260750065425ec785"></a><!-- doxytag: member="HiiFont.h::EFI_HII_STRING_ID_TO_IMAGE" ref="91fc04cc4d1981e260750065425ec785" args=")(IN CONST EFI_HII_FONT_PROTOCOL *This, IN EFI_HII_OUT_FLAGS Flags, IN EFI_HII_HANDLE PackageList, IN EFI_STRING_ID StringId, IN CONST CHAR8 *Language, IN CONST EFI_FONT_DISPLAY_INFO *StringInfo, IN OUT EFI_IMAGE_OUTPUT **Blt, IN UINTN BltX, IN UINTN BltY, OUT EFI_HII_ROW_INFO **RowInfoArray, OUT UINTN *RowInfoArraySize, OUT UINTN *ColumnInfoArray)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d3/d10/a01189.html#91fc04cc4d1981e260750065425ec785">EFI_HII_STRING_ID_TO_IMAGE</a>)(IN CONST <a class="el" href="../../d6/d97/a00045.html">EFI_HII_FONT_PROTOCOL</a> *This, IN <a class="el" href="../../d3/d10/a01189.html#d2f8cc35bfa1ea86bae909f18d09c4d4">EFI_HII_OUT_FLAGS</a> Flags, IN <a class="el" href="../../d3/d7b/a01249.html#ea5ce95a55f97b2ee1e77092a15290a2">EFI_HII_HANDLE</a> PackageList, IN <a class="el" href="../../d3/d7b/a01249.html#ed584a1cd697a25504fd17a5c82dc1d7">EFI_STRING_ID</a> StringId, IN CONST <a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Language, IN CONST <a class="el" href="../../db/df3/a00034.html">EFI_FONT_DISPLAY_INFO</a> *StringInfo, IN OUT <a class="el" href="../../d5/df1/a00206.html">EFI_IMAGE_OUTPUT</a> **Blt, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> BltX, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> BltY, OUT <a class="el" href="../../d1/d1e/a00087.html">EFI_HII_ROW_INFO</a> **RowInfoArray, OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *RowInfoArraySize, OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *ColumnInfoArray)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function renders a string as a bitmap or to the screen and can clip or wrap the string. The bitmap is either supplied by the caller or allocated by the function. The strings are drawn with the font, size and style specified and can be drawn transparently or opaquely. The function can also return information about each row and each character's position on the row. If EFI_HII_OUT_FLAG_CLIP is set, then text will be formatted only based on explicit line breaks and all pixels which would lie outside the bounding box specified by Width and Height are ignored. The information in the RowInfoArray only describes characters which are at least partially displayed. For the final row, the LineHeight and BaseLine may describe pixels which are outside the limit specified by Height (unless EFI_HII_OUT_FLAG_CLIP_CLEAN_Y is specified) even though those pixels were not drawn. If EFI_HII_OUT_FLAG_CLIP_CLEAN_X is set, then it modifies the behavior of EFI_HII_OUT_FLAG_CLIP so that if a character's right-most on pixel cannot fit, then it will not be drawn at all. This flag requires that EFI_HII_OUT_FLAG_CLIP be set. If EFI_HII_OUT_FLAG_CLIP_CLEAN_Y is set, then it modifies the behavior of EFI_HII_OUT_FLAG_CLIP so that if a row's bottom most pixel cannot fit, then it will not be drawn at all. This flag requires that EFI_HII_OUT_FLAG_CLIP be set. If EFI_HII_OUT_FLAG_WRAP is set, then text will be wrapped at the right-most line-break opportunity prior to a character whose right-most extent would exceed Width. If no line-break opportunity can be found, then the text will behave as if EFI_HII_OUT_FLAG_CLIP_CLEAN_X is set. This flag cannot be used with EFI_HII_OUT_FLAG_CLIP_CLEAN_X. If EFI_HII_OUT_FLAG_TRANSPARENT is set, then BackgroundColor is ignored and all off" pixels in the character's glyph will use the pixel value from Blt. This flag cannot be used if Blt is NULL upon entry. If EFI_HII_IGNORE_IF_NO_GLYPH is set, then characters which have no glyphs are not drawn. Otherwise, they are replaced with Unicode character 0xFFFD (REPLACEMENT CHARACTER). If EFI_HII_IGNORE_LINE_BREAK is set, then explicit line break characters will be ignored. If EFI_HII_DIRECT_TO_SCREEN is set, then the string will be written directly to the output device specified by Screen. Otherwise the string will be rendered to the bitmap specified by Bitmap.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_HII_FONT_PROTOCOL instance.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Flags</em>&nbsp;</td><td>Describes how the string is to be drawn.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>PackageList</em>&nbsp;</td><td>The package list in the HII database to search for the specified string.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>StringId</em>&nbsp;</td><td>The string's id, which is unique within PackageList.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Language</em>&nbsp;</td><td>Points to the language for the retrieved string. If NULL, then the current system language is used.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>StringInfo</em>&nbsp;</td><td>Points to the string output information, including the color and font. If NULL, then the string will be output in the default system font and color.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Blt</em>&nbsp;</td><td>If this points to a non-NULL on entry, this points to the image, which is Width pixels wide and Height pixels high. The string will be drawn onto this image and EFI_HII_OUT_FLAG_CLIP is implied. If this points to a NULL on entry, then a buffer will be allocated to hold the generated image and the pointer updated on exit. It is the caller's responsibility to free this buffer.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>BltX,BltY</em>&nbsp;</td><td>Specifies the offset from the left and top edge of the output image of the first character cell in the image.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>RowInfoArray</em>&nbsp;</td><td>If this is non-NULL on entry, then on exit, this will point to an allocated buffer containing row information and RowInfoArraySize will be updated to contain the number of elements. This array describes the characters which were at least partially drawn and the heights of the rows. It is the caller's responsibility to free this buffer.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>RowInfoArraySize</em>&nbsp;</td><td>If this is non-NULL on entry, then on exit it contains the number of elements in RowInfoArray.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ColumnInfoArray</em>&nbsp;</td><td>If non-NULL, on return it is filled with the horizontal offset for each character in the string on the row where it is displayed. Non-printing characters will have the offset ~0. The caller is responsible to allocate a buffer large enough so that there is one entry for each character in the string, not including the null-terminator. It is possible when character display is normalized that some character cells overlap.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The string was successfully updated.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>Unable to allocate an output buffer for RowInfoArray or Blt.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The String or Blt or Height or Width was NULL. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The Blt or PackageList was NULL. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Flags were invalid combination. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The specified PackageList is not in the Database or the stringid is not in the specified PackageList. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="bc575c417a60424048d5750f4c66d870"></a><!-- doxytag: member="HiiFont.h::EFI_HII_STRING_TO_IMAGE" ref="bc575c417a60424048d5750f4c66d870" args=")(IN CONST EFI_HII_FONT_PROTOCOL *This, IN EFI_HII_OUT_FLAGS Flags, IN CONST EFI_STRING String, IN CONST EFI_FONT_DISPLAY_INFO *StringInfo, IN OUT EFI_IMAGE_OUTPUT **Blt, IN UINTN BltX, IN UINTN BltY, OUT EFI_HII_ROW_INFO **RowInfoArray, OUT UINTN *RowInfoArraySize, OUT UINTN *ColumnInfoArray)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d3/d10/a01189.html#bc575c417a60424048d5750f4c66d870">EFI_HII_STRING_TO_IMAGE</a>)(IN CONST <a class="el" href="../../d6/d97/a00045.html">EFI_HII_FONT_PROTOCOL</a> *This, IN <a class="el" href="../../d3/d10/a01189.html#d2f8cc35bfa1ea86bae909f18d09c4d4">EFI_HII_OUT_FLAGS</a> Flags, IN CONST <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> String, IN CONST <a class="el" href="../../db/df3/a00034.html">EFI_FONT_DISPLAY_INFO</a> *StringInfo, IN OUT <a class="el" href="../../d5/df1/a00206.html">EFI_IMAGE_OUTPUT</a> **Blt, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> BltX, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> BltY, OUT <a class="el" href="../../d1/d1e/a00087.html">EFI_HII_ROW_INFO</a> **RowInfoArray, OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *RowInfoArraySize, OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *ColumnInfoArray)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function renders a string to a bitmap or the screen using the specified font, color and options. It either draws the string and glyphs on an existing bitmap, allocates a new bitmap or uses the screen. The strings can be clipped or wrapped. Optionally, the function also returns the information about each row and the character position on that row. If EFI_HII_OUT_FLAG_CLIP is set, then text will be formatted only based on explicit line breaks and all pixels which would lie outside the bounding box specified by Width and Height are ignored. The information in the RowInfoArray only describes characters which are at least partially displayed. For the final row, the LineHeight and BaseLine may describe pixels which are outside the limit specified by Height (unless EFI_HII_OUT_FLAG_CLIP_CLEAN_Y is specified) even though those pixels were not drawn. The LineWidth may describe pixels which are outside the limit specified by Width (unless EFI_HII_OUT_FLAG_CLIP_CLEAN_X is specified) even though those pixels were not drawn. If EFI_HII_OUT_FLAG_CLIP_CLEAN_X is set, then it modifies the behavior of EFI_HII_OUT_FLAG_CLIP so that if a character's right-most on pixel cannot fit, then it will not be drawn at all. This flag requires that EFI_HII_OUT_FLAG_CLIP be set. If EFI_HII_OUT_FLAG_CLIP_CLEAN_Y is set, then it modifies the behavior of EFI_HII_OUT_FLAG_CLIP so that if a row's bottom-most pixel cannot fit, then it will not be drawn at all. This flag requires that EFI_HII_OUT_FLAG_CLIP be set. If EFI_HII_OUT_FLAG_WRAP is set, then text will be wrapped at the right-most line-break opportunity prior to a character whose right-most extent would exceed Width. If no line-break opportunity can be found, then the text will behave as if EFI_HII_OUT_FLAG_CLIP_CLEAN_X is set. This flag cannot be used with EFI_HII_OUT_FLAG_CLIP_CLEAN_X. If EFI_HII_OUT_FLAG_TRANSPARENT is set, then BackgroundColor is ignored and all 'off' pixels in the character's drawn will use the pixel value from Blt. This flag cannot be used if Blt is NULL upon entry. If EFI_HII_IGNORE_IF_NO_GLYPH is set, then characters which have no glyphs are not drawn. Otherwise, they are replaced with Unicode character 0xFFFD (REPLACEMENT CHARACTER). If EFI_HII_IGNORE_LINE_BREAK is set, then explicit line break characters will be ignored. If EFI_HII_DIRECT_TO_SCREEN is set, then the string will be written directly to the output device specified by Screen. Otherwise the string will be rendered to the bitmap specified by Bitmap.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_HII_FONT_PROTOCOL instance.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Flags</em>&nbsp;</td><td>Describes how the string is to be drawn.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>String</em>&nbsp;</td><td>Points to the null-terminated string to be</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>StringInfo</em>&nbsp;</td><td>Points to the string output information, including the color and font. If NULL, then the string will be output in the default system font and color.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Blt</em>&nbsp;</td><td>If this points to a non-NULL on entry, this points to the image, which is Width pixels wide and Height pixels high. The string will be drawn onto this image and EFI_HII_OUT_FLAG_CLIP is implied. If this points to a NULL on entry, then a buffer will be allocated to hold the generated image and the pointer updated on exit. It is the caller's responsibility to free this buffer.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>BltX,BltY</em>&nbsp;</td><td>Specifies the offset from the left and top edge of the image of the first character cell in the image.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>RowInfoArray</em>&nbsp;</td><td>If this is non-NULL on entry, then on exit, this will point to an allocated buffer containing row information and RowInfoArraySize will be updated to contain the number of elements. This array describes the characters which were at least partially drawn and the heights of the rows. It is the caller's responsibility to free this buffer.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>RowInfoArraySize</em>&nbsp;</td><td>If this is non-NULL on entry, then on exit it contains the number of elements in RowInfoArray.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ColumnInfoArray</em>&nbsp;</td><td>If this is non-NULL, then on return it will be filled with the horizontal offset for each character in the string on the row where it is displayed. Non-printing characters will have the offset ~0. The caller is responsible for allocating a buffer large enough so that there is one entry for each character in the string, not including the null-terminator. It is possible when character display is normalized that some character cells overlap.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The string was successfully updated.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>Unable to allocate an output buffer for RowInfoArray or Blt.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The String or Blt was NULL.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Flags were invalid combination. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<hr><h2>Variable Documentation</h2>
+<a class="anchor" name="46104dddf358e7e90cd370fb03ffbf52"></a><!-- doxytag: member="HiiFont.h::gEfiHiiFontProtocolGuid" ref="46104dddf358e7e90cd370fb03ffbf52" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../d3/d10/a01189.html#46104dddf358e7e90cd370fb03ffbf52">gEfiHiiFontProtocolGuid</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+</div>
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:33 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

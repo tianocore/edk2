@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: _EFI_IMAGE_OUTPUT Struct Reference</title>
+<title>MdePkg[ALL]: _EFI_IFR_ZERO Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,99 +21,19 @@
   </div>
 </div>
 <div class="contents">
-<h1>_EFI_IMAGE_OUTPUT Struct Reference</h1><!-- doxytag: class="_EFI_IMAGE_OUTPUT" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>_EFI_IFR_ZERO Struct Reference</h1><!-- doxytag: class="_EFI_IFR_ZERO" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d72/a00204.html#ccd8fc752ec1fb52c2e0414ef8073fe7">Width</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d72/a00204.html#fc6f1342920e091911362eb65a082a5a">Height</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap>union {</td></tr>
-
-<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d9/d3a/a00439.html">EFI_GRAPHICS_OUTPUT_BLT_PIXEL</a> *&nbsp;&nbsp;&nbsp;<a class="el" href="../../d1/d72/a00204.html#a66d191f6039f0da9c27a8ee3d0767ee">Bitmap</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../de/d8c/a00036.html">EFI_GRAPHICS_OUTPUT_PROTOCOL</a> *&nbsp;&nbsp;&nbsp;<a class="el" href="../../d1/d72/a00204.html#dcb3ca5d1326c89753e33c65b19c7b30">Screen</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap valign="top">}&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d72/a00204.html#3f794bf722111152302fc4eb0f8a8df6">Image</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/df8/a00155.html">EFI_IFR_OP_HEADER</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d72/a00204.html#276272b96a2ea11717db7e02e7e325f8">Header</a></td></tr>
 
 </table>
-<hr><a name="_details"></a><h2>Detailed Description</h2>
-Definition of EFI_IMAGE_OUTPUT.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Width</em>&nbsp;</td><td>Width of the output image.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Height</em>&nbsp;</td><td>Height of the output image.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Bitmap</em>&nbsp;</td><td>Points to the output bitmap.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Screen</em>&nbsp;</td><td>Points to the EFI_GRAPHICS_OUTPUT_PROTOCOL which describes the screen on which to draw the specified image. </td></tr>
-  </table>
-</dl>
 <hr><h2>Field Documentation</h2>
-<a class="anchor" name="a66d191f6039f0da9c27a8ee3d0767ee"></a><!-- doxytag: member="_EFI_IMAGE_OUTPUT::Bitmap" ref="a66d191f6039f0da9c27a8ee3d0767ee" args="" -->
+<a class="anchor" name="276272b96a2ea11717db7e02e7e325f8"></a><!-- doxytag: member="_EFI_IFR_ZERO::Header" ref="276272b96a2ea11717db7e02e7e325f8" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d3a/a00439.html">EFI_GRAPHICS_OUTPUT_BLT_PIXEL</a>* <a class="el" href="../../d1/d72/a00204.html#a66d191f6039f0da9c27a8ee3d0767ee">_EFI_IMAGE_OUTPUT::Bitmap</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="fc6f1342920e091911362eb65a082a5a"></a><!-- doxytag: member="_EFI_IMAGE_OUTPUT::Height" ref="fc6f1342920e091911362eb65a082a5a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d1/d72/a00204.html#fc6f1342920e091911362eb65a082a5a">_EFI_IMAGE_OUTPUT::Height</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="3f794bf722111152302fc4eb0f8a8df6"></a><!-- doxytag: member="_EFI_IMAGE_OUTPUT::Image" ref="3f794bf722111152302fc4eb0f8a8df6" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">union { ... }   <a class="el" href="../../d1/d72/a00204.html#3f794bf722111152302fc4eb0f8a8df6">_EFI_IMAGE_OUTPUT::Image</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="dcb3ca5d1326c89753e33c65b19c7b30"></a><!-- doxytag: member="_EFI_IMAGE_OUTPUT::Screen" ref="dcb3ca5d1326c89753e33c65b19c7b30" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../de/d8c/a00036.html">EFI_GRAPHICS_OUTPUT_PROTOCOL</a>* <a class="el" href="../../d1/d72/a00204.html#dcb3ca5d1326c89753e33c65b19c7b30">_EFI_IMAGE_OUTPUT::Screen</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="ccd8fc752ec1fb52c2e0414ef8073fe7"></a><!-- doxytag: member="_EFI_IMAGE_OUTPUT::Width" ref="ccd8fc752ec1fb52c2e0414ef8073fe7" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d1/d72/a00204.html#ccd8fc752ec1fb52c2e0414ef8073fe7">_EFI_IMAGE_OUTPUT::Width</a>          </td>
+          <td class="memname"><a class="el" href="../../d3/df8/a00155.html">EFI_IFR_OP_HEADER</a> <a class="el" href="../../d1/d72/a00204.html#276272b96a2ea11717db7e02e7e325f8">_EFI_IFR_ZERO::Header</a>          </td>
         </tr>
       </table>
 </div>
@@ -124,7 +44,7 @@ Definition of EFI_IMAGE_OUTPUT.<p>
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:13 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:14 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

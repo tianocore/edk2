@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: _EFI_SERVICE_BINDING_PROTOCOL Struct Reference</title>
+<title>MdePkg[ALL]: _EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,22 +21,22 @@
   </div>
 </div>
 <div class="contents">
-<h1>_EFI_SERVICE_BINDING_PROTOCOL Struct Reference</h1><!-- doxytag: class="_EFI_SERVICE_BINDING_PROTOCOL" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>_EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL Struct Reference</h1><!-- doxytag: class="_EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d6/d27/a01163.html#43dffcdaa8d49c9a725488bbf668e7db">EFI_SERVICE_BINDING_CREATE_CHILD</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d22/a00245.html#02bda06523491adc11e43fae4968818c">CreateChild</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d5/d54/a01213.html#1d5a17e465e588d665cba17cee75d896">EFI_PLATFORM_TO_DRIVER_CONFIGURATION_QUERY</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d22/a00245.html#bdcf9b9d9e2f825200406bd5a761f84b">Query</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d6/d27/a01163.html#97e36652dbf599df0da676e8812ce546">EFI_SERVICE_BINDING_DESTROY_CHILD</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d22/a00245.html#46a62be764a606a1876ed6b5a82d8117">DestroyChild</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d5/d54/a01213.html#930dbadd894ad39c956fd96dc550422d">EFI_PLATFORM_TO_DRIVER_CONFIGURATION_RESPONSE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d22/a00245.html#24242225de299cd0f8e631e549e8d4d9">Response</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-The EFI_SERVICE_BINDING_PROTOCOL provides member functions to create and destroy child handles. A driver is responsible for adding protocols to the child handle in <a class="el" href="../../d6/d22/a00245.html#02bda06523491adc11e43fae4968818c">CreateChild()</a> and removing protocols in <a class="el" href="../../d6/d22/a00245.html#46a62be764a606a1876ed6b5a82d8117">DestroyChild()</a>. It is also required that the <a class="el" href="../../d6/d22/a00245.html#02bda06523491adc11e43fae4968818c">CreateChild()</a> function opens the parent protocol BY_CHILD_CONTROLLER to establish the parent-child relationship, and closes the protocol in <a class="el" href="../../d6/d22/a00245.html#46a62be764a606a1876ed6b5a82d8117">DestroyChild()</a>. The pseudo code for <a class="el" href="../../d6/d22/a00245.html#02bda06523491adc11e43fae4968818c">CreateChild()</a> and <a class="el" href="../../d6/d22/a00245.html#46a62be764a606a1876ed6b5a82d8117">DestroyChild()</a> is provided to specify the required behavior, not to specify the required implementation. Each consumer of a software protocol is responsible for calling <a class="el" href="../../d6/d22/a00245.html#02bda06523491adc11e43fae4968818c">CreateChild()</a> when it requires the protocol and calling <a class="el" href="../../d6/d22/a00245.html#46a62be764a606a1876ed6b5a82d8117">DestroyChild()</a> when it is finished with that protocol. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="02bda06523491adc11e43fae4968818c"></a><!-- doxytag: member="_EFI_SERVICE_BINDING_PROTOCOL::CreateChild" ref="02bda06523491adc11e43fae4968818c" args="" -->
+The EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL is used by the UEFI driver to query the platform for configuration information. The UEFI driver calls <a class="el" href="../../d6/d22/a00245.html#bdcf9b9d9e2f825200406bd5a761f84b">Query()</a> multiple times to get configuration information from the platform. For every call to <a class="el" href="../../d6/d22/a00245.html#bdcf9b9d9e2f825200406bd5a761f84b">Query()</a> there must be a matching call to <a class="el" href="../../d6/d22/a00245.html#24242225de299cd0f8e631e549e8d4d9">Response()</a> so the UEFI driver can inform the platform how it used the information passed in from <a class="el" href="../../d6/d22/a00245.html#bdcf9b9d9e2f825200406bd5a761f84b">Query()</a>. It's legal for a UEFI driver to use <a class="el" href="../../d6/d22/a00245.html#24242225de299cd0f8e631e549e8d4d9">Response()</a> to inform the platform it does not understand the data returned via <a class="el" href="../../d6/d22/a00245.html#bdcf9b9d9e2f825200406bd5a761f84b">Query()</a> and thus no action was taken. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="bdcf9b9d9e2f825200406bd5a761f84b"></a><!-- doxytag: member="_EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL::Query" ref="bdcf9b9d9e2f825200406bd5a761f84b" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d6/d27/a01163.html#43dffcdaa8d49c9a725488bbf668e7db">EFI_SERVICE_BINDING_CREATE_CHILD</a> <a class="el" href="../../d6/d22/a00245.html#02bda06523491adc11e43fae4968818c">_EFI_SERVICE_BINDING_PROTOCOL::CreateChild</a>          </td>
+          <td class="memname"><a class="el" href="../../d5/d54/a01213.html#1d5a17e465e588d665cba17cee75d896">EFI_PLATFORM_TO_DRIVER_CONFIGURATION_QUERY</a> <a class="el" href="../../d6/d22/a00245.html#bdcf9b9d9e2f825200406bd5a761f84b">_EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL::Query</a>          </td>
         </tr>
       </table>
 </div>
@@ -46,12 +46,12 @@ The EFI_SERVICE_BINDING_PROTOCOL provides member functions to create and destroy
 
 </div>
 </div><p>
-<a class="anchor" name="46a62be764a606a1876ed6b5a82d8117"></a><!-- doxytag: member="_EFI_SERVICE_BINDING_PROTOCOL::DestroyChild" ref="46a62be764a606a1876ed6b5a82d8117" args="" -->
+<a class="anchor" name="24242225de299cd0f8e631e549e8d4d9"></a><!-- doxytag: member="_EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL::Response" ref="24242225de299cd0f8e631e549e8d4d9" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d6/d27/a01163.html#97e36652dbf599df0da676e8812ce546">EFI_SERVICE_BINDING_DESTROY_CHILD</a> <a class="el" href="../../d6/d22/a00245.html#46a62be764a606a1876ed6b5a82d8117">_EFI_SERVICE_BINDING_PROTOCOL::DestroyChild</a>          </td>
+          <td class="memname"><a class="el" href="../../d5/d54/a01213.html#930dbadd894ad39c956fd96dc550422d">EFI_PLATFORM_TO_DRIVER_CONFIGURATION_RESPONSE</a> <a class="el" href="../../d6/d22/a00245.html#24242225de299cd0f8e631e549e8d4d9">_EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL::Response</a>          </td>
         </tr>
       </table>
 </div>
@@ -62,7 +62,7 @@ The EFI_SERVICE_BINDING_PROTOCOL provides member functions to create and destroy
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:13 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:17 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

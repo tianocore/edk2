@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: DEVICE_STRUCT Struct Reference</title>
+<title>MdePkg[ALL]: BASE_LIBRARY_JUMP_BUFFER Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,22 +21,148 @@
   </div>
 </div>
 <div class="contents">
-<h1>DEVICE_STRUCT Struct Reference</h1><!-- doxytag: class="DEVICE_STRUCT" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>BASE_LIBRARY_JUMP_BUFFER Struct Reference</h1><!-- doxytag: class="BASE_LIBRARY_JUMP_BUFFER" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d49/a00979.html#12f25d723fbdbb236899a5b446455e47">MISC_ONBOARD_DEVICE_TYPE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#4568b8d9cbf0940e657140885fb65e02">DeviceType</a></td></tr>
+<tr><td colspan="2"><br><h2>Data Fields For IA32</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#72c25a65775141640766eb9275b15714">Ebx</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d49/a00979.html#bd86e1460ed2b924b45d2fa3c883e6b0">SMBIOS_TABLE_STRING</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#94718f1602eb8111256394db399b162d">DescriptionString</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#785d8e56799fdf68748440370d0db21f">Esi</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#1d66072c9ca6b32ed45b7204c95dc73a">Edi</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#cd272d4f2d03f7b4cbf241d772dc9622">Ebp</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#17b48b92b375dfc575f3a686dc3207d2">Esp</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#7275028517906fe713008ac55625c917">Eip</a></td></tr>
+
+<tr><td colspan="2"><br><h2>Data Fields For IPF</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#08b5244cab68d37633ba84887f750fc0">F2</a> [2]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#5082c8d5be76195e9c333d3f5614d350">F3</a> [2]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#85ffe8095c0d6c28f2c83ab1d062f70e">F4</a> [2]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#f810e5116c8957572d0c0e02b0a6fa00">F5</a> [2]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#ab2949f2d00a90b7a47f122f10d5a2af">F16</a> [2]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#94ebaef89c15b668c49cc5fe8654c691">F17</a> [2]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#b12c0870fee9231b4c5d9af8f23cf95e">F18</a> [2]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#c0146a0328f89221538c6620ac2a164a">F19</a> [2]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#b1440e6f2d05d4acaadcad82ae05bffe">F20</a> [2]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#f0c60090c145621cb35755782e475d11">F21</a> [2]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#3a9a07e9967084fe9efd68cc5114cc35">F22</a> [2]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#fd158cc9a4bfe0c2d27f95e1fc3e3f2d">F23</a> [2]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#d08ae14cdca26c52016deee400c61022">F24</a> [2]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#fdc6071505a4ef9dc276294e9e1085fe">F25</a> [2]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#73930797fdfa3bd32bb4436c6b2216b7">F26</a> [2]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#e07b990ab8b8ed91b504c67139dee00d">F27</a> [2]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#faf5e4dbf94a1b57de4ee61ac2d17d76">F28</a> [2]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#6b77a1fbe02f928f85ec79ae483d52c9">F29</a> [2]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#60e6f3e2357fcff3bbb5789fa5276827">F30</a> [2]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#585e54f96bf4c1084d25308629667ab6">F31</a> [2]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#16a540f5f0ca2948cf675b61df00a9b4">R4</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#66aed8dd5816228ba03d6b9ec0fb135f">R5</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#21a0b309d76044e4dbb6053731ef3754">R6</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#c532fafe1ad87da44efa2db5b86a70fe">R7</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#ab901c6b9d51af45b709956ef7b1b181">SP</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#cf1e4c7835d796f37d31c89bcbab9fc1">BR0</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#01072ee12176fa5fdeffdba2091dd436">BR1</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#494bcab383303d10d7955a42ef4b0f87">BR2</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#8fec2e4623f129feabb684160ea11941">BR3</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#b93a74ca9d89a1f1038911d21a1b0562">BR4</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#d033f88dbcf2bd9314595d0bfcdb4429">BR5</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#be63d5d240180f9213307be6817e18d3">InitialUNAT</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#425aafa78b4afa5a2c9c8f2943058a76">AfterSpillUNAT</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#15ff6d1879340971969b6a865bf658d9">PFS</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#1c91e88c62fc3194cb229d83fcbe0f50">BSP</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#76df53c8f3c221c2e762baafd3795f45">Predicates</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#a017e228469aa1e281509a1841ff828a">LoopCount</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#ad3ec5a8c23caef341b671ec84625aa4">FPSR</a></td></tr>
+
+<tr><td colspan="2"><br><h2>Data Fields For X64</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#061a309d5467f2febdff477d01121e36">Rbx</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#8b1d1d05abe29975bb789c28d5abb3aa">Rsp</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#2e236b9daae72d8edb29d70f2b0ab595">Rbp</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#d39cab5f1a0f8cd4c4995b5615605d03">Rdi</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#efe5802c149bbe0012f20e6156bcecfa">Rsi</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#ea3ba970dcf05a5c3b2f09d41f48697d">R12</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#93ae36c3128e4fe632a25b958b101182">R13</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#9fdf669470a7e2ef0d745da4d2d68d84">R14</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#69bb0acc21c5c64d3523bb049b24d911">R15</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#94e87e0671394ead212435c818f9a2fe">Rip</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#b2bd9993771ad3c665d98b4e38fd9916">MxCsr</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#9c09aebf2800d08e013da0fa27785999">XmmBuffer</a> [160]</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">XMM6-XMM15.  <a href="#9c09aebf2800d08e013da0fa27785999"></a><br></td></tr>
+<tr><td colspan="2"><br><h2>Data Fields For EBC</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#d8eadba2d5523dad0a2cebd8bcd16c00">R0</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#803ee5ec0cc6a560e2f46c7bd0f7e2d2">R1</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#752f00191ef7d84a7101047c0d925d6d">R2</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#4e6a85597b6f8b8266199839dfa8e6e2">R3</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d07/a00305.html#8eb00a16799fae5dcf17f369543c7b31">IP</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Device Item Entry <hr><h2>Field Documentation</h2>
-<a class="anchor" name="94718f1602eb8111256394db399b162d"></a><!-- doxytag: member="DEVICE_STRUCT::DescriptionString" ref="94718f1602eb8111256394db399b162d" args="" -->
+IA-32 architecture context buffer used by <a class="el" href="../../d5/d16/a01060.html#691b4dac579754c4302fd500f387b3eb">SetJump()</a> and <a class="el" href="../../d5/d16/a01060.html#e0fe44ac600c960dbc32eed5f0325307">LongJump()</a><p>
+Itanium architecture context buffer used by <a class="el" href="../../d5/d16/a01060.html#691b4dac579754c4302fd500f387b3eb">SetJump()</a> and <a class="el" href="../../d5/d16/a01060.html#e0fe44ac600c960dbc32eed5f0325307">LongJump()</a><p>
+x64 architecture context buffer used by <a class="el" href="../../d5/d16/a01060.html#691b4dac579754c4302fd500f387b3eb">SetJump()</a> and <a class="el" href="../../d5/d16/a01060.html#e0fe44ac600c960dbc32eed5f0325307">LongJump()</a><p>
+EBC context buffer used by <a class="el" href="../../d5/d16/a01060.html#691b4dac579754c4302fd500f387b3eb">SetJump()</a> and <a class="el" href="../../d5/d16/a01060.html#e0fe44ac600c960dbc32eed5f0325307">LongJump()</a> <hr><h2>Field Documentation</h2>
+<a class="anchor" name="425aafa78b4afa5a2c9c8f2943058a76"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::AfterSpillUNAT" ref="425aafa78b4afa5a2c9c8f2943058a76" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d8/d49/a00979.html#bd86e1460ed2b924b45d2fa3c883e6b0">SMBIOS_TABLE_STRING</a> <a class="el" href="../../d3/d07/a00305.html#94718f1602eb8111256394db399b162d">DEVICE_STRUCT::DescriptionString</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#425aafa78b4afa5a2c9c8f2943058a76">BASE_LIBRARY_JUMP_BUFFER::AfterSpillUNAT</a>          </td>
         </tr>
       </table>
 </div>
@@ -46,12 +172,12 @@ Device Item Entry <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="4568b8d9cbf0940e657140885fb65e02"></a><!-- doxytag: member="DEVICE_STRUCT::DeviceType" ref="4568b8d9cbf0940e657140885fb65e02" args="" -->
+<a class="anchor" name="cf1e4c7835d796f37d31c89bcbab9fc1"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::BR0" ref="cf1e4c7835d796f37d31c89bcbab9fc1" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d8/d49/a00979.html#12f25d723fbdbb236899a5b446455e47">MISC_ONBOARD_DEVICE_TYPE</a> <a class="el" href="../../d3/d07/a00305.html#4568b8d9cbf0940e657140885fb65e02">DEVICE_STRUCT::DeviceType</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#cf1e4c7835d796f37d31c89bcbab9fc1">BASE_LIBRARY_JUMP_BUFFER::BR0</a>          </td>
         </tr>
       </table>
 </div>
@@ -61,8 +187,895 @@ Device Item Entry <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
+<a class="anchor" name="01072ee12176fa5fdeffdba2091dd436"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::BR1" ref="01072ee12176fa5fdeffdba2091dd436" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#01072ee12176fa5fdeffdba2091dd436">BASE_LIBRARY_JUMP_BUFFER::BR1</a>          </td>
+        </tr>
+      </table>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:15 2009 for MdePkg[ALL] by&nbsp;
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="494bcab383303d10d7955a42ef4b0f87"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::BR2" ref="494bcab383303d10d7955a42ef4b0f87" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#494bcab383303d10d7955a42ef4b0f87">BASE_LIBRARY_JUMP_BUFFER::BR2</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="8fec2e4623f129feabb684160ea11941"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::BR3" ref="8fec2e4623f129feabb684160ea11941" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#8fec2e4623f129feabb684160ea11941">BASE_LIBRARY_JUMP_BUFFER::BR3</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="b93a74ca9d89a1f1038911d21a1b0562"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::BR4" ref="b93a74ca9d89a1f1038911d21a1b0562" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#b93a74ca9d89a1f1038911d21a1b0562">BASE_LIBRARY_JUMP_BUFFER::BR4</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="d033f88dbcf2bd9314595d0bfcdb4429"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::BR5" ref="d033f88dbcf2bd9314595d0bfcdb4429" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#d033f88dbcf2bd9314595d0bfcdb4429">BASE_LIBRARY_JUMP_BUFFER::BR5</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="1c91e88c62fc3194cb229d83fcbe0f50"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::BSP" ref="1c91e88c62fc3194cb229d83fcbe0f50" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#1c91e88c62fc3194cb229d83fcbe0f50">BASE_LIBRARY_JUMP_BUFFER::BSP</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="cd272d4f2d03f7b4cbf241d772dc9622"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::Ebp" ref="cd272d4f2d03f7b4cbf241d772dc9622" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d3/d07/a00305.html#cd272d4f2d03f7b4cbf241d772dc9622">BASE_LIBRARY_JUMP_BUFFER::Ebp</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="72c25a65775141640766eb9275b15714"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::Ebx" ref="72c25a65775141640766eb9275b15714" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d3/d07/a00305.html#72c25a65775141640766eb9275b15714">BASE_LIBRARY_JUMP_BUFFER::Ebx</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="1d66072c9ca6b32ed45b7204c95dc73a"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::Edi" ref="1d66072c9ca6b32ed45b7204c95dc73a" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d3/d07/a00305.html#1d66072c9ca6b32ed45b7204c95dc73a">BASE_LIBRARY_JUMP_BUFFER::Edi</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="7275028517906fe713008ac55625c917"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::Eip" ref="7275028517906fe713008ac55625c917" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d3/d07/a00305.html#7275028517906fe713008ac55625c917">BASE_LIBRARY_JUMP_BUFFER::Eip</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="785d8e56799fdf68748440370d0db21f"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::Esi" ref="785d8e56799fdf68748440370d0db21f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d3/d07/a00305.html#785d8e56799fdf68748440370d0db21f">BASE_LIBRARY_JUMP_BUFFER::Esi</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="17b48b92b375dfc575f3a686dc3207d2"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::Esp" ref="17b48b92b375dfc575f3a686dc3207d2" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d3/d07/a00305.html#17b48b92b375dfc575f3a686dc3207d2">BASE_LIBRARY_JUMP_BUFFER::Esp</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="ab2949f2d00a90b7a47f122f10d5a2af"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::F16" ref="ab2949f2d00a90b7a47f122f10d5a2af" args="[2]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#ab2949f2d00a90b7a47f122f10d5a2af">BASE_LIBRARY_JUMP_BUFFER::F16</a>[2]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="94ebaef89c15b668c49cc5fe8654c691"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::F17" ref="94ebaef89c15b668c49cc5fe8654c691" args="[2]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#94ebaef89c15b668c49cc5fe8654c691">BASE_LIBRARY_JUMP_BUFFER::F17</a>[2]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="b12c0870fee9231b4c5d9af8f23cf95e"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::F18" ref="b12c0870fee9231b4c5d9af8f23cf95e" args="[2]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#b12c0870fee9231b4c5d9af8f23cf95e">BASE_LIBRARY_JUMP_BUFFER::F18</a>[2]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="c0146a0328f89221538c6620ac2a164a"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::F19" ref="c0146a0328f89221538c6620ac2a164a" args="[2]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#c0146a0328f89221538c6620ac2a164a">BASE_LIBRARY_JUMP_BUFFER::F19</a>[2]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="08b5244cab68d37633ba84887f750fc0"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::F2" ref="08b5244cab68d37633ba84887f750fc0" args="[2]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#08b5244cab68d37633ba84887f750fc0">BASE_LIBRARY_JUMP_BUFFER::F2</a>[2]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="b1440e6f2d05d4acaadcad82ae05bffe"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::F20" ref="b1440e6f2d05d4acaadcad82ae05bffe" args="[2]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#b1440e6f2d05d4acaadcad82ae05bffe">BASE_LIBRARY_JUMP_BUFFER::F20</a>[2]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="f0c60090c145621cb35755782e475d11"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::F21" ref="f0c60090c145621cb35755782e475d11" args="[2]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#f0c60090c145621cb35755782e475d11">BASE_LIBRARY_JUMP_BUFFER::F21</a>[2]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="3a9a07e9967084fe9efd68cc5114cc35"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::F22" ref="3a9a07e9967084fe9efd68cc5114cc35" args="[2]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#3a9a07e9967084fe9efd68cc5114cc35">BASE_LIBRARY_JUMP_BUFFER::F22</a>[2]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="fd158cc9a4bfe0c2d27f95e1fc3e3f2d"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::F23" ref="fd158cc9a4bfe0c2d27f95e1fc3e3f2d" args="[2]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#fd158cc9a4bfe0c2d27f95e1fc3e3f2d">BASE_LIBRARY_JUMP_BUFFER::F23</a>[2]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="d08ae14cdca26c52016deee400c61022"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::F24" ref="d08ae14cdca26c52016deee400c61022" args="[2]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#d08ae14cdca26c52016deee400c61022">BASE_LIBRARY_JUMP_BUFFER::F24</a>[2]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="fdc6071505a4ef9dc276294e9e1085fe"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::F25" ref="fdc6071505a4ef9dc276294e9e1085fe" args="[2]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#fdc6071505a4ef9dc276294e9e1085fe">BASE_LIBRARY_JUMP_BUFFER::F25</a>[2]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="73930797fdfa3bd32bb4436c6b2216b7"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::F26" ref="73930797fdfa3bd32bb4436c6b2216b7" args="[2]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#73930797fdfa3bd32bb4436c6b2216b7">BASE_LIBRARY_JUMP_BUFFER::F26</a>[2]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="e07b990ab8b8ed91b504c67139dee00d"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::F27" ref="e07b990ab8b8ed91b504c67139dee00d" args="[2]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#e07b990ab8b8ed91b504c67139dee00d">BASE_LIBRARY_JUMP_BUFFER::F27</a>[2]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="faf5e4dbf94a1b57de4ee61ac2d17d76"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::F28" ref="faf5e4dbf94a1b57de4ee61ac2d17d76" args="[2]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#faf5e4dbf94a1b57de4ee61ac2d17d76">BASE_LIBRARY_JUMP_BUFFER::F28</a>[2]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="6b77a1fbe02f928f85ec79ae483d52c9"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::F29" ref="6b77a1fbe02f928f85ec79ae483d52c9" args="[2]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#6b77a1fbe02f928f85ec79ae483d52c9">BASE_LIBRARY_JUMP_BUFFER::F29</a>[2]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="5082c8d5be76195e9c333d3f5614d350"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::F3" ref="5082c8d5be76195e9c333d3f5614d350" args="[2]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#5082c8d5be76195e9c333d3f5614d350">BASE_LIBRARY_JUMP_BUFFER::F3</a>[2]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="60e6f3e2357fcff3bbb5789fa5276827"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::F30" ref="60e6f3e2357fcff3bbb5789fa5276827" args="[2]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#60e6f3e2357fcff3bbb5789fa5276827">BASE_LIBRARY_JUMP_BUFFER::F30</a>[2]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="585e54f96bf4c1084d25308629667ab6"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::F31" ref="585e54f96bf4c1084d25308629667ab6" args="[2]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#585e54f96bf4c1084d25308629667ab6">BASE_LIBRARY_JUMP_BUFFER::F31</a>[2]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="85ffe8095c0d6c28f2c83ab1d062f70e"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::F4" ref="85ffe8095c0d6c28f2c83ab1d062f70e" args="[2]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#85ffe8095c0d6c28f2c83ab1d062f70e">BASE_LIBRARY_JUMP_BUFFER::F4</a>[2]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="f810e5116c8957572d0c0e02b0a6fa00"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::F5" ref="f810e5116c8957572d0c0e02b0a6fa00" args="[2]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#f810e5116c8957572d0c0e02b0a6fa00">BASE_LIBRARY_JUMP_BUFFER::F5</a>[2]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="ad3ec5a8c23caef341b671ec84625aa4"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::FPSR" ref="ad3ec5a8c23caef341b671ec84625aa4" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#ad3ec5a8c23caef341b671ec84625aa4">BASE_LIBRARY_JUMP_BUFFER::FPSR</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="be63d5d240180f9213307be6817e18d3"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::InitialUNAT" ref="be63d5d240180f9213307be6817e18d3" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#be63d5d240180f9213307be6817e18d3">BASE_LIBRARY_JUMP_BUFFER::InitialUNAT</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="8eb00a16799fae5dcf17f369543c7b31"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::IP" ref="8eb00a16799fae5dcf17f369543c7b31" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#8eb00a16799fae5dcf17f369543c7b31">BASE_LIBRARY_JUMP_BUFFER::IP</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="a017e228469aa1e281509a1841ff828a"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::LoopCount" ref="a017e228469aa1e281509a1841ff828a" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#a017e228469aa1e281509a1841ff828a">BASE_LIBRARY_JUMP_BUFFER::LoopCount</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="b2bd9993771ad3c665d98b4e38fd9916"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::MxCsr" ref="b2bd9993771ad3c665d98b4e38fd9916" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#b2bd9993771ad3c665d98b4e38fd9916">BASE_LIBRARY_JUMP_BUFFER::MxCsr</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="15ff6d1879340971969b6a865bf658d9"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::PFS" ref="15ff6d1879340971969b6a865bf658d9" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#15ff6d1879340971969b6a865bf658d9">BASE_LIBRARY_JUMP_BUFFER::PFS</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="76df53c8f3c221c2e762baafd3795f45"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::Predicates" ref="76df53c8f3c221c2e762baafd3795f45" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#76df53c8f3c221c2e762baafd3795f45">BASE_LIBRARY_JUMP_BUFFER::Predicates</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="d8eadba2d5523dad0a2cebd8bcd16c00"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::R0" ref="d8eadba2d5523dad0a2cebd8bcd16c00" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#d8eadba2d5523dad0a2cebd8bcd16c00">BASE_LIBRARY_JUMP_BUFFER::R0</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="803ee5ec0cc6a560e2f46c7bd0f7e2d2"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::R1" ref="803ee5ec0cc6a560e2f46c7bd0f7e2d2" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#803ee5ec0cc6a560e2f46c7bd0f7e2d2">BASE_LIBRARY_JUMP_BUFFER::R1</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="ea3ba970dcf05a5c3b2f09d41f48697d"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::R12" ref="ea3ba970dcf05a5c3b2f09d41f48697d" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#ea3ba970dcf05a5c3b2f09d41f48697d">BASE_LIBRARY_JUMP_BUFFER::R12</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="93ae36c3128e4fe632a25b958b101182"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::R13" ref="93ae36c3128e4fe632a25b958b101182" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#93ae36c3128e4fe632a25b958b101182">BASE_LIBRARY_JUMP_BUFFER::R13</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="9fdf669470a7e2ef0d745da4d2d68d84"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::R14" ref="9fdf669470a7e2ef0d745da4d2d68d84" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#9fdf669470a7e2ef0d745da4d2d68d84">BASE_LIBRARY_JUMP_BUFFER::R14</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="69bb0acc21c5c64d3523bb049b24d911"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::R15" ref="69bb0acc21c5c64d3523bb049b24d911" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#69bb0acc21c5c64d3523bb049b24d911">BASE_LIBRARY_JUMP_BUFFER::R15</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="752f00191ef7d84a7101047c0d925d6d"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::R2" ref="752f00191ef7d84a7101047c0d925d6d" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#752f00191ef7d84a7101047c0d925d6d">BASE_LIBRARY_JUMP_BUFFER::R2</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="4e6a85597b6f8b8266199839dfa8e6e2"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::R3" ref="4e6a85597b6f8b8266199839dfa8e6e2" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#4e6a85597b6f8b8266199839dfa8e6e2">BASE_LIBRARY_JUMP_BUFFER::R3</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="16a540f5f0ca2948cf675b61df00a9b4"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::R4" ref="16a540f5f0ca2948cf675b61df00a9b4" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#16a540f5f0ca2948cf675b61df00a9b4">BASE_LIBRARY_JUMP_BUFFER::R4</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="66aed8dd5816228ba03d6b9ec0fb135f"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::R5" ref="66aed8dd5816228ba03d6b9ec0fb135f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#66aed8dd5816228ba03d6b9ec0fb135f">BASE_LIBRARY_JUMP_BUFFER::R5</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="21a0b309d76044e4dbb6053731ef3754"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::R6" ref="21a0b309d76044e4dbb6053731ef3754" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#21a0b309d76044e4dbb6053731ef3754">BASE_LIBRARY_JUMP_BUFFER::R6</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="c532fafe1ad87da44efa2db5b86a70fe"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::R7" ref="c532fafe1ad87da44efa2db5b86a70fe" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#c532fafe1ad87da44efa2db5b86a70fe">BASE_LIBRARY_JUMP_BUFFER::R7</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="2e236b9daae72d8edb29d70f2b0ab595"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::Rbp" ref="2e236b9daae72d8edb29d70f2b0ab595" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#2e236b9daae72d8edb29d70f2b0ab595">BASE_LIBRARY_JUMP_BUFFER::Rbp</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="061a309d5467f2febdff477d01121e36"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::Rbx" ref="061a309d5467f2febdff477d01121e36" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#061a309d5467f2febdff477d01121e36">BASE_LIBRARY_JUMP_BUFFER::Rbx</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="d39cab5f1a0f8cd4c4995b5615605d03"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::Rdi" ref="d39cab5f1a0f8cd4c4995b5615605d03" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#d39cab5f1a0f8cd4c4995b5615605d03">BASE_LIBRARY_JUMP_BUFFER::Rdi</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="94e87e0671394ead212435c818f9a2fe"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::Rip" ref="94e87e0671394ead212435c818f9a2fe" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#94e87e0671394ead212435c818f9a2fe">BASE_LIBRARY_JUMP_BUFFER::Rip</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="efe5802c149bbe0012f20e6156bcecfa"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::Rsi" ref="efe5802c149bbe0012f20e6156bcecfa" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#efe5802c149bbe0012f20e6156bcecfa">BASE_LIBRARY_JUMP_BUFFER::Rsi</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="8b1d1d05abe29975bb789c28d5abb3aa"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::Rsp" ref="8b1d1d05abe29975bb789c28d5abb3aa" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#8b1d1d05abe29975bb789c28d5abb3aa">BASE_LIBRARY_JUMP_BUFFER::Rsp</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="ab901c6b9d51af45b709956ef7b1b181"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::SP" ref="ab901c6b9d51af45b709956ef7b1b181" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/d07/a00305.html#ab901c6b9d51af45b709956ef7b1b181">BASE_LIBRARY_JUMP_BUFFER::SP</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="9c09aebf2800d08e013da0fa27785999"></a><!-- doxytag: member="BASE_LIBRARY_JUMP_BUFFER::XmmBuffer" ref="9c09aebf2800d08e013da0fa27785999" args="[160]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d3/d07/a00305.html#9c09aebf2800d08e013da0fa27785999">BASE_LIBRARY_JUMP_BUFFER::XmmBuffer</a>[160]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+XMM6-XMM15. 
+<p>
+
+</div>
+</div><p>
+</div>
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:21 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: _EFI_RUNTIME_EVENT_ENTRY Struct Reference</title>
+<title>MdePkg[ALL]: _EFI_PEI_RECOVERY_BLOCK_IO_PPI Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,116 +21,65 @@
   </div>
 </div>
 <div class="contents">
-<h1>_EFI_RUNTIME_EVENT_ENTRY Struct Reference</h1><!-- doxytag: class="_EFI_RUNTIME_EVENT_ENTRY" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>_EFI_PEI_RECOVERY_BLOCK_IO_PPI Struct Reference</h1><!-- doxytag: class="_EFI_PEI_RECOVERY_BLOCK_IO_PPI" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d08/a00237.html#0c381c6a4d6f4435ca022772d2dabd94">Type</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/dc5/a01116.html#38614ed9963a9e6b469f5ef6cde9d8e2">EFI_PEI_GET_NUMBER_BLOCK_DEVICES</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d08/a00237.html#53a6cf343af66e79e08d0d81fc58e1f2">GetNumberOfBlockDevices</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#b998e5f7da4a664eaa86252ab16e459a">EFI_TPL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d08/a00237.html#f6dd867c601819b311299c8ff2bc1f2c">NotifyTpl</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/dc5/a01116.html#8c44359978eece48349fcb2ef99a008c">EFI_PEI_GET_DEVICE_MEDIA_INFORMATION</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d08/a00237.html#cd7054afef2c1486e7c6c7549c1b510d">GetBlockDeviceMediaInfo</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d0d/a01191.html#0232efb36b3e8c42740d8f54dd737105">EFI_EVENT_NOTIFY</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d08/a00237.html#8256113fcb7d00b94c21c7a978f6400c">NotifyFunction</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d08/a00237.html#545044d12d03d43c22ff8d05ed0357d2">NotifyContext</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#7f3111de303d836d8d3711c39363f81a">EFI_EVENT</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d08/a00237.html#ea3ff9690c05770a519a7f2b95173f94">Event</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d5/d35/a00266.html">EFI_LIST_ENTRY</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d08/a00237.html#d5950ae558674553a6b31dbca6a31e58">Link</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/dc5/a01116.html#70f4dc214a8616576c2f1f2559c27771">EFI_PEI_READ_BLOCKS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d08/a00237.html#2d157e9307601857bf9b4f077cd1d355">ReadBlocks</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-EFI_RUNTIME_EVENT_ENTRY <hr><h2>Field Documentation</h2>
-<a class="anchor" name="ea3ff9690c05770a519a7f2b95173f94"></a><!-- doxytag: member="_EFI_RUNTIME_EVENT_ENTRY::Event" ref="ea3ff9690c05770a519a7f2b95173f94" args="" -->
+EFI_PEI_RECOVERY_BLOCK_IO_PPI provides the services that are required to access a block I/O device during PEI recovery boot mode. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="cd7054afef2c1486e7c6c7549c1b510d"></a><!-- doxytag: member="_EFI_PEI_RECOVERY_BLOCK_IO_PPI::GetBlockDeviceMediaInfo" ref="cd7054afef2c1486e7c6c7549c1b510d" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#7f3111de303d836d8d3711c39363f81a">EFI_EVENT</a>* <a class="el" href="../../d4/d08/a00237.html#ea3ff9690c05770a519a7f2b95173f94">_EFI_RUNTIME_EVENT_ENTRY::Event</a>          </td>
+          <td class="memname"><a class="el" href="../../d4/dc5/a01116.html#8c44359978eece48349fcb2ef99a008c">EFI_PEI_GET_DEVICE_MEDIA_INFORMATION</a> <a class="el" href="../../d4/d08/a00237.html#cd7054afef2c1486e7c6c7549c1b510d">_EFI_PEI_RECOVERY_BLOCK_IO_PPI::GetBlockDeviceMediaInfo</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The EFI_EVENT returned by CreateEvent(). Event must be in runtime memory. 
+Gets the specified media information. 
 </div>
 </div><p>
-<a class="anchor" name="d5950ae558674553a6b31dbca6a31e58"></a><!-- doxytag: member="_EFI_RUNTIME_EVENT_ENTRY::Link" ref="d5950ae558674553a6b31dbca6a31e58" args="" -->
+<a class="anchor" name="53a6cf343af66e79e08d0d81fc58e1f2"></a><!-- doxytag: member="_EFI_PEI_RECOVERY_BLOCK_IO_PPI::GetNumberOfBlockDevices" ref="53a6cf343af66e79e08d0d81fc58e1f2" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d5/d35/a00266.html">EFI_LIST_ENTRY</a> <a class="el" href="../../d4/d08/a00237.html#d5950ae558674553a6b31dbca6a31e58">_EFI_RUNTIME_EVENT_ENTRY::Link</a>          </td>
+          <td class="memname"><a class="el" href="../../d4/dc5/a01116.html#38614ed9963a9e6b469f5ef6cde9d8e2">EFI_PEI_GET_NUMBER_BLOCK_DEVICES</a> <a class="el" href="../../d4/d08/a00237.html#53a6cf343af66e79e08d0d81fc58e1f2">_EFI_PEI_RECOVERY_BLOCK_IO_PPI::GetNumberOfBlockDevices</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Entry for this node in the EFI_RUNTIME_ARCHITECTURE_PROTOCOL.EventHead list. 
+Gets the number of block I/O devices that the specific block driver manages. 
 </div>
 </div><p>
-<a class="anchor" name="545044d12d03d43c22ff8d05ed0357d2"></a><!-- doxytag: member="_EFI_RUNTIME_EVENT_ENTRY::NotifyContext" ref="545044d12d03d43c22ff8d05ed0357d2" args="" -->
+<a class="anchor" name="2d157e9307601857bf9b4f077cd1d355"></a><!-- doxytag: member="_EFI_PEI_RECOVERY_BLOCK_IO_PPI::ReadBlocks" ref="2d157e9307601857bf9b4f077cd1d355" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">VOID* <a class="el" href="../../d4/d08/a00237.html#545044d12d03d43c22ff8d05ed0357d2">_EFI_RUNTIME_EVENT_ENTRY::NotifyContext</a>          </td>
+          <td class="memname"><a class="el" href="../../d4/dc5/a01116.html#70f4dc214a8616576c2f1f2559c27771">EFI_PEI_READ_BLOCKS</a> <a class="el" href="../../d4/d08/a00237.html#2d157e9307601857bf9b4f077cd1d355">_EFI_PEI_RECOVERY_BLOCK_IO_PPI::ReadBlocks</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The same as NotifyContext passed into CreateEvent(). 
-</div>
-</div><p>
-<a class="anchor" name="8256113fcb7d00b94c21c7a978f6400c"></a><!-- doxytag: member="_EFI_RUNTIME_EVENT_ENTRY::NotifyFunction" ref="8256113fcb7d00b94c21c7a978f6400c" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d1/d0d/a01191.html#0232efb36b3e8c42740d8f54dd737105">EFI_EVENT_NOTIFY</a> <a class="el" href="../../d4/d08/a00237.html#8256113fcb7d00b94c21c7a978f6400c">_EFI_RUNTIME_EVENT_ENTRY::NotifyFunction</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-The same as NotifyFunction passed into CreateEvent(). 
-</div>
-</div><p>
-<a class="anchor" name="f6dd867c601819b311299c8ff2bc1f2c"></a><!-- doxytag: member="_EFI_RUNTIME_EVENT_ENTRY::NotifyTpl" ref="f6dd867c601819b311299c8ff2bc1f2c" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#b998e5f7da4a664eaa86252ab16e459a">EFI_TPL</a> <a class="el" href="../../d4/d08/a00237.html#f6dd867c601819b311299c8ff2bc1f2c">_EFI_RUNTIME_EVENT_ENTRY::NotifyTpl</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-The same as NotifyTpl passed into CreateEvent(). 
-</div>
-</div><p>
-<a class="anchor" name="0c381c6a4d6f4435ca022772d2dabd94"></a><!-- doxytag: member="_EFI_RUNTIME_EVENT_ENTRY::Type" ref="0c381c6a4d6f4435ca022772d2dabd94" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d4/d08/a00237.html#0c381c6a4d6f4435ca022772d2dabd94">_EFI_RUNTIME_EVENT_ENTRY::Type</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-The same as Type passed into CreateEvent(). 
+Reads the requested number of blocks from the specified block device. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:13 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:16 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

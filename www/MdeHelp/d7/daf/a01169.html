@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Protocol/SimpleTextOut.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Protocol/DiskIo.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,1247 +21,75 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Protocol/SimpleTextOut.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Protocol/DiskIo.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/db1/a00590.html">EFI_SIMPLE_TEXT_OUTPUT_MODE</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d1a/a00251.html">_EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/da2/a00019.html">_EFI_DISK_IO_PROTOCOL</a></td></tr>
 
 <tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#4f8c7726da0f239821b19b29136704a1">EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL_GUID</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#e60283865b614c331fd238c76d28fe72">EFI_DISK_IO_PROTOCOL_GUID</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#134f5aa2b5efd40f18b67eba3b1251ae">SIMPLE_TEXT_OUTPUT_PROTOCOL</a>&nbsp;&nbsp;&nbsp;EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL_GUID</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#c33b9c5d74454df98aa11b1a0f6997b9">DISK_IO_PROTOCOL</a>&nbsp;&nbsp;&nbsp;EFI_DISK_IO_PROTOCOL_GUID</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#25c8042bb5683139524e93d43aa4bfbd">BOXDRAW_HORIZONTAL</a>&nbsp;&nbsp;&nbsp;0x2500</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#a40b5536034931b488df5e416e1d7fdb">EFI_DISK_IO_PROTOCOL_REVISION</a>&nbsp;&nbsp;&nbsp;0x00010000</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#60216873c54d4083e988c7d6946e4b1b">BOXDRAW_VERTICAL</a>&nbsp;&nbsp;&nbsp;0x2502</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#8c40f03c47b4a5a539b624ee84e1bca0">BOXDRAW_DOWN_RIGHT</a>&nbsp;&nbsp;&nbsp;0x250c</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#9bff835bd07a98e40d98c38477954205">BOXDRAW_DOWN_LEFT</a>&nbsp;&nbsp;&nbsp;0x2510</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#9ded716dc94635e3885a4ff02cf1b78d">BOXDRAW_UP_RIGHT</a>&nbsp;&nbsp;&nbsp;0x2514</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#531ca36074738fc07d315aff073584f1">BOXDRAW_UP_LEFT</a>&nbsp;&nbsp;&nbsp;0x2518</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#2246408ab856fa36d169d2d7d3c90f0e">BOXDRAW_VERTICAL_RIGHT</a>&nbsp;&nbsp;&nbsp;0x251c</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#dd8b2c52fe1ece71b5c21faac74b221b">BOXDRAW_VERTICAL_LEFT</a>&nbsp;&nbsp;&nbsp;0x2524</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#216dbc7c6bbc91f9e4bf6cfa0f52dade">BOXDRAW_DOWN_HORIZONTAL</a>&nbsp;&nbsp;&nbsp;0x252c</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#97e2ad330bfa686ae82a7e2e620a6121">BOXDRAW_UP_HORIZONTAL</a>&nbsp;&nbsp;&nbsp;0x2534</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#f3576c595525de2bda1d4d73fe7f513c">BOXDRAW_VERTICAL_HORIZONTAL</a>&nbsp;&nbsp;&nbsp;0x253c</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#4f6436f5c9e7bd7abb905749dda9a21e">BOXDRAW_DOUBLE_HORIZONTAL</a>&nbsp;&nbsp;&nbsp;0x2550</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#0d2e36034efa72f64862c0558fe13605">BOXDRAW_DOUBLE_VERTICAL</a>&nbsp;&nbsp;&nbsp;0x2551</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#bcff92426d8cf0948ccea31c6411ffa8">BOXDRAW_DOWN_RIGHT_DOUBLE</a>&nbsp;&nbsp;&nbsp;0x2552</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#26630171bc3497b2aace8b137e312292">BOXDRAW_DOWN_DOUBLE_RIGHT</a>&nbsp;&nbsp;&nbsp;0x2553</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#65f8324bd80a4ab638a39ed3f8dd658d">BOXDRAW_DOUBLE_DOWN_RIGHT</a>&nbsp;&nbsp;&nbsp;0x2554</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#086c7bc9d457f19491a4c3c46087ff38">BOXDRAW_DOWN_LEFT_DOUBLE</a>&nbsp;&nbsp;&nbsp;0x2555</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#e30682dd99c155055564b9d28bc2cb84">BOXDRAW_DOWN_DOUBLE_LEFT</a>&nbsp;&nbsp;&nbsp;0x2556</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#d4073ae13e8c003050c596d50898b73c">BOXDRAW_DOUBLE_DOWN_LEFT</a>&nbsp;&nbsp;&nbsp;0x2557</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#d59193de8a91d02c1a660710a7d2563e">BOXDRAW_UP_RIGHT_DOUBLE</a>&nbsp;&nbsp;&nbsp;0x2558</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#b44918935821ad32fa609f58c59cac52">BOXDRAW_UP_DOUBLE_RIGHT</a>&nbsp;&nbsp;&nbsp;0x2559</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#202e5daf5ecf156ebb92438eebdcb9c9">BOXDRAW_DOUBLE_UP_RIGHT</a>&nbsp;&nbsp;&nbsp;0x255a</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#219d0b08a7f0b8416bfb20f6cb4c021e">BOXDRAW_UP_LEFT_DOUBLE</a>&nbsp;&nbsp;&nbsp;0x255b</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#02eed0704309f76966a5a2a49fd4bfd5">BOXDRAW_UP_DOUBLE_LEFT</a>&nbsp;&nbsp;&nbsp;0x255c</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#97f828d2b9a8024c8744b9d9d6fed5ea">BOXDRAW_DOUBLE_UP_LEFT</a>&nbsp;&nbsp;&nbsp;0x255d</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#906349a45561cdfaed296fedbe1841c4">BOXDRAW_VERTICAL_RIGHT_DOUBLE</a>&nbsp;&nbsp;&nbsp;0x255e</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#52bf698604f55351ca49a96f77aaec8a">BOXDRAW_VERTICAL_DOUBLE_RIGHT</a>&nbsp;&nbsp;&nbsp;0x255f</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#af568078530b91dd0d5a50eabc4879d9">BOXDRAW_DOUBLE_VERTICAL_RIGHT</a>&nbsp;&nbsp;&nbsp;0x2560</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#c4757cf55cf65aa77f485aac7d2e02c3">BOXDRAW_VERTICAL_LEFT_DOUBLE</a>&nbsp;&nbsp;&nbsp;0x2561</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#3458d71460bc4765e00c79e338aa6892">BOXDRAW_VERTICAL_DOUBLE_LEFT</a>&nbsp;&nbsp;&nbsp;0x2562</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#ff805ef71a1780a3612c07560d6d9d82">BOXDRAW_DOUBLE_VERTICAL_LEFT</a>&nbsp;&nbsp;&nbsp;0x2563</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#28b18bbabbe2f2c80d451a8aac45aab1">BOXDRAW_DOWN_HORIZONTAL_DOUBLE</a>&nbsp;&nbsp;&nbsp;0x2564</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#8e841c81b1dd45daee338725dbf97d17">BOXDRAW_DOWN_DOUBLE_HORIZONTAL</a>&nbsp;&nbsp;&nbsp;0x2565</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#688beed8232c860d26916fa8d26bc0c3">BOXDRAW_DOUBLE_DOWN_HORIZONTAL</a>&nbsp;&nbsp;&nbsp;0x2566</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#17c1e2cca8c0f892611c4bda938b2f7f">BOXDRAW_UP_HORIZONTAL_DOUBLE</a>&nbsp;&nbsp;&nbsp;0x2567</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#cd5f7829806a242d8d70037e03225e61">BOXDRAW_UP_DOUBLE_HORIZONTAL</a>&nbsp;&nbsp;&nbsp;0x2568</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#e039c357ea2b3597501a9441a588b59b">BOXDRAW_DOUBLE_UP_HORIZONTAL</a>&nbsp;&nbsp;&nbsp;0x2569</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#43ff4816a6d70aa3ef5421dadb7aa58f">BOXDRAW_VERTICAL_HORIZONTAL_DOUBLE</a>&nbsp;&nbsp;&nbsp;0x256a</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#b2cf037564e060cb14f7612449218bac">BOXDRAW_VERTICAL_DOUBLE_HORIZONTAL</a>&nbsp;&nbsp;&nbsp;0x256b</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#6c985f284fdfac9a9b7984757ee1dbfe">BOXDRAW_DOUBLE_VERTICAL_HORIZONTAL</a>&nbsp;&nbsp;&nbsp;0x256c</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#5b970f9261a23d9df9ca2f706541a288">BLOCKELEMENT_FULL_BLOCK</a>&nbsp;&nbsp;&nbsp;0x2588</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#931775c4dad2a728aadae69bc142d062">BLOCKELEMENT_LIGHT_SHADE</a>&nbsp;&nbsp;&nbsp;0x2591</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#83a8168d0c6b9082026fca9a045b8423">GEOMETRICSHAPE_UP_TRIANGLE</a>&nbsp;&nbsp;&nbsp;0x25b2</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#7ff7336c9925c22b7d99074b9e2f7194">GEOMETRICSHAPE_RIGHT_TRIANGLE</a>&nbsp;&nbsp;&nbsp;0x25ba</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#a6cd3ae630dc46df04af3deeb96326f7">GEOMETRICSHAPE_DOWN_TRIANGLE</a>&nbsp;&nbsp;&nbsp;0x25bc</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#ff99ff9b066a88f7c04fa6d7a39c053b">GEOMETRICSHAPE_LEFT_TRIANGLE</a>&nbsp;&nbsp;&nbsp;0x25c4</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#972990573657c6767160574e40bf664e">ARROW_LEFT</a>&nbsp;&nbsp;&nbsp;0x2190</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#016e68eaa6a8185455fc7a372055e623">ARROW_UP</a>&nbsp;&nbsp;&nbsp;0x2191</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#b7ab822b400589e7bb08dd5fa4cefb52">ARROW_RIGHT</a>&nbsp;&nbsp;&nbsp;0x2192</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#3710616ea12e5437f6ff15170e3bbdc6">ARROW_DOWN</a>&nbsp;&nbsp;&nbsp;0x2193</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#97b8e3f5d4df037f0b08d15d5730436f">EFI_BLACK</a>&nbsp;&nbsp;&nbsp;0x00</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#6c6d6f894a61bab14317fe0ea7e2daa9">EFI_BLUE</a>&nbsp;&nbsp;&nbsp;0x01</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#df599f019a14812131082cdb6ef7f5f7">EFI_GREEN</a>&nbsp;&nbsp;&nbsp;0x02</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#1ff96389d49afe0bac6df5f94e87d989">EFI_CYAN</a>&nbsp;&nbsp;&nbsp;(EFI_BLUE | EFI_GREEN)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#178291b1a27cbf4e9af2a4b3637de6c9">EFI_RED</a>&nbsp;&nbsp;&nbsp;0x04</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#56fbf239f2ed675acc2be031df437001">EFI_MAGENTA</a>&nbsp;&nbsp;&nbsp;(EFI_BLUE | EFI_RED)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#52ea941a5a8676850ef8f66d4ef510ef">EFI_BROWN</a>&nbsp;&nbsp;&nbsp;(EFI_GREEN | EFI_RED)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#4ed57fd2b7eb6bd7b8474e7bbe6f11ab">EFI_LIGHTGRAY</a>&nbsp;&nbsp;&nbsp;(EFI_BLUE | EFI_GREEN | EFI_RED)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#777fd1d46222a8b6ec3b3f7c20c86916">EFI_BRIGHT</a>&nbsp;&nbsp;&nbsp;0x08</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#27b4b9bf8dc189375e344cbd617d2bac">EFI_DARKGRAY</a>&nbsp;&nbsp;&nbsp;(EFI_BRIGHT)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#1450b8e6393fd87e7d4f7bbe1ea38d29">EFI_LIGHTBLUE</a>&nbsp;&nbsp;&nbsp;(EFI_BLUE | EFI_BRIGHT)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#5b4ad91848d74fad4ae27b2a2564f944">EFI_LIGHTGREEN</a>&nbsp;&nbsp;&nbsp;(EFI_GREEN | EFI_BRIGHT)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#ff519031c9a2fb6139bb9fe460375eea">EFI_LIGHTCYAN</a>&nbsp;&nbsp;&nbsp;(EFI_CYAN | EFI_BRIGHT)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#0459cb953e29374691ce3ccc616f8c7e">EFI_LIGHTRED</a>&nbsp;&nbsp;&nbsp;(EFI_RED | EFI_BRIGHT)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#e1739075e63827cd8ccb35f9039a55cf">EFI_LIGHTMAGENTA</a>&nbsp;&nbsp;&nbsp;(EFI_MAGENTA | EFI_BRIGHT)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#c6472f702c33378b350e7d9d27faee2c">EFI_YELLOW</a>&nbsp;&nbsp;&nbsp;(EFI_BROWN | EFI_BRIGHT)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#e67fa3c47e84b743a7e2959d7fc33aae">EFI_WHITE</a>&nbsp;&nbsp;&nbsp;(EFI_BLUE | EFI_GREEN | EFI_RED | EFI_BRIGHT)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#38d18c65a18c3984ed59381c24fad98d">EFI_TEXT_ATTR</a>(f, b)&nbsp;&nbsp;&nbsp;((f) | ((b) &lt;&lt; 4))</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#51c21d8daf0a9756e11595b403fa8c45">EFI_BACKGROUND_BLACK</a>&nbsp;&nbsp;&nbsp;0x00</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#2525c5034cf5f6b73a48652af5e30386">EFI_BACKGROUND_BLUE</a>&nbsp;&nbsp;&nbsp;0x10</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#fc7bb96eab80c0fbe7bf055b684a67f1">EFI_BACKGROUND_GREEN</a>&nbsp;&nbsp;&nbsp;0x20</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#da5b85d744f5e3e99248e24e9460e484">EFI_BACKGROUND_CYAN</a>&nbsp;&nbsp;&nbsp;(EFI_BACKGROUND_BLUE | EFI_BACKGROUND_GREEN)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#260ba3674bed62d22efde8555493092d">EFI_BACKGROUND_RED</a>&nbsp;&nbsp;&nbsp;0x40</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#ee0ca0556ed928898f78654847fcd276">EFI_BACKGROUND_MAGENTA</a>&nbsp;&nbsp;&nbsp;(EFI_BACKGROUND_BLUE | EFI_BACKGROUND_RED)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#25ff329c797e411dba9ca90596307682">EFI_BACKGROUND_BROWN</a>&nbsp;&nbsp;&nbsp;(EFI_BACKGROUND_GREEN | EFI_BACKGROUND_RED)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#0af86d25d784dac5983f5f02c49aa2bf">EFI_BACKGROUND_LIGHTGRAY</a>&nbsp;&nbsp;&nbsp;(EFI_BACKGROUND_BLUE | EFI_BACKGROUND_GREEN | EFI_BACKGROUND_RED)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#6edca2da32ed525240164ab996c8e90c">EFI_WIDE_ATTRIBUTE</a>&nbsp;&nbsp;&nbsp;0x80</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#b1ac0803827fa9b60987c43e02ca2ffd">EFI_DISK_IO_INTERFACE_REVISION</a>&nbsp;&nbsp;&nbsp;EFI_DISK_IO_PROTOCOL_REVISION</td></tr>
 
 <tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
-<a class="el" href="../../d3/d1a/a00251.html">_EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#453d952a1755e042472e6c70d0e0cdcf">EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL</a></td></tr>
+<a class="el" href="../../dd/da2/a00019.html">_EFI_DISK_IO_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#c5fd5ad1a262fb7bbfbaceacf1d317a0">EFI_DISK_IO_PROTOCOL</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <br class="typebreak">
-<a class="el" href="../../d3/d1a/a00251.html">EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#e28c7104ce684e95d93e88eececc2d57">SIMPLE_TEXT_OUTPUT_INTERFACE</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/da2/a00019.html">EFI_DISK_IO_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#3a8b9b205f19c4ee392555d302caae68">EFI_DISK_IO</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#26faa5d6bb12041b371fe4a41f68cff5">EFI_TEXT_RESET</a> )(IN <a class="el" href="../../d3/d1a/a00251.html">EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> ExtendedVerification)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#8d766d15dd3d0de9768604f5ba00d235">EFI_DISK_READ</a> )(IN <a class="el" href="../../dd/da2/a00019.html">EFI_DISK_IO_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> MediaId, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Offset, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> BufferSize, OUT VOID *Buffer)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#79bc999edef254d7a21ad2f65e11c385">EFI_TEXT_STRING</a> )(IN <a class="el" href="../../d3/d1a/a00251.html">EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> *String)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#d4b086611065baf132f2542ed106d0bb">EFI_TEXT_TEST_STRING</a> )(IN <a class="el" href="../../d3/d1a/a00251.html">EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> *String)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#33a318d7f7e725ce3bdb0276773dcd7f">EFI_TEXT_QUERY_MODE</a> )(IN <a class="el" href="../../d3/d1a/a00251.html">EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> ModeNumber, OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *Columns, OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *Rows)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#34cca5e244b2d7079bb03b1aa294b77e">EFI_TEXT_SET_MODE</a> )(IN <a class="el" href="../../d3/d1a/a00251.html">EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> ModeNumber)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#6127b9a62bfed51643e720b563d3e0bf">EFI_TEXT_SET_ATTRIBUTE</a> )(IN <a class="el" href="../../d3/d1a/a00251.html">EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Attribute)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#348f65745526a083d5e4cdca0b176fc0">EFI_TEXT_CLEAR_SCREEN</a> )(IN <a class="el" href="../../d3/d1a/a00251.html">EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL</a> *This)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#fecab2b94c0c943def0f8aa096f57c6f">EFI_TEXT_SET_CURSOR_POSITION</a> )(IN <a class="el" href="../../d3/d1a/a00251.html">EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Column, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Row)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#b29f91bc105d567c05cf32a82ae184ea">EFI_TEXT_ENABLE_CURSOR</a> )(IN <a class="el" href="../../d3/d1a/a00251.html">EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> Visible)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#a239c3132174fb26f9b011e09d9dcae0">EFI_DISK_WRITE</a> )(IN <a class="el" href="../../dd/da2/a00019.html">EFI_DISK_IO_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> MediaId, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Offset, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> BufferSize, IN VOID *Buffer)</td></tr>
 
 <tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#6bb3649c64efd22d573fd1e0d8c45eab">gEfiSimpleTextOutProtocolGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/daf/a01169.html#daecbb499e83841243d5cfdfd4b01cf9">gEfiDiskIoProtocolGuid</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Simple Text Out protocol from the UEFI 2.0 specification.<p>
-Abstraction of a very simple text based output device like VGA text mode or a serial terminal. The Simple Text Out protocol instance can represent a single hardware device or a virtual device that is an aggregation of multiple physical devices.<p>
+Disk IO protocol as defined in the UEFI 2.0 specification.<p>
+The Disk IO protocol is used to convert block oriented devices into byte oriented devices. The Disk IO protocol is intended to layer on top of the Block IO protocol.<p>
 Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
-<a class="anchor" name="3710616ea12e5437f6ff15170e3bbdc6"></a><!-- doxytag: member="SimpleTextOut.h::ARROW_DOWN" ref="3710616ea12e5437f6ff15170e3bbdc6" args="" -->
+<a class="anchor" name="c33b9c5d74454df98aa11b1a0f6997b9"></a><!-- doxytag: member="DiskIo.h::DISK_IO_PROTOCOL" ref="c33b9c5d74454df98aa11b1a0f6997b9" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ARROW_DOWN&nbsp;&nbsp;&nbsp;0x2193          </td>
+          <td class="memname">#define DISK_IO_PROTOCOL&nbsp;&nbsp;&nbsp;EFI_DISK_IO_PROTOCOL_GUID          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<a class="anchor" name="972990573657c6767160574e40bf664e"></a><!-- doxytag: member="SimpleTextOut.h::ARROW_LEFT" ref="972990573657c6767160574e40bf664e" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ARROW_LEFT&nbsp;&nbsp;&nbsp;0x2190          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="b7ab822b400589e7bb08dd5fa4cefb52"></a><!-- doxytag: member="SimpleTextOut.h::ARROW_RIGHT" ref="b7ab822b400589e7bb08dd5fa4cefb52" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ARROW_RIGHT&nbsp;&nbsp;&nbsp;0x2192          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="016e68eaa6a8185455fc7a372055e623"></a><!-- doxytag: member="SimpleTextOut.h::ARROW_UP" ref="016e68eaa6a8185455fc7a372055e623" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ARROW_UP&nbsp;&nbsp;&nbsp;0x2191          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="5b970f9261a23d9df9ca2f706541a288"></a><!-- doxytag: member="SimpleTextOut.h::BLOCKELEMENT_FULL_BLOCK" ref="5b970f9261a23d9df9ca2f706541a288" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BLOCKELEMENT_FULL_BLOCK&nbsp;&nbsp;&nbsp;0x2588          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="931775c4dad2a728aadae69bc142d062"></a><!-- doxytag: member="SimpleTextOut.h::BLOCKELEMENT_LIGHT_SHADE" ref="931775c4dad2a728aadae69bc142d062" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BLOCKELEMENT_LIGHT_SHADE&nbsp;&nbsp;&nbsp;0x2591          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="688beed8232c860d26916fa8d26bc0c3"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_DOUBLE_DOWN_HORIZONTAL" ref="688beed8232c860d26916fa8d26bc0c3" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_DOUBLE_DOWN_HORIZONTAL&nbsp;&nbsp;&nbsp;0x2566          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="d4073ae13e8c003050c596d50898b73c"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_DOUBLE_DOWN_LEFT" ref="d4073ae13e8c003050c596d50898b73c" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_DOUBLE_DOWN_LEFT&nbsp;&nbsp;&nbsp;0x2557          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="65f8324bd80a4ab638a39ed3f8dd658d"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_DOUBLE_DOWN_RIGHT" ref="65f8324bd80a4ab638a39ed3f8dd658d" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_DOUBLE_DOWN_RIGHT&nbsp;&nbsp;&nbsp;0x2554          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="4f6436f5c9e7bd7abb905749dda9a21e"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_DOUBLE_HORIZONTAL" ref="4f6436f5c9e7bd7abb905749dda9a21e" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_DOUBLE_HORIZONTAL&nbsp;&nbsp;&nbsp;0x2550          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="e039c357ea2b3597501a9441a588b59b"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_DOUBLE_UP_HORIZONTAL" ref="e039c357ea2b3597501a9441a588b59b" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_DOUBLE_UP_HORIZONTAL&nbsp;&nbsp;&nbsp;0x2569          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="97f828d2b9a8024c8744b9d9d6fed5ea"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_DOUBLE_UP_LEFT" ref="97f828d2b9a8024c8744b9d9d6fed5ea" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_DOUBLE_UP_LEFT&nbsp;&nbsp;&nbsp;0x255d          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="202e5daf5ecf156ebb92438eebdcb9c9"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_DOUBLE_UP_RIGHT" ref="202e5daf5ecf156ebb92438eebdcb9c9" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_DOUBLE_UP_RIGHT&nbsp;&nbsp;&nbsp;0x255a          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="0d2e36034efa72f64862c0558fe13605"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_DOUBLE_VERTICAL" ref="0d2e36034efa72f64862c0558fe13605" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_DOUBLE_VERTICAL&nbsp;&nbsp;&nbsp;0x2551          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="6c985f284fdfac9a9b7984757ee1dbfe"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_DOUBLE_VERTICAL_HORIZONTAL" ref="6c985f284fdfac9a9b7984757ee1dbfe" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_DOUBLE_VERTICAL_HORIZONTAL&nbsp;&nbsp;&nbsp;0x256c          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="ff805ef71a1780a3612c07560d6d9d82"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_DOUBLE_VERTICAL_LEFT" ref="ff805ef71a1780a3612c07560d6d9d82" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_DOUBLE_VERTICAL_LEFT&nbsp;&nbsp;&nbsp;0x2563          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="af568078530b91dd0d5a50eabc4879d9"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_DOUBLE_VERTICAL_RIGHT" ref="af568078530b91dd0d5a50eabc4879d9" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_DOUBLE_VERTICAL_RIGHT&nbsp;&nbsp;&nbsp;0x2560          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="8e841c81b1dd45daee338725dbf97d17"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_DOWN_DOUBLE_HORIZONTAL" ref="8e841c81b1dd45daee338725dbf97d17" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_DOWN_DOUBLE_HORIZONTAL&nbsp;&nbsp;&nbsp;0x2565          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="e30682dd99c155055564b9d28bc2cb84"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_DOWN_DOUBLE_LEFT" ref="e30682dd99c155055564b9d28bc2cb84" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_DOWN_DOUBLE_LEFT&nbsp;&nbsp;&nbsp;0x2556          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="26630171bc3497b2aace8b137e312292"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_DOWN_DOUBLE_RIGHT" ref="26630171bc3497b2aace8b137e312292" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_DOWN_DOUBLE_RIGHT&nbsp;&nbsp;&nbsp;0x2553          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="216dbc7c6bbc91f9e4bf6cfa0f52dade"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_DOWN_HORIZONTAL" ref="216dbc7c6bbc91f9e4bf6cfa0f52dade" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_DOWN_HORIZONTAL&nbsp;&nbsp;&nbsp;0x252c          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="28b18bbabbe2f2c80d451a8aac45aab1"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_DOWN_HORIZONTAL_DOUBLE" ref="28b18bbabbe2f2c80d451a8aac45aab1" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_DOWN_HORIZONTAL_DOUBLE&nbsp;&nbsp;&nbsp;0x2564          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="9bff835bd07a98e40d98c38477954205"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_DOWN_LEFT" ref="9bff835bd07a98e40d98c38477954205" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_DOWN_LEFT&nbsp;&nbsp;&nbsp;0x2510          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="086c7bc9d457f19491a4c3c46087ff38"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_DOWN_LEFT_DOUBLE" ref="086c7bc9d457f19491a4c3c46087ff38" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_DOWN_LEFT_DOUBLE&nbsp;&nbsp;&nbsp;0x2555          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="8c40f03c47b4a5a539b624ee84e1bca0"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_DOWN_RIGHT" ref="8c40f03c47b4a5a539b624ee84e1bca0" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_DOWN_RIGHT&nbsp;&nbsp;&nbsp;0x250c          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="bcff92426d8cf0948ccea31c6411ffa8"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_DOWN_RIGHT_DOUBLE" ref="bcff92426d8cf0948ccea31c6411ffa8" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_DOWN_RIGHT_DOUBLE&nbsp;&nbsp;&nbsp;0x2552          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="25c8042bb5683139524e93d43aa4bfbd"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_HORIZONTAL" ref="25c8042bb5683139524e93d43aa4bfbd" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_HORIZONTAL&nbsp;&nbsp;&nbsp;0x2500          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="cd5f7829806a242d8d70037e03225e61"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_UP_DOUBLE_HORIZONTAL" ref="cd5f7829806a242d8d70037e03225e61" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_UP_DOUBLE_HORIZONTAL&nbsp;&nbsp;&nbsp;0x2568          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="02eed0704309f76966a5a2a49fd4bfd5"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_UP_DOUBLE_LEFT" ref="02eed0704309f76966a5a2a49fd4bfd5" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_UP_DOUBLE_LEFT&nbsp;&nbsp;&nbsp;0x255c          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="b44918935821ad32fa609f58c59cac52"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_UP_DOUBLE_RIGHT" ref="b44918935821ad32fa609f58c59cac52" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_UP_DOUBLE_RIGHT&nbsp;&nbsp;&nbsp;0x2559          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="97e2ad330bfa686ae82a7e2e620a6121"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_UP_HORIZONTAL" ref="97e2ad330bfa686ae82a7e2e620a6121" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_UP_HORIZONTAL&nbsp;&nbsp;&nbsp;0x2534          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="17c1e2cca8c0f892611c4bda938b2f7f"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_UP_HORIZONTAL_DOUBLE" ref="17c1e2cca8c0f892611c4bda938b2f7f" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_UP_HORIZONTAL_DOUBLE&nbsp;&nbsp;&nbsp;0x2567          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="531ca36074738fc07d315aff073584f1"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_UP_LEFT" ref="531ca36074738fc07d315aff073584f1" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_UP_LEFT&nbsp;&nbsp;&nbsp;0x2518          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="219d0b08a7f0b8416bfb20f6cb4c021e"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_UP_LEFT_DOUBLE" ref="219d0b08a7f0b8416bfb20f6cb4c021e" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_UP_LEFT_DOUBLE&nbsp;&nbsp;&nbsp;0x255b          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="9ded716dc94635e3885a4ff02cf1b78d"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_UP_RIGHT" ref="9ded716dc94635e3885a4ff02cf1b78d" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_UP_RIGHT&nbsp;&nbsp;&nbsp;0x2514          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="d59193de8a91d02c1a660710a7d2563e"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_UP_RIGHT_DOUBLE" ref="d59193de8a91d02c1a660710a7d2563e" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_UP_RIGHT_DOUBLE&nbsp;&nbsp;&nbsp;0x2558          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="60216873c54d4083e988c7d6946e4b1b"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_VERTICAL" ref="60216873c54d4083e988c7d6946e4b1b" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_VERTICAL&nbsp;&nbsp;&nbsp;0x2502          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="b2cf037564e060cb14f7612449218bac"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_VERTICAL_DOUBLE_HORIZONTAL" ref="b2cf037564e060cb14f7612449218bac" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_VERTICAL_DOUBLE_HORIZONTAL&nbsp;&nbsp;&nbsp;0x256b          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="3458d71460bc4765e00c79e338aa6892"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_VERTICAL_DOUBLE_LEFT" ref="3458d71460bc4765e00c79e338aa6892" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_VERTICAL_DOUBLE_LEFT&nbsp;&nbsp;&nbsp;0x2562          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="52bf698604f55351ca49a96f77aaec8a"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_VERTICAL_DOUBLE_RIGHT" ref="52bf698604f55351ca49a96f77aaec8a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_VERTICAL_DOUBLE_RIGHT&nbsp;&nbsp;&nbsp;0x255f          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="f3576c595525de2bda1d4d73fe7f513c"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_VERTICAL_HORIZONTAL" ref="f3576c595525de2bda1d4d73fe7f513c" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_VERTICAL_HORIZONTAL&nbsp;&nbsp;&nbsp;0x253c          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="43ff4816a6d70aa3ef5421dadb7aa58f"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_VERTICAL_HORIZONTAL_DOUBLE" ref="43ff4816a6d70aa3ef5421dadb7aa58f" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_VERTICAL_HORIZONTAL_DOUBLE&nbsp;&nbsp;&nbsp;0x256a          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="dd8b2c52fe1ece71b5c21faac74b221b"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_VERTICAL_LEFT" ref="dd8b2c52fe1ece71b5c21faac74b221b" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_VERTICAL_LEFT&nbsp;&nbsp;&nbsp;0x2524          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="c4757cf55cf65aa77f485aac7d2e02c3"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_VERTICAL_LEFT_DOUBLE" ref="c4757cf55cf65aa77f485aac7d2e02c3" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_VERTICAL_LEFT_DOUBLE&nbsp;&nbsp;&nbsp;0x2561          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="2246408ab856fa36d169d2d7d3c90f0e"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_VERTICAL_RIGHT" ref="2246408ab856fa36d169d2d7d3c90f0e" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_VERTICAL_RIGHT&nbsp;&nbsp;&nbsp;0x251c          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="906349a45561cdfaed296fedbe1841c4"></a><!-- doxytag: member="SimpleTextOut.h::BOXDRAW_VERTICAL_RIGHT_DOUBLE" ref="906349a45561cdfaed296fedbe1841c4" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BOXDRAW_VERTICAL_RIGHT_DOUBLE&nbsp;&nbsp;&nbsp;0x255e          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="51c21d8daf0a9756e11595b403fa8c45"></a><!-- doxytag: member="SimpleTextOut.h::EFI_BACKGROUND_BLACK" ref="51c21d8daf0a9756e11595b403fa8c45" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_BACKGROUND_BLACK&nbsp;&nbsp;&nbsp;0x00          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="2525c5034cf5f6b73a48652af5e30386"></a><!-- doxytag: member="SimpleTextOut.h::EFI_BACKGROUND_BLUE" ref="2525c5034cf5f6b73a48652af5e30386" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_BACKGROUND_BLUE&nbsp;&nbsp;&nbsp;0x10          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="25ff329c797e411dba9ca90596307682"></a><!-- doxytag: member="SimpleTextOut.h::EFI_BACKGROUND_BROWN" ref="25ff329c797e411dba9ca90596307682" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_BACKGROUND_BROWN&nbsp;&nbsp;&nbsp;(EFI_BACKGROUND_GREEN | EFI_BACKGROUND_RED)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="da5b85d744f5e3e99248e24e9460e484"></a><!-- doxytag: member="SimpleTextOut.h::EFI_BACKGROUND_CYAN" ref="da5b85d744f5e3e99248e24e9460e484" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_BACKGROUND_CYAN&nbsp;&nbsp;&nbsp;(EFI_BACKGROUND_BLUE | EFI_BACKGROUND_GREEN)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="fc7bb96eab80c0fbe7bf055b684a67f1"></a><!-- doxytag: member="SimpleTextOut.h::EFI_BACKGROUND_GREEN" ref="fc7bb96eab80c0fbe7bf055b684a67f1" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_BACKGROUND_GREEN&nbsp;&nbsp;&nbsp;0x20          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="0af86d25d784dac5983f5f02c49aa2bf"></a><!-- doxytag: member="SimpleTextOut.h::EFI_BACKGROUND_LIGHTGRAY" ref="0af86d25d784dac5983f5f02c49aa2bf" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_BACKGROUND_LIGHTGRAY&nbsp;&nbsp;&nbsp;(EFI_BACKGROUND_BLUE | EFI_BACKGROUND_GREEN | EFI_BACKGROUND_RED)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="ee0ca0556ed928898f78654847fcd276"></a><!-- doxytag: member="SimpleTextOut.h::EFI_BACKGROUND_MAGENTA" ref="ee0ca0556ed928898f78654847fcd276" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_BACKGROUND_MAGENTA&nbsp;&nbsp;&nbsp;(EFI_BACKGROUND_BLUE | EFI_BACKGROUND_RED)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="260ba3674bed62d22efde8555493092d"></a><!-- doxytag: member="SimpleTextOut.h::EFI_BACKGROUND_RED" ref="260ba3674bed62d22efde8555493092d" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_BACKGROUND_RED&nbsp;&nbsp;&nbsp;0x40          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="97b8e3f5d4df037f0b08d15d5730436f"></a><!-- doxytag: member="SimpleTextOut.h::EFI_BLACK" ref="97b8e3f5d4df037f0b08d15d5730436f" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_BLACK&nbsp;&nbsp;&nbsp;0x00          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="6c6d6f894a61bab14317fe0ea7e2daa9"></a><!-- doxytag: member="SimpleTextOut.h::EFI_BLUE" ref="6c6d6f894a61bab14317fe0ea7e2daa9" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_BLUE&nbsp;&nbsp;&nbsp;0x01          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="777fd1d46222a8b6ec3b3f7c20c86916"></a><!-- doxytag: member="SimpleTextOut.h::EFI_BRIGHT" ref="777fd1d46222a8b6ec3b3f7c20c86916" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_BRIGHT&nbsp;&nbsp;&nbsp;0x08          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="52ea941a5a8676850ef8f66d4ef510ef"></a><!-- doxytag: member="SimpleTextOut.h::EFI_BROWN" ref="52ea941a5a8676850ef8f66d4ef510ef" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_BROWN&nbsp;&nbsp;&nbsp;(EFI_GREEN | EFI_RED)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="1ff96389d49afe0bac6df5f94e87d989"></a><!-- doxytag: member="SimpleTextOut.h::EFI_CYAN" ref="1ff96389d49afe0bac6df5f94e87d989" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_CYAN&nbsp;&nbsp;&nbsp;(EFI_BLUE | EFI_GREEN)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="27b4b9bf8dc189375e344cbd617d2bac"></a><!-- doxytag: member="SimpleTextOut.h::EFI_DARKGRAY" ref="27b4b9bf8dc189375e344cbd617d2bac" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_DARKGRAY&nbsp;&nbsp;&nbsp;(EFI_BRIGHT)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="df599f019a14812131082cdb6ef7f5f7"></a><!-- doxytag: member="SimpleTextOut.h::EFI_GREEN" ref="df599f019a14812131082cdb6ef7f5f7" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_GREEN&nbsp;&nbsp;&nbsp;0x02          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="1450b8e6393fd87e7d4f7bbe1ea38d29"></a><!-- doxytag: member="SimpleTextOut.h::EFI_LIGHTBLUE" ref="1450b8e6393fd87e7d4f7bbe1ea38d29" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_LIGHTBLUE&nbsp;&nbsp;&nbsp;(EFI_BLUE | EFI_BRIGHT)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="ff519031c9a2fb6139bb9fe460375eea"></a><!-- doxytag: member="SimpleTextOut.h::EFI_LIGHTCYAN" ref="ff519031c9a2fb6139bb9fe460375eea" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_LIGHTCYAN&nbsp;&nbsp;&nbsp;(EFI_CYAN | EFI_BRIGHT)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="4ed57fd2b7eb6bd7b8474e7bbe6f11ab"></a><!-- doxytag: member="SimpleTextOut.h::EFI_LIGHTGRAY" ref="4ed57fd2b7eb6bd7b8474e7bbe6f11ab" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_LIGHTGRAY&nbsp;&nbsp;&nbsp;(EFI_BLUE | EFI_GREEN | EFI_RED)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="5b4ad91848d74fad4ae27b2a2564f944"></a><!-- doxytag: member="SimpleTextOut.h::EFI_LIGHTGREEN" ref="5b4ad91848d74fad4ae27b2a2564f944" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_LIGHTGREEN&nbsp;&nbsp;&nbsp;(EFI_GREEN | EFI_BRIGHT)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="e1739075e63827cd8ccb35f9039a55cf"></a><!-- doxytag: member="SimpleTextOut.h::EFI_LIGHTMAGENTA" ref="e1739075e63827cd8ccb35f9039a55cf" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_LIGHTMAGENTA&nbsp;&nbsp;&nbsp;(EFI_MAGENTA | EFI_BRIGHT)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="0459cb953e29374691ce3ccc616f8c7e"></a><!-- doxytag: member="SimpleTextOut.h::EFI_LIGHTRED" ref="0459cb953e29374691ce3ccc616f8c7e" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_LIGHTRED&nbsp;&nbsp;&nbsp;(EFI_RED | EFI_BRIGHT)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="56fbf239f2ed675acc2be031df437001"></a><!-- doxytag: member="SimpleTextOut.h::EFI_MAGENTA" ref="56fbf239f2ed675acc2be031df437001" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_MAGENTA&nbsp;&nbsp;&nbsp;(EFI_BLUE | EFI_RED)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
+Protocol <a class="el" href="../../d1/d87/a00689.html">GUID</a> name defined in EFI1.1. 
 </div>
 </div><p>
-<a class="anchor" name="178291b1a27cbf4e9af2a4b3637de6c9"></a><!-- doxytag: member="SimpleTextOut.h::EFI_RED" ref="178291b1a27cbf4e9af2a4b3637de6c9" args="" -->
+<a class="anchor" name="b1ac0803827fa9b60987c43e02ca2ffd"></a><!-- doxytag: member="DiskIo.h::EFI_DISK_IO_INTERFACE_REVISION" ref="b1ac0803827fa9b60987c43e02ca2ffd" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_RED&nbsp;&nbsp;&nbsp;0x04          </td>
+          <td class="memname">#define EFI_DISK_IO_INTERFACE_REVISION&nbsp;&nbsp;&nbsp;EFI_DISK_IO_PROTOCOL_REVISION          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+Revision defined in EFI1.1 
 </div>
 </div><p>
-<a class="anchor" name="4f8c7726da0f239821b19b29136704a1"></a><!-- doxytag: member="SimpleTextOut.h::EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL_GUID" ref="4f8c7726da0f239821b19b29136704a1" args="" -->
+<a class="anchor" name="e60283865b614c331fd238c76d28fe72"></a><!-- doxytag: member="DiskIo.h::EFI_DISK_IO_PROTOCOL_GUID" ref="e60283865b614c331fd238c76d28fe72" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL_GUID          </td>
+          <td class="memname">#define EFI_DISK_IO_PROTOCOL_GUID          </td>
         </tr>
       </table>
 </div>
@@ -1269,25 +97,17 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 <p>
 <b>Value:</b><div class="fragment"><pre class="fragment">{ \
-    0x387477c2, 0x69c7, 0x11d2, {0x8e, 0x39, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b } \
+    0xce345171, 0xba0b, 0x11d2, {0x8e, 0x4f, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b } \
   }
 </pre></div>
 </div>
 </div><p>
-<a class="anchor" name="38d18c65a18c3984ed59381c24fad98d"></a><!-- doxytag: member="SimpleTextOut.h::EFI_TEXT_ATTR" ref="38d18c65a18c3984ed59381c24fad98d" args="(f, b)" -->
+<a class="anchor" name="a40b5536034931b488df5e416e1d7fdb"></a><!-- doxytag: member="DiskIo.h::EFI_DISK_IO_PROTOCOL_REVISION" ref="a40b5536034931b488df5e416e1d7fdb" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_TEXT_ATTR          </td>
-          <td>(</td>
-          <td class="paramtype">f,         <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">b&nbsp;</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td>&nbsp;&nbsp;&nbsp;((f) | ((b) &lt;&lt; 4))</td>
+          <td class="memname">#define EFI_DISK_IO_PROTOCOL_REVISION&nbsp;&nbsp;&nbsp;0x00010000          </td>
         </tr>
       </table>
 </div>
@@ -1295,135 +115,30 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 <p>
 
-</div>
-</div><p>
-<a class="anchor" name="e67fa3c47e84b743a7e2959d7fc33aae"></a><!-- doxytag: member="SimpleTextOut.h::EFI_WHITE" ref="e67fa3c47e84b743a7e2959d7fc33aae" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_WHITE&nbsp;&nbsp;&nbsp;(EFI_BLUE | EFI_GREEN | EFI_RED | EFI_BRIGHT)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="6edca2da32ed525240164ab996c8e90c"></a><!-- doxytag: member="SimpleTextOut.h::EFI_WIDE_ATTRIBUTE" ref="6edca2da32ed525240164ab996c8e90c" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_WIDE_ATTRIBUTE&nbsp;&nbsp;&nbsp;0x80          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="c6472f702c33378b350e7d9d27faee2c"></a><!-- doxytag: member="SimpleTextOut.h::EFI_YELLOW" ref="c6472f702c33378b350e7d9d27faee2c" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_YELLOW&nbsp;&nbsp;&nbsp;(EFI_BROWN | EFI_BRIGHT)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="a6cd3ae630dc46df04af3deeb96326f7"></a><!-- doxytag: member="SimpleTextOut.h::GEOMETRICSHAPE_DOWN_TRIANGLE" ref="a6cd3ae630dc46df04af3deeb96326f7" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define GEOMETRICSHAPE_DOWN_TRIANGLE&nbsp;&nbsp;&nbsp;0x25bc          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="ff99ff9b066a88f7c04fa6d7a39c053b"></a><!-- doxytag: member="SimpleTextOut.h::GEOMETRICSHAPE_LEFT_TRIANGLE" ref="ff99ff9b066a88f7c04fa6d7a39c053b" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define GEOMETRICSHAPE_LEFT_TRIANGLE&nbsp;&nbsp;&nbsp;0x25c4          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="7ff7336c9925c22b7d99074b9e2f7194"></a><!-- doxytag: member="SimpleTextOut.h::GEOMETRICSHAPE_RIGHT_TRIANGLE" ref="7ff7336c9925c22b7d99074b9e2f7194" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define GEOMETRICSHAPE_RIGHT_TRIANGLE&nbsp;&nbsp;&nbsp;0x25ba          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="83a8168d0c6b9082026fca9a045b8423"></a><!-- doxytag: member="SimpleTextOut.h::GEOMETRICSHAPE_UP_TRIANGLE" ref="83a8168d0c6b9082026fca9a045b8423" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define GEOMETRICSHAPE_UP_TRIANGLE&nbsp;&nbsp;&nbsp;0x25b2          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="134f5aa2b5efd40f18b67eba3b1251ae"></a><!-- doxytag: member="SimpleTextOut.h::SIMPLE_TEXT_OUTPUT_PROTOCOL" ref="134f5aa2b5efd40f18b67eba3b1251ae" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SIMPLE_TEXT_OUTPUT_PROTOCOL&nbsp;&nbsp;&nbsp;EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL_GUID          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Protocol <a class="el" href="../../d9/d0f/a00644.html">GUID</a> defined in EFI1.1. 
 </div>
 </div><p>
 <hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="453d952a1755e042472e6c70d0e0cdcf"></a><!-- doxytag: member="SimpleTextOut.h::EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL" ref="453d952a1755e042472e6c70d0e0cdcf" args="" -->
+<a class="anchor" name="3a8b9b205f19c4ee392555d302caae68"></a><!-- doxytag: member="DiskIo.h::EFI_DISK_IO" ref="3a8b9b205f19c4ee392555d302caae68" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef struct <a class="el" href="../../d3/d1a/a00251.html">_EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL</a> <a class="el" href="../../d3/d1a/a00251.html">EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL</a>          </td>
+          <td class="memname">typedef <a class="el" href="../../dd/da2/a00019.html">EFI_DISK_IO_PROTOCOL</a> <a class="el" href="../../dd/da2/a00019.html">EFI_DISK_IO</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Protocol defined in EFI1.1. 
+</div>
+</div><p>
+<a class="anchor" name="c5fd5ad1a262fb7bbfbaceacf1d317a0"></a><!-- doxytag: member="DiskIo.h::EFI_DISK_IO_PROTOCOL" ref="c5fd5ad1a262fb7bbfbaceacf1d317a0" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct <a class="el" href="../../dd/da2/a00019.html">_EFI_DISK_IO_PROTOCOL</a> <a class="el" href="../../dd/da2/a00019.html">EFI_DISK_IO_PROTOCOL</a>          </td>
         </tr>
       </table>
 </div>
@@ -1433,290 +148,82 @@ Protocol <a class="el" href="../../d9/d0f/a00644.html">GUID</a> defined in EFI1.
 
 </div>
 </div><p>
-<a class="anchor" name="348f65745526a083d5e4cdca0b176fc0"></a><!-- doxytag: member="SimpleTextOut.h::EFI_TEXT_CLEAR_SCREEN" ref="348f65745526a083d5e4cdca0b176fc0" args=")(IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This)" -->
+<a class="anchor" name="8d766d15dd3d0de9768604f5ba00d235"></a><!-- doxytag: member="DiskIo.h::EFI_DISK_READ" ref="8d766d15dd3d0de9768604f5ba00d235" args=")(IN EFI_DISK_IO_PROTOCOL *This, IN UINT32 MediaId, IN UINT64 Offset, IN UINTN BufferSize, OUT VOID *Buffer)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d7/daf/a01169.html#348f65745526a083d5e4cdca0b176fc0">EFI_TEXT_CLEAR_SCREEN</a>)(IN <a class="el" href="../../d3/d1a/a00251.html">EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL</a> *This)          </td>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d7/daf/a01169.html#8d766d15dd3d0de9768604f5ba00d235">EFI_DISK_READ</a>)(IN <a class="el" href="../../dd/da2/a00019.html">EFI_DISK_IO_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> MediaId, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Offset, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> BufferSize, OUT VOID *Buffer)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Clears the output device(s) display to the currently selected background color.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Protocol instance pointer.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The operation completed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The device had an error and could not complete the request. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The output device is not in a valid text mode. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="b29f91bc105d567c05cf32a82ae184ea"></a><!-- doxytag: member="SimpleTextOut.h::EFI_TEXT_ENABLE_CURSOR" ref="b29f91bc105d567c05cf32a82ae184ea" args=")(IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, IN BOOLEAN Visible)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d7/daf/a01169.html#b29f91bc105d567c05cf32a82ae184ea">EFI_TEXT_ENABLE_CURSOR</a>)(IN <a class="el" href="../../d3/d1a/a00251.html">EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> Visible)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Makes the cursor visible or invisible<p>
+Read BufferSize bytes from Offset into Buffer.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Protocol instance pointer. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Visible</em>&nbsp;</td><td>If TRUE, the cursor is set to be visible. If FALSE, the cursor is set to be invisible.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>MediaId</em>&nbsp;</td><td>Id of the media, changes every time the media is replaced. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Offset</em>&nbsp;</td><td>The starting byte offset to read from </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>BufferSize</em>&nbsp;</td><td>Size of Buffer </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>Buffer containing read data</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The operation completed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The device had an error and could not complete the request, or the device does not support changing the cursor mode. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The output device is not in a valid text mode. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The data was read correctly from the device. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The device reported an error while performing the read. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NO_MEDIA</em>&nbsp;</td><td>There is no media in the device. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_MEDIA_CHNAGED</em>&nbsp;</td><td>The MediaId does not matched the current device. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The read request contains device addresses that are not valid for the device. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
-<a class="anchor" name="33a318d7f7e725ce3bdb0276773dcd7f"></a><!-- doxytag: member="SimpleTextOut.h::EFI_TEXT_QUERY_MODE" ref="33a318d7f7e725ce3bdb0276773dcd7f" args=")(IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, IN UINTN ModeNumber, OUT UINTN *Columns, OUT UINTN *Rows)" -->
+<a class="anchor" name="a239c3132174fb26f9b011e09d9dcae0"></a><!-- doxytag: member="DiskIo.h::EFI_DISK_WRITE" ref="a239c3132174fb26f9b011e09d9dcae0" args=")(IN EFI_DISK_IO_PROTOCOL *This, IN UINT32 MediaId, IN UINT64 Offset, IN UINTN BufferSize, IN VOID *Buffer)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d7/daf/a01169.html#33a318d7f7e725ce3bdb0276773dcd7f">EFI_TEXT_QUERY_MODE</a>)(IN <a class="el" href="../../d3/d1a/a00251.html">EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> ModeNumber, OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *Columns, OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *Rows)          </td>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d7/daf/a01169.html#a239c3132174fb26f9b011e09d9dcae0">EFI_DISK_WRITE</a>)(IN <a class="el" href="../../dd/da2/a00019.html">EFI_DISK_IO_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> MediaId, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Offset, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> BufferSize, IN VOID *Buffer)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Returns information for an available text mode that the output device(s) supports.<p>
+Writes a specified number of bytes to a device.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Protocol instance pointer. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ModeNumber</em>&nbsp;</td><td>The mode number to return information on. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Columns</em>&nbsp;</td><td>Returns the geometry of the text output device for the requested ModeNumber. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Rows</em>&nbsp;</td><td>Returns the geometry of the text output device for the requested ModeNumber.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Indicates a pointer to the calling context. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>MediaId</em>&nbsp;</td><td>ID of the medium to be written. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Offset</em>&nbsp;</td><td>The starting byte offset on the logical block I/O device to write. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>BufferSize</em>&nbsp;</td><td>The size in bytes of Buffer. The number of bytes to write to the device. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>A pointer to the buffer containing the data to be written.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The requested mode information was returned. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The device had an error and could not complete the request. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The mode number was not valid. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The data was written correctly to the device. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_WRITE_PROTECTED</em>&nbsp;</td><td>The device can not be written to. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The device reported an error while performing the write. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NO_MEDIA</em>&nbsp;</td><td>There is no media in the device. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_MEDIA_CHNAGED</em>&nbsp;</td><td>The MediaId does not matched the current device. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The write request contains device addresses that are not valid for the device. </td></tr>
   </table>
 </dl>
 
-</div>
-</div><p>
-<a class="anchor" name="26faa5d6bb12041b371fe4a41f68cff5"></a><!-- doxytag: member="SimpleTextOut.h::EFI_TEXT_RESET" ref="26faa5d6bb12041b371fe4a41f68cff5" args=")(IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, IN BOOLEAN ExtendedVerification)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d7/daf/a01169.html#26faa5d6bb12041b371fe4a41f68cff5">EFI_TEXT_RESET</a>)(IN <a class="el" href="../../d3/d1a/a00251.html">EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> ExtendedVerification)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Reset the text output device hardware and optionaly run diagnostics<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Protocol instance pointer. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ExtendedVerification</em>&nbsp;</td><td>Driver may perform more exhaustive verfication operation of the device during reset.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The text output device was reset. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The text output device is not functioning correctly and could not be reset. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="6127b9a62bfed51643e720b563d3e0bf"></a><!-- doxytag: member="SimpleTextOut.h::EFI_TEXT_SET_ATTRIBUTE" ref="6127b9a62bfed51643e720b563d3e0bf" args=")(IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, IN UINTN Attribute)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d7/daf/a01169.html#6127b9a62bfed51643e720b563d3e0bf">EFI_TEXT_SET_ATTRIBUTE</a>)(IN <a class="el" href="../../d3/d1a/a00251.html">EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Attribute)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Sets the background and foreground colors for the OutputString () and ClearScreen () functions.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Protocol instance pointer. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Attribute</em>&nbsp;</td><td>The attribute to set. Bits 0..3 are the foreground color, and bits 4..6 are the background color. All other bits are undefined and must be zero. The valid Attributes are defined in this file.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The attribute was set. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The device had an error and could not complete the request. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The attribute requested is not defined. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="fecab2b94c0c943def0f8aa096f57c6f"></a><!-- doxytag: member="SimpleTextOut.h::EFI_TEXT_SET_CURSOR_POSITION" ref="fecab2b94c0c943def0f8aa096f57c6f" args=")(IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, IN UINTN Column, IN UINTN Row)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d7/daf/a01169.html#fecab2b94c0c943def0f8aa096f57c6f">EFI_TEXT_SET_CURSOR_POSITION</a>)(IN <a class="el" href="../../d3/d1a/a00251.html">EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Column, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Row)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Sets the current coordinates of the cursor position<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Protocol instance pointer. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Column</em>&nbsp;</td><td>The position to set the cursor to. Must be greater than or equal to zero and less than the number of columns and rows by QueryMode (). </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Row</em>&nbsp;</td><td>The position to set the cursor to. Must be greater than or equal to zero and less than the number of columns and rows by QueryMode ().</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The operation completed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The device had an error and could not complete the request. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The output device is not in a valid text mode, or the cursor position is invalid for the current mode. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="34cca5e244b2d7079bb03b1aa294b77e"></a><!-- doxytag: member="SimpleTextOut.h::EFI_TEXT_SET_MODE" ref="34cca5e244b2d7079bb03b1aa294b77e" args=")(IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, IN UINTN ModeNumber)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d7/daf/a01169.html#34cca5e244b2d7079bb03b1aa294b77e">EFI_TEXT_SET_MODE</a>)(IN <a class="el" href="../../d3/d1a/a00251.html">EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> ModeNumber)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Sets the output device(s) to a specified mode.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Protocol instance pointer. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ModeNumber</em>&nbsp;</td><td>The mode number to set.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The requested text mode was set. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The device had an error and could not complete the request. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The mode number was not valid. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="79bc999edef254d7a21ad2f65e11c385"></a><!-- doxytag: member="SimpleTextOut.h::EFI_TEXT_STRING" ref="79bc999edef254d7a21ad2f65e11c385" args=")(IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, IN CHAR16 *String)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d7/daf/a01169.html#79bc999edef254d7a21ad2f65e11c385">EFI_TEXT_STRING</a>)(IN <a class="el" href="../../d3/d1a/a00251.html">EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> *String)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Write a Unicode string to the output device.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Protocol instance pointer. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>String</em>&nbsp;</td><td>The NULL-terminated Unicode string to be displayed on the output device(s). All output devices must also support the Unicode drawing defined in this file.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The string was output to the device. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The device reported an error while attempting to output the text. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The output device's mode is not currently in a defined text mode. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_WARN_UNKNOWN_GLYPH</em>&nbsp;</td><td>This warning code indicates that some of the characters in the Unicode string could not be rendered and were skipped. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="d4b086611065baf132f2542ed106d0bb"></a><!-- doxytag: member="SimpleTextOut.h::EFI_TEXT_TEST_STRING" ref="d4b086611065baf132f2542ed106d0bb" args=")(IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, IN CHAR16 *String)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d7/daf/a01169.html#d4b086611065baf132f2542ed106d0bb">EFI_TEXT_TEST_STRING</a>)(IN <a class="el" href="../../d3/d1a/a00251.html">EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> *String)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Verifies that all characters in a Unicode string can be output to the target device.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Protocol instance pointer. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>String</em>&nbsp;</td><td>The NULL-terminated Unicode string to be examined for the output device(s).</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The device(s) are capable of rendering the output string. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>Some of the characters in the Unicode string cannot be rendered by one or more of the output devices mapped by the EFI handle. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="e28c7104ce684e95d93e88eececc2d57"></a><!-- doxytag: member="SimpleTextOut.h::SIMPLE_TEXT_OUTPUT_INTERFACE" ref="e28c7104ce684e95d93e88eececc2d57" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d3/d1a/a00251.html">EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL</a> <a class="el" href="../../d3/d1a/a00251.html">SIMPLE_TEXT_OUTPUT_INTERFACE</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Backward-compatible with EFI1.1. 
 </div>
 </div><p>
 <hr><h2>Variable Documentation</h2>
-<a class="anchor" name="6bb3649c64efd22d573fd1e0d8c45eab"></a><!-- doxytag: member="SimpleTextOut.h::gEfiSimpleTextOutProtocolGuid" ref="6bb3649c64efd22d573fd1e0d8c45eab" args="" -->
+<a class="anchor" name="daecbb499e83841243d5cfdfd4b01cf9"></a><!-- doxytag: member="DiskIo.h::gEfiDiskIoProtocolGuid" ref="daecbb499e83841243d5cfdfd4b01cf9" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../d7/daf/a01169.html#6bb3649c64efd22d573fd1e0d8c45eab">gEfiSimpleTextOutProtocolGuid</a>          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../d7/daf/a01169.html#daecbb499e83841243d5cfdfd4b01cf9">gEfiDiskIoProtocolGuid</a>          </td>
         </tr>
       </table>
 </div>
@@ -1727,7 +234,7 @@ Backward-compatible with EFI1.1.
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:10 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:32 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

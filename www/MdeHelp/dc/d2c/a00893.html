@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: tdTPM_IDENTITY_REQ Struct Reference</title>
+<title>MdePkg[ALL]: tdEFI_IMAGE_LOAD_EVENT Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,30 +21,29 @@
   </div>
 </div>
 <div class="contents">
-<h1>tdTPM_IDENTITY_REQ Struct Reference</h1><!-- doxytag: class="tdTPM_IDENTITY_REQ" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>tdEFI_IMAGE_LOAD_EVENT Struct Reference</h1><!-- doxytag: class="tdEFI_IMAGE_LOAD_EVENT" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2c/a00893.html#a82b46a6fa4552762fa0dd794309be8e">asymSize</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d95/a01247.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2c/a00893.html#59a1eaa1ce9b0a0ddb9d48993058c3d9">ImageLocationInMemory</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2c/a00893.html#db1ca8b822932200c1787517aba5446a">symSize</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2c/a00893.html#134cbe4a151d9fc86ffaaeda463f8e60">ImageLengthInMemory</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/d01/a00897.html">TPM_KEY_PARMS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2c/a00893.html#4b68971996727cfce13bfe601e52157c">asymAlgorithm</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2c/a00893.html#04fd4947b5b604da34a02f409ab376af">ImageLinkTimeAddress</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/d01/a00897.html">TPM_KEY_PARMS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2c/a00893.html#3e8dbaf61f67be0b99d3b483f727d786">symAlgorithm</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2c/a00893.html#1a12724b977a94bdd8aa789d8f31b9b7">LengthOfDevicePath</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2c/a00893.html#8ce73109113e94f28e3547851067d092">asymBlob</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2c/a00893.html#ae5e754787ba86c85bb961a45874e198">symBlob</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d2c/a00893.html#49ee4813252e08ce02513370ef0919c2">DevicePath</a> [1]</td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Part 2, section 12.6 TPM_IDENTITY_REQ <hr><h2>Field Documentation</h2>
-<a class="anchor" name="4b68971996727cfce13bfe601e52157c"></a><!-- doxytag: member="tdTPM_IDENTITY_REQ::asymAlgorithm" ref="4b68971996727cfce13bfe601e52157c" args="" -->
+EFI_IMAGE_LOAD_EVENT<p>
+This structure is used in EV_EFI_BOOT_SERVICES_APPLICATION, EV_EFI_BOOT_SERVICES_DRIVER and EV_EFI_RUNTIME_SERVICES_DRIVER <hr><h2>Field Documentation</h2>
+<a class="anchor" name="49ee4813252e08ce02513370ef0919c2"></a><!-- doxytag: member="tdEFI_IMAGE_LOAD_EVENT::DevicePath" ref="49ee4813252e08ce02513370ef0919c2" args="[1]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../de/d01/a00897.html">TPM_KEY_PARMS</a> <a class="el" href="../../dc/d2c/a00893.html#4b68971996727cfce13bfe601e52157c">tdTPM_IDENTITY_REQ::asymAlgorithm</a>          </td>
+          <td class="memname"><a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> <a class="el" href="../../dc/d2c/a00893.html#49ee4813252e08ce02513370ef0919c2">tdEFI_IMAGE_LOAD_EVENT::DevicePath</a>[1]          </td>
         </tr>
       </table>
 </div>
@@ -54,12 +53,12 @@ Part 2, section 12.6 TPM_IDENTITY_REQ <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="8ce73109113e94f28e3547851067d092"></a><!-- doxytag: member="tdTPM_IDENTITY_REQ::asymBlob" ref="8ce73109113e94f28e3547851067d092" args="" -->
+<a class="anchor" name="134cbe4a151d9fc86ffaaeda463f8e60"></a><!-- doxytag: member="tdEFI_IMAGE_LOAD_EVENT::ImageLengthInMemory" ref="134cbe4a151d9fc86ffaaeda463f8e60" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>* <a class="el" href="../../dc/d2c/a00893.html#8ce73109113e94f28e3547851067d092">tdTPM_IDENTITY_REQ::asymBlob</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> <a class="el" href="../../dc/d2c/a00893.html#134cbe4a151d9fc86ffaaeda463f8e60">tdEFI_IMAGE_LOAD_EVENT::ImageLengthInMemory</a>          </td>
         </tr>
       </table>
 </div>
@@ -69,12 +68,12 @@ Part 2, section 12.6 TPM_IDENTITY_REQ <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="a82b46a6fa4552762fa0dd794309be8e"></a><!-- doxytag: member="tdTPM_IDENTITY_REQ::asymSize" ref="a82b46a6fa4552762fa0dd794309be8e" args="" -->
+<a class="anchor" name="04fd4947b5b604da34a02f409ab376af"></a><!-- doxytag: member="tdEFI_IMAGE_LOAD_EVENT::ImageLinkTimeAddress" ref="04fd4947b5b604da34a02f409ab376af" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../dc/d2c/a00893.html#a82b46a6fa4552762fa0dd794309be8e">tdTPM_IDENTITY_REQ::asymSize</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> <a class="el" href="../../dc/d2c/a00893.html#04fd4947b5b604da34a02f409ab376af">tdEFI_IMAGE_LOAD_EVENT::ImageLinkTimeAddress</a>          </td>
         </tr>
       </table>
 </div>
@@ -84,12 +83,12 @@ Part 2, section 12.6 TPM_IDENTITY_REQ <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="3e8dbaf61f67be0b99d3b483f727d786"></a><!-- doxytag: member="tdTPM_IDENTITY_REQ::symAlgorithm" ref="3e8dbaf61f67be0b99d3b483f727d786" args="" -->
+<a class="anchor" name="59a1eaa1ce9b0a0ddb9d48993058c3d9"></a><!-- doxytag: member="tdEFI_IMAGE_LOAD_EVENT::ImageLocationInMemory" ref="59a1eaa1ce9b0a0ddb9d48993058c3d9" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../de/d01/a00897.html">TPM_KEY_PARMS</a> <a class="el" href="../../dc/d2c/a00893.html#3e8dbaf61f67be0b99d3b483f727d786">tdTPM_IDENTITY_REQ::symAlgorithm</a>          </td>
+          <td class="memname"><a class="el" href="../../dd/d95/a01247.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> <a class="el" href="../../dc/d2c/a00893.html#59a1eaa1ce9b0a0ddb9d48993058c3d9">tdEFI_IMAGE_LOAD_EVENT::ImageLocationInMemory</a>          </td>
         </tr>
       </table>
 </div>
@@ -99,27 +98,12 @@ Part 2, section 12.6 TPM_IDENTITY_REQ <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="ae5e754787ba86c85bb961a45874e198"></a><!-- doxytag: member="tdTPM_IDENTITY_REQ::symBlob" ref="ae5e754787ba86c85bb961a45874e198" args="" -->
+<a class="anchor" name="1a12724b977a94bdd8aa789d8f31b9b7"></a><!-- doxytag: member="tdEFI_IMAGE_LOAD_EVENT::LengthOfDevicePath" ref="1a12724b977a94bdd8aa789d8f31b9b7" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>* <a class="el" href="../../dc/d2c/a00893.html#ae5e754787ba86c85bb961a45874e198">tdTPM_IDENTITY_REQ::symBlob</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="db1ca8b822932200c1787517aba5446a"></a><!-- doxytag: member="tdTPM_IDENTITY_REQ::symSize" ref="db1ca8b822932200c1787517aba5446a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../dc/d2c/a00893.html#db1ca8b822932200c1787517aba5446a">tdTPM_IDENTITY_REQ::symSize</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> <a class="el" href="../../dc/d2c/a00893.html#1a12724b977a94bdd8aa789d8f31b9b7">tdEFI_IMAGE_LOAD_EVENT::LengthOfDevicePath</a>          </td>
         </tr>
       </table>
 </div>
@@ -130,7 +114,7 @@ Part 2, section 12.6 TPM_IDENTITY_REQ <hr><h2>Field Documentation</h2>
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:23 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:07 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

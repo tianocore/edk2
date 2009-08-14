@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MISC_BIOS_CHARACTERISTICS Struct Reference</title>
+<title>MdePkg[ALL]: ELTORITO_CATALOG Union Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,83 +21,108 @@
   </div>
 </div>
 <div class="contents">
-<h1>MISC_BIOS_CHARACTERISTICS Struct Reference</h1><!-- doxytag: class="MISC_BIOS_CHARACTERISTICS" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>ELTORITO_CATALOG Union Reference</h1><!-- doxytag: class="ELTORITO_CATALOG" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#5c80bda5ef887bff406353a94dfe32e2">Reserved</a>:2</td></tr>
+<tr><td class="memItemLeft" nowrap>struct {</td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Bits 0-1.  <a href="#5c80bda5ef887bff406353a94dfe32e2"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#f71934d8874418bf4da0e483f2b0bd54">Unknown</a>:1</td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d7/dc3/a00682.html#1c86c427499a71e95bcecae3120f1dd6">Reserved</a> [0x20]</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#af6137f407ea3fd2868088c221002256">BiosCharacteristicsNotSupported</a>:1</td></tr>
+<tr><td class="memItemLeft" nowrap valign="top">}&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#289980b5f7b3d569a76d2f1464c5c051">Unknown</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#c27ca04b4fb2b4a49c76475c08ab4665">IsaIsSupported</a>:1</td></tr>
+<tr><td class="memItemLeft" nowrap>struct {</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#de3ad1e54e75626ca7abe0e9e6ec06a9">McaIsSupported</a>:1</td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d7/dc3/a00682.html#da753e44605784e380043da935a4ead7">Indicator</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#4b955915c0c6cfe7048a549ead7fc2df">EisaIsSupported</a>:1</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Must be 01.  <a href="#64163441636986f7b9f26753dda0ad67"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d7/dc3/a00682.html#877cffe97cae095af58c3abb8ef7c894">PlatformId</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#c29117e196bf13915b8018d3e1ffd4f8">PciIsSupported</a>:1</td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d7/dc3/a00682.html#3970e70929fdc4255ca2e7713feb8f7e">Reserved</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#495faecea41554937029f9851701b148">PcmciaIsSupported</a>:1</td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d7/dc3/a00682.html#58fe917da08c0ae5dab6ef7d5685df3d">ManufacId</a> [24]</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#8eb9dbd2c5b29c1425af2874b35baee9">PlugAndPlayIsSupported</a>:1</td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d7/dc3/a00682.html#f0452e987182b3607ea0fd80e308ab71">Checksum</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#103e1eb477af94644a55f8e67f518850">ApmIsSupported</a>:1</td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d7/dc3/a00682.html#0dbd5faf592c618bac4d6b84decc9e18">Id55AA</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#1c429c742af81dab0f946b77f062b0b0">BiosIsUpgradable</a>:1</td></tr>
+<tr><td class="memItemLeft" nowrap valign="top">}&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#e92f54088428611c9662670c4c5479df">Catalog</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#e7fbc9967bb8425bfe309f57631fda83">BiosShadowingAllowed</a>:1</td></tr>
+<tr><td class="memItemLeft" nowrap>struct {</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#9187c29a44a10bf1e6e0ccb7a164fa3d">VlVesaIsSupported</a>:1</td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d7/dc3/a00682.html#da753e44605784e380043da935a4ead7">Indicator</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#c88ed3630890212b9954246869c77f04">EscdSupportIsAvailable</a>:1</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">88 = Bootable, 00 = Not Bootable  <a href="#556d78067b066f8bb6ebc05de96b91e5"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d7/dc3/a00682.html#436d01a9ebfae5d49328dd32292def56">MediaType</a>: 4</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#9fc60d60c81233c558e335946337baf3">BootFromCdIsSupported</a>:1</td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d7/dc3/a00682.html#b8f8c24023234631f44f7c914b149632">Reserved1</a>: 4</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#6934b3d3b69754edd5f6012d8095aadf">SelectableBootIsSupported</a>:1</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Must be 0.  <a href="#6875ebdea8c3a220931f6bc7cad89728"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d7/dc3/a00682.html#19e254000a7e3279f2d7a3d946aa075b">LoadSegment</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#49038e9305e13d3e494072b198db1b5a">RomBiosIsSocketed</a>:1</td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d7/dc3/a00682.html#a1c00a874e3c087bbd823bd7e7d81995">SystemType</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#da4c3cf3ac628397bf922fd15f2fab0c">BootFromPcmciaIsSupported</a>:1</td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d7/dc3/a00682.html#5e964137cef738288f2cb6dfb061bb73">Reserved2</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#90b50bc9175f69f9a8caf08096982292">EDDSpecificationIsSupported</a>:1</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Must be 0.  <a href="#465f17517f04b9097da1c5832f31b247"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d7/dc3/a00682.html#8167bb2376d9e59b8d5ace954d6b7fa6">SectorCount</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#c15bcdfebe71d04d4311369a9bd39a1b">JapaneseNecFloppyIsSupported</a>:1</td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d7/dc3/a00682.html#d4d1345656a89ed9e0a3d1c68e8648c4">Lba</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#2ecf2b7dd7ba299d688a74001bd1a14c">JapaneseToshibaFloppyIsSupported</a>:1</td></tr>
+<tr><td class="memItemLeft" nowrap valign="top">}&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#4f45e14e257e4e3f2b5a6959920df59f">Boot</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#a48a58c5b3e5d8fa26e3aab2dcf88274">Floppy525_360IsSupported</a>:1</td></tr>
+<tr><td class="memItemLeft" nowrap>struct {</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#bc164143a7bc4a1bcf4d43532894596c">Floppy525_12IsSupported</a>:1</td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d7/dc3/a00682.html#da753e44605784e380043da935a4ead7">Indicator</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#b59143be4e6f40c571c76e264d877380">Floppy35_720IsSupported</a>:1</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">90 - Header, more header follw, 91 - Final Header  <a href="#9b6801858ed308c5f4d99a56af4dfd31"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d7/dc3/a00682.html#877cffe97cae095af58c3abb8ef7c894">PlatformId</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#8dace4de3838ccc7672af1396eac4244">Floppy35_288IsSupported</a>:1</td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d7/dc3/a00682.html#a988e85df3cb17f8139a3e263fc3738f">SectionEntries</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#d21e0eb354657eff299698a56a0101f4">PrintScreenIsSupported</a>:1</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Number of section entries following this header.  <a href="#5b93f35adf7b4b716654d553edb26eb6"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d7/dc3/a00682.html#0d57445216fea84cc82655e9f3a3a0c2">Id</a> [28]</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#7be9bb2c62e60742ab1894a3f12b8033">Keyboard8042IsSupported</a>:1</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#40e186b46048d7ce795b2c56047439b4">SerialIsSupported</a>:1</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#6360d7f4107351cc2c23f3334214079e">PrinterIsSupported</a>:1</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#ba3810a8f75f441048e2c8a1cfae636f">CgaMonoIsSupported</a>:1</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#f647d50b871fc93602396fd771eda852">NecPc98</a>:1</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#8378a0eb3dc47425f0a002d148c441da">ReservedForVendor</a>:32</td></tr>
+<tr><td class="memItemLeft" nowrap valign="top">}&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dc3/a00682.html#d7382a021ab7e7d0d882d5e22fb1348c">Section</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-BIOS Characteristics Defines which functions the BIOS supports. PCI, PCMCIA, Flash, etc. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="103e1eb477af94644a55f8e67f518850"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::ApmIsSupported" ref="103e1eb477af94644a55f8e67f518850" args="" -->
+Catalog Entry <hr><h2>Field Documentation</h2>
+<a class="anchor" name="4f45e14e257e4e3f2b5a6959920df59f"></a><!-- doxytag: member="ELTORITO_CATALOG::Boot" ref="4f45e14e257e4e3f2b5a6959920df59f" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#103e1eb477af94644a55f8e67f518850">MISC_BIOS_CHARACTERISTICS::ApmIsSupported</a>          </td>
+          <td class="memname">struct { ... }   <a class="el" href="../../d7/dc3/a00682.html#4f45e14e257e4e3f2b5a6959920df59f">ELTORITO_CATALOG::Boot</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Initial/Default Entry or Section Entry 
+</div>
+</div><p>
+<a class="anchor" name="e92f54088428611c9662670c4c5479df"></a><!-- doxytag: member="ELTORITO_CATALOG::Catalog" ref="e92f54088428611c9662670c4c5479df" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct { ... }   <a class="el" href="../../d7/dc3/a00682.html#e92f54088428611c9662670c4c5479df">ELTORITO_CATALOG::Catalog</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Catalog validation entry (Catalog header) 
+</div>
+</div><p>
+<a class="anchor" name="f0452e987182b3607ea0fd80e308ab71"></a><!-- doxytag: member="ELTORITO_CATALOG::Checksum" ref="f0452e987182b3607ea0fd80e308ab71" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d7/dc3/a00682.html#f0452e987182b3607ea0fd80e308ab71">ELTORITO_CATALOG::Checksum</a>          </td>
         </tr>
       </table>
 </div>
@@ -107,12 +132,12 @@ BIOS Characteristics Defines which functions the BIOS supports. PCI, PCMCIA, Fla
 
 </div>
 </div><p>
-<a class="anchor" name="af6137f407ea3fd2868088c221002256"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::BiosCharacteristicsNotSupported" ref="af6137f407ea3fd2868088c221002256" args="" -->
+<a class="anchor" name="0d57445216fea84cc82655e9f3a3a0c2"></a><!-- doxytag: member="ELTORITO_CATALOG::Id" ref="0d57445216fea84cc82655e9f3a3a0c2" args="[28]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#af6137f407ea3fd2868088c221002256">MISC_BIOS_CHARACTERISTICS::BiosCharacteristicsNotSupported</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> <a class="el" href="../../d7/dc3/a00682.html#0d57445216fea84cc82655e9f3a3a0c2">ELTORITO_CATALOG::Id</a>[28]          </td>
         </tr>
       </table>
 </div>
@@ -122,12 +147,12 @@ BIOS Characteristics Defines which functions the BIOS supports. PCI, PCMCIA, Fla
 
 </div>
 </div><p>
-<a class="anchor" name="1c429c742af81dab0f946b77f062b0b0"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::BiosIsUpgradable" ref="1c429c742af81dab0f946b77f062b0b0" args="" -->
+<a class="anchor" name="0dbd5faf592c618bac4d6b84decc9e18"></a><!-- doxytag: member="ELTORITO_CATALOG::Id55AA" ref="0dbd5faf592c618bac4d6b84decc9e18" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#1c429c742af81dab0f946b77f062b0b0">MISC_BIOS_CHARACTERISTICS::BiosIsUpgradable</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d7/dc3/a00682.html#0dbd5faf592c618bac4d6b84decc9e18">ELTORITO_CATALOG::Id55AA</a>          </td>
         </tr>
       </table>
 </div>
@@ -137,12 +162,30 @@ BIOS Characteristics Defines which functions the BIOS supports. PCI, PCMCIA, Fla
 
 </div>
 </div><p>
-<a class="anchor" name="e7fbc9967bb8425bfe309f57631fda83"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::BiosShadowingAllowed" ref="e7fbc9967bb8425bfe309f57631fda83" args="" -->
+<a class="anchor" name="da753e44605784e380043da935a4ead7"></a><!-- doxytag: member="ELTORITO_CATALOG::Indicator" ref="da753e44605784e380043da935a4ead7" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#e7fbc9967bb8425bfe309f57631fda83">MISC_BIOS_CHARACTERISTICS::BiosShadowingAllowed</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d7/dc3/a00682.html#da753e44605784e380043da935a4ead7">ELTORITO_CATALOG::Indicator</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Must be 01. 
+<p>
+90 - Header, more header follw, 91 - Final Header<p>
+88 = Bootable, 00 = Not Bootable 
+</div>
+</div><p>
+<a class="anchor" name="d4d1345656a89ed9e0a3d1c68e8648c4"></a><!-- doxytag: member="ELTORITO_CATALOG::Lba" ref="d4d1345656a89ed9e0a3d1c68e8648c4" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#d4d1345656a89ed9e0a3d1c68e8648c4">ELTORITO_CATALOG::Lba</a>          </td>
         </tr>
       </table>
 </div>
@@ -152,12 +195,12 @@ BIOS Characteristics Defines which functions the BIOS supports. PCI, PCMCIA, Fla
 
 </div>
 </div><p>
-<a class="anchor" name="9fc60d60c81233c558e335946337baf3"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::BootFromCdIsSupported" ref="9fc60d60c81233c558e335946337baf3" args="" -->
+<a class="anchor" name="19e254000a7e3279f2d7a3d946aa075b"></a><!-- doxytag: member="ELTORITO_CATALOG::LoadSegment" ref="19e254000a7e3279f2d7a3d946aa075b" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#9fc60d60c81233c558e335946337baf3">MISC_BIOS_CHARACTERISTICS::BootFromCdIsSupported</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d7/dc3/a00682.html#19e254000a7e3279f2d7a3d946aa075b">ELTORITO_CATALOG::LoadSegment</a>          </td>
         </tr>
       </table>
 </div>
@@ -167,12 +210,12 @@ BIOS Characteristics Defines which functions the BIOS supports. PCI, PCMCIA, Fla
 
 </div>
 </div><p>
-<a class="anchor" name="da4c3cf3ac628397bf922fd15f2fab0c"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::BootFromPcmciaIsSupported" ref="da4c3cf3ac628397bf922fd15f2fab0c" args="" -->
+<a class="anchor" name="58fe917da08c0ae5dab6ef7d5685df3d"></a><!-- doxytag: member="ELTORITO_CATALOG::ManufacId" ref="58fe917da08c0ae5dab6ef7d5685df3d" args="[24]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#da4c3cf3ac628397bf922fd15f2fab0c">MISC_BIOS_CHARACTERISTICS::BootFromPcmciaIsSupported</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> <a class="el" href="../../d7/dc3/a00682.html#58fe917da08c0ae5dab6ef7d5685df3d">ELTORITO_CATALOG::ManufacId</a>[24]          </td>
         </tr>
       </table>
 </div>
@@ -182,12 +225,12 @@ BIOS Characteristics Defines which functions the BIOS supports. PCI, PCMCIA, Fla
 
 </div>
 </div><p>
-<a class="anchor" name="ba3810a8f75f441048e2c8a1cfae636f"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::CgaMonoIsSupported" ref="ba3810a8f75f441048e2c8a1cfae636f" args="" -->
+<a class="anchor" name="436d01a9ebfae5d49328dd32292def56"></a><!-- doxytag: member="ELTORITO_CATALOG::MediaType" ref="436d01a9ebfae5d49328dd32292def56" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#ba3810a8f75f441048e2c8a1cfae636f">MISC_BIOS_CHARACTERISTICS::CgaMonoIsSupported</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d7/dc3/a00682.html#436d01a9ebfae5d49328dd32292def56">ELTORITO_CATALOG::MediaType</a>          </td>
         </tr>
       </table>
 </div>
@@ -197,12 +240,12 @@ BIOS Characteristics Defines which functions the BIOS supports. PCI, PCMCIA, Fla
 
 </div>
 </div><p>
-<a class="anchor" name="90b50bc9175f69f9a8caf08096982292"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::EDDSpecificationIsSupported" ref="90b50bc9175f69f9a8caf08096982292" args="" -->
+<a class="anchor" name="877cffe97cae095af58c3abb8ef7c894"></a><!-- doxytag: member="ELTORITO_CATALOG::PlatformId" ref="877cffe97cae095af58c3abb8ef7c894" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#90b50bc9175f69f9a8caf08096982292">MISC_BIOS_CHARACTERISTICS::EDDSpecificationIsSupported</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d7/dc3/a00682.html#877cffe97cae095af58c3abb8ef7c894">ELTORITO_CATALOG::PlatformId</a>          </td>
         </tr>
       </table>
 </div>
@@ -212,12 +255,12 @@ BIOS Characteristics Defines which functions the BIOS supports. PCI, PCMCIA, Fla
 
 </div>
 </div><p>
-<a class="anchor" name="4b955915c0c6cfe7048a549ead7fc2df"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::EisaIsSupported" ref="4b955915c0c6cfe7048a549ead7fc2df" args="" -->
+<a class="anchor" name="3970e70929fdc4255ca2e7713feb8f7e"></a><!-- doxytag: member="ELTORITO_CATALOG::Reserved" ref="3970e70929fdc4255ca2e7713feb8f7e" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#4b955915c0c6cfe7048a549ead7fc2df">MISC_BIOS_CHARACTERISTICS::EisaIsSupported</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d7/dc3/a00682.html#1c86c427499a71e95bcecae3120f1dd6">ELTORITO_CATALOG::Reserved</a>          </td>
         </tr>
       </table>
 </div>
@@ -227,12 +270,12 @@ BIOS Characteristics Defines which functions the BIOS supports. PCI, PCMCIA, Fla
 
 </div>
 </div><p>
-<a class="anchor" name="c88ed3630890212b9954246869c77f04"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::EscdSupportIsAvailable" ref="c88ed3630890212b9954246869c77f04" args="" -->
+<a class="anchor" name="1c86c427499a71e95bcecae3120f1dd6"></a><!-- doxytag: member="ELTORITO_CATALOG::Reserved" ref="1c86c427499a71e95bcecae3120f1dd6" args="[0x20]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#c88ed3630890212b9954246869c77f04">MISC_BIOS_CHARACTERISTICS::EscdSupportIsAvailable</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> <a class="el" href="../../d7/dc3/a00682.html#1c86c427499a71e95bcecae3120f1dd6">ELTORITO_CATALOG::Reserved</a>[0x20]          </td>
         </tr>
       </table>
 </div>
@@ -242,12 +285,78 @@ BIOS Characteristics Defines which functions the BIOS supports. PCI, PCMCIA, Fla
 
 </div>
 </div><p>
-<a class="anchor" name="8dace4de3838ccc7672af1396eac4244"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::Floppy35_288IsSupported" ref="8dace4de3838ccc7672af1396eac4244" args="" -->
+<a class="anchor" name="b8f8c24023234631f44f7c914b149632"></a><!-- doxytag: member="ELTORITO_CATALOG::Reserved1" ref="b8f8c24023234631f44f7c914b149632" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#8dace4de3838ccc7672af1396eac4244">MISC_BIOS_CHARACTERISTICS::Floppy35_288IsSupported</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d7/dc3/a00682.html#b8f8c24023234631f44f7c914b149632">ELTORITO_CATALOG::Reserved1</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Must be 0. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="5e964137cef738288f2cb6dfb061bb73"></a><!-- doxytag: member="ELTORITO_CATALOG::Reserved2" ref="5e964137cef738288f2cb6dfb061bb73" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d7/dc3/a00682.html#5e964137cef738288f2cb6dfb061bb73">ELTORITO_CATALOG::Reserved2</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Must be 0. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="d7382a021ab7e7d0d882d5e22fb1348c"></a><!-- doxytag: member="ELTORITO_CATALOG::Section" ref="d7382a021ab7e7d0d882d5e22fb1348c" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct { ... }   <a class="el" href="../../d7/dc3/a00682.html#d7382a021ab7e7d0d882d5e22fb1348c">ELTORITO_CATALOG::Section</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Section Header Entry 
+</div>
+</div><p>
+<a class="anchor" name="a988e85df3cb17f8139a3e263fc3738f"></a><!-- doxytag: member="ELTORITO_CATALOG::SectionEntries" ref="a988e85df3cb17f8139a3e263fc3738f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d7/dc3/a00682.html#a988e85df3cb17f8139a3e263fc3738f">ELTORITO_CATALOG::SectionEntries</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Number of section entries following this header. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="8167bb2376d9e59b8d5ace954d6b7fa6"></a><!-- doxytag: member="ELTORITO_CATALOG::SectorCount" ref="8167bb2376d9e59b8d5ace954d6b7fa6" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d7/dc3/a00682.html#8167bb2376d9e59b8d5ace954d6b7fa6">ELTORITO_CATALOG::SectorCount</a>          </td>
         </tr>
       </table>
 </div>
@@ -257,12 +366,12 @@ BIOS Characteristics Defines which functions the BIOS supports. PCI, PCMCIA, Fla
 
 </div>
 </div><p>
-<a class="anchor" name="b59143be4e6f40c571c76e264d877380"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::Floppy35_720IsSupported" ref="b59143be4e6f40c571c76e264d877380" args="" -->
+<a class="anchor" name="a1c00a874e3c087bbd823bd7e7d81995"></a><!-- doxytag: member="ELTORITO_CATALOG::SystemType" ref="a1c00a874e3c087bbd823bd7e7d81995" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#b59143be4e6f40c571c76e264d877380">MISC_BIOS_CHARACTERISTICS::Floppy35_720IsSupported</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d7/dc3/a00682.html#a1c00a874e3c087bbd823bd7e7d81995">ELTORITO_CATALOG::SystemType</a>          </td>
         </tr>
       </table>
 </div>
@@ -272,299 +381,12 @@ BIOS Characteristics Defines which functions the BIOS supports. PCI, PCMCIA, Fla
 
 </div>
 </div><p>
-<a class="anchor" name="bc164143a7bc4a1bcf4d43532894596c"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::Floppy525_12IsSupported" ref="bc164143a7bc4a1bcf4d43532894596c" args="" -->
+<a class="anchor" name="289980b5f7b3d569a76d2f1464c5c051"></a><!-- doxytag: member="ELTORITO_CATALOG::Unknown" ref="289980b5f7b3d569a76d2f1464c5c051" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#bc164143a7bc4a1bcf4d43532894596c">MISC_BIOS_CHARACTERISTICS::Floppy525_12IsSupported</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="a48a58c5b3e5d8fa26e3aab2dcf88274"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::Floppy525_360IsSupported" ref="a48a58c5b3e5d8fa26e3aab2dcf88274" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#a48a58c5b3e5d8fa26e3aab2dcf88274">MISC_BIOS_CHARACTERISTICS::Floppy525_360IsSupported</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="c27ca04b4fb2b4a49c76475c08ab4665"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::IsaIsSupported" ref="c27ca04b4fb2b4a49c76475c08ab4665" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#c27ca04b4fb2b4a49c76475c08ab4665">MISC_BIOS_CHARACTERISTICS::IsaIsSupported</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="c15bcdfebe71d04d4311369a9bd39a1b"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::JapaneseNecFloppyIsSupported" ref="c15bcdfebe71d04d4311369a9bd39a1b" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#c15bcdfebe71d04d4311369a9bd39a1b">MISC_BIOS_CHARACTERISTICS::JapaneseNecFloppyIsSupported</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="2ecf2b7dd7ba299d688a74001bd1a14c"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::JapaneseToshibaFloppyIsSupported" ref="2ecf2b7dd7ba299d688a74001bd1a14c" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#2ecf2b7dd7ba299d688a74001bd1a14c">MISC_BIOS_CHARACTERISTICS::JapaneseToshibaFloppyIsSupported</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="7be9bb2c62e60742ab1894a3f12b8033"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::Keyboard8042IsSupported" ref="7be9bb2c62e60742ab1894a3f12b8033" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#7be9bb2c62e60742ab1894a3f12b8033">MISC_BIOS_CHARACTERISTICS::Keyboard8042IsSupported</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="de3ad1e54e75626ca7abe0e9e6ec06a9"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::McaIsSupported" ref="de3ad1e54e75626ca7abe0e9e6ec06a9" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#de3ad1e54e75626ca7abe0e9e6ec06a9">MISC_BIOS_CHARACTERISTICS::McaIsSupported</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="f647d50b871fc93602396fd771eda852"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::NecPc98" ref="f647d50b871fc93602396fd771eda852" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#f647d50b871fc93602396fd771eda852">MISC_BIOS_CHARACTERISTICS::NecPc98</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="c29117e196bf13915b8018d3e1ffd4f8"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::PciIsSupported" ref="c29117e196bf13915b8018d3e1ffd4f8" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#c29117e196bf13915b8018d3e1ffd4f8">MISC_BIOS_CHARACTERISTICS::PciIsSupported</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="495faecea41554937029f9851701b148"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::PcmciaIsSupported" ref="495faecea41554937029f9851701b148" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#495faecea41554937029f9851701b148">MISC_BIOS_CHARACTERISTICS::PcmciaIsSupported</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="8eb9dbd2c5b29c1425af2874b35baee9"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::PlugAndPlayIsSupported" ref="8eb9dbd2c5b29c1425af2874b35baee9" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#8eb9dbd2c5b29c1425af2874b35baee9">MISC_BIOS_CHARACTERISTICS::PlugAndPlayIsSupported</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="6360d7f4107351cc2c23f3334214079e"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::PrinterIsSupported" ref="6360d7f4107351cc2c23f3334214079e" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#6360d7f4107351cc2c23f3334214079e">MISC_BIOS_CHARACTERISTICS::PrinterIsSupported</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="d21e0eb354657eff299698a56a0101f4"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::PrintScreenIsSupported" ref="d21e0eb354657eff299698a56a0101f4" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#d21e0eb354657eff299698a56a0101f4">MISC_BIOS_CHARACTERISTICS::PrintScreenIsSupported</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="5c80bda5ef887bff406353a94dfe32e2"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::Reserved" ref="5c80bda5ef887bff406353a94dfe32e2" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#5c80bda5ef887bff406353a94dfe32e2">MISC_BIOS_CHARACTERISTICS::Reserved</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Bits 0-1. 
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="8378a0eb3dc47425f0a002d148c441da"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::ReservedForVendor" ref="8378a0eb3dc47425f0a002d148c441da" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#8378a0eb3dc47425f0a002d148c441da">MISC_BIOS_CHARACTERISTICS::ReservedForVendor</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Bits 32-63. Bits 32-47 reserved for BIOS vendor and bits 48-63 reserved for System Vendor. 
-</div>
-</div><p>
-<a class="anchor" name="49038e9305e13d3e494072b198db1b5a"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::RomBiosIsSocketed" ref="49038e9305e13d3e494072b198db1b5a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#49038e9305e13d3e494072b198db1b5a">MISC_BIOS_CHARACTERISTICS::RomBiosIsSocketed</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="6934b3d3b69754edd5f6012d8095aadf"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::SelectableBootIsSupported" ref="6934b3d3b69754edd5f6012d8095aadf" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#6934b3d3b69754edd5f6012d8095aadf">MISC_BIOS_CHARACTERISTICS::SelectableBootIsSupported</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="40e186b46048d7ce795b2c56047439b4"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::SerialIsSupported" ref="40e186b46048d7ce795b2c56047439b4" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#40e186b46048d7ce795b2c56047439b4">MISC_BIOS_CHARACTERISTICS::SerialIsSupported</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="f71934d8874418bf4da0e483f2b0bd54"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::Unknown" ref="f71934d8874418bf4da0e483f2b0bd54" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#f71934d8874418bf4da0e483f2b0bd54">MISC_BIOS_CHARACTERISTICS::Unknown</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="9187c29a44a10bf1e6e0ccb7a164fa3d"></a><!-- doxytag: member="MISC_BIOS_CHARACTERISTICS::VlVesaIsSupported" ref="9187c29a44a10bf1e6e0ccb7a164fa3d" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d7/dc3/a00682.html#9187c29a44a10bf1e6e0ccb7a164fa3d">MISC_BIOS_CHARACTERISTICS::VlVesaIsSupported</a>          </td>
+          <td class="memname">struct { ... }   <a class="el" href="../../d7/dc3/a00682.html#289980b5f7b3d569a76d2f1464c5c051">ELTORITO_CATALOG::Unknown</a>          </td>
         </tr>
       </table>
 </div>
@@ -575,7 +397,7 @@ Bits 32-63. Bits 32-47 reserved for BIOS vendor and bits 48-63 reserved for Syst
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:19 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:51 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_TCP4_VARIABLE_DATA Struct Reference</title>
+<title>MdePkg[ALL]: EFI_SCREEN_DESCRIPTOR Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,23 +21,34 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_TCP4_VARIABLE_DATA Struct Reference</h1><!-- doxytag: class="EFI_TCP4_VARIABLE_DATA" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_SCREEN_DESCRIPTOR Struct Reference</h1><!-- doxytag: class="EFI_SCREEN_DESCRIPTOR" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/dd8/a00615.html#b896ec415f1a11390db631318e91ed79">DriverHandle</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/dd8/a00615.html#d4efd25dabd51b1fd2a0420985ce60d5">LeftColumn</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/dd8/a00615.html#2acfcd9420e60bbbbb8f15a226be5bd3">ServiceCount</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/dd8/a00615.html#c54badd8a66be803289e1a759212fde6">RightColumn</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d6e/a00613.html">EFI_TCP4_SERVICE_POINT</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/dd8/a00615.html#cd2f6f448dc4bb35392e8959189cdf40">Services</a> [1]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/dd8/a00615.html#9c3734f50880714c15e1e573300576b3">TopRow</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/dd8/a00615.html#98f793e720e07a90a75825ef6826717d">BottomRow</a></td></tr>
 
 </table>
+<hr><a name="_details"></a><h2>Detailed Description</h2>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>LeftColumn</em>&nbsp;</td><td>Value that designates the text column where the browser window will begin from the left-hand side of the screen</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>RightColumn</em>&nbsp;</td><td>Value that designates the text column where the browser window will end on the right-hand side of the screen.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>TopRow</em>&nbsp;</td><td>Value that designates the text row from the top of the screen where the browser window will start.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>BottomRow</em>&nbsp;</td><td>Value that designates the text row from the bottom of the screen where the browser window will end. </td></tr>
+  </table>
+</dl>
 <hr><h2>Field Documentation</h2>
-<a class="anchor" name="b896ec415f1a11390db631318e91ed79"></a><!-- doxytag: member="EFI_TCP4_VARIABLE_DATA::DriverHandle" ref="b896ec415f1a11390db631318e91ed79" args="" -->
+<a class="anchor" name="98f793e720e07a90a75825ef6826717d"></a><!-- doxytag: member="EFI_SCREEN_DESCRIPTOR::BottomRow" ref="98f793e720e07a90a75825ef6826717d" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> <a class="el" href="../../d5/dd8/a00615.html#b896ec415f1a11390db631318e91ed79">EFI_TCP4_VARIABLE_DATA::DriverHandle</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> <a class="el" href="../../d5/dd8/a00615.html#98f793e720e07a90a75825ef6826717d">EFI_SCREEN_DESCRIPTOR::BottomRow</a>          </td>
         </tr>
       </table>
 </div>
@@ -47,12 +58,12 @@
 
 </div>
 </div><p>
-<a class="anchor" name="2acfcd9420e60bbbbb8f15a226be5bd3"></a><!-- doxytag: member="EFI_TCP4_VARIABLE_DATA::ServiceCount" ref="2acfcd9420e60bbbbb8f15a226be5bd3" args="" -->
+<a class="anchor" name="d4efd25dabd51b1fd2a0420985ce60d5"></a><!-- doxytag: member="EFI_SCREEN_DESCRIPTOR::LeftColumn" ref="d4efd25dabd51b1fd2a0420985ce60d5" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d5/dd8/a00615.html#2acfcd9420e60bbbbb8f15a226be5bd3">EFI_TCP4_VARIABLE_DATA::ServiceCount</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> <a class="el" href="../../d5/dd8/a00615.html#d4efd25dabd51b1fd2a0420985ce60d5">EFI_SCREEN_DESCRIPTOR::LeftColumn</a>          </td>
         </tr>
       </table>
 </div>
@@ -62,12 +73,27 @@
 
 </div>
 </div><p>
-<a class="anchor" name="cd2f6f448dc4bb35392e8959189cdf40"></a><!-- doxytag: member="EFI_TCP4_VARIABLE_DATA::Services" ref="cd2f6f448dc4bb35392e8959189cdf40" args="[1]" -->
+<a class="anchor" name="c54badd8a66be803289e1a759212fde6"></a><!-- doxytag: member="EFI_SCREEN_DESCRIPTOR::RightColumn" ref="c54badd8a66be803289e1a759212fde6" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d1/d6e/a00613.html">EFI_TCP4_SERVICE_POINT</a> <a class="el" href="../../d5/dd8/a00615.html#cd2f6f448dc4bb35392e8959189cdf40">EFI_TCP4_VARIABLE_DATA::Services</a>[1]          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> <a class="el" href="../../d5/dd8/a00615.html#c54badd8a66be803289e1a759212fde6">EFI_SCREEN_DESCRIPTOR::RightColumn</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="9c3734f50880714c15e1e573300576b3"></a><!-- doxytag: member="EFI_SCREEN_DESCRIPTOR::TopRow" ref="9c3734f50880714c15e1e573300576b3" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> <a class="el" href="../../d5/dd8/a00615.html#9c3734f50880714c15e1e573300576b3">EFI_SCREEN_DESCRIPTOR::TopRow</a>          </td>
         </tr>
       </table>
 </div>
@@ -78,7 +104,7 @@
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:19 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:43 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

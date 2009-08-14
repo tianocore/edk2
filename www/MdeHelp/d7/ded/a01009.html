@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Ebc/ProcessorBind.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Guid/EventGroup.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,372 +21,154 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Ebc/ProcessorBind.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Guid/EventGroup.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/ded/a01009.html#68147285bdc4404f85af351bbf3a5968">MDE_CPU_EBC</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/ded/a01009.html#bc101e6a0dee97fd6b3e90be389960d8">EFI_EVENT_GROUP_EXIT_BOOT_SERVICES</a>&nbsp;&nbsp;&nbsp;{ 0x27abf055, 0xb1b8, 0x4c26, { 0x80, 0x48, 0x74, 0x8f, 0x37, 0xba, 0xa2, 0xdf } }</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/ded/a01009.html#2137fc5695cbd81598a4dba1ac6fab31">MAX_BIT</a>&nbsp;&nbsp;&nbsp;(1ULL &lt;&lt; (sizeof (INTN) * 8 - 1))</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/ded/a01009.html#0114788f18f879aed1bd4e226f1eebb2">EFI_EVENT_GROUP_VIRTUAL_ADDRESS_CHANGE</a>&nbsp;&nbsp;&nbsp;{ 0x13fa7698, 0xc831, 0x49c7, { 0x87, 0xea, 0x8f, 0x43, 0xfc, 0xc2, 0x51, 0x96 } }</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/ded/a01009.html#60bb431495193072cc1abf0c2452e18a">MAX_2_BITS</a>&nbsp;&nbsp;&nbsp;(3ULL &lt;&lt; (sizeof (INTN) * 8 - 2))</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/ded/a01009.html#9975abc5166c76abd1de253b52ae897f">EFI_EVENT_GROUP_MEMORY_MAP_CHANGE</a>&nbsp;&nbsp;&nbsp;{ 0x78bee926, 0x692f, 0x48fd, { 0x9e, 0xdb, 0x1, 0x42, 0x2e, 0xf0, 0xd7, 0xab } }</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/ded/a01009.html#aba07841c3e227bc8bdd8ccdad149349">MAX_ADDRESS</a>&nbsp;&nbsp;&nbsp;((<a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>) ~0)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/ded/a01009.html#17536579c70d973f56d204ca0ff3b7c2">EFI_EVENT_GROUP_READY_TO_BOOT</a>&nbsp;&nbsp;&nbsp;{ 0x7ce88fb3, 0x4bd7, 0x4679, { 0x87, 0xa8, 0xa8, 0xd8, 0xde, 0xe5, 0x0d, 0x2b } }</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/ded/a01009.html#8aed43eb1b3c346772c127482b4b5372">CPU_STACK_ALIGNMENT</a>&nbsp;&nbsp;&nbsp;sizeof(<a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>)</td></tr>
+<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/ded/a01009.html#7e4fab28c1d63a4b4f2ac61c7e4c0a35">gEfiEventExitBootServicesGuid</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/ded/a01009.html#f5aee859ec14423bc427edf78c30d083">GLOBAL_REMOVE_IF_UNREFERENCED</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/ded/a01009.html#b428fd63cd7315f70d942398c829aa0c">gEfiEventVirtualAddressChangeGuid</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/ded/a01009.html#7e840a4e1d7fbaf630dc62358d80a845">FUNCTION_ENTRY_POINT</a>(FunctionPointer)&nbsp;&nbsp;&nbsp;(VOID *)(<a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>)(FunctionPointer)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/ded/a01009.html#5f505590ae457d01883aa8ec67c7829d">gEfiEventMemoryMapChangeGuid</a></td></tr>
 
-<tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef char&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/ded/a01009.html#307b8734c020247f6bac4fcde0dcfbb9">INT8</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef unsigned char&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/ded/a01009.html#112e3146cb38b6ee95e64d85842e380a">BOOLEAN</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef unsigned char&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/ded/a01009.html#b27e9918b538ce9d8ca692479b375b6a">UINT8</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef char&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/ded/a01009.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef short&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/ded/a01009.html#57de7cb8e702b1746127a4d5137fa455">INT16</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef unsigned short&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/ded/a01009.html#09f1a1fb2293e33483cc8d44aefb1eb1">UINT16</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef unsigned short&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/ded/a01009.html#7ae886893bd2a2ae253eb2b021a48724">CHAR16</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/ded/a01009.html#63021d67d54286c2163bcdb43a6f2569">INT32</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef unsigned int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/ded/a01009.html#e1e6edbbc26d6fbc71a90190d0266018">UINT32</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef __int64&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/ded/a01009.html#1e9aeaef48b6012036cbbcf0f6614eaa">INT64</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef unsigned __int64&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/ded/a01009.html#ae17ebb9ef7279d026817fb22f8aebe9">UINT64</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef long&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/ded/a01009.html#8693e3bedb91ab009b6b7e6ec9aa179c">INTN</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef unsigned long&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/ded/a01009.html#888294298ab5799dc811a39558c2aa2b">UINTN</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/ded/a01009.html#80196743a69160050c463099b0f12797">gEfiEventReadyToBootGuid</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Processor or compiler specific defines and types for EBC.<p>
-We currently only have one EBC compiler so there may be some Intel compiler specific functions in this file.<p>
-Copyright (c) 2006 - 2009, Intel Corporation<br>
- All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
+GUIDs for gBS-&gt;CreateEventEx Event Groups. Defined in UEFI spec 2.0.<p>
+Copyright (c) 2006, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
-<a class="anchor" name="8aed43eb1b3c346772c127482b4b5372"></a><!-- doxytag: member="ProcessorBind.h::CPU_STACK_ALIGNMENT" ref="8aed43eb1b3c346772c127482b4b5372" args="" -->
+<a class="anchor" name="bc101e6a0dee97fd6b3e90be389960d8"></a><!-- doxytag: member="EventGroup.h::EFI_EVENT_GROUP_EXIT_BOOT_SERVICES" ref="bc101e6a0dee97fd6b3e90be389960d8" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define CPU_STACK_ALIGNMENT&nbsp;&nbsp;&nbsp;sizeof(<a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>)          </td>
+          <td class="memname">#define EFI_EVENT_GROUP_EXIT_BOOT_SERVICES&nbsp;&nbsp;&nbsp;{ 0x27abf055, 0xb1b8, 0x4c26, { 0x80, 0x48, 0x74, 0x8f, 0x37, 0xba, 0xa2, 0xdf } }          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The stack alignment required for EBC 
+
 </div>
 </div><p>
-<a class="anchor" name="7e840a4e1d7fbaf630dc62358d80a845"></a><!-- doxytag: member="ProcessorBind.h::FUNCTION_ENTRY_POINT" ref="7e840a4e1d7fbaf630dc62358d80a845" args="(FunctionPointer)" -->
+<a class="anchor" name="9975abc5166c76abd1de253b52ae897f"></a><!-- doxytag: member="EventGroup.h::EFI_EVENT_GROUP_MEMORY_MAP_CHANGE" ref="9975abc5166c76abd1de253b52ae897f" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define FUNCTION_ENTRY_POINT          </td>
-          <td>(</td>
-          <td class="paramtype">FunctionPointer&nbsp;</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td>&nbsp;&nbsp;&nbsp;(VOID *)(<a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>)(FunctionPointer)</td>
+          <td class="memname">#define EFI_EVENT_GROUP_MEMORY_MAP_CHANGE&nbsp;&nbsp;&nbsp;{ 0x78bee926, 0x692f, 0x48fd, { 0x9e, 0xdb, 0x1, 0x42, 0x2e, 0xf0, 0xd7, 0xab } }          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Return the pointer to the first instruction of a function given a function pointer. On EBC architectures, these two pointer values are the same, so the implementation of this macro is very simple.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>FunctionPointer</em>&nbsp;</td><td>A pointer to a function.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The pointer to the first instruction of a function given a function pointer. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="f5aee859ec14423bc427edf78c30d083"></a><!-- doxytag: member="ProcessorBind.h::GLOBAL_REMOVE_IF_UNREFERENCED" ref="f5aee859ec14423bc427edf78c30d083" args="" -->
+<a class="anchor" name="17536579c70d973f56d204ca0ff3b7c2"></a><!-- doxytag: member="EventGroup.h::EFI_EVENT_GROUP_READY_TO_BOOT" ref="17536579c70d973f56d204ca0ff3b7c2" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define GLOBAL_REMOVE_IF_UNREFERENCED          </td>
+          <td class="memname">#define EFI_EVENT_GROUP_READY_TO_BOOT&nbsp;&nbsp;&nbsp;{ 0x7ce88fb3, 0x4bd7, 0x4679, { 0x87, 0xa8, 0xa8, 0xd8, 0xde, 0xe5, 0x0d, 0x2b } }          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Modifier to ensure that all protocol member functions and EFI intrinsics use the correct C calling convention. All protocol member functions and EFI intrinsics are required to modify their member functions with EFIAPI. The Microsoft* C compiler can removed references to unreferenced data items if the /OPT:REF linker option is used. We defined a macro as this is a a non standard extension. Currently not supported by the EBC compiler 
+
 </div>
 </div><p>
-<a class="anchor" name="60bb431495193072cc1abf0c2452e18a"></a><!-- doxytag: member="ProcessorBind.h::MAX_2_BITS" ref="60bb431495193072cc1abf0c2452e18a" args="" -->
+<a class="anchor" name="0114788f18f879aed1bd4e226f1eebb2"></a><!-- doxytag: member="EventGroup.h::EFI_EVENT_GROUP_VIRTUAL_ADDRESS_CHANGE" ref="0114788f18f879aed1bd4e226f1eebb2" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define MAX_2_BITS&nbsp;&nbsp;&nbsp;(3ULL &lt;&lt; (sizeof (INTN) * 8 - 2))          </td>
+          <td class="memname">#define EFI_EVENT_GROUP_VIRTUAL_ADDRESS_CHANGE&nbsp;&nbsp;&nbsp;{ 0x13fa7698, 0xc831, 0x49c7, { 0x87, 0xea, 0x8f, 0x43, 0xfc, 0xc2, 0x51, 0x96 } }          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-A value of native width with the two highest bits set. Scalable macro to set the most 2 significant bits in a natural number 
+
 </div>
 </div><p>
-<a class="anchor" name="aba07841c3e227bc8bdd8ccdad149349"></a><!-- doxytag: member="ProcessorBind.h::MAX_ADDRESS" ref="aba07841c3e227bc8bdd8ccdad149349" args="" -->
+<hr><h2>Variable Documentation</h2>
+<a class="anchor" name="7e4fab28c1d63a4b4f2ac61c7e4c0a35"></a><!-- doxytag: member="EventGroup.h::gEfiEventExitBootServicesGuid" ref="7e4fab28c1d63a4b4f2ac61c7e4c0a35" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define MAX_ADDRESS&nbsp;&nbsp;&nbsp;((<a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>) ~0)          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../d7/ded/a01009.html#7e4fab28c1d63a4b4f2ac61c7e4c0a35">gEfiEventExitBootServicesGuid</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Maximum legal EBC address 
+
 </div>
 </div><p>
-<a class="anchor" name="2137fc5695cbd81598a4dba1ac6fab31"></a><!-- doxytag: member="ProcessorBind.h::MAX_BIT" ref="2137fc5695cbd81598a4dba1ac6fab31" args="" -->
+<a class="anchor" name="5f505590ae457d01883aa8ec67c7829d"></a><!-- doxytag: member="EventGroup.h::gEfiEventMemoryMapChangeGuid" ref="5f505590ae457d01883aa8ec67c7829d" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define MAX_BIT&nbsp;&nbsp;&nbsp;(1ULL &lt;&lt; (sizeof (INTN) * 8 - 1))          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../d7/ded/a01009.html#5f505590ae457d01883aa8ec67c7829d">gEfiEventMemoryMapChangeGuid</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-A value of native width with the highest bit set. Scalable macro to set the most significant bit in a natural number 
+
 </div>
 </div><p>
-<a class="anchor" name="68147285bdc4404f85af351bbf3a5968"></a><!-- doxytag: member="ProcessorBind.h::MDE_CPU_EBC" ref="68147285bdc4404f85af351bbf3a5968" args="" -->
+<a class="anchor" name="80196743a69160050c463099b0f12797"></a><!-- doxytag: member="EventGroup.h::gEfiEventReadyToBootGuid" ref="80196743a69160050c463099b0f12797" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define MDE_CPU_EBC          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../d7/ded/a01009.html#80196743a69160050c463099b0f12797">gEfiEventReadyToBootGuid</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Define the processor type so other code can make processor based choices 
+
 </div>
 </div><p>
-<hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="112e3146cb38b6ee95e64d85842e380a"></a><!-- doxytag: member="ProcessorBind.h::BOOLEAN" ref="112e3146cb38b6ee95e64d85842e380a" args="" -->
+<a class="anchor" name="b428fd63cd7315f70d942398c829aa0c"></a><!-- doxytag: member="EventGroup.h::gEfiEventVirtualAddressChangeGuid" ref="b428fd63cd7315f70d942398c829aa0c" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef unsigned char <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../d7/ded/a01009.html#b428fd63cd7315f70d942398c829aa0c">gEfiEventVirtualAddressChangeGuid</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Logical Boolean. 1-byte value containing 0 for FALSE or a 1 for TRUE. Other values are undefined. 
-</div>
-</div><p>
-<a class="anchor" name="7ae886893bd2a2ae253eb2b021a48724"></a><!-- doxytag: member="ProcessorBind.h::CHAR16" ref="7ae886893bd2a2ae253eb2b021a48724" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef unsigned short <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
 
-<p>
-2-byte Character. Unless otherwise specified all strings are stored in the UTF-16 encoding format as defined by Unicode 2.1 and ISO/IEC 10646 standards. 
-</div>
-</div><p>
-<a class="anchor" name="2f68f0189367ead40015f7c0ec68eb9e"></a><!-- doxytag: member="ProcessorBind.h::CHAR8" ref="2f68f0189367ead40015f7c0ec68eb9e" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef char <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-1-byte Character 
-</div>
-</div><p>
-<a class="anchor" name="57de7cb8e702b1746127a4d5137fa455"></a><!-- doxytag: member="ProcessorBind.h::INT16" ref="57de7cb8e702b1746127a4d5137fa455" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef short <a class="el" href="../../d0/d2b/a01010.html#ca6c48234f001fdbd6597515a4cc088d">INT16</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-2-byte signed value 
-</div>
-</div><p>
-<a class="anchor" name="63021d67d54286c2163bcdb43a6f2569"></a><!-- doxytag: member="ProcessorBind.h::INT32" ref="63021d67d54286c2163bcdb43a6f2569" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef int <a class="el" href="../../d0/d2b/a01010.html#2c951cf9402cd61f04b43789471dbe7c">INT32</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-4-byte signed value 
-</div>
-</div><p>
-<a class="anchor" name="1e9aeaef48b6012036cbbcf0f6614eaa"></a><!-- doxytag: member="ProcessorBind.h::INT64" ref="1e9aeaef48b6012036cbbcf0f6614eaa" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef __int64 <a class="el" href="../../d0/d2b/a01010.html#296e89aa9d3de65d9ba04e7060118260">INT64</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-8-byte signed value 
-</div>
-</div><p>
-<a class="anchor" name="307b8734c020247f6bac4fcde0dcfbb9"></a><!-- doxytag: member="ProcessorBind.h::INT8" ref="307b8734c020247f6bac4fcde0dcfbb9" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef char <a class="el" href="../../d0/d2b/a01010.html#0e16e07c1525c9688ca6fbd34f334ec8">INT8</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-1-byte signed value 
-</div>
-</div><p>
-<a class="anchor" name="8693e3bedb91ab009b6b7e6ec9aa179c"></a><!-- doxytag: member="ProcessorBind.h::INTN" ref="8693e3bedb91ab009b6b7e6ec9aa179c" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef long <a class="el" href="../../d0/d2b/a01010.html#88c67527ff19b831c672f11fc131ee53">INTN</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Signed value of native width. (4 bytes on supported 32-bit processor instructions, 8 bytes on supported 64-bit processor instructions) "long" type scales to the processor native size with EBC compiler 
-</div>
-</div><p>
-<a class="anchor" name="09f1a1fb2293e33483cc8d44aefb1eb1"></a><!-- doxytag: member="ProcessorBind.h::UINT16" ref="09f1a1fb2293e33483cc8d44aefb1eb1" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef unsigned short <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-2-byte unsigned value 
-</div>
-</div><p>
-<a class="anchor" name="e1e6edbbc26d6fbc71a90190d0266018"></a><!-- doxytag: member="ProcessorBind.h::UINT32" ref="e1e6edbbc26d6fbc71a90190d0266018" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef unsigned int <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-4-byte unsigned value 
-</div>
-</div><p>
-<a class="anchor" name="ae17ebb9ef7279d026817fb22f8aebe9"></a><!-- doxytag: member="ProcessorBind.h::UINT64" ref="ae17ebb9ef7279d026817fb22f8aebe9" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef unsigned __int64 <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-8-byte unsigned value 
-</div>
-</div><p>
-<a class="anchor" name="b27e9918b538ce9d8ca692479b375b6a"></a><!-- doxytag: member="ProcessorBind.h::UINT8" ref="b27e9918b538ce9d8ca692479b375b6a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef unsigned char <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-1-byte unsigned value 
-</div>
-</div><p>
-<a class="anchor" name="888294298ab5799dc811a39558c2aa2b"></a><!-- doxytag: member="ProcessorBind.h::UINTN" ref="888294298ab5799dc811a39558c2aa2b" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef unsigned long <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Unsigned value of native width. (4 bytes on supported 32-bit processor instructions, 8 bytes on supported 64-bit processor instructions) "long" type scales to the processor native size with EBC compiler 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:07 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:12 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

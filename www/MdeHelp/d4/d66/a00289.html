@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: ATAPI_REQUEST_SENSE_DATA Struct Reference</title>
+<title>MdePkg[ALL]: ATA_IDENTIFY_DATA Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,117 +21,129 @@
   </div>
 </div>
 <div class="contents">
-<h1>ATAPI_REQUEST_SENSE_DATA Struct Reference</h1><!-- doxytag: class="ATAPI_REQUEST_SENSE_DATA" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>ATA_IDENTIFY_DATA Struct Reference</h1><!-- doxytag: class="ATA_IDENTIFY_DATA" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#199db7e38e3afaddbeea41358874c10d">error_code</a>: 7</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#5d38db77f558841aeff823cb24134ca5">config</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#65047bcbbe14f120ccbf4b7ef9b7afde">valid</a>: 1</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">General Configuration.  <a href="#5d38db77f558841aeff823cb24134ca5"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#dcce3830d3e74f89c00274272fdb8aed">cylinders</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#0ee575899cf339043b5cd04c2fd1cfc5">reserved_1</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Number of Cylinders.  <a href="#dcce3830d3e74f89c00274272fdb8aed"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#425d7822cca4a4376e84eaff6108077e">reserved_2</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#1bf08d37e9a6d2f4529155f6020f235e">sense_key</a>: 4</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#f056cf093b7146ad11d5efbab1f39dc2">heads</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#04dc3a5a1654f1e178fb0f1378520b96">reserved_2</a>: 1</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Number of logical heads.  <a href="#f056cf093b7146ad11d5efbab1f39dc2"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#e00218f367d0d471b8ac114e621b9a82">vendor_data1</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#16d0940d6ce955d447c12a6d13d3a8d3">Vendor_specifc_1</a>: 3</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#6f1f2d4d34c4408b65b894c45d9b414b">vendor_data2</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#fbc976e125b51fc0b5e2c22a21ec3e97">vendor_specific_3</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#1ce9788a05c6ddba5427994bc64e2271">sectors_per_track</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#533e7240621a485d093091d2111e5ce7">vendor_specific_4</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#b7959c5c0dd5f95ca37010b358c53e4d">vendor_specific_7_9</a> [3]</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#2a5aabe7e160b87598fb25e4163d2fb9">vendor_specific_5</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#45f61f49fb2ddcf56377a6f902ead60d">SerialNo</a> [20]</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#c3ba9d0a701d8fb725762b26992481f1">vendor_specific_6</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">ASCII.  <a href="#45f61f49fb2ddcf56377a6f902ead60d"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#1f76edab7d84882ff6473451c5ea428a">vendor_specific_20_21</a> [2]</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#0107b9c7a7ace9548659fe2ba08fc92c">addnl_sense_length</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#8f9600bb429d54a124ebc739e42d260e">ecc_bytes_available</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">n - 7  <a href="#0107b9c7a7ace9548659fe2ba08fc92c"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#50d21c3f39ed41ef8ba550c5cb2d8cd9">vendor_specific_8</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#60b6b3dbb04f9b89ee9523808a99b422">FirmwareVer</a> [8]</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#f96303d0b61b8e036c6ffb07c13c8e10">vendor_specific_9</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">ASCII.  <a href="#60b6b3dbb04f9b89ee9523808a99b422"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#31a8d2c5bdc4004d59a8285a7dcbb2ad">ModelName</a> [40]</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#c6a16c6cd2dd1b7e1b45ba386eafc56d">vendor_specific_10</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">ASCII.  <a href="#31a8d2c5bdc4004d59a8285a7dcbb2ad"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#f23b56c09596d72b6555f31eeb327e5e">multi_sector_cmd_max_sct_cnt</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#f21d44844d2a6a86b6262b93bd0fb2fa">vendor_specific_11</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#f702b559649eaeafca98c87b3a16b187">reserved_48</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#37db3347e7dbcee299eff168fb425a01">addnl_sense_code</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#059eb4550a6436dcf3f14c6a0701f735">capabilities</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">mandatory  <a href="#37db3347e7dbcee299eff168fb425a01"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#a9063009c5e5f05dade3ecc8c4d8db80">addnl_sense_code_qualifier</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#af211efdb6e4834ac26b416513d1edc2">reserved_50</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">mandatory  <a href="#a9063009c5e5f05dade3ecc8c4d8db80"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#a6eac9a8eccfaeb49c83e71b134be356">field_replaceable_unit_code</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#1e57edb709d64acf964b8911a14f6733">pio_cycle_timing</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">optional  <a href="#a6eac9a8eccfaeb49c83e71b134be356"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#680a1c4fdded371e2ef99485d00fe2f6">sense_key_specific_15</a>: 7</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#eb7c5b4be74366dc211da41be1428f6f">reserved_52</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#cb728730628d98c64ef228b491f9699c">SKSV</a>: 1</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#385b8ebca7beec50a148ff3476592207">field_validity</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#9d4d484f494034d03d4cbb7012e49ab3">sense_key_specific_16</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#043c43fc2a354b7f31bc7acfafb0954c">current_cylinders</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#41a0516e9009bd89c8a1e0530fd10be3">sense_key_specific_17</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#ec30f308f1bd4e0bfa3b6ef0afdabe1c">current_heads</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#24ce893f4b87a7793b96d0eb12468b20">current_sectors</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#acee4e1b5dc7962408f07f2f05509a7d">CurrentCapacityLsb</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#7505dbf9c006f0028eeaa1808bc38616">CurrentCapacityMsb</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#47c6ab90ccab220f809ac899ad8cd737">reserved_59</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#01fe536cf2a1d2acc6b074c6c66ce177">user_addressable_sectors_lo</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#d4631f9703c2fca8d55d106df80cf433">user_addressable_sectors_hi</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#9e4e1adf46a557a7aa8c178b4cf567b0">reserved_62</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#f6ffe8c16181174eb6acc7db1c0ef00c">multi_word_dma_mode</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#91a4c1b3f91faf6f9ec7589a5af7e806">advanced_pio_modes</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#1de9bfff80a9a70f2a23834110f0c78a">min_multi_word_dma_cycle_time</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#abcbc42d448c7141a634e2df1819f427">rec_multi_word_dma_cycle_time</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#233258a3468605ad6bfa0b2b991cb0b1">min_pio_cycle_time_without_flow_control</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#d2006d55785c74dfc0bc06939326ef7d">min_pio_cycle_time_with_flow_control</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#bb2bc4a1fe860d6502955c3d41ee2ca6">reserved_69_79</a> [11]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#3ed15040d46bd18b9ba7342d9d053b23">major_version_no</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#242ed330c471fc3b72658461a554560d">minor_version_no</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#d089cfd10ff9e7fa8c21e86fb0572361">command_set_supported_82</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">word 82  <a href="#d089cfd10ff9e7fa8c21e86fb0572361"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#9ce214b25ee88aa0cba2a976eccc75b9">command_set_supported_83</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">word 83  <a href="#9ce214b25ee88aa0cba2a976eccc75b9"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#69b816910fff3576a01d471e6be0f7ce">command_set_feature_extn</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">word 84  <a href="#69b816910fff3576a01d471e6be0f7ce"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#1e774e858b28652ee95792123e1085f2">command_set_feature_enb_85</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">word 85  <a href="#1e774e858b28652ee95792123e1085f2"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#6321ca3d3f9b57d9a5d584bc0da71caf">command_set_feature_enb_86</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">word 86  <a href="#6321ca3d3f9b57d9a5d584bc0da71caf"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#706e48f0bc12a9d5f2ec365748b8985c">command_set_feature_default</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">word 87  <a href="#706e48f0bc12a9d5f2ec365748b8985c"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#1595e552ff1aaccf732c959b0e0f5d33">ultra_dma_mode</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">word 88  <a href="#1595e552ff1aaccf732c959b0e0f5d33"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#77ff137f0519b6a970afaf4b73233ce9">reserved_89_127</a> [39]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#651d94840244294f587f678b7a2e04ac">security_status</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#df8e519048272ae7cce9df3fede75415">vendor_data_129_159</a> [31]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d66/a00289.html#4b979144155ed3a94434b00d14088c8c">reserved_160_255</a> [96]</td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Request Sense Standard Data, defined in SFF-8070i(ATAPI Removable Rewritable Specification) <hr><h2>Field Documentation</h2>
-<a class="anchor" name="37db3347e7dbcee299eff168fb425a01"></a><!-- doxytag: member="ATAPI_REQUEST_SENSE_DATA::addnl_sense_code" ref="37db3347e7dbcee299eff168fb425a01" args="" -->
+<a class="el" href="../../d4/d66/a00289.html">ATA_IDENTIFY_DATA</a> is defined in ATA-5 <hr><h2>Field Documentation</h2>
+<a class="anchor" name="91a4c1b3f91faf6f9ec7589a5af7e806"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::advanced_pio_modes" ref="91a4c1b3f91faf6f9ec7589a5af7e806" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d66/a00289.html#37db3347e7dbcee299eff168fb425a01">ATAPI_REQUEST_SENSE_DATA::addnl_sense_code</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-mandatory 
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="a9063009c5e5f05dade3ecc8c4d8db80"></a><!-- doxytag: member="ATAPI_REQUEST_SENSE_DATA::addnl_sense_code_qualifier" ref="a9063009c5e5f05dade3ecc8c4d8db80" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d66/a00289.html#a9063009c5e5f05dade3ecc8c4d8db80">ATAPI_REQUEST_SENSE_DATA::addnl_sense_code_qualifier</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-mandatory 
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="0107b9c7a7ace9548659fe2ba08fc92c"></a><!-- doxytag: member="ATAPI_REQUEST_SENSE_DATA::addnl_sense_length" ref="0107b9c7a7ace9548659fe2ba08fc92c" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d66/a00289.html#0107b9c7a7ace9548659fe2ba08fc92c">ATAPI_REQUEST_SENSE_DATA::addnl_sense_length</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-n - 7 
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="199db7e38e3afaddbeea41358874c10d"></a><!-- doxytag: member="ATAPI_REQUEST_SENSE_DATA::error_code" ref="199db7e38e3afaddbeea41358874c10d" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d66/a00289.html#199db7e38e3afaddbeea41358874c10d">ATAPI_REQUEST_SENSE_DATA::error_code</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#91a4c1b3f91faf6f9ec7589a5af7e806">ATA_IDENTIFY_DATA::advanced_pio_modes</a>          </td>
         </tr>
       </table>
 </div>
@@ -141,29 +153,12 @@ n - 7
 
 </div>
 </div><p>
-<a class="anchor" name="a6eac9a8eccfaeb49c83e71b134be356"></a><!-- doxytag: member="ATAPI_REQUEST_SENSE_DATA::field_replaceable_unit_code" ref="a6eac9a8eccfaeb49c83e71b134be356" args="" -->
+<a class="anchor" name="059eb4550a6436dcf3f14c6a0701f735"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::capabilities" ref="059eb4550a6436dcf3f14c6a0701f735" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d66/a00289.html#a6eac9a8eccfaeb49c83e71b134be356">ATAPI_REQUEST_SENSE_DATA::field_replaceable_unit_code</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-optional 
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="0ee575899cf339043b5cd04c2fd1cfc5"></a><!-- doxytag: member="ATAPI_REQUEST_SENSE_DATA::reserved_1" ref="0ee575899cf339043b5cd04c2fd1cfc5" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d66/a00289.html#0ee575899cf339043b5cd04c2fd1cfc5">ATAPI_REQUEST_SENSE_DATA::reserved_1</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#059eb4550a6436dcf3f14c6a0701f735">ATA_IDENTIFY_DATA::capabilities</a>          </td>
         </tr>
       </table>
 </div>
@@ -173,12 +168,131 @@ optional
 
 </div>
 </div><p>
-<a class="anchor" name="04dc3a5a1654f1e178fb0f1378520b96"></a><!-- doxytag: member="ATAPI_REQUEST_SENSE_DATA::reserved_2" ref="04dc3a5a1654f1e178fb0f1378520b96" args="" -->
+<a class="anchor" name="706e48f0bc12a9d5f2ec365748b8985c"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::command_set_feature_default" ref="706e48f0bc12a9d5f2ec365748b8985c" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d66/a00289.html#04dc3a5a1654f1e178fb0f1378520b96">ATAPI_REQUEST_SENSE_DATA::reserved_2</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#706e48f0bc12a9d5f2ec365748b8985c">ATA_IDENTIFY_DATA::command_set_feature_default</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+word 87 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="1e774e858b28652ee95792123e1085f2"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::command_set_feature_enb_85" ref="1e774e858b28652ee95792123e1085f2" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#1e774e858b28652ee95792123e1085f2">ATA_IDENTIFY_DATA::command_set_feature_enb_85</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+word 85 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="6321ca3d3f9b57d9a5d584bc0da71caf"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::command_set_feature_enb_86" ref="6321ca3d3f9b57d9a5d584bc0da71caf" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#6321ca3d3f9b57d9a5d584bc0da71caf">ATA_IDENTIFY_DATA::command_set_feature_enb_86</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+word 86 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="69b816910fff3576a01d471e6be0f7ce"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::command_set_feature_extn" ref="69b816910fff3576a01d471e6be0f7ce" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#69b816910fff3576a01d471e6be0f7ce">ATA_IDENTIFY_DATA::command_set_feature_extn</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+word 84 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="d089cfd10ff9e7fa8c21e86fb0572361"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::command_set_supported_82" ref="d089cfd10ff9e7fa8c21e86fb0572361" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#d089cfd10ff9e7fa8c21e86fb0572361">ATA_IDENTIFY_DATA::command_set_supported_82</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+word 82 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="9ce214b25ee88aa0cba2a976eccc75b9"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::command_set_supported_83" ref="9ce214b25ee88aa0cba2a976eccc75b9" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#9ce214b25ee88aa0cba2a976eccc75b9">ATA_IDENTIFY_DATA::command_set_supported_83</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+word 83 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="5d38db77f558841aeff823cb24134ca5"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::config" ref="5d38db77f558841aeff823cb24134ca5" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#5d38db77f558841aeff823cb24134ca5">ATA_IDENTIFY_DATA::config</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+General Configuration. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="043c43fc2a354b7f31bc7acfafb0954c"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::current_cylinders" ref="043c43fc2a354b7f31bc7acfafb0954c" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#043c43fc2a354b7f31bc7acfafb0954c">ATA_IDENTIFY_DATA::current_cylinders</a>          </td>
         </tr>
       </table>
 </div>
@@ -188,12 +302,12 @@ optional
 
 </div>
 </div><p>
-<a class="anchor" name="1bf08d37e9a6d2f4529155f6020f235e"></a><!-- doxytag: member="ATAPI_REQUEST_SENSE_DATA::sense_key" ref="1bf08d37e9a6d2f4529155f6020f235e" args="" -->
+<a class="anchor" name="ec30f308f1bd4e0bfa3b6ef0afdabe1c"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::current_heads" ref="ec30f308f1bd4e0bfa3b6ef0afdabe1c" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d66/a00289.html#1bf08d37e9a6d2f4529155f6020f235e">ATAPI_REQUEST_SENSE_DATA::sense_key</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#ec30f308f1bd4e0bfa3b6ef0afdabe1c">ATA_IDENTIFY_DATA::current_heads</a>          </td>
         </tr>
       </table>
 </div>
@@ -203,12 +317,12 @@ optional
 
 </div>
 </div><p>
-<a class="anchor" name="680a1c4fdded371e2ef99485d00fe2f6"></a><!-- doxytag: member="ATAPI_REQUEST_SENSE_DATA::sense_key_specific_15" ref="680a1c4fdded371e2ef99485d00fe2f6" args="" -->
+<a class="anchor" name="24ce893f4b87a7793b96d0eb12468b20"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::current_sectors" ref="24ce893f4b87a7793b96d0eb12468b20" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d66/a00289.html#680a1c4fdded371e2ef99485d00fe2f6">ATAPI_REQUEST_SENSE_DATA::sense_key_specific_15</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#24ce893f4b87a7793b96d0eb12468b20">ATA_IDENTIFY_DATA::current_sectors</a>          </td>
         </tr>
       </table>
 </div>
@@ -218,12 +332,12 @@ optional
 
 </div>
 </div><p>
-<a class="anchor" name="9d4d484f494034d03d4cbb7012e49ab3"></a><!-- doxytag: member="ATAPI_REQUEST_SENSE_DATA::sense_key_specific_16" ref="9d4d484f494034d03d4cbb7012e49ab3" args="" -->
+<a class="anchor" name="acee4e1b5dc7962408f07f2f05509a7d"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::CurrentCapacityLsb" ref="acee4e1b5dc7962408f07f2f05509a7d" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d66/a00289.html#9d4d484f494034d03d4cbb7012e49ab3">ATAPI_REQUEST_SENSE_DATA::sense_key_specific_16</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#acee4e1b5dc7962408f07f2f05509a7d">ATA_IDENTIFY_DATA::CurrentCapacityLsb</a>          </td>
         </tr>
       </table>
 </div>
@@ -233,12 +347,12 @@ optional
 
 </div>
 </div><p>
-<a class="anchor" name="41a0516e9009bd89c8a1e0530fd10be3"></a><!-- doxytag: member="ATAPI_REQUEST_SENSE_DATA::sense_key_specific_17" ref="41a0516e9009bd89c8a1e0530fd10be3" args="" -->
+<a class="anchor" name="7505dbf9c006f0028eeaa1808bc38616"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::CurrentCapacityMsb" ref="7505dbf9c006f0028eeaa1808bc38616" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d66/a00289.html#41a0516e9009bd89c8a1e0530fd10be3">ATAPI_REQUEST_SENSE_DATA::sense_key_specific_17</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#7505dbf9c006f0028eeaa1808bc38616">ATA_IDENTIFY_DATA::CurrentCapacityMsb</a>          </td>
         </tr>
       </table>
 </div>
@@ -248,12 +362,29 @@ optional
 
 </div>
 </div><p>
-<a class="anchor" name="cb728730628d98c64ef228b491f9699c"></a><!-- doxytag: member="ATAPI_REQUEST_SENSE_DATA::SKSV" ref="cb728730628d98c64ef228b491f9699c" args="" -->
+<a class="anchor" name="dcce3830d3e74f89c00274272fdb8aed"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::cylinders" ref="dcce3830d3e74f89c00274272fdb8aed" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d66/a00289.html#cb728730628d98c64ef228b491f9699c">ATAPI_REQUEST_SENSE_DATA::SKSV</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#dcce3830d3e74f89c00274272fdb8aed">ATA_IDENTIFY_DATA::cylinders</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Number of Cylinders. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="8f9600bb429d54a124ebc739e42d260e"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::ecc_bytes_available" ref="8f9600bb429d54a124ebc739e42d260e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#8f9600bb429d54a124ebc739e42d260e">ATA_IDENTIFY_DATA::ecc_bytes_available</a>          </td>
         </tr>
       </table>
 </div>
@@ -263,12 +394,12 @@ optional
 
 </div>
 </div><p>
-<a class="anchor" name="65047bcbbe14f120ccbf4b7ef9b7afde"></a><!-- doxytag: member="ATAPI_REQUEST_SENSE_DATA::valid" ref="65047bcbbe14f120ccbf4b7ef9b7afde" args="" -->
+<a class="anchor" name="385b8ebca7beec50a148ff3476592207"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::field_validity" ref="385b8ebca7beec50a148ff3476592207" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d66/a00289.html#65047bcbbe14f120ccbf4b7ef9b7afde">ATAPI_REQUEST_SENSE_DATA::valid</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#385b8ebca7beec50a148ff3476592207">ATA_IDENTIFY_DATA::field_validity</a>          </td>
         </tr>
       </table>
 </div>
@@ -278,12 +409,46 @@ optional
 
 </div>
 </div><p>
-<a class="anchor" name="16d0940d6ce955d447c12a6d13d3a8d3"></a><!-- doxytag: member="ATAPI_REQUEST_SENSE_DATA::Vendor_specifc_1" ref="16d0940d6ce955d447c12a6d13d3a8d3" args="" -->
+<a class="anchor" name="60b6b3dbb04f9b89ee9523808a99b422"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::FirmwareVer" ref="60b6b3dbb04f9b89ee9523808a99b422" args="[8]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d66/a00289.html#16d0940d6ce955d447c12a6d13d3a8d3">ATAPI_REQUEST_SENSE_DATA::Vendor_specifc_1</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> <a class="el" href="../../d4/d66/a00289.html#60b6b3dbb04f9b89ee9523808a99b422">ATA_IDENTIFY_DATA::FirmwareVer</a>[8]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+ASCII. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="f056cf093b7146ad11d5efbab1f39dc2"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::heads" ref="f056cf093b7146ad11d5efbab1f39dc2" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#f056cf093b7146ad11d5efbab1f39dc2">ATA_IDENTIFY_DATA::heads</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Number of logical heads. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="3ed15040d46bd18b9ba7342d9d053b23"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::major_version_no" ref="3ed15040d46bd18b9ba7342d9d053b23" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#3ed15040d46bd18b9ba7342d9d053b23">ATA_IDENTIFY_DATA::major_version_no</a>          </td>
         </tr>
       </table>
 </div>
@@ -293,12 +458,12 @@ optional
 
 </div>
 </div><p>
-<a class="anchor" name="c6a16c6cd2dd1b7e1b45ba386eafc56d"></a><!-- doxytag: member="ATAPI_REQUEST_SENSE_DATA::vendor_specific_10" ref="c6a16c6cd2dd1b7e1b45ba386eafc56d" args="" -->
+<a class="anchor" name="1de9bfff80a9a70f2a23834110f0c78a"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::min_multi_word_dma_cycle_time" ref="1de9bfff80a9a70f2a23834110f0c78a" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d66/a00289.html#c6a16c6cd2dd1b7e1b45ba386eafc56d">ATAPI_REQUEST_SENSE_DATA::vendor_specific_10</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#1de9bfff80a9a70f2a23834110f0c78a">ATA_IDENTIFY_DATA::min_multi_word_dma_cycle_time</a>          </td>
         </tr>
       </table>
 </div>
@@ -308,12 +473,12 @@ optional
 
 </div>
 </div><p>
-<a class="anchor" name="f21d44844d2a6a86b6262b93bd0fb2fa"></a><!-- doxytag: member="ATAPI_REQUEST_SENSE_DATA::vendor_specific_11" ref="f21d44844d2a6a86b6262b93bd0fb2fa" args="" -->
+<a class="anchor" name="d2006d55785c74dfc0bc06939326ef7d"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::min_pio_cycle_time_with_flow_control" ref="d2006d55785c74dfc0bc06939326ef7d" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d66/a00289.html#f21d44844d2a6a86b6262b93bd0fb2fa">ATAPI_REQUEST_SENSE_DATA::vendor_specific_11</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#d2006d55785c74dfc0bc06939326ef7d">ATA_IDENTIFY_DATA::min_pio_cycle_time_with_flow_control</a>          </td>
         </tr>
       </table>
 </div>
@@ -323,12 +488,12 @@ optional
 
 </div>
 </div><p>
-<a class="anchor" name="fbc976e125b51fc0b5e2c22a21ec3e97"></a><!-- doxytag: member="ATAPI_REQUEST_SENSE_DATA::vendor_specific_3" ref="fbc976e125b51fc0b5e2c22a21ec3e97" args="" -->
+<a class="anchor" name="233258a3468605ad6bfa0b2b991cb0b1"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::min_pio_cycle_time_without_flow_control" ref="233258a3468605ad6bfa0b2b991cb0b1" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d66/a00289.html#fbc976e125b51fc0b5e2c22a21ec3e97">ATAPI_REQUEST_SENSE_DATA::vendor_specific_3</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#233258a3468605ad6bfa0b2b991cb0b1">ATA_IDENTIFY_DATA::min_pio_cycle_time_without_flow_control</a>          </td>
         </tr>
       </table>
 </div>
@@ -338,12 +503,12 @@ optional
 
 </div>
 </div><p>
-<a class="anchor" name="533e7240621a485d093091d2111e5ce7"></a><!-- doxytag: member="ATAPI_REQUEST_SENSE_DATA::vendor_specific_4" ref="533e7240621a485d093091d2111e5ce7" args="" -->
+<a class="anchor" name="242ed330c471fc3b72658461a554560d"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::minor_version_no" ref="242ed330c471fc3b72658461a554560d" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d66/a00289.html#533e7240621a485d093091d2111e5ce7">ATAPI_REQUEST_SENSE_DATA::vendor_specific_4</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#242ed330c471fc3b72658461a554560d">ATA_IDENTIFY_DATA::minor_version_no</a>          </td>
         </tr>
       </table>
 </div>
@@ -353,12 +518,29 @@ optional
 
 </div>
 </div><p>
-<a class="anchor" name="2a5aabe7e160b87598fb25e4163d2fb9"></a><!-- doxytag: member="ATAPI_REQUEST_SENSE_DATA::vendor_specific_5" ref="2a5aabe7e160b87598fb25e4163d2fb9" args="" -->
+<a class="anchor" name="31a8d2c5bdc4004d59a8285a7dcbb2ad"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::ModelName" ref="31a8d2c5bdc4004d59a8285a7dcbb2ad" args="[40]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d66/a00289.html#2a5aabe7e160b87598fb25e4163d2fb9">ATAPI_REQUEST_SENSE_DATA::vendor_specific_5</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> <a class="el" href="../../d4/d66/a00289.html#31a8d2c5bdc4004d59a8285a7dcbb2ad">ATA_IDENTIFY_DATA::ModelName</a>[40]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+ASCII. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="f23b56c09596d72b6555f31eeb327e5e"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::multi_sector_cmd_max_sct_cnt" ref="f23b56c09596d72b6555f31eeb327e5e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#f23b56c09596d72b6555f31eeb327e5e">ATA_IDENTIFY_DATA::multi_sector_cmd_max_sct_cnt</a>          </td>
         </tr>
       </table>
 </div>
@@ -368,12 +550,12 @@ optional
 
 </div>
 </div><p>
-<a class="anchor" name="c3ba9d0a701d8fb725762b26992481f1"></a><!-- doxytag: member="ATAPI_REQUEST_SENSE_DATA::vendor_specific_6" ref="c3ba9d0a701d8fb725762b26992481f1" args="" -->
+<a class="anchor" name="f6ffe8c16181174eb6acc7db1c0ef00c"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::multi_word_dma_mode" ref="f6ffe8c16181174eb6acc7db1c0ef00c" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d66/a00289.html#c3ba9d0a701d8fb725762b26992481f1">ATAPI_REQUEST_SENSE_DATA::vendor_specific_6</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#f6ffe8c16181174eb6acc7db1c0ef00c">ATA_IDENTIFY_DATA::multi_word_dma_mode</a>          </td>
         </tr>
       </table>
 </div>
@@ -383,12 +565,12 @@ optional
 
 </div>
 </div><p>
-<a class="anchor" name="50d21c3f39ed41ef8ba550c5cb2d8cd9"></a><!-- doxytag: member="ATAPI_REQUEST_SENSE_DATA::vendor_specific_8" ref="50d21c3f39ed41ef8ba550c5cb2d8cd9" args="" -->
+<a class="anchor" name="1e57edb709d64acf964b8911a14f6733"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::pio_cycle_timing" ref="1e57edb709d64acf964b8911a14f6733" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d66/a00289.html#50d21c3f39ed41ef8ba550c5cb2d8cd9">ATAPI_REQUEST_SENSE_DATA::vendor_specific_8</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#1e57edb709d64acf964b8911a14f6733">ATA_IDENTIFY_DATA::pio_cycle_timing</a>          </td>
         </tr>
       </table>
 </div>
@@ -398,12 +580,316 @@ optional
 
 </div>
 </div><p>
-<a class="anchor" name="f96303d0b61b8e036c6ffb07c13c8e10"></a><!-- doxytag: member="ATAPI_REQUEST_SENSE_DATA::vendor_specific_9" ref="f96303d0b61b8e036c6ffb07c13c8e10" args="" -->
+<a class="anchor" name="abcbc42d448c7141a634e2df1819f427"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::rec_multi_word_dma_cycle_time" ref="abcbc42d448c7141a634e2df1819f427" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d4/d66/a00289.html#f96303d0b61b8e036c6ffb07c13c8e10">ATAPI_REQUEST_SENSE_DATA::vendor_specific_9</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#abcbc42d448c7141a634e2df1819f427">ATA_IDENTIFY_DATA::rec_multi_word_dma_cycle_time</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="4b979144155ed3a94434b00d14088c8c"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::reserved_160_255" ref="4b979144155ed3a94434b00d14088c8c" args="[96]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#4b979144155ed3a94434b00d14088c8c">ATA_IDENTIFY_DATA::reserved_160_255</a>[96]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="425d7822cca4a4376e84eaff6108077e"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::reserved_2" ref="425d7822cca4a4376e84eaff6108077e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#425d7822cca4a4376e84eaff6108077e">ATA_IDENTIFY_DATA::reserved_2</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="f702b559649eaeafca98c87b3a16b187"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::reserved_48" ref="f702b559649eaeafca98c87b3a16b187" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#f702b559649eaeafca98c87b3a16b187">ATA_IDENTIFY_DATA::reserved_48</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="af211efdb6e4834ac26b416513d1edc2"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::reserved_50" ref="af211efdb6e4834ac26b416513d1edc2" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#af211efdb6e4834ac26b416513d1edc2">ATA_IDENTIFY_DATA::reserved_50</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="eb7c5b4be74366dc211da41be1428f6f"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::reserved_52" ref="eb7c5b4be74366dc211da41be1428f6f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#eb7c5b4be74366dc211da41be1428f6f">ATA_IDENTIFY_DATA::reserved_52</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="47c6ab90ccab220f809ac899ad8cd737"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::reserved_59" ref="47c6ab90ccab220f809ac899ad8cd737" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#47c6ab90ccab220f809ac899ad8cd737">ATA_IDENTIFY_DATA::reserved_59</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="9e4e1adf46a557a7aa8c178b4cf567b0"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::reserved_62" ref="9e4e1adf46a557a7aa8c178b4cf567b0" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#9e4e1adf46a557a7aa8c178b4cf567b0">ATA_IDENTIFY_DATA::reserved_62</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="bb2bc4a1fe860d6502955c3d41ee2ca6"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::reserved_69_79" ref="bb2bc4a1fe860d6502955c3d41ee2ca6" args="[11]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#bb2bc4a1fe860d6502955c3d41ee2ca6">ATA_IDENTIFY_DATA::reserved_69_79</a>[11]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="77ff137f0519b6a970afaf4b73233ce9"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::reserved_89_127" ref="77ff137f0519b6a970afaf4b73233ce9" args="[39]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#77ff137f0519b6a970afaf4b73233ce9">ATA_IDENTIFY_DATA::reserved_89_127</a>[39]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="1ce9788a05c6ddba5427994bc64e2271"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::sectors_per_track" ref="1ce9788a05c6ddba5427994bc64e2271" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#1ce9788a05c6ddba5427994bc64e2271">ATA_IDENTIFY_DATA::sectors_per_track</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="651d94840244294f587f678b7a2e04ac"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::security_status" ref="651d94840244294f587f678b7a2e04ac" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#651d94840244294f587f678b7a2e04ac">ATA_IDENTIFY_DATA::security_status</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="45f61f49fb2ddcf56377a6f902ead60d"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::SerialNo" ref="45f61f49fb2ddcf56377a6f902ead60d" args="[20]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> <a class="el" href="../../d4/d66/a00289.html#45f61f49fb2ddcf56377a6f902ead60d">ATA_IDENTIFY_DATA::SerialNo</a>[20]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+ASCII. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="1595e552ff1aaccf732c959b0e0f5d33"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::ultra_dma_mode" ref="1595e552ff1aaccf732c959b0e0f5d33" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#1595e552ff1aaccf732c959b0e0f5d33">ATA_IDENTIFY_DATA::ultra_dma_mode</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+word 88 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="d4631f9703c2fca8d55d106df80cf433"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::user_addressable_sectors_hi" ref="d4631f9703c2fca8d55d106df80cf433" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#d4631f9703c2fca8d55d106df80cf433">ATA_IDENTIFY_DATA::user_addressable_sectors_hi</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="01fe536cf2a1d2acc6b074c6c66ce177"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::user_addressable_sectors_lo" ref="01fe536cf2a1d2acc6b074c6c66ce177" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#01fe536cf2a1d2acc6b074c6c66ce177">ATA_IDENTIFY_DATA::user_addressable_sectors_lo</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="e00218f367d0d471b8ac114e621b9a82"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::vendor_data1" ref="e00218f367d0d471b8ac114e621b9a82" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#e00218f367d0d471b8ac114e621b9a82">ATA_IDENTIFY_DATA::vendor_data1</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="6f1f2d4d34c4408b65b894c45d9b414b"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::vendor_data2" ref="6f1f2d4d34c4408b65b894c45d9b414b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#6f1f2d4d34c4408b65b894c45d9b414b">ATA_IDENTIFY_DATA::vendor_data2</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="df8e519048272ae7cce9df3fede75415"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::vendor_data_129_159" ref="df8e519048272ae7cce9df3fede75415" args="[31]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#df8e519048272ae7cce9df3fede75415">ATA_IDENTIFY_DATA::vendor_data_129_159</a>[31]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="1f76edab7d84882ff6473451c5ea428a"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::vendor_specific_20_21" ref="1f76edab7d84882ff6473451c5ea428a" args="[2]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#1f76edab7d84882ff6473451c5ea428a">ATA_IDENTIFY_DATA::vendor_specific_20_21</a>[2]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="b7959c5c0dd5f95ca37010b358c53e4d"></a><!-- doxytag: member="ATA_IDENTIFY_DATA::vendor_specific_7_9" ref="b7959c5c0dd5f95ca37010b358c53e4d" args="[3]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d66/a00289.html#b7959c5c0dd5f95ca37010b358c53e4d">ATA_IDENTIFY_DATA::vendor_specific_7_9</a>[3]          </td>
         </tr>
       </table>
 </div>
@@ -414,7 +900,7 @@ optional
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:14 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:20 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

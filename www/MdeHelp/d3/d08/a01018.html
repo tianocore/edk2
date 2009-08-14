@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Library/DxeServicesLib.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Guid/HiiKeyBoardLayout.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,223 +21,54 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Library/DxeServicesLib.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Guid/HiiKeyBoardLayout.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
-<tr><td colspan="2"><br><h2>Functions</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d08/a01018.html#c075a3bf116716f418c63344f15692f5">GetSectionFromAnyFv</a> (IN CONST <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *NameGuid, IN <a class="el" href="../../d0/d90/a01059.html#208180af3108068f979d673a752e58d1">EFI_SECTION_TYPE</a> SectionType, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> SectionInstance, OUT VOID **Buffer, OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *Size)</td></tr>
+<tr><td colspan="2"><br><h2>Defines</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d08/a01018.html#c391d2639248bd13902c9b98e6893b49">EFI_HII_SET_KEYBOARD_LAYOUT_EVENT_GUID</a>&nbsp;&nbsp;&nbsp;{ 0x14982a4f, 0xb0ed, 0x45b8, { 0xa8, 0x11, 0x5a, 0x7a, 0x9b, 0xc2, 0x32, 0xdf }}</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d08/a01018.html#c342a3e44b64fb75ff95bed2667d67ab">GetSectionFromFv</a> (IN CONST <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *NameGuid, IN <a class="el" href="../../d0/d90/a01059.html#208180af3108068f979d673a752e58d1">EFI_SECTION_TYPE</a> SectionType, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> SectionInstance, OUT VOID **Buffer, OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *Size)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d08/a01018.html#75ef2bfc2aab6bd99eed459d0cc28a4f">GetSectionFromFfs</a> (IN <a class="el" href="../../d0/d90/a01059.html#208180af3108068f979d673a752e58d1">EFI_SECTION_TYPE</a> SectionType, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> SectionInstance, OUT VOID **Buffer, OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *Size)</td></tr>
+<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d08/a01018.html#9bf0d1f6d73309f8fa0fda82568c6d4f">gEfiHiiKeyBoardLayoutGuid</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-MDE DXE Services Library provides functions that simplify the development of DXE Drivers. These functions help access data from sections of FFS files.<p>
-Copyright (c) 2008, Intel Corporation<br>
- All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Function Documentation</h2>
-<a class="anchor" name="c075a3bf116716f418c63344f15692f5"></a><!-- doxytag: member="DxeServicesLib.h::GetSectionFromAnyFv" ref="c075a3bf116716f418c63344f15692f5" args="(IN CONST EFI_GUID *NameGuid, IN EFI_SECTION_TYPE SectionType, IN UINTN SectionInstance, OUT VOID **Buffer, OUT UINTN *Size)" -->
+HII keyboard layout <a class="el" href="../../d1/d87/a00689.html">GUID</a> as defined in UEFI2.1 specification<p>
+Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
+<dl class="user" compact><dt><b>Revision Reference:</b></dt><dd>GUIDs defined in UEFI 2.1 spec. </dd></dl>
+<hr><h2>Define Documentation</h2>
+<a class="anchor" name="c391d2639248bd13902c9b98e6893b49"></a><!-- doxytag: member="HiiKeyBoardLayout.h::EFI_HII_SET_KEYBOARD_LAYOUT_EVENT_GUID" ref="c391d2639248bd13902c9b98e6893b49" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI GetSectionFromAnyFv           </td>
-          <td>(</td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *&nbsp;</td>
-          <td class="paramname"> <em>NameGuid</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#208180af3108068f979d673a752e58d1">EFI_SECTION_TYPE</a>&nbsp;</td>
-          <td class="paramname"> <em>SectionType</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>SectionInstance</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT VOID **&nbsp;</td>
-          <td class="paramname"> <em>Buffer</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *&nbsp;</td>
-          <td class="paramname"> <em>Size</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EFI_HII_SET_KEYBOARD_LAYOUT_EVENT_GUID&nbsp;&nbsp;&nbsp;{ 0x14982a4f, 0xb0ed, 0x45b8, { 0xa8, 0x11, 0x5a, 0x7a, 0x9b, 0xc2, 0x32, 0xdf }}          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Searches all the available firmware volumes and returns the first matching FFS section.<p>
-This function searches all the firmware volumes for FFS files with an FFS filename specified by NameGuid. The order in which the firmware volumes are searched is not deterministic. For each FFS file found, a search is made for FFS sections of type SectionType. If the FFS file contains at least SectionInstance instances of the FFS section specified by SectionType, then the SectionInstance instance is returned in Buffer. Buffer is allocated using <a class="el" href="../../d6/dcd/a01023.html#646c0f82c2a35557dda175dbfcd26e96">AllocatePool()</a>, and the size of the allocated buffer is returned in Size. It is the caller's responsibility to use <a class="el" href="../../d6/dcd/a01023.html#8b1cbc21e0cebcfc6a992546ec9b4941">FreePool()</a> to free the allocated buffer. See <a class="el" href="../../df/d61/a00031.html#b4b01f77853f9d78136a12c798ead69d">EFI_FIRMWARE_VOLUME2_PROTOCOL.ReadSection()</a> for details on how sections are retrieved from an FFS file based on SectionType and SectionInstance.<p>
-If SectionType is EFI_SECTION_TE, and the search with an FFS file fails, the search will be retried with a section type of EFI_SECTION_PE32. This function must be called with a TPL &lt;= TPL_NOTIFY.<p>
-If NameGuid is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Buffer is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Size is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>NameGuid</em>&nbsp;</td><td>A pointer to to the FFS filename <a class="el" href="../../d9/d0f/a00644.html">GUID</a> to search for within any of the firmware volumes in the platform. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SectionType</em>&nbsp;</td><td>Indicates the FFS section type to search for within the FFS file specified by NameGuid. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SectionInstance</em>&nbsp;</td><td>Indicates which section instance within the FFS file specified by NameGuid to retrieve. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>On output, a pointer to a callee allocated buffer containing the FFS file section that was found. It is the caller's responsibility to free this buffer using <a class="el" href="../../d6/dcd/a01023.html#8b1cbc21e0cebcfc6a992546ec9b4941">FreePool()</a>. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Size</em>&nbsp;</td><td>On output, a pointer to the size, in bytes, of Buffer.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The specified FFS section was returned. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The specified FFS section could not be found. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There are not enough resources available to retrieve the matching FFS section. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The FFS section could not be retrieves due to a device error. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ACCESS_DENIED</em>&nbsp;</td><td>The FFS section could not be retrieves because the firmware volume that contains the matching FFS section does not allow reads. </td></tr>
-  </table>
-</dl>
 
 </div>
 </div><p>
-<a class="anchor" name="75ef2bfc2aab6bd99eed459d0cc28a4f"></a><!-- doxytag: member="DxeServicesLib.h::GetSectionFromFfs" ref="75ef2bfc2aab6bd99eed459d0cc28a4f" args="(IN EFI_SECTION_TYPE SectionType, IN UINTN SectionInstance, OUT VOID **Buffer, OUT UINTN *Size)" -->
+<hr><h2>Variable Documentation</h2>
+<a class="anchor" name="9bf0d1f6d73309f8fa0fda82568c6d4f"></a><!-- doxytag: member="HiiKeyBoardLayout.h::gEfiHiiKeyBoardLayoutGuid" ref="9bf0d1f6d73309f8fa0fda82568c6d4f" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI GetSectionFromFfs           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#208180af3108068f979d673a752e58d1">EFI_SECTION_TYPE</a>&nbsp;</td>
-          <td class="paramname"> <em>SectionType</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>SectionInstance</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT VOID **&nbsp;</td>
-          <td class="paramname"> <em>Buffer</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *&nbsp;</td>
-          <td class="paramname"> <em>Size</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../d3/d08/a01018.html#9bf0d1f6d73309f8fa0fda82568c6d4f">gEfiHiiKeyBoardLayoutGuid</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Searches the FFS file the the currently executing module was loaded from and returns the first matching FFS section.<p>
-This function searches the FFS file that the currently executing module was loaded from for a FFS sections of type SectionType. If the FFS file contains at least SectionInstance instances of the FFS section specified by SectionType, then the SectionInstance instance is returned in Buffer. Buffer is allocated using <a class="el" href="../../d6/dcd/a01023.html#646c0f82c2a35557dda175dbfcd26e96">AllocatePool()</a>, and the size of the allocated buffer is returned in Size. It is the caller's responsibility to use <a class="el" href="../../d6/dcd/a01023.html#8b1cbc21e0cebcfc6a992546ec9b4941">FreePool()</a> to free the allocated buffer. See <a class="el" href="../../df/d61/a00031.html#b4b01f77853f9d78136a12c798ead69d">EFI_FIRMWARE_VOLUME2_PROTOCOL.ReadSection()</a> for details on how sections are retrieved from an FFS file based on SectionType and SectionInstance.<p>
-If the currently executing module was not loaded from an FFS file, then EFI_NOT_FOUND is returned. If SectionType is EFI_SECTION_TE, and the search with an FFS file fails, the search will be retried with a section type of EFI_SECTION_PE32. This function must be called with a TPL &lt;= TPL_NOTIFY.<p>
-If Buffer is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Size is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>SectionType</em>&nbsp;</td><td>Indicates the FFS section type to search for within the FFS file that the currently executing module was loaded from. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SectionInstance</em>&nbsp;</td><td>Indicates which section instance to retrieve within the FFS file that the currently executing module was loaded from. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>On output, a pointer to a callee allocated buffer containing the FFS file section that was found. It is the caller's responsibility to free this buffer using <a class="el" href="../../d6/dcd/a01023.html#8b1cbc21e0cebcfc6a992546ec9b4941">FreePool()</a>. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Size</em>&nbsp;</td><td>On output, a pointer to the size, in bytes, of Buffer.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The specified FFS section was returned. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The specified FFS section could not be found. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There are not enough resources available to retrieve the matching FFS section. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The FFS section could not be retrieves due to a device error. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ACCESS_DENIED</em>&nbsp;</td><td>The FFS section could not be retrieves because the firmware volume that contains the matching FFS section does not allow reads. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="c342a3e44b64fb75ff95bed2667d67ab"></a><!-- doxytag: member="DxeServicesLib.h::GetSectionFromFv" ref="c342a3e44b64fb75ff95bed2667d67ab" args="(IN CONST EFI_GUID *NameGuid, IN EFI_SECTION_TYPE SectionType, IN UINTN SectionInstance, OUT VOID **Buffer, OUT UINTN *Size)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI GetSectionFromFv           </td>
-          <td>(</td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *&nbsp;</td>
-          <td class="paramname"> <em>NameGuid</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#208180af3108068f979d673a752e58d1">EFI_SECTION_TYPE</a>&nbsp;</td>
-          <td class="paramname"> <em>SectionType</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>SectionInstance</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT VOID **&nbsp;</td>
-          <td class="paramname"> <em>Buffer</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *&nbsp;</td>
-          <td class="paramname"> <em>Size</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Searches the firmware volume that the currently executing module was loaded from and returns the first matching FFS section.<p>
-This function searches the firmware volume that the currently executing module was loaded from for an FFS file with an FFS filename specified by NameGuid. If the FFS file is found, a search is made for FFS sections of type SectionType. If the FFS file contains at least SectionInstance instances of the FFS section specified by SectionType, then the SectionInstance instance is returned in Buffer. Buffer is allocated using <a class="el" href="../../d6/dcd/a01023.html#646c0f82c2a35557dda175dbfcd26e96">AllocatePool()</a>, and the size of the allocated buffer is returned in Size. It is the caller's responsibility to use <a class="el" href="../../d6/dcd/a01023.html#8b1cbc21e0cebcfc6a992546ec9b4941">FreePool()</a> to free the allocated buffer. See <a class="el" href="../../df/d61/a00031.html#b4b01f77853f9d78136a12c798ead69d">EFI_FIRMWARE_VOLUME2_PROTOCOL.ReadSection()</a> for details on how sections are retrieved from an FFS file based on SectionType and SectionInstance.<p>
-If the currently executing module was not loaded from a firmware volume, then EFI_NOT_FOUND is returned. If SectionType is EFI_SECTION_TE, and the search with an FFS file fails, the search will be retried with a section type of EFI_SECTION_PE32.<p>
-This function must be called with a TPL &lt;= TPL_NOTIFY. If NameGuid is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Buffer is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Size is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>NameGuid</em>&nbsp;</td><td>A pointer to to the FFS filename <a class="el" href="../../d9/d0f/a00644.html">GUID</a> to search for within the firmware volumes that the currently executing module was loaded from. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SectionType</em>&nbsp;</td><td>Indicates the FFS section type to search for within the FFS file specified by NameGuid. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SectionInstance</em>&nbsp;</td><td>Indicates which section instance within the FFS file specified by NameGuid to retrieve. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>On output, a pointer to a callee allocated buffer containing the FFS file section that was found. It is the caller's responsibility to free this buffer using <a class="el" href="../../d6/dcd/a01023.html#8b1cbc21e0cebcfc6a992546ec9b4941">FreePool()</a>. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Size</em>&nbsp;</td><td>On output, a pointer to the size, in bytes, of Buffer.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The specified FFS section was returned. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The specified FFS section could not be found. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There are not enough resources available to retrieve the matching FFS section. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The FFS section could not be retrieves due to a device error. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ACCESS_DENIED</em>&nbsp;</td><td>The FFS section could not be retrieves because the firmware volume that contains the matching FFS section does not allow reads. </td></tr>
-  </table>
-</dl>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:08 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:13 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

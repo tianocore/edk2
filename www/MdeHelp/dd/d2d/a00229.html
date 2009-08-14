@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: _EFI_PEI_SERVICES Struct Reference</title>
+<title>MdePkg[ALL]: _EFI_PEI_FIRMWARE_VOLUME_INFO_PPI Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,441 +21,99 @@
   </div>
 </div>
 <div class="contents">
-<h1>_EFI_PEI_SERVICES Struct Reference</h1><!-- doxytag: class="_EFI_PEI_SERVICES" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>_EFI_PEI_FIRMWARE_VOLUME_INFO_PPI Struct Reference</h1><!-- doxytag: class="_EFI_PEI_FIRMWARE_VOLUME_INFO_PPI" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d5/d0a/a00602.html">EFI_TABLE_HEADER</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d2d/a00229.html#598fa45fd244d9e1575ddcb03d8c99bc">Hdr</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d2d/a00229.html#aafa13307e4d61b4dc37f74dab35e10c">FvFormat</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/de6/a01063.html#dc0c994b20a1a8d8bf3f64b5de925cc5">EFI_PEI_INSTALL_PPI</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d2d/a00229.html#6898c408971ac70a681593efeae57f95">InstallPpi</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d2d/a00229.html#252ad93781e84765bfb2085efc536fbb">FvInfo</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/de6/a01063.html#647d2f5b35a06059264b5e1ab8b92f9e">EFI_PEI_REINSTALL_PPI</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d2d/a00229.html#23603bf22b6828f01ac2683ce0797690">ReInstallPpi</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d2d/a00229.html#61aa8531a932e2bfdb6157515d816e97">FvInfoSize</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/de6/a01063.html#fefb1ba02c2f8e914f0c5fd9710517aa">EFI_PEI_LOCATE_PPI</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d2d/a00229.html#5ac4eed8e5499a612611dee86182dbc5">LocatePpi</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d2d/a00229.html#9e76f17feb9cea788cdb29e86def4df1">ParentFvName</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/de6/a01063.html#fbd48960312b87de633b36c5aebc7d9f">EFI_PEI_NOTIFY_PPI</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d2d/a00229.html#1cca952427933495346cec06f6804095">NotifyPpi</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/de6/a01063.html#91154e0f2fd1ef353bd9552b46e458d2">EFI_PEI_GET_BOOT_MODE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d2d/a00229.html#884dec60059d84a1d24d55ec16f11586">GetBootMode</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/de6/a01063.html#bfd229891decfee624cbb9e2708bf106">EFI_PEI_SET_BOOT_MODE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d2d/a00229.html#87bfb73868bd6c318cd2b5a27036943b">SetBootMode</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/de6/a01063.html#7cb287bb2838ee3607afa0686e560cf4">EFI_PEI_GET_HOB_LIST</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d2d/a00229.html#81da327af2c2a0ec9cd4164ba3e62ee3">GetHobList</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/de6/a01063.html#62cf4cff8cfd5daec220275b2054bceb">EFI_PEI_CREATE_HOB</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d2d/a00229.html#0bcdb2625d6168cacde08fd86b2fdff6">CreateHob</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/de6/a01063.html#de02f9a05dde9ad174ffd161c529ec63">EFI_PEI_FFS_FIND_NEXT_VOLUME2</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d2d/a00229.html#65f4fb28ccf6ed81a6e858fe48dec259">FfsFindNextVolume</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/de6/a01063.html#be0c35044093644f5a638f4fdeef8441">EFI_PEI_FFS_FIND_NEXT_FILE2</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d2d/a00229.html#8788d55fa2ac8955810e7e4f56e1f25d">FfsFindNextFile</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/de6/a01063.html#922b2351cf235ba7db7639dfda7327ec">EFI_PEI_FFS_FIND_SECTION_DATA2</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d2d/a00229.html#05f07517dc7a75aea5392fa7cebdee7d">FfsFindSectionData</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/de6/a01063.html#72952e46dd71f52800517173de00b15e">EFI_PEI_INSTALL_PEI_MEMORY</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d2d/a00229.html#a47f1abcf92780ed935f3bf21f27a4c9">InstallPeiMemory</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/de6/a01063.html#51f4955f94b808d6bb14f833bb210734">EFI_PEI_ALLOCATE_PAGES</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d2d/a00229.html#d18579879f2337ffc03a4b8a113160da">AllocatePages</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/de6/a01063.html#1c9a47a54bdbdea05760a206659a514f">EFI_PEI_ALLOCATE_POOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d2d/a00229.html#9720376467bdc5cf8cbae75da36cbcf4">AllocatePool</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/de6/a01063.html#b702b66d8f3b23a9b84a636af49182fb">EFI_PEI_COPY_MEM</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d2d/a00229.html#89f062433f3130e7a0d10ae43f62a6f5">CopyMem</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/de6/a01063.html#af8e939ef020b2c0da46fb29211eaddf">EFI_PEI_SET_MEM</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d2d/a00229.html#1dcc1bb88abe835c1e6ee6897f2248e8">SetMem</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/de6/a01063.html#030e5e4a9ac34ada0d9ab2cc898d7748">EFI_PEI_REPORT_STATUS_CODE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d2d/a00229.html#9aa4d95a5eddf72054a9aaabf41652f5">ReportStatusCode</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/de6/a01063.html#7b07f5892b93ec4d7b475f0ae098022a">EFI_PEI_RESET_SYSTEM</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d2d/a00229.html#34bcdad812202ac6ab640bc22920a7a0">ResetSystem</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d9a/a00218.html">EFI_PEI_CPU_IO_PPI</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d2d/a00229.html#9d1fe10bd50dcbf49c9bb8afe3dcb813">CpuIo</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d55/a00226.html">EFI_PEI_PCI_CFG2_PPI</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d2d/a00229.html#3610884d789a2c6d62e4af9d23be63d0">PciCfg</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/de6/a01063.html#e81b24bddddb4de33c31fb267f70ef77">EFI_PEI_FFS_FIND_BY_NAME</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d2d/a00229.html#86b0eb490216e450d7ff64bda55e78a7">FfsFindFileByName</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/de6/a01063.html#5023d8541c310ebc31a679fccaf95f8c">EFI_PEI_FFS_GET_FILE_INFO</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d2d/a00229.html#6e3d46b2c3c400a236c96bb718993526">FfsGetFileInfo</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/de6/a01063.html#d704055e6033b39a10f727098b875419">EFI_PEI_FFS_GET_VOLUME_INFO</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d2d/a00229.html#edec65df7edb03aa1effe790ea93549a">FfsGetVolumeInfo</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/de6/a01063.html#968fefa789c68a46f17881a57556ad00">EFI_PEI_REGISTER_FOR_SHADOW</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d2d/a00229.html#6ea7a9d30993293dc9611f9d124ad402">RegisterForShadow</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d2d/a00229.html#e71639a5ff70a2b20f083b3df272bca2">ParentFileName</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-EFI_PEI_SERVICES is a collection of functions whose implementation is provided by the PEI Foundation. These services fall into various classes, including the following:<ul>
-<li>Managing the boot mode</li><li>Allocating both early and permanent memory</li><li>Supporting the Firmware File System (FFS)</li><li>Abstracting the PPI database abstraction</li><li>Creating Hand-Off Blocks (HOBs) </li></ul>
-<hr><h2>Field Documentation</h2>
-<a class="anchor" name="d18579879f2337ffc03a4b8a113160da"></a><!-- doxytag: member="_EFI_PEI_SERVICES::AllocatePages" ref="d18579879f2337ffc03a4b8a113160da" args="" -->
+This PPI describes the location and format of a firmware volume. The FvFormat can be EFI_FIRMWARE_FILE_SYSTEM2_GUID or the <a class="el" href="../../d1/d87/a00689.html">GUID</a> for a user-defined format. The EFI_FIRMWARE_FILE_SYSTEM2_GUID is the PI Firmware Volume format. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="aafa13307e4d61b4dc37f74dab35e10c"></a><!-- doxytag: member="_EFI_PEI_FIRMWARE_VOLUME_INFO_PPI::FvFormat" ref="aafa13307e4d61b4dc37f74dab35e10c" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../de/de6/a01063.html#51f4955f94b808d6bb14f833bb210734">EFI_PEI_ALLOCATE_PAGES</a> <a class="el" href="../../dd/d2d/a00229.html#d18579879f2337ffc03a4b8a113160da">_EFI_PEI_SERVICES::AllocatePages</a>          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../dd/d2d/a00229.html#aafa13307e4d61b4dc37f74dab35e10c">_EFI_PEI_FIRMWARE_VOLUME_INFO_PPI::FvFormat</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+Unique identifier of the format of the memory-mapped firmware volume. 
 </div>
 </div><p>
-<a class="anchor" name="9720376467bdc5cf8cbae75da36cbcf4"></a><!-- doxytag: member="_EFI_PEI_SERVICES::AllocatePool" ref="9720376467bdc5cf8cbae75da36cbcf4" args="" -->
+<a class="anchor" name="252ad93781e84765bfb2085efc536fbb"></a><!-- doxytag: member="_EFI_PEI_FIRMWARE_VOLUME_INFO_PPI::FvInfo" ref="252ad93781e84765bfb2085efc536fbb" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../de/de6/a01063.html#1c9a47a54bdbdea05760a206659a514f">EFI_PEI_ALLOCATE_POOL</a> <a class="el" href="../../dd/d2d/a00229.html#9720376467bdc5cf8cbae75da36cbcf4">_EFI_PEI_SERVICES::AllocatePool</a>          </td>
+          <td class="memname">VOID* <a class="el" href="../../dd/d2d/a00229.html#252ad93781e84765bfb2085efc536fbb">_EFI_PEI_FIRMWARE_VOLUME_INFO_PPI::FvInfo</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+Points to a buffer which allows the EFI_PEI_FIRMWARE_VOLUME_PPI to process the volume. The format of this buffer is specific to the FvFormat. For memory-mapped firmware volumes, this typically points to the first byte of the firmware volume. 
 </div>
 </div><p>
-<a class="anchor" name="89f062433f3130e7a0d10ae43f62a6f5"></a><!-- doxytag: member="_EFI_PEI_SERVICES::CopyMem" ref="89f062433f3130e7a0d10ae43f62a6f5" args="" -->
+<a class="anchor" name="61aa8531a932e2bfdb6157515d816e97"></a><!-- doxytag: member="_EFI_PEI_FIRMWARE_VOLUME_INFO_PPI::FvInfoSize" ref="61aa8531a932e2bfdb6157515d816e97" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../de/de6/a01063.html#b702b66d8f3b23a9b84a636af49182fb">EFI_PEI_COPY_MEM</a> <a class="el" href="../../dd/d2d/a00229.html#89f062433f3130e7a0d10ae43f62a6f5">_EFI_PEI_SERVICES::CopyMem</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../dd/d2d/a00229.html#61aa8531a932e2bfdb6157515d816e97">_EFI_PEI_FIRMWARE_VOLUME_INFO_PPI::FvInfoSize</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+Size of the data provided by FvInfo. For memory-mapped firmware volumes, this is typically the size of the firmware volume. 
 </div>
 </div><p>
-<a class="anchor" name="9d1fe10bd50dcbf49c9bb8afe3dcb813"></a><!-- doxytag: member="_EFI_PEI_SERVICES::CpuIo" ref="9d1fe10bd50dcbf49c9bb8afe3dcb813" args="" -->
+<a class="anchor" name="e71639a5ff70a2b20f083b3df272bca2"></a><!-- doxytag: member="_EFI_PEI_FIRMWARE_VOLUME_INFO_PPI::ParentFileName" ref="e71639a5ff70a2b20f083b3df272bca2" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d9a/a00218.html">EFI_PEI_CPU_IO_PPI</a>* <a class="el" href="../../dd/d2d/a00229.html#9d1fe10bd50dcbf49c9bb8afe3dcb813">_EFI_PEI_SERVICES::CpuIo</a>          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>* <a class="el" href="../../dd/d2d/a00229.html#e71639a5ff70a2b20f083b3df272bca2">_EFI_PEI_FIRMWARE_VOLUME_INFO_PPI::ParentFileName</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+If the firmware volume originally came from a firmware file, then these point to the parent firmware volume name and firmware volume file. If it did not originally come from a firmware file, these should be NULL. 
 </div>
 </div><p>
-<a class="anchor" name="0bcdb2625d6168cacde08fd86b2fdff6"></a><!-- doxytag: member="_EFI_PEI_SERVICES::CreateHob" ref="0bcdb2625d6168cacde08fd86b2fdff6" args="" -->
+<a class="anchor" name="9e76f17feb9cea788cdb29e86def4df1"></a><!-- doxytag: member="_EFI_PEI_FIRMWARE_VOLUME_INFO_PPI::ParentFvName" ref="9e76f17feb9cea788cdb29e86def4df1" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../de/de6/a01063.html#62cf4cff8cfd5daec220275b2054bceb">EFI_PEI_CREATE_HOB</a> <a class="el" href="../../dd/d2d/a00229.html#0bcdb2625d6168cacde08fd86b2fdff6">_EFI_PEI_SERVICES::CreateHob</a>          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>* <a class="el" href="../../dd/d2d/a00229.html#9e76f17feb9cea788cdb29e86def4df1">_EFI_PEI_FIRMWARE_VOLUME_INFO_PPI::ParentFvName</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<a class="anchor" name="86b0eb490216e450d7ff64bda55e78a7"></a><!-- doxytag: member="_EFI_PEI_SERVICES::FfsFindFileByName" ref="86b0eb490216e450d7ff64bda55e78a7" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../de/de6/a01063.html#e81b24bddddb4de33c31fb267f70ef77">EFI_PEI_FFS_FIND_BY_NAME</a> <a class="el" href="../../dd/d2d/a00229.html#86b0eb490216e450d7ff64bda55e78a7">_EFI_PEI_SERVICES::FfsFindFileByName</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="8788d55fa2ac8955810e7e4f56e1f25d"></a><!-- doxytag: member="_EFI_PEI_SERVICES::FfsFindNextFile" ref="8788d55fa2ac8955810e7e4f56e1f25d" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../de/de6/a01063.html#be0c35044093644f5a638f4fdeef8441">EFI_PEI_FFS_FIND_NEXT_FILE2</a> <a class="el" href="../../dd/d2d/a00229.html#8788d55fa2ac8955810e7e4f56e1f25d">_EFI_PEI_SERVICES::FfsFindNextFile</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="65f4fb28ccf6ed81a6e858fe48dec259"></a><!-- doxytag: member="_EFI_PEI_SERVICES::FfsFindNextVolume" ref="65f4fb28ccf6ed81a6e858fe48dec259" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../de/de6/a01063.html#de02f9a05dde9ad174ffd161c529ec63">EFI_PEI_FFS_FIND_NEXT_VOLUME2</a> <a class="el" href="../../dd/d2d/a00229.html#65f4fb28ccf6ed81a6e858fe48dec259">_EFI_PEI_SERVICES::FfsFindNextVolume</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="05f07517dc7a75aea5392fa7cebdee7d"></a><!-- doxytag: member="_EFI_PEI_SERVICES::FfsFindSectionData" ref="05f07517dc7a75aea5392fa7cebdee7d" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../de/de6/a01063.html#922b2351cf235ba7db7639dfda7327ec">EFI_PEI_FFS_FIND_SECTION_DATA2</a> <a class="el" href="../../dd/d2d/a00229.html#05f07517dc7a75aea5392fa7cebdee7d">_EFI_PEI_SERVICES::FfsFindSectionData</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="6e3d46b2c3c400a236c96bb718993526"></a><!-- doxytag: member="_EFI_PEI_SERVICES::FfsGetFileInfo" ref="6e3d46b2c3c400a236c96bb718993526" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../de/de6/a01063.html#5023d8541c310ebc31a679fccaf95f8c">EFI_PEI_FFS_GET_FILE_INFO</a> <a class="el" href="../../dd/d2d/a00229.html#6e3d46b2c3c400a236c96bb718993526">_EFI_PEI_SERVICES::FfsGetFileInfo</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="edec65df7edb03aa1effe790ea93549a"></a><!-- doxytag: member="_EFI_PEI_SERVICES::FfsGetVolumeInfo" ref="edec65df7edb03aa1effe790ea93549a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../de/de6/a01063.html#d704055e6033b39a10f727098b875419">EFI_PEI_FFS_GET_VOLUME_INFO</a> <a class="el" href="../../dd/d2d/a00229.html#edec65df7edb03aa1effe790ea93549a">_EFI_PEI_SERVICES::FfsGetVolumeInfo</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="884dec60059d84a1d24d55ec16f11586"></a><!-- doxytag: member="_EFI_PEI_SERVICES::GetBootMode" ref="884dec60059d84a1d24d55ec16f11586" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../de/de6/a01063.html#91154e0f2fd1ef353bd9552b46e458d2">EFI_PEI_GET_BOOT_MODE</a> <a class="el" href="../../dd/d2d/a00229.html#884dec60059d84a1d24d55ec16f11586">_EFI_PEI_SERVICES::GetBootMode</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="81da327af2c2a0ec9cd4164ba3e62ee3"></a><!-- doxytag: member="_EFI_PEI_SERVICES::GetHobList" ref="81da327af2c2a0ec9cd4164ba3e62ee3" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../de/de6/a01063.html#7cb287bb2838ee3607afa0686e560cf4">EFI_PEI_GET_HOB_LIST</a> <a class="el" href="../../dd/d2d/a00229.html#81da327af2c2a0ec9cd4164ba3e62ee3">_EFI_PEI_SERVICES::GetHobList</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="598fa45fd244d9e1575ddcb03d8c99bc"></a><!-- doxytag: member="_EFI_PEI_SERVICES::Hdr" ref="598fa45fd244d9e1575ddcb03d8c99bc" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d5/d0a/a00602.html">EFI_TABLE_HEADER</a> <a class="el" href="../../dd/d2d/a00229.html#598fa45fd244d9e1575ddcb03d8c99bc">_EFI_PEI_SERVICES::Hdr</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-The table header for the PEI Services Table. 
-</div>
-</div><p>
-<a class="anchor" name="a47f1abcf92780ed935f3bf21f27a4c9"></a><!-- doxytag: member="_EFI_PEI_SERVICES::InstallPeiMemory" ref="a47f1abcf92780ed935f3bf21f27a4c9" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../de/de6/a01063.html#72952e46dd71f52800517173de00b15e">EFI_PEI_INSTALL_PEI_MEMORY</a> <a class="el" href="../../dd/d2d/a00229.html#a47f1abcf92780ed935f3bf21f27a4c9">_EFI_PEI_SERVICES::InstallPeiMemory</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="6898c408971ac70a681593efeae57f95"></a><!-- doxytag: member="_EFI_PEI_SERVICES::InstallPpi" ref="6898c408971ac70a681593efeae57f95" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../de/de6/a01063.html#dc0c994b20a1a8d8bf3f64b5de925cc5">EFI_PEI_INSTALL_PPI</a> <a class="el" href="../../dd/d2d/a00229.html#6898c408971ac70a681593efeae57f95">_EFI_PEI_SERVICES::InstallPpi</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="5ac4eed8e5499a612611dee86182dbc5"></a><!-- doxytag: member="_EFI_PEI_SERVICES::LocatePpi" ref="5ac4eed8e5499a612611dee86182dbc5" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../de/de6/a01063.html#fefb1ba02c2f8e914f0c5fd9710517aa">EFI_PEI_LOCATE_PPI</a> <a class="el" href="../../dd/d2d/a00229.html#5ac4eed8e5499a612611dee86182dbc5">_EFI_PEI_SERVICES::LocatePpi</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="1cca952427933495346cec06f6804095"></a><!-- doxytag: member="_EFI_PEI_SERVICES::NotifyPpi" ref="1cca952427933495346cec06f6804095" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../de/de6/a01063.html#fbd48960312b87de633b36c5aebc7d9f">EFI_PEI_NOTIFY_PPI</a> <a class="el" href="../../dd/d2d/a00229.html#1cca952427933495346cec06f6804095">_EFI_PEI_SERVICES::NotifyPpi</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="3610884d789a2c6d62e4af9d23be63d0"></a><!-- doxytag: member="_EFI_PEI_SERVICES::PciCfg" ref="3610884d789a2c6d62e4af9d23be63d0" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../dc/d55/a00226.html">EFI_PEI_PCI_CFG2_PPI</a>* <a class="el" href="../../dd/d2d/a00229.html#3610884d789a2c6d62e4af9d23be63d0">_EFI_PEI_SERVICES::PciCfg</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="6ea7a9d30993293dc9611f9d124ad402"></a><!-- doxytag: member="_EFI_PEI_SERVICES::RegisterForShadow" ref="6ea7a9d30993293dc9611f9d124ad402" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../de/de6/a01063.html#968fefa789c68a46f17881a57556ad00">EFI_PEI_REGISTER_FOR_SHADOW</a> <a class="el" href="../../dd/d2d/a00229.html#6ea7a9d30993293dc9611f9d124ad402">_EFI_PEI_SERVICES::RegisterForShadow</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="23603bf22b6828f01ac2683ce0797690"></a><!-- doxytag: member="_EFI_PEI_SERVICES::ReInstallPpi" ref="23603bf22b6828f01ac2683ce0797690" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../de/de6/a01063.html#647d2f5b35a06059264b5e1ab8b92f9e">EFI_PEI_REINSTALL_PPI</a> <a class="el" href="../../dd/d2d/a00229.html#23603bf22b6828f01ac2683ce0797690">_EFI_PEI_SERVICES::ReInstallPpi</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="9aa4d95a5eddf72054a9aaabf41652f5"></a><!-- doxytag: member="_EFI_PEI_SERVICES::ReportStatusCode" ref="9aa4d95a5eddf72054a9aaabf41652f5" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../de/de6/a01063.html#030e5e4a9ac34ada0d9ab2cc898d7748">EFI_PEI_REPORT_STATUS_CODE</a> <a class="el" href="../../dd/d2d/a00229.html#9aa4d95a5eddf72054a9aaabf41652f5">_EFI_PEI_SERVICES::ReportStatusCode</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="34bcdad812202ac6ab640bc22920a7a0"></a><!-- doxytag: member="_EFI_PEI_SERVICES::ResetSystem" ref="34bcdad812202ac6ab640bc22920a7a0" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../de/de6/a01063.html#7b07f5892b93ec4d7b475f0ae098022a">EFI_PEI_RESET_SYSTEM</a> <a class="el" href="../../dd/d2d/a00229.html#34bcdad812202ac6ab640bc22920a7a0">_EFI_PEI_SERVICES::ResetSystem</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="87bfb73868bd6c318cd2b5a27036943b"></a><!-- doxytag: member="_EFI_PEI_SERVICES::SetBootMode" ref="87bfb73868bd6c318cd2b5a27036943b" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../de/de6/a01063.html#bfd229891decfee624cbb9e2708bf106">EFI_PEI_SET_BOOT_MODE</a> <a class="el" href="../../dd/d2d/a00229.html#87bfb73868bd6c318cd2b5a27036943b">_EFI_PEI_SERVICES::SetBootMode</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="1dcc1bb88abe835c1e6ee6897f2248e8"></a><!-- doxytag: member="_EFI_PEI_SERVICES::SetMem" ref="1dcc1bb88abe835c1e6ee6897f2248e8" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../de/de6/a01063.html#af8e939ef020b2c0da46fb29211eaddf">EFI_PEI_SET_MEM</a> <a class="el" href="../../dd/d2d/a00229.html#1dcc1bb88abe835c1e6ee6897f2248e8">_EFI_PEI_SERVICES::SetMem</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
+If the firmware volume originally came from a firmware file, then these point to the parent firmware volume name and firmware volume file. If it did not originally come from a firmware file, these should be NULL. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:13 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:16 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

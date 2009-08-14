@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: SMBIOS_TABLE_TYPE18 Struct Reference</title>
+<title>MdePkg[ALL]: s_pxe_pcc_config_info Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,35 +21,65 @@
   </div>
 </div>
 <div class="contents">
-<h1>SMBIOS_TABLE_TYPE18 Struct Reference</h1><!-- doxytag: class="SMBIOS_TABLE_TYPE18" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>s_pxe_pcc_config_info Struct Reference</h1><!-- doxytag: class="s_pxe_pcc_config_info" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../da/db8/a00797.html">SMBIOS_STRUCTURE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/db7/a00812.html#f4dc2bfd712ca2c0e33f225e1d3cc451">Hdr</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/db7/a00812.html#d449e1fb10ed77813fdf9944b2386336">BusType</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d49/a00979.html#afff1dfd7a4529fecd773765819cb126">MEMORY_ERROR_TYPE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/db7/a00812.html#a22e1d2fafdd124bb90d9edf84d7bb05">ErrorType</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/db7/a00812.html#b624a87092c92438d77e88da27103b65">Bus</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d49/a00979.html#13ebb086b1f516086fcbc73067248f4a">MEMORY_ERROR_GRANULARITY</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/db7/a00812.html#f6f94a11974c959456181fa7872e5544">ErrorGranularity</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/db7/a00812.html#7cc7dd2c4aaab494209c566a5c906336">Device</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d49/a00979.html#fb1e8ae36f0998ef207ed2e80d81407b">MEMORY_ERROR_OPERATION</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/db7/a00812.html#5e757b7c84ca620e1f584b0eba8e3bfd">ErrorOperation</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/db7/a00812.html#b0bc531ea1fbd3f6927f1e15308e2e7a">Function</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/db7/a00812.html#3f5a4a165901f4828c680118b32c5572">VendorSyndrome</a></td></tr>
+<tr><td class="memItemLeft" nowrap>union {</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/db7/a00812.html#6b417410549587d0ee4389ee3fd6ba8a">MemoryArrayErrorAddress</a></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../dc/dc2/a01251.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d8/db7/a00812.html#a68dcbfb38198fbeac740a9a7c291df2">Byte</a> [256]</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/db7/a00812.html#607258a1d3ffbbad4fa2db7ea7e44a44">DeviceErrorAddress</a></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d8/db7/a00812.html#5906ee27dfbc66f215ff797a7fec01b7">Word</a> [128]</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/db7/a00812.html#3a2ac58bbe821a2197d735e9437b346d">ErrorResolution</a></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../dc/dc2/a01251.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d8/db7/a00812.html#d2f71626ddc9593e5e1b90af90c732a5">Dword</a> [64]</td></tr>
+
+<tr><td class="memItemLeft" nowrap valign="top">}&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/db7/a00812.html#fb1fa85a8974ba6fd9337ee59bf46742">Config</a></td></tr>
 
 </table>
-<hr><a name="_details"></a><h2>Detailed Description</h2>
-32-bit Memory Error Information (Type 18)<p>
-This structure identifies the specifics of an error that might be detected within a Physical Memory Array. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="607258a1d3ffbbad4fa2db7ea7e44a44"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE18::DeviceErrorAddress" ref="607258a1d3ffbbad4fa2db7ea7e44a44" args="" -->
+<hr><h2>Field Documentation</h2>
+<a class="anchor" name="b624a87092c92438d77e88da27103b65"></a><!-- doxytag: member="s_pxe_pcc_config_info::Bus" ref="b624a87092c92438d77e88da27103b65" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d8/db7/a00812.html#607258a1d3ffbbad4fa2db7ea7e44a44">SMBIOS_TABLE_TYPE18::DeviceErrorAddress</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a> <a class="el" href="../../d8/db7/a00812.html#b624a87092c92438d77e88da27103b65">s_pxe_pcc_config_info::Bus</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This identifies the PCC network device that this UNDI interface is bound to. 
+</div>
+</div><p>
+<a class="anchor" name="d449e1fb10ed77813fdf9944b2386336"></a><!-- doxytag: member="s_pxe_pcc_config_info::BusType" ref="d449e1fb10ed77813fdf9944b2386336" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a> <a class="el" href="../../d8/db7/a00812.html#d449e1fb10ed77813fdf9944b2386336">s_pxe_pcc_config_info::BusType</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This is the flag field for the PXE_DB_GET_CONFIG_INFO union. For PCC bus devices, this field is set to PXE_BUSTYPE_PCC. 
+</div>
+</div><p>
+<a class="anchor" name="a68dcbfb38198fbeac740a9a7c291df2"></a><!-- doxytag: member="s_pxe_pcc_config_info::Byte" ref="a68dcbfb38198fbeac740a9a7c291df2" args="[256]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a> <a class="el" href="../../d8/db7/a00812.html#a68dcbfb38198fbeac740a9a7c291df2">s_pxe_pcc_config_info::Byte</a>[256]          </td>
         </tr>
       </table>
 </div>
@@ -59,12 +89,27 @@ This structure identifies the specifics of an error that might be detected withi
 
 </div>
 </div><p>
-<a class="anchor" name="f6f94a11974c959456181fa7872e5544"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE18::ErrorGranularity" ref="f6f94a11974c959456181fa7872e5544" args="" -->
+<a class="anchor" name="fb1fa85a8974ba6fd9337ee59bf46742"></a><!-- doxytag: member="s_pxe_pcc_config_info::Config" ref="fb1fa85a8974ba6fd9337ee59bf46742" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d8/d49/a00979.html#13ebb086b1f516086fcbc73067248f4a">MEMORY_ERROR_GRANULARITY</a> <a class="el" href="../../d8/db7/a00812.html#f6f94a11974c959456181fa7872e5544">SMBIOS_TABLE_TYPE18::ErrorGranularity</a>          </td>
+          <td class="memname">union { ... }   <a class="el" href="../../d8/db7/a00812.html#fb1fa85a8974ba6fd9337ee59bf46742">s_pxe_pcc_config_info::Config</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This is a copy of the PCC configuration space for this network device. 
+</div>
+</div><p>
+<a class="anchor" name="7cc7dd2c4aaab494209c566a5c906336"></a><!-- doxytag: member="s_pxe_pcc_config_info::Device" ref="7cc7dd2c4aaab494209c566a5c906336" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a> <a class="el" href="../../d8/db7/a00812.html#7cc7dd2c4aaab494209c566a5c906336">s_pxe_pcc_config_info::Device</a>          </td>
         </tr>
       </table>
 </div>
@@ -74,12 +119,12 @@ This structure identifies the specifics of an error that might be detected withi
 
 </div>
 </div><p>
-<a class="anchor" name="5e757b7c84ca620e1f584b0eba8e3bfd"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE18::ErrorOperation" ref="5e757b7c84ca620e1f584b0eba8e3bfd" args="" -->
+<a class="anchor" name="d2f71626ddc9593e5e1b90af90c732a5"></a><!-- doxytag: member="s_pxe_pcc_config_info::Dword" ref="d2f71626ddc9593e5e1b90af90c732a5" args="[64]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d8/d49/a00979.html#fb1e8ae36f0998ef207ed2e80d81407b">MEMORY_ERROR_OPERATION</a> <a class="el" href="../../d8/db7/a00812.html#5e757b7c84ca620e1f584b0eba8e3bfd">SMBIOS_TABLE_TYPE18::ErrorOperation</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a> <a class="el" href="../../d8/db7/a00812.html#d2f71626ddc9593e5e1b90af90c732a5">s_pxe_pcc_config_info::Dword</a>[64]          </td>
         </tr>
       </table>
 </div>
@@ -89,12 +134,12 @@ This structure identifies the specifics of an error that might be detected withi
 
 </div>
 </div><p>
-<a class="anchor" name="3a2ac58bbe821a2197d735e9437b346d"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE18::ErrorResolution" ref="3a2ac58bbe821a2197d735e9437b346d" args="" -->
+<a class="anchor" name="b0bc531ea1fbd3f6927f1e15308e2e7a"></a><!-- doxytag: member="s_pxe_pcc_config_info::Function" ref="b0bc531ea1fbd3f6927f1e15308e2e7a" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d8/db7/a00812.html#3a2ac58bbe821a2197d735e9437b346d">SMBIOS_TABLE_TYPE18::ErrorResolution</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a> <a class="el" href="../../d8/db7/a00812.html#b0bc531ea1fbd3f6927f1e15308e2e7a">s_pxe_pcc_config_info::Function</a>          </td>
         </tr>
       </table>
 </div>
@@ -104,57 +149,12 @@ This structure identifies the specifics of an error that might be detected withi
 
 </div>
 </div><p>
-<a class="anchor" name="a22e1d2fafdd124bb90d9edf84d7bb05"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE18::ErrorType" ref="a22e1d2fafdd124bb90d9edf84d7bb05" args="" -->
+<a class="anchor" name="5906ee27dfbc66f215ff797a7fec01b7"></a><!-- doxytag: member="s_pxe_pcc_config_info::Word" ref="5906ee27dfbc66f215ff797a7fec01b7" args="[128]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d8/d49/a00979.html#afff1dfd7a4529fecd773765819cb126">MEMORY_ERROR_TYPE</a> <a class="el" href="../../d8/db7/a00812.html#a22e1d2fafdd124bb90d9edf84d7bb05">SMBIOS_TABLE_TYPE18::ErrorType</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="f4dc2bfd712ca2c0e33f225e1d3cc451"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE18::Hdr" ref="f4dc2bfd712ca2c0e33f225e1d3cc451" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../da/db8/a00797.html">SMBIOS_STRUCTURE</a> <a class="el" href="../../d8/db7/a00812.html#f4dc2bfd712ca2c0e33f225e1d3cc451">SMBIOS_TABLE_TYPE18::Hdr</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="6b417410549587d0ee4389ee3fd6ba8a"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE18::MemoryArrayErrorAddress" ref="6b417410549587d0ee4389ee3fd6ba8a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d8/db7/a00812.html#6b417410549587d0ee4389ee3fd6ba8a">SMBIOS_TABLE_TYPE18::MemoryArrayErrorAddress</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="3f5a4a165901f4828c680118b32c5572"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE18::VendorSyndrome" ref="3f5a4a165901f4828c680118b32c5572" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d8/db7/a00812.html#3f5a4a165901f4828c680118b32c5572">SMBIOS_TABLE_TYPE18::VendorSyndrome</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a> <a class="el" href="../../d8/db7/a00812.html#5906ee27dfbc66f215ff797a7fec01b7">s_pxe_pcc_config_info::Word</a>[128]          </td>
         </tr>
       </table>
 </div>
@@ -165,7 +165,7 @@ This structure identifies the specifics of an error that might be detected withi
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:21 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:01 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

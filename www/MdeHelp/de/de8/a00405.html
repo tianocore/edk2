@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_DEVICE_PATH_TO_TEXT_PROTOCOL Struct Reference</title>
+<title>MdePkg[ALL]: EFI_BLOCK_IO_MEDIA Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,48 +21,201 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_DEVICE_PATH_TO_TEXT_PROTOCOL Struct Reference</h1><!-- doxytag: class="EFI_DEVICE_PATH_TO_TEXT_PROTOCOL" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_BLOCK_IO_MEDIA Struct Reference</h1><!-- doxytag: class="EFI_BLOCK_IO_MEDIA" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d39/a01112.html#d5d5806a59131837a4d4c3bb53c4b438">EFI_DEVICE_PATH_TO_TEXT_NODE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de8/a00405.html#5747a710c617cf103117d7184b54785a">ConvertDeviceNodeToText</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de8/a00405.html#7b5117f5bd52a4f81a8f6c4e0be6a039">MediaId</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d39/a01112.html#8ea49308ea4501030139840e0c52f2e4">EFI_DEVICE_PATH_TO_TEXT_PATH</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de8/a00405.html#33a655992995220a46497e52925d21fb">ConvertDevicePathToText</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de8/a00405.html#08f652e3b7b4f34d9d05100133039722">RemovableMedia</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de8/a00405.html#c67e4efd7f139b76a2cfcf5750fb52fc">MediaPresent</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de8/a00405.html#1d35f5bb70d1ca8ebe627474803faa3f">LogicalPartition</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de8/a00405.html#cd0f44b5af1c8c00f35138ca78c0cf4a">ReadOnly</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de8/a00405.html#43cb62d1de918180aa1c6ea9ae79a723">WriteCaching</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de8/a00405.html#2e70f9bd2806fefdfa6d56b2d4f64a8d">BlockSize</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de8/a00405.html#084b56a43a70914b1de64b1076ffacef">IoAlign</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d95/a01247.html#3495b0e526b2172f98d5bde00bf28b72">EFI_LBA</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de8/a00405.html#41a91daab23393f8b2eb78293d7b32f4">LastBlock</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d95/a01247.html#3495b0e526b2172f98d5bde00bf28b72">EFI_LBA</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de8/a00405.html#e5aeaa551786c3bfda21f88f3f152943">LowestAlignedLba</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de8/a00405.html#0a6d342e079f42291da054595bf5a40e">LogicalBlocksPerPhysicalBlock</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-This protocol converts device paths and device nodes to text. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="5747a710c617cf103117d7184b54785a"></a><!-- doxytag: member="EFI_DEVICE_PATH_TO_TEXT_PROTOCOL::ConvertDeviceNodeToText" ref="5747a710c617cf103117d7184b54785a" args="" -->
+Block IO read only mode data and updated only via members of BlockIO <hr><h2>Field Documentation</h2>
+<a class="anchor" name="2e70f9bd2806fefdfa6d56b2d4f64a8d"></a><!-- doxytag: member="EFI_BLOCK_IO_MEDIA::BlockSize" ref="2e70f9bd2806fefdfa6d56b2d4f64a8d" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d39/a01112.html#d5d5806a59131837a4d4c3bb53c4b438">EFI_DEVICE_PATH_TO_TEXT_NODE</a> <a class="el" href="../../de/de8/a00405.html#5747a710c617cf103117d7184b54785a">EFI_DEVICE_PATH_TO_TEXT_PROTOCOL::ConvertDeviceNodeToText</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../de/de8/a00405.html#2e70f9bd2806fefdfa6d56b2d4f64a8d">EFI_BLOCK_IO_MEDIA::BlockSize</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The intrinsic block size of the device. If the media changes, then this field is updated. 
 </div>
 </div><p>
-<a class="anchor" name="33a655992995220a46497e52925d21fb"></a><!-- doxytag: member="EFI_DEVICE_PATH_TO_TEXT_PROTOCOL::ConvertDevicePathToText" ref="33a655992995220a46497e52925d21fb" args="" -->
+<a class="anchor" name="084b56a43a70914b1de64b1076ffacef"></a><!-- doxytag: member="EFI_BLOCK_IO_MEDIA::IoAlign" ref="084b56a43a70914b1de64b1076ffacef" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d39/a01112.html#8ea49308ea4501030139840e0c52f2e4">EFI_DEVICE_PATH_TO_TEXT_PATH</a> <a class="el" href="../../de/de8/a00405.html#33a655992995220a46497e52925d21fb">EFI_DEVICE_PATH_TO_TEXT_PROTOCOL::ConvertDevicePathToText</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../de/de8/a00405.html#084b56a43a70914b1de64b1076ffacef">EFI_BLOCK_IO_MEDIA::IoAlign</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+Supplies the alignment requirement for any buffer to read or write block(s). 
+</div>
+</div><p>
+<a class="anchor" name="41a91daab23393f8b2eb78293d7b32f4"></a><!-- doxytag: member="EFI_BLOCK_IO_MEDIA::LastBlock" ref="41a91daab23393f8b2eb78293d7b32f4" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dd/d95/a01247.html#3495b0e526b2172f98d5bde00bf28b72">EFI_LBA</a> <a class="el" href="../../de/de8/a00405.html#41a91daab23393f8b2eb78293d7b32f4">EFI_BLOCK_IO_MEDIA::LastBlock</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
 
+<p>
+The last logical block address on the device. If the media changes, then this field is updated. 
+</div>
+</div><p>
+<a class="anchor" name="0a6d342e079f42291da054595bf5a40e"></a><!-- doxytag: member="EFI_BLOCK_IO_MEDIA::LogicalBlocksPerPhysicalBlock" ref="0a6d342e079f42291da054595bf5a40e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../de/de8/a00405.html#0a6d342e079f42291da054595bf5a40e">EFI_BLOCK_IO_MEDIA::LogicalBlocksPerPhysicalBlock</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Only present if <a class="el" href="../../de/d5e/a00007.html#8ebcb5fbf96bc58b1c54e154e292c372">EFI_BLOCK_IO_PROTOCOL.Revision</a> is greater than or equal to EFI_BLOCK_IO_PROTOCOL_REVISION2. Returns the number of logical blocks per physical block. 
+</div>
+</div><p>
+<a class="anchor" name="1d35f5bb70d1ca8ebe627474803faa3f"></a><!-- doxytag: member="EFI_BLOCK_IO_MEDIA::LogicalPartition" ref="1d35f5bb70d1ca8ebe627474803faa3f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../de/de8/a00405.html#1d35f5bb70d1ca8ebe627474803faa3f">EFI_BLOCK_IO_MEDIA::LogicalPartition</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+TRUE if LBA 0 is the first block of a partition; otherwise FALSE. For media with only one partition this would be TRUE. 
+</div>
+</div><p>
+<a class="anchor" name="e5aeaa551786c3bfda21f88f3f152943"></a><!-- doxytag: member="EFI_BLOCK_IO_MEDIA::LowestAlignedLba" ref="e5aeaa551786c3bfda21f88f3f152943" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dd/d95/a01247.html#3495b0e526b2172f98d5bde00bf28b72">EFI_LBA</a> <a class="el" href="../../de/de8/a00405.html#e5aeaa551786c3bfda21f88f3f152943">EFI_BLOCK_IO_MEDIA::LowestAlignedLba</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Only present if <a class="el" href="../../de/d5e/a00007.html#8ebcb5fbf96bc58b1c54e154e292c372">EFI_BLOCK_IO_PROTOCOL.Revision</a> is greater than or equal to EFI_BLOCK_IO_PROTOCOL_REVISION2. Returns the first LBA is aligned to a physical block boundary. 
+</div>
+</div><p>
+<a class="anchor" name="7b5117f5bd52a4f81a8f6c4e0be6a039"></a><!-- doxytag: member="EFI_BLOCK_IO_MEDIA::MediaId" ref="7b5117f5bd52a4f81a8f6c4e0be6a039" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../de/de8/a00405.html#7b5117f5bd52a4f81a8f6c4e0be6a039">EFI_BLOCK_IO_MEDIA::MediaId</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+The curent media Id. If the media changes, this value is changed. 
+</div>
+</div><p>
+<a class="anchor" name="c67e4efd7f139b76a2cfcf5750fb52fc"></a><!-- doxytag: member="EFI_BLOCK_IO_MEDIA::MediaPresent" ref="c67e4efd7f139b76a2cfcf5750fb52fc" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../de/de8/a00405.html#c67e4efd7f139b76a2cfcf5750fb52fc">EFI_BLOCK_IO_MEDIA::MediaPresent</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+TRUE if there is a media currently present in the device; othersise, FALSE. THis field shows the media present status as of the most recent ReadBlocks() or WriteBlocks() call. 
+</div>
+</div><p>
+<a class="anchor" name="cd0f44b5af1c8c00f35138ca78c0cf4a"></a><!-- doxytag: member="EFI_BLOCK_IO_MEDIA::ReadOnly" ref="cd0f44b5af1c8c00f35138ca78c0cf4a" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../de/de8/a00405.html#cd0f44b5af1c8c00f35138ca78c0cf4a">EFI_BLOCK_IO_MEDIA::ReadOnly</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+TRUE if the media is marked read-only otherwise, FALSE. This field shows the read-only status as of the most recent WriteBlocks () call. 
+</div>
+</div><p>
+<a class="anchor" name="08f652e3b7b4f34d9d05100133039722"></a><!-- doxytag: member="EFI_BLOCK_IO_MEDIA::RemovableMedia" ref="08f652e3b7b4f34d9d05100133039722" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../de/de8/a00405.html#08f652e3b7b4f34d9d05100133039722">EFI_BLOCK_IO_MEDIA::RemovableMedia</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+TRUE if the media is removable; otherwise, FALSE. 
+</div>
+</div><p>
+<a class="anchor" name="43cb62d1de918180aa1c6ea9ae79a723"></a><!-- doxytag: member="EFI_BLOCK_IO_MEDIA::WriteCaching" ref="43cb62d1de918180aa1c6ea9ae79a723" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../de/de8/a00405.html#43cb62d1de918180aa1c6ea9ae79a723">EFI_BLOCK_IO_MEDIA::WriteCaching</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+TRUE if the WriteBlock () function caches write data. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:29 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

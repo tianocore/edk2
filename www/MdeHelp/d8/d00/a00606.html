@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_TCP4_CONFIG_DATA Struct Reference</title>
+<title>MdePkg[ALL]: EFI_PXE_BASE_CODE_MODE Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,25 +21,86 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_TCP4_CONFIG_DATA Struct Reference</h1><!-- doxytag: class="EFI_TCP4_CONFIG_DATA" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_PXE_BASE_CODE_MODE Struct Reference</h1><!-- doxytag: class="EFI_PXE_BASE_CODE_MODE" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#2aa83723a2d429262dcff1f950c0eb8f">TypeOfService</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#7c1cc28c5f289326d743e8852e2cba75">Started</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#8fea3dc0f8a119556c3e70a9c0d5df3b">TimeToLive</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#31fabd83d566ac253bdd62da8e19f247">Ipv6Available</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/d94/a00603.html">EFI_TCP4_ACCESS_POINT</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#83646ca2dba0342031e8fc48db52df55">AccessPoint</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#96af676ba1c1a5954ed0d34d528fbe58">Ipv6Supported</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/dc0/a00611.html">EFI_TCP4_OPTION</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#0274dd4563d8876792d0fcce3b0952dc">ControlOption</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#169a7a9e6d8e2d850ba9a6d3c08effc8">UsingIpv6</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#8e0f18796d86c2e7c0ffab4c0418a077">BisSupported</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#b964b638ddbb9b5addef9f063540ac45">BisDetected</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#d8734de513a2f822a4a76b9459174d9b">AutoArp</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#7b8516f4008b952c8ba8e731e06c128d">SendGUID</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#a125d10eac6a2fd66d9dfd19af7b5339">DhcpDiscoverValid</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#8f0508cb0fc9d197c7fe9b3cf9d1c3be">DhcpAckReceived</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#1c59f07b06537328d66ad31f74646559">ProxyOfferReceived</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#ae53736610616eb837a1a3c1ad7dc445">PxeDiscoverValid</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#35e7398b4510b9160a2d918278c7487f">PxeReplyReceived</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#02aeea07670b5d1f091e25ba67a1b2ee">PxeBisReplyReceived</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#b8cb15ea2ac7a2fc134ec707d18b9d97">IcmpErrorReceived</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#4cd7b331ade22f8bdf4adadb50597b9e">TftpErrorReceived</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#6b9213d7f82b8005839ba2171f65eadc">MakeCallbacks</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#12b909489a4d5deb55ab28877d66cca3">TTL</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#181c109db36ced8b5d1adfe555187128">ToS</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d5a/a00538.html">EFI_IP_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#094076aee6a45b987995c95840e3ed58">StationIp</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d5a/a00538.html">EFI_IP_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#edc97db4abd2bedf2bd84c4e06f0082f">SubnetMask</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/d14/a00608.html">EFI_PXE_BASE_CODE_PACKET</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#949d5b8862fc3fd0813605b9ca174b79">DhcpDiscover</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/d14/a00608.html">EFI_PXE_BASE_CODE_PACKET</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#570defc9caaeaa56acff62c9f310f02e">DhcpAck</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/d14/a00608.html">EFI_PXE_BASE_CODE_PACKET</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#2681eba373afe9ef4904357ad5740bd6">ProxyOffer</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/d14/a00608.html">EFI_PXE_BASE_CODE_PACKET</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#fb890fd18a229a57ad5aa4e798d1cb32">PxeDiscover</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/d14/a00608.html">EFI_PXE_BASE_CODE_PACKET</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#885cb44ff906cf6899fe03b4ff5ae8d8">PxeReply</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/d14/a00608.html">EFI_PXE_BASE_CODE_PACKET</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#679acfb39bb085d3d4c22b61875ff1eb">PxeBisReply</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d1c/a00605.html">EFI_PXE_BASE_CODE_IP_FILTER</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#15ec03a2daf8d9d828e507e9d3879727">IpFilter</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#345310019c33b0c1e11cf8b2a7fd6dd4">ArpCacheEntries</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d6/db2/a00601.html">EFI_PXE_BASE_CODE_ARP_ENTRY</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#d919d4420f983201d38c8313bbdc67be">ArpCache</a> [EFI_PXE_BASE_CODE_MAX_ARP_ENTRIES]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#900b6c9afad1bf72d5dc6311e3cd6dde">RouteTableEntries</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../db/d3f/a00609.html">EFI_PXE_BASE_CODE_ROUTE_ENTRY</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#898cee3790a246ef3c245b34daf6728f">RouteTable</a> [EFI_PXE_BASE_CODE_MAX_ROUTE_ENTRIES]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d6/d75/a00604.html">EFI_PXE_BASE_CODE_ICMP_ERROR</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#c92c20d407283e5fcfc726f8412b7d30">IcmpError</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/dc0/a00611.html">EFI_PXE_BASE_CODE_TFTP_ERROR</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d00/a00606.html#9d85805bbb5d22796a4aa35a416130d2">TftpError</a></td></tr>
 
 </table>
-<hr><h2>Field Documentation</h2>
-<a class="anchor" name="83646ca2dba0342031e8fc48db52df55"></a><!-- doxytag: member="EFI_TCP4_CONFIG_DATA::AccessPoint" ref="83646ca2dba0342031e8fc48db52df55" args="" -->
+<hr><a name="_details"></a><h2>Detailed Description</h2>
+<a class="el" href="../../d8/d00/a00606.html">EFI_PXE_BASE_CODE_MODE</a> The data values in this structure are read-only and are updated by the code that produces the EFI_PXE_BASE_CODE_PROTOCOL functions. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="d919d4420f983201d38c8313bbdc67be"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::ArpCache" ref="d919d4420f983201d38c8313bbdc67be" args="[EFI_PXE_BASE_CODE_MAX_ARP_ENTRIES]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../de/d94/a00603.html">EFI_TCP4_ACCESS_POINT</a> <a class="el" href="../../d8/d00/a00606.html#83646ca2dba0342031e8fc48db52df55">EFI_TCP4_CONFIG_DATA::AccessPoint</a>          </td>
+          <td class="memname"><a class="el" href="../../d6/db2/a00601.html">EFI_PXE_BASE_CODE_ARP_ENTRY</a> <a class="el" href="../../d8/d00/a00606.html#d919d4420f983201d38c8313bbdc67be">EFI_PXE_BASE_CODE_MODE::ArpCache</a>[EFI_PXE_BASE_CODE_MAX_ARP_ENTRIES]          </td>
         </tr>
       </table>
 </div>
@@ -49,12 +110,12 @@
 
 </div>
 </div><p>
-<a class="anchor" name="0274dd4563d8876792d0fcce3b0952dc"></a><!-- doxytag: member="EFI_TCP4_CONFIG_DATA::ControlOption" ref="0274dd4563d8876792d0fcce3b0952dc" args="" -->
+<a class="anchor" name="345310019c33b0c1e11cf8b2a7fd6dd4"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::ArpCacheEntries" ref="345310019c33b0c1e11cf8b2a7fd6dd4" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dd/dc0/a00611.html">EFI_TCP4_OPTION</a>* <a class="el" href="../../d8/d00/a00606.html#0274dd4563d8876792d0fcce3b0952dc">EFI_TCP4_CONFIG_DATA::ControlOption</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d8/d00/a00606.html#345310019c33b0c1e11cf8b2a7fd6dd4">EFI_PXE_BASE_CODE_MODE::ArpCacheEntries</a>          </td>
         </tr>
       </table>
 </div>
@@ -64,12 +125,12 @@
 
 </div>
 </div><p>
-<a class="anchor" name="8fea3dc0f8a119556c3e70a9c0d5df3b"></a><!-- doxytag: member="EFI_TCP4_CONFIG_DATA::TimeToLive" ref="8fea3dc0f8a119556c3e70a9c0d5df3b" args="" -->
+<a class="anchor" name="d8734de513a2f822a4a76b9459174d9b"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::AutoArp" ref="d8734de513a2f822a4a76b9459174d9b" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d00/a00606.html#8fea3dc0f8a119556c3e70a9c0d5df3b">EFI_TCP4_CONFIG_DATA::TimeToLive</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d8/d00/a00606.html#d8734de513a2f822a4a76b9459174d9b">EFI_PXE_BASE_CODE_MODE::AutoArp</a>          </td>
         </tr>
       </table>
 </div>
@@ -79,12 +140,462 @@
 
 </div>
 </div><p>
-<a class="anchor" name="2aa83723a2d429262dcff1f950c0eb8f"></a><!-- doxytag: member="EFI_TCP4_CONFIG_DATA::TypeOfService" ref="2aa83723a2d429262dcff1f950c0eb8f" args="" -->
+<a class="anchor" name="b964b638ddbb9b5addef9f063540ac45"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::BisDetected" ref="b964b638ddbb9b5addef9f063540ac45" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d00/a00606.html#2aa83723a2d429262dcff1f950c0eb8f">EFI_TCP4_CONFIG_DATA::TypeOfService</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d8/d00/a00606.html#b964b638ddbb9b5addef9f063540ac45">EFI_PXE_BASE_CODE_MODE::BisDetected</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="8e0f18796d86c2e7c0ffab4c0418a077"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::BisSupported" ref="8e0f18796d86c2e7c0ffab4c0418a077" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d8/d00/a00606.html#8e0f18796d86c2e7c0ffab4c0418a077">EFI_PXE_BASE_CODE_MODE::BisSupported</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="570defc9caaeaa56acff62c9f310f02e"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::DhcpAck" ref="570defc9caaeaa56acff62c9f310f02e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d4/d14/a00608.html">EFI_PXE_BASE_CODE_PACKET</a> <a class="el" href="../../d8/d00/a00606.html#570defc9caaeaa56acff62c9f310f02e">EFI_PXE_BASE_CODE_MODE::DhcpAck</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="8f0508cb0fc9d197c7fe9b3cf9d1c3be"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::DhcpAckReceived" ref="8f0508cb0fc9d197c7fe9b3cf9d1c3be" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d8/d00/a00606.html#8f0508cb0fc9d197c7fe9b3cf9d1c3be">EFI_PXE_BASE_CODE_MODE::DhcpAckReceived</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="949d5b8862fc3fd0813605b9ca174b79"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::DhcpDiscover" ref="949d5b8862fc3fd0813605b9ca174b79" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d4/d14/a00608.html">EFI_PXE_BASE_CODE_PACKET</a> <a class="el" href="../../d8/d00/a00606.html#949d5b8862fc3fd0813605b9ca174b79">EFI_PXE_BASE_CODE_MODE::DhcpDiscover</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="a125d10eac6a2fd66d9dfd19af7b5339"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::DhcpDiscoverValid" ref="a125d10eac6a2fd66d9dfd19af7b5339" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d8/d00/a00606.html#a125d10eac6a2fd66d9dfd19af7b5339">EFI_PXE_BASE_CODE_MODE::DhcpDiscoverValid</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="c92c20d407283e5fcfc726f8412b7d30"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::IcmpError" ref="c92c20d407283e5fcfc726f8412b7d30" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d6/d75/a00604.html">EFI_PXE_BASE_CODE_ICMP_ERROR</a> <a class="el" href="../../d8/d00/a00606.html#c92c20d407283e5fcfc726f8412b7d30">EFI_PXE_BASE_CODE_MODE::IcmpError</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="b8cb15ea2ac7a2fc134ec707d18b9d97"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::IcmpErrorReceived" ref="b8cb15ea2ac7a2fc134ec707d18b9d97" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d8/d00/a00606.html#b8cb15ea2ac7a2fc134ec707d18b9d97">EFI_PXE_BASE_CODE_MODE::IcmpErrorReceived</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="15ec03a2daf8d9d828e507e9d3879727"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::IpFilter" ref="15ec03a2daf8d9d828e507e9d3879727" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d1c/a00605.html">EFI_PXE_BASE_CODE_IP_FILTER</a> <a class="el" href="../../d8/d00/a00606.html#15ec03a2daf8d9d828e507e9d3879727">EFI_PXE_BASE_CODE_MODE::IpFilter</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="31fabd83d566ac253bdd62da8e19f247"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::Ipv6Available" ref="31fabd83d566ac253bdd62da8e19f247" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d8/d00/a00606.html#31fabd83d566ac253bdd62da8e19f247">EFI_PXE_BASE_CODE_MODE::Ipv6Available</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="96af676ba1c1a5954ed0d34d528fbe58"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::Ipv6Supported" ref="96af676ba1c1a5954ed0d34d528fbe58" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d8/d00/a00606.html#96af676ba1c1a5954ed0d34d528fbe58">EFI_PXE_BASE_CODE_MODE::Ipv6Supported</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="6b9213d7f82b8005839ba2171f65eadc"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::MakeCallbacks" ref="6b9213d7f82b8005839ba2171f65eadc" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d8/d00/a00606.html#6b9213d7f82b8005839ba2171f65eadc">EFI_PXE_BASE_CODE_MODE::MakeCallbacks</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="2681eba373afe9ef4904357ad5740bd6"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::ProxyOffer" ref="2681eba373afe9ef4904357ad5740bd6" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d4/d14/a00608.html">EFI_PXE_BASE_CODE_PACKET</a> <a class="el" href="../../d8/d00/a00606.html#2681eba373afe9ef4904357ad5740bd6">EFI_PXE_BASE_CODE_MODE::ProxyOffer</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="1c59f07b06537328d66ad31f74646559"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::ProxyOfferReceived" ref="1c59f07b06537328d66ad31f74646559" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d8/d00/a00606.html#1c59f07b06537328d66ad31f74646559">EFI_PXE_BASE_CODE_MODE::ProxyOfferReceived</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="679acfb39bb085d3d4c22b61875ff1eb"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::PxeBisReply" ref="679acfb39bb085d3d4c22b61875ff1eb" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d4/d14/a00608.html">EFI_PXE_BASE_CODE_PACKET</a> <a class="el" href="../../d8/d00/a00606.html#679acfb39bb085d3d4c22b61875ff1eb">EFI_PXE_BASE_CODE_MODE::PxeBisReply</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="02aeea07670b5d1f091e25ba67a1b2ee"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::PxeBisReplyReceived" ref="02aeea07670b5d1f091e25ba67a1b2ee" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d8/d00/a00606.html#02aeea07670b5d1f091e25ba67a1b2ee">EFI_PXE_BASE_CODE_MODE::PxeBisReplyReceived</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="fb890fd18a229a57ad5aa4e798d1cb32"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::PxeDiscover" ref="fb890fd18a229a57ad5aa4e798d1cb32" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d4/d14/a00608.html">EFI_PXE_BASE_CODE_PACKET</a> <a class="el" href="../../d8/d00/a00606.html#fb890fd18a229a57ad5aa4e798d1cb32">EFI_PXE_BASE_CODE_MODE::PxeDiscover</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="ae53736610616eb837a1a3c1ad7dc445"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::PxeDiscoverValid" ref="ae53736610616eb837a1a3c1ad7dc445" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d8/d00/a00606.html#ae53736610616eb837a1a3c1ad7dc445">EFI_PXE_BASE_CODE_MODE::PxeDiscoverValid</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="885cb44ff906cf6899fe03b4ff5ae8d8"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::PxeReply" ref="885cb44ff906cf6899fe03b4ff5ae8d8" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d4/d14/a00608.html">EFI_PXE_BASE_CODE_PACKET</a> <a class="el" href="../../d8/d00/a00606.html#885cb44ff906cf6899fe03b4ff5ae8d8">EFI_PXE_BASE_CODE_MODE::PxeReply</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="35e7398b4510b9160a2d918278c7487f"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::PxeReplyReceived" ref="35e7398b4510b9160a2d918278c7487f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d8/d00/a00606.html#35e7398b4510b9160a2d918278c7487f">EFI_PXE_BASE_CODE_MODE::PxeReplyReceived</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="898cee3790a246ef3c245b34daf6728f"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::RouteTable" ref="898cee3790a246ef3c245b34daf6728f" args="[EFI_PXE_BASE_CODE_MAX_ROUTE_ENTRIES]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../db/d3f/a00609.html">EFI_PXE_BASE_CODE_ROUTE_ENTRY</a> <a class="el" href="../../d8/d00/a00606.html#898cee3790a246ef3c245b34daf6728f">EFI_PXE_BASE_CODE_MODE::RouteTable</a>[EFI_PXE_BASE_CODE_MAX_ROUTE_ENTRIES]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="900b6c9afad1bf72d5dc6311e3cd6dde"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::RouteTableEntries" ref="900b6c9afad1bf72d5dc6311e3cd6dde" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d8/d00/a00606.html#900b6c9afad1bf72d5dc6311e3cd6dde">EFI_PXE_BASE_CODE_MODE::RouteTableEntries</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="7b8516f4008b952c8ba8e731e06c128d"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::SendGUID" ref="7b8516f4008b952c8ba8e731e06c128d" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d8/d00/a00606.html#7b8516f4008b952c8ba8e731e06c128d">EFI_PXE_BASE_CODE_MODE::SendGUID</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="7c1cc28c5f289326d743e8852e2cba75"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::Started" ref="7c1cc28c5f289326d743e8852e2cba75" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d8/d00/a00606.html#7c1cc28c5f289326d743e8852e2cba75">EFI_PXE_BASE_CODE_MODE::Started</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="094076aee6a45b987995c95840e3ed58"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::StationIp" ref="094076aee6a45b987995c95840e3ed58" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dd/d5a/a00538.html">EFI_IP_ADDRESS</a> <a class="el" href="../../d8/d00/a00606.html#094076aee6a45b987995c95840e3ed58">EFI_PXE_BASE_CODE_MODE::StationIp</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="edc97db4abd2bedf2bd84c4e06f0082f"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::SubnetMask" ref="edc97db4abd2bedf2bd84c4e06f0082f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dd/d5a/a00538.html">EFI_IP_ADDRESS</a> <a class="el" href="../../d8/d00/a00606.html#edc97db4abd2bedf2bd84c4e06f0082f">EFI_PXE_BASE_CODE_MODE::SubnetMask</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="9d85805bbb5d22796a4aa35a416130d2"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::TftpError" ref="9d85805bbb5d22796a4aa35a416130d2" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dd/dc0/a00611.html">EFI_PXE_BASE_CODE_TFTP_ERROR</a> <a class="el" href="../../d8/d00/a00606.html#9d85805bbb5d22796a4aa35a416130d2">EFI_PXE_BASE_CODE_MODE::TftpError</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="4cd7b331ade22f8bdf4adadb50597b9e"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::TftpErrorReceived" ref="4cd7b331ade22f8bdf4adadb50597b9e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d8/d00/a00606.html#4cd7b331ade22f8bdf4adadb50597b9e">EFI_PXE_BASE_CODE_MODE::TftpErrorReceived</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="181c109db36ced8b5d1adfe555187128"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::ToS" ref="181c109db36ced8b5d1adfe555187128" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d00/a00606.html#181c109db36ced8b5d1adfe555187128">EFI_PXE_BASE_CODE_MODE::ToS</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="12b909489a4d5deb55ab28877d66cca3"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::TTL" ref="12b909489a4d5deb55ab28877d66cca3" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d00/a00606.html#12b909489a4d5deb55ab28877d66cca3">EFI_PXE_BASE_CODE_MODE::TTL</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="169a7a9e6d8e2d850ba9a6d3c08effc8"></a><!-- doxytag: member="EFI_PXE_BASE_CODE_MODE::UsingIpv6" ref="169a7a9e6d8e2d850ba9a6d3c08effc8" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> <a class="el" href="../../d8/d00/a00606.html#169a7a9e6d8e2d850ba9a6d3c08effc8">EFI_PXE_BASE_CODE_MODE::UsingIpv6</a>          </td>
         </tr>
       </table>
 </div>
@@ -95,7 +606,7 @@
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:19 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:43 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

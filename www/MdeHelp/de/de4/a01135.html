@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Protocol/HiiFont.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Protocol/Pcd.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,93 +21,95 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Protocol/HiiFont.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Protocol/Pcd.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d2a/a00086.html">_EFI_HII_ROW_INFO</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d53/a00429.html">EFI_FONT_INFO</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/dc0/a00033.html">_EFI_FONT_DISPLAY_INFO</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/df9/a00044.html">_EFI_HII_FONT_PROTOCOL</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d13/a00766.html">PCD_PROTOCOL</a></td></tr>
 
 <tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#5946ed98c3177a54fa5722afdd8f9231">EFI_HII_FONT_PROTOCOL_GUID</a>&nbsp;&nbsp;&nbsp;{ 0xe9ca4775, 0x8657, 0x47fc, { 0x97, 0xe7, 0x7e, 0xd6, 0x5a, 0x8, 0x43, 0x24 } }</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#3647f20779ecefe2e01dc5b13b6f0892">PCD_PROTOCOL_GUID</a>&nbsp;&nbsp;&nbsp;{ 0x11b34006, 0xd85b, 0x4d0a, { 0xa2, 0x90, 0xd5, 0xa5, 0x71, 0x31, 0xe, 0xf7 } }</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#2e33055ab18cfdaff6ffd665d355dd06">EFI_HII_OUT_FLAG_CLIP</a>&nbsp;&nbsp;&nbsp;0x00000001</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#d582554af81643b6eea3e2e324e179cf">EFI_HII_OUT_FLAG_WRAP</a>&nbsp;&nbsp;&nbsp;0x00000002</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#95d1578d87b9737ae7c5a8edc68cb3d7">EFI_HII_OUT_FLAG_CLIP_CLEAN_Y</a>&nbsp;&nbsp;&nbsp;0x00000004</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#31b93f8b6d1cfe4613aceb5d8b6cf43d">EFI_HII_OUT_FLAG_CLIP_CLEAN_X</a>&nbsp;&nbsp;&nbsp;0x00000008</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#028ab6b97d9319f67d3b0e9edcffe837">EFI_HII_OUT_FLAG_TRANSPARENT</a>&nbsp;&nbsp;&nbsp;0x00000010</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#8da26bf963a8d0d4a020ac012ce77244">EFI_HII_IGNORE_IF_NO_GLYPH</a>&nbsp;&nbsp;&nbsp;0x00000020</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#81a1e7c44ebdef98030180ceeb31c043">EFI_HII_IGNORE_LINE_BREAK</a>&nbsp;&nbsp;&nbsp;0x00000040</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#839efca2363f775a6ee3f6848894716c">EFI_HII_DIRECT_TO_SCREEN</a>&nbsp;&nbsp;&nbsp;0x00000080</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#47fc86cdf9ad43f0731396bc3ce26209">EFI_FONT_INFO_SYS_FONT</a>&nbsp;&nbsp;&nbsp;0x00000001</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#e2bf94869d36c3e6e53974e179e741dd">EFI_FONT_INFO_SYS_SIZE</a>&nbsp;&nbsp;&nbsp;0x00000002</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#43f4657452521d2222b3115af2845ff9">EFI_FONT_INFO_SYS_STYLE</a>&nbsp;&nbsp;&nbsp;0x00000004</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#5d90bb8df9b4990248704bc9b6562236">EFI_FONT_INFO_SYS_FORE_COLOR</a>&nbsp;&nbsp;&nbsp;0x00000010</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#7a238678d39376ef02593d0e47a598a5">EFI_FONT_INFO_SYS_BACK_COLOR</a>&nbsp;&nbsp;&nbsp;0x00000020</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#3d943714aaaf65f8442f3fb155199af2">EFI_FONT_INFO_RESIZE</a>&nbsp;&nbsp;&nbsp;0x00001000</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#a3474fa33062289b1e28b3fa8b0ae3dc">EFI_FONT_INFO_RESTYLE</a>&nbsp;&nbsp;&nbsp;0x00002000</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#c80432ec2859e6bc44756d45ab10aca6">EFI_FONT_INFO_ANY_FONT</a>&nbsp;&nbsp;&nbsp;0x00010000</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#620f0dc9f759ee4df1ae99c530765007">EFI_FONT_INFO_ANY_SIZE</a>&nbsp;&nbsp;&nbsp;0x00020000</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#aa7db0674f9ecf2e49f7f14f00fcf04b">EFI_FONT_INFO_ANY_STYLE</a>&nbsp;&nbsp;&nbsp;0x00040000</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#7cffd411eb9ef5200af78d18e59236da">PCD_INVALID_TOKEN_NUMBER</a>&nbsp;&nbsp;&nbsp;((<a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>) 0)</td></tr>
 
 <tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
-<a class="el" href="../../d5/df9/a00044.html">_EFI_HII_FONT_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#118e8c24eea65a6b60842773e353f875">EFI_HII_FONT_PROTOCOL</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef VOID(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#72d8ab50a626fa0f9a011976ff9d2c44">PCD_PROTOCOL_SET_SKU</a> )(IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> SkuId)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef VOID *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#ac691711608720c9707c80f2d6ea5031">EFI_FONT_HANDLE</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#97f6eb9e085aae4bb71283b23654483d">PCD_PROTOCOL_GET8</a> )(IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#d2f8cc35bfa1ea86bae909f18d09c4d4">EFI_HII_OUT_FLAGS</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#3194beaf4876014a3d3cbfb652aa4dfa">PCD_PROTOCOL_GET16</a> )(IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <a class="el" href="../../da/d2a/a00086.html">_EFI_HII_ROW_INFO</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#3221ee3972a4c2b716a4254978b54f47">EFI_HII_ROW_INFO</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#f8872e35474d5ab7bebab2cf8e007acf">PCD_PROTOCOL_GET32</a> )(IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#0236ebbbba2d6f95d4106692c2cf97c7">EFI_FONT_INFO_MASK</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#41248c415cd32e5574e3de16e426579f">PCD_PROTOCOL_GET64</a> )(IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
-<a class="el" href="../../d0/dc0/a00033.html">_EFI_FONT_DISPLAY_INFO</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#92287bec04af8008fb3915df78f970b4">EFI_FONT_DISPLAY_INFO</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef VOID *(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#ade0f30c486bec987c8d61facfc0f5f1">PCD_PROTOCOL_GET_POINTER</a> )(IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#bc575c417a60424048d5750f4c66d870">EFI_HII_STRING_TO_IMAGE</a> )(IN CONST <a class="el" href="../../d5/df9/a00044.html">EFI_HII_FONT_PROTOCOL</a> *This, IN <a class="el" href="../../de/de4/a01135.html#d2f8cc35bfa1ea86bae909f18d09c4d4">EFI_HII_OUT_FLAGS</a> Flags, IN CONST <a class="el" href="../../d6/d97/a01188.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> String, IN CONST <a class="el" href="../../d0/dc0/a00033.html">EFI_FONT_DISPLAY_INFO</a> *StringInfo, IN OUT <a class="el" href="../../d1/d72/a00204.html">EFI_IMAGE_OUTPUT</a> **Blt, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> BltX, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> BltY, OUT <a class="el" href="../../da/d2a/a00086.html">EFI_HII_ROW_INFO</a> **RowInfoArray, OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *RowInfoArraySize, OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *ColumnInfoArray)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#d3d0ec0aa7b3bfc0de4b7c16771e9ee8">PCD_PROTOCOL_GET_BOOLEAN</a> )(IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#91fc04cc4d1981e260750065425ec785">EFI_HII_STRING_ID_TO_IMAGE</a> )(IN CONST <a class="el" href="../../d5/df9/a00044.html">EFI_HII_FONT_PROTOCOL</a> *This, IN <a class="el" href="../../de/de4/a01135.html#d2f8cc35bfa1ea86bae909f18d09c4d4">EFI_HII_OUT_FLAGS</a> Flags, IN <a class="el" href="../../d6/d97/a01188.html#ea5ce95a55f97b2ee1e77092a15290a2">EFI_HII_HANDLE</a> PackageList, IN <a class="el" href="../../d6/d97/a01188.html#ed584a1cd697a25504fd17a5c82dc1d7">EFI_STRING_ID</a> StringId, IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Language, IN CONST <a class="el" href="../../d0/dc0/a00033.html">EFI_FONT_DISPLAY_INFO</a> *StringInfo, IN OUT <a class="el" href="../../d1/d72/a00204.html">EFI_IMAGE_OUTPUT</a> **Blt, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> BltX, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> BltY, OUT <a class="el" href="../../da/d2a/a00086.html">EFI_HII_ROW_INFO</a> **RowInfoArray, OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *RowInfoArraySize, OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *ColumnInfoArray)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#e189906d466070d0392ec6e085641961">PCD_PROTOCOL_GET_SIZE</a> )(IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#8e56dd31905307ef523d2c195d75d0d3">EFI_HII_GET_GLYPH</a> )(IN CONST <a class="el" href="../../d5/df9/a00044.html">EFI_HII_FONT_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> Char, IN CONST <a class="el" href="../../d0/dc0/a00033.html">EFI_FONT_DISPLAY_INFO</a> *StringInfo, OUT <a class="el" href="../../d1/d72/a00204.html">EFI_IMAGE_OUTPUT</a> **Blt, OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *Baseline)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#9a18d7ba222262b765647b22d7730022">PCD_PROTOCOL_GET_EX_8</a> )(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#9c9d120aab389d109ebe518a96a3230e">EFI_HII_GET_FONT_INFO</a> )(IN CONST <a class="el" href="../../d5/df9/a00044.html">EFI_HII_FONT_PROTOCOL</a> *This, IN OUT <a class="el" href="../../de/de4/a01135.html#ac691711608720c9707c80f2d6ea5031">EFI_FONT_HANDLE</a> *FontHandle, IN CONST <a class="el" href="../../d0/dc0/a00033.html">EFI_FONT_DISPLAY_INFO</a> *StringInfoIn, OUT <a class="el" href="../../d0/dc0/a00033.html">EFI_FONT_DISPLAY_INFO</a> **StringInfoOut, IN CONST <a class="el" href="../../d6/d97/a01188.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> String)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#b97eea3cffeb8c25bfa7927873e193c3">PCD_PROTOCOL_GET_EX_16</a> )(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#3ad43e70e617d7109fb2d409406dbf91">PCD_PROTOCOL_GET_EX_32</a> )(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#32034133ec324ac15bf487e949bcd650">PCD_PROTOCOL_GET_EX_64</a> )(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef VOID *(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#9f0b7179caab5fcb212f62bfe9da8739">PCD_PROTOCOL_GET_EX_POINTER</a> )(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#49a1cb8a6f598cea47de049ccd39f632">PCD_PROTOCOL_GET_EX_BOOLEAN</a> )(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#c560199b591be271cc8c361169f663a4">PCD_PROTOCOL_GET_EX_SIZE</a> )(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#57a1c84bee57b4084ca7a0ca08c1a4f6">PCD_PROTOCOL_SET8</a> )(IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> Value)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#45ff93ac5c7363f35a9a57f3c79fd702">PCD_PROTOCOL_SET16</a> )(IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> Value)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#e4f3ccdcc69460bd49821fc913b84cc3">PCD_PROTOCOL_SET32</a> )(IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> Value)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#35ca754288a7bdb9c60a2d3f94ecd46f">PCD_PROTOCOL_SET64</a> )(IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Value)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#2c17aa6c76a77f41321ba5deed32b8a1">PCD_PROTOCOL_SET_POINTER</a> )(IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *SizeOfBuffer, IN VOID *Buffer)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#f9af63d2ee4e2ef8ec33178e519a7fb6">PCD_PROTOCOL_SET_BOOLEAN</a> )(IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> Value)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#06d4294243e4ece89cfcbc8c2ca7f3ea">PCD_PROTOCOL_SET_EX_8</a> )(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> Value)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#d2c3e91f3b16145e9ffdbbb8e4b95da9">PCD_PROTOCOL_SET_EX_16</a> )(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> Value)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#7184e6de1dffd4bf6e3cd77afa5a0759">PCD_PROTOCOL_SET_EX_32</a> )(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> Value)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#c7cd2f723b83a5de05561268d323e181">PCD_PROTOCOL_SET_EX_64</a> )(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Value)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#9e30e36b1be7455206ea077bc9465584">PCD_PROTOCOL_SET_EX_POINTER</a> )(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *SizeOfBuffer, IN VOID *Buffer)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#39d6fad6baa230e7a45208e143c493a1">PCD_PROTOCOL_SET_EX_BOOLEAN</a> )(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> Value)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef VOID(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#15510a931042a3b761ca0fb4e2751906">PCD_PROTOCOL_CALLBACK</a> )(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *CallBackGuid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> CallBackToken, IN OUT VOID *TokenData, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenDataSize)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#cb8c83ff75f2265b2b073676c944df11">PCD_PROTOCOL_CALLBACK_ONSET</a> )(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../de/de4/a01135.html#15510a931042a3b761ca0fb4e2751906">PCD_PROTOCOL_CALLBACK</a> CallBackFunction)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#fcf4146c3d2c010cdbad9b5fd5c49f02">PCD_PROTOCOL_CANCEL_CALLBACK</a> )(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../de/de4/a01135.html#15510a931042a3b761ca0fb4e2751906">PCD_PROTOCOL_CALLBACK</a> CallBackFunction)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#3fc239d68761539ff95f35e3b55157ba">PCD_PROTOCOL_GET_NEXT_TOKEN</a> )(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *TokenNumber)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#54026a127b4947e99885b4c71aa768a7">PCD_PROTOCOL_GET_NEXT_TOKENSPACE</a> )(IN OUT CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> **Guid)</td></tr>
 
 <tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#46104dddf358e7e90cd370fb03ffbf52">gEfiHiiFontProtocolGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de4/a01135.html#7b1eb454e9c4f91ee81a793864285148">gPcdProtocolGuid</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-The file provides services to retrieve font information.<p>
+Platform Configuration Database (PCD) Protocol<p>
 Copyright (c) 2006 - 2009, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
-<a class="anchor" name="c80432ec2859e6bc44756d45ab10aca6"></a><!-- doxytag: member="HiiFont.h::EFI_FONT_INFO_ANY_FONT" ref="c80432ec2859e6bc44756d45ab10aca6" args="" -->
+<a class="anchor" name="7cffd411eb9ef5200af78d18e59236da"></a><!-- doxytag: member="Pcd.h::PCD_INVALID_TOKEN_NUMBER" ref="7cffd411eb9ef5200af78d18e59236da" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_FONT_INFO_ANY_FONT&nbsp;&nbsp;&nbsp;0x00010000          </td>
+          <td class="memname">#define PCD_INVALID_TOKEN_NUMBER&nbsp;&nbsp;&nbsp;((<a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>) 0)          </td>
         </tr>
       </table>
 </div>
@@ -117,267 +119,12 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 </div>
 </div><p>
-<a class="anchor" name="620f0dc9f759ee4df1ae99c530765007"></a><!-- doxytag: member="HiiFont.h::EFI_FONT_INFO_ANY_SIZE" ref="620f0dc9f759ee4df1ae99c530765007" args="" -->
+<a class="anchor" name="3647f20779ecefe2e01dc5b13b6f0892"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_GUID" ref="3647f20779ecefe2e01dc5b13b6f0892" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_FONT_INFO_ANY_SIZE&nbsp;&nbsp;&nbsp;0x00020000          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="aa7db0674f9ecf2e49f7f14f00fcf04b"></a><!-- doxytag: member="HiiFont.h::EFI_FONT_INFO_ANY_STYLE" ref="aa7db0674f9ecf2e49f7f14f00fcf04b" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_FONT_INFO_ANY_STYLE&nbsp;&nbsp;&nbsp;0x00040000          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="3d943714aaaf65f8442f3fb155199af2"></a><!-- doxytag: member="HiiFont.h::EFI_FONT_INFO_RESIZE" ref="3d943714aaaf65f8442f3fb155199af2" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_FONT_INFO_RESIZE&nbsp;&nbsp;&nbsp;0x00001000          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="a3474fa33062289b1e28b3fa8b0ae3dc"></a><!-- doxytag: member="HiiFont.h::EFI_FONT_INFO_RESTYLE" ref="a3474fa33062289b1e28b3fa8b0ae3dc" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_FONT_INFO_RESTYLE&nbsp;&nbsp;&nbsp;0x00002000          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="7a238678d39376ef02593d0e47a598a5"></a><!-- doxytag: member="HiiFont.h::EFI_FONT_INFO_SYS_BACK_COLOR" ref="7a238678d39376ef02593d0e47a598a5" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_FONT_INFO_SYS_BACK_COLOR&nbsp;&nbsp;&nbsp;0x00000020          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="47fc86cdf9ad43f0731396bc3ce26209"></a><!-- doxytag: member="HiiFont.h::EFI_FONT_INFO_SYS_FONT" ref="47fc86cdf9ad43f0731396bc3ce26209" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_FONT_INFO_SYS_FONT&nbsp;&nbsp;&nbsp;0x00000001          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="5d90bb8df9b4990248704bc9b6562236"></a><!-- doxytag: member="HiiFont.h::EFI_FONT_INFO_SYS_FORE_COLOR" ref="5d90bb8df9b4990248704bc9b6562236" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_FONT_INFO_SYS_FORE_COLOR&nbsp;&nbsp;&nbsp;0x00000010          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="e2bf94869d36c3e6e53974e179e741dd"></a><!-- doxytag: member="HiiFont.h::EFI_FONT_INFO_SYS_SIZE" ref="e2bf94869d36c3e6e53974e179e741dd" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_FONT_INFO_SYS_SIZE&nbsp;&nbsp;&nbsp;0x00000002          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="43f4657452521d2222b3115af2845ff9"></a><!-- doxytag: member="HiiFont.h::EFI_FONT_INFO_SYS_STYLE" ref="43f4657452521d2222b3115af2845ff9" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_FONT_INFO_SYS_STYLE&nbsp;&nbsp;&nbsp;0x00000004          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="839efca2363f775a6ee3f6848894716c"></a><!-- doxytag: member="HiiFont.h::EFI_HII_DIRECT_TO_SCREEN" ref="839efca2363f775a6ee3f6848894716c" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_HII_DIRECT_TO_SCREEN&nbsp;&nbsp;&nbsp;0x00000080          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="5946ed98c3177a54fa5722afdd8f9231"></a><!-- doxytag: member="HiiFont.h::EFI_HII_FONT_PROTOCOL_GUID" ref="5946ed98c3177a54fa5722afdd8f9231" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_HII_FONT_PROTOCOL_GUID&nbsp;&nbsp;&nbsp;{ 0xe9ca4775, 0x8657, 0x47fc, { 0x97, 0xe7, 0x7e, 0xd6, 0x5a, 0x8, 0x43, 0x24 } }          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="8da26bf963a8d0d4a020ac012ce77244"></a><!-- doxytag: member="HiiFont.h::EFI_HII_IGNORE_IF_NO_GLYPH" ref="8da26bf963a8d0d4a020ac012ce77244" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_HII_IGNORE_IF_NO_GLYPH&nbsp;&nbsp;&nbsp;0x00000020          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="81a1e7c44ebdef98030180ceeb31c043"></a><!-- doxytag: member="HiiFont.h::EFI_HII_IGNORE_LINE_BREAK" ref="81a1e7c44ebdef98030180ceeb31c043" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_HII_IGNORE_LINE_BREAK&nbsp;&nbsp;&nbsp;0x00000040          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="2e33055ab18cfdaff6ffd665d355dd06"></a><!-- doxytag: member="HiiFont.h::EFI_HII_OUT_FLAG_CLIP" ref="2e33055ab18cfdaff6ffd665d355dd06" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_HII_OUT_FLAG_CLIP&nbsp;&nbsp;&nbsp;0x00000001          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="31b93f8b6d1cfe4613aceb5d8b6cf43d"></a><!-- doxytag: member="HiiFont.h::EFI_HII_OUT_FLAG_CLIP_CLEAN_X" ref="31b93f8b6d1cfe4613aceb5d8b6cf43d" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_HII_OUT_FLAG_CLIP_CLEAN_X&nbsp;&nbsp;&nbsp;0x00000008          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="95d1578d87b9737ae7c5a8edc68cb3d7"></a><!-- doxytag: member="HiiFont.h::EFI_HII_OUT_FLAG_CLIP_CLEAN_Y" ref="95d1578d87b9737ae7c5a8edc68cb3d7" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_HII_OUT_FLAG_CLIP_CLEAN_Y&nbsp;&nbsp;&nbsp;0x00000004          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="028ab6b97d9319f67d3b0e9edcffe837"></a><!-- doxytag: member="HiiFont.h::EFI_HII_OUT_FLAG_TRANSPARENT" ref="028ab6b97d9319f67d3b0e9edcffe837" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_HII_OUT_FLAG_TRANSPARENT&nbsp;&nbsp;&nbsp;0x00000010          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="d582554af81643b6eea3e2e324e179cf"></a><!-- doxytag: member="HiiFont.h::EFI_HII_OUT_FLAG_WRAP" ref="d582554af81643b6eea3e2e324e179cf" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_HII_OUT_FLAG_WRAP&nbsp;&nbsp;&nbsp;0x00000002          </td>
+          <td class="memname">#define PCD_PROTOCOL_GUID&nbsp;&nbsp;&nbsp;{ 0x11b34006, 0xd85b, 0x4d0a, { 0xa2, 0x90, 0xd5, 0xa5, 0x71, 0x31, 0xe, 0xf7 } }          </td>
         </tr>
       </table>
 </div>
@@ -388,247 +135,879 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 </div>
 </div><p>
 <hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="92287bec04af8008fb3915df78f970b4"></a><!-- doxytag: member="HiiFont.h::EFI_FONT_DISPLAY_INFO" ref="92287bec04af8008fb3915df78f970b4" args="" -->
+<a class="anchor" name="15510a931042a3b761ca0fb4e2751906"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_CALLBACK" ref="15510a931042a3b761ca0fb4e2751906" args=")(IN CONST EFI_GUID *CallBackGuid, IN UINTN CallBackToken, IN OUT VOID *TokenData, IN UINTN TokenDataSize)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef struct <a class="el" href="../../d0/dc0/a00033.html">_EFI_FONT_DISPLAY_INFO</a>  <a class="el" href="../../d0/dc0/a00033.html">EFI_FONT_DISPLAY_INFO</a>          </td>
+          <td class="memname">typedef VOID(EFIAPI * <a class="el" href="../../de/de4/a01135.html#15510a931042a3b761ca0fb4e2751906">PCD_PROTOCOL_CALLBACK</a>)(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *CallBackGuid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> CallBackToken, IN OUT VOID *TokenData, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenDataSize)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Describes font output-related information.<p>
-This structure is used for describing the way a string should be rendered in a particular font. FontInfo specifies the basic font information, and ForegroundColor and BackgroundColor specify the color in which the characters should be displayed. The flags in FontInfoMask describe where the system default should be supplied instead of the specified information. The flags also describe what options can be used to make a match between the font requested and the font available. 
-</div>
-</div><p>
-<a class="anchor" name="ac691711608720c9707c80f2d6ea5031"></a><!-- doxytag: member="HiiFont.h::EFI_FONT_HANDLE" ref="ac691711608720c9707c80f2d6ea5031" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef VOID* <a class="el" href="../../de/de4/a01135.html#ac691711608720c9707c80f2d6ea5031">EFI_FONT_HANDLE</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="0236ebbbba2d6f95d4106692c2cf97c7"></a><!-- doxytag: member="HiiFont.h::EFI_FONT_INFO_MASK" ref="0236ebbbba2d6f95d4106692c2cf97c7" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../de/de4/a01135.html#0236ebbbba2d6f95d4106692c2cf97c7">EFI_FONT_INFO_MASK</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Font info flag. All flags (FONT, SIZE, STYLE, and COLOR) are defined. They are defined as EFI_FONT_INFO_*** 
-</div>
-</div><p>
-<a class="anchor" name="118e8c24eea65a6b60842773e353f875"></a><!-- doxytag: member="HiiFont.h::EFI_HII_FONT_PROTOCOL" ref="118e8c24eea65a6b60842773e353f875" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct <a class="el" href="../../d5/df9/a00044.html">_EFI_HII_FONT_PROTOCOL</a> <a class="el" href="../../d5/df9/a00044.html">EFI_HII_FONT_PROTOCOL</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="9c9d120aab389d109ebe518a96a3230e"></a><!-- doxytag: member="HiiFont.h::EFI_HII_GET_FONT_INFO" ref="9c9d120aab389d109ebe518a96a3230e" args=")(IN CONST EFI_HII_FONT_PROTOCOL *This, IN OUT EFI_FONT_HANDLE *FontHandle, IN CONST EFI_FONT_DISPLAY_INFO *StringInfoIn, OUT EFI_FONT_DISPLAY_INFO **StringInfoOut, IN CONST EFI_STRING String)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#9c9d120aab389d109ebe518a96a3230e">EFI_HII_GET_FONT_INFO</a>)(IN CONST <a class="el" href="../../d5/df9/a00044.html">EFI_HII_FONT_PROTOCOL</a> *This, IN OUT <a class="el" href="../../de/de4/a01135.html#ac691711608720c9707c80f2d6ea5031">EFI_FONT_HANDLE</a> *FontHandle, IN CONST <a class="el" href="../../d0/dc0/a00033.html">EFI_FONT_DISPLAY_INFO</a> *StringInfoIn, OUT <a class="el" href="../../d0/dc0/a00033.html">EFI_FONT_DISPLAY_INFO</a> **StringInfoOut, IN CONST <a class="el" href="../../d6/d97/a01188.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> String)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This function iterates through fonts which match the specified font, using the specified criteria. If String is non-NULL, then all of the characters in the string must exist in order for a candidate font to be returned.<p>
+Callback on SET function prototype definition.<p>
+This notification function serves two purposes. Firstly, it notifies the module which did the registration that the value of this PCD token has been set. Secondly, it provides a mechanism for the module that did the registration to intercept the set operation and override the value that has been set, if necessary. After the invocation of the callback function, TokenData will be used by PCD service DXE driver to modify the internal data in PCD database.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_HII_FONT_PROTOCOL instance.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>FontHandle</em>&nbsp;</td><td>On entry, points to the font handle returned by a previous call to GetFontInfo() or NULL to start with the first font. On return, points to the returned font handle or points to NULL if there are no more matching fonts.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>StringInfoIn</em>&nbsp;</td><td>Upon entry, points to the font to return information about. If NULL, then the information about the system default font will be returned.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>StringInfoOut</em>&nbsp;</td><td>Upon return, contains the matching font's information. If NULL, then no information is returned.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>String</em>&nbsp;</td><td>Points to the string which will be tested to determine if all characters are available. If NULL, then any font is acceptable.</td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>CallBackGuid</em>&nbsp;</td><td>The PCD token <a class="el" href="../../d1/d87/a00689.html">GUID</a> being set. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>CallBackToken</em>&nbsp;</td><td>The PCD token number being set. </td></tr>
+    <tr><td valign="top"><tt>[in,out]</tt>&nbsp;</td><td valign="top"><em>TokenData</em>&nbsp;</td><td>A pointer to the token data being set. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenDataSize</em>&nbsp;</td><td>The size, in bytes, of the data being set.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Matching font returned successfully.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>No matching font was found.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There were insufficient resources to complete the request. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>VOID</em>&nbsp;</td><td></td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
-<a class="anchor" name="8e56dd31905307ef523d2c195d75d0d3"></a><!-- doxytag: member="HiiFont.h::EFI_HII_GET_GLYPH" ref="8e56dd31905307ef523d2c195d75d0d3" args=")(IN CONST EFI_HII_FONT_PROTOCOL *This, IN CONST CHAR16 Char, IN CONST EFI_FONT_DISPLAY_INFO *StringInfo, OUT EFI_IMAGE_OUTPUT **Blt, OUT UINTN *Baseline)" -->
+<a class="anchor" name="cb8c83ff75f2265b2b073676c944df11"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_CALLBACK_ONSET" ref="cb8c83ff75f2265b2b073676c944df11" args=")(IN CONST EFI_GUID *Guid, IN UINTN TokenNumber, IN PCD_PROTOCOL_CALLBACK CallBackFunction)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#8e56dd31905307ef523d2c195d75d0d3">EFI_HII_GET_GLYPH</a>)(IN CONST <a class="el" href="../../d5/df9/a00044.html">EFI_HII_FONT_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> Char, IN CONST <a class="el" href="../../d0/dc0/a00033.html">EFI_FONT_DISPLAY_INFO</a> *StringInfo, OUT <a class="el" href="../../d1/d72/a00204.html">EFI_IMAGE_OUTPUT</a> **Blt, OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *Baseline)          </td>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#cb8c83ff75f2265b2b073676c944df11">PCD_PROTOCOL_CALLBACK_ONSET</a>)(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../de/de4/a01135.html#15510a931042a3b761ca0fb4e2751906">PCD_PROTOCOL_CALLBACK</a> CallBackFunction)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Convert the glyph for a single character into a bitmap.<p>
+Specifies a function to be called anytime the value of a designated token is changed.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_HII_FONT_PROTOCOL instance.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Char</em>&nbsp;</td><td>Character to retrieve.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>StringInfo</em>&nbsp;</td><td>Points to the string font and color information or NULL if the string should use the default system font and color.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Blt</em>&nbsp;</td><td>Thus must point to a NULL on entry. A buffer will be allocated to hold the output and the pointer updated on exit. It is the caller's responsibility to free this buffer.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Baseline</em>&nbsp;</td><td>Number of pixels from the bottom of the bitmap to the baseline.</td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>The 128-bit unique value that designates the namespace from which to extract the value. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>CallBackFunction</em>&nbsp;</td><td>The function prototype called when the value associated with the CallBackToken is set.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Glyph bitmap created.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>Unable to allocate the output buffer Blt.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_WARN_UNKNOWN_GLYPH</em>&nbsp;</td><td>The glyph was unknown and was replaced with the glyph for Unicode character 0xFFFD.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Blt is NULL or Width is NULL or Height is NULL </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The PCD service has successfully established a call event for the CallBackToken requested. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The PCD service could not find the referenced token number. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
-<a class="anchor" name="d2f8cc35bfa1ea86bae909f18d09c4d4"></a><!-- doxytag: member="HiiFont.h::EFI_HII_OUT_FLAGS" ref="d2f8cc35bfa1ea86bae909f18d09c4d4" args="" -->
+<a class="anchor" name="fcf4146c3d2c010cdbad9b5fd5c49f02"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_CANCEL_CALLBACK" ref="fcf4146c3d2c010cdbad9b5fd5c49f02" args=")(IN CONST EFI_GUID *Guid, IN UINTN TokenNumber, IN PCD_PROTOCOL_CALLBACK CallBackFunction)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../de/de4/a01135.html#d2f8cc35bfa1ea86bae909f18d09c4d4">EFI_HII_OUT_FLAGS</a>          </td>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#fcf4146c3d2c010cdbad9b5fd5c49f02">PCD_PROTOCOL_CANCEL_CALLBACK</a>)(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../de/de4/a01135.html#15510a931042a3b761ca0fb4e2751906">PCD_PROTOCOL_CALLBACK</a> CallBackFunction)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-EFI_HII_OUT_FLAGS 
-</div>
-</div><p>
-<a class="anchor" name="3221ee3972a4c2b716a4254978b54f47"></a><!-- doxytag: member="HiiFont.h::EFI_HII_ROW_INFO" ref="3221ee3972a4c2b716a4254978b54f47" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct <a class="el" href="../../da/d2a/a00086.html">_EFI_HII_ROW_INFO</a>  <a class="el" href="../../da/d2a/a00086.html">EFI_HII_ROW_INFO</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Definition of EFI_HII_ROW_INFO. 
-</div>
-</div><p>
-<a class="anchor" name="91fc04cc4d1981e260750065425ec785"></a><!-- doxytag: member="HiiFont.h::EFI_HII_STRING_ID_TO_IMAGE" ref="91fc04cc4d1981e260750065425ec785" args=")(IN CONST EFI_HII_FONT_PROTOCOL *This, IN EFI_HII_OUT_FLAGS Flags, IN EFI_HII_HANDLE PackageList, IN EFI_STRING_ID StringId, IN CONST CHAR8 *Language, IN CONST EFI_FONT_DISPLAY_INFO *StringInfo, IN OUT EFI_IMAGE_OUTPUT **Blt, IN UINTN BltX, IN UINTN BltY, OUT EFI_HII_ROW_INFO **RowInfoArray, OUT UINTN *RowInfoArraySize, OUT UINTN *ColumnInfoArray)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#91fc04cc4d1981e260750065425ec785">EFI_HII_STRING_ID_TO_IMAGE</a>)(IN CONST <a class="el" href="../../d5/df9/a00044.html">EFI_HII_FONT_PROTOCOL</a> *This, IN <a class="el" href="../../de/de4/a01135.html#d2f8cc35bfa1ea86bae909f18d09c4d4">EFI_HII_OUT_FLAGS</a> Flags, IN <a class="el" href="../../d6/d97/a01188.html#ea5ce95a55f97b2ee1e77092a15290a2">EFI_HII_HANDLE</a> PackageList, IN <a class="el" href="../../d6/d97/a01188.html#ed584a1cd697a25504fd17a5c82dc1d7">EFI_STRING_ID</a> StringId, IN CONST <a class="el" href="../../d0/d2b/a01010.html#2f68f0189367ead40015f7c0ec68eb9e">CHAR8</a> *Language, IN CONST <a class="el" href="../../d0/dc0/a00033.html">EFI_FONT_DISPLAY_INFO</a> *StringInfo, IN OUT <a class="el" href="../../d1/d72/a00204.html">EFI_IMAGE_OUTPUT</a> **Blt, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> BltX, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> BltY, OUT <a class="el" href="../../da/d2a/a00086.html">EFI_HII_ROW_INFO</a> **RowInfoArray, OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *RowInfoArraySize, OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *ColumnInfoArray)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This function renders a string as a bitmap or to the screen and can clip or wrap the string. The bitmap is either supplied by the caller or allocated by the function. The strings are drawn with the font, size and style specified and can be drawn transparently or opaquely. The function can also return information about each row and each character's position on the row. If EFI_HII_OUT_FLAG_CLIP is set, then text will be formatted only based on explicit line breaks and all pixels which would lie outside the bounding box specified by Width and Height are ignored. The information in the RowInfoArray only describes characters which are at least partially displayed. For the final row, the LineHeight and BaseLine may describe pixels which are outside the limit specified by Height (unless EFI_HII_OUT_FLAG_CLIP_CLEAN_Y is specified) even though those pixels were not drawn. If EFI_HII_OUT_FLAG_CLIP_CLEAN_X is set, then it modifies the behavior of EFI_HII_OUT_FLAG_CLIP so that if a character's right-most on pixel cannot fit, then it will not be drawn at all. This flag requires that EFI_HII_OUT_FLAG_CLIP be set. If EFI_HII_OUT_FLAG_CLIP_CLEAN_Y is set, then it modifies the behavior of EFI_HII_OUT_FLAG_CLIP so that if a row's bottom most pixel cannot fit, then it will not be drawn at all. This flag requires that EFI_HII_OUT_FLAG_CLIP be set. If EFI_HII_OUT_FLAG_WRAP is set, then text will be wrapped at the right-most line-break opportunity prior to a character whose right-most extent would exceed Width. If no line-break opportunity can be found, then the text will behave as if EFI_HII_OUT_FLAG_CLIP_CLEAN_X is set. This flag cannot be used with EFI_HII_OUT_FLAG_CLIP_CLEAN_X. If EFI_HII_OUT_FLAG_TRANSPARENT is set, then BackgroundColor is ignored and all off" pixels in the character's glyph will use the pixel value from Blt. This flag cannot be used if Blt is NULL upon entry. If EFI_HII_IGNORE_IF_NO_GLYPH is set, then characters which have no glyphs are not drawn. Otherwise, they are replaced with Unicode character 0xFFFD (REPLACEMENT CHARACTER). If EFI_HII_IGNORE_LINE_BREAK is set, then explicit line break characters will be ignored. If EFI_HII_DIRECT_TO_SCREEN is set, then the string will be written directly to the output device specified by Screen. Otherwise the string will be rendered to the bitmap specified by Bitmap.<p>
+Cancels a previously set callback function for a particular PCD token number.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_HII_FONT_PROTOCOL instance.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Flags</em>&nbsp;</td><td>Describes how the string is to be drawn.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>PackageList</em>&nbsp;</td><td>The package list in the HII database to search for the specified string.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>StringId</em>&nbsp;</td><td>The string's id, which is unique within PackageList.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Language</em>&nbsp;</td><td>Points to the language for the retrieved string. If NULL, then the current system language is used.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>StringInfo</em>&nbsp;</td><td>Points to the string output information, including the color and font. If NULL, then the string will be output in the default system font and color.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Blt</em>&nbsp;</td><td>If this points to a non-NULL on entry, this points to the image, which is Width pixels wide and Height pixels high. The string will be drawn onto this image and EFI_HII_OUT_FLAG_CLIP is implied. If this points to a NULL on entry, then a buffer will be allocated to hold the generated image and the pointer updated on exit. It is the caller's responsibility to free this buffer.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>BltX,BltY</em>&nbsp;</td><td>Specifies the offset from the left and top edge of the output image of the first character cell in the image.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>RowInfoArray</em>&nbsp;</td><td>If this is non-NULL on entry, then on exit, this will point to an allocated buffer containing row information and RowInfoArraySize will be updated to contain the number of elements. This array describes the characters which were at least partially drawn and the heights of the rows. It is the caller's responsibility to free this buffer.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>RowInfoArraySize</em>&nbsp;</td><td>If this is non-NULL on entry, then on exit it contains the number of elements in RowInfoArray.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ColumnInfoArray</em>&nbsp;</td><td>If non-NULL, on return it is filled with the horizontal offset for each character in the string on the row where it is displayed. Non-printing characters will have the offset ~0. The caller is responsible to allocate a buffer large enough so that there is one entry for each character in the string, not including the null-terminator. It is possible when character display is normalized that some character cells overlap.</td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>The 128-bit unique value that designates the namespace from which to extract the value. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>CallBackFunction</em>&nbsp;</td><td>The function prototype called when the value associated with the CallBackToken is set.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The string was successfully updated.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>Unable to allocate an output buffer for RowInfoArray or Blt.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The String or Blt or Height or Width was NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The Blt or PackageList was NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Flags were invalid combination. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The specified PackageList is not in the Database or the stringid is not in the specified PackageList. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The PCD service has successfully established a call event for the CallBackToken requested. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The PCD service could not find the referenced token number. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
-<a class="anchor" name="bc575c417a60424048d5750f4c66d870"></a><!-- doxytag: member="HiiFont.h::EFI_HII_STRING_TO_IMAGE" ref="bc575c417a60424048d5750f4c66d870" args=")(IN CONST EFI_HII_FONT_PROTOCOL *This, IN EFI_HII_OUT_FLAGS Flags, IN CONST EFI_STRING String, IN CONST EFI_FONT_DISPLAY_INFO *StringInfo, IN OUT EFI_IMAGE_OUTPUT **Blt, IN UINTN BltX, IN UINTN BltY, OUT EFI_HII_ROW_INFO **RowInfoArray, OUT UINTN *RowInfoArraySize, OUT UINTN *ColumnInfoArray)" -->
+<a class="anchor" name="3194beaf4876014a3d3cbfb652aa4dfa"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_GET16" ref="3194beaf4876014a3d3cbfb652aa4dfa" args=")(IN UINTN TokenNumber)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#bc575c417a60424048d5750f4c66d870">EFI_HII_STRING_TO_IMAGE</a>)(IN CONST <a class="el" href="../../d5/df9/a00044.html">EFI_HII_FONT_PROTOCOL</a> *This, IN <a class="el" href="../../de/de4/a01135.html#d2f8cc35bfa1ea86bae909f18d09c4d4">EFI_HII_OUT_FLAGS</a> Flags, IN CONST <a class="el" href="../../d6/d97/a01188.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> String, IN CONST <a class="el" href="../../d0/dc0/a00033.html">EFI_FONT_DISPLAY_INFO</a> *StringInfo, IN OUT <a class="el" href="../../d1/d72/a00204.html">EFI_IMAGE_OUTPUT</a> **Blt, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> BltX, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> BltY, OUT <a class="el" href="../../da/d2a/a00086.html">EFI_HII_ROW_INFO</a> **RowInfoArray, OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *RowInfoArraySize, OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *ColumnInfoArray)          </td>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#3194beaf4876014a3d3cbfb652aa4dfa">PCD_PROTOCOL_GET16</a>)(IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-This function renders a string to a bitmap or the screen using the specified font, color and options. It either draws the string and glyphs on an existing bitmap, allocates a new bitmap or uses the screen. The strings can be clipped or wrapped. Optionally, the function also returns the information about each row and the character position on that row. If EFI_HII_OUT_FLAG_CLIP is set, then text will be formatted only based on explicit line breaks and all pixels which would lie outside the bounding box specified by Width and Height are ignored. The information in the RowInfoArray only describes characters which are at least partially displayed. For the final row, the LineHeight and BaseLine may describe pixels which are outside the limit specified by Height (unless EFI_HII_OUT_FLAG_CLIP_CLEAN_Y is specified) even though those pixels were not drawn. The LineWidth may describe pixels which are outside the limit specified by Width (unless EFI_HII_OUT_FLAG_CLIP_CLEAN_X is specified) even though those pixels were not drawn. If EFI_HII_OUT_FLAG_CLIP_CLEAN_X is set, then it modifies the behavior of EFI_HII_OUT_FLAG_CLIP so that if a character's right-most on pixel cannot fit, then it will not be drawn at all. This flag requires that EFI_HII_OUT_FLAG_CLIP be set. If EFI_HII_OUT_FLAG_CLIP_CLEAN_Y is set, then it modifies the behavior of EFI_HII_OUT_FLAG_CLIP so that if a row's bottom-most pixel cannot fit, then it will not be drawn at all. This flag requires that EFI_HII_OUT_FLAG_CLIP be set. If EFI_HII_OUT_FLAG_WRAP is set, then text will be wrapped at the right-most line-break opportunity prior to a character whose right-most extent would exceed Width. If no line-break opportunity can be found, then the text will behave as if EFI_HII_OUT_FLAG_CLIP_CLEAN_X is set. This flag cannot be used with EFI_HII_OUT_FLAG_CLIP_CLEAN_X. If EFI_HII_OUT_FLAG_TRANSPARENT is set, then BackgroundColor is ignored and all 'off' pixels in the character's drawn will use the pixel value from Blt. This flag cannot be used if Blt is NULL upon entry. If EFI_HII_IGNORE_IF_NO_GLYPH is set, then characters which have no glyphs are not drawn. Otherwise, they are replaced with Unicode character 0xFFFD (REPLACEMENT CHARACTER). If EFI_HII_IGNORE_LINE_BREAK is set, then explicit line break characters will be ignored. If EFI_HII_DIRECT_TO_SCREEN is set, then the string will be written directly to the output device specified by Screen. Otherwise the string will be rendered to the bitmap specified by Bitmap.<p>
+Retrieves a 16-bit value for a given PCD token.<p>
+Retrieves the current 16-bit value for a PCD token number. If the TokenNumber is invalid, the results are unpredictable.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_HII_FONT_PROTOCOL instance.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Flags</em>&nbsp;</td><td>Describes how the string is to be drawn.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>String</em>&nbsp;</td><td>Points to the null-terminated string to be</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>StringInfo</em>&nbsp;</td><td>Points to the string output information, including the color and font. If NULL, then the string will be output in the default system font and color.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Blt</em>&nbsp;</td><td>If this points to a non-NULL on entry, this points to the image, which is Width pixels wide and Height pixels high. The string will be drawn onto this image and EFI_HII_OUT_FLAG_CLIP is implied. If this points to a NULL on entry, then a buffer will be allocated to hold the generated image and the pointer updated on exit. It is the caller's responsibility to free this buffer.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>BltX,BltY</em>&nbsp;</td><td>Specifies the offset from the left and top edge of the image of the first character cell in the image.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>RowInfoArray</em>&nbsp;</td><td>If this is non-NULL on entry, then on exit, this will point to an allocated buffer containing row information and RowInfoArraySize will be updated to contain the number of elements. This array describes the characters which were at least partially drawn and the heights of the rows. It is the caller's responsibility to free this buffer.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>RowInfoArraySize</em>&nbsp;</td><td>If this is non-NULL on entry, then on exit it contains the number of elements in RowInfoArray.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ColumnInfoArray</em>&nbsp;</td><td>If this is non-NULL, then on return it will be filled with the horizontal offset for each character in the string on the row where it is displayed. Non-printing characters will have the offset ~0. The caller is responsible for allocating a buffer large enough so that there is one entry for each character in the string, not including the null-terminator. It is possible when character display is normalized that some character cells overlap.</td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The UINT16 value. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="f8872e35474d5ab7bebab2cf8e007acf"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_GET32" ref="f8872e35474d5ab7bebab2cf8e007acf" args=")(IN UINTN TokenNumber)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#f8872e35474d5ab7bebab2cf8e007acf">PCD_PROTOCOL_GET32</a>)(IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves a 32-bit value for a given PCD token.<p>
+Retrieves the current 32-bit value for a PCD token number. If the TokenNumber is invalid, the results are unpredictable.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The UINT32 value. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="41248c415cd32e5574e3de16e426579f"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_GET64" ref="41248c415cd32e5574e3de16e426579f" args=")(IN UINTN TokenNumber)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#41248c415cd32e5574e3de16e426579f">PCD_PROTOCOL_GET64</a>)(IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves a 64-bit value for a given PCD token.<p>
+Retrieves the current 64-bit value for a PCD token number. If the TokenNumber is invalid, the results are unpredictable.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The UINT64 value. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="97f6eb9e085aae4bb71283b23654483d"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_GET8" ref="97f6eb9e085aae4bb71283b23654483d" args=")(IN UINTN TokenNumber)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#97f6eb9e085aae4bb71283b23654483d">PCD_PROTOCOL_GET8</a>)(IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves an 8-bit value for a given PCD token.<p>
+Retrieves the current byte-sized value for a PCD token number. If the TokenNumber is invalid, the results are unpredictable.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The UINT8 value. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="d3d0ec0aa7b3bfc0de4b7c16771e9ee8"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_GET_BOOLEAN" ref="d3d0ec0aa7b3bfc0de4b7c16771e9ee8" args=")(IN UINTN TokenNumber)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#d3d0ec0aa7b3bfc0de4b7c16771e9ee8">PCD_PROTOCOL_GET_BOOLEAN</a>)(IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves a Boolean value for a given PCD token.<p>
+Retrieves the current boolean value for a PCD token number. Do not make any assumptions about the alignment of the pointer that is returned by this function call. If the TokenNumber is invalid, the results are unpredictable.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The Boolean value. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="b97eea3cffeb8c25bfa7927873e193c3"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_GET_EX_16" ref="b97eea3cffeb8c25bfa7927873e193c3" args=")(IN CONST EFI_GUID *Guid, IN UINTN TokenNumber)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#b97eea3cffeb8c25bfa7927873e193c3">PCD_PROTOCOL_GET_EX_16</a>)(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves a 16-bit value for a given PCD token.<p>
+Retrieves the 16-bit value of a particular PCD token. If the TokenNumber is invalid or the token space specified by Guid does not exist, the results are unpredictable.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>The token space for the token number. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The size 16-bit value for the PCD token. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="3ad43e70e617d7109fb2d409406dbf91"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_GET_EX_32" ref="3ad43e70e617d7109fb2d409406dbf91" args=")(IN CONST EFI_GUID *Guid, IN UINTN TokenNumber)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#3ad43e70e617d7109fb2d409406dbf91">PCD_PROTOCOL_GET_EX_32</a>)(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves a 32-bit value for a given PCD token.<p>
+Retrieves the 32-bit value of a particular PCD token. If the TokenNumber is invalid or the token space specified by Guid does not exist, the results are unpredictable.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>The token space for the token number. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The size 32-bit value for the PCD token. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="32034133ec324ac15bf487e949bcd650"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_GET_EX_64" ref="32034133ec324ac15bf487e949bcd650" args=")(IN CONST EFI_GUID *Guid, IN UINTN TokenNumber)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#32034133ec324ac15bf487e949bcd650">PCD_PROTOCOL_GET_EX_64</a>)(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves an 64-bit value for a given PCD token.<p>
+Retrieves the 64-bit value of a particular PCD token. If the TokenNumber is invalid or the token space specified by Guid does not exist, the results are unpredictable.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>The token space for the token number. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The size 64-bit value for the PCD token. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="9a18d7ba222262b765647b22d7730022"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_GET_EX_8" ref="9a18d7ba222262b765647b22d7730022" args=")(IN CONST EFI_GUID *Guid, IN UINTN TokenNumber)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#9a18d7ba222262b765647b22d7730022">PCD_PROTOCOL_GET_EX_8</a>)(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves an 8-bit value for a given PCD token.<p>
+Retrieves the 8-bit value of a particular PCD token. If the TokenNumber is invalid or the token space specified by Guid does not exist, the results are unpredictable.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>The token space for the token number. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The size 8-bit value for the PCD token. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="49a1cb8a6f598cea47de049ccd39f632"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_GET_EX_BOOLEAN" ref="49a1cb8a6f598cea47de049ccd39f632" args=")(IN CONST EFI_GUID *Guid, IN UINTN TokenNumber)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#49a1cb8a6f598cea47de049ccd39f632">PCD_PROTOCOL_GET_EX_BOOLEAN</a>)(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves a Boolean value for a given PCD token.<p>
+Retrieves the Boolean value of a particular PCD token. If the TokenNumber is invalid or the token space specified by Guid does not exist, the results are unpredictable.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>The token space for the token number. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The size Boolean value for the PCD token. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="9f0b7179caab5fcb212f62bfe9da8739"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_GET_EX_POINTER" ref="9f0b7179caab5fcb212f62bfe9da8739" args=")(IN CONST EFI_GUID *Guid, IN UINTN TokenNumber)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef VOID*(EFIAPI * <a class="el" href="../../de/de4/a01135.html#9f0b7179caab5fcb212f62bfe9da8739">PCD_PROTOCOL_GET_EX_POINTER</a>)(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves a pointer to a value for a given PCD token.<p>
+Retrieves the current pointer to the buffer for a PCD token number. Do not make any assumptions about the alignment of the pointer that is returned by this function call. If the TokenNumber is invalid, the results are unpredictable.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>The token space for the token number. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The pointer to the buffer to be retrieved. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="c560199b591be271cc8c361169f663a4"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_GET_EX_SIZE" ref="c560199b591be271cc8c361169f663a4" args=")(IN CONST EFI_GUID *Guid, IN UINTN TokenNumber)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#c560199b591be271cc8c361169f663a4">PCD_PROTOCOL_GET_EX_SIZE</a>)(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves the size of the value for a given PCD token.<p>
+Retrieves the current size of a particular PCD token. If the TokenNumber is invalid, the results are unpredictable.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>The token space for the token number. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The size of the value for the PCD token. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="3fc239d68761539ff95f35e3b55157ba"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_GET_NEXT_TOKEN" ref="3fc239d68761539ff95f35e3b55157ba" args=")(IN CONST EFI_GUID *Guid, IN OUT UINTN *TokenNumber)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#3fc239d68761539ff95f35e3b55157ba">PCD_PROTOCOL_GET_NEXT_TOKEN</a>)(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *TokenNumber)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves the next valid token number in a given namespace.<p>
+This is useful since the PCD infrastructure contains a sparse list of token numbers, and one cannot a priori know what token numbers are valid in the database.<p>
+If TokenNumber is 0 and Guid is not NULL, then the first token from the token space specified by Guid is returned. If TokenNumber is not 0 and Guid is not NULL, then the next token in the token space specified by Guid is returned. If TokenNumber is 0 and Guid is NULL, then the first token in the default token space is returned. If TokenNumber is not 0 and Guid is NULL, then the next token in the default token space is returned. The token numbers in the default token space may not be related to token numbers in token spaces that are named by Guid. If the next token number can be retrieved, then it is returned in TokenNumber, and EFI_SUCCESS is returned. If TokenNumber represents the last token number in the token space specified by Guid, then EFI_NOT_FOUND is returned. If TokenNumber is not present in the token space specified by Guid, then EFI_NOT_FOUND is returned.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>The 128-bit unique value that designates the namespace from which to retrieve the next token. This is an optional parameter that may be NULL. If this parameter is NULL, then a request is being made to retrieve tokens from the default token space. </td></tr>
+    <tr><td valign="top"><tt>[in,out]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>A pointer to the PCD token number to use to find the subsequent token number.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The string was successfully updated.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>Unable to allocate an output buffer for RowInfoArray or Blt.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The String or Blt was NULL.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Flags were invalid combination. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The PCD service retrieved the next valid token number. Or the input token number is already the last valid token number in the PCD database. In the later case, *TokenNumber is updated with the value of 0. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>If this input token number and token namespace does not exist on the platform. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="54026a127b4947e99885b4c71aa768a7"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_GET_NEXT_TOKENSPACE" ref="54026a127b4947e99885b4c71aa768a7" args=")(IN OUT CONST EFI_GUID **Guid)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#54026a127b4947e99885b4c71aa768a7">PCD_PROTOCOL_GET_NEXT_TOKENSPACE</a>)(IN OUT CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> **Guid)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves the next valid PCD token namespace for a given namespace.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in,out]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>An indirect pointer to EFI_GUID. On input it designates a known token namespace from which the search will start. On output, it designates the next valid token namespace on the platform. If the input token namespace does not exist on the platform, an error is returned and the value of *Guid is undefined. If *Guid is NULL, then the <a class="el" href="../../d1/d87/a00689.html">GUID</a> of the first token space of the current platform is assigned to *Guid the function return EFI_SUCCESS. If *Guid is NULL and there is no namespace exist in the platform other than the default (NULL) token namespace, *Guid is unchanged and the function return EFI_SUCCESS. If this input token namespace is the last namespace on the platform, *Guid will be assigned to NULL and the function return EFI_SUCCESS.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The PCD service retrieved the next valid token space Guid. Or the input token space Guid is already the last valid token space Guid in the PCD database. In the later case, *Guid is updated with the value of NULL. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>If the input token namespace does not exist on the platform. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="ade0f30c486bec987c8d61facfc0f5f1"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_GET_POINTER" ref="ade0f30c486bec987c8d61facfc0f5f1" args=")(IN UINTN TokenNumber)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef VOID*(EFIAPI * <a class="el" href="../../de/de4/a01135.html#ade0f30c486bec987c8d61facfc0f5f1">PCD_PROTOCOL_GET_POINTER</a>)(IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves a pointer to a value for a given PCD token.<p>
+Retrieves the current pointer to the buffer for a PCD token number. Do not make any assumptions about the alignment of the pointer that is returned by this function call. If the TokenNumber is invalid, the results are unpredictable.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The pointer to the buffer to be retrived. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="e189906d466070d0392ec6e085641961"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_GET_SIZE" ref="e189906d466070d0392ec6e085641961" args=")(IN UINTN TokenNumber)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#e189906d466070d0392ec6e085641961">PCD_PROTOCOL_GET_SIZE</a>)(IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves the size of the value for a given PCD token.<p>
+Retrieves the current size of a particular PCD token. If the TokenNumber is invalid, the results are unpredictable.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number.</td></tr>
+  </table>
+</dl>
+<dl class="return" compact><dt><b>Returns:</b></dt><dd>The size of the value for the PCD token. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="45ff93ac5c7363f35a9a57f3c79fd702"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_SET16" ref="45ff93ac5c7363f35a9a57f3c79fd702" args=")(IN UINTN TokenNumber, IN UINT16 Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#45ff93ac5c7363f35a9a57f3c79fd702">PCD_PROTOCOL_SET16</a>)(IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> Value)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sets a 16-bit value for a given PCD token.<p>
+When the PCD service sets a value, it will check to ensure that the size of the value being set is compatible with the Token's existing definition. If it is not, an error will be returned.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Value</em>&nbsp;</td><td>The value to set for the PCD token.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Procedure returned successfully. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The PCD service determined that the size of the data being set was incompatible with a call to this function. Use GetSize() to retrieve the size of the target data. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The PCD service could not find the requested token number. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="e4f3ccdcc69460bd49821fc913b84cc3"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_SET32" ref="e4f3ccdcc69460bd49821fc913b84cc3" args=")(IN UINTN TokenNumber, IN UINT32 Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#e4f3ccdcc69460bd49821fc913b84cc3">PCD_PROTOCOL_SET32</a>)(IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> Value)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sets a 32-bit value for a given PCD token.<p>
+When the PCD service sets a value, it will check to ensure that the size of the value being set is compatible with the Token's existing definition. If it is not, an error will be returned.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Value</em>&nbsp;</td><td>The value to set for the PCD token.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Procedure returned successfully. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The PCD service determined that the size of the data being set was incompatible with a call to this function. Use GetSize() to retrieve the size of the target data. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The PCD service could not find the requested token number. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="35ca754288a7bdb9c60a2d3f94ecd46f"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_SET64" ref="35ca754288a7bdb9c60a2d3f94ecd46f" args=")(IN UINTN TokenNumber, IN UINT64 Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#35ca754288a7bdb9c60a2d3f94ecd46f">PCD_PROTOCOL_SET64</a>)(IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Value)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sets a 64-bit value for a given PCD token.<p>
+When the PCD service sets a value, it will check to ensure that the size of the value being set is compatible with the Token's existing definition. If it is not, an error will be returned.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Value</em>&nbsp;</td><td>The value to set for the PCD token.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Procedure returned successfully. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The PCD service determined that the size of the data being set was incompatible with a call to this function. Use GetSize() to retrieve the size of the target data. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The PCD service could not find the requested token number. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="57a1c84bee57b4084ca7a0ca08c1a4f6"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_SET8" ref="57a1c84bee57b4084ca7a0ca08c1a4f6" args=")(IN UINTN TokenNumber, IN UINT8 Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#57a1c84bee57b4084ca7a0ca08c1a4f6">PCD_PROTOCOL_SET8</a>)(IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> Value)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sets an 8-bit value for a given PCD token.<p>
+When the PCD service sets a value, it will check to ensure that the size of the value being set is compatible with the Token's existing definition. If it is not, an error will be returned.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Value</em>&nbsp;</td><td>The value to set for the PCD token.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Procedure returned successfully. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The PCD service determined that the size of the data being set was incompatible with a call to this function. Use GetSize() to retrieve the size of the target data. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The PCD service could not find the requested token number. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="f9af63d2ee4e2ef8ec33178e519a7fb6"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_SET_BOOLEAN" ref="f9af63d2ee4e2ef8ec33178e519a7fb6" args=")(IN UINTN TokenNumber, IN BOOLEAN Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#f9af63d2ee4e2ef8ec33178e519a7fb6">PCD_PROTOCOL_SET_BOOLEAN</a>)(IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> Value)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sets a Boolean value for a given PCD token.<p>
+When the PCD service sets a value, it will check to ensure that the size of the value being set is compatible with the Token's existing definition. If it is not, an error will be returned.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Value</em>&nbsp;</td><td>The value to set for the PCD token.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Procedure returned successfully. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The PCD service determined that the size of the data being set was incompatible with a call to this function. Use GetSize() to retrieve the size of the target data. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The PCD service could not find the requested token number. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="d2c3e91f3b16145e9ffdbbb8e4b95da9"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_SET_EX_16" ref="d2c3e91f3b16145e9ffdbbb8e4b95da9" args=")(IN CONST EFI_GUID *Guid, IN UINTN TokenNumber, IN UINT16 Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#d2c3e91f3b16145e9ffdbbb8e4b95da9">PCD_PROTOCOL_SET_EX_16</a>)(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> Value)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sets an 16-bit value for a given PCD token.<p>
+When the PCD service sets a value, it will check to ensure that the size of the value being set is compatible with the Token's existing definition. If it is not, an error will be returned.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>The 128-bit unique value that designates the namespace from which to extract the value. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Value</em>&nbsp;</td><td>The value to set for the PCD token.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Procedure returned successfully. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The PCD service determined that the size of the data being set was incompatible with a call to this function. Use GetSize() to retrieve the size of the target data. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The PCD service could not find the requested token number. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="7184e6de1dffd4bf6e3cd77afa5a0759"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_SET_EX_32" ref="7184e6de1dffd4bf6e3cd77afa5a0759" args=")(IN CONST EFI_GUID *Guid, IN UINTN TokenNumber, IN UINT32 Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#7184e6de1dffd4bf6e3cd77afa5a0759">PCD_PROTOCOL_SET_EX_32</a>)(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> Value)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sets a 32-bit value for a given PCD token.<p>
+When the PCD service sets a value, it will check to ensure that the size of the value being set is compatible with the Token's existing definition. If it is not, an error will be returned.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>The 128-bit unique value that designates the namespace from which to extract the value. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Value</em>&nbsp;</td><td>The value to set for the PCD token.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Procedure returned successfully. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The PCD service determined that the size of the data being set was incompatible with a call to this function. Use GetSize() to retrieve the size of the target data. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The PCD service could not find the requested token number. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="c7cd2f723b83a5de05561268d323e181"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_SET_EX_64" ref="c7cd2f723b83a5de05561268d323e181" args=")(IN CONST EFI_GUID *Guid, IN UINTN TokenNumber, IN UINT64 Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#c7cd2f723b83a5de05561268d323e181">PCD_PROTOCOL_SET_EX_64</a>)(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Value)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sets a 64-bit value for a given PCD token.<p>
+When the PCD service sets a value, it will check to ensure that the size of the value being set is compatible with the Token's existing definition. If it is not, an error will be returned.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>The 128-bit unique value that designates the namespace from which to extract the value. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Value</em>&nbsp;</td><td>The value to set for the PCD token.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Procedure returned successfully. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The PCD service determined that the size of the data being set was incompatible with a call to this function. Use GetSize() to retrieve the size of the target data. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The PCD service could not find the requested token number. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="06d4294243e4ece89cfcbc8c2ca7f3ea"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_SET_EX_8" ref="06d4294243e4ece89cfcbc8c2ca7f3ea" args=")(IN CONST EFI_GUID *Guid, IN UINTN TokenNumber, IN UINT8 Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#06d4294243e4ece89cfcbc8c2ca7f3ea">PCD_PROTOCOL_SET_EX_8</a>)(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> Value)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sets an 8-bit value for a given PCD token.<p>
+When the PCD service sets a value, it will check to ensure that the size of the value being set is compatible with the Token's existing definition. If it is not, an error will be returned.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>The 128-bit unique value that designates the namespace from which to extract the value. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Value</em>&nbsp;</td><td>The value to set for the PCD token.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Procedure returned successfully. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The PCD service determined that the size of the data being set was incompatible with a call to this function. Use GetSize() to retrieve the size of the target data. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The PCD service could not find the requested token number. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="39d6fad6baa230e7a45208e143c493a1"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_SET_EX_BOOLEAN" ref="39d6fad6baa230e7a45208e143c493a1" args=")(IN CONST EFI_GUID *Guid, IN UINTN TokenNumber, IN BOOLEAN Value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#39d6fad6baa230e7a45208e143c493a1">PCD_PROTOCOL_SET_EX_BOOLEAN</a>)(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN <a class="el" href="../../d0/d90/a01059.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> Value)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sets a Boolean value for a given PCD token.<p>
+When the PCD service sets a value, it will check to ensure that the size of the value being set is compatible with the Token's existing definition. If it is not, an error will be returned.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>The 128-bit unique value that designates the namespace from which to extract the value. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Value</em>&nbsp;</td><td>The value to set for the PCD token.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Procedure returned successfully. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The PCD service determined that the size of the data being set was incompatible with a call to this function. Use GetSize() to retrieve the size of the target data. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The PCD service could not find the requested token number. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="9e30e36b1be7455206ea077bc9465584"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_SET_EX_POINTER" ref="9e30e36b1be7455206ea077bc9465584" args=")(IN CONST EFI_GUID *Guid, IN UINTN TokenNumber, IN OUT UINTN *SizeOfBuffer, IN VOID *Buffer)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#9e30e36b1be7455206ea077bc9465584">PCD_PROTOCOL_SET_EX_POINTER</a>)(IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *SizeOfBuffer, IN VOID *Buffer)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sets a value of a specified size for a given PCD token.<p>
+When the PCD service sets a value, it will check to ensure that the size of the value being set is compatible with the Token's existing definition. If it is not, an error will be returned.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Guid</em>&nbsp;</td><td>The 128-bit unique value that designates the namespace from which to extract the value. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number. </td></tr>
+    <tr><td valign="top"><tt>[in,out]</tt>&nbsp;</td><td valign="top"><em>SizeOfBuffer</em>&nbsp;</td><td>A pointer to the length of the value being set for the PCD token. On input, if the SizeOfValue is greater than the maximum size supported for this TokenNumber then the output value of SizeOfValue will reflect the maximum size supported for this TokenNumber. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Buffer</em>&nbsp;</td><td>The buffer to set for the PCD token.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Procedure returned successfully. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The PCD service determined that the size of the data being set was incompatible with a call to this function. Use GetSize() to retrieve the size of the target data. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The PCD service could not find the requested token number. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="2c17aa6c76a77f41321ba5deed32b8a1"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_SET_POINTER" ref="2c17aa6c76a77f41321ba5deed32b8a1" args=")(IN UINTN TokenNumber, IN OUT UINTN *SizeOfBuffer, IN VOID *Buffer)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/de4/a01135.html#2c17aa6c76a77f41321ba5deed32b8a1">PCD_PROTOCOL_SET_POINTER</a>)(IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> TokenNumber, IN OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *SizeOfBuffer, IN VOID *Buffer)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sets a value of a specified size for a given PCD token.<p>
+When the PCD service sets a value, it will check to ensure that the size of the value being set is compatible with the Token's existing definition. If it is not, an error will be returned.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>TokenNumber</em>&nbsp;</td><td>The PCD token number. </td></tr>
+    <tr><td valign="top"><tt>[in,out]</tt>&nbsp;</td><td valign="top"><em>SizeOfBuffer</em>&nbsp;</td><td>A pointer to the length of the value being set for the PCD token. On input, if the SizeOfValue is greater than the maximum size supported for this TokenNumber then the output value of SizeOfValue will reflect the maximum size supported for this TokenNumber. </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>Buffer</em>&nbsp;</td><td>The buffer to set for the PCD token.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Procedure returned successfully. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The PCD service determined that the size of the data being set was incompatible with a call to this function. Use GetSize() to retrieve the size of the target data. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The PCD service could not find the requested token number. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="72d8ab50a626fa0f9a011976ff9d2c44"></a><!-- doxytag: member="Pcd.h::PCD_PROTOCOL_SET_SKU" ref="72d8ab50a626fa0f9a011976ff9d2c44" args=")(IN UINTN SkuId)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef VOID(EFIAPI * <a class="el" href="../../de/de4/a01135.html#72d8ab50a626fa0f9a011976ff9d2c44">PCD_PROTOCOL_SET_SKU</a>)(IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> SkuId)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sets the SKU value for subsequent calls to set or get PCD token values.<p>
+SetSku() sets the SKU Id to be used for subsequent calls to set or get PCD values. SetSku() is normally called only once by the system.<p>
+For each item (token), the database can hold a single value that applies to all SKUs, or multiple values, where each value is associated with a specific SKU Id. Items with multiple, SKU-specific values are called SKU enabled.<p>
+The SKU Id of zero is reserved as a default. The valid SkuId range is 1 to 255. For tokens that are not SKU enabled, the system ignores any set SKU Id and works with the single value for that token. For SKU-enabled tokens, the system will use the SKU Id set by the last call to SetSku(). If no SKU Id is set or the currently set SKU Id isn't valid for the specified token, the system uses the default SKU Id. If the system attempts to use the default SKU Id and no value has been set for that Id, the results are unpredictable.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>SkuId</em>&nbsp;</td><td>The SKU value that will be used when the PCD service will retrieve and set values associated with a PCD token. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
 <hr><h2>Variable Documentation</h2>
-<a class="anchor" name="46104dddf358e7e90cd370fb03ffbf52"></a><!-- doxytag: member="HiiFont.h::gEfiHiiFontProtocolGuid" ref="46104dddf358e7e90cd370fb03ffbf52" args="" -->
+<a class="anchor" name="7b1eb454e9c4f91ee81a793864285148"></a><!-- doxytag: member="Pcd.h::gPcdProtocolGuid" ref="7b1eb454e9c4f91ee81a793864285148" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../de/de4/a01135.html#46104dddf358e7e90cd370fb03ffbf52">gEfiHiiFontProtocolGuid</a>          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../de/de4/a01135.html#7b1eb454e9c4f91ee81a793864285148">gPcdProtocolGuid</a>          </td>
         </tr>
       </table>
 </div>
@@ -639,7 +1018,7 @@ This function renders a string to a bitmap or the screen using the specified fon
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:10 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:29 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_HOB_GUID_TYPE Struct Reference</title>
+<title>MdePkg[ALL]: EFI_FONT_INFO Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,48 +21,67 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_HOB_GUID_TYPE Struct Reference</h1><!-- doxytag: class="EFI_HOB_GUID_TYPE" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_FONT_INFO Struct Reference</h1><!-- doxytag: class="EFI_FONT_INFO" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/d87/a00456.html">EFI_HOB_GENERIC_HEADER</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/dbd/a00457.html#2b73a20507691b7e03dea6a9b80ea3dc">Header</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/d7b/a01249.html#ce9e6a83ce8d823e622004137dd91918">EFI_HII_FONT_STYLE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/dbd/a00457.html#8c3ff251023a24f92f3bc276cb7f7f3d">FontStyle</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/dbd/a00457.html#fb648a344ff678f4b35c5ac875f5daed">Name</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/dbd/a00457.html#921e99e78118308b9f62f7e758325d67">FontSize</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">character cell height in pixels  <a href="#921e99e78118308b9f62f7e758325d67"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/dbd/a00457.html#ef3362f4b4d0c2870d7d82ce5c31f284">FontName</a> [1]</td></tr>
 
 </table>
-<hr><a name="_details"></a><h2>Detailed Description</h2>
-Allows writers of executable content in the HOB producer phase to maintain and manage HOBs with specific <a class="el" href="../../d9/d0f/a00644.html">GUID</a>. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="2b73a20507691b7e03dea6a9b80ea3dc"></a><!-- doxytag: member="EFI_HOB_GUID_TYPE::Header" ref="2b73a20507691b7e03dea6a9b80ea3dc" args="" -->
+<hr><h2>Field Documentation</h2>
+<a class="anchor" name="ef3362f4b4d0c2870d7d82ce5c31f284"></a><!-- doxytag: member="EFI_FONT_INFO::FontName" ref="ef3362f4b4d0c2870d7d82ce5c31f284" args="[1]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../de/d87/a00456.html">EFI_HOB_GENERIC_HEADER</a> <a class="el" href="../../d1/dbd/a00457.html#2b73a20507691b7e03dea6a9b80ea3dc">EFI_HOB_GUID_TYPE::Header</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> <a class="el" href="../../d1/dbd/a00457.html#ef3362f4b4d0c2870d7d82ce5c31f284">EFI_FONT_INFO::FontName</a>[1]          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The HOB generic header. Header.HobType = EFI_HOB_TYPE_GUID_EXTENSION. 
+
 </div>
 </div><p>
-<a class="anchor" name="fb648a344ff678f4b35c5ac875f5daed"></a><!-- doxytag: member="EFI_HOB_GUID_TYPE::Name" ref="fb648a344ff678f4b35c5ac875f5daed" args="" -->
+<a class="anchor" name="921e99e78118308b9f62f7e758325d67"></a><!-- doxytag: member="EFI_FONT_INFO::FontSize" ref="921e99e78118308b9f62f7e758325d67" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../d1/dbd/a00457.html#fb648a344ff678f4b35c5ac875f5daed">EFI_HOB_GUID_TYPE::Name</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d1/dbd/a00457.html#921e99e78118308b9f62f7e758325d67">EFI_FONT_INFO::FontSize</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-A <a class="el" href="../../d9/d0f/a00644.html">GUID</a> that defines the contents of this HOB. 
+character cell height in pixels 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="8c3ff251023a24f92f3bc276cb7f7f3d"></a><!-- doxytag: member="EFI_FONT_INFO::FontStyle" ref="8c3ff251023a24f92f3bc276cb7f7f3d" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d3/d7b/a01249.html#ce9e6a83ce8d823e622004137dd91918">EFI_HII_FONT_STYLE</a> <a class="el" href="../../d1/dbd/a00457.html#8c3ff251023a24f92f3bc276cb7f7f3d">EFI_FONT_INFO::FontStyle</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:31 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

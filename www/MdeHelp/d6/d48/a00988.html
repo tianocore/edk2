@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/IndustryStandard/Mbr.h File Reference</title>
+<title>MdePkg[ALL]: u_pxe_undi Union Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -9,51 +9,33 @@
   <div class="tabs">
     <ul>
       <li><a href="../../main.html"><span>Main&nbsp;Page</span></a></li>
-      <li><a href="../../annotated.html"><span>Data&nbsp;Structures</span></a></li>
-      <li class="current"><a href="../../files.html"><span>Files</span></a></li>
+      <li class="current"><a href="../../annotated.html"><span>Data&nbsp;Structures</span></a></li>
+      <li><a href="../../files.html"><span>Files</span></a></li>
     </ul>
   </div>
   <div class="tabs">
     <ul>
-      <li><a href="../../files.html"><span>File&nbsp;List</span></a></li>
-      <li><a href="../../globals.html"><span>Globals</span></a></li>
+      <li><a href="../../annotated.html"><span>Data&nbsp;Structures</span></a></li>
+      <li><a href="../../functions.html"><span>Data&nbsp;Fields</span></a></li>
     </ul>
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/IndustryStandard/Mbr.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>u_pxe_undi Union Reference</h1><!-- doxytag: class="u_pxe_undi" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
-<tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d7a/a00669.html">MBR_PARTITION_RECORD</a></td></tr>
+<tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d07/a00811.html">PXE_HW_UNDI</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d48/a00988.html#e603acbd6afcf3c1d1efa615f32be6c8">hw</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d41/a00666.html">MASTER_BOOT_RECORD</a></td></tr>
-
-<tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d48/a00988.html#b38f5eee4d85ff467c951fa4f6301f87">MBR_SIGNATURE</a>&nbsp;&nbsp;&nbsp;0xaa55</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d48/a00988.html#aa66eb8f63a3a0b831990c8d7ef09151">EXTENDED_DOS_PARTITION</a>&nbsp;&nbsp;&nbsp;0x05</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d48/a00988.html#18717eb054e57110f4e28cce90085e72">EXTENDED_WINDOWS_PARTITION</a>&nbsp;&nbsp;&nbsp;0x0F</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d48/a00988.html#6d79b632396871cab9adb9e88888dc77">MAX_MBR_PARTITIONS</a>&nbsp;&nbsp;&nbsp;4</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d48/a00988.html#1b98bf5cb900eba975365e999587b533">PMBR_GPT_PARTITION</a>&nbsp;&nbsp;&nbsp;0xEE</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d48/a00988.html#8006e9739d4b6e9eaf3927390891e102">EFI_PARTITION</a>&nbsp;&nbsp;&nbsp;0xEF</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d48/a00988.html#2f71568a2395dc0783c1e6142ef71d5b">MBR_SIZE</a>&nbsp;&nbsp;&nbsp;512</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../da/d71/a00814.html">PXE_SW_UNDI</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d48/a00988.html#42fa26bd9e4ee965e5c5abe70b0c89db">sw</a></td></tr>
 
 </table>
-<hr><a name="_details"></a><h2>Detailed Description</h2>
-Legacy Master Boot Record Format Definition.<p>
-Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
-<a class="anchor" name="8006e9739d4b6e9eaf3927390891e102"></a><!-- doxytag: member="Mbr.h::EFI_PARTITION" ref="8006e9739d4b6e9eaf3927390891e102" args="" -->
+<hr><h2>Field Documentation</h2>
+<a class="anchor" name="e603acbd6afcf3c1d1efa615f32be6c8"></a><!-- doxytag: member="u_pxe_undi::hw" ref="e603acbd6afcf3c1d1efa615f32be6c8" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_PARTITION&nbsp;&nbsp;&nbsp;0xEF          </td>
+          <td class="memname"><a class="el" href="../../dd/d07/a00811.html">PXE_HW_UNDI</a> <a class="el" href="../../d6/d48/a00988.html#e603acbd6afcf3c1d1efa615f32be6c8">u_pxe_undi::hw</a>          </td>
         </tr>
       </table>
 </div>
@@ -63,87 +45,12 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 </div>
 </div><p>
-<a class="anchor" name="aa66eb8f63a3a0b831990c8d7ef09151"></a><!-- doxytag: member="Mbr.h::EXTENDED_DOS_PARTITION" ref="aa66eb8f63a3a0b831990c8d7ef09151" args="" -->
+<a class="anchor" name="42fa26bd9e4ee965e5c5abe70b0c89db"></a><!-- doxytag: member="u_pxe_undi::sw" ref="42fa26bd9e4ee965e5c5abe70b0c89db" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EXTENDED_DOS_PARTITION&nbsp;&nbsp;&nbsp;0x05          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="18717eb054e57110f4e28cce90085e72"></a><!-- doxytag: member="Mbr.h::EXTENDED_WINDOWS_PARTITION" ref="18717eb054e57110f4e28cce90085e72" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EXTENDED_WINDOWS_PARTITION&nbsp;&nbsp;&nbsp;0x0F          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="6d79b632396871cab9adb9e88888dc77"></a><!-- doxytag: member="Mbr.h::MAX_MBR_PARTITIONS" ref="6d79b632396871cab9adb9e88888dc77" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define MAX_MBR_PARTITIONS&nbsp;&nbsp;&nbsp;4          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="b38f5eee4d85ff467c951fa4f6301f87"></a><!-- doxytag: member="Mbr.h::MBR_SIGNATURE" ref="b38f5eee4d85ff467c951fa4f6301f87" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define MBR_SIGNATURE&nbsp;&nbsp;&nbsp;0xaa55          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="2f71568a2395dc0783c1e6142ef71d5b"></a><!-- doxytag: member="Mbr.h::MBR_SIZE" ref="2f71568a2395dc0783c1e6142ef71d5b" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define MBR_SIZE&nbsp;&nbsp;&nbsp;512          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="1b98bf5cb900eba975365e999587b533"></a><!-- doxytag: member="Mbr.h::PMBR_GPT_PARTITION" ref="1b98bf5cb900eba975365e999587b533" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define PMBR_GPT_PARTITION&nbsp;&nbsp;&nbsp;0xEE          </td>
+          <td class="memname"><a class="el" href="../../da/d71/a00814.html">PXE_SW_UNDI</a> <a class="el" href="../../d6/d48/a00988.html#42fa26bd9e4ee965e5c5abe70b0c89db">u_pxe_undi::sw</a>          </td>
         </tr>
       </table>
 </div>
@@ -154,7 +61,7 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:07 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:13 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

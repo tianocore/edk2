@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_IMAGE_RESOURCE_DIRECTORY_STRING Struct Reference</title>
+<title>MdePkg[ALL]: EFI_HOB_MEMORY_ALLOCATION_HEADER Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,48 +21,99 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_IMAGE_RESOURCE_DIRECTORY_STRING Struct Reference</h1><!-- doxytag: class="EFI_IMAGE_RESOURCE_DIRECTORY_STRING" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_HOB_MEMORY_ALLOCATION_HEADER Struct Reference</h1><!-- doxytag: class="EFI_HOB_MEMORY_ALLOCATION_HEADER" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d05/a00489.html#1334aa7b30a1f47a3cfc9e1850cc7b72">Length</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d05/a00489.html#75dc8d41ad8dd7e9afb845f4416a3246">Name</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d05/a00489.html#3214488cb2eae3efc67728e9f65490ad">String</a> [1]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d95/a01247.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d05/a00489.html#0dc155493204f3e3f7dbfbf547a9326d">MemoryBaseAddress</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d05/a00489.html#49f9b273f6200788ea5988481e699cf1">MemoryLength</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/d22/a01250.html#0e2cdd0290e753cca604d3977cbe8bb9">EFI_MEMORY_TYPE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d05/a00489.html#8311bb46986373d64600c5034a30ca61">MemoryType</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d05/a00489.html#c9fb79b751a050ed554cc6e5873c39dc">Reserved</a> [4]</td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Resource directory entry for string. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="1334aa7b30a1f47a3cfc9e1850cc7b72"></a><!-- doxytag: member="EFI_IMAGE_RESOURCE_DIRECTORY_STRING::Length" ref="1334aa7b30a1f47a3cfc9e1850cc7b72" args="" -->
+<a class="el" href="../../da/d05/a00489.html">EFI_HOB_MEMORY_ALLOCATION_HEADER</a> describes the various attributes of the logical memory allocation. The type field will be used for subsequent inclusion in the UEFI memory map. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="0dc155493204f3e3f7dbfbf547a9326d"></a><!-- doxytag: member="EFI_HOB_MEMORY_ALLOCATION_HEADER::MemoryBaseAddress" ref="0dc155493204f3e3f7dbfbf547a9326d" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../da/d05/a00489.html#1334aa7b30a1f47a3cfc9e1850cc7b72">EFI_IMAGE_RESOURCE_DIRECTORY_STRING::Length</a>          </td>
+          <td class="memname"><a class="el" href="../../dd/d95/a01247.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> <a class="el" href="../../da/d05/a00489.html#0dc155493204f3e3f7dbfbf547a9326d">EFI_HOB_MEMORY_ALLOCATION_HEADER::MemoryBaseAddress</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The base address of memory allocated by this HOB. Type EFI_PHYSICAL_ADDRESS is defined in <a class="el" href="../../d6/d6a/a01072.html#48d461654ab0264be90527d408ee231e">AllocatePages()</a> in the UEFI 2.0 specification. 
 </div>
 </div><p>
-<a class="anchor" name="3214488cb2eae3efc67728e9f65490ad"></a><!-- doxytag: member="EFI_IMAGE_RESOURCE_DIRECTORY_STRING::String" ref="3214488cb2eae3efc67728e9f65490ad" args="[1]" -->
+<a class="anchor" name="49f9b273f6200788ea5988481e699cf1"></a><!-- doxytag: member="EFI_HOB_MEMORY_ALLOCATION_HEADER::MemoryLength" ref="49f9b273f6200788ea5988481e699cf1" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> <a class="el" href="../../da/d05/a00489.html#3214488cb2eae3efc67728e9f65490ad">EFI_IMAGE_RESOURCE_DIRECTORY_STRING::String</a>[1]          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../da/d05/a00489.html#49f9b273f6200788ea5988481e699cf1">EFI_HOB_MEMORY_ALLOCATION_HEADER::MemoryLength</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+The length in bytes of memory allocated by this HOB. 
+</div>
+</div><p>
+<a class="anchor" name="8311bb46986373d64600c5034a30ca61"></a><!-- doxytag: member="EFI_HOB_MEMORY_ALLOCATION_HEADER::MemoryType" ref="8311bb46986373d64600c5034a30ca61" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d4/d22/a01250.html#0e2cdd0290e753cca604d3977cbe8bb9">EFI_MEMORY_TYPE</a> <a class="el" href="../../da/d05/a00489.html#8311bb46986373d64600c5034a30ca61">EFI_HOB_MEMORY_ALLOCATION_HEADER::MemoryType</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
 
+<p>
+Defines the type of memory allocated by this HOB. The memory type definition follows the EFI_MEMORY_TYPE definition. Type EFI_MEMORY_TYPE is defined in <a class="el" href="../../d6/d6a/a01072.html#48d461654ab0264be90527d408ee231e">AllocatePages()</a> in the UEFI 2.0 specification. 
+</div>
+</div><p>
+<a class="anchor" name="75dc8d41ad8dd7e9afb845f4416a3246"></a><!-- doxytag: member="EFI_HOB_MEMORY_ALLOCATION_HEADER::Name" ref="75dc8d41ad8dd7e9afb845f4416a3246" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../da/d05/a00489.html#75dc8d41ad8dd7e9afb845f4416a3246">EFI_HOB_MEMORY_ALLOCATION_HEADER::Name</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+A <a class="el" href="../../d1/d87/a00689.html">GUID</a> that defines the memory allocation region's type and purpose, as well as other fields within the memory allocation HOB. This <a class="el" href="../../d1/d87/a00689.html">GUID</a> is used to define the additional data within the HOB that may be present for the memory allocation HOB. Type EFI_GUID is defined in InstallProtocolInterface() in the UEFI 2.0 specification. 
+</div>
+</div><p>
+<a class="anchor" name="c9fb79b751a050ed554cc6e5873c39dc"></a><!-- doxytag: member="EFI_HOB_MEMORY_ALLOCATION_HEADER::Reserved" ref="c9fb79b751a050ed554cc6e5873c39dc" args="[4]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../da/d05/a00489.html#c9fb79b751a050ed554cc6e5873c39dc">EFI_HOB_MEMORY_ALLOCATION_HEADER::Reserved</a>[4]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Padding for Itanium processor family 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:33 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Protocol/UsbIo.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Protocol/FirmwareVolume2.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,95 +21,152 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Protocol/UsbIo.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Protocol/FirmwareVolume2.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/dcc/a00264.html">_EFI_USB_IO_PROTOCOL</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dcb/a00462.html">EFI_FV_WRITE_FILE_DATA</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d87/a00032.html">_EFI_FIRMWARE_VOLUME2_PROTOCOL</a></td></tr>
 
 <tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#69059ae99dc14c95246e29a2ba4d252f">EFI_USB_IO_PROTOCOL_GUID</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#db1c12282f6b988eb8c0be46ef81b8fd">EFI_FIRMWARE_VOLUME2_PROTOCOL_GUID</a>&nbsp;&nbsp;&nbsp;{ 0x220e73b6, 0x6bdb, 0x4413, { 0x84, 0x5, 0xb9, 0x74, 0xb1, 0x8, 0x61, 0x9a } }</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#db544235906d0f997a2c2caa7497ef3c">EFI_USB_NOERROR</a>&nbsp;&nbsp;&nbsp;0x00</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#484c637c164205664c4a4cf3c5a06616">EFI_FV2_READ_DISABLE_CAP</a>&nbsp;&nbsp;&nbsp;0x0000000000000001ULL</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#3faa1932507d3a5358cc5bfa87f84651">EFI_USB_ERR_NOTEXECUTE</a>&nbsp;&nbsp;&nbsp;0x01</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#743559c86da31990c577d3adb9a13047">EFI_FV2_READ_ENABLE_CAP</a>&nbsp;&nbsp;&nbsp;0x0000000000000002ULL</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#3e22d4bd8603efec8873b970f2491f52">EFI_USB_ERR_STALL</a>&nbsp;&nbsp;&nbsp;0x02</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#03b51cb7668c078c1e8650fb83364599">EFI_FV2_READ_STATUS</a>&nbsp;&nbsp;&nbsp;0x0000000000000004ULL</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#9858673990fd3a41615ecbae50fce1d5">EFI_USB_ERR_BUFFER</a>&nbsp;&nbsp;&nbsp;0x04</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#7a86bdd00f983b6d286fe8f5edede78d">EFI_FV2_WRITE_DISABLE_CAP</a>&nbsp;&nbsp;&nbsp;0x0000000000000008ULL</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#314f453cc17e286bed768ee8ae7cf8fb">EFI_USB_ERR_BABBLE</a>&nbsp;&nbsp;&nbsp;0x08</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#c05bbe8d6e5854191893a67f5d8ae02d">EFI_FV2_WRITE_ENABLE_CAP</a>&nbsp;&nbsp;&nbsp;0x0000000000000010ULL</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#b3ace63d229646d7b5c45b54698a9a0b">EFI_USB_ERR_NAK</a>&nbsp;&nbsp;&nbsp;0x10</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#55d05177ad7cfe790bbdd91c670372ed">EFI_FV2_WRITE_STATUS</a>&nbsp;&nbsp;&nbsp;0x0000000000000020ULL</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#e0167767c214d9619af1785378787673">EFI_USB_ERR_CRC</a>&nbsp;&nbsp;&nbsp;0x20</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#172e1f61fed740dddd1652017c2754c7">EFI_FV2_LOCK_CAP</a>&nbsp;&nbsp;&nbsp;0x0000000000000040ULL</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#5775d7d17141397dcd0eb52427e74061">EFI_USB_ERR_TIMEOUT</a>&nbsp;&nbsp;&nbsp;0x40</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#afa79f8d2ca13adc274241dad8dca983">EFI_FV2_LOCK_STATUS</a>&nbsp;&nbsp;&nbsp;0x0000000000000080ULL</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#4ac67bd555a6c2d8e330765dc478f606">EFI_USB_ERR_BITSTUFF</a>&nbsp;&nbsp;&nbsp;0x80</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#8c372e771e1504dba1d30690aec5a053">EFI_FV2_WRITE_POLICY_RELIABLE</a>&nbsp;&nbsp;&nbsp;0x0000000000000100ULL</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#cf3fd1a7b9d071cc75c27cbd448295e1">EFI_USB_ERR_SYSTEM</a>&nbsp;&nbsp;&nbsp;0x100</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#07ab300930e93e1f0103a5e4b074be5f">EFI_FV2_READ_LOCK_CAP</a>&nbsp;&nbsp;&nbsp;0x0000000000001000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#acad1d48b79ebf86fbe539ca0550ac0b">EFI_FV2_READ_LOCK_STATUS</a>&nbsp;&nbsp;&nbsp;0x0000000000002000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#47a4c618b5cde147601996030703a6fd">EFI_FV2_WRITE_LOCK_CAP</a>&nbsp;&nbsp;&nbsp;0x0000000000004000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#d1bb3a850bae404ef52ccf3b29aba931">EFI_FV2_WRITE_LOCK_STATUS</a>&nbsp;&nbsp;&nbsp;0x0000000000008000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#50106f0f6a6321a2cbfe05ca2a6efcae">EFI_FV2_ALIGNMENT</a>&nbsp;&nbsp;&nbsp;0x00000000001F0000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#4700e29c6c25e361440244484240126e">EFI_FV2_ALIGNMENT_1</a>&nbsp;&nbsp;&nbsp;0x0000000000000000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#4d602c69e317a0575948db6c3b3d4741">EFI_FV2_ALIGNMENT_2</a>&nbsp;&nbsp;&nbsp;0x0000000000010000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#cd8372674a6c7195236a7bcb9ae24668">EFI_FV2_ALIGNMENT_4</a>&nbsp;&nbsp;&nbsp;0x0000000000020000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#fd20a63787a616859616432ca6c6dc6d">EFI_FV2_ALIGNMENT_8</a>&nbsp;&nbsp;&nbsp;0x0000000000030000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#45776326c5b9d041a36d857ed1d058b7">EFI_FV2_ALIGNMENT_16</a>&nbsp;&nbsp;&nbsp;0x0000000000040000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#0669964f5564c13fbe9a1c673e2cc249">EFI_FV2_ALIGNMENT_32</a>&nbsp;&nbsp;&nbsp;0x0000000000050000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#4b7d3196d368af0628de3c75f6271d1f">EFI_FV2_ALIGNMENT_64</a>&nbsp;&nbsp;&nbsp;0x0000000000060000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#2ef9a6d5e2f9076fcc7818ca176fcf18">EFI_FV2_ALIGNMENT_128</a>&nbsp;&nbsp;&nbsp;0x0000000000070000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#c407be052c231fff8b3d5dc459f5b258">EFI_FV2_ALIGNMENT_256</a>&nbsp;&nbsp;&nbsp;0x0000000000080000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#5967154ff6d29f0e9ab99de7bef95fd5">EFI_FV2_ALIGNMENT_512</a>&nbsp;&nbsp;&nbsp;0x0000000000090000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#7eff96d160d9b2a186247fa05ff9dd68">EFI_FV2_ALIGNMENT_1K</a>&nbsp;&nbsp;&nbsp;0x00000000000A0000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#123cbc807c017ce2e452edd507fef7ee">EFI_FV2_ALIGNMENT_2K</a>&nbsp;&nbsp;&nbsp;0x00000000000B0000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#5b1398cdd2894f5d20fe5c52f36693cd">EFI_FV2_ALIGNMENT_4K</a>&nbsp;&nbsp;&nbsp;0x00000000000C0000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#7cbaae6e5567f0c4b3c8b4cd14996f2b">EFI_FV2_ALIGNMENT_8K</a>&nbsp;&nbsp;&nbsp;0x00000000000D0000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#84404066979fe53e1bcaa17aea9636f0">EFI_FV2_ALIGNMENT_16K</a>&nbsp;&nbsp;&nbsp;0x00000000000E0000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#d92bb1a899b086e204d9bd5071b26a74">EFI_FV2_ALIGNMENT_32K</a>&nbsp;&nbsp;&nbsp;0x00000000000F0000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#09f03cd24ddea715ac1372d16c168573">EFI_FV2_ALIGNMENT_64K</a>&nbsp;&nbsp;&nbsp;0x0000000000100000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#2c42f50a5f6b7c9297f0bf09e7c73e3b">EFI_FV2_ALIGNMENT_128K</a>&nbsp;&nbsp;&nbsp;0x0000000000110000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#2d4f614d01ef5b506f9cf05d000d342c">EFI_FV2_ALIGNMENT_256K</a>&nbsp;&nbsp;&nbsp;0x0000000000120000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#062b4e2c0ed03cc71ed94bda4a7d8253">EFI_FV2_ALIGNMENT_512K</a>&nbsp;&nbsp;&nbsp;0x0000000000130000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#81aa931a22c358f6bf983382ae937e94">EFI_FV2_ALIGNMENT_1M</a>&nbsp;&nbsp;&nbsp;0x0000000000140000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#b1c02f44c5bcba7bd75233c90b3373e4">EFI_FV2_ALIGNMENT_2M</a>&nbsp;&nbsp;&nbsp;0x0000000000150000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#5a38e860a1e35190d8563c2208a932f9">EFI_FV2_ALIGNMENT_4M</a>&nbsp;&nbsp;&nbsp;0x0000000000160000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#067cd2dfd7fb0660b334195715984c78">EFI_FV2_ALIGNMENT_8M</a>&nbsp;&nbsp;&nbsp;0x0000000000170000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#96718dc63dfb9eba6b15d775c8b0d146">EFI_FV2_ALIGNMENT_16M</a>&nbsp;&nbsp;&nbsp;0x0000000000180000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#0d56b13fa3ef1935144092d5c6621a6c">EFI_FV2_ALIGNMENT_32M</a>&nbsp;&nbsp;&nbsp;0x0000000000190000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#fe4fd8bbe824c65096662303a8861a7d">EFI_FV2_ALIGNMENT_64M</a>&nbsp;&nbsp;&nbsp;0x00000000001A0000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#b7666da0f2d0fbb29ffd5443c1b2fd90">EFI_FV2_ALIGNMENT_128M</a>&nbsp;&nbsp;&nbsp;0x00000000001B0000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#d53db8d7aba733f7f7eba136bb0247a8">EFI_FV2_ALIGNMENT_256M</a>&nbsp;&nbsp;&nbsp;0x00000000001C0000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#10a2e83b9e64c2b8ab497261c4a2aa42">EFI_FV2_ALIGNMENT_512M</a>&nbsp;&nbsp;&nbsp;0x00000000001D0000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#2f85713f43dc4cfcee34fb6a584c9cb7">EFI_FV2_ALIGNMENT_1G</a>&nbsp;&nbsp;&nbsp;0x00000000001E0000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#72fe1c1f3c9170500721b83cb687e934">EFI_FV2_ALIGNMENT_2G</a>&nbsp;&nbsp;&nbsp;0x00000000001F0000ULL</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#a29fa02e40d8f893ae0d2b7907abf831">EFI_FV_UNRELIABLE_WRITE</a>&nbsp;&nbsp;&nbsp;0x00000000</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#ac8022aa89c8500ca5b4814fa46e7bef">EFI_FV_RELIABLE_WRITE</a>&nbsp;&nbsp;&nbsp;0x00000001</td></tr>
 
 <tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <a class="el" href="../../d3/dcc/a00264.html">_EFI_USB_IO_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#5560c7cf160ff0cf2be6ca301fa2dfab">EFI_USB_IO_PROTOCOL</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
+<a class="el" href="../../dc/d87/a00032.html">_EFI_FIRMWARE_VOLUME2_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#44fc3a9d5468e90e9585fd9a4a0a54d7">EFI_FIRMWARE_VOLUME2_PROTOCOL</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../df/dc6/a00949.html">USB_DEVICE_REQUEST</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#8abaaf435d0a8f1fd95a2bca316da7b6">EFI_USB_DEVICE_REQUEST</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#5688c464af594b3a02c33d03d8880971">EFI_FV_ATTRIBUTES</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d3/d29/a00947.html">USB_DEVICE_DESCRIPTOR</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#0ef17bd6610efacdc94d9864e89ff356">EFI_USB_DEVICE_DESCRIPTOR</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#7dcf77dd3df2c34e8bff05bd3d17f610">EFI_FV_GET_ATTRIBUTES</a> )(IN CONST <a class="el" href="../../dc/d87/a00032.html">EFI_FIRMWARE_VOLUME2_PROTOCOL</a> *This, OUT <a class="el" href="../../de/db5/a01181.html#5688c464af594b3a02c33d03d8880971">EFI_FV_ATTRIBUTES</a> *FvAttributes)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../da/d40/a00946.html">USB_CONFIG_DESCRIPTOR</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#5e31050b63657825a0fb21a847aff263">EFI_USB_CONFIG_DESCRIPTOR</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#1b048fd37cfbfa2f5d85f9ac7323d1fc">EFI_FV_SET_ATTRIBUTES</a> )(IN CONST <a class="el" href="../../dc/d87/a00032.html">EFI_FIRMWARE_VOLUME2_PROTOCOL</a> *This, IN OUT <a class="el" href="../../de/db5/a01181.html#5688c464af594b3a02c33d03d8880971">EFI_FV_ATTRIBUTES</a> *FvAttributes)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dc/da0/a00951.html">USB_INTERFACE_DESCRIPTOR</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#7234e32f2f257bec99d281bbb4f6b1b3">EFI_USB_INTERFACE_DESCRIPTOR</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#32e423b8f638f65209a882fc829ce9b6">EFI_FV_READ_FILE</a> )(IN CONST <a class="el" href="../../dc/d87/a00032.html">EFI_FIRMWARE_VOLUME2_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *NameGuid, IN OUT VOID **Buffer, IN OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *BufferSize, OUT <a class="el" href="../../d2/dd7/a01108.html#a8c9898a7322417d167ff078bcde1f2b">EFI_FV_FILETYPE</a> *FoundType, OUT <a class="el" href="../../d8/dbf/a01109.html#56c78b5eb5f41551eafafdcf8e6c519d">EFI_FV_FILE_ATTRIBUTES</a> *FileAttributes, OUT <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *AuthenticationStatus)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../df/d39/a00950.html">USB_ENDPOINT_DESCRIPTOR</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#dbb437118e4028dc66cc17dca7fa14e9">EFI_USB_ENDPOINT_DESCRIPTOR</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#72e8c763d64940bd71ce902d2b7a6d29">EFI_FV_READ_SECTION</a> )(IN CONST <a class="el" href="../../dc/d87/a00032.html">EFI_FIRMWARE_VOLUME2_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *NameGuid, IN <a class="el" href="../../d2/dd7/a01108.html#208180af3108068f979d673a752e58d1">EFI_SECTION_TYPE</a> SectionType, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> SectionInstance, IN OUT VOID **Buffer, IN OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *BufferSize, OUT <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *AuthenticationStatus)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#1b762a6df7d89481fa9b1ea4c5c8df54">EFI_ASYNC_USB_TRANSFER_CALLBACK</a> )(IN VOID *Data, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> DataLength, IN VOID *Context, IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> Status)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#7cebbd531e07e05226a91a8f371f7dd9">EFI_FV_WRITE_POLICY</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#d31846d71fccc44b2eecd4c76e66ade9">EFI_USB_IO_CONTROL_TRANSFER</a> )(IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *This, IN <a class="el" href="../../df/dc6/a00949.html">EFI_USB_DEVICE_REQUEST</a> *Request, IN <a class="el" href="../../de/db5/a01181.html#465fef7f75dc2b09df850101702dc579">EFI_USB_DATA_DIRECTION</a> Direction, IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> Timeout, IN OUT VOID *Data, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> DataLength, OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *Status)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#566ba2394adc729f8bbb64f9c132c2a5">EFI_FV_WRITE_FILE</a> )(IN CONST <a class="el" href="../../dc/d87/a00032.html">EFI_FIRMWARE_VOLUME2_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> NumberOfFiles, IN <a class="el" href="../../de/db5/a01181.html#7cebbd531e07e05226a91a8f371f7dd9">EFI_FV_WRITE_POLICY</a> WritePolicy, IN <a class="el" href="../../de/dcb/a00462.html">EFI_FV_WRITE_FILE_DATA</a> *FileData)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#7bad4ee3d5d14c62ad5c19b0b205e929">EFI_USB_IO_BULK_TRANSFER</a> )(IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> DeviceEndpoint, IN OUT VOID *Data, IN OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *DataLength, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Timeout, OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *Status)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#2165e3ad39262d664c6c23f58a2dc3d9">EFI_FV_GET_NEXT_FILE</a> )(IN CONST <a class="el" href="../../dc/d87/a00032.html">EFI_FIRMWARE_VOLUME2_PROTOCOL</a> *This, IN OUT VOID *Key, IN OUT <a class="el" href="../../d2/dd7/a01108.html#a8c9898a7322417d167ff078bcde1f2b">EFI_FV_FILETYPE</a> *FileType, OUT <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *NameGuid, OUT <a class="el" href="../../d8/dbf/a01109.html#56c78b5eb5f41551eafafdcf8e6c519d">EFI_FV_FILE_ATTRIBUTES</a> *Attributes, OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *Size)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#05430bec4b997305ab36659114480af5">EFI_USB_IO_ASYNC_INTERRUPT_TRANSFER</a> )(IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> DeviceEndpoint, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> IsNewTransfer, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> PollingInterval, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> DataLength, IN <a class="el" href="../../de/db5/a01181.html#1b762a6df7d89481fa9b1ea4c5c8df54">EFI_ASYNC_USB_TRANSFER_CALLBACK</a> InterruptCallBack, IN VOID *Context)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#9ddaa0bf86d2e2842301cd862d127c9b">EFI_FV_GET_INFO</a> )(IN CONST <a class="el" href="../../dc/d87/a00032.html">EFI_FIRMWARE_VOLUME2_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *InformationType, IN OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *BufferSize, OUT VOID *Buffer)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#ffd57803524c732ed9d152dd4e9f3347">EFI_USB_IO_SYNC_INTERRUPT_TRANSFER</a> )(IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> DeviceEndpoint, IN OUT VOID *Data, IN OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *DataLength, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Timeout, OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *Status)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#1709948e25507e9e78873083e7b863a0">EFI_USB_IO_ISOCHRONOUS_TRANSFER</a> )(IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> DeviceEndpoint, IN OUT VOID *Data, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> DataLength, OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *Status)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#db2f1486238ac1f6ea3189322c21fb12">EFI_USB_IO_ASYNC_ISOCHRONOUS_TRANSFER</a> )(IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> DeviceEndpoint, IN OUT VOID *Data, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> DataLength, IN <a class="el" href="../../de/db5/a01181.html#1b762a6df7d89481fa9b1ea4c5c8df54">EFI_ASYNC_USB_TRANSFER_CALLBACK</a> IsochronousCallBack, IN VOID *Context)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#a4915a5941ec42fc1d2196c18aca0db6">EFI_USB_IO_PORT_RESET</a> )(IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *This)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#45693ea12e273427be1f7c953c8fa2f2">EFI_USB_IO_GET_DEVICE_DESCRIPTOR</a> )(IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *This, OUT <a class="el" href="../../d3/d29/a00947.html">EFI_USB_DEVICE_DESCRIPTOR</a> *DeviceDescriptor)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#a310a630e4071637f2e682ea2c4f508d">EFI_USB_IO_GET_CONFIG_DESCRIPTOR</a> )(IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *This, OUT <a class="el" href="../../da/d40/a00946.html">EFI_USB_CONFIG_DESCRIPTOR</a> *ConfigurationDescriptor)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#386bb06c7106a0ede3d632c3252b62bc">EFI_USB_IO_GET_INTERFACE_DESCRIPTOR</a> )(IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *This, OUT <a class="el" href="../../dc/da0/a00951.html">EFI_USB_INTERFACE_DESCRIPTOR</a> *InterfaceDescriptor)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#0b97c21a91f0cb0c9d7b3303e305a21a">EFI_USB_IO_GET_ENDPOINT_DESCRIPTOR</a> )(IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EndpointIndex, OUT <a class="el" href="../../df/d39/a00950.html">EFI_USB_ENDPOINT_DESCRIPTOR</a> *EndpointDescriptor)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#1f67100cf13fa74cf2fb5203e7a53d6b">EFI_USB_IO_GET_STRING_DESCRIPTOR</a> )(IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> LangID, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> StringID, OUT <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> **String)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#b4ad9610b45629d09994fde7f86f3a6a">EFI_USB_IO_GET_SUPPORTED_LANGUAGE</a> )(IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *This, OUT <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> **LangIDTable, OUT <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> *TableSize)</td></tr>
-
-<tr><td colspan="2"><br><h2>Enumerations</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#465fef7f75dc2b09df850101702dc579">EFI_USB_DATA_DIRECTION</a> { <a class="el" href="../../de/db5/a01181.html#465fef7f75dc2b09df850101702dc5799929b555fa374543b1a8fb7b047c603e">EfiUsbDataIn</a>, 
-<a class="el" href="../../de/db5/a01181.html#465fef7f75dc2b09df850101702dc57999511a97d844116e1a851ecaddf74420">EfiUsbDataOut</a>, 
-<a class="el" href="../../de/db5/a01181.html#465fef7f75dc2b09df850101702dc579351ed52a751ad387bc017eb3fb5de6bc">EfiUsbNoData</a>
- }</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#6a4926aa3d3881b0ec10ad3537b20f78">EFI_FV_SET_INFO</a> )(IN CONST <a class="el" href="../../dc/d87/a00032.html">EFI_FIRMWARE_VOLUME2_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *InformationType, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> BufferSize, IN CONST VOID *Buffer)</td></tr>
 
 <tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#afa970a81fc9aa3289212df4de3bfdbe">gEfiUsbIoProtocolGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/db5/a01181.html#0d04d6ab888deef48be4b6e439cc115f">gEfiFirmwareVolume2ProtocolGuid</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-EFI Usb I/O Protocol as defined in UEFI specification. This protocol is used by code, typically drivers, running in the EFI boot services environment to access USB devices like USB keyboards, mice and mass storage devices. In particular, functions for managing devices on USB buses are defined here.<p>
+The Firmware Volume Protocol provides file-level access to the firmware volume. Each firmware volume driver must produce an instance of the Firmware Volume Protocol if the firmware volume is to be visible to the system during the DXE phase. The Firmware Volume Protocol also provides mechanisms for determining and modifying some attributes of the firmware volume.<p>
 Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
-<a class="anchor" name="314f453cc17e286bed768ee8ae7cf8fb"></a><!-- doxytag: member="UsbIo.h::EFI_USB_ERR_BABBLE" ref="314f453cc17e286bed768ee8ae7cf8fb" args="" -->
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
+<dl class="user" compact><dt><b>Revision Reference: PI</b></dt><dd>Version 1.00. </dd></dl>
+<hr><h2>Define Documentation</h2>
+<a class="anchor" name="db1c12282f6b988eb8c0be46ef81b8fd"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FIRMWARE_VOLUME2_PROTOCOL_GUID" ref="db1c12282f6b988eb8c0be46ef81b8fd" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_USB_ERR_BABBLE&nbsp;&nbsp;&nbsp;0x08          </td>
+          <td class="memname">#define EFI_FIRMWARE_VOLUME2_PROTOCOL_GUID&nbsp;&nbsp;&nbsp;{ 0x220e73b6, 0x6bdb, 0x4413, { 0x84, 0x5, 0xb9, 0x74, 0xb1, 0x8, 0x61, 0x9a } }          </td>
         </tr>
       </table>
 </div>
@@ -119,12 +176,12 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 </div>
 </div><p>
-<a class="anchor" name="4ac67bd555a6c2d8e330765dc478f606"></a><!-- doxytag: member="UsbIo.h::EFI_USB_ERR_BITSTUFF" ref="4ac67bd555a6c2d8e330765dc478f606" args="" -->
+<a class="anchor" name="50106f0f6a6321a2cbfe05ca2a6efcae"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT" ref="50106f0f6a6321a2cbfe05ca2a6efcae" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_USB_ERR_BITSTUFF&nbsp;&nbsp;&nbsp;0x80          </td>
+          <td class="memname">#define EFI_FV2_ALIGNMENT&nbsp;&nbsp;&nbsp;0x00000000001F0000ULL          </td>
         </tr>
       </table>
 </div>
@@ -134,12 +191,12 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 </div>
 </div><p>
-<a class="anchor" name="9858673990fd3a41615ecbae50fce1d5"></a><!-- doxytag: member="UsbIo.h::EFI_USB_ERR_BUFFER" ref="9858673990fd3a41615ecbae50fce1d5" args="" -->
+<a class="anchor" name="4700e29c6c25e361440244484240126e"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_1" ref="4700e29c6c25e361440244484240126e" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_USB_ERR_BUFFER&nbsp;&nbsp;&nbsp;0x04          </td>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_1&nbsp;&nbsp;&nbsp;0x0000000000000000ULL          </td>
         </tr>
       </table>
 </div>
@@ -149,12 +206,12 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 </div>
 </div><p>
-<a class="anchor" name="e0167767c214d9619af1785378787673"></a><!-- doxytag: member="UsbIo.h::EFI_USB_ERR_CRC" ref="e0167767c214d9619af1785378787673" args="" -->
+<a class="anchor" name="2ef9a6d5e2f9076fcc7818ca176fcf18"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_128" ref="2ef9a6d5e2f9076fcc7818ca176fcf18" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_USB_ERR_CRC&nbsp;&nbsp;&nbsp;0x20          </td>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_128&nbsp;&nbsp;&nbsp;0x0000000000070000ULL          </td>
         </tr>
       </table>
 </div>
@@ -164,12 +221,12 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 </div>
 </div><p>
-<a class="anchor" name="b3ace63d229646d7b5c45b54698a9a0b"></a><!-- doxytag: member="UsbIo.h::EFI_USB_ERR_NAK" ref="b3ace63d229646d7b5c45b54698a9a0b" args="" -->
+<a class="anchor" name="2c42f50a5f6b7c9297f0bf09e7c73e3b"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_128K" ref="2c42f50a5f6b7c9297f0bf09e7c73e3b" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_USB_ERR_NAK&nbsp;&nbsp;&nbsp;0x10          </td>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_128K&nbsp;&nbsp;&nbsp;0x0000000000110000ULL          </td>
         </tr>
       </table>
 </div>
@@ -179,12 +236,12 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 </div>
 </div><p>
-<a class="anchor" name="3faa1932507d3a5358cc5bfa87f84651"></a><!-- doxytag: member="UsbIo.h::EFI_USB_ERR_NOTEXECUTE" ref="3faa1932507d3a5358cc5bfa87f84651" args="" -->
+<a class="anchor" name="b7666da0f2d0fbb29ffd5443c1b2fd90"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_128M" ref="b7666da0f2d0fbb29ffd5443c1b2fd90" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_USB_ERR_NOTEXECUTE&nbsp;&nbsp;&nbsp;0x01          </td>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_128M&nbsp;&nbsp;&nbsp;0x00000000001B0000ULL          </td>
         </tr>
       </table>
 </div>
@@ -194,12 +251,12 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 </div>
 </div><p>
-<a class="anchor" name="3e22d4bd8603efec8873b970f2491f52"></a><!-- doxytag: member="UsbIo.h::EFI_USB_ERR_STALL" ref="3e22d4bd8603efec8873b970f2491f52" args="" -->
+<a class="anchor" name="45776326c5b9d041a36d857ed1d058b7"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_16" ref="45776326c5b9d041a36d857ed1d058b7" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_USB_ERR_STALL&nbsp;&nbsp;&nbsp;0x02          </td>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_16&nbsp;&nbsp;&nbsp;0x0000000000040000ULL          </td>
         </tr>
       </table>
 </div>
@@ -209,12 +266,12 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 </div>
 </div><p>
-<a class="anchor" name="cf3fd1a7b9d071cc75c27cbd448295e1"></a><!-- doxytag: member="UsbIo.h::EFI_USB_ERR_SYSTEM" ref="cf3fd1a7b9d071cc75c27cbd448295e1" args="" -->
+<a class="anchor" name="84404066979fe53e1bcaa17aea9636f0"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_16K" ref="84404066979fe53e1bcaa17aea9636f0" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_USB_ERR_SYSTEM&nbsp;&nbsp;&nbsp;0x100          </td>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_16K&nbsp;&nbsp;&nbsp;0x00000000000E0000ULL          </td>
         </tr>
       </table>
 </div>
@@ -224,12 +281,12 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 </div>
 </div><p>
-<a class="anchor" name="5775d7d17141397dcd0eb52427e74061"></a><!-- doxytag: member="UsbIo.h::EFI_USB_ERR_TIMEOUT" ref="5775d7d17141397dcd0eb52427e74061" args="" -->
+<a class="anchor" name="96718dc63dfb9eba6b15d775c8b0d146"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_16M" ref="96718dc63dfb9eba6b15d775c8b0d146" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_USB_ERR_TIMEOUT&nbsp;&nbsp;&nbsp;0x40          </td>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_16M&nbsp;&nbsp;&nbsp;0x0000000000180000ULL          </td>
         </tr>
       </table>
 </div>
@@ -239,30 +296,597 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 </div>
 </div><p>
-<a class="anchor" name="69059ae99dc14c95246e29a2ba4d252f"></a><!-- doxytag: member="UsbIo.h::EFI_USB_IO_PROTOCOL_GUID" ref="69059ae99dc14c95246e29a2ba4d252f" args="" -->
+<a class="anchor" name="2f85713f43dc4cfcee34fb6a584c9cb7"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_1G" ref="2f85713f43dc4cfcee34fb6a584c9cb7" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_USB_IO_PROTOCOL_GUID          </td>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_1G&nbsp;&nbsp;&nbsp;0x00000000001E0000ULL          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-<b>Value:</b><div class="fragment"><pre class="fragment">{ \
-    0x2B2F68D6, 0x0CD2, 0x44cf, {0x8E, 0x8B, 0xBB, 0xA2, 0x0B, 0x1B, 0x5B, 0x75 } \
-  }
-</pre></div>
+
 </div>
 </div><p>
-<a class="anchor" name="db544235906d0f997a2c2caa7497ef3c"></a><!-- doxytag: member="UsbIo.h::EFI_USB_NOERROR" ref="db544235906d0f997a2c2caa7497ef3c" args="" -->
+<a class="anchor" name="7eff96d160d9b2a186247fa05ff9dd68"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_1K" ref="7eff96d160d9b2a186247fa05ff9dd68" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_USB_NOERROR&nbsp;&nbsp;&nbsp;0x00          </td>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_1K&nbsp;&nbsp;&nbsp;0x00000000000A0000ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="81aa931a22c358f6bf983382ae937e94"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_1M" ref="81aa931a22c358f6bf983382ae937e94" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_1M&nbsp;&nbsp;&nbsp;0x0000000000140000ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="4d602c69e317a0575948db6c3b3d4741"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_2" ref="4d602c69e317a0575948db6c3b3d4741" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_2&nbsp;&nbsp;&nbsp;0x0000000000010000ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="c407be052c231fff8b3d5dc459f5b258"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_256" ref="c407be052c231fff8b3d5dc459f5b258" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_256&nbsp;&nbsp;&nbsp;0x0000000000080000ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="2d4f614d01ef5b506f9cf05d000d342c"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_256K" ref="2d4f614d01ef5b506f9cf05d000d342c" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_256K&nbsp;&nbsp;&nbsp;0x0000000000120000ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="d53db8d7aba733f7f7eba136bb0247a8"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_256M" ref="d53db8d7aba733f7f7eba136bb0247a8" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_256M&nbsp;&nbsp;&nbsp;0x00000000001C0000ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="72fe1c1f3c9170500721b83cb687e934"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_2G" ref="72fe1c1f3c9170500721b83cb687e934" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_2G&nbsp;&nbsp;&nbsp;0x00000000001F0000ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="123cbc807c017ce2e452edd507fef7ee"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_2K" ref="123cbc807c017ce2e452edd507fef7ee" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_2K&nbsp;&nbsp;&nbsp;0x00000000000B0000ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="b1c02f44c5bcba7bd75233c90b3373e4"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_2M" ref="b1c02f44c5bcba7bd75233c90b3373e4" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_2M&nbsp;&nbsp;&nbsp;0x0000000000150000ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="0669964f5564c13fbe9a1c673e2cc249"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_32" ref="0669964f5564c13fbe9a1c673e2cc249" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_32&nbsp;&nbsp;&nbsp;0x0000000000050000ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="d92bb1a899b086e204d9bd5071b26a74"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_32K" ref="d92bb1a899b086e204d9bd5071b26a74" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_32K&nbsp;&nbsp;&nbsp;0x00000000000F0000ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="0d56b13fa3ef1935144092d5c6621a6c"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_32M" ref="0d56b13fa3ef1935144092d5c6621a6c" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_32M&nbsp;&nbsp;&nbsp;0x0000000000190000ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="cd8372674a6c7195236a7bcb9ae24668"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_4" ref="cd8372674a6c7195236a7bcb9ae24668" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_4&nbsp;&nbsp;&nbsp;0x0000000000020000ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="5b1398cdd2894f5d20fe5c52f36693cd"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_4K" ref="5b1398cdd2894f5d20fe5c52f36693cd" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_4K&nbsp;&nbsp;&nbsp;0x00000000000C0000ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="5a38e860a1e35190d8563c2208a932f9"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_4M" ref="5a38e860a1e35190d8563c2208a932f9" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_4M&nbsp;&nbsp;&nbsp;0x0000000000160000ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="5967154ff6d29f0e9ab99de7bef95fd5"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_512" ref="5967154ff6d29f0e9ab99de7bef95fd5" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_512&nbsp;&nbsp;&nbsp;0x0000000000090000ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="062b4e2c0ed03cc71ed94bda4a7d8253"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_512K" ref="062b4e2c0ed03cc71ed94bda4a7d8253" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_512K&nbsp;&nbsp;&nbsp;0x0000000000130000ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="10a2e83b9e64c2b8ab497261c4a2aa42"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_512M" ref="10a2e83b9e64c2b8ab497261c4a2aa42" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_512M&nbsp;&nbsp;&nbsp;0x00000000001D0000ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="4b7d3196d368af0628de3c75f6271d1f"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_64" ref="4b7d3196d368af0628de3c75f6271d1f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_64&nbsp;&nbsp;&nbsp;0x0000000000060000ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="09f03cd24ddea715ac1372d16c168573"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_64K" ref="09f03cd24ddea715ac1372d16c168573" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_64K&nbsp;&nbsp;&nbsp;0x0000000000100000ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="fe4fd8bbe824c65096662303a8861a7d"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_64M" ref="fe4fd8bbe824c65096662303a8861a7d" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_64M&nbsp;&nbsp;&nbsp;0x00000000001A0000ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="fd20a63787a616859616432ca6c6dc6d"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_8" ref="fd20a63787a616859616432ca6c6dc6d" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_8&nbsp;&nbsp;&nbsp;0x0000000000030000ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="7cbaae6e5567f0c4b3c8b4cd14996f2b"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_8K" ref="7cbaae6e5567f0c4b3c8b4cd14996f2b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_8K&nbsp;&nbsp;&nbsp;0x00000000000D0000ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="067cd2dfd7fb0660b334195715984c78"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_ALIGNMENT_8M" ref="067cd2dfd7fb0660b334195715984c78" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_ALIGNMENT_8M&nbsp;&nbsp;&nbsp;0x0000000000170000ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="172e1f61fed740dddd1652017c2754c7"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_LOCK_CAP" ref="172e1f61fed740dddd1652017c2754c7" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_LOCK_CAP&nbsp;&nbsp;&nbsp;0x0000000000000040ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="afa79f8d2ca13adc274241dad8dca983"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_LOCK_STATUS" ref="afa79f8d2ca13adc274241dad8dca983" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_LOCK_STATUS&nbsp;&nbsp;&nbsp;0x0000000000000080ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="484c637c164205664c4a4cf3c5a06616"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_READ_DISABLE_CAP" ref="484c637c164205664c4a4cf3c5a06616" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_READ_DISABLE_CAP&nbsp;&nbsp;&nbsp;0x0000000000000001ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="743559c86da31990c577d3adb9a13047"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_READ_ENABLE_CAP" ref="743559c86da31990c577d3adb9a13047" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_READ_ENABLE_CAP&nbsp;&nbsp;&nbsp;0x0000000000000002ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="07ab300930e93e1f0103a5e4b074be5f"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_READ_LOCK_CAP" ref="07ab300930e93e1f0103a5e4b074be5f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_READ_LOCK_CAP&nbsp;&nbsp;&nbsp;0x0000000000001000ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="acad1d48b79ebf86fbe539ca0550ac0b"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_READ_LOCK_STATUS" ref="acad1d48b79ebf86fbe539ca0550ac0b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_READ_LOCK_STATUS&nbsp;&nbsp;&nbsp;0x0000000000002000ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="03b51cb7668c078c1e8650fb83364599"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_READ_STATUS" ref="03b51cb7668c078c1e8650fb83364599" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_READ_STATUS&nbsp;&nbsp;&nbsp;0x0000000000000004ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="7a86bdd00f983b6d286fe8f5edede78d"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_WRITE_DISABLE_CAP" ref="7a86bdd00f983b6d286fe8f5edede78d" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_WRITE_DISABLE_CAP&nbsp;&nbsp;&nbsp;0x0000000000000008ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="c05bbe8d6e5854191893a67f5d8ae02d"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_WRITE_ENABLE_CAP" ref="c05bbe8d6e5854191893a67f5d8ae02d" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_WRITE_ENABLE_CAP&nbsp;&nbsp;&nbsp;0x0000000000000010ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="47a4c618b5cde147601996030703a6fd"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_WRITE_LOCK_CAP" ref="47a4c618b5cde147601996030703a6fd" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_WRITE_LOCK_CAP&nbsp;&nbsp;&nbsp;0x0000000000004000ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="d1bb3a850bae404ef52ccf3b29aba931"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_WRITE_LOCK_STATUS" ref="d1bb3a850bae404ef52ccf3b29aba931" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_WRITE_LOCK_STATUS&nbsp;&nbsp;&nbsp;0x0000000000008000ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="8c372e771e1504dba1d30690aec5a053"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_WRITE_POLICY_RELIABLE" ref="8c372e771e1504dba1d30690aec5a053" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_WRITE_POLICY_RELIABLE&nbsp;&nbsp;&nbsp;0x0000000000000100ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="55d05177ad7cfe790bbdd91c670372ed"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV2_WRITE_STATUS" ref="55d05177ad7cfe790bbdd91c670372ed" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV2_WRITE_STATUS&nbsp;&nbsp;&nbsp;0x0000000000000020ULL          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="ac8022aa89c8500ca5b4814fa46e7bef"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV_RELIABLE_WRITE" ref="ac8022aa89c8500ca5b4814fa46e7bef" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV_RELIABLE_WRITE&nbsp;&nbsp;&nbsp;0x00000001          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="a29fa02e40d8f893ae0d2b7907abf831"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV_UNRELIABLE_WRITE" ref="a29fa02e40d8f893ae0d2b7907abf831" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_FV_UNRELIABLE_WRITE&nbsp;&nbsp;&nbsp;0x00000000          </td>
         </tr>
       </table>
 </div>
@@ -273,569 +897,344 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 </div>
 </div><p>
 <hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="1b762a6df7d89481fa9b1ea4c5c8df54"></a><!-- doxytag: member="UsbIo.h::EFI_ASYNC_USB_TRANSFER_CALLBACK" ref="1b762a6df7d89481fa9b1ea4c5c8df54" args=")(IN VOID *Data, IN UINTN DataLength, IN VOID *Context, IN UINT32 Status)" -->
+<a class="anchor" name="44fc3a9d5468e90e9585fd9a4a0a54d7"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FIRMWARE_VOLUME2_PROTOCOL" ref="44fc3a9d5468e90e9585fd9a4a0a54d7" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/db5/a01181.html#1b762a6df7d89481fa9b1ea4c5c8df54">EFI_ASYNC_USB_TRANSFER_CALLBACK</a>)(IN VOID *Data, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> DataLength, IN VOID *Context, IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> Status)          </td>
+          <td class="memname">typedef struct <a class="el" href="../../dc/d87/a00032.html">_EFI_FIRMWARE_VOLUME2_PROTOCOL</a> <a class="el" href="../../dc/d87/a00032.html">EFI_FIRMWARE_VOLUME2_PROTOCOL</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Async USB transfer callback routine.<p>
+
+</div>
+</div><p>
+<a class="anchor" name="5688c464af594b3a02c33d03d8880971"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV_ATTRIBUTES" ref="5688c464af594b3a02c33d03d8880971" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../de/db5/a01181.html#5688c464af594b3a02c33d03d8880971">EFI_FV_ATTRIBUTES</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+EFI_FV_ATTRIBUTES 
+</div>
+</div><p>
+<a class="anchor" name="7dcf77dd3df2c34e8bff05bd3d17f610"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV_GET_ATTRIBUTES" ref="7dcf77dd3df2c34e8bff05bd3d17f610" args=")(IN CONST EFI_FIRMWARE_VOLUME2_PROTOCOL *This, OUT EFI_FV_ATTRIBUTES *FvAttributes)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/db5/a01181.html#7dcf77dd3df2c34e8bff05bd3d17f610">EFI_FV_GET_ATTRIBUTES</a>)(IN CONST <a class="el" href="../../dc/d87/a00032.html">EFI_FIRMWARE_VOLUME2_PROTOCOL</a> *This, OUT <a class="el" href="../../de/db5/a01181.html#5688c464af594b3a02c33d03d8880971">EFI_FV_ATTRIBUTES</a> *FvAttributes)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Returns the attributes and current settings of the firmware volume.<p>
+Because of constraints imposed by the underlying firmware storage, an instance of the Firmware Volume Protocol may not be to able to support all possible variations of this architecture. These constraints and the current state of the firmware volume are exposed to the caller using the GetVolumeAttributes() function. GetVolumeAttributes() is callable only from TPL_NOTIFY and below. Behavior of GetVolumeAttributes() at any EFI_TPL above TPL_NOTIFY is undefined.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Data</em>&nbsp;</td><td>Data received or sent via the USB Asynchronous Transfer, if the transfer completed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DataLength</em>&nbsp;</td><td>The length of Data received or sent via the Asynchronous Transfer, if transfer successfully completes. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Context</em>&nbsp;</td><td>Data passed from UsbAsyncInterruptTransfer() request. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Status</em>&nbsp;</td><td>Indicates the result of the asynchronous transfer.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Indicates the EFI_FIRMWARE_VOLUME2_PROTOCOL instance.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>FvAttributes</em>&nbsp;</td><td>Pointer to an EFI_FV_ATTRIBUTES in which the attributes and current settings are returned.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The asynchronous USB transfer request has been successfully executed. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The asynchronous USB transfer request failed. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The firmware volume attributes were returned. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
-<a class="anchor" name="5e31050b63657825a0fb21a847aff263"></a><!-- doxytag: member="UsbIo.h::EFI_USB_CONFIG_DESCRIPTOR" ref="5e31050b63657825a0fb21a847aff263" args="" -->
+<a class="anchor" name="9ddaa0bf86d2e2842301cd862d127c9b"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV_GET_INFO" ref="9ddaa0bf86d2e2842301cd862d127c9b" args=")(IN CONST EFI_FIRMWARE_VOLUME2_PROTOCOL *This, IN CONST EFI_GUID *InformationType, IN OUT UINTN *BufferSize, OUT VOID *Buffer)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../da/d40/a00946.html">USB_CONFIG_DESCRIPTOR</a> <a class="el" href="../../da/d40/a00946.html">EFI_USB_CONFIG_DESCRIPTOR</a>          </td>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/db5/a01181.html#9ddaa0bf86d2e2842301cd862d127c9b">EFI_FV_GET_INFO</a>)(IN CONST <a class="el" href="../../dc/d87/a00032.html">EFI_FIRMWARE_VOLUME2_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *InformationType, IN OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *BufferSize, OUT VOID *Buffer)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<a class="anchor" name="0ef17bd6610efacdc94d9864e89ff356"></a><!-- doxytag: member="UsbIo.h::EFI_USB_DEVICE_DESCRIPTOR" ref="0ef17bd6610efacdc94d9864e89ff356" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d3/d29/a00947.html">USB_DEVICE_DESCRIPTOR</a> <a class="el" href="../../d3/d29/a00947.html">EFI_USB_DEVICE_DESCRIPTOR</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="8abaaf435d0a8f1fd95a2bca316da7b6"></a><!-- doxytag: member="UsbIo.h::EFI_USB_DEVICE_REQUEST" ref="8abaaf435d0a8f1fd95a2bca316da7b6" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../df/dc6/a00949.html">USB_DEVICE_REQUEST</a> <a class="el" href="../../df/dc6/a00949.html">EFI_USB_DEVICE_REQUEST</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="dbb437118e4028dc66cc17dca7fa14e9"></a><!-- doxytag: member="UsbIo.h::EFI_USB_ENDPOINT_DESCRIPTOR" ref="dbb437118e4028dc66cc17dca7fa14e9" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../df/d39/a00950.html">USB_ENDPOINT_DESCRIPTOR</a> <a class="el" href="../../df/d39/a00950.html">EFI_USB_ENDPOINT_DESCRIPTOR</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="7234e32f2f257bec99d281bbb4f6b1b3"></a><!-- doxytag: member="UsbIo.h::EFI_USB_INTERFACE_DESCRIPTOR" ref="7234e32f2f257bec99d281bbb4f6b1b3" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../dc/da0/a00951.html">USB_INTERFACE_DESCRIPTOR</a> <a class="el" href="../../dc/da0/a00951.html">EFI_USB_INTERFACE_DESCRIPTOR</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="05430bec4b997305ab36659114480af5"></a><!-- doxytag: member="UsbIo.h::EFI_USB_IO_ASYNC_INTERRUPT_TRANSFER" ref="05430bec4b997305ab36659114480af5" args=")(IN EFI_USB_IO_PROTOCOL *This, IN UINT8 DeviceEndpoint, IN BOOLEAN IsNewTransfer, IN UINTN PollingInterval, IN UINTN DataLength, IN EFI_ASYNC_USB_TRANSFER_CALLBACK InterruptCallBack, IN VOID *Context)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/db5/a01181.html#05430bec4b997305ab36659114480af5">EFI_USB_IO_ASYNC_INTERRUPT_TRANSFER</a>)(IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> DeviceEndpoint, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> IsNewTransfer, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> PollingInterval, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> DataLength, IN <a class="el" href="../../de/db5/a01181.html#1b762a6df7d89481fa9b1ea4c5c8df54">EFI_ASYNC_USB_TRANSFER_CALLBACK</a> InterruptCallBack, IN VOID *Context)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This function is used to manage a USB device with an interrupt transfer pipe. An Asynchronous Interrupt Transfer is typically used to query a device's status at a fixed rate. For example, keyboard, mouse, and hub devices use this type of transfer to query their interrupt endpoints at a fixed rate.<p>
+Return information about a firmware volume.<p>
+The GetInfo() function returns information of type InformationType for the requested firmware volume. If the volume does not support the requested information type, then EFI_UNSUPPORTED is returned. If the buffer is not large enough to hold the requested structure, EFI_BUFFER_TOO_SMALL is returned and the BufferSize is set to the size of buffer that is required to make the request. The information types defined by this specification are required information types that all file systems must support.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_USB_IO_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DeviceEndpoint</em>&nbsp;</td><td>The destination USB device endpoint to which the device request is being sent. DeviceEndpoint must be between 0x01 and 0x0F or between 0x81 and 0x8F, otherwise EFI_INVALID_PARAMETER is returned. If the endpoint is not a BULK endpoint, EFI_INVALID_PARAMETER is returned. The MSB of this parameter indicates the endpoint direction. The number "1" stands for an IN endpoint, and "0" stands for an OUT endpoint. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>IsNewTransfer</em>&nbsp;</td><td>If TRUE, a new transfer will be submitted to USB controller. If FALSE, the interrupt transfer is deleted from the device's interrupt transfer queue. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>PollingInterval</em>&nbsp;</td><td>Indicates the periodic rate, in milliseconds, that the transfer is to be executed.This parameter is required when IsNewTransfer is TRUE. The value must be between 1 to 255, otherwise EFI_INVALID_PARAMETER is returned. The units are in milliseconds. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DataLength</em>&nbsp;</td><td>Specifies the length, in bytes, of the data to be received from the USB device. This parameter is only required when IsNewTransfer is TRUE. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>InterruptCallback</em>&nbsp;</td><td>The Callback function. This function is called if the asynchronous interrupt transfer is completed. This parameter is required when IsNewTransfer is TRUE. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Context</em>&nbsp;</td><td>Data passed to the InterruptCallback function. This is an optional parameter and may be NULL.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_FIRMWARE_VOLUME2_PROTOCOL instance that is the file handle the requested information is for.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>InformationType</em>&nbsp;</td><td>The type identifier for the information being requested.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>BufferSize</em>&nbsp;</td><td>On input, the size of Buffer. On output, the amount of data returned in Buffer. In both cases, the size is measured in bytes.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>A pointer to the data buffer to return. The buffer's type is indicated by InformationType.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The asynchronous USB transfer request transfer has been successfully executed. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The asynchronous USB transfer request failed. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The information was retrieved.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The InformationType is not known.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NO_MEDIA</em>&nbsp;</td><td>The device has no medium.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The device reported an error.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_VOLUME_CORRUPTED</em>&nbsp;</td><td>The file system structures are corrupted.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_BUFFER_TOO_SMALL</em>&nbsp;</td><td>The BufferSize is too small to read the current directory entry. BufferSize has been updated with the size needed to complete the request. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
-<a class="anchor" name="db2f1486238ac1f6ea3189322c21fb12"></a><!-- doxytag: member="UsbIo.h::EFI_USB_IO_ASYNC_ISOCHRONOUS_TRANSFER" ref="db2f1486238ac1f6ea3189322c21fb12" args=")(IN EFI_USB_IO_PROTOCOL *This, IN UINT8 DeviceEndpoint, IN OUT VOID *Data, IN UINTN DataLength, IN EFI_ASYNC_USB_TRANSFER_CALLBACK IsochronousCallBack, IN VOID *Context)" -->
+<a class="anchor" name="2165e3ad39262d664c6c23f58a2dc3d9"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV_GET_NEXT_FILE" ref="2165e3ad39262d664c6c23f58a2dc3d9" args=")(IN CONST EFI_FIRMWARE_VOLUME2_PROTOCOL *This, IN OUT VOID *Key, IN OUT EFI_FV_FILETYPE *FileType, OUT EFI_GUID *NameGuid, OUT EFI_FV_FILE_ATTRIBUTES *Attributes, OUT UINTN *Size)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/db5/a01181.html#db2f1486238ac1f6ea3189322c21fb12">EFI_USB_IO_ASYNC_ISOCHRONOUS_TRANSFER</a>)(IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> DeviceEndpoint, IN OUT VOID *Data, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> DataLength, IN <a class="el" href="../../de/db5/a01181.html#1b762a6df7d89481fa9b1ea4c5c8df54">EFI_ASYNC_USB_TRANSFER_CALLBACK</a> IsochronousCallBack, IN VOID *Context)          </td>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/db5/a01181.html#2165e3ad39262d664c6c23f58a2dc3d9">EFI_FV_GET_NEXT_FILE</a>)(IN CONST <a class="el" href="../../dc/d87/a00032.html">EFI_FIRMWARE_VOLUME2_PROTOCOL</a> *This, IN OUT VOID *Key, IN OUT <a class="el" href="../../d2/dd7/a01108.html#a8c9898a7322417d167ff078bcde1f2b">EFI_FV_FILETYPE</a> *FileType, OUT <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *NameGuid, OUT <a class="el" href="../../d8/dbf/a01109.html#56c78b5eb5f41551eafafdcf8e6c519d">EFI_FV_FILE_ATTRIBUTES</a> *Attributes, OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *Size)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-This function is used to manage a USB device with an isochronous transfer pipe. An Isochronous transfer is typically used to transfer streaming data.<p>
+Retrieves information about the next file in the firmware volume store that matches the search criteria.<p>
+GetNextFile() is the interface that is used to search a firmware volume for a particular file. It is called successively until the desired file is located or the function returns EFI_NOT_FOUND. To filter uninteresting files from the output, the type of file to search for may be specified in FileType. For example, if *FileType is EFI_FV_FILETYPE_DRIVER, only files of this type will be returned in the output. If *FileType is EFI_FV_FILETYPE_ALL, no filtering of file types is done. The Key parameter is used to indicate a starting point of the search. If the buffer *Key is completely initialized to zero, the search re-initialized and starts at the beginning. Subsequent calls to GetNextFile() must maintain the value of *Key returned by the immediately previous call. The actual contents of *Key are implementation specific and no semantic content is implied. GetNextFile() is callable only from TPL_NOTIFY and below. Behavior of GetNextFile() at any EFI_TPL above TPL_NOTIFY is undefined.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_USB_IO_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DeviceEndpoint</em>&nbsp;</td><td>The destination USB device endpoint to which the device request is being sent. DeviceEndpoint must be between 0x01 and 0x0F or between 0x81 and 0x8F, otherwise EFI_INVALID_PARAMETER is returned. If the endpoint is not a BULK endpoint, EFI_INVALID_PARAMETER is returned. The MSB of this parameter indicates the endpoint direction. The number "1" stands for an IN endpoint, and "0" stands for an OUT endpoint. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Data</em>&nbsp;</td><td>A pointer to the buffer of data that will be transmitted to USB device or received from USB device. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DataLength</em>&nbsp;</td><td>The size, in bytes, of the data buffer specified by Data. This is an optional parameter and may be NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>IsochronousCallback</em>&nbsp;</td><td>The IsochronousCallback() function.This function is called if the requested isochronous transfer is completed. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Context</em>&nbsp;</td><td>Data passed to the IsochronousCallback() function.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Indicates the EFI_FIRMWARE_VOLUME2_PROTOCOL instance.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Key</em>&nbsp;</td><td>Pointer to a caller-allocated buffer that contains implementation-specific data that is used to track where to begin the search for the next file. The size of the buffer must be at least This-&gt;KeySize bytes long. To re-initialize the search and begin from the beginning of the firmware volume, the entire buffer must be cleared to zero. Other than clearing the buffer to initiate a new search, the caller must not modify the data in the buffer between calls to GetNextFile().</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>FileType</em>&nbsp;</td><td>Pointer to a caller-allocated EFI_FV_FILETYPE. The GetNextFile() API can filter its search for files based on the value of the FileType input. A *FileType input of EFI_FV_FILETYPE_ALL causes GetNextFile() to search for files of all types. If a file is found, the file's type is returned in FileType. *FileType is not modified if no file is found.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>NameGuid</em>&nbsp;</td><td>Pointer to a caller-allocated EFI_GUID. If a matching file is found, the file's name is returned in NameGuid. If no matching file is found, *NameGuid is not modified.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Attributes</em>&nbsp;</td><td>Pointer to a caller-allocated EFI_FV_FILE_ATTRIBUTES. If a matching file is found, the file's attributes are returned in Attributes. If no matching file is found, Attributes is not modified. Type EFI_FV_FILE_ATTRIBUTES is defined in ReadFile().</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Size</em>&nbsp;</td><td>Pointer to a caller-allocated UINTN. If a matching file is found, the file's size is returned in *Size. If no matching file is found, Size is not modified.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The asynchronous isochronous transfer has been successfully submitted to the system. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The parameter DeviceEndpoint is not valid. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>The request could not be submitted due to a lack of resources. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The output parameters are filled with data obtained from the first matching file that was found.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>FI_NOT_FOUND</em>&nbsp;</td><td>No files of type FileType were found.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>A hardware error occurred when attempting to access the firmware volume.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_ACCESS_DENIED</em>&nbsp;</td><td>The firmware volume is configured to disallow reads. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
-<a class="anchor" name="7bad4ee3d5d14c62ad5c19b0b205e929"></a><!-- doxytag: member="UsbIo.h::EFI_USB_IO_BULK_TRANSFER" ref="7bad4ee3d5d14c62ad5c19b0b205e929" args=")(IN EFI_USB_IO_PROTOCOL *This, IN UINT8 DeviceEndpoint, IN OUT VOID *Data, IN OUT UINTN *DataLength, IN UINTN Timeout, OUT UINT32 *Status)" -->
+<a class="anchor" name="32e423b8f638f65209a882fc829ce9b6"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV_READ_FILE" ref="32e423b8f638f65209a882fc829ce9b6" args=")(IN CONST EFI_FIRMWARE_VOLUME2_PROTOCOL *This, IN CONST EFI_GUID *NameGuid, IN OUT VOID **Buffer, IN OUT UINTN *BufferSize, OUT EFI_FV_FILETYPE *FoundType, OUT EFI_FV_FILE_ATTRIBUTES *FileAttributes, OUT UINT32 *AuthenticationStatus)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/db5/a01181.html#7bad4ee3d5d14c62ad5c19b0b205e929">EFI_USB_IO_BULK_TRANSFER</a>)(IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> DeviceEndpoint, IN OUT VOID *Data, IN OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *DataLength, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Timeout, OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *Status)          </td>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/db5/a01181.html#32e423b8f638f65209a882fc829ce9b6">EFI_FV_READ_FILE</a>)(IN CONST <a class="el" href="../../dc/d87/a00032.html">EFI_FIRMWARE_VOLUME2_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *NameGuid, IN OUT VOID **Buffer, IN OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *BufferSize, OUT <a class="el" href="../../d2/dd7/a01108.html#a8c9898a7322417d167ff078bcde1f2b">EFI_FV_FILETYPE</a> *FoundType, OUT <a class="el" href="../../d8/dbf/a01109.html#56c78b5eb5f41551eafafdcf8e6c519d">EFI_FV_FILE_ATTRIBUTES</a> *FileAttributes, OUT <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *AuthenticationStatus)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-This function is used to manage a USB device with the bulk transfer pipe. Bulk Transfers are typically used to transfer large amounts of data to/from USB devices.<p>
+Retrieves a file and/or file information from the firmware volume.<p>
+ReadFile() is used to retrieve any file from a firmware volume during the DXE phase. The actual binary encoding of the file in the firmware volume media may be in any arbitrary format as long as it does the following: It is accessed using the Firmware Volume Protocol. The image that is returned follows the image format defined in Code Definitions: PI Firmware File Format. If the input value of Buffer==NULL, it indicates the caller is requesting only that the type, attributes, and size of the file be returned and that there is no output buffer. In this case, the following occurs:<ul>
+<li>BufferSize is returned with the size that is required to successfully complete the read.</li><li>The output parameters FoundType and *FileAttributes are returned with valid values.</li><li>The returned value of *AuthenticationStatus is undefined.</li></ul>
+<p>
+If the input value of Buffer!=NULL, the output buffer is specified by a double indirection of the Buffer parameter. The input value of *Buffer is used to determine if the output buffer is caller allocated or is dynamically allocated by ReadFile(). If the input value of *Buffer!=NULL, it indicates the output buffer is caller allocated. In this case, the input value of *BufferSize indicates the size of the caller-allocated output buffer. If the output buffer is not large enough to contain the entire requested output, it is filled up to the point that the output buffer is exhausted and EFI_WARN_BUFFER_TOO_SMALL is returned, and then BufferSize is returned with the size required to successfully complete the read. All other output parameters are returned with valid values. If the input value of *Buffer==NULL, it indicates the output buffer is to be allocated by ReadFile(). In this case, ReadFile() will allocate an appropriately sized buffer from boot services pool memory, which will be returned in Buffer. The size of the new buffer is returned in BufferSize and all other output parameters are returned with valid values. ReadFile() is callable only from TPL_NOTIFY and below. Behavior of ReadFile() at any EFI_TPL above TPL_NOTIFY is undefined.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_USB_IO_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DeviceEndpoint</em>&nbsp;</td><td>The destination USB device endpoint to which the device request is being sent. DeviceEndpoint must be between 0x01 and 0x0F or between 0x81 and 0x8F, otherwise EFI_INVALID_PARAMETER is returned. If the endpoint is not a BULK endpoint, EFI_INVALID_PARAMETER is returned. The MSB of this parameter indicates the endpoint direction. The number "1" stands for an IN endpoint, and "0" stands for an OUT endpoint. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Data</em>&nbsp;</td><td>A pointer to the buffer of data that will be transmitted to USB device or received from USB device. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DataLength</em>&nbsp;</td><td>The size, in bytes, of the data buffer specified by Data. On input, the size, in bytes, of the data buffer specified by Data. On output, the number of bytes that were actually transferred. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Timeout</em>&nbsp;</td><td>Indicating the transfer should be completed within this time frame. The units are in milliseconds. If Timeout is 0, then the caller must wait for the function to be completed until EFI_SUCCESS or EFI_DEVICE_ERROR is returned. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Status</em>&nbsp;</td><td>This parameter indicates the USB transfer status.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Indicates the EFI_FIRMWARE_VOLUME2_PROTOCOL instance.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>NameGuid</em>&nbsp;</td><td>Pointer to an EFI_GUID, which is the file name. All firmware file names are EFI_GUIDs. A single firmware volume must not have two valid files with the same file name EFI_GUID.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>Pointer to a pointer to a buffer in which the file contents are returned, not including the file header.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>BufferSize</em>&nbsp;</td><td>Pointer to a caller-allocated UINTN. It indicates the size of the memory represented by Buffer.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>FoundType</em>&nbsp;</td><td>Pointer to a caller-allocated EFI_FV_FILETYPE.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>FileAttributes</em>&nbsp;</td><td>Pointer to a caller-allocated EFI_FV_FILE_ATTRIBUTES.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>AuthenticationStatus</em>&nbsp;</td><td>Pointer to a caller-allocated UINT32 in which the authentication status is returned.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The bulk transfer has been successfully executed. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The transfer failed. The transfer status is returned in Status. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETE</em>&nbsp;</td><td>One or more parameters are invalid. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>The request could not be submitted due to a lack of resources. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_TIMEOUT</em>&nbsp;</td><td>The control transfer fails due to timeout. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The call completed successfully.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_WARN_BUFFER_TOO_SMALL</em>&nbsp;</td><td>The buffer is too small to contain the requested output. The buffer is filled and the output is truncated.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>An allocation failure occurred.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>Name was not found in the firmware volume.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>A hardware error occurred when attempting to access the firmware volume.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_ACCESS_DENIED</em>&nbsp;</td><td>The firmware volume is configured to disallow reads. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
-<a class="anchor" name="d31846d71fccc44b2eecd4c76e66ade9"></a><!-- doxytag: member="UsbIo.h::EFI_USB_IO_CONTROL_TRANSFER" ref="d31846d71fccc44b2eecd4c76e66ade9" args=")(IN EFI_USB_IO_PROTOCOL *This, IN EFI_USB_DEVICE_REQUEST *Request, IN EFI_USB_DATA_DIRECTION Direction, IN UINT32 Timeout, IN OUT VOID *Data, IN UINTN DataLength, OUT UINT32 *Status)" -->
+<a class="anchor" name="72e8c763d64940bd71ce902d2b7a6d29"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV_READ_SECTION" ref="72e8c763d64940bd71ce902d2b7a6d29" args=")(IN CONST EFI_FIRMWARE_VOLUME2_PROTOCOL *This, IN CONST EFI_GUID *NameGuid, IN EFI_SECTION_TYPE SectionType, IN UINTN SectionInstance, IN OUT VOID **Buffer, IN OUT UINTN *BufferSize, OUT UINT32 *AuthenticationStatus)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/db5/a01181.html#d31846d71fccc44b2eecd4c76e66ade9">EFI_USB_IO_CONTROL_TRANSFER</a>)(IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *This, IN <a class="el" href="../../df/dc6/a00949.html">EFI_USB_DEVICE_REQUEST</a> *Request, IN <a class="el" href="../../de/db5/a01181.html#465fef7f75dc2b09df850101702dc579">EFI_USB_DATA_DIRECTION</a> Direction, IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> Timeout, IN OUT VOID *Data, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> DataLength, OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *Status)          </td>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/db5/a01181.html#72e8c763d64940bd71ce902d2b7a6d29">EFI_FV_READ_SECTION</a>)(IN CONST <a class="el" href="../../dc/d87/a00032.html">EFI_FIRMWARE_VOLUME2_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *NameGuid, IN <a class="el" href="../../d2/dd7/a01108.html#208180af3108068f979d673a752e58d1">EFI_SECTION_TYPE</a> SectionType, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> SectionInstance, IN OUT VOID **Buffer, IN OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *BufferSize, OUT <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *AuthenticationStatus)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-This function is used to manage a USB device with a control transfer pipe. A control transfer is typically used to perform device initialization and configuration.<p>
+Locates the requested section within a file and returns it in a buffer.<p>
+ReadSection() is used to retrieve a specific section from a file within a firmware volume. The section returned is determined using a depth-first, left-to-right search algorithm through all sections found in the specified file. The output buffer is specified by a double indirection of the Buffer parameter. The input value of Buffer is used to determine if the output buffer is caller allocated or is dynamically allocated by ReadSection(). If the input value of Buffer!=NULL, it indicates that the output buffer is caller allocated. In this case, the input value of *BufferSize indicates the size of the caller-allocated output buffer. If the output buffer is not large enough to contain the entire requested output, it is filled up to the point that the output buffer is exhausted and EFI_WARN_BUFFER_TOO_SMALL is returned, and then BufferSize is returned with the size that is required to successfully complete the read. All other output parameters are returned with valid values. If the input value of *Buffer==NULL, it indicates the output buffer is to be allocated by ReadSection(). In this case, ReadSection() will allocate an appropriately sized buffer from boot services pool memory, which will be returned in *Buffer. The size of the new buffer is returned in *BufferSize and all other output parameters are returned with valid values. ReadSection() is callable only from TPL_NOTIFY and below. Behavior of ReadSection() at any EFI_TPL above TPL_NOTIFY is undefined.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_USB_IO_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Request</em>&nbsp;</td><td>A pointer to the USB device request that will be sent to the USB device. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Direction</em>&nbsp;</td><td>Indicates the data direction. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Timeout</em>&nbsp;</td><td>Indicating the transfer should be completed within this time frame. The units are in milliseconds. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Data</em>&nbsp;</td><td>A pointer to the buffer of data that will be transmitted to USB device or received from USB device. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DataLength</em>&nbsp;</td><td>The size, in bytes, of the data buffer specified by Data. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Status</em>&nbsp;</td><td>A pointer to the result of the USB transfer.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Indicates the EFI_FIRMWARE_VOLUME2_PROTOCOL instance.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>NameGuid</em>&nbsp;</td><td>Pointer to an EFI_GUID, which indicates the file name from which the requested section will be read.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>SectionType</em>&nbsp;</td><td>Indicates the section type to return. SectionType in conjunction with SectionInstance indicates which section to return.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>SectionInstance</em>&nbsp;</td><td>Indicates which instance of sections with a type of SectionType to return. SectionType in conjunction with SectionInstance indicates which section to return. SectionInstance is zero based.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>Pointer to a pointer to a buffer in which the section contents are returned, not including the section header.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>BufferSize</em>&nbsp;</td><td>Pointer to a caller-allocated UINTN. It indicates the size of the memory represented by Buffer.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>AuthenticationStatus</em>&nbsp;</td><td>Pointer to a caller-allocated UINT32 in which the authentication status is returned.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The control transfer has been successfully executed. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The transfer failed. The transfer status is returned in Status. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETE</em>&nbsp;</td><td>One or more parameters are invalid. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>The request could not be completed due to a lack of resources. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_TIMEOUT</em>&nbsp;</td><td>The control transfer fails due to timeout. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The call completed successfully.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_WARN_BUFFER_TOO_SMALL</em>&nbsp;</td><td>The caller-allocated buffer is too small to contain the requested output. The buffer is filled and the output is truncated.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>An allocation failure occurred.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The requested file was not found in the firmware volume. EFI_NOT_FOUND The requested section was not found in the specified file.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>A hardware error occurred when attempting to access the firmware volume.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_ACCESS_DENIED</em>&nbsp;</td><td>The firmware volume is configured to disallow reads. EFI_PROTOCOL_ERROR The requested section was not found, but the file could not be fully parsed because a required GUIDED_SECTION_EXTRACTION_PROTOCOL was not found. It is possible the requested section exists within the file and could be successfully extracted once the required GUIDED_SECTION_EXTRACTION_PROTOCOL is published. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
-<a class="anchor" name="a310a630e4071637f2e682ea2c4f508d"></a><!-- doxytag: member="UsbIo.h::EFI_USB_IO_GET_CONFIG_DESCRIPTOR" ref="a310a630e4071637f2e682ea2c4f508d" args=")(IN EFI_USB_IO_PROTOCOL *This, OUT EFI_USB_CONFIG_DESCRIPTOR *ConfigurationDescriptor)" -->
+<a class="anchor" name="1b048fd37cfbfa2f5d85f9ac7323d1fc"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV_SET_ATTRIBUTES" ref="1b048fd37cfbfa2f5d85f9ac7323d1fc" args=")(IN CONST EFI_FIRMWARE_VOLUME2_PROTOCOL *This, IN OUT EFI_FV_ATTRIBUTES *FvAttributes)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/db5/a01181.html#a310a630e4071637f2e682ea2c4f508d">EFI_USB_IO_GET_CONFIG_DESCRIPTOR</a>)(IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *This, OUT <a class="el" href="../../da/d40/a00946.html">EFI_USB_CONFIG_DESCRIPTOR</a> *ConfigurationDescriptor)          </td>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/db5/a01181.html#1b048fd37cfbfa2f5d85f9ac7323d1fc">EFI_FV_SET_ATTRIBUTES</a>)(IN CONST <a class="el" href="../../dc/d87/a00032.html">EFI_FIRMWARE_VOLUME2_PROTOCOL</a> *This, IN OUT <a class="el" href="../../de/db5/a01181.html#5688c464af594b3a02c33d03d8880971">EFI_FV_ATTRIBUTES</a> *FvAttributes)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Retrieves the USB Device Descriptor.<p>
+Modifies the current settings of the firmware volume according to the input parameter.<p>
+The SetVolumeAttributes() function is used to set configurable firmware volume attributes. Only EFI_FV_READ_STATUS, EFI_FV_WRITE_STATUS, and EFI_FV_LOCK_STATUS may be modified, and then only in accordance with the declared capabilities. All other bits of FvAttributes are ignored on input. On successful return, all bits of *FvAttributes are valid and it contains the completed EFI_FV_ATTRIBUTES for the volume. To modify an attribute, the corresponding status bit in the EFI_FV_ATTRIBUTES is set to the desired value on input. The EFI_FV_LOCK_STATUS bit does not affect the ability to read or write the firmware volume. Rather, once the EFI_FV_LOCK_STATUS bit is set, it prevents further modification to all the attribute bits. SetVolumeAttributes() is callable only from TPL_NOTIFY and below. Behavior of SetVolumeAttributes() at any EFI_TPL above TPL_NOTIFY is undefined.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_USB_IO_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ConfigurationDescriptor</em>&nbsp;</td><td>A pointer to the caller allocated USB Active Configuration Descriptor. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Indicates the EFI_FIRMWARE_VOLUME2_PROTOCOL instance.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>FvAttributes</em>&nbsp;</td><td>On input, FvAttributes is a pointer to an EFI_FV_ATTRIBUTES containing the desired firmware volume settings. On successful return, it contains the new settings of the firmware volume. On unsuccessful return, FvAttributes is not modified and the firmware volume settings are not changed.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The active configuration descriptor was retrieved successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>ConfigurationDescriptor is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>An active configuration descriptor cannot be found. The device may not be configured. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The requested firmware volume attributes were set and the resulting EFI_FV_ATTRIBUTES is returned in FvAttributes.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>FvAttributes:EFI_FV_READ_STATUS is set to 1 on input, but the device does not support enabling reads (FvAttributes:EFI_FV_READ_ENABLE is clear on return from GetVolumeAttributes()). Actual volume attributes are unchanged.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>FvAttributes:EFI_FV_READ_STATUS is cleared to 0 on input, but the device does not support disabling reads (FvAttributes:EFI_FV_READ_DISABL is clear on return from GetVolumeAttributes()). Actual volume attributes are unchanged.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>FvAttributes:EFI_FV_WRITE_STATUS is set to 1 on input, but the device does not support enabling writes (FvAttributes:EFI_FV_WRITE_ENABL is clear on return from GetVolumeAttributes()). Actual volume attributes are unchanged.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>FvAttributes:EFI_FV_WRITE_STATUS is cleared to 0 on input, but the device does not support disabling writes (FvAttributes:EFI_FV_WRITE_DISAB is clear on return from GetVolumeAttributes()). Actual volume attributes are unchanged.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>FvAttributes:EFI_FV_LOCK_STATUS is set on input, but the device does not support locking (FvAttributes:EFI_FV_LOCK_CAP is clear on return from GetVolumeAttributes()). Actual volume attributes are unchanged.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_ACCESS_DENIED</em>&nbsp;</td><td>Device is locked and does not allow attribute modification (FvAttributes:EFI_FV_LOCK_STATUS is set on return from GetVolumeAttributes()). Actual volume attributes are unchanged. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
-<a class="anchor" name="45693ea12e273427be1f7c953c8fa2f2"></a><!-- doxytag: member="UsbIo.h::EFI_USB_IO_GET_DEVICE_DESCRIPTOR" ref="45693ea12e273427be1f7c953c8fa2f2" args=")(IN EFI_USB_IO_PROTOCOL *This, OUT EFI_USB_DEVICE_DESCRIPTOR *DeviceDescriptor)" -->
+<a class="anchor" name="6a4926aa3d3881b0ec10ad3537b20f78"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV_SET_INFO" ref="6a4926aa3d3881b0ec10ad3537b20f78" args=")(IN CONST EFI_FIRMWARE_VOLUME2_PROTOCOL *This, IN CONST EFI_GUID *InformationType, IN UINTN BufferSize, IN CONST VOID *Buffer)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/db5/a01181.html#45693ea12e273427be1f7c953c8fa2f2">EFI_USB_IO_GET_DEVICE_DESCRIPTOR</a>)(IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *This, OUT <a class="el" href="../../d3/d29/a00947.html">EFI_USB_DEVICE_DESCRIPTOR</a> *DeviceDescriptor)          </td>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/db5/a01181.html#6a4926aa3d3881b0ec10ad3537b20f78">EFI_FV_SET_INFO</a>)(IN CONST <a class="el" href="../../dc/d87/a00032.html">EFI_FIRMWARE_VOLUME2_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *InformationType, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> BufferSize, IN CONST VOID *Buffer)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Retrieves the USB Device Descriptor.<p>
+Sets information about a firmware volume.<p>
+The SetInfo() function sets information of type InformationType on the requested firmware volume.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_USB_IO_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DeviceDescriptor</em>&nbsp;</td><td>A pointer to the caller allocated USB Device Descriptor.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_FIRMWARE_VOLUME2_PROTOCOL instance that is the file handle the information is for.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>InformationType</em>&nbsp;</td><td>The type identifier for the information being set.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>BufferSize</em>&nbsp;</td><td>The size, in bytes, of Buffer.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>A pointer to the data buffer to write. The buffer's type is indicated by InformationType.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The device descriptor was retrieved successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>DeviceDescriptor is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The device descriptor was not found. The device may not be configured. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The information was set.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The InformationType is not known.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NO_MEDIA</em>&nbsp;</td><td>The device has no medium.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The device reported an error.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_VOLUME_CORRUPTED</em>&nbsp;</td><td>The file system structures are corrupted.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_WRITE_PROTECTED</em>&nbsp;</td><td>The media is read only.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_VOLUME_FULL</em>&nbsp;</td><td>The volume is full.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_BAD_BUFFER_SIZE</em>&nbsp;</td><td>BufferSize is smaller than the size of the type indicated by InformationType. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
-<a class="anchor" name="0b97c21a91f0cb0c9d7b3303e305a21a"></a><!-- doxytag: member="UsbIo.h::EFI_USB_IO_GET_ENDPOINT_DESCRIPTOR" ref="0b97c21a91f0cb0c9d7b3303e305a21a" args=")(IN EFI_USB_IO_PROTOCOL *This, IN UINT8 EndpointIndex, OUT EFI_USB_ENDPOINT_DESCRIPTOR *EndpointDescriptor)" -->
+<a class="anchor" name="566ba2394adc729f8bbb64f9c132c2a5"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV_WRITE_FILE" ref="566ba2394adc729f8bbb64f9c132c2a5" args=")(IN CONST EFI_FIRMWARE_VOLUME2_PROTOCOL *This, IN UINT32 NumberOfFiles, IN EFI_FV_WRITE_POLICY WritePolicy, IN EFI_FV_WRITE_FILE_DATA *FileData)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/db5/a01181.html#0b97c21a91f0cb0c9d7b3303e305a21a">EFI_USB_IO_GET_ENDPOINT_DESCRIPTOR</a>)(IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EndpointIndex, OUT <a class="el" href="../../df/d39/a00950.html">EFI_USB_ENDPOINT_DESCRIPTOR</a> *EndpointDescriptor)          </td>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/db5/a01181.html#566ba2394adc729f8bbb64f9c132c2a5">EFI_FV_WRITE_FILE</a>)(IN CONST <a class="el" href="../../dc/d87/a00032.html">EFI_FIRMWARE_VOLUME2_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> NumberOfFiles, IN <a class="el" href="../../de/db5/a01181.html#7cebbd531e07e05226a91a8f371f7dd9">EFI_FV_WRITE_POLICY</a> WritePolicy, IN <a class="el" href="../../de/dcb/a00462.html">EFI_FV_WRITE_FILE_DATA</a> *FileData)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Retrieves an Endpoint Descriptor within a USB Controller.<p>
+Locates the requested section within a file and returns it in a buffer.<p>
+WriteFile() is used to write one or more files to a firmware volume. Each file to be written is described by an <a class="el" href="../../de/dcb/a00462.html">EFI_FV_WRITE_FILE_DATA</a> structure. The caller must ensure that any required alignment for all files listed in the FileData array is compatible with the firmware volume. Firmware volume capabilities can be determined using the GetVolumeAttributes() call. Similarly, if the WritePolicy is set to EFI_FV_RELIABLE_WRITE, the caller must check the firmware volume capabilities to ensure EFI_FV_RELIABLE_WRITE is supported by the firmware volume. EFI_FV_UNRELIABLE_WRITE must always be supported. Writing a file with a size of zero (FileData[n].BufferSize == 0) deletes the file from the firmware volume if it exists. Deleting a file must be done one at a time. Deleting a file as part of a multiple file write is not allowed. Platform Initialization Specification VOLUME 3 Shared Architectural Elements 84 August 21, 2006 Version 1.0 WriteFile() is callable only from TPL_NOTIFY and below. Behavior of WriteFile() at any EFI_TPL above TPL_NOTIFY is undefined.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_USB_IO_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EndpointIndex</em>&nbsp;</td><td>Indicates which endpoint descriptor to retrieve. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EndpointDescriptor</em>&nbsp;</td><td>A pointer to the caller allocated USB Endpoint Descriptor of a USB controller.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Indicates the EFI_FIRMWARE_VOLUME2_PROTOCOL instance.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>NumberOfFiles</em>&nbsp;</td><td>Indicates the number of elements in the array pointed to by FileData</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>WritePolicy</em>&nbsp;</td><td>Indicates the level of reliability for the write in the event of a power failure or other system failure during the write operation.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>FileData</em>&nbsp;</td><td>Pointer to an array of <a class="el" href="../../de/dcb/a00462.html">EFI_FV_WRITE_FILE_DATA</a>. Each element of FileData[] represents a file to be written.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The endpoint descriptor was retrieved successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>One or more parameters are invalid. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The endpoint descriptor cannot be found. The device may not be correctly configured. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The write completed successfully.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>The firmware volume does not have enough free space to storefile(s).</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>A hardware error occurred when attempting to access the firmware volume.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_WRITE_PROTECTED</em>&nbsp;</td><td>The firmware volume is configured to disallow writes.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>A delete was requested, but the requested file was not found in the firmware volume.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>A delete was requested with a multiple file write.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>An unsupported WritePolicy was requested.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>An unknown file type was specified.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>A file system specific error has occurred. </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
-<a class="anchor" name="386bb06c7106a0ede3d632c3252b62bc"></a><!-- doxytag: member="UsbIo.h::EFI_USB_IO_GET_INTERFACE_DESCRIPTOR" ref="386bb06c7106a0ede3d632c3252b62bc" args=")(IN EFI_USB_IO_PROTOCOL *This, OUT EFI_USB_INTERFACE_DESCRIPTOR *InterfaceDescriptor)" -->
+<a class="anchor" name="7cebbd531e07e05226a91a8f371f7dd9"></a><!-- doxytag: member="FirmwareVolume2.h::EFI_FV_WRITE_POLICY" ref="7cebbd531e07e05226a91a8f371f7dd9" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/db5/a01181.html#386bb06c7106a0ede3d632c3252b62bc">EFI_USB_IO_GET_INTERFACE_DESCRIPTOR</a>)(IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *This, OUT <a class="el" href="../../dc/da0/a00951.html">EFI_USB_INTERFACE_DESCRIPTOR</a> *InterfaceDescriptor)          </td>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../de/db5/a01181.html#7cebbd531e07e05226a91a8f371f7dd9">EFI_FV_WRITE_POLICY</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Retrieves the Interface Descriptor for a USB Device Controller. As stated earlier, an interface within a USB device is equivalently to a USB Controller within the current configuration.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_USB_IO_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>InterfaceDescriptor</em>&nbsp;</td><td>A pointer to the caller allocated USB Interface Descriptor within the configuration setting. </td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The interface descriptor retrieved successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>InterfaceDescriptor is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The interface descriptor cannot be found. The device may not be correctly configured. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="1f67100cf13fa74cf2fb5203e7a53d6b"></a><!-- doxytag: member="UsbIo.h::EFI_USB_IO_GET_STRING_DESCRIPTOR" ref="1f67100cf13fa74cf2fb5203e7a53d6b" args=")(IN EFI_USB_IO_PROTOCOL *This, IN UINT16 LangID, IN UINT8 StringID, OUT CHAR16 **String)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/db5/a01181.html#1f67100cf13fa74cf2fb5203e7a53d6b">EFI_USB_IO_GET_STRING_DESCRIPTOR</a>)(IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> LangID, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> StringID, OUT <a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> **String)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Retrieves a Unicode string stored in a USB Device.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_USB_IO_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>LangID</em>&nbsp;</td><td>The Language ID for the string being retrieved. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>StringID</em>&nbsp;</td><td>The ID of the string being retrieved. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>String</em>&nbsp;</td><td>A pointer to a buffer allocated by this function with <a class="el" href="../../d6/dcd/a01023.html#646c0f82c2a35557dda175dbfcd26e96">AllocatePool()</a> to store the string.If this function returns EFI_SUCCESS, it stores the string the caller wants to get. The caller should release the string buffer with <a class="el" href="../../d6/dcd/a01023.html#8b1cbc21e0cebcfc6a992546ec9b4941">FreePool()</a> after the string is not used any more.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The string was retrieved successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The string specified by LangID and StringID was not found. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There are not enough resources to allocate the return buffer String. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="b4ad9610b45629d09994fde7f86f3a6a"></a><!-- doxytag: member="UsbIo.h::EFI_USB_IO_GET_SUPPORTED_LANGUAGE" ref="b4ad9610b45629d09994fde7f86f3a6a" args=")(IN EFI_USB_IO_PROTOCOL *This, OUT UINT16 **LangIDTable, OUT UINT16 *TableSize)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/db5/a01181.html#b4ad9610b45629d09994fde7f86f3a6a">EFI_USB_IO_GET_SUPPORTED_LANGUAGE</a>)(IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *This, OUT <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> **LangIDTable, OUT <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> *TableSize)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Retrieves all the language ID codes that the USB device supports.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_USB_IO_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>LangIDTable</em>&nbsp;</td><td>Language ID for the string the caller wants to get. This is a 16-bit ID defined by Microsoft. This buffer pointer is allocated and maintained by the USB Bus Driver, the caller should not modify its contents. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>TableSize</em>&nbsp;</td><td>The size, in bytes, of the table LangIDTable.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The support languages were retrieved successfully. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="1709948e25507e9e78873083e7b863a0"></a><!-- doxytag: member="UsbIo.h::EFI_USB_IO_ISOCHRONOUS_TRANSFER" ref="1709948e25507e9e78873083e7b863a0" args=")(IN EFI_USB_IO_PROTOCOL *This, IN UINT8 DeviceEndpoint, IN OUT VOID *Data, IN UINTN DataLength, OUT UINT32 *Status)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/db5/a01181.html#1709948e25507e9e78873083e7b863a0">EFI_USB_IO_ISOCHRONOUS_TRANSFER</a>)(IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> DeviceEndpoint, IN OUT VOID *Data, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> DataLength, OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *Status)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This function is used to manage a USB device with an isochronous transfer pipe. An Isochronous transfer is typically used to transfer streaming data.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_USB_IO_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DeviceEndpoint</em>&nbsp;</td><td>The destination USB device endpoint to which the device request is being sent. DeviceEndpoint must be between 0x01 and 0x0F or between 0x81 and 0x8F, otherwise EFI_INVALID_PARAMETER is returned. If the endpoint is not a BULK endpoint, EFI_INVALID_PARAMETER is returned. The MSB of this parameter indicates the endpoint direction. The number "1" stands for an IN endpoint, and "0" stands for an OUT endpoint. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Data</em>&nbsp;</td><td>A pointer to the buffer of data that will be transmitted to USB device or received from USB device. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DataLength</em>&nbsp;</td><td>The size, in bytes, of the data buffer specified by Data. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Status</em>&nbsp;</td><td>This parameter indicates the USB transfer status.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The isochronous transfer has been successfully executed. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The parameter DeviceEndpoint is not valid. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The transfer failed due to the reason other than timeout, The error status is returned in Status. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>The request could not be submitted due to a lack of resources. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_TIMEOUT</em>&nbsp;</td><td>The transfer fails due to timeout. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="a4915a5941ec42fc1d2196c18aca0db6"></a><!-- doxytag: member="UsbIo.h::EFI_USB_IO_PORT_RESET" ref="a4915a5941ec42fc1d2196c18aca0db6" args=")(IN EFI_USB_IO_PROTOCOL *This)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/db5/a01181.html#a4915a5941ec42fc1d2196c18aca0db6">EFI_USB_IO_PORT_RESET</a>)(IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *This)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Resets and reconfigures the USB controller. This function will work for all USB devices except USB Hub Controllers.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_USB_IO_PROTOCOL instance.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The USB controller was reset. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>If the controller specified by This is a USB hub. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>An error occurred during the reconfiguration process. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="5560c7cf160ff0cf2be6ca301fa2dfab"></a><!-- doxytag: member="UsbIo.h::EFI_USB_IO_PROTOCOL" ref="5560c7cf160ff0cf2be6ca301fa2dfab" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct <a class="el" href="../../d3/dcc/a00264.html">_EFI_USB_IO_PROTOCOL</a> <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="ffd57803524c732ed9d152dd4e9f3347"></a><!-- doxytag: member="UsbIo.h::EFI_USB_IO_SYNC_INTERRUPT_TRANSFER" ref="ffd57803524c732ed9d152dd4e9f3347" args=")(IN EFI_USB_IO_PROTOCOL *This, IN UINT8 DeviceEndpoint, IN OUT VOID *Data, IN OUT UINTN *DataLength, IN UINTN Timeout, OUT UINT32 *Status)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../de/db5/a01181.html#ffd57803524c732ed9d152dd4e9f3347">EFI_USB_IO_SYNC_INTERRUPT_TRANSFER</a>)(IN <a class="el" href="../../d3/dcc/a00264.html">EFI_USB_IO_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> DeviceEndpoint, IN OUT VOID *Data, IN OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *DataLength, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Timeout, OUT <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> *Status)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This function is used to manage a USB device with an interrupt transfer pipe.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_USB_IO_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DeviceEndpoint</em>&nbsp;</td><td>The destination USB device endpoint to which the device request is being sent. DeviceEndpoint must be between 0x01 and 0x0F or between 0x81 and 0x8F, otherwise EFI_INVALID_PARAMETER is returned. If the endpoint is not a BULK endpoint, EFI_INVALID_PARAMETER is returned. The MSB of this parameter indicates the endpoint direction. The number "1" stands for an IN endpoint, and "0" stands for an OUT endpoint. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Data</em>&nbsp;</td><td>A pointer to the buffer of data that will be transmitted to USB device or received from USB device. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>DataLength</em>&nbsp;</td><td>On input, then size, in bytes, of the buffer Data. On output, the amount of data actually transferred. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Timeout</em>&nbsp;</td><td>The time out, in seconds, for this transfer. If Timeout is 0, then the caller must wait for the function to be completed until EFI_SUCCESS or EFI_DEVICE_ERROR is returned. If the transfer is not completed in this time frame, then EFI_TIMEOUT is returned. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Status</em>&nbsp;</td><td>This parameter indicates the USB transfer status.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The sync interrupt transfer has been successfully executed. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>One or more parameters are invalid. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The sync interrupt transfer request failed. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>The request could not be submitted due to a lack of resources. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_TIMEOUT</em>&nbsp;</td><td>The transfer fails due to timeout. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<hr><h2>Enumeration Type Documentation</h2>
-<a class="anchor" name="465fef7f75dc2b09df850101702dc579"></a><!-- doxytag: member="UsbIo.h::EFI_USB_DATA_DIRECTION" ref="465fef7f75dc2b09df850101702dc579" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">enum <a class="el" href="../../de/db5/a01181.html#465fef7f75dc2b09df850101702dc579">EFI_USB_DATA_DIRECTION</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-USB data transfer direction <dl compact><dt><b>Enumerator: </b></dt><dd>
-<table border="0" cellspacing="2" cellpadding="0">
-<tr><td valign="top"><em><a class="anchor" name="465fef7f75dc2b09df850101702dc5799929b555fa374543b1a8fb7b047c603e"></a><!-- doxytag: member="EfiUsbDataIn" ref="465fef7f75dc2b09df850101702dc5799929b555fa374543b1a8fb7b047c603e" args="" -->EfiUsbDataIn</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" name="465fef7f75dc2b09df850101702dc57999511a97d844116e1a851ecaddf74420"></a><!-- doxytag: member="EfiUsbDataOut" ref="465fef7f75dc2b09df850101702dc57999511a97d844116e1a851ecaddf74420" args="" -->EfiUsbDataOut</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" name="465fef7f75dc2b09df850101702dc579351ed52a751ad387bc017eb3fb5de6bc"></a><!-- doxytag: member="EfiUsbNoData" ref="465fef7f75dc2b09df850101702dc579351ed52a751ad387bc017eb3fb5de6bc" args="" -->EfiUsbNoData</em>&nbsp;</td><td>
-</td></tr>
-</table>
-</dl>
-
+EFI_FV_WRITE_POLICY, two policies (unreliable write and reliable write) are defined. 
 </div>
 </div><p>
 <hr><h2>Variable Documentation</h2>
-<a class="anchor" name="afa970a81fc9aa3289212df4de3bfdbe"></a><!-- doxytag: member="UsbIo.h::gEfiUsbIoProtocolGuid" ref="afa970a81fc9aa3289212df4de3bfdbe" args="" -->
+<a class="anchor" name="0d04d6ab888deef48be4b6e439cc115f"></a><!-- doxytag: member="FirmwareVolume2.h::gEfiFirmwareVolume2ProtocolGuid" ref="0d04d6ab888deef48be4b6e439cc115f" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../de/db5/a01181.html#afa970a81fc9aa3289212df4de3bfdbe">gEfiUsbIoProtocolGuid</a>          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../de/db5/a01181.html#0d04d6ab888deef48be4b6e439cc115f">gEfiFirmwareVolume2ProtocolGuid</a>          </td>
         </tr>
       </table>
 </div>
@@ -846,7 +1245,7 @@ USB data transfer direction <dl compact><dt><b>Enumerator: </b></dt><dd>
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:11 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:33 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

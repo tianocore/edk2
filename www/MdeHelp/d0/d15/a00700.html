@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: PAL_MC_ERROR_INFO_LEVEL_INDEX Struct Reference</title>
+<title>MdePkg[ALL]: IA32_FLAGS16 Union Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,157 +21,86 @@
   </div>
 </div>
 <div class="contents">
-<h1>PAL_MC_ERROR_INFO_LEVEL_INDEX Struct Reference</h1><!-- doxytag: class="PAL_MC_ERROR_INFO_LEVEL_INDEX" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>IA32_FLAGS16 Union Reference</h1><!-- doxytag: class="IA32_FLAGS16" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d15/a00700.html#cecebaa43058a8d6944f06dd8a3adaff">CoreId</a>:4</td></tr>
+<tr><td class="memItemLeft" nowrap>struct {</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d15/a00700.html#699e60c1888ec7e22dd848627c59b8f6">ThreadId</a>:4</td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d15/a00700.html#e00a9da25b012ab2932c735e933a79d5">CF</a>:1</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d15/a00700.html#34b7716af7d6db86a30a90bc2cbf733b">InfoOfInsCache</a>:4</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Carry Flag.  <a href="#65e4799d23914a6252cbbea7fd784eac"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d15/a00700.html#94a55399433f2d6526125eea336d396c">Reserved_0</a>:1</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d15/a00700.html#94a9a6d695879a405d0a0d81306fa683">InfoOfDataCache</a>:4</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Reserved.  <a href="#213ad5795b9a808b367c173910d36366"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d15/a00700.html#02ab22f303a86b0a052097c2d7e21ec5">PF</a>:1</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d15/a00700.html#9ce0cd506b2de68382d83f9afbd5d0f6">InfoOfInsTlb</a>:4</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Parity Flag.  <a href="#11b17ad0b6bfd50d5d156cbf0cb2fa85"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d15/a00700.html#dd7ea41510c7d9f4aad88ad8f323c17f">Reserved_1</a>:1</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d15/a00700.html#c5e5a506e212bb8090ab6a3d7f96bcd3">InfoOfDataTlb</a>:4</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Reserved.  <a href="#a79258d7ad62f22b2be6a8afcdbb791b"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d15/a00700.html#27b279db94fb040411bd50192aeca116">AF</a>:1</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d15/a00700.html#8dfb4aeceefcfe183b2726bb65989a84">InfoOfProcessorBus</a>:4</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Auxiliary Carry Flag.  <a href="#28e898c56fa91871ba888d0377c740b9"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d15/a00700.html#5328d092935ff7dfa5e844426cb531ca">Reserved_2</a>:1</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d15/a00700.html#c823dee604b4b4ac5624868451f95eb7">InfoOfRegisterFile</a>:4</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Reserved.  <a href="#0259aad0a4e43227ebe3681b06206e67"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d15/a00700.html#63faee60a4edfab26c7485920c2830cd">ZF</a>:1</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d15/a00700.html#8926e50ad2815f014ec7656f67cae4b6">InfoOfMicroArch</a>:4</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Zero Flag.  <a href="#78c5b49b0ec634f5f01784447b01ec48"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d15/a00700.html#fc1f0f4f1a397f3bef760a868a4f1205">SF</a>:1</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d15/a00700.html#fe4744863a587fc1ea66e86792a580af">Reserved</a>:16</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sign Flag.  <a href="#bb896e309aec9dac8044c4ce2eb12201"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d15/a00700.html#61d1722ba3c8d25e0c25c84501fdb002">TF</a>:1</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Trap Flag.  <a href="#9ea13b424b6c90e5cde62962b400a820"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d15/a00700.html#d2c0d3c76193cc33d2277955aabfa13d">IF</a>:1</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Interrupt Enable Flag.  <a href="#d9765725882b46302cff31c8f6f143bd"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d15/a00700.html#f56dde139e9a7d8fe2e048e40301e14c">DF</a>:1</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Direction Flag.  <a href="#4706bd8f6620269d10b305eaf0cb6f45"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d15/a00700.html#155aee50987e7566af38aaf1bce1a20c">OF</a>:1</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Overflow Flag.  <a href="#77c69eba87b35ce0893c1f5509293389"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d15/a00700.html#a83c50db767db7f0b780b47b7463ead3">IOPL</a>:2</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">I/O Privilege Level.  <a href="#6e03dd14713caa4cb1e9388235107b65"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d15/a00700.html#c0722f9018c493a56b38230b0513c458">NT</a>:1</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Nested Task.  <a href="#1a0b3e427c88e37789a8a0b0364fa0d2"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d0/d15/a00700.html#cfe23f2f502ccd16fa542a4fd5b773f3">Reserved_3</a>:1</td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Reserved.  <a href="#c68acf836040f94c5528c03c1c0eb59c"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap valign="top">}&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d15/a00700.html#f86ec2e54211289b2851e05e25757cd4">Bits</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d15/a00700.html#0c28027497e538d704e932a8e1a7d9f4">Uint16</a></td></tr>
 
 </table>
-<hr><h2>Field Documentation</h2>
-<a class="anchor" name="cecebaa43058a8d6944f06dd8a3adaff"></a><!-- doxytag: member="PAL_MC_ERROR_INFO_LEVEL_INDEX::CoreId" ref="cecebaa43058a8d6944f06dd8a3adaff" args="" -->
+<hr><a name="_details"></a><h2>Detailed Description</h2>
+IA32 and x64 Specific Functions Byte packed structure for 16-bit Real Mode EFLAGS <hr><h2>Field Documentation</h2>
+<a class="anchor" name="27b279db94fb040411bd50192aeca116"></a><!-- doxytag: member="IA32_FLAGS16::AF" ref="27b279db94fb040411bd50192aeca116" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d0/d15/a00700.html#cecebaa43058a8d6944f06dd8a3adaff">PAL_MC_ERROR_INFO_LEVEL_INDEX::CoreId</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d0/d15/a00700.html#27b279db94fb040411bd50192aeca116">IA32_FLAGS16::AF</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Bit3:0, Processor core ID (default is 0 for processors with a single core) 
-</div>
-</div><p>
-<a class="anchor" name="94a9a6d695879a405d0a0d81306fa683"></a><!-- doxytag: member="PAL_MC_ERROR_INFO_LEVEL_INDEX::InfoOfDataCache" ref="94a9a6d695879a405d0a0d81306fa683" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d0/d15/a00700.html#94a9a6d695879a405d0a0d81306fa683">PAL_MC_ERROR_INFO_LEVEL_INDEX::InfoOfDataCache</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
+Auxiliary Carry Flag. 
 <p>
-Bit15:12, Error information is available for 1st, 2nd, 3rd, and 4th level data/unified caches. 
-</div>
-</div><p>
-<a class="anchor" name="c5e5a506e212bb8090ab6a3d7f96bcd3"></a><!-- doxytag: member="PAL_MC_ERROR_INFO_LEVEL_INDEX::InfoOfDataTlb" ref="c5e5a506e212bb8090ab6a3d7f96bcd3" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d0/d15/a00700.html#c5e5a506e212bb8090ab6a3d7f96bcd3">PAL_MC_ERROR_INFO_LEVEL_INDEX::InfoOfDataTlb</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
 
-<p>
-Bit23:20, Error information is available for 1st, 2nd, 3rd, and 4th level data/unified TLB 
 </div>
 </div><p>
-<a class="anchor" name="34b7716af7d6db86a30a90bc2cbf733b"></a><!-- doxytag: member="PAL_MC_ERROR_INFO_LEVEL_INDEX::InfoOfInsCache" ref="34b7716af7d6db86a30a90bc2cbf733b" args="" -->
+<a class="anchor" name="f86ec2e54211289b2851e05e25757cd4"></a><!-- doxytag: member="IA32_FLAGS16::Bits" ref="f86ec2e54211289b2851e05e25757cd4" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d0/d15/a00700.html#34b7716af7d6db86a30a90bc2cbf733b">PAL_MC_ERROR_INFO_LEVEL_INDEX::InfoOfInsCache</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Bit11:8, Error information is available for 1st, 2nd, 3rd, and 4th level instruction caches. 
-</div>
-</div><p>
-<a class="anchor" name="9ce0cd506b2de68382d83f9afbd5d0f6"></a><!-- doxytag: member="PAL_MC_ERROR_INFO_LEVEL_INDEX::InfoOfInsTlb" ref="9ce0cd506b2de68382d83f9afbd5d0f6" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d0/d15/a00700.html#9ce0cd506b2de68382d83f9afbd5d0f6">PAL_MC_ERROR_INFO_LEVEL_INDEX::InfoOfInsTlb</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Bit19:16 Error information is available for 1st, 2nd, 3rd, and 4th level instruction TLB. 
-</div>
-</div><p>
-<a class="anchor" name="8926e50ad2815f014ec7656f67cae4b6"></a><!-- doxytag: member="PAL_MC_ERROR_INFO_LEVEL_INDEX::InfoOfMicroArch" ref="8926e50ad2815f014ec7656f67cae4b6" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d0/d15/a00700.html#8926e50ad2815f014ec7656f67cae4b6">PAL_MC_ERROR_INFO_LEVEL_INDEX::InfoOfMicroArch</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Bit47:32, Error information is available on micro-architectural structures. 
-</div>
-</div><p>
-<a class="anchor" name="8dfb4aeceefcfe183b2726bb65989a84"></a><!-- doxytag: member="PAL_MC_ERROR_INFO_LEVEL_INDEX::InfoOfProcessorBus" ref="8dfb4aeceefcfe183b2726bb65989a84" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d0/d15/a00700.html#8dfb4aeceefcfe183b2726bb65989a84">PAL_MC_ERROR_INFO_LEVEL_INDEX::InfoOfProcessorBus</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Bit27:24 Error information is available for the 1st, 2nd, 3rd, and 4th level processor bus hierarchy. 
-</div>
-</div><p>
-<a class="anchor" name="c823dee604b4b4ac5624868451f95eb7"></a><!-- doxytag: member="PAL_MC_ERROR_INFO_LEVEL_INDEX::InfoOfRegisterFile" ref="c823dee604b4b4ac5624868451f95eb7" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d0/d15/a00700.html#c823dee604b4b4ac5624868451f95eb7">PAL_MC_ERROR_INFO_LEVEL_INDEX::InfoOfRegisterFile</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Bit31:28 Error information is available on register file structures. 
-</div>
-</div><p>
-<a class="anchor" name="fe4744863a587fc1ea66e86792a580af"></a><!-- doxytag: member="PAL_MC_ERROR_INFO_LEVEL_INDEX::Reserved" ref="fe4744863a587fc1ea66e86792a580af" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d0/d15/a00700.html#fe4744863a587fc1ea66e86792a580af">PAL_MC_ERROR_INFO_LEVEL_INDEX::Reserved</a>          </td>
+          <td class="memname">struct { ... }   <a class="el" href="../../d0/d15/a00700.html#f86ec2e54211289b2851e05e25757cd4">IA32_FLAGS16::Bits</a>          </td>
         </tr>
       </table>
 </div>
@@ -181,23 +110,261 @@ Bit31:28 Error information is available on register file structures.
 
 </div>
 </div><p>
-<a class="anchor" name="699e60c1888ec7e22dd848627c59b8f6"></a><!-- doxytag: member="PAL_MC_ERROR_INFO_LEVEL_INDEX::ThreadId" ref="699e60c1888ec7e22dd848627c59b8f6" args="" -->
+<a class="anchor" name="e00a9da25b012ab2932c735e933a79d5"></a><!-- doxytag: member="IA32_FLAGS16::CF" ref="e00a9da25b012ab2932c735e933a79d5" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d0/d15/a00700.html#699e60c1888ec7e22dd848627c59b8f6">PAL_MC_ERROR_INFO_LEVEL_INDEX::ThreadId</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d0/d15/a00700.html#e00a9da25b012ab2932c735e933a79d5">IA32_FLAGS16::CF</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Bit7:4, Logical thread ID (default is 0 for processors that execute a single thread) 
+Carry Flag. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="f56dde139e9a7d8fe2e048e40301e14c"></a><!-- doxytag: member="IA32_FLAGS16::DF" ref="f56dde139e9a7d8fe2e048e40301e14c" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d0/d15/a00700.html#f56dde139e9a7d8fe2e048e40301e14c">IA32_FLAGS16::DF</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Direction Flag. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="d2c0d3c76193cc33d2277955aabfa13d"></a><!-- doxytag: member="IA32_FLAGS16::IF" ref="d2c0d3c76193cc33d2277955aabfa13d" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d0/d15/a00700.html#d2c0d3c76193cc33d2277955aabfa13d">IA32_FLAGS16::IF</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Interrupt Enable Flag. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="a83c50db767db7f0b780b47b7463ead3"></a><!-- doxytag: member="IA32_FLAGS16::IOPL" ref="a83c50db767db7f0b780b47b7463ead3" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d0/d15/a00700.html#a83c50db767db7f0b780b47b7463ead3">IA32_FLAGS16::IOPL</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+I/O Privilege Level. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="c0722f9018c493a56b38230b0513c458"></a><!-- doxytag: member="IA32_FLAGS16::NT" ref="c0722f9018c493a56b38230b0513c458" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d0/d15/a00700.html#c0722f9018c493a56b38230b0513c458">IA32_FLAGS16::NT</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Nested Task. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="155aee50987e7566af38aaf1bce1a20c"></a><!-- doxytag: member="IA32_FLAGS16::OF" ref="155aee50987e7566af38aaf1bce1a20c" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d0/d15/a00700.html#155aee50987e7566af38aaf1bce1a20c">IA32_FLAGS16::OF</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Overflow Flag. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="02ab22f303a86b0a052097c2d7e21ec5"></a><!-- doxytag: member="IA32_FLAGS16::PF" ref="02ab22f303a86b0a052097c2d7e21ec5" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d0/d15/a00700.html#02ab22f303a86b0a052097c2d7e21ec5">IA32_FLAGS16::PF</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Parity Flag. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="94a55399433f2d6526125eea336d396c"></a><!-- doxytag: member="IA32_FLAGS16::Reserved_0" ref="94a55399433f2d6526125eea336d396c" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d0/d15/a00700.html#94a55399433f2d6526125eea336d396c">IA32_FLAGS16::Reserved_0</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Reserved. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="dd7ea41510c7d9f4aad88ad8f323c17f"></a><!-- doxytag: member="IA32_FLAGS16::Reserved_1" ref="dd7ea41510c7d9f4aad88ad8f323c17f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d0/d15/a00700.html#dd7ea41510c7d9f4aad88ad8f323c17f">IA32_FLAGS16::Reserved_1</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Reserved. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="5328d092935ff7dfa5e844426cb531ca"></a><!-- doxytag: member="IA32_FLAGS16::Reserved_2" ref="5328d092935ff7dfa5e844426cb531ca" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d0/d15/a00700.html#5328d092935ff7dfa5e844426cb531ca">IA32_FLAGS16::Reserved_2</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Reserved. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="cfe23f2f502ccd16fa542a4fd5b773f3"></a><!-- doxytag: member="IA32_FLAGS16::Reserved_3" ref="cfe23f2f502ccd16fa542a4fd5b773f3" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d0/d15/a00700.html#cfe23f2f502ccd16fa542a4fd5b773f3">IA32_FLAGS16::Reserved_3</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Reserved. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="fc1f0f4f1a397f3bef760a868a4f1205"></a><!-- doxytag: member="IA32_FLAGS16::SF" ref="fc1f0f4f1a397f3bef760a868a4f1205" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d0/d15/a00700.html#fc1f0f4f1a397f3bef760a868a4f1205">IA32_FLAGS16::SF</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Sign Flag. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="61d1722ba3c8d25e0c25c84501fdb002"></a><!-- doxytag: member="IA32_FLAGS16::TF" ref="61d1722ba3c8d25e0c25c84501fdb002" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d0/d15/a00700.html#61d1722ba3c8d25e0c25c84501fdb002">IA32_FLAGS16::TF</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Trap Flag. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="0c28027497e538d704e932a8e1a7d9f4"></a><!-- doxytag: member="IA32_FLAGS16::Uint16" ref="0c28027497e538d704e932a8e1a7d9f4" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d0/d15/a00700.html#0c28027497e538d704e932a8e1a7d9f4">IA32_FLAGS16::Uint16</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="63faee60a4edfab26c7485920c2830cd"></a><!-- doxytag: member="IA32_FLAGS16::ZF" ref="63faee60a4edfab26c7485920c2830cd" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d0/d15/a00700.html#63faee60a4edfab26c7485920c2830cd">IA32_FLAGS16::ZF</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Zero Flag. 
+<p>
+
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:20 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:52 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

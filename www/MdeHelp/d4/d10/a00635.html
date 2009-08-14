@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_VERSION_SECTION Struct Reference</title>
+<title>MdePkg[ALL]: EFI_STATUS_CODE_EXCEP_SYSTEM_CONTEXT Union Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,65 +21,65 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_VERSION_SECTION Struct Reference</h1><!-- doxytag: class="EFI_VERSION_SECTION" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_STATUS_CODE_EXCEP_SYSTEM_CONTEXT Union Reference</h1><!-- doxytag: class="EFI_STATUS_CODE_EXCEP_SYSTEM_CONTEXT" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dad/a00394.html">EFI_COMMON_SECTION_HEADER</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d10/a00635.html#20e4aa4f9eadc6c882b77c42c5f78f7e">CommonHeader</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../db/d3a/a00641.html">EFI_SYSTEM_CONTEXT_EBC</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d10/a00635.html#d69318df9953d31682ca4b6acb292a42">SystemContextEbc</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d10/a00635.html#b13b16cd9684a90e5261f49aa16ef550">BuildNumber</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/dcf/a00642.html">EFI_SYSTEM_CONTEXT_IA32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d10/a00635.html#634016951eaefd016ce74b0094a93656">SystemContextIa32</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d10/a00635.html#a517b6593a26f0231416c42b8892219c">VersionString</a> [1]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/d19/a00643.html">EFI_SYSTEM_CONTEXT_IPF</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d10/a00635.html#b36c6a4c086be6d6192df54dc5b9a40b">SystemContextIpf</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Leaf section which contains a numeric build number and an optional unicode string that represents the file revision. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="b13b16cd9684a90e5261f49aa16ef550"></a><!-- doxytag: member="EFI_VERSION_SECTION::BuildNumber" ref="b13b16cd9684a90e5261f49aa16ef550" args="" -->
+System Context Data EBC/IA32/IPF <hr><h2>Field Documentation</h2>
+<a class="anchor" name="d69318df9953d31682ca4b6acb292a42"></a><!-- doxytag: member="EFI_STATUS_CODE_EXCEP_SYSTEM_CONTEXT::SystemContextEbc" ref="d69318df9953d31682ca4b6acb292a42" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d4/d10/a00635.html#b13b16cd9684a90e5261f49aa16ef550">EFI_VERSION_SECTION::BuildNumber</a>          </td>
+          <td class="memname"><a class="el" href="../../db/d3a/a00641.html">EFI_SYSTEM_CONTEXT_EBC</a> <a class="el" href="../../d4/d10/a00635.html#d69318df9953d31682ca4b6acb292a42">EFI_STATUS_CODE_EXCEP_SYSTEM_CONTEXT::SystemContextEbc</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The context of the EBC virtual machine when the exception was generated. Type <a class="el" href="../../db/d3a/a00641.html">EFI_SYSTEM_CONTEXT_EBC</a> is defined in EFI_DEBUG_SUPPORT_PROTOCOL in the UEFI Specification. 
 </div>
 </div><p>
-<a class="anchor" name="20e4aa4f9eadc6c882b77c42c5f78f7e"></a><!-- doxytag: member="EFI_VERSION_SECTION::CommonHeader" ref="20e4aa4f9eadc6c882b77c42c5f78f7e" args="" -->
+<a class="anchor" name="634016951eaefd016ce74b0094a93656"></a><!-- doxytag: member="EFI_STATUS_CODE_EXCEP_SYSTEM_CONTEXT::SystemContextIa32" ref="634016951eaefd016ce74b0094a93656" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dad/a00394.html">EFI_COMMON_SECTION_HEADER</a> <a class="el" href="../../d4/d10/a00635.html#20e4aa4f9eadc6c882b77c42c5f78f7e">EFI_VERSION_SECTION::CommonHeader</a>          </td>
+          <td class="memname"><a class="el" href="../../df/dcf/a00642.html">EFI_SYSTEM_CONTEXT_IA32</a> <a class="el" href="../../d4/d10/a00635.html#634016951eaefd016ce74b0094a93656">EFI_STATUS_CODE_EXCEP_SYSTEM_CONTEXT::SystemContextIa32</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The context of the IA-32 processor when the exception was generated. Type <a class="el" href="../../df/dcf/a00642.html">EFI_SYSTEM_CONTEXT_IA32</a> is defined in the EFI_DEBUG_SUPPORT_PROTOCOL in the UEFI Specification. 
 </div>
 </div><p>
-<a class="anchor" name="a517b6593a26f0231416c42b8892219c"></a><!-- doxytag: member="EFI_VERSION_SECTION::VersionString" ref="a517b6593a26f0231416c42b8892219c" args="[1]" -->
+<a class="anchor" name="b36c6a4c086be6d6192df54dc5b9a40b"></a><!-- doxytag: member="EFI_STATUS_CODE_EXCEP_SYSTEM_CONTEXT::SystemContextIpf" ref="b36c6a4c086be6d6192df54dc5b9a40b" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> <a class="el" href="../../d4/d10/a00635.html#a517b6593a26f0231416c42b8892219c">EFI_VERSION_SECTION::VersionString</a>[1]          </td>
+          <td class="memname"><a class="el" href="../../de/d19/a00643.html">EFI_SYSTEM_CONTEXT_IPF</a> <a class="el" href="../../d4/d10/a00635.html#b36c6a4c086be6d6192df54dc5b9a40b">EFI_STATUS_CODE_EXCEP_SYSTEM_CONTEXT::SystemContextIpf</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Array of unicode string. 
+The context of the Itanium(R) processor when the exception was generated. Type <a class="el" href="../../de/d19/a00643.html">EFI_SYSTEM_CONTEXT_IPF</a> is defined in the EFI_DEBUG_SUPPORT_PROTOCOL in the UEFI Specification. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:19 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:45 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

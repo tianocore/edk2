@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: s_pxe_pcc_config_info Struct Reference</title>
+<title>MdePkg[ALL]: PCI_BRIDGE_CONTROL_REGISTER Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,65 +21,62 @@
   </div>
 </div>
 <div class="contents">
-<h1>s_pxe_pcc_config_info Struct Reference</h1><!-- doxytag: class="s_pxe_pcc_config_info" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>PCI_BRIDGE_CONTROL_REGISTER Struct Reference</h1><!-- doxytag: class="PCI_BRIDGE_CONTROL_REGISTER" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d19/a01190.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d20/a00768.html#d449e1fb10ed77813fdf9944b2386336">BusType</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d20/a00768.html#3299bd20f7c0739aac21766d84af45b2">Bar</a> [2]</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d19/a01190.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d20/a00768.html#b624a87092c92438d77e88da27103b65">Bus</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d20/a00768.html#270e21616681443f52d49410259b1525">PrimaryBus</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d19/a01190.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d20/a00768.html#7cc7dd2c4aaab494209c566a5c906336">Device</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d20/a00768.html#95ddad807af1f6424106740011012f14">SecondaryBus</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d19/a01190.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d20/a00768.html#b0bc531ea1fbd3f6927f1e15308e2e7a">Function</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d20/a00768.html#6bfb37ecc6711546b8754100ff8998e2">SubordinateBus</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap>union {</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d20/a00768.html#82e198b82adf2bf7b21f231561f346e6">SecondaryLatencyTimer</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../dc/d19/a01190.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d8/d20/a00768.html#a68dcbfb38198fbeac740a9a7c291df2">Byte</a> [256]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d20/a00768.html#0c1334bd56025ce109f1182a05f0feac">IoBase</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../dc/d19/a01190.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d8/d20/a00768.html#5906ee27dfbc66f215ff797a7fec01b7">Word</a> [128]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d20/a00768.html#cf730a4f86e8be1e46ebd5e8e5df5168">IoLimit</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../dc/d19/a01190.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d8/d20/a00768.html#d2f71626ddc9593e5e1b90af90c732a5">Dword</a> [64]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d20/a00768.html#e325b62078cc672a89e0e807975908bc">SecondaryStatus</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap valign="top">}&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d20/a00768.html#fb1fa85a8974ba6fd9337ee59bf46742">Config</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d20/a00768.html#f1bdbe9d3d8089a0f6e8bbcadab37f79">MemoryBase</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d20/a00768.html#878e06089ffe078d2d208885b1009823">MemoryLimit</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d20/a00768.html#c8628e9293630c535c99bdd122639db6">PrefetchableMemoryBase</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d20/a00768.html#2487a8a75da137da4d434632431dcbb1">PrefetchableMemoryLimit</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d20/a00768.html#bda005cb0530c9281be4663f91a47a49">PrefetchableBaseUpper32</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d20/a00768.html#8554f3ab892af8edb7a9d513cf2a6c36">PrefetchableLimitUpper32</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d20/a00768.html#3a78daa717e8d8fd4a1b5a62d92945cd">IoBaseUpper16</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d20/a00768.html#d564fde365b3b006f75dbfc22940255e">IoLimitUpper16</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d20/a00768.html#80e15b8fce06046cbbcf3d6139f6df70">CapabilityPtr</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d20/a00768.html#ed1a9aaaab4db5cf084ba5ccdb9ab7aa">Reserved</a> [3]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d20/a00768.html#5bb906fd8bfa94c55ed8fae3cb2e3a7d">ExpansionRomBAR</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d20/a00768.html#c62d925112c26c636b1e7901a0d4308d">InterruptLine</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d20/a00768.html#1262011a829467f05044293fab23a4fd">InterruptPin</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d20/a00768.html#6fbc770cd4841661defb95f3a9a07969">BridgeControl</a></td></tr>
 
 </table>
-<hr><h2>Field Documentation</h2>
-<a class="anchor" name="b624a87092c92438d77e88da27103b65"></a><!-- doxytag: member="s_pxe_pcc_config_info::Bus" ref="b624a87092c92438d77e88da27103b65" args="" -->
+<hr><a name="_details"></a><h2>Detailed Description</h2>
+PCI-PCI Bridge header region in PCI Configuration Space Section 3.2, PCI-PCI Bridge Architecture, Version 1.2 <hr><h2>Field Documentation</h2>
+<a class="anchor" name="3299bd20f7c0739aac21766d84af45b2"></a><!-- doxytag: member="PCI_BRIDGE_CONTROL_REGISTER::Bar" ref="3299bd20f7c0739aac21766d84af45b2" args="[2]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d19/a01190.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a> <a class="el" href="../../d8/d20/a00768.html#b624a87092c92438d77e88da27103b65">s_pxe_pcc_config_info::Bus</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This identifies the PCC network device that this UNDI interface is bound to. 
-</div>
-</div><p>
-<a class="anchor" name="d449e1fb10ed77813fdf9944b2386336"></a><!-- doxytag: member="s_pxe_pcc_config_info::BusType" ref="d449e1fb10ed77813fdf9944b2386336" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../dc/d19/a01190.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a> <a class="el" href="../../d8/d20/a00768.html#d449e1fb10ed77813fdf9944b2386336">s_pxe_pcc_config_info::BusType</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This is the flag field for the PXE_DB_GET_CONFIG_INFO union. For PCC bus devices, this field is set to PXE_BUSTYPE_PCC. 
-</div>
-</div><p>
-<a class="anchor" name="a68dcbfb38198fbeac740a9a7c291df2"></a><!-- doxytag: member="s_pxe_pcc_config_info::Byte" ref="a68dcbfb38198fbeac740a9a7c291df2" args="[256]" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../dc/d19/a01190.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a> <a class="el" href="../../d8/d20/a00768.html#a68dcbfb38198fbeac740a9a7c291df2">s_pxe_pcc_config_info::Byte</a>[256]          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d8/d20/a00768.html#3299bd20f7c0739aac21766d84af45b2">PCI_BRIDGE_CONTROL_REGISTER::Bar</a>[2]          </td>
         </tr>
       </table>
 </div>
@@ -89,27 +86,12 @@ This is the flag field for the PXE_DB_GET_CONFIG_INFO union. For PCC bus devices
 
 </div>
 </div><p>
-<a class="anchor" name="fb1fa85a8974ba6fd9337ee59bf46742"></a><!-- doxytag: member="s_pxe_pcc_config_info::Config" ref="fb1fa85a8974ba6fd9337ee59bf46742" args="" -->
+<a class="anchor" name="6fbc770cd4841661defb95f3a9a07969"></a><!-- doxytag: member="PCI_BRIDGE_CONTROL_REGISTER::BridgeControl" ref="6fbc770cd4841661defb95f3a9a07969" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">union { ... }   <a class="el" href="../../d8/d20/a00768.html#fb1fa85a8974ba6fd9337ee59bf46742">s_pxe_pcc_config_info::Config</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This is a copy of the PCC configuration space for this network device. 
-</div>
-</div><p>
-<a class="anchor" name="7cc7dd2c4aaab494209c566a5c906336"></a><!-- doxytag: member="s_pxe_pcc_config_info::Device" ref="7cc7dd2c4aaab494209c566a5c906336" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../dc/d19/a01190.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a> <a class="el" href="../../d8/d20/a00768.html#7cc7dd2c4aaab494209c566a5c906336">s_pxe_pcc_config_info::Device</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d8/d20/a00768.html#6fbc770cd4841661defb95f3a9a07969">PCI_BRIDGE_CONTROL_REGISTER::BridgeControl</a>          </td>
         </tr>
       </table>
 </div>
@@ -119,12 +101,12 @@ This is a copy of the PCC configuration space for this network device.
 
 </div>
 </div><p>
-<a class="anchor" name="d2f71626ddc9593e5e1b90af90c732a5"></a><!-- doxytag: member="s_pxe_pcc_config_info::Dword" ref="d2f71626ddc9593e5e1b90af90c732a5" args="[64]" -->
+<a class="anchor" name="80e15b8fce06046cbbcf3d6139f6df70"></a><!-- doxytag: member="PCI_BRIDGE_CONTROL_REGISTER::CapabilityPtr" ref="80e15b8fce06046cbbcf3d6139f6df70" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d19/a01190.html#7a2514f8e9e8b6e01067d8bb7c0a9804">PXE_UINT32</a> <a class="el" href="../../d8/d20/a00768.html#d2f71626ddc9593e5e1b90af90c732a5">s_pxe_pcc_config_info::Dword</a>[64]          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d20/a00768.html#80e15b8fce06046cbbcf3d6139f6df70">PCI_BRIDGE_CONTROL_REGISTER::CapabilityPtr</a>          </td>
         </tr>
       </table>
 </div>
@@ -134,12 +116,12 @@ This is a copy of the PCC configuration space for this network device.
 
 </div>
 </div><p>
-<a class="anchor" name="b0bc531ea1fbd3f6927f1e15308e2e7a"></a><!-- doxytag: member="s_pxe_pcc_config_info::Function" ref="b0bc531ea1fbd3f6927f1e15308e2e7a" args="" -->
+<a class="anchor" name="5bb906fd8bfa94c55ed8fae3cb2e3a7d"></a><!-- doxytag: member="PCI_BRIDGE_CONTROL_REGISTER::ExpansionRomBAR" ref="5bb906fd8bfa94c55ed8fae3cb2e3a7d" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d19/a01190.html#30426fc087189779294a6cbc821d01ad">PXE_UINT8</a> <a class="el" href="../../d8/d20/a00768.html#b0bc531ea1fbd3f6927f1e15308e2e7a">s_pxe_pcc_config_info::Function</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d8/d20/a00768.html#5bb906fd8bfa94c55ed8fae3cb2e3a7d">PCI_BRIDGE_CONTROL_REGISTER::ExpansionRomBAR</a>          </td>
         </tr>
       </table>
 </div>
@@ -149,12 +131,267 @@ This is a copy of the PCC configuration space for this network device.
 
 </div>
 </div><p>
-<a class="anchor" name="5906ee27dfbc66f215ff797a7fec01b7"></a><!-- doxytag: member="s_pxe_pcc_config_info::Word" ref="5906ee27dfbc66f215ff797a7fec01b7" args="[128]" -->
+<a class="anchor" name="c62d925112c26c636b1e7901a0d4308d"></a><!-- doxytag: member="PCI_BRIDGE_CONTROL_REGISTER::InterruptLine" ref="c62d925112c26c636b1e7901a0d4308d" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dc/d19/a01190.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a> <a class="el" href="../../d8/d20/a00768.html#5906ee27dfbc66f215ff797a7fec01b7">s_pxe_pcc_config_info::Word</a>[128]          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d20/a00768.html#c62d925112c26c636b1e7901a0d4308d">PCI_BRIDGE_CONTROL_REGISTER::InterruptLine</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="1262011a829467f05044293fab23a4fd"></a><!-- doxytag: member="PCI_BRIDGE_CONTROL_REGISTER::InterruptPin" ref="1262011a829467f05044293fab23a4fd" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d20/a00768.html#1262011a829467f05044293fab23a4fd">PCI_BRIDGE_CONTROL_REGISTER::InterruptPin</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="0c1334bd56025ce109f1182a05f0feac"></a><!-- doxytag: member="PCI_BRIDGE_CONTROL_REGISTER::IoBase" ref="0c1334bd56025ce109f1182a05f0feac" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d20/a00768.html#0c1334bd56025ce109f1182a05f0feac">PCI_BRIDGE_CONTROL_REGISTER::IoBase</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="3a78daa717e8d8fd4a1b5a62d92945cd"></a><!-- doxytag: member="PCI_BRIDGE_CONTROL_REGISTER::IoBaseUpper16" ref="3a78daa717e8d8fd4a1b5a62d92945cd" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d8/d20/a00768.html#3a78daa717e8d8fd4a1b5a62d92945cd">PCI_BRIDGE_CONTROL_REGISTER::IoBaseUpper16</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="cf730a4f86e8be1e46ebd5e8e5df5168"></a><!-- doxytag: member="PCI_BRIDGE_CONTROL_REGISTER::IoLimit" ref="cf730a4f86e8be1e46ebd5e8e5df5168" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d20/a00768.html#cf730a4f86e8be1e46ebd5e8e5df5168">PCI_BRIDGE_CONTROL_REGISTER::IoLimit</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="d564fde365b3b006f75dbfc22940255e"></a><!-- doxytag: member="PCI_BRIDGE_CONTROL_REGISTER::IoLimitUpper16" ref="d564fde365b3b006f75dbfc22940255e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d8/d20/a00768.html#d564fde365b3b006f75dbfc22940255e">PCI_BRIDGE_CONTROL_REGISTER::IoLimitUpper16</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="f1bdbe9d3d8089a0f6e8bbcadab37f79"></a><!-- doxytag: member="PCI_BRIDGE_CONTROL_REGISTER::MemoryBase" ref="f1bdbe9d3d8089a0f6e8bbcadab37f79" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d8/d20/a00768.html#f1bdbe9d3d8089a0f6e8bbcadab37f79">PCI_BRIDGE_CONTROL_REGISTER::MemoryBase</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="878e06089ffe078d2d208885b1009823"></a><!-- doxytag: member="PCI_BRIDGE_CONTROL_REGISTER::MemoryLimit" ref="878e06089ffe078d2d208885b1009823" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d8/d20/a00768.html#878e06089ffe078d2d208885b1009823">PCI_BRIDGE_CONTROL_REGISTER::MemoryLimit</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="bda005cb0530c9281be4663f91a47a49"></a><!-- doxytag: member="PCI_BRIDGE_CONTROL_REGISTER::PrefetchableBaseUpper32" ref="bda005cb0530c9281be4663f91a47a49" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d8/d20/a00768.html#bda005cb0530c9281be4663f91a47a49">PCI_BRIDGE_CONTROL_REGISTER::PrefetchableBaseUpper32</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="8554f3ab892af8edb7a9d513cf2a6c36"></a><!-- doxytag: member="PCI_BRIDGE_CONTROL_REGISTER::PrefetchableLimitUpper32" ref="8554f3ab892af8edb7a9d513cf2a6c36" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d8/d20/a00768.html#8554f3ab892af8edb7a9d513cf2a6c36">PCI_BRIDGE_CONTROL_REGISTER::PrefetchableLimitUpper32</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="c8628e9293630c535c99bdd122639db6"></a><!-- doxytag: member="PCI_BRIDGE_CONTROL_REGISTER::PrefetchableMemoryBase" ref="c8628e9293630c535c99bdd122639db6" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d8/d20/a00768.html#c8628e9293630c535c99bdd122639db6">PCI_BRIDGE_CONTROL_REGISTER::PrefetchableMemoryBase</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="2487a8a75da137da4d434632431dcbb1"></a><!-- doxytag: member="PCI_BRIDGE_CONTROL_REGISTER::PrefetchableMemoryLimit" ref="2487a8a75da137da4d434632431dcbb1" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d8/d20/a00768.html#2487a8a75da137da4d434632431dcbb1">PCI_BRIDGE_CONTROL_REGISTER::PrefetchableMemoryLimit</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="270e21616681443f52d49410259b1525"></a><!-- doxytag: member="PCI_BRIDGE_CONTROL_REGISTER::PrimaryBus" ref="270e21616681443f52d49410259b1525" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d20/a00768.html#270e21616681443f52d49410259b1525">PCI_BRIDGE_CONTROL_REGISTER::PrimaryBus</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="ed1a9aaaab4db5cf084ba5ccdb9ab7aa"></a><!-- doxytag: member="PCI_BRIDGE_CONTROL_REGISTER::Reserved" ref="ed1a9aaaab4db5cf084ba5ccdb9ab7aa" args="[3]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d20/a00768.html#ed1a9aaaab4db5cf084ba5ccdb9ab7aa">PCI_BRIDGE_CONTROL_REGISTER::Reserved</a>[3]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="95ddad807af1f6424106740011012f14"></a><!-- doxytag: member="PCI_BRIDGE_CONTROL_REGISTER::SecondaryBus" ref="95ddad807af1f6424106740011012f14" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d20/a00768.html#95ddad807af1f6424106740011012f14">PCI_BRIDGE_CONTROL_REGISTER::SecondaryBus</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="82e198b82adf2bf7b21f231561f346e6"></a><!-- doxytag: member="PCI_BRIDGE_CONTROL_REGISTER::SecondaryLatencyTimer" ref="82e198b82adf2bf7b21f231561f346e6" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d20/a00768.html#82e198b82adf2bf7b21f231561f346e6">PCI_BRIDGE_CONTROL_REGISTER::SecondaryLatencyTimer</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="e325b62078cc672a89e0e807975908bc"></a><!-- doxytag: member="PCI_BRIDGE_CONTROL_REGISTER::SecondaryStatus" ref="e325b62078cc672a89e0e807975908bc" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d8/d20/a00768.html#e325b62078cc672a89e0e807975908bc">PCI_BRIDGE_CONTROL_REGISTER::SecondaryStatus</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="6bfb37ecc6711546b8754100ff8998e2"></a><!-- doxytag: member="PCI_BRIDGE_CONTROL_REGISTER::SubordinateBus" ref="6bfb37ecc6711546b8754100ff8998e2" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d20/a00768.html#6bfb37ecc6711546b8754100ff8998e2">PCI_BRIDGE_CONTROL_REGISTER::SubordinateBus</a>          </td>
         </tr>
       </table>
 </div>
@@ -165,7 +402,7 @@ This is a copy of the PCC configuration space for this network device.
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:21 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:58 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

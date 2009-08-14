@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: tdTPM_SEALED_DATA Struct Reference</title>
+<title>MdePkg[ALL]: tdTPM_DA_INFO_LIMITED Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,30 +21,28 @@
   </div>
 </div>
 <div class="contents">
-<h1>tdTPM_SEALED_DATA Struct Reference</h1><!-- doxytag: class="tdTPM_SEALED_DATA" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>tdTPM_DA_INFO_LIMITED Struct Reference</h1><!-- doxytag: class="tdTPM_DA_INFO_LIMITED" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/d59/a01001.html#851ca56c93bc8149f9f17e9562f63e6a">TPM_PAYLOAD_TYPE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d66/a00916.html#0c4c2b4faf6633aebfc7d51f7776657a">payload</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d8e/a01050.html#69f3eb3e40aee2061dba5f9202fac1a2">TPM_STRUCTURE_TAG</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d66/a00916.html#6caba409ccf96bbcb13ae6e9e8400042">tag</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/d59/a01001.html#06f4454a3bdd9176d98c4d188aa22b31">TPM_SECRET</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d66/a00916.html#582d77f1367137166eb0a82478b4e618">authData</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d8e/a01050.html#5b5f9c2232b669ad3a78b80e6a2f9e55">TPM_DA_STATE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d66/a00916.html#095ecad1d5f45e8682856891912a46fa">state</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/dac/a00901.html">TPM_NONCE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d66/a00916.html#e8177a7787c0e8f19752836bb419cc46">tpmProof</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/dd1/a00914.html">TPM_DA_ACTION_TYPE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d66/a00916.html#97f287d7d78c93d5764e6553928537f8">actionAtThreshold</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d08/a00884.html">TPM_DIGEST</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d66/a00916.html#ceea87c63f17cee573ada19bb0026428">storedDigest</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d66/a00916.html#44a78d234b453e472c01e237bcccc888">vendorDataSize</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d66/a00916.html#5833ca5e9d02e9d24f49601fb5242e7e">dataSize</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d66/a00916.html#369a9001f2254e393728a89f48564dcb">data</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d66/a00916.html#65d0bbac29ad5de70af5f70be17f59d0">vendorData</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Part 2, section 9.3: TPM_SEALED_DATA [size_is(dataSize)] BYTE* data; <hr><h2>Field Documentation</h2>
-<a class="anchor" name="582d77f1367137166eb0a82478b4e618"></a><!-- doxytag: member="tdTPM_SEALED_DATA::authData" ref="582d77f1367137166eb0a82478b4e618" args="" -->
+Part 2, section 21.8: TPM_DA_INFO_LIMITED <hr><h2>Field Documentation</h2>
+<a class="anchor" name="97f287d7d78c93d5764e6553928537f8"></a><!-- doxytag: member="tdTPM_DA_INFO_LIMITED::actionAtThreshold" ref="97f287d7d78c93d5764e6553928537f8" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../df/d59/a01001.html#06f4454a3bdd9176d98c4d188aa22b31">TPM_SECRET</a> <a class="el" href="../../d6/d66/a00916.html#582d77f1367137166eb0a82478b4e618">tdTPM_SEALED_DATA::authData</a>          </td>
+          <td class="memname"><a class="el" href="../../d3/dd1/a00914.html">TPM_DA_ACTION_TYPE</a> <a class="el" href="../../d6/d66/a00916.html#97f287d7d78c93d5764e6553928537f8">tdTPM_DA_INFO_LIMITED::actionAtThreshold</a>          </td>
         </tr>
       </table>
 </div>
@@ -54,12 +52,12 @@ Part 2, section 9.3: TPM_SEALED_DATA [size_is(dataSize)] BYTE* data; <hr><h2>Fie
 
 </div>
 </div><p>
-<a class="anchor" name="369a9001f2254e393728a89f48564dcb"></a><!-- doxytag: member="tdTPM_SEALED_DATA::data" ref="369a9001f2254e393728a89f48564dcb" args="" -->
+<a class="anchor" name="095ecad1d5f45e8682856891912a46fa"></a><!-- doxytag: member="tdTPM_DA_INFO_LIMITED::state" ref="095ecad1d5f45e8682856891912a46fa" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>* <a class="el" href="../../d6/d66/a00916.html#369a9001f2254e393728a89f48564dcb">tdTPM_SEALED_DATA::data</a>          </td>
+          <td class="memname"><a class="el" href="../../d9/d8e/a01050.html#5b5f9c2232b669ad3a78b80e6a2f9e55">TPM_DA_STATE</a> <a class="el" href="../../d6/d66/a00916.html#095ecad1d5f45e8682856891912a46fa">tdTPM_DA_INFO_LIMITED::state</a>          </td>
         </tr>
       </table>
 </div>
@@ -69,12 +67,12 @@ Part 2, section 9.3: TPM_SEALED_DATA [size_is(dataSize)] BYTE* data; <hr><h2>Fie
 
 </div>
 </div><p>
-<a class="anchor" name="5833ca5e9d02e9d24f49601fb5242e7e"></a><!-- doxytag: member="tdTPM_SEALED_DATA::dataSize" ref="5833ca5e9d02e9d24f49601fb5242e7e" args="" -->
+<a class="anchor" name="6caba409ccf96bbcb13ae6e9e8400042"></a><!-- doxytag: member="tdTPM_DA_INFO_LIMITED::tag" ref="6caba409ccf96bbcb13ae6e9e8400042" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d6/d66/a00916.html#5833ca5e9d02e9d24f49601fb5242e7e">tdTPM_SEALED_DATA::dataSize</a>          </td>
+          <td class="memname"><a class="el" href="../../d9/d8e/a01050.html#69f3eb3e40aee2061dba5f9202fac1a2">TPM_STRUCTURE_TAG</a> <a class="el" href="../../d6/d66/a00916.html#6caba409ccf96bbcb13ae6e9e8400042">tdTPM_DA_INFO_LIMITED::tag</a>          </td>
         </tr>
       </table>
 </div>
@@ -84,12 +82,12 @@ Part 2, section 9.3: TPM_SEALED_DATA [size_is(dataSize)] BYTE* data; <hr><h2>Fie
 
 </div>
 </div><p>
-<a class="anchor" name="0c4c2b4faf6633aebfc7d51f7776657a"></a><!-- doxytag: member="tdTPM_SEALED_DATA::payload" ref="0c4c2b4faf6633aebfc7d51f7776657a" args="" -->
+<a class="anchor" name="65d0bbac29ad5de70af5f70be17f59d0"></a><!-- doxytag: member="tdTPM_DA_INFO_LIMITED::vendorData" ref="65d0bbac29ad5de70af5f70be17f59d0" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../df/d59/a01001.html#851ca56c93bc8149f9f17e9562f63e6a">TPM_PAYLOAD_TYPE</a> <a class="el" href="../../d6/d66/a00916.html#0c4c2b4faf6633aebfc7d51f7776657a">tdTPM_SEALED_DATA::payload</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>* <a class="el" href="../../d6/d66/a00916.html#65d0bbac29ad5de70af5f70be17f59d0">tdTPM_DA_INFO_LIMITED::vendorData</a>          </td>
         </tr>
       </table>
 </div>
@@ -99,27 +97,12 @@ Part 2, section 9.3: TPM_SEALED_DATA [size_is(dataSize)] BYTE* data; <hr><h2>Fie
 
 </div>
 </div><p>
-<a class="anchor" name="ceea87c63f17cee573ada19bb0026428"></a><!-- doxytag: member="tdTPM_SEALED_DATA::storedDigest" ref="ceea87c63f17cee573ada19bb0026428" args="" -->
+<a class="anchor" name="44a78d234b453e472c01e237bcccc888"></a><!-- doxytag: member="tdTPM_DA_INFO_LIMITED::vendorDataSize" ref="44a78d234b453e472c01e237bcccc888" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dd/d08/a00884.html">TPM_DIGEST</a> <a class="el" href="../../d6/d66/a00916.html#ceea87c63f17cee573ada19bb0026428">tdTPM_SEALED_DATA::storedDigest</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="e8177a7787c0e8f19752836bb419cc46"></a><!-- doxytag: member="tdTPM_SEALED_DATA::tpmProof" ref="e8177a7787c0e8f19752836bb419cc46" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/dac/a00901.html">TPM_NONCE</a> <a class="el" href="../../d6/d66/a00916.html#e8177a7787c0e8f19752836bb419cc46">tdTPM_SEALED_DATA::tpmProof</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d6/d66/a00916.html#44a78d234b453e472c01e237bcccc888">tdTPM_DA_INFO_LIMITED::vendorDataSize</a>          </td>
         </tr>
       </table>
 </div>
@@ -130,7 +113,7 @@ Part 2, section 9.3: TPM_SEALED_DATA [size_is(dataSize)] BYTE* data; <hr><h2>Fie
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:23 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:08 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Protocol/Cpu.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Pi/PiDependency.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,62 +21,57 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Protocol/Cpu.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Pi/PiDependency.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
-<tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/d86/a00012.html">_EFI_CPU_ARCH_PROTOCOL</a></td></tr>
-
 <tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d4e/a01106.html#049ecc59226e04cc91123314ba68cfa2">EFI_CPU_ARCH_PROTOCOL_GUID</a>&nbsp;&nbsp;&nbsp;{ 0x26baccb1, 0x6f42, 0x11d4, {0xbc, 0xe7, 0x0, 0x80, 0xc7, 0x3c, 0x88, 0x81 } }</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d4e/a01106.html#130cdd2b4b40b196ae25bce78c8f608e">EFI_DEP_BEFORE</a>&nbsp;&nbsp;&nbsp;0x00</td></tr>
 
-<tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
-<a class="el" href="../../df/d86/a00012.html">_EFI_CPU_ARCH_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d4e/a01106.html#2f9d86b7d9c12180196d75b9a455388f">EFI_CPU_ARCH_PROTOCOL</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d4e/a01106.html#e1e2f466457803724ddf3c4a02677cf5">EFI_DEP_AFTER</a>&nbsp;&nbsp;&nbsp;0x01</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef VOID(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d4e/a01106.html#b1b2fe2a294a47a3c1fe13e13e0eaddb">EFI_CPU_INTERRUPT_HANDLER</a> )(IN CONST <a class="el" href="../../d2/dd7/a01108.html#406cd3b8e734b4c7b144232bae800bfb">EFI_EXCEPTION_TYPE</a> InterruptType, IN CONST <a class="el" href="../../d8/de9/a00595.html">EFI_SYSTEM_CONTEXT</a> SystemContext)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d4e/a01106.html#d2fab8455fb2100a32cfe9f656a5432d">EFI_DEP_PUSH</a>&nbsp;&nbsp;&nbsp;0x02</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d4e/a01106.html#caf96f673a12fd6c558bf8d951adb2fd">EFI_CPU_FLUSH_DATA_CACHE</a> )(IN <a class="el" href="../../df/d86/a00012.html">EFI_CPU_ARCH_PROTOCOL</a> *This, IN <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> Start, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Length, IN <a class="el" href="../../da/d4e/a01106.html#18c227b7309a5ff2e449bb9ac65e3293">EFI_CPU_FLUSH_TYPE</a> FlushType)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d4e/a01106.html#340cc39b65bbcfa040f5ba509d7a4871">EFI_DEP_AND</a>&nbsp;&nbsp;&nbsp;0x03</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d4e/a01106.html#5f9a5da60fe34257dfc0c12e3be23dff">EFI_CPU_ENABLE_INTERRUPT</a> )(IN <a class="el" href="../../df/d86/a00012.html">EFI_CPU_ARCH_PROTOCOL</a> *This)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d4e/a01106.html#8d60729dc64dcc11562d50c4e600b6e1">EFI_DEP_OR</a>&nbsp;&nbsp;&nbsp;0x04</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d4e/a01106.html#db44ec2c4016ced5a01a67bd79a7e5b8">EFI_CPU_DISABLE_INTERRUPT</a> )(IN <a class="el" href="../../df/d86/a00012.html">EFI_CPU_ARCH_PROTOCOL</a> *This)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d4e/a01106.html#295980891b14ab82242675ad293560c3">EFI_DEP_NOT</a>&nbsp;&nbsp;&nbsp;0x05</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d4e/a01106.html#6da92cc130695f0f14dcbb3b5c0f7daa">EFI_CPU_GET_INTERRUPT_STATE</a> )(IN <a class="el" href="../../df/d86/a00012.html">EFI_CPU_ARCH_PROTOCOL</a> *This, OUT <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> *State)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d4e/a01106.html#c2a18f3a3b8ef25a9180d525267cb6ad">EFI_DEP_TRUE</a>&nbsp;&nbsp;&nbsp;0x06</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d4e/a01106.html#20f7d5cefde6fd1a7ee6e192fef21a32">EFI_CPU_INIT</a> )(IN <a class="el" href="../../df/d86/a00012.html">EFI_CPU_ARCH_PROTOCOL</a> *This, IN <a class="el" href="../../da/d4e/a01106.html#4dca965ff5f54a9a3404c21d8f4b5bb7">EFI_CPU_INIT_TYPE</a> InitType)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d4e/a01106.html#ed0b1fe984181517b6630326cbdca27a">EFI_DEP_FALSE</a>&nbsp;&nbsp;&nbsp;0x07</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d4e/a01106.html#b00646299a514152e73f17f90daec94f">EFI_CPU_REGISTER_INTERRUPT_HANDLER</a> )(IN <a class="el" href="../../df/d86/a00012.html">EFI_CPU_ARCH_PROTOCOL</a> *This, IN <a class="el" href="../../d2/dd7/a01108.html#406cd3b8e734b4c7b144232bae800bfb">EFI_EXCEPTION_TYPE</a> InterruptType, IN <a class="el" href="../../da/d4e/a01106.html#b1b2fe2a294a47a3c1fe13e13e0eaddb">EFI_CPU_INTERRUPT_HANDLER</a> InterruptHandler)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d4e/a01106.html#ab6e1097c5d5e1675e474c005983dc6f">EFI_DEP_END</a>&nbsp;&nbsp;&nbsp;0x08</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d4e/a01106.html#c6b022338f8dacb89a3a914028b1009d">EFI_CPU_GET_TIMER_VALUE</a> )(IN <a class="el" href="../../df/d86/a00012.html">EFI_CPU_ARCH_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> TimerIndex, OUT <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> *TimerValue, OUT <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> *TimerPeriod)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d4e/a01106.html#4ef67410b49a071605f123a80277b280">EFI_CPU_SET_MEMORY_ATTRIBUTES</a> )(IN <a class="el" href="../../df/d86/a00012.html">EFI_CPU_ARCH_PROTOCOL</a> *This, IN <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> BaseAddress, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Length, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Attributes)</td></tr>
-
-<tr><td colspan="2"><br><h2>Enumerations</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d4e/a01106.html#18c227b7309a5ff2e449bb9ac65e3293">EFI_CPU_FLUSH_TYPE</a> { <a class="el" href="../../da/d4e/a01106.html#18c227b7309a5ff2e449bb9ac65e329379fde5454ea29c2b5c4c6b69d3c3709a">EfiCpuFlushTypeWriteBackInvalidate</a>, 
-<a class="el" href="../../da/d4e/a01106.html#18c227b7309a5ff2e449bb9ac65e329311e9a626f81532987834afb4d1e2bb92">EfiCpuFlushTypeWriteBack</a>, 
-<a class="el" href="../../da/d4e/a01106.html#18c227b7309a5ff2e449bb9ac65e3293e11a0341aebe080f65b648eda84dbb95">EfiCpuFlushTypeInvalidate</a>, 
-<a class="el" href="../../da/d4e/a01106.html#18c227b7309a5ff2e449bb9ac65e32933e0748c1db96fc69aeed0e24927fcad2">EfiCpuMaxFlushType</a>
- }</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">enum &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d4e/a01106.html#4dca965ff5f54a9a3404c21d8f4b5bb7">EFI_CPU_INIT_TYPE</a> { <a class="el" href="../../da/d4e/a01106.html#4dca965ff5f54a9a3404c21d8f4b5bb7f6e158f39d850a9637896655106129ff">EfiCpuInit</a>, 
-<a class="el" href="../../da/d4e/a01106.html#4dca965ff5f54a9a3404c21d8f4b5bb7a6e3da037aa243754a790320a088108b">EfiCpuMaxInitType</a>
- }</td></tr>
-
-<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d4e/a01106.html#620bc84091e4d1a0145b3f3edeba77c3">gEfiCpuArchProtocolGuid</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d4e/a01106.html#0701da336aefc4bf0c9d34dd0c702027">EFI_DEP_SOR</a>&nbsp;&nbsp;&nbsp;0x09</td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-CPU Architectural Protocol as defined in PI spec Volume 2 DXE<p>
-This code abstracts the DXE core from processor implementation details.<p>
+Present the dependency expression values in PI.<p>
 Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
-<a class="anchor" name="049ecc59226e04cc91123314ba68cfa2"></a><!-- doxytag: member="Cpu.h::EFI_CPU_ARCH_PROTOCOL_GUID" ref="049ecc59226e04cc91123314ba68cfa2" args="" -->
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
+<dl class="user" compact><dt><b>Revision Reference:</b></dt><dd>PI Version 1.0 </dd></dl>
+<hr><h2>Define Documentation</h2>
+<a class="anchor" name="e1e2f466457803724ddf3c4a02677cf5"></a><!-- doxytag: member="PiDependency.h::EFI_DEP_AFTER" ref="e1e2f466457803724ddf3c4a02677cf5" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_CPU_ARCH_PROTOCOL_GUID&nbsp;&nbsp;&nbsp;{ 0x26baccb1, 0x6f42, 0x11d4, {0xbc, 0xe7, 0x0, 0x80, 0xc7, 0x3c, 0x88, 0x81 } }          </td>
+          <td class="memname">#define EFI_DEP_AFTER&nbsp;&nbsp;&nbsp;0x01          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+If present, this must be the first and only opcode, EFI_DEP_AFTER is only used by DXE driver. 
+</div>
+</div><p>
+<a class="anchor" name="340cc39b65bbcfa040f5ba509d7a4871"></a><!-- doxytag: member="PiDependency.h::EFI_DEP_AND" ref="340cc39b65bbcfa040f5ba509d7a4871" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_DEP_AND&nbsp;&nbsp;&nbsp;0x03          </td>
         </tr>
       </table>
 </div>
@@ -86,13 +81,27 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 </div>
 </div><p>
-<hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="2f9d86b7d9c12180196d75b9a455388f"></a><!-- doxytag: member="Cpu.h::EFI_CPU_ARCH_PROTOCOL" ref="2f9d86b7d9c12180196d75b9a455388f" args="" -->
+<a class="anchor" name="130cdd2b4b40b196ae25bce78c8f608e"></a><!-- doxytag: member="PiDependency.h::EFI_DEP_BEFORE" ref="130cdd2b4b40b196ae25bce78c8f608e" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef struct <a class="el" href="../../df/d86/a00012.html">_EFI_CPU_ARCH_PROTOCOL</a> <a class="el" href="../../df/d86/a00012.html">EFI_CPU_ARCH_PROTOCOL</a>          </td>
+          <td class="memname">#define EFI_DEP_BEFORE&nbsp;&nbsp;&nbsp;0x00          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+If present, this must be the first and only opcode, EFI_DEP_BEFORE is only used by DXE driver. 
+</div>
+</div><p>
+<a class="anchor" name="ab6e1097c5d5e1675e474c005983dc6f"></a><!-- doxytag: member="PiDependency.h::EFI_DEP_END" ref="ab6e1097c5d5e1675e474c005983dc6f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_DEP_END&nbsp;&nbsp;&nbsp;0x08          </td>
         </tr>
       </table>
 </div>
@@ -102,325 +111,87 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 </div>
 </div><p>
-<a class="anchor" name="db44ec2c4016ced5a01a67bd79a7e5b8"></a><!-- doxytag: member="Cpu.h::EFI_CPU_DISABLE_INTERRUPT" ref="db44ec2c4016ced5a01a67bd79a7e5b8" args=")(IN EFI_CPU_ARCH_PROTOCOL *This)" -->
+<a class="anchor" name="ed0b1fe984181517b6630326cbdca27a"></a><!-- doxytag: member="PiDependency.h::EFI_DEP_FALSE" ref="ed0b1fe984181517b6630326cbdca27a" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../da/d4e/a01106.html#db44ec2c4016ced5a01a67bd79a7e5b8">EFI_CPU_DISABLE_INTERRUPT</a>)(IN <a class="el" href="../../df/d86/a00012.html">EFI_CPU_ARCH_PROTOCOL</a> *This)          </td>
+          <td class="memname">#define EFI_DEP_FALSE&nbsp;&nbsp;&nbsp;0x07          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-This function disables interrupt processing by the processor.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>The EFI_CPU_ARCH_PROTOCOL instance.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Interrupts are disabled on the processor. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>Interrupts could not be disabled on the processor. </td></tr>
-  </table>
-</dl>
 
 </div>
 </div><p>
-<a class="anchor" name="5f9a5da60fe34257dfc0c12e3be23dff"></a><!-- doxytag: member="Cpu.h::EFI_CPU_ENABLE_INTERRUPT" ref="5f9a5da60fe34257dfc0c12e3be23dff" args=")(IN EFI_CPU_ARCH_PROTOCOL *This)" -->
+<a class="anchor" name="295980891b14ab82242675ad293560c3"></a><!-- doxytag: member="PiDependency.h::EFI_DEP_NOT" ref="295980891b14ab82242675ad293560c3" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../da/d4e/a01106.html#5f9a5da60fe34257dfc0c12e3be23dff">EFI_CPU_ENABLE_INTERRUPT</a>)(IN <a class="el" href="../../df/d86/a00012.html">EFI_CPU_ARCH_PROTOCOL</a> *This)          </td>
+          <td class="memname">#define EFI_DEP_NOT&nbsp;&nbsp;&nbsp;0x05          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-This function enables interrupt processing by the processor.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>The EFI_CPU_ARCH_PROTOCOL instance.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>Interrupts are enabled on the processor. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>Interrupts could not be enabled on the processor. </td></tr>
-  </table>
-</dl>
 
 </div>
 </div><p>
-<a class="anchor" name="caf96f673a12fd6c558bf8d951adb2fd"></a><!-- doxytag: member="Cpu.h::EFI_CPU_FLUSH_DATA_CACHE" ref="caf96f673a12fd6c558bf8d951adb2fd" args=")(IN EFI_CPU_ARCH_PROTOCOL *This, IN EFI_PHYSICAL_ADDRESS Start, IN UINT64 Length, IN EFI_CPU_FLUSH_TYPE FlushType)" -->
+<a class="anchor" name="8d60729dc64dcc11562d50c4e600b6e1"></a><!-- doxytag: member="PiDependency.h::EFI_DEP_OR" ref="8d60729dc64dcc11562d50c4e600b6e1" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../da/d4e/a01106.html#caf96f673a12fd6c558bf8d951adb2fd">EFI_CPU_FLUSH_DATA_CACHE</a>)(IN <a class="el" href="../../df/d86/a00012.html">EFI_CPU_ARCH_PROTOCOL</a> *This, IN <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> Start, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Length, IN <a class="el" href="../../da/d4e/a01106.html#18c227b7309a5ff2e449bb9ac65e3293">EFI_CPU_FLUSH_TYPE</a> FlushType)          </td>
+          <td class="memname">#define EFI_DEP_OR&nbsp;&nbsp;&nbsp;0x04          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-This function flushes the range of addresses from Start to Start+Length from the processor's data cache. If Start is not aligned to a cache line boundary, then the bytes before Start to the preceding cache line boundary are also flushed. If Start+Length is not aligned to a cache line boundary, then the bytes past Start+Length to the end of the next cache line boundary are also flushed. The FlushType of EfiCpuFlushTypeWriteBackInvalidate must be supported. If the data cache is fully coherent with all DMA operations, then this function can just return EFI_SUCCESS. If the processor does not support flushing a range of the data cache, then the entire data cache can be flushed.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>The EFI_CPU_ARCH_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Start</em>&nbsp;</td><td>The beginning physical address to flush from the processor's data cache. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Length</em>&nbsp;</td><td>The number of bytes to flush from the processor's data cache. This function may flush more bytes than Length specifies depending upon the granularity of the flush operation that the processor supports. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>FlushType</em>&nbsp;</td><td>Specifies the type of flush operation to perform.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The address range from Start to Start+Length was flushed from the processor's data cache. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTEDT</em>&nbsp;</td><td>The processor does not support the cache flush type specified by FlushType. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The address range from Start to Start+Length could not be flushed from the processor's data cache. </td></tr>
-  </table>
-</dl>
 
 </div>
 </div><p>
-<a class="anchor" name="6da92cc130695f0f14dcbb3b5c0f7daa"></a><!-- doxytag: member="Cpu.h::EFI_CPU_GET_INTERRUPT_STATE" ref="6da92cc130695f0f14dcbb3b5c0f7daa" args=")(IN EFI_CPU_ARCH_PROTOCOL *This, OUT BOOLEAN *State)" -->
+<a class="anchor" name="d2fab8455fb2100a32cfe9f656a5432d"></a><!-- doxytag: member="PiDependency.h::EFI_DEP_PUSH" ref="d2fab8455fb2100a32cfe9f656a5432d" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../da/d4e/a01106.html#6da92cc130695f0f14dcbb3b5c0f7daa">EFI_CPU_GET_INTERRUPT_STATE</a>)(IN <a class="el" href="../../df/d86/a00012.html">EFI_CPU_ARCH_PROTOCOL</a> *This, OUT <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> *State)          </td>
+          <td class="memname">#define EFI_DEP_PUSH&nbsp;&nbsp;&nbsp;0x02          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-This function retrieves the processor's current interrupt state a returns it in State. If interrupts are currently enabled, then TRUE is returned. If interrupts are currently disabled, then FALSE is returned.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>The EFI_CPU_ARCH_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>State</em>&nbsp;</td><td>A pointer to the processor's current interrupt state. Set to TRUE if interrupts are enabled and FALSE if interrupts are disabled.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The processor's current interrupt state was returned in State. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>State is NULL. </td></tr>
-  </table>
-</dl>
 
 </div>
 </div><p>
-<a class="anchor" name="c6b022338f8dacb89a3a914028b1009d"></a><!-- doxytag: member="Cpu.h::EFI_CPU_GET_TIMER_VALUE" ref="c6b022338f8dacb89a3a914028b1009d" args=")(IN EFI_CPU_ARCH_PROTOCOL *This, IN UINT32 TimerIndex, OUT UINT64 *TimerValue, OUT UINT64 *TimerPeriod)" -->
+<a class="anchor" name="0701da336aefc4bf0c9d34dd0c702027"></a><!-- doxytag: member="PiDependency.h::EFI_DEP_SOR" ref="0701da336aefc4bf0c9d34dd0c702027" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../da/d4e/a01106.html#c6b022338f8dacb89a3a914028b1009d">EFI_CPU_GET_TIMER_VALUE</a>)(IN <a class="el" href="../../df/d86/a00012.html">EFI_CPU_ARCH_PROTOCOL</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> TimerIndex, OUT <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> *TimerValue, OUT <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> *TimerPeriod)          </td>
+          <td class="memname">#define EFI_DEP_SOR&nbsp;&nbsp;&nbsp;0x09          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-This function reads the processor timer specified by TimerIndex and returns it in TimerValue.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>The EFI_CPU_ARCH_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>TimerIndex</em>&nbsp;</td><td>Specifies which processor timer is to be returned in TimerValue. This parameter must be between 0 and NumberOfTimers-1. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>TimerValue</em>&nbsp;</td><td>Pointer to the returned timer value. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>TimerPeriod</em>&nbsp;</td><td>A pointer to the amount of time that passes in femtoseconds for each increment of TimerValue. If TimerValue does not increment at a predictable rate, then 0 is returned. This parameter is optional and may be NULL.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The processor timer value specified by TimerIndex was returned in TimerValue. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>An error occurred attempting to read one of the processor's timers. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>TimerValue is NULL or TimerIndex is not valid. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The processor does not have any readable timers. </td></tr>
-  </table>
-</dl>
-
+If present, this must be the first opcode, EFI_DEP_SOR is only used by DXE driver. 
 </div>
 </div><p>
-<a class="anchor" name="20f7d5cefde6fd1a7ee6e192fef21a32"></a><!-- doxytag: member="Cpu.h::EFI_CPU_INIT" ref="20f7d5cefde6fd1a7ee6e192fef21a32" args=")(IN EFI_CPU_ARCH_PROTOCOL *This, IN EFI_CPU_INIT_TYPE InitType)" -->
+<a class="anchor" name="c2a18f3a3b8ef25a9180d525267cb6ad"></a><!-- doxytag: member="PiDependency.h::EFI_DEP_TRUE" ref="c2a18f3a3b8ef25a9180d525267cb6ad" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../da/d4e/a01106.html#20f7d5cefde6fd1a7ee6e192fef21a32">EFI_CPU_INIT</a>)(IN <a class="el" href="../../df/d86/a00012.html">EFI_CPU_ARCH_PROTOCOL</a> *This, IN <a class="el" href="../../da/d4e/a01106.html#4dca965ff5f54a9a3404c21d8f4b5bb7">EFI_CPU_INIT_TYPE</a> InitType)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This function generates an INIT on the processor. If this function succeeds, then the processor will be reset, and control will not be returned to the caller. If InitType is not supported by this processor, or the processor cannot programmatically generate an INIT without help from external hardware, then EFI_UNSUPPORTED is returned. If an error occurs attempting to generate an INIT, then EFI_DEVICE_ERROR is returned.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>The EFI_CPU_ARCH_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>InitType</em>&nbsp;</td><td>The type of processor INIT to perform.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The processor INIT was performed. This return code should never be seen. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The processor INIT operation specified by InitType is not supported by this processor. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The processor INIT failed. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="b1b2fe2a294a47a3c1fe13e13e0eaddb"></a><!-- doxytag: member="Cpu.h::EFI_CPU_INTERRUPT_HANDLER" ref="b1b2fe2a294a47a3c1fe13e13e0eaddb" args=")(IN CONST EFI_EXCEPTION_TYPE InterruptType, IN CONST EFI_SYSTEM_CONTEXT SystemContext)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef VOID(EFIAPI * <a class="el" href="../../da/d4e/a01106.html#b1b2fe2a294a47a3c1fe13e13e0eaddb">EFI_CPU_INTERRUPT_HANDLER</a>)(IN CONST <a class="el" href="../../d2/dd7/a01108.html#406cd3b8e734b4c7b144232bae800bfb">EFI_EXCEPTION_TYPE</a> InterruptType, IN CONST <a class="el" href="../../d8/de9/a00595.html">EFI_SYSTEM_CONTEXT</a> SystemContext)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-EFI_CPU_INTERRUPT_HANDLER that is called when a processor interrupt occurs.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>InterruptType</em>&nbsp;</td><td>Defines the type of interrupt or exception that occurred on the processor.This parameter is processor architecture specific. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SystemContext</em>&nbsp;</td><td>A pointer to the processor context when the interrupt occurred on the processor.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>None </dd></dl>
-
-</div>
-</div><p>
-<a class="anchor" name="b00646299a514152e73f17f90daec94f"></a><!-- doxytag: member="Cpu.h::EFI_CPU_REGISTER_INTERRUPT_HANDLER" ref="b00646299a514152e73f17f90daec94f" args=")(IN EFI_CPU_ARCH_PROTOCOL *This, IN EFI_EXCEPTION_TYPE InterruptType, IN EFI_CPU_INTERRUPT_HANDLER InterruptHandler)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../da/d4e/a01106.html#b00646299a514152e73f17f90daec94f">EFI_CPU_REGISTER_INTERRUPT_HANDLER</a>)(IN <a class="el" href="../../df/d86/a00012.html">EFI_CPU_ARCH_PROTOCOL</a> *This, IN <a class="el" href="../../d2/dd7/a01108.html#406cd3b8e734b4c7b144232bae800bfb">EFI_EXCEPTION_TYPE</a> InterruptType, IN <a class="el" href="../../da/d4e/a01106.html#b1b2fe2a294a47a3c1fe13e13e0eaddb">EFI_CPU_INTERRUPT_HANDLER</a> InterruptHandler)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This function registers and enables the handler specified by InterruptHandler for a processor interrupt or exception type specified by InterruptType. If InterruptHandler is NULL, then the handler for the processor interrupt or exception type specified by InterruptType is uninstalled. The installed handler is called once for each processor interrupt or exception.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>The EFI_CPU_ARCH_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>InterruptType</em>&nbsp;</td><td>A pointer to the processor's current interrupt state. Set to TRUE if interrupts are enabled and FALSE if interrupts are disabled. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>InterruptHandler</em>&nbsp;</td><td>A pointer to a function of type EFI_CPU_INTERRUPT_HANDLER that is called when a processor interrupt occurs. If this parameter is NULL, then the handler will be uninstalled.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The handler for the processor interrupt was successfully installed or uninstalled. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ALREADY_STARTED</em>&nbsp;</td><td>InterruptHandler is not NULL, and a handler for InterruptType was previously installed. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>InterruptHandler is NULL, and a handler for InterruptType was not previously installed. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The interrupt specified by InterruptType is not supported. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="4ef67410b49a071605f123a80277b280"></a><!-- doxytag: member="Cpu.h::EFI_CPU_SET_MEMORY_ATTRIBUTES" ref="4ef67410b49a071605f123a80277b280" args=")(IN EFI_CPU_ARCH_PROTOCOL *This, IN EFI_PHYSICAL_ADDRESS BaseAddress, IN UINT64 Length, IN UINT64 Attributes)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../da/d4e/a01106.html#4ef67410b49a071605f123a80277b280">EFI_CPU_SET_MEMORY_ATTRIBUTES</a>)(IN <a class="el" href="../../df/d86/a00012.html">EFI_CPU_ARCH_PROTOCOL</a> *This, IN <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> BaseAddress, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Length, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Attributes)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This function modifies the attributes for the memory region specified by BaseAddress and Length from their current attributes to the attributes specified by Attributes.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>The EFI_CPU_ARCH_PROTOCOL instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>BaseAddress</em>&nbsp;</td><td>The physical address that is the start address of a memory region. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Length</em>&nbsp;</td><td>The size in bytes of the memory region. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Attributes</em>&nbsp;</td><td>The bit mask of attributes to set for the memory region.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The attributes were set for the memory region. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ACCESS_DENIED</em>&nbsp;</td><td>The attributes for the memory resource range specified by BaseAddress and Length cannot be modified. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Length is zero. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There are not enough system resources to modify the attributes of the memory resource range. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The processor does not support one or more bytes of the memory resource range specified by BaseAddress and Length. The bit mask of attributes is not support for the memory resource range specified by BaseAddress and Length. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<hr><h2>Enumeration Type Documentation</h2>
-<a class="anchor" name="18c227b7309a5ff2e449bb9ac65e3293"></a><!-- doxytag: member="Cpu.h::EFI_CPU_FLUSH_TYPE" ref="18c227b7309a5ff2e449bb9ac65e3293" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">enum <a class="el" href="../../da/d4e/a01106.html#18c227b7309a5ff2e449bb9ac65e3293">EFI_CPU_FLUSH_TYPE</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-The type of flush operation <dl compact><dt><b>Enumerator: </b></dt><dd>
-<table border="0" cellspacing="2" cellpadding="0">
-<tr><td valign="top"><em><a class="anchor" name="18c227b7309a5ff2e449bb9ac65e329379fde5454ea29c2b5c4c6b69d3c3709a"></a><!-- doxytag: member="EfiCpuFlushTypeWriteBackInvalidate" ref="18c227b7309a5ff2e449bb9ac65e329379fde5454ea29c2b5c4c6b69d3c3709a" args="" -->EfiCpuFlushTypeWriteBackInvalidate</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" name="18c227b7309a5ff2e449bb9ac65e329311e9a626f81532987834afb4d1e2bb92"></a><!-- doxytag: member="EfiCpuFlushTypeWriteBack" ref="18c227b7309a5ff2e449bb9ac65e329311e9a626f81532987834afb4d1e2bb92" args="" -->EfiCpuFlushTypeWriteBack</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" name="18c227b7309a5ff2e449bb9ac65e3293e11a0341aebe080f65b648eda84dbb95"></a><!-- doxytag: member="EfiCpuFlushTypeInvalidate" ref="18c227b7309a5ff2e449bb9ac65e3293e11a0341aebe080f65b648eda84dbb95" args="" -->EfiCpuFlushTypeInvalidate</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" name="18c227b7309a5ff2e449bb9ac65e32933e0748c1db96fc69aeed0e24927fcad2"></a><!-- doxytag: member="EfiCpuMaxFlushType" ref="18c227b7309a5ff2e449bb9ac65e32933e0748c1db96fc69aeed0e24927fcad2" args="" -->EfiCpuMaxFlushType</em>&nbsp;</td><td>
-</td></tr>
-</table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="4dca965ff5f54a9a3404c21d8f4b5bb7"></a><!-- doxytag: member="Cpu.h::EFI_CPU_INIT_TYPE" ref="4dca965ff5f54a9a3404c21d8f4b5bb7" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">enum <a class="el" href="../../da/d4e/a01106.html#4dca965ff5f54a9a3404c21d8f4b5bb7">EFI_CPU_INIT_TYPE</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-The type of processor INIT. <dl compact><dt><b>Enumerator: </b></dt><dd>
-<table border="0" cellspacing="2" cellpadding="0">
-<tr><td valign="top"><em><a class="anchor" name="4dca965ff5f54a9a3404c21d8f4b5bb7f6e158f39d850a9637896655106129ff"></a><!-- doxytag: member="EfiCpuInit" ref="4dca965ff5f54a9a3404c21d8f4b5bb7f6e158f39d850a9637896655106129ff" args="" -->EfiCpuInit</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" name="4dca965ff5f54a9a3404c21d8f4b5bb7a6e3da037aa243754a790320a088108b"></a><!-- doxytag: member="EfiCpuMaxInitType" ref="4dca965ff5f54a9a3404c21d8f4b5bb7a6e3da037aa243754a790320a088108b" args="" -->EfiCpuMaxInitType</em>&nbsp;</td><td>
-</td></tr>
-</table>
-</dl>
-
-</div>
-</div><p>
-<hr><h2>Variable Documentation</h2>
-<a class="anchor" name="620bc84091e4d1a0145b3f3edeba77c3"></a><!-- doxytag: member="Cpu.h::gEfiCpuArchProtocolGuid" ref="620bc84091e4d1a0145b3f3edeba77c3" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../da/d4e/a01106.html#620bc84091e4d1a0145b3f3edeba77c3">gEfiCpuArchProtocolGuid</a>          </td>
+          <td class="memname">#define EFI_DEP_TRUE&nbsp;&nbsp;&nbsp;0x06          </td>
         </tr>
       </table>
 </div>
@@ -431,7 +202,7 @@ The type of processor INIT. <dl compact><dt><b>Enumerator: </b></dt><dd>
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:09 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:25 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

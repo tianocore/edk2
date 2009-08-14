@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_PCI_CAPABILITY_PCIX Struct Reference</title>
+<title>MdePkg[ALL]: EFI_LEGACY_OPROM_EXTENDED_DATA Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,65 +21,66 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_PCI_CAPABILITY_PCIX Struct Reference</h1><!-- doxytag: class="EFI_PCI_CAPABILITY_PCIX" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_LEGACY_OPROM_EXTENDED_DATA Struct Reference</h1><!-- doxytag: class="EFI_LEGACY_OPROM_EXTENDED_DATA" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d72/a00541.html">EFI_PCI_CAPABILITY_HDR</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/deb/a00545.html#aefffff5c45e133f38cdad939aba59e5">Hdr</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/d2a/a00632.html">EFI_STATUS_CODE_DATA</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/deb/a00545.html#39c21d290a80f51cc013dbdae321fde3">DataHeader</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/deb/a00545.html#10b60e1e0e991bf8a6e7fbca34816900">CommandReg</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/deb/a00545.html#069c19cf6bf213376ca513966830780f">DeviceHandle</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/deb/a00545.html#42294c9fdb76f4196841d24a3b92a255">StatusReg</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d95/a01247.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/deb/a00545.html#d79aeccf1947c2a251309372150c66da">RomImageBase</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-PCI-X Capabilities List, Section 7.2, PCI-X Addendum to the PCI Local Bus Specification, Revision 1.0b <hr><h2>Field Documentation</h2>
-<a class="anchor" name="10b60e1e0e991bf8a6e7fbca34816900"></a><!-- doxytag: member="EFI_PCI_CAPABILITY_PCIX::CommandReg" ref="10b60e1e0e991bf8a6e7fbca34816900" args="" -->
+This structure defines extended data describing a legacy option ROM (OpROM).<p>
+The device handle and ROM image base can be used by consumers to determine which option ROM failed. Due to the black-box nature of legacy option ROMs, the amount of information that can be obtained may be limited. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="39c21d290a80f51cc013dbdae321fde3"></a><!-- doxytag: member="EFI_LEGACY_OPROM_EXTENDED_DATA::DataHeader" ref="39c21d290a80f51cc013dbdae321fde3" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d8/deb/a00545.html#10b60e1e0e991bf8a6e7fbca34816900">EFI_PCI_CAPABILITY_PCIX::CommandReg</a>          </td>
+          <td class="memname"><a class="el" href="../../d4/d2a/a00632.html">EFI_STATUS_CODE_DATA</a> <a class="el" href="../../d8/deb/a00545.html#39c21d290a80f51cc013dbdae321fde3">EFI_LEGACY_OPROM_EXTENDED_DATA::DataHeader</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The data header identifying the data. DataHeader.HeaderSize should be sizeof (<a class="el" href="../../d4/d2a/a00632.html">EFI_STATUS_CODE_DATA</a>), DataHeader.Size should be sizeof (<a class="el" href="../../d8/deb/a00545.html">EFI_LEGACY_OPROM_EXTENDED_DATA</a>) - HeaderSize, and DataHeader.Type should be EFI_STATUS_CODE_SPECIFIC_DATA_GUID. 
 </div>
 </div><p>
-<a class="anchor" name="aefffff5c45e133f38cdad939aba59e5"></a><!-- doxytag: member="EFI_PCI_CAPABILITY_PCIX::Hdr" ref="aefffff5c45e133f38cdad939aba59e5" args="" -->
+<a class="anchor" name="069c19cf6bf213376ca513966830780f"></a><!-- doxytag: member="EFI_LEGACY_OPROM_EXTENDED_DATA::DeviceHandle" ref="069c19cf6bf213376ca513966830780f" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dd/d72/a00541.html">EFI_PCI_CAPABILITY_HDR</a> <a class="el" href="../../d8/deb/a00545.html#aefffff5c45e133f38cdad939aba59e5">EFI_PCI_CAPABILITY_PCIX::Hdr</a>          </td>
+          <td class="memname"><a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> <a class="el" href="../../d8/deb/a00545.html#069c19cf6bf213376ca513966830780f">EFI_LEGACY_OPROM_EXTENDED_DATA::DeviceHandle</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The handle corresponding to the device that this legacy option ROM is being invoked. 
 </div>
 </div><p>
-<a class="anchor" name="42294c9fdb76f4196841d24a3b92a255"></a><!-- doxytag: member="EFI_PCI_CAPABILITY_PCIX::StatusReg" ref="42294c9fdb76f4196841d24a3b92a255" args="" -->
+<a class="anchor" name="d79aeccf1947c2a251309372150c66da"></a><!-- doxytag: member="EFI_LEGACY_OPROM_EXTENDED_DATA::RomImageBase" ref="d79aeccf1947c2a251309372150c66da" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d8/deb/a00545.html#42294c9fdb76f4196841d24a3b92a255">EFI_PCI_CAPABILITY_PCIX::StatusReg</a>          </td>
+          <td class="memname"><a class="el" href="../../dd/d95/a01247.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> <a class="el" href="../../d8/deb/a00545.html#d79aeccf1947c2a251309372150c66da">EFI_LEGACY_OPROM_EXTENDED_DATA::RomImageBase</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The base address of the shadowed legacy ROM image. May or may not point to the shadow RAM area. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:37 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

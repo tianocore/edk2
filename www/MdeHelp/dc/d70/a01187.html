@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Uefi/UefiGpt.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Protocol/HiiConfigRouting.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,55 +21,285 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Uefi/UefiGpt.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Protocol/HiiConfigRouting.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d87/a00539.html">EFI_PARTITION_TABLE_HEADER</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d5a/a00538.html">EFI_PARTITION_ENTRY</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d32/a00041.html">_EFI_HII_CONFIG_ROUTING_PROTOCOL</a></td></tr>
 
 <tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d70/a01187.html#20b9ea1632791ee3b4e833dcbf523f24">PRIMARY_PART_HEADER_LBA</a>&nbsp;&nbsp;&nbsp;1</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d70/a01187.html#412496e367e27e2942ba93c8484cc1c1">EFI_HII_CONFIG_ROUTING_PROTOCOL_GUID</a>&nbsp;&nbsp;&nbsp;{ 0x587e72d7, 0xcc50, 0x4f79, { 0x82, 0x09, 0xca, 0x29, 0x1f, 0xc1, 0xa1, 0x0f } }</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d70/a01187.html#b87b5bfa9fb50d80656e580b5d80977c">EFI_PTAB_HEADER_ID</a>&nbsp;&nbsp;&nbsp;SIGNATURE_64 ('E','F','I',' ','P','A','R','T')</td></tr>
+<tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
+<a class="el" href="../../dd/d32/a00041.html">_EFI_HII_CONFIG_ROUTING_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d70/a01187.html#c8f91d436bdb4d60305bd8ac4f048d71">EFI_HII_CONFIG_ROUTING_PROTOCOL</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d70/a01187.html#25cc349dd172b46748de4bb9ac830f99">EFI_HII_EXTRACT_CONFIG</a> )(IN CONST <a class="el" href="../../dd/d32/a00041.html">EFI_HII_CONFIG_ROUTING_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> Request, OUT <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> *Progress, OUT <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> *Results)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d70/a01187.html#4838472facb5f1e3f3a556a2311ce68d">EFI_HII_EXPORT_CONFIG</a> )(IN CONST <a class="el" href="../../dd/d32/a00041.html">EFI_HII_CONFIG_ROUTING_PROTOCOL</a> *This, OUT <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> *Results)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d70/a01187.html#2faeac3173240a15246f4978eedfa647">EFI_HII_ROUTE_CONFIG</a> )(IN CONST <a class="el" href="../../dd/d32/a00041.html">EFI_HII_CONFIG_ROUTING_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> Configuration, OUT <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> *Progress)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d70/a01187.html#207cee8ba580de1b89f9c3eb1b1ad232">EFI_HII_BLOCK_TO_CONFIG</a> )(IN CONST <a class="el" href="../../dd/d32/a00041.html">EFI_HII_CONFIG_ROUTING_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> ConfigRequest, IN CONST <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *Block, IN CONST <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> BlockSize, OUT <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> *Config, OUT <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> *Progress)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d70/a01187.html#a931c51de84dea080c6efaeeb8ab1ab5">EFI_HII_CONFIG_TO_BLOCK</a> )(IN CONST <a class="el" href="../../dd/d32/a00041.html">EFI_HII_CONFIG_ROUTING_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> ConfigResp, IN OUT <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *Block, IN OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *BlockSize, OUT <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> *Progress)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d70/a01187.html#6e858bb02ff5bdde0d360d729d4bffaf">EFI_HII_GET_ALT_CFG</a> )(IN CONST <a class="el" href="../../dd/d32/a00041.html">EFI_HII_CONFIG_ROUTING_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> Configuration, IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN CONST <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> Name, IN CONST <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> *DevicePath, IN CONST <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> *AltCfgId, OUT <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> *AltCfgResp)</td></tr>
+
+<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d70/a01187.html#b3f3783e476c8afafd121ddab70343ca">gEfiHiiConfigRoutingProtocolGuid</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-EFI Guid Partition Table Format Definition.<p>
-Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
+The file provides services to manage the movement of configuration data from drivers to configuration applications. It then serves as the single point to receive configuration information from configuration applications, routing the results to the appropriate drivers.<p>
+Copyright (c) 2006 - 2009, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
-<a class="anchor" name="b87b5bfa9fb50d80656e580b5d80977c"></a><!-- doxytag: member="UefiGpt.h::EFI_PTAB_HEADER_ID" ref="b87b5bfa9fb50d80656e580b5d80977c" args="" -->
+<a class="anchor" name="412496e367e27e2942ba93c8484cc1c1"></a><!-- doxytag: member="HiiConfigRouting.h::EFI_HII_CONFIG_ROUTING_PROTOCOL_GUID" ref="412496e367e27e2942ba93c8484cc1c1" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_PTAB_HEADER_ID&nbsp;&nbsp;&nbsp;SIGNATURE_64 ('E','F','I',' ','P','A','R','T')          </td>
+          <td class="memname">#define EFI_HII_CONFIG_ROUTING_PROTOCOL_GUID&nbsp;&nbsp;&nbsp;{ 0x587e72d7, 0xcc50, 0x4f79, { 0x82, 0x09, 0xca, 0x29, 0x1f, 0xc1, 0xa1, 0x0f } }          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-EFI Partition Table Signature: "EFI PART" 
+
 </div>
 </div><p>
-<a class="anchor" name="20b9ea1632791ee3b4e833dcbf523f24"></a><!-- doxytag: member="UefiGpt.h::PRIMARY_PART_HEADER_LBA" ref="20b9ea1632791ee3b4e833dcbf523f24" args="" -->
+<hr><h2>Typedef Documentation</h2>
+<a class="anchor" name="207cee8ba580de1b89f9c3eb1b1ad232"></a><!-- doxytag: member="HiiConfigRouting.h::EFI_HII_BLOCK_TO_CONFIG" ref="207cee8ba580de1b89f9c3eb1b1ad232" args=")(IN CONST EFI_HII_CONFIG_ROUTING_PROTOCOL *This, IN CONST EFI_STRING ConfigRequest, IN CONST UINT8 *Block, IN CONST UINTN BlockSize, OUT EFI_STRING *Config, OUT EFI_STRING *Progress)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define PRIMARY_PART_HEADER_LBA&nbsp;&nbsp;&nbsp;1          </td>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../dc/d70/a01187.html#207cee8ba580de1b89f9c3eb1b1ad232">EFI_HII_BLOCK_TO_CONFIG</a>)(IN CONST <a class="el" href="../../dd/d32/a00041.html">EFI_HII_CONFIG_ROUTING_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> ConfigRequest, IN CONST <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *Block, IN CONST <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> BlockSize, OUT <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> *Config, OUT <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> *Progress)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The primary <a class="el" href="../../d9/d0f/a00644.html">GUID</a> Partition Table Header must be located in LBA 1 (i.e., the second logical block). 
+This function extracts the current configuration from a block of bytes. To do so, it requires that the ConfigRequest string consists of a list of &lt;BlockName&gt; formatted names. It uses the offset in the name to determine the index into the Block to start the extraction and the width of each name to determine the number of bytes to extract. These are mapped to a UNICODE value using the equivalent of the C "%x" format (with optional leading spaces). The call fails if, for any (offset, width) pair in ConfigRequest, offset+value &gt;= BlockSize.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Points to the EFI_HII_CONFIG_ROUTING_PROTOCOL instance.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ConfigRequest</em>&nbsp;</td><td>A null-terminated Unicode string in &lt;ConfigRequest&gt; format.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Block</em>&nbsp;</td><td>Array of bytes defining the block's configuration.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>BlockSize</em>&nbsp;</td><td>Length in bytes of Block.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Config</em>&nbsp;</td><td>Filled-in configuration string. String allocated by the function. Returned only if call is successful.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Progress</em>&nbsp;</td><td>A pointer to a string filled in with the offset of the most recent '&amp;' before the first failing name / value pair (or the beginning of the string if the failure is in the first name / value pair) or the terminating NULL if all was successful.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The request succeeded. Progress points to the null terminator at the end of the ConfigRequest string.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>Not enough memory to allocate Config. Progress points to the first character of ConfigRequest.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETERS</em>&nbsp;</td><td>Passing in a NULL for the ConfigRequest or Block parameter would result in this type of error. Progress points to the first character of ConfigRequest.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>Target for the specified routing data was not found. Progress points to the 'G' in "GUID" of the errant routing data. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>Block not large enough. Progress undefined.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Encountered non &lt;BlockName&gt; formatted string. Block is left updated and Progress points at the '&amp;' preceding the first non-&lt;BlockName&gt;. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="c8f91d436bdb4d60305bd8ac4f048d71"></a><!-- doxytag: member="HiiConfigRouting.h::EFI_HII_CONFIG_ROUTING_PROTOCOL" ref="c8f91d436bdb4d60305bd8ac4f048d71" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct <a class="el" href="../../dd/d32/a00041.html">_EFI_HII_CONFIG_ROUTING_PROTOCOL</a> <a class="el" href="../../dd/d32/a00041.html">EFI_HII_CONFIG_ROUTING_PROTOCOL</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="a931c51de84dea080c6efaeeb8ab1ab5"></a><!-- doxytag: member="HiiConfigRouting.h::EFI_HII_CONFIG_TO_BLOCK" ref="a931c51de84dea080c6efaeeb8ab1ab5" args=")(IN CONST EFI_HII_CONFIG_ROUTING_PROTOCOL *This, IN CONST EFI_STRING ConfigResp, IN OUT UINT8 *Block, IN OUT UINTN *BlockSize, OUT EFI_STRING *Progress)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../dc/d70/a01187.html#a931c51de84dea080c6efaeeb8ab1ab5">EFI_HII_CONFIG_TO_BLOCK</a>)(IN CONST <a class="el" href="../../dd/d32/a00041.html">EFI_HII_CONFIG_ROUTING_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> ConfigResp, IN OUT <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *Block, IN OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *BlockSize, OUT <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> *Progress)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function maps a configuration containing a series of &lt;BlockConfig&gt; formatted name value pairs in ConfigResp into a Block so it may be stored in a linear mapped storage such as a UEFI Variable. If present, the function skips <a class="el" href="../../d1/d87/a00689.html">GUID</a>, NAME, and PATH in &lt;ConfigResp&gt;. It stops when it finds a non-&lt;BlockConfig&gt; name / value pair (after skipping the routing header) or when it reaches the end of the string. Example Assume an existing block containing: 00 01 02 03 04 05 And the ConfigResp string is: OFFSET=4&amp;WIDTH=1&amp;VALUE=7&amp;OFFSET=0&amp;WIDTH=2&amp;VALUE=AA55 The results are 55 AA 02 07 04 05<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Points to the EFI_HII_CONFIG_ROUTING_PROTOCOL instance.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ConfigResp</em>&nbsp;</td><td>A null-terminated Unicode string in &lt;ConfigResp&gt; format.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Block</em>&nbsp;</td><td>A possibly null array of bytes representing the current block. Only bytes referenced in the ConfigResp string in the block are modified. If this parameter is null or if the BlockLength parameter is (on input) shorter than required by the Configuration string, only the BlockSize parameter is updated and an appropriate status (see below) is returned.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>BlockSize</em>&nbsp;</td><td>The length of the Block in units of UINT8. On input, this is the size of the Block. On output, if successful, contains the index of the last modified byte in the Block.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Progress</em>&nbsp;</td><td>On return, points to an element of the ConfigResp string filled in with the offset of the most recent "&amp;" before the first failing name / value pair (or the beginning of the string if the failure is in the first name / value pair) or the terminating NULL if all was successful.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The request succeeded. Progress points to the null terminator at the end of the ConfigResp string. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>Not enough memory to allocate Config. Progress points to the first character of ConfigResp. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Passing in a NULL for the ConfigResp or Block parameter would result in this type of error. Progress points to the first character of ConfigResp. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Encountered non &lt;BlockName&gt; formatted name / value pair. Block is left updated and Progress points at the '&amp;' preceding the first non-&lt;BlockName&gt;. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="4838472facb5f1e3f3a556a2311ce68d"></a><!-- doxytag: member="HiiConfigRouting.h::EFI_HII_EXPORT_CONFIG" ref="4838472facb5f1e3f3a556a2311ce68d" args=")(IN CONST EFI_HII_CONFIG_ROUTING_PROTOCOL *This, OUT EFI_STRING *Results)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../dc/d70/a01187.html#4838472facb5f1e3f3a556a2311ce68d">EFI_HII_EXPORT_CONFIG</a>)(IN CONST <a class="el" href="../../dd/d32/a00041.html">EFI_HII_CONFIG_ROUTING_PROTOCOL</a> *This, OUT <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> *Results)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function allows the caller to request the current configuration for all of the current HII database. The results include both the current and alternate configurations as described in ExtractConfig() above. Implementation note: This call has deceptively few inputs but the implementation is likely to be somewhat complex. The requirement is to scan all IFR in the HII database to determine the list of names and then request the configuration using the corresponding drivers. <a class="el" href="../../db/d3a/a00040.html#e76c72576f28f1faa8de76c7a88b9a09">EFI_HII_CONFIG_ACCESS_PROTOCOL.ExtractConfig()</a> interfaces below.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Points to the EFI_HII_CONFIG_ROUTING_PROTOCOL instance.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Results</em>&nbsp;</td><td>A null-terminated Unicode string in &lt;MultiConfigAltResp&gt; format which has all values filled in for the names in the Request string. String to be allocated by this function. De-allocation is up to the caller.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The Results string is filled with the values corresponding to all requested names.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>Not enough memory to store the parts of the results that must be stored awaiting possible future protocols.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETERS</em>&nbsp;</td><td>For example, passing in a NULL for the Results parameter would result in this type of error. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="25cc349dd172b46748de4bb9ac830f99"></a><!-- doxytag: member="HiiConfigRouting.h::EFI_HII_EXTRACT_CONFIG" ref="25cc349dd172b46748de4bb9ac830f99" args=")(IN CONST EFI_HII_CONFIG_ROUTING_PROTOCOL *This, IN CONST EFI_STRING Request, OUT EFI_STRING *Progress, OUT EFI_STRING *Results)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../dc/d70/a01187.html#25cc349dd172b46748de4bb9ac830f99">EFI_HII_EXTRACT_CONFIG</a>)(IN CONST <a class="el" href="../../dd/d32/a00041.html">EFI_HII_CONFIG_ROUTING_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> Request, OUT <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> *Progress, OUT <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> *Results)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function allows the caller to request the current configuration for one or more named elements from one or more drivers. The resulting string is in the standard HII configuration string format. If Successful Results contains an equivalent string with "=" and the values associated with all names added in. The expected implementation is for each &lt;ConfigRequest&gt; substring in the Request, call the HII Configuration Routing Protocol ExtractProtocol function for the driver corresponding to the &lt;ConfigHdr&gt; at the start of the &lt;ConfigRequest&gt; substring. The request fails if no driver matches the &lt;ConfigRequest&gt; substring. Note: Alternative configuration strings may also be appended to the end of the current configuration string. If they are, they must appear after the current configuration. They must contain the same routing (<a class="el" href="../../d1/d87/a00689.html">GUID</a>, NAME, PATH) as the current configuration string. They must have an additional description indicating the type of alternative configuration the string represents, "ALTCFG=&lt;StringToken&gt;". That &lt;StringToken&gt; (when converted from Hex UNICODE to binary) is a reference to a string in the associated string pack. As an example, assume that the Request string is: GUID=...&amp;NAME=00480050&amp;PATH=...&amp;Fred&amp;George&amp;Ron&amp;Neville A result might be: GUID=...&amp;NAME=00480050&amp;PATH=...&amp;Fred=16&amp;George=16&amp;Ron=12&amp;Neville=11&amp; GUID=...&amp;NAME=00480050&amp;PATH=...&amp;ALTCFG=0037&amp;Fred=12&amp;Neville=7<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Points to the EFI_HII_CONFIG_ROUTING_PROTOCOL instance.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Request</em>&nbsp;</td><td>A null-terminated Unicode string in &lt;MultiConfigRequest&gt; format.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Progress</em>&nbsp;</td><td>On return, points to a character in the Request string. Points to the string's null terminator if request was successful. Points to the most recent '&amp;' before the first failing name / value pair (or the beginning of the string if the failure is in the first name / value pair) if the request was not successful</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Results</em>&nbsp;</td><td>Null-terminated Unicode string in &lt;MultiConfigAltResp&gt; format which has all values filled in for the names in the Request string. String to be allocated by the called function.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The Results string is filled with the values corresponding to all requested names.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>Not enough memory to store the parts of the results that must be stored awaiting possible future protocols.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>For example, passing in a NULL for the Request parameter would result in this type of error. The Progress parameter is set to NULL.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>Routing data doesn't match any known driver. Progress set to the "G" in "GUID" of the routing header that doesn't match. Note: There is no requirement that all routing data be validated before any configuration extraction.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Illegal syntax. Progress set to most recent &amp; before the error or the beginning of the string. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Unknown name. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="6e858bb02ff5bdde0d360d729d4bffaf"></a><!-- doxytag: member="HiiConfigRouting.h::EFI_HII_GET_ALT_CFG" ref="6e858bb02ff5bdde0d360d729d4bffaf" args=")(IN CONST EFI_HII_CONFIG_ROUTING_PROTOCOL *This, IN CONST EFI_STRING Configuration, IN CONST EFI_GUID *Guid, IN CONST EFI_STRING Name, IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePath, IN CONST UINT16 *AltCfgId, OUT EFI_STRING *AltCfgResp)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../dc/d70/a01187.html#6e858bb02ff5bdde0d360d729d4bffaf">EFI_HII_GET_ALT_CFG</a>)(IN CONST <a class="el" href="../../dd/d32/a00041.html">EFI_HII_CONFIG_ROUTING_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> Configuration, IN CONST <a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> *Guid, IN CONST <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> Name, IN CONST <a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> *DevicePath, IN CONST <a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> *AltCfgId, OUT <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> *AltCfgResp)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This helper function is to be called by drivers to extract portions of a larger configuration string.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_HII_CONFIG_ROUTING_PROTOCOL instance. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Configuration</em>&nbsp;</td><td>A null-terminated Unicode string in &lt;MultiConfigAltResp&gt; format. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Guid</em>&nbsp;</td><td>A pointer to the <a class="el" href="../../d1/d87/a00689.html">GUID</a> value to search for in the routing portion of the ConfigResp string when retrieving the requested data. If Guid is NULL, then all <a class="el" href="../../d1/d87/a00689.html">GUID</a> values will be searched for. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Name</em>&nbsp;</td><td>A pointer to the NAME value to search for in the routing portion of the ConfigResp string when retrieving the requested data. If Name is NULL, then all Name values will be searched for. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>DevicePath</em>&nbsp;</td><td>A pointer to the PATH value to search for in the routing portion of the ConfigResp string when retrieving the requested data. If DevicePath is NULL, then all DevicePath values will be searched for. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>AltCfgId</em>&nbsp;</td><td>A pointer to the ALTCFG value to search for in the routing portion of the ConfigResp string when retrieving the requested data. If this parameter is NULL, then the current setting will be retrieved. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>AltCfgResp</em>&nbsp;</td><td>A pointer to a buffer which will be allocated by the function which contains the retrieved string as requested. This buffer is only allocated if the call was successful.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The request succeeded. The requested data was extracted and placed in the newly allocated AltCfgResp buffer. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>Not enough memory to allocate AltCfgResp. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Any parameter is invalid. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>Target for the specified routing data was not found. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="2faeac3173240a15246f4978eedfa647"></a><!-- doxytag: member="HiiConfigRouting.h::EFI_HII_ROUTE_CONFIG" ref="2faeac3173240a15246f4978eedfa647" args=")(IN CONST EFI_HII_CONFIG_ROUTING_PROTOCOL *This, IN CONST EFI_STRING Configuration, OUT EFI_STRING *Progress)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../dc/d70/a01187.html#2faeac3173240a15246f4978eedfa647">EFI_HII_ROUTE_CONFIG</a>)(IN CONST <a class="el" href="../../dd/d32/a00041.html">EFI_HII_CONFIG_ROUTING_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> Configuration, OUT <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> *Progress)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+This function routes the results of processing forms to the appropriate targets. It scans for &lt;ConfigHdr&gt; within the string and passes the header and subsequent body to the driver whose location is described in the &lt;ConfigHdr&gt;. Many &lt;ConfigHdr&gt;s may appear as a single request. The expected implementation is to hand off the various &lt;ConfigResp&gt; substrings to the Configuration Access Protocol RouteConfig routine corresponding to the driver whose routing information is defined by the &lt;ConfigHdr&gt; in turn.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Points to the EFI_HII_CONFIG_ROUTING_PROTOCOL instance.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Configuration</em>&nbsp;</td><td>A null-terminated Unicode string in &lt;MulltiConfigResp&gt; format.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Progress</em>&nbsp;</td><td>A pointer to a string filled in with the offset of the most recent '&amp;' before the first failing name / value pair (or the beginning of the string if the failure is in the first name / value pair) or the terminating NULL if all was successful.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The results have been distributed or are awaiting distribution.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>Not enough memory to store the parts of the results that must be stored awaiting possible future protocols.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETERS</em>&nbsp;</td><td>Passing in a NULL for the Results parameter would result in this type of error.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>Target for the specified routing data was not found </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<hr><h2>Variable Documentation</h2>
+<a class="anchor" name="b3f3783e476c8afafd121ddab70343ca"></a><!-- doxytag: member="HiiConfigRouting.h::gEfiHiiConfigRoutingProtocolGuid" ref="b3f3783e476c8afafd121ddab70343ca" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../dc/d70/a01187.html#b3f3783e476c8afafd121ddab70343ca">gEfiHiiConfigRoutingProtocolGuid</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:11 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:33 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

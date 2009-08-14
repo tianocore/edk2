@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_WIDE_GLYPH Struct Reference</title>
+<title>MdePkg[ALL]: EFI_STATUS_CODE_START_EXTENDED_DATA Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,98 +21,100 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_WIDE_GLYPH Struct Reference</h1><!-- doxytag: class="EFI_WIDE_GLYPH" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_STATUS_CODE_START_EXTENDED_DATA Struct Reference</h1><!-- doxytag: class="EFI_STATUS_CODE_START_EXTENDED_DATA" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/ddc/a00636.html#499731044fbc806e8ed259be0151ad0f">UnicodeWeight</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/d2a/a00632.html">EFI_STATUS_CODE_DATA</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/ddc/a00636.html#0cb3512049688bb3b10a4183b2697ff4">DataHeader</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/ddc/a00636.html#f19231fda55963ac72bb3a72c0753e34">Attributes</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/ddc/a00636.html#3699326875cd74e19c7628f38b8f72b2">ControllerHandle</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/ddc/a00636.html#e19966dc8e5f5b61a974d3e75899c37d">GlyphCol1</a> [EFI_GLYPH_HEIGHT]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/ddc/a00636.html#46ef04587e0a411a5fd3c96f327974f3">DriverBindingHandle</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/ddc/a00636.html#4086c94dacf4cfd573abae3324c6cfbe">GlyphCol2</a> [EFI_GLYPH_HEIGHT]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/ddc/a00636.html#331b9bc38e17a6ad83f423166a5631f1">DevicePathSize</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/ddc/a00636.html#cf1d3ae48abbe4675c9e9f6f527f1228">Pad</a> [3]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/ddc/a00636.html#a35577f9731dcd454f5bd59b8684f847">RemainingDevicePath</a></td></tr>
 
 </table>
-<hr><h2>Field Documentation</h2>
-<a class="anchor" name="f19231fda55963ac72bb3a72c0753e34"></a><!-- doxytag: member="EFI_WIDE_GLYPH::Attributes" ref="f19231fda55963ac72bb3a72c0753e34" args="" -->
+<hr><a name="_details"></a><h2>Detailed Description</h2>
+This structure defines extended data describing a call to a driver binding protocol start function.<p>
+This extended data records information about a Start() function call. Start() is a member of the UEFI Driver Binding Protocol. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="3699326875cd74e19c7628f38b8f72b2"></a><!-- doxytag: member="EFI_STATUS_CODE_START_EXTENDED_DATA::ControllerHandle" ref="3699326875cd74e19c7628f38b8f72b2" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../db/ddc/a00636.html#f19231fda55963ac72bb3a72c0753e34">EFI_WIDE_GLYPH::Attributes</a>          </td>
+          <td class="memname"><a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> <a class="el" href="../../db/ddc/a00636.html#3699326875cd74e19c7628f38b8f72b2">EFI_STATUS_CODE_START_EXTENDED_DATA::ControllerHandle</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The controller handle. 
 </div>
 </div><p>
-<a class="anchor" name="e19966dc8e5f5b61a974d3e75899c37d"></a><!-- doxytag: member="EFI_WIDE_GLYPH::GlyphCol1" ref="e19966dc8e5f5b61a974d3e75899c37d" args="[EFI_GLYPH_HEIGHT]" -->
+<a class="anchor" name="0cb3512049688bb3b10a4183b2697ff4"></a><!-- doxytag: member="EFI_STATUS_CODE_START_EXTENDED_DATA::DataHeader" ref="0cb3512049688bb3b10a4183b2697ff4" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../db/ddc/a00636.html#e19966dc8e5f5b61a974d3e75899c37d">EFI_WIDE_GLYPH::GlyphCol1</a>[EFI_GLYPH_HEIGHT]          </td>
+          <td class="memname"><a class="el" href="../../d4/d2a/a00632.html">EFI_STATUS_CODE_DATA</a> <a class="el" href="../../db/ddc/a00636.html#0cb3512049688bb3b10a4183b2697ff4">EFI_STATUS_CODE_START_EXTENDED_DATA::DataHeader</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The data header identifying the data. DataHeader.HeaderSize should be sizeof (<a class="el" href="../../d4/d2a/a00632.html">EFI_STATUS_CODE_DATA</a>), DataHeader.Size should be sizeof (<a class="el" href="../../db/ddc/a00636.html">EFI_STATUS_CODE_START_EXTENDED_DATA</a>) - HeaderSize, and DataHeader.Type should be EFI_STATUS_CODE_SPECIFIC_DATA_GUID. 
 </div>
 </div><p>
-<a class="anchor" name="4086c94dacf4cfd573abae3324c6cfbe"></a><!-- doxytag: member="EFI_WIDE_GLYPH::GlyphCol2" ref="4086c94dacf4cfd573abae3324c6cfbe" args="[EFI_GLYPH_HEIGHT]" -->
+<a class="anchor" name="331b9bc38e17a6ad83f423166a5631f1"></a><!-- doxytag: member="EFI_STATUS_CODE_START_EXTENDED_DATA::DevicePathSize" ref="331b9bc38e17a6ad83f423166a5631f1" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../db/ddc/a00636.html#4086c94dacf4cfd573abae3324c6cfbe">EFI_WIDE_GLYPH::GlyphCol2</a>[EFI_GLYPH_HEIGHT]          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../db/ddc/a00636.html#331b9bc38e17a6ad83f423166a5631f1">EFI_STATUS_CODE_START_EXTENDED_DATA::DevicePathSize</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The size of the RemainingDevicePath. It is zero if the Start() function is called with RemainingDevicePath = NULL. The UEFI Specification allows that the Start() function of bus drivers can be called in this way. 
 </div>
 </div><p>
-<a class="anchor" name="cf1d3ae48abbe4675c9e9f6f527f1228"></a><!-- doxytag: member="EFI_WIDE_GLYPH::Pad" ref="cf1d3ae48abbe4675c9e9f6f527f1228" args="[3]" -->
+<a class="anchor" name="46ef04587e0a411a5fd3c96f327974f3"></a><!-- doxytag: member="EFI_STATUS_CODE_START_EXTENDED_DATA::DriverBindingHandle" ref="46ef04587e0a411a5fd3c96f327974f3" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../db/ddc/a00636.html#cf1d3ae48abbe4675c9e9f6f527f1228">EFI_WIDE_GLYPH::Pad</a>[3]          </td>
+          <td class="memname"><a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> <a class="el" href="../../db/ddc/a00636.html#46ef04587e0a411a5fd3c96f327974f3">EFI_STATUS_CODE_START_EXTENDED_DATA::DriverBindingHandle</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+The driver binding handle. 
 </div>
 </div><p>
-<a class="anchor" name="499731044fbc806e8ed259be0151ad0f"></a><!-- doxytag: member="EFI_WIDE_GLYPH::UnicodeWeight" ref="499731044fbc806e8ed259be0151ad0f" args="" -->
+<a class="anchor" name="a35577f9731dcd454f5bd59b8684f847"></a><!-- doxytag: member="EFI_STATUS_CODE_START_EXTENDED_DATA::RemainingDevicePath" ref="a35577f9731dcd454f5bd59b8684f847" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> <a class="el" href="../../db/ddc/a00636.html#499731044fbc806e8ed259be0151ad0f">EFI_WIDE_GLYPH::UnicodeWeight</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>* <a class="el" href="../../db/ddc/a00636.html#a35577f9731dcd454f5bd59b8684f847">EFI_STATUS_CODE_START_EXTENDED_DATA::RemainingDevicePath</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+Matches the RemainingDevicePath parameter being passed to the Start() function. Note that this parameter is the variable-length device path and not a pointer to the device path. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:19 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:45 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

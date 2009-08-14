@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Library/PeiServicesLib.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/IndustryStandard/HighPrecisionEventTimerTable.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,901 +21,87 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Library/PeiServicesLib.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/IndustryStandard/HighPrecisionEventTimerTable.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
-<tr><td colspan="2"><br><h2>Functions</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d26/a01035.html#aee4897374edfcb91b144f682f952e5d">PeiServicesInstallPpi</a> (IN CONST <a class="el" href="../../d2/d50/a00559.html">EFI_PEI_PPI_DESCRIPTOR</a> *PpiList)</td></tr>
+<tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d45/a00382.html">EFI_ACPI_HIGH_PRECISION_EVENT_TIMER_TABLE_HEADER</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d26/a01035.html#dcf9f9ea280950ddc74b940407f96f05">PeiServicesReInstallPpi</a> (IN CONST <a class="el" href="../../d2/d50/a00559.html">EFI_PEI_PPI_DESCRIPTOR</a> *OldPpi, IN CONST <a class="el" href="../../d2/d50/a00559.html">EFI_PEI_PPI_DESCRIPTOR</a> *NewPpi)</td></tr>
+<tr><td colspan="2"><br><h2>Defines</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d26/a01035.html#20811860919389df20815da7cb180f5a">EFI_ACPI_HIGH_PRECISION_EVENT_TIMER_TABLE_REVISION</a>&nbsp;&nbsp;&nbsp;0x01</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d26/a01035.html#68aaa14f29ba22927db39961d63c63d0">PeiServicesLocatePpi</a> (IN CONST <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *Guid, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Instance, IN OUT <a class="el" href="../../d2/d50/a00559.html">EFI_PEI_PPI_DESCRIPTOR</a> **PpiDescriptor, IN OUT VOID **Ppi)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d26/a01035.html#af823e3006a255f93aad0e89ef5fa2d8">EFI_ACPI_NO_PAGE_PROTECTION</a>&nbsp;&nbsp;&nbsp;0</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d26/a01035.html#8e525d6f46bb4325e64d6da0dc4c97de">PeiServicesNotifyPpi</a> (IN CONST <a class="el" href="../../dc/d98/a00225.html">EFI_PEI_NOTIFY_DESCRIPTOR</a> *NotifyList)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d26/a01035.html#c964bab344ca7902a8f5409dfa9fd664">EFI_ACPI_4KB_PAGE_PROTECTION</a>&nbsp;&nbsp;&nbsp;1</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d26/a01035.html#18351fd6a39e907d7b1fe6141c28293e">PeiServicesGetBootMode</a> (OUT <a class="el" href="../../dc/d19/a01056.html#30cd764e34dd311a5197ea5bcd09b579">EFI_BOOT_MODE</a> *BootMode)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d26/a01035.html#e3af34734073d018f3c82865faf4b006">PeiServicesSetBootMode</a> (IN <a class="el" href="../../dc/d19/a01056.html#30cd764e34dd311a5197ea5bcd09b579">EFI_BOOT_MODE</a> BootMode)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d26/a01035.html#18c78f228b47469f2ad6b9a68fda8578">PeiServicesGetHobList</a> (OUT VOID **HobList)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d26/a01035.html#3599d0a12eddfe44e4356369baf2c02f">PeiServicesCreateHob</a> (IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> Type, IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> Length, OUT VOID **Hob)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d26/a01035.html#18322a984b4de8e088e912fc2046d427">PeiServicesFfsFindNextVolume</a> (IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Instance, IN OUT <a class="el" href="../../de/de6/a01063.html#a91cb3539cfb2742ee94c7bd0ab1e702">EFI_PEI_FV_HANDLE</a> *VolumeHandle)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d26/a01035.html#4efda59e48032c6f66fc34d6895c2df4">PeiServicesFfsFindNextFile</a> (IN <a class="el" href="../../d0/d90/a01059.html#a8c9898a7322417d167ff078bcde1f2b">EFI_FV_FILETYPE</a> SearchType, IN <a class="el" href="../../de/de6/a01063.html#a91cb3539cfb2742ee94c7bd0ab1e702">EFI_PEI_FV_HANDLE</a> VolumeHandle, IN OUT <a class="el" href="../../de/de6/a01063.html#98129642fe8f4e1c925ae7d76995fd56">EFI_PEI_FILE_HANDLE</a> *FileHandle)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d26/a01035.html#14a5b5f5aea9eb830792b6035e1c5b54">PeiServicesFfsFindSectionData</a> (IN <a class="el" href="../../d0/d90/a01059.html#208180af3108068f979d673a752e58d1">EFI_SECTION_TYPE</a> SectionType, IN <a class="el" href="../../de/de6/a01063.html#98129642fe8f4e1c925ae7d76995fd56">EFI_PEI_FILE_HANDLE</a> FileHandle, OUT VOID **SectionData)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d26/a01035.html#8d332c14602d2edce51e681c8f8c87ce">PeiServicesInstallPeiMemory</a> (IN <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> MemoryBegin, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> MemoryLength)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d26/a01035.html#a340a54439edd773478ac42659d84411">PeiServicesAllocatePages</a> (IN <a class="el" href="../../d3/d10/a01189.html#0e2cdd0290e753cca604d3977cbe8bb9">EFI_MEMORY_TYPE</a> MemoryType, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Pages, OUT <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> *Memory)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d26/a01035.html#2ceb5d99b20d531dc334f6b333b84296">PeiServicesAllocatePool</a> (IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Size, OUT VOID **Buffer)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d26/a01035.html#89b4cfe23ba5e92e2542ba5c9decd3d6">PeiServicesResetSystem</a> (VOID)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d26/a01035.html#7ed50a2079619d0daaa485a82561bae9">PeiServicesFfsFindFileByName</a> (IN CONST <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *FileName, IN CONST <a class="el" href="../../de/de6/a01063.html#a91cb3539cfb2742ee94c7bd0ab1e702">EFI_PEI_FV_HANDLE</a> VolumeHandle, OUT <a class="el" href="../../de/de6/a01063.html#98129642fe8f4e1c925ae7d76995fd56">EFI_PEI_FILE_HANDLE</a> *FileHandle)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d26/a01035.html#05e6c32644be95cecd764b520f7d4ee2">PeiServicesFfsGetFileInfo</a> (IN CONST <a class="el" href="../../de/de6/a01063.html#98129642fe8f4e1c925ae7d76995fd56">EFI_PEI_FILE_HANDLE</a> FileHandle, OUT <a class="el" href="../../d9/dd5/a00432.html">EFI_FV_FILE_INFO</a> *FileInfo)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d26/a01035.html#fc87bfddc35a5723e0b0a58551265005">PeiServicesFfsGetVolumeInfo</a> (IN <a class="el" href="../../de/de6/a01063.html#a91cb3539cfb2742ee94c7bd0ab1e702">EFI_PEI_FV_HANDLE</a> VolumeHandle, OUT <a class="el" href="../../dd/d07/a00433.html">EFI_FV_INFO</a> *VolumeInfo)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d26/a01035.html#e9c8888a7323893b1aaef85d6ed5ebaa">PeiServicesRegisterForShadow</a> (IN <a class="el" href="../../de/de6/a01063.html#98129642fe8f4e1c925ae7d76995fd56">EFI_PEI_FILE_HANDLE</a> FileHandle)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d26/a01035.html#d91587af0cdf7d5ea124459339057d79">PeiServicesInstallFvInfoPpi</a> (IN CONST <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *FvFormat, IN CONST VOID *FvInfo, IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> FvInfoSize, IN CONST <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *ParentFvName, IN CONST <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *ParentFileName)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d26/a01035.html#d506bb45315ec2672c9c84c13c1cbd37">EFI_ACPI_64KB_PAGE_PROTECTION</a>&nbsp;&nbsp;&nbsp;2</td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Provides library functions for all PEI Services.<p>
-Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Function Documentation</h2>
-<a class="anchor" name="a340a54439edd773478ac42659d84411"></a><!-- doxytag: member="PeiServicesLib.h::PeiServicesAllocatePages" ref="a340a54439edd773478ac42659d84411" args="(IN EFI_MEMORY_TYPE MemoryType, IN UINTN Pages, OUT EFI_PHYSICAL_ADDRESS *Memory)" -->
+ACPI high precision event timer table definition, at www.intel.com Specification name is IA-PC HPET (High Precision Event Timers) Specification.<p>
+Copyright (c) 2007 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
+<a class="anchor" name="c964bab344ca7902a8f5409dfa9fd664"></a><!-- doxytag: member="HighPrecisionEventTimerTable.h::EFI_ACPI_4KB_PAGE_PROTECTION" ref="c964bab344ca7902a8f5409dfa9fd664" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI PeiServicesAllocatePages           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d3/d10/a01189.html#0e2cdd0290e753cca604d3977cbe8bb9">EFI_MEMORY_TYPE</a>&nbsp;</td>
-          <td class="paramname"> <em>MemoryType</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>Pages</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> *&nbsp;</td>
-          <td class="paramname"> <em>Memory</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EFI_ACPI_4KB_PAGE_PROTECTION&nbsp;&nbsp;&nbsp;1          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-This service enables PEIMs to allocate memory after the permanent memory has been installed by a PEIM.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>MemoryType</em>&nbsp;</td><td>Type of memory to allocate. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Pages</em>&nbsp;</td><td>Number of pages to allocate. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Memory</em>&nbsp;</td><td>Pointer of memory allocated.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The memory range was successfully allocated. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Type is not equal to AllocateAnyPages. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_AVAILABLE_YET</em>&nbsp;</td><td>Called with permanent memory not available. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>The pages could not be allocated. </td></tr>
-  </table>
-</dl>
 
 </div>
 </div><p>
-<a class="anchor" name="2ceb5d99b20d531dc334f6b333b84296"></a><!-- doxytag: member="PeiServicesLib.h::PeiServicesAllocatePool" ref="2ceb5d99b20d531dc334f6b333b84296" args="(IN UINTN Size, OUT VOID **Buffer)" -->
+<a class="anchor" name="d506bb45315ec2672c9c84c13c1cbd37"></a><!-- doxytag: member="HighPrecisionEventTimerTable.h::EFI_ACPI_64KB_PAGE_PROTECTION" ref="d506bb45315ec2672c9c84c13c1cbd37" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI PeiServicesAllocatePool           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>Size</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT VOID **&nbsp;</td>
-          <td class="paramname"> <em>Buffer</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EFI_ACPI_64KB_PAGE_PROTECTION&nbsp;&nbsp;&nbsp;2          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-This service allocates memory from the Hand-Off Block (HOB) heap.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Size</em>&nbsp;</td><td>The number of bytes to allocate from the pool. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>If the call succeeds, a pointer to a pointer to the allocate buffer; undefined otherwise.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The allocation was successful </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There is not enough heap to allocate the requested size. </td></tr>
-  </table>
-</dl>
 
 </div>
 </div><p>
-<a class="anchor" name="3599d0a12eddfe44e4356369baf2c02f"></a><!-- doxytag: member="PeiServicesLib.h::PeiServicesCreateHob" ref="3599d0a12eddfe44e4356369baf2c02f" args="(IN UINT16 Type, IN UINT16 Length, OUT VOID **Hob)" -->
+<a class="anchor" name="20811860919389df20815da7cb180f5a"></a><!-- doxytag: member="HighPrecisionEventTimerTable.h::EFI_ACPI_HIGH_PRECISION_EVENT_TIMER_TABLE_REVISION" ref="20811860919389df20815da7cb180f5a" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI PeiServicesCreateHob           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
-          <td class="paramname"> <em>Type</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
-          <td class="paramname"> <em>Length</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT VOID **&nbsp;</td>
-          <td class="paramname"> <em>Hob</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EFI_ACPI_HIGH_PRECISION_EVENT_TIMER_TABLE_REVISION&nbsp;&nbsp;&nbsp;0x01          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-This service enables PEIMs to create various types of HOBs.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Type</em>&nbsp;</td><td>The type of HOB to be installed. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Length</em>&nbsp;</td><td>The length of the HOB to be added. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Hob</em>&nbsp;</td><td>The address of a pointer that will contain the HOB header.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The HOB was successfully created. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There is no additional space for HOB creation. </td></tr>
-  </table>
-</dl>
-
+HPET Revision (defined in spec) 
 </div>
 </div><p>
-<a class="anchor" name="7ed50a2079619d0daaa485a82561bae9"></a><!-- doxytag: member="PeiServicesLib.h::PeiServicesFfsFindFileByName" ref="7ed50a2079619d0daaa485a82561bae9" args="(IN CONST EFI_GUID *FileName, IN CONST EFI_PEI_FV_HANDLE VolumeHandle, OUT EFI_PEI_FILE_HANDLE *FileHandle)" -->
+<a class="anchor" name="af823e3006a255f93aad0e89ef5fa2d8"></a><!-- doxytag: member="HighPrecisionEventTimerTable.h::EFI_ACPI_NO_PAGE_PROTECTION" ref="af823e3006a255f93aad0e89ef5fa2d8" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI PeiServicesFfsFindFileByName           </td>
-          <td>(</td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *&nbsp;</td>
-          <td class="paramname"> <em>FileName</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../de/de6/a01063.html#a91cb3539cfb2742ee94c7bd0ab1e702">EFI_PEI_FV_HANDLE</a>&nbsp;</td>
-          <td class="paramname"> <em>VolumeHandle</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT <a class="el" href="../../de/de6/a01063.html#98129642fe8f4e1c925ae7d76995fd56">EFI_PEI_FILE_HANDLE</a> *&nbsp;</td>
-          <td class="paramname"> <em>FileHandle</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EFI_ACPI_NO_PAGE_PROTECTION&nbsp;&nbsp;&nbsp;0          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-This service is a wrapper for the PEI Service FfsFindByName(), except the pointer to the PEI Services Table has been removed. See the Platform Initialization Pre-EFI Initialization Core Interface Specification for details.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>FileName</em>&nbsp;</td><td>A pointer to the name of the file to find within the firmware volume.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>VolumeHandle</em>&nbsp;</td><td>The firmware volume to search FileHandle Upon exit, points to the found file's handle or NULL if it could not be found. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>FileHandle</em>&nbsp;</td><td>Pointer to found file handle</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>File was found.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>File was not found.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>VolumeHandle or FileHandle or FileName was NULL. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="4efda59e48032c6f66fc34d6895c2df4"></a><!-- doxytag: member="PeiServicesLib.h::PeiServicesFfsFindNextFile" ref="4efda59e48032c6f66fc34d6895c2df4" args="(IN EFI_FV_FILETYPE SearchType, IN EFI_PEI_FV_HANDLE VolumeHandle, IN OUT EFI_PEI_FILE_HANDLE *FileHandle)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI PeiServicesFfsFindNextFile           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#a8c9898a7322417d167ff078bcde1f2b">EFI_FV_FILETYPE</a>&nbsp;</td>
-          <td class="paramname"> <em>SearchType</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../de/de6/a01063.html#a91cb3539cfb2742ee94c7bd0ab1e702">EFI_PEI_FV_HANDLE</a>&nbsp;</td>
-          <td class="paramname"> <em>VolumeHandle</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN OUT <a class="el" href="../../de/de6/a01063.html#98129642fe8f4e1c925ae7d76995fd56">EFI_PEI_FILE_HANDLE</a> *&nbsp;</td>
-          <td class="paramname"> <em>FileHandle</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This service enables PEIMs to discover additional firmware files.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>SearchType</em>&nbsp;</td><td>A filter to find files only of this type. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>VolumeHandle</em>&nbsp;</td><td>Pointer to the firmware volume header of the volume to search. This parameter must point to a valid FFS volume. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>FileHandle</em>&nbsp;</td><td>Handle of the current file from which to begin searching.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The file was found. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The file was not found. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The header checksum was not zero. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="18322a984b4de8e088e912fc2046d427"></a><!-- doxytag: member="PeiServicesLib.h::PeiServicesFfsFindNextVolume" ref="18322a984b4de8e088e912fc2046d427" args="(IN UINTN Instance, IN OUT EFI_PEI_FV_HANDLE *VolumeHandle)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI PeiServicesFfsFindNextVolume           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>Instance</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN OUT <a class="el" href="../../de/de6/a01063.html#a91cb3539cfb2742ee94c7bd0ab1e702">EFI_PEI_FV_HANDLE</a> *&nbsp;</td>
-          <td class="paramname"> <em>VolumeHandle</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This service enables PEIMs to discover additional firmware volumes.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Instance</em>&nbsp;</td><td>This instance of the firmware volume to find. The value 0 is the Boot Firmware Volume (BFV). </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>VolumeHandle</em>&nbsp;</td><td>Handle of the firmware volume header of the volume to return.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The volume was found. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The volume was not found. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>FwVolHeader is NULL. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="14a5b5f5aea9eb830792b6035e1c5b54"></a><!-- doxytag: member="PeiServicesLib.h::PeiServicesFfsFindSectionData" ref="14a5b5f5aea9eb830792b6035e1c5b54" args="(IN EFI_SECTION_TYPE SectionType, IN EFI_PEI_FILE_HANDLE FileHandle, OUT VOID **SectionData)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI PeiServicesFfsFindSectionData           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#208180af3108068f979d673a752e58d1">EFI_SECTION_TYPE</a>&nbsp;</td>
-          <td class="paramname"> <em>SectionType</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../de/de6/a01063.html#98129642fe8f4e1c925ae7d76995fd56">EFI_PEI_FILE_HANDLE</a>&nbsp;</td>
-          <td class="paramname"> <em>FileHandle</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT VOID **&nbsp;</td>
-          <td class="paramname"> <em>SectionData</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This service enables PEIMs to discover sections of a given type within a valid FFS file.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>SectionType</em>&nbsp;</td><td>The value of the section type to find. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>FileHandle</em>&nbsp;</td><td>A pointer to the file header that contains the set of sections to be searched. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SectionData</em>&nbsp;</td><td>A pointer to the discovered section, if successful.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The section was found. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The section was not found. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="05e6c32644be95cecd764b520f7d4ee2"></a><!-- doxytag: member="PeiServicesLib.h::PeiServicesFfsGetFileInfo" ref="05e6c32644be95cecd764b520f7d4ee2" args="(IN CONST EFI_PEI_FILE_HANDLE FileHandle, OUT EFI_FV_FILE_INFO *FileInfo)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI PeiServicesFfsGetFileInfo           </td>
-          <td>(</td>
-          <td class="paramtype">IN CONST <a class="el" href="../../de/de6/a01063.html#98129642fe8f4e1c925ae7d76995fd56">EFI_PEI_FILE_HANDLE</a>&nbsp;</td>
-          <td class="paramname"> <em>FileHandle</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT <a class="el" href="../../d9/dd5/a00432.html">EFI_FV_FILE_INFO</a> *&nbsp;</td>
-          <td class="paramname"> <em>FileInfo</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This service is a wrapper for the PEI Service FfsGetFileInfo(), except the pointer to the PEI Services Table has been removed. See the Platform Initialization Pre-EFI Initialization Core Interface Specification for details.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>FileHandle</em>&nbsp;</td><td>Handle of the file.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>FileInfo</em>&nbsp;</td><td>Upon exit, points to the file's information.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>File information returned.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>If FileHandle does not represent a valid file.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>If FileInfo is NULL. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="fc87bfddc35a5723e0b0a58551265005"></a><!-- doxytag: member="PeiServicesLib.h::PeiServicesFfsGetVolumeInfo" ref="fc87bfddc35a5723e0b0a58551265005" args="(IN EFI_PEI_FV_HANDLE VolumeHandle, OUT EFI_FV_INFO *VolumeInfo)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI PeiServicesFfsGetVolumeInfo           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../de/de6/a01063.html#a91cb3539cfb2742ee94c7bd0ab1e702">EFI_PEI_FV_HANDLE</a>&nbsp;</td>
-          <td class="paramname"> <em>VolumeHandle</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT <a class="el" href="../../dd/d07/a00433.html">EFI_FV_INFO</a> *&nbsp;</td>
-          <td class="paramname"> <em>VolumeInfo</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This service is a wrapper for the PEI Service FfsGetVolumeInfo(), except the pointer to the PEI Services Table has been removed. See the Platform Initialization Pre-EFI Initialization Core Interface Specification for details.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>VolumeHandle</em>&nbsp;</td><td>Handle of the volume.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>VolumeInfo</em>&nbsp;</td><td>Upon exit, points to the volume's information.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>File information returned.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>If FileHandle does not represent a valid file.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>If FileInfo is NULL. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="18351fd6a39e907d7b1fe6141c28293e"></a><!-- doxytag: member="PeiServicesLib.h::PeiServicesGetBootMode" ref="18351fd6a39e907d7b1fe6141c28293e" args="(OUT EFI_BOOT_MODE *BootMode)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI PeiServicesGetBootMode           </td>
-          <td>(</td>
-          <td class="paramtype">OUT <a class="el" href="../../dc/d19/a01056.html#30cd764e34dd311a5197ea5bcd09b579">EFI_BOOT_MODE</a> *&nbsp;</td>
-          <td class="paramname"> <em>BootMode</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This service enables PEIMs to ascertain the present value of the boot mode.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>BootMode</em>&nbsp;</td><td>A pointer to contain the value of the boot mode.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The boot mode was returned successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>BootMode is NULL. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="18c78f228b47469f2ad6b9a68fda8578"></a><!-- doxytag: member="PeiServicesLib.h::PeiServicesGetHobList" ref="18c78f228b47469f2ad6b9a68fda8578" args="(OUT VOID **HobList)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI PeiServicesGetHobList           </td>
-          <td>(</td>
-          <td class="paramtype">OUT VOID **&nbsp;</td>
-          <td class="paramname"> <em>HobList</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This service enables a PEIM to ascertain the address of the list of HOBs in memory.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>HobList</em>&nbsp;</td><td>A pointer to the list of HOBs that the PEI Foundation will initialize.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The list was successfully returned. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_AVAILABLE_YET</em>&nbsp;</td><td>The HOB list is not yet published. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="d91587af0cdf7d5ea124459339057d79"></a><!-- doxytag: member="PeiServicesLib.h::PeiServicesInstallFvInfoPpi" ref="d91587af0cdf7d5ea124459339057d79" args="(IN CONST EFI_GUID *FvFormat, IN CONST VOID *FvInfo, IN UINT32 FvInfoSize, IN CONST EFI_GUID *ParentFvName, IN CONST EFI_GUID *ParentFileName)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VOID EFIAPI PeiServicesInstallFvInfoPpi           </td>
-          <td>(</td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *&nbsp;</td>
-          <td class="paramname"> <em>FvFormat</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST VOID *&nbsp;</td>
-          <td class="paramname"> <em>FvInfo</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td>
-          <td class="paramname"> <em>FvInfoSize</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *&nbsp;</td>
-          <td class="paramname"> <em>ParentFvName</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *&nbsp;</td>
-          <td class="paramname"> <em>ParentFileName</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Install a EFI_PEI_FIRMWARE_VOLUME_INFO_PPI instance so the PEI Core will be notified about a new firmware volume.<p>
-This function allocates, initializes, and installs a new EFI_PEI_FIRMWARE_VOLUME_INFO_PPI using the parameters passed in to initialize the fields of the EFI_PEI_FIRMWARE_VOLUME_INFO_PPI instance. If the resources can not be allocated for EFI_PEI_FIRMWARE_VOLUME_INFO_PPI, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If the EFI_PEI_FIRMWARE_VOLUME_INFO_PPI can not be installed, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>FvFormat</em>&nbsp;</td><td>Unique identifier of the format of the memory-mapped firmware volume. This parameter is optional and may be NULL. If NULL is specified, the EFI_FIRMWARE_FILE_SYSTEM2_GUID format is assumed. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>FvInfo</em>&nbsp;</td><td>Points to a buffer which allows the EFI_PEI_FIRMWARE_VOLUME_PPI to process the volume. The format of this buffer is specific to the FvFormat. For memory-mapped firmware volumes, this typically points to the first byte of the firmware volume. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>FvInfoSize</em>&nbsp;</td><td>The size, in bytes, of FvInfo. For memory-mapped firmware volumes, this is typically the size of the firmware volume. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ParentFvName</em>&nbsp;</td><td>If the new firmware volume originated from a file in a different firmware volume, then this parameter specifies the <a class="el" href="../../d9/d0f/a00644.html">GUID</a> name of the originating firmware volume. Otherwise, this parameter must be NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ParentFileName</em>&nbsp;</td><td>If the new firmware volume originated from a file in a different firmware volume, then this parameter specifies the <a class="el" href="../../d9/d0f/a00644.html">GUID</a> file name of the originating firmware file. Otherwise, this parameter must be NULL. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="8d332c14602d2edce51e681c8f8c87ce"></a><!-- doxytag: member="PeiServicesLib.h::PeiServicesInstallPeiMemory" ref="8d332c14602d2edce51e681c8f8c87ce" args="(IN EFI_PHYSICAL_ADDRESS MemoryBegin, IN UINT64 MemoryLength)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI PeiServicesInstallPeiMemory           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a>&nbsp;</td>
-          <td class="paramname"> <em>MemoryBegin</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>MemoryLength</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This service enables PEIMs to register the permanent memory configuration that has been initialized with the PEI Foundation.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>MemoryBegin</em>&nbsp;</td><td>The value of a region of installed memory. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>MemoryLength</em>&nbsp;</td><td>The corresponding length of a region of installed memory.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The region was successfully installed in a HOB. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>MemoryBegin and MemoryLength are illegal for this system. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There is no additional space for HOB creation. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="aee4897374edfcb91b144f682f952e5d"></a><!-- doxytag: member="PeiServicesLib.h::PeiServicesInstallPpi" ref="aee4897374edfcb91b144f682f952e5d" args="(IN CONST EFI_PEI_PPI_DESCRIPTOR *PpiList)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI PeiServicesInstallPpi           </td>
-          <td>(</td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d2/d50/a00559.html">EFI_PEI_PPI_DESCRIPTOR</a> *&nbsp;</td>
-          <td class="paramname"> <em>PpiList</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This service enables a given PEIM to register an interface into the PEI Foundation.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>PpiList</em>&nbsp;</td><td>A pointer to the list of interfaces that the caller shall install.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The interface was successfully installed. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The PpiList pointer is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Any of the PEI PPI descriptors in the list do not have the EFI_PEI_PPI_DESCRIPTOR_PPI bit set in the Flags field. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There is no additional space in the PPI database. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="68aaa14f29ba22927db39961d63c63d0"></a><!-- doxytag: member="PeiServicesLib.h::PeiServicesLocatePpi" ref="68aaa14f29ba22927db39961d63c63d0" args="(IN CONST EFI_GUID *Guid, IN UINTN Instance, IN OUT EFI_PEI_PPI_DESCRIPTOR **PpiDescriptor, IN OUT VOID **Ppi)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI PeiServicesLocatePpi           </td>
-          <td>(</td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> *&nbsp;</td>
-          <td class="paramname"> <em>Guid</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>Instance</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN OUT <a class="el" href="../../d2/d50/a00559.html">EFI_PEI_PPI_DESCRIPTOR</a> **&nbsp;</td>
-          <td class="paramname"> <em>PpiDescriptor</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN OUT VOID **&nbsp;</td>
-          <td class="paramname"> <em>Ppi</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This service enables PEIMs to discover a given instance of an interface.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Guid</em>&nbsp;</td><td>A pointer to the <a class="el" href="../../d9/d0f/a00644.html">GUID</a> whose corresponding interface needs to be found. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Instance</em>&nbsp;</td><td>The N-th instance of the interface that is required. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>PpiDescriptor</em>&nbsp;</td><td>A pointer to instance of the <a class="el" href="../../d2/d50/a00559.html">EFI_PEI_PPI_DESCRIPTOR</a>. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Ppi</em>&nbsp;</td><td>A pointer to the instance of the interface.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The interface was successfully returned. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The PPI descriptor is not found in the database. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="8e525d6f46bb4325e64d6da0dc4c97de"></a><!-- doxytag: member="PeiServicesLib.h::PeiServicesNotifyPpi" ref="8e525d6f46bb4325e64d6da0dc4c97de" args="(IN CONST EFI_PEI_NOTIFY_DESCRIPTOR *NotifyList)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI PeiServicesNotifyPpi           </td>
-          <td>(</td>
-          <td class="paramtype">IN CONST <a class="el" href="../../dc/d98/a00225.html">EFI_PEI_NOTIFY_DESCRIPTOR</a> *&nbsp;</td>
-          <td class="paramname"> <em>NotifyList</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This service enables PEIMs to register a given service to be invoked when another service is installed or reinstalled.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>NotifyList</em>&nbsp;</td><td>A pointer to the list of notification interfaces that the caller shall install.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The interface was successfully installed. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The NotifyList pointer is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Any of the PEI notify descriptors in the list do not have the EFI_PEI_PPI_DESCRIPTOR_NOTIFY_TYPES bit set in the Flags field. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There is no additional space in the PPI database. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="e9c8888a7323893b1aaef85d6ed5ebaa"></a><!-- doxytag: member="PeiServicesLib.h::PeiServicesRegisterForShadow" ref="e9c8888a7323893b1aaef85d6ed5ebaa" args="(IN EFI_PEI_FILE_HANDLE FileHandle)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI PeiServicesRegisterForShadow           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../de/de6/a01063.html#98129642fe8f4e1c925ae7d76995fd56">EFI_PEI_FILE_HANDLE</a>&nbsp;</td>
-          <td class="paramname"> <em>FileHandle</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This service is a wrapper for the PEI Service RegisterForShadow(), except the pointer to the PEI Services Table has been removed. See the Platform Initialization Pre-EFI Initialization Core Interface Specification for details.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>FileHandle</em>&nbsp;</td><td>PEIM's file handle. Must be the currently executing PEIM.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The PEIM was successfully registered for shadowing.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_ALREADY_STARTED</em>&nbsp;</td><td>The PEIM was previously registered for shadowing.</td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The FileHandle does not refer to a valid file handle. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="dcf9f9ea280950ddc74b940407f96f05"></a><!-- doxytag: member="PeiServicesLib.h::PeiServicesReInstallPpi" ref="dcf9f9ea280950ddc74b940407f96f05" args="(IN CONST EFI_PEI_PPI_DESCRIPTOR *OldPpi, IN CONST EFI_PEI_PPI_DESCRIPTOR *NewPpi)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI PeiServicesReInstallPpi           </td>
-          <td>(</td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d2/d50/a00559.html">EFI_PEI_PPI_DESCRIPTOR</a> *&nbsp;</td>
-          <td class="paramname"> <em>OldPpi</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST <a class="el" href="../../d2/d50/a00559.html">EFI_PEI_PPI_DESCRIPTOR</a> *&nbsp;</td>
-          <td class="paramname"> <em>NewPpi</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This service enables PEIMs to replace an entry in the PPI database with an alternate entry.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>OldPpi</em>&nbsp;</td><td>Pointer to the old PEI PPI Descriptors. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>NewPpi</em>&nbsp;</td><td>Pointer to the new PEI PPI Descriptors.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The interface was successfully installed. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>The OldPpi or NewPpi is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Any of the PEI PPI descriptors in the list do not have the EFI_PEI_PPI_DESCRIPTOR_PPI bit set in the Flags field. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>There is no additional space in the PPI database. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>The PPI for which the reinstallation was requested has not been installed. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="89b4cfe23ba5e92e2542ba5c9decd3d6"></a><!-- doxytag: member="PeiServicesLib.h::PeiServicesResetSystem" ref="89b4cfe23ba5e92e2542ba5c9decd3d6" args="(VOID)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI PeiServicesResetSystem           </td>
-          <td>(</td>
-          <td class="paramtype">VOID&nbsp;</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Resets the entire platform.<p>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The function completed successfully. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_AVAILABLE_YET</em>&nbsp;</td><td>The service has not been installed yet. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="e3af34734073d018f3c82865faf4b006"></a><!-- doxytag: member="PeiServicesLib.h::PeiServicesSetBootMode" ref="e3af34734073d018f3c82865faf4b006" args="(IN EFI_BOOT_MODE BootMode)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> EFIAPI PeiServicesSetBootMode           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../dc/d19/a01056.html#30cd764e34dd311a5197ea5bcd09b579">EFI_BOOT_MODE</a>&nbsp;</td>
-          <td class="paramname"> <em>BootMode</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-This service enables PEIMs to update the boot mode variable.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>BootMode</em>&nbsp;</td><td>The value of the boot mode to set.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The value was successfully updated </td></tr>
-  </table>
-</dl>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:08 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:15 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

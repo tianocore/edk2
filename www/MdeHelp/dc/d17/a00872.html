@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: tdTPM_DAA_ISSUER Struct Reference</title>
+<title>MdePkg[ALL]: SMBIOS_TABLE_TYPE32 Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,34 +21,43 @@
   </div>
 </div>
 <div class="contents">
-<h1>tdTPM_DAA_ISSUER Struct Reference</h1><!-- doxytag: class="tdTPM_DAA_ISSUER" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>SMBIOS_TABLE_TYPE32 Struct Reference</h1><!-- doxytag: class="SMBIOS_TABLE_TYPE32" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/d59/a01001.html#69f3eb3e40aee2061dba5f9202fac1a2">TPM_STRUCTURE_TAG</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d17/a00872.html#e39fc98c306d47083e14ddc4184f34ca">tag</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d5/dac/a00841.html">SMBIOS_STRUCTURE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d17/a00872.html#0d8af2d028fc7efbfdb930ee2241b588">Hdr</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d08/a00884.html">TPM_DIGEST</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d17/a00872.html#8ec9fccb4ea9617721009aa12096b0f6">DAA_digest_R0</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d17/a00872.html#a6706cd7108b990519c5a565f1cf0c2d">Reserved</a> [6]</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d08/a00884.html">TPM_DIGEST</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d17/a00872.html#fdd0596734e9bec754629b3e7360d670">DAA_digest_R1</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d17/a00872.html#715d55ee972b176c153c1c1874e9a021">BootStatus</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d08/a00884.html">TPM_DIGEST</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d17/a00872.html#3ed274349ff165902aeb9822eb1246c9">DAA_digest_S0</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d08/a00884.html">TPM_DIGEST</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d17/a00872.html#33a5421ae4527ce6b5c8697337ac4a47">DAA_digest_S1</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d08/a00884.html">TPM_DIGEST</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d17/a00872.html#85b17c83b28623faeb1304f675ba5b3b">DAA_digest_n</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d08/a00884.html">TPM_DIGEST</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d17/a00872.html#6048ec1b79e4418d5cf41b26042ae70d">DAA_digest_gamma</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d17/a00872.html#5ba5ccd71761500b5c2dae6665ceda74">DAA_generic_q</a> [26]</td></tr>
-
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">enumeration value from MISC_BOOT_INFORMATION_STATUS_DATA_TYPE  <a href="#715d55ee972b176c153c1c1874e9a021"></a><br></td></tr>
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Part 2, section 22.3: TPM_DAA_ISSUER <hr><h2>Field Documentation</h2>
-<a class="anchor" name="6048ec1b79e4418d5cf41b26042ae70d"></a><!-- doxytag: member="tdTPM_DAA_ISSUER::DAA_digest_gamma" ref="6048ec1b79e4418d5cf41b26042ae70d" args="" -->
+System Boot Information (Type 32)<p>
+The client system firmware, e.g. BIOS, communicates the System Boot Status to the client's Pre-boot Execution Environment (PXE) boot image or OS-present management application via this structure. When used in the PXE environment, for example, this code identifies the reason the PXE was initiated and can be used by boot-image software to further automate an enterprise's PXE sessions. For example, an enterprise could choose to automatically download a hardware-diagnostic image to a client whose reason code indicated either a firmware- or operating system-detected hardware failure. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="715d55ee972b176c153c1c1874e9a021"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE32::BootStatus" ref="715d55ee972b176c153c1c1874e9a021" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dd/d08/a00884.html">TPM_DIGEST</a> <a class="el" href="../../dc/d17/a00872.html#6048ec1b79e4418d5cf41b26042ae70d">tdTPM_DAA_ISSUER::DAA_digest_gamma</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../dc/d17/a00872.html#715d55ee972b176c153c1c1874e9a021">SMBIOS_TABLE_TYPE32::BootStatus</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+enumeration value from MISC_BOOT_INFORMATION_STATUS_DATA_TYPE 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="0d8af2d028fc7efbfdb930ee2241b588"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE32::Hdr" ref="0d8af2d028fc7efbfdb930ee2241b588" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d5/dac/a00841.html">SMBIOS_STRUCTURE</a> <a class="el" href="../../dc/d17/a00872.html#0d8af2d028fc7efbfdb930ee2241b588">SMBIOS_TABLE_TYPE32::Hdr</a>          </td>
         </tr>
       </table>
 </div>
@@ -58,102 +67,12 @@ Part 2, section 22.3: TPM_DAA_ISSUER <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="85b17c83b28623faeb1304f675ba5b3b"></a><!-- doxytag: member="tdTPM_DAA_ISSUER::DAA_digest_n" ref="85b17c83b28623faeb1304f675ba5b3b" args="" -->
+<a class="anchor" name="a6706cd7108b990519c5a565f1cf0c2d"></a><!-- doxytag: member="SMBIOS_TABLE_TYPE32::Reserved" ref="a6706cd7108b990519c5a565f1cf0c2d" args="[6]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dd/d08/a00884.html">TPM_DIGEST</a> <a class="el" href="../../dc/d17/a00872.html#85b17c83b28623faeb1304f675ba5b3b">tdTPM_DAA_ISSUER::DAA_digest_n</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="8ec9fccb4ea9617721009aa12096b0f6"></a><!-- doxytag: member="tdTPM_DAA_ISSUER::DAA_digest_R0" ref="8ec9fccb4ea9617721009aa12096b0f6" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../dd/d08/a00884.html">TPM_DIGEST</a> <a class="el" href="../../dc/d17/a00872.html#8ec9fccb4ea9617721009aa12096b0f6">tdTPM_DAA_ISSUER::DAA_digest_R0</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="fdd0596734e9bec754629b3e7360d670"></a><!-- doxytag: member="tdTPM_DAA_ISSUER::DAA_digest_R1" ref="fdd0596734e9bec754629b3e7360d670" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../dd/d08/a00884.html">TPM_DIGEST</a> <a class="el" href="../../dc/d17/a00872.html#fdd0596734e9bec754629b3e7360d670">tdTPM_DAA_ISSUER::DAA_digest_R1</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="3ed274349ff165902aeb9822eb1246c9"></a><!-- doxytag: member="tdTPM_DAA_ISSUER::DAA_digest_S0" ref="3ed274349ff165902aeb9822eb1246c9" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../dd/d08/a00884.html">TPM_DIGEST</a> <a class="el" href="../../dc/d17/a00872.html#3ed274349ff165902aeb9822eb1246c9">tdTPM_DAA_ISSUER::DAA_digest_S0</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="33a5421ae4527ce6b5c8697337ac4a47"></a><!-- doxytag: member="tdTPM_DAA_ISSUER::DAA_digest_S1" ref="33a5421ae4527ce6b5c8697337ac4a47" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../dd/d08/a00884.html">TPM_DIGEST</a> <a class="el" href="../../dc/d17/a00872.html#33a5421ae4527ce6b5c8697337ac4a47">tdTPM_DAA_ISSUER::DAA_digest_S1</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="5ba5ccd71761500b5c2dae6665ceda74"></a><!-- doxytag: member="tdTPM_DAA_ISSUER::DAA_generic_q" ref="5ba5ccd71761500b5c2dae6665ceda74" args="[26]" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../dc/d17/a00872.html#5ba5ccd71761500b5c2dae6665ceda74">tdTPM_DAA_ISSUER::DAA_generic_q</a>[26]          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="e39fc98c306d47083e14ddc4184f34ca"></a><!-- doxytag: member="tdTPM_DAA_ISSUER::tag" ref="e39fc98c306d47083e14ddc4184f34ca" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../df/d59/a01001.html#69f3eb3e40aee2061dba5f9202fac1a2">TPM_STRUCTURE_TAG</a> <a class="el" href="../../dc/d17/a00872.html#e39fc98c306d47083e14ddc4184f34ca">tdTPM_DAA_ISSUER::tag</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../dc/d17/a00872.html#a6706cd7108b990519c5a565f1cf0c2d">SMBIOS_TABLE_TYPE32::Reserved</a>[6]          </td>
         </tr>
       </table>
 </div>
@@ -164,7 +83,7 @@ Part 2, section 22.3: TPM_DAA_ISSUER <hr><h2>Field Documentation</h2>
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:22 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:05 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

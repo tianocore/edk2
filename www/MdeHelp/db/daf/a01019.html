@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Library/DxeServicesTableLib.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Guid/HiiPlatformSetupFormset.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,35 +21,54 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Library/DxeServicesTableLib.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Guid/HiiPlatformSetupFormset.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
+<tr><td colspan="2"><br><h2>Defines</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/daf/a01019.html#789786578a245ed3153f85cd446d93c5">EFI_HII_PLATFORM_SETUP_FORMSET_GUID</a>&nbsp;&nbsp;&nbsp;{ 0x93039971, 0x8545, 0x4b04, { 0xb4, 0x5e, 0x32, 0xeb, 0x83, 0x26, 0x4, 0xe } }</td></tr>
+
 <tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/de3/a00306.html">EFI_DXE_SERVICES</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/daf/a01019.html#62f46bf572234f11550955311f9c0799">gDS</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/daf/a01019.html#1c8a2258ca243f8f00c08fe4203b494a">gEfiHiiPlatformSetupFormsetGuid</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Provides a service to retrieve a pointer to the DXE Services Table. Only available to DXE module types.<p>
-This library does not contain any functions or macros. It simply exports a global pointer to the DXE Services Table as defined in the Platform Initialization Driver Execution Environment Core Interface Specification. The library constructor must initialize this global pointer to the DX Services Table, so it is available at the module's entry point. Since there is overhead in looking up the pointer to the DXE Services Table, only those modules that actually require access to the DXE Services Table should use this library. This will typically be DXE Drivers that require GCD or Dispatcher services.<p>
-Copyright (c) 2006 - 2008, Intel Corporation<br>
- All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Variable Documentation</h2>
-<a class="anchor" name="62f46bf572234f11550955311f9c0799"></a><!-- doxytag: member="DxeServicesTableLib.h::gDS" ref="62f46bf572234f11550955311f9c0799" args="" -->
+<a class="el" href="../../d1/d87/a00689.html">GUID</a> indicates that the form set contains forms designed to be used for platform configuration and this form set will be displayed.<p>
+Copyright (c) 2009, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
+<dl class="user" compact><dt><b>Revision Reference:</b></dt><dd><a class="el" href="../../d1/d87/a00689.html">GUID</a> defined in UEFI 2.1. </dd></dl>
+<hr><h2>Define Documentation</h2>
+<a class="anchor" name="789786578a245ed3153f85cd446d93c5"></a><!-- doxytag: member="HiiPlatformSetupFormset.h::EFI_HII_PLATFORM_SETUP_FORMSET_GUID" ref="789786578a245ed3153f85cd446d93c5" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d1/de3/a00306.html">EFI_DXE_SERVICES</a>* <a class="el" href="../../db/daf/a01019.html#62f46bf572234f11550955311f9c0799">gDS</a>          </td>
+          <td class="memname">#define EFI_HII_PLATFORM_SETUP_FORMSET_GUID&nbsp;&nbsp;&nbsp;{ 0x93039971, 0x8545, 0x4b04, { 0xb4, 0x5e, 0x32, 0xeb, 0x83, 0x26, 0x4, 0xe } }          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Cache copy of the DXE Services Table 
+
+</div>
+</div><p>
+<hr><h2>Variable Documentation</h2>
+<a class="anchor" name="1c8a2258ca243f8f00c08fe4203b494a"></a><!-- doxytag: member="HiiPlatformSetupFormset.h::gEfiHiiPlatformSetupFormsetGuid" ref="1c8a2258ca243f8f00c08fe4203b494a" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../db/daf/a01019.html#1c8a2258ca243f8f00c08fe4203b494a">gEfiHiiPlatformSetupFormsetGuid</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:08 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:13 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

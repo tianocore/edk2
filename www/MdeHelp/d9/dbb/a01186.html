@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Uefi/UefiBaseType.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Protocol/HiiConfigAccess.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,144 +21,44 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Uefi/UefiBaseType.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Protocol/HiiConfigAccess.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/dc4/a00617.html">EFI_TIME</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d30/a00508.html">EFI_IPv4_ADDRESS</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/db6/a00509.html">EFI_IPv6_ADDRESS</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d40/a00516.html">EFI_MAC_ADDRESS</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">union &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d69/a00507.html">EFI_IP_ADDRESS</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d3a/a00040.html">_EFI_HII_CONFIG_ACCESS_PROTOCOL</a></td></tr>
 
 <tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#fd2956ea230ac571679e90c1f7fdcf7a">EFI_SUCCESS</a>&nbsp;&nbsp;&nbsp;RETURN_SUCCESS</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#7486b5026b3546c678878d6c909cc2ed">EFI_HII_CONFIG_ACCESS_PROTOCOL_GUID</a>&nbsp;&nbsp;&nbsp;{ 0x330d4706, 0xf2a0, 0x4e4f, { 0xa3, 0x69, 0xb6, 0x6f, 0xa8, 0xd5, 0x43, 0x85 } }</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#eb42b1a02667e462bd28de378dde7ea2">EFI_LOAD_ERROR</a>&nbsp;&nbsp;&nbsp;RETURN_LOAD_ERROR</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#954a7db1d50e4752e3a5346a7b469164">EFI_BROWSER_ACTION_CHANGING</a>&nbsp;&nbsp;&nbsp;0</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#517555b4ca97418f0943e5c437382b4c">EFI_INVALID_PARAMETER</a>&nbsp;&nbsp;&nbsp;RETURN_INVALID_PARAMETER</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#33f9e7f3e8414d8c0f37b696fa87e98b">EFI_UNSUPPORTED</a>&nbsp;&nbsp;&nbsp;RETURN_UNSUPPORTED</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#8dbb6c4bd47378c9ac82c8fa783f184f">EFI_BAD_BUFFER_SIZE</a>&nbsp;&nbsp;&nbsp;RETURN_BAD_BUFFER_SIZE</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#de8e20dfdefffa2aefba608e7b30c701">EFI_BUFFER_TOO_SMALL</a>&nbsp;&nbsp;&nbsp;RETURN_BUFFER_TOO_SMALL</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#11b217b264b88fe2990003ffce0c285d">EFI_NOT_READY</a>&nbsp;&nbsp;&nbsp;RETURN_NOT_READY</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#314604f35676ecd5675c4aed248e687a">EFI_DEVICE_ERROR</a>&nbsp;&nbsp;&nbsp;RETURN_DEVICE_ERROR</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#622887a68e58c72b1ceccbf007fc0922">EFI_WRITE_PROTECTED</a>&nbsp;&nbsp;&nbsp;RETURN_WRITE_PROTECTED</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#df288f30572eb468a09ab95c76c00052">EFI_OUT_OF_RESOURCES</a>&nbsp;&nbsp;&nbsp;RETURN_OUT_OF_RESOURCES</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#799ac69ab99d97820d1ec5ed974aebe4">EFI_VOLUME_CORRUPTED</a>&nbsp;&nbsp;&nbsp;RETURN_VOLUME_CORRUPTED</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#2a810abe290057c835d5022294cf555f">EFI_VOLUME_FULL</a>&nbsp;&nbsp;&nbsp;RETURN_VOLUME_FULL</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#6834fec7bb4610c77aa5ec4551bb55e9">EFI_NO_MEDIA</a>&nbsp;&nbsp;&nbsp;RETURN_NO_MEDIA</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#0f4a2606302f7c468419f2985abd5b1c">EFI_MEDIA_CHANGED</a>&nbsp;&nbsp;&nbsp;RETURN_MEDIA_CHANGED</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#7d71dcd8a1666b9119271a011763bf79">EFI_NOT_FOUND</a>&nbsp;&nbsp;&nbsp;RETURN_NOT_FOUND</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#7aac7291e56995be020d249c19cdf3af">EFI_ACCESS_DENIED</a>&nbsp;&nbsp;&nbsp;RETURN_ACCESS_DENIED</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#4d8ce4398d594d5944f4fa97c2ae3389">EFI_NO_RESPONSE</a>&nbsp;&nbsp;&nbsp;RETURN_NO_RESPONSE</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#0e6cc31078fe0bb82d562279a1409d9f">EFI_NO_MAPPING</a>&nbsp;&nbsp;&nbsp;RETURN_NO_MAPPING</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#d0a4ae73a61270c9cf93fce9b6963a8f">EFI_TIMEOUT</a>&nbsp;&nbsp;&nbsp;RETURN_TIMEOUT</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#6f338b4c2382d9daa5ce67fcf907d1af">EFI_NOT_STARTED</a>&nbsp;&nbsp;&nbsp;RETURN_NOT_STARTED</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#4f99611e3239b11262053173b4503c37">EFI_ALREADY_STARTED</a>&nbsp;&nbsp;&nbsp;RETURN_ALREADY_STARTED</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#f7b31df1ca1c127f99c5d53b6c6f5b5b">EFI_ABORTED</a>&nbsp;&nbsp;&nbsp;RETURN_ABORTED</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#7fe4bf1f52758504b3320a56e6c5b98b">EFI_ICMP_ERROR</a>&nbsp;&nbsp;&nbsp;RETURN_ICMP_ERROR</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#caec3033b0a20d8fce48953a9943c42f">EFI_TFTP_ERROR</a>&nbsp;&nbsp;&nbsp;RETURN_TFTP_ERROR</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#6712a7f85cab36770c273f477b5a2e6b">EFI_PROTOCOL_ERROR</a>&nbsp;&nbsp;&nbsp;RETURN_PROTOCOL_ERROR</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#4fa4c301cde7ac51c6aff6fe7b0b7e9c">EFI_INCOMPATIBLE_VERSION</a>&nbsp;&nbsp;&nbsp;RETURN_INCOMPATIBLE_VERSION</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#3cd7733d7f3a62ab5d4c088e02ce094a">EFI_SECURITY_VIOLATION</a>&nbsp;&nbsp;&nbsp;RETURN_SECURITY_VIOLATION</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#5e86bebe336d06823b8a51776ca6015d">EFI_CRC_ERROR</a>&nbsp;&nbsp;&nbsp;RETURN_CRC_ERROR</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#a7db62a00c3723c515ecdb1dc2597f45">EFI_END_OF_MEDIA</a>&nbsp;&nbsp;&nbsp;RETURN_END_OF_MEDIA</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#7eae5fda95bdb480cb36556fa0b5c5b2">EFI_END_OF_FILE</a>&nbsp;&nbsp;&nbsp;RETURN_END_OF_FILE</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#54e4bbbdaf5cd44a546a936923bea399">EFI_INVALID_LANGUAGE</a>&nbsp;&nbsp;&nbsp;RETURN_INVALID_LANGUAGE</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#0f0a434fc76962dd5dd6049c24cd3583">EFI_WARN_UNKNOWN_GLYPH</a>&nbsp;&nbsp;&nbsp;RETURN_WARN_UNKNOWN_GLYPH</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#f8f690347b49eb8950b3bf50fe237ddb">EFI_WARN_DELETE_FAILURE</a>&nbsp;&nbsp;&nbsp;RETURN_WARN_DELETE_FAILURE</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#bcb9624fb5aa51a0a853cf24a7be5b4c">EFI_WARN_WRITE_FAILURE</a>&nbsp;&nbsp;&nbsp;RETURN_WARN_WRITE_FAILURE</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#f3efd8e4fe29febce3beca557b70133a">EFI_WARN_BUFFER_TOO_SMALL</a>&nbsp;&nbsp;&nbsp;RETURN_WARN_BUFFER_TOO_SMALL</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#e4575a8865019cd2a3065bb97eb08dbd">EFIERR</a>(_a)&nbsp;&nbsp;&nbsp;ENCODE_ERROR(_a)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#170e88146954e1126b97a0ce22ec5d52">EFI_ERROR</a>(A)&nbsp;&nbsp;&nbsp;RETURN_ERROR(A)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#13d050384cfdc94809913cfdec9571e6">EFI_PAGE_SIZE</a>&nbsp;&nbsp;&nbsp;0x1000</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#ce83cb8fe7c059da5f93f59dc1a77a5b">EFI_PAGE_MASK</a>&nbsp;&nbsp;&nbsp;0xFFF</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#bc02417bc3f15dd459be81b382242de0">EFI_PAGE_SHIFT</a>&nbsp;&nbsp;&nbsp;12</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#d50efc5dfc6c7e9c896733f77bfd5304">EFI_SIZE_TO_PAGES</a>(a)&nbsp;&nbsp;&nbsp;(((a) &gt;&gt; EFI_PAGE_SHIFT) + (((a) &amp; EFI_PAGE_MASK) ? 1 : 0))</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#7519fd833a6709d376602441972f6104">EFI_PAGES_TO_SIZE</a>(a)&nbsp;&nbsp;&nbsp;( (a) &lt;&lt; EFI_PAGE_SHIFT)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#55e39adc4c4a1811ea266b92785c0e2e">EFI_IMAGE_MACHINE_IA32</a>&nbsp;&nbsp;&nbsp;0x014C</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#85302cd36d44b568d46134764b6835e1">EFI_IMAGE_MACHINE_IA64</a>&nbsp;&nbsp;&nbsp;0x0200</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#53afa669670cd0e016de9c8f0a1ab2d5">EFI_IMAGE_MACHINE_EBC</a>&nbsp;&nbsp;&nbsp;0x0EBC</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#95dfa8a3d8b23ba3b20be0bf074d908b">EFI_IMAGE_MACHINE_X64</a>&nbsp;&nbsp;&nbsp;0x8664</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#61026a2e21c3fb11c6a3169a983e220c">EFI_IMAGE_MACHINE_TYPE_SUPPORTED</a>(Machine)&nbsp;&nbsp;&nbsp;(((Machine) == EFI_IMAGE_MACHINE_IA32) || ((Machine) == EFI_IMAGE_MACHINE_EBC))</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#1f356b02a220bd310527aca3e35e7a49">EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED</a>(Machine)&nbsp;&nbsp;&nbsp;((Machine) == EFI_IMAGE_MACHINE_X64)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#708e278bba15c8d6209af13b1920a3f5">EFI_BROWSER_ACTION_CHANGED</a>&nbsp;&nbsp;&nbsp;1</td></tr>
 
 <tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/d0f/a00644.html">GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#d87614428813f71edb2c2d802e9ce2af">EFI_GUID</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <br class="typebreak">
+<a class="el" href="../../db/d3a/a00040.html">_EFI_HII_CONFIG_ACCESS_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#f301aa582b80cabb3864f25154aa962f">EFI_HII_CONFIG_ACCESS_PROTOCOL</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d3/dca/a00954.html#f3519a25bfa97c295fb23ffec95b1cb1">RETURN_STATUS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#1fa21e5c09eff10767756c9eb3ca5940">EFI_BROWSER_ACTION</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef VOID *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#7946bf3122406e6b115faa0a200b224e">EFI_HII_ACCESS_EXTRACT_CONFIG</a> )(IN CONST <a class="el" href="../../db/d3a/a00040.html">EFI_HII_CONFIG_ACCESS_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> Request, OUT <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> *Progress, OUT <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> *Results)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef VOID *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#7f3111de303d836d8d3711c39363f81a">EFI_EVENT</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#bfa7901e53696c1c4b7069cd1d1c0285">EFI_HII_ACCESS_ROUTE_CONFIG</a> )(IN CONST <a class="el" href="../../db/d3a/a00040.html">EFI_HII_CONFIG_ACCESS_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> Configuration, OUT <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> *Progress)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#b998e5f7da4a664eaa86252ab16e459a">EFI_TPL</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#fbaeb5e29e396f70938e43eeb99da41a">EFI_HII_ACCESS_FORM_CALLBACK</a> )(IN CONST <a class="el" href="../../db/d3a/a00040.html">EFI_HII_CONFIG_ACCESS_PROTOCOL</a> *This, IN <a class="el" href="../../d9/dbb/a01186.html#1fa21e5c09eff10767756c9eb3ca5940">EFI_BROWSER_ACTION</a> Action, IN <a class="el" href="../../d3/d7b/a01249.html#9221f2b1fef32d0b36f6775c510a7381">EFI_QUESTION_ID</a> QuestionId, IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> Type, IN <a class="el" href="../../d4/d1e/a00497.html">EFI_IFR_TYPE_VALUE</a> *Value, OUT <a class="el" href="../../dc/d2d/a01183.html#8959362a4cd4422cc57483fe9c710eb9">EFI_BROWSER_ACTION_REQUEST</a> *ActionRequest)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#3495b0e526b2172f98d5bde00bf28b72">EFI_LBA</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#353ea2e3d6220a4e32c5f1eb39a1ed6a">EFI_VIRTUAL_ADDRESS</a></td></tr>
+<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dbb/a01186.html#69256d7a3e83ffb5f35453e8e98465b9">gEfiHiiConfigAccessProtocolGuid</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Defines data types and constants introduced in UEFI.<p>
-Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
+The EFI HII results processing protocol invokes this type of protocol when it needs to forward results to a driver's configuration handler. This protocol is published by drivers providing and requesting configuration data from HII. It may only be invoked by HII.<p>
+Copyright (c) 2006 - 2009, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
-<a class="anchor" name="f7b31df1ca1c127f99c5d53b6c6f5b5b"></a><!-- doxytag: member="UefiBaseType.h::EFI_ABORTED" ref="f7b31df1ca1c127f99c5d53b6c6f5b5b" args="" -->
+<a class="anchor" name="708e278bba15c8d6209af13b1920a3f5"></a><!-- doxytag: member="HiiConfigAccess.h::EFI_BROWSER_ACTION_CHANGED" ref="708e278bba15c8d6209af13b1920a3f5" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_ABORTED&nbsp;&nbsp;&nbsp;RETURN_ABORTED          </td>
+          <td class="memname">#define EFI_BROWSER_ACTION_CHANGED&nbsp;&nbsp;&nbsp;1          </td>
         </tr>
       </table>
 </div>
@@ -168,12 +68,12 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 </div>
 </div><p>
-<a class="anchor" name="7aac7291e56995be020d249c19cdf3af"></a><!-- doxytag: member="UefiBaseType.h::EFI_ACCESS_DENIED" ref="7aac7291e56995be020d249c19cdf3af" args="" -->
+<a class="anchor" name="954a7db1d50e4752e3a5346a7b469164"></a><!-- doxytag: member="HiiConfigAccess.h::EFI_BROWSER_ACTION_CHANGING" ref="954a7db1d50e4752e3a5346a7b469164" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_ACCESS_DENIED&nbsp;&nbsp;&nbsp;RETURN_ACCESS_DENIED          </td>
+          <td class="memname">#define EFI_BROWSER_ACTION_CHANGING&nbsp;&nbsp;&nbsp;0          </td>
         </tr>
       </table>
 </div>
@@ -183,717 +83,12 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 </div>
 </div><p>
-<a class="anchor" name="4f99611e3239b11262053173b4503c37"></a><!-- doxytag: member="UefiBaseType.h::EFI_ALREADY_STARTED" ref="4f99611e3239b11262053173b4503c37" args="" -->
+<a class="anchor" name="7486b5026b3546c678878d6c909cc2ed"></a><!-- doxytag: member="HiiConfigAccess.h::EFI_HII_CONFIG_ACCESS_PROTOCOL_GUID" ref="7486b5026b3546c678878d6c909cc2ed" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_ALREADY_STARTED&nbsp;&nbsp;&nbsp;RETURN_ALREADY_STARTED          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="8dbb6c4bd47378c9ac82c8fa783f184f"></a><!-- doxytag: member="UefiBaseType.h::EFI_BAD_BUFFER_SIZE" ref="8dbb6c4bd47378c9ac82c8fa783f184f" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_BAD_BUFFER_SIZE&nbsp;&nbsp;&nbsp;RETURN_BAD_BUFFER_SIZE          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="de8e20dfdefffa2aefba608e7b30c701"></a><!-- doxytag: member="UefiBaseType.h::EFI_BUFFER_TOO_SMALL" ref="de8e20dfdefffa2aefba608e7b30c701" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_BUFFER_TOO_SMALL&nbsp;&nbsp;&nbsp;RETURN_BUFFER_TOO_SMALL          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="5e86bebe336d06823b8a51776ca6015d"></a><!-- doxytag: member="UefiBaseType.h::EFI_CRC_ERROR" ref="5e86bebe336d06823b8a51776ca6015d" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_CRC_ERROR&nbsp;&nbsp;&nbsp;RETURN_CRC_ERROR          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="314604f35676ecd5675c4aed248e687a"></a><!-- doxytag: member="UefiBaseType.h::EFI_DEVICE_ERROR" ref="314604f35676ecd5675c4aed248e687a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_DEVICE_ERROR&nbsp;&nbsp;&nbsp;RETURN_DEVICE_ERROR          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="7eae5fda95bdb480cb36556fa0b5c5b2"></a><!-- doxytag: member="UefiBaseType.h::EFI_END_OF_FILE" ref="7eae5fda95bdb480cb36556fa0b5c5b2" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_END_OF_FILE&nbsp;&nbsp;&nbsp;RETURN_END_OF_FILE          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="a7db62a00c3723c515ecdb1dc2597f45"></a><!-- doxytag: member="UefiBaseType.h::EFI_END_OF_MEDIA" ref="a7db62a00c3723c515ecdb1dc2597f45" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_END_OF_MEDIA&nbsp;&nbsp;&nbsp;RETURN_END_OF_MEDIA          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="170e88146954e1126b97a0ce22ec5d52"></a><!-- doxytag: member="UefiBaseType.h::EFI_ERROR" ref="170e88146954e1126b97a0ce22ec5d52" args="(A)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_ERROR          </td>
-          <td>(</td>
-          <td class="paramtype">A&nbsp;</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td>&nbsp;&nbsp;&nbsp;RETURN_ERROR(A)</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="7fe4bf1f52758504b3320a56e6c5b98b"></a><!-- doxytag: member="UefiBaseType.h::EFI_ICMP_ERROR" ref="7fe4bf1f52758504b3320a56e6c5b98b" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_ICMP_ERROR&nbsp;&nbsp;&nbsp;RETURN_ICMP_ERROR          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="1f356b02a220bd310527aca3e35e7a49"></a><!-- doxytag: member="UefiBaseType.h::EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED" ref="1f356b02a220bd310527aca3e35e7a49" args="(Machine)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED          </td>
-          <td>(</td>
-          <td class="paramtype">Machine&nbsp;</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td>&nbsp;&nbsp;&nbsp;((Machine) == EFI_IMAGE_MACHINE_X64)</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="53afa669670cd0e016de9c8f0a1ab2d5"></a><!-- doxytag: member="UefiBaseType.h::EFI_IMAGE_MACHINE_EBC" ref="53afa669670cd0e016de9c8f0a1ab2d5" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_IMAGE_MACHINE_EBC&nbsp;&nbsp;&nbsp;0x0EBC          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-PE32+ Machine type for EBC UEFI images 
-</div>
-</div><p>
-<a class="anchor" name="55e39adc4c4a1811ea266b92785c0e2e"></a><!-- doxytag: member="UefiBaseType.h::EFI_IMAGE_MACHINE_IA32" ref="55e39adc4c4a1811ea266b92785c0e2e" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_IMAGE_MACHINE_IA32&nbsp;&nbsp;&nbsp;0x014C          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-PE32+ Machine type for IA32 UEFI images 
-</div>
-</div><p>
-<a class="anchor" name="85302cd36d44b568d46134764b6835e1"></a><!-- doxytag: member="UefiBaseType.h::EFI_IMAGE_MACHINE_IA64" ref="85302cd36d44b568d46134764b6835e1" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_IMAGE_MACHINE_IA64&nbsp;&nbsp;&nbsp;0x0200          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-PE32+ Machine type for IA64 UEFI images 
-</div>
-</div><p>
-<a class="anchor" name="61026a2e21c3fb11c6a3169a983e220c"></a><!-- doxytag: member="UefiBaseType.h::EFI_IMAGE_MACHINE_TYPE_SUPPORTED" ref="61026a2e21c3fb11c6a3169a983e220c" args="(Machine)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_IMAGE_MACHINE_TYPE_SUPPORTED          </td>
-          <td>(</td>
-          <td class="paramtype">Machine&nbsp;</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td>&nbsp;&nbsp;&nbsp;(((Machine) == EFI_IMAGE_MACHINE_IA32) || ((Machine) == EFI_IMAGE_MACHINE_EBC))</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="95dfa8a3d8b23ba3b20be0bf074d908b"></a><!-- doxytag: member="UefiBaseType.h::EFI_IMAGE_MACHINE_X64" ref="95dfa8a3d8b23ba3b20be0bf074d908b" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_IMAGE_MACHINE_X64&nbsp;&nbsp;&nbsp;0x8664          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-PE32+ Machine type for X64 UEFI images 
-</div>
-</div><p>
-<a class="anchor" name="4fa4c301cde7ac51c6aff6fe7b0b7e9c"></a><!-- doxytag: member="UefiBaseType.h::EFI_INCOMPATIBLE_VERSION" ref="4fa4c301cde7ac51c6aff6fe7b0b7e9c" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_INCOMPATIBLE_VERSION&nbsp;&nbsp;&nbsp;RETURN_INCOMPATIBLE_VERSION          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="54e4bbbdaf5cd44a546a936923bea399"></a><!-- doxytag: member="UefiBaseType.h::EFI_INVALID_LANGUAGE" ref="54e4bbbdaf5cd44a546a936923bea399" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_INVALID_LANGUAGE&nbsp;&nbsp;&nbsp;RETURN_INVALID_LANGUAGE          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="517555b4ca97418f0943e5c437382b4c"></a><!-- doxytag: member="UefiBaseType.h::EFI_INVALID_PARAMETER" ref="517555b4ca97418f0943e5c437382b4c" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_INVALID_PARAMETER&nbsp;&nbsp;&nbsp;RETURN_INVALID_PARAMETER          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="eb42b1a02667e462bd28de378dde7ea2"></a><!-- doxytag: member="UefiBaseType.h::EFI_LOAD_ERROR" ref="eb42b1a02667e462bd28de378dde7ea2" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_LOAD_ERROR&nbsp;&nbsp;&nbsp;RETURN_LOAD_ERROR          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="0f4a2606302f7c468419f2985abd5b1c"></a><!-- doxytag: member="UefiBaseType.h::EFI_MEDIA_CHANGED" ref="0f4a2606302f7c468419f2985abd5b1c" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_MEDIA_CHANGED&nbsp;&nbsp;&nbsp;RETURN_MEDIA_CHANGED          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="0e6cc31078fe0bb82d562279a1409d9f"></a><!-- doxytag: member="UefiBaseType.h::EFI_NO_MAPPING" ref="0e6cc31078fe0bb82d562279a1409d9f" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_NO_MAPPING&nbsp;&nbsp;&nbsp;RETURN_NO_MAPPING          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="6834fec7bb4610c77aa5ec4551bb55e9"></a><!-- doxytag: member="UefiBaseType.h::EFI_NO_MEDIA" ref="6834fec7bb4610c77aa5ec4551bb55e9" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_NO_MEDIA&nbsp;&nbsp;&nbsp;RETURN_NO_MEDIA          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="4d8ce4398d594d5944f4fa97c2ae3389"></a><!-- doxytag: member="UefiBaseType.h::EFI_NO_RESPONSE" ref="4d8ce4398d594d5944f4fa97c2ae3389" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_NO_RESPONSE&nbsp;&nbsp;&nbsp;RETURN_NO_RESPONSE          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="7d71dcd8a1666b9119271a011763bf79"></a><!-- doxytag: member="UefiBaseType.h::EFI_NOT_FOUND" ref="7d71dcd8a1666b9119271a011763bf79" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_NOT_FOUND&nbsp;&nbsp;&nbsp;RETURN_NOT_FOUND          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="11b217b264b88fe2990003ffce0c285d"></a><!-- doxytag: member="UefiBaseType.h::EFI_NOT_READY" ref="11b217b264b88fe2990003ffce0c285d" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_NOT_READY&nbsp;&nbsp;&nbsp;RETURN_NOT_READY          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="6f338b4c2382d9daa5ce67fcf907d1af"></a><!-- doxytag: member="UefiBaseType.h::EFI_NOT_STARTED" ref="6f338b4c2382d9daa5ce67fcf907d1af" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_NOT_STARTED&nbsp;&nbsp;&nbsp;RETURN_NOT_STARTED          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="df288f30572eb468a09ab95c76c00052"></a><!-- doxytag: member="UefiBaseType.h::EFI_OUT_OF_RESOURCES" ref="df288f30572eb468a09ab95c76c00052" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_OUT_OF_RESOURCES&nbsp;&nbsp;&nbsp;RETURN_OUT_OF_RESOURCES          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="ce83cb8fe7c059da5f93f59dc1a77a5b"></a><!-- doxytag: member="UefiBaseType.h::EFI_PAGE_MASK" ref="ce83cb8fe7c059da5f93f59dc1a77a5b" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_PAGE_MASK&nbsp;&nbsp;&nbsp;0xFFF          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="bc02417bc3f15dd459be81b382242de0"></a><!-- doxytag: member="UefiBaseType.h::EFI_PAGE_SHIFT" ref="bc02417bc3f15dd459be81b382242de0" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_PAGE_SHIFT&nbsp;&nbsp;&nbsp;12          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="13d050384cfdc94809913cfdec9571e6"></a><!-- doxytag: member="UefiBaseType.h::EFI_PAGE_SIZE" ref="13d050384cfdc94809913cfdec9571e6" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_PAGE_SIZE&nbsp;&nbsp;&nbsp;0x1000          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="7519fd833a6709d376602441972f6104"></a><!-- doxytag: member="UefiBaseType.h::EFI_PAGES_TO_SIZE" ref="7519fd833a6709d376602441972f6104" args="(a)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_PAGES_TO_SIZE          </td>
-          <td>(</td>
-          <td class="paramtype">a&nbsp;</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td>&nbsp;&nbsp;&nbsp;( (a) &lt;&lt; EFI_PAGE_SHIFT)</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="6712a7f85cab36770c273f477b5a2e6b"></a><!-- doxytag: member="UefiBaseType.h::EFI_PROTOCOL_ERROR" ref="6712a7f85cab36770c273f477b5a2e6b" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_PROTOCOL_ERROR&nbsp;&nbsp;&nbsp;RETURN_PROTOCOL_ERROR          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="3cd7733d7f3a62ab5d4c088e02ce094a"></a><!-- doxytag: member="UefiBaseType.h::EFI_SECURITY_VIOLATION" ref="3cd7733d7f3a62ab5d4c088e02ce094a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_SECURITY_VIOLATION&nbsp;&nbsp;&nbsp;RETURN_SECURITY_VIOLATION          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="d50efc5dfc6c7e9c896733f77bfd5304"></a><!-- doxytag: member="UefiBaseType.h::EFI_SIZE_TO_PAGES" ref="d50efc5dfc6c7e9c896733f77bfd5304" args="(a)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_SIZE_TO_PAGES          </td>
-          <td>(</td>
-          <td class="paramtype">a&nbsp;</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td>&nbsp;&nbsp;&nbsp;(((a) &gt;&gt; EFI_PAGE_SHIFT) + (((a) &amp; EFI_PAGE_MASK) ? 1 : 0))</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="fd2956ea230ac571679e90c1f7fdcf7a"></a><!-- doxytag: member="UefiBaseType.h::EFI_SUCCESS" ref="fd2956ea230ac571679e90c1f7fdcf7a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_SUCCESS&nbsp;&nbsp;&nbsp;RETURN_SUCCESS          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="caec3033b0a20d8fce48953a9943c42f"></a><!-- doxytag: member="UefiBaseType.h::EFI_TFTP_ERROR" ref="caec3033b0a20d8fce48953a9943c42f" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_TFTP_ERROR&nbsp;&nbsp;&nbsp;RETURN_TFTP_ERROR          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="d0a4ae73a61270c9cf93fce9b6963a8f"></a><!-- doxytag: member="UefiBaseType.h::EFI_TIMEOUT" ref="d0a4ae73a61270c9cf93fce9b6963a8f" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_TIMEOUT&nbsp;&nbsp;&nbsp;RETURN_TIMEOUT          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="33f9e7f3e8414d8c0f37b696fa87e98b"></a><!-- doxytag: member="UefiBaseType.h::EFI_UNSUPPORTED" ref="33f9e7f3e8414d8c0f37b696fa87e98b" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_UNSUPPORTED&nbsp;&nbsp;&nbsp;RETURN_UNSUPPORTED          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="799ac69ab99d97820d1ec5ed974aebe4"></a><!-- doxytag: member="UefiBaseType.h::EFI_VOLUME_CORRUPTED" ref="799ac69ab99d97820d1ec5ed974aebe4" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_VOLUME_CORRUPTED&nbsp;&nbsp;&nbsp;RETURN_VOLUME_CORRUPTED          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="2a810abe290057c835d5022294cf555f"></a><!-- doxytag: member="UefiBaseType.h::EFI_VOLUME_FULL" ref="2a810abe290057c835d5022294cf555f" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_VOLUME_FULL&nbsp;&nbsp;&nbsp;RETURN_VOLUME_FULL          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="f3efd8e4fe29febce3beca557b70133a"></a><!-- doxytag: member="UefiBaseType.h::EFI_WARN_BUFFER_TOO_SMALL" ref="f3efd8e4fe29febce3beca557b70133a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_WARN_BUFFER_TOO_SMALL&nbsp;&nbsp;&nbsp;RETURN_WARN_BUFFER_TOO_SMALL          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="f8f690347b49eb8950b3bf50fe237ddb"></a><!-- doxytag: member="UefiBaseType.h::EFI_WARN_DELETE_FAILURE" ref="f8f690347b49eb8950b3bf50fe237ddb" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_WARN_DELETE_FAILURE&nbsp;&nbsp;&nbsp;RETURN_WARN_DELETE_FAILURE          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="0f0a434fc76962dd5dd6049c24cd3583"></a><!-- doxytag: member="UefiBaseType.h::EFI_WARN_UNKNOWN_GLYPH" ref="0f0a434fc76962dd5dd6049c24cd3583" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_WARN_UNKNOWN_GLYPH&nbsp;&nbsp;&nbsp;RETURN_WARN_UNKNOWN_GLYPH          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="bcb9624fb5aa51a0a853cf24a7be5b4c"></a><!-- doxytag: member="UefiBaseType.h::EFI_WARN_WRITE_FAILURE" ref="bcb9624fb5aa51a0a853cf24a7be5b4c" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_WARN_WRITE_FAILURE&nbsp;&nbsp;&nbsp;RETURN_WARN_WRITE_FAILURE          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="622887a68e58c72b1ceccbf007fc0922"></a><!-- doxytag: member="UefiBaseType.h::EFI_WRITE_PROTECTED" ref="622887a68e58c72b1ceccbf007fc0922" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFI_WRITE_PROTECTED&nbsp;&nbsp;&nbsp;RETURN_WRITE_PROTECTED          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="e4575a8865019cd2a3065bb97eb08dbd"></a><!-- doxytag: member="UefiBaseType.h::EFIERR" ref="e4575a8865019cd2a3065bb97eb08dbd" args="(_a)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EFIERR          </td>
-          <td>(</td>
-          <td class="paramtype">_a&nbsp;</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td>&nbsp;&nbsp;&nbsp;ENCODE_ERROR(_a)</td>
+          <td class="memname">#define EFI_HII_CONFIG_ACCESS_PROTOCOL_GUID&nbsp;&nbsp;&nbsp;{ 0x330d4706, 0xf2a0, 0x4e4f, { 0xa3, 0x69, 0xb6, 0x6f, 0xa8, 0xd5, 0x43, 0x85 } }          </td>
         </tr>
       </table>
 </div>
@@ -904,128 +99,153 @@ PE32+ Machine type for X64 UEFI images
 </div>
 </div><p>
 <hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="7f3111de303d836d8d3711c39363f81a"></a><!-- doxytag: member="UefiBaseType.h::EFI_EVENT" ref="7f3111de303d836d8d3711c39363f81a" args="" -->
+<a class="anchor" name="1fa21e5c09eff10767756c9eb3ca5940"></a><!-- doxytag: member="HiiConfigAccess.h::EFI_BROWSER_ACTION" ref="1fa21e5c09eff10767756c9eb3ca5940" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef VOID* <a class="el" href="../../d9/dbb/a01186.html#7f3111de303d836d8d3711c39363f81a">EFI_EVENT</a>          </td>
+          <td class="memname">typedef <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> <a class="el" href="../../d9/dbb/a01186.html#1fa21e5c09eff10767756c9eb3ca5940">EFI_BROWSER_ACTION</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Handle to an event structure. 
+
 </div>
 </div><p>
-<a class="anchor" name="d87614428813f71edb2c2d802e9ce2af"></a><!-- doxytag: member="UefiBaseType.h::EFI_GUID" ref="d87614428813f71edb2c2d802e9ce2af" args="" -->
+<a class="anchor" name="7946bf3122406e6b115faa0a200b224e"></a><!-- doxytag: member="HiiConfigAccess.h::EFI_HII_ACCESS_EXTRACT_CONFIG" ref="7946bf3122406e6b115faa0a200b224e" args=")(IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL *This, IN CONST EFI_STRING Request, OUT EFI_STRING *Progress, OUT EFI_STRING *Results)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/d0f/a00644.html">GUID</a> <a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>          </td>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d9/dbb/a01186.html#7946bf3122406e6b115faa0a200b224e">EFI_HII_ACCESS_EXTRACT_CONFIG</a>)(IN CONST <a class="el" href="../../db/d3a/a00040.html">EFI_HII_CONFIG_ACCESS_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> Request, OUT <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> *Progress, OUT <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> *Results)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-128-bit buffer containing a unique identifier value. 
+This function allows the caller to request the current configuration for one or more named elements. The resulting string is in &lt;ConfigAltResp&gt; format. Any and all alternative configuration strings shall also be appended to the end of the current configuration string. If they are, they must appear after the current configuration. They must contain the same routing (<a class="el" href="../../d1/d87/a00689.html">GUID</a>, NAME, PATH) as the current configuration string. They must have an additional description indicating the type of alternative configuration the string represents, "ALTCFG=&lt;StringToken&gt;". That &lt;StringToken&gt; (when converted from Hex UNICODE to binary) is a reference to a string in the associated string pack.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Request</em>&nbsp;</td><td>A null-terminated Unicode string in &lt;ConfigRequest&gt; format. Note that this includes the routing information as well as the configurable name / value pairs. It is invalid for this string to be in &lt;MultiConfigRequest&gt; format.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Progress</em>&nbsp;</td><td>On return, points to a character in the Request string. Points to the string's null terminator if request was successful. Points to the most recent "&amp;" before the first failing name / value pair (or the beginning of the string if the failure is in the first name / value pair) if the request was not successful</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Results</em>&nbsp;</td><td>A null-terminated Unicode string in &lt;ConfigAltResp&gt; format which has all values filled in for the names in the Request string. String to be allocated by the called function.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The Results string is filled with the values corresponding to all requested names.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>Not enough memory to store the parts of the results that must be stored awaiting possible future protocols.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>For example, passing in a NULL for the Request parameter would result in this type of error. In this case, the Progress parameter would be set to NULL.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>Routing data doesn't match any known driver. Progress set to the first character in the routing header. Note: There is no requirement that the driver validate the routing data. It must skip the &lt;ConfigHdr&gt; in order to process the names.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Illegal syntax. Progress set to most recent "&amp;" before the error or the beginning of the string.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Unknown name. Progress points to the &amp; before the name in question. </td></tr>
+  </table>
+</dl>
+
 </div>
 </div><p>
-<a class="anchor" name="f943d518ce8a229e7e51ce3fed0e3122"></a><!-- doxytag: member="UefiBaseType.h::EFI_HANDLE" ref="f943d518ce8a229e7e51ce3fed0e3122" args="" -->
+<a class="anchor" name="fbaeb5e29e396f70938e43eeb99da41a"></a><!-- doxytag: member="HiiConfigAccess.h::EFI_HII_ACCESS_FORM_CALLBACK" ref="fbaeb5e29e396f70938e43eeb99da41a" args=")(IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL *This, IN EFI_BROWSER_ACTION Action, IN EFI_QUESTION_ID QuestionId, IN UINT8 Type, IN EFI_IFR_TYPE_VALUE *Value, OUT EFI_BROWSER_ACTION_REQUEST *ActionRequest)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef VOID* <a class="el" href="../../d9/dbb/a01186.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>          </td>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d9/dbb/a01186.html#fbaeb5e29e396f70938e43eeb99da41a">EFI_HII_ACCESS_FORM_CALLBACK</a>)(IN CONST <a class="el" href="../../db/d3a/a00040.html">EFI_HII_CONFIG_ACCESS_PROTOCOL</a> *This, IN <a class="el" href="../../d9/dbb/a01186.html#1fa21e5c09eff10767756c9eb3ca5940">EFI_BROWSER_ACTION</a> Action, IN <a class="el" href="../../d3/d7b/a01249.html#9221f2b1fef32d0b36f6775c510a7381">EFI_QUESTION_ID</a> QuestionId, IN <a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> Type, IN <a class="el" href="../../d4/d1e/a00497.html">EFI_IFR_TYPE_VALUE</a> *Value, OUT <a class="el" href="../../dc/d2d/a01183.html#8959362a4cd4422cc57483fe9c710eb9">EFI_BROWSER_ACTION_REQUEST</a> *ActionRequest)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-A collection of related interfaces. 
+This function is called to provide results data to the driver. This data consists of a unique key that is used to identify which data is either being passed back or being asked for.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Action</em>&nbsp;</td><td>Specifies the type of action taken by the browser. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>QuestionId</em>&nbsp;</td><td>A unique value which is sent to the original exporting driver so that it can identify the type of data to expect. The format of the data tends to vary based on the opcode that generated the callback. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Type</em>&nbsp;</td><td>The type of value for the question. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>A pointer to the data being sent to the original exporting driver. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ActionRequest</em>&nbsp;</td><td>On return, points to the action requested by the callback function.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The callback successfully handled the action. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>Not enough storage is available to hold the variable and its data. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The variable could not be saved. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The specified Action is not supported by the callback. </td></tr>
+  </table>
+</dl>
+
 </div>
 </div><p>
-<a class="anchor" name="3495b0e526b2172f98d5bde00bf28b72"></a><!-- doxytag: member="UefiBaseType.h::EFI_LBA" ref="3495b0e526b2172f98d5bde00bf28b72" args="" -->
+<a class="anchor" name="bfa7901e53696c1c4b7069cd1d1c0285"></a><!-- doxytag: member="HiiConfigAccess.h::EFI_HII_ACCESS_ROUTE_CONFIG" ref="bfa7901e53696c1c4b7069cd1d1c0285" args=")(IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL *This, IN CONST EFI_STRING Configuration, OUT EFI_STRING *Progress)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d9/dbb/a01186.html#3495b0e526b2172f98d5bde00bf28b72">EFI_LBA</a>          </td>
+          <td class="memname">typedef <a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../d9/dbb/a01186.html#bfa7901e53696c1c4b7069cd1d1c0285">EFI_HII_ACCESS_ROUTE_CONFIG</a>)(IN CONST <a class="el" href="../../db/d3a/a00040.html">EFI_HII_CONFIG_ACCESS_PROTOCOL</a> *This, IN CONST <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> Configuration, OUT <a class="el" href="../../d3/d7b/a01249.html#33f0a994dc76513ac04871982fbc278a">EFI_STRING</a> *Progress)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Logical block address. 
+This function applies changes in a driver's configuration. Input is a Configuration, which has the routing data for this driver followed by name / value configuration pairs. The driver must apply those pairs to its configurable storage. If the driver's configuration is stored in a linear block of data and the driver's name / value pairs are in &lt;BlockConfig&gt; format, it may use the ConfigToBlock helper function (above) to simplify the job.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Configuration</em>&nbsp;</td><td>A null-terminated Unicode string in &lt;ConfigString&gt; format.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Progress</em>&nbsp;</td><td>A pointer to a string filled in with the offset of the most recent '&amp;' before the first failing name / value pair (or the beginn ing of the string if the failure is in the first name / value pair) or the terminating NULL if all was successful.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The results have been distributed or are awaiting distribution.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>Not enough memory to store the parts of the results that must be stored awaiting possible future protocols.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETERS</em>&nbsp;</td><td>Passing in a NULL for the Results parameter would result in this type of error.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>EFI_NOT_FOUND</em>&nbsp;</td><td>Target for the specified routing data was not found </td></tr>
+  </table>
+</dl>
+
 </div>
 </div><p>
-<a class="anchor" name="31bc7e7faeab8d2940ee34f21d41cd04"></a><!-- doxytag: member="UefiBaseType.h::EFI_PHYSICAL_ADDRESS" ref="31bc7e7faeab8d2940ee34f21d41cd04" args="" -->
+<a class="anchor" name="f301aa582b80cabb3864f25154aa962f"></a><!-- doxytag: member="HiiConfigAccess.h::EFI_HII_CONFIG_ACCESS_PROTOCOL" ref="f301aa582b80cabb3864f25154aa962f" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a>          </td>
+          <td class="memname">typedef struct <a class="el" href="../../db/d3a/a00040.html">_EFI_HII_CONFIG_ACCESS_PROTOCOL</a> <a class="el" href="../../db/d3a/a00040.html">EFI_HII_CONFIG_ACCESS_PROTOCOL</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-64-bit physical memory address. 
+
 </div>
 </div><p>
-<a class="anchor" name="5f446f35c9f907a4f1cf22e794ba338d"></a><!-- doxytag: member="UefiBaseType.h::EFI_STATUS" ref="5f446f35c9f907a4f1cf22e794ba338d" args="" -->
+<hr><h2>Variable Documentation</h2>
+<a class="anchor" name="69256d7a3e83ffb5f35453e8e98465b9"></a><!-- doxytag: member="HiiConfigAccess.h::gEfiHiiConfigAccessProtocolGuid" ref="69256d7a3e83ffb5f35453e8e98465b9" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="../../d3/dca/a00954.html#f3519a25bfa97c295fb23ffec95b1cb1">RETURN_STATUS</a> <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../d9/dbb/a01186.html#69256d7a3e83ffb5f35453e8e98465b9">gEfiHiiConfigAccessProtocolGuid</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Function return status for EFI API 
-</div>
-</div><p>
-<a class="anchor" name="b998e5f7da4a664eaa86252ab16e459a"></a><!-- doxytag: member="UefiBaseType.h::EFI_TPL" ref="b998e5f7da4a664eaa86252ab16e459a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> <a class="el" href="../../d9/dbb/a01186.html#b998e5f7da4a664eaa86252ab16e459a">EFI_TPL</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
 
-<p>
-Task priority level. 
-</div>
-</div><p>
-<a class="anchor" name="353ea2e3d6220a4e32c5f1eb39a1ed6a"></a><!-- doxytag: member="UefiBaseType.h::EFI_VIRTUAL_ADDRESS" ref="353ea2e3d6220a4e32c5f1eb39a1ed6a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d9/dbb/a01186.html#353ea2e3d6220a4e32c5f1eb39a1ed6a">EFI_VIRTUAL_ADDRESS</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-64-bit virtual memory address. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:11 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:33 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Library/SalLib.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/IndustryStandard/Pci23.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,98 +21,89 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Library/SalLib.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/IndustryStandard/Pci23.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
-<tr><td colspan="2"><br><h2>Functions</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d6/d86/a00781.html">SAL_RETURN_REGS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d56/a01042.html#970a8ad7d2f870766e7ea3ebf347a897">SalCall</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Index, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Arg2, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Arg3, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Arg4, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Arg5, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Arg6, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Arg7, IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Arg8)</td></tr>
+<tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/de2/a00580.html">EFI_PCI_CAPABILITY_PCIX</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/dc8/a00581.html">EFI_PCI_CAPABILITY_PCIX_BRDG</a></td></tr>
+
+<tr><td colspan="2"><br><h2>Defines</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d56/a01042.html#fb8a256a3a9fb6f7d5ecdefe484e9f14">PCI_IF_EHCI</a>&nbsp;&nbsp;&nbsp;0x20</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d56/a01042.html#aad850aec47dacc19a88de323ee66148">PCI_EXP_MAX_CONFIG_OFFSET</a>&nbsp;&nbsp;&nbsp;0x1000</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d56/a01042.html#8e0b02870c5e8cf83ee3dd26ccf345df">EFI_PCI_CAPABILITY_ID_PCIX</a>&nbsp;&nbsp;&nbsp;0x07</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d56/a01042.html#23f8a90d987dec3b594d95ae99f06a04">PCI_CODE_TYPE_EFI_IMAGE</a>&nbsp;&nbsp;&nbsp;0x03</td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Provides library services to make SAL Calls.<p>
-Copyright (c) 2007 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Function Documentation</h2>
-<a class="anchor" name="970a8ad7d2f870766e7ea3ebf347a897"></a><!-- doxytag: member="SalLib.h::SalCall" ref="970a8ad7d2f870766e7ea3ebf347a897" args="(IN UINT64 Index, IN UINT64 Arg2, IN UINT64 Arg3, IN UINT64 Arg4, IN UINT64 Arg5, IN UINT64 Arg6, IN UINT64 Arg7, IN UINT64 Arg8)" -->
+Support for PCI 2.3 standard.<p>
+Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
+<a class="anchor" name="8e0b02870c5e8cf83ee3dd26ccf345df"></a><!-- doxytag: member="Pci23.h::EFI_PCI_CAPABILITY_ID_PCIX" ref="8e0b02870c5e8cf83ee3dd26ccf345df" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d6/d86/a00781.html">SAL_RETURN_REGS</a> EFIAPI SalCall           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Index</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Arg2</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Arg3</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Arg4</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Arg5</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Arg6</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Arg7</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Arg8</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EFI_PCI_CAPABILITY_ID_PCIX&nbsp;&nbsp;&nbsp;0x07          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Makes a SAL procedure call.<p>
-This is a wrapper function to make a SAL procedure call. No parameter checking is performed on the 8 input parameters, but there are some common rules that the caller should follow when making a SAL call. Any address passed to SAL as buffers for return parameters must be 8-byte aligned. Unaligned addresses may cause undefined results. For those parameters defined as reserved or some fields defined as reserved must be zero filled or the invalid argument return value may be returned or undefined result may occur during the execution of the procedure. This function is only available on Intel Itanium-based platforms.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Index</em>&nbsp;</td><td>The SAL procedure Index number </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Arg2</em>&nbsp;</td><td>The 2nd parameter for SAL procedure calls </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Arg3</em>&nbsp;</td><td>The 3rd parameter for SAL procedure calls </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Arg4</em>&nbsp;</td><td>The 4th parameter for SAL procedure calls </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Arg5</em>&nbsp;</td><td>The 5th parameter for SAL procedure calls </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Arg6</em>&nbsp;</td><td>The 6th parameter for SAL procedure calls </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Arg7</em>&nbsp;</td><td>The 7th parameter for SAL procedure calls </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Arg8</em>&nbsp;</td><td>The 8th parameter for SAL procedure calls</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>SAL returned registers. </dd></dl>
+PCI Capability List IDs and records 
+</div>
+</div><p>
+<a class="anchor" name="23f8a90d987dec3b594d95ae99f06a04"></a><!-- doxytag: member="Pci23.h::PCI_CODE_TYPE_EFI_IMAGE" ref="23f8a90d987dec3b594d95ae99f06a04" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PCI_CODE_TYPE_EFI_IMAGE&nbsp;&nbsp;&nbsp;0x03          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
 
 </div>
 </div><p>
+<a class="anchor" name="aad850aec47dacc19a88de323ee66148"></a><!-- doxytag: member="Pci23.h::PCI_EXP_MAX_CONFIG_OFFSET" ref="aad850aec47dacc19a88de323ee66148" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PCI_EXP_MAX_CONFIG_OFFSET&nbsp;&nbsp;&nbsp;0x1000          </td>
+        </tr>
+      </table>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:09 2009 for MdePkg[ALL] by&nbsp;
+<div class="memdoc">
+
+<p>
+defined in PCI Express Spec. 
+</div>
+</div><p>
+<a class="anchor" name="fb8a256a3a9fb6f7d5ecdefe484e9f14"></a><!-- doxytag: member="Pci23.h::PCI_IF_EHCI" ref="fb8a256a3a9fb6f7d5ecdefe484e9f14" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PCI_IF_EHCI&nbsp;&nbsp;&nbsp;0x20          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Definitions of PCI class bytes and manipulation macros. 
+</div>
+</div><p>
+</div>
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:17 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

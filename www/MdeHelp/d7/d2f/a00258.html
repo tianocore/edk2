@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: _EFI_UDP4_PROTOCOL Struct Reference</title>
+<title>MdePkg[ALL]: _EFI_SIMPLE_FILE_SYSTEM_PROTOCOL Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,34 +21,21 @@
   </div>
 </div>
 <div class="contents">
-<h1>_EFI_UDP4_PROTOCOL Struct Reference</h1><!-- doxytag: class="_EFI_UDP4_PROTOCOL" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>_EFI_SIMPLE_FILE_SYSTEM_PROTOCOL Struct Reference</h1><!-- doxytag: class="_EFI_SIMPLE_FILE_SYSTEM_PROTOCOL" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d6/df2/a01175.html#9d37219365010c960af0b1e32708e942">EFI_UDP4_GET_MODE_DATA</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d2f/a00258.html#b18645d184eda040a6e10fad744f5e38">GetModeData</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d2f/a00258.html#c6cc39f6f4e701b4190563c05c7a93c8">Revision</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d6/df2/a01175.html#341029680e0f33ec540d1a7a73a83d58">EFI_UDP4_CONFIGURE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d2f/a00258.html#e4f41bd6a34762b2643f0e455d598e53">Configure</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d6/df2/a01175.html#fcb4ae18aa8ee717c697576d4e94e194">EFI_UDP4_GROUPS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d2f/a00258.html#ce2f376207b7f113d031d6471c9434b4">Groups</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d6/df2/a01175.html#40697608c844919cea7835abb3a7312b">EFI_UDP4_ROUTES</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d2f/a00258.html#4a3728d0ce6a1117a5bbf52d73a83189">Routes</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d6/df2/a01175.html#93187fc388e536dc8a6d9908de66a1d7">EFI_UDP4_TRANSMIT</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d2f/a00258.html#b1056da65d5d73ffb9ed5fa341682e18">Transmit</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d6/df2/a01175.html#b7935f078a424c85b24c51a4c6992629">EFI_UDP4_RECEIVE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d2f/a00258.html#33b077a33c5c2e1d7a63e4ecebc75a83">Receive</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d6/df2/a01175.html#257ae5a511c2ae9df179019fb3557a4d">EFI_UDP4_CANCEL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d2f/a00258.html#864f4bd1c6c2ec1def6ad5f7916affc6">Cancel</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d6/df2/a01175.html#0b2b026cad49686c480f6e9eb0552b18">EFI_UDP4_POLL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d2f/a00258.html#4634a94c619a330077f0ab4d5ceeaa59">Poll</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/d53/a01225.html#af9c229fa2eb7a8a476000d9b7d8f21c">EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_OPEN_VOLUME</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/d2f/a00258.html#2cd3a9268b5086255ed43cc3c77037b4">OpenVolume</a></td></tr>
 
 </table>
-<hr><a name="_details"></a><h2>Detailed Description</h2>
-The EFI_UDP4_PROTOCOL defines an EFI UDPv4 Protocol session that can be used by any network drivers, applications, or daemons to transmit or receive UDP packets. This protocol instance can either be bound to a specified port as a service or connected to some remote peer as an active client. Each instance has its own settings, such as the routing table and group table, which are independent from each other. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="864f4bd1c6c2ec1def6ad5f7916affc6"></a><!-- doxytag: member="_EFI_UDP4_PROTOCOL::Cancel" ref="864f4bd1c6c2ec1def6ad5f7916affc6" args="" -->
+<hr><h2>Field Documentation</h2>
+<a class="anchor" name="2cd3a9268b5086255ed43cc3c77037b4"></a><!-- doxytag: member="_EFI_SIMPLE_FILE_SYSTEM_PROTOCOL::OpenVolume" ref="2cd3a9268b5086255ed43cc3c77037b4" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d6/df2/a01175.html#257ae5a511c2ae9df179019fb3557a4d">EFI_UDP4_CANCEL</a> <a class="el" href="../../d7/d2f/a00258.html#864f4bd1c6c2ec1def6ad5f7916affc6">_EFI_UDP4_PROTOCOL::Cancel</a>          </td>
+          <td class="memname"><a class="el" href="../../d8/d53/a01225.html#af9c229fa2eb7a8a476000d9b7d8f21c">EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_OPEN_VOLUME</a> <a class="el" href="../../d7/d2f/a00258.html#2cd3a9268b5086255ed43cc3c77037b4">_EFI_SIMPLE_FILE_SYSTEM_PROTOCOL::OpenVolume</a>          </td>
         </tr>
       </table>
 </div>
@@ -58,113 +45,23 @@ The EFI_UDP4_PROTOCOL defines an EFI UDPv4 Protocol session that can be used by 
 
 </div>
 </div><p>
-<a class="anchor" name="e4f41bd6a34762b2643f0e455d598e53"></a><!-- doxytag: member="_EFI_UDP4_PROTOCOL::Configure" ref="e4f41bd6a34762b2643f0e455d598e53" args="" -->
+<a class="anchor" name="c6cc39f6f4e701b4190563c05c7a93c8"></a><!-- doxytag: member="_EFI_SIMPLE_FILE_SYSTEM_PROTOCOL::Revision" ref="c6cc39f6f4e701b4190563c05c7a93c8" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d6/df2/a01175.html#341029680e0f33ec540d1a7a73a83d58">EFI_UDP4_CONFIGURE</a> <a class="el" href="../../d7/d2f/a00258.html#e4f41bd6a34762b2643f0e455d598e53">_EFI_UDP4_PROTOCOL::Configure</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d7/d2f/a00258.html#c6cc39f6f4e701b4190563c05c7a93c8">_EFI_SIMPLE_FILE_SYSTEM_PROTOCOL::Revision</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<a class="anchor" name="b18645d184eda040a6e10fad744f5e38"></a><!-- doxytag: member="_EFI_UDP4_PROTOCOL::GetModeData" ref="b18645d184eda040a6e10fad744f5e38" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d6/df2/a01175.html#9d37219365010c960af0b1e32708e942">EFI_UDP4_GET_MODE_DATA</a> <a class="el" href="../../d7/d2f/a00258.html#b18645d184eda040a6e10fad744f5e38">_EFI_UDP4_PROTOCOL::GetModeData</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="ce2f376207b7f113d031d6471c9434b4"></a><!-- doxytag: member="_EFI_UDP4_PROTOCOL::Groups" ref="ce2f376207b7f113d031d6471c9434b4" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d6/df2/a01175.html#fcb4ae18aa8ee717c697576d4e94e194">EFI_UDP4_GROUPS</a> <a class="el" href="../../d7/d2f/a00258.html#ce2f376207b7f113d031d6471c9434b4">_EFI_UDP4_PROTOCOL::Groups</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="4634a94c619a330077f0ab4d5ceeaa59"></a><!-- doxytag: member="_EFI_UDP4_PROTOCOL::Poll" ref="4634a94c619a330077f0ab4d5ceeaa59" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d6/df2/a01175.html#0b2b026cad49686c480f6e9eb0552b18">EFI_UDP4_POLL</a> <a class="el" href="../../d7/d2f/a00258.html#4634a94c619a330077f0ab4d5ceeaa59">_EFI_UDP4_PROTOCOL::Poll</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="33b077a33c5c2e1d7a63e4ecebc75a83"></a><!-- doxytag: member="_EFI_UDP4_PROTOCOL::Receive" ref="33b077a33c5c2e1d7a63e4ecebc75a83" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d6/df2/a01175.html#b7935f078a424c85b24c51a4c6992629">EFI_UDP4_RECEIVE</a> <a class="el" href="../../d7/d2f/a00258.html#33b077a33c5c2e1d7a63e4ecebc75a83">_EFI_UDP4_PROTOCOL::Receive</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="4a3728d0ce6a1117a5bbf52d73a83189"></a><!-- doxytag: member="_EFI_UDP4_PROTOCOL::Routes" ref="4a3728d0ce6a1117a5bbf52d73a83189" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d6/df2/a01175.html#40697608c844919cea7835abb3a7312b">EFI_UDP4_ROUTES</a> <a class="el" href="../../d7/d2f/a00258.html#4a3728d0ce6a1117a5bbf52d73a83189">_EFI_UDP4_PROTOCOL::Routes</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="b1056da65d5d73ffb9ed5fa341682e18"></a><!-- doxytag: member="_EFI_UDP4_PROTOCOL::Transmit" ref="b1056da65d5d73ffb9ed5fa341682e18" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d6/df2/a01175.html#93187fc388e536dc8a6d9908de66a1d7">EFI_UDP4_TRANSMIT</a> <a class="el" href="../../d7/d2f/a00258.html#b1056da65d5d73ffb9ed5fa341682e18">_EFI_UDP4_PROTOCOL::Transmit</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
+The version of the EFI_SIMPLE_FILE_SYSTEM_PROTOCOL. The version specified by this specification is 0x00010000. All future revisions must be backwards compatible. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:14 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:17 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

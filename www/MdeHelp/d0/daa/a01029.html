@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Library/PciSegmentLib.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/IndustryStandard/Acpi10.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,1635 +21,929 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Library/PciSegmentLib.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/IndustryStandard/Acpi10.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
+<tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d95/a00379.html">EFI_ACPI_COMMON_HEADER</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/ddd/a00380.html">EFI_ACPI_DESCRIPTION_HEADER</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/d30/a00370.html">EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d08/a00381.html">EFI_ACPI_END_TAG_DESCRIPTOR</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d4e/a00329.html">EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/de9/a00322.html">EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d53/a00321.html">EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d23/a00326.html">EFI_ACPI_1_0_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/db5/a00328.html">EFI_ACPI_1_0_PROCESSOR_LOCAL_APIC_STRUCTURE</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d8f/a00324.html">EFI_ACPI_1_0_IO_APIC_STRUCTURE</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d55/a00323.html">EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/dfc/a00327.html">EFI_ACPI_1_0_NON_MASKABLE_INTERRUPT_SOURCE_STRUCTURE</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/dc8/a00325.html">EFI_ACPI_1_0_LOCAL_APIC_NMI_STRUCTURE</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dbb/a00330.html">EFI_ACPI_1_0_SMART_BATTERY_DESCRIPTION_TABLE</a></td></tr>
+
 <tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#6cfc18ee7a988a898e6ccbdad3540d56">PCI_SEGMENT_LIB_ADDRESS</a>(Segment, Bus, Device, Function, Register)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#4af711653b37c97891a608b824f4a1a0">ACPI_ADDRESS_SPACE_DESCRIPTOR</a>&nbsp;&nbsp;&nbsp;0x8A</td></tr>
 
-<tr><td colspan="2"><br><h2>Functions</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/dca/a00954.html#f3519a25bfa97c295fb23ffec95b1cb1">RETURN_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#725a83e7b7c792a76d994cad3c7def72">PciSegmentRegisterForRuntimeAccess</a> (IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Address)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#eb86febcaace75bd88c89c2699cb5951">ACPI_END_TAG_DESCRIPTOR</a>&nbsp;&nbsp;&nbsp;0x79</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#001315cbcd1469a3310eba6e6f2a9799">PciSegmentRead8</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#ce57ca82231ec1ee6dac833621d775f8">ACPI_ADDRESS_SPACE_TYPE_MEM</a>&nbsp;&nbsp;&nbsp;0x00</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#ed095904b4116339f2f92e8b9bf2947d">PciSegmentWrite8</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> Value)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#405b7fa90561b22940b7ef68003a8a3b">ACPI_ADDRESS_SPACE_TYPE_IO</a>&nbsp;&nbsp;&nbsp;0x01</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#932cb07ec8326272557ec990966410eb">PciSegmentOr8</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> OrData)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#205b304bb9bba67ed08ae8b39beb6cc2">ACPI_ADDRESS_SPACE_TYPE_BUS</a>&nbsp;&nbsp;&nbsp;0x02</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#b38e14cbe98073c6fad562315872aa1a">PciSegmentAnd8</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> AndData)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#56a79a0601072574295cb8abca08216b">ACPI_TIMER_FREQUENCY</a>&nbsp;&nbsp;&nbsp;3579545</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#e8a8def88fa426d08ffc365146055c69">PciSegmentAndThenOr8</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> AndData, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> OrData)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#1c353878d54908c56692385c61b1c3c8">EFI_ACPI_RESERVED_BYTE</a>&nbsp;&nbsp;&nbsp;0x00</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#92259b32e02fd1e192a44a1a896796a0">PciSegmentBitFieldRead8</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartBit, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EndBit)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#bd92dbb3e3e134c65f48ef65c163f779">EFI_ACPI_RESERVED_WORD</a>&nbsp;&nbsp;&nbsp;0x0000</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#8472695dae7d0fc2cb4d15046c14f69a">PciSegmentBitFieldWrite8</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartBit, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EndBit, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> Value)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#dc495968caa7effd3111e1ad9a016a2d">EFI_ACPI_RESERVED_DWORD</a>&nbsp;&nbsp;&nbsp;0x00000000</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#424fbccb47221314843c9468dde55c51">PciSegmentBitFieldOr8</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartBit, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EndBit, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> OrData)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#f25b5b6df2a0b5b7496f2b0f39d989da">EFI_ACPI_RESERVED_QWORD</a>&nbsp;&nbsp;&nbsp;0x0000000000000000</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#48b0f05d23681a6347e1e9545a5faff3">PciSegmentBitFieldAnd8</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartBit, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EndBit, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> AndData)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#e269d72713409d341538932e1b24878e">EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_READ_WRITE</a>&nbsp;&nbsp;&nbsp;(1 &lt;&lt; 0)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#bdf7f31e5f1bb5199d6542cad1c29d67">PciSegmentBitFieldAndThenOr8</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartBit, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EndBit, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> AndData, IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> OrData)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#6af853e6f73bcf85f14d6983e0d93c30">EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_READ_ONLY</a>&nbsp;&nbsp;&nbsp;(0 &lt;&lt; 0)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#5eb5291667553fa4d129f16a9489231a">PciSegmentRead16</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#a10601e2a3240e6b11f428fe5729dfc9">EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_NON_CACHEABLE</a>&nbsp;&nbsp;&nbsp;(0 &lt;&lt; 1)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#272c53bd955c1b0cb9a0e584addd3991">PciSegmentWrite16</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> Value)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#0bd9e5b64cbc884727a4a296877c0627">EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE</a>&nbsp;&nbsp;&nbsp;(1 &lt;&lt; 1)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#8aba07bde28e9850f3ef6856ca727952">PciSegmentOr16</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> OrData)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#2f0f29bac204fcf855b28bdd8bf2a99d">EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_WRITE_COMBINING</a>&nbsp;&nbsp;&nbsp;(2 &lt;&lt; 1)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#5d02c3c0f714dde20e74e3b63c445f4b">PciSegmentAnd16</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> AndData)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#678ee124898415e43d32f52558adfbaa">EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE</a>&nbsp;&nbsp;&nbsp;(3 &lt;&lt; 1)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#e3485d0ba574cc3c133cebfa7915cf37">PciSegmentAndThenOr16</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> AndData, IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> OrData)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#27d17bd21ecc2e3dca45ae19aace253b">EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_ADDRESS_RANGE_MEMORY</a>&nbsp;&nbsp;&nbsp;(0 &lt;&lt; 3)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#9d03083490998d1feb4e77c32988f435">PciSegmentBitFieldRead16</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartBit, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EndBit)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#0558c10a7237c20a353af1df7ee52f79">EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_ADDRESS_RANGE_RESERVED</a>&nbsp;&nbsp;&nbsp;(1 &lt;&lt; 3)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#ec895b7987ea2306c0a74496aaf2344e">PciSegmentBitFieldWrite16</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartBit, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EndBit, IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> Value)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#ced3a0bde8efdd97c5317511d60c1faa">EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_ADDRESS_RANGE_ACPI</a>&nbsp;&nbsp;&nbsp;(2 &lt;&lt; 3)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#4351af761620ce16343b50b2091a7409">PciSegmentBitFieldOr16</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartBit, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EndBit, IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> OrData)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#0fc34a8934f0994acb49cc51f7ae363e">EFI_APCI_MEMORY_RESOURCE_SPECIFIC_FLAG_ADDRESS_RANGE_NVS</a>&nbsp;&nbsp;&nbsp;(3 &lt;&lt; 3)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#2f709398b9e514acbca985d8a569cdf9">PciSegmentBitFieldAnd16</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartBit, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EndBit, IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> AndData)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#90e643bad0356d8cbd114db82921fcd0">EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_TYPE_TRANSLATION</a>&nbsp;&nbsp;&nbsp;(1 &lt;&lt; 5)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#9c6af5492af9189c9883038291ddbe60">PciSegmentBitFieldAndThenOr16</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartBit, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EndBit, IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> AndData, IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> OrData)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#324428265504a722ffbac0f578f6b591">EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_TYPE_STATIC</a>&nbsp;&nbsp;&nbsp;(0 &lt;&lt; 5)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#a5e125d090fc0163771caabf002c638e">PciSegmentRead32</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#6aa0e5934a43950675131f215b5f6af8">EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_TABLE_REVISION</a>&nbsp;&nbsp;&nbsp;0x01</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#39fd4685d24b0f724f4f25590334d093">PciSegmentWrite32</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> Value)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#2fc59f84057e184513a9e3cb5f8f6d82">EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE_REVISION</a>&nbsp;&nbsp;&nbsp;0x01</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#fbbb7872b767f791e3e886c108bf65a3">PciSegmentOr32</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> OrData)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#2cfe96205e6302e43a95393e211702e0">EFI_ACPI_1_0_WBINVD</a>&nbsp;&nbsp;&nbsp;BIT0</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#09d0a44110e96e757ebcde96a1f192c4">PciSegmentAnd32</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> AndData)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#95dbfb22b7ecffa946c0a2483b411fe4">EFI_ACPI_1_0_WBINVD_FLUSH</a>&nbsp;&nbsp;&nbsp;BIT1</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#a25d4b11a3f7af8878ebd0802e67adfe">PciSegmentAndThenOr32</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> AndData, IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> OrData)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#87348c5e4af06e4beb3ab0c913371bb8">EFI_ACPI_1_0_PROC_C1</a>&nbsp;&nbsp;&nbsp;BIT2</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#ed5340430a06a7274d4f6e234972b8f0">PciSegmentBitFieldRead32</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartBit, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EndBit)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#f4962e87d00ce1e30007d8d682304e52">EFI_ACPI_1_0_P_LVL2_UP</a>&nbsp;&nbsp;&nbsp;BIT3</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#767ee0ca1d504ef566337737f6845149">PciSegmentBitFieldWrite32</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartBit, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EndBit, IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> Value)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#4d9ab7d60f725cdf626a6f7eaec883fe">EFI_ACPI_1_0_PWR_BUTTON</a>&nbsp;&nbsp;&nbsp;BIT4</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#d71481fe06d5767564a511bfe19be982">PciSegmentBitFieldOr32</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartBit, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EndBit, IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> OrData)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#475bb4e4c6286c550d2cb4cc6385c322">EFI_ACPI_1_0_SLP_BUTTON</a>&nbsp;&nbsp;&nbsp;BIT5</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#e5a563f9c49450b34ffce98e030d02e7">PciSegmentBitFieldAnd32</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartBit, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EndBit, IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> AndData)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#e8452670c1e0786bdc45a5776e0fe82b">EFI_ACPI_1_0_FIX_RTC</a>&nbsp;&nbsp;&nbsp;BIT6</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#8c250b8a45de929fd56f12a72d3c26f2">PciSegmentBitFieldAndThenOr32</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> Address, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> StartBit, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EndBit, IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> AndData, IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> OrData)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#2112aaf691f87a6b4b0790b68e562ed1">EFI_ACPI_1_0_RTC_S4</a>&nbsp;&nbsp;&nbsp;BIT7</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#43581684cf9fd47adc3f53ac36ba0803">PciSegmentReadBuffer</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> StartAddress, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Size, OUT VOID *Buffer)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#c872aee47bf9ad043dcab3085f0268ab">EFI_ACPI_1_0_TMR_VAL_EXT</a>&nbsp;&nbsp;&nbsp;BIT8</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#ed74524a9ef2243de1d43e51ce0e448a">PciSegmentWriteBuffer</a> (IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> StartAddress, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Size, IN VOID *Buffer)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#d686406975884d2931b0643908d1589f">EFI_ACPI_1_0_DCK_CAP</a>&nbsp;&nbsp;&nbsp;BIT9</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#1f75b6d1f7e93a68cd64ffeb49d98950">EFI_ACPI_1_0_S4BIOS_F</a>&nbsp;&nbsp;&nbsp;BIT0</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#24103a63013cc1bf981e3b2ab923cb3c">EFI_ACPI_1_0_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION</a>&nbsp;&nbsp;&nbsp;0x01</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#b331227d9d5d1d96e3f4f65716f01ca7">EFI_ACPI_1_0_PCAT_COMPAT</a>&nbsp;&nbsp;&nbsp;BIT0</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#3a5fa2b6abc4ba6d53cdac6f9838f7d4">EFI_ACPI_1_0_PROCESSOR_LOCAL_APIC</a>&nbsp;&nbsp;&nbsp;0x00</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#d0ff4ef53295bdf6b8da4e8e4ccb3624">EFI_ACPI_1_0_IO_APIC</a>&nbsp;&nbsp;&nbsp;0x01</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#98a4d83a2a9a250c64225d12efb4a4bf">EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE</a>&nbsp;&nbsp;&nbsp;0x02</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#299cff7e769fd3eaf132ed23008a04f1">EFI_ACPI_1_0_NON_MASKABLE_INTERRUPT_SOURCE</a>&nbsp;&nbsp;&nbsp;0x03</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#0d185450a2993b778b06fe8241dabfcb">EFI_ACPI_1_0_LOCAL_APIC_NMI</a>&nbsp;&nbsp;&nbsp;0x04</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#1fba356ab4914f337ac264226caa7454">EFI_ACPI_1_0_LOCAL_APIC_ENABLED</a>&nbsp;&nbsp;&nbsp;BIT0</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#ae3a2eb2b48fd62cf01f65c01d450507">EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER_SIGNATURE</a>&nbsp;&nbsp;&nbsp;SIGNATURE_64('R', 'S', 'D', ' ', 'P', 'T', 'R', ' ')</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#938dfd1d331ba699b89d42e97b233201">EFI_ACPI_1_0_APIC_SIGNATURE</a>&nbsp;&nbsp;&nbsp;SIGNATURE_32('A', 'P', 'I', 'C')</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#4c902c7f125ba15113355a18d762ef36">EFI_ACPI_1_0_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE</a>&nbsp;&nbsp;&nbsp;SIGNATURE_32('D', 'S', 'D', 'T')</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#033ec1a95884b3b78f8c97a1fba032a1">EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE</a>&nbsp;&nbsp;&nbsp;SIGNATURE_32('F', 'A', 'C', 'S')</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#2f8d40f0b8ec28d6610d30a34e5f1d1b">EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE</a>&nbsp;&nbsp;&nbsp;SIGNATURE_32('F', 'A', 'C', 'P')</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#95c79885dbd6249c2636b77188397b64">EFI_ACPI_1_0_PERSISTENT_SYSTEM_DESCRIPTION_TABLE_SIGNATURE</a>&nbsp;&nbsp;&nbsp;SIGNATURE_32('P', 'S', 'D', 'T')</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#0b6343f299f5cdd08518f446904f6f7e">EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_TABLE_SIGNATURE</a>&nbsp;&nbsp;&nbsp;SIGNATURE_32('R', 'S', 'D', 'T')</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#545966277f58325d6a9ce25a5eddd0cc">EFI_ACPI_1_0_SMART_BATTERY_SPECIFICATION_TABLE_SIGNATURE</a>&nbsp;&nbsp;&nbsp;SIGNATURE_32('S', 'B', 'S', 'T')</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/daa/a01029.html#03fff12d599e4381e0a6ad5e0295b41e">EFI_ACPI_1_0_SECONDARY_SYSTEM_DESCRIPTION_TABLE_SIGNATURE</a>&nbsp;&nbsp;&nbsp;SIGNATURE_32('S', 'S', 'D', 'T')</td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Provides services to access PCI Configuration Space on a platform with multiple PCI segments.<p>
-The PCI Segment Library function provide services to read, write, and modify the PCI configuration registers on PCI root bridges on any supported PCI segment. These library services take a single address parameter that encodes the PCI Segment, PCI Bus, PCI Device, PCI Function, and PCI Register. The layout of this address parameter is as follows:<p>
-PCI Register: Bits 0..11 PCI Function Bits 12..14 PCI Device Bits 15..19 PCI Bus Bits 20..27 Reserved Bits 28..31. Must be 0. PCI Segment Bits 32..47 Reserved Bits 48..63. Must be 0.<p>
-| Reserved (MBZ) | Segment | Reserved (MBZ) | Bus | Device | Function | Register | 63 48 47 32 31 28 27 20 19 15 14 12 11 0<p>
-These functions perform PCI configuration cycles using the default PCI configuration access method. This may use I/O ports 0xCF8 and 0xCFC to perform PCI configuration accesses, or it may use MMIO registers relative to the PcdPciExpressBaseAddress, or it may use some alternate access method. Modules will typically use the PCI Segment Library for its PCI configuration accesses when PCI Segments other than Segment #0 must be accessed.<p>
-Copyright (c) 2006 - 2009, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
+ACPI 1.0b definitions from the ACPI Specification, revision 1.0b<p>
+Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
-<a class="anchor" name="6cfc18ee7a988a898e6ccbdad3540d56"></a><!-- doxytag: member="PciSegmentLib.h::PCI_SEGMENT_LIB_ADDRESS" ref="6cfc18ee7a988a898e6ccbdad3540d56" args="(Segment, Bus, Device, Function, Register)" -->
+<a class="anchor" name="4af711653b37c97891a608b824f4a1a0"></a><!-- doxytag: member="Acpi10.h::ACPI_ADDRESS_SPACE_DESCRIPTOR" ref="4af711653b37c97891a608b824f4a1a0" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define PCI_SEGMENT_LIB_ADDRESS          </td>
-          <td>(</td>
-          <td class="paramtype">Segment,         <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Bus,         <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Device,         <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Function,         <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Register&nbsp;</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
+          <td class="memname">#define ACPI_ADDRESS_SPACE_DESCRIPTOR&nbsp;&nbsp;&nbsp;0x8A          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-<b>Value:</b><div class="fragment"><pre class="fragment">( ((Register) &amp; 0xfff)              | \
-    (((Function) &amp; 0x07) &lt;&lt; 12)       | \
-    (((Device) &amp; 0x1f) &lt;&lt; 15)         | \
-    (((Bus) &amp; 0xff) &lt;&lt; 20)            | \
-    (<a class="code" href="../../d6/d36/a01011.html#c11f862556922e955f34819af35148af">LShiftU64</a>((Segment) &amp; 0xffff, 32)) \
-  )
-</pre></div>Macro that converts PCI Segment, PCI Bus, PCI Device, PCI Function, and PCI Register to an address that can be passed to the PCI Segment Library functions.<p>
-Computes an address that is compatible with the PCI Segment Library functions. The unused upper bits of Segment, Bus, Device, Function, and Register are stripped prior to the generation of the address.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Segment</em>&nbsp;</td><td>PCI Segment number. Range 0..65535. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Bus</em>&nbsp;</td><td>PCI Bus number. Range 0..255. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Device</em>&nbsp;</td><td>PCI Device number. Range 0..31. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Function</em>&nbsp;</td><td>PCI Function number. Range 0..7. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Register</em>&nbsp;</td><td>PCI Register number. Range 0..255 for PCI. Range 0..4095 for PCI Express.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The address that is compatible with the PCI Segment Library functions. </dd></dl>
 
 </div>
 </div><p>
-<hr><h2>Function Documentation</h2>
-<a class="anchor" name="5d02c3c0f714dde20e74e3b63c445f4b"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentAnd16" ref="5d02c3c0f714dde20e74e3b63c445f4b" args="(IN UINT64 Address, IN UINT16 AndData)" -->
+<a class="anchor" name="205b304bb9bba67ed08ae8b39beb6cc2"></a><!-- doxytag: member="Acpi10.h::ACPI_ADDRESS_SPACE_TYPE_BUS" ref="205b304bb9bba67ed08ae8b39beb6cc2" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI PciSegmentAnd16           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
-          <td class="paramname"> <em>AndData</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define ACPI_ADDRESS_SPACE_TYPE_BUS&nbsp;&nbsp;&nbsp;0x02          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Performs a bitwise AND of a 16-bit PCI configuration register with a 16-bit value.<p>
-Reads the 16-bit PCI configuration register specified by Address, performs a bitwise AND between the read result and the value specified by AndData, and writes the result to the 16-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized.<p>
-If any reserved bits in Address are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 16-bit boundary, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Segment, Bus, Device, Function, and Register. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>AndData</em>&nbsp;</td><td>The value to AND with the PCI configuration register.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written to the PCI configuration register. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="09d0a44110e96e757ebcde96a1f192c4"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentAnd32" ref="09d0a44110e96e757ebcde96a1f192c4" args="(IN UINT64 Address, IN UINT32 AndData)" -->
+<a class="anchor" name="405b7fa90561b22940b7ef68003a8a3b"></a><!-- doxytag: member="Acpi10.h::ACPI_ADDRESS_SPACE_TYPE_IO" ref="405b7fa90561b22940b7ef68003a8a3b" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI PciSegmentAnd32           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td>
-          <td class="paramname"> <em>AndData</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define ACPI_ADDRESS_SPACE_TYPE_IO&nbsp;&nbsp;&nbsp;0x01          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Performs a bitwise AND of a 32-bit PCI configuration register with a 32-bit value.<p>
-Reads the 32-bit PCI configuration register specified by Address, performs a bitwise AND between the read result and the value specified by AndData, and writes the result to the 32-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized.<p>
-If any reserved bits in Address are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 32-bit boundary, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Segment, Bus, Device, Function, and Register. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>AndData</em>&nbsp;</td><td>The value to AND with the PCI configuration register.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written to the PCI configuration register. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="b38e14cbe98073c6fad562315872aa1a"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentAnd8" ref="b38e14cbe98073c6fad562315872aa1a" args="(IN UINT64 Address, IN UINT8 AndData)" -->
+<a class="anchor" name="ce57ca82231ec1ee6dac833621d775f8"></a><!-- doxytag: member="Acpi10.h::ACPI_ADDRESS_SPACE_TYPE_MEM" ref="ce57ca82231ec1ee6dac833621d775f8" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI PciSegmentAnd8           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
-          <td class="paramname"> <em>AndData</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define ACPI_ADDRESS_SPACE_TYPE_MEM&nbsp;&nbsp;&nbsp;0x00          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Performs a bitwise AND of an 8-bit PCI configuration register with an 8-bit value.<p>
-Reads the 8-bit PCI configuration register specified by Address, performs a bitwise AND between the read result and the value specified by AndData, and writes the result to the 8-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized. If any reserved bits in Address are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Segment, Bus, Device, Function, and Register. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>AndData</em>&nbsp;</td><td>The value to AND with the PCI configuration register.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written to the PCI configuration register. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="e3485d0ba574cc3c133cebfa7915cf37"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentAndThenOr16" ref="e3485d0ba574cc3c133cebfa7915cf37" args="(IN UINT64 Address, IN UINT16 AndData, IN UINT16 OrData)" -->
+<a class="anchor" name="eb86febcaace75bd88c89c2699cb5951"></a><!-- doxytag: member="Acpi10.h::ACPI_END_TAG_DESCRIPTOR" ref="eb86febcaace75bd88c89c2699cb5951" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI PciSegmentAndThenOr16           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
-          <td class="paramname"> <em>AndData</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
-          <td class="paramname"> <em>OrData</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define ACPI_END_TAG_DESCRIPTOR&nbsp;&nbsp;&nbsp;0x79          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Performs a bitwise AND of a 16-bit PCI configuration register with a 16-bit value, followed a bitwise OR with another 16-bit value.<p>
-Reads the 16-bit PCI configuration register specified by Address, performs a bitwise AND between the read result and the value specified by AndData, performs a bitwise OR between the result of the AND operation and the value specified by OrData, and writes the result to the 16-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized.<p>
-If any reserved bits in Address are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 16-bit boundary, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Segment, Bus, Device, Function, and Register. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>AndData</em>&nbsp;</td><td>The value to AND with the PCI configuration register. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>OrData</em>&nbsp;</td><td>The value to OR with the PCI configuration register.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written to the PCI configuration register. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="a25d4b11a3f7af8878ebd0802e67adfe"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentAndThenOr32" ref="a25d4b11a3f7af8878ebd0802e67adfe" args="(IN UINT64 Address, IN UINT32 AndData, IN UINT32 OrData)" -->
+<a class="anchor" name="56a79a0601072574295cb8abca08216b"></a><!-- doxytag: member="Acpi10.h::ACPI_TIMER_FREQUENCY" ref="56a79a0601072574295cb8abca08216b" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI PciSegmentAndThenOr32           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td>
-          <td class="paramname"> <em>AndData</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td>
-          <td class="paramname"> <em>OrData</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define ACPI_TIMER_FREQUENCY&nbsp;&nbsp;&nbsp;3579545          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Performs a bitwise AND of a 32-bit PCI configuration register with a 32-bit value, followed a bitwise OR with another 32-bit value.<p>
-Reads the 32-bit PCI configuration register specified by Address, performs a bitwise AND between the read result and the value specified by AndData, performs a bitwise OR between the result of the AND operation and the value specified by OrData, and writes the result to the 32-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized.<p>
-If any reserved bits in Address are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 32-bit boundary, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Segment, Bus, Device, Function, and Register. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>AndData</em>&nbsp;</td><td>The value to AND with the PCI configuration register. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>OrData</em>&nbsp;</td><td>The value to OR with the PCI configuration register.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written to the PCI configuration register. </dd></dl>
-
+Power Management Timer frequency is fixed at 3.579545MHz 
 </div>
 </div><p>
-<a class="anchor" name="e8a8def88fa426d08ffc365146055c69"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentAndThenOr8" ref="e8a8def88fa426d08ffc365146055c69" args="(IN UINT64 Address, IN UINT8 AndData, IN UINT8 OrData)" -->
+<a class="anchor" name="938dfd1d331ba699b89d42e97b233201"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_1_0_APIC_SIGNATURE" ref="938dfd1d331ba699b89d42e97b233201" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI PciSegmentAndThenOr8           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
-          <td class="paramname"> <em>AndData</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
-          <td class="paramname"> <em>OrData</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EFI_ACPI_1_0_APIC_SIGNATURE&nbsp;&nbsp;&nbsp;SIGNATURE_32('A', 'P', 'I', 'C')          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Performs a bitwise AND of an 8-bit PCI configuration register with an 8-bit value, followed a bitwise OR with another 8-bit value.<p>
-Reads the 8-bit PCI configuration register specified by Address, performs a bitwise AND between the read result and the value specified by AndData, performs a bitwise OR between the result of the AND operation and the value specified by OrData, and writes the result to the 8-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized.<p>
-If any reserved bits in Address are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Segment, Bus, Device, Function, and Register. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>AndData</em>&nbsp;</td><td>The value to AND with the PCI configuration register. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>OrData</em>&nbsp;</td><td>The value to OR with the PCI configuration register.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written to the PCI configuration register. </dd></dl>
-
+"APIC" Multiple APIC Description Table 
 </div>
 </div><p>
-<a class="anchor" name="2f709398b9e514acbca985d8a569cdf9"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentBitFieldAnd16" ref="2f709398b9e514acbca985d8a569cdf9" args="(IN UINT64 Address, IN UINTN StartBit, IN UINTN EndBit, IN UINT16 AndData)" -->
+<a class="anchor" name="d686406975884d2931b0643908d1589f"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_1_0_DCK_CAP" ref="d686406975884d2931b0643908d1589f" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI PciSegmentBitFieldAnd16           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>StartBit</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>EndBit</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
-          <td class="paramname"> <em>AndData</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EFI_ACPI_1_0_DCK_CAP&nbsp;&nbsp;&nbsp;BIT9          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Reads a bit field in a 16-bit PCI configuration, performs a bitwise OR, and writes the result back to the bit field in the 16-bit port.<p>
-Reads the 16-bit PCI configuration register specified by Address, performs a bitwise OR between the read result and the value specified by OrData, and writes the result to the 16-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized. Extra left bits in OrData are stripped.<p>
-If any reserved bits in Address are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 16-bit boundary, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If StartBit is greater than 7, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is greater than 7, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is less than StartBit, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Segment, Bus, Device, Function, and Register. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>StartBit</em>&nbsp;</td><td>The ordinal of the least significant bit in the bit field. The ordinal of the least significant bit in a byte is bit 0. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EndBit</em>&nbsp;</td><td>The ordinal of the most significant bit in the bit field. The ordinal of the most significant bit in a byte is bit 7. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>AndData</em>&nbsp;</td><td>The value to AND with the read value from the PCI configuration register.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written to the PCI configuration register. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="e5a563f9c49450b34ffce98e030d02e7"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentBitFieldAnd32" ref="e5a563f9c49450b34ffce98e030d02e7" args="(IN UINT64 Address, IN UINTN StartBit, IN UINTN EndBit, IN UINT32 AndData)" -->
+<a class="anchor" name="4c902c7f125ba15113355a18d762ef36"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_1_0_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE" ref="4c902c7f125ba15113355a18d762ef36" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI PciSegmentBitFieldAnd32           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>StartBit</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>EndBit</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td>
-          <td class="paramname"> <em>AndData</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EFI_ACPI_1_0_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE&nbsp;&nbsp;&nbsp;SIGNATURE_32('D', 'S', 'D', 'T')          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Reads a bit field in a 32-bit PCI configuration register, performs a bitwise AND, and writes the result back to the bit field in the 32-bit register.<p>
-Reads the 32-bit PCI configuration register specified by Address, performs a bitwise AND between the read result and the value specified by AndData, and writes the result to the 32-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized. Extra left bits in AndData are stripped. If any reserved bits in Address are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 32-bit boundary, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If StartBit is greater than 31, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is greater than 31, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is less than StartBit, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>PCI configuration register to write. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>StartBit</em>&nbsp;</td><td>The ordinal of the least significant bit in the bit field. Range 0..31. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EndBit</em>&nbsp;</td><td>The ordinal of the most significant bit in the bit field. Range 0..31. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>AndData</em>&nbsp;</td><td>The value to AND with the PCI configuration register.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
-
+"DSDT" Differentiated System Description Table 
 </div>
 </div><p>
-<a class="anchor" name="48b0f05d23681a6347e1e9545a5faff3"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentBitFieldAnd8" ref="48b0f05d23681a6347e1e9545a5faff3" args="(IN UINT64 Address, IN UINTN StartBit, IN UINTN EndBit, IN UINT8 AndData)" -->
+<a class="anchor" name="033ec1a95884b3b78f8c97a1fba032a1"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE" ref="033ec1a95884b3b78f8c97a1fba032a1" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI PciSegmentBitFieldAnd8           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>StartBit</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>EndBit</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
-          <td class="paramname"> <em>AndData</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE&nbsp;&nbsp;&nbsp;SIGNATURE_32('F', 'A', 'C', 'S')          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Reads a bit field in an 8-bit PCI configuration register, performs a bitwise AND, and writes the result back to the bit field in the 8-bit register.<p>
-Reads the 8-bit PCI configuration register specified by Address, performs a bitwise AND between the read result and the value specified by AndData, and writes the result to the 8-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized. Extra left bits in AndData are stripped.<p>
-If any reserved bits in Address are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If StartBit is greater than 7, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is greater than 7, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is less than StartBit, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>PCI configuration register to write. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>StartBit</em>&nbsp;</td><td>The ordinal of the least significant bit in the bit field. Range 0..7. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EndBit</em>&nbsp;</td><td>The ordinal of the most significant bit in the bit field. Range 0..7. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>AndData</em>&nbsp;</td><td>The value to AND with the PCI configuration register.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
-
+"FACS" Firmware ACPI Control Structure 
 </div>
 </div><p>
-<a class="anchor" name="9c6af5492af9189c9883038291ddbe60"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentBitFieldAndThenOr16" ref="9c6af5492af9189c9883038291ddbe60" args="(IN UINT64 Address, IN UINTN StartBit, IN UINTN EndBit, IN UINT16 AndData, IN UINT16 OrData)" -->
+<a class="anchor" name="e8452670c1e0786bdc45a5776e0fe82b"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_1_0_FIX_RTC" ref="e8452670c1e0786bdc45a5776e0fe82b" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI PciSegmentBitFieldAndThenOr16           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>StartBit</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>EndBit</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
-          <td class="paramname"> <em>AndData</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
-          <td class="paramname"> <em>OrData</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EFI_ACPI_1_0_FIX_RTC&nbsp;&nbsp;&nbsp;BIT6          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Reads a bit field in a 16-bit port, performs a bitwise AND followed by a bitwise OR, and writes the result back to the bit field in the 16-bit port.<p>
-Reads the 16-bit PCI configuration register specified by Address, performs a bitwise AND followed by a bitwise OR between the read result and the value specified by AndData, and writes the result to the 16-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized. Extra left bits in both AndData and OrData are stripped.<p>
-If any reserved bits in Address are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If StartBit is greater than 15, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is greater than 15, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is less than StartBit, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>PCI configuration register to write. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>StartBit</em>&nbsp;</td><td>The ordinal of the least significant bit in the bit field. Range 0..15. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EndBit</em>&nbsp;</td><td>The ordinal of the most significant bit in the bit field. Range 0..15. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>AndData</em>&nbsp;</td><td>The value to AND with the PCI configuration register. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>OrData</em>&nbsp;</td><td>The value to OR with the result of the AND operation.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="8c250b8a45de929fd56f12a72d3c26f2"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentBitFieldAndThenOr32" ref="8c250b8a45de929fd56f12a72d3c26f2" args="(IN UINT64 Address, IN UINTN StartBit, IN UINTN EndBit, IN UINT32 AndData, IN UINT32 OrData)" -->
+<a class="anchor" name="2fc59f84057e184513a9e3cb5f8f6d82"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE_REVISION" ref="2fc59f84057e184513a9e3cb5f8f6d82" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI PciSegmentBitFieldAndThenOr32           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>StartBit</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>EndBit</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td>
-          <td class="paramname"> <em>AndData</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td>
-          <td class="paramname"> <em>OrData</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE_REVISION&nbsp;&nbsp;&nbsp;0x01          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Reads a bit field in a 32-bit port, performs a bitwise AND followed by a bitwise OR, and writes the result back to the bit field in the 32-bit port.<p>
-Reads the 32-bit PCI configuration register specified by Address, performs a bitwise AND followed by a bitwise OR between the read result and the value specified by AndData, and writes the result to the 32-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized. Extra left bits in both AndData and OrData are stripped.<p>
-If any reserved bits in Address are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If StartBit is greater than 31, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is greater than 31, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is less than StartBit, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>PCI configuration register to write. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>StartBit</em>&nbsp;</td><td>The ordinal of the least significant bit in the bit field. Range 0..31. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EndBit</em>&nbsp;</td><td>The ordinal of the most significant bit in the bit field. Range 0..31. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>AndData</em>&nbsp;</td><td>The value to AND with the PCI configuration register. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>OrData</em>&nbsp;</td><td>The value to OR with the result of the AND operation.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
-
+FADT Version (as defined in ACPI 1.0b spec.) 
 </div>
 </div><p>
-<a class="anchor" name="bdf7f31e5f1bb5199d6542cad1c29d67"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentBitFieldAndThenOr8" ref="bdf7f31e5f1bb5199d6542cad1c29d67" args="(IN UINT64 Address, IN UINTN StartBit, IN UINTN EndBit, IN UINT8 AndData, IN UINT8 OrData)" -->
+<a class="anchor" name="2f8d40f0b8ec28d6610d30a34e5f1d1b"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE" ref="2f8d40f0b8ec28d6610d30a34e5f1d1b" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI PciSegmentBitFieldAndThenOr8           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>StartBit</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>EndBit</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
-          <td class="paramname"> <em>AndData</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
-          <td class="paramname"> <em>OrData</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE&nbsp;&nbsp;&nbsp;SIGNATURE_32('F', 'A', 'C', 'P')          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Reads a bit field in an 8-bit port, performs a bitwise AND followed by a bitwise OR, and writes the result back to the bit field in the 8-bit port.<p>
-Reads the 8-bit PCI configuration register specified by Address, performs a bitwise AND followed by a bitwise OR between the read result and the value specified by AndData, and writes the result to the 8-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized. Extra left bits in both AndData and OrData are stripped.<p>
-If any reserved bits in Address are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If StartBit is greater than 7, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is greater than 7, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is less than StartBit, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>PCI configuration register to write. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>StartBit</em>&nbsp;</td><td>The ordinal of the least significant bit in the bit field. Range 0..7. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EndBit</em>&nbsp;</td><td>The ordinal of the most significant bit in the bit field. Range 0..7. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>AndData</em>&nbsp;</td><td>The value to AND with the PCI configuration register. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>OrData</em>&nbsp;</td><td>The value to OR with the result of the AND operation.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
-
+"FACP" Fixed ACPI Description Table 
 </div>
 </div><p>
-<a class="anchor" name="4351af761620ce16343b50b2091a7409"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentBitFieldOr16" ref="4351af761620ce16343b50b2091a7409" args="(IN UINT64 Address, IN UINTN StartBit, IN UINTN EndBit, IN UINT16 OrData)" -->
+<a class="anchor" name="98a4d83a2a9a250c64225d12efb4a4bf"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE" ref="98a4d83a2a9a250c64225d12efb4a4bf" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI PciSegmentBitFieldOr16           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>StartBit</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>EndBit</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
-          <td class="paramname"> <em>OrData</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE&nbsp;&nbsp;&nbsp;0x02          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Reads the 16-bit PCI configuration register specified by Address, performs a bitwise OR between the read result and the value specified by OrData, and writes the result to the 16-bit PCI configuration register specified by Address.<p>
-If any reserved bits in Address are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 16-bit boundary, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If StartBit is greater than 15, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is greater than 15, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is less than StartBit, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>PCI configuration register to write. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>StartBit</em>&nbsp;</td><td>The ordinal of the least significant bit in the bit field. Range 0..15. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EndBit</em>&nbsp;</td><td>The ordinal of the most significant bit in the bit field. Range 0..15. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>OrData</em>&nbsp;</td><td>The value to OR with the PCI configuration register.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="d71481fe06d5767564a511bfe19be982"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentBitFieldOr32" ref="d71481fe06d5767564a511bfe19be982" args="(IN UINT64 Address, IN UINTN StartBit, IN UINTN EndBit, IN UINT32 OrData)" -->
+<a class="anchor" name="d0ff4ef53295bdf6b8da4e8e4ccb3624"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_1_0_IO_APIC" ref="d0ff4ef53295bdf6b8da4e8e4ccb3624" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI PciSegmentBitFieldOr32           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>StartBit</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>EndBit</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td>
-          <td class="paramname"> <em>OrData</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EFI_ACPI_1_0_IO_APIC&nbsp;&nbsp;&nbsp;0x01          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Reads a bit field in a 32-bit PCI configuration, performs a bitwise OR, and writes the result back to the bit field in the 32-bit port.<p>
-Reads the 32-bit PCI configuration register specified by Address, performs a bitwise OR between the read result and the value specified by OrData, and writes the result to the 32-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized. Extra left bits in OrData are stripped.<p>
-If any reserved bits in Address are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If StartBit is greater than 31, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is greater than 31, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is less than StartBit, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>PCI configuration register to write. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>StartBit</em>&nbsp;</td><td>The ordinal of the least significant bit in the bit field. Range 0..31. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EndBit</em>&nbsp;</td><td>The ordinal of the most significant bit in the bit field. Range 0..31. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>OrData</em>&nbsp;</td><td>The value to OR with the PCI configuration register.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="424fbccb47221314843c9468dde55c51"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentBitFieldOr8" ref="424fbccb47221314843c9468dde55c51" args="(IN UINT64 Address, IN UINTN StartBit, IN UINTN EndBit, IN UINT8 OrData)" -->
+<a class="anchor" name="1fba356ab4914f337ac264226caa7454"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_1_0_LOCAL_APIC_ENABLED" ref="1fba356ab4914f337ac264226caa7454" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI PciSegmentBitFieldOr8           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>StartBit</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>EndBit</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
-          <td class="paramname"> <em>OrData</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EFI_ACPI_1_0_LOCAL_APIC_ENABLED&nbsp;&nbsp;&nbsp;BIT0          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Reads a bit field in an 8-bit PCI configuration, performs a bitwise OR, and writes the result back to the bit field in the 8-bit port.<p>
-Reads the 8-bit PCI configuration register specified by Address, performs a bitwise OR between the read result and the value specified by OrData, and writes the result to the 8-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized. Extra left bits in OrData are stripped.<p>
-If any reserved bits in Address are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If StartBit is greater than 7, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is greater than 7, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is less than StartBit, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>PCI configuration register to write. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>StartBit</em>&nbsp;</td><td>The ordinal of the least significant bit in the bit field. Range 0..7. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EndBit</em>&nbsp;</td><td>The ordinal of the most significant bit in the bit field. Range 0..7. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>OrData</em>&nbsp;</td><td>The value to OR with the PCI configuration register.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
-
+Local APIC Flags. All other bits are reserved and must be 0. 
 </div>
 </div><p>
-<a class="anchor" name="9d03083490998d1feb4e77c32988f435"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentBitFieldRead16" ref="9d03083490998d1feb4e77c32988f435" args="(IN UINT64 Address, IN UINTN StartBit, IN UINTN EndBit)" -->
+<a class="anchor" name="0d185450a2993b778b06fe8241dabfcb"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_1_0_LOCAL_APIC_NMI" ref="0d185450a2993b778b06fe8241dabfcb" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI PciSegmentBitFieldRead16           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>StartBit</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>EndBit</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EFI_ACPI_1_0_LOCAL_APIC_NMI&nbsp;&nbsp;&nbsp;0x04          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Reads a bit field of a PCI configuration register.<p>
-Reads the bit field in a 16-bit PCI configuration register. The bit field is specified by the StartBit and the EndBit. The value of the bit field is returned.<p>
-If any reserved bits in Address are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 16-bit boundary, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If StartBit is greater than 15, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is greater than 15, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is less than StartBit, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>PCI configuration register to read. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>StartBit</em>&nbsp;</td><td>The ordinal of the least significant bit in the bit field. Range 0..15. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EndBit</em>&nbsp;</td><td>The ordinal of the most significant bit in the bit field. Range 0..15.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value of the bit field read from the PCI configuration register. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="ed5340430a06a7274d4f6e234972b8f0"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentBitFieldRead32" ref="ed5340430a06a7274d4f6e234972b8f0" args="(IN UINT64 Address, IN UINTN StartBit, IN UINTN EndBit)" -->
+<a class="anchor" name="24103a63013cc1bf981e3b2ab923cb3c"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_1_0_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION" ref="24103a63013cc1bf981e3b2ab923cb3c" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI PciSegmentBitFieldRead32           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>StartBit</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>EndBit</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EFI_ACPI_1_0_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION&nbsp;&nbsp;&nbsp;0x01          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Reads a bit field of a PCI configuration register.<p>
-Reads the bit field in a 32-bit PCI configuration register. The bit field is specified by the StartBit and the EndBit. The value of the bit field is returned.<p>
-If any reserved bits in Address are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 32-bit boundary, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If StartBit is greater than 31, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is greater than 31, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is less than StartBit, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>PCI configuration register to read. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>StartBit</em>&nbsp;</td><td>The ordinal of the least significant bit in the bit field. Range 0..31. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EndBit</em>&nbsp;</td><td>The ordinal of the most significant bit in the bit field. Range 0..31.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value of the bit field read from the PCI configuration register. </dd></dl>
-
+MADT Revision (as defined in ACPI 1.0b spec.) 
 </div>
 </div><p>
-<a class="anchor" name="92259b32e02fd1e192a44a1a896796a0"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentBitFieldRead8" ref="92259b32e02fd1e192a44a1a896796a0" args="(IN UINT64 Address, IN UINTN StartBit, IN UINTN EndBit)" -->
+<a class="anchor" name="299cff7e769fd3eaf132ed23008a04f1"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_1_0_NON_MASKABLE_INTERRUPT_SOURCE" ref="299cff7e769fd3eaf132ed23008a04f1" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI PciSegmentBitFieldRead8           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>StartBit</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>EndBit</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EFI_ACPI_1_0_NON_MASKABLE_INTERRUPT_SOURCE&nbsp;&nbsp;&nbsp;0x03          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Reads a bit field of a PCI configuration register.<p>
-Reads the bit field in an 8-bit PCI configuration register. The bit field is specified by the StartBit and the EndBit. The value of the bit field is returned.<p>
-If any reserved bits in Address are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If StartBit is greater than 7, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is greater than 7, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is less than StartBit, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>PCI configuration register to read. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>StartBit</em>&nbsp;</td><td>The ordinal of the least significant bit in the bit field. Range 0..7. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EndBit</em>&nbsp;</td><td>The ordinal of the most significant bit in the bit field. Range 0..7.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value of the bit field read from the PCI configuration register. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="ec895b7987ea2306c0a74496aaf2344e"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentBitFieldWrite16" ref="ec895b7987ea2306c0a74496aaf2344e" args="(IN UINT64 Address, IN UINTN StartBit, IN UINTN EndBit, IN UINT16 Value)" -->
+<a class="anchor" name="f4962e87d00ce1e30007d8d682304e52"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_1_0_P_LVL2_UP" ref="f4962e87d00ce1e30007d8d682304e52" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI PciSegmentBitFieldWrite16           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>StartBit</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>EndBit</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
-          <td class="paramname"> <em>Value</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EFI_ACPI_1_0_P_LVL2_UP&nbsp;&nbsp;&nbsp;BIT3          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Writes a bit field to a PCI configuration register.<p>
-Writes Value to the bit field of the PCI configuration register. The bit field is specified by the StartBit and the EndBit. All other bits in the destination PCI configuration register are preserved. The new value of the 16-bit register is returned.<p>
-If any reserved bits in Address are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 16-bit boundary, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If StartBit is greater than 15, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is greater than 15, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is less than StartBit, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>PCI configuration register to write. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>StartBit</em>&nbsp;</td><td>The ordinal of the least significant bit in the bit field. Range 0..15. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EndBit</em>&nbsp;</td><td>The ordinal of the most significant bit in the bit field. Range 0..15. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>New value of the bit field.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="767ee0ca1d504ef566337737f6845149"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentBitFieldWrite32" ref="767ee0ca1d504ef566337737f6845149" args="(IN UINT64 Address, IN UINTN StartBit, IN UINTN EndBit, IN UINT32 Value)" -->
+<a class="anchor" name="b331227d9d5d1d96e3f4f65716f01ca7"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_1_0_PCAT_COMPAT" ref="b331227d9d5d1d96e3f4f65716f01ca7" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI PciSegmentBitFieldWrite32           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>StartBit</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>EndBit</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td>
-          <td class="paramname"> <em>Value</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EFI_ACPI_1_0_PCAT_COMPAT&nbsp;&nbsp;&nbsp;BIT0          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Writes a bit field to a PCI configuration register.<p>
-Writes Value to the bit field of the PCI configuration register. The bit field is specified by the StartBit and the EndBit. All other bits in the destination PCI configuration register are preserved. The new value of the 32-bit register is returned.<p>
-If any reserved bits in Address are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 32-bit boundary, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If StartBit is greater than 31, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is greater than 31, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is less than StartBit, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>PCI configuration register to write. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>StartBit</em>&nbsp;</td><td>The ordinal of the least significant bit in the bit field. Range 0..31. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EndBit</em>&nbsp;</td><td>The ordinal of the most significant bit in the bit field. Range 0..31. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>New value of the bit field.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
-
+Multiple APIC Flags All other bits are reserved and must be set to 0. 
 </div>
 </div><p>
-<a class="anchor" name="8472695dae7d0fc2cb4d15046c14f69a"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentBitFieldWrite8" ref="8472695dae7d0fc2cb4d15046c14f69a" args="(IN UINT64 Address, IN UINTN StartBit, IN UINTN EndBit, IN UINT8 Value)" -->
+<a class="anchor" name="95c79885dbd6249c2636b77188397b64"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_1_0_PERSISTENT_SYSTEM_DESCRIPTION_TABLE_SIGNATURE" ref="95c79885dbd6249c2636b77188397b64" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI PciSegmentBitFieldWrite8           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>StartBit</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>EndBit</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
-          <td class="paramname"> <em>Value</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EFI_ACPI_1_0_PERSISTENT_SYSTEM_DESCRIPTION_TABLE_SIGNATURE&nbsp;&nbsp;&nbsp;SIGNATURE_32('P', 'S', 'D', 'T')          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Writes a bit field to a PCI configuration register.<p>
-Writes Value to the bit field of the PCI configuration register. The bit field is specified by the StartBit and the EndBit. All other bits in the destination PCI configuration register are preserved. The new value of the 8-bit register is returned.<p>
-If any reserved bits in Address are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If StartBit is greater than 7, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is greater than 7, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If EndBit is less than StartBit, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>PCI configuration register to write. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>StartBit</em>&nbsp;</td><td>The ordinal of the least significant bit in the bit field. Range 0..7. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EndBit</em>&nbsp;</td><td>The ordinal of the most significant bit in the bit field. Range 0..7. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>New value of the bit field.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
-
+"PSDT" Persistent System Description Table 
 </div>
 </div><p>
-<a class="anchor" name="8aba07bde28e9850f3ef6856ca727952"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentOr16" ref="8aba07bde28e9850f3ef6856ca727952" args="(IN UINT64 Address, IN UINT16 OrData)" -->
+<a class="anchor" name="87348c5e4af06e4beb3ab0c913371bb8"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_1_0_PROC_C1" ref="87348c5e4af06e4beb3ab0c913371bb8" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI PciSegmentOr16           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
-          <td class="paramname"> <em>OrData</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EFI_ACPI_1_0_PROC_C1&nbsp;&nbsp;&nbsp;BIT2          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Performs a bitwise OR of a 16-bit PCI configuration register with a 16-bit value.<p>
-Reads the 16-bit PCI configuration register specified by Address, performs a bitwise OR between the read result and the value specified by OrData, and writes the result to the 16-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized.<p>
-If any reserved bits in Address are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 16-bit boundary, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Segment, Bus, Device, Function and Register. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>OrData</em>&nbsp;</td><td>The value to OR with the PCI configuration register.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written back to the PCI configuration register. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="fbbb7872b767f791e3e886c108bf65a3"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentOr32" ref="fbbb7872b767f791e3e886c108bf65a3" args="(IN UINT64 Address, IN UINT32 OrData)" -->
+<a class="anchor" name="3a5fa2b6abc4ba6d53cdac6f9838f7d4"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_1_0_PROCESSOR_LOCAL_APIC" ref="3a5fa2b6abc4ba6d53cdac6f9838f7d4" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI PciSegmentOr32           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td>
-          <td class="paramname"> <em>OrData</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EFI_ACPI_1_0_PROCESSOR_LOCAL_APIC&nbsp;&nbsp;&nbsp;0x00          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Performs a bitwise OR of a 32-bit PCI configuration register with a 32-bit value.<p>
-Reads the 32-bit PCI configuration register specified by Address, performs a bitwise OR between the read result and the value specified by OrData, and writes the result to the 32-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized.<p>
-If any reserved bits in Address are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 32-bit boundary, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Segment, Bus, Device, Function, and Register. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>OrData</em>&nbsp;</td><td>The value to OR with the PCI configuration register.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written to the PCI configuration register. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="932cb07ec8326272557ec990966410eb"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentOr8" ref="932cb07ec8326272557ec990966410eb" args="(IN UINT64 Address, IN UINT8 OrData)" -->
+<a class="anchor" name="4d9ab7d60f725cdf626a6f7eaec883fe"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_1_0_PWR_BUTTON" ref="4d9ab7d60f725cdf626a6f7eaec883fe" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI PciSegmentOr8           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
-          <td class="paramname"> <em>OrData</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EFI_ACPI_1_0_PWR_BUTTON&nbsp;&nbsp;&nbsp;BIT4          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Performs a bitwise OR of an 8-bit PCI configuration register with an 8-bit value.<p>
-Reads the 8-bit PCI configuration register specified by Address, performs a bitwise OR between the read result and the value specified by OrData, and writes the result to the 8-bit PCI configuration register specified by Address. The value written to the PCI configuration register is returned. This function must guarantee that all PCI read and write operations are serialized.<p>
-If any reserved bits in Address are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Segment, Bus, Device, Function, and Register. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>OrData</em>&nbsp;</td><td>The value to OR with the PCI configuration register.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written to the PCI configuration register. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="5eb5291667553fa4d129f16a9489231a"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentRead16" ref="5eb5291667553fa4d129f16a9489231a" args="(IN UINT64 Address)" -->
+<a class="anchor" name="ae3a2eb2b48fd62cf01f65c01d450507"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER_SIGNATURE" ref="ae3a2eb2b48fd62cf01f65c01d450507" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI PciSegmentRead16           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Address</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
+          <td class="memname">#define EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER_SIGNATURE&nbsp;&nbsp;&nbsp;SIGNATURE_64('R', 'S', 'D', ' ', 'P', 'T', 'R', ' ')          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Reads a 16-bit PCI configuration register.<p>
-Reads and returns the 16-bit PCI configuration register specified by Address. This function must guarantee that all PCI read and write operations are serialized.<p>
-If any reserved bits in Address are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 16-bit boundary, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Segment, Bus, Device, Function, and Register.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The 16-bit PCI configuration register specified by Address. </dd></dl>
-
+"RSD PTR " Root System Description Pointer 
 </div>
 </div><p>
-<a class="anchor" name="a5e125d090fc0163771caabf002c638e"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentRead32" ref="a5e125d090fc0163771caabf002c638e" args="(IN UINT64 Address)" -->
+<a class="anchor" name="6aa0e5934a43950675131f215b5f6af8"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_TABLE_REVISION" ref="6aa0e5934a43950675131f215b5f6af8" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI PciSegmentRead32           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Address</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
+          <td class="memname">#define EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_TABLE_REVISION&nbsp;&nbsp;&nbsp;0x01          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Reads a 32-bit PCI configuration register.<p>
-Reads and returns the 32-bit PCI configuration register specified by Address. This function must guarantee that all PCI read and write operations are serialized.<p>
-If any reserved bits in Address are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 32-bit boundary, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Segment, Bus, Device, Function, and Register.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The 32-bit PCI configuration register specified by Address. </dd></dl>
-
+RSDT Revision (as defined in ACPI 1.0b spec.) 
 </div>
 </div><p>
-<a class="anchor" name="001315cbcd1469a3310eba6e6f2a9799"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentRead8" ref="001315cbcd1469a3310eba6e6f2a9799" args="(IN UINT64 Address)" -->
+<a class="anchor" name="0b6343f299f5cdd08518f446904f6f7e"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_TABLE_SIGNATURE" ref="0b6343f299f5cdd08518f446904f6f7e" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI PciSegmentRead8           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Address</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
+          <td class="memname">#define EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_TABLE_SIGNATURE&nbsp;&nbsp;&nbsp;SIGNATURE_32('R', 'S', 'D', 'T')          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Reads an 8-bit PCI configuration register.<p>
-Reads and returns the 8-bit PCI configuration register specified by Address. This function must guarantee that all PCI read and write operations are serialized.<p>
-If any reserved bits in Address are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Segment, Bus, Device, Function, and Register.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The 8-bit PCI configuration register specified by Address. </dd></dl>
-
+"RSDT" Root System Description Table 
 </div>
 </div><p>
-<a class="anchor" name="43581684cf9fd47adc3f53ac36ba0803"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentReadBuffer" ref="43581684cf9fd47adc3f53ac36ba0803" args="(IN UINT64 StartAddress, IN UINTN Size, OUT VOID *Buffer)" -->
+<a class="anchor" name="2112aaf691f87a6b4b0790b68e562ed1"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_1_0_RTC_S4" ref="2112aaf691f87a6b4b0790b68e562ed1" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI PciSegmentReadBuffer           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>StartAddress</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>Size</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OUT VOID *&nbsp;</td>
-          <td class="paramname"> <em>Buffer</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EFI_ACPI_1_0_RTC_S4&nbsp;&nbsp;&nbsp;BIT7          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Reads a range of PCI configuration registers into a caller supplied buffer.<p>
-Reads the range of PCI configuration registers specified by StartAddress and Size into the buffer specified by Buffer. This function only allows the PCI configuration registers from a single PCI function to be read. Size is returned. When possible 32-bit PCI configuration read cycles are used to read from StartAdress to StartAddress + Size. Due to alignment restrictions, 8-bit and 16-bit PCI configuration read cycles may be used at the beginning and the end of the range.<p>
-If any reserved bits in StartAddress are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If ((StartAddress &amp; 0xFFF) + Size) &gt; 0x1000, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Size &gt; 0 and Buffer is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>StartAddress</em>&nbsp;</td><td>Starting address that encodes the PCI Segment, Bus, Device, Function and Register. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Size</em>&nbsp;</td><td>Size in bytes of the transfer. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>Pointer to a buffer receiving the data read.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>Size </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="725a83e7b7c792a76d994cad3c7def72"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentRegisterForRuntimeAccess" ref="725a83e7b7c792a76d994cad3c7def72" args="(IN UINTN Address)" -->
+<a class="anchor" name="1f75b6d1f7e93a68cd64ffeb49d98950"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_1_0_S4BIOS_F" ref="1f75b6d1f7e93a68cd64ffeb49d98950" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d3/dca/a00954.html#f3519a25bfa97c295fb23ffec95b1cb1">RETURN_STATUS</a> EFIAPI PciSegmentRegisterForRuntimeAccess           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>Address</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
+          <td class="memname">#define EFI_ACPI_1_0_S4BIOS_F&nbsp;&nbsp;&nbsp;BIT0          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Register a PCI device so PCI configuration registers may be accessed after SetVirtualAddressMap().<p>
-If any reserved bits in Address are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Bus, Device, Function and Register.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>RETURN_SUCCESS</em>&nbsp;</td><td>The PCI device was registered for runtime access. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>RETURN_UNSUPPORTED</em>&nbsp;</td><td>An attempt was made to call this function after ExitBootServices(). </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>RETURN_UNSUPPORTED</em>&nbsp;</td><td>The resources required to access the PCI device at runtime could not be mapped. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>RETURN_OUT_OF_RESOURCES</em>&nbsp;</td><td>There are not enough resources available to complete the registration. </td></tr>
-  </table>
-</dl>
-
+Firmware Control Structure Feature Flags All other bits are reserved and must be set to 0. 
 </div>
 </div><p>
-<a class="anchor" name="272c53bd955c1b0cb9a0e584addd3991"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentWrite16" ref="272c53bd955c1b0cb9a0e584addd3991" args="(IN UINT64 Address, IN UINT16 Value)" -->
+<a class="anchor" name="03fff12d599e4381e0a6ad5e0295b41e"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_1_0_SECONDARY_SYSTEM_DESCRIPTION_TABLE_SIGNATURE" ref="03fff12d599e4381e0a6ad5e0295b41e" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> EFIAPI PciSegmentWrite16           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td>
-          <td class="paramname"> <em>Value</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EFI_ACPI_1_0_SECONDARY_SYSTEM_DESCRIPTION_TABLE_SIGNATURE&nbsp;&nbsp;&nbsp;SIGNATURE_32('S', 'S', 'D', 'T')          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Writes a 16-bit PCI configuration register.<p>
-Writes the 16-bit PCI configuration register specified by Address with the value specified by Value. Value is returned. This function must guarantee that all PCI read and write operations are serialized.<p>
-If any reserved bits in Address are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 16-bit boundary, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Segment, Bus, Device, Function, and Register. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>The value to write.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The parameter of Value. </dd></dl>
-
+"SSDT" Secondary System Description Table 
 </div>
 </div><p>
-<a class="anchor" name="39fd4685d24b0f724f4f25590334d093"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentWrite32" ref="39fd4685d24b0f724f4f25590334d093" args="(IN UINT64 Address, IN UINT32 Value)" -->
+<a class="anchor" name="475bb4e4c6286c550d2cb4cc6385c322"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_1_0_SLP_BUTTON" ref="475bb4e4c6286c550d2cb4cc6385c322" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> EFIAPI PciSegmentWrite32           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td>
-          <td class="paramname"> <em>Value</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EFI_ACPI_1_0_SLP_BUTTON&nbsp;&nbsp;&nbsp;BIT5          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Writes a 32-bit PCI configuration register.<p>
-Writes the 32-bit PCI configuration register specified by Address with the value specified by Value. Value is returned. This function must guarantee that all PCI read and write operations are serialized.<p>
-If any reserved bits in Address are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Address is not aligned on a 32-bit boundary, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Segment, Bus, Device, Function, and Register. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>The value to write.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The parameter of Value. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="ed095904b4116339f2f92e8b9bf2947d"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentWrite8" ref="ed095904b4116339f2f92e8b9bf2947d" args="(IN UINT64 Address, IN UINT8 Value)" -->
+<a class="anchor" name="545966277f58325d6a9ce25a5eddd0cc"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_1_0_SMART_BATTERY_SPECIFICATION_TABLE_SIGNATURE" ref="545966277f58325d6a9ce25a5eddd0cc" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> EFIAPI PciSegmentWrite8           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>Address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td>
-          <td class="paramname"> <em>Value</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EFI_ACPI_1_0_SMART_BATTERY_SPECIFICATION_TABLE_SIGNATURE&nbsp;&nbsp;&nbsp;SIGNATURE_32('S', 'B', 'S', 'T')          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Writes an 8-bit PCI configuration register.<p>
-Writes the 8-bit PCI configuration register specified by Address with the value specified by Value. Value is returned. This function must guarantee that all PCI read and write operations are serialized.<p>
-If any reserved bits in Address are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Address</em>&nbsp;</td><td>Address that encodes the PCI Segment, Bus, Device, Function, and Register. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Value</em>&nbsp;</td><td>The value to write.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The value written to the PCI configuration register. </dd></dl>
-
+"SBST" Smart Battery Specification Table 
 </div>
 </div><p>
-<a class="anchor" name="ed74524a9ef2243de1d43e51ce0e448a"></a><!-- doxytag: member="PciSegmentLib.h::PciSegmentWriteBuffer" ref="ed74524a9ef2243de1d43e51ce0e448a" args="(IN UINT64 StartAddress, IN UINTN Size, IN VOID *Buffer)" -->
+<a class="anchor" name="c872aee47bf9ad043dcab3085f0268ab"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_1_0_TMR_VAL_EXT" ref="c872aee47bf9ad043dcab3085f0268ab" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> EFIAPI PciSegmentWriteBuffer           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
-          <td class="paramname"> <em>StartAddress</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>Size</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN VOID *&nbsp;</td>
-          <td class="paramname"> <em>Buffer</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EFI_ACPI_1_0_TMR_VAL_EXT&nbsp;&nbsp;&nbsp;BIT8          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Copies the data in a caller supplied buffer to a specified range of PCI configuration space.<p>
-Writes the range of PCI configuration registers specified by StartAddress and Size from the buffer specified by Buffer. This function only allows the PCI configuration registers from a single PCI function to be written. Size is returned. When possible 32-bit PCI configuration write cycles are used to write from StartAdress to StartAddress + Size. Due to alignment restrictions, 8-bit and 16-bit PCI configuration write cycles may be used at the beginning and the end of the range.<p>
-If any reserved bits in StartAddress are set, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If ((StartAddress &amp; 0xFFF) + Size) &gt; 0x1000, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Size &gt; 0 and Buffer is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>StartAddress</em>&nbsp;</td><td>Starting address that encodes the PCI Segment, Bus, Device, Function and Register. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Size</em>&nbsp;</td><td>Size in bytes of the transfer. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>Pointer to a buffer containing the data to write.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>The parameter of Size. </dd></dl>
+
+</div>
+</div><p>
+<a class="anchor" name="2cfe96205e6302e43a95393e211702e0"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_1_0_WBINVD" ref="2cfe96205e6302e43a95393e211702e0" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_ACPI_1_0_WBINVD&nbsp;&nbsp;&nbsp;BIT0          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="95dbfb22b7ecffa946c0a2483b411fe4"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_1_0_WBINVD_FLUSH" ref="95dbfb22b7ecffa946c0a2483b411fe4" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_ACPI_1_0_WBINVD_FLUSH&nbsp;&nbsp;&nbsp;BIT1          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="ced3a0bde8efdd97c5317511d60c1faa"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_ADDRESS_RANGE_ACPI" ref="ced3a0bde8efdd97c5317511d60c1faa" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_ADDRESS_RANGE_ACPI&nbsp;&nbsp;&nbsp;(2 &lt;&lt; 3)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="27d17bd21ecc2e3dca45ae19aace253b"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_ADDRESS_RANGE_MEMORY" ref="27d17bd21ecc2e3dca45ae19aace253b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_ADDRESS_RANGE_MEMORY&nbsp;&nbsp;&nbsp;(0 &lt;&lt; 3)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="0558c10a7237c20a353af1df7ee52f79"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_ADDRESS_RANGE_RESERVED" ref="0558c10a7237c20a353af1df7ee52f79" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_ADDRESS_RANGE_RESERVED&nbsp;&nbsp;&nbsp;(1 &lt;&lt; 3)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="0bd9e5b64cbc884727a4a296877c0627"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE" ref="0bd9e5b64cbc884727a4a296877c0627" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE&nbsp;&nbsp;&nbsp;(1 &lt;&lt; 1)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="678ee124898415e43d32f52558adfbaa"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE" ref="678ee124898415e43d32f52558adfbaa" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE&nbsp;&nbsp;&nbsp;(3 &lt;&lt; 1)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="2f0f29bac204fcf855b28bdd8bf2a99d"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_WRITE_COMBINING" ref="2f0f29bac204fcf855b28bdd8bf2a99d" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_WRITE_COMBINING&nbsp;&nbsp;&nbsp;(2 &lt;&lt; 1)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="a10601e2a3240e6b11f428fe5729dfc9"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_NON_CACHEABLE" ref="a10601e2a3240e6b11f428fe5729dfc9" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_NON_CACHEABLE&nbsp;&nbsp;&nbsp;(0 &lt;&lt; 1)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="6af853e6f73bcf85f14d6983e0d93c30"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_READ_ONLY" ref="6af853e6f73bcf85f14d6983e0d93c30" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_READ_ONLY&nbsp;&nbsp;&nbsp;(0 &lt;&lt; 0)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="e269d72713409d341538932e1b24878e"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_READ_WRITE" ref="e269d72713409d341538932e1b24878e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_READ_WRITE&nbsp;&nbsp;&nbsp;(1 &lt;&lt; 0)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="324428265504a722ffbac0f578f6b591"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_TYPE_STATIC" ref="324428265504a722ffbac0f578f6b591" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_TYPE_STATIC&nbsp;&nbsp;&nbsp;(0 &lt;&lt; 5)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="90e643bad0356d8cbd114db82921fcd0"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_TYPE_TRANSLATION" ref="90e643bad0356d8cbd114db82921fcd0" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_TYPE_TRANSLATION&nbsp;&nbsp;&nbsp;(1 &lt;&lt; 5)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="1c353878d54908c56692385c61b1c3c8"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_RESERVED_BYTE" ref="1c353878d54908c56692385c61b1c3c8" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_ACPI_RESERVED_BYTE&nbsp;&nbsp;&nbsp;0x00          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="dc495968caa7effd3111e1ad9a016a2d"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_RESERVED_DWORD" ref="dc495968caa7effd3111e1ad9a016a2d" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_ACPI_RESERVED_DWORD&nbsp;&nbsp;&nbsp;0x00000000          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="f25b5b6df2a0b5b7496f2b0f39d989da"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_RESERVED_QWORD" ref="f25b5b6df2a0b5b7496f2b0f39d989da" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_ACPI_RESERVED_QWORD&nbsp;&nbsp;&nbsp;0x0000000000000000          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="bd92dbb3e3e134c65f48ef65c163f779"></a><!-- doxytag: member="Acpi10.h::EFI_ACPI_RESERVED_WORD" ref="bd92dbb3e3e134c65f48ef65c163f779" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_ACPI_RESERVED_WORD&nbsp;&nbsp;&nbsp;0x0000          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="0fc34a8934f0994acb49cc51f7ae363e"></a><!-- doxytag: member="Acpi10.h::EFI_APCI_MEMORY_RESOURCE_SPECIFIC_FLAG_ADDRESS_RANGE_NVS" ref="0fc34a8934f0994acb49cc51f7ae363e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EFI_APCI_MEMORY_RESOURCE_SPECIFIC_FLAG_ADDRESS_RANGE_NVS&nbsp;&nbsp;&nbsp;(3 &lt;&lt; 3)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:08 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:14 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

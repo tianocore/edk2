@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Library/MemoryAllocationLib.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Guid/Mps.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,787 +21,74 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Library/MemoryAllocationLib.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Guid/Mps.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
-<tr><td colspan="2"><br><h2>Functions</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dcd/a01023.html#48d461654ab0264be90527d408ee231e">AllocatePages</a> (IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Pages)</td></tr>
+<tr><td colspan="2"><br><h2>Defines</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dcd/a01023.html#c2cc3821b52b5b16a7437b59fd63f110">EFI_MPS_TABLE_GUID</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dcd/a01023.html#a42ff829a2cb2efcbf40645002558bd1">AllocateRuntimePages</a> (IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Pages)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dcd/a01023.html#3f487b70040caa0cf6f6d235a21da918">MPS_TABLE_GUID</a>&nbsp;&nbsp;&nbsp;EFI_MPS_TABLE_GUID</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dcd/a01023.html#be384e2875847149f0fcd6aa0f8aa7ad">AllocateReservedPages</a> (IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Pages)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dcd/a01023.html#19764a0f29c0489f6e3666552276756f">FreePages</a> (IN VOID *Buffer, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Pages)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dcd/a01023.html#96fe788f8abff0893cc7da52e56d9af8">AllocateAlignedPages</a> (IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Pages, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Alignment)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dcd/a01023.html#f6718f537468d06027fcce08f5b087da">AllocateAlignedRuntimePages</a> (IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Pages, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Alignment)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dcd/a01023.html#220eaab10f63fa5ddc84684321d7991b">AllocateAlignedReservedPages</a> (IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Pages, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Alignment)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dcd/a01023.html#adaaa3a3e32a86333ef3f8a2ec003098">FreeAlignedPages</a> (IN VOID *Buffer, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Pages)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dcd/a01023.html#646c0f82c2a35557dda175dbfcd26e96">AllocatePool</a> (IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> AllocationSize)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dcd/a01023.html#ef7ba5d3ec03640ee6d4aa54171e61df">AllocateRuntimePool</a> (IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> AllocationSize)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dcd/a01023.html#138f707298d984ac79b90c32d790fa4a">AllocateReservedPool</a> (IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> AllocationSize)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dcd/a01023.html#1622c7bc2d1a1fc5a7efe98d0398a180">AllocateZeroPool</a> (IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> AllocationSize)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dcd/a01023.html#1282d1847caf1aa96aede6f4f4e29501">AllocateRuntimeZeroPool</a> (IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> AllocationSize)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dcd/a01023.html#04976ba4ba5952504e52e70faa2e92f5">AllocateReservedZeroPool</a> (IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> AllocationSize)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dcd/a01023.html#708b2127658312368690aea9d5c66d3e">AllocateCopyPool</a> (IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> AllocationSize, IN CONST VOID *Buffer)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dcd/a01023.html#f2644b673f8d897038e3509503d2e172">AllocateRuntimeCopyPool</a> (IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> AllocationSize, IN CONST VOID *Buffer)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dcd/a01023.html#48d83d71db2972d59b7746b20e3e735b">AllocateReservedCopyPool</a> (IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> AllocationSize, IN CONST VOID *Buffer)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dcd/a01023.html#d57c40decf8f7802505ec6ec6939d571">ReallocatePool</a> (IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> OldSize, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> NewSize, IN VOID *OldBuffer)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dcd/a01023.html#0ce087259d16d7a83f6b9fe43f68f4c3">ReallocateRuntimePool</a> (IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> OldSize, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> NewSize, IN VOID *OldBuffer)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dcd/a01023.html#09d0702f54157bb0fc11021898cad56c">ReallocateReservedPool</a> (IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> OldSize, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> NewSize, IN VOID *OldBuffer)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dcd/a01023.html#8b1cbc21e0cebcfc6a992546ec9b4941">FreePool</a> (IN VOID *Buffer)</td></tr>
+<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/dcd/a01023.html#d1ca81e3527976615460a25cb8ddd474">gEfiMpsTableGuid</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Provides services to allocate and free memory buffers of various memory types and alignments.<p>
-The Memory Allocation Library abstracts various common memory allocation operations. This library allows code to be written in a phase-independent manner because the allocation of memory in PEI, DXE, and SMM (for example) is done via a different mechanism. Using a common library interface makes it much easier to port algorithms from phase to phase.<p>
-Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Function Documentation</h2>
-<a class="anchor" name="96fe788f8abff0893cc7da52e56d9af8"></a><!-- doxytag: member="MemoryAllocationLib.h::AllocateAlignedPages" ref="96fe788f8abff0893cc7da52e56d9af8" args="(IN UINTN Pages, IN UINTN Alignment)" -->
+GUIDs used for MPS entries in the UEFI 2.0 system table ACPI is the primary means of exporting MPS information to the OS. MPS only was included to support Itanium-based platform power on. So don't use it if you don't have too.<p>
+Copyright (c) 2006, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
+<dl class="user" compact><dt><b>Revision Reference:</b></dt><dd>GUIDs defined in UEFI 2.0 spec. </dd></dl>
+<hr><h2>Define Documentation</h2>
+<a class="anchor" name="c2cc3821b52b5b16a7437b59fd63f110"></a><!-- doxytag: member="Mps.h::EFI_MPS_TABLE_GUID" ref="c2cc3821b52b5b16a7437b59fd63f110" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">VOID* EFIAPI AllocateAlignedPages           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>Pages</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>Alignment</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define EFI_MPS_TABLE_GUID          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Allocates one or more 4KB pages of type EfiBootServicesData at a specified alignment.<p>
-Allocates the number of 4KB pages specified by Pages of type EfiBootServicesData with an alignment specified by Alignment. The allocated buffer is returned. If Pages is 0, then NULL is returned. If there is not enough memory at the specified alignment remaining to satisfy the request, then NULL is returned.<p>
-If Alignment is not a power of two and Alignment is not zero, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Pages</em>&nbsp;</td><td>The number of 4 KB pages to allocate. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Alignment</em>&nbsp;</td><td>The requested alignment of the allocation. Must be a power of two. If Alignment is zero, then byte alignment is used.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>A pointer to the allocated buffer or NULL if allocation fails. </dd></dl>
-
+<b>Value:</b><div class="fragment"><pre class="fragment">{ \
+    0xeb9d2d2f, 0x2d88, 0x11d3, {0x9a, 0x16, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d } \
+  }
+</pre></div>
 </div>
 </div><p>
-<a class="anchor" name="220eaab10f63fa5ddc84684321d7991b"></a><!-- doxytag: member="MemoryAllocationLib.h::AllocateAlignedReservedPages" ref="220eaab10f63fa5ddc84684321d7991b" args="(IN UINTN Pages, IN UINTN Alignment)" -->
+<a class="anchor" name="3f487b70040caa0cf6f6d235a21da918"></a><!-- doxytag: member="Mps.h::MPS_TABLE_GUID" ref="3f487b70040caa0cf6f6d235a21da918" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">VOID* EFIAPI AllocateAlignedReservedPages           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>Pages</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>Alignment</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname">#define MPS_TABLE_GUID&nbsp;&nbsp;&nbsp;EFI_MPS_TABLE_GUID          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Allocates one or more 4KB pages of type EfiReservedMemoryType at a specified alignment.<p>
-Allocates the number of 4KB pages specified by Pages of type EfiReservedMemoryType with an alignment specified by Alignment. The allocated buffer is returned. If Pages is 0, then NULL is returned. If there is not enough memory at the specified alignment remaining to satisfy the request, then NULL is returned.<p>
-If Alignment is not a power of two and Alignment is not zero, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Pages</em>&nbsp;</td><td>The number of 4 KB pages to allocate. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Alignment</em>&nbsp;</td><td>The requested alignment of the allocation. Must be a power of two. If Alignment is zero, then byte alignment is used.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>A pointer to the allocated buffer or NULL if allocation fails. </dd></dl>
 
 </div>
 </div><p>
-<a class="anchor" name="f6718f537468d06027fcce08f5b087da"></a><!-- doxytag: member="MemoryAllocationLib.h::AllocateAlignedRuntimePages" ref="f6718f537468d06027fcce08f5b087da" args="(IN UINTN Pages, IN UINTN Alignment)" -->
+<hr><h2>Variable Documentation</h2>
+<a class="anchor" name="d1ca81e3527976615460a25cb8ddd474"></a><!-- doxytag: member="Mps.h::gEfiMpsTableGuid" ref="d1ca81e3527976615460a25cb8ddd474" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">VOID* EFIAPI AllocateAlignedRuntimePages           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>Pages</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>Alignment</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../d6/dcd/a01023.html#d1ca81e3527976615460a25cb8ddd474">gEfiMpsTableGuid</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Allocates one or more 4KB pages of type EfiRuntimeServicesData at a specified alignment.<p>
-Allocates the number of 4KB pages specified by Pages of type EfiRuntimeServicesData with an alignment specified by Alignment. The allocated buffer is returned. If Pages is 0, then NULL is returned. If there is not enough memory at the specified alignment remaining to satisfy the request, then NULL is returned.<p>
-If Alignment is not a power of two and Alignment is not zero, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Pages</em>&nbsp;</td><td>The number of 4 KB pages to allocate. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Alignment</em>&nbsp;</td><td>The requested alignment of the allocation. Must be a power of two. If Alignment is zero, then byte alignment is used.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>A pointer to the allocated buffer or NULL if allocation fails. </dd></dl>
-
-</div>
-</div><p>
-<a class="anchor" name="708b2127658312368690aea9d5c66d3e"></a><!-- doxytag: member="MemoryAllocationLib.h::AllocateCopyPool" ref="708b2127658312368690aea9d5c66d3e" args="(IN UINTN AllocationSize, IN CONST VOID *Buffer)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VOID* EFIAPI AllocateCopyPool           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>AllocationSize</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST VOID *&nbsp;</td>
-          <td class="paramname"> <em>Buffer</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Copies a buffer to an allocated buffer of type EfiBootServicesData.<p>
-Allocates the number bytes specified by AllocationSize of type EfiBootServicesData, copies AllocationSize bytes from Buffer to the newly allocated buffer, and returns a pointer to the allocated buffer. If AllocationSize is 0, then a valid buffer of 0 size is returned. If there is not enough memory remaining to satisfy the request, then NULL is returned.<p>
-If Buffer is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If AllocationSize is greater than (MAX_ADDRESS - Buffer + 1), then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>AllocationSize</em>&nbsp;</td><td>The number of bytes to allocate and zero. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>The buffer to copy to the allocated buffer.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>A pointer to the allocated buffer or NULL if allocation fails. </dd></dl>
-
-</div>
-</div><p>
-<a class="anchor" name="48d461654ab0264be90527d408ee231e"></a><!-- doxytag: member="MemoryAllocationLib.h::AllocatePages" ref="48d461654ab0264be90527d408ee231e" args="(IN UINTN Pages)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VOID* EFIAPI AllocatePages           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>Pages</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Allocates one or more 4KB pages of type EfiBootServicesData.<p>
-Allocates the number of 4KB pages of type EfiBootServicesData and returns a pointer to the allocated buffer. The buffer returned is aligned on a 4KB boundary. If Pages is 0, then NULL is returned. If there is not enough memory remaining to satisfy the request, then NULL is returned.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Pages</em>&nbsp;</td><td>The number of 4 KB pages to allocate.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>A pointer to the allocated buffer or NULL if allocation fails. </dd></dl>
-
-</div>
-</div><p>
-<a class="anchor" name="646c0f82c2a35557dda175dbfcd26e96"></a><!-- doxytag: member="MemoryAllocationLib.h::AllocatePool" ref="646c0f82c2a35557dda175dbfcd26e96" args="(IN UINTN AllocationSize)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VOID* EFIAPI AllocatePool           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>AllocationSize</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Allocates a buffer of type EfiBootServicesData.<p>
-Allocates the number bytes specified by AllocationSize of type EfiBootServicesData and returns a pointer to the allocated buffer. If AllocationSize is 0, then a valid buffer of 0 size is returned. If there is not enough memory remaining to satisfy the request, then NULL is returned.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>AllocationSize</em>&nbsp;</td><td>The number of bytes to allocate.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>A pointer to the allocated buffer or NULL if allocation fails. </dd></dl>
-
-</div>
-</div><p>
-<a class="anchor" name="48d83d71db2972d59b7746b20e3e735b"></a><!-- doxytag: member="MemoryAllocationLib.h::AllocateReservedCopyPool" ref="48d83d71db2972d59b7746b20e3e735b" args="(IN UINTN AllocationSize, IN CONST VOID *Buffer)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VOID* EFIAPI AllocateReservedCopyPool           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>AllocationSize</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST VOID *&nbsp;</td>
-          <td class="paramname"> <em>Buffer</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Copies a buffer to an allocated buffer of type EfiReservedMemoryType.<p>
-Allocates the number bytes specified by AllocationSize of type EfiReservedMemoryType, copies AllocationSize bytes from Buffer to the newly allocated buffer, and returns a pointer to the allocated buffer. If AllocationSize is 0, then a valid buffer of 0 size is returned. If there is not enough memory remaining to satisfy the request, then NULL is returned.<p>
-If Buffer is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If AllocationSize is greater than (MAX_ADDRESS - Buffer + 1), then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>AllocationSize</em>&nbsp;</td><td>The number of bytes to allocate and zero. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>The buffer to copy to the allocated buffer.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>A pointer to the allocated buffer or NULL if allocation fails. </dd></dl>
-
-</div>
-</div><p>
-<a class="anchor" name="be384e2875847149f0fcd6aa0f8aa7ad"></a><!-- doxytag: member="MemoryAllocationLib.h::AllocateReservedPages" ref="be384e2875847149f0fcd6aa0f8aa7ad" args="(IN UINTN Pages)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VOID* EFIAPI AllocateReservedPages           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>Pages</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Allocates one or more 4KB pages of type EfiReservedMemoryType.<p>
-Allocates the number of 4KB pages of type EfiReservedMemoryType and returns a pointer to the allocated buffer. The buffer returned is aligned on a 4KB boundary. If Pages is 0, then NULL is returned. If there is not enough memory remaining to satisfy the request, then NULL is returned.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Pages</em>&nbsp;</td><td>The number of 4 KB pages to allocate.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>A pointer to the allocated buffer or NULL if allocation fails. </dd></dl>
-
-</div>
-</div><p>
-<a class="anchor" name="138f707298d984ac79b90c32d790fa4a"></a><!-- doxytag: member="MemoryAllocationLib.h::AllocateReservedPool" ref="138f707298d984ac79b90c32d790fa4a" args="(IN UINTN AllocationSize)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VOID* EFIAPI AllocateReservedPool           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>AllocationSize</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Allocates a buffer of type EfiReservedMemoryType.<p>
-Allocates the number bytes specified by AllocationSize of type EfiReservedMemoryType and returns a pointer to the allocated buffer. If AllocationSize is 0, then a valid buffer of 0 size is returned. If there is not enough memory remaining to satisfy the request, then NULL is returned.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>AllocationSize</em>&nbsp;</td><td>The number of bytes to allocate.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>A pointer to the allocated buffer or NULL if allocation fails. </dd></dl>
-
-</div>
-</div><p>
-<a class="anchor" name="04976ba4ba5952504e52e70faa2e92f5"></a><!-- doxytag: member="MemoryAllocationLib.h::AllocateReservedZeroPool" ref="04976ba4ba5952504e52e70faa2e92f5" args="(IN UINTN AllocationSize)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VOID* EFIAPI AllocateReservedZeroPool           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>AllocationSize</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Allocates and zeros a buffer of type EfiReservedMemoryType.<p>
-Allocates the number bytes specified by AllocationSize of type EfiReservedMemoryType, clears the buffer with zeros, and returns a pointer to the allocated buffer. If AllocationSize is 0, then a valid buffer of 0 size is returned. If there is not enough memory remaining to satisfy the request, then NULL is returned.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>AllocationSize</em>&nbsp;</td><td>The number of bytes to allocate and zero.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>A pointer to the allocated buffer or NULL if allocation fails. </dd></dl>
-
-</div>
-</div><p>
-<a class="anchor" name="f2644b673f8d897038e3509503d2e172"></a><!-- doxytag: member="MemoryAllocationLib.h::AllocateRuntimeCopyPool" ref="f2644b673f8d897038e3509503d2e172" args="(IN UINTN AllocationSize, IN CONST VOID *Buffer)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VOID* EFIAPI AllocateRuntimeCopyPool           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>AllocationSize</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN CONST VOID *&nbsp;</td>
-          <td class="paramname"> <em>Buffer</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Copies a buffer to an allocated buffer of type EfiRuntimeServicesData.<p>
-Allocates the number bytes specified by AllocationSize of type EfiRuntimeServicesData, copies AllocationSize bytes from Buffer to the newly allocated buffer, and returns a pointer to the allocated buffer. If AllocationSize is 0, then a valid buffer of 0 size is returned. If there is not enough memory remaining to satisfy the request, then NULL is returned.<p>
-If Buffer is NULL, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If AllocationSize is greater than (MAX_ADDRESS - Buffer + 1), then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>AllocationSize</em>&nbsp;</td><td>The number of bytes to allocate and zero. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>The buffer to copy to the allocated buffer.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>A pointer to the allocated buffer or NULL if allocation fails. </dd></dl>
-
-</div>
-</div><p>
-<a class="anchor" name="a42ff829a2cb2efcbf40645002558bd1"></a><!-- doxytag: member="MemoryAllocationLib.h::AllocateRuntimePages" ref="a42ff829a2cb2efcbf40645002558bd1" args="(IN UINTN Pages)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VOID* EFIAPI AllocateRuntimePages           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>Pages</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Allocates one or more 4KB pages of type EfiRuntimeServicesData.<p>
-Allocates the number of 4KB pages of type EfiRuntimeServicesData and returns a pointer to the allocated buffer. The buffer returned is aligned on a 4KB boundary. If Pages is 0, then NULL is returned. If there is not enough memory remaining to satisfy the request, then NULL is returned.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Pages</em>&nbsp;</td><td>The number of 4 KB pages to allocate.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>A pointer to the allocated buffer or NULL if allocation fails. </dd></dl>
-
-</div>
-</div><p>
-<a class="anchor" name="ef7ba5d3ec03640ee6d4aa54171e61df"></a><!-- doxytag: member="MemoryAllocationLib.h::AllocateRuntimePool" ref="ef7ba5d3ec03640ee6d4aa54171e61df" args="(IN UINTN AllocationSize)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VOID* EFIAPI AllocateRuntimePool           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>AllocationSize</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Allocates a buffer of type EfiRuntimeServicesData.<p>
-Allocates the number bytes specified by AllocationSize of type EfiRuntimeServicesData and returns a pointer to the allocated buffer. If AllocationSize is 0, then a valid buffer of 0 size is returned. If there is not enough memory remaining to satisfy the request, then NULL is returned.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>AllocationSize</em>&nbsp;</td><td>The number of bytes to allocate.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>A pointer to the allocated buffer or NULL if allocation fails. </dd></dl>
-
-</div>
-</div><p>
-<a class="anchor" name="1282d1847caf1aa96aede6f4f4e29501"></a><!-- doxytag: member="MemoryAllocationLib.h::AllocateRuntimeZeroPool" ref="1282d1847caf1aa96aede6f4f4e29501" args="(IN UINTN AllocationSize)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VOID* EFIAPI AllocateRuntimeZeroPool           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>AllocationSize</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Allocates and zeros a buffer of type EfiRuntimeServicesData.<p>
-Allocates the number bytes specified by AllocationSize of type EfiRuntimeServicesData, clears the buffer with zeros, and returns a pointer to the allocated buffer. If AllocationSize is 0, then a valid buffer of 0 size is returned. If there is not enough memory remaining to satisfy the request, then NULL is returned.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>AllocationSize</em>&nbsp;</td><td>The number of bytes to allocate and zero.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>A pointer to the allocated buffer or NULL if allocation fails. </dd></dl>
-
-</div>
-</div><p>
-<a class="anchor" name="1622c7bc2d1a1fc5a7efe98d0398a180"></a><!-- doxytag: member="MemoryAllocationLib.h::AllocateZeroPool" ref="1622c7bc2d1a1fc5a7efe98d0398a180" args="(IN UINTN AllocationSize)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VOID* EFIAPI AllocateZeroPool           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>AllocationSize</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Allocates and zeros a buffer of type EfiBootServicesData.<p>
-Allocates the number bytes specified by AllocationSize of type EfiBootServicesData, clears the buffer with zeros, and returns a pointer to the allocated buffer. If AllocationSize is 0, then a valid buffer of 0 size is returned. If there is not enough memory remaining to satisfy the request, then NULL is returned.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>AllocationSize</em>&nbsp;</td><td>The number of bytes to allocate and zero.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>A pointer to the allocated buffer or NULL if allocation fails. </dd></dl>
-
-</div>
-</div><p>
-<a class="anchor" name="adaaa3a3e32a86333ef3f8a2ec003098"></a><!-- doxytag: member="MemoryAllocationLib.h::FreeAlignedPages" ref="adaaa3a3e32a86333ef3f8a2ec003098" args="(IN VOID *Buffer, IN UINTN Pages)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VOID EFIAPI FreeAlignedPages           </td>
-          <td>(</td>
-          <td class="paramtype">IN VOID *&nbsp;</td>
-          <td class="paramname"> <em>Buffer</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>Pages</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Frees one or more 4KB pages that were previously allocated with one of the aligned page allocation functions in the Memory Allocation Library.<p>
-Frees the number of 4KB pages specified by Pages from the buffer specified by Buffer. Buffer must have been allocated on a previous call to the aligned page allocation services of the Memory Allocation Library. If it is not possible to free allocated pages, then this function will perform no actions.<p>
-If Buffer was not allocated with an aligned page allocation function in the Memory Allocation Library, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Pages is zero, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>Pointer to the buffer of pages to free. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Pages</em>&nbsp;</td><td>The number of 4 KB pages to free. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="19764a0f29c0489f6e3666552276756f"></a><!-- doxytag: member="MemoryAllocationLib.h::FreePages" ref="19764a0f29c0489f6e3666552276756f" args="(IN VOID *Buffer, IN UINTN Pages)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VOID EFIAPI FreePages           </td>
-          <td>(</td>
-          <td class="paramtype">IN VOID *&nbsp;</td>
-          <td class="paramname"> <em>Buffer</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>Pages</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Frees one or more 4KB pages that were previously allocated with one of the page allocation functions in the Memory Allocation Library.<p>
-Frees the number of 4KB pages specified by Pages from the buffer specified by Buffer. Buffer must have been allocated on a previous call to the page allocation services of the Memory Allocation Library. If it is not possible to free allocated pages, then this function will perform no actions.<p>
-If Buffer was not allocated with a page allocation function in the Memory Allocation Library, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Pages is zero, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>Pointer to the buffer of pages to free. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Pages</em>&nbsp;</td><td>The number of 4 KB pages to free. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="8b1cbc21e0cebcfc6a992546ec9b4941"></a><!-- doxytag: member="MemoryAllocationLib.h::FreePool" ref="8b1cbc21e0cebcfc6a992546ec9b4941" args="(IN VOID *Buffer)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VOID EFIAPI FreePool           </td>
-          <td>(</td>
-          <td class="paramtype">IN VOID *&nbsp;</td>
-          <td class="paramname"> <em>Buffer</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Frees a buffer that was previously allocated with one of the pool allocation functions in the Memory Allocation Library.<p>
-Frees the buffer specified by Buffer. Buffer must have been allocated on a previous call to the pool allocation services of the Memory Allocation Library. If it is not possible to free pool resources, then this function will perform no actions.<p>
-If Buffer was not allocated with a pool allocation function in the Memory Allocation Library, then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>Pointer to the buffer to free. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="d57c40decf8f7802505ec6ec6939d571"></a><!-- doxytag: member="MemoryAllocationLib.h::ReallocatePool" ref="d57c40decf8f7802505ec6ec6939d571" args="(IN UINTN OldSize, IN UINTN NewSize, IN VOID *OldBuffer)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VOID* EFIAPI ReallocatePool           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>OldSize</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>NewSize</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN VOID *&nbsp;</td>
-          <td class="paramname"> <em>OldBuffer</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Reallocates a buffer of type EfiBootServicesData.<p>
-Allocates and zeros the number bytes specified by NewSize from memory of type EfiBootServicesData. If OldBuffer is not NULL, then the smaller of OldSize and NewSize bytes are copied from OldBuffer to the newly allocated buffer, and OldBuffer is freed. A pointer to the newly allocated buffer is returned. If NewSize is 0, then a valid buffer of 0 size is returned. If there is not enough memory remaining to satisfy the request, then NULL is returned.<p>
-If the allocation of the new buffer is successful and the smaller of NewSize and OldSize is greater than (MAX_ADDRESS - OldBuffer + 1), then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>OldSize</em>&nbsp;</td><td>The size, in bytes, of OldBuffer. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>NewSize</em>&nbsp;</td><td>The size, in bytes, of the buffer to reallocate. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>OldBuffer</em>&nbsp;</td><td>The buffer to copy to the allocated buffer. This is an optional parameter that may be NULL.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>A pointer to the allocated buffer or NULL if allocation fails. </dd></dl>
-
-</div>
-</div><p>
-<a class="anchor" name="09d0702f54157bb0fc11021898cad56c"></a><!-- doxytag: member="MemoryAllocationLib.h::ReallocateReservedPool" ref="09d0702f54157bb0fc11021898cad56c" args="(IN UINTN OldSize, IN UINTN NewSize, IN VOID *OldBuffer)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VOID* EFIAPI ReallocateReservedPool           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>OldSize</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>NewSize</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN VOID *&nbsp;</td>
-          <td class="paramname"> <em>OldBuffer</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Reallocates a buffer of type EfiReservedMemoryType.<p>
-Allocates and zeros the number bytes specified by NewSize from memory of type EfiReservedMemoryType. If OldBuffer is not NULL, then the smaller of OldSize and NewSize bytes are copied from OldBuffer to the newly allocated buffer, and OldBuffer is freed. A pointer to the newly allocated buffer is returned. If NewSize is 0, then a valid buffer of 0 size is returned. If there is not enough memory remaining to satisfy the request, then NULL is returned.<p>
-If the allocation of the new buffer is successful and the smaller of NewSize and OldSize is greater than (MAX_ADDRESS - OldBuffer + 1), then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>OldSize</em>&nbsp;</td><td>The size, in bytes, of OldBuffer. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>NewSize</em>&nbsp;</td><td>The size, in bytes, of the buffer to reallocate. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>OldBuffer</em>&nbsp;</td><td>The buffer to copy to the allocated buffer. This is an optional parameter that may be NULL.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>A pointer to the allocated buffer or NULL if allocation fails. </dd></dl>
-
-</div>
-</div><p>
-<a class="anchor" name="0ce087259d16d7a83f6b9fe43f68f4c3"></a><!-- doxytag: member="MemoryAllocationLib.h::ReallocateRuntimePool" ref="0ce087259d16d7a83f6b9fe43f68f4c3" args="(IN UINTN OldSize, IN UINTN NewSize, IN VOID *OldBuffer)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">VOID* EFIAPI ReallocateRuntimePool           </td>
-          <td>(</td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>OldSize</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
-          <td class="paramname"> <em>NewSize</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">IN VOID *&nbsp;</td>
-          <td class="paramname"> <em>OldBuffer</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Reallocates a buffer of type EfiRuntimeServicesData.<p>
-Allocates and zeros the number bytes specified by NewSize from memory of type EfiRuntimeServicesData. If OldBuffer is not NULL, then the smaller of OldSize and NewSize bytes are copied from OldBuffer to the newly allocated buffer, and OldBuffer is freed. A pointer to the newly allocated buffer is returned. If NewSize is 0, then a valid buffer of 0 size is returned. If there is not enough memory remaining to satisfy the request, then NULL is returned.<p>
-If the allocation of the new buffer is successful and the smaller of NewSize and OldSize is greater than (MAX_ADDRESS - OldBuffer + 1), then <a class="el" href="../../d1/dac/a01015.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>OldSize</em>&nbsp;</td><td>The size, in bytes, of OldBuffer. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>NewSize</em>&nbsp;</td><td>The size, in bytes, of the buffer to reallocate. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>OldBuffer</em>&nbsp;</td><td>The buffer to copy to the allocated buffer. This is an optional parameter that may be NULL.</td></tr>
-  </table>
-</dl>
-<dl class="return" compact><dt><b>Returns:</b></dt><dd>A pointer to the allocated buffer or NULL if allocation fails. </dd></dl>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:08 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:13 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Ppi/Smbus2.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Library/ResourcePublicationLib.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,247 +21,61 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Ppi/Smbus2.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Library/ResourcePublicationLib.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
-<tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/da8/a00230.html">_EFI_PEI_SMBUS2_PPI</a></td></tr>
-
-<tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d73/a01090.html#b58958574d75dbeb42d7d0e086c0e566">EFI_PEI_SMBUS2_PPI_GUID</a>&nbsp;&nbsp;&nbsp;{ 0x9ca93627, 0xb65b, 0x4324, { 0xa2, 0x2, 0xc0, 0xb4, 0x61, 0x76, 0x45, 0x43 } }</td></tr>
-
-<tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef struct <a class="el" href="../../d1/da8/a00230.html">_EFI_PEI_SMBUS2_PPI</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d73/a01090.html#388abdc3489a80123628c5ce6be28af9">EFI_PEI_SMBUS2_PPI</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d73/a01090.html#93bd3f11102cbacdd4d5219b86d814b6">EFI_PEI_SMBUS2_PPI_EXECUTE_OPERATION</a> )(IN CONST <a class="el" href="../../d1/da8/a00230.html">EFI_PEI_SMBUS2_PPI</a> *This, IN <a class="el" href="../../d9/dad/a00591.html">EFI_SMBUS_DEVICE_ADDRESS</a> SlaveAddress, IN <a class="el" href="../../d7/df2/a01000.html#0e036b8292641b19ce16792acbde35ba">EFI_SMBUS_DEVICE_COMMAND</a> Command, IN <a class="el" href="../../d7/df2/a01000.html#a8b213cf201989c6b42291855b32db41">EFI_SMBUS_OPERATION</a> Operation, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> PecCheck, IN OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *Length, IN OUT VOID *Buffer)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d73/a01090.html#0e1dc5b277e502fe7237303df06cf7ad">EFI_PEI_SMBUS2_PPI_ARP_DEVICE</a> )(IN CONST <a class="el" href="../../d1/da8/a00230.html">EFI_PEI_SMBUS2_PPI</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> ArpAll, IN <a class="el" href="../../d2/da3/a00593.html">EFI_SMBUS_UDID</a> *SmbusUdid, IN OUT <a class="el" href="../../d9/dad/a00591.html">EFI_SMBUS_DEVICE_ADDRESS</a> *SlaveAddress)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d73/a01090.html#33c5367fc05c5e4d49efb4e03ce95a05">EFI_PEI_SMBUS2_PPI_GET_ARP_MAP</a> )(IN CONST <a class="el" href="../../d1/da8/a00230.html">EFI_PEI_SMBUS2_PPI</a> *This, IN OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *Length, IN OUT <a class="el" href="../../d0/dec/a00592.html">EFI_SMBUS_DEVICE_MAP</a> **SmbusDeviceMap)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d73/a01090.html#2f37ce3bad1bf98ffe2e37748e4c2da3">EFI_PEI_SMBUS_NOTIFY2_FUNCTION</a> )(IN CONST <a class="el" href="../../d1/da8/a00230.html">EFI_PEI_SMBUS2_PPI</a> *SmbusPpi, IN <a class="el" href="../../d9/dad/a00591.html">EFI_SMBUS_DEVICE_ADDRESS</a> SlaveAddress, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Data)</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d73/a01090.html#d42db4f3dd9a9c406a5e4cd3448bbf16">EFI_PEI_SMBUS2_PPI_NOTIFY</a> )(IN CONST <a class="el" href="../../d1/da8/a00230.html">EFI_PEI_SMBUS2_PPI</a> *This, IN <a class="el" href="../../d9/dad/a00591.html">EFI_SMBUS_DEVICE_ADDRESS</a> SlaveAddress, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Data, IN <a class="el" href="../../da/d73/a01090.html#2f37ce3bad1bf98ffe2e37748e4c2da3">EFI_PEI_SMBUS_NOTIFY2_FUNCTION</a> NotifyFunction)</td></tr>
-
-<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d73/a01090.html#d16a833407ce21b4dbf15646beed232a">gEfiPeiSmbus2PpiGuid</a></td></tr>
+<tr><td colspan="2"><br><h2>Functions</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d2/dd5/a01002.html#f3519a25bfa97c295fb23ffec95b1cb1">RETURN_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d73/a01090.html#fd4efceb60cef72e8ff21ddb9c6fb884">PublishSystemMemory</a> (IN <a class="el" href="../../d2/dd5/a01002.html#8557e721a169e9f286709e9b55a64559">PHYSICAL_ADDRESS</a> MemoryBegin, IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> MemoryLength)</td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-This file declares Smbus2 PPI. This PPI provides the basic I/O interfaces that a PEIM uses to access its SMBus controller and the slave devices attached to it.<p>
+Provides a service to publish discovered system resources.<p>
 Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
-<dl class="user" compact><dt><b>Revision Reference:</b></dt><dd>This PPI is introduced in PI Version 1.0. </dd></dl>
-<hr><h2>Define Documentation</h2>
-<a class="anchor" name="b58958574d75dbeb42d7d0e086c0e566"></a><!-- doxytag: member="Smbus2.h::EFI_PEI_SMBUS2_PPI_GUID" ref="b58958574d75dbeb42d7d0e086c0e566" args="" -->
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Function Documentation</h2>
+<a class="anchor" name="fd4efceb60cef72e8ff21ddb9c6fb884"></a><!-- doxytag: member="ResourcePublicationLib.h::PublishSystemMemory" ref="fd4efceb60cef72e8ff21ddb9c6fb884" args="(IN PHYSICAL_ADDRESS MemoryBegin, IN UINT64 MemoryLength)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_PEI_SMBUS2_PPI_GUID&nbsp;&nbsp;&nbsp;{ 0x9ca93627, 0xb65b, 0x4324, { 0xa2, 0x2, 0xc0, 0xb4, 0x61, 0x76, 0x45, 0x43 } }          </td>
+          <td class="memname"><a class="el" href="../../d2/dd5/a01002.html#f3519a25bfa97c295fb23ffec95b1cb1">RETURN_STATUS</a> EFIAPI PublishSystemMemory           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d2/dd5/a01002.html#8557e721a169e9f286709e9b55a64559">PHYSICAL_ADDRESS</a>&nbsp;</td>
+          <td class="paramname"> <em>MemoryBegin</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td>
+          <td class="paramname"> <em>MemoryLength</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="388abdc3489a80123628c5ce6be28af9"></a><!-- doxytag: member="Smbus2.h::EFI_PEI_SMBUS2_PPI" ref="388abdc3489a80123628c5ce6be28af9" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct <a class="el" href="../../d1/da8/a00230.html">_EFI_PEI_SMBUS2_PPI</a> <a class="el" href="../../d1/da8/a00230.html">EFI_PEI_SMBUS2_PPI</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="0e1dc5b277e502fe7237303df06cf7ad"></a><!-- doxytag: member="Smbus2.h::EFI_PEI_SMBUS2_PPI_ARP_DEVICE" ref="0e1dc5b277e502fe7237303df06cf7ad" args=")(IN CONST EFI_PEI_SMBUS2_PPI *This, IN BOOLEAN ArpAll, IN EFI_SMBUS_UDID *SmbusUdid, IN OUT EFI_SMBUS_DEVICE_ADDRESS *SlaveAddress)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../da/d73/a01090.html#0e1dc5b277e502fe7237303df06cf7ad">EFI_PEI_SMBUS2_PPI_ARP_DEVICE</a>)(IN CONST <a class="el" href="../../d1/da8/a00230.html">EFI_PEI_SMBUS2_PPI</a> *This, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> ArpAll, IN <a class="el" href="../../d2/da3/a00593.html">EFI_SMBUS_UDID</a> *SmbusUdid, IN OUT <a class="el" href="../../d9/dad/a00591.html">EFI_SMBUS_DEVICE_ADDRESS</a> *SlaveAddress)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-The ArpDevice() function enumerates the entire bus or enumerates a specific device that is identified by SmbusUdid.<p>
+Declares the presence of permanent system memory in the platform.<p>
+Declares that the system memory buffer specified by MemoryBegin and MemoryLength as permanent memory that may be used for general purpose use by software. The amount of memory available to software may be less than MemoryLength if published memory has alignment restrictions. If MemoryLength is 0, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If MemoryLength is greater than (MAX_ADDRESS - MemoryBegin + 1), then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
 <dl compact><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_PEI_SMBUS2_PPI instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>ArpAll</em>&nbsp;</td><td>A Boolean expression that indicates if the host drivers need to enumerate all the devices or enumerate only the device that is identified by SmbusUdid. If ArpAll is TRUE, SmbusUdid and SlaveAddress are optional. If ArpAll is FALSE, ArpDevice will enumerate SmbusUdid and the address will be at SlaveAddress. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SmbusUdid</em>&nbsp;</td><td>The targeted SMBus Unique Device Identifier (UDID). The UDID may not exist for SMBus devices with fixed addresses. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SlaveAddress</em>&nbsp;</td><td>The new SMBus address for the slave device for which the operation is targeted.</td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>MemoryBegin</em>&nbsp;</td><td>The start address of the memory being declared. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>MemoryLength</em>&nbsp;</td><td>The number of bytes of memory being declared.</td></tr>
   </table>
 </dl>
 <dl compact><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The SMBus slave device address was set. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>SlaveAddress is NULL. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>The request could not be completed due to a lack of resources. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_TIMEOUT</em>&nbsp;</td><td>The SMBus slave device did not respond. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The request was not completed because the transaction failed. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>ArpDevice, GetArpMap, and Notify are not implemented by this PEIM. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>RETURN_SUCCESS</em>&nbsp;</td><td>The memory buffer was published. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>RETURN_OUT_OF_RESOURCES</em>&nbsp;</td><td>There are not enough resources to publish the memory buffer </td></tr>
   </table>
 </dl>
 
 </div>
 </div><p>
-<a class="anchor" name="93bd3f11102cbacdd4d5219b86d814b6"></a><!-- doxytag: member="Smbus2.h::EFI_PEI_SMBUS2_PPI_EXECUTE_OPERATION" ref="93bd3f11102cbacdd4d5219b86d814b6" args=")(IN CONST EFI_PEI_SMBUS2_PPI *This, IN EFI_SMBUS_DEVICE_ADDRESS SlaveAddress, IN EFI_SMBUS_DEVICE_COMMAND Command, IN EFI_SMBUS_OPERATION Operation, IN BOOLEAN PecCheck, IN OUT UINTN *Length, IN OUT VOID *Buffer)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../da/d73/a01090.html#93bd3f11102cbacdd4d5219b86d814b6">EFI_PEI_SMBUS2_PPI_EXECUTE_OPERATION</a>)(IN CONST <a class="el" href="../../d1/da8/a00230.html">EFI_PEI_SMBUS2_PPI</a> *This, IN <a class="el" href="../../d9/dad/a00591.html">EFI_SMBUS_DEVICE_ADDRESS</a> SlaveAddress, IN <a class="el" href="../../d7/df2/a01000.html#0e036b8292641b19ce16792acbde35ba">EFI_SMBUS_DEVICE_COMMAND</a> Command, IN <a class="el" href="../../d7/df2/a01000.html#a8b213cf201989c6b42291855b32db41">EFI_SMBUS_OPERATION</a> Operation, IN <a class="el" href="../../d0/d2b/a01010.html#000dc5dbcb0d4ba7b6f12c577bc56fba">BOOLEAN</a> PecCheck, IN OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *Length, IN OUT VOID *Buffer)          </td>
-        </tr>
-      </table>
 </div>
-<div class="memdoc">
-
-<p>
-Executes an SMBus operation to an SMBus controller. Returns when either the command has been executed or an error is encountered in doing the operation.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_PEI_SMBUS2_PPI instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SlaveAddress</em>&nbsp;</td><td>The SMBUS hardware address to which the SMBUS device is preassigned or allocated. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Command</em>&nbsp;</td><td>This command is transmitted by the SMBus host controller to the SMBus slave device and the interpretation is SMBus slave device specific. It can mean the offset to a list of functions inside an SMBus slave device. Not all operations or slave devices support this command's registers. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Operation</em>&nbsp;</td><td>Signifies which particular SMBus hardware protocol instance that it will use to execute the SMBus transactions. This SMBus hardware protocol is defined by the System Management Bus (SMBus) Specification and is not related to UEFI. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>PecCheck</em>&nbsp;</td><td>Defines if Packet Error Code (PEC) checking is required for this operation. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Length</em>&nbsp;</td><td>Signifies the number of bytes that this operation will do. The maximum number of bytes can be revision specific and operation specific. This parameter will contain the actual number of bytes that are executed for this operation. Not all operations require this argument. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>Contains the value of data to execute to the SMBus slave device. Not all operations require this argument. The length of this buffer is identified by Length.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The last data that was returned from the access matched the poll exit criteria. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_CRC_ERROR</em>&nbsp;</td><td>The checksum is not correct (PEC is incorrect) </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_TIMEOUT</em>&nbsp;</td><td>Timeout expired before the operation was completed. Timeout is determined by the SMBus host controller device. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_OUT_OF_RESOURCES</em>&nbsp;</td><td>The request could not be completed due to a lack of resources. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_DEVICE_ERROR</em>&nbsp;</td><td>The request was not completed because a failure reflected in the Host Status Register bit. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_INVALID_PARAMETER</em>&nbsp;</td><td>Operation is not defined in EFI_SMBUS_OPERATION. Or Length/Buffer is NULL for operations except for EfiSmbusQuickRead and EfiSmbusQuickWrite. Or Length is outside the range of valid values. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>The SMBus operation or PEC is not supported. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_BUFFER_TOO_SMALL</em>&nbsp;</td><td>Buffer is not sufficient for this operation. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="33c5367fc05c5e4d49efb4e03ce95a05"></a><!-- doxytag: member="Smbus2.h::EFI_PEI_SMBUS2_PPI_GET_ARP_MAP" ref="33c5367fc05c5e4d49efb4e03ce95a05" args=")(IN CONST EFI_PEI_SMBUS2_PPI *This, IN OUT UINTN *Length, IN OUT EFI_SMBUS_DEVICE_MAP **SmbusDeviceMap)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../da/d73/a01090.html#33c5367fc05c5e4d49efb4e03ce95a05">EFI_PEI_SMBUS2_PPI_GET_ARP_MAP</a>)(IN CONST <a class="el" href="../../d1/da8/a00230.html">EFI_PEI_SMBUS2_PPI</a> *This, IN OUT <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *Length, IN OUT <a class="el" href="../../d0/dec/a00592.html">EFI_SMBUS_DEVICE_MAP</a> **SmbusDeviceMap)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-The GetArpMap() function returns the mapping of all the SMBus devices that are enumerated by the SMBus host driver.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_PEI_SMBUS2_PPI instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Length</em>&nbsp;</td><td>Size of the buffer that contains the SMBus device map. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SmbusDeviceMap</em>&nbsp;</td><td>The pointer to the device map as enumerated by the SMBus controller driver.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>The device map was returned correctly in the buffer. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>ArpDevice, GetArpMap, and Notify are not implemented by this PEIM. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="d42db4f3dd9a9c406a5e4cd3448bbf16"></a><!-- doxytag: member="Smbus2.h::EFI_PEI_SMBUS2_PPI_NOTIFY" ref="d42db4f3dd9a9c406a5e4cd3448bbf16" args=")(IN CONST EFI_PEI_SMBUS2_PPI *This, IN EFI_SMBUS_DEVICE_ADDRESS SlaveAddress, IN UINTN Data, IN EFI_PEI_SMBUS_NOTIFY2_FUNCTION NotifyFunction)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../da/d73/a01090.html#d42db4f3dd9a9c406a5e4cd3448bbf16">EFI_PEI_SMBUS2_PPI_NOTIFY</a>)(IN CONST <a class="el" href="../../d1/da8/a00230.html">EFI_PEI_SMBUS2_PPI</a> *This, IN <a class="el" href="../../d9/dad/a00591.html">EFI_SMBUS_DEVICE_ADDRESS</a> SlaveAddress, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Data, IN <a class="el" href="../../da/d73/a01090.html#2f37ce3bad1bf98ffe2e37748e4c2da3">EFI_PEI_SMBUS_NOTIFY2_FUNCTION</a> NotifyFunction)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-The Notify() function registers all the callback functions to allow the bus driver to call these functions when the SlaveAddress/Data pair happens.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_PEI_SMBUS2_PPI instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SlaveAddress</em>&nbsp;</td><td>Address that the host controller detects as sending a message and calls all the registered functions. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Data</em>&nbsp;</td><td>Data that the host controller detects as sending a message and calls all the registered functions. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>NotifyFunction</em>&nbsp;</td><td>The function to call when the bus driver detects the SlaveAddress and Data pair.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>NotifyFunction has been registered. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>ArpDevice, GetArpMap, and Notify are not implemented by this PEIM. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<a class="anchor" name="2f37ce3bad1bf98ffe2e37748e4c2da3"></a><!-- doxytag: member="Smbus2.h::EFI_PEI_SMBUS_NOTIFY2_FUNCTION" ref="2f37ce3bad1bf98ffe2e37748e4c2da3" args=")(IN CONST EFI_PEI_SMBUS2_PPI *SmbusPpi, IN EFI_SMBUS_DEVICE_ADDRESS SlaveAddress, IN UINTN Data)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="../../d9/dbb/a01186.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>(EFIAPI * <a class="el" href="../../da/d73/a01090.html#2f37ce3bad1bf98ffe2e37748e4c2da3">EFI_PEI_SMBUS_NOTIFY2_FUNCTION</a>)(IN CONST <a class="el" href="../../d1/da8/a00230.html">EFI_PEI_SMBUS2_PPI</a> *SmbusPpi, IN <a class="el" href="../../d9/dad/a00591.html">EFI_SMBUS_DEVICE_ADDRESS</a> SlaveAddress, IN <a class="el" href="../../d0/d2b/a01010.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> Data)          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-CallBack function can be registered in EFI_PEI_SMBUS2_PPI_NOTIFY.<p>
-<dl compact><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>This</em>&nbsp;</td><td>A pointer to the EFI_PEI_SMBUS2_PPI instance. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>SlaveAddress</em>&nbsp;</td><td>The SMBUS hardware address to which the SMBUS device is preassigned or allocated. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>Data</em>&nbsp;</td><td>Data of the SMBus host notify command that the caller wants to be called.</td></tr>
-  </table>
-</dl>
-<dl compact><dt><b>Return values:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>EFI_SUCCESS</em>&nbsp;</td><td>NotifyFunction has been registered. </td></tr>
-    <tr><td valign="top"></td><td valign="top"><em>EFI_UNSUPPORTED</em>&nbsp;</td><td>ArpDevice, GetArpMap, and Notify are not implemented by this PEIM. </td></tr>
-  </table>
-</dl>
-
-</div>
-</div><p>
-<hr><h2>Variable Documentation</h2>
-<a class="anchor" name="d16a833407ce21b4dbf15646beed232a"></a><!-- doxytag: member="Smbus2.h::gEfiPeiSmbus2PpiGuid" ref="d16a833407ce21b4dbf15646beed232a" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../da/d73/a01090.html#d16a833407ce21b4dbf15646beed232a">gEfiPeiSmbus2PpiGuid</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-</div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:09 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:23 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

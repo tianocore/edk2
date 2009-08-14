@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: _EFI_HII_FONT_PROTOCOL Struct Reference</title>
+<title>MdePkg[ALL]: _EFI_HII_FONT_PACKAGE_HDR Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,26 +21,30 @@
   </div>
 </div>
 <div class="contents">
-<h1>_EFI_HII_FONT_PROTOCOL Struct Reference</h1><!-- doxytag: class="_EFI_HII_FONT_PROTOCOL" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>_EFI_HII_FONT_PACKAGE_HDR Struct Reference</h1><!-- doxytag: class="_EFI_HII_FONT_PACKAGE_HDR" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/de4/a01135.html#bc575c417a60424048d5750f4c66d870">EFI_HII_STRING_TO_IMAGE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/df9/a00044.html#67fd792af1edec6189f64263ed37977f">StringToImage</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dca/a00477.html">EFI_HII_PACKAGE_HEADER</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/df9/a00044.html#871e11ed0014e94722e94941359ef22c">Header</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/de4/a01135.html#91fc04cc4d1981e260750065425ec785">EFI_HII_STRING_ID_TO_IMAGE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/df9/a00044.html#8efce54c7a018ca95b85152eaa5cb09b">StringIdToImage</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/df9/a00044.html#f5ed462c2bc36b9e6c236c5a4a0cc6e8">HdrSize</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/de4/a01135.html#8e56dd31905307ef523d2c195d75d0d3">EFI_HII_GET_GLYPH</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/df9/a00044.html#afc8069f4e7408a5e519158e7dd74c8f">GetGlyph</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/df9/a00044.html#28b831302bb5b495f23cc9ea13ca68e5">GlyphBlockOffset</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../de/de4/a01135.html#9c9d120aab389d109ebe518a96a3230e">EFI_HII_GET_FONT_INFO</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/df9/a00044.html#8e73efeb405581d34ea47893adacc083">GetFontInfo</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/d8b/a00059.html">EFI_HII_GLYPH_INFO</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/df9/a00044.html#1671d7ad37dac407c21f6270e5c9a239">Cell</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/d7b/a01249.html#ce9e6a83ce8d823e622004137dd91918">EFI_HII_FONT_STYLE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/df9/a00044.html#3f08bb1e483b4432bb0b0219d439bc41">FontStyle</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/df9/a00044.html#fdc3669befe2d6c84fd900ae3abc77a3">FontFamily</a> [1]</td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-The protocol provides the service to retrieve the font informations. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="8e73efeb405581d34ea47893adacc083"></a><!-- doxytag: member="_EFI_HII_FONT_PROTOCOL::GetFontInfo" ref="8e73efeb405581d34ea47893adacc083" args="" -->
+The fixed header consists of a standard record header and then the character values in this section, the flags (including the encoding method) and the offsets of the glyph information, the glyph bitmaps and the character map. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="1671d7ad37dac407c21f6270e5c9a239"></a><!-- doxytag: member="_EFI_HII_FONT_PACKAGE_HDR::Cell" ref="1671d7ad37dac407c21f6270e5c9a239" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../de/de4/a01135.html#9c9d120aab389d109ebe518a96a3230e">EFI_HII_GET_FONT_INFO</a> <a class="el" href="../../d5/df9/a00044.html#8e73efeb405581d34ea47893adacc083">_EFI_HII_FONT_PROTOCOL::GetFontInfo</a>          </td>
+          <td class="memname"><a class="el" href="../../d3/d8b/a00059.html">EFI_HII_GLYPH_INFO</a> <a class="el" href="../../d5/df9/a00044.html#1671d7ad37dac407c21f6270e5c9a239">_EFI_HII_FONT_PACKAGE_HDR::Cell</a>          </td>
         </tr>
       </table>
 </div>
@@ -50,12 +54,12 @@ The protocol provides the service to retrieve the font informations. <hr><h2>Fie
 
 </div>
 </div><p>
-<a class="anchor" name="afc8069f4e7408a5e519158e7dd74c8f"></a><!-- doxytag: member="_EFI_HII_FONT_PROTOCOL::GetGlyph" ref="afc8069f4e7408a5e519158e7dd74c8f" args="" -->
+<a class="anchor" name="fdc3669befe2d6c84fd900ae3abc77a3"></a><!-- doxytag: member="_EFI_HII_FONT_PACKAGE_HDR::FontFamily" ref="fdc3669befe2d6c84fd900ae3abc77a3" args="[1]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../de/de4/a01135.html#8e56dd31905307ef523d2c195d75d0d3">EFI_HII_GET_GLYPH</a> <a class="el" href="../../d5/df9/a00044.html#afc8069f4e7408a5e519158e7dd74c8f">_EFI_HII_FONT_PROTOCOL::GetGlyph</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#8a79e1974f247348d08f0ad87ccfe7a4">CHAR16</a> <a class="el" href="../../d5/df9/a00044.html#fdc3669befe2d6c84fd900ae3abc77a3">_EFI_HII_FONT_PACKAGE_HDR::FontFamily</a>[1]          </td>
         </tr>
       </table>
 </div>
@@ -65,12 +69,12 @@ The protocol provides the service to retrieve the font informations. <hr><h2>Fie
 
 </div>
 </div><p>
-<a class="anchor" name="8efce54c7a018ca95b85152eaa5cb09b"></a><!-- doxytag: member="_EFI_HII_FONT_PROTOCOL::StringIdToImage" ref="8efce54c7a018ca95b85152eaa5cb09b" args="" -->
+<a class="anchor" name="3f08bb1e483b4432bb0b0219d439bc41"></a><!-- doxytag: member="_EFI_HII_FONT_PACKAGE_HDR::FontStyle" ref="3f08bb1e483b4432bb0b0219d439bc41" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../de/de4/a01135.html#91fc04cc4d1981e260750065425ec785">EFI_HII_STRING_ID_TO_IMAGE</a> <a class="el" href="../../d5/df9/a00044.html#8efce54c7a018ca95b85152eaa5cb09b">_EFI_HII_FONT_PROTOCOL::StringIdToImage</a>          </td>
+          <td class="memname"><a class="el" href="../../d3/d7b/a01249.html#ce9e6a83ce8d823e622004137dd91918">EFI_HII_FONT_STYLE</a> <a class="el" href="../../d5/df9/a00044.html#3f08bb1e483b4432bb0b0219d439bc41">_EFI_HII_FONT_PACKAGE_HDR::FontStyle</a>          </td>
         </tr>
       </table>
 </div>
@@ -80,12 +84,42 @@ The protocol provides the service to retrieve the font informations. <hr><h2>Fie
 
 </div>
 </div><p>
-<a class="anchor" name="67fd792af1edec6189f64263ed37977f"></a><!-- doxytag: member="_EFI_HII_FONT_PROTOCOL::StringToImage" ref="67fd792af1edec6189f64263ed37977f" args="" -->
+<a class="anchor" name="28b831302bb5b495f23cc9ea13ca68e5"></a><!-- doxytag: member="_EFI_HII_FONT_PACKAGE_HDR::GlyphBlockOffset" ref="28b831302bb5b495f23cc9ea13ca68e5" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../de/de4/a01135.html#bc575c417a60424048d5750f4c66d870">EFI_HII_STRING_TO_IMAGE</a> <a class="el" href="../../d5/df9/a00044.html#67fd792af1edec6189f64263ed37977f">_EFI_HII_FONT_PROTOCOL::StringToImage</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d5/df9/a00044.html#28b831302bb5b495f23cc9ea13ca68e5">_EFI_HII_FONT_PACKAGE_HDR::GlyphBlockOffset</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="f5ed462c2bc36b9e6c236c5a4a0cc6e8"></a><!-- doxytag: member="_EFI_HII_FONT_PACKAGE_HDR::HdrSize" ref="f5ed462c2bc36b9e6c236c5a4a0cc6e8" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d5/df9/a00044.html#f5ed462c2bc36b9e6c236c5a4a0cc6e8">_EFI_HII_FONT_PACKAGE_HDR::HdrSize</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="871e11ed0014e94722e94941359ef22c"></a><!-- doxytag: member="_EFI_HII_FONT_PACKAGE_HDR::Header" ref="871e11ed0014e94722e94941359ef22c" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d9/dca/a00477.html">EFI_HII_PACKAGE_HEADER</a> <a class="el" href="../../d5/df9/a00044.html#871e11ed0014e94722e94941359ef22c">_EFI_HII_FONT_PACKAGE_HDR::Header</a>          </td>
         </tr>
       </table>
 </div>
@@ -96,7 +130,7 @@ The protocol provides the service to retrieve the font informations. <hr><h2>Fie
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:12 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:03 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE Struct Reference</title>
+<title>MdePkg[ALL]: CHAP_RADIUS_AUTH_NODE Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,30 +21,99 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE Struct Reference</h1><!-- doxytag: class="EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>CHAP_RADIUS_AUTH_NODE Struct Reference</h1><!-- doxytag: class="CHAP_RADIUS_AUTH_NODE" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d5d/a00311.html#817cd44136468ec5cfb50fef4450393a">Type</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d0f/a00303.html">AUTH_NODE_HEADER</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d5d/a00311.html#cb2c1604b961e3b4617282cb97f4fae6">Header</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d5d/a00311.html#1dab278363b6675d054e9c311b9e643c">Length</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/d79/a00540.html">EFI_IPv6_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d5d/a00311.html#5da9a77445d62a6a06ae4247c7e7939e">RadiusIpAddr</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d5d/a00311.html#c2347125f87e4d14bdb67264df2a130a">Bus</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">IPv4 or IPv6 address.  <a href="#5da9a77445d62a6a06ae4247c7e7939e"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d5d/a00311.html#96e6f19dddaf9d6d96488872f48b771a">Reserved</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d5d/a00311.html#43748aae562787eb866c18a42e938cf2">Source</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d4/d79/a00540.html">EFI_IPv6_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d5d/a00311.html#54309fad396b22d88e80f47ea5c1a0f1">NasIpAddr</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d5d/a00311.html#a16df99e14636c3a45681c77f27eca94">GlobalSystemInterruptVector</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">IPv4 or IPv6 address.  <a href="#54309fad396b22d88e80f47ea5c1a0f1"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d5d/a00311.html#b6cf9a2c79841cde7c4283549129552e">NasSecretLength</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d5d/a00311.html#dcf0b9c02ff9340b42e71ca217bc1c53">Flags</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d5d/a00311.html#e39e48d5da93bf6a1c6a8fada0f178f2">NasSecret</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d5d/a00311.html#e8bb9b893fe791bed9693df246264779">ChapSecretLength</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d5d/a00311.html#26cd33c561847febf9eb47f51561650d">ChapSecret</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d5d/a00311.html#be46cb4387471b9605271c235af0560f">ChapNameLength</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d5d/a00311.html#d40d98ba09e5c4f0ef886c6f769976c0">ChapName</a></td></tr>
 
 </table>
-<hr><a name="_details"></a><h2>Detailed Description</h2>
-Interrupt Source Override Structure <hr><h2>Field Documentation</h2>
-<a class="anchor" name="c2347125f87e4d14bdb67264df2a130a"></a><!-- doxytag: member="EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE::Bus" ref="c2347125f87e4d14bdb67264df2a130a" args="" -->
+<hr><h2>Field Documentation</h2>
+<a class="anchor" name="d40d98ba09e5c4f0ef886c6f769976c0"></a><!-- doxytag: member="CHAP_RADIUS_AUTH_NODE::ChapName" ref="d40d98ba09e5c4f0ef886c6f769976c0" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d1/d5d/a00311.html#c2347125f87e4d14bdb67264df2a130a">EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE::Bus</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>* <a class="el" href="../../d1/d5d/a00311.html#d40d98ba09e5c4f0ef886c6f769976c0">CHAP_RADIUS_AUTH_NODE::ChapName</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+CHAP Initiator Name 
+</div>
+</div><p>
+<a class="anchor" name="be46cb4387471b9605271c235af0560f"></a><!-- doxytag: member="CHAP_RADIUS_AUTH_NODE::ChapNameLength" ref="be46cb4387471b9605271c235af0560f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d1/d5d/a00311.html#be46cb4387471b9605271c235af0560f">CHAP_RADIUS_AUTH_NODE::ChapNameLength</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+CHAP Initiator Name Length in bytes 
+</div>
+</div><p>
+<a class="anchor" name="26cd33c561847febf9eb47f51561650d"></a><!-- doxytag: member="CHAP_RADIUS_AUTH_NODE::ChapSecret" ref="26cd33c561847febf9eb47f51561650d" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>* <a class="el" href="../../d1/d5d/a00311.html#26cd33c561847febf9eb47f51561650d">CHAP_RADIUS_AUTH_NODE::ChapSecret</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+CHAP Initiator Secret 
+</div>
+</div><p>
+<a class="anchor" name="e8bb9b893fe791bed9693df246264779"></a><!-- doxytag: member="CHAP_RADIUS_AUTH_NODE::ChapSecretLength" ref="e8bb9b893fe791bed9693df246264779" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d1/d5d/a00311.html#e8bb9b893fe791bed9693df246264779">CHAP_RADIUS_AUTH_NODE::ChapSecretLength</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+CHAP Initiator Secret length in bytes 
+</div>
+</div><p>
+<a class="anchor" name="cb2c1604b961e3b4617282cb97f4fae6"></a><!-- doxytag: member="CHAP_RADIUS_AUTH_NODE::Header" ref="cb2c1604b961e3b4617282cb97f4fae6" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/d0f/a00303.html">AUTH_NODE_HEADER</a> <a class="el" href="../../d1/d5d/a00311.html#cb2c1604b961e3b4617282cb97f4fae6">CHAP_RADIUS_AUTH_NODE::Header</a>          </td>
         </tr>
       </table>
 </div>
@@ -54,83 +123,87 @@ Interrupt Source Override Structure <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="dcf0b9c02ff9340b42e71ca217bc1c53"></a><!-- doxytag: member="EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE::Flags" ref="dcf0b9c02ff9340b42e71ca217bc1c53" args="" -->
+<a class="anchor" name="54309fad396b22d88e80f47ea5c1a0f1"></a><!-- doxytag: member="CHAP_RADIUS_AUTH_NODE::NasIpAddr" ref="54309fad396b22d88e80f47ea5c1a0f1" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d1/d5d/a00311.html#dcf0b9c02ff9340b42e71ca217bc1c53">EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE::Flags</a>          </td>
+          <td class="memname"><a class="el" href="../../d4/d79/a00540.html">EFI_IPv6_ADDRESS</a> <a class="el" href="../../d1/d5d/a00311.html#54309fad396b22d88e80f47ea5c1a0f1">CHAP_RADIUS_AUTH_NODE::NasIpAddr</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+IPv4 or IPv6 address. 
+<p>
+Network Access Server IPv4 or IPv6 Address (OPTIONAL) 
 </div>
 </div><p>
-<a class="anchor" name="a16df99e14636c3a45681c77f27eca94"></a><!-- doxytag: member="EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE::GlobalSystemInterruptVector" ref="a16df99e14636c3a45681c77f27eca94" args="" -->
+<a class="anchor" name="e39e48d5da93bf6a1c6a8fada0f178f2"></a><!-- doxytag: member="CHAP_RADIUS_AUTH_NODE::NasSecret" ref="e39e48d5da93bf6a1c6a8fada0f178f2" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d1/d5d/a00311.html#a16df99e14636c3a45681c77f27eca94">EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE::GlobalSystemInterruptVector</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>* <a class="el" href="../../d1/d5d/a00311.html#e39e48d5da93bf6a1c6a8fada0f178f2">CHAP_RADIUS_AUTH_NODE::NasSecret</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+Network Access Server secret (OPTIONAL) 
 </div>
 </div><p>
-<a class="anchor" name="1dab278363b6675d054e9c311b9e643c"></a><!-- doxytag: member="EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE::Length" ref="1dab278363b6675d054e9c311b9e643c" args="" -->
+<a class="anchor" name="b6cf9a2c79841cde7c4283549129552e"></a><!-- doxytag: member="CHAP_RADIUS_AUTH_NODE::NasSecretLength" ref="b6cf9a2c79841cde7c4283549129552e" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d1/d5d/a00311.html#1dab278363b6675d054e9c311b9e643c">EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE::Length</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d1/d5d/a00311.html#b6cf9a2c79841cde7c4283549129552e">CHAP_RADIUS_AUTH_NODE::NasSecretLength</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+Network Access Server Secret Length in bytes (OPTIONAL) 
 </div>
 </div><p>
-<a class="anchor" name="43748aae562787eb866c18a42e938cf2"></a><!-- doxytag: member="EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE::Source" ref="43748aae562787eb866c18a42e938cf2" args="" -->
+<a class="anchor" name="5da9a77445d62a6a06ae4247c7e7939e"></a><!-- doxytag: member="CHAP_RADIUS_AUTH_NODE::RadiusIpAddr" ref="5da9a77445d62a6a06ae4247c7e7939e" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d1/d5d/a00311.html#43748aae562787eb866c18a42e938cf2">EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE::Source</a>          </td>
+          <td class="memname"><a class="el" href="../../d4/d79/a00540.html">EFI_IPv6_ADDRESS</a> <a class="el" href="../../d1/d5d/a00311.html#5da9a77445d62a6a06ae4247c7e7939e">CHAP_RADIUS_AUTH_NODE::RadiusIpAddr</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+IPv4 or IPv6 address. 
+<p>
+RADIUS Server IPv4 or IPv6 Address 
 </div>
 </div><p>
-<a class="anchor" name="817cd44136468ec5cfb50fef4450393a"></a><!-- doxytag: member="EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE::Type" ref="817cd44136468ec5cfb50fef4450393a" args="" -->
+<a class="anchor" name="96e6f19dddaf9d6d96488872f48b771a"></a><!-- doxytag: member="CHAP_RADIUS_AUTH_NODE::Reserved" ref="96e6f19dddaf9d6d96488872f48b771a" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d1/d5d/a00311.html#817cd44136468ec5cfb50fef4450393a">EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE::Type</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d1/d5d/a00311.html#96e6f19dddaf9d6d96488872f48b771a">CHAP_RADIUS_AUTH_NODE::Reserved</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+Reserved for future use 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:15 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:21 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

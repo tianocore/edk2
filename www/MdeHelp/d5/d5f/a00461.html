@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_HOB_MEMORY_ALLOCATION_HEADER Struct Reference</title>
+<title>MdePkg[ALL]: EFI_FV_INFO Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,99 +21,99 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_HOB_MEMORY_ALLOCATION_HEADER Struct Reference</h1><!-- doxytag: class="EFI_HOB_MEMORY_ALLOCATION_HEADER" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_FV_INFO Struct Reference</h1><!-- doxytag: class="EFI_FV_INFO" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d5f/a00461.html#75dc8d41ad8dd7e9afb845f4416a3246">Name</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d8/dbf/a01109.html#9c9b8f7e8c5c7ea086f40aca0f74fd02">EFI_FVB_ATTRIBUTES_2</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d5f/a00461.html#cc7e12424d7bb5e275c2449ba272ca2d">FvAttributes</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d5f/a00461.html#0dc155493204f3e3f7dbfbf547a9326d">MemoryBaseAddress</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d5f/a00461.html#5abeeddab2a11f4a9b8dad169652e158">FvFormat</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d5f/a00461.html#49f9b273f6200788ea5988481e699cf1">MemoryLength</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d5f/a00461.html#cc33dafe66f9e564b80c5ff18d9c20f7">FvName</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/d10/a01189.html#0e2cdd0290e753cca604d3977cbe8bb9">EFI_MEMORY_TYPE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d5f/a00461.html#8311bb46986373d64600c5034a30ca61">MemoryType</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d5f/a00461.html#d800c559acbf052af4b973e9e3c3c8ee">FvStart</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d5f/a00461.html#c9fb79b751a050ed554cc6e5873c39dc">Reserved</a> [4]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d5f/a00461.html#a2330ca370d0fb5f1f405522016c04c3">FvSize</a></td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-<a class="el" href="../../d5/d5f/a00461.html">EFI_HOB_MEMORY_ALLOCATION_HEADER</a> describes the various attributes of the logical memory allocation. The type field will be used for subsequent inclusion in the UEFI memory map. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="0dc155493204f3e3f7dbfbf547a9326d"></a><!-- doxytag: member="EFI_HOB_MEMORY_ALLOCATION_HEADER::MemoryBaseAddress" ref="0dc155493204f3e3f7dbfbf547a9326d" args="" -->
+Information of FV volume. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="cc7e12424d7bb5e275c2449ba272ca2d"></a><!-- doxytag: member="EFI_FV_INFO::FvAttributes" ref="cc7e12424d7bb5e275c2449ba272ca2d" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/dbb/a01186.html#31bc7e7faeab8d2940ee34f21d41cd04">EFI_PHYSICAL_ADDRESS</a> <a class="el" href="../../d5/d5f/a00461.html#0dc155493204f3e3f7dbfbf547a9326d">EFI_HOB_MEMORY_ALLOCATION_HEADER::MemoryBaseAddress</a>          </td>
+          <td class="memname"><a class="el" href="../../d8/dbf/a01109.html#9c9b8f7e8c5c7ea086f40aca0f74fd02">EFI_FVB_ATTRIBUTES_2</a> <a class="el" href="../../d5/d5f/a00461.html#cc7e12424d7bb5e275c2449ba272ca2d">EFI_FV_INFO::FvAttributes</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The base address of memory allocated by this HOB. Type EFI_PHYSICAL_ADDRESS is defined in <a class="el" href="../../d6/dcd/a01023.html#48d461654ab0264be90527d408ee231e">AllocatePages()</a> in the UEFI 2.0 specification. 
+Attributes of the firmware volume. 
 </div>
 </div><p>
-<a class="anchor" name="49f9b273f6200788ea5988481e699cf1"></a><!-- doxytag: member="EFI_HOB_MEMORY_ALLOCATION_HEADER::MemoryLength" ref="49f9b273f6200788ea5988481e699cf1" args="" -->
+<a class="anchor" name="5abeeddab2a11f4a9b8dad169652e158"></a><!-- doxytag: member="EFI_FV_INFO::FvFormat" ref="5abeeddab2a11f4a9b8dad169652e158" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d5/d5f/a00461.html#49f9b273f6200788ea5988481e699cf1">EFI_HOB_MEMORY_ALLOCATION_HEADER::MemoryLength</a>          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../d5/d5f/a00461.html#5abeeddab2a11f4a9b8dad169652e158">EFI_FV_INFO::FvFormat</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-The length in bytes of memory allocated by this HOB. 
+Format of the firmware volume. 
 </div>
 </div><p>
-<a class="anchor" name="8311bb46986373d64600c5034a30ca61"></a><!-- doxytag: member="EFI_HOB_MEMORY_ALLOCATION_HEADER::MemoryType" ref="8311bb46986373d64600c5034a30ca61" args="" -->
+<a class="anchor" name="cc33dafe66f9e564b80c5ff18d9c20f7"></a><!-- doxytag: member="EFI_FV_INFO::FvName" ref="cc33dafe66f9e564b80c5ff18d9c20f7" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d3/d10/a01189.html#0e2cdd0290e753cca604d3977cbe8bb9">EFI_MEMORY_TYPE</a> <a class="el" href="../../d5/d5f/a00461.html#8311bb46986373d64600c5034a30ca61">EFI_HOB_MEMORY_ALLOCATION_HEADER::MemoryType</a>          </td>
+          <td class="memname"><a class="el" href="../../d1/d87/a00689.html">EFI_GUID</a> <a class="el" href="../../d5/d5f/a00461.html#cc33dafe66f9e564b80c5ff18d9c20f7">EFI_FV_INFO::FvName</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Defines the type of memory allocated by this HOB. The memory type definition follows the EFI_MEMORY_TYPE definition. Type EFI_MEMORY_TYPE is defined in <a class="el" href="../../d6/dcd/a01023.html#48d461654ab0264be90527d408ee231e">AllocatePages()</a> in the UEFI 2.0 specification. 
+Name of the firmware volume. 
 </div>
 </div><p>
-<a class="anchor" name="75dc8d41ad8dd7e9afb845f4416a3246"></a><!-- doxytag: member="EFI_HOB_MEMORY_ALLOCATION_HEADER::Name" ref="75dc8d41ad8dd7e9afb845f4416a3246" args="" -->
+<a class="anchor" name="a2330ca370d0fb5f1f405522016c04c3"></a><!-- doxytag: member="EFI_FV_INFO::FvSize" ref="a2330ca370d0fb5f1f405522016c04c3" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../d5/d5f/a00461.html#75dc8d41ad8dd7e9afb845f4416a3246">EFI_HOB_MEMORY_ALLOCATION_HEADER::Name</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d5/d5f/a00461.html#a2330ca370d0fb5f1f405522016c04c3">EFI_FV_INFO::FvSize</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-A <a class="el" href="../../d9/d0f/a00644.html">GUID</a> that defines the memory allocation region's type and purpose, as well as other fields within the memory allocation HOB. This <a class="el" href="../../d9/d0f/a00644.html">GUID</a> is used to define the additional data within the HOB that may be present for the memory allocation HOB. Type EFI_GUID is defined in InstallProtocolInterface() in the UEFI 2.0 specification. 
+Size of the firmware volume. 
 </div>
 </div><p>
-<a class="anchor" name="c9fb79b751a050ed554cc6e5873c39dc"></a><!-- doxytag: member="EFI_HOB_MEMORY_ALLOCATION_HEADER::Reserved" ref="c9fb79b751a050ed554cc6e5873c39dc" args="[4]" -->
+<a class="anchor" name="d800c559acbf052af4b973e9e3c3c8ee"></a><!-- doxytag: member="EFI_FV_INFO::FvStart" ref="d800c559acbf052af4b973e9e3c3c8ee" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d5/d5f/a00461.html#c9fb79b751a050ed554cc6e5873c39dc">EFI_HOB_MEMORY_ALLOCATION_HEADER::Reserved</a>[4]          </td>
+          <td class="memname">VOID* <a class="el" href="../../d5/d5f/a00461.html#d800c559acbf052af4b973e9e3c3c8ee">EFI_FV_INFO::FvStart</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Padding for Itanium processor family 
+Points to the first byte of the firmware volume, if bit EFI_FVB_MEMORY_MAPPED is set in FvAttributes. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:31 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: ISCSI_DEVICE_PATH Struct Reference</title>
+<title>MdePkg[ALL]: EFI_UDP4_COMPLETION_TOKEN Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,27 +21,29 @@
   </div>
 </div>
 <div class="contents">
-<h1>ISCSI_DEVICE_PATH Struct Reference</h1><!-- doxytag: class="ISCSI_DEVICE_PATH" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_UDP4_COMPLETION_TOKEN Struct Reference</h1><!-- doxytag: class="EFI_UDP4_COMPLETION_TOKEN" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/de6/a00404.html">EFI_DEVICE_PATH_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/d46/a00664.html#9ec977cce621def3079398606b6c1440">Header</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d95/a01247.html#7f3111de303d836d8d3711c39363f81a">EFI_EVENT</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/d46/a00664.html#e44efc46761841e3a43632c2dbb5dfb6">Event</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/d46/a00664.html#92934e6eddfedd8637281c8847c69c3c">NetworkProtocol</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/d46/a00664.html#4a99ead04fbfea89cb0546503e4221cf">Status</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/d46/a00664.html#7954d80a8442567b33519b162306fb18">LoginOption</a></td></tr>
+<tr><td class="memItemLeft" nowrap>union {</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/d46/a00664.html#1fe40edbd53ee63897966889f9063b35">Lun</a></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d2/d6e/a00667.html">EFI_UDP4_RECEIVE_DATA</a> *&nbsp;&nbsp;&nbsp;<a class="el" href="../../df/d46/a00664.html#ee286eb2c5389898cf874240ce2cfb72">RxData</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/d46/a00664.html#4533813c521f0d3df4af19d6ddd98deb">TargetPortalGroupTag</a></td></tr>
+<tr><td class="memItemLeft" nowrap>&nbsp;&nbsp;&nbsp;<a class="el" href="../../d1/d97/a00670.html">EFI_UDP4_TRANSMIT_DATA</a> *&nbsp;&nbsp;&nbsp;<a class="el" href="../../df/d46/a00664.html#2f24712b52425b7d349d87affbd4ed38">TxData</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap valign="top">}&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/d46/a00664.html#47db18a2edb2ac665158d835b97ddfce">Packet</a></td></tr>
 
 </table>
 <hr><h2>Field Documentation</h2>
-<a class="anchor" name="9ec977cce621def3079398606b6c1440"></a><!-- doxytag: member="ISCSI_DEVICE_PATH::Header" ref="9ec977cce621def3079398606b6c1440" args="" -->
+<a class="anchor" name="e44efc46761841e3a43632c2dbb5dfb6"></a><!-- doxytag: member="EFI_UDP4_COMPLETION_TOKEN::Event" ref="e44efc46761841e3a43632c2dbb5dfb6" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/de6/a00404.html">EFI_DEVICE_PATH_PROTOCOL</a> <a class="el" href="../../df/d46/a00664.html#9ec977cce621def3079398606b6c1440">ISCSI_DEVICE_PATH::Header</a>          </td>
+          <td class="memname"><a class="el" href="../../dd/d95/a01247.html#7f3111de303d836d8d3711c39363f81a">EFI_EVENT</a> <a class="el" href="../../df/d46/a00664.html#e44efc46761841e3a43632c2dbb5dfb6">EFI_UDP4_COMPLETION_TOKEN::Event</a>          </td>
         </tr>
       </table>
 </div>
@@ -51,68 +53,68 @@
 
 </div>
 </div><p>
-<a class="anchor" name="7954d80a8442567b33519b162306fb18"></a><!-- doxytag: member="ISCSI_DEVICE_PATH::LoginOption" ref="7954d80a8442567b33519b162306fb18" args="" -->
+<a class="anchor" name="47db18a2edb2ac665158d835b97ddfce"></a><!-- doxytag: member="EFI_UDP4_COMPLETION_TOKEN::Packet" ref="47db18a2edb2ac665158d835b97ddfce" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../df/d46/a00664.html#7954d80a8442567b33519b162306fb18">ISCSI_DEVICE_PATH::LoginOption</a>          </td>
+          <td class="memname">union { ... }   <a class="el" href="../../df/d46/a00664.html#47db18a2edb2ac665158d835b97ddfce">EFI_UDP4_COMPLETION_TOKEN::Packet</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-iSCSI Login Options 
+
 </div>
 </div><p>
-<a class="anchor" name="1fe40edbd53ee63897966889f9063b35"></a><!-- doxytag: member="ISCSI_DEVICE_PATH::Lun" ref="1fe40edbd53ee63897966889f9063b35" args="" -->
+<a class="anchor" name="ee286eb2c5389898cf874240ce2cfb72"></a><!-- doxytag: member="EFI_UDP4_COMPLETION_TOKEN::RxData" ref="ee286eb2c5389898cf874240ce2cfb72" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../df/d46/a00664.html#1fe40edbd53ee63897966889f9063b35">ISCSI_DEVICE_PATH::Lun</a>          </td>
+          <td class="memname"><a class="el" href="../../d2/d6e/a00667.html">EFI_UDP4_RECEIVE_DATA</a>* <a class="el" href="../../df/d46/a00664.html#ee286eb2c5389898cf874240ce2cfb72">EFI_UDP4_COMPLETION_TOKEN::RxData</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-iSCSI Logical Unit Number 
+
 </div>
 </div><p>
-<a class="anchor" name="92934e6eddfedd8637281c8847c69c3c"></a><!-- doxytag: member="ISCSI_DEVICE_PATH::NetworkProtocol" ref="92934e6eddfedd8637281c8847c69c3c" args="" -->
+<a class="anchor" name="4a99ead04fbfea89cb0546503e4221cf"></a><!-- doxytag: member="EFI_UDP4_COMPLETION_TOKEN::Status" ref="4a99ead04fbfea89cb0546503e4221cf" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../df/d46/a00664.html#92934e6eddfedd8637281c8847c69c3c">ISCSI_DEVICE_PATH::NetworkProtocol</a>          </td>
+          <td class="memname"><a class="el" href="../../dd/d95/a01247.html#5f446f35c9f907a4f1cf22e794ba338d">EFI_STATUS</a> <a class="el" href="../../df/d46/a00664.html#4a99ead04fbfea89cb0546503e4221cf">EFI_UDP4_COMPLETION_TOKEN::Status</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Network Protocol (0 = TCP, 1+ = reserved) 
+
 </div>
 </div><p>
-<a class="anchor" name="4533813c521f0d3df4af19d6ddd98deb"></a><!-- doxytag: member="ISCSI_DEVICE_PATH::TargetPortalGroupTag" ref="4533813c521f0d3df4af19d6ddd98deb" args="" -->
+<a class="anchor" name="2f24712b52425b7d349d87affbd4ed38"></a><!-- doxytag: member="EFI_UDP4_COMPLETION_TOKEN::TxData" ref="2f24712b52425b7d349d87affbd4ed38" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../df/d46/a00664.html#4533813c521f0d3df4af19d6ddd98deb">ISCSI_DEVICE_PATH::TargetPortalGroupTag</a>          </td>
+          <td class="memname"><a class="el" href="../../d1/d97/a00670.html">EFI_UDP4_TRANSMIT_DATA</a>* <a class="el" href="../../df/d46/a00664.html#2f24712b52425b7d349d87affbd4ed38">EFI_UDP4_COMPLETION_TOKEN::TxData</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-iSCSI Target Portal group tag the initiator intends to establish a session with. 
+
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:19 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:49 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

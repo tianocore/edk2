@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MISC_COOLING_DEVICE_TYPE Struct Reference</title>
+<title>MdePkg[ALL]: F1394_DEVICE_PATH Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,22 +21,38 @@
   </div>
 </div>
 <div class="contents">
-<h1>MISC_COOLING_DEVICE_TYPE Struct Reference</h1><!-- doxytag: class="MISC_COOLING_DEVICE_TYPE" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>F1394_DEVICE_PATH Struct Reference</h1><!-- doxytag: class="F1394_DEVICE_PATH" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/db4/a00684.html#8b955b6d1efa6c95135ea1f5e47e97b5">CoolingDevice</a>:5</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/db4/a00684.html#58cf762fd7da5e89dff1a09115f69485">Header</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/db4/a00684.html#359de50c6b6817acf21d959f3bfe5b9d">CoolingDeviceStatus</a>:3</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/db4/a00684.html#8965be2daba15287c9308a8f44855c64">Reserved</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d3/db4/a00684.html#be2e1a7e6911e84c1d4f7d60fd826560">Guid</a></td></tr>
 
 </table>
-<hr><a name="_details"></a><h2>Detailed Description</h2>
-Cooling Device - Device Type and Status <hr><h2>Field Documentation</h2>
-<a class="anchor" name="8b955b6d1efa6c95135ea1f5e47e97b5"></a><!-- doxytag: member="MISC_COOLING_DEVICE_TYPE::CoolingDevice" ref="8b955b6d1efa6c95135ea1f5e47e97b5" args="" -->
+<hr><h2>Field Documentation</h2>
+<a class="anchor" name="be2e1a7e6911e84c1d4f7d60fd826560"></a><!-- doxytag: member="F1394_DEVICE_PATH::Guid" ref="be2e1a7e6911e84c1d4f7d60fd826560" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d3/db4/a00684.html#8b955b6d1efa6c95135ea1f5e47e97b5">MISC_COOLING_DEVICE_TYPE::CoolingDevice</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d3/db4/a00684.html#be2e1a7e6911e84c1d4f7d60fd826560">F1394_DEVICE_PATH::Guid</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+1394 Global Unique ID (<a class="el" href="../../d1/d87/a00689.html">GUID</a>). 
+</div>
+</div><p>
+<a class="anchor" name="58cf762fd7da5e89dff1a09115f69485"></a><!-- doxytag: member="F1394_DEVICE_PATH::Header" ref="58cf762fd7da5e89dff1a09115f69485" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../df/d70/a00431.html">EFI_DEVICE_PATH_PROTOCOL</a> <a class="el" href="../../d3/db4/a00684.html#58cf762fd7da5e89dff1a09115f69485">F1394_DEVICE_PATH::Header</a>          </td>
         </tr>
       </table>
 </div>
@@ -46,23 +62,23 @@ Cooling Device - Device Type and Status <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="359de50c6b6817acf21d959f3bfe5b9d"></a><!-- doxytag: member="MISC_COOLING_DEVICE_TYPE::CoolingDeviceStatus" ref="359de50c6b6817acf21d959f3bfe5b9d" args="" -->
+<a class="anchor" name="8965be2daba15287c9308a8f44855c64"></a><!-- doxytag: member="F1394_DEVICE_PATH::Reserved" ref="8965be2daba15287c9308a8f44855c64" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d3/db4/a00684.html#359de50c6b6817acf21d959f3bfe5b9d">MISC_COOLING_DEVICE_TYPE::CoolingDeviceStatus</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d3/db4/a00684.html#8965be2daba15287c9308a8f44855c64">F1394_DEVICE_PATH::Reserved</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
+Reserved for the future. 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:20 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:51 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

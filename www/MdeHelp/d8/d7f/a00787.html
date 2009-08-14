@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: SAL_ST_CACHE_COHERENCE_DECRIPTOR Struct Reference</title>
+<title>MdePkg[ALL]: PSI_STATIC_STRUCT Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,27 +21,32 @@
   </div>
 </div>
 <div class="contents">
-<h1>SAL_ST_CACHE_COHERENCE_DECRIPTOR Struct Reference</h1><!-- doxytag: class="SAL_ST_CACHE_COHERENCE_DECRIPTOR" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>PSI_STATIC_STRUCT Struct Reference</h1><!-- doxytag: class="PSI_STATIC_STRUCT" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d7f/a00787.html#fb2e12814b4e47e4dea100636274f129">Type</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d7f/a00787.html#9331cdd626410930d686d19f43c1916b">ValidFieldBits</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Type here should be 4.  <a href="#fb2e12814b4e47e4dea100636274f129"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d7f/a00787.html#f8bf79982a1b94116f2da4ae74fec236">Reserved</a> [3]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d7f/a00787.html#2aa67368b9508d4b18da9d4273a290db">MinStateInfo</a> [1024]</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d7f/a00787.html#fcb1caac2e710d27dafb8452c430b2d2">NumberOfDomains</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d7f/a00787.html#7f92911e5c42a8a7e5cfe2b6b745e4c0">Br</a> [8]</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/de5/a00771.html">SAL_COHERENCE_DOMAIN_INFO</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d7f/a00787.html#4ea6ac7c923bf4659950fd17d5bec069">DomainInformation</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d7f/a00787.html#0f92dcdc47db99531fae972e1778a8a0">Cr</a> [128]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d7f/a00787.html#c93f5da4e8ec049d0a8c96972defd814">Ar</a> [128]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d7f/a00787.html#0d66ae701523cbb3b06da3c6da9a9e05">Rr</a> [8]</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/d1b/a00687.html">FR_STRUCT</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d7f/a00787.html#848aa983a32a6686f6a5c52db0a9263b">Fr</a> [128]</td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-Format of Purge Translation Cache Coherence Domain Entry <hr><h2>Field Documentation</h2>
-<a class="anchor" name="4ea6ac7c923bf4659950fd17d5bec069"></a><!-- doxytag: member="SAL_ST_CACHE_COHERENCE_DECRIPTOR::DomainInformation" ref="4ea6ac7c923bf4659950fd17d5bec069" args="" -->
+Definition of <a class="el" href="../../d8/d7f/a00787.html">PSI_STATIC_STRUCT</a> <hr><h2>Field Documentation</h2>
+<a class="anchor" name="c93f5da4e8ec049d0a8c96972defd814"></a><!-- doxytag: member="PSI_STATIC_STRUCT::Ar" ref="c93f5da4e8ec049d0a8c96972defd814" args="[128]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../dd/de5/a00771.html">SAL_COHERENCE_DOMAIN_INFO</a>* <a class="el" href="../../d8/d7f/a00787.html#4ea6ac7c923bf4659950fd17d5bec069">SAL_ST_CACHE_COHERENCE_DECRIPTOR::DomainInformation</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d8/d7f/a00787.html#c93f5da4e8ec049d0a8c96972defd814">PSI_STATIC_STRUCT::Ar</a>[128]          </td>
         </tr>
       </table>
 </div>
@@ -51,12 +56,12 @@ Format of Purge Translation Cache Coherence Domain Entry <hr><h2>Field Documenta
 
 </div>
 </div><p>
-<a class="anchor" name="fcb1caac2e710d27dafb8452c430b2d2"></a><!-- doxytag: member="SAL_ST_CACHE_COHERENCE_DECRIPTOR::NumberOfDomains" ref="fcb1caac2e710d27dafb8452c430b2d2" args="" -->
+<a class="anchor" name="7f92911e5c42a8a7e5cfe2b6b745e4c0"></a><!-- doxytag: member="PSI_STATIC_STRUCT::Br" ref="7f92911e5c42a8a7e5cfe2b6b745e4c0" args="[8]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d8/d7f/a00787.html#fcb1caac2e710d27dafb8452c430b2d2">SAL_ST_CACHE_COHERENCE_DECRIPTOR::NumberOfDomains</a>          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d8/d7f/a00787.html#7f92911e5c42a8a7e5cfe2b6b745e4c0">PSI_STATIC_STRUCT::Br</a>[8]          </td>
         </tr>
       </table>
 </div>
@@ -66,12 +71,12 @@ Format of Purge Translation Cache Coherence Domain Entry <hr><h2>Field Documenta
 
 </div>
 </div><p>
-<a class="anchor" name="f8bf79982a1b94116f2da4ae74fec236"></a><!-- doxytag: member="SAL_ST_CACHE_COHERENCE_DECRIPTOR::Reserved" ref="f8bf79982a1b94116f2da4ae74fec236" args="[3]" -->
+<a class="anchor" name="0f92dcdc47db99531fae972e1778a8a0"></a><!-- doxytag: member="PSI_STATIC_STRUCT::Cr" ref="0f92dcdc47db99531fae972e1778a8a0" args="[128]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d7f/a00787.html#f8bf79982a1b94116f2da4ae74fec236">SAL_ST_CACHE_COHERENCE_DECRIPTOR::Reserved</a>[3]          </td>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d8/d7f/a00787.html#0f92dcdc47db99531fae972e1778a8a0">PSI_STATIC_STRUCT::Cr</a>[128]          </td>
         </tr>
       </table>
 </div>
@@ -81,25 +86,68 @@ Format of Purge Translation Cache Coherence Domain Entry <hr><h2>Field Documenta
 
 </div>
 </div><p>
-<a class="anchor" name="fb2e12814b4e47e4dea100636274f129"></a><!-- doxytag: member="SAL_ST_CACHE_COHERENCE_DECRIPTOR::Type" ref="fb2e12814b4e47e4dea100636274f129" args="" -->
+<a class="anchor" name="848aa983a32a6686f6a5c52db0a9263b"></a><!-- doxytag: member="PSI_STATIC_STRUCT::Fr" ref="848aa983a32a6686f6a5c52db0a9263b" args="[128]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d7f/a00787.html#fb2e12814b4e47e4dea100636274f129">SAL_ST_CACHE_COHERENCE_DECRIPTOR::Type</a>          </td>
+          <td class="memname"><a class="el" href="../../df/d1b/a00687.html">FR_STRUCT</a> <a class="el" href="../../d8/d7f/a00787.html#848aa983a32a6686f6a5c52db0a9263b">PSI_STATIC_STRUCT::Fr</a>[128]          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Type here should be 4. 
+
+</div>
+</div><p>
+<a class="anchor" name="2aa67368b9508d4b18da9d4273a290db"></a><!-- doxytag: member="PSI_STATIC_STRUCT::MinStateInfo" ref="2aa67368b9508d4b18da9d4273a290db" args="[1024]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d7f/a00787.html#2aa67368b9508d4b18da9d4273a290db">PSI_STATIC_STRUCT::MinStateInfo</a>[1024]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="0d66ae701523cbb3b06da3c6da9a9e05"></a><!-- doxytag: member="PSI_STATIC_STRUCT::Rr" ref="0d66ae701523cbb3b06da3c6da9a9e05" args="[8]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d8/d7f/a00787.html#0d66ae701523cbb3b06da3c6da9a9e05">PSI_STATIC_STRUCT::Rr</a>[8]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="9331cdd626410930d686d19f43c1916b"></a><!-- doxytag: member="PSI_STATIC_STRUCT::ValidFieldBits" ref="9331cdd626410930d686d19f43c1916b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#95df6cdb32afc350ff070f2fe8a54a67">UINT64</a> <a class="el" href="../../d8/d7f/a00787.html#9331cdd626410930d686d19f43c1916b">PSI_STATIC_STRUCT::ValidFieldBits</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
 <p>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:21 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:00 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

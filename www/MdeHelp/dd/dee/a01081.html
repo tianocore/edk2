@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MdePkg/Include/Ppi/MemoryDiscovered.h File Reference</title>
+<title>MdePkg[ALL]: MdePkg/Include/Library/PeCoffLib.h File Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,47 +21,62 @@
   </div>
 </div>
 <div class="contents">
-<h1>MdePkg/Include/Ppi/MemoryDiscovered.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>MdePkg/Include/Library/PeCoffLib.h File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
-<tr><td colspan="2"><br><h2>Defines</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dee/a01081.html#f9d53de7647893ba0620d9830dc5f251">EFI_PEI_PERMANENT_MEMORY_INSTALLED_PPI_GUID</a></td></tr>
+<tr><td colspan="2"><br><h2>Data Structures</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d6/d86/a00781.html">PE_COFF_LOADER_IMAGE_CONTEXT</a></td></tr>
 
-<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dee/a01081.html#041eeb5f0946a3a74ffc4eede035b309">gEfiPeiMemoryDiscoveredPpiGuid</a></td></tr>
+<tr><td colspan="2"><br><h2>Defines</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dee/a01081.html#4174e6f1be8a3a37874d38146eee96a2">IMAGE_ERROR_SUCCESS</a>&nbsp;&nbsp;&nbsp;0</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dee/a01081.html#b0a0b530c020f17d32e189e950d367c1">IMAGE_ERROR_IMAGE_READ</a>&nbsp;&nbsp;&nbsp;1</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dee/a01081.html#fcb9a16380c82e7207b55f2267b6b01b">IMAGE_ERROR_INVALID_PE_HEADER_SIGNATURE</a>&nbsp;&nbsp;&nbsp;2</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dee/a01081.html#64fb7c351d064acc0f068e77cc6deb87">IMAGE_ERROR_INVALID_MACHINE_TYPE</a>&nbsp;&nbsp;&nbsp;3</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dee/a01081.html#40704ffd2cea8c3b33f91c64d528bb56">IMAGE_ERROR_INVALID_SUBSYSTEM</a>&nbsp;&nbsp;&nbsp;4</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dee/a01081.html#581ecf5efddbfa2284456062240a8292">IMAGE_ERROR_INVALID_IMAGE_ADDRESS</a>&nbsp;&nbsp;&nbsp;5</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dee/a01081.html#d196df062aca79941bbb9c018baf10a5">IMAGE_ERROR_INVALID_IMAGE_SIZE</a>&nbsp;&nbsp;&nbsp;6</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dee/a01081.html#8b2ce78beada49c4dc3ea3102b42dbb6">IMAGE_ERROR_INVALID_SECTION_ALIGNMENT</a>&nbsp;&nbsp;&nbsp;7</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dee/a01081.html#1d7a363e7b74611de9ddc633df5909af">IMAGE_ERROR_SECTION_NOT_LOADED</a>&nbsp;&nbsp;&nbsp;8</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dee/a01081.html#567f2d294f7595d9307d8e5a9cfcbc3b">IMAGE_ERROR_FAILED_RELOCATION</a>&nbsp;&nbsp;&nbsp;9</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dee/a01081.html#44180fa654565ed888a7e72987b10579">IMAGE_ERROR_FAILED_ICACHE_FLUSH</a>&nbsp;&nbsp;&nbsp;10</td></tr>
+
+<tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef <a class="el" href="../../d2/dd5/a01002.html#f3519a25bfa97c295fb23ffec95b1cb1">RETURN_STATUS</a>(EFIAPI *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dee/a01081.html#5e79e54d0a98d4ca1edd0dd3b9427443">PE_COFF_LOADER_READ_FILE</a> )(IN VOID *FileHandle, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> FileOffset, IN OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *ReadSize, OUT VOID *Buffer)</td></tr>
+
+<tr><td colspan="2"><br><h2>Functions</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d2/dd5/a01002.html#f3519a25bfa97c295fb23ffec95b1cb1">RETURN_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dee/a01081.html#b5c5bcd17794b6de4bb93a8eb2129b94">PeCoffLoaderGetImageInfo</a> (IN OUT <a class="el" href="../../d6/d86/a00781.html">PE_COFF_LOADER_IMAGE_CONTEXT</a> *ImageContext)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d2/dd5/a01002.html#f3519a25bfa97c295fb23ffec95b1cb1">RETURN_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dee/a01081.html#2a50888c6100c2d1374d71668a59303f">PeCoffLoaderRelocateImage</a> (IN OUT <a class="el" href="../../d6/d86/a00781.html">PE_COFF_LOADER_IMAGE_CONTEXT</a> *ImageContext)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d2/dd5/a01002.html#f3519a25bfa97c295fb23ffec95b1cb1">RETURN_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dee/a01081.html#2003fb97c41baf50162901cbe9e0f988">PeCoffLoaderLoadImage</a> (IN OUT <a class="el" href="../../d6/d86/a00781.html">PE_COFF_LOADER_IMAGE_CONTEXT</a> *ImageContext)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d2/dd5/a01002.html#f3519a25bfa97c295fb23ffec95b1cb1">RETURN_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dee/a01081.html#e95875d898be0efbc1fbaf43b9d44c6f">PeCoffLoaderImageReadFromMemory</a> (IN VOID *FileHandle, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> FileOffset, IN OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *ReadSize, OUT VOID *Buffer)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">VOID EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dee/a01081.html#4827dd41b90b7887445e3c94edbdba84">PeCoffLoaderRelocateImageForRuntime</a> (IN <a class="el" href="../../d2/dd5/a01002.html#8557e721a169e9f286709e9b55a64559">PHYSICAL_ADDRESS</a> ImageBase, IN <a class="el" href="../../d2/dd5/a01002.html#8557e721a169e9f286709e9b55a64559">PHYSICAL_ADDRESS</a> VirtImageBase, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> ImageSize, IN VOID *RelocationData)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d2/dd5/a01002.html#f3519a25bfa97c295fb23ffec95b1cb1">RETURN_STATUS</a> EFIAPI&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/dee/a01081.html#5e7f95ca7feb12a3aa470b69584c2e75">PeCoffLoaderUnloadImage</a> (IN OUT <a class="el" href="../../d6/d86/a00781.html">PE_COFF_LOADER_IMAGE_CONTEXT</a> *ImageContext)</td></tr>
 
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-This file declares Memory Discovered PPI.<p>
-This PPI is published by the PEI Foundation when the main memory is installed. It is essentially a PPI with no associated interface. Its purpose is to be used as a signal for other PEIMs who can register for a notification on its installation.<p>
+Provides services to load and relocate a PE/COFF image.<p>
+The PE/COFF Loader Library abstracts the implementation of a PE/COFF loader for IA-32, x86, IPF, and EBC processor types. The library functions are memory-based and can be ported easily to any environment.<p>
 Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
-<dl class="user" compact><dt><b>Revision Reference:</b></dt><dd>This PPI is introduced in PI Version 1.0. </dd></dl>
-<hr><h2>Define Documentation</h2>
-<a class="anchor" name="f9d53de7647893ba0620d9830dc5f251"></a><!-- doxytag: member="MemoryDiscovered.h::EFI_PEI_PERMANENT_MEMORY_INSTALLED_PPI_GUID" ref="f9d53de7647893ba0620d9830dc5f251" args="" -->
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. <hr><h2>Define Documentation</h2>
+<a class="anchor" name="44180fa654565ed888a7e72987b10579"></a><!-- doxytag: member="PeCoffLib.h::IMAGE_ERROR_FAILED_ICACHE_FLUSH" ref="44180fa654565ed888a7e72987b10579" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EFI_PEI_PERMANENT_MEMORY_INSTALLED_PPI_GUID          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-<b>Value:</b><div class="fragment"><pre class="fragment">{ \
-    0xf894643d, 0xc449, 0x42d1, {0x8e, 0xa8, 0x85, 0xbd, 0xd8, 0xc6, 0x5b, 0xde } \
-  }
-</pre></div>
-</div>
-</div><p>
-<hr><h2>Variable Documentation</h2>
-<a class="anchor" name="041eeb5f0946a3a74ffc4eede035b309"></a><!-- doxytag: member="MemoryDiscovered.h::gEfiPeiMemoryDiscoveredPpiGuid" ref="041eeb5f0946a3a74ffc4eede035b309" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../dd/dee/a01081.html#041eeb5f0946a3a74ffc4eede035b309">gEfiPeiMemoryDiscoveredPpiGuid</a>          </td>
+          <td class="memname">#define IMAGE_ERROR_FAILED_ICACHE_FLUSH&nbsp;&nbsp;&nbsp;10          </td>
         </tr>
       </table>
 </div>
@@ -71,8 +86,442 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WA
 
 </div>
 </div><p>
+<a class="anchor" name="567f2d294f7595d9307d8e5a9cfcbc3b"></a><!-- doxytag: member="PeCoffLib.h::IMAGE_ERROR_FAILED_RELOCATION" ref="567f2d294f7595d9307d8e5a9cfcbc3b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define IMAGE_ERROR_FAILED_RELOCATION&nbsp;&nbsp;&nbsp;9          </td>
+        </tr>
+      </table>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:09 2009 for MdePkg[ALL] by&nbsp;
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="b0a0b530c020f17d32e189e950d367c1"></a><!-- doxytag: member="PeCoffLib.h::IMAGE_ERROR_IMAGE_READ" ref="b0a0b530c020f17d32e189e950d367c1" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define IMAGE_ERROR_IMAGE_READ&nbsp;&nbsp;&nbsp;1          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="581ecf5efddbfa2284456062240a8292"></a><!-- doxytag: member="PeCoffLib.h::IMAGE_ERROR_INVALID_IMAGE_ADDRESS" ref="581ecf5efddbfa2284456062240a8292" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define IMAGE_ERROR_INVALID_IMAGE_ADDRESS&nbsp;&nbsp;&nbsp;5          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="d196df062aca79941bbb9c018baf10a5"></a><!-- doxytag: member="PeCoffLib.h::IMAGE_ERROR_INVALID_IMAGE_SIZE" ref="d196df062aca79941bbb9c018baf10a5" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define IMAGE_ERROR_INVALID_IMAGE_SIZE&nbsp;&nbsp;&nbsp;6          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="64fb7c351d064acc0f068e77cc6deb87"></a><!-- doxytag: member="PeCoffLib.h::IMAGE_ERROR_INVALID_MACHINE_TYPE" ref="64fb7c351d064acc0f068e77cc6deb87" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define IMAGE_ERROR_INVALID_MACHINE_TYPE&nbsp;&nbsp;&nbsp;3          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="fcb9a16380c82e7207b55f2267b6b01b"></a><!-- doxytag: member="PeCoffLib.h::IMAGE_ERROR_INVALID_PE_HEADER_SIGNATURE" ref="fcb9a16380c82e7207b55f2267b6b01b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define IMAGE_ERROR_INVALID_PE_HEADER_SIGNATURE&nbsp;&nbsp;&nbsp;2          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="8b2ce78beada49c4dc3ea3102b42dbb6"></a><!-- doxytag: member="PeCoffLib.h::IMAGE_ERROR_INVALID_SECTION_ALIGNMENT" ref="8b2ce78beada49c4dc3ea3102b42dbb6" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define IMAGE_ERROR_INVALID_SECTION_ALIGNMENT&nbsp;&nbsp;&nbsp;7          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="40704ffd2cea8c3b33f91c64d528bb56"></a><!-- doxytag: member="PeCoffLib.h::IMAGE_ERROR_INVALID_SUBSYSTEM" ref="40704ffd2cea8c3b33f91c64d528bb56" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define IMAGE_ERROR_INVALID_SUBSYSTEM&nbsp;&nbsp;&nbsp;4          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="1d7a363e7b74611de9ddc633df5909af"></a><!-- doxytag: member="PeCoffLib.h::IMAGE_ERROR_SECTION_NOT_LOADED" ref="1d7a363e7b74611de9ddc633df5909af" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define IMAGE_ERROR_SECTION_NOT_LOADED&nbsp;&nbsp;&nbsp;8          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="4174e6f1be8a3a37874d38146eee96a2"></a><!-- doxytag: member="PeCoffLib.h::IMAGE_ERROR_SUCCESS" ref="4174e6f1be8a3a37874d38146eee96a2" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define IMAGE_ERROR_SUCCESS&nbsp;&nbsp;&nbsp;0          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<hr><h2>Typedef Documentation</h2>
+<a class="anchor" name="5e79e54d0a98d4ca1edd0dd3b9427443"></a><!-- doxytag: member="PeCoffLib.h::PE_COFF_LOADER_READ_FILE" ref="5e79e54d0a98d4ca1edd0dd3b9427443" args=")(IN VOID *FileHandle, IN UINTN FileOffset, IN OUT UINTN *ReadSize, OUT VOID *Buffer)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="../../d2/dd5/a01002.html#f3519a25bfa97c295fb23ffec95b1cb1">RETURN_STATUS</a>(EFIAPI * <a class="el" href="../../dd/dee/a01081.html#5e79e54d0a98d4ca1edd0dd3b9427443">PE_COFF_LOADER_READ_FILE</a>)(IN VOID *FileHandle, IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> FileOffset, IN OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *ReadSize, OUT VOID *Buffer)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Reads contents of a PE/COFF image.<p>
+A function of this type reads contents of the PE/COFF image specified by FileHandle. The read operation copies ReadSize bytes from the PE/COFF image starting at byte offset FileOffset into the buffer specified by Buffer. The size of the buffer actually read is returned in ReadSize. If FileOffset specifies an offset past the end of the PE/COFF image, a ReadSize of 0 is returned. A function of this type must be registered in the ImageRead field of a <a class="el" href="../../d6/d86/a00781.html">PE_COFF_LOADER_IMAGE_CONTEXT</a> structure for the PE/COFF Loader Library service to function correctly. This function abstracts access to a PE/COFF image so it can be implemented in an environment specific manner. For example, SEC and PEI environments may access memory directly to read the contents of a PE/COFF image, and DXE or UEFI environments may require protocol services to read the contents of PE/COFF image stored on FLASH, disk, or network devices.<p>
+If FileHandle is not a valid handle, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If ReadSize is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Buffer is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>FileHandle</em>&nbsp;</td><td>Pointer to the file handle to read the PE/COFF image. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>FileOffset</em>&nbsp;</td><td>Offset into the PE/COFF image to begin the read operation. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ReadSize</em>&nbsp;</td><td>On input, the size in bytes of the requested read operation. On output, the number of bytes actually read. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>Output buffer that contains the data read from the PE/COFF image.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>RETURN_SUCCESS</em>&nbsp;</td><td>The specified portion of the PE/COFF image was read and the size </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>RETURN_DEVICE_ERROR</em>&nbsp;</td><td>The specified portion of the PE/COFF image could not be read due to a device error. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<hr><h2>Function Documentation</h2>
+<a class="anchor" name="b5c5bcd17794b6de4bb93a8eb2129b94"></a><!-- doxytag: member="PeCoffLib.h::PeCoffLoaderGetImageInfo" ref="b5c5bcd17794b6de4bb93a8eb2129b94" args="(IN OUT PE_COFF_LOADER_IMAGE_CONTEXT *ImageContext)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d2/dd5/a01002.html#f3519a25bfa97c295fb23ffec95b1cb1">RETURN_STATUS</a> EFIAPI PeCoffLoaderGetImageInfo           </td>
+          <td>(</td>
+          <td class="paramtype">IN OUT <a class="el" href="../../d6/d86/a00781.html">PE_COFF_LOADER_IMAGE_CONTEXT</a> *&nbsp;</td>
+          <td class="paramname"> <em>ImageContext</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Retrieves information about a PE/COFF image.<p>
+Computes the PeCoffHeaderOffset, IsTeImage, ImageType, ImageAddress, ImageSize, DestinationAddress, RelocationsStripped, SectionAlignment, SizeOfHeaders, and DebugDirectoryEntryRva fields of the ImageContext structure. If ImageContext is NULL, then return RETURN_INVALID_PARAMETER. If the PE/COFF image accessed through the ImageRead service in the ImageContext structure is not a supported PE/COFF image type, then return RETURN_UNSUPPORTED. If any errors occur while computing the fields of ImageContext, then the error status is returned in the ImageError field of ImageContext. If the image is a TE image, then SectionAlignment is set to 0. The ImageRead and Handle fields of ImageContext structure must be valid prior to invoking this service.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>ImageContext</em>&nbsp;</td><td>Pointer to the image context structure that describes the PE/COFF image that needs to be examined by this function.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>RETURN_SUCCESS</em>&nbsp;</td><td>The information on the PE/COFF image was collected. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>RETURN_INVALID_PARAMETER</em>&nbsp;</td><td>ImageContext is NULL. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>RETURN_UNSUPPORTED</em>&nbsp;</td><td>The PE/COFF image is not supported. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="e95875d898be0efbc1fbaf43b9d44c6f"></a><!-- doxytag: member="PeCoffLib.h::PeCoffLoaderImageReadFromMemory" ref="e95875d898be0efbc1fbaf43b9d44c6f" args="(IN VOID *FileHandle, IN UINTN FileOffset, IN OUT UINTN *ReadSize, OUT VOID *Buffer)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d2/dd5/a01002.html#f3519a25bfa97c295fb23ffec95b1cb1">RETURN_STATUS</a> EFIAPI PeCoffLoaderImageReadFromMemory           </td>
+          <td>(</td>
+          <td class="paramtype">IN VOID *&nbsp;</td>
+          <td class="paramname"> <em>FileHandle</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>FileOffset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN OUT <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a> *&nbsp;</td>
+          <td class="paramname"> <em>ReadSize</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">OUT VOID *&nbsp;</td>
+          <td class="paramname"> <em>Buffer</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Reads contents of a PE/COFF image from a buffer in system memory.<p>
+This is the default implementation of a PE_COFF_LOADER_READ_FILE function that assumes FileHandle pointer to the beginning of a PE/COFF image. This function reads contents of the PE/COFF image that starts at the system memory address specified by FileHandle. The read operation copies ReadSize bytes from the PE/COFF image starting at byte offset FileOffset into the buffer specified by Buffer. The size of the buffer actually read is returned in ReadSize.<p>
+If FileHandle is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If ReadSize is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>. If Buffer is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>FileHandle</em>&nbsp;</td><td>Pointer to base of the input stream </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>FileOffset</em>&nbsp;</td><td>Offset into the PE/COFF image to begin the read operation. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ReadSize</em>&nbsp;</td><td>On input, the size in bytes of the requested read operation. On output, the number of bytes actually read. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>Buffer</em>&nbsp;</td><td>Output buffer that contains the data read from the PE/COFF image.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>RETURN_SUCCESS</em>&nbsp;</td><td>Data is read from FileOffset from the Handle into the buffer. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="2003fb97c41baf50162901cbe9e0f988"></a><!-- doxytag: member="PeCoffLib.h::PeCoffLoaderLoadImage" ref="2003fb97c41baf50162901cbe9e0f988" args="(IN OUT PE_COFF_LOADER_IMAGE_CONTEXT *ImageContext)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d2/dd5/a01002.html#f3519a25bfa97c295fb23ffec95b1cb1">RETURN_STATUS</a> EFIAPI PeCoffLoaderLoadImage           </td>
+          <td>(</td>
+          <td class="paramtype">IN OUT <a class="el" href="../../d6/d86/a00781.html">PE_COFF_LOADER_IMAGE_CONTEXT</a> *&nbsp;</td>
+          <td class="paramname"> <em>ImageContext</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Loads a PE/COFF image into memory.<p>
+Loads the PE/COFF image accessed through the ImageRead service of ImageContext into the buffer specified by the ImageAddress and ImageSize fields of ImageContext. The caller must allocate the load buffer and fill in the ImageAddress and ImageSize fields prior to calling this function. The EntryPoint, FixupDataSize, CodeView, PdbPointer and HiiResourceData fields of ImageContext are computed. The ImageRead, Handle, PeCoffHeaderOffset, IsTeImage, Machine, ImageType, ImageAddress, ImageSize, DestinationAddress, RelocationsStripped, SectionAlignment, SizeOfHeaders, and DebugDirectoryEntryRva fields of the ImageContext structure must be valid prior to invoking this service.<p>
+If ImageContext is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+Note that if the platform does not maintain coherency between the instruction cache(s) and the data cache(s) in hardware, then the caller is responsible for performing cache maintenance operations prior to transferring control to a PE/COFF image that is loaded using this library.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>ImageContext</em>&nbsp;</td><td>Pointer to the image context structure that describes the PE/COFF image that is being loaded.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>RETURN_SUCCESS</em>&nbsp;</td><td>The PE/COFF image was loaded into the buffer specified by the ImageAddress and ImageSize fields of ImageContext. Extended status information is in the ImageError field of ImageContext. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>RETURN_BUFFER_TOO_SMALL</em>&nbsp;</td><td>The caller did not provide a large enough buffer. Extended status information is in the ImageError field of ImageContext. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>RETURN_LOAD_ERROR</em>&nbsp;</td><td>The PE/COFF image is an EFI Runtime image with no relocations. Extended status information is in the ImageError field of ImageContext. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>RETURN_INVALID_PARAMETER</em>&nbsp;</td><td>The image address is invalid. Extended status information is in the ImageError field of ImageContext. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="2a50888c6100c2d1374d71668a59303f"></a><!-- doxytag: member="PeCoffLib.h::PeCoffLoaderRelocateImage" ref="2a50888c6100c2d1374d71668a59303f" args="(IN OUT PE_COFF_LOADER_IMAGE_CONTEXT *ImageContext)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d2/dd5/a01002.html#f3519a25bfa97c295fb23ffec95b1cb1">RETURN_STATUS</a> EFIAPI PeCoffLoaderRelocateImage           </td>
+          <td>(</td>
+          <td class="paramtype">IN OUT <a class="el" href="../../d6/d86/a00781.html">PE_COFF_LOADER_IMAGE_CONTEXT</a> *&nbsp;</td>
+          <td class="paramname"> <em>ImageContext</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Applies relocation fixups to a PE/COFF image that was loaded with <a class="el" href="../../dd/dee/a01081.html#2003fb97c41baf50162901cbe9e0f988">PeCoffLoaderLoadImage()</a>.<p>
+If the DestinationAddress field of ImageContext is 0, then use the ImageAddress field of ImageContext as the relocation base address. Otherwise, use the DestinationAddress field of ImageContext as the relocation base address. The caller must allocate the relocation fixup log buffer and fill in the FixupData field of ImageContext prior to calling this function.<p>
+The ImageRead, Handle, PeCoffHeaderOffset, IsTeImage, Machine, ImageType, ImageAddress, ImageSize, DestinationAddress, RelocationsStripped, SectionAlignment, SizeOfHeaders, DebugDirectoryEntryRva, EntryPoint, FixupDataSize, CodeView, PdbPointer, and FixupData of the ImageContext structure must be valid prior to invoking this service.<p>
+If ImageContext is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+Note that if the platform does not maintain coherency between the instruction cache(s) and the data cache(s) in hardware, then the caller is responsible for performing cache maintenance operations prior to transferring control to a PE/COFF image that is loaded using this library.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>ImageContext</em>&nbsp;</td><td>Pointer to the image context structure that describes the PE/COFF image that is being relocated.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>RETURN_SUCCESS</em>&nbsp;</td><td>The PE/COFF image was relocated. Extended status information is in the ImageError field of ImageContext. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>RETURN_LOAD_ERROR</em>&nbsp;</td><td>The image in not a valid PE/COFF image. Extended status information is in the ImageError field of ImageContext. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>RETURN_UNSUPPORTED</em>&nbsp;</td><td>A relocation record type is not supported. Extended status information is in the ImageError field of ImageContext. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="4827dd41b90b7887445e3c94edbdba84"></a><!-- doxytag: member="PeCoffLib.h::PeCoffLoaderRelocateImageForRuntime" ref="4827dd41b90b7887445e3c94edbdba84" args="(IN PHYSICAL_ADDRESS ImageBase, IN PHYSICAL_ADDRESS VirtImageBase, IN UINTN ImageSize, IN VOID *RelocationData)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">VOID EFIAPI PeCoffLoaderRelocateImageForRuntime           </td>
+          <td>(</td>
+          <td class="paramtype">IN <a class="el" href="../../d2/dd5/a01002.html#8557e721a169e9f286709e9b55a64559">PHYSICAL_ADDRESS</a>&nbsp;</td>
+          <td class="paramname"> <em>ImageBase</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d2/dd5/a01002.html#8557e721a169e9f286709e9b55a64559">PHYSICAL_ADDRESS</a>&nbsp;</td>
+          <td class="paramname"> <em>VirtImageBase</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN <a class="el" href="../../d0/d90/a01059.html#4a2fc3b6f740e9cca9f895579c167560">UINTN</a>&nbsp;</td>
+          <td class="paramname"> <em>ImageSize</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IN VOID *&nbsp;</td>
+          <td class="paramname"> <em>RelocationData</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Reapply fixups on a fixed up PE32/PE32+ image to allow virutal calling at EFI runtime.<p>
+This function reapplies relocation fixups to the PE/COFF image specified by ImageBase and ImageSize so the image will execute correctly when the PE/COFF image is mapped to the address specified by VirtualImageBase. RelocationData must be identical to the FiuxupData buffer from the <a class="el" href="../../d6/d86/a00781.html">PE_COFF_LOADER_IMAGE_CONTEXT</a> structure after this PE/COFF image was relocated with <a class="el" href="../../dd/dee/a01081.html#2a50888c6100c2d1374d71668a59303f">PeCoffLoaderRelocateImage()</a>.<p>
+Note that if the platform does not maintain coherency between the instruction cache(s) and the data cache(s) in hardware, then the caller is responsible for performing cache maintenance operations prior to transferring control to a PE/COFF image that is loaded using this library.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>ImageBase</em>&nbsp;</td><td>Base address of a PE/COFF image that has been loaded and relocated into system memory. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>VirtImageBase</em>&nbsp;</td><td>The request virtual address that the PE/COFF image is to be fixed up for. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>ImageSize</em>&nbsp;</td><td>The size, in bytes, of the PE/COFF image. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>RelocationData</em>&nbsp;</td><td>A pointer to the relocation data that was collected when the PE/COFF image was relocated using <a class="el" href="../../dd/dee/a01081.html#2a50888c6100c2d1374d71668a59303f">PeCoffLoaderRelocateImage()</a>. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+<a class="anchor" name="5e7f95ca7feb12a3aa470b69584c2e75"></a><!-- doxytag: member="PeCoffLib.h::PeCoffLoaderUnloadImage" ref="5e7f95ca7feb12a3aa470b69584c2e75" args="(IN OUT PE_COFF_LOADER_IMAGE_CONTEXT *ImageContext)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d2/dd5/a01002.html#f3519a25bfa97c295fb23ffec95b1cb1">RETURN_STATUS</a> EFIAPI PeCoffLoaderUnloadImage           </td>
+          <td>(</td>
+          <td class="paramtype">IN OUT <a class="el" href="../../d6/d86/a00781.html">PE_COFF_LOADER_IMAGE_CONTEXT</a> *&nbsp;</td>
+          <td class="paramname"> <em>ImageContext</em>          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Unloads a loaded PE/COFF image from memory and releases its taken resource. Releases any environment specific resources that were allocated when the image specified by ImageContext was loaded using <a class="el" href="../../dd/dee/a01081.html#2003fb97c41baf50162901cbe9e0f988">PeCoffLoaderLoadImage()</a>.<p>
+For NT32 emulator, the PE/COFF image loaded by system needs to release. For real platform, the PE/COFF image loaded by Core doesn't needs to be unloaded, this function can simply return RETURN_SUCCESS.<p>
+If ImageContext is NULL, then <a class="el" href="../../d9/db3/a01064.html#76b4aae2259415ea4b7e2c9b34ede0bb">ASSERT()</a>.<p>
+<dl compact><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>ImageContext</em>&nbsp;</td><td>Pointer to the image context structure that describes the PE/COFF image to be unloaded.</td></tr>
+  </table>
+</dl>
+<dl compact><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>RETURN_SUCCESS</em>&nbsp;</td><td>The PE/COFF image was unloaded successfully. </td></tr>
+  </table>
+</dl>
+
+</div>
+</div><p>
+</div>
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:23 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

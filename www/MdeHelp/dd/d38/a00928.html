@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: tdTPM_SYMMETRIC_KEY Struct Reference</title>
+<title>MdePkg[ALL]: tdTPM_DELEGATE_TABLE Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,71 +21,19 @@
   </div>
 </div>
 <div class="contents">
-<h1>tdTPM_SYMMETRIC_KEY Struct Reference</h1><!-- doxytag: class="tdTPM_SYMMETRIC_KEY" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>tdTPM_DELEGATE_TABLE Struct Reference</h1><!-- doxytag: class="tdTPM_DELEGATE_TABLE" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/d59/a01001.html#a5d5faf5bb6cccf9588ab37604a8986c">TPM_ALGORITHM_ID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d38/a00928.html#88017051e55abb09bc136595810f6ed2">algId</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../df/d59/a01001.html#5f68ddf23d48725cf41f037e6edfe56f">TPM_ENC_SCHEME</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d38/a00928.html#735a96d064442892f1a7ba09a23e1f3c">encScheme</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d38/a00928.html#a89f03e17f70b9589ea35f739e928b91">dataSize</a></td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d38/a00928.html#1d73c323fa316d12b9cec688aa8be028">data</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/d92/a00929.html">TPM_DELEGATE_TABLE_ROW</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d38/a00928.html#60ba38ea6fd03b7bed563395c0653db0">delRow</a> [TPM_NUM_DELEGATE_TABLE_ENTRY_MIN]</td></tr>
 
 </table>
-<hr><a name="_details"></a><h2>Detailed Description</h2>
-Part 2, section 9.4: TPM_SYMMETRIC_KEY [size_is(size)] BYTE* data; <hr><h2>Field Documentation</h2>
-<a class="anchor" name="88017051e55abb09bc136595810f6ed2"></a><!-- doxytag: member="tdTPM_SYMMETRIC_KEY::algId" ref="88017051e55abb09bc136595810f6ed2" args="" -->
+<hr><h2>Field Documentation</h2>
+<a class="anchor" name="60ba38ea6fd03b7bed563395c0653db0"></a><!-- doxytag: member="tdTPM_DELEGATE_TABLE::delRow" ref="60ba38ea6fd03b7bed563395c0653db0" args="[TPM_NUM_DELEGATE_TABLE_ENTRY_MIN]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../df/d59/a01001.html#a5d5faf5bb6cccf9588ab37604a8986c">TPM_ALGORITHM_ID</a> <a class="el" href="../../dd/d38/a00928.html#88017051e55abb09bc136595810f6ed2">tdTPM_SYMMETRIC_KEY::algId</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="1d73c323fa316d12b9cec688aa8be028"></a><!-- doxytag: member="tdTPM_SYMMETRIC_KEY::data" ref="1d73c323fa316d12b9cec688aa8be028" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>* <a class="el" href="../../dd/d38/a00928.html#1d73c323fa316d12b9cec688aa8be028">tdTPM_SYMMETRIC_KEY::data</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="a89f03e17f70b9589ea35f739e928b91"></a><!-- doxytag: member="tdTPM_SYMMETRIC_KEY::dataSize" ref="a89f03e17f70b9589ea35f739e928b91" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../dd/d38/a00928.html#a89f03e17f70b9589ea35f739e928b91">tdTPM_SYMMETRIC_KEY::dataSize</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="735a96d064442892f1a7ba09a23e1f3c"></a><!-- doxytag: member="tdTPM_SYMMETRIC_KEY::encScheme" ref="735a96d064442892f1a7ba09a23e1f3c" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../df/d59/a01001.html#5f68ddf23d48725cf41f037e6edfe56f">TPM_ENC_SCHEME</a> <a class="el" href="../../dd/d38/a00928.html#735a96d064442892f1a7ba09a23e1f3c">tdTPM_SYMMETRIC_KEY::encScheme</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/d92/a00929.html">TPM_DELEGATE_TABLE_ROW</a> <a class="el" href="../../dd/d38/a00928.html#60ba38ea6fd03b7bed563395c0653db0">tdTPM_DELEGATE_TABLE::delRow</a>[TPM_NUM_DELEGATE_TABLE_ENTRY_MIN]          </td>
         </tr>
       </table>
 </div>
@@ -96,7 +44,7 @@ Part 2, section 9.4: TPM_SYMMETRIC_KEY [size_is(size)] BYTE* data; <hr><h2>Field
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:23 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:09 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

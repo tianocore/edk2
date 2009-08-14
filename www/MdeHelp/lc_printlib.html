@@ -20,9 +20,11 @@
 <h1><a class="anchor" name="lc_PrintLib">PrintLib </a></h1>Provides services to print a formatted string to a buffer. All combinations of Unicode and ASCII strings are supported.<p>
 Copyright (c) 2006 - 2008, Intel Corporation All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at <a href="http://opensource.org/licenses/bsd-license.php">http://opensource.org/licenses/bsd-license.php</a><p>
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.<p>
-The Print Library functions provide a simple means to produce formatted output strings. Many of the output functions use a format string to describe how to format the output of variable arguments. The format string consists of normal text and argument descriptors. There are no restrictions for how the normal text and argument descriptors can be mixed. A normal text character '<br>
-' must always be converted to '<br>
-'. This does not follow the ANSI C standard for sprint(). The format of argument descriptors is described below. The ANSI C standard for sprint() has been followed for some of the format types, and has not been followed for others. The exceptions are noted below.<p>
+The Print Library functions provide a simple means to produce formatted output strings. Many of the output functions use a format string to describe how to format the output of variable arguments. The format string consists of normal text and argument descriptors. There are no restrictions for how the normal text and argument descriptors can be mixed. The following end of line(EOL) translations must be performed on the contents of the format string:<p>
+<ul>
+<li>'\r' is translated to '\r'</li><li>'\r\n' is translated to '\r\n'</li><li>'\n' is translated to '\r\n'</li><li>'\n\r' is translated to '\r\n'</li></ul>
+<p>
+This does not follow the ANSI C standard for sprint(). The format of argument descriptors is described below. The ANSI C standard for sprint() has been followed for some of the format types, and has not been followed for others. The exceptions are noted below.<p>
 %[flags][width][.precision]type<p>
 [flags]:<ul>
 <li>-<ul>
@@ -74,9 +76,9 @@ type:<p>
 </li><li>S, s<ul>
 <li>The argument is a pointer to a Unicode string. This does not follow ANSI C.</li></ul>
 </li><li>g<ul>
-<li>The argument is a pointer to a <a class="el" href="d9/d0f/a00644.html">GUID</a> structure. The <a class="el" href="d9/d0f/a00644.html">GUID</a> is printed in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX. This does not follow ANSI C.</li></ul>
+<li>The argument is a pointer to a <a class="el" href="d1/d87/a00689.html">GUID</a> structure. The <a class="el" href="d1/d87/a00689.html">GUID</a> is printed in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX. This does not follow ANSI C.</li></ul>
 </li><li>t<ul>
-<li>The argument is a pointer to an <a class="el" href="d4/dc4/a00617.html">EFI_TIME</a> structure. The time and date are printed in the format "mm/dd/yyyy hh:mm" where mm is the month zero padded, dd is the day zero padded, yyyy is the year zero padded, hh is the hour zero padded, and mm is minutes zero padded. This does not follow ANSI C.</li></ul>
+<li>The argument is a pointer to an <a class="el" href="dc/df1/a00662.html">EFI_TIME</a> structure. The time and date are printed in the format "mm/dd/yyyy hh:mm" where mm is the month zero padded, dd is the day zero padded, yyyy is the year zero padded, hh is the hour zero padded, and mm is minutes zero padded. This does not follow ANSI C.</li></ul>
 </li><li>r<ul>
 <li>The argument is a RETURN_STATUS value. This value is converted to a string following the table below. This does not follow ANSI C.</li><li>RETURN_SUCCESS<ul>
 <li>"Success"</li></ul>
@@ -140,8 +142,8 @@ type:<p>
 </li></ul>
 <h2><a class="anchor" name="ref">
 Refer to Header File</a></h2>
-<a class="el" href="df/d21/a01039.html">Include/Library/PrintLib.h</a></div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:11 2009 for MdePkg[ALL] by&nbsp;
+<a class="el" href="da/db7/a01088.html">Include/Library/PrintLib.h</a></div>
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:53:43 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

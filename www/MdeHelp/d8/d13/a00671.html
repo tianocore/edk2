@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: MEDIA_FW_VOL_FILEPATH_DEVICE_PATH Struct Reference</title>
+<title>MdePkg[ALL]: EFI_UDP4_VARIABLE_DATA Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,37 +21,23 @@
   </div>
 </div>
 <div class="contents">
-<h1>MEDIA_FW_VOL_FILEPATH_DEVICE_PATH Struct Reference</h1><!-- doxytag: class="MEDIA_FW_VOL_FILEPATH_DEVICE_PATH" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_UDP4_VARIABLE_DATA Struct Reference</h1><!-- doxytag: class="EFI_UDP4_VARIABLE_DATA" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/de6/a00404.html">EFI_DEVICE_PATH_PROTOCOL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d13/a00671.html#c4e3290713a65336f14e61a4bfc63bf1">Header</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d13/a00671.html#db769931972f96e7d89520afbaae1c63">DriverHandle</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d13/a00671.html#6d21b1b7c640d41241791a6bbb5b7dab">FvFileName</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d13/a00671.html#de12992f0c59f069cdd21a16e2fd1cba">ServiceCount</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d5c/a00668.html">EFI_UDP4_SERVICE_POINT</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d13/a00671.html#0bf7be1ecc5c15edc45116af22eb3189">Services</a> [1]</td></tr>
 
 </table>
-<hr><a name="_details"></a><h2>Detailed Description</h2>
-This device path is used by systems implementing the UEFI PI Specification 1.0 to describe a firmware file. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="6d21b1b7c640d41241791a6bbb5b7dab"></a><!-- doxytag: member="MEDIA_FW_VOL_FILEPATH_DEVICE_PATH::FvFileName" ref="6d21b1b7c640d41241791a6bbb5b7dab" args="" -->
+<hr><h2>Field Documentation</h2>
+<a class="anchor" name="db769931972f96e7d89520afbaae1c63"></a><!-- doxytag: member="EFI_UDP4_VARIABLE_DATA::DriverHandle" ref="db769931972f96e7d89520afbaae1c63" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d9/d0f/a00644.html">EFI_GUID</a> <a class="el" href="../../d8/d13/a00671.html#6d21b1b7c640d41241791a6bbb5b7dab">MEDIA_FW_VOL_FILEPATH_DEVICE_PATH::FvFileName</a>          </td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-Firmware file name 
-</div>
-</div><p>
-<a class="anchor" name="c4e3290713a65336f14e61a4bfc63bf1"></a><!-- doxytag: member="MEDIA_FW_VOL_FILEPATH_DEVICE_PATH::Header" ref="c4e3290713a65336f14e61a4bfc63bf1" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../d9/de6/a00404.html">EFI_DEVICE_PATH_PROTOCOL</a> <a class="el" href="../../d8/d13/a00671.html#c4e3290713a65336f14e61a4bfc63bf1">MEDIA_FW_VOL_FILEPATH_DEVICE_PATH::Header</a>          </td>
+          <td class="memname"><a class="el" href="../../dd/d95/a01247.html#f943d518ce8a229e7e51ce3fed0e3122">EFI_HANDLE</a> <a class="el" href="../../d8/d13/a00671.html#db769931972f96e7d89520afbaae1c63">EFI_UDP4_VARIABLE_DATA::DriverHandle</a>          </td>
         </tr>
       </table>
 </div>
@@ -61,8 +47,38 @@ Firmware file name
 
 </div>
 </div><p>
+<a class="anchor" name="de12992f0c59f069cdd21a16e2fd1cba"></a><!-- doxytag: member="EFI_UDP4_VARIABLE_DATA::ServiceCount" ref="de12992f0c59f069cdd21a16e2fd1cba" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#dfe04a44baaebba6143c3a23507ff85b">UINT32</a> <a class="el" href="../../d8/d13/a00671.html#de12992f0c59f069cdd21a16e2fd1cba">EFI_UDP4_VARIABLE_DATA::ServiceCount</a>          </td>
+        </tr>
+      </table>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:19 2009 for MdePkg[ALL] by&nbsp;
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="0bf7be1ecc5c15edc45116af22eb3189"></a><!-- doxytag: member="EFI_UDP4_VARIABLE_DATA::Services" ref="0bf7be1ecc5c15edc45116af22eb3189" args="[1]" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d5c/a00668.html">EFI_UDP4_SERVICE_POINT</a> <a class="el" href="../../d8/d13/a00671.html#0bf7be1ecc5c15edc45116af22eb3189">EFI_UDP4_VARIABLE_DATA::Services</a>[1]          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+</div>
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:50 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

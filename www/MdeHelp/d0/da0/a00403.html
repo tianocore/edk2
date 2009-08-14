@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL Struct Reference</title>
+<title>MdePkg[ALL]: EFI_BIS_SIGNATURE_INFO Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,48 +21,74 @@
   </div>
 </div>
 <div class="contents">
-<h1>EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL Struct Reference</h1><!-- doxytag: class="EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>EFI_BIS_SIGNATURE_INFO Struct Reference</h1><!-- doxytag: class="EFI_BIS_SIGNATURE_INFO" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/de1/a01111.html#b8ae1e6dd685c880664eacbc567eb86a">EFI_DEVICE_PATH_FROM_TEXT_NODE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/da0/a00403.html#5c5cc77f005fffb3ce914fb23dbe233d">ConvertTextToDeviceNode</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d5/d16/a01154.html#baafb705b367ccd7da8afcbeec84904f">BIS_CERT_ID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/da0/a00403.html#f114cee81fed7e614d98d1e7308068a0">CertificateID</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d3/de1/a01111.html#b834f7782f26987f33320aea072bffa9">EFI_DEVICE_PATH_FROM_TEXT_PATH</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/da0/a00403.html#e8621ddd3e3cb357889bb29c16a01ff3">ConvertTextToDevicePath</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Truncated hash of platform Boot Object.  <a href="#f114cee81fed7e614d98d1e7308068a0"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d5/d16/a01154.html#2199a608621925a982e4f7c04c592a86">BIS_ALG_ID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/da0/a00403.html#4dbf5d11c7355ca3194147488586d02c">AlgorithmID</a></td></tr>
 
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">A signature algorithm number.  <a href="#4dbf5d11c7355ca3194147488586d02c"></a><br></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/da0/a00403.html#dc5ff40d57f04623be4c872b53f26a9e">KeyLength</a></td></tr>
+
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Length of alg. keys in bits.  <a href="#dc5ff40d57f04623be4c872b53f26a9e"></a><br></td></tr>
 </table>
 <hr><a name="_details"></a><h2>Detailed Description</h2>
-This protocol converts text to device paths and device nodes. <hr><h2>Field Documentation</h2>
-<a class="anchor" name="5c5cc77f005fffb3ce914fb23dbe233d"></a><!-- doxytag: member="EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL::ConvertTextToDeviceNode" ref="5c5cc77f005fffb3ce914fb23dbe233d" args="" -->
+<a class="el" href="../../d0/da0/a00403.html">EFI_BIS_SIGNATURE_INFO</a> type. <hr><h2>Field Documentation</h2>
+<a class="anchor" name="4dbf5d11c7355ca3194147488586d02c"></a><!-- doxytag: member="EFI_BIS_SIGNATURE_INFO::AlgorithmID" ref="4dbf5d11c7355ca3194147488586d02c" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d3/de1/a01111.html#b8ae1e6dd685c880664eacbc567eb86a">EFI_DEVICE_PATH_FROM_TEXT_NODE</a> <a class="el" href="../../d0/da0/a00403.html#5c5cc77f005fffb3ce914fb23dbe233d">EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL::ConvertTextToDeviceNode</a>          </td>
+          <td class="memname"><a class="el" href="../../d5/d16/a01154.html#2199a608621925a982e4f7c04c592a86">BIS_ALG_ID</a> <a class="el" href="../../d0/da0/a00403.html#4dbf5d11c7355ca3194147488586d02c">EFI_BIS_SIGNATURE_INFO::AlgorithmID</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+A signature algorithm number. 
+<p>
 
 </div>
 </div><p>
-<a class="anchor" name="e8621ddd3e3cb357889bb29c16a01ff3"></a><!-- doxytag: member="EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL::ConvertTextToDevicePath" ref="e8621ddd3e3cb357889bb29c16a01ff3" args="" -->
+<a class="anchor" name="f114cee81fed7e614d98d1e7308068a0"></a><!-- doxytag: member="EFI_BIS_SIGNATURE_INFO::CertificateID" ref="f114cee81fed7e614d98d1e7308068a0" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d3/de1/a01111.html#b834f7782f26987f33320aea072bffa9">EFI_DEVICE_PATH_FROM_TEXT_PATH</a> <a class="el" href="../../d0/da0/a00403.html#e8621ddd3e3cb357889bb29c16a01ff3">EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL::ConvertTextToDevicePath</a>          </td>
+          <td class="memname"><a class="el" href="../../d5/d16/a01154.html#baafb705b367ccd7da8afcbeec84904f">BIS_CERT_ID</a> <a class="el" href="../../d0/da0/a00403.html#f114cee81fed7e614d98d1e7308068a0">EFI_BIS_SIGNATURE_INFO::CertificateID</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
+Truncated hash of platform Boot Object. 
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="dc5ff40d57f04623be4c872b53f26a9e"></a><!-- doxytag: member="EFI_BIS_SIGNATURE_INFO::KeyLength" ref="dc5ff40d57f04623be4c872b53f26a9e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../d0/d90/a01059.html#cbc04026a2008f7c2fccf01718291c20">UINT16</a> <a class="el" href="../../d0/da0/a00403.html#dc5ff40d57f04623be4c872b53f26a9e">EFI_BIS_SIGNATURE_INFO::KeyLength</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+Length of alg. keys in bits. 
+<p>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:18 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:54:29 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>

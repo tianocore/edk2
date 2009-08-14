@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>MdePkg[ALL]: SAL_ST_PLATFORM_FEATURES Struct Reference</title>
+<title>MdePkg[ALL]: s_pxe_cdb Struct Reference</title>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css">
 <link href="../../tabs.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -21,25 +21,37 @@
   </div>
 </div>
 <div class="contents">
-<h1>SAL_ST_PLATFORM_FEATURES Struct Reference</h1><!-- doxytag: class="SAL_ST_PLATFORM_FEATURES" --><table border="0" cellpadding="0" cellspacing="0">
+<h1>s_pxe_cdb Struct Reference</h1><!-- doxytag: class="s_pxe_cdb" --><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d7d/a00789.html#a9bb2e8e2efb5152c8c6f16ae867e51f">Type</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#2c16f3d84ed07afabcbde276d22330f0">PXE_OPCODE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d7d/a00789.html#e8de37122b8646adf610dee0cabc5b15">OpCode</a></td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Type here should be 2.  <a href="#a9bb2e8e2efb5152c8c6f16ae867e51f"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d7d/a00789.html#7bd43f204dcae78f4f2968862199fc2c">PlatformFeatures</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#1b17fba16922e4ef26033322c82624f3">PXE_OPFLAGS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d7d/a00789.html#96fef3ff249a1712eca6fefd09ca6d53">OpFlags</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d7d/a00789.html#ea5a5a75b7cff7a93793f4644272dec3">Reserved</a> [14]</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d7d/a00789.html#e9f55d2de52e137e90afd72c53e2d1bb">CPBsize</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d7d/a00789.html#5b7fefb91ac5f3a9f28e7cefde13d788">DBsize</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#46095e9a84c0bc88f934110dbca0993f">PXE_UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d7d/a00789.html#01d063f40ce5d4a5a90f92690c48abd5">CPBaddr</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#46095e9a84c0bc88f934110dbca0993f">PXE_UINT64</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d7d/a00789.html#df301761617bacdb2c53ee1be106cf9e">DBaddr</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#d1abf939a9ffc63b407a0e9ddbb063f2">PXE_STATCODE</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d7d/a00789.html#08d18f747912461c797015bc36fd281e">StatCode</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#164635ee131246a4d65e34c91f6f30bf">PXE_STATFLAGS</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d7d/a00789.html#5c575606ab048b9f775f2db69dbf561f">StatFlags</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d7d/a00789.html#633c06b0478bcde723dc2df5aa869d29">IFnum</a></td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="../../dc/dc2/a01251.html#2a296504a139fa8a8d7af7c142bbd89e">PXE_CONTROL</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d7d/a00789.html#2fe9f1d431d717af21a8faa0f1f68e42">Control</a></td></tr>
 
 </table>
-<hr><a name="_details"></a><h2>Detailed Description</h2>
-Format of Platform Features Descriptor Entry <hr><h2>Field Documentation</h2>
-<a class="anchor" name="7bd43f204dcae78f4f2968862199fc2c"></a><!-- doxytag: member="SAL_ST_PLATFORM_FEATURES::PlatformFeatures" ref="7bd43f204dcae78f4f2968862199fc2c" args="" -->
+<hr><h2>Field Documentation</h2>
+<a class="anchor" name="2fe9f1d431d717af21a8faa0f1f68e42"></a><!-- doxytag: member="s_pxe_cdb::Control" ref="2fe9f1d431d717af21a8faa0f1f68e42" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d7d/a00789.html#7bd43f204dcae78f4f2968862199fc2c">SAL_ST_PLATFORM_FEATURES::PlatformFeatures</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#2a296504a139fa8a8d7af7c142bbd89e">PXE_CONTROL</a> <a class="el" href="../../d8/d7d/a00789.html#2fe9f1d431d717af21a8faa0f1f68e42">s_pxe_cdb::Control</a>          </td>
         </tr>
       </table>
 </div>
@@ -49,12 +61,12 @@ Format of Platform Features Descriptor Entry <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="ea5a5a75b7cff7a93793f4644272dec3"></a><!-- doxytag: member="SAL_ST_PLATFORM_FEATURES::Reserved" ref="ea5a5a75b7cff7a93793f4644272dec3" args="[14]" -->
+<a class="anchor" name="01d063f40ce5d4a5a90f92690c48abd5"></a><!-- doxytag: member="s_pxe_cdb::CPBaddr" ref="01d063f40ce5d4a5a90f92690c48abd5" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d7d/a00789.html#ea5a5a75b7cff7a93793f4644272dec3">SAL_ST_PLATFORM_FEATURES::Reserved</a>[14]          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#46095e9a84c0bc88f934110dbca0993f">PXE_UINT64</a> <a class="el" href="../../d8/d7d/a00789.html#01d063f40ce5d4a5a90f92690c48abd5">s_pxe_cdb::CPBaddr</a>          </td>
         </tr>
       </table>
 </div>
@@ -64,25 +76,128 @@ Format of Platform Features Descriptor Entry <hr><h2>Field Documentation</h2>
 
 </div>
 </div><p>
-<a class="anchor" name="a9bb2e8e2efb5152c8c6f16ae867e51f"></a><!-- doxytag: member="SAL_ST_PLATFORM_FEATURES::Type" ref="a9bb2e8e2efb5152c8c6f16ae867e51f" args="" -->
+<a class="anchor" name="e9f55d2de52e137e90afd72c53e2d1bb"></a><!-- doxytag: member="s_pxe_cdb::CPBsize" ref="e9f55d2de52e137e90afd72c53e2d1bb" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="../../d0/d2b/a01010.html#f3037cbae2cdbc45fb75983c08b87935">UINT8</a> <a class="el" href="../../d8/d7d/a00789.html#a9bb2e8e2efb5152c8c6f16ae867e51f">SAL_ST_PLATFORM_FEATURES::Type</a>          </td>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a> <a class="el" href="../../d8/d7d/a00789.html#e9f55d2de52e137e90afd72c53e2d1bb">s_pxe_cdb::CPBsize</a>          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Type here should be 2. 
+
+</div>
+</div><p>
+<a class="anchor" name="df301761617bacdb2c53ee1be106cf9e"></a><!-- doxytag: member="s_pxe_cdb::DBaddr" ref="df301761617bacdb2c53ee1be106cf9e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#46095e9a84c0bc88f934110dbca0993f">PXE_UINT64</a> <a class="el" href="../../d8/d7d/a00789.html#df301761617bacdb2c53ee1be106cf9e">s_pxe_cdb::DBaddr</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="5b7fefb91ac5f3a9f28e7cefde13d788"></a><!-- doxytag: member="s_pxe_cdb::DBsize" ref="5b7fefb91ac5f3a9f28e7cefde13d788" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a> <a class="el" href="../../d8/d7d/a00789.html#5b7fefb91ac5f3a9f28e7cefde13d788">s_pxe_cdb::DBsize</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="633c06b0478bcde723dc2df5aa869d29"></a><!-- doxytag: member="s_pxe_cdb::IFnum" ref="633c06b0478bcde723dc2df5aa869d29" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#b3973130877a56060271b680f114ea6f">PXE_UINT16</a> <a class="el" href="../../d8/d7d/a00789.html#633c06b0478bcde723dc2df5aa869d29">s_pxe_cdb::IFnum</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="e8de37122b8646adf610dee0cabc5b15"></a><!-- doxytag: member="s_pxe_cdb::OpCode" ref="e8de37122b8646adf610dee0cabc5b15" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#2c16f3d84ed07afabcbde276d22330f0">PXE_OPCODE</a> <a class="el" href="../../d8/d7d/a00789.html#e8de37122b8646adf610dee0cabc5b15">s_pxe_cdb::OpCode</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="96fef3ff249a1712eca6fefd09ca6d53"></a><!-- doxytag: member="s_pxe_cdb::OpFlags" ref="96fef3ff249a1712eca6fefd09ca6d53" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#1b17fba16922e4ef26033322c82624f3">PXE_OPFLAGS</a> <a class="el" href="../../d8/d7d/a00789.html#96fef3ff249a1712eca6fefd09ca6d53">s_pxe_cdb::OpFlags</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="08d18f747912461c797015bc36fd281e"></a><!-- doxytag: member="s_pxe_cdb::StatCode" ref="08d18f747912461c797015bc36fd281e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#d1abf939a9ffc63b407a0e9ddbb063f2">PXE_STATCODE</a> <a class="el" href="../../d8/d7d/a00789.html#08d18f747912461c797015bc36fd281e">s_pxe_cdb::StatCode</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="5c575606ab048b9f775f2db69dbf561f"></a><!-- doxytag: member="s_pxe_cdb::StatFlags" ref="5c575606ab048b9f775f2db69dbf561f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/dc2/a01251.html#164635ee131246a4d65e34c91f6f30bf">PXE_STATFLAGS</a> <a class="el" href="../../d8/d7d/a00789.html#5c575606ab048b9f775f2db69dbf561f">s_pxe_cdb::StatFlags</a>          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
 <p>
 
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Wed Jun 10 17:24:21 2009 for MdePkg[ALL] by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 7 13:55:00 2009 for MdePkg[ALL] by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="../../doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.7.1 </small></address>
 </body>
