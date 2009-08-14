@@ -275,10 +275,11 @@ PxeBcTryBinl (
   Offer = &Private->Dhcp4Offers[Index].Packet.Offer;
 
   //
-  // use option 54, if zero, use siaddr in header
+  // Use siaddr(next server) in DHCPOFFER packet header, if zero, use option 54(server identifier)
+  // in DHCPOFFER packet.
+  // (It does not comply with PXE Spec, Ver2.1)
   //
-  ZeroMem (&ServerIp, sizeof(EFI_IP_ADDRESS));
-  if (Private->Dhcp4Offers[Index].Dhcp4Option[PXEBC_DHCP4_TAG_INDEX_SERVER_ID] != NULL) {
+  if (EFI_IP4_EQUAL (&Offer->Dhcp4.Header.ServerAddr.Addr, &mZeroIp4Addr)) {
     CopyMem (
       &ServerIp.Addr[0],
       Private->Dhcp4Offers[Index].Dhcp4Option[PXEBC_DHCP4_TAG_INDEX_SERVER_ID]->Data,
