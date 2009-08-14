@@ -4,7 +4,7 @@
   of the raw block devices media. Currently "El Torito CD-ROM", Legacy
   MBR, and GPT partition schemes are supported.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -179,6 +179,7 @@ PartitionDriverBindingStart (
   EFI_DISK_IO_PROTOCOL      *DiskIo;
   EFI_DEVICE_PATH_PROTOCOL  *ParentDevicePath;
   PARTITION_DETECT_ROUTINE  *Routine;
+  BOOLEAN                   MediaPresent;
 
   Status = gBS->OpenProtocol (
                   ControllerHandle,
@@ -227,10 +228,12 @@ PartitionDriverBindingStart (
   OpenStatus = Status;
 
   //
-  // If no media is present, do nothing here.
+  // Try to read blocks when there's media or it is removable physical partition.
   //
-  Status = EFI_UNSUPPORTED;
-  if (BlockIo->Media->MediaPresent) {
+  Status       = EFI_UNSUPPORTED;
+  MediaPresent = BlockIo->Media->MediaPresent;
+  if (BlockIo->Media->MediaPresent ||
+      (BlockIo->Media->RemovableMedia && !BlockIo->Media->LogicalPartition)) {
     //
     // Try for GPT, then El Torito, and then legacy MBR partition types. If the
     // media supports a given partition type install child handles to represent
@@ -245,7 +248,7 @@ PartitionDriverBindingStart (
                    BlockIo,
                    ParentDevicePath
                    );
-      if (!EFI_ERROR (Status) || Status == EFI_MEDIA_CHANGED) {
+      if (!EFI_ERROR (Status) || Status == EFI_MEDIA_CHANGED || Status == EFI_NO_MEDIA) {
         break;
       }
       Routine++;
@@ -257,7 +260,16 @@ PartitionDriverBindingStart (
   // driver. So don't try to close them. Otherwise, we will break the dependency
   // between the controller and the driver set up before.
   //
-  if (EFI_ERROR (Status) && !EFI_ERROR (OpenStatus) && Status != EFI_MEDIA_CHANGED) {
+  // In the case that when the media changes on a device it will Reinstall the 
+  // BlockIo interaface. This will cause a call to our Stop(), and a subsequent
+  // reentrant call to our Start() successfully. We should leave the device open
+  // when this happen. The "media change" case includes either the status is
+  // EFI_MEDIA_CHANGED or it is a "media" to "no media" change. 
+  //  
+  if (EFI_ERROR (Status)          &&
+      !EFI_ERROR (OpenStatus)     &&
+      Status != EFI_MEDIA_CHANGED &&
+      !(MediaPresent && Status == EFI_NO_MEDIA)) {
     gBS->CloseProtocol (
           ControllerHandle,
           &gEfiDiskIoProtocolGuid,
