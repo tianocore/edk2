@@ -3,7 +3,7 @@
   performance, all the function will only include if the performance
   switch is set.
 
-Copyright (c) 2004 - 2008, Intel Corporation. <BR>
+Copyright (c) 2004 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -18,6 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 PERF_HEADER               mPerfHeader;
 PERF_DATA                 mPerfData;
+EFI_PHYSICAL_ADDRESS      mAcpiLowMemoryBase = 0x0FFFFFFFFULL;
 
 /**
   Get the short verion of PDB file name to be
@@ -144,7 +145,6 @@ WriteBootToOsPerformanceData (
   )
 {
   EFI_STATUS                Status;
-  EFI_PHYSICAL_ADDRESS      AcpiLowMemoryBase;
   UINT32                    AcpiLowMemoryLength;
   UINT32                    LimitCount;
   EFI_HANDLE                *Handles;
@@ -187,25 +187,6 @@ WriteBootToOsPerformanceData (
     CountUp            = FALSE;
   }
 
-  AcpiLowMemoryLength   = 0x2000;
-
-  //
-  // Allocate a block of memory that contain performance data to OS
-  //
-  Status = gBS->AllocatePages (
-                  AllocateAnyPages,
-                  EfiReservedMemoryType,
-                  EFI_SIZE_TO_PAGES (AcpiLowMemoryLength),
-                  &AcpiLowMemoryBase
-                  );
-  if (EFI_ERROR (Status)) {
-    return ;
-  }
-
-
-  Ptr                   = (UINT8 *) ((UINT32) AcpiLowMemoryBase + sizeof (PERF_HEADER));
-  LimitCount            = (AcpiLowMemoryLength - sizeof (PERF_HEADER)) / sizeof (PERF_DATA);
-
   //
   // Put Detailed performance data into memory
   //
@@ -218,9 +199,32 @@ WriteBootToOsPerformanceData (
                   &Handles
                   );
   if (EFI_ERROR (Status)) {
-    gBS->FreePages (AcpiLowMemoryBase, 1);
     return ;
   }
+
+
+  AcpiLowMemoryLength = 0x4000;
+  if (mAcpiLowMemoryBase == 0x0FFFFFFFF) {
+    //
+    // Allocate a block of memory that contain performance data to OS
+    //
+    Status = gBS->AllocatePages (
+                    AllocateMaxAddress,
+                    EfiReservedMemoryType,
+                    EFI_SIZE_TO_PAGES (AcpiLowMemoryLength),
+                    &mAcpiLowMemoryBase
+                    );
+    if (EFI_ERROR (Status)) {
+      FreePool (Handles);
+      return ;
+    }
+  }
+
+
+  Ptr        = (UINT8 *) ((UINT32) mAcpiLowMemoryBase + sizeof (PERF_HEADER));
+  LimitCount = (AcpiLowMemoryLength - sizeof (PERF_HEADER)) / sizeof (PERF_DATA);
+
+
   
   //
   // Get DXE drivers performance
@@ -296,10 +300,10 @@ Done:
   mPerfHeader.Signiture = PERFORMANCE_SIGNATURE;
 
   //
-  // Put performance data to ACPI memory
+  // Put performance data to Reserved memory
   //
   CopyMem (
-    (UINTN *) (UINTN) AcpiLowMemoryBase,
+    (UINTN *) (UINTN) mAcpiLowMemoryBase,
     &mPerfHeader,
     sizeof (PERF_HEADER)
     );
@@ -309,7 +313,7 @@ Done:
         &gPerformanceProtocolGuid,
         EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
         sizeof (EFI_PHYSICAL_ADDRESS),
-        &AcpiLowMemoryBase
+        &mAcpiLowMemoryBase
         );
 
   return ;
