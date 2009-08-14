@@ -2480,9 +2480,11 @@ DiscoverBootFile (
   }
 
   //
-  // use option 54, if zero, use siaddr in header
+  // Use siaddr(next server) in DHCPOFFER packet header, if zero, use option 54(server identifier)
+  // in DHCPOFFER packet.
+  // (It does not comply with PXE Spec, Ver2.1)
   //
-  if (Packet->Dhcp4Option[PXEBC_DHCP4_TAG_INDEX_SERVER_ID] != NULL) {
+  if (EFI_IP4_EQUAL (&Packet->Packet.Offer.Dhcp4.Header.ServerAddr, &mZeroIp4Addr)) {
     CopyMem (
       &Private->ServerIp,
       Packet->Dhcp4Option[PXEBC_DHCP4_TAG_INDEX_SERVER_ID]->Data,
