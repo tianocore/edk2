@@ -754,7 +754,6 @@ UpdateConModePage (
   UINTN                         Index;
   UINTN                         Col;
   UINTN                         Row;
-  CHAR16                        RowString[50];
   CHAR16                        ModeString[50];
   CHAR16                        *PStr;
   UINTN                         MaxMode;
@@ -813,10 +812,9 @@ UpdateConModePage (
     //
     UnicodeValueToString (ModeString, 0, Col, 0);
     PStr = &ModeString[0];
-    StrnCat (PStr, L" x ", StrLen(L" x "));
-    UnicodeValueToString (RowString, 0, Row, 0);
-    PStr = &ModeString[0];
-    StrnCat (PStr, RowString, StrLen(RowString));
+    StrnCat (PStr, L" x ", StrLen(L" x ") + 1);
+    PStr = PStr + StrLen (PStr);
+    UnicodeValueToString (PStr , 0, Row, 0);
 
     ModeToken[Index] = HiiSetString (CallbackData->BmmHiiHandle, 0, ModeString, NULL);
 
