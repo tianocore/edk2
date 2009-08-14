@@ -2,7 +2,7 @@
   Decode a hard disk partitioned with the GPT scheme in the UEFI 2.0
   specification.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -231,10 +231,15 @@ PartitionInstallGptChildHandles (
   //
   // Verify that the Protective MBR is valid
   //
-  if (ProtectiveMbr->Partition[0].BootIndicator != 0x00 ||
-      ProtectiveMbr->Partition[0].OSIndicator != PMBR_GPT_PARTITION ||
-      UNPACK_UINT32 (ProtectiveMbr->Partition[0].StartingLBA) != 1
-      ) {
+  for (Index = 0; Index < MAX_MBR_PARTITIONS; Index++) {
+    if (ProtectiveMbr->Partition[Index].BootIndicator == 0x00 &&
+        ProtectiveMbr->Partition[Index].OSIndicator == PMBR_GPT_PARTITION &&
+        UNPACK_UINT32 (ProtectiveMbr->Partition[Index].StartingLBA) == 1
+        ) {
+      break;
+    }
+  }
+  if (Index == MAX_MBR_PARTITIONS) {
     goto Done;
   }
 
