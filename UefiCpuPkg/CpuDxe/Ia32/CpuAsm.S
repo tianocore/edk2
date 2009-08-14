@@ -1,8 +1,3 @@
-#
-# ConvertAsm.py: Automatically generated from CpuAsm.asm
-#
-#      TITLE   CpuAsm.asm:
-
 #------------------------------------------------------------------------------
 #*
 #*   Copyright 2006 - 2009, Intel Corporation
@@ -33,11 +28,10 @@
 ExternalVectorTablePtr:
     .byte      0, 0, 0, 0
 
-.intel_syntax
 ASM_GLOBAL ASM_PFX(InitializeExternalVectorTablePtr)
 ASM_PFX(InitializeExternalVectorTablePtr):
-    mov     eax, [esp+4]
-    mov     ExternalVectorTablePtr, eax
+    movl    4(%esp), %eax
+    movl    %eax, ExternalVectorTablePtr
     ret
 
 #------------------------------------------------------------------------------
@@ -46,17 +40,16 @@ ASM_PFX(InitializeExternalVectorTablePtr):
 #   UINT16 Selector
 #   );
 #------------------------------------------------------------------------------
-.intel_syntax
 ASM_GLOBAL ASM_PFX(SetCodeSelector)
 ASM_PFX(SetCodeSelector):
-    mov     %ecx, [%esp+4]
-    sub     %esp, 0x10
-    lea     %eax, setCodeSelectorLongJump
-    mov     [%esp], %eax
-    mov     [%esp+4], %cx
-    jmp     fword ptr [%esp]
+    movl    4(%esp), %ecx
+    subl    $0x10, %esp 
+    leal    setCodeSelectorLongJump, %eax 
+    movl    %eax, (%esp)
+    movw    %cx, 4(%esp)
+    .byte   0xFF, 0x2C, 0x24   # jmp *(%esp)  note:(FWORD jmp) 
 setCodeSelectorLongJump:
-    add     %esp, 0x10
+    addl    $0x10, %esp 
     ret
 
 #------------------------------------------------------------------------------
@@ -65,15 +58,14 @@ setCodeSelectorLongJump:
 #   UINT16 Selector
 #   );
 #------------------------------------------------------------------------------
-.intel_syntax
 ASM_GLOBAL ASM_PFX(SetDataSelectors)
 ASM_PFX(SetDataSelectors):
-    mov     %ecx, [%esp+4]
-    mov     %ss, %cx
-    mov     %ds, %cx
-    mov     %es, %cx
-    mov     %fs, %cx
-    mov     %gs, %cx
+    movl    4(%esp), %ecx
+    movw    %cx, %ss
+    movw    %cx, %ds
+    movw    %cx, %es
+    movw    %cx, %fs
+    movw    %cx, %gs
     ret
 
 #---------------------------------------;
@@ -81,7 +73,6 @@ ASM_PFX(SetDataSelectors):
 #---------------------------------------;
 # The follow algorithm is used for the common interrupt routine.
 
-.intel_syntax
 ASM_GLOBAL ASM_PFX(CommonInterruptEntry)
 ASM_PFX(CommonInterruptEntry):
     cli
@@ -96,12 +87,12 @@ ASM_PFX(CommonInterruptEntry):
     # Get the return address of call, actually, it is the
     # address of vector number.
     #
-    xchg    ecx, [esp]
-    mov     cx, [ecx]
-    and     ecx, 0x0FFFF
-    cmp     ecx, 32         # Intel reserved vector for exceptions?
+    xchgl   (%esp), %ecx
+    movw    (%ecx), %cx
+    andl    $0x0FFFF, %ecx
+    cmpl    $32, %ecx         # Intel reserved vector for exceptions?
     jae     NoErrorCode
-    bt      ASM_PFX(mErrorCodeFlag), ecx
+    bt      %ecx, ASM_PFX(mErrorCodeFlag)
     jc      HasErrorCode
 
 NoErrorCode:
@@ -125,13 +116,13 @@ NoErrorCode:
     #
     # Put Vector Number on stack
     #
-    push    ecx
+    pushl   %ecx
 
     #
     # Put 0 (dummy) error code on stack, and restore ECX
     #
-    xor     ecx, ecx  # ECX = 0
-    xchg    ecx, [esp+4]
+    xorl    %ecx, %ecx  # ECX = 0
+    xchgl   4(%esp), %ecx
 
     jmp     ErrorCodeAndVectorOnStack
 
@@ -158,7 +149,7 @@ HasErrorCode:
     #
     # Put Vector Number on stack and restore ECX
     #
-    xchg    ecx, [esp]
+    xchgl   (%esp), %ecx 
 
     #
     # Fall through to join main routine code
@@ -168,8 +159,8 @@ CommonInterruptEntry_al_0000:
     jmp CommonInterruptEntry_al_0000
 
 ErrorCodeAndVectorOnStack:
-    push    ebp
-    mov     ebp, esp
+    pushl   %ebp
+    movl    %esp, %ebp
 
     #
     # Stack:
@@ -192,203 +183,203 @@ ErrorCodeAndVectorOnStack:
     # Align stack to make sure that EFI_FX_SAVE_STATE_IA32 of EFI_SYSTEM_CONTEXT_IA32
     # is 16-byte aligned
     #
-    and     esp, 0x0fffffff0
-    sub     esp, 12
+    andl    $0x0fffffff0, %esp 
+    subl    $12, %esp
 
 #; UINT32  Edi, Esi, Ebp, Esp, Ebx, Edx, Ecx, Eax;
-    push    eax
-    push    ecx
-    push    edx
-    push    ebx
-    lea     ecx, [ebp + 6 * 4]
-    push    ecx                          # ESP
-    push    dword ptr [ebp]              # EBP
-    push    esi
-    push    edi
+    pushl   %eax
+    pushl   %ecx
+    pushl   %edx
+    pushl   %ebx
+    leal    24(%ebp), %ecx
+    pushl   %ecx                          # ESP
+    pushl   (%ebp)              # EBP
+    pushl   %esi
+    pushl   %edi
 
 #; UINT32  Gs, Fs, Es, Ds, Cs, Ss;
-    mov     eax, ss
-    push    eax
-    movzx   eax, word ptr [ebp + 4 * 4]
-    push    eax
-    mov     eax, ds
-    push    eax
-    mov     eax, es
-    push    eax
-    mov     eax, fs
-    push    eax
-    mov     eax, gs
-    push    eax
+    movl    %ss, %eax
+    pushl   %eax
+    movzwl  16(%ebp), %eax 
+    pushl   %eax
+    movl    %ds, %eax
+    pushl   %eax
+    movl    %es, %eax
+    pushl   %eax
+    movl    %fs, %eax
+    pushl   %eax
+    movl    %gs, %eax
+    pushl   %eax
 
 #; UINT32  Eip;
-    mov     eax, [ebp + 3 * 4]
-    push    eax
+    movl    12(%ebp), %eax
+    pushl   %eax
 
 #; UINT32  Gdtr[2], Idtr[2];
-    sub     esp, 8
-    sidt    [esp]
-    mov     eax, [esp + 2]
-    xchg    eax, [esp]
-    and     eax, 0x0FFFF
-    mov     [esp+4], eax
+    subl    $8, %esp
+    sidt    (%esp)
+    movl    2(%esp), %eax
+    xchgl   (%esp), %eax
+    andl    $0x0FFFF, %eax 
+    movl    %eax, 4(%esp)
 
-    sub     esp, 8
-    sgdt    [esp]
-    mov     eax, [esp + 2]
-    xchg    eax, [esp]
-    and     eax, 0x0FFFF
-    mov     [esp+4], eax
+    subl    $8, %esp
+    sgdt    (%esp)
+    movl    2(%esp), %eax
+    xchgl   (%esp), %eax
+    andl    $0x0FFFF, %eax 
+    movl    %eax, 4(%esp)
 
 #; UINT32  Ldtr, Tr;
-    xor     eax, eax
-    str     ax
-    push    eax
-    sldt    ax
-    push    eax
+    xorl    %eax, %eax
+    str     %ax
+    pushl   %eax
+    sldt    %ax
+    pushl   %eax
 
 #; UINT32  EFlags;
-    mov     eax, [ebp + 5 * 4]
-    push    eax
+    movl    20(%ebp), %eax
+    pushl   %eax
 
 #; UINT32  Cr0, Cr1, Cr2, Cr3, Cr4;
-    mov     eax, cr4
-    or      eax, 0x208
-    mov     cr4, eax
-    push    eax
-    mov     eax, cr3
-    push    eax
-    mov     eax, cr2
-    push    eax
-    xor     eax, eax
-    push    eax
-    mov     eax, cr0
-    push    eax
+    movl    %cr4, %eax
+    orl     $0x208, %eax
+    movl    %eax, %cr4
+    pushl   %eax
+    movl    %cr3, %eax
+    pushl   %eax
+    movl    %cr2, %eax
+    pushl   %eax
+    xorl    %eax, %eax
+    pushl   %eax
+    movl    %cr0, %eax
+    pushl   %eax
 
 #; UINT32  Dr0, Dr1, Dr2, Dr3, Dr6, Dr7;
-    mov     eax, dr7
-    push    eax
+    movl    %dr7, %eax
+    pushl   %eax
 #; clear Dr7 while executing debugger itself
-    xor     eax, eax
-    mov     dr7, eax
+    xorl    %eax, %eax
+    movl    %eax, %dr7
 
-    mov     eax, dr6
-    push    eax
+    movl    %dr6, %eax
+    pushl   %eax
 #; insure all status bits in dr6 are clear...
-    xor     eax, eax
-    mov     dr6, eax
+    xorl    %eax, %eax
+    movl    %eax, %dr6
 
-    mov     eax, dr3
-    push    eax
-    mov     eax, dr2
-    push    eax
-    mov     eax, dr1
-    push    eax
-    mov     eax, dr0
-    push    eax
+    movl    %dr3, %eax
+    pushl   %eax
+    movl    %dr2, %eax
+    pushl   %eax
+    movl    %dr1, %eax
+    pushl   %eax
+    movl    %dr0, %eax
+    pushl   %eax
 
 #; FX_SAVE_STATE_IA32 FxSaveState;
-    sub     esp, 512
-    mov     edi, esp
+    subl    $512, %esp
+    movl    %esp, %edi
     .byte      0x0f, 0x0ae, 0x07 #fxsave [edi]
 
 #; UINT32  ExceptionData;
-    push    dword ptr [ebp + 2 * 4]
+    pushl   8(%ebp)
 
 #; call into exception handler
-    mov     eax, ExternalVectorTablePtr  # get the interrupt vectors base
-    or      eax, eax                        # NULL?
+    movl    ExternalVectorTablePtr, %eax  # get the interrupt vectors base
+    orl     %eax, %eax                        # NULL?
     jz      nullExternalExceptionHandler
 
-    mov     ecx, [ebp + 4]
-    mov     eax, [eax + ecx * 4]
-    or      eax, eax                        # NULL?
+    mov     4(%ebp), %ecx
+    movl    (%eax,%ecx,4), %eax
+    orl     %eax, %eax                        # NULL?
     jz      nullExternalExceptionHandler
 
 #; Prepare parameter and call
-    mov     edx, esp
-    push    edx
-    mov     edx, dword ptr [ebp + 1 * 4]
-    push    edx
+    movl    %esp, %edx
+    pushl   %edx
+    movl    4(%ebp), %edx
+    pushl   %edx
 
     #
     # Call External Exception Handler
     #
-    call    eax
-    add     esp, 8
+    call    *%eax
+    addl    $8, %esp
 
 nullExternalExceptionHandler:
 
     cli
 #; UINT32  ExceptionData;
-    add     esp, 4
+    addl    $4, %esp
 
 #; FX_SAVE_STATE_IA32 FxSaveState;
-    mov     esi, esp
+    movl    %esp, %esi
     .byte      0x0f, 0x0ae, 0x0e # fxrstor [esi]
-    add     esp, 512
+    addl    $512, %esp
 
 #; UINT32  Dr0, Dr1, Dr2, Dr3, Dr6, Dr7;
-    pop     eax
-    mov     dr0, eax
-    pop     eax
-    mov     dr1, eax
-    pop     eax
-    mov     dr2, eax
-    pop     eax
-    mov     dr3, eax
+    popl    %eax
+    movl    %eax, %dr0
+    popl    %eax
+    movl    %eax, %dr1
+    popl    %eax
+    movl    %eax, %dr2
+    popl    %eax
+    movl    %eax, %dr3
 #; skip restore of dr6.  We cleared dr6 during the context save.
-    add     esp, 4
-    pop     eax
-    mov     dr7, eax
+    addl    $4, %esp
+    popl    %eax
+    movl    %eax, %dr7
 
 #; UINT32  Cr0, Cr1, Cr2, Cr3, Cr4;
-    pop     eax
-    mov     cr0, eax
-    add     esp, 4    # not for Cr1
-    pop     eax
-    mov     cr2, eax
-    pop     eax
-    mov     cr3, eax
-    pop     eax
-    mov     cr4, eax
+    popl    %eax
+    movl    %eax, %cr0
+    addl    $4, %esp    # not for Cr1
+    popl    %eax
+    movl    %eax, %cr2
+    popl    %eax
+    movl    %eax, %cr3
+    popl    %eax
+    movl    %eax, %cr4
 
 #; UINT32  EFlags;
-    pop     dword ptr [ebp + 5 * 4]
+    popl    20(%ebp)
 
 #; UINT32  Ldtr, Tr;
 #; UINT32  Gdtr[2], Idtr[2];
 #; Best not let anyone mess with these particular registers...
-    add     esp, 24
+    addl    $24, %esp
 
 #; UINT32  Eip;
-    pop     dword ptr [ebp + 3 * 4]
+    popl    12(%ebp)
 
 #; UINT32  Gs, Fs, Es, Ds, Cs, Ss;
 #; NOTE - modified segment registers could hang the debugger...  We
 #;        could attempt to insulate ourselves against this possibility,
 #;        but that poses risks as well.
 #;
-    pop     gs
-    pop     fs
-    pop     es
-    pop     ds
-    pop     dword ptr [ebp + 4 * 4]
-    pop     ss
+    popl    %gs
+    popl    %fs
+    popl    %es
+    popl    %ds
+    popl    16(%ebp)
+    popl    %ss
 
 #; UINT32  Edi, Esi, Ebp, Esp, Ebx, Edx, Ecx, Eax;
-    pop     edi
-    pop     esi
-    add     esp, 4   # not for ebp
-    add     esp, 4   # not for esp
-    pop     ebx
-    pop     edx
-    pop     ecx
-    pop     eax
+    popl    %edi
+    popl    %esi
+    addl    $4, %esp   # not for ebp
+    addl    $4, %esp   # not for esp
+    popl    %ebx
+    popl    %edx
+    popl    %ecx
+    popl    %eax
 
-    mov     esp, ebp
-    pop     ebp
-    add     esp, 8
-    iretd
+    movl    %ebp, %esp
+    popl    %ebp
+    addl    $8, %esp
+    iretl
 
 
 #END
