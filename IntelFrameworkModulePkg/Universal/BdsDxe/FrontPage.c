@@ -721,6 +721,9 @@ UpdateFrontPageStrings (
   Record          = NULL;
   do {
     Status = DataHub->GetNextRecord (DataHub, &MonotonicCount, NULL, &Record);
+    if (EFI_ERROR (Status) || Record == NULL) {
+      break;
+    }
     if (Record->DataRecordClass == EFI_DATA_RECORD_CLASS_DATA) {
       DataHeader = (EFI_SUBCLASS_TYPE1_HEADER *) (Record + 1);
       if (CompareGuid (&Record->DataRecordGuid, &gEfiMiscSubClassGuid) &&
