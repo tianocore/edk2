@@ -56,9 +56,9 @@ DEFINE ELFGCC_BIN       = /usr/bin
 
 #
 # Option 1: Hard coded full path to compiler suite
-DEFINE UNIXGCC_IA32_PETOOLS_PREFIX = /opt/tiano/i386-tiano-pe/i386-tiano-pe/bin
-DEFINE UNIXGCC_X64_PETOOLS_PREFIX  = /opt/tiano/x86_64-pc-mingw64/x86_64-pc-mingw64/bin
-DEFINE UNIXGCC_IPF_PETOOLS_PREFIX  = /opt/tiano/ia64-pc-elf/ia64-pc-elf/bin
+DEFINE UNIXGCC_IA32_PETOOLS_PREFIX = /opt/tiano/i386-tiano-pe/i386-tiano-pe/bin/
+DEFINE UNIXGCC_X64_PETOOLS_PREFIX  = /opt/tiano/x86_64-pc-mingw64/x86_64-pc-mingw64/bin/
+DEFINE UNIXGCC_IPF_PETOOLS_PREFIX  = /opt/tiano/ia64-pc-elf/ia64-pc-elf/bin/
 #
 # Option 2: Use an environment variable
 #DEFINE UNIXGCC_IA32_PETOOLS_PREFIX = ENV(IA32_PETOOLS_PREFIX)
@@ -70,8 +70,8 @@ DEFINE UNIXGCC_IPF_PETOOLS_PREFIX  = /opt/tiano/ia64-pc-elf/ia64-pc-elf/bin
 #
 # Option 4: Create links under the BaseTools/Bin/gcc/ARCH directory
 # Links needed: gcc, ar & ld
-#DEFINE UNIXGCC_IA32_PETOOLS_PREFIX = ENV(WORKSPACE)/BaseTools/Bin/gcc/Ia32
-#DEFINE UNIXGCC_X64_PETOOLS_PREFIX  = ENV(WORKSPACE)/BaseTools/Bin/gcc/X64
+#DEFINE UNIXGCC_IA32_PETOOLS_PREFIX = ENV(WORKSPACE)/BaseTools/Bin/gcc/Ia32/
+#DEFINE UNIXGCC_X64_PETOOLS_PREFIX  = ENV(WORKSPACE)/BaseTools/Bin/gcc/X64/
 #
 # Option 5: Install programs under user's home directory
 #DEFINE UNIXGCC_IA32_PETOOLS_PREFIX = ENV(HOME)/programs/gcc/ia32/bin/i686-pc-mingw32-
@@ -79,8 +79,8 @@ DEFINE UNIXGCC_IPF_PETOOLS_PREFIX  = /opt/tiano/ia64-pc-elf/ia64-pc-elf/bin
 #
 
 DEFINE CYGWIN_BIN              = c:/cygwin/bin
-DEFINE CYGWIN_BIN32            = c:/cygwin/opt/tiano/i386-tiano-pe/i386-tiano-pe/bin
-DEFINE CYGWIN_BINX64           = c:/cygwin/opt/tiano/x86_64-pc-mingw64/x86_64-pc-mingw64/bin
+DEFINE CYGWIN_BIN32            = c:/cygwin/opt/tiano/i386-tiano-pe/i386-tiano-pe/bin/
+DEFINE CYGWIN_BINX64           = c:/cygwin/opt/tiano/x86_64-pc-mingw64/x86_64-pc-mingw64/bin/
 DEFINE CYGWIN_BINIPF           = c:/cygwin/opt/tiano/gcc/ipf/bin/ia64-pc-elf-
 
 DEFINE UNIX_IASL_BIN           = ~/programs/iasl
@@ -1087,47 +1087,47 @@ DEFINE UNIXGCC_DLINK_FLAGS_COMMON        = -nostdlib -s --pie
 ##################
 # IA32 definitions
 ##################
-*_UNIXGCC_IA32_PP_PATH              = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)/gcc
-*_UNIXGCC_IA32_CC_PATH              = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)/gcc
-*_UNIXGCC_IA32_SLINK_PATH           = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)/ar
-*_UNIXGCC_IA32_DLINK_PATH           = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)/ld
-*_UNIXGCC_IA32_ASLPP_PATH           = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)/gcc
-*_UNIXGCC_IA32_ASLCC_PATH           = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)/gcc
-*_UNIXGCC_IA32_ASLDLINK_PATH        = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)/ld
-*_UNIXGCC_IA32_ASM_PATH             = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)/gcc
-*_UNIXGCC_IA32_VFRPP_PATH           = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)/gcc
+*_UNIXGCC_IA32_PP_PATH              = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)gcc
+*_UNIXGCC_IA32_CC_PATH              = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)gcc
+*_UNIXGCC_IA32_SLINK_PATH           = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)ar
+*_UNIXGCC_IA32_DLINK_PATH           = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)ld
+*_UNIXGCC_IA32_ASLPP_PATH           = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)gcc
+*_UNIXGCC_IA32_ASLCC_PATH           = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)gcc
+*_UNIXGCC_IA32_ASLDLINK_PATH        = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)ld
+*_UNIXGCC_IA32_ASM_PATH             = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)gcc
+*_UNIXGCC_IA32_VFRPP_PATH           = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)gcc
 
 *_UNIXGCC_IA32_CC_FLAGS             = -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -Wno-array-bounds -c -include AutoGen.h -m32 -malign-double -freorder-blocks -freorder-blocks-and-partition 
 
 ##################
 # X64 definitions
 ##################
-*_UNIXGCC_X64_CC_PATH               = DEF(UNIXGCC_X64_PETOOLS_PREFIX)/gcc
-*_UNIXGCC_X64_ASLCC_PATH            = DEF(UNIXGCC_X64_PETOOLS_PREFIX)/gcc
-*_UNIXGCC_X64_SLINK_PATH            = DEF(UNIXGCC_X64_PETOOLS_PREFIX)/ar
-*_UNIXGCC_X64_DLINK_PATH            = DEF(UNIXGCC_X64_PETOOLS_PREFIX)/ld
-*_UNIXGCC_X64_ASLDLINK_PATH         = DEF(UNIXGCC_X64_PETOOLS_PREFIX)/ld
-*_UNIXGCC_X64_ASM_PATH              = DEF(UNIXGCC_X64_PETOOLS_PREFIX)/gcc
-*_UNIXGCC_X64_PP_PATH               = DEF(UNIXGCC_X64_PETOOLS_PREFIX)/gcc
-*_UNIXGCC_X64_ASLPP_PATH            = DEF(UNIXGCC_X64_PETOOLS_PREFIX)/gcc
-*_UNIXGCC_X64_VFRPP_PATH            = DEF(UNIXGCC_X64_PETOOLS_PREFIX)/gcc
+*_UNIXGCC_X64_CC_PATH               = DEF(UNIXGCC_X64_PETOOLS_PREFIX)gcc
+*_UNIXGCC_X64_ASLCC_PATH            = DEF(UNIXGCC_X64_PETOOLS_PREFIX)gcc
+*_UNIXGCC_X64_SLINK_PATH            = DEF(UNIXGCC_X64_PETOOLS_PREFIX)ar
+*_UNIXGCC_X64_DLINK_PATH            = DEF(UNIXGCC_X64_PETOOLS_PREFIX)ld
+*_UNIXGCC_X64_ASLDLINK_PATH         = DEF(UNIXGCC_X64_PETOOLS_PREFIX)ld
+*_UNIXGCC_X64_ASM_PATH              = DEF(UNIXGCC_X64_PETOOLS_PREFIX)gcc
+*_UNIXGCC_X64_PP_PATH               = DEF(UNIXGCC_X64_PETOOLS_PREFIX)gcc
+*_UNIXGCC_X64_ASLPP_PATH            = DEF(UNIXGCC_X64_PETOOLS_PREFIX)gcc
+*_UNIXGCC_X64_VFRPP_PATH            = DEF(UNIXGCC_X64_PETOOLS_PREFIX)gcc
 
 *_UNIXGCC_X64_CC_FLAGS              = -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -Wno-array-bounds -c -include AutoGen.h -mno-red-zone -Wno-address
 
 ##################
 # IPF definitions
 ##################
-*_UNIXGCC_IPF_CC_PATH              = DEF(UNIXGCC_IPF_PETOOLS_PREFIX)/gcc
-*_UNIXGCC_IPF_ASLCC_PATH           = DEF(UNIXGCC_IPF_PETOOLS_PREFIX)/gcc
-*_UNIXGCC_IPF_SLINK_PATH           = DEF(UNIXGCC_IPF_PETOOLS_PREFIX)/ar
-*_UNIXGCC_IPF_DLINK_PATH           = DEF(UNIXGCC_IPF_PETOOLS_PREFIX)/ld
-*_UNIXGCC_IPF_ASLDLINK_PATH        = DEF(UNIXGCC_IPF_PETOOLS_PREFIX)/ld
-*_UNIXGCC_IPF_ASM_PATH             = DEF(UNIXGCC_IPF_PETOOLS_PREFIX)/gcc
-*_UNIXGCC_IPF_PP_PATH              = DEF(UNIXGCC_IPF_PETOOLS_PREFIX)/gcc
-*_UNIXGCC_IPF_ASLPP_PATH           = DEF(UNIXGCC_IPF_PETOOLS_PREFIX)/gcc
-*_UNIXGCC_IPF_VFRPP_PATH           = DEF(UNIXGCC_IPF_PETOOLS_PREFIX)/gcc
-*_UNIXGCC_IPF_OBJCOPY_PATH     = DEF(UNIXGCC_IPF_PETOOLS_PREFIX)/objcopy
-*_UNIXGCC_IPF_SYMRENAME_PATH   = DEF(UNIXGCC_IPF_PETOOLS_PREFIX)/objcopy
+*_UNIXGCC_IPF_CC_PATH              = DEF(UNIXGCC_IPF_PETOOLS_PREFIX)gcc
+*_UNIXGCC_IPF_ASLCC_PATH           = DEF(UNIXGCC_IPF_PETOOLS_PREFIX)gcc
+*_UNIXGCC_IPF_SLINK_PATH           = DEF(UNIXGCC_IPF_PETOOLS_PREFIX)ar
+*_UNIXGCC_IPF_DLINK_PATH           = DEF(UNIXGCC_IPF_PETOOLS_PREFIX)ld
+*_UNIXGCC_IPF_ASLDLINK_PATH        = DEF(UNIXGCC_IPF_PETOOLS_PREFIX)ld
+*_UNIXGCC_IPF_ASM_PATH             = DEF(UNIXGCC_IPF_PETOOLS_PREFIX)gcc
+*_UNIXGCC_IPF_PP_PATH              = DEF(UNIXGCC_IPF_PETOOLS_PREFIX)gcc
+*_UNIXGCC_IPF_ASLPP_PATH           = DEF(UNIXGCC_IPF_PETOOLS_PREFIX)gcc
+*_UNIXGCC_IPF_VFRPP_PATH           = DEF(UNIXGCC_IPF_PETOOLS_PREFIX)gcc
+*_UNIXGCC_IPF_OBJCOPY_PATH         = DEF(UNIXGCC_IPF_PETOOLS_PREFIX)objcopy
+*_UNIXGCC_IPF_SYMRENAME_PATH       = DEF(UNIXGCC_IPF_PETOOLS_PREFIX)objcopy
 
 *_UNIXGCC_IPF_CC_FLAGS             = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -Wno-array-bounds -c -include AutoGen.h -minline-int-divide-min-latency
 *_UNIXGCC_IPF_DLINK_FLAGS          = -nostdlib -O2 --gc-sections --dll -static --entry $(IMAGE_ENTRY_POINT) --undefined $(IMAGE_ENTRY_POINT) -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
@@ -1166,32 +1166,32 @@ DEFINE UNIXGCC_DLINK_FLAGS_COMMON        = -nostdlib -s --pie
 ##################
 # IA32 definitions
 ##################
-*_CYGGCC_IA32_CC_PATH            = DEF(CYGWIN_BIN32)/gcc
-*_CYGGCC_IA32_SLINK_PATH         = DEF(CYGWIN_BIN32)/ar
-*_CYGGCC_IA32_DLINK_PATH         = DEF(CYGWIN_BIN32)/ld
-*_CYGGCC_IA32_ASM_PATH           = DEF(CYGWIN_BIN32)/gcc
-*_CYGGCC_IA32_PP_PATH            = DEF(CYGWIN_BIN32)/gcc
-*_CYGGCC_IA32_APP_PATH           = DEF(CYGWIN_BIN32)/gcc
-*_CYGGCC_IA32_VFRPP_PATH         = DEF(CYGWIN_BIN32)/gcc
-*_CYGGCC_IA32_ASLCC_PATH         = DEF(CYGWIN_BIN32)/gcc
-*_CYGGCC_IA32_ASLPP_PATH         = DEF(CYGWIN_BIN32)/gcc
-*_CYGGCC_IA32_ASLDLINK_PATH      = DEF(CYGWIN_BIN32)/ld
+*_CYGGCC_IA32_CC_PATH            = DEF(CYGWIN_BIN32)gcc
+*_CYGGCC_IA32_SLINK_PATH         = DEF(CYGWIN_BIN32)ar
+*_CYGGCC_IA32_DLINK_PATH         = DEF(CYGWIN_BIN32)ld
+*_CYGGCC_IA32_ASM_PATH           = DEF(CYGWIN_BIN32)gcc
+*_CYGGCC_IA32_PP_PATH            = DEF(CYGWIN_BIN32)gcc
+*_CYGGCC_IA32_APP_PATH           = DEF(CYGWIN_BIN32)gcc
+*_CYGGCC_IA32_VFRPP_PATH         = DEF(CYGWIN_BIN32)gcc
+*_CYGGCC_IA32_ASLCC_PATH         = DEF(CYGWIN_BIN32)gcc
+*_CYGGCC_IA32_ASLPP_PATH         = DEF(CYGWIN_BIN32)gcc
+*_CYGGCC_IA32_ASLDLINK_PATH      = DEF(CYGWIN_BIN32)ld
 
 *_CYGGCC_IA32_CC_FLAGS           = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -c -include AutoGen.h
 
 ##################
 # X64 definitions
 ##################
-*_CYGGCC_X64_CC_PATH             = DEF(CYGWIN_BINX64)/gcc
-*_CYGGCC_X64_SLINK_PATH          = DEF(CYGWIN_BINX64)/ar
-*_CYGGCC_X64_DLINK_PATH          = DEF(CYGWIN_BINX64)/ld
-*_CYGGCC_X64_ASM_PATH            = DEF(CYGWIN_BINX64)/gcc
-*_CYGGCC_X64_PP_PATH             = DEF(CYGWIN_BINX64)/gcc
-*_CYGGCC_X64_APP_PATH            = DEF(CYGWIN_BINX64)/gcc
-*_CYGGCC_X64_VFRPP_PATH          = DEF(CYGWIN_BINX64)/gcc
-*_CYGGCC_X64_ASLCC_PATH         = DEF(CYGWIN_BINX64)/gcc
-*_CYGGCC_X64_ASLPP_PATH         = DEF(CYGWIN_BINX64)/gcc
-*_CYGGCC_X64_ASLDLINK_PATH      = DEF(CYGWIN_BINX64)/ld
+*_CYGGCC_X64_CC_PATH             = DEF(CYGWIN_BINX64)gcc
+*_CYGGCC_X64_SLINK_PATH          = DEF(CYGWIN_BINX64)ar
+*_CYGGCC_X64_DLINK_PATH          = DEF(CYGWIN_BINX64)ld
+*_CYGGCC_X64_ASM_PATH            = DEF(CYGWIN_BINX64)gcc
+*_CYGGCC_X64_PP_PATH             = DEF(CYGWIN_BINX64)gcc
+*_CYGGCC_X64_APP_PATH            = DEF(CYGWIN_BINX64)gcc
+*_CYGGCC_X64_VFRPP_PATH          = DEF(CYGWIN_BINX64)gcc
+*_CYGGCC_X64_ASLCC_PATH          = DEF(CYGWIN_BINX64)gcc
+*_CYGGCC_X64_ASLPP_PATH          = DEF(CYGWIN_BINX64)gcc
+*_CYGGCC_X64_ASLDLINK_PATH       = DEF(CYGWIN_BINX64)ld
 
 *_CYGGCC_X64_CC_FLAGS            = -Os -fshort-wchar -fno-strict-aliasing -mno-red-zone -Wall -Werror -c -include AutoGen.h -D_EFI_P64
 
@@ -1262,32 +1262,32 @@ DEFINE UNIXGCC_DLINK_FLAGS_COMMON        = -nostdlib -s --pie
 ##################
 # IA32 definitions
 ##################
-*_CYGGCCxASL_IA32_CC_PATH            = DEF(CYGWIN_BIN32)/gcc
-*_CYGGCCxASL_IA32_SLINK_PATH         = DEF(CYGWIN_BIN32)/ar
-*_CYGGCCxASL_IA32_DLINK_PATH         = DEF(CYGWIN_BIN32)/ld
-*_CYGGCCxASL_IA32_ASM_PATH           = DEF(CYGWIN_BIN32)/gcc
-*_CYGGCCxASL_IA32_PP_PATH            = DEF(CYGWIN_BIN32)/gcc
-*_CYGGCCxASL_IA32_APP_PATH           = DEF(CYGWIN_BIN32)/gcc
-*_CYGGCCxASL_IA32_VFRPP_PATH         = DEF(CYGWIN_BIN32)/gcc
-*_CYGGCCxASL_IA32_ASLCC_PATH         = DEF(CYGWIN_BIN32)/gcc
-*_CYGGCCxASL_IA32_ASLPP_PATH         = DEF(CYGWIN_BIN32)/gcc
-*_CYGGCCxASL_IA32_ASLDLINK_PATH      = DEF(CYGWIN_BIN32)/ld
+*_CYGGCCxASL_IA32_CC_PATH            = DEF(CYGWIN_BIN32)gcc
+*_CYGGCCxASL_IA32_SLINK_PATH         = DEF(CYGWIN_BIN32)ar
+*_CYGGCCxASL_IA32_DLINK_PATH         = DEF(CYGWIN_BIN32)ld
+*_CYGGCCxASL_IA32_ASM_PATH           = DEF(CYGWIN_BIN32)gcc
+*_CYGGCCxASL_IA32_PP_PATH            = DEF(CYGWIN_BIN32)gcc
+*_CYGGCCxASL_IA32_APP_PATH           = DEF(CYGWIN_BIN32)gcc
+*_CYGGCCxASL_IA32_VFRPP_PATH         = DEF(CYGWIN_BIN32)gcc
+*_CYGGCCxASL_IA32_ASLCC_PATH         = DEF(CYGWIN_BIN32)gcc
+*_CYGGCCxASL_IA32_ASLPP_PATH         = DEF(CYGWIN_BIN32)gcc
+*_CYGGCCxASL_IA32_ASLDLINK_PATH      = DEF(CYGWIN_BIN32)ld
 
 *_CYGGCCxASL_IA32_CC_FLAGS           = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -c -include AutoGen.h
 
 ##################
 # X64 definitions
 ##################
-*_CYGGCCxASL_X64_CC_PATH             = DEF(CYGWIN_BINX64)/gcc
-*_CYGGCCxASL_X64_SLINK_PATH          = DEF(CYGWIN_BINX64)/ar
-*_CYGGCCxASL_X64_DLINK_PATH          = DEF(CYGWIN_BINX64)/ld
-*_CYGGCCxASL_X64_ASM_PATH            = DEF(CYGWIN_BINX64)/gcc
-*_CYGGCCxASL_X64_PP_PATH             = DEF(CYGWIN_BINX64)/gcc
-*_CYGGCCxASL_X64_APP_PATH            = DEF(CYGWIN_BINX64)/gcc
-*_CYGGCCxASL_X64_VFRPP_PATH          = DEF(CYGWIN_BINX64)/gcc
-*_CYGGCCxASL_X64_ASLCC_PATH         = DEF(CYGWIN_BINX64)/gcc
-*_CYGGCCxASL_X64_ASLPP_PATH         = DEF(CYGWIN_BINX64)/gcc
-*_CYGGCCxASL_X64_ASLDLINK_PATH      = DEF(CYGWIN_BINX64)/ld
+*_CYGGCCxASL_X64_CC_PATH             = DEF(CYGWIN_BINX64)gcc
+*_CYGGCCxASL_X64_SLINK_PATH          = DEF(CYGWIN_BINX64)ar
+*_CYGGCCxASL_X64_DLINK_PATH          = DEF(CYGWIN_BINX64)ld
+*_CYGGCCxASL_X64_ASM_PATH            = DEF(CYGWIN_BINX64)gcc
+*_CYGGCCxASL_X64_PP_PATH             = DEF(CYGWIN_BINX64)gcc
+*_CYGGCCxASL_X64_APP_PATH            = DEF(CYGWIN_BINX64)gcc
+*_CYGGCCxASL_X64_VFRPP_PATH          = DEF(CYGWIN_BINX64)gcc
+*_CYGGCCxASL_X64_ASLCC_PATH          = DEF(CYGWIN_BINX64)gcc
+*_CYGGCCxASL_X64_ASLPP_PATH          = DEF(CYGWIN_BINX64)gcc
+*_CYGGCCxASL_X64_ASLDLINK_PATH       = DEF(CYGWIN_BINX64)ld
 
 *_CYGGCCxASL_X64_CC_FLAGS            = -Os -fshort-wchar -fno-strict-aliasing -mno-red-zone -Wall -Werror -c -include AutoGen.h -D_EFI_P64
 
