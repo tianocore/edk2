@@ -83,7 +83,8 @@ DEFINE CYGWIN_BIN32            = c:/cygwin/opt/tiano/i386-tiano-pe/i386-tiano-pe
 DEFINE CYGWIN_BINX64           = c:/cygwin/opt/tiano/x86_64-pc-mingw64/x86_64-pc-mingw64/bin/
 DEFINE CYGWIN_BINIPF           = c:/cygwin/opt/tiano/gcc/ipf/bin/ia64-pc-elf-
 
-DEFINE UNIX_IASL_BIN           = ~/programs/iasl
+DEFINE UNIX_IASL_BIN           = /usr/bin/iasl
+#DEFINE UNIX_IASL_BIN           = $(HOME)/programs/iasl
 DEFINE WIN_ASL_BIN_DIR         = C:\ASL
 DEFINE WIN_IASL_BIN            = DEF(WIN_ASL_BIN_DIR)\iasl.exe
 DEFINE WIN_ASL_BIN             = DEF(WIN_ASL_BIN_DIR)\asl.exe
