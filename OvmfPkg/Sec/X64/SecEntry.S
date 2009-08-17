@@ -34,7 +34,6 @@
 #  @return None
 #
 #
-.intel_syntax
 ASM_GLOBAL ASM_PFX(_ModuleEntryPoint)
 ASM_PFX(_ModuleEntryPoint):
 
@@ -42,7 +41,7 @@ ASM_PFX(_ModuleEntryPoint):
     # Load temporary stack top at very low memory.  The C code
     # can reload to a better address.
     #
-    mov     %rsp, INITIAL_TOP_OF_STACK
+    movq    $INITIAL_TOP_OF_STACK, %rsp 
     nop
 
     #
@@ -52,9 +51,9 @@ ASM_PFX(_ModuleEntryPoint):
     #   r8:  PeiCoreEntryPoint
     #   r9:  TopOfCurrentStack
     #
-    mov     %rcx, %rbp
-    mov     %rdx, %rsi
-    mov     %r8, %rdi
-    mov     %r9, %rsp
+    movq    %rbp, %rcx 
+    movq    %rsi, %rdx
+    movq    %rdi, %r8
+    movq    %rsp, %r9
     call    ASM_PFX(SecCoreStartupWithStack)
 
