@@ -1,4 +1,4 @@
-#      TITLE   CpuAsm.asm: 
+#      TITLE   CpuAsm.S: 
 
 #------------------------------------------------------------------------------
 #*
@@ -30,11 +30,10 @@
 ExternalVectorTablePtr:
     .byte      0, 0, 0, 0, 0, 0, 0, 0
 
-.intel_syntax
 ASM_GLOBAL ASM_PFX(InitializeExternalVectorTablePtr)
 ASM_PFX(InitializeExternalVectorTablePtr):
-    lea     %rax, [%rip+ExternalVectorTablePtr] # save vector number
-    mov     [%rax], %rcx
+    lea     ExternalVectorTablePtr(%rip), %rax # save vector number
+    mov     %rcx, (%rax) 
     ret
 
 
@@ -44,16 +43,15 @@ ASM_PFX(InitializeExternalVectorTablePtr):
 #   UINT16 Selector
 #   );
 #------------------------------------------------------------------------------
-.intel_syntax
 ASM_GLOBAL ASM_PFX(SetCodeSelector)
 ASM_PFX(SetCodeSelector):
-    sub     %rsp, 0x10
-    lea     %rax, [%rip+setCodeSelectorLongJump]
-    mov     [%rsp], %rax
-    mov     [%rsp+4], %cx
-    jmp     fword ptr [%rsp]
+    subq    $0x10, %rsp 
+    leaq    setCodeSelectorLongJump(%rip), %rax 
+    movq    %rax, (%rsp) 
+    movw    %cx, 4(%rsp)
+    .byte   0xFF, 0x2C, 0x24     # jmp (%rsp) note:fword jmp
 setCodeSelectorLongJump:
-    add     %rsp, 0x10
+    addq    $0x10, %rsp
     ret
 
 #------------------------------------------------------------------------------
@@ -62,14 +60,13 @@ setCodeSelectorLongJump:
 #   UINT16 Selector
 #   );
 #------------------------------------------------------------------------------
-.intel_syntax
 ASM_GLOBAL ASM_PFX(SetDataSelectors)
 ASM_PFX(SetDataSelectors):
-    mov     %ss, %cx
-    mov     %ds, %cx
-    mov     %es, %cx
-    mov     %fs, %cx
-    mov     %gs, %cx
+    movw    %cx, %ss
+    movw    %cx, %ds
+    movw    %cx, %es
+    movw    %cx, %fs
+    movw    %cx, %gs
     ret
 
 #---------------------------------------;
@@ -77,7 +74,6 @@ ASM_PFX(SetDataSelectors):
 #---------------------------------------;
 # The follow algorithm is used for the common interrupt routine.
 
-.intel_syntax
 ASM_GLOBAL ASM_PFX(CommonInterruptEntry)
 ASM_PFX(CommonInterruptEntry):
     cli
@@ -88,14 +84,14 @@ ASM_PFX(CommonInterruptEntry):
     #
     # Calculate vector number
     #
-    xchg    %rcx, [%rsp] # get the return address of call, actually, it is the address of vector number.
-    movzx   %ecx, word ptr [%rcx]
-    cmp     %ecx, 32         # Intel reserved vector for exceptions?
+    xchgq   (%rsp), %rcx # get the return address of call, actually, it is the address of vector number.
+    movzwl  (%rcx), %ecx 
+    cmp     $32, %ecx          # Intel reserved vector for exceptions?
     jae     NoErrorCode
-    push    %rax
-    lea     %rax, [%rip+ASM_PFX(mErrorCodeFlag)]
-    bt      dword ptr [%rax], %ecx
-    pop     %rax
+    pushq   %rax
+    leaq    ASM_PFX(mErrorCodeFlag)(%rip), %rax
+    bt      %ecx, (%rax) 
+    popq    %rax
     jc      CommonInterruptEntry_al_0000
 
 NoErrorCode:
@@ -104,11 +100,11 @@ NoErrorCode:
     # Push a dummy error code on the stack
     # to maintain coherent stack map
     #
-    push    [%rsp]
-    mov     qword ptr [%rsp + 8], 0
+    pushq   (%rsp)
+    movq    $0, 8(%rsp)
 CommonInterruptEntry_al_0000:
-    push    %rbp
-    mov     %rbp, %rsp
+    pushq   %rbp
+    movq    %rsp, %rbp
 
     #
     # Stack:
@@ -140,219 +136,219 @@ CommonInterruptEntry_al_0000:
 
 #; UINT64  Rdi, Rsi, Rbp, Rsp, Rbx, Rdx, Rcx, Rax;
 #; UINT64  R8, R9, R10, R11, R12, R13, R14, R15;
-    push    %r15
-    push    %r14
-    push    %r13
-    push    %r12
-    push    %r11
-    push    %r10
-    push    %r9
-    push    %r8
-    push    %rax
-    push    qword ptr [%rbp + 8]   # RCX
-    push    %rdx
-    push    %rbx
-    push    qword ptr [%rbp + 48]  # RSP
-    push    qword ptr [%rbp]       # RBP
-    push    %rsi
-    push    %rdi
+    pushq    %r15
+    pushq    %r14
+    pushq    %r13
+    pushq    %r12
+    pushq    %r11
+    pushq    %r10
+    pushq    %r9
+    pushq    %r8
+    pushq    %rax
+    pushq    8(%rbp)   # RCX
+    pushq    %rdx
+    pushq    %rbx
+    pushq    48(%rbp)  # RSP
+    pushq    (%rbp)    # RBP
+    pushq    %rsi
+    pushq    %rdi
 
 #; UINT64  Gs, Fs, Es, Ds, Cs, Ss;  insure high 16 bits of each is zero
-    movzx   %rax, word ptr [%rbp + 56]
-    push    %rax                      # for ss
-    movzx   %rax, word ptr [%rbp + 32]
-    push    %rax                      # for cs
-    mov     %rax, %ds
-    push    %rax
-    mov     %rax, %es
-    push    %rax
-    mov     %rax, %fs
-    push    %rax
-    mov     %rax, %gs
-    push    %rax
+    movzwq  56(%rbp), %rax
+    pushq   %rax                      # for ss
+    movzwq  32(%rbp), %rax
+    pushq   %rax                      # for cs
+    movq    %ds, %rax
+    pushq   %rax
+    movq    %es, %rax
+    pushq   %rax
+    movq    %fs, %rax
+    pushq   %rax
+    movq    %gs, %rax
+    pushq   %rax
 
-    mov     [%rbp + 8], %rcx               # save vector number
+    movq    %rcx, 8(%rbp)                # save vector number
 
 #; UINT64  Rip;
-    push    qword ptr [%rbp + 24]
+    pushq   24(%rbp)
 
 #; UINT64  Gdtr[2], Idtr[2];
-    xor     %rax, %rax
-    push    %rax
-    push    %rax
-    sidt    [%rsp]
-    xchg    %rax, [%rsp + 2]
-    xchg    %rax, [%rsp]
-    xchg    %rax, [%rsp + 8]
+    xorq    %rax, %rax
+    pushq   %rax
+    pushq   %rax
+    sidt    (%rsp)
+    xchgq   2(%rsp), %rax
+    xchgq   (%rsp), %rax
+    xchgq   8(%rsp), %rax
 
-    xor     %rax, %rax
-    push    %rax
-    push    %rax
-    sgdt    [%rsp]
-    xchg    %rax, [%rsp + 2]
-    xchg    %rax, [%rsp]
-    xchg    %rax, [%rsp + 8]
+    xorq    %rax, %rax
+    pushq   %rax
+    pushq   %rax
+    sgdt    (%rsp)
+    xchgq   2(%rsp), %rax
+    xchgq   (%rsp), %rax
+    xchgq   8(%rsp), %rax
 
 #; UINT64  Ldtr, Tr;
-    xor     %rax, %rax
+    xorq    %rax, %rax
     str     %ax
-    push    %rax
+    pushq   %rax
     sldt    %ax
-    push    %rax
+    pushq   %rax
 
 #; UINT64  RFlags;
-    push    qword ptr [%rbp + 40]
+    pushq   40(%rbp)
 
 #; UINT64  Cr0, Cr1, Cr2, Cr3, Cr4, Cr8;
-    mov     %rax, %cr8
-    push    %rax
-    mov     %rax, %cr4
-    or      %rax, 0x208
-    mov     %cr4, %rax
-    push    %rax
-    mov     %rax, %cr3
-    push    %rax
-    mov     %rax, %cr2
-    push    %rax
-    xor     %rax, %rax
-    push    %rax
-    mov     %rax, %cr0
-    push    %rax
+    movq    %cr8, %rax
+    pushq   %rax
+    movq    %cr4, %rax
+    orq     $0x208, %rax 
+    movq    %rax, %cr4 
+    pushq   %rax
+    mov     %cr3, %rax 
+    pushq   %rax
+    mov     %cr2, %rax 
+    pushq   %rax
+    xorq    %rax, %rax
+    pushq   %rax
+    mov     %cr0, %rax 
+    pushq   %rax
 
 #; UINT64  Dr0, Dr1, Dr2, Dr3, Dr6, Dr7;
-    mov     %rax, %dr7
-    push    %rax
+    movq    %dr7, %rax
+    pushq   %rax
 #; clear Dr7 while executing debugger itself
-    xor     %rax, %rax
-    mov     %dr7, %rax
+    xorq    %rax, %rax
+    movq    %rax, %dr7
 
-    mov     %rax, %dr6
-    push    %rax
+    movq    %dr6, %rax
+    pushq   %rax
 #; insure all status bits in dr6 are clear...
-    xor     %rax, %rax
-    mov     %dr6, %rax
+    xorq    %rax, %rax
+    movq    %rax, %dr6
 
-    mov     %rax, %dr3
-    push    %rax
-    mov     %rax, %dr2
-    push    %rax
-    mov     %rax, %dr1
-    push    %rax
-    mov     %rax, %dr0
-    push    %rax
+    movq    %dr3, %rax
+    pushq   %rax
+    movq    %dr2, %rax
+    pushq   %rax
+    movq    %dr1, %rax
+    pushq   %rax
+    movq    %dr0, %rax
+    pushq   %rax
 
 #; FX_SAVE_STATE_X64 FxSaveState;
-    sub     %rsp, 512
-    mov     %rdi, %rsp
+    subq    $512, %rsp
+    movq    %rsp, %rdi
     .byte 0x0f, 0x0ae, 0x07 #fxsave [rdi]
 
 #; UINT32  ExceptionData;
-    push    qword ptr [%rbp + 16]
+    pushq   16(%rbp)
 
 #; call into exception handler
-    mov     %rcx, [%rbp + 8]
-    lea     %rax, [%rip+ExternalVectorTablePtr]
-    mov     %eax, [%eax]
-    mov     %rax, [%rax + %rcx * 8]
-    or      %rax, %rax                        # NULL?
+    movq    8(%rbp), %rcx
+    leaq    ExternalVectorTablePtr(%rip), %rax
+    movl    (%eax), %eax
+    movq    (%rax,%rcx,8), %rax
+    orq     %rax, %rax                        # NULL?
 
     je    nonNullValue#
 
 #; Prepare parameter and call
 #  mov     rcx, [rbp + 8]
-    mov     %rdx, %rsp
+    mov     %rsp, %rdx
     #
     # Per X64 calling convention, allocate maximum parameter stack space
     # and make sure RSP is 16-byte aligned
     #
-    sub     %rsp, 4 * 8 + 8
-    call    %rax
-    add     %rsp, 4 * 8 + 8
+    subq    $40, %rsp 
+    call    *%rax
+    addq    $40, %rsp
 
 nonNullValue:
     cli
 #; UINT64  ExceptionData;
-    add     %rsp, 8
+    addq    $8, %rsp
 
 #; FX_SAVE_STATE_X64 FxSaveState;
 
-    mov     %rsi, %rsp
+    movq    %rsp, %rsi
     .byte   0x0f, 0x0ae, 0x0E # fxrstor [rsi]
-    add     %rsp, 512
+    addq    $512, %rsp
 
 #; UINT64  Dr0, Dr1, Dr2, Dr3, Dr6, Dr7;
-    pop     %rax
-    mov     %dr0, %rax
-    pop     %rax
-    mov     %dr1, %rax
-    pop     %rax
-    mov     %dr2, %rax
-    pop     %rax
-    mov     %dr3, %rax
+    popq    %rax
+    movq    %rax, %dr0
+    popq    %rax
+    movq    %rax, %dr1
+    popq    %rax
+    movq    %rax, %dr2
+    popq    %rax
+    movq    %rax, %dr3
 #; skip restore of dr6.  We cleared dr6 during the context save.
-    add     %rsp, 8
-    pop     %rax
-    mov     %dr7, %rax
+    addq    $8, %rsp
+    popq    %rax
+    movq    %rax, %dr7
 
 #; UINT64  Cr0, Cr1, Cr2, Cr3, Cr4, Cr8;
-    pop     %rax
-    mov     %cr0, %rax
-    add     %rsp, 8   # not for Cr1
-    pop     %rax
-    mov     %cr2, %rax
-    pop     %rax
-    mov     %cr3, %rax
-    pop     %rax
-    mov     %cr4, %rax
-    pop     %rax
-    mov     %cr8, %rax
+    popq    %rax
+    movq    %rax, %cr0
+    addq    $8, %rsp   # not for Cr1
+    popq    %rax
+    movq    %rax, %cr2
+    popq    %rax
+    movq    %rax, %cr3
+    popq    %rax
+    movq    %rax, %cr4
+    popq    %rax
+    movq    %rax, %cr8
 
 #; UINT64  RFlags;
-    pop     qword ptr [%rbp + 40]
+    popq    40(%rbp)
 
 #; UINT64  Ldtr, Tr;
 #; UINT64  Gdtr[2], Idtr[2];
 #; Best not let anyone mess with these particular registers...
-    add     %rsp, 48
+    addq    $48, %rsp
 
 #; UINT64  Rip;
-    pop     qword ptr [%rbp + 24]
+    popq    24(%rbp)
 
 #; UINT64  Gs, Fs, Es, Ds, Cs, Ss;
-    pop     %rax
-    # mov     gs, rax ; not for gs
-    pop     %rax
-    # mov     fs, rax ; not for fs
+    popq    %rax
+    # mov   %rax, %gs ; not for gs
+    popq    %rax
+    # mov   %rax, %fs ; not for fs
     # (X64 will not use fs and gs, so we do not restore it)
-    pop     %rax
-    mov     %es, %rax
-    pop     %rax
-    mov     %ds, %rax
-    pop     qword ptr [%rbp + 32]  # for cs
-    pop     qword ptr [%rbp + 56]  # for ss
+    popq    %rax
+    movq    %rax, %es
+    popq    %rax
+    movq    %rax, %ds
+    popq    32(%rbp)  # for cs
+    popq    56(%rbp)  # for ss
 
 #; UINT64  Rdi, Rsi, Rbp, Rsp, Rbx, Rdx, Rcx, Rax;
 #; UINT64  R8, R9, R10, R11, R12, R13, R14, R15;
-    pop     %rdi
-    pop     %rsi
-    add     %rsp, 8               # not for rbp
-    pop     qword ptr [%rbp + 48] # for rsp
-    pop     %rbx
-    pop     %rdx
-    pop     %rcx
-    pop     %rax
-    pop     %r8
-    pop     %r9
-    pop     %r10
-    pop     %r11
-    pop     %r12
-    pop     %r13
-    pop     %r14
-    pop     %r15
+    popq    %rdi
+    popq    %rsi
+    addq    $8, %rsp              # not for rbp
+    popq    48(%rbp)              # for rsp
+    popq    %rbx
+    popq    %rdx
+    popq    %rcx
+    popq    %rax
+    popq    %r8
+    popq    %r9
+    popq    %r10
+    popq    %r11
+    popq    %r12
+    popq    %r13
+    popq    %r14
+    popq    %r15
 
-    mov     %rsp, %rbp
-    pop     %rbp
-    add     %rsp, 16
+    movq    %rbp, %rsp
+    popq    %rbp
+    addq    $16, %rsp
     iretq
 
 

@@ -24,7 +24,6 @@
 #
 
 .macro SingleIdtVectorMacro vectorNum
-    .intel_syntax
     call    ASM_PFX(CommonInterruptEntry)
     .short  \vectorNum
     nop
