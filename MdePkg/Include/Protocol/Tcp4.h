@@ -1,10 +1,10 @@
 /** @file
-  EFI TCPv4 Protocol Definition
+  EFI TCPv4(Transmission Control Protocol version 4) Protocol Definition
   The EFI TCPv4 Service Binding Protocol is used to locate EFI TCPv4 Protocol drivers to create
   and destroy child of the driver to communicate with other host using TCP protocol.
   The EFI TCPv4 Protocol provides services to send and receive data stream.
 
-  Copyright (c) 2006 - 2008, Intel Corporation
+  Copyright (c) 2006 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -269,8 +269,7 @@ EFI_STATUS
                                 way handshake finishes.
 
   @retval EFI_SUCCESS           The connection request is successfully initiated and the state
-                                - of this TCPv4 instance has been changed to
-                                - Tcp4StateSynSent.
+                                of this TCPv4 instance has been changed to Tcp4StateSynSent.
   @retval EFI_NOT_STARTED       This EFI TCPv4 Protocol instance has not been configured.
   @retval EFI_ACCESS_DENIED     One or more of the following conditions are TRUE:
                                 - This instance is not configured as an active one.
@@ -279,7 +278,7 @@ EFI_STATUS
                                 - This is NULL.
                                 - ConnectionToken is NULL.
                                 - ConnectionToken->CompletionToken.Event is NULL.
-  @retval EFI_OUT_OF_RESOURCES  The driver can't allocate enough resource to initiate the activeopen.
+  @retval EFI_OUT_OF_RESOURCES  The driver can't allocate enough resource to initiate the activ eopen.
   @retval EFI_DEVICE_ERROR      An unexpected system or network error occurred.
 
 **/
@@ -443,12 +442,15 @@ EFI_STATUS
                 EFI_TCP4_COMPLETION_TOKEN is defined in
                 EFI_TCP4_PROTOCOL.Connect().
 
-  @retval  EFI_SUCCESS           Incoming or outgoing data was processed.
-  @retval  EFI_INVALID_PARAMETER This is NULL.
-  @retval  EFI_DEVICE_ERROR      An unexpected system or network error occurred.
-  @retval  EFI_NOT_READY         No incoming or outgoing data is processed.
-  @retval  EFI_TIMEOUT           Data was dropped out of the transmission or receive queue.
-                                 Consider increasing the polling rate.
+  @retval  EFI_SUCCESS             The asynchronous I/O request is aborted and Token->Event
+                                   is signaled.
+  @retval  EFI_INVALID_PARAMETER   This is NULL.
+  @retval  EFI_NOT_STARTED         This instance hasn't been configured.
+  @retval  EFI_NO_MAPPING          When using the default address, configuration
+                                   (DHCP, BOOTP,RARP, etc.) hasn't finished yet.
+  @retval  EFI_NOT_FOUND           The asynchronous I/O request isn't found in the 
+                                   transmission or receive queue. It has either 
+                                   completed or wasn't issued by Transmit() and Receive().
 
 **/
 typedef
