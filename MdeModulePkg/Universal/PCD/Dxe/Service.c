@@ -975,8 +975,10 @@ SetHiiVariable (
   VOID        *Buffer;
   EFI_STATUS  Status;
   UINT32      Attribute;
+  UINTN       SetSize;
 
   Size = 0;
+  SetSize = 0;
 
   //
   // Try to get original variable size information.
@@ -988,14 +990,17 @@ SetHiiVariable (
     &Size,
     NULL
     );
-
+  
   if (Status == EFI_BUFFER_TOO_SMALL) {
     //
     // Patch new PCD's value to offset in given HII variable.
     //
-    
-    Buffer = AllocatePool (Size);
-
+    if  (Size >= (DataSize + Offset)) {
+      SetSize = Size;
+    } else {
+      SetSize = DataSize + Offset;
+    }
+    Buffer = AllocatePool (SetSize);
     ASSERT (Buffer != NULL);
 
     Status = gRT->GetVariable (
@@ -1014,13 +1019,12 @@ SetHiiVariable (
               VariableName,
               VariableGuid,
               Attribute,
-              Size,
+              SetSize,
               Buffer
               );
 
     FreePool (Buffer);
     return Status;
-
   } else if (Status == EFI_NOT_FOUND) {
     //
     // If variable does not exist, a new variable need to be created.
