@@ -5,11 +5,11 @@
   sections:
   - EFI IPv4 Service Binding Protocol
   - EFI IPv4 Variable
-  - EFI IPv4 Protocol The EFI IPv4 Protocol provides basic
-    network IPv4 packet I/O services, which includes support for
-    a subset of the Internet Control Message Protocol (ICMP) and
-    may include support for the Internet Group Management
-    Protocol (IGMP).
+  - EFI IPv4 Protocol
+  The EFI IPv4 Protocol provides basic network IPv4 packet I/O services,
+  which includes support foR a subset of the Internet Control Message 
+  Protocol (ICMP) and may include support for the Internet Group Management
+  Protocol (IGMP).
   
   Copyright (c) 2006 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
@@ -353,7 +353,7 @@ EFI_STATUS
                                 - This is NULL.
                                 - JoinFlag is TRUE and GroupAddress is NULL.
                                 - GroupAddress is not NULL and *GroupAddress is
-                                not a multicast IPv4 address.
+                                  not a multicast IPv4 address.
   @retval EFI_NOT_STARTED       This instance has not been started.
   @retval EFI_NO_MAPPING        When using the default address, configuration (DHCP, BOOTP,
                                 RARP, etc.) is not finished yet.
@@ -420,7 +420,7 @@ EFI_STATUS
   @retval EFI_OUT_OF_RESOURCES   Could not add the entry to the routing table.
   @retval EFI_NOT_FOUND          This route is not in the routing table (when DeleteRoute is TRUE).
   @retval EFI_ACCESS_DENIED      The route is already defined in the routing table (when
-                                  DeleteRoute is FALSE).
+                                 DeleteRoute is FALSE).
                                  
 **/
 typedef 
@@ -495,7 +495,7 @@ EFI_STATUS
                                 resources (usually memory).
   @retval EFI_DEVICE_ERROR      An unexpected system or network error occurred.
                                 The EFI IPv4 Protocol instance has been reset to startup defaults.
-                                EFI_ACCESS_DENIED The receive completion token with the same Token.Event was already
+  @retval EFI_ACCESS_DENIED     The receive completion token with the same Token.Event was already
                                 in the receive queue.
   @retval EFI_NOT_READY         The receive request could not be queued because the receive queue is full.
   @retval EFI_ICMP_ERROR        An ICMP error packet was received.
@@ -526,7 +526,7 @@ EFI_STATUS
                 defined in EFI_IP4_PROTOCOL.Transmit().
 
   @retval EFI_SUCCESS           The asynchronous I/O request was aborted and
-                                Token.->Event was signaled. When Token is NULL, all
+                                Token->Event was signaled. When Token is NULL, all
                                 pending requests were aborted and their events were signaled.
   @retval EFI_INVALID_PARAMETER This is NULL.
   @retval EFI_NOT_STARTED       This instance has not been started.
