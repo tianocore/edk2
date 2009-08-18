@@ -428,9 +428,9 @@ SerialControllerDriverStart (
     //
   }
   //
-  // Build the device path by appending the UART node to the ParentDevicePath
-  // from the WinNtIo handle. The Uart setings are zero here, since
-  // SetAttribute() will update them to match the current setings.
+  // Build the device path by appending the UART node to the ParentDevicePath.
+  //The Uart setings are zero here, since  SetAttribute() will update them to match 
+  // the default setings.
   //
   SerialDevice->DevicePath = AppendDevicePathNode (
                                ParentDevicePath,
