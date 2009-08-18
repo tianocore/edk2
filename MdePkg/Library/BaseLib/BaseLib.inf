@@ -1,7 +1,8 @@
 #/** @file
 #  Base Library implementation.
 #
-#  Copyright (c) 2007 - 2009, Intel Corporation.
+#  Copyright (c) 2007 - 2009, Intel Corporation.<BR>
+#  Portions Copyright (c) 2008-2009 Apple Inc.<BR>
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -22,7 +23,7 @@
   LIBRARY_CLASS                  = BaseLib 
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC ARM
 #
 
 [Sources.common]
@@ -582,6 +583,25 @@
   Ebc/SwitchStack.c
   Unaligned.c
   Math64.c
+
+[Sources.ARM]
+  Arm/InternalSwitchStack.c
+  Arm/Unaligned.c
+  Math64.c 
+    
+  Arm/SwitchStack.asm        | RVCT
+  Arm/SetJumpLongJump.asm    | RVCT
+  Arm/DisableInterrupts.asm  | RVCT
+  Arm/EnableInterrupts.asm   | RVCT
+  Arm/GetInterruptsState.asm | RVCT
+  Arm/CpuPause.asm           | RVCT
+  Arm/CpuBreakpoint.asm
+ 
+  Arm/GccInline.c               | GCC
+  Arm/EnableInterrupts.S        | GCC
+  Arm/DisableInterrupts.S       | GCC
+  Arm/SetJumpLongJump.S         | GCC
+  Arm/CpuBreakpoint.S           | GCC
 
 [Packages]
   MdePkg/MdePkg.dec
