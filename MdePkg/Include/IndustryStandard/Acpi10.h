@@ -67,7 +67,7 @@ typedef struct {
 /// The commond definition of QWORD, DWORD, and WORD
 /// Address Space Descriptors
 ///
-typedef struct {
+typedef PACKED struct {
   UINT8   Desc;
   UINT16  Len;
   UINT8   ResType;
