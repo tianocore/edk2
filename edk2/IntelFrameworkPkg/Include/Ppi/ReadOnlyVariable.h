@@ -37,11 +37,11 @@ typedef struct _EFI_PEI_READ_ONLY_VARIABLE_PPI  EFI_PEI_READ_ONLY_VARIABLE_PPI;
 #define EFI_VARIABLE_NON_VOLATILE       0x00000001
 #define EFI_VARIABLE_BOOTSERVICE_ACCESS 0x00000002
 #define EFI_VARIABLE_RUNTIME_ACCESS     0x00000004
-  /**
-  /// Inconsistent with specification here: 
-  /// In Framework Spec, PeiCis0.91, neither the macro or its value is defined.
-  /// Keeping this inconsistancy for backward compatibility.
-  **/ 
+///
+/// Inconsistent with specification here: 
+/// In Framework Spec, PeiCis0.91, neither the macro or its value is defined.
+/// Keeping this inconsistancy for backward compatibility.
+/// 
 #define EFI_VARIABLE_READ_ONLY          0x00000008
 ///@}
 
