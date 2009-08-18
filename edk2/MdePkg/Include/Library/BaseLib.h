@@ -3,6 +3,7 @@
   functions, and CPU architecture-specific functions.
 
 Copyright (c) 2006 - 2008, Intel Corporation<BR>
+Portions Copyright (c) 2008-2009 Apple Inc.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -124,6 +125,26 @@ typedef struct {
 #define BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT 8
 
 #endif // defined (MDE_CPU_EBC)
+
+#if defined (MDE_CPU_ARM)
+
+typedef struct {
+	UINT32		R3;  ///< Copy of R13
+	UINT32		R4;
+	UINT32		R5;
+	UINT32		R6;
+	UINT32		R7;
+	UINT32		R8;
+	UINT32		R9;
+	UINT32		R10;
+	UINT32		R11;
+	UINT32		R12;
+	UINT32		R14;
+} BASE_LIBRARY_JUMP_BUFFER;
+
+#define BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT 4
+
+#endif  // defined (MDE_CPU_ARM)
 
 //
 // String Services
