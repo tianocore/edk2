@@ -371,27 +371,6 @@ typedef INT64   INTN;
   #define EFIAPI
 #endif
 
-//
-// The Microsoft* C compiler can removed references to unreferenced data items
-//  if the /OPT:REF linker option is used. We defined a macro as this is a
-//  a non standard extension
-//
-#if defined(_MSC_EXTENSIONS)
-  ///
-  /// Remove global variable from the linked image if there are no references to 
-  /// it after all compiler and linker optimizations have been performed.
-  ///
-  ///
-  #define GLOBAL_REMOVE_IF_UNREFERENCED __declspec(selectany)
-#else
-  ///
-  /// Remove global variable from the linked image if there are no references to 
-  /// it after all compiler and linker optimizations have been performed.
-  ///
-  ///
-  #define GLOBAL_REMOVE_IF_UNREFERENCED
-#endif
-
 ///
 /// For GNU assembly code, .global or .globl can declare global symbols.
 /// Define this macro to unify the usage.

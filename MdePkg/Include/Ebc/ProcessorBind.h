@@ -121,14 +121,6 @@ typedef unsigned long         UINTN;
 #define EFIAPI    
 #endif
 
-///
-/// The Microsoft* C compiler can removed references to unreferenced data items
-///  if the /OPT:REF linker option is used. We defined a macro as this is a 
-///  a non standard extension. Currently not supported by the EBC compiler
-///
-#define GLOBAL_REMOVE_IF_UNREFERENCED
-
-
 /**
   Return the pointer to the first instruction of a function given a function pointer.
   On EBC architectures, these two pointer values are the same, 
