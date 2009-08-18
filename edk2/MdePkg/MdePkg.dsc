@@ -1,7 +1,8 @@
 #/** @file
 # EFI/PI MdePkg Package
 #
-# Copyright (c) 2007 - 2009, Intel Corporation
+# Copyright (c) 2007 - 2009, Intel Corporation<BR>
+# Portions Copyright (c) 2008-2009 Apple Inc.<BR>
 #
 #  All rights reserved. This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -19,7 +20,7 @@
   PLATFORM_VERSION               = 1.01
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/Mde
-  SUPPORTED_ARCHITECTURES        = IA32|IPF|X64|EBC
+  SUPPORTED_ARCHITECTURES        = IA32|IPF|X64|EBC|ARM
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
 
