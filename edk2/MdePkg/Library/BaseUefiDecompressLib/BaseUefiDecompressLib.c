@@ -1,7 +1,8 @@
 /** @file
   UEFI Decompress Library implementation refer to UEFI specification.
 
-  Copyright (c) 2006 - 2008, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation<BR>
+  Portions Copyright (c) 2008-2009 Apple Inc.<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -337,9 +338,7 @@ ReadPTLen (
     //
     CharC = (UINT16) GetBits (Sd, nbit);
 
-    for (Index = 0; Index < 256; Index++) {
-      Sd->mPTTable[Index] = CharC;
-    }
+    SetMem16 (&Sd->mPTTable[0] , sizeof (Sd->mPTTable), CharC);
 
     SetMem (Sd->mPTLen, nn, 0);
 
@@ -418,10 +417,7 @@ ReadCLen (
     CharC = (UINT16) GetBits (Sd, CBIT);
 
     SetMem (Sd->mCLen, NC, 0);
-
-    for (Index = 0; Index < 4096; Index++) {
-      Sd->mCTable[Index] = CharC;
-    }
+    SetMem16 (&Sd->mCTable[0], sizeof (Sd->mCTable), CharC);
 
     return ;
   }
