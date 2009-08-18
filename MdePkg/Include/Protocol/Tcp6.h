@@ -35,7 +35,6 @@
 
 typedef struct _EFI_TCP6_PROTOCOL EFI_TCP6_PROTOCOL;
 
-
 ///
 /// EFI_TCP6_SERVICE_POINT
 ///
@@ -489,7 +488,7 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TCP6_GET_MODE_DATA) (
+(EFIAPI *EFI_TCP6_GET_MODE_DATA)(
   IN  EFI_TCP6_PROTOCOL                  *This,
   OUT EFI_TCP6_CONNECTION_STATE          *Tcp6State OPTIONAL,
   OUT EFI_TCP6_CONFIG_DATA               *Tcp6ConfigData OPTIONAL,
@@ -547,7 +546,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TCP6_CONFIGURE) (
+(EFIAPI *EFI_TCP6_CONFIGURE)(
   IN EFI_TCP6_PROTOCOL        *This,
   IN EFI_TCP6_CONFIG_DATA     *Tcp6ConfigData OPTIONAL
   );
@@ -584,7 +583,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TCP6_CONNECT) (
+(EFIAPI *EFI_TCP6_CONNECT)(
   IN EFI_TCP6_PROTOCOL           *This,
   IN EFI_TCP6_CONNECTION_TOKEN   *ConnectionToken
   );
@@ -626,7 +625,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TCP6_ACCEPT) (
+(EFIAPI *EFI_TCP6_ACCEPT)(
   IN EFI_TCP6_PROTOCOL             *This,
   IN EFI_TCP6_LISTEN_TOKEN         *ListenToken
   );
@@ -670,7 +669,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TCP6_TRANSMIT) (
+(EFIAPI *EFI_TCP6_TRANSMIT)(
   IN EFI_TCP6_PROTOCOL            *This,
   IN EFI_TCP6_IO_TOKEN            *Token
   );
@@ -723,7 +722,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TCP6_RECEIVE) (
+(EFIAPI *EFI_TCP6_RECEIVE)(
   IN EFI_TCP6_PROTOCOL           *This,
   IN EFI_TCP6_IO_TOKEN           *Token
   );
@@ -757,7 +756,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TCP6_CLOSE) (
+(EFIAPI *EFI_TCP6_CLOSE)(
   IN EFI_TCP6_PROTOCOL           *This,
   IN EFI_TCP6_CLOSE_TOKEN        *CloseToken
   );
@@ -799,7 +798,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TCP6_CANCEL) (
+(EFIAPI *EFI_TCP6_CANCEL)(
   IN EFI_TCP6_PROTOCOL           *This,
   IN EFI_TCP6_COMPLETION_TOKEN   *Token OPTIONAL
   );
@@ -823,7 +822,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_TCP6_POLL) (
+(EFIAPI *EFI_TCP6_POLL)(
   IN EFI_TCP6_PROTOCOL        *This
   );
 
@@ -834,7 +833,7 @@ EFI_STATUS
 /// specified port as a service or actively connect to remote peer as a client.
 /// Each instance has its own independent settings. 
 ///
-typedef struct _EFI_TCP6_PROTOCOL {
+struct _EFI_TCP6_PROTOCOL {
   EFI_TCP6_GET_MODE_DATA  GetModeData;
   EFI_TCP6_CONFIGURE      Configure;
   EFI_TCP6_CONNECT        Connect;
@@ -844,7 +843,7 @@ typedef struct _EFI_TCP6_PROTOCOL {
   EFI_TCP6_CLOSE          Close;
   EFI_TCP6_CANCEL         Cancel;
   EFI_TCP6_POLL           Poll;
-} EFI_TCP6_PROTOCOL;
+};
 
 extern EFI_GUID gEfiTcp6ServiceBindingProtocolGuid;
 extern EFI_GUID gEfiTcp6ProtocolGuid;

@@ -531,7 +531,7 @@ typedef struct {
 **/
 typedef 
 EFI_STATUS
-(EFIAPI *EFI_IP6_GET_MODE_DATA) (
+(EFIAPI *EFI_IP6_GET_MODE_DATA)(
   IN EFI_IP6_PROTOCOL                 *This,
   OUT EFI_IP6_MODE_DATA               *Ip6ModeData     OPTIONAL,
   OUT EFI_MANAGED_NETWORK_CONFIG_DATA *MnpConfigData   OPTIONAL,
@@ -586,7 +586,7 @@ EFI_STATUS
 **/
 typedef 
 EFI_STATUS
-(EFIAPI *EFI_IP6_CONFIGURE) (
+(EFIAPI *EFI_IP6_CONFIGURE)(
   IN EFI_IP6_PROTOCOL            *This,
   IN EFI_IP6_CONFIG_DATA         *Ip6ConfigData OPTIONAL
   );
@@ -623,7 +623,7 @@ EFI_STATUS
 **/
 typedef 
 EFI_STATUS
-(EFIAPI *EFI_IP6_GROUPS) (
+(EFIAPI *EFI_IP6_GROUPS)(
   IN EFI_IP6_PROTOCOL            *This,
   IN BOOLEAN                     JoinFlag,
   IN EFI_IPv6_ADDRESS            *GroupAddress  OPTIONAL
@@ -672,10 +672,10 @@ EFI_STATUS
 **/
 typedef 
 EFI_STATUS
-(EFIAPI *EFI_IP6_ROUTES) (
+(EFIAPI *EFI_IP6_ROUTES)(
   IN EFI_IP6_PROTOCOL            *This,
   IN BOOLEAN                     DeleteRoute,
-  IN EFI_IPv6_ADDRESS            *Destination, OPTIONAL
+  IN EFI_IPv6_ADDRESS            *Destination OPTIONAL,
   IN UINT8                       PrefixLength,
   IN EFI_IPv6_ADDRESS            *GatewayAddress OPTIONAL 
   );
@@ -728,7 +728,7 @@ EFI_STATUS
 **/
 typedef 
 EFI_STATUS
-(EFIAPI *EFI_IP6_NEIGHBORS) (
+(EFIAPI *EFI_IP6_NEIGHBORS)(
   IN EFI_IP6_PROTOCOL            *This,
   IN BOOLEAN                     DeleteFlag,
   IN EFI_IPv6_ADDRESS            *TargetIp6Address,
@@ -781,7 +781,7 @@ EFI_STATUS
 **/
 typedef 
 EFI_STATUS
-(EFIAPI *EFI_IP6_TRANSMIT) (
+(EFIAPI *EFI_IP6_TRANSMIT)(
   IN EFI_IP6_PROTOCOL            *This,
   IN EFI_IP6_COMPLETION_TOKEN    *Token
   );
@@ -819,7 +819,7 @@ EFI_STATUS
 **/                              
 typedef                          
 EFI_STATUS                       
-(EFIAPI *EFI_IP6_RECEIVE) (      
+(EFIAPI *EFI_IP6_RECEIVE)(      
   IN EFI_IP6_PROTOCOL            *This,
   IN EFI_IP6_COMPLETION_TOKEN    *Token
   );
@@ -886,7 +886,7 @@ EFI_STATUS
 **/
 typedef 
 EFI_STATUS
-(EFIAPI *EFI_IP6_POLL) (
+(EFIAPI *EFI_IP6_POLL)(
   IN EFI_IP6_PROTOCOL            *This
   );
 
@@ -894,7 +894,7 @@ EFI_STATUS
 /// The EFI IPv6 Protocol implements a simple packet-oriented interface that can be
 /// used by drivers, daemons, and applications to transmit and receive network packets.
 ///
-typedef struct _EFI_IP6_PROTOCOL {
+struct _EFI_IP6_PROTOCOL {
   EFI_IP6_GET_MODE_DATA   GetModeData;
   EFI_IP6_CONFIGURE       Configure;
   EFI_IP6_GROUPS          Groups;
@@ -904,7 +904,7 @@ typedef struct _EFI_IP6_PROTOCOL {
   EFI_IP6_RECEIVE         Receive;
   EFI_IP6_CANCEL          Cancel;
   EFI_IP6_POLL            Poll;
-} EFI_IP6_PROTOCOL;
+};
 
 extern EFI_GUID gEfiIp6ServiceBindingProtocolGuid;
 extern EFI_GUID gEfiIp6ProtocolGuid;
