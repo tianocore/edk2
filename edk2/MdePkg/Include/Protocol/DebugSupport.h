@@ -5,7 +5,8 @@
   The DebugSupport protocol is used by source level debuggers to abstract the
   processor and handle context save and restore operations.
 
-  Copyright (c) 2006 - 2009, Intel Corporation                                                         
+  Copyright (c) 2006 - 2009, Intel Corporation<BR>       
+  Portions Copyright (c) 2008-2009 Apple Inc.<BR>
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -471,6 +472,52 @@ typedef struct {
   UINT64  Ip;
 } EFI_SYSTEM_CONTEXT_EBC;
 
+
+
+///
+///  ARM processor exception types
+///
+#define EXCEPT_ARM_RESET                    0
+#define EXCEPT_ARM_UNDEFINED_INSTRUCTION    1
+#define EXCEPT_ARM_SOFTWARE_INTERRUPT       2
+#define EXCEPT_ARM_PREFETCH_ABORT           3
+#define EXCEPT_ARM_DATA_ABORT               4
+#define EXCEPT_ARM_RESERVED                 5
+#define EXCEPT_ARM_IRQ                      6
+#define EXCEPT_ARM_FIQ                      7
+
+///
+/// For coding convenience, define the maximum valid ARM exception.
+///
+#define MAX_ARM_EXCEPTION EXCEPT_ARM_FIQ
+
+///
+///  ARM processor context definition
+///
+typedef struct {
+  UINT32  R0;
+  UINT32  R1;
+  UINT32  R2;
+  UINT32  R3;
+  UINT32  R4;
+  UINT32  R5;
+  UINT32  R6;
+  UINT32  R7;
+  UINT32  R8;
+  UINT32  R9;
+  UINT32  R10;
+  UINT32  R11;
+  UINT32  R12;
+  UINT32  SP;
+  UINT32  LR;
+  UINT32  PC;
+  UINT32  CPSR;
+  UINT32  DFSR;
+  UINT32  DFAR;
+  UINT32  IFSR;
+  UINT32  IFAR;
+} EFI_SYSTEM_CONTEXT_ARM;
+
 ///
 /// Universal EFI_SYSTEM_CONTEXT definition
 ///
@@ -479,6 +526,7 @@ typedef union {
   EFI_SYSTEM_CONTEXT_IA32 *SystemContextIa32;
   EFI_SYSTEM_CONTEXT_X64  *SystemContextX64;
   EFI_SYSTEM_CONTEXT_IPF  *SystemContextIpf;
+  EFI_SYSTEM_CONTEXT_ARM  *SystemContextArm;
 } EFI_SYSTEM_CONTEXT;
 
 //
@@ -515,10 +563,11 @@ VOID
 /// Machine type definition
 ///
 typedef enum {
-  IsaIa32 = IMAGE_FILE_MACHINE_I386,  ///< 0x014C
-  IsaX64  = IMAGE_FILE_MACHINE_X64,   ///< 0x8664
-  IsaIpf  = IMAGE_FILE_MACHINE_IA64,  ///< 0x0200
-  IsaEbc  = IMAGE_FILE_MACHINE_EBC    ///< 0x0EBC
+  IsaIa32 = IMAGE_FILE_MACHINE_I386,           ///< 0x014C
+  IsaX64  = IMAGE_FILE_MACHINE_X64,            ///< 0x8664
+  IsaIpf  = IMAGE_FILE_MACHINE_IA64,           ///< 0x0200
+  IsaEbc  = IMAGE_FILE_MACHINE_EBC,            ///< 0x0EBC
+  IsaArm  = IMAGE_FILE_MACHINE_ARMTHUMB_MIXED  ///< 0x01c2
 } EFI_INSTRUCTION_SET_ARCHITECTURE;
 
 
