@@ -3,6 +3,7 @@
   loaded into memory or is executing at it's linked address.
 
   Copyright (c) 2006 - 2008, Intel Corporation<BR>
+  Portions Copyright (c) 2008-2009 Apple Inc.<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -255,6 +256,8 @@ PeCoffLoaderGetPdbPointer (
           return (VOID *) ((CHAR8 *)CodeViewEntryPointer + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY));
         case CODEVIEW_SIGNATURE_RSDS:
           return (VOID *) ((CHAR8 *)CodeViewEntryPointer + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_RSDS_ENTRY));
+        case CODEVIEW_SIGNATURE_MTOC:
+          return (VOID *) ((CHAR8 *)CodeViewEntryPointer + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_MTOC_ENTRY));
         default:
           break;
         }
