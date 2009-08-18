@@ -1,7 +1,8 @@
 #/** @file
 #  Base Synchronization Library implementation.
 #
-#  Copyright (c) 2007 - 2008, Intel Corporation.
+#  Copyright (c) 2007 - 2008, Intel Corporation.<BR>
+#  Portions Copyright (c) 2008-2009 Apple Inc.<BR>
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -22,12 +23,12 @@
   LIBRARY_CLASS                  = SynchronizationLib
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC ARM
 #
 [Sources.Common]
   BaseSynchronizationLibInternals.h
 
-[Sources.Ia32]
+[Sources.IA32]
   Ia32/InterlockedCompareExchange64.c | MSFT 
   Ia32/InterlockedCompareExchange32.c | MSFT 
   Ia32/InterlockedDecrement.c | MSFT 
@@ -79,6 +80,10 @@
 [Sources.EBC]
   Synchronization.c
   Ebc/Synchronization.c
+
+[Sources.ARM]
+  Synchronization.c
+  Arm/Synchronization.c
 
 [Packages]
   MdePkg/MdePkg.dec
