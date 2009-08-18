@@ -806,6 +806,9 @@
   ## Include/Protocol/HiiPackageList.h
   gEfiHiiPackageListProtocolGuid  = { 0x6a1ee763, 0xd47a, 0x43b4, {0xaa, 0xbe, 0xef, 0x1d, 0xe2, 0xab, 0x56, 0xfc}}
 
+  ## Include/Protocol/Smbios.h
+  gEfiSmbiosProtocolGuid          = {0x3583ff6, 0xcb36, 0x4940, {0x94, 0x7e, 0xb9, 0xb3, 0x9f, 0x4a, 0xfa, 0xf7}}
+  
 [PcdsFeatureFlag]
   ## If TRUE, the component name protocol will not be installed.
   gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable|FALSE|BOOLEAN|0x0000000d
