@@ -63,6 +63,7 @@ UpdateCapsule (
   UINTN                     ArrayNumber;
   EFI_STATUS                Status;
   EFI_CAPSULE_HEADER        *CapsuleHeader;
+  BOOLEAN                   NeedReset;
   
   //
   // Capsule Count can't be less than one.
@@ -70,8 +71,8 @@ UpdateCapsule (
   if (CapsuleCount < 1) {
     return EFI_INVALID_PARAMETER;
   }
-
-  CapsuleHeader   = NULL;
+  NeedReset     = FALSE;
+  CapsuleHeader = NULL;
 
   for (ArrayNumber = 0; ArrayNumber < CapsuleCount; ArrayNumber++) {
     //
@@ -92,71 +93,66 @@ UpdateCapsule (
   }
 
   //
-  // Assume that capsules have the same flags on reseting or not.
+  // Walk through all capsules, record whether there is a capsule 
+  // needs reset. And then process capsules which has no reset flag directly.
   //
-  CapsuleHeader = CapsuleHeaderArray[0];
-  
-  //
-  //  Process across reset capsule image.
-  //
-  if ((CapsuleHeader->Flags & CAPSULE_FLAGS_PERSIST_ACROSS_RESET) != 0) {
+  for (ArrayNumber = 0; ArrayNumber < CapsuleCount ; ArrayNumber++) {
+    CapsuleHeader = CapsuleHeaderArray[ArrayNumber];
     //
-    // Check if the platform supports update capsule across a system reset
+    // Here should be in the boot-time for non-reset capsule image
+    // Platform specific update for the non-reset capsule image.
     //
-    if (!FeaturePcdGet(PcdSupportUpdateCapsuleReset)) {
-      return EFI_UNSUPPORTED;
-    }
-    //
-    // ScatterGatherList is only referenced if the capsules are defined to persist across
-    // system reset. 
-    //
-    if (ScatterGatherList == (EFI_PHYSICAL_ADDRESS) (UINTN) NULL) {
-      return EFI_INVALID_PARAMETER;
-    } else {
-      //
-      // ScatterGatherList is only referenced if the capsules are defined to persist across
-      // system reset. Set its value into NV storage to let pre-boot driver to pick it up 
-      // after coming through a system reset.
-      //
-      Status = gRT->SetVariable (
-                     EFI_CAPSULE_VARIABLE_NAME,
-                     &gEfiCapsuleVendorGuid,
-                     EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                     sizeof (UINTN),
-                     (VOID *) &ScatterGatherList
-                     );
-      if (Status != EFI_SUCCESS) {
+    if ((CapsuleHeader->Flags & CAPSULE_FLAGS_PERSIST_ACROSS_RESET) == 0) {
+      if (EfiAtRuntime ()) { 
+        Status = EFI_UNSUPPORTED;
+      } else {
+        Status = ProcessCapsuleImage(CapsuleHeader);
+      }
+      if (EFI_ERROR(Status)) {
         return Status;
       }
-      //
-      // Successfully set the capsule image address into EFI variable.
-      //
-      return EFI_SUCCESS;
+    } else {
+      NeedReset = TRUE;
     }
+  }
+  
+  //
+  // After launching all capsules who has no reset flag, if no more capsules claims
+  // for a system reset just return.
+  //
+  if (!NeedReset) {
+    return EFI_SUCCESS;
   }
 
   //
-  // Process the non-reset capsule image.
+  // ScatterGatherList is only referenced if the capsules are defined to persist across
+  // system reset. 
   //
-  if (EfiAtRuntime ()) {
-    //
-    // Runtime mode doesn't support the non-reset capsule image.
-    //
+  if (ScatterGatherList == (EFI_PHYSICAL_ADDRESS) (UINTN) NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Check if the platform supports update capsule across a system reset
+  //
+  if (!FeaturePcdGet(PcdSupportUpdateCapsuleReset)) {
     return EFI_UNSUPPORTED;
   }
 
   //
-  // Here should be in the boot-time for non-reset capsule image
-  // Platform specific update for the non-reset capsule image.
+  // ScatterGatherList is only referenced if the capsules are defined to persist across
+  // system reset. Set its value into NV storage to let pre-boot driver to pick it up 
+  // after coming through a system reset.
   //
-  for (ArrayNumber = 0; ArrayNumber < CapsuleCount; ArrayNumber++) {
-    Status = ProcessCapsuleImage (CapsuleHeaderArray[ArrayNumber]);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-  }
+  Status = gRT->SetVariable (
+                 EFI_CAPSULE_VARIABLE_NAME,
+                 &gEfiCapsuleVendorGuid,
+                 EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                 sizeof (UINTN),
+                 (VOID *) &ScatterGatherList
+                 );
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
