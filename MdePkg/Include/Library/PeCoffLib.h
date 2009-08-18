@@ -5,7 +5,8 @@
   IA-32, x86, IPF, and EBC processor types. The library functions are memory-based 
   and can be ported easily to any environment.
   
-Copyright (c) 2006 - 2008, Intel Corporation                                                         
+Copyright (c) 2006 - 2008, Intel Corporation<BR>       
+Portions Copyright (c) 2008-2009 Apple Inc.<BR>
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -191,6 +192,10 @@ typedef struct {
   /// otherwise, the entry remains to be 0.
   ///
   PHYSICAL_ADDRESS                  HiiResourceData;
+  ///
+  /// Private storage for implementation specific data. 
+  ///
+  UINT64                            Context;      
 } PE_COFF_LOADER_IMAGE_CONTEXT;
 
 /**
