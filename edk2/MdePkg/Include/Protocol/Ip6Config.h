@@ -246,7 +246,7 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_IP6_CONFIG_SET_DATA) (
+(EFIAPI *EFI_IP6_CONFIG_SET_DATA)(
   IN EFI_IP6_CONFIG_PROTOCOL    *This,
   IN EFI_IP6_CONFIG_DATA_TYPE   DataType,
   IN UINTN                      DataSize,
@@ -292,7 +292,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_IP6_CONFIG_GET_DATA) (
+(EFIAPI *EFI_IP6_CONFIG_GET_DATA)(
   IN EFI_IP6_CONFIG_PROTOCOL    *This,
   IN EFI_IP6_CONFIG_DATA_TYPE   DataType,
   IN OUT UINTN                  *DataSize,
@@ -323,7 +323,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_IP6_CONFIG_REGISTER_NOTIFY) (
+(EFIAPI *EFI_IP6_CONFIG_REGISTER_NOTIFY)(
   IN EFI_IP6_CONFIG_PROTOCOL    *This,
   IN EFI_IP6_CONFIG_DATA_TYPE   DataType,
   IN EFI_EVENT                  Event
@@ -346,7 +346,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_IP6_CONFIG_UNREGISTER_NOTIFY) (
+(EFIAPI *EFI_IP6_CONFIG_UNREGISTER_NOTIFY)(
   IN EFI_IP6_CONFIG_PROTOCOL    *This,
   IN EFI_IP6_CONFIG_DATA_TYPE   DataType,
   IN EFI_EVENT                  Event
@@ -356,12 +356,12 @@ EFI_STATUS
 /// The EFI_IP6_CONFIG_PROTOCOL provides the mechanism to set and get various
 /// types of configurations for the EFI IPv6 network stack.
 ///
-typedef struct _EFI_IP6_CONFIG_PROTOCOL {
+struct _EFI_IP6_CONFIG_PROTOCOL {
   EFI_IP6_CONFIG_SET_DATA           SetData;
   EFI_IP6_CONFIG_GET_DATA           GetData;
   EFI_IP6_CONFIG_REGISTER_NOTIFY    RegisterDataNotify;
   EFI_IP6_CONFIG_UNREGISTER_NOTIFY  UnregisterDataNotify;
-} EFI_IP6_CONFIG_PROTOCOL;
+};
 
 extern EFI_GUID gEfiIp6ConfigProtocolGuid;
 
