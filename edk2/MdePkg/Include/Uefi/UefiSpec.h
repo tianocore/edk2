@@ -5,7 +5,8 @@
   If a code construct is defined in the UEFI 2.1 specification it must be included
   by this include file.
 
-  Copyright (c) 2006 - 2008, Intel Corporation
+  Copyright (c) 2006 - 2008, Intel Corporation<BR>
+  Portions Copyright (c) 2008-2009 Apple Inc.<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -2055,6 +2056,7 @@ typedef struct {
 #define EFI_REMOVABLE_MEDIA_FILE_NAME_IA32    L"\\EFI\\BOOT\\BOOTIA32.EFI"
 #define EFI_REMOVABLE_MEDIA_FILE_NAME_IA64    L"\\EFI\\BOOT\\BOOTIA64.EFI"
 #define EFI_REMOVABLE_MEDIA_FILE_NAME_X64     L"\\EFI\\BOOT\\BOOTX64.EFI"
+#define EFI_REMOVABLE_MEDIA_FILE_NAME_ARM     L"\\EFI\\BOOT\\BOOTARM.EFI"
 
 #if   defined (MDE_CPU_IA32)
   #define EFI_REMOVABLE_MEDIA_FILE_NAME   EFI_REMOVABLE_MEDIA_FILE_NAME_IA32
@@ -2063,6 +2065,8 @@ typedef struct {
 #elif defined (MDE_CPU_X64)
   #define EFI_REMOVABLE_MEDIA_FILE_NAME   EFI_REMOVABLE_MEDIA_FILE_NAME_X64
 #elif defined (MDE_CPU_EBC)
+#elif defined (MDE_CPU_ARM)
+  #define EFI_REMOVABLE_MEDIA_FILE_NAME   EFI_REMOVABLE_MEDIA_FILE_NAME_ARM
 #else
   #error Unknown Processor Type
 #endif
