@@ -149,7 +149,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_SMBIOS_ADD)(
   IN CONST      EFI_SMBIOS_PROTOCOL     *This,
-  IN            EFI_HANDLE              ProducerHandle, OPTIONAL
+  IN            EFI_HANDLE              ProducerHandle OPTIONAL,
   IN OUT        EFI_SMBIOS_HANDLE       *SmbiosHandle,
   IN            EFI_SMBIOS_TABLE_HEADER *Record
 );
@@ -224,9 +224,9 @@ EFI_STATUS
 (EFIAPI *EFI_SMBIOS_GET_NEXT)(
    IN     CONST EFI_SMBIOS_PROTOCOL     *This,
    IN OUT       EFI_SMBIOS_HANDLE       *SmbiosHandle,
-   IN           EFI_SMBIOS_TYPE         *Type,              OPTIONAL
+   IN           EFI_SMBIOS_TYPE         *Type              OPTIONAL,
    OUT          EFI_SMBIOS_TABLE_HEADER **Record,
-   OUT          EFI_HANDLE              *ProducerHandle     OPTIONAL
+   OUT          EFI_HANDLE              *ProducerHandle    OPTIONAL
 );
 
 struct _EFI_SMBIOS_PROTOCOL {
