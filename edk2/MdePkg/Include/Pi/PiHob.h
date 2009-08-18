@@ -403,6 +403,28 @@ typedef struct {
 } EFI_HOB_MEMORY_POOL;
 
 ///
+/// Each UEFI capsule HOB details the location of a UEFI capsule. It includes a base address and length
+/// which is based upon memory blocks with a EFI_CAPSULE_HEADER and the associated
+/// CapsuleImageSize-based payloads. These HOB’s shall be created by the PEI PI firmware
+/// sometime after the UEFI UpdateCapsule service invocation with the
+/// CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE flag set in the EFI_CAPSULE_HEADER.
+///
+typedef struct {
+  ///
+  /// The HOB generic header where Header.HobType = EFI_HOB_TYPE_UEFI_CAPSULE.
+  ///
+  EFI_HOB_GENERIC_HEADER Header;
+  
+  ///
+  /// The physical memory-mapped base address of an UEFI capsule. This value is set to
+  /// point to the base of the contiguous memory of the UEFI capsule.
+  /// The length of the contiguous memory in bytes
+  ///
+  EFI_PHYSICAL_ADDRESS   BaseAddress;
+  UINT64                 Length;
+} EFI_HOB_UEFI_CAPSULE;
+
+///
 /// Union of all the possible HOB Types
 ///
 typedef union {
@@ -418,6 +440,7 @@ typedef union {
   EFI_HOB_FIRMWARE_VOLUME2            *FirmwareVolume2;
   EFI_HOB_CPU                         *Cpu;
   EFI_HOB_MEMORY_POOL                 *Pool;
+  EFI_HOB_UEFI_CAPSULE                *Capsule;
   UINT8                               *Raw;
 } EFI_PEI_HOB_POINTERS;
 
