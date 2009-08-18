@@ -2,6 +2,7 @@
   Base Print Library instance implementation.
 
   Copyright (c) 2006 - 2008, Intel Corporation<BR>
+  Portions Copyright (c) 2008-2009 Apple Inc.<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -13,6 +14,14 @@
 **/
 
 #include "PrintLibInternal.h"
+
+//
+// Declare a VA_LIST global variable that is used in calls to BasePrintLibSPrintMarker()
+// when the BASE_LIST parameter is valid and the VA_LIST parameter is ignored.  
+// A NULL VA_LIST can not be passed into  BasePrintLibSPrintMarker() because some 
+// compilers define VA_LIST to be a structure.
+//
+VA_LIST gNullVaList;
 
 #define ASSERT_UNICODE_BUFFER(Buffer) ASSERT ((((UINTN) (Buffer)) & 0x01) == 0)
 
@@ -109,7 +118,7 @@ UnicodeBSPrint (
 {
   ASSERT_UNICODE_BUFFER (StartOfBuffer);
   ASSERT_UNICODE_BUFFER (FormatString);
-  return BasePrintLibSPrintMarker ((CHAR8 *)StartOfBuffer, BufferSize >> 1, FORMAT_UNICODE | OUTPUT_UNICODE, (CHAR8 *)FormatString, NULL, Marker);
+  return BasePrintLibSPrintMarker ((CHAR8 *)StartOfBuffer, BufferSize >> 1, FORMAT_UNICODE | OUTPUT_UNICODE, (CHAR8 *)FormatString, gNullVaList, Marker);
 }
 
 /**
@@ -250,7 +259,7 @@ UnicodeBSPrintAsciiFormat (
   )
 {
   ASSERT_UNICODE_BUFFER (StartOfBuffer);
-  return BasePrintLibSPrintMarker ((CHAR8 *)StartOfBuffer, BufferSize >> 1, OUTPUT_UNICODE, FormatString, NULL, Marker);
+  return BasePrintLibSPrintMarker ((CHAR8 *)StartOfBuffer, BufferSize >> 1, OUTPUT_UNICODE, FormatString, gNullVaList, Marker);
 }
 
 /**
@@ -441,7 +450,7 @@ AsciiBSPrint (
   IN  BASE_LIST     Marker
   )
 {
-  return BasePrintLibSPrintMarker (StartOfBuffer, BufferSize, 0, FormatString, NULL, Marker);
+  return BasePrintLibSPrintMarker (StartOfBuffer, BufferSize, 0, FormatString, gNullVaList, Marker);
 }
 
 /**
@@ -581,7 +590,7 @@ AsciiBSPrintUnicodeFormat (
   )
 {
   ASSERT_UNICODE_BUFFER (FormatString);
-  return BasePrintLibSPrintMarker (StartOfBuffer, BufferSize, FORMAT_UNICODE, (CHAR8 *)FormatString, NULL, Marker);
+  return BasePrintLibSPrintMarker (StartOfBuffer, BufferSize, FORMAT_UNICODE, (CHAR8 *)FormatString, gNullVaList, Marker);
 }
 
 /**
