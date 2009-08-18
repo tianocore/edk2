@@ -7,7 +7,8 @@
   Common Object File Format Specification, Revision 8.0 - May 16, 2006. 
   This file also includes some definitions in PI Specification, Revision 1.0.
 
-  Copyright (c) 2006 - 2009, Intel Corporation
+  Copyright (c) 2006 - 2009, Intel Corporation<BR>
+  Portions Copyright (c) 2008-2009 Apple Inc.<BR>
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -33,10 +34,11 @@
 //
 // PE32+ Machine type for EFI images
 //
-#define IMAGE_FILE_MACHINE_I386     0x014c
-#define IMAGE_FILE_MACHINE_IA64     0x0200
-#define IMAGE_FILE_MACHINE_EBC      0x0EBC
-#define IMAGE_FILE_MACHINE_X64      0x8664
+#define IMAGE_FILE_MACHINE_I386            0x014c
+#define IMAGE_FILE_MACHINE_IA64            0x0200
+#define IMAGE_FILE_MACHINE_EBC             0x0EBC
+#define IMAGE_FILE_MACHINE_X64             0x8664
+#define IMAGE_FILE_MACHINE_ARMTHUMB_MIXED  0x01c2
 
 //
 // EXE file formats
@@ -640,6 +642,19 @@ typedef struct {
   // Filename of .PDB goes here
   //
 } EFI_IMAGE_DEBUG_CODEVIEW_RSDS_ENTRY;
+
+
+///
+/// Debug Data Structure defined by Apple Mach-O to Coff utility
+///
+#define CODEVIEW_SIGNATURE_MTOC  SIGNATURE_32('M', 'T', 'O', 'C')
+typedef struct {
+  UINT32    Signature;                       ///< "MTOC"
+  GUID      MachOUuid;
+  //
+  //  Filename of .DLL (Mach-O with debug info) goes here
+  //
+} EFI_IMAGE_DEBUG_CODEVIEW_MTOC_ENTRY;
 
 ///
 /// Resource format.
