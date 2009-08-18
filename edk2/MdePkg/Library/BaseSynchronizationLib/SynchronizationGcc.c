@@ -2,6 +2,7 @@
   Implementation of synchronization functions.
 
   Copyright (c) 2006 - 2008, Intel Corporation<BR>
+  Portions Copyright (c) 2008-2009 Apple Inc.<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -17,7 +18,7 @@
 //
 // GCC inline assembly for Read Write Barrier  
 //
-#define _ReadWriteBarrier() do { asm volatile ("": : : "memory"); } while(0)
+#define _ReadWriteBarrier() do { __asm__ __volatile__ ("": : : "memory"); } while(0)
 
 #define SPIN_LOCK_RELEASED          ((UINTN) 1)
 #define SPIN_LOCK_ACQUIRED          ((UINTN) 2)
