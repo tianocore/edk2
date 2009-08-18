@@ -564,6 +564,5 @@ struct _EFI_UDP6_PROTOCOL {
 
 extern EFI_GUID gEfiUdp6ServiceBindingProtocolGuid;
 extern EFI_GUID gEfiUdp6ProtocolGuid;
-extern EFI_GUID gEfiUdp6RegistryDataGuid;
 
 #endif
