@@ -7,6 +7,7 @@
   be used to implement base modules.
 
 Copyright (c) 2006 - 2008, Intel Corporation<BR>
+Portions Copyright (c) 2008-2009 Apple Inc.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -25,6 +26,64 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // Include processor specific binding
 //
 #include <ProcessorBind.h>
+
+//
+// The Microsoft* C compiler can removed references to unreferenced data items
+//  if the /OPT:REF linker option is used. We defined a macro as this is a 
+//  a non standard extension
+//
+#if defined(_MSC_EXTENSIONS)
+  ///
+  /// Remove global variable from the linked image if there are no references to 
+  /// it after all compiler and linker optimizations have been performed.
+  ///
+  ///
+  #define GLOBAL_REMOVE_IF_UNREFERENCED __declspec(selectany)
+#else
+  ///
+  /// Remove global variable from the linked image if there are no references to 
+  /// it after all compiler and linker optimizations have been performed.
+  ///
+  ///
+  #define GLOBAL_REMOVE_IF_UNREFERENCED
+#endif
+
+//
+// For symbol name in GNU assembly code, an extra "_" is necessary
+//
+#if defined(__GNUC__)
+  ///
+  /// Private worker functions for ASM_PFX()
+  ///
+  #define _CONCATENATE(a, b)  __CONCATENATE(a, b)
+  #define __CONCATENATE(a, b) a ## b
+
+  ///
+  /// The __USER_LABEL_PREFIX__ macro predefined by GNUC represents the prefix
+  /// on symbols in assembly language.
+  ///
+  #define ASM_PFX(name) _CONCATENATE (__USER_LABEL_PREFIX__, name)
+#endif
+
+#if __APPLE__
+  //
+  // Apple extension that is used by the linker to optimize code size 
+  // with assembly functions. Put at the end of your .S files
+  //
+  #define ASM_FUNCTION_REMOVE_IF_UNREFERENCED  .subsections_via_symbols
+#else
+  #define ASM_FUNCTION_REMOVE_IF_UNREFERENCED
+#endif
+
+#ifdef __CC_ARM
+  //
+  // Older RVCT ARM compilers don't fully support #pragma pack and require __packed 
+  // as a prefix for the structure.
+  //
+  #define PACKED  __packed
+#else
+  #define PACKED
+#endif
 
 ///
 /// 128 bit buffer containing a unique identifier value.  
@@ -342,10 +401,38 @@ struct _LIST_ENTRY {
 **/
 #define _INT_SIZE_OF(n) ((sizeof (n) + sizeof (UINTN) - 1) &~(sizeof (UINTN) - 1))
 
-#if defined(__GNUC__)
+#if defined(__CC_ARM)
+//
+// RVCT ARM variable argument list support.
+//
+
+///
+/// Variable used to traverse the list of arguments. This type can vary by 
+/// implementation and could be an array or structure. 
+///
+#ifdef __APCS_ADSABI
+  typedef int         *va_list[1];
+  #define VA_LIST     va_list
+#else
+  typedef struct __va_list { void *__ap; } va_list;
+  #define VA_LIST                          va_list
+#endif
+
+#define VA_START(Marker, Parameter)   __va_start(Marker, Parameter)
+
+#define VA_ARG(Marker, TYPE)          __va_arg(Marker, TYPE)
+
+#define VA_END(Marker)                ((void)0)
+
+#elif defined(__GNUC__)
 //
 // Use GCC built-in macros for variable argument lists.
 //
+
+///
+/// Variable used to traverse the list of arguments. This type can vary by 
+/// implementation and could be an array or structure. 
+///
 typedef __builtin_va_list VA_LIST;
 
 #define VA_START(Marker, Parameter)  __builtin_va_start (Marker, Parameter)
@@ -356,7 +443,8 @@ typedef __builtin_va_list VA_LIST;
 
 #else
 ///
-/// Pointer to the start of a variable argument list. Same as CHAR8 *.
+/// Variable used to traverse the list of arguments. This type can vary by 
+/// implementation and could be an array or structure. 
 ///
 typedef CHAR8 *VA_LIST;
 
@@ -368,7 +456,7 @@ typedef CHAR8 *VA_LIST;
   list that immediately follows Parameter.  The method for computing the pointer to the 
   next argument in the argument list is CPU specific following the EFIAPI ABI.
 
-  @param   Marker       Pointer to the beginning of the variable argument list.
+  @param   Marker       VA_LIST used to traverse the list of arguments.
   @param   Parameter    The name of the parameter that immediately precedes 
                         the variable argument list.
   
@@ -386,7 +474,7 @@ typedef CHAR8 *VA_LIST;
   to the next argument in the variable argument list.  The method for computing the 
   pointer to the next argument in the argument list is CPU specific following the EFIAPI ABI.
 
-  @param   Marker   Pointer to the beginning of a variable argument list.
+  @param   Marker   VA_LIST used to traverse the list of arguments.
   @param   TYPE     The type of argument to retrieve from the beginning 
                     of the variable argument list.
   
@@ -402,7 +490,7 @@ typedef CHAR8 *VA_LIST;
   After this macro is used, the only way to access the variable argument list again is 
   by using VA_START() again.
 
-  @param   Marker   The variable to set to the beginning of the variable argument list.
+  @param   Marker   VA_LIST used to traverse the list of arguments.
   
 **/
 #define VA_END(Marker)      (Marker = (VA_LIST) 0)
