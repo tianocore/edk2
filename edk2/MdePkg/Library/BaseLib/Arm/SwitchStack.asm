@@ -11,11 +11,11 @@
 ; WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ;
 ;------------------------------------------------------------------------------
-	
+  
     EXPORT InternalSwitchStackAsm
             
     AREA   Switch_Stack, CODE, READONLY
-	
+  
 ;/**
 ;  This allows the caller to switch the stack and goes to the new entry point
 ;

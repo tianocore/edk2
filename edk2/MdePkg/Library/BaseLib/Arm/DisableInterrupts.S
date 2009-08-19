@@ -30,6 +30,6 @@
 #
 ASM_PFX(DisableInterrupts):
     mrs  R0,CPSR
-    orr  R0,R0,#0x80		@Disable IRQ interrupts
+    orr  R0,R0,#0x80    @Disable IRQ interrupts
     msr  CPSR_c,R0
     bx   LR

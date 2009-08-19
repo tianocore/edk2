@@ -258,7 +258,7 @@ EFI_STATUS
                                   was not found. Progress points to the
                                   'G' in "GUID" of the errant routing
                                   data. 
-  @retval EFI_DEVICE_ERROR 				Block not large enough. Progress undefined.
+  @retval EFI_DEVICE_ERROR        Block not large enough. Progress undefined.
 
   @retval EFI_INVALID_PARAMETER   Encountered non <BlockName>
                                   formatted string. Block is
