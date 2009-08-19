@@ -1510,6 +1510,38 @@ DevPathToTextFvFile (
 }
 
 /**
+  Converts a Relative Offset device path structure to its string representative.
+
+  @param Str             The string representative of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
+VOID
+DevPathRelativeOffsetRange (
+  IN OUT POOL_PRINT       *Str,
+  IN VOID                 *DevPath,
+  IN BOOLEAN              DisplayOnly,
+  IN BOOLEAN              AllowShortcuts
+  )
+{
+  MEDIA_RELATIVE_OFFSET_RANGE_DEVICE_PATH *Offset;
+
+  Offset = DevPath;
+  CatPrint (
+    Str,
+    L"Offset(%lx,%lx)",
+    Offset->StartingOffset,
+    Offset->EndingOffset
+    );
+}
+
+/**
   Converts a BIOS Boot Specification device path structure to its string representative.
 
   @param Str             The string representative of input device.
@@ -1659,6 +1691,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED const DEVICE_PATH_TO_TEXT_TABLE DevPathToTextTable
   {MEDIA_DEVICE_PATH, MEDIA_FILEPATH_DP, DevPathToTextFilePath},
   {MEDIA_DEVICE_PATH, MEDIA_PIWG_FW_VOL_DP, DevPathToTextFv},
   {MEDIA_DEVICE_PATH, MEDIA_PIWG_FW_FILE_DP, DevPathToTextFvFile},
+  {MEDIA_DEVICE_PATH, MEDIA_RELATIVE_OFFSET_RANGE_DP, DevPathRelativeOffsetRange},
   {BBS_DEVICE_PATH, BBS_BBS_DP, DevPathToTextBBS},
   {END_DEVICE_PATH_TYPE, END_INSTANCE_DEVICE_PATH_SUBTYPE, DevPathToTextEndInstance},
   {0, 0, NULL}
