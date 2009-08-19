@@ -18,7 +18,6 @@
 #ifndef __EFI_TCP6_PROTOCOL_H__
 #define __EFI_TCP6_PROTOCOL_H__
 
-#include <Protocol/Snp.h>
 #include <Protocol/ManagedNetwork.h>
 #include <Protocol/Ip6.h>
 
