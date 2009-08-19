@@ -203,7 +203,7 @@ typedef EFI_PCI_EXECUTION_PHASE EFI_PCI_CHIPSET_EXECUTION_PHASE;
   @param[in] This           Pointer to the EFI_PCI_PLATFORM_PROTOCOL instance.
   @param[in] HostBridge     The handle of the host bridge controller.
   @param[in] Phase          The phase of the PCI bus enumeration.
-  @param[in] ChipsetPhase   Defines the execution phase of the PCI chipset driver.
+  @param[in] ExecPhase      Defines the execution phase of the PCI chipset driver.
 
   @retval EFI_SUCCESS   The function completed successfully.
 
@@ -214,7 +214,7 @@ EFI_STATUS
   IN EFI_PCI_PLATFORM_PROTOCOL                      *This,
   IN EFI_HANDLE                                     HostBridge,
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PHASE  Phase,
-  IN EFI_PCI_CHIPSET_EXECUTION_PHASE                ChipsetPhase
+  IN EFI_PCI_EXECUTION_PHASE                        ExecPhase
   );
 
 /**
@@ -238,7 +238,7 @@ EFI_STATUS
   @param[in] RootBridge     The associated PCI root bridge handle.
   @param[in] PciAddress     The address of the PCI device on the PCI bus.
   @param[in] Phase          The phase of the PCI controller enumeration.
-  @param[in] ChipsetPhase   Defines the execution phase of the PCI chipset driver.
+  @param[in] ExecPhase      Defines the execution phase of the PCI chipset driver.
 
   @retval EFI_SUCCESS   The function completed successfully.
 
@@ -251,7 +251,7 @@ EFI_STATUS
   IN EFI_HANDLE                                    RootBridge,
   IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_PCI_ADDRESS   PciAddress,
   IN EFI_PCI_CONTROLLER_RESOURCE_ALLOCATION_PHASE  Phase,
-  IN EFI_PCI_CHIPSET_EXECUTION_PHASE               ChipsetPhase
+  IN EFI_PCI_EXECUTION_PHASE                       ExecPhase
   );
 
 /**
@@ -271,8 +271,8 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PCI_PLATFORM_GET_PLATFORM_POLICY)(
-  IN  EFI_PCI_PLATFORM_PROTOCOL  *This,
-  OUT EFI_PCI_PLATFORM_POLICY    *PciPolicy
+  IN  CONST EFI_PCI_PLATFORM_PROTOCOL  *This,
+  OUT       EFI_PCI_PLATFORM_POLICY    *PciPolicy
   );
 
 /**
@@ -307,10 +307,10 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_PCI_PLATFORM_GET_PCI_ROM)(
-  IN  EFI_PCI_PLATFORM_PROTOCOL  *This,
-  IN  EFI_HANDLE                 PciHandle,
-  OUT VOID                       **RomImage,
-  OUT UINTN                      *RomSize
+  IN  CONST EFI_PCI_PLATFORM_PROTOCOL  *This,
+  IN        EFI_HANDLE                 PciHandle,
+  OUT       VOID                       **RomImage,
+  OUT       UINTN                      *RomSize
   );
 
 ///
