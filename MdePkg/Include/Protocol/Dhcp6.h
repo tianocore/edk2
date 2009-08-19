@@ -208,19 +208,19 @@ typedef struct {
   ///
   UINT32                       Irt;
   ///
-  /// Maximum retransmission count for one packet. If Mrc is zero, there¡¯s no upper limit 
+  /// Maximum retransmission count for one packet. If Mrc is zero, there's no upper limit 
   /// for retransmission count.
   ///
   UINT32                       Mrc;
   ///
-  /// Maximum retransmission timeout for each retry. It¡¯s the upper bound of the number of 
+  /// Maximum retransmission timeout for each retry. It's the upper bound of the number of 
   /// retransmission timeout. If Mrt is zero, there is no upper limit for retransmission 
   /// timeout.
   ///
   UINT32                       Mrt;
   ///
-  /// Maximum retransmission duration for one packet. It¡¯s the upper bound of the numbers 
-  /// the client may retransmit a message. If Mrd is zero, there¡¯s no upper limit for 
+  /// Maximum retransmission duration for one packet. It's the upper bound of the numbers 
+  /// the client may retransmit a message. If Mrd is zero, there's no upper limit for 
   /// retransmission duration.
   ///
   UINT32                       Mrd;
@@ -478,7 +478,7 @@ EFI_STATUS
                                 EFI_DHCP6_CONFIG_DATA.IaInfoEvent is NULL. 
                                 The DHCPv6 S.A.R.R process is started when 
                                 EFI_DHCP6_CONFIG_DATA.IaInfoEvent is not NULL.
-  @retval EFI_ACCESS_DENIED     The EFI DHCPv6 Child instance hasn¡¯t been configured.
+  @retval EFI_ACCESS_DENIED     The EFI DHCPv6 Child instance hasn't been configured.
   @retval EFI_INVALID_PARAMETER This is NULL.
   @retval EFI_OUT_OF_RESOURCES  Required system resources could not be allocated.
   @retval EFI_ALREADY_STARTED   The DHCPv6 S.A.R.R process has already started.
@@ -580,7 +580,7 @@ EFI_STATUS
   timer continues. 
   - When RebindRequest is TRUE and the state of the configured IA is Dhcp6Bound, it will 
   send Rebind packet. If valid Reply packet received, the state transfers to Dhcp6Bound and the 
-  valid and preferred timer restarts. If fails, the state transfers to Dhcp6Init and the IA can¡¯t
+  valid and preferred timer restarts. If fails, the state transfers to Dhcp6Init and the IA can't
   be used.
 
   @param[in]  This              Pointer to the EFI_DHCP4_PROTOCOL instance.
@@ -592,7 +592,7 @@ EFI_STATUS
                                 when EFI_DHCP6_CONFIG_DATA.IaInfoEvent is NULL. 
                                 The EFI DHCPv6 Protocol instance has sent Renew or Rebind packet 
                                 when EFI_DHCP6_CONFIG_DATA.IaInfoEvent is not NULL.
-  @retval EFI_ACCESS_DENIED     The EFI DHCPv6 Child instance hasn¡¯t been configured, or the state
+  @retval EFI_ACCESS_DENIED     The EFI DHCPv6 Child instance hasn't been configured, or the state
                                 of the configured IA is not in Dhcp6Bound.
   @retval EFI_ALREADY_STARTED   The state of the configured IA has already entered Dhcp6Renewing 
                                 when RebindRequest is FALSE. 
@@ -638,7 +638,7 @@ EFI_STATUS
                                 - AddressCount is zero or Addresses is NULL.
   @retval EFI_NOT_FOUND         Any specified IPv6 address is not correlated with the configured IA 
                                 for this instance.
-  @retval EFI_ACCESS_DENIED     The EFI DHCPv6 Child instance hasn¡¯t been configured, or the 
+  @retval EFI_ACCESS_DENIED     The EFI DHCPv6 Child instance hasn't been configured, or the 
                                 state of the configured IA is not in Dhcp6Bound.
   @retval EFI_DEVICE_ERROR      An unexpected network or system error occurred.
   @retval EFI_ABORTED           The DHCPv6 decline exchange process aborted by user.
@@ -676,7 +676,7 @@ EFI_STATUS
                                 - AddressCount is not zero or Addresses is NULL.
   @retval EFI_NOT_FOUND         Any specified IPv6 address is not correlated with the configured
                                 IA for this instance.
-  @retval EFI_ACCESS_DENIED     The EFI DHCPv6 Child instance hasn¡¯t been configured, or the 
+  @retval EFI_ACCESS_DENIED     The EFI DHCPv6 Child instance hasn't been configured, or the 
                                 state of the configured IA is not in Dhcp6Bound.
   @retval EFI_DEVICE_ERROR      An unexpected network or system error occurred.
   @retval EFI_ABORTED           The DHCPv6 release exchange process aborted by user. 
@@ -702,7 +702,7 @@ EFI_STATUS
   @retval EFI_SUCCESS           The DHCPv6 S.A.R.R process has been stopped when
                                 EFI_DHCP6_CONFIG_DATA.IaInfoEvent is NULL.
                                 The EFI DHCPv6 Protocol instance has sent Release packet if
-                                need release or has been stopped if needn¡¯t, when
+                                need release or has been stopped if needn't, when
                                 EFI_DHCP6_CONFIG_DATA.IaInfoEvent is not NULL.
   @retval EFI_INVALID_PARAMETER This is NULL.
 

@@ -83,7 +83,7 @@
 /// the formatted portion of the structure. This method of returning string information eliminates the need for
 /// application software to deal with pointers embedded in the SMBIOS structure. Each string is terminated with a null
 /// (00h) BYTE and the set of strings is terminated with an additional null (00h) BYTE. When the formatted portion of
-/// a SMBIOS structure references a string, it does so by specifying a non-zero string number within the structure’s
+/// a SMBIOS structure references a string, it does so by specifying a non-zero string number within the structure's
 /// string-set. For example, if a string field contains 02h, it references the second string following the formatted portion
 /// of the SMBIOS structure. If a string field references no string, a null (0) is placed in that string field. If the
 /// formatted portion of the structure contains string-reference fields and all the string fields are set to 0 (no string
@@ -98,7 +98,7 @@ typedef UINT8  EFI_SMBIOS_STRING;
 typedef UINT8  EFI_SMBIOS_TYPE;
 
 ///
-/// Specifies the structure’s handle, a unique 16-bit number in the range 0 to 0FFFEh (for version
+/// Specifies the structure's handle, a unique 16-bit number in the range 0 to 0FFFEh (for version
 /// 2.0) or 0 to 0FEFFh (for version 2.1 and later). The handle can be used with the Get SMBIOS
 /// Structure function to retrieve a specific structure; the handle numbers are not required to be
 /// contiguous. For v2.1 and later, handle values in the range 0FF00h to 0FFFFh are reserved for

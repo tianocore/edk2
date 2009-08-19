@@ -45,7 +45,7 @@ EFI_STATUS
   @retval EFI_INVALID_PARAMETER The callback function was NULL.
   @retval EFI_OUT_OF_RESOURCES  The internal buffer ran out of space. No more functions can be
                                 registered.
-  @retval EFI_ALREADY_STARTED   The function was already registered. It can’t be registered again.
+  @retval EFI_ALREADY_STARTED   The function was already registered. It can't be registered again.
                         
 **/
 typedef

@@ -1,7 +1,7 @@
 /** @file
   UEFI Driver Family Protocol
 
-  Copyright (c) 2007 - 2008, Intel Corporation                                                         
+  Copyright (c) 2007 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -47,12 +47,12 @@ UINT32
   );
 
 ///
-/// When installed, the Driver Family Override Protocol produces a GUID that represets 
+/// When installed, the Driver Family Override Protocol produces a GUID that represents 
 /// a family of drivers.  Drivers with the same GUID are members of the same family 
 /// When drivers are connected to controllers, drivers with a higher revision value 
 /// in the same driver family are connected with a higher priority than drivers 
 /// with a lower revision value in the same driver family.  The EFI Boot Service
-/// Connect Controller uses five rules to build a prioritied list of drivers when 
+/// Connect Controller uses five rules to build a prioritized list of drivers when 
 /// a request is made to connect a driver to a controller.  The Driver Family Protocol
 /// rule is between the Platform Specific Driver Override Protocol and above the 
 /// Bus Specific Driver Override Protocol.  
