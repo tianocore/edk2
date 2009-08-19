@@ -869,6 +869,8 @@
 
   ## Include/Protocol/VlanConfig.h
   gEfiVlanConfigProtocolGuid           = { 0x9e23d768, 0xd2f3, 0x4366, {0x9f, 0xc3, 0x3a, 0x7a, 0xba, 0x86, 0x43, 0x74 }}
+  
+  ## Include/Protocol/DriverHead
 
 [PcdsFeatureFlag]
   ## If TRUE, the component name protocol will not be installed.
