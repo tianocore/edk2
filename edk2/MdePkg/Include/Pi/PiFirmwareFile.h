@@ -201,6 +201,17 @@ typedef struct {
 } EFI_COMPRESSION_SECTION;
 
 ///
+/// An encapsulation section type in which the section data is disposable.
+/// A disposable section is an encapsulation section in which the section data may be disposed of during
+/// the process of creating or updating a firmware image without significant impact on the usefulness of
+/// the file. The Type field in the section header is set to EFI_SECTION_DISPOSABLE. This
+/// allows optional or descriptive data to be included with the firmware file which can be removed in
+/// order to conserve space. The contents of this section are implementation specific, but might contain
+/// debug data or detailed integration instructions.
+///
+typedef EFI_COMMON_SECTION_HEADER EFI_DISPOSABLE_SECTION;
+
+///
 /// Leaf section which could be used to determine the dispatch order of DXEs.
 /// 
 typedef EFI_COMMON_SECTION_HEADER EFI_DXE_DEPEX_SECTION;
