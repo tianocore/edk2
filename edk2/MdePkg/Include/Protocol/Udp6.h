@@ -99,12 +99,12 @@ typedef struct {
   ///
   UINT16             SourcePort;
   ///
-  /// Address to which this packet is sent. When sending packet, it¡¯ll be ignored
+  /// Address to which this packet is sent. When sending packet, it'll be ignored
   /// if it is zero.
   ///
   EFI_IPv6_ADDRESS   DestinationAddress;
   ///
-  /// Port to which this packet is sent. When sending packet, it¡¯ll be 
+  /// Port to which this packet is sent. When sending packet, it'll be 
   /// ignored if it is zero.
   ///
   UINT16             DestinationPort;
@@ -428,7 +428,7 @@ EFI_STATUS
                                   fields is NULL.
                                 - Token.Packet.TxData.UdpSessionData.DestinationAddress is not zero
                                   and is not valid unicast Ipv6 address if UdpSessionData is not NULL.
-                                - Token.Packet.TxData.UdpSessionData is NULL and this instance¡¯s 
+                                - Token.Packet.TxData.UdpSessionData is NULL and this instance's 
                                   UdpConfigData.RemoteAddress is unspecified.
                                 - Token.Packet.TxData.UdpSessionData.DestinationAddress is non-zero
                                   when DestinationAddress is configured as non-zero when doing Configure()

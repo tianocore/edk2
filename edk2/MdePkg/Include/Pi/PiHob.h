@@ -405,7 +405,7 @@ typedef struct {
 ///
 /// Each UEFI capsule HOB details the location of a UEFI capsule. It includes a base address and length
 /// which is based upon memory blocks with a EFI_CAPSULE_HEADER and the associated
-/// CapsuleImageSize-based payloads. These HOB’s shall be created by the PEI PI firmware
+/// CapsuleImageSize-based payloads. These HOB's shall be created by the PEI PI firmware
 /// sometime after the UEFI UpdateCapsule service invocation with the
 /// CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE flag set in the EFI_CAPSULE_HEADER.
 ///
