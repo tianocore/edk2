@@ -37,7 +37,7 @@
 #
 _GetInterruptState:
     mrs    R0, CPSR
-    tst    R0, #0x80	@Check if IRQ is enabled.
+    tst    R0, #0x80  @Check if IRQ is enabled.
     moveq  R0, #1
     movne  R0, #0
     bx     LR

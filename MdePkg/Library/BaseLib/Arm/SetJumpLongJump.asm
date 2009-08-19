@@ -12,10 +12,10 @@
 ;
 ;------------------------------------------------------------------------------
 
-	EXPORT	SetJump
-	EXPORT	InternalLongJump
+  EXPORT  SetJump
+  EXPORT  InternalLongJump
 
-	AREA	BaseLib, CODE, READONLY
+  AREA  BaseLib, CODE, READONLY
 
 ;/**
 ;  Saves the current CPU context that can be restored with a call to LongJump() and returns 0.;

@@ -31,6 +31,6 @@
 #
 ASM_PFX(EnableInterrupts):
     mrs  R0,CPSR
-    bic  R0,R0,#0x80		@Enable IRQ interrupts
+    bic  R0,R0,#0x80    @Enable IRQ interrupts
     msr  CPSR_c,R0
     bx   LR

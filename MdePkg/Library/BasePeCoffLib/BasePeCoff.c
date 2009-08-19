@@ -548,7 +548,7 @@ PeCoffLoaderRelocateImage (
   if (ImageContext->RelocationsStripped) {
     // Applies additional environment specific actions to relocate fixups 
     // to a PE/COFF image if needed
-    PeCoffLoaderRelocateImageExtraAction (ImageContext); 	
+    PeCoffLoaderRelocateImageExtraAction (ImageContext);  
     return RETURN_SUCCESS;
   }
 
