@@ -3,7 +3,7 @@
   IFR is primarily consumed by the EFI presentation engine, and produced by EFI
   internal application and drivers as well as all add-in card option-ROM drivers
 
-  Copyright (c) 2006 - 2008, Intel Corporation                                                         
+  Copyright (c) 2006 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -894,7 +894,7 @@ typedef struct _EFI_IFR_REF4 {
 
 typedef struct _EFI_IFR_RESET_BUTTON {
   EFI_IFR_OP_HEADER        Header;
-  EFI_IFR_QUESTION_HEADER  Question;
+  EFI_IFR_STATEMENT_HEADER Statement;
   EFI_DEFAULT_ID           DefaultId;
 } EFI_IFR_RESET_BUTTON;
 
