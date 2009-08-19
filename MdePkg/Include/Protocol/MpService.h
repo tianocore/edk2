@@ -229,7 +229,7 @@ EFI_STATUS
 (EFIAPI *EFI_MP_SERVICES_GET_PROCESSOR_INFO)(
   IN  EFI_MP_SERVICES_PROTOCOL   *This,
   IN  UINTN                      ProcessorNumber,
-  OUT EFI_PROCESSOR_INFORMATION  *ProcessorContextBuffer
+  OUT EFI_PROCESSOR_INFORMATION  *ProcessorInfoBuffer
   );
 
 /**
@@ -567,7 +567,7 @@ EFI_STATUS
 (EFIAPI *EFI_MP_SERVICES_ENABLEDISABLEAP)(
   IN  EFI_MP_SERVICES_PROTOCOL  *This,
   IN  UINTN                     ProcessorNumber,
-  IN  BOOLEAN                   NewAPState,
+  IN  BOOLEAN                   EnableAP,
   IN  UINT32                    *HealthFlag OPTIONAL
   );
 
