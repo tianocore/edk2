@@ -64,7 +64,7 @@ typedef enum {
   // Sync and Async transfer polling interval, set by experience,
   // and the unit of Async is 100us, means 50ms as interval.
   //
-  EHC_SYNC_POLL_INTERVAL       = 20 * EHC_1_MICROSECOND,
+  EHC_SYNC_POLL_INTERVAL       = 1 * EHC_1_MILLISECOND,
   EHC_ASYNC_POLL_INTERVAL      = 50 * 10000U
 } EHC_TIMEOUT_EXPERIENCE_VALUE;
 

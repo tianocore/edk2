@@ -101,7 +101,7 @@ typedef enum {
   //
   // Wait for clear roothub port reset, set by experience
   //
-  USB_CLR_ROOT_PORT_RESET_STALL  = 1 * USB_BUS_1_MILLISECOND,
+  USB_CLR_ROOT_PORT_RESET_STALL  = 20 * USB_BUS_1_MILLISECOND,
 
   //
   // Wait for set roothub port enable, set by experience
@@ -112,12 +112,12 @@ typedef enum {
   // Send general device request timeout, refers to
   // specification[USB20-11.24.1]
   //
-  USB_GENERAL_DEVICE_REQUEST_TIMEOUT = 50 * USB_BUS_1_MILLISECOND,
+  USB_GENERAL_DEVICE_REQUEST_TIMEOUT = 50,
 
   //
   // Send clear feature request timeout, set by experience
   //
-  USB_CLEAR_FEATURE_REQUEST_TIMEOUT  = 10 * USB_BUS_1_MILLISECOND
+  USB_CLEAR_FEATURE_REQUEST_TIMEOUT  = 10
 }USB_BUS_TIMEOUT_EXPERIENCE_VALUE;
 
 //
