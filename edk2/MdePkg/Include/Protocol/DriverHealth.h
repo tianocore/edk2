@@ -68,10 +68,10 @@ typedef struct {
 /**
   Reports the progress of a repair operation
 
-  @param  Value                 A value between 0 and Limit that identifies the current 
+  @param[in]  Value             A value between 0 and Limit that identifies the current 
                                 progress of the repair operation.
   
-  @param  Limit                 The maximum value of Value for the current repair operation.
+  @param[in]  Limit             The maximum value of Value for the current repair operation.
                                 For example, a driver that wants to specify progress in 
                                 percent would use a Limit value of 100.
   
@@ -97,54 +97,54 @@ EFI_STATUS
   optionally return warning messages, error messages, and a set of HII Forms that may 
   be repair a controller that is not proper configured. 
   
-  @param  This             A pointer to the EFI_DRIVER_HEALTH_PROTOCOL instance.
+  @param[in] This             A pointer to the EFI_DRIVER_HEALTH_PROTOCOL instance.
 
-  @param  ControllerHandle The handle of the controller to retrieve the health status 
-                           on.  This is an optional parameter that may be NULL.  If 
-                           this parameter is NULL, then the value of ChildHandle is 
-                           ignored, and the combined health status of all the devices 
-                           that the driver is managing is returned.
+  @param[in] ControllerHandle The handle of the controller to retrieve the health status 
+                              on.  This is an optional parameter that may be NULL.  If 
+                              this parameter is NULL, then the value of ChildHandle is 
+                              ignored, and the combined health status of all the devices 
+                              that the driver is managing is returned.
 
-  @param  ChildHandle      The handle of the child controller to retrieve the health 
-                           status on.  This is an optional parameter that may be NULL.  
-                           This parameter is ignored of ControllerHandle is NULL.  It 
-                           will be NULL for device drivers.  It will also be NULL for 
-                           bus drivers when an attempt is made to collect the health 
-                           status of the bus controller.  If will not be NULL when an 
-                           attempt is made to collect the health status for a child 
-                           controller produced by the driver.
+  @param[in] ChildHandle      The handle of the child controller to retrieve the health 
+                              status on.  This is an optional parameter that may be NULL.  
+                              This parameter is ignored of ControllerHandle is NULL.  It 
+                              will be NULL for device drivers.  It will also be NULL for 
+                              bus drivers when an attempt is made to collect the health 
+                              status of the bus controller.  If will not be NULL when an 
+                              attempt is made to collect the health status for a child 
+                              controller produced by the driver.
 
-  @param  HealthStatus     A pointer to the health status that is returned by this 
-                           function.  This is an optional parameter that may be NULL.  
-                           This parameter is ignored of ControllerHandle is NULL.  
-                           The health status for the controller specified by 
-                           ControllerHandle and ChildHandle is returned. 
+  @param[out] HealthStatus    A pointer to the health status that is returned by this 
+                              function.  This is an optional parameter that may be NULL.  
+                              This parameter is ignored of ControllerHandle is NULL.  
+                              The health status for the controller specified by 
+                              ControllerHandle and ChildHandle is returned. 
 
-  @param  MessageList      A pointer to an array of warning or error messages associated 
-                           with the controller specified by ControllerHandle and 
-                           ChildHandle.  This is an optional parameter that may be NULL.  
-                           MessageList is allocated by this function with the EFI Boot 
-                           Service AllocatePool(), and it is the caller's responsibility 
-                           to free MessageList with the EFI Boot Service FreePool().  
-                           Each message is specified by tuple of an EFI_HII_HANDLE and 
-                           an EFI_STRING_ID.  The array of messages is terminated by tuple 
-                           containing a EFI_HII_HANDLE with a value of NULL.  The 
-                           EFI_HII_STRING_PROTOCOL.GetString() function can be used to 
-                           retrieve the warning or error message as a Null-terminated 
-                           Unicode string in a specific language.  Messages may be 
-                           returned for any of the HealthStatus values except 
-                           EfiDriverHealthStatusReconnectRequired and 
-                           EfiDriverHealthStatusRebootRequired.
+  @param[out] MessageList     A pointer to an array of warning or error messages associated 
+                              with the controller specified by ControllerHandle and 
+                              ChildHandle.  This is an optional parameter that may be NULL.  
+                              MessageList is allocated by this function with the EFI Boot 
+                              Service AllocatePool(), and it is the caller's responsibility 
+                              to free MessageList with the EFI Boot Service FreePool().  
+                              Each message is specified by tuple of an EFI_HII_HANDLE and 
+                              an EFI_STRING_ID.  The array of messages is terminated by tuple 
+                              containing a EFI_HII_HANDLE with a value of NULL.  The 
+                              EFI_HII_STRING_PROTOCOL.GetString() function can be used to 
+                              retrieve the warning or error message as a Null-terminated 
+                              Unicode string in a specific language.  Messages may be 
+                              returned for any of the HealthStatus values except 
+                              EfiDriverHealthStatusReconnectRequired and 
+                              EfiDriverHealthStatusRebootRequired.
 
-  @param  FormHiiHandle    A pointer to the HII handle for an HII form associated with the 
-                           controller specified by ControllerHandle and ChildHandle.  
-                           This is an optional parameter that may be NULL.  An HII form 
-                           is specified by a combination of an EFI_HII_HANDLE and an 
-                           EFI_GUID that identifies the Form Set GUID.  The 
-                           EFI_FORM_BROWSER2_PROTOCOL.SendForm() function can be used 
-                           to display and allow the user to make configuration changes 
-                           to the HII Form.  An HII form may only be returned with a 
-                           HealthStatus value of EfiDriverHealthStatusConfigurationRequired.
+  @param[out] FormHiiHandle   A pointer to the HII handle for an HII form associated with the 
+                              controller specified by ControllerHandle and ChildHandle.  
+                              This is an optional parameter that may be NULL.  An HII form 
+                              is specified by a combination of an EFI_HII_HANDLE and an 
+                              EFI_GUID that identifies the Form Set GUID.  The 
+                              EFI_FORM_BROWSER2_PROTOCOL.SendForm() function can be used 
+                              to display and allow the user to make configuration changes 
+                              to the HII Form.  An HII form may only be returned with a 
+                              HealthStatus value of EfiDriverHealthStatusConfigurationRequired.
 
   @retval EFI_SUCCESS           ControllerHandle is NULL, and all the controllers 
                                 managed by this driver specified by This have a health 
@@ -171,13 +171,13 @@ EFI_STATUS
                                 returned in MessageList, and a list of HII Forms 
                                 may be optionally returned in FormList.
 
-  @retval EFI_UNSUPPORTED	      ControllerHandle is not NULL, and the controller 
+  @retval EFI_UNSUPPORTED       ControllerHandle is not NULL, and the controller 
                                 specified by ControllerHandle and ChildHandle is not 
                                 currently being managed by the driver specified by This.
 
-  @retval EFI_INVALID_PARAMETER	HealthStatus is NULL.
+  @retval EFI_INVALID_PARAMETER HealthStatus is NULL.
 
-  @retval EFI_OUT_OF_RESOURCES	MessageList is not NULL, and there are not enough 
+  @retval EFI_OUT_OF_RESOURCES  MessageList is not NULL, and there are not enough 
                                 resource available to allocate memory for MessageList.
 
 **/
@@ -196,27 +196,27 @@ EFI_STATUS
   Performs a repair operation on a controller in the platform.  This function can 
   optionally report repair progress information back to the platform. 
   
-  @param  This                  A pointer to the EFI_DRIVER_HEALTH_PROTOCOL instance.
-  @param  ControllerHandle      The handle of the controller to repair.
-  @param  ChildHandle           The handle of the child controller to repair.  This is 
-                                an optional parameter that may be NULL.  It will be NULL 
-                                for device drivers.  It will also be NULL for bus 
-                                drivers when an attempt is made to repair a bus controller.
-                                If will not be NULL when an attempt is made to repair a 
-                                child controller produced by the driver.
-  @param  ProgressNotification  A notification function that may be used by a driver to 
-                                report the progress of the repair operation.  This is 
-                                an optional parameter that may be NULL.  
+  @param[in] This                  A pointer to the EFI_DRIVER_HEALTH_PROTOCOL instance.
+  @param[in] ControllerHandle      The handle of the controller to repair.
+  @param[in] ChildHandle           The handle of the child controller to repair.  This is 
+                                   an optional parameter that may be NULL.  It will be NULL 
+                                   for device drivers.  It will also be NULL for bus 
+                                   drivers when an attempt is made to repair a bus controller.
+                                   If will not be NULL when an attempt is made to repair a 
+                                   child controller produced by the driver.
+  @param[in] ProgressNotification  A notification function that may be used by a driver to 
+                                   report the progress of the repair operation.  This is 
+                                   an optional parameter that may be NULL.  
 
 
-  @retval EFI_SUCCESS	          An attempt to repair the controller specified by 
+  @retval EFI_SUCCESS           An attempt to repair the controller specified by 
                                 ControllerHandle and ChildHandle was performed.  
                                 The result of the repair operation can bet 
                                 determined by calling GetHealthStatus().
-  @retval EFI_UNSUPPORTED	      The driver specified by This is not currently 
+  @retval EFI_UNSUPPORTED       The driver specified by This is not currently 
                                 managing the controller specified by ControllerHandle 
                                 and ChildHandle.
-  @retval EFI_OUT_OF_RESOURCES	There are not enough resources to perform the 
+  @retval EFI_OUT_OF_RESOURCES  There are not enough resources to perform the 
                                 repair operation.
 
 */
