@@ -712,12 +712,14 @@ ON_ERROR:
   if (UsbMass != NULL) {
     FreePool (UsbMass);
   }
-  gBS->CloseProtocol (
-         Controller,
-         &gEfiUsbIoProtocolGuid,
-         This->DriverBindingHandle,
-         Controller
-         );
+  if (UsbIo != NULL) {
+    gBS->CloseProtocol (
+           Controller,
+           &gEfiUsbIoProtocolGuid,
+           This->DriverBindingHandle,
+           Controller
+           );
+  }
   return Status;  
 }
 
@@ -830,6 +832,7 @@ USBMassDriverBindingStart (
   VOID                          *Context;
   UINT8                         MaxLun;
   EFI_STATUS                    Status;
+  EFI_USB_IO_PROTOCOL           *UsbIo; 
   
   Transport = NULL;
   Context   = NULL;
@@ -867,18 +870,44 @@ USBMassDriverBindingStart (
       return Status;
     }
 
+    Status = gBS->OpenProtocol (
+                    Controller,
+                    &gEfiUsbIoProtocolGuid,
+                    (VOID **) &UsbIo,
+                    This->DriverBindingHandle,
+                    Controller,
+                    EFI_OPEN_PROTOCOL_BY_DRIVER
+                    );
+  
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "USBMassDriverBindingStart: OpenUsbIoProtocol By Driver (%r)\n", Status));
+      gBS->CloseProtocol (
+             Controller,
+             &gEfiDevicePathProtocolGuid,
+             This->DriverBindingHandle,
+             Controller
+             );
+      return Status;
+    }
+
     //
     // Initialize data for device that supports multiple LUNSs.
     // EFI_SUCCESS is returned if at least 1 LUN is initialized successfully.
     //
     Status = UsbMassInitMultiLun (This, Controller, Transport, Context, DevicePath, MaxLun);
     if (EFI_ERROR (Status)) {
-     gBS->CloseProtocol (
-            Controller,
-            &gEfiDevicePathProtocolGuid,
-            This->DriverBindingHandle,
-            Controller
-            );
+      gBS->CloseProtocol (
+              Controller,
+              &gEfiDevicePathProtocolGuid,
+              This->DriverBindingHandle,
+              Controller
+              );
+      gBS->CloseProtocol (
+              Controller,
+              &gEfiUsbIoProtocolGuid,
+              This->DriverBindingHandle,
+              Controller
+              );
       DEBUG ((EFI_D_ERROR, "USBMassDriverBindingStart: UsbMassInitMultiLun (%r) with Maxlun=%d\n", Status, MaxLun));
     }
   }
@@ -919,9 +948,9 @@ USBMassDriverBindingStop (
   //
   // This is a bus driver stop function since multi-lun is supported.
   // There are three kinds of device handles that might be passed:
-  // 1st is a handle with Device Path & USB I/O & Block I/O installed (non-multi-lun)
+  // 1st is a handle with USB I/O & Block I/O installed (non-multi-lun)
   // 2nd is a handle with Device Path & USB I/O installed (multi-lun root)
-  // 3rd is a handle with Device Path & Block I/O installed (multi-lun).
+  // 3rd is a handle with Device Path & USB I/O & Block I/O installed (multi-lun).
   //
   if (NumberOfChildren == 0) {
     //
@@ -938,12 +967,18 @@ USBMassDriverBindingStop (
   
     if (EFI_ERROR(Status)) {
       //
-      // This is a 2nd type handle(multi-lun root), which only needs to close 
-      // Device Path Protocol.
+      // This is a 2nd type handle(multi-lun root), it needs to close devicepath
+      // and usbio protocol.
       //
       gBS->CloseProtocol (
             Controller,
             &gEfiDevicePathProtocolGuid,
+            This->DriverBindingHandle,
+            Controller
+            );
+      gBS->CloseProtocol (
+            Controller,
+            &gEfiUsbIoProtocolGuid,
             This->DriverBindingHandle,
             Controller
             );
