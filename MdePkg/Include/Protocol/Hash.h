@@ -6,7 +6,7 @@
   so that a multiple drivers can use the underlying hashing services.
   The EFI Service Binding Protocol defines the generic Service Binding Protocol functions.
 
-  Copyright (c) 2006 - 2008, Intel Corporation                                                         
+  Copyright (c) 2006 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -20,7 +20,7 @@
 #ifndef __EFI_HASH_PROTOCOL_H__
 #define __EFI_HASH_PROTOCOL_H__
 
-#define EFI_HASH_SERVICE_BINDING_PROTOCOL \
+#define EFI_HASH_SERVICE_BINDING_PROTOCOL_GUID \
   { \
     0x42881c98, 0xa4f3, 0x44b0, {0xa3, 0x9d, 0xdf, 0xa1, 0x86, 0x67, 0xd8, 0xcd } \
   }
