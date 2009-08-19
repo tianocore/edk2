@@ -41,7 +41,7 @@ typedef UINT16 EFI_USER_INFO_ATTRIBS;
 #define EFI_USER_INFO_EXCLUSIVE                 0x0080
 
 ///
-/// User infromation structure
+/// User information structure
 ///
 typedef struct {
   ///

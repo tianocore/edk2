@@ -262,7 +262,7 @@ ReportStatusCodeWithExtendedData (
   is responsible for allocating a buffer large enough for the standard header and 
   the extended data passed into this function.  The standard header is filled in 
   with a GUID specified by ExtendedDataGuid.  If ExtendedDataGuid is NULL, then a 
-  GUID of gEfiStatusCodeSpecificDatauid is used.  The status code is reported with 
+  GUID of gEfiStatusCodeSpecificDataGuid is used.  The status code is reported with 
   an instance specified by Instance and a caller ID specified by CallerId.  If 
   CallerId is NULL, then a caller ID of gEfiCallerIdGuid is used.
 
