@@ -1,5 +1,5 @@
 /** @file
-  This ppi provide registering and unregistering services to status code consumers.
+  This PPI provides registering and unregistering services to status code consumers.
   
   Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
@@ -17,8 +17,7 @@
 
 #define EFI_PEI_RSC_HANDLER_PPI_GUID \
   { \
-    0x65d394, 0x9951, 0x4144, \
-    {0x82, 0xa3, 0xa, 0xfc, 0x85, 0x79, 0xc2, 0x51} \
+    0x65d394, 0x9951, 0x4144, {0x82, 0xa3, 0xa, 0xfc, 0x85, 0x79, 0xc2, 0x51} \
   }
 
 typedef
