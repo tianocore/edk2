@@ -371,7 +371,7 @@ typedef struct _EFI_IP6_HEADER {
   EFI_IPv6_ADDRESS        SourceAddress;
   EFI_IPv6_ADDRESS        DestinationAddress;
 } EFI_IP6_HEADER;
-#pragma pack
+#pragma pack()
 
 ///
 /// EFI_IP6_FRAGMENT_DATA
