@@ -1,7 +1,7 @@
 #/**@file
 # Low leve x64 specific debug support functions.
 #
-# Copyright (c) 2006 - 2008, Intel Corporation
+# Copyright (c) 2006 - 2009, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -66,7 +66,7 @@ ASM_PFX(OrigVector):       .long   0x66666666 # ?
 ##        UINT64            R8, R9, R10, R11, R12, R13, R14, R15;
 ##      } SYSTEM_CONTEXT_X64;  // 64 bit system context record
 
-.align          16
+.p2align 4
 DebugStackEnd : .ascii     "DbgStkEnd >>>>>>"    # 16 byte long string - must be 16 bytes to preserve alignment
                 .rept  0x1ffc
                   .long    0x00000000  
