@@ -23,7 +23,7 @@
 #define MDE_CPU_ARM
 
 //
-// Make sure we are useing the correct packing rules per EFI specification
+// Make sure we are using the correct packing rules per EFI specification
 //
 #ifndef __GNUC__
 #pragma pack()
@@ -101,7 +101,7 @@ typedef INT32   INTN;
 //
 // Modifier to ensure that all protocol member functions and EFI intrinsics
 // use the correct C calling convention. All protocol member functions and
-// EFI intrinsics are required to modify thier member functions with EFIAPI.
+// EFI intrinsics are required to modify their member functions with EFIAPI.
 //
 #define EFIAPI    
 
