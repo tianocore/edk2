@@ -83,7 +83,7 @@ ASM_PFX(InstallInterruptHandler):
     .long     commonIdtEntry - . - 4      #  offset to jump to
 	.endm
 
-    .align 2
+    .p2align 1
 	ASM_GLOBAL ASM_PFX(SystemExceptionHandler)
 ASM_PFX(SystemExceptionHandler):
 INT0:
@@ -453,7 +453,7 @@ ExceptionDone:
 ##############################################################################
 
 	.data
-    .align 0x10
+    .p2align 4
 
 gdtr:	.short GDT_END - GDT_BASE - 1   # GDT limit
         .quad 0                         # (GDT base gets set above)
@@ -461,7 +461,7 @@ gdtr:	.short GDT_END - GDT_BASE - 1   # GDT limit
 #   global descriptor table (GDT)
 ##############################################################################
 
-        .align 0x10
+        .p2align 4
 
 GDT_BASE:
 # null descriptor
@@ -538,7 +538,7 @@ SPARE5_SEL  = .-GDT_BASE
 
 GDT_END:
 
-        .align 0x4
+        .p2align 2
 
 
 
@@ -554,7 +554,7 @@ idtr:	.short IDT_END - IDT_BASE - 1   # IDT limit
 ##############################################################################
 
 #idt_tag .byte "IDT",0     
-        .align 0x4
+        .p2align 2
 
 IDT_BASE:
 # divide by zero (INT 0)
