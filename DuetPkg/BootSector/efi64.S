@@ -177,7 +177,7 @@ EfiLdrOffset:
     .byte 0xc3
 
 #    db      "**** DEFAULT IDT ENTRY ***",0
-    .align 0x2
+    .p2align 1
 Halt: 
 INT0: 
     pushl   $0x0    # push error code place holder on the stack

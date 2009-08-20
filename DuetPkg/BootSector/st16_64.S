@@ -580,7 +580,7 @@ Empty8042Loop:
 # data
 ##############################################################################
 
-        .align 0x2
+        .p2align 1
 
 				gdtr:    .long  GDT_END - GDT_BASE - 1  # GDT limit 
         .long 0                     # (GDT base gets set above)
@@ -588,7 +588,7 @@ Empty8042Loop:
 #   global descriptor table (GDT)
 ##############################################################################
 
-        .align 0x2
+        .p2align 1
 
 GDT_BASE: 
 # null descriptor
@@ -678,7 +678,7 @@ GDT_BASE:
 
 GDT_END: 
 
-        .align 0x2
+        .p2align 1
 
 
 
@@ -695,7 +695,7 @@ idtr:   .long  IDT_END - IDT_BASE - 1 # IDT limit
 ##############################################################################
 
 #idt_tag db "IDT",0     
-        .align 0x2
+        .p2align 1
 
 
 IDT_BASE: 
@@ -1064,7 +1064,7 @@ IDT_BASE:
 
 IDT_END: 
 
-        .align 0x2
+        .p2align 1
 
 MemoryMapSize:  .long 0
 MemoryMap:  .long 0,0,0,0,0,0,0,0
