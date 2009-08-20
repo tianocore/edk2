@@ -199,9 +199,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x2F
 
-[PcdsDynamicDefault.common.DEFAULT]
-  gEfiMdePkgTokenSpaceGuid.PcdFSBClock|0
-
 ################################################################################
 #
 # Pcd Dynamic Section - list of all EDK II PCD Entries defined by this Platform
