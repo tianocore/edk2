@@ -201,8 +201,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x2F
 
-[PcdsDynamicDefault.common.DEFAULT]
-  gEfiMdePkgTokenSpaceGuid.PcdFSBClock|0
 
 ################################################################################
 #
