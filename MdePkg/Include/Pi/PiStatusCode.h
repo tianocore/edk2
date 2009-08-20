@@ -209,6 +209,61 @@ typedef struct {
 //
 
 ///
+/// South Bridge initialization prior to memory detection
+///
+#define EFI_CHIPSET_PC_PEI_CAR_SB_INIT      (EFI_SUBCLASS_SPECIFIC|0x00000000)
+
+///
+/// North Bridge initialization prior to memory detection
+///
+#define EFI_CHIPSET_PC_PEI_CAR_NB_INIT      (EFI_SUBCLASS_SPECIFIC|0x00000001)
+
+///
+/// South Bridge initialization after memory detection
+///
+#define EFI_CHIPSET_PC_PEI_MEM_SB_INIT      (EFI_SUBCLASS_SPECIFIC|0x00000002)
+
+///
+/// North Bridge initialization after memory detection
+///
+#define EFI_CHIPSET_PC_PEI_MEM_NB_INIT      (EFI_SUBCLASS_SPECIFIC|0x00000003)
+
+///
+/// PCI Host Bridge DXE initialization
+///
+#define EFI_CHIPSET_PC_DXE_HB_INIT          (EFI_SUBCLASS_SPECIFIC|0x00000004)
+
+///
+/// North Bridge DXE initialization
+///
+#define EFI_CHIPSET_PC_DXE_NB_INIT          (EFI_SUBCLASS_SPECIFIC|0x00000005)
+
+///
+/// North Bridge specific SMM initialization in DXE
+///
+#define EFI_CHIPSET_PC_DXE_NB_SMM_INIT      (EFI_SUBCLASS_SPECIFIC|0x00000006)
+
+///
+/// Initialization of the South Bridge specific UEFI Runtime Services
+///
+#define EFI_CHIPSET_PC_DXE_SB_RT_INIT       (EFI_SUBCLASS_SPECIFIC|0x00000007)
+
+///
+/// South Bridge DXE initialization
+///
+#define EFI_CHIPSET_PC_DXE_SB_INIT          (EFI_SUBCLASS_SPECIFIC|0x00000008)
+
+///
+/// South Bridge specific SMM initialization in DXE
+///
+#define EFI_CHIPSET_PC_DXE_SB_SMM_INIT      (EFI_SUBCLASS_SPECIFIC|0x00000009)
+
+///
+/// Initialization of the South Bridge devices
+///
+#define EFI_CHIPSET_PC_DXE_SB_DEVICES_INIT  (EFI_SUBCLASS_SPECIFIC|0x0000000a)
+
+///
 /// Computing Unit Class Error Code definitions.
 /// These are shared by all subclasses.
 ///
