@@ -1,8 +1,8 @@
 /** @file
   This file declares PlatfromOpRom protocols which provides the interface between 
   the PCI bus driver/PCI Host Bridge Resource Allocation driver and a platform-specific 
-  driver to describe the unique features of a platform. This
-  protocol is optional.
+  driver to describe the unique features of a platform. 
+  This protocol is optional.
   
   Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
@@ -42,7 +42,7 @@
 typedef struct _EFI_PCI_PLATFORM_PROTOCOL EFI_PCI_PLATFORM_PROTOCOL;
 
 ///
-/// EFI_PCI_PLATYFORM_POLICY that is a bitmask with the following legal combinations:
+/// EFI_PCI_PLATFORM_POLICY that is a bitmask with the following legal combinations:
 ///   - EFI_RESERVE_NONE_IO_ALIAS:<BR>
 ///       Does not set aside either ISA or VGA I/O resources during PCI
 ///       enumeration. By using this selection, the platform indicates that it does
