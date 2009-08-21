@@ -34,5 +34,5 @@
 ASM_GLOBAL ASM_PFX(InternalSyncCompareExchange64)
 ASM_PFX(InternalSyncCompareExchange64):
     mov     %rdx, %rax
-    lock    cmpxchg %r8,(%rcx)
+    lock/cmpxchg %r8,(%rcx)
     ret
