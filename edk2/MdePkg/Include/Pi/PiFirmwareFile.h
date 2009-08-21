@@ -11,7 +11,7 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
   @par Revision Reference:
-  PI Version 1.0
+  PI Version 1.2
 
 **/
 
@@ -66,7 +66,10 @@ typedef UINT8 EFI_FFS_FILE_STATE;
 #define EFI_FV_FILETYPE_DRIVER                0x07
 #define EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER  0x08
 #define EFI_FV_FILETYPE_APPLICATION           0x09
+#define EFI_FV_FILETYPE_SMM                   0x0A
 #define EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE 0x0B
+#define EFI_FV_FILETYPE_COMBINED_SMM_DXE      0x0C
+#define EFI_FV_FILETYPE_SMM_CORE              0x0D
 #define EFI_FV_FILETYPE_OEM_MIN               0xc0
 #define EFI_FV_FILETYPE_OEM_MAX               0xdf
 #define EFI_FV_FILETYPE_DEBUG_MIN             0xe0
