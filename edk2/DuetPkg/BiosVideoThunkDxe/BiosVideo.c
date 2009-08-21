@@ -1090,18 +1090,18 @@ BiosVideoCheckForVbe (
   //
   // INT 10 - VESA SuperVGA BIOS (VBE) - GET SuperVGA INFORMATION
   //
-  //	AX = 4F00h
-  //	ES:DI -> buffer for SuperVGA information (see #00077)
+  //  AX = 4F00h
+  //  ES:DI -> buffer for SuperVGA information (see #00077)
   // Return: AL = 4Fh if function supported
-  //	AH = status
-  //	    00h successful
-  //		ES:DI buffer filled
-  //	    01h failed
-  //	    ---VBE v2.0---
-  //	    02h function not supported by current hardware configuration
-  //	    03h function invalid in current video mode
-  // Desc:	determine whether VESA BIOS extensions are present and the capabilities
-  //	  supported by the display adapter
+  //  AH = status
+  //      00h successful
+  //    ES:DI buffer filled
+  //      01h failed
+  //      ---VBE v2.0---
+  //      02h function not supported by current hardware configuration
+  //      03h function invalid in current video mode
+  // Desc:  determine whether VESA BIOS extensions are present and the capabilities
+  //    supported by the display adapter
   //
   gBS->SetMem (&Regs, sizeof (Regs), 0);
   Regs.X.AX = VESA_BIOS_EXTENSIONS_RETURN_CONTROLLER_INFORMATION;
@@ -1232,15 +1232,15 @@ BiosVideoCheckForVbe (
     //
     // INT 10 - VESA SuperVGA BIOS - GET SuperVGA MODE INFORMATION
     //
-    //	 AX = 4F01h
-    //	 CX = SuperVGA video mode (see #04082 for bitfields)
-    //	 ES:DI -> 256-byte buffer for mode information (see #00079)
+    //   AX = 4F01h
+    //   CX = SuperVGA video mode (see #04082 for bitfields)
+    //   ES:DI -> 256-byte buffer for mode information (see #00079)
     // Return: AL = 4Fh if function supported
-    //	 AH = status
-    //	    00h successful
-    //		ES:DI buffer filled
-    //	    01h failed
-    // Desc:	determine the attributes of the specified video mode
+    //   AH = status
+    //      00h successful
+    //    ES:DI buffer filled
+    //      01h failed
+    // Desc:  determine the attributes of the specified video mode
     //
     gBS->SetMem (&Regs, sizeof (Regs), 0);
     Regs.X.AX = VESA_BIOS_EXTENSIONS_RETURN_MODE_INFORMATION;

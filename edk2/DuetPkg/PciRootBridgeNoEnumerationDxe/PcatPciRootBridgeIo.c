@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2005 - 2008, Intel Corporation                                                         
+Copyright (c) 2005 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -202,7 +202,7 @@ PcatRootBridgeIoMemRW (
 
 EFI_STATUS
 PcatRootBridgeIoConstructor (
-	IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *Protocol,
+  IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *Protocol,
   IN UINTN                            SegmentNumber
   )
 /*++
@@ -707,7 +707,7 @@ PcatRootBridgeIoMap (
     }
 
 
-	Status =gBS->AllocatePool (
+  Status =gBS->AllocatePool (
                     EfiBootServicesData, 
                     sizeof(MAP_INFO_INSTANCE), 
                     (VOID **)&MapInstance
@@ -723,7 +723,7 @@ PcatRootBridgeIoMap (
     PrivateData = DRIVER_INSTANCE_FROM_PCI_ROOT_BRIDGE_IO_THIS(This);
     InsertTailList(&PrivateData->MapInfo,&MapInstance->Link);
     
-	//
+  //
     // The DeviceAddress is the address of the maped buffer below 4GB
     //
     *DeviceAddress = MapInfo->MappedHostAddress;
@@ -770,14 +770,14 @@ PcatRootBridgeIoUnmap (
     //
     MapInfo = (MAP_INFO *)Mapping;
 
-	for (Link = PrivateData->MapInfo.ForwardLink; Link != &PrivateData->MapInfo; Link = Link->ForwardLink) {
-    	if (((MAP_INFO_INSTANCE*)Link)->Map == MapInfo)
-    	 	break;
+  for (Link = PrivateData->MapInfo.ForwardLink; Link != &PrivateData->MapInfo; Link = Link->ForwardLink) {
+      if (((MAP_INFO_INSTANCE*)Link)->Map == MapInfo)
+        break;
     }
 
     if (Link == &PrivateData->MapInfo) {
-    	return EFI_INVALID_PARAMETER;
-	}
+      return EFI_INVALID_PARAMETER;
+  }
 
     RemoveEntryList(Link);
     ((MAP_INFO_INSTANCE*)Link)->Map = NULL;
@@ -872,7 +872,7 @@ PcatRootBridgeIoFreeBuffer (
 {
 
   if( HostAddress == NULL ){
-  	 return EFI_INVALID_PARAMETER;
+     return EFI_INVALID_PARAMETER;
   } 
   return gBS->FreePages ((EFI_PHYSICAL_ADDRESS)(UINTN)HostAddress, Pages);
 }

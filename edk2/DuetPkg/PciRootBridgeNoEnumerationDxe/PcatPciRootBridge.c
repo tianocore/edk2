@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2005 - 2008, Intel Corporation                                                         
+Copyright (c) 2005 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -43,7 +43,7 @@ Returns:
 
 --*/
 {
-  EFI_STATUS		                 Status;
+  EFI_STATUS                     Status;
   PCAT_PCI_ROOT_BRIDGE_INSTANCE  *PrivateData;
   UINTN                          PciSegmentIndex;
   UINTN                          PciRootBridgeIndex;
@@ -93,7 +93,7 @@ Returns:
     PrivateData->Signature  = PCAT_PCI_ROOT_BRIDGE_SIGNATURE;
     PrivateData->Handle     = NULL;
     PrivateData->DevicePath = NULL;
-	  InitializeListHead (&PrivateData->MapInfo);
+    InitializeListHead (&PrivateData->MapInfo);
 
     //
     // Initialize the PCI root bridge number and the bus range for that root bridge

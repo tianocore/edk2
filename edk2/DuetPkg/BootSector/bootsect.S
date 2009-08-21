@@ -129,7 +129,7 @@ BootSectorEntryPoint:
   xorw  %bx, %bx
 
 FindEFILDR: 
-	cmpl   $LOADER_FILENAME_PART1, (%di)        # Compare to "EFIL"
+  cmpl   $LOADER_FILENAME_PART1, (%di)        # Compare to "EFIL"
   jne   FindVARSTORE
   cmpl   $LOADER_FILENAME_PART2, 4(%di) 
   jne   FindVARSTORE
