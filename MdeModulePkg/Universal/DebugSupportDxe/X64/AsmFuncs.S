@@ -68,9 +68,7 @@ ASM_PFX(OrigVector):       .long   0x66666666 # ?
 
 .p2align 4
 DebugStackEnd : .ascii     "DbgStkEnd >>>>>>"    # 16 byte long string - must be 16 bytes to preserve alignment
-                .rept  0x1ffc
-                  .long    0x00000000  
-                .endr
+                .fill 0x1ffc, 4, 0x00000000
                                                  # 32K should be enough stack
                                                  #   This allocation is coocked to insure
                                                  #   that the the buffer for the FXSTORE instruction
