@@ -272,13 +272,608 @@ INT19:
     jmpCommonIdtEntry 
 
 INTUnknown: 
-.rept  (0x78 - 20)
+# The following segment repeats (0x78 - 20) times:
+# No. 1
     pushl   $0x0    # push error code place holder on the stack
 #   push    $0xxx   # push vector number
     .byte   0x6a
     .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
     jmpCommonIdtEntry 
-.endr
+# No. 2
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 3
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 4
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 5
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 6
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 7
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 8
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 9
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 10
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 11
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 12
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 13
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 14
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 15
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 16
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 17
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 18
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 19
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 20
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 21
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 22
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 23
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 24
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 25
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 26
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 27
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 28
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 29
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 30
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 31
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 32
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 33
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 34
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 35
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 36
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 37
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 38
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 39
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 40
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 41
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 42
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 43
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 44
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 45
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 46
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 47
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 48
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 49
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 50
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 51
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 52
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 53
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 54
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 55
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 56
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 57
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 58
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 59
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 60
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 61
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 62
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 63
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 64
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 65
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 66
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 67
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 68
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 69
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 70
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 71
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 72
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 73
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 74
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 75
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 76
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 77
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 78
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 79
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 80
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 81
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 82
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 83
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 84
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 85
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 86
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 87
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 88
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 89
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 90
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 91
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 92
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 93
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 94
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 95
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 96
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 97
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 98
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 99
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+# No. 100
+    pushl   $0x0    # push error code place holder on the stack
+#   push    $0xxx   # push vector number
+    .byte   0x6a
+    .long   ( . - INTUnknown - 3 ) / 9 + 20  # vector number
+    jmpCommonIdtEntry 
+
 
 commonIdtEntry: 
     pushal

@@ -198,13 +198,80 @@ INT19:
     JmpCommonIdtEntry
 
 INTUnknown:
-  .rept (32 - 20)
+  # The following segment repeats (32 - 20) times:
+  # No. 1
     pushl    $0x0      # push error code place holder on the stack
 #    push    xxh     # push vector number
     .byte    0x6a
     .byte    ( . - INTUnknown - 3 ) / 9 + 20 # vector number
     JmpCommonIdtEntry
-  .endr
+  # No. 2
+    pushl    $0x0      # push error code place holder on the stack
+#    push    xxh     # push vector number
+    .byte    0x6a
+    .byte    ( . - INTUnknown - 3 ) / 9 + 20 # vector number
+    JmpCommonIdtEntry
+  # No. 3
+    pushl    $0x0      # push error code place holder on the stack
+#    push    xxh     # push vector number
+    .byte    0x6a
+    .byte    ( . - INTUnknown - 3 ) / 9 + 20 # vector number
+    JmpCommonIdtEntry
+  # No. 4
+    pushl    $0x0      # push error code place holder on the stack
+#    push    xxh     # push vector number
+    .byte    0x6a
+    .byte    ( . - INTUnknown - 3 ) / 9 + 20 # vector number
+    JmpCommonIdtEntry
+  # No. 5
+    pushl    $0x0      # push error code place holder on the stack
+#    push    xxh     # push vector number
+    .byte    0x6a
+    .byte    ( . - INTUnknown - 3 ) / 9 + 20 # vector number
+    JmpCommonIdtEntry
+  # No. 6
+    pushl    $0x0      # push error code place holder on the stack
+#    push    xxh     # push vector number
+    .byte    0x6a
+    .byte    ( . - INTUnknown - 3 ) / 9 + 20 # vector number
+    JmpCommonIdtEntry
+  # No. 7
+    pushl    $0x0      # push error code place holder on the stack
+#    push    xxh     # push vector number
+    .byte    0x6a
+    .byte    ( . - INTUnknown - 3 ) / 9 + 20 # vector number
+    JmpCommonIdtEntry
+  # No. 8
+    pushl    $0x0      # push error code place holder on the stack
+#    push    xxh     # push vector number
+    .byte    0x6a
+    .byte    ( . - INTUnknown - 3 ) / 9 + 20 # vector number
+    JmpCommonIdtEntry
+  # No. 9
+    pushl    $0x0      # push error code place holder on the stack
+#    push    xxh     # push vector number
+    .byte    0x6a
+    .byte    ( . - INTUnknown - 3 ) / 9 + 20 # vector number
+    JmpCommonIdtEntry
+  # No. 10
+    pushl    $0x0      # push error code place holder on the stack
+#    push    xxh     # push vector number
+    .byte    0x6a
+    .byte    ( . - INTUnknown - 3 ) / 9 + 20 # vector number
+    JmpCommonIdtEntry
+  # No. 11
+    pushl    $0x0      # push error code place holder on the stack
+#    push    xxh     # push vector number
+    .byte    0x6a
+    .byte    ( . - INTUnknown - 3 ) / 9 + 20 # vector number
+    JmpCommonIdtEntry
+  # No. 12
+    pushl    $0x0      # push error code place holder on the stack
+#    push    xxh     # push vector number
+    .byte    0x6a
+    .byte    ( . - INTUnknown - 3 ) / 9 + 20 # vector number
+    JmpCommonIdtEntry
+
 
   ASM_GLOBAL ASM_PFX(SystemTimerHandler)
 ASM_PFX(SystemTimerHandler):
@@ -682,13 +749,80 @@ SIMD_EXCEPTION_SEL  = .-IDT_BASE
         .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
-  .rept  (32 - 20)
+  # The following segment repeats (32 - 20) times:
+  # No. 1
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
         .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
         .short 0            # offset 31:16
-  .endr
+  # No. 2
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0             # 0 for interrupt gate
+        .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
+        .short 0            # offset 31:16
+  # No. 3
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0             # 0 for interrupt gate
+        .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
+        .short 0            # offset 31:16
+  # No. 4
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0             # 0 for interrupt gate
+        .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
+        .short 0            # offset 31:16
+  # No. 5
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0             # 0 for interrupt gate
+        .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
+        .short 0            # offset 31:16
+  # No. 6
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0             # 0 for interrupt gate
+        .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
+        .short 0            # offset 31:16
+  # No. 7
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0             # 0 for interrupt gate
+        .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
+        .short 0            # offset 31:16
+  # No. 8
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0             # 0 for interrupt gate
+        .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
+        .short 0            # offset 31:16
+  # No. 9
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0             # 0 for interrupt gate
+        .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
+        .short 0            # offset 31:16
+  # No. 10
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0             # 0 for interrupt gate
+        .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
+        .short 0            # offset 31:16
+  # No. 11
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0             # 0 for interrupt gate
+        .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
+        .short 0            # offset 31:16
+  # No. 12
+        .short 0            # offset 15:0
+        .short SYS_CODE_SEL # selector 15:0
+        .byte 0             # 0 for interrupt gate
+        .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
+        .short 0            # offset 31:16
+
 
 # 72 unspecified descriptors
   .fill 72 * 8, 1, 0
