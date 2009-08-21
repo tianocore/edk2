@@ -18,7 +18,7 @@
         .stack: 
         .486p: 
         .code16
-		
+    
 .equ                        FAT_DIRECTORY_ENTRY_SIZE, 0x020
 .equ                        FAT_DIRECTORY_ENTRY_SHIFT, 5
 .equ                        BLOCK_SIZE, 0x0200
@@ -715,7 +715,7 @@ IDT_BASE:
         .word 0            # offset 31:16
 
 # 85 unspecified descriptors, First 12 of them are reserved, the rest are avail
-		.fill 85 * 8, 1, 0   # db (85 * 8) dup(0)
+    .fill 85 * 8, 1, 0   # db (85 * 8) dup(0)
 
 # IRQ 0 (System timer) - (INT 0x68)
 .equ                IRQ0_SEL, .-IDT_BASE

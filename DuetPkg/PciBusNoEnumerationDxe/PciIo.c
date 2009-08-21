@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2005 - 2007, Intel Corporation                                                         
+Copyright (c) 2005 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -571,7 +571,7 @@ Returns:
   PCI_IO_DEVICE *PciIoDevice;
 
   if (Buffer == NULL){
-	  return EFI_INVALID_PARAMETER;
+    return EFI_INVALID_PARAMETER;
   }
 
   PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS (This);
@@ -624,7 +624,7 @@ Returns:
   PCI_IO_DEVICE *PciIoDevice;
 
   if (Buffer == NULL){
-	  return EFI_INVALID_PARAMETER;
+    return EFI_INVALID_PARAMETER;
   }
   
   PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS (This);
@@ -677,7 +677,7 @@ Returns:
   PCI_IO_DEVICE *PciIoDevice;
 
   if (Buffer == NULL){
-	  return EFI_INVALID_PARAMETER;
+    return EFI_INVALID_PARAMETER;
   }
 
   PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS (This);
@@ -730,7 +730,7 @@ Returns:
   PCI_IO_DEVICE *PciIoDevice;
 
   if (Buffer == NULL){
-	  return EFI_INVALID_PARAMETER;
+    return EFI_INVALID_PARAMETER;
   }
 
   PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS (This);
@@ -1074,7 +1074,7 @@ Returns:
   PCI_IO_DEVICE *PciIoDevice;
   
   if( HostAddress == NULL ){
-  	 return EFI_INVALID_PARAMETER;
+     return EFI_INVALID_PARAMETER;
   } 
 
   PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS (This);
@@ -1282,21 +1282,21 @@ Returns:
     return EFI_SUCCESS;
 
   case EfiPciIoAttributeOperationEnable:
-	  if(Attributes & ~(PciIoDevice->Supports)) {
-		  return EFI_UNSUPPORTED;
-	  }
-	  NewAttributes = PciIoDevice->Attributes | Attributes;
+    if(Attributes & ~(PciIoDevice->Supports)) {
+      return EFI_UNSUPPORTED;
+    }
+    NewAttributes = PciIoDevice->Attributes | Attributes;
     break;
   case EfiPciIoAttributeOperationDisable:
-	  if(Attributes & ~(PciIoDevice->Supports)) {
-		  return EFI_UNSUPPORTED;
-	  }
+    if(Attributes & ~(PciIoDevice->Supports)) {
+      return EFI_UNSUPPORTED;
+    }
     NewAttributes = PciIoDevice->Attributes & (~Attributes);
     break;
   case EfiPciIoAttributeOperationSet:
-	  if(Attributes & ~(PciIoDevice->Supports)) {
-		  return EFI_UNSUPPORTED;
-	  }
+    if(Attributes & ~(PciIoDevice->Supports)) {
+      return EFI_UNSUPPORTED;
+    }
     NewAttributes = Attributes;
     break;
   default:

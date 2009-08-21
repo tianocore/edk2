@@ -32,8 +32,8 @@
     #                          within 255 bytes of the common entry.  This must
     #                          be done to maintain the consistency of the size
     #                          of entry points...
-    .byte   0xe9               			 # jmp 16 bit relative
-		.long   commonIdtEntry - . - 4   # offset to jump to
+    .byte   0xe9                     # jmp 16 bit relative
+    .long   commonIdtEntry - . - 4   # offset to jump to
 .endm
 
 
@@ -56,21 +56,21 @@ Start:
     call    ClearScreen
 
     # Populate IDT with meaningful offsets for exception handlers...
-		sidt    Idtr 
-		
+    sidt    Idtr 
+    
 
-		movl    Halt, %eax
+    movl    Halt, %eax
     movl    %eax,%ebx                   # use bx to copy 15..0 to descriptors
     shrl    $16,%eax                    # use ax to copy 31..16 to descriptors 
                                         # 63..32 of descriptors is 0
     movl    $0x78,%ecx                  # 78h IDT entries to initialize with unique entry points (exceptions)
-		movl    (Idtr + 2), %esi
+    movl    (Idtr + 2), %esi
     movl    (%esi),%edi
 
 LOOP_1:                                         # loop through all IDT entries exception handlers and initialize to default handler
     movw    %bx, (%edi)                         # write bits 15..0 of offset
     movw    $0x38, 2(%edi)                      # SYS_CODE_SEL64 from GDT
-    movw    $(0x0e00 | 0x8000), 4(%edi)     		# type = 386 interrupt gate, present
+    movw    $(0x0e00 | 0x8000), 4(%edi)         # type = 386 interrupt gate, present
     movw    %ax, 6(%edi)                        # write bits 31..16 of offset
     movl    $0, 8(%edi)                         # write bits 31..16 of offset  
     addl    $16, %edi                           # move up to next descriptor
@@ -123,12 +123,12 @@ LOOP_1:                                         # loop through all IDT entries e
     movl    0x30(%ebp),%edi             # edi = [[22000 + [22014] + 3c] + 2c] = ImageBase (63..32 is zero, ignore)
     movl    0x28(%ebp),%eax             # eax = [[22000 + [22014] + 3c] + 24] = EntryPoint
     addl    %edi,%eax                   # eax = ImageBase + EntryPoint
-		movl    %ebx, EfiLdrOffset          
+    movl    %ebx, EfiLdrOffset          
     movl    %eax, (%ebx)                # Modify far jump instruction for correct entry point
 
-		movw    6(%ebp), %bx                # bx = Number of sections
+    movw    6(%ebp), %bx                # bx = Number of sections
     xorl    %eax,%eax
-		movw    0x14(%ebp), %ax             # ax = Optional Header Size
+    movw    0x14(%ebp), %ax             # ax = Optional Header Size
     addl    %eax,%ebp
     addl    $0x18,%ebp                  # ebp = Start of 1st Section
 
@@ -155,12 +155,12 @@ SectionLoop:
     cmpw    $0,%bx
     jne     SectionLoop
 
-		movl    (Idtr), %eax                  # get size of IDT
-		movzx		(%edx), %eax
+    movl    (Idtr), %eax                  # get size of IDT
+    movzx   (%edx), %eax
     .byte 0xff
     .byte 0xc0
 #    inc     eax
- 		addl    2(%edx), %eax								 # add to base of IDT to get location of memory map...
+    addl    2(%edx), %eax                # add to base of IDT to get location of memory map...
     xorl    %ecx,%ecx
     movl    %eax,%ecx                    # put argument to RCX
 
@@ -379,11 +379,11 @@ commonIdtEntry:
     ja      PrintDefaultString
 PrintExceptionString: 
     shll    $3,%eax             ## multiply by 8 to get offset from StringTable to actual string address
-		addl    StringTable, %eax
+    addl    StringTable, %eax
     movl    (%eax),%esi
     jmp     PrintTheString
 PrintDefaultString: 
-		movl    IntUnknownString, %esi
+    movl    IntUnknownString, %esi
     # patch Int number
     movl    %eax,%edx
     call    A2C
@@ -394,35 +394,35 @@ PrintDefaultString:
     movb    %al,(%esi)
 PrintTheString:        
     call    PrintString
-		movl    String2, %esi
+    movl    String2, %esi
     call    PrintString
     .byte 0x48
     movl    19*8(%ebp),%eax    # CS
     call    PrintQword
     movb    $':', %al
-		movb    %al, (%edi)
+    movb    %al, (%edi)
     addl    $2,%edi
     .byte 0x48
     movl    18*8(%ebp),%eax    # RIP
     call    PrintQword
-		movl    String3, %esi
+    movl    String3, %esi
     call    PrintString
 
     movl    $0xb8140,%edi
 
-		movl    StringRax, %esi
+    movl    StringRax, %esi
     call    PrintString
     .byte 0x48
     movl    15*8(%ebp),%eax
     call    PrintQword
 
-		movl    StringRcx, %esi
+    movl    StringRcx, %esi
     call    PrintString
     .byte 0x48
     movl    14*8(%ebp),%eax
     call    PrintQword
 
-		movl    StringRdx, %esi
+    movl    StringRdx, %esi
     call    PrintString
     .byte 0x48
     movl    13*8(%ebp),%eax
@@ -430,19 +430,19 @@ PrintTheString:
 
     movl    $0xb81e0,%edi
 
-		movl    StringRbx, %esi
+    movl    StringRbx, %esi
     call    PrintString
     .byte 0x48
     movl    12*8(%ebp),%eax
     call    PrintQword
 
-		movl    StringRsp, %esi
+    movl    StringRsp, %esi
     call    PrintString
     .byte 0x48
     movl    21*8(%ebp),%eax
     call    PrintQword
 
-		movl    StringRbp, %esi
+    movl    StringRbp, %esi
     call    PrintString
     .byte 0x48
     movl    10*8(%ebp),%eax
@@ -450,19 +450,19 @@ PrintTheString:
 
     movl    $0xb8280,%edi
 
-		movl    StringRsi, %esi
+    movl    StringRsi, %esi
     call    PrintString
     .byte 0x48
     movl    9*8(%ebp),%eax
     call    PrintQword
 
-		movl    StringRdi, %esi
+    movl    StringRdi, %esi
     call    PrintString
     .byte 0x48
     movl    8*8(%ebp),%eax
     call    PrintQword
 
-		movl    StringEcode, %esi
+    movl    StringEcode, %esi
     call    PrintString
     .byte 0x48
     movl    17*8(%ebp),%eax
@@ -470,19 +470,19 @@ PrintTheString:
 
     movl    $0xb8320,%edi
 
-		movl    StringR8, %esi
+    movl    StringR8, %esi
     call    PrintString
     .byte 0x48
     movl    7*8(%ebp),%eax
     call    PrintQword
 
-		movl    StringR9, %esi
+    movl    StringR9, %esi
     call    PrintString
     .byte 0x48
     movl    6*8(%ebp),%eax
     call    PrintQword
 
-		movl    StringR10, %esi
+    movl    StringR10, %esi
     call    PrintString
     .byte 0x48
     movl    5*8(%ebp),%eax
@@ -490,19 +490,19 @@ PrintTheString:
 
     movl    $0xb83c0,%edi
 
-		movl    StringR11, %esi
+    movl    StringR11, %esi
     call    PrintString
     .byte 0x48
     movl    4*8(%ebp),%eax
     call    PrintQword
 
-		movl    StringR12, %esi
+    movl    StringR12, %esi
     call    PrintString
     .byte 0x48
     movl    3*8(%ebp),%eax
     call    PrintQword
 
-		movl    StringR13, %esi
+    movl    StringR13, %esi
     call    PrintString
     .byte 0x48
     movl    2*8(%ebp),%eax
@@ -510,19 +510,19 @@ PrintTheString:
 
     movl    $0xb8460,%edi
 
-		movl    StringR14, %esi
+    movl    StringR14, %esi
     call    PrintString
     .byte 0x48
     movl    1*8(%ebp),%eax
     call    PrintQword
 
-		movl    StringR15, %esi
+    movl    StringR15, %esi
     call    PrintString
     .byte 0x48
     movl    0*8(%ebp),%eax
     call    PrintQword
 
-		movl    StringSs, %esi
+    movl    StringSs, %esi
     call    PrintString
     .byte 0x48
     movl    22*8(%ebp),%eax
@@ -530,7 +530,7 @@ PrintTheString:
 
     movl    $0xb8500,%edi
 
-		movl    StringRflags, %esi
+    movl    StringRflags, %esi
     call    PrintString
     .byte 0x48
     movl    20*8(%ebp),%eax
@@ -554,7 +554,7 @@ InnerLoop:
     movl    (%esi),%eax
     call    PrintQword
     addl    $8,%esi
-		mov			$0x00, %al 
+    mov     $0x00, %al 
     movb    %al,(%edi)
     addl    $2,%edi
     loop    InnerLoop
@@ -585,7 +585,7 @@ InnerLoop1:
     movl    (%esi),%eax
     call    PrintQword
     addl    $8,%esi
-		movb		$0x00, %al
+    movb    $0x00, %al
     movb    %al,(%edi)
     addl    $2,%edi
     loop    InnerLoop1
@@ -652,10 +652,10 @@ LN_C1:
 PrintString: 
     pushl   %eax
 LN_C2: 
-		movb    (%esi), %al
+    movb    (%esi), %al
     cmpb    $0,%al
     je      LN_C3
- 		movb    %al, (%edi)
+    movb    %al, (%edi)
     .byte 0xff
     .byte 0xc6
 #    inc     esi
@@ -687,7 +687,7 @@ looptop:
     jle     @f
     addb    $7,%bl
 @@: 
-		movb %bl, (%edi)
+    movb %bl, (%edi)
     addl    $2,%edi
     loop    looptop
     #wbinvd
@@ -701,12 +701,12 @@ ClearScreen:
     pushl   %eax
     pushl   %ecx
 
-		movb 		$0x00, %al
+    movb    $0x00, %al
     movb    $0xc,%ah
     movl    $0xb8000,%edi
     movl    $80*24,%ecx
 LN_C4: 
-		movw	  %ax, (%edi)
+    movw    %ax, (%edi)
     addl    $2,%edi
     loop    LN_C4
     movl    $0xb8000,%edi

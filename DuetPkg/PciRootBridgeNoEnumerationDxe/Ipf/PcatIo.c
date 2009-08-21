@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2005, Intel Corporation                                                         
+Copyright (c) 2005 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -59,8 +59,8 @@ PcatRootBridgeIoIoRead (
   )
 {
   PCAT_PCI_ROOT_BRIDGE_INSTANCE *PrivateData;
-  UINTN	                        InStride;
-  UINTN	                        OutStride;
+  UINTN                         InStride;
+  UINTN                         OutStride;
   UINTN                         AlignMask;
   UINTN                         Address;
   PTR                           Buffer;
@@ -163,9 +163,9 @@ PcatRootBridgeIoIoWrite (
   )
 {
   PCAT_PCI_ROOT_BRIDGE_INSTANCE  *PrivateData;
-  UINTN	                         InStride;
-  UINTN	                         OutStride;
-  UINTN	                         AlignMask;
+  UINTN                          InStride;
+  UINTN                          OutStride;
+  UINTN                          AlignMask;
   UINTN                          Address;
   PTR                            Buffer;
   UINT16                         Data16;
@@ -318,9 +318,9 @@ PcatRootBridgeIoPciRW (
   )
 {
   PCAT_PCI_ROOT_BRIDGE_INSTANCE  *PrivateData;
-  UINTN	                         AlignMask;
-  UINTN	                         InStride;
-  UINTN	                         OutStride;
+  UINTN                          AlignMask;
+  UINTN                          InStride;
+  UINTN                          OutStride;
   UINT64                         Address;
   DEFIO_PCI_ADDR                 *Defio;
   PTR                            Buffer;

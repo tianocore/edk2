@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006 - 2007, Intel Corporation                                                         
+Copyright (c) 2006 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -132,12 +132,12 @@ BDS_CONSOLE_CONNECT_ENTRY         gPlatformConsole[] = {
 //    (CONSOLE_IN | STD_ERROR)
 //  },
 //  {
-//  	(EFI_DEVICE_PATH_PROTOCOL *) &gDummyPciVgaDevicePath,
-//  	CONSOLE_OUT
+//    (EFI_DEVICE_PATH_PROTOCOL *) &gDummyPciVgaDevicePath,
+//    CONSOLE_OUT
 //  },
 //  {
-//  	(EFI_DEVICE_PATH_PROTOCOL *) &gDummyPciSerialDevicePath,
-//  	(CONSOLE_OUT | CONSOLE_IN | STD_ERROR)
+//    (EFI_DEVICE_PATH_PROTOCOL *) &gDummyPciSerialDevicePath,
+//    (CONSOLE_OUT | CONSOLE_IN | STD_ERROR)
 //  },
   {
     (EFI_DEVICE_PATH_PROTOCOL*) &gUsbClassKeyboardDevicePath, 

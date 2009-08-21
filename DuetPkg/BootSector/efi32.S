@@ -59,7 +59,7 @@ Start:
 LOOP_1:                                         # loop through all IDT entries exception handlers and initialize to default handler
     movw    %bx, (%edi)                         # write bits 15..0 of offset
     movw    $0x20, 2(%edi)                      # SYS_CODE_SEL from GDT
-    movw    $(0x0e00 | 0x8000), 4(%edi)     		# type = 386 interrupt gate, present
+    movw    $(0x0e00 | 0x8000), 4(%edi)         # type = 386 interrupt gate, present
     movw    %ax, 6(%edi)                        # write bits 31..16 of offset
     addl    $8, %edi                            # move up to next descriptor
     addw    DEFAULT_HANDLER_SIZE, %bx           # move to next entry point

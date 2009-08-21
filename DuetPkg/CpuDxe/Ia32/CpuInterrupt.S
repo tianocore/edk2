@@ -23,12 +23,12 @@
 #EXTERN ExceptionHandler: NEAR
 #EXTERN mTimerVector: DWORD
 
-	.data
-	ASM_GLOBAL ASM_PFX(mExceptionCodeSize)
+  .data
+  ASM_GLOBAL ASM_PFX(mExceptionCodeSize)
 ASM_PFX(mExceptionCodeSize): .long  9
 
-	.text
-	ASM_GLOBAL ASM_PFX(InitDescriptor)
+  .text
+  ASM_GLOBAL ASM_PFX(InitDescriptor)
 
 ASM_PFX(InitDescriptor):
         movl    $GDT_BASE,%eax              # EAX=PHYSICAL address of gdt
@@ -44,7 +44,7 @@ ASM_PFX(InitDescriptor):
 #     UINTN Vector,
 #     VOID  (*Handler)(VOID)
 #     )
-	ASM_GLOBAL ASM_PFX(InstallInterruptHandler)
+  ASM_GLOBAL ASM_PFX(InstallInterruptHandler)
 ASM_PFX(InstallInterruptHandler):
 #  Vector:DWORD @ 4(%esp)
 #  Handler:DWORD @ 8(%esp)
@@ -68,7 +68,7 @@ ASM_PFX(InstallInterruptHandler):
         pop     %edi
         ret
 
-	.macro JmpCommonIdtEntry
+  .macro JmpCommonIdtEntry
     # jmp     commonIdtEntry - this must be hand coded to keep the assembler from
     #                          using a 8 bit reletive jump when the entries are
     #                          within 255 bytes of the common entry.  This must
@@ -76,10 +76,10 @@ ASM_PFX(InstallInterruptHandler):
     #                          of entry points...
     .byte     0xe9                        # jmp 16 bit reletive 
     .long     commonIdtEntry - . - 4      #  offset to jump to
-	.endm
+  .endm
 
     .p2align 1
-	ASM_GLOBAL ASM_PFX(SystemExceptionHandler)
+  ASM_GLOBAL ASM_PFX(SystemExceptionHandler)
 ASM_PFX(SystemExceptionHandler):
 INT0:
     pushl    $0x0      # push error code place holder on the stack
@@ -198,15 +198,15 @@ INT19:
     JmpCommonIdtEntry
 
 INTUnknown:
-	.rept (32 - 20)
+  .rept (32 - 20)
     pushl    $0x0      # push error code place holder on the stack
 #    push    xxh     # push vector number
     .byte    0x6a
     .byte    ( . - INTUnknown - 3 ) / 9 + 20 # vector number
     JmpCommonIdtEntry
-	.endr
+  .endr
 
-	ASM_GLOBAL ASM_PFX(SystemTimerHandler)
+  ASM_GLOBAL ASM_PFX(SystemTimerHandler)
 ASM_PFX(SystemTimerHandler):
     pushl    $0
     pushl    $ASM_PFX(mTimerVector)
@@ -417,10 +417,10 @@ ExceptionDone:
 # data
 #;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-	.data
+  .data
         .p2align 2
 
-gdtr:	.short GDT_END - GDT_BASE - 1   # GDT limit
+gdtr: .short GDT_END - GDT_BASE - 1   # GDT limit
         .long 0                         # (GDT base gets set above)
 #;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #   global descriptor table (GDT)
@@ -507,7 +507,7 @@ GDT_END:
 
 
 
-idtr:	.short IDT_END - IDT_BASE - 1   # IDT limit
+idtr: .short IDT_END - IDT_BASE - 1   # IDT limit
         .long 0                         # (IDT base gets set above)
 #;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #   interrupt descriptor table (IDT)
@@ -682,16 +682,16 @@ SIMD_EXCEPTION_SEL  = .-IDT_BASE
         .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
-	.rept  (32 - 20)
+  .rept  (32 - 20)
         .short 0            # offset 15:0
         .short SYS_CODE_SEL # selector 15:0
         .byte 0             # 0 for interrupt gate
         .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
         .short 0            # offset 31:16
-	.endr
+  .endr
 
 # 72 unspecified descriptors
-	.fill 72 * 8, 1, 0
+  .fill 72 * 8, 1, 0
         
 # IRQ 0 (System timer) - (INT 0x68)
 IRQ0_SEL            = .-IDT_BASE
@@ -821,7 +821,7 @@ IRQ15_SEL            = .-IDT_BASE
         .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
-	.fill 1 * 8, 1, 0
+  .fill 1 * 8, 1, 0
 
 IDT_END:
 
