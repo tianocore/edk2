@@ -726,9 +726,7 @@ SIMD_EXCEPTION_SEL  = .-IDT_BASE
 	.endr
 
 # 72 unspecified descriptors
-	.rept 72 * 8
-        .byte 0
-	.endr
+	.fill 72 * 8, 1, 0
         
 # IRQ 0 (System timer) - (INT 0x68)
 IRQ0_SEL            = .-IDT_BASE
@@ -858,9 +856,7 @@ IRQ15_SEL            = .-IDT_BASE
         .byte 0x0e | 0x80   # (10001110)type = 386 interrupt gate, present
         .short 0            # offset 31:16
 
-	.rept 1 * 16
-        .byte 0
-	.endr
+	.fill 16, 1, 0
 
 IDT_END:
 
