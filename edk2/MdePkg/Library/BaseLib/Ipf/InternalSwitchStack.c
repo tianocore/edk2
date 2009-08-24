@@ -57,9 +57,8 @@ InternalSwitchStack (
   NewBsp   = VA_ARG (Marker, VOID *);
 
   //
-  // Stack should be aligned with CPU_STACK_ALIGNMENT
+  // New backing store pointer should be aligned with CPU_STACK_ALIGNMENT
   //
-  ASSERT (((UINTN)NewStack & (CPU_STACK_ALIGNMENT - 1)) == 0);
   ASSERT (((UINTN)NewBsp & (CPU_STACK_ALIGNMENT - 1)) == 0);
 
   AsmSwitchStackAndBackingStore (EntryPoint, Context1, Context2, NewStack, NewBsp);

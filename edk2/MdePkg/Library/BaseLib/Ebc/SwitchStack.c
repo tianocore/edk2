@@ -54,11 +54,5 @@ InternalSwitchStack (
   // This is to support compilation of CPU types that do not support assemblers
   // such as EBC
   //
-
-  //
-  // Stack should be aligned with CPU_STACK_ALIGNMENT
-  //
-  ASSERT (((UINTN)NewStack & (CPU_STACK_ALIGNMENT - 1)) == 0);
-
   EntryPoint (Context1, Context2);
 }
