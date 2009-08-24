@@ -19,7 +19,7 @@
   PLATFORM_VERSION               = 0.90
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/MdeModule
-  SUPPORTED_ARCHITECTURES        = IA32|IPF|X64|EBC
+  SUPPORTED_ARCHITECTURES        = IA32|IPF|X64|EBC|ARM
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
 
@@ -80,6 +80,9 @@
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
 
 [LibraryClasses.IPF]
+  IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
+
+[LibraryClasses.ARM]
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
 
 [LibraryClasses.EBC.DXE_DRIVER]
