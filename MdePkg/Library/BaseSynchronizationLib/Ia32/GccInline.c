@@ -2,7 +2,7 @@
   GCC inline implementation of BaseSynchronizationLib processor specific functions.
   
   Copyright (c) 2006 - 2009, Intel Corporation<BR>
-  Portions copyright (c) 2008-2009 Apple Inc.<BR>
+  Portions copyright (c) 2008-2009 Apple Inc. All rights reserved.<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -127,7 +127,7 @@ InternalSyncCompareExchange32 (
     "cmpxchgl    %1, %2   \n\t"
     : "=a" (CompareValue)     // %0
     : "q"  (ExchangeValue),   // %1
-      "m"  (*Value),m           // %2
+      "m"  (*Value),          // %2
       "0"  (CompareValue)     // %4 
     : "memory",
       "cc"
