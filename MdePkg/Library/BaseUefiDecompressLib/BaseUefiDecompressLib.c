@@ -2,7 +2,7 @@
   UEFI Decompress Library implementation refer to UEFI specification.
 
   Copyright (c) 2006 - 2008, Intel Corporation<BR>
-  Portions Copyright (c) 2008-2009 Apple Inc.<BR>
+  Portions copyright (c) 2008-2009 Apple Inc. All rights reserved.<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
