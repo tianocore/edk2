@@ -261,6 +261,9 @@ PeCoffLoaderGetPdbPointer (
           return (VOID *) ((CHAR8 *)CodeViewEntryPointer + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY));
         case CODEVIEW_SIGNATURE_RSDS:
           return (VOID *) ((CHAR8 *)CodeViewEntryPointer + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_RSDS_ENTRY));
+        case CODEVIEW_SIGNATURE_MTOC:              
+          return (VOID *) ((CHAR8 *)CodeViewEntryPointer + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_MTOC_ENTRY));
+          break;
         default:
           break;
         }
