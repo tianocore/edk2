@@ -374,9 +374,6 @@ typedef INT64   INTN;
   #define EFIAPI       
 #endif
 
-//
-// For symbol name in GNU assembly code, an extra "_" is necessary
-//
 #if defined(__GNUC__)
   ///
   /// For GNU assembly code, .global or .globl can declare global symbols.

@@ -2,7 +2,7 @@
   Defines data types and constants introduced in UEFI.
 
   Copyright (c) 2006 - 2008, Intel Corporation<BR>
-  Portions Copyright (c) 2008-2009 Apple Inc.<BR>
+  Portions copyright (c) 2008-2009 Apple Inc. All rights reserved.<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -236,8 +236,7 @@ typedef union {
 
 ///
 /// This is just to make sure you can cross compile with the EBC compiler.
-/// It does not make sense to have a PE loader coded in EBC. You need to 
-/// understand the basic.
+/// It does not make sense to have a PE loader coded in EBC. 
 ///
 #define EFI_IMAGE_MACHINE_TYPE_SUPPORTED(Machine) ((Machine) == EFI_IMAGE_MACHINE_EBC)
 
