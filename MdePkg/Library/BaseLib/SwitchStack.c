@@ -58,9 +58,16 @@ SwitchStack (
   ASSERT (EntryPoint != NULL);
   ASSERT (NewStack != NULL);
 
+  //
+  // New stack must be aligned with CPU_STACK_ALIGNMENT
+  //
+  ASSERT (((UINTN)NewStack & (CPU_STACK_ALIGNMENT - 1)) == 0);
+
   VA_START (Marker, NewStack);
 
   InternalSwitchStack (EntryPoint, Context1, Context2, NewStack, Marker);
+
+  VA_END (Marker);
 
   //
   // InternalSwitchStack () will never return

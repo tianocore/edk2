@@ -50,11 +50,6 @@ InternalSwitchStack (
 {
   BASE_LIBRARY_JUMP_BUFFER  JumpBuffer;
 
-  //
-  // Stack should be aligned with CPU_STACK_ALIGNMENT
-  //
-  ASSERT (((UINTN)NewStack & (CPU_STACK_ALIGNMENT - 1)) == 0);
-
   JumpBuffer.Eip = (UINTN)EntryPoint;
   JumpBuffer.Esp = (UINTN)NewStack - sizeof (VOID*);
   JumpBuffer.Esp -= sizeof (Context1) + sizeof (Context2);

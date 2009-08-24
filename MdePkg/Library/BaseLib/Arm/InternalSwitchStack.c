@@ -2,7 +2,7 @@
   SwitchStack() function for ARM.
 
   Copyright (c) 2006 - 2007, Intel Corporation<BR>
-  Portions copyright (c) 2008-2009 Apple Inc.<BR>
+  Portions copyright (c) 2008-2009 Apple Inc. All rights reserved.<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -15,6 +15,16 @@
 
 #include "BaseLibInternals.h"
 
+VOID
+EFIAPI
+InternalSwitchStackAsm (
+  IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
+  IN      VOID                      *Context1,   OPTIONAL
+  IN      VOID                      *Context2,   OPTIONAL
+  IN      VOID                      *NewStack
+  );
+
+  
 /**
   Transfers control to a function starting with a new stack.
 
@@ -50,10 +60,5 @@ InternalSwitchStack (
   )
 
 {
-  //
-  // Stack should be aligned with CPU_STACK_ALIGNMENT
-  //
-  ASSERT (((UINTN)NewStack & (CPU_STACK_ALIGNMENT - 1)) == 0);
-
   InternalSwitchStackAsm (EntryPoint, Context1, Context2, NewStack);
 }
