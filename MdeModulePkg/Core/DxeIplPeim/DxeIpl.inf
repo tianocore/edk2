@@ -53,6 +53,9 @@
 [Sources.EBC]
   Ebc/DxeLoadFunc.c
 
+[Sources.ARM]
+  Arm/DxeLoadFunc.c
+
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec

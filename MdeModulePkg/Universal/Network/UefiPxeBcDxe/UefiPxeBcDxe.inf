@@ -55,6 +55,9 @@
 [Sources.IPF]
   Ipf/PxeArch.h
 
+[Sources.ARM]
+  Arm/PxeArch.h
+
 [Sources.EBC]
   Ebc/PxeArch.h
   Ebc/PxeArch.c
