@@ -1,7 +1,7 @@
 /** @file
   DXE Core Main Entry Point
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -313,9 +313,9 @@ DxeMain (
     for (Hob.Raw = HobStart; !END_OF_HOB_LIST(Hob); Hob.Raw = GET_NEXT_HOB(Hob)) {
       if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_MEMORY_ALLOCATION) {
         DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Memory Allocation %08x %0lx - %0lx\n", \
+          Hob.MemoryAllocation->AllocDescriptor.MemoryType,                      \
           Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress,               \
-          Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress + Hob.MemoryAllocation->AllocDescriptor.MemoryLength - 1, \
-          Hob.MemoryAllocation->AllocDescriptor.MemoryType));
+          Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress + Hob.MemoryAllocation->AllocDescriptor.MemoryLength - 1));
       }
     }
     for (Hob.Raw = HobStart; !END_OF_HOB_LIST(Hob); Hob.Raw = GET_NEXT_HOB(Hob)) {
