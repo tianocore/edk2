@@ -2,7 +2,8 @@
 # Entry Point of Unix Emulator
 #
 # Main executable file of Unix Emulator that loads PEI core after initialization finished.
-# Copyright (c) 2008, Intel Corporation
+# Copyright (c) 2008 - 2009, Intel Corporation
+# Portions copyright (c) 2008-2009 Apple Inc.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -35,7 +36,10 @@
   UnixThunk.c
   FwVol.c
   SecMain.c
-  Stack.S
+  
+[Sources.Ia32]  
+  Ia32/Gasket.S
+  Ia32/Stack.S
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -74,3 +78,10 @@
    GCC:*_*_IA32_CC_FLAGS == -m32 -g -fshort-wchar -fno-strict-aliasing -Wall -malign-double -idirafter/usr/include -c -include $(DEST_DIR_DEBUG)/AutoGen.h -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings
    GCC:*_*_IA32_PP_FLAGS == -m32 -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
    GCC:*_*_IA32_ASM_FLAGS == -c -x assembler -imacros $(DEST_DIR_DEBUG)/AutoGen.h
+
+#
+# Need to do this link via gcc and not ld as the pathing to libraries changes from OS version to OS version
+#
+   XCODE:*_*_IA32_DLINK_PATH == gcc
+   XCODE:*_*_IA32_DLINK_FLAGS == -arch i386  -L/usr/X11R6/lib -lXext -lX11 -lIOKit -framework Carbon		
+   XCODE:*_*_IA32_ASM_FLAGS == -arch i386 -g

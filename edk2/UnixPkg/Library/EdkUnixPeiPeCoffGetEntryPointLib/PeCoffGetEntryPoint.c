@@ -1,6 +1,7 @@
 /*++
 
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2006 - 2009, Intel Corporation
+Portions copyright (c) 2008-2009 Apple Inc. All rights reserved.
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -54,38 +55,24 @@ Returns:
 
 --*/
 {
+	PEI_UNIX_THUNK_PPI      *UnixThunkPpi;
   EFI_STATUS              Status;
-  EFI_PEI_PPI_DESCRIPTOR  *PpiDescriptor;
-  UNIX_PEI_LOAD_FILE_PPI *PeiUnixService;
-  EFI_PHYSICAL_ADDRESS    ImageAddress;
-  UINT64                  ImageSize;
-  EFI_PHYSICAL_ADDRESS    ImageEntryPoint;
+  EFI_UNIX_THUNK_PROTOCOL *Unix;
 
-  ASSERT (Pe32Data   != NULL);
-  ASSERT (EntryPoint != NULL);
-
+  //
+  // Locate Unix ThunkPpi for retrieving standard output handle
+  //
   Status = PeiServicesLocatePpi (
-             &gUnixPeiLoadFilePpiGuid,
+              &gPeiUnixThunkPpiGuid,
              0,
-             &PpiDescriptor,
-             (void **)&PeiUnixService
+              NULL,
+              (VOID **) &UnixThunkPpi
              );
-
   ASSERT_EFI_ERROR (Status);
 
-  Status = PeiUnixService->PeiLoadFileService (
-                           Pe32Data,
-                           &ImageAddress,
-                           &ImageSize,
-                           &ImageEntryPoint
-                           );
+  Unix  = (EFI_UNIX_THUNK_PROTOCOL *)UnixThunkPpi->UnixThunk ();
 
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  *EntryPoint = (VOID*)(UINTN)ImageEntryPoint;
-  return Status;
+  return Unix->PeCoffGetEntryPoint (Pe32Data, EntryPoint);
 }
 
 /**
@@ -255,6 +242,8 @@ PeCoffLoaderGetPdbPointer (
           return (VOID *) ((CHAR8 *)CodeViewEntryPointer + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY));
         case CODEVIEW_SIGNATURE_RSDS:
           return (VOID *) ((CHAR8 *)CodeViewEntryPointer + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_RSDS_ENTRY));
+        case CODEVIEW_SIGNATURE_MTOC:
+          return (VOID *) ((CHAR8 *)CodeViewEntryPointer + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_MTOC_ENTRY));
         default:
           break;
         }

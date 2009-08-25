@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -46,7 +46,6 @@ Abstract:
 --*/
 
 #include "UnixSerialIo.h"
-#include <termio.h>
 
 EFI_DRIVER_BINDING_PROTOCOL gUnixSerialIoDriverBinding = {
   UnixSerialIoDriverBindingSupported,
@@ -454,7 +453,7 @@ Returns:
   UnixHandle = UnixIo->UnixThunk->Open (AsciiDevName, O_RDWR | O_NOCTTY, 0);
   
   if (UnixHandle == -1) {
-    DEBUG ((EFI_D_INFO, "Faile to open serial device, %s!\r\n", UnixIo->EnvString ));
+    DEBUG ((EFI_D_INFO, "Failed to open serial device, %s!\r\n", UnixIo->EnvString ));
     UnixIo->UnixThunk->Perror (AsciiDevName);
     Status = EFI_DEVICE_ERROR;
     goto Error;
@@ -1125,6 +1124,7 @@ Returns:
     return EFI_DEVICE_ERROR;
   }
 
+  Bits = 0;
   if ((Status & TIOCM_CTS) == TIOCM_CTS) {
     Bits |= EFI_SERIAL_CLEAR_TO_SEND;
   }
@@ -1206,6 +1206,7 @@ Returns:
 --*/
 {
   UNIX_SERIAL_IO_PRIVATE_DATA   *Private;
+  EFI_STATUS                    Status;
   UINT8                         *ByteBuffer;
   UINT32                        TotalBytesWritten;
   UINT32                        BytesToGo;
@@ -1219,6 +1220,7 @@ Returns:
   Private           = UNIX_SERIAL_IO_PRIVATE_DATA_FROM_THIS (This); 
 
   ByteBuffer        = (UINT8 *) Buffer;
+  Status = EFI_SUCCESS;
   TotalBytesWritten = 0;
 
   if (Private->SoftwareLoopbackEnable || Private->HardwareLoopbackEnable) {
@@ -1250,6 +1252,10 @@ Returns:
                                            &ByteBuffer[TotalBytesWritten],
                                            BytesToGo
                                            );
+      if (BytesWritten == -1) {
+        Status = EFI_DEVICE_ERROR;
+        break;
+      }
 
       if (Private->HardwareFlowControl) {
         //
@@ -1269,7 +1275,7 @@ Returns:
 
   gBS->RestoreTPL (Tpl);
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 EFI_STATUS

@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006 - 2007, Intel Corporation                                                         
+Copyright (c) 2006 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -566,6 +566,8 @@ Done:
 
       gBS->FreePool (PrivateFile);
     }
+    
+    *Root = NULL;
   }
 
   gBS->RestoreTPL (OldTpl);
@@ -1262,7 +1264,12 @@ Returns:
   CHAR8                   *FullFileName;
   EFI_TPL                 OldTpl;
 
-  if (This == NULL || BufferSize == NULL || Buffer == NULL) {
+  if (This == NULL || BufferSize == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
+  if ((*BufferSize != 0) && (Buffer == NULL)) {
+    // Buffer can be NULL  if *BufferSize is zero
     return EFI_INVALID_PARAMETER;
   }
 

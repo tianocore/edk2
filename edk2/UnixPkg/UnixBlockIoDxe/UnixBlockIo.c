@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2007, Intel Corporation                                                         
+Copyright (c) 2004 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -1276,6 +1276,7 @@ This function extends the capability of SetFilePointer to accept 64 bit paramete
   EFI_STATUS    Status;
   off_t         res;
 
+  Status = EFI_SUCCESS;
   res = Private->UnixThunk->Lseek(Private->fd, DistanceToMove, MoveMethod);
   if (res == -1) {
     Status = EFI_INVALID_PARAMETER;

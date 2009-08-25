@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2008, Intel Corporation                                                         
+Copyright (c) 2004 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -113,9 +113,30 @@ Returns:
 
 --*/
 {
+  EFI_STATUS  Status;
+  UINTN       HandleCount;
+  EFI_HANDLE  *HandleBuffer;
+  UINTN       Index;
+
   //
-  // BUGBUG Need to kill all console windows later
+  // Disconnect all
   //
+  Status = gBS->LocateHandleBuffer (
+                  AllHandles,
+                  NULL,
+                  NULL,
+                  &HandleCount,
+                  &HandleBuffer
+                  );
+  if (!EFI_ERROR (Status)) {
+    for (Index = 0; Index < HandleCount; Index++) {
+      Status = gBS->DisconnectController (HandleBuffer[Index], NULL, NULL);
+    }
+  
+    gBS->FreePool (HandleBuffer);
+  }
+
+
   //
   // Discard ResetType, always return 0 as exit code
   //
@@ -124,6 +145,7 @@ Returns:
   //
   // Should never go here
   //
-  while (1)
-    ;
+  ASSERT (FALSE);
+
+  return;
 }
