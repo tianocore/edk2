@@ -1,6 +1,7 @@
 /*++
 
-Copyright (c) 2004 - 2006, Intel Corporation                                                         
+Copyright (c) 2004 - 2009, Intel Corporation                                                         
+Portions copyright (c) 2008-2009 Apple Inc. All rights reserved.
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -149,11 +150,136 @@ GetErrno(void)
   return errno;
 }
 
+#if __APPLE__
+void GasketmsSleep (unsigned long Milliseconds);
+void Gasketexit (int status);
+void GasketSetTimer (UINT64 PeriodMs, VOID (*CallBack)(UINT64 DeltaMs));
+void GasketGetLocalTime (EFI_TIME *Time);
+struct tm *Gasketgmtime (const time_t *clock);
+long GasketGetTimeZone (void);
+int GasketGetDayLight (void);
+int Gasketpoll (struct pollfd *pfd, int nfds, int timeout);
+int Gasketread (int fd, void *buf, int count);
+int Gasketwrite (int fd, const void *buf, int count);
+char *Gasketgetenv (const char *name);
+int Gasketopen (const char *name, int flags, int mode);
+off_t Gasketlseek (int fd, off_t off, int whence);
+int Gasketftruncate (int fd, long int len);
+int Gasketclose (int fd);
+int Gasketmkdir (const char *pathname, mode_t mode);
+int Gasketrmdir (const char *pathname);
+int Gasketunlink (const char *pathname);
+int GasketGetErrno (void);
+DIR *Gasketopendir (const char *pathname);
+void *Gasketrewinddir (DIR *dir);
+struct dirent *Gasketreaddir (DIR *dir);
+int Gasketclosedir (DIR *dir);
+int Gasketstat (const char *path, struct stat *buf);
+int Gasketstatfs (const char *path, struct statfs *buf);
+int Gasketrename (const char *oldpath, const char *newpath);
+time_t Gasketmktime (struct tm *tm);
+int Gasketfsync (int fd);
+int Gasketchmod (const char *path, mode_t mode);
+int Gasketutime (const char *filename, const struct utimbuf *buf);
+int Gaskettcflush (int fildes, int queue_selector);
+EFI_STATUS GasketUgaCreate(struct _EFI_UNIX_UGA_IO_PROTOCOL **UgaIo, CONST CHAR16 *Title);
+void Gasketperror (__const char *__s);
+
+//
+// ... is always an int or pointer to device specific data structure
+//
+int Gasketioctl (int fd, unsigned long int __request, ...);
+int Gasketfcntl (int __fd, int __cmd, ...);
+
+int Gasketcfsetispeed (struct termios *__termios_p, speed_t __speed);
+int Gasketcfsetospeed (struct termios *__termios_p, speed_t __speed);
+int Gaskettcgetattr (int __fd, struct termios *__termios_p); 
+int Gaskettcsetattr (int __fd, int __optional_actions, __const struct termios *__termios_p);
+int Gasketsigaction (int sig, const struct sigaction *act, struct sigaction *oact);
+int Gasketsetcontext (const ucontext_t *ucp);
+int Gasketgetcontext (ucontext_t *ucp);
+int Gasketsigemptyset (sigset_t *set);
+int Gasketsigaltstack (const stack_t *ss, stack_t *oss);
+
+RETURN_STATUS
+GasketUnixPeCoffGetEntryPoint (
+  IN     VOID  *Pe32Data,
+  IN OUT VOID  **EntryPoint
+  );
+
+VOID
+GasketUnixPeCoffRelocateImageExtraAction (
+  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
+  );
+
+VOID
+GasketPeCoffLoaderUnloadImageExtraAction (
+  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
+  );
+
+#endif
+
 extern EFI_STATUS
 UgaCreate(struct _EFI_UNIX_UGA_IO_PROTOCOL **UgaIo, CONST CHAR16 *Title);
 
 EFI_UNIX_THUNK_PROTOCOL mUnixThunkTable = {
   EFI_UNIX_THUNK_PROTOCOL_SIGNATURE,
+#ifdef __APPLE__
+//
+// Mac OS X requires the stack to be 16-byte aligned for IA-32. So on an OS X build
+// we add an assembly wrapper that makes sure the stack ges aligned. 
+// This has the nice benfit of being able to run EFI ABI code, like the EFI shell
+// that is checked in to source control in the OS X version of the emulator
+//
+  GasketmsSleep, /* Sleep */
+  Gasketexit, /* Exit */
+  GasketSetTimer,
+  GasketGetLocalTime,
+  Gasketgmtime,
+  GasketGetTimeZone,
+  GasketGetDayLight,
+  (UnixPoll)Gasketpoll,
+  (UnixRead)Gasketread,
+  (UnixWrite)Gasketwrite,
+  Gasketgetenv,
+  (UnixOpen)Gasketopen,
+  (UnixSeek)Gasketlseek,
+  (UnixFtruncate)Gasketftruncate,
+  Gasketclose,
+  Gasketmkdir,
+  Gasketrmdir,
+  Gasketunlink,
+  GasketGetErrno,
+  Gasketopendir,
+  (UnixRewindDir)Gasketrewinddir,
+  Gasketreaddir,
+  Gasketclosedir,
+  Gasketstat,
+  Gasketstatfs,
+  Gasketrename,
+  Gasketmktime,
+  Gasketfsync,
+  Gasketchmod,
+  Gasketutime,
+  Gaskettcflush,
+  GasketUgaCreate,
+  Gasketperror,
+  Gasketioctl,
+  Gasketfcntl,
+  Gasketcfsetispeed,
+  Gasketcfsetospeed,
+  Gaskettcgetattr,
+  Gaskettcsetattr,
+  
+  dlopen,  // Update me with a gasket
+  dlerror, // Update me with a gasket
+  dlsym,   // Update me with a gasket
+
+  SecPeCoffGetEntryPoint,                // Update me with a gasket
+  SecPeCoffRelocateImageExtraAction,     // Update me with a gasket
+  SecPeCoffLoaderUnloadImageExtraAction  // Update me with a gasket
+
+#else
   msSleep, /* Sleep */
   exit, /* Exit */
   SetTimer,
@@ -166,8 +292,8 @@ EFI_UNIX_THUNK_PROTOCOL mUnixThunkTable = {
   (UnixWrite)write,
   getenv,
   (UnixOpen)open,
-  lseek,
-  ftruncate,
+  (UnixSeek)lseek,
+  (UnixFtruncate)ftruncate,
   close,
   mkdir,
   rmdir,
@@ -195,7 +321,11 @@ EFI_UNIX_THUNK_PROTOCOL mUnixThunkTable = {
   tcsetattr,
   dlopen,
   dlerror,
-  dlsym
+  dlsym,
+  SecPeCoffGetEntryPoint,
+  SecPeCoffRelocateImageExtraAction,
+  SecPeCoffLoaderUnloadImageExtraAction
+#endif
 };
 
 

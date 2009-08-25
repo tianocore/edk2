@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006 - 2008, Intel Corporation                                                         
+Copyright (c) 2006 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -210,7 +210,7 @@ Returns:
 
 --*/
 {
-  EFI_FW_VOL_INSTANCE *FwhInstance;
+  EFI_FW_VOL_INSTANCE *FwhInstance = NULL;
   EFI_STATUS          Status;
 
   //
@@ -250,7 +250,7 @@ Returns:
 
 --*/
 {
-  EFI_FW_VOL_INSTANCE *FwhInstance;
+  EFI_FW_VOL_INSTANCE *FwhInstance = NULL;
   EFI_STATUS          Status;
 
   //
@@ -303,7 +303,7 @@ Returns:
   UINTN                   Offset;
   EFI_LBA                 StartLba;
   EFI_LBA                 NextLba;
-  EFI_FW_VOL_INSTANCE     *FwhInstance;
+  EFI_FW_VOL_INSTANCE     *FwhInstance = NULL;
   EFI_FV_BLOCK_MAP_ENTRY  *BlockMap;
   EFI_STATUS              Status;
 
@@ -626,7 +626,7 @@ Returns:
 
 --*/
 {
-  EFI_FW_VOL_INSTANCE *FwhInstance;
+  EFI_FW_VOL_INSTANCE   *FwhInstance = NULL;
   EFI_FVB_ATTRIBUTES_2  OldAttributes;
   EFI_FVB_ATTRIBUTES_2  *AttribPtr;
   UINT32              Capabilities;
@@ -733,7 +733,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 FvbProtocolGetPhysicalAddress (
-  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
+  IN CONST EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL     *This,
   OUT EFI_PHYSICAL_ADDRESS                        *Address
   )
 /*++
@@ -764,7 +764,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 FvbProtocolGetBlockSize (
-  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
+  IN CONST EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL     *This,
   IN  EFI_LBA                                     Lba,
   OUT UINTN                                       *BlockSize,
   OUT UINTN                                       *NumOfBlocks
@@ -808,7 +808,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 FvbProtocolGetAttributes (
-  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
+  IN CONST EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL     *This,
   OUT EFI_FVB_ATTRIBUTES_2                          *Attributes
   )
 /*++
@@ -835,7 +835,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 FvbProtocolSetAttributes (
-  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
+  IN CONST EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL     *This,
   IN OUT EFI_FVB_ATTRIBUTES_2                       *Attributes
   )
 /*++
@@ -862,7 +862,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 FvbProtocolEraseBlocks (
-  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    *This,
+  IN CONST EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    *This,
   ...  
   )
 /*++
@@ -891,7 +891,7 @@ Returns:
 --*/
 {
   EFI_FW_VOL_BLOCK_DEVICE *FvbDevice;
-  EFI_FW_VOL_INSTANCE     *FwhInstance;
+  EFI_FW_VOL_INSTANCE     *FwhInstance = NULL;
   UINTN                   NumOfBlocks;
   VA_LIST                 args;
   EFI_LBA                 StartingLba;
@@ -960,7 +960,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 FvbProtocolWrite (
-  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
+  IN CONST EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL     *This,
   IN EFI_LBA                                      Lba,
   IN UINTN                                        Offset,
   IN OUT UINTN                                    *NumBytes,
@@ -1008,7 +1008,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 FvbProtocolRead (
-  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
+  IN CONST EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL     *This,
   IN EFI_LBA                                      Lba,
   IN UINTN                                        Offset,
   IN OUT UINTN                                    *NumBytes,
@@ -1124,7 +1124,7 @@ Returns:
 --*/
 {
   EFI_STATUS                          Status;
-  EFI_FW_VOL_INSTANCE                 *FwhInstance;
+  EFI_FW_VOL_INSTANCE                 *FwhInstance = NULL;
   EFI_FIRMWARE_VOLUME_HEADER          *FwVolHeader;
   EFI_DXE_SERVICES                    *DxeServices;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR     Descriptor;

@@ -1,6 +1,7 @@
 /**@file
 
 Copyright (c) 2006 - 2009, Intel Corporation
+Portions copyright (c) 2008-2009 Apple Inc. All rights reserved.
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -36,7 +37,7 @@ Abstract:
 EFI_UNIX_THUNK_PROTOCOL   *mUnix = NULL;
 
 /**
-  The function caches the pointer of the WinNT thunk functions
+  The function caches the pointer of the Unix thunk functions
   It will ASSERT() if Unix thunk ppi is not installed.
 
   @retval EFI_SUCCESS   WinNT thunk protocol is found and cached.
@@ -83,38 +84,12 @@ PeCoffLoaderRelocateImageExtraAction (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
-  VOID * Handle;
-  VOID * Entry;
-
-  ASSERT (ImageContext != NULL);
-
-  Handle = NULL;
-  Entry  = NULL;
-  
   if (mUnix == NULL) {
     UnixPeCoffGetUnixThunkStucture ();
   }
-  DEBUG ((EFI_D_ERROR, "Loading %a 0x%08lx - entry point 0x%08lx\n",
-          ImageContext->PdbPointer,
-          (UINTN)ImageContext->ImageAddress,
-          (UINTN)ImageContext->EntryPoint));
-
-  Handle = mUnix->Dlopen (ImageContext->PdbPointer, RTLD_NOW);
-  
-  if (Handle) {
-    Entry = mUnix->Dlsym(Handle, "_ModuleEntryPoint");
-  } else {
-  	DEBUG ((EFI_D_ERROR, "%a\n", mUnix->Dlerror()));
-  }
-  
-  if (Entry != NULL) {
-    ImageContext->EntryPoint = Entry;
-    DEBUG ((EFI_D_ERROR, "Change %a Entrypoint to :0x%08lx\n", ImageContext->PdbPointer, Entry));
+  mUnix->PeCoffRelocateImageExtraAction (ImageContext);
   }
 
-
-  return;
- }  
 
 /**
   Performs additional actions just before a PE/COFF image is unloaded.  Any resources
@@ -132,5 +107,8 @@ PeCoffLoaderUnloadImageExtraAction (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
-  ASSERT (ImageContext != NULL);
+  if (mUnix == NULL) {
+    UnixPeCoffGetUnixThunkStucture ();
+  }
+  mUnix->PeCoffUnloadImageExtraAction (ImageContext);
 }

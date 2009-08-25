@@ -1,6 +1,7 @@
 /*++
 
-Copyright (c) 2006 - 2007 Intel Corporation.
+Copyright (c) 2006 - 2009 Intel Corporation.
+Portions copyright (c) 2008-2009 Apple Inc.
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -14,7 +15,7 @@ Module Name:
   SecMain.c
 
 Abstract:
-  WinNt emulator of SEC phase. It's really a Posix application, but this is
+  Unix emulator of SEC phase. It's really a Posix application, but this is
   Ok since all the other modules for NT32 are NOT Posix applications.
 
   This program processes host environment variables and figures out
@@ -35,21 +36,29 @@ Abstract:
 #include "SecMain.h"
 #include <sys/mman.h>
 #include <Ppi/UnixPeiLoadFile.h>
+#include <Framework/StatusCode.h>
 #include <Ppi/TemporaryRamSupport.h>
 #include <dlfcn.h>
+
+#ifdef __APPLE__
+#define MAP_ANONYMOUS MAP_ANON
+char *gGdbWorkingFileName = NULL;
+#endif
+
+
 //
 // Globals
 //
 
-UNIX_PEI_LOAD_FILE_PPI                    mSecNtLoadFilePpi          = { SecWinNtPeiLoadFile };
+UNIX_PEI_LOAD_FILE_PPI                    mSecUnixLoadFilePpi          = { SecUnixPeiLoadFile };
 
-PEI_UNIX_AUTOSCAN_PPI                     mSecNtAutoScanPpi          = { SecWinNtPeiAutoScan };
+PEI_UNIX_AUTOSCAN_PPI                     mSecUnixAutoScanPpi          = { SecUnixPeiAutoScan };
 
-PEI_UNIX_THUNK_PPI                        mSecWinNtThunkPpi          = { SecWinNtWinNtThunkAddress };
+PEI_UNIX_THUNK_PPI                        mSecUnixThunkPpi          = { SecUnixUnixThunkAddress };
 
 EFI_PEI_PROGRESS_CODE_PPI                 mSecStatusCodePpi          = { SecPeiReportStatusCode };
 
-UNIX_FWH_PPI                              mSecFwhInformationPpi      = { SecWinNtFdAddress };
+UNIX_FWH_PPI                              mSecFwhInformationPpi      = { SecUnixFdAddress };
 
 TEMPORARY_RAM_SUPPORT_PPI                 mSecTemporaryRamSupportPpi = {SecTemporaryRamSupport};
 
@@ -57,17 +66,17 @@ EFI_PEI_PPI_DESCRIPTOR  gPrivateDispatchTable[] = {
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI,
     &gUnixPeiLoadFilePpiGuid,
-    &mSecNtLoadFilePpi
+    &mSecUnixLoadFilePpi
   },
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI,
     &gPeiUnixAutoScanPpiGuid,
-    &mSecNtAutoScanPpi
+    &mSecUnixAutoScanPpi
   },
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI,
     &gPeiUnixThunkPpiGuid,
-    &mSecWinNtThunkPpi
+    &mSecUnixThunkPpi
   },
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI,
@@ -107,6 +116,12 @@ UNIX_FD_INFO                                *gFdInfo;
 UINTN                                     gSystemMemoryCount = 0;
 UNIX_SYSTEM_MEMORY                       *gSystemMemory;
 
+
+
+UINTN                        mImageContextModHandleArraySize = 0;
+IMAGE_CONTEXT_TO_MOD_HANDLE  *mImageContextModHandleArray = NULL;
+
+
 VOID
 EFIAPI
 SecSwitchStack (
@@ -134,17 +149,16 @@ SecNt32PeCoffRelocateImage (
   );
 
 
-INTN
-EFIAPI
+int
 main (
-  IN  INTN  Argc,
-  IN  CHAR8 **Argv,
-  IN  CHAR8 **Envp
+  IN  int   Argc,
+  IN  char  **Argv,
+  IN  char  **Envp
   )
 /*++
 
 Routine Description:
-  Main entry point to SEC for WinNt. This is a unix program
+  Main entry point to SEC for Unix. This is a unix program
 
 Arguments:
   Argc - Number of command line arguments
@@ -179,6 +193,19 @@ Returns:
 
   printf ("\nEDK SEC Main UNIX Emulation Environment from www.TianoCore.org\n");
 
+#ifdef __APPLE__
+  //
+  // We can't use dlopen on OS X, so we need a scheme to get symboles into gdb
+  // We need to create a temp file that contains gdb commands so we can load
+  // symbols when we load every PE/COFF image.
+  //
+  Index = strlen (*Argv);
+  gGdbWorkingFileName = malloc (Index + strlen(".gdb"));
+  strcpy (gGdbWorkingFileName, *Argv);
+  strcat (gGdbWorkingFileName, ".gdb");
+#endif
+
+
   //
   // Allocate space for gSystemMemory Array
   //
@@ -200,12 +227,12 @@ Returns:
   //
   // Setup Boot Mode. If BootModeStr == "" then BootMode = 0 (BOOT_WITH_FULL_CONFIGURATION)
   //
-  printf ("  BootMode 0x%02x\n", FixedPcdGet32 (PcdUnixBootMode));
+  printf ("  BootMode 0x%02x\n", (unsigned int)FixedPcdGet32 (PcdUnixBootMode));
 
   //
   // Open up a 128K file to emulate temp memory for PEI.
   //  on a real platform this would be SRAM, or using the cache as RAM.
-  //  Set InitialStackMemory to zero so WinNtOpenFile will allocate a new mapping
+  //  Set InitialStackMemory to zero so UnixOpenFile will allocate a new mapping
   //
   InitialStackMemorySize  = STACK_SIZE;
   InitialStackMemory = (UINTN)MapMemory(0, 
@@ -218,11 +245,11 @@ Returns:
   }
 
   printf ("  SEC passing in %u KB of temp RAM at 0x%08lx to PEI\n",
-    (UINTN)(InitialStackMemorySize / 1024),
+    (unsigned int)(InitialStackMemorySize / 1024),
     (unsigned long)InitialStackMemory);
     
   for (StackPointer = (UINTN*) (UINTN) InitialStackMemory;
-     StackPointer < (UINTN*) ((UINTN) InitialStackMemory + (UINT64) InitialStackMemorySize);
+     StackPointer < (UINTN*)(UINTN)((UINTN) InitialStackMemory + (UINT64) InitialStackMemorySize);
      StackPointer ++) {
     *StackPointer = 0x5AA55AA5;
   }
@@ -255,7 +282,7 @@ Returns:
 		      &gFdInfo[Index].Size
 		      );
     if (EFI_ERROR (Status)) {
-      printf ("ERROR : Can not open Firmware Device File %s (%x).  Exiting.\n", FileName, Status);
+      printf ("ERROR : Can not open Firmware Device File %s (%x).  Exiting.\n", FileName, (unsigned int)Status);
       exit (1);
     }
 
@@ -354,7 +381,7 @@ MapFile (
 /*++
 
 Routine Description:
-  Opens and memory maps a file using WinNt services. If BaseAddress is non zero
+  Opens and memory maps a file using Unix services. If BaseAddress is non zero
   the process will try and allocate the memory starting at BaseAddress.
 
 Arguments:
@@ -415,12 +442,12 @@ Returns:
 EFI_STATUS
 EFIAPI
 SecPeiReportStatusCode (
-  IN EFI_PEI_SERVICES           **PeiServices,
+  IN CONST EFI_PEI_SERVICES     **PeiServices,
   IN EFI_STATUS_CODE_TYPE       CodeType,
   IN EFI_STATUS_CODE_VALUE      Value,
   IN UINT32                     Instance,
-  IN EFI_GUID                   * CallerId,
-  IN EFI_STATUS_CODE_DATA       * Data OPTIONAL
+  IN CONST EFI_GUID             *CallerId,
+  IN CONST EFI_STATUS_CODE_DATA *Data OPTIONAL
   )
 /*++
 
@@ -460,7 +487,7 @@ Returns:
     //
     // Processes ASSERT ()
     //
-    printf ("ASSERT %s(%d): %s\n", Filename, LineNumber, Description);
+    printf ("ASSERT %s(%d): %s\n", Filename, (int)LineNumber, Description);
 
   } else if (ReportStatusCodeExtractDebugInfo (Data, &ErrorLevel, &Marker, &Format)) {
     //
@@ -605,7 +632,7 @@ Returns:
   //
   // Load the PEI Core from a Firmware Volume
   //
-  Status = SecWinNtPeiLoadFile (
+  Status = SecUnixPeiLoadFile (
             PeiCorePe32File,
             &PeiImageAddress,
             &PeiCoreSize,
@@ -633,7 +660,7 @@ Returns:
 
 EFI_STATUS
 EFIAPI
-SecWinNtPeiAutoScan (
+SecUnixPeiAutoScan (
   IN  UINTN                 Index,
   OUT EFI_PHYSICAL_ADDRESS  *MemoryBase,
   OUT UINT64                *MemorySize
@@ -646,7 +673,7 @@ Routine Description:
   It uses gSystemMemory[] and gSystemMemoryCount that were created by
   parsing the host environment variable EFI_MEMORY_SIZE.
   The size comes from the varaible and the address comes from the call to
-  WinNtOpenFile.
+  UnixOpenFile.
 
 Arguments:
   Index      - Which memory region to use
@@ -680,19 +707,18 @@ Returns:
 
 VOID *
 EFIAPI
-SecWinNtWinNtThunkAddress (
+SecUnixUnixThunkAddress (
   VOID
   )
 /*++
 
 Routine Description:
   Since the SEC is the only Unix program in stack it must export
-  an interface to do Win API calls. That's what the WinNtThunk address
-  is for. gWinNt is initailized in WinNtThunk.c.
+  an interface to do POSIX calls.  gUnix is initailized in UnixThunk.c.
 
 Arguments:
   InterfaceSize - sizeof (EFI_WIN_NT_THUNK_PROTOCOL);
-  InterfaceBase - Address of the gWinNt global
+  InterfaceBase - Address of the gUnix global
 
 Returns:
   EFI_SUCCESS - Data returned
@@ -704,12 +730,11 @@ Returns:
 
 
 EFI_STATUS
-EFIAPI
-SecWinNtPeiLoadFile (
+SecUnixPeiLoadFile (
   IN  VOID                    *Pe32Data,
-  IN  EFI_PHYSICAL_ADDRESS    *ImageAddress,
-  IN  UINT64                  *ImageSize,
-  IN  EFI_PHYSICAL_ADDRESS    *EntryPoint
+  OUT EFI_PHYSICAL_ADDRESS    *ImageAddress,
+  OUT UINT64                  *ImageSize,
+  OUT EFI_PHYSICAL_ADDRESS    *EntryPoint
   )
 /*++
 
@@ -759,10 +784,7 @@ Returns:
     return Status;
   }
 
-  Status = SecNt32PeCoffRelocateImage(&ImageContext);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
+  SecPeCoffRelocateImageExtraAction (&ImageContext);
 
   //
   // BugBug: Flush Instruction Cache Here when CPU Lib is ready
@@ -775,9 +797,30 @@ Returns:
   return EFI_SUCCESS;
 }
 
+
+RETURN_STATUS
+EFIAPI
+SecPeCoffGetEntryPoint (
+  IN     VOID  *Pe32Data,
+  IN OUT VOID  **EntryPoint
+  )
+{
+  EFI_STATUS              Status;
+  EFI_PHYSICAL_ADDRESS    ImageAddress;
+  UINT64                  ImageSize;
+  EFI_PHYSICAL_ADDRESS    PhysEntryPoint;
+
+  Status = SecUnixPeiLoadFile (Pe32Data, &ImageAddress, &ImageSize, &PhysEntryPoint);
+
+  *EntryPoint = (VOID *)(UINTN)PhysEntryPoint;
+  return Status;
+}
+
+
+
 EFI_STATUS
 EFIAPI
-SecWinNtFdAddress (
+SecUnixFdAddress (
   IN     UINTN                 Index,
   IN OUT EFI_PHYSICAL_ADDRESS  *FdBase,
   IN OUT UINT64                *FdSize
@@ -882,6 +925,131 @@ Returns:
 }
 
 
+EFI_STATUS
+AddHandle (
+  IN  PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext,
+  IN  VOID                                 *ModHandle
+  )
+/*++
+
+Routine Description:
+  Store the ModHandle in an array indexed by the Pdb File name.
+  The ModHandle is needed to unload the image. 
+
+Arguments:
+  ImageContext - Input data returned from PE Laoder Library. Used to find the 
+                 .PDB file name of the PE Image.
+  ModHandle    - Returned from LoadLibraryEx() and stored for call to 
+                 FreeLibrary().
+
+Returns:
+  EFI_SUCCESS - ModHandle was stored. 
+
+--*/
+{
+  UINTN                       Index;
+  IMAGE_CONTEXT_TO_MOD_HANDLE *Array;
+  UINTN                       PreviousSize;
+
+
+  Array = mImageContextModHandleArray;
+  for (Index = 0; Index < mImageContextModHandleArraySize; Index++, Array++) {
+    if (Array->ImageContext == NULL) {
+      //
+      // Make a copy of the stirng and store the ModHandle
+      //
+      Array->ImageContext = ImageContext;
+      Array->ModHandle    = ModHandle;
+      return EFI_SUCCESS;
+    }
+  }
+  
+  //
+  // No free space in mImageContextModHandleArray so grow it by 
+  // IMAGE_CONTEXT_TO_MOD_HANDLE entires. realloc will
+  // copy the old values to the new locaiton. But it does
+  // not zero the new memory area.
+  //
+  PreviousSize = mImageContextModHandleArraySize * sizeof (IMAGE_CONTEXT_TO_MOD_HANDLE);
+  mImageContextModHandleArraySize += MAX_IMAGE_CONTEXT_TO_MOD_HANDLE_ARRAY_SIZE;
+
+  mImageContextModHandleArray = realloc (mImageContextModHandleArray, mImageContextModHandleArraySize * sizeof (IMAGE_CONTEXT_TO_MOD_HANDLE));
+  if (mImageContextModHandleArray == NULL) {
+    ASSERT (FALSE);
+    return EFI_OUT_OF_RESOURCES;
+  }
+  
+  memset (mImageContextModHandleArray + PreviousSize, 0, MAX_IMAGE_CONTEXT_TO_MOD_HANDLE_ARRAY_SIZE * sizeof (IMAGE_CONTEXT_TO_MOD_HANDLE));
+ 
+  return AddHandle (ImageContext, ModHandle);
+}
+
+
+VOID *
+RemoveHandle (
+  IN  PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
+  )
+/*++
+
+Routine Description:
+  Return the ModHandle and delete the entry in the array.
+
+Arguments:
+  ImageContext - Input data returned from PE Laoder Library. Used to find the 
+                 .PDB file name of the PE Image.
+
+Returns:
+  ModHandle - ModHandle assoicated with ImageContext is returned
+  NULL      - No ModHandle associated with ImageContext
+
+--*/
+{
+  UINTN                        Index;
+  IMAGE_CONTEXT_TO_MOD_HANDLE  *Array;
+
+  if (ImageContext->PdbPointer == NULL) {
+    //
+    // If no PDB pointer there is no ModHandle so return NULL
+    //
+    return NULL;
+  }
+
+  Array = mImageContextModHandleArray;
+  for (Index = 0; Index < mImageContextModHandleArraySize; Index++, Array++) {
+    if ((Array->ImageContext == ImageContext)) {
+      //
+      // If you find a match return it and delete the entry
+      //
+      Array->ImageContext = NULL;
+      return Array->ModHandle;
+    }
+  }
+
+  return NULL;
+}
+
+
+
+//
+// Target for gdb breakpoint in a script that uses gGdbWorkingFileName to source a 
+// add-symbol-file command. Hey what can you say scripting in gdb is not that great....
+//
+// Put .gdbinit in the CWD where you do gdb SecMain.dll for source level debug
+//
+// cat .gdbinit
+// b SecGdbScriptBreak
+// command
+// silent
+// source SecMain.dll.gdb
+// c
+// end
+//
+VOID
+SecGdbScriptBreak (
+  VOID
+  )
+{
+}
 
 VOID
 SecUnixLoaderBreak (
@@ -890,19 +1058,128 @@ SecUnixLoaderBreak (
 {
 }
 
-EFI_STATUS
+BOOLEAN
+IsPdbFile (
+  IN  CHAR8   *PdbFileName
+  )
+{
+  UINTN Len;
+
+  if (PdbFileName == NULL) {
+    return FALSE;
+  }
+
+  Len = strlen (PdbFileName);
+  if ((Len < 5)|| (PdbFileName[Len - 4] != '.')) {
+    return FALSE;
+  }
+  
+  if ((PdbFileName[Len - 3] == 'P' || PdbFileName[Len - 3] == 'p') &&
+      (PdbFileName[Len - 2] == 'D' || PdbFileName[Len - 2] == 'd') &&
+      (PdbFileName[Len - 1] == 'B' || PdbFileName[Len - 1] == 'b')) {
+    return TRUE;
+  }
+  
+  return FALSE;
+}
+
+
+#define MAX_SPRINT_BUFFER_SIZE 0x200
+
+void
+PrintLoadAddress (
+  IN PE_COFF_LOADER_IMAGE_CONTEXT          *ImageContext
+  )
+{
+  fprintf (stderr,
+     "0x%08lx Loading %s with entry point 0x%08lx\n",
+     (unsigned long)ImageContext->ImageAddress + ImageContext->SizeOfHeaders,
+     ImageContext->PdbPointer,   
+     (unsigned long)ImageContext->EntryPoint
+     );
+     
+  // Keep output synced up
+  fflush (stderr);
+}
+
+
+VOID
 EFIAPI
-SecNt32PeCoffRelocateImage (
+SecPeCoffRelocateImageExtraAction (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
   )
 {
-  void * Handle;
-  void * Entry;
   EFI_STATUS Status;
 
-  Handle = NULL;
-  Entry  = NULL;
   Status = PeCoffLoaderRelocateImage (ImageContext);
+  if (EFI_ERROR (Status)) {
+    PrintLoadAddress (ImageContext);
+    return;
+  }
+    
+#ifdef __APPLE__
+  PrintLoadAddress (ImageContext);
+
+  //
+  // In mach-o (OS X executable) dlopen() can only load files in the MH_DYLIB of MH_BUNDLE format.
+  // To convert to PE/COFF we need to construct a mach-o with the MH_PRELOAD format. We create
+  // .dSYM files for the PE/COFF images that can be used by gdb for source level debugging.
+  //
+  FILE  *GdbTempFile;
+  
+  //
+  // In the Mach-O to PE/COFF conversion the size of the PE/COFF headers is not accounted for.
+  // Thus we need to skip over the PE/COFF header when giving load addresses for our symbol table.
+  //
+  if (ImageContext->PdbPointer != NULL && !IsPdbFile (ImageContext->PdbPointer)) {
+    //
+    // Now we have a database of the images that are currently loaded
+    //
+    
+    //
+    // 'symbol-file' will clear out currnet symbol mappings in gdb. 
+    // you can do a 'add-symbol-file filename address' for every image we loaded to get source 
+    // level debug in gdb. Note Sec, being a true application will work differently. 
+    //
+    // We add the PE/COFF header size into the image as the mach-O does not have a header in 
+    // loaded into system memory. 
+    // 
+    // This gives us a data base of gdb commands and after something is unloaded that entry will be
+    // removed. We don't yet have the scheme of how to comunicate with gdb, but we have the 
+    // data base of info ready to roll.
+    //
+    // We could use qXfer:libraries:read, but OS X GDB does not currently support it. 
+    //  <library-list> 
+    //    <library name="/lib/libc.so.6">   // ImageContext->PdbPointer
+    //      <segment address="0x10000000"/> // ImageContext->ImageAddress + ImageContext->SizeOfHeaders
+    //    </library> 
+    //  </library-list> 
+    //
+    
+    //
+    // Write the file we need for the gdb script
+    //
+    GdbTempFile = fopen (gGdbWorkingFileName, "w");
+    if (GdbTempFile != NULL) {
+      fprintf (GdbTempFile, "add-symbol-file %s 0x%x\n", ImageContext->PdbPointer, (UINTN)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders));
+      fclose (GdbTempFile);
+      
+      //
+      // Target for gdb breakpoint in a script that uses gGdbWorkingFileName to set a breakpoint. 
+      // Hey what can you say scripting in gdb is not that great....
+      //
+      SecGdbScriptBreak ();
+    }
+
+    AddHandle (ImageContext, ImageContext->PdbPointer);
+    
+  }
+  
+#else
+  
+  void        *Handle = NULL;
+  void        *Entry = NULL;
+ 
   fprintf (stderr, 
      "Loading %s 0x%08lx - entry point 0x%08lx\n",
      ImageContext->PdbPointer,
@@ -918,23 +1195,63 @@ SecNt32PeCoffRelocateImage (
   }
   
   if (Entry != NULL) {
-    ImageContext->EntryPoint = Entry;
-    printf("Change %s Entrypoint to :0x%08lx\n", ImageContext->PdbPointer, Entry);
+    ImageContext->EntryPoint = (UINTN)Entry;
+    printf("Change %s Entrypoint to :0x%08lx\n", ImageContext->PdbPointer, (unsigned long)Entry);
   }
 
   SecUnixLoaderBreak ();
 
-  return Status;
+#endif
+
+  return;
 }
 
 
-EFI_STATUS
+VOID
 EFIAPI
-SecNt32PeCoffUnloadimage (
+SecPeCoffLoaderUnloadImageExtraAction (
   IN PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
   )
 {
-  return EFI_SUCCESS;
+  VOID *Handle;
+
+  Handle = RemoveHandle (ImageContext);
+
+#ifdef __APPLE__
+  FILE  *GdbTempFile;
+  
+  if (Handle != NULL) {
+    //
+    // Need to skip .PDB files created from VC++
+    //
+    if (!IsPdbFile (ImageContext->PdbPointer)) {      
+      //
+      // Write the file we need for the gdb script
+      //
+      GdbTempFile = fopen (gGdbWorkingFileName, "w");
+      if (GdbTempFile != NULL) {
+        fprintf (GdbTempFile, "remove-symbol-file %s\n", ImageContext->PdbPointer);
+        fclose (GdbTempFile);
+  
+        //
+        // Target for gdb breakpoint in a script that uses gGdbWorkingFileName to set a breakpoint. 
+        // Hey what can you say scripting in gdb is not that great....
+        //
+        SecGdbScriptBreak ();
+      }
+    }
+  }
+  
+#else
+  //
+  // Don't want to confuse gdb with symbols for something that got unloaded
+  //
+  if (Handle != NULL) {
+    dlclose (Handle);
+  }
+
+#endif
+  return;
 }
 
 VOID

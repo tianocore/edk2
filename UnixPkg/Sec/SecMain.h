@@ -1,6 +1,7 @@
 /*++
 
-Copyright (c) 2006 - 2008, Intel Corporation                                                         
+Copyright (c) 2006 - 2009, Intel Corporation                                                         
+Portions copyright (c) 2008-2009 Apple Inc.
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -28,6 +29,7 @@ Abstract:
 #include <Library/PrintLib.h>
 #include <Library/PcdLib.h>
 #include <Library/DebugLib.h>
+#include <Library/ReportStatusCodeLib.h>
 
 #define STACK_SIZE                0x20000      
 
@@ -42,10 +44,17 @@ typedef struct {
 } UNIX_SYSTEM_MEMORY;
 
 
+#define MAX_IMAGE_CONTEXT_TO_MOD_HANDLE_ARRAY_SIZE 0x100
+
+typedef struct {
+  PE_COFF_LOADER_IMAGE_CONTEXT   *ImageContext;
+  VOID                           *ModHandle;
+} IMAGE_CONTEXT_TO_MOD_HANDLE;
+
 
 EFI_STATUS
 EFIAPI
-SecWinNtPeiLoadFile (
+SecUnixPeiLoadFile (
   VOID                  *Pe32Data,  // TODO: add IN/OUT modifier to Pe32Data
   EFI_PHYSICAL_ADDRESS  *ImageAddress,  // TODO: add IN/OUT modifier to ImageAddress
   UINT64                *ImageSize,  // TODO: add IN/OUT modifier to ImageSize
@@ -73,7 +82,7 @@ Returns:
 
 EFI_STATUS
 EFIAPI
-SecWinNtPeiAutoScan (
+SecUnixPeiAutoScan (
   IN  UINTN                 Index,
   OUT EFI_PHYSICAL_ADDRESS  *MemoryBase,
   OUT UINT64                *MemorySize
@@ -99,7 +108,7 @@ Returns:
 
 VOID *
 EFIAPI
-SecWinNtWinNtThunkAddress (
+SecUnixUnixThunkAddress (
   VOID
   )
 /*++
@@ -122,7 +131,7 @@ Returns:
 
 EFI_STATUS
 EFIAPI
-SecWinNtWinNtFwhAddress (
+SecUnixUnixFwhAddress (
   IN OUT UINT64                *FwhSize,
   IN OUT EFI_PHYSICAL_ADDRESS  *FwhBase
   )
@@ -147,12 +156,12 @@ Returns:
 EFI_STATUS
 EFIAPI
 SecPeiReportStatusCode (
-  IN EFI_PEI_SERVICES         **PeiServices,
+  IN CONST EFI_PEI_SERVICES     **PeiServices,
   IN EFI_STATUS_CODE_TYPE     CodeType,
   IN EFI_STATUS_CODE_VALUE    Value,
   IN UINT32                   Instance,
-  IN EFI_GUID                 * CallerId,
-  IN EFI_STATUS_CODE_DATA     * Data OPTIONAL
+  IN CONST EFI_GUID             *CallerId,
+  IN CONST EFI_STATUS_CODE_DATA *Data OPTIONAL
   )
 /*++
 
@@ -176,12 +185,11 @@ Returns:
 --*/
 ;
 
-INTN
-EFIAPI
+int
 main (
-  IN  INTN  Argc,
-  IN  CHAR8 **Argv,
-  IN  CHAR8 **Envp
+  IN  int   Argc,
+  IN  char  **Argv,
+  IN  char  **Envp
   )
 /*++
 
@@ -331,7 +339,7 @@ Returns:
 
 EFI_STATUS
 EFIAPI
-SecWinNtPeCoffLoaderLoadAsDll (
+SecUnixPeCoffLoaderLoadAsDll (
   IN CHAR8    *PdbFileName,
   IN VOID     **ImageEntryPoint,
   OUT VOID    **ModHandle
@@ -357,7 +365,7 @@ Returns:
 
 EFI_STATUS
 EFIAPI
-SecWinNtPeCoffLoaderFreeLibrary (
+SecUnixPeCoffLoaderFreeLibrary (
   OUT VOID    *ModHandle
   )
 /*++
@@ -379,7 +387,7 @@ Returns:
 
 EFI_STATUS
 EFIAPI
-SecWinNtFdAddress (
+SecUnixFdAddress (
   IN     UINTN                 Index,
   IN OUT EFI_PHYSICAL_ADDRESS  *FdBase,
   IN OUT UINT64                *FdSize
@@ -508,5 +516,26 @@ SecTemporaryRamSupport (
   IN EFI_PHYSICAL_ADDRESS     PermanentMemoryBase,
   IN UINTN                    CopySize
   );
+
+
+RETURN_STATUS
+EFIAPI
+SecPeCoffGetEntryPoint (
+  IN     VOID  *Pe32Data,
+  IN OUT VOID  **EntryPoint
+  );
+
+VOID
+EFIAPI
+SecPeCoffRelocateImageExtraAction (
+  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
+  );
+
+VOID
+EFIAPI
+SecPeCoffLoaderUnloadImageExtraAction (
+  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
+  );
+
 
 extern EFI_UNIX_THUNK_PROTOCOL  *gUnix;

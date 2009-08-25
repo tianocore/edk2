@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -37,7 +37,7 @@ UNIX_PLATFORM_UGA_DEVICE_PATH gUgaDevicePath0 =
       HW_VENDOR_DP,
       {
         (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
-        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8),
+        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
       },
       EFI_UNIX_THUNK_PROTOCOL_GUID
   },
@@ -46,7 +46,7 @@ UNIX_PLATFORM_UGA_DEVICE_PATH gUgaDevicePath0 =
       HW_VENDOR_DP,
       {
         (UINT8) (sizeof (UNIX_VENDOR_DEVICE_PATH_NODE)),
-        (UINT8) ((sizeof (UNIX_VENDOR_DEVICE_PATH_NODE)) >> 8),
+        (UINT8) ((sizeof (UNIX_VENDOR_DEVICE_PATH_NODE)) >> 8)
       },
       EFI_UNIX_UGA_GUID,
       0
@@ -60,7 +60,7 @@ UNIX_PLATFORM_UGA_DEVICE_PATH gUgaDevicePath1 = {
       HW_VENDOR_DP,
       {
         (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
-        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8),
+        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
       },
       EFI_UNIX_THUNK_PROTOCOL_GUID
   },
@@ -69,7 +69,7 @@ UNIX_PLATFORM_UGA_DEVICE_PATH gUgaDevicePath1 = {
       HW_VENDOR_DP,
       {
         (UINT8) (sizeof (UNIX_VENDOR_DEVICE_PATH_NODE)),
-        (UINT8) ((sizeof (UNIX_VENDOR_DEVICE_PATH_NODE)) >> 8),
+        (UINT8) ((sizeof (UNIX_VENDOR_DEVICE_PATH_NODE)) >> 8)
       },
       EFI_UNIX_UGA_GUID,
       1
@@ -83,7 +83,7 @@ UNIX_CONSOLE_DEVICE_PATH   gUnixConsoleDevicePath = {
       HW_VENDOR_DP,
       {
         (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
-        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8),
+        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
       },
       EFI_UNIX_THUNK_PROTOCOL_GUID
   },
@@ -92,7 +92,7 @@ UNIX_CONSOLE_DEVICE_PATH   gUnixConsoleDevicePath = {
       HW_VENDOR_DP,
       {
         (UINT8) (sizeof (UNIX_VENDOR_DEVICE_PATH_NODE)),
-        (UINT8) ((sizeof (UNIX_VENDOR_DEVICE_PATH_NODE)) >> 8),
+        (UINT8) ((sizeof (UNIX_VENDOR_DEVICE_PATH_NODE)) >> 8)
       },
       EFI_UNIX_CONSOLE_GUID,
       0  

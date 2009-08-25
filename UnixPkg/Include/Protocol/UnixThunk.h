@@ -1,6 +1,7 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation                                                         
+Copyright (c) 2004 - 2009, Intel Corporation                                                         
+Portions copyright (c) 2008-2009 Apple Inc.<BR>
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -31,7 +32,13 @@ Abstract:
 #include <sys/termios.h>
 #include <stdio.h>
 #include <sys/time.h>
+
+#if __CYGWIN__
+#include <sys/dirent.h>
+#else
 #include <sys/dir.h>
+#endif
+
 #include <unistd.h>
 #include <poll.h>
 #include <sys/types.h>
@@ -42,11 +49,23 @@ Abstract:
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
-#include <termio.h>
 #include <sys/ioctl.h>
+
+#ifdef __APPLE__
+#include <sys/param.h>
+#include <sys/mount.h>
+#define _XOPEN_SOURCE
+#else
+#include <termio.h>
 #include <sys/vfs.h>
+#endif 
+
 #include <utime.h>
 #include <dlfcn.h>
+
+#include <Base.h>
+#include <Library/PeCoffLib.h>
+
 
 #define EFI_UNIX_THUNK_PROTOCOL_GUID \
   { \
@@ -167,7 +186,11 @@ void
 
 typedef 
 int 
+#if __CYGWIN__
+(*UnixIoCtl) (int fd, int __request, ...);
+#else
 (*UnixIoCtl) (int fd, unsigned long int __request, ...);
+#endif
 
 typedef 
 int 
@@ -204,8 +227,29 @@ VOID *
 
 
 //
+// Work functions to enable source level debug in the emulator
 //
-//
+
+typedef
+RETURN_STATUS
+(EFIAPI *UnixPeCoffGetEntryPoint) (
+  IN     VOID  *Pe32Data,
+  IN OUT VOID  **EntryPoint
+  );
+
+typedef
+VOID
+(EFIAPI *UnixPeCoffRelocateImageExtraAction) (
+  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
+  );
+
+typedef
+VOID
+(EFIAPI *UnixPeCoffLoaderUnloadImageExtraAction) (
+  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
+  );
+
+
 
 #define EFI_UNIX_THUNK_PROTOCOL_SIGNATURE SIGNATURE_32 ('L', 'N', 'X', 'T')
 
@@ -254,6 +298,11 @@ typedef struct _EFI_UNIX_THUNK_PROTOCOL {
   UnixDlopen                          Dlopen;
   UnixDlerror                         Dlerror;
   UnixDlsym                           Dlsym;
+  UnixPeCoffGetEntryPoint                 PeCoffGetEntryPoint;
+  UnixPeCoffRelocateImageExtraAction      PeCoffRelocateImageExtraAction;
+  UnixPeCoffLoaderUnloadImageExtraAction  PeCoffUnloadImageExtraAction;
+	
+	
 } EFI_UNIX_THUNK_PROTOCOL;
 
 extern EFI_GUID gEfiUnixThunkProtocolGuid;

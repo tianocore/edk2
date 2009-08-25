@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -161,7 +161,7 @@ FvbGetLbaAddress (
 EFI_STATUS
 EFIAPI
 FvbProtocolGetAttributes (
-  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
+  IN  CONST EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
   OUT EFI_FVB_ATTRIBUTES_2                          *Attributes
   )
 ;
@@ -169,7 +169,7 @@ FvbProtocolGetAttributes (
 EFI_STATUS
 EFIAPI
 FvbProtocolSetAttributes (
-  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
+  IN CONST EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
   IN OUT EFI_FVB_ATTRIBUTES_2                       *Attributes
   )
 ;
@@ -177,7 +177,7 @@ FvbProtocolSetAttributes (
 EFI_STATUS
 EFIAPI
 FvbProtocolGetPhysicalAddress (
-  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
+  IN CONST EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
   OUT EFI_PHYSICAL_ADDRESS                        *Address
   )
 ;
@@ -185,7 +185,7 @@ FvbProtocolGetPhysicalAddress (
 EFI_STATUS
 EFIAPI
 FvbProtocolGetBlockSize (
-  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
+  IN CONST EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL     *This,
   IN  EFI_LBA                                     Lba,
   OUT UINTN                                       *BlockSize,
   OUT UINTN                                       *NumOfBlocks
@@ -195,7 +195,7 @@ FvbProtocolGetBlockSize (
 EFI_STATUS
 EFIAPI
 FvbProtocolRead (
-  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
+  IN CONST EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL     *This,
   IN EFI_LBA                                      Lba,
   IN UINTN                                        Offset,
   IN OUT UINTN                                    *NumBytes,
@@ -206,7 +206,7 @@ FvbProtocolRead (
 EFI_STATUS
 EFIAPI
 FvbProtocolWrite (
-  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
+  IN CONST EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL     *This,
   IN EFI_LBA                                      Lba,
   IN UINTN                                        Offset,
   IN OUT UINTN                                    *NumBytes,
@@ -217,7 +217,7 @@ FvbProtocolWrite (
 EFI_STATUS
 EFIAPI
 FvbProtocolEraseBlocks (
-  IN EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    *This,
+  IN CONST EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    *This,
   ...
   )
 ;

@@ -1,6 +1,19 @@
+/*++
+
+Copyright (c) 2004 - 2009, Intel Corporation                                                         
+Portions copyright (c) 2008-2009 Apple Inc. All rights reserved.
+All rights reserved. This program and the accompanying materials                          
+are licensed and made available under the terms and conditions of the BSD License         
+which accompanies this distribution.  The full text of the license may be found at        
+http://opensource.org/licenses/bsd-license.php                                            
+                                                                                          
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+
+--*/
+
 #include <sys/ipc.h>
 #include <sys/shm.h>
-#include <sys/dir.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -123,8 +136,15 @@ TryCreateShmImage(UGA_IO_PRIVATE *drv)
       XDestroyImage(drv->image);
       return 0;
     }
+  
+#ifndef __APPLE__  
+  //
+  // This closes shared memory in real time on OS X. Only closes after folks quit using
+  // it on Linux. 
+  //
   /* Can this fail ?  */
   shmctl (drv->xshm_info.shmid, IPC_RMID, NULL);
+#endif
 
   drv->xshm_info.shmaddr = (char*)drv->image_data;
   drv->image->data = (char*)drv->image_data;
@@ -157,6 +177,12 @@ UgaClose (EFI_UNIX_UGA_IO_PROTOCOL *UgaIo)
     }
   XDestroyWindow(drv->display, drv->win);
   XCloseDisplay(drv->display);
+  
+#ifdef __APPLE__
+  // Free up the shared memory
+  shmctl (drv->xshm_info.shmid, IPC_RMID, NULL);
+#endif
+  
   free(drv);
   return EFI_SUCCESS;
 }
@@ -534,16 +560,45 @@ UgaCreate (EFI_UNIX_UGA_IO_PROTOCOL **Uga, CONST CHAR16 *Title)
   char *display_name = NULL;
   int title_len;
 
-  drv = (UGA_IO_PRIVATE *)
-    calloc (1, sizeof (UGA_IO_PRIVATE));
+  drv = (UGA_IO_PRIVATE *)calloc (1, sizeof (UGA_IO_PRIVATE));
   if (drv == NULL)
     return EFI_OUT_OF_RESOURCES;
 
+#ifdef __APPLE__
+//
+//
+//
+EFI_STATUS EFIAPI GasketUgaClose (EFI_UNIX_UGA_IO_PROTOCOL *UgaIo);
+EFI_STATUS EFIAPI GasketUgaSize (EFI_UNIX_UGA_IO_PROTOCOL *UgaIo, UINT32 Width, UINT32 Height);
+EFI_STATUS EFIAPI GasketUgaCheckKey (EFI_UNIX_UGA_IO_PROTOCOL *UgaIo);
+EFI_STATUS EFIAPI GasketUgaGetKey (EFI_UNIX_UGA_IO_PROTOCOL *UgaIo, EFI_INPUT_KEY *key);
+EFI_STATUS EFIAPI GasketUgaBlt (
+   EFI_UNIX_UGA_IO_PROTOCOL *UgaIo,
+   IN  EFI_UGA_PIXEL                           *BltBuffer OPTIONAL,
+   IN  EFI_UGA_BLT_OPERATION                   BltOperation,
+   IN  UINTN                                   SourceX,
+   IN  UINTN                                   SourceY,
+   IN  UINTN                                   DestinationX,
+   IN  UINTN                                   DestinationY,
+   IN  UINTN                                   Width,
+   IN  UINTN                                   Height,
+   IN  UINTN                                   Delta OPTIONAL
+   );
+
+  drv->UgaIo.UgaClose    = GasketUgaClose; 
+  drv->UgaIo.UgaSize     = GasketUgaSize;
+  drv->UgaIo.UgaCheckKey = GasketUgaCheckKey;
+  drv->UgaIo.UgaGetKey   = GasketUgaGetKey;
+  drv->UgaIo.UgaBlt      = GasketUgaBlt;
+#else
   drv->UgaIo.UgaClose = UgaClose;
   drv->UgaIo.UgaSize = UgaSize;
   drv->UgaIo.UgaCheckKey = UgaCheckKey;
   drv->UgaIo.UgaGetKey = UgaGetKey;
   drv->UgaIo.UgaBlt = UgaBlt;
+#endif
+  
+  
 
   drv->key_count = 0;
   drv->key_rd = 0;
