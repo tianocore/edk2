@@ -2,7 +2,7 @@
 # EFI/PI MdePkg Package
 #
 # Copyright (c) 2007 - 2009, Intel Corporation<BR>
-# Portions Copyright (c) 2008-2009 Apple Inc.<BR>
+# Portions copyright (c) 2008-2009 Apple Inc. All rights reserved.<BR>
 #
 #  All rights reserved. This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
