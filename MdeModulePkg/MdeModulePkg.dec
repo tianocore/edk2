@@ -272,10 +272,11 @@
   # In IA64 platforms, this value should be larger than 128KB.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize|0x8000|UINT32|0x30000004
 
-  ## The size of reserved HwErr variable space. This space is located at NV variable range.
-  # HwErr type variable is stored with common non-volatile variables in NV region.
+  ## The size of reserved HwErr variable space. Note that this value must be less than or equal to PcdFlashNvStorageVariableSize
+  # In EdkII implementation, HwErr type variable is stored with common non-volatile variables in the same NV region.
+  # so the platform integrator should ensure this value is less than or equal to PcdFlashNvStorageVariableSize.
   # this value is used to guarantee the space of HwErr type variable and not populated by common variable.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHwErrStorageSize|0x8000|UINT32|0x30000006
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHwErrStorageSize|0x0000|UINT32|0x30000006
 
   ## The size of volatile buffer. This buffer is used to store VOLATILE attribute variable.
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x10000|UINT32|0x30000005
