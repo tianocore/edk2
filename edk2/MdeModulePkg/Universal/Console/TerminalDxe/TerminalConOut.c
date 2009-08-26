@@ -182,7 +182,7 @@ TerminalConOutOutputString (
   UINTN                       Length;
   UTF8_CHAR                   Utf8Char;
   CHAR8                       GraphicChar;
-  CHAR8                       AsciiChar;
+  CHAR8                       AsciiChar = 0;
   EFI_STATUS                  Status;
   UINT8                       ValidBytes;
   //
