@@ -2696,19 +2696,19 @@ UiDisplayMenu (
           TopOfScreen = NewPos;
         }
 
-	 Difference = MoveToNextStatement (TRUE, &NewPos);
+	      Difference = MoveToNextStatement (TRUE, &NewPos);
         PreviousMenuOption = MENU_OPTION_FROM_LINK (NewPos);
         DistanceValue += PreviousMenuOption->Skip;
         
-	if ((INTN) MenuOption->Row - (INTN) DistanceValue  < (INTN) TopRow) {
+	      if ((INTN) MenuOption->Row - (INTN) DistanceValue  < (INTN) TopRow) {
           if (Difference > 0) {
             //
             // Previous focus MenuOption is above the TopOfScreen, so we need to scroll
             //
             TopOfScreen = NewPos;
             Repaint     = TRUE;
-	     SkipValue = 0;
-	     OldSkipValue = 0;
+	          SkipValue = 0;
+	          OldSkipValue = 0;
           }
         }
         if (Difference < 0) {
