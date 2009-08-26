@@ -92,7 +92,6 @@ DxePrintLibPrint2ProtocolVaListToBaseList (
   BOOLEAN    Done;
 
   ASSERT (Format         != NULL);
-  ASSERT (VaListMarker   != NULL);
   ASSERT (BaseListMarker != NULL);
 
   BaseListStart = BaseListMarker;

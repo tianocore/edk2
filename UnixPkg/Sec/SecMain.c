@@ -494,7 +494,7 @@ Returns:
     // Process DEBUG () macro 
     //
     AsciiBSPrint (PrintBuffer, BYTES_PER_RECORD, Format, Marker);
-    printf (PrintBuffer);
+    printf ("%s", PrintBuffer);
   }
 
   return EFI_SUCCESS;
