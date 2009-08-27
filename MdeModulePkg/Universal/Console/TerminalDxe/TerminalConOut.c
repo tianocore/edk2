@@ -1,7 +1,7 @@
 /** @file
   Implementation for EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL protocol.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -182,7 +182,7 @@ TerminalConOutOutputString (
   UINTN                       Length;
   UTF8_CHAR                   Utf8Char;
   CHAR8                       GraphicChar;
-  CHAR8                       AsciiChar = 0;
+  CHAR8                       AsciiChar;
   EFI_STATUS                  Status;
   UINT8                       ValidBytes;
   //
@@ -193,6 +193,7 @@ TerminalConOutOutputString (
 
   ValidBytes  = 0;
   Warning     = FALSE;
+  AsciiChar   = 0;
 
   //
   //  get Terminal device data structure pointer.
