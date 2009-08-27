@@ -1317,9 +1317,9 @@ InitializeVariableStore (
   // Note that in EdkII variable driver implementation, Hardware Error Record type variable
   // is stored with common variable in the same NV region. So the platform integrator should
   // ensure that the value of PcdHwErrStorageSize is less than or equal to the value of 
-  // PcdFlashNvStorageVariableSize.
+  // PcdVariableStoreSize.
   //
-  ASSERT (FixedPcdGet32(PcdHwErrStorageSize) <= FixedPcdGet32(PcdFlashNvStorageVariableSize));
+  ASSERT (FixedPcdGet32(PcdHwErrStorageSize) <= FixedPcdGet32(PcdVariableStoreSize));
 
   //
   // Allocate memory for volatile variable store
