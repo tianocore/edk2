@@ -586,7 +586,7 @@ DeRegisterPciDevice (
 }
 
 /**
-  Start to manage the PCI device on specified the root bridge or PCI-PCI Bridge
+  Start to manage the PCI device on the specified root bridge or PCI-PCI Bridge.
 
   @param Controller          The root bridge handle.
   @param RootBridge          A pointer to the PCI_IO_DEVICE.
@@ -597,7 +597,7 @@ DeRegisterPciDevice (
   @retval EFI_NOT_READY   Device is not allocated.
   @retval EFI_UNSUPPORTED Device only support PCI-PCI bridge.
   @retval EFI_NOT_FOUND   Can not find the specific device.
-  @retval EFI_SUCCESS     Success to start Pci device on bridge.
+  @retval EFI_SUCCESS     Success to start Pci devices on bridge.
 
 **/
 EFI_STATUS
@@ -617,6 +617,7 @@ StartPciDevicesOnBridge (
   LIST_ENTRY                *CurrentLink;
   UINT64                    Supports;
 
+  PciIoDevice = NULL;
   CurrentLink = RootBridge->ChildList.ForwardLink;
 
   while (CurrentLink != NULL && CurrentLink != &RootBridge->ChildList) {
@@ -749,7 +750,11 @@ StartPciDevicesOnBridge (
     }
   }
 
-  return EFI_NOT_FOUND;
+  if (PciIoDevice == NULL) {
+    return EFI_NOT_FOUND;
+  } else {
+    return EFI_SUCCESS;
+  }
 }
 
 /**
