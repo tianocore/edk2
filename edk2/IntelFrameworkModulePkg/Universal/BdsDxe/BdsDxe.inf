@@ -109,6 +109,7 @@
   PlatformBdsLib
   CapsuleLib
   PcdLib
+  UefiHiiServicesLib
   
 [Guids]
   gEfiGlobalVariableGuid                        ## SOMETIMES_PRODUCES ## Variable:L"BootNext" (The number of next boot option)
@@ -137,19 +138,16 @@
   gEfiIfrTianoGuid                              ## CONSUMES ## GUID (Extended IFR Guid Opcode)
 
 [Protocols]
-  gEfiHiiStringProtocolGuid                     # PROTOCOL ALWAYS_CONSUMES
   gEfiSimpleFileSystemProtocolGuid              # PROTOCOL ALWAYS_CONSUMES
   gEfiLoadFileProtocolGuid                      # PROTOCOL ALWAYS_CONSUMES
   gEfiBdsArchProtocolGuid                       # PROTOCOL ALWAYS_PRODUCES
   gEfiDataHubProtocolGuid                       # PROTOCOL ALWAYS_CONSUMES
   gEfiGenericMemTestProtocolGuid                # PROTOCOL ALWAYS_CONSUMES
   gEfiLegacyBiosProtocolGuid                    # PROTOCOL ALWAYS_CONSUMES
-  gEfiHiiDatabaseProtocolGuid                   # PROTOCOL ALWAYS_CONSUMES
   gEfiUgaDrawProtocolGuid |PcdUgaConsumeSupport # PROTOCOL SOMETIMES_CONSUMES
   gEfiBlockIoProtocolGuid                       # PROTOCOL ALWAYS_CONSUMES
   gEfiGraphicsOutputProtocolGuid                # PROTOCOL SOMETIMES_CONSUMES
   gEfiSimpleTextInputExProtocolGuid             # PROTOCOL ALWAYS_CONSUMES
-  gEfiHiiConfigRoutingProtocolGuid              # PROTOCOL ALWAYS_CONSUMES
   gEfiHiiConfigAccessProtocolGuid               # PROTOCOL ALWAYS_CONSUMES
   gEfiFormBrowser2ProtocolGuid                  # PROTOCOL ALWAYS_CONSUMES
   gEfiSerialIoProtocolGuid                      # PROTOCOL ALWAYS_CONSUMES
