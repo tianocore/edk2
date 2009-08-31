@@ -297,6 +297,9 @@ EFI_STATUS
   handle, point UserInfo at a NULL. Each subsequent call will retrieve another user information 
   record handle until there are no more, at which point UserInfo will point to NULL. 
 
+  Note: in-consistency between code and the UEFI 2.3 specification that the type of the User parameter
+  is EFI_USER_PROFILE_HANDLE. It should be spec error and wait for spec update.
+
   @param[in]     This      Points to this instance of the EFI_USER_MANAGER_PROTOCOL.
   @param[in]     User      Handle of the user whose information will be deleted.
   @param[in,out] UserInfo  Handle of the user information to remove.
