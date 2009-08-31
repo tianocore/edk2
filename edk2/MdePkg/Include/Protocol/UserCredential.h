@@ -189,9 +189,11 @@ typedef EFI_USER_INFO_ACCESS_CONTROL EFI_USER_INFO_ACCESS_POLICY;
 ///
 #define EFI_USER_INFO_ACCESS_FORBID_LOAD              0x00000001
 ///
-///
 /// Permits the user from booting or loading executables from the specified device path or any child 
 /// device paths.
+/// Note: in-consistency between code and the UEFI 2.3 specification here.
+/// The definition EFI_USER_INFO_ACCESS_PERMIT_BOOT in the specification should be typo and wait for
+/// spec update.
 ///
 #define EFI_USER_INFO_ACCESS_PERMIT_LOAD              0x00000002
 ///
