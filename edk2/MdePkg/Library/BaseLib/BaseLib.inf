@@ -553,6 +553,7 @@
   Ipf/AccessPsr.s
   Ipf/AccessPmr.s
   Ipf/AccessKr.s
+  Ipf/AccessKr7.s
   Ipf/AccessGcr.s
   Ipf/AccessEicr.s
   Ipf/AccessDbr.s

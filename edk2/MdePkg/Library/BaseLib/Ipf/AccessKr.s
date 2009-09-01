@@ -1,7 +1,7 @@
 /// @file
-///  IPF specific AsmReadKrX() and AsmWriteKrX functions, 'X' is from '0' to '7'
+///  IPF specific AsmReadKrX() and AsmWriteKrX() functions, 'X' is from '0' to '6'
 ///
-/// Copyright (c) 2006 - 2008, Intel Corporation
+/// Copyright (c) 2006 - 2009, Intel Corporation
 /// All rights reserved. This program and the accompanying materials
 /// are licensed and made available under the terms and conditions of the BSD License
 /// which accompanies this distribution.  The full text of the license may be found at
@@ -358,51 +358,3 @@ AsmWriteKr6::
         mov             r8 = in0;;
         br.ret.dpnt     b0;;
 .endp   AsmWriteKr6
-
-
-//---------------------------------------------------------------------------------
-//++
-// AsmReadKr7
-//
-// This routine is used to get KR7.
-//
-// Arguments :
-//
-// On Entry :  None.
-//
-// Return Value: The value store in KR7.
-//
-//--
-//----------------------------------------------------------------------------------
-.text
-.type   AsmReadKr7, @function
-.proc   AsmReadKr7
-
-AsmReadKr7::
-        mov             r8 = ar.k7;;
-        br.ret.dpnt     b0;;
-.endp   AsmReadKr7
-
-//---------------------------------------------------------------------------------
-//++
-// AsmWriteKr7
-//
-// This routine is used to write KR7.
-//
-// Arguments :
-//
-// On Entry :  None.
-//
-// Return Value: The value written to the KR7.
-//
-//--
-//----------------------------------------------------------------------------------
-.text
-.type   AsmWriteKr7, @function
-.proc   AsmWriteKr7
-
-AsmWriteKr7::
-        mov             ar.k7 = in0
-        mov             r8 = in0;;
-        br.ret.dpnt     b0;;
-.endp   AsmWriteKr7
