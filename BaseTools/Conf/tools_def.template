@@ -1510,8 +1510,8 @@ RELEASE_ICC_X64_DLINK_FLAGS              = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /O
 *_ICC_IPF_ASLPP_PATH                = DEF(ICC_BIN64)\icl.exe
 *_ICC_IPF_ASLDLINK_PATH             = DEF(ICC_BIN64)\xilink.exe
 
-  DEBUG_ICC_IPF_CC_FLAGS                 = /nologo /c /WX /W4 /GX /Gy /Od /FI$(DEST_DIR_DEBUG)/AutoGen.h /QIA64_fr32 /Zi
-RELEASE_ICC_IPF_CC_FLAGS                 = /nologo /c /WX /W4 /GX /Gy /Od /FI$(DEST_DIR_DEBUG)/AutoGen.h /QIA64_fr32
+  DEBUG_ICC_IPF_CC_FLAGS                 = /nologo /c /WX /W4 /GX /Gy /Od /FI$(DEST_DIR_DEBUG)/AutoGen.h /QIA64_fr32 /GF /Zi
+RELEASE_ICC_IPF_CC_FLAGS                 = /nologo /c /WX /W4 /GX /Gy /Od /FI$(DEST_DIR_DEBUG)/AutoGen.h /QIA64_fr32 /GF
   DEBUG_ICC_IPF_ASM_FLAGS                = -N us -X explicit -M ilp64 -N so -W3 -d debug -F COFF32
 RELEASE_ICC_IPF_ASM_FLAGS                = -N us -X explicit -M ilp64 -N so -W3 -F COFF32
   DEBUG_ICC_IPF_DLINK_FLAGS              = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGNORE:4086 /MAP /ALIGN:64 /MACHINE:IA64 /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MAP:$(DEST_DIR_DEBUG)/$(BASE_NAME).map /PDB:$(DEST_DIR_DEBUG)/$(BASE_NAME).pdb /DEBUG
@@ -1636,8 +1636,8 @@ RELEASE_ICCxASL_X64_DLINK_FLAGS              = /NOLOGO /NODEFAULTLIB /IGNORE:408
 *_ICCxASL_IPF_ASLPP_PATH                = DEF(ICC_BIN64)\icl.exe
 *_ICCxASL_IPF_ASLDLINK_PATH             = DEF(ICC_BIN64)\xilink.exe
 
-  DEBUG_ICCxASL_IPF_CC_FLAGS                 = /nologo /c /WX /W4 /GX /Gy /Od /FI$(DEST_DIR_DEBUG)/AutoGen.h /QIA64_fr32 /Zi
-RELEASE_ICCxASL_IPF_CC_FLAGS                 = /nologo /c /WX /W4 /GX /Gy /Od /FI$(DEST_DIR_DEBUG)/AutoGen.h /QIA64_fr32
+  DEBUG_ICCxASL_IPF_CC_FLAGS                 = /nologo /c /WX /W4 /GX /Gy /Od /FI$(DEST_DIR_DEBUG)/AutoGen.h /QIA64_fr32 /GF /Zi
+RELEASE_ICCxASL_IPF_CC_FLAGS                 = /nologo /c /WX /W4 /GX /Gy /Od /FI$(DEST_DIR_DEBUG)/AutoGen.h /QIA64_fr32 /GF
   DEBUG_ICCxASL_IPF_ASM_FLAGS                = -N us -X explicit -M ilp64 -N so -W3 -d debug -F COFF32
 RELEASE_ICCxASL_IPF_ASM_FLAGS                = -N us -X explicit -M ilp64 -N so -W3 -F COFF32
   DEBUG_ICCxASL_IPF_DLINK_FLAGS              = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGNORE:4086 /MAP /ALIGN:64 /MACHINE:IA64 /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MAP:$(DEST_DIR_DEBUG)/$(BASE_NAME).map /PDB:$(DEST_DIR_DEBUG)/$(BASE_NAME).pdb /DEBUG
@@ -1763,8 +1763,8 @@ RELEASE_ICCx86_X64_DLINK_FLAGS              = /NOLOGO /NODEFAULTLIB /IGNORE:4086
 *_ICCx86_IPF_ASLPP_PATH                = DEF(ICC_BIN64x86)\icl.exe
 *_ICCx86_IPF_ASLDLINK_PATH             = DEF(ICC_BIN64x86)\xilink.exe
 
-  DEBUG_ICCx86_IPF_CC_FLAGS                 = /nologo /c /WX /W4 /GX /Gy /Od /FI$(DEST_DIR_DEBUG)/AutoGen.h /QIA64_fr32 /Zi
-RELEASE_ICCx86_IPF_CC_FLAGS                 = /nologo /c /WX /W4 /GX /Gy /Od /FI$(DEST_DIR_DEBUG)/AutoGen.h /QIA64_fr32
+  DEBUG_ICCx86_IPF_CC_FLAGS                 = /nologo /c /WX /W4 /GX /Gy /Od /FI$(DEST_DIR_DEBUG)/AutoGen.h /QIA64_fr32 /GF /Zi
+RELEASE_ICCx86_IPF_CC_FLAGS                 = /nologo /c /WX /W4 /GX /Gy /Od /FI$(DEST_DIR_DEBUG)/AutoGen.h /QIA64_fr32 /GF
   DEBUG_ICCx86_IPF_ASM_FLAGS                = -N us -X explicit -M ilp64 -N so -W3 -d debug -F COFF32
 RELEASE_ICCx86_IPF_ASM_FLAGS                = -N us -X explicit -M ilp64 -N so -W3 -F COFF32
   DEBUG_ICCx86_IPF_DLINK_FLAGS              = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGNORE:4086 /MAP /ALIGN:64 /MACHINE:IA64 /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MAP:$(DEST_DIR_DEBUG)/$(BASE_NAME).map /PDB:$(DEST_DIR_DEBUG)/$(BASE_NAME).pdb /DEBUG
@@ -1890,8 +1890,8 @@ RELEASE_ICCx86xASL_X64_DLINK_FLAGS              = /NOLOGO /NODEFAULTLIB /IGNORE:
 *_ICCx86xASL_IPF_ASLPP_PATH                = DEF(ICC_BIN64x86)\icl.exe
 *_ICCx86xASL_IPF_ASLDLINK_PATH             = DEF(ICC_BIN64x86)\xilink.exe
 
-  DEBUG_ICCx86xASL_IPF_CC_FLAGS                 = /nologo /c /WX /W4 /GX /Gy /Od /FI$(DEST_DIR_DEBUG)/AutoGen.h /QIA64_fr32 /Zi
-RELEASE_ICCx86xASL_IPF_CC_FLAGS                 = /nologo /c /WX /W4 /GX /Gy /Od /FI$(DEST_DIR_DEBUG)/AutoGen.h /QIA64_fr32
+  DEBUG_ICCx86xASL_IPF_CC_FLAGS                 = /nologo /c /WX /W4 /GX /Gy /Od /FI$(DEST_DIR_DEBUG)/AutoGen.h /QIA64_fr32 /GF /Zi
+RELEASE_ICCx86xASL_IPF_CC_FLAGS                 = /nologo /c /WX /W4 /GX /Gy /Od /FI$(DEST_DIR_DEBUG)/AutoGen.h /QIA64_fr32 /GF
   DEBUG_ICCx86xASL_IPF_ASM_FLAGS                = -N us -X explicit -M ilp64 -N so -W3 -d debug -F COFF32
 RELEASE_ICCx86xASL_IPF_ASM_FLAGS                = -N us -X explicit -M ilp64 -N so -W3 -F COFF32
   DEBUG_ICCx86xASL_IPF_DLINK_FLAGS              = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGNORE:4086 /MAP /ALIGN:64 /MACHINE:IA64 /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MAP:$(DEST_DIR_DEBUG)/$(BASE_NAME).map /PDB:$(DEST_DIR_DEBUG)/$(BASE_NAME).pdb /DEBUG
