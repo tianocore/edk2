@@ -53,7 +53,6 @@ DebugPrint (
   BASE_LIST       BaseListMarker;
   CHAR8           *FormatString;
   BOOLEAN         Long;
-  BOOLEAN         Done;
 
   //
   // If Format is NULL, then ASSERT().
@@ -73,7 +72,7 @@ DebugPrint (
   // the following layout:
   //
   //         Buffer->|------------------------|
-  //                 |         Pading         | 4 bytes
+  //                 |         Padding        | 4 bytes
   //      DebugInfo->|------------------------|
   //                 |      EFI_DEBUG_INFO    | sizeof(EFI_DEBUG_INFO)
   // BaseListMarker->|------------------------|
@@ -99,7 +98,7 @@ DebugPrint (
   // Here we skip the first 4 bytes of Buffer, because we must ensure BaseListMarker is
   // 64-bit aligned, otherwise retrieving 64-bit parameter from BaseListMarker will cause
   // exception on IPF. Buffer starts at 64-bit aligned address, so skipping 4 types (sizeof(EFI_DEBUG_INFO))
-  // just makes addess of BaseListMarker, which follows DebugInfo, 64-bit aligned.
+  // just makes address of BaseListMarker, which follows DebugInfo, 64-bit aligned.
   //
   DebugInfo             = (EFI_DEBUG_INFO *)(Buffer) + 1;
   DebugInfo->ErrorLevel = (UINT32)ErrorLevel;
@@ -128,91 +127,66 @@ DebugPrint (
     //
     // Parse Flags and Width
     //
-    for (Done = FALSE; !Done; ) {
-      Format++;
-      switch (*Format) {
-      case '.': 
-      case '-': 
-      case '+': 
-      case ' ': 
-      case ',': 
-      case '0':
-      case '1':
-      case '2':
-      case '3':
-      case '4':
-      case '5':
-      case '6':
-      case '7':
-      case '8':
-      case '9':
+    for (Format++; TRUE; Format++) {
+      if (*Format == '.' || *Format == '-' || *Format == '+' || *Format == ' ') {
         //
         // These characters in format field are omitted.
         //
-        break;
-      case 'L':
-      case 'l': 
+        continue;
+      }
+      if (*Format >= '0' && *Format <= '9') {
+        //
+        // These characters in format field are omitted.
+        //
+        continue;
+      }
+      if (*Format == 'L' || *Format == 'l') {
         //
         // 'L" or "l" in format field means the number being printed is a UINT64
         //
         Long = TRUE;
-        break;
-      case '*':
+        continue;
+      }
+      if (*Format == '*') {
         //
         // '*' in format field means the precision of the field is specified by
         // a UINTN argument in the argument list.
         //
         BASE_ARG (BaseListMarker, UINTN) = VA_ARG (VaListMarker, UINTN);
-        break;
-      case '\0':
+        continue;
+      }
+      if (*Format == '\0') {
         //
         // Make no output if Format string terminates unexpectedly when
         // looking up for flag, width, precision and type. 
         //
         Format--;
-        //
-        // break skipped on purpose.
-        //
-      default:
-        //
-        // When valid argument type detected or format string terminates unexpectedly,
-        // the inner loop is done.
-        //
-        Done = TRUE;
-        break;
       }
-    } 
-        
+      //
+      // When valid argument type detected or format string terminates unexpectedly,
+      // the inner loop is done.
+      //
+      break;
+    }
+    
     //
     // Pack variable arguments into the storage area following EFI_DEBUG_INFO.
     //
-    switch (*Format) {
-    case 'p':
-      if (sizeof (VOID *) > 4) {
-        Long = TRUE;
-      }
-    case 'X':
-    case 'x':
-    case 'd':
+    if ((*Format == 'p') && (sizeof (VOID *) > 4)) {
+      Long = TRUE;
+    }
+    if (*Format == 'p' || *Format == 'X' || *Format == 'x' || *Format == 'd') {
       if (Long) {
         BASE_ARG (BaseListMarker, INT64) = VA_ARG (VaListMarker, INT64);
       } else {
         BASE_ARG (BaseListMarker, int) = VA_ARG (VaListMarker, int);
       }
-      break;
-    case 's':
-    case 'S':
-    case 'a':
-    case 'g':
-    case 't':
+    } else if (*Format == 's' || *Format == 'S' || *Format == 'a' || *Format == 'g' || *Format == 't') {
       BASE_ARG (BaseListMarker, VOID *) = VA_ARG (VaListMarker, VOID *);
-      break;
-    case 'c':
+    } else if (*Format == 'c') {
       BASE_ARG (BaseListMarker, UINTN) = VA_ARG (VaListMarker, UINTN);
-      break;
-    case 'r':
+    } else if (*Format == 'r') {
       BASE_ARG (BaseListMarker, RETURN_STATUS) = VA_ARG (VaListMarker, RETURN_STATUS);
-      break;
     }
 
     //
