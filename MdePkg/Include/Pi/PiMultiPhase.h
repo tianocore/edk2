@@ -52,6 +52,28 @@
 #define EFI_NOT_AVAILABLE_YET     DXE_ERROR (2)
 
 ///
+/// Success and warning codes reserved for use by PI
+/// Supported 32-bit range is 0x20000000-0x3fffffff
+/// Supported 64-bit range is 0x2000000000000000-0x3fffffffffffffff
+///
+#define PI_ENCODE_WARNING(a)                ((MAX_BIT >> 2) | (a))
+
+///
+/// Error codes reserved for use by PI
+/// Supported 32-bit range is 0xa0000000-0xbfffffff
+/// Supported 64-bit range is 0xa000000000000000-0xbfffffffffffffff
+///
+#define PI_ENCODE_ERROR(a)                  (MAX_BIT | (MAX_BIT >> 2) | (a))
+
+/// 
+/// Return status codes defined in SMM CIS
+/// 
+#define EFI_INTERRUPT_PENDING               PI_ENCODE_ERROR (0)
+
+#define EFI_WARN_INTERRUPT_SOURCE_PENDING   PI_ENCODE_WARNING (0)
+#define EFI_WARN_INTERRUPT_SOURCE_QUIESCED  PI_ENCODE_WARNING (1)
+
+///
 /// Bitmask of values for Authentication Status.
 /// Authentication Status is returned from EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL 
 /// and the EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI
