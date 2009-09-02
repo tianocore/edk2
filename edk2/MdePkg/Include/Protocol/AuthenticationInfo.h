@@ -34,6 +34,7 @@
 
 typedef struct _EFI_AUTHENTICATION_INFO_PROTOCOL EFI_AUTHENTICATION_INFO_PROTOCOL;
 
+#pragma pack(1)
 typedef struct {
   ///
   /// Authentication Type GUID.
@@ -52,7 +53,7 @@ typedef struct {
   ///
   /// RADIUS Server IPv4 or IPv6 Address
   ///
-  EFI_IPv6_ADDRESS RadiusIpAddr;             ///< IPv4 or IPv6 address
+  UINT8            RadiusIpAddr[16];         ///< IPv4 or IPv6 address
 
   ///
   /// Reserved for future use
@@ -62,7 +63,7 @@ typedef struct {
   ///
   /// Network Access Server IPv4 or IPv6 Address (OPTIONAL)
   ///
-  EFI_IPv6_ADDRESS NasIpAddr;                ///< IPv4 or IPv6 address
+  UINT8            NasIpAddr[16];            ///< IPv4 or IPv6 address
 
   ///
   /// Network Access Server Secret Length in bytes (OPTIONAL)
@@ -70,29 +71,27 @@ typedef struct {
   UINT16           NasSecretLength; 
 
   ///
-  /// Network Access Server secret (OPTIONAL)
+  /// Network Access Server Secret (OPTIONAL)
   ///
-  UINT8            *NasSecret;      
+  UINT8            NasSecret[1];
 
+  /// 
+  /// CHAP Initiator Secret length in bytes on offset NasSecret + NasSecretLength.
   ///
-  /// CHAP Initiator Secret length in bytes
-  ///
-  UINT16           ChapSecretLength;
-
+  /// UINT16           ChapSecretLength;
   ///
   /// CHAP Initiator Secret
   ///
-  UINT8            *ChapSecret;
-
+  /// UINT8            ChapSecret[];
   ///
-  /// CHAP Initiator Name Length in bytes
+  /// CHAP Initiator Name Length in bytes on offset ChapSecret + ChapSecretLength
   ///
-  UINT16           ChapNameLength;
-
+  /// UINT16           ChapNameLength;
   ///
   /// CHAP Initiator Name
   ///
-  UINT8            *ChapName;
+  /// UINT8            ChapName[];
+  ///
 } CHAP_RADIUS_AUTH_NODE;
 
 typedef struct {
@@ -111,45 +110,42 @@ typedef struct {
   ///
   /// User Secret
   ///
-  UINT8            *UserSecret;     
+  UINT8            UserSecret[1];
 
   ///
-  /// User Name Length in bytes
+  /// User Name Length in bytes on offset UserSecret + UserSecretLength
   ///
-  UINT16           UserNameLength;
-
+  /// UINT16           UserNameLength;
   ///
   /// User Name
   ///
-  UINT8            *UserName;
-
+  /// UINT8            *UserName;
   ///
-  /// CHAP Initiator Secret length in bytes
+  /// CHAP Initiator Secret length in bytes on offset UserName + UserNameLength
   ///
-  UINT16           ChapSecretLength;
-
+  /// UINT16           ChapSecretLength;
   ///
   /// CHAP Initiator Secret
   ///
-  UINT8            *ChapSecret;
-
+  /// UINT8            *ChapSecret;
   ///
-  /// CHAP Initiator Name Length in bytes
+  /// CHAP Initiator Name Length in bytes on offset ChapSecret + ChapSecretLength
   ///
-  UINT16           ChapNameLength;
-
+  /// UINT16           ChapNameLength;
   ///
   /// CHAP Initiator Name
   ///
-  UINT8            *ChapName;
+  /// UINT8            *ChapName;
+  ///
 } CHAP_LOCAL_AUTH_NODE;
+#pragma pack()
 
 /**
   Retrieves the authentication information associated with a particular controller handle.
 
-  @param  This                  Pointer to the EFI_AUTHENTICATION_INFO_PROTOCOL
-  @param  ControllerHandle      Handle to the Controller
-  @param  Buffer                Pointer to the authentication information.
+  @param[in]  This                  Pointer to the EFI_AUTHENTICATION_INFO_PROTOCOL
+  @param[in]  ControllerHandle      Handle to the Controller
+  @param[out] Buffer                Pointer to the authentication information.
 
   @retval EFI_SUCCESS           Successfully retrieved authentication information for the given ControllerHandle
   @retval EFI_INVALID_PARAMETER No matching authentication information found for the given ControllerHandle
@@ -163,14 +159,14 @@ EFI_STATUS
   IN  EFI_AUTHENTICATION_INFO_PROTOCOL *This,
   IN  EFI_HANDLE                       *ControllerHandle,
   OUT VOID                             *Buffer
-  );  
+  );
 
 /**
   Set the authentication information for a given controller handle.
 
-  @param  This                 Pointer to the EFI_AUTHENTICATION_INFO_PROTOCOL
-  @param  ControllerHandle     Handle to the Controller
-  @param  Buffer               Pointer to the authentication information.
+  @param[in]  This                 Pointer to the EFI_AUTHENTICATION_INFO_PROTOCOL
+  @param[in]  ControllerHandle     Handle to the Controller
+  @param[in]  Buffer               Pointer to the authentication information.
                                 
   @retval EFI_SUCCESS          Successfully set authentication information for the given ControllerHandle
   @retval EFI_UNSUPPORTED      If the platform policies do not allow setting of the authentication

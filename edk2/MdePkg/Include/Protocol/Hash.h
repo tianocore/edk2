@@ -4,7 +4,6 @@
   The EFI Hash Service Binding Protocol is used to locate hashing services support 
   provided by a driver and to create and destroy instances of the EFI Hash Protocol 
   so that a multiple drivers can use the underlying hashing services.
-  The EFI Service Binding Protocol defines the generic Service Binding Protocol functions.
 
   Copyright (c) 2006 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
@@ -81,9 +80,9 @@ typedef union {
 /**
   Returns the size of the hash which results from a specific algorithm.
 
-  @param  This                  Points to this instance of EFI_HASH_PROTOCOL.
-  @param  HashAlgorithm         Points to the EFI_GUID which identifies the algorithm to use.
-  @param  HashSize              Holds the returned size of the algorithm's hash.
+  @param[in]  This                  Points to this instance of EFI_HASH_PROTOCOL.
+  @param[in]  HashAlgorithm         Points to the EFI_GUID which identifies the algorithm to use.
+  @param[out] HashSize              Holds the returned size of the algorithm's hash.
 
   @retval EFI_SUCCESS           Hash size returned successfully.
   @retval EFI_INVALID_PARAMETER HashSize is NULL
@@ -102,14 +101,14 @@ EFI_STATUS
 /**
   Returns the size of the hash which results from a specific algorithm.
 
-  @param  This          Points to this instance of EFI_HASH_PROTOCOL.
-  @param  HashAlgorithm Points to the EFI_GUID which identifies the algorithm to use.
-  @param  Extend        Specifies whether to create a new hash (FALSE) or extend the specified
-                        existing hash (TRUE).
-  @param  Message       Points to the start of the message.
-  @param  MessageSize   The size of Message, in bytes.
-  @param  Hash          On input, if Extend is TRUE, then this holds the hash to extend. On
-                        output, holds the resulting hash computed from the message.
+  @param[in]  This          Points to this instance of EFI_HASH_PROTOCOL.
+  @param[in]  HashAlgorithm Points to the EFI_GUID which identifies the algorithm to use.
+  @param[in]  Extend        Specifies whether to create a new hash (FALSE) or extend the specified
+                            existing hash (TRUE).
+  @param[in]  Message       Points to the start of the message.
+  @param[in]  MessageSize   The size of Message, in bytes.
+  @param[in,out]  Hash      On input, if Extend is TRUE, then this holds the hash to extend. On
+                            output, holds the resulting hash computed from the message.
 
   @retval EFI_SUCCESS           Hash returned successfully.
   @retval EFI_INVALID_PARAMETER Message or Hash is NULL
