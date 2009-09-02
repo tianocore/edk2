@@ -500,10 +500,6 @@ struct _EFI_TCP4_PROTOCOL {
   EFI_TCP4_POLL                          Poll;
 };
 
-#define EFI_CONNECTION_FIN               EFIERR (104)
-#define EFI_CONNECTION_RESET             EFIERR (105)
-#define EFI_CONNECTION_REFUSED           EFIERR (106)
-
 extern EFI_GUID gEfiTcp4ServiceBindingProtocolGuid;
 extern EFI_GUID gEfiTcp4ProtocolGuid;
 

@@ -48,15 +48,6 @@ typedef struct {
   EFI_UDP4_SERVICE_POINT  Services[1];
 } EFI_UDP4_VARIABLE_DATA;
 
-//
-//ICMP error definitions
-//
-#define EFI_NETWORK_UNREACHABLE      EFIERR(100)
-#define EFI_HOST_UNREACHABLE         EFIERR(101) 
-#define EFI_PROTOCOL_UNREACHABLE     EFIERR(102)
-#define EFI_PORT_UNREACHABLE         EFIERR(103)
-
-
 typedef struct {
   UINT32             FragmentLength;
   VOID               *FragmentBuffer;
