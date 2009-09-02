@@ -115,9 +115,9 @@ typedef union {
 } EFI_IP_ADDRESS;
 
 
-//
-// Enumeration of EFI_STATUS.
-// 
+///
+/// Enumeration of EFI_STATUS.
+///@{ 
 #define EFI_SUCCESS               RETURN_SUCCESS              
 #define EFI_LOAD_ERROR            RETURN_LOAD_ERROR           
 #define EFI_INVALID_PARAMETER     RETURN_INVALID_PARAMETER    
@@ -154,16 +154,31 @@ typedef union {
 #define EFI_WARN_DELETE_FAILURE   RETURN_WARN_DELETE_FAILURE  
 #define EFI_WARN_WRITE_FAILURE    RETURN_WARN_WRITE_FAILURE   
 #define EFI_WARN_BUFFER_TOO_SMALL RETURN_WARN_BUFFER_TOO_SMALL
+///@}
 
-
-//
-// Define macro to encode the status code.
-// 
+///
+/// Define macro to encode the status code.
+/// 
 #define EFIERR(_a)                ENCODE_ERROR(_a)
 
 #define EFI_ERROR(A)              RETURN_ERROR(A)
 
+///
+/// ICMP error definitions
+///@{
+#define EFI_NETWORK_UNREACHABLE   EFIERR(100)
+#define EFI_HOST_UNREACHABLE      EFIERR(101) 
+#define EFI_PROTOCOL_UNREACHABLE  EFIERR(102)
+#define EFI_PORT_UNREACHABLE      EFIERR(103)
+///@}
 
+///
+/// Tcp connection status definitions
+///@{
+#define EFI_CONNECTION_FIN        EFIERR(104)
+#define EFI_CONNECTION_RESET      EFIERR(105)
+#define EFI_CONNECTION_REFUSED    EFIERR(106)
+///@}
 
 //
 // The EFI memory allocation functions work in units of EFI_PAGEs that are
