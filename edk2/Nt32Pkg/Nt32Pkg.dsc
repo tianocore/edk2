@@ -443,6 +443,7 @@
   MdeModulePkg/Universal/Network/Mtftp4Dxe/Mtftp4Dxe.inf
   MdeModulePkg/Universal/Network/Tcp4Dxe/Tcp4Dxe.inf
   MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
+  MdeModulePkg/Universal/Network/UefiPxeBcDxe/UefiPxeBcDxe.inf
   Nt32Pkg/SnpNt32Dxe/SnpNt32Dxe.inf
 
   MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
