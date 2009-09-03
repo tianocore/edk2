@@ -1,5 +1,4 @@
 /** @file
-  
   This file defines the EFI IPv6 (Internet Protocol version 6)
   Protocol interface. It is split into the following three main
   sections:
@@ -18,7 +17,10 @@
   http://opensource.org/licenses/bsd-license.php                                            
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
+
+  @par Revision Reference:          
+  This Protocol is introduced in UEFI Specification 2.2       
 
 **/
 

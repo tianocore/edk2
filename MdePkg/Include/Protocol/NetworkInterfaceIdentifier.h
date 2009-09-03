@@ -10,6 +10,8 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
+  @par Revision Reference:          
+  This Protocol is introduced in EFI Specification 1.10
 
 **/
 
