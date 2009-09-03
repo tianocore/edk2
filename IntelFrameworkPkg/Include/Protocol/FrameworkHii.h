@@ -1,9 +1,7 @@
 /** @file
   This file defines the Human Interface Infrastructure protocol, which is
   used by resources that want to publish IFR/Font/String data and have it
-  collected by the Configuration engine. This protocol is defined in the.
-  Intel Platform Innovation Framework for EFI Human Interface Infrastructure
-  Specification Version 0.92.
+  collected by the Configuration engine.
 
   Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
@@ -13,6 +11,10 @@
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+  @par Revision Reference:
+  This protocol is defined in Framework for EFI Human Interface Infrastructure
+  Specification Version 0.92.
 
 **/
 

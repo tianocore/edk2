@@ -3,9 +3,6 @@
   data and those wishing to be made aware of all information that
   has been logged.
 
-  This protocol is defined in Framework for EFI Data Hub Specification.
-  Version 0.9.
-
   Copyright (c) 2007 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -14,6 +11,10 @@
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+  @par Revision Reference:
+  The Data Hub Protocol is defined in Framework for EFI Data Hub Specification
+  Version 0.9.
 
 **/
 
