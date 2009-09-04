@@ -85,9 +85,6 @@
 [LibraryClasses.ARM]
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
 
-[LibraryClasses.EBC.DXE_DRIVER]
-  IoLib|IntelFrameworkPkg/Library/DxeIoLibCpuIo/DxeIoLibCpuIo.inf
-
 [LibraryClasses.EBC.PEIM]
   IoLib|MdePkg/Library/PeiIoLibCpuIo/PeiIoLibCpuIo.inf
 
