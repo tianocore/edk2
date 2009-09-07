@@ -160,6 +160,38 @@ GetVariableDataPtr (
 }
 
 /**
+  Gets pointer to header of the next potential variable.
+
+  This function gets the pointer to the next potential variable header
+  according to the input point to the variable header.  The return value
+  is not a valid variable if the input variable was the last variable
+  in the variabl store.
+
+  @param  Variable      Pointer to header of the next variable
+
+  @return Pointer to next variable header.
+  @retval NULL  Input was not a valid variable header.
+
+**/
+VARIABLE_HEADER *
+GetNextPotentialVariablePtr (
+  IN  VARIABLE_HEADER   *Variable
+  )
+{
+  VARIABLE_HEADER *VarHeader;
+
+  if (Variable->StartId != VARIABLE_DATA) {
+    return NULL;
+  }
+  //
+  // Be careful about pad size for alignment
+  //
+  VarHeader = (VARIABLE_HEADER *) (GetVariableDataPtr (Variable) + Variable->DataSize + GET_PAD_SIZE (Variable->DataSize));
+
+  return VarHeader;
+}
+
+/**
   Gets pointer to header of the next variable.
 
   This function gets the pointer to the next variable header according
@@ -177,19 +209,44 @@ GetNextVariablePtr (
 {
   VARIABLE_HEADER *VarHeader;
 
-  if (Variable->StartId != VARIABLE_DATA) {
-    return NULL;
-  }
-  //
-  // Be careful about pad size for alignment
-  //
-  VarHeader = (VARIABLE_HEADER *) (GetVariableDataPtr (Variable) + Variable->DataSize + GET_PAD_SIZE (Variable->DataSize));
+  VarHeader = GetNextPotentialVariablePtr (Variable);
 
-  if (VarHeader->StartId != VARIABLE_DATA) {
+  if ((VarHeader == NULL) || (VarHeader->StartId != VARIABLE_DATA)) {
     return NULL;
   }
 
   return VarHeader;
+}
+
+/**
+  Updates LastVariableOffset variable for the given variable store.
+
+  LastVariableOffset points to the offset to use for the next variable
+  when updating the variable store.
+
+  @param[in]   VariableStore       Pointer to the start of the variable store
+  @param[out]  LastVariableOffset  Offset to put the next new variable in
+
+**/
+VOID
+InitializeLocationForLastVariableOffset (
+  IN  VARIABLE_STORE_HEADER *VariableStore,
+  OUT UINTN                 *LastVariableOffset
+  )
+{
+  VARIABLE_HEADER *VarHeader;
+
+  *LastVariableOffset       = sizeof (VARIABLE_STORE_HEADER);
+  VarHeader = (VARIABLE_HEADER*) ((UINT8*)VariableStore + *LastVariableOffset);
+  while (VarHeader->StartId == VARIABLE_DATA) {
+    VarHeader = GetNextPotentialVariablePtr (VarHeader);
+
+    if (VarHeader != NULL) {
+      *LastVariableOffset = (UINTN) VarHeader - (UINTN) VariableStore;
+    } else {
+      return;
+    }
+  }
 }
 
 /**
@@ -1307,11 +1364,23 @@ EmuQueryVariableInfo (
 **/
 EFI_STATUS
 InitializeVariableStore (
-  OUT EFI_PHYSICAL_ADDRESS  *VariableBase,
-  OUT UINTN                 *LastVariableOffset
+  IN  BOOLEAN               VolatileStore
   )
 {
   VARIABLE_STORE_HEADER *VariableStore;
+  BOOLEAN               FullyInitializeStore;
+  EFI_PHYSICAL_ADDRESS  *VariableBase;
+  UINTN                 *LastVariableOffset;
+
+  FullyInitializeStore = TRUE;
+
+  if (VolatileStore) {
+    VariableBase = &mVariableModuleGlobal->VariableGlobal[Physical].VolatileVariableBase;
+    LastVariableOffset = &mVariableModuleGlobal->VolatileLastVariableOffset;
+  } else {
+    VariableBase = &mVariableModuleGlobal->VariableGlobal[Physical].NonVolatileVariableBase;
+    LastVariableOffset = &mVariableModuleGlobal->NonVolatileLastVariableOffset;
+  }
 
   //
   // Note that in EdkII variable driver implementation, Hardware Error Record type variable
@@ -1322,22 +1391,48 @@ InitializeVariableStore (
   ASSERT (FixedPcdGet32(PcdHwErrStorageSize) <= FixedPcdGet32(PcdVariableStoreSize));
 
   //
-  // Allocate memory for volatile variable store
+  // Allocate memory for variable store.
   //
-  VariableStore = (VARIABLE_STORE_HEADER *) AllocateRuntimePool (
-                                              FixedPcdGet32(PcdVariableStoreSize)
-                                              );
+  if (VolatileStore || (PcdGet64 (PcdEmuVariableNvStoreReserved) == 0)) {
+    VariableStore = (VARIABLE_STORE_HEADER *) AllocateRuntimePool (
+                                                FixedPcdGet32(PcdVariableStoreSize)
+                                                );
+  } else {
+    //
+    // A memory location has been reserved for the NV variable store.  Certain
+    // platforms may be able to preserve a memory range across system resets,
+    // thereby providing better NV variable emulation.
+    //
+    VariableStore =
+      (VARIABLE_STORE_HEADER *)(VOID*)(UINTN)
+        PcdGet64 (PcdEmuVariableNvStoreReserved);
+    if (
+         (VariableStore->Size == FixedPcdGet32(PcdVariableStoreSize)) &&
+         (VariableStore->Format == VARIABLE_STORE_FORMATTED) &&
+         (VariableStore->State == VARIABLE_STORE_HEALTHY)
+       ) {
+      DEBUG((
+        EFI_D_INFO,
+        "Variable Store reserved at %p appears to be valid\n",
+        VariableStore
+        ));
+      FullyInitializeStore = FALSE;
+    }
+  }
+
   if (NULL == VariableStore) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  SetMem (VariableStore, FixedPcdGet32(PcdVariableStoreSize), 0xff);
+  if (FullyInitializeStore) {
+    SetMem (VariableStore, FixedPcdGet32(PcdVariableStoreSize), 0xff);
+  }
 
   //
   // Variable Specific Data
   //
   *VariableBase             = (EFI_PHYSICAL_ADDRESS) (UINTN) VariableStore;
-  *LastVariableOffset       = sizeof (VARIABLE_STORE_HEADER);
+  InitializeLocationForLastVariableOffset (VariableStore, LastVariableOffset);
 
   CopyGuid (&VariableStore->Signature, &gEfiVariableGuid);
   VariableStore->Size       = FixedPcdGet32(PcdVariableStoreSize);
@@ -1386,11 +1481,7 @@ VariableCommonInitialize (
   //
   // Intialize volatile variable store
   //
-  Status = InitializeVariableStore (
-            &mVariableModuleGlobal->VariableGlobal[Physical].VolatileVariableBase,
-            &mVariableModuleGlobal->VolatileLastVariableOffset
-            );
-
+  Status = InitializeVariableStore (TRUE);
   if (EFI_ERROR (Status)) {
     FreePool(mVariableModuleGlobal);
     return Status;
@@ -1398,10 +1489,7 @@ VariableCommonInitialize (
   //
   // Intialize non volatile variable store
   //
-  Status = InitializeVariableStore (
-            &mVariableModuleGlobal->VariableGlobal[Physical].NonVolatileVariableBase,
-            &mVariableModuleGlobal->NonVolatileLastVariableOffset
-            );
+  Status = InitializeVariableStore (FALSE);
 
   return Status;
 }
