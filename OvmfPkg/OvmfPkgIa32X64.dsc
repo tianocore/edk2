@@ -206,7 +206,8 @@
 #
 ################################################################################
 
-[PcdsDynamicDefault.common.DEFAULT]
+[PcdsDynamicDefault.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved|0
 
 ################################################################################
 #
@@ -232,7 +233,11 @@
     <LibraryClasses>
       NULL|IntelFrameworkModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
   }
-  OvmfPkg/PlatformPei/PlatformPei.inf
+
+  OvmfPkg/PlatformPei/PlatformPei.inf {
+    <LibraryClasses>
+      PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
+  }
 
 [Components.X64]
   #

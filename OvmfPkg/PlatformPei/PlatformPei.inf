@@ -63,7 +63,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
 
 [Pcd.common]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved
 
 [Depex]
   TRUE
