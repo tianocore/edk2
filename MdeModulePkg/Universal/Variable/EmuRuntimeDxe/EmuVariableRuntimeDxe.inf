@@ -60,6 +60,7 @@
   gEfiVariableGuid
 
 [Pcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize

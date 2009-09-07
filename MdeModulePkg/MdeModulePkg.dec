@@ -321,6 +321,10 @@
   #  This PCD is a sample to explain String typed PCD usage.
   gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintString|L"UEFI Hello World!\n"|VOID*|0x40000004
 
+  ## This PCD defines a reserved memory range for the EMU Variable driver's NV Variable Store
+  #  The range is valid if non-zero.  The memory range size must be PcdVariableStoreSize.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved|0|UINT64|0x40000008
+
 [PcdsFixedAtBuild,PcdsPatchableInModule,PcdsDynamic]
   ## This PCD defines the times to print hello world string.
   #  This PCD is a sample to explain FixedAtBuild UINT32 PCD usage.
