@@ -462,6 +462,14 @@ Returns:
       continue;
     }
 
+    Status = PciIo->Attributes (
+      PciIo,
+      EfiPciIoAttributeOperationEnable,
+      EFI_PCI_DEVICE_ENABLE,
+      NULL
+      );
+    ASSERT_EFI_ERROR (Status);
+
     if (!DetectVgaOnly) {
       //
       // Here we decide whether it is LPC Bridge
@@ -472,17 +480,11 @@ Returns:
            (Pci.Hdr.DeviceId == 0x7000)
           )
          ) {
-        Status = PciIo->Attributes (
-          PciIo,
-          EfiPciIoAttributeOperationEnable,
-          EFI_PCI_DEVICE_ENABLE,
-          NULL
-          );
         //
         // Add IsaKeyboard to ConIn,
         // add IsaSerial to ConOut, ConIn, ErrOut
         //
-        DEBUG ((EFI_D_INFO, "Find the LPC Bridge device\n"));
+        DEBUG ((EFI_D_INFO, "Found LPC Bridge device\n"));
         PrepareLpcBridgeDevicePath (HandleBuffer[Index]);
         continue;
       }
@@ -493,22 +495,11 @@ Returns:
         //
         // Add them to ConOut, ConIn, ErrOut.
         //
-        DEBUG ((EFI_D_INFO, "Find the 16550 SERIAL device\n"));
+        DEBUG ((EFI_D_INFO, "Found PCI 16550 SERIAL device\n"));
         PreparePciSerialDevicePath (HandleBuffer[Index]);
         continue;
       }
     }
-
-    if ((Pci.Hdr.VendorId == 0x8086) &&
-        (Pci.Hdr.DeviceId == 0x7010)
-       ) {
-      Status = PciIo->Attributes (
-        PciIo,
-        EfiPciIoAttributeOperationEnable,
-        EFI_PCI_DEVICE_ENABLE,
-        NULL
-        );
-     }
 
     //
     // Here we decide which VGA device to enable in PCI bus
@@ -517,7 +508,7 @@ Returns:
       //
       // Add them to ConOut.
       //
-      DEBUG ((EFI_D_INFO, "Find the VGA device\n"));
+      DEBUG ((EFI_D_INFO, "Found PCI VGA device\n"));
       PreparePciVgaDevicePath (HandleBuffer[Index]);
       continue;
     }
