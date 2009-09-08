@@ -3,7 +3,7 @@
   Child device(Disk, CDROM, etc) enumeration and child handler installation, and 
   driver stop.
     
-  Copyright (c) 2006 - 2008, Intel Corporation
+  Copyright (c) 2006 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -151,41 +151,22 @@ IDEBusDriverBindingSupported (
 
   if (RemainingDevicePath != NULL) {
     Node = (EFI_DEV_PATH *) RemainingDevicePath;
-    if (Node->DevPath.Type != MESSAGING_DEVICE_PATH ||
-        Node->DevPath.SubType != MSG_ATAPI_DP ||
-        DevicePathNodeLength(&Node->DevPath) != sizeof(ATAPI_DEVICE_PATH)) {
-      return EFI_UNSUPPORTED;
+    //
+    // Check if RemainingDevicePath is the End of Device Path Node, 
+    // if yes, go on checking other conditions
+    //
+    if (!IsDevicePathEnd (Node)) {
+      //
+      // If RemainingDevicePath isn't the End of Device Path Node,
+      // check its validation
+      //
+      if (Node->DevPath.Type != MESSAGING_DEVICE_PATH ||
+          Node->DevPath.SubType != MSG_ATAPI_DP ||
+          DevicePathNodeLength(&Node->DevPath) != sizeof(ATAPI_DEVICE_PATH)) {
+        return EFI_UNSUPPORTED;
+      }
     }
   }
-
-  //
-  // Open the IO Abstraction(s) needed to perform the supported test
-  //
-  Status = gBS->OpenProtocol (
-                  Controller,
-                  &gEfiDevicePathProtocolGuid,
-                  (VOID **) &ParentDevicePath,
-                  This->DriverBindingHandle,
-                  Controller,
-                  EFI_OPEN_PROTOCOL_BY_DRIVER
-                  );
-  if (Status == EFI_ALREADY_STARTED) {
-    return EFI_SUCCESS;
-  }
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Close protocol, don't use device path protocol in the .Support() function
-  //
-  gBS->CloseProtocol (
-        Controller,
-        &gEfiDevicePathProtocolGuid,
-        This->DriverBindingHandle,
-        Controller
-        );
 
   //
   // Verify the Ide Controller Init Protocol, which installed by the
@@ -214,6 +195,35 @@ IDEBusDriverBindingSupported (
   gBS->CloseProtocol (
         Controller,
         &gEfiIdeControllerInitProtocolGuid,
+        This->DriverBindingHandle,
+        Controller
+        );
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Open the EFI Device Path protocol needed to perform the supported test
+  //
+  Status = gBS->OpenProtocol (
+                  Controller,
+                  &gEfiDevicePathProtocolGuid,
+                  (VOID **) &ParentDevicePath,
+                  This->DriverBindingHandle,
+                  Controller,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
+  if (Status == EFI_ALREADY_STARTED) {
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Close protocol, don't use device path protocol in the Support() function
+  //
+  gBS->CloseProtocol (
+        Controller,
+        &gEfiDevicePathProtocolGuid,
         This->DriverBindingHandle,
         Controller
         );
@@ -415,28 +425,20 @@ IDEBusDriverBindingStart (
     ConfigurationOptions = 0x0f;
   }
 
-  if (EnumAll) {
+   if (EnumAll || RemainingDevicePath == NULL) {
     //
-    // If IdeInit->EnumAll is TRUE, must enumerate all IDE device anyway
+    // If IdeInit->EnumAll is TRUE or RemainingDevicePath is NULL, 
+    // must enumerate all IDE device anyway
     //
     BeginningIdeChannel = IdePrimary;
     EndIdeChannel       = IdeSecondary;
     BeginningIdeDevice  = IdeMaster;
     EndIdeDevice        = IdeSlave;
-  } else if (RemainingDevicePath == NULL) {
+
+  } else if (!IsDevicePathEnd (RemainingDevicePath)) {
     //
-    // RemainingDevicePath is NULL, scan IDE bus for each device;
-    //
-    BeginningIdeChannel = IdePrimary;
-    EndIdeChannel       = IdeSecondary;
-    BeginningIdeDevice  = IdeMaster;
-    //
-    // default, may be redefined by IdeInit
-    //
-    EndIdeDevice = IdeSlave;
-  } else {
-    //
-    // RemainingDevicePath is not NULL, only scan the specified device.
+    // RemainingDevicePath is the End of Device Path Node, 
+    // only scan the specified device by RemainingDevicePath.
     //
     Node                = (EFI_DEV_PATH *) RemainingDevicePath;
     BeginningIdeChannel = Node->Atapi.PrimarySecondary;
@@ -451,6 +453,16 @@ IDEBusDriverBindingStart (
       Status = EFI_INVALID_PARAMETER;
       goto ErrorExit;
     }
+
+  } else {
+    //
+    // If RemainingDevicePath is not the End of Device Path Node,
+    // skip enumerate any device and return EFI_SUCESSS
+    // 
+    BeginningIdeChannel = IdeMaxChannel;
+    EndIdeChannel       = IdeMaxChannel - 1;
+    BeginningIdeDevice  = IdeMaxDevice;
+    EndIdeDevice        = IdeMaxDevice - 1;
   }
 
   //
@@ -846,7 +858,7 @@ IDEBusDriverBindingStart (
   IdeInit->NotifyPhase (IdeInit, EfiIdeBusPhaseMaximum, 0);
 
   if (SupportedModes != NULL) {
-    gBS->FreePool (SupportedModes);
+    FreePool (SupportedModes);
   }
 
   PERF_START (NULL, "Finish IDE detection", "IDE", 1);
