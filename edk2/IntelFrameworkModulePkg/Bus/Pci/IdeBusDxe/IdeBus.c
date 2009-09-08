@@ -189,6 +189,10 @@ IDEBusDriverBindingSupported (
     return EFI_SUCCESS;
   }
 
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
   //
   // If protocols were opened normally, closed it
   //
@@ -198,10 +202,6 @@ IDEBusDriverBindingSupported (
         This->DriverBindingHandle,
         Controller
         );
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
 
   //
   // Open the EFI Device Path protocol needed to perform the supported test
