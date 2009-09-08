@@ -698,8 +698,7 @@ ParseOpCodes (
       break;
 
     case EFI_IFR_RESET_BUTTON_OP:
-      CurrentStatement = CreateQuestion (OpCodeData, FormSet, CurrentForm);
-
+      CurrentStatement = CreateStatement (OpCodeData, FormSet, CurrentForm);
       CopyMem (&CurrentStatement->DefaultId, &((EFI_IFR_RESET_BUTTON *) OpCodeData)->DefaultId, sizeof (EFI_DEFAULT_ID));
       break;
 
@@ -987,8 +986,7 @@ ParseOpCodes (
         default:
           break;
         }
-      } 
-      else if (CompareGuid ((EFI_GUID *)(VOID *)&OptionMap->Guid, &mFrameworkHiiCompatibilityGuid)) {
+      } else if (CompareGuid ((EFI_GUID *)(VOID *)&OptionMap->Guid, &mFrameworkHiiCompatibilityGuid)) {
         if (OptionMap->ExtendOpCode == EFI_IFR_EXTEND_OP_OPTIONKEY) {
           OneOfOptinMapEntryListHead = GetOneOfOptionMapEntryListHead (FormSet, OptionMap->QuestionId);
           if (OneOfOptinMapEntryListHead == NULL) {
