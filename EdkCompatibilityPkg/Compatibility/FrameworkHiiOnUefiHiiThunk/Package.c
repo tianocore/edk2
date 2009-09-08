@@ -459,7 +459,7 @@ FindStringPackAndUpdatePackListWithOnlyIfrPack (
 **/
 EFI_STATUS
 UefiRegisterPackageList (
-  IN  EFI_HII_PROTOCOL               *This,
+  IN  EFI_HII_PROTOCOL            *This,
   IN  HII_THUNK_PRIVATE_DATA      *Private,
   IN  EFI_HII_PACKAGES            *Packages,
   OUT FRAMEWORK_EFI_HII_HANDLE    *Handle
