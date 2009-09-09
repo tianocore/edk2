@@ -996,6 +996,12 @@
   ## Include/Protocol/AtaPassThru.h
   gEfiAtaPassThruProtocolGuid          = { 0x1d3de7f0, 0x807, 0x424f, {0xaa, 0x69, 0x11, 0xa5, 0x4e, 0x19, 0xa4, 0x6f }}
 
+  #
+  # Protocols defined in UEFI2.3
+  #
+  ## Include/Protocol/FirmwareManagement.h
+  gEfiFirmwareManagementProtocolGuid   = { 0x86c77a67, 0xb97, 0x4633, {0xa1, 0x87, 0x49, 0x10, 0x4d, 0x6, 0x85, 0xc7 }}
+
 [PcdsFeatureFlag]
   ## If TRUE, the component name protocol will not be installed.
   gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable|FALSE|BOOLEAN|0x0000000d

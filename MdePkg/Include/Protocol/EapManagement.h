@@ -3,7 +3,7 @@
   The EFI EAP Management Protocol is designed to provide ease of management and
   ease of test for EAPOL state machine. It is intended for the supplicant side. 
   It conforms to IEEE 802.1x specification. 
-  The definitions in this file are defined in UEFI Specification 2.3, which have
+  The definitions in this file are defined in UEFI Specification 2.2, which have
   not been verified by one implementation yet.
 
   Copyright (c) 2009, Intel Corporation
