@@ -993,6 +993,9 @@
   ## Include/Protocol/UserManager.h
   gEfiUserManagerProtocolGuid          = { 0x6fd5b00c, 0xd426, 0x4283, {0x98, 0x87, 0x6c, 0xf5, 0xcf, 0x1c, 0xb1, 0xfe }}
 
+  ## Include/Protocol/AtaPassThru.h
+  gEfiAtaPassThruProtocolGuid          = { 0x1d3de7f0, 0x807, 0x424f, {0xaa, 0x69, 0x11, 0xa5, 0x4e, 0x19, 0xa4, 0x6f }}
+
 [PcdsFeatureFlag]
   ## If TRUE, the component name protocol will not be installed.
   gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable|FALSE|BOOLEAN|0x0000000d
