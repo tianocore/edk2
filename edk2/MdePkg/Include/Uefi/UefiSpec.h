@@ -5,7 +5,7 @@
   If a code construct is defined in the UEFI 2.1 specification it must be included
   by this include file.
 
-  Copyright (c) 2006 - 2008, Intel Corporation<BR>
+  Copyright (c) 2006 - 2009, Intel Corporation<BR>
   Portions copyright (c) 2008-2009 Apple Inc. All rights reserved.<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1615,6 +1615,7 @@ typedef struct {
 
 #define CAPSULE_FLAGS_PERSIST_ACROSS_RESET          0x00010000
 #define CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE         0x00020000
+#define CAPSULE_FLAGS_INITIATE_RESET                0x00040000
 
 /**
   Passes capsules to the firmware with both virtual and physical mapping. Depending on the intended
@@ -1634,7 +1635,8 @@ typedef struct {
   @retval EFI_SUCCESS           Valid capsule was passed. If
                                 CAPSULE_FLAGS_PERSIT_ACROSS_RESET is not set, the
                                 capsule has been successfully processed by the firmware.
-  @retval EFI_INVALID_PARAMETER CapsuleSize or HeaderSize is NULL.
+  @retval EFI_INVALID_PARAMETER CapsuleSize is NULL, or an incompatible set of flags were
+                                set in the capsule header.
   @retval EFI_INVALID_PARAMETER CapsuleCount is 0.
   @retval EFI_DEVICE_ERROR      The capsule update was started, but failed due to a device error.
   @retval EFI_UNSUPPORTED       The capsule type is not supported on this platform.

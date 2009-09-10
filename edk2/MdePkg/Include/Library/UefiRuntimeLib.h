@@ -2,7 +2,7 @@
   Provides library functions for each of the UEFI Runtime Services.
   Only available to DXE and UEFI module types.
 
-Copyright (c) 2006 - 2008, Intel Corporation<BR>
+Copyright (c) 2006 - 2009, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -480,7 +480,8 @@ EfiConvertList (
 
   @retval EFI_SUCCESS           Valid capsule was passed. If CAPSULE_FLAGS_PERSIT_ACROSS_RESET is not set,
                                 the capsule has been successfully processed by the firmware.
-  @retval EFI_INVALID_PARAMETER CapsuleSize or HeaderSize is NULL.
+  @retval EFI_INVALID_PARAMETER CapsuleSize is NULL, or an incompatible set of flags were
+                                set in the capsule header.
   @retval EFI_INVALID_PARAMETER CapsuleCount is 0
   @retval EFI_DEVICE_ERROR      The capsule update was started, but failed due to a device error.
   @retval EFI_UNSUPPORTED       The capsule type is not supported on this platform.
