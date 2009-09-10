@@ -1,6 +1,6 @@
 /**@file
 
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -127,31 +127,50 @@ Returns:
   UART_DEVICE_PATH          *UartNode;
 
   //
+  // Check RemainingDevicePath validation
+  //
+  if (RemainingDevicePath != NULL) {
+    //
+    // Check if RemainingDevicePath is the End of Device Path Node, 
+    // if yes, go on checking other conditions
+    //
+    if (!IsDevicePathEnd (RemainingDevicePath)) {
+      //
+      // If RemainingDevicePath isn't the End of Device Path Node,
+      // check its validation
+      //
+      Status = EFI_UNSUPPORTED;
+
+      UartNode  = (UART_DEVICE_PATH *) RemainingDevicePath;
+      if (UartNode->Header.Type != MESSAGING_DEVICE_PATH ||
+          UartNode->Header.SubType != MSG_UART_DP ||
+          DevicePathNodeLength((EFI_DEVICE_PATH_PROTOCOL *)UartNode) != sizeof(UART_DEVICE_PATH)) {
+        goto Error;
+      }
+      if ( UartNode->BaudRate > SERIAL_PORT_MAX_BAUD_RATE) {
+        goto Error;
+      }
+      if (UartNode->Parity < NoParity || UartNode->Parity > SpaceParity) {
+        goto Error;
+      }
+      if (UartNode->DataBits < 5 || UartNode->DataBits > 8) {
+        goto Error;
+      }
+      if (UartNode->StopBits < OneStopBit || UartNode->StopBits > TwoStopBits) {
+        goto Error;
+      }
+      if ((UartNode->DataBits == 5) && (UartNode->StopBits == TwoStopBits)) {
+        goto Error;
+      }
+      if ((UartNode->DataBits >= 6) && (UartNode->DataBits <= 8) && (UartNode->StopBits == OneFiveStopBits)) {
+        goto Error;
+      }
+    }
+  }
+
+  //
   // Open the IO Abstraction(s) needed to perform the supported test
   //
-  Status = gBS->OpenProtocol (
-                  Handle,
-                  &gEfiDevicePathProtocolGuid,
-                  (VOID **) &ParentDevicePath,
-                  This->DriverBindingHandle,
-                  Handle,
-                  EFI_OPEN_PROTOCOL_BY_DRIVER
-                  );
-  if (Status == EFI_ALREADY_STARTED) {
-    return EFI_SUCCESS;
-  }
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  gBS->CloseProtocol (
-        Handle,
-        &gEfiDevicePathProtocolGuid,
-        This->DriverBindingHandle,
-        Handle
-        );
-
   Status = gBS->OpenProtocol (
                   Handle,
                   &gEfiWinNtIoProtocolGuid,
@@ -169,6 +188,45 @@ Returns:
   }
 
   //
+  // If protocols were opened normally, closed it
+  //
+  gBS->CloseProtocol (
+        Handle,
+        &gEfiWinNtIoProtocolGuid,
+        This->DriverBindingHandle,
+        Handle
+        );
+
+  //
+  // Open the EFI Device Path protocol needed to perform the supported test
+  //
+  Status = gBS->OpenProtocol (
+                  Handle,
+                  &gEfiDevicePathProtocolGuid,
+                  (VOID **) &ParentDevicePath,
+                  This->DriverBindingHandle,
+                  Handle,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
+  if (Status == EFI_ALREADY_STARTED) {
+    return EFI_SUCCESS;
+  }
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Close protocol, don't use device path protocol in the Support() function
+  //
+  gBS->CloseProtocol (
+        Handle,
+        &gEfiDevicePathProtocolGuid,
+        This->DriverBindingHandle,
+        Handle
+        );
+
+  //
   // Make sure that the WinNt Thunk Protocol is valid
   //
   if (WinNtIo->WinNtThunk->Signature != EFI_WIN_NT_THUNK_PROTOCOL_SIGNATURE) {
@@ -184,46 +242,9 @@ Returns:
     goto Error;
   }
 
-  if (RemainingDevicePath != NULL) {
-    Status    = EFI_UNSUPPORTED;
-    UartNode  = (UART_DEVICE_PATH *) RemainingDevicePath;
-    if (UartNode->Header.Type != MESSAGING_DEVICE_PATH ||
-        UartNode->Header.SubType != MSG_UART_DP ||
-        DevicePathNodeLength((EFI_DEVICE_PATH_PROTOCOL *)UartNode) != sizeof(UART_DEVICE_PATH)) {
-      goto Error;
-    }
-    if ( UartNode->BaudRate > SERIAL_PORT_MAX_BAUD_RATE) {
-      goto Error;
-    }
-    if (UartNode->Parity < NoParity || UartNode->Parity > SpaceParity) {
-      goto Error;
-    }
-    if (UartNode->DataBits < 5 || UartNode->DataBits > 8) {
-      goto Error;
-    }
-    if (UartNode->StopBits < OneStopBit || UartNode->StopBits > TwoStopBits) {
-      goto Error;
-    }
-    if ((UartNode->DataBits == 5) && (UartNode->StopBits == TwoStopBits)) {
-      goto Error;
-    }
-    if ((UartNode->DataBits >= 6) && (UartNode->DataBits <= 8) && (UartNode->StopBits == OneFiveStopBits)) {
-      goto Error;
-    }
-    Status = EFI_SUCCESS;
-  }
+  return EFI_SUCCESS;
 
 Error:
-  //
-  // Close the I/O Abstraction(s) used to perform the supported test
-  //
-  gBS->CloseProtocol (
-        Handle,
-        &gEfiWinNtIoProtocolGuid,
-        This->DriverBindingHandle,
-        Handle
-        );
-
   return Status;
 }
 
@@ -261,6 +282,7 @@ Returns:
   UINTN                               EntryCount;
   UINTN                               Index;
   EFI_SERIAL_IO_PROTOCOL              *SerialIo;
+  UART_DEVICE_PATH                    *UartNode;
 
   Private   = NULL;
   NtHandle  = INVALID_HANDLE_VALUE;
@@ -303,7 +325,10 @@ Returns:
 
   if (Status == EFI_ALREADY_STARTED) {
 
-    if (RemainingDevicePath == NULL) {
+    if (RemainingDevicePath == NULL || IsDevicePathEnd (RemainingDevicePath)) {
+      //
+      // If RemainingDevicePath is NULL or is the End of Device Path Node
+      //
       return EFI_SUCCESS;
     }
 
@@ -333,23 +358,63 @@ Returns:
                         EFI_OPEN_PROTOCOL_GET_PROTOCOL
                         );
         if (!EFI_ERROR (Status)) {
-          CopyMem (&Node, RemainingDevicePath, sizeof (UART_DEVICE_PATH));
+          UartNode = (UART_DEVICE_PATH *) RemainingDevicePath;
           Status = SerialIo->SetAttributes (
                               SerialIo,
-                              Node.BaudRate,
+                              UartNode->BaudRate,
                               SerialIo->Mode->ReceiveFifoDepth,
                               SerialIo->Mode->Timeout,
-                              (EFI_PARITY_TYPE)Node.Parity,
-                              Node.DataBits,
-                              (EFI_STOP_BITS_TYPE)Node.StopBits
+                              (EFI_PARITY_TYPE)UartNode->Parity,
+                              UartNode->DataBits,
+                              (EFI_STOP_BITS_TYPE)UartNode->StopBits
                               );
         }
         break;
       }
     }
-
     FreePool (OpenInfoBuffer);
-    return Status;
+    
+    if (Index < EntryCount) {
+      //
+      // If gEfiWinNtIoProtocolGuid is opened by one child device, return
+      //
+      return Status;
+    }
+    //
+    // If gEfiWinNtIoProtocolGuid is not opened by any child device,
+    // go further to create child device handle based on RemainingDevicePath
+    //
+  }
+
+  if (RemainingDevicePath == NULL) {
+    //
+    // Build the device path by appending the UART node to the ParentDevicePath
+    // from the WinNtIo handle. The Uart setings are zero here, since
+    // SetAttribute() will update them to match the default setings.
+    //
+    ZeroMem (&Node, sizeof (UART_DEVICE_PATH));
+    Node.Header.Type     = MESSAGING_DEVICE_PATH;
+    Node.Header.SubType  = MSG_UART_DP;
+    SetDevicePathNodeLength ((EFI_DEVICE_PATH_PROTOCOL *) &Node, sizeof (UART_DEVICE_PATH));
+
+  } else if (!IsDevicePathEnd (RemainingDevicePath)) {
+    //
+    // If RemainingDevicePath isn't the End of Device Path Node, 
+    // only scan the specified device by RemainingDevicePath
+    //
+    //
+    // Match the configuration of the RemainingDevicePath. IsHandleSupported()
+    // already checked to make sure the RemainingDevicePath contains settings
+    // that we can support.
+    //
+    CopyMem (&Node, RemainingDevicePath, sizeof (UART_DEVICE_PATH));
+
+  } else {
+    //
+    // If RemainingDevicePath is the End of Device Path Node,
+    // skip enumerate any device and return EFI_SUCESSS
+    // 
+    return EFI_SUCCESS;
   }
 
   //
@@ -396,6 +461,8 @@ Returns:
   Private->Fifo.Last              = 0;
   Private->Fifo.Surplus           = SERIAL_MAX_BUFFER_SIZE;
 
+  CopyMem (&Private->UartDevicePath, &Node, sizeof (UART_DEVICE_PATH));
+
   AddUnicodeString2 (
     "eng",
     gWinNtSerialIoComponentName.SupportedLanguages,
@@ -420,25 +487,6 @@ Returns:
   Private->SerialIo.Write         = WinNtSerialIoWrite;
   Private->SerialIo.Read          = WinNtSerialIoRead;
   Private->SerialIo.Mode          = &Private->SerialIoMode;
-
-  if (RemainingDevicePath != NULL) {
-    //
-    // Match the configuration of the RemainingDevicePath. IsHandleSupported()
-    // already checked to make sure the RemainingDevicePath contains settings
-    // that we can support.
-    //
-    CopyMem (&Private->UartDevicePath, RemainingDevicePath, sizeof (UART_DEVICE_PATH));
-  } else {
-    //
-    // Build the device path by appending the UART node to the ParentDevicePath
-    // from the WinNtIo handle. The Uart setings are zero here, since
-    // SetAttribute() will update them to match the default setings.
-    //
-    ZeroMem (&Private->UartDevicePath, sizeof (UART_DEVICE_PATH));
-    Private->UartDevicePath.Header.Type     = MESSAGING_DEVICE_PATH;
-    Private->UartDevicePath.Header.SubType  = MSG_UART_DP;
-    SetDevicePathNodeLength ((EFI_DEVICE_PATH_PROTOCOL *) &Private->UartDevicePath, sizeof (UART_DEVICE_PATH));
-  }
 
   //
   // Build the device path by appending the UART node to the ParentDevicePath
