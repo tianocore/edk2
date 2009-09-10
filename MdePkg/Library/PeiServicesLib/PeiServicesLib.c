@@ -553,9 +553,13 @@ PeiServicesInstallFvInfoPpi (
   EFI_STATUS                       Status;   
   EFI_PEI_FIRMWARE_VOLUME_INFO_PPI *FvInfoPpi;
   EFI_PEI_PPI_DESCRIPTOR           *FvInfoPpiDescriptor;
+  EFI_GUID                         *ParentFvNameValue;
+  EFI_GUID                         *ParentFileNameValue;
 
+  ParentFvNameValue   = NULL;
+  ParentFileNameValue = NULL;
   FvInfoPpi = AllocateZeroPool (sizeof (EFI_PEI_FIRMWARE_VOLUME_INFO_PPI));
-  ASSERT( FvInfoPpi != NULL);
+  ASSERT(FvInfoPpi != NULL);
 
   if (FvFormat != NULL) {
     CopyGuid (&FvInfoPpi->FvFormat, FvFormat);
@@ -564,9 +568,16 @@ PeiServicesInstallFvInfoPpi (
   }
   FvInfoPpi->FvInfo = (VOID *) FvInfo;
   FvInfoPpi->FvInfoSize = FvInfoSize;
-  FvInfoPpi->ParentFvName = (EFI_GUID *) ParentFvName;
-  FvInfoPpi->ParentFileName = (EFI_GUID *) ParentFileName;
-
+  if (ParentFvName != NULL) {
+    ParentFvNameValue = AllocateCopyPool (sizeof (EFI_GUID), ParentFvName);
+	ASSERT (ParentFvNameValue != NULL);
+    FvInfoPpi->ParentFvName = ParentFvNameValue;
+  }
+  if (ParentFileName != NULL) {
+    ParentFileNameValue = AllocateCopyPool (sizeof (EFI_GUID), ParentFileName);
+    ASSERT (ParentFileNameValue != NULL);
+    FvInfoPpi->ParentFileName = ParentFileNameValue;
+  }
 
   FvInfoPpiDescriptor = AllocateCopyPool (sizeof(EFI_PEI_PPI_DESCRIPTOR), mPpiListTemplate);
   ASSERT (FvInfoPpiDescriptor != NULL);
