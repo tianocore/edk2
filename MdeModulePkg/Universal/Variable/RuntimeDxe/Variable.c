@@ -2179,7 +2179,7 @@ ReclaimForOS(
   VOID       *Context
   )
 {
-  EFI_STATUS                      Status;
+  EFI_STATUS                     Status;
   UINTN                          CommonVariableSpace;
   UINTN                          RemainingCommonVariableSpace;
   UINTN                          RemainingHwErrVariableSpace;
@@ -2192,10 +2192,11 @@ ReclaimForOS(
 
   RemainingHwErrVariableSpace = PcdGet32 (PcdHwErrStorageSize) - mVariableModuleGlobal->HwErrVariableTotalSize;
   //
-  // Check if the free area is blow a threshold
+  // Check if the free area is blow a threshold.
   //
   if ((RemainingCommonVariableSpace < PcdGet32 (PcdMaxVariableSize))
-    || (RemainingHwErrVariableSpace < PcdGet32 (PcdMaxHardwareErrorVariableSize))){
+    || ((PcdGet32 (PcdHwErrStorageSize) != 0) && 
+       (RemainingHwErrVariableSpace < PcdGet32 (PcdMaxHardwareErrorVariableSize)))){
     Status = Reclaim (
             mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase,
             &mVariableModuleGlobal->NonVolatileLastVariableOffset,
