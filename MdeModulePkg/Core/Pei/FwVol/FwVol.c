@@ -281,8 +281,6 @@ PeiInitializeFv (
 
   PrivateData->AllFvCount = 1;
   PrivateData->AllFv[0] = (EFI_PEI_FV_HANDLE)PrivateData->Fv[0].FvHeader;
-
-
   //
   // Post a call-back for the FvInfoPPI services to expose
   // additional Fvs to PeiCore.
@@ -652,7 +650,7 @@ PeiFvFindNextVolume (
       //
       if (!Match) {
         PeiServicesInstallFvInfoPpi (
-          NULL,
+          &(((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)FvHob->BaseAddress)->FileSystemGuid),
           (VOID *)(UINTN)FvHob->BaseAddress,
           (UINT32)FvHob->Length,
           NULL,
