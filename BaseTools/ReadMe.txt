@@ -66,7 +66,7 @@ Notes:
 	 or modules because the AutoGen.* files have been be removed. The "makefile" itself
 	 cannot generate AutoGen.* files. Only "build" command can.
 3) All .exe binary file including C and python tools are generated from:
-    r1655 <buildtools_project>\BaseTools\Source\ + r1662 VfrCompiler tool update
+    r1707 <buildtools_project>\BaseTools\Source\ + r1707 VfrCompiler tool update
 
 Brief usage for Migration Tool MigrationMsa2Inf.exe:
 1. Command line format:
@@ -190,4 +190,4 @@ Brief usage for Migration Tool Fpd2Dsc.exe:
 7. Pyton Source
    r767 <buildtools_project>\BaseTools\Source\Python\Fpd2Dsc
 
-17-July-2009
+10-Sep-2009

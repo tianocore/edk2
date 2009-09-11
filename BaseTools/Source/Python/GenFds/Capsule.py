@@ -21,6 +21,7 @@ import os
 import subprocess
 import StringIO
 from Common.Misc import SaveFileOnChange
+from GenFds import GenFds
 
 
 T_CHAR_LF = '\n'
@@ -39,17 +40,26 @@ class Capsule (CapsuleClassObject) :
         self.BlockSize = None
         # For GenFv
         self.BlockNum = None
+        self.CapsuleName = None
 
     ## Generate capsule
     #
     #   @param  self        The object pointer
+    #   @retval string      Generated Capsule file path
     #
     def GenCapsule(self):
+        if self.UiCapsuleName.upper() + 'cap' in GenFds.ImageBinDict.keys():
+            return GenFds.ImageBinDict[self.UiCapsuleName.upper() + 'cap']
+
+        GenFdsGlobalVariable.InfLogger( "\nGenerate %s Capsule" %self.UiCapsuleName)
         CapInfFile = self.GenCapInf()
         CapInfFile.writelines("[files]" + T_CHAR_LF)
-
+        CapFileList = []
         for CapsuleDataObj in self.CapsuleDataList :
+            CapsuleDataObj.CapsuleName = self.CapsuleName
             FileName = CapsuleDataObj.GenCapsuleSubItem()
+            CapsuleDataObj.CapsuleName = None
+            CapFileList.append(FileName)
             CapInfFile.writelines("EFI_FILE_NAME = " + \
                                    FileName      + \
                                    T_CHAR_LF)
@@ -63,9 +73,14 @@ class Capsule (CapsuleClassObject) :
         GenFdsGlobalVariable.GenerateFirmwareVolume(
                                 CapOutputFile,
                                 [self.CapInfFileName],
-                                Capsule=True
+                                Capsule=True,
+                                FfsList=CapFileList
                                 )
+
+        GenFdsGlobalVariable.VerboseLogger( "\nGenerate %s Capsule Successfully" %self.UiCapsuleName)
         GenFdsGlobalVariable.SharpCounter = 0
+        GenFds.ImageBinDict[self.UiCapsuleName.upper() + 'cap'] = CapOutputFile
+        return CapOutputFile
 
     ## Generate inf file for capsule
     #

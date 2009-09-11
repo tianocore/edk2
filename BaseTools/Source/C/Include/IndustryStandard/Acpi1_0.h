@@ -114,6 +114,7 @@ typedef struct {
 #define EFI_ACPI_1_0_TMR_VAL_EXT  (1 << 8)
 #define EFI_ACPI_1_0_DCK_CAP      (1 << 9)
 
+#define EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_VERSION  0x0
 //
 // Firmware ACPI Control Structure
 //

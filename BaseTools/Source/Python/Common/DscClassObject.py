@@ -385,10 +385,11 @@ class Dsc(DscObject):
             for IncludeFile in IncludeFiles:
                 if IncludeFile[1] == Arch or IncludeFile[1] == TAB_ARCH_COMMON.upper():
                     Filename = CheckFileExist(self.WorkspaceDir, IncludeFile[0], ContainerFile, TAB_LIBRARIES, '', IncludeFile[2])
-                    for NewItem in open(Filename, 'r').readlines():
-                        if CleanString(NewItem) == '':
-                            continue
-                        MergeArches(Libraries, NewItem, Arch)
+                    if os.path.exists(Filename):
+                        for NewItem in open(Filename, 'r').readlines():
+                            if CleanString(NewItem) == '':
+                                continue
+                            MergeArches(Libraries, NewItem, Arch)
 
             for Record in RecordSet:
                 if Record[1] == Arch or Record[1] == TAB_ARCH_COMMON.upper():

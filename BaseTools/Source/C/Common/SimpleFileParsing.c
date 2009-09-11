@@ -536,7 +536,7 @@ Returns:
 
 --*/
 {
-  UINT32 Val;
+  unsigned Val;
 
   SkipWhiteSpace (&mGlobals.SourceFile);
   if (EndOfFile (&mGlobals.SourceFile)) {
@@ -554,7 +554,7 @@ Returns:
 
       mGlobals.SourceFile.FileBufferPtr += 2;
       sscanf (mGlobals.SourceFile.FileBufferPtr, "%x", &Val);
-      *Value = Val;
+      *Value = (UINT32) Val;
       while (isxdigit (mGlobals.SourceFile.FileBufferPtr[0])) {
         mGlobals.SourceFile.FileBufferPtr++;
       }
@@ -634,7 +634,7 @@ Returns:
   // depth.
   //
   if (mGlobals.VerboseFile) {
-    fprintf (stdout, "%*cProcessing file '%s'\n", (INT32)NestDepth * 2, ' ', SourceFile->FileName);
+    fprintf (stdout, "%*cProcessing file '%s'\n", (int)NestDepth * 2, ' ', SourceFile->FileName);
     fprintf (stdout, "Parent source file = '%s'\n", ParentSourceFile->FileName);
   }
 
@@ -642,7 +642,7 @@ Returns:
   // Make sure we didn't exceed our maximum nesting depth
   //
   if (NestDepth > MAX_NEST_DEPTH) {
-    Error (NULL, 0, 3001, "Not Supported", "%s exceeeds max nesting depth (%d)", SourceFile->FileName, NestDepth);
+    Error (NULL, 0, 3001, "Not Supported", "%s exceeeds max nesting depth (%u)", SourceFile->FileName, (unsigned) NestDepth);
     Status = STATUS_ERROR;
     goto Finish;
   }
@@ -698,7 +698,7 @@ Returns:
   fseek (SourceFile->Fptr, 0, SEEK_END);
   SourceFile->FileSize = ftell (SourceFile->Fptr);
   if (mGlobals.VerboseFile) {
-    printf ("FileSize = %d (0x%X)\n", (INT32)SourceFile->FileSize, (UINT32)SourceFile->FileSize);
+    printf ("FileSize = %u (0x%X)\n", (unsigned) SourceFile->FileSize, (unsigned) SourceFile->FileSize);
   }
 
   fseek (SourceFile->Fptr, 0, SEEK_SET);
@@ -819,7 +819,7 @@ Returns:
     }
 
     printf ("'\n");
-    printf ("FileSize = %d (0x%X)\n", (INT32)SourceFile->FileSize, (UINT32)SourceFile->FileSize);
+    printf ("FileSize = %u (0x%X)\n", (unsigned)SourceFile->FileSize, (unsigned)SourceFile->FileSize);
     RewindFile (SourceFile);
   }
 }
@@ -1282,7 +1282,7 @@ Returns:
 
 --*/
 {
-  UINT32        Value32;
+  unsigned      Value32;
   UINT32        Index;
   FILE_POSITION FPos;
   CHAR8         TempString[20];

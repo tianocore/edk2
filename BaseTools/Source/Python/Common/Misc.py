@@ -418,6 +418,14 @@ def RealPath(File, Dir='', OverrideDir=''):
     return NewFile
 
 def RealPath2(File, Dir='', OverrideDir=''):
+    if OverrideDir:
+        NewFile = GlobalData.gAllFiles[os.path.normpath(os.path.join(OverrideDir, File))]
+        if NewFile:
+            if OverrideDir[-1] == os.path.sep:
+                return NewFile[len(OverrideDir):], NewFile[0:len(OverrideDir)]
+            else:
+                return NewFile[len(OverrideDir)+1:], NewFile[0:len(OverrideDir)]
+
     NewFile = GlobalData.gAllFiles[os.path.normpath(os.path.join(Dir, File))]
     if NewFile:
         if Dir:
@@ -428,10 +436,6 @@ def RealPath2(File, Dir='', OverrideDir=''):
         else:
             return NewFile, ''
 
-    if OverrideDir:
-        NewFile = GlobalData.gAllFiles[os.path.normpath(os.path.join(OverrideDir, File))]
-        if NewFile:
-            return NewFile[len(OverrideDir)+1:], NewFile[0:len(OverrideDir)]
     return None, None
 
 ## Check if gvien file exists or not

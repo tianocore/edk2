@@ -26,6 +26,7 @@ from CommonDataClass.FdfClass import FDClassObject
 from Common import EdkLogger
 from Common.BuildToolError import *
 from Common.Misc import SaveFileOnChange
+from GenFds import GenFds
 
 ## generate FD
 #
@@ -42,11 +43,12 @@ class FD(FDClassObject):
     #
     #   Generate FD
     #
-    #   @param  self        The object pointer
-    #   @param  FvBinDict   dictionary contains generated FV name and its file name
     #   @retval string      Generated FD file name
     #
-    def GenFd (self, FvBinDict):
+    def GenFd (self):
+        if self.FdUiName.upper() + 'fd' in GenFds.ImageBinDict.keys():
+            return GenFds.ImageBinDict[self.FdUiName.upper() + 'fd']
+
         #
         # Print Information
         #
@@ -80,7 +82,7 @@ class FD(FDClassObject):
                 PadRegion = Region.Region()
                 PadRegion.Offset = PreviousRegionStart + PreviousRegionSize
                 PadRegion.Size = RegionObj.Offset - PadRegion.Offset
-                PadRegion.AddToBuffer(FdBuffer, self.BaseAddress, self.BlockSizeList, self.ErasePolarity, FvBinDict, self.vtfRawDict, self.DefineVarDict)
+                PadRegion.AddToBuffer(FdBuffer, self.BaseAddress, self.BlockSizeList, self.ErasePolarity, GenFds.ImageBinDict, self.vtfRawDict, self.DefineVarDict)
             PreviousRegionStart = RegionObj.Offset
             PreviousRegionSize = RegionObj.Size
             #
@@ -89,23 +91,19 @@ class FD(FDClassObject):
             if PreviousRegionSize > self.Size:
                 EdkLogger.error("GenFds", GENFDS_ERROR, 'FD %s size too small' % self.FdUiName)
             GenFdsGlobalVariable.VerboseLogger('Call each region\'s AddToBuffer function')
-            RegionObj.AddToBuffer (FdBuffer, self.BaseAddress, self.BlockSizeList, self.ErasePolarity, FvBinDict, self.vtfRawDict, self.DefineVarDict)
+            RegionObj.AddToBuffer (FdBuffer, self.BaseAddress, self.BlockSizeList, self.ErasePolarity, GenFds.ImageBinDict, self.vtfRawDict, self.DefineVarDict)
         #
         # Create a empty Fd file
         #
         GenFdsGlobalVariable.VerboseLogger ('Create an empty Fd file')
-        FdFileName = os.path.join(GenFdsGlobalVariable.FvDir,
-                                  self.FdUiName + '.fd')
-        #FdFile = open(FdFileName, 'wb')
-
+        FdFileName = os.path.join(GenFdsGlobalVariable.FvDir,self.FdUiName + '.fd')
         #
         # Write the buffer contents to Fd file
         #
         GenFdsGlobalVariable.VerboseLogger('Write the buffer contents to Fd file')
         SaveFileOnChange(FdFileName, FdBuffer.getvalue())
-        #FdFile.write(FdBuffer.getvalue());
-        #FdFile.close();
         FdBuffer.close();
+        GenFds.ImageBinDict[self.FdUiName.upper() + 'fd'] = FdFileName
         return FdFileName
 
     ## generate VTF

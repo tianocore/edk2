@@ -371,13 +371,13 @@ Return:
   if ((FatType == FatTypeFat32) &&
       (FatBpb->Fat12_16.BPB_TotSec32 == 0)) {
     DebugMsg (NULL, 0, DEBUG_ERROR, NULL, "ERROR: E3003: FAT32 - BPB_TotSec32 - %04x, expected: Non-Zero",
-        FatBpb->Fat12_16.BPB_TotSec32);
+        (unsigned) FatBpb->Fat12_16.BPB_TotSec32);
     return FatTypeUnknown;
   }
   if ((FatType == FatTypeFat32) &&
       (FatBpb->Fat32.BPB_FATSz32 == 0)) {
     DebugMsg (NULL, 0, DEBUG_ERROR, NULL, "ERROR: E3003: FAT32 - BPB_FATSz32 - %08x, expected: Non-Zero",
-        FatBpb->Fat32.BPB_FATSz32);
+        (unsigned) FatBpb->Fat32.BPB_FATSz32);
     return FatTypeUnknown;
   }
   if ((FatType == FatTypeFat32) &&
@@ -388,7 +388,7 @@ Return:
   if ((FatType == FatTypeFat32) &&
       (FatBpb->Fat32.BPB_RootClus != 2)) {
     DebugMsg (NULL, 0, DEBUG_WARN, NULL, "ERROR: E3003: FAT32 - BPB_RootClus - %08x, expected: %04x",
-        FatBpb->Fat32.BPB_RootClus, 2);
+        (unsigned) FatBpb->Fat32.BPB_RootClus, 2);
   }
   if ((FatType == FatTypeFat32) &&
       (FatBpb->Fat32.BPB_FSInfo != 1)) {
@@ -523,14 +523,14 @@ ParseBootSector (
   printf ("  16     Sectors per FAT (small vol.) %04x\n", FatBpb.Fat12_16.BPB_FATSz16);
   printf ("  18     Sectors per track            %04x\n", FatBpb.Fat12_16.BPB_SecPerTrk);
   printf ("  1A     Heads                        %04x\n", FatBpb.Fat12_16.BPB_NumHeads);
-  printf ("  1C     Hidden sectors               %08x\n", FatBpb.Fat12_16.BPB_HiddSec);
-  printf ("  20     Sectors (over 32MB)          %08x\n", FatBpb.Fat12_16.BPB_TotSec32);
+  printf ("  1C     Hidden sectors               %08x\n", (unsigned) FatBpb.Fat12_16.BPB_HiddSec);
+  printf ("  20     Sectors (over 32MB)          %08x\n", (unsigned) FatBpb.Fat12_16.BPB_TotSec32);
   printf ("\n");
   if (FatType != FatTypeFat32) {
     printf ("  24     BIOS drive                   %02x\n", FatBpb.Fat12_16.BS_DrvNum);
     printf ("  25     (Unused)                     %02x\n", FatBpb.Fat12_16.BS_Reserved1);
     printf ("  26     Ext. boot signature          %02x\n", FatBpb.Fat12_16.BS_BootSig);
-    printf ("  27     Volume serial number         %08x\n", FatBpb.Fat12_16.BS_VolID);
+    printf ("  27     Volume serial number         %08x\n", (unsigned) FatBpb.Fat12_16.BS_VolID);
     printf ("  2B     Volume lable                 %c%c%c%c%c%c%c%c%c%c%c\n",
                                                    FatBpb.Fat12_16.BS_VolLab[0],
                                                    FatBpb.Fat12_16.BS_VolLab[1],
@@ -555,10 +555,10 @@ ParseBootSector (
     printf ("\n");
   } else {
     printf ("FAT32 Section\n");
-    printf ("  24     Sectors per FAT (large vol.) %08x\n", FatBpb.Fat32.BPB_FATSz32);
+    printf ("  24     Sectors per FAT (large vol.) %08x\n", (unsigned) FatBpb.Fat32.BPB_FATSz32);
     printf ("  28     Flags                        %04x\n", FatBpb.Fat32.BPB_ExtFlags);
     printf ("  2A     Version                      %04x\n", FatBpb.Fat32.BPB_FSVer);
-    printf ("  2C     Root dir 1st cluster         %08x\n", FatBpb.Fat32.BPB_RootClus);
+    printf ("  2C     Root dir 1st cluster         %08x\n", (unsigned) FatBpb.Fat32.BPB_RootClus);
     printf ("  30     FSInfo sector                %04x\n", FatBpb.Fat32.BPB_FSInfo);
     printf ("  32     Backup boot sector           %04x\n", FatBpb.Fat32.BPB_BkBootSec);
     printf ("  34     (Reserved)                   %02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x\n",
@@ -578,7 +578,7 @@ ParseBootSector (
     printf ("  40     BIOS drive                   %02x\n", FatBpb.Fat32.BS_DrvNum);
     printf ("  41     (Unused)                     %02x\n", FatBpb.Fat32.BS_Reserved1);
     printf ("  42     Ext. boot signature          %02x\n", FatBpb.Fat32.BS_BootSig);
-    printf ("  43     Volume serial number         %08x\n", FatBpb.Fat32.BS_VolID);
+    printf ("  43     Volume serial number         %08x\n", (unsigned) FatBpb.Fat32.BS_VolID);
     printf ("  47     Volume lable                 %c%c%c%c%c%c%c%c%c%c%c\n",
                                                    FatBpb.Fat32.BS_VolLab[0],
                                                    FatBpb.Fat32.BS_VolLab[1],
@@ -738,7 +738,7 @@ ParseMbr (
   printf ("  Offset Title                        Value\n");
   printf ("==================================================================\n");
   printf ("  0      Master bootstrap loader code (not list)\n");
-  printf ("  1B8    Windows disk signature       %08x\n", Mbr.UniqueMbrSignature);
+  printf ("  1B8    Windows disk signature       %08x\n", (unsigned) Mbr.UniqueMbrSignature);
   printf ("\n");
   printf ("Partition Table Entry #1\n");
   printf ("  1BE    80 = active partition        %02x\n", Mbr.PartitionRecord[0].BootIndicator);
@@ -749,8 +749,8 @@ ParseMbr (
   printf ("  1C3    End head                     %02x\n", Mbr.PartitionRecord[0].EndHead);
   printf ("  1C4    End sector                   %02x\n", Mbr.PartitionRecord[0].EndSector);
   printf ("  1C5    End cylinder                 %02x\n", Mbr.PartitionRecord[0].EndTrack);
-  printf ("  1C6    Sectors preceding partition  %08x\n", Mbr.PartitionRecord[0].StartingLBA);
-  printf ("  1CA    Sectors in partition         %08x\n", Mbr.PartitionRecord[0].SizeInLBA);
+  printf ("  1C6    Sectors preceding partition  %08x\n", (unsigned) Mbr.PartitionRecord[0].StartingLBA);
+  printf ("  1CA    Sectors in partition         %08x\n", (unsigned) Mbr.PartitionRecord[0].SizeInLBA);
   printf ("\n");
   printf ("Partition Table Entry #2\n");
   printf ("  1CE    80 = active partition        %02x\n", Mbr.PartitionRecord[1].BootIndicator);
@@ -761,8 +761,8 @@ ParseMbr (
   printf ("  1D3    End head                     %02x\n", Mbr.PartitionRecord[1].EndHead);
   printf ("  1D4    End sector                   %02x\n", Mbr.PartitionRecord[1].EndSector);
   printf ("  1D5    End cylinder                 %02x\n", Mbr.PartitionRecord[1].EndTrack);
-  printf ("  1D6    Sectors preceding partition  %08x\n", Mbr.PartitionRecord[1].StartingLBA);
-  printf ("  1DA    Sectors in partition         %08x\n", Mbr.PartitionRecord[1].SizeInLBA);
+  printf ("  1D6    Sectors preceding partition  %08x\n", (unsigned) Mbr.PartitionRecord[1].StartingLBA);
+  printf ("  1DA    Sectors in partition         %08x\n", (unsigned) Mbr.PartitionRecord[1].SizeInLBA);
   printf ("\n");
   printf ("Partition Table Entry #3\n");
   printf ("  1DE    80 = active partition        %02x\n", Mbr.PartitionRecord[2].BootIndicator);
@@ -773,8 +773,8 @@ ParseMbr (
   printf ("  1E3    End head                     %02x\n", Mbr.PartitionRecord[2].EndHead);
   printf ("  1E4    End sector                   %02x\n", Mbr.PartitionRecord[2].EndSector);
   printf ("  1E5    End cylinder                 %02x\n", Mbr.PartitionRecord[2].EndTrack);
-  printf ("  1E6    Sectors preceding partition  %08x\n", Mbr.PartitionRecord[2].StartingLBA);
-  printf ("  1EA    Sectors in partition         %08x\n", Mbr.PartitionRecord[2].SizeInLBA);
+  printf ("  1E6    Sectors preceding partition  %08x\n", (unsigned) Mbr.PartitionRecord[2].StartingLBA);
+  printf ("  1EA    Sectors in partition         %08x\n", (unsigned) Mbr.PartitionRecord[2].SizeInLBA);
   printf ("\n");
   printf ("Partition Table Entry #4\n");
   printf ("  1EE    80 = active partition        %02x\n", Mbr.PartitionRecord[3].BootIndicator);
@@ -785,8 +785,8 @@ ParseMbr (
   printf ("  1F3    End head                     %02x\n", Mbr.PartitionRecord[3].EndHead);
   printf ("  1F4    End sector                   %02x\n", Mbr.PartitionRecord[3].EndSector);
   printf ("  1F5    End cylinder                 %02x\n", Mbr.PartitionRecord[3].EndTrack);
-  printf ("  1F6    Sectors preceding partition  %08x\n", Mbr.PartitionRecord[3].StartingLBA);
-  printf ("  1FA    Sectors in partition         %08x\n", Mbr.PartitionRecord[3].SizeInLBA);
+  printf ("  1F6    Sectors preceding partition  %08x\n", (unsigned) Mbr.PartitionRecord[3].StartingLBA);
+  printf ("  1FA    Sectors in partition         %08x\n", (unsigned) Mbr.PartitionRecord[3].SizeInLBA);
   printf ("\n");
   printf ("  1FE    Signature                    %04x\n", Mbr.Signature);
   printf ("\n");

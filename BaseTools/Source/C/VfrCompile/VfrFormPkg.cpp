@@ -787,9 +787,20 @@ CIfrRecordInfoDB::IfrRecordInfoUpdate (
   )
 {
   SIfrRecord *pNode;
+  SIfrRecord *Prev;
 
   if ((pNode = GetRecordInfoFromIdx (RecordIdx)) == NULL) {
     return;
+  }
+
+  if (LineNo == 0) {
+    //
+    // Line number is not specified explicitly, try to use line number of previous opcode
+    //
+    Prev = GetRecordInfoFromIdx (RecordIdx - 1);
+    if (Prev != NULL) {
+      LineNo = Prev->mLineNo;
+    }
   }
 
   pNode->mLineNo    = LineNo;

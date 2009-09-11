@@ -173,7 +173,7 @@ class FileProfile :
 
         self.FdDict = {}
         self.FvDict = {}
-        self.CapsuleList = []
+        self.CapsuleDict = {}
         self.VtfList = []
         self.RuleDict = {}
         self.OptRomDict = {}
@@ -1622,7 +1622,7 @@ class FdfParser:
         if not self.__GetNextWord():
             return True
 
-        if not self.__Token in ("SET", "FV", "FILE", "DATA"):
+        if not self.__Token in ("SET", "FV", "FILE", "DATA", "CAPSULE"):
             self.__UndoToken()
             RegionObj.PcdOffset = self.__GetNextPcdName()
             self.Profile.PcdDict[RegionObj.PcdOffset] = "0x%08X" % (RegionObj.Offset + long(Fd.BaseAddress, 0))
@@ -1639,9 +1639,13 @@ class FdfParser:
             if not self.__GetNextWord():
                 return True
 
-        if self.__Token == "FV":
+        elif self.__Token == "FV":
             self.__UndoToken()
             self.__GetRegionFvType( RegionObj)
+
+        elif self.__Token == "CAPSULE":
+            self.__UndoToken()
+            self.__GetRegionCapType( RegionObj)
 
         elif self.__Token == "FILE":
             self.__UndoToken()
@@ -1681,6 +1685,37 @@ class FdfParser:
 
             if not self.__GetNextToken():
                 raise Warning("expected FV name", self.FileName, self.CurrentLineNumber)
+
+            RegionObj.RegionDataList.append(self.__Token)
+
+    ## __GetRegionCapType() method
+    #
+    #   Get region capsule data for region
+    #
+    #   @param  self        The object pointer
+    #   @param  RegionObj   for whom region data is got
+    #
+    def __GetRegionCapType(self, RegionObj):
+
+        if not self.__IsKeyword("CAPSULE"):
+            raise Warning("expected Keyword 'CAPSULE'", self.FileName, self.CurrentLineNumber)
+
+        if not self.__IsToken("="):
+            raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
+
+        if not self.__GetNextToken():
+            raise Warning("expected CAPSULE name", self.FileName, self.CurrentLineNumber)
+
+        RegionObj.RegionType = "CAPSULE"
+        RegionObj.RegionDataList.append(self.__Token)
+
+        while self.__IsKeyword("CAPSULE"):
+
+            if not self.__IsToken("="):
+                raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
+
+            if not self.__GetNextToken():
+                raise Warning("expected CAPSULE name", self.FileName, self.CurrentLineNumber)
 
             RegionObj.RegionDataList.append(self.__Token)
 
@@ -2624,7 +2659,7 @@ class FdfParser:
             CapsuleObj.CreateFile = self.__Token
 
         self.__GetCapsuleStatements(CapsuleObj)
-        self.Profile.CapsuleList.append(CapsuleObj)
+        self.Profile.CapsuleDict[CapsuleObj.UiCapsuleName] = CapsuleObj
         return True
 
     ## __GetCapsuleStatements() method
@@ -2638,10 +2673,9 @@ class FdfParser:
         self.__GetCapsuleTokens(Obj)
         self.__GetDefineStatements(Obj)
         self.__GetSetStatements(Obj)
-
         self.__GetCapsuleData(Obj)
 
-    ## __GetCapsuleStatements() method
+    ## __GetCapsuleTokens() method
     #
     #   Get token statements for capsule
     #
@@ -3558,51 +3592,53 @@ class FdfParser:
     def __GetOptRomOverrides(self, Obj):
         if self.__IsToken('{'):
             Overrides = OptionRom.OverrideAttribs()
-            if self.__IsKeyword( "PCI_VENDOR_ID"):
-                if not self.__IsToken( "="):
-                    raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
-                if not self.__GetNextHexNumber():
-                    raise Warning("expected Hex vendor id", self.FileName, self.CurrentLineNumber)
-                Overrides.PciVendorId = self.__Token
-    
-            if self.__IsKeyword( "PCI_CLASS_CODE"):
-                if not self.__IsToken( "="):
-                    raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
-                if not self.__GetNextHexNumber():
-                    raise Warning("expected Hex class code", self.FileName, self.CurrentLineNumber)
-                Overrides.PciClassCode = self.__Token
-    
-            if self.__IsKeyword( "PCI_DEVICE_ID"):
-                if not self.__IsToken( "="):
-                    raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
-                if not self.__GetNextHexNumber():
-                    raise Warning("expected Hex device id", self.FileName, self.CurrentLineNumber)
-    
-                Overrides.PciDeviceId = self.__Token
-    
-            if self.__IsKeyword( "PCI_REVISION"):
-                if not self.__IsToken( "="):
-                    raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
-                if not self.__GetNextHexNumber():
-                    raise Warning("expected Hex revision", self.FileName, self.CurrentLineNumber)
-                Overrides.PciRevision = self.__Token
-                    
-            if self.__IsKeyword( "COMPRESS"):
-                if not self.__IsToken( "="):
-                    raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
-                if not self.__GetNextToken():
-                    raise Warning("expected TRUE/FALSE for compress", self.FileName, self.CurrentLineNumber)
-                
-                if self.__Token.upper() == 'TRUE':
-                    Overrides.NeedCompress = True        
-                
-            if not self.__IsToken( "}"):
-                
-                if self.__Token not in ("PCI_CLASS_CODE", "PCI_VENDOR_ID", "PCI_DEVICE_ID", "PCI_REVISION", "COMPRESS"):
-                    raise Warning("unknown attribute %s" % self.__Token, self.FileName, self.CurrentLineNumber)
-                
-                raise Warning("expected '}'", self.FileName, self.CurrentLineNumber)
-            
+            while True:
+                if self.__IsKeyword( "PCI_VENDOR_ID"):
+                    if not self.__IsToken( "="):
+                        raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
+                    if not self.__GetNextHexNumber():
+                        raise Warning("expected Hex vendor id", self.FileName, self.CurrentLineNumber)
+                    Overrides.PciVendorId = self.__Token
+                    continue
+
+                if self.__IsKeyword( "PCI_CLASS_CODE"):
+                    if not self.__IsToken( "="):
+                        raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
+                    if not self.__GetNextHexNumber():
+                        raise Warning("expected Hex class code", self.FileName, self.CurrentLineNumber)
+                    Overrides.PciClassCode = self.__Token
+                    continue
+
+                if self.__IsKeyword( "PCI_DEVICE_ID"):
+                    if not self.__IsToken( "="):
+                        raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
+                    if not self.__GetNextHexNumber():
+                        raise Warning("expected Hex device id", self.FileName, self.CurrentLineNumber)
+
+                    Overrides.PciDeviceId = self.__Token
+                    continue
+
+                if self.__IsKeyword( "PCI_REVISION"):
+                    if not self.__IsToken( "="):
+                        raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
+                    if not self.__GetNextHexNumber():
+                        raise Warning("expected Hex revision", self.FileName, self.CurrentLineNumber)
+                    Overrides.PciRevision = self.__Token
+                    continue
+
+                if self.__IsKeyword( "COMPRESS"):
+                    if not self.__IsToken( "="):
+                        raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
+                    if not self.__GetNextToken():
+                        raise Warning("expected TRUE/FALSE for compress", self.FileName, self.CurrentLineNumber)
+                    Overrides.NeedCompress = self.__Token.upper() == 'TRUE'
+                    continue
+
+                if self.__IsToken( "}"):
+                    break
+                else:
+                    EdkLogger.error("FdfParser", FORMAT_INVALID, File=self.FileName, Line=self.CurrentLineNumber)
+
             Obj.OverrideAttribs = Overrides
             
     ## __GetOptRomFileStatement() method
@@ -3635,8 +3671,52 @@ class FdfParser:
         Obj.FfsList.append(FfsFileObj)
 
         return True
-        
-            
+
+    ## __GetCapInFd() method
+    #
+    #   Get Cap list contained in FD
+    #
+    #   @param  self        The object pointer
+    #   @param  FdName      FD name
+    #   @retval CapList     List of Capsule in FD
+    #
+    def __GetCapInFd (self, FdName):
+
+        CapList = []
+        if FdName.upper() in self.Profile.FdDict.keys():
+            FdObj = self.Profile.FdDict[FdName.upper()]
+            for elementRegion in FdObj.RegionList:
+                if elementRegion.RegionType == 'CAPSULE':
+                    for elementRegionData in elementRegion.RegionDataList:
+                        if elementRegionData.endswith(".cap"):
+                            continue
+                        if elementRegionData != None and elementRegionData.upper() not in CapList:
+                            CapList.append(elementRegionData.upper())
+        return CapList
+
+    ## __GetReferencedFdCapTuple() method
+    #
+    #   Get FV and FD list referenced by a capsule image
+    #
+    #   @param  self        The object pointer
+    #   @param  CapObj      Capsule section to be searched
+    #   @param  RefFdList   referenced FD by section
+    #   @param  RefFvList   referenced FV by section
+    #
+    def __GetReferencedFdCapTuple(self, CapObj, RefFdList = [], RefFvList = []):
+
+        for CapsuleDataObj in CapObj.CapsuleDataList :
+            if CapsuleDataObj.FvName != None and CapsuleDataObj.FvName.upper() not in RefFvList:
+                RefFvList.append (CapsuleDataObj.FvName.upper())
+            elif CapsuleDataObj.Ffs != None:
+              if isinstance(CapsuleDataObj.Ffs, FfsFileStatement.FileStatement):
+                  if CapsuleDataObj.Ffs.FvName != None and CapsuleDataObj.Ffs.FvName.upper() not in RefFvList:
+                      RefFvList.append(CapsuleDataObj.Ffs.FvName.upper())
+                  elif CapsuleDataObj.Ffs.FdName != None and CapsuleDataObj.Ffs.FdName.upper() not in RefFdList:
+                      RefFdList.append(CapsuleDataObj.Ffs.FdName.upper())
+                  else:
+                      self.__GetReferencedFdFvTupleFromSection(CapsuleDataObj.Ffs, RefFdList, RefFvList)
+
     ## __GetFvInFd() method
     #
     #   Get FV list contained in FD
@@ -3653,6 +3733,8 @@ class FdfParser:
             for elementRegion in FdObj.RegionList:
                 if elementRegion.RegionType == 'FV':
                     for elementRegionData in elementRegion.RegionDataList:
+                        if elementRegionData.endswith(".fv"):
+                            continue
                         if elementRegionData != None and elementRegionData.upper() not in FvList:
                             FvList.append(elementRegionData.upper())
         return FvList
@@ -3711,60 +3793,126 @@ class FdfParser:
     #   @retval False       Not exists cycle reference
     #
     def CycleReferenceCheck(self):
+        #
+        # Check the cycle between FV and FD image
+        #
+        MaxLength = len (self.Profile.FvDict)
+        for FvName in self.Profile.FvDict.keys():
+            LogStr = "\nCycle Reference Checking for FV: %s\n" % FvName
+            RefFvStack = []
+            RefFvStack.append(FvName)
+            FdAnalyzedList = []
+            
+            Index = 0
+            while RefFvStack != [] and Index < MaxLength:
+                Index = Index + 1
+                FvNameFromStack = RefFvStack.pop()
+                if FvNameFromStack.upper() in self.Profile.FvDict.keys():
+                    FvObj = self.Profile.FvDict[FvNameFromStack.upper()]
+                else:
+                    continue
 
-        CycleRefExists = False
+                RefFdList = []
+                RefFvList = []
+                self.__GetReferencedFdFvTuple(FvObj, RefFdList, RefFvList)
 
-        try:
-            for FvName in self.Profile.FvDict.keys():
-                LogStr = "Cycle Reference Checking for FV: %s\n" % FvName
-                RefFvStack = []
-                RefFvStack.append(FvName)
-                FdAnalyzedList = []
-
-                while RefFvStack != []:
-                    FvNameFromStack = RefFvStack.pop()
-                    if FvNameFromStack.upper() in self.Profile.FvDict.keys():
-                        FvObj = self.Profile.FvDict[FvNameFromStack.upper()]
-                    else:
+                for RefFdName in RefFdList:
+                    if RefFdName in FdAnalyzedList:
                         continue
 
-                    RefFdList = []
-                    RefFvList = []
-                    self.__GetReferencedFdFvTuple(FvObj, RefFdList, RefFvList)
+                    LogStr += "FV %s contains FD %s\n" % (FvNameFromStack, RefFdName)
+                    FvInFdList = self.__GetFvInFd(RefFdName)
+                    if FvInFdList != []:
+                        for FvNameInFd in FvInFdList:
+                            LogStr += "FD %s contains FV %s\n" % (RefFdName,FvNameInFd)
+                            if FvNameInFd not in RefFvStack:
+                                RefFvStack.append(FvNameInFd)
 
+                            if FvName in RefFvStack or FvNameFromStack in RefFvStack:
+                                EdkLogger.info(LogStr)
+                                return True
+                    FdAnalyzedList.append(RefFdName)
+
+                for RefFvName in RefFvList:
+                    LogStr += "FV %s contains FV %s\n" % (FvNameFromStack, RefFvName)
+                    if RefFvName not in RefFvStack:
+                        RefFvStack.append(RefFvName)
+
+                    if FvName in RefFvStack or FvNameFromStack in RefFvStack:
+                        EdkLogger.info(LogStr)
+                        return True
+
+        #
+        # Check the cycle between Capsule and FD image
+        #
+        MaxLength = len (self.Profile.CapsuleDict)
+        for CapName in self.Profile.CapsuleDict.keys():
+            #
+            # Capsule image to be checked.
+            #
+            LogStr = "\n\n\nCycle Reference Checking for Capsule: %s\n" % CapName
+            RefCapStack = []
+            RefCapStack.append(CapName)
+            FdAnalyzedList = []
+            FvAnalyzedList = []
+            
+            Index = 0
+            while RefCapStack != [] and Index < MaxLength:
+                Index = Index + 1
+                CapNameFromStack = RefCapStack.pop()
+                if CapNameFromStack.upper() in self.Profile.CapsuleDict.keys():
+                    CapObj = self.Profile.CapsuleDict[CapNameFromStack.upper()]
+                else:
+                    continue
+
+                RefFvList = []
+                RefFdList = []
+                self.__GetReferencedFdCapTuple(CapObj, RefFdList, RefFvList)
+
+                FvListLength = 0
+                FdListLength = 0
+                while FvListLength < len (RefFvList) or FdListLength < len (RefFdList):
                     for RefFdName in RefFdList:
                         if RefFdName in FdAnalyzedList:
                             continue
 
-                        LogStr += "FD %s is referenced by FV %s\n" % (RefFdName, FvNameFromStack)
+                        LogStr += "Capsule %s contains FD %s\n" % (CapNameFromStack, RefFdName)
+                        CapInFdList = self.__GetCapInFd(RefFdName)
+                        if CapInFdList != []:
+                            for CapNameInFd in CapInFdList:
+                                LogStr += "FD %s contains Capsule %s\n" % (RefFdName,CapNameInFd)
+                                if CapNameInFd not in RefCapStack:
+                                    RefCapStack.append(CapNameInFd)
+
+                                if CapName in RefCapStack or CapNameFromStack in RefCapStack:
+                                    EdkLogger.info(LogStr)
+                                    return True
+
                         FvInFdList = self.__GetFvInFd(RefFdName)
                         if FvInFdList != []:
-                            LogStr += "FD %s contains FV: " % RefFdName
-                            for FvObj in FvInFdList:
-                                LogStr += FvObj
-                                LogStr += ' \n'
-                                if FvObj not in RefFvStack:
-                                    RefFvStack.append(FvObj)
+                            for FvNameInFd in FvInFdList:
+                                LogStr += "FD %s contains FV %s\n" % (RefFdName,FvNameInFd)
+                                if FvNameInFd not in RefFvList:
+                                    RefFvList.append(FvNameInFd)
 
-                                if FvName in RefFvStack:
-                                    CycleRefExists = True
-                                    raise Warning(LogStr)
                         FdAnalyzedList.append(RefFdName)
-
+                    #
+                    # the number of the parsed FV and FD image
+                    #
+                    FvListLength = len (RefFvList)
+                    FdListLength = len (RefFdList)
                     for RefFvName in RefFvList:
-                        LogStr += "FV %s is referenced by FV %s\n" % (RefFvName, FvNameFromStack)
-                        if RefFvName not in RefFvStack:
-                            RefFvStack.append(RefFvName)
+                        if RefFvName in FvAnalyzedList:
+                            continue
+                        LogStr += "Capsule %s contains FV %s\n" % (CapNameFromStack, RefFvName)
+                        if RefFvName.upper() in self.Profile.FvDict.keys():
+                            FvObj = self.Profile.FvDict[RefFvName.upper()]
+                        else:
+                            continue
+                        self.__GetReferencedFdFvTuple(FvObj, RefFdList, RefFvList)
+                        FvAnalyzedList.append(RefFvName)
 
-                        if FvName in RefFvStack:
-                            CycleRefExists = True
-                            raise Warning(LogStr)
-
-        except Warning:
-            print LogStr
-
-        finally:
-            return CycleRefExists
+        return False
 
 if __name__ == "__main__":
     parser = FdfParser("..\LakeportX64Pkg.fdf")

@@ -23,6 +23,7 @@ Abstract:
 
 #ifndef __GNUC__
 #include <windows.h>
+#include <io.h>
 #endif
 #include <stdio.h>
 #include <stdlib.h>
@@ -43,6 +44,8 @@ Abstract:
 #include <IndustryStandard/MemoryMappedConfigurationSpaceAccessTable.h>
 
 #include "CommonLib.h"
+#include "PeCoffLib.h"
+#include "ParseInf.h"
 #include "EfiUtilityMsgs.h"
 
 #include "elf_common.h"
@@ -321,6 +324,10 @@ Returns:
       ExpectedLength = sizeof(EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE);
       break;
     default:
+      if (AcpiHeader->Revision > EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE_REVISION) {
+        ExpectedLength = AcpiHeader->Length;
+        break;
+      }
       Error (NULL, 0, 3000, "Invalid", "FACP revision check failed.");
       return STATUS_ERROR;
     }
@@ -335,7 +342,10 @@ Returns:
   //
   case EFI_ACPI_3_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE:
     Facs = (EFI_ACPI_3_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *)AcpiTable;
-    if ((Facs->Version != 0) &&
+    if (Facs->Version > EFI_ACPI_3_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_VERSION) {
+      break;
+    }
+    if ((Facs->Version != EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_VERSION) &&
         (Facs->Version != EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_VERSION) &&
         (Facs->Version != EFI_ACPI_3_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_VERSION)){
       Error (NULL, 0, 3000, "Invalid", "FACS version check failed.");
@@ -354,8 +364,7 @@ Returns:
   //
   case EFI_ACPI_3_0_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE:
     if (AcpiHeader->Revision > EFI_ACPI_3_0_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_REVISION) {
-      Error (NULL, 0, 3000, "Invalid", "DSDT revision check failed.");
-      return STATUS_ERROR;
+      break;
     }
     if (AcpiHeader->Length <= sizeof(EFI_ACPI_DESCRIPTION_HEADER)) {
       Error (NULL, 0, 3000, "Invalid", "DSDT length check failed.");
@@ -367,6 +376,9 @@ Returns:
   // "APIC" Multiple APIC Description Table
   //
   case EFI_ACPI_3_0_MULTIPLE_APIC_DESCRIPTION_TABLE_SIGNATURE:
+    if (AcpiHeader->Revision > EFI_ACPI_3_0_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION) {
+      break;
+    }
     if ((AcpiHeader->Revision != EFI_ACPI_1_0_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION) &&
         (AcpiHeader->Revision != EFI_ACPI_2_0_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION) &&
         (AcpiHeader->Revision != EFI_ACPI_3_0_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION)) {
@@ -383,6 +395,9 @@ Returns:
   // "MCFG" PCI Express Memory Mapped Configuration Space Base Address Description Table
   //
   case EFI_ACPI_3_0_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE:
+    if (AcpiHeader->Revision > EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_TABLE_REVISION) {
+      break;
+    }
     if (AcpiHeader->Revision != EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_TABLE_REVISION) {
       Error (NULL, 0, 3000, "Invalid", "MCFG revision check failed.");
       return STATUS_ERROR;
@@ -437,7 +452,7 @@ Elf_Phdr *gPhdrBase;
 // PE section alignment.
 //
 const UINT32 CoffAlignment = 0x20;
-const UINT32 CoffNbrSections = 4;
+const UINT16 CoffNbrSections = 4;
 
 //
 // Current offset in coff file.
@@ -508,7 +523,7 @@ CheckElfHeader(
     return 0;
   }
   if (Ehdr->e_version != EV_CURRENT) {
-    Error (NULL, 0, 3000, "Unsupported", "ELF e_version (%d) not EV_CURRENT (%d)", Ehdr->e_version, EV_CURRENT);
+    Error (NULL, 0, 3000, "Unsupported", "ELF e_version (%u) not EV_CURRENT (%d)", (unsigned) Ehdr->e_version, EV_CURRENT);
     return 0;
   }
 
@@ -707,7 +722,7 @@ ScanSections(
   }
 
   NtHdr->Pe32.FileHeader.NumberOfSections = CoffNbrSections;
-  NtHdr->Pe32.FileHeader.TimeDateStamp = time(NULL);
+  NtHdr->Pe32.FileHeader.TimeDateStamp = (UINT32) time(NULL);
   NtHdr->Pe32.FileHeader.PointerToSymbolTable = 0;
   NtHdr->Pe32.FileHeader.NumberOfSymbols = 0;
   NtHdr->Pe32.FileHeader.SizeOfOptionalHeader = sizeof(NtHdr->Pe32.OptionalHeader);
@@ -787,7 +802,7 @@ WriteSections(
         //
         //  Ignore for unkown section type.
         //
-        VerboseMsg ("%s unknown section type %x. We directly copy this section into Coff file", mInImageName, (UINTN)Shdr->sh_type);
+        VerboseMsg ("%s unknown section type %x. We directly copy this section into Coff file", mInImageName, (unsigned)Shdr->sh_type);
         break;
       }
     }
@@ -846,7 +861,7 @@ WriteSections(
               - (SecOffset - SecShdr->sh_addr);
             break;
           default:
-            Error (NULL, 0, 3000, "Invalid", "%s unhandled section type %x.", mInImageName, ELF_R_TYPE(Rel->r_info));
+            Error (NULL, 0, 3000, "Invalid", "%s unhandled section type %x.", mInImageName, (unsigned) ELF_R_TYPE(Rel->r_info));
           }
         } else if (Ehdr->e_machine == EM_ARM) {
           switch (ELF32_R_TYPE(Rel->r_info)) {
@@ -862,7 +877,7 @@ WriteSections(
             *(UINT32 *)Targ = *(UINT32 *)Targ - SymShdr->sh_addr + CoffSectionsOffset[Sym->st_shndx];
             break;
           default:
-            Error (NULL, 0, 3000, "Invalid", "%s unhandled section type %x.", mInImageName, ELF32_R_TYPE(Rel->r_info));
+            Error (NULL, 0, 3000, "Invalid", "%s unhandled section type %x.", mInImageName, (unsigned) ELF32_R_TYPE(Rel->r_info));
           }
         }
       }
@@ -918,7 +933,7 @@ CoffAddFixup(
   //
   // Fill the entry.
   //
-  CoffAddFixupEntry((Type << 12) | (Offset & 0xfff));
+  CoffAddFixupEntry((UINT16) ((Type << 12) | (Offset & 0xfff)));
 }
 
 
@@ -976,7 +991,7 @@ WriteRelocations(
               EFI_IMAGE_REL_BASED_HIGHLOW);
               break;
             default:
-              Error (NULL, 0, 3000, "Invalid", "%s unhandled section type %x.", mInImageName, ELF_R_TYPE(Rel->r_info));
+              Error (NULL, 0, 3000, "Invalid", "%s unhandled section type %x.", mInImageName, (unsigned) ELF_R_TYPE(Rel->r_info));
             }
           } else if (Ehdr->e_machine == EM_ARM) {
             switch (ELF32_R_TYPE(Rel->r_info)) {
@@ -993,10 +1008,10 @@ WriteRelocations(
                 );
               break;
             default:
-              Error (NULL, 0, 3000, "Invalid", "%s unhandled section type %x.", mInImageName, ELF32_R_TYPE(Rel->r_info));
+              Error (NULL, 0, 3000, "Invalid", "%s unhandled section type %x.", mInImageName, (unsigned) ELF32_R_TYPE(Rel->r_info));
             }
           } else {
-            Error (NULL, 0, 3000, "Not Supported", "This tool does not support relocations for ELF with e_machine %d (processor type).", Ehdr->e_machine);
+            Error (NULL, 0, 3000, "Not Supported", "This tool does not support relocations for ELF with e_machine %u (processor type).", (unsigned) Ehdr->e_machine);
           }
         }
       }
@@ -1214,19 +1229,20 @@ ZeroXdataSection (
   CHAR8  KeyWord [MAX_LINE_LEN];
   CHAR8  SectionName [MAX_LINE_LEN];
   UINT32 FunctionType = 0;
-  UINT32 SectionOffset;
-  UINT32 SectionLength;
-  UINT32 SectionNumber;
+  unsigned SectionOffset = 0;
+  unsigned SectionLength = 0;
+  unsigned SectionNumber = 0;
   CHAR8  *PdbPointer;
-  INT32  Index = 0;
+  INT32  Index;
+  UINT32 Index2;
 
-  for (Index = 0; Index < SectionTotalNumber; Index ++) {
-    if (stricmp ((char *)SectionHeader[Index].Name, ".zdata") == 0) {
+  for (Index2 = 0; Index2 < SectionTotalNumber; Index2++) {
+    if (stricmp ((char *)SectionHeader[Index2].Name, ".zdata") == 0) {
       //
       // try to zero the customized .zdata section, which is mapped to .xdata
       //
-      memset (FileBuffer + SectionHeader[Index].PointerToRawData, 0, SectionHeader[Index].SizeOfRawData);
-      DebugMsg (NULL, 0, 9, NULL, "Zero the .xdata section for PE image at Offset 0x%x and Length 0x%x", SectionHeader[Index].PointerToRawData, SectionHeader[Index].SizeOfRawData);
+      memset (FileBuffer + SectionHeader[Index2].PointerToRawData, 0, SectionHeader[Index2].SizeOfRawData);
+      DebugMsg (NULL, 0, 9, NULL, "Zero the .xdata section for PE image at Offset 0x%x and Length 0x%x", (unsigned) SectionHeader[Index2].PointerToRawData, (unsigned) SectionHeader[Index2].SizeOfRawData);
       return;
     }
   }
@@ -1329,7 +1345,7 @@ ZeroXdataSection (
   // Zero .xdata Section data
   //
   memset (FileBuffer + SectionHeader[SectionNumber-1].PointerToRawData + SectionOffset, 0, SectionLength);
-  DebugMsg (NULL, 0, 9, NULL, "Zero the .xdata section for PE image at Offset 0x%x and Length 0x%x", SectionHeader[SectionNumber-1].PointerToRawData + SectionOffset, SectionLength);
+  DebugMsg (NULL, 0, 9, NULL, "Zero the .xdata section for PE image at Offset 0x%x and Length 0x%x", (unsigned) SectionHeader[SectionNumber-1].PointerToRawData + SectionOffset, SectionLength);
   fclose (fpMapFile);
   return;
 }
@@ -1610,7 +1626,7 @@ Returns:
         goto Finish;
       }
       if (LogLevel > 9) {
-        Error (NULL, 0, 1003, "Invalid option value", "Debug Level range is 0-9, currnt input level is %d", LogLevel);
+        Error (NULL, 0, 1003, "Invalid option value", "Debug Level range is 0-9, currnt input level is %d", (int) LogLevel);
         goto Finish;
       }
       SetPrintLevel (LogLevel);
@@ -1631,7 +1647,7 @@ Returns:
       InputFileName = (CHAR8 **) malloc (MAXIMUM_INPUT_FILE_NUM * sizeof (CHAR8 *));
       if (InputFileName == NULL) {
         Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
-        return EFI_OUT_OF_RESOURCES;
+        goto Finish;
       }
 
       memset (InputFileName, 0, (MAXIMUM_INPUT_FILE_NUM * sizeof (CHAR8 *)));
@@ -1646,7 +1662,7 @@ Returns:
 
       if (InputFileName == NULL) {
         Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
-        return EFI_OUT_OF_RESOURCES;
+        goto Finish;
       }
 
       memset (&(InputFileName[InputFileNum]), 0, (MAXIMUM_INPUT_FILE_NUM * sizeof (CHAR8 *)));
@@ -1883,7 +1899,7 @@ Returns:
     }
 
     if (Index != FileLength) {
-      Error (NULL, 0, 3000, "Invalid", "file length of %s (0x%x) does not equal expected TotalSize: 0x%04X.", mInImageName, FileLength, Index);
+      Error (NULL, 0, 3000, "Invalid", "file length of %s (0x%x) does not equal expected TotalSize: 0x%04X.", mInImageName, (unsigned) FileLength, (unsigned) Index);
       goto Finish;
     }
 
@@ -1899,7 +1915,7 @@ Returns:
       Index       += sizeof (*DataPointer);
     }
     if (CheckSum != 0) {
-      Error (NULL, 0, 3000, "Invalid", "checksum (0x%x) failed on file %s.", CheckSum, mInImageName);
+      Error (NULL, 0, 3000, "Invalid", "checksum (0x%x) failed on file %s.", (unsigned) CheckSum, mInImageName);
       goto Finish;
     }
     //
@@ -1923,7 +1939,7 @@ Returns:
         goto Finish;
       }
     }
-    VerboseMsg ("the size of output file is %d bytes", FileLength);
+    VerboseMsg ("the size of output file is %u bytes", (unsigned) FileLength);
     //
     //  Convert Mci.TXT to Mci.bin file successfully
     //
@@ -1950,7 +1966,7 @@ Returns:
   fread (FileBuffer, 1, FileLength, fpIn);
   fclose (fpIn);
 
-  DebugMsg (NULL, 0, 9, "input file info", "the input file size is %d bytes", FileLength);
+  DebugMsg (NULL, 0, 9, "input file info", "the input file size is %u bytes", (unsigned) FileLength);
 
   //
   // Replace file
@@ -1978,11 +1994,11 @@ Returns:
       fprintf (fpInOut, "%17X number of sections\n", TEImageHeader.NumberOfSections);
       fprintf (fpInOut, "%17X subsystems\n", TEImageHeader.Subsystem);
       fprintf (fpInOut, "%17X stripped size\n", TEImageHeader.StrippedSize);
-      fprintf (fpInOut, "%17X entry point\n", TEImageHeader.AddressOfEntryPoint);
-      fprintf (fpInOut, "%17X base of code\n", TEImageHeader.BaseOfCode);
-      fprintf (fpInOut, "%17lX image base\n", (long unsigned int)TEImageHeader.ImageBase);
-      fprintf (fpInOut, "%17X [%8X] RVA [size] of Base Relocation Directory\n", TEImageHeader.DataDirectory[0].VirtualAddress, TEImageHeader.DataDirectory[0].Size);
-      fprintf (fpInOut, "%17X [%8X] RVA [size] of Debug Directory\n", TEImageHeader.DataDirectory[1].VirtualAddress, TEImageHeader.DataDirectory[1].Size);
+      fprintf (fpInOut, "%17X entry point\n", (unsigned) TEImageHeader.AddressOfEntryPoint);
+      fprintf (fpInOut, "%17X base of code\n", (unsigned) TEImageHeader.BaseOfCode);
+      fprintf (fpInOut, "%17llX image base\n", (unsigned long long)TEImageHeader.ImageBase);
+      fprintf (fpInOut, "%17X [%8X] RVA [size] of Base Relocation Directory\n", (unsigned) TEImageHeader.DataDirectory[0].VirtualAddress, (unsigned) TEImageHeader.DataDirectory[0].Size);
+      fprintf (fpInOut, "%17X [%8X] RVA [size] of Debug Directory\n", (unsigned) TEImageHeader.DataDirectory[1].VirtualAddress, (unsigned) TEImageHeader.DataDirectory[1].Size);
     }
 
     if (fpOut != NULL) {
@@ -1992,11 +2008,11 @@ Returns:
       fprintf (fpOut, "%17X number of sections\n", TEImageHeader.NumberOfSections);
       fprintf (fpOut, "%17X subsystems\n", TEImageHeader.Subsystem);
       fprintf (fpOut, "%17X stripped size\n", TEImageHeader.StrippedSize);
-      fprintf (fpOut, "%17X entry point\n", TEImageHeader.AddressOfEntryPoint);
-      fprintf (fpOut, "%17X base of code\n", TEImageHeader.BaseOfCode);
-      fprintf (fpOut, "%17lX image base\n", (long unsigned int)TEImageHeader.ImageBase);
-      fprintf (fpOut, "%17X [%8X] RVA [size] of Base Relocation Directory\n", TEImageHeader.DataDirectory[0].VirtualAddress, TEImageHeader.DataDirectory[0].Size);
-      fprintf (fpOut, "%17X [%8X] RVA [size] of Debug Directory\n", TEImageHeader.DataDirectory[1].VirtualAddress, TEImageHeader.DataDirectory[1].Size);
+      fprintf (fpOut, "%17X entry point\n", (unsigned) TEImageHeader.AddressOfEntryPoint);
+      fprintf (fpOut, "%17X base of code\n", (unsigned) TEImageHeader.BaseOfCode);
+      fprintf (fpOut, "%17llX image base\n", (unsigned long long)TEImageHeader.ImageBase);
+      fprintf (fpOut, "%17X [%8X] RVA [size] of Base Relocation Directory\n", (unsigned) TEImageHeader.DataDirectory[0].VirtualAddress, (unsigned) TEImageHeader.DataDirectory[0].Size);
+      fprintf (fpOut, "%17X [%8X] RVA [size] of Debug Directory\n", (unsigned) TEImageHeader.DataDirectory[1].VirtualAddress, (unsigned) TEImageHeader.DataDirectory[1].Size);
     }
     goto Finish;
   }
@@ -2201,7 +2217,7 @@ Returns:
     if (fpInOut != NULL) {
       fwrite (FileBuffer + PeHdr->Pe32.OptionalHeader.SizeOfHeaders, 1, FileLength - PeHdr->Pe32.OptionalHeader.SizeOfHeaders, fpInOut);
     }
-    VerboseMsg ("the size of output file is %d bytes", FileLength - PeHdr->Pe32.OptionalHeader.SizeOfHeaders);
+    VerboseMsg ("the size of output file is %u bytes", (unsigned) (FileLength - PeHdr->Pe32.OptionalHeader.SizeOfHeaders));
     goto Finish;
   }
 
@@ -2211,7 +2227,7 @@ Returns:
   if (OutImageType == FW_ZERO_DEBUG_IMAGE) {
     Status = ZeroDebugData (FileBuffer, TRUE);
     if (EFI_ERROR (Status)) {
-      Error (NULL, 0, 3000, "Invalid", "Zero DebugData Error status is 0x%lx", (UINTN) Status);
+      Error (NULL, 0, 3000, "Invalid", "Zero DebugData Error status is 0x%x", (int) Status);
       goto Finish;
     }
 
@@ -2221,7 +2237,7 @@ Returns:
     if (fpInOut != NULL) {
       fwrite (FileBuffer, 1, FileLength, fpInOut);
     }
-    VerboseMsg ("the size of output file is %d bytes", FileLength);
+    VerboseMsg ("the size of output file is %u bytes", (unsigned) FileLength);
     goto Finish;
   }
 
@@ -2240,7 +2256,7 @@ Returns:
     if (fpInOut != NULL) {
       fwrite (FileBuffer, 1, FileLength, fpInOut);
     }
-    VerboseMsg ("the size of output file is %d bytes", FileLength);
+    VerboseMsg ("the size of output file is %u bytes", (unsigned) FileLength);
     goto Finish;
   }
 
@@ -2274,7 +2290,7 @@ Returns:
         if (fpInOut != NULL) {
           fwrite (FileBuffer + SectionHeader->PointerToRawData, 1, FileLength, fpInOut);
         }
-        VerboseMsg ("the size of output file is %d bytes", FileLength);
+        VerboseMsg ("the size of output file is %u bytes", (unsigned) FileLength);
         goto Finish;
       }
     }
@@ -2291,7 +2307,7 @@ Returns:
     DosHdr->e_lfanew = BackupDosHdr.e_lfanew;
   
     for (Index = sizeof (EFI_IMAGE_DOS_HEADER); Index < (UINT32 ) DosHdr->e_lfanew; Index++) {
-      FileBuffer[Index] = DosHdr->e_cp;
+      FileBuffer[Index] = (UINT8) DosHdr->e_cp;
     }
   }
 
@@ -2397,7 +2413,7 @@ Returns:
                 Optional32->SizeOfInitializedData -= (SectionHeader->SizeOfRawData - AllignedRelocSize);
                 SectionHeader->SizeOfRawData = AllignedRelocSize;
                 FileLength = Optional32->SizeOfImage;
-                DebugMsg (NULL, 0, 9, "Remove the zero padding bytes at the end of the base relocations", "The size of padding bytes is %d", SectionHeader->SizeOfRawData - AllignedRelocSize);
+                DebugMsg (NULL, 0, 9, "Remove the zero padding bytes at the end of the base relocations", "The size of padding bytes is %u", (unsigned) (SectionHeader->SizeOfRawData - AllignedRelocSize));
               }
             }
           }
@@ -2505,7 +2521,7 @@ Returns:
                 Optional64->SizeOfInitializedData -= (SectionHeader->SizeOfRawData - AllignedRelocSize);
                 SectionHeader->SizeOfRawData = AllignedRelocSize;
                 FileLength = Optional64->SizeOfImage;
-                DebugMsg (NULL, 0, 9, "Remove the zero padding bytes at the end of the base relocations", "The size of padding bytes is %d", SectionHeader->SizeOfRawData - AllignedRelocSize);
+                DebugMsg (NULL, 0, 9, "Remove the zero padding bytes at the end of the base relocations", "The size of padding bytes is %u", (unsigned) (SectionHeader->SizeOfRawData - AllignedRelocSize));
               }
             }
           }
@@ -2561,8 +2577,8 @@ Returns:
       goto Finish;
     }
 
-    DebugMsg (NULL, 0, 9, "TeImage Header Info", "Machine type is %X, Number of sections is %X, Stripped size is %X, EntryPoint is %X, BaseOfCode is %X, ImageBase is %X",
-              TEImageHeader.Machine, TEImageHeader.NumberOfSections, TEImageHeader.StrippedSize, TEImageHeader.AddressOfEntryPoint, TEImageHeader.BaseOfCode, TEImageHeader.ImageBase);
+    DebugMsg (NULL, 0, 9, "TeImage Header Info", "Machine type is %X, Number of sections is %X, Stripped size is %X, EntryPoint is %X, BaseOfCode is %X, ImageBase is %llX",
+              TEImageHeader.Machine, TEImageHeader.NumberOfSections, TEImageHeader.StrippedSize, (unsigned) TEImageHeader.AddressOfEntryPoint, (unsigned) TEImageHeader.BaseOfCode, (unsigned long long) TEImageHeader.ImageBase);
     //
     // Update Image to TeImage
     //
@@ -2574,7 +2590,7 @@ Returns:
       fwrite (&TEImageHeader, 1, sizeof (EFI_TE_IMAGE_HEADER), fpInOut);
       fwrite (FileBuffer + TEImageHeader.StrippedSize, 1, FileLength - TEImageHeader.StrippedSize, fpInOut);
     }
-    VerboseMsg ("the size of output file is %d bytes", FileLength - TEImageHeader.StrippedSize);
+    VerboseMsg ("the size of output file is %u bytes", (unsigned) (FileLength - TEImageHeader.StrippedSize));
     goto Finish;
   }
 WriteFile:
@@ -2587,7 +2603,7 @@ WriteFile:
   if (fpInOut != NULL) {
     fwrite (FileBuffer, 1, FileLength, fpInOut);
   }
-  VerboseMsg ("the size of output file is %d bytes", FileLength);
+  VerboseMsg ("the size of output file is %u bytes", (unsigned) FileLength);
 
 Finish:
   if (fpInOut != NULL) {
@@ -2813,13 +2829,13 @@ Returns:
   struct tm                       stime;
   struct tm                       *ptime;
   time_t                          newtime;
-  UINT32                           Index;
-  UINT32                           DebugDirectoryEntryRva;
-  UINT32                           DebugDirectoryEntryFileOffset;
-  UINT32                           ExportDirectoryEntryRva;
-  UINT32                           ExportDirectoryEntryFileOffset;
-  UINT32                           ResourceDirectoryEntryRva;
-  UINT32                           ResourceDirectoryEntryFileOffset;
+  UINT32                          Index;
+  UINT32                          DebugDirectoryEntryRva;
+  UINT32                          DebugDirectoryEntryFileOffset;
+  UINT32                          ExportDirectoryEntryRva;
+  UINT32                          ExportDirectoryEntryFileOffset;
+  UINT32                          ResourceDirectoryEntryRva;
+  UINT32                          ResourceDirectoryEntryFileOffset;
   EFI_IMAGE_DOS_HEADER            *DosHdr;
   EFI_IMAGE_FILE_HEADER           *FileHdr;
   EFI_IMAGE_OPTIONAL_HEADER32     *Optional32Hdr;
@@ -2830,9 +2846,12 @@ Returns:
   //
   // Init variable.
   //
-  DebugDirectoryEntryRva    = 0;
-  ExportDirectoryEntryRva   = 0;
-  ResourceDirectoryEntryRva = 0;
+  DebugDirectoryEntryRva           = 0;
+  DebugDirectoryEntryFileOffset    = 0;
+  ExportDirectoryEntryRva          = 0;
+  ExportDirectoryEntryFileOffset   = 0;
+  ResourceDirectoryEntryRva        = 0;
+  ResourceDirectoryEntryFileOffset = 0;
   //
   // Get time and date that will be set.
   //
@@ -3041,6 +3060,7 @@ Returns:
 {
   CHAR8  Line[MAX_LINE_LEN];
   CHAR8  *cptr;
+  unsigned ScannedData = 0;
 
   Line[MAX_LINE_LEN - 1]  = 0;
   while (1) {
@@ -3080,10 +3100,11 @@ Returns:
     for (; *cptr && isspace(*cptr); cptr++) {
     }
     if (isxdigit (*cptr)) {
-      if (sscanf (cptr, "%X", Data) != 1) {
+      if (sscanf (cptr, "%X", &ScannedData) != 1) {
         return STATUS_ERROR;
       }
     }
+    *Data = (UINT32) ScannedData;
     return STATUS_SUCCESS;
   }
 

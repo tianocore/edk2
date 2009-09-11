@@ -122,8 +122,8 @@ Returns:
   CHAR8  StrPtr[40];
   CHAR8  *Token;
   UINTN  Length;
-  UINT32 Major;
-  UINT32 Minor;
+  unsigned Major;
+  unsigned Minor;
 
   Major = 0;
   Minor = 0;
@@ -278,7 +278,7 @@ InitializeComps (
 
 Routine Description:
 
-  This function intializes the relevant global variable which is being
+  This function initializes the relevant global variable which is being
   used to store the information retrieved from INF file.  This also initializes
   the VTF symbol file.
 
@@ -316,7 +316,7 @@ ParseAndUpdateComponents (
 
 Routine Description:
 
-  This function intializes the relevant global variable which is being
+  This function initializes the relevant global variable which is being
   used to store the information retrieved from INF file.
 
 Arguments:
@@ -347,7 +347,7 @@ Returns:
     } else if (strnicmp (*TokenStr, "COMP_TYPE", 9) == 0) {
       TokenStr++;
       if (AsciiStringToUint64 (*TokenStr, FALSE, &StringValue) != EFI_SUCCESS) {
-        Error (NULL, 0, 5001, "Cannot get: \"0x%x\".", *TokenStr);
+        Error (NULL, 0, 5001, "Cannot get: \"0x%s\".", *TokenStr);
         return ;
       }
 
@@ -1970,7 +1970,7 @@ Returns:
 
   Fv1BaseAddress        = StartAddress1;
   Fv1EndAddress         = Fv1BaseAddress + Size1;
-  if (Fv1EndAddress != 0x100000000 || Size1 < 0x100000) {
+  if (Fv1EndAddress != 0x100000000ULL || Size1 < 0x100000) {
     Error (NULL, 0, 2000, "Invalid parameter", "Error BaseAddress and Size parameters!");
     if (Size1 < 0x100000) {
       Error (NULL, 0, 2000, "Invalid parameter", "The FwVolumeSize must be larger than 1M!");
@@ -2281,11 +2281,7 @@ Returns:
       //
       TokenAddress += BaseAddress &~IPF_CACHE_BIT;
 
-#ifdef __GNUC__
-      fprintf (DestFile, "%s | %016lX | %s | %s%s\n", Type, TokenAddress, Section, BaseToken, Token);
-#else
-       fprintf (DestFile, "%s | %016I64X | %s | %s%s\n", Type, TokenAddress, Section, BaseToken, Token);
-#endif
+      fprintf (DestFile, "%s | %016llX | %s | %s%s\n", Type, (unsigned long long) TokenAddress, Section, BaseToken, Token);
     }
   }
 
@@ -2689,7 +2685,7 @@ Returns:
       break;
 
     case EFI_ABORTED:
-      Error (NULL, 0, 3000, "Invaild", "Error detected while creating the file image.");
+      Error (NULL, 0, 3000, "Invalid", "Error detected while creating the file image.");
       break;
 
     case EFI_OUT_OF_RESOURCES:
@@ -2697,11 +2693,11 @@ Returns:
       break;
 
     case EFI_VOLUME_CORRUPTED:
-      Error (NULL, 0, 3000, "Invaild", "No base address was specified.");
+      Error (NULL, 0, 3000, "Invalid", "No base address was specified.");
       break;
 
     default:
-      Error (NULL, 0, 3000, "Invaild", "GenVtfImage function returned unknown status %x.",Status );
+      Error (NULL, 0, 3000, "Invalid", "GenVtfImage function returned unknown status %x.", (int) Status );
       break;
     }
   }

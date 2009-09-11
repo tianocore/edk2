@@ -29,6 +29,7 @@ from Common.FdfClassObject import Fdf
 from Common.String import NormPath
 from Common import BuildToolError
 import c
+import re, string
 from Exception import *
 
 ## Ecc
@@ -51,29 +52,29 @@ class Ecc(object):
         self.IsInit = True
         self.ScanSourceCode = True
         self.ScanMetaData = True
-        
+
         # Parse the options and args
         self.ParseOption()
 
         # Generate checkpoints list
         EccGlobalData.gConfig = Configuration(self.ConfigFile)
-        
+
         # Generate exception list
         EccGlobalData.gException = ExceptionCheck(self.ExceptionFile)
-        
+
         # Init Ecc database
         EccGlobalData.gDb = Database.Database(Database.DATABASE_PATH)
         EccGlobalData.gDb.InitDatabase(self.IsInit)
-        
+
         # Build ECC database
         self.BuildDatabase()
-        
+
         # Start to check
         self.Check()
-        
+
         # Show report
         self.GenReport()
-        
+
         # Close Database
         EccGlobalData.gDb.Close()
 
@@ -94,7 +95,7 @@ class Ecc(object):
         # Clean report table
         EccGlobalData.gDb.TblReport.Drop()
         EccGlobalData.gDb.TblReport.Create()
-        
+
         # Build database
         if self.IsInit:
             if self.ScanSourceCode:
@@ -103,9 +104,9 @@ class Ecc(object):
             if self.ScanMetaData:
                 EdkLogger.quiet("Building database for source code done!")
                 self.BuildMetaDataFileDatabase()
-        
+
         EccGlobalData.gIdentifierTableList = GetTableList((MODEL_FILE_C, MODEL_FILE_H), 'Identifier', EccGlobalData.gDb)
-    
+
     ## BuildMetaDataFileDatabase
     #
     # Build the database for meta data files
@@ -115,10 +116,11 @@ class Ecc(object):
         Op = open(EccGlobalData.gConfig.MetaDataFileCheckPathOfGenerateFileList, 'w+')
         #SkipDirs = Read from config file
         SkipDirs = EccGlobalData.gConfig.SkipDirList
+        SkipDirString = string.join(SkipDirs, '|')
+        p = re.compile(r'.*[\\/](?:%s)[\\/]?.*' % SkipDirString)
         for Root, Dirs, Files in os.walk(EccGlobalData.gTarget):
-            for Dir in Dirs:
-                if Dir.upper() in SkipDirs:
-                    Dirs.remove(Dir)
+            if p.match(Root.upper()):
+                continue
 
             for Dir in Dirs:
                 Dirname = os.path.join(Root, Dir)
@@ -152,15 +154,15 @@ class Ecc(object):
                     Filename = os.path.normpath(os.path.join(Root, File))
                     EdkLogger.quiet("Parsing %s" % Filename)
                     Op.write("%s\r" % Filename)
-                    Fdf(Filename, True, EccGlobalData.gWorkspace, EccGlobalData.gDb)                    
+                    Fdf(Filename, True, EccGlobalData.gWorkspace, EccGlobalData.gDb)
                     continue
         Op.close()
-        
+
         # Commit to database
         EccGlobalData.gDb.Conn.commit()
-        
+
         EdkLogger.quiet("Building database for meta data files done!")
-    
+
     ##
     #
     # Check each checkpoint
@@ -170,7 +172,7 @@ class Ecc(object):
         EccCheck = Check()
         EccCheck.Check()
         EdkLogger.quiet("Checking  done!")
-    
+
     ##
     #
     # Generate the scan report
@@ -179,7 +181,7 @@ class Ecc(object):
         EdkLogger.quiet("Generating report ...")
         EccGlobalData.gDb.TblReport.ToCSV(self.ReportFile)
         EdkLogger.quiet("Generating report done!")
-        
+
     def GetRealPathCase(self, path):
         TmpPath = path.rstrip(os.sep)
         PathParts = TmpPath.split(os.sep)
@@ -193,7 +195,7 @@ class Ecc(object):
             for Dir in Dirs:
                 if Dir.upper() == PathParts[0].upper():
                     return Dir
-        
+
         if PathParts[0].strip().endswith(':'):
             PathParts[0] = PathParts[0].upper()
         ParentDir = PathParts[0]
@@ -201,7 +203,7 @@ class Ecc(object):
         if PathParts[0] == '':
             RealPath = os.sep
             ParentDir = os.sep
-        
+
         PathParts.remove(PathParts[0])    # need to remove the parent
         for Part in PathParts:
             Dirs = os.listdir(ParentDir + os.sep)
@@ -212,9 +214,9 @@ class Ecc(object):
                     break
             ParentDir += os.sep
             ParentDir += Dir
-            
+
         return RealPath
-        
+
     ## ParseOption
     #
     # Parse options
@@ -222,10 +224,10 @@ class Ecc(object):
     def ParseOption(self):
         EdkLogger.quiet("Loading ECC configuration ... done")
         (Options, Target) = self.EccOptionParser()
-        
+
         # Check workspace envirnoment
         if "WORKSPACE" not in os.environ:
-            EdkLogger.error("ECC", BuildToolError.ATTRIBUTE_NOT_AVAILABLE, "Environment variable not found", 
+            EdkLogger.error("ECC", BuildToolError.ATTRIBUTE_NOT_AVAILABLE, "Environment variable not found",
                             ExtraData="WORKSPACE")
         else:
             EccGlobalData.gWorkspace = os.path.normpath(os.getenv("WORKSPACE"))
@@ -234,7 +236,7 @@ class Ecc(object):
             os.environ["WORKSPACE"] = EccGlobalData.gWorkspace
         # Set log level
         self.SetLogLevel(Options)
-        
+
         # Set other options
         if Options.ConfigFile != None:
             self.ConfigFile = Options.ConfigFile
@@ -258,12 +260,12 @@ class Ecc(object):
             self.ScanSourceCode = False
         if Options.sourcecode != None:
             self.ScanMetaData = False
-        
+
     ## SetLogLevel
     #
     # Set current log level of the tool based on args
     #
-    # @param Option:  The option list including log level setting 
+    # @param Option:  The option list including log level setting
     #
     def SetLogLevel(self, Option):
         if Option.verbose != None:
@@ -295,19 +297,19 @@ class Ecc(object):
         Parser.add_option("-m", "--metadata", action="store_true", type=None, help="Only scan meta-data files information if this option is specified.")
         Parser.add_option("-s", "--sourcecode", action="store_true", type=None, help="Only scan source code files information if this option is specified.")
         Parser.add_option("-k", "--keepdatabase", action="store_true", type=None, help="The existing Ecc database will not be cleaned except report information if this option is specified.")
-        Parser.add_option("-l", "--log filename", action="store", dest="LogFile", help="""If specified, the tool should emit the changes that 
-                                                                                          were made by the tool after printing the result message. 
-                                                                                          If filename, the emit to the file, otherwise emit to 
-                                                                                          standard output. If no modifications were made, then do not 
+        Parser.add_option("-l", "--log filename", action="store", dest="LogFile", help="""If specified, the tool should emit the changes that
+                                                                                          were made by the tool after printing the result message.
+                                                                                          If filename, the emit to the file, otherwise emit to
+                                                                                          standard output. If no modifications were made, then do not
                                                                                           create a log file, or output a log message.""")
         Parser.add_option("-q", "--quiet", action="store_true", type=None, help="Disable all messages except FATAL ERRORS.")
         Parser.add_option("-v", "--verbose", action="store_true", type=None, help="Turn on verbose output with informational messages printed, "\
                                                                                    "including library instances selected, final dependency expression, "\
                                                                                    "and warning messages, etc.")
         Parser.add_option("-d", "--debug", action="store", type="int", help="Enable debug messages at specified level.")
-    
+
         (Opt, Args)=Parser.parse_args()
-        
+
         return (Opt, Args)
 
 ##

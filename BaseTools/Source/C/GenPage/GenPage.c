@@ -35,6 +35,7 @@ Abstract:
 #include <string.h>
 #include "VirtualMemory.h"
 #include "EfiUtilityMsgs.h"
+#include "ParseInf.h"
 
 #define EFI_PAGE_BASE_OFFSET_IN_LDR 0x70000
 #define EFI_PAGE_BASE_ADDRESS       (EFI_PAGE_BASE_OFFSET_IN_LDR + 0x20000)
@@ -252,7 +253,7 @@ return:
   FileSize = ftell (NoPageFile);
   fseek (NoPageFile, 0, SEEK_SET);
   if (FileSize > gPageTableOffsetInFile) {
-    Error (NoPageFileName, 0, 0x4002, "Invalid parameter option", "Input file size (0x%x) exceeds the Page Table Offset (0x%x)", FileSize, gPageTableOffsetInFile);
+    Error (NoPageFileName, 0, 0x4002, "Invalid parameter option", "Input file size (0x%lx) exceeds the Page Table Offset (0x%x)", FileSize, (unsigned) gPageTableOffsetInFile);
     fclose (PageFile);
     fclose (NoPageFile);
     return -1;
@@ -380,7 +381,7 @@ main (
         return STATUS_ERROR;
       }
       if (TempValue > 9) {
-        Error (NULL, 0, 1003, "Invalid option value", "Debug Level range is 0-9, currnt input level is %d", TempValue);
+        Error (NULL, 0, 1003, "Invalid option value", "Debug Level range is 0-9, currnt input level is %d", (int) TempValue);
         return STATUS_ERROR;
       }
       argc -= 2;

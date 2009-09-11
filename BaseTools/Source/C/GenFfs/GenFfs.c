@@ -322,7 +322,7 @@ Returns:
     FileSize = ftell (InFile);
     fseek (InFile, 0, SEEK_SET);
     DebugMsg (NULL, 0, 9, "Input section files", 
-              "the input section name is %s and the size is %d bytes", InputFileName[Index], FileSize); 
+              "the input section name is %s and the size is %u bytes", InputFileName[Index], (unsigned) FileSize); 
 
     //
     // Check this section is Te/Pe section, and Calculate the numbers of Te/Pe section.
@@ -374,7 +374,7 @@ Returns:
         SectHeader->Size[2] = (UINT8) ((Offset & 0xff0000) >> 16);
       }
       DebugMsg (NULL, 0, 9, "Pad raw section for section data alignment", 
-                "Pad Raw section size is %d", Offset);
+                "Pad Raw section size is %u", (unsigned) Offset);
 
       Size = Size + Offset;
     }
@@ -409,7 +409,7 @@ Returns:
 
 int
 main (
-  INT32 argc,
+  int   argc,
   CHAR8 *argv[]
   )
 /*++
@@ -679,7 +679,7 @@ Returns:
         goto Finish;
       }
       if (LogLevel > 9) {
-        Error (NULL, 0, 1003, "Invalid option value", "Debug Level range is 0-9, current input level is %d", LogLevel);
+        Error (NULL, 0, 1003, "Invalid option value", "Debug Level range is 0-9, current input level is %d", (int) LogLevel);
         goto Finish;
       }
       SetPrintLevel (LogLevel);
@@ -719,7 +719,7 @@ Returns:
   VerboseMsg ("Fv File type is %s", mFfsFileType [FfsFiletype]);
   VerboseMsg ("Output file name is %s", OutputFileName);
   VerboseMsg ("FFS File Guid is %08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X", 
-                FileGuid.Data1,
+                (unsigned) FileGuid.Data1,
                 FileGuid.Data2,
                 FileGuid.Data3,
                 FileGuid.Data4[0],
@@ -744,7 +744,7 @@ Returns:
       //
       InputFileAlign[Index] = 1;
     }
-    VerboseMsg ("the %dth input section name is %s and section alignment is %d", Index, InputFileName[Index], InputFileAlign[Index]);
+    VerboseMsg ("the %dth input section name is %s and section alignment is %u", Index, InputFileName[Index], (unsigned) InputFileAlign[Index]);
   }
   
   //
@@ -763,7 +763,7 @@ Returns:
   if ((FfsFiletype == EFI_FV_FILETYPE_SECURITY_CORE || 
       FfsFiletype == EFI_FV_FILETYPE_PEI_CORE ||
       FfsFiletype == EFI_FV_FILETYPE_DXE_CORE) && (PeSectionNum != 1)) {
-    Error (NULL, 0, 2000, "Invalid parameter", "Fv File type %s must have one and only one Pe or Te section, but %d Pe/Te section are input", mFfsFileType [FfsFiletype], PeSectionNum);
+    Error (NULL, 0, 2000, "Invalid parameter", "Fv File type %s must have one and only one Pe or Te section, but %u Pe/Te section are input", mFfsFileType [FfsFiletype], PeSectionNum);
     goto Finish;
   }
   
@@ -810,7 +810,7 @@ Returns:
   //
   // Update FFS Alignment based on the max alignment required by input section files 
   //
-  VerboseMsg ("the max alignment of all input sections is %d", MaxAlignment); 
+  VerboseMsg ("the max alignment of all input sections is %u", (unsigned) MaxAlignment); 
   for (Index = 0; Index < sizeof (mFfsValidAlign) / sizeof (UINT32) - 1; Index ++) {
     if ((MaxAlignment > mFfsValidAlign [Index]) && (MaxAlignment <= mFfsValidAlign [Index + 1])) {
       break;
@@ -819,14 +819,14 @@ Returns:
   if (FfsAlign < Index) {
     FfsAlign = Index;
   }
-  VerboseMsg ("the alignment of the genreated FFS file is %d", mFfsValidAlign [FfsAlign + 1]);  
-  FfsFileHeader.Attributes = FfsAttrib | (FfsAlign << 3);
+  VerboseMsg ("the alignment of the generated FFS file is %u", (unsigned) mFfsValidAlign [FfsAlign + 1]);  
+  FfsFileHeader.Attributes = (EFI_FFS_FILE_ATTRIBUTES) (FfsAttrib | (FfsAlign << 3));
   
   //
   // Now FileSize includes the EFI_FFS_FILE_HEADER
   //
   FileSize += sizeof (EFI_FFS_FILE_HEADER);
-  VerboseMsg ("the size of the genreated FFS file is %d bytes", FileSize);
+  VerboseMsg ("the size of the generated FFS file is %u bytes", (unsigned) FileSize);
   FfsFileHeader.Size[0]  = (UINT8) (FileSize & 0xFF);
   FfsFileHeader.Size[1]  = (UINT8) ((FileSize & 0xFF00) >> 8);
   FfsFileHeader.Size[2]  = (UINT8) ((FileSize & 0xFF0000) >> 16);

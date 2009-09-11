@@ -160,7 +160,8 @@ Returns:
                         EFI_SECTION_USER_INTERFACE, EFI_SECTION_VERSION,\n\
                         EFI_SECTION_FIRMWARE_VOLUME_IMAGE, EFI_SECTION_RAW,\n\
                         EFI_SECTION_FREEFORM_SUBTYPE_GUID,\n\
-                        EFI_SECTION_PEI_DEPEX. if -s option is not given, \n\
+                        EFI_SECTION_PEI_DEPEX, EFI_SECTION_SMM_DEPEX.\n\
+                        if -s option is not given, \n\
                         EFI_SECTION_ALL is default section type.\n");
   fprintf (stdout, "  -c [Type], --compress [Type]\n\
                         Compress method type can be PI_NONE or PI_STD.\n\
@@ -282,16 +283,16 @@ Returns:
   fseek (InFile, 0, SEEK_END);
   InputFileLength = ftell (InFile);
   fseek (InFile, 0, SEEK_SET);
-  DebugMsg (NULL, 0, 9, "Input file", "File name is %s and File size is %d bytes", InputFileName[0], InputFileLength);
+  DebugMsg (NULL, 0, 9, "Input file", "File name is %s and File size is %u bytes", InputFileName[0], (unsigned) InputFileLength);
   TotalLength     = sizeof (EFI_COMMON_SECTION_HEADER) + InputFileLength;
   //
   // Size must fit in 3 bytes
   //
   if (TotalLength >= MAX_SECTION_SIZE) {
-    Error (NULL, 0, 2000, "Invalid paramter", "%s file size (0x%X) exceeds section size limit(%dM).", InputFileName[0], TotalLength, MAX_SECTION_SIZE>>20);
+    Error (NULL, 0, 2000, "Invalid paramter", "%s file size (0x%X) exceeds section size limit(%uM).", InputFileName[0], (unsigned) TotalLength, MAX_SECTION_SIZE>>20);
     goto Done;
   }
-  VerboseMsg ("the size of the created section file is %d bytes", TotalLength);
+  VerboseMsg ("the size of the created section file is %u bytes", (unsigned) TotalLength);
   //
   // Fill in the fields in the local section header structure
   //
@@ -404,7 +405,7 @@ Returns:
     fseek (InFile, 0, SEEK_END);
     FileSize = ftell (InFile);
     fseek (InFile, 0, SEEK_SET);
-    DebugMsg (NULL, 0, 9, "Input files", "the input file name is %s and the size is %d bytes", InputFileName[Index], FileSize); 
+    DebugMsg (NULL, 0, 9, "Input files", "the input file name is %s and the size is %u bytes", InputFileName[Index], (unsigned) FileSize); 
     //
     // Now read the contents of the file into the buffer
     // Buffer must be enough to contain the file content.
@@ -561,10 +562,10 @@ Returns:
   }
 
   DebugMsg (NULL, 0, 9, "comprss file size", 
-            "the original section size is %d bytes and the compressed section size is %d bytes", InputLength, CompressedLength);
+            "the original section size is %d bytes and the compressed section size is %u bytes", (unsigned) InputLength, (unsigned) CompressedLength);
   TotalLength = CompressedLength + sizeof (EFI_COMPRESSION_SECTION);
   if (TotalLength >= MAX_SECTION_SIZE) {
-    Error (NULL, 0, 2000, "Invalid paramter", "The size of all files exceeds section size limit(%dM).", MAX_SECTION_SIZE>>20);
+    Error (NULL, 0, 2000, "Invalid paramter", "The size of all files exceeds section size limit(%uM).", MAX_SECTION_SIZE>>20);
     if (FileBuffer != NULL) {
       free (FileBuffer);
     }
@@ -573,7 +574,7 @@ Returns:
     }
     return STATUS_ERROR;
   }
-  VerboseMsg ("the size of the created section file is %d bytes", TotalLength);
+  VerboseMsg ("the size of the created section file is %u bytes", (unsigned) TotalLength);
 
   //
   // Add the section header for the compressed data
@@ -708,7 +709,7 @@ Returns:
 
     TotalLength = InputLength + sizeof (CRC32_SECTION_HEADER);
     if (TotalLength >= MAX_SECTION_SIZE) {
-      Error (NULL, 0, 2000, "Invalid paramter", "The size of all files exceeds section size limit(%dM).", MAX_SECTION_SIZE>>20);
+      Error (NULL, 0, 2000, "Invalid paramter", "The size of all files exceeds section size limit(%uM).", MAX_SECTION_SIZE>>20);
       free (FileBuffer);
       return STATUS_ERROR;
     }
@@ -722,12 +723,12 @@ Returns:
     Crc32GuidSect->GuidSectionHeader.Attributes  = EFI_GUIDED_SECTION_AUTH_STATUS_VALID;
     Crc32GuidSect->GuidSectionHeader.DataOffset  = sizeof (CRC32_SECTION_HEADER);
     Crc32GuidSect->CRC32Checksum                 = Crc32Checksum;
-    DebugMsg (NULL, 0, 9, "Guided section", "Data offset is %d", Crc32GuidSect->GuidSectionHeader.DataOffset);
+    DebugMsg (NULL, 0, 9, "Guided section", "Data offset is %u", Crc32GuidSect->GuidSectionHeader.DataOffset);
 
   } else {
     TotalLength = InputLength + sizeof (EFI_GUID_DEFINED_SECTION);
     if (TotalLength >= MAX_SECTION_SIZE) {
-      Error (NULL, 0, 2000, "Invalid paramter", "The size of all files exceeds section size limit(%dM).", MAX_SECTION_SIZE>>20);
+      Error (NULL, 0, 2000, "Invalid paramter", "The size of all files exceeds section size limit(%uM).", MAX_SECTION_SIZE>>20);
       free (FileBuffer);
       return STATUS_ERROR;
     }
@@ -739,10 +740,10 @@ Returns:
     VendorGuidSect->CommonHeader.Size[2]  = (UINT8) ((TotalLength & 0xff0000) >> 16);
     memcpy (&(VendorGuidSect->SectionDefinitionGuid), VendorGuid, sizeof (EFI_GUID));
     VendorGuidSect->Attributes  = DataAttribute;
-    VendorGuidSect->DataOffset  = sizeof (EFI_GUID_DEFINED_SECTION) + DataHeaderSize;
-    DebugMsg (NULL, 0, 9, "Guided section", "Data offset is %d", VendorGuidSect->DataOffset);
+    VendorGuidSect->DataOffset  = (UINT16) (sizeof (EFI_GUID_DEFINED_SECTION) + DataHeaderSize);
+    DebugMsg (NULL, 0, 9, "Guided section", "Data offset is %u", VendorGuidSect->DataOffset);
   }
-  VerboseMsg ("the size of the created section file is %d bytes", TotalLength);
+  VerboseMsg ("the size of the created section file is %u bytes", (unsigned) TotalLength);
   
   //
   // Set OutFileBuffer 
@@ -785,7 +786,7 @@ Returns:
   CHAR8                     *CompressionName;
   CHAR8                     *StringBuffer;
   EFI_GUID                  VendorGuid = mZeroGuid;
-  INT32                     VersionNumber;
+  int                       VersionNumber;
   UINT8                     SectType;
   UINT8                     SectCompSubType;
   UINT16                    SectGuidAttribute; 
@@ -972,7 +973,7 @@ Returns:
         goto Finish;
       }
       if (LogLevel > 9) {
-        Error (NULL, 0, 1003, "Invalid option value", "Debug Level range is 0~9, currnt input level is %d", LogLevel);
+        Error (NULL, 0, 1003, "Invalid option value", "Debug Level range is 0~9, currnt input level is %d", (int) LogLevel);
         goto Finish;
       }
       SetPrintLevel (LogLevel);
@@ -1059,7 +1060,7 @@ Returns:
       SectGuidAttribute = 0;
     }
     VerboseMsg ("Vendor Guid is %08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X", 
-                VendorGuid.Data1,
+                (unsigned) VendorGuid.Data1,
                 VendorGuid.Data2,
                 VendorGuid.Data3,
                 VendorGuid.Data4[0],
@@ -1077,7 +1078,7 @@ Returns:
       VerboseMsg ("Guid Attribute is %s", mGUIDedSectionAttribue[EFI_GUIDED_SECTION_AUTH_STATUS_VALID]);
     }
     if (SectGuidHeaderLength != 0) {
-      VerboseMsg ("Guid Data Header size is 0x%x", SectGuidHeaderLength);
+      VerboseMsg ("Guid Data Header size is 0x%llx", (unsigned long long) SectGuidHeaderLength);
     }
   } else if (stricmp (SectionName, mSectionTypeName[EFI_SECTION_PE32]) == 0) {
     SectType = EFI_SECTION_PE32;
@@ -1087,6 +1088,8 @@ Returns:
     SectType = EFI_SECTION_TE;
   } else if (stricmp (SectionName, mSectionTypeName[EFI_SECTION_DXE_DEPEX]) == 0) {
     SectType = EFI_SECTION_DXE_DEPEX;
+  } else if (stricmp (SectionName, mSectionTypeName[EFI_SECTION_SMM_DEPEX]) == 0) {
+    SectType = EFI_SECTION_SMM_DEPEX;
   } else if (stricmp (SectionName, mSectionTypeName[EFI_SECTION_VERSION]) == 0) {
     SectType = EFI_SECTION_VERSION;
     if (VersionNumber < 0 || VersionNumber > 9999) {
@@ -1139,7 +1142,7 @@ Returns:
   // Check whether there is output file
   //
   for (Index = 0; Index < InputFileNum; Index ++) {
-    VerboseMsg ("the %dth input file name is %s", Index, InputFileName[Index]);
+    VerboseMsg ("the %uth input file name is %s", (unsigned) Index, InputFileName[Index]);
   }
   if (OutputFileName == NULL) {
     Error (NULL, 0, 1001, "Missing options", "Output file");
@@ -1199,7 +1202,7 @@ Returns:
     VersionSect->CommonHeader.Size[2]  = (UINT8) ((Index & 0xff0000) >> 16);
     VersionSect->BuildNumber           = (UINT16) VersionNumber;
     Ascii2UnicodeString (StringBuffer, VersionSect->VersionString);
-    VerboseMsg ("the size of the created section file is %d bytes", Index);
+    VerboseMsg ("the size of the created section file is %u bytes", (unsigned) Index);
     break;
 
   case EFI_SECTION_USER_INTERFACE:
@@ -1219,7 +1222,7 @@ Returns:
     UiSect->CommonHeader.Size[1]  = (UINT8) ((Index & 0xff00) >> 8);
     UiSect->CommonHeader.Size[2]  = (UINT8) ((Index & 0xff0000) >> 16);
     Ascii2UnicodeString (StringBuffer, UiSect->FileNameString);
-    VerboseMsg ("the size of the created section file is %d bytes", Index);
+    VerboseMsg ("the size of the created section file is %u bytes", (unsigned) Index);
    break;
 
   case EFI_SECTION_ALL:
@@ -1250,7 +1253,7 @@ Returns:
                 &InputLength
                 );
     }
-    VerboseMsg ("the size of the created section file is %d bytes", InputLength);
+    VerboseMsg ("the size of the created section file is %u bytes", (unsigned) InputLength);
     break;
   default:
     //
@@ -1266,7 +1269,7 @@ Returns:
   }
   
   if (Status != EFI_SUCCESS || OutFileBuffer == NULL) {
-    Error (NULL, 0, 2000, "Status is not successful", "Status value is 0x%X", (UINTN) Status);
+    Error (NULL, 0, 2000, "Status is not successful", "Status value is 0x%X", (int) Status);
 	  goto Finish;
   }
 

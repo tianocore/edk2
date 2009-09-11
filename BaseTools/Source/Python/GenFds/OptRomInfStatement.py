@@ -48,7 +48,15 @@ class OptRomInfStatement (FfsInfStatement):
         
         if self.OverrideAttribs == None:
             self.OverrideAttribs = OptionRom.OverrideAttribs()
-        
+
+        if self.OverrideAttribs.NeedCompress == None:
+            self.OverrideAttribs.NeedCompress = self.OptRomDefs.get ('COMPRESS')
+            if self.OverrideAttribs.NeedCompress is not None:
+                if self.OverrideAttribs.NeedCompress.upper() not in ('TRUE', 'FALSE'):
+                    GenFdsGlobalVariable.ErrorLogger( "Expected TRUE/FALSE for COMPRESS: %s" %self.InfFileName)
+                self.OverrideAttribs.NeedCompress = \
+                    self.OverrideAttribs.NeedCompress.upper() == 'TRUE'
+
         if self.OverrideAttribs.PciVendorId == None:
             self.OverrideAttribs.PciVendorId = self.OptRomDefs.get ('PCI_VENDOR_ID')
         

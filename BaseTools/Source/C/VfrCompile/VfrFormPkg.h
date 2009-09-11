@@ -254,7 +254,7 @@ public:
 
   VOID DecLength (UINT8 Size) {
     if (mHeader->Length >= Size) {
-	  mHeader -= Size;
+      mHeader -= Size;
     }
   }
 
@@ -358,7 +358,7 @@ public:
 
   VOID SetVarStoreInfo (IN EFI_VARSTORE_INFO *Info) {
     mHeader->VarStoreId             = Info->mVarStoreId;
-	  mHeader->VarStoreInfo.VarName   = Info->mInfo.mVarName;
+    mHeader->VarStoreInfo.VarName   = Info->mInfo.mVarName;
     mHeader->VarStoreInfo.VarOffset = Info->mInfo.mVarOffset;
   }
 
@@ -398,7 +398,8 @@ public:
   }
 };
 
-static CIfrQuestionHeader *gCurrentQuestion = NULL;
+static CIfrQuestionHeader *gCurrentQuestion  = NULL;
+static CIfrObj            *gCurrentIfrOpcode = NULL;
 
 /*
  * The definition of CIfrMinMaxStepData
@@ -537,6 +538,12 @@ public:
   }
 
   EFI_VFR_RETURN_CODE SetFormId (IN EFI_FORM_ID FormId) {
+    if (FormId == 0) {
+      //
+      // FormId can't be 0.
+      //
+      return VFR_RETURN_INVALID_PARAMETER;
+    }
     if (CIfrForm::ChekFormIdFree (FormId) == FALSE) {
       return VFR_RETURN_FORMID_REDEFINED;
     }
@@ -688,7 +695,7 @@ public:
     ) : CIfrObj (EFI_IFR_DEFAULT_OP, (CHAR8 **)&mDefault),
         CIfrOpHeader (EFI_IFR_DEFAULT_OP, &mDefault->Header) {
     mDefault->Type      = Type;
-	  mDefault->Value     = Value;
+    mDefault->Value     = Value;
     mDefault->DefaultId = DefaultId;
   }
 
@@ -722,7 +729,7 @@ private:
 public:
   CIfrSubtitle () : CIfrObj (EFI_IFR_SUBTITLE_OP, (CHAR8 **)&mSubtitle),
                   CIfrOpHeader (EFI_IFR_SUBTITLE_OP, &mSubtitle->Header),
-				  CIfrStatementHeader (&mSubtitle->Statement) {
+  CIfrStatementHeader (&mSubtitle->Statement) {
     mSubtitle->Flags = 0;
   }
 
@@ -856,7 +863,7 @@ private:
 public:
   CIfrResetButton () : CIfrObj (EFI_IFR_RESET_BUTTON_OP, (CHAR8 **)&mResetButton),
                        CIfrOpHeader (EFI_IFR_RESET_BUTTON_OP, &mResetButton->Header), 
-					   CIfrStatementHeader (&mResetButton->Question.Header) {
+  CIfrStatementHeader (&mResetButton->Statement) {
     mResetButton->DefaultId = EFI_HII_DEFAULT_CLASS_STANDARD;
   }
 
@@ -874,11 +881,11 @@ public:
                      CIfrOpHeader (EFI_IFR_CHECKBOX_OP, &mCheckBox->Header), 
                      CIfrQuestionHeader (&mCheckBox->Question) {
     mCheckBox->Flags = 0;
-    gCurrentQuestion = this;
+    gCurrentQuestion  = this;
   }
 
   ~CIfrCheckBox () {
-    gCurrentQuestion = NULL;
+    gCurrentQuestion  = NULL;
   }
 
   EFI_VFR_RETURN_CODE SetFlags (IN UINT8 HFlags, UINT8 LFlags) {
@@ -974,11 +981,13 @@ public:
                    CIfrQuestionHeader (&mNumeric->Question),
                    CIfrMinMaxStepData (&mNumeric->data) {
     mNumeric->Flags  = EFI_IFR_NUMERIC_SIZE_1 | EFI_IFR_DISPLAY_UINT_DEC;
-    gCurrentQuestion = this;
+    gCurrentQuestion  = this;
+    gCurrentIfrOpcode = this;
   }
 
   ~CIfrNumeric () {
-    gCurrentQuestion = NULL;
+    gCurrentQuestion  = NULL;
+    gCurrentIfrOpcode = NULL;
   }
 
   EFI_VFR_RETURN_CODE SetFlags (IN UINT8 HFlags, IN UINT8 LFlags) {
@@ -1008,11 +1017,13 @@ public:
                  CIfrQuestionHeader (&mOneOf->Question),
                  CIfrMinMaxStepData (&mOneOf->data) {
     mOneOf->Flags    = 0;
-    gCurrentQuestion = this;
+    gCurrentQuestion  = this;
+    gCurrentIfrOpcode = this;
   }
 
   ~CIfrOneOf () {
-    gCurrentQuestion = NULL;
+    gCurrentQuestion  = NULL;
+    gCurrentIfrOpcode = NULL;
   }
 
   EFI_VFR_RETURN_CODE SetFlags (IN UINT8 HFlags, IN UINT8 LFlags) {

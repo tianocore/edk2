@@ -44,6 +44,7 @@ class FV (FvClassObject):
         self.BaseAddress = None
         self.InfFileName = None
         self.FvAddressFileName = None
+        self.CapsuleName = None
 
     ## AddToBuffer()
     #
@@ -61,10 +62,27 @@ class FV (FvClassObject):
     #
     def AddToBuffer (self, Buffer, BaseAddress=None, BlockSize= None, BlockNum=None, ErasePloarity='1', VtfDict=None, MacroDict = {}) :
 
-        if self.UiFvName.upper() in GenFds.FvBinDict.keys():
-            return GenFds.FvBinDict[self.UiFvName.upper()]
+        if self.UiFvName.upper() + 'fv' in GenFds.ImageBinDict.keys():
+            return GenFds.ImageBinDict[self.UiFvName.upper() + 'fv']
+        
+        #
+        # Check whether FV in Capsule is in FD flash region.
+        # If yes, return error. Doesn't support FV in Capsule image is also in FD flash region.
+        #
+        if self.CapsuleName != None:
+            for FdName in GenFdsGlobalVariable.FdfParser.Profile.FdDict.keys():
+                FdObj = GenFdsGlobalVariable.FdfParser.Profile.FdDict[FdName]
+                for RegionObj in FdObj.RegionList:
+                    if RegionObj.RegionType == 'FV':
+                        for RegionData in RegionObj.RegionDataList:
+                            if RegionData.endswith(".fv"):
+                                continue
+                            elif RegionData.upper() + 'fv' in GenFds.ImageBinDict.keys():
+                                continue
+                            elif self.UiFvName.upper() == RegionData.upper():
+                               GenFdsGlobalVariable.ErrorLogger("Capsule %s in FD region can't contain a FV %s in FD region." % (self.CapsuleName, self.UiFvName.upper()))
 
-        GenFdsGlobalVariable.InfLogger( "\nGenerating %s FV ..." %self.UiFvName)
+        GenFdsGlobalVariable.InfLogger( "\nGenerating %s FV" %self.UiFvName)
 
         self.__InitializeInf__(BaseAddress, BlockSize, BlockNum, ErasePloarity, VtfDict)
         #
@@ -115,12 +133,12 @@ class FV (FvClassObject):
         #
         FvFileObj = open ( FvOutputFile,'r+b')
 
-        GenFdsGlobalVariable.InfLogger( "\nGenerate %s FV Successfully" %self.UiFvName)
+        GenFdsGlobalVariable.VerboseLogger( "\nGenerate %s FV Successfully" %self.UiFvName)
         GenFdsGlobalVariable.SharpCounter = 0
 
         Buffer.write(FvFileObj.read())
         FvFileObj.close()
-        GenFds.FvBinDict[self.UiFvName.upper()] = FvOutputFile
+        GenFds.ImageBinDict[self.UiFvName.upper() + 'fv'] = FvOutputFile
         return FvOutputFile
 
     ## __InitializeInf__()

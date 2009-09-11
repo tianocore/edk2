@@ -171,9 +171,15 @@ def CreateHFileContent(BaseName, UniObjectClass):
         if Name != None:
             Line = ''
             if Referenced == True:
-                Line = DEFINE_STR + ' ' + Name + ' ' * (ValueStartPtr - len(DEFINE_STR + Name)) + DecToHexStr(Token, 4)
+                if (ValueStartPtr - len(DEFINE_STR + Name)) <= 0:
+                    Line = DEFINE_STR + ' ' + Name + ' ' + DecToHexStr(Token, 4)
+                else:
+                    Line = DEFINE_STR + ' ' + Name + ' ' * (ValueStartPtr - len(DEFINE_STR + Name)) + DecToHexStr(Token, 4)
             else:
-                Line = COMMENT_DEFINE_STR + ' ' + Name + ' ' * (ValueStartPtr - len(DEFINE_STR + Name)) + DecToHexStr(Token, 4) + COMMENT_NOT_REFERENCED
+                if (ValueStartPtr - len(DEFINE_STR + Name)) <= 0:
+                    Line = COMMENT_DEFINE_STR + ' ' + Name + ' ' + DecToHexStr(Token, 4) + COMMENT_NOT_REFERENCED
+                else:
+                    Line = COMMENT_DEFINE_STR + ' ' + Name + ' ' * (ValueStartPtr - len(DEFINE_STR + Name)) + DecToHexStr(Token, 4) + COMMENT_NOT_REFERENCED
             Str = WriteLine(Str, Line)
 
     Str =  WriteLine(Str, '')

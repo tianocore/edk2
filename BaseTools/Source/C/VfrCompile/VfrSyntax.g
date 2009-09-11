@@ -1078,7 +1078,7 @@ vfrStatementRules :
 vfrStatementDefault :
   <<
      BOOLEAN               IsExp         = FALSE;
-     EFI_IFR_TYPE_VALUE    Val = gZeroEfiIfrTypeValue;
+     EFI_IFR_TYPE_VALUE    Val           = gZeroEfiIfrTypeValue;
      CIfrDefault           DObj;
      EFI_DEFAULT_ID        DefaultId     = EFI_HII_DEFAULT_CLASS_STANDARD;
      CHAR8                 *VarStoreName = NULL;
@@ -1087,9 +1087,73 @@ vfrStatementDefault :
   D:Default                                         << DObj.SetLineNo(D->getLine()); >>
   (
     (
-        vfrStatementValue ","                       << IsExp = TRUE; DObj.SetScope (1); >>
-      | "=" vfrConstantValueField[_GET_CURRQEST_DATATYPE()] > [Val] ","
-                                                    << DObj.SetType (_GET_CURRQEST_DATATYPE()); DObj.SetValue(Val); >>
+        vfrStatementValue ","                       << IsExp = TRUE; DObj.SetScope (1); CIfrEnd EndObj1; EndObj1.SetLineNo(D->getLine()); >>
+      | "=" vfrConstantValueField[_GET_CURRQEST_DATATYPE()] > [Val] ","  << 
+
+                                                        if (gCurrentIfrOpcode != NULL && gCurrentIfrOpcode->GetObjBinAddr() != NULL) {
+                                                          EFI_IFR_OP_HEADER *TempOpCode;
+                                                          TempOpCode = (EFI_IFR_OP_HEADER *) gCurrentIfrOpcode->GetObjBinAddr();
+                                                          switch (TempOpCode->OpCode) {
+                                                          case EFI_IFR_NUMERIC_OP:
+                                                            EFI_IFR_NUMERIC *TempNumricCode;
+                                                            TempNumricCode = (EFI_IFR_NUMERIC *) TempOpCode;
+                                                            switch (_GET_CURRQEST_DATATYPE()) {
+                                                            case EFI_IFR_TYPE_NUM_SIZE_64:
+                                                              if (Val.u64 < TempNumricCode->data.u64.MinValue || Val.u64 > TempNumricCode->data.u64.MaxValue) {
+                                                                _PCATCH (VFR_RETURN_INVALID_PARAMETER, D->getLine(), "Numeric default value must be between MinValue and MaxValue.");
+                                                              }
+                                                              break;
+                                                            case EFI_IFR_TYPE_NUM_SIZE_32:
+                                                              if (Val.u32 < TempNumricCode->data.u32.MinValue || Val.u32 > TempNumricCode->data.u32.MaxValue) {
+                                                                _PCATCH (VFR_RETURN_INVALID_PARAMETER, D->getLine(), "Numeric default value must be between MinValue and MaxValue.");
+                                                              }
+                                                              break;
+                                                            case EFI_IFR_TYPE_NUM_SIZE_16:
+                                                              if (Val.u16 < TempNumricCode->data.u16.MinValue || Val.u16 > TempNumricCode->data.u16.MaxValue) {
+                                                                _PCATCH (VFR_RETURN_INVALID_PARAMETER, D->getLine(), "Numeric default value must be between MinValue and MaxValue.");
+                                                              }
+                                                              break;
+                                                            case EFI_IFR_TYPE_NUM_SIZE_8:
+                                                              if (Val.u8 < TempNumricCode->data.u8.MinValue || Val.u8 > TempNumricCode->data.u8.MaxValue) {
+                                                                _PCATCH (VFR_RETURN_INVALID_PARAMETER, D->getLine(), "Numeric default value must be between MinValue and MaxValue.");
+                                                              }
+                                                              break;
+                                                            }
+                                                            break;
+                                                          case EFI_IFR_ONE_OF_OP:
+                                                            EFI_IFR_ONE_OF *TempOneOfCode;
+                                                            TempOneOfCode = (EFI_IFR_ONE_OF *) TempOpCode;
+                                                            if (TempOneOfCode->data.u64.MinValue != 0 || TempOneOfCode->data.u64.MaxValue != 0 || TempOneOfCode->data.u64.Step != 0) {
+                                                              //OneOf MinMaxStep Data is set, Val value will be checked for MinMaxStep.
+                                                              switch (_GET_CURRQEST_DATATYPE()) {
+                                                              case EFI_IFR_TYPE_NUM_SIZE_64:
+                                                                if (Val.u64 < TempOneOfCode->data.u64.MinValue || Val.u64 > TempOneOfCode->data.u64.MaxValue) {
+                                                                  _PCATCH (VFR_RETURN_INVALID_PARAMETER, D->getLine(), "OneOf default value must be between MinValue and MaxValue.");
+                                                                }
+                                                                break;
+                                                              case EFI_IFR_TYPE_NUM_SIZE_32:
+                                                                if (Val.u32 < TempOneOfCode->data.u32.MinValue || Val.u32 > TempOneOfCode->data.u32.MaxValue) {
+                                                                  _PCATCH (VFR_RETURN_INVALID_PARAMETER, D->getLine(), "OneOf default value must be between MinValue and MaxValue.");
+                                                                }
+                                                                break;
+                                                              case EFI_IFR_TYPE_NUM_SIZE_16:
+                                                                if (Val.u16 < TempOneOfCode->data.u16.MinValue || Val.u16 > TempOneOfCode->data.u16.MaxValue) {
+                                                                  _PCATCH (VFR_RETURN_INVALID_PARAMETER, D->getLine(), "OneOf default value must be between MinValue and MaxValue.");
+                                                                }
+                                                                break;
+                                                              case EFI_IFR_TYPE_NUM_SIZE_8:
+                                                                if (Val.u8 < TempOneOfCode->data.u8.MinValue || Val.u8 > TempOneOfCode->data.u8.MaxValue) {
+                                                                  _PCATCH (VFR_RETURN_INVALID_PARAMETER, D->getLine(), "OneOf default value must be between MinValue and MaxValue.");
+                                                                }
+                                                                break;
+                                                              }
+                                                            }
+                                                            break;
+                                                          }
+                                                        }
+                                                        DObj.SetType (_GET_CURRQEST_DATATYPE()); 
+                                                        DObj.SetValue(Val);
+                                                    >>
     )
     {
       DefaultStore "=" SN:StringIdentifier ","      << _PCATCH(mCVfrDefaultStore.GetDefaultId (SN->getText(), &DefaultId), SN); DObj.SetDefaultId (DefaultId); >>
@@ -1167,7 +1231,7 @@ flagsField :
 vfrStatementValue :
   << CIfrValue VObj; >>
   V:Value                                              << VObj.SetLineNo(V->getLine()); >>
-  "=" vfrStatementExpression[0]
+  "=" vfrStatementExpression[0]                        << {CIfrEnd EndObj; EndObj.SetLineNo(V->getLine());} >>
   ;
 
 vfrStatementSubTitle :
@@ -1588,15 +1652,30 @@ vfrStatementDate :
   ;
 
 minMaxDateStepDefault[EFI_HII_DATE & D, UINT8 KeyValue] :
-  Minimum   "=" Number ","
-  Maximum   "=" Number ","
+  Minimum   "=" MinN:Number ","
+  Maximum   "=" MaxN:Number ","
   { "step"    "=" Number "," }
   {
     "default" "=" N:Number ","                         <<
                                                           switch (KeyValue) {
-                                                          case 0: D.Year  = _STOU16(N->getText()); break;
-                                                          case 1: D.Month = _STOU8(N->getText()); break;
-                                                          case 2: D.Day   = _STOU8(N->getText()); break;
+                                                          case 0: 
+                                                            D.Year  = _STOU16(N->getText());
+                                                            if (D.Year < _STOU16 (MinN->getText()) || D.Year > _STOU16 (MaxN->getText())) {
+                                                              _PCATCH (VFR_RETURN_INVALID_PARAMETER, N->getLine(), "Year default value must be between Min year and Max year.");
+                                                            }
+                                                            break;
+                                                          case 1: 
+                                                            D.Month = _STOU8(N->getText()); 
+                                                            if (D.Month < 1 || D.Month > 12) {
+                                                              _PCATCH (VFR_RETURN_INVALID_PARAMETER, N->getLine(), "Month default value must be between 1 and 12.");
+                                                            }
+                                                            break;
+                                                          case 2: 
+                                                            D.Day = _STOU8(N->getText()); 
+                                                            if (D.Day < 1 || D.Day > 31) {
+                                                              _PCATCH (VFR_RETURN_INVALID_PARAMETER, N->getLine(), "Day default value must be between 1 and 31.");
+                                                            }
+                                                            break;
                                                           }
                                                        >>
   }
@@ -1642,10 +1721,30 @@ vfrSetMinMaxStep[CIfrMinMaxStepData & MMSDObj] :
   Maximum   "=" A:Number ","
                                                        <<
                                                           switch (_GET_CURRQEST_DATATYPE ()) {
-                                                          case EFI_IFR_TYPE_NUM_SIZE_64 : MaxU8 = _STOU64(A->getText()); break;
-                                                          case EFI_IFR_TYPE_NUM_SIZE_32 : MaxU4 = _STOU32(A->getText()); break;
-                                                          case EFI_IFR_TYPE_NUM_SIZE_16 : MaxU2 = _STOU16(A->getText()); break;
-                                                          case EFI_IFR_TYPE_NUM_SIZE_8 :  MaxU1 = _STOU8(A->getText());  break;
+                                                          case EFI_IFR_TYPE_NUM_SIZE_64 : 
+                                                            MaxU8 = _STOU64(A->getText()); 
+                                                            if (MaxU8 < MinU8) {
+                                                              _PCATCH (VFR_RETURN_INVALID_PARAMETER, A->getLine(), "Maximum can't be less than Minimum");
+                                                            }
+                                                            break;
+                                                          case EFI_IFR_TYPE_NUM_SIZE_32 : 
+                                                            MaxU4 = _STOU32(A->getText()); 
+                                                            if (MaxU4 < MinU4) {
+                                                              _PCATCH (VFR_RETURN_INVALID_PARAMETER, A->getLine(), "Maximum can't be less than Minimum");
+                                                            }
+                                                            break;
+                                                          case EFI_IFR_TYPE_NUM_SIZE_16 : 
+                                                            MaxU2 = _STOU16(A->getText()); 
+                                                            if (MaxU2 < MinU2) {
+                                                              _PCATCH (VFR_RETURN_INVALID_PARAMETER, A->getLine(), "Maximum can't be less than Minimum");
+                                                            }
+                                                            break;
+                                                          case EFI_IFR_TYPE_NUM_SIZE_8 :  
+                                                            MaxU1 = _STOU8(A->getText());  
+                                                            if (MaxU1 < MinU1) {
+                                                              _PCATCH (VFR_RETURN_INVALID_PARAMETER, A->getLine(), "Maximum can't be less than Minimum");
+                                                            }
+                                                            break;
                                                           }
                                                        >>
   {
@@ -1894,9 +1993,24 @@ minMaxTimeStepDefault[EFI_HII_TIME & T, UINT8 KeyValue] :
   {
     "default" "=" N:Number ","                         <<
                                                           switch (KeyValue) {
-                                                          case 0: T.Hour   = _STOU8(N->getText()); break;
-                                                          case 1: T.Minute = _STOU8(N->getText()); break;
-                                                          case 2: T.Second = _STOU8(N->getText()); break;
+                                                          case 0: 
+                                                            T.Hour   = _STOU8(N->getText()); 
+                                                            if (T.Hour > 23) {
+                                                              _PCATCH (VFR_RETURN_INVALID_PARAMETER, N->getLine(), "Hour default value must be between 0 and 23.");
+                                                            }
+                                                            break;
+                                                          case 1: 
+                                                            T.Minute = _STOU8(N->getText()); 
+                                                            if (T.Minute > 59) {
+                                                              _PCATCH (VFR_RETURN_INVALID_PARAMETER, N->getLine(), "Minute default value must be between 0 and 59.");
+                                                            }
+                                                            break;
+                                                          case 2: 
+                                                            T.Second = _STOU8(N->getText());
+                                                            if (T.Second > 59) {
+                                                              _PCATCH (VFR_RETURN_INVALID_PARAMETER, N->getLine(), "Second default value must be between 0 and 59.");
+                                                            }
+                                                            break;
                                                           }
                                                        >>
   }
@@ -3090,7 +3204,6 @@ public:
 
   VOID                _STRCAT (IN OUT CHAR8 **, IN CHAR8 *);
 
-  VOID                _CRGUID (EFI_GUID *, CHAR8 *, CHAR8 *, CHAR8 *, CHAR8 *, CHAR8 *, CHAR8 *, CHAR8 *, CHAR8 *, CHAR8 *, CHAR8 *, CHAR8 *);
   VOID                _DeclareDefaultLinearVarStore (IN UINT32);
   VOID                _DeclareStandardDefaultStorage (IN UINT32);
   VOID                _DeclareDefaultFrameworkVarStore (IN UINT32);
@@ -3488,35 +3601,6 @@ EfiVfrParser::_STRCAT (
   strcat (NewStr, Src);
 
   *Dest = NewStr;
-}
-
-VOID
-EfiVfrParser::_CRGUID (
-  IN EFI_GUID *Guid,
-  IN CHAR8    *G1,
-  IN CHAR8    *G2,
-  IN CHAR8    *G3,
-  IN CHAR8    *G4,
-  IN CHAR8    *G5,
-  IN CHAR8    *G6,
-  IN CHAR8    *G7,
-  IN CHAR8    *G8,
-  IN CHAR8    *G9,
-  IN CHAR8    *G10,
-  IN CHAR8    *G11
-  )
-{
-  Guid->Data1 = _STOU32 (G1);
-  Guid->Data2 = _STOU16 (G2);
-  Guid->Data3 = _STOU16 (G3);
-  Guid->Data4[0] = _STOU8(G4);
-  Guid->Data4[1] = _STOU8(G5);
-  Guid->Data4[2] = _STOU8(G6);
-  Guid->Data4[3] = _STOU8(G7);
-  Guid->Data4[4] = _STOU8(G8);
-  Guid->Data4[5] = _STOU8(G9);
-  Guid->Data4[6] = _STOU8(G10);
-  Guid->Data4[7] = _STOU8(G11);
 }
 
 //

@@ -26,7 +26,7 @@
 #include <stdarg.h>
 
 //
-// Modifiers to absract standard types to aid in debug of problems
+// Modifiers to abstract standard types to aid in debug of problems
 //
 #define CONST     const
 #define STATIC    static
@@ -38,8 +38,8 @@
 //
 #ifndef IN
 //
-// Some other envirnments use this construct, so #ifndef to prevent
-// mulitple definition.
+// Some other environments use this construct, so #ifndef to prevent
+// multiple definition.
 //
 #define IN
 #define OUT
@@ -68,13 +68,13 @@
 //
 //  Support for variable length argument lists using the ANSI standard.
 //  
-//  Since we are using the ANSI standard we used the standard nameing and
-//  did not folow the coding convention
+//  Since we are using the ANSI standard we used the standard naming and
+//  did not follow the coding convention
 //
 //  VA_LIST  - typedef for argument list.
 //  VA_START (VA_LIST Marker, argument before the ...) - Init Marker for use.
 //  VA_END (VA_LIST Marker) - Clear Marker
-//  VA_ARG (VA_LIST Marker, var arg size) - Use Marker to get an argumnet from
+//  VA_ARG (VA_LIST Marker, var arg size) - Use Marker to get an argument from
 //    the ... list. You must know the size and pass it in this macro.
 //
 //  example:
@@ -136,12 +136,12 @@
 #define _CR(Record, TYPE, Field)  ((TYPE *) ((CHAR8 *) (Record) - (CHAR8 *) &(((TYPE *) 0)->Field)))
 
 ///
-///  ALIGN_POINTER - aligns a pointer to the lowest boundry
+///  ALIGN_POINTER - aligns a pointer to the lowest boundary
 ///
 #define ALIGN_POINTER(p, s) ((VOID *) ((UINTN)(p) + (((s) - ((UINTN) (p))) & ((s) - 1))))
 
 ///
-///  ALIGN_VARIABLE - aligns a variable up to the next natural boundry for int size of a processor
+///  ALIGN_VARIABLE - aligns a variable up to the next natural boundary for int size of a processor
 ///
 #define ALIGN_VARIABLE(Value, Adjustment) \
   Adjustment = 0U; \

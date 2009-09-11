@@ -45,6 +45,7 @@ class CapsuleFfs (CapsuleData):
     #
     def __init_(self) :
         self.Ffs = None
+        self.FvName = None
 
     ## generate FFS capsule data
     #
@@ -64,7 +65,9 @@ class CapsuleFv (CapsuleData):
     #   @param  self        The object pointer
     #
     def __init__(self) :
+        self.Ffs = None
         self.FvName = None
+        self.CapsuleName = None
 
     ## generate FV capsule data
     #
@@ -76,9 +79,11 @@ class CapsuleFv (CapsuleData):
             if self.FvName.upper() in GenFdsGlobalVariable.FdfParser.Profile.FvDict.keys():
                 FvObj = GenFdsGlobalVariable.FdfParser.Profile.FvDict.get(self.FvName.upper())
                 FdBuffer = StringIO.StringIO('')
+                FvObj.CapsuleName = self.CapsuleName
                 FvFile = FvObj.AddToBuffer(FdBuffer)
+                FvObj.CapsuleName = None
+                FdBuffer.close()
                 return FvFile
-            
         else:
             FvFile = GenFdsGlobalVariable.ReplaceWorkspaceMacro(self.FvName)
             return FvFile

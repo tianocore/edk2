@@ -22,6 +22,7 @@ Abstract:
 #include <stdlib.h>
 #include <string.h>
 
+#include "ParseInf.h"
 #include "EfiUtilityMsgs.h"
 #include "CommonLib.h"
 #include "Crc32.h"
@@ -104,7 +105,7 @@ Returns:
 
 int
 main (
-  INT32 argc,
+  int   argc,
   CHAR8 *argv[]
   )
 /*++
@@ -222,7 +223,7 @@ Returns:
         goto Finish;
       }
       if (LogLevel > 9) {
-        Error (NULL, 0, 1003, "Invalid option value", "Debug Level range is 0-9, current input level is %d", LogLevel);
+        Error (NULL, 0, 1003, "Invalid option value", "Debug Level range is 0-9, current input level is %d", (int) LogLevel);
         goto Finish;
       }
       SetPrintLevel (LogLevel);
@@ -294,7 +295,7 @@ Returns:
   
   fread (FileBuffer, 1, FileSize, InFile);
   fclose (InFile);
-  VerboseMsg ("the size of the input file is %d bytes", FileSize);
+  VerboseMsg ("the size of the input file is %u bytes", (unsigned) FileSize);
   
   //
   // Open output file
@@ -318,9 +319,9 @@ Returns:
     // Done, write output file.
     //
     fwrite (&Crc32Value, 1, sizeof (Crc32Value), OutFile);
-    VerboseMsg ("The calculated CRC32 value is 0x%08x", Crc32Value);
+    VerboseMsg ("The calculated CRC32 value is 0x%08x", (unsigned) Crc32Value);
     fwrite (FileBuffer, 1, FileSize, OutFile);
-    VerboseMsg ("the size of the encoded file is %d bytes", FileSize + sizeof (UINT32));
+    VerboseMsg ("the size of the encoded file is %u bytes", (unsigned) FileSize + sizeof (UINT32));
   } else {
     //
     // Verify Crc32 Value
@@ -330,7 +331,7 @@ Returns:
       Error (NULL, 0, 3000, "Invalid", "Calculate CRC32 value failed!");
       goto Finish;
     }
-    VerboseMsg ("The calculated CRC32 value is 0x%08x and File Crc32 value is 0x%08x", Crc32Value, *(UINT32 *)FileBuffer);
+    VerboseMsg ("The calculated CRC32 value is 0x%08x and File Crc32 value is 0x%08x", (unsigned) Crc32Value, (unsigned) (*(UINT32 *)FileBuffer));
     if (Crc32Value != *(UINT32 *)FileBuffer) {
       Error (NULL, 0, 3000, "Invalid", "CRC32 value of input file is not correct!");
       Status = STATUS_ERROR;
@@ -340,7 +341,7 @@ Returns:
     // Done, write output file.
     //
     fwrite (FileBuffer + sizeof (UINT32), 1, FileSize - sizeof (UINT32), OutFile);
-    VerboseMsg ("the size of the decoded file is %d bytes", FileSize - sizeof (UINT32));
+    VerboseMsg ("the size of the decoded file is %u bytes", (unsigned) FileSize - sizeof (UINT32));
   }
 
 Finish:

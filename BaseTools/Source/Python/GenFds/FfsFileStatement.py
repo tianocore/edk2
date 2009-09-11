@@ -78,8 +78,7 @@ class FileStatement (FileStatementClassObject) :
             if self.FdName.upper() not in GenFdsGlobalVariable.FdfParser.Profile.FdDict.keys():
                 EdkLogger.error("GenFds", GENFDS_ERROR, "FD (%s) is NOT described in FDF file!" % (self.FdName))
             Fd = GenFdsGlobalVariable.FdfParser.Profile.FdDict.get(self.FdName.upper())
-            FvBin = {}
-            FileName = Fd.GenFd(FvBin)
+            FileName = Fd.GenFd()
             SectionFiles = [FileName]
 
         elif self.FileName != None:
