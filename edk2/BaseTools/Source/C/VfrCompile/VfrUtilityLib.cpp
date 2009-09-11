@@ -870,7 +870,7 @@ CVfrVarDataTypeDB::Pack (
     SVfrPackStackNode *pNode = NULL;
 
     if (mPackStack == NULL) {
-      gCVfrErrorHandle.PrintMsg (LineNum, "", "Warning", "#pragma pack(pop...) : more pops than pushes");
+      gCVfrErrorHandle.PrintMsg (LineNum, "", "Error", "#pragma pack(pop...) : more pops than pushes");
     }
 
     for (pNode = mPackStack; pNode != NULL; pNode = pNode->mNext) {
@@ -884,7 +884,7 @@ CVfrVarDataTypeDB::Pack (
   if (Action & VFR_PACK_ASSIGN) {
     PackAlign = (Number > 1) ? Number + Number % 2 : Number;
     if ((PackAlign == 0) || (PackAlign > 16)) {
-      gCVfrErrorHandle.PrintMsg (LineNum, "", "Warning", "expected pragma parameter to be '1', '2', '4', '8', or '16'");
+      gCVfrErrorHandle.PrintMsg (LineNum, "", "Error", "expected pragma parameter to be '1', '2', '4', '8', or '16'");
     } else {
       mPackAlign = PackAlign;
     }

@@ -3,7 +3,7 @@
 @REM   however it may be executed directly from the BaseTools project folder
 @REM   if the file is not executed within a WORKSPACE\BaseTools folder.
 @REM
-@REM Copyright (c) 2006 - 2008, Intel Corporation.  All rights reserved.
+@REM Copyright (c) 2006 - 2009, Intel Corporation.  All rights reserved.
 @REM
 @REM This program and the accompanying materials are licensed and made available
 @REM under the terms and conditions of the BSD Licensewhich accompanies this 
@@ -261,7 +261,7 @@ goto end
       set PYTHON_HOME=%PYTHONHOME%
     ) else (
       echo.
-      echo  !!! ERROR !!! PYTHON is required to build or execute the tools !!!
+      echo  !!! ERROR !!! PYTHON_HOME is required to build or execute the tools, please set it. !!!
       echo.
       goto end
     )

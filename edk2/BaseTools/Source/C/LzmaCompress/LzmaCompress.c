@@ -208,7 +208,7 @@ int main2(int numArgs, const char *args[], char *rs)
   CFileSeqInStream inStream;
   CFileOutStream outStream;
   int res;
-  int encodeMode;
+  int encodeMode = 0;
   Bool modeWasSet = False;
   const char *inputFile = NULL;
   const char *outputFile = "file.tmp";

@@ -201,7 +201,11 @@ CVfrErrorHandle::PrintMsg (
 {
   CHAR8                  *FileName = NULL;
   UINT32                 FileLine;
-
+  
+  if (strncmp ("Warning", MsgType, strlen ("Warning")) == 0) {
+    VerboseMsg (ErrorMsg);
+    return;
+  }
   GetFileNameLineNum (LineNum, &FileName, &FileLine);
   Error (FileName, FileLine, 0x3000, TokName, "\t%s\n", ErrorMsg);
 }

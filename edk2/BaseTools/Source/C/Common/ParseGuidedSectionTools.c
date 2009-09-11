@@ -122,6 +122,7 @@ Returns:
   GUID_SEC_TOOL_ENTRY *NewGuidTool;
 
   FirstGuidTool = NULL;
+  LastGuidTool  = NULL;
 
   while (TRUE) {
     NextLine = ReadMemoryFileLine (InputFile);

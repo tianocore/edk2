@@ -84,7 +84,7 @@ STATIC UINT16 *mFreq, *mSortPtr, mLenCnt[17], mLeft[2 * NC - 1], mRight[2 * NC -
 
 STATIC NODE   mPos, mMatchPos, mAvail, *mPosition, *mParent, *mPrev, *mNext = NULL;
 
-static  UINTN      DebugLevel;
+static  UINT64     DebugLevel;
 static  BOOLEAN    DebugMode;
 //
 // functions
@@ -180,12 +180,11 @@ Returns:
 
   if (mCompSize + 1 + 8 > *DstSize) {
     *DstSize = mCompSize + 1 + 8;    
-       return EFI_BUFFER_TOO_SMALL;
-    } else {
+    return EFI_BUFFER_TOO_SMALL;
+  } else {
     *DstSize = mCompSize + 1 + 8;   
-      return EFI_SUCCESS;
-   }
-  return EFI_SUCCESS;
+    return EFI_SUCCESS;
+  }
 }
 
 STATIC

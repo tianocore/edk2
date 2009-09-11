@@ -33,6 +33,9 @@ Abstract:
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifndef __GNUC__
+#include <io.h>
+#endif
 #include "assert.h"
 #include <Common/PiFirmwareFile.h>
 #include "ParseInf.h"

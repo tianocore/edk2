@@ -856,6 +856,7 @@ Returns:
 
   PeHdr = NULL;
   TeHdr = NULL;
+  OptionHeader.Header = NULL;
   //
   // Assume success
   //
@@ -1252,11 +1253,11 @@ PeCoffLoaderGetPdbPointer (
       //
       // Get the DebugEntry offset in the raw data image.
       //
-	    SectionHeader = (EFI_IMAGE_SECTION_HEADER *) (Hdr.Te + 1);
-	    Index = Hdr.Te->NumberOfSections;
+      SectionHeader = (EFI_IMAGE_SECTION_HEADER *) (Hdr.Te + 1);
+      Index = Hdr.Te->NumberOfSections;
       for (Index1 = 0; Index1 < Index; Index1 ++) {
-      	if ((DirectoryEntry->VirtualAddress >= SectionHeader[Index1].VirtualAddress) && 
-      		 (DirectoryEntry->VirtualAddress < (SectionHeader[Index1].VirtualAddress + SectionHeader[Index1].Misc.VirtualSize))) {
+        if ((DirectoryEntry->VirtualAddress >= SectionHeader[Index1].VirtualAddress) && 
+           (DirectoryEntry->VirtualAddress < (SectionHeader[Index1].VirtualAddress + SectionHeader[Index1].Misc.VirtualSize))) {
           DebugEntry = (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY *)((UINTN) Hdr.Te +
                         DirectoryEntry->VirtualAddress - 
                         SectionHeader [Index1].VirtualAddress + 
@@ -1324,8 +1325,8 @@ PeCoffLoaderGetPdbPointer (
       // Get the DebugEntry offset in the raw data image.
       //
       for (Index1 = 0; Index1 < Index; Index1 ++) {
-      	if ((DirectoryEntry->VirtualAddress >= SectionHeader[Index1].VirtualAddress) && 
-      		 (DirectoryEntry->VirtualAddress < (SectionHeader[Index1].VirtualAddress + SectionHeader[Index1].Misc.VirtualSize))) {
+        if ((DirectoryEntry->VirtualAddress >= SectionHeader[Index1].VirtualAddress) && 
+           (DirectoryEntry->VirtualAddress < (SectionHeader[Index1].VirtualAddress + SectionHeader[Index1].Misc.VirtualSize))) {
           DebugEntry = (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY *) (
                        (UINTN) Pe32Data + 
                        DirectoryEntry->VirtualAddress - 
@@ -1349,27 +1350,28 @@ PeCoffLoaderGetPdbPointer (
   for (DirCount = 0; DirCount < DirectoryEntry->Size; DirCount += sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY), DebugEntry++) {
     if (EFI_IMAGE_DEBUG_TYPE_CODEVIEW == DebugEntry->Type) {
       if (DebugEntry->SizeOfData > 0) {
-	      //
-	      // Get the DebugEntry offset in the raw data image.
-	      //
-	      for (Index1 = 0; Index1 < Index; Index1 ++) {
-	      	if ((DebugEntry->RVA >= SectionHeader[Index1].VirtualAddress) && 
-	      		 (DebugEntry->RVA < (SectionHeader[Index1].VirtualAddress + SectionHeader[Index1].Misc.VirtualSize))) {
-	          CodeViewEntryPointer = (VOID *) (
-	                                 ((UINTN)Pe32Data) + 
-	                                 (UINTN) DebugEntry->RVA - 
-	                                 SectionHeader[Index1].VirtualAddress + 
-	                                 SectionHeader[Index1].PointerToRawData + 
-	                                 (UINTN)TEImageAdjust);
-	          break;
-	        }
-	      }
-	      if (Index1 >= Index) {
-	        //
-	        // Can't find CodeViewEntryPointer in raw PE/COFF image.
-	        //
-	        continue;
-	      }
+        //
+        // Get the DebugEntry offset in the raw data image.
+        //
+        CodeViewEntryPointer = NULL;
+        for (Index1 = 0; Index1 < Index; Index1 ++) {
+          if ((DebugEntry->RVA >= SectionHeader[Index1].VirtualAddress) && 
+             (DebugEntry->RVA < (SectionHeader[Index1].VirtualAddress + SectionHeader[Index1].Misc.VirtualSize))) {
+            CodeViewEntryPointer = (VOID *) (
+                                   ((UINTN)Pe32Data) + 
+                                   (UINTN) DebugEntry->RVA - 
+                                   SectionHeader[Index1].VirtualAddress + 
+                                   SectionHeader[Index1].PointerToRawData + 
+                                   (UINTN)TEImageAdjust);
+            break;
+          }
+        }
+        if (Index1 >= Index) {
+          //
+          // Can't find CodeViewEntryPointer in raw PE/COFF image.
+          //
+          continue;
+        }
         switch (* (UINT32 *) CodeViewEntryPointer) {
         case CODEVIEW_SIGNATURE_NB10:
           return (VOID *) ((CHAR8 *)CodeViewEntryPointer + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY));

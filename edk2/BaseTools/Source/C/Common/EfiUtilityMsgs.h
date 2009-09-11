@@ -96,7 +96,7 @@ VOID
 DebugMsg (
   CHAR8   *FileName,
   UINT32  LineNumber,
-  UINT32  MsgLevel,
+  UINT64  MsgLevel,
   CHAR8   *OffendingText,
   CHAR8   *MsgFmt,
   ...
@@ -123,7 +123,7 @@ KeyMsg (
 
 VOID
 SetPrintLevel (
-  UINT32  LogLevel
+  UINT64  LogLevel
   );
 
 VOID

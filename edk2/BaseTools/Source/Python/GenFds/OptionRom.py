@@ -135,6 +135,6 @@ class OverrideAttribs:
         self.PciClassCode = None
         self.PciDeviceId = None
         self.PciRevision = None
-        self.NeedCompress = False
+        self.NeedCompress = None
         
         

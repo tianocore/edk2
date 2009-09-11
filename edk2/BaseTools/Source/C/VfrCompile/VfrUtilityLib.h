@@ -2,7 +2,7 @@
   
   Vfr common library functions.
 
-Copyright (c) 2004 - 2008, Intel Corporation                                                         
+Copyright (c) 2004 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -420,8 +420,5 @@ public:
   VOID RegisterRule (IN CHAR8 *);
   UINT8 GetRuleId (IN CHAR8 *);
 };
-
-#define MIN(v1, v2) (((v1) < (v2)) ? (v1) : (v2))
-#define MAX(v1, v2) (((v1) > (v2)) ? (v1) : (v2))
 
 #endif

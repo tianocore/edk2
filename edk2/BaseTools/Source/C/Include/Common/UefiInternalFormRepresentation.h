@@ -839,7 +839,7 @@ typedef struct _EFI_IFR_REF4 {
 
 typedef struct _EFI_IFR_RESET_BUTTON {
   EFI_IFR_OP_HEADER        Header;
-  EFI_IFR_QUESTION_HEADER  Question;
+  EFI_IFR_STATEMENT_HEADER Statement;
   EFI_DEFAULT_ID           DefaultId;
 } EFI_IFR_RESET_BUTTON;
 

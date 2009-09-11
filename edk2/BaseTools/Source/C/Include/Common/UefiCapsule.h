@@ -1,7 +1,7 @@
 /** @file
   Defines for the EFI Capsule functionality.
 
-  Copyright (c) 2006 - 2008, Intel Corporation  All rights reserved.
+  Copyright (c) 2006 - 2009, Intel Corporation  All rights reserved.
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -30,5 +30,6 @@ typedef struct {
 
 #define CAPSULE_FLAGS_PERSIST_ACROSS_RESET          0x00010000
 #define CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE         0x00020000
+#define CAPSULE_FLAGS_INITIATE_RESET                0x00040000
 
 #endif // #ifndef _EFI_CAPSULE_H_

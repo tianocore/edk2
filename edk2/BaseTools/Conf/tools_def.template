@@ -1,5 +1,6 @@
 #
 #  Copyright (c) 2006-2009, Intel Corporation
+#  Portions copyright (c) 2008-2009 Apple Inc. All rights reserved.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -100,6 +101,12 @@ DEFINE ICC_WIN_ASLPP_FLAGS     = /nologo /EP /C
 DEFINE ICC_WIN_ASLCC_FLAGS     = /Y- /TC /WX- /Od /Dmain=ReferenceAcpiTable
 DEFINE ICC_WIN_ASLDLINK_FLAGS  = /NODEFAULTLIB /ENTRY:ReferenceAcpiTable /SUBSYSTEM:CONSOLE /NODEFAULTLIB:libmmt /NODEFAULTLIB:libirc
 
+DEFINE IPHONE_TOOLS            = /Developer/Platforms/iPhoneOS.platform/Developer
+DEFINE RVCT31_TOOLS_PATH       = c:/Program Files/ARM/RVCT/Programs/3.1/761/win_32-pentium
+DEFINE RVCT31CYGWIN_TOOLS_PATH = /cygdrive/c/Program\ Files/ARM/RVCT/Programs/3.1/761/win_32-pentium
+
+# Update to the location of the gcc executables
+DEFINE ARMGCC_BIN              = /
 
 ####################################################################################
 #
@@ -2039,6 +2046,267 @@ RELEASE_MYTOOLS_IPF_DLINK_FLAGS          = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 *_MYTOOLS_EBC_VFRPP_FLAGS                = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
 *_MYTOOLS_EBC_SLINK_FLAGS                = /lib /NOLOGO /MACHINE:EBC
 *_MYTOOLS_EBC_DLINK_FLAGS                = "C:\Program Files\Intel\EBC\Lib\EbcLib.lib" /NOLOGO /NODEFAULTLIB /MACHINE:EBC /OPT:REF /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /MAP
+
+
+####################################################################################
+#
+# Xcode Support for building on Mac OS X (Snow Leopard)
+#
+####################################################################################
+#   XCODE32         - Xcode 3.2 Tools (Snow Leopard)
+*_XCODE32_*_*_FAMILY            = GCC
+*_XCODE32_*_*_BUILDRULEFAMILY   = XCODE
+
+
+*_XCODE32_*_ASL_PATH          = /usr/bin/iasl
+
+*_XCODE32_*_MAKE_PATH        = make
+
+# This tool needs to be installed seperatly from Xcode 3.2
+*_XCODE32_*_MTOC_PATH        = /Developer/usr/bin/mtoc
+*_XCODE32_*_DSYMUTIL_PATH    = /usr/bin/dsymutil
+
+  DEBUG_XCODE32_*_MTOC_FLAGS = -align 0x20 -d $(DEBUG_DIR)/$(MODULE_NAME).dll
+RELEASE_XCODE32_*_MTOC_FLAGS = -align 0x20 
+
+##################
+# IA32 definitions
+##################
+*_XCODE32_IA32_CC_PATH      = gcc
+*_XCODE32_IA32_SLINK_PATH   = libtool
+*_XCODE32_IA32_DLINK_PATH   = ld
+*_XCODE32_IA32_ASM_PATH     = as
+*_XCODE32_IA32_PP_PATH      = gcc
+*_XCODE32_IA32_VFRPP_PATH   = gcc
+*_XCODE32_IA32_ASL_PATH     = iasl
+*_XCODE32_IA32_ASLCC_PATH   = gcc
+*_XCODE32_IA32_ASLPP_PATH   = gcc
+*_XCODE32_IA32_ASLDLINK_PATH  = ld
+
+  DEBUG_XCODE32_IA32_DLINK_FLAGS      = -arch i386 -u _$(IMAGE_ENTRY_POINT) -e _$(IMAGE_ENTRY_POINT) -preload -segalign 0x20 -slow_stubs -pie -all_load -dead_strip -seg1addr 0x240 -read_only_relocs suppress -map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
+RELEASE_XCODE32_IA32_DLINK_FLAGS      = -arch i386 -u _$(IMAGE_ENTRY_POINT) -e _$(IMAGE_ENTRY_POINT) -preload -segalign 0x20 -slow_stubs -pie -all_load -dead_strip -seg1addr 0x220 -read_only_relocs suppress -map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
+*_XCODE32_IA32_SLINK_FLAGS      = -static -o
+  DEBUG_XCODE32_IA32_ASM_FLAGS  = -arch i386 -g
+RELEASE_XCODE32_IA32_ASM_FLAGS  = -arch i386 
+*_XCODE32_IA32_PP_FLAGS         = -arch i386 -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
+*_XCODE32_IA32_VFRPP_FLAGS      = -arch i386 -x c -E -P -DVFRCOMPILE --include $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h
+  DEBUG_XCODE32_IA32_CC_FLAGS   = -arch i386 -save-temps -g -O0 -combine -mms-bitfields  -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-missing-braces  -c -include AutoGen.h -mdynamic-no-pic -fno-stack-protector
+RELEASE_XCODE32_IA32_CC_FLAGS   = -arch i386 -Oz -combine -mms-bitfields  -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -fomit-frame-pointer -c -include AutoGen.h -mdynamic-no-pic -fno-stack-protector
+
+*_XCODE32_IA32_ASLCC_FLAGS      = -arch i386 -x c -save-temps -g -O0 -mms-bitfields -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -c -include AutoGen.h -mdynamic-no-pic
+*_XCODE32_IA32_ASLDLINK_FLAGS   = -arch i386 -e _main -preload -segalign 0x20 -slow_stubs -pie -seg1addr 0x220 -read_only_relocs suppress -map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
+*_XCODE32_IA32_ASLPP_FLAGS      = -arch i386 -x c -E 
+*_XCODE32_IA32_ASL_FLAGS        =
+
+##################
+# X64 definitions - still a work in progress. This tool chain does not produce 
+# the correct ABI, it is just used to compile the code....
+##################
+*_XCODE32_X64_CC_PATH       = gcc-4.2
+*_XCODE32_X64_SLINK_PATH    = libtool
+*_XCODE32_X64_DLINK_PATH    = ld
+*_XCODE32_X64_ASM_PATH      = as
+*_XCODE32_X64_PP_PATH       = gcc-4.2
+*_XCODE32_X64_VFRPP_PATH    = gcc-4.2
+*_XCODE32_X64_ASL_PATH     = iasl
+*_XCODE32_X64_ASLCC_PATH   = gcc
+*_XCODE32_X64_ASLPP_PATH   = gcc
+*_XCODE32_X64_ASLDLINK_PATH  = ld
+
+*_XCODE32_X64_DLINK_FLAGS      = -arch x86_64 -u _$(IMAGE_ENTRY_POINT) -e _$(IMAGE_ENTRY_POINT) -preload -segalign 0x20 -slow_stubs -pie -seg1addr 0x240 -read_only_relocs suppress -map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
+*_XCODE32_X64_SLINK_FLAGS      = -static -o
+
+  DEBUG_XCODE32_X64_ASM_FLAGS  = -arch x86_64 -g
+RELEASE_XCODE32_X64_ASM_FLAGS  = -arch x86_64 
+*_XCODE32_X64_PP_FLAGS         = -arch x86_64 -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
+*_XCODE32_X64_VFRPP_FLAGS      = -arch x86_64 -x c -E -P -DVFRCOMPILE --include $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h
+
+  DEBUG_XCODE32_X64_CC_FLAGS   = -arch x86_64 -save-temps -g -O0 -combine -mms-bitfields -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -Wno-address  -fomit-frame-pointer -static  -c -include AutoGen.h -fno-stack-protector
+RELEASE_XCODE32_X64_CC_FLAGS   = -arch x86_64 -Oz -combine -mms-bitfields -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -Wno-address  -fomit-frame-pointer -static  -c -include AutoGen.h -fno-stack-protector
+
+##################
+# ARM definitions - still a work in progress (Assumes iPhone SDK installed)
+##################
+
+*_XCODE32_ARM_ARCHCC_FLAGS    = -arch armv6 -march=armv6 -mthumb
+*_XCODE32_ARM_ARCHASM_FLAGS   = -arch armv6 
+*_XCODE32_ARM_ARCHDLINK_FLAGS = -arch armv6 
+*_XCODE32_ARM_PLATFORM_FLAGS  =
+*_XCODE32_ARM_INTRINSIC_FLAGS = CompilerIntrinsicsLib.lib
+
+*_XCODE32_ARM_CC_PATH       = DEF(IPHONE_TOOLS)/usr/bin/gcc
+*_XCODE32_ARM_SLINK_PATH    = DEF(IPHONE_TOOLS)/usr/bin/libtool
+*_XCODE32_ARM_DLINK_PATH    = DEF(IPHONE_TOOLS)/usr/bin/ld
+*_XCODE32_ARM_ASM_PATH      = DEF(IPHONE_TOOLS)/usr/bin/as
+*_XCODE32_ARM_PP_PATH       = DEF(IPHONE_TOOLS)/usr/bin/gcc
+*_XCODE32_ARM_VFRPP_PATH    = DEF(IPHONE_TOOLS)/usr/bin/gcc
+
+  DEBUG_XCODE32_ARM_DLINK_FLAGS      = $(ARCHDLINK_FLAGS) -u _$(IMAGE_ENTRY_POINT) -e _$(IMAGE_ENTRY_POINT) -preload -segalign 0x20 -slow_stubs -pie -all_load -dead_strip -seg1addr 0x220 -read_only_relocs suppress -map $(DEST_DIR_DEBUG)/$(BASE_NAME).map ENV(EDK_TOOLS_PATH)/Bin/Darwin-i386/ARM/DEBUG_XCODE32/$(INTRINSIC_FLAGS)
+RELEASE_XCODE32_ARM_DLINK_FLAGS      = $(ARCHDLINK_FLAGS) -u _$(IMAGE_ENTRY_POINT) -e _$(IMAGE_ENTRY_POINT) -preload -segalign 0x20 -slow_stubs -pie -all_load -dead_strip -seg1addr 0x220 -read_only_relocs suppress -map $(DEST_DIR_DEBUG)/$(BASE_NAME).map ENV(EDK_TOOLS_PATH)/Bin/Darwin-i386/ARM/RELEASE_XCODE32/$(INTRINSIC_FLAGS)
+
+*_XCODE32_ARM_SLINK_FLAGS      = -static -o
+
+  DEBUG_XCODE32_ARM_ASM_FLAGS  = $(ARCHASM_FLAGS) -g
+RELEASE_XCODE32_ARM_ASM_FLAGS  = $(ARCHASM_FLAGS) 
+*_XCODE32_ARM_PP_FLAGS         = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
+*_XCODE32_ARM_VFRPP_FLAGS      = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -x c -E -P -DVFRCOMPILE --include $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h
+
+  DEBUG_XCODE32_ARM_CC_FLAGS   = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -mthumb-interwork -g -Oz -mabi=aapcs -mapcs -fno-short-enums  -save-temps -combine  -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -fomit-frame-pointer -c -include AutoGen.h -mdynamic-no-pic -fno-stack-protector
+RELEASE_XCODE32_ARM_CC_FLAGS   = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -mthumb-interwork -Oz    -mabi=aapcs -mapcs -fno-short-enums  -save-temps -combine -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -fomit-frame-pointer -c -include AutoGen.h -mdynamic-no-pic -fno-stack-protector
+
+
+####################################################################################
+#
+# ARM Tools
+#
+####################################################################################
+#   RVCT31         - Tools from ARM
+
+*_RVCT31_*_*_FAMILY          = RVCT
+
+#
+# Use default values, or override in DSC file
+#
+*_RVCT31_ARM_ARCHCC_FLAGS    = --thumb --cpu ARM1176JZF-S
+*_RVCT31_ARM_ARCHASM_FLAGS   = --cpu ARM1176JZF-S
+*_RVCT31_ARM_ARCHDLINK_FLAGS = 
+*_RVCT31_ARM_PLATFORM_FLAGS  =
+*_RVCT31_ARM_INTRINSIC_FLAGS = CompilerIntrinsicsLib.lib
+
+  DEBUG_RVCT31_ARM_DLINK_FLAGS     = $(ARCHDLINK_FLAGS) --entry $(IMAGE_ENTRY_POINT)  --ro-base 0 --no_scanlib --reloc --no_exceptions --datacompressor off --strict --symbols --map --list $(DEST_DIR_DEBUG)/$(BASE_NAME).map ENV(EDK_TOOLS_PATH)/Bin/Win32/ARM/DEBUG_RVCT31/$(INTRINSIC_FLAGS)
+RELEASE_RVCT31_ARM_DLINK_FLAGS     = $(ARCHDLINK_FLAGS) --entry $(IMAGE_ENTRY_POINT)  --ro-base 0 --no_scanlib --reloc --no_exceptions --datacompressor off --strict --symbols --map --list $(DEST_DIR_DEBUG)/$(BASE_NAME).map ENV(EDK_TOOLS_PATH)/Bin/Win32/ARM/RELEASE_RVCT31/$(INTRINSIC_FLAGS)
+
+
+*_RVCT31_ARM_ASM_FLAGS       = $(ARCHASM_FLAGS) --apcs /interwork
+*_RVCT31_ARM_PP_FLAGS        = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -E
+*_RVCT31_ARM_VFRPP_FLAGS     = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -E  -DVFRCOMPILE --preinclude $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h
+*_RVCT31_ARM_MAKE_PATH       = nmake
+*_RVCT31_ARM_SLINK_FLAGS     = --partial -o
+  DEBUG_RVCT31_ARM_CC_FLAGS  = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) --c90 -c -g -O2 --no_autoinline --asm --gnu --apcs /interwork --signed_chars --no_unaligned_access --split_sections --enum_is_int --preinclude AutoGen.h --diag_warning 167
+RELEASE_RVCT31_ARM_CC_FLAGS  = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) --c90 -c --no_autoinline --asm --gnu --apcs /interwork --signed_chars --no_unaligned_access --split_sections --enum_is_int --preinclude AutoGen.h --diag_warning 167
+
+##################
+# ARM definitions
+##################
+*_RVCT31_ARM_CC_PATH         = DEF(RVCT31_TOOLS_PATH)/armcc
+*_RVCT31_ARM_SLINK_PATH      = DEF(RVCT31_TOOLS_PATH)/armlink
+*_RVCT31_ARM_DLINK_PATH      = DEF(RVCT31_TOOLS_PATH)/armlink
+*_RVCT31_ARM_ASM_PATH        = DEF(RVCT31_TOOLS_PATH)/armasm
+*_RVCT31_ARM_PP_PATH         = DEF(RVCT31_TOOLS_PATH)/armcc
+*_RVCT31_ARM_VFRPP_PATH      = DEF(RVCT31_TOOLS_PATH)/armcc
+*_RVCT31_ARM_FROMELF_PATH    = DEF(RVCT31_TOOLS_PATH)/fromelf
+
+####################################################################################
+#
+# ARM Tools & Cygwin
+#
+####################################################################################
+#   ARMCYGWIN         - Tools from ARM in a Cygwin environment
+
+*_RVCT31CYGWIN_*_*_FAMILY               = RVCT
+*_RVCT31CYGWIN_*_*_BUILDRULEFAMILY      = RVCTCYGWIN
+
+*_RVCT31CYGWIN_ARM_CCPATH_FLAG         = DEF(RVCT31CYGWIN_TOOLS_PATH)/armcc
+*_RVCT31CYGWIN_ARM_SLINKPATH_FLAG      = DEF(RVCT31CYGWIN_TOOLS_PATH)/armlink
+*_RVCT31CYGWIN_ARM_DLINKPATH_FLAG      = DEF(RVCT31CYGWIN_TOOLS_PATH)/armlink
+*_RVCT31CYGWIN_ARM_ASMPATH_FLAG        = DEF(RVCT31CYGWIN_TOOLS_PATH)/armasm
+*_RVCT31CYGWIN_ARM_PPPATH_FLAG         = DEF(RVCT31CYGWIN_TOOLS_PATH)/armcc
+*_RVCT31CYGWIN_ARM_VFRPPPATH_FLAG      = DEF(RVCT31CYGWIN_TOOLS_PATH)/armcc
+*_RVCT31CYGWIN_ARM_FROMELFPATH_FLAG    = DEF(RVCT31CYGWIN_TOOLS_PATH)/fromelf
+
+
+#
+# Use default values, or override in DSC file
+#
+*_RVCT31CYGWIN_ARM_ARCHCC_FLAGS    = --thumb --cpu ARM1176JZF-S
+*_RVCT31CYGWIN_ARM_ARCHASM_FLAGS   = --cpu ARM1176JZF-S
+*_RVCT31CYGWIN_ARM_ARCHDLINK_FLAGS = 
+*_RVCT31CYGWIN_ARM_PLATFORM_FLAGS  =
+*_RVCT31CYGWIN_ARM_INTRINSIC_FLAGS = CompilerIntrinsicsLib.lib
+
+  DEBUG_RVCT31CYGWIN_ARM_DLINK_FLAGS     = "$(DLINKPATH_FLAG)" $(ARCHDLINK_FLAGS) --entry $(IMAGE_ENTRY_POINT)  --ro-base 0 --no_scanlib --reloc --no_exceptions --datacompressor off --strict --symbols --map --list `cygpath -m $(DEST_DIR_DEBUG)/$(BASE_NAME).map` ENV(EDK_TOOLS_PATH)/Bin/CYGWIN_NT-5.1-i686/ARM/DEBUG_RVCT31CYGWIN/$(INTRINSIC_FLAGS)
+RELEASE_RVCT31CYGWIN_ARM_DLINK_FLAGS     = "$(DLINKPATH_FLAG)" $(ARCHDLINK_FLAGS) --entry $(IMAGE_ENTRY_POINT)  --ro-base 0 --no_scanlib --reloc --no_exceptions --datacompressor off --strict --symbols --map --list `cygpath -m $(DEST_DIR_DEBUG)/$(BASE_NAME).map` ENV(EDK_TOOLS_PATH)/Bin/CYGWIN_NT-5.1-i686/ARM/DEBUG_RVCT31CYGWIN/$(INTRINSIC_FLAGS)
+
+*_RVCT31CYGWIN_ARM_ASM_FLAGS       = "$(ASMPATH_FLAG)" $(ARCHASM_FLAGS) --apcs /interwork
+*_RVCT31CYGWIN_ARM_PP_FLAGS        = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -E
+*_RVCT31CYGWIN_ARM_VFRPP_FLAGS     = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -E  -DVFRCOMPILE --preinclude `cygpath -m $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h`
+*_RVCT31CYGWIN_ARM_MAKE_PATH       = make
+*_RVCT31CYGWIN_ARM_SLINK_FLAGS     = "$(SLINKPATH_FLAG)" --partial -o
+  DEBUG_RVCT31CYGWIN_ARM_CC_FLAGS  = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) --c90 -c -g -O2 --no_autoinline --asm --gnu --apcs /interwork --signed_chars --no_unaligned_access --split_sections --preinclude AutoGen.h --diag_warning 167
+RELEASE_RVCT31CYGWIN_ARM_CC_FLAGS  = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) --c90 -c --no_autoinline --asm --gnu --apcs /interwork --signed_chars --no_unaligned_access --split_sections --preinclude AutoGen.h --diag_warning 167
+
+##################
+# ARM definitions
+##################
+*_RVCT31CYGWIN_ARM_CC_PATH         = ENV(WORKSPACE)/BaseTools/Bin/CYGWIN_NT-5.1-i686/armcc_wrapper.py
+*_RVCT31CYGWIN_ARM_SLINK_PATH      = ENV(WORKSPACE)/BaseTools/Bin/CYGWIN_NT-5.1-i686/armcc_wrapper.py
+*_RVCT31CYGWIN_ARM_DLINK_PATH      = ENV(WORKSPACE)/BaseTools/Bin/CYGWIN_NT-5.1-i686/armcc_wrapper.py
+*_RVCT31CYGWIN_ARM_ASM_PATH        = ENV(WORKSPACE)/BaseTools/Bin/CYGWIN_NT-5.1-i686/armcc_wrapper.py
+*_RVCT31CYGWIN_ARM_PP_PATH         = ENV(WORKSPACE)/BaseTools/Bin/CYGWIN_NT-5.1-i686/armcc_wrapper.py
+*_RVCT31CYGWIN_ARM_VFRPP_PATH      = ENV(WORKSPACE)/BaseTools/Bin/CYGWIN_NT-5.1-i686/armcc_wrapper.py
+*_RVCT31CYGWIN_ARM_FROMELF_PATH    = ENV(WORKSPACE)/BaseTools/Bin/CYGWIN_NT-5.1-i686/armcc_wrapper.py
+
+####################################################################################
+#
+# ARM GCC (GCC 4.1.1, etc.)
+#
+####################################################################################
+#  ARMGCC         - ARM version of the GCC cross compiler
+
+*_ARMGCC_*_*_FAMILY          = GCC
+*_ARMGCC_*_MAKE_PATH         = make
+
+##################
+# ASL definitions
+##################
+*_ARMGCC_*_ASL_PATH                     = DEF(UNIX_IASL_BIN)
+*_ARMGCCC_*_ASL_FLAGS                    = 
+*_ARMGCC_*_ASL_OUTFLAGS                 = DEF(IASL_OUTFLAGS)
+*_ARMGCC_*_ASLPP_FLAGS                  = -x c -E -P
+*_ARMGCC_*_ASLCC_FLAGS                  = -x c
+*_ARMGCC_*_ASLDLINK_FLAGS               = DEF(UNIXGCC_DLINK_FLAGS_COMMON) --entry _ReferenceAcpiTable
+
+##################
+# ARM definitions
+##################
+
+*_ARMGCC_ARM_ASLCC_PATH      = DEF(ARMGCC_BIN)/arm-elf-gcc
+*_ARMGCC_ARM_ASLDLINK_PATH   = DEF(ARMGCC_BIN)/arm-elf-ld
+*_ARMGCC_ARM_ASLPP_PATH      = DEF(ARMGCC_BIN)/arm-elf-gcc
+
+*_ARMGCC_ARM_CC_PATH         = DEF(ARMGCC_BIN)/arm-elf-gcc
+*_ARMGCC_ARM_SLINK_PATH      = DEF(ARMGCC_BIN)/arm-elf-ar
+*_ARMGCC_ARM_DLINK_PATH      = DEF(ARMGCC_BIN)/arm-elf-ld
+*_ARMGCC_ARM_ASM_PATH        = DEF(ARMGCC_BIN)/arm-elf-as
+*_ARMGCC_ARM_PP_PATH         = DEF(ARMGCC_BIN)/arm-elf-gcc
+*_ARMGCC_ARM_VFRPP_PATH      = DEF(ARMGCC_BIN)/arm-elf-gcc
+
+#
+# Use default values, or override in DSC file
+#
+*_ARMGCC_ARM_ARCHCC_FLAGS    = 
+*_ARMGCC_ARM_ARCHASM_FLAGS   = 
+*_ARMGCC_ARM_ARCHDLINK_FLAGS = 
+*_ARMGCC_ARM_PLATFORM_FLAGS  =
+*_ARMGCC_ARM_INTRINSIC_FLAGS = CompilerIntrinsicsLib.lib
+
+  DEBUG_ARMGCC_ARM_ASM_FLAGS   = $(ARCHASM_FLAGS) -mlittle-endian -g
+RELEASE_ARMGCC_ARM_ASM_FLAGS   = $(ARCHASM_FLAGS) -mlittle-endian
+
+*_ARMGCC_ARM_PP_FLAGS    = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS)  -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
+*_ARMGCC_ARM_VFRPP_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS)  -x c -E -P -DVFRCOMPILE --include $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h
+
+*_ARMGCC_ARM_MAKE_PATH   = make
+
+*_ARMGCC_ARM_SLINK_FLAGS = -r
+*_ARMGCC_ARM_DLINK_FLAGS =  $(ARCHDLINK_FLAGS) --emit-relocs --oformat=elf32-littlearm -nostdlib -u $(IMAGE_ENTRY_POINT) -e $(IMAGE_ENTRY_POINT) -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
+# --gc-sections
+
+  DEBUG_ARMGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -mfpu=fpa -mlittle-endian -g -O2 -mabi=aapcs -mapcs -fno-short-enums -save-temps -combine -fsigned-char -fshort-wchar -fno-strict-aliasing -ffunction-sections -fdata-sections -Wall -Werror -Wno-missing-braces -fomit-frame-pointer -c -include AutoGen.h
+RELEASE_ARMGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -mfpu=fpa -mlittle-endian    -O2 -mabi=aapcs -mapcs -fno-short-enums -save-temps -combine -fsigned-char -fshort-wchar -fno-strict-aliasing -ffunction-sections -fdata-sections -Wall -Werror -Wno-missing-braces -fomit-frame-pointer -c -include AutoGen.h
+
+
+
 
 ##################
 # VfrCompiler definitions

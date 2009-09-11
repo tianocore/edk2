@@ -26,6 +26,9 @@ Abstract:
 #include <string.h>
 #include <Common/UefiBaseTypes.h>
 
+#include "ParseInf.h"
+#include "EfiUtilityMsgs.h"
+
 //
 // Utility Name
 //
@@ -259,9 +262,9 @@ Routine Description:
         } else {
           fprintf (
             stdout,
-            "%c: - DiskNum: %d, Type: %s\n", 
+            "%c: - DiskNum: %u, Type: %s\n", 
             DriveInfo.VolumeLetter,
-            DriveInfo.DiskNumber, 
+            (unsigned) DriveInfo.DiskNumber, 
             DriveInfo.DriveType->Description
             );
         }
@@ -438,11 +441,9 @@ ProcessBsOrMbr (
   BYTE              DiskPartition[0x200] = {0};
   BYTE              DiskPartitionBackup[0x200] = {0};
   DWORD             BytesReturn;
-  DWORD             DbrOffset;
   INT               DrvNumOffset;
   HANDLE            InputHandle;
   HANDLE            OutputHandle;
-  BOOL              WriteToDisk;
   ERROR_STATUS      Status;
   DWORD             InputDbrOffset;
   DWORD             OutputDbrOffset;
@@ -731,7 +732,7 @@ main (
         return 1;
       }
       if (LogLevel > 9) {
-        Error (NULL, 0, 1003, "Invalid option value", "Debug Level range is 0-9, currnt input level is %d", LogLevel);
+        Error (NULL, 0, 1003, "Invalid option value", "Debug Level range is 0-9, currnt input level is %d", (int) LogLevel);
         return 1;
       }
       SetPrintLevel (LogLevel);

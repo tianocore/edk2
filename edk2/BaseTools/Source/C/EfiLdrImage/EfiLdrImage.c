@@ -131,7 +131,7 @@ Return:
   UINT64 : file size of input file
 --*/
 {
-  UINT64           filesize, offset, length;
+  UINT32          filesize, offset, length;
   CHAR8           Buffer[8*1024];
 
   fseek (in, 0, SEEK_END);
@@ -252,7 +252,7 @@ Returns:
       continue; 
     }
     //
-    // Don't recognize the paramter, should be regarded as the input file name.
+    // Don't recognize the parameter, should be regarded as the input file name.
     //
     InputFileNames[InputFileCount] = argv[0];
     InputFileCount++;
@@ -309,9 +309,9 @@ Returns:
     //  And in the same time update the EfiLdrHeader and EfiLdrImage array
     //
     EfiLdrImage[i].Offset = EfiLdrHeader.FileLength;
-    EfiLdrImage[i].Length = filesize;
+    EfiLdrImage[i].Length = (UINT32) filesize;
     strncpy ((CHAR8*) EfiLdrImage[i].FileName, InputFileNames[i], sizeof (EfiLdrImage[i].FileName) - 1);
-    EfiLdrHeader.FileLength += filesize;
+    EfiLdrHeader.FileLength += (UINT32) filesize;
     EfiLdrHeader.NumberOfImages++;
   }
 

@@ -134,6 +134,7 @@ typedef UINT8 EFI_SECTION_TYPE;
 #define EFI_SECTION_FREEFORM_SUBTYPE_GUID 0x18
 #define EFI_SECTION_RAW                   0x19
 #define EFI_SECTION_PEI_DEPEX             0x1B
+#define EFI_SECTION_SMM_DEPEX             0x1C
 
 typedef struct {
   UINT8             Size[3];

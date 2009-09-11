@@ -17,6 +17,7 @@
 import sqlite3
 import os
 import os.path
+import pickle
 
 import Common.EdkLogger as EdkLogger
 import Common.GlobalData as GlobalData
@@ -24,6 +25,7 @@ import Common.GlobalData as GlobalData
 from Common.String import *
 from Common.DataType import *
 from Common.Misc import *
+from types import *
 
 from CommonDataClass.CommonClass import SkuInfoClass
 
@@ -1109,6 +1111,7 @@ class InfBuildData(ModuleBuildClassObject):
         "BS_DRIVER"             :   "DXE_DRIVER",
         "RT_DRIVER"             :   "DXE_RUNTIME_DRIVER",
         "SAL_RT_DRIVER"         :   "DXE_SAL_DRIVER",
+        "SMM_DRIVER"            :   "SMM_DRIVER",
     #    "BS_DRIVER"             :   "DXE_SMM_DRIVER",
     #    "BS_DRIVER"             :   "UEFI_DRIVER",
         "APPLICATION"           :   "UEFI_APPLICATION",
@@ -2060,10 +2063,10 @@ class WorkspaceDatabase(object):
             DbDir = os.path.split(DbPath)[0]
             if not os.path.exists(DbDir):
                 os.makedirs(DbDir)
-                
-        # remove db file in case inconsistency between db and file in file system
-        if self._CheckWhetherDbNeedRenew(RenewDb, DbPath):
-            os.remove(DbPath)
+
+            # remove db file in case inconsistency between db and file in file system
+            if self._CheckWhetherDbNeedRenew(RenewDb, DbPath):
+                os.remove(DbPath)
         
         # create db with optimized parameters
         self.Conn = sqlite3.connect(DbPath, isolation_level='DEFERRED')
@@ -2098,6 +2101,41 @@ class WorkspaceDatabase(object):
     #  @return Bool value for whether need renew workspace databse
     #
     def _CheckWhetherDbNeedRenew (self, force, DbPath):
+        DbDir = os.path.split(DbPath)[0]
+        MacroFilePath = os.path.normpath(os.path.join(DbDir, "build.mac"))
+        MacroMatch = False
+        if os.path.exists(MacroFilePath) and os.path.isfile(MacroFilePath):
+            LastMacros = None
+            try:
+                f = open(MacroFilePath,'r')
+                LastMacros = pickle.load(f)
+                f.close()
+            except IOError:
+                pass
+            except:
+                f.close()
+
+            if LastMacros != None and type(LastMacros) is DictType:
+                if LastMacros == self._GlobalMacros:
+                    MacroMatch = True
+                    for Macro in LastMacros.keys():
+                        if not (Macro in self._GlobalMacros and LastMacros[Macro] == self._GlobalMacros[Macro]):
+                            MacroMatch = False;
+                            break;
+
+        if not MacroMatch:
+            # save command line macros to file
+            try:
+                f = open(MacroFilePath,'w')
+                pickle.dump(self._GlobalMacros, f, 2)
+                f.close()
+            except IOError:
+                pass
+            except:
+                f.close()
+
+            force = True
+
         # if database does not exist, we need do nothing
         if not os.path.exists(DbPath): return False
             

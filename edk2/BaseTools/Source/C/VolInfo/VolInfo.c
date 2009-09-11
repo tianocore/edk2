@@ -164,7 +164,7 @@ Returns:
   EFI_FIRMWARE_VOLUME_HEADER  *FvImage;
   UINT32                      FvSize;
   EFI_STATUS                  Status;
-  UINT32                      Offset;
+  int                         Offset;
   BOOLEAN                     ErasePolarity;
 
   SetUtilityName (UTILITY_NAME);
@@ -622,8 +622,8 @@ Returns:
   //
   // Print FV header information
   //
-  printf ("Signature:        %s (%X)\n", (char *) Signature, VolumeHeader.Signature);
-  printf ("Attributes:       %X\n", VolumeHeader.Attributes);
+  printf ("Signature:        %s (%X)\n", (char *) Signature, (unsigned) VolumeHeader.Signature);
+  printf ("Attributes:       %X\n", (unsigned) VolumeHeader.Attributes);
 
   if (VolumeHeader.Attributes & EFI_FVB2_READ_DISABLED_CAP) {
     printf ("       EFI_FVB2_READ_DISABLED_CAP\n");
@@ -907,8 +907,8 @@ Returns:
     BytesRead += sizeof (EFI_FV_BLOCK_MAP_ENTRY);
 
     if (BlockMap.NumBlocks != 0) {
-      printf ("Number of Blocks:      0x%08X\n", BlockMap.NumBlocks);
-      printf ("Block Length:          0x%08X\n", BlockMap.Length);
+      printf ("Number of Blocks:      0x%08X\n", (unsigned) BlockMap.NumBlocks);
+      printf ("Block Length:          0x%08X\n", (unsigned) BlockMap.Length);
       Size += BlockMap.NumBlocks * BlockMap.Length;
     }
 
@@ -924,7 +924,7 @@ Returns:
     return EFI_ABORTED;
   }
 
-  printf ("Total Volume Size:     0x%08X\n", Size);
+  printf ("Total Volume Size:     0x%08X\n", (unsigned) Size);
 
   *FvSize = Size;
 
@@ -998,7 +998,7 @@ Returns:
   //
   FileLength = GetLength (FileHeader->Size);
   printf ("File Offset:      0x%08X\n", (unsigned) ((UINTN) FileHeader - (UINTN) FvImage));
-  printf ("File Length:      0x%08X\n", FileLength);
+  printf ("File Length:      0x%08X\n", (unsigned) FileLength);
   printf ("File Attributes:  0x%02X\n", FileHeader->Attributes);
   printf ("File State:       0x%02X\n", FileHeader->State);
 
@@ -1242,7 +1242,7 @@ Returns:
 
     SectionName = SectionNameToStr (Type);
     printf ("------------------------------------------------------------\n");
-    printf ("  Type:  %s\n  Size:  0x%08X\n", SectionName, SectionLength);
+    printf ("  Type:  %s\n  Size:  0x%08X\n", SectionName, (unsigned) SectionLength);
     free (SectionName);
 
     switch (Type) {
@@ -1288,7 +1288,7 @@ Returns:
       CompressedLength    = SectionLength - sizeof (EFI_COMPRESSION_SECTION);
       UncompressedLength  = ((EFI_COMPRESSION_SECTION *) Ptr)->UncompressedLength;
       CompressionType     = ((EFI_COMPRESSION_SECTION *) Ptr)->CompressionType;
-      printf ("  Uncompressed Length:  0x%08X\n", UncompressedLength);
+      printf ("  Uncompressed Length:  0x%08X\n", (unsigned) UncompressedLength);
 
       if (CompressionType == EFI_NOT_COMPRESSED) {
         printf ("  Compression Type:  EFI_NOT_COMPRESSED\n");
@@ -1342,7 +1342,7 @@ Returns:
           return EFI_SECTION_ERROR;
         }
       } else {
-        Error (NULL, 0, 0003, "unrecognized compression type", "type 0x%X", (UINT32) CompressionType);
+        Error (NULL, 0, 0003, "unrecognized compression type", "type 0x%X", CompressionType);
         return EFI_SECTION_ERROR;
       }
 
@@ -1365,8 +1365,8 @@ Returns:
       printf ("  SectionDefinitionGuid:  ");
       PrintGuid (&((EFI_GUID_DEFINED_SECTION *) Ptr)->SectionDefinitionGuid);
       printf ("\n");
-      printf ("  DataOffset:             0x%04X\n", ((EFI_GUID_DEFINED_SECTION *) Ptr)->DataOffset);
-      printf ("  Attributes:             0x%04X\n", ((EFI_GUID_DEFINED_SECTION *) Ptr)->Attributes);
+      printf ("  DataOffset:             0x%04X\n", (unsigned) ((EFI_GUID_DEFINED_SECTION *) Ptr)->DataOffset);
+      printf ("  Attributes:             0x%04X\n", (unsigned) ((EFI_GUID_DEFINED_SECTION *) Ptr)->Attributes);
 
       ExtractionTool =
         LookupGuidedSectionToolPath (
@@ -1465,7 +1465,7 @@ Returns:
       //
       // Unknown section, return error
       //
-      Error (NULL, 0, 0003, "unrecognized section type found", "section type = 0x%X", (UINT32) Type);
+      Error (NULL, 0, 0003, "unrecognized section type found", "section type = 0x%X", Type);
       return EFI_SECTION_ERROR;
     }
 
@@ -1588,7 +1588,7 @@ Returns:
       break;
 
     default:
-      printf ("Unrecognized byte in depex: 0x%X\n", (UINT32) *Ptr);
+      printf ("Unrecognized byte in depex: 0x%X\n", *Ptr);
       return EFI_SUCCESS;
     }
   }
@@ -1732,10 +1732,13 @@ LoadGuidedSectionToolsTxt (
 {
   CHAR8* PeerFilename;
   CHAR8* Places[] = {
-    FirmwareVolumeFilename,
-    //mUtilityFilename,
+    NULL,
+    //NULL,
     };
   UINTN Index;
+
+  Places[0] = FirmwareVolumeFilename;
+  //Places[1] = mUtilityFilename;
 
   mParsedGuidedSectionTools = NULL;
 

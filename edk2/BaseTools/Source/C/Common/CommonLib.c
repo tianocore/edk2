@@ -472,7 +472,7 @@ Returns:
 
   printf (
     "%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x\n",
-    Guid->Data1,
+    (unsigned) Guid->Data1,
     Guid->Data2,
     Guid->Data3,
     Guid->Data4[0],
@@ -529,7 +529,7 @@ Returns:
     sprintf (
       (CHAR8 *)Buffer,
       "%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
-      Guid->Data1,
+      (unsigned) Guid->Data1,
       Guid->Data2,
       Guid->Data3,
       Guid->Data4[0],
@@ -545,7 +545,7 @@ Returns:
     sprintf (
       (CHAR8 *)Buffer,
       "%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
-      Guid->Data1,
+      (unsigned) Guid->Data1,
       Guid->Data2,
       Guid->Data3,
       Guid->Data4[0],

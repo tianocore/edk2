@@ -360,7 +360,7 @@ class GenFdsGlobalVariable:
         try:
             PopenObject = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr= subprocess.PIPE)
         except Exception, X:
-            EdkLogger.error("GenFds", BuildToolError.COMMAND_FAILURE, ExtraData="%s: %s" % (str(X), cmd[0]))
+            EdkLogger.error("GenFds", COMMAND_FAILURE, ExtraData="%s: %s" % (str(X), cmd[0]))
         (out, error) = PopenObject.communicate()
 
         while PopenObject.returncode == None :
@@ -371,7 +371,7 @@ class GenFdsGlobalVariable:
             GenFdsGlobalVariable.InfLogger (error)
             if PopenObject.returncode != 0:
                 print "###", cmd
-                EdkLogger.error("GenFds", BuildToolError.COMMAND_FAILURE, errorMess)
+                EdkLogger.error("GenFds", COMMAND_FAILURE, errorMess)
 
     def VerboseLogger (msg):
         EdkLogger.verbose(msg)
@@ -380,7 +380,7 @@ class GenFdsGlobalVariable:
         EdkLogger.info(msg)
 
     def ErrorLogger (msg, File = None, Line = None, ExtraData = None):
-        EdkLogger.error('GenFds', BuildToolError.GENFDS_ERROR, msg, File, Line, ExtraData)
+        EdkLogger.error('GenFds', GENFDS_ERROR, msg, File, Line, ExtraData)
 
     def DebugLogger (Level, msg):
         EdkLogger.debug(Level, msg)

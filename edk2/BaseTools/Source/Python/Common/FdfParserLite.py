@@ -1599,7 +1599,7 @@ class FdfParser(object):
         if not self.__GetNextWord():
             return True
         
-        if not self.__Token in ("SET", "FV", "FILE", "DATA"):
+        if not self.__Token in ("SET", "FV", "FILE", "DATA", "CAPSULE"):
             self.__UndoToken()
             RegionObj.PcdOffset = self.__GetNextPcdName()
             self.Profile.PcdDict[RegionObj.PcdOffset] = RegionObj.Offset + long(Fd.BaseAddress, 0)
@@ -1620,9 +1620,13 @@ class FdfParser(object):
             if not self.__GetNextWord():
                 return True
             
-        if self.__Token == "FV":
+        elif self.__Token == "FV":
             self.__UndoToken()
             self.__GetRegionFvType( RegionObj)
+
+        elif self.__Token == "CAPSULE":
+            self.__UndoToken()
+            self.__GetRegionCapType( RegionObj)
 
         elif self.__Token == "FILE":
             self.__UndoToken()
@@ -1664,7 +1668,38 @@ class FdfParser(object):
                 raise Warning("expected FV name At Line ", self.FileName, self.CurrentLineNumber)
         
             RegionObj.RegionDataList.append(self.__Token)
-        
+
+    ## __GetRegionCapType() method
+    #
+    #   Get region capsule data for region
+    #
+    #   @param  self        The object pointer
+    #   @param  RegionObj   for whom region data is got
+    #
+    def __GetRegionCapType(self, RegionObj):
+
+        if not self.__IsKeyword("CAPSULE"):
+            raise Warning("expected Keyword 'CAPSULE' at line", self.FileName, self.CurrentLineNumber)
+
+        if not self.__IsToken("="):
+            raise Warning("expected '=' at line", self.FileName, self.CurrentLineNumber)
+
+        if not self.__GetNextToken():
+            raise Warning("expected CAPSULE name at line", self.FileName, self.CurrentLineNumber)
+
+        RegionObj.RegionType = "CAPSULE"
+        RegionObj.RegionDataList.append(self.__Token)
+
+        while self.__IsKeyword("CAPSULE"):
+
+            if not self.__IsToken("="):
+                raise Warning("expected '=' at line", self.FileName, self.CurrentLineNumber)
+
+            if not self.__GetNextToken():
+                raise Warning("expected CAPSULE name at line", self.FileName, self.CurrentLineNumber)
+
+            RegionObj.RegionDataList.append(self.__Token)
+
     ## __GetRegionFileType() method
     #
     #   Get region file data for region
@@ -2713,7 +2748,7 @@ class FdfParser(object):
         
         Arch = self.__SkippedChars.rstrip(".")
         if Arch.upper() not in ("IA32", "X64", "IPF", "EBC", "ARM", "COMMON"):
-            raise Warning("Unknown Arch At line ", self.FileName, self.CurrentLineNumber)
+            raise Warning("Unknown Arch '%s'" % Arch, self.FileName, self.CurrentLineNumber)
         
         ModuleType = self.__GetModuleType()
         
@@ -2763,7 +2798,7 @@ class FdfParser(object):
                              "DXE_SMM_DRIVER", "DXE_RUNTIME_DRIVER", \
                              "UEFI_DRIVER", "UEFI_APPLICATION", "USER_DEFINED", "DEFAULT", "BASE", \
                              "SECURITY_CORE", "COMBINED_PEIM_DRIVER", "PIC_PEIM", "RELOCATABLE_PEIM", \
-                             "PE32_PEIM", "BS_DRIVER", "RT_DRIVER", "SAL_RT_DRIVER", "APPLICATION"):
+                             "PE32_PEIM", "BS_DRIVER", "RT_DRIVER", "SAL_RT_DRIVER", "APPLICATION", "ACPITABLE", "SMM_DRIVER", "SMM_CORE"):
             raise Warning("Unknown Module type At line ", self.FileName, self.CurrentLineNumber)
         return self.__Token
     
@@ -2803,11 +2838,11 @@ class FdfParser(object):
             raise Warning("expected FILE At Line ", self.FileName, self.CurrentLineNumber)
         
         if not self.__GetNextWord():
-            raise Warning("expected FV type At Line ", self.FileName, self.CurrentLineNumber)
+            raise Warning("expected FFS type At Line ", self.FileName, self.CurrentLineNumber)
         
         Type = self.__Token.strip().upper()
         if Type not in ("RAW", "FREEFORM", "SEC", "PEI_CORE", "PEIM",\
-                             "PEI_DXE_COMBO", "DRIVER", "DXE_CORE", "APPLICATION", "FV_IMAGE"):
+                             "PEI_DXE_COMBO", "DRIVER", "DXE_CORE", "APPLICATION", "FV_IMAGE", "SMM_DXE_COMBO", "SMM", "SMM_CORE"):
             raise Warning("Unknown FV type At line ", self.FileName, self.CurrentLineNumber)
 
         if not self.__IsToken("="):

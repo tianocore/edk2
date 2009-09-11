@@ -19,6 +19,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <stdlib.h>
 #ifdef __GNUC__
 #include <unistd.h>
+#else
+#include <direct.h>
 #endif
 #include <ctype.h>
 #include "ParseInf.h"
@@ -219,7 +221,7 @@ Returns:
   CHAR8         *OutputDir = NULL;
   CHAR8         *OutFileName1 = NULL;
   CHAR8         *OutFileName2 = NULL;
-  UINT64        SplitValue = -1;
+  UINT64        SplitValue = (UINT64) -1;
   FILE          *Out1;
   FILE          *Out2;
   CHAR8         *OutName1 = NULL;
