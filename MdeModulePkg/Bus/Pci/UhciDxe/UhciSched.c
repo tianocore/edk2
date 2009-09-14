@@ -38,6 +38,8 @@ UhciInitFrameList (
   UINTN                 Pages;
   UINTN                 Bytes;
   UINTN                 Index;
+  UINTN                 Len;
+  EFI_PHYSICAL_ADDRESS  PhyAddr;
 
   //
   // The Frame List is a common buffer that will be
@@ -75,8 +77,9 @@ UhciInitFrameList (
     goto ON_ERROR;
   }
 
-  Uhc->FrameBase    = (UINT32 *) (UINTN) MappedAddr;
-  Uhc->FrameMapping = Mapping;
+  Uhc->FrameBase           = (UINT32 *) (UINTN) Buffer; // Cpu memory address
+  Uhc->FrameBasePciMemAddr = (UINT32 *) (UINTN) MappedAddr; // Pci memory address
+  Uhc->FrameMapping        = Mapping;
 
   //
   // Allocate the QH used by sync interrupt/control/bulk transfer.
@@ -101,10 +104,31 @@ UhciInitFrameList (
   // Each frame entry is linked to this sequence of QH. These QH
   // will remain on the schedul, never got removed
   //
-  Uhc->SyncIntQh->QhHw.HorizonLink  = QH_HLINK (Uhc->CtrlQh, FALSE);
+  Len    = sizeof (UHCI_QH_HW);
+  Status = Uhc->PciIo->Map (
+                         Uhc->PciIo,
+                         EfiPciIoOperationBusMasterRead,
+                         Uhc->CtrlQh,
+                         &Len,
+                         &PhyAddr,
+                         &Mapping
+                         );
+  ASSERT (!EFI_ERROR (Status));
+
+  Uhc->SyncIntQh->QhHw.HorizonLink  = QH_HLINK (PhyAddr, FALSE);
   Uhc->SyncIntQh->NextQh            = Uhc->CtrlQh;
 
-  Uhc->CtrlQh->QhHw.HorizonLink     = QH_HLINK (Uhc->BulkQh, FALSE);
+  Status = Uhc->PciIo->Map (
+                         Uhc->PciIo,
+                         EfiPciIoOperationBusMasterRead,
+                         Uhc->BulkQh,
+                         &Len,
+                         &PhyAddr,
+                         &Mapping
+                         );
+  ASSERT (!EFI_ERROR (Status));
+
+  Uhc->CtrlQh->QhHw.HorizonLink     = QH_HLINK (PhyAddr, FALSE);
   Uhc->CtrlQh->NextQh               = Uhc->BulkQh;
 
   //
@@ -112,19 +136,31 @@ UhciInitFrameList (
   // in supporting the full speed bandwidth reclamation in the previous
   // mentioned form. Most new platforms don't suffer it.
   //
-  Uhc->BulkQh->QhHw.HorizonLink     = QH_HLINK (Uhc->BulkQh, FALSE);
+  Uhc->BulkQh->QhHw.HorizonLink     = QH_HLINK (PhyAddr, FALSE);
 
   Uhc->BulkQh->NextQh               = NULL;
 
+  Len    = sizeof (UHCI_QH_HW);
+  Status = Uhc->PciIo->Map (
+                         Uhc->PciIo,
+                         EfiPciIoOperationBusMasterRead,
+                         Uhc->SyncIntQh,
+                         &Len,
+                         &PhyAddr,
+                         &Mapping
+                         );
+  ASSERT (!EFI_ERROR (Status));
+
   for (Index = 0; Index < UHCI_FRAME_NUM; Index++) {
     Uhc->FrameBase[Index] = QH_HLINK (Uhc->SyncIntQh, FALSE);
+    Uhc->FrameBasePciMemAddr[Index] = QH_HLINK (PhyAddr, FALSE);
   }
 
   //
   // Tell the Host Controller where the Frame List lies,
   // by set the Frame List Base Address Register.
   //
-  UhciSetFrameListBaseAddr (Uhc->PciIo, (VOID *) (Uhc->FrameBase));
+  UhciSetFrameListBaseAddr (Uhc->PciIo, (VOID *) (Uhc->FrameBasePciMemAddr));
   return EFI_SUCCESS;
 
 ON_ERROR:
@@ -181,10 +217,11 @@ UhciDestoryFrameList (
     UsbHcFreeMem (Uhc->MemPool, Uhc->BulkQh, sizeof (UHCI_QH_SW));
   }
 
-  Uhc->FrameBase    = NULL;
-  Uhc->SyncIntQh    = NULL;
-  Uhc->CtrlQh       = NULL;
-  Uhc->BulkQh       = NULL;
+  Uhc->FrameBase           = NULL;
+  Uhc->FrameBasePciMemAddr = NULL;
+  Uhc->SyncIntQh           = NULL;
+  Uhc->CtrlQh              = NULL;
+  Uhc->BulkQh              = NULL;
 }
 
 
@@ -224,29 +261,45 @@ UhciConvertPollRate (
   Link a queue head (for asynchronous interrupt transfer) to
   the frame list.
 
-  @param  FrameBase              The base of the frame list.
+  @param  Uhc                    The UHCI device.
   @param  Qh                     The queue head to link into.
 
 **/
 VOID
 UhciLinkQhToFrameList (
-  UINT32                  *FrameBase,
+  USB_HC_DEV              *Uhc,
   UHCI_QH_SW              *Qh
   )
 {
   UINTN                   Index;
   UHCI_QH_SW              *Prev;
   UHCI_QH_SW              *Next;
+  UINTN                   Len;
+  EFI_PHYSICAL_ADDRESS    PhyAddr;
+  EFI_PHYSICAL_ADDRESS    QhPciAddr;
+  VOID*                   Map;
+  EFI_STATUS              Status;
 
-  ASSERT ((FrameBase != NULL) && (Qh != NULL));
+  ASSERT ((Uhc->FrameBase != NULL) && (Qh != NULL));
+
+  Len    = sizeof (UHCI_QH_HW);
+  Status = Uhc->PciIo->Map (
+                            Uhc->PciIo,
+                            EfiPciIoOperationBusMasterRead,
+                            Qh,
+                            &Len,
+                            &QhPciAddr,
+                            &Map
+                            );
+  ASSERT (!EFI_ERROR (Status));
 
   for (Index = 0; Index < UHCI_FRAME_NUM; Index += Qh->Interval) {
     //
     // First QH can't be NULL because we always keep static queue
     // heads on the frame list
     //
-    ASSERT (!LINK_TERMINATED (FrameBase[Index]));
-    Next  = UHCI_ADDR (FrameBase[Index]);
+    ASSERT (!LINK_TERMINATED (Uhc->FrameBase[Index]));
+    Next  = UHCI_ADDR (Uhc->FrameBase[Index]);
     Prev  = NULL;
 
     //
@@ -266,9 +319,8 @@ UhciLinkQhToFrameList (
     while (Next->Interval > Qh->Interval) {
       Prev  = Next;
       Next  = Next->NextQh;
+      ASSERT (Next != NULL);
     }
-
-    ASSERT (Next != NULL);
 
     //
     // The entry may have been linked into the frame by early insertation.
@@ -298,7 +350,8 @@ UhciLinkQhToFrameList (
       Prev->NextQh            = Qh;
 
       Qh->QhHw.HorizonLink    = Prev->QhHw.HorizonLink;
-      Prev->QhHw.HorizonLink  = QH_HLINK (Qh, FALSE);
+
+      Prev->QhHw.HorizonLink  = QH_HLINK (QhPciAddr, FALSE);
       break;
     }
 
@@ -309,14 +362,27 @@ UhciLinkQhToFrameList (
     //
     if (Qh->NextQh == NULL) {
       Qh->NextQh            = Next;
-      Qh->QhHw.HorizonLink  = QH_HLINK (Next, FALSE);
+
+      Len    = sizeof (UHCI_QH_HW);
+      Status = Uhc->PciIo->Map (
+                            Uhc->PciIo,
+                            EfiPciIoOperationBusMasterRead,
+                            Next,
+                            &Len,
+                            &PhyAddr,
+                            &Map
+                            );
+      ASSERT (!EFI_ERROR (Status));
+
+      Qh->QhHw.HorizonLink  = QH_HLINK (PhyAddr, FALSE);
     }
 
     if (Prev == NULL) {
-      FrameBase[Index]        = QH_HLINK (Qh, FALSE);
+      Uhc->FrameBase[Index]           = QH_HLINK (Qh, FALSE);
+      Uhc->FrameBasePciMemAddr[Index] = QH_HLINK (QhPciAddr, FALSE);
     } else {
       Prev->NextQh            = Qh;
-      Prev->QhHw.HorizonLink  = QH_HLINK (Qh, FALSE);
+      Prev->QhHw.HorizonLink  = QH_HLINK (QhPciAddr, FALSE);
     }
   }
 }
@@ -327,29 +393,29 @@ UhciLinkQhToFrameList (
   the precedence node, and pointer there next to QhSw's
   next.
 
-  @param  FrameBase              The base address of the frame list.
+  @param  Uhc                    The UHCI device.
   @param  Qh                     The queue head to unlink.
 
 **/
 VOID
 UhciUnlinkQhFromFrameList (
-  UINT32                *FrameBase,
-  UHCI_QH_SW            *Qh
+  USB_HC_DEV              *Uhc,
+  UHCI_QH_SW              *Qh
   )
 {
   UINTN                   Index;
   UHCI_QH_SW              *Prev;
   UHCI_QH_SW              *This;
 
-  ASSERT ((FrameBase != NULL) && (Qh != NULL));
+  ASSERT ((Uhc->FrameBase != NULL) && (Qh != NULL));
 
   for (Index = 0; Index < UHCI_FRAME_NUM; Index += Qh->Interval) {
     //
     // Frame link can't be NULL because we always keep static
     // queue heads on the frame list
     //
-    ASSERT (!LINK_TERMINATED (FrameBase[Index]));
-    This  = UHCI_ADDR (FrameBase[Index]);
+    ASSERT (!LINK_TERMINATED (Uhc->FrameBase[Index]));
+    This  = UHCI_ADDR (Uhc->FrameBase[Index]);
     Prev  = NULL;
 
     //
@@ -373,7 +439,8 @@ UhciUnlinkQhFromFrameList (
       //
       // Qh is the first entry in the frame
       //
-      FrameBase[Index]        = Qh->QhHw.HorizonLink;
+      Uhc->FrameBase[Index]           = (UINT32)(UINTN)Qh->NextQh;
+      Uhc->FrameBasePciMemAddr[Index] = Qh->QhHw.HorizonLink;
     } else {
       Prev->NextQh            = Qh->NextQh;
       Prev->QhHw.HorizonLink  = Qh->QhHw.HorizonLink;
@@ -592,6 +659,7 @@ UhciExecuteTransfer (
 /**
   Update Async Request, QH and TDs.
 
+  @param  Uhc                    The UHCI device.
   @param  AsyncReq               The UHCI asynchronous transfer to update.
   @param  Result                 Transfer reslut.
   @param  NextToggle             The toggle of next data.
@@ -599,6 +667,7 @@ UhciExecuteTransfer (
 **/
 VOID
 UhciUpdateAsyncReq (
+  IN USB_HC_DEV          *Uhc,
   IN UHCI_ASYNC_REQUEST  *AsyncReq,
   IN UINT32              Result,
   IN UINT32              NextToggle
@@ -627,7 +696,7 @@ UhciUpdateAsyncReq (
       Td->TdHw.Status    |= USBTD_ACTIVE;
     }
 
-    UhciLinkTdToQh (Qh, FirstTd);
+    UhciLinkTdToQh (Uhc, Qh, FirstTd);
     return ;
   }
 }
@@ -759,7 +828,7 @@ UhciUnlinkAsyncReq (
   ASSERT ((Uhc != NULL) && (AsyncReq != NULL));
 
   RemoveEntryList (&(AsyncReq->Link));
-  UhciUnlinkQhFromFrameList (Uhc->FrameBase, AsyncReq->QhSw);
+  UhciUnlinkQhFromFrameList (Uhc, AsyncReq->QhSw);
 
   if (FreeNow) {
     UhciFreeAsyncReq (Uhc, AsyncReq);
@@ -985,7 +1054,7 @@ UhciMonitorAsyncReqList (
       CopyMem (Data, AsyncReq->FirstTd->Data, QhResult.Complete);
     }
 
-    UhciUpdateAsyncReq (AsyncReq, QhResult.Result, QhResult.NextToggle);
+    UhciUpdateAsyncReq (Uhc, AsyncReq, QhResult.Result, QhResult.NextToggle);
 
     //
     // Now, either transfer is SUCCESS or met errors since
