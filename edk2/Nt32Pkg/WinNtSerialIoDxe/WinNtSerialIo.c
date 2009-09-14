@@ -188,7 +188,7 @@ Returns:
   }
 
   //
-  // If protocols were opened normally, closed it
+  // Close the I/O Abstraction(s) used to perform the supported test
   //
   gBS->CloseProtocol (
         Handle,

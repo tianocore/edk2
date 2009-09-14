@@ -1,6 +1,6 @@
 /*+++
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -186,20 +186,30 @@ Returns:
   // it is a legal Device Path Node for this bus driver's children.
   //
   if (RemainingDevicePath != NULL) {
-    if (RemainingDevicePath->Type != HARDWARE_DEVICE_PATH ||
-        RemainingDevicePath->SubType != HW_VENDOR_DP ||
-        DevicePathNodeLength(RemainingDevicePath) != sizeof(UNIX_VENDOR_DEVICE_PATH_NODE)) {
-      return EFI_UNSUPPORTED;
-    }
-
-    for (Index = 0; Index < UNIX_PCD_ARRAY_SIZE; Index++) {
-      if (CompareGuid (&((VENDOR_DEVICE_PATH *) RemainingDevicePath)->Guid, mPcdEnvironment[Index].DevicePathGuid)) {
-        break;
+    //
+    // Check if RemainingDevicePath is the End of Device Path Node, 
+    // if yes, go on checking other conditions
+    //
+    if (!IsDevicePathEnd (RemainingDevicePath)) {
+      //
+      // If RemainingDevicePath isn't the End of Device Path Node,
+      // check its validation
+      //
+      if (RemainingDevicePath->Type != HARDWARE_DEVICE_PATH ||
+          RemainingDevicePath->SubType != HW_VENDOR_DP ||
+          DevicePathNodeLength(RemainingDevicePath) != sizeof(UNIX_VENDOR_DEVICE_PATH_NODE)) {
+        return EFI_UNSUPPORTED;
       }
-    }
-
-    if (Index >= UNIX_PCD_ARRAY_SIZE) {
-      return EFI_UNSUPPORTED;
+  
+      for (Index = 0; Index < UNIX_PCD_ARRAY_SIZE; Index++) {
+        if (CompareGuid (&((VENDOR_DEVICE_PATH *) RemainingDevicePath)->Guid, mPcdEnvironment[Index].DevicePathGuid)) {
+          break;
+        }
+      }
+  
+      if (Index >= UNIX_PCD_ARRAY_SIZE) {
+        return EFI_UNSUPPORTED;
+      }
     }
   }
   
@@ -208,8 +218,8 @@ Returns:
   //
   Status = gBS->OpenProtocol (
                   ControllerHandle,
-                  &gEfiDevicePathProtocolGuid,
-                  (VOID **)&ParentDevicePath,
+                  &gEfiUnixThunkProtocolGuid,
+                  (VOID **)&UnixThunk,
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -222,17 +232,23 @@ Returns:
     return Status;
   }
 
+  //
+  // Close the I/O Abstraction(s) used to perform the supported test
+  //
   gBS->CloseProtocol (
         ControllerHandle,
-        &gEfiDevicePathProtocolGuid,
+        &gEfiUnixThunkProtocolGuid,
         This->DriverBindingHandle,
         ControllerHandle
         );
 
+  //
+  // Open the EFI Device Path protocol needed to perform the supported test
+  //
   Status = gBS->OpenProtocol (
                   ControllerHandle,
-                  &gEfiUnixThunkProtocolGuid,
-                  (VOID **)&UnixThunk,
+                  &gEfiDevicePathProtocolGuid,
+                  (VOID **)&ParentDevicePath,
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -253,12 +269,12 @@ Returns:
     Status = EFI_UNSUPPORTED;
   }
 
-  //
-  // Close the I/O Abstraction(s) used to perform the supported test
+   //
+  // Close protocol, don't use device path protocol in the Support() function
   //
   gBS->CloseProtocol (
         ControllerHandle,
-        &gEfiUnixThunkProtocolGuid,
+        &gEfiDevicePathProtocolGuid,
         This->DriverBindingHandle,
         ControllerHandle
         );
@@ -414,15 +430,25 @@ Returns:
       CreateDevice = TRUE;
       if (RemainingDevicePath != NULL) {
         CreateDevice  = FALSE;
-        Node          = (UNIX_VENDOR_DEVICE_PATH_NODE *) RemainingDevicePath;
-        if (Node->VendorDevicePath.Header.Type == HARDWARE_DEVICE_PATH &&
-            Node->VendorDevicePath.Header.SubType == HW_VENDOR_DP &&
-            DevicePathNodeLength (&Node->VendorDevicePath.Header) == sizeof (UNIX_VENDOR_DEVICE_PATH_NODE)
-            ) {
-          if (CompareGuid (&Node->VendorDevicePath.Guid, mPcdEnvironment[Index].DevicePathGuid) &&
-              Node->Instance == Count
+        //
+        // Check if RemainingDevicePath is the End of Device Path Node, 
+        // if yes, don't create any child device 
+        //
+        if (!IsDevicePathEnd (RemainingDevicePath)) {
+          //
+          // If RemainingDevicePath isn't the End of Device Path Node,
+          // check its validation
+          //
+          Node          = (UNIX_VENDOR_DEVICE_PATH_NODE *) RemainingDevicePath;
+          if (Node->VendorDevicePath.Header.Type == HARDWARE_DEVICE_PATH &&
+              Node->VendorDevicePath.Header.SubType == HW_VENDOR_DP &&
+              DevicePathNodeLength (&Node->VendorDevicePath.Header) == sizeof (UNIX_VENDOR_DEVICE_PATH_NODE)
               ) {
-            CreateDevice = TRUE;
+            if (CompareGuid (&Node->VendorDevicePath.Guid, mPcdEnvironment[Index].DevicePathGuid) &&
+                Node->Instance == Count
+                ) {
+              CreateDevice = TRUE;
+            }
           }
         }
       }

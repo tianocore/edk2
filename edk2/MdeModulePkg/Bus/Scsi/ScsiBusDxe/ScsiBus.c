@@ -2,7 +2,7 @@
   SCSI Bus driver that layers on every SCSI Pass Thru and
   Extended SCSI Pass Thru protocol in the system.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -142,9 +142,30 @@ SCSIBusDriverBindingSupported (
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
-  EFI_STATUS  Status;
-  EFI_SCSI_PASS_THRU_PROTOCOL *PassThru;
+  EFI_STATUS                      Status;
+  EFI_SCSI_PASS_THRU_PROTOCOL     *PassThru;
   EFI_EXT_SCSI_PASS_THRU_PROTOCOL *ExtPassThru;
+  EFI_DEV_PATH                    *Node;
+
+  if (RemainingDevicePath != NULL) {
+    Node = (EFI_DEV_PATH *) RemainingDevicePath;
+    //
+    // Check if RemainingDevicePath is the End of Device Path Node, 
+    // if yes, go on checking other conditions
+    //
+    if (!IsDevicePathEnd (Node)) {
+      //
+      // If RemainingDevicePath isn't the End of Device Path Node,
+      // check its validation
+      //
+      if (Node->DevPath.Type != MESSAGING_DEVICE_PATH ||
+          Node->DevPath.SubType != MSG_SCSI_DP ||
+          DevicePathNodeLength(&Node->DevPath) != sizeof(ATAPI_DEVICE_PATH)) {
+        return EFI_UNSUPPORTED;
+      }
+    }
+  }
+
   //
   // Check for the existence of Extended SCSI Pass Thru Protocol and SCSI Pass Thru Protocol
   //
@@ -188,6 +209,9 @@ SCSIBusDriverBindingSupported (
     return EFI_SUCCESS;
   }
 
+  //
+  // Close the I/O Abstraction(s) used to perform the supported test
+  //
   gBS->CloseProtocol (
     Controller,
     &gEfiExtScsiPassThruProtocolGuid,
@@ -377,16 +401,32 @@ SCSIBusDriverBindingStart (
     ScsiBusDev = SCSI_BUS_CONTROLLER_DEVICE_FROM_THIS (BusIdentify);
   }
 
+  Lun  = 0;
   if (RemainingDevicePath == NULL) {
+    //
+    // If RemainingDevicePath is NULL, 
+    // must enumerate all SCSI devices anyway
+    //
     SetMem (ScsiTargetId, TARGET_MAX_BYTES,0xFF);
-    Lun  = 0;
     FromFirstTarget = TRUE;
-  } else {
+
+  } else if (!IsDevicePathEnd (RemainingDevicePath)) {
+    //
+    // If RemainingDevicePath isn't the End of Device Path Node, 
+    // only scan the specified device by RemainingDevicePath
+    //
     if (ScsiBusDev->ExtScsiSupport) {
       ScsiBusDev->ExtScsiInterface->GetTargetLun (ScsiBusDev->ExtScsiInterface, RemainingDevicePath, &TargetId, &Lun);  
     } else {
       ScsiBusDev->ScsiInterface->GetTargetLun (ScsiBusDev->ScsiInterface, RemainingDevicePath, &ScsiTargetId->ScsiId.Scsi, &Lun);
     }
+
+  } else {
+    //
+    // If RemainingDevicePath is the End of Device Path Node,
+    // skip enumerate any device and return EFI_SUCESSS
+    // 
+    ScanOtherPuns = FALSE;
   }
 
   while(ScanOtherPuns) {

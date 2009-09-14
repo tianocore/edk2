@@ -2,7 +2,7 @@
 
     Wrapper function for usb host controller interface.
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1109,7 +1109,7 @@ UsbBusAddWantedUsbIoDP (
   //
   // Check whether remaining device path is valid
   //
-  if (RemainingDevicePath != NULL) {
+  if (RemainingDevicePath != NULL && !IsDevicePathEnd (RemainingDevicePath)) {
     if ((RemainingDevicePath->Type    != MESSAGING_DEVICE_PATH) ||
         (RemainingDevicePath->SubType != MSG_USB_DP &&
          RemainingDevicePath->SubType != MSG_USB_CLASS_DP
@@ -1127,24 +1127,31 @@ UsbBusAddWantedUsbIoDP (
 
   if (RemainingDevicePath == NULL) {
     //
-    // RemainingDevicePath== NULL means all Usb devices in this bus are wanted.
+    // RemainingDevicePath == NULL means all Usb devices in this bus are wanted.
     // Here use a Usb class Device Path in WantedUsbIoDPList to indicate all Usb devices
     // are wanted Usb devices
     //
     Status = UsbBusFreeUsbDPList (&Bus->WantedUsbIoDPList);
     ASSERT (!EFI_ERROR (Status));
     DevicePathPtr = DuplicateDevicePath ((EFI_DEVICE_PATH_PROTOCOL *) &mAllUsbClassDevicePath);
-  } else {
+  } else if (!IsDevicePathEnd (RemainingDevicePath)) {
     //
+    // If RemainingDevicePath isn't the End of Device Path Node, 
     // Create new Usb device path according to the usb part in remaining device path
     //
     DevicePathPtr = GetUsbDPFromFullDP (RemainingDevicePath);
+  } else {
+    //
+    // If RemainingDevicePath is the End of Device Path Node,
+    // skip enumerate any device and return EFI_SUCESSS
+    // 
+    return EFI_SUCCESS;
   }
 
   ASSERT (DevicePathPtr != NULL);
   Status = AddUsbDPToList (DevicePathPtr, &Bus->WantedUsbIoDPList);
   ASSERT (!EFI_ERROR (Status));
-  gBS->FreePool (DevicePathPtr);
+  FreePool (DevicePathPtr);
   return EFI_SUCCESS;
 }
 

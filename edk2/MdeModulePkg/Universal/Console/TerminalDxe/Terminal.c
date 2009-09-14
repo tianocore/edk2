@@ -2,7 +2,7 @@
   Produces Simple Text Input Protocol, Simple Text Input Extended Protocol and
   Simple Text Output Protocol upon Serial IO Protocol.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -124,54 +124,38 @@ TerminalDriverBindingSupported (
   // device path that describes a terminal communications protocol.
   //
   if (RemainingDevicePath != NULL) {
-
-    Node = (VENDOR_DEVICE_PATH *) RemainingDevicePath;
-
-    if (Node->Header.Type != MESSAGING_DEVICE_PATH ||
-        Node->Header.SubType != MSG_VENDOR_DP ||
-        DevicePathNodeLength(&Node->Header) != sizeof(VENDOR_DEVICE_PATH)) {
-
-      return EFI_UNSUPPORTED;
-
-    }
     //
-    // only supports PC ANSI, VT100, VT100+ and VT-UTF8 terminal types
+    // Check if RemainingDevicePath is the End of Device Path Node, 
+    // if yes, go on checking other conditions
     //
-    if (!CompareGuid (&Node->Guid, &gEfiPcAnsiGuid) &&
-        !CompareGuid (&Node->Guid, &gEfiVT100Guid) &&
-        !CompareGuid (&Node->Guid, &gEfiVT100PlusGuid) &&
-        !CompareGuid (&Node->Guid, &gEfiVTUTF8Guid)) {
-
-      return EFI_UNSUPPORTED;
+    if (!IsDevicePathEnd (RemainingDevicePath)) {
+      //
+      // If RemainingDevicePath isn't the End of Device Path Node,
+      // check its validation
+      //
+      Node = (VENDOR_DEVICE_PATH *) RemainingDevicePath;
+  
+      if (Node->Header.Type != MESSAGING_DEVICE_PATH ||
+          Node->Header.SubType != MSG_VENDOR_DP ||
+          DevicePathNodeLength(&Node->Header) != sizeof(VENDOR_DEVICE_PATH)) {
+  
+        return EFI_UNSUPPORTED;
+  
+      }
+      //
+      // only supports PC ANSI, VT100, VT100+ and VT-UTF8 terminal types
+      //
+      if (!CompareGuid (&Node->Guid, &gEfiPcAnsiGuid) &&
+          !CompareGuid (&Node->Guid, &gEfiVT100Guid) &&
+          !CompareGuid (&Node->Guid, &gEfiVT100PlusGuid) &&
+          !CompareGuid (&Node->Guid, &gEfiVTUTF8Guid)) {
+  
+        return EFI_UNSUPPORTED;
+      }
     }
   }
   //
   // Open the IO Abstraction(s) needed to perform the supported test
-  //
-  Status = gBS->OpenProtocol (
-                  Controller,
-                  &gEfiDevicePathProtocolGuid,
-                  (VOID **) &ParentDevicePath,
-                  This->DriverBindingHandle,
-                  Controller,
-                  EFI_OPEN_PROTOCOL_BY_DRIVER
-                  );
-  if (Status == EFI_ALREADY_STARTED) {
-    return EFI_SUCCESS;
-  }
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  gBS->CloseProtocol (
-        Controller,
-        &gEfiDevicePathProtocolGuid,
-        This->DriverBindingHandle,
-        Controller
-        );
-
-  //
   // The Controller must support the Serial I/O Protocol.
   // This driver is a bus driver with at most 1 child device, so it is
   // ok for it to be already started.
@@ -191,12 +175,42 @@ TerminalDriverBindingSupported (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   //
   // Close the I/O Abstraction(s) used to perform the supported test
   //
   gBS->CloseProtocol (
         Controller,
         &gEfiSerialIoProtocolGuid,
+        This->DriverBindingHandle,
+        Controller
+        );
+
+  //
+  // Open the EFI Device Path protocol needed to perform the supported test
+  //
+  Status = gBS->OpenProtocol (
+                  Controller,
+                  &gEfiDevicePathProtocolGuid,
+                  (VOID **) &ParentDevicePath,
+                  This->DriverBindingHandle,
+                  Controller,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
+  if (Status == EFI_ALREADY_STARTED) {
+    return EFI_SUCCESS;
+  }
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Close protocol, don't use device path protocol in the Support() function
+  //
+  gBS->CloseProtocol (
+        Controller,
+        &gEfiDevicePathProtocolGuid,
         This->DriverBindingHandle,
         Controller
         );
@@ -353,8 +367,9 @@ TerminalDriverBindingStart (
 
     CopyMem (&DefaultNode->Guid, gTerminalType[TerminalType], sizeof (EFI_GUID));
     RemainingDevicePath = (EFI_DEVICE_PATH_PROTOCOL *) DefaultNode;
-  } else {
+  } else if (!IsDevicePathEnd (RemainingDevicePath)) {
     //
+    // If RemainingDevicePath isn't the End of Device Path Node, 
     // Use the RemainingDevicePath to determine the terminal type
     //
     Node = (VENDOR_DEVICE_PATH *)RemainingDevicePath;
@@ -369,6 +384,12 @@ TerminalDriverBindingStart (
     } else {
       goto Error;
     }
+  } else {
+    //
+    // If RemainingDevicePath is the End of Device Path Node,
+    // skip enumerate any device and return EFI_SUCESSS
+    // 
+    return EFI_SUCCESS;
   }
 
   //
