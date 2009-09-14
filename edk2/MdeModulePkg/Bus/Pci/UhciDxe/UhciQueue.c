@@ -152,19 +152,36 @@ EXIT:
 /**
   Link the TD To QH.
 
+  @param  Uhc         The UHCI device.
   @param  Qh          The queue head for the TD to link to.
   @param  Td          The TD to link.
 
 **/
 VOID
 UhciLinkTdToQh (
+  IN USB_HC_DEV           *Uhc,
   IN UHCI_QH_SW           *Qh,
   IN UHCI_TD_SW           *Td
   )
 {
-  ASSERT ((Qh != NULL) && (Td != NULL));
+  EFI_STATUS            Status;
+  UINTN                 Len;
+  EFI_PHYSICAL_ADDRESS  PhyAddr;
+  VOID*                 Map;
 
-  Qh->QhHw.VerticalLink = QH_VLINK (Td, FALSE);
+  Len    = sizeof (UHCI_TD_HW);
+  Status = Uhc->PciIo->Map (
+                         Uhc->PciIo,
+                         EfiPciIoOperationBusMasterRead,
+                         Td,
+                         &Len,
+                         &PhyAddr,
+                         &Map
+                         );
+
+  ASSERT (!EFI_ERROR (Status) && (Qh != NULL) && (Td != NULL));
+
+  Qh->QhHw.VerticalLink = QH_VLINK (PhyAddr, FALSE);
   Qh->TDs               = (VOID *) Td;
 }
 
@@ -192,19 +209,36 @@ UhciUnlinkTdFromQh (
 /**
   Append a new TD To the previous TD.
 
+  @param  Uhc         The UHCI device.
   @param  PrevTd      Previous UHCI_TD_SW to be linked to.
   @param  ThisTd      TD to link.
 
 **/
 VOID
 UhciAppendTd (
+  IN USB_HC_DEV     *Uhc,
   IN UHCI_TD_SW     *PrevTd,
   IN UHCI_TD_SW     *ThisTd
   )
 {
-  ASSERT ((PrevTd != NULL) && (ThisTd != NULL));
+  EFI_STATUS            Status;
+  UINTN                 Len;
+  EFI_PHYSICAL_ADDRESS  PhyAddr;
+  VOID*                 Map;
 
-  PrevTd->TdHw.NextLink = TD_LINK (ThisTd, TRUE, FALSE);
+  Len    = sizeof (UHCI_TD_HW);
+  Status = Uhc->PciIo->Map (
+                         Uhc->PciIo,
+                         EfiPciIoOperationBusMasterRead,
+                         ThisTd,
+                         &Len,
+                         &PhyAddr,
+                         &Map
+                         );
+
+  ASSERT (!EFI_ERROR (Status) && (PrevTd != NULL) && (ThisTd != NULL));
+
+  PrevTd->TdHw.NextLink = TD_LINK (PhyAddr, TRUE, FALSE);
   PrevTd->NextTd        = (VOID *) ThisTd;
 }
 
@@ -290,7 +324,6 @@ UhciCreateTd (
     return NULL;
   }
 
-  Td->TdHw.NextLink = TD_LINK (NULL, FALSE, TRUE);
   Td->NextTd        = NULL;
   Td->Data          = NULL;
   Td->DataLen       = 0;
@@ -304,7 +337,8 @@ UhciCreateTd (
 
   @param  Uhc         The UHCI device.
   @param  DevAddr     Device address.
-  @param  Request     Device request.
+  @param  Request     A pointer to cpu memory address of Device request.
+  @param  RequestPhy  A pointer to pci memory address of Device request.
   @param  IsLow       Full speed or low speed.
 
   @return The created setup Td Pointer.
@@ -315,6 +349,7 @@ UhciCreateSetupTd (
   IN  USB_HC_DEV          *Uhc,
   IN  UINT8               DevAddr,
   IN  UINT8               *Request,
+  IN  UINT8               *RequestPhy,
   IN  BOOLEAN             IsLow
   )
 {
@@ -338,7 +373,7 @@ UhciCreateSetupTd (
   Td->TdHw.DeviceAddr   = DevAddr & 0x7F;
   Td->TdHw.MaxPacketLen = (UINT32) (sizeof (EFI_USB_DEVICE_REQUEST) - 1);
   Td->TdHw.PidCode      = SETUP_PACKET_ID;
-  Td->TdHw.DataBuffer   = (UINT32) (UINTN) Request;
+  Td->TdHw.DataBuffer   = (UINT32) (UINTN) RequestPhy;
 
   Td->Data              = Request;
   Td->DataLen           = sizeof (EFI_USB_DEVICE_REQUEST);
@@ -353,7 +388,8 @@ UhciCreateSetupTd (
   @param  Uhc         The UHCI device.
   @param  DevAddr     Device address.
   @param  Endpoint    Endpoint number.
-  @param  DataPtr     Data buffer.
+  @param  DataPtr     A pointer to cpu memory address of Data buffer.
+  @param  DataPhyPtr  A pointer to pci memory address of Data buffer.
   @param  Len         Data length.
   @param  PktId       Packet ID.
   @param  Toggle      Data toggle value.
@@ -368,6 +404,7 @@ UhciCreateDataTd (
   IN  UINT8               DevAddr,
   IN  UINT8               Endpoint,
   IN  UINT8               *DataPtr,
+  IN  UINT8               *DataPhyPtr,
   IN  UINTN               Len,
   IN  UINT8               PktId,
   IN  UINT8               Toggle,
@@ -399,7 +436,7 @@ UhciCreateDataTd (
   Td->TdHw.DeviceAddr   = DevAddr & 0x7F;
   Td->TdHw.MaxPacketLen = (UINT32) (Len - 1);
   Td->TdHw.PidCode      = (UINT8) PktId;
-  Td->TdHw.DataBuffer   = (UINT32) (UINTN) DataPtr;
+  Td->TdHw.DataBuffer   = (UINT32) (UINTN) DataPhyPtr;
 
   Td->Data              = DataPtr;
   Td->DataLen           = (UINT16) Len;
@@ -462,8 +499,10 @@ UhciCreateStatusTd (
   @param  Uhc         The UHCI device.
   @param  DeviceAddr  The device address.
   @param  DataPktId   Packet Identification of Data Tds.
-  @param  Request     A pointer to request structure buffer to transfer.
-  @param  Data        A pointer to user data buffer to transfer.
+  @param  Request     A pointer to cpu memory address of request structure buffer to transfer.
+  @param  RequestPhy  A pointer to pci memory address of request structure buffer to transfer.
+  @param  Data        A pointer to cpu memory address of user data buffer to transfer.
+  @param  DataPhy     A pointer to pci memory address of user data buffer to transfer.
   @param  DataLen     Length of user data to transfer.
   @param  MaxPacket   Maximum packet size for control transfer.
   @param  IsLow       Full speed or low speed.
@@ -477,7 +516,9 @@ UhciCreateCtrlTds (
   IN UINT8                DeviceAddr,
   IN UINT8                DataPktId,
   IN UINT8                *Request,
+  IN UINT8                *RequestPhy,
   IN UINT8                *Data,
+  IN UINT8                *DataPhy,
   IN UINTN                DataLen,
   IN UINT8                MaxPacket,
   IN BOOLEAN              IsLow
@@ -502,7 +543,7 @@ UhciCreateCtrlTds (
   //
   // Create setup packets for the transfer
   //
-  SetupTd = UhciCreateSetupTd (Uhc, DeviceAddr, Request, IsLow);
+  SetupTd = UhciCreateSetupTd (Uhc, DeviceAddr, Request, RequestPhy, IsLow);
 
   if (SetupTd == NULL) {
     return NULL;
@@ -523,7 +564,8 @@ UhciCreateCtrlTds (
                Uhc,
                DeviceAddr,
                0,
-               Data,
+               Data,  //cpu memory address
+               DataPhy, //Pci memory address
                ThisTdLen,
                DataPktId,
                DataToggle,
@@ -538,12 +580,13 @@ UhciCreateCtrlTds (
       FirstDataTd         = DataTd;
       FirstDataTd->NextTd = NULL;
     } else {
-      UhciAppendTd (PrevDataTd, DataTd);
+      UhciAppendTd (Uhc, PrevDataTd, DataTd);
     }
 
     DataToggle ^= 1;
     PrevDataTd = DataTd;
     Data += ThisTdLen;
+    DataPhy += ThisTdLen;
     DataLen -= ThisTdLen;
   }
 
@@ -566,10 +609,10 @@ UhciCreateCtrlTds (
   // Link setup Td -> data Tds -> status Td together
   //
   if (FirstDataTd != NULL) {
-    UhciAppendTd (SetupTd, FirstDataTd);
-    UhciAppendTd (PrevDataTd, StatusTd);
+    UhciAppendTd (Uhc, SetupTd, FirstDataTd);
+    UhciAppendTd (Uhc, PrevDataTd, StatusTd);
   } else {
-    UhciAppendTd (SetupTd, StatusTd);
+    UhciAppendTd (Uhc, SetupTd, StatusTd);
   }
 
   return SetupTd;
@@ -594,7 +637,8 @@ FREE_TD:
   @param  DevAddr     Address of Device.
   @param  EndPoint    Endpoint Number.
   @param  PktId       Packet Identification of Data Tds.
-  @param  Data        A pointer to user data buffer to transfer.
+  @param  Data        A pointer to cpu memory address of user data buffer to transfer.
+  @param  DataPhy     A pointer to pci memory address of user data buffer to transfer.
   @param  DataLen     Length of user data to transfer.
   @param  DataToggle  Data Toggle Pointer.
   @param  MaxPacket   Maximum packet size for Bulk/Interrupt transfer.
@@ -610,6 +654,7 @@ UhciCreateBulkOrIntTds (
   IN UINT8                EndPoint,
   IN UINT8                PktId,
   IN UINT8                *Data,
+  IN UINT8                *DataPhy,
   IN UINTN                DataLen,
   IN OUT UINT8            *DataToggle,
   IN UINT8                MaxPacket,
@@ -643,6 +688,7 @@ UhciCreateBulkOrIntTds (
                DevAddr,
                EndPoint,
                Data,
+               DataPhy,
                ThisTdLen,
                PktId,
                *DataToggle,
@@ -661,12 +707,13 @@ UhciCreateBulkOrIntTds (
       FirstDataTd         = DataTd;
       FirstDataTd->NextTd = NULL;
     } else {
-      UhciAppendTd (PrevDataTd, DataTd);
+      UhciAppendTd (Uhc, PrevDataTd, DataTd);
     }
 
     *DataToggle ^= 1;
     PrevDataTd   = DataTd;
     Data        += ThisTdLen;
+    DataPhy     += ThisTdLen;
     DataLen     -= ThisTdLen;
   }
 

@@ -131,15 +131,13 @@ UhciConvertPollRate (
   Link a queue head (for asynchronous interrupt transfer) to
   the frame list.
 
-  @param  FrameBase              The base of the frame list.
+  @param  Uhc                    The UHCI device.
   @param  Qh                     The queue head to link into.
-
-  @return None.
 
 **/
 VOID
 UhciLinkQhToFrameList (
-  UINT32                  *FrameBase,
+  USB_HC_DEV              *Uhc,
   UHCI_QH_SW              *Qh
   );
 
@@ -149,16 +147,14 @@ UhciLinkQhToFrameList (
   the precedence node, and pointer there next to QhSw's
   next.
 
-  @param  FrameBase              The base address of the frame list.
+  @param  Uhc                    The UHCI device.
   @param  Qh                     The queue head to unlink.
-
-  @return None.
 
 **/
 VOID
 UhciUnlinkQhFromFrameList (
-  UINT32                *FrameBase,
-  UHCI_QH_SW            *Qh
+  USB_HC_DEV              *Uhc,
+  UHCI_QH_SW              *Qh
   );
 
 

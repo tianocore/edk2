@@ -707,7 +707,9 @@ Uhci2ControlTransfer (
           Uhc,
           DeviceAddress,
           PktId,
+          (UINT8*)Request,
           RequestPhy,
+          (UINT8*)Data,
           DataPhy,
           TransferDataLength,
           (UINT8) MaximumPacketLength,
@@ -724,7 +726,7 @@ Uhci2ControlTransfer (
   // the TD to corrosponding queue head, then check
   // the execution result
   //
-  UhciLinkTdToQh (Uhc->CtrlQh, TDs);
+  UhciLinkTdToQh (Uhc, Uhc->CtrlQh, TDs);
   Status = UhciExecuteTransfer (Uhc, Uhc->CtrlQh, TDs, TimeOut, IsSlowDevice, &QhResult);
   UhciUnlinkTdFromQh (Uhc->CtrlQh, TDs);
 
@@ -858,6 +860,7 @@ Uhci2BulkTransfer (
              DeviceAddress,
              EndPointAddress,
              PktId,
+             (UINT8 *)*Data,
              DataPhy,
              *DataLength,
              DataToggle,
@@ -878,7 +881,7 @@ Uhci2BulkTransfer (
   //
   BulkQh = Uhc->BulkQh;
 
-  UhciLinkTdToQh (BulkQh, TDs);
+  UhciLinkTdToQh (Uhc, BulkQh, TDs);
   Status = UhciExecuteTransfer (Uhc, BulkQh, TDs, TimeOut, FALSE, &QhResult);
   UhciUnlinkTdFromQh (BulkQh, TDs);
 
@@ -1036,6 +1039,7 @@ Uhci2AsyncInterruptTransfer (
              DeviceAddress,
              EndPointAddress,
              PktId,
+             DataPtr,
              DataPhy,
              DataLength,
              DataToggle,
@@ -1048,7 +1052,7 @@ Uhci2AsyncInterruptTransfer (
     goto DESTORY_QH;
   }
 
-  UhciLinkTdToQh (Qh, IntTds);
+  UhciLinkTdToQh (Uhc, Qh, IntTds);
 
   //
   // Save QH-TD structures to async Interrupt transfer list,
@@ -1073,7 +1077,7 @@ Uhci2AsyncInterruptTransfer (
     goto DESTORY_QH;
   }
 
-  UhciLinkQhToFrameList (Uhc->FrameBase, Qh);
+  UhciLinkQhToFrameList (Uhc, Qh);
 
   gBS->RestoreTPL (OldTpl);
   return EFI_SUCCESS;
@@ -1209,6 +1213,7 @@ Uhci2SyncInterruptTransfer (
           DeviceAddress,
           EndPointAddress,
           PktId,
+          (UINT8 *)Data,
           DataPhy,
           *DataLength,
           DataToggle,
@@ -1224,7 +1229,7 @@ Uhci2SyncInterruptTransfer (
   }
 
 
-  UhciLinkTdToQh (Uhc->SyncIntQh, TDs);
+  UhciLinkTdToQh (Uhc, Uhc->SyncIntQh, TDs);
 
   Status = UhciExecuteTransfer (Uhc, Uhc->SyncIntQh, TDs, TimeOut, IsSlowDevice, &QhResult);
 

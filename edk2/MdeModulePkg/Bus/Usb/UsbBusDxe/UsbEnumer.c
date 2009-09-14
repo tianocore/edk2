@@ -852,8 +852,8 @@ UsbEnumeratePort (
     return EFI_SUCCESS;
   }
 
-  DEBUG (( EFI_D_INFO, "UsbEnumeratePort: port %d state - %x, change - %x\n",
-              Port, PortState.PortStatus, PortState.PortChangeStatus));
+  DEBUG (( EFI_D_INFO, "UsbEnumeratePort: port %d state - %x, change - %x on %p\n",
+              Port, PortState.PortStatus, PortState.PortChangeStatus, HubIf));
 
   //
   // This driver only process two kinds of events now: over current and

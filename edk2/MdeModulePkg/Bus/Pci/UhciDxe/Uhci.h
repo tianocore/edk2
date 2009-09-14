@@ -117,6 +117,7 @@ struct _USB_HC_DEV {
   // Schedule data structures
   //
   UINT32                    *FrameBase;
+  UINT32                    *FrameBasePciMemAddr;
   UHCI_QH_SW                *SyncIntQh;
   UHCI_QH_SW                *CtrlQh;
   UHCI_QH_SW                *BulkQh;

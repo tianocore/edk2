@@ -97,14 +97,14 @@ struct _UHCI_TD_SW {
 /**
   Link the TD To QH.
 
+  @param  Uhc         The UHCI device.
   @param  Qh          The queue head for the TD to link to.
   @param  Td          The TD to link.
-
-  @return None.
 
 **/
 VOID
 UhciLinkTdToQh (
+  IN USB_HC_DEV           *Uhc,
   IN UHCI_QH_SW           *Qh,
   IN UHCI_TD_SW           *Td
   );
@@ -212,8 +212,10 @@ UhciCreateQh (
   @param  Uhc         The UHCI device.
   @param  DeviceAddr  The device address.
   @param  DataPktId   Packet Identification of Data Tds.
-  @param  Request     A pointer to request structure buffer to transfer.
-  @param  Data        A pointer to user data buffer to transfer.
+  @param  Request     A pointer to cpu memory address of request structure buffer to transfer.
+  @param  RequestPhy  A pointer to pci memory address of request structure buffer to transfer.
+  @param  Data        A pointer to cpu memory address of user data buffer to transfer.
+  @param  DataPhy     A pointer to pci memory address of user data buffer to transfer.
   @param  DataLen     Length of user data to transfer.
   @param  MaxPacket   Maximum packet size for control transfer.
   @param  IsLow       Full speed or low speed.
@@ -227,7 +229,9 @@ UhciCreateCtrlTds (
   IN UINT8                DeviceAddr,
   IN UINT8                DataPktId,
   IN UINT8                *Request,
+  IN UINT8                *RequestPhy,
   IN UINT8                *Data,
+  IN UINT8                *DataPhy,
   IN UINTN                DataLen,
   IN UINT8                MaxPacket,
   IN BOOLEAN              IsLow
@@ -241,7 +245,8 @@ UhciCreateCtrlTds (
   @param  DevAddr     Address of Device.
   @param  EndPoint    Endpoint Number.
   @param  PktId       Packet Identification of Data Tds.
-  @param  Data        A pointer to user data buffer to transfer.
+  @param  Data        A pointer to cpu memory address of user data buffer to transfer.
+  @param  DataPhy     A pointer to pci memory address of user data buffer to transfer.
   @param  DataLen     Length of user data to transfer.
   @param  DataToggle  Data Toggle Pointer.
   @param  MaxPacket   Maximum packet size for Bulk/Interrupt transfer.
@@ -257,6 +262,7 @@ UhciCreateBulkOrIntTds (
   IN UINT8                EndPoint,
   IN UINT8                PktId,
   IN UINT8                *Data,
+  IN UINT8                *DataPhy,
   IN UINTN                DataLen,
   IN OUT UINT8            *DataToggle,
   IN UINT8                MaxPacket,
