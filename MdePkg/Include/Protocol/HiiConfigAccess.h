@@ -29,8 +29,11 @@ typedef struct _EFI_HII_CONFIG_ACCESS_PROTOCOL  EFI_HII_CONFIG_ACCESS_PROTOCOL;
 
 typedef UINTN EFI_BROWSER_ACTION;
 
-#define EFI_BROWSER_ACTION_CHANGING 0
-#define EFI_BROWSER_ACTION_CHANGED  1
+#define EFI_BROWSER_ACTION_CHANGING   0
+#define EFI_BROWSER_ACTION_CHANGED    1
+#define EFI_BROWSER_ACTION_RETRIEVE   2
+#define EFI_BROWSER_ACTION_FORM_OPEN  3
+#define EFI_BROWSER_ACTION_FORM_CLOSE 4
 
 /**
    
@@ -190,12 +193,12 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_HII_ACCESS_FORM_CALLBACK)(
-  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
-  IN  EFI_BROWSER_ACTION                     Action,
-  IN  EFI_QUESTION_ID                        QuestionId,
-  IN  UINT8                                  Type,
-  IN  EFI_IFR_TYPE_VALUE                     *Value,
-  OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
+  IN     CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
+  IN     EFI_BROWSER_ACTION                     Action,
+  IN     EFI_QUESTION_ID                        QuestionId,
+  IN     UINT8                                  Type,
+  IN OUT EFI_IFR_TYPE_VALUE                     *Value,
+  OUT    EFI_BROWSER_ACTION_REQUEST             *ActionRequest
   )
   ;
   
