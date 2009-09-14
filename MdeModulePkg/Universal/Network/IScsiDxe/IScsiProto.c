@@ -1008,7 +1008,7 @@ IScsiReceivePdu (
       // The first to receive the useful data. The second to receive the padding.
       //
       Fragment[1].Len   = PadLen + (DataDigest ? sizeof (UINT32) : 0);
-      Fragment[1].Bulk  = (UINT8 *)((UINTN) &PadAndCRC32[0] + (4 - PadLen));
+      Fragment[1].Bulk  = (UINT8 *)PadAndCRC32 + (4 - PadLen);
       FragmentCount     = 2;
     } else {
       FragmentCount = 1;
