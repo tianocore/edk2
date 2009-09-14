@@ -2,7 +2,7 @@
 
     Usb Bus Driver Binding and Bus IO Protocol.
 
-Copyright (c) 2004 - 2007, Intel Corporation
+Copyright (c) 2004 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1124,41 +1124,27 @@ UsbBusControllerDriverSupported (
   // Check whether device path is valid
   //
   if (RemainingDevicePath != NULL) {
-    DevicePathNode.DevPath = RemainingDevicePath;
-
-    if ((DevicePathNode.DevPath->Type    != MESSAGING_DEVICE_PATH) ||
-        (DevicePathNode.DevPath->SubType != MSG_USB_DP &&
-         DevicePathNode.DevPath->SubType != MSG_USB_CLASS_DP
-         && DevicePathNode.DevPath->SubType != MSG_USB_WWID_DP
-         )) {
-
-      return EFI_UNSUPPORTED;
+    //
+    // Check if RemainingDevicePath is the End of Device Path Node, 
+    // if yes, go on checking other conditions
+    //
+    if (!IsDevicePathEnd (RemainingDevicePath)) {
+      //
+      // If RemainingDevicePath isn't the End of Device Path Node,
+      // check its validation
+      //
+      DevicePathNode.DevPath = RemainingDevicePath;
+      
+      if ((DevicePathNode.DevPath->Type    != MESSAGING_DEVICE_PATH) ||
+          (DevicePathNode.DevPath->SubType != MSG_USB_DP &&
+           DevicePathNode.DevPath->SubType != MSG_USB_CLASS_DP
+           && DevicePathNode.DevPath->SubType != MSG_USB_WWID_DP
+           )) {
+      
+        return EFI_UNSUPPORTED;
+      }
     }
   }
-
-  Status = gBS->OpenProtocol (
-                  Controller,
-                  &gEfiDevicePathProtocolGuid,
-                  (VOID **) &ParentDevicePath,
-                  This->DriverBindingHandle,
-                  Controller,
-                  EFI_OPEN_PROTOCOL_BY_DRIVER
-                  );
-
-  if (Status == EFI_ALREADY_STARTED) {
-    return EFI_SUCCESS;
-  }
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  gBS->CloseProtocol (
-         Controller,
-         &gEfiDevicePathProtocolGuid,
-         This->DriverBindingHandle,
-         Controller
-         );
 
   //
   // Check whether USB_HC2 protocol is installed
@@ -1171,45 +1157,80 @@ UsbBusControllerDriverSupported (
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
-
   if (Status == EFI_ALREADY_STARTED) {
     return EFI_SUCCESS;
   }
 
-  if (!EFI_ERROR (Status)) {
-    gBS->CloseProtocol (
-          Controller,
-          &gEfiUsb2HcProtocolGuid,
-          This->DriverBindingHandle,
-          Controller
-          );
+  if (EFI_ERROR (Status)) {
+    //
+    // If failed to open USB_HC2, fall back to USB_HC
+    //
+    Status = gBS->OpenProtocol (
+                    Controller,
+                    &gEfiUsbHcProtocolGuid,
+                    (VOID **) &UsbHc,
+                    This->DriverBindingHandle,
+                    Controller,
+                    EFI_OPEN_PROTOCOL_BY_DRIVER
+                    );
+    if (Status == EFI_ALREADY_STARTED) {
+      return EFI_SUCCESS;
+    }
+  
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
 
-    return EFI_SUCCESS;
-  }
-
-  //
-  // If failed to open USB_HC2, fall back to USB_HC
-  //
-  Status = gBS->OpenProtocol (
-                  Controller,
-                  &gEfiUsbHcProtocolGuid,
-                  (VOID **) &UsbHc,
-                  This->DriverBindingHandle,
-                  Controller,
-                  EFI_OPEN_PROTOCOL_BY_DRIVER
-                  );
-
-  if (Status == EFI_ALREADY_STARTED) {
-    return EFI_SUCCESS;
-  }
-
-  if (!EFI_ERROR (Status)) {
+    //
+    // Close the USB_HC used to perform the supported test
+    //
     gBS->CloseProtocol (
           Controller,
           &gEfiUsbHcProtocolGuid,
           This->DriverBindingHandle,
           Controller
           );
+
+  } else {
+
+    //
+    // Close the USB_HC2 used to perform the supported test
+    //
+    gBS->CloseProtocol (
+           Controller,
+           &gEfiUsb2HcProtocolGuid,
+           This->DriverBindingHandle,
+           Controller
+           );
+  }
+ 
+  //
+  // Open the EFI Device Path protocol needed to perform the supported test
+  //
+  Status = gBS->OpenProtocol (
+                  Controller,
+                  &gEfiDevicePathProtocolGuid,
+                  (VOID **) &ParentDevicePath,
+                  This->DriverBindingHandle,
+                  Controller,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
+  if (Status == EFI_ALREADY_STARTED) {
+    return EFI_SUCCESS;
+  }
+
+  if (!EFI_ERROR (Status)) {
+    //
+    // Close protocol, don't use device path protocol in the Support() function
+    //
+    gBS->CloseProtocol (
+          Controller,
+          &gEfiDevicePathProtocolGuid,
+          This->DriverBindingHandle,
+          Controller
+          );
+
+    return EFI_SUCCESS;
   }
 
   return Status;
@@ -1283,6 +1304,16 @@ UsbBusControllerDriverStart (
     //
     // Save the passed in RemainingDevicePath this time
     //
+    if (RemainingDevicePath != NULL) {
+      if (IsDevicePathEnd (RemainingDevicePath)) {
+        //
+        // If RemainingDevicePath is the End of Device Path Node,
+        // skip enumerate any device and return EFI_SUCESSS
+        // 
+        return EFI_SUCCESS;
+      }
+    }
+
     Status = UsbBusAddWantedUsbIoDP (UsbBusId, RemainingDevicePath);
     ASSERT (!EFI_ERROR (Status));
     //

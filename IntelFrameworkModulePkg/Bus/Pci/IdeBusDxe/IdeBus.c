@@ -194,7 +194,7 @@ IDEBusDriverBindingSupported (
   }
   
   //
-  // If protocols were opened normally, closed it
+  // Close the I/O Abstraction(s) used to perform the supported test
   //
   gBS->CloseProtocol (
         Controller,
@@ -428,7 +428,7 @@ IDEBusDriverBindingStart (
    if (EnumAll || RemainingDevicePath == NULL) {
     //
     // If IdeInit->EnumAll is TRUE or RemainingDevicePath is NULL, 
-    // must enumerate all IDE device anyway
+    // must enumerate all IDE devices anyway
     //
     BeginningIdeChannel = IdePrimary;
     EndIdeChannel       = IdeSecondary;
@@ -437,8 +437,8 @@ IDEBusDriverBindingStart (
 
   } else if (!IsDevicePathEnd (RemainingDevicePath)) {
     //
-    // RemainingDevicePath is the End of Device Path Node, 
-    // only scan the specified device by RemainingDevicePath.
+    // If RemainingDevicePath isn't the End of Device Path Node, 
+    // only scan the specified device by RemainingDevicePath
     //
     Node                = (EFI_DEV_PATH *) RemainingDevicePath;
     BeginningIdeChannel = Node->Atapi.PrimarySecondary;
@@ -456,7 +456,7 @@ IDEBusDriverBindingStart (
 
   } else {
     //
-    // If RemainingDevicePath is not the End of Device Path Node,
+    // If RemainingDevicePath is the End of Device Path Node,
     // skip enumerate any device and return EFI_SUCESSS
     // 
     BeginningIdeChannel = IdeMaxChannel;

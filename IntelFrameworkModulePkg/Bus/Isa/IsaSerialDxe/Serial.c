@@ -144,13 +144,90 @@ SerialControllerDriverSupported (
   EFI_STATUS                                Status;
   EFI_DEVICE_PATH_PROTOCOL                  *ParentDevicePath;
   EFI_ISA_IO_PROTOCOL                       *IsaIo;
-  UART_DEVICE_PATH                          UartNode;
+  UART_DEVICE_PATH                          *UartNode;
 
   //
-  // Ignore the RemainingDevicePath
+  // Check RemainingDevicePath validation
   //
+  if (RemainingDevicePath != NULL) {
+    //
+    // Check if RemainingDevicePath is the End of Device Path Node, 
+    // if yes, go on checking other conditions
+    //
+    if (!IsDevicePathEnd (RemainingDevicePath)) {
+      //
+      // If RemainingDevicePath isn't the End of Device Path Node,
+      // check its validation
+      //
+      Status = EFI_UNSUPPORTED;
+
+      UartNode = (UART_DEVICE_PATH *) RemainingDevicePath;
+      if (UartNode->Header.Type != MESSAGING_DEVICE_PATH ||
+          UartNode->Header.SubType != MSG_UART_DP ||
+          sizeof (UART_DEVICE_PATH) != DevicePathNodeLength ((EFI_DEVICE_PATH_PROTOCOL *) UartNode)
+                                        ) {
+        goto Error;
+      }
+  
+      if (UartNode->BaudRate > SERIAL_PORT_MAX_BAUD_RATE) {
+        goto Error;
+      }
+  
+      if (UartNode->Parity < NoParity || UartNode->Parity > SpaceParity) {
+        goto Error;
+      }
+  
+      if (UartNode->DataBits < 5 || UartNode->DataBits > 8) {
+        goto Error;
+      }
+  
+      if (UartNode->StopBits < OneStopBit || UartNode->StopBits > TwoStopBits) {
+        goto Error;
+      }
+  
+      if ((UartNode->DataBits == 5) && (UartNode->StopBits == TwoStopBits)) {
+        goto Error;
+      }
+  
+      if ((UartNode->DataBits >= 6) && (UartNode->DataBits <= 8) && (UartNode->StopBits == OneFiveStopBits)) {
+        goto Error;
+      }
+  
+      Status = EFI_SUCCESS;
+    }
+  }
+
   //
   // Open the IO Abstraction(s) needed to perform the supported test
+  //
+  Status = gBS->OpenProtocol (
+                  Controller,
+                  &gEfiIsaIoProtocolGuid,
+                  (VOID **) &IsaIo,
+                  This->DriverBindingHandle,
+                  Controller,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
+  if (Status == EFI_ALREADY_STARTED) {
+    return EFI_SUCCESS;
+  }
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Close the I/O Abstraction(s) used to perform the supported test
+  //
+  gBS->CloseProtocol (
+         Controller,
+         &gEfiIsaIoProtocolGuid,
+         This->DriverBindingHandle,
+         Controller
+         );
+
+  //
+  // Open the EFI Device Path protocol needed to perform the supported test
   //
   Status = gBS->OpenProtocol (
                   Controller,
@@ -167,30 +244,6 @@ SerialControllerDriverSupported (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-
-  gBS->CloseProtocol (
-         Controller,
-         &gEfiDevicePathProtocolGuid,
-         This->DriverBindingHandle,
-         Controller
-         );
-
-  Status = gBS->OpenProtocol (
-                  Controller,
-                  &gEfiIsaIoProtocolGuid,
-                  (VOID **) &IsaIo,
-                  This->DriverBindingHandle,
-                  Controller,
-                  EFI_OPEN_PROTOCOL_BY_DRIVER
-                  );
-
-  if (Status == EFI_ALREADY_STARTED) {
-    return EFI_SUCCESS;
-  }
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
   //
   // Use the ISA I/O Protocol to see if Controller is standard ISA UART that
   // can be managed by this driver.
@@ -200,57 +253,14 @@ SerialControllerDriverSupported (
     Status = EFI_UNSUPPORTED;
     goto Error;
   }
-  //
-  // Make sure RemainingDevicePath is valid
-  //
-  if (RemainingDevicePath != NULL) {
-    Status = EFI_UNSUPPORTED;
-    CopyMem (
-      &UartNode,
-      (UART_DEVICE_PATH *) RemainingDevicePath,
-      sizeof (UART_DEVICE_PATH)
-      );
-    if (UartNode.Header.Type != MESSAGING_DEVICE_PATH ||
-        UartNode.Header.SubType != MSG_UART_DP ||
-        sizeof (UART_DEVICE_PATH) != DevicePathNodeLength ((EFI_DEVICE_PATH_PROTOCOL *) &UartNode)
-                                      ) {
-      goto Error;
-    }
-
-    if (UartNode.BaudRate > SERIAL_PORT_MAX_BAUD_RATE) {
-      goto Error;
-    }
-
-    if (UartNode.Parity < NoParity || UartNode.Parity > SpaceParity) {
-      goto Error;
-    }
-
-    if (UartNode.DataBits < 5 || UartNode.DataBits > 8) {
-      goto Error;
-    }
-
-    if (UartNode.StopBits < OneStopBit || UartNode.StopBits > TwoStopBits) {
-      goto Error;
-    }
-
-    if ((UartNode.DataBits == 5) && (UartNode.StopBits == TwoStopBits)) {
-      goto Error;
-    }
-
-    if ((UartNode.DataBits >= 6) && (UartNode.DataBits <= 8) && (UartNode.StopBits == OneFiveStopBits)) {
-      goto Error;
-    }
-
-    Status = EFI_SUCCESS;
-  }
 
 Error:
   //
-  // Close the I/O Abstraction(s) used to perform the supported test
+  // Close protocol, don't use device path protocol in the Support() function
   //
   gBS->CloseProtocol (
          Controller,
-         &gEfiIsaIoProtocolGuid,
+         &gEfiDevicePathProtocolGuid,
          This->DriverBindingHandle,
          Controller
          );
@@ -281,11 +291,11 @@ SerialControllerDriverStart (
   EFI_ISA_IO_PROTOCOL                 *IsaIo;
   SERIAL_DEV                          *SerialDevice;
   UINTN                               Index;
-  UART_DEVICE_PATH                    Node;
   EFI_DEVICE_PATH_PROTOCOL            *ParentDevicePath;
   EFI_OPEN_PROTOCOL_INFORMATION_ENTRY *OpenInfoBuffer;
   UINTN                               EntryCount;
   EFI_SERIAL_IO_PROTOCOL              *SerialIo;
+  UART_DEVICE_PATH                    *UartNode;
 
   SerialDevice = NULL;
   //
@@ -328,9 +338,13 @@ SerialControllerDriverStart (
 
   if (Status == EFI_ALREADY_STARTED) {
 
-    if (RemainingDevicePath == NULL) {
+    if (RemainingDevicePath == NULL || IsDevicePathEnd (RemainingDevicePath)) {
+      //
+      // If RemainingDevicePath is NULL or is the End of Device Path Node
+      //
       return EFI_SUCCESS;
     }
+
     //
     // Make sure a child handle does not already exist.  This driver can only
     // produce one child per serial port.
@@ -357,24 +371,44 @@ SerialControllerDriverStart (
                         EFI_OPEN_PROTOCOL_GET_PROTOCOL
                         );
         if (!EFI_ERROR (Status)) {
-          CopyMem (&Node, RemainingDevicePath, sizeof (UART_DEVICE_PATH));
+          UartNode = (UART_DEVICE_PATH *) RemainingDevicePath;
           Status = SerialIo->SetAttributes (
                                SerialIo,
-                               Node.BaudRate,
+                               UartNode->BaudRate,
                                SerialIo->Mode->ReceiveFifoDepth,
                                SerialIo->Mode->Timeout,
-                               (EFI_PARITY_TYPE) Node.Parity,
-                               Node.DataBits,
-                               (EFI_STOP_BITS_TYPE) Node.StopBits
+                               (EFI_PARITY_TYPE) UartNode->Parity,
+                               UartNode->DataBits,
+                               (EFI_STOP_BITS_TYPE) UartNode->StopBits
                                );
         }
         break;
       }
     }
+    FreePool (OpenInfoBuffer);
 
-    gBS->FreePool (OpenInfoBuffer);
-    return Status;
+    if (Index < EntryCount) {
+      //
+      // If gEfiSerialIoProtocolGuid is opened by one child device, return
+      //
+      return Status;
+    }
+    //
+    // If gEfiSerialIoProtocolGuid is not opened by any child device,
+    // go further to create child device handle based on RemainingDevicePath
+    //
   }
+
+  if (RemainingDevicePath != NULL) {
+    if (IsDevicePathEnd (RemainingDevicePath)) {
+      //
+      // If RemainingDevicePath is the End of Device Path Node,
+      // skip enumerate any device and return EFI_SUCESSS
+      // 
+      return EFI_SUCCESS;
+    }
+  }
+
   //
   // Initialize the serial device instance
   //
@@ -387,6 +421,21 @@ SerialControllerDriverStart (
   SerialDevice->SerialIo.Mode       = &(SerialDevice->SerialMode);
   SerialDevice->IsaIo               = IsaIo;
   SerialDevice->ParentDevicePath    = ParentDevicePath;
+
+  //
+  // Check if RemainingDevicePath is NULL, 
+  // if yes, use the values from the gSerialDevTempate as no remaining device path was
+  // passed in.
+  //
+  if (RemainingDevicePath != NULL) {
+    //
+    // If RemainingDevicePath isn't NULL, 
+    // match the configuration of the RemainingDevicePath. IsHandleSupported()
+    // already checked to make sure the RemainingDevicePath contains settings
+    // that we can support.
+    //
+    CopyMem (&SerialDevice->UartDevicePath, RemainingDevicePath, sizeof (UART_DEVICE_PATH));
+  }
 
   AddName (SerialDevice, IsaIo);
 
@@ -414,19 +463,6 @@ SerialControllerDriverStart (
     goto Error;
   }
 
-  if (RemainingDevicePath != NULL) {
-    //
-    // Match the configuration of the RemainingDevicePath. IsHandleSupported()
-    // already checked to make sure the RemainingDevicePath contains settings
-    // that we can support.
-    //
-    CopyMem (&SerialDevice->UartDevicePath, RemainingDevicePath, sizeof (UART_DEVICE_PATH));
-  } else {
-    //
-    // Use the values from the gSerialDevTempate as no remaining device path was
-    // passed in.
-    //
-  }
   //
   // Build the device path by appending the UART node to the ParentDevicePath.
   //The Uart setings are zero here, since  SetAttribute() will update them to match 
