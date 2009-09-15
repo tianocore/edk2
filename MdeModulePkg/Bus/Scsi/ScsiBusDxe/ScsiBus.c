@@ -160,7 +160,7 @@ SCSIBusDriverBindingSupported (
       //
       if (Node->DevPath.Type != MESSAGING_DEVICE_PATH ||
           Node->DevPath.SubType != MSG_SCSI_DP ||
-          DevicePathNodeLength(&Node->DevPath) != sizeof(ATAPI_DEVICE_PATH)) {
+          DevicePathNodeLength(&Node->DevPath) != sizeof(SCSI_DEVICE_PATH)) {
         return EFI_UNSUPPORTED;
       }
     }
