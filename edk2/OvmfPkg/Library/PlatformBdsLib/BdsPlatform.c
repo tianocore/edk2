@@ -21,11 +21,50 @@
 
 VOID          *mEfiDevPathNotifyReg;
 EFI_EVENT     mEfiDevPathEvent;
+BOOLEAN       mDetectVgaOnly;
+
+
+//
+// Type definitions
+//
+
+typedef
+EFI_STATUS
+(EFIAPI *PROTOCOL_INSTANCE_CALLBACK)(
+  IN EFI_HANDLE           Handle,
+  IN VOID                 *Instance,
+  IN VOID                 *Context
+  );
+
+/**
+  @param[in]  Handle - Handle of PCI device instance
+  @param[in]  PciIo - PCI IO protocol instance
+  @param[in]  Pci - PCI Header register block
+**/
+typedef
+EFI_STATUS
+(EFIAPI *VISIT_PCI_INSTANCE_CALLBACK)(
+  IN EFI_HANDLE           Handle,
+  IN EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN PCI_TYPE00           *Pci
+  );
 
 
 //
 // Function prototypes
 //
+
+EFI_STATUS
+VisitAllInstancesOfProtocol (
+  IN EFI_GUID                    *Id,
+  IN PROTOCOL_INSTANCE_CALLBACK  CallBackFunction,
+  IN VOID                        *Context
+  );
+
+EFI_STATUS
+VisitAllPciInstancesOfProtocol (
+  IN VISIT_PCI_INSTANCE_CALLBACK CallBackFunction
+  );
 
 VOID
 InstallDevicePathCallback (
@@ -399,32 +438,17 @@ Returns:
 }
 
 EFI_STATUS
-DetectAndPreparePlatformPciDevicePath (
-  BOOLEAN DetectVgaOnly
+VisitAllInstancesOfProtocol (
+  IN EFI_GUID                    *Id,
+  IN PROTOCOL_INSTANCE_CALLBACK  CallBackFunction,
+  IN VOID                        *Context
   )
-/*++
-
-Routine Description:
-
-  Do platform specific PCI Device check and add them to ConOut, ConIn, ErrOut
-
-Arguments:
-
-  DetectVgaOnly           - Only detect VGA device if it's TRUE.
-
-Returns:
-
-  EFI_SUCCESS             - PCI Device check and Console variable update successfully.
-  EFI_STATUS              - PCI Device check or Console variable update fail.
-
---*/
 {
   EFI_STATUS                Status;
   UINTN                     HandleCount;
   EFI_HANDLE                *HandleBuffer;
   UINTN                     Index;
-  EFI_PCI_IO_PROTOCOL       *PciIo;
-  PCI_TYPE00                Pci;
+  VOID                      *Instance;
 
   //
   // Start to check all the PciIo to find all possible device
@@ -433,7 +457,7 @@ Returns:
   HandleBuffer = NULL;
   Status = gBS->LocateHandleBuffer (
                   ByProtocol,
-                  &gEfiPciIoProtocolGuid,
+                  Id,
                   NULL,
                   &HandleCount,
                   &HandleBuffer
@@ -443,80 +467,167 @@ Returns:
   }
 
   for (Index = 0; Index < HandleCount; Index++) {
-    Status = gBS->HandleProtocol (HandleBuffer[Index], &gEfiPciIoProtocolGuid, (VOID*)&PciIo);
+    Status = gBS->HandleProtocol (HandleBuffer[Index], Id, &Instance);
     if (EFI_ERROR (Status)) {
       continue;
     }
 
-    //
-    // Check for all PCI device
-    //
-    Status = PciIo->Pci.Read (
-                      PciIo,
-                      EfiPciIoWidthUint32,
-                      0,
-                      sizeof (Pci) / sizeof (UINT32),
-                      &Pci
-                      );
-    if (EFI_ERROR (Status)) {
-      continue;
-    }
-
-    Status = PciIo->Attributes (
-      PciIo,
-      EfiPciIoAttributeOperationEnable,
-      EFI_PCI_DEVICE_ENABLE,
-      NULL
-      );
-    ASSERT_EFI_ERROR (Status);
-
-    if (!DetectVgaOnly) {
-      //
-      // Here we decide whether it is LPC Bridge
-      //
-      if ((IS_PCI_LPC (&Pci)) ||
-          ((IS_PCI_ISA_PDECODE (&Pci)) &&
-           (Pci.Hdr.VendorId == 0x8086) &&
-           (Pci.Hdr.DeviceId == 0x7000)
-          )
-         ) {
-        //
-        // Add IsaKeyboard to ConIn,
-        // add IsaSerial to ConOut, ConIn, ErrOut
-        //
-        DEBUG ((EFI_D_INFO, "Found LPC Bridge device\n"));
-        PrepareLpcBridgeDevicePath (HandleBuffer[Index]);
-        continue;
-      }
-      //
-      // Here we decide which Serial device to enable in PCI bus
-      //
-      if (IS_PCI_16550SERIAL (&Pci)) {
-        //
-        // Add them to ConOut, ConIn, ErrOut.
-        //
-        DEBUG ((EFI_D_INFO, "Found PCI 16550 SERIAL device\n"));
-        PreparePciSerialDevicePath (HandleBuffer[Index]);
-        continue;
-      }
-    }
-
-    //
-    // Here we decide which VGA device to enable in PCI bus
-    //
-    if (IS_PCI_VGA (&Pci)) {
-      //
-      // Add them to ConOut.
-      //
-      DEBUG ((EFI_D_INFO, "Found PCI VGA device\n"));
-      PreparePciVgaDevicePath (HandleBuffer[Index]);
-      continue;
-    }
+    Status = (*CallBackFunction) (
+               HandleBuffer[Index],
+               Instance,
+               Context
+               );
   }
 
   gBS->FreePool (HandleBuffer);
 
   return EFI_SUCCESS;
+}
+
+
+EFI_STATUS
+EFIAPI
+VisitingAPciInstance (
+  IN EFI_HANDLE  Handle,
+  IN VOID        *Instance,
+  IN VOID        *Context
+  )
+{
+  EFI_STATUS                Status;
+  EFI_PCI_IO_PROTOCOL       *PciIo;
+  PCI_TYPE00                Pci;
+
+  PciIo = (EFI_PCI_IO_PROTOCOL*) Instance;
+
+  //
+  // Check for all PCI device
+  //
+  Status = PciIo->Pci.Read (
+                    PciIo,
+                    EfiPciIoWidthUint32,
+                    0,
+                    sizeof (Pci) / sizeof (UINT32),
+                    &Pci
+                    );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return (*(VISIT_PCI_INSTANCE_CALLBACK) Context) (
+           Handle,
+           PciIo,
+           &Pci
+           );
+
+}
+
+
+
+EFI_STATUS
+VisitAllPciInstances (
+  IN VISIT_PCI_INSTANCE_CALLBACK CallBackFunction
+  )
+{
+  return VisitAllInstancesOfProtocol (
+           &gEfiPciIoProtocolGuid,
+           VisitingAPciInstance,
+           (VOID*) CallBackFunction
+           );
+}
+
+
+/**
+  Do platform specific PCI Device check and add them to
+  ConOut, ConIn, ErrOut.
+
+  @param[in]  Handle - Handle of PCI device instance
+  @param[in]  PciIo - PCI IO protocol instance
+  @param[in]  Pci - PCI Header register block
+
+  @retval EFI_SUCCESS - PCI Device check and Console variable update successfully.
+  @retval EFI_STATUS - PCI Device check or Console variable update fail.
+
+**/
+EFI_STATUS
+DetectAndPreparePlatformPciDevicePath (
+  IN EFI_HANDLE           Handle,
+  IN EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN PCI_TYPE00           *Pci
+  )
+{
+  EFI_STATUS                Status;
+
+  Status = PciIo->Attributes (
+    PciIo,
+    EfiPciIoAttributeOperationEnable,
+    EFI_PCI_DEVICE_ENABLE,
+    NULL
+    );
+  ASSERT_EFI_ERROR (Status);
+
+  if (!mDetectVgaOnly) {
+    //
+    // Here we decide whether it is LPC Bridge
+    //
+    if ((IS_PCI_LPC (Pci)) ||
+        ((IS_PCI_ISA_PDECODE (Pci)) &&
+         (Pci->Hdr.VendorId == 0x8086) &&
+         (Pci->Hdr.DeviceId == 0x7000)
+        )
+       ) {
+      //
+      // Add IsaKeyboard to ConIn,
+      // add IsaSerial to ConOut, ConIn, ErrOut
+      //
+      DEBUG ((EFI_D_INFO, "Found LPC Bridge device\n"));
+      PrepareLpcBridgeDevicePath (Handle);
+      return EFI_SUCCESS;
+    }
+    //
+    // Here we decide which Serial device to enable in PCI bus
+    //
+    if (IS_PCI_16550SERIAL (Pci)) {
+      //
+      // Add them to ConOut, ConIn, ErrOut.
+      //
+      DEBUG ((EFI_D_INFO, "Found PCI 16550 SERIAL device\n"));
+      PreparePciSerialDevicePath (Handle);
+      return EFI_SUCCESS;
+    }
+  }
+
+  //
+  // Here we decide which VGA device to enable in PCI bus
+  //
+  if (IS_PCI_VGA (Pci)) {
+    //
+    // Add them to ConOut.
+    //
+    DEBUG ((EFI_D_INFO, "Found PCI VGA device\n"));
+    PreparePciVgaDevicePath (Handle);
+    return EFI_SUCCESS;
+  }
+
+  return Status;
+}
+
+
+/**
+  Do platform specific PCI Device check and add them to ConOut, ConIn, ErrOut
+
+  @param[in]  DetectVgaOnly - Only detect VGA device if it's TRUE.
+
+  @retval EFI_SUCCESS - PCI Device check and Console variable update successfully.
+  @retval EFI_STATUS - PCI Device check or Console variable update fail.
+
+**/
+EFI_STATUS
+DetectAndPreparePlatformPciDevicePaths (
+  BOOLEAN DetectVgaOnly
+  )
+{
+  mDetectVgaOnly = DetectVgaOnly;
+  return VisitAllPciInstances (DetectAndPreparePlatformPciDevicePath);
 }
 
 
@@ -572,7 +683,7 @@ Returns:
     //
     // Do platform specific PCI Device check and add them to ConOut, ConIn, ErrOut
     //
-    DetectAndPreparePlatformPciDevicePath (FALSE);
+    DetectAndPreparePlatformPciDevicePaths (FALSE);
 
     //
     // Have chance to connect the platform default console,
@@ -597,7 +708,7 @@ Returns:
     //
     // Only detect VGA device and add them to ConOut
     //
-    DetectAndPreparePlatformPciDevicePath (TRUE);
+    DetectAndPreparePlatformPciDevicePaths (TRUE);
   }
 
   //
