@@ -132,39 +132,27 @@ PciBusDriverBindingSupported (
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL *PciRootBridgeIo;
   EFI_DEV_PATH_PTR                Node;
 
+  //
+  // Check RemainingDevicePath validation
+  //
   if (RemainingDevicePath != NULL) {
-    Node.DevPath = RemainingDevicePath;
-    if (Node.DevPath->Type != HARDWARE_DEVICE_PATH ||
-        Node.DevPath->SubType != HW_PCI_DP         ||
-        DevicePathNodeLength(Node.DevPath) != sizeof(PCI_DEVICE_PATH)) {
-      return EFI_UNSUPPORTED;
+    //
+    // Check if RemainingDevicePath is the End of Device Path Node, 
+    // if yes, go on checking other conditions
+    //
+    if (!IsDevicePathEnd (RemainingDevicePath)) {
+      //
+      // If RemainingDevicePath isn't the End of Device Path Node,
+      // check its validation
+      //
+      Node.DevPath = RemainingDevicePath;
+      if (Node.DevPath->Type != HARDWARE_DEVICE_PATH ||
+          Node.DevPath->SubType != HW_PCI_DP         ||
+          DevicePathNodeLength(Node.DevPath) != sizeof(PCI_DEVICE_PATH)) {
+        return EFI_UNSUPPORTED;
+      }
     }
   }
-  //
-  // Open the IO Abstraction(s) needed to perform the supported test
-  //
-  Status = gBS->OpenProtocol (
-                  Controller,
-                  &gEfiDevicePathProtocolGuid,
-                  (VOID **) &ParentDevicePath,
-                  This->DriverBindingHandle,
-                  Controller,
-                  EFI_OPEN_PROTOCOL_BY_DRIVER
-                  );
-  if (Status == EFI_ALREADY_STARTED) {
-    return EFI_SUCCESS;
-  }
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  gBS->CloseProtocol (
-        Controller,
-        &gEfiDevicePathProtocolGuid,
-        This->DriverBindingHandle,
-        Controller
-        );
 
   //
   // Check if Pci Root Bridge IO protocol is installed by platform
@@ -185,9 +173,41 @@ PciBusDriverBindingSupported (
     return Status;
   }
 
+  //
+  // Close the I/O Abstraction(s) used to perform the supported test
+  //
   gBS->CloseProtocol (
         Controller,
         &gEfiPciRootBridgeIoProtocolGuid,
+        This->DriverBindingHandle,
+        Controller
+        );
+
+  //
+  // Open the EFI Device Path protocol needed to perform the supported test
+  //
+  Status = gBS->OpenProtocol (
+                  Controller,
+                  &gEfiDevicePathProtocolGuid,
+                  (VOID **) &ParentDevicePath,
+                  This->DriverBindingHandle,
+                  Controller,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
+  if (Status == EFI_ALREADY_STARTED) {
+    return EFI_SUCCESS;
+  }
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Close protocol, don't use device path protocol in the Support() function
+  //
+  gBS->CloseProtocol (
+        Controller,
+        &gEfiDevicePathProtocolGuid,
         This->DriverBindingHandle,
         Controller
         );
@@ -218,6 +238,19 @@ PciBusDriverBindingStart (
   )
 {
   EFI_STATUS  Status;
+
+  //
+  // Check RemainingDevicePath validation
+  //
+  if (RemainingDevicePath != NULL) {
+    //
+    // Check if RemainingDevicePath is the End of Device Path Node, 
+    // if yes, return EFI_SUCCESS
+    //
+    if (IsDevicePathEnd (RemainingDevicePath)) {
+      return EFI_SUCCESS;
+    }
+  }
 
   Status = gBS->LocateProtocol (
                   &gEfiIncompatiblePciDeviceSupportProtocolGuid,

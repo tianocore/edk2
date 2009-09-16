@@ -69,42 +69,27 @@ PartitionDriverBindingSupported (
   EFI_DISK_IO_PROTOCOL      *DiskIo;
   EFI_DEV_PATH              *Node;
 
+  //
+  // Check RemainingDevicePath validation
+  //
   if (RemainingDevicePath != NULL) {
-    Node = (EFI_DEV_PATH *) RemainingDevicePath;
-    if (Node->DevPath.Type != MEDIA_DEVICE_PATH ||
+    //
+    // Check if RemainingDevicePath is the End of Device Path Node, 
+    // if yes, go on checking other conditions
+    //
+    if (!IsDevicePathEnd (RemainingDevicePath)) {
+      //
+      // If RemainingDevicePath isn't the End of Device Path Node,
+      // check its validation
+      //
+      Node = (EFI_DEV_PATH *) RemainingDevicePath;
+      if (Node->DevPath.Type != MEDIA_DEVICE_PATH ||
         Node->DevPath.SubType != MEDIA_HARDDRIVE_DP ||
-        DevicePathNodeLength (&Node->DevPath) != sizeof (HARDDRIVE_DEVICE_PATH)
-        ) {
+        DevicePathNodeLength (&Node->DevPath) != sizeof (HARDDRIVE_DEVICE_PATH)) {
       return EFI_UNSUPPORTED;
+      }
     }
   }
-  //
-  // Open the IO Abstraction(s) needed to perform the supported test
-  //
-  Status = gBS->OpenProtocol (
-                  ControllerHandle,
-                  &gEfiDevicePathProtocolGuid,
-                  (VOID **) &ParentDevicePath,
-                  This->DriverBindingHandle,
-                  ControllerHandle,
-                  EFI_OPEN_PROTOCOL_BY_DRIVER
-                  );
-  if (Status == EFI_ALREADY_STARTED) {
-    return EFI_SUCCESS;
-  }
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-  //
-  // Close the I/O Abstraction(s) used to perform the supported test
-  //
-  gBS->CloseProtocol (
-         ControllerHandle,
-         &gEfiDevicePathProtocolGuid,
-         This->DriverBindingHandle,
-         ControllerHandle
-         );
 
   //
   // Open the IO Abstraction(s) needed to perform the supported test
@@ -128,8 +113,37 @@ PartitionDriverBindingSupported (
   // Close the I/O Abstraction(s) used to perform the supported test
   //
   gBS->CloseProtocol (
+         ControllerHandle,
+         &gEfiDiskIoProtocolGuid,
+         This->DriverBindingHandle,
+         ControllerHandle
+         );
+
+  //
+  // Open the EFI Device Path protocol needed to perform the supported test
+  //
+  Status = gBS->OpenProtocol (
+                  ControllerHandle,
+                  &gEfiDevicePathProtocolGuid,
+                  (VOID **) &ParentDevicePath,
+                  This->DriverBindingHandle,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
+  if (Status == EFI_ALREADY_STARTED) {
+    return EFI_SUCCESS;
+  }
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Close protocol, don't use device path protocol in the Support() function
+  //
+  gBS->CloseProtocol (
         ControllerHandle,
-        &gEfiDiskIoProtocolGuid,
+        &gEfiDevicePathProtocolGuid,
         This->DriverBindingHandle,
         ControllerHandle
         );
@@ -180,6 +194,19 @@ PartitionDriverBindingStart (
   EFI_DEVICE_PATH_PROTOCOL  *ParentDevicePath;
   PARTITION_DETECT_ROUTINE  *Routine;
   BOOLEAN                   MediaPresent;
+
+  //
+  // Check RemainingDevicePath validation
+  //
+  if (RemainingDevicePath != NULL) {
+    //
+    // Check if RemainingDevicePath is the End of Device Path Node, 
+    // if yes, return EFI_SUCCESS
+    //
+    if (IsDevicePathEnd (RemainingDevicePath)) {
+      return EFI_SUCCESS;
+    }
+  }
 
   Status = gBS->OpenProtocol (
                   ControllerHandle,

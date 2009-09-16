@@ -466,16 +466,7 @@ Returns:
     }
 
     FreePool (OpenInfoBuffer);
-    if (Index < EntryCount) {
-      //
-      // If gEfiUnixIoProtocolGuid is opened by one child device, return
-      //
-      return Status;
-    }
-    //
-    // If gEfiUnixIoProtocolGuid is not opened by any child device,
-    // go further to create child device handle based on RemainingDevicePath
-    //
+    return Status;
   }
 
   if (RemainingDevicePath == NULL) {

@@ -385,18 +385,9 @@ SerialControllerDriverStart (
         break;
       }
     }
-    FreePool (OpenInfoBuffer);
 
-    if (Index < EntryCount) {
-      //
-      // If gEfiSerialIoProtocolGuid is opened by one child device, return
-      //
-      return Status;
-    }
-    //
-    // If gEfiSerialIoProtocolGuid is not opened by any child device,
-    // go further to create child device handle based on RemainingDevicePath
-    //
+    FreePool (OpenInfoBuffer);
+    return Status;
   }
 
   if (RemainingDevicePath != NULL) {

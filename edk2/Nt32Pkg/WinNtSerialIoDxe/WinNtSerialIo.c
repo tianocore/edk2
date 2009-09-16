@@ -372,18 +372,9 @@ Returns:
         break;
       }
     }
+
     FreePool (OpenInfoBuffer);
-    
-    if (Index < EntryCount) {
-      //
-      // If gEfiWinNtIoProtocolGuid is opened by one child device, return
-      //
-      return Status;
-    }
-    //
-    // If gEfiWinNtIoProtocolGuid is not opened by any child device,
-    // go further to create child device handle based on RemainingDevicePath
-    //
+    return Status;
   }
 
   if (RemainingDevicePath == NULL) {
