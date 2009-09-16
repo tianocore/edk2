@@ -19,6 +19,9 @@
   PACKAGE_GUID                   = 2daf5f34-50e5-4b9d-b8e3-5562334d87e5
   PACKAGE_VERSION                = 0.1
 
+[Includes]
+  Include
+
 [Guids.common]
   gUefiOvmfPkgTokenSpaceGuid      = {0x93bb96af, 0xb9f2, 0x4eb8, {0x94, 0x62, 0xe0, 0xba, 0x74, 0x56, 0x42, 0x36}}
 
@@ -31,4 +34,8 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareBlockSize|0|UINT32|0x00001013
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageVariableBase|0x0|UINT32|0x00001014
 
+[LibraryClasses]
+  ##  @libraryclass  Save and restore variables using a file
+  #
+  NvVarsFileLib|Include/Library/NvVarsFileLib.h
 
