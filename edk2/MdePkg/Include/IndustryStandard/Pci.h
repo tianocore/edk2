@@ -16,5 +16,6 @@
 #define _PCI_H_
 
 #include <IndustryStandard/Pci30.h>
+#include <IndustryStandard/PciExpress21.h>
 
 #endif
