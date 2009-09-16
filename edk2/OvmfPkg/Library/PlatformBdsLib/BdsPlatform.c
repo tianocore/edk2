@@ -666,8 +666,6 @@ Returns:
   //
   // Connect RootBridge
   //
-  ConnectRootBridge ();
-
   VarConout = BdsLibGetVariableAndSize (
                 VarConsoleOut,
                 &gEfiGlobalVariableGuid,
@@ -769,6 +767,90 @@ PciInitialization (
   //
   PciWrite8 (PCI_LIB_ADDRESS (0, 4, 0, 0x3c), 0x09);
   PciWrite8 (PCI_LIB_ADDRESS (0, 4, 0, 0x3d), 0x01);
+}
+
+
+EFI_STATUS
+EFIAPI
+ConnectRecursivelyIfPciMassStorage (
+  IN EFI_HANDLE           Handle,
+  IN EFI_PCI_IO_PROTOCOL  *Instance,
+  IN PCI_TYPE00           *PciHeader
+  )
+{
+  EFI_STATUS                Status;
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+  CHAR16                    *DevPathStr;
+
+  if (IS_CLASS1 (PciHeader, PCI_CLASS_MASS_STORAGE)) {
+    DevicePath = NULL;
+    Status = gBS->HandleProtocol (
+                    Handle,
+                    &gEfiDevicePathProtocolGuid,
+                    (VOID*)&DevicePath
+                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // Print Device Path
+    //
+    DevPathStr = DevicePathToStr (DevicePath);
+    DEBUG((
+      EFI_D_INFO,
+      "Found Mass Storage device: %s\n",
+      DevPathStr
+      ));
+    FreePool(DevPathStr);
+
+    Status = gBS->ConnectController (Handle, NULL, NULL, TRUE);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+  }
+
+  return EFI_SUCCESS;
+}
+
+
+EFI_STATUS
+EFIAPI
+VisitingFileSystemInstance (
+  IN EFI_HANDLE  Handle,
+  IN VOID        *Instance,
+  IN VOID        *Context
+  )
+{
+  EFI_STATUS      Status;
+  STATIC BOOLEAN  ConnectedToFileSystem = FALSE;
+
+  if (ConnectedToFileSystem) {
+    return EFI_ALREADY_STARTED;
+  }
+
+  Status = ConnectNvVarsToFileSystem (Handle);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  ConnectedToFileSystem = TRUE;
+  return EFI_SUCCESS;
+}
+
+
+VOID
+PlatformBdsRestoreNvVarsFromHardDisk (
+  )
+{
+  VisitAllPciInstances (ConnectRecursivelyIfPciMassStorage);
+  VisitAllInstancesOfProtocol (
+    &gEfiSimpleFileSystemProtocolGuid,
+    VisitingFileSystemInstance,
+    NULL
+    );
+  
 }
 
 
@@ -949,6 +1031,14 @@ Returns:
   EFI_BOOT_MODE                      BootMode;
 
   DEBUG ((EFI_D_INFO, "PlatformBdsPolicyBehavior\n"));
+
+  ConnectRootBridge ();
+
+  //
+  // Try to restore variables from the hard disk early so
+  // they can be used for the other BDS connect operations.
+  //
+  PlatformBdsRestoreNvVarsFromHardDisk ();
 
   //
   // Init the time out value
