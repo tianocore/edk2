@@ -4,7 +4,7 @@
   It installs the Capsule Architectural Protocol defined in PI1.0a to signify 
   the capsule runtime services are ready.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -28,6 +28,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/UefiRuntimeLib.h>
 
+//
+// Handle for the installation of Capsule Architecture Protocol.
+//
+EFI_HANDLE  mNewHandle = NULL;
+
 /**
   Passes capsules to the firmware with both virtual and physical mapping. Depending on the intended
   consumption, the firmware may process the capsule immediately. If the payload should persist
@@ -47,8 +52,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                                 CAPSULE_FLAGS_PERSIT_ACROSS_RESET is not set, the
                                 capsule has been successfully processed by the firmware.
   @retval EFI_DEVICE_ERROR      The capsule update was started, but failed due to a device error.
-  @retval EFI_INVALID_PARAMETER CapsuleCount is Zero, or CapsuleImage is not valid.
-                                For across reset capsule image, ScatterGatherList is NULL.
+  @retval EFI_INVALID_PARAMETER CapsuleSize is NULL, or an incompatible set of flags were
+                                set in the capsule header.
+  @retval EFI_INVALID_PARAMETER CapsuleCount is Zero.
+  @retval EFI_INVALID_PARAMETER For across reset capsule image, ScatterGatherList is NULL.
   @retval EFI_UNSUPPORTED       CapsuleImage is not recognized by the firmware.
 
 **/
@@ -64,6 +71,7 @@ UpdateCapsule (
   EFI_STATUS                Status;
   EFI_CAPSULE_HEADER        *CapsuleHeader;
   BOOLEAN                   NeedReset;
+  BOOLEAN                   InitiateReset;
   
   //
   // Capsule Count can't be less than one.
@@ -71,7 +79,9 @@ UpdateCapsule (
   if (CapsuleCount < 1) {
     return EFI_INVALID_PARAMETER;
   }
+
   NeedReset     = FALSE;
+  InitiateReset = FALSE;
   CapsuleHeader = NULL;
 
   for (ArrayNumber = 0; ArrayNumber < CapsuleCount; ArrayNumber++) {
@@ -84,6 +94,13 @@ UpdateCapsule (
       return EFI_INVALID_PARAMETER;
     }
     //
+    // A capsule which has the CAPSULE_FLAGS_INITIATE_RESET flag must have
+    // CAPSULE_FLAGS_PERSIST_ACROSS_RESET set in its header as well.
+    //
+    if ((CapsuleHeader->Flags & (CAPSULE_FLAGS_PERSIST_ACROSS_RESET | CAPSULE_FLAGS_INITIATE_RESET)) == CAPSULE_FLAGS_INITIATE_RESET) {
+      return EFI_INVALID_PARAMETER;
+    }
+    //
     // Check Capsule image without populate flag by firmware support capsule function  
     //
     if (((CapsuleHeader->Flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) == 0) && 
@@ -93,8 +110,8 @@ UpdateCapsule (
   }
 
   //
-  // Walk through all capsules, record whether there is a capsule 
-  // needs reset. And then process capsules which has no reset flag directly.
+  // Walk through all capsules, record whether there is a capsule needs reset
+  // or initiate reset. And then process capsules which has no reset flag directly.
   //
   for (ArrayNumber = 0; ArrayNumber < CapsuleCount ; ArrayNumber++) {
     CapsuleHeader = CapsuleHeaderArray[ArrayNumber];
@@ -113,6 +130,9 @@ UpdateCapsule (
       }
     } else {
       NeedReset = TRUE;
+      if ((CapsuleHeader->Flags & CAPSULE_FLAGS_INITIATE_RESET) != 0) {
+        InitiateReset = TRUE;
+      }
     }
   }
   
@@ -151,7 +171,14 @@ UpdateCapsule (
                  sizeof (UINTN),
                  (VOID *) &ScatterGatherList
                  );
-
+  if (!EFI_ERROR (Status) && InitiateReset) {
+    //
+    // Firmware that encounters a capsule which has the CAPSULE_FLAGS_INITIATE_RESET Flag set in its header
+    // will initiate a reset of the platform which is compatible with the passed-in capsule request and will 
+    // not return back to the caller.
+    //
+    gRT->ResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
+  }
   return Status;
 }
 
@@ -194,7 +221,7 @@ QueryCapsuleCapabilities (
   }
   
   //
-  // Check whether input paramter is valid
+  // Check whether input parameter is valid
   //
   if ((MaxiumCapsuleSize == NULL) ||(ResetType == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -209,6 +236,13 @@ QueryCapsuleCapabilities (
     // CAPSULE_FLAGS_PERSIST_ACROSS_RESET set in its header as well.
     //
     if ((CapsuleHeader->Flags & (CAPSULE_FLAGS_PERSIST_ACROSS_RESET | CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE)) == CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) {
+      return EFI_INVALID_PARAMETER;
+    }
+    //
+    // A capsule which has the CAPSULE_FLAGS_INITIATE_RESET flag must have
+    // CAPSULE_FLAGS_PERSIST_ACROSS_RESET set in its header as well.
+    //
+    if ((CapsuleHeader->Flags & (CAPSULE_FLAGS_PERSIST_ACROSS_RESET | CAPSULE_FLAGS_INITIATE_RESET)) == CAPSULE_FLAGS_INITIATE_RESET) {
       return EFI_INVALID_PARAMETER;
     }
     //
@@ -270,7 +304,6 @@ CapsuleServiceInitialize (
   )
 {
   EFI_STATUS  Status;
-  EFI_HANDLE  NewHandle;
   
   //
   // Install capsule runtime services into UEFI runtime service tables.
@@ -282,15 +315,13 @@ CapsuleServiceInitialize (
   // Install the Capsule Architectural Protocol on a new handle
   // to signify the capsule runtime services are ready.
   //
-  NewHandle = NULL;
-
   Status = gBS->InstallMultipleProtocolInterfaces (
-                  &NewHandle,
+                  &mNewHandle,
                   &gEfiCapsuleArchProtocolGuid,
                   NULL,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
 
-  return EFI_SUCCESS;
+  return Status;
 }
