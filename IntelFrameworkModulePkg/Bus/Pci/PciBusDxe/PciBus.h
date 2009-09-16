@@ -50,6 +50,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 typedef struct _PCI_IO_DEVICE              PCI_IO_DEVICE;
 typedef struct _PCI_BAR                    PCI_BAR;
 
+#define EFI_PCI_RID(Bus, Device, Function)  (((UINT32)Bus << 8) + ((UINT32)Device << 3) + (UINT32)Function)
+#define EFI_PCI_BUS_OF_RID(RID)             ((UINT32)RID >> 8)
+
+#define     EFI_PCI_IOV_POLICY_ARI           0x0001
+#define     EFI_PCI_IOV_POLICY_SRIOV         0x0002
+#define     EFI_PCI_IOV_POLICY_MRIOV         0x0004
+
 typedef enum {
   PciBarTypeUnknown = 0,
   PciBarTypeIo16,
@@ -248,7 +255,17 @@ struct _PCI_IO_DEVICE {
   EFI_HPC_PADDING_ATTRIBUTES                PaddingAttributes;
 
   BOOLEAN                                   IsPciExp;
-
+  //
+  // For SR-IOV
+  //
+  UINT8                                     PciExpressCapabilityOffset;
+  UINT32                                    AriCapabilityOffset;
+  UINT32                                    SrIovCapabilityOffset;
+  UINT32                                    MrIovCapabilityOffset;
+  PCI_BAR                                   VfPciBar[PCI_MAX_BAR];
+  UINT32                                    SystemPageSize;
+  UINT16                                    InitialVFs;
+  UINT16                                    ReservedBusNum;
 };
 
 #define PCI_IO_DEVICE_FROM_PCI_IO_THIS(a) \

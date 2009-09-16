@@ -101,7 +101,12 @@
 
 [FeaturePcd.common]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSrIovSupport
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdAriSupport
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdMrIovSupport
 
+[FixedPcd.common]
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize
 # [Event]
 #   ##
 #   # Notify event set by CreateEventForHpc () for PCI Hot Plug controller.
