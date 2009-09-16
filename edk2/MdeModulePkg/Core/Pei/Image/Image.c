@@ -434,6 +434,13 @@ PeiLoadImage (
                           AuthenticationState
                           );
       if (!EFI_ERROR (Status)) {
+        if (!EFI_IMAGE_MACHINE_TYPE_SUPPORTED (PeCoffLoaderGetMachineType ((VOID *) (UINTN) ImageAddress))) {
+          //
+          // The image to be started must have the machine type supported by PeiCore.
+          //
+          ASSERT (FALSE);
+          return EFI_UNSUPPORTED;
+        }
         return Status;
       }
     }
