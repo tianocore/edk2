@@ -46,6 +46,7 @@ Abstract:
 #define EFI_ACPI_DMA_REMAPPING_STRUCTURE_TYPE_DRHD  0
 #define EFI_ACPI_DMA_REMAPPING_STRUCTURE_TYPE_RMRR  1
 #define EFI_ACPI_DMA_REMAPPING_STRUCTURE_TYPE_ATSR  2
+#define EFI_ACPI_DMA_REMAPPING_STRUCTURE_TYPE_RHSA  3
 
 //
 // Definition for DMA Remapping Structure Header
@@ -116,6 +117,17 @@ typedef struct {
   UINT8                                       Reserved_5;
   UINT16                                      SegmentNumber;
 } EFI_ACPI_DMAR_ROOT_PORT_ATS_CAPABILITY_REPORTING_STRUCTURE;
+
+//
+// Definition for Remapping Hardware Static Affinity(RHSA) Structure
+//
+typedef struct {
+  UINT16                                      Type;
+  UINT16                                      Length;
+  UINT32                                      Reserved;
+  UINT64                                      RegisterBaseAddress;
+  UINT32                                      ProximityDomain;
+} EFI_ACPI_DMAR_REMAPPING_HARDWARE_STATIC_AFFINITY_STRUCTURE;
 
 //
 // Definition for DMA Remapping Structure
