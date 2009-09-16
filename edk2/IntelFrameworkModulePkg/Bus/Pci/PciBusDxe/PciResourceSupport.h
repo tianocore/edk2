@@ -35,6 +35,7 @@ typedef struct {
   UINT64              Length;
   BOOLEAN             Reserved;
   PCI_RESOURCE_USAGE  ResourceUsage;
+  BOOLEAN             Virtual;
 } PCI_RESOURCE_NODE;
 
 #define RESOURCE_NODE_FROM_LINK(a) \
@@ -176,6 +177,28 @@ CreateResourceNode (
 
 /**
   This function is used to extract resource request from
+  IOV VF device node list.
+
+  @param Bridge     Pci device instance.
+  @param IoNode     Resource info node for IO.
+  @param Mem32Node  Resource info node for 32-bit memory.
+  @param PMem32Node Resource info node for 32-bit Prefetchable Memory.
+  @param Mem64Node  Resource info node for 64-bit memory.
+  @param PMem64Node Resource info node for 64-bit Prefetchable Memory.
+
+**/
+PCI_RESOURCE_NODE *
+CreateVfResourceNode (
+  IN PCI_IO_DEVICE         *PciDev,
+  IN UINT64                Length,
+  IN UINT64                Alignment,
+  IN UINT8                 Bar,
+  IN PCI_BAR_TYPE          ResType,
+  IN PCI_RESOURCE_USAGE    ResUsage
+  );
+
+/**
+  This function is used to extract resource request from
   device node list.
 
   @param Bridge     Pci device instance.
@@ -283,6 +306,19 @@ ProgramResource (
 **/
 VOID
 ProgramBar (
+  IN UINT64            Base,
+  IN PCI_RESOURCE_NODE *Node
+  );
+
+/**
+  Program IOV VF Bar register for PCI device.
+
+  @param Base  Base address for PCI device resource to be progammed.
+  @param Node  Point to resoure node structure.
+
+**/
+EFI_STATUS
+ProgramVfBar (
   IN UINT64            Base,
   IN PCI_RESOURCE_NODE *Node
   );

@@ -544,6 +544,94 @@ GetResourceFromDevice (
   }
 
   //
+  // Add VF resource
+  //
+  for (Index = 0; Index < PCI_MAX_BAR; Index++) {
+
+    switch ((PciDev->VfPciBar)[Index].BarType) {
+
+    case PciBarTypeMem32:
+
+      Node = CreateVfResourceNode (
+              PciDev,
+              (PciDev->VfPciBar)[Index].Length,
+              (PciDev->VfPciBar)[Index].Alignment,
+              Index,
+              PciBarTypeMem32,
+              PciResUsageTypical
+              );
+
+      InsertResourceNode (
+        Mem32Node,
+        Node
+        );
+
+      break;
+
+    case PciBarTypeMem64:
+
+      Node = CreateVfResourceNode (
+              PciDev,
+              (PciDev->VfPciBar)[Index].Length,
+              (PciDev->VfPciBar)[Index].Alignment,
+              Index,
+              PciBarTypeMem64,
+              PciResUsageTypical
+              );
+
+      InsertResourceNode (
+        Mem64Node,
+        Node
+        );
+
+      break;
+
+    case PciBarTypePMem64:
+
+      Node = CreateVfResourceNode (
+              PciDev,
+              (PciDev->VfPciBar)[Index].Length,
+              (PciDev->VfPciBar)[Index].Alignment,
+              Index,
+              PciBarTypePMem64,
+              PciResUsageTypical
+              );
+
+      InsertResourceNode (
+        PMem64Node,
+        Node
+        );
+
+      break;
+
+    case PciBarTypePMem32:
+
+      Node = CreateVfResourceNode (
+              PciDev,
+              (PciDev->VfPciBar)[Index].Length,
+              (PciDev->VfPciBar)[Index].Alignment,
+              Index,
+              PciBarTypePMem32,
+              PciResUsageTypical
+              );
+
+      InsertResourceNode (
+        PMem32Node,
+        Node
+        );
+      break;
+
+    case PciBarTypeIo16:
+    case PciBarTypeIo32:
+      break;
+
+    case PciBarTypeUnknown:
+      break;
+
+    default:
+      break;
+    }
+  }
   // If there is no resource requested from this device,
   // then we indicate this device has been allocated naturally.
   //
@@ -595,6 +683,53 @@ CreateResourceNode (
   Node->Reserved      = FALSE;
   Node->ResourceUsage = ResUsage;
   InitializeListHead (&Node->ChildList);
+
+  return Node;
+}
+
+/**
+  This function is used to create a IOV VF resource node.
+
+  @param PciDev       Pci device instance.
+  @param Length       Length of Io/Memory resource.
+  @param Alignment    Alignment of resource.
+  @param Bar          Bar index.
+  @param ResType      Type of resource: IO/Memory.
+  @param ResUsage     Resource usage.
+
+  @return PCI resource node created for given VF PCI device.
+          NULL means PCI resource node is not created.
+
+**/
+PCI_RESOURCE_NODE *
+CreateVfResourceNode (
+  IN PCI_IO_DEVICE         *PciDev,
+  IN UINT64                Length,
+  IN UINT64                Alignment,
+  IN UINT8                 Bar,
+  IN PCI_BAR_TYPE          ResType,
+  IN PCI_RESOURCE_USAGE    ResUsage
+  )
+{
+  PCI_RESOURCE_NODE *Node;
+
+  DEBUG ((
+    EFI_D_INFO,
+    "PCI-IOV B%x.D%x.F%x - VfResource (Bar - 0x%x) (Type - 0x%x) (Length - 0x%x)\n",
+    (UINTN)PciDev->BusNumber,
+    (UINTN)PciDev->DeviceNumber,
+    (UINTN)PciDev->FunctionNumber,
+    (UINTN)Bar,
+    (UINTN)ResType,
+    (UINTN)Length
+    ));
+
+  Node = CreateResourceNode (PciDev, Length, Alignment, Bar, ResType, ResUsage);
+  if (Node == NULL) {
+    return Node;
+  }
+
+  Node->Virtual = TRUE;
 
   return Node;
 }
@@ -1094,6 +1229,13 @@ ProgramBar (
   UINT64              Address;
   UINT32              Address32;
 
+  //
+  // Check VF BAR
+  //
+  if (Node->Virtual) {
+    ProgramVfBar (Base, Node);
+  }
+
   Address = 0;
   PciIo   = &(Node->PciDev->PciIo);
 
@@ -1157,6 +1299,116 @@ ProgramBar (
   default:
     break;
   }
+}
+
+/**
+  Program IOV VF Bar register for PCI device.
+
+  @param Base  Base address for PCI device resource to be progammed.
+  @param Node  Point to resoure node structure.
+
+**/
+EFI_STATUS
+ProgramVfBar (
+  IN UINT64            Base,
+  IN PCI_RESOURCE_NODE *Node
+  )
+{
+  EFI_PCI_IO_PROTOCOL *PciIo;
+  UINT64              Address;
+  UINT32              Address32;
+
+  ASSERT (Node->Virtual);
+  if (!Node->Virtual) {
+    return EFI_UNSUPPORTED;
+  }
+
+  Address = 0;
+  PciIo   = &(Node->PciDev->PciIo);
+
+  Address = Base + Node->Offset;
+
+  //
+  // Indicate pci bus driver has allocated
+  // resource for this device
+  // It might be a temporary solution here since
+  // pci device could have multiple bar
+  //
+  Node->PciDev->Allocated = TRUE;
+
+  switch ((Node->PciDev->VfPciBar[Node->Bar]).BarType) {
+
+  case PciBarTypeMem32:
+  case PciBarTypePMem32:
+
+    PciIo->Pci.Write (
+                PciIo,
+                EfiPciIoWidthUint32,
+                (Node->PciDev->VfPciBar[Node->Bar]).Offset,
+                1,
+                &Address
+                );
+
+    Node->PciDev->VfPciBar[Node->Bar].BaseAddress = Address;
+
+    DEBUG ((
+      EFI_D_INFO,
+      "PCI-IOV B%x.D%x.F%x - VF Bar (Offset - 0x%x) 32Mem (Address - 0x%x)\n",
+      (UINTN)Node->PciDev->BusNumber,
+      (UINTN)Node->PciDev->DeviceNumber,
+      (UINTN)Node->PciDev->FunctionNumber,
+      (UINTN)(Node->PciDev->VfPciBar[Node->Bar]).Offset,
+      (UINTN)Address
+      ));
+
+    break;
+
+  case PciBarTypeMem64:
+  case PciBarTypePMem64:
+
+    Address32 = (UINT32) (Address & 0x00000000FFFFFFFF);
+
+    PciIo->Pci.Write (
+                PciIo,
+                EfiPciIoWidthUint32,
+                (Node->PciDev->VfPciBar[Node->Bar]).Offset,
+                1,
+                &Address32
+                );
+
+    Address32 = (UINT32) RShiftU64 (Address, 32);
+
+    PciIo->Pci.Write (
+                PciIo,
+                EfiPciIoWidthUint32,
+                ((Node->PciDev->VfPciBar[Node->Bar]).Offset + 4),
+                1,
+                &Address32
+                );
+
+    Node->PciDev->VfPciBar[Node->Bar].BaseAddress = Address;
+
+    DEBUG ((
+      EFI_D_INFO,
+      "PCI-IOV B%x.D%x.F%x - VF Bar (Offset - 0x%x) 64Mem (Address - 0x%lx)\n",
+      (UINTN)Node->PciDev->BusNumber,
+      (UINTN)Node->PciDev->DeviceNumber,
+      (UINTN)Node->PciDev->FunctionNumber,
+      (UINTN)(Node->PciDev->VfPciBar[Node->Bar]).Offset,
+      (UINT64)Address
+      ));
+
+    break;
+
+  case PciBarTypeIo16:
+  case PciBarTypeIo32:
+    break;
+
+  default:
+    break;
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**

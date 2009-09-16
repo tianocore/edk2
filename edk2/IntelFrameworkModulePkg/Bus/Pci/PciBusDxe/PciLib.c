@@ -706,6 +706,7 @@ PciScanBus (
   UINT16                            BusRange;
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL   *PciRootBridgeIo;
   BOOLEAN                           BusPadding;
+  UINT32                            TempReservedBusNum;
 
   PciRootBridgeIo = Bridge->PciRootBridgeIo;
   SecondBus       = 0;
@@ -718,6 +719,7 @@ PciScanBus (
   PciAddress      = 0;
 
   for (Device = 0; Device <= PCI_MAX_DEVICE; Device++) {
+    TempReservedBusNum = 0;
     for (Func = 0; Func <= PCI_MAX_FUNC; Func++) {
 
       //
@@ -742,7 +744,7 @@ PciScanBus (
         continue;
       }
 
-      DEBUG((EFI_D_ERROR, "Found DEV(%02d,%02d,%02d)\n", StartBusNumber, Device, Func ));
+      DEBUG((EFI_D_INFO, "Found DEV(%02d,%02d,%02d)\n", StartBusNumber, Device, Func ));
 
       if (FeaturePcdGet (PcdPciBusHotplugDeviceSupport)) {
         //
@@ -930,7 +932,7 @@ PciScanBus (
             EfiPciBeforeChildBusEnumeration
             );
 
-          DEBUG((EFI_D_ERROR, "Scan  PPB(%02d,%02d,%02d)\n", PciDevice->BusNumber, PciDevice->DeviceNumber,PciDevice->FunctionNumber));
+          DEBUG((EFI_D_INFO, "Scan  PPB(%02d,%02d,%02d)\n", PciDevice->BusNumber, PciDevice->DeviceNumber,PciDevice->FunctionNumber));
           Status = PciScanBus (
                     PciDevice,
                     (UINT8) (SecondBus),
@@ -967,6 +969,28 @@ PciScanBus (
                                         1,
                                         SubBusNumber
                                         );
+      } else  {
+        //
+        // It is device. Check PCI IOV for Bus reservation
+        //
+
+        //
+        // Go through each function, just reserve the MAX ReservedBusNum for one device
+        //
+        if ((PciDevice->AriCapabilityOffset != 0) && ((FeaturePcdGet(PcdSrIovSupport)& EFI_PCI_IOV_POLICY_SRIOV) != 0)) {
+
+          if (TempReservedBusNum < PciDevice->ReservedBusNum) {
+
+            (*SubBusNumber) = (UINT8)((*SubBusNumber) + PciDevice->ReservedBusNum - TempReservedBusNum);
+            TempReservedBusNum = PciDevice->ReservedBusNum;
+
+            if (Func == 0) {
+              DEBUG ((EFI_D_INFO, "PCI-IOV ScanBus - SubBusNumber - 0x%x\n", *SubBusNumber));
+            } else {
+              DEBUG ((EFI_D_INFO, "PCI-IOV ScanBus - SubBusNumber - 0x%x (Update)\n", *SubBusNumber));
+            }
+          }
+        }
       }
 
       if (Func == 0 && !IS_PCI_MULTI_FUNC (&Pci)) {
@@ -1139,7 +1163,7 @@ PciHostBridgeEnumerator (
   //
   NotifyPhase (PciResAlloc, EfiPciHostBridgeBeginBusAllocation);
 
-  DEBUG((EFI_D_ERROR, "PCI Bus First Scanning\n"));
+  DEBUG((EFI_D_INFO, "PCI Bus First Scanning\n"));
   RootBridgeHandle = NULL;
   while (PciResAlloc->GetNextRootBridge (PciResAlloc, &RootBridgeHandle) == EFI_SUCCESS) {
 
@@ -1226,7 +1250,7 @@ PciHostBridgeEnumerator (
     //
     NotifyPhase (PciResAlloc, EfiPciHostBridgeBeginBusAllocation);
 
-    DEBUG((EFI_D_ERROR, "PCI Bus Second Scanning\n"));
+    DEBUG((EFI_D_INFO, "PCI Bus Second Scanning\n"));
     RootBridgeHandle = NULL;
     while (PciResAlloc->GetNextRootBridge (PciResAlloc, &RootBridgeHandle) == EFI_SUCCESS) {
 

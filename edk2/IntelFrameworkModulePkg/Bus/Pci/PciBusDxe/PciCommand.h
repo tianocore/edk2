@@ -119,6 +119,27 @@ LocateCapabilityRegBlock (
   );
 
 /**
+  Locate PciExpress capability register block per capability ID.
+
+  @param PciIoDevice       A pointer to the PCI_IO_DEVICE.
+  @param CapId             The capability ID.
+  @param Offset            A pointer to the offset returned.
+  @param NextRegBlock      A pointer to the next block returned.
+
+  @retval EFI_SUCCESS      Successfuly located capability register block.
+  @retval EFI_UNSUPPORTED  Pci device does not support capability.
+  @retval EFI_NOT_FOUND    Pci device support but can not find register block.
+
+**/
+EFI_STATUS
+LocatePciExpressCapabilityRegBlock (
+  IN     PCI_IO_DEVICE *PciIoDevice,
+  IN     UINT16        CapId,
+  IN OUT UINT32        *Offset,
+     OUT UINT32        *NextRegBlock OPTIONAL
+  );
+
+/**
   Macro that reads command register.
 
   @param a[in]            Pointer to instance of PCI_IO_DEVICE.

@@ -159,6 +159,26 @@ CreatePciDevicePath (
   );
 
 /**
+  Check whether the PCI IOV VF bar is existed or not.
+
+  @param PciIoDevice       A pointer to the PCI_IO_DEVICE.
+  @param Offset            The offset.
+  @param BarLengthValue    The bar length value returned.
+  @param OriginalBarValue  The original bar value returned.
+
+  @retval EFI_NOT_FOUND    The bar doesn't exist.
+  @retval EFI_SUCCESS      The bar exist.
+
+**/
+EFI_STATUS
+VfBarExisted (
+  IN PCI_IO_DEVICE *PciIoDevice,
+  IN UINTN         Offset,
+  OUT UINT32       *BarLengthValue,
+  OUT UINT32       *OriginalBarValue
+  );
+
+/**
   Check whether the bar is existed or not.
 
   @param PciIoDevice       A pointer to the PCI_IO_DEVICE.
@@ -283,6 +303,23 @@ SetNewAlign (
 **/
 UINTN
 PciParseBar (
+  IN PCI_IO_DEVICE  *PciIoDevice,
+  IN UINTN          Offset,
+  IN UINTN          BarIndex
+  );
+
+/**
+  Parse PCI IOV VF bar information and fill them into PCI device instance.
+
+  @param PciIoDevice  Pci device instance.
+  @param Offset       Bar offset.
+  @param BarIndex     Bar index.
+
+  @return Next bar offset.
+
+**/
+UINTN
+PciIovParseVfBar (
   IN PCI_IO_DEVICE  *PciIoDevice,
   IN UINTN          Offset,
   IN UINTN          BarIndex

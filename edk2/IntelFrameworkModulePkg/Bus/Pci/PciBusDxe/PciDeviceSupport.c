@@ -215,6 +215,10 @@ RegisterPciDevice (
   EFI_PCI_IO_PROTOCOL *PciIo;
   UINT8               Data8;
   BOOLEAN             HasEfiImage;
+  PCI_IO_DEVICE       *ParrentPciIoDevice;
+  EFI_PCI_IO_PROTOCOL *ParrentPciIo;
+  UINT16              Data16;
+  UINT32              Data32;
 
   //
   // Install the pciio protocol, device path protocol
@@ -251,7 +255,35 @@ RegisterPciDevice (
   PciIo = &(PciIoDevice->PciIo);
   Data8 = PCI_INT_LINE_UNKNOWN;
   PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, 0x3C, 1, &Data8);
+  
+  //
+  // PCI-IOV programming
+  //
+  if (((FeaturePcdGet(PcdAriSupport) & EFI_PCI_IOV_POLICY_ARI) != 0) && (PciIoDevice->AriCapabilityOffset != 0) && ((FeaturePcdGet(PcdSrIovSupport) & EFI_PCI_IOV_POLICY_SRIOV) != 0) &&
+      (PciIoDevice->SrIovCapabilityOffset != 0)) {
+    //
+    // Check its parrent ARI forwarding capability
+    //
+    ParrentPciIoDevice = PciIoDevice->Parent;
+    ParrentPciIo = &(ParrentPciIoDevice->PciIo);
+    ParrentPciIo->Pci.Read (PciIo, EfiPciIoWidthUint32, ParrentPciIoDevice->PciExpressCapabilityOffset + EFI_PCIE_CAPABILITY_DEVICE_CAPABILITIES_2_OFFSET, 1, &Data32);
+    if (Data32 & EFI_PCIE_CAPABILITY_DEVICE_CAPABILITIES_2_ARI_FORWARDING) {
+      //
+      // ARI forward support in bridge, so enable it.
+      //
+      ParrentPciIo->Pci.Read (PciIo, EfiPciIoWidthUint32, ParrentPciIoDevice->PciExpressCapabilityOffset + EFI_PCIE_CAPABILITY_DEVICE_CONTROL_2_OFFSET, 1, &Data32);
+      Data32 |= EFI_PCIE_CAPABILITY_DEVICE_CONTROL_2_ARI_FORWARDING;
+      ParrentPciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, ParrentPciIoDevice->PciExpressCapabilityOffset + EFI_PCIE_CAPABILITY_DEVICE_CONTROL_2_OFFSET, 1, &Data32);
 
+      //
+      // Set ARI Capable Hierarchy for device
+      //
+      PciIo->Pci.Read (PciIo, EfiPciIoWidthUint16, PciIoDevice->SrIovCapabilityOffset + EFI_PCIE_CAPABILITY_ID_SRIOV_CONTROL, 1, &Data16);
+      Data16 |= EFI_PCIE_CAPABILITY_ID_SRIOV_CONTROL_ARI_HIERARCHY;
+      PciIo->Pci.Write (PciIo, EfiPciIoWidthUint16, PciIoDevice->SrIovCapabilityOffset + EFI_PCIE_CAPABILITY_ID_SRIOV_CONTROL, 1, &Data16);
+    }
+  }
+  
   //
   // Process OpRom
   //

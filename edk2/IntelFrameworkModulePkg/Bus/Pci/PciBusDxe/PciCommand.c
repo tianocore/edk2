@@ -179,3 +179,70 @@ LocateCapabilityRegBlock (
   return EFI_NOT_FOUND;
 }
 
+/**
+  Locate PciExpress capability register block per capability ID.
+
+  @param PciIoDevice       A pointer to the PCI_IO_DEVICE.
+  @param CapId             The capability ID.
+  @param Offset            A pointer to the offset returned.
+  @param NextRegBlock      A pointer to the next block returned.
+
+  @retval EFI_SUCCESS      Successfuly located capability register block.
+  @retval EFI_UNSUPPORTED  Pci device does not support capability.
+  @retval EFI_NOT_FOUND    Pci device support but can not find register block.
+
+**/
+EFI_STATUS
+LocatePciExpressCapabilityRegBlock (
+  IN     PCI_IO_DEVICE *PciIoDevice,
+  IN     UINT16        CapId,
+  IN OUT UINT32        *Offset,
+     OUT UINT32        *NextRegBlock OPTIONAL
+  )
+{
+  UINT32  CapabilityPtr;
+  UINT32  CapabilityEntry;
+  UINT16  CapabilityID;
+
+  //
+  // To check the capability of this device supports
+  //
+  if (!PciIoDevice->IsPciExp) {
+    return EFI_UNSUPPORTED;
+  }
+
+  if (*Offset != 0) {
+    CapabilityPtr = *Offset;
+  } else {
+    CapabilityPtr = EFI_PCIE_CAPABILITY_BASE_OFFSET;
+  }
+
+  while (CapabilityPtr != 0) {
+    //
+    // Mask it to DWORD alignment per PCI spec
+    //
+    CapabilityPtr &= 0xFFC;
+    PciIoDevice->PciIo.Pci.Read (
+                             &PciIoDevice->PciIo,
+                             EfiPciIoWidthUint32,
+                             CapabilityPtr,
+                             1,
+                             &CapabilityEntry
+                             );
+
+    CapabilityID = (UINT16) CapabilityEntry;
+
+    if (CapabilityID == CapId) {
+      *Offset = CapabilityPtr;
+      if (NextRegBlock != NULL) {
+        *NextRegBlock = (CapabilityEntry >> 20) & 0xFFF;
+      }
+
+      return EFI_SUCCESS;
+    }
+
+    CapabilityPtr = (CapabilityEntry >> 20) & 0xFFF;
+  }
+
+  return EFI_NOT_FOUND;
+}
