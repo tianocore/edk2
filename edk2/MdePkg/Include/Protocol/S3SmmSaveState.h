@@ -21,7 +21,11 @@
   http://opensource.org/licenses/bsd-license.php                                            
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.   
+
+  @par Revision Reference:
+  This PPI is defined in UEFI Platform Initialization Specification 1.2 Volume 5: 
+  Standards          
 
 **/
 
