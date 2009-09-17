@@ -322,20 +322,31 @@ EFI_STATUS
   @param  Packet       The pointer to the received packet. This buffer must be freed by
                        the caller.
 
-  @retval EFI_SUCCESS           An MTFTPv4 OACK packet was received and is in the Buffer.
-  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
-  @retval EFI_UNSUPPORTED       One or more options in the OptionList are in the
-                                unsupported list of structure EFI_MTFTP4_MODE_DATA.
-  @retval EFI_NOT_STARTED       The EFI MTFTPv4 Protocol driver has not been started.
-  @retval EFI_NO_MAPPING        When using a default address, configuration (DHCP, BOOTP,
-                                RARP, etc.) has not finished yet.
-  @retval EFI_ACCESS_DENIED     The previous operation has not completed yet.
-  @retval EFI_OUT_OF_RESOURCES  Required system resources could not be allocated.
-  @retval EFI_TFTP_ERROR        An MTFTPv4 ERROR packet was received and is in the buffer.
-  @retval EFI_ICMP_ERROR        An ICMP ERROR packet was received and is in the Buffer.
-  @retval EFI_PROTOCOL_ERROR    An unexpected MTFTPv4 packet was received and is in the buffer.
-  @retval EFI_TIMEOUT           No responses were received from the MTFTPv4 server.
-  @retval EFI_DEVICE_ERROR      An unexpected network error or system error occurred.
+  @retval EFI_SUCCESS              An MTFTPv4 OACK packet was received and is in the Packet.
+  @retval EFI_INVALID_PARAMETER    One or more of the following conditions is TRUE:
+                                   - This is NULL.
+                                   - Filename is NULL.
+                                   - OptionCount is not zero and OptionList is NULL.
+                                   - One or more options in OptionList have wrong format.
+                                   - PacketLength is NULL.
+                                   - One or more IPv4 addresses in OverrideData are not valid
+                                     unicast IPv4 addresses if OverrideData is not NULL.
+  @retval EFI_UNSUPPORTED          One or more options in the OptionList are in the
+                                   unsupported list of structure EFI_MTFTP4_MODE_DATA.
+  @retval EFI_NOT_STARTED          The EFI MTFTPv4 Protocol driver has not been started.
+  @retval EFI_NO_MAPPING           When using a default address, configuration (DHCP, BOOTP,
+                                   RARP, etc.) has not finished yet.
+  @retval EFI_ACCESS_DENIED        The previous operation has not completed yet.
+  @retval EFI_OUT_OF_RESOURCES     Required system resources could not be allocated.
+  @retval EFI_TFTP_ERROR           An MTFTPv4 ERROR packet was received and is in the Packet.
+  @retval EFI_NETWORK_UNREACHABLE  An ICMP network unreachable error packet was received and the Packet is set to NULL.
+  @retval EFI_HOST_UNREACHABLE     An ICMP host unreachable error packet was received and the Packet is set to NULL.
+  @retval EFI_PROTOCOL_UNREACHABLE An ICMP protocol unreachable error packet was received and the Packet is set to NULL.
+  @retval EFI_PORT_UNREACHABLE     An ICMP port unreachable error packet was received and the Packet is set to NULL.
+  @retval EFI_ICMP_ERROR           Some other ICMP ERROR packet was received and is in the Buffer.
+  @retval EFI_PROTOCOL_ERROR       An unexpected MTFTPv4 packet was received and is in the Packet.
+  @retval EFI_TIMEOUT              No responses were received from the MTFTPv4 server.
+  @retval EFI_DEVICE_ERROR         An unexpected network error or system error occurred.
 
 **/
 typedef 
@@ -391,15 +402,19 @@ EFI_STATUS
   @param  Token Pointer to the token structure to provide the parameters that are
                 used in this operation.
 
-  @retval EFI_SUCCESS          The data file has been transferred successfully.
-  @retval EFI_OUT_OF_RESOURCES Required system resources could not be allocated.
-  @retval EFI_BUFFER_TOO_SMALL BufferSize is not large enough to hold the downloaded data
-                               in downloading process.
-  @retval EFI_ABORTED          Current operation is aborted by user.
-  @retval EFI_ICMP_ERROR       An ICMP ERROR packet was received.
-  @retval EFI_TIMEOUT          No responses were received from the MTFTPv4 server.
-  @retval EFI_TFTP_ERROR       An MTFTPv4 ERROR packet was received.
-  @retval EFI_DEVICE_ERROR     An unexpected network error or system error occurred.
+  @retval EFI_SUCCESS              The data file has been transferred successfully.
+  @retval EFI_OUT_OF_RESOURCES     Required system resources could not be allocated.
+  @retval EFI_BUFFER_TOO_SMALL     BufferSize is not zero but not large enough to hold the
+                                   downloaded data in downloading process.
+  @retval EFI_ABORTED              Current operation is aborted by user.
+  @retval EFI_NETWORK_UNREACHABLE  An ICMP network unreachable error packet was received.
+  @retval EFI_HOST_UNREACHABLE     An ICMP host unreachable error packet was received.
+  @retval EFI_PROTOCOL_UNREACHABLE An ICMP protocol unreachable error packet was received.
+  @retval EFI_PORT_UNREACHABLE     An ICMP port unreachable error packet was received.
+  @retval EFI_ICMP_ERROR           Some other  ICMP ERROR packet was received.
+  @retval EFI_TIMEOUT              No responses were received from the MTFTPv4 server.
+  @retval EFI_TFTP_ERROR           An MTFTPv4 ERROR packet was received.
+  @retval EFI_DEVICE_ERROR         An unexpected network error or system error occurred.
 
 **/
 typedef 

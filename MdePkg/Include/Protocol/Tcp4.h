@@ -118,6 +118,31 @@ typedef struct {
 } EFI_TCP4_COMPLETION_TOKEN;
 
 typedef struct {
+  ///
+  /// The Status in the CompletionToken will be set to one of 
+  /// the following values if the active open succeeds or an unexpected 
+  /// error happens:
+  /// EFI_SUCCESS:              The active open succeeds and the instance's 
+  ///                           state is Tcp4StateEstablished.
+  /// EFI_CONNECTION_RESET:     The connect fails because the connection is reset
+  ///                           either by instance itself or the communication peer.
+  /// EFI_CONNECTION_REFUSED:   The connect fails because this connection is initiated with
+  ///                           an active open and the connection is refused.
+  /// EFI_ABORTED:              The active open is aborted.
+  /// EFI_TIMEOUT:              The connection establishment timer expires and 
+  ///                           no more specific information is available.
+  /// EFI_NETWORK_UNREACHABLE:  The active open fails because 
+  ///                           an ICMP network unreachable error is received. 
+  /// EFI_HOST_UNREACHABLE:     The active open fails because an 
+  ///                           ICMP host unreachable error is received. 
+  /// EFI_PROTOCOL_UNREACHABLE: The active open fails 
+  ///                           because an ICMP protocol unreachable error is received.
+  /// EFI_PORT_UNREACHABLE:     The connection establishment 
+  ///                           timer times out and an ICMP port unreachable error is received.
+  /// EFI_ICMP_ERROR:           The connection establishment timer timeout and some other ICMP
+  ///                           error is received.
+  /// EFI_DEVICE_ERROR:         An unexpected system or network error occurred.
+  /// 
   EFI_TCP4_COMPLETION_TOKEN CompletionToken;
 } EFI_TCP4_CONNECTION_TOKEN;
 
@@ -147,9 +172,42 @@ typedef struct {
 } EFI_TCP4_TRANSMIT_DATA;
 
 typedef struct {
+  /// 
+  /// When transmission finishes or meets any unexpected error it will 
+  /// be set to one of the following values:
+  /// EFI_SUCCESS:              The receiving or transmission operation 
+  ///                           completes successfully.
+  /// EFI_CONNECTION_FIN:       The receiving operation fails because the communication peer 
+  ///                           has closed the connection and there is no more data in the 
+  ///                           receive buffer of the instance.
+  /// EFI_CONNECTION_RESET:     The receiving or transmission operation fails
+  ///                           because this connection is reset either by instance 
+  ///                           itself or the communication peer.
+  /// EFI_ABORTED:              The receiving or transmission is aborted.
+  /// EFI_TIMEOUT:              The transmission timer expires and no more 
+  ///                           specific information is available.
+  /// EFI_NETWORK_UNREACHABLE:  The transmission fails 
+  ///                           because an ICMP network unreachable error is received. 
+  /// EFI_HOST_UNREACHABLE:     The transmission fails because an 
+  ///                           ICMP host unreachable error is received. 
+  /// EFI_PROTOCOL_UNREACHABLE: The transmission fails 
+  ///                           because an ICMP protocol unreachable error is received. 
+  /// EFI_PORT_UNREACHABLE:     The transmission fails and an 
+  ///                           ICMP port unreachable error is received. 
+  /// EFI_ICMP_ERROR:           The transmission fails and some other 
+  ///                           ICMP error is received. 
+  /// EFI_DEVICE_ERROR:         An unexpected system or network error occurs.
+  /// EFI_NO_MEDIA:             There was a media error.
+  ///
   EFI_TCP4_COMPLETION_TOKEN CompletionToken;
   union {
+    ///
+    /// When this token is used for receiving, RxData is a pointer to EFI_TCP4_RECEIVE_DATA.
+    ///
     EFI_TCP4_RECEIVE_DATA   *RxData;
+    ///
+    /// When this token is used for transmitting, TxData is a pointer to EFI_TCP4_TRANSMIT_DATA.
+    ///
     EFI_TCP4_TRANSMIT_DATA  *TxData;
   } Packet;
 } EFI_TCP4_IO_TOKEN;
@@ -454,6 +512,7 @@ EFI_STATUS
   @retval  EFI_NOT_FOUND           The asynchronous I/O request isn't found in the 
                                    transmission or receive queue. It has either 
                                    completed or wasn't issued by Transmit() and Receive().
+  @retval  EFI_UNSUPPORTED         The implementation does not support this function.
 
 **/
 typedef

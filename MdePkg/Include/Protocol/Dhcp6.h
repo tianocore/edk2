@@ -144,21 +144,31 @@ typedef enum {
 #define EFI_DHCP6_IA_TYPE_TA   4
 
 #pragma pack(1)
+///
+/// EFI_DHCP6_PACKET_OPTION
+/// defines the format of the DHCPv6 option, See RFC 3315 for more information.
+/// This data structure is used to reference option data that is packed in the DHCPv6 packet. 
+///
 typedef struct {
   ///
-  /// The DHCPv6 option code.
+  /// The DHCPv6 option code, stored in network order.
   ///
   UINT16                       OpCode;
   ///
-  /// Length of the DHCPv6 option data. From the first byte to the last byte of the Data field.
+  /// Length of the DHCPv6 option data, stored in network order.
+  /// From the first byte to the last byte of the Data field.
   ///
   UINT16                       OpLen;
   ///
-  /// The data for the DHCPv6 option.
+  /// The data for the DHCPv6 option, stored in network order.
   ///
   UINT8                        Data[1];
 } EFI_DHCP6_PACKET_OPTION;
 
+///
+/// EFI_DHCP6_HEADER
+/// defines the format of the DHCPv6 header. See RFC 3315 for more information. 
+///
 typedef struct{
   ///
   /// The DHCPv6 transaction ID.
@@ -170,6 +180,10 @@ typedef struct{
   UINT32                       TransactionId:24;
 } EFI_DHCP6_HEADER;
 
+///
+/// EFI_DHCP6_PACKET 
+/// defines the format of the DHCPv6 packet. See RFC 3315 for more information.
+///
 typedef struct {
   ///
   /// Size of the EFI_DHCP6_PACKET buffer.
