@@ -1351,7 +1351,6 @@ PciIovParseVfBar (
   )
 {
   UINT32      Value;
-  UINT64      BarValue64;
   UINT32      OriginalValue;
   UINT32      Mask;
   UINT32      Data;
@@ -1368,7 +1367,6 @@ PciIovParseVfBar (
 
   OriginalValue = 0;
   Value         = 0;
-  BarValue64    = 0;
 
   Status = VfBarExisted (
             PciIoDevice,
