@@ -2,7 +2,7 @@
 
 # Set up environment at fisrt.
 export BUILD_DIR=$WORKSPACE/Build/DuetPkg/DEBUG_UNIXGCC
-export BASETOOLS_DIR=$EDK_TOOLS_PATH/Source/C/bin
+export BASETOOLS_DIR=$WORKSPACE/Conf/BaseToolsSource/Source/C/bin
 export BOOTSECTOR_BIN_DIR=$WORKSPACE/DuetPkg/BootSector/bin
 export DISK_LABEL=DUET
 export PROCESS_MARK=TRUE
@@ -57,23 +57,12 @@ then
 			if [ "$4" = FAT12 ]
 				then
 				echo "Start to create file boot disk ..."
-				dd if=/dev/zero of=$EFI_BOOT_MEDIA bs=512 count=2880 2> /dev/null
-				mformat -i $EFI_BOOT_MEDIA -f 1440 ::
 				echo Create boot sector ...	
 	
 				## Linux version of GenBootSector has not pass build yet.
 				$BASETOOLS_DIR/GnuGenBootSector -i $EFI_BOOT_MEDIA -o FDBs.com
 				$BASETOOLS_DIR/BootSectImage -g FDBs.com $BOOTSECTOR_BIN_DIR/bootsect.com -f
-				$BASETOOLS_DIR/GnuGenBootSector -o tmp.$EFI_BOOT_MEDIA -i $BOOTSECTOR_BIN_DIR/bootsect.com
-				dd if=tmp.$EFI_BOOT_MEDIA of=$EFI_BOOT_MEDIA conv=notrunc 2> /dev/null
-				rm -f tmp.$EFI_BOOT_MEDIA
-
-				mcopy -i $EFI_BOOT_MEDIA $BUILD_DIR/FV/Efildr ::/Efildr
-	
-				mmd -i $EFI_BOOT_MEDIA ::/efi
-				mmd -i $EFI_BOOT_MEDIA ::/efi/boot
-
-				mcopy -i $EFI_BOOT_MEDIA $WORKSPACE/EdkShellBinPkg/MinimumShell/Ia32/Shell.efi ::/efi/boot/bootia32.efi 
+				$BASETOOLS_DIR/GnuGenBootSector -o $EFI_BOOT_MEDIA -i $BOOTSECTOR_BIN_DIR/bootsect.com
 				echo Done.
 			else
 				echo "Wrong FAT type" $4 "for floppy!"
