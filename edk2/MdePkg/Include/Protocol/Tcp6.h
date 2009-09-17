@@ -289,6 +289,8 @@ typedef struct {
   ///                           state is Tcp6StateEstablished.
   /// EFI_CONNECTION_RESET:     The connect fails because the connection is reset
   ///                           either by instance itself or the communication peer.
+  /// EFI_CONNECTION_REFUSED:   The receiving or transmission operation fails because this 
+  ///                           connection is refused.
   /// EFI_ABORTED:              The active open is aborted.
   /// EFI_TIMEOUT:              The connection establishment timer expires and 
   ///                           no more specific information is available.
@@ -409,6 +411,9 @@ typedef struct {
   /// be set to one of the following values:
   /// EFI_SUCCESS:              The receiving or transmission operation 
   ///                           completes successfully.
+  /// EFI_CONNECTION_FIN:       The receiving operation fails because the communication peer 
+  ///                           has closed the connection and there is no more data in the 
+  ///                           receive buffer of the instance.
   /// EFI_CONNECTION_RESET:     The receiving or transmission operation fails
   ///                           because this connection is reset either by instance 
   ///                           itself or the communication peer.
@@ -796,6 +801,7 @@ EFI_STATUS
   @retval EFI_NOT_FOUND          The asynchronous I/O request isn't found in the transmission or 
                                  receive queue. It has either completed or wasn't issued by 
                                  Transmit() and Receive().
+  @retval EFI_UNSUPPORTED        The implementation does not support this function.
 
 **/
 typedef

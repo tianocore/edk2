@@ -43,6 +43,42 @@
 typedef struct _EFI_IP6_PROTOCOL EFI_IP6_PROTOCOL;
 
 ///
+/// EFI_IP6_ADDRESS_PAIR 
+///
+typedef struct{ 
+  ///
+  /// The EFI IPv6 Protocol instance handle that is using this address/prefix pair.
+  ///
+  EFI_HANDLE          InstanceHandle;
+  ///
+  /// IPv6 address in network byte order.
+  ///
+  EFI_IPv6_ADDRESS    Ip6Address;
+  ///
+  /// The length of the prefix associated with the Ip6Address.
+  ///
+  UINT8               PrefixLength;
+} EFI_IP6_ADDRESS_PAIR; 
+
+///
+/// EFI_IP6_VARIABLE_DATA
+///
+typedef struct {
+  ///
+  /// The handle of the driver that creates this entry.
+  ///
+  EFI_HANDLE              DriverHandle;
+  ///
+  /// The number of IPv6 address pairs that follow this data structure.
+  ///
+  UINT32                  AddressCount;
+  ///
+  /// List of IPv6 address pairs that are currently in use.
+  ///
+  EFI_IP6_ADDRESS_PAIR    AddressPairs[1];
+} EFI_IP6_VARIABLE_DATA;
+
+///
 /// ICMPv6 type definitions for error messages
 ///
 ///@{
