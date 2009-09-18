@@ -44,6 +44,7 @@ typedef struct _EFI_IP6_PROTOCOL EFI_IP6_PROTOCOL;
 
 ///
 /// EFI_IP6_ADDRESS_PAIR 
+/// which is not defined in the UEFI 2.3 Specification.
 ///
 typedef struct{ 
   ///
@@ -62,6 +63,7 @@ typedef struct{
 
 ///
 /// EFI_IP6_VARIABLE_DATA
+/// which is not defined in the UEFI 2.3 Specification.
 ///
 typedef struct {
   ///

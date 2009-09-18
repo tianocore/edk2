@@ -503,15 +503,19 @@ EFI_STATUS
                                  - MtftpConfigData.StationIp is neither zero nor one 
                                    of the configured IP addresses in the underlying IPv6 driver.
                                  - MtftpCofigData.ServerIp is not a valid IPv6 unicast address.
+                                 Note: It does not match UEFI 2.3 Specification.
   @retval  EFI_ACCESS_DENIED     - The configuration could not be changed at this time because there 
                                    is some MTFTP background operation in progress.
                                  - MtftpCofigData.LocalPort is already in use.
+								 Note: It does not match UEFI 2.3 Specification.
   @retval  EFI_NO_MAPPING        The underlying IPv6 driver was responsible for choosing a source 
                                  address for this instance, but no source address was available for use.
   @retval  EFI_OUT_OF_RESOURCES  The EFI MTFTPv6 Protocol driver instance data could not be 
                                  allocated.
+								 Note: It is not defined in UEFI 2.3 Specification.
   @retval  EFI_DEVICE_ERROR      An unexpected system or network error occurred. The EFI 
                                  MTFTPv6 Protocol driver instance is not configured.
+								 Note: It is not defined in UEFI 2.3 Specification.
 
 
 **/
@@ -544,6 +548,7 @@ EFI_STATUS
                                  the caller.
 
   @retval  EFI_SUCCESS              An MTFTPv6 OACK packet was received and is in the Packet.
+                                    Note: It does not match UEFI 2.3 Specification.
   @retval  EFI_INVALID_PARAMETER    One or more of the following conditions is TRUE:
                                     - This is NULL.
                                     - Filename is NULL
@@ -560,10 +565,14 @@ EFI_STATUS
   @retval  EFI_OUT_OF_RESOURCES     Required system resources could not be allocated.
   @retval  EFI_TFTP_ERROR           An MTFTPv6 ERROR packet was received and is in the Packet.
   @retval  EFI_NETWORK_UNREACHABLE  An ICMP network unreachable error packet was received and the Packet is set to NULL.
+                                    Note: It is not defined in UEFI 2.3 Specification.
   @retval  EFI_HOST_UNREACHABLE     An ICMP host unreachable error packet was received and the Packet is set to NULL.
+                                    Note: It is not defined in UEFI 2.3 Specification.
   @retval  EFI_PROTOCOL_UNREACHABLE An ICMP protocol unreachable error packet was received and the Packet is set to NULL.
+                                    Note: It is not defined in UEFI 2.3 Specification.
   @retval  EFI_PORT_UNREACHABLE     An ICMP port unreachable error packet was received and the Packet is set to NULL.
   @retval  EFI_ICMP_ERROR           Some other ICMP ERROR packet was received and the Packet is set to NULL.
+                                    Note: It does not match UEFI 2.3 Specification.
   @retval  EFI_PROTOCOL_ERROR       An unexpected MTFTPv6 packet was received and is in the Packet.
   @retval  EFI_TIMEOUT              No responses were received from the MTFTPv6 server.
   @retval  EFI_DEVICE_ERROR         An unexpected network error or system error occurred.
@@ -645,11 +654,16 @@ EFI_STATUS
   @retval  EFI_OUT_OF_RESOURCES     Required system resources could not be allocated.
   @retval  EFI_BUFFER_TOO_SMALL     BufferSize is not zero but not large enough to hold the
                                     downloaded data in downloading process.
+									Note: It does not match UEFI 2.3 Specification.
   @retval  EFI_ABORTED              Current operation is aborted by user.
   @retval  EFI_NETWORK_UNREACHABLE  An ICMP network unreachable error packet was received.
+                                    Note: It is not defined in UEFI 2.3 Specification.
   @retval  EFI_HOST_UNREACHABLE     An ICMP host unreachable error packet was received.
+                                    Note: It is not defined in UEFI 2.3 Specification.
   @retval  EFI_PROTOCOL_UNREACHABLE An ICMP protocol unreachable error packet was received.
+                                    Note: It is not defined in UEFI 2.3 Specification.
   @retval  EFI_PORT_UNREACHABLE     An ICMP port unreachable error packet was received.
+                                    Note: It is not defined in UEFI 2.3 Specification.
   @retval  EFI_ICMP_ERROR           An ICMP ERROR packet was received.
   @retval  EFI_TIMEOUT              No responses were received from the MTFTPv6 server.
   @retval  EFI_TFTP_ERROR           An MTFTPv6 ERROR packet was received.
