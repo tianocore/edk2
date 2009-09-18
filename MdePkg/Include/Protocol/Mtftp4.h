@@ -413,7 +413,7 @@ EFI_STATUS
   @retval EFI_OUT_OF_RESOURCES     Required system resources could not be allocated.
   @retval EFI_BUFFER_TOO_SMALL     BufferSize is not zero but not large enough to hold the
                                    downloaded data in downloading process.
-								   Note: It does not match UEFI 2.3 Specification.
+                                   Note: It does not match UEFI 2.3 Specification.
   @retval EFI_ABORTED              Current operation is aborted by user.
   @retval EFI_NETWORK_UNREACHABLE  An ICMP network unreachable error packet was received.
                                    Note: It is not defined in UEFI 2.3 Specification.
