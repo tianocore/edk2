@@ -128,6 +128,7 @@ typedef struct {
   ///                           either by instance itself or the communication peer.
   /// EFI_CONNECTION_REFUSED:   The connect fails because this connection is initiated with
   ///                           an active open and the connection is refused.
+  ///                           Note: It is not defined in UEFI 2.3 Specification.
   /// EFI_ABORTED:              The active open is aborted.
   /// EFI_TIMEOUT:              The connection establishment timer expires and 
   ///                           no more specific information is available.
@@ -180,6 +181,7 @@ typedef struct {
   /// EFI_CONNECTION_FIN:       The receiving operation fails because the communication peer 
   ///                           has closed the connection and there is no more data in the 
   ///                           receive buffer of the instance.
+  ///                           Note: It is not defined in UEFI 2.3 Specification.
   /// EFI_CONNECTION_RESET:     The receiving or transmission operation fails
   ///                           because this connection is reset either by instance 
   ///                           itself or the communication peer.
@@ -513,6 +515,7 @@ EFI_STATUS
                                    transmission or receive queue. It has either 
                                    completed or wasn't issued by Transmit() and Receive().
   @retval  EFI_UNSUPPORTED         The implementation does not support this function.
+                                   Note: It is not defined in UEFI 2.3 Specification.
 
 **/
 typedef

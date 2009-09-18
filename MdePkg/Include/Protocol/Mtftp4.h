@@ -323,6 +323,7 @@ EFI_STATUS
                        the caller.
 
   @retval EFI_SUCCESS              An MTFTPv4 OACK packet was received and is in the Packet.
+                                   Note: It does not match UEFI 2.3 Specification.
   @retval EFI_INVALID_PARAMETER    One or more of the following conditions is TRUE:
                                    - This is NULL.
                                    - Filename is NULL.
@@ -340,11 +341,17 @@ EFI_STATUS
   @retval EFI_OUT_OF_RESOURCES     Required system resources could not be allocated.
   @retval EFI_TFTP_ERROR           An MTFTPv4 ERROR packet was received and is in the Packet.
   @retval EFI_NETWORK_UNREACHABLE  An ICMP network unreachable error packet was received and the Packet is set to NULL.
+                                   Note: It is not defined in UEFI 2.3 Specification.
   @retval EFI_HOST_UNREACHABLE     An ICMP host unreachable error packet was received and the Packet is set to NULL.
+                                   Note: It is not defined in UEFI 2.3 Specification.
   @retval EFI_PROTOCOL_UNREACHABLE An ICMP protocol unreachable error packet was received and the Packet is set to NULL.
+                                   Note: It is not defined in UEFI 2.3 Specification.
   @retval EFI_PORT_UNREACHABLE     An ICMP port unreachable error packet was received and the Packet is set to NULL.
+                                   Note: It is not defined in UEFI 2.3 Specification.
   @retval EFI_ICMP_ERROR           Some other ICMP ERROR packet was received and is in the Buffer.
+                                   Note: It does not match UEFI 2.3 Specification.
   @retval EFI_PROTOCOL_ERROR       An unexpected MTFTPv4 packet was received and is in the Packet.
+                                   Note: It does not match UEFI 2.3 Specification.
   @retval EFI_TIMEOUT              No responses were received from the MTFTPv4 server.
   @retval EFI_DEVICE_ERROR         An unexpected network error or system error occurred.
 
@@ -406,12 +413,18 @@ EFI_STATUS
   @retval EFI_OUT_OF_RESOURCES     Required system resources could not be allocated.
   @retval EFI_BUFFER_TOO_SMALL     BufferSize is not zero but not large enough to hold the
                                    downloaded data in downloading process.
+								   Note: It does not match UEFI 2.3 Specification.
   @retval EFI_ABORTED              Current operation is aborted by user.
   @retval EFI_NETWORK_UNREACHABLE  An ICMP network unreachable error packet was received.
+                                   Note: It is not defined in UEFI 2.3 Specification.
   @retval EFI_HOST_UNREACHABLE     An ICMP host unreachable error packet was received.
+                                   Note: It is not defined in UEFI 2.3 Specification.
   @retval EFI_PROTOCOL_UNREACHABLE An ICMP protocol unreachable error packet was received.
+                                   Note: It is not defined in UEFI 2.3 Specification.
   @retval EFI_PORT_UNREACHABLE     An ICMP port unreachable error packet was received.
+                                   Note: It is not defined in UEFI 2.3 Specification.
   @retval EFI_ICMP_ERROR           Some other  ICMP ERROR packet was received.
+                                   Note: It does not match UEFI 2.3 Specification.
   @retval EFI_TIMEOUT              No responses were received from the MTFTPv4 server.
   @retval EFI_TFTP_ERROR           An MTFTPv4 ERROR packet was received.
   @retval EFI_DEVICE_ERROR         An unexpected network error or system error occurred.
