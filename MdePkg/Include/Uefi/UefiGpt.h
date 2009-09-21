@@ -1,7 +1,7 @@
 /** @file
   EFI Guid Partition Table Format Definition.
 
-  Copyright (c) 2006 - 2008, Intel Corporation
+  Copyright (c) 2006 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -106,9 +106,22 @@ typedef struct {
   EFI_LBA   EndingLBA;
   ///
   /// Attribute bits, all bits reserved by UEFI
-  /// Bit 0 Required for the platform to function.
-  /// Bits 1-47 Undefined and must be zero.
-  /// Bits 48-63 Reserved for GUID specific use.
+  /// Bit 0:      If this bit is set, the partition is required for the platform to function. The owner/creator of the
+  ///             partition indicates that deletion or modification of the contents can result in loss of platform
+  ///             features or failure for the platform to boot or operate. The system cannot function normally if
+  ///             this partition is removed, and it should be considered part of the hardware of the system.
+  ///             Actions such as running diagnostics, system recovery, or even OS install or boot could
+  ///             potentially stop working if this partition is removed. Unless OS software or firmware
+  ///             recognizes this partition, it should never be removed or modified as the UEFI firmware or
+  ///             platform hardware may become non-functional.
+  /// Bit 1:      If this bit is set firmware must not produce an EFI_BLOCK_IO_PROTOCOL device for
+  ///             this partition. By not producing EFI_BLOCK_IO_PROTOCOL partition, file system
+  ///             mappings will not be created for this partition in UEFI.
+  /// Bits 2-47:  Undefined and must be zero. Reserved for expansion by future versions of the UEFI
+  ///             specification.
+  /// Bits 48-63: Reserved for GUID specific use. The use of these bits will vary depending on the
+  ///             PartitionTypeGUID. Only the owner of the PartitionTypeGUID is allowed
+  ///             to modify these bits. They must be preserved if Bits 0¨C47 are modified..
   ///
   UINT64    Attributes;
   ///
