@@ -466,14 +466,6 @@ CoreLocateDevicePath (
   SourceSize = (UINTN) TmpDevicePath - (UINTN) SourcePath;
 
   //
-  // The source path can only have 1 instance
-  //
-  if (IsDevicePathMultiInstance (SourcePath)) {
-    DEBUG((DEBUG_ERROR, "LocateDevicePath: Device path has too many instances\n"));
-    return EFI_INVALID_PARAMETER;
-  }
-
-  //
   // Get a list of all handles that support the requested protocol
   //
   Status = CoreLocateHandleBuffer (ByProtocol, Protocol, NULL, &HandleCount, &Handles);
