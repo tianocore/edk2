@@ -1,6 +1,6 @@
 /*++
  
-Copyright (c) 2004 - 2007, Intel Corporation                                                         
+Copyright (c) 2004 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -432,6 +432,7 @@ typedef struct {
 #define MEDIA_RELATIVE_OFFSET_RANGE_DP 0x08
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL  Header;
+  UINT32                    Reserved;
   UINT64                    StartingOffset;
   UINT64                    EndingOffset;
 } MEDIA_RELATIVE_OFFSET_RANGE_DEVICE_PATH;
