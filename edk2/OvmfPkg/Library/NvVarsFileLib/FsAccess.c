@@ -117,7 +117,7 @@ NvVarsFileReadCheckup (
   }
 
   *Exists = TRUE;
-  *Size = FileInfo->FileSize;
+  *Size = (UINTN) FileInfo->FileSize;
 
   FreePool (FileInfo);
 }
