@@ -121,7 +121,7 @@ typedef struct {
   ///             specification.
   /// Bits 48-63: Reserved for GUID specific use. The use of these bits will vary depending on the
   ///             PartitionTypeGUID. Only the owner of the PartitionTypeGUID is allowed
-  ///             to modify these bits. They must be preserved if Bits 0¨C47 are modified..
+  ///             to modify these bits. They must be preserved if Bits 0-47 are modified..
   ///
   UINT64    Attributes;
   ///

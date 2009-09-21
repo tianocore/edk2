@@ -321,7 +321,7 @@ EFI_STATUS
   @param[in,out] DevicePath          A pointer to a single device path node that describes the ATA
                                      device specified by Port and PortMultiplierPort. This function
                                      is responsible for allocating the buffer DevicePath with the
-                                     boot service AllocatePool(). It is the caller¡¯s responsibility
+                                     boot service AllocatePool(). It is the caller's responsibility
                                      to free DevicePath when the caller is finished with DevicePath.
   @retval EFI_SUCCESS                The device path node that describes the ATA device specified by
                                      Port and PortMultiplierPort was allocated and returned in DevicePath.

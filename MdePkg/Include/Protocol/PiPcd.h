@@ -44,7 +44,7 @@ extern EFI_GUID gEfiPcdProtocolGuid;
   The SKU Id of zero is reserved as a default. The valid SkuId range is 1 to 255. For tokens that are
   not SKU enabled, the system ignores any set SKU Id and works with the single value for that token.
   For SKU-enabled tokens, the system will use the SKU Id set by the last call to SetSku(). If no SKU
-  Id is set or the currently set SKU Id isn’t valid for the specified token, the system uses the default
+  Id is set or the currently set SKU Id isn't valid for the specified token, the system uses the default
   SKU Id. If the system attempts to use the default SKU Id and no value has been set for that Id, the
   results are unpredictable.
   
