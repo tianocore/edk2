@@ -131,7 +131,7 @@ typedef struct {
 
 
 ///
-/// Image Attribute ¨CAuthentication Required
+/// Image Attribute -Authentication Required
 ///
 typedef struct {
   ///

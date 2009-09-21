@@ -44,7 +44,7 @@ extern EFI_GUID gEfiPeiPcdPpiGuid;
   The SKU Id of zero is reserved as a default. The valid SkuId range is 1 to 255. For tokens that are
   not SKU enabled, the system ignores any set SKU Id and works with the single value for that token.
   For SKU-enabled tokens, the system will use the SKU Id set by the last call to SetSku(). If no
-  SKU Id is set or the currently set SKU Id isn’t valid for the specified token, the system uses the
+  SKU Id is set or the currently set SKU Id isn't valid for the specified token, the system uses the
   default SKU Id. If the system attempts to use the default SKU Id and no value has been set for that
   Id, the results are unpredictable.
   
@@ -155,7 +155,7 @@ UINTN
   Sets an 8-bit value for a given PCD token.
   
   When the PCD service sets a value, it will check to ensure that the size of the value being set is
-  compatible with the Token’s existing definition. If it is not, an error will be returned.
+  compatible with the Token's existing definition. If it is not, an error will be returned.
   
   @param[in]    Guid          The 128-bit unique value that designates which namespace to extract the value from.
   @param[in]    TokenNumber   The PCD token number. 
@@ -179,7 +179,7 @@ EFI_STATUS
   Sets an 16-bit value for a given PCD token.
   
   When the PCD service sets a value, it will check to ensure that the size of the value being set is
-  compatible with the Token’s existing definition. If it is not, an error will be returned.
+  compatible with the Token's existing definition. If it is not, an error will be returned.
   
   @param[in]    Guid          The 128-bit unique value that designates which namespace to extract the value from.
   @param[in]    TokenNumber   The PCD token number. 
@@ -203,7 +203,7 @@ EFI_STATUS
   Sets an 32-bit value for a given PCD token.
   
   When the PCD service sets a value, it will check to ensure that the size of the value being set is
-  compatible with the Token’s existing definition. If it is not, an error will be returned.
+  compatible with the Token's existing definition. If it is not, an error will be returned.
   
   @param[in]    Guid          The 128-bit unique value that designates which namespace to extract the value from.
   @param[in]    TokenNumber   The PCD token number. 
@@ -227,7 +227,7 @@ EFI_STATUS
   Sets an 64-bit value for a given PCD token.
   
   When the PCD service sets a value, it will check to ensure that the size of the value being set is
-  compatible with the Token’s existing definition. If it is not, an error will be returned.
+  compatible with the Token's existing definition. If it is not, an error will be returned.
   
   @param[in]    Guid          The 128-bit unique value that designates which namespace to extract the value from.
   @param[in]    TokenNumber   The PCD token number. 
@@ -251,7 +251,7 @@ EFI_STATUS
   Sets a value of the specified size for a given PCD token.
   
   When the PCD service sets a value, it will check to ensure that the size of the value being set is
-  compatible with the Token’s existing definition. If it is not, an error will be returned.
+  compatible with the Token's existing definition. If it is not, an error will be returned.
   
   @param[in]    Guid          The 128-bit unique value that designates which namespace to extract the value from.
   @param[in]    TokenNumber   The PCD token number. 
@@ -277,7 +277,7 @@ EFI_STATUS
   Sets a Boolean value for a given PCD token.
   
   When the PCD service sets a value, it will check to ensure that the size of the value being set is
-  compatible with the Token’s existing definition. If it is not, an error will be returned.
+  compatible with the Token's existing definition. If it is not, an error will be returned.
   
   @param[in]    Guid          The 128-bit unique value that designates which namespace to extract the value from.
   @param[in]    TokenNumber   The PCD token number. 
