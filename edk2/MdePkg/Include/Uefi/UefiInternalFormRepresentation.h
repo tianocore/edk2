@@ -75,6 +75,7 @@ typedef struct {
 #define EFI_HII_PACKAGE_SIMPLE_FONTS         0x07
 #define EFI_HII_PACKAGE_DEVICE_PATH          0x08
 #define EFI_HII_PACKAGE_KEYBOARD_LAYOUT      0x09
+#define EFI_HII_PACKAGE_ANIMATIONS           0x0A
 #define EFI_HII_PACKAGE_END                  0xDF
 #define EFI_HII_PACKAGE_TYPE_SYSTEM_BEGIN    0xE0
 #define EFI_HII_PACKAGE_TYPE_SYSTEM_END      0xFF
@@ -281,8 +282,8 @@ typedef struct _EFI_HII_GUID_PACKAGE_HDR {
 // Section 27.3.6
 //
 
-#define UEFI_CONFIG_LANG  L"x-UEFI"
-#define UEFI_CONFIG_LANG2 L"x-i-UEFI"
+#define UEFI_CONFIG_LANG  "x-UEFI"
+#define UEFI_CONFIG_LANG2 "x-i-UEFI"
 
 ///
 /// The fixed header consists of a standard record header and then the string identifiers
@@ -1114,12 +1115,12 @@ typedef struct _EFI_IFR_EQ_ID_VAL {
   UINT16                   Value;
 } EFI_IFR_EQ_ID_VAL;
 
-typedef struct _EFI_IFR_EQ_ID_LIST {
+typedef struct _EFI_IFR_EQ_ID_VAL_LIST {
   EFI_IFR_OP_HEADER        Header;
   EFI_QUESTION_ID          QuestionId;
   UINT16                   ListLength;
   UINT16                   ValueList[1];
-} EFI_IFR_EQ_ID_LIST;
+} EFI_IFR_EQ_ID_VAL_LIST;
 
 typedef struct _EFI_IFR_UINT8 {
   EFI_IFR_OP_HEADER        Header;
