@@ -777,8 +777,7 @@ typedef struct {
   /// Describes the entry in a partition table, starting with entry 1.
   /// Partition number zero represents the entire device. Valid
   /// partition numbers for a MBR partition are [1, 4]. Valid
-  /// partition numbers for a GPT partition are [1,
-  /// NumberOfPartitionEntries].
+  /// partition numbers for a GPT partition are [1, NumberOfPartitionEntries].
   ///
   UINT32                          PartitionNumber;
   ///
@@ -790,7 +789,11 @@ typedef struct {
   ///
   UINT64                          PartitionSize;
   ///
-  /// Signature unique to this partition
+  /// Signature unique to this partition:
+  /// If SignatureType is 0, this field has to be initialized with 16 zeros.
+  /// If SignatureType is 1, the MBR signature is stored in the first 4 bytes of this field.
+  /// The other 12 bytes are initialized with zeros.
+  /// If SignatureType is 2, this field contains a 16 byte signature.
   ///
   UINT8                           Signature[16];
   ///
