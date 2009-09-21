@@ -56,8 +56,10 @@ typedef struct _EFI_HII_CONFIG_ROUTING_PROTOCOL EFI_HII_CONFIG_ROUTING_PROTOCOL;
   @param This       Points to the EFI_HII_CONFIG_ROUTING_PROTOCOL
                     instance.
 
-  @param Request    A null-terminated Unicode string in
-                    <MultiConfigRequest> format.
+  @param Request    A null-terminated string in <MultiConfigRequest>
+                    format. If a NULL is passed in for the Request field,
+                    all of the settings being abstracted by this function
+                    will be returned in the Results field.
 
   @param Progress   On return, points to a character in the
                     Request string. Points to the string's null
@@ -68,11 +70,11 @@ typedef struct _EFI_HII_CONFIG_ROUTING_PROTOCOL EFI_HII_CONFIG_ROUTING_PROTOCOL;
                     name / value pair) if the request was not
                     successful
 
-  @param Results    Null-terminated Unicode string in
-                    <MultiConfigAltResp> format which has all
-                    values filled in for the names in the
-                    Request string. String to be allocated by
-                    the called function.
+  @param Results    A null-terminated string in <ConfigAltResp> format
+                    which has all values filled in for the names in the
+                    Request string. If the Request string was NULL, the data
+                    returned is in <MultiConfigAltResp> format. String to be
+                    allocated by the called function.
 
   @retval EFI_SUCCESS             The Results string is filled with the
                                   values corresponding to all requested
@@ -120,12 +122,7 @@ EFI_STATUS
   This function allows the caller to request the current
   configuration for all of the current HII database. The results
   include both the current and alternate configurations as
-  described in ExtractConfig() above. Implementation note: This
-  call has deceptively few inputs but the implementation is likely
-  to be somewhat complex. The requirement is to scan all IFR in
-  the HII database to determine the list of names and then request
-  the configuration using the corresponding drivers.
-  EFI_HII_CONFIG_ACCESS_PROTOCOL.ExtractConfig() interfaces below.
+  described in ExtractConfig() above. 
   
   @param This     Points to the EFI_HII_CONFIG_ROUTING_PROTOCOL instance.
   
