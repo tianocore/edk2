@@ -1,7 +1,7 @@
 /** @file
   Defines data types and constants introduced in UEFI.
 
-  Copyright (c) 2006 - 2008, Intel Corporation<BR>
+  Copyright (c) 2006 - 2009, Intel Corporation<BR>
   Portions copyright (c) 2008-2009 Apple Inc. All rights reserved.<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -59,7 +59,7 @@ typedef UINT64                    EFI_VIRTUAL_ADDRESS;
 
 ///
 /// EFI Time Abstraction:
-///  Year:       1998 - 20XX
+///  Year:       1900 - 9999
 ///  Month:      1 - 12
 ///  Day:        1 - 31
 ///  Hour:       0 - 23
