@@ -339,10 +339,12 @@ PartitionInstallGptChildHandles (
   for (Index = 0; Index < PrimaryHeader->NumberOfPartitionEntries; Index++) {
     if (CompareGuid (&PartEntry[Index].PartitionTypeGUID, &gEfiPartTypeUnusedGuid) ||
         PEntryStatus[Index].OutOfRange ||
-        PEntryStatus[Index].Overlap
+        PEntryStatus[Index].Overlap ||
+        PEntryStatus[Index].OsSpecific
         ) {
       //
-      // Don't use null EFI Partition Entries or Invalid Partition Entries
+      // Don't use null EFI Partition Entries, Invalid Partition Entries or OS specific
+      // partition Entries
       //
       continue;
     }
@@ -652,6 +654,7 @@ PartitionCheckGptEntry (
   EFI_LBA EndingLBA;
   UINTN   Index1;
   UINTN   Index2;
+  UINT64  Attributes;
 
   DEBUG ((EFI_D_INFO, " start check partition entries\n"));
   for (Index1 = 0; Index1 < PartHeader->NumberOfPartitionEntries; Index1++) {
@@ -686,6 +689,14 @@ PartitionCheckGptEntry (
         continue;
 
       }
+    }
+
+    Attributes = PartEntry[Index1].Attributes;
+    if ((Attributes & BIT1) != 0) {
+      //
+      // If Bit 1 is set, this indicate that this is an OS specific GUID partition. 
+      //
+      PEntryStatus[Index1].OsSpecific = TRUE;
     }
   }
 

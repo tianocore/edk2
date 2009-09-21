@@ -4,7 +4,7 @@
   of the raw block devices media. Currently "El Torito CD-ROM", Legacy 
   MBR, and GPT partition schemes are supported.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -92,6 +92,7 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gPartitionComponentName2;
 typedef struct {
   BOOLEAN OutOfRange;
   BOOLEAN Overlap;
+  BOOLEAN OsSpecific;
 } EFI_PARTITION_ENTRY_STATUS;
 
 //
