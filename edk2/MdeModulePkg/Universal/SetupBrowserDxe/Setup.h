@@ -1,7 +1,7 @@
 /** @file
 Private MACRO, structure and function definitions for Setup Browser module. 
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -256,10 +256,10 @@ typedef struct {
 
   EFI_HII_VALUE     Value;       // For EFI_IFR_EQ_ID_VAL, EFI_IFR_UINT64, EFI_IFR_UINT32, EFI_IFR_UINT16, EFI_IFR_UINT8, EFI_IFR_STRING_REF1
 
-  EFI_QUESTION_ID   QuestionId;  // For EFI_IFR_EQ_ID_ID, EFI_IFR_EQ_ID_LIST, EFI_IFR_QUESTION_REF1
+  EFI_QUESTION_ID   QuestionId;  // For EFI_IFR_EQ_ID_ID, EFI_IFR_EQ_ID_VAL_LIST, EFI_IFR_QUESTION_REF1
   EFI_QUESTION_ID   QuestionId2;
 
-  UINT16            ListLength;  // For EFI_IFR_EQ_ID_LIST
+  UINT16            ListLength;  // For EFI_IFR_EQ_ID_VAL_LIST
   UINT16            *ValueList;
 
   EFI_STRING_ID     DevicePath;  // For EFI_IFR_QUESTION_REF3_2, EFI_IFR_QUESTION_REF3_3
