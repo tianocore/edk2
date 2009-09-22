@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2005 - 2007, Intel Corporation
+Copyright (c) 2005 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
 distribution. The full text of the license may be found at
@@ -209,7 +209,7 @@ typedef struct _FAT_ODIR {
 
 typedef struct {
   UINTN               Signature;
-  EFI_FILE            Handle;
+  EFI_FILE_PROTOCOL   Handle;
   UINT64              Position;
   BOOLEAN             ReadOnly;
   struct _FAT_OFILE   *OFile;
@@ -369,8 +369,8 @@ typedef struct _FAT_VOLUME {
 EFI_STATUS
 EFIAPI
 FatOpen (
-  IN  EFI_FILE          *FHand,
-  OUT EFI_FILE          **NewHandle,
+  IN  EFI_FILE_PROTOCOL *FHand,
+  OUT EFI_FILE_PROTOCOL **NewHandle,
   IN  CHAR16            *FileName,
   IN  UINT64            OpenMode,
   IN  UINT64            Attributes
@@ -403,7 +403,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 FatGetPosition (
-  IN  EFI_FILE          *FHand,
+  IN  EFI_FILE_PROTOCOL *FHand,
   OUT UINT64            *Position
   )
 /*++
@@ -429,10 +429,10 @@ Returns:
 EFI_STATUS
 EFIAPI
 FatGetInfo (
-  IN     EFI_FILE      *FHand,
-  IN     EFI_GUID      *Type,
-  IN OUT UINTN         *BufferSize,
-     OUT VOID          *Buffer
+  IN     EFI_FILE_PROTOCOL      *FHand,
+  IN     EFI_GUID               *Type,
+  IN OUT UINTN                  *BufferSize,
+     OUT VOID                   *Buffer
   )
 /*++
 
@@ -458,7 +458,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 FatSetInfo (
-  IN EFI_FILE           *FHand,
+  IN EFI_FILE_PROTOCOL  *FHand,
   IN EFI_GUID           *Type,
   IN UINTN              BufferSize,
   IN VOID               *Buffer
@@ -487,7 +487,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 FatFlush (
-  IN EFI_FILE           *FHand
+  IN EFI_FILE_PROTOCOL  *FHand
   )
 /*++
 
@@ -513,7 +513,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 FatClose (
-  IN EFI_FILE  *FHand
+  IN EFI_FILE_PROTOCOL  *FHand
   )
 /*++
 
@@ -535,7 +535,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 FatDelete (
-  IN EFI_FILE           *FHand
+  IN EFI_FILE_PROTOCOL  *FHand
   )
 /*++
 
@@ -558,7 +558,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 FatSetPosition (
-  IN EFI_FILE           *FHand,
+  IN EFI_FILE_PROTOCOL  *FHand,
   IN UINT64             Position
   )
 /*++
@@ -584,9 +584,9 @@ Returns:
 EFI_STATUS
 EFIAPI
 FatRead (
-  IN     EFI_FILE   *FHand,
-  IN OUT UINTN      *BufferSize,
-     OUT VOID       *Buffer
+  IN     EFI_FILE_PROTOCOL    *FHand,
+  IN OUT UINTN                *BufferSize,
+     OUT VOID                 *Buffer
   )
 /*++
 
@@ -613,9 +613,9 @@ Returns:
 EFI_STATUS
 EFIAPI
 FatWrite (
-  IN     EFI_FILE      *FHand,
-  IN OUT UINTN         *BufferSize,
-  IN     VOID          *Buffer
+  IN     EFI_FILE_PROTOCOL      *FHand,
+  IN OUT UINTN                  *BufferSize,
+  IN     VOID                   *Buffer
   )
 /*++
 
@@ -883,7 +883,7 @@ EFI_STATUS
 EFIAPI
 FatOpenVolume (
   IN  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *This,
-  OUT EFI_FILE                        **File
+  OUT EFI_FILE_PROTOCOL               **File
   );
 
 //
@@ -1113,6 +1113,6 @@ extern EFI_DRIVER_BINDING_PROTOCOL     gFatDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL     gFatComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL    gFatComponentName2;
 extern EFI_LOCK                        FatFsLock;
-extern EFI_FILE                        FatFileInterface;
+extern EFI_FILE_PROTOCOL               FatFileInterface;
 
 #endif

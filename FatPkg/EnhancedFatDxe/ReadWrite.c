@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2005, Intel Corporation
+Copyright (c) 2005 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
 distribution. The full text of the license may be found at
@@ -27,7 +27,7 @@ Revision History
 EFI_STATUS
 EFIAPI
 FatGetPosition (
-  IN  EFI_FILE          *FHand,
+  IN  EFI_FILE_PROTOCOL *FHand,
   OUT UINT64            *Position
   )
 /*++
@@ -70,8 +70,8 @@ Returns:
 EFI_STATUS
 EFIAPI
 FatSetPosition (
-  IN EFI_FILE  *FHand,
-  IN UINT64    Position
+  IN EFI_FILE_PROTOCOL  *FHand,
+  IN UINT64             Position
   )
 /*++
 
@@ -204,7 +204,7 @@ Done:
 
 EFI_STATUS
 FatIFileAccess (
-  IN     EFI_FILE              *FHand,
+  IN     EFI_FILE_PROTOCOL     *FHand,
   IN     IO_MODE               IoMode,
   IN OUT UINTN                 *BufferSize,
   IN OUT VOID                  *Buffer
@@ -343,9 +343,9 @@ Done:
 EFI_STATUS
 EFIAPI
 FatRead (
-  IN     EFI_FILE       *FHand,
-  IN OUT UINTN          *BufferSize,
-     OUT VOID           *Buffer
+  IN     EFI_FILE_PROTOCOL  *FHand,
+  IN OUT UINTN              *BufferSize,
+     OUT VOID               *Buffer
   )
 /*++
 
@@ -374,9 +374,9 @@ Returns:
 EFI_STATUS
 EFIAPI
 FatWrite (
-  IN     EFI_FILE       *FHand,
-  IN OUT UINTN          *BufferSize,
-  IN     VOID           *Buffer
+  IN     EFI_FILE_PROTOCOL  *FHand,
+  IN OUT UINTN              *BufferSize,
+  IN     VOID               *Buffer
   )
 /*++
 
