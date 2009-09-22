@@ -7,7 +7,7 @@
 
   UEFI 2.0 can boot from any valid EFI image contained in a SimpleFileSystem.
 
-  Copyright (c) 2006 - 2008, Intel Corporation                                                         
+  Copyright (c) 2006 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -40,7 +40,7 @@ typedef struct _EFI_FILE_PROTOCOL         *EFI_FILE_HANDLE;
 /// Protocol name defined in EFI1.1.
 /// 
 typedef EFI_SIMPLE_FILE_SYSTEM_PROTOCOL   EFI_FILE_IO_INTERFACE;
-typedef struct _EFI_FILE_PROTOCOL         EFI_FILE;
+typedef EFI_FILE_PROTOCOL                 EFI_FILE;
 
 /**
   Open the root directory on a volume.
@@ -49,7 +49,7 @@ typedef struct _EFI_FILE_PROTOCOL         EFI_FILE;
   @param  Root Returns an Open file handle for the root directory
 
   @retval EFI_SUCCESS          The device was opened.
-  @retval EFI_UNSUPPORTED      This volume does not suppor the file system.
+  @retval EFI_UNSUPPORTED      This volume does not support the file system.
   @retval EFI_NO_MEDIA         The device has no media.
   @retval EFI_DEVICE_ERROR     The device reported an error.
   @retval EFI_VOLUME_CORRUPTED The file system structures are corrupted
@@ -82,7 +82,7 @@ struct _EFI_SIMPLE_FILE_SYSTEM_PROTOCOL {
 };
 
 /**
-  Open the root directory on a volume.
+  Opens a new file relative to the source file's location.
 
   @param  This       Protocol instance pointer.
   @param  NewHandle  Returns File Handle for FileName
@@ -140,7 +140,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_FILE_CLOSE)(
-  IN EFI_FILE  *This
+  IN EFI_FILE_PROTOCOL  *This
   );
 
 /**
@@ -155,7 +155,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_FILE_DELETE)(
-  IN EFI_FILE  *This
+  IN EFI_FILE_PROTOCOL  *This
   );
 
 /**
@@ -311,7 +311,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_FILE_FLUSH)(
-  IN EFI_FILE  *This
+  IN EFI_FILE_PROTOCOL  *This
   );
 
 #define EFI_FILE_PROTOCOL_REVISION   0x00010000
