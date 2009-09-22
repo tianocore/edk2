@@ -70,26 +70,26 @@ typedef struct {
   ///
   /// An identifier which identifies the agent which added the signature to the list.
   ///
-  EFI_GUID	        SignatureOwner;
+  EFI_GUID          SignatureOwner;
   ///
   /// The format of the signature is defined by the SignatureType.
   ///
-  UINT8		          SignatureData[1];
+  UINT8             SignatureData[1];
 } EFI_SIGNATURE_DATA;
 
 typedef struct {
   ///
   /// Type of the signature. GUID signature types are defined in below.
   ///
-  EFI_GUID          	SignatureType;
+  EFI_GUID            SignatureType;
   ///
   /// Total size of the signature list, including this header.
   ///
-  UINT32            	SignatureListSize;
+  UINT32              SignatureListSize;
   ///
   /// Size of the signature header which precedes the array of signatures.
   ///
-  UINT32            	SignatureHeaderSize;
+  UINT32              SignatureHeaderSize;
   ///
   /// Size of each signature.
   ///
@@ -176,7 +176,7 @@ typedef struct {
   ///
   /// Describes the action taken by the firmware regarding this image.
   ///
-  EFI_IMAGE_EXECUTION_ACTION 	  Action;
+  EFI_IMAGE_EXECUTION_ACTION    Action;
   ///
   /// Size of all of the entire structure.
   ///
@@ -204,7 +204,7 @@ typedef struct {
   ///
   WIN_CERTIFICATE               ImageHash;
   ///
-  /// Zero or more image signatures. If the image contained no signtures, 
+  /// Zero or more image signatures. If the image contained no signatures, 
   /// then this field is empty.
   ///
   WIN_CERTIFICATE               Signature;
