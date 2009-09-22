@@ -457,7 +457,7 @@ EFI_STATUS
 EFIAPI
 UnixSimpleFileSystemOpenVolume (
   IN EFI_SIMPLE_FILE_SYSTEM_PROTOCOL  *This,
-  OUT EFI_FILE                        **Root
+  OUT EFI_FILE_PROTOCOL               **Root
   )
 /*++
 
@@ -578,11 +578,11 @@ Done:
 EFI_STATUS
 EFIAPI
 UnixSimpleFileSystemOpen (
-  IN  EFI_FILE  *This,
-  OUT EFI_FILE  **NewHandle,
-  IN  CHAR16    *FileName,
-  IN  UINT64    OpenMode,
-  IN  UINT64    Attributes
+  IN  EFI_FILE_PROTOCOL   *This,
+  OUT EFI_FILE_PROTOCOL   **NewHandle,
+  IN  CHAR16              *FileName,
+  IN  UINT64              OpenMode,
+  IN  UINT64              Attributes
   )
 /*++
 
@@ -630,7 +630,7 @@ Returns:
 // TODO:    EFI_INVALID_PARAMETER - add return value to function comment
 // TODO:    EFI_INVALID_PARAMETER - add return value to function comment
 {
-  EFI_FILE                          *Root;
+  EFI_FILE_PROTOCOL                 *Root;
   UNIX_EFI_FILE_PRIVATE           *PrivateFile;
   UNIX_EFI_FILE_PRIVATE           *NewPrivateFile;
   UNIX_SIMPLE_FILE_SYSTEM_PRIVATE *PrivateRoot;
@@ -963,7 +963,7 @@ Done: ;
 EFI_STATUS
 EFIAPI
 UnixSimpleFileSystemClose (
-  IN EFI_FILE  *This
+  IN EFI_FILE_PROTOCOL  *This
   )
 /*++
 
@@ -1017,7 +1017,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 UnixSimpleFileSystemDelete (
-  IN EFI_FILE  *This
+  IN EFI_FILE_PROTOCOL  *This
   )
 /*++
 
@@ -1221,9 +1221,9 @@ Returns:
 EFI_STATUS
 EFIAPI
 UnixSimpleFileSystemRead (
-  IN     EFI_FILE  *This,
-  IN OUT UINTN     *BufferSize,
-  OUT    VOID      *Buffer
+  IN     EFI_FILE_PROTOCOL  *This,
+  IN OUT UINTN              *BufferSize,
+  OUT    VOID               *Buffer
   )
 /*++
 
@@ -1357,9 +1357,9 @@ Done:
 EFI_STATUS
 EFIAPI
 UnixSimpleFileSystemWrite (
-  IN     EFI_FILE  *This,
-  IN OUT UINTN     *BufferSize,
-  IN     VOID      *Buffer
+  IN     EFI_FILE_PROTOCOL  *This,
+  IN OUT UINTN              *BufferSize,
+  IN     VOID               *Buffer
   )
 /*++
 
@@ -1445,8 +1445,8 @@ Done:
 EFI_STATUS
 EFIAPI
 UnixSimpleFileSystemSetPosition (
-  IN EFI_FILE  *This,
-  IN UINT64    Position
+  IN EFI_FILE_PROTOCOL  *This,
+  IN UINT64             Position
   )
 /*++
 
@@ -1512,8 +1512,8 @@ Done:
 EFI_STATUS
 EFIAPI
 UnixSimpleFileSystemGetPosition (
-  IN  EFI_FILE  *This,
-  OUT UINT64    *Position
+  IN  EFI_FILE_PROTOCOL   *This,
+  OUT UINT64              *Position
   )
 /*++
 
@@ -1562,10 +1562,10 @@ Returns:
 EFI_STATUS
 EFIAPI
 UnixSimpleFileSystemGetInfo (
-  IN     EFI_FILE  *This,
-  IN     EFI_GUID  *InformationType,
-  IN OUT UINTN     *BufferSize,
-  OUT    VOID      *Buffer
+  IN     EFI_FILE_PROTOCOL  *This,
+  IN     EFI_GUID           *InformationType,
+  IN OUT UINTN              *BufferSize,
+  OUT    VOID               *Buffer
   )
 /*++
 
@@ -1671,7 +1671,7 @@ Done:
 EFI_STATUS
 EFIAPI
 UnixSimpleFileSystemSetInfo (
-  IN EFI_FILE         *This,
+  IN EFI_FILE_PROTOCOL*This,
   IN EFI_GUID         *InformationType,
   IN UINTN            BufferSize,
   IN VOID             *Buffer
@@ -2117,7 +2117,7 @@ Done:
 EFI_STATUS
 EFIAPI
 UnixSimpleFileSystemFlush (
-  IN EFI_FILE  *This
+  IN EFI_FILE_PROTOCOL  *This
   )
 /*++
 
