@@ -23,7 +23,7 @@
 
 typedef struct _EFI_TAPE_IO_PROTOCOL EFI_TAPE_IO_PROTOCOL;
 
-typedef struct {
+typedef struct _EFI_TAPE_HEADER {
   UINT64     Signature;
   UINT32     Revision;
   UINT32     BootDescSize;
@@ -41,7 +41,7 @@ typedef struct {
   CHAR8      SystemName[256];  // UTF-8
   CHAR8      TapeTitle[120];   // UTF-8
   CHAR8      pad[468];         // pad to 1024
-} TAPE_HEADER;
+} EFI_TAPE_HEADER;
 
 /**
   Reads from the tape.
@@ -164,8 +164,8 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_TAPE_SPACE)(
   IN EFI_TAPE_IO_PROTOCOL *This,
-  INTN                    Direction,
-  UINTN                   Type
+  IN INTN                 Direction,
+  IN UINTN                Type
   );   
 
 

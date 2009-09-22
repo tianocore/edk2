@@ -258,10 +258,10 @@ typedef struct _EFI_HII_GIBT_SKIP2_BLOCK {
 /// The device path package is used to carry a device path
 /// associated with the package list.
 ///
-typedef struct _EFI_HII_DEVICE_PATH_PACKAGE {
+typedef struct _EFI_HII_DEVICE_PATH_PACKAGE_HDR {
   EFI_HII_PACKAGE_HEADER   Header;
   // EFI_DEVICE_PATH_PROTOCOL DevicePath[];
-} EFI_HII_DEVICE_PATH_PACKAGE;
+} EFI_HII_DEVICE_PATH_PACKAGE_HDR;
 
 //
 // Definitions for GUID Package
@@ -596,13 +596,13 @@ typedef struct _EFI_HII_IMAGE_PALETTE_INFO {
 //
 
 ///
-/// The Forms package is used to carry forms-based encoding data.
+/// The Form package is used to carry form-based encoding data.
 ///
-typedef struct _EFI_HII_FORM_PACKAGE {
+typedef struct _EFI_HII_FORM_PACKAGE_HDR {
   EFI_HII_PACKAGE_HEADER       Header;
   // EFI_IFR_OP_HEADER         OpCodeHeader;
   // More op-codes follow
-} EFI_HII_FORM_PACKAGE;
+} EFI_HII_FORM_PACKAGE_HDR;
 
 typedef struct {
   UINT8 Hour;
