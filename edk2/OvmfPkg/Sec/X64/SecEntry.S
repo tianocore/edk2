@@ -55,5 +55,6 @@ ASM_PFX(_ModuleEntryPoint):
     movq    %rsi, %rdx
     movq    %rdi, %r8
     movq    %rsp, %r9
+    subq    $0x20, %rsp
     call    ASM_PFX(SecCoreStartupWithStack)
 

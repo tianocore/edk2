@@ -31,7 +31,9 @@ EXTERNDEF  InternalX86GetApicBase:PROC
 ;   );
 ;------------------------------------------------------------------------------
 CpuInitLocalApicTimer    PROC
+    sub rsp, 28h  ;Reserve home addresses and make RSP 16-byte aligned
     call InternalX86GetApicBase
+    add rsp, 28h
     mov dword ptr [rax + 3e0h], 0ah
     bts dword ptr [rax + 320h], 17
     mov dword ptr [rax + 380h], -1
