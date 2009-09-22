@@ -433,7 +433,7 @@ EFI_STATUS
 (EFIAPI *EFI_HII_GET_KEYBOARD_LAYOUT)(
   IN CONST  EFI_HII_DATABASE_PROTOCOL *This,
   IN CONST  EFI_GUID                  *KeyGuid,
-  IN OUT UINT16                        *KeyboardLayoutLength,
+  IN OUT UINT16                       *KeyboardLayoutLength,
   OUT       EFI_HII_KEYBOARD_LAYOUT   *KeyboardLayout
 );
 
