@@ -504,7 +504,7 @@ EFI_STATUS
 EFIAPI
 WinNtSimpleFileSystemOpenVolume (
   IN EFI_SIMPLE_FILE_SYSTEM_PROTOCOL  *This,
-  OUT EFI_FILE                        **Root
+  OUT EFI_FILE_PROTOCOL               **Root
   )
 /*++
 
@@ -808,11 +808,11 @@ IsFileNameValid (
 EFI_STATUS
 EFIAPI
 WinNtSimpleFileSystemOpen (
-  IN  EFI_FILE  *This,
-  OUT EFI_FILE  **NewHandle,
-  IN  CHAR16    *FileName,
-  IN  UINT64    OpenMode,
-  IN  UINT64    Attributes
+  IN  EFI_FILE_PROTOCOL  *This,
+  OUT EFI_FILE_PROTOCOL  **NewHandle,
+  IN  CHAR16             *FileName,
+  IN  UINT64             OpenMode,
+  IN  UINT64             Attributes
   )
 /*++
 
@@ -822,7 +822,7 @@ Routine Description:
 
 Arguments:
 
-  This        - A pointer to the seource file location.
+  This        - A pointer to the source file location.
 
   NewHandle   - Pointer to storage for the new file handle.
 
@@ -1309,7 +1309,7 @@ Done:
 EFI_STATUS
 EFIAPI
 WinNtSimpleFileSystemClose (
-  IN EFI_FILE  *This
+  IN EFI_FILE_PROTOCOL  *This
   )
 /*++
 
@@ -1368,7 +1368,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 WinNtSimpleFileSystemDelete (
-  IN EFI_FILE  *This
+  IN EFI_FILE_PROTOCOL  *This
   )
 /*++
 
@@ -1476,9 +1476,9 @@ Returns:
 EFI_STATUS
 EFIAPI
 WinNtSimpleFileSystemRead (
-  IN     EFI_FILE  *This,
-  IN OUT UINTN     *BufferSize,
-  OUT    VOID      *Buffer
+  IN     EFI_FILE_PROTOCOL  *This,
+  IN OUT UINTN              *BufferSize,
+  OUT    VOID               *Buffer
   )
 /*++
 
@@ -1691,9 +1691,9 @@ Done:
 EFI_STATUS
 EFIAPI
 WinNtSimpleFileSystemWrite (
-  IN     EFI_FILE  *This,
-  IN OUT UINTN     *BufferSize,
-  IN     VOID      *Buffer
+  IN     EFI_FILE_PROTOCOL  *This,
+  IN OUT UINTN              *BufferSize,
+  IN     VOID               *Buffer
   )
 /*++
 
@@ -1778,8 +1778,8 @@ Done:
 EFI_STATUS
 EFIAPI
 WinNtSimpleFileSystemSetPosition (
-  IN EFI_FILE  *This,
-  IN UINT64    Position
+  IN EFI_FILE_PROTOCOL  *This,
+  IN UINT64             Position
   )
 /*++
 
@@ -1870,8 +1870,8 @@ Done:
 EFI_STATUS
 EFIAPI
 WinNtSimpleFileSystemGetPosition (
-  IN  EFI_FILE  *This,
-  OUT UINT64    *Position
+  IN  EFI_FILE_PROTOCOL   *This,
+  OUT UINT64              *Position
   )
 /*++
 
@@ -2109,10 +2109,10 @@ Returns:
 EFI_STATUS
 EFIAPI
 WinNtSimpleFileSystemGetInfo (
-  IN     EFI_FILE  *This,
-  IN     EFI_GUID  *InformationType,
-  IN OUT UINTN     *BufferSize,
-  OUT    VOID      *Buffer
+  IN     EFI_FILE_PROTOCOL  *This,
+  IN     EFI_GUID           *InformationType,
+  IN OUT UINTN              *BufferSize,
+  OUT    VOID               *Buffer
   )
 /*++
 
@@ -2290,7 +2290,7 @@ Done:
 EFI_STATUS
 EFIAPI
 WinNtSimpleFileSystemSetInfo (
-  IN EFI_FILE         *This,
+  IN EFI_FILE_PROTOCOL*This,
   IN EFI_GUID         *InformationType,
   IN UINTN            BufferSize,
   IN VOID             *Buffer
@@ -2869,7 +2869,7 @@ Done:
 EFI_STATUS
 EFIAPI
 WinNtSimpleFileSystemFlush (
-  IN EFI_FILE  *This
+  IN EFI_FILE_PROTOCOL  *This
   )
 /*++
 
