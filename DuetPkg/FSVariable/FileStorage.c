@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -55,7 +55,7 @@ OpenStore (
   IN  EFI_DEVICE_PATH_PROTOCOL  *Device,
   IN  CHAR16                    *FilePathName,
   IN  UINT64                    OpenMode,
-  OUT EFI_FILE                  **File
+  OUT EFI_FILE_PROTOCOL         **File
   );
 
 //
@@ -63,7 +63,7 @@ OpenStore (
 //
 VOID
 FileClose (
-  IN  EFI_FILE                   *File
+  IN  EFI_FILE_PROTOCOL          *File
   )
 {
   EFI_STATUS Status;
@@ -180,7 +180,7 @@ OnSimpleFileSystemInstall (
   EFI_HANDLE                Handle;
   EFI_DEVICE_PATH_PROTOCOL  *Device;
   VS_DEV                    *Dev;
-  EFI_FILE                  *File;
+  EFI_FILE_PROTOCOL         *File;
   UINTN                     NumBytes;
 
   Dev = (VS_DEV *) Context;
@@ -288,7 +288,7 @@ FileEraseStore(
 {
   EFI_STATUS              Status;
   VS_DEV                  *Dev;
-  EFI_FILE                *File;
+  EFI_FILE_PROTOCOL       *File;
   UINTN                   NumBytes;
 
   Status = EFI_SUCCESS;
@@ -324,7 +324,7 @@ FileWriteStore (
 {
   EFI_STATUS              Status;
   VS_DEV                  *Dev;
-  EFI_FILE                *File;
+  EFI_FILE_PROTOCOL       *File;
 
   Status = EFI_SUCCESS;
   Dev    = DEV_FROM_THIS(This);
@@ -371,7 +371,7 @@ OpenStore (
   IN  EFI_DEVICE_PATH_PROTOCOL  *Device,
   IN  CHAR16                    *FilePathName,
   IN  UINT64                    OpenMode,
-  OUT EFI_FILE                  **File
+  OUT EFI_FILE_PROTOCOL         **File
   )
 {
   EFI_HANDLE                        Handle;
