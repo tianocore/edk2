@@ -1,7 +1,7 @@
 /** @file
   Implementation for PEI Services Library.
 
-  Copyright (c) 2006 - 2008, Intel Corporation<BR>
+  Copyright (c) 2006 - 2009, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -570,7 +570,7 @@ PeiServicesInstallFvInfoPpi (
   FvInfoPpi->FvInfoSize = FvInfoSize;
   if (ParentFvName != NULL) {
     ParentFvNameValue = AllocateCopyPool (sizeof (EFI_GUID), ParentFvName);
-	ASSERT (ParentFvNameValue != NULL);
+    ASSERT (ParentFvNameValue != NULL);
     FvInfoPpi->ParentFvName = ParentFvNameValue;
   }
   if (ParentFileName != NULL) {
