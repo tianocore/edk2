@@ -54,6 +54,7 @@ _ModuleEntryPoint PROC PUBLIC
     mov     rdx, rsi
     mov     r8, rdi
     mov     r9, rsp
+    sub     rsp, 20h
     call    SecCoreStartupWithStack
 
 _ModuleEntryPoint ENDP
