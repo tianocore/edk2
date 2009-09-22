@@ -507,11 +507,11 @@ SaveNvVarsToFs (
     Status = PackVariableIntoFile (
                File,
                VariableName,
-               VariableNameSize,
+               (UINT32) VariableNameSize,
                &VendorGuid,
                VariableAttributes,
                VariableData,
-               VariableDataSize
+               (UINT32) VariableDataSize
                );
     if (EFI_ERROR (Status)) {
       break;
