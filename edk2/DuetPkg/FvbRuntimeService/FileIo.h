@@ -1,5 +1,5 @@
 /**@file
-Copyright (c) 2007, Intel Corporation                                                         
+Copyright (c) 2007 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -24,10 +24,10 @@ Abstract:
 
 EFI_STATUS
 FileWrite (
-  IN EFI_FILE  *File,
-  IN UINTN     Offset,
-  IN UINTN     Buffer,
-  IN UINTN     Size
+  IN EFI_FILE_PROTOCOL  *File,
+  IN UINTN              Offset,
+  IN UINTN              Buffer,
+  IN UINTN              Size
   );
 
 EFI_STATUS
@@ -46,13 +46,13 @@ EFI_STATUS
 FileOpen (
   IN  EFI_DEVICE_PATH_PROTOCOL   *Device,
   IN  CHAR16                     *MappedFile,
-  OUT EFI_FILE                   **File,
+  OUT EFI_FILE_PROTOCOL          **File,
   IN  UINT64                     OpenMode
   );
 
 VOID
 FileClose (
-  IN  EFI_FILE                   *File
+  IN  EFI_FILE_PROTOCOL          *File
   );
 
 #endif // _FW_BLOCK_SERVICE_FILE_IO_H

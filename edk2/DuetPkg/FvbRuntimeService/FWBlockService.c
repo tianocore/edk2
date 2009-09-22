@@ -1,5 +1,5 @@
 /**@file
-Copyright (c) 2007, Intel Corporation                                                         
+Copyright (c) 2007 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -83,11 +83,11 @@ Returns:
 
 --*/
 {
-  EFI_STATUS  Status;
-  EFI_FILE    *File;
-  UINTN       FileOffset;
-  UINTN       BufferForFile;
-  UINTN       Length;
+  EFI_STATUS          Status;
+  EFI_FILE_PROTOCOL   *File;
+  UINTN               FileOffset;
+  UINTN               BufferForFile;
+  UINTN               Length;
 
   Status = EFI_SUCCESS;
   CopyMem ((VOID *) Address, Buffer, *NumBytes);
@@ -131,11 +131,11 @@ Returns:
 
 --*/
 {
-  EFI_STATUS  Status;
-  EFI_FILE    *File;
-  UINTN       FileOffset;
-  UINTN       BufferForFile;
-  UINTN       Length;
+  EFI_STATUS           Status;
+  EFI_FILE_PROTOCOL    *File;
+  UINTN                FileOffset;
+  UINTN                BufferForFile;
+  UINTN                Length;
 
   Status = EFI_SUCCESS;
 
@@ -1272,7 +1272,7 @@ OnSimpleFileSystemInstall (
   EFI_HANDLE                Handle;
   UINTN                     Instance;
   EFI_DEVICE_PATH_PROTOCOL  *Device;
-  EFI_FILE                  *File;
+  EFI_FILE_PROTOCOL         *File;
   EFI_FW_VOL_INSTANCE       *FwhInstance;
   while (TRUE) {
     HandleSize = sizeof (EFI_HANDLE);
