@@ -1910,7 +1910,8 @@ typedef struct {
   ///
   UINT32                            FirmwareRevision;
   ///
-  /// The handle for the active console input device.
+  /// The handle for the active console input device. This handle must support
+  /// EFI_SIMPLE_TEXT_INPUT_PROTOCOL and EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL.
   ///
   EFI_HANDLE                        ConsoleInHandle;
   ///
@@ -1929,6 +1930,7 @@ typedef struct {
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL   *ConOut;
   ///
   /// The handle for the active standard error console device.
+  /// This handle must support the EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.
   ///
   EFI_HANDLE                        StandardErrorHandle;
   ///
