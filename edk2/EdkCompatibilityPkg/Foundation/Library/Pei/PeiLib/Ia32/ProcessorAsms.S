@@ -28,8 +28,8 @@
 .globl ASM_PFX(SwitchStacks)
 .globl ASM_PFX(SwitchIplStacks)
 
-.equ                            EFI_SUCCESS, 0
-.equ                            EFI_WARN_RETURN_FROM_LONG_JUMP, 5
+#define EFI_SUCCESS                     0
+#define EFI_WARN_RETURN_FROM_LONG_JUMP  5
 
 #
 # typedef struct {

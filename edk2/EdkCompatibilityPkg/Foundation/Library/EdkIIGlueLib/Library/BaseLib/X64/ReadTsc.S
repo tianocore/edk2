@@ -29,7 +29,7 @@
 #   VOID
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(AsmReadTsc)
+.globl ASM_PFX(AsmReadTsc)
 ASM_PFX(AsmReadTsc):
     rdtsc
     shl     $0x20, %rdx

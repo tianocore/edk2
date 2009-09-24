@@ -28,7 +28,7 @@
 #   VOID
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(CpuPause)
+.globl ASM_PFX(CpuPause)
 ASM_PFX(CpuPause):
     pause
     ret

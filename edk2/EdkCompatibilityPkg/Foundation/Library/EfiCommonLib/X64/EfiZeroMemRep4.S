@@ -24,7 +24,7 @@
 
     .code: 
 
-.global ASM_PFX(EfiCommonLibZeroMem)
+.globl ASM_PFX(EfiCommonLibZeroMem)
 #------------------------------------------------------------------------------
 #  VOID
 #  EfiCommonLibZeroMem (

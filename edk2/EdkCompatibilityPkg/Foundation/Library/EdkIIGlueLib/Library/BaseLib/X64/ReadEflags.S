@@ -29,7 +29,7 @@
 #   VOID
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(AsmReadEflags)
+.globl ASM_PFX(AsmReadEflags)
 ASM_PFX(AsmReadEflags):
     pushfq
     pop     %rax

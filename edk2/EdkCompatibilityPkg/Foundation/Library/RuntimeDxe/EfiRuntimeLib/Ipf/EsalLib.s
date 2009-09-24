@@ -26,7 +26,7 @@
 //
 // Exports
 //
-.global GetEsalEntryPoint
+.globl GetEsalEntryPoint
 
 
 //-----------------------------------------------------------------------------

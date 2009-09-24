@@ -29,7 +29,7 @@
 #   IN UINT64   Value
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(AsmWriteMm6)
+.globl ASM_PFX(AsmWriteMm6)
 ASM_PFX(AsmWriteMm6):
     movd	%rcx, %mm6
     ret

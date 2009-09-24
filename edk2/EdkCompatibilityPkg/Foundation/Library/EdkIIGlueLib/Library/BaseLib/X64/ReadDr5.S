@@ -29,7 +29,7 @@
 #   VOID
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(AsmReadDr5)
+.globl ASM_PFX(AsmReadDr5)
 ASM_PFX(AsmReadDr5):
     mov	%dr5, %rax
     ret

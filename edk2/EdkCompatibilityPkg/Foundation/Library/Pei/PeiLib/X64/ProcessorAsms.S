@@ -21,9 +21,9 @@
 
     .text
 
-.global ASM_PFX(SwitchStacks)
-.global ASM_PFX(TransferControlSetJump)
-.global ASM_PFX(TransferControlLongJump)
+.globl ASM_PFX(SwitchStacks)
+.globl ASM_PFX(TransferControlSetJump)
+.globl ASM_PFX(TransferControlLongJump)
 
 #
 # Routine Description:

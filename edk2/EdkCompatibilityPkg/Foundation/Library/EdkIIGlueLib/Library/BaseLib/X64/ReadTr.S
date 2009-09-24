@@ -29,7 +29,7 @@
 #   VOID
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(AsmReadTr)
+.globl ASM_PFX(AsmReadTr)
 ASM_PFX(AsmReadTr): 
     str     %eax
     ret

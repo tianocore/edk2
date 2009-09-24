@@ -20,7 +20,7 @@
 #------------------------------------------------------------------------------
 #include <EdkIIGlueBase.h>
 
-.global ASM_PFX(CpuBreakpoint)
+.globl ASM_PFX(CpuBreakpoint)
 ASM_PFX(CpuBreakpoint):
 	int $0x3
 	ret

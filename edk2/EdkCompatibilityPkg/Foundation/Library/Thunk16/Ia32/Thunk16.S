@@ -73,7 +73,7 @@ ASM_PFX(Thunk16):
     pop    %ecx
     rep movsl %ds:(%esi),%es:(%edi)   #; copy context to 16-bit stack
     pop    %ebx                       #; ebx <- 16-bit stack offset
-    mov    $L_Label1,%eax
+    mov    $L_Lable1,%eax
     stos   %eax,%es:(%edi)
     movl   %cs,%eax
     stos   %ax,%es:(%edi)

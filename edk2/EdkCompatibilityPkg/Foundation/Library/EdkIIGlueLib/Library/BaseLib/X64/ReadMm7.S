@@ -29,7 +29,7 @@
 #   VOID
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(AsmReadMm7)
+.globl ASM_PFX(AsmReadMm7)
 ASM_PFX(AsmReadMm7):
     #DB      48h, 0fh, 7eh, 0f8h
     movd	%mm7, %rax

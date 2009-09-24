@@ -29,7 +29,7 @@
 #   VOID
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(EnableDisableInterrupts)
+.globl ASM_PFX(EnableDisableInterrupts)
 ASM_PFX(EnableDisableInterrupts):
     sti
     cli
