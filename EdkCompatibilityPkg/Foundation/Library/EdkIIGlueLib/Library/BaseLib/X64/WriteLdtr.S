@@ -29,7 +29,7 @@
 #   IN UINT16 Ldtr
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(AsmWriteLdtr);
+.globl ASM_PFX(AsmWriteLdtr);
 ASM_PFX(AsmWriteLdtr):
     lldt    %cx
     ret

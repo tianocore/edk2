@@ -20,7 +20,7 @@
 #------------------------------------------------------------------------------
 #include <EdkIIGlueBase.h>
 .extern InternalAssertJumpBuffer;
-.global ASM_PFX(SetJump)
+.globl ASM_PFX(SetJump)
 ASM_PFX(SetJump):
     push   %rcx
     add    $0xffffffffffffffe0,%rsp

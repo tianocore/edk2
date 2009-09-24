@@ -29,7 +29,7 @@
 #   IN UINT32  Index
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(AsmReadMsr64)
+.globl ASM_PFX(AsmReadMsr64)
 ASM_PFX(AsmReadMsr64):
     rdmsr                               # edx & eax are zero extended
     shl     $0x20, %rdx

@@ -29,7 +29,7 @@
 #   VOID
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(AsmReadDs)
+.globl ASM_PFX(AsmReadDs)
 ASM_PFX(AsmReadDs):
     movl	%ds, %eax
     ret

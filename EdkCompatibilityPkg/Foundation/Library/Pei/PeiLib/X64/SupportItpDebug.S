@@ -22,7 +22,7 @@
 
   .text
 
-.global ASM_PFX(AsmEfiSetBreakSupport)
+.globl ASM_PFX(AsmEfiSetBreakSupport)
 
 #------------------------------------------------------------------------------
 #  VOID

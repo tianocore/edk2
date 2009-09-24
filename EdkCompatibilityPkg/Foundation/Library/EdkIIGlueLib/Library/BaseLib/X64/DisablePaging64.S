@@ -35,7 +35,7 @@
 #   );
 #------------------------------------------------------------------------------
 
-.global ASM_PFX(InternalX86DisablePaging64)
+.globl ASM_PFX(InternalX86DisablePaging64)
 ASM_PFX(InternalX86DisablePaging64):
     cli    
     shl    $0x20,%rcx

@@ -29,7 +29,7 @@
 #   VOID
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(AsmReadCr2)
+.globl ASM_PFX(AsmReadCr2)
 ASM_PFX(AsmReadCr2):
     mov     %cr2, %rax
     ret

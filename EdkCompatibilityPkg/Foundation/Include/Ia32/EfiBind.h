@@ -83,7 +83,9 @@ Abstract:
 //
 // Make sure we are useing the correct packing rules per EFI specification
 //
+#ifndef __GNUC__
 #pragma pack()
+#endif
 
 #if __INTEL_COMPILER
 //

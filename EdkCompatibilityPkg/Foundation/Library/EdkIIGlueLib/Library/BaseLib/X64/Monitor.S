@@ -31,7 +31,7 @@
 #   IN      UINTN                     Edx
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(AsmMonitor)
+.globl ASM_PFX(AsmMonitor)
 ASM_PFX(AsmMonitor):
     mov    %ecx,%eax
     mov    %edx,%ecx

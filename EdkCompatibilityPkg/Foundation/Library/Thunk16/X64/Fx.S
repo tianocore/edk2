@@ -20,8 +20,8 @@
 #*****************************************************************************
 #include <EfiBind.h>
 
-.global ASM_PFX(AsmFxSave)
-.global ASM_PFX(AsmFxRestore)
+.globl ASM_PFX(AsmFxSave)
+.globl ASM_PFX(AsmFxRestore)
 
     .text
 

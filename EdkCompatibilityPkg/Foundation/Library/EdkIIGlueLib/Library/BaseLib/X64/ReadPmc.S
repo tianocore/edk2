@@ -29,7 +29,7 @@
 #   IN UINT32   PmcIndex
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(AsmReadPmc)
+.globl ASM_PFX(AsmReadPmc)
 ASM_PFX(AsmReadPmc):
     rdpmc
     shl     $0x20, %rdx

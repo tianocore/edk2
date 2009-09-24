@@ -29,7 +29,7 @@
 #   OUT     IA32_DESCRIPTOR           *Idtr
 #   );
 #------------------------------------------------------------------------------
-.global ASM_PFX(InternalX86ReadIdtr)
+.globl ASM_PFX(InternalX86ReadIdtr)
 ASM_PFX(InternalX86ReadIdtr):
     sidt    (%rcx)
     ret

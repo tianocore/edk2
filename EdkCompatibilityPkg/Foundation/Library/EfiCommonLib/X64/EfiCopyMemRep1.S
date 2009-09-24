@@ -24,7 +24,7 @@
 
     .code: 
 
-.global ASM_PFX(EfiCommonLibCopyMem)
+.globl ASM_PFX(EfiCommonLibCopyMem)
 
 #------------------------------------------------------------------------------
 # VOID

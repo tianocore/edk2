@@ -21,7 +21,7 @@
 
 .text
 
-.global ASM_PFX(EfiCpuFlushCache)
+.globl ASM_PFX(EfiCpuFlushCache)
 #------------------------------------------------------------------------------
 #EFI_STATUS
 #EfiCpuFlushCache (

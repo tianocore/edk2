@@ -31,7 +31,7 @@
 #   );
 # TODO:
 #------------------------------------------------------------------------------
-.global ASM_PFX(AsmWriteMsr64)
+.globl ASM_PFX(AsmWriteMsr64)
 ASM_PFX(AsmWriteMsr64):
     mov	%rdx, %rax
     shr $0x20, %rdx

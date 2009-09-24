@@ -60,6 +60,25 @@ Abstract:
 
 #define _EFI_INT_SIZE_OF(n) ((sizeof (n) + sizeof (UINTN) - 1) &~(sizeof (UINTN) - 1))
 
+#if defined(__GNUC__)
+//
+// Use GCC built-in macros for variable argument lists.
+//
+
+///
+/// Variable used to traverse the list of arguments. This type can vary by 
+/// implementation and could be an array or structure. 
+///
+typedef __builtin_va_list VA_LIST;
+
+#define VA_START(Marker, Parameter)  __builtin_va_start (Marker, Parameter)
+
+#define VA_ARG(Marker, TYPE)         ((sizeof (TYPE) < sizeof (UINTN)) ? (TYPE)(__builtin_va_arg (Marker, UINTN)) : (TYPE)(__builtin_va_arg (Marker, TYPE)))
+
+#define VA_END(Marker)               __builtin_va_end (Marker)
+
+#else
+
 //
 // Also support coding convention rules for var arg macros
 //
@@ -69,6 +88,9 @@ typedef CHAR8 *VA_LIST;
 #define VA_START(ap, v) (ap = (VA_LIST) & (v) + _EFI_INT_SIZE_OF (v))
 #define VA_ARG(ap, t)   (*(t *) ((ap += _EFI_INT_SIZE_OF (t)) - _EFI_INT_SIZE_OF (t)))
 #define VA_END(ap)      (ap = (VA_LIST) 0)
+
+#endif
+
 
 #endif
 

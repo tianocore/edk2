@@ -46,7 +46,7 @@
   .section  .rtcode,  "ax", "progbits"
   .align 32
   .type  RtPioICacheFlush#  ,@function 
-        .global RtPioICacheFlush#
+        .globl RtPioICacheFlush#
 // Function compile flags: /Ogsy
   .section  .rtcode
 
