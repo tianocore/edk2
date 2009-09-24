@@ -125,7 +125,7 @@ typedef struct {
   ///
   UINT64    Attributes;
   ///
-  /// Unicode string.
+  /// Null-terminated name of the partition.
   ///
   CHAR16    PartitionName[36];
 } EFI_PARTITION_ENTRY;

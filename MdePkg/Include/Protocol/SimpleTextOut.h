@@ -165,12 +165,12 @@ EFI_STATUS
   );
 
 /**
-  Write a Unicode string to the output device.
+  Write a string to the output device.
 
   @param  This   Protocol instance pointer.
-  @param  String The NULL-terminated Unicode string to be displayed on the output
+  @param  String The NULL-terminated string to be displayed on the output
                  device(s). All output devices must also support the Unicode
-                 drawing defined in this file.
+                 drawing character codes defined in this file.
 
   @retval EFI_SUCCESS             The string was output to the device.
   @retval EFI_DEVICE_ERROR        The device reported an error while attempting to output
@@ -178,7 +178,7 @@ EFI_STATUS
   @retval EFI_UNSUPPORTED         The output device's mode is not currently in a
                                   defined text mode.
   @retval EFI_WARN_UNKNOWN_GLYPH  This warning code indicates that some of the
-                                  characters in the Unicode string could not be
+                                  characters in the string could not be
                                   rendered and were skipped.
 
 **/
@@ -190,15 +190,15 @@ EFI_STATUS
   );
 
 /**
-  Verifies that all characters in a Unicode string can be output to the 
+  Verifies that all characters in a string can be output to the 
   target device.
 
   @param  This   Protocol instance pointer.
-  @param  String The NULL-terminated Unicode string to be examined for the output
+  @param  String The NULL-terminated string to be examined for the output
                  device(s).
 
   @retval EFI_SUCCESS      The device(s) are capable of rendering the output string.
-  @retval EFI_UNSUPPORTED  Some of the characters in the Unicode string cannot be
+  @retval EFI_UNSUPPORTED  Some of the characters in the string cannot be
                            rendered by one or more of the output devices mapped
                            by the EFI handle.
 

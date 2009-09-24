@@ -65,7 +65,7 @@ typedef enum {
                            the driver writer.
   @param  ErrorType        A GUID that defines the format of the data returned in Buffer.
   @param  BufferSize       The size, in bytes, of the data returned in Buffer.
-  @param  Buffer           A buffer that contains a Null-terminated Unicode string
+  @param  Buffer           A buffer that contains a Null-terminated string
                            plus some additional data whose format is defined by
                            ErrorType.  Buffer is allocated by this function with
                            AllocatePool(), and it is the caller's responsibility

@@ -24,7 +24,7 @@
 
 typedef struct {
   ///
-  /// Size of the EFI_FILE_INFO structure, including the Nullterminated Unicode FileName string.
+  /// Size of the EFI_FILE_INFO structure, including the Null-terminated FileName string.
   ///
   UINT64    Size;
   ///
@@ -52,7 +52,7 @@ typedef struct {
   ///
   UINT64    Attribute;
   ///
-  /// The Null-terminated Unicode name of the file.
+  /// The Null-terminated name of the file.
   ///
   CHAR16    FileName[1];
 } EFI_FILE_INFO;

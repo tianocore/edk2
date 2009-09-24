@@ -24,7 +24,7 @@
 
 typedef struct {
   ///
-  /// Size of the EFI_FILE_SYSTEM_INFO structure, including the Null-terminated Unicode VolumeLabel string.
+  /// Size of the EFI_FILE_SYSTEM_INFO structure, including the Null-terminated VolumeLabel string.
   ///
   UINT64  Size;
   ///

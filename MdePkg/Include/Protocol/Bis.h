@@ -364,7 +364,7 @@ EFI_STATUS
   @param  Credentials              A Signed Manifest containing verification information for the
                                    indicated data object.                                       
   @param  DataObject               An in-memory copy of the raw data object to be verified.
-  @param  SectionName              An ASCII (not Unicode) string giving the section name in the  
+  @param  SectionName              An ASCII string giving the section name in the  
                                    manifest holding the verification information (in other words,
                                    hash value) that corresponds to DataObject.                             
   @param  AuthorityCertificate     A digital certificate whose public key must match the signer's                              

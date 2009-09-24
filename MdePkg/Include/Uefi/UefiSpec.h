@@ -592,8 +592,8 @@ VOID
 /**
   Returns the value of a variable.
 
-  @param  VariableName          A Null-terminated Unicode string that is the name of the
-                                vendor's variable.
+  @param  VariableName          A Null-terminated string that is the name of the vendor's
+                                variable.
   @param  VendorGuid            A unique identifier for the vendor.
   @param  Attributes            If not NULL, a pointer to the memory location to return the
                                 attributes bitmask for the variable.
@@ -628,7 +628,7 @@ EFI_STATUS
   @param  VariableNameSize      The size of the VariableName buffer.
   @param  VariableName          On input, supplies the last VariableName that was returned
                                 by GetNextVariableName(). On output, returns the Nullterminated
-                                Unicode string of the current variable.
+                                string of the current variable.
   @param  VendorGuid            On input, supplies the last VendorGuid that was returned by
                                 GetNextVariableName(). On output, returns the
                                 VendorGuid of the current variable.
@@ -841,7 +841,7 @@ EFI_STATUS
   @param  ImageHandle           Handle of image to be started.
   @param  ExitDataSize          Pointer to the size, in bytes, of ExitData.
   @param  ExitData              Pointer to a pointer to a data buffer that includes a Null-terminated
-                                Unicode string, optionally followed by additional binary data.
+                                string, optionally followed by additional binary data.
 
   @retval EFI_INVALID_PARAMETER ImageHandle is either an invalid image handle or the image
                                 has already been initialized with StartImage
@@ -859,11 +859,16 @@ EFI_STATUS
 /**
   Terminates a loaded EFI image and returns control to boot services.
 
-  @param  ImageHandle           Handle that identifies the image.
+  @param  ImageHandle           Handle that identifies the image. This parameter is passed to the 
+                                image on entry.
   @param  ExitStatus            The image's exit code.
-  @param  ExitDataSize          The size, in bytes, of ExitData.
-  @param  ExitData              Pointer to a data buffer that includes a Null-terminated Unicode string,
-                                optionally followed by additional binary data.
+  @param  ExitDataSize          The size, in bytes, of ExitData. Ignored if ExitStatus is EFI_SUCCESS.
+  @param  ExitData              Pointer to a data buffer that includes a Null-terminated string,
+                                optionally followed by additional binary data. The string is a 
+                                description that the caller may use to further indicate the reason 
+                                for the image's exit. ExitData is only valid if ExitStatus 
+                                is something other than EFI_SUCCESS. The ExitData buffer 
+                                must be allocated by calling AllocatePool().
 
   @retval EFI_SUCCESS           The image specified by ImageHandle was unloaded.
   @retval EFI_INVALID_PARAMETER The image specified by ImageHandle has been loaded and
@@ -933,7 +938,7 @@ EFI_STATUS
   @param  Timeout               The number of seconds to set the watchdog timer to.
   @param  WatchdogCode          The numeric code to log on a watchdog timer timeout event.
   @param  DataSize              The size, in bytes, of WatchdogData.
-  @param  WatchdogData          A data buffer that includes a Null-terminated Unicode string, optionally
+  @param  WatchdogData          A data buffer that includes a Null-terminated string, optionally
                                 followed by additional binary data.
 
   @retval EFI_SUCCESS           The timeout has been set.
@@ -985,7 +990,7 @@ typedef enum {
   @param  DataSize              The size, in bytes, of WatchdogData.
   @param  ResetData             For a ResetType of EfiResetCold, EfiResetWarm, or
                                 EfiResetShutdown the data buffer starts with a Null-terminated
-                                Unicode string, optionally followed by additional binary data.
+                                string, optionally followed by additional binary data.
 
 **/
 typedef
@@ -1900,8 +1905,8 @@ typedef struct {
   ///
   EFI_TABLE_HEADER                  Hdr;
   ///
-  /// A pointer to a null terminated Unicode string that identifies
-  /// the vendor that produces the system firmware for the platform.
+  /// A pointer to a null terminated string that identifies the vendor
+  /// that produces the system firmware for the platform.
   ///
   CHAR16                            *FirmwareVendor;
   ///

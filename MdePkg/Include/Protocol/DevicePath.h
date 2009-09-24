@@ -854,7 +854,7 @@ typedef struct {
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL        Header;
   ///
-  /// A NULL-terminated Unicode Path string including directory and file names.
+  /// A NULL-terminated Path string including directory and file names.
   ///
   CHAR16                          PathName[1];
 } FILEPATH_DEVICE_PATH;
