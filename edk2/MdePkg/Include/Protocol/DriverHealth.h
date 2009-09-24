@@ -136,15 +136,12 @@ EFI_STATUS
                               EfiDriverHealthStatusReconnectRequired and 
                               EfiDriverHealthStatusRebootRequired.
 
-  @param[out] FormHiiHandle   A pointer to the HII handle for an HII form associated with the 
-                              controller specified by ControllerHandle and ChildHandle.  
-                              This is an optional parameter that may be NULL.  An HII form 
-                              is specified by a combination of an EFI_HII_HANDLE and an 
-                              EFI_GUID that identifies the Form Set GUID.  The 
-                              EFI_FORM_BROWSER2_PROTOCOL.SendForm() function can be used 
-                              to display and allow the user to make configuration changes 
-                              to the HII Form.  An HII form may only be returned with a 
-                              HealthStatus value of EfiDriverHealthStatusConfigurationRequired.
+  @param[out] FormHiiHandle   A pointer to the HII handle containing the HII form used when 
+                              configuration is required. The HII handle is associated with 
+                              the controller specified by ControllerHandle and ChildHandle.
+                              If this is NULL, then no HII form is available. An HII handle
+                              will only be returned with a HealthStatus value of 
+                              EfiDriverHealthStatusConfigurationRequired.
 
   @retval EFI_SUCCESS           ControllerHandle is NULL, and all the controllers 
                                 managed by this driver specified by This have a health 
