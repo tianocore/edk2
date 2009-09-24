@@ -4,7 +4,7 @@
   The EFI_FORM_BROWSER2_PROTOCOL is the interface to call for drivers to 
   leverage the EFI configuration driver interface.
   
-  Copyright (c) 2006 - 2008, Intel Corporation
+  Copyright (c) 2006 - 2009, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -76,14 +76,14 @@ typedef UINTN EFI_BROWSER_ACTION_REQUEST;
 
   @param HandleCount     The number of Handles specified in Handle.
 
-  @param FormSetGuid     This field points to the EFI_GUID which must match the Guid
-                         field in the EFI_IFR_FORM_SET op-code for the specified
-                         forms-based package. If FormSetGuid is NULL, then this
-                         function will display the first found forms package.
+  @param FormSetGuid     This field points to the EFI_GUID which must match the Guid field or one of the
+                         elements of the ClassId field  in the EFI_IFR_FORM_SET op-code.  If
+                         FormsetGuid is NULL, then this function will display the the form set class
+                         EFI_HII_PLATFORM_SETUP_FORMSET_GUID.
 
-  @param FormId          This field specifies which EFI_IFR_FORM to render as the first
-                         displayable page. If this field has a value of 0x0000, then
-                         the forms browser will render the specified forms in their encoded order.
+  @param FormId          This field specifies the identifier of the form within the form set to render as the first
+                         displayable page. If this field has a value of 0x0000, then the Forms Browser will
+                         render the first enabled form in the form set.
 
   @param ScreenDimensions Points to recommended form dimensions, including any non-content area, in 
                           characters.
