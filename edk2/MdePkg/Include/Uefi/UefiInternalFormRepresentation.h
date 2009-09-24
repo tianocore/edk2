@@ -83,28 +83,69 @@ typedef struct {
 
 //
 // Definitions for Simplified Font Package
-// Section 27.3.2
 //
 
-//
-// Contents of EFI_NARROW_GLYPH.Attributes
-//
+///
+/// Contents of EFI_NARROW_GLYPH.Attributes
+///@{
 #define EFI_GLYPH_NON_SPACING                0x01
 #define EFI_GLYPH_WIDE                       0x02
 #define EFI_GLYPH_HEIGHT                     19
 #define EFI_GLYPH_WIDTH                      8
+///@}
 
+///
+/// The EFI_NARROW_GLYPH has a preferred dimension (w x h) of 8 x 19 pixels.
+///
 typedef struct {
+  ///
+  /// The Unicode representation of the glyph. The term weight is the 
+  /// technical term for a character code.
+  ///
   CHAR16                 UnicodeWeight;
+  ///
+  /// The data element containing the glyph definitions.
+  ///
   UINT8                  Attributes;
+  ///
+  /// The column major glyph representation of the character. Bits 
+  /// with values of one indicate that the corresponding pixel is to be
+  /// on when normally displayed; those with zero are off.
+  ///
   UINT8                  GlyphCol1[EFI_GLYPH_HEIGHT];
 } EFI_NARROW_GLYPH;
 
+///
+/// The EFI_WIDE_GLYPH has a preferred dimension (w x h) of 16 x 19 pixels, which is large enough 
+/// to accommodate logographic characters.
+///
 typedef struct {
+  ///
+  /// The Unicode representation of the glyph. The term weight is the 
+  /// technical term for a character code.
+  ///
   CHAR16                 UnicodeWeight;
+  ///
+  /// The data element containing the glyph definitions.
+  ///
   UINT8                  Attributes;
+  ///
+  /// The column major glyph representation of the character. Bits 
+  /// with values of one indicate that the corresponding pixel is to be 
+  /// on when normally displayed; those with zero are off.
+  ///
   UINT8                  GlyphCol1[EFI_GLYPH_HEIGHT];
+  ///
+  /// The column major glyph representation of the character. Bits 
+  /// with values of one indicate that the corresponding pixel is to be 
+  /// on when normally displayed; those with zero are off.
+  ///
   UINT8                  GlyphCol2[EFI_GLYPH_HEIGHT];
+  ///
+  /// Ensures that sizeof (EFI_WIDE_GLYPH) is twice the 
+  /// sizeof (EFI_NARROW_GLYPH). The contents of Pad must 
+  /// be zero.
+  ///
   UINT8                  Pad[3];
 } EFI_WIDE_GLYPH;
 
@@ -1230,25 +1271,28 @@ typedef struct _EFI_IFR_TO_BOOLEAN {
   EFI_IFR_OP_HEADER        Header;
 } EFI_IFR_TO_BOOLEAN;
 
-//
-// For EFI_IFR_TO_STRING, when converting from
-// unsigned integers, these flags control the format:
-// 0 = unsigned decimal
-// 1 = signed decimal
-// 2 = hexadecimal (lower-case alpha)
-// 3 = hexadecimal (upper-case alpha)
-//
+///
+/// For EFI_IFR_TO_STRING, when converting from
+/// unsigned integers, these flags control the format:
+/// 0 = unsigned decimal
+/// 1 = signed decimal
+/// 2 = hexadecimal (lower-case alpha)
+/// 3 = hexadecimal (upper-case alpha)
+///@{
 #define EFI_IFR_STRING_UNSIGNED_DEC      0
 #define EFI_IFR_STRING_SIGNED_DEC        1
 #define EFI_IFR_STRING_LOWERCASE_HEX     2
 #define EFI_IFR_STRING_UPPERCASE_HEX     3
-//
-// When converting from a buffer, these flags control the format:
-// 0 = ASCII
-// 8 = Unicode
-//
+///@}
+
+///
+/// When converting from a buffer, these flags control the format:
+/// 0 = ASCII
+/// 8 = Unicode
+///@{
 #define EFI_IFR_STRING_ASCII             0
 #define EFI_IFR_STRING_UNICODE           8
+///@}
 
 typedef struct _EFI_IFR_TO_STRING {
   EFI_IFR_OP_HEADER        Header;
@@ -1596,11 +1640,31 @@ typedef enum {
 } EFI_KEY;
 
 typedef struct {
+  ///
+  /// Used to describe a physical key on a keyboard.
+  ///
   EFI_KEY                 Key;
+  ///
+  /// Unicode character code for the Key.
+  ///
   CHAR16                  Unicode;
+  ///
+  /// Unicode character code for the key with the shift key being held down.
+  ///
   CHAR16                  ShiftedUnicode;
+  ///
+  /// Unicode character code for the key with the Alt-GR being held down.
+  ///
   CHAR16                  AltGrUnicode;
+  ///
+  /// Unicode character code for the key with the Alt-GR and shift keys being held down.
+  ///
   CHAR16                  ShiftedAltGrUnicode;
+  ///
+  /// Modifier keys are defined to allow for special functionality that is not necessarily 
+  /// accomplished by a printable character. Many of these modifier keys are flags to toggle 
+  /// certain state bits on and off inside of a keyboard driver.
+  ///
   UINT16                  Modifier;
   UINT16                  AffectedAttribute;
 } EFI_KEY_DESCRIPTOR;

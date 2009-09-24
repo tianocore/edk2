@@ -144,7 +144,7 @@ typedef struct _EFI_FONT_DISPLAY_INFO {
   will use the pixel value from Blt. This flag cannot be used if
   Blt is NULL upon entry. If EFI_HII_IGNORE_IF_NO_GLYPH is set,
   then characters which have no glyphs are not drawn. Otherwise,
-  they are replaced with Unicode character 0xFFFD (REPLACEMENT
+  they are replaced with Unicode character code 0xFFFD (REPLACEMENT
   CHARACTER). If EFI_HII_IGNORE_LINE_BREAK is set, then explicit
   line break characters will be ignored. If
   EFI_HII_DIRECT_TO_SCREEN is set, then the string will be written
@@ -263,7 +263,7 @@ EFI_STATUS
   use the pixel value from Blt. This flag cannot be used if Blt
   is NULL upon entry. If EFI_HII_IGNORE_IF_NO_GLYPH is set, then
   characters which have no glyphs are not drawn. Otherwise, they
-  are replaced with Unicode character 0xFFFD (REPLACEMENT
+  are replaced with Unicode character code 0xFFFD (REPLACEMENT
   CHARACTER). If EFI_HII_IGNORE_LINE_BREAK is set, then explicit
   line break characters will be ignored. If
   EFI_HII_DIRECT_TO_SCREEN is set, then the string will be
@@ -391,7 +391,7 @@ EFI_STATUS
 
   @retval EFI_WARN_UNKNOWN_GLYPH  The glyph was unknown and was
                                   replaced with the glyph for
-                                  Unicode character 0xFFFD.
+                                  Unicode character code 0xFFFD.
 
   @retval EFI_INVALID_PARAMETER   Blt is NULL or Width is NULL or
                                   Height is NULL

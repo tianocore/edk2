@@ -844,7 +844,7 @@ typedef INTN RETURN_STATUS;
 
 
 ///
-/// The Unicode string contained one or more characters that
+/// The string contained one or more characters that
 /// the device could not render and were skipped.
 ///
 #define RETURN_WARN_UNKNOWN_GLYPH    ENCODE_WARNING (1)

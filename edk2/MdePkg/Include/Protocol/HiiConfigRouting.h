@@ -45,7 +45,7 @@ typedef struct _EFI_HII_CONFIG_ROUTING_PROTOCOL EFI_HII_CONFIG_ROUTING_PROTOCOL;
   They must have an additional description indicating the type of
   alternative configuration the string represents,
   "ALTCFG=<StringToken>". That <StringToken> (when converted from
-  Hex UNICODE to binary) is a reference to a string in the
+  hexadecimal (encoded as text) to binary) is a reference to a string in the
   associated string pack. As an example, assume that the Request
   string is:
   GUID=...&NAME=00480050&PATH=...&Fred&George&Ron&Neville A result
@@ -118,7 +118,10 @@ EFI_STATUS
 );
 
 /**
-   
+  This function allows the caller to request the current configuration 
+  for the entirety of the current HII database and returns the data in
+  a null-terminated string.
+
   This function allows the caller to request the current
   configuration for all of the current HII database. The results
   include both the current and alternate configurations as
@@ -126,11 +129,11 @@ EFI_STATUS
   
   @param This     Points to the EFI_HII_CONFIG_ROUTING_PROTOCOL instance.
   
-  @param Results  A null-terminated Unicode string in
-                  <MultiConfigAltResp> format which has all
-                  values filled in for the names in the Request
-                  string. String to be allocated by this
-                  function. De-allocation is up to the caller.
+  @param Results  A null-terminated string in <MultiConfigAltResp>
+                  format which has all values filled in for the
+                  names in the Request string.
+                  String to be allocated by this function.
+                  De-allocation is up to the caller.
   
   @retval EFI_SUCCESS             The Results string is filled with the
                                   values corresponding to all requested
@@ -168,8 +171,7 @@ EFI_STATUS
 
   @param This           Points to the EFI_HII_CONFIG_ROUTING_PROTOCOL instance.
 
-  @param Configuration  A null-terminated Unicode string in
-                        <MulltiConfigResp> format.
+  @param Configuration  A null-terminated string in <MulltiConfigResp> format.
 
   @param Progress       A pointer to a string filled in with the
                         offset of the most recent '&' before the
@@ -210,15 +212,14 @@ EFI_STATUS
   consists of a list of <BlockName> formatted names. It uses the
   offset in the name to determine the index into the Block to
   start the extraction and the width of each name to determine the
-  number of bytes to extract. These are mapped to a UNICODE value
+  number of bytes to extract. These are mapped to a string
   using the equivalent of the C "%x" format (with optional leading
   spaces). The call fails if, for any (offset, width) pair in
   ConfigRequest, offset+value >= BlockSize.
 
   @param This      Points to the EFI_HII_CONFIG_ROUTING_PROTOCOL instance.
 
-  @param ConfigRequest  A null-terminated Unicode string in
-                        <ConfigRequest> format.
+  @param ConfigRequest  A null-terminated string in <ConfigRequest> format.
 
   @param Block      Array of bytes defining the block's
                     configuration.
@@ -293,8 +294,7 @@ EFI_STATUS
 
   @param This           Points to the EFI_HII_CONFIG_ROUTING_PROTOCOL instance.
 
-  @param ConfigResp     A null-terminated Unicode string in
-                        <ConfigResp> format.
+  @param ConfigResp     A null-terminated string in <ConfigResp> format.
 
   @param Block          A possibly null array of bytes
                         representing the current block. Only
@@ -348,8 +348,8 @@ EFI_STATUS
   This helper function is to be called by drivers to extract portions of 
   a larger configuration string.
           
-  @param This              A pointer to the EFI_HII_CONFIG_ROUTING_PROTOCOL instance.    
-  @param Configuration     A null-terminated Unicode string in <MultiConfigAltResp> format.
+  @param This              A pointer to the EFI_HII_CONFIG_ROUTING_PROTOCOL instance.
+  @param Configuration     A null-terminated string in <MultiConfigAltResp> format.
   @param Guid              A pointer to the GUID value to search for in the 
                            routing portion of the ConfigResp string when retrieving 
                            the requested data. If Guid is NULL, then all GUID 

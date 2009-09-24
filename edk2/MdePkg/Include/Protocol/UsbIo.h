@@ -426,7 +426,7 @@ EFI_STATUS
   );
 
 /**
-  Retrieves a Unicode string stored in a USB Device.
+  Retrieves a string stored in a USB Device.
 
   @param  This                    A pointer to the EFI_USB_IO_PROTOCOL instance.
   @param  LangID                  The Language ID for the string being retrieved.
