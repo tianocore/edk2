@@ -374,6 +374,8 @@ GatherDeviceInfo (
     for (Offset = PciIoDevice->SrIovCapabilityOffset + EFI_PCIE_CAPABILITY_ID_SRIOV_BAR0, BarIndex = 0;
          Offset <= PciIoDevice->SrIovCapabilityOffset + EFI_PCIE_CAPABILITY_ID_SRIOV_BAR5;
          BarIndex++) {
+
+      ASSERT (BarIndex < PCI_MAX_BAR);
       Offset = PciIovParseVfBar (PciIoDevice, Offset, BarIndex);
     }
   }
