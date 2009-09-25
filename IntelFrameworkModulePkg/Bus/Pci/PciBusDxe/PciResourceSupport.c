@@ -1229,6 +1229,8 @@ ProgramBar (
   UINT64              Address;
   UINT32              Address32;
 
+  ASSERT (Node->Bar < PCI_MAX_BAR);
+
   //
   // Check VF BAR
   //
@@ -1249,7 +1251,6 @@ ProgramBar (
   //
   Node->PciDev->Allocated = TRUE;
 
-  ASSERT (Node->Bar < PCI_MAX_BAR);
   switch ((Node->PciDev->PciBar[Node->Bar]).BarType) {
 
   case PciBarTypeIo16:
