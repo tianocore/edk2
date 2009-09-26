@@ -189,7 +189,7 @@ FvbProtocolGetBlockSize (
   FvbDevice = FVB_DEVICE_FROM_THIS (This);
 
   *BlockSize = FvbDevice->BlockSize;
-  *NumberOfBlocks = 2 - Lba;
+  *NumberOfBlocks = (UINTN) (2 - (UINTN) Lba);
 
   return EFI_SUCCESS;
 }
@@ -364,7 +364,7 @@ FvbProtocolEraseBlocks (
   if ((Erase & BIT0) != 0) {
     EraseSize = EraseSize + FvbDevice->BlockSize;
   } else {
-    ErasePtr = ErasePtr + FvbDevice->BlockSize;
+    ErasePtr = (VOID*) ((UINT8*)ErasePtr + FvbDevice->BlockSize);
   }
 
   if ((Erase & BIT1) != 0) {
@@ -468,7 +468,7 @@ FvbProtocolWrite (
 
   FvbDataPtr =
     (UINT8*) FvbDevice->BufferPtr +
-    MultU64x32 (Lba, FvbDevice->BlockSize) +
+    MultU64x32 (Lba, (UINT32) FvbDevice->BlockSize) +
     Offset;
 
   if (*NumBytes > 0) {
@@ -552,7 +552,7 @@ FvbProtocolRead (
 
   FvbDataPtr =
     (UINT8*) FvbDevice->BufferPtr +
-    MultU64x32 (Lba, FvbDevice->BlockSize) +
+    MultU64x32 (Lba, (UINT32) FvbDevice->BlockSize) +
     Offset;
 
   if (*NumBytes > 0) {
