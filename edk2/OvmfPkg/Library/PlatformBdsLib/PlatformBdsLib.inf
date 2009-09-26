@@ -50,9 +50,10 @@
   PciLib
   NvVarsFileLib
 
-[Pcd.common]
+[Pcd]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile
+  gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent
 
 [Pcd.IA32, Pcd.X64]
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock
