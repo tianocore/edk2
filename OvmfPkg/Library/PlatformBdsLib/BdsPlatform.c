@@ -21,6 +21,8 @@
 
 VOID          *mEfiDevPathNotifyReg;
 EFI_EVENT     mEfiDevPathEvent;
+VOID          *mEmuVariableEventReg;
+EFI_EVENT     mEmuVariableEvent;
 BOOLEAN       mDetectVgaOnly;
 
 
@@ -815,6 +817,26 @@ ConnectRecursivelyIfPciMassStorage (
 }
 
 
+/**
+  This notification function is invoked when the
+  EMU Variable FVB has been changed.
+
+  @param  Event                 The event that occured
+  @param  Context               For EFI compatiblity.  Not used.
+
+**/
+VOID
+EFIAPI
+EmuVariablesUpdatedCallback (
+  IN  EFI_EVENT Event,
+  IN  VOID      *Context
+  )
+{
+  DEBUG ((EFI_D_INFO, "EmuVariablesUpdatedCallback\n"));
+  UpdateNvVarsOnFileSystem ();
+}
+
+
 EFI_STATUS
 EFIAPI
 VisitingFileSystemInstance (
@@ -836,6 +858,16 @@ VisitingFileSystemInstance (
   }
 
   ConnectedToFileSystem = TRUE;
+  mEmuVariableEvent =
+    EfiCreateProtocolNotifyEvent (
+      &gEfiDevicePathProtocolGuid,
+      TPL_CALLBACK,
+      EmuVariablesUpdatedCallback,
+      NULL,
+      &mEmuVariableEventReg
+      );
+  PcdSet64 (PcdEmuVariableEvent, (UINT64)(UINTN) mEmuVariableEvent);
+
   return EFI_SUCCESS;
 }
 

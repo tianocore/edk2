@@ -16,6 +16,8 @@
 #include <Library/DebugLib.h>
 #include <Library/NvVarsFileLib.h>
 
+EFI_HANDLE    mNvVarsFileLibFsHandle = NULL;
+
 
 /**
   Attempts to connect the NvVarsFileLib to the specified file system.
@@ -46,8 +48,36 @@ ConnectNvVarsToFileSystem (
   // to have connected successfully.
   //
   Status = SaveNvVarsToFs (FsHandle);
+  if (!EFI_ERROR (Status)) {
+    mNvVarsFileLibFsHandle = FsHandle;
+  }
 
   return Status;
+}
+
+
+/**
+  Update non-volatile variables stored on the file system.
+
+  @return     The EFI_STATUS while attempting to update the variable on
+              the connected file system.
+  @retval     EFI_SUCCESS - The non-volatile variables were saved to the disk
+  @retval     EFI_NOT_STARTED - A file system has not been connected
+
+**/
+EFI_STATUS
+EFIAPI
+UpdateNvVarsOnFileSystem (
+  )
+{
+  if (mNvVarsFileLibFsHandle == NULL) {
+    //
+    // A file system had not been connected to the library.
+    //
+    return EFI_NOT_STARTED;
+  } else {
+    return SaveNvVarsToFs (mNvVarsFileLibFsHandle);
+  }
 }
 
 

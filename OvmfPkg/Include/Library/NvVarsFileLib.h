@@ -31,5 +31,21 @@ ConnectNvVarsToFileSystem (
   IN EFI_HANDLE    FsHandle
   );
 
+
+/**
+  Update non-volatile variables stored on the file system.
+
+  @return     The EFI_STATUS while attempting to update the variable on
+              the connected file system.
+  @retval     EFI_SUCCESS - The non-volatile variables were saved to the disk
+  @retval     EFI_NOT_STARTED - A file system has not been connected
+
+**/
+EFI_STATUS
+EFIAPI
+UpdateNvVarsOnFileSystem (
+  );
+
+
 #endif
 
