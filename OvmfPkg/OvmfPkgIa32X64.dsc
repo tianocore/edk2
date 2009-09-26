@@ -182,7 +182,10 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeimPerFv|32
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x400
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize|0x8000
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x10000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0xc000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize|0xc000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize|0x2000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize|0x10000
 
   gEfiEdkModulePkgTokenSpaceGuid.PcdDxePcdDatabaseTraverseEnabled|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress|0x0
@@ -210,6 +213,10 @@
 
 [PcdsDynamicDefault.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|0
+
 
 ################################################################################
 #
@@ -282,7 +289,12 @@
       TimerLib|OvmfPkg/Library/AcpiTimerLib/AcpiTimerLib.inf
   }
 
-  MdeModulePkg/Universal/Variable/EmuRuntimeDxe/EmuVariableRuntimeDxe.inf
+  OvmfPkg/EmuVariableFvbRuntimeDxe/Fvb.inf {
+    <LibraryClasses>
+      PlatformFvbLib|OvmfPkg/Library/EmuVariableFvbLib/EmuVariableFvbLib.inf
+  }
+  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
