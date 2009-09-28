@@ -973,7 +973,12 @@ PciScanBus (
         //
         // It is device. Check PCI IOV for Bus reservation
         //
-
+        if (PciDevice == NULL) {
+          //
+          // No PciDevice found, conitue Scan
+          //
+          continue;
+        }
         //
         // Go through each function, just reserve the MAX ReservedBusNum for one device
         //
