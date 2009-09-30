@@ -1001,7 +1001,7 @@ Uhci2AsyncInterruptTransfer (
   //
   // Allocate and map source data buffer for bus master access.
   //
-  DataPtr = AllocatePool (DataLength);
+  DataPtr     = UsbHcAllocateMem (Uhc->MemPool, DataLength);
 
   if (DataPtr == NULL) {
     return EFI_OUT_OF_RESOURCES;

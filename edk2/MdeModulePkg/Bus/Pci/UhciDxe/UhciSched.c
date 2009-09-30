@@ -798,7 +798,7 @@ UhciFreeAsyncReq (
   }
 
   if (AsyncReq->Data != NULL) {
-    gBS->FreePool (AsyncReq->Data);
+    UsbHcFreeMem (Uhc->MemPool, AsyncReq->Data, AsyncReq->DataLen);
   }
 
   gBS->FreePool (AsyncReq);
