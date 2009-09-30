@@ -6,7 +6,7 @@
   environment. There are a set of base libraries in the Mde Package that can
   be used to implement base modules.
 
-Copyright (c) 2006 - 2008, Intel Corporation<BR>
+Copyright (c) 2006 - 2009, Intel Corporation<BR>
 Portions copyright (c) 2008-2009 Apple Inc. All rights reserved.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -643,7 +643,7 @@ typedef UINTN  *BASE_LIST;
 //
 // Status codes common to all execution phases
 //
-typedef INTN RETURN_STATUS;
+typedef UINTN RETURN_STATUS;
 
 /**
   Produces a RETURN_STATUS code with the highest bit set. 
@@ -678,7 +678,7 @@ typedef INTN RETURN_STATUS;
   @retval FALSE         The high bit of StatusCode is clear.
 
 **/
-#define RETURN_ERROR(StatusCode)     (((RETURN_STATUS)(StatusCode)) < 0)
+#define RETURN_ERROR(StatusCode)     (((INTN)(RETURN_STATUS)(StatusCode)) < 0)
 
 ///
 /// The operation completed successfully.
