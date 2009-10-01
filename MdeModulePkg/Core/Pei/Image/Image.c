@@ -54,9 +54,11 @@ PeiImageRead (
 
   Destination8  = Buffer;
   Source8       = (CHAR8 *) ((UINTN) FileHandle + FileOffset);
-  Length        = *ReadSize;
-  while ((Length--) > 0) {
-    *(Destination8++) = *(Source8++);
+  if (Destination8 != Source8) {
+    Length        = *ReadSize;
+    while ((Length--) > 0) {
+      *(Destination8++) = *(Source8++);
+    }
   }
 
   return EFI_SUCCESS;
@@ -76,14 +78,21 @@ GetImageReadFunction (
   IN      PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
+  PEI_CORE_INSTANCE  *Private;
   VOID*  MemoryBuffer;
 
-  MemoryBuffer = AllocatePages (0x400 / EFI_PAGE_SIZE + 1);
-  ASSERT (MemoryBuffer != NULL);
+  Private = PEI_CORE_INSTANCE_FROM_PS_THIS (GetPeiServicesTablePointer ());
 
-  CopyMem (MemoryBuffer, (CONST VOID *) (UINTN) PeiImageRead, 0x400);
+  if (!Private->PeiMemoryInstalled) {
+    ImageContext->ImageRead = PeiImageRead;
+  } else {
+    MemoryBuffer = AllocatePages (0x400 / EFI_PAGE_SIZE + 1);
+    ASSERT (MemoryBuffer != NULL);
 
-  ImageContext->ImageRead = (PE_COFF_LOADER_READ_FILE) (UINTN) MemoryBuffer;
+    CopyMem (MemoryBuffer, (CONST VOID *) (UINTN) PeiImageRead, 0x400);
+
+    ImageContext->ImageRead = (PE_COFF_LOADER_READ_FILE) (UINTN) MemoryBuffer;
+  }
 
   return EFI_SUCCESS;
 }
@@ -113,6 +122,9 @@ LoadAndRelocatePeCoffImage (
 {
   EFI_STATUS                            Status;
   PE_COFF_LOADER_IMAGE_CONTEXT          ImageContext;
+  PEI_CORE_INSTANCE                     *Private;
+
+  Private = PEI_CORE_INSTANCE_FROM_PS_THIS (GetPeiServicesTablePointer ());
 
   ZeroMem (&ImageContext, sizeof (ImageContext));
   ImageContext.Handle = Pe32Data;
@@ -129,21 +141,24 @@ LoadAndRelocatePeCoffImage (
   //
   if (ImageContext.RelocationsStripped) {
     DEBUG ((EFI_D_ERROR, "The image at 0x%08x without reloc section can't be loaded into memory\n", (UINTN) Pe32Data));
-    return EFI_INVALID_PARAMETER;
   }
   //
   // Allocate Memory for the image
   //
-  ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)(UINTN) AllocatePages (EFI_SIZE_TO_PAGES ((UINT32) ImageContext.ImageSize));
-  ASSERT (ImageContext.ImageAddress != 0);
-  
-  //
-  // Skip the reserved space for the stripped PeHeader when load TeImage into memory.
-  //
-  if (ImageContext.IsTeImage) {
-    ImageContext.ImageAddress = ImageContext.ImageAddress + 
-                                ((EFI_TE_IMAGE_HEADER *) Pe32Data)->StrippedSize -
-                                sizeof (EFI_TE_IMAGE_HEADER);
+  if (Private->PeiMemoryInstalled) {
+    ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)(UINTN) AllocatePages (EFI_SIZE_TO_PAGES ((UINT32) ImageContext.ImageSize));
+    ASSERT (ImageContext.ImageAddress != 0);
+    
+    //
+    // Skip the reserved space for the stripped PeHeader when load TeImage into memory.
+    //
+    if (ImageContext.IsTeImage) {
+      ImageContext.ImageAddress = ImageContext.ImageAddress + 
+                                  ((EFI_TE_IMAGE_HEADER *) Pe32Data)->StrippedSize -
+                                  sizeof (EFI_TE_IMAGE_HEADER);
+    }
+  } else {
+    ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)(UINTN) Pe32Data;
   }
 
   //
@@ -164,7 +179,9 @@ LoadAndRelocatePeCoffImage (
   //
   // Flush the instruction cache so the image data is written before we execute it
   //
-  InvalidateInstructionCacheRange ((VOID *)(UINTN)ImageContext.ImageAddress, (UINTN)ImageContext.ImageSize);
+  if (Private->PeiMemoryInstalled) {
+    InvalidateInstructionCacheRange ((VOID *)(UINTN)ImageContext.ImageAddress, (UINTN)ImageContext.ImageSize);
+  }
 
   *ImageAddress = ImageContext.ImageAddress;
   *ImageSize    = ImageContext.ImageSize;
@@ -207,7 +224,6 @@ PeiLoadImageLoadImage (
   EFI_PHYSICAL_ADDRESS        ImageEntryPoint;
   UINT16                      Machine;
   PEI_CORE_INSTANCE           *Private;
-  VOID                        *EntryPointArg;
   EFI_SECTION_TYPE            SearchType1;
   EFI_SECTION_TYPE            SearchType2;
 
@@ -251,38 +267,28 @@ PeiLoadImageLoadImage (
   
   Private = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
 
-  if (Private->PeiMemoryInstalled && 
-      (Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME)) {
-    //
-    // If memory is installed, perform the shadow operations
-    //
-    Status = LoadAndRelocatePeCoffImage (
-      Pe32Data,
-      &ImageAddress,
-      &ImageSize,
-      &ImageEntryPoint
-    );
+  //
+  // If memory is installed, perform the shadow operations
+  //
+  Status = LoadAndRelocatePeCoffImage (
+    Pe32Data,
+    &ImageAddress,
+    &ImageSize,
+    &ImageEntryPoint
+  );
 
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
+  ASSERT_EFI_ERROR (Status);
 
-    //
-    // Got the entry point from the loaded Pe32Data
-    //
-    Pe32Data    = (VOID *) ((UINTN) ImageAddress);
-    *EntryPoint = ImageEntryPoint;
-  } else {
-    //
-    // Retrieve the entry point from the PE/COFF or TE image header
-    //
-    ImageAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) Pe32Data;
-    Status = PeCoffLoaderGetEntryPoint (Pe32Data, &EntryPointArg);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-    *EntryPoint = (EFI_PHYSICAL_ADDRESS) (UINTN) EntryPointArg;
+
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
+
+  //
+  // Got the entry point from the loaded Pe32Data
+  //
+  Pe32Data    = (VOID *) ((UINTN) ImageAddress);
+  *EntryPoint = ImageEntryPoint;
   
   Machine = PeCoffLoaderGetMachineType (Pe32Data);
   
