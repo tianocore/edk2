@@ -926,6 +926,14 @@ PeCoffLoaderLoadImage (
   Section = FirstSection;
   for (Index = 0, MaxEnd = NULL; Index < NumberOfSections; Index++) {
     //
+    // Read the section
+    //
+    Size = (UINTN) Section->Misc.VirtualSize;
+    if ((Size == 0) || (Size > Section->SizeOfRawData)) {
+      Size = (UINTN) Section->SizeOfRawData;
+    }
+
+    //
     // Compute sections address
     //
     Base = PeCoffLoaderImageAddress (ImageContext, Section->VirtualAddress);
@@ -935,9 +943,9 @@ PeCoffLoaderLoadImage (
             );
 
     //
-    // If the base start or end address resolved to 0, then fail.
+    // If the size of the section is non-zero and the base address or end address resolved to 0, then fail.
     //
-    if ((Base == NULL) || (End == NULL)) {
+    if ((Size > 0) && ((Base == NULL) || (End == NULL))) {
       ImageContext->ImageError = IMAGE_ERROR_SECTION_NOT_LOADED;
       return RETURN_LOAD_ERROR;
     }
@@ -949,14 +957,6 @@ PeCoffLoaderLoadImage (
 
     if (End > MaxEnd) {
       MaxEnd = End;
-    }
-
-    //
-    // Read the section
-    //
-    Size = (UINTN) Section->Misc.VirtualSize;
-    if ((Size == 0) || (Size > Section->SizeOfRawData)) {
-      Size = (UINTN) Section->SizeOfRawData;
     }
 
     if (Section->SizeOfRawData > 0) {
