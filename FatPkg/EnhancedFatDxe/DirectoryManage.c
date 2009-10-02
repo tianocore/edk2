@@ -1441,6 +1441,8 @@ Returns:
   FAT_OFILE   *OFile;
   FAT_DIRENT  *DirEnt;
 
+  DirEnt = NULL;
+
   FileNameLen = StrLen (FileName);
   if (FileNameLen == 0) {
     return EFI_INVALID_PARAMETER;
