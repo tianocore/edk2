@@ -1,5 +1,5 @@
 #/** @file
-#  OVMF platform customization for EMU Variable FVB driver
+#  NULL PlatformFvbLib library instance
 #
 #  This library handles hooks for the EMU Variable FVB driver.
 #
