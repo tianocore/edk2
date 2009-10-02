@@ -868,6 +868,7 @@ ParseIfrData (
   TempStr          = NULL;
   BlockData        = NULL;
   DefaultData      = NULL;
+  VarDefaultName   = 0;
 
   //
   // Go through the form package to parse OpCode one by one.

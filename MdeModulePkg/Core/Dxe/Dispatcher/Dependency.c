@@ -220,6 +220,9 @@ CoreIsSchedulable (
   EFI_GUID    DriverGuid;
   VOID        *Interface;
 
+  Operator = FALSE;
+  Operator2 = FALSE;
+
   if (DriverEntry->After || DriverEntry->Before) {
     //
     // If Before or After Depex skip as CoreInsertOnScheduledQueueWhileProcessingBeforeAndAfter ()
