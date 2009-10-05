@@ -109,10 +109,13 @@ typedef enum {
   USB_SET_ROOT_PORT_ENABLE_STALL = 20 * USB_BUS_1_MILLISECOND,
 
   //
-  // Send general device request timeout, refers to
-  // specification[USB20-11.24.1]
+  // Send general device request timeout.
+  // 
+  // The USB Specification 2.0, section 11.24.1 recommends a value of
+  // 50 milliseconds.  We use a value of 100 milliseconds to work
+  // around slower hubs and devices.
   //
-  USB_GENERAL_DEVICE_REQUEST_TIMEOUT = 50,
+  USB_GENERAL_DEVICE_REQUEST_TIMEOUT = 100,
 
   //
   // Send clear feature request timeout, set by experience
