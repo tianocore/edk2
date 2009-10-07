@@ -144,6 +144,7 @@ peiCoreEntryPointWasFound:
 ;
 ; Input:
 ;   EAX - Start of FFS file
+;   ECX - End of FFS file
 ;
 ; Output:
 ;   EAX - Entry point of PE32 (or 0 if not found)
@@ -154,11 +155,33 @@ peiCoreEntryPointWasFound:
 GetEntryPointOfFfsFileReturnEdx:
     test    eax, eax
     jz      getEntryPointOfFfsFileErrorReturn
+    add     eax, 0x18       ; EAX = Start of section
 
-    cmp     byte [eax + 0x1b], EFI_SECTION_PE32
-    jne     getEntryPointOfFfsFileErrorReturn
+getEntryPointOfFfsFileLoopForSections:
+    cmp     eax, ecx
+    jae     getEntryPointOfFfsFileErrorReturn
 
-    add     eax, 0x1c       ; EAX = Start of PE32 image
+    cmp     byte [eax + 3], EFI_SECTION_PE32
+    je      getEntryPointOfFfsFileFoundPe32Section
+
+    ;
+    ; The section type was not PE32, so move to next section
+    ;
+    mov     ebx, dword [eax]
+    and     ebx, 0x00ffffff
+    add     eax, ebx
+    jc      getEntryPointOfFfsFileErrorReturn
+
+    ;
+    ; Ensure that FFS section is 32-bit aligned
+    ;
+    add     eax, 3
+    jc      getEntryPointOfFfsFileErrorReturn
+    and     al, 0xfc
+    jmp     getEntryPointOfFfsFileLoopForSections
+
+getEntryPointOfFfsFileFoundPe32Section:
+    add     eax, 4       ; EAX = Start of PE32 image
 
     mov     ebx, eax
     cmp     word [eax], 'MZ'
