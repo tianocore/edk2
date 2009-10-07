@@ -201,9 +201,9 @@ INF  OvmfPkg/Sec/SecMain.inf
 #  PEI Phase modules
 #
 INF  MdeModulePkg/Core/Pei/PeiMain.inf
-INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
-INF  IntelFrameworkModulePkg/Universal/StatusCode/Pei/StatusCodePei.inf
-INF  OvmfPkg/PlatformPei/PlatformPei.inf
+INF  RuleOverride=NORELOC MdeModulePkg/Universal/PCD/Pei/Pcd.inf
+INF  RuleOverride=NORELOC IntelFrameworkModulePkg/Universal/StatusCode/Pei/StatusCodePei.inf
+INF  RuleOverride=NORELOC OvmfPkg/PlatformPei/PlatformPei.inf
 INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 
 #
@@ -230,7 +230,7 @@ INF  RuleOverride=RESET_VECTOR OvmfPkg/ResetVector/Bin/ResetVector.inf
 
 [Rule.Common.PEI_CORE]
   FILE PEI_CORE = $(NAMED_GUID) {
-    PE32     PE32           |.efi
+    PE32     PE32   Align=32    |.efi
     UI       STRING ="$(MODULE_NAME)" Optional
     VERSION  STRING ="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
@@ -242,10 +242,18 @@ INF  RuleOverride=RESET_VECTOR OvmfPkg/ResetVector/Bin/ResetVector.inf
     VERSION  STRING ="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
 
+[Rule.Common.PEIM.NORELOC]
+  FILE PEIM = $(NAMED_GUID) RELOCS_STRIPPED  {
+     PEI_DEPEX PEI_DEPEX Optional        |.depex
+     TE        TE                        |.efi
+     UI        STRING="$(MODULE_NAME)" Optional
+     VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
 [Rule.Common.PEIM]
   FILE PEIM = $(NAMED_GUID) {
      PEI_DEPEX PEI_DEPEX Optional        |.depex
-     PE32      PE32                      |.efi
+     PE32      PE32   Align=32           |.efi
      UI       STRING="$(MODULE_NAME)" Optional
      VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
