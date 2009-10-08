@@ -223,7 +223,6 @@ PeiLoadImageLoadImage (
   UINT64                      ImageSize;
   EFI_PHYSICAL_ADDRESS        ImageEntryPoint;
   UINT16                      Machine;
-  PEI_CORE_INSTANCE           *Private;
   EFI_SECTION_TYPE            SearchType1;
   EFI_SECTION_TYPE            SearchType2;
 
@@ -265,8 +264,6 @@ PeiLoadImageLoadImage (
     }
   }
   
-  Private = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
-
   //
   // If memory is installed, perform the shadow operations
   //
