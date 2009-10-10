@@ -847,7 +847,7 @@ VgaClassReset (
 
   @retval EFI_SUCCESS            The string was output to the device.
   @retval EFI_DEVICE_ERROR       The device reported an error while attempting to output the text.
-  @retval EFI_UNSUPPORTED        The output device’s mode is not currently in a defined text mode.
+  @retval EFI_UNSUPPORTED        The output device's mode is not currently in a defined text mode.
   @retval EFI_WARN_UNKNOWN_GLYPH This warning code indicates that some of the characters in
                                  the Unicode string could not be rendered and were skipped.
 

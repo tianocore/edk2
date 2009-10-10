@@ -59,7 +59,7 @@ EFI_GUID  mTianoHiiIfrGuid              = EFI_IFR_TIANO_GUID;
 /**
 
   This thunk module only handles UEFI HII packages. The caller of this function 
-  won¡¯t be able to parse the content. Therefore, it is not supported.
+  won't be able to parse the content. Therefore, it is not supported.
   
   This function will ASSERT and return EFI_UNSUPPORTED.
 

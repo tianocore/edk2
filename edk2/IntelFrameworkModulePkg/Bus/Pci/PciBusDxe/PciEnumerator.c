@@ -1876,7 +1876,7 @@ PreprocessController (
   @param RemainingDevicePath  The remaining device path for the PCI-like hot-plug device.
   @param NumberOfChildren     The number of child handles.
                               For a add operation, it is an output parameter.
-                              For a remove operation, it?¡¥s an input parameter.
+                              For a remove operation, it's an input parameter.
   @param ChildHandleBuffer    The buffer which contains the child handles.
 
   @retval EFI_INVALID_PARAMETER  Operation is not a legal value.
