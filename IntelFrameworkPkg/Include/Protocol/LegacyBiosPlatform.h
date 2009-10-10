@@ -489,7 +489,7 @@ typedef struct {
   ///
   UINT16  CompatibleDid;
   ///
-  /// If nonzero, a value passed directly to the IRQ miniport’s Initialize function.
+  /// If nonzero, a value passed directly to the IRQ miniport's Initialize function.
   ///
   UINT32  Miniport;
   ///

@@ -143,7 +143,7 @@ typedef struct {
   /// @par IPF:
   ///   Lower 32 bits of self test state parameter. For definition of self test 
   ///   state parameter, please refer to Intel(R) Itanium(R) Architecture Software 
-  ///   Developer’s Manual, Volume 2: System Architecture.
+  ///   Developer's Manual, Volume 2: System Architecture.
   ///
   EFI_MP_HEALTH_FLAGS  Flags;
   ///
