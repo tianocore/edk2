@@ -406,8 +406,8 @@ Once this is completed, you are ready to test the build, by executing:
 This command builds the active platform specified in text file target.txt. If
 the active platform is not specified target.txt, you must execute the build
 command from the sub-directory that contains FPD files. For more information
-about the active platform policy, see the “EDK II Build and Packaging
-Architecture Specification.?
+about the active platform policy, see the "EDK II Build and Packaging
+Architecture Specification."
 
 -------------------------------------------------------------------------------
 Detailed Starting Instructions
@@ -467,8 +467,8 @@ Once this is completed, you are ready to test the build, by executing:
 This command builds the active platform specified in text file target.txt. If
 the active platform is not specified, go to the sub-directory that contains FPD
 files and execute the build command. For more information about the active
-platform policy, see the “EDK II Build and Packaging Architecture
-Specification.?
+platform policy, see the "EDK II Build and Packaging Architecture
+Specification."
 
 --------------------------
 Individual Platform Builds
@@ -483,15 +483,15 @@ or
 
   Note that the active platform specified in target.txt overrides the platform
   specified by any FPD file in the current directory. For more   information
-  about active platform policy, see the “EDK II Build and Packaging Architecture
-  Specification.?
+  about active platform policy, see the "EDK II Build and Packaging Architecture
+  Specification."
 
 To run the Nt32 emulation platform under Microsoft Windows, go to
 <full build path>\DEBUG\MSFT\IA32 and execute SecMain.exe
 
-To exit the Nt32 emulation platform, type “reset?at the EFI Shell>
+To exit the Nt32 emulation platform, type "reset" at the EFI Shell>
 command prompt.  Alternatively, from the graphical interface, select the Boot
-Maintenance Manager's “Reset System?command.
+Maintenance Manager's "Reset System" command.
 
       NOTE: When creating a new platform, the Platform Name is restricted
       to a single word containing alphanumeric characters, underscore, dash,
@@ -532,8 +532,8 @@ A) The Surface Area Package Description (SPD) file contains information about
 the modules that the package contains, including the location of all MSA files,
 and public library names and headers that might be provided by a module in the
 package.  Packages are defined by SPD files.  (Found in the root of the Package
-subdirectory (i.e. EdkNt32Pkg).) The SPD file is further explained in “EDK II
-Build and Packaging Architecture Specification.?
+subdirectory (i.e. EdkNt32Pkg).) The SPD file is further explained in "EDK II
+Build and Packaging Architecture Specification."
 
 B) Module Surface Area Definition (MSA) files.  A description of a module's
 surface area, with all module specific default flags and features specified.

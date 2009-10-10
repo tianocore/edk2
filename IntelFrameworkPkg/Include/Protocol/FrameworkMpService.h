@@ -191,7 +191,7 @@ typedef struct {
   ///
   /// @par IPF:
   ///   Bit format of this field is the same as the definition of self-test state 
-  ///   parameter, in Intel?Itanium?Architecture Software Developer’s Manual, 
+  ///   parameter, in Intel?Itanium?Architecture Software Developer's Manual, 
   ///   Volume 2: System Architecture.
   ///
   EFI_MP_HEALTH        Health;
@@ -475,7 +475,7 @@ EFI_STATUS
                                      If the value is not zero, the BSP waits until 
                                      the AP finishes or timeout expires. If timeout 
                                      expires, EFI_TIMEOUT is returned, and the 
-                                     BSP will then check the AP’s status periodically, 
+                                     BSP will then check the AP's status periodically, 
                                      with time interval of 16 microseconds.
                                      - IPF:
                                      If WaitEvent is NULL, this parameter is ignored.
