@@ -365,7 +365,7 @@ VgaClassClearScreen (
   It sets the background and foreground colors for the OutputString() and ClearScreen() functions.
   The color mask can be set even when the device is in an invalid text mode.
   Devices supporting a different number of text colors are required to emulate the above colors
-  to the best of the device’s capabilities.
+  to the best of the device's capabilities.
 
   @param  This                   Pointer to EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL instance.
   @param  Attribute              The attribute to set.
