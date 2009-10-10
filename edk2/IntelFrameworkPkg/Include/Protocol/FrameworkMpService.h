@@ -191,7 +191,7 @@ typedef struct {
   ///
   /// @par IPF:
   ///   Bit format of this field is the same as the definition of self-test state 
-  ///   parameter, in Intel?Itanium?Architecture Software Developer's Manual, 
+  ///   parameter, in Intel(R) Itanium(R) Architecture Software Developer's Manual, 
   ///   Volume 2: System Architecture.
   ///
   EFI_MP_HEALTH        Health;
