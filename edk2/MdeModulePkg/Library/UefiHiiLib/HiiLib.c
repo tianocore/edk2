@@ -1537,7 +1537,7 @@ InternalHiiValidateCurrentSetting (
           //
           // OneOf value doesn't belong to one of option value. 
           //
-          if (VarBlockData.OpCode == EFI_IFR_ONE_OF_OP) {
+          if ((VarBlockData.Scope == 0) && (VarBlockData.OpCode == EFI_IFR_ONE_OF_OP)) {
             Status = EFI_INVALID_PARAMETER;
             goto Done;
           }
