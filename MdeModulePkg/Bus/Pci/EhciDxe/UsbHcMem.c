@@ -261,7 +261,7 @@ UsbHcGetPciAddressForHostMem (
   // calculate the pci memory address for host memory address.
   //
   Offset = (UINT8 *)Mem - Block->BufHost;
-  PhyAddr = (EFI_PHYSICAL_ADDRESS)(Block->Buf + Offset);
+  PhyAddr = (EFI_PHYSICAL_ADDRESS)(UINTN) (Block->Buf + Offset);
   return PhyAddr;
 }
 
