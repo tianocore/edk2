@@ -244,7 +244,8 @@ struct _URB {
   Create a single QTD to hold the data.
 
   @param  Ehc        The EHCI device.
-  @param  Data       Current data not associated with a QTD.
+  @param  Data       The cpu memory address of current data not associated with a QTD.
+  @param  DataPhy    The pci bus address of current data not associated with a QTD.
   @param  DataLen    The length of the data.
   @param  PktId      Packet ID to use in the QTD.
   @param  Toggle     Data toggle to use in the QTD.
@@ -257,6 +258,7 @@ EHC_QTD *
 EhcCreateQtd (
   IN USB2_HC_DEV          *Ehc,
   IN UINT8                *Data,
+  IN UINT8                *DataPhy,
   IN UINTN                DataLen,
   IN UINT8                PktId,
   IN UINT8                Toggle,

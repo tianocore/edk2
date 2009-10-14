@@ -221,6 +221,50 @@ UsbHcAllocMemFromBlock (
   return Block->Buf + (StartByte * 8 + StartBit) * USBHC_MEM_UNIT;
 }
 
+/**
+  Get the pci memory address according to the allocated host memory address.
+
+  @param  Pool           The memory pool of the host controller.
+  @param  Mem            The memory to free.
+  @param  Size           The size of the memory to free.
+
+  @return the pci memory address
+**/
+EFI_PHYSICAL_ADDRESS
+UsbHcGetPciAddressForHostMem (
+  IN USBHC_MEM_POOL       *Pool,
+  IN VOID                 *Mem,
+  IN UINTN                Size
+  )
+{
+  USBHC_MEM_BLOCK         *Head;
+  USBHC_MEM_BLOCK         *Block;
+  UINTN                   AllocSize;
+  EFI_PHYSICAL_ADDRESS    PhyAddr;
+  UINTN                   Offset;
+
+  Head      = Pool->Head;
+  AllocSize = USBHC_MEM_ROUND (Size);
+
+  for (Block = Head; Block != NULL; Block = Block->Next) {
+    //
+    // scan the memory block list for the memory block that
+    // completely contains the allocated memory.
+    //
+    if ((Block->Buf <= (UINT8 *) Mem) && (((UINT8 *) Mem + AllocSize) <= (Block->Buf + Block->BufLen))) {
+      break;
+    }
+  }
+
+  ASSERT ((Block != NULL));
+  //
+  // calculate the pci memory address for host memory address.
+  //
+  Offset = (UINT8 *)Mem - Block->BufHost;
+  PhyAddr = (EFI_PHYSICAL_ADDRESS)(Block->Buf + Offset);
+  return PhyAddr;
+}
+
 
 /**
   Insert the memory block to the pool's list of the blocks.

@@ -561,7 +561,7 @@ EhcInitHC (
   // Allocate the periodic frame and associated memeory
   // management facilities if not already done.
   //
-  if (Ehc->PeriodFrame != NULL) {
+  if (Ehc->PeriodFrameHost != NULL) {
     EhcFreeSched (Ehc);
   }
 

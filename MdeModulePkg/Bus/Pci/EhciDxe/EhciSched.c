@@ -34,11 +34,12 @@ EhcCreateHelpQ (
   EHC_QH                  *Qh;
   QH_HW                   *QhHw;
   EHC_QTD                 *Qtd;
+  EFI_PHYSICAL_ADDRESS    PciAddr;
 
   //
   // Create an inactive Qtd to terminate the short packet read.
   //
-  Qtd = EhcCreateQtd (Ehc, NULL, 0, QTD_PID_INPUT, 0, 64);
+  Qtd = EhcCreateQtd (Ehc, NULL, NULL, 0, QTD_PID_INPUT, 0, 64);
 
   if (Qtd == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -68,8 +69,9 @@ EhcCreateHelpQ (
     return EFI_OUT_OF_RESOURCES;
   }
 
+  PciAddr           = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Qh, sizeof (EHC_QH));
   QhHw              = &Qh->QhHw;
-  QhHw->HorizonLink = QH_LINK (QhHw, EHC_TYPE_QH, FALSE);
+  QhHw->HorizonLink = QH_LINK (PciAddr + OFFSET_OF(EHC_QH, QhHw), EHC_TYPE_QH, FALSE);
   QhHw->Status      = QTD_STAT_HALTED;
   QhHw->ReclaimHead = 1;
   Ehc->ReclaimHead  = Qh;
@@ -116,6 +118,7 @@ EhcInitSched (
   UINTN                 Index;
   UINT32                *Desc;
   EFI_STATUS            Status;
+  EFI_PHYSICAL_ADDRESS  PciAddr;
 
   //
   // First initialize the periodical schedule data:
@@ -185,10 +188,11 @@ EhcInitSched (
   //
   // Initialize the frame list entries then set the registers
   //
-  Desc = (UINT32 *) Ehc->PeriodFrame;
+  Desc = (UINT32 *) Ehc->PeriodFrameHost;
 
   for (Index = 0; Index < EHC_FRAME_LEN; Index++) {
-    Desc[Index] = QH_LINK (Ehc->PeriodOne, EHC_TYPE_QH, FALSE);
+    PciAddr     = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Ehc->PeriodOne, sizeof (EHC_QH));
+    Desc[Index] = QH_LINK (PciAddr, EHC_TYPE_QH, FALSE);
   }
 
   EhcWriteOpReg (Ehc, EHC_FRAME_BASE_OFFSET, EHC_LOW_32BIT (Ehc->PeriodFrame));
@@ -198,7 +202,8 @@ EhcInitSched (
   // Only need to set the AsynListAddr register to
   // the reclamation header
   //
-  EhcWriteOpReg (Ehc, EHC_ASYNC_HEAD_OFFSET, EHC_LOW_32BIT (Ehc->ReclaimHead));
+  PciAddr = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Ehc->ReclaimHead, sizeof (EHC_QH));
+  EhcWriteOpReg (Ehc, EHC_ASYNC_HEAD_OFFSET, EHC_LOW_32BIT (PciAddr));
   return EFI_SUCCESS;
 }
 
@@ -239,7 +244,7 @@ EhcFreeSched (
     Ehc->MemPool = NULL;
   }
 
-  if (Ehc->PeriodFrame != NULL) {
+  if (Ehc->PeriodFrameHost != NULL) {
     PciIo = Ehc->PciIo;
     ASSERT (PciIo != NULL);
 
@@ -251,7 +256,8 @@ EhcFreeSched (
              Ehc->PeriodFrameHost
              );
 
-    Ehc->PeriodFrame = NULL;
+    Ehc->PeriodFrameHost = NULL;
+    Ehc->PeriodFrame     = NULL;
   }
 }
 
@@ -274,6 +280,7 @@ EhcLinkQhToAsync (
   )
 {
   EHC_QH                  *Head;
+  EFI_PHYSICAL_ADDRESS    PciAddr;
 
   //
   // Append the queue head after the reclaim header, then
@@ -285,8 +292,10 @@ EhcLinkQhToAsync (
   Qh->NextQh              = Head->NextQh;
   Head->NextQh            = Qh;
 
-  Qh->QhHw.HorizonLink    = QH_LINK (Head, EHC_TYPE_QH, FALSE);;
-  Head->QhHw.HorizonLink  = QH_LINK (Qh, EHC_TYPE_QH, FALSE);
+  PciAddr = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Head, sizeof (EHC_QH));
+  Qh->QhHw.HorizonLink    = QH_LINK (PciAddr, EHC_TYPE_QH, FALSE);;
+  PciAddr = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Qh, sizeof (EHC_QH));
+  Head->QhHw.HorizonLink  = QH_LINK (PciAddr, EHC_TYPE_QH, FALSE);
 }
 
 
@@ -306,6 +315,7 @@ EhcUnlinkQhFromAsync (
 {
   EHC_QH                  *Head;
   EFI_STATUS              Status;
+  EFI_PHYSICAL_ADDRESS    PciAddr;
 
   ASSERT (Ehc->ReclaimHead->NextQh == Qh);
 
@@ -319,7 +329,8 @@ EhcUnlinkQhFromAsync (
   Head->NextQh            = Qh->NextQh;
   Qh->NextQh              = NULL;
 
-  Head->QhHw.HorizonLink  = QH_LINK (Head, EHC_TYPE_QH, FALSE);
+  PciAddr = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Head, sizeof (EHC_QH));
+  Head->QhHw.HorizonLink  = QH_LINK (PciAddr, EHC_TYPE_QH, FALSE);
 
   //
   // Set and wait the door bell to synchronize with the hardware
@@ -351,8 +362,9 @@ EhcLinkQhToPeriod (
   UINTN                   Index;
   EHC_QH                  *Prev;
   EHC_QH                  *Next;
+  EFI_PHYSICAL_ADDRESS    PciAddr;
 
-  Frames = Ehc->PeriodFrame;
+  Frames = Ehc->PeriodFrameHost;
 
   for (Index = 0; Index < EHC_FRAME_LEN; Index += Qh->Interval) {
     //
@@ -408,7 +420,8 @@ EhcLinkQhToPeriod (
       Prev->NextQh            = Qh;
 
       Qh->QhHw.HorizonLink    = Prev->QhHw.HorizonLink;
-      Prev->QhHw.HorizonLink  = QH_LINK (Qh, EHC_TYPE_QH, FALSE);
+      PciAddr = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Qh, sizeof (EHC_QH));
+      Prev->QhHw.HorizonLink  = QH_LINK (PciAddr, EHC_TYPE_QH, FALSE);
       break;
     }
 
@@ -419,14 +432,17 @@ EhcLinkQhToPeriod (
     //
     if (Qh->NextQh == NULL) {
       Qh->NextQh              = Next;
-      Qh->QhHw.HorizonLink    = QH_LINK (Next, EHC_TYPE_QH, FALSE);
+      PciAddr = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Next, sizeof (EHC_QH));
+      Qh->QhHw.HorizonLink    = QH_LINK (PciAddr, EHC_TYPE_QH, FALSE);
     }
 
+    PciAddr = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Qh, sizeof (EHC_QH));
+
     if (Prev == NULL) {
-      Frames[Index] = QH_LINK (Qh, EHC_TYPE_QH, FALSE);
+      Frames[Index] = QH_LINK (PciAddr, EHC_TYPE_QH, FALSE);
     } else {
       Prev->NextQh            = Qh;
-      Prev->QhHw.HorizonLink  = QH_LINK (Qh, EHC_TYPE_QH, FALSE);
+      Prev->QhHw.HorizonLink  = QH_LINK (PciAddr, EHC_TYPE_QH, FALSE);
     }
   }
 }
@@ -451,7 +467,7 @@ EhcUnlinkQhFromPeriod (
   EHC_QH                  *Prev;
   EHC_QH                  *This;
 
-  Frames = Ehc->PeriodFrame;
+  Frames = Ehc->PeriodFrameHost;
 
   for (Index = 0; Index < EHC_FRAME_LEN; Index += Qh->Interval) {
     //
@@ -513,6 +529,7 @@ EhcCheckUrbResult (
   QTD_HW                  *QtdHw;
   UINT8                   State;
   BOOLEAN                 Finished;
+  EFI_PHYSICAL_ADDRESS    PciAddr;
 
   ASSERT ((Ehc != NULL) && (Urb != NULL) && (Urb->Qh != NULL));
 
@@ -582,7 +599,8 @@ EhcCheckUrbResult (
         // ShortReadStop. If it is a setup transfer, need to check the
         // Status Stage of the setup transfer to get the finial result
         //
-        if (QtdHw->AltNext == QTD_LINK (Ehc->ShortReadStop, FALSE)) {
+        PciAddr = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Ehc->ShortReadStop, sizeof (EHC_QTD));
+        if (QtdHw->AltNext == QTD_LINK (PciAddr, FALSE)) {
           DEBUG ((EFI_D_INFO, "EhcCheckUrbResult: Short packet read, break\n"));
 
           Finished = TRUE;
@@ -803,11 +821,13 @@ ON_ERROR:
 /**
   Update the queue head for next round of asynchronous transfer.
 
+  @param  Ehc                   The EHCI device.
   @param  Urb                   The URB to update.
 
 **/
 VOID
 EhcUpdateAsyncRequest (
+  IN  USB2_HC_DEV         *Ehc,
   IN URB                  *Urb
   )
 {
@@ -817,6 +837,7 @@ EhcUpdateAsyncRequest (
   EHC_QTD                 *Qtd;
   QTD_HW                  *QtdHw;
   UINTN                   Index;
+  EFI_PHYSICAL_ADDRESS    PciAddr;
 
   Qtd = NULL;
 
@@ -868,7 +889,8 @@ EhcUpdateAsyncRequest (
       QhHw->PageHigh[Index] = 0;
     }
 
-    QhHw->NextQtd = QTD_LINK (FirstQtd, FALSE);
+    PciAddr = UsbHcGetPciAddressForHostMem (Ehc->MemPool, FirstQtd, sizeof (EHC_QTD));
+    QhHw->NextQtd = QTD_LINK (PciAddr, FALSE);
   }
 
   return ;
@@ -936,14 +958,14 @@ EhcMonitorAsyncRequests (
       ProcBuf = AllocatePool (Urb->Completed);
 
       if (ProcBuf == NULL) {
-        EhcUpdateAsyncRequest (Urb);
+        EhcUpdateAsyncRequest (Ehc, Urb);
         continue;
       }
 
       CopyMem (ProcBuf, Urb->Data, Urb->Completed);
     }
 
-    EhcUpdateAsyncRequest (Urb);
+    EhcUpdateAsyncRequest (Ehc, Urb);
 
     //
     // Leave error recovery to its related device driver. A
