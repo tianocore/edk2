@@ -21,7 +21,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   Create a single QTD to hold the data.
 
   @param  Ehc                   The EHCI device.
-  @param  Data                  Current data not associated with a QTD.
+  @param  Data                  The cpu memory address of current data not associated with a QTD.
+  @param  DataPhy               The pci bus address of current data not associated with a QTD.
   @param  DataLen               The length of the data.
   @param  PktId                 Packet ID to use in the QTD.
   @param  Toggle                Data toggle to use in the QTD.
@@ -34,6 +35,7 @@ EHC_QTD *
 EhcCreateQtd (
   IN USB2_HC_DEV          *Ehc,
   IN UINT8                *Data,
+  IN UINT8                *DataPhy,
   IN UINTN                DataLen,
   IN UINT8                PktId,
   IN UINT8                Toggle,
@@ -82,10 +84,10 @@ EhcCreateQtd (
       // compute the offset and clear Reserved fields. This is already
       // done in the data point.
       //
-      QtdHw->Page[Index]      = EHC_LOW_32BIT (Data);
-      QtdHw->PageHigh[Index]  = EHC_HIGH_32BIT (Data);
+      QtdHw->Page[Index]      = EHC_LOW_32BIT (DataPhy);
+      QtdHw->PageHigh[Index]  = EHC_HIGH_32BIT (DataPhy);
 
-      ThisBufLen              = QTD_BUF_LEN - (EHC_LOW_32BIT (Data) & QTD_BUF_MASK);
+      ThisBufLen              = QTD_BUF_LEN - (EHC_LOW_32BIT (DataPhy) & QTD_BUF_MASK);
 
       if (Len + ThisBufLen >= DataLen) {
         Len = DataLen;
@@ -94,6 +96,7 @@ EhcCreateQtd (
 
       Len += ThisBufLen;
       Data += ThisBufLen;
+      DataPhy += ThisBufLen;
     }
 
     //
@@ -375,6 +378,7 @@ EhcCreateQtds (
   UINT8                   Toggle;
   UINTN                   Len;
   UINT8                   Pid;
+  EFI_PHYSICAL_ADDRESS    PhyAddr;
 
   ASSERT ((Urb != NULL) && (Urb->Qh != NULL));
 
@@ -390,8 +394,9 @@ EhcCreateQtds (
   StatusQtd = NULL;
   AlterNext = QTD_LINK (NULL, TRUE);
 
+  PhyAddr   = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Ehc->ShortReadStop, sizeof (EHC_QTD));
   if (Ep->Direction == EfiUsbDataIn) {
-    AlterNext = QTD_LINK (Ehc->ShortReadStop, FALSE);
+    AlterNext = QTD_LINK (PhyAddr, FALSE);
   }
 
   //
@@ -399,7 +404,7 @@ EhcCreateQtds (
   //
   if (Urb->Ep.Type == EHC_CTRL_TRANSFER) {
     Len = sizeof (EFI_USB_DEVICE_REQUEST);
-    Qtd = EhcCreateQtd (Ehc, Urb->RequestPhy, Len, QTD_PID_SETUP, 0, Ep->MaxPacket);
+    Qtd = EhcCreateQtd (Ehc, (UINT8 *)Urb->Request, (UINT8 *)Urb->RequestPhy, Len, QTD_PID_SETUP, 0, Ep->MaxPacket);
 
     if (Qtd == NULL) {
       return EFI_OUT_OF_RESOURCES;
@@ -419,14 +424,15 @@ EhcCreateQtds (
       Pid = QTD_PID_INPUT;
     }
 
-    StatusQtd = EhcCreateQtd (Ehc, NULL, 0, Pid, 1, Ep->MaxPacket);
+    StatusQtd = EhcCreateQtd (Ehc, NULL, NULL, 0, Pid, 1, Ep->MaxPacket);
 
     if (StatusQtd == NULL) {
       goto ON_ERROR;
     }
 
     if (Ep->Direction == EfiUsbDataIn) {
-      AlterNext = QTD_LINK (StatusQtd, FALSE);
+      PhyAddr   = UsbHcGetPciAddressForHostMem (Ehc->MemPool, StatusQtd, sizeof (EHC_QTD));
+      AlterNext = QTD_LINK (PhyAddr, FALSE);
     }
 
     Toggle = 1;
@@ -447,6 +453,7 @@ EhcCreateQtds (
   while (Len < Urb->DataLen) {
     Qtd = EhcCreateQtd (
             Ehc,
+            (UINT8 *) Urb->Data + Len,
             (UINT8 *) Urb->DataPhy + Len,
             Urb->DataLen - Len,
             Pid,
@@ -492,14 +499,16 @@ EhcCreateQtds (
     }
 
     NextQtd             = EFI_LIST_CONTAINER (Entry->ForwardLink, EHC_QTD, QtdList);
-    Qtd->QtdHw.NextQtd  = QTD_LINK (NextQtd, FALSE);
+    PhyAddr             = UsbHcGetPciAddressForHostMem (Ehc->MemPool, NextQtd, sizeof (EHC_QTD));
+    Qtd->QtdHw.NextQtd  = QTD_LINK (PhyAddr, FALSE);
   }
 
   //
   // Link the QTDs to the queue head
   //
   NextQtd           = EFI_LIST_CONTAINER (Qh->Qtds.ForwardLink, EHC_QTD, QtdList);
-  Qh->QhHw.NextQtd  = QTD_LINK (NextQtd, FALSE);
+  PhyAddr           = UsbHcGetPciAddressForHostMem (Ehc->MemPool, NextQtd, sizeof (EHC_QTD));
+  Qh->QhHw.NextQtd  = QTD_LINK (PhyAddr, FALSE);
   return EFI_SUCCESS;
 
 ON_ERROR:
