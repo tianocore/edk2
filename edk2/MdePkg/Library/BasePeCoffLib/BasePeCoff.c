@@ -572,7 +572,9 @@ PeCoffLoaderRelocateImage (
       // Use PE32 offset
       //
       Adjust = (UINT64)BaseAddress - Hdr.Pe32->OptionalHeader.ImageBase;
-      Hdr.Pe32->OptionalHeader.ImageBase = (UINT32)BaseAddress;
+      if (Adjust != 0) {
+        Hdr.Pe32->OptionalHeader.ImageBase = (UINT32)BaseAddress;
+      }
 
       NumberOfRvaAndSizes = Hdr.Pe32->OptionalHeader.NumberOfRvaAndSizes;
       RelocDir  = &Hdr.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC];
@@ -581,7 +583,9 @@ PeCoffLoaderRelocateImage (
       // Use PE32+ offset
       //
       Adjust = (UINT64) BaseAddress - Hdr.Pe32Plus->OptionalHeader.ImageBase;
-      Hdr.Pe32Plus->OptionalHeader.ImageBase = (UINT64)BaseAddress;
+      if (Adjust != 0) {
+        Hdr.Pe32Plus->OptionalHeader.ImageBase = (UINT64)BaseAddress;
+      }
 
       NumberOfRvaAndSizes = Hdr.Pe32Plus->OptionalHeader.NumberOfRvaAndSizes;
       RelocDir  = &Hdr.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC];
@@ -612,7 +616,9 @@ PeCoffLoaderRelocateImage (
   } else {
     Hdr.Te             = (EFI_TE_IMAGE_HEADER *)(UINTN)(ImageContext->ImageAddress);
     Adjust             = (UINT64) (BaseAddress - Hdr.Te->StrippedSize + sizeof (EFI_TE_IMAGE_HEADER) - Hdr.Te->ImageBase);
-    Hdr.Te->ImageBase  = (UINT64) (BaseAddress - Hdr.Te->StrippedSize + sizeof (EFI_TE_IMAGE_HEADER));
+    if (Adjust != 0) {
+      Hdr.Te->ImageBase  = (UINT64) (BaseAddress - Hdr.Te->StrippedSize + sizeof (EFI_TE_IMAGE_HEADER));
+    }
 
     //
     // Find the relocation block
