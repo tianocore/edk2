@@ -32,7 +32,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //  if the /OPT:REF linker option is used. We defined a macro as this is a 
 //  a non standard extension
 //
-#if defined(_MSC_EXTENSIONS)
+#if defined(_MSC_EXTENSIONS) && !defined (MDE_CPU_EBC)
   ///
   /// Remove global variable from the linked image if there are no references to 
   /// it after all compiler and linker optimizations have been performed.
