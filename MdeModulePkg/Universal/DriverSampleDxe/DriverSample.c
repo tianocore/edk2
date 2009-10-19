@@ -839,7 +839,7 @@ DriverSampleInit (
   //
   // Initialize driver private data
   //
-  PrivateData = AllocatePool (sizeof (DRIVER_SAMPLE_PRIVATE_DATA));
+  PrivateData = AllocateZeroPool (sizeof (DRIVER_SAMPLE_PRIVATE_DATA));
   if (PrivateData == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -1048,6 +1048,7 @@ DriverSampleUnload (
             &PrivateData->ConfigAccess,
             NULL
            );
+    DriverHandle[0] = NULL;
   }
 
   if (DriverHandle[1] != NULL) {
@@ -1057,6 +1058,7 @@ DriverSampleUnload (
             &mHiiVendorDevicePath1,
             NULL
            );
+    DriverHandle[1] = NULL;
   }
 
   if (PrivateData->HiiHandle[0] != NULL) {
@@ -1069,6 +1071,7 @@ DriverSampleUnload (
 
   if (PrivateData != NULL) {
     FreePool (PrivateData);
+    PrivateData = NULL;
   }
 
   return EFI_SUCCESS;
