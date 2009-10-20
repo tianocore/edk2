@@ -225,6 +225,19 @@
   #  If FALSE, DXE IPL will not support UEFI decompression to save space.
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportUefiDecompress|TRUE|BOOLEAN|0x0001200c
 
+  ## This PCD specifies whether PciBus supports the hot plug device.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport|TRUE|BOOLEAN|0x0001003d
+
+  ## This PCD specifies whether the Single Root I/O virtualization support.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSupport|TRUE|BOOLEAN|0x10000044
+
+  ## This PCD specifies whether the Alternative Routing-ID support.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAriSupport|TRUE|BOOLEAN|0x10000045
+
+  ## This PCD specifies whether the Multi Root I/O virtualization support.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMrIovSupport|FALSE|BOOLEAN|0x10000046
+
+
 [PcdsFeatureFlag.IA32]
   ##
   # This feature flag specifies whether DxeIpl switches to long mode to enter DXE phase.
@@ -292,6 +305,12 @@
 
   ## FFS filename to find the ACPI tables
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiTableStorageFile|{ 0x25, 0x4e, 0x37, 0x7e, 0x01, 0x8e, 0xee, 0x4f, 0x87, 0xf2, 0x39, 0xc, 0x23, 0xc6, 0x6, 0xcd }|VOID*|16
+
+  ## Single root I/O virtualization virtual function memory BAR alignment
+  #  BITN set indicates 2 of n+12 power
+  #  BIT0 set indicates 4KB alignment
+  #  BIT1 set indicates 8KB alignment
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize|0x1|UINT32|0x10000047
 
 [PcdsFixedAtBuild,PcdsPatchableInModule]
   ## Maximun number of performance log entries during PEI phase.
