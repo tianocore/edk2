@@ -1031,6 +1031,7 @@ ParseOpCodes (
         break;
       }
 
+      ASSERT (CurrentExpression != NULL);
       InsertTailList (&CurrentExpression->OpCodeListHead, &ExpressionOpCode->Link);
 
       if (SingleOpCodeExpression) {
@@ -1050,7 +1051,6 @@ ParseOpCodes (
             return Status;
           }
 
-          ASSERT (CurrentExpression != NULL);
           if (CurrentExpression->Result.Type != EFI_IFR_TYPE_BOOLEAN) {
             return EFI_INVALID_PARAMETER;
           }
@@ -1071,7 +1071,7 @@ ParseOpCodes (
 
     case EFI_IFR_FORM_SET_OP:
       //
-      // check the formset GUID
+      // Check the formset GUID
       //
       if (CompareMem (&FormSet->Guid, &((EFI_IFR_FORM_SET *) OpCodeData)->Guid, sizeof (EFI_GUID)) != 0) {
         return EFI_INVALID_PARAMETER;
@@ -1202,6 +1202,12 @@ ParseOpCodes (
       CopyMem (&CurrentStatement->TextTwo, &((EFI_IFR_TEXT *) OpCodeData)->TextTwo, sizeof (EFI_STRING_ID));
       break;
 
+    case EFI_IFR_RESET_BUTTON_OP:
+      CurrentStatement = CreateStatement (OpCodeData, FormSet, CurrentForm);
+      ASSERT (CurrentStatement != NULL);
+      CopyMem (&CurrentStatement->DefaultId, &((EFI_IFR_RESET_BUTTON *) OpCodeData)->DefaultId, sizeof (EFI_DEFAULT_ID));
+      break;
+
     //
     // Questions
     //
@@ -1217,15 +1223,6 @@ ParseOpCodes (
       } else {
         CopyMem (&CurrentStatement->QuestionConfig, &((EFI_IFR_ACTION *) OpCodeData)->QuestionConfig, sizeof (EFI_STRING_ID));
       }
-      break;
-
-    case EFI_IFR_RESET_BUTTON_OP:
-      //
-      // Create Statement
-      //
-      CurrentStatement = CreateStatement (OpCodeData, FormSet, CurrentForm);
-      ASSERT (CurrentStatement != NULL);
-      CopyMem (&CurrentStatement->DefaultId, &((EFI_IFR_RESET_BUTTON *) OpCodeData)->DefaultId, sizeof (EFI_DEFAULT_ID));
       break;
 
     case EFI_IFR_REF_OP:
@@ -1746,12 +1743,12 @@ ParseOpCodes (
             //
             // This is DisableIf expression for Form, it should be a constant expression
             //
+            ASSERT (CurrentExpression != NULL);
             Status = EvaluateExpression (FormSet, CurrentForm, CurrentExpression);
             if (EFI_ERROR (Status)) {
               return Status;
             }
 
-            ASSERT (CurrentExpression != NULL);
             if (CurrentExpression->Result.Type != EFI_IFR_TYPE_BOOLEAN) {
               return EFI_INVALID_PARAMETER;
             }
