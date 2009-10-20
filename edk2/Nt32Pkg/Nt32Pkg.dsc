@@ -300,7 +300,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText|TRUE
   gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable|FALSE
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst|FALSE
 
 
@@ -416,7 +416,7 @@
   MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
-  IntelFrameworkModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
+  MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
   MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf     ##This driver follows UEFI specification definition
   MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf    ##This driver follows UEFI specification definition
   IntelFrameworkModulePkg/Bus/Pci/IdeBusDxe/IdeBusDxe.inf
