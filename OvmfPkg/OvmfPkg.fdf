@@ -112,7 +112,7 @@ INF  UefiCpuPkg/CpuIoDxe/CpuIo.inf
 INF  UefiCpuPkg/CpuDxe/CpuDxe.inf
 INF  PcAtChipsetPkg/8254TimerDxe/8254Timer.inf
 INF  PcAtChipsetPkg/PciHostBridgeDxe/PciHostBridgeDxe.inf
-INF  IntelFrameworkModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
+INF  MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
 INF  PcAtChipsetPkg/KbcResetDxe/Reset.inf
 INF  MdeModulePkg/Universal/Metronome/Metronome.inf
 INF  PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
