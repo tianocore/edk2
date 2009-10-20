@@ -132,7 +132,14 @@ typedef enum {
   /// The resource allocation phase is completed.  No specific action is required
   /// here. This notification can be used to perform any chipset specific programming.  
   ///
-  EfiPciHostBridgeEndResourceAllocation
+  EfiPciHostBridgeEndResourceAllocation,
+
+  ///
+  /// The Host Bridge Enumeration is completed. No specific action is required here.
+  /// This notification can be used to perform any chipset specific programming.
+  ///
+  EfiPciHostBridgeEndEnumeration,
+  EfiMaxPciHostBridgeEnumerationPhase
 } EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PHASE;
 
 ///
