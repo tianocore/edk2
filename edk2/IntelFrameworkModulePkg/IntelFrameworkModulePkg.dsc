@@ -130,7 +130,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable|FALSE
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|FALSE
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport|TRUE
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSerialUseHalfHandshake|FALSE
 
 [PcdsFixedAtBuild.common]
@@ -193,7 +192,6 @@
   IntelFrameworkModulePkg/Library/PlatformBdsLibNull/PlatformBdsLibNull.inf
   IntelFrameworkModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
 
-  IntelFrameworkModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
   IntelFrameworkModulePkg/Bus/Pci/IdeBusDxe/IdeBusDxe.inf
   IntelFrameworkModulePkg/Bus/Isa/IsaBusDxe/IsaBusDxe.inf
   IntelFrameworkModulePkg/Bus/Isa/IsaFloppyDxe/IsaFloppyDxe.inf
@@ -202,7 +200,6 @@
   IntelFrameworkModulePkg/Bus/Isa/Ps2MouseDxe/Ps2MouseDxe.inf
   IntelFrameworkModulePkg/Bus/Isa/Ps2MouseAbsolutePointerDxe/Ps2MouseAbsolutePointerDxe.inf
   IntelFrameworkModulePkg/Bus/Pci/VgaMiniPortDxe/VgaMiniPortDxe.inf
-  IntelFrameworkModulePkg/Bus/Pci/IncompatiblePciDeviceSupportDxe/IncompatiblePciDeviceSupportDxe.inf
 
   IntelFrameworkModulePkg/Universal/SectionExtractionDxe/SectionExtractionDxe.inf
   IntelFrameworkModulePkg/Universal/DataHubDxe/DataHubDxe.inf

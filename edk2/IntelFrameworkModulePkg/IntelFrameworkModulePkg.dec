@@ -96,21 +96,8 @@
   ## This PCD specifies whether Peiphase StatusCode is replayed in DxePhase.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeReplayIn|FALSE|BOOLEAN|0x0001002d
 
-  ## This PCD specifies whether PciBus supports the hot plug device.
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport|TRUE|BOOLEAN|0x0001003d
-
   ## This PCD specifies whether Serial device use half hand shake.
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSerialUseHalfHandshake|FALSE|BOOLEAN|0x00010043
-
-  ## This PCD specifies whether the Single Root I/O virtualization support.
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSrIovSupport|TRUE|BOOLEAN|0x10000044
-
-  ## This PCD specifies whether the Alternative Routing-ID support.
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdAriSupport|TRUE|BOOLEAN|0x10000045
-
-  ## This PCD specifies whether the Multi Root I/O virtualization support.
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdMrIovSupport|FALSE|BOOLEAN|0x10000046
-
 
 [PcdsFixedAtBuild]
   ## FFS filename to find the default BMP Logo file.
@@ -124,12 +111,6 @@
   #  BIT1 indicates if only slave DMA is supported
   #  BIT2 indicates if ISA memory is supported
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSupportedFeatures|0x05|UINT8|0x00010040
-
-  ## Single root I/O virtualization virtual function memory BAR alignment
-  #  BITN set indicates 2 of n+12 power
-  #  BIT0 set indicates 4KB alignment
-  #  BIT1 set indicates 8KB alignment
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize|0x1|UINT32|0x10000047
 
 [PcdsFixedAtBuild,PcdsPatchableInModule,PcdsDynamic]
   ## PcdStatusCodeMemorySize is used when PcdStatusCodeUseMemory is set to true
