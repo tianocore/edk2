@@ -816,14 +816,6 @@ EfiDhcp4Start (
     goto ON_ERROR;
   }
 
-  //
-  // Start/Restart the receiving.
-  //
-  Status = UdpIoRecvDatagram (DhcpSb->UdpIo, DhcpInput, DhcpSb, 0);
-
-  if (EFI_ERROR (Status) && (Status != EFI_ALREADY_STARTED)) {
-    goto ON_ERROR;
-  }
 
   Instance->CompletionEvent = CompletionEvent;
 
@@ -1584,8 +1576,19 @@ ON_ERROR:
     // Keep polling until timeout if no error happens and the CompletionEvent
     // is NULL.
     //
-    while (Instance->Timeout != 0) {
-      Instance->UdpIo->Udp->Poll (Instance->UdpIo->Udp);
+    while (TRUE) {
+      OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+      //
+      // Raise TPL to protect the UDPIO in instance, in case that DhcpOnTimerTick
+      // free it when timeout.
+      //
+      if (Instance->Timeout > 0) {
+        Instance->UdpIo->Udp->Poll (Instance->UdpIo->Udp);
+        gBS->RestoreTPL (OldTpl);
+      } else {
+        gBS->RestoreTPL (OldTpl);
+        break;
+      }
     }
   }
 
