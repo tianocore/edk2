@@ -74,7 +74,7 @@ typedef struct _EFI_ATA_STATUS_BLOCK {
   UINT8 AtaSectorNumberExp;
   UINT8 AtaCylinderLowExp;
   UINT8 AtaCylinderHighExp; 
-  UINT8 Reserved2;
+  UINT8 Reserved;
   UINT8 AtaSectorCount;
   UINT8 AtaSectorCountExp;
   UINT8 Reserved2[6];
