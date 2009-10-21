@@ -105,6 +105,22 @@ UINT32
 );
 
 /**
+  Retrieves the current 64-bit value for a PCD token number. If the TokenNumber is invalid, the
+  results are unpredictable.
+  
+  @param[in]    Guid          The 128-bit unique value that designates which namespace to extract the value from.
+  @param[in]    TokenNumber   The PCD token number.
+  
+  @return 64-bit value for a given PCD token.  
+**/
+typedef
+UINT32
+(EFIAPI *EFI_PEI_PCD_PPI_GET_EX_64)(
+  IN CONST  EFI_GUID  *Guid,
+  IN        UINTN     TokenNumber
+);
+
+/**
   Retrieves the current pointer to the value for a PCD token number. There should not be any
   alignment assumptions about the pointer that is returned by this function call. If the TokenNumber
   is invalid, the results are unpredictable.
@@ -299,7 +315,7 @@ EFI_STATUS
 
 typedef
 VOID
-(EFIAPI *PCD_PPI_CALLBACK)(
+(EFIAPI *EFI_PCD_PPI_CALLBACK)(
   IN EFI_GUID *Guid     OPTIONAL,
   IN UINTN    CallBackToken,
   IN VOID     *TokenData,
@@ -321,10 +337,10 @@ VOID
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_PCD_PPI_CALL_BACK_ON_SET)(
+(EFIAPI *EFI_PEI_PCD_PPI_CALLBACK_ON_SET)(
   IN CONST  EFI_GUID          *Guid   OPTIONAL,
   IN        UINTN             CallBackToken,
-  IN        PCD_PPI_CALLBACK  CallBackFunction
+  IN        EFI_PCD_PPI_CALLBACK  CallBackFunction
 );
 
 /**
@@ -343,10 +359,10 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_PCD_PPI_CANCEL_CALL_BACK)(
+(EFIAPI *EFI_PEI_PCD_PPI_CANCEL_CALLBACK)(
   IN CONST  EFI_GUID          *Guid   OPTIONAL,
   IN        UINTN             CallBackToken,
-  IN        PCD_PPI_CALLBACK  CallBackFunction
+  IN        EFI_PCD_PPI_CALLBACK  CallBackFunction
 );
 
 /**
