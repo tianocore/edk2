@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2008, Intel Corporation.<BR>
+Copyright (c) 2006 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -310,6 +310,14 @@ Dhcp4DriverBindingStart (
     return Status;
   }
 
+  //
+  // Start the receiving
+  //
+  Status = UdpIoRecvDatagram (DhcpSb->UdpIo, DhcpInput, DhcpSb, 0);
+
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
   Status = gBS->SetTimer (DhcpSb->Timer, TimerPeriodic, TICKS_PER_SECOND);
 
   if (EFI_ERROR (Status)) {

@@ -443,6 +443,7 @@ DhcpCleanLease (
   DhcpSb->DhcpState   = Dhcp4Init;
   DhcpSb->Xid         = DhcpSb->Xid + 1;
   DhcpSb->ClientAddr  = 0;
+  DhcpSb->Netmask     = 0;
   DhcpSb->ServerAddr  = 0;
 
   if (DhcpSb->LastOffer != NULL) {
@@ -1066,6 +1067,7 @@ DhcpInput (
 
   if (EFI_ERROR (Status)) {
     NetbufFree (UdpPacket);
+    UdpIoRecvDatagram (DhcpSb->UdpIo, DhcpInput, DhcpSb, 0);
     DhcpEndSession (DhcpSb, Status);
     return ;
   }
