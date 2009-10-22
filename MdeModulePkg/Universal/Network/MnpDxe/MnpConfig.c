@@ -32,8 +32,8 @@ EFI_MANAGED_NETWORK_PROTOCOL    mMnpProtocolTemplate = {
 };
 
 EFI_MANAGED_NETWORK_CONFIG_DATA mMnpDefaultConfigData = {
-  10000,
-  10000,
+  10000000,
+  10000000,
   0,
   FALSE,
   FALSE,

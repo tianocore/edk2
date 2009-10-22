@@ -1,7 +1,7 @@
 /** @file
   Implementation of Managed Network Protocol public services.
 
-Copyright (c) 2005 - 2007, Intel Corporation. <BR>
+Copyright (c) 2005 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -226,22 +226,20 @@ MnpMcastIpToMac (
   MNP_INSTANCE_DATA           *Instance;
   EFI_SIMPLE_NETWORK_PROTOCOL *Snp;
   EFI_TPL                     OldTpl;
+  EFI_IPv6_ADDRESS            *Ip6Address;
 
   if ((This == NULL) || (IpAddress == NULL) || (MacAddress == NULL)) {
 
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Ipv6Flag) {
-    //
-    // Currently IPv6 isn't supported.
-    //
-    return EFI_UNSUPPORTED;
-  }
+  Ip6Address = &IpAddress->v6;
 
-  if (!IP4_IS_MULTICAST (EFI_NTOHL (*IpAddress))) {
+  if ((Ipv6Flag && !IP6_IS_MULTICAST (Ip6Address)) ||
+      (!Ipv6Flag && !IP4_IS_MULTICAST (EFI_NTOHL (*IpAddress)))
+      ) {
     //
-    // The IPv4 address passed in is not a multicast address.
+    // The IP address passed in is not a multicast address.
     //
     return EFI_INVALID_PARAMETER;
   }
@@ -259,17 +257,33 @@ MnpMcastIpToMac (
   Snp = Instance->MnpServiceData->Snp;
   ASSERT (Snp != NULL);
 
+  ZeroMem (MacAddress, sizeof (EFI_MAC_ADDRESS));  
+
   if (Snp->Mode->IfType == NET_IFTYPE_ETHERNET) {
-    //
-    // Translate the IPv4 address into a multicast MAC address if the NIC is an
-    // ethernet NIC.
-    //
-    MacAddress->Addr[0] = 0x01;
-    MacAddress->Addr[1] = 0x00;
-    MacAddress->Addr[2] = 0x5E;
-    MacAddress->Addr[3] = (UINT8) (IpAddress->v4.Addr[1] & 0x7F);
-    MacAddress->Addr[4] = IpAddress->v4.Addr[2];
-    MacAddress->Addr[5] = IpAddress->v4.Addr[3];
+    if (!Ipv6Flag) {
+      //
+      // Translate the IPv4 address into a multicast MAC address if the NIC is an
+      // ethernet NIC according to RFC1112..
+      //
+      MacAddress->Addr[0] = 0x01;
+      MacAddress->Addr[1] = 0x00;
+      MacAddress->Addr[2] = 0x5E;
+      MacAddress->Addr[3] = (UINT8) (IpAddress->v4.Addr[1] & 0x7F);
+      MacAddress->Addr[4] = IpAddress->v4.Addr[2];
+      MacAddress->Addr[5] = IpAddress->v4.Addr[3];
+    } else {
+      //
+      // Translate the IPv6 address into a multicast MAC address if the NIC is an 
+      // ethernet NIC according to RFC2464.
+      //
+      
+      MacAddress->Addr[0] = 0x33;
+      MacAddress->Addr[1] = 0x33;
+      MacAddress->Addr[2] = Ip6Address->Addr[12];
+      MacAddress->Addr[3] = Ip6Address->Addr[13];
+      MacAddress->Addr[4] = Ip6Address->Addr[14];
+      MacAddress->Addr[5] = Ip6Address->Addr[15];
+    }
 
     Status = EFI_SUCCESS;
   } else {
@@ -454,7 +468,7 @@ ON_EXIT:
   @param[in]  This    Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
   @param[in]  Token   Pointer to a token associated with the transmit data
                       descriptor. Type EFI_MANAGED_NETWORK_COMPLETION_TOKEN
-					  is defined in "Related Definitions" below.
+                      is defined in "Related Definitions" below.
 
   @retval EFI_SUCCESS            The transmit completion token was cached.
   @retval EFI_NOT_STARTED        This MNP child driver instance has not been
@@ -655,7 +669,7 @@ ON_EXIT:
   @param[in]  Token    Pointer to a token that has been issued by
                        EFI_MANAGED_NETWORK_PROTOCOL.Transmit() or
                        EFI_MANAGED_NETWORK_PROTOCOL.Receive(). If NULL, all 
-					   pending tokens are aborted.
+                       pending tokens are aborted.
 
   @retval EFI_SUCCESS            The asynchronous I/O request was aborted and
                                  Token.Event was signaled. When Token is NULL,
