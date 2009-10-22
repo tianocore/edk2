@@ -2,7 +2,7 @@
   Ihis library is only intended to be used by UEFI network stack modules.
   It provides basic functions for the UEFI network stack.
 
-Copyright (c) 2005 - 2008, Intel Corporation
+Copyright (c) 2005 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -150,6 +150,8 @@ typedef struct {
 #define IP4_IS_LOCAL_BROADCAST(Ip)        ((Ip) == 0xFFFFFFFF)
 #define IP4_NET_EQUAL(Ip1, Ip2, NetMask)  (((Ip1) & (NetMask)) == ((Ip2) & (NetMask)))
 #define IP4_IS_VALID_NETMASK(Ip)          (NetGetMaskLength (Ip) != IP4_MASK_NUM)
+
+#define IP6_IS_MULTICAST(Ip6)             (((Ip6)->Addr[0]) == 0xFF)
 
 //
 // Convert the EFI_IP4_ADDRESS to plain UINT32 IP4 address.
