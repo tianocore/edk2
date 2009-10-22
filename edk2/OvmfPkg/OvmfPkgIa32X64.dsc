@@ -22,7 +22,7 @@
   PLATFORM_NAME                  = Ovmf
   PLATFORM_GUID                  = 5a9e7754-d81b-49ea-85ad-69eaa7b1539b
   PLATFORM_VERSION               = 0.1
-  DSC_ SPECIFICATION             = 0x00010005
+  DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/Ovmf3264
   SUPPORTED_ARCHITECTURES        = IA32|X64
   BUILD_TARGETS                  = DEBUG|RELEASE
