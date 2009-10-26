@@ -517,6 +517,40 @@ ValueToOption (
   );
 
 /**
+  Return data element in an Array by its Index.
+
+  @param  Array                  The data array.
+  @param  Type                   Type of the data in this array.
+  @param  Index                  Zero based index for data in this array.
+
+  @retval Value                  The data to be returned
+
+**/
+UINT64
+GetArrayData (
+  IN VOID                     *Array,
+  IN UINT8                    Type,
+  IN UINTN                    Index
+  );
+
+/**
+  Set value of a data element in an Array by its Index.
+
+  @param  Array                  The data array.
+  @param  Type                   Type of the data in this array.
+  @param  Index                  Zero based index for data in this array.
+  @param  Value                  The value to be set.
+
+**/
+VOID
+SetArrayData (
+  IN VOID                     *Array,
+  IN UINT8                    Type,
+  IN UINTN                    Index,
+  IN UINT64                   Value
+  );
+
+/**
   Process a Question's Option (whether selected or un-selected).
 
   @param  Selection              Pointer to UI_MENU_SELECTION.

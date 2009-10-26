@@ -877,11 +877,6 @@ SetupBrowser (
 
   do {
     //
-    // Displays the Header and Footer borders
-    //
-    DisplayPageFrame ();
-
-    //
     // Initialize Selection->Form
     //
     if (Selection->FormId == 0) {
@@ -910,6 +905,11 @@ SetupBrowser (
     if (EFI_ERROR (Status)) {
       return Status;
     }
+
+    //
+    // Displays the Header and Footer borders
+    //
+    DisplayPageFrame ();
 
     //
     // Display form

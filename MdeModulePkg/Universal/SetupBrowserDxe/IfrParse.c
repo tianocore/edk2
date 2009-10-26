@@ -810,6 +810,7 @@ ParseOpCodes (
   FORMSET_DEFAULTSTORE    *DefaultStore;
   QUESTION_DEFAULT        *CurrentDefault;
   QUESTION_OPTION         *CurrentOption;
+  UINT8                   Width;
   CHAR8                   *AsciiString;
   UINT16                  NumberOfStatement;
   UINT16                  NumberOfExpression;
@@ -1019,7 +1020,7 @@ ParseOpCodes (
         break;
 
       case EFI_IFR_UNDEFINED_OP:
-        Value->Type = EFI_IFR_TYPE_OTHER;
+        Value->Type = EFI_IFR_TYPE_UNDEFINED;
         break;
 
       case EFI_IFR_VERSION_OP:
@@ -1214,6 +1215,7 @@ ParseOpCodes (
     case EFI_IFR_ACTION_OP:
       CurrentStatement = CreateQuestion (OpCodeData, FormSet, CurrentForm);
       ASSERT (CurrentStatement != NULL);
+      CurrentStatement->HiiValue.Type = EFI_IFR_TYPE_ACTION;
 
       if (OpCodeLength == sizeof (EFI_IFR_ACTION_1)) {
         //
@@ -1228,6 +1230,7 @@ ParseOpCodes (
     case EFI_IFR_REF_OP:
       CurrentStatement = CreateQuestion (OpCodeData, FormSet, CurrentForm);
       ASSERT (CurrentStatement != NULL);
+      CurrentStatement->HiiValue.Type = EFI_IFR_TYPE_UNDEFINED;
       CopyMem (&CurrentStatement->RefFormId, &((EFI_IFR_REF *) OpCodeData)->FormId, sizeof (EFI_FORM_ID));
       if (OpCodeLength >= sizeof (EFI_IFR_REF2)) {
         CopyMem (&CurrentStatement->RefQuestionId, &((EFI_IFR_REF2 *) OpCodeData)->QuestionId, sizeof (EFI_QUESTION_ID));
@@ -1300,16 +1303,8 @@ ParseOpCodes (
       
       CurrentStatement->Flags = ((EFI_IFR_ORDERED_LIST *) OpCodeData)->Flags;
       CurrentStatement->MaxContainers = ((EFI_IFR_ORDERED_LIST *) OpCodeData)->MaxContainers;
-      CurrentStatement->StorageWidth = (UINT16)(CurrentStatement->MaxContainers * sizeof (UINT8));
-      InitializeRequestElement (FormSet, CurrentStatement);
 
-      //
-      // No buffer type is defined in EFI_IFR_TYPE_VALUE, so a Configuration Driver
-      // has to use FormBrowser2.Callback() to retrieve the uncommited data for
-      // an interactive orderedlist (i.e. with EFI_IFR_FLAG_CALLBACK flag set).
-      //
-      CurrentStatement->HiiValue.Type = EFI_IFR_TYPE_OTHER;
-      CurrentStatement->BufferValue = AllocateZeroPool (CurrentStatement->StorageWidth);
+      CurrentStatement->HiiValue.Type = EFI_IFR_TYPE_BUFFER;
 
       if (Scope != 0) {
         SuppressForOption = TRUE;
@@ -1459,6 +1454,42 @@ ParseOpCodes (
       // Insert to Option list of current Question
       //
       InsertTailList (&CurrentStatement->OptionListHead, &CurrentOption->Link);
+
+      //
+      // Now we know the Storage width of nested Ordered List
+      //
+      if ((CurrentStatement->Operand == EFI_IFR_ORDERED_LIST_OP) && (CurrentStatement->BufferValue == NULL)) {
+        Width = 1;
+        switch (CurrentOption->Value.Type) {
+        case EFI_IFR_TYPE_NUM_SIZE_8:
+          Width = 1;
+          break;
+
+        case EFI_IFR_TYPE_NUM_SIZE_16:
+          Width = 2;
+          break;
+
+        case EFI_IFR_TYPE_NUM_SIZE_32:
+          Width = 4;
+          break;
+
+        case EFI_IFR_TYPE_NUM_SIZE_64:
+          Width = 8;
+          break;
+
+        default:
+          //
+          // Invalid type for Ordered List
+          //
+          break;
+        }
+
+        CurrentStatement->StorageWidth = (UINT16) (CurrentStatement->MaxContainers * Width);
+        CurrentStatement->BufferValue = AllocateZeroPool (CurrentStatement->StorageWidth);
+        CurrentStatement->ValueType = CurrentOption->Value.Type;
+
+        InitializeRequestElement (FormSet, CurrentStatement);
+      }
       break;
 
     //
