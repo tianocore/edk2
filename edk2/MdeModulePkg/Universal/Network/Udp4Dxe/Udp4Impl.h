@@ -45,7 +45,7 @@ extern UINT16                          mUdp4RandomPort;
 
 #define UDP4_TIMEOUT_INTERVAL (50 * TICKS_PER_MS)  // 50 milliseconds
 
-#define UDP4_HEADER_SIZE      sizeof (EFI_UDP4_HEADER)
+#define UDP4_HEADER_SIZE      sizeof (EFI_UDP_HEADER)
 #define UDP4_MAX_DATA_SIZE    65507
 
 #define UDP4_PORT_KNOWN       1024

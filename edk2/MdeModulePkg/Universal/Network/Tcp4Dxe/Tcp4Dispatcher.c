@@ -1,7 +1,7 @@
 /** @file
   Tcp request dispatcher implementation.
 
-Copyright (c) 2005 - 2006, Intel Corporation<BR>
+Copyright (c) 2005 - 2009, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -357,7 +357,7 @@ Tcp4ConfigurePcb (
   //
   // Add Ip for send pkt to the peer
   //
-  CopyMem (&IpCfgData, &mIpIoDefaultIpConfigData, sizeof (IpCfgData));
+  CopyMem (&IpCfgData, &mIp4IoDefaultIpConfigData, sizeof (IpCfgData));
   IpCfgData.DefaultProtocol   = EFI_IP_PROTO_TCP;
   IpCfgData.UseDefaultAddress = CfgData->AccessPoint.UseDefaultAddress;
   IpCfgData.StationAddress    = CfgData->AccessPoint.StationAddress;
@@ -605,7 +605,7 @@ Tcp4Dispatcher (
 
   switch (Request) {
   case SOCK_POLL:
-    Ip = ProtoData->TcpService->IpIo->Ip;
+    Ip = (EFI_IP4_PROTOCOL *) (ProtoData->TcpService->IpIo->Ip);
     Ip->Poll (Ip);
     break;
 

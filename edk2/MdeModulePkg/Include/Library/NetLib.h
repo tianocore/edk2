@@ -16,6 +16,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _NET_LIB_H_
 #define _NET_LIB_H_
 
+#include <Protocol/Ip6.h>
+
 typedef UINT32          IP4_ADDR;
 typedef UINT32          TCP_SEQNO;
 typedef UINT16          TCP_PORTNO;
@@ -39,6 +41,15 @@ typedef enum {
 
   IP4_MASK_NUM          = 33
 } IP4_CLASS_TYPE;
+
+typedef enum {
+  IP6_HOP_BY_HOP        = 0,
+  IP6_DESTINATION       = 60,
+  IP6_FRAGMENT          = 44,
+  IP6_AH                = 51,
+  IP6_ESP               = 50,
+  IP6_NO_NEXT_HEADER    = 59
+} IP6_EXTENSION_HEADER_TYPE;
 
 #pragma pack(1)
 
@@ -95,6 +106,22 @@ typedef struct {
   UINT16                Seq;
 } IP4_ICMP_QUERY_HEAD;
 
+typedef struct {
+  UINT8                 Type;
+  UINT8                 Code;
+  UINT16                Checksum;
+} IP6_ICMP_HEAD;
+
+typedef struct {
+  IP6_ICMP_HEAD         Head;
+  UINT32                Fourth;
+  EFI_IP6_HEADER        IpHead;
+} IP6_ICMP_ERROR_HEAD;
+
+typedef struct {
+  IP6_ICMP_HEAD         Head;
+  UINT32                Fourth;
+} IP6_ICMP_INFORMATION_HEAD;
 
 //
 // UDP header definition
@@ -104,8 +131,7 @@ typedef struct {
   UINT16                DstPort;
   UINT16                Length;
   UINT16                Checksum;
-} EFI_UDP4_HEADER;
-
+} EFI_UDP_HEADER;
 
 //
 // TCP header definition
@@ -159,6 +185,9 @@ typedef struct {
 #define EFI_IP4(EfiIpAddr)       (*(IP4_ADDR *) ((EfiIpAddr).Addr))
 #define EFI_NTOHL(EfiIp)         (NTOHL (EFI_IP4 ((EfiIp))))
 #define EFI_IP4_EQUAL(Ip1, Ip2)  (CompareMem ((Ip1), (Ip2), sizeof (EFI_IPv4_ADDRESS)) == 0)
+
+#define EFI_IP6_EQUAL(Ip1, Ip2)  (CompareMem ((Ip1), (Ip2), sizeof (EFI_IPv6_ADDRESS)) == 0)
+
 
 /**
   Return the length of the mask. 
@@ -225,6 +254,25 @@ EFIAPI
 Ip4IsUnicast (
   IN IP4_ADDR               Ip,
   IN IP4_ADDR               NetMask
+  );
+
+/**
+  Check whether the incoming IPv6 address is a valid unicast address.
+
+  If the address is a multicast address has binary 0xFF at the start, it is not
+  a valid unicast address. If the address is unspecified ::, it is not a valid
+  unicast address to be assigned to any node. If the address is loopback address
+  ::1, it is also not a valid unicast address to be assigned to any physical
+  interface. 
+
+  @param[in]  Ip6                   The IPv6 address to check against.
+
+  @return TRUE if Ip6 is a valid unicast address on the network, otherwise FALSE.
+
+**/ 
+BOOLEAN
+Ip6IsValidUnicast (
+  IN EFI_IPv6_ADDRESS       *Ip6
   );
 
 extern IP4_ADDR gIp4AllMasks[IP4_MASK_NUM];

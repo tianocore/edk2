@@ -270,8 +270,9 @@ Udp4CreateService (
   IN     EFI_HANDLE         ControllerHandle
   )
 {
-  EFI_STATUS       Status;
-  IP_IO_OPEN_DATA  OpenData;
+  EFI_STATUS          Status;
+  IP_IO_OPEN_DATA     OpenData;
+  EFI_IP4_CONFIG_DATA *Ip4ConfigData;
 
   ZeroMem (Udp4Service, sizeof (UDP4_SERVICE_DATA));
 
@@ -286,7 +287,7 @@ Udp4CreateService (
   //
   // Create the IpIo for this service context.
   //
-  Udp4Service->IpIo = IpIoCreate (ImageHandle, ControllerHandle);
+  Udp4Service->IpIo = IpIoCreate (ImageHandle, ControllerHandle, IP_VERSION_4);
   if (Udp4Service->IpIo == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -294,12 +295,13 @@ Udp4CreateService (
   //
   // Set the OpenData used to open the IpIo.
   //
-  CopyMem (&OpenData.IpConfigData, &mIpIoDefaultIpConfigData, sizeof (OpenData.IpConfigData));
-  OpenData.IpConfigData.AcceptBroadcast = TRUE;
-  OpenData.RcvdContext                  = (VOID *) Udp4Service;
-  OpenData.SndContext                   = NULL;
-  OpenData.PktRcvdNotify                = Udp4DgramRcvd;
-  OpenData.PktSentNotify                = Udp4DgramSent;
+  Ip4ConfigData = &OpenData.IpConfigData.Ip4CfgData;
+  CopyMem (Ip4ConfigData, &mIp4IoDefaultIpConfigData, sizeof (EFI_IP4_CONFIG_DATA));
+  Ip4ConfigData->AcceptBroadcast = TRUE;
+  OpenData.RcvdContext           = (VOID *) Udp4Service;
+  OpenData.SndContext            = NULL;
+  OpenData.PktRcvdNotify         = Udp4DgramRcvd;
+  OpenData.PktSentNotify         = Udp4DgramSent;
 
   //
   // Configure and start the IpIo.
@@ -731,7 +733,7 @@ Udp4BuildIp4ConfigData (
   IN OUT EFI_IP4_CONFIG_DATA   *Ip4ConfigData
   )
 {
-  CopyMem (Ip4ConfigData, &mIpIoDefaultIpConfigData, sizeof (*Ip4ConfigData));
+  CopyMem (Ip4ConfigData, &mIp4IoDefaultIpConfigData, sizeof (*Ip4ConfigData));
 
   Ip4ConfigData->DefaultProtocol   = EFI_IP_PROTO_UDP;
   Ip4ConfigData->AcceptBroadcast   = Udp4ConfigData->AcceptBroadcast;
@@ -1592,7 +1594,7 @@ Udp4Demultiplex (
   IN NET_BUF               *Packet
   )
 {
-  EFI_UDP4_HEADER        *Udp4Header;
+  EFI_UDP_HEADER        *Udp4Header;
   UINT16                 HeadSum;
   EFI_UDP4_RECEIVE_DATA  RxData;
   EFI_UDP4_SESSION_DATA  *Udp4Session;
@@ -1601,15 +1603,15 @@ Udp4Demultiplex (
   //
   // Get the datagram header from the packet buffer.
   //
-  Udp4Header = (EFI_UDP4_HEADER *) NetbufGetByte (Packet, 0, NULL);
+  Udp4Header = (EFI_UDP_HEADER *) NetbufGetByte (Packet, 0, NULL);
 
   if (Udp4Header->Checksum != 0) {
     //
     // check the checksum.
     //
     HeadSum = NetPseudoHeadChecksum (
-                NetSession->Source,
-                NetSession->Dest,
+                NetSession->Source.Addr[0],
+                NetSession->Dest.Addr[0],
                 EFI_IP_PROTO_UDP,
                 0
                 );
@@ -1689,7 +1691,7 @@ Udp4SendPortUnreach (
   IP_IO_OVERRIDE       Override;
   IP_IO_IP_INFO        *IpSender;
 
-  IpSender = IpIoFindSender (&IpIo, NetSession->Dest);
+  IpSender = IpIoFindSender (&IpIo, NetSession->IpVersion, &NetSession->Dest);
   if (IpSender == NULL) {
     //
     // No apropriate sender, since we cannot send out the ICMP message through
@@ -1698,7 +1700,7 @@ Udp4SendPortUnreach (
     return;
   }
 
-  IpHdr = NetSession->IpHdr;
+  IpHdr = NetSession->IpHdr.Ip4Hdr;
 
   //
   // Calculate the requried length of the icmp error message.
@@ -1747,18 +1749,18 @@ Udp4SendPortUnreach (
   //
   // Fill the override data.
   //
-  Override.DoNotFragment = FALSE;
-  Override.TypeOfService = 0;
-  Override.TimeToLive    = 255;
-  Override.Protocol      = EFI_IP_PROTO_ICMP;
+  Override.Ip4OverrideData.DoNotFragment = FALSE;
+  Override.Ip4OverrideData.TypeOfService = 0;
+  Override.Ip4OverrideData.TimeToLive    = 255;
+  Override.Ip4OverrideData.Protocol      = EFI_IP_PROTO_ICMP;
 
-  CopyMem (&Override.SourceAddress, &NetSession->Dest, sizeof (EFI_IPv4_ADDRESS));
-  ZeroMem (&Override.GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&Override.Ip4OverrideData.SourceAddress, &NetSession->Dest, sizeof (EFI_IPv4_ADDRESS));
+  ZeroMem (&Override.Ip4OverrideData.GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
 
   //
   // Send out this icmp packet.
   //
-  IpIoSend (IpIo, Packet, IpSender, NULL, NULL, NetSession->Source, &Override);
+  IpIoSend (IpIo, Packet, IpSender, NULL, NULL, &NetSession->Source, &Override);
 
   NetbufFree (Packet);
 }
@@ -1783,12 +1785,12 @@ Udp4IcmpHandler (
   IN NET_BUF               *Packet
   )
 {
-  EFI_UDP4_HEADER        *Udp4Header;
+  EFI_UDP_HEADER        *Udp4Header;
   EFI_UDP4_SESSION_DATA  Udp4Session;
   LIST_ENTRY             *Entry;
   UDP4_INSTANCE_DATA     *Instance;
 
-  Udp4Header = (EFI_UDP4_HEADER *) NetbufGetByte (Packet, 0, NULL);
+  Udp4Header = (EFI_UDP_HEADER *) NetbufGetByte (Packet, 0, NULL);
 
   CopyMem (&Udp4Session.SourceAddress, &NetSession->Source, sizeof (EFI_IPv4_ADDRESS));
   CopyMem (&Udp4Session.DestinationAddress, &NetSession->Dest, sizeof (EFI_IPv4_ADDRESS));
@@ -1819,7 +1821,7 @@ Udp4IcmpHandler (
       //
       // Translate the Icmp Error code according to the udp spec.
       //
-      Instance->IcmpError = IpIoGetIcmpErrStatus (IcmpError, NULL, NULL);
+      Instance->IcmpError = IpIoGetIcmpErrStatus (IcmpError, IP_VERSION_4, NULL, NULL);
 
       if (IcmpError > ICMP_ERR_UNREACH_PORT) {
         Instance->IcmpError = EFI_ICMP_ERROR;

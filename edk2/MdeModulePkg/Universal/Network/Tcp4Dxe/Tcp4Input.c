@@ -1,7 +1,7 @@
 /** @file
   TCP input process routines.
 
-Copyright (c) 2005 - 2007, Intel Corporation<BR>
+Copyright (c) 2005 - 2009, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1441,7 +1441,12 @@ TcpIcmpInput (
     goto CLEAN_EXIT;
   }
 
-  IcmpErrStatus = IpIoGetIcmpErrStatus (IcmpErr, &IcmpErrIsHard, &IcmpErrNotify);
+  IcmpErrStatus = IpIoGetIcmpErrStatus (
+                    IcmpErr,
+                    IP_VERSION_4,
+                    &IcmpErrIsHard,
+                    &IcmpErrNotify
+                    );
 
   if (IcmpErrNotify) {
 
