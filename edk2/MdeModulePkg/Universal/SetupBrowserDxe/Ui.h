@@ -190,6 +190,7 @@ typedef struct {
 } SCREEN_OPERATION_T0_CONTROL_FLAG;
 
 
+extern LIST_ENTRY          gMenuOption;
 extern MENU_REFRESH_ENTRY  *gMenuRefreshHead;
 extern UI_MENU_SELECTION   *gCurrentSelection;
 extern BOOLEAN             mHiiPackageListUpdated;
