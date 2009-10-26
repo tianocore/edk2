@@ -44,7 +44,6 @@ BOOLEAN               gDownArrow;
 //
 // Browser Global Strings
 //
-CHAR16            *gFunctionOneString;
 CHAR16            *gFunctionNineString;
 CHAR16            *gFunctionTenString;
 CHAR16            *gEnterString;
@@ -2500,10 +2499,6 @@ InitializeFormSet (
       //
       // Function key prompt can not be displayed if the function key has been disabled.
       //
-      if ((gFunctionKeySetting & FUNCTION_ONE) != FUNCTION_ONE) {
-        gFunctionOneString = GetToken (STRING_TOKEN (EMPTY_STRING), gHiiHandle);
-      }
-
       if ((gFunctionKeySetting & FUNCTION_NINE) != FUNCTION_NINE) {
         gFunctionNineString = GetToken (STRING_TOKEN (EMPTY_STRING), gHiiHandle);
       }

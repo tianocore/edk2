@@ -108,6 +108,11 @@ typedef struct {
   FORM_BROWSER_FORMSET    *FormSet;
   FORM_BROWSER_FORM       *Form;
   FORM_BROWSER_STATEMENT  *Statement;
+
+  //
+  // Whether the Form is editable
+  //
+  BOOLEAN                 FormEditable;
 } UI_MENU_SELECTION;
 
 #define UI_MENU_OPTION_SIGNATURE  SIGNATURE_32 ('u', 'i', 'm', 'm')
@@ -140,6 +145,11 @@ typedef struct {
 
   BOOLEAN                 GrayOut;
   BOOLEAN                 ReadOnly;
+
+  //
+  // Whether user could change value of this item
+  //
+  BOOLEAN                 IsQuestion;
 } UI_MENU_OPTION;
 
 #define MENU_OPTION_FROM_LINK(a)  CR (a, UI_MENU_OPTION, Link, UI_MENU_OPTION_SIGNATURE)
@@ -280,8 +290,10 @@ UiFreeRefreshList (
   @param  NumberOfLines          Display lines for this Menu Option.
   @param  MenuItemCount          The index for this Option in the Menu.
 
+  @retval Pointer                Pointer to the added Menu Option.
+
 **/
-VOID
+UI_MENU_OPTION *
 UiAddMenuOption (
   IN CHAR16                  *String,
   IN EFI_HII_HANDLE          Handle,
@@ -589,12 +601,14 @@ ProcessHelpString (
 /**
   Update key's help imformation.
 
+  @param Selection       Tell setup browser the information about the Selection
   @param  MenuOption     The Menu option
   @param  Selected       Whether or not a tag be selected
 
 **/
 VOID
 UpdateKeyHelp (
+  IN  UI_MENU_SELECTION           *Selection,
   IN  UI_MENU_OPTION              *MenuOption,
   IN  BOOLEAN                     Selected
   );
@@ -611,11 +625,11 @@ UpdateKeyHelp (
 **/
 VOID
 ClearLines (
-  UINTN                                       LeftColumn,
-  UINTN                                       RightColumn,
-  UINTN                                       TopRow,
-  UINTN                                       BottomRow,
-  UINTN                                       TextAttribute
+  IN UINTN               LeftColumn,
+  IN UINTN               RightColumn,
+  IN UINTN               TopRow,
+  IN UINTN               BottomRow,
+  IN UINTN               TextAttribute
   );
 
 /**
@@ -634,7 +648,7 @@ ClearLines (
 **/
 UINTN
 GetStringWidth (
-  CHAR16                                      *String
+  IN CHAR16               *String
   );
 
 /**
@@ -683,8 +697,8 @@ GetWidth (
 **/
 VOID
 NewStrCat (
-  CHAR16                                      *Destination,
-  CHAR16                                      *Source
+  IN OUT CHAR16               *Destination,
+  IN     CHAR16               *Source
   );
 
 /**

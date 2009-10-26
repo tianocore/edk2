@@ -71,9 +71,8 @@ extern UINT8  SetupBrowserStrings[];
 // Definition for function key setting
 //
 #define NONE_FUNCTION_KEY_SETTING     0
-#define DEFAULT_FUNCTION_KEY_SETTING  (FUNCTION_ONE | FUNCTION_NINE | FUNCTION_TEN)
+#define DEFAULT_FUNCTION_KEY_SETTING  (FUNCTION_NINE | FUNCTION_TEN)
 
-#define FUNCTION_ONE                  (1 << 0)
 #define FUNCTION_NINE                 (1 << 2)
 #define FUNCTION_TEN                  (1 << 3)
 
@@ -466,7 +465,6 @@ extern FORM_BROWSER_FORMSET  *gOldFormSet;
 //
 // Browser Global Strings
 //
-extern CHAR16            *gFunctionOneString;
 extern CHAR16            *gFunctionNineString;
 extern CHAR16            *gFunctionTenString;
 extern CHAR16            *gEnterString;

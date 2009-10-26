@@ -512,7 +512,7 @@ InitializeUnicodeCollationProtocol (
 **/
 VOID
 IfrStrToUpper (
-  CHAR16                   *String
+  IN CHAR16                   *String
   )
 {
   while (*String != 0) {
@@ -635,7 +635,7 @@ IfrToUint (
     if (String == NULL) {
       return EFI_NOT_FOUND;
     }
-    
+
     IfrStrToUpper (String);
     StringPtr = StrStr (String, L"0X");
     if (StringPtr != NULL) {
@@ -724,7 +724,7 @@ Done:
   }
   if (String[1] != NULL) {
     FreePool (String[1]);
-  }  
+  }
   if (StringPtr != NULL) {
     FreePool (StringPtr);
   }
@@ -788,7 +788,7 @@ Done:
   }
   if (String[1] != NULL) {
     FreePool (String[1]);
-  }  
+  }
 
   return Status;
 }
@@ -877,7 +877,7 @@ Done:
   }
   if (String[1] != NULL) {
     FreePool (String[1]);
-  }  
+  }
 
   return Status;
 }
@@ -1051,7 +1051,7 @@ Done:
   }
   if (String[1] != NULL) {
     FreePool (String[1]);
-  }  
+  }
 
   return Status;
 }
@@ -1159,7 +1159,7 @@ Done:
   }
   if (String[1] != NULL) {
     FreePool (String[1]);
-  }  
+  }
 
   return Status;
 }
