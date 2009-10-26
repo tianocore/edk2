@@ -867,6 +867,52 @@ SetupBrowser (
   }
 
   //
+  // Before display the formset, invoke ConfigAccess.Callback() with EFI_BROWSER_ACTION_FORM_OPEN
+  //
+  ConfigAccess = Selection->FormSet->ConfigAccess;
+  if ((ConfigAccess != NULL) && (Selection->Action != UI_ACTION_REFRESH_FORMSET)) {
+    ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
+    mHiiPackageListUpdated = FALSE;
+    Status = ConfigAccess->Callback (
+                             ConfigAccess,
+                             EFI_BROWSER_ACTION_FORM_OPEN,
+                             0,
+                             EFI_IFR_TYPE_UNDEFINED,
+                             NULL,
+                             &ActionRequest
+                             );
+
+    if (!EFI_ERROR (Status)) {
+      switch (ActionRequest) {
+      case EFI_BROWSER_ACTION_REQUEST_RESET:
+        gResetRequired = TRUE;
+        break;
+
+      case EFI_BROWSER_ACTION_REQUEST_SUBMIT:
+        //
+        // Till now there is no uncommitted data, so ignore this request
+        //
+        break;
+
+      case EFI_BROWSER_ACTION_REQUEST_EXIT:
+        Selection->Action = UI_ACTION_EXIT;
+        break;
+
+      default:
+        break;
+      }
+    }
+
+    if (mHiiPackageListUpdated) {
+      //
+      // IFR is updated during callback, force to reparse the IFR binary
+      //
+      Selection->Action = UI_ACTION_REFRESH_FORMSET;
+      goto Done;
+    }
+  }
+
+  //
   // Initialize current settings of Questions in this FormSet
   //
   Status = InitializeCurrentSetting (Selection->FormSet);
@@ -944,7 +990,6 @@ SetupBrowser (
           HiiValue->Value.string = NewString ((CHAR16 *) Statement->BufferValue, Selection->FormSet->HiiHandle);
         }
 
-        ConfigAccess = Selection->FormSet->ConfigAccess;
         if (ConfigAccess == NULL) {
           return EFI_UNSUPPORTED;
         }
@@ -1007,6 +1052,40 @@ SetupBrowser (
       }
     }
   } while (Selection->Action == UI_ACTION_REFRESH_FORM);
+
+  //
+  // Before exit the formset, invoke ConfigAccess.Callback() with EFI_BROWSER_ACTION_FORM_CLOSE
+  //
+  if ((ConfigAccess != NULL) && (Selection->Action == UI_ACTION_EXIT)) {
+    ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
+    Status = ConfigAccess->Callback (
+                             ConfigAccess,
+                             EFI_BROWSER_ACTION_FORM_CLOSE,
+                             0,
+                             EFI_IFR_TYPE_UNDEFINED,
+                             NULL,
+                             &ActionRequest
+                             );
+
+    if (!EFI_ERROR (Status)) {
+      switch (ActionRequest) {
+      case EFI_BROWSER_ACTION_REQUEST_RESET:
+        gResetRequired = TRUE;
+        break;
+
+      case EFI_BROWSER_ACTION_REQUEST_SUBMIT:
+        SubmitForm (Selection->FormSet, Selection->Form);
+        break;
+
+      case EFI_BROWSER_ACTION_REQUEST_EXIT:
+        gNvUpdateRequired = FALSE;
+        break;
+
+      default:
+        break;
+      }
+    }
+  }
 
   //
   // Record the old formset
