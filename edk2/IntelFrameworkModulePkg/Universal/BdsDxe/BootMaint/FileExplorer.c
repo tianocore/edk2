@@ -139,9 +139,9 @@ UpdateFileExplorer (
 
     CallbackData->FeDisplayContext  = FileExplorerDisplayDirectory;
 
-    NewFileContext                  = (BM_FILE_CONTEXT *) NewMenuEntry->VariableContext;
-
     if (NewFileContext->IsDir ) {
+      NewFileContext = (BM_FILE_CONTEXT *) NewMenuEntry->VariableContext;
+
       RemoveEntryList (&NewMenuEntry->Link);
       BOpt_FreeMenu (&DirectoryMenu);
       Status = BOpt_FindFiles (CallbackData, NewMenuEntry);
