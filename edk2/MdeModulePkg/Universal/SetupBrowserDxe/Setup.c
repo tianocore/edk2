@@ -1,7 +1,7 @@
 /** @file
 Entry and initialization module for the browser.
 
-Copyright (c) 2007 - 2008, Intel Corporation
+Copyright (c) 2007 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -45,7 +45,6 @@ BOOLEAN               gDownArrow;
 // Browser Global Strings
 //
 CHAR16            *gFunctionOneString;
-CHAR16            *gFunctionTwoString;
 CHAR16            *gFunctionNineString;
 CHAR16            *gFunctionTenString;
 CHAR16            *gEnterString;
@@ -86,6 +85,8 @@ EFI_GUID  gZeroGuid = {0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}};
 EFI_GUID  gSetupBrowserGuid = {
   0xab368524, 0xb60c, 0x495b, {0xa0, 0x9, 0x12, 0xe8, 0x5b, 0x1a, 0xea, 0x32}
 };
+
+FORM_BROWSER_FORMSET  *gOldFormSet = NULL;
 
 FUNCTIION_KEY_SETTING gFunctionKeySettingTable[] = {
   //
@@ -190,7 +191,7 @@ FUNCTIION_KEY_SETTING gFunctionKeySettingTable[] = {
   @param FormId          This field specifies which EFI_IFR_FORM to render as the first
                          displayable page. If this field has a value of 0x0000, then
                          the forms browser will render the specified forms in their encoded order.
-  @param ScreenDimensions Points to recommended form dimensions, including any non-content area, in 
+  @param ScreenDimensions Points to recommended form dimensions, including any non-content area, in
                           characters.
   @param ActionRequest   Points to the action recommended by the form.
 
@@ -287,6 +288,8 @@ SendForm (
       Selection->FormId = FormId;
     }
 
+    gNvUpdateRequired = FALSE;
+
     do {
       FormSet = AllocateZeroPool (sizeof (FORM_BROWSER_FORMSET));
       ASSERT (FormSet != NULL);
@@ -302,15 +305,6 @@ SendForm (
       Selection->FormSet = FormSet;
 
       //
-      // Initialize current settings of Questions in this FormSet
-      //
-      Status = InitializeCurrentSetting (FormSet);
-      if (EFI_ERROR (Status)) {
-        DestroyFormSet (FormSet);
-        break;
-      }
-
-      //
       // Display this formset
       //
       gCurrentSelection = Selection;
@@ -318,13 +312,17 @@ SendForm (
       Status = SetupBrowser (Selection);
 
       gCurrentSelection = NULL;
-      DestroyFormSet (FormSet);
 
       if (EFI_ERROR (Status)) {
         break;
       }
 
     } while (Selection->Action == UI_ACTION_REFRESH_FORMSET);
+
+    if (gOldFormSet != NULL) {
+      DestroyFormSet (gOldFormSet);
+      gOldFormSet = NULL;
+    }
 
     FreePool (Selection);
   }
@@ -1128,7 +1126,7 @@ GetQuestionValue (
       if (EFI_ERROR (Status)) {
         return Status;
       }
-      
+
       LengthStr = StrLen (Value);
       Status    = EFI_SUCCESS;
       if (IsString) {
@@ -1529,7 +1527,7 @@ SetQuestionValue (
         TemString += UnicodeValueToString (TemString, PREFIX_ZERO | RADIX_HEX, *TemBuffer, 2);
       }
     }
-    
+
     //
     // Convert to lower char.
     //
@@ -1893,7 +1891,7 @@ GetQuestionDefault (
     //
     // Take first oneof option as oneof's default value
     //
-    if (ValueToOption (Question, HiiValue) == NULL) {    
+    if (ValueToOption (Question, HiiValue) == NULL) {
       Link = GetFirstNode (&Question->OptionListHead);
       if (!IsNull (&Question->OptionListHead, Link)) {
         Option = QUESTION_OPTION_FROM_LINK (Link);
@@ -2027,6 +2025,42 @@ LoadFormConfig (
 
 
 /**
+  Initialize Question's Edit copy from Storage for the whole Formset.
+
+  @param  FormSet                FormSet data structure.
+
+  @retval EFI_SUCCESS            The function completed successfully.
+
+**/
+EFI_STATUS
+LoadFormSetConfig (
+  IN FORM_BROWSER_FORMSET             *FormSet
+  )
+{
+  EFI_STATUS          Status;
+  LIST_ENTRY          *Link;
+  FORM_BROWSER_FORM   *Form;
+
+  Link = GetFirstNode (&FormSet->FormListHead);
+  while (!IsNull (&FormSet->FormListHead, Link)) {
+    Form = FORM_BROWSER_FORM_FROM_LINK (Link);
+
+    //
+    // Initialize local copy of Value for each Form
+    //
+    Status = LoadFormConfig (FormSet, Form);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    Link = GetNextNode (&FormSet->FormListHead, Link);
+  }
+
+  return EFI_SUCCESS;
+}
+
+
+/**
   Fill storage's edit copy with settings requested from Configuration Driver.
 
   @param  FormSet                FormSet data structure.
@@ -2089,6 +2123,54 @@ LoadStorage (
 
 
 /**
+  Copy uncommitted data from source Storage to destination Storage.
+
+  @param  Dst                    Target Storage for uncommitted data.
+  @param  Src                    Source Storage for uncommitted data.
+
+  @retval EFI_SUCCESS            The function completed successfully.
+  @retval EFI_INVALID_PARAMETER  Source and destination Storage is not the same type.
+
+**/
+EFI_STATUS
+CopyStorage (
+  IN OUT FORMSET_STORAGE     *Dst,
+  IN FORMSET_STORAGE         *Src
+  )
+{
+  LIST_ENTRY          *Link;
+  NAME_VALUE_NODE     *Node;
+
+  if ((Dst->Type != Src->Type) || (Dst->Size != Src->Size)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  switch (Src->Type) {
+  case EFI_HII_VARSTORE_BUFFER:
+    CopyMem (Dst->EditBuffer, Src->EditBuffer, Src->Size);
+    break;
+
+  case EFI_HII_VARSTORE_NAME_VALUE:
+    Link = GetFirstNode (&Src->NameValueListHead);
+    while (!IsNull (&Src->NameValueListHead, Link)) {
+      Node = NAME_VALUE_NODE_FROM_LINK (Link);
+
+      SetValueByName (Dst, Node->Name, Node->EditValue);
+
+      Link = GetNextNode (&Src->NameValueListHead, Link);
+    }
+    break;
+
+  case EFI_HII_VARSTORE_EFI_VARIABLE:
+  default:
+    break;
+  }
+
+  return EFI_SUCCESS;
+}
+
+
+/**
   Get current setting of Questions.
 
   @param  FormSet                FormSet data structure.
@@ -2102,7 +2184,10 @@ InitializeCurrentSetting (
   )
 {
   LIST_ENTRY              *Link;
+  LIST_ENTRY              *Link2;
   FORMSET_STORAGE         *Storage;
+  FORMSET_STORAGE         *StorageSrc;
+  FORMSET_STORAGE         *OldStorage;
   FORM_BROWSER_FORM       *Form;
   EFI_STATUS              Status;
 
@@ -2125,7 +2210,35 @@ InitializeCurrentSetting (
   while (!IsNull (&FormSet->StorageListHead, Link)) {
     Storage = FORMSET_STORAGE_FROM_LINK (Link);
 
-    Status = LoadStorage (FormSet, Storage);
+    OldStorage = NULL;
+    if (gOldFormSet != NULL) {
+      //
+      // Try to find the Storage in backup formset gOldFormSet
+      //
+      Link2 = GetFirstNode (&gOldFormSet->StorageListHead);
+      while (!IsNull (&gOldFormSet->StorageListHead, Link2)) {
+        StorageSrc = FORMSET_STORAGE_FROM_LINK (Link2);
+
+        if (StorageSrc->VarStoreId == Storage->VarStoreId) {
+          OldStorage = StorageSrc;
+          break;
+        }
+
+        Link2 = GetNextNode (&gOldFormSet->StorageListHead, Link2);
+      }
+    }
+
+    if (OldStorage == NULL) {
+      //
+      // Storage is not found in backup formset, request it from ConfigDriver
+      //
+      Status = LoadStorage (FormSet, Storage);
+    } else {
+      //
+      // Storage found in backup formset, use it
+      //
+      Status = CopyStorage (Storage, OldStorage);
+    }
 
     //
     // Now Edit Buffer is filled with default values(lower priority) and current
@@ -2211,7 +2324,7 @@ GetIfrBinaryData (
     return Status;
   }
   ASSERT (HiiPackageList != NULL);
-  
+
   //
   // Get Form package from this HII package List
   //
@@ -2389,10 +2502,6 @@ InitializeFormSet (
       //
       if ((gFunctionKeySetting & FUNCTION_ONE) != FUNCTION_ONE) {
         gFunctionOneString = GetToken (STRING_TOKEN (EMPTY_STRING), gHiiHandle);
-      }
-
-      if ((gFunctionKeySetting & FUNCTION_TWO) != FUNCTION_TWO) {
-        gFunctionTwoString = GetToken (STRING_TOKEN (EMPTY_STRING), gHiiHandle);
       }
 
       if ((gFunctionKeySetting & FUNCTION_NINE) != FUNCTION_NINE) {

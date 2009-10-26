@@ -1,7 +1,7 @@
 /** @file
 Private structure, MACRO and function definitions for User Interface related functionalities.
 
-Copyright (c) 2004 - 2008, Intel Corporation
+Copyright (c) 2004 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -58,7 +58,6 @@ typedef enum {
   CfPrepareToReadKey,
   CfReadKey,
   CfScreenOperation,
-  CfUiPrevious,
   CfUiSelect,
   CfUiReset,
   CfUiLeft,
@@ -145,13 +144,21 @@ typedef struct {
 
 #define MENU_OPTION_FROM_LINK(a)  CR (a, UI_MENU_OPTION, Link, UI_MENU_OPTION_SIGNATURE)
 
-typedef struct {
-  UINTN           Signature;
-  LIST_ENTRY      MenuLink;
+typedef struct _UI_MENU_LIST UI_MENU_LIST;
 
+struct _UI_MENU_LIST {
+  UINTN           Signature;
+  LIST_ENTRY      Link;
+
+  EFI_GUID        FormSetGuid;
   UINT16          FormId;
   UINT16          QuestionId;
-} UI_MENU_LIST;
+
+  UI_MENU_LIST    *Parent;
+  LIST_ENTRY      ChildListHead;
+};
+
+#define UI_MENU_LIST_FROM_LINK(a)  CR (a, UI_MENU_LIST, Link, UI_MENU_LIST_SIGNATURE)
 
 typedef struct _MENU_REFRESH_ENTRY {
   struct _MENU_REFRESH_ENTRY  *Next;
@@ -173,7 +180,6 @@ typedef struct {
 } SCREEN_OPERATION_T0_CONTROL_FLAG;
 
 
-extern LIST_ENTRY          gMenuList;
 extern MENU_REFRESH_ENTRY  *gMenuRefreshHead;
 extern UI_MENU_SELECTION   *gCurrentSelection;
 extern BOOLEAN             mHiiPackageListUpdated;
@@ -200,42 +206,68 @@ UiInitMenuList (
   );
 
 /**
-  Remove a Menu in list, and return FormId/QuestionId for previous Menu.
-
-  @param  Selection              Menu selection.
-
-**/
-VOID
-UiRemoveMenuListEntry (
-  OUT UI_MENU_SELECTION  *Selection
-  );
-
-/**
-  Free Menu option linked list.
-
-**/
-VOID
-UiFreeMenuList (
-  VOID
-  );
-
-/**
-  Add one menu entry to the linked lst
-
-  @param  Selection              Menu selection.
-
-**/
-VOID
-UiAddMenuListEntry (
-  IN UI_MENU_SELECTION            *Selection
-  );
-
-/**
   Free Menu option linked list.
 
 **/
 VOID
 UiFreeMenu (
+  VOID
+  );
+
+/**
+  Create a menu with specified formset GUID and form ID, and add it as a child
+  of the given parent menu.
+
+  @param  Parent                 The parent of menu to be added.
+  @param  FormSetGuid            The Formset Guid of menu to be added.
+  @param  FormId                 The Form ID of menu to be added.
+
+  @return A pointer to the newly added menu or NULL if memory is insufficient.
+
+**/
+UI_MENU_LIST *
+UiAddMenuList (
+  IN OUT UI_MENU_LIST     *Parent,
+  IN EFI_GUID             *FormSetGuid,
+  IN UINT16               FormId
+  );
+
+/**
+  Search Menu with given FormId in the parent menu and all its child menus.
+
+  @param  Parent                 The parent of menu to search.
+  @param  FormId                 The Form ID of menu to search.
+
+  @return A pointer to menu found or NULL if not found.
+
+**/
+UI_MENU_LIST *
+UiFindChildMenuList (
+  IN UI_MENU_LIST         *Parent,
+  IN UINT16               FormId
+  );
+
+/**
+  Search Menu with given FormSetGuid and FormId in all cached menu list.
+
+  @param  FormSetGuid            The Formset GUID of the menu to search.
+  @param  FormId                 The Form ID of menu to search.
+
+  @return A pointer to menu found or NULL if not found.
+
+**/
+UI_MENU_LIST *
+UiFindMenuList (
+  IN EFI_GUID             *FormSetGuid,
+  IN UINT16               FormId
+  );
+
+/**
+  Free Menu option linked list.
+
+**/
+VOID
+UiFreeRefreshList (
   VOID
   );
 
@@ -557,7 +589,7 @@ ClearLines (
 
   This function handles the Unicode string with NARROW_CHAR
   and WIDE_CHAR control characters. NARROW_HCAR and WIDE_CHAR
-  does not count in the resultant output. If a WIDE_CHAR is 
+  does not count in the resultant output. If a WIDE_CHAR is
   hit, then 2 Unicode character will consume an output storage
   space with size of CHAR16 till a NARROW_CHAR is hit.
 
