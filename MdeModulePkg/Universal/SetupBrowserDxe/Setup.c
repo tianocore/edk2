@@ -29,6 +29,9 @@ EFI_HII_DATABASE_PROTOCOL         *mHiiDatabase;
 EFI_HII_STRING_PROTOCOL           *mHiiString;
 EFI_HII_CONFIG_ROUTING_PROTOCOL   *mHiiConfigRouting;
 
+UINTN           gBrowserContextCount = 0;
+LIST_ENTRY      gBrowserContextList = INITIALIZE_LIST_HEAD_VARIABLE (gBrowserContextList);
+
 BANNER_DATA           *gBannerData;
 EFI_HII_HANDLE        gFrontPageHandle;
 UINTN                 gClassOfVfr;
@@ -38,8 +41,6 @@ BOOLEAN               gNvUpdateRequired;
 EFI_HII_HANDLE        gHiiHandle;
 UINT16                gDirection;
 EFI_SCREEN_DESCRIPTOR gScreenDimensions;
-BOOLEAN               gUpArrow;
-BOOLEAN               gDownArrow;
 
 //
 // Browser Global Strings
@@ -85,7 +86,7 @@ EFI_GUID  gSetupBrowserGuid = {
   0xab368524, 0xb60c, 0x495b, {0xa0, 0x9, 0x12, 0xe8, 0x5b, 0x1a, 0xea, 0x32}
 };
 
-FORM_BROWSER_FORMSET  *gOldFormSet = NULL;
+FORM_BROWSER_FORMSET  *gOldFormSet;
 
 FUNCTIION_KEY_SETTING gFunctionKeySettingTable[] = {
   //
@@ -216,6 +217,11 @@ SendForm (
   UINTN                         Index;
   FORM_BROWSER_FORMSET          *FormSet;
 
+  //
+  // Save globals used by SendForm()
+  //
+  SaveBrowserContext ();
+
   Status = EFI_SUCCESS;
   ZeroMem (&gScreenDimensions, sizeof (EFI_SCREEN_DESCRIPTOR));
 
@@ -236,7 +242,8 @@ SendForm (
     if ((gScreenDimensions.RightColumn < ScreenDimensions->RightColumn) ||
         (gScreenDimensions.BottomRow < ScreenDimensions->BottomRow)
         ) {
-      return EFI_INVALID_PARAMETER;
+      Status = EFI_INVALID_PARAMETER;
+      goto Done;
     } else {
       //
       // Local dimension validation.
@@ -255,7 +262,8 @@ SendForm (
         ) {
         CopyMem (&gScreenDimensions, (VOID *) ScreenDimensions, sizeof (EFI_SCREEN_DESCRIPTOR));
       } else {
-        return EFI_INVALID_PARAMETER;
+        Status = EFI_INVALID_PARAMETER;
+        goto Done;
       }
     }
   }
@@ -287,6 +295,7 @@ SendForm (
       Selection->FormId = FormId;
     }
 
+    gOldFormSet = NULL;
     gNvUpdateRequired = FALSE;
 
     do {
@@ -337,6 +346,12 @@ SendForm (
 
   gST->ConOut->SetAttribute (gST->ConOut, EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK));
   gST->ConOut->ClearScreen (gST->ConOut);
+
+Done:
+  //
+  // Restore globals used by SendForm()
+  //
+  RestoreBrowserContext ();
 
   return Status;
 }
@@ -2510,4 +2525,165 @@ InitializeFormSet (
   }
 
   return Status;
+}
+
+
+/**
+  Save globals used by previous call to SendForm(). SendForm() may be called from 
+  HiiConfigAccess.Callback(), this will cause SendForm() be reentried.
+  So, save globals of previous call to SendForm() and restore them upon exit.
+
+**/
+VOID
+SaveBrowserContext (
+  VOID
+  )
+{
+  BROWSER_CONTEXT  *Context;
+
+  gBrowserContextCount++;
+  if (gBrowserContextCount == 1) {
+    //
+    // This is not reentry of SendForm(), no context to save
+    //
+    return;
+  }
+
+  Context = AllocatePool (sizeof (BROWSER_CONTEXT));
+  ASSERT (Context != NULL);
+
+  Context->Signature = BROWSER_CONTEXT_SIGNATURE;
+
+  //
+  // Save FormBrowser context
+  //
+  Context->BannerData           = gBannerData;
+  Context->ClassOfVfr           = gClassOfVfr;
+  Context->FunctionKeySetting   = gFunctionKeySetting;
+  Context->ResetRequired        = gResetRequired;
+  Context->NvUpdateRequired     = gNvUpdateRequired;
+  Context->Direction            = gDirection;
+  Context->FunctionNineString   = gFunctionNineString;
+  Context->FunctionTenString    = gFunctionTenString;
+  Context->EnterString          = gEnterString;
+  Context->EnterCommitString    = gEnterCommitString;
+  Context->EnterEscapeString    = gEnterEscapeString;
+  Context->EscapeString         = gEscapeString;
+  Context->SaveFailed           = gSaveFailed;
+  Context->MoveHighlight        = gMoveHighlight;
+  Context->MakeSelection        = gMakeSelection;
+  Context->DecNumericInput      = gDecNumericInput;
+  Context->HexNumericInput      = gHexNumericInput;
+  Context->ToggleCheckBox       = gToggleCheckBox;
+  Context->PromptForData        = gPromptForData;
+  Context->PromptForPassword    = gPromptForPassword;
+  Context->PromptForNewPassword = gPromptForNewPassword;
+  Context->ConfirmPassword      = gConfirmPassword;
+  Context->ConfirmError         = gConfirmError;
+  Context->PassowordInvalid     = gPassowordInvalid;
+  Context->PressEnter           = gPressEnter;
+  Context->EmptyString          = gEmptyString;
+  Context->AreYouSure           = gAreYouSure;
+  Context->YesResponse          = gYesResponse;
+  Context->NoResponse           = gNoResponse;
+  Context->MiniString           = gMiniString;
+  Context->PlusString           = gPlusString;
+  Context->MinusString          = gMinusString;
+  Context->AdjustNumber         = gAdjustNumber;
+  Context->SaveChanges          = gSaveChanges;
+  Context->OptionMismatch       = gOptionMismatch;
+  Context->PromptBlockWidth     = gPromptBlockWidth;
+  Context->OptionBlockWidth     = gOptionBlockWidth;
+  Context->HelpBlockWidth       = gHelpBlockWidth;
+  Context->OldFormSet           = gOldFormSet;
+  Context->MenuRefreshHead      = gMenuRefreshHead;
+
+  CopyMem (&Context->ScreenDimensions, &gScreenDimensions, sizeof (gScreenDimensions));
+  CopyMem (&Context->MenuOption, &gMenuOption, sizeof (gMenuOption));
+
+  //
+  // Insert to FormBrowser context list
+  //
+  InsertHeadList (&gBrowserContextList, &Context->Link);
+}
+
+
+/**
+  Restore globals used by previous call to SendForm().
+
+**/
+VOID
+RestoreBrowserContext (
+  VOID
+  )
+{
+  LIST_ENTRY       *Link;
+  BROWSER_CONTEXT  *Context;
+
+  ASSERT (gBrowserContextCount != 0);
+  gBrowserContextCount--;
+  if (gBrowserContextCount == 0) {
+    //
+    // This is not reentry of SendForm(), no context to restore
+    //
+    return;
+  }
+
+  ASSERT (!IsListEmpty (&gBrowserContextList));
+
+  Link = GetFirstNode (&gBrowserContextList);
+  Context = BROWSER_CONTEXT_FROM_LINK (Link);
+
+  //
+  // Restore FormBrowser context
+  //
+  gBannerData           = Context->BannerData;
+  gClassOfVfr           = Context->ClassOfVfr;
+  gFunctionKeySetting   = Context->FunctionKeySetting;
+  gResetRequired        = Context->ResetRequired;
+  gNvUpdateRequired     = Context->NvUpdateRequired;
+  gDirection            = Context->Direction;
+  gFunctionNineString   = Context->FunctionNineString;
+  gFunctionTenString    = Context->FunctionTenString;
+  gEnterString          = Context->EnterString;
+  gEnterCommitString    = Context->EnterCommitString;
+  gEnterEscapeString    = Context->EnterEscapeString;
+  gEscapeString         = Context->EscapeString;
+  gSaveFailed           = Context->SaveFailed;
+  gMoveHighlight        = Context->MoveHighlight;
+  gMakeSelection        = Context->MakeSelection;
+  gDecNumericInput      = Context->DecNumericInput;
+  gHexNumericInput      = Context->HexNumericInput;
+  gToggleCheckBox       = Context->ToggleCheckBox;
+  gPromptForData        = Context->PromptForData;
+  gPromptForPassword    = Context->PromptForPassword;
+  gPromptForNewPassword = Context->PromptForNewPassword;
+  gConfirmPassword      = Context->ConfirmPassword;
+  gConfirmError         = Context->ConfirmError;
+  gPassowordInvalid     = Context->PassowordInvalid;
+  gPressEnter           = Context->PressEnter;
+  gEmptyString          = Context->EmptyString;
+  gAreYouSure           = Context->AreYouSure;
+  gYesResponse          = Context->YesResponse;
+  gNoResponse           = Context->NoResponse;
+  gMiniString           = Context->MiniString;
+  gPlusString           = Context->PlusString;
+  gMinusString          = Context->MinusString;
+  gAdjustNumber         = Context->AdjustNumber;
+  gSaveChanges          = Context->SaveChanges;
+  gOptionMismatch       = Context->OptionMismatch;
+  gPromptBlockWidth     = Context->PromptBlockWidth;
+  gOptionBlockWidth     = Context->OptionBlockWidth;
+  gHelpBlockWidth       = Context->HelpBlockWidth;
+  gOldFormSet           = Context->OldFormSet;
+  gMenuRefreshHead      = Context->MenuRefreshHead;
+
+  CopyMem (&gScreenDimensions, &Context->ScreenDimensions, sizeof (gScreenDimensions));
+  CopyMem (&gMenuOption, &Context->MenuOption, sizeof (gMenuOption));
+
+  //
+  // Remove from FormBrowser context list
+  //
+  RemoveEntryList (&Context->Link);
+  gBS->FreePool (Context);
 }

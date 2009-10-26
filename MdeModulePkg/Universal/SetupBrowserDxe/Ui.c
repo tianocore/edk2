@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Ui.h"
 #include "Setup.h"
 
-LIST_ENTRY          Menu;
+LIST_ENTRY          gMenuOption;
 LIST_ENTRY          gMenuList = INITIALIZE_LIST_HEAD_VARIABLE (gMenuList);
 MENU_REFRESH_ENTRY  *gMenuRefreshHead;
 
@@ -145,7 +145,7 @@ UiInitMenu (
   VOID
   )
 {
-  InitializeListHead (&Menu);
+  InitializeListHead (&gMenuOption);
 }
 
 
@@ -160,8 +160,8 @@ UiFreeMenu (
 {
   UI_MENU_OPTION  *MenuOption;
 
-  while (!IsListEmpty (&Menu)) {
-    MenuOption = MENU_OPTION_FROM_LINK (Menu.ForwardLink);
+  while (!IsListEmpty (&gMenuOption)) {
+    MenuOption = MENU_OPTION_FROM_LINK (gMenuOption.ForwardLink);
     RemoveEntryList (&MenuOption->Link);
 
     //
@@ -645,7 +645,7 @@ UiAddMenuOption (
       MenuOption->ReadOnly = TRUE;
     }
 
-    InsertTailList (&Menu, &MenuOption->Link);
+    InsertTailList (&gMenuOption, &MenuOption->Link);
   }
 
   return MenuOption;
@@ -1353,11 +1353,11 @@ ValueIsScroll (
 
   Temp = Direction ? CurrentPos->BackLink : CurrentPos->ForwardLink;
 
-  if (Temp == &Menu) {
+  if (Temp == &gMenuOption) {
     return TRUE;
   }
 
-  for (; Temp != &Menu; Temp = Direction ? Temp->BackLink : Temp->ForwardLink) {
+  for (; Temp != &gMenuOption; Temp = Direction ? Temp->BackLink : Temp->ForwardLink) {
     MenuOption = MENU_OPTION_FROM_LINK (Temp);
     if (IsSelectable (MenuOption)) {
       return FALSE;
@@ -1399,7 +1399,7 @@ MoveToNextStatement (
     if (IsSelectable (NextMenuOption)) {
       break;
     }
-    if ((GoUp ? Pos->BackLink : Pos->ForwardLink) == &Menu) {
+    if ((GoUp ? Pos->BackLink : Pos->ForwardLink) == &gMenuOption) {
       HitEnd = TRUE;
       break;
     }
@@ -1420,7 +1420,7 @@ MoveToNextStatement (
       if (IsSelectable (NextMenuOption)) {
         break;
       }
-      if ((!GoUp ? Pos->BackLink : Pos->ForwardLink) == &Menu) {
+      if ((!GoUp ? Pos->BackLink : Pos->ForwardLink) == &gMenuOption) {
         ASSERT (FALSE);
         break;
       }
@@ -1643,6 +1643,8 @@ UiDisplayMenu (
   BOOLEAN                         NewLine;
   BOOLEAN                         Repaint;
   BOOLEAN                         SavedValue;
+  BOOLEAN                         UpArrow;
+  BOOLEAN                         DownArrow;
   EFI_STATUS                      Status;
   EFI_INPUT_KEY                   Key;
   LIST_ENTRY                      *Link;
@@ -1679,8 +1681,8 @@ UiDisplayMenu (
   DefaultId           = 0;
 
   OutputString        = NULL;
-  gUpArrow            = FALSE;
-  gDownArrow          = FALSE;
+  UpArrow             = FALSE;
+  DownArrow           = FALSE;
   SkipValue           = 0;
   OldSkipValue        = 0;
   MenuRefreshEntry    = gMenuRefreshHead;
@@ -1708,7 +1710,7 @@ UiDisplayMenu (
   Selection->OptionCol = gPromptBlockWidth + 1 + LocalScreen.LeftColumn;
   Selection->Statement = NULL;
 
-  TopOfScreen = Menu.ForwardLink;
+  TopOfScreen = gMenuOption.ForwardLink;
   Repaint     = TRUE;
   MenuOption  = NULL;
 
@@ -1734,7 +1736,7 @@ UiDisplayMenu (
   //
   // Get user's selection
   //
-  NewPos = Menu.ForwardLink;
+  NewPos = gMenuOption.ForwardLink;
 
   gST->ConOut->EnableCursor (gST->ConOut, FALSE);
   UpdateStatusBar (REFRESH_STATUS_BAR, (UINT8) 0, TRUE);
@@ -1744,7 +1746,7 @@ UiDisplayMenu (
   while (TRUE) {
     switch (ControlFlag) {
     case CfInitialization:
-      if (IsListEmpty (&Menu)) {
+      if (IsListEmpty (&gMenuOption)) {
         ControlFlag = CfReadKey;
       } else {
         ControlFlag = CfCheckSelection;
@@ -1766,8 +1768,8 @@ UiDisplayMenu (
         //
         // Display menu
         //
-        gDownArrow      = FALSE;
-        gUpArrow        = FALSE;
+        DownArrow       = FALSE;
+        UpArrow         = FALSE;
         Row             = TopRow;
 
         Temp            = SkipValue;
@@ -1784,7 +1786,7 @@ UiDisplayMenu (
         UiFreeRefreshList ();
         MinRefreshInterval = 0;
 
-        for (Link = TopOfScreen; Link != &Menu; Link = Link->ForwardLink) {
+        for (Link = TopOfScreen; Link != &gMenuOption; Link = Link->ForwardLink) {
           MenuOption          = MENU_OPTION_FROM_LINK (Link);
           MenuOption->Row     = Row;
           MenuOption->Col     = Col;
@@ -1989,7 +1991,7 @@ UiDisplayMenu (
 
           if (Row > BottomRow) {
             if (!ValueIsScroll (FALSE, Link)) {
-              gDownArrow = TRUE;
+              DownArrow = TRUE;
             }
 
             Row = BottomRow + 1;
@@ -1998,10 +2000,10 @@ UiDisplayMenu (
         }
 
         if (!ValueIsScroll (TRUE, TopOfScreen)) {
-          gUpArrow = TRUE;
+          UpArrow = TRUE;
         }
 
-        if (gUpArrow) {
+        if (UpArrow) {
           gST->ConOut->SetAttribute (gST->ConOut, ARROW_TEXT | ARROW_BACKGROUND);
           PrintAt (
             LocalScreen.LeftColumn + gPromptBlockWidth + gOptionBlockWidth + 1,
@@ -2012,7 +2014,7 @@ UiDisplayMenu (
           gST->ConOut->SetAttribute (gST->ConOut, FIELD_TEXT | FIELD_BACKGROUND);
         }
 
-        if (gDownArrow) {
+        if (DownArrow) {
           gST->ConOut->SetAttribute (gST->ConOut, ARROW_TEXT | ARROW_BACKGROUND);
           PrintAt (
             LocalScreen.LeftColumn + gPromptBlockWidth + gOptionBlockWidth + 1,
@@ -2043,10 +2045,10 @@ UiDisplayMenu (
       Repaint     = FALSE;
 
       if (Selection->QuestionId != 0) {
-        NewPos = Menu.ForwardLink;
+        NewPos = gMenuOption.ForwardLink;
         SavedMenuOption = MENU_OPTION_FROM_LINK (NewPos);
 
-        while (SavedMenuOption->ThisTag->QuestionId != Selection->QuestionId && NewPos->ForwardLink != &Menu) {
+        while (SavedMenuOption->ThisTag->QuestionId != Selection->QuestionId && NewPos->ForwardLink != &gMenuOption) {
           NewPos     = NewPos->ForwardLink;
           SavedMenuOption = MENU_OPTION_FROM_LINK (NewPos);
         }
@@ -2439,21 +2441,21 @@ UiDisplayMenu (
         // If the screen has no menu items, and the user didn't select UiReset
         // ignore the selection and go back to reading keys.
         //
-        if (IsListEmpty (&Menu)) {
+        if (IsListEmpty (&gMenuOption)) {
           ControlFlag = CfReadKey;
           break;
         }
         //
         // if there is nothing logical to place a cursor on, just move on to wait for a key.
         //
-        for (Link = Menu.ForwardLink; Link != &Menu; Link = Link->ForwardLink) {
+        for (Link = gMenuOption.ForwardLink; Link != &gMenuOption; Link = Link->ForwardLink) {
           NextMenuOption = MENU_OPTION_FROM_LINK (Link);
           if (IsSelectable (NextMenuOption)) {
             break;
           }
         }
 
-        if (Link == &Menu) {
+        if (Link == &gMenuOption) {
           ControlFlag = CfPrepareToReadKey;
           break;
         }
@@ -2744,7 +2746,7 @@ UiDisplayMenu (
 
       SavedListEntry = TopOfScreen;
 
-      if (NewPos->BackLink != &Menu) {
+      if (NewPos->BackLink != &gMenuOption) {
         NewLine = TRUE;
         //
         // Adjust Date/Time position before we advance forward.
@@ -2754,7 +2756,7 @@ UiDisplayMenu (
         //
         // Caution that we have already rewind to the top, don't go backward in this situation.
         //
-        if (NewPos->BackLink != &Menu) {
+        if (NewPos->BackLink != &gMenuOption) {
           NewPos = NewPos->BackLink;
         }
 
@@ -2799,8 +2801,8 @@ UiDisplayMenu (
           // it means that we hit the begining MenuOption that can be focused
           // so we simply scroll to the top
           //
-          if (SavedListEntry != Menu.ForwardLink) {
-            TopOfScreen = Menu.ForwardLink;
+          if (SavedListEntry != gMenuOption.ForwardLink) {
+            TopOfScreen = gMenuOption.ForwardLink;
             Repaint     = TRUE;
           }
         }
@@ -2830,7 +2832,7 @@ UiDisplayMenu (
     case CfUiPageUp:
       ControlFlag     = CfCheckSelection;
 
-      if (NewPos->BackLink == &Menu) {
+      if (NewPos->BackLink == &gMenuOption) {
         NewLine = FALSE;
         Repaint = FALSE;
         break;
@@ -2841,7 +2843,7 @@ UiDisplayMenu (
       Link      = TopOfScreen;
       PreviousMenuOption = MENU_OPTION_FROM_LINK (Link);
       Index = BottomRow;
-      while ((Index >= TopRow) && (Link->BackLink != &Menu)) {
+      while ((Index >= TopRow) && (Link->BackLink != &gMenuOption)) {
         Index = Index - PreviousMenuOption->Skip;
         Link = Link->BackLink;
         PreviousMenuOption = MENU_OPTION_FROM_LINK (Link);
@@ -2859,7 +2861,7 @@ UiDisplayMenu (
         // This happens when there is no MenuOption can be focused from
         // Current MenuOption to the first MenuOption
         //
-        TopOfScreen = Menu.ForwardLink;
+        TopOfScreen = gMenuOption.ForwardLink;
       }
       Index += Difference;
       if (Index < TopRow) {
@@ -2884,7 +2886,7 @@ UiDisplayMenu (
     case CfUiPageDown:
       ControlFlag     = CfCheckSelection;
 
-      if (NewPos->ForwardLink == &Menu) {
+      if (NewPos->ForwardLink == &gMenuOption) {
         NewLine = FALSE;
         Repaint = FALSE;
         break;
@@ -2895,7 +2897,7 @@ UiDisplayMenu (
       Link    = TopOfScreen;
       NextMenuOption = MENU_OPTION_FROM_LINK (Link);
       Index = TopRow;
-      while ((Index <= BottomRow) && (Link->ForwardLink != &Menu)) {
+      while ((Index <= BottomRow) && (Link->ForwardLink != &gMenuOption)) {
         Index = Index + NextMenuOption->Skip;
         Link           = Link->ForwardLink;
         NextMenuOption = MENU_OPTION_FROM_LINK (Link);
@@ -2940,7 +2942,7 @@ UiDisplayMenu (
       SavedListEntry = NewPos;
       DistanceValue  = AdjustDateAndTimePosition (FALSE, &NewPos);
 
-      if (NewPos->ForwardLink != &Menu) {
+      if (NewPos->ForwardLink != &gMenuOption) {
         MenuOption      = MENU_OPTION_FROM_LINK (NewPos);
         NewLine         = TRUE;
         NewPos          = NewPos->ForwardLink;
