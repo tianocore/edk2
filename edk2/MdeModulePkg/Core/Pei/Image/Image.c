@@ -83,7 +83,7 @@ GetImageReadFunction (
 
   Private = PEI_CORE_INSTANCE_FROM_PS_THIS (GetPeiServicesTablePointer ());
 
-  if (!Private->PeiMemoryInstalled) {
+  if (!Private->PeiMemoryInstalled || (Private->HobList.HandoffInformationTable->BootMode == BOOT_ON_S3_RESUME)) {
     ImageContext->ImageRead = PeiImageRead;
   } else {
     MemoryBuffer = AllocatePages (0x400 / EFI_PAGE_SIZE + 1);
@@ -145,7 +145,7 @@ LoadAndRelocatePeCoffImage (
   //
   // Allocate Memory for the image
   //
-  if (Private->PeiMemoryInstalled) {
+  if ((Private->PeiMemoryInstalled) && (Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME)) {
     ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)(UINTN) AllocatePages (EFI_SIZE_TO_PAGES ((UINT32) ImageContext.ImageSize));
     ASSERT (ImageContext.ImageAddress != 0);
     
@@ -179,7 +179,7 @@ LoadAndRelocatePeCoffImage (
   //
   // Flush the instruction cache so the image data is written before we execute it
   //
-  if (Private->PeiMemoryInstalled) {
+  if ((Private->PeiMemoryInstalled) && (Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME)) {
     InvalidateInstructionCacheRange ((VOID *)(UINTN)ImageContext.ImageAddress, (UINTN)ImageContext.ImageSize);
   }
 
