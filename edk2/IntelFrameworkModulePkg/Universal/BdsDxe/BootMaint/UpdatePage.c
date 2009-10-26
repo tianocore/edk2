@@ -180,7 +180,7 @@ BootThisFile (
 
   Option = (BDS_COMMON_OPTION *) AllocatePool (sizeof (BDS_COMMON_OPTION));
   ASSERT (Option != NULL);
-  Option->Description     = FileContext->FileName;
+  Option->Description     = (CHAR16 *) AllocateCopyPool (StrSize (FileContext->FileName), FileContext->FileName);
   Option->DevicePath      = FileContext->DevicePath;
   Option->LoadOptionsSize = 0;
   Option->LoadOptions     = NULL;
