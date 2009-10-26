@@ -2,7 +2,7 @@
 This is an example of how a driver might export data to the HII protocol to be
 later utilized by the Setup Protocol
 
-Copyright (c) 2004 - 2008, Intel Corporation
+Copyright (c) 2004 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -43,7 +43,7 @@ HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePath0 = {
   {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
-    { 
+    {
       (UINT8) (END_DEVICE_PATH_LENGTH),
       (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
     }
@@ -68,7 +68,7 @@ HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePath1 = {
   {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
-    { 
+    {
       (UINT8) (END_DEVICE_PATH_LENGTH),
       (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
     }
@@ -77,10 +77,10 @@ HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePath1 = {
 
 /**
   Encode the password using a simple algorithm.
-  
+
   @param Password The string to be encoded.
   @param MaxSize  The size of the string.
-  
+
 **/
 VOID
 EncodePassword (
@@ -111,10 +111,10 @@ EncodePassword (
 
 /**
   Validate the user's password.
-  
+
   @param PrivateData This driver's private context data.
   @param StringId    The user's input.
-  
+
   @retval EFI_SUCCESS   The user's input matches the password.
   @retval EFI_NOT_READY The user's input does not match the password.
 **/
@@ -204,13 +204,13 @@ ValidatePassword (
 
 /**
   Encode the password using a simple algorithm.
-  
+
   @param PrivateData This driver's private context data.
   @param StringId    The password from User.
-  
+
   @retval  EFI_SUCESS The operation is successful.
   @return  Other value if gRT->SetVariable () fails.
-  
+
 **/
 EFI_STATUS
 SetPassword (
@@ -244,9 +244,9 @@ SetPassword (
   // Get user input password
   //
   Password = &PrivateData->Configuration.WhatIsThePassword2[0];
-  PasswordSize = sizeof (PrivateData->Configuration.WhatIsThePassword2); 
+  PasswordSize = sizeof (PrivateData->Configuration.WhatIsThePassword2);
   ZeroMem (Password, PasswordSize);
-  
+
   TempPassword = HiiGetString (PrivateData->HiiHandle[0], StringId, NULL);
   if (TempPassword == NULL) {
     return EFI_NOT_READY;
@@ -344,7 +344,7 @@ ExtractConfig (
   EFI_STRING                       ConfigRequest;
   EFI_STRING                       ConfigRequestHdr;
   UINTN                            Size;
-  
+
   if (Progress == NULL || Results == NULL || Request == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -374,14 +374,14 @@ ExtractConfig (
   if (EFI_ERROR (Status)) {
     return EFI_NOT_FOUND;
   }
-  
+
   if (Request == NULL) {
     //
     // Request is set to NULL, construct full request string.
     //
 
     //
-    // Allocate and fill a buffer large enough to hold the <ConfigHdr> template 
+    // Allocate and fill a buffer large enough to hold the <ConfigHdr> template
     // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
     //
     ConfigRequestHdr = HiiConstructConfigHdr (&mFormSetGuid, VariableName, PrivateData->DriverHandle[0]);
@@ -411,7 +411,7 @@ ExtractConfig (
                                 Results,
                                 Progress
                                 );
-  
+
   if (Request == NULL) {
     FreePool (ConfigRequest);
     *Progress = NULL;
@@ -554,15 +554,76 @@ DriverCallback (
   EFI_IFR_GUID_LABEL              *StartLabel;
   VOID                            *EndOpCodeHandle;
   EFI_IFR_GUID_LABEL              *EndLabel;
+  EFI_INPUT_KEY                   Key;
+  DRIVER_SAMPLE_CONFIGURATION     *Configuration;
+
+  if (Action == EFI_BROWSER_ACTION_FORM_OPEN) {
+    //
+    // On FORM_OPEN event, update the form on-the-fly
+    //
+    PrivateData = DRIVER_SAMPLE_PRIVATE_FROM_THIS (This);
+
+    //
+    // Initialize the container for dynamic opcodes
+    //
+    StartOpCodeHandle = HiiAllocateOpCodeHandle ();
+    ASSERT (StartOpCodeHandle != NULL);
+
+    //
+    // Create Hii Extend Label OpCode as the start opcode
+    //
+    StartLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+    StartLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+    StartLabel->Number       = LABEL_UPDATE2;
+
+    HiiCreateActionOpCode (
+      StartOpCodeHandle,                // Container for dynamic created opcodes
+      0x1238,                           // Question ID
+      STRING_TOKEN(STR_SAVE_TEXT),      // Prompt text
+      STRING_TOKEN(STR_SAVE_TEXT),      // Help text
+      EFI_IFR_FLAG_CALLBACK,            // Question flag
+      0                                 // Action String ID
+    );
+
+    HiiUpdateForm (
+      PrivateData->HiiHandle[0],  // HII handle
+      &mFormSetGuid,              // Formset GUID
+      0x3,                        // Form ID
+      StartOpCodeHandle,          // Label for where to insert opcodes
+      NULL                        // Insert data
+      );
+
+    HiiFreeOpCodeHandle (StartOpCodeHandle);
+    return EFI_SUCCESS;
+  }
+
+  if (Action == EFI_BROWSER_ACTION_FORM_CLOSE) {
+    //
+    // On FORM_CLOSE event, show up a pop-up
+    //
+    do {
+      CreatePopUp (
+        EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+        &Key,
+        L"",
+        L"You are going to leave the Form!",
+        L"Press ESC or ENTER to continue ...",
+        L"",
+        NULL
+        );
+    } while ((Key.ScanCode != SCAN_ESC) && (Key.UnicodeChar != CHAR_CARRIAGE_RETURN));
+
+    return EFI_SUCCESS;
+  }
 
   if ((Value == NULL) || (ActionRequest == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   if ((Type == EFI_IFR_TYPE_STRING) && (Value->string == 0)) {
     return EFI_INVALID_PARAMETER;
   }
-   
+
 
   Status = EFI_SUCCESS;
   PrivateData = DRIVER_SAMPLE_PRIVATE_FROM_THIS (This);
@@ -635,6 +696,28 @@ DriverCallback (
                     &PrivateData->Configuration
                     );
 
+    //
+    // Set initial vlaue of dynamic created oneof Question in Form Browser
+    //
+    Configuration = AllocateZeroPool (sizeof (DRIVER_SAMPLE_CONFIGURATION));
+    ASSERT (Configuration != NULL);
+    Status = HiiGetBrowserData (&mFormSetGuid, VariableName, sizeof (DRIVER_SAMPLE_CONFIGURATION), (UINT8 *) Configuration);
+    if (!EFI_ERROR (Status)) {
+      Configuration->DynamicOneof = 2;
+
+      //
+      // Update uncommitted data of Browser
+      //
+      HiiSetBrowserData (
+        &mFormSetGuid,
+        VariableName,
+        sizeof (DRIVER_SAMPLE_CONFIGURATION),
+        (UINT8 *) Configuration,
+        NULL
+        );
+    }
+    FreePool (Configuration);
+
     HiiCreateOneOfOpCode (
       StartOpCodeHandle,                         // Container for dynamic created opcodes
       0x8001,                                    // Question ID (or call it "key")
@@ -682,8 +765,9 @@ DriverCallback (
 
     HiiFreeOpCodeHandle (StartOpCodeHandle);
     HiiFreeOpCodeHandle (OptionsOpCodeHandle);
+    HiiFreeOpCodeHandle (EndOpCodeHandle);
     break;
-    
+
   case 0x5678:
     //
     // We will reach here once the Question is refreshed
@@ -710,7 +794,7 @@ DriverCallback (
       EFI_IFR_FLAG_CALLBACK,            // Question flag
       0                                 // Action String ID
     );
-    
+
     HiiUpdateForm (
       PrivateData->HiiHandle[0],  // HII handle
       &mFormSetGuid,              // Formset GUID
@@ -719,8 +803,8 @@ DriverCallback (
       NULL                        // Insert data
       );
 
-    HiiFreeOpCodeHandle (StartOpCodeHandle); 
-  
+    HiiFreeOpCodeHandle (StartOpCodeHandle);
+
     //
     // Refresh the Question value
     //
@@ -732,7 +816,7 @@ DriverCallback (
                     sizeof (DRIVER_SAMPLE_CONFIGURATION),
                     &PrivateData->Configuration
                     );
-  
+
     //
     // Change an EFI Variable storage (MyEfiVar) asynchronous, this will cause
     // the first statement in Form 3 be suppressed
@@ -795,7 +879,7 @@ DriverCallback (
 
 /**
   Main entry for this driver.
-  
+
   @param ImageHandle     Image handle this driver.
   @param SystemTable     Pointer to SystemTable.
 
@@ -820,8 +904,8 @@ DriverSampleInit (
   UINTN                           BufferSize;
   DRIVER_SAMPLE_CONFIGURATION     *Configuration;
   BOOLEAN                         ActionFlag;
-  EFI_STRING                      ConfigRequestHdr;  
-  
+  EFI_STRING                      ConfigRequestHdr;
+
   //
   // Initialize the local variables.
   //
@@ -990,18 +1074,18 @@ DriverSampleInit (
     ActionFlag = HiiValidateSettings (ConfigRequestHdr);
     ASSERT (ActionFlag);
   }
-  
+
   FreePool (ConfigRequestHdr);
 
 
   //
-  // In default, this driver is built into Flash device image, 
+  // In default, this driver is built into Flash device image,
   // the following code doesn't run.
   //
 
   //
   // Example of how to display only the item we sent to HII
-  // When this driver is not built into Flash device image, 
+  // When this driver is not built into Flash device image,
   // it need to call SendForm to show front page by itself.
   //
   if (DISPLAY_ONLY_MY_ITEM <= 1) {
@@ -1017,9 +1101,9 @@ DriverSampleInit (
                              NULL,
                              NULL
                              );
-  
+
     HiiRemovePackages (HiiHandle[0]);
-  
+
     HiiRemovePackages (HiiHandle[1]);
   }
 
