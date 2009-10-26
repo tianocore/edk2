@@ -2273,9 +2273,11 @@ InitializeCurrentSetting (
   Fetch the Ifr binary data of a FormSet.
 
   @param  Handle                 PackageList Handle
-  @param  FormSetGuid            GUID of a formset. If not specified (NULL or zero
-                                 GUID), take the first FormSet found in package
-                                 list.
+  @param  FormSetGuid            On input, GUID or class GUID of a formset. If not
+                                 specified (NULL or zero GUID), take the first
+                                 FormSet with class GUID EFI_HII_PLATFORM_SETUP_FORMSET_GUID
+                                 found in package list.
+                                 On output, GUID of the formset found(if not NULL).
   @param  BinaryLength           The length of the FormSet IFR binary.
   @param  BinaryData             The buffer designed to receive the FormSet.
 
@@ -2301,25 +2303,25 @@ GetIfrBinaryData (
   UINT8                        *OpCodeData;
   UINT32                       Offset;
   UINT32                       Offset2;
-  BOOLEAN                      ReturnDefault;
   UINT32                       PackageListLength;
   EFI_HII_PACKAGE_HEADER       PackageHeader;
   UINT8                        Index;
   UINT8                        NumberOfClassGuid;
-  BOOLEAN                      IsSetupClassGuid;
+  BOOLEAN                      ClassGuidMatch;
   EFI_GUID                     *ClassGuid;
+  EFI_GUID                     *ComparingGuid;
 
   OpCodeData = NULL;
   Package = NULL;
   ZeroMem (&PackageHeader, sizeof (EFI_HII_PACKAGE_HEADER));;
 
   //
-  // if FormSetGuid is NULL or zero GUID, return first FormSet in the package list
+  // if FormSetGuid is NULL or zero GUID, return first Setup FormSet in the package list
   //
   if (FormSetGuid == NULL || CompareGuid (FormSetGuid, &gZeroGuid)) {
-    ReturnDefault = TRUE;
+    ComparingGuid = &gEfiHiiPlatformSetupFormsetGuid;
   } else {
-    ReturnDefault = FALSE;
+    ComparingGuid = FormSetGuid;
   }
 
   //
@@ -2346,6 +2348,7 @@ GetIfrBinaryData (
   Offset2 = 0;
   CopyMem (&PackageListLength, &HiiPackageList->PackageLength, sizeof (UINT32));
 
+  ClassGuidMatch = FALSE;
   while (Offset < PackageListLength) {
     Package = ((UINT8 *) HiiPackageList) + Offset;
     CopyMem (&PackageHeader, Package, sizeof (EFI_HII_PACKAGE_HEADER));
@@ -2360,30 +2363,24 @@ GetIfrBinaryData (
 
         if (((EFI_IFR_OP_HEADER *) OpCodeData)->OpCode == EFI_IFR_FORM_SET_OP) {
           //
-          // Check whether return default FormSet
+          // Try to compare against formset GUID
           //
-          if (ReturnDefault) {
-            //
-            // Check ClassGuid of formset OpCode
-            //
-            IsSetupClassGuid  = FALSE;
-            NumberOfClassGuid = (UINT8) (((EFI_IFR_FORM_SET *) OpCodeData)->Flags & 0x3);
-            ClassGuid         = (EFI_GUID *) (OpCodeData + sizeof (EFI_IFR_FORM_SET));
-            for (Index = 0; Index < NumberOfClassGuid; Index++) {
-              if (CompareGuid (ClassGuid + Index, &gEfiHiiPlatformSetupFormsetGuid)) {
-                IsSetupClassGuid = TRUE;
-                break;
-              }
-            }
-            if (IsSetupClassGuid) {
-              break;
-            }
+          if (CompareGuid (ComparingGuid, (EFI_GUID *)(OpCodeData + sizeof (EFI_IFR_OP_HEADER)))) {
+            break;
           }
 
           //
-          // FormSet GUID is specified, check it
+          // Try to compare against formset class GUID
           //
-          if (CompareGuid (FormSetGuid, (EFI_GUID *)(OpCodeData + sizeof (EFI_IFR_OP_HEADER)))) {
+          NumberOfClassGuid = (UINT8) (((EFI_IFR_FORM_SET *) OpCodeData)->Flags & 0x3);
+          ClassGuid         = (EFI_GUID *) (OpCodeData + sizeof (EFI_IFR_FORM_SET));
+          for (Index = 0; Index < NumberOfClassGuid; Index++) {
+            if (CompareGuid (ComparingGuid, ClassGuid + Index)) {
+              ClassGuidMatch = TRUE;
+              break;
+            }
+          }
+          if (ClassGuidMatch) {
             break;
           }
         }
@@ -2410,9 +2407,9 @@ GetIfrBinaryData (
     return EFI_NOT_FOUND;
   }
 
-  if (ReturnDefault && FormSetGuid != NULL) {
+  if (ClassGuidMatch && (FormSetGuid != NULL)) {
     //
-    // Return the default FormSet GUID
+    // Return the FormSet GUID
     //
     CopyMem (FormSetGuid, &((EFI_IFR_FORM_SET *) OpCodeData)->Guid, sizeof (EFI_GUID));
   }
@@ -2439,9 +2436,11 @@ GetIfrBinaryData (
   Initialize the internal data structure of a FormSet.
 
   @param  Handle                 PackageList Handle
-  @param  FormSetGuid            GUID of a formset. If not specified (NULL or zero
-                                 GUID), take the first FormSet found in package
-                                 list.
+  @param  FormSetGuid            On input, GUID or class GUID of a formset. If not
+                                 specified (NULL or zero GUID), take the first
+                                 FormSet with class GUID EFI_HII_PLATFORM_SETUP_FORMSET_GUID
+                                 found in package list.
+                                 On output, GUID of the formset found(if not NULL).
   @param  FormSet                FormSet data structure.
 
   @retval EFI_SUCCESS            The function completed successfully.
