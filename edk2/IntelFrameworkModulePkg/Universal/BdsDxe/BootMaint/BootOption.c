@@ -5,7 +5,7 @@
 
   Boot option manipulation
 
-Copyright (c) 2004 - 2008, Intel Corporation. <BR>
+Copyright (c) 2004 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -423,7 +423,8 @@ BOpt_FindFileSystem (
       FileContext->Handle           = LoadFileHandle[Index];
       FileContext->IsRoot           = TRUE;
 
-      FileContext->DevicePath = DevicePathFromHandle (FileContext->Handle);
+      FileContext->DevicePath       = DevicePathFromHandle (FileContext->Handle);
+      FileContext->FileName         = DevicePathToStr (FileContext->DevicePath);
 
       MenuEntry->HelpString     = DevicePathToStr (FileContext->DevicePath);
 
