@@ -106,7 +106,7 @@ NewStrCat (
 
   This function handles the Unicode string with NARROW_CHAR
   and WIDE_CHAR control characters. NARROW_HCAR and WIDE_CHAR
-  does not count in the resultant output. If a WIDE_CHAR is 
+  does not count in the resultant output. If a WIDE_CHAR is
   hit, then 2 Unicode character will consume an output storage
   space with size of CHAR16 till a NARROW_CHAR is hit.
 
@@ -236,7 +236,7 @@ DisplayPageFrame (
 
         ASSERT (RowIdx < BANNER_HEIGHT);
         ASSERT (ColumnIdx < BANNER_COLUMNS);
-        
+
         if (gBannerData->Banner[RowIdx][ColumnIdx] != 0x0000) {
           StrFrontPageBanner = GetToken (
                                 gBannerData->Banner[RowIdx][ColumnIdx],
@@ -406,7 +406,7 @@ EvaluateFormExpressions (
 
 /*
 +------------------------------------------------------------------------------+
-?F2=Previous Page                 Setup Page                                  ?
+?                                 Setup Page                                  ?
 +------------------------------------------------------------------------------+
 
 
@@ -433,9 +433,9 @@ EvaluateFormExpressions (
 
 /**
 
-  
+
   Display form and wait for user to select one menu option, then return it.
-  
+
   @param Selection       On input, Selection tell setup browser the information
                          about the Selection, form and formset to be displayed.
                          On output, Selection return the screen item that is selected
@@ -481,16 +481,6 @@ DisplayForm (
       );
   }
 
-  if (gClassOfVfr == FORMSET_CLASS_PLATFORM_SETUP) {
-    gST->ConOut->SetAttribute (gST->ConOut, KEYHELP_TEXT | KEYHELP_BACKGROUND);
-
-    //
-    // Display the infrastructure strings
-    //
-    if (!IsListEmpty (&gMenuList)) {
-      PrintStringAt (LocalScreen.LeftColumn + 2, LocalScreen.TopRow + 1, gFunctionTwoString);
-    }
-  }
   //
   // Remove Buffer allocated for StringPtr after it has been used.
   //
@@ -564,7 +554,6 @@ InitializeBrowserStrings (
   )
 {
   gFunctionOneString    = GetToken (STRING_TOKEN (FUNCTION_ONE_STRING), gHiiHandle);
-  gFunctionTwoString    = GetToken (STRING_TOKEN (FUNCTION_TWO_STRING), gHiiHandle);
   gFunctionNineString   = GetToken (STRING_TOKEN (FUNCTION_NINE_STRING), gHiiHandle);
   gFunctionTenString    = GetToken (STRING_TOKEN (FUNCTION_TEN_STRING), gHiiHandle);
   gEnterString          = GetToken (STRING_TOKEN (ENTER_STRING), gHiiHandle);
@@ -608,7 +597,6 @@ FreeBrowserStrings (
   )
 {
   FreePool (gFunctionOneString);
-  FreePool (gFunctionTwoString);
   FreePool (gFunctionNineString);
   FreePool (gFunctionTenString);
   FreePool (gEnterString);
@@ -857,15 +845,11 @@ SetupBrowser (
   EFI_HII_VALUE                   *HiiValue;
   FORM_BROWSER_STATEMENT          *Statement;
   EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess;
-  EFI_INPUT_KEY                   Key;
-  CHAR16                          YesResponse;
-  CHAR16                          NoResponse;
+  FORM_BROWSER_FORMSET            *FormSet;
 
   gMenuRefreshHead = NULL;
   gResetRequired = FALSE;
-  gNvUpdateRequired = FALSE;
-
-  UiInitMenuList ();
+  FormSet = Selection->FormSet;
 
   //
   // Register notify for Form package update
@@ -880,6 +864,15 @@ SetupBrowser (
                            );
   if (EFI_ERROR (Status)) {
     return Status;
+  }
+
+  //
+  // Initialize current settings of Questions in this FormSet
+  //
+  Status = InitializeCurrentSetting (Selection->FormSet);
+  if (EFI_ERROR (Status)) {
+    Selection->Action = UI_ACTION_EXIT;
+    goto Done;
   }
 
   do {
@@ -913,7 +906,7 @@ SetupBrowser (
     //
     // Load Questions' Value for display
     //
-    Status = LoadFormConfig (Selection->FormSet, Selection->Form);
+    Status = LoadFormSetConfig (Selection->FormSet);
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -1000,36 +993,19 @@ SetupBrowser (
         // Force to reparse IFR binary of target Formset
         //
         Selection->Action = UI_ACTION_REFRESH_FORMSET;
-
-        //
-        // Uncommitted data will be lost after IFR binary re-pasing, so confirm on whether to save
-        //
-        if (gNvUpdateRequired) {
-          Status      = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-
-          YesResponse = gYesResponse[0];
-          NoResponse  = gNoResponse[0];
-
-          do {
-            CreateDialog (3, TRUE, 0, NULL, &Key, gEmptyString, gSaveChanges, gEmptyString);
-          } while
-          (
-            (Key.ScanCode != SCAN_ESC) &&
-            ((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) != (NoResponse | UPPER_LOWER_CASE_OFFSET)) &&
-            ((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) != (YesResponse | UPPER_LOWER_CASE_OFFSET))
-          );
-
-          if ((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) == (YesResponse | UPPER_LOWER_CASE_OFFSET)) {
-            //
-            // If the user hits the YesResponse key
-            //
-            SubmitForm (Selection->FormSet, Selection->Form);
-          }
-        }
       }
     }
   } while (Selection->Action == UI_ACTION_REFRESH_FORM);
 
+  //
+  // Record the old formset
+  //
+  if (gOldFormSet != NULL) {
+    DestroyFormSet (gOldFormSet);
+  }
+  gOldFormSet = FormSet;
+
+Done:
   //
   // Unregister notify for Form package update
   //

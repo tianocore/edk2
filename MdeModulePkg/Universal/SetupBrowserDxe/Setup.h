@@ -1,5 +1,5 @@
 /** @file
-Private MACRO, structure and function definitions for Setup Browser module. 
+Private MACRO, structure and function definitions for Setup Browser module.
 
 Copyright (c) 2007 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -71,10 +71,9 @@ extern UINT8  SetupBrowserStrings[];
 // Definition for function key setting
 //
 #define NONE_FUNCTION_KEY_SETTING     0
-#define DEFAULT_FUNCTION_KEY_SETTING  (FUNCTION_ONE | FUNCTION_TWO | FUNCTION_NINE | FUNCTION_TEN)
+#define DEFAULT_FUNCTION_KEY_SETTING  (FUNCTION_ONE | FUNCTION_NINE | FUNCTION_TEN)
 
 #define FUNCTION_ONE                  (1 << 0)
-#define FUNCTION_TWO                  (1 << 1)
 #define FUNCTION_NINE                 (1 << 2)
 #define FUNCTION_TEN                  (1 << 3)
 
@@ -461,11 +460,12 @@ extern EFI_SCREEN_DESCRIPTOR gScreenDimensions;
 extern BOOLEAN               gUpArrow;
 extern BOOLEAN               gDownArrow;
 
+extern FORM_BROWSER_FORMSET  *gOldFormSet;
+
 //
 // Browser Global Strings
 //
 extern CHAR16            *gFunctionOneString;
-extern CHAR16            *gFunctionTwoString;
 extern CHAR16            *gFunctionNineString;
 extern CHAR16            *gFunctionTenString;
 extern CHAR16            *gEnterString;
@@ -893,6 +893,19 @@ LoadFormConfig (
   );
 
 /**
+  Initialize Question's Edit copy from Storage for the whole Formset.
+
+  @param  FormSet                FormSet data structure.
+
+  @retval EFI_SUCCESS            The function completed successfully.
+
+**/
+EFI_STATUS
+LoadFormSetConfig (
+  IN FORM_BROWSER_FORMSET             *FormSet
+  );
+
+/**
   Convert setting of Buffer Storage or NameValue Storage to <ConfigResp>.
 
   @param  Storage                The Storage to be conveted.
@@ -983,7 +996,7 @@ GetIfrBinaryData (
                          ScreenDimenions - This allows the browser to be called so that it occupies a
                          portion of the physical screen instead of dynamically determining the screen dimensions.
                          ActionRequest   - Points to the action recommended by the form.
-  @param ScreenDimensions Points to recommended form dimensions, including any non-content area, in 
+  @param ScreenDimensions Points to recommended form dimensions, including any non-content area, in
                           characters.
   @param ActionRequest       Points to the action recommended by the form.
 
