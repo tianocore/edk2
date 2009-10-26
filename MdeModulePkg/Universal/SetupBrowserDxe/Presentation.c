@@ -982,6 +982,17 @@ SetupBrowser (
           default:
             break;
           }
+        } else if (Status != EFI_UNSUPPORTED) {
+          //
+          // Callback return error status other than EFI_UNSUPPORTED
+          //
+          if (Statement->Operand == EFI_IFR_REF_OP) {
+            //
+            // Cross reference will not be taken
+            //
+            Selection->FormId = Selection->Form->FormId;
+            Selection->QuestionId = 0;
+          }
         }
       }
 
