@@ -324,8 +324,8 @@ typedef struct _EFI_HII_GUID_PACKAGE_HDR {
 // Section 27.3.6
 //
 
-#define UEFI_CONFIG_LANG  "x-UEFI"
-#define UEFI_CONFIG_LANG2 "x-i-UEFI"
+#define UEFI_CONFIG_LANG   "x-UEFI"
+#define UEFI_CONFIG_LANG_2 "x-i-UEFI"
 
 ///
 /// The fixed header consists of a standard record header and then the string identifiers
