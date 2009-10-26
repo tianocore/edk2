@@ -126,6 +126,7 @@ PciEnumerator (
 
   gFullEnumeration = FALSE;
 
+  Handle = NULL;
   Status = gBS->InstallProtocolInterface (
                   &Handle,
                   &gEfiPciEnumerationCompleteProtocolGuid,
