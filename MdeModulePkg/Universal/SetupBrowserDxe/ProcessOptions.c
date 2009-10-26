@@ -819,7 +819,7 @@ ProcessOptions (
 
           TempString = AllocateCopyPool ((Maximum + 1) * sizeof (CHAR16), Question->BufferValue);
           ASSERT (TempString != NULL);
-          
+
           TempString[Maximum] = L'\0';
 
           if (StrCmp (StringPtr, TempString) != 0) {
@@ -965,7 +965,7 @@ ProcessHelpString (
   UINTN *OldIndexArray;
 
   BlockWidth = (UINTN) gHelpBlockWidth - 1;
-  
+
   //
   // every three elements of IndexArray form a screen-line of string:[ IndexArray[i*3], IndexArray[i*3+1] )
   // IndexArray[i*3+2] stores the initial glyph width of single character. to save this is because we want
@@ -992,7 +992,7 @@ ProcessHelpString (
       OldIndexArray  = IndexArray;
       IndexArray = AllocatePool (AllocateSize * sizeof (UINTN) * 3);
       ASSERT (IndexArray != NULL);
-      
+
       CopyMem (IndexArray, OldIndexArray, LineCount * sizeof (UINTN) * 3);
       FreePool (OldIndexArray);
     }

@@ -558,8 +558,10 @@ UiWaitForSingleEvent (
   @param  NumberOfLines          Display lines for this Menu Option.
   @param  MenuItemCount          The index for this Option in the Menu.
 
+  @retval Pointer                Pointer to the added Menu Option.
+
 **/
-VOID
+UI_MENU_OPTION *
 UiAddMenuOption (
   IN CHAR16                  *String,
   IN EFI_HII_HANDLE          Handle,
@@ -573,6 +575,7 @@ UiAddMenuOption (
   UINTN           Count;
 
   Count = 1;
+  MenuOption = NULL;
 
   if (Statement->Operand == EFI_IFR_DATE_OP || Statement->Operand == EFI_IFR_TIME_OP) {
     //
@@ -617,6 +620,26 @@ UiAddMenuOption (
       MenuOption->GrayOut = Statement->GrayOutExpression->Result.Value.b;
     }
 
+    switch (Statement->Operand) {
+    case EFI_IFR_ORDERED_LIST_OP:
+    case EFI_IFR_ONE_OF_OP:
+    case EFI_IFR_NUMERIC_OP:
+    case EFI_IFR_TIME_OP:
+    case EFI_IFR_DATE_OP:
+    case EFI_IFR_CHECKBOX_OP:
+    case EFI_IFR_PASSWORD_OP:
+    case EFI_IFR_STRING_OP:
+      //
+      // User could change the value of these items
+      //
+      MenuOption->IsQuestion = TRUE;
+      break;
+
+    default:
+      MenuOption->IsQuestion = FALSE;
+      break;
+    }
+
     if ((Statement->ValueExpression != NULL) ||
         ((Statement->QuestionFlags & EFI_IFR_FLAG_READ_ONLY) != 0)) {
       MenuOption->ReadOnly = TRUE;
@@ -624,6 +647,8 @@ UiAddMenuOption (
 
     InsertTailList (&Menu, &MenuOption->Link);
   }
+
+  return MenuOption;
 }
 
 
@@ -2245,7 +2270,7 @@ UiDisplayMenu (
           }
         }
 
-        UpdateKeyHelp (MenuOption, FALSE);
+        UpdateKeyHelp (Selection, MenuOption, FALSE);
 
         //
         // Clear reverse attribute
@@ -2384,8 +2409,7 @@ UiDisplayMenu (
         break;
 
       case CHAR_NULL:
-        if (((Key.ScanCode == SCAN_F1) && ((gFunctionKeySetting & FUNCTION_ONE) != FUNCTION_ONE)) ||
-            ((Key.ScanCode == SCAN_F9) && ((gFunctionKeySetting & FUNCTION_NINE) != FUNCTION_NINE)) ||
+        if (((Key.ScanCode == SCAN_F9) && ((gFunctionKeySetting & FUNCTION_NINE) != FUNCTION_NINE)) ||
             ((Key.ScanCode == SCAN_F10) && ((gFunctionKeySetting & FUNCTION_TEN) != FUNCTION_TEN))
             ) {
           //
@@ -2589,16 +2613,16 @@ UiDisplayMenu (
         //
         // Editable Questions: oneof, ordered list, checkbox, numeric, string, password
         //
-        UpdateKeyHelp (MenuOption, TRUE);
+        UpdateKeyHelp (Selection, MenuOption, TRUE);
         Status = ProcessOptions (Selection, MenuOption, TRUE, &OptionString);
 
         if (EFI_ERROR (Status)) {
           Repaint = TRUE;
           NewLine = TRUE;
-            UpdateKeyHelp (MenuOption, FALSE);
-          } else {
-            Selection->Action = UI_ACTION_REFRESH_FORM;
-          }
+          UpdateKeyHelp (Selection, MenuOption, FALSE);
+        } else {
+          Selection->Action = UI_ACTION_REFRESH_FORM;
+        }
 
           if (OptionString != NULL) {
             FreePool (OptionString);
@@ -3078,6 +3102,12 @@ UiDisplayMenu (
 
     case CfUiDefault:
       ControlFlag = CfCheckSelection;
+      if (!Selection->FormEditable) {
+        //
+        // This Form is not editable, ignore the F9 (reset to default)
+        //
+        break;
+      }
 
       Status = ExtractFormDefault (Selection->FormSet, Selection->Form, DefaultId);
 

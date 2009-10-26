@@ -96,15 +96,15 @@ CreateStatement (
   Convert a numeric value to a Unicode String and insert it to String Package.
   This string is used as the Unicode Name for the EFI Variable. This is to support
   the deprecated vareqval opcode.
-  
+
   @param FormSet        The FormSet.
   @param Statement      The numeric question whose VarStoreInfo.VarName is the
                         numeric value which is used to produce the Unicode Name
                         for the EFI Variable.
-                        
+
   If the Statement is NULL, the ASSERT.
   If the opcode is not Numeric, then ASSERT.
-  
+
   @retval EFI_SUCCESS The funtion always succeeds.
 **/
 EFI_STATUS
@@ -118,7 +118,7 @@ UpdateCheckBoxStringToken (
 
   ASSERT (Statement != NULL);
   ASSERT (Statement->Operand == EFI_IFR_NUMERIC_OP);
-  
+
   UnicodeValueToString (Str, 0, Statement->VarStoreInfo.VarName, MAXIMUM_VALUE_CHARACTERS - 1);
 
   Id = HiiSetString (FormSet->HiiHandle, 0, Str, NULL);
@@ -127,21 +127,21 @@ UpdateCheckBoxStringToken (
   }
 
   Statement->VarStoreInfo.VarName = Id;
-    
+
   return EFI_SUCCESS;
 }
 
 /**
   Check if the next opcode is the EFI_IFR_EXTEND_OP_VAREQNAME.
-  
+
   @param OpCodeData     The current opcode.
-                        
+
   @retval TRUE Yes.
   @retval FALSE No.
 **/
 BOOLEAN
 IsNextOpCodeGuidedVarEqName (
-  UINT8 *OpCodeData
+  IN UINT8 *OpCodeData
   )
 {
   //
@@ -151,7 +151,7 @@ IsNextOpCodeGuidedVarEqName (
   if (*OpCodeData == EFI_IFR_GUID_OP) {
     if (CompareGuid (&gEfiIfrFrameworkGuid, (EFI_GUID *)(OpCodeData + sizeof (EFI_IFR_OP_HEADER)))) {
       //
-      // Specific GUIDed opcodes to support IFR generated from Framework HII VFR 
+      // Specific GUIDed opcodes to support IFR generated from Framework HII VFR
       //
       if ((((EFI_IFR_GUID_VAREQNAME *) OpCodeData)->ExtendOpCode) == EFI_IFR_EXTEND_OP_VAREQNAME) {
         return TRUE;
@@ -329,19 +329,19 @@ InitializeConfigHdr (
   )
 {
   CHAR16      *Name;
-  
+
   if (Storage->Type == EFI_HII_VARSTORE_BUFFER) {
     Name = Storage->Name;
   } else {
     Name = NULL;
   }
-  
+
   Storage->ConfigHdr = HiiConstructConfigHdr (
                          &Storage->Guid,
                          Name,
                          FormSet->DriverHandle
                          );
-  
+
   if (Storage->ConfigHdr == NULL) {
     return EFI_NOT_FOUND;
   }
@@ -1188,7 +1188,7 @@ ParseOpCodes (
     case EFI_IFR_SUBTITLE_OP:
       CurrentStatement = CreateStatement (OpCodeData, FormSet, CurrentForm);
       ASSERT (CurrentStatement != NULL);
-      
+
       CurrentStatement->Flags = ((EFI_IFR_SUBTITLE *) OpCodeData)->Flags;
 
       if (Scope != 0) {
@@ -1249,7 +1249,7 @@ ParseOpCodes (
     case EFI_IFR_NUMERIC_OP:
       CurrentStatement = CreateQuestion (OpCodeData, FormSet, CurrentForm);
       ASSERT(CurrentStatement != NULL);
-      
+
       CurrentStatement->Flags = ((EFI_IFR_ONE_OF *) OpCodeData)->Flags;
       Value = &CurrentStatement->HiiValue;
 
@@ -1300,7 +1300,7 @@ ParseOpCodes (
     case EFI_IFR_ORDERED_LIST_OP:
       CurrentStatement = CreateQuestion (OpCodeData, FormSet, CurrentForm);
       ASSERT(CurrentStatement != NULL);
-      
+
       CurrentStatement->Flags = ((EFI_IFR_ORDERED_LIST *) OpCodeData)->Flags;
       CurrentStatement->MaxContainers = ((EFI_IFR_ORDERED_LIST *) OpCodeData)->MaxContainers;
 
@@ -1314,7 +1314,7 @@ ParseOpCodes (
     case EFI_IFR_CHECKBOX_OP:
       CurrentStatement = CreateQuestion (OpCodeData, FormSet, CurrentForm);
       ASSERT(CurrentStatement != NULL);
-      
+
       CurrentStatement->Flags = ((EFI_IFR_CHECKBOX *) OpCodeData)->Flags;
       CurrentStatement->StorageWidth = sizeof (BOOLEAN);
       CurrentStatement->HiiValue.Type = EFI_IFR_TYPE_BOOLEAN;
@@ -1363,7 +1363,7 @@ ParseOpCodes (
     case EFI_IFR_DATE_OP:
       CurrentStatement = CreateQuestion (OpCodeData, FormSet, CurrentForm);
       ASSERT(CurrentStatement != NULL);
-      
+
       CurrentStatement->Flags = ((EFI_IFR_DATE *) OpCodeData)->Flags;
       CurrentStatement->HiiValue.Type = EFI_IFR_TYPE_DATE;
 
@@ -1383,7 +1383,7 @@ ParseOpCodes (
     case EFI_IFR_TIME_OP:
       CurrentStatement = CreateQuestion (OpCodeData, FormSet, CurrentForm);
       ASSERT(CurrentStatement != NULL);
-      
+
       CurrentStatement->Flags = ((EFI_IFR_TIME *) OpCodeData)->Flags;
       CurrentStatement->HiiValue.Type = EFI_IFR_TYPE_TIME;
 

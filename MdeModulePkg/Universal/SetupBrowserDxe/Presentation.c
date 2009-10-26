@@ -31,11 +31,11 @@ UI_MENU_SELECTION  *gCurrentSelection;
 **/
 VOID
 ClearLines (
-  UINTN                                       LeftColumn,
-  UINTN                                       RightColumn,
-  UINTN                                       TopRow,
-  UINTN                                       BottomRow,
-  UINTN                                       TextAttribute
+  IN UINTN               LeftColumn,
+  IN UINTN               RightColumn,
+  IN UINTN               TopRow,
+  IN UINTN               BottomRow,
+  IN UINTN               TextAttribute
   )
 {
   CHAR16  *Buffer;
@@ -80,8 +80,8 @@ ClearLines (
 **/
 VOID
 NewStrCat (
-  CHAR16                                      *Destination,
-  CHAR16                                      *Source
+  IN OUT CHAR16               *Destination,
+  IN     CHAR16               *Source
   )
 {
   UINTN Length;
@@ -117,7 +117,7 @@ NewStrCat (
 **/
 UINTN
 GetStringWidth (
-  CHAR16                                      *String
+  IN CHAR16               *String
   )
 {
   UINTN Index;
@@ -460,6 +460,7 @@ DisplayForm (
   FORM_BROWSER_STATEMENT *Statement;
   UINT16                 NumberOfLines;
   EFI_STATUS             Status;
+  UI_MENU_OPTION         *MenuOption;
 
   Handle        = Selection->Handle;
   MenuItemCount = 0;
@@ -494,6 +495,7 @@ DisplayForm (
     return Status;
   }
 
+  Selection->FormEditable = FALSE;
   Link = GetFirstNode (&Selection->Form->StatementListHead);
   while (!IsNull (&Selection->Form->StatementListHead, Link)) {
     Statement = FORM_BROWSER_STATEMENT_FROM_LINK (Link);
@@ -530,8 +532,15 @@ DisplayForm (
       // We are NOT!! removing this StringPtr buffer via FreePool since it is being used in the menuoptions, we will do
       // it in UiFreeMenu.
       //
-      UiAddMenuOption (StringPtr, Selection->Handle, Statement, NumberOfLines, MenuItemCount);
+      MenuOption = UiAddMenuOption (StringPtr, Selection->Handle, Statement, NumberOfLines, MenuItemCount);
       MenuItemCount++;
+
+      if (MenuOption->IsQuestion && !MenuOption->ReadOnly) {
+        //
+        // At least one item is not readonly, this Form is considered as editable
+        //
+        Selection->FormEditable = TRUE;
+      }
     }
 
     Link = GetNextNode (&Selection->Form->StatementListHead, Link);
@@ -553,7 +562,6 @@ InitializeBrowserStrings (
   VOID
   )
 {
-  gFunctionOneString    = GetToken (STRING_TOKEN (FUNCTION_ONE_STRING), gHiiHandle);
   gFunctionNineString   = GetToken (STRING_TOKEN (FUNCTION_NINE_STRING), gHiiHandle);
   gFunctionTenString    = GetToken (STRING_TOKEN (FUNCTION_TEN_STRING), gHiiHandle);
   gEnterString          = GetToken (STRING_TOKEN (ENTER_STRING), gHiiHandle);
@@ -596,7 +604,6 @@ FreeBrowserStrings (
   VOID
   )
 {
-  FreePool (gFunctionOneString);
   FreePool (gFunctionNineString);
   FreePool (gFunctionTenString);
   FreePool (gEnterString);
@@ -632,12 +639,14 @@ FreeBrowserStrings (
 /**
   Update key's help imformation.
 
+  @param Selection       Tell setup browser the information about the Selection
   @param  MenuOption     The Menu option
   @param  Selected       Whether or not a tag be selected
 
 **/
 VOID
 UpdateKeyHelp (
+  IN  UI_MENU_SELECTION           *Selection,
   IN  UI_MENU_OPTION              *MenuOption,
   IN  BOOLEAN                     Selected
   )
@@ -676,9 +685,10 @@ UpdateKeyHelp (
 
     if (!Selected) {
       if (gClassOfVfr == FORMSET_CLASS_PLATFORM_SETUP) {
-        PrintStringAt (StartColumnOfHelp, TopRowOfHelp, gFunctionOneString);
-        PrintStringAt (SecCol, TopRowOfHelp, gFunctionNineString);
-        PrintStringAt (ThdCol, TopRowOfHelp, gFunctionTenString);
+        if (Selection->FormEditable) {
+          PrintStringAt (SecCol, TopRowOfHelp, gFunctionNineString);
+          PrintStringAt (ThdCol, TopRowOfHelp, gFunctionTenString);
+        }
         PrintStringAt (ThdCol, BottomRowOfHelp, gEscapeString);
       }
 
@@ -732,9 +742,10 @@ UpdateKeyHelp (
     ClearLines (LeftColumnOfHelp, RightColumnOfHelp, TopRowOfHelp, BottomRowOfHelp, KEYHELP_TEXT | KEYHELP_BACKGROUND);
 
     if (gClassOfVfr == FORMSET_CLASS_PLATFORM_SETUP) {
-      PrintStringAt (StartColumnOfHelp, TopRowOfHelp, gFunctionOneString);
-      PrintStringAt (SecCol, TopRowOfHelp, gFunctionNineString);
-      PrintStringAt (ThdCol, TopRowOfHelp, gFunctionTenString);
+      if (Selection->FormEditable) {
+        PrintStringAt (SecCol, TopRowOfHelp, gFunctionNineString);
+        PrintStringAt (ThdCol, TopRowOfHelp, gFunctionTenString);
+      }
       PrintStringAt (ThdCol, BottomRowOfHelp, gEscapeString);
     }
 
@@ -752,9 +763,10 @@ UpdateKeyHelp (
 
     if (!Selected) {
       if (gClassOfVfr == FORMSET_CLASS_PLATFORM_SETUP) {
-        PrintStringAt (StartColumnOfHelp, TopRowOfHelp, gFunctionOneString);
-        PrintStringAt (SecCol, TopRowOfHelp, gFunctionNineString);
-        PrintStringAt (ThdCol, TopRowOfHelp, gFunctionTenString);
+        if (Selection->FormEditable) {
+          PrintStringAt (SecCol, TopRowOfHelp, gFunctionNineString);
+          PrintStringAt (ThdCol, TopRowOfHelp, gFunctionTenString);
+        }
         PrintStringAt (ThdCol, BottomRowOfHelp, gEscapeString);
       }
 
