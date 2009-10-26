@@ -845,9 +845,12 @@ CoreProcessFvImageFile (
     // FvImage should be at its required alignment.
     //
     FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *) Buffer;
+    //
+    // Get FvHeader alignment
+    //
     FvAlignment = 1 << ((FvHeader->Attributes & EFI_FVB2_ALIGNMENT) >> 16);
     //
-    // FvAlignment must be more than 8 bytes required by FvHeader structure.
+    // FvAlignment must be greater than or equal to 8 bytes of the minimum FFS alignment value. 
     //
     if (FvAlignment < 8) {
       FvAlignment = 8;

@@ -450,6 +450,9 @@ ProduceFVBProtocolOnBuffer (
   // Get FvHeader alignment
   //
   FvAlignment = 1 << ((FwVolHeader->Attributes & EFI_FVB2_ALIGNMENT) >> 16);
+  //
+  // FvAlignment must be greater than or equal to 8 bytes of the minimum FFS alignment value. 
+  //
   if (FvAlignment < 8) {
     FvAlignment = 8;
   }

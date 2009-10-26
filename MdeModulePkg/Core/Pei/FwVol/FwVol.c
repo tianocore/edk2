@@ -893,7 +893,7 @@ ProcessFvFile (
   ASSERT_EFI_ERROR (Status);
   
   //
-  // FvAlignment must be more than 8 bytes required by FvHeader structure.
+  // FvAlignment must be greater than or equal to 8 bytes of the minimum FFS alignment value.
   //
   FvAlignment = 1 << ((FvImageInfo.FvAttributes & EFI_FVB2_ALIGNMENT) >> 16);
   if (FvAlignment < 8) {
