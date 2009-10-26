@@ -2,7 +2,7 @@
 Implementation for handling the User Interface option processing.
 
 
-Copyright (c) 2004 - 2008, Intel Corporation
+Copyright (c) 2004 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -98,6 +98,96 @@ ValueToOption (
   }
 
   return NULL;
+}
+
+
+/**
+  Return data element in an Array by its Index.
+
+  @param  Array                  The data array.
+  @param  Type                   Type of the data in this array.
+  @param  Index                  Zero based index for data in this array.
+
+  @retval Value                  The data to be returned
+
+**/
+UINT64
+GetArrayData (
+  IN VOID                     *Array,
+  IN UINT8                    Type,
+  IN UINTN                    Index
+  )
+{
+  UINT64 Data;
+
+  ASSERT (Array != NULL);
+
+  Data = 0;
+  switch (Type) {
+  case EFI_IFR_TYPE_NUM_SIZE_8:
+    Data = (UINT64) *(((UINT8 *) Array) + Index);
+    break;
+
+  case EFI_IFR_TYPE_NUM_SIZE_16:
+    Data = (UINT64) *(((UINT16 *) Array) + Index);
+    break;
+
+  case EFI_IFR_TYPE_NUM_SIZE_32:
+    Data = (UINT64) *(((UINT32 *) Array) + Index);
+    break;
+
+  case EFI_IFR_TYPE_NUM_SIZE_64:
+    Data = (UINT64) *(((UINT64 *) Array) + Index);
+    break;
+
+  default:
+    break;
+  }
+
+  return Data;
+}
+
+
+/**
+  Set value of a data element in an Array by its Index.
+
+  @param  Array                  The data array.
+  @param  Type                   Type of the data in this array.
+  @param  Index                  Zero based index for data in this array.
+  @param  Value                  The value to be set.
+
+**/
+VOID
+SetArrayData (
+  IN VOID                     *Array,
+  IN UINT8                    Type,
+  IN UINTN                    Index,
+  IN UINT64                   Value
+  )
+{
+
+  ASSERT (Array != NULL);
+
+  switch (Type) {
+  case EFI_IFR_TYPE_NUM_SIZE_8:
+    *(((UINT8 *) Array) + Index) = (UINT8) Value;
+    break;
+
+  case EFI_IFR_TYPE_NUM_SIZE_16:
+    *(((UINT16 *) Array) + Index) = (UINT16) Value;
+    break;
+
+  case EFI_IFR_TYPE_NUM_SIZE_32:
+    *(((UINT32 *) Array) + Index) = (UINT32) Value;
+    break;
+
+  case EFI_IFR_TYPE_NUM_SIZE_64:
+    *(((UINT64 *) Array) + Index) = (UINT64) Value;
+    break;
+
+  default:
+    break;
+  }
 }
 
 
@@ -311,6 +401,8 @@ ProcessOptions (
   UINT16                          Maximum;
   QUESTION_OPTION                 *Option;
   UINTN                           Index2;
+  UINT8                           *ValueArray;
+  UINT8                           ValueType;
 
   Status        = EFI_SUCCESS;
 
@@ -325,13 +417,15 @@ ProcessOptions (
   QuestionValue = &Question->HiiValue;
   Maximum = (UINT16) Question->Maximum;
 
+  ValueArray = Question->BufferValue;
+  ValueType = Question->ValueType;
+
   switch (Question->Operand) {
   case EFI_IFR_ORDERED_LIST_OP:
     //
     // Initialize Option value array
     //
-
-    if (Question->BufferValue[0] == 0) {
+    if (GetArrayData (ValueArray, ValueType, 0) == 0) {
       GetQuestionDefault (Selection->FormSet, Selection->Form, Question, 0);
     }
 
@@ -348,11 +442,11 @@ ProcessOptions (
       *OptionString = AllocateZeroPool (Question->MaxContainers * BufferSize);
       ASSERT (*OptionString);
 
-      HiiValue.Type = EFI_IFR_TYPE_NUM_SIZE_8;
+      HiiValue.Type = ValueType;
       HiiValue.Value.u64 = 0;
       for (Index = 0; Index < Question->MaxContainers; Index++) {
-        HiiValue.Value.u8 = Question->BufferValue[Index];
-        if (HiiValue.Value.u8 == 0) {
+        HiiValue.Value.u64 = GetArrayData (ValueArray, ValueType, Index);
+        if (HiiValue.Value.u64 == 0) {
           //
           // Values for the options in ordered lists should never be a 0
           //
@@ -375,10 +469,11 @@ ProcessOptions (
           Index2 = 0;
           while (!IsNull (&Question->OptionListHead, Link) && Index2 < Question->MaxContainers) {
             Option = QUESTION_OPTION_FROM_LINK (Link);
-            Question->BufferValue[Index2++] = Option->Value.Value.u8;
+            SetArrayData (ValueArray, ValueType, Index2, Option->Value.Value.u64);
+            Index2++;
             Link = GetNextNode (&Question->OptionListHead, Link);
           }
-          Question->BufferValue[Index2] = 0;
+          SetArrayData (ValueArray, ValueType, Index2, 0);
 
           Status = SetQuestionValue (Selection->FormSet, Selection->Form, Question, TRUE);
           UpdateStatusBar (NV_UPDATE_REQUIRED, Question->QuestionFlags, TRUE);

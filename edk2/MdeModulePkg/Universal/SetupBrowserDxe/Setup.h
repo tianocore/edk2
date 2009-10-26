@@ -346,6 +346,7 @@ typedef struct {
 
   EFI_HII_VALUE         HiiValue;         // Edit copy for checkbox, numberic, oneof
   UINT8                 *BufferValue;     // Edit copy for string, password, orderedlist
+  UINT8                 ValueType;        // Data type for orderedlist value array
 
   //
   // OpCode specific members

@@ -1909,7 +1909,7 @@ GetQuestionDefault (
     while (!IsNull (&Question->OptionListHead, Link)) {
       Option = QUESTION_OPTION_FROM_LINK (Link);
 
-      Question->BufferValue[Index] = Option->Value.Value.u8;
+      SetArrayData (Question->BufferValue, Question->ValueType, Index, Option->Value.Value.u64);
 
       Index++;
       if (Index >= Question->MaxContainers) {
