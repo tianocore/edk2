@@ -1,7 +1,7 @@
 /** @file
   I/O interfaces between TCP and IpIo.
 
-Copyright (c) 2005 - 2006, Intel Corporation<BR>
+Copyright (c) 2005 - 2009, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -37,9 +37,9 @@ Tcp4RxCallback (
   )
 {
   if (EFI_SUCCESS == Status) {
-    TcpInput (Pkt, NetSession->Source, NetSession->Dest);
+    TcpInput (Pkt, NetSession->Source.Addr[0], NetSession->Dest.Addr[0]);
   } else {
-    TcpIcmpInput (Pkt, IcmpErr, NetSession->Source, NetSession->Dest);
+    TcpIcmpInput (Pkt, IcmpErr, NetSession->Source.Addr[0], NetSession->Dest.Addr[0]);
   }
 }
 
@@ -70,11 +70,16 @@ TcpSendIpPacket (
   SOCKET           *Sock;
   VOID             *IpSender;
   TCP4_PROTO_DATA  *TcpProto;
+  EFI_IP_ADDRESS   Source;
+  EFI_IP_ADDRESS   Destination;
+
+  Source.Addr[0]      = Src;
+  Destination.Addr[0] = Dest;
 
   if (NULL == Tcb) {
 
     IpIo     = NULL;
-    IpSender = IpIoFindSender (&IpIo, Src);
+    IpSender = IpIoFindSender (&IpIo, IP_VERSION_4, &Source);
 
     if (IpSender == NULL) {
       DEBUG ((EFI_D_WARN, "TcpSendIpPacket: No appropriate IpSender.\n"));
@@ -88,14 +93,14 @@ TcpSendIpPacket (
     IpSender = Tcb->IpInfo;
   }
 
-  Override.TypeOfService            = 0;
-  Override.TimeToLive               = 255;
-  Override.DoNotFragment            = FALSE;
-  Override.Protocol                 = EFI_IP_PROTO_TCP;
-  ZeroMem (&Override.GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
-  CopyMem (&Override.SourceAddress, &Src, sizeof (EFI_IPv4_ADDRESS));
+  Override.Ip4OverrideData.TypeOfService            = 0;
+  Override.Ip4OverrideData.TimeToLive               = 255;
+  Override.Ip4OverrideData.DoNotFragment            = FALSE;
+  Override.Ip4OverrideData.Protocol                 = EFI_IP_PROTO_TCP;
+  ZeroMem (&Override.Ip4OverrideData.GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
+  CopyMem (&Override.Ip4OverrideData.SourceAddress, &Src, sizeof (EFI_IPv4_ADDRESS));
 
-  Status = IpIoSend (IpIo, Nbuf, IpSender, NULL, NULL, Dest, &Override);
+  Status = IpIoSend (IpIo, Nbuf, IpSender, NULL, NULL, &Destination, &Override);
 
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "TcpSendIpPacket: return %r error\n", Status));

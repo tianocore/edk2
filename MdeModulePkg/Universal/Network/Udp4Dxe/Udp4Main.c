@@ -507,7 +507,7 @@ Udp4Transmit (
   UDP4_INSTANCE_DATA      *Instance;
   EFI_TPL                 OldTpl;
   NET_BUF                 *Packet;
-  EFI_UDP4_HEADER         *Udp4Header;
+  EFI_UDP_HEADER         *Udp4Header;
   EFI_UDP4_CONFIG_DATA    *ConfigData;
   IP4_ADDR                Source;
   IP4_ADDR                Destination;
@@ -516,6 +516,7 @@ Udp4Transmit (
   UDP4_SERVICE_DATA       *Udp4Service;
   IP_IO_OVERRIDE          Override;
   UINT16                  HeadSum;
+  EFI_IP_ADDRESS          IpDestAddr;
 
   if ((This == NULL) || (Token == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -575,7 +576,7 @@ Udp4Transmit (
   Udp4Service = Instance->Udp4Service;
   *((UINTN *) &Packet->ProtoData[0]) = (UINTN) (Udp4Service->IpIo);
 
-  Udp4Header = (EFI_UDP4_HEADER *) NetbufAllocSpace (Packet, UDP4_HEADER_SIZE, TRUE);
+  Udp4Header = (EFI_UDP_HEADER *) NetbufAllocSpace (Packet, UDP4_HEADER_SIZE, TRUE);
   ASSERT (Udp4Header != NULL);
 
   ConfigData = &Instance->ConfigData;
@@ -589,7 +590,7 @@ Udp4Transmit (
   Udp4Header->Checksum     = 0;
 
   UdpSessionData = TxData->UdpSessionData;
-  Override.SourceAddress = ConfigData->StationAddress;
+  Override.Ip4OverrideData.SourceAddress = ConfigData->StationAddress;
 
   if (UdpSessionData != NULL) {
     //
@@ -597,7 +598,7 @@ Udp4Transmit (
     // UdpSessionData.
     //
     if (!EFI_IP4_EQUAL (&UdpSessionData->SourceAddress, &mZeroIp4Addr)) {
-      CopyMem (&Override.SourceAddress, &UdpSessionData->SourceAddress, sizeof (EFI_IPv4_ADDRESS));
+      CopyMem (&Override.Ip4OverrideData.SourceAddress, &UdpSessionData->SourceAddress, sizeof (EFI_IPv4_ADDRESS));
     }
 
     if (UdpSessionData->SourcePort != 0) {
@@ -608,7 +609,7 @@ Udp4Transmit (
       Udp4Header->DstPort = HTONS (UdpSessionData->DestinationPort);
     }
 
-    CopyMem (&Source, &Override.SourceAddress, sizeof (IP4_ADDR));
+    CopyMem (&Source, &Override.Ip4OverrideData.SourceAddress, sizeof (IP4_ADDR));
     CopyMem (&Destination, &UdpSessionData->DestinationAddress, sizeof (IP4_ADDR));
 
     //
@@ -644,15 +645,15 @@ Udp4Transmit (
   // Fill the IpIo Override data.
   //
   if (TxData->GatewayAddress != NULL) {
-    CopyMem (&Override.GatewayAddress, TxData->GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
+    CopyMem (&Override.Ip4OverrideData.GatewayAddress, TxData->GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
   } else {
-    ZeroMem (&Override.GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
+    ZeroMem (&Override.Ip4OverrideData.GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
   }
 
-  Override.Protocol                 = EFI_IP_PROTO_UDP;
-  Override.TypeOfService            = ConfigData->TypeOfService;
-  Override.TimeToLive               = ConfigData->TimeToLive;
-  Override.DoNotFragment            = ConfigData->DoNotFragment;
+  Override.Ip4OverrideData.Protocol                 = EFI_IP_PROTO_UDP;
+  Override.Ip4OverrideData.TypeOfService            = ConfigData->TypeOfService;
+  Override.Ip4OverrideData.TimeToLive               = ConfigData->TimeToLive;
+  Override.Ip4OverrideData.DoNotFragment            = ConfigData->DoNotFragment;
 
   //
   // Save the token into the TxToken map.
@@ -665,13 +666,14 @@ Udp4Transmit (
   //
   // Send out this datagram through IpIo.
   //
+  IpDestAddr.Addr[0] = Destination;
   Status = IpIoSend (
              Udp4Service->IpIo,
              Packet,
              Instance->IpInfo,
              Instance,
              Token,
-             Destination,
+             &IpDestAddr,
              &Override
              );
   if (EFI_ERROR (Status)) {

@@ -203,6 +203,46 @@ Ip4IsUnicast (
   return TRUE;
 }
 
+/**
+  Check whether the incoming IPv6 address is a valid unicast address.
+
+  If the address is a multicast address has binary 0xFF at the start, it is not
+  a valid unicast address. If the address is unspecified ::, it is not a valid
+  unicast address to be assigned to any node. If the address is loopback address
+  ::1, it is also not a valid unicast address to be assigned to any physical
+  interface. 
+
+  @param[in]  Ip6                   The IPv6 address to check against.
+
+  @return TRUE if Ip6 is a valid unicast address on the network, otherwise FALSE.
+
+**/ 
+BOOLEAN
+Ip6IsValidUnicast (
+  IN EFI_IPv6_ADDRESS       *Ip6
+  ) 
+{
+  UINT8 t;
+  UINT8 i;
+  
+  if (Ip6->Addr[0] == 0xFF) {
+    return FALSE;
+  }
+
+  for (i = 0; i < 15; i++) {
+    if (Ip6->Addr[i] != 0) {
+      return TRUE;
+    }
+  }
+
+  t = Ip6->Addr[i];
+
+  if (t == 0x0 || t == 0x1) {
+    return FALSE;
+  }
+
+  return TRUE;  
+}
 
 /**
   Initialize a random seed using current time.
