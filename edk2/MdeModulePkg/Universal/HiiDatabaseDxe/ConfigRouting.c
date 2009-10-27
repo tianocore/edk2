@@ -1043,32 +1043,15 @@ ParseIfrData (
       //
       IfrOrderedList = (EFI_IFR_ORDERED_LIST *) IfrOpHdr;
       if (IfrOrderedList->Question.VarStoreId != VarStorageData->VarStoreId) {
+        BlockData = NULL;
         break;
       }
-      
+
       //
       // Get Offset/Width by Question header and OneOf Flags
       //
       VarOffset = IfrOrderedList->Question.VarStoreInfo.VarOffset;
       VarWidth  = IfrOrderedList->MaxContainers;
-
-      //
-      // Check whether this question is in requested block array.
-      //
-      if (!BlockArrayCheck (RequestBlockArray, VarOffset, VarWidth)) {
-        //
-        // This question is not in the requested string. Skip it.
-        //
-        break;
-      }
-
-      //
-      // Check this var question is in the var storage 
-      //
-      if ((VarOffset + VarWidth) > VarStorageData->Size) {
-        Status = EFI_INVALID_PARAMETER;
-        goto Done;
-      }
       
       //
       // Set Block Data
@@ -1084,11 +1067,6 @@ ParseIfrData (
       BlockData->OpCode     = IfrOpHdr->OpCode;
       BlockData->Scope      = IfrOpHdr->Scope;
       InitializeListHead (&BlockData->DefaultValueEntry);
-      
-      //
-      // Add Block Data into VarStorageData BlockEntry
-      //
-      InsertBlockData (&VarStorageData->BlockEntry, &BlockData);
       break;
 
     case EFI_IFR_CHECKBOX_OP:
@@ -1385,12 +1363,40 @@ ParseIfrData (
           // Invalid ordered list option data type.
           //
           Status = EFI_INVALID_PARAMETER;
+          FreePool (BlockData);
           goto Done;
         }
+
         //
         // Calculate Ordered list QuestionId width.
         //
         BlockData->Width = (UINT16) (BlockData->Width * VarWidth);
+        //
+        // Check whether this question is in requested block array.
+        //
+        if (!BlockArrayCheck (RequestBlockArray, BlockData->Offset, BlockData->Width)) {
+          //
+          // This question is not in the requested string. Skip it.
+          //
+          FreePool (BlockData);
+          BlockData = NULL;
+          break;
+        }
+        //
+        // Check this var question is in the var storage 
+        //
+        if ((BlockData->Offset + BlockData->Width) > VarStorageData->Size) {
+          Status = EFI_INVALID_PARAMETER;
+          FreePool (BlockData);
+          goto Done;
+        }
+        //
+        // Add Block Data into VarStorageData BlockEntry
+        //
+        InsertBlockData (&VarStorageData->BlockEntry, &BlockData);
+        //
+        // No default data for OrderedList.
+        //
         BlockData = NULL;
         break;
       }
