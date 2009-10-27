@@ -121,7 +121,6 @@ typedef enum {
 /// The helper struct for IpIoGetIcmpErrStatus(). It is for internal use only.
 ///
 typedef struct {
-  EFI_STATUS                Error;
   BOOLEAN                   IsHard;
   BOOLEAN                   Notify;
 } ICMP_ERROR_INFO;
