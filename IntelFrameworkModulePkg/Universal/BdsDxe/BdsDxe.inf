@@ -133,7 +133,6 @@
   gEfiMiscSubClassGuid                          ## CONSUMES ## GUID (Indicate the datahub for holding misc sub class record)
   gEfiMemorySubClassGuid                        ## CONSUMES ## GUID (Indicate the datahub for holding memory record)
   gEfiProcessorSubClassGuid                     ## CONSUMES ## GUID (Indicate the datahub for holding processor record)
-  gEfiCapsuleVendorGuid                         ## CONSUMES ## GUID (Indicate the hob for holding capsule update image)
   gEfiHiiPlatformSetupFormsetGuid               ## CONSUMES ## GUID (Indicate the formset class guid to be displayed)
   gEfiIfrTianoGuid                              ## CONSUMES ## GUID (Extended IFR Guid Opcode)
 

@@ -1,7 +1,7 @@
 /** @file
   BDS routines to handle capsules.
 
-Copyright (c) 2004 - 2008, Intel Corporation. <BR>
+Copyright (c) 2004 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -51,7 +51,6 @@ BdsProcessCapsules (
   VOID                        **CapsulePtr;
   VOID                        **CapsulePtrCache;
   EFI_GUID                    *CapsuleGuidCache; 
-  CAPSULE_HOB_INFO            *CapsuleHobInfo;
 
   CapsuleNumber = 0;
   CapsuleTotalNumber = 0;
@@ -73,9 +72,8 @@ BdsProcessCapsules (
   // Find all capsule images from hob
   //
   HobPointer.Raw = GetHobList ();
-  while ((HobPointer.Raw = GetNextGuidHob (&gEfiCapsuleVendorGuid, HobPointer.Raw)) != NULL) {
+  while ((HobPointer.Raw = GetNextHob (EFI_HOB_TYPE_UEFI_CAPSULE, HobPointer.Raw)) != NULL) {
     CapsuleTotalNumber ++;
-
     HobPointer.Raw = GET_NEXT_HOB (HobPointer);
   }
   
@@ -101,10 +99,8 @@ BdsProcessCapsules (
   // Find all capsule images from hob
   //
   HobPointer.Raw = GetHobList ();
-  while ((HobPointer.Raw = GetNextGuidHob (&gEfiCapsuleVendorGuid, HobPointer.Raw)) != NULL) {
-    CapsuleHobInfo = GET_GUID_HOB_DATA (HobPointer.Guid);
-    CapsulePtr [CapsuleNumber++] = (VOID *)(UINTN)(CapsuleHobInfo->BaseAddress);
-
+  while ((HobPointer.Raw = GetNextHob (EFI_HOB_TYPE_UEFI_CAPSULE, HobPointer.Raw)) != NULL) {
+    CapsulePtr [CapsuleNumber++] = (VOID *) (UINTN) HobPointer.Capsule->BaseAddress;
     HobPointer.Raw = GET_NEXT_HOB (HobPointer);
   }
 
@@ -206,3 +202,4 @@ BdsProcessCapsules (
 
   return Status;
 }
+
