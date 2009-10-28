@@ -1,7 +1,7 @@
 /** @file
   Provide Hob Library functions for Pei phase.
 
-Copyright (c) 2007 - 2008, Intel Corporation<BR>
+Copyright (c) 2007 - 2009, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -640,4 +640,31 @@ BuildMemoryAllocationHob (
   // Zero the reserved space to match HOB spec
   //
   ZeroMem (Hob->AllocDescriptor.Reserved, sizeof (Hob->AllocDescriptor.Reserved));
+}
+
+/**
+  Builds an UEFI Capsule HOB.
+
+  This function builds an UEFI Capsule HOB.
+  It can only be invoked during PEI phase;
+  for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  If there is no additional space for HOB creation, then ASSERT().
+
+  @param  BaseAddress   The physical memory-mapped base address of an UEFI capsule.
+  @param  Length        The length of the contiguous memory in bytes.
+
+**/
+VOID
+EFIAPI
+BuildCapsuleHob (
+  IN EFI_PHYSICAL_ADDRESS        BaseAddress,
+  IN UINT64                      Length
+  )
+{
+  EFI_HOB_UEFI_CAPSULE  *Hob;
+
+  Hob = InternalPeiCreateHob (EFI_HOB_TYPE_UEFI_CAPSULE, sizeof (EFI_HOB_UEFI_CAPSULE));
+
+  Hob->BaseAddress  = BaseAddress;
+  Hob->Length       = Length;
 }
