@@ -2,11 +2,8 @@
   This file defines:
   * the capsule vendor GUID for capsule variables and the HOB
   * the capsule variable name
-  * the capsule GUID HOB data structure.
-  The capsule HOB and variable can be used to store the capsule image start address and length.
-  They are used by EDKII implementation of capsule update across a system reset.
 
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -35,13 +32,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /// 
 #define EFI_CAPSULE_VARIABLE_NAME L"CapsuleUpdateData"
 
-///
-/// Data structure of capsule guid hob entry
-///
-typedef struct {
-  EFI_PHYSICAL_ADDRESS BaseAddress;  ///< Capsule data start address
-  UINT32 Length;                     ///< Length of capsule data.
-} CAPSULE_HOB_INFO;
 
 extern EFI_GUID gEfiCapsuleVendorGuid;
 
