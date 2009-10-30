@@ -359,7 +359,7 @@ Mtftp4SendError (
   It simply frees the packet.
 
   @param  Packet                The transmitted (or failed to) packet
-  @param  Points                The local and remote UDP access point
+  @param  EndPoint              The local and remote UDP access point
   @param  IoStatus              The result of the transmission
   @param  Context               Opaque parameter to the callback
 
@@ -367,7 +367,7 @@ Mtftp4SendError (
 VOID
 Mtftp4OnPacketSent (
   IN NET_BUF                   *Packet,
-  IN UDP_POINTS                *Points,
+  IN UDP_END_POINT             *EndPoint,
   IN EFI_STATUS                IoStatus,
   IN VOID                      *Context
   )
@@ -415,7 +415,7 @@ Mtftp4SendPacket (
   IN OUT NET_BUF                *Packet
   )
 {
-  UDP_POINTS                UdpPoint;
+  UDP_END_POINT             UdpPoint;
   EFI_STATUS                Status;
   UINT16                    OpCode;
   UINT16                    Value;
@@ -427,14 +427,13 @@ Mtftp4SendPacket (
     NetbufFree (Instance->LastPacket);
   }
 
-  Instance->LastPacket  = Packet;
+  Instance->LastPacket        = Packet;
 
-  Instance->CurRetry    = 0;
+  Instance->CurRetry          = 0;
   Mtftp4SetTimeout (Instance);
 
-  UdpPoint.LocalAddr    = 0;
-  UdpPoint.LocalPort    = 0;
-  UdpPoint.RemoteAddr   = Instance->ServerIp;
+  ZeroMem (&UdpPoint, sizeof (UdpPoint));
+  UdpPoint.RemoteAddr.Addr[0] = Instance->ServerIp;
 
   //
   // Send the requests to the listening port, other packets
@@ -457,7 +456,7 @@ Mtftp4SendPacket (
              Instance->UnicastPort,
              Packet,
              &UdpPoint,
-             0,
+             NULL,
              Mtftp4OnPacketSent,
              Instance
              );
@@ -484,16 +483,15 @@ Mtftp4Retransmit (
   IN MTFTP4_PROTOCOL        *Instance
   )
 {
-  UDP_POINTS                UdpPoint;
+  UDP_END_POINT             UdpPoint;
   EFI_STATUS                Status;
   UINT16                    OpCode;
   UINT16                    Value;
 
   ASSERT (Instance->LastPacket != NULL);
 
-  UdpPoint.LocalAddr  = 0;
-  UdpPoint.LocalPort  = 0;
-  UdpPoint.RemoteAddr = Instance->ServerIp;
+  ZeroMem (&UdpPoint, sizeof (UdpPoint));
+  UdpPoint.RemoteAddr.Addr[0] = Instance->ServerIp;
 
   //
   // Set the requests to the listening port, other packets to the connected port
@@ -514,7 +512,7 @@ Mtftp4Retransmit (
              Instance->UnicastPort,
              Instance->LastPacket,
              &UdpPoint,
-             0,
+             NULL,
              Mtftp4OnPacketSent,
              Instance
              );

@@ -69,7 +69,7 @@ struct _DHCP_PROTOCOL {
   EFI_EVENT                         RenewRebindEvent;
 
   EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN  *Token;
-  UDP_IO_PORT                       *UdpIo; // The UDP IO used for TransmitReceive.
+  UDP_IO                            *UdpIo; // The UDP IO used for TransmitReceive.
   UINT32                            Timeout;
   NET_BUF_QUEUE                     ResponseQueue;
 };
@@ -108,8 +108,8 @@ struct _DHCP_SERVICE {
   UINT32                        T2;
   INTN                          ExtraRefresh; // This refresh is reqested by user
 
-  UDP_IO_PORT                   *UdpIo;       // Udp child receiving all DHCP message
-  UDP_IO_PORT                   *LeaseIoPort; // Udp child with lease IP
+  UDP_IO                        *UdpIo;       // Udp child receiving all DHCP message
+  UDP_IO                        *LeaseIoPort; // Udp child with lease IP
   EFI_DHCP4_PACKET              *LastPacket;  // The last sent packet for retransmission
   EFI_MAC_ADDRESS               Mac;
   UINT8                         HwType;

@@ -305,7 +305,7 @@ DhcpComputeLease (
   DHCP driver needs this port to unicast packet to the server
   such as DHCP release.
 
-  @param[in]  UdpIo                 The UDP IO port to configure
+  @param[in]  UdpIo                 The UDP IO to configure
   @param[in]  Context               Dhcp service instance.
 
   @retval EFI_SUCCESS           The UDP IO port is successfully configured.
@@ -314,7 +314,7 @@ DhcpComputeLease (
 **/
 EFI_STATUS
 DhcpConfigLeaseIoPort (
-  IN UDP_IO_PORT            *UdpIo,
+  IN UDP_IO                 *UdpIo,
   IN VOID                   *Context
   )
 {
@@ -349,7 +349,7 @@ DhcpConfigLeaseIoPort (
 
   ZeroMem (&UdpConfigData.RemoteAddress, sizeof (EFI_IPv4_ADDRESS));
 
-  Status = UdpIo->Udp->Configure (UdpIo->Udp, &UdpConfigData);
+  Status = UdpIo->Protocol.Udp4->Configure (UdpIo->Protocol.Udp4, &UdpConfigData);
 
   if (EFI_ERROR (Status)) {
     return Status;
@@ -364,7 +364,7 @@ DhcpConfigLeaseIoPort (
     Ip = HTONL (DhcpSb->Para->Router);
     CopyMem (&Gateway, &Ip, sizeof (EFI_IPv4_ADDRESS));
 
-    UdpIo->Udp->Routes (UdpIo->Udp, FALSE, &Subnet, &Subnet, &Gateway);
+    UdpIo->Protocol.Udp4->Routes (UdpIo->Protocol.Udp4, FALSE, &Subnet, &Subnet, &Gateway);
   }
 
   return EFI_SUCCESS;
@@ -402,7 +402,7 @@ DhcpLeaseAcquired (
   }
 
   if (DhcpSb->LeaseIoPort != NULL) {
-    UdpIoFreePort (DhcpSb->LeaseIoPort);
+    UdpIoFreeIo (DhcpSb->LeaseIoPort);
   }
 
   //
@@ -410,10 +410,11 @@ DhcpLeaseAcquired (
   // and transmit unicast packet with it as source address. Don't
   // start receive on this port, the queued packet will be timeout.
   //
-  DhcpSb->LeaseIoPort = UdpIoCreatePort (
+  DhcpSb->LeaseIoPort = UdpIoCreateIo (
                           DhcpSb->Controller,
                           DhcpSb->Image,
                           DhcpConfigLeaseIoPort,
+                          UDP_IO_UDP4_VERSION,
                           DhcpSb
                           );
 
@@ -467,7 +468,7 @@ DhcpCleanLease (
   DhcpSb->ExtraRefresh  = FALSE;
 
   if (DhcpSb->LeaseIoPort != NULL) {
-    UdpIoFreePort (DhcpSb->LeaseIoPort);
+    UdpIoFreeIo (DhcpSb->LeaseIoPort);
     DhcpSb->LeaseIoPort = NULL;
   }
 
@@ -935,7 +936,7 @@ ON_EXIT:
   state machine.
 
   @param  UdpPacket             The UDP packets received.
-  @param  Points                The local/remote UDP access points
+  @param  EndPoint              The local/remote UDP access point
   @param  IoStatus              The status of the UDP receive
   @param  Context               The opaque parameter to the function.
 
@@ -943,7 +944,7 @@ ON_EXIT:
 VOID
 DhcpInput (
   NET_BUF                   *UdpPacket,
-  UDP_POINTS                *Points,
+  UDP_END_POINT             *EndPoint,
   EFI_STATUS                IoStatus,
   VOID                      *Context
   )
@@ -1106,7 +1107,7 @@ DhcpReleasePacket (
   Release the net buffer when packet is sent.
 
   @param  UdpPacket             The UDP packets received.
-  @param  Points                The local/remote UDP access points
+  @param  EndPoint              The local/remote UDP access point
   @param  IoStatus              The status of the UDP receive
   @param  Context               The opaque parameter to the function.
 
@@ -1114,7 +1115,7 @@ DhcpReleasePacket (
 VOID
 DhcpOnPacketSent (
   NET_BUF                   *Packet,
-  UDP_POINTS                *Points,
+  UDP_END_POINT             *EndPoint,
   EFI_STATUS                IoStatus,
   VOID                      *Context
   )
@@ -1157,8 +1158,8 @@ DhcpSendMessage (
   EFI_DHCP4_PACKET          *NewPacket;
   EFI_DHCP4_HEADER          *Head;
   EFI_DHCP4_HEADER          *SeedHead;
-  UDP_IO_PORT               *UdpIo;
-  UDP_POINTS                EndPoint;
+  UDP_IO                    *UdpIo;
+  UDP_END_POINT             EndPoint;
   NET_BUF                   *Wrap;
   NET_FRAGMENT              Frag;
   EFI_STATUS                Status;
@@ -1363,16 +1364,16 @@ DhcpSendMessage (
   // Broadcast the message, unless we know the server address.
   // Use the lease UdpIo port to send the unicast packet.
   //
-  EndPoint.RemoteAddr = 0xffffffff;
-  EndPoint.LocalAddr  = 0;
-  EndPoint.RemotePort = DHCP_SERVER_PORT;
-  EndPoint.LocalPort  = DHCP_CLIENT_PORT;
-  UdpIo               = DhcpSb->UdpIo;
+  EndPoint.RemoteAddr.Addr[0] = 0xffffffff;
+  EndPoint.LocalAddr.Addr[0]  = 0;
+  EndPoint.RemotePort         = DHCP_SERVER_PORT;
+  EndPoint.LocalPort          = DHCP_CLIENT_PORT;
+  UdpIo                       = DhcpSb->UdpIo;
 
   if ((DhcpSb->DhcpState == Dhcp4Renewing) || (Type == DHCP_MSG_RELEASE)) {
-    EndPoint.RemoteAddr = DhcpSb->ServerAddr;
-    EndPoint.LocalAddr  = DhcpSb->ClientAddr;
-    UdpIo               = DhcpSb->LeaseIoPort;
+    EndPoint.RemoteAddr.Addr[0] = DhcpSb->ServerAddr;
+    EndPoint.LocalAddr.Addr[0]  = DhcpSb->ClientAddr;
+    UdpIo                       = DhcpSb->LeaseIoPort;
   }
 
   ASSERT (UdpIo != NULL);
@@ -1382,7 +1383,7 @@ DhcpSendMessage (
              UdpIo, 
              Wrap, 
              &EndPoint, 
-             0, 
+             NULL, 
              DhcpOnPacketSent, 
              DhcpSb
              );
@@ -1411,8 +1412,8 @@ DhcpRetransmit (
   IN DHCP_SERVICE           *DhcpSb
   )
 {
-  UDP_IO_PORT               *UdpIo;
-  UDP_POINTS                EndPoint;
+  UDP_IO                    *UdpIo;
+  UDP_END_POINT             EndPoint;
   NET_BUF                   *Wrap;
   NET_FRAGMENT              Frag;
   EFI_STATUS                Status;
@@ -1435,16 +1436,16 @@ DhcpRetransmit (
   //
   // Broadcast the message, unless we know the server address.
   //
-  EndPoint.RemotePort = DHCP_SERVER_PORT;
-  EndPoint.LocalPort  = DHCP_CLIENT_PORT;
-  EndPoint.RemoteAddr = 0xffffffff;
-  EndPoint.LocalAddr  = 0;
-  UdpIo               = DhcpSb->UdpIo;
+  EndPoint.RemotePort         = DHCP_SERVER_PORT;
+  EndPoint.LocalPort          = DHCP_CLIENT_PORT;
+  EndPoint.RemoteAddr.Addr[0] = 0xffffffff;
+  EndPoint.LocalAddr.Addr[0]  = 0;
+  UdpIo                       = DhcpSb->UdpIo;
 
   if (DhcpSb->DhcpState == Dhcp4Renewing) {
-    EndPoint.RemoteAddr = DhcpSb->ServerAddr;
-    EndPoint.LocalAddr  = DhcpSb->ClientAddr;
-    UdpIo               = DhcpSb->LeaseIoPort;
+    EndPoint.RemoteAddr.Addr[0] = DhcpSb->ServerAddr;
+    EndPoint.LocalAddr.Addr[0]  = DhcpSb->ClientAddr;
+    UdpIo                       = DhcpSb->LeaseIoPort;
   }
 
   ASSERT (UdpIo != NULL);
@@ -1454,7 +1455,7 @@ DhcpRetransmit (
              UdpIo,
              Wrap,
              &EndPoint,
-             0,
+             NULL,
              DhcpOnPacketSent,
              DhcpSb
              );

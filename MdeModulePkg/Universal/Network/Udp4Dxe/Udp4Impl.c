@@ -86,7 +86,7 @@ Udp4DgramSent (
 VOID
 Udp4DgramRcvd (
   IN EFI_STATUS            Status,
-  IN ICMP_ERROR            IcmpError,
+  IN UINT8                 IcmpError,
   IN EFI_NET_SESSION_DATA  *NetSession,
   IN NET_BUF               *Packet,
   IN VOID                  *Context
@@ -227,7 +227,7 @@ Udp4Demultiplex (
 VOID
 Udp4IcmpHandler (
   IN UDP4_SERVICE_DATA     *Udp4Service,
-  IN ICMP_ERROR            IcmpError,
+  IN UINT8                 IcmpError,
   IN EFI_NET_SESSION_DATA  *NetSession,
   IN NET_BUF               *Packet
   );
@@ -1029,7 +1029,7 @@ Udp4DgramSent (
 VOID
 Udp4DgramRcvd (
   IN EFI_STATUS            Status,
-  IN ICMP_ERROR            IcmpError,
+  IN UINT8                 IcmpError,
   IN EFI_NET_SESSION_DATA  *NetSession,
   IN NET_BUF               *Packet,
   IN VOID                  *Context
@@ -1780,7 +1780,7 @@ Udp4SendPortUnreach (
 VOID
 Udp4IcmpHandler (
   IN UDP4_SERVICE_DATA     *Udp4Service,
-  IN ICMP_ERROR            IcmpError,
+  IN UINT8                 IcmpError,
   IN EFI_NET_SESSION_DATA  *NetSession,
   IN NET_BUF               *Packet
   )

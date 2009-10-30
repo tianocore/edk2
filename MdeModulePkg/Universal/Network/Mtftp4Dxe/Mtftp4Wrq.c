@@ -329,7 +329,7 @@ Mtftp4WrqHandleOack (
   The input process routine for MTFTP upload.
 
   @param  UdpPacket             The received MTFTP packet.
-  @param  Points                The local/remote access point
+  @param  EndPoint              The local/remote access point
   @param  IoStatus              The result of the packet receiving
   @param  Context               Opaque parameter for the callback, which is the
                                 MTFTP session.
@@ -337,7 +337,7 @@ Mtftp4WrqHandleOack (
 VOID
 Mtftp4WrqInput (
   IN NET_BUF                *UdpPacket,
-  IN UDP_POINTS             *Points,
+  IN UDP_END_POINT          *EndPoint,
   IN EFI_STATUS             IoStatus,
   IN VOID                   *Context
   )
@@ -371,11 +371,11 @@ Mtftp4WrqInput (
   // Client send initial request to server's listening port. Server
   // will select a UDP port to communicate with the client.
   //
-  if (Points->RemotePort != Instance->ConnectedPort) {
+  if (EndPoint->RemotePort != Instance->ConnectedPort) {
     if (Instance->ConnectedPort != 0) {
       goto ON_EXIT;
     } else {
-      Instance->ConnectedPort = Points->RemotePort;
+      Instance->ConnectedPort = EndPoint->RemotePort;
     }
   }
 

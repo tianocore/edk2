@@ -1407,7 +1407,7 @@ DISCARD:
 VOID
 TcpIcmpInput (
   IN NET_BUF     *Nbuf,
-  IN ICMP_ERROR  IcmpErr,
+  IN UINT8       IcmpErr,
   IN UINT32      Src,
   IN UINT32      Dst
   )

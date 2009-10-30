@@ -22,34 +22,33 @@ typedef UINT32          IP4_ADDR;
 typedef UINT32          TCP_SEQNO;
 typedef UINT16          TCP_PORTNO;
 
-typedef enum {
-  NET_ETHER_ADDR_LEN    = 6,
-  NET_IFTYPE_ETHERNET   = 0x01,
 
-  EFI_IP_PROTO_UDP      = 0x11,
-  EFI_IP_PROTO_TCP      = 0x06,
-  EFI_IP_PROTO_ICMP     = 0x01,
+#define  NET_ETHER_ADDR_LEN    6
+#define  NET_IFTYPE_ETHERNET   0x01
 
-  //
-  // The address classification
-  //
-  IP4_ADDR_CLASSA       = 1,
-  IP4_ADDR_CLASSB,
-  IP4_ADDR_CLASSC,
-  IP4_ADDR_CLASSD,
-  IP4_ADDR_CLASSE,
+#define  EFI_IP_PROTO_UDP      0x11
+#define  EFI_IP_PROTO_TCP      0x06
+#define  EFI_IP_PROTO_ICMP     0x01
 
-  IP4_MASK_NUM          = 33
-} IP4_CLASS_TYPE;
+//
+// The address classification
+//
+#define  IP4_ADDR_CLASSA       1
+#define  IP4_ADDR_CLASSB       2
+#define  IP4_ADDR_CLASSC       3
+#define  IP4_ADDR_CLASSD       4
+#define  IP4_ADDR_CLASSE       5
 
-typedef enum {
-  IP6_HOP_BY_HOP        = 0,
-  IP6_DESTINATION       = 60,
-  IP6_FRAGMENT          = 44,
-  IP6_AH                = 51,
-  IP6_ESP               = 50,
-  IP6_NO_NEXT_HEADER    = 59
-} IP6_EXTENSION_HEADER_TYPE;
+#define  IP4_MASK_NUM          33
+
+
+#define  IP6_HOP_BY_HOP        0
+#define  IP6_DESTINATION       60
+#define  IP6_FRAGMENT          44
+#define  IP6_AH                51
+#define  IP6_ESP               50
+#define  IP6_NO_NEXT_HEADER    59
+
 
 #pragma pack(1)
 
@@ -273,6 +272,23 @@ Ip4IsUnicast (
 BOOLEAN
 Ip6IsValidUnicast (
   IN EFI_IPv6_ADDRESS       *Ip6
+  );
+
+/**
+  Switches the endianess of an IPv6 address
+
+  This function swaps the bytes in a 128-bit IPv6 address to switch the value
+  from little endian to big endian or vice versa. The byte swapped value is
+  returned.
+
+  @param  Ip6 Points to an IPv6 address
+
+  @return The byte swapped IPv6 address.
+
+**/
+EFI_IPv6_ADDRESS *
+Ip6Swap128 (
+  EFI_IPv6_ADDRESS *Ip6
   );
 
 extern IP4_ADDR gIp4AllMasks[IP4_MASK_NUM];
@@ -886,20 +902,19 @@ NetLibDefaultUnload (
   IN EFI_HANDLE             ImageHandle
   );
 
-typedef enum {
-  //
-  //Various signatures
-  //
-  NET_BUF_SIGNATURE    = SIGNATURE_32 ('n', 'b', 'u', 'f'),
-  NET_VECTOR_SIGNATURE = SIGNATURE_32 ('n', 'v', 'e', 'c'),
-  NET_QUE_SIGNATURE    = SIGNATURE_32 ('n', 'b', 'q', 'u'),
+
+//
+//Various signatures
+//
+#define  NET_BUF_SIGNATURE    SIGNATURE_32 ('n', 'b', 'u', 'f')
+#define  NET_VECTOR_SIGNATURE SIGNATURE_32 ('n', 'v', 'e', 'c')
+#define  NET_QUE_SIGNATURE    SIGNATURE_32 ('n', 'b', 'q', 'u')
 
 
-  NET_PROTO_DATA       = 64,   // Opaque buffer for protocols
-  NET_BUF_HEAD         = 1,    // Trim or allocate space from head
-  NET_BUF_TAIL         = 0,    // Trim or allocate space from tail
-  NET_VECTOR_OWN_FIRST = 0x01  // We allocated the 1st block in the vector
-} NET_SIGNATURE_TYPE;
+#define  NET_PROTO_DATA       64   // Opaque buffer for protocols
+#define  NET_BUF_HEAD         1    // Trim or allocate space from head
+#define  NET_BUF_TAIL         0    // Trim or allocate space from tail
+#define  NET_VECTOR_OWN_FIRST 0x01  // We allocated the 1st block in the vector
 
 #define NET_CHECK_SIGNATURE(PData, SIGNATURE) \
   ASSERT (((PData) != NULL) && ((PData)->Signature == (SIGNATURE)))

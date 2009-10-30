@@ -1,7 +1,7 @@
 /** @file
   Tcp driver function header.
 
-Copyright (c) 2005 - 2006, Intel Corporation<BR>
+Copyright (c) 2005 - 2009, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -78,7 +78,7 @@ typedef struct _TCP4_PROTO_DATA {
 VOID
 Tcp4RxCallback (
   IN EFI_STATUS                       Status,
-  IN ICMP_ERROR                       IcmpErr,
+  IN UINT8                            IcmpErr,
   IN EFI_NET_SESSION_DATA             *NetSession,
   IN NET_BUF                          *Pkt,
   IN VOID                             *Context    OPTIONAL
