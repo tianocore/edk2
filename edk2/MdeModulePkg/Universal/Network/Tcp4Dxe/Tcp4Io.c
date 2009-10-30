@@ -30,7 +30,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 VOID
 Tcp4RxCallback (
   IN EFI_STATUS                       Status,
-  IN ICMP_ERROR                       IcmpErr,
+  IN UINT8                            IcmpErr,
   IN EFI_NET_SESSION_DATA             *NetSession,
   IN NET_BUF                          *Pkt,
   IN VOID                             *Context    OPTIONAL

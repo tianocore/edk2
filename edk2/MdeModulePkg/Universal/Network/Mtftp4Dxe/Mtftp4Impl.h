@@ -85,7 +85,7 @@ struct _MTFTP4_SERVICE {
   // This UDP child is used to keep the connection between the UDP
   // and MTFTP, so MTFTP will be notified when UDP is uninstalled.
   //
-  UDP_IO_PORT                   *ConnectUdp;
+  UDP_IO                        *ConnectUdp;
 };
 
 
@@ -131,7 +131,7 @@ struct _MTFTP4_PROTOCOL {
   UINT16                        ListeningPort;
   UINT16                        ConnectedPort;
   IP4_ADDR                      Gateway;
-  UDP_IO_PORT                   *UnicastPort;
+  UDP_IO                        *UnicastPort;
 
   //
   // Timeout and retransmit status
@@ -148,7 +148,7 @@ struct _MTFTP4_PROTOCOL {
   IP4_ADDR                      McastIp;
   UINT16                        McastPort;
   BOOLEAN                       Master;
-  UDP_IO_PORT                   *McastUdpPort;
+  UDP_IO                        *McastUdpPort;
 };
 
 /**

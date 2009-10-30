@@ -826,7 +826,7 @@ EfiDhcp4Start (
 
   if (CompletionEvent == NULL) {
     while (DhcpSb->IoStatus == EFI_ALREADY_STARTED) {
-      DhcpSb->UdpIo->Udp->Poll (DhcpSb->UdpIo->Udp);
+      DhcpSb->UdpIo->Protocol.Udp4->Poll (DhcpSb->UdpIo->Protocol.Udp4);
     }
 
     return DhcpSb->IoStatus;
@@ -951,7 +951,8 @@ EfiDhcp4RenewRebind (
 
   if (CompletionEvent == NULL) {
     while (DhcpSb->IoStatus == EFI_ALREADY_STARTED) {
-      DhcpSb->UdpIo->Udp->Poll (DhcpSb->UdpIo->Udp);
+      DhcpSb->UdpIo->Protocol.Udp4->Poll (DhcpSb->UdpIo->Protocol.Udp4);
+
     }
 
     return DhcpSb->IoStatus;
@@ -1173,7 +1174,7 @@ EfiDhcp4Build (
 **/
 EFI_STATUS
 Dhcp4InstanceConfigUdpIo (
-  IN UDP_IO_PORT  *UdpIo,
+  IN UDP_IO       *UdpIo,
   IN VOID         *Context
   )
 {
@@ -1206,7 +1207,7 @@ Dhcp4InstanceConfigUdpIo (
     UdpConfigData.StationPort = Token->ListenPoints[0].ListenPort;
   }
 
-  return UdpIo->Udp->Configure (UdpIo->Udp, &UdpConfigData);
+  return UdpIo->Protocol.Udp4->Configure (UdpIo->Protocol.Udp4, &UdpConfigData);
 }
 
 /**
@@ -1228,7 +1229,13 @@ Dhcp4InstanceCreateUdpIo (
   ASSERT (Instance->Token != NULL);
 
   DhcpSb          = Instance->Service;
-  Instance->UdpIo = UdpIoCreatePort (DhcpSb->Controller, DhcpSb->Image, Dhcp4InstanceConfigUdpIo, Instance);
+  Instance->UdpIo = UdpIoCreateIo (
+                      DhcpSb->Controller,
+                      DhcpSb->Image,
+                      Dhcp4InstanceConfigUdpIo,
+                      UDP_IO_UDP4_VERSION,
+                      Instance
+                      );
   if (Instance->UdpIo == NULL) {
     return EFI_OUT_OF_RESOURCES;
   } else {
@@ -1256,7 +1263,7 @@ DhcpDummyExtFree (
   sent out. The packet will be queued to the response queue.
   
   @param UdpPacket        The Dhcp4 packet.
-  @param Points           Udp4 address pair.
+  @param EndPoint         Udp4 address pair.
   @param IoStatus         Status of the input.
   @param Context          Extra info for the input.
   
@@ -1264,7 +1271,7 @@ DhcpDummyExtFree (
 VOID
 PxeDhcpInput (
   NET_BUF                   *UdpPacket,
-  UDP_POINTS                *Points,
+  UDP_END_POINT             *EndPoint,
   EFI_STATUS                IoStatus,
   VOID                      *Context
   )
@@ -1397,8 +1404,8 @@ SIGNAL_USER:
   // Clean up the resources dedicated for this transmit receive transaction.
   //
   NetbufQueFlush (&Instance->ResponseQueue);
-  UdpIoCleanPort (Instance->UdpIo);
-  UdpIoFreePort (Instance->UdpIo);
+  UdpIoCleanIo (Instance->UdpIo);
+  UdpIoFreeIo (Instance->UdpIo);
   Instance->UdpIo = NULL;
   Instance->Token = NULL;
 
@@ -1439,10 +1446,10 @@ EfiDhcp4TransmitReceive (
   EFI_STATUS     Status;
   NET_FRAGMENT   Frag;
   NET_BUF        *Wrap;
-  UDP_POINTS     EndPoint;
+  UDP_END_POINT  EndPoint;
   IP4_ADDR       Ip;
   DHCP_SERVICE   *DhcpSb;
-  IP4_ADDR       Gateway;
+  EFI_IP_ADDRESS Gateway;
   IP4_ADDR       SubnetMask;
 
   if ((This == NULL) || (Token == NULL) || (Token->Packet == NULL)) {
@@ -1516,16 +1523,15 @@ EfiDhcp4TransmitReceive (
   }
 
   //
-  // Set the local address and local port.
+  // Set the local address and local port to ZERO.
   //
-  EndPoint.LocalAddr = 0;
-  EndPoint.LocalPort = 0;
+  ZeroMem (&EndPoint, sizeof (UDP_END_POINT));
 
   //
   // Set the destination address and destination port.
   //
   CopyMem (&Ip, &Token->RemoteAddress, sizeof (EFI_IPv4_ADDRESS));
-  EndPoint.RemoteAddr = NTOHL (Ip);
+  EndPoint.RemoteAddr.Addr[0] = NTOHL (Ip);
 
   if (Token->RemotePort == 0) {
     EndPoint.RemotePort = DHCP_SERVER_PORT;
@@ -1537,16 +1543,16 @@ EfiDhcp4TransmitReceive (
   // Get the gateway.
   //
   SubnetMask = DhcpSb->Netmask;
-  Gateway    = 0;
-  if (!IP4_NET_EQUAL (DhcpSb->ClientAddr, EndPoint.RemoteAddr, SubnetMask)) {
-    CopyMem (&Gateway, &Token->GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
-    Gateway = NTOHL (Gateway);
+  ZeroMem (&Gateway, sizeof (Gateway));
+  if (!IP4_NET_EQUAL (DhcpSb->ClientAddr, EndPoint.RemoteAddr.Addr[0], SubnetMask)) {
+    CopyMem (&Gateway.v4, &Token->GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
+    Gateway.Addr[0] = NTOHL (Gateway.Addr[0]);
   }
 
   //
   // Transmit the DHCP packet.
   //
-  Status = UdpIoSendDatagram (Instance->UdpIo, Wrap, &EndPoint, Gateway, DhcpOnPacketSent, NULL);
+  Status = UdpIoSendDatagram (Instance->UdpIo, Wrap, &EndPoint, &Gateway, DhcpOnPacketSent, NULL);
   if (EFI_ERROR (Status)) {
     NetbufFree (Wrap);
     goto ON_ERROR;
@@ -1563,8 +1569,8 @@ EfiDhcp4TransmitReceive (
 ON_ERROR:
 
   if (EFI_ERROR (Status) && (Instance->UdpIo != NULL)) {
-    UdpIoCleanPort (Instance->UdpIo);
-    UdpIoFreePort (Instance->UdpIo);
+    UdpIoCleanIo (Instance->UdpIo);
+    UdpIoFreeIo (Instance->UdpIo);
     Instance->UdpIo = NULL;
     Instance->Token = NULL;
   }
@@ -1583,7 +1589,7 @@ ON_ERROR:
       // free it when timeout.
       //
       if (Instance->Timeout > 0) {
-        Instance->UdpIo->Udp->Poll (Instance->UdpIo->Udp);
+        Instance->UdpIo->Protocol.Udp4->Poll (Instance->UdpIo->Protocol.Udp4);
         gBS->RestoreTPL (OldTpl);
       } else {
         gBS->RestoreTPL (OldTpl);

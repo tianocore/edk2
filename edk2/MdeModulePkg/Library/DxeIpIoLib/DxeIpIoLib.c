@@ -136,7 +136,7 @@ IpIoCreateIpChildOpenProtocol (
   IN  EFI_HANDLE  ControllerHandle,
   IN  EFI_HANDLE  ImageHandle,
   IN  EFI_HANDLE  *ChildHandle,
-  IN  IP_VERSION  IpVersion,  
+  IN  UINT8       IpVersion,
   OUT VOID        **Interface
   )
 {
@@ -213,7 +213,7 @@ IpIoCloseProtocolDestroyIpChild (
   IN EFI_HANDLE  ControllerHandle,
   IN EFI_HANDLE  ImageHandle,
   IN EFI_HANDLE  ChildHandle,
-  IN IP_VERSION  IpVersion
+  IN UINT8       IpVersion
   )
 {
   EFI_STATUS  Status;
@@ -274,7 +274,7 @@ IpIoIcmpv4Handler (
 {
   IP4_ICMP_ERROR_HEAD  *IcmpHdr;
   EFI_IP4_HEADER       *IpHdr;
-  ICMP_ERROR           IcmpErr;
+  UINT8                IcmpErr;
   UINT8                *PayLoadHdr;
   UINT8                Type;
   UINT8                Code;
@@ -307,7 +307,7 @@ IpIoIcmpv4Handler (
     case ICMP_CODE_UNREACH_PROTOCOL:
     case ICMP_CODE_UNREACH_PORT:
     case ICMP_CODE_UNREACH_SRCFAIL:
-      IcmpErr = (ICMP_ERROR) (ICMP_ERR_UNREACH_NET + Code);
+      IcmpErr = (UINT8) (ICMP_ERR_UNREACH_NET + Code);
 
       break;
 
@@ -342,7 +342,7 @@ IpIoIcmpv4Handler (
       return EFI_ABORTED;
     }
 
-    IcmpErr = (ICMP_ERROR) (Code + ICMP_ERR_TIMXCEED_INTRANS);
+    IcmpErr = (UINT8) (Code + ICMP_ERR_TIMXCEED_INTRANS);
 
     break;
 
@@ -403,7 +403,7 @@ IpIoIcmpv6Handler (
 {
   IP6_ICMP_ERROR_HEAD  *IcmpHdr;
   EFI_IP6_HEADER       *IpHdr;
-  ICMP6_ERROR          IcmpErr;
+  UINT8                IcmpErr;
   UINT8                *PayLoadHdr;
   UINT8                Type;
   UINT8                Code;
@@ -470,7 +470,7 @@ IpIoIcmpv6Handler (
       return EFI_ABORTED;
     }
 
-    IcmpErr = (ICMP6_ERROR) (ICMP6_ERR_TIMXCEED_HOPLIMIT + Code);
+    IcmpErr = (UINT8) (ICMP6_ERR_TIMXCEED_HOPLIMIT + Code);
 
     break;
 
@@ -479,7 +479,7 @@ IpIoIcmpv6Handler (
       return EFI_ABORTED;
     }
 
-    IcmpErr = (ICMP6_ERROR) (ICMP6_ERR_PARAMPROB_HEADER + Code);
+    IcmpErr = (UINT8) (ICMP6_ERR_PARAMPROB_HEADER + Code);
 
     break;
 
@@ -538,7 +538,7 @@ IpIoIcmpv6Handler (
   
   NetbufTrim (Pkt, TrimBytes, TRUE);
 
-  IpIo->PktRcvdNotify (EFI_ICMP_ERROR, (ICMP_ERROR) IcmpErr, Session, Pkt, IpIo->RcvdContext);
+  IpIo->PktRcvdNotify (EFI_ICMP_ERROR, IcmpErr, Session, Pkt, IpIo->RcvdContext);
 
   return EFI_SUCCESS;
 }
@@ -1098,7 +1098,7 @@ IpIoListenHandlerDpc (
 
   if (EFI_SUCCESS == Status) {
 
-    IpIo->PktRcvdNotify (EFI_SUCCESS, (ICMP_ERROR) 0, &Session, Pkt, IpIo->RcvdContext);
+    IpIo->PktRcvdNotify (EFI_SUCCESS, 0, &Session, Pkt, IpIo->RcvdContext);
   } else {
     //
     // Status is EFI_ICMP_ERROR
@@ -1170,7 +1170,7 @@ EFIAPI
 IpIoCreate (
   IN EFI_HANDLE Image,
   IN EFI_HANDLE Controller,
-  IN IP_VERSION IpVersion  
+  IN UINT8      IpVersion
   )
 {
   EFI_STATUS  Status;
@@ -1264,7 +1264,7 @@ IpIoOpen (
 {
   EFI_STATUS        Status;
   VOID              *Ip;
-  IP_VERSION        IpVersion;
+  UINT8             IpVersion;
 
   if (IpIo->IsConfigured) {
     return EFI_ACCESS_DENIED;
@@ -1379,7 +1379,7 @@ IpIoStop (
   EFI_STATUS        Status;
   VOID              *Ip;
   IP_IO_IP_INFO     *IpInfo;
-  IP_VERSION        IpVersion;
+  UINT8             IpVersion;
 
   if (!IpIo->IsConfigured) {
     return EFI_SUCCESS;
@@ -1728,7 +1728,7 @@ IpIoConfigIp (
 {
   EFI_STATUS         Status;
   VOID               *Ip;
-  IP_VERSION         IpVersion;
+  UINT8              IpVersion;
   EFI_IP4_MODE_DATA  Ip4ModeData;
   EFI_IP6_MODE_DATA  Ip6ModeData;
 
@@ -1885,7 +1885,7 @@ IpIoRemoveIp (
   )
 {
 
-  IP_VERSION          IpVersion;
+  UINT8               IpVersion;
 
   ASSERT (IpInfo->RefCnt > 0);
 
@@ -1957,7 +1957,7 @@ IP_IO_IP_INFO *
 EFIAPI
 IpIoFindSender (
   IN OUT IP_IO           **IpIo,
-  IN     IP_VERSION      IpVersion,
+  IN     UINT8           IpVersion,
   IN     EFI_IP_ADDRESS  *Src
   )
 {
@@ -2021,14 +2021,14 @@ IpIoFindSender (
 EFI_STATUS
 EFIAPI
 IpIoGetIcmpErrStatus (
-  IN  ICMP_ERROR  IcmpError,
-  IN  IP_VERSION  IpVersion,
+  IN  UINT8       IcmpError,
+  IN  UINT8       IpVersion,
   OUT BOOLEAN     *IsHard  OPTIONAL,
   OUT BOOLEAN     *Notify  OPTIONAL
   )
 {
   if (IpVersion == IP_VERSION_4 ) {
-    ASSERT ((IcmpError >= ICMP_ERR_UNREACH_NET) && (IcmpError <= ICMP_ERR_PARAMPROB));
+    ASSERT (IcmpError <= ICMP_ERR_PARAMPROB);
 
     if (IsHard != NULL) {
       *IsHard = mIcmpErrMap[IcmpError].IsHard;
@@ -2066,7 +2066,7 @@ IpIoGetIcmpErrStatus (
 
   } else if (IpVersion == IP_VERSION_6) {
 
-    ASSERT ((IcmpError >= ICMP6_ERR_UNREACH_NET) && (IcmpError <= ICMP6_ERR_PARAMPROB_IPV6OPTION));
+    ASSERT (IcmpError <= ICMP6_ERR_PARAMPROB_IPV6OPTION);
 
     if (IsHard != NULL) {
       *IsHard = mIcmp6ErrMap[IcmpError].IsHard;

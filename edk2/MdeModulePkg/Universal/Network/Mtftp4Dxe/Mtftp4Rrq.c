@@ -20,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   The packet process callback for MTFTP download.
 
   @param  UdpPacket             The packet received
-  @param  Points                The local/remote access point of the packet
+  @param  EndPoint              The local/remote access point of the packet
   @param  IoStatus              The status of the receiving
   @param  Context               Opaque parameter, which is the MTFTP session
 
@@ -28,7 +28,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 VOID
 Mtftp4RrqInput (
   IN NET_BUF                *UdpPacket,
-  IN UDP_POINTS             *Points,
+  IN UDP_END_POINT          *EndPoint,
   IN EFI_STATUS             IoStatus,
   IN VOID                   *Context
   );
@@ -370,7 +370,7 @@ Mtftp4RrqOackValid (
 /**
   Configure a UDP IO port to receive the multicast.
 
-  @param  McastIo               The UDP IO port to configure
+  @param  McastIo               The UDP IO to configure
   @param  Context               The opaque parameter to the function which is the
                                 MTFTP session.
 
@@ -380,7 +380,7 @@ Mtftp4RrqOackValid (
 **/
 EFI_STATUS
 Mtftp4RrqConfigMcastPort (
-  IN UDP_IO_PORT            *McastIo,
+  IN UDP_IO                 *McastIo,
   IN VOID                   *Context
   )
 {
@@ -412,7 +412,7 @@ Mtftp4RrqConfigMcastPort (
   Ip = HTONL (Instance->ServerIp);
   CopyMem (&UdpConfig.RemoteAddress, &Ip, sizeof (EFI_IPv4_ADDRESS));
 
-  Status = McastIo->Udp->Configure (McastIo->Udp, &UdpConfig);
+  Status = McastIo->Protocol.Udp4->Configure (McastIo->Protocol.Udp4, &UdpConfig);
 
   if (EFI_ERROR (Status)) {
     return Status;
@@ -424,16 +424,16 @@ Mtftp4RrqConfigMcastPort (
     // The station IP address is manually configured and the Gateway IP is not 0.
     // Add the default route for this UDP instance.
     //
-    Status = McastIo->Udp->Routes (
-                             McastIo->Udp, 
-                             FALSE,
-                             &mZeroIp4Addr,
-                             &mZeroIp4Addr,
-                             &Config->GatewayIp
-                             );
+    Status = McastIo->Protocol.Udp4->Routes (
+                                       McastIo->Protocol.Udp4, 
+                                       FALSE,
+                                       &mZeroIp4Addr,
+                                       &mZeroIp4Addr,
+                                       &Config->GatewayIp
+                                       );
                              
     if (EFI_ERROR (Status)) {
-      McastIo->Udp->Configure (McastIo->Udp, NULL);
+      McastIo->Protocol.Udp4->Configure (McastIo->Protocol.Udp4, NULL);
       return Status;
     }
   }
@@ -444,7 +444,7 @@ Mtftp4RrqConfigMcastPort (
   Ip = HTONL (Instance->McastIp);
   CopyMem (&Group, &Ip, sizeof (EFI_IPv4_ADDRESS));
 
-  return McastIo->Udp->Groups (McastIo->Udp, TRUE, &Group);
+  return McastIo->Protocol.Udp4->Groups (McastIo->Protocol.Udp4, TRUE, &Group);
 }
 
 
@@ -539,10 +539,11 @@ Mtftp4RrqHandleOack (
       //
       Instance->McastIp      = Reply.McastIp;
       Instance->McastPort    = Reply.McastPort;
-      Instance->McastUdpPort = UdpIoCreatePort (
+      Instance->McastUdpPort = UdpIoCreateIo (
                                  Instance->Service->Controller,
                                  Instance->Service->Image,
                                  Mtftp4RrqConfigMcastPort,
+                                 UDP_IO_UDP4_VERSION,
                                  Instance
                                  );
 
@@ -598,7 +599,7 @@ Mtftp4RrqHandleOack (
   The packet process callback for MTFTP download.
 
   @param  UdpPacket             The packet received
-  @param  Points                The local/remote access point of the packet
+  @param  EndPoint              The local/remote access point of the packet
   @param  IoStatus              The status of the receiving
   @param  Context               Opaque parameter, which is the MTFTP session
 
@@ -606,7 +607,7 @@ Mtftp4RrqHandleOack (
 VOID
 Mtftp4RrqInput (
   IN NET_BUF                *UdpPacket,
-  IN UDP_POINTS             *Points,
+  IN UDP_END_POINT          *EndPoint,
   IN EFI_STATUS             IoStatus,
   IN VOID                   *Context
   )
@@ -637,7 +638,7 @@ Mtftp4RrqInput (
   //
   // Find the port this packet is from to restart receive correctly.
   //
-  Multicast = (BOOLEAN) (Points->LocalAddr == Instance->McastIp);
+  Multicast = (BOOLEAN) (EndPoint->LocalAddr.Addr[0] == Instance->McastIp);
 
   if (UdpPacket->TotalSize < MTFTP4_OPCODE_LEN) {
     goto ON_EXIT;
@@ -649,11 +650,11 @@ Mtftp4RrqInput (
   // is required to use the same port as RemotePort to multicast the
   // data.
   //
-  if (Points->RemotePort != Instance->ConnectedPort) {
+  if (EndPoint->RemotePort != Instance->ConnectedPort) {
     if (Instance->ConnectedPort != 0) {
       goto ON_EXIT;
     } else {
-      Instance->ConnectedPort = Points->RemotePort;
+      Instance->ConnectedPort = EndPoint->RemotePort;
     }
   }
 

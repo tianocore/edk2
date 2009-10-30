@@ -222,26 +222,58 @@ Ip6IsValidUnicast (
   IN EFI_IPv6_ADDRESS       *Ip6
   ) 
 {
-  UINT8 t;
-  UINT8 i;
+  UINT8 Byte;
+  UINT8 Index;
   
   if (Ip6->Addr[0] == 0xFF) {
     return FALSE;
   }
 
-  for (i = 0; i < 15; i++) {
-    if (Ip6->Addr[i] != 0) {
+  for (Index = 0; Index < 15; Index++) {
+    if (Ip6->Addr[Index] != 0) {
       return TRUE;
     }
   }
 
-  t = Ip6->Addr[i];
+  Byte = Ip6->Addr[Index];
 
-  if (t == 0x0 || t == 0x1) {
+  if (Byte == 0x0 || Byte == 0x1) {
     return FALSE;
   }
 
   return TRUE;  
+}
+
+/**
+  Switches the endianess of an IPv6 address
+
+  This function swaps the bytes in a 128-bit IPv6 address to switch the value
+  from little endian to big endian or vice versa. The byte swapped value is
+  returned.
+
+  @param  Ip6 Points to an IPv6 address
+
+  @return The byte swapped IPv6 address.
+
+**/
+EFI_IPv6_ADDRESS *
+Ip6Swap128 (
+  EFI_IPv6_ADDRESS *Ip6
+  )
+{
+  UINT64 High;
+  UINT64 Low;
+
+  CopyMem (&High, Ip6, sizeof (UINT64));
+  CopyMem (&Low, &Ip6->Addr[8], sizeof (UINT64));
+
+  High = SwapBytes64 (High);
+  Low  = SwapBytes64 (Low);
+
+  CopyMem (Ip6, &Low, sizeof (UINT64));
+  CopyMem (&Ip6->Addr[8], &High, sizeof (UINT64));
+
+  return Ip6;
 }
 
 /**

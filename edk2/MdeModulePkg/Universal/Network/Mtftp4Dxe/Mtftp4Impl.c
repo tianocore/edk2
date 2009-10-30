@@ -50,7 +50,7 @@ Mtftp4CleanOperation (
   }
 
   ASSERT (Instance->UnicastPort != NULL);
-  UdpIoCleanPort (Instance->UnicastPort);
+  UdpIoCleanIo (Instance->UnicastPort);
 
   if (Instance->LastPacket != NULL) {
     NetbufFree (Instance->LastPacket);
@@ -58,7 +58,7 @@ Mtftp4CleanOperation (
   }
 
   if (Instance->McastUdpPort != NULL) {
-    UdpIoFreePort (Instance->McastUdpPort);
+    UdpIoFreeIo (Instance->McastUdpPort);
     Instance->McastUdpPort = NULL;
   }
 
@@ -211,9 +211,8 @@ Mtftp4OverrideValid (
   the UDP is reconfigured.
 
   @param  Instance               The Mtftp instance
-  @param  UdpPort                The UDP port to poll
-  @param  UdpCfgData             The UDP configure data to reconfigure the UDP
-                                 port.
+  @param  UdpIo                  The UDP_IO to poll
+  @param  UdpCfgData             The UDP configure data to reconfigure the UDP_IO
 
   @retval TRUE                   The default address is retrieved and UDP is reconfigured.
   @retval FALSE                  Some error occured.
@@ -222,7 +221,7 @@ Mtftp4OverrideValid (
 BOOLEAN
 Mtftp4GetMapping (
   IN MTFTP4_PROTOCOL        *Instance,
-  IN UDP_IO_PORT            *UdpPort,
+  IN UDP_IO                 *UdpIo,
   IN EFI_UDP4_CONFIG_DATA   *UdpCfgData
   )
 {
@@ -234,7 +233,7 @@ Mtftp4GetMapping (
   ASSERT (Instance->Config.UseDefaultSetting);
 
   Service = Instance->Service;
-  Udp     = UdpPort->Udp;
+  Udp     = UdpIo->Protocol.Udp4;
 
   Status = gBS->SetTimer (
                   Service->TimerToGetMap,
@@ -263,7 +262,7 @@ Mtftp4GetMapping (
 /**
   Configure the UDP port for unicast receiving.
 
-  @param  UdpIo                  The UDP port
+  @param  UdpIo                  The UDP_IO instance
   @param  Instance               The MTFTP session
 
   @retval EFI_SUCCESS            The UDP port is successfully configured for the
@@ -272,7 +271,7 @@ Mtftp4GetMapping (
 **/
 EFI_STATUS
 Mtftp4ConfigUnicastPort (
-  IN UDP_IO_PORT            *UdpIo,
+  IN UDP_IO                 *UdpIo,
   IN MTFTP4_PROTOCOL        *Instance
   )
 {
@@ -301,7 +300,7 @@ Mtftp4ConfigUnicastPort (
   Ip = HTONL (Instance->ServerIp);
   CopyMem (&UdpConfig.RemoteAddress, &Ip, sizeof (EFI_IPv4_ADDRESS));
 
-  Status = UdpIo->Udp->Configure (UdpIo->Udp, &UdpConfig);
+  Status = UdpIo->Protocol.Udp4->Configure (UdpIo->Protocol.Udp4, &UdpConfig);
 
   if ((Status == EFI_NO_MAPPING) && Mtftp4GetMapping (Instance, UdpIo, &UdpConfig)) {
     return EFI_SUCCESS;
@@ -312,9 +311,15 @@ Mtftp4ConfigUnicastPort (
     // The station IP address is manually configured and the Gateway IP is not 0.
     // Add the default route for this UDP instance.
     //
-    Status = UdpIo->Udp->Routes (UdpIo->Udp, FALSE, &mZeroIp4Addr, &mZeroIp4Addr, &Config->GatewayIp);
+    Status = UdpIo->Protocol.Udp4->Routes (
+                                     UdpIo->Protocol.Udp4,
+                                     FALSE,
+                                     &mZeroIp4Addr,
+                                     &mZeroIp4Addr,
+                                     &Config->GatewayIp
+                                     );
     if (EFI_ERROR (Status)) {
-      UdpIo->Udp->Configure (UdpIo->Udp, NULL);
+      UdpIo->Protocol.Udp4->Configure (UdpIo->Protocol.Udp4, NULL);
     }
   }
   return Status;
@@ -1070,7 +1075,7 @@ EfiMtftp4Poll (
     return EFI_DEVICE_ERROR;
   }
 
-  Udp = Instance->UnicastPort->Udp;
+  Udp = Instance->UnicastPort->Protocol.Udp4;
   return Udp->Poll (Udp);
 }
 

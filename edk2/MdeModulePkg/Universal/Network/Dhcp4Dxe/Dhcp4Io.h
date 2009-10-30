@@ -1,7 +1,7 @@
 /** @file
   The DHCP4 protocol implementation.
   
-Copyright (c) 2006 - 2008, Intel Corporation.<BR>
+Copyright (c) 2006 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -140,7 +140,7 @@ DhcpOnTimerTick (
   state machine.
 
   @param  UdpPacket             The UDP packets received.
-  @param  Points                The local/remote UDP access points
+  @param  EndPoint              The local/remote UDP access point
   @param  IoStatus              The status of the UDP receive
   @param  Context               The opaque parameter to the function.
 
@@ -148,7 +148,7 @@ DhcpOnTimerTick (
 VOID
 DhcpInput (
   NET_BUF                   *UdpPacket,
-  UDP_POINTS                *Points,
+  UDP_END_POINT             *EndPoint,
   EFI_STATUS                IoStatus,
   VOID                      *Context
   );
@@ -183,7 +183,7 @@ DhcpCleanLease (
   Release the net buffer when packet is sent.
 
   @param  UdpPacket             The UDP packets received.
-  @param  Points                The local/remote UDP access points
+  @param  EndPoint              The local/remote UDP access point
   @param  IoStatus              The status of the UDP receive
   @param  Context               The opaque parameter to the function.
 
@@ -191,7 +191,7 @@ DhcpCleanLease (
 VOID
 DhcpOnPacketSent (
   NET_BUF                   *Packet,
-  UDP_POINTS                *Points,
+  UDP_END_POINT             *EndPoint,
   EFI_STATUS                IoStatus,
   VOID                      *Context
   );

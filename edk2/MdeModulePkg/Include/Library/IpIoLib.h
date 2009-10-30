@@ -81,41 +81,36 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 extern EFI_IP4_CONFIG_DATA  mIp4IoDefaultIpConfigData;
 extern EFI_IP6_CONFIG_DATA  mIp6IoDefaultIpConfigData;
 
-typedef enum {
-  IP_VERSION_4 = 4,
-  IP_VERSION_6 = 6
-} IP_VERSION;
+#define IP_VERSION_4 4
+#define IP_VERSION_6 6
 
 ///
 /// This error will be delivered to the
 /// listening transportation layer protocol
 /// that consumes IpIO.
 ///
-typedef enum {
-  ICMP_ERR_UNREACH_NET      = 0,
-  ICMP_ERR_UNREACH_HOST,
-  ICMP_ERR_UNREACH_PROTOCOL,
-  ICMP_ERR_UNREACH_PORT,
-  ICMP_ERR_MSGSIZE,
-  ICMP_ERR_UNREACH_SRCFAIL,
-  ICMP_ERR_TIMXCEED_INTRANS,
-  ICMP_ERR_TIMXCEED_REASS,
-  ICMP_ERR_QUENCH,
-  ICMP_ERR_PARAMPROB
-} ICMP_ERROR;
 
-typedef enum {
-  ICMP6_ERR_UNREACH_NET      = 0,
-  ICMP6_ERR_UNREACH_HOST,
-  ICMP6_ERR_UNREACH_PROTOCOL,
-  ICMP6_ERR_UNREACH_PORT,
-  ICMP6_ERR_PACKAGE_TOOBIG,
-  ICMP6_ERR_TIMXCEED_HOPLIMIT,
-  ICMP6_ERR_TIMXCEED_REASS,
-  ICMP6_ERR_PARAMPROB_HEADER,
-  ICMP6_ERR_PARAMPROB_NEXHEADER,
-  ICMP6_ERR_PARAMPROB_IPV6OPTION
-} ICMP6_ERROR;
+#define  ICMP_ERR_UNREACH_NET           0
+#define  ICMP_ERR_UNREACH_HOST          1
+#define  ICMP_ERR_UNREACH_PROTOCOL      2
+#define  ICMP_ERR_UNREACH_PORT          3
+#define  ICMP_ERR_MSGSIZE               4
+#define  ICMP_ERR_UNREACH_SRCFAIL       5
+#define  ICMP_ERR_TIMXCEED_INTRANS      6
+#define  ICMP_ERR_TIMXCEED_REASS        7
+#define  ICMP_ERR_QUENCH                8
+#define  ICMP_ERR_PARAMPROB             9
+
+#define  ICMP6_ERR_UNREACH_NET          0
+#define  ICMP6_ERR_UNREACH_HOST         1
+#define  ICMP6_ERR_UNREACH_PROTOCOL     2
+#define  ICMP6_ERR_UNREACH_PORT         3
+#define  ICMP6_ERR_PACKAGE_TOOBIG       4
+#define  ICMP6_ERR_TIMXCEED_HOPLIMIT    5
+#define  ICMP6_ERR_TIMXCEED_REASS       6
+#define  ICMP6_ERR_PARAMPROB_HEADER     7
+#define  ICMP6_ERR_PARAMPROB_NEXHEADER  8
+#define  ICMP6_ERR_PARAMPROB_IPV6OPTION 9
 
 ///
 /// The helper struct for IpIoGetIcmpErrStatus(). It is for internal use only.
@@ -150,17 +145,24 @@ typedef union {
   EFI_IP6_CONFIG_DATA       Ip6CfgData;
 } IP_IO_IP_CONFIG_DATA;
 
+typedef union {
+  EFI_IP4_HEADER            *Ip4Hdr;
+  EFI_IP6_HEADER            *Ip6Hdr;
+} IP_IO_IP_HEADER;
+
+typedef union {
+  IP4_ADDR                  SubnetMask;
+  UINT8                     PrefixLength;
+} IP_IO_IP_MASK;
+
 ///
 /// The IP session for an IP receive packet.
 ///
 typedef struct _EFI_NET_SESSION_DATA {
   EFI_IP_ADDRESS        Source;     ///< Source IP of the received packet
   EFI_IP_ADDRESS        Dest;       ///< Destination IP of the received packet
-  union {
-    EFI_IP4_HEADER      *Ip4Hdr;    ///< IP4 header of the received packet
-    EFI_IP6_HEADER      *Ip6Hdr;    ///< IP6 header of the received packet
-  } IpHdr;
-  IP_VERSION            IpVersion;  ///< The IP version of the received packet
+  IP_IO_IP_HEADER       IpHdr;      ///< IP header of the received packet
+  UINT8                 IpVersion;  ///< The IP version of the received packet
 } EFI_NET_SESSION_DATA;
 
 /**
@@ -178,7 +180,7 @@ typedef
 VOID
 (*PKT_RCVD_NOTIFY) (
   IN EFI_STATUS           Status, 
-  IN ICMP_ERROR           IcmpErr,
+  IN UINT8                IcmpErr,
   IN EFI_NET_SESSION_DATA *NetSession,
   IN NET_BUF              *Pkt,
   IN VOID                 *Context
@@ -249,10 +251,7 @@ typedef struct _IP_IO {
   VOID                          *SndContext;     ///< See IP_IO_OPEN_DATA::SndContext
   PKT_RCVD_NOTIFY               PktRcvdNotify;   ///< See IP_IO_OPEN_DATA::PktRcvdNotify
   PKT_SENT_NOTIFY               PktSentNotify;   ///< See IP_IO_OPEN_DATA::PktSentNotify
-  //
-  // Ip Version 
-  //
-  IP_VERSION                    IpVersion;
+  UINT8                         IpVersion;
 } IP_IO;
 
 ///
@@ -289,16 +288,13 @@ typedef struct _IP_IO_SEND_ENTRY {
 ///
 typedef struct _IP_IO_IP_INFO {
   EFI_IP_ADDRESS            Addr;
-  union {
-   IP4_ADDR                 SubnetMask;
-   UINT8                    PrefixLength;
-  } PreMask;
+  IP_IO_IP_MASK             PreMask;
   LIST_ENTRY                Entry;
   EFI_HANDLE                ChildHandle;
   VOID                      *Ip;
   IP_IO_IP_COMPLETION_TOKEN DummyRcvToken;
   INTN                      RefCnt;
-  IP_VERSION                IpVersion;
+  UINT8                     IpVersion;
 } IP_IO_IP_INFO;
 
 /**
@@ -322,7 +318,7 @@ EFIAPI
 IpIoCreate (
   IN EFI_HANDLE Image,
   IN EFI_HANDLE Controller,
-  IN IP_VERSION IpVersion
+  IN UINT8      IpVersion
   );
 
 /**
@@ -518,7 +514,7 @@ IP_IO_IP_INFO *
 EFIAPI
 IpIoFindSender (
   IN OUT IP_IO           **IpIo,
-  IN     IP_VERSION      IpVersion,
+  IN     UINT8           IpVersion,
   IN     EFI_IP_ADDRESS  *Src
   );
 
@@ -541,8 +537,8 @@ IpIoFindSender (
 EFI_STATUS
 EFIAPI
 IpIoGetIcmpErrStatus (
-  IN  ICMP_ERROR  IcmpError,
-  IN  IP_VERSION  IpVersion,
+  IN  UINT8       IcmpError,
+  IN  UINT8       IpVersion,
   OUT BOOLEAN     *IsHard  OPTIONAL,
   OUT BOOLEAN     *Notify  OPTIONAL
   );
