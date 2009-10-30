@@ -311,7 +311,7 @@ HiiSetToDefaults (
 /**
   Validate the current configuration by parsing the IFR opcode in HII form.
 
-  NULL request string support depends on the ExtractConfig interface of
+  NULL request string support depends on the ExportConfig interface of
   HiiConfigRouting protocol in the UEFI specification.
   
   @param  Request   A null-terminated Unicode string in 

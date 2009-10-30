@@ -1774,7 +1774,7 @@ InternalHiiIfrValueAction (
       // Its default value and validating can't execute by parsing IFR data.
       // Directly jump into the next ConfigAltResp string for another pair Guid, Name, and Path.   
       //
-	  Status = EFI_SUCCESS;
+	    Status = EFI_SUCCESS;
       goto NextConfigAltResp;
     }
     
@@ -2029,7 +2029,7 @@ Done:
 /**
   Validate the current configuration by parsing HII form IFR opcode.
 
-  NULL request string support depends on the ExtractConfig interface of
+  NULL request string support depends on the ExportConfig interface of
   HiiConfigRouting protocol in UEFI specification.
   
   @param  Request   A null-terminated Unicode string in 
