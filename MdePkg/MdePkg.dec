@@ -1077,90 +1077,119 @@
   gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|320|UINT32|0x101
 
   ## Status code value for indicating a watchdog timer is expired
+  # EFI_COMPUTING_UNIT_HOST_PROCESSOR | EFI_CU_HP_EC_TIMER_EXPIRED
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueEfiWatchDogTimerExpired|0x00011003|UINT32|0x00000013
 
   ## Status code value for indicating the invocation of SetVirtualAddressMap()
+  # EFI_SOFTWARE_EFI_RUNTIME_SERVICE | EFI_SW_RS_PC_SET_VIRTUAL_ADDRESS_MAP
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueSetVirtualAddressMap|0x03111004|UINT32|0x00000014
 
   ## Status code value for indicating the start of memory test
+  # EFI_COMPUTING_UNIT_MEMORY | EFI_CU_MEMORY_PC_TEST
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMemoryTestStarted|0x00051006|UINT32|0x00000015
 
   ## Status code value for indicating memory error in memory test
+  # EFI_COMPUTING_UNIT_MEMORY | EFI_CU_MEMORY_EC_UNCORRECTABLE
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueUncorrectableMemoryError|0x00051003|UINT32|0x00000016
 
   ## Status code value for indicating the failure of console operation
+  # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_CONTROLLER_ERROR
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleError|0x01040006|UINT32|0x00000017
 
   ## Status code value for indicating the failure of console reset operation
+  # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_PC_RESET
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleReset|0x01040001|UINT32|0x00000018
 
   ## Status code value for indicating the failure of console input operation
+  # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_INPUT_ERROR
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleInputError|0x01040007|UINT32|0x00000019
 
   ## Status code value for indicating the failure of console output operation
+  # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_OUTPUT_ERROR
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleOutputError|0x01040008|UINT32|0x0000001a
 
   ## Status code value for indicating the failure of mouse operation
+  # EFI_PERIPHERAL_MOUSE | EFI_P_EC_INTERFACE_ERROR
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseInterfaceError|0x01020005|UINT32|0x30001000
 
   ## Status code value for indicating the enable of mouse device
+  # EFI_PERIPHERAL_MOUSE | EFI_P_PC_ENABLE
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseEnable|0x01020004|UINT32|0x30001001
 
   ## Status code value for indicating the disable of mouse device
+  # EFI_PERIPHERAL_MOUSE | EFI_P_PC_DISABLE
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseDisable|0x01020002|UINT32|0x30001002
 
   ## Status code value for indicating the enable of keyboard device
+  # EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_ENABLE
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardEnable|0x01010004|UINT32|0x30001003
 
   ## Status code value for indicating the disable of keyboard device
+  # EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_DISABLE
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardDisable|0x01010002|UINT32|0x30001004
 
   ## Status code value for indicating whether keboard device is present
+  # EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_PRESENCE_DETECT
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardPresenceDetect|0x01010003|UINT32|0x30001005
 
   ## Status code value for indicating the reset operation of keyboard device
+  # EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_RESET
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardReset|0x01010001|UINT32|0x30001006
 
   ## Status code value for indicating the clear buffer operation of keyboard device
+  # EFI_PERIPHERAL_KEYBOARD | EFI_P_KEYBOARD_PC_CLEAR_BUFFER
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardClearBuffer|0x01011000|UINT32|0x30001007
 
   ## Status code value for indicating the self test of keyboard device
+  # EFI_PERIPHERAL_KEYBOARD | EFI_P_KEYBOARD_PC_SELF_TEST
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardSelfTest|0x01011001|UINT32|0x30001008
 
   ## Status code value for indicating the operation of keyboard device is failed
+  # EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_INTERFACE_ERROR
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardInterfaceError|0x01010005|UINT32|0x30001009
 
   ## Status code value for indicating the failure of keyboard input handler
+  # EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_INPUT_ERROR
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardInputError|0x01010007|UINT32|0x3000100a
 
   ## Status code value for indicating the failure of mouse input handler
+  # EFI_PERIPHERAL_MOUSE | EFI_P_EC_INPUT_ERROR
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseInputError|0x01020007|UINT32|0x3000100b
 
   ## Status code value for indicating the reset operation of mouse device
+  # EFI_PERIPHERAL_MOUSE | EFI_P_PC_RESET
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseReset|0x01020001|UINT32|0x3000100c
 
   ## Status code value for indicating the handoff from Pei phase to Dxe phase
+  # EFI_SOFTWARE_PEI_CORE | EFI_SW_PEI_CORE_PC_HANDOFF_TO_NEXT
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeiHandoffToDxe|0x3021001|UINT32|0x3000100d
 
   ## Status code value for indicating one PEIM is dispatched.
+  #  EFI_SOFTWARE_PEI_CORE | EFI_SW_PC_INIT_BEGIN
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeimDispatch|0x3020002|UINT32|0x3000100e
 
   ## Status code value for indicating entering PeiCore
+  #  EFI_SOFTWARE_PEI_CORE | EFI_SW_PC_INIT
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeiCoreEntry|0x3020000|UINT32|0x3000100f
 
   ## Status code value for indicating entering DxeCore
+  # EFI_SOFTWARE_DXE_CORE | EFI_SW_DXE_CORE_PC_ENTRY_POINT
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueDxeCoreEntry|0x3041000|UINT32|0x30001010
 
   ## Status code value for indicating the handoff from DxeCore to Bds
+  # EFI_SOFTWARE_DXE_CORE | EFI_SW_DXE_CORE_PC_HANDOFF_TO_NEXT
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueDxeCoreHandoffToBds|0x3041001|UINT32|0x30001011
 
   ## Status code value for indicating the exit of boot service
+  # EFI_SOFTWARE_EFI_BOOT_SERVICE | EFI_SW_BS_PC_EXIT_BOOT_SERVICES
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueBootServiceExit|0x3101019|UINT32|0x30001012
 
   ## Status code value for indicating the begin of Dxe driver
+  # EFI_SOFTWARE_DXE_CORE | EFI_SW_PC_INIT_BEGIN
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueDxeDriverBegin|0x3040002|UINT32|0x30001013
 
   ## Status code value for indicating the end of Dxe driver
+  # EFI_SOFTWARE_DXE_CORE | EFI_SW_PC_INIT_END
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueDxeDriverEnd|0x3040003|UINT32|0x30001014
 
 [PcdsFixedAtBuild.IPF]
