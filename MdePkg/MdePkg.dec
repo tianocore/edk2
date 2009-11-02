@@ -1140,7 +1140,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMouseReset|0x01020001|UINT32|0x3000100c
 
   ## Status code value for indicating the handoff from Pei phase to Dxe phase
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeiHandoffToDxe|0x3031001|UINT32|0x3000100d
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeiHandoffToDxe|0x3021001|UINT32|0x3000100d
 
   ## Status code value for indicating one PEIM is dispatched.
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeimDispatch|0x3020002|UINT32|0x3000100e
@@ -1155,7 +1155,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueDxeCoreHandoffToBds|0x3041001|UINT32|0x30001011
 
   ## Status code value for indicating the exit of boot service
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueBootServiceExit|0x3100019|UINT32|0x30001012
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueBootServiceExit|0x3101019|UINT32|0x30001012
 
   ## Status code value for indicating the begin of Dxe driver
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueDxeDriverBegin|0x3040002|UINT32|0x30001013
