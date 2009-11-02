@@ -296,3 +296,22 @@ Possible impacts:
 	All modules depending on macro TIME_OUT in MdePkg/Include/Uefi/UefiUsbLib.h should use PcdGet32 (PcdUsbTransferTimeoutValue)
 	for the USB transaction, include "PcdLib" in INF [LibraryClasses] section and add "#include <Library/PcdLib.h>" in module
 	source.
+
+EDK_9384: Non-Compatible: xli24
+
+	2 default values of status code PCDs updated in MdePkg.dec.
+
+	1) PcdStatusCodeValueBootServiceExit. Its value is changed from 0x3100019 to 0x3101019, which equals EFI_SOFTWARE_EFI_BOOT_SERVICE | EFI_SW_BS_PC_EXIT_BOOT_SERVICES.
+	2) PcdStatusCodeValuePeiHandoffToDxe. Its value is changed from 0x3031001 to 0x3021001, which equals EFI_SOFTWARE_PEI_CORE | EFI_SW_PEI_CORE_PC_HANDOFF_TO_NEXT. 
+
+Possible impacts:
+	Platforms which uses the default values of PCD (not overriding in DSC) would get updated report status code values for boot service exit and PEI hand-off.
+
+EDK_9385: Non-Compatible: xli24
+
+	Default value of PcdStatusCodeValueSetVirtualAddressMap updated in MdePkg.dec.
+	The value of PcdStatusCodeValueSetVirtualAddressMap is changed from 0x03101004 to 0x03111004, which equals EFI_SOFTWARE_EFI_RUNTIME_SERVICE | EFI_SW_RS_PC_SET_VIRTUAL_ADDRESS_MAP.
+
+
+Possible impacts:
+	Platforms which uses the default value of PCD (not overriding in DSC) would get updated report status code value for setting virtual address map.
