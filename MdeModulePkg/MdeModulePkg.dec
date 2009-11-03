@@ -124,6 +124,9 @@
   ## Include/Guid/NicIp4ConfigNvData.h
   gEfiNicIp4ConfigVariableGuid   = {0xd8944553, 0xc4dd, 0x41f4, { 0x9b, 0x30, 0xe1, 0x39, 0x7c, 0xfb, 0x26, 0x7b }}
 
+  ## Include/Guid/StatusCodeCallbackGuid.h
+  gStatusCodeCallbackGuid   = {0xe701458c, 0x4900, 0x4ca5, {0xb7, 0x72, 0x3d, 0x37, 0x94, 0x9f, 0x79, 0x27}}
+
 [Protocols.common]
   ## Load File protocol provides capability to load and unload EFI image into memory and execute it.
   #  Include/Protocol/LoadPe32Image.h
