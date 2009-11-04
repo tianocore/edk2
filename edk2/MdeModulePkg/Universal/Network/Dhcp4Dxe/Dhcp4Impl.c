@@ -661,7 +661,7 @@ EfiDhcp4Configure (
 
     CopyMem (&Ip, &Dhcp4CfgData->ClientAddress, sizeof (IP4_ADDR));
 
-    if ((Ip != 0) && !Ip4IsUnicast (NTOHL (Ip), 0)) {
+    if ((Ip != 0) && !NetIp4IsUnicast (NTOHL (Ip), 0)) {
 
       return EFI_INVALID_PARAMETER;
     }

@@ -43,18 +43,18 @@ typedef struct _DHCP_PROTOCOL DHCP_PROTOCOL;
 #define DHCP_SERVICE_SIGNATURE   SIGNATURE_32 ('D', 'H', 'C', 'P')
 #define DHCP_PROTOCOL_SIGNATURE  SIGNATURE_32 ('d', 'h', 'c', 'p')
 
-typedef enum {
-  //
-  // The state of the DHCP service. It starts as UNCONFIGED. If
-  // and active child configures the service successfully, it
-  // goes to CONFIGED. If the active child configures NULL, it
-  // goes back to UNCONFIGED. It becomes DESTORY if it is (partly)
-  // destoried.
-  //
-  DHCP_UNCONFIGED         = 0,
-  DHCP_CONFIGED,
-  DHCP_DESTORY
-} DHCP_STATE;
+
+//
+// The state of the DHCP service. It starts as UNCONFIGED. If
+// and active child configures the service successfully, it
+// goes to CONFIGED. If the active child configures NULL, it
+// goes back to UNCONFIGED. It becomes DESTORY if it is (partly)
+// destoried.
+//
+#define DHCP_UNCONFIGED          0
+#define DHCP_CONFIGED            1
+#define DHCP_DESTORY             2
+
 
 struct _DHCP_PROTOCOL {
   UINT32                            Signature;

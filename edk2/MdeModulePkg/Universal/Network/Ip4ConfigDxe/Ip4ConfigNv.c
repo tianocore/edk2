@@ -198,8 +198,8 @@ Ip4ConfigIpToStr (
 /**
   Convert the network configuration data into the IFR data.
 
-  @param[in]   ConfigFormEntry The IP4 configuration form entry.
-  @param[out]  IfrNvData       The IFR nv data.
+  @param[in]   Ip4ConfigInstance The IP4Config instance
+  @param[out]  IfrFormNvData     The IFR nv data.
 **/
 VOID
 Ip4ConfigConvertDeviceConfigDataToIfrNvData (
@@ -700,7 +700,7 @@ Ip4FormCallback (
   case KEY_LOCAL_IP:
     UnicodeStrToAsciiStr (IfrFormNvData->StationAddress, Ip4String);
     Status = Ip4AsciiStrToIp (Ip4String, &HostIp.v4);
-    if (EFI_ERROR (Status) || !Ip4IsUnicast (NTOHL (HostIp.Addr[0]), 0)) {
+    if (EFI_ERROR (Status) || !NetIp4IsUnicast (NTOHL (HostIp.Addr[0]), 0)) {
       CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid IP address!", NULL);
       Status = EFI_INVALID_PARAMETER;
     } else {
@@ -724,7 +724,7 @@ Ip4FormCallback (
   case KEY_GATE_WAY:
     UnicodeStrToAsciiStr (IfrFormNvData->GatewayAddress, Ip4String);
     Status = Ip4AsciiStrToIp (Ip4String, &Gateway.v4);
-    if (EFI_ERROR (Status) || ((Gateway.Addr[0] != 0) && !Ip4IsUnicast (NTOHL (Gateway.Addr[0]), 0))) {
+    if (EFI_ERROR (Status) || ((Gateway.Addr[0] != 0) && !NetIp4IsUnicast (NTOHL (Gateway.Addr[0]), 0))) {
       CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid Gateway!", NULL);
       Status = EFI_INVALID_PARAMETER;
     } else {

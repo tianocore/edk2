@@ -46,27 +46,24 @@ typedef struct _IP4_CONFIG_INSTANCE IP4_CONFIG_INSTANCE;
 //
 // Global variables
 //
-extern EFI_DRIVER_BINDING_PROTOCOL   gIp4ConfigDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL   gIp4ConfigComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL  gIp4ConfigComponentName2;
-
-extern IP4_CONFIG_INSTANCE           *mIp4ConfigNicList[MAX_IP4_CONFIG_IN_VARIABLE];
-extern EFI_IP4_CONFIG_PROTOCOL       mIp4ConfigProtocolTemplate;
+extern EFI_DRIVER_BINDING_PROTOCOL     gIp4ConfigDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL     gIp4ConfigComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL    gIp4ConfigComponentName2;
+                                      
+extern IP4_CONFIG_INSTANCE             *mIp4ConfigNicList[MAX_IP4_CONFIG_IN_VARIABLE];
+extern EFI_IP4_CONFIG_PROTOCOL         mIp4ConfigProtocolTemplate;
 
 #define IP4_PROTO_ICMP                 0x01
 #define IP4_CONFIG_INSTANCE_SIGNATURE  SIGNATURE_32 ('I', 'P', '4', 'C')
 
-typedef enum {
-  IP4_CONFIG_STATE_IDLE         = 0,
-  IP4_CONFIG_STATE_STARTED,
-  IP4_CONFIG_STATE_CONFIGURED
-} IP4_CONFIG_STATE;
+#define IP4_CONFIG_STATE_IDLE          0
+#define IP4_CONFIG_STATE_STARTED       1
+#define IP4_CONFIG_STATE_CONFIGURED    2
 
-typedef enum {
-  DHCP_TAG_PARA_LIST            = 55,
-  DHCP_TAG_NETMASK              = 1,
-  DHCP_TAG_ROUTER               = 3
-} DHCP_TAGS;
+#define DHCP_TAG_PARA_LIST             55
+#define DHCP_TAG_NETMASK               1
+#define DHCP_TAG_ROUTER                3
+
 
 //
 // Configure the DHCP to request the routers and netmask

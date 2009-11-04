@@ -824,7 +824,7 @@ Udp4ValidateTxToken (
   if (TxData->GatewayAddress != NULL) {
     CopyMem (&GatewayAddress, TxData->GatewayAddress, sizeof (IP4_ADDR));
 
-    if (!Ip4IsUnicast (NTOHL (GatewayAddress), 0)) {
+    if (!NetIp4IsUnicast (NTOHL (GatewayAddress), 0)) {
       //
       // The specified GatewayAddress is not a unicast IPv4 address while it's not 0.
       //
@@ -839,7 +839,7 @@ Udp4ValidateTxToken (
 
     CopyMem (&SourceAddress, &UdpSessionData->SourceAddress, sizeof (IP4_ADDR));
 
-    if ((SourceAddress != 0) && !Ip4IsUnicast (HTONL (SourceAddress), 0)) {
+    if ((SourceAddress != 0) && !NetIp4IsUnicast (HTONL (SourceAddress), 0)) {
       //
       // Check whether SourceAddress is a valid IPv4 address in case it's not zero.
       // The configured station address is used if SourceAddress is zero.

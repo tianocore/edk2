@@ -1,7 +1,7 @@
 /** @file
   Implementation of the Socket.
 
-Copyright (c) 2005 - 2006, Intel Corporation<BR>
+Copyright (c) 2005 - 2009, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -215,7 +215,7 @@ SockProcessRcvToken (
 
   ASSERT (Sock != NULL);
 
-  ASSERT (SOCK_STREAM == Sock->Type);
+  ASSERT (SockStream == Sock->Type);
 
   RxData = RcvToken->Packet.RxData;
 
@@ -481,7 +481,7 @@ SockProcessSndToken (
   EFI_TCP4_TRANSMIT_DATA  *TxData;
   EFI_STATUS              Status;
 
-  ASSERT ((Sock != NULL) && (SOCK_STREAM == Sock->Type));
+  ASSERT ((Sock != NULL) && (SockStream == Sock->Type));
 
   FreeSpace = SockGetFreeSpace (Sock, SOCK_SND_BUF);
 
@@ -557,7 +557,7 @@ SockCreate (
   EFI_STATUS  Status;
 
   ASSERT ((SockInitData != NULL) && (SockInitData->ProtoHandler != NULL));
-  ASSERT (SockInitData->Type == SOCK_STREAM);
+  ASSERT (SockInitData->Type == SockStream);
   ASSERT ((SockInitData->ProtoData != NULL) && (SockInitData->DataSize <= PROTO_RESERVED_LEN));
 
   Parent = SockInitData->Parent;
@@ -720,7 +720,7 @@ SockDestroy (
   EFI_GUID    *ProtocolGuid;
   EFI_STATUS  Status;
 
-  ASSERT (SOCK_STREAM == Sock->Type);
+  ASSERT (SockStream == Sock->Type);
 
   if (Sock->DestroyCallback != NULL) {
     Sock->DestroyCallback (Sock, Sock->Context);
@@ -873,13 +873,13 @@ SockConnFlush (
   Set the state of the socket.
 
   @param  Sock                  Pointer to the socket.
-  @param  State                 The new state to be set.
+  @param  State                 The new socket state to be set.
 
 **/
 VOID
 SockSetState (
   IN OUT SOCKET     *Sock,
-  IN     SOCK_STATE State
+  IN     UINT8      State
   )
 {
   Sock->State = State;
@@ -1070,7 +1070,7 @@ SockGetDataToSend (
   IN UINT8       *Dest
   )
 {
-  ASSERT ((Sock != NULL) && SOCK_STREAM == Sock->Type);
+  ASSERT ((Sock != NULL) && SockStream == Sock->Type);
 
   return NetbufQueCopy (
           Sock->SndBuffer.DataQueue,

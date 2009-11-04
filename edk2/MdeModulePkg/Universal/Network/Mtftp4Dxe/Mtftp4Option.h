@@ -1,7 +1,7 @@
 /** @file
   Routines to process MTFTP4 options.
   
-Copyright (c) 2006 - 2007, Intel Corporation<BR>
+Copyright (c) 2006 - 2009, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -16,20 +16,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __EFI_MTFTP4_OPTION_H__
 #define __EFI_MTFTP4_OPTION_H__
 
+#define MTFTP4_SUPPORTED_OPTIONS  4
+#define MTFTP4_OPCODE_LEN         2
+#define MTFTP4_ERRCODE_LEN        2
+#define MTFTP4_BLKNO_LEN          2
+#define MTFTP4_DATA_HEAD_LEN      4
 
-
-typedef enum {
-  MTFTP4_SUPPORTED_OPTIONS = 4,
-  MTFTP4_OPCODE_LEN        = 2,
-  MTFTP4_ERRCODE_LEN       = 2,
-  MTFTP4_BLKNO_LEN         = 2,
-  MTFTP4_DATA_HEAD_LEN     = 4,
-
-  MTFTP4_BLKSIZE_EXIST     = 0x01,
-  MTFTP4_TIMEOUT_EXIST     = 0x02,
-  MTFTP4_TSIZE_EXIST       = 0x04,
-  MTFTP4_MCAST_EXIST       = 0x08
-} MTFTP4_OPTION_CONST_VALUE;
+#define MTFTP4_BLKSIZE_EXIST      0x01
+#define MTFTP4_TIMEOUT_EXIST      0x02
+#define MTFTP4_TSIZE_EXIST        0x04
+#define MTFTP4_MCAST_EXIST        0x08
 
 typedef struct {
   UINT16                    BlkSize;

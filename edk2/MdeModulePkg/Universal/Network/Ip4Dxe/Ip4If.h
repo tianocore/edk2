@@ -1,7 +1,7 @@
 /** @file
   Definition for IP4 pesudo interface structure.
   
-Copyright (c) 2005 - 2006, Intel Corporation.<BR>
+Copyright (c) 2005 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -15,12 +15,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __EFI_IP4_IF_H__
 #define __EFI_IP4_IF_H__
 
-typedef enum {
-  IP4_FRAME_RX_SIGNATURE  = SIGNATURE_32 ('I', 'P', 'F', 'R'),
-  IP4_FRAME_TX_SIGNATURE  = SIGNATURE_32 ('I', 'P', 'F', 'T'),
-  IP4_FRAME_ARP_SIGNATURE = SIGNATURE_32 ('I', 'P', 'F', 'A'),
-  IP4_INTERFACE_SIGNATURE = SIGNATURE_32 ('I', 'P', 'I', 'F')
-} IP4_IF_ENUM_TYPES;
+#define IP4_FRAME_RX_SIGNATURE  SIGNATURE_32 ('I', 'P', 'F', 'R')
+#define IP4_FRAME_TX_SIGNATURE  SIGNATURE_32 ('I', 'P', 'F', 'T')
+#define IP4_FRAME_ARP_SIGNATURE SIGNATURE_32 ('I', 'P', 'F', 'A')
+#define IP4_INTERFACE_SIGNATURE SIGNATURE_32 ('I', 'P', 'I', 'F')
 
 /**
   This prototype is used by both receive and transmission.

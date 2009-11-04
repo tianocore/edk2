@@ -228,7 +228,7 @@ Ip4Reassemble (
   NET_BUF                   *NewPacket;
   INTN                      Index;
 
-  IpHead  = Packet->Ip;
+  IpHead  = Packet->Ip.Ip4;
   This    = IP4_GET_CLIP_INFO (Packet);
 
   ASSERT (IpHead != NULL);
@@ -417,7 +417,7 @@ Ip4Reassemble (
       return NULL;
     }
 
-    NewPacket->Ip = Assemble->Head;
+    NewPacket->Ip.Ip4 = Assemble->Head;
     CopyMem (IP4_GET_CLIP_INFO (NewPacket), Assemble->Info, sizeof (*IP4_GET_CLIP_INFO (NewPacket)));
     return NewPacket;
   }
@@ -501,7 +501,7 @@ Ip4AccpetFrame (
   //
   // Convert the IP header to host byte order, then get the per packet info.
   //
-  Packet->Ip      = Ip4NtohHead (Head);
+  Packet->Ip.Ip4  = Ip4NtohHead (Head);
 
   Info            = IP4_GET_CLIP_INFO (Packet);
   Info->LinkFlag  = Flag;
@@ -570,11 +570,11 @@ Ip4AccpetFrame (
   // info must be reloaded bofore use. The ownership of the packet
   // is transfered to the packet process logic.
   //
-  Head  = Packet->Ip;
+  Head  = Packet->Ip.Ip4;
   IP4_GET_CLIP_INFO (Packet)->Status = EFI_SUCCESS;
 
   switch (Head->Protocol) {
-  case IP4_PROTO_ICMP:
+  case EFI_IP_PROTO_ICMP:
     Ip4IcmpHandle (IpSb, Head, Packet);
     break;
 
@@ -655,7 +655,7 @@ Ip4InstanceFrameAcceptable (
   //
   Proto = Head->Protocol;
 
-  if (Proto == IP4_PROTO_ICMP) {
+  if (Proto == EFI_IP_PROTO_ICMP) {
     NetbufCopy (Packet, 0, sizeof (Icmp.Head), (UINT8 *) &Icmp.Head);
 
     if (mIcmpClass[Icmp.Head.Type].IcmpClass == ICMP_ERROR_MESSAGE) {
@@ -850,13 +850,13 @@ Ip4WrapRxData (
     return NULL;
   }
 
-  ASSERT (Packet->Ip != NULL);
+  ASSERT (Packet->Ip.Ip4 != NULL);
 
   //
   // The application expects a network byte order header.
   //
-  RxData->HeaderLength  = (Packet->Ip->HeadLen << 2);
-  RxData->Header        = (EFI_IP4_HEADER *) Ip4NtohHead (Packet->Ip);
+  RxData->HeaderLength  = (Packet->Ip.Ip4->HeadLen << 2);
+  RxData->Header        = (EFI_IP4_HEADER *) Ip4NtohHead (Packet->Ip.Ip4);
 
   RxData->OptionsLength = RxData->HeaderLength - IP4_MIN_HEADLEN;
   RxData->Options       = NULL;
@@ -938,9 +938,9 @@ Ip4InstanceDeliverPacket (
       // may be not continuous before the data.
       //
       Head    = NetbufAllocSpace (Dup, IP4_MAX_HEADLEN, NET_BUF_HEAD);
-      Dup->Ip = (IP4_HEAD *) Head;
+      Dup->Ip.Ip4 = (IP4_HEAD *) Head;
 
-      CopyMem (Head, Packet->Ip, Packet->Ip->HeadLen << 2);
+      CopyMem (Head, Packet->Ip.Ip4, Packet->Ip.Ip4->HeadLen << 2);
       NetbufTrim (Dup, IP4_MAX_HEADLEN, TRUE);
 
       Wrap = Ip4WrapRxData (IpInstance, Dup);

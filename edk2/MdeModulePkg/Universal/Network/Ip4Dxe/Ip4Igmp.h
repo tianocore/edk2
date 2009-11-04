@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2005 - 2006, Intel Corporation.<BR>
+Copyright (c) 2005 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -13,6 +13,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #ifndef __EFI_IP4_IGMP_H__
 #define __EFI_IP4_IGMP_H__
+
+//
+// IGMP message type
+//
+#define IGMP_MEMBERSHIP_QUERY      0x11
+#define IGMP_V1_MEMBERSHIP_REPORT  0x12
+#define IGMP_V2_MEMBERSHIP_REPORT  0x16
+#define IGMP_LEAVE_GROUP           0x17
+
+#define IGMP_V1ROUTER_PRESENT      400
+#define IGMP_UNSOLICIATED_REPORT   10
 
 #pragma pack(1)
 typedef struct {
@@ -47,19 +58,6 @@ typedef struct {
   INTN                    Igmpv1QuerySeen;
   LIST_ENTRY              Groups;
 } IGMP_SERVICE_DATA;
-
-typedef enum {
-  //
-  // IGMP message type
-  //
-  IGMP_MEMBERSHIP_QUERY     = 0x11,
-  IGMP_V1_MEMBERSHIP_REPORT = 0x12,
-  IGMP_V2_MEMBERSHIP_REPORT = 0x16,
-  IGMP_LEAVE_GROUP          = 0x17,
-
-  IGMP_V1ROUTER_PRESENT     = 400,
-  IGMP_UNSOLICIATED_REPORT  = 10
-} IGMP_ENUM_TYPES;
 
 /**
   Init the IGMP control data of the IP4 service instance, configure

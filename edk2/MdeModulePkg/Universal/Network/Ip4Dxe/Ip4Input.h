@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2005 - 2006, Intel Corporation.<BR>
+Copyright (c) 2005 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -14,14 +14,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __EFI_IP4_INPUT_H__
 #define __EFI_IP4_INPUT_H__
 
-typedef enum {
-  IP4_MIN_HEADLEN       = 20,
-  IP4_MAX_HEADLEN       = 60,
+#define IP4_MIN_HEADLEN        20
+#define IP4_MAX_HEADLEN        60
 
-  IP4_ASSEMLE_HASH_SIZE = 31,
-  IP4_FRAGMENT_LIFE     = 120,
-  IP4_MAX_PACKET_SIZE   = 65535
-} IP4_INPUT_ENUM_TYPES;
+#define IP4_ASSEMLE_HASH_SIZE  31
+#define IP4_FRAGMENT_LIFE      120
+#define IP4_MAX_PACKET_SIZE    65535
 
 ///
 /// Per packet information for input process. LinkFlag specifies whether

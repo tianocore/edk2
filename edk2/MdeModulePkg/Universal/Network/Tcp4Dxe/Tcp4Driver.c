@@ -38,8 +38,8 @@ EFI_TCP4_PROTOCOL mTcp4ProtocolTemplate = {
 };
 
 SOCK_INIT_DATA mTcp4DefaultSockData = {
-  SOCK_STREAM,
-  (SOCK_STATE) 0,
+  SockStream,
+  0,
   NULL,
   TCP_BACKLOG,
   TCP_SND_BUF_SIZE,

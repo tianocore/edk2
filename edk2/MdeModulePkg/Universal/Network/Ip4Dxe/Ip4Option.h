@@ -1,7 +1,7 @@
 /** @file
   IP4 option support routines.
   
-Copyright (c) 2005 - 2006, Intel Corporation.<BR>
+Copyright (c) 2005 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -15,15 +15,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __EFI_IP4_OPTION_H__
 #define __EFI_IP4_OPTION_H__
 
-typedef enum {
-  IP4_OPTION_EOP       = 0,
-  IP4_OPTION_NOP       = 1,
-  IP4_OPTION_LSRR      = 131,  // Loss source and record routing,   10000011
-  IP4_OPTION_SSRR      = 137,  // Strict source and record routing, 10001001
-  IP4_OPTION_RR        = 7,    // Record routing, 00000111
+#define IP4_OPTION_EOP        0
+#define IP4_OPTION_NOP        1
+#define IP4_OPTION_LSRR       131  // Loss source and record routing,   10000011
+#define IP4_OPTION_SSRR       137  // Strict source and record routing, 10001001
+#define IP4_OPTION_RR         7    // Record routing, 00000111
 
-  IP4_OPTION_COPY_MASK = 0x80
-} IP4_OPTION_ENUM_TYPES;
+#define IP4_OPTION_COPY_MASK  0x80
 
 /**
   Validate the IP4 option format for both the packets we received

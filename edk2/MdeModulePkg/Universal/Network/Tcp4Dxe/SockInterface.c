@@ -1,7 +1,7 @@
 /** @file
   Interface function of the Socket.
 
-Copyright (c) 2005 - 2006, Intel Corporation<BR>
+Copyright (c) 2005 - 2009, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -397,7 +397,7 @@ SockAccept (
   SOCKET                *Socket;
   EFI_EVENT             Event;
 
-  ASSERT (SOCK_STREAM == Sock->Type);
+  ASSERT (SockStream == Sock->Type);
 
   Status = EfiAcquireLockOrFail (&(Sock->Lock));
   if (EFI_ERROR (Status)) {
@@ -510,7 +510,7 @@ SockSend (
   SOCK_TOKEN              *SockToken;
   UINT32                  DataLen;
 
-  ASSERT (SOCK_STREAM == Sock->Type);
+  ASSERT (SockStream == Sock->Type);
 
   Status = EfiAcquireLockOrFail (&(Sock->Lock));
   if (EFI_ERROR (Status)) {
@@ -633,7 +633,7 @@ SockRcv (
   EFI_STATUS    Status;
   EFI_EVENT     Event;
 
-  ASSERT (SOCK_STREAM == Sock->Type);
+  ASSERT (SockStream == Sock->Type);
 
   Status = EfiAcquireLockOrFail (&(Sock->Lock));
   if (EFI_ERROR (Status)) {
@@ -733,7 +733,7 @@ SockFlush (
 {
   EFI_STATUS  Status;
 
-  ASSERT (SOCK_STREAM == Sock->Type);
+  ASSERT (SockStream == Sock->Type);
 
   Status = EfiAcquireLockOrFail (&(Sock->Lock));
   if (EFI_ERROR (Status)) {
@@ -798,7 +798,7 @@ SockClose (
   EFI_STATUS  Status;
   EFI_EVENT   Event;
 
-  ASSERT (SOCK_STREAM == Sock->Type);
+  ASSERT (SockStream == Sock->Type);
 
   Status = EfiAcquireLockOrFail (&(Sock->Lock));
   if (EFI_ERROR (Status)) {
