@@ -1,7 +1,7 @@
 /** @file
   EFI Address Resolution Protocol (ARP) Protocol interface header file.
 
-Copyright (c) 2006 - 2008, Intel Corporation.<BR>
+Copyright (c) 2006 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -186,17 +186,19 @@ typedef struct {
 #define ARP_MAX_PROTOCOL_ADDRESS_LEN  sizeof(EFI_IP_ADDRESS)
 #define ARP_MAX_HARDWARE_ADDRESS_LEN  sizeof(EFI_MAC_ADDRESS)
 
+typedef union {
+  UINT8  ProtoAddress[ARP_MAX_PROTOCOL_ADDRESS_LEN];
+  UINT8  HwAddress[ARP_MAX_HARDWARE_ADDRESS_LEN];
+} NET_ARP_ADDRESS_UNION;
+
 //
 // ARP address structure in an ARP packet.
 //
 typedef struct {
-  UINT16  Type;
-  UINT8   Length;
-  UINT8   *AddressPtr;
-  union {
-    UINT8  ProtoAddress[ARP_MAX_PROTOCOL_ADDRESS_LEN];
-    UINT8  HwAddress[ARP_MAX_HARDWARE_ADDRESS_LEN];
-  } Buffer;
+  UINT16                Type;
+  UINT8                 Length;
+  UINT8                 *AddressPtr;
+  NET_ARP_ADDRESS_UNION Buffer;
 } NET_ARP_ADDRESS;
 
 //

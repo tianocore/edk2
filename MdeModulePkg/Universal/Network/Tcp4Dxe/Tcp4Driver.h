@@ -122,7 +122,7 @@ TcpSendIpPacket (
 EFI_STATUS
 Tcp4Dispatcher (
   IN SOCKET                  *Sock,
-  IN SOCK_REQUEST            Request,
+  IN UINT8                   Request,
   IN VOID                    *Data    OPTIONAL
   );
 

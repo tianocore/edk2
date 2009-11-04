@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2005 - 2006, Intel Corporation.<BR>
+Copyright (c) 2005 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -62,7 +62,7 @@ mIp4SupportedIcmp[23] = {
   {ICMP_ECHO_REQUEST,      ICMP_DEFAULT_CODE        },
 
   {ICMP_TIME_EXCEEDED,     ICMP_TIMEOUT_IN_TRANSIT  },
-  {ICMP_TIME_EXCEEDED,     ICMp_TIMEOUT_REASSEMBLE  },
+  {ICMP_TIME_EXCEEDED,     ICMP_TIMEOUT_REASSEMBLE  },
 
   {ICMP_PARAMETER_PROBLEM, ICMP_DEFAULT_CODE        },
 };
@@ -247,7 +247,7 @@ Ip4IcmpReplyEcho (
   ReplyHead.Tos       = 0;
   ReplyHead.Fragment  = 0;
   ReplyHead.Ttl       = 64;
-  ReplyHead.Protocol  = IP4_PROTO_ICMP;
+  ReplyHead.Protocol  = EFI_IP_PROTO_ICMP;
   ReplyHead.Src       = 0;
 
   //

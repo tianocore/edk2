@@ -1,7 +1,7 @@
 /** @file
   Common definition for IP4.
   
-Copyright (c) 2005 - 2006, Intel Corporation.<BR>
+Copyright (c) 2005 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -19,38 +19,32 @@ typedef struct _IP4_INTERFACE  IP4_INTERFACE;
 typedef struct _IP4_PROTOCOL   IP4_PROTOCOL;
 typedef struct _IP4_SERVICE    IP4_SERVICE;
 
+#define IP4_ETHER_PROTO       0x0800
 
-typedef enum {
-  IP4_ETHER_PROTO      = 0x0800,
+//
+// The packet is received as link level broadcast/multicast/promiscuous.
+//
+#define IP4_LINK_BROADCAST    0x00000001
+#define IP4_LINK_MULTICAST    0x00000002
+#define IP4_LINK_PROMISC      0x00000004
 
-  IP4_PROTO_ICMP       = 0x01,
-  IP4_PROTO_IGMP       = 0x02,
+//
+// IP4 address cast type classfication. Keep it true that any
+// type bigger than or equal to LOCAL_BROADCAST is broadcast.
+//
+#define IP4_PROMISCUOUS       1
+#define IP4_LOCAL_HOST        2
+#define IP4_MULTICAST         3
+#define IP4_LOCAL_BROADCAST   4  // Destination is 255.255.255.255
+#define IP4_SUBNET_BROADCAST  5
+#define IP4_NET_BROADCAST     6
 
-  //
-  // The packet is received as link level broadcast/multicast/promiscuous.
-  //
-  IP4_LINK_BROADCAST   = 0x00000001,
-  IP4_LINK_MULTICAST   = 0x00000002,
-  IP4_LINK_PROMISC     = 0x00000004,
-
-  //
-  // IP4 address cast type classfication. Keep it true that any
-  // type bigger than or equal to LOCAL_BROADCAST is broadcast.
-  //
-  IP4_PROMISCUOUS      = 1,
-  IP4_LOCAL_HOST,
-  IP4_MULTICAST,
-  IP4_LOCAL_BROADCAST,  // Destination is 255.255.255.255
-  IP4_SUBNET_BROADCAST,
-  IP4_NET_BROADCAST,
-
-  //
-  // IP4 header flags
-  //
-  IP4_HEAD_DF_MASK     = 0x4000,
-  IP4_HEAD_MF_MASK     = 0x2000,
-  IP4_HEAD_OFFSET_MASK = 0x1fff
-} IP_ENUM_TYPES;
+//
+// IP4 header flags
+//
+#define IP4_HEAD_DF_MASK      0x4000
+#define IP4_HEAD_MF_MASK      0x2000
+#define IP4_HEAD_OFFSET_MASK  0x1fff
 
 #define IP4_ALLZERO_ADDRESS   0x00000000u
 #define IP4_ALLONE_ADDRESS    0xFFFFFFFFu

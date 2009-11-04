@@ -1962,7 +1962,7 @@ EfiIp4Transmit (
   // a IP4_TXTOKEN_WRAP and the data in a netbuf
   //
   Status = EFI_OUT_OF_RESOURCES;
-  Wrap   = AllocatePool (sizeof (IP4_TXTOKEN_WRAP));
+  Wrap   = AllocateZeroPool (sizeof (IP4_TXTOKEN_WRAP));
   if (Wrap == NULL) {
     goto ON_EXIT;
   }

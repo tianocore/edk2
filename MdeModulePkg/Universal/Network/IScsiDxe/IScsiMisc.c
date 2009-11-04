@@ -126,7 +126,7 @@ IScsiAsciiStrToLun (
   UINTN   Index, IndexValue, IndexNum, SizeStr;
   CHAR8   TemStr[2];
   UINT8   TemValue;
-  UINT16  Value [4];
+  UINT16  Value[4];
   
   ZeroMem (Lun, 8);
   ZeroMem (TemStr, 2);

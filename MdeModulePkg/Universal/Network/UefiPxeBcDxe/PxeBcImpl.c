@@ -176,7 +176,7 @@ IcmpErrorListenHandlerDpc (
   }
 
   if (EFI_IP4 (RxData->Header->SourceAddress) != 0 &&
-      !Ip4IsUnicast (EFI_NTOHL (RxData->Header->SourceAddress), 0)) {
+      !NetIp4IsUnicast (EFI_NTOHL (RxData->Header->SourceAddress), 0)) {
     //
     // The source address is not zero and it's not a unicast IP address, discard it.
     //
@@ -1044,11 +1044,11 @@ EfiPxeBcMtftp (
   EFI_PXE_BASE_CODE_MODE  *Mode;
   EFI_MAC_ADDRESS         TempMacAddr;
 
-  if ((This == NULL)                                                       ||
-      (Filename == NULL)                                                   ||
-      (BufferSize == NULL)                                                 ||
-      ((ServerIp == NULL) || !Ip4IsUnicast (NTOHL (ServerIp->Addr[0]), 0)) ||
-      ((BufferPtr == NULL) && DontUseBuffer)                               ||
+  if ((This == NULL)                                                          ||
+      (Filename == NULL)                                                      ||
+      (BufferSize == NULL)                                                    ||
+      ((ServerIp == NULL) || !NetIp4IsUnicast (NTOHL (ServerIp->Addr[0]), 0)) ||
+      ((BufferPtr == NULL) && DontUseBuffer)                                  ||
       ((BlockSize != NULL) && (*BlockSize < 512))) {
 
     return EFI_INVALID_PARAMETER;
@@ -1243,7 +1243,7 @@ EfiPxeBcUdpWrite (
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((GatewayIp != NULL) && !Ip4IsUnicast (NTOHL (GatewayIp->Addr[0]), 0)) {
+  if ((GatewayIp != NULL) && !NetIp4IsUnicast (NTOHL (GatewayIp->Addr[0]), 0)) {
     //
     // Gateway is provided but it's not a unicast IP address.
     //
@@ -1783,7 +1783,7 @@ EfiPxeBcSetIpFilter (
       DEBUG ((EFI_D_ERROR, "There is broadcast address in NewFilter.\n"));
       return EFI_INVALID_PARAMETER;
     }
-    if (Ip4IsUnicast (EFI_IP4 (NewFilter->IpList[Index].v4), 0) &&
+    if (NetIp4IsUnicast (EFI_IP4 (NewFilter->IpList[Index].v4), 0) &&
         (NewFilter->Filters & EFI_PXE_BASE_CODE_IP_FILTER_STATION_IP)
        ) {
       //
@@ -2110,7 +2110,7 @@ EfiPxeBcSetStationIP (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (NewStationIp != NULL && !Ip4IsUnicast (NTOHL (NewStationIp->Addr[0]), 0)) {
+  if (NewStationIp != NULL && !NetIp4IsUnicast (NTOHL (NewStationIp->Addr[0]), 0)) {
     return EFI_INVALID_PARAMETER;
   }
 

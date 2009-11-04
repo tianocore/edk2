@@ -1,7 +1,7 @@
 /** @file
   The implementation of iSCSI protocol based on RFC3720.
 
-Copyright (c) 2004 - 2008, Intel Corporation.<BR>
+Copyright (c) 2004 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -225,8 +225,8 @@ IScsiCreateConnection (
   // set the default connection-only parameters
   //
   Conn->MaxRecvDataSegmentLength  = DEFAULT_MAX_RECV_DATA_SEG_LEN;
-  Conn->HeaderDigest              = ISCSI_DIGEST_NONE;
-  Conn->DataDigest                = ISCSI_DIGEST_NONE;
+  Conn->HeaderDigest              = IScsiDigestNone;
+  Conn->DataDigest                = IScsiDigestNone;
 
   CopyMem (&Tcp4IoConfig.LocalIp, &Session->ConfigData.NvData.LocalIp, sizeof (EFI_IPv4_ADDRESS));
   CopyMem (&Tcp4IoConfig.SubnetMask, &Session->ConfigData.NvData.SubnetMask, sizeof (EFI_IPv4_ADDRESS));
@@ -1146,11 +1146,11 @@ IScsiCheckOpParams (
   }
 
   if (AsciiStrCmp (Value, "CRC32") == 0) {
-    if (Conn->HeaderDigest != ISCSI_DIGEST_CRC32) {
+    if (Conn->HeaderDigest != IScsiDigestCRC32) {
       goto ON_ERROR;
     }
   } else if (AsciiStrCmp (Value, ISCSI_KEY_VALUE_NONE) == 0) {
-    Conn->HeaderDigest = ISCSI_DIGEST_NONE;
+    Conn->HeaderDigest = IScsiDigestNone;
   } else {
     goto ON_ERROR;
   }
@@ -1163,11 +1163,11 @@ IScsiCheckOpParams (
   }
 
   if (AsciiStrCmp (Value, "CRC32") == 0) {
-    if (Conn->DataDigest != ISCSI_DIGEST_CRC32) {
+    if (Conn->DataDigest != IScsiDigestCRC32) {
       goto ON_ERROR;
     }
   } else if (AsciiStrCmp (Value, ISCSI_KEY_VALUE_NONE) == 0) {
-    Conn->DataDigest = ISCSI_DIGEST_NONE;
+    Conn->DataDigest = IScsiDigestNone;
   } else {
     goto ON_ERROR;
   }
@@ -1361,10 +1361,10 @@ IScsiFillOpParams (
 
   Session = Conn->Session;
 
-  AsciiSPrint (Value, sizeof (Value), "%a", (Conn->HeaderDigest == ISCSI_DIGEST_CRC32) ? "None,CRC32" : "None");
+  AsciiSPrint (Value, sizeof (Value), "%a", (Conn->HeaderDigest == IScsiDigestCRC32) ? "None,CRC32" : "None");
   IScsiAddKeyValuePair (Pdu, ISCSI_KEY_HEADER_DIGEST, Value);
 
-  AsciiSPrint (Value, sizeof (Value), "%a", (Conn->DataDigest == ISCSI_DIGEST_CRC32) ? "None,CRC32" : "None");
+  AsciiSPrint (Value, sizeof (Value), "%a", (Conn->DataDigest == IScsiDigestCRC32) ? "None,CRC32" : "None");
   IScsiAddKeyValuePair (Pdu, ISCSI_KEY_DATA_DIGEST, Value);
 
   AsciiSPrint (Value, sizeof (Value), "%d", Session->ErrorRecoveryLevel);
@@ -1854,7 +1854,7 @@ IScsiNewScsiCmdPdu (
   ScsiCmd->CmdSN            = NTOHL (Tcb->CmdSN);
   ScsiCmd->ExpStatSN        = NTOHL (Tcb->Conn->ExpStatSN);
 
-  CopyMem (ScsiCmd->CDB, Packet->Cdb, sizeof (ScsiCmd->CDB));
+  CopyMem (ScsiCmd->Cdb, Packet->Cdb, sizeof (ScsiCmd->Cdb));
 
   if (Packet->CdbLength > 16) {
     Header->Length  = NTOHS (Packet->CdbLength - 15);
@@ -2258,7 +2258,7 @@ IScsiOnR2TRcvd (
   R2THdr->InitiatorTaskTag = NTOHL (R2THdr->InitiatorTaskTag);
   R2THdr->TargetTransferTag = NTOHL (R2THdr->TargetTransferTag);
   R2THdr->StatSN = NTOHL (R2THdr->StatSN);
-  R2THdr->R2TSN = NTOHL (R2THdr->R2TSN);
+  R2THdr->R2TSeqNum = NTOHL (R2THdr->R2TSeqNum);
   R2THdr->BufferOffset = NTOHL (R2THdr->BufferOffset);
   R2THdr->DesiredDataTransferLength = NTOHL (R2THdr->DesiredDataTransferLength);
 
@@ -2268,7 +2268,7 @@ IScsiOnR2TRcvd (
   //
   // Check the sequence number.
   //
-  Status = IScsiCheckSN (&Tcb->ExpDataSN, R2THdr->R2TSN);
+  Status = IScsiCheckSN (&Tcb->ExpDataSN, R2THdr->R2TSeqNum);
   if (EFI_ERROR (Status)) {
     return Status;
   }

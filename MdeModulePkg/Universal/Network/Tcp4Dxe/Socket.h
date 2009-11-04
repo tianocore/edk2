@@ -1,7 +1,7 @@
 /** @file
   Socket header file.
 
-Copyright (c) 2005 - 2006, Intel Corporation<BR>
+Copyright (c) 2005 - 2009, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -68,23 +68,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ///
 /// Socket state
 ///
-typedef enum {
-  SO_CLOSED       = 0,
-  SO_LISTENING,
-  SO_CONNECTING,
-  SO_CONNECTED,
-  SO_DISCONNECTING
-} SOCK_STATE;
+#define SO_CLOSED        0
+#define SO_LISTENING     1
+#define SO_CONNECTING    2
+#define SO_CONNECTED     3
+#define SO_DISCONNECTING 4
 
 ///
 /// Socket configure state
 ///
-typedef enum {
-  SO_UNCONFIGURED       = 0,
-  SO_CONFIGURED_ACTIVE,
-  SO_CONFIGURED_PASSIVE,
-  SO_NO_MAPPING
-} SOCK_CONFIGURE_STATE;
+#define SO_UNCONFIGURED        0
+#define SO_CONFIGURED_ACTIVE   1
+#define SO_CONFIGURED_PASSIVE  2
+#define SO_NO_MAPPING          3
 
 /**
   Set socket SO_NO_MORE_DATA flag.
@@ -331,44 +327,44 @@ typedef struct _SOCK_COMPLETION_TOKEN {
   EFI_STATUS  Status;           ///< The status to be issued
 } SOCK_COMPLETION_TOKEN;
 
+typedef union {
+  VOID  *RxData;
+  VOID  *TxData;
+} SOCK_IO_DATA;
+
 ///
 /// The application token with data packet
 ///
 typedef struct _SOCK_IO_TOKEN {
   SOCK_COMPLETION_TOKEN Token;
-  union {
-    VOID  *RxData;
-    VOID  *TxData;
-  } Packet;
+  SOCK_IO_DATA          Packet;
 } SOCK_IO_TOKEN;
 
 ///
 ///  The request issued from socket layer to protocol layer.  
 ///
-typedef enum {
-  SOCK_ATTACH,    ///< Attach current socket to a new PCB
-  SOCK_DETACH,    ///< Detach current socket from the PCB
-  SOCK_CONFIGURE, ///< Configure attached PCB
-  SOCK_FLUSH,     ///< Flush attached PCB
-  SOCK_SND,       ///< Need protocol to send something
-  SOCK_SNDPUSH,   ///< Need protocol to send pushed data
-  SOCK_SNDURG,    ///< Need protocol to send urgent data
-  SOCK_CONSUMED,  ///< Application has retrieved data from socket
-  SOCK_CONNECT,   ///< Need to connect to a peer
-  SOCK_CLOSE,     ///< Need to close the protocol process
-  SOCK_ABORT,     ///< Need to reset the protocol process
-  SOCK_POLL,      ///< Need to poll to the protocol layer
-  SOCK_ROUTE,     ///< Need to add a route information
-  SOCK_MODE,      ///< Need to get the mode data of the protocol
-  SOCK_GROUP      ///< Need to join a mcast group
-} SOCK_REQUEST;
+#define SOCK_ATTACH     0    ///< Attach current socket to a new PCB
+#define SOCK_DETACH     1    ///< Detach current socket from the PCB
+#define SOCK_CONFIGURE  2    ///< Configure attached PCB
+#define SOCK_FLUSH      3    ///< Flush attached PCB
+#define SOCK_SND        4    ///< Need protocol to send something
+#define SOCK_SNDPUSH    5    ///< Need protocol to send pushed data
+#define SOCK_SNDURG     6    ///< Need protocol to send urgent data
+#define SOCK_CONSUMED   7    ///< Application has retrieved data from socket
+#define SOCK_CONNECT    8    ///< Need to connect to a peer
+#define SOCK_CLOSE      9    ///< Need to close the protocol process
+#define SOCK_ABORT      10   ///< Need to reset the protocol process
+#define SOCK_POLL       11   ///< Need to poll to the protocol layer
+#define SOCK_ROUTE      12   ///< Need to add a route information
+#define SOCK_MODE       13   ///< Need to get the mode data of the protocol
+#define SOCK_GROUP      14   ///< Need to join a mcast group
 
 ///
 ///  The socket type.
 ///
 typedef enum {
-  SOCK_DGRAM, ///< This socket providing datagram service
-  SOCK_STREAM ///< This socket providing stream service
+  SockDgram, ///< This socket providing datagram service
+  SockStream ///< This socket providing stream service
 } SOCK_TYPE;
 
 ///
@@ -396,7 +392,7 @@ typedef
 EFI_STATUS
 (*SOCK_PROTO_HANDLER) (
   IN SOCKET       *Socket,
-  IN SOCK_REQUEST Request,
+  IN UINT8        Request,
   IN VOID         *RequestData
   );
   
@@ -413,13 +409,13 @@ EFI_STATUS
   Set the state of the socket.
 
   @param  Sock                  Pointer to the socket.
-  @param  State                 The new state to be set.
+  @param  State                 The new socket state to be set.
 
 **/
 VOID
 SockSetState (
   IN OUT SOCKET     *Sock,
-  IN     SOCK_STATE State
+  IN     UINT8      State
   );
 
 /**
@@ -592,7 +588,7 @@ VOID
 ///
 typedef struct _SOCK_INIT_DATA {
   SOCK_TYPE   Type;
-  SOCK_STATE  State;
+  UINT8       State;
 
   SOCKET      *Parent;        ///< The parent of this socket
   UINT32      BackLog;        ///< The connection limit for listening socket
@@ -641,9 +637,9 @@ struct _SOCKET {
   EFI_DEVICE_PATH_PROTOCOL  *ParentDevicePath;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
   LIST_ENTRY                Link;  
-  SOCK_CONFIGURE_STATE  ConfigureState;
+  UINT8                 ConfigureState;
   SOCK_TYPE             Type;
-  SOCK_STATE            State;
+  UINT8                 State;
   UINT16                Flag;
   EFI_LOCK              Lock;       ///< The lock of socket
   SOCK_BUFFER           SndBuffer;  ///< Send buffer of application's data

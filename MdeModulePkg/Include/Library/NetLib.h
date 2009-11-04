@@ -29,6 +29,8 @@ typedef UINT16          TCP_PORTNO;
 #define  EFI_IP_PROTO_UDP      0x11
 #define  EFI_IP_PROTO_TCP      0x06
 #define  EFI_IP_PROTO_ICMP     0x01
+#define  IP4_PROTO_IGMP        0x02
+#define  IP6_ICMP              58
 
 //
 // The address classification
@@ -40,7 +42,7 @@ typedef UINT16          TCP_PORTNO;
 #define  IP4_ADDR_CLASSE       5
 
 #define  IP4_MASK_NUM          33
-
+#define  IP6_PREFIX_NUM        129
 
 #define  IP6_HOP_BY_HOP        0
 #define  IP6_DESTINATION       60
@@ -166,7 +168,11 @@ typedef struct {
 #define NTOHS(x)  (UINT16)((((UINT16) (x) & 0xff) << 8) | \
                            (((UINT16) (x) & 0xff00) >> 8))
 
-#define HTONS(x)  NTOHS(x)
+#define HTONS(x)   NTOHS(x)
+#define NTOHLL(x)  SwapBytes64 (x)
+#define HTONLL(x)  NTOHLL(x)
+#define NTOHLLL(x) Ip6Swap128 (x)
+#define HTONLLL(x) NTOHLLL(x)
 
 //
 // Test the IP's attribute, All the IPs are in host byte order.
@@ -186,6 +192,113 @@ typedef struct {
 #define EFI_IP4_EQUAL(Ip1, Ip2)  (CompareMem ((Ip1), (Ip2), sizeof (EFI_IPv4_ADDRESS)) == 0)
 
 #define EFI_IP6_EQUAL(Ip1, Ip2)  (CompareMem ((Ip1), (Ip2), sizeof (EFI_IPv6_ADDRESS)) == 0)
+
+#define IP6_COPY_ADDRESS(Dest, Src) (CopyMem ((Dest), (Src), sizeof (EFI_IPv6_ADDRESS)))
+#define IP6_COPY_LINK_ADDRESS(Mac1, Mac2) (CopyMem ((Mac1), (Mac2), sizeof (EFI_MAC_ADDRESS)))
+
+//
+// The debug level definition. This value is also used as the 
+// syslog's servity level. Don't change it. 
+//
+#define NETDEBUG_LEVEL_TRACE   5
+#define NETDEBUG_LEVEL_WARNING 4
+#define NETDEBUG_LEVEL_ERROR   3
+
+//
+// Network debug message is sent out as syslog packet. 
+//
+#define NET_SYSLOG_FACILITY    16             // Syslog local facility local use
+#define NET_SYSLOG_PACKET_LEN  512  
+#define NET_SYSLOG_TX_TIMEOUT  500 *1000 *10  // 500ms
+#define NET_DEBUG_MSG_LEN      470            // 512 - (ether+ip4+udp4 head length)
+
+//
+// The debug output expects the ASCII format string, Use %a to print ASCII 
+// string, and %s to print UNICODE string. PrintArg must be enclosed in (). 
+// For example: NET_DEBUG_TRACE ("Tcp", ("State transit to %a\n", Name));
+//
+#define NET_DEBUG_TRACE(Module, PrintArg) \
+  NetDebugOutput ( \
+    NETDEBUG_LEVEL_TRACE, \
+    Module, \
+    __FILE__, \
+    __LINE__, \
+    NetDebugASPrint PrintArg \
+    )
+
+#define NET_DEBUG_WARNING(Module, PrintArg) \
+  NetDebugOutput ( \
+    NETDEBUG_LEVEL_WARNING, \
+    Module, \
+    __FILE__, \
+    __LINE__, \
+    NetDebugASPrint PrintArg \
+    )
+
+#define NET_DEBUG_ERROR(Module, PrintArg) \
+  NetDebugOutput ( \
+    NETDEBUG_LEVEL_ERROR, \
+    Module, \
+    __FILE__, \
+    __LINE__, \
+    NetDebugASPrint PrintArg \
+    )
+
+/**
+  Allocate a buffer, then format the message to it. This is a 
+  help function for the NET_DEBUG_XXX macros. The PrintArg of 
+  these macros treats the variable length print parameters as a 
+  single parameter, and pass it to the NetDebugASPrint. For
+  example, NET_DEBUG_TRACE ("Tcp", ("State transit to %a\n", Name))
+  if extracted to:   
+  
+         NetDebugOutput (
+           NETDEBUG_LEVEL_TRACE, 
+           "Tcp", 
+           __FILE__,
+           __LINE__,
+           NetDebugASPrint ("State transit to %a\n", Name) 
+         )  
+ 
+  @param Format  The ASCII format string.
+  @param ...     The variable length parameter whose format is determined 
+                 by the Format string.
+
+  @return        The buffer containing the formatted message,
+                 or NULL if failed to allocate memory.
+
+**/
+CHAR8 *
+NetDebugASPrint (
+  IN CHAR8                  *Format,
+  ...
+  );
+
+/**
+  Builds an UDP4 syslog packet and send it using SNP.
+
+  This function will locate a instance of SNP then send the message through it.
+  Because it isn't open the SNP BY_DRIVER, apply caution when using it.
+
+  @param Level    The servity level of the message.
+  @param Module   The Moudle that generates the log.
+  @param File     The file that contains the log.
+  @param Line     The exact line that contains the log.
+  @param Message  The user message to log.
+
+  @retval EFI_INVALID_PARAMETER Any input parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES  Failed to allocate memory for the packet
+  @retval EFI_SUCCESS           The log is discard because that it is more verbose 
+                                than the mNetDebugLevelMax. Or, it has been sent out.
+**/  
+EFI_STATUS
+NetDebugOutput (
+  IN UINT32                    Level, 
+  IN UINT8                     *Module,
+  IN UINT8                     *File,
+  IN UINT32                    Line,
+  IN UINT8                     *Message
+  );
 
 
 /**
@@ -250,7 +363,7 @@ NetGetIpClass (
 **/
 BOOLEAN
 EFIAPI
-Ip4IsUnicast (
+NetIp4IsUnicast (
   IN IP4_ADDR               Ip,
   IN IP4_ADDR               NetMask
   );
@@ -270,8 +383,55 @@ Ip4IsUnicast (
 
 **/ 
 BOOLEAN
-Ip6IsValidUnicast (
+NetIp6IsValidUnicast (
   IN EFI_IPv6_ADDRESS       *Ip6
+  );
+
+
+/**
+  Check whether the incoming Ipv6 address is the unspecified address or not.
+
+  @param[in] Ip6   - Ip6 address, in network order.
+
+  @retval TRUE     - Yes, unspecified
+  @retval FALSE    - No
+  
+**/
+BOOLEAN
+NetIp6IsUnspecifiedAddr (
+  IN EFI_IPv6_ADDRESS       *Ip6
+  );
+
+/**
+  Check whether the incoming Ipv6 address is a link-local address.
+
+  @param[in] Ip6   - Ip6 address, in network order.
+
+  @retval TRUE  - Yes, link-local address
+  @retval FALSE - No
+  
+**/
+BOOLEAN
+NetIp6IsLinkLocalAddr (
+  IN EFI_IPv6_ADDRESS *Ip6
+  );
+
+/**
+  Check whether the Ipv6 address1 and address2 are on the connected network.
+
+  @param[in] Ip1          - Ip6 address1, in network order.
+  @param[in] Ip2          - Ip6 address2, in network order.
+  @param[in] PrefixLength - The prefix length of the checking net.
+
+  @retval TRUE            - Yes, connected.
+  @retval FALSE           - No.
+  
+**/
+BOOLEAN
+NetIp6IsNetEqual (
+  EFI_IPv6_ADDRESS *Ip1,
+  EFI_IPv6_ADDRESS *Ip2,
+  UINT8            PrefixLength
   );
 
 /**
@@ -741,7 +901,7 @@ EFIAPI
 NetMapIterate (
   IN NET_MAP                *Map,
   IN NET_MAP_CALLBACK       CallBack,
-  IN VOID                   *Arg
+  IN VOID                   *Arg      OPTIONAL
   );
 
 
@@ -838,7 +998,7 @@ NetLibGetMacString (
   Get other info from parameters to make up the whole IPv4 device path node.
 
   @param[in, out]  Node                  Pointer to the IPv4 device path node.
-  @param[in]       Controller            The handle where the NIC IP4 config protocol resides.
+  @param[in]       Controller            The controller handle.
   @param[in]       LocalIp               The local IPv4 address.
   @param[in]       LocalPort             The local port.
   @param[in]       RemoteIp              The remote IPv4 address.
@@ -859,6 +1019,36 @@ NetLibCreateIPv4DPathNode (
   IN UINT16                Protocol,
   IN BOOLEAN               UseDefaultAddress
   );
+
+/**
+  Create an IPv6 device path node.
+  
+  The header type of IPv6 device path node is MESSAGING_DEVICE_PATH.
+  The header subtype of IPv6 device path node is MSG_IPv6_DP.
+  The length of the IPv6 device path node in bytes is 43.
+  Get other info from parameters to make up the whole IPv6 device path node.
+
+  @param[in, out]  Node                  Pointer to the IPv6 device path node.
+  @param[in]       Controller            The controller handle.
+  @param[in]       LocalIp               The local IPv6 address.
+  @param[in]       LocalPort             The local port.
+  @param[in]       RemoteIp              The remote IPv6 address.
+  @param[in]       RemotePort            The remote port.
+  @param[in]       Protocol              The protocol type in the IP header.
+
+**/
+VOID
+EFIAPI
+NetLibCreateIPv6DPathNode (
+  IN OUT IPv6_DEVICE_PATH  *Node,
+  IN EFI_HANDLE            Controller,
+  IN EFI_IPv6_ADDRESS      *LocalIp,
+  IN UINT16                LocalPort,
+  IN EFI_IPv6_ADDRESS      *RemoteIp,
+  IN UINT16                RemotePort,
+  IN UINT16                Protocol
+  );
+
 
 /**
   Find the UNDI/SNP handle from controller and protocol GUID.
@@ -961,6 +1151,10 @@ typedef struct {
   UINT32              Size;         // The size of the data
 } NET_BLOCK_OP;
 
+typedef union {
+  IP4_HEAD          *Ip4;
+  EFI_IP6_HEADER    *Ip6;
+} NET_IP_HEAD;
 
 //
 //NET_BUF is the buffer manage structure used by the
@@ -973,21 +1167,21 @@ typedef struct {
 //to overwrite the members after that.
 //
 typedef struct {
-  UINT32              Signature;
-  INTN                RefCnt;
-  LIST_ENTRY          List;       // The List this NET_BUF is on
+  UINT32         Signature;
+  INTN           RefCnt;
+  LIST_ENTRY     List;                       // The List this NET_BUF is on
 
-  IP4_HEAD            *Ip;        // Network layer header, for fast access
-  TCP_HEAD            *Tcp;       // Transport layer header, for fast access
-  UINT8               ProtoData [NET_PROTO_DATA]; //Protocol specific data
+  NET_IP_HEAD    Ip;                         // Network layer header, for fast access
+  TCP_HEAD       *Tcp;                       // Transport layer header, for fast access
+  EFI_UDP_HEADER *Udp;                       // User Datagram Protocol header
+  UINT8          ProtoData [NET_PROTO_DATA]; //Protocol specific data
 
-  NET_VECTOR          *Vector;    // The vector containing the packet
+  NET_VECTOR     *Vector;                    // The vector containing the packet
 
-  UINT32              BlockOpNum; // Total number of BlockOp in the buffer
-  UINT32              TotalSize;  // Total size of the actual packet
-  NET_BLOCK_OP        BlockOp[1]; // Specify the position of actual packet
+  UINT32         BlockOpNum;                 // Total number of BlockOp in the buffer
+  UINT32         TotalSize;                  // Total size of the actual packet
+  NET_BLOCK_OP   BlockOp[1];                 // Specify the position of actual packet
 } NET_BUF;
-
 
 //
 //A queue of NET_BUFs. It is a thin extension of
@@ -1014,6 +1208,14 @@ typedef struct {
   UINT8               Protocol;
   UINT16              Len;
 } NET_PSEUDO_HDR;
+
+typedef struct {
+  EFI_IPv6_ADDRESS    SrcIp;
+  EFI_IPv6_ADDRESS    DstIp;
+  UINT32              Len;
+  UINT32              Reserved:24;
+  UINT32              NextHeader:8;
+} NET_IP6_PSEUDO_HDR;
 #pragma pack()
 
 //
@@ -1544,4 +1746,24 @@ NetPseudoHeadChecksum (
   IN UINT16                 Len
   );
 
+/**
+  Compute the checksum for TCP6/UDP6 pseudo header. 
+   
+  Src and Dst are in network byte order, and Len is in host byte order.
+
+  @param[in]   Src                   The source address of the packet.
+  @param[in]   Dst                   The destination address of the packet.
+  @param[in]   NextHeader            The protocol type of the packet.
+  @param[in]   Len                   The length of the packet.
+
+  @return   The computed checksum.
+
+**/
+UINT16
+NetIp6PseudoHeadChecksum (
+  IN EFI_IPv6_ADDRESS       *Src,
+  IN EFI_IPv6_ADDRESS       *Dst,
+  IN UINT8                  NextHeader,
+  IN UINT32                 Len
+  );
 #endif

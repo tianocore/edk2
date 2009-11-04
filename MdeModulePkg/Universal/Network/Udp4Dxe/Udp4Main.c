@@ -171,8 +171,8 @@ Udp4Configure (
 
     if (!UdpConfigData->UseDefaultAddress &&
       (!IP4_IS_VALID_NETMASK (SubnetMask) ||
-      !((StationAddress == 0) || Ip4IsUnicast (StationAddress, SubnetMask)) ||
-      !((RemoteAddress  == 0) || Ip4IsUnicast (RemoteAddress, 0)))) {
+      !((StationAddress == 0) || NetIp4IsUnicast (StationAddress, SubnetMask)) ||
+      !((RemoteAddress  == 0) || NetIp4IsUnicast (RemoteAddress, 0)))) {
       //
       // Don't use default address, and subnet mask is invalid or StationAddress is not
       // a valid unicast IPv4 address or RemoteAddress is not a valid unicast IPv4 address

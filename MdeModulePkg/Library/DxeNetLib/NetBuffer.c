@@ -1803,3 +1803,41 @@ NetPseudoHeadChecksum (
 
   return NetblockChecksum ((UINT8 *) &Hdr, sizeof (Hdr));
 }
+
+/**
+  Compute the checksum for TCP6/UDP6 pseudo header. 
+   
+  Src and Dst are in network byte order, and Len is in host byte order.
+
+  @param[in]   Src                   The source address of the packet.
+  @param[in]   Dst                   The destination address of the packet.
+  @param[in]   NextHeader            The protocol type of the packet.
+  @param[in]   Len                   The length of the packet.
+
+  @return   The computed checksum.
+
+**/
+UINT16
+NetIp6PseudoHeadChecksum (
+  IN EFI_IPv6_ADDRESS       *Src,
+  IN EFI_IPv6_ADDRESS       *Dst,
+  IN UINT8                  NextHeader,
+  IN UINT32                 Len
+  )
+{
+  NET_IP6_PSEUDO_HDR        Hdr;
+
+  //
+  // Zero the memory to relieve align problems
+  //
+  ZeroMem (&Hdr, sizeof (Hdr));
+
+  IP6_COPY_ADDRESS (&Hdr.SrcIp, Src);
+  IP6_COPY_ADDRESS (&Hdr.DstIp, Dst);
+
+  Hdr.NextHeader = NextHeader;
+  Hdr.Len        = HTONL (Len); 
+
+  return NetblockChecksum ((UINT8 *) &Hdr, sizeof (Hdr));
+}
+

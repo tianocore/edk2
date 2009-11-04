@@ -1029,7 +1029,7 @@ IpIoListenHandlerDpc (
 
   if (IpIo->IpVersion == IP_VERSION_4) {
     if ((EFI_IP4 (RxData->Ip4RxData.Header->SourceAddress) != 0) &&
-      !Ip4IsUnicast (EFI_NTOHL (((EFI_IP4_RECEIVE_DATA *) RxData)->Header->SourceAddress), 0)) {
+      !NetIp4IsUnicast (EFI_NTOHL (((EFI_IP4_RECEIVE_DATA *) RxData)->Header->SourceAddress), 0)) {
     //
     // The source address is not zero and it's not a unicast IP address, discard it.
     //
@@ -1060,7 +1060,7 @@ IpIoListenHandlerDpc (
   Session.IpVersion      = IP_VERSION_4;
   } else {
 
-    if (!Ip6IsValidUnicast(&RxData->Ip6RxData.Header->SourceAddress)) {
+    if (!NetIp6IsValidUnicast(&RxData->Ip6RxData.Header->SourceAddress)) {
       goto CleanUp;
     }
     

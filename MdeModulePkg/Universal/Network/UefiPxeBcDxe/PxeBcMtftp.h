@@ -1,7 +1,7 @@
 /** @file
   Mtftp routines for PxeBc.
     
-Copyright (c) 2007, Intel Corporation.<BR>
+Copyright (c) 2007 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -15,13 +15,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __EFI_PXEBC_MTFTP_H__
 #define __EFI_PXEBC_MTFTP_H__
 
-typedef enum {
-  PXE_MTFTP_OPTION_BLKSIZE_INDEX,
-  PXE_MTFTP_OPTION_TIMEOUT_INDEX,
-  PXE_MTFTP_OPTION_TSIZE_INDEX,
-  PXE_MTFTP_OPTION_MULTICAST_INDEX,
-  PXE_MTFTP_OPTION_MAXIMUM_INDEX
-} PXE_MTFTP_OPTION_ENUM_TYPES;
+#define PXE_MTFTP_OPTION_BLKSIZE_INDEX   0
+#define PXE_MTFTP_OPTION_TIMEOUT_INDEX   1
+#define PXE_MTFTP_OPTION_TSIZE_INDEX     2
+#define PXE_MTFTP_OPTION_MULTICAST_INDEX 3
+#define PXE_MTFTP_OPTION_MAXIMUM_INDEX   4
 
 
 /**

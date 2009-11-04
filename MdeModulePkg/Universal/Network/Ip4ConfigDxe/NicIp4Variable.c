@@ -1,7 +1,7 @@
 /** @file
   Routines used to operate the Ip4 configure variable.
 
-Copyright (c) 2006 - 2008, Intel Corporation.<BR>                                                         
+Copyright (c) 2006 - 2009, Intel Corporation.<BR>                                                         
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -45,7 +45,7 @@ Ip4ConfigIsValid (
     Netmask = EFI_NTOHL (IpConfig->SubnetMask);
 
     if ((Netmask == 0) || !IP4_IS_VALID_NETMASK (Netmask) ||
-        (Station == 0) || !Ip4IsUnicast (Station, Netmask)) {
+        (Station == 0) || !NetIp4IsUnicast (Station, Netmask)) {
       return FALSE;
     }
 
@@ -57,7 +57,7 @@ Ip4ConfigIsValid (
       Gateway = EFI_NTOHL (IpConfig->RouteTable[Index].GatewayAddress);
 
       if ((Gateway != 0) && (!IP4_NET_EQUAL (Station, Gateway, Netmask) ||
-          !Ip4IsUnicast (Gateway, Netmask))) {
+          !NetIp4IsUnicast (Gateway, Netmask))) {
         return FALSE;
       }
     }

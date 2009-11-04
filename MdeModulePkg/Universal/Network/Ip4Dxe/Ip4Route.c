@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2005 - 2006, Intel Corporation.<BR>
+Copyright (c) 2005 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -145,7 +145,7 @@ Ip4InitRouteCache (
 {
   UINT32                    Index;
 
-  for (Index = 0; Index < IP4_ROUTE_CACHE_HASH; Index++) {
+  for (Index = 0; Index < IP4_ROUTE_CACHE_HASH_VALUE; Index++) {
     InitializeListHead (&(RtCache->CacheBucket[Index]));
   }
 }
@@ -168,7 +168,7 @@ Ip4CleanRouteCache (
   IP4_ROUTE_CACHE_ENTRY     *RtCacheEntry;
   UINT32                    Index;
 
-  for (Index = 0; Index < IP4_ROUTE_CACHE_HASH; Index++) {
+  for (Index = 0; Index < IP4_ROUTE_CACHE_HASH_VALUE; Index++) {
     NET_LIST_FOR_EACH_SAFE (Entry, Next, &(RtCache->CacheBucket[Index])) {
       RtCacheEntry = NET_LIST_USER_STRUCT (Entry, IP4_ROUTE_CACHE_ENTRY, Link);
 
@@ -278,7 +278,7 @@ Ip4PurgeRouteCache (
   IP4_ROUTE_CACHE_ENTRY     *RtCacheEntry;
   UINT32                    Index;
 
-  for (Index = 0; Index < IP4_ROUTE_CACHE_HASH; Index++) {
+  for (Index = 0; Index < IP4_ROUTE_CACHE_HASH_VALUE; Index++) {
     NET_LIST_FOR_EACH_SAFE (Entry, Next, &RtCache->CacheBucket[Index]) {
 
       RtCacheEntry = NET_LIST_USER_STRUCT (Entry, IP4_ROUTE_CACHE_ENTRY, Link);

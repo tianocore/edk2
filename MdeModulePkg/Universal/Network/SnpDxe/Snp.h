@@ -135,13 +135,15 @@ extern EFI_COMPONENT_NAME2_PROTOCOL   gSimpleNetworkComponentName2;
 //
 //  Virtual to physical mapping for all UNDI 3.0s.
 //
-typedef struct _V2P {
-  struct _V2P           *Next;
+typedef struct _V2P V2P;
+
+struct _V2P {
+  V2P                   *Next;
   VOID                  *VirtualAddress;
   UINTN                 BufferSize;
   EFI_PHYSICAL_ADDRESS  PhysicalAddress;
   VOID                  *Unmap;
-} V2P;
+};
 
 /**
   This routine maps the given CPU address to a Device address. It creates a

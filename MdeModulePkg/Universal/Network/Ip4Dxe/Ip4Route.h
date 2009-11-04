@@ -1,7 +1,7 @@
 /** @file
   EFI IP4 route table and route cache table defintions.
   
-Copyright (c) 2005 - 2006, Intel Corporation.<BR>
+Copyright (c) 2005 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -17,14 +17,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Ip4Common.h"
 
-typedef enum {
-  IP4_DIRECT_ROUTE      = 0x00000001,
+#define IP4_DIRECT_ROUTE       0x00000001
 
-  IP4_ROUTE_CACHE_HASH  = 31,
-  IP4_ROUTE_CACHE_MAX   = 64  // Max NO. of cache entry per hash bucket
-} IP4_ROUTE_ENUM_TYPES;
+#define IP4_ROUTE_CACHE_HASH_VALUE 31
+#define IP4_ROUTE_CACHE_MAX        64  // Max NO. of cache entry per hash bucket
 
-#define IP4_ROUTE_CACHE_HASH(Dst, Src)  (((Dst) ^ (Src)) % IP4_ROUTE_CACHE_HASH)
+#define IP4_ROUTE_CACHE_HASH(Dst, Src)  (((Dst) ^ (Src)) % IP4_ROUTE_CACHE_HASH_VALUE)
 
 ///
 /// The route entry in the route table. Dest/Netmask is the destion
@@ -69,7 +67,7 @@ typedef struct {
 /// detach them later.
 ///
 typedef struct {
-  LIST_ENTRY                CacheBucket[IP4_ROUTE_CACHE_HASH];
+  LIST_ENTRY                CacheBucket[IP4_ROUTE_CACHE_HASH_VALUE];
 } IP4_ROUTE_CACHE;
 
 ///

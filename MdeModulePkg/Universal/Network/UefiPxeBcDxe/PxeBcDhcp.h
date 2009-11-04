@@ -15,115 +15,109 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __EFI_PXEBC_DHCP_H__
 #define __EFI_PXEBC_DHCP_H__
 
-typedef enum {
-  PXEBC_DHCP4_MAX_OPTION_NUM        = 16,
-  PXEBC_DHCP4_MAX_OPTION_SIZE       = 312,
-  PXEBC_DHCP4_MAX_PACKET_SIZE       = 1472,
+#define PXEBC_DHCP4_MAX_OPTION_NUM         16
+#define PXEBC_DHCP4_MAX_OPTION_SIZE        312
+#define PXEBC_DHCP4_MAX_PACKET_SIZE        1472
 
-  PXEBC_DHCP4_S_PORT                = 67,
-  PXEBC_DHCP4_C_PORT                = 68,
-  PXEBC_BS_DOWNLOAD_PORT            = 69,
-  PXEBC_BS_DISCOVER_PORT            = 4011,
+#define PXEBC_DHCP4_S_PORT                 67
+#define PXEBC_DHCP4_C_PORT                 68
+#define PXEBC_BS_DOWNLOAD_PORT             69
+#define PXEBC_BS_DISCOVER_PORT             4011
 
-  PXEBC_DHCP4_OPCODE_REQUEST        = 1,
-  PXEBC_DHCP4_OPCODE_REPLY          = 2,
-  PXEBC_DHCP4_MSG_TYPE_REQUEST      = 3,
-  PXEBC_DHCP4_MAGIC                 = 0x63538263, // network byte order
-  //
-  // Dhcp Options
-  //
-  PXEBC_DHCP4_TAG_PAD               = 0,    // Pad Option
-  PXEBC_DHCP4_TAG_EOP               = 255,  // End Option
-  PXEBC_DHCP4_TAG_NETMASK           = 1,    // Subnet Mask
-  PXEBC_DHCP4_TAG_TIME_OFFSET       = 2,    // Time Offset from UTC
-  PXEBC_DHCP4_TAG_ROUTER            = 3,    // Router option,
-  PXEBC_DHCP4_TAG_TIME_SERVER       = 4,    // Time Server
-  PXEBC_DHCP4_TAG_NAME_SERVER       = 5,    // Name Server
-  PXEBC_DHCP4_TAG_DNS_SERVER        = 6,    // Domain Name Server
-  PXEBC_DHCP4_TAG_HOSTNAME          = 12,   // Host Name
-  PXEBC_DHCP4_TAG_BOOTFILE_LEN      = 13,   // Boot File Size
-  PXEBC_DHCP4_TAG_DUMP              = 14,   // Merit Dump File
-  PXEBC_DHCP4_TAG_DOMAINNAME        = 15,   // Domain Name
-  PXEBC_DHCP4_TAG_ROOTPATH          = 17,   // Root path
-  PXEBC_DHCP4_TAG_EXTEND_PATH       = 18,   // Extensions Path
-  PXEBC_DHCP4_TAG_EMTU              = 22,   // Maximum Datagram Reassembly Size
-  PXEBC_DHCP4_TAG_TTL               = 23,   // Default IP Time-to-live
-  PXEBC_DHCP4_TAG_BROADCAST         = 28,   // Broadcast Address
-  PXEBC_DHCP4_TAG_NIS_DOMAIN        = 40,   // Network Information Service Domain
-  PXEBC_DHCP4_TAG_NIS_SERVER        = 41,   // Network Information Servers
-  PXEBC_DHCP4_TAG_NTP_SERVER        = 42,   // Network Time Protocol Servers
-  PXEBC_DHCP4_TAG_VENDOR            = 43,   // Vendor Specific Information
-  PXEBC_DHCP4_TAG_REQUEST_IP        = 50,   // Requested IP Address
-  PXEBC_DHCP4_TAG_LEASE             = 51,   // IP Address Lease Time
-  PXEBC_DHCP4_TAG_OVERLOAD          = 52,   // Option Overload
-  PXEBC_DHCP4_TAG_MSG_TYPE          = 53,   // DHCP Message Type
-  PXEBC_DHCP4_TAG_SERVER_ID         = 54,   // Server Identifier
-  PXEBC_DHCP4_TAG_PARA_LIST         = 55,   // Parameter Request List
-  PXEBC_DHCP4_TAG_MAXMSG            = 57,   // Maximum DHCP Message Size
-  PXEBC_DHCP4_TAG_T1                = 58,   // Renewal (T1) Time Value
-  PXEBC_DHCP4_TAG_T2                = 59,   // Rebinding (T2) Time Value
-  PXEBC_DHCP4_TAG_CLASS_ID          = 60,   // Vendor class identifier
-  PXEBC_DHCP4_TAG_CLIENT_ID         = 61,   // Client-identifier
-  PXEBC_DHCP4_TAG_TFTP              = 66,   // TFTP server name
-  PXEBC_DHCP4_TAG_BOOTFILE          = 67,   // Bootfile name
-  PXEBC_PXE_DHCP4_TAG_ARCH          = 93,
-  PXEBC_PXE_DHCP4_TAG_UNDI          = 94,
-  PXEBC_PXE_DHCP4_TAG_UUID          = 97,
-  //
-  // Sub-Options in Dhcp Vendor Option
-  //
-  PXEBC_VENDOR_TAG_MTFTP_IP         = 1,
-  PXEBC_VENDOR_TAG_MTFTP_CPORT      = 2,
-  PXEBC_VENDOR_TAG_MTFTP_SPORT      = 3,
-  PXEBC_VENDOR_TAG_MTFTP_TIMEOUT    = 4,
-  PXEBC_VENDOR_TAG_MTFTP_DELAY      = 5,
-  PXEBC_VENDOR_TAG_DISCOVER_CTRL    = 6,
-  PXEBC_VENDOR_TAG_DISCOVER_MCAST   = 7,
-  PXEBC_VENDOR_TAG_BOOT_SERVERS     = 8,
-  PXEBC_VENDOR_TAG_BOOT_MENU        = 9,
-  PXEBC_VENDOR_TAG_MENU_PROMPT      = 10,
-  PXEBC_VENDOR_TAG_MCAST_ALLOC      = 11,
-  PXEBC_VENDOR_TAG_CREDENTIAL_TYPES = 12,
-  PXEBC_VENDOR_TAG_BOOT_ITEM        = 71,
+#define PXEBC_DHCP4_OPCODE_REQUEST         1
+#define PXEBC_DHCP4_OPCODE_REPLY           2
+#define PXEBC_DHCP4_MSG_TYPE_REQUEST       3
+#define PXEBC_DHCP4_MAGIC                  0x63538263 // network byte order
+//
+// Dhcp Options
+//
+#define PXEBC_DHCP4_TAG_PAD                0    // Pad Option
+#define PXEBC_DHCP4_TAG_EOP                255  // End Option
+#define PXEBC_DHCP4_TAG_NETMASK            1    // Subnet Mask
+#define PXEBC_DHCP4_TAG_TIME_OFFSET        2    // Time Offset from UTC
+#define PXEBC_DHCP4_TAG_ROUTER             3    // Router option,
+#define PXEBC_DHCP4_TAG_TIME_SERVER        4    // Time Server
+#define PXEBC_DHCP4_TAG_NAME_SERVER        5    // Name Server
+#define PXEBC_DHCP4_TAG_DNS_SERVER         6    // Domain Name Server
+#define PXEBC_DHCP4_TAG_HOSTNAME           12   // Host Name
+#define PXEBC_DHCP4_TAG_BOOTFILE_LEN       13   // Boot File Size
+#define PXEBC_DHCP4_TAG_DUMP               14   // Merit Dump File
+#define PXEBC_DHCP4_TAG_DOMAINNAME         15   // Domain Name
+#define PXEBC_DHCP4_TAG_ROOTPATH           17   // Root path
+#define PXEBC_DHCP4_TAG_EXTEND_PATH        18   // Extensions Path
+#define PXEBC_DHCP4_TAG_EMTU               22   // Maximum Datagram Reassembly Size
+#define PXEBC_DHCP4_TAG_TTL                23   // Default IP Time-to-live
+#define PXEBC_DHCP4_TAG_BROADCAST          28   // Broadcast Address
+#define PXEBC_DHCP4_TAG_NIS_DOMAIN         40   // Network Information Service Domain
+#define PXEBC_DHCP4_TAG_NIS_SERVER         41   // Network Information Servers
+#define PXEBC_DHCP4_TAG_NTP_SERVER         42   // Network Time Protocol Servers
+#define PXEBC_DHCP4_TAG_VENDOR             43   // Vendor Specific Information
+#define PXEBC_DHCP4_TAG_REQUEST_IP         50   // Requested IP Address
+#define PXEBC_DHCP4_TAG_LEASE              51   // IP Address Lease Time
+#define PXEBC_DHCP4_TAG_OVERLOAD           52   // Option Overload
+#define PXEBC_DHCP4_TAG_MSG_TYPE           53   // DHCP Message Type
+#define PXEBC_DHCP4_TAG_SERVER_ID          54   // Server Identifier
+#define PXEBC_DHCP4_TAG_PARA_LIST          55   // Parameter Request List
+#define PXEBC_DHCP4_TAG_MAXMSG             57   // Maximum DHCP Message Size
+#define PXEBC_DHCP4_TAG_T1                 58   // Renewal (T1) Time Value
+#define PXEBC_DHCP4_TAG_T2                 59   // Rebinding (T2) Time Value
+#define PXEBC_DHCP4_TAG_CLASS_ID           60   // Vendor class identifier
+#define PXEBC_DHCP4_TAG_CLIENT_ID          61   // Client-identifier
+#define PXEBC_DHCP4_TAG_TFTP               66   // TFTP server name
+#define PXEBC_DHCP4_TAG_BOOTFILE           67   // Bootfile name
+#define PXEBC_PXE_DHCP4_TAG_ARCH           93
+#define PXEBC_PXE_DHCP4_TAG_UNDI           94
+#define PXEBC_PXE_DHCP4_TAG_UUID           97
+//
+// Sub-Options in Dhcp Vendor Option
+//
+#define PXEBC_VENDOR_TAG_MTFTP_IP          1
+#define PXEBC_VENDOR_TAG_MTFTP_CPORT       2
+#define PXEBC_VENDOR_TAG_MTFTP_SPORT       3
+#define PXEBC_VENDOR_TAG_MTFTP_TIMEOUT     4
+#define PXEBC_VENDOR_TAG_MTFTP_DELAY       5
+#define PXEBC_VENDOR_TAG_DISCOVER_CTRL     6
+#define PXEBC_VENDOR_TAG_DISCOVER_MCAST    7
+#define PXEBC_VENDOR_TAG_BOOT_SERVERS      8
+#define PXEBC_VENDOR_TAG_BOOT_MENU         9
+#define PXEBC_VENDOR_TAG_MENU_PROMPT       10
+#define PXEBC_VENDOR_TAG_MCAST_ALLOC       11
+#define PXEBC_VENDOR_TAG_CREDENTIAL_TYPES  12
+#define PXEBC_VENDOR_TAG_BOOT_ITEM         71
 
-  PXEBC_DHCP4_DISCOVER_INIT_TIMEOUT = 4,
-  PXEBC_DHCP4_DISCOVER_RETRIES      = 4,
+#define PXEBC_DHCP4_DISCOVER_INIT_TIMEOUT  4
+#define PXEBC_DHCP4_DISCOVER_RETRIES       4
 
-  PXEBC_MAX_MENU_NUM                = 24,
-  PXEBC_MAX_OFFER_NUM               = 16,
+#define PXEBC_MAX_MENU_NUM                 24
+#define PXEBC_MAX_OFFER_NUM                16
 
-  PXEBC_BOOT_REQUEST_TIMEOUT        = 1,
-  PXEBC_BOOT_REQUEST_RETRIES        = 4,
+#define PXEBC_BOOT_REQUEST_TIMEOUT         1
+#define PXEBC_BOOT_REQUEST_RETRIES         4
 
-  PXEBC_DHCP4_OVERLOAD_FILE         = 1,
-  PXEBC_DHCP4_OVERLOAD_SERVER_NAME  = 2
-} PXEBC_ENUM_TYPES;
+#define PXEBC_DHCP4_OVERLOAD_FILE          1
+#define PXEBC_DHCP4_OVERLOAD_SERVER_NAME   2
 
 //
 // The array index of the DHCP4 option tag interested
 //
-typedef enum {
-  PXEBC_DHCP4_TAG_INDEX_BOOTFILE_LEN,
-  PXEBC_DHCP4_TAG_INDEX_VENDOR,
-  PXEBC_DHCP4_TAG_INDEX_OVERLOAD,
-  PXEBC_DHCP4_TAG_INDEX_MSG_TYPE,
-  PXEBC_DHCP4_TAG_INDEX_SERVER_ID,
-  PXEBC_DHCP4_TAG_INDEX_CLASS_ID,
-  PXEBC_DHCP4_TAG_INDEX_BOOTFILE,
-  PXEBC_DHCP4_TAG_INDEX_MAX
-} PXEBC_DHCP4_TAG_INDEX_ENUM_TYPES;
+#define PXEBC_DHCP4_TAG_INDEX_BOOTFILE_LEN 0
+#define PXEBC_DHCP4_TAG_INDEX_VENDOR       1
+#define PXEBC_DHCP4_TAG_INDEX_OVERLOAD     2
+#define PXEBC_DHCP4_TAG_INDEX_MSG_TYPE     3
+#define PXEBC_DHCP4_TAG_INDEX_SERVER_ID    4
+#define PXEBC_DHCP4_TAG_INDEX_CLASS_ID     5
+#define PXEBC_DHCP4_TAG_INDEX_BOOTFILE     6
+#define PXEBC_DHCP4_TAG_INDEX_MAX          7
 
 //
 // The type of DHCP OFFER, arranged by priority, PXE10 has the highest priority.
 //
-typedef enum {
-  DHCP4_PACKET_TYPE_PXE10,
-  DHCP4_PACKET_TYPE_WFM11A,
-  DHCP4_PACKET_TYPE_BINL,
-  DHCP4_PACKET_TYPE_DHCP_ONLY,
-  DHCP4_PACKET_TYPE_MAX,
-  DHCP4_PACKET_TYPE_BOOTP           = DHCP4_PACKET_TYPE_MAX
-} DHCP4_PACKET_TYPE_ENUM_TYPES;
+#define DHCP4_PACKET_TYPE_PXE10            0
+#define DHCP4_PACKET_TYPE_WFM11A           1
+#define DHCP4_PACKET_TYPE_BINL             2
+#define DHCP4_PACKET_TYPE_DHCP_ONLY        3
+#define DHCP4_PACKET_TYPE_MAX              4
+#define DHCP4_PACKET_TYPE_BOOTP            DHCP4_PACKET_TYPE_MAX
 
 #define BIT(x)  (1 << x)
 #define CTRL(x) (0x1F & (x))
@@ -274,13 +268,14 @@ typedef struct {
 
 #define PXEBC_CACHED_DHCP4_PACKET_MAX_SIZE  (OFFSET_OF (EFI_DHCP4_PACKET, Dhcp4) + PXEBC_DHCP4_MAX_PACKET_SIZE)
 
-typedef struct {
-  union {
-    EFI_DHCP4_PACKET  Offer;
-    EFI_DHCP4_PACKET  Ack;
-    UINT8             Buffer[PXEBC_CACHED_DHCP4_PACKET_MAX_SIZE];
-  } Packet;
+typedef union {
+  EFI_DHCP4_PACKET  Offer;
+  EFI_DHCP4_PACKET  Ack;
+  UINT8             Buffer[PXEBC_CACHED_DHCP4_PACKET_MAX_SIZE];
+} PXEBC_DHCP4_PACKET;
 
+typedef struct {
+  PXEBC_DHCP4_PACKET      Packet;
   BOOLEAN                 IsPxeOffer;
   UINT8                   OfferType;
   EFI_DHCP4_PACKET_OPTION *Dhcp4Option[PXEBC_DHCP4_TAG_INDEX_MAX];
@@ -438,7 +433,7 @@ PxeBcBuildDhcpOptions (
 
 
 /**
-  Create the boot options
+  Create the boot options.
 
   @param  OptList    Pointer to the list of the options
   @param  Type       the type of option

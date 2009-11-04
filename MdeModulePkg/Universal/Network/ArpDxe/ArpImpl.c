@@ -928,7 +928,7 @@ ArpConfigureInstance (
       if (ConfigData->SwAddressType == IPV4_ETHER_PROTO_TYPE) {
         CopyMem (&Ip, ConfigData->StationAddress, sizeof (IP4_ADDR));
 
-        if (!Ip4IsUnicast (NTOHL (Ip), 0)) {
+        if (!NetIp4IsUnicast (NTOHL (Ip), 0)) {
           //
           // The station address is not a valid IPv4 unicast address.
           //

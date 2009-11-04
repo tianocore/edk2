@@ -24,17 +24,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define EFI_NIC_IP4_CONFIG_VARIABLE          L"EfiNicIp4ConfigVariable"
 
-typedef enum {
-  //
-  // Config source: dhcp or static
-  //
-  IP4_CONFIG_SOURCE_DHCP     = 0,
-  IP4_CONFIG_SOURCE_STATIC,
-  IP4_CONFIG_SOURCE_MAX,
 
-  IP4_NIC_NAME_LENGTH        = 64,
-  MAX_IP4_CONFIG_IN_VARIABLE = 16
-} IP4_CONFIG_TYPE;
+//
+// Config source: dhcp or static
+//
+#define IP4_CONFIG_SOURCE_DHCP     0
+#define IP4_CONFIG_SOURCE_STATIC   1
+#define IP4_CONFIG_SOURCE_MAX      2
+
+#define IP4_NIC_NAME_LENGTH        64
+#define MAX_IP4_CONFIG_IN_VARIABLE 16
 
 //
 // The following structures are used by drivers/applications other

@@ -1,7 +1,7 @@
 /** @file
   The header file of CHAP configuration.
 
-Copyright (c) 2004 - 2007, Intel Corporation.<BR>
+Copyright (c) 2004 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -37,13 +37,12 @@ extern EFI_GUID mIScsiCHAPAuthInfoGuid;
 /// MD5_HASHSIZE
 ///
 #define ISCSI_CHAP_RSP_LEN        16  
-typedef enum {
-  ISCSI_CHAP_INITIAL,
-  ISCSI_CHAP_STEP_ONE,
-  ISCSI_CHAP_STEP_TWO,
-  ISCSI_CHAP_STEP_THREE,
-  ISCSI_CHAP_STEP_FOUR
-} ISCSI_CHAP_STEP;
+
+#define ISCSI_CHAP_INITIAL        0 
+#define ISCSI_CHAP_STEP_ONE       1
+#define ISCSI_CHAP_STEP_TWO       2
+#define ISCSI_CHAP_STEP_THREE     3
+#define ISCSI_CHAP_STEP_FOUR      4
 
 #pragma pack(1)
 

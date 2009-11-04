@@ -1,7 +1,7 @@
 /** @file
   Tcp Protocol header file.
 
-Copyright (c) 2005 - 2006, Intel Corporation<BR>
+Copyright (c) 2005 - 2009, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -27,122 +27,116 @@ typedef struct _TCP_CB  TCP_CB;
 /// Tcp states, Don't change their order, it is used as
 /// index to mTcpOutFlag and other macros
 ///
-typedef enum {
-  TCP_CLOSED      = 0,
-  TCP_LISTEN,
-  TCP_SYN_SENT,
-  TCP_SYN_RCVD,
-  TCP_ESTABLISHED,
-  TCP_FIN_WAIT_1,
-  TCP_FIN_WAIT_2,
-  TCP_CLOSING,
-  TCP_TIME_WAIT,
-  TCP_CLOSE_WAIT,
-  TCP_LAST_ACK
-} TCP_STATES;
+#define TCP_CLOSED       0
+#define TCP_LISTEN       1
+#define TCP_SYN_SENT     2
+#define TCP_SYN_RCVD     3
+#define TCP_ESTABLISHED  4
+#define TCP_FIN_WAIT_1   5
+#define TCP_FIN_WAIT_2   6
+#define TCP_CLOSING      7
+#define TCP_TIME_WAIT    8
+#define TCP_CLOSE_WAIT   9
+#define TCP_LAST_ACK     10
+
 
 ///
 /// Flags in the TCP header
 ///
-typedef enum {
+#define TCP_FLG_FIN      0x01
+#define TCP_FLG_SYN      0x02
+#define TCP_FLG_RST      0x04
+#define TCP_FLG_PSH      0x08
+#define TCP_FLG_ACK      0x10
+#define TCP_FLG_URG      0x20
+ 
+ //
+ // mask for all the flags
+ //
+#define TCP_FLG_FLAG     0x3F  
 
-  TCP_FLG_FIN     = 0x01,
-  TCP_FLG_SYN     = 0x02,
-  TCP_FLG_RST     = 0x04,
-  TCP_FLG_PSH     = 0x08,
-  TCP_FLG_ACK     = 0x10,
-  TCP_FLG_URG     = 0x20,
-  
-  //
-  // mask for all the flags
-  //
-  TCP_FLG_FLAG    = 0x3F  
-} TCP_HEADER_FLAG;
 
-typedef enum {
+#define TCP_CONNECT_REFUSED      (-1) ///< TCP error status
+#define TCP_CONNECT_RESET        (-2) ///< TCP error status
+#define TCP_CONNECT_CLOSED       (-3) ///< TCP error status
 
-  TCP_CONNECT_REFUSED     = -1, ///< TCP error status
-  TCP_CONNECT_RESET       = -2, ///< TCP error status
-  TCP_CONNECT_CLOSED      = -3, ///< TCP error status
+//
+// Current congestion status as suggested by RFC3782.
+//
+#define TCP_CONGEST_RECOVER      1  ///< During the NewReno fast recovery
+#define TCP_CONGEST_LOSS         2  ///< Retxmit because of retxmit time out
+#define TCP_CONGEST_OPEN         3  ///< TCP is opening its congestion window
 
-  //
-  // Current congestion status as suggested by RFC3782.
-  //
-  TCP_CONGEST_RECOVER     = 1,  ///< During the NewReno fast recovery
-  TCP_CONGEST_LOSS        = 2,  ///< Retxmit because of retxmit time out
-  TCP_CONGEST_OPEN        = 3,  ///< TCP is opening its congestion window
+//
+// TCP control flags
+//
+#define TCP_CTRL_NO_NAGLE        0x0001 ///< Disable Nagle algorithm
+#define TCP_CTRL_NO_KEEPALIVE    0x0002 ///< Disable keepalive timer
+#define TCP_CTRL_NO_WS           0x0004 ///< Disable window scale option
+#define TCP_CTRL_RCVD_WS         0x0008 ///< Received a wnd scale option in syn
+#define TCP_CTRL_NO_TS           0x0010 ///< Disable Timestamp option
+#define TCP_CTRL_RCVD_TS         0x0020 ///< Received a Timestamp option in syn
+#define TCP_CTRL_SND_TS          0x0040 ///< Send Timestamp option to remote
+#define TCP_CTRL_SND_URG         0x0080 ///< In urgent send mode
+#define TCP_CTRL_RCVD_URG        0x0100 ///< In urgent receive mode
+#define TCP_CTRL_SND_PSH         0x0200 ///< In PUSH send mode
+#define TCP_CTRL_FIN_SENT        0x0400 ///< FIN is sent
+#define TCP_CTRL_FIN_ACKED       0x0800 ///< FIN is ACKed.
+#define TCP_CTRL_TIMER_ON        0x1000 ///< At least one of the timer is on
+#define TCP_CTRL_RTT_ON          0x2000 ///< The RTT measurement is on
+#define TCP_CTRL_ACK_NOW         0x4000 ///< Send the ACK now, don't delay
 
-  //
-  // TCP control flags
-  //
-  TCP_CTRL_NO_NAGLE       = 0x0001, ///< Disable Nagle algorithm
-  TCP_CTRL_NO_KEEPALIVE   = 0x0002, ///< Disable keepalive timer
-  TCP_CTRL_NO_WS          = 0x0004, ///< Disable window scale option
-  TCP_CTRL_RCVD_WS        = 0x0008, ///< Received a wnd scale option in syn
-  TCP_CTRL_NO_TS          = 0x0010, ///< Disable Timestamp option
-  TCP_CTRL_RCVD_TS        = 0x0020, ///< Received a Timestamp option in syn
-  TCP_CTRL_SND_TS         = 0x0040, ///< Send Timestamp option to remote
-  TCP_CTRL_SND_URG        = 0x0080, ///< In urgent send mode
-  TCP_CTRL_RCVD_URG       = 0x0100, ///< In urgent receive mode
-  TCP_CTRL_SND_PSH        = 0x0200, ///< In PUSH send mode
-  TCP_CTRL_FIN_SENT       = 0x0400, ///< FIN is sent
-  TCP_CTRL_FIN_ACKED      = 0x0800, ///< FIN is ACKed.
-  TCP_CTRL_TIMER_ON       = 0x1000, ///< At least one of the timer is on
-  TCP_CTRL_RTT_ON         = 0x2000, ///< The RTT measurement is on
-  TCP_CTRL_ACK_NOW        = 0x4000, ///< Send the ACK now, don't delay
+//
+// Timer related values
+//
+#define TCP_TIMER_CONNECT        0                  ///< Connection establishment timer
+#define TCP_TIMER_REXMIT         1                  ///< Retransmit timer
+#define TCP_TIMER_PROBE          2                  ///< Window probe timer
+#define TCP_TIMER_KEEPALIVE      3                  ///< Keepalive timer
+#define TCP_TIMER_FINWAIT2       4                  ///< FIN_WAIT_2 timer
+#define TCP_TIMER_2MSL           5                  ///< TIME_WAIT tiemr
+#define TCP_TIMER_NUMBER         6                  ///< The total number of TCP timer.
+#define TCP_TICK                 200                ///< Every TCP tick is 200ms
+#define TCP_TICK_HZ              5                  ///< The frequence of TCP tick
+#define TCP_RTT_SHIFT            3                  ///< SRTT & RTTVAR scaled by 8
+#define TCP_RTO_MIN              TCP_TICK_HZ        ///< The minium value of RTO
+#define TCP_RTO_MAX              (TCP_TICK_HZ * 60) ///< The maxium value of RTO
+#define TCP_FOLD_RTT             4                  ///< Timeout threshod to fold RTT
 
-  //
-  // Timer related values
-  //
-  TCP_TIMER_CONNECT       = 0,                  ///< Connection establishment timer
-  TCP_TIMER_REXMIT        = 1,                  ///< Retransmit timer
-  TCP_TIMER_PROBE         = 2,                  ///< Window probe timer
-  TCP_TIMER_KEEPALIVE     = 3,                  ///< Keepalive timer
-  TCP_TIMER_FINWAIT2      = 4,                  ///< FIN_WAIT_2 timer
-  TCP_TIMER_2MSL          = 5,                  ///< TIME_WAIT tiemr
-  TCP_TIMER_NUMBER        = 6,                  ///< The total number of TCP timer.
-  TCP_TICK                = 200,                ///< Every TCP tick is 200ms
-  TCP_TICK_HZ             = 5,                  ///< The frequence of TCP tick
-  TCP_RTT_SHIFT           = 3,                  ///< SRTT & RTTVAR scaled by 8
-  TCP_RTO_MIN             = TCP_TICK_HZ,        ///< The minium value of RTO
-  TCP_RTO_MAX             = (TCP_TICK_HZ * 60), ///< The maxium value of RTO
-  TCP_FOLD_RTT            = 4,                  ///< Timeout threshod to fold RTT
+//
+// Default values for some timers
+//
+#define TCP_MAX_LOSS             12                          ///< Default max times to retxmit
+#define TCP_KEEPALIVE_IDLE_MIN   (TCP_TICK_HZ * 60 * 60 * 2) ///< First keep alive
+#define TCP_KEEPALIVE_PERIOD     (TCP_TICK_HZ * 60)
+#define TCP_MAX_KEEPALIVE        8
+#define TCP_FIN_WAIT2_TIME       (2 * TCP_TICK_HZ)
+#define TCP_TIME_WAIT_TIME       (2 * TCP_TICK_HZ)
+#define TCP_PAWS_24DAY           (24 * 24 * 60 * 60 * TCP_TICK_HZ)
+#define TCP_CONNECT_TIME         (75 * TCP_TICK_HZ)
 
-  //
-  // Default values for some timers
-  //
-  TCP_MAX_LOSS            = 12,                          ///< Default max times to retxmit
-  TCP_KEEPALIVE_IDLE_MIN  = (TCP_TICK_HZ * 60 * 60 * 2), ///< First keep alive
-  TCP_KEEPALIVE_PERIOD    = (TCP_TICK_HZ * 60),
-  TCP_MAX_KEEPALIVE       = 8,
-  TCP_FIN_WAIT2_TIME      = (2 * TCP_TICK_HZ),
-  TCP_TIME_WAIT_TIME      = (2 * TCP_TICK_HZ),
-  TCP_PAWS_24DAY          = (24 * 24 * 60 * 60 * TCP_TICK_HZ),
-  TCP_CONNECT_TIME        = (75 * TCP_TICK_HZ),
+//
+// The header space to be reserved before TCP data to accomodate :
+// 60byte IP head + 60byte TCP head + link layer head
+//
+#define TCP_MAX_HEAD             192
 
-  //
-  // The header space to be reserved before TCP data to accomodate :
-  // 60byte IP head + 60byte TCP head + link layer head
-  //
-  TCP_MAX_HEAD            = 192,
-
-  //
-  // Value ranges for some control option
-  //
-  TCP_RCV_BUF_SIZE        = (2 * 1024 * 1024),
-  TCP_RCV_BUF_SIZE_MIN    = (8 * 1024),
-  TCP_SND_BUF_SIZE        = (2 * 1024 * 1024),
-  TCP_SND_BUF_SIZE_MIN    = (8 * 1024),
-  TCP_BACKLOG             = 10,
-  TCP_BACKLOG_MIN         = 5,
-  TCP_MAX_LOSS_MIN        = 6,
-  TCP_CONNECT_TIME_MIN    = (60 * TCP_TICK_HZ),
-  TCP_MAX_KEEPALIVE_MIN   = 4,
-  TCP_KEEPALIVE_IDLE_MAX  = (TCP_TICK_HZ * 60 * 60 * 4),
-  TCP_KEEPALIVE_PERIOD_MIN= (TCP_TICK_HZ * 30),
-  TCP_FIN_WAIT2_TIME_MAX  = (4 * TCP_TICK_HZ),
-  TCP_TIME_WAIT_TIME_MAX  = (60 * TCP_TICK_HZ)
-} TCP_MISC_VALUES;
+//
+// Value ranges for some control option
+//
+#define TCP_RCV_BUF_SIZE         (2 * 1024 * 1024)
+#define TCP_RCV_BUF_SIZE_MIN     (8 * 1024)
+#define TCP_SND_BUF_SIZE         (2 * 1024 * 1024)
+#define TCP_SND_BUF_SIZE_MIN     (8 * 1024)
+#define TCP_BACKLOG              10
+#define TCP_BACKLOG_MIN          5
+#define TCP_MAX_LOSS_MIN         6
+#define TCP_CONNECT_TIME_MIN     (60 * TCP_TICK_HZ)
+#define TCP_MAX_KEEPALIVE_MIN    4
+#define TCP_KEEPALIVE_IDLE_MAX   (TCP_TICK_HZ * 60 * 60 * 4)
+#define TCP_KEEPALIVE_PERIOD_MIN (TCP_TICK_HZ * 30)
+#define TCP_FIN_WAIT2_TIME_MAX   (4 * TCP_TICK_HZ)
+#define TCP_TIME_WAIT_TIME_MAX   (60 * TCP_TICK_HZ)
 
 ///
 /// TCP segmentation data

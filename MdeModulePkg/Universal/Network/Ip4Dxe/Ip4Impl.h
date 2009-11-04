@@ -1,7 +1,7 @@
 /** @file
   Ip4 internal functions and type defintions.
   
-Copyright (c) 2005 - 2007, Intel Corporation.<BR>                                                         
+Copyright (c) 2005 - 2009, Intel Corporation.<BR>                                                         
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -43,33 +43,30 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Ip4Input.h"
 #include "Ip4Output.h"
 
+#define IP4_PROTOCOL_SIGNATURE  SIGNATURE_32 ('I', 'P', '4', 'P')
+#define IP4_SERVICE_SIGNATURE   SIGNATURE_32 ('I', 'P', '4', 'S')
 
+//
+// The state of IP4 protocol. It starts from UNCONFIGED. if it is
+// successfully configured, it goes to CONFIGED. if configure NULL
+// is called, it becomes UNCONFIGED again. If (partly) destoried, it
+// becomes DESTORY.
+//
+#define IP4_STATE_UNCONFIGED    0
+#define IP4_STATE_CONFIGED      1
+#define IP4_STATE_DESTORY       2
 
-typedef enum {
-  IP4_PROTOCOL_SIGNATURE = SIGNATURE_32 ('I', 'P', '4', 'P'),
-  IP4_SERVICE_SIGNATURE  = SIGNATURE_32 ('I', 'P', '4', 'S'),
+//
+// The state of IP4 service. It starts from UNSTARTED. It transits
+// to STARTED if autoconfigure is started. If default address is
+// configured, it becomes CONFIGED. and if partly destoried, it goes
+// to DESTORY.
+//
+#define IP4_SERVICE_UNSTARTED   0
+#define IP4_SERVICE_STARTED     1
+#define IP4_SERVICE_CONFIGED    2
+#define IP4_SERVICE_DESTORY     3
 
-  //
-  // The state of IP4 protocol. It starts from UNCONFIGED. if it is
-  // successfully configured, it goes to CONFIGED. if configure NULL
-  // is called, it becomes UNCONFIGED again. If (partly) destoried, it
-  // becomes DESTORY.
-  //
-  IP4_STATE_UNCONFIGED   = 0,
-  IP4_STATE_CONFIGED,
-  IP4_STATE_DESTORY,
-
-  //
-  // The state of IP4 service. It starts from UNSTARTED. It transits
-  // to STARTED if autoconfigure is started. If default address is
-  // configured, it becomes CONFIGED. and if partly destoried, it goes
-  // to DESTORY.
-  //
-  IP4_SERVICE_UNSTARTED  = 0,
-  IP4_SERVICE_STARTED,
-  IP4_SERVICE_CONFIGED,
-  IP4_SERVICE_DESTORY
-} IP4_IMPL_ENUM_TYPES;
 
 ///
 /// IP4_TXTOKEN_WRAP wraps the upper layer's transmit token.

@@ -1,7 +1,7 @@
 /** @file
   Transmit the IP4 packet.
   
-Copyright (c) 2005 - 2006, Intel Corporation.<BR>
+Copyright (c) 2005 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -83,7 +83,7 @@ Ip4PrependHead (
   PacketHead->Dst       = HTONL (Head->Dst);
   PacketHead->Checksum  = (UINT16) (~NetblockChecksum ((UINT8 *) PacketHead, HeadLen));
 
-  Packet->Ip            = PacketHead;
+  Packet->Ip.Ip4        = PacketHead;
   return EFI_SUCCESS;
 }
 

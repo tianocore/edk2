@@ -1,7 +1,7 @@
 /** @file
   The header file of iSCSI Protocol that defines many specific data structures.
 
-Copyright (c) 2004 - 2008, Intel Corporation.<BR>
+Copyright (c) 2004 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -75,25 +75,22 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ///
 /// connection state for initiator
 ///
-typedef enum {
-  CONN_STATE_FREE,
-  CONN_STATE_XPT_WAIT,
-  CONN_STATE_IN_LOGIN,
-  CONN_STATE_LOGGED_IN,
-  CONN_STATE_IN_LOGOUT,
-  CONN_STATE_LOGOUT_REQUESTED,
-  CONN_STATE_CLEANUP_WAIT,
-  CONN_STATE_IN_CLEANUP
-} CONNECTION_STATE;
+
+#define CONN_STATE_FREE                         0
+#define CONN_STATE_XPT_WAIT                     1
+#define CONN_STATE_IN_LOGIN                     2
+#define CONN_STATE_LOGGED_IN                    3
+#define CONN_STATE_IN_LOGOUT                    4
+#define CONN_STATE_LOGOUT_REQUESTED             5
+#define CONN_STATE_CLEANUP_WAIT                 6
+#define CONN_STATE_IN_CLEANUP                   7
 
 ///
 /// session state for initiator
 ///
-typedef enum {
-  SESSION_STATE_FREE,
-  SESSION_STATE_LOGGED_IN,
-  SESSION_STATE_FAILED
-} SESSION_STATE;
+#define SESSION_STATE_FREE                      0
+#define SESSION_STATE_LOGGED_IN                 1
+#define SESSION_STATE_FAILED                    2
 
 typedef enum {
   DataIn  = 0,
@@ -227,7 +224,7 @@ typedef struct _SCSI_COMMAND {
   UINT32  ExpDataXferLength;
   UINT32  CmdSN;
   UINT32  ExpStatSN;
-  UINT8   CDB[16];
+  UINT8   Cdb[16];
 } SCSI_COMMAND;
 
 //
@@ -378,7 +375,7 @@ typedef struct _ISCSI_READY_TO_TRANSFER {
   UINT32  StatSN;
   UINT32  ExpCmdSN;
   UINT32  MaxCmdSN;
-  UINT32  R2TSN;
+  UINT32  R2TSeqNum;
   UINT32  BufferOffset;
   UINT32  DesiredDataTransferLength;
 } ISCSI_READY_TO_TRANSFER;
@@ -586,8 +583,8 @@ typedef struct _ISCSI_NOP_IN {
 #define ISCSI_FULL_FEATURE_PHASE            3
 
 typedef enum {
-  ISCSI_DIGEST_NONE,
-  ISCSI_DIGEST_CRC32
+  IScsiDigestNone,
+  IScsiDigestCRC32
 } ISCSI_DIGEST_TYPE;
 
 typedef struct _ISCSI_XFER_CONTEXT {
