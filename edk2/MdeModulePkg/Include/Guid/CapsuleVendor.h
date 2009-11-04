@@ -6,7 +6,7 @@
   The capsule HOB and variable can be used to store the capsule image start address and length.
   They are used by EDKII implementation of capsule update across a system reset.
   
-  @par Note: EDKII implementation of capsule updating has obsolted this capsule GUID HOB data
+  @par Note: EDKII implementation of capsule updating has discarded this capsule GUID HOB data
              structur and used one UEFI Capsule HOB (defined in PI Specification 1.2) instead.
 
 Copyright (c) 2006 - 2009, Intel Corporation
@@ -40,7 +40,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 ///
 /// Data structure of capsule guid hob entry
-/// Note: EDKII implementation has obsoleted this structure and used 
+/// Note: EDKII implementation has discarded this structure and used 
 ///       UEFI_CAPSULE_HOB instead.
 ///
 typedef struct {
