@@ -198,18 +198,19 @@ HiiGetPackageString (
 ;
 
 /**
-  Retrieves the array of all the HII Handles or the HII handle of a specific
-  package list in the HII Database.
+  Retrieves the array of all the HII Handles or the HII handles of a specific
+  package list GUID in the HII Database.
   This array is terminated with a NULL HII Handle.
   This function allocates the returned array using AllocatePool().
   The caller is responsible for freeing the array with FreePool().
 
   @param[in]  PackageListGuid  An optional parameter that is used to request 
-                               an HII Handle associated with a specific
+                               HII Handles associated with a specific
                                Package List GUID.  If this parameter is NULL,
                                then all the HII Handles in the HII Database
                                are returned.  If this parameter is not NULL,
-                               then at most 1 HII Handle is returned.
+                               then zero or more HII Handles associated with 
+                               PackageListGuid are returned.
 
   @retval NULL   No HII handles were found in the HII database
   @retval NULL   The array of HII Handles could not be retrieved
