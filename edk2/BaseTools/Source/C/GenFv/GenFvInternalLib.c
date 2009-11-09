@@ -229,22 +229,11 @@ Returns:
   }
 
   //
-  // Read the FV Name Guid
+  // Read the FV Extension Header File Name
   //
-  if (!FvInfo->FvNameGuidSet) {
-    Status = FindToken (InfFile, ATTRIBUTES_SECTION_STRING, EFI_FV_NAMEGUID_STRING, 0, Value);
-    if (Status == EFI_SUCCESS) {
-      //
-      // Get the guid value
-      //
-      Status = StringToGuid (Value, &GuidValue);
-      if (EFI_ERROR (Status)) {
-        Error (NULL, 0, 2000, "Invalid parameter", "%s = %s", EFI_FV_NAMEGUID_STRING, Value);
-        return EFI_ABORTED;
-      }
-      memcpy (&FvInfo->FvNameGuid, &GuidValue, sizeof (EFI_GUID));
-      FvInfo->FvNameGuidSet = TRUE;
-    }
+  Status = FindToken (InfFile, ATTRIBUTES_SECTION_STRING, EFI_FV_EXT_HEADER_FILE_NAME, 0, Value);
+  if (Status == EFI_SUCCESS) {
+    strcpy (FvInfo->FvExtHeaderFile, Value);
   }
 
   //
@@ -1272,6 +1261,7 @@ Returns:
   EFI_FFS_FILE_STATE        SavedState;
   UINT64                    FitAddress;
   FIT_TABLE                 *FitTablePtr;
+  BOOLEAN                   Vtf0Detected;
 
   //
   // Verify input parameters
@@ -1292,11 +1282,32 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
+  if (
+      (((UINTN)FvImage->Eof - (UINTN)FvImage->FileImage) >=
+        IA32_X64_VTF_SIGNATURE_OFFSET) &&
+      (*(UINT32 *)(VOID*)((UINTN) FvImage->Eof -
+                                  IA32_X64_VTF_SIGNATURE_OFFSET) ==
+        IA32_X64_VTF0_SIGNATURE)
+     ) {
+    Vtf0Detected = TRUE;
+  } else {
+    Vtf0Detected = FALSE;
+  }
+
   //
   // Find the Sec Core
   //
   Status = GetFileByType (EFI_FV_FILETYPE_SECURITY_CORE, 1, &SecCoreFile);
   if (EFI_ERROR (Status) || SecCoreFile == NULL) {
+    if (Vtf0Detected) {
+      //
+      // If the SEC core file is not found, but the VTF-0 signature
+      // is found, we'll treat it as a VTF-0 'Volume Top File'.
+      // This means no modifications are required to the VTF.
+      //
+      return EFI_SUCCESS;
+    }
+
     Error (NULL, 0, 3000, "Invalid", "could not find the SEC core file in the FV.");
     return EFI_ABORTED;
   }
@@ -1324,6 +1335,19 @@ Returns:
     Error (NULL, 0, 3000, "Invalid", "could not get the PE32 entry point for the SEC core.");
     return EFI_ABORTED;
   }  
+
+  if (
+       Vtf0Detected &&
+       (MachineType == EFI_IMAGE_MACHINE_IA32 ||
+        MachineType == EFI_IMAGE_MACHINE_X64)
+     ) {
+    //
+    // If the SEC core code is IA32 or X64 and the VTF-0 signature
+    // is found, we'll treat it as a VTF-0 'Volume Top File'.
+    // This means no modifications are required to the VTF.
+    //
+    return EFI_SUCCESS;
+  }
 
   //
   // Physical address is FV base + offset of PE32 + offset of the entry point
@@ -1428,16 +1452,6 @@ Returns:
     SecCoreEntryAddressPtr  = (EFI_PHYSICAL_ADDRESS *) ((UINTN) FvImage->Eof - IPF_SALE_ENTRY_ADDRESS_OFFSET);
     *SecCoreEntryAddressPtr = SecCorePhysicalAddress;
 
-  } else if (
-    (MachineType == EFI_IMAGE_MACHINE_IA32 ||
-     MachineType == EFI_IMAGE_MACHINE_X64) &&
-    (((UINTN)FvImage->Eof - (UINTN)FvImage->FileImage) >= IA32_X64_VTF_SIGNATURE_OFFSET) &&
-    (*(UINT32 *)(VOID*)((UINTN) FvImage->Eof - IA32_X64_VTF_SIGNATURE_OFFSET) ==
-      IA32_X64_VTF0_SIGNATURE)
-    ) {
-    //
-    // If VTF-0 signature is found, then no modifications are needed.
-    //
   } else if (MachineType == EFI_IMAGE_MACHINE_IA32 || MachineType == EFI_IMAGE_MACHINE_X64) {
     //
     // Get the location to update
@@ -1545,8 +1559,8 @@ Returns:
   VtfFile->State                        = 0;
   if (VtfFile->Attributes & FFS_ATTRIB_CHECKSUM) {
     VtfFile->IntegrityCheck.Checksum.File = CalculateChecksum8 (
-                                              (UINT8 *) VtfFile,
-                                              GetLength (VtfFile->Size)
+                                              (UINT8 *) (VtfFile + 1),
+                                              GetLength (VtfFile->Size) - sizeof (EFI_FFS_FILE_HEADER)
                                               );
   } else {
     VtfFile->IntegrityCheck.Checksum.File = FFS_FIXED_CHECKSUM;
@@ -1938,19 +1952,21 @@ Returns:
 
 --*/
 {
-  EFI_STATUS                  Status;
-  MEMORY_FILE                 InfMemoryFile;
-  MEMORY_FILE                 FvImageMemoryFile;
-  UINTN                       Index;
-  EFI_FIRMWARE_VOLUME_HEADER  *FvHeader;
-  EFI_FFS_FILE_HEADER         *VtfFileImage;
-  UINT8                       *FvBufferHeader; // to make sure fvimage header 8 type alignment.
-  UINT8                       *FvImage;
-  UINTN                       FvImageSize;
-  FILE                        *FvFile;
-  CHAR8                       FvMapName [_MAX_PATH];
-  FILE                        *FvMapFile;
-  EFI_FIRMWARE_VOLUME_EXT_HEADER FvExtHeader;
+  EFI_STATUS                      Status;
+  MEMORY_FILE                     InfMemoryFile;
+  MEMORY_FILE                     FvImageMemoryFile;
+  UINTN                           Index;
+  EFI_FIRMWARE_VOLUME_HEADER      *FvHeader;
+  EFI_FFS_FILE_HEADER             *VtfFileImage;
+  UINT8                           *FvBufferHeader; // to make sure fvimage header 8 type alignment.
+  UINT8                           *FvImage;
+  UINTN                           FvImageSize;
+  FILE                            *FvFile;
+  CHAR8                           FvMapName [_MAX_PATH];
+  FILE                            *FvMapFile;
+  EFI_FIRMWARE_VOLUME_EXT_HEADER  *FvExtHeader;
+  FILE                            *FvExtHeaderFile;
+  UINTN                           FileSize;
 
   FvBufferHeader = NULL;
   FvFile         = NULL;
@@ -2008,6 +2024,58 @@ Returns:
                   mFvDataInfo.FvFileSystemGuid.Data4[6],
                   mFvDataInfo.FvFileSystemGuid.Data4[7]);
   }
+
+  //
+  // Add PI FV extension header
+  //
+  FvExtHeader = NULL;
+  FvExtHeaderFile = NULL;
+  if (mFvDataInfo.FvExtHeaderFile[0] != 0) {
+    //
+    // Open the FV Extension Header file
+    //
+    FvExtHeaderFile = fopen (mFvDataInfo.FvExtHeaderFile, "rb");
+
+    //
+    // Get the file size
+    //
+    FileSize = _filelength (fileno (FvExtHeaderFile));
+
+    //
+    // Allocate a buffer for the FV Extension Header
+    //
+    FvExtHeader = malloc(FileSize);
+    if (FvExtHeader == NULL) {
+      fclose (FvExtHeaderFile);
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    //
+    // Read the FV Extension Header
+    //
+    fread (FvExtHeader, sizeof (UINT8), FileSize, FvExtHeaderFile);
+    fclose (FvExtHeaderFile);
+
+    //
+    // See if there is an override for the FV Name GUID
+    //
+    if (mFvDataInfo.FvNameGuidSet) {
+      memcpy (&FvExtHeader->FvName, &mFvDataInfo.FvNameGuid, sizeof (EFI_GUID));
+    }
+    memcpy (&mFvDataInfo.FvNameGuid, &FvExtHeader->FvName, sizeof (EFI_GUID));
+    mFvDataInfo.FvNameGuidSet = TRUE;
+  } else if (mFvDataInfo.FvNameGuidSet) {
+    //
+    // Allocate a buffer for the FV Extension Header
+    //
+    FvExtHeader = malloc(sizeof (EFI_FIRMWARE_VOLUME_EXT_HEADER));
+    if (FvExtHeader == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    memcpy (&FvExtHeader->FvName, &mFvDataInfo.FvNameGuid, sizeof (EFI_GUID));
+    FvExtHeader->ExtHeaderSize = sizeof (EFI_FIRMWARE_VOLUME_EXT_HEADER);
+  }
+
   //
   // Debug message Fv Name Guid
   //
@@ -2173,12 +2241,14 @@ Returns:
   }
 
   //
-  // Set PI FV extension header
+  // Add PI FV extension header
   //
-  if (mFvDataInfo.FvNameGuidSet) {
-    memcpy (&FvExtHeader.FvName, &mFvDataInfo.FvNameGuid, sizeof (EFI_GUID));
-    FvExtHeader.ExtHeaderSize = sizeof (EFI_FIRMWARE_VOLUME_EXT_HEADER);
-    AddPadFile (&FvImageMemoryFile, 4, VtfFileImage, &FvExtHeader);
+  if (FvExtHeader != NULL) {
+    //
+    // Add FV Extended Header contents to the FV as a PAD file
+    //
+    AddPadFile (&FvImageMemoryFile, 4, VtfFileImage, FvExtHeader);
+
     //
     // Fv Extension header change update Fv Header Check sum
     //
@@ -2281,6 +2351,10 @@ WriteFile:
 Finish:
   if (FvBufferHeader != NULL) {
     free (FvBufferHeader);
+  }
+
+  if (FvExtHeader != NULL) {
+    free (FvExtHeader);
   }
   
   if (FvFile != NULL) {
@@ -2385,11 +2459,13 @@ Returns:
   UINTN               Index;
   FILE                *fpin;
   UINTN               FfsFileSize;
+  UINTN               FvExtendHeaderSize;
   UINT32              FfsAlignment;
   EFI_FFS_FILE_HEADER FfsHeader;
   BOOLEAN             VtfFileFlag;
   UINTN               VtfFileSize;
   
+  FvExtendHeaderSize = 0;
   VtfFileSize = 0;
   VtfFileFlag = FALSE;
   fpin  = NULL;
@@ -2418,7 +2494,17 @@ Returns:
   //
   // Calculate PI extension header
   //
-  if (CompareGuid (&mFvDataInfo.FvNameGuid, &mZeroGuid) != 0) {
+  if (mFvDataInfo.FvExtHeaderFile[0] != '\0') {
+    fpin = fopen (mFvDataInfo.FvExtHeaderFile, "rb");
+    if (fpin == NULL) {
+      Error (NULL, 0, 0001, "Error opening file", mFvDataInfo.FvExtHeaderFile);
+      return EFI_ABORTED;
+    }
+    FvExtendHeaderSize = _filelength (fileno (fpin));
+    fclose (fpin);
+    CurrentOffset += sizeof (EFI_FFS_FILE_HEADER) + FvExtendHeaderSize;
+    CurrentOffset = (CurrentOffset + 7) & (~7);
+  } else if (mFvDataInfo.FvNameGuidSet) {
     CurrentOffset += sizeof (EFI_FFS_FILE_HEADER) + sizeof (EFI_FIRMWARE_VOLUME_EXT_HEADER);
     CurrentOffset = (CurrentOffset + 7) & (~7);
   }
@@ -2959,15 +3045,10 @@ Returns:
       SavedState  = FfsFile->State;
       FfsFile->IntegrityCheck.Checksum.File = 0;
       FfsFile->State                        = 0;
-      if (FfsFile->Attributes & FFS_ATTRIB_CHECKSUM) {
-        FfsFile->IntegrityCheck.Checksum.File = CalculateChecksum8 (
-                                                  (UINT8 *) FfsFile,
-                                                  GetLength (FfsFile->Size)
-                                                  );
-      } else {
-        FfsFile->IntegrityCheck.Checksum.File = FFS_FIXED_CHECKSUM;
-      }
-
+      FfsFile->IntegrityCheck.Checksum.File = CalculateChecksum8 (
+                                                (UINT8 *) (FfsFile + 1),
+                                                GetLength (FfsFile->Size) - sizeof (EFI_FFS_FILE_HEADER)
+                                                );
       FfsFile->State = SavedState;
     }
 
@@ -3189,15 +3270,10 @@ WritePeMap:
       SavedState  = FfsFile->State;
       FfsFile->IntegrityCheck.Checksum.File = 0;
       FfsFile->State                        = 0;
-      if (FfsFile->Attributes & FFS_ATTRIB_CHECKSUM) {
-        FfsFile->IntegrityCheck.Checksum.File = CalculateChecksum8 (
-                                                  (UINT8 *) FfsFile,
-                                                  GetLength (FfsFile->Size)
-                                                  );
-      } else {
-        FfsFile->IntegrityCheck.Checksum.File = FFS_FIXED_CHECKSUM;
-      }
-
+      FfsFile->IntegrityCheck.Checksum.File = CalculateChecksum8 (
+                                                (UINT8 *)(FfsFile + 1),
+                                                GetLength (FfsFile->Size) - sizeof (EFI_FFS_FILE_HEADER)
+                                                );
       FfsFile->State = SavedState;
     }
     //

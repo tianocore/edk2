@@ -437,122 +437,126 @@ Returns:
 {
   CHAR8 *SectionStr;
   CHAR8 *SectionTypeStringTable[] = {
-    "EFI_SECTION_ALL",
     //
     // 0X00
     //
-    "EFI_SECTION_COMPRESSION",
+    "EFI_SECTION_ALL",
     //
     // 0x01
     //
-    "EFI_SECTION_GUID_DEFINED",
+    "EFI_SECTION_COMPRESSION",
     //
     // 0x02
     //
-    "Unknown section type - Reserved 0x03",
+    "EFI_SECTION_GUID_DEFINED",    
     //
     // 0x03
     //
-    "Unknown section type - Reserved 0x04",
+    "Unknown section type - Reserved 0x03",
     //
     // 0x04
     //
-    "Unknown section type - Reserved 0x05",
+    "Unknown section type - Reserved 0x04",
     //
     // 0x05
     //
-    "Unknown section type - Reserved 0x06",
+    "Unknown section type - Reserved 0x05",
     //
     // 0x06
     //
-    "Unknown section type - Reserved 0x07",
+    "Unknown section type - Reserved 0x06",
     //
     // 0x07
     //
-    "Unknown section type - Reserved 0x08",
+    "Unknown section type - Reserved 0x07",
     //
     // 0x08
     //
-    "Unknown section type - Reserved 0x09",
+    "Unknown section type - Reserved 0x08",
     //
     // 0x09
     //
-    "Unknown section type - Reserved 0x0A",
+    "Unknown section type - Reserved 0x09",
     //
     // 0x0A
     //
-    "Unknown section type - Reserved 0x0B",
+    "Unknown section type - Reserved 0x0A",
     //
     // 0x0B
     //
-    "Unknown section type - Reserved 0x0C",
+    "Unknown section type - Reserved 0x0B",
     //
     // 0x0C
     //
-    "Unknown section type - Reserved 0x0D",
+    "Unknown section type - Reserved 0x0C",
     //
     // 0x0D
     //
-    "Unknown section type - Reserved 0x0E",
+    "Unknown section type - Reserved 0x0D",
     //
     // 0x0E
     //
-    "Unknown section type - Reserved 0x0F",
+    "Unknown section type - Reserved 0x0E",
     //
     // 0x0F
     //
-    "EFI_SECTION_PE32",
+    "Unknown section type - Reserved 0x0E",
     //
     // 0x10
     //
-    "EFI_SECTION_PIC",
+    "EFI_SECTION_PE32",
     //
     // 0x11
     //
-    "EFI_SECTION_TE",
+    "EFI_SECTION_PIC",
     //
     // 0x12
     //
-    "EFI_SECTION_DXE_DEPEX",
+    "EFI_SECTION_TE",    
     //
     // 0x13
     //
-    "EFI_SECTION_VERSION",
+    "EFI_SECTION_DXE_DEPEX", 
     //
     // 0x14
     //
-    "EFI_SECTION_USER_INTERFACE",
+    "EFI_SECTION_VERSION",
     //
     // 0x15
     //
-    "EFI_SECTION_COMPATIBILITY16",
+    "EFI_SECTION_USER_INTERFACE",
     //
     // 0x16
     //
-    "EFI_SECTION_FIRMWARE_VOLUME_IMAGE ",
+    "EFI_SECTION_COMPATIBILITY16",
     //
     // 0x17
     //
-    "EFI_SECTION_FREEFORM_SUBTYPE_GUID ",
+    "EFI_SECTION_FIRMWARE_VOLUME_IMAGE ",
     //
     // 0x18
     //
-    "EFI_SECTION_RAW",
+    "EFI_SECTION_FREEFORM_SUBTYPE_GUID ",
     //
     // 0x19
     //
-    "Unknown section type - 0x1A",
+    "EFI_SECTION_RAW",
     //
     // 0x1A
     //
-    "EFI_SECTION_PEI_DEPEX",
+    "Unknown section type - 0x1A",
     //
     // 0x1B
     //
-    "Unknown section type - Reserved - beyond last defined section"
+    "EFI_SECTION_PEI_DEPEX",
+    //
+    // 0x1C
+    //
+    "EFI_SECTION_SMM_DEPEX",
     //
     // 0x1C+
     //
+    "Unknown section type - Reserved - beyond last defined section"
   };
 
   if (Type > EFI_SECTION_LAST_SECTION_TYPE) {
@@ -1055,15 +1059,15 @@ Returns:
       //
       // Calculate file checksum
       //
-      Checksum  = CalculateSum8 ((UINT8 *) FileHeader, FileLength);
-      Checksum  = (UINT8) (Checksum - FileHeader->State);
+      Checksum  = CalculateSum8 ((UINT8 *) (FileHeader + 1), FileLength - sizeof (EFI_FFS_FILE_HEADER));
+      Checksum  = Checksum + FileHeader->IntegrityCheck.Checksum.File;
       if (Checksum != 0) {
         Error (NULL, 0, 0003, "error parsing FFS file", "FFS file with Guid %s has invalid file checksum", GuidBuffer);
         return EFI_ABORTED;
       }
     } else {
       if (FileHeader->IntegrityCheck.Checksum.File != FFS_FIXED_CHECKSUM) {
-        Error (NULL, 0, 0003, "error parsing FFS file", "FFS file with Guid %s has invalid header checksum -- not set to fixed value of 0x5A", GuidBuffer);
+        Error (NULL, 0, 0003, "error parsing FFS file", "FFS file with Guid %s has invalid header checksum -- not set to fixed value of 0xAA", GuidBuffer);
         return EFI_ABORTED;
       }
     }
@@ -1130,8 +1134,20 @@ Returns:
     printf ("EFI_FV_FILETYPE_APPLICATION\n");
     break;
 
+  case EFI_FV_FILETYPE_SMM:
+    printf ("EFI_FV_FILETYPE_SMM\n");
+    break;
+
   case EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE:
     printf ("EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE\n");
+    break;
+
+  case EFI_FV_FILETYPE_COMBINED_SMM_DXE:
+    printf ("EFI_FV_FILETYPE_COMBINED_SMM_DXE\n");
+    break;
+
+  case EFI_FV_FILETYPE_SMM_CORE:
+    printf ("EFI_FV_FILETYPE_SMM_CORE\n");
     break;
 
   case EFI_FV_FILETYPE_FFS_PAD:
@@ -1273,8 +1289,9 @@ Returns:
       //
       break;
 
-    case EFI_SECTION_DXE_DEPEX:
     case EFI_SECTION_PEI_DEPEX:
+    case EFI_SECTION_DXE_DEPEX:
+    case EFI_SECTION_SMM_DEPEX:
       DumpDepexSection (Ptr, SectionLength);
       break;
 

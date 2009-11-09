@@ -2,7 +2,7 @@
   
   The definition of CFormPkg's member function
 
-Copyright (c) 2004 - 2008, Intel Corporation                                                         
+Copyright (c) 2004 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -1568,12 +1568,12 @@ public:
 
 class CIfrEqIdList : public CIfrObj, public CIfrOpHeader {
 private:
-  EFI_IFR_EQ_ID_LIST *mEqIdVList;
+  EFI_IFR_EQ_ID_VAL_LIST *mEqIdVList;
 
 public:
   CIfrEqIdList (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_EQ_ID_LIST_OP, (CHAR8 **)&mEqIdVList, sizeof (EFI_IFR_EQ_ID_LIST), TRUE),
+  ) : CIfrObj (EFI_IFR_EQ_ID_LIST_OP, (CHAR8 **)&mEqIdVList, sizeof (EFI_IFR_EQ_ID_VAL_LIST), TRUE),
                    CIfrOpHeader (EFI_IFR_EQ_ID_LIST_OP, &mEqIdVList->Header) {
     SetLineNo (LineNo);
     mEqIdVList->QuestionId   = EFI_QUESTION_ID_INVALID;
@@ -1584,7 +1584,7 @@ public:
   VOID UpdateIfrBuffer ( 
   ) {
     _EMIT_PENDING_OBJ();
-    mEqIdVList = (EFI_IFR_EQ_ID_LIST *) GetObjBinAddr();
+    mEqIdVList = (EFI_IFR_EQ_ID_VAL_LIST *) GetObjBinAddr();
     UpdateHeader (&mEqIdVList->Header);
   }
 

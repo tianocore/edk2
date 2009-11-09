@@ -80,23 +80,27 @@ class DepexSection (DepexSectionClassObject):
             self.Expression = self.Expression.replace(Item, ExpGuidDict[Item])
 
         self.Expression = self.Expression.strip()
-        ModuleType = (self.DepexType.startswith('PEI') and ['PEIM'] or ['DXE_DRIVER'])[0]
-        if self.DepexType.startswith('SMM'):
-            ModuleType = 'SMM_DRIVER'
-        InputFile = os.path.join (OutputPath, ModuleName + 'SEC' + SecNum + '.dpx')
+        if self.DepexType == 'PEI_DEPEX_EXP':
+            ModuleType = 'PEIM'
+            SecType    = 'PEI_DEPEX'
+        elif self.DepexType == 'DXE_DEPEX_EXP':
+            ModuleType = 'DXE_DRIVER'
+            SecType    = 'DXE_DEPEX'
+        elif self.DepexType == 'SMM_DEPEX_EXP':
+            ModuleType = 'DXE_SMM_DRIVER'
+            SecType    = 'SMM_DEPEX'
+        else:
+            EdkLogger.error("GenFds", FORMAT_INVALID,
+                            "Depex type %s is not valid for module %s" % (self.DepexType, ModuleName))
+
+        InputFile = os.path.join (OutputPath, ModuleName + 'SEC' + SecNum + '.depex')
         InputFile = os.path.normpath(InputFile)
+        Depex = DependencyExpression(self.Expression, ModuleType)
+        Depex.Generate(InputFile)
 
-        Dpx = DependencyExpression(self.Expression, ModuleType)
-        Dpx.Generate(InputFile)
-
-        OutputFile = os.path.join (OutputPath, ModuleName + 'SEC' + SecNum + '.depex')
-        if self.DepexType.startswith('SMM'):
-            OutputFile = os.path.join (OutputPath, ModuleName + 'SEC' + SecNum + '.smm')
+        OutputFile = os.path.join (OutputPath, ModuleName + 'SEC' + SecNum + '.dpx')
         OutputFile = os.path.normpath(OutputFile)
-        SecType = (self.DepexType.startswith('PEI') and ['PEI_DEPEX'] or ['DXE_DEPEX'])[0]
-        if self.DepexType.startswith('SMM'):
-            SecType = 'SMM_DEPEX'
-        
+
         GenFdsGlobalVariable.GenerateSection(OutputFile, [InputFile], Section.Section.SectionType.get (SecType))
         FileList = [OutputFile]
         return FileList, self.Alignment

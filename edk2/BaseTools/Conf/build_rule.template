@@ -69,6 +69,7 @@
 #   $(<tool>_FLAGS)     Tools flags of current module
 #   $(MODULE_NAME)      Current module name
 #   $(MODULE_TYPE)      Current module type
+#   $(MODULE_GUID)      Current module guid
 #   $(ARCH)             Architecture of current module
 #   $(TOOLCHAIN)        Toolchain used to build current module
 #   $(TARGET)           Target of current module (DEBUG/RELEASE)
@@ -209,7 +210,7 @@
         "$(SLINK)" $(SLINK_FLAGS) /OUT:${dst} @$(OBJECT_FILES_LIST)
 
     <Command.GCC>
-        "$(SLINK)" -cr ${dst} $(SLINK_FLAGS) @"$(OBJECT_FILES_LIST)"
+        "$(SLINK)" -cr ${dst} $(SLINK_FLAGS) @$(OBJECT_FILES_LIST)
     
     <Command.RVCT>
         "$(SLINK)" $(SLINK_FLAGS) ${dst} --via $(OBJECT_FILES_LIST)
@@ -235,7 +236,7 @@
         "$(DLINK)" /OUT:${dst} $(DLINK_FLAGS) $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST)
 
     <Command.GCC>
-        "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -\( $(DLINK_SPATH) @"$(STATIC_LIBRARY_FILES_LIST)" -\) $(DLINK2_FLAGS)
+        "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -\( $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST) -\) $(DLINK2_FLAGS)
         "$(OBJCOPY)" $(OBJCOPY_FLAGS) ${dst}
 
     <Command.RVCT>
@@ -456,3 +457,45 @@
     <Command>
         $(OPTROM) -i $(PCI_DEVICE_ID) -f $(PCI_VENDOR_ID) -l $(PCI_CLASS_CODE) -r $(PCI_REVISION) -o $dst $(OPTROM_FLAGS) $src
 
+[Unicode-Text-File.UEFI_HII]
+    <InputFile>
+        *.uni, *.Uni, *.UNI
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)$(MODULE_NAME)StrDefs.hpk
+        $(DEBUG_DIR)(+)$(MODULE_NAME)StrDefs.h
+
+    <Command>
+
+[Visual-Form-Representation-File.UEFI_HII]
+    <InputFile>
+        ?.vfr
+        ?.Vfr
+        ?.VFR
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.hpk
+
+    <Command>
+        -$(MD) $(OUTPUT_DIR)(+)${s_dir} > NUL 2>&1
+        "$(VFRPP)" $(VFRPP_FLAGS) $(INC) ${src} > $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
+        -$(MD) $(OUTPUT_DIR)(+)${s_dir} > NUL 2>&1
+        "$(VFR)" $(VFR_FLAGS) --create-ifr-package --output-directory $(OUTPUT_DIR)(+)${s_dir} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
+
+[Hii-Binary-Package.UEFI_HII]
+    <InputFile>
+        *.hpk
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.lib
+
+    <Command.MSFT, Command.INTEL>
+        GenFw -o $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc -g $(MODULE_GUID) --hiipackage $(HII_BINARY_PACKAGES)
+        "$(RC)" /Fo${dst} $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc
+
+    <Command.GCC>
+        GenFw -o $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc -g $(MODULE_GUID) --hiipackage $(HII_BINARY_PACKAGES)
+        "$(RC)" (RC_FLAGS) $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc ${dst}

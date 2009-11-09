@@ -236,8 +236,8 @@ Returns:
 
   if (File->Attributes & FFS_ATTRIB_CHECKSUM) {
     File->IntegrityCheck.Checksum.File = FvBufCalculateChecksum8 (
-                                                (VOID*)File,
-                                                FileSize
+                                                (VOID*)(File + 1),
+                                                FileSize - sizeof (EFI_FFS_FILE_HEADER)
                                                 );
   } else {
     File->IntegrityCheck.Checksum.File = FFS_FIXED_CHECKSUM;

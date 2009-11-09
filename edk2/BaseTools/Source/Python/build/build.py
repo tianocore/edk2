@@ -676,7 +676,8 @@ class Build():
     def __init__(self, Target, WorkspaceDir, Platform, Module, Arch, ToolChain,
                  BuildTarget, FlashDefinition, FdList=[], FvList=[],
                  MakefileType="nmake", SilentMode=False, ThreadNumber=2,
-                 SkipAutoGen=False, Reparse=False, SkuId=None):
+                 SkipAutoGen=False, Reparse=False, SkuId=None, 
+                 ReportFile=None, ReportType=None):
 
         self.WorkspaceDir = WorkspaceDir
         self.Target         = Target
@@ -695,6 +696,11 @@ class Build():
         self.Reparse        = Reparse
         self.SkuId          = SkuId
         self.SpawnMode      = True
+        self.ReportFile     = ReportFile
+        if ReportType == None:
+          self.ReportType   = ['ALL']
+        else:
+          self.ReportType   = ReportType
 
         self.TargetTxt      = TargetTxtClassObject()
         self.ToolDef        = ToolDefClassObject()
@@ -954,7 +960,9 @@ class Build():
                         self.Fdf,
                         self.FdList,
                         self.FvList,
-                        self.SkuId
+                        self.SkuId,
+                        self.ReportFile,
+                        self.ReportType
                         )
                 self.Progress.Stop("done!")
                 self._Build(self.Target, Wa)
@@ -980,7 +988,9 @@ class Build():
                         self.Fdf,
                         self.FdList,
                         self.FvList,
-                        self.SkuId
+                        self.SkuId,
+                        self.ReportFile,
+                        self.ReportType
                         )
                 Wa.CreateMakeFile(False)
                 self.Progress.Stop("done!")
@@ -1018,7 +1028,9 @@ class Build():
                         self.Fdf,
                         self.FdList,
                         self.FvList,
-                        self.SkuId
+                        self.SkuId,
+                        self.ReportFile,
+                        self.ReportType
                         )
                 Wa.CreateMakeFile(False)
 
@@ -1253,6 +1265,10 @@ def MyOptionParser():
     Parser.add_option("-d", "--debug", action="store", type="int", help="Enable debug messages at specified level.")
     Parser.add_option("-D", "--define", action="append", type="string", dest="Macros", help="Macro: \"Name [= Value]\".")
 
+    Parser.add_option("-y", "--report-file", action="store", dest="ReportFile", help="Put build report in specified file.")
+    Parser.add_option("-Y", "--report-type", action="append", type="choice", choices=['ALL','PCD',], dest="ReportType",
+        help="Flags that control the type of build report to generate.  Must be one of [ALL, PCD].  To specify more flags, please repeat this option.")
+
     (Opt, Args)=Parser.parse_args()
     return (Opt, Args)
 
@@ -1358,7 +1374,8 @@ def Main():
                         Option.TargetArch, Option.ToolChain, Option.BuildTarget,
                         Option.FdfFile, Option.RomImage, Option.FvImage,
                         None, Option.SilentMode, Option.ThreadNumber,
-                        Option.SkipAutoGen, Option.Reparse, Option.SkuId)
+                        Option.SkipAutoGen, Option.Reparse, Option.SkuId, 
+                        Option.ReportFile, Option.ReportType)
         MyBuild.Launch()
         #MyBuild.DumpBuildData()
     except FatalError, X:

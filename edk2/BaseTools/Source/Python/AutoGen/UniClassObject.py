@@ -234,6 +234,11 @@ class UniFileClassObject(object):
         Value = ''
 
         Name = Item.split()[1]
+        # Check the string name is the upper character
+        if not self.IsCompatibleMode and Name != '':
+            MatchString = re.match('[A-Z0-9_]+', Name, re.UNICODE)
+            if MatchString == None or MatchString.end(0) != len(Name):
+                EdkLogger.error('Unicode File Parser', FORMAT_INVALID, 'The string token name %s defined in UNI file %s contains the invalid lower case character.' %(Name, self.File))
         LanguageList = Item.split(u'#language ')
         for IndexI in range(len(LanguageList)):
             if IndexI == 0:
@@ -365,6 +370,11 @@ class UniFileClassObject(object):
                         break
                 # Value = Value.replace(u'\r\n', u'')
                 Language = GetLanguageCode(Language, self.IsCompatibleMode, self.File)
+                # Check the string name is the upper character
+                if not self.IsCompatibleMode and Name != '':
+                    MatchString = re.match('[A-Z0-9_]+', Name, re.UNICODE)
+                    if MatchString == None or MatchString.end(0) != len(Name):
+                        EdkLogger.error('Unicode File Parser', FORMAT_INVALID, 'The string token name %s defined in UNI file %s contains the invalid lower case character.' %(Name, self.File))
                 self.AddStringToList(Name, Language, Value)
                 continue
 

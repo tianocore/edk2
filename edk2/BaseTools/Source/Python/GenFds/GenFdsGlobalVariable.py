@@ -294,10 +294,7 @@ class GenFdsGlobalVariable:
     @staticmethod
     def GenerateOptionRom(Output, EfiInput, BinaryInput, Compress=False, ClassCode=None,
                         Revision=None, DeviceId=None, VendorId=None):
-#        if not GenFdsGlobalVariable.NeedsUpdate(Output, Input):
-#            return
-#        GenFdsGlobalVariable.DebugLogger(EdkLogger.DEBUG_5, "%s needs update because of newer %s" % (Output, Input))
-
+        InputList = []   
         Cmd = ["EfiRom"]
         if len(EfiInput) > 0:
             
@@ -308,11 +305,18 @@ class GenFdsGlobalVariable:
                 
             for EfiFile in EfiInput:
                 Cmd += [EfiFile]
+                InputList.append (EfiFile)
         
         if len(BinaryInput) > 0:
             Cmd += ["-b"]
             for BinFile in BinaryInput:
                 Cmd += [BinFile]
+                InputList.append (BinFile)
+
+        # Check List
+        if not GenFdsGlobalVariable.NeedsUpdate(Output, InputList):
+            return
+        GenFdsGlobalVariable.DebugLogger(EdkLogger.DEBUG_5, "%s needs update because of newer %s" % (Output, InputList))
                         
         if ClassCode != None:
             Cmd += ["-l", ClassCode]

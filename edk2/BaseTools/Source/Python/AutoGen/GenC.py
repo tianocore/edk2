@@ -383,28 +383,6 @@ ${Function} (
 ${END}
 """)
 
-## SMM_CORE Entry Point Templates
-gSmmCoreEntryPointString = TemplateString("""
-const UINT32 _gUefiDriverRevision = 0;
-${BEGIN}
-EFI_STATUS
-${Function} (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
-  );
-
-EFI_STATUS
-EFIAPI
-ProcessModuleEntryPointList (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
-  )
-{
-  return ${Function} (ImageHandle, SystemTable);
-}
-${END}
-""")
-
 gPeimEntryPointString = [
 TemplateString("""
 GLOBAL_REMOVE_IF_UNREFERENCED const UINT32 _gPeimRevision = ${PiSpecVersion};
@@ -460,6 +438,35 @@ ${END}
 }
 """)
 ]
+
+## SMM_CORE Entry Point Templates
+gSmmCoreEntryPointPrototype = TemplateString("""
+${BEGIN}
+EFI_STATUS
+EFIAPI
+${Function} (
+  IN EFI_HANDLE         ImageHandle,
+  IN EFI_SYSTEM_TABLE   *SystemTable
+  );
+${END}
+""")
+
+gSmmCoreEntryPointString = TemplateString("""
+${BEGIN}
+const UINT32 _gUefiDriverRevision = ${EfiSpecVersion};
+const UINT32 _gDxeRevision = ${PiSpecVersion};
+
+EFI_STATUS
+EFIAPI
+ProcessModuleEntryPointList (
+  IN EFI_HANDLE         ImageHandle,
+  IN EFI_SYSTEM_TABLE   *SystemTable
+  )
+{
+  return ${Function} (ImageHandle, SystemTable);
+}
+${END}
+""")
 
 ## DXE SMM Entry Point Templates
 gDxeSmmEntryPointPrototype = TemplateString("""
@@ -890,8 +897,7 @@ gModuleTypeHeaderFile = {
     "DXE_SAL_DRIVER"    :   ["PiDxe.h", "Library/BaseLib.h", "Library/DebugLib.h", "Library/UefiBootServicesTableLib.h", "Library/UefiDriverEntryPoint.h"],
     "UEFI_DRIVER"       :   ["Uefi.h",  "Library/BaseLib.h", "Library/DebugLib.h", "Library/UefiBootServicesTableLib.h", "Library/UefiDriverEntryPoint.h"],
     "UEFI_APPLICATION"  :   ["Uefi.h",  "Library/BaseLib.h", "Library/DebugLib.h", "Library/UefiBootServicesTableLib.h", "Library/UefiApplicationEntryPoint.h"],
-    "SMM_DRIVER"        :   ["PiDxe.h", "Library/BaseLib.h", "Library/DebugLib.h", "Library/SmmDriverEntryPoint.h"],
-    "SMM_CORE"          :   ["PiDxe.h", "Library/DebugLib.h"],
+    "SMM_CORE"          :   ["PiDxe.h", "Library/BaseLib.h", "Library/DebugLib.h", "Library/UefiDriverEntryPoint.h"],
     "USER_DEFINED"      :   [gBasicHeaderFile]
 }
 
@@ -1504,7 +1510,7 @@ def CreateLibraryConstructorCode(Info, AutoGenC, AutoGenH):
             ConstructorPrototypeString.Append(gLibraryStructorPrototype['PEI'].Replace(Dict))
             ConstructorCallingString.Append(gLibraryStructorCall['PEI'].Replace(Dict))
         elif Lib.ModuleType in ['DXE_CORE','DXE_DRIVER','DXE_SMM_DRIVER','DXE_RUNTIME_DRIVER',
-                                'DXE_SAL_DRIVER','UEFI_DRIVER','UEFI_APPLICATION', 'SMM_DRIVER', 'SMM_CORE']:
+                                'DXE_SAL_DRIVER','UEFI_DRIVER','UEFI_APPLICATION','SMM_CORE']:
             ConstructorPrototypeString.Append(gLibraryStructorPrototype['DXE'].Replace(Dict))
             ConstructorCallingString.Append(gLibraryStructorCall['DXE'].Replace(Dict))
 
@@ -1530,7 +1536,7 @@ def CreateLibraryConstructorCode(Info, AutoGenC, AutoGenH):
         elif Info.ModuleType in ['PEI_CORE','PEIM']:
             AutoGenC.Append(gLibraryString['PEI'].Replace(Dict))
         elif Info.ModuleType in ['DXE_CORE','DXE_DRIVER','DXE_SMM_DRIVER','DXE_RUNTIME_DRIVER',
-                                 'DXE_SAL_DRIVER','UEFI_DRIVER','UEFI_APPLICATION', 'SMM_DRIVER', 'SMM_CORE']:
+                                 'DXE_SAL_DRIVER','UEFI_DRIVER','UEFI_APPLICATION','SMM_CORE']:
             AutoGenC.Append(gLibraryString['DXE'].Replace(Dict))
 
 ## Create code for library destructor
@@ -1561,7 +1567,7 @@ def CreateLibraryDestructorCode(Info, AutoGenC, AutoGenH):
             DestructorPrototypeString.Append(gLibraryStructorPrototype['PEI'].Replace(Dict))
             DestructorCallingString.Append(gLibraryStructorCall['PEI'].Replace(Dict))
         elif Lib.ModuleType in ['DXE_CORE','DXE_DRIVER','DXE_SMM_DRIVER','DXE_RUNTIME_DRIVER',
-                                'DXE_SAL_DRIVER','UEFI_DRIVER','UEFI_APPLICATION', 'SMM_DRIVER', 'SMM_CORE']:
+                                'DXE_SAL_DRIVER','UEFI_DRIVER','UEFI_APPLICATION', 'SMM_CORE']:
             DestructorPrototypeString.Append(gLibraryStructorPrototype['DXE'].Replace(Dict))
             DestructorCallingString.Append(gLibraryStructorCall['DXE'].Replace(Dict))
 
@@ -1587,7 +1593,7 @@ def CreateLibraryDestructorCode(Info, AutoGenC, AutoGenH):
         elif Info.ModuleType in ['PEI_CORE','PEIM']:
             AutoGenC.Append(gLibraryString['PEI'].Replace(Dict))
         elif Info.ModuleType in ['DXE_CORE','DXE_DRIVER','DXE_SMM_DRIVER','DXE_RUNTIME_DRIVER',
-                                 'DXE_SAL_DRIVER','UEFI_DRIVER','UEFI_APPLICATION', 'SMM_DRIVER', 'SMM_CORE']:
+                                 'DXE_SAL_DRIVER','UEFI_DRIVER','UEFI_APPLICATION','SMM_CORE']:
             AutoGenC.Append(gLibraryString['DXE'].Replace(Dict))
 
 
@@ -1635,26 +1641,25 @@ def CreateModuleEntryPointCode(Info, AutoGenC, AutoGenH):
         AutoGenH.Append(gDxeCoreEntryPointPrototype.Replace(Dict))
     elif Info.ModuleType == 'SMM_CORE':
         AutoGenC.Append(gSmmCoreEntryPointString.Replace(Dict))
+        AutoGenH.Append(gSmmCoreEntryPointPrototype.Replace(Dict))
     elif Info.ModuleType == 'PEIM':
         if NumEntryPoints < 2:
             AutoGenC.Append(gPeimEntryPointString[NumEntryPoints].Replace(Dict))
         else:
             AutoGenC.Append(gPeimEntryPointString[2].Replace(Dict))
         AutoGenH.Append(gPeimEntryPointPrototype.Replace(Dict))
-    elif Info.ModuleType in ['DXE_RUNTIME_DRIVER','DXE_DRIVER','DXE_SMM_DRIVER',
-                             'DXE_SAL_DRIVER','UEFI_DRIVER', 'SMM_DRIVER']:
-        if Info.ModuleType in ['DXE_SMM_DRIVER', 'SMM_DRIVER']:
-            if NumEntryPoints == 0:
-                AutoGenC.Append(gDxeSmmEntryPointString[0].Replace(Dict))
-            else:
-                AutoGenC.Append(gDxeSmmEntryPointString[1].Replace(Dict))
-            AutoGenH.Append(gDxeSmmEntryPointPrototype.Replace(Dict))
+    elif Info.ModuleType in ['DXE_RUNTIME_DRIVER','DXE_DRIVER','DXE_SAL_DRIVER','UEFI_DRIVER']:
+        if NumEntryPoints < 2:
+            AutoGenC.Append(gUefiDriverEntryPointString[NumEntryPoints].Replace(Dict))
         else:
-            if NumEntryPoints < 2:
-                AutoGenC.Append(gUefiDriverEntryPointString[NumEntryPoints].Replace(Dict))
-            else:
-                AutoGenC.Append(gUefiDriverEntryPointString[2].Replace(Dict))
-            AutoGenH.Append(gUefiDriverEntryPointPrototype.Replace(Dict))
+            AutoGenC.Append(gUefiDriverEntryPointString[2].Replace(Dict))
+        AutoGenH.Append(gUefiDriverEntryPointPrototype.Replace(Dict))
+    elif Info.ModuleType == 'DXE_SMM_DRIVER':
+        if NumEntryPoints == 0:
+            AutoGenC.Append(gDxeSmmEntryPointString[0].Replace(Dict))
+        else:
+            AutoGenC.Append(gDxeSmmEntryPointString[1].Replace(Dict))
+        AutoGenH.Append(gDxeSmmEntryPointPrototype.Replace(Dict))    
     elif Info.ModuleType == 'UEFI_APPLICATION':
         if NumEntryPoints < 2:
             AutoGenC.Append(gUefiApplicationEntryPointString[NumEntryPoints].Replace(Dict))
@@ -1782,8 +1787,10 @@ def CreatePcdCode(Info, AutoGenC, AutoGenH):
 #   @param      Info        The ModuleAutoGen object
 #   @param      AutoGenC    The TemplateString object for C code
 #   @param      AutoGenH    The TemplateString object for header file
+#   @param      UniGenCFlag     UniString is generated into AutoGen C file when it is set to True
+#   @param      UniGenBinBuffer Buffer to store uni string package data
 #
-def CreateUnicodeStringCode(Info, AutoGenC, AutoGenH):
+def CreateUnicodeStringCode(Info, AutoGenC, AutoGenH, UniGenCFlag, UniGenBinBuffer):
     WorkingDir = os.getcwd()
     os.chdir(Info.WorkspaceDir)
 
@@ -1823,13 +1830,15 @@ def CreateUnicodeStringCode(Info, AutoGenC, AutoGenH):
     else:
         ShellMode = False
 
-    Header, Code = GetStringFiles(Info.UnicodeFileList, SrcList, IncList, ['.uni', '.inf'], Info.Name, CompatibleMode, ShellMode)
-    AutoGenC.Append("\n//\n//Unicode String Pack Definition\n//\n")
-    AutoGenC.Append(Code)
-    AutoGenC.Append("\n")
+    Header, Code = GetStringFiles(Info.UnicodeFileList, SrcList, IncList, ['.uni', '.inf'], Info.Name, CompatibleMode, ShellMode, UniGenCFlag, UniGenBinBuffer)
+    if CompatibleMode or UniGenCFlag:
+        AutoGenC.Append("\n//\n//Unicode String Pack Definition\n//\n")
+        AutoGenC.Append(Code)
+        AutoGenC.Append("\n")
     AutoGenH.Append("\n//\n//Unicode String ID\n//\n")
     AutoGenH.Append(Header)
-    AutoGenH.Append("\n#define STRING_ARRAY_NAME %sStrings\n" % Info.Name)
+    if CompatibleMode or UniGenCFlag:
+        AutoGenH.Append("\n#define STRING_ARRAY_NAME %sStrings\n" % Info.Name)
     os.chdir(WorkingDir)
 
 ## Create common code
@@ -1890,8 +1899,10 @@ def CreateFooterCode(Info, AutoGenC, AutoGenH):
 #   @param      Info        The ModuleAutoGen object
 #   @param      AutoGenC    The TemplateString object for C code
 #   @param      AutoGenH    The TemplateString object for header file
+#   @param      UniGenCFlag     UniString is generated into AutoGen C file when it is set to True
+#   @param      UniGenBinBuffer Buffer to store uni string package data
 #
-def CreateCode(Info, AutoGenC, AutoGenH, StringH):
+def CreateCode(Info, AutoGenC, AutoGenH, StringH, UniGenCFlag, UniGenBinBuffer):
     CreateHeaderCode(Info, AutoGenC, AutoGenH)
 
     if Info.AutoGenVersion >= 0x00010005:
@@ -1908,7 +1919,7 @@ def CreateCode(Info, AutoGenC, AutoGenH, StringH):
         FileName = "%sStrDefs.h" % Info.Name
         StringH.Append(gAutoGenHeaderString.Replace({'FileName':FileName}))
         StringH.Append(gAutoGenHPrologueString.Replace({'File':'STRDEFS', 'Guid':Info.Guid.replace('-','_')}))
-        CreateUnicodeStringCode(Info, AutoGenC, StringH)
+        CreateUnicodeStringCode(Info, AutoGenC, StringH, UniGenCFlag, UniGenBinBuffer)
         StringH.Append("\n#endif\n")
         AutoGenH.Append('#include "%s"\n' % FileName)
 
@@ -1920,12 +1931,13 @@ def CreateCode(Info, AutoGenC, AutoGenH, StringH):
 
 ## Create the code file
 #
-#   @param      FilePath    The path of code file
-#   @param      Content     The content of code file
+#   @param      FilePath     The path of code file
+#   @param      Content      The content of code file
+#   @param      IsBinaryFile The flag indicating if the file is binary file or not
 #
 #   @retval     True        If file content is changed or file doesn't exist
 #   @retval     False       If the file exists and the content is not changed
 #
-def Generate(FilePath, Content):
-    return SaveFileOnChange(FilePath, Content, False)
+def Generate(FilePath, Content, IsBinaryFile):
+    return SaveFileOnChange(FilePath, Content, IsBinaryFile)
 

@@ -205,7 +205,8 @@ EFI_STATUS
 UpdateSymFile (
   IN UINT64 BaseAddress,
   IN CHAR8  *DestFileName,
-  IN CHAR8  *SourceFileName
+  IN CHAR8  *SourceFileName,
+  IN UINT64 FileSize
   )
 /*++
 
@@ -219,6 +220,7 @@ Arguments:
   BaseAddress    - The base address for the new SYM tokens.
   DestFileName   - The destination file.
   SourceFileName - The source file.
+  FileSize       - Size of bin file.
 
 Returns:
 

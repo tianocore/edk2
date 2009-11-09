@@ -41,7 +41,7 @@ gType2Phase = {
     "DXE_SAL_DRIVER"    :   "DXE",
     "UEFI_DRIVER"       :   "DXE",
     "UEFI_APPLICATION"  :   "DXE",
-    "SMM_DRIVER"        :   "DXE",
+    "SMM_CORE"          :   "DXE",
 }
 
 ## Convert dependency expression string into EFI internal representation

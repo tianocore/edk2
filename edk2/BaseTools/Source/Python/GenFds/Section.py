@@ -129,7 +129,7 @@ class Section (SectionClassObject):
         if FileType != None:
             for File in FfsInf.BinFileList:
                 if File.Arch == "COMMON" or FfsInf.CurrentArch == File.Arch:
-                    if File.Type == FileType:
+                    if File.Type == FileType or (FfsInf.PiSpecVersion >= 0x0001000A and FileType == 'DXE_DPEX'and File.Type == 'SMM_DEPEX'):
                         if '*' in FfsInf.TargetOverrideList or File.Target == '*' or File.Target in FfsInf.TargetOverrideList or FfsInf.TargetOverrideList == []:
                             FileList.append(File.Path)
                         else:

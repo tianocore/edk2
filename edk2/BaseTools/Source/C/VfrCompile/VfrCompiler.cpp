@@ -628,23 +628,27 @@ CVfrCompiler::GenCFile (
   if (!IS_RUN_STATUS(STATUS_GENBINARY)) {
     goto Fail;
   }
+  
+  if (!mOptions.CreateIfrPkgFile || mOptions.CompatibleMode) {
+    if ((pFile = fopen (mOptions.COutputFileName, "w")) == NULL) {
+      Error (NULL, 0, 0001, "Error opening output C file", mOptions.COutputFileName);
+      goto Fail;
+    }
 
-  if ((pFile = fopen (mOptions.COutputFileName, "w")) == NULL) {
-    Error (NULL, 0, 0001, "Error opening output C file", mOptions.COutputFileName);
-    goto Fail;
-  }
+    for (Index = 0; gSourceFileHeader[Index] != NULL; Index++) {
+      fprintf (pFile, "%s\n", gSourceFileHeader[Index]);
+    }
 
-  for (Index = 0; gSourceFileHeader[Index] != NULL; Index++) {
-    fprintf (pFile, "%s\n", gSourceFileHeader[Index]);
-  }
+    if (mOptions.CompatibleMode) { 
+      gCVfrBufferConfig.OutputCFile (pFile, mOptions.VfrBaseFileName);
+    }
 
-  gCVfrBufferConfig.OutputCFile (pFile, mOptions.VfrBaseFileName);
-
-  if (gCFormPkg.GenCFile (mOptions.VfrBaseFileName, pFile, &gRBuffer) != VFR_RETURN_SUCCESS) {
+    if (gCFormPkg.GenCFile (mOptions.VfrBaseFileName, pFile, &gRBuffer) != VFR_RETURN_SUCCESS) {
+      fclose (pFile);
+      goto Fail;
+    }
     fclose (pFile);
-    goto Fail;
   }
-  fclose (pFile);
 
   SET_RUN_STATUS (STATUS_FINISHED);
   return;

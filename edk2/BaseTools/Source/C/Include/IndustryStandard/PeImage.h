@@ -657,6 +657,59 @@ typedef struct {
 } UNWIND_INFO;
 
 ///
+/// Resource format.
+///
+typedef struct {
+  UINT32  Characteristics;
+  UINT32  TimeDateStamp;
+  UINT16  MajorVersion;
+  UINT16  MinorVersion;
+  UINT16  NumberOfNamedEntries;
+  UINT16  NumberOfIdEntries;
+  //
+  // Array of EFI_IMAGE_RESOURCE_DIRECTORY_ENTRY entries goes here.
+  //
+} EFI_IMAGE_RESOURCE_DIRECTORY;
+
+///
+/// Resource directory entry format.
+///
+typedef struct {
+  union {
+    struct {
+      UINT32  NameOffset:31;
+      UINT32  NameIsString:1;
+    } s;
+    UINT32  Id;
+  } u1;
+  union {
+    UINT32  OffsetToData;
+    struct {
+      UINT32  OffsetToDirectory:31;
+      UINT32  DataIsDirectory:1;
+    } s;
+  } u2;
+} EFI_IMAGE_RESOURCE_DIRECTORY_ENTRY;
+
+///
+/// Resource directory entry for string.
+///
+typedef struct {
+  UINT16  Length;
+  CHAR16  String[1];
+} EFI_IMAGE_RESOURCE_DIRECTORY_STRING;
+
+///
+/// Resource directory entry for data array.
+///
+typedef struct {
+  UINT32  OffsetToData;
+  UINT32  Size;
+  UINT32  CodePage;
+  UINT32  Reserved;
+} EFI_IMAGE_RESOURCE_DATA_ENTRY;
+
+///
 /// Header format for TE images
 ///
 typedef struct {

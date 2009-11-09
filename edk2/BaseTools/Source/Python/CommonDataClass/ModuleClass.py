@@ -121,7 +121,7 @@ class ModuleSourceFileClass(CommonClass):
 #
 # @var BinaryFile:       To store value for BinaryFile
 # @var FileType:         To store value for FileType, selection scope is in below list
-#                        FW | GUID | PREEFORM | UEFI_APP | UNI_UI | UNI_VER | LIB | PE32 | PIC | PEI_DEPEX | DXE_DEPEX | TE | VER | UI | BIN | FV
+#                        FW | GUID | PREEFORM | UEFI_APP | UNI_UI | UNI_VER | LIB | PE32 | PIC | PEI_DEPEX | DXE_DEPEX | SMM_DEPEX| TE | VER | UI | BIN | FV
 # @var Target:           To store value for Target
 # @var ToolChainFamily:  To store value for ToolChainFamily
 #
