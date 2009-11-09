@@ -647,12 +647,16 @@ extern SHELL_PARAM_ITEM EmptyParamList[];
 **/
 EFI_STATUS
 EFIAPI
-ShellCommandLineParse (
+ShellCommandLineParseEx (
   IN CONST SHELL_PARAM_ITEM     *CheckList,
   OUT LIST_ENTRY                **CheckPackage,
   OUT CHAR16                    **ProblemParam OPTIONAL,
-  IN BOOLEAN                    AutoPageBreak
+  IN BOOLEAN                    AutoPageBreak,
+  IN BOOLEAN                    AlwaysAllowNumbers
   );
+
+// make it easy to upgrade from older versions of the shell library.
+#define ShellCommandLineParse(CheckList,CheckPackage,ProblemParam,AutoPageBreak) ShellCommandLineParseEx(CheckList,CheckPackage,ProblemParam,AutoPageBreak,FALSE)
 
 /**
   Frees shell variable list that was returned from ShellCommandLineParse.
@@ -734,6 +738,20 @@ ShellCommandLineGetRawValue (
   );
 
 /**
+  returns the number of command line value parameters that were parsed.  
+  
+  this will not include flags.
+
+  @retval (UINTN)-1     No parsing has ocurred
+  @return other         The number of value parameters found
+**/
+UINTN
+EFIAPI
+ShellCommandLineGetCount(
+  VOID
+  );
+
+/**
   This function causes the shell library to initialize itself.  If the shell library
   is already initialized it will de-initialize all the current protocol poitners and
   re-populate them again.
@@ -788,5 +806,60 @@ ShellPrintEx(
   IN CONST CHAR16         *Format,
   ...
   );
+
+/**
+  Print at a specific location on the screen.
+
+  This function will move the cursor to a given screen location, print the specified string, 
+  and return the cursor to the original locaiton.  
+  
+  If -1 is specified for either the Row or Col the current screen location for BOTH 
+  will be used and the cursor's position will not be moved back to an original location.
+
+  if either Row or Col is out of range for the current console, then ASSERT
+  if Format is NULL, then ASSERT
+
+  In addition to the standard %-based flags as supported by UefiLib Print() this supports 
+  the following additional flags:
+    %N       -   Set output attribute to normal
+    %H       -   Set output attribute to highlight
+    %E       -   Set output attribute to error
+    %B       -   Set output attribute to blue color
+    %V       -   Set output attribute to green color
+
+  Note: The background color is controlled by the shell command cls.
+
+  @param[in] Row                the row to print at
+  @param[in] Col                the column to print at
+  @param[in] HiiFormatStringId  the format string Id for getting from Hii
+  @param[in] HiiFormatHandle    the format string Handle for getting from Hii
+
+  @return the number of characters printed to the screen
+**/
+UINTN
+EFIAPI
+ShellPrintHiiEx(
+  IN INT32                Col OPTIONAL,
+  IN INT32                Row OPTIONAL,
+  IN CONST EFI_STRING_ID  HiiFormatStringId,
+  IN CONST EFI_HANDLE     HiiFormatHandle,
+  ...
+  );
+
+/**
+  Function to determine if a given filename represents a file or a directory.
+
+  @param[in] DirName      Path to directory to test.
+
+  @retval EFI_SUCCESS     The Path represents a directory
+  @retval EFI_NOT_FOUND   The Path does not represent a directory
+  @return other           The path failed to open
+**/
+EFI_STATUS
+EFIAPI
+ShellIsDirectory(
+  IN CONST CHAR16 *DirName
+  );
+
 
 #endif // __SHELL_LIB__
