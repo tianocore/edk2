@@ -1,7 +1,7 @@
 /** @file
   This file provides control over block-oriented firmware devices.
 
-  Copyright (c) 2006 - 2008, Intel Corporation                                                         
+  Copyright (c) 2006 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -11,25 +11,33 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
   @par Revision Reference: PI
-  Version 1.00.
+  Version 1.0 and 1.2.
 
 **/
 
 #ifndef __FIRMWARE_VOLUME_BLOCK_H__
 #define __FIRMWARE_VOLUME_BLOCK_H__
 
-
+//
+// EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL is defined in PI 1.0 spec and its GUID value
+// is later updated to be the same as that of EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL
+// defined in PI 1.2 spec. 
+//
 #define EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL_GUID \
-  { 0xDE28BC59, 0x6228, 0x41BD, {0xBD, 0xF6, 0xA3, 0xB9, 0xAD,0xB5, 0x8D, 0xA1 } }
+  { 0x8f644fa9, 0xe850, 0x4db1, {0x9c, 0xe2, 0xb, 0x44, 0x69, 0x8e, 0x8d, 0xa4 } }
 
+#define EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL_GUID \
+  { 0x8f644fa9, 0xe850, 0x4db1, {0x9c, 0xe2, 0xb, 0x44, 0x69, 0x8e, 0x8d, 0xa4 } }
 
 typedef struct _EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL;
+
+typedef EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL;    
 
 /**
   The GetAttributes() function retrieves the attributes and
   current settings of the block. Status Codes Returned
 
-  @param This       Indicates the EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL instance.
+  @param This       Indicates the EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL instance.
 
   @param Attributes Pointer to EFI_FVB_ATTRIBUTES_2 in which the
                     attributes and current settings are
@@ -43,7 +51,7 @@ typedef struct _EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL EFI_FIRMWARE_VOLUME_BLOCK_PRO
 typedef
 EFI_STATUS
 (EFIAPI * EFI_FVB_GET_ATTRIBUTES)(
-  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
+  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL *This,
   OUT       EFI_FVB_ATTRIBUTES_2                *Attributes
 );
 
@@ -52,7 +60,7 @@ EFI_STATUS
   The SetAttributes() function sets configurable firmware volume
   attributes and returns the new settings of the firmware volume.
 
-  @param This         Indicates the EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL instance.
+  @param This         Indicates the EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL instance.
 
   @param Attributes   On input, Attributes is a pointer to
                       EFI_FVB_ATTRIBUTES_2 that contains the
@@ -73,7 +81,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI * EFI_FVB_SET_ATTRIBUTES)(
-  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
+  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL *This,
   IN OUT    EFI_FVB_ATTRIBUTES_2                *Attributes
 );
 
@@ -83,7 +91,7 @@ EFI_STATUS
   a memory-mapped firmware volume. This function should be called
   only for memory-mapped firmware volumes.
 
-  @param This     Indicates the EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL instance.
+  @param This     Indicates the EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL instance.
   
   @param Address  Pointer to a caller-allocated
                   EFI_PHYSICAL_ADDRESS that, on successful
@@ -98,7 +106,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI * EFI_FVB_GET_PHYSICAL_ADDRESS)(
-  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
+  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL *This,
   OUT       EFI_PHYSICAL_ADDRESS                *Address
 );
 
@@ -109,7 +117,7 @@ EFI_STATUS
   retrieve the block map (see EFI_FIRMWARE_VOLUME_HEADER).
 
 
-  @param This           Indicates the EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL instance.
+  @param This           Indicates the EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL instance.
 
   @param Lba            Indicates the block for which to return the size.
 
@@ -131,7 +139,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI * EFI_FVB_GET_BLOCK_SIZE)(
-  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
+  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL *This,
   IN        EFI_LBA                             Lba,
   OUT       UINTN                               *BlockSize,
   OUT       UINTN                               *NumberOfBlocks
@@ -154,7 +162,7 @@ EFI_STATUS
   indicate the number of bytes actually read. The caller must be
   aware that a read may be partially completed.
 
-  @param This     Indicates the EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL instance.
+  @param This     Indicates the EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL instance.
   
   @param Lba      The starting logical block index
                   from which to read.
@@ -188,7 +196,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_FVB_READ)(
-  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
+  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL *This,
   IN        EFI_LBA                             Lba,
   IN        UINTN                               Offset,
   IN OUT    UINTN                               *NumBytes,
@@ -225,7 +233,7 @@ EFI_STATUS
   fully flushed to the hardware before the Write() service
   returns.
 
-  @param This     Indicates the EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL instance.
+  @param This     Indicates the EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL instance.
   
   @param Lba      The starting logical block index to write to.
   
@@ -257,7 +265,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI * EFI_FVB_WRITE)(
-  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
+  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL *This,
   IN        EFI_LBA                             Lba,
   IN        UINTN                               Offset,
   IN OUT    UINTN                               *NumBytes,
@@ -291,7 +299,7 @@ EFI_STATUS
   flushed to the hardware before the EraseBlocks() service
   returns.
 
-  @param This   Indicates the EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL
+  @param This   Indicates the EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL
                 instance.
 
   @param ...    The variable argument list is a list of tuples.
@@ -324,7 +332,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI * EFI_FVB_ERASE_BLOCKS)(
-  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
+  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL *This,
   ...
 );
 
@@ -337,7 +345,7 @@ EFI_STATUS
 /// produces the Firmware Volume Protocol will bind to the
 /// Firmware Volume Block Protocol.
 ///
-struct _EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL {
+struct _EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL{
   EFI_FVB_GET_ATTRIBUTES        GetAttributes;
   EFI_FVB_SET_ATTRIBUTES        SetAttributes;
   EFI_FVB_GET_PHYSICAL_ADDRESS  GetPhysicalAddress;
@@ -353,6 +361,6 @@ struct _EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL {
 
 
 extern EFI_GUID gEfiFirmwareVolumeBlockProtocolGuid;
-
+extern EFI_GUID gEfiFirmwareVolumeBlock2ProtocolGuid;
 
 #endif
