@@ -315,3 +315,14 @@ EDK_9385: Non-Compatible: xli24
 
 Possible impacts:
 	Platforms which uses the default value of PCD (not overriding in DSC) would get updated report status code value for setting virtual address map.
+
+EDK_9394: Non-Compatible: qhuang8
+
+	GUID value of EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL_GUID and gEfiFirmwareVolumeBlockProtocolGuid has been changed to 
+        that of EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL_GUID defined in PI 1.2 spec.
+        	
+
+Possible impacts:
+	This is a source level compatible change, but not binary level. We might need to rebuild some old binary modules to work with newer version of MdePkg.
+
+
