@@ -824,7 +824,7 @@ class DscParser(MetaFileParser):
     #   [PcdsDynamicHii]
     #
     def _PcdParser(self):
-        TokenList = GetSplitValueList(self._CurrentLine, TAB_VALUE_SPLIT, 1)
+        TokenList = GetSplitValueList(ReplaceMacro(self._CurrentLine, self._Macros), TAB_VALUE_SPLIT, 1)
         self._ValueList[0:1] = GetSplitValueList(TokenList[0], TAB_SPLIT)
         if len(TokenList) == 2:
             self._ValueList[2] = TokenList[1]
@@ -1109,7 +1109,8 @@ class DecParser(MetaFileParser):
         if not IsValid:
             EdkLogger.error('Parser', FORMAT_INVALID, Cause, ExtraData=self._CurrentLine,
                             File=self.MetaFile, Line=self._LineIndex+1)
-        self._ValueList[2] = TokenList[1]
+
+        self._ValueList[2] = ValueList[0].strip() + '|' + ValueList[1].strip() + '|' + ValueList[2].strip()
 
     _SectionParser = {
         MODEL_META_DATA_HEADER          :   MetaFileParser._DefineParser,

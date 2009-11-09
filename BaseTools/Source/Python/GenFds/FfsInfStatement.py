@@ -47,6 +47,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
         self.KeepRelocFromRule = None
         self.InDsc = True
         self.OptRomDefs = {}
+        self.PiSpecVersion = 0
         
     ## __InfParse() method
     #
@@ -89,6 +90,8 @@ class FfsInfStatement(FfsInfStatementClassObject):
             self.BaseName = Inf.BaseName
             self.ModuleGuid = Inf.Guid
             self.ModuleType = Inf.ModuleType
+            if Inf.Specification != None and 'PI_SPECIFICATION_VERSION' in Inf.Specification:
+                self.PiSpecVersion = Inf.Specification['PI_SPECIFICATION_VERSION']
             if Inf.AutoGenVersion < 0x00010005:
                 self.ModuleType = Inf.ComponentType
             self.VersionString = Inf.Version
@@ -102,6 +105,8 @@ class FfsInfStatement(FfsInfStatementClassObject):
             self.BaseName = Inf.BaseName
             self.ModuleGuid = Inf.Guid
             self.ModuleType = Inf.ModuleType
+            if Inf.Specification != None and 'PI_SPECIFICATION_VERSION' in Inf.Specification:
+                self.PiSpecVersion = Inf.Specification['PI_SPECIFICATION_VERSION']
             self.VersionString = Inf.Version
             self.BinFileList = Inf.Binaries
             self.SourceFileList = Inf.Sources
@@ -112,6 +117,9 @@ class FfsInfStatement(FfsInfStatementClassObject):
 
         if len(self.SourceFileList) != 0 and not self.InDsc:
             EdkLogger.warn("GenFds", GENFDS_ERROR, "Module %s NOT found in DSC file; Is it really a binary module?" % (self.InfFileName))
+
+        if self.ModuleType == 'SMM_CORE' and self.PiSpecVersion < 0x0001000A:
+            EdkLogger.error("GenFds", FORMAT_NOT_SUPPORTED, "SMM_CORE module type can't be used in the module with PI_SPECIFICATION_VERSION less than 0x0001000A", File=self.InfFileName)      
 
         if Inf._Defs != None and len(Inf._Defs) > 0:
             self.OptRomDefs.update(Inf._Defs)
@@ -153,7 +161,18 @@ class FfsInfStatement(FfsInfStatementClassObject):
         #
         Rule = self.__GetRule__()
         GenFdsGlobalVariable.VerboseLogger( "Packing binaries from inf file : %s" %self.InfFileName)
-        #FileType = Ffs.Ffs.ModuleTypeToFileType[Rule.ModuleType]
+        #
+        # Convert Fv File Type for PI1.1 SMM driver.
+        #
+        if self.ModuleType == 'DXE_SMM_DRIVER' and self.PiSpecVersion >= 0x0001000A:
+            if Rule.FvFileType == 'DRIVER':
+                Rule.FvFileType = 'SMM'
+        #
+        # Framework SMM Driver has no SMM FV file type
+        #
+        if self.ModuleType == 'DXE_SMM_DRIVER' and self.PiSpecVersion < 0x0001000A:
+            if Rule.FvFileType == 'SMM' or Rule.FvFileType == 'SMM_CORE':
+                EdkLogger.error("GenFds", FORMAT_NOT_SUPPORTED, "Framework SMM module doesn't support SMM or SMM_CORE FV file type", File=self.InfFileName)
         #
         # For the rule only has simpleFile
         #
@@ -380,7 +399,19 @@ class FfsInfStatement(FfsInfStatementClassObject):
             FileList, IsSect = Section.Section.GetFileList(self, '', Rule.FileExtension)
 
         Index = 1
-        SectionType     = Rule.SectionType
+        SectionType = Rule.SectionType
+        #
+        # Convert Fv Section Type for PI1.1 SMM driver.
+        #
+        if self.ModuleType == 'DXE_SMM_DRIVER' and self.PiSpecVersion >= 0x0001000A:
+            if SectionType == 'DXE_DEPEX':
+                SectionType = 'SMM_DEPEX'
+        #
+        # Framework SMM Driver has no SMM_DEPEX section type
+        #
+        if self.ModuleType == 'DXE_SMM_DRIVER' and self.PiSpecVersion < 0x0001000A:
+            if SectionType == 'SMM_DEPEX':
+                EdkLogger.error("GenFds", FORMAT_NOT_SUPPORTED, "Framework SMM module doesn't support SMM_DEPEX section type", File=self.InfFileName)
         NoStrip = True
         if self.ModuleType in ('SEC', 'PEI_CORE', 'PEIM'):
             if self.KeepReloc != None:
@@ -517,6 +548,18 @@ class FfsInfStatement(FfsInfStatementClassObject):
         for Sect in Rule.SectionList:
             SecIndex = '%d' %Index
             SectList  = []
+            #
+            # Convert Fv Section Type for PI1.1 SMM driver.
+            #
+            if self.ModuleType == 'DXE_SMM_DRIVER' and self.PiSpecVersion >= 0x0001000A:
+                if Sect.SectionType == 'DXE_DEPEX':
+                    Sect.SectionType = 'SMM_DEPEX'
+            #
+            # Framework SMM Driver has no SMM_DEPEX section type
+            #
+            if self.ModuleType == 'DXE_SMM_DRIVER' and self.PiSpecVersion < 0x0001000A:
+                if Sect.SectionType == 'SMM_DEPEX':
+                    EdkLogger.error("GenFds", FORMAT_NOT_SUPPORTED, "Framework SMM module doesn't support SMM_DEPEX section type", File=self.InfFileName)
             if Rule.KeyStringList != []:
                 SectList, Align = Sect.GenSection(self.OutputPath , self.ModuleGuid, SecIndex, Rule.KeyStringList, self)
             else :

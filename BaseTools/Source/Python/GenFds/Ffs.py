@@ -34,7 +34,6 @@ class Ffs(FDClassObject):
         'DXE_RUNTIME_DRIVER': 'EFI_FV_FILETYPE_DRIVER',
         'UEFI_DRIVER'       : 'EFI_FV_FILETYPE_DRIVER',
         'UEFI_APPLICATION'  : 'EFI_FV_FILETYPE_APPLICATION',
-        'SMM_DRIVER'        : 'EFI_FV_FILETYPE_SMM',
         'SMM_CORE'          : 'EFI_FV_FILETYPE_SMM_CORE'
     }
     
@@ -50,7 +49,6 @@ class Ffs(FDClassObject):
         'FV_IMAGE'          : 'EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE',
         'RAW'               : 'EFI_FV_FILETYPE_RAW',
         'PEI_DXE_COMBO'     : 'EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER',
-        'SMM_DXE_COMBO'     : 'EFI_FV_FILETYPE_COMBINED_SMM_DXE',
         'SMM'               : 'EFI_FV_FILETYPE_SMM',
         'SMM_CORE'          : 'EFI_FV_FILETYPE_SMM_CORE'
     }
@@ -70,7 +68,7 @@ class Ffs(FDClassObject):
         'COMPRESS'             : '.com',
         'GUIDED'               : '.guided',
         'PEI_DEPEX'            : '.dpx',
-        'SMM_DEPEX'            : '.smm'
+        'SMM_DEPEX'            : '.dpx'
     }
     
     ## The constructor

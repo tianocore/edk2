@@ -1911,7 +1911,7 @@ vfrStatementOrderedList :
   >>
   L:OrderedList                                        << OLObj.SetLineNo(L->getLine()); >>
   vfrQuestionHeader[OLObj] ","
-                                                       << OLObj.SetMaxContainers ((UINT8)_GET_CURRQEST_VARSIZE()); >>
+                                                       << OLObj.SetMaxContainers ((UINT8) _GET_CURRQEST_ARRAY_SIZE()); >>
   {
     MaxContainers "=" M:Number ","                     << OLObj.SetMaxContainers (_STOU8(M->getText())); >>
   }
@@ -3179,6 +3179,7 @@ private:
 
   UINT8               _GET_CURRQEST_DATATYPE ();
   UINT32              _GET_CURRQEST_VARSIZE ();
+  UINT32              _GET_CURRQEST_ARRAY_SIZE();
 
 public:
   VOID                _PCATCH (IN INTN, IN INTN, IN ANTLRTokenPtr, IN CHAR8 *);
@@ -3284,6 +3285,37 @@ EfiVfrParser::_GET_CURRQEST_VARTINFO (
   )
 {
   return mCurrQestVarInfo;
+}
+
+UINT32
+EfiVfrParser::_GET_CURRQEST_ARRAY_SIZE (
+  VOID
+  )
+{
+  UINT8 Size = 1;
+
+  switch (mCurrQestVarInfo.mVarType) {
+  case EFI_IFR_TYPE_NUM_SIZE_8:
+    Size = 1;
+    break;
+
+  case EFI_IFR_TYPE_NUM_SIZE_16:
+    Size = 2;
+    break;
+
+  case EFI_IFR_TYPE_NUM_SIZE_32:
+    Size = 4;
+    break;
+
+  case EFI_IFR_TYPE_NUM_SIZE_64:
+    Size = 8;
+    break;
+
+  default:
+    break;
+  }
+
+  return (mCurrQestVarInfo.mVarTotalSize / Size);
 }
 
 UINT8

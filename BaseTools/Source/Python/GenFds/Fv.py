@@ -19,6 +19,7 @@ import os
 import shutil
 import subprocess
 import StringIO
+from struct import *
 
 import Ffs
 import AprioriSection
@@ -215,19 +216,81 @@ class FV (FvClassObject):
                                        self.FvAlignment.strip() + \
                                        " = TRUE"                + \
                                        T_CHAR_LF)
-            
-        if self.FvNameGuid != None:
-            self.FvInfFile.writelines("EFI_FVNAME_GUID"     + \
-                                       " = %s" % self.FvNameGuid + \
-                                       T_CHAR_LF)
+                                       
+        #
+        # Generate FV extension header file
+        #
+        if self.FvNameGuid == None or self.FvNameGuid == '':
+            if len(self.FvExtEntryType) > 0:
+                GenFdsGlobalVariable.ErrorLogger("FV Extension Header Entries declared for %s with no FvNameGuid declaration." % (self.UiFvName))
+        
+        if self.FvNameGuid <> None and self.FvNameGuid <> '':
+            TotalSize = 16 + 4
+            Buffer = ''
+            for Index in range (0, len(self.FvExtEntryType)):
+                if self.FvExtEntryType[Index] == 'FILE':
+                    # check if the path is absolute or relative
+                    if os.path.isabs(self.FvExtEntryData[Index]):
+                        FileFullPath = os.path.normpath(self.FvExtEntryData[Index])
+                    else:
+                        FileFullPath = os.path.normpath(os.path.join(GenFdsGlobalVariable.WorkSpaceDir, self.FvExtEntryData[Index]))
+                    # check if the file path exists or not
+                    if not os.path.isfile(FileFullPath):
+                        GenFdsGlobalVariable.ErrorLogger("Error opening FV Extension Header Entry file %s." % (self.FvExtEntryData[Index]))
+                    FvExtFile = open (FileFullPath,'rb')
+                    FvExtFile.seek(0,2)
+                    Size = FvExtFile.tell()
+                    if Size >= 0x10000:
+                        GenFdsGlobalVariable.ErrorLogger("The size of FV Extension Header Entry file %s exceeds 0x10000." % (self.FvExtEntryData[Index]))
+                    TotalSize += (Size + 4)
+                    FvExtFile.seek(0)
+                    Buffer += pack('HH', (Size + 4), int(self.FvExtEntryTypeValue[Index], 16))
+                    Buffer += FvExtFile.read() 
+                    FvExtFile.close()
+                if self.FvExtEntryType[Index] == 'DATA':
+                    ByteList = self.FvExtEntryData[Index].split(',')
+                    Size = len (ByteList)
+                    if Size >= 0x10000:
+                        GenFdsGlobalVariable.ErrorLogger("The size of FV Extension Header Entry data %s exceeds 0x10000." % (self.FvExtEntryData[Index]))
+                    TotalSize += (Size + 4)
+                    Buffer += pack('HH', (Size + 4), int(self.FvExtEntryTypeValue[Index], 16))
+                    for Index1 in range (0, Size):
+                        Buffer += pack('B', int(ByteList[Index1], 16))
+
+            Guid = self.FvNameGuid.split('-')
+            Buffer = pack('LHHBBBBBBBBL', 
+                        int(Guid[0], 16), 
+                        int(Guid[1], 16), 
+                        int(Guid[2], 16), 
+                        int(Guid[3][-4:-2], 16), 
+                        int(Guid[3][-2:], 16),  
+                        int(Guid[4][-12:-10], 16),
+                        int(Guid[4][-10:-8], 16),
+                        int(Guid[4][-8:-6], 16),
+                        int(Guid[4][-6:-4], 16),
+                        int(Guid[4][-4:-2], 16),
+                        int(Guid[4][-2:], 16),
+                        TotalSize
+                        ) + Buffer
+
+            #
+            # Generate FV extension header file if the total size is not zero
+            #
+            if TotalSize > 0:
+                FvExtHeaderFileName = os.path.join(GenFdsGlobalVariable.FvDir, self.UiFvName + '.ext')
+                FvExtHeaderFile = open (FvExtHeaderFileName,'wb')
+                FvExtHeaderFile.write(Buffer)
+                FvExtHeaderFile.close()
+                self.FvInfFile.writelines("EFI_FV_EXT_HEADER_FILE_NAME = "      + \
+                                           FvExtHeaderFileName                  + \
+                                           T_CHAR_LF)
+
+         
         #
         # Add [Files]
         #
-
         self.FvInfFile.writelines("[files]" + T_CHAR_LF)
         if VtfDict != None and self.UiFvName in VtfDict.keys():
             self.FvInfFile.writelines("EFI_FILE_NAME = "                   + \
                                        VtfDict.get(self.UiFvName)          + \
                                        T_CHAR_LF)
-
-

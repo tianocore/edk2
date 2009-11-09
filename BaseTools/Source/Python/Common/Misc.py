@@ -316,12 +316,14 @@ def DataRestore(File):
 #   @retval     None    If path doesn't exist
 #
 class DirCache:
-    _CACHE_ = {}
+    _CACHE_ = set()
+    _UPPER_CACHE_ = {}
 
     def __init__(self, Root):
         self._Root = Root
         for F in os.listdir(Root):
-            self._CACHE_[F.upper()] = F
+            self._CACHE_.add(F)
+            self._UPPER_CACHE_[F.upper()] = F
 
     # =[] operator
     def __getitem__(self, Path):
@@ -330,16 +332,18 @@ class DirCache:
             return self._Root
         if Path and Path[0] == os.path.sep:
             Path = Path[1:]
-        Path = Path.upper()
         if Path in self._CACHE_:
-            return os.path.join(self._Root, self._CACHE_[Path])
+            return os.path.join(self._Root, Path)
+        UpperPath = Path.upper()
+        if UpperPath in self._UPPER_CACHE_:
+            return os.path.join(self._Root, self._UPPER_CACHE_[UpperPath])
 
         IndexList = []
         LastSepIndex = -1
         SepIndex = Path.find(os.path.sep)
         while SepIndex > -1:
-            Parent = Path[:SepIndex]
-            if Parent not in self._CACHE_:
+            Parent = UpperPath[:SepIndex]
+            if Parent not in self._UPPER_CACHE_:
                 break
             LastSepIndex = SepIndex
             SepIndex = Path.find(os.path.sep, LastSepIndex + 1)
@@ -351,22 +355,29 @@ class DirCache:
         os.chdir(self._Root)
         SepIndex = LastSepIndex
         while SepIndex > -1:
-            ParentKey = Path[:SepIndex]
-            if ParentKey not in self._CACHE_:
+            Parent = Path[:SepIndex]
+            ParentKey = UpperPath[:SepIndex]
+            if ParentKey not in self._UPPER_CACHE_:
                 os.chdir(Cwd)
                 return None
 
-            ParentDir = self._CACHE_[ParentKey]
+            if Parent in self._CACHE_:
+                ParentDir = Parent
+            else:
+                ParentDir = self._UPPER_CACHE_[ParentKey]
             for F in os.listdir(ParentDir):
                 Dir = os.path.join(ParentDir, F)
-                self._CACHE_[Dir.upper()] = Dir
+                self._CACHE_.add(Dir)
+                self._UPPER_CACHE_[Dir.upper()] = Dir
 
             SepIndex = Path.find(os.path.sep, SepIndex + 1)
 
         os.chdir(Cwd)
-        if Path not in self._CACHE_:
-            return None
-        return os.path.join(self._Root, self._CACHE_[Path])
+        if Path in self._CACHE_:
+            return os.path.join(self._Root, Path)
+        elif UpperPath in self._UPPER_CACHE_:
+            return os.path.join(self._Root, self._UPPER_CACHE_[UpperPath])
+        return None
 
 ## Get all files of a directory
 #
@@ -683,6 +694,7 @@ class TemplateString(object):
     ## Constructor
     def __init__(self, Template=None):
         self.String = ''
+        self.IsBinary = False
         self._Template = Template
         self._TemplateSectionList = self._Parse(Template)
 

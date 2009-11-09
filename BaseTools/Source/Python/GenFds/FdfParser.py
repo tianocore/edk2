@@ -1877,6 +1877,14 @@ class FdfParser:
         
         self.__GetFvNameGuid(FvObj)
 
+        FvObj.FvExtEntryTypeValue = []
+        FvObj.FvExtEntryType = []
+        FvObj.FvExtEntryData = []
+        while True:
+            isFvExtEntry = self.__GetFvExtEntryStatement(FvObj)
+            if not isFvExtEntry:
+                break
+
         self.__GetAprioriSection(FvObj, FvObj.DefineVarDict.copy())
         self.__GetAprioriSection(FvObj, FvObj.DefineVarDict.copy())
 
@@ -1969,6 +1977,79 @@ class FdfParser:
         FvObj.FvNameGuid = self.__Token
 
         return
+
+    def __GetFvExtEntryStatement(self, FvObj):
+
+        if not self.__IsKeyword( "FV_EXT_ENTRY"):
+            return False
+
+        if not self.__IsKeyword ("TYPE"):
+            raise Warning("expected 'TYPE'", self.FileName, self.CurrentLineNumber)
+            
+        if not self.__IsToken( "="):
+            raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
+
+        if not self.__GetNextHexNumber() and not self.__GetNextDecimalNumber():
+            raise Warning("expected Hex FV extension entry type value At Line ", self.FileName, self.CurrentLineNumber)
+
+        FvObj.FvExtEntryTypeValue += [self.__Token]
+
+        if not self.__IsToken( "{"):
+            raise Warning("expected '{'", self.FileName, self.CurrentLineNumber)
+
+        if not self.__IsKeyword ("FILE") and not self.__IsKeyword ("DATA"):
+            raise Warning("expected 'FILE' or 'DATA'", self.FileName, self.CurrentLineNumber)
+
+        FvObj.FvExtEntryType += [self.__Token]
+
+        if self.__Token == 'DATA':
+
+            if not self.__IsToken( "="):
+                raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
+                
+            if not self.__IsToken( "{"):
+                raise Warning("expected '{'", self.FileName, self.CurrentLineNumber)
+
+            if not self.__GetNextHexNumber():
+                raise Warning("expected Hex byte", self.FileName, self.CurrentLineNumber)
+
+            if len(self.__Token) > 4:
+                raise Warning("Hex byte(must be 2 digits) too long", self.FileName, self.CurrentLineNumber)
+
+            DataString = self.__Token
+            DataString += ","
+
+            while self.__IsToken(","):
+                if not self.__GetNextHexNumber():
+                    raise Warning("Invalid Hex number", self.FileName, self.CurrentLineNumber)
+                if len(self.__Token) > 4:
+                    raise Warning("Hex byte(must be 2 digits) too long", self.FileName, self.CurrentLineNumber)
+                DataString += self.__Token
+                DataString += ","
+
+            if not self.__IsToken( "}"):
+                raise Warning("expected '}'", self.FileName, self.CurrentLineNumber)
+
+            if not self.__IsToken( "}"):
+                raise Warning("expected '}'", self.FileName, self.CurrentLineNumber)
+
+            DataString = DataString.rstrip(",")
+            FvObj.FvExtEntryData += [DataString]
+
+        if self.__Token == 'FILE':
+        
+            if not self.__IsToken( "="):
+                raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
+                
+            if not self.__GetNextToken():
+                raise Warning("expected FV Extension Entry file path At Line ", self.FileName, self.CurrentLineNumber)
+                
+            FvObj.FvExtEntryData += [self.__Token]
+
+            if not self.__IsToken( "}"):
+                raise Warning("expected '}'", self.FileName, self.CurrentLineNumber)
+
+        return True
 
     ## __GetAprioriSection() method
     #
@@ -2683,15 +2764,31 @@ class FdfParser:
     #   @param  Obj         for whom token statements are got
     #
     def __GetCapsuleTokens(self, Obj):
-
-        if not self.__IsKeyword("CAPSULE_GUID"):
-            raise Warning("expected 'CAPSULE_GUID'", self.FileName, self.CurrentLineNumber)
-
-        while self.__CurrentLine().find("=") != -1:
-            NameValue = self.__CurrentLine().split("=")
-            Obj.TokensDict[NameValue[0].strip()] = NameValue[1].strip()
-            self.CurrentLineNumber += 1
-            self.CurrentOffsetWithinLine = 0
+        if not self.__GetNextToken():
+            return False
+        while self.__Token in ("CAPSULE_GUID", "CAPSULE_HEADER_SIZE", "CAPSULE_FLAGS"):
+            Name = self.__Token.strip()
+            if not self.__IsToken("="):
+                raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
+            if not self.__GetNextToken():
+                raise Warning("expected value", self.FileName, self.CurrentLineNumber)
+            if Name == 'CAPSULE_FLAGS':
+                if not self.__Token in ("PersistAcrossReset", "PopulateSystemTable", "InitiateReset"):
+                    raise Warning("expected PersistAcrossReset, PopulateSystemTable, or InitiateReset", self.FileName, self.CurrentLineNumber)
+                Value = self.__Token.strip()
+                while self.__IsToken(","):
+                    Value += ','
+                    if not self.__GetNextToken():
+                        raise Warning("expected value", self.FileName, self.CurrentLineNumber)
+                    if not self.__Token in ("PersistAcrossReset", "PopulateSystemTable", "InitiateReset"):
+                        raise Warning("expected PersistAcrossReset, PopulateSystemTable, or InitiateReset", self.FileName, self.CurrentLineNumber)
+                    Value += self.__Token.strip()
+            else:
+                Value = self.__Token.strip()
+            Obj.TokensDict[Name] = Value  
+            if not self.__GetNextToken():
+                return False
+        self.__UndoToken()
 
     ## __GetCapsuleData() method
     #
@@ -2815,7 +2912,7 @@ class FdfParser:
                              "DXE_SMM_DRIVER", "DXE_RUNTIME_DRIVER", \
                              "UEFI_DRIVER", "UEFI_APPLICATION", "USER_DEFINED", "DEFAULT", "BASE", \
                              "SECURITY_CORE", "COMBINED_PEIM_DRIVER", "PIC_PEIM", "RELOCATABLE_PEIM", \
-                             "PE32_PEIM", "BS_DRIVER", "RT_DRIVER", "SAL_RT_DRIVER", "APPLICATION", "ACPITABLE", "SMM_DRIVER", "SMM_CORE"):
+                             "PE32_PEIM", "BS_DRIVER", "RT_DRIVER", "SAL_RT_DRIVER", "APPLICATION", "ACPITABLE", "SMM_CORE"):
             raise Warning("Unknown Module type '%s'" % self.__Token, self.FileName, self.CurrentLineNumber)
         return self.__Token
 
@@ -2859,7 +2956,7 @@ class FdfParser:
 
         Type = self.__Token.strip().upper()
         if Type not in ("RAW", "FREEFORM", "SEC", "PEI_CORE", "PEIM",\
-                             "PEI_DXE_COMBO", "DRIVER", "DXE_CORE", "APPLICATION", "FV_IMAGE", "SMM_DXE_COMBO", "SMM", "SMM_CORE"):
+                             "PEI_DXE_COMBO", "DRIVER", "DXE_CORE", "APPLICATION", "FV_IMAGE", "SMM", "SMM_CORE"):
             raise Warning("Unknown FV type '%s'" % self.__Token, self.FileName, self.CurrentLineNumber)
 
         if not self.__IsToken("="):
@@ -3238,8 +3335,8 @@ class FdfParser:
         elif SectionType == "RAW":
             if FileType not in ("BIN", "SEC_BIN", "RAW", "ASL", "ACPI"):
                 raise Warning("Incorrect section file type '%s'" % FileType, self.FileName, self.CurrentLineNumber)
-        elif SectionType == "DXE_DEPEX":
-            if FileType not in ("DXE_DEPEX", "SEC_DXE_DEPEX"):
+        elif SectionType == "DXE_DEPEX" or SectionType == "SMM_DEPEX":
+            if FileType not in ("DXE_DEPEX", "SEC_DXE_DEPEX", "SMM_DEPEX"):
                 raise Warning("Incorrect section file type '%s'" % FileType, self.FileName, self.CurrentLineNumber)
         elif SectionType == "UI":
             if FileType not in ("UI", "SEC_UI"):

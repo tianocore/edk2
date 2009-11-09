@@ -61,13 +61,12 @@ Abstract:
 #define MAX_NUMBER_OF_FILES_IN_FV       1000
 #define MAX_NUMBER_OF_FILES_IN_CAP      1000
 #define EFI_FFS_FILE_HEADER_ALIGNMENT   8
-
 //
 // INF file strings
 //
-#define OPTIONS_SECTION_STRING            "[options]"
-#define ATTRIBUTES_SECTION_STRING         "[attributes]"
-#define FILES_SECTION_STRING              "[files]"
+#define OPTIONS_SECTION_STRING                "[options]"
+#define ATTRIBUTES_SECTION_STRING             "[attributes]"
+#define FILES_SECTION_STRING                  "[files]"
 
 //
 // Options section
@@ -158,6 +157,12 @@ Abstract:
 #define NULL_STRING               "NULL"
 
 //
+//
+//
+#define EFI_FV_EXT_HEADER_FILE_NAME     "EFI_FV_EXT_HEADER_FILE_NAME"
+
+
+//
 // VTF (Firmware Volume Top File) signatures
 //
 #define IA32_X64_VTF_SIGNATURE_OFFSET    0x14
@@ -229,6 +234,7 @@ typedef struct {
   BOOLEAN                 FvFileSystemGuidSet;
   EFI_GUID                FvNameGuid;
   BOOLEAN                 FvNameGuidSet;
+  CHAR8                   FvExtHeaderFile[_MAX_PATH];
   UINTN                   Size;
   EFI_FVB_ATTRIBUTES      FvAttributes;
   CHAR8                   FvName[_MAX_PATH];

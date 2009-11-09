@@ -18,6 +18,8 @@ import re
 import Common.EdkLogger as EdkLogger
 from Common.BuildToolError import *
 from UniClassObject import *
+from StringIO import StringIO
+from struct import pack
 
 ##
 # Static definitions
@@ -60,6 +62,7 @@ OFFSET = 'offset'
 STRING = 'string'
 TO = 'to'
 STRING_TOKEN = re.compile('STRING_TOKEN *\(([A-Z0-9_]+) *\)', re.MULTILINE | re.UNICODE)
+COMPATIBLE_STRING_TOKEN = re.compile('STRING_TOKEN *\(([A-Za-z0-9_]+) *\)', re.MULTILINE | re.UNICODE)
 
 EFI_HII_ARRAY_SIZE_LENGTH = 4
 EFI_HII_PACKAGE_HEADER_LENGTH = 4
@@ -151,12 +154,14 @@ def CreateHFileHeader(BaseName):
 #
 # Create content of .h file
 #
-# @param BaseName:       The basename of strings
-# @param UniObjectClass: A UniObjectClass instance
+# @param BaseName:        The basename of strings
+# @param UniObjectClass   A UniObjectClass instance
+# @param IsCompatibleMode Compatible mode
+# @param UniGenCFlag      UniString is generated into AutoGen C file when it is set to True
 #
 # @retval Str:           A string of .h file content
 #
-def CreateHFileContent(BaseName, UniObjectClass):
+def CreateHFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniGenCFlag):
     Str = ''
     ValueStartPtr = 60
     Line = COMMENT_DEFINE_STR + ' ' + LANGUAGE_NAME_STRING_NAME + ' ' * (ValueStartPtr - len(DEFINE_STR + LANGUAGE_NAME_STRING_NAME)) + DecToHexStr(0, 4) + COMMENT_NOT_REFERENCED
@@ -182,21 +187,24 @@ def CreateHFileContent(BaseName, UniObjectClass):
                     Line = COMMENT_DEFINE_STR + ' ' + Name + ' ' * (ValueStartPtr - len(DEFINE_STR + Name)) + DecToHexStr(Token, 4) + COMMENT_NOT_REFERENCED
             Str = WriteLine(Str, Line)
 
-    Str =  WriteLine(Str, '')
-    Str = WriteLine(Str, 'extern unsigned char ' + BaseName + 'Strings[];')
+    Str = WriteLine(Str, '')
+    if IsCompatibleMode or UniGenCFlag:
+        Str = WriteLine(Str, 'extern unsigned char ' + BaseName + 'Strings[];')
     return Str
 
 ## Create a complete .h file
 #
 # Create a complet .h file with file header and file content
 #
-# @param BaseName:       The basename of strings
-# @param UniObjectClass: A UniObjectClass instance
+# @param BaseName:        The basename of strings
+# @param UniObjectClass   A UniObjectClass instance
+# @param IsCompatibleMode Compatible mode
+# @param UniGenCFlag      UniString is generated into AutoGen C file when it is set to True
 #
 # @retval Str:           A string of complete .h file
 #
-def CreateHFile(BaseName, UniObjectClass):
-    HFile = WriteLine('', CreateHFileContent(BaseName, UniObjectClass))
+def CreateHFile(BaseName, UniObjectClass, IsCompatibleMode, UniGenCFlag):
+    HFile = WriteLine('', CreateHFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniGenCFlag))
 
     return HFile
 
@@ -212,6 +220,15 @@ def CreateCFileHeader():
         Str = WriteLine(Str, Item)
 
     return Str
+
+## Create a buffer to store all items in an array
+#
+# @param BinBuffer   Buffer to contain Binary data.
+# @param Array:      The array need to be formatted
+#
+def CreateBinBuffer(BinBuffer, Array):
+    for Item in Array:
+        BinBuffer.write(pack("B", int(Item,16)))
 
 ## Create a formatted string all items in an array
 #
@@ -260,12 +277,14 @@ def CreateCFileStringValue(Value):
 #
 # Create content of .c file
 #
-# @param BaseName:       The basename of strings
-# @param UniObjectClass: A UniObjectClass instance
+# @param BaseName:        The basename of strings
+# @param UniObjectClass   A UniObjectClass instance
+# @param IsCompatibleMode Compatible mode
+# @param UniBinBuffer     UniBinBuffer to contain UniBinary data.
 #
 # @retval Str:           A string of .c file content
 #
-def CreateCFileContent(BaseName, UniObjectClass, IsCompatibleMode):
+def CreateCFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniBinBuffer=None):
     #
     # Init array length
     #
@@ -280,9 +299,10 @@ def CreateCFileContent(BaseName, UniObjectClass, IsCompatibleMode):
         Language = UniObjectClass.LanguageDef[IndexI][0]
         LangPrintName = UniObjectClass.LanguageDef[IndexI][1]
 
+        StringBuffer = StringIO()
         StrStringValue = ''
         ArrayLength = 0
-        NumberOfUseOhterLangDef = 0
+        NumberOfUseOtherLangDef = 0
         Index = 0
         for IndexJ in range(1, len(UniObjectClass.OrderedStringList[UniObjectClass.LanguageDef[IndexI][0]])):
             Item = UniObjectClass.FindByToken(IndexJ, Language)
@@ -294,18 +314,19 @@ def CreateCFileContent(BaseName, UniObjectClass, IsCompatibleMode):
             UseOtherLangDef = Item.UseOtherLangDef
 
             if UseOtherLangDef != '' and Referenced:
-                NumberOfUseOhterLangDef = NumberOfUseOhterLangDef + 1
+                NumberOfUseOtherLangDef = NumberOfUseOtherLangDef + 1
                 Index = Index + 1
             else:
-                if NumberOfUseOhterLangDef > 0:
-                    StrStringValue = WriteLine(StrStringValue, CreateArrayItem([StringSkipType] + DecToHexList(NumberOfUseOhterLangDef, 4)))
-                    NumberOfUseOhterLangDef = 0
+                if NumberOfUseOtherLangDef > 0:
+                    StrStringValue = WriteLine(StrStringValue, CreateArrayItem([StringSkipType] + DecToHexList(NumberOfUseOtherLangDef, 4)))
+                    CreateBinBuffer (StringBuffer, ([StringSkipType] + DecToHexList(NumberOfUseOtherLangDef, 4)))
+                    NumberOfUseOtherLangDef = 0
                     ArrayLength = ArrayLength + 3
                 if Referenced and Item.Token > 0:
                     Index = Index + 1
                     StrStringValue = WriteLine(StrStringValue, "// %s: %s:%s" % (DecToHexStr(Index, 4), Name, DecToHexStr(Token, 4)))
                     StrStringValue = Write(StrStringValue, CreateCFileStringValue(Value))
-                    Offset = Offset + Length
+                    CreateBinBuffer (StringBuffer, [StringBlockType] + Value)
                     ArrayLength = ArrayLength + Item.Length + 1 # 1 is for the length of string type
 
         #
@@ -340,6 +361,15 @@ def CreateCFileContent(BaseName, UniObjectClass, IsCompatibleMode):
         # Add an EFI_HII_SIBT_END at last
         #
         Str = WriteLine(Str, '  ' + EFI_HII_SIBT_END + ",")
+        
+        #
+        # Create binary UNI string
+        #
+        if UniBinBuffer:
+            CreateBinBuffer (UniBinBuffer, List)
+            UniBinBuffer.write (StringBuffer.getvalue())
+            UniBinBuffer.write (pack("B", int(EFI_HII_SIBT_END,16)))
+        StringBuffer.close()
 
     #
     # Create line for string variable name
@@ -347,19 +377,18 @@ def CreateCFileContent(BaseName, UniObjectClass, IsCompatibleMode):
     #
     AllStr = WriteLine('', CHAR_ARRAY_DEFIN + ' ' + BaseName + COMMON_FILE_NAME + '[] = {\n' )
 
-    #
-    # Create FRAMEWORK_EFI_HII_PACK_HEADER in compatible mode
-    #
     if IsCompatibleMode:
+        #
+        # Create FRAMEWORK_EFI_HII_PACK_HEADER in compatible mode
+        #
         AllStr = WriteLine(AllStr, '// FRAMEWORK PACKAGE HEADER Length')
         AllStr = WriteLine(AllStr, CreateArrayItem(DecToHexList(TotalLength + 2)) + '\n')
         AllStr = WriteLine(AllStr, '// FRAMEWORK PACKAGE HEADER Type')
         AllStr = WriteLine(AllStr, CreateArrayItem(DecToHexList(2, 4)) + '\n')
-
-    #
-    # Create whole array length in UEFI mode
-    #
-    if not IsCompatibleMode:
+    else:
+        #
+        # Create whole array length in UEFI mode
+        #
         AllStr = WriteLine(AllStr, '// STRGATHER_OUTPUT_HEADER')
         AllStr = WriteLine(AllStr, CreateArrayItem(DecToHexList(TotalLength)) + '\n')
 
@@ -384,8 +413,9 @@ def CreateCFileEnd():
 #
 # Create a complete .c file
 #
-# @param BaseName:       The basename of strings
-# @param UniObjectClass: A UniObjectClass instance
+# @param BaseName:        The basename of strings
+# @param UniObjectClass   A UniObjectClass instance
+# @param IsCompatibleMode Compatible Mode
 #
 # @retval CFile:         A string of complete .c file
 #
@@ -447,10 +477,11 @@ def GetFileList(SourceFileList, IncludeList, SkipList):
 #
 # @param UniObjectClass:  Input UniObjectClass
 # @param FileList:        Search path list
+# @param IsCompatibleMode Compatible Mode
 #
 # @retval UniObjectClass: UniObjectClass after searched
 #
-def SearchString(UniObjectClass, FileList):
+def SearchString(UniObjectClass, FileList, IsCompatibleMode):
     if FileList == []:
         return UniObjectClass
 
@@ -458,7 +489,10 @@ def SearchString(UniObjectClass, FileList):
         if os.path.isfile(File):
             Lines = open(File, 'r')
             for Line in Lines:
-                StringTokenList = STRING_TOKEN.findall(Line)
+                if not IsCompatibleMode:
+                    StringTokenList = STRING_TOKEN.findall(Line)
+                else:
+                    StringTokenList = COMPATIBLE_STRING_TOKEN.findall(Line)
                 for StrName in StringTokenList:
                     EdkLogger.debug(EdkLogger.DEBUG_5, "Found string identifier: " + StrName)
                     UniObjectClass.SetStringReferenced(StrName)
@@ -472,7 +506,7 @@ def SearchString(UniObjectClass, FileList):
 # This function is used for UEFI2.1 spec
 #
 #
-def GetStringFiles(UniFilList, SourceFileList, IncludeList, SkipList, BaseName, IsCompatibleMode = False, ShellMode = False):
+def GetStringFiles(UniFilList, SourceFileList, IncludeList, SkipList, BaseName, IsCompatibleMode = False, ShellMode = False, UniGenCFlag = True, UniGenBinBuffer = None):
     Status = True
     ErrorMessage = ''
 
@@ -489,10 +523,14 @@ def GetStringFiles(UniFilList, SourceFileList, IncludeList, SkipList, BaseName, 
 
     FileList = GetFileList(SourceFileList, IncludeList, SkipList)
 
-    Uni = SearchString(Uni, FileList)
+    Uni = SearchString(Uni, FileList, IsCompatibleMode)
 
-    HFile = CreateHFile(BaseName, Uni)
-    CFile = CreateCFile(BaseName, Uni, IsCompatibleMode)
+    HFile = CreateHFile(BaseName, Uni, IsCompatibleMode, UniGenCFlag)
+    CFile = None
+    if IsCompatibleMode or UniGenCFlag:
+        CFile = CreateCFile(BaseName, Uni, IsCompatibleMode)
+    if UniGenBinBuffer:
+        CreateCFileContent(BaseName, Uni, IsCompatibleMode, UniGenBinBuffer)
 
     return HFile, CFile
 

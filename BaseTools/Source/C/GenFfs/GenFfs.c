@@ -134,6 +134,8 @@ Returns:
                         EFI_FV_FILETYPE_PEI_CORE, EFI_FV_FILETYPE_DXE_CORE,\n\
                         EFI_FV_FILETYPE_DRIVER, EFI_FV_FILETYPE_APPLICATION,\n\
                         EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER,\n\
+                        EFI_FV_FILETYPE_SMM, EFI_FV_FILETYPE_SMM_CORE,\n\
+                        EFI_FV_FILETYPE_COMBINED_SMM_DXE, \n\
                         EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE.\n");
   fprintf (stdout, "  -g FileGuid, --fileguid FileGuid\n\
                         FileGuid is one module guid.\n\

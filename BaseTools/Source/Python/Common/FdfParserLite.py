@@ -2408,7 +2408,7 @@ class FdfParser(object):
                 
             Obj.SectionList.append(FvImageSectionObj) 
            
-        elif self.__IsKeyword("PEI_DEPEX_EXP") or self.__IsKeyword("DXE_DEPEX_EXP"):
+        elif self.__IsKeyword("PEI_DEPEX_EXP") or self.__IsKeyword("DXE_DEPEX_EXP") or self.__IsKeyword("SMM_DEPEX_EXP"):
             DepexSectionObj = CommonDataClass.FdfClass.DepexSectionClassObject()
             DepexSectionObj.Alignment = AlignValue
             DepexSectionObj.DepexType = self.__Token
@@ -2798,7 +2798,7 @@ class FdfParser(object):
                              "DXE_SMM_DRIVER", "DXE_RUNTIME_DRIVER", \
                              "UEFI_DRIVER", "UEFI_APPLICATION", "USER_DEFINED", "DEFAULT", "BASE", \
                              "SECURITY_CORE", "COMBINED_PEIM_DRIVER", "PIC_PEIM", "RELOCATABLE_PEIM", \
-                             "PE32_PEIM", "BS_DRIVER", "RT_DRIVER", "SAL_RT_DRIVER", "APPLICATION", "ACPITABLE", "SMM_DRIVER", "SMM_CORE"):
+                             "PE32_PEIM", "BS_DRIVER", "RT_DRIVER", "SAL_RT_DRIVER", "APPLICATION", "ACPITABLE", "SMM_CORE"):
             raise Warning("Unknown Module type At line ", self.FileName, self.CurrentLineNumber)
         return self.__Token
     
@@ -2842,7 +2842,7 @@ class FdfParser(object):
         
         Type = self.__Token.strip().upper()
         if Type not in ("RAW", "FREEFORM", "SEC", "PEI_CORE", "PEIM",\
-                             "PEI_DXE_COMBO", "DRIVER", "DXE_CORE", "APPLICATION", "FV_IMAGE", "SMM_DXE_COMBO", "SMM", "SMM_CORE"):
+                             "PEI_DXE_COMBO", "DRIVER", "DXE_CORE", "APPLICATION", "FV_IMAGE", "SMM", "SMM_CORE"):
             raise Warning("Unknown FV type At line ", self.FileName, self.CurrentLineNumber)
 
         if not self.__IsToken("="):
@@ -3221,8 +3221,8 @@ class FdfParser(object):
         elif SectionType == "RAW":
             if FileType not in ("BIN", "SEC_BIN", "RAW", "ASL", "ACPI"):
                 raise Warning("Incorrect section file type At Line ", self.FileName, self.CurrentLineNumber)
-        elif SectionType == "DXE_DEPEX":
-            if FileType not in ("DXE_DEPEX", "SEC_DXE_DEPEX"):
+        elif SectionType == "DXE_DEPEX" or SectionType == "SMM_DEPEX":
+            if FileType not in ("DXE_DEPEX", "SEC_DXE_DEPEX", "SMM_DEPEX"):
                 raise Warning("Incorrect section file type At Line ", self.FileName, self.CurrentLineNumber)
         elif SectionType == "UI":
             if FileType not in ("UI", "SEC_UI"):

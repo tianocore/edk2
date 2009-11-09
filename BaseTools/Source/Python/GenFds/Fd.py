@@ -65,6 +65,33 @@ class FD(FDClassObject):
         GenFdsGlobalVariable.VerboseLogger('################### Gen VTF ####################')
         self.GenVtfFile()
 
+        TempFdBuffer = StringIO.StringIO('')
+        PreviousRegionStart = -1
+        PreviousRegionSize = 1
+        
+        for RegionObj in self.RegionList :
+            if RegionObj.RegionType == 'CAPSULE':
+              continue
+            if RegionObj.Offset + RegionObj.Size <= PreviousRegionStart:
+              pass
+            elif RegionObj.Offset <= PreviousRegionStart or (RegionObj.Offset >=PreviousRegionStart and RegionObj.Offset < PreviousRegionStart + PreviousRegionSize):
+              pass
+            elif RegionObj.Offset > PreviousRegionStart + PreviousRegionSize:
+                GenFdsGlobalVariable.InfLogger('Padding region starting from offset 0x%X, with size 0x%X' %(PreviousRegionStart + PreviousRegionSize, RegionObj.Offset - (PreviousRegionStart + PreviousRegionSize)))
+                PadRegion = Region.Region()
+                PadRegion.Offset = PreviousRegionStart + PreviousRegionSize
+                PadRegion.Size = RegionObj.Offset - PadRegion.Offset
+                PadRegion.AddToBuffer(TempFdBuffer, self.BaseAddress, self.BlockSizeList, self.ErasePolarity, GenFds.ImageBinDict, self.vtfRawDict, self.DefineVarDict)
+            PreviousRegionStart = RegionObj.Offset
+            PreviousRegionSize = RegionObj.Size
+            #
+            # Call each region's AddToBuffer function
+            #
+            if PreviousRegionSize > self.Size:
+              pass
+            GenFdsGlobalVariable.VerboseLogger('Call each region\'s AddToBuffer function')
+            RegionObj.AddToBuffer (TempFdBuffer, self.BaseAddress, self.BlockSizeList, self.ErasePolarity, GenFds.ImageBinDict, self.vtfRawDict, self.DefineVarDict)
+        
         FdBuffer = StringIO.StringIO('')
         PreviousRegionStart = -1
         PreviousRegionSize = 1

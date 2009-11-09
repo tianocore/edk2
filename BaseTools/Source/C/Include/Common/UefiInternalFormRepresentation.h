@@ -3,7 +3,7 @@
   IFR is primarily consumed by the EFI presentation engine, and produced by EFI
   internal application and drivers as well as all add-in card option-ROM drivers
 
-  Copyright (c) 2006 - 2008, Intel Corporation  All rights reserved.
+  Copyright (c) 2006 - 2009, Intel Corporation  All rights reserved.
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -268,8 +268,8 @@ typedef struct _EFI_HII_GUID_PACKAGE_HDR {
 // String Package
 //
 
-#define UEFI_CONFIG_LANG  L"x-UEFI"
-#define UEFI_CONFIG_LANG2 L"x-i-UEFI"     // BUGBUG, spec need to be updated.
+#define UEFI_CONFIG_LANG  "x-UEFI"
+#define UEFI_CONFIG_LANG2 "x-i-UEFI"
 
 typedef struct _EFI_HII_STRING_PACKAGE_HDR {
   EFI_HII_PACKAGE_HEADER  Header;
@@ -1034,12 +1034,12 @@ typedef struct _EFI_IFR_EQ_ID_VAL {
   UINT16                   Value;
 } EFI_IFR_EQ_ID_VAL;
 
-typedef struct _EFI_IFR_EQ_ID_LIST {
+typedef struct _EFI_IFR_EQ_ID_VAL_LIST {
   EFI_IFR_OP_HEADER        Header;
   EFI_QUESTION_ID          QuestionId;
   UINT16                   ListLength;
   UINT16                   ValueList[1];
-} EFI_IFR_EQ_ID_LIST;
+} EFI_IFR_EQ_ID_VAL_LIST;
 
 typedef struct _EFI_IFR_QUESTION_REF1 {
   EFI_IFR_OP_HEADER        Header;

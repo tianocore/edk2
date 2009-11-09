@@ -1267,7 +1267,7 @@ Returns:
   //
   // Update the SYM file for this component based on it's start address.
   //
-  Status = UpdateSymFile (CompStartAddress, SymFileName, VtfInfo->CompSymName);
+  Status = UpdateSymFile (CompStartAddress, SymFileName, VtfInfo->CompSymName, FileSize);
   if (EFI_ERROR (Status)) {
 
     //
@@ -1406,7 +1406,7 @@ Returns:
   //
   // Update the SYM file for this component based on it's start address.
   //
-  Status = UpdateSymFile (PalStartAddress, SymFileName, VtfInfo->CompSymName);
+  Status = UpdateSymFile (PalStartAddress, SymFileName, VtfInfo->CompSymName, FileSize);
   if (EFI_ERROR (Status)) {
 
     //
@@ -1688,7 +1688,7 @@ Returns:
   FileHeader->IntegrityCheck.Checksum.File    = 0;
   FileHeader->State                           = 0;
   FileHeader->IntegrityCheck.Checksum.Header  = CalculateChecksum8 ((UINT8 *) FileHeader, sizeof (EFI_FFS_FILE_HEADER));
-  FileHeader->IntegrityCheck.Checksum.File    = CalculateChecksum8 ((UINT8 *) FileHeader, TotalVtfSize);
+  FileHeader->IntegrityCheck.Checksum.File    = CalculateChecksum8 ((UINT8 *) (FileHeader + 1), TotalVtfSize - sizeof (EFI_FFS_FILE_HEADER));
   FileHeader->State                           = EFI_FILE_HEADER_CONSTRUCTION | EFI_FILE_HEADER_VALID | EFI_FILE_DATA_VALID;
 
   return EFI_SUCCESS;
@@ -2153,7 +2153,9 @@ EFI_STATUS
 UpdateSymFile (
   IN UINT64 BaseAddress,
   IN CHAR8  *DestFileName,
-  IN CHAR8  *SourceFileName
+  IN CHAR8  *SourceFileName,
+  IN UINT64 FileSize
+
   )
 /*++
 
@@ -2167,6 +2169,7 @@ Arguments:
   BaseAddress    - The base address for the new SYM tokens.
   DestFileName   - The destination file.
   SourceFileName - The source file.
+  FileSize       - Size of bin file.
 
 Returns:
 
@@ -2185,7 +2188,7 @@ Returns:
   CHAR8   Token[_MAX_PATH];
   CHAR8   BaseToken[_MAX_PATH];
   UINT64  TokenAddress;
-  long      StartLocation;
+  long    StartLocation;
 
   //
   // Verify input parameters.
@@ -2275,13 +2278,20 @@ Returns:
       // Get the token address
       //
       AsciiStringToUint64 (Address, TRUE, &TokenAddress);
+      if (TokenAddress > FileSize) {
+        //
+        // Symbol offset larger than FileSize. This Symbol can't be in Bin file. Don't print them.
+        //
+        break;
+      }
 
       //
       // Add the base address, the size of the FFS file header and the size of the peim header.
       //
       TokenAddress += BaseAddress &~IPF_CACHE_BIT;
 
-      fprintf (DestFile, "%s | %016llX | %s | %s%s\n", Type, (unsigned long long) TokenAddress, Section, BaseToken, Token);
+      fprintf (DestFile, "%s | %016llX | ", Type, (unsigned long long) TokenAddress);
+      fprintf (DestFile, "%s | %s\n    %s\n", Section, Token, BaseToken); 
     }
   }
 

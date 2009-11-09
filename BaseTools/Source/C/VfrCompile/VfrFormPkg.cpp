@@ -2,7 +2,7 @@
   
   The definition of CFormPkg's member function
 
-Copyright (c) 2004 - 2008, Intel Corporation                                                         
+Copyright (c) 2004 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -1228,7 +1228,7 @@ static struct {
   { sizeof (EFI_IFR_INCONSISTENT_IF), 1 },     // EFI_IFR_INCONSISTENT_IF_OP
   { sizeof (EFI_IFR_EQ_ID_VAL), 0 },           // EFI_IFR_EQ_ID_VAL_OP
   { sizeof (EFI_IFR_EQ_ID_ID), 0 },            // EFI_IFR_EQ_ID_ID_OP
-  { sizeof (EFI_IFR_EQ_ID_LIST), 0 },          // EFI_IFR_EQ_ID_LIST_OP - 0x14
+  { sizeof (EFI_IFR_EQ_ID_VAL_LIST), 0 },      // EFI_IFR_EQ_ID_LIST_OP - 0x14
   { sizeof (EFI_IFR_AND), 0 },                 // EFI_IFR_AND_OP
   { sizeof (EFI_IFR_OR), 0 },                  // EFI_IFR_OR_OP
   { sizeof (EFI_IFR_NOT), 0 },                 // EFI_IFR_NOT_OP

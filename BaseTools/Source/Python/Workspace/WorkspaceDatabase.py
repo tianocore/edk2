@@ -1111,7 +1111,7 @@ class InfBuildData(ModuleBuildClassObject):
         "BS_DRIVER"             :   "DXE_DRIVER",
         "RT_DRIVER"             :   "DXE_RUNTIME_DRIVER",
         "SAL_RT_DRIVER"         :   "DXE_SAL_DRIVER",
-        "SMM_DRIVER"            :   "SMM_DRIVER",
+    #    "SMM_DRIVER"            :   "DXE_SMM_DRIVER",
     #    "BS_DRIVER"             :   "DXE_SMM_DRIVER",
     #    "BS_DRIVER"             :   "UEFI_DRIVER",
         "APPLICATION"           :   "UEFI_APPLICATION",
@@ -1198,6 +1198,7 @@ class InfBuildData(ModuleBuildClassObject):
         self._Pcds                  = None
         self._BuildOptions          = None
         self._Depex                 = None
+        self._DepexExpression       = None
         #self._SourceOverridePath    = None
 
     ## Get architecture
@@ -1317,9 +1318,15 @@ class InfBuildData(ModuleBuildClassObject):
             if not self._ModuleType:
                 EdkLogger.error("build", ATTRIBUTE_NOT_AVAILABLE,
                                 "MODULE_TYPE is not given", File=self.MetaFile)
+            if (self._Specification == None) or (not 'PI_SPECIFICATION_VERSION' in self._Specification) or (self._Specification['PI_SPECIFICATION_VERSION'] < 0x0001000A):
+                if self._ModuleType == SUP_MODULE_SMM_CORE:
+                    EdkLogger.error("build", FORMAT_NOT_SUPPORTED, "SMM_CORE module type can't be used in the module with PI_SPECIFICATION_VERSION less than 0x0001000A", File=self.MetaFile)                
             if self._Defs and 'PCI_DEVICE_ID' in self._Defs and 'PCI_VENDOR_ID' in self._Defs \
                and 'PCI_CLASS_CODE' in self._Defs:
                 self._BuildType = 'UEFI_OPTIONROM'
+            elif self._Defs and 'UEFI_HII_RESOURCE_SECTION' in self._Defs \
+               and self._Defs['UEFI_HII_RESOURCE_SECTION'] == 'TRUE':
+                self._BuildType = 'UEFI_HII'
             else:
                 self._BuildType = self._ModuleType.upper()
         else:
@@ -1824,6 +1831,25 @@ class InfBuildData(ModuleBuildClassObject):
                 self._Depex[Arch, ModuleType] = Depex[Arch, ModuleType]
         return self._Depex
 
+    ## Retrieve depedency expression
+    def _GetDepexExpression(self):
+        if self._DepexExpression == None:
+            self._DepexExpression = tdict(False, 2)
+            RecordList = self._RawData[MODEL_EFI_DEPEX, self._Arch]
+            DepexExpression = {}
+            for Record in RecordList:
+                Record = ReplaceMacros(Record, GlobalData.gEdkGlobal, False)
+                Arch = Record[3]
+                ModuleType = Record[4]
+                TokenList = Record[0].split()
+                if (Arch, ModuleType) not in DepexExpression:
+                    DepexExpression[Arch, ModuleType] = ''
+                for Token in TokenList:
+                    DepexExpression[Arch, ModuleType] = DepexExpression[Arch, ModuleType] + Token.strip() + ' '
+            for Arch, ModuleType in DepexExpression:
+                self._DepexExpression[Arch, ModuleType] = DepexExpression[Arch, ModuleType]
+        return self._DepexExpression
+
     ## Retrieve PCD for given type
     def _GetPcd(self, Type):
         Pcds = {}
@@ -1889,6 +1915,7 @@ class InfBuildData(ModuleBuildClassObject):
                     Pcd.TokenValue = PcdInPackage.TokenValue
                     Pcd.DatumType = PcdInPackage.DatumType
                     Pcd.MaxDatumSize = PcdInPackage.MaxDatumSize
+                    Pcd.InfDefaultValue = Pcd.DefaultValue
                     if Pcd.DefaultValue in [None, '']:
                         Pcd.DefaultValue = PcdInPackage.DefaultValue
                     break
@@ -1936,6 +1963,7 @@ class InfBuildData(ModuleBuildClassObject):
     Pcds                    = property(_GetPcds)
     BuildOptions            = property(_GetBuildOptions)
     Depex                   = property(_GetDepex)
+    DepexExpression         = property(_GetDepexExpression)
 
 ## Database
 #
