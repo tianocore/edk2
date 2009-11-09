@@ -1,7 +1,7 @@
 /** @file
   This file provides control over block-oriented firmware devices.
 
-  Copyright (c) 2006 - 2008, Intel Corporation                                                         
+  Copyright (c) 2006 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -18,10 +18,12 @@
 #ifndef __FRAMEWORK_FIRMWARE_VOLUME_BLOCK_H__
 #define __FRAMEWORK_FIRMWARE_VOLUME_BLOCK_H__
 
+#define FRAMEWORK_EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL_GUID \
+{ 0xDE28BC59, 0x6228, 0x41BD, {0xBD, 0xF6, 0xA3, 0xB9, 0xAD,0xB5, 0x8D, 0xA1 } }
 
 typedef struct _FRAMEWORK_EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL FRAMEWORK_EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL;
 ///
-/// type of EFI FVB attribute per Frameowrk spec
+/// type of EFI FVB attribute per Framework spec
 /// 
 typedef UINT32  EFI_FVB_ATTRIBUTES;
 
@@ -346,6 +348,6 @@ struct _FRAMEWORK_EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL {
   EFI_HANDLE                    ParentHandle;
 };
 
-
+extern EFI_GUID gFramerworkEfiFirmwareVolumeBlockProtocolGuid;
 
 #endif
