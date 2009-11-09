@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation                                                         
+Copyright (c) 2004 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -28,9 +28,14 @@ Abstract:
 
 #include "EfiFirmwareVolumeHeader.h"
 
+//
+// The following GUID value has been changed to EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL_GUID in
+// PI 1.2 spec on purpose. This will force all platforms built with EdkCompatibilityPkg
+// produce FVB 2 protocol.
+//
 #define EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL_GUID \
   { \
-    0xDE28BC59, 0x6228, 0x41BD, {0xBD, 0xF6, 0xA3, 0xB9, 0xAD, 0xB5, 0x8D, 0xA1} \
+    0x8f644fa9, 0xe850, 0x4db1, {0x9c, 0xe2, 0xb, 0x44, 0x69, 0x8e, 0x8d, 0xa4 } \
   }
 
 EFI_FORWARD_DECLARATION (EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL);
