@@ -33,6 +33,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   ShellPkg/ShellPkg.dec
 
 [LibraryClasses]
@@ -45,6 +46,7 @@
   FileHandleLib
   PrintLib
   UefiLib
+  HiiLib
 
 [Protocols]
   gEfiSimpleFileSystemProtocolGuid              # ALWAYS_CONSUMED
