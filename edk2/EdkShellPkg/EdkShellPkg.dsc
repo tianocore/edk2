@@ -21,7 +21,7 @@
   PLATFORM_VERSION               = 1.04
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/EdkShellPkg
-  SUPPORTED_ARCHITECTURES        = IA32|IPF|X64
+  SUPPORTED_ARCHITECTURES        = IA32|IPF|X64|ARM
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
 # 
@@ -32,6 +32,9 @@
 #
 DEFINE EDK_SHELL_DIR             = Shell  # when "Shell" directory is directly under $(WORKSPACE) 
 
+define MSFT_MACRO                = /D EFI_SPECIFICATION_VERSION=0x0002000A /D PI_SPECIFICATION_VERSION=0x00009000 /D TIANO_RELEASE_VERSION=0x00080006 /D PCD_EDKII_GLUE_PciExpressBaseAddress=0xE0000000 /D EFI_DEBUG
+define INTEL_MACRO               = /D EFI_SPECIFICATION_VERSION=0x0002000A /D PI_SPECIFICATION_VERSION=0x00009000 /D TIANO_RELEASE_VERSION=0x00080006 /D PCD_EDKII_GLUE_PciExpressBaseAddress=0xE0000000 /D EFI_DEBUG
+define GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x0002000A -DPI_SPECIFICATION_VERSION=0x00009000 -DTIANO_RELEASE_VERSION=0x00080006 -DPCD_EDKII_GLUE_PciExpressBaseAddress=0xE0000000 -DEFI_DEBUG -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings -DSTRING_DEFINES_FILE=\"$(BASE_NAME)StrDefs.h\" 
 
 
 [Libraries]
@@ -41,9 +44,7 @@ DEFINE EDK_SHELL_DIR             = Shell  # when "Shell" directory is directly u
   EdkCompatibilityPkg/Foundation/Efi/Guid/EfiGuidLib.inf
   EdkCompatibilityPkg/Foundation/Framework/Guid/EdkFrameworkGuidLib.inf
   EdkCompatibilityPkg/Foundation/Guid/EdkGuidLib.inf
-  EdkCompatibilityPkg/Foundation/Library/EfiCommonLib/EfiCommonLib.inf
-  EdkCompatibilityPkg/Foundation/Cpu/Pentium/CpuIA32Lib/CpuIA32Lib.inf
-  EdkCompatibilityPkg/Foundation/Cpu/Itanium/CpuIa64Lib/CpuIA64Lib.inf
+  EdkCompatibilityPkg/Foundation/Library/EfiCommonLib/EfiCommonLib_Edk2.inf
   EdkCompatibilityPkg/Foundation/Library/CustomizedDecompress/CustomizedDecompress.inf
   EdkCompatibilityPkg/Foundation/Library/Dxe/Hob/HobLib.inf
   #
@@ -81,6 +82,13 @@ DEFINE EDK_SHELL_DIR             = Shell  # when "Shell" directory is directly u
 [Libraries.IA32, Libraries.X64]
   EdkCompatibilityPkg/Foundation/Library/CompilerStub/CompilerStubLib.inf
 
+[Libraries.IA32]
+  EdkCompatibilityPkg/Foundation/Cpu/Pentium/CpuIA32Lib/CpuIA32Lib_Edk2.inf
+
+[Libraries.X64]
+  EdkCompatibilityPkg/Foundation/Cpu/Itanium/CpuIa64Lib/CpuIA64Lib.inf
+
+
 ###################################################################################################
 #
 # Components Section - list of the modules and components that will be processed by compilation
@@ -101,8 +109,35 @@ DEFINE EDK_SHELL_DIR             = Shell  # when "Shell" directory is directly u
 ###################################################################################################
 
 [Components]
-  $(EDK_SHELL_DIR)/Shell.inf
-  $(EDK_SHELL_DIR)/ShellFull.inf
+  $(EDK_SHELL_DIR)/Shell.inf {
+    <BuildOptions>
+      #
+      # Can not do this in nmake section of edk INF
+      #
+      GCC:*_*_*_CC_FLAGS     = -DEFI_MONOSHELL 
+      GCC:*_*_*_VFRPP_FLAGS  = -DEFI_MONOSHELL 
+      GCC:*_*_*_APP_FLAGS    = -DEFI_MONOSHELL 
+      GCC:*_*_*_PP_FLAGS     = -DEFI_MONOSHELL 
+
+      RVCT:*_*_ARM_CC_FLAGS     = -DEFI_MONOSHELL 
+      RVCT:*_*_ARM_VFRPP_FLAGS  = -DEFI_MONOSHELL
+      RVCT:*_*_ARM_APP_FLAGS    = -DEFI_MONOSHELL 
+      RVCT:*_*_ARM_PP_FLAGS     = -DEFI_MONOSHELL 
+  }
+  
+  $(EDK_SHELL_DIR)/ShellFull.inf {
+    <BuildOptions>
+      GCC:*_*_*_CC_FLAGS     = -DEFI_MONOSHELL -DEFI_FULLSHELL 
+      GCC:*_*_*_VFRPP_FLAGS  = -DEFI_MONOSHELL -DEFI_FULLSHELL
+      GCC:*_*_*_APP_FLAGS    = -DEFI_MONOSHELL -DEFI_FULLSHELL
+      GCC:*_*_*_PP_FLAGS     = -DEFI_MONOSHELL -DEFI_FULLSHELL
+
+      RVCT:*_*_ARM_CC_FLAGS     = -DEFI_MONOSHELL -DEFI_FULLSHELL 
+      RVCT:*_*_ARM_VFRPP_FLAGS  = -DEFI_MONOSHELL -DEFI_FULLSHELL
+      RVCT:*_*_ARM_APP_FLAGS    = -DEFI_MONOSHELL -DEFI_FULLSHELL
+      RVCT:*_*_ARM_PP_FLAGS     = -DEFI_MONOSHELL -DEFI_FULLSHELL
+  }
+  
   $(EDK_SHELL_DIR)/attrib/attrib.inf
   $(EDK_SHELL_DIR)/cls/cls.inf
   $(EDK_SHELL_DIR)/comp/comp.inf
@@ -192,5 +227,31 @@ DEFINE EDK_SHELL_DIR             = Shell  # when "Shell" directory is directly u
   INTEL:*_*_IPF_PP_FLAGS    = /D EFI_SPECIFICATION_VERSION=0x0002000A /D PI_SPECIFICATION_VERSION=0x00010000 /D TIANO_RELEASE_VERSION=0x00080006 /D EFI64
 
   INTEL:*_*_*_BUILD_FLAGS   = -s
+
+  GCC:*_*_IA32_CC_FLAGS     = -DEFI32 $(GCC_MACRO)
+  GCC:*_*_IA32_VFRPP_FLAGS  = -DEFI32 $(GCC_MACRO)
+  GCC:*_*_IA32_APP_FLAGS    = -DEFI32 $(GCC_MACRO)
+  GCC:*_*_IA32_PP_FLAGS     = -DEFI32 $(GCC_MACRO)
+
+  GCC:*_*_X64_CC_FLAGS     = -DEFIX64 $(GCC_MACRO)
+  GCC:*_*_X64_VFRPP_FLAGS  = -DEFIX64 $(GCC_MACRO)
+  GCC:*_*_X64_APP_FLAGS    = -DEFIX64 $(GCC_MACRO)
+  GCC:*_*_X64_PP_FLAGS     = -DEFIX64 $(GCC_MACRO)
+
+  GCC:*_*_IPF_CC_FLAGS     = -DEFI64 $(GCC_MACRO)
+  GCC:*_*_IPF_VFRPP_FLAGS  = -DEFI64 $(GCC_MACRO)
+  GCC:*_*_IPF_APP_FLAGS    = -DEFI64 $(GCC_MACRO)
+  GCC:*_*_IPF_PP_FLAGS     = -DEFI64 $(GCC_MACRO)
+  
+  GCC:*_*_ARM_CC_FLAGS     = -DEFIARM $(GCC_MACRO)
+  GCC:*_*_ARM_VFRPP_FLAGS  = -DEFIARM $(GCC_MACRO)
+  GCC:*_*_ARM_APP_FLAGS    = -DEFIARM $(GCC_MACRO)
+  GCC:*_*_ARM_PP_FLAGS     = -DEFIARM $(GCC_MACRO)
+
+  RVCT:*_*_ARM_CC_FLAGS     = -DEFIARM $(GCC_MACRO)
+  RVCT:*_*_ARM_VFRPP_FLAGS  = -DEFIARM $(GCC_MACRO)
+  RVCT:*_*_ARM_APP_FLAGS    = -DEFIARM $(GCC_MACRO)
+  RVCT:*_*_ARM_PP_FLAGS     = -DEFIARM $(GCC_MACRO)
+
 
 
