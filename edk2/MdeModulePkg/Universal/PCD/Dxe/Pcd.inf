@@ -318,7 +318,8 @@
 
 [Protocols]
   gPcdProtocolGuid                              ## PRODUCES
-
+  gEfiPcdProtocolGuid                           ## PRODUCES
+  
 [FixedPcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress
 
