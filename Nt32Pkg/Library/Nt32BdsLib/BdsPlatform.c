@@ -345,6 +345,11 @@ PlatformBdsPolicyBehavior (
     PlatformBdsConnectSequence ();
 
     //
+    // Perform user identification process
+    //
+    PlatformBdsUserIdentify ();
+    
+    //
     // Notes: current time out = 0 can not enter the
     // front page
     //
@@ -363,6 +368,10 @@ PlatformBdsPolicyBehavior (
     PlatformBdsConnectConsole (gPlatformConsole);
     PlatformBdsDiagnostics (EXTENSIVE, FALSE, BaseMemoryTest);
     BdsLibConnectAll ();
+    //
+    // Perform user identification process
+    //
+    PlatformBdsUserIdentify ();
     ProcessCapsules (BOOT_ON_FLASH_UPDATE);
     break;
 
@@ -374,6 +383,11 @@ PlatformBdsPolicyBehavior (
     PlatformBdsConnectConsole (gPlatformConsole);
     PlatformBdsDiagnostics (EXTENSIVE, FALSE, BaseMemoryTest);
 
+    //
+    // Perform user identification process
+    //
+    PlatformBdsUserIdentify ();
+    
     //
     // In recovery boot mode, we still enter to the
     // frong page now
@@ -403,6 +417,11 @@ PlatformBdsPolicyBehavior (
     //
     PlatformBdsConnectSequence ();
 
+    //
+    // Perform user identification process
+    //
+    PlatformBdsUserIdentify ();
+    
     //
     // Give one chance to enter the setup if we
     // have the time out
@@ -558,3 +577,49 @@ LockKeyboards (
 {
     return EFI_UNSUPPORTED;
 }
+
+
+EFI_STATUS
+PlatformBdsUserIdentify (
+  VOID
+  )
+/*++
+
+  Routine Description:
+
+  This function is to identify a valid user, if successed, handle the deferred images.
+
+  Arguments:
+
+  None.
+
+  Returns:
+
+  EFI_SUCCESS      - User successfully identified.
+
+--*/
+{
+  EFI_STATUS                          Status;
+  EFI_USER_MANAGER_PROTOCOL           *Manager;
+  EFI_USER_PROFILE_HANDLE             User;
+
+  //
+  // Locate user manager driver
+  //
+  Status = gBS->LocateProtocol (
+                  &gEfiUserManagerProtocolGuid,
+                  NULL,
+                  &Manager
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
+  //
+  // Identity user
+  //
+  Status = Manager->Identify (Manager, &User);
+  return Status;
+}
+
+

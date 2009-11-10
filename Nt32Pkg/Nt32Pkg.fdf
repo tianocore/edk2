@@ -226,6 +226,8 @@ INF  Nt32Pkg/WinNtGopDxe/WinNtGopDxe.inf
 INF  Nt32Pkg/WinNtSimpleFileSystemDxe/WinNtSimpleFileSystemDxe.inf
 INF  MdeModulePkg/Universal/PlatformDriOverrideDxe/PlatformDriOverrideDxe.inf
 INF  MdeModulePkg/Universal/DriverSampleDxe/DriverSampleDxe.inf
+INF  SecurityPkg/UserIdentification/UserIdentificationDxe/UserIdentityManager.inf
+INF  SecurityPkg/UserIdentification/UserManagerDxe/UserProfileManager.inf
 
 INF  MdeModulePkg/Universal/Network/DpcDxe/DpcDxe.inf
 INF  MdeModulePkg/Universal/Network/ArpDxe/ArpDxe.inf
