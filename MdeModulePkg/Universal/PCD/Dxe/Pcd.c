@@ -2,7 +2,7 @@
   PCD DXE driver manage all PCD entry initialized in PEI phase and DXE phase, and
   produce the implementation of PCD protocol.
 
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -66,6 +66,26 @@ PCD_PROTOCOL mPcdInstance = {
   DxePcdGetNextTokenSpace
 };
 
+EFI_PCD_PROTOCOL mEfiPcdInstance = {
+  DxePcdSetSku,
+  DxePcdGet8Ex,
+  DxePcdGet16Ex,
+  DxePcdGet32Ex,
+  DxePcdGet64Ex,
+  DxePcdGetPtrEx,
+  DxePcdGetBoolEx,
+  DxePcdGetSizeEx,
+  DxePcdSet8Ex,
+  DxePcdSet16Ex,
+  DxePcdSet32Ex,
+  DxePcdSet64Ex,
+  DxePcdSetPtrEx,
+  DxePcdSetBoolEx,
+  (EFI_PCD_PROTOCOL_CALLBACK_ON_SET) DxeRegisterCallBackOnSet,
+  (EFI_PCD_PROTOCOL_CANCEL_CALLBACK) DxeUnRegisterCallBackOnSet,
+  DxePcdGetNextToken,
+  DxePcdGetNextTokenSpace
+};
 
 //
 // Static global to reduce the code size
@@ -107,6 +127,19 @@ PcdDxeInit (
                   &mPcdInstance
                   );
 
+  
+  //
+  // Also install gEfiPcdProtocolGuid which is only support dynamic-ex type 
+  // PCD.
+  //
+  mNewHandle = NULL;
+  Status = gBS->InstallProtocolInterface (
+                  &mNewHandle,
+                  &gEfiPcdProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  &mEfiPcdInstance
+                  );
+                  
   ASSERT_EFI_ERROR (Status);
 
   return EFI_SUCCESS;

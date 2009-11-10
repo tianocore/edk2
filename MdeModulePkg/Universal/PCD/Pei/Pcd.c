@@ -1,7 +1,7 @@
 /** @file 
   All Pcd Ppi services are implemented here.
   
-Copyright (c) 2006 - 2008, Intel Corporation                                                         
+Copyright (c) 2006 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -53,10 +53,38 @@ PCD_PPI mPcdPpiInstance = {
   PeiPcdGetNextTokenSpace
 };
 
+EFI_PEI_PCD_PPI  mEfiPcdPpiInstance = {
+  PeiPcdSetSku,
+  
+  PeiPcdGet8Ex,
+  PeiPcdGet16Ex,
+  PeiPcdGet32Ex,
+  PeiPcdGet64Ex,
+  PeiPcdGetPtrEx,
+  PeiPcdGetBoolEx,
+  PeiPcdGetSizeEx,
+  PeiPcdSet8Ex,
+  PeiPcdSet16Ex,
+  PeiPcdSet32Ex,
+  PeiPcdSet64Ex,
+  PeiPcdSetPtrEx,
+  PeiPcdSetBoolEx,
+  (EFI_PEI_PCD_PPI_CALLBACK_ON_SET) PeiRegisterCallBackOnSet,
+  (EFI_PEI_PCD_PPI_CANCEL_CALLBACK) PcdUnRegisterCallBackOnSet,
+  PeiPcdGetNextToken,
+  PeiPcdGetNextTokenSpace
+};
+
 EFI_PEI_PPI_DESCRIPTOR  mPpiPCD = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gPcdPpiGuid,
   &mPcdPpiInstance
+};
+
+EFI_PEI_PPI_DESCRIPTOR  mEfiPpiPCD = {
+  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+  &gEfiPeiPcdPpiGuid,
+  &mEfiPcdPpiInstance
 };
 
 /**
