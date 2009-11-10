@@ -37,8 +37,6 @@ Abstract:
 
 #include <Protocol/WinNtThunk.h>
 #include <Protocol/WinNtIo.h>
-#include <Protocol/LoadedImage.h>
-#include <Protocol/UserManager.h>
 #include <Guid/WinNtSystemConfig.h>
 
 extern BDS_CONSOLE_CONNECT_ENTRY  gPlatformConsole[];
@@ -116,11 +114,6 @@ VOID
 PlatformBdsEnterFrontPage (
   IN UINT16                 TimeoutDefault,
   IN BOOLEAN                ConnectAllHappened
-  );
-
-EFI_STATUS
-PlatformBdsUserIdentify (
-  VOID
   );
 
 #endif // _BDS_PLATFORM_H
