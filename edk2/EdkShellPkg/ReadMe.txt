@@ -13,3 +13,10 @@ This is EDK style package and the following steps can help to build the package:
 3. The EDK II style DSC file is used to validate build EDK Shell source & EDK compatibility package and can generate     the binaries in EdkShellBinPkg.
    To use this file, execute the following command under workspace to build EDK Shell source:
    build -a IA32 -a X64 -a IPF -p EdkShellPkg\EdkShellPkg.dsc
+   
+4. If you need to compile for GCC or ARM you will need to apply ShellR33.patch.
+   cd $(WORKSPACE)/Shell and execute patch -p1 < $(WORKSPACE)/EdkShellPkg/ShellR33.patch.
+   If you are using a case sensative file system there are a few case bugs that patch 
+   would not fix. Just fix the case of the file to match its usage and you should be 
+   able to compile.
+   
