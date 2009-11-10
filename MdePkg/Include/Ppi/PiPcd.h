@@ -114,7 +114,7 @@ UINT32
   @return 64-bit value for a given PCD token.  
 **/
 typedef
-UINT32
+UINT64
 (EFIAPI *EFI_PEI_PCD_PPI_GET_EX_64)(
   IN CONST  EFI_GUID  *Guid,
   IN        UINTN     TokenNumber
@@ -285,7 +285,7 @@ EFI_STATUS
 (EFIAPI *EFI_PEI_PCD_PPI_SET_EX_POINTER)(
   IN CONST  EFI_GUID  *Guid,
   IN        UINTN     TokenNumber,
-  IN        UINTN     SizeOfValue,
+  IN OUT    UINTN     *SizeOfValue,
   IN        VOID      *Buffer
 );
 
