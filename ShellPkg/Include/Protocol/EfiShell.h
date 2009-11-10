@@ -1,5 +1,5 @@
 /** @file
-  EFI Shell protocol as defined in the UEFI Shell 2.0 specification.
+  EFI Shell protocol as defined in the UEFI Shell 2.0 specification including errata.
   
   Copyright (c) 2006 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
@@ -53,7 +53,7 @@ BOOLEAN
   flushed to the device, and the file is closed. In all cases, the handle is 
   closed.
 
-  @param FileHandle             The file handle to be closed
+  @param[in] FileHandle             The file handle to be closed
 
   @retval EFI_SUCCESS           the file closed sucessfully
 **/
@@ -77,10 +77,10 @@ EFI_STATUS
   shell environment variable with the specified name. If the shell environment variable
   already exists and is non-volatile then EFI_INVALID_PARAMETER is returned.
 
-  @param FileName           Pointer to null-terminated file path
-  @param FileAttribs        The new file's attrbiutes.  the different attributes are
+  @param[in] FileName       Pointer to null-terminated file path
+  @param[in] FileAttribs    The new file's attrbiutes.  the different attributes are
                             described in EFI_FILE_PROTOCOL.Open().
-  @param FileHandle         On return, points to the created file handle or directory's handle
+  @param[out] FileHandle    On return, points to the created file handle or directory's handle
 
   @retval EFI_SUCCESS       The file was opened.  FileHandle points to the new file's handle.
   @retval EFI_INVALID_PARAMETER One of the parameters has an invalid value.
@@ -114,7 +114,7 @@ EFI_STATUS
   cannot be deleted, the warning code EFI_WARN_DELETE_FAILURE is returned, but the
   handle is still closed.
 
-  @param FileHandle           The file handle to delete.
+  @param[in] FileHandle           The file handle to delete.
 
   @retval EFI_SUCCESS         The file was closed and deleted, and the handle was closed.
   @retval EFI_WARN_DELETE_FAILURE The handle was closed but the file was not deleted.
@@ -130,9 +130,9 @@ EFI_STATUS
 
   This function deletes a file.
 
-  @param FileName             Points to the null-terminated file name.
+  @param[in] FileName             Points to the null-terminated file name.
 
-  @retval EFI_SUCCESS         The file was closed and deleted, and the handle was closed.
+  @retval EFI_SUCCESS             The file was closed and deleted, and the handle was closed.
   @retval EFI_WARN_DELETE_FAILURE The handle was closed but the file was not deleted.
 **/
 typedef
@@ -173,22 +173,22 @@ VOID
   The CommandLine is executed from the current working directory on the current
   device.
 
-  @param ParentImageHandle  A handle of the image that is executing the specified 
-                            command line.  
-  @param CommandLine        Points to the null-terminated UCS-2 encoded string 
-                            containing the command line. If NULL then the command-
-                            line will be empty.
-  @param Environment        Points to a null-terminated array of environment 
-                            variables with the format 'x=y', where x is the 
-                            environment variable name and y is the value. If this
-                            is NULL, then the current shell environment is used.
-  @param ErrorCode          Points to the status code returned by the command.
+  @param[in] ParentImageHandle  A handle of the image that is executing the specified 
+                                command line.  
+  @param[in] CommandLine        Points to the null-terminated UCS-2 encoded string 
+                                containing the command line. If NULL then the command-
+                                line will be empty.
+  @param[in] Environment        Points to a null-terminated array of environment 
+                                variables with the format 'x=y', where x is the 
+                                environment variable name and y is the value. If this
+                                is NULL, then the current shell environment is used.
+  @param[out] ErrorCode         Points to the status code returned by the command.
 
-  @retval EFI_SUCCESS       The command executed successfully. The  status code 
-                            returned by the command is pointed to by StatusCode.
+  @retval EFI_SUCCESS           The command executed successfully. The  status code 
+                                returned by the command is pointed to by StatusCode.
   @retval EFI_INVALID_PARAMETER The parameters are invalid.
-  @retval EFI_OUT_OF_RESOURCES Out of resources.
-  @retval EFI_UNSUPPORTED   Nested shell invocations are not allowed.
+  @retval EFI_OUT_OF_RESOURCES  Out of resources.
+  @retval EFI_UNSUPPORTED       Nested shell invocations are not allowed.
 **/
 typedef
 EFI_STATUS
@@ -209,16 +209,16 @@ EFI_STATUS
   The files in the file list are not opened. The OpenMode field is set to 0 and the FileInfo
   field is set to NULL.
 
-  @param FilePattern      Points to a null-terminated shell file path, including wildcards.
-  @param FileList         On return, points to the start of a file list containing the names 
-                          of all matching files or else points to NULL if no matching files 
-                          were found.
+  @param[in] FilePattern        Points to a null-terminated shell file path, including wildcards.
+  @param[out] FileList          On return, points to the start of a file list containing the names 
+                                of all matching files or else points to NULL if no matching files 
+                                were found.
 
-  @retval EFI_SUCCESS     Files found.
-  @retval EFI_NOT_FOUND   No files found.
-  @retval EFI_NO_MEDIA    The device has no media
-  @retval EFI_DEVICE_ERROR The device reported an error
-  @retval EFI_VOLUME_CORRUPTED The file system structures are corrupted
+  @retval EFI_SUCCESS           Files found.
+  @retval EFI_NOT_FOUND         No files found.
+  @retval EFI_NO_MEDIA          The device has no media
+  @retval EFI_DEVICE_ERROR      The device reported an error
+  @retval EFI_VOLUME_CORRUPTED  The file system structures are corrupted
 **/
 typedef
 EFI_STATUS
@@ -230,14 +230,14 @@ EFI_STATUS
 /**
   Find all files in a specified directory.
 
-  @param FileDirHandle     Handle of the directory to search.
-  @param FileList          On return, points to the list of files in the directory 
-                           or NULL if there are no files in the directory.
+  @param[in] FileDirHandle      Handle of the directory to search.
+  @param[out] FileList          On return, points to the list of files in the directory 
+                                or NULL if there are no files in the directory.
 
-  @retval EFI_SUCCESS      File information was returned successfully.
-  @retval EFI_VOLUME_CORRUPTED The file system structures have been corrupted.
-  @retval EFI_DEVICE_ERROR The device reported an error.
-  @retval EFI_NO_MEDIA     The device media is not present.
+  @retval EFI_SUCCESS           File information was returned successfully.
+  @retval EFI_VOLUME_CORRUPTED  The file system structures have been corrupted.
+  @retval EFI_DEVICE_ERROR      The device reported an error.
+  @retval EFI_NO_MEDIA          The device media is not present.
 **/
 typedef
 EFI_STATUS
@@ -251,7 +251,7 @@ OUT EFI_SHELL_FILE_INFO **FileList
   
   This function flushes all modified data associated with a file to a device.
 
-  @param FileHandle             The handle of the file to flush
+  @param[in] FileHandle             The handle of the file to flush
 
   @retval EFI_SUCCESS           The data was flushed.
   @retval EFI_NO_MEDIA          The device has no medium.
@@ -273,7 +273,7 @@ EFI_STATUS
   This function cleans up the file list and any related data structures. It has no
   impact on the files themselves.
 
-  @param FileList               The file list to free. Type EFI_SHELL_FILE_INFO is 
+  @param[in] FileList               The file list to free. Type EFI_SHELL_FILE_INFO is 
                                 defined in OpenFileList()
 
   @retval EFI_SUCCESS           Free the file list successfully.
@@ -292,7 +292,7 @@ EFI_STATUS
   FileSystemMapping. In both cases, the returned name includes the file system
   mapping (i.e. fs0:\current-dir).
 
-  @param FileSystemMapping      A pointer to the file system mapping. If NULL, 
+  @param[in] FileSystemMapping      A pointer to the file system mapping. If NULL, 
                                 then the current working directory is returned.
   
   @retval !=NULL                The current directory.
@@ -324,12 +324,12 @@ typedef UINT32 EFI_SHELL_DEVICE_NAME_FLAGS;
   EFI_DEVICE_NAME_USE_DEVICE_PATH are set, then
   EFI_DEVICE_NAME_USE_COMPONENT_NAME will have higher priority.
 
-  @param DeviceHandle           The handle of the device.
-  @param Flags                  Determines the possible sources of component names. 
-  @param Language               A pointer to the language specified for the device 
+  @param[in] DeviceHandle       The handle of the device.
+  @param[in] Flags              Determines the possible sources of component names. 
+  @param[in] Language           A pointer to the language specified for the device 
                                 name, in the same format as described in the UEFI 
                                 specification, Appendix M 
-  @param BestDeviceName         On return, points to the callee-allocated null-
+  @param[out] BestDeviceName    On return, points to the callee-allocated null-
                                 terminated name of the device. If no device name 
                                 could be found, points to NULL. The name must be 
                                 freed by the caller...
@@ -351,7 +351,7 @@ EFI_STATUS
 
   This function gets the device path associated with a mapping.
 
-  @param Mapping                A pointer to the mapping
+  @param[in] Mapping                A pointer to the mapping
 
   @retval !=NULL                Pointer to the device path that corresponds to the 
                                 device mapping. The returned pointer does not need 
@@ -371,7 +371,7 @@ CONST EFI_DEVICE_PATH_PROTOCOL *
   This function converts a file system style name to a device path, by replacing any
   mapping references to the associated device path.
 
-  @param Path                   the pointer to the path
+  @param[in] Path                   the pointer to the path
 
   @return all                   The pointer of the file path. The file path is callee 
                                 allocated and should be freed by the caller.
@@ -383,20 +383,34 @@ EFI_DEVICE_PATH_PROTOCOL *
   );
 
 /**
-  Gets the environment variable.
+  This function updated with errata.
 
-  This function returns the current value of the specified environment variable.
+  Gets either a single or list of environment variables.
 
-  @param Name                   A pointer to the environment variable name
+  If name is not NULL then this function returns the current value of the specified 
+  environment variable.
 
-  @return !=NULL                The environment variable's value. The returned 
-                                pointer does not need to be freed by the caller.
-  @retval NULL                  The environment variable doesn't exist.
+  If Name is NULL than a list of all environment variable names is returned.  Each a 
+  NULL terminated string with a double NULL terminating the list.
+
+  @param[in] Name                   A pointer to the environment variable name.  If 
+                                Name is NULL, then the function will return all 
+                                of the defined shell environment variables.  In 
+                                the case where multiple environment variables are 
+                                being returned, each variable will be terminated by 
+                                a NULL, and the list will be terminated by a double 
+                                NULL.
+
+  @return !=NULL                A pointer to the returned string.
+                                The returned pointer does not need to be freed by the caller.
+
+  @retval NULL                  The environment variable doesn't exist or there are 
+                                no environment variables.
 **/
 typedef
 CONST CHAR16 *
 (EFIAPI *EFI_SHELL_GET_ENV) (
-  IN CONST CHAR16 *Name
+  IN CONST CHAR16 *Name OPTIONAL
   );
 
 /**
@@ -405,7 +419,7 @@ CONST CHAR16 *
   This function allocates a buffer to store the file's information. It's the caller's
   responsibility to free the buffer.
 
-  @param FileHandle             A File Handle
+  @param[in] FileHandle             A File Handle
 
   @return !=NULL                Cannot get the file info.
   @return NULL                  A pointer to a buffer with file information.
@@ -423,7 +437,7 @@ EFI_FILE_INFO *
   the device path with the file-system mapping. If there are more than one application
   file system mappings, the one that most closely matches Path will be used.
 
-  @param Path                   The pointer to the device path
+  @param[in] Path                   The pointer to the device path
 
   @return all                   The pointer of the null-terminated file path. The path 
                                 is callee-allocated and should be freed by the caller.
@@ -441,8 +455,8 @@ CHAR16 *
   current file position has no meaning outside of the file system driver and as such, the
   operation is not supported.
 
-  @param FileHandle             The file handle on which to get the current position.
-  @param Position               Byte position from the start of the file
+  @param[in] FileHandle         The file handle on which to get the current position.
+  @paramp[out] Position         Byte position from the start of the file
 
   @retval EFI_SUCCESS           Data was accessed.
   @retval EFI_UNSUPPORTED       The request is not valid on open directories.
@@ -459,8 +473,8 @@ EFI_STATUS
 
   This function returns the size of the file specified by FileHandle.
 
-  @param FileHandle             The handle of the file.
-  @param Size                   The size of this file.
+  @param[in] FileHandle         The handle of the file.
+  @param[out] Size              The size of this file.
 
   @retval EFI_SUCCESS           Get the file's size.
   @retval EFI_DEVICE_ERROR      Can't access the file.
@@ -484,11 +498,11 @@ EFI_STATUS
   information will be returned. If Sections is NULL, then all help text information
   available will be returned.
 
-  @param Command                Points to the null-terminated UEFI Shell command name.
-  @param Sections               Points to the null-terminated comma-delimited 
+  @param[in] Command            Points to the null-terminated UEFI Shell command name.
+  @param[in] Sections           Points to the null-terminated comma-delimited 
                                 section names to return. If NULL, then all 
                                 sections will be returned.
-  @param HelpText               On return, points to a callee-allocated buffer 
+  @param[out] HelpText          On return, points to a callee-allocated buffer 
                                 containing all specified help text.
 
   @retval EFI_SUCCESS           The help text was returned.
@@ -506,7 +520,9 @@ EFI_STATUS
   );
 
 /**
-  Gets the mapping that most closely matches the device path.
+  This funciton is updated with Errata.
+
+  Gets the mapping(s) that most closely matches the device path.
 
   This function gets the mapping which corresponds to the device path *DevicePath. If
   there is no exact match, then the mapping which most closely matches *DevicePath
@@ -514,7 +530,10 @@ EFI_STATUS
   device path. If there is an exact match, the mapping is returned and *DevicePath
   points to the end-of-device-path node.
 
-  @param DevicePath             On entry, points to a device path pointer. On 
+  If there are multiple map names they will be semi-colon seperated in the 
+  NULL-terminated string.
+
+  @param[in,out] DevicePath     On entry, points to a device path pointer. On 
                                 exit, updates the pointer to point to the 
                                 portion of the device path after the mapping.
 
@@ -585,9 +604,9 @@ VOID
   If return EFI_SUCCESS, the FileHandle is the opened file's handle, else, the
   FileHandle is NULL.
 
-  @param FileName               Points to the null-terminated UCS-2 encoded file name.
-  @param FileHandle             On return, points to the file handle.
-  @param OpenMode               File open mode. Either EFI_FILE_MODE_READ or 
+  @param[in] FileName           Points to the null-terminated UCS-2 encoded file name.
+  @param[out] FileHandle        On return, points to the file handle.
+  @param[in] OpenMode           File open mode. Either EFI_FILE_MODE_READ or 
                                 EFI_FILE_MODE_WRITE from section 12.4 of the UEFI 
                                 Specification.
   @retval EFI_SUCCESS           The file was opened. FileHandle has the opened file's handle.
@@ -623,10 +642,10 @@ EFI_STATUS
   according to the rules specified in UEFI Shell 2.0 spec section 3.7.1. Each 
   matching file has an EFI_SHELL_FILE_INFO structure created in a linked list.
 
-  @param Path                   A pointer to the path string.
-  @param OpenMode               Specifies the mode used to open each file, EFI_FILE_MODE_READ or
+  @param[in] Path               A pointer to the path string.
+  @param[in] OpenMode           Specifies the mode used to open each file, EFI_FILE_MODE_READ or
                                 EFI_FILE_MODE_WRITE.
-  @param FileList               Points to the start of a list of files opened.
+  @param[in,out] FileList       Points to the start of a list of files opened.
 
   @retval EFI_SUCCESS           Create the file list successfully.
   @return Others                Can't create the file list.
@@ -644,9 +663,9 @@ EFI_STATUS
 
   This function opens the root directory of a device and returns a file handle to it.
 
-  @param DevicePath             Points to the device path corresponding to the device where the
+  @param[in] DevicePath         Points to the device path corresponding to the device where the
                                 EFI_SIMPLE_FILE_SYSTEM_PROTOCOL is installed.
-  @param FileHandle             On exit, points to the file handle corresponding to the root directory on the
+  @param[out] FileHandle        On exit, points to the file handle corresponding to the root directory on the
                                 device.
 
   @retval EFI_SUCCESS           Root opened successfully.
@@ -667,8 +686,8 @@ EFI_STATUS
 
   This function opens the root directory of a device and returns a file handle to it.
 
-  @param DeviceHandle           The handle of the device that contains the volume.
-  @param FileHandle             On exit, points to the file handle corresponding to the root directory on the
+  @param[in] DeviceHandle       The handle of the device that contains the volume.
+  @param[out] FileHandle        On exit, points to the file handle corresponding to the root directory on the
                                 device.
 
   @retval EFI_SUCCESS           Root opened successfully.
@@ -693,9 +712,9 @@ EFI_STATUS
   current position is increased by the number of bytes returned.
   If FileHandle is a directory, then an error is returned.
 
-  @param FileHandle             The opened file handle for read
-  @param ReadSize               On input, the size of Buffer, in bytes. On output, the amount of data read.
-  @param Buffer                 The buffer in which data is read.
+  @param[in] FileHandle         The opened file handle for read
+  @param[in] ReadSize           On input, the size of Buffer, in bytes. On output, the amount of data read.
+  @param[in,out] Buffer         The buffer in which data is read.
 
   @retval EFI_SUCCESS           Data was read.
   @retval EFI_NO_MEDIA          The device has no media
@@ -708,7 +727,7 @@ EFI_STATUS
 (EFIAPI *EFI_SHELL_READ_FILE) (
   IN EFI_FILE_HANDLE FileHandle,
   IN OUT UINTN *ReadSize,
-  OUT VOID *Buffer
+  IN OUT VOID *Buffer
   );
 
 /**
@@ -716,7 +735,7 @@ EFI_STATUS
 
   This function deletes the reduplicate files in the given file list.
 
-  @param FileList               A pointer to the first entry in the file list.
+  @param[in] FileList           A pointer to the first entry in the file list.
 
   @retval EFI_SUCCESS           Always success.
 **/
@@ -726,17 +745,24 @@ EFI_STATUS
   IN EFI_SHELL_FILE_INFO **FileList
   );
 
+//
+// The SetAlias and GetAlias functions were affected by errata.  
+// They are not UEFI Shell 2.0 (no errata) compliant.
+//
+
 /**
   Changes a shell command alias.
 
   This function creates an alias for a shell command.
 
-  @param Command                Points to the null-terminated shell command or existing alias.
-  @param Alias                  Points to the null-terminated alias for the shell command. If this is NULL, and
+  @param[in] Command            Points to the null-terminated shell command or existing alias.
+  @param[in] Alias              Points to the null-terminated alias for the shell command. If this is NULL, and
                                 Command refers to an alias, that alias will be deleted.
-  @param Replace                If TRUE and the alias already exists, then the existing alias will be replaced. If
+  @param[in] Replace            If TRUE and the alias already exists, then the existing alias will be replaced. If
                                 FALSE and the alias already exists, then the existing alias is unchanged and
                                 EFI_ACCESS_DENIED is returned.
+  @param[in] Volatile           if TRUE the Alias being set will be stored in a volatile fashion.  if FALSE the 
+                                Alias being set will be stored in a non-volatile fashion.
 
   @retval EFI_SUCCESS           Alias created or deleted successfully.
   @retval EFI_ACCESS_DENIED     The alias is a built-in alias or already existed and Replace was set to
@@ -747,7 +773,32 @@ EFI_STATUS
 (EFIAPI *EFI_SHELL_SET_ALIAS)(
   IN CONST CHAR16 *Command,
   IN CONST CHAR16 *Alias,
-  IN BOOLEAN Replace
+  IN BOOLEAN Replace,
+  IN BOOLEAN Volatile
+  );
+
+/**
+  This function returns the alias associated with a command.
+
+  @param[in] Command            Points to the null-terminated shell command. 
+                                If this parameter is NULL, then all commands 
+                                aliases will be returned in ReturnedData.
+  @param[out] ReturnedData    	If Command is not NULL, ReturnedData points to 
+                                the null-terminated alias for the shell command. 
+                                If Command is NULL, ReturnedData points to a ‘;’ 
+                                delimited list of command and alias tuples (e.g. 
+                                ReturnedData = “md;mkdir;rd;rm;cp;copy;fs0:\test
+                                app\myfavoriteprogram.efi;mfp”) that are null-terminated.  
+
+  @retval EFI_SUCCESS	          Alias retrieved successfully.
+  @retval EFI_NOT_FOUND	        Alias could not be found for the specified Command.
+  @retval EFI_OUT_OF_RESOURCES	Insufficient memory was available to complete the request.
+**/
+typedef 
+EFI_STATUS
+(EFIAPI *EFI_SHELL_GET_ALIAS)(
+  IN  CONST CHAR16 *Command,
+  OUT CONST CHAR16 *ReturnedData
   );
 
 /**
@@ -767,9 +818,9 @@ EFI_STATUS
   If the current working directory or the current working file system is changed then the
   %cwd% environment variable will be updated
 
-  @param FileSystem             A pointer to the file system's mapped name. If NULL, then the current working
+  @param[in] FileSystem         A pointer to the file system's mapped name. If NULL, then the current working
                                 directory is changed.
-  @param Dir                    Points to the null-terminated directory on the device specified by FileSystem.
+  @param[in] Dir                Points to the null-terminated directory on the device specified by FileSystem.
 
   @return !=NULL                The current directory.
   @retval NULL                  Current directory does not exist.
@@ -795,10 +846,10 @@ EFI_STATUS
   For a description of volatile and non-volatile environment variables, see UEFI Shell 
   2.0 specification section 3.6.1.
 
-  @param Name                   Points to the null-terminated environment variable name.
-  @param Value                  Points to the null-terminated environment variable value. If the value is an
+  @param[in] Name                   Points to the null-terminated environment variable name.
+  @param[in] Value                  Points to the null-terminated environment variable value. If the value is an
                                 empty string then the environment variable is deleted.
-  @param Volatile               Indicates whether the variable is non-volatile (FALSE) or volatile (TRUE).
+  @param[in] Volatile               Indicates whether the variable is non-volatile (FALSE) or volatile (TRUE).
 
   @retval EFI_SUCCESS           The environment variable was successfully updated.
 **/
@@ -815,8 +866,8 @@ EFI_STATUS
 
   This function changes file information.
 
-  @param FileHandle             A file handle
-  @param FileInfo               Points to new file information.
+  @param[in] FileHandle             A file handle
+  @param[in] FileInfo               Points to new file information.
 
   @retval EFI_SUCCESS           The information was set.
   @retval EFI_NO_MEDIA          The device has no medium.
@@ -843,8 +894,8 @@ EFI_STATUS
   grow the file). Seeking to position 0xFFFFFFFFFFFFFFFF causes the current position
   to be set to the end of the file.
 
-  @param FileHandle             The file handle on which requested position will be set.
-  @param Position               Byte position from the start of the file
+  @param[in] FileHandle             The file handle on which requested position will be set.
+  @param[in] Position               Byte position from the start of the file
 
   @retval EFI_SUCCESS           Data was written.
   @retval EFI_UNSUPPORTED       The seek request for nonzero is not valid on open directories.
@@ -859,9 +910,9 @@ EFI_STATUS
 /**
   This function creates a mapping for a device path.
 
-  @param DevicePath             Points to the device path. If this is NULL and Mapping points to a valid mapping,
+  @param[in] DevicePath             Points to the device path. If this is NULL and Mapping points to a valid mapping,
                                 then the mapping will be deleted.
-  @param Mapping                Points to the null-terminated mapping for the device path.
+  @param[in] Mapping                Points to the null-terminated mapping for the device path.
 
   @retval EFI_SUCCESS           Mapping created or deleted successfully.
   @retval EFI_NO_MAPPING        There is no handle that corresponds exactly to DevicePath. See the
@@ -886,9 +937,9 @@ EFI_STATUS
 
   Direct writes to opened directories are not supported.
 
-  @param FileHandle             The opened file handle for writing.
-  @param BufferSize             On input, size of Buffer.
-  @param Buffer                 The buffer in which data to write.
+  @param[in] FileHandle             The opened file handle for writing.
+  @param[in,out] BufferSize         On input, size of Buffer.
+  @param[in] Buffer                 The buffer in which data to write.
 
   @retval EFI_SUCCESS Data was written.
   @retval EFI_UNSUPPORTED Writes to open directory are not supported
@@ -911,6 +962,7 @@ typedef struct _EFI_SHELL_PROTOCOL {
   EFI_SHELL_EXECUTE                         Execute;
   EFI_SHELL_GET_ENV                         GetEnv;
   EFI_SHELL_SET_ENV                         SetEnv;
+  EFI_SHELL_GET_ALIAS                       GetAlias;
   EFI_SHELL_SET_ALIAS                       SetAlias;
   EFI_SHELL_GET_HELP_TEXT                   GetHelpText;
   EFI_SHELL_GET_DEVICE_PATH_FROM_MAP        GetDevicePathFromMap;
