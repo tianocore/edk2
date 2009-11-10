@@ -464,8 +464,6 @@
   
   MdeModulePkg/Universal/PlatformDriOverrideDxe/PlatformDriOverrideDxe.inf
 
-  SecurityPkg/UserIdentification/UserIdentificationDxe/UserIdentityManager.inf
-  SecurityPkg/UserIdentification/UserManagerDxe/UserProfileManager.inf
 [BuildOptions]
   DEBUG_*_IA32_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /ALIGN:4096 /FILEALIGN:4096 /SUBSYSTEM:CONSOLE
   RELEASE_*_IA32_DLINK_FLAGS = /ALIGN:4096 /FILEALIGN:4096

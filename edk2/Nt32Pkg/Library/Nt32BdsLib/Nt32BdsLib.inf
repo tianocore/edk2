@@ -56,9 +56,6 @@
 [Guids]
   gEfiWinNtSystemConfigGuid
 
-[Protocols]
-  gEfiUserManagerProtocolGuid
-
 [Pcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
