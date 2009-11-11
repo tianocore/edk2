@@ -601,6 +601,15 @@ PeiFfsFindNextFile (
   
   CoreFvHandle = FvHandleToCoreHandle (FvHandle);
   
+  //
+  // To make backward compatiblity, if can not find corresponding the handle of FV
+  // then treat FV as build-in FFS2 format and memory mapped FV that FV handle is pointed
+  // to the address of first byte of FV.
+  //
+  if ((CoreFvHandle == NULL) && FeaturePcdGet (PcdFrameworkCompatibilitySupport)) {
+    return FindFileEx (FvHandle, NULL, SearchType, FileHandle, NULL);
+  } 
+  
   if ((CoreFvHandle == NULL) || CoreFvHandle->FvPpi == NULL) {
     return EFI_NOT_FOUND;
   }
