@@ -778,25 +778,27 @@ EFI_STATUS
   );
 
 /**
-  This function returns the alias associated with a command.
+  This function returns the command associated with a alias or a list of all
+  alias'.
 
-  @param[in] Command            Points to the null-terminated shell command. 
-                                If this parameter is NULL, then all commands 
+  @param[in] Alias              Points to the null-terminated shell alias. 
+                                If this parameter is NULL, then all 
                                 aliases will be returned in ReturnedData.
-
-  @retutn                      	If Command is not NULL, it will return a pointer to 
-                                the null-terminated alias for the shell command. 
-                                If Command is NULL, ReturnedData points to a ‘;’ 
-                                delimited list of command and alias tuples (e.g. 
-                                ReturnedData = “md;mkdir;rd;rm;cp;copy;fs0:\test
-                                app\myfavoriteprogram.efi;mfp”) that are null-terminated.  
+  @param[out] Volatile          upon return of a single command if TRUE indicates
+                                this is stored in a volatile fashion.  FALSE otherwise.
+  @return                      	If Alias is not NULL, it will return a pointer to 
+                                the null-terminated command for that alias. 
+                                If Alias is NULL, ReturnedData points to a ‘;’ 
+                                delimited list of alias (e.g. 
+                                ReturnedData = “dir;del;copy;mfp”) that is null-terminated.  
   @retval NULL                  an error ocurred
-  @retval NULL                  no alias was found for Command
+  @retval NULL                  Alias was not a valid Alias
 **/
 typedef 
 CONST CHAR16 *
 (EFIAPI *EFI_SHELL_GET_ALIAS)(
-  IN  CONST CHAR16 *Command
+  IN  CONST CHAR16 *Alias,
+  OUT BOOLEAN      *Volatile OPTIONAL
   );
 
 /**
