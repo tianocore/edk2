@@ -1,7 +1,7 @@
 /** @file
   Definition of Pei Core Structures and Services
   
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -105,6 +105,8 @@ typedef struct {
 
 typedef struct {
   EFI_FIRMWARE_VOLUME_HEADER          *FvHeader;
+  EFI_PEI_FIRMWARE_VOLUME_PPI         *FvPpi;
+  EFI_PEI_FV_HANDLE                   FvHandle;
   UINT8                               PeimState[FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv)];
   EFI_PEI_FILE_HANDLE                 FvFileHandles[FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv)];
   BOOLEAN                             ScanFv;
@@ -127,10 +129,23 @@ typedef struct {
 ///
 typedef struct{
   UINTN                              Signature;
-  EFI_PEI_SERVICES                   *PS;     // Point to ServiceTableShadow
+  
+  ///
+  /// Point to ServiceTableShadow
+  ///
+  EFI_PEI_SERVICES                   *PS;
   PEI_PPI_DATABASE                   PpiData;
+  
+  ///
+  /// The count of FVs which contains FFS and could be dispatched by PeiCore.
+  ///
   UINTN                              FvCount;
+  
+  ///
+  /// The instance arrary for FVs which contains FFS and could be dispatched by PeiCore.
+  ///
   PEI_CORE_FV_HANDLE                 Fv[FixedPcdGet32 (PcdPeiCoreMaxFvSupported)];
+
   EFI_PEI_FILE_HANDLE                CurrentFvFileHandles[FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv)];
   UINTN                              AprioriCount;
   UINTN                              CurrentPeimFvCount;
@@ -139,8 +154,6 @@ typedef struct{
   BOOLEAN                            PeimNeedingDispatch;
   BOOLEAN                            PeimDispatchOnThisPass;
   BOOLEAN                            PeimDispatcherReenter;
-  UINTN                              AllFvCount;
-  EFI_PEI_FV_HANDLE                  AllFv[FixedPcdGet32 (PcdPeiCoreMaxFvSupported)];
   EFI_PEI_HOB_POINTERS               HobList;
   BOOLEAN                            SwitchStackSignal;
   BOOLEAN                            PeiMemoryInstalled;
@@ -629,19 +642,19 @@ PeiCoreBuildHobHandoffInfoTable (
 // FFS Fw Volume support functions
 //
 /**
-  Given the input file pointer, search for the next matching file in the
-  FFS volume as defined by SearchType. The search starts from FileHeader inside
-  the Firmware Volume defined by FwVolHeader.
-
+  Searches for the next matching file in the firmware volume.
 
   @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param SearchType      Filter to find only files of this type.
                          Type EFI_FV_FILETYPE_ALL causes no filtering to be done.
-  @param FwVolHeader     Pointer to the FV header of the volume to search.
-  @param FileHeader      Pointer to the current file from which to begin searching.
-                         This pointer will be updated upon return to reflect the file found.
-  @retval EFI_NOT_FOUND  No files matching the search criteria were found
-  @retval EFI_SUCCESS    Success to find next file in given volume
+  @param VolumeHandle    Handle of firmware volume in which to search.
+  @param FileHandle      On entry, points to the current handle from which to begin searching or NULL to start
+                         at the beginning of the firmware volume. On exit, points the file handle of the next file
+                         in the volume or NULL if there are no more files.
+
+  @retval EFI_NOT_FOUND  The file was not found.
+  @retval EFI_NOT_FOUND  The header checksum was not zero.
+  @retval EFI_SUCCESS    The file was found.
 
 **/
 EFI_STATUS
@@ -649,47 +662,48 @@ EFIAPI
 PeiFfsFindNextFile (
   IN CONST EFI_PEI_SERVICES      **PeiServices,
   IN UINT8                       SearchType,
-  IN EFI_PEI_FV_HANDLE           FwVolHeader,
-  IN OUT EFI_PEI_FILE_HANDLE     *FileHeader
+  IN EFI_PEI_FV_HANDLE           FvHandle,
+  IN OUT EFI_PEI_FILE_HANDLE     *FileHandle
   );
 
 /**
-  Given the input file pointer, search for the next matching section in the
-  FFS volume.
+  Searches for the next matching section within the specified file.
 
-  @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation
   @param SectionType     Filter to find only sections of this type.
-  @param FfsFileHeader   Pointer to the current file to search.
-  @param SectionData     Pointer to the Section matching SectionType in FfsFileHeader.
+  @param FileHandle      Pointer to the current file to search.
+  @param SectionData     A pointer to the discovered section, if successful.
                          NULL if section not found
 
-  @retval EFI_NOT_FOUND  No files matching the search criteria were found
-  @retval EFI_SUCCESS    Success to find section data in given file
+  @retval EFI_NOT_FOUND  The section was not found.
+  @retval EFI_SUCCESS    The section was found.
 
 **/
 EFI_STATUS
 EFIAPI
 PeiFfsFindSectionData (
-  IN CONST EFI_PEI_SERVICES      **PeiServices,
-  IN EFI_SECTION_TYPE            SectionType,
-  IN EFI_PEI_FILE_HANDLE         FfsFileHeader,
-  IN OUT VOID                    **SectionData
+  IN CONST EFI_PEI_SERVICES    **PeiServices,
+  IN     EFI_SECTION_TYPE      SectionType,
+  IN     EFI_PEI_FILE_HANDLE   FileHandle,
+  OUT VOID                     **SectionData
   );
 
 /**
-  search the firmware volumes by index
+  Search the firmware volumes by index
 
-  @param PeiServices            An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
-  @param Instance               Instance of FV to find
-  @param FwVolHeader            Pointer to found Volume.
+  @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation
+  @param Instance        This instance of the firmware volume to find. The value 0 is the Boot Firmware
+                         Volume (BFV).
+  @param VolumeHandle    On exit, points to the next volume handle or NULL if it does not exist.
 
-  @retval EFI_INVALID_PARAMETER FwVolHeader is NULL
-  @retval EFI_SUCCESS           Firmware volume instance successfully found.
+  @retval EFI_INVALID_PARAMETER  VolumeHandle is NULL
+  @retval EFI_NOT_FOUND          The volume was not found.
+  @retval EFI_SUCCESS            The volume was found.
 
 **/
 EFI_STATUS
 EFIAPI
-PeiFvFindNextVolume (
+PeiFfsFindNextVolume (
   IN CONST EFI_PEI_SERVICES          **PeiServices,
   IN UINTN                           Instance,
   IN OUT EFI_PEI_FV_HANDLE           *FwVolHeader
@@ -908,15 +922,14 @@ PeiFfsFindFileByName (
   );
 
 /**
-
   Returns information about a specific file.
 
+  @param FileHandle       Handle of the file.
+  @param FileInfo         Upon exit, points to the file’s information.
 
-  @param FileHandle         The handle to file.
-  @param FileInfo           Pointer to the file information.
-
-  @retval EFI_INVALID_PARAMETER Invalid FileHandle or FileInfo.
-  @retval EFI_SUCCESS           Success to collect file info.
+  @retval EFI_INVALID_PARAMETER If FileInfo is NULL.
+  @retval EFI_INVALID_PARAMETER If FileHandle does not represent a valid file.
+  @retval EFI_SUCCESS           File information returned.
 
 **/
 EFI_STATUS
@@ -927,14 +940,14 @@ PeiFfsGetFileInfo (
   );
 
 /**
+  Returns information about the specified volume.
 
-  Collect information of given Fv Volume.
+  @param VolumeHandle    Handle of the volume.
+  @param VolumeInfo      Upon exit, points to the volume’s information.
 
-  @param VolumeHandle           The handle to Fv Volume.
-  @param VolumeInfo             The pointer to volume information.
-
-  @retval EFI_INVALID_PARAMETER VolumeInfo is NULL
-  @retval EFI_SUCCESS           Success to collect fv info.
+  @retval EFI_INVALID_PARAMETER If VolumeHandle does not represent a valid volume.
+  @retval EFI_INVALID_PARAMETER If VolumeInfo is NULL.
+  @retval EFI_SUCCESS           Volume information returned.
 **/
 EFI_STATUS
 EFIAPI
@@ -961,32 +974,6 @@ PeiRegisterForShadow (
   );
 
 /**
-  Given the input file pointer, search for the next matching file in the
-  FFS volume as defined by SearchType. The search starts from FileHeader inside
-  the Firmware Volume defined by FwVolHeader.
-
-
-  @param FvHandle        Pointer to the FV header of the volume to search
-  @param FileName        File name
-  @param SearchType      Filter to find only files of this type.
-                         Type EFI_FV_FILETYPE_ALL causes no filtering to be done.
-  @param FileHandle      This parameter must point to a valid FFS volume.
-  @param AprioriFile     Pointer to AprioriFile image in this FV if has
-
-  @return EFI_NOT_FOUND  No files matching the search criteria were found
-  @retval EFI_SUCCESS    Success to search given file
-
-**/
-EFI_STATUS
-PeiFindFileEx (
-  IN  CONST EFI_PEI_FV_HANDLE        FvHandle,
-  IN  CONST EFI_GUID                 *FileName,   OPTIONAL
-  IN        EFI_FV_FILETYPE          SearchType,
-  IN OUT    EFI_PEI_FILE_HANDLE      *FileHandle,
-  IN OUT    EFI_PEI_FV_HANDLE        *AprioriFile  OPTIONAL
-  );
-
-/**
   Initialize image service that install PeiLoadFilePpi.
 
   @param PrivateData     Pointer to PeiCore's private data structure PEI_CORE_INSTANCE.
@@ -1000,27 +987,6 @@ VOID
 InitializeImageServices (
   IN  PEI_CORE_INSTANCE   *PrivateData,
   IN  PEI_CORE_INSTANCE   *OldCoreData
-  );
-
-/**
-  Get Fv image from the FV type file, then install FV INFO ppi, Build FV hob.
-
-  @param PeiServices          An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
-  @param ParentFvHandle       Fv handle to parent Fv image that contain this Fv file.
-  @param ParentFvFileHandle   File handle of a Fv type file that contain this Fv image.
-  @param AuthenticationState  Pointer to attestation authentication state of image.
-                              If return 0, means pass security checking.
-
-  @retval EFI_NOT_FOUND       FV image can't be found.
-  @retval EFI_SUCCESS         Successfully to process it.
-
-**/
-EFI_STATUS
-ProcessFvFile (
-  IN  CONST EFI_PEI_SERVICES **PeiServices,
-  IN  EFI_PEI_FV_HANDLE      ParentFvHandle,
-  IN  EFI_PEI_FILE_HANDLE    ParentFvFileHandle,
-  OUT UINT32                 *AuthenticationState
   );
 
 /**
@@ -1066,4 +1032,38 @@ SecurityPpiNotifyCallback (
   IN VOID                       *Ppi
   );
 
+/**
+  Get Fv image from the FV type file, then install FV INFO ppi, Build FV hob.
+
+  @param ParentFvCoreHandle   Pointer of EFI_CORE_FV_HANDLE to parent Fv image that contain this Fv image.
+  @param ParentFvFileHandle   File handle of a Fv type file that contain this Fv image.
+
+  @retval EFI_NOT_FOUND         FV image can't be found.
+  @retval EFI_SUCCESS           Successfully to process it.
+  @retval EFI_OUT_OF_RESOURCES  Can not allocate page when aligning FV image
+  @retval Others                Can not find EFI_SECTION_FIRMWARE_VOLUME_IMAGE section
+  
+**/
+EFI_STATUS
+ProcessFvFile (
+  IN  PEI_CORE_FV_HANDLE          *ParentFvCoreHandle,
+  IN  EFI_PEI_FILE_HANDLE         ParentFvFileHandle
+  );
+  
+/**
+  Get instance of PEI_CORE_FV_HANDLE for next volume according to given index.
+  
+  This routine also will install FvInfo ppi for FV hob in PI ways.
+  
+  @param Private    Pointer of PEI_CORE_INSTANCE
+  @param Instance   The index of FV want to be searched.
+  
+  @return Instance of PEI_CORE_FV_HANDLE.
+**/
+PEI_CORE_FV_HANDLE *
+FindNextCoreFvHandle (
+  IN PEI_CORE_INSTANCE  *Private,
+  IN UINTN              Instance
+  );
+    
 #endif
