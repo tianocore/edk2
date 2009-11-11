@@ -783,22 +783,20 @@ EFI_STATUS
   @param[in] Command            Points to the null-terminated shell command. 
                                 If this parameter is NULL, then all commands 
                                 aliases will be returned in ReturnedData.
-  @param[out] ReturnedData    	If Command is not NULL, ReturnedData points to 
+
+  @retutn                      	If Command is not NULL, it will return a pointer to 
                                 the null-terminated alias for the shell command. 
                                 If Command is NULL, ReturnedData points to a ‘;’ 
                                 delimited list of command and alias tuples (e.g. 
                                 ReturnedData = “md;mkdir;rd;rm;cp;copy;fs0:\test
                                 app\myfavoriteprogram.efi;mfp”) that are null-terminated.  
-
-  @retval EFI_SUCCESS	          Alias retrieved successfully.
-  @retval EFI_NOT_FOUND	        Alias could not be found for the specified Command.
-  @retval EFI_OUT_OF_RESOURCES	Insufficient memory was available to complete the request.
+  @retval NULL                  an error ocurred
+  @retval NULL                  no alias was found for Command
 **/
 typedef 
-EFI_STATUS
+CONST CHAR16 *
 (EFIAPI *EFI_SHELL_GET_ALIAS)(
-  IN  CONST CHAR16 *Command,
-  OUT CONST CHAR16 *ReturnedData
+  IN  CONST CHAR16 *Command
   );
 
 /**
