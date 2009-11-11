@@ -143,6 +143,10 @@ typedef struct {
   ///
   BOOLEAN                 IsStarted;
   ///
+  /// The maximum packet size, in bytes, of the packet which the upper layer driver could feed.
+  ///
+  UINT32                  MaxPacketSize;
+  ///
   /// Current configuration settings.
   ///
   EFI_IP4_CONFIG_DATA     ConfigData;
