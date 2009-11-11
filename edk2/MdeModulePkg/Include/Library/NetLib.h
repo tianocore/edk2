@@ -51,6 +51,8 @@ typedef UINT16          TCP_PORTNO;
 #define  IP6_ESP               50
 #define  IP6_NO_NEXT_HEADER    59
 
+#define  IP_VERSION_4          4
+#define  IP_VERSION_6          6
 
 #pragma pack(1)
 
