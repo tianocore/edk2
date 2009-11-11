@@ -1,7 +1,7 @@
 /** @file
   Pei Core Firmware File System service routines.
   
-Copyright (c) 2006 - 2008, Intel Corporation                                                         
+Copyright (c) 2006 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include "PeiMain.h"
+#include "FwVol.h"
 
 EFI_PEI_NOTIFY_DESCRIPTOR mNotifyOnFvInfoList = {
   (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
@@ -20,10 +20,21 @@ EFI_PEI_NOTIFY_DESCRIPTOR mNotifyOnFvInfoList = {
   FirmwareVolmeInfoPpiNotifyCallback 
 };
 
-
-#define GET_OCCUPIED_SIZE(ActualSize, Alignment) \
-  ((ActualSize) + (((Alignment) - ((ActualSize) & ((Alignment) - 1))) & ((Alignment) - 1)))
-
+EFI_PEI_FIRMWARE_VOLUME_PPI mPeiFfs2FvPpi = {
+  PeiFfs2FvPpiProcessVolume,
+  PeiFfs2FvPpiFindFileByType,
+  PeiFfs2FvPpiFindFileByName,
+  PeiFfs2FvPpiGetFileInfo,
+  PeiFfs2FvPpiGetVolumeInfo,
+  PeiFfs2FvPpiFindSectionByType
+};
+            
+EFI_PEI_PPI_DESCRIPTOR  mPeiFfs2FvPpiList = {
+  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+  &gEfiFirmwareFileSystem2Guid,
+  &mPeiFfs2FvPpi
+};
+ 
 /**
   Returns the file state set by the highest zero bit in the State field
 
@@ -87,20 +98,15 @@ CalculateHeaderChecksum (
 }
 
 /**
-  Find FV handler according some FileHandle in that FV.
+  Find FV handler according to FileHandle in that FV.
 
   @param FileHandle      Handle of file image
-  @param VolumeHandle    Handle of the found FV, if not found, NULL will be set.
-
-  @retval TRUE           The corresponding FV handler is found.
-  @retval FALSE          The corresponding FV handler is not found.
-
+  
+  @return Pointer to instance of PEI_CORE_FV_HANDLE.
 **/
-BOOLEAN
-EFIAPI
-PeiFileHandleToVolume (
-  IN   EFI_PEI_FILE_HANDLE     FileHandle,
-  OUT  EFI_PEI_FV_HANDLE       *VolumeHandle
+PEI_CORE_FV_HANDLE*
+FileHandleToVolume (
+  IN   EFI_PEI_FILE_HANDLE          FileHandle
   )
 {
   UINTN                       Index;
@@ -108,16 +114,15 @@ PeiFileHandleToVolume (
   EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader;
 
   PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS (GetPeiServicesTablePointer ());
+  
   for (Index = 0; Index < PrivateData->FvCount; Index++) {
     FwVolHeader = PrivateData->Fv[Index].FvHeader;
     if (((UINT64) (UINTN) FileHandle > (UINT64) (UINTN) FwVolHeader ) &&   \
         ((UINT64) (UINTN) FileHandle <= ((UINT64) (UINTN) FwVolHeader + FwVolHeader->FvLength - 1))) {
-      *VolumeHandle = (EFI_PEI_FV_HANDLE)FwVolHeader;
-      return TRUE;
+      return &PrivateData->Fv[Index];
     }
   }
-  *VolumeHandle = NULL;
-  return FALSE;
+  return NULL;
 }
 
 /**
@@ -140,7 +145,7 @@ PeiFileHandleToVolume (
 
 **/
 EFI_STATUS
-PeiFindFileEx (
+FindFileEx (
   IN  CONST EFI_PEI_FV_HANDLE        FvHandle,
   IN  CONST EFI_GUID                 *FileName,   OPTIONAL
   IN        EFI_FV_FILETYPE          SearchType,
@@ -157,8 +162,11 @@ PeiFindFileEx (
   UINT64                                FvLength;
   UINT8                                 ErasePolarity;
   UINT8                                 FileState;
-
-  FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *)FvHandle;
+  
+  //
+  // Convert the handle of FV to FV header for memory-mapped firmware volume
+  //
+  FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *) FvHandle;
   FileHeader  = (EFI_FFS_FILE_HEADER **)FileHandle;
 
   FvLength = FwVolHeader->FvLength;
@@ -269,18 +277,39 @@ PeiInitializeFv (
   IN CONST EFI_SEC_PEI_HAND_OFF   *SecCoreData
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS                    Status;
+  EFI_PEI_FIRMWARE_VOLUME_PPI   *FvPpi;
+  EFI_PEI_FV_HANDLE             FvHandle;
+  EFI_FIRMWARE_VOLUME_HEADER    *BfvHeader;
+  
   //
-  // The BFV must be the first entry. The Core FV support is stateless 
-  // The AllFV list has a single entry per FV in PEI. 
-  // The Fv list only includes FV that PEIMs will be dispatched from and
-  // its File System Format is PI 1.0 definition.
+  // Install FV_PPI for FFS2 file system.
   //
-  PrivateData->FvCount = 1;
-  PrivateData->Fv[0].FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *)SecCoreData->BootFirmwareVolumeBase;
-
-  PrivateData->AllFvCount = 1;
-  PrivateData->AllFv[0] = (EFI_PEI_FV_HANDLE)PrivateData->Fv[0].FvHeader;
+  PeiServicesInstallPpi (&mPeiFfs2FvPpiList);
+  
+  BfvHeader = (EFI_FIRMWARE_VOLUME_HEADER *)SecCoreData->BootFirmwareVolumeBase;
+  
+  //
+  // The FV_PPI in BFV's format should be installed.
+  //
+  Status = PeiServicesLocatePpi (
+             &BfvHeader->FileSystemGuid,
+             0,
+             NULL,
+             (VOID**)&FvPpi
+             );
+  ASSERT_EFI_ERROR (Status);
+    
+  //
+  // Get handle of BFV
+  //
+  FvPpi->ProcessVolume (
+           FvPpi, 
+           SecCoreData->BootFirmwareVolumeBase,
+           (UINTN)BfvHeader->FvLength,
+           &FvHandle
+           );
+                        
   //
   // Post a call-back for the FvInfoPPI services to expose
   // additional Fvs to PeiCore.
@@ -289,7 +318,7 @@ PeiInitializeFv (
   ASSERT_EFI_ERROR (Status);
 
 }
-
+  
 /**
   Process Firmware Volum Information once FvInfoPPI install.
   The FV Info will be registered into PeiCore private data structure.
@@ -311,16 +340,13 @@ FirmwareVolmeInfoPpiNotifyCallback (
   IN VOID                          *Ppi
   )
 {
-  UINT8                                 FvCount;
-  EFI_PEI_FIRMWARE_VOLUME_INFO_PPI      *Fv;
+  EFI_PEI_FIRMWARE_VOLUME_INFO_PPI      *FvInfoPpi;
+  EFI_PEI_FIRMWARE_VOLUME_PPI           *FvPpi;
   PEI_CORE_INSTANCE                     *PrivateData;
-  EFI_PEI_FILE_HANDLE                   FileHandle;
-  VOID                                  *DepexData;
-  UINT32                                AuthenticationStatus;
   EFI_STATUS                            Status;
+  EFI_PEI_FV_HANDLE                     FvHandle;
+  UINTN                                 FvIndex;
   
-  FileHandle   = NULL;
-  DepexData    = NULL;
   Status       = EFI_SUCCESS;
   PrivateData  = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
 
@@ -330,63 +356,52 @@ FirmwareVolmeInfoPpiNotifyCallback (
     ASSERT (FALSE);
   }
 
-  Fv = (EFI_PEI_FIRMWARE_VOLUME_INFO_PPI *)Ppi;
+  FvInfoPpi = (EFI_PEI_FIRMWARE_VOLUME_INFO_PPI *)Ppi;
 
   //
-  // Only add FileSystem2 Fv to Fv list
+  // Locate the corresponding FV_PPI according to founded FV's format guid
   //
-  if (CompareGuid (&Fv->FvFormat, &gEfiFirmwareFileSystem2Guid)) {
-    for (FvCount = 0; FvCount < PrivateData->FvCount; FvCount ++) {
-      if ((UINTN)PrivateData->Fv[FvCount].FvHeader == (UINTN)Fv->FvInfo) {
-        return EFI_SUCCESS;
-      }
-    }
-    
-    Status = VerifyFv ((EFI_FIRMWARE_VOLUME_HEADER*)Fv->FvInfo);
-    if (EFI_ERROR(Status)) {
-      DEBUG ((EFI_D_ERROR, "Fail to verify FV which address is 0x%11p", (VOID *) Fv->FvInfo));
+  Status = PeiServicesLocatePpi (
+             &FvInfoPpi->FvFormat, 
+             0, 
+             NULL,
+             (VOID**)&FvPpi
+             );
+  if (!EFI_ERROR (Status)) {
+    //
+    // Process new found FV and get FV handle.
+    //
+    Status = FvPpi->ProcessVolume (FvPpi, FvInfoPpi->FvInfo, FvInfoPpi->FvInfoSize, &FvHandle);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "Fail to process new found FV, FV may be corrupted!"));
       return Status;
     }
+    DEBUG ((EFI_D_INFO, "Found and process new FV %p, all fv's count is %d\n", FvHandle, PrivateData->FvCount));
+  } else {
+    DEBUG ((EFI_D_ERROR, "Fail to process FV %p because no corresponding EFI_FIRMWARE_VOLUME_PPI is found!\n", FvInfoPpi->FvInfo));
     
-    PrivateData->Fv[PrivateData->FvCount++].FvHeader = (EFI_FIRMWARE_VOLUME_HEADER*)Fv->FvInfo;
-
-    PrivateData->AllFv[PrivateData->AllFvCount++] = (EFI_PEI_FV_HANDLE)Fv->FvInfo;
+    //
+    // If can not find EFI_FIRMWARE_VOLUME_PPI to process firmware to get FvHandle, 
+    // use the address of FV buffer as its handle.
+    //
+    FvHandle = FvInfoPpi->FvInfo;
     
-    DEBUG ((EFI_D_INFO, "The %dth FvImage start address is 0x%11p and size is 0x%08x\n", (UINT32)PrivateData->AllFvCount, (VOID *) Fv->FvInfo, Fv->FvInfoSize));
     //
-    // Preprocess all FV type files in this new FileSystem2 Fv image
+    // Check whether the FV has already been processed.
     //
-    do {
-      Status = PeiFindFileEx (
-                 (EFI_PEI_FV_HANDLE)Fv->FvInfo, 
-                 NULL, 
-                 EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE, 
-                 &FileHandle, 
-                 NULL
-                 );
-      if (!EFI_ERROR (Status)) {
-        Status = PeiFfsFindSectionData (
-                    (CONST EFI_PEI_SERVICES **) PeiServices,
-                    EFI_SECTION_PEI_DEPEX,
-                    FileHandle, 
-                    (VOID **)&DepexData
-                    );
-        if (!EFI_ERROR (Status)) {
-          if (!PeimDispatchReadiness (PeiServices, DepexData)) {
-            //
-            // Dependency is not satisfied.
-            //
-            continue;
-          }
-        }
-        //
-        // Process FvFile to install FvInfo ppi and build FvHob
-        // 
-        ProcessFvFile ((CONST EFI_PEI_SERVICES **) PeiServices, (EFI_PEI_FV_HANDLE)Fv->FvInfo, FileHandle, &AuthenticationStatus);
+    for (FvIndex = 0; FvIndex < PrivateData->FvCount; FvIndex ++) {
+      if (PrivateData->Fv[FvIndex].FvHandle == FvHandle) {
+        DEBUG ((EFI_D_INFO, "The Fv %p has already been processed!\n", FvHandle));
+        return EFI_SUCCESS;
       }
-    } while (FileHandle != NULL);
+    }    
+    
+    PrivateData->Fv[PrivateData->FvCount].FvHeader = (EFI_FIRMWARE_VOLUME_HEADER*) FvInfoPpi->FvInfo;
+    PrivateData->Fv[PrivateData->FvCount].FvPpi    = NULL;
+    PrivateData->Fv[PrivateData->FvCount].FvHandle = FvHandle;
+    PrivateData->FvCount ++;
   }
-
+  
   return EFI_SUCCESS;
 }
 
@@ -395,11 +410,11 @@ FirmwareVolmeInfoPpiNotifyCallback (
   Search within encapsulation sections (compression and GUIDed) recursively, 
   until the match section is found.
   
-  @param PeiServices     - An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
-  @param SectionType     - Filter to find only section of this type.
-  @param Section         - From where to search.
-  @param SectionSize     - The file size to search.
-  @param OutputBuffer    - A pointer to the discovered section, if successful.
+  @param PeiServices       An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param SectionType       Filter to find only section of this type.
+  @param Section           From where to search.
+  @param SectionSize       The file size to search.
+  @param OutputBuffer      A pointer to the discovered section, if successful.
                            NULL if section not found
 
   @return EFI_NOT_FOUND    The match section is not found.
@@ -407,7 +422,7 @@ FirmwareVolmeInfoPpiNotifyCallback (
 
 **/
 EFI_STATUS
-PeiFfsProcessSection (
+ProcessSection (
   IN CONST EFI_PEI_SERVICES     **PeiServices,
   IN EFI_SECTION_TYPE           SectionType,
   IN EFI_COMMON_SECTION_HEADER  *Section,
@@ -448,13 +463,13 @@ PeiFfsProcessSection (
           //
           // Search section directly from the cache data.
           //
-          return PeiFfsProcessSection (
-                  PeiServices,
-                  SectionType, 
-                  PpiOutput, 
-                  PpiOutputSize, 
-                  OutputBuffer 
-                  );
+          return ProcessSection (
+                   PeiServices,
+                   SectionType, 
+                   PpiOutput, 
+                   PpiOutputSize, 
+                   OutputBuffer 
+                   );
         }
       }
       
@@ -468,12 +483,12 @@ PeiFfsProcessSection (
                    );
         if (!EFI_ERROR (Status)) {
           Status = GuidSectionPpi->ExtractSection (
-                                    GuidSectionPpi,
-                                    Section,
-                                    &PpiOutput,
-                                    &PpiOutputSize,
-                                    &Authentication
-                                    );
+                                     GuidSectionPpi,
+                                     Section,
+                                     &PpiOutput,
+                                     &PpiOutputSize,
+                                     &Authentication
+                                     );
         }
       } else if (Section->Type == EFI_SECTION_COMPRESSION) {
         Status = PeiServicesLocatePpi (&gEfiPeiDecompressPpiGuid, 0, NULL, (VOID **) &DecompressPpi);
@@ -499,13 +514,13 @@ PeiFfsProcessSection (
         PrivateData->CacheSection.SectionSize [PrivateData->CacheSection.SectionIndex] = PpiOutputSize;
         PrivateData->CacheSection.SectionIndex = (PrivateData->CacheSection.SectionIndex + 1)%CACHE_SETION_MAX_NUMBER;
         
-        return PeiFfsProcessSection (
-                PeiServices,
-                SectionType, 
-                PpiOutput, 
-                PpiOutputSize, 
-                OutputBuffer 
-                );
+        return ProcessSection (
+                 PeiServices,
+                 SectionType, 
+                 PpiOutput, 
+                 PpiOutputSize, 
+                 OutputBuffer 
+                 );
       }
     }
 
@@ -526,8 +541,7 @@ PeiFfsProcessSection (
 
 
 /**
-  Given the input file pointer, search for the first matching section in the
-  FFS volume.
+  Searches for the next matching section within the specified file.
 
   @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation
   @param SectionType     Filter to find only sections of this type.
@@ -535,57 +549,43 @@ PeiFfsProcessSection (
   @param SectionData     A pointer to the discovered section, if successful.
                          NULL if section not found
 
-  @retval EFI_NOT_FOUND  No files matching the search criteria were found
-  @retval EFI_SUCCESS    Success to find section data in given file
+  @retval EFI_NOT_FOUND  The section was not found.
+  @retval EFI_SUCCESS    The section was found.
 
 **/
 EFI_STATUS
 EFIAPI
 PeiFfsFindSectionData (
-  IN CONST EFI_PEI_SERVICES      **PeiServices,
+  IN CONST EFI_PEI_SERVICES    **PeiServices,
   IN     EFI_SECTION_TYPE      SectionType,
   IN     EFI_PEI_FILE_HANDLE   FileHandle,
-  IN OUT VOID                  **SectionData
+  OUT VOID                     **SectionData
   )
 {
-  EFI_FFS_FILE_HEADER                     *FfsFileHeader;
-  UINT32                                  FileSize;
-  EFI_COMMON_SECTION_HEADER               *Section;
-
-  FfsFileHeader = (EFI_FFS_FILE_HEADER *)(FileHandle);
-
-  //
-  // Size is 24 bits wide so mask upper 8 bits. 
-  // Does not include FfsFileHeader header size
-  // FileSize is adjusted to FileOccupiedSize as it is 8 byte aligned.
-  //
-  Section = (EFI_COMMON_SECTION_HEADER *)(FfsFileHeader + 1);
-  FileSize = *(UINT32 *)(FfsFileHeader->Size) & 0x00FFFFFF;
-  FileSize -= sizeof (EFI_FFS_FILE_HEADER);
-
-  return PeiFfsProcessSection (
-          PeiServices,
-          SectionType, 
-          Section, 
-          FileSize, 
-          SectionData
-          );
+  PEI_CORE_FV_HANDLE           *CoreFvHandle;
+  
+  CoreFvHandle = FileHandleToVolume (FileHandle);
+  if ((CoreFvHandle == NULL) || (CoreFvHandle->FvPpi == NULL)) {
+    return EFI_NOT_FOUND;
+  }
+  
+  return CoreFvHandle->FvPpi->FindSectionByType (CoreFvHandle->FvPpi, SectionType, FileHandle, SectionData);
 }
 
 /**
-  Given the input file pointer, search for the next matching file in the
-  FFS volume as defined by SearchType. The search starts from FileHeader inside
-  the Firmware Volume defined by FwVolHeader.
-
+  Searches for the next matching file in the firmware volume.
 
   @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param SearchType      Filter to find only files of this type.
                          Type EFI_FV_FILETYPE_ALL causes no filtering to be done.
-  @param VolumeHandle    Pointer to the FV header of the volume to search.
-  @param FileHandle      Pointer to the current file from which to begin searching.
-                         This pointer will be updated upon return to reflect the file found.
-  @retval EFI_NOT_FOUND  No files matching the search criteria were found
-  @retval EFI_SUCCESS    Success to find next file in given volume
+  @param VolumeHandle    Handle of firmware volume in which to search.
+  @param FileHandle      On entry, points to the current handle from which to begin searching or NULL to start
+                         at the beginning of the firmware volume. On exit, points the file handle of the next file
+                         in the volume or NULL if there are no more files.
+
+  @retval EFI_NOT_FOUND  The file was not found.
+  @retval EFI_NOT_FOUND  The header checksum was not zero.
+  @retval EFI_SUCCESS    The file was found.
 
 **/
 EFI_STATUS
@@ -593,11 +593,19 @@ EFIAPI
 PeiFfsFindNextFile (
   IN CONST EFI_PEI_SERVICES      **PeiServices,
   IN UINT8                       SearchType,
-  IN EFI_PEI_FV_HANDLE           VolumeHandle,
+  IN EFI_PEI_FV_HANDLE           FvHandle,
   IN OUT EFI_PEI_FILE_HANDLE     *FileHandle
   )
 {
-  return PeiFindFileEx (VolumeHandle, NULL, SearchType, FileHandle, NULL);
+  PEI_CORE_FV_HANDLE      *CoreFvHandle;
+  
+  CoreFvHandle = FvHandleToCoreHandle (FvHandle);
+  
+  if ((CoreFvHandle == NULL) || CoreFvHandle->FvPpi == NULL) {
+    return EFI_NOT_FOUND;
+  }
+  
+  return CoreFvHandle->FvPpi->FindFileByType (CoreFvHandle->FvPpi, SearchType, FvHandle, FileHandle);
 }
 
 
@@ -605,68 +613,36 @@ PeiFfsFindNextFile (
   Search the firmware volumes by index
 
   @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation
-  @param Instance        Instance of FV to find
-  @param VolumeHandle    Pointer to found Volume.
+  @param Instance        This instance of the firmware volume to find. The value 0 is the Boot Firmware
+                         Volume (BFV).
+  @param VolumeHandle    On exit, points to the next volume handle or NULL if it does not exist.
 
-  @retval EFI_INVALID_PARAMETER  FwVolHeader is NULL
-  @retval EFI_SUCCESS            Firmware volume instance successfully found.
+  @retval EFI_INVALID_PARAMETER  VolumeHandle is NULL
+  @retval EFI_NOT_FOUND          The volume was not found.
+  @retval EFI_SUCCESS            The volume was found.
 
 **/
 EFI_STATUS 
 EFIAPI
-PeiFvFindNextVolume (
+PeiFfsFindNextVolume (
   IN CONST EFI_PEI_SERVICES         **PeiServices,
   IN     UINTN                      Instance,
   IN OUT EFI_PEI_FV_HANDLE          *VolumeHandle
   )
 {
-  PEI_CORE_INSTANCE        *Private;
-  UINTN                    Index;
-  BOOLEAN                  Match;
-  EFI_HOB_FIRMWARE_VOLUME  *FvHob;
-
+  PEI_CORE_INSTANCE  *Private;
+  PEI_CORE_FV_HANDLE *CoreFvHandle;
+  
   Private = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
-  if (VolumeHandle == NULL) {
-   return EFI_INVALID_PARAMETER;
+  
+  CoreFvHandle = FindNextCoreFvHandle (Private, Instance);
+  if (CoreFvHandle == NULL) {
+    *VolumeHandle = NULL;
+    return EFI_NOT_FOUND;
   }
   
-  //
-  // Handle Framework FvHob and Install FvInfo Ppi for it.
-  //
-  if (FeaturePcdGet (PcdFrameworkCompatibilitySupport)) {
-    //
-    // Loop to search the wanted FirmwareVolume which supports FFS
-    //
-    FvHob = (EFI_HOB_FIRMWARE_VOLUME *)GetFirstHob (EFI_HOB_TYPE_FV);
-    while (FvHob != NULL) {
-      for (Index = 0, Match = FALSE; Index < Private->AllFvCount; Index++) {
-        if ((EFI_PEI_FV_HANDLE)(UINTN)FvHob->BaseAddress == Private->AllFv[Index]) {
-          Match = TRUE;
-          break;
-        }
-      }
-      //
-      // If Not Found, Install FvInfo Ppi for it.
-      //
-      if (!Match) {
-        PeiServicesInstallFvInfoPpi (
-          &(((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)FvHob->BaseAddress)->FileSystemGuid),
-          (VOID *)(UINTN)FvHob->BaseAddress,
-          (UINT32)FvHob->Length,
-          NULL,
-          NULL
-          );
-      }
-      FvHob = (EFI_HOB_FIRMWARE_VOLUME *)GetNextHob (EFI_HOB_TYPE_FV, (VOID *)((UINTN)FvHob + FvHob->Header.HobLength)); 
-    }
-  }
-
-  if (Instance >= Private->AllFvCount) {
-   VolumeHandle = NULL;
-   return EFI_NOT_FOUND;
-  }
-
-  *VolumeHandle = Private->AllFv[Instance];
+  *VolumeHandle = CoreFvHandle->FvHandle;
+  
   return EFI_SUCCESS;
 }
 
@@ -692,27 +668,29 @@ PeiFfsFindFileByName (
   OUT EFI_PEI_FILE_HANDLE   *FileHandle
   )
 {
-  EFI_STATUS  Status;
+  PEI_CORE_FV_HANDLE            *CoreFvHandle;
+  
   if ((VolumeHandle == NULL) || (FileName == NULL) || (FileHandle == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
-  Status = PeiFindFileEx (VolumeHandle, FileName, 0, FileHandle, NULL);
-  if (Status == EFI_NOT_FOUND) {
-    *FileHandle = NULL;
+  
+  CoreFvHandle = FvHandleToCoreHandle (VolumeHandle);
+  if ((CoreFvHandle == NULL) || (CoreFvHandle->FvPpi == NULL)) {
+    return EFI_NOT_FOUND;
   }
-  return Status;
+  
+  return CoreFvHandle->FvPpi->FindFileByName (CoreFvHandle->FvPpi, FileName, &VolumeHandle, FileHandle);
 }
 
 /**
-
   Returns information about a specific file.
 
+  @param FileHandle       Handle of the file.
+  @param FileInfo         Upon exit, points to the file’s information.
 
-  @param FileHandle      - The handle to file.
-  @param FileInfo        - Pointer to the file information.
-
-  @retval EFI_INVALID_PARAMETER Invalid FileHandle or FileInfo.
-  @retval EFI_SUCCESS           Success to collect file info.
+  @retval EFI_INVALID_PARAMETER If FileInfo is NULL.
+  @retval EFI_INVALID_PARAMETER If FileHandle does not represent a valid file.
+  @retval EFI_SUCCESS           File information returned.
 
 **/
 EFI_STATUS
@@ -722,24 +700,439 @@ PeiFfsGetFileInfo (
   OUT EFI_FV_FILE_INFO    *FileInfo
   )
 {
-  UINT8                       FileState;
-  UINT8                       ErasePolarity;
-  EFI_FFS_FILE_HEADER         *FileHeader;
-  EFI_PEI_FV_HANDLE           VolumeHandle;
-
+  PEI_CORE_FV_HANDLE          *CoreFvHandle;
+  
   if ((FileHandle == NULL) || (FileInfo == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  VolumeHandle = 0;
   //
   // Retrieve the FirmwareVolume which the file resides in.
   //
-  if (!PeiFileHandleToVolume(FileHandle, &VolumeHandle)) {
+  CoreFvHandle = FileHandleToVolume (FileHandle);
+  if ((CoreFvHandle == NULL) || (CoreFvHandle->FvPpi == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (((EFI_FIRMWARE_VOLUME_HEADER*)VolumeHandle)->Attributes & EFI_FVB2_ERASE_POLARITY) {
+  return CoreFvHandle->FvPpi->GetFileInfo (CoreFvHandle->FvPpi, FileHandle, FileInfo);
+}
+
+
+/**
+  Returns information about the specified volume.
+
+  @param VolumeHandle    Handle of the volume.
+  @param VolumeInfo      Upon exit, points to the volume’s information.
+
+  @retval EFI_INVALID_PARAMETER If VolumeHandle does not represent a valid volume.
+  @retval EFI_INVALID_PARAMETER If VolumeInfo is NULL.
+  @retval EFI_SUCCESS           Volume information returned.
+**/
+EFI_STATUS
+EFIAPI 
+PeiFfsGetVolumeInfo (
+  IN EFI_PEI_FV_HANDLE  VolumeHandle,
+  OUT EFI_FV_INFO       *VolumeInfo
+  )
+{
+  PEI_CORE_FV_HANDLE                     *CoreHandle;
+  
+  if (VolumeInfo == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
+  CoreHandle = FvHandleToCoreHandle (VolumeHandle);
+  
+  if ((CoreHandle == NULL) || (CoreHandle->FvPpi == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
+  return CoreHandle->FvPpi->GetVolumeInfo (CoreHandle->FvPpi, VolumeHandle, VolumeInfo);
+}
+
+/**
+  Get Fv image from the FV type file, then install FV INFO ppi, Build FV hob.
+
+  @param ParentFvCoreHandle   Pointer of EFI_CORE_FV_HANDLE to parent Fv image that contain this Fv image.
+  @param ParentFvFileHandle   File handle of a Fv type file that contain this Fv image.
+
+  @retval EFI_NOT_FOUND         FV image can't be found.
+  @retval EFI_SUCCESS           Successfully to process it.
+  @retval EFI_OUT_OF_RESOURCES  Can not allocate page when aligning FV image
+  @retval Others                Can not find EFI_SECTION_FIRMWARE_VOLUME_IMAGE section
+  
+**/
+EFI_STATUS
+ProcessFvFile (
+  IN  PEI_CORE_FV_HANDLE          *ParentFvCoreHandle,
+  IN  EFI_PEI_FILE_HANDLE         ParentFvFileHandle
+  )
+{
+  EFI_STATUS                    Status;
+  EFI_FV_INFO                   ParentFvImageInfo;
+  UINT32                        FvAlignment;
+  VOID                          *NewFvBuffer;
+  EFI_PEI_HOB_POINTERS          HobPtr;
+  EFI_PEI_FIRMWARE_VOLUME_PPI   *ParentFvPpi;
+  EFI_PEI_FV_HANDLE             ParentFvHandle;
+  EFI_FIRMWARE_VOLUME_HEADER    *FvHeader;
+  EFI_FV_FILE_INFO              FileInfo;
+  
+  //
+  // Check if this EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE file has already
+  // been extracted.
+  //
+  HobPtr.Raw = GetHobList ();
+  while ((HobPtr.Raw = GetNextHob (EFI_HOB_TYPE_FV2, HobPtr.Raw)) != NULL) {
+    if (CompareGuid (&(((EFI_FFS_FILE_HEADER *)ParentFvFileHandle)->Name), &HobPtr.FirmwareVolume2->FileName)) {
+      //
+      // this FILE has been dispatched, it will not be dispatched again.
+      //
+      DEBUG ((EFI_D_INFO, "FV file %p has been dispatched!\r\n", ParentFvFileHandle));
+      return EFI_SUCCESS;
+    }
+    HobPtr.Raw = GET_NEXT_HOB (HobPtr);
+  }
+
+  ParentFvHandle = ParentFvCoreHandle->FvHandle;
+  ParentFvPpi    = ParentFvCoreHandle->FvPpi;
+  
+  //
+  // Find FvImage in FvFile
+  //
+  Status = ParentFvPpi->FindSectionByType (
+                          ParentFvPpi,
+                          EFI_SECTION_FIRMWARE_VOLUME_IMAGE,
+                          ParentFvFileHandle,
+                          (VOID **)&FvHeader
+                          );
+             
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // FvAlignment must be more than 8 bytes required by FvHeader structure.
+  //
+  FvAlignment = 1 << ((FvHeader->Attributes & EFI_FVB2_ALIGNMENT) >> 16);
+  if (FvAlignment < 8) {
+    FvAlignment = 8;
+  }
+  
+  //
+  // Check FvImage
+  //
+  if ((UINTN) FvHeader % FvAlignment != 0) {
+    NewFvBuffer = AllocateAlignedPages (EFI_SIZE_TO_PAGES ((UINT32) FvHeader->FvLength), FvAlignment);
+    if (NewFvBuffer == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    CopyMem (NewFvBuffer, FvHeader, (UINTN) FvHeader->FvLength);
+    FvHeader = (EFI_FIRMWARE_VOLUME_HEADER*) NewFvBuffer;
+  }
+  
+  Status = ParentFvPpi->GetVolumeInfo (ParentFvPpi, ParentFvHandle, &ParentFvImageInfo);
+  ASSERT_EFI_ERROR (Status);
+  
+  Status = ParentFvPpi->GetFileInfo (ParentFvPpi, ParentFvFileHandle, &FileInfo);
+  ASSERT_EFI_ERROR (Status);
+  
+  //
+  // Install FvPpi and Build FvHob
+  //
+  PeiServicesInstallFvInfoPpi (
+    &FvHeader->FileSystemGuid,
+    (VOID**) FvHeader,
+    (UINT32) FvHeader->FvLength,
+    &ParentFvImageInfo.FvName,
+    &FileInfo.FileName
+    );
+
+  //
+  // Inform the extracted FvImage to Fv HOB consumer phase, i.e. DXE phase
+  //
+  BuildFvHob (
+    (EFI_PHYSICAL_ADDRESS) (UINTN) FvHeader,
+    FvHeader->FvLength
+    );
+
+  //
+  // Makes the encapsulated volume show up in DXE phase to skip processing of
+  // encapsulated file again.
+  //
+  BuildFv2Hob (
+    (EFI_PHYSICAL_ADDRESS) (UINTN) FvHeader,
+    FvHeader->FvLength,
+    &ParentFvImageInfo.FvName,
+    &FileInfo.FileName
+    );
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Process a firmware volume and create a volume handle.
+
+  Create a volume handle from the information in the buffer. For
+  memory-mapped firmware volumes, Buffer and BufferSize refer to
+  the start of the firmware volume and the firmware volume size.
+  For non memory-mapped firmware volumes, this points to a
+  buffer which contains the necessary information for creating
+  the firmware volume handle. Normally, these values are derived
+  from the EFI_FIRMWARE_VOLUME_INFO_PPI.
+  
+  
+  @param This                   Points to this instance of the
+                                EFI_PEI_FIRMWARE_VOLUME_PPI.
+  @param Buffer                 Points to the start of the buffer.
+  @param BufferSize             Size of the buffer.
+  @param FvHandle               Points to the returned firmware volume
+                                handle. The firmware volume handle must
+                                be unique within the system. 
+
+  @retval EFI_SUCCESS           Firmware volume handle created.
+  @retval EFI_VOLUME_CORRUPTED  Volume was corrupt.
+
+**/
+EFI_STATUS
+EFIAPI
+PeiFfs2FvPpiProcessVolume (
+  IN  CONST  EFI_PEI_FIRMWARE_VOLUME_PPI *This,
+  IN  VOID                               *Buffer,
+  IN  UINTN                              BufferSize,
+  OUT EFI_PEI_FV_HANDLE                  *FvHandle
+  )
+{
+  EFI_STATUS          Status;
+  PEI_CORE_INSTANCE   *PrivateData;
+  EFI_PEI_FILE_HANDLE FileHandle;
+  VOID                *DepexData;
+  EFI_PEI_SERVICES    **PeiServices;
+  UINTN               FvIndex;
+  
+  PeiServices = (EFI_PEI_SERVICES**) GetPeiServicesTablePointer ();
+  PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
+  
+  //
+  // The build-in EFI_PEI_FIRMWARE_VOLUME_PPI for FFS2 support memory-mapped
+  // FV image and the handle is pointed to Fv image's buffer.
+  //
+  *FvHandle = (EFI_PEI_FV_HANDLE) Buffer;
+  
+  //
+  // Do verify for given FV buffer.
+  //
+  Status = VerifyFv ((EFI_FIRMWARE_VOLUME_HEADER*) Buffer);
+  if (EFI_ERROR(Status)) {
+    DEBUG ((EFI_D_ERROR, "Fail to verify FV which address is 0x%11p", Buffer));
+    return EFI_VOLUME_CORRUPTED;
+  }
+
+  //
+  // Check whether the FV has already been processed.
+  //
+  for (FvIndex = 0; FvIndex < PrivateData->FvCount; FvIndex ++) {
+    if (PrivateData->Fv[FvIndex].FvHandle == *FvHandle) {
+      DEBUG ((EFI_D_INFO, "The Fv %p has already been processed!", Buffer));
+      return EFI_SUCCESS;
+    }
+  }
+  
+  //
+  // Update internal PEI_CORE_FV array.
+  //
+  PrivateData->Fv[PrivateData->FvCount].FvHeader = (EFI_FIRMWARE_VOLUME_HEADER*) Buffer;
+  PrivateData->Fv[PrivateData->FvCount].FvPpi    = (EFI_PEI_FIRMWARE_VOLUME_PPI*) This;
+  PrivateData->Fv[PrivateData->FvCount].FvHandle = *FvHandle;
+  
+  DEBUG ((EFI_D_INFO, 
+          "The %dth FV start address is 0x%11p and size is 0x%08x\n", 
+          (UINT32) PrivateData->FvCount, 
+          (VOID *) Buffer, 
+          BufferSize
+          ));
+  PrivateData->FvCount ++;
+  
+  do {
+    Status = This->FindFileByType (
+                     This,
+                     EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE,
+                     *FvHandle,
+                     &FileHandle
+                     );
+    if (!EFI_ERROR (Status)) {
+      Status = This->FindSectionByType (
+                       This,
+                       EFI_SECTION_PEI_DEPEX,
+                       FileHandle,
+                       (VOID**)&DepexData
+                       );
+      if (!EFI_ERROR (Status)) {
+        if (!PeimDispatchReadiness (PeiServices, DepexData)) {
+          //
+          // Dependency is not satisfied.
+          //
+          continue;
+        }
+      }
+      
+      DEBUG ((EFI_D_INFO, "Found firmware volume Image File %p in FV[%d] %p", FileHandle, PrivateData->FvCount - 1, *FvHandle));
+      ProcessFvFile (&PrivateData->Fv[PrivateData->FvCount - 1], FileHandle);
+    }
+  } while (FileHandle != NULL);
+
+  return EFI_SUCCESS;
+}  
+
+/**
+  Finds the next file of the specified type.
+
+  This service enables PEI modules to discover additional firmware files. 
+  The FileHandle must be unique within the system.
+
+  @param This           Points to this instance of the
+                        EFI_PEI_FIRMWARE_VOLUME_PPI.
+  @param SearchType     A filter to find only files of this type. Type
+                        EFI_FV_FILETYPE_ALL causes no filtering to be
+                        done.
+  @param FvHandle       Handle of firmware volume in which to
+                        search.
+  @param FileHandle     Points to the current handle from which to
+                        begin searching or NULL to start at the
+                        beginning of the firmware volume. Updated
+                        upon return to reflect the file found.
+
+  @retval EFI_SUCCESS   The file was found.
+  @retval EFI_NOT_FOUND The file was not found. FileHandle contains NULL.
+
+**/
+EFI_STATUS
+EFIAPI
+PeiFfs2FvPpiFindFileByType (
+  IN CONST  EFI_PEI_FIRMWARE_VOLUME_PPI *This,
+  IN        EFI_FV_FILETYPE             SearchType,
+  IN        EFI_PEI_FV_HANDLE           FvHandle,
+  IN OUT    EFI_PEI_FILE_HANDLE         *FileHandle
+  )
+{ 
+  return FindFileEx (FvHandle, NULL, SearchType, FileHandle, NULL);
+}
+
+/**
+  Find a file within a volume by its name. 
+  
+  This service searches for files with a specific name, within
+  either the specified firmware volume or all firmware volumes.
+
+  @param This                   Points to this instance of the
+                                EFI_PEI_FIRMWARE_VOLUME_PPI.
+  @param FileName               A pointer to the name of the file to find
+                                within the firmware volume.
+  @param FvHandle               Upon entry, the pointer to the firmware
+                                volume to search or NULL if all firmware
+                                volumes should be searched. Upon exit, the
+                                actual firmware volume in which the file was
+                                found.
+  @param FileHandle             Upon exit, points to the found file's
+                                handle or NULL if it could not be found.
+
+  @retval EFI_SUCCESS           File was found.
+  @retval EFI_NOT_FOUND         File was not found.
+  @retval EFI_INVALID_PARAMETER FvHandle or FileHandle or
+                                FileName was NULL.
+
+
+**/
+EFI_STATUS
+EFIAPI
+PeiFfs2FvPpiFindFileByName (
+  IN  CONST  EFI_PEI_FIRMWARE_VOLUME_PPI *This,
+  IN  CONST  EFI_GUID                    *FileName,
+  IN  EFI_PEI_FV_HANDLE                  *FvHandle,
+  OUT EFI_PEI_FILE_HANDLE                *FileHandle  
+  )
+{
+  EFI_STATUS        Status;
+  PEI_CORE_INSTANCE *PrivateData;
+  UINTN             Index;
+  
+  if ((FvHandle == NULL) || (FileName == NULL) || (FileHandle == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
+  if (*FvHandle != NULL) {
+    Status = FindFileEx (*FvHandle, FileName, 0, FileHandle, NULL);
+    if (Status == EFI_NOT_FOUND) {
+      *FileHandle = NULL;
+    }
+  } else {   
+    //
+    // If *FvHandle = NULL, so search all FV for given filename
+    //
+    Status = EFI_NOT_FOUND;
+    
+    PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS (GetPeiServicesTablePointer());
+    for (Index = 0; Index < PrivateData->FvCount; Index ++) {
+      //
+      // Only search the FV which is associated with a EFI_PEI_FIRMWARE_VOLUME_PPI instance.
+      //
+      if (PrivateData->Fv[Index].FvPpi != NULL) {
+        Status = FindFileEx (PrivateData->Fv[Index].FvHandle, FileName, 0, FileHandle, NULL);
+        if (!EFI_ERROR (Status)) {
+          *FvHandle = PrivateData->Fv[Index].FvHandle;
+        }
+      }
+    }
+  }
+  
+  return Status;  
+}  
+
+/**
+  Returns information about a specific file.
+
+  This function returns information about a specific
+  file, including its file name, type, attributes, starting
+  address and size. 
+   
+  @param This                     Points to this instance of the
+                                  EFI_PEI_FIRMWARE_VOLUME_PPI.
+  @param FileHandle               Handle of the file.
+  @param FileInfo                 Upon exit, points to the file's
+                                  information.
+
+  @retval EFI_SUCCESS             File information returned.
+  @retval EFI_INVALID_PARAMETER   If FileHandle does not
+                                  represent a valid file.
+  @retval EFI_INVALID_PARAMETER   If FileInfo is NULL.
+  
+**/ 
+EFI_STATUS
+EFIAPI
+PeiFfs2FvPpiGetFileInfo (
+  IN  CONST EFI_PEI_FIRMWARE_VOLUME_PPI   *This, 
+  IN        EFI_PEI_FILE_HANDLE           FileHandle, 
+  OUT       EFI_FV_FILE_INFO              *FileInfo
+  )
+{
+  UINT8                       FileState;
+  UINT8                       ErasePolarity;
+  EFI_FFS_FILE_HEADER         *FileHeader;
+  PEI_CORE_FV_HANDLE          *CoreFvHandle;
+  
+  if ((FileHandle == NULL) || (FileInfo == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Retrieve the FirmwareVolume which the file resides in.
+  //
+  CoreFvHandle = FileHandleToVolume (FileHandle);
+  if (CoreFvHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (CoreFvHandle->FvHeader->Attributes & EFI_FVB2_ERASE_POLARITY) {
     ErasePolarity = 1;
   } else {
     ErasePolarity = 0;
@@ -764,25 +1157,29 @@ PeiFfsGetFileInfo (
   FileInfo->FileAttributes = FileHeader->Attributes;
   FileInfo->BufferSize = ((*(UINT32 *)FileHeader->Size) & 0x00FFFFFF) -  sizeof (EFI_FFS_FILE_HEADER);
   FileInfo->Buffer = (FileHeader + 1);
-  return EFI_SUCCESS;
-}
-
-
+  return EFI_SUCCESS;  
+}  
+  
 /**
+  This function returns information about the firmware volume.
+  
+  @param This                     Points to this instance of the
+                                  EFI_PEI_FIRMWARE_VOLUME_PPI.
+  @param FvHandle                 Handle to the firmware handle.
+  @param VolumeInfo               Points to the returned firmware volume
+                                  information.
 
-  Collect information of given Fv Volume.
+  @retval EFI_SUCCESS             Information returned successfully.
+  @retval EFI_INVALID_PARAMETER   FvHandle does not indicate a valid
+                                  firmware volume or VolumeInfo is NULL.
 
-  @param VolumeHandle    - The handle to Fv Volume.
-  @param VolumeInfo      - The pointer to volume information.
-
-  @retval EFI_INVALID_PARAMETER VolumeInfo is NULL
-  @retval EFI_SUCCESS           Success to collect fv info.
-**/
+**/   
 EFI_STATUS
-EFIAPI 
-PeiFfsGetVolumeInfo (
-  IN EFI_PEI_FV_HANDLE  VolumeHandle,
-  OUT EFI_FV_INFO       *VolumeInfo
+EFIAPI
+PeiFfs2FvPpiGetVolumeInfo (
+  IN  CONST  EFI_PEI_FIRMWARE_VOLUME_PPI   *This, 
+  IN  EFI_PEI_FV_HANDLE                    FvHandle, 
+  OUT EFI_FV_INFO                          *VolumeInfo
   )
 {
   EFI_FIRMWARE_VOLUME_HEADER             FwVolHeader;
@@ -797,156 +1194,161 @@ PeiFfsGetVolumeInfo (
   // but FvLength is UINT64 type, which requires FvHeader align at least 8 byte. 
   // So, Copy FvHeader into the local FvHeader structure.
   //
-  CopyMem (&FwVolHeader, VolumeHandle, sizeof (EFI_FIRMWARE_VOLUME_HEADER));
+  CopyMem (&FwVolHeader, FvHandle, sizeof (EFI_FIRMWARE_VOLUME_HEADER));
+
   //
   // Check Fv Image Signature
   //
   if (FwVolHeader.Signature != EFI_FVH_SIGNATURE) {
     return EFI_INVALID_PARAMETER;
   }
+
   ZeroMem (VolumeInfo, sizeof (EFI_FV_INFO));
-  VolumeInfo->FvAttributes = FwVolHeader.Attributes;
-  VolumeInfo->FvStart = (VOID *) VolumeHandle;
-  VolumeInfo->FvSize = FwVolHeader.FvLength;
+  VolumeInfo->FvAttributes  = FwVolHeader.Attributes;
+  VolumeInfo->FvStart       = (VOID *) FvHandle;
+  VolumeInfo->FvSize        = FwVolHeader.FvLength;
   CopyMem (&VolumeInfo->FvFormat, &FwVolHeader.FileSystemGuid, sizeof(EFI_GUID));
 
   if (FwVolHeader.ExtHeaderOffset != 0) {
-    FwVolExHeaderInfo = (EFI_FIRMWARE_VOLUME_EXT_HEADER*)(((UINT8 *)VolumeHandle) + FwVolHeader.ExtHeaderOffset);
+    FwVolExHeaderInfo = (EFI_FIRMWARE_VOLUME_EXT_HEADER*)(((UINT8 *)FvHandle) + FwVolHeader.ExtHeaderOffset);
     CopyMem (&VolumeInfo->FvName, &FwVolExHeaderInfo->FvName, sizeof(EFI_GUID));
   }
-  return EFI_SUCCESS;
-}
+  
+  return EFI_SUCCESS;  
+}    
 
 /**
-  Get Fv image from the FV type file, then install FV INFO ppi, Build FV hob.
-
-  @param PeiServices          An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
-  @param ParentFvHandle       Fv handle to parent Fv image that contain this Fv image.
-  @param ParentFvFileHandle   File handle of a Fv type file that contain this Fv image.
-  @param AuthenticationState  Pointer to attestation authentication state of image.
-
-
-  @retval EFI_NOT_FOUND         FV image can't be found.
-  @retval EFI_SUCCESS           Successfully to process it.
-  @retval EFI_OUT_OF_RESOURCES  Can not allocate page when aligning FV image
-  @retval Others                Can not find EFI_SECTION_FIRMWARE_VOLUME_IMAGE section
+  Find the next matching section in the firmware file.
   
+  This service enables PEI modules to discover sections
+  of a given type within a valid file.
+  
+  @param This             Points to this instance of the
+                          EFI_PEI_FIRMWARE_VOLUME_PPI.
+  @param SearchType       A filter to find only sections of this
+                          type.
+  @param FileHandle       Handle of firmware file in which to
+                          search.
+  @param SectionData      Updated upon  return to point to the
+                          section found.
+  
+  @retval EFI_SUCCESS     Section was found.
+  @retval EFI_NOT_FOUND   Section of the specified type was not
+                          found. SectionData contains NULL.
 **/
 EFI_STATUS
-ProcessFvFile (
-  IN  CONST EFI_PEI_SERVICES      **PeiServices,
-  IN  EFI_PEI_FV_HANDLE           ParentFvHandle,
-  IN  EFI_PEI_FILE_HANDLE         ParentFvFileHandle,
-  OUT UINT32                      *AuthenticationState
+EFIAPI
+PeiFfs2FvPpiFindSectionByType (
+  IN  CONST EFI_PEI_FIRMWARE_VOLUME_PPI    *This,
+  IN        EFI_SECTION_TYPE               SearchType,
+  IN        EFI_PEI_FILE_HANDLE            FileHandle,
+  OUT VOID                                 **SectionData
   )
 {
-  EFI_STATUS            Status;
-  EFI_PEI_FV_HANDLE     FvImageHandle;
-  EFI_FV_INFO           FvImageInfo;
-  EFI_FV_INFO           ParentFvImageInfo;
-  UINT32                FvAlignment;
-  VOID                  *FvBuffer;
-  EFI_PEI_HOB_POINTERS  HobPtr;
-
-  FvBuffer             = NULL;
-  *AuthenticationState = 0;
-
-  //
-  // Check if this EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE file has already
-  // been extracted.
-  //
-  HobPtr.Raw = GetHobList ();
-  while ((HobPtr.Raw = GetNextHob (EFI_HOB_TYPE_FV2, HobPtr.Raw)) != NULL) {
-    if (CompareGuid (&(((EFI_FFS_FILE_HEADER *)ParentFvFileHandle)->Name), &HobPtr.FirmwareVolume2->FileName)) {
-      //
-      // this FILE has been dispatched, it will not be dispatched again.
-      //
-      return EFI_SUCCESS;
-    }
-    HobPtr.Raw = GET_NEXT_HOB (HobPtr);
-  }
-
-  //
-  // Find FvImage in FvFile
-  //
-  Status = PeiFfsFindSectionData (
-             PeiServices,
-             EFI_SECTION_FIRMWARE_VOLUME_IMAGE,
-             ParentFvFileHandle,
-             (VOID **)&FvImageHandle
-             );
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Collect Parent FvImage Info.
-  //
-  Status = PeiFfsGetVolumeInfo (ParentFvHandle, &ParentFvImageInfo);
-  ASSERT_EFI_ERROR (Status); 
- 
-  //
-  // Collect FvImage Info.
-  //
-  Status = PeiFfsGetVolumeInfo (FvImageHandle, &FvImageInfo);
-  ASSERT_EFI_ERROR (Status);
+  EFI_FFS_FILE_HEADER                     *FfsFileHeader;
+  UINT32                                  FileSize;
+  EFI_COMMON_SECTION_HEADER               *Section;
   
+  FfsFileHeader = (EFI_FFS_FILE_HEADER *)(FileHandle);
+
   //
-  // FvAlignment must be greater than or equal to 8 bytes of the minimum FFS alignment value.
+  // Size is 24 bits wide so mask upper 8 bits. 
+  // Does not include FfsFileHeader header size
+  // FileSize is adjusted to FileOccupiedSize as it is 8 byte aligned.
   //
-  FvAlignment = 1 << ((FvImageInfo.FvAttributes & EFI_FVB2_ALIGNMENT) >> 16);
-  if (FvAlignment < 8) {
-    FvAlignment = 8;
+  Section = (EFI_COMMON_SECTION_HEADER *)(FfsFileHeader + 1);
+  FileSize = *(UINT32 *)(FfsFileHeader->Size) & 0x00FFFFFF;
+  FileSize -= sizeof (EFI_FFS_FILE_HEADER);
+
+  return ProcessSection (
+           GetPeiServicesTablePointer (),
+           SearchType, 
+           Section, 
+           FileSize, 
+           SectionData
+           );  
+}  
+
+/**
+  Convert the handle of FV to pointer of corresponding PEI_CORE_FV_HANDLE.
+  
+  @param FvHandle   The handle of a FV.
+  
+  @retval NULL if can not find.
+  @return Pointer of corresponding PEI_CORE_FV_HANDLE. 
+**/
+PEI_CORE_FV_HANDLE *
+FvHandleToCoreHandle (
+  IN EFI_PEI_FV_HANDLE  FvHandle
+  )
+{
+  UINTN             Index;
+  PEI_CORE_INSTANCE *PrivateData;
+  
+  PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS (GetPeiServicesTablePointer());  
+  for (Index = 0; Index < PrivateData->FvCount; Index ++) {
+    if (FvHandle == PrivateData->Fv[Index].FvHandle) {
+      return &PrivateData->Fv[Index];
+    }
   }
   
+  return NULL;
+}  
+
+/**
+  Get instance of PEI_CORE_FV_HANDLE for next volume according to given index.
+  
+  This routine also will install FvInfo ppi for FV hob in PI ways.
+  
+  @param Private    Pointer of PEI_CORE_INSTANCE
+  @param Instance   The index of FV want to be searched.
+  
+  @return Instance of PEI_CORE_FV_HANDLE.
+**/
+PEI_CORE_FV_HANDLE *
+FindNextCoreFvHandle (
+  IN PEI_CORE_INSTANCE  *Private,
+  IN UINTN              Instance
+  )
+{
+  UINTN                    Index;
+  BOOLEAN                  Match;
+  EFI_HOB_FIRMWARE_VOLUME  *FvHob;
+  
   //
-  // Check FvImage
+  // Handle Framework FvHob and Install FvInfo Ppi for it.
   //
-  if ((UINTN) FvImageInfo.FvStart % FvAlignment != 0) {
-    FvBuffer = AllocateAlignedPages (EFI_SIZE_TO_PAGES ((UINT32) FvImageInfo.FvSize), FvAlignment);
-    if (FvBuffer == NULL) {
-      return EFI_OUT_OF_RESOURCES;
+  if (FeaturePcdGet (PcdFrameworkCompatibilitySupport)) {
+    //
+    // Loop to search the wanted FirmwareVolume which supports FFS
+    //
+    FvHob = (EFI_HOB_FIRMWARE_VOLUME *)GetFirstHob (EFI_HOB_TYPE_FV);
+    while (FvHob != NULL) {
+      for (Index = 0, Match = FALSE; Index < Private->FvCount; Index++) {
+        if ((EFI_PEI_FV_HANDLE)(UINTN)FvHob->BaseAddress == Private->Fv[Index].FvHeader) {
+          Match = TRUE;
+          break;
+        }
+      }
+      //
+      // If Not Found, Install FvInfo Ppi for it.
+      //
+      if (!Match) {
+        PeiServicesInstallFvInfoPpi (
+          &(((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)FvHob->BaseAddress)->FileSystemGuid),
+          (VOID *)(UINTN)FvHob->BaseAddress,
+          (UINT32)FvHob->Length,
+          NULL,
+          NULL
+          );
+      }
+      FvHob = (EFI_HOB_FIRMWARE_VOLUME *)GetNextHob (EFI_HOB_TYPE_FV, (VOID *)((UINTN)FvHob + FvHob->Header.HobLength)); 
     }
-    CopyMem (FvBuffer, FvImageInfo.FvStart, (UINTN) FvImageInfo.FvSize);
-    //
-    // Update FvImageInfo after reload FvImage to new aligned memory
-    //
-    Status = PeiFfsGetVolumeInfo ((EFI_PEI_FV_HANDLE) FvBuffer, &FvImageInfo);
-    ASSERT_EFI_ERROR (Status);
   }
 
-  //
-  // Install FvPpi and Build FvHob
-  //
-  PeiServicesInstallFvInfoPpi (
-    NULL,
-    FvImageInfo.FvStart,
-    (UINT32) FvImageInfo.FvSize,
-    &ParentFvImageInfo.FvName,
-    &(((EFI_FFS_FILE_HEADER*)ParentFvFileHandle)->Name)
-    );
+  if (Instance >= Private->FvCount) {
+    return NULL;
+  }
 
-  //
-  // Inform the extracted FvImage to Fv HOB consumer phase, i.e. DXE phase
-  //
-  BuildFvHob (
-    (EFI_PHYSICAL_ADDRESS) (UINTN) FvImageInfo.FvStart,
-    FvImageInfo.FvSize
-    );
-
-  //
-  // Makes the encapsulated volume show up in DXE phase to skip processing of
-  // encapsulated file again.
-  //
-  BuildFv2Hob (
-    (EFI_PHYSICAL_ADDRESS) (UINTN) FvImageInfo.FvStart,
-    FvImageInfo.FvSize,
-    &ParentFvImageInfo.FvName,
-    &(((EFI_FFS_FILE_HEADER *)ParentFvFileHandle)->Name)
-    );
-
-  return EFI_SUCCESS;
-}
-
-
+  return &Private->Fv[Instance];
+}  

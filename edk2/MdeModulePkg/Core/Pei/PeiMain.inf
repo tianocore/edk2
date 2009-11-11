@@ -4,7 +4,7 @@
 # 2) Dispatch PEIM from discovered FV.
 # 3) Handoff control to DxeIpl to load DXE core and enter DXE phase.
 #
-# Copyright (c) 2006 - 2008, Intel Corporation
+# Copyright (c) 2006 - 2009, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -42,6 +42,7 @@
   Image/Image.c
   Hob/Hob.c
   FwVol/FwVol.c
+  FwVol/FwVol.h
   Dispatcher/Dispatcher.c
   Dependency/Dependency.c
   Dependency/Dependency.h
@@ -70,9 +71,9 @@
   
 
 [Guids]
-  gPeiAprioriFileNameGuid     ## CONSUMES ## GUID
-  gEfiFirmwareFileSystem2Guid ## CONSUMES ## FV
-
+  gPeiAprioriFileNameGuid       ## CONSUMES ## GUID
+  gEfiFirmwareFileSystem2Guid   ## CONSUMES ## FV
+  
 [Ppis]
   gEfiPeiStatusCodePpiGuid                      ## SOMETIMES_CONSUMES (PeiReportStatusService is not ready if this PPI doesn't exist)
   gEfiPeiResetPpiGuid                           ## SOMETIMES_CONSUMES (PeiResetService is not ready if this PPI doesn't exist) 

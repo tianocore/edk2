@@ -30,14 +30,14 @@ typedef struct {
   Apriori file in one FV.
 
 
-  @param Private         - Pointer to the private data passed in from caller
-  @param VolumeHandle    - Fv handle.
+  @param Private          Pointer to the private data passed in from caller
+  @param CoreFileHandle   The instance of PEI_CORE_FV_HANDLE.
 
 **/
 VOID
 DiscoverPeimsAndOrderWithApriori (
   IN  PEI_CORE_INSTANCE    *Private,
-  IN  EFI_PEI_FV_HANDLE    VolumeHandle
+  IN  PEI_CORE_FV_HANDLE   *CoreFileHandle
   )
 {
   EFI_STATUS                          Status;
@@ -51,7 +51,11 @@ DiscoverPeimsAndOrderWithApriori (
   EFI_GUID                            *Guid;
   EFI_PEI_FV_HANDLE                   TempFileHandles[FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv)];
   EFI_GUID                            FileGuid[FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv)];
-
+  EFI_PEI_FIRMWARE_VOLUME_PPI         *FvPpi;
+  EFI_FV_FILE_INFO                    FileInfo;
+  
+  FvPpi = CoreFileHandle->FvPpi;
+  
   //
   // Walk the FV and find all the PEIMs and the Apriori file.
   //
@@ -72,13 +76,7 @@ DiscoverPeimsAndOrderWithApriori (
   // Go ahead to scan this Fv, and cache FileHandles within it.
   //
   for (PeimCount = 0; PeimCount < FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv); PeimCount++) {
-    Status = PeiFindFileEx (
-                VolumeHandle,
-                NULL,
-                PEI_CORE_INTERNAL_FFS_FILE_DISPATCH_TYPE,
-                &FileHandle,
-                &AprioriFileHandle
-                );
+    Status = FvPpi->FindFileByType (FvPpi, PEI_CORE_INTERNAL_FFS_FILE_DISPATCH_TYPE, CoreFileHandle->FvHandle, &FileHandle);
     if (Status != EFI_SUCCESS) {
       break;
     }
@@ -92,17 +90,23 @@ DiscoverPeimsAndOrderWithApriori (
   //
   ASSERT (PeimCount < FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv));
 
+  //
+  // Get Apriori File handle
+  //
   Private->AprioriCount = 0;
-  if (AprioriFileHandle != NULL) {
+  Status = FvPpi->FindFileByName (FvPpi, &gPeiAprioriFileNameGuid, &CoreFileHandle->FvHandle, &AprioriFileHandle);
+  if (!EFI_ERROR(Status) && AprioriFileHandle != NULL) {
     //
     // Read the Apriori file
     //
-    Status = PeiServicesFfsFindSectionData (EFI_SECTION_RAW, AprioriFileHandle, (VOID **) &Apriori);
+    Status = FvPpi->FindSectionByType (FvPpi, EFI_SECTION_RAW, AprioriFileHandle, (VOID **) &Apriori);
     if (!EFI_ERROR (Status)) {
       //
       // Calculate the number of PEIMs in the A Priori list
       //
-      Private->AprioriCount = *(UINT32 *)(((EFI_FFS_FILE_HEADER *)AprioriFileHandle)->Size) & 0x00FFFFFF;
+      Status = FvPpi->GetFileInfo (FvPpi, AprioriFileHandle, &FileInfo);
+      ASSERT_EFI_ERROR (Status);
+      Private->AprioriCount = FileInfo.BufferSize & 0x00FFFFFF;
       Private->AprioriCount -= sizeof (EFI_FFS_FILE_HEADER) - sizeof (EFI_COMMON_SECTION_HEADER);
       Private->AprioriCount /= sizeof (EFI_GUID);
 
@@ -112,7 +116,8 @@ DiscoverPeimsAndOrderWithApriori (
         // Make an array of file name guids that matches the FileHandle array so we can convert
         // quickly from file name to file handle
         //
-        CopyMem (&FileGuid[Index], &((EFI_FFS_FILE_HEADER *)Private->CurrentFvFileHandles[Index])->Name,sizeof(EFI_GUID));
+        Status = FvPpi->GetFileInfo (FvPpi, Private->CurrentFvFileHandles[Index], &FileInfo);
+        CopyMem (&FileGuid[Index], &FileInfo.FileName, sizeof(EFI_GUID));
       }
 
       //
@@ -202,13 +207,12 @@ ShadowPeiCore(
   //
   // Find the PEI Core in the BFV
   //
-  Status = PeiFindFileEx (
-             (EFI_PEI_FV_HANDLE)PrivateInMem->Fv[0].FvHeader,
-             NULL,
-             EFI_FV_FILETYPE_PEI_CORE,
-             &PeiCoreFileHandle,
-             NULL
-             );
+  Status = PrivateInMem->Fv[0].FvPpi->FindFileByType (
+                                        PrivateInMem->Fv[0].FvPpi,
+                                        EFI_FV_FILETYPE_PEI_CORE,
+                                        PrivateInMem->Fv[0].FvHandle,
+                                        &PeiCoreFileHandle
+                                        );
   ASSERT_EFI_ERROR (Status);
 
   //
@@ -248,7 +252,6 @@ PeiDispatcher (
   UINT32                              Index1;
   UINT32                              Index2;
   CONST EFI_PEI_SERVICES              **PeiServices;
-  EFI_PEI_FV_HANDLE                   VolumeHandle;
   EFI_PEI_FILE_HANDLE                 PeimFileHandle;
   UINTN                               FvCount;
   UINTN                               PeimCount;
@@ -272,7 +275,7 @@ PeiDispatcher (
   EFI_FV_FILE_INFO                    FvFileInfo;
   UINTN                               OldCheckingTop;
   UINTN                               OldCheckingBottom;
-
+  PEI_CORE_FV_HANDLE                  *CoreFvHandle;
 
   PeiServices = (CONST EFI_PEI_SERVICES **) &Private->PS;
   PeimEntryPoint = NULL;
@@ -349,11 +352,17 @@ PeiDispatcher (
     }
     
     for (FvCount = Private->CurrentPeimFvCount; FvCount < Private->FvCount; FvCount++) {
+      CoreFvHandle = FindNextCoreFvHandle (Private, FvCount);
+      ASSERT (CoreFvHandle != NULL);
+      
+      //
+      // If the FV has corresponding EFI_PEI_FIRMWARE_VOLUME_PPI instance, then dispatch it.
+      //
+      if (CoreFvHandle->FvPpi == NULL) {
+        continue;
+      }
+      
       Private->CurrentPeimFvCount = FvCount;
-      //
-      // Get this Fv Handle by PeiService FvFindNextVolume.
-      //
-      PeiFvFindNextVolume (PeiServices, FvCount, &VolumeHandle);
 
       if (Private->CurrentPeimCount == 0) {
         //
@@ -361,7 +370,7 @@ PeiDispatcher (
         // reorder all PEIMs to ensure the PEIMs in Apriori file to get
         // dispatch at first.
         //
-        DiscoverPeimsAndOrderWithApriori (Private, VolumeHandle);
+        DiscoverPeimsAndOrderWithApriori (Private, CoreFvHandle);
       }
 
       //
@@ -377,13 +386,14 @@ PeiDispatcher (
           if (!DepexSatisfied (Private, PeimFileHandle, PeimCount)) {
             Private->PeimNeedingDispatch = TRUE;
           } else {
-            Status = PeiFfsGetFileInfo (PeimFileHandle, &FvFileInfo);
+            Status = CoreFvHandle->FvPpi->GetFileInfo (CoreFvHandle->FvPpi, PeimFileHandle, &FvFileInfo);
             ASSERT_EFI_ERROR (Status);
             if (FvFileInfo.FileType == EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE) {
               //
               // For Fv type file, Produce new FV PPI and FV hob
               //
-              Status = ProcessFvFile (PeiServices, VolumeHandle, PeimFileHandle, &AuthenticationState);
+              Status = ProcessFvFile (&Private->Fv[FvCount], PeimFileHandle);
+              AuthenticationState = 0;
             } else {
               //
               // For PEIM driver, Load its entry point
@@ -412,7 +422,7 @@ PeiDispatcher (
                 sizeof (ExtendedData)
                 );
 
-              Status = VerifyPeim (Private, VolumeHandle, PeimFileHandle);
+              Status = VerifyPeim (Private, CoreFvHandle->FvHandle, PeimFileHandle);
               if (Status != EFI_SECURITY_VIOLATION && (AuthenticationState == 0)) {
                 //
                 // PEIM_STATE_NOT_DISPATCHED move to PEIM_STATE_DISPATCHED
@@ -806,4 +816,5 @@ PeiRegisterForShadow (
 
   return EFI_SUCCESS;
 }
+
 
