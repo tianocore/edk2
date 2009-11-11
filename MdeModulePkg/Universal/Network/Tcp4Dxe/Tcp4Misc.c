@@ -471,7 +471,7 @@ TcpGetRcvMss (
   IN SOCKET  *Sock
   )
 {
-  EFI_SIMPLE_NETWORK_MODE SnpMode;
+  EFI_IP4_MODE_DATA       Ip4Mode;
   TCP4_PROTO_DATA         *TcpProto;
   EFI_IP4_PROTOCOL        *Ip;
 
@@ -481,9 +481,9 @@ TcpGetRcvMss (
   Ip       = (EFI_IP4_PROTOCOL *) (TcpProto->TcpService->IpIo->Ip);
   ASSERT (Ip != NULL);
 
-  Ip->GetModeData (Ip, NULL, NULL, &SnpMode);
+  Ip->GetModeData (Ip, &Ip4Mode, NULL, NULL);
 
-  return (UINT16) (SnpMode.MaxPacketSize - 40);
+  return (UINT16) (Ip4Mode.MaxPacketSize - sizeof (TCP_HEAD));
 }
 
 

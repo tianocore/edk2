@@ -429,6 +429,219 @@ DROP:
   return NULL;
 }
 
+/**
+  The callback function for the net buffer which wraps the packet processed by 
+  IPsec. It releases the wrap packet and also signals IPsec to free the resources. 
+
+  @param[in]  Arg       The wrap context
+
+**/
+VOID
+Ip4IpSecFree (
+  IN VOID                   *Arg
+  )
+{
+  IP4_IPSEC_WRAP            *Wrap;
+
+  Wrap = (IP4_IPSEC_WRAP *) Arg;
+
+  if (Wrap->IpSecRecycleSignal != NULL) {
+    gBS->SignalEvent (Wrap->IpSecRecycleSignal);
+  }
+
+  NetbufFree (Wrap->Packet);
+
+  FreePool (Wrap);
+
+  return;
+}
+
+/**
+  The work function to locate IPsec protocol to process the inbound or 
+  outbound IP packets. The process routine handls the packet with following
+  actions: bypass the packet, discard the packet, or protect the packet.       
+
+  @param[in]       IpSb          The IP4 service instance
+  @param[in]       Head          The The caller supplied IP4 header.
+  @param[in, out]  Netbuf        The IP4 packet to be processed by IPsec
+  @param[in]       Options       The caller supplied options
+  @param[in]       OptionsLen    The length of the option
+  @param[in]       Direction     The directionality in an SPD entry, 
+                                 EfiIPsecInBound or EfiIPsecOutBound
+  @param[in]       Context       The token's wrap
+
+  @retval EFI_SUCCESS            The IPsec protocol is not available or disabled.
+  @retval EFI_SUCCESS            The packet was bypassed and all buffers remain the same.
+  @retval EFI_SUCCESS            The packet was protected.
+  @retval EFI_ACCESS_DENIED      The packet was discarded.  
+  @retval EFI_OUT_OF_RESOURCES   There is no suffcient resource to complete the operation.
+  @retval EFI_BUFFER_TOO_SMALL   The number of non-empty block is bigger than the 
+                                 number of input data blocks when build a fragment table.
+
+**/
+EFI_STATUS
+Ip4IpSecProcessPacket (
+  IN IP4_SERVICE            *IpSb,
+  IN IP4_HEAD               *Head,
+  IN OUT NET_BUF            **Netbuf,
+  IN UINT8                  *Options,
+  IN UINT32                 OptionsLen,
+  IN EFI_IPSEC_TRAFFIC_DIR  Direction,
+  IN VOID                   *Context
+  )
+{
+  NET_FRAGMENT              *FragmentTable;
+  UINT32                    FragmentCount;
+  EFI_EVENT                 RecycleEvent;
+  NET_BUF                   *Packet;
+  IP4_TXTOKEN_WRAP          *TxWrap;
+  IP4_IPSEC_WRAP            *IpSecWrap;
+  EFI_STATUS                Status;
+
+  Status        = EFI_SUCCESS;
+  Packet        = *Netbuf;
+  RecycleEvent  = NULL;
+  IpSecWrap     = NULL;
+  FragmentTable = NULL;
+  TxWrap        = (IP4_TXTOKEN_WRAP *) Context; 
+  FragmentCount = Packet->BlockOpNum;
+  
+  if (mIpSec == NULL) {
+    gBS->LocateProtocol (&gEfiIpSecProtocolGuid, NULL, (VOID **) &mIpSec);
+    if (mIpSec != NULL) {
+      //
+      // Save the original MTU
+      //
+      IpSb->OldMaxPacketSize = IpSb->MaxPacketSize; 
+    }
+  }
+
+  //
+  // Check whether the IPsec protocol is available.
+  //
+  if (mIpSec == NULL) {
+    goto ON_EXIT;
+  }
+  //
+  // Check whether the IPsec enable variable is set.
+  //
+  if (mIpSec->DisabledFlag) {
+    //
+    // If IPsec is disabled, restore the original MTU
+    //   
+    IpSb->MaxPacketSize = IpSb->OldMaxPacketSize;
+    goto ON_EXIT;
+  } else {
+    //
+    // If IPsec is enabled, use the MTU which reduce the IPsec header length.  
+    //
+    IpSb->MaxPacketSize = IpSb->OldMaxPacketSize - IP4_MAX_IPSEC_HEADLEN;   
+  }
+
+  //
+  // Rebuild fragment table from netbuf to ease IPsec process.
+  //
+  FragmentTable = AllocateZeroPool (FragmentCount * sizeof (NET_FRAGMENT));
+
+  if (FragmentTable == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ON_EXIT;
+  }
+ 
+  Status = NetbufBuildExt (Packet, FragmentTable, &FragmentCount);
+
+  if (EFI_ERROR (Status)) {
+    FreePool (FragmentTable);
+    goto ON_EXIT;
+  }
+
+  //
+  // Convert host byte order to network byte order
+  //
+  Ip4NtohHead (Head);
+  
+  Status = mIpSec->Process (
+                     mIpSec,
+                     IpSb->Controller,
+                     IP_VERSION_4,
+                     (VOID *) Head,
+                     &Head->Protocol,
+                     NULL,
+                     0,
+                     (EFI_IPSEC_FRAGMENT_DATA **) (&FragmentTable),
+                     &FragmentCount,
+                     Direction,
+                     &RecycleEvent
+                     );
+  //
+  // Convert back to host byte order
+  //
+  Ip4NtohHead (Head);
+  
+  if (EFI_ERROR (Status)) {
+    goto ON_EXIT;
+  }
+
+  if (Direction == EfiIPsecOutBound && TxWrap != NULL) {
+  
+    TxWrap->IpSecRecycleSignal = RecycleEvent;
+    TxWrap->Packet             = NetbufFromExt (
+                                   FragmentTable,
+                                   FragmentCount,
+                                   IP4_MAX_HEADLEN,
+                                   0,
+                                   Ip4FreeTxToken,
+                                   TxWrap
+                                   );
+    if (TxWrap->Packet == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto ON_EXIT;
+    }
+
+    *Netbuf = TxWrap->Packet;
+    
+  } else {
+  
+    IpSecWrap = AllocateZeroPool (sizeof (IP4_IPSEC_WRAP));
+  
+    if (IpSecWrap == NULL) {
+      goto ON_EXIT;
+    }
+    
+    IpSecWrap->IpSecRecycleSignal = RecycleEvent;
+    IpSecWrap->Packet             = Packet;
+    Packet                        = NetbufFromExt (
+                                      FragmentTable, 
+                                      FragmentCount, 
+                                      IP4_MAX_HEADLEN, 
+                                      0, 
+                                      Ip4IpSecFree, 
+                                      IpSecWrap
+                                      );
+  
+    if (Packet == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto ON_EXIT;
+    }
+
+    if (Direction == EfiIPsecInBound) {
+      Ip4PrependHead (Packet, Head, Options, OptionsLen);
+      Ip4NtohHead (Packet->Ip.Ip4);
+      NetbufTrim (Packet, (Head->HeadLen << 2), TRUE);
+
+      CopyMem (
+        IP4_GET_CLIP_INFO (Packet),
+        IP4_GET_CLIP_INFO (IpSecWrap->Packet),
+        sizeof (IP4_CLIP_INFO)
+        );
+    }
+
+    *Netbuf = Packet;
+  }
+
+ON_EXIT:
+  return Status;
+}
 
 /**
   The IP4 input routine. It is called by the IP4_INTERFACE when a
@@ -459,6 +672,7 @@ Ip4AccpetFrame (
   UINT32                    OptionLen;
   UINT32                    TotalLen;
   UINT16                    Checksum;
+  EFI_STATUS                Status;
 
   IpSb = (IP4_SERVICE *) Context;
 
@@ -566,6 +780,22 @@ Ip4AccpetFrame (
   }
 
   //
+  // After trim off, the packet is a esp/ah/udp/tcp/icmp6 net buffer,
+  // and no need consider any other ahead ext headers.
+  //
+  Status = Ip4IpSecProcessPacket (
+             IpSb, 
+             Head, 
+             &Packet, 
+             NULL,
+             0, 
+             EfiIPsecInBound,
+             NULL
+             );
+
+  if (EFI_ERROR(Status)) {
+    goto RESTART;
+  }
   // Packet may have been changed. Head, HeadLen, TotalLen, and
   // info must be reloaded bofore use. The ownership of the packet
   // is transfered to the packet process logic.

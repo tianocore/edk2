@@ -81,8 +81,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 extern EFI_IP4_CONFIG_DATA  mIp4IoDefaultIpConfigData;
 extern EFI_IP6_CONFIG_DATA  mIp6IoDefaultIpConfigData;
 
-#define IP_VERSION_4 4
-#define IP_VERSION_6 6
 
 ///
 /// This error will be delivered to the

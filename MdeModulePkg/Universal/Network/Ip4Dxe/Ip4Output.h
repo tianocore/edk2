@@ -95,5 +95,32 @@ Ip4CancelPacket (
   IN EFI_STATUS       IoStatus
   );
 
+/**
+  Prepend an IP4 head to the Packet. It will copy the options and
+  build the IP4 header fields. Used for IP4 fragmentation.
+
+  @param  Packet           The packet to prepend IP4 header to
+  @param  Head             The caller supplied header. The caller should set
+                           the following header fields: Tos, TotalLen, Id,
+                           Fragment, Ttl, Protocol, Src and Dst. All the fields
+                           are in host byte order. This function will fill in
+                           the Ver, HeadLen, and checksum.
+  @param  Option           The orginal IP4 option to copy from
+  @param  OptLen           The length of the IP4 option
+
+  @retval EFI_BAD_BUFFER_SIZE  There is no enought room in the head space of
+                               Packet.
+  @retval EFI_SUCCESS          The IP4 header is successfully added to the packet.
+
+**/
+EFI_STATUS
+Ip4PrependHead (
+  IN OUT NET_BUF                *Packet,
+  IN     IP4_HEAD               *Head,
+  IN     UINT8                  *Option,
+  IN     UINT32                 OptLen
+  );
+
 extern UINT16  mIp4Id;
+
 #endif

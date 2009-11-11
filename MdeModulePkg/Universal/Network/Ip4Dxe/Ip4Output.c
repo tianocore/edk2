@@ -292,8 +292,28 @@ Ip4Output (
   }
 
   //
+  // TODO: currently Option/OptLen are not included into encryption scope.
+  //
+  Status = Ip4IpSecProcessPacket (
+             IpSb, 
+             Head, 
+             &Packet, 
+             Option, 
+             OptLen, 
+             EfiIPsecOutBound,
+             Context
+             );
+
+  if (EFI_ERROR(Status)) {
+    return Status;
+  }
+
+  //
   // OK, selected the source and route, fragment the packet then send
   // them. Tag each fragment other than the first one as spawn from it.
+
+  //
+  // IPsec payload has been appended, so use IpSb->SnpMode.MaxPacketSize here.
   //
   Mtu            = IpSb->SnpMode.MaxPacketSize;
   HeadLen        = sizeof (IP4_HEAD) + ((OptLen + 3) & (~0x03));
