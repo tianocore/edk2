@@ -2557,11 +2557,11 @@ UiDisplayMenu (
           Selection->QuestionId = Statement->RefQuestionId;
         } else if (Statement->RefFormId != 0) {
           //
-          // Check Ref From is suppressed.
+          // Check whether target From is suppressed.
           //
           RefForm = IdToForm (Selection->FormSet, Statement->RefFormId);
 
-          if (RefForm->SuppressExpression != NULL) {
+          if ((RefForm != NULL) && (RefForm->SuppressExpression != NULL)) {
             Status = EvaluateExpression (Selection->FormSet, RefForm, RefForm->SuppressExpression);
             if (EFI_ERROR (Status)) {
               return Status;

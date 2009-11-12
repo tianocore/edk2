@@ -729,6 +729,7 @@ GetSelectionInputPopUp (
   Question = MenuOption->ThisTag;
   if (Question->Operand == EFI_IFR_ORDERED_LIST_OP) {
     ValueArray = Question->BufferValue;
+    ValueType = Question->ValueType;
     OrderedList = TRUE;
   } else {
     OrderedList = FALSE;
