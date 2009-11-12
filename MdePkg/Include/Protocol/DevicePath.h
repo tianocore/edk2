@@ -758,6 +758,18 @@ typedef struct {
 #define ISCSI_LOGIN_OPTION_CHAP_BI                      0x0000
 #define ISCSI_LOGIN_OPTION_CHAP_UNI                     0x2000
 
+///
+/// VLAN Device Path SubType
+///
+#define MSG_VLAN_DP               0x14
+typedef struct {
+  EFI_DEVICE_PATH_PROTOCOL        Header;
+  ///
+  /// VLAN identifier (0-4094)
+  ///
+  UINT16                          VlanId;
+} VLAN_DEVICE_PATH;
+
 //
 // Media Device Path
 //

@@ -1,7 +1,7 @@
 /** @file
   DevicePathFromText protocol as defined in the UEFI 2.0 specification.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2350,6 +2350,34 @@ DevPathFromTextiSCSI (
 }
 
 /**
+  Converts a text device path node to VLAN device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created VLAN device path structure.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+DevPathFromTextVlan (
+  IN CHAR16 *TextDeviceNode
+  )
+{
+  CHAR16            *VlanStr;
+  VLAN_DEVICE_PATH  *Vlan;
+
+  VlanStr = GetNextParamStr (&TextDeviceNode);
+  Vlan    = (VLAN_DEVICE_PATH *) CreateDeviceNode (
+                                   MESSAGING_DEVICE_PATH,
+                                   MSG_VLAN_DP,
+                                   sizeof (VLAN_DEVICE_PATH)
+                                   );
+
+  Vlan->VlanId = (UINT16) Strtoi (VlanStr);
+
+  return (EFI_DEVICE_PATH_PROTOCOL *) Vlan;
+}
+
+/**
   Converts a text device path node to HD device path structure.
 
   @param TextDeviceNode  The input Text device path node.
@@ -2753,6 +2781,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED DEVICE_PATH_FROM_TEXT_TABLE DevPathFromTextTable[]
   {L"UsbWwid", DevPathFromTextUsbWwid},
   {L"Unit", DevPathFromTextUnit},
   {L"iSCSI", DevPathFromTextiSCSI},
+  {L"Vlan", DevPathFromTextVlan},
   {L"HD", DevPathFromTextHD},
   {L"CDROM", DevPathFromTextCDROM},
   {L"VenMEDIA", DevPathFromTextVenMEDIA},
