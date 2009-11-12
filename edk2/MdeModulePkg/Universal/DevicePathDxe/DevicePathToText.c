@@ -1,7 +1,7 @@
 /** @file
   DevicePathToText protocol as defined in the UEFI 2.0 specification.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1312,6 +1312,33 @@ DevPathToTextiSCSI (
 }
 
 /**
+  Converts a VLAN device path structure to its string representative.
+
+  @param Str             The string representative of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
+VOID
+DevPathToTextVlan (
+  IN OUT POOL_PRINT  *Str,
+  IN VOID            *DevPath,
+  IN BOOLEAN         DisplayOnly,
+  IN BOOLEAN         AllowShortcuts
+  )
+{
+  VLAN_DEVICE_PATH  *Vlan;
+
+  Vlan = DevPath;
+  CatPrint (Str, L"Vlan(%d)", (UINTN) Vlan->VlanId);
+}
+
+/**
   Converts a Hard drive device path structure to its string representative.
 
   @param Str             The string representative of input device.
@@ -1684,6 +1711,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED const DEVICE_PATH_TO_TEXT_TABLE DevPathToTextTable
   {MESSAGING_DEVICE_PATH, MSG_UART_DP, DevPathToTextUart},
   {MESSAGING_DEVICE_PATH, MSG_VENDOR_DP, DevPathToTextVendor},
   {MESSAGING_DEVICE_PATH, MSG_ISCSI_DP, DevPathToTextiSCSI},
+  {MESSAGING_DEVICE_PATH, MSG_VLAN_DP, DevPathToTextVlan},
   {MEDIA_DEVICE_PATH, MEDIA_HARDDRIVE_DP, DevPathToTextHardDrive},
   {MEDIA_DEVICE_PATH, MEDIA_CDROM_DP, DevPathToTextCDROM},
   {MEDIA_DEVICE_PATH, MEDIA_VENDOR_DP, DevPathToTextVendor},
