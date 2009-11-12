@@ -401,6 +401,7 @@ typedef struct {
 
   LIST_ENTRY        ExpressionListHead;   // List of Expressions (FORM_EXPRESSION)
   LIST_ENTRY        StatementListHead;    // List of Statements and Questions (FORM_BROWSER_STATEMENT)
+  FORM_EXPRESSION   *SuppressExpression;  // nesting inside of SuppressIf
 } FORM_BROWSER_FORM;
 
 #define FORM_BROWSER_FORM_FROM_LINK(a)  CR (a, FORM_BROWSER_FORM, Link, FORM_BROWSER_FORM_SIGNATURE)
@@ -441,6 +442,7 @@ typedef struct {
   LIST_ENTRY                      StorageListHead;      // Storage list (FORMSET_STORAGE)
   LIST_ENTRY                      DefaultStoreListHead; // DefaultStore list (FORMSET_DEFAULTSTORE)
   LIST_ENTRY                      FormListHead;         // Form list (FORM_BROWSER_FORM)
+  LIST_ENTRY                      ExpressionListHead;   // List of Expressions (FORM_EXPRESSION)
 } FORM_BROWSER_FORMSET;
 
 #define BROWSER_CONTEXT_SIGNATURE  SIGNATURE_32 ('B', 'C', 'T', 'X')
@@ -550,6 +552,7 @@ extern CHAR16            *gMinusString;
 extern CHAR16            *gAdjustNumber;
 extern CHAR16            *gSaveChanges;
 extern CHAR16            *gOptionMismatch;
+extern CHAR16            *gFormSuppress;
 
 extern CHAR16            gPromptBlockWidth;
 extern CHAR16            gOptionBlockWidth;

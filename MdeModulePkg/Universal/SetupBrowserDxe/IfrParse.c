@@ -652,6 +652,7 @@ DestroyFormSet (
   LIST_ENTRY            *Link;
   FORMSET_STORAGE       *Storage;
   FORMSET_DEFAULTSTORE  *DefaultStore;
+  FORM_EXPRESSION       *Expression;
   FORM_BROWSER_FORM     *Form;
 
   //
@@ -683,6 +684,17 @@ DestroyFormSet (
 
       FreePool (DefaultStore);
     }
+  }
+
+  //
+  // Free Formset Expressions
+  //
+  while (!IsListEmpty (&FormSet->ExpressionListHead)) {
+    Link = GetFirstNode (&FormSet->ExpressionListHead);
+    Expression = FORM_EXPRESSION_FROM_LINK (Link);
+    RemoveEntryList (&Expression->Link);
+
+    DestroyExpression (Expression);
   }
 
   //
@@ -815,9 +827,12 @@ ParseOpCodes (
   UINT16                  NumberOfStatement;
   UINT16                  NumberOfExpression;
   EFI_IMAGE_ID            *ImageId;
+  BOOLEAN                 SuppressForQuestion;
   BOOLEAN                 SuppressForOption;
   BOOLEAN                 InScopeOptionSuppress;
   FORM_EXPRESSION         *OptionSuppressExpression;
+  BOOLEAN                 InScopeFormSuppress;
+  FORM_EXPRESSION         *FormSuppressExpression;
   UINT16                  DepthOfDisable;
   BOOLEAN                 OpCodeDisabled;
   BOOLEAN                 SingleOpCodeExpression;
@@ -825,7 +840,9 @@ ParseOpCodes (
   EFI_HII_VALUE           *Value;
 
   mInScopeSubtitle         = FALSE;
+  SuppressForQuestion      = FALSE;
   SuppressForOption        = FALSE;
+  InScopeFormSuppress      = FALSE;
   mInScopeSuppress         = FALSE;
   InScopeOptionSuppress    = FALSE;
   mInScopeGrayOut          = FALSE;
@@ -838,6 +855,7 @@ ParseOpCodes (
   CurrentDefault           = NULL;
   CurrentOption            = NULL;
   OptionSuppressExpression = NULL;
+  FormSuppressExpression   = NULL;
   ImageId                  = NULL;
 
   //
@@ -1086,6 +1104,8 @@ ParseOpCodes (
       //
       FormSet->NumberOfClassGuid = (UINT8) (((EFI_IFR_FORM_SET *) OpCodeData)->Flags & 0x3);
       CopyMem (FormSet->ClassGuid, OpCodeData + sizeof (EFI_IFR_FORM_SET), FormSet->NumberOfClassGuid * sizeof (EFI_GUID));
+
+      InitializeListHead (&FormSet->ExpressionListHead);
       break;
 
     case EFI_IFR_FORM_OP:
@@ -1100,6 +1120,20 @@ ParseOpCodes (
 
       CopyMem (&CurrentForm->FormId,    &((EFI_IFR_FORM *) OpCodeData)->FormId,    sizeof (UINT16));
       CopyMem (&CurrentForm->FormTitle, &((EFI_IFR_FORM *) OpCodeData)->FormTitle, sizeof (EFI_STRING_ID));
+
+      if (InScopeFormSuppress) {
+        //
+        // Form is inside of suppressif
+        //
+        CurrentForm->SuppressExpression = FormSuppressExpression;
+      }
+
+      if (Scope != 0) {
+        //
+        // Enter scope of a Form, suppressif will be used for Question or Option
+        //
+        SuppressForQuestion = TRUE;
+      }
 
       //
       // Insert into Form list of this FormSet
@@ -1510,6 +1544,14 @@ ParseOpCodes (
         CurrentExpression->Type = EFI_HII_EXPRESSION_INCONSISTENT_IF;
         InsertTailList (&CurrentStatement->InconsistentListHead, &CurrentExpression->Link);
       }
+
+      //
+      // Take a look at next OpCode to see whether current expression consists
+      // of single OpCode
+      //
+      if (((EFI_IFR_OP_HEADER *) (OpCodeData + OpCodeLength))->Scope == 0) {
+        SingleOpCodeExpression = TRUE;
+      }
       break;
 
     case EFI_IFR_SUPPRESS_IF_OP:
@@ -1518,14 +1560,30 @@ ParseOpCodes (
       //
       CurrentExpression = CreateExpression (CurrentForm);
       CurrentExpression->Type = EFI_HII_EXPRESSION_SUPPRESS_IF;
-      InsertTailList (&CurrentForm->ExpressionListHead, &CurrentExpression->Link);
+
+      if (CurrentForm == NULL) {
+        InsertTailList (&FormSet->ExpressionListHead, &CurrentExpression->Link);
+      } else {
+        InsertTailList (&CurrentForm->ExpressionListHead, &CurrentExpression->Link);
+      }
 
       if (SuppressForOption) {
         InScopeOptionSuppress = TRUE;
         OptionSuppressExpression = CurrentExpression;
-      } else {
+      } else if (SuppressForQuestion) {
         mInScopeSuppress = TRUE;
         mSuppressExpression = CurrentExpression;
+      } else {
+        InScopeFormSuppress = TRUE;
+        FormSuppressExpression = CurrentExpression;
+      }
+
+      //
+      // Take a look at next OpCode to see whether current expression consists
+      // of single OpCode
+      //
+      if (((EFI_IFR_OP_HEADER *) (OpCodeData + OpCodeLength))->Scope == 0) {
+        SingleOpCodeExpression = TRUE;
       }
       break;
 
@@ -1539,6 +1597,14 @@ ParseOpCodes (
 
       mInScopeGrayOut = TRUE;
       mGrayOutExpression = CurrentExpression;
+
+      //
+      // Take a look at next OpCode to see whether current expression consists
+      // of single OpCode
+      //
+      if (((EFI_IFR_OP_HEADER *) (OpCodeData + OpCodeLength))->Scope == 0) {
+        SingleOpCodeExpression = TRUE;
+      }
       break;
 
     case EFI_IFR_DISABLE_IF_OP:
@@ -1597,6 +1663,14 @@ ParseOpCodes (
         ASSERT (CurrentStatement != NULL);
         CurrentStatement->ValueExpression = CurrentExpression;
       }
+
+      //
+      // Take a look at next OpCode to see whether current expression consists
+      // of single OpCode
+      //
+      if (((EFI_IFR_OP_HEADER *) (OpCodeData + OpCodeLength))->Scope == 0) {
+        SingleOpCodeExpression = TRUE;
+      }
       break;
 
     case EFI_IFR_RULE_OP:
@@ -1605,6 +1679,14 @@ ParseOpCodes (
 
       CurrentExpression->RuleId = ((EFI_IFR_RULE *) OpCodeData)->RuleId;
       InsertTailList (&CurrentForm->ExpressionListHead, &CurrentExpression->Link);
+
+      //
+      // Take a look at next OpCode to see whether current expression consists
+      // of single OpCode
+      //
+      if (((EFI_IFR_OP_HEADER *) (OpCodeData + OpCodeLength))->Scope == 0) {
+        SingleOpCodeExpression = TRUE;
+      }
       break;
 
     //
@@ -1722,6 +1804,7 @@ ParseOpCodes (
         // End of Form
         //
         CurrentForm = NULL;
+        SuppressForQuestion = FALSE;
         break;
 
       case EFI_IFR_ONE_OF_OPTION_OP:
@@ -1745,8 +1828,10 @@ ParseOpCodes (
       case EFI_IFR_SUPPRESS_IF_OP:
         if (SuppressForOption) {
           InScopeOptionSuppress = FALSE;
-        } else {
+        } else if (SuppressForQuestion) {
           mInScopeSuppress = FALSE;
+        } else {
+          InScopeFormSuppress = FALSE;
         }
         break;
 

@@ -74,6 +74,7 @@ CHAR16            *gMinusString;
 CHAR16            *gAdjustNumber;
 CHAR16            *gSaveChanges;
 CHAR16            *gOptionMismatch;
+CHAR16            *gFormSuppress;
 
 CHAR16            *mUnknownString = L"!";
 
@@ -2313,7 +2314,7 @@ GetIfrBinaryData (
 
   OpCodeData = NULL;
   Package = NULL;
-  ZeroMem (&PackageHeader, sizeof (EFI_HII_PACKAGE_HEADER));;
+  ZeroMem (&PackageHeader, sizeof (EFI_HII_PACKAGE_HEADER));
 
   //
   // if FormSetGuid is NULL or zero GUID, return first Setup FormSet in the package list
