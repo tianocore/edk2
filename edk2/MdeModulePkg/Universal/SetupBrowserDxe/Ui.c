@@ -1669,6 +1669,7 @@ UiDisplayMenu (
   UINT8                           DigitUint8;
   UI_MENU_LIST                    *CurrentMenu;
   UI_MENU_LIST                    *MenuList;
+  FORM_BROWSER_FORM               *RefForm;
 
   CopyMem (&LocalScreen, &gScreenDimensions, sizeof (EFI_SCREEN_DESCRIPTOR));
 
@@ -1690,6 +1691,7 @@ UiDisplayMenu (
   NextMenuOption      = NULL;
   PreviousMenuOption  = NULL;
   SavedMenuOption     = NULL;
+  RefForm             = NULL;
 
   ZeroMem (&Key, sizeof (EFI_INPUT_KEY));
 
@@ -2494,7 +2496,6 @@ UiDisplayMenu (
           //
           // Goto another Hii Package list
           //
-          ControlFlag = CfCheckSelection;
           Selection->Action = UI_ACTION_REFRESH_FORMSET;
 
           StringPtr = GetToken (Statement->RefDevicePath, Selection->FormSet->HiiHandle);
@@ -2549,13 +2550,36 @@ UiDisplayMenu (
           //
           // Goto another Formset, check for uncommitted data
           //
-          ControlFlag = CfCheckSelection;
           Selection->Action = UI_ACTION_REFRESH_FORMSET;
 
           CopyMem (&Selection->FormSetGuid, &Statement->RefFormSetId, sizeof (EFI_GUID));
           Selection->FormId = Statement->RefFormId;
           Selection->QuestionId = Statement->RefQuestionId;
         } else if (Statement->RefFormId != 0) {
+          //
+          // Check Ref From is suppressed.
+          //
+          RefForm = IdToForm (Selection->FormSet, Statement->RefFormId);
+
+          if (RefForm->SuppressExpression != NULL) {
+            Status = EvaluateExpression (Selection->FormSet, RefForm, RefForm->SuppressExpression);
+            if (EFI_ERROR (Status)) {
+              return Status;
+            }
+
+            if (RefForm->SuppressExpression->Result.Value.b) {
+              //
+              // Form is suppressed. 
+              //
+              do {
+                CreateDialog (4, TRUE, 0, NULL, &Key, gEmptyString, gFormSuppress, gPressEnter, gEmptyString);
+              } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
+
+              Repaint = TRUE;
+              break;
+            }
+          }
+
           //
           // Goto another form inside this formset,
           //
@@ -2626,9 +2650,9 @@ UiDisplayMenu (
           Selection->Action = UI_ACTION_REFRESH_FORM;
         }
 
-          if (OptionString != NULL) {
-            FreePool (OptionString);
-          }
+        if (OptionString != NULL) {
+          FreePool (OptionString);
+        }
         break;
       }
       break;

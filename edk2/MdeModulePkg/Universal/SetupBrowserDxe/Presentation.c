@@ -591,6 +591,7 @@ InitializeBrowserStrings (
   gAdjustNumber         = GetToken (STRING_TOKEN (ADJUST_NUMBER), gHiiHandle);
   gSaveChanges          = GetToken (STRING_TOKEN (SAVE_CHANGES), gHiiHandle);
   gOptionMismatch       = GetToken (STRING_TOKEN (OPTION_MISMATCH), gHiiHandle);
+  gFormSuppress         = GetToken (STRING_TOKEN (FORM_SUPPRESSED), gHiiHandle);
   return ;
 }
 
@@ -632,6 +633,7 @@ FreeBrowserStrings (
   FreePool (gAdjustNumber);
   FreePool (gSaveChanges);
   FreePool (gOptionMismatch);
+  FreePool (gFormSuppress);
   return ;
 }
 
@@ -858,6 +860,7 @@ SetupBrowser (
   FORM_BROWSER_STATEMENT          *Statement;
   EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess;
   FORM_BROWSER_FORMSET            *FormSet;
+  EFI_INPUT_KEY                   Key;
 
   gMenuRefreshHead = NULL;
   gResetRequired = FALSE;
@@ -919,6 +922,7 @@ SetupBrowser (
       //
       // IFR is updated during callback, force to reparse the IFR binary
       //
+      mHiiPackageListUpdated = FALSE;
       Selection->Action = UI_ACTION_REFRESH_FORMSET;
       goto Done;
     }
@@ -956,6 +960,27 @@ SetupBrowser (
       return EFI_NOT_FOUND;
     }
 
+    //
+    // Check Form is suppressed.
+    //
+    if (Selection->Form->SuppressExpression != NULL) {
+      Status = EvaluateExpression (Selection->FormSet, Selection->Form, Selection->Form->SuppressExpression);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+
+      if (Selection->Form->SuppressExpression->Result.Value.b) {
+        //
+        // Form is suppressed. 
+        //
+        do {
+          CreateDialog (4, TRUE, 0, NULL, &Key, gEmptyString, gFormSuppress, gPressEnter, gEmptyString);
+        } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
+
+        return EFI_NOT_FOUND;
+      }
+    }
+    
     //
     // Load Questions' Value for display
     //
@@ -1060,6 +1085,7 @@ SetupBrowser (
         //
         // Force to reparse IFR binary of target Formset
         //
+        mHiiPackageListUpdated = FALSE;
         Selection->Action = UI_ACTION_REFRESH_FORMSET;
       }
     }
