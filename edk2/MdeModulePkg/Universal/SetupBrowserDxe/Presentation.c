@@ -857,6 +857,7 @@ SetupBrowser (
   EFI_BROWSER_ACTION_REQUEST      ActionRequest;
   EFI_HANDLE                      NotifyHandle;
   EFI_HII_VALUE                   *HiiValue;
+  EFI_IFR_TYPE_VALUE              *TypeValue;
   FORM_BROWSER_STATEMENT          *Statement;
   EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess;
   FORM_BROWSER_FORMSET            *FormSet;
@@ -1019,23 +1020,30 @@ SetupBrowser (
       if (((Statement->QuestionFlags & EFI_IFR_FLAG_CALLBACK) == EFI_IFR_FLAG_CALLBACK) && (Statement->Operand != EFI_IFR_PASSWORD_OP)) {
         ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
 
+        if (ConfigAccess == NULL) {
+          return EFI_UNSUPPORTED;
+        }
+
         HiiValue = &Statement->HiiValue;
+        TypeValue = &HiiValue->Value;
         if (HiiValue->Type == EFI_IFR_TYPE_STRING) {
           //
           // Create String in HII database for Configuration Driver to retrieve
           //
           HiiValue->Value.string = NewString ((CHAR16 *) Statement->BufferValue, Selection->FormSet->HiiHandle);
+        } else if (HiiValue->Type == EFI_IFR_TYPE_BUFFER) {
+          //
+          // For OrderedList, passing in the value buffer to Callback()
+          //
+          TypeValue = (EFI_IFR_TYPE_VALUE *) Statement->BufferValue;
         }
 
-        if (ConfigAccess == NULL) {
-          return EFI_UNSUPPORTED;
-        }
         Status = ConfigAccess->Callback (
                                  ConfigAccess,
                                  EFI_BROWSER_ACTION_CHANGING,
                                  Statement->QuestionId,
                                  HiiValue->Type,
-                                 &HiiValue->Value,
+                                 TypeValue,
                                  &ActionRequest
                                  );
 

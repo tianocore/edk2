@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007 - 2008, Intel Corporation
+Copyright (c) 2007 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -57,7 +57,7 @@ typedef struct {
   UINT8   ChooseToActivateNuclearWeaponry;
   UINT8   SuppressGrayOutSomething;
   UINT8   OrderedList[8];
-  UINT8   BootOrder[8];
+  UINT16  BootOrder[8];
   UINT8   BootOrderLarge;
   UINT8   DynamicRefresh;
   UINT8   DynamicOneof;
