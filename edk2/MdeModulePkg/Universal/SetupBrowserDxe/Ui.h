@@ -348,24 +348,6 @@ SetupBrowser (
   );
 
 /**
-  VSPrint worker function that prints a Value as a decimal number in Buffer.
-
-  @param  Buffer     Location to place ascii decimal number string of Value.
-  @param  Flags      Flags to use in printing decimal string, see file header for
-                     details.
-  @param  Value      Decimal value to convert to a string in Buffer.
-
-  @return Number of characters printed.
-
-**/
-VOID
-ValueToString (
-  IN CHAR16   *Buffer,
-  IN BOOLEAN  Flags,
-  IN INT64    Value
-  );
-
-/**
   Set Buffer to Value for Size bytes.
 
   @param  Buffer                 Memory to set.

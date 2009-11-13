@@ -29,24 +29,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Setup.h"
 
 /**
-  VSPrint worker function that prints a Value as a decimal number in Buffer.
-
-  @param  Buffer     Location to place ascii decimal number string of Value.
-  @param  Flags      Flags to use in printing decimal string, see file header for
-                     details.
-  @param  Value      Decimal value to convert to a string in Buffer.
-
-  @return Number of characters printed.
-
-**/
-UINTN
-ValueToString (
-  IN  OUT CHAR16  *Buffer,
-  IN  BOOLEAN     Flags,
-  IN  INT64       Value
-  );
-
-/**
   The internal function prints to the EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL
   protocol instance.
 
@@ -279,71 +261,4 @@ PrintCharAt (
   )
 {
   return PrintAt (Column, Row, L"%c", Character);
-}
-
-
-/**
-  VSPrint worker function that prints a Value as a decimal number in Buffer.
-
-  @param  Buffer     Location to place ascii decimal number string of Value.
-  @param  Flags      Flags to use in printing decimal string, see file header for
-                     details.
-  @param  Value      Decimal value to convert to a string in Buffer.
-
-  @return Number of characters printed.
-
-**/
-UINTN
-ValueToString (
-  IN  OUT CHAR16  *Buffer,
-  IN  BOOLEAN     Flags,
-  IN  INT64       Value
-  )
-{
-  CHAR16  TempBuffer[30];
-  CHAR16  *TempStr;
-  CHAR16  *BufferPtr;
-  UINTN   Count;
-  UINTN   NumberCount;
-  UINT32  Remainder;
-  BOOLEAN Negative;
-
-  Negative    = FALSE;
-  TempStr     = TempBuffer;
-  BufferPtr   = Buffer;
-  Count       = 0;
-  NumberCount = 0;
-
-  if (Value < 0) {
-    Negative = TRUE;
-    Value    = -Value;
-  }
-
-  do {
-    Value         = (INT64) DivU64x32Remainder  ((UINT64) Value, 10, &Remainder);
-    *(TempStr++)  = (CHAR16) (Remainder + '0');
-    Count++;
-    NumberCount++;
-    if ((Flags & COMMA_TYPE) == COMMA_TYPE) {
-      if (NumberCount % 3 == 0 && Value != 0) {
-        *(TempStr++) = ',';
-        Count++;
-      }
-    }
-  } while (Value != 0);
-
-  if (Negative) {
-    *(BufferPtr++) = '-';
-    Count++;
-  }
-
-  //
-  // Reverse temp string into Buffer.
-  //
-  while (TempStr != TempBuffer) {
-    *(BufferPtr++) = *(--TempStr);
-  }
-
-  *BufferPtr = 0;
-  return Count;
 }
