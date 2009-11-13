@@ -655,6 +655,14 @@ DestroyFormSet (
   FORM_EXPRESSION       *Expression;
   FORM_BROWSER_FORM     *Form;
 
+  if (FormSet->IfrBinaryData == NULL) {
+    //
+    // Uninitialized FormSet
+    //
+    FreePool (FormSet);
+    return;
+  }
+
   //
   // Free IFR binary buffer
   //
