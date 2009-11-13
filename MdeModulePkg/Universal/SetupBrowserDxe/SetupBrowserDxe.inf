@@ -37,7 +37,6 @@
   Expression.c
   InputHandler.c
   Print.c
-  Print.h
   Presentation.c
   ProcessOptions.c
   Ui.c
