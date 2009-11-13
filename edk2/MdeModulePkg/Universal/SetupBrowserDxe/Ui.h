@@ -15,8 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _UI_H_
 #define _UI_H_
 
-#include "Setup.h"
-
 //
 // Globals
 //

@@ -13,8 +13,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "Setup.h"
-#include "Ui.h"
-
 
 SETUP_DRIVER_PRIVATE_DATA  mPrivateData = {
   SETUP_DRIVER_SIGNATURE,
@@ -2000,10 +1998,12 @@ ExtractFormDefault (
   return EFI_SUCCESS;
 }
 
-
 /**
   Initialize Question's Edit copy from Storage.
 
+  @param  Selection              Selection contains the information about 
+                                 the Selection, form and formset to be displayed.
+                                 Selection action may be updated in retrieve callback.
   @param  FormSet                FormSet data structure.
   @param  Form                   Form data structure.
 
@@ -2012,14 +2012,19 @@ ExtractFormDefault (
 **/
 EFI_STATUS
 LoadFormConfig (
-  IN FORM_BROWSER_FORMSET             *FormSet,
-  IN FORM_BROWSER_FORM                *Form
+  IN OUT UI_MENU_SELECTION    *Selection,
+  IN FORM_BROWSER_FORMSET     *FormSet,
+  IN FORM_BROWSER_FORM        *Form
   )
 {
-  EFI_STATUS              Status;
-  LIST_ENTRY              *Link;
-  FORM_BROWSER_STATEMENT  *Question;
-
+  EFI_STATUS                  Status;
+  LIST_ENTRY                  *Link;
+  FORM_BROWSER_STATEMENT      *Question;
+  UINT8                       *BufferValue;
+  UINTN                       StorageWidth;
+  EFI_HII_VALUE               *HiiValue;
+  EFI_BROWSER_ACTION_REQUEST  ActionRequest;
+  
   Link = GetFirstNode (&Form->StatementListHead);
   while (!IsNull (&Form->StatementListHead, Link)) {
     Question = FORM_BROWSER_STATEMENT_FROM_LINK (Link);
@@ -2031,6 +2036,87 @@ LoadFormConfig (
     if (EFI_ERROR (Status)) {
       return Status;
     }
+    
+    //
+    // Check whether EfiVarstore with CallBack can be got.
+    //
+    if ((Question->QuestionId != 0) && (Question->Storage != NULL) &&
+        (Question->Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE) && 
+        ((Question->QuestionFlags & EFI_IFR_FLAG_CALLBACK) == EFI_IFR_FLAG_CALLBACK)) {
+      //
+      // ConfigAccess can't be NULL.
+      //
+      if (FormSet->ConfigAccess == NULL) {
+        return EFI_UNSUPPORTED;
+      }
+      //
+      // Check QuestionValue does exist.
+      //
+      StorageWidth = Question->StorageWidth;
+      if (Question->BufferValue != NULL) {
+        BufferValue  = Question->BufferValue;
+      } else {
+        BufferValue = (UINT8 *) &Question->HiiValue.Value;
+      }
+      Status = gRT->GetVariable (
+                       Question->VariableName,
+                       &Question->Storage->Guid,
+                       NULL,
+                       &StorageWidth,
+                       BufferValue
+                       );
+
+      if (!EFI_ERROR (Status)) {
+        ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
+        HiiValue = &Question->HiiValue;
+        BufferValue = (UINT8 *) &Question->HiiValue.Value;
+        if (HiiValue->Type == EFI_IFR_TYPE_STRING) {
+          //
+          // Create String in HII database for Configuration Driver to retrieve
+          //
+          HiiValue->Value.string = NewString ((CHAR16 *) Question->BufferValue, FormSet->HiiHandle);
+        } else if (HiiValue->Type == EFI_IFR_TYPE_BUFFER) {
+          BufferValue = Question->BufferValue;
+        }
+
+        Status = FormSet->ConfigAccess->Callback (
+                                 FormSet->ConfigAccess,
+                                 EFI_BROWSER_ACTION_RETRIEVE,
+                                 Question->QuestionId,
+                                 HiiValue->Type,
+                                 (EFI_IFR_TYPE_VALUE *) BufferValue,
+                                 &ActionRequest
+                                 );
+
+        if (HiiValue->Type == EFI_IFR_TYPE_STRING) {
+          //
+          // Clean the String in HII Database
+          //
+          DeleteString (HiiValue->Value.string, FormSet->HiiHandle);
+        }
+
+        if (!EFI_ERROR (Status)) {
+          switch (ActionRequest) {
+          case EFI_BROWSER_ACTION_REQUEST_RESET:
+            gResetRequired = TRUE;
+            break;
+
+          case EFI_BROWSER_ACTION_REQUEST_SUBMIT:
+            //
+            // Till now there is no uncommitted data, so ignore this request
+            //
+            break;
+
+          case EFI_BROWSER_ACTION_REQUEST_EXIT:
+            Selection->Action = UI_ACTION_EXIT;
+            break;
+
+          default:
+            break;
+          }
+        }
+      }
+    }
 
     Link = GetNextNode (&Form->StatementListHead, Link);
   }
@@ -2038,10 +2124,12 @@ LoadFormConfig (
   return EFI_SUCCESS;
 }
 
-
 /**
   Initialize Question's Edit copy from Storage for the whole Formset.
 
+  @param  Selection              Selection contains the information about 
+                                 the Selection, form and formset to be displayed.
+                                 Selection action may be updated in retrieve callback.
   @param  FormSet                FormSet data structure.
 
   @retval EFI_SUCCESS            The function completed successfully.
@@ -2049,12 +2137,13 @@ LoadFormConfig (
 **/
 EFI_STATUS
 LoadFormSetConfig (
-  IN FORM_BROWSER_FORMSET             *FormSet
+  IN OUT UI_MENU_SELECTION    *Selection,
+  IN     FORM_BROWSER_FORMSET *FormSet
   )
 {
-  EFI_STATUS          Status;
-  LIST_ENTRY          *Link;
-  FORM_BROWSER_FORM   *Form;
+  EFI_STATUS            Status;
+  LIST_ENTRY            *Link;
+  FORM_BROWSER_FORM     *Form;
 
   Link = GetFirstNode (&FormSet->FormListHead);
   while (!IsNull (&FormSet->FormListHead, Link)) {
@@ -2063,7 +2152,7 @@ LoadFormSetConfig (
     //
     // Initialize local copy of Value for each Form
     //
-    Status = LoadFormConfig (FormSet, Form);
+    Status = LoadFormConfig (Selection, FormSet, Form);
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -2073,7 +2162,6 @@ LoadFormSetConfig (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Fill storage's edit copy with settings requested from Configuration Driver.

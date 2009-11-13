@@ -561,6 +561,7 @@ extern CHAR16            gHelpBlockWidth;
 extern EFI_GUID          gZeroGuid;
 extern EFI_GUID          gTianoHiiIfrGuid;
 
+#include "Ui.h"
 //
 // Global Procedure Defines
 //
@@ -938,6 +939,9 @@ ExtractFormDefault (
 /**
   Initialize Question's Edit copy from Storage.
 
+  @param  Selection              Selection contains the information about 
+                                 the Selection, form and formset to be displayed.
+                                 Selection action may be updated in retrieve callback.
   @param  FormSet                FormSet data structure.
   @param  Form                   Form data structure.
 
@@ -946,13 +950,17 @@ ExtractFormDefault (
 **/
 EFI_STATUS
 LoadFormConfig (
-  IN FORM_BROWSER_FORMSET             *FormSet,
-  IN FORM_BROWSER_FORM                *Form
+  IN OUT UI_MENU_SELECTION    *Selection,
+  IN FORM_BROWSER_FORMSET     *FormSet,
+  IN FORM_BROWSER_FORM        *Form
   );
 
 /**
   Initialize Question's Edit copy from Storage for the whole Formset.
 
+  @param  Selection              Selection contains the information about 
+                                 the Selection, form and formset to be displayed.
+                                 Selection action may be updated in retrieve callback.
   @param  FormSet                FormSet data structure.
 
   @retval EFI_SUCCESS            The function completed successfully.
@@ -960,7 +968,8 @@ LoadFormConfig (
 **/
 EFI_STATUS
 LoadFormSetConfig (
-  IN FORM_BROWSER_FORMSET             *FormSet
+  IN OUT UI_MENU_SELECTION    *Selection,
+  IN     FORM_BROWSER_FORMSET *FormSet
   );
 
 /**
