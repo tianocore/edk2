@@ -1006,6 +1006,13 @@ ThunkCallback (
   EFI_INPUT_KEY                               Key;  
   BOOLEAN                                     NvMapAllocated;
 
+  if ((Action == EFI_BROWSER_ACTION_FORM_OPEN) || (Action == EFI_BROWSER_ACTION_FORM_CLOSE)) {
+    //
+    // Ignore UEFI OPEN/CLOSE Action for FrameworkCallback
+    //
+    return EFI_SUCCESS;
+  }
+
   ASSERT (This != NULL);
   ASSERT (Value != NULL);
   ASSERT (ActionRequest != NULL);
