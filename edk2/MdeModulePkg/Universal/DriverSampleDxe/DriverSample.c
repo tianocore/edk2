@@ -556,6 +556,7 @@ DriverCallback (
   EFI_IFR_GUID_LABEL              *EndLabel;
   EFI_INPUT_KEY                   Key;
   DRIVER_SAMPLE_CONFIGURATION     *Configuration;
+  UINTN                           MyVarSize;
 
   if (Action == EFI_BROWSER_ACTION_FORM_OPEN) {
     //
@@ -623,7 +624,6 @@ DriverCallback (
   if ((Type == EFI_IFR_TYPE_STRING) && (Value->string == 0)) {
     return EFI_INVALID_PARAMETER;
   }
-
 
   Status = EFI_SUCCESS;
   PrivateData = DRIVER_SAMPLE_PRIVATE_FROM_THIS (This);
@@ -821,12 +821,13 @@ DriverCallback (
     // Change an EFI Variable storage (MyEfiVar) asynchronous, this will cause
     // the first statement in Form 3 be suppressed
     //
+    MyVarSize = 1;
     MyVar = 111;
     Status = gRT->SetVariable(
                     L"MyVar",
                     &mFormSetGuid,
                     EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                    1,
+                    MyVarSize,
                     &MyVar
                     );
     break;
@@ -870,6 +871,21 @@ DriverCallback (
 
     break;
 
+  case 0x1111:
+    //
+    // EfiVarstore question takes sample action (print value as debug information) 
+    // after read/write question.
+    //
+    MyVarSize = 1;
+    Status = gRT->GetVariable(
+                    L"MyVar",
+                    &mFormSetGuid,
+                    NULL,
+                    &MyVarSize,
+                    &MyVar
+                    );
+    ASSERT_EFI_ERROR (Status);
+    DEBUG ((DEBUG_INFO, "EfiVarstore question: Tall value is %d with value width %d\n", MyVar, MyVarSize));
   default:
     break;
   }
