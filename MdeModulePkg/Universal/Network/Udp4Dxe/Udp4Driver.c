@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006, Intel Corporation.<BR>
+Copyright (c) 2006 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -127,7 +127,7 @@ Udp4DriverBindingStart (
 
   Status = Udp4CreateService (Udp4Service, This->DriverBindingHandle, ControllerHandle);
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (Udp4Service);
+    FreePool (Udp4Service);
     return Status;
   }
 
@@ -142,7 +142,7 @@ Udp4DriverBindingStart (
                   );
   if (EFI_ERROR (Status)) {
     Udp4CleanService (Udp4Service);
-    gBS->FreePool (Udp4Service);
+    FreePool (Udp4Service);
   } else {
     Udp4SetVariableData (Udp4Service);
   }
@@ -222,7 +222,7 @@ Udp4DriverBindingStop (
 
     Udp4CleanService (Udp4Service);
 
-    gBS->FreePool (Udp4Service);
+    FreePool (Udp4Service);
   } else {
 
     while (!IsListEmpty (&Udp4Service->ChildrenList)) {
@@ -352,7 +352,7 @@ ON_ERROR:
 
   Udp4CleanInstance (Instance);
 
-  gBS->FreePool (Instance);
+  FreePool (Instance);
 
   return Status;
 }
@@ -470,7 +470,7 @@ Udp4ServiceBindingDestroyChild (
 
   gBS->RestoreTPL (OldTpl);
 
-  gBS->FreePool (Instance);
+  FreePool (Instance);
 
   return EFI_SUCCESS;
 }

@@ -432,7 +432,7 @@ TcpCloneTcb (
   Clone->Sk = SockClone (Tcb->Sk);
   if (Clone->Sk == NULL) {
     DEBUG ((EFI_D_ERROR, "TcpCloneTcb: failed to clone a sock\n"));
-    gBS->FreePool (Clone);
+    FreePool (Clone);
     return NULL;
   }
 
@@ -1025,7 +1025,7 @@ TcpSetVariableData (
              );
     }
 
-    gBS->FreePool (Tcp4Service->MacString);
+    FreePool (Tcp4Service->MacString);
   }
 
   Tcp4Service->MacString = NewMacString;
@@ -1040,7 +1040,7 @@ TcpSetVariableData (
 
 ON_ERROR:
 
-  gBS->FreePool (Tcp4VariableData);
+  FreePool (Tcp4VariableData);
 
   return Status;
 }
@@ -1067,7 +1067,7 @@ TcpClearVariableData (
          NULL
          );
 
-  gBS->FreePool (Tcp4Service->MacString);
+  FreePool (Tcp4Service->MacString);
   Tcp4Service->MacString = NULL;
 }
 
@@ -1121,7 +1121,7 @@ TcpInstallDevicePath (
                   Sock->DevicePath
                   );
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (Sock->DevicePath);
+    FreePool (Sock->DevicePath);
   }
 
   return Status;

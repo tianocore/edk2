@@ -345,7 +345,7 @@ SockFlushPendingToken (
     SIGNAL_TOKEN (Token, Sock->SockError);
 
     RemoveEntryList (&(SockToken->TokenList));
-    gBS->FreePool (SockToken);
+    FreePool (SockToken);
   }
 }
 
@@ -407,7 +407,7 @@ SockWakeListenToken (
     SIGNAL_TOKEN (&(ListenToken->CompletionToken), EFI_SUCCESS);
 
     RemoveEntryList (&SockToken->TokenList);
-    gBS->FreePool (SockToken);
+    FreePool (SockToken);
 
     RemoveEntryList (&Sock->ConnectionList);
 
@@ -457,7 +457,7 @@ SockWakeRcvToken (
     }
 
     RemoveEntryList (&(SockToken->TokenList));
-    gBS->FreePool (SockToken);
+    FreePool (SockToken);
     RcvdBytes -= TokenRcvdBytes;
   }
 }
@@ -535,7 +535,7 @@ OnError:
 
   RemoveEntryList (&SockToken->TokenList);
   SIGNAL_TOKEN (SockToken->Token, Status);
-  gBS->FreePool (SockToken);
+  FreePool (SockToken);
 }
 
 
@@ -699,7 +699,7 @@ OnError:
     NetbufQueFree (Sock->RcvBuffer.DataQueue);
   }
 
-  gBS->FreePool (Sock);
+  FreePool (Sock);
 
   return NULL;
 }
@@ -799,7 +799,7 @@ SockDestroy (
         );
 
 FreeSock:
-  gBS->FreePool (Sock);
+  FreePool (Sock);
   return ;
 }
 
@@ -1032,7 +1032,7 @@ SockDataSent (
       RemoveEntryList (&(SockToken->TokenList));
       SIGNAL_TOKEN (SndToken, EFI_SUCCESS);
       Count -= SockToken->RemainDataLen;
-      gBS->FreePool (SockToken);
+      FreePool (SockToken);
     } else {
 
       SockToken->RemainDataLen -= Count;
@@ -1180,7 +1180,7 @@ SockRcvdErr (
 
     SIGNAL_TOKEN (SockToken->Token, Error);
 
-    gBS->FreePool (SockToken);
+    FreePool (SockToken);
   } else {
 
     SOCK_ERROR (Sock, Error);

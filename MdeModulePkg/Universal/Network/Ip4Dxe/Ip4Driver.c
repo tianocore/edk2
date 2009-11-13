@@ -298,7 +298,7 @@ Ip4CreateService (
 
 ON_ERROR:
   Ip4CleanService (IpSb);
-  gBS->FreePool (IpSb);
+  FreePool (IpSb);
 
   return Status;
 }
@@ -488,7 +488,7 @@ UNINSTALL_PROTOCOL:
 
 FREE_SERVICE:
   Ip4CleanService (IpSb);
-  gBS->FreePool (IpSb);
+  FreePool (IpSb);
 
   return Status;
 }
@@ -686,7 +686,7 @@ Ip4DriverBindingStop (
            ServiceBinding
            );
 
-    gBS->FreePool (IpSb);
+    FreePool (IpSb);
   } else if (NumberOfChildren == 0) {
     IpSb->InDestory = TRUE;
 
@@ -714,7 +714,7 @@ Ip4DriverBindingStop (
            ServiceBinding
            );
 
-    gBS->FreePool (IpSb);
+    FreePool (IpSb);
   } else {
 
     while (!IsListEmpty (&IpSb->Children)) {
@@ -834,7 +834,7 @@ ON_ERROR:
 
     Ip4CleanProtocol (IpInstance);
 
-    gBS->FreePool (IpInstance);
+    FreePool (IpInstance);
   }
 
   return Status;
@@ -971,7 +971,7 @@ Ip4ServiceBindingDestroyChild (
 
   gBS->RestoreTPL (OldTpl);
 
-  gBS->FreePool (IpInstance);
+  FreePool (IpInstance);
   return EFI_SUCCESS;
 
 ON_ERROR:

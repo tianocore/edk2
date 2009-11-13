@@ -454,7 +454,7 @@ MnpRecycleRxData (
   //
   RemoveEntryList (&RxDataWrap->WrapEntry);
 
-  gBS->FreePool (RxDataWrap);
+  FreePool (RxDataWrap);
 }
 
 
@@ -739,7 +739,7 @@ MnpWrapRxData (
   if (EFI_ERROR (Status)) {
 
     DEBUG ((EFI_D_ERROR, "MnpDispatchPacket: gBS->CreateEvent failed, %r.\n", Status));
-    gBS->FreePool (RxDataWrap);
+    FreePool (RxDataWrap);
     return NULL;
   }
 

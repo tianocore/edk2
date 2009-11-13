@@ -593,7 +593,7 @@ SockSend (
         "Snd Data\n", Status));
 
       RemoveEntryList (&(SockToken->TokenList));
-      gBS->FreePool (SockToken);
+      FreePool (SockToken);
     }
   }
 

@@ -234,7 +234,7 @@ Tcp4FlushPcb (
            &gEfiDevicePathProtocolGuid,
            Sock->DevicePath
            );
-    gBS->FreePool (Sock->DevicePath);
+    FreePool (Sock->DevicePath);
 
     TcpSetVariableData (TcpProto->TcpService);
   }
@@ -279,7 +279,7 @@ Tcp4AttachPcb (
   Tcb->IpInfo = IpIoAddIp (IpIo);
   if (Tcb->IpInfo == NULL) {
 
-    gBS->FreePool (Tcb);
+    FreePool (Tcb);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -317,7 +317,7 @@ Tcp4DetachPcb (
 
   IpIoRemoveIp (ProtoData->TcpService->IpIo, Tcb->IpInfo);
 
-  gBS->FreePool (Tcb);
+  FreePool (Tcb);
 
   ProtoData->TcpPcb = NULL;
 }

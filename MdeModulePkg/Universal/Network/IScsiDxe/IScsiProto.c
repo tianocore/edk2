@@ -215,7 +215,7 @@ IScsiCreateConnection (
                   &Conn->TimeoutEvent
                   );
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (Conn);
+    FreePool (Conn);
     return NULL;
   }
 
@@ -246,7 +246,7 @@ IScsiCreateConnection (
             );
   if (EFI_ERROR (Status)) {
     gBS->CloseEvent (Conn->TimeoutEvent);
-    gBS->FreePool (Conn);
+    FreePool (Conn);
     Conn = NULL;
   }
 
@@ -266,7 +266,7 @@ IScsiDestroyConnection (
   Tcp4IoDestroySocket (&Conn->Tcp4Io);
   NetbufQueFlush (&Conn->RspQue);
   gBS->CloseEvent (Conn->TimeoutEvent);
-  gBS->FreePool (Conn);
+  FreePool (Conn);
 }
 
 /**
@@ -875,7 +875,7 @@ IScsiFreeNbufList (
   ASSERT (Arg != NULL);
 
   NetbufFreeList ((LIST_ENTRY     *) Arg);
-  gBS->FreePool (Arg);
+  FreePool (Arg);
 }
 
 /**
@@ -944,7 +944,7 @@ IScsiReceivePdu (
   Len     = sizeof (ISCSI_BASIC_HEADER) + (HeaderDigest ? sizeof (UINT32) : 0);
   PduHdr  = NetbufAlloc (Len);
   if (PduHdr == NULL) {
-    gBS->FreePool (NbufList);
+    FreePool (NbufList);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -1134,7 +1134,7 @@ IScsiCheckOpParams (
   //
   KeyValueList = IScsiBuildKeyValueList (Data, Len);
   if (KeyValueList == NULL) {
-    gBS->FreePool (Data);
+    FreePool (Data);
     return Status;
   }
   //
@@ -1337,7 +1337,7 @@ ON_ERROR:
 
   IScsiFreeKeyValueList (KeyValueList);
 
-  gBS->FreePool (Data);
+  FreePool (Data);
 
   return Status;
 }
@@ -1485,7 +1485,7 @@ IScsiBuildKeyValueList (
       Data++;
       Len--;
     } else {
-      gBS->FreePool (KeyValuePair);
+      FreePool (KeyValuePair);
       goto ON_ERROR;
     }
 
@@ -1534,7 +1534,7 @@ IScsiGetValueByKeyFromList (
       Value = KeyValuePair->Value;
 
       RemoveEntryList (&KeyValuePair->List);
-      gBS->FreePool (KeyValuePair);
+      FreePool (KeyValuePair);
       break;
     }
   }
@@ -1559,10 +1559,10 @@ IScsiFreeKeyValueList (
     Entry         = NetListRemoveHead (KeyValueList);
     KeyValuePair  = NET_LIST_USER_STRUCT (Entry, ISCSI_KEY_VALUE_PAIR, List);
 
-    gBS->FreePool (KeyValuePair);
+    FreePool (KeyValuePair);
   }
 
-  gBS->FreePool (KeyValueList);
+  FreePool (KeyValueList);
 }
 
 /**
@@ -1678,7 +1678,7 @@ IScsiDelTcb (
 {
   RemoveEntryList (&Tcb->Link);
 
-  gBS->FreePool (Tcb);
+  FreePool (Tcb);
 }
 
 /**
@@ -1969,7 +1969,7 @@ IScsiNewDataOutPdu (
   //
   PduHdr = NetbufAlloc (sizeof (ISCSI_SCSI_DATA_OUT));
   if (PduHdr == NULL) {
-    gBS->FreePool (NbufList);
+    FreePool (NbufList);
     return NULL;
   }
   //

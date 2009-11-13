@@ -335,21 +335,21 @@ Ip4ConfigDriverBindingStart (
   Ip4ConfigWriteVariable (NewVariable);
 
   if (NewVariable != NULL) {
-    gBS->FreePool (NewVariable);
+    FreePool (NewVariable);
   }
 
 ON_EXIT:
-  gBS->FreePool (Variable);
+  FreePool (Variable);
 
   if (NicConfig != NULL) {
-    gBS->FreePool (NicConfig);
+    FreePool (NicConfig);
   }
 
   return EFI_SUCCESS;
 
 ON_ERROR:
   if (Instance != NULL) {
-    gBS->FreePool (Instance);
+    FreePool (Instance);
   }
 
   if (Mnp != NULL) {
@@ -506,7 +506,7 @@ Ip4ConfigDriverBindingStop (
 
   Ip4ConfigCleanConfig (Instance);
   mIp4ConfigNicList[Instance->NicIndex] = NULL;
-  gBS->FreePool (Instance);
+  FreePool (Instance);
 
   return EFI_SUCCESS;
 }

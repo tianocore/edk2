@@ -162,7 +162,7 @@ IScsiDhcpExtractRootPath (
 
 ON_EXIT:
 
-  gBS->FreePool (TmpStr);
+  FreePool (TmpStr);
 
   return Status;
 }
@@ -217,7 +217,7 @@ IScsiDhcpSelectOffer (
 
   Status = This->Parse (This, Packet, &OptionCount, OptionList);
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (OptionList);
+    FreePool (OptionList);
     return EFI_NOT_READY;
   }
 
@@ -239,7 +239,7 @@ IScsiDhcpSelectOffer (
     Status = EFI_NOT_READY;
   }
 
-  gBS->FreePool (OptionList);
+  FreePool (OptionList);
 
   return Status;
 }
@@ -295,7 +295,7 @@ IScsiParseDhcpAck (
 
   Status = Dhcp4->Parse (Dhcp4, Dhcp4ModeData.ReplyPacket, &OptionCount, OptionList);
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (OptionList);
+    FreePool (OptionList);
     return EFI_DEVICE_ERROR;
   }
 
@@ -330,7 +330,7 @@ IScsiParseDhcpAck (
     }
   }
 
-  gBS->FreePool (OptionList);
+  FreePool (OptionList);
 
   return Status;
 }
@@ -432,7 +432,7 @@ IScsiDoDhcp (
 ON_EXIT:
 
   if (ParaList != NULL) {
-    gBS->FreePool (ParaList);
+    FreePool (ParaList);
   }
 
   if (Dhcp4 != NULL) {

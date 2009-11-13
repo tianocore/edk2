@@ -463,7 +463,7 @@ ON_ERROR:
       );
   }
 
-  gBS->FreePool (Private);
+  FreePool (Private);
 
   return Status;
 }
@@ -626,7 +626,7 @@ PxeBcDriverBindingStop (
       Private->ArpChild
       );
 
-    gBS->FreePool (Private);
+    FreePool (Private);
   }
 
   return Status;

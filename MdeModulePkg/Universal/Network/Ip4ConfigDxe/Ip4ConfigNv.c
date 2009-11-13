@@ -1039,7 +1039,7 @@ Ip4ConfigUpdateForm (
 
     mNumberOfIp4Devices--;
     RemoveEntryList (&ConfigFormEntry->Link);
-    gBS->FreePool (ConfigFormEntry);
+    FreePool (ConfigFormEntry);
   }
 
   //

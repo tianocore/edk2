@@ -91,7 +91,7 @@ Mtftp4WrqSendBlock (
 
     if (EFI_ERROR (Status) || (DataLen > Instance->BlkSize)) {
       if (DataBuf != NULL) {
-        gBS->FreePool (DataBuf);
+        FreePool (DataBuf);
       }
 
       Mtftp4SendError (
@@ -111,7 +111,7 @@ Mtftp4WrqSendBlock (
     if (DataLen > 0) {
       NetbufAllocSpace (UdpPacket, DataLen, FALSE);
       CopyMem (Packet->Data.Data, DataBuf, DataLen);
-      gBS->FreePool (DataBuf);
+      FreePool (DataBuf);
     }
   }
 
@@ -462,7 +462,7 @@ ON_EXIT:
   // restart the receive, otherwise end the session.
   //
   if ((Packet != NULL) && (UdpPacket->BlockOpNum > 1)) {
-    gBS->FreePool (Packet);
+    FreePool (Packet);
   }
 
   if (UdpPacket != NULL) {

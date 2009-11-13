@@ -188,7 +188,7 @@ Ip4WrapLinkTxToken (
                   );
 
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (Token);
+    FreePool (Token);
     return NULL;
   }
 
@@ -225,7 +225,7 @@ Ip4FreeLinkTxToken (
   NET_CHECK_SIGNATURE (Token, IP4_FRAME_TX_SIGNATURE);
 
   gBS->CloseEvent (Token->MnpToken.Event);
-  gBS->FreePool (Token);
+  FreePool (Token);
 }
 
 
@@ -269,7 +269,7 @@ Ip4CreateArpQue (
                   );
 
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (ArpQue);
+    FreePool (ArpQue);
     return NULL;
   }
 
@@ -302,7 +302,7 @@ Ip4FreeArpQue (
   Ip4CancelFrameArp (ArpQue, IoStatus, NULL, NULL);
 
   gBS->CloseEvent (ArpQue->OnResolved);
-  gBS->FreePool (ArpQue);
+  FreePool (ArpQue);
 }
 
 
@@ -353,7 +353,7 @@ Ip4CreateLinkRxToken (
                   );
 
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (Token);
+    FreePool (Token);
     return NULL;
   }
 
@@ -378,7 +378,7 @@ Ip4FreeFrameRxToken (
   NET_CHECK_SIGNATURE (Token, IP4_FRAME_RX_SIGNATURE);
 
   gBS->CloseEvent (Token->MnpToken.Event);
-  gBS->FreePool (Token);
+  FreePool (Token);
 }
 
 
@@ -523,7 +523,7 @@ Ip4CreateInterface (
   // Get the interface's Mac address and broadcast mac address from SNP
   //
   if (EFI_ERROR (Mnp->GetModeData (Mnp, NULL, &SnpMode))) {
-    gBS->FreePool (Interface);
+    FreePool (Interface);
     return NULL;
   }
 
@@ -774,7 +774,7 @@ Ip4FreeInterface (
   }
 
   RemoveEntryList (&Interface->Link);
-  gBS->FreePool (Interface);
+  FreePool (Interface);
 
   return EFI_SUCCESS;
 }

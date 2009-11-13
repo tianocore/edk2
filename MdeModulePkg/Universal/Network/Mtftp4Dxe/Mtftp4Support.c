@@ -139,7 +139,7 @@ Mtftp4SetLastBlockNum (
 
     if (Range->Start > Last) {
       RemoveEntryList (&Range->Link);
-      gBS->FreePool (Range);
+      FreePool (Range);
       continue;
     }
 
@@ -209,7 +209,7 @@ Mtftp4RemoveBlockNum (
 
       if (Range->Start > Range->End) {
         RemoveEntryList (&Range->Link);
-        gBS->FreePool (Range);
+        FreePool (Range);
       }
 
       return EFI_SUCCESS;

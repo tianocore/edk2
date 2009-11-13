@@ -151,7 +151,7 @@ REMOVE_VARIABLE:
 
 ON_ERROR:
   if (Variable != NULL) {
-    gBS->FreePool (Variable);
+    FreePool (Variable);
   }
 
   return NULL;
@@ -296,7 +296,7 @@ Ip4ConfigModifyVariable (
 
     if (Old != NULL) {
       TotalLen -= SIZEOF_NIC_IP4_CONFIG_INFO (Old);
-      gBS->FreePool (Old);
+      FreePool (Old);
     }
 
     if (Config != NULL) {

@@ -682,7 +682,7 @@ Ip4AutoConfigCallBackDpc (
   Ip4SetVariableData (IpSb);
 
 ON_EXIT:
-  gBS->FreePool (Data);
+  FreePool (Data);
 }
 
 /**
@@ -1045,13 +1045,13 @@ Ip4CleanProtocol (
   }
 
   if (IpInstance->EfiRouteTable != NULL) {
-    gBS->FreePool (IpInstance->EfiRouteTable);
+    FreePool (IpInstance->EfiRouteTable);
     IpInstance->EfiRouteTable = NULL;
     IpInstance->EfiRouteCount = 0;
   }
 
   if (IpInstance->Groups != NULL) {
-    gBS->FreePool (IpInstance->Groups);
+    FreePool (IpInstance->Groups);
     IpInstance->Groups      = NULL;
     IpInstance->GroupCount  = 0;
   }
@@ -1337,12 +1337,12 @@ Ip4Groups (
     }
 
     if (EFI_ERROR (Ip4JoinGroup (IpInstance, NTOHL (Group)))) {
-      gBS->FreePool (Members);
+      FreePool (Members);
       return EFI_DEVICE_ERROR;
     }
 
     if (IpInstance->Groups != NULL) {
-      gBS->FreePool (IpInstance->Groups);
+      FreePool (IpInstance->Groups);
     }
 
     IpInstance->Groups = Members;
@@ -1370,7 +1370,7 @@ Ip4Groups (
       if (IpInstance->GroupCount == 0) {
         ASSERT (Index == 1);
 
-        gBS->FreePool (IpInstance->Groups);
+        FreePool (IpInstance->Groups);
         IpInstance->Groups = NULL;
       }
 
@@ -1794,7 +1794,7 @@ Ip4FreeTxToken (
     DispatchDpc ();
   }
 
-  gBS->FreePool (Wrap);
+  FreePool (Wrap);
 }
 
 
@@ -1992,7 +1992,7 @@ EfiIp4Transmit (
                         );
 
   if (Wrap->Packet == NULL) {
-    gBS->FreePool (Wrap);
+    FreePool (Wrap);
     goto ON_EXIT;
   }
 

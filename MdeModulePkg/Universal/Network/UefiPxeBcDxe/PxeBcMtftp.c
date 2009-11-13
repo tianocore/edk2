@@ -196,12 +196,12 @@ PxeBcTftpGetFileSize (
     OptCnt--;
   }
 
-  gBS->FreePool (Option);
+  FreePool (Option);
 
 ON_ERROR:
 
   if (Packet != NULL) {
-    gBS->FreePool (Packet);
+    FreePool (Packet);
   }
 
   Mtftp4->Configure (Mtftp4, NULL);

@@ -377,7 +377,7 @@ ERROR:
 
     if (MnpServiceData->TxBuf != NULL) {
 
-      gBS->FreePool (MnpServiceData->TxBuf);
+      FreePool (MnpServiceData->TxBuf);
     }
 
     if (MnpServiceData->RxNbufCache != NULL) {
@@ -425,7 +425,7 @@ MnpFlushServiceData (
   //
   // Free the tx buffer.
   //
-  gBS->FreePool (MnpServiceData->TxBuf);
+  FreePool (MnpServiceData->TxBuf);
 
   //
   // Free the RxNbufCache.
@@ -1152,7 +1152,7 @@ MnpConfigReceiveFilters (
     //
     // Free the buffer used to hold the group addresses.
     //
-    gBS->FreePool (MCastFilter);
+    FreePool (MCastFilter);
   }
 
   return Status;
@@ -1257,7 +1257,7 @@ MnpGroupOpDelCtrlBlk (
   //
   GroupAddress = CtrlBlk->GroupAddress;
   RemoveEntryList (&CtrlBlk->CtrlBlkEntry);
-  gBS->FreePool (CtrlBlk);
+  FreePool (CtrlBlk);
 
   ASSERT (GroupAddress->RefCnt > 0);
 
@@ -1272,7 +1272,7 @@ MnpGroupOpDelCtrlBlk (
     //
     MnpServiceData->GroupAddressCount--;
     RemoveEntryList (&GroupAddress->AddrEntry);
-    gBS->FreePool (GroupAddress);
+    FreePool (GroupAddress);
 
     return TRUE;
   }

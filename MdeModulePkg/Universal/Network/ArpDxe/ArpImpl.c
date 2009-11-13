@@ -360,10 +360,10 @@ ArpOnFrameSentDpc (
   //
   // Free the allocated memory and close the event.
   //
-  gBS->FreePool (TxData->FragmentTable[0].FragmentBuffer);
-  gBS->FreePool (TxData);
+  FreePool (TxData->FragmentTable[0].FragmentBuffer);
+  FreePool (TxData);
   gBS->CloseEvent (TxToken->Event);
-  gBS->FreePool (TxToken);
+  FreePool (TxToken);
 }
 
 /**
@@ -437,7 +437,7 @@ ArpTimerHandler (
         ASSERT (IsListEmpty (&CacheEntry->UserRequestList));
 
         RemoveEntryList (&CacheEntry->List);
-        gBS->FreePool (CacheEntry);
+        FreePool (CacheEntry);
       } else {
         //
         // resend the ARP request.
@@ -479,7 +479,7 @@ ArpTimerHandler (
       // Time out, remove it.
       //
       RemoveEntryList (&CacheEntry->List);
-      gBS->FreePool (CacheEntry);
+      FreePool (CacheEntry);
     } else {
       //
       // Update the DecayTime.
@@ -507,7 +507,7 @@ ArpTimerHandler (
       // Time out, remove it.
       //
       RemoveEntryList (&CacheEntry->List);
-      gBS->FreePool (CacheEntry);
+      FreePool (CacheEntry);
     } else {
       //
       // Update the DecayTime.
@@ -803,7 +803,7 @@ ArpAddressResolved (
       // Remove this user request and free the context data.
       //
       RemoveEntryList (&Context->List);
-      gBS->FreePool (Context);
+      FreePool (Context);
 
       Count++;
     }
@@ -988,7 +988,7 @@ ArpConfigureInstance (
       //
       // Free the buffer previously allocated to hold the station address.
       //
-      gBS->FreePool (OldConfigData->StationAddress);
+      FreePool (OldConfigData->StationAddress);
     }
 
     Instance->Configured = FALSE;
@@ -1189,18 +1189,18 @@ ArpSendFrame (
 CLEAN_EXIT:
 
   if (Packet != NULL) {
-    gBS->FreePool (Packet);
+    FreePool (Packet);
   }
 
   if (TxData != NULL) {
-    gBS->FreePool (TxData);
+    FreePool (TxData);
   }
 
   if (TxToken->Event != NULL) {
     gBS->CloseEvent (TxToken->Event);
   }
 
-  gBS->FreePool (TxToken);
+  FreePool (TxToken);
 }
 
 
@@ -1286,7 +1286,7 @@ MATCHED:
     //
     RemoveEntryList (&CacheEntry->List);
     ASSERT (IsListEmpty (&CacheEntry->UserRequestList));
-    gBS->FreePool (CacheEntry);
+    FreePool (CacheEntry);
 
     Count++;
   }
@@ -1399,7 +1399,7 @@ ArpCancelRequest (
         // No user requests any more, remove this request cache entry.
         //
         RemoveEntryList (&CacheEntry->List);
-        gBS->FreePool (CacheEntry);
+        FreePool (CacheEntry);
       }
     }
   }

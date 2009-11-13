@@ -65,7 +65,7 @@ Mtftp4CleanOperation (
   NET_LIST_FOR_EACH_SAFE (Entry, Next, &Instance->Blocks) {
     Block = NET_LIST_USER_STRUCT (Entry, MTFTP4_BLOCK_RANGE, Link);
     RemoveEntryList (Entry);
-    gBS->FreePool (Block);
+    FreePool (Block);
   }
 
   ZeroMem (&Instance->RequestOption, sizeof (MTFTP4_OPTION));
