@@ -85,7 +85,7 @@ Ip4FreeAssembleEntry (
     NetbufFree (Fragment);
   }
 
-  gBS->FreePool (Assemble);
+  FreePool (Assemble);
 }
 
 
@@ -1024,7 +1024,7 @@ Ip4OnRecyclePacket (
   NetbufFree (Wrap->Packet);
 
   gBS->CloseEvent (Wrap->RxData.RecycleSignal);
-  gBS->FreePool (Wrap);
+  FreePool (Wrap);
 }
 
 
@@ -1076,7 +1076,7 @@ Ip4WrapRxData (
                   );
 
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (Wrap);
+    FreePool (Wrap);
     return NULL;
   }
 

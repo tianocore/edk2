@@ -165,7 +165,7 @@ IScsiCHAPOnRspReceived (
   //
   KeyValueList = IScsiBuildKeyValueList ((CHAR8 *) Data, Len);
   if (KeyValueList == NULL) {
-    gBS->FreePool (Data);
+    FreePool (Data);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -295,7 +295,7 @@ ON_EXIT:
 
   IScsiFreeKeyValueList (KeyValueList);
 
-  gBS->FreePool (Data);
+  FreePool (Data);
 
   return Status;
 }
@@ -422,8 +422,8 @@ IScsiCHAPToSendReq (
     break;
   }
 
-  gBS->FreePool (Response);
-  gBS->FreePool (Challenge);
+  FreePool (Response);
+  FreePool (Challenge);
 
   return Status;
 }

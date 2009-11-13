@@ -540,7 +540,7 @@ IScsiCreateDriverData (
                   &Private->ExitBootServiceEvent
                   );
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (Private);
+    FreePool (Private);
     return NULL;
   }
 
@@ -565,7 +565,7 @@ IScsiCreateDriverData (
                   );
   if (EFI_ERROR (Status)) {
     gBS->CloseEvent (Private->ExitBootServiceEvent);
-    gBS->FreePool (Private);
+    FreePool (Private);
 
     return NULL;
   }
@@ -592,7 +592,7 @@ IScsiCleanDriverData (
           Private->DevicePath
           );
 
-    gBS->FreePool (Private->DevicePath);
+    FreePool (Private->DevicePath);
   }
 
   if (Private->ExtScsiPassThruHandle != NULL) {
@@ -605,7 +605,7 @@ IScsiCleanDriverData (
 
   gBS->CloseEvent (Private->ExitBootServiceEvent);
 
-  gBS->FreePool (Private);
+  FreePool (Private);
 }
 
 /**

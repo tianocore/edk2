@@ -389,7 +389,7 @@ ON_ERROR:
     IpIoDestroy (TcpServiceData->IpIo);
   }
 
-  gBS->FreePool (TcpServiceData);
+  FreePool (TcpServiceData);
 
   return Status;
 }
@@ -494,7 +494,7 @@ Tcp4DriverBindingStop (
     //
     // Release the TCP service data
     //
-    gBS->FreePool (TcpServiceData);
+    FreePool (TcpServiceData);
   } else {
 
     while (!IsListEmpty (&TcpServiceData->SocketList)) {

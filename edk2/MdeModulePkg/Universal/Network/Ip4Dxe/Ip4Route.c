@@ -67,7 +67,7 @@ Ip4FreeRouteEntry (
   ASSERT (RtEntry->RefCnt > 0);
 
   if (--RtEntry->RefCnt == 0) {
-    gBS->FreePool (RtEntry);
+    FreePool (RtEntry);
   }
 }
 
@@ -127,7 +127,7 @@ Ip4FreeRouteCacheEntry (
   ASSERT (RtCacheEntry->RefCnt > 0);
 
   if (--RtCacheEntry->RefCnt == 0) {
-    gBS->FreePool (RtCacheEntry);
+    FreePool (RtCacheEntry);
   }
 }
 
@@ -252,7 +252,7 @@ Ip4FreeRouteTable (
 
   Ip4CleanRouteCache (&RtTable->Cache);
 
-  gBS->FreePool (RtTable);
+  FreePool (RtTable);
 }
 
 
@@ -611,7 +611,7 @@ Ip4BuildEfiRouteTable (
   RtTable = IpInstance->RouteTable;
 
   if (IpInstance->EfiRouteTable != NULL) {
-    gBS->FreePool (IpInstance->EfiRouteTable);
+    FreePool (IpInstance->EfiRouteTable);
 
     IpInstance->EfiRouteTable = NULL;
     IpInstance->EfiRouteCount = 0;

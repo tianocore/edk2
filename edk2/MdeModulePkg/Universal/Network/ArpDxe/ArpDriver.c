@@ -1,7 +1,7 @@
 /** @file
   ARP driver functions.
   
-Copyright (c) 2006 - 2008, Intel Corporation.<BR>
+Copyright (c) 2006 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -401,7 +401,7 @@ ERROR:
   // On error, clean the arp service context data, and free the memory allocated.
   //
   ArpCleanService (ArpService);
-  gBS->FreePool (ArpService);
+  FreePool (ArpService);
 
   return Status;
 }
@@ -493,7 +493,7 @@ ArpDriverBindingStop (
     //
     ArpCleanService (ArpService);
 
-    gBS->FreePool (ArpService);
+    FreePool (ArpService);
   } else {
 
     while (!IsListEmpty (&ArpService->ChildrenList)) {
@@ -576,7 +576,7 @@ ArpServiceBindingCreateChild (
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "ArpSBCreateChild: faild to install ARP protocol, %r.\n", Status));
 
-    gBS->FreePool (Instance);
+    FreePool (Instance);
     return Status;
   }
 
@@ -631,7 +631,7 @@ ERROR:
     //
     // Free the allocated memory.
     //
-    gBS->FreePool (Instance);
+    FreePool (Instance);
   }
 
   return Status;
@@ -751,7 +751,7 @@ ArpServiceBindingDestroyChild (
 
   gBS->RestoreTPL (OldTpl);
 
-  gBS->FreePool (Instance);
+  FreePool (Instance);
 
   return Status;
 }

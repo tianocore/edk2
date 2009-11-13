@@ -743,7 +743,7 @@ ON_EXIT:
   // receive, otherwise end the session.
   //
   if ((Packet != NULL) && (UdpPacket->BlockOpNum > 1)) {
-    gBS->FreePool (Packet);
+    FreePool (Packet);
   }
 
   if (UdpPacket != NULL) {

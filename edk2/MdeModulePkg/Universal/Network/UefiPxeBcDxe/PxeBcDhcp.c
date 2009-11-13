@@ -1161,7 +1161,7 @@ PxeBcDiscvBootService (
   Status = Dhcp4->Build (Dhcp4, &Private->SeedPacket, 0, NULL, OptCount, OptList, &Token.Packet);
 
   if (IsDiscv) {
-    gBS->FreePool (OptList[OptCount - 1]);
+    FreePool (OptList[OptCount - 1]);
   }
 
   if (EFI_ERROR (Status)) {
@@ -1270,12 +1270,12 @@ PxeBcDiscvBootService (
     //
     // free the responselist
     //
-    gBS->FreePool (Token.ResponseList);
+    FreePool (Token.ResponseList);
   }
   //
   // Free the dhcp packet
   //
-  gBS->FreePool (Token.Packet);
+  FreePool (Token.Packet);
 
   return Status;
 }

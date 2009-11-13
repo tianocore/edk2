@@ -76,7 +76,7 @@ Ip4InitIgmp (
   return EFI_SUCCESS;
 
 ON_ERROR:
-  gBS->FreePool (Group);
+  FreePool (Group);
   return Status;
 }
 
@@ -325,7 +325,7 @@ Ip4JoinGroup (
   return EFI_SUCCESS;
 
 ON_ERROR:
-  gBS->FreePool (Group);
+  FreePool (Group);
   return Status;
 }
 
@@ -394,7 +394,7 @@ Ip4LeaveGroup (
   }
 
   RemoveEntryList (&Group->Link);
-  gBS->FreePool (Group);
+  FreePool (Group);
 
   return EFI_SUCCESS;
 }

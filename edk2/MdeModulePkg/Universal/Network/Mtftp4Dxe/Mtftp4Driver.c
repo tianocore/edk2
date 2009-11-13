@@ -180,7 +180,7 @@ Mtftp4CreateService (
                   );
 
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (MtftpSb);
+    FreePool (MtftpSb);
     return Status;
   }
 
@@ -197,7 +197,7 @@ Mtftp4CreateService (
                   );
   if (EFI_ERROR (Status)) {
     gBS->CloseEvent (MtftpSb->Timer);
-    gBS->FreePool (MtftpSb);
+    FreePool (MtftpSb);
     return Status;
   }
 
@@ -212,7 +212,7 @@ Mtftp4CreateService (
   if (MtftpSb->ConnectUdp == NULL) {
     gBS->CloseEvent (MtftpSb->TimerToGetMap);
     gBS->CloseEvent (MtftpSb->Timer);
-    gBS->FreePool (MtftpSb);
+    FreePool (MtftpSb);
     return EFI_DEVICE_ERROR;
   }
 
@@ -311,7 +311,7 @@ Mtftp4DriverBindingStart (
 
 ON_ERROR:
   Mtftp4CleanService (MtftpSb);
-  gBS->FreePool (MtftpSb);
+  FreePool (MtftpSb);
 
   return Status;
 }
@@ -390,7 +390,7 @@ Mtftp4DriverBindingStop (
 
     Mtftp4CleanService (MtftpSb);
 
-    gBS->FreePool (MtftpSb);
+    FreePool (MtftpSb);
   } else {
 
     while (!IsListEmpty (&MtftpSb->Children)) {
@@ -482,7 +482,7 @@ Mtftp4ServiceBindingCreateChild (
                             );
 
   if (Instance->UnicastPort == NULL) {
-    gBS->FreePool (Instance);
+    FreePool (Instance);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -538,7 +538,7 @@ ON_ERROR:
 
   if (EFI_ERROR (Status)) {
     UdpIoFreeIo (Instance->UnicastPort);
-    gBS->FreePool (Instance);
+    FreePool (Instance);
   }
 
   return Status;
@@ -637,6 +637,6 @@ Mtftp4ServiceBindingDestroyChild (
 
   gBS->RestoreTPL (OldTpl);
 
-  gBS->FreePool (Instance);
+  FreePool (Instance);
   return EFI_SUCCESS;
 }

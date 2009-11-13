@@ -1363,7 +1363,7 @@ Udp4RecycleRxDataWrap (
   //
   gBS->CloseEvent (Wrap->RxData.RecycleSignal);
 
-  gBS->FreePool (Wrap);
+  FreePool (Wrap);
 }
 
 
@@ -1413,7 +1413,7 @@ Udp4WrapRxData (
                   &Wrap->RxData.RecycleSignal
                   );
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (Wrap);
+    FreePool (Wrap);
     return NULL;
   }
 
@@ -2012,7 +2012,7 @@ Udp4SetVariableData (
              );
     }
 
-    gBS->FreePool (Udp4Service->MacString);
+    FreePool (Udp4Service->MacString);
   }
 
   Udp4Service->MacString = NewMacString;
@@ -2027,7 +2027,7 @@ Udp4SetVariableData (
 
 ON_ERROR:
 
-  gBS->FreePool (Udp4VariableData);
+  FreePool (Udp4VariableData);
 
   return Status;
 }
@@ -2054,6 +2054,6 @@ Udp4ClearVariableData (
          NULL
          );
 
-  gBS->FreePool (Udp4Service->MacString);
+  FreePool (Udp4Service->MacString);
   Udp4Service->MacString = NULL;
 }

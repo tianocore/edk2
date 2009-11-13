@@ -168,9 +168,9 @@ IScsiUpdateDeviceList (
       gRT->SetVariable (MacString, &mIScsiCHAPAuthInfoGuid, 0, 0, NULL);
     }
 
-    gBS->FreePool (DeviceList);
+    FreePool (DeviceList);
   } else if (Status != EFI_NOT_FOUND) {
-    gBS->FreePool (Handles);
+    FreePool (Handles);
     return Status;
   }
   //
@@ -197,8 +197,8 @@ IScsiUpdateDeviceList (
         DeviceList
         );
 
-  gBS->FreePool (DeviceList);
-  gBS->FreePool (Handles);
+  FreePool (DeviceList);
+  FreePool (Handles);
 
   return Status;
 }
@@ -400,7 +400,7 @@ IScsiFormExtractConfig (
                                Results,
                                Progress
                                );
-  gBS->FreePool (IfrNvData);
+  FreePool (IfrNvData);
   return Status;
 }
 
@@ -873,7 +873,7 @@ IScsiConfigUpdateForm (
 
     mNumberOfIScsiDevices--;
     RemoveEntryList (&ConfigFormEntry->Link);
-    gBS->FreePool (ConfigFormEntry);
+    FreePool (ConfigFormEntry);
   }
   //
   // Allocate space for creation of Buffer
@@ -1055,7 +1055,7 @@ IScsiConfigFormUnload (
          &mCallbackInfo->ConfigAccess,
          NULL
          );
-  gBS->FreePool (mCallbackInfo);
+  FreePool (mCallbackInfo);
 
   return EFI_SUCCESS;
 }

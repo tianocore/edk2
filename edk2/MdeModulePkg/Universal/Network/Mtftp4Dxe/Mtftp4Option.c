@@ -1,7 +1,7 @@
 /** @file
   Routines to process MTFTP4 options.
   
-Copyright (c) 2006 - 2007, Intel Corporation<BR>
+Copyright (c) 2006 - 2009, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -528,6 +528,6 @@ Mtftp4ParseOptionOack (
 
   Status = Mtftp4ParseOption (OptionList, Count, FALSE, MtftpOption);
 
-  gBS->FreePool (OptionList);
+  FreePool (OptionList);
   return Status;
 }

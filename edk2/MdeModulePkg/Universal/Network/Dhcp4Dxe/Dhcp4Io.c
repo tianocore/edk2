@@ -525,7 +525,7 @@ DhcpChooseOffer (
     TempPacket = (EFI_DHCP4_PACKET *) AllocatePool (NewPacket->Size);
     if (TempPacket != NULL) {
       CopyMem (TempPacket, NewPacket, NewPacket->Size);
-      gBS->FreePool (Selected);
+      FreePool (Selected);
       Selected = TempPacket;
     }
   }
@@ -663,7 +663,7 @@ DhcpHandleSelect (
   return EFI_SUCCESS;
 
 ON_EXIT:
-  gBS->FreePool (Packet);
+  FreePool (Packet);
   return Status;
 }
 
@@ -749,14 +749,14 @@ DhcpHandleRequest (
   DhcpSb->IoStatus = EFI_SUCCESS;
   DhcpNotifyUser (DhcpSb, DHCP_NOTIFY_COMPLETION);
 
-  gBS->FreePool (Packet);
+  FreePool (Packet);
   return EFI_SUCCESS;
 
 REJECT:
   DhcpSendMessage (DhcpSb, DhcpSb->Selected, DhcpSb->Para, DHCP_MSG_DECLINE, Message);
 
 ON_EXIT:
-  gBS->FreePool (Packet);
+  FreePool (Packet);
   return Status;
 }
 
@@ -840,7 +840,7 @@ DhcpHandleRenewRebind (
   }
 
 ON_EXIT:
-  gBS->FreePool (Packet);
+  FreePool (Packet);
   return Status;
 }
 
@@ -926,7 +926,7 @@ DhcpHandleReboot (
   return EFI_SUCCESS;
 
 ON_EXIT:
-  gBS->FreePool (Packet);
+  FreePool (Packet);
   return Status;
 }
 
@@ -1046,7 +1046,7 @@ DhcpInput (
     //
     // Ignore the packet in INITREBOOT, INIT and BOUND states
     //
-    gBS->FreePool (Packet);
+    FreePool (Packet);
     Status = EFI_SUCCESS;
     break;
 
@@ -1077,7 +1077,7 @@ RESTART:
   NetbufFree (UdpPacket);
 
   if (Packet != NULL) {
-    gBS->FreePool (Packet);
+    FreePool (Packet);
   }
 
   Status = UdpIoRecvDatagram (DhcpSb->UdpIo, DhcpInput, DhcpSb, 0);
@@ -1099,7 +1099,7 @@ DhcpReleasePacket (
   IN VOID                   *Arg
   )
 {
-  gBS->FreePool (Arg);
+  FreePool (Arg);
 }
 
 
@@ -1319,12 +1319,12 @@ DhcpSendMessage (
   }
 
   if (EFI_ERROR (Status)) {
-    gBS->FreePool (Packet);
+    FreePool (Packet);
     return Status;
   }
 
   if (NewPacket != NULL) {
-    gBS->FreePool (Packet);
+    FreePool (Packet);
     Packet = NewPacket;
   }
 
@@ -1346,7 +1346,7 @@ DhcpSendMessage (
   Wrap      = NetbufFromExt (&Frag, 1, 0, 0, DhcpReleasePacket, Packet);
 
   if (Wrap == NULL) {
-    gBS->FreePool (Packet);
+    FreePool (Packet);
     return EFI_OUT_OF_RESOURCES;
   }
 

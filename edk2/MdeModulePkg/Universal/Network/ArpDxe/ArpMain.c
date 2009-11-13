@@ -1,7 +1,7 @@
 /** @file
   Implementation of EFI Address Resolution Protocol (ARP) Protocol interface functions.
   
-Copyright (c) 2006, Intel Corporation.<BR>
+Copyright (c) 2006 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -628,7 +628,7 @@ ArpRequest (
     CacheEntry = ArpAllocCacheEntry (Instance);
     if (CacheEntry == NULL) {
       DEBUG ((EFI_D_ERROR, "ArpRequest: Allocate memory for CacheEntry failed.\n"));
-      gBS->FreePool (RequestContext);
+      FreePool (RequestContext);
 
       Status = EFI_OUT_OF_RESOURCES;
       goto UNLOCK_EXIT;

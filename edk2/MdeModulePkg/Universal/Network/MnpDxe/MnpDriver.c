@@ -1,7 +1,7 @@
 /** @file
   Implementation of driver entry point and driver binding protocol.
 
-Copyright (c) 2005 - 2008, Intel Corporation. <BR> 
+Copyright (c) 2005 - 2009, Intel Corporation. <BR> 
 All rights reserved. This program and the accompanying materials are licensed 
 and made available under the terms and conditions of the BSD License which 
 accompanies this distribution. The full text of the license may be found at 
@@ -171,7 +171,7 @@ ErrorExit:
       MnpFlushServiceData (MnpServiceData, This->DriverBindingHandle);
     }
 
-    gBS->FreePool (MnpServiceData);
+    FreePool (MnpServiceData);
   }
 
   return Status;
@@ -248,7 +248,7 @@ MnpDriverBindingStop (
     //
     MnpFlushServiceData (MnpServiceData, This->DriverBindingHandle);
 
-    gBS->FreePool (MnpServiceData);
+    FreePool (MnpServiceData);
   } else {
     while (!IsListEmpty (&MnpServiceData->ChildrenList)) {
       //
@@ -376,7 +376,7 @@ ErrorExit:
             );
     }
 
-    gBS->FreePool (Instance);
+    FreePool (Instance);
   }
 
   return Status;
@@ -511,7 +511,7 @@ MnpServiceBindingDestroyChild (
 
   gBS->RestoreTPL (OldTpl);
 
-  gBS->FreePool (Instance);
+  FreePool (Instance);
 
   return Status;
 }

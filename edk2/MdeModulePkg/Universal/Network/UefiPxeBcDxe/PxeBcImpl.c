@@ -1376,7 +1376,7 @@ ON_EXIT:
     gBS->CloseEvent (Token.Event);
   }
 
-  gBS->FreePool (Udp4TxData);
+  FreePool (Udp4TxData);
 
   return Status;
 }
