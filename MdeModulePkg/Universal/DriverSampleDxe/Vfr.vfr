@@ -84,7 +84,7 @@ formset
   // Define a EFI variable Storage (EFI_IFR_VARSTORE_EFI)
   //
   efivarstore MyEfiVar,                           // Define referenced name in vfr
-    attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS,  // EFI variable attribures
+    attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,  // EFI variable attribures
     name      = STRING_TOKEN(STR_VAR_NAME),       // EFI variable name
     varsize   = 1,                                // Size of the EFI variable
     guid      = FORMSET_GUID;                     // EFI variable GUID
@@ -153,9 +153,9 @@ formset
     oneof varid  = MyIfrNVData.BootOrderLarge,
       prompt      = STRING_TOKEN(STR_ONE_OF_PROMPT),
       help        = STRING_TOKEN(STR_ONE_OF_HELP),
-      default value = cond (questionref(MyOneOf) == 0x0 ? 0 : 1),
+      default value = cond (pushthis == 0 ? 0 : cond ((questionref(MyOneOf) >> 0x4 & 0xF00) == 0x0 + 0x2 ? 0 : 1)),
       option text = STRING_TOKEN(STR_BOOT_ORDER1), value = 0x0, flags = 0;
-      option text = STRING_TOKEN(STR_BOOT_ORDER2), value = 0x1, flags = DEFAULT;
+      option text = STRING_TOKEN(STR_BOOT_ORDER2), value = 0x1, flags = 0;
     endoneof;
 
     grayoutif  ideqval MyIfrNVData.SuppressGrayOutSomething == 0x1;
@@ -313,9 +313,10 @@ formset
     endnumeric;
 
     numeric varid   = MyEfiVar,                           // Reference of EFI variable storage
+            questionid  = 0x1111,
             prompt  = STRING_TOKEN(STR_TALL_HEX_PROMPT),
             help    = STRING_TOKEN(STR_NUMERIC_HELP1),
-            flags   = DISPLAY_UINT_HEX,                   // Display in HEX format (if not specified, default is in decimal format)
+            flags   = DISPLAY_UINT_HEX | INTERACTIVE,     // Display in HEX format (if not specified, default is in decimal format)
             minimum = 0,
             maximum = 250,
             default = 175,
