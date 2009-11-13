@@ -13,7 +13,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "Setup.h"
-#include "Ui.h"
 
 BOOLEAN            mHiiPackageListUpdated;
 UI_MENU_SELECTION  *gCurrentSelection;
@@ -983,11 +982,25 @@ SetupBrowser (
     }
     
     //
+    // Reset FormPackage update flag
+    //
+    mHiiPackageListUpdated = FALSE;
+
+    //
     // Load Questions' Value for display
     //
-    Status = LoadFormSetConfig (Selection->FormSet);
+    Status = LoadFormSetConfig (Selection, Selection->FormSet);
     if (EFI_ERROR (Status)) {
       return Status;
+    }
+
+    //
+    // IFR is updated during callback of read value, force to reparse the IFR binary
+    //
+    if (mHiiPackageListUpdated) {
+      Selection->Action = UI_ACTION_REFRESH_FORMSET;
+      mHiiPackageListUpdated = FALSE;
+      goto Done;
     }
 
     //

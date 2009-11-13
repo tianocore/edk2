@@ -13,7 +13,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "Setup.h"
-#include "Ui.h"
 
 UINT16           mStatementIndex;
 UINT16           mExpressionOpCodeIndex;
