@@ -237,6 +237,7 @@ PeiLoadImageLoadImage (
     SearchType1 = EFI_SECTION_PE32;
     SearchType2 = EFI_SECTION_TE;
   }
+  asm ("int $3");
   //
   // Try to find a first exe section (if PcdPeiCoreImageLoaderSearchTeSectionFirst 
   // is true, TE will be searched first).
