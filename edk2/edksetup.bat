@@ -51,9 +51,13 @@ if not defined VCINSTALLDIR (
     if defined VS80COMNTOOLS (
       call "%VS80COMNTOOLS%\vsvars32.bat"
     ) else (
-      echo.
-      echo !!! WARNING !!! Cannot find Visual Studio !!!
-      echo.
+      if defined VS90COMNTOOLS (
+        call "%VS90COMNTOOLS%\vsvars32.bat"
+      ) else (
+        echo.
+        echo !!! WARNING !!! Cannot find Visual Studio !!!
+        echo.
+      )
     )
   )
 )
