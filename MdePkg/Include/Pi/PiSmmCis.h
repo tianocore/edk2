@@ -60,12 +60,12 @@ EFI_STATUS
 /**
   Function prototype for invoking a function on an Application Processor.
 
-  @param[in] Buffer  Pointer to private data buffer.
+  @param[in,out] Buffer  Pointer to private data buffer.
 **/
 typedef
 VOID
 (EFIAPI *EFI_AP_PROCEDURE)(
-  IN VOID  *Buffer
+  IN OUT VOID  *Buffer
   );
 
 /**
