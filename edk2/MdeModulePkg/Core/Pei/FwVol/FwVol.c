@@ -962,6 +962,8 @@ PeiFfs2FvPpiProcessVolume (
           ));
   PrivateData->FvCount ++;
   
+  FileHandle = NULL;
+  
   do {
     Status = This->FindFileByType (
                      This,
