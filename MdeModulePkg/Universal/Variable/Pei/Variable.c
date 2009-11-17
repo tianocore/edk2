@@ -592,7 +592,7 @@ PeiGetVariable (
   @param  VariableNameSize  On entry, points to the size of the buffer pointed to by VariableName.
   @param  VariableName      On entry, a pointer to a null-terminated string that is the variable's name.
                             On return, points to the next variable's null-terminated name string.
-  @param  VendorGuid        On entry, a pointer to an EFI_GUID that is the variable's GUID. 
+  @param  VariableGuid      On entry, a pointer to an EFI_GUID that is the variable's GUID. 
                             On return, a pointer to the next variable's GUID.
 
   @retval EFI_SUCCESS           The variable was read successfully.
