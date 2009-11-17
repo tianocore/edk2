@@ -35,7 +35,7 @@ typedef struct _EFI_PEI_READ_ONLY_VARIABLE2_PPI  EFI_PEI_READ_ONLY_VARIABLE2_PPI
 
   @param  This                  A pointer to this instance of the EFI_PEI_READ_ONLY_VARIABLE2_PPI.
   @param  VariableName          A pointer to a null-terminated string that is the variable's name.
-  @param  VendorGuid            A pointer to an EFI_GUID that is the variable's GUID. The combination of
+  @param  VariableGuid          A pointer to an EFI_GUID that is the variable's GUID. The combination of
                                 VariableGuid and VariableName must be unique.
   @param  Attributes            If non-NULL, on return, points to the variable's attributes.
   @param  DataSize              On entry, points to the size in bytes of the Data buffer.
@@ -79,7 +79,7 @@ EFI_STATUS
   @param  VariableName      On entry, a pointer to a null-terminated string that is the variable's name.
                             On return, points to the next variable's null-terminated name string.
 
-  @param  VendorGuid        On entry, a pointer to an EFI_GUID that is the variable's GUID. 
+  @param  VariableGuid      On entry, a pointer to an EFI_GUID that is the variable's GUID. 
                             On return, a pointer to the next variable's GUID.
 
   @retval EFI_SUCCESS           The variable was read successfully.
