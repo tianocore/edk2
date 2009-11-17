@@ -195,8 +195,8 @@ ASM_PFX(InternalAsmThunk16):
 
     .const:
 
-ASM_PFX(m16Size):        .word      _InternalAsmThunk16 - ASM_PFX(m16Start)
-ASM_PFX(mThunk16Attr):   .word      _ThunkAttr          - ASM_PFX(m16Start)
+ASM_PFX(m16Size):        .word      ASM_PFX(InternalAsmThunk16)  - ASM_PFX(m16Start)
+ASM_PFX(mThunk16Attr):   .word      ASM_PFX(ThunkAttr)          - ASM_PFX(m16Start)
 ASM_PFX(m16Gdt):         .word      _NullSegDesc        - ASM_PFX(m16Start)
 ASM_PFX(m16GdtrBase):    .word      _16GdtrBase         - ASM_PFX(m16Start)
 ASM_PFX(mTransition):    .word      _EntryPoint         - ASM_PFX(m16Start)
