@@ -160,6 +160,11 @@ typedef struct _EFI_NET_SESSION_DATA {
   EFI_IP_ADDRESS        Source;     ///< Source IP of the received packet
   EFI_IP_ADDRESS        Dest;       ///< Destination IP of the received packet
   IP_IO_IP_HEADER       IpHdr;      ///< IP header of the received packet
+  UINT32                IpHdrLen;   ///< IP header length of the received packet. 
+                                    ///< For IPv6, it includes the IP6 header 
+                                    ///< length and extension header length. For
+                                    ///< IPv4, it includes the IP4 header length
+                                    ///< and options length.
   UINT8                 IpVersion;  ///< The IP version of the received packet
 } EFI_NET_SESSION_DATA;
 
