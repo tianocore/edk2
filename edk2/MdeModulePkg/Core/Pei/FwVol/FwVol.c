@@ -730,12 +730,19 @@ PeiFfsGetFileInfo (
 /**
   Returns information about the specified volume.
 
-  @param VolumeHandle    Handle of the volume.
-  @param VolumeInfo      Upon exit, points to the volume’s information.
+  This function returns information about a specific firmware
+  volume, including its name, type, attributes, starting address
+  and size.
 
-  @retval EFI_INVALID_PARAMETER If VolumeHandle does not represent a valid volume.
-  @retval EFI_INVALID_PARAMETER If VolumeInfo is NULL.
-  @retval EFI_SUCCESS           Volume information returned.
+  @param VolumeHandle   Handle of the volume.
+  @param VolumeInfo     Upon exit, points to the volume's information.
+
+  @retval EFI_SUCCESS             Volume information returned.
+  @retval EFI_INVALID_PARAMETER   If VolumeHandle does not represent a valid volume.
+  @retval EFI_INVALID_PARAMETER   If VolumeHandle is NULL.
+  @retval EFI_SUCCESS             Information successfully returned.
+  @retval EFI_INVALID_PARAMETER   The volume designated by the VolumeHandle is not available.
+
 **/
 EFI_STATUS
 EFIAPI 

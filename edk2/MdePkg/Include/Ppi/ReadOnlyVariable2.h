@@ -2,7 +2,7 @@
   This file declares Read-only Variable Service2 PPI.
   This ppi permits read-only access to the UEFI variable store during the PEI phase.
 
-  Copyright (c) 2006 - 2008, Intel Corporation                                                         
+  Copyright (c) 2006 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -79,7 +79,7 @@ EFI_STATUS
   @param  VariableName      On entry, a pointer to a null-terminated string that is the variable's name.
                             On return, points to the next variable's null-terminated name string.
 
-  @param  VendorGuid        On entry, a pointer to an UEFI _GUID that is the variable's GUID. 
+  @param  VendorGuid        On entry, a pointer to an EFI_GUID that is the variable's GUID. 
                             On return, a pointer to the next variable's GUID.
 
   @retval EFI_SUCCESS           The variable was read successfully.
@@ -94,7 +94,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_NEXT_VARIABLE_NAME2)(
+(EFIAPI *EFI_PEI_GET_NEXT_VARIABLE_NAME2)(
   IN CONST  EFI_PEI_READ_ONLY_VARIABLE2_PPI *This,
   IN OUT    UINTN                           *VariableNameSize,
   IN OUT    CHAR16                          *VariableName,
@@ -106,8 +106,8 @@ EFI_STATUS
 /// variable services. 
 ///
 struct _EFI_PEI_READ_ONLY_VARIABLE2_PPI {
-  EFI_PEI_GET_VARIABLE2       GetVariable;
-  EFI_PEI_NEXT_VARIABLE_NAME2 NextVariableName;
+  EFI_PEI_GET_VARIABLE2           GetVariable;
+  EFI_PEI_GET_NEXT_VARIABLE_NAME2 NextVariableName;
 };
 
 extern EFI_GUID gEfiPeiReadOnlyVariable2PpiGuid;
