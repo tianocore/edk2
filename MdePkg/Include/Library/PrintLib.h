@@ -2,7 +2,7 @@
   Provides services to print a formatted string to a buffer. All combinations of
   Unicode and ASCII strings are supported.
 
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -473,18 +473,18 @@ UnicodeSPrintAsciiFormat (
   If Width is 0, PREFIX_ZERO is ignored in Flags.
   If COMMA_TYPE is set in Flags, then PREFIX_ZERO is ignored in Flags, and commas
   are inserted every 3rd digit starting from the right.
-  If HEX_RADIX is set in Flags, then the output buffer will be 
+  If RADIX_HEX is set in Flags, then the output buffer will be 
   formatted in hexadecimal format.
-  If Value is < 0 and HEX_RADIX is not set in Flags, then the fist character in Buffer is a '-'.
+  If Value is < 0 and RADIX_HEX is not set in Flags, then the fist character in Buffer is a '-'.
   If PREFIX_ZERO is set in Flags and PREFIX_ZERO is not being ignored, 
   then Buffer is padded with '0' characters so the combination of the optional '-' 
   sign character, '0' characters, digit characters for Value, and the Null-terminator
   add up to Width characters.
-  If both COMMA_TYPE and HEX_RADIX are set in Flags, then ASSERT().
+  If both COMMA_TYPE and RADIX_HEX are set in Flags, then ASSERT().
   If Buffer is NULL, then ASSERT().
   If Buffer is not aligned on a 16-bit boundary, then ASSERT().
   If unsupported bits are set in Flags, then ASSERT().
-  If both COMMA_TYPE and HEX_RADIX are set in Flags, then ASSERT().
+  If both COMMA_TYPE and RADIX_HEX are set in Flags, then ASSERT().
   If Width >= MAXIMUM_VALUE_CHARACTERS, then ASSERT()
 
   @param  Buffer  Pointer to the output buffer for the produced Null-terminated
@@ -774,9 +774,9 @@ AsciiSPrintUnicodeFormat (
   If Width is 0, PREFIX_ZERO is ignored in Flags.
   If COMMA_TYPE is set in Flags, then PREFIX_ZERO is ignored in Flags, and commas
   are inserted every 3rd digit starting from the right.
-  If HEX_RADIX is set in Flags, then the output buffer will be 
+  If RADIX_HEX is set in Flags, then the output buffer will be 
   formatted in hexadecimal format.
-  If Value is < 0 and HEX_RADIX is not set in Flags, then the fist character in Buffer is a '-'.
+  If Value is < 0 and RADIX_HEX is not set in Flags, then the fist character in Buffer is a '-'.
   If PREFIX_ZERO is set in Flags and PREFIX_ZERO is not being ignored, 
   then Buffer is padded with '0' characters so the combination of the optional '-' 
   sign character, '0' characters, digit characters for Value, and the Null-terminator
@@ -784,7 +784,7 @@ AsciiSPrintUnicodeFormat (
   
   If Buffer is NULL, then ASSERT().
   If unsupported bits are set in Flags, then ASSERT().
-  If both COMMA_TYPE and HEX_RADIX are set in Flags, then ASSERT().
+  If both COMMA_TYPE and RADIX_HEX are set in Flags, then ASSERT().
   If Width >= MAXIMUM_VALUE_CHARACTERS, then ASSERT()
 
   @param  Buffer  Pointer to the output buffer for the produced Null-terminated
