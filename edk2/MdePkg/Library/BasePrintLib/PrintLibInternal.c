@@ -1,7 +1,7 @@
 /** @file
   Print Library internal worker functions.
 
-  Copyright (c) 2006 - 2008, Intel Corporation<BR>
+  Copyright (c) 2006 - 2009, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -193,7 +193,7 @@ BasePrintLibConvertValueToString (
   ASSERT ((Flags & ~(LEFT_JUSTIFY | COMMA_TYPE | PREFIX_ZERO | RADIX_HEX)) == 0);
 
   //
-  // If both COMMA_TYPE and HEX_RADIX are set, then ASSERT ()
+  // If both COMMA_TYPE and RADIX_HEX are set, then ASSERT ()
   //
   ASSERT (((Flags & COMMA_TYPE) == 0) || ((Flags & RADIX_HEX) == 0));
 
