@@ -1057,6 +1057,7 @@ IpIoListenHandlerDpc (
   Session.Source.Addr[0] = EFI_IP4 (RxData->Ip4RxData.Header->SourceAddress);
   Session.Dest.Addr[0]   = EFI_IP4 (RxData->Ip4RxData.Header->DestinationAddress);
   Session.IpHdr.Ip4Hdr   = RxData->Ip4RxData.Header;
+  Session.IpHdrLen       = RxData->Ip4RxData.HeaderLength;
   Session.IpVersion      = IP_VERSION_4;
   } else {
 
@@ -1093,6 +1094,7 @@ IpIoListenHandlerDpc (
       sizeof(EFI_IPv6_ADDRESS)
       );
     Session.IpHdr.Ip6Hdr = RxData->Ip6RxData.Header;
+    Session.IpHdrLen     = RxData->Ip6RxData.HeaderLength;
     Session.IpVersion    = IP_VERSION_6;
   } 
 
