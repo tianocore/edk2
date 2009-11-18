@@ -2680,6 +2680,7 @@ SaveBrowserContext (
   Context->AdjustNumber         = gAdjustNumber;
   Context->SaveChanges          = gSaveChanges;
   Context->OptionMismatch       = gOptionMismatch;
+  Context->FormSuppress         = gFormSuppress;
   Context->PromptBlockWidth     = gPromptBlockWidth;
   Context->OptionBlockWidth     = gOptionBlockWidth;
   Context->HelpBlockWidth       = gHelpBlockWidth;
@@ -2760,6 +2761,7 @@ RestoreBrowserContext (
   gAdjustNumber         = Context->AdjustNumber;
   gSaveChanges          = Context->SaveChanges;
   gOptionMismatch       = Context->OptionMismatch;
+  gFormSuppress         = Context->FormSuppress;
   gPromptBlockWidth     = Context->PromptBlockWidth;
   gOptionBlockWidth     = Context->OptionBlockWidth;
   gHelpBlockWidth       = Context->HelpBlockWidth;
