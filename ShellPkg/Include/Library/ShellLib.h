@@ -69,7 +69,7 @@ ShellSetFileInfo (
   This function opens a file with the open mode according to the file path. The 
   Attributes is valid only for EFI_FILE_MODE_CREATE.
 
-  @param  FilePath 		    on input the device path to the file.  On output 
+  @param  FilePath 		    On input the device path to the file.  On output 
                           the remaining device path.
   @param  DeviceHandle  	pointer to the system device handle.
   @param  FileHandle		  pointer to the file handle.
@@ -148,12 +148,12 @@ ShellOpenFileByName(
   otherwise, the Filehandle is NULL. If the directory already existed, this 
   function opens the existing directory.
 
-  @param  DirectoryName         pointer to Directory name
-  @param  FileHandle		        pointer to the file handle.
+  @param  DirectoryName         Pointer to Directory name.
+  @param  FileHandle		        Pointer to the file handle.
 
   @retval EFI_SUCCESS		        The information was set.
   @retval EFI_INVALID_PARAMETER	One of the parameters has an invalid value.
-  @retval EFI_UNSUPPORTED	Could not open the file path.	
+  @retval EFI_UNSUPPORTED	      Could not open the file path.	
   @retval EFI_NOT_FOUND	        The specified file could not be found on the 
                                 device or the file system could not be found 
                                 on the device.
@@ -191,18 +191,16 @@ ShellCreateDirectory(
   are no more directory entries, the read returns a zero-length buffer. 
   EFI_FILE_INFO is the structure returned as the directory entry.
 
-  @param FileHandle             the opened file handle
-  
-  @param ReadSize               on input the size of buffer in bytes.  on return 
+  @param FileHandle             The opened file handle.
+  @param ReadSize               On input the size of buffer in bytes.  On return 
                                 the number of bytes written.
+  @param Buffer                 The buffer to put read data into.
 
-  @param Buffer                 the buffer to put read data into.
-
- @retval EFI_SUCCESS	          Data was read.
- @retval EFI_NO_MEDIA	          The device has no media.
- @retval EFI_DEVICE_ERROR	      The device reported an error.
- @retval EFI_VOLUME_CORRUPTED	  The file system structures are corrupted.
- @retval EFI_BUFFER_TO_SMALL	  Buffer is too small. ReadSize contains required 
+  @retval EFI_SUCCESS	          Data was read.
+  @retval EFI_NO_MEDIA	        The device has no media.
+  @retval EFI_DEVICE_ERROR	    The device reported an error.
+  @retval EFI_VOLUME_CORRUPTED	The file system structures are corrupted.
+  @retval EFI_BUFFER_TO_SMALL	  Buffer is too small. ReadSize contains required 
                                 size.
 
 **/
@@ -224,21 +222,21 @@ ShellReadFile(
   The file is automatically grown to hold the data if required. Direct writes to 
   opened directories are not supported.
 
-  @param FileHandle             The opened file for writing
+  @param FileHandle             The opened file for writing.
 
-  @param BufferSize             on input the number of bytes in Buffer.  On output
+  @param BufferSize             On input the number of bytes in Buffer.  On output
                                 the number of bytes written.
 
-  @param Buffer                 the buffer containing data to write is stored.
+  @param Buffer                 The buffer containing data to write is stored.
 
- @retval EFI_SUCCESS	        Data was written.
- @retval EFI_UNSUPPORTED	    Writes to an open directory are not supported.
- @retval EFI_NO_MEDIA	        The device has no media.
- @retval EFI_DEVICE_ERROR	    The device reported an error.
- @retval EFI_VOLUME_CORRUPTED	The file system structures are corrupted.
- @retval EFI_WRITE_PROTECTED	The device is write-protected.
- @retval EFI_ACCESS_DENIED	  The file was open for read only.
- @retval EFI_VOLUME_FULL	    The volume is full.
+  @retval EFI_SUCCESS	          Data was written.
+  @retval EFI_UNSUPPORTED	      Writes to an open directory are not supported.
+  @retval EFI_NO_MEDIA	        The device has no media.
+  @retval EFI_DEVICE_ERROR	    The device reported an error.
+  @retval EFI_VOLUME_CORRUPTED	The file system structures are corrupted.
+  @retval EFI_WRITE_PROTECTED	  The device is write-protected.
+  @retval EFI_ACCESS_DENIED	    The file was open for read only.
+  @retval EFI_VOLUME_FULL	      The volume is full.
 **/
 EFI_STATUS
 EFIAPI
@@ -255,10 +253,10 @@ ShellWriteFile(
   flushed to the device, and the file is closed. In all cases the handle is 
   closed.
 
-@param FileHandle               the file handle to close.
+  @param FileHandle               The file handle to close.
 
-@retval EFI_SUCCESS             the file handle was closed sucessfully.
-@retval INVALID_PARAMETER      	One of the parameters has an invalid value.
+  @retval EFI_SUCCESS             The file handle was closed sucessfully.
+  @retval INVALID_PARAMETER      	One of the parameters has an invalid value.
 **/
 EFI_STATUS
 EFIAPI
@@ -273,12 +271,12 @@ ShellCloseFile (
   If the file cannot be deleted, the warning code EFI_WARN_DELETE_FAILURE is 
   returned, but the handle is still closed.
 
-  @param FileHandle             the file handle to delete
+  @param FileHandle                 The file handle to delete.
 
-  @retval EFI_SUCCESS           the file was closed sucessfully
-  @retval EFI_WARN_DELETE_FAILURE the handle was closed, but the file was not 
-                                deleted
-  @retval INVALID_PARAMETER    	One of the parameters has an invalid value.
+  @retval EFI_SUCCESS               The file was closed sucessfully.
+  @retval EFI_WARN_DELETE_FAILURE   The handle was closed, but the file was not 
+                                    deleted.
+  @retval INVALID_PARAMETER    	    One of the parameters has an invalid value.
 **/
 EFI_STATUS
 EFIAPI
@@ -414,11 +412,11 @@ ShellFindNextFile(
   This function extracts the file size info from the FileHandle's EFI_FILE_INFO 
   data.
 
-  @param FileHandle             file handle from which size is retrieved
-  @param Size                   pointer to size
+  @param FileHandle             The file handle from which size is retrieved.
+  @param Size                   Pointer to size.
 
-  @retval EFI_SUCCESS           operation was completed sucessfully
-  @retval EFI_DEVICE_ERROR      cannot access the file
+  @retval EFI_SUCCESS           The operation was completed sucessfully.
+  @retval EFI_DEVICE_ERROR      cannot access the file.
 **/
 EFI_STATUS
 EFIAPI
@@ -442,15 +440,15 @@ ShellGetExecutionBreakFlag(
   );
 
 /**
-  return the value of an environment variable
+  Return the value of an environment variable.
 
-  this function gets the value of the environment variable set by the 
-  ShellSetEnvironmentVariable function
+  This function gets the value of the environment variable set by the 
+  ShellSetEnvironmentVariable function.
 
   @param EnvKey                 The key name of the environment variable.
 
   @retval NULL                  the named environment variable does not exist.
-  @return != NULL               pointer to the value of the environment variable
+  @return != NULL               pointer to the value of the environment variable.
 **/
 CONST CHAR16*
 EFIAPI
@@ -461,13 +459,13 @@ ShellGetEnvironmentVariable (
 /**
   set the value of an environment variable
 
-This function changes the current value of the specified environment variable. If the
-environment variable exists and the Value is an empty string, then the environment
-variable is deleted. If the environment variable exists and the Value is not an empty
-string, then the value of the environment variable is changed. If the environment
-variable does not exist and the Value is an empty string, there is no action. If the
-environment variable does not exist and the Value is a non-empty string, then the
-environment variable is created and assigned the specified value.
+  This function changes the current value of the specified environment variable. If the
+  environment variable exists and the Value is an empty string, then the environment
+  variable is deleted. If the environment variable exists and the Value is not an empty
+  string, then the value of the environment variable is changed. If the environment
+  variable does not exist and the Value is an empty string, there is no action. If the
+  environment variable does not exist and the Value is a non-empty string, then the
+  environment variable is created and assigned the specified value.
 
   This is not supported pre-UEFI Shell 2.0.
 
@@ -487,19 +485,19 @@ ShellSetEnvironmentVariable (
   );
 
 /**
-  cause the shell to parse and execute a command line.
+  Cause the shell to parse and execute a command line.
 
   This function creates a nested instance of the shell and executes the specified
-command (CommandLine) with the specified environment (Environment). Upon return,
-the status code returned by the specified command is placed in StatusCode.
-If Environment is NULL, then the current environment is used and all changes made
-by the commands executed will be reflected in the current environment. If the
-Environment is non-NULL, then the changes made will be discarded.
-The CommandLine is executed from the current working directory on the current
-device.
+  command (CommandLine) with the specified environment (Environment). Upon return,
+  the status code returned by the specified command is placed in StatusCode.
+  If Environment is NULL, then the current environment is used and all changes made
+  by the commands executed will be reflected in the current environment. If the
+  Environment is non-NULL, then the changes made will be discarded.
+  The CommandLine is executed from the current working directory on the current
+  device.
 
-EnvironmentVariables and Status are only supported for UEFI Shell 2.0.
-Output is only supported for pre-UEFI Shell 2.0
+  EnvironmentVariables and Status are only supported for UEFI Shell 2.0.
+  Output is only supported for pre-UEFI Shell 2.0
 
   @param ImageHandle            Parent image that is starting the operation
   @param CommandLine            pointer to null terminated command line.
@@ -543,9 +541,9 @@ ShellGetCurrentDir (
   );
 
 /**
-  sets (enabled or disabled) the page break mode
+  Sets (enabled or disabled) the page break mode.
 
-  when page break mode is enabled the screen will stop scrolling 
+  When page break mode is enabled the screen will stop scrolling 
   and wait for operator input before scrolling a subsequent screen.
 
   @param CurrentState           TRUE to enable and FALSE to disable
@@ -563,21 +561,19 @@ ShellSetPageBreakMode (
   file has a SHELL_FILE_ARG structure to record the file information. These 
   structures are placed on the list ListHead. Users can get the SHELL_FILE_ARG 
   structures from ListHead to access each file. This function supports wildcards
-  and will process '?' and '*' as such.  the list must be freed with a call to 
+  and will process '?' and '*' as such.  The list must be freed with a call to 
   ShellCloseFileMetaArg().
 
   If you are NOT appending to an existing list *ListHead must be NULL.  If 
   *ListHead is NULL then it must be callee freed.
 
-  @param Arg                    pointer to path string
-  @param OpenMode               mode to open files with
-  @param ListHead               head of linked list of results
+  @param Arg                    Pointer to path string.
+  @param OpenMode               Mode to open files with.
+  @param ListHead               Head of linked list of results.
 
-  @retval EFI_SUCCESS           the operation was sucessful and the list head 
-                                contains the list of opened files
-  #retval EFI_UNSUPPORTED       a previous ShellOpenFileMetaArg must be closed first.
-                                *ListHead is set to NULL.
-  @return != EFI_SUCCESS        the operation failed
+  @retval EFI_SUCCESS           The operation was sucessful and the list head 
+                                contains the list of opened files.
+  @return != EFI_SUCCESS        The operation failed.
 
   @sa InternalShellConvertFileListType
 **/
@@ -603,11 +599,31 @@ ShellCloseFileMetaArg (
   IN OUT EFI_SHELL_FILE_INFO    **ListHead
   );
 
+/**
+  Find a file by searching the CWD and then the path.
+
+  if FileName is NULL then ASSERT.
+
+  if the return value is not NULL then the memory must be caller freed.
+
+  @param FileName               Filename string.
+
+  @retval NULL                  the file was not found
+  @return !NULL                 the path to the file.
+**/
+CHAR16 *
+EFIAPI
+ShellFindFilePath (
+  IN CONST CHAR16 *FileName
+  );
+
 typedef enum {
-  TypeFlag  = 0,
-  TypeValue,
-  TypePosition,
-  TypeStart,
+  TypeFlag  = 0,    /// a flag that is present or not present only. (IE "-a")
+  TypeValue,        /// a flag that has some data following it with a space (IE "-a 1")
+  TypePosition,     /// some data that did not follow a parameter (IE "filename.txt")
+  TypeStart,        /// a flag that has variable value appended to the end (IE "-ad", "-afd", "-adf", etc...
+  TypeDoubleValue,  /// a flag that has 2 space seperated value data following it. (IE "-a 1 2")
+  TypeMaxValue,     /// a flag followed by all the command line data before the next flag.
   TypeMax,
 } ParamType;
 
@@ -626,11 +642,11 @@ extern SHELL_PARAM_ITEM EmptyParamList[];
   
   If no initialization is required, then return RETURN_SUCCESS.
   
-  @param CheckList              pointer to list of parameters to check
-  @param CheckPackage           Package of checked values
-  @param ProblemParam           optional pointer to pointer to unicode string for 
+  @param CheckList              Pointer to list of parameters to check.
+  @param CheckPackage           Package of checked values.
+  @param ProblemParam           Pptional pointer to pointer to unicode string for 
                                 the paramater that caused failure.
-  @param AutoPageBreak          will automatically set PageBreakEnabled
+  @param AutoPageBreak          Will automatically set PageBreakEnabled.
 
   @retval EFI_SUCCESS           The operation completed sucessfully.
   @retval EFI_OUT_OF_RESOURCES  A memory allocation failed
@@ -638,10 +654,10 @@ extern SHELL_PARAM_ITEM EmptyParamList[];
   @retval EFI_VOLUME_CORRUPTED  the command line was corrupt.  an argument was 
                                 duplicated.  the duplicated command line argument 
                                 was returned in ProblemParam if provided.
-  @retval EFI_DEVICE_ERROR      the commands contained 2 opposing arguments.  one
+  @retval EFI_DEVICE_ERROR      The commands contained 2 opposing arguments.  one
                                 of the command line arguments was returned in 
                                 ProblemParam if provided.
-  @retval EFI_NOT_FOUND         a argument required a value that was missing.  
+  @retval EFI_NOT_FOUND         A argument required a value that was missing.  
                                 the invalid command line argument was returned in
                                 ProblemParam if provided.
 **/
@@ -767,6 +783,7 @@ ShellCommandLineGetCount(
 EFI_STATUS
 EFIAPI
 ShellInitialize (
+  VOID
   );
 
 /**
@@ -861,5 +878,59 @@ ShellIsDirectory(
   IN CONST CHAR16 *DirName
   );
 
+/**
+  Function to determine whether a string is decimal or hex representation of a number 
+  and return the number converted from the string.
+
+  @param[in] String   String representation of a number
+
+  @retval all         the number
+**/
+UINTN
+EFIAPI
+ShellStrToUintn(
+  IN CONST CHAR16 *String
+  );
+
+/**
+  Safely append with automatic string resizing given length of Destination and 
+  desired length of copy from Source.
+
+  append the first D characters of Source to the end of Destination, where D is 
+  the lesser of Count and the StrLen() of Source. If appending those D characters 
+  will fit within Destination (whose Size is given as CurrentSize) and 
+  still leave room for a null terminator, then those characters are appended, 
+  starting at the original terminating null of Destination, and a new terminating 
+  null is appended.
+
+  If appending D characters onto Destination will result in a overflow of the size
+  given in CurrentSize the string will be grown such that the copy can be performed
+  and CurrentSize will be updated to the new size.
+
+  If Source is NULL, there is nothing to append, just return the current buffer in 
+  Destination.
+
+  if Destination is NULL, then ASSERT()
+  if Destination's current length (including NULL terminator) is already more then 
+  CurrentSize, then ASSERT()
+
+  @param[in,out] Destination   The String to append onto
+  @param[in,out] CurrentSize   on call the number of bytes in Destination.  On 
+                                return possibly the new size (still in bytes).  if NULL
+                                then allocate whatever is needed.
+  @param[in]      Source        The String to append from
+  @param[in]      Count         Maximum number of characters to append.  if 0 then 
+                                all are appended.
+
+  @return Destination           return the resultant string.
+**/
+CHAR16* 
+EFIAPI
+StrnCatGrow (
+  IN OUT CHAR16           **Destination,
+  IN OUT UINTN            *CurrentSize,
+  IN     CONST CHAR16     *Source,
+  IN     UINTN            Count
+  );
 
 #endif // __SHELL_LIB__

@@ -55,7 +55,8 @@ QuickSortWorker (
   IN CONST UINTN                        ElementSize,
   IN       SORT_COMPARE                 CompareFunction,
   IN VOID                               *Buffer
-  ){
+  )
+{
   VOID        *Pivot;
   UINTN       LoopCount;
   UINTN       NextSwapLocation;
@@ -154,7 +155,8 @@ PerformQuickSort (
   IN CONST UINTN                        Count,
   IN CONST UINTN                        ElementSize,
   IN       SORT_COMPARE                 CompareFunction
-  ){
+  )
+{
   VOID  *Buffer;
 
   ASSERT(BufferToSort     != NULL);
@@ -188,7 +190,8 @@ INTN
 DevicePathCompare (
   IN  VOID             *Buffer1,
   IN  VOID             *Buffer2
-  ){
+  )
+{
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath1;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath2;
   CHAR16                    *TextPath1;

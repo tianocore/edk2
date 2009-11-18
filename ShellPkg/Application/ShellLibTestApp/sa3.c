@@ -24,6 +24,8 @@
 SHELL_PARAM_ITEM ParamList[] = {
   {L"/Param1", TypeFlag},
   {L"/Param2", TypeValue},
+  {L"/Param3", TypeDoubleValue},
+  {L"/Param4", TypeMaxValue},
   {NULL, TypeMax}};
 
 /**
@@ -46,26 +48,47 @@ UefiMain (
   EFI_FILE_HANDLE     FileHandle;
   EFI_STATUS          Status;
   CHAR16              FileName[100];
-  UINTN               BufferSize;
-  UINT64              Position;
-  UINT8               Buffer[200];
+//  UINTN               BufferSize;
+//  UINT64              Position;
+//  UINT8               Buffer[200];
   EFI_FILE_INFO       *pFileInfo;
   UINT64              Size;
   BOOLEAN             NoFile;
   EFI_SHELL_FILE_INFO *pShellFileInfo;
   LIST_ENTRY          *List;
+  CONST CHAR16              *Tester;
   
   FileHandle = NULL;
   StrCpy(FileName, L"testfile.txt");
-  Position = 0;
+//  Position = 0;
   pFileInfo = NULL;
   Size = 0;
   NoFile = FALSE;
   pShellFileInfo = NULL;
   List = NULL;
 
+  // command line param functions
+  Status = ShellCommandLineParse(ParamList, &List, NULL, FALSE);
+  // if you put an invalid parameter you SHOULD hit this assert.
+  ASSERT_EFI_ERROR(Status);
+  if (List) {
+    ASSERT(ShellCommandLineGetFlag(List, L"/Param5") == FALSE);
+    ASSERT(ShellCommandLineGetFlag(List, L"/Param1") != FALSE);
+    ASSERT(StrCmp(ShellCommandLineGetValue(List, L"/Param2"), L"Val1")==0);
+    ASSERT(StrCmp(ShellCommandLineGetRawValue(List, 0), L"SimpleApplication.efi")==0);
+    Tester = ShellCommandLineGetValue(List, L"/Param3");
+    Tester = ShellCommandLineGetValue(List, L"/Param4");
+
+    ShellCommandLineFreeVarList(List);
+  } else {
+    Print(L"param checking skipped.\r\n");
+  }
+
+  return (EFI_SUCCESS);
+/*
+
   ASSERT(ShellGetExecutionBreakFlag() == FALSE);
-  ASSERT(StrCmp(ShellGetCurrentDir(NULL), L"f8:\\") == 0);
+  ASSERT(StrCmp(ShellGetCurrentDir(NULL), L"f10:\\") == 0);
   Print(L"execution break and get cur dir - pass\r\n");
 
   ShellSetPageBreakMode(TRUE);
@@ -253,7 +276,7 @@ UefiMain (
 
   // get environment variable
   // made for testing under nt32
-  ASSERT(StrCmp(ShellGetEnvironmentVariable(L"path"), L".;f8:\\efi\\tools;f8:\\efi\\boot;f8:\\;f9:\\efi\\tools;f9:\\efi\\boot;f9:\\") == 0);
+  ASSERT(StrCmp(ShellGetEnvironmentVariable(L"path"), L".;f10:\\efi\\tools;f10:\\efi\\boot;f10:\\;f9:\\efi\\tools;f9:\\efi\\boot;f9:\\") == 0);
   Print(L"ShellGetEnvironmentVariable - pass\r\n");
 
   // set environment variable
@@ -266,21 +289,6 @@ UefiMain (
   ASSERT_EFI_ERROR(Status);
   // the pass printout for this is performed by EmptyApplication
   Print(L"\r\n");
-    
-  // command line param functions
-  Status = ShellCommandLineParse(ParamList, &List, NULL, FALSE);
-  // if you put an invalid parameter you SHOULD hit this assert.
-  ASSERT_EFI_ERROR(Status);
-  if (List) {
-    ASSERT(ShellCommandLineGetFlag(List, L"/Param5") == FALSE);
-    ASSERT(ShellCommandLineGetFlag(List, L"/Param1") != FALSE);
-    ASSERT(StrCmp(ShellCommandLineGetValue(List, L"/Param2"), L"Val1")==0);
-    ASSERT(StrCmp(ShellCommandLineGetRawValue(List, 0), L"SimpleApplication.efi")==0);
-
-    ShellCommandLineFreeVarList(List);
-  } else {
-    Print(L"param checking skipped.\r\n");
-  }
 
   // page break mode (done last so we can see the results)
   // we set this true at the begining of the program
@@ -290,6 +298,7 @@ UefiMain (
   Print(L"1\r\n2\r\n3\r\n4\r\n5\r\n6\r\n7\r\n8\r\n9\r\n10\r\n11\r\n12\r\n13\r\n14\r\n15\r\n16\r\n17\r\n18\r\n19\r\n20\r\n21\r\n22\r\n23\r\n24\r\n25\r\n26\r\n27\r\n28\r\n29\r\n30\r\n31\r\n32\r\n33\r\n34\r\n35\r\n36\r\n37\r\n38\r\n39\r\n40\r\n41\r\n42\r\n43\r\n44\r\n45\r\n46\r\n47\r\n48\r\n49\r\n50\r\n51\r\n52\r\n53\r\n54\r\n55\r\n56\r\n57\r\n58\r\n59\r\n60\r\n");
 
   return EFI_SUCCESS;
+*/
 }
 
 

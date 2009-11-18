@@ -1249,7 +1249,8 @@ EFIAPI
 InternalShellConvertFileListType (
   IN LIST_ENTRY                 *FileList,
   IN OUT LIST_ENTRY             *ListHead
-  ){
+  )
+{
   SHELL_FILE_ARG                *OldInfo;
   LIST_ENTRY                    *Link;
   EFI_SHELL_FILE_INFO_NO_CONST  *NewInfo;
@@ -1464,6 +1465,74 @@ ShellCloseFileMetaArg (
   }
 }
 
+/**
+  Find a file by searching the CWD and then the path.
+
+  if FileName is NULL then ASSERT.
+
+  if the return value is not NULL then the memory must be caller freed.
+
+  @param FileName               Filename string.
+
+  @retval NULL                  the file was not found
+  @return !NULL                 the full path to the file.
+**/
+CHAR16 *
+EFIAPI
+ShellFindFilePath (
+  IN CONST CHAR16 *FileName
+  )
+{
+  CONST CHAR16      *Path;
+  EFI_FILE_HANDLE   Handle;
+  EFI_STATUS        Status;
+  CHAR16            *RetVal;
+  CHAR16            *TestPath;
+  CONST CHAR16      *Walker;
+
+  RetVal = NULL;
+
+  Path = ShellGetEnvironmentVariable(L"cwd");
+  if (Path != NULL) {
+    TestPath = AllocateZeroPool(StrSize(Path) + StrSize(FileName));
+    StrCpy(TestPath, Path);
+    StrCat(TestPath, FileName);
+    Status = ShellOpenFileByName(TestPath, &Handle, EFI_FILE_MODE_READ, 0);
+    if (!EFI_ERROR(Status)){
+      RetVal = StrnCatGrow(&RetVal, NULL, TestPath, 0);
+      ShellCloseFile(&Handle);
+      FreePool(TestPath);
+      return (RetVal);
+    }
+    FreePool(TestPath);
+  }
+  Path = ShellGetEnvironmentVariable(L"path");
+  if (Path != NULL) {
+    TestPath = AllocateZeroPool(StrSize(Path)+StrSize(FileName) );
+    Walker = (CHAR16*)Path; 
+    do {
+      CopyMem(TestPath, Walker, StrSize(Walker));
+      if (StrStr(TestPath, L";") != NULL) {
+        *(StrStr(TestPath, L";")) = CHAR_NULL;
+      }
+      StrCat(TestPath, FileName);
+      if (StrStr(Walker, L";") != NULL) {
+        Walker = StrStr(Walker, L";") + 1;
+      } else {
+        Walker = NULL;
+      }
+      Status = ShellOpenFileByName(TestPath, &Handle, EFI_FILE_MODE_READ, 0);
+      if (!EFI_ERROR(Status)){
+        RetVal = StrnCatGrow(&RetVal, NULL, TestPath, 0);
+        ShellCloseFile(&Handle);
+        break;
+      }
+    } while (Walker != NULL && Walker[0] != CHAR_NULL);
+    FreePool(TestPath);
+  }
+  return (RetVal);
+}
+
 typedef struct {
   LIST_ENTRY     Link;
   CHAR16         *Name;
@@ -1609,11 +1678,13 @@ InternalCommandLineParse (
   UINTN                         LoopCounter;
   ParamType                     CurrentItemType;
   SHELL_PARAM_PACKAGE           *CurrentItemPackage;
-  BOOLEAN                       GetItemValue;
+  UINTN                         GetItemValue;
+  UINTN                         ValueSize;
 
   CurrentItemPackage = NULL;
   mTotalParameterCount = 0;
-  GetItemValue = FALSE;
+  GetItemValue = 0;
+  ValueSize = 0;
 
   //
   // If there is only 1 item we dont need to do anything
@@ -1647,8 +1718,8 @@ InternalCommandLineParse (
       //
       // We might have leftover if last parameter didnt have optional value
       //
-      if (GetItemValue == TRUE) {
-        GetItemValue = FALSE;
+      if (GetItemValue != 0) {
+        GetItemValue = 0;
         InsertHeadList(*CheckPackage, &CurrentItemPackage->Link);
       }
       //
@@ -1666,27 +1737,48 @@ InternalCommandLineParse (
       //
       // Does this flag require a value
       //
-      if (CurrentItemPackage->Type == TypeValue) {
+      switch (CurrentItemPackage->Type) {
         //
-        // trigger the next loop to populate the value of this item
-        //
-        GetItemValue = TRUE; 
-      } else {
-        //
-        // this item has no value expected; we are done
-        //
-        InsertHeadList(*CheckPackage, &CurrentItemPackage->Link);
+        // possibly trigger the next loop(s) to populate the value of this item
+        //        
+        case TypeValue:
+          GetItemValue = 1; 
+          ValueSize = 0;
+          break;
+        case TypeDoubleValue:
+          GetItemValue = 2;
+          ValueSize = 0;
+          break;
+        case TypeMaxValue:
+          GetItemValue = (UINTN)(-1);
+          ValueSize = 0;
+          break;
+        default:
+          //
+          // this item has no value expected; we are done
+          //
+          InsertHeadList(*CheckPackage, &CurrentItemPackage->Link);
+          ASSERT(GetItemValue == 0);
+          break;
       }
-    } else if (GetItemValue == TRUE && InternalIsFlag(Argv[LoopCounter], AlwaysAllowNumbers) == FALSE) {
+    } else if (GetItemValue != 0 && InternalIsFlag(Argv[LoopCounter], AlwaysAllowNumbers) == FALSE) {
       ASSERT(CurrentItemPackage != NULL);
       //
-      // get the item VALUE for the previous flag
+      // get the item VALUE for a previous flag
       //
-      GetItemValue = FALSE;
-      CurrentItemPackage->Value = AllocateZeroPool(StrSize(Argv[LoopCounter]));
+      CurrentItemPackage->Value = ReallocatePool(ValueSize, ValueSize + StrSize(Argv[LoopCounter]) + sizeof(CHAR16), CurrentItemPackage->Value);
       ASSERT(CurrentItemPackage->Value != NULL);
-      StrCpy(CurrentItemPackage->Value, Argv[LoopCounter]);
-      InsertHeadList(*CheckPackage, &CurrentItemPackage->Link);
+      if (ValueSize == 0) {
+        StrCpy(CurrentItemPackage->Value, Argv[LoopCounter]);
+      } else {
+        StrCat(CurrentItemPackage->Value, L" ");
+        StrCat(CurrentItemPackage->Value, Argv[LoopCounter]);
+      }
+      ValueSize += StrSize(Argv[LoopCounter]) + sizeof(CHAR16);
+      GetItemValue--;
+      if (GetItemValue == 0) {
+        InsertHeadList(*CheckPackage, &CurrentItemPackage->Link);
+      }
     } else if (InternalIsFlag(Argv[LoopCounter], AlwaysAllowNumbers) == FALSE) {
       //
       // add this one as a non-flag
@@ -1715,6 +1807,10 @@ InternalCommandLineParse (
       *CheckPackage = NULL;
       return (EFI_VOLUME_CORRUPTED);
     }
+  }
+  if (GetItemValue != 0) {
+    GetItemValue = 0;
+    InsertHeadList(*CheckPackage, &CurrentItemPackage->Link);
   }
   //
   // support for AutoPageBreak
@@ -2028,7 +2124,8 @@ UINTN
 EFIAPI
 ShellCommandLineGetCount(
   VOID
-  ){
+  )
+{
   return (mTotalParameterCount);
 }
 
@@ -2362,3 +2459,126 @@ ShellIsDirectory(
   return (EFI_NOT_FOUND);
 }
 
+/**
+  Function to determine whether a string is decimal or hex representation of a number 
+  and return the number converted from the string.
+
+  @param[in] String   String representation of a number
+
+  @retval all         the number
+**/
+UINTN
+EFIAPI
+ShellStrToUintn(
+  IN CONST CHAR16 *String
+  )
+{
+  CONST CHAR16  *Walker;
+  for (Walker = String; Walker != NULL && *Walker != CHAR_NULL && *Walker == L' '; Walker = Walker + 1);
+  if (StrnCmp(Walker, L"0x", 2) == 0 || StrnCmp(Walker, L"0X", 2) == 0){
+    return (StrHexToUintn(Walker));
+  }
+  return (StrDecimalToUintn(Walker));
+}
+
+/**
+  Safely append with automatic string resizing given length of Destination and
+  desired length of copy from Source.
+
+  append the first D characters of Source to the end of Destination, where D is
+  the lesser of Count and the StrLen() of Source. If appending those D characters
+  will fit within Destination (whose Size is given as CurrentSize) and
+  still leave room for a null terminator, then those characters are appended,
+  starting at the original terminating null of Destination, and a new terminating
+  null is appended.
+
+  If appending D characters onto Destination will result in a overflow of the size
+  given in CurrentSize the string will be grown such that the copy can be performed
+  and CurrentSize will be updated to the new size.
+
+  If Source is NULL, there is nothing to append, just return the current buffer in
+  Destination.
+
+  if Destination is NULL, then ASSERT()
+  if Destination's current length (including NULL terminator) is already more then
+  CurrentSize, then ASSERT()
+
+  @param[in,out] Destination   The String to append onto
+  @param[in,out] CurrentSize   on call the number of bytes in Destination.  On
+                                return possibly the new size (still in bytes).  if NULL
+                                then allocate whatever is needed.
+  @param[in]      Source        The String to append from
+  @param[in]      Count         Maximum number of characters to append.  if 0 then
+                                all are appended.
+
+  @return Destination           return the resultant string.
+**/
+CHAR16*
+EFIAPI
+StrnCatGrow (
+  IN OUT CHAR16           **Destination,
+  IN OUT UINTN            *CurrentSize,
+  IN     CONST CHAR16     *Source,
+  IN     UINTN            Count
+  )
+{
+  UINTN DestinationStartSize;
+  UINTN NewSize;
+
+  //
+  // ASSERTs
+  //
+  ASSERT(Destination != NULL);
+
+  //
+  // If there's nothing to do then just return Destination
+  //
+  if (Source == NULL) {
+    return (*Destination);
+  }
+
+  //
+  // allow for un-initialized pointers, based on size being 0
+  //
+  if (CurrentSize != NULL && *CurrentSize == 0) {
+    *Destination = NULL;
+  }
+
+  //
+  // allow for NULL pointers address as Destination
+  //
+  if (*Destination != NULL) {
+    ASSERT(CurrentSize != 0);
+    DestinationStartSize = StrSize(*Destination);
+    ASSERT(DestinationStartSize <= *CurrentSize);
+  } else {
+    DestinationStartSize = 0;
+//    ASSERT(*CurrentSize == 0);
+  }
+
+  //
+  // Append all of Source?
+  //
+  if (Count == 0) {
+    Count = StrLen(Source);
+  }
+
+  //
+  // Test and grow if required
+  //
+  if (CurrentSize != NULL) {
+    NewSize = *CurrentSize;
+    while (NewSize < (DestinationStartSize + (Count*sizeof(CHAR16)))) {
+      NewSize += 2 * Count * sizeof(CHAR16);
+    }
+    *Destination = ReallocatePool(*CurrentSize, NewSize, *Destination);
+    *CurrentSize = NewSize;
+  } else {
+    *Destination = AllocateZeroPool((Count+1)*sizeof(CHAR16));
+  }
+
+  //
+  // Now use standard StrnCat on a big enough buffer
+  //
+  return StrnCat(*Destination, Source, Count);
+}

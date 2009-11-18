@@ -1,5 +1,5 @@
 /** @file
-  Library used for sorting routines.
+  Library used for sorting and comparison routines.
 
 Copyright (c) 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -59,4 +59,20 @@ PerformQuickSort (
   IN       SORT_COMPARE                 CompareFunction
   );
 
+
+/**
+  Function to compare 2 device paths for use as CompareFunction.
+
+  @param[in] Buffer1            pointer to Device Path to compare
+  @param[in] Buffer2            pointer to second DevicePath to compare
+
+  @retval 0                           Buffer1 equal to Buffer2
+  @return < 0                         Buffer1 is less than Buffer2
+  @return > 0                         Buffer1 is greater than Buffer2                     
+**/
+INTN
+DevicePathCompare (
+  IN  VOID             *Buffer1,
+  IN  VOID             *Buffer2
+  );
 #endif //__SORT_LIB_H__
