@@ -490,6 +490,7 @@ typedef struct {
   CHAR16                *AdjustNumber;
   CHAR16                *SaveChanges;
   CHAR16                *OptionMismatch;
+  CHAR16                *FormSuppress;
   CHAR16                PromptBlockWidth;
   CHAR16                OptionBlockWidth;
   CHAR16                HelpBlockWidth;
