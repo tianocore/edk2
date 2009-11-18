@@ -48,7 +48,8 @@ EFIAPI
 ShellAppMain (
   IN UINTN Argc, 
   IN CHAR16 **Argv
-  ){
+  )
+{
   INTN Array[10] = {2,3,4,1,5,6,7,8,1,5};
   Print(L"Array = %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\r\n", Array[0],Array[1],Array[2],Array[3],Array[4],Array[5],Array[6],Array[7],Array[8],Array[9]);
   PerformQuickSort(Array, 10, sizeof(INTN), Test);

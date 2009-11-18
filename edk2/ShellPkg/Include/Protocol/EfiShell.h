@@ -26,12 +26,12 @@
 // replaced EFI_LIST_ENTRY with LIST_ENTRY for simplicity.
 // they are identical outside of the name.
 typedef struct {
-  LIST_ENTRY Link;
-  EFI_STATUS Status;
-  CONST CHAR16 *FullName;
-  CONST CHAR16 *FileName;
-  EFI_FILE_HANDLE Handle;
-  EFI_FILE_INFO *Info;
+  LIST_ENTRY Link;          /// Linked list members
+  EFI_STATUS Status;        /// Status of opening the file.  Valid only if Handle != NULL.
+  CONST CHAR16 *FullName;   /// Fully qualified filename.
+  CONST CHAR16 *FileName;   /// name of this file.
+  EFI_FILE_HANDLE Handle;   /// Handle for interacting with the opened file or NULL if closed.
+  EFI_FILE_INFO *Info;      /// Pointer to the FileInfo struct for this file or NULL.
 } EFI_SHELL_FILE_INFO;
 /**
   Returns whether any script files are currently being processed.
@@ -85,7 +85,7 @@ EFI_STATUS
   @retval EFI_SUCCESS       The file was opened.  FileHandle points to the new file's handle.
   @retval EFI_INVALID_PARAMETER One of the parameters has an invalid value.
   @retval EFI_UNSUPPORTED   could not open the file path
-  @retval EFI_NOT_FOUND     the specified file could not be found on the devide, or could not
+  @retval EFI_NOT_FOUND     The specified file could not be found on the device, or could not
                             file the file system on the device.
   @retval EFI_NO_MEDIA      the device has no medium.
   @retval EFI_MEDIA_CHANGED The device has a different medium in it or the medium is no
@@ -846,10 +846,10 @@ EFI_STATUS
   For a description of volatile and non-volatile environment variables, see UEFI Shell 
   2.0 specification section 3.6.1.
 
-  @param[in] Name                   Points to the null-terminated environment variable name.
-  @param[in] Value                  Points to the null-terminated environment variable value. If the value is an
+  @param[in] Name               Points to the null-terminated environment variable name.
+  @param[in] Value              Points to the null-terminated environment variable value. If the value is an
                                 empty string then the environment variable is deleted.
-  @param[in] Volatile               Indicates whether the variable is non-volatile (FALSE) or volatile (TRUE).
+  @param[in] Volatile           Indicates whether the variable is non-volatile (FALSE) or volatile (TRUE).
 
   @retval EFI_SUCCESS           The environment variable was successfully updated.
 **/

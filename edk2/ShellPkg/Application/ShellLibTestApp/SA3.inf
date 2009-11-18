@@ -17,7 +17,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = SimpleApplication
+  BASE_NAME                      = ShellLibTestApp
   FILE_GUID                      = 10C75C00-3052-4467-9ED8-7196CAAF610F
   MODULE_TYPE                    = UEFI_APPLICATION
   VERSION_STRING                 = 1.0

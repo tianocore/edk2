@@ -17,7 +17,7 @@
   INF_VERSION                    = 0x00010006
   BASE_NAME                      = BaseFileHandleLib
   FILE_GUID                      = 9495D344-9D8A-41f3-8D17-E2FD238C4E71
-  MODULE_TYPE                    = UEFI_DRIVER
+  MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = FileHandleLib|DXE_DRIVER UEFI_APPLICATION UEFI_DRIVER
 
@@ -33,17 +33,18 @@
   ShellPkg/ShellPkg.dec
 
 [LibraryClasses]
-  UefiBootServicesTableLib
   MemoryAllocationLib
-  DevicePathLib
   BaseLib
   BaseMemoryLib
   DebugLib
+  PrintLib
+  PcdLib
 
 [Protocols]
+  gEfiSimpleFileSystemProtocolGuid             # ALWAYS_USED
   
 [Guids]
   gEfiFileInfoGuid                              # ALWAYS_CONSUMED
 
 [Pcd.common]
-
+  gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize # ALWAYS_CONSUMED
