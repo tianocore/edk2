@@ -479,7 +479,7 @@ typedef struct _EFI_IPSEC_SA_DATA {
   /// 
   EFI_IPSEC_SPD_SELECTOR          *SpdSelector;
   /// 
-  /// Indication of whether it¡¯s manually set or negotiated automatically. 
+  /// Indication of whether it's manually set or negotiated automatically. 
   /// If ManualSet is FALSE, the corresponding SA entry is inserted through 
   /// IKE protocol negotiation.
   ///
@@ -595,7 +595,7 @@ typedef struct _EFI_IPSEC_PAD_DATA {
   This function is used to set the IPsec configuration information of type DataType for
   the EFI IPsec driver.
   The IPsec configuration data has a unique selector/identifier separately to identify
-  a data entry. The selector structure depends on DataType¡¯s definition.
+  a data entry. The selector structure depends on DataType's definition.
   Using SetData() with a Data of NULL causes the IPsec configuration data entry identified
   by DataType and Selector to be deleted.        
 
