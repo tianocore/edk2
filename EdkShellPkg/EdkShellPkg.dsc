@@ -81,11 +81,9 @@ define GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x0002000A -DPI_S
 
 [Libraries.IA32, Libraries.X64]
   EdkCompatibilityPkg/Foundation/Library/CompilerStub/CompilerStubLib.inf
-
-[Libraries.IA32]
   EdkCompatibilityPkg/Foundation/Cpu/Pentium/CpuIA32Lib/CpuIA32Lib_Edk2.inf
 
-[Libraries.X64]
+[Libraries.IPF]
   EdkCompatibilityPkg/Foundation/Cpu/Itanium/CpuIa64Lib/CpuIA64Lib.inf
 
 
