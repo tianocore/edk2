@@ -46,7 +46,6 @@ FileHandleGetInfo (
   IN EFI_FILE_HANDLE            FileHandle
   )
 {
-  EFI_GUID        FileInfoGuid;
   EFI_FILE_INFO   *pFileInfo;
   UINTN           FileInfoSize;
   EFI_STATUS      Status;
@@ -59,11 +58,10 @@ FileHandleGetInfo (
   //
   // Get the required size to allocate
   //
-  FileInfoGuid = gEfiFileInfoGuid;
   FileInfoSize = 0;
   pFileInfo = NULL;
   Status = FileHandle->GetInfo(FileHandle, 
-                               &FileInfoGuid, 
+                               &gEfiFileInfoGuid, 
                                &FileInfoSize, 
                                pFileInfo);
   //
@@ -76,7 +74,7 @@ FileHandleGetInfo (
   // now get the information
   //
   Status = FileHandle->GetInfo(FileHandle, 
-                               &FileInfoGuid, 
+                               &gEfiFileInfoGuid, 
                                &FileInfoSize, 
                                pFileInfo);
   //
@@ -114,7 +112,6 @@ FileHandleSetInfo (
   IN CONST EFI_FILE_INFO        *FileInfo
   )
 {
-  EFI_GUID        FileInfoGuid;
   
   //
   // ASSERT if the FileHandle or FileInfo is NULL
@@ -122,12 +119,11 @@ FileHandleSetInfo (
   ASSERT (FileHandle != NULL);
   ASSERT (FileInfo   != NULL);
 
-  FileInfoGuid = gEfiFileInfoGuid;
   //
   // Set the info
   //
   return (FileHandle->SetInfo(FileHandle, 
-                              &FileInfoGuid,
+                              &gEfiFileInfoGuid,
                               (UINTN)FileInfo->Size,
                               (EFI_FILE_INFO*)FileInfo));
 }  
