@@ -79,20 +79,28 @@ extern VENDOR_DEVICE_PATH         gTerminalTypeDeviceNode;
 
 #define PCI_DEVICE_PATH_NODE(Func, Dev) \
   { \
-    HARDWARE_DEVICE_PATH, \
-    HW_PCI_DP, \
-    (UINT8) (sizeof (PCI_DEVICE_PATH)), \
-    (UINT8) ((sizeof (PCI_DEVICE_PATH)) >> 8), \
+    { \
+      HARDWARE_DEVICE_PATH, \
+      HW_PCI_DP, \
+      { \
+        (UINT8) (sizeof (PCI_DEVICE_PATH)), \
+        (UINT8) ((sizeof (PCI_DEVICE_PATH)) >> 8) \
+      } \
+    }, \
     (Func), \
     (Dev) \
   }
 
 #define PNPID_DEVICE_PATH_NODE(PnpId) \
   { \
-    ACPI_DEVICE_PATH, \
-    ACPI_DP, \
-    (UINT8) (sizeof (ACPI_HID_DEVICE_PATH)), \
-    (UINT8) ((sizeof (ACPI_HID_DEVICE_PATH)) >> 8), \
+    { \
+      ACPI_DEVICE_PATH, \
+      ACPI_DP, \
+      { \
+        (UINT8) (sizeof (ACPI_HID_DEVICE_PATH)), \
+        (UINT8) ((sizeof (ACPI_HID_DEVICE_PATH)) >> 8) \
+      }, \
+    }, \
     EISA_PNP_ID((PnpId)), \
     0 \
   }
@@ -114,10 +122,14 @@ extern VENDOR_DEVICE_PATH         gTerminalTypeDeviceNode;
 
 #define gUart \
   { \
-    MESSAGING_DEVICE_PATH, \
-    MSG_UART_DP, \
-    (UINT8) (sizeof (UART_DEVICE_PATH)), \
-    (UINT8) ((sizeof (UART_DEVICE_PATH)) >> 8), \
+    { \
+      MESSAGING_DEVICE_PATH, \
+      MSG_UART_DP, \
+      { \
+        (UINT8) (sizeof (UART_DEVICE_PATH)), \
+        (UINT8) ((sizeof (UART_DEVICE_PATH)) >> 8) \
+      } \
+    }, \
     0, \
     115200, \
     8, \
@@ -127,10 +139,14 @@ extern VENDOR_DEVICE_PATH         gTerminalTypeDeviceNode;
 
 #define gPcAnsiTerminal \
   { \
-    MESSAGING_DEVICE_PATH, \
-    MSG_VENDOR_DP, \
-    (UINT8) (sizeof (VENDOR_DEVICE_PATH)), \
-    (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8), \
+    { \
+      MESSAGING_DEVICE_PATH, \
+      MSG_VENDOR_DP, \
+      { \
+        (UINT8) (sizeof (VENDOR_DEVICE_PATH)), \
+        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8) \
+      } \
+    }, \
     DEVICE_PATH_MESSAGING_PC_ANSI \
   }
 
@@ -138,8 +154,10 @@ extern VENDOR_DEVICE_PATH         gTerminalTypeDeviceNode;
   { \
     END_DEVICE_PATH_TYPE, \
     END_ENTIRE_DEVICE_PATH_SUBTYPE, \
-    END_DEVICE_PATH_LENGTH, \
-    0 \
+    { \
+      END_DEVICE_PATH_LENGTH, \
+      0 \
+    } \
   }
 
 #define PCI_CLASS_SCC          0x07
