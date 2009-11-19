@@ -1494,7 +1494,7 @@ ShellFindFilePath (
 
   Path = ShellGetEnvironmentVariable(L"cwd");
   if (Path != NULL) {
-    TestPath = AllocateZeroPool(StrSize(Path) + StrSize(FileName));
+    TestPath = AllocateZeroPool((StrSize(Path) + StrSize(FileName)));
     StrCpy(TestPath, Path);
     StrCat(TestPath, FileName);
     Status = ShellOpenFileByName(TestPath, &Handle, EFI_FILE_MODE_READ, 0);
@@ -1508,7 +1508,7 @@ ShellFindFilePath (
   }
   Path = ShellGetEnvironmentVariable(L"path");
   if (Path != NULL) {
-    TestPath = AllocateZeroPool(StrSize(Path)+StrSize(FileName) );
+    TestPath = AllocateZeroPool((StrSize(Path)+StrSize(FileName)));
     Walker = (CHAR16*)Path; 
     do {
       CopyMem(TestPath, Walker, StrSize(Walker));
