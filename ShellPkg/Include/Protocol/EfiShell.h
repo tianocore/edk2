@@ -26,12 +26,12 @@
 // replaced EFI_LIST_ENTRY with LIST_ENTRY for simplicity.
 // they are identical outside of the name.
 typedef struct {
-  LIST_ENTRY Link;          /// Linked list members
-  EFI_STATUS Status;        /// Status of opening the file.  Valid only if Handle != NULL.
-  CONST CHAR16 *FullName;   /// Fully qualified filename.
-  CONST CHAR16 *FileName;   /// name of this file.
-  EFI_FILE_HANDLE Handle;   /// Handle for interacting with the opened file or NULL if closed.
-  EFI_FILE_INFO *Info;      /// Pointer to the FileInfo struct for this file or NULL.
+  LIST_ENTRY Link;          ///< Linked list members
+  EFI_STATUS Status;        ///< Status of opening the file.  Valid only if Handle != NULL.
+  CONST CHAR16 *FullName;   ///< Fully qualified filename.
+  CONST CHAR16 *FileName;   ///< name of this file.
+  EFI_FILE_HANDLE Handle;   ///< Handle for interacting with the opened file or NULL if closed.
+  EFI_FILE_INFO *Info;      ///< Pointer to the FileInfo struct for this file or NULL.
 } EFI_SHELL_FILE_INFO;
 /**
   Returns whether any script files are currently being processed.
