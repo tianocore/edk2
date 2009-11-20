@@ -791,7 +791,7 @@ EFI_STATUS
                                 If Alias is NULL, ReturnedData points to a ‘;’ 
                                 delimited list of alias (e.g. 
                                 ReturnedData = “dir;del;copy;mfp”) that is null-terminated.  
-  @retval NULL                  an error ocurred.
+  @retval NULL                  An error ocurred.
   @retval NULL                  Alias was not a valid Alias.
 **/
 typedef 
