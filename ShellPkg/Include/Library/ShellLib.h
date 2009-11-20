@@ -1,7 +1,7 @@
 /** @file
   Provides interface to shell functionality for shell commands and applications.
 
-Copyright (c) 2006 - 2009, Intel Corporation
+Copyright (c) 2006 - 2009, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -416,7 +416,7 @@ ShellFindNextFile(
   @param Size                   Pointer to size.
 
   @retval EFI_SUCCESS           The operation was completed sucessfully.
-  @retval EFI_DEVICE_ERROR      cannot access the file.
+  @retval EFI_DEVICE_ERROR      Cannot access the file.
 **/
 EFI_STATUS
 EFIAPI
@@ -447,7 +447,7 @@ ShellGetExecutionBreakFlag(
 
   @param EnvKey                 The key name of the environment variable.
 
-  @retval NULL                  the named environment variable does not exist.
+  @retval NULL                  The named environment variable does not exist.
   @return != NULL               pointer to the value of the environment variable.
 **/
 CONST CHAR16*
@@ -499,18 +499,18 @@ ShellSetEnvironmentVariable (
   EnvironmentVariables and Status are only supported for UEFI Shell 2.0.
   Output is only supported for pre-UEFI Shell 2.0
 
-  @param ImageHandle            Parent image that is starting the operation
-  @param CommandLine            pointer to null terminated command line.
-  @param Output                 true to display debug output.  false to hide it.
-  @param EnvironmentVariables   optional pointer to array of environment variables
-                                in the form "x=y".  if NULL current set is used.
-  @param Status                 the status of the run command line.
+  @param ImageHandle            Parent image that is starting the operation.
+  @param CommandLine            Pointer to null terminated command line.
+  @param Output                 True to display debug output.  false to hide it.
+  @param EnvironmentVariables   Optional pointer to array of environment variables
+                                in the form "x=y".  If NULL current set is used.
+  @param Status                 The status of the run command line.
 
-  @retval EFI_SUCCESS           the operation completed sucessfully.  Status
+  @retval EFI_SUCCESS           The operation completed sucessfully.  Status
                                 contains the status code returned.
-  @retval EFI_INVALID_PARAMETER a parameter contains an invalid value
-  @retval EFI_OUT_OF_RESOURCES  out of resources
-  @retval EFI_UNSUPPORTED       the operation is not allowed.
+  @retval EFI_INVALID_PARAMETER A parameter contains an invalid value.
+  @retval EFI_OUT_OF_RESOURCES  Out of resources.
+  @retval EFI_UNSUPPORTED       The operation is not allowed.
 **/
 EFI_STATUS
 EFIAPI
@@ -523,16 +523,16 @@ ShellExecute (
   );
 
 /**
-  Retreives the current directory path
+  Retreives the current directory path.
 
   If the DeviceName is NULL, it returns the current device's current directory 
   name. If the DeviceName is not NULL, it returns the current directory name 
   on specified drive.
 
-  @param DeviceName             the name of the drive to get directory on
+  @param DeviceName             The name of the file system to get directory on.
 
-  @retval NULL                  the directory does not exist
-  @return != NULL               the directory
+  @retval NULL                  The directory does not exist.
+  @return != NULL               The directory.
 **/
 CONST CHAR16*
 EFIAPI
@@ -546,7 +546,7 @@ ShellGetCurrentDir (
   When page break mode is enabled the screen will stop scrolling 
   and wait for operator input before scrolling a subsequent screen.
 
-  @param CurrentState           TRUE to enable and FALSE to disable
+  @param CurrentState           TRUE to enable and FALSE to disable.
 **/
 VOID 
 EFIAPI
@@ -573,7 +573,7 @@ ShellSetPageBreakMode (
 
   @retval EFI_SUCCESS           The operation was sucessful and the list head 
                                 contains the list of opened files.
-  @return != EFI_SUCCESS        The operation failed.
+  @retval != EFI_SUCCESS        The operation failed.
 
   @sa InternalShellConvertFileListType
 **/
@@ -586,12 +586,12 @@ ShellOpenFileMetaArg (
   );
 
 /**
-  Free the linked list returned from ShellOpenFileMetaArg
+  Free the linked list returned from ShellOpenFileMetaArg.
 
-  @param ListHead               the pointer to free
+  @param ListHead               The pointer to free.
 
-  @retval EFI_SUCCESS           the operation was sucessful
-  @retval EFI_INVALID_PARAMETER A parameter was invalid
+  @retval EFI_SUCCESS           The operation was sucessful.
+  @retval EFI_INVALID_PARAMETER A parameter was invalid.
 **/
 EFI_STATUS
 EFIAPI
@@ -602,14 +602,14 @@ ShellCloseFileMetaArg (
 /**
   Find a file by searching the CWD and then the path.
 
-  if FileName is NULL then ASSERT.
+  If FileName is NULL, then ASSERT.
 
-  if the return value is not NULL then the memory must be caller freed.
+  If the return value is not NULL then the memory must be caller freed.
 
   @param FileName               Filename string.
 
-  @retval NULL                  the file was not found
-  @return !NULL                 the path to the file.
+  @retval NULL                  The file was not found.
+  @return !NULL                 The path to the file.
 **/
 CHAR16 *
 EFIAPI
@@ -618,12 +618,12 @@ ShellFindFilePath (
   );
 
 typedef enum {
-  TypeFlag  = 0,    /// a flag that is present or not present only. (IE "-a")
-  TypeValue,        /// a flag that has some data following it with a space (IE "-a 1")
-  TypePosition,     /// some data that did not follow a parameter (IE "filename.txt")
-  TypeStart,        /// a flag that has variable value appended to the end (IE "-ad", "-afd", "-adf", etc...
-  TypeDoubleValue,  /// a flag that has 2 space seperated value data following it. (IE "-a 1 2")
-  TypeMaxValue,     /// a flag followed by all the command line data before the next flag.
+  TypeFlag  = 0,    ///< a flag that is present or not present only (IE "-a").
+  TypeValue,        ///< a flag that has some data following it with a space (IE "-a 1").
+  TypePosition,     ///< some data that did not follow a parameter (IE "filename.txt").
+  TypeStart,        ///< a flag that has variable value appended to the end (IE "-ad", "-afd", "-adf", etc...).
+  TypeDoubleValue,  ///< a flag that has 2 space seperated value data following it (IE "-a 1 2").
+  TypeMaxValue,     ///< a flag followed by all the command line data before the next flag.
   TypeMax,
 } ParamType;
 
@@ -644,21 +644,21 @@ extern SHELL_PARAM_ITEM EmptyParamList[];
   
   @param CheckList              Pointer to list of parameters to check.
   @param CheckPackage           Package of checked values.
-  @param ProblemParam           Pptional pointer to pointer to unicode string for 
+  @param ProblemParam           Optional pointer to pointer to unicode string for 
                                 the paramater that caused failure.
   @param AutoPageBreak          Will automatically set PageBreakEnabled.
 
   @retval EFI_SUCCESS           The operation completed sucessfully.
-  @retval EFI_OUT_OF_RESOURCES  A memory allocation failed
-  @retval EFI_INVALID_PARAMETER A parameter was invalid
-  @retval EFI_VOLUME_CORRUPTED  the command line was corrupt.  an argument was 
-                                duplicated.  the duplicated command line argument 
+  @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
+  @retval EFI_INVALID_PARAMETER A parameter was invalid.
+  @retval EFI_VOLUME_CORRUPTED  The command line was corrupt.  an argument was 
+                                duplicated.  The duplicated command line argument 
                                 was returned in ProblemParam if provided.
-  @retval EFI_DEVICE_ERROR      The commands contained 2 opposing arguments.  one
+  @retval EFI_DEVICE_ERROR      The commands contained 2 opposing arguments.  One
                                 of the command line arguments was returned in 
                                 ProblemParam if provided.
   @retval EFI_NOT_FOUND         A argument required a value that was missing.  
-                                the invalid command line argument was returned in
+                                The invalid command line argument was returned in
                                 ProblemParam if provided.
 **/
 EFI_STATUS
@@ -671,7 +671,7 @@ ShellCommandLineParseEx (
   IN BOOLEAN                    AlwaysAllowNumbers
   );
 
-// make it easy to upgrade from older versions of the shell library.
+/// make it easy to upgrade from older versions of the shell library.
 #define ShellCommandLineParse(CheckList,CheckPackage,ProblemParam,AutoPageBreak) ShellCommandLineParseEx(CheckList,CheckPackage,ProblemParam,AutoPageBreak,FALSE)
 
 /**
@@ -680,11 +680,9 @@ ShellCommandLineParseEx (
   This function will free all the memory that was used for the CheckPackage
   list of postprocessed shell arguments.
 
-  this function has no return value.
+  If CheckPackage is NULL, then return.
 
-  if CheckPackage is NULL, then return
-
-  @param CheckPackage           the list to de-allocate
+  @param CheckPackage           The list to de-allocate.
   **/
 VOID
 EFIAPI
@@ -693,18 +691,18 @@ ShellCommandLineFreeVarList (
   );
 
 /**
-  Checks for presence of a flag parameter
+  Checks for presence of a flag parameter.
 
   flag arguments are in the form of "-<Key>" or "/<Key>", but do not have a value following the key
 
   if CheckPackage is NULL then return FALSE.
-  if KeyString is NULL then ASSERT()
+  if KeyString is NULL then ASSERT().
   
-  @param CheckPackage           The package of parsed command line arguments
-  @param KeyString              the Key of the command line argument to check for
+  @param CheckPackage           The package of parsed command line arguments.
+  @param KeyString              The Key of the command line argument to check for.
 
-  @retval TRUE                  the flag is on the command line
-  @retval FALSE                 the flag is not on the command line
+  @retval TRUE                  The flag is on the command line.
+  @retval FALSE                 The flag is not on the command line.
   **/
 BOOLEAN
 EFIAPI
@@ -714,17 +712,17 @@ ShellCommandLineGetFlag (
   );
 
 /**
-  returns value from command line argument
+  Returns value from command line argument.
 
-  value parameters are in the form of "-<Key> value" or "/<Key> value"
+  Value parameters are in the form of "-<Key> value" or "/<Key> value"
   
-  if CheckPackage is NULL, then return NULL;
+  If CheckPackage is NULL, then return NULL.
 
-  @param CheckPackage           The package of parsed command line arguments
-  @param KeyString              the Key of the command line argument to check for
+  @param CheckPackage           The package of parsed command line arguments.
+  @param KeyString              The Key of the command line argument to check for.
 
-  @retval NULL                  the flag is not on the command line
-  @return !=NULL                pointer to unicode string of the value
+  @retval NULL                  The flag is not on the command line.
+  @retval !=NULL                Pointer to unicode string of the value.
   **/
 CONST CHAR16*
 EFIAPI
@@ -734,17 +732,17 @@ ShellCommandLineGetValue (
   );
 
 /**
-  returns raw value from command line argument
+  Returns raw value from command line argument.
 
-  raw value parameters are in the form of "value" in a specific position in the list
+  Raw value parameters are in the form of "value" in a specific position in the list.
   
-  if CheckPackage is NULL, then return NULL;
+  If CheckPackage is NULL, then return NULL;
 
-  @param CheckPackage           The package of parsed command line arguments
-  @param Position               the position of the value 
+  @param CheckPackage           The package of parsed command line arguments.
+  @param Position               The position of the value.
 
-  @retval NULL                  the flag is not on the command line
-  @return !=NULL                pointer to unicode string of the value
+  @retval NULL                  The flag is not on the command line.
+  @retval !=NULL                Pointer to unicode string of the value.
   **/
 CONST CHAR16*
 EFIAPI
@@ -754,12 +752,12 @@ ShellCommandLineGetRawValue (
   );
 
 /**
-  returns the number of command line value parameters that were parsed.  
+  Returns the number of command line value parameters that were parsed.  
   
-  this will not include flags.
+  This will not include flags.
 
   @retval (UINTN)-1     No parsing has ocurred
-  @return other         The number of value parameters found
+  @return               The number of value parameters found
 **/
 UINTN
 EFIAPI
@@ -790,13 +788,13 @@ ShellInitialize (
   Print at a specific location on the screen.
 
   This function will move the cursor to a given screen location, print the specified string, 
-  and return the cursor to the original locaiton.  
+  and return the cursor to the original location.  
   
   If -1 is specified for either the Row or Col the current screen location for BOTH 
   will be used and the cursor's position will not be moved back to an original location.
 
-  if either Row or Col is out of range for the current console, then ASSERT
-  if Format is NULL, then ASSERT
+  If either Row or Col is out of range for the current console, then ASSERT.
+  If Format is NULL, then ASSERT.
 
   In addition to the standard %-based flags as supported by UefiLib Print() this supports 
   the following additional flags:
@@ -864,13 +862,13 @@ ShellPrintHiiEx(
   );
 
 /**
-  Function to determine if a given filename represents a file or a directory.
+  Function to determine if a given filename represents a directory.
 
   @param[in] DirName      Path to directory to test.
 
-  @retval EFI_SUCCESS     The Path represents a directory
-  @retval EFI_NOT_FOUND   The Path does not represent a directory
-  @return other           The path failed to open
+  @retval EFI_SUCCESS     The Path represents a directory.
+  @retval EFI_NOT_FOUND   The Path does not represent a directory.
+  @retval other           The path failed to open.
 **/
 EFI_STATUS
 EFIAPI
@@ -879,12 +877,27 @@ ShellIsDirectory(
   );
 
 /**
+  Function to determine if a given filename represents a file.
+
+  @param[in] Name         Path to file to test.
+
+  @retval EFI_SUCCESS     The Path represents a file.
+  @retval EFI_NOT_FOUND   The Path does not represent a file.
+  @retval other           The path failed to open.
+**/
+EFI_STATUS
+EFIAPI
+ShellIsFile(
+  IN CONST CHAR16 *Name
+  );
+
+/**
   Function to determine whether a string is decimal or hex representation of a number 
   and return the number converted from the string.
 
   @param[in] String   String representation of a number
 
-  @retval all         the number
+  @return             The unsigned integer result of the conversion.
 **/
 UINTN
 EFIAPI
@@ -896,7 +909,7 @@ ShellStrToUintn(
   Safely append with automatic string resizing given length of Destination and 
   desired length of copy from Source.
 
-  append the first D characters of Source to the end of Destination, where D is 
+  Append the first D characters of Source to the end of Destination, where D is 
   the lesser of Count and the StrLen() of Source. If appending those D characters 
   will fit within Destination (whose Size is given as CurrentSize) and 
   still leave room for a null terminator, then those characters are appended, 
@@ -910,19 +923,19 @@ ShellStrToUintn(
   If Source is NULL, there is nothing to append, just return the current buffer in 
   Destination.
 
-  if Destination is NULL, then ASSERT()
+  if Destination is NULL, then ASSERT().
   if Destination's current length (including NULL terminator) is already more then 
-  CurrentSize, then ASSERT()
+  CurrentSize, then ASSERT().
 
-  @param[in,out] Destination   The String to append onto
-  @param[in,out] CurrentSize   on call the number of bytes in Destination.  On 
+  @param[in,out] Destination    The String to append onto.
+  @param[in,out] CurrentSize    On call the number of bytes in Destination.  On 
                                 return possibly the new size (still in bytes).  if NULL
                                 then allocate whatever is needed.
-  @param[in]      Source        The String to append from
-  @param[in]      Count         Maximum number of characters to append.  if 0 then 
+  @param[in]     Source         The String to append from.
+  @param[in]     Count          Maximum number of characters to append.  If 0 then 
                                 all are appended.
 
-  @return Destination           return the resultant string.
+  @return                       the Destination after apending the Source.
 **/
 CHAR16* 
 EFIAPI

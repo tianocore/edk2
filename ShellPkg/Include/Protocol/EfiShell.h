@@ -26,13 +26,14 @@
 // replaced EFI_LIST_ENTRY with LIST_ENTRY for simplicity.
 // they are identical outside of the name.
 typedef struct {
-  LIST_ENTRY Link;          ///< Linked list members
-  EFI_STATUS Status;        ///< Status of opening the file.  Valid only if Handle != NULL.
-  CONST CHAR16 *FullName;   ///< Fully qualified filename.
-  CONST CHAR16 *FileName;   ///< name of this file.
-  EFI_FILE_HANDLE Handle;   ///< Handle for interacting with the opened file or NULL if closed.
-  EFI_FILE_INFO *Info;      ///< Pointer to the FileInfo struct for this file or NULL.
+  LIST_ENTRY      Link;       ///< Linked list members.
+  EFI_STATUS      Status;     ///< Status of opening the file.  Valid only if Handle != NULL.
+  CONST CHAR16    *FullName;  ///< Fully qualified filename.
+  CONST CHAR16    *FileName;  ///< name of this file.
+  EFI_FILE_HANDLE Handle;     ///< Handle for interacting with the opened file or NULL if closed.
+  EFI_FILE_INFO   *Info;      ///< Pointer to the FileInfo struct for this file or NULL.
 } EFI_SHELL_FILE_INFO;
+
 /**
   Returns whether any script files are currently being processed.
 
@@ -53,9 +54,9 @@ BOOLEAN
   flushed to the device, and the file is closed. In all cases, the handle is 
   closed.
 
-  @param[in] FileHandle             The file handle to be closed
+  @param[in] FileHandle         The file handle to be closed
 
-  @retval EFI_SUCCESS           the file closed sucessfully
+  @retval EFI_SUCCESS           The file closed sucessfully.
 **/
 typedef
 EFI_STATUS
@@ -77,27 +78,27 @@ EFI_STATUS
   shell environment variable with the specified name. If the shell environment variable
   already exists and is non-volatile then EFI_INVALID_PARAMETER is returned.
 
-  @param[in] FileName       Pointer to null-terminated file path
-  @param[in] FileAttribs    The new file's attrbiutes.  the different attributes are
-                            described in EFI_FILE_PROTOCOL.Open().
-  @param[out] FileHandle    On return, points to the created file handle or directory's handle
+  @param[in] FileName           Pointer to null-terminated file path.
+  @param[in] FileAttribs        The new file's attrbiutes.  the different attributes are
+                                described in EFI_FILE_PROTOCOL.Open().
+  @param[out] FileHandle        On return, points to the created file handle or directory's handle
 
-  @retval EFI_SUCCESS       The file was opened.  FileHandle points to the new file's handle.
+  @retval EFI_SUCCESS           The file was opened.  FileHandle points to the new file's handle.
   @retval EFI_INVALID_PARAMETER One of the parameters has an invalid value.
-  @retval EFI_UNSUPPORTED   could not open the file path
-  @retval EFI_NOT_FOUND     The specified file could not be found on the device, or could not
-                            file the file system on the device.
-  @retval EFI_NO_MEDIA      the device has no medium.
-  @retval EFI_MEDIA_CHANGED The device has a different medium in it or the medium is no
-                            longer supported.
-  @retval EFI_DEVICE_ERROR The device reported an error or can't get the file path according
-                            the DirName.
-  @retval EFI_VOLUME_CORRUPTED The file system structures are corrupted.
-  @retval EFI_WRITE_PROTECTED An attempt was made to create a file, or open a file for write
-                            when the media is write-protected.
-  @retval EFI_ACCESS_DENIED The service denied access to the file.
-  @retval EFI_OUT_OF_RESOURCES Not enough resources were available to open the file.
-  @retval EFI_VOLUME_FULL   The volume is full.
+  @retval EFI_UNSUPPORTED       could not open the file path
+  @retval EFI_NOT_FOUND         The specified file could not be found on the device, or could not
+                                file the file system on the device.
+  @retval EFI_NO_MEDIA          The device has no medium.
+  @retval EFI_MEDIA_CHANGED     The device has a different medium in it or the medium is no
+                                longer supported.
+  @retval EFI_DEVICE_ERROR      The device reported an error or can't get the file path according
+                                the DirName.
+  @retval EFI_VOLUME_CORRUPTED  The file system structures are corrupted.
+  @retval EFI_WRITE_PROTECTED   An attempt was made to create a file, or open a file for write
+                                when the media is write-protected.
+  @retval EFI_ACCESS_DENIED     The service denied access to the file.
+  @retval EFI_OUT_OF_RESOURCES  Not enough resources were available to open the file.
+  @retval EFI_VOLUME_FULL       The volume is full.
 **/
 typedef
 EFI_STATUS
@@ -116,7 +117,7 @@ EFI_STATUS
 
   @param[in] FileHandle           The file handle to delete.
 
-  @retval EFI_SUCCESS         The file was closed and deleted, and the handle was closed.
+  @retval EFI_SUCCESS             The file was closed and deleted, and the handle was closed.
   @retval EFI_WARN_DELETE_FAILURE The handle was closed but the file was not deleted.
 **/
 typedef
@@ -216,9 +217,9 @@ EFI_STATUS
 
   @retval EFI_SUCCESS           Files found.
   @retval EFI_NOT_FOUND         No files found.
-  @retval EFI_NO_MEDIA          The device has no media
-  @retval EFI_DEVICE_ERROR      The device reported an error
-  @retval EFI_VOLUME_CORRUPTED  The file system structures are corrupted
+  @retval EFI_NO_MEDIA          The device has no media.
+  @retval EFI_DEVICE_ERROR      The device reported an error.
+  @retval EFI_VOLUME_CORRUPTED  The file system structures are corrupted.
 **/
 typedef
 EFI_STATUS
@@ -247,11 +248,11 @@ OUT EFI_SHELL_FILE_INFO **FileList
 );
 
 /**
-  Flushes data back to a device
+  Flushes data back to a device.
   
   This function flushes all modified data associated with a file to a device.
 
-  @param[in] FileHandle             The handle of the file to flush
+  @param[in] FileHandle         The handle of the file to flush
 
   @retval EFI_SUCCESS           The data was flushed.
   @retval EFI_NO_MEDIA          The device has no medium.
@@ -273,7 +274,7 @@ EFI_STATUS
   This function cleans up the file list and any related data structures. It has no
   impact on the files themselves.
 
-  @param[in] FileList               The file list to free. Type EFI_SHELL_FILE_INFO is 
+  @param[in] FileList           The file list to free. Type EFI_SHELL_FILE_INFO is 
                                 defined in OpenFileList()
 
   @retval EFI_SUCCESS           Free the file list successfully.
@@ -292,7 +293,7 @@ EFI_STATUS
   FileSystemMapping. In both cases, the returned name includes the file system
   mapping (i.e. fs0:\current-dir).
 
-  @param[in] FileSystemMapping      A pointer to the file system mapping. If NULL, 
+  @param[in] FileSystemMapping  A pointer to the file system mapping. If NULL, 
                                 then the current working directory is returned.
   
   @retval !=NULL                The current directory.
@@ -307,6 +308,7 @@ CONST CHAR16 *
 typedef UINT32 EFI_SHELL_DEVICE_NAME_FLAGS;
 #define EFI_DEVICE_NAME_USE_COMPONENT_NAME  0x00000001
 #define EFI_DEVICE_NAME_USE_DEVICE_PATH     0x00000002
+
 /**
   Gets the name of the device specified by the device handle.
 
@@ -328,7 +330,7 @@ typedef UINT32 EFI_SHELL_DEVICE_NAME_FLAGS;
   @param[in] Flags              Determines the possible sources of component names. 
   @param[in] Language           A pointer to the language specified for the device 
                                 name, in the same format as described in the UEFI 
-                                specification, Appendix M 
+                                specification, Appendix M.
   @param[out] BestDeviceName    On return, points to the callee-allocated null-
                                 terminated name of the device. If no device name 
                                 could be found, points to NULL. The name must be 
@@ -371,9 +373,9 @@ CONST EFI_DEVICE_PATH_PROTOCOL *
   This function converts a file system style name to a device path, by replacing any
   mapping references to the associated device path.
 
-  @param[in] Path                   the pointer to the path
+  @param[in] Path               The pointer to the path.
 
-  @return all                   The pointer of the file path. The file path is callee 
+  @return                       The pointer of the file path. The file path is callee 
                                 allocated and should be freed by the caller.
 **/
 typedef
@@ -393,7 +395,7 @@ EFI_DEVICE_PATH_PROTOCOL *
   If Name is NULL than a list of all environment variable names is returned.  Each a 
   NULL terminated string with a double NULL terminating the list.
 
-  @param[in] Name                   A pointer to the environment variable name.  If 
+  @param[in] Name               A pointer to the environment variable name.  If 
                                 Name is NULL, then the function will return all 
                                 of the defined shell environment variables.  In 
                                 the case where multiple environment variables are 
@@ -419,7 +421,7 @@ CONST CHAR16 *
   This function allocates a buffer to store the file's information. It's the caller's
   responsibility to free the buffer.
 
-  @param[in] FileHandle             A File Handle
+  @param[in] FileHandle         A File Handle.
 
   @return !=NULL                Cannot get the file info.
   @return NULL                  A pointer to a buffer with file information.
@@ -437,7 +439,7 @@ EFI_FILE_INFO *
   the device path with the file-system mapping. If there are more than one application
   file system mappings, the one that most closely matches Path will be used.
 
-  @param[in] Path                   The pointer to the device path
+  @param[in] Path               The pointer to the device path
 
   @return all                   The pointer of the null-terminated file path. The path 
                                 is callee-allocated and should be freed by the caller.
@@ -449,14 +451,14 @@ CHAR16 *
   );
 
 /**
-  Gets a file's current position
+  Gets a file's current position.
 
   This function returns the current file position for the file handle. For directories, the
   current file position has no meaning outside of the file system driver and as such, the
   operation is not supported.
 
   @param[in] FileHandle         The file handle on which to get the current position.
-  @paramp[out] Position         Byte position from the start of the file
+  @paramp[out] Position         Byte position from the start of the file.
 
   @retval EFI_SUCCESS           Data was accessed.
   @retval EFI_UNSUPPORTED       The request is not valid on open directories.
@@ -508,7 +510,7 @@ EFI_STATUS
   @retval EFI_SUCCESS           The help text was returned.
   @retval EFI_OUT_OF_RESOURCES  The necessary buffer could not be allocated to hold the 
                                 returned help text.
-  @retval EFI_INVALID_PARAMETER HelpText is NULL
+  @retval EFI_INVALID_PARAMETER HelpText is NULL.
   @retval EFI_NOT_FOUND         There is no help text available for Command.
 **/
 typedef
@@ -538,7 +540,7 @@ EFI_STATUS
                                 portion of the device path after the mapping.
 
   @retval NULL                  No mapping was found.
-  @return !=NULL                Pointer to null-terminated mapping. The buffer 
+  @retval !=NULL                Pointer to null-terminated mapping. The buffer 
                                 is callee allocated and should be freed by the caller.
 **/
 typedef
@@ -552,8 +554,8 @@ CONST CHAR16 *
 
   User can use this function to determine current page break mode.
 
-  @retval TRUE                  The page break output mode is enabled
-  @retval FALSE                 The page break output mode is disabled
+  @retval TRUE                  The page break output mode is enabled.
+  @retval FALSE                 The page break output mode is disabled.
 **/
 typedef
 BOOLEAN
@@ -648,7 +650,7 @@ EFI_STATUS
   @param[in,out] FileList       Points to the start of a list of files opened.
 
   @retval EFI_SUCCESS           Create the file list successfully.
-  @return Others                Can't create the file list.
+  @return                       Can't create the file list.
 **/
 typedef
 EFI_STATUS
@@ -672,7 +674,7 @@ EFI_STATUS
   @retval EFI_NOT_FOUND         EFI_SIMPLE_FILE_SYSTEM could not be found or the root directory
                                 could not be opened.
   @retval EFI_VOLUME_CORRUPTED  The data structures in the volume were corrupted.
-  @retval EFI_DEVICE_ERROR      The device had an error
+  @retval EFI_DEVICE_ERROR      The device had an error.
 **/
 typedef
 EFI_STATUS
@@ -682,7 +684,7 @@ EFI_STATUS
   );
 
 /**
-  Opens the root directory of a device on a handle
+  Opens the root directory of a device on a handle.
 
   This function opens the root directory of a device and returns a file handle to it.
 
@@ -694,7 +696,7 @@ EFI_STATUS
   @retval EFI_NOT_FOUND         EFI_SIMPLE_FILE_SYSTEM could not be found or the root directory
                                 could not be opened.
   @retval EFI_VOLUME_CORRUPTED  The data structures in the volume were corrupted.
-  @retval EFI_DEVICE_ERROR      The device had an error
+  @retval EFI_DEVICE_ERROR      The device had an error.
 **/
 typedef
 EFI_STATUS
@@ -712,15 +714,15 @@ EFI_STATUS
   current position is increased by the number of bytes returned.
   If FileHandle is a directory, then an error is returned.
 
-  @param[in] FileHandle         The opened file handle for read
+  @param[in] FileHandle         The opened file handle for read.
   @param[in] ReadSize           On input, the size of Buffer, in bytes. On output, the amount of data read.
   @param[in,out] Buffer         The buffer in which data is read.
 
   @retval EFI_SUCCESS           Data was read.
-  @retval EFI_NO_MEDIA          The device has no media
-  @retval EFI_DEVICE_ERROR      The device reported an error
-  @retval EFI_VOLUME_CORRUPTED  The file system structures are corrupted
-  @retval EFI_BUFFER_TO_SMALL   Buffer is too small. ReadSize contains required size
+  @retval EFI_NO_MEDIA          The device has no media.
+  @retval EFI_DEVICE_ERROR      The device reported an error.
+  @retval EFI_VOLUME_CORRUPTED  The file system structures are corrupted.
+  @retval EFI_BUFFER_TO_SMALL   Buffer is too small. ReadSize contains required size.
 **/
 typedef
 EFI_STATUS
@@ -732,8 +734,6 @@ EFI_STATUS
 
 /**
   Deletes the duplicate file names files in the given file list.
-
-  This function deletes the reduplicate files in the given file list.
 
   @param[in] FileList           A pointer to the first entry in the file list.
 
@@ -784,15 +784,15 @@ EFI_STATUS
   @param[in] Alias              Points to the null-terminated shell alias. 
                                 If this parameter is NULL, then all 
                                 aliases will be returned in ReturnedData.
-  @param[out] Volatile          upon return of a single command if TRUE indicates
+  @param[out] Volatile          Upon return of a single command if TRUE indicates
                                 this is stored in a volatile fashion.  FALSE otherwise.
   @return                      	If Alias is not NULL, it will return a pointer to 
                                 the null-terminated command for that alias. 
                                 If Alias is NULL, ReturnedData points to a ‘;’ 
                                 delimited list of alias (e.g. 
                                 ReturnedData = “dir;del;copy;mfp”) that is null-terminated.  
-  @retval NULL                  an error ocurred
-  @retval NULL                  Alias was not a valid Alias
+  @retval NULL                  an error ocurred.
+  @retval NULL                  Alias was not a valid Alias.
 **/
 typedef 
 CONST CHAR16 *
@@ -866,8 +866,8 @@ EFI_STATUS
 
   This function changes file information.
 
-  @param[in] FileHandle             A file handle
-  @param[in] FileInfo               Points to new file information.
+  @param[in] FileHandle         A file handle
+  @param[in] FileInfo           Points to new file information.
 
   @retval EFI_SUCCESS           The information was set.
   @retval EFI_NO_MEDIA          The device has no medium.
@@ -886,7 +886,7 @@ EFI_STATUS
   );
 
 /**
-  Sets a file's current position
+  Sets a file's current position.
 
   This function sets the current file position for the handle to the position supplied. With
   the exception of seeking to position 0xFFFFFFFFFFFFFFFF, only absolute positioning is
@@ -894,8 +894,8 @@ EFI_STATUS
   grow the file). Seeking to position 0xFFFFFFFFFFFFFFFF causes the current position
   to be set to the end of the file.
 
-  @param[in] FileHandle             The file handle on which requested position will be set.
-  @param[in] Position               Byte position from the start of the file
+  @param[in] FileHandle         The file handle on which requested position will be set.
+  @param[in] Position           Byte position from the start of the file.
 
   @retval EFI_SUCCESS           Data was written.
   @retval EFI_UNSUPPORTED       The seek request for nonzero is not valid on open directories.
@@ -910,9 +910,9 @@ EFI_STATUS
 /**
   This function creates a mapping for a device path.
 
-  @param[in] DevicePath             Points to the device path. If this is NULL and Mapping points to a valid mapping,
+  @param[in] DevicePath         Points to the device path. If this is NULL and Mapping points to a valid mapping,
                                 then the mapping will be deleted.
-  @param[in] Mapping                Points to the null-terminated mapping for the device path.
+  @param[in] Mapping            Points to the null-terminated mapping for the device path.
 
   @retval EFI_SUCCESS           Mapping created or deleted successfully.
   @retval EFI_NO_MAPPING        There is no handle that corresponds exactly to DevicePath. See the
@@ -941,14 +941,14 @@ EFI_STATUS
   @param[in,out] BufferSize         On input, size of Buffer.
   @param[in] Buffer                 The buffer in which data to write.
 
-  @retval EFI_SUCCESS Data was written.
-  @retval EFI_UNSUPPORTED Writes to open directory are not supported
-  @retval EFI_NO_MEDIA The device has no media
-  @retval EFI_DEVICE_ERROR The device reported an error
-  @retval EFI_VOLUME_CORRUPTED The file system structures are corrupted
-  @retval EFI_WRITE_PROTECTED The device is write-protected
-  @retval EFI_ACCESS_DENIED The file was open for read only
-  @retval EFI_VOLUME_FULL The volume is full
+  @retval EFI_SUCCESS               Data was written.
+  @retval EFI_UNSUPPORTED           Writes to open directory are not supported.
+  @retval EFI_NO_MEDIA              The device has no media.
+  @retval EFI_DEVICE_ERROR          The device reported an error.
+  @retval EFI_VOLUME_CORRUPTED      The file system structures are corrupted.
+  @retval EFI_WRITE_PROTECTED       The device is write-protected.
+  @retval EFI_ACCESS_DENIED         The file was open for read only.
+  @retval EFI_VOLUME_FULL           The volume is full.
 **/
 typedef
 EFI_STATUS

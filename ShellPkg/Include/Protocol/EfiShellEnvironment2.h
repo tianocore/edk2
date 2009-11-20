@@ -1,7 +1,7 @@
 /** @file
   Defines for EFI shell environment 2 ported to EDK II build environment. (no spec)
 
-Copyright (c) 2005 - 2009, Intel Corporation
+Copyright (c) 2005 - 2009, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -25,8 +25,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 /**
-  this function is a prototype for a function that dumps information on a protocol 
-  to a given location.  the location is dependant on the implementation.  This is 
+  This function is a prototype for a function that dumps information on a protocol 
+  to a given location.  The location is dependant on the implementation.  This is 
   used when programatically adding shell commands.
 
   @param Handle                 the handle the protocol is on
@@ -41,15 +41,15 @@ VOID
   );
 
 /**
-  this function is a prototype foe each command internal to the EFI shell 
-  implementation.  the specific command depends on the implementation.  This is 
+  This function is a prototype for each command internal to the EFI shell 
+  implementation.  The specific command depends on the implementation.  This is 
   used when programatically adding shell commands.
 
-  @param ImageHandle            The handle to the binary shell
-  @param SystemTable            pointer to the system table.
+  @param ImageHandle            The handle to the binary shell.
+  @param SystemTable            Pointer to the system table.
 
-  @retval EFI_SUCCESS           the command ran to completion
-  @return other                 an error ocurred.  any error is possible 
+  @retval EFI_SUCCESS           The command ran to completion
+  @retval other                 An error ocurred.  Any error is possible 
                                 depending on the implementation of the shell 
                                 command.
 
@@ -66,9 +66,9 @@ EFI_STATUS
   This is used when programatically adding shell commands.  Upon successful return 
   the memory allocated is up to the caller to free.
 
-  @param Str                      pointer to pointer to string to display for help.
+  @param Str                      Pointer to pointer to string to display for help.
 
-  @retval EFI_SUCCESS             the help string is in the parameter Str.
+  @retval EFI_SUCCESS             Phe help string is in the parameter Str.
 
 **/
 typedef
@@ -78,26 +78,26 @@ EFI_STATUS
   );
 
 /**
-* Structure returned from functions that open multiple files
+Structure returned from functions that open multiple files.
 **/
 typedef struct {
   UINT32                    Signature;            ///< SHELL_FILE_ARG_SIGNATURE
-  LIST_ENTRY                Link;                 ///< linked list helper
+  LIST_ENTRY                Link;                 ///< Linked list helper
   EFI_STATUS                Status;               ///< File's status
 
-  EFI_FILE_HANDLE           Parent;               ///< what is the Parent file of this file
-  UINT64                    OpenMode;             ///< how was the file opened
-  CHAR16                    *ParentName;          ///< string representation of parent
+  EFI_FILE_HANDLE           Parent;               ///< What is the Parent file of this file
+  UINT64                    OpenMode;             ///< How was the file opened
+  CHAR16                    *ParentName;          ///< String representation of parent
   EFI_DEVICE_PATH_PROTOCOL  *ParentDevicePath;    ///< DevicePath for Parent
 
-  CHAR16                    *FullName;            ///< path and file name for this file
-  CHAR16                    *FileName;            ///< file name for this file
+  CHAR16                    *FullName;            ///< Path and file name for this file
+  CHAR16                    *FileName;            ///< File name for this file
 
-  EFI_FILE_HANDLE           Handle;               ///< handle to this file
-  EFI_FILE_INFO             *Info;                ///< pointer to file info for this file
+  EFI_FILE_HANDLE           Handle;               ///< Handle to this file
+  EFI_FILE_INFO             *Info;                ///< Pointer to file info for this file
 } SHELL_FILE_ARG;
 
-/// signature for SHELL_FILE_ARG
+/// Signature for SHELL_FILE_ARG
 #define SHELL_FILE_ARG_SIGNATURE  SIGNATURE_32 ('g', 'r', 'a', 'f') 
 
 /**
@@ -109,7 +109,7 @@ typedef struct {
   }
 
 /**
-*  GUID for the shell environment2 extension (main GUID same as shell environment)
+*  GUID for the shell environment2 extension (main GUID same as shell environment).
 **/
 #define EFI_SE_EXT_SIGNATURE_GUID \
   { \
@@ -120,19 +120,19 @@ typedef struct {
 #define EFI_SHELL_MINOR_VER 0x00000000 ///< Minor version of the EFI_SHELL_ENVIRONMENT2
 
 /**
-  execute a command line
+  Execute a command line
 
-  this function will run the CommandLine.  This includes loading any required images, 
+  This function will run the CommandLine.  This includes loading any required images, 
   parsing any requires scripts, and it DebugOutput is TRUE printing errors 
   encountered directly to the screen.
   
-  @param ParentImageHandle      Handle of image executing this operation
-  @param CommandLine            string command line to execute
+  @param ParentImageHandle      Handle of image executing this operation.
+  @param CommandLine            string command line to execute.
   @param DebugOutput            TRUE indicates that errors should be printed directly.
                                 FALSE supresses error messages.
 
-  @retval EFI_SUCCESS           the command line executed and completed.
-  @retval EFI_ABORTED           the operation did not complete due to abort.
+  @retval EFI_SUCCESS           The command line executed and completed.
+  @retval EFI_ABORTED           The operation did not complete due to abort.
   @retval EFI_INVALID_PARAMETER A parameter did not have a valid value.
   @retval EFI_OUT_OF_RESOURCES  A required memory allocation failed.
 
