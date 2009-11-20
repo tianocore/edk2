@@ -86,7 +86,7 @@ typedef struct {
 ///
 /// SMM CPU I/O Protocol provides CPU I/O and memory access within SMM.
 ///
-typedef struct _EFI_SMM_CPU_IO_PROTOCOL {
+struct _EFI_SMM_CPU_IO_PROTOCOL {
   EFI_SMM_IO_ACCESS2 Mem;  ///< Allows reads and writes to memory-mapped I/O space.
   EFI_SMM_IO_ACCESS2 Io;   ///< Allows reads and writes to I/O space.
 };
