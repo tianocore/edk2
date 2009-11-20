@@ -1,7 +1,7 @@
 /** @file
   Provides interface to EFI_FILE_HANDLE functionality.
 
-Copyright (c) 2009, Intel Corporation
+Copyright (c) 2009, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -74,7 +74,7 @@ FileHandleSetInfo (
   EFI_FILE_INFO is the structure returned as the directory entry.
 
   @param FileHandle             The opened file handle.
-  @param BufferSize             On input the size of buffer in bytes.  on return 
+  @param BufferSize             On input the size of buffer in bytes.  On return 
                                 the number of bytes written.
   @param Buffer                 The buffer to put read data into.
 
@@ -104,19 +104,19 @@ FileHandleRead(
   The file is automatically grown to hold the data if required. Direct writes to 
   opened directories are not supported.
 
-  @param FileHandle           The opened file for writing
-  @param BufferSize           On input the number of bytes in Buffer.  On output
-                              the number of bytes written.
-  @param Buffer               The buffer containing data to write is stored.
+  @param FileHandle             The opened file for writing
+  @param BufferSize             On input the number of bytes in Buffer.  On output
+                                the number of bytes written.
+  @param Buffer                 The buffer containing data to write is stored.
 
-  @retval EFI_SUCCESS	        Data was written.
-  @retval EFI_UNSUPPORTED	    Writes to an open directory are not supported.
+  @retval EFI_SUCCESS	          Data was written.
+  @retval EFI_UNSUPPORTED	      Writes to an open directory are not supported.
   @retval EFI_NO_MEDIA	        The device has no media.
   @retval EFI_DEVICE_ERROR	    The device reported an error.
   @retval EFI_VOLUME_CORRUPTED	The file system structures are corrupted.
-  @retval EFI_WRITE_PROTECTED	The device is write-protected.
-  @retval EFI_ACCESS_DENIED	  The file was open for read only.
-  @retval EFI_VOLUME_FULL	    The volume is full.
+  @retval EFI_WRITE_PROTECTED	  The device is write-protected.
+  @retval EFI_ACCESS_DENIED	    The file was open for read only.
+  @retval EFI_VOLUME_FULL	      The volume is full.
 **/
 EFI_STATUS
 EFIAPI
