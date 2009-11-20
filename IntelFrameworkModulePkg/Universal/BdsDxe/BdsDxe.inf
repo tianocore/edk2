@@ -130,9 +130,6 @@
                                                 ## SOMETIMES_CONSUMES ## Variable:L"ErrOut" (The device path of error out device)
   gEfiFileSystemVolumeLabelInfoIdGuid           ## CONSUMES ## GUID (Indicate the information type is volume)
   gEfiFileInfoGuid                              ## CONSUMES ## GUID (Indicate the information type is file)
-  gEfiMiscSubClassGuid                          ## CONSUMES ## GUID (Indicate the datahub for holding misc sub class record)
-  gEfiMemorySubClassGuid                        ## CONSUMES ## GUID (Indicate the datahub for holding memory record)
-  gEfiProcessorSubClassGuid                     ## CONSUMES ## GUID (Indicate the datahub for holding processor record)
   gEfiHiiPlatformSetupFormsetGuid               ## CONSUMES ## GUID (Indicate the formset class guid to be displayed)
   gEfiIfrTianoGuid                              ## CONSUMES ## GUID (Extended IFR Guid Opcode)
 
@@ -140,7 +137,7 @@
   gEfiSimpleFileSystemProtocolGuid              # PROTOCOL ALWAYS_CONSUMES
   gEfiLoadFileProtocolGuid                      # PROTOCOL ALWAYS_CONSUMES
   gEfiBdsArchProtocolGuid                       # PROTOCOL ALWAYS_PRODUCES
-  gEfiDataHubProtocolGuid                       # PROTOCOL ALWAYS_CONSUMES
+  gEfiSmbiosProtocolGuid                        # PROTOCOL ALWAYS_CONSUMED
   gEfiGenericMemTestProtocolGuid                # PROTOCOL ALWAYS_CONSUMES
   gEfiLegacyBiosProtocolGuid                    # PROTOCOL ALWAYS_CONSUMES
   gEfiUgaDrawProtocolGuid |PcdUgaConsumeSupport # PROTOCOL SOMETIMES_CONSUMES
