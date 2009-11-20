@@ -1,6 +1,6 @@
 /**@file
  
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -22,25 +22,8 @@ Abstract:
 
 #include "MiscSubclassDriver.h"
 
-BOOLEAN                    mDone                   = FALSE;
-PS2_CONN_DEVICE_PATH       mPs2KeyboardDevicePath  = { DP_ACPI, DP_PCI (0x1F, 0x00), DP_LPC (0x0303, 0), DP_END };
-PS2_CONN_DEVICE_PATH       mPs2MouseDevicePath     = { DP_ACPI, DP_PCI (0x1F, 0x00), DP_LPC (0x0303, 1), DP_END };
-SERIAL_CONN_DEVICE_PATH    mCom1DevicePath         = { DP_ACPI, DP_PCI (0x1F, 0x00), DP_LPC (0x0501, 0), DP_END };
-SERIAL_CONN_DEVICE_PATH    mCom2DevicePath         = { DP_ACPI, DP_PCI (0x1F, 0x00), DP_LPC (0x0501, 1), DP_END };
-PARALLEL_CONN_DEVICE_PATH  mLpt1DevicePath         = { DP_ACPI, DP_PCI (0x1F, 0x00), DP_LPC (0x0401, 0), DP_END };
-FLOOPY_CONN_DEVICE_PATH    mFloopyADevicePath      = { DP_ACPI, DP_PCI (0x1F, 0x00), DP_LPC (0x0604, 0), DP_END };
-FLOOPY_CONN_DEVICE_PATH    mFloopyBDevicePath      = { DP_ACPI, DP_PCI (0x1F, 0x00), DP_LPC (0x0604, 1), DP_END };
-USB_PORT_DEVICE_PATH       mUsb0DevicePath         = { DP_ACPI, DP_PCI (0x1d, 0x00), DP_END };
-USB_PORT_DEVICE_PATH       mUsb1DevicePath         = { DP_ACPI, DP_PCI (0x1d, 0x01), DP_END };
-USB_PORT_DEVICE_PATH       mUsb2DevicePath         = { DP_ACPI, DP_PCI (0x1d, 0x02), DP_END };
-USB_PORT_DEVICE_PATH       mUsb3DevicePath         = { DP_ACPI, DP_PCI (0x1d, 0x07), DP_END };
-IDE_DEVICE_PATH            mIdeDevicePath          = { DP_ACPI, DP_PCI (0x1F, 0x01), DP_END };
-GB_NIC_DEVICE_PATH         mGbNicDevicePath        = { DP_ACPI, DP_PCI( 0x03,0x00 ),DP_PCI( 0x1F,0x00 ),DP_PCI( 0x07,0x00 ), DP_END };
 
-//
-//
-//
-MISC_SUBCLASS_TABLE_FUNCTION (
+MISC_SMBIOS_TABLE_FUNCTION (
   MiscPortInternalConnectorDesignator
   )
 /*++
@@ -84,184 +67,111 @@ Returns:
       LogRecordData was NULL.
 --*/
 {
-  EFI_DEVICE_PATH_PROTOCOL          EndDevicePath           = DP_END;
-
+  CHAR8                                        *OptionalStrStart;
+  UINTN                                        InternalRefStrLen;
+  UINTN                                        ExternalRefStrLen;  
+  EFI_STRING                                   InternalRef;
+  EFI_STRING                                   ExternalRef;
+  STRING_REF                                   TokenForInternal;
+  STRING_REF                                   TokenForExternal;
+  EFI_STATUS                                   Status;
+  SMBIOS_TABLE_TYPE8                           *SmbiosRecord;
+  EFI_SMBIOS_HANDLE                            SmbiosHandle;
+  EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR  *ForType8InputData;
+  
+  ForType8InputData = (EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR *)RecordData;
   //
   // First check for invalid parameters.
   //
-  // Shanmu >> to fix the Device Path Issue...
-  // if (RecordLen == 0 || RecordData == NULL || LogRecordData == NULL) {
-  //
-  if (*RecordLen == 0 || RecordData == NULL || LogRecordData == NULL) {
-    //
-    // End Shanmu
-    //
+  if (RecordData == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  //
-  // Then check for unsupported RecordType.
-  //
-  if (RecordType != EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_RECORD_NUMBER) {
+
+  TokenForInternal = 0;
+  TokenForExternal = 0;
+  
+  switch (ForType8InputData->PortInternalConnectorDesignator) { 
+
+    case STR_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR:
+      TokenForInternal = STRING_TOKEN (STR_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR);
+      TokenForExternal = STRING_TOKEN(STR_MISC_PORT_EXTERNAL_CONNECTOR_DESIGNATOR);
+      break;
+    case STR_MISC_PORT_INTERNAL_KEYBOARD:
+      TokenForInternal = STRING_TOKEN (STR_MISC_PORT_INTERNAL_KEYBOARD);
+      TokenForExternal = STRING_TOKEN(STR_MISC_PORT_EXTERNAL_KEYBOARD);
+      break;
+    case STR_MISC_PORT_INTERNAL_MOUSE:
+      TokenForInternal = STRING_TOKEN (STR_MISC_PORT_INTERNAL_MOUSE);
+      TokenForExternal = STRING_TOKEN(STR_MISC_PORT_EXTERNAL_MOUSE);
+      break;
+    case STR_MISC_PORT_INTERNAL_COM1:
+      TokenForInternal = STRING_TOKEN (STR_MISC_PORT_INTERNAL_COM1);
+      TokenForExternal = STRING_TOKEN(STR_MISC_PORT_EXTERNAL_COM1);
+      break;
+    case STR_MISC_PORT_INTERNAL_COM2:
+      TokenForInternal = STRING_TOKEN (STR_MISC_PORT_INTERNAL_COM2);
+      TokenForExternal = STRING_TOKEN(STR_MISC_PORT_EXTERNAL_COM2);
+      break;
+    case STR_MISC_PORT_INTERNAL_EXTENSION_POWER:
+      TokenForInternal = STRING_TOKEN (STR_MISC_PORT_INTERNAL_EXTENSION_POWER);
+      TokenForExternal = STRING_TOKEN(STR_MISC_PORT_EXTERNAL_EXTENSION_POWER);
+      break;
+    case STR_MISC_PORT_INTERNAL_FLOPPY:
+      TokenForInternal = STRING_TOKEN (STR_MISC_PORT_INTERNAL_FLOPPY);
+      TokenForExternal = STRING_TOKEN(STR_MISC_PORT_EXTERNAL_FLOPPY);
+      break;
+    default:
+      break;
+  }
+
+  InternalRef = HiiGetPackageString(&gEfiCallerIdGuid, TokenForInternal, NULL);
+  InternalRefStrLen = StrLen(InternalRef);
+  if (InternalRefStrLen > SMBIOS_STRING_MAX_LENGTH) {
     return EFI_UNSUPPORTED;
   }
-  //
-  // Is this the first time through this function?
-  //
-  if (!mDone) {
-    //
-    // Yes, this is the first time.  Inspect/Change the contents of the
-    // RecordData structure.
-    //
-    //
-    // Device path is only updated here as it was not taking that in static data
-    //
-    // Shanmu >> to fix the Device Path Issue...
-    //
 
-    /*
-    switch (((EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA *)RecordData)->PortInternalConnectorDesignator) 
-    {
-      case STR_MISC_PORT_INTERNAL_MOUSE:
-        {
-          (EFI_DEVICE_PATH_PROTOCOL)((EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA *)RecordData)->PortPath = *((EFI_DEVICE_PATH_PROTOCOL*)&mPs2MouseDevicePath);          
-        }break;
-      case STR_MISC_PORT_INTERNAL_KEYBOARD:
-        {
-          (EFI_DEVICE_PATH_PROTOCOL)((EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA *)RecordData)->PortPath = *((EFI_DEVICE_PATH_PROTOCOL*)&mPs2KeyboardDevicePath);          
-        }break;
-      case STR_MISC_PORT_INTERNAL_COM1:
-        {
-          (EFI_DEVICE_PATH_PROTOCOL)((EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA *)RecordData)->PortPath = *((EFI_DEVICE_PATH_PROTOCOL*)&mCom1DevicePath);          
-        }break;
-      case STR_MISC_PORT_INTERNAL_COM2:
-        {
-          (EFI_DEVICE_PATH_PROTOCOL)((EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA *)RecordData)->PortPath = *((EFI_DEVICE_PATH_PROTOCOL*)&mCom2DevicePath);          
-        }break;
-      case STR_MISC_PORT_INTERNAL_LPT1:
-        {
-          (EFI_DEVICE_PATH_PROTOCOL)((EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA *)RecordData)->PortPath = *((EFI_DEVICE_PATH_PROTOCOL*)&mLpt1DevicePath);          
-        }break;
-      case STR_MISC_PORT_INTERNAL_USB1:
-        {
-          (EFI_DEVICE_PATH_PROTOCOL)((EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA *)RecordData)->PortPath = *((EFI_DEVICE_PATH_PROTOCOL*)&mUsb0DevicePath);          
-        }break;
-      case STR_MISC_PORT_INTERNAL_USB2:
-        {
-          (EFI_DEVICE_PATH_PROTOCOL)((EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA *)RecordData)->PortPath = *((EFI_DEVICE_PATH_PROTOCOL*)&mUsb1DevicePath);          
-        }break;
-      case STR_MISC_PORT_INTERNAL_USB3:
-        {
-          (EFI_DEVICE_PATH_PROTOCOL)((EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA *)RecordData)->PortPath = *((EFI_DEVICE_PATH_PROTOCOL*)&mUsb2DevicePath);          
-        }break;
-      case STR_MISC_PORT_INTERNAL_NETWORK:
-        {
-          (EFI_DEVICE_PATH_PROTOCOL)((EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA *)RecordData)->PortPath = *((EFI_DEVICE_PATH_PROTOCOL*)&mGbNicDevicePath);          
-        }break;
-      case STR_MISC_PORT_INTERNAL_FLOPPY:
-        {
-          (EFI_DEVICE_PATH_PROTOCOL)((EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA *)RecordData)->PortPath = *((EFI_DEVICE_PATH_PROTOCOL*)&mFloopyADevicePath);          
-        }break;
-      case STR_MISC_PORT_INTERNAL_IDE1:
-        {
-          (EFI_DEVICE_PATH_PROTOCOL)((EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA *)RecordData)->PortPath = *((EFI_DEVICE_PATH_PROTOCOL*)&mIdeDevicePath);          
-        }break;
-      case STR_MISC_PORT_INTERNAL_IDE2:
-        {
-          (EFI_DEVICE_PATH_PROTOCOL)((EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA *)RecordData)->PortPath = *((EFI_DEVICE_PATH_PROTOCOL*)&mIdeDevicePath);          
-        }break;
-      default:
-        {
-          (EFI_DEVICE_PATH_PROTOCOL)((EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA *)RecordData)->PortPath = EndDevicePath;
-        }break;    
-    }
-    */
-    switch (((EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA *) RecordData)->PortInternalConnectorDesignator) {
-    case STR_MISC_PORT_INTERNAL_MOUSE:
-      {
-        CopyMem (
-          &((EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA *) RecordData)->PortPath,
-          &mPs2MouseDevicePath,
-          GetDevicePathSize ((EFI_DEVICE_PATH_PROTOCOL *) &mPs2MouseDevicePath)
-          );
-        *RecordLen = *RecordLen - sizeof (EFI_MISC_PORT_DEVICE_PATH) + GetDevicePathSize ((EFI_DEVICE_PATH_PROTOCOL *) &mPs2MouseDevicePath);
-      }
-      break;
-
-    case STR_MISC_PORT_INTERNAL_KEYBOARD:
-      {
-        CopyMem (
-          &((EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA *) RecordData)->PortPath,
-          &mPs2KeyboardDevicePath,
-          GetDevicePathSize ((EFI_DEVICE_PATH_PROTOCOL *) &mPs2KeyboardDevicePath)
-          );
-        *RecordLen = *RecordLen - sizeof (EFI_MISC_PORT_DEVICE_PATH) + GetDevicePathSize ((EFI_DEVICE_PATH_PROTOCOL *) &mPs2KeyboardDevicePath);
-      }
-      break;
-
-    case STR_MISC_PORT_INTERNAL_COM1:
-      {
-        CopyMem (
-          &((EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA *) RecordData)->PortPath,
-          &mCom1DevicePath,
-          GetDevicePathSize ((EFI_DEVICE_PATH_PROTOCOL *) &mCom1DevicePath)
-          );
-        *RecordLen = *RecordLen - sizeof (EFI_MISC_PORT_DEVICE_PATH) + GetDevicePathSize ((EFI_DEVICE_PATH_PROTOCOL *) &mCom1DevicePath);
-      }
-      break;
-
-    case STR_MISC_PORT_INTERNAL_COM2:
-      {
-        CopyMem (
-          &((EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA *) RecordData)->PortPath,
-          &mCom2DevicePath,
-          GetDevicePathSize ((EFI_DEVICE_PATH_PROTOCOL *) &mCom2DevicePath)
-          );
-        *RecordLen = *RecordLen - sizeof (EFI_MISC_PORT_DEVICE_PATH) + GetDevicePathSize ((EFI_DEVICE_PATH_PROTOCOL *) &mCom2DevicePath);
-      }
-      break;
-
-    case STR_MISC_PORT_INTERNAL_FLOPPY:
-      {
-        CopyMem (
-          &((EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA *) RecordData)->PortPath,
-          &mFloopyADevicePath,
-          GetDevicePathSize ((EFI_DEVICE_PATH_PROTOCOL *) &mFloopyADevicePath)
-          );
-        *RecordLen = *RecordLen - sizeof (EFI_MISC_PORT_DEVICE_PATH) + GetDevicePathSize ((EFI_DEVICE_PATH_PROTOCOL *) &mFloopyADevicePath);
-      }
-      break;
-
-    default:
-      {
-        CopyMem (
-          &((EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA *) RecordData)->PortPath,
-          &EndDevicePath,
-          GetDevicePathSize ((EFI_DEVICE_PATH_PROTOCOL *) &EndDevicePath)
-          );
-        *RecordLen = *RecordLen - sizeof (EFI_MISC_PORT_DEVICE_PATH) + GetDevicePathSize ((EFI_DEVICE_PATH_PROTOCOL *) &EndDevicePath);
-      }
-      break;
-    }
-    //
-    // End Shanmu
-    //
-    // Set mDone flag to TRUE for next pass through this function.
-    // Set *LogRecordData to TRUE so data will get logged to Data Hub.
-    //
-    mDone            = TRUE;
-    *LogRecordData  = TRUE;
-  } else {
-    //
-    // No, this is the second time.  Reset the state of the mDone flag
-    // to FALSE and tell the data logger that there is no more data
-    // to be logged for this record type.  If any memory allocations
-    // were made by earlier passes, they must be released now.
-    //
-    mDone            = FALSE;
-    *LogRecordData  = FALSE;
+  ExternalRef = HiiGetPackageString(&gEfiCallerIdGuid, TokenForExternal, NULL);
+  ExternalRefStrLen = StrLen(ExternalRef);
+  if (ExternalRefStrLen > SMBIOS_STRING_MAX_LENGTH) {
+    return EFI_UNSUPPORTED;
   }
 
-  return EFI_SUCCESS;
+  //
+  // Two zeros following the last string.
+  //
+  SmbiosRecord = AllocatePool(sizeof (SMBIOS_TABLE_TYPE8) + InternalRefStrLen + 1 + ExternalRefStrLen + 1 + 1);
+  ZeroMem(SmbiosRecord, sizeof (SMBIOS_TABLE_TYPE8) + InternalRefStrLen + 1 + ExternalRefStrLen + 1 + 1);
+
+  SmbiosRecord->Hdr.Type = EFI_SMBIOS_TYPE_PORT_CONNECTOR_INFORMATION;
+  SmbiosRecord->Hdr.Length = sizeof (SMBIOS_TABLE_TYPE8);
+  //
+  // Make handle chosen by smbios protocol.add automatically.
+  //
+  SmbiosRecord->Hdr.Handle = 0;  
+  SmbiosRecord->InternalReferenceDesignator = 1;
+  SmbiosRecord->InternalConnectorType = (UINT8)ForType8InputData->PortInternalConnectorType;
+  SmbiosRecord->ExternalReferenceDesignator = 2;
+  SmbiosRecord->ExternalConnectorType = (UINT8)ForType8InputData->PortExternalConnectorType;
+  SmbiosRecord->PortType = (UINT8)ForType8InputData->PortType;
+  
+  OptionalStrStart = (CHAR8 *)(SmbiosRecord + 1);
+  UnicodeStrToAsciiStr(InternalRef, OptionalStrStart);
+  UnicodeStrToAsciiStr(ExternalRef, OptionalStrStart + InternalRefStrLen + 1);
+
+  //
+  // Now we have got the full smbios record, call smbios protocol to add this record.
+  //
+  SmbiosHandle = 0;
+  Status = Smbios-> Add(
+                      Smbios, 
+                      NULL,
+                      &SmbiosHandle, 
+                      (EFI_SMBIOS_TABLE_HEADER *) SmbiosRecord
+                      );
+  FreePool(SmbiosRecord);
+  return Status;
 }
+
+
 
 /* eof - MiscSystemManufacturerFunction.c */

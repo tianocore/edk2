@@ -1,6 +1,6 @@
 /**@file
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -22,78 +22,57 @@ Abstract:
 
 #include "MiscSubclassDriver.h"
 
+
 //
 // External definitions referenced by Data Table entries.
 //
-MISC_SUBCLASS_TABLE_EXTERNS (
-  EFI_MISC_CHASSIS_MANUFACTURER_DATA,
-  MiscChassisManufacturer
-  );
-MISC_SUBCLASS_TABLE_EXTERNS (
-  EFI_MISC_BIOS_VENDOR_DATA,
-  MiscBiosVendor
-  );
-MISC_SUBCLASS_TABLE_EXTERNS (
-  EFI_MISC_SYSTEM_MANUFACTURER_DATA,
-  MiscSystemManufacturer
-  );
-MISC_SUBCLASS_TABLE_EXTERNS (
-  EFI_MISC_BASE_BOARD_MANUFACTURER_DATA,
-  MiscBaseBoardManufacturer
-  );
-MISC_SUBCLASS_TABLE_EXTERNS (
-  EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA,
-  MiscPortInternalConnectorDesignator
-  );
-MISC_SUBCLASS_TABLE_EXTERNS (
-  EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA,
-  MiscPortKeyboard
-  );
-MISC_SUBCLASS_TABLE_EXTERNS (
-  EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA,
-  MiscPortMouse
-  );
-MISC_SUBCLASS_TABLE_EXTERNS (
-  EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA,
-  MiscPortCom1
-  );
-MISC_SUBCLASS_TABLE_EXTERNS (
-  EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA,
-  MiscPortCom2
-  );
-MISC_SUBCLASS_TABLE_EXTERNS (
-  EFI_MISC_SYSTEM_SLOT_DESIGNATION_DATA,
-  MiscSystemSlotDesignation
-  );
-MISC_SUBCLASS_TABLE_EXTERNS (
-  EFI_MISC_OEM_STRING_DATA,
-  OemString
-  );
-MISC_SUBCLASS_TABLE_EXTERNS (
-  EFI_MISC_SYSTEM_OPTION_STRING_DATA,
-  SystemOptionString
-  );
+MISC_SMBIOS_TABLE_EXTERNS ( EFI_MISC_BASE_BOARD_MANUFACTURER_DATA, MiscBaseBoardManufacturer, MiscBaseBoardManufacturer);
+MISC_SMBIOS_TABLE_EXTERNS ( EFI_MISC_BIOS_VENDOR_DATA, MiscBiosVendor,MiscBiosVendor );
+MISC_SMBIOS_TABLE_EXTERNS ( EFI_MISC_BOOT_INFORMATION_STATUS_DATA, BootInformationStatus, BootInformationStatus);
+MISC_SMBIOS_TABLE_EXTERNS ( EFI_MISC_CHASSIS_MANUFACTURER_DATA, MiscChassisManufacturer, MiscChassisManufacturer);
+MISC_SMBIOS_TABLE_EXTERNS ( EFI_MISC_NUMBER_OF_INSTALLABLE_LANGUAGES_DATA,NumberOfInstallableLanguages, NumberOfInstallableLanguages);
+MISC_SMBIOS_TABLE_EXTERNS ( EFI_MISC_OEM_STRING_DATA,OemString, OemString);
+MISC_SMBIOS_TABLE_EXTERNS ( EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA, MiscPortInternalConnectorDesignator, MiscPortInternalConnectorDesignator);
+MISC_SMBIOS_TABLE_EXTERNS ( EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA, MiscPortKeyboard, MiscPortInternalConnectorDesignator);
+MISC_SMBIOS_TABLE_EXTERNS ( EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA, MiscPortMouse, MiscPortInternalConnectorDesignator);
+MISC_SMBIOS_TABLE_EXTERNS ( EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA, MiscPortCom1, MiscPortInternalConnectorDesignator);
+MISC_SMBIOS_TABLE_EXTERNS ( EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA, MiscPortCom2, MiscPortInternalConnectorDesignator);
+MISC_SMBIOS_TABLE_EXTERNS ( EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA, MiscPortExtensionPower, MiscPortInternalConnectorDesignator);
+MISC_SMBIOS_TABLE_EXTERNS ( EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA, MiscPortFloppy, MiscPortInternalConnectorDesignator);
+MISC_SMBIOS_TABLE_EXTERNS ( EFI_MISC_RESET_CAPABILITIES, MiscResetCapabilities, MiscResetCapabilities);
+MISC_SMBIOS_TABLE_EXTERNS ( EFI_MISC_SYSTEM_LANGUAGE_STRING_DATA,SystemLanguageString, SystemLanguageString);
+MISC_SMBIOS_TABLE_EXTERNS ( EFI_MISC_SYSTEM_MANUFACTURER_DATA, MiscSystemManufacturer, MiscSystemManufacturer);
+MISC_SMBIOS_TABLE_EXTERNS ( EFI_MISC_SYSTEM_OPTION_STRING_DATA, SystemOptionString, SystemOptionString);
+MISC_SMBIOS_TABLE_EXTERNS ( EFI_MISC_SYSTEM_SLOT_DESIGNATION_DATA, MiscSystemSlotDesignation, MiscSystemSlotDesignation);
+
 
 //
 // Data Table.
 //
-EFI_MISC_SUBCLASS_DATA_TABLE  mMiscSubclassDataTable[] = {
-  MISC_SUBCLASS_TABLE_ENTRY_DATA_AND_FUNCTION(EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR, MiscPortKeyboard, MiscPortInternalConnectorDesignator),
-  MISC_SUBCLASS_TABLE_ENTRY_DATA_AND_FUNCTION(EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR, MiscPortMouse, MiscPortInternalConnectorDesignator),
-  MISC_SUBCLASS_TABLE_ENTRY_DATA_AND_FUNCTION(EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR, MiscPortCom1, MiscPortInternalConnectorDesignator),
-  MISC_SUBCLASS_TABLE_ENTRY_DATA_AND_FUNCTION(EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR, MiscPortCom2, MiscPortInternalConnectorDesignator),
-  MISC_SUBCLASS_TABLE_ENTRY_DATA_ONLY(EFI_MISC_BIOS_VENDOR, MiscBiosVendor),
-  MISC_SUBCLASS_TABLE_ENTRY_DATA_ONLY(EFI_MISC_SYSTEM_MANUFACTURER, MiscSystemManufacturer),
-  MISC_SUBCLASS_TABLE_ENTRY_DATA_ONLY(EFI_MISC_BASE_BOARD_MANUFACTURER, MiscBaseBoardManufacturer),
-  MISC_SUBCLASS_TABLE_ENTRY_DATA_ONLY(EFI_MISC_CHASSIS_MANUFACTURER, MiscChassisManufacturer),
-  MISC_SUBCLASS_TABLE_ENTRY_DATA_ONLY(EFI_MISC_SYSTEM_SLOT_DESIGNATION, MiscSystemSlotDesignation),
-  MISC_SUBCLASS_TABLE_ENTRY_DATA_ONLY(EFI_MISC_OEM_STRING, OemString),
-  MISC_SUBCLASS_TABLE_ENTRY_DATA_ONLY(EFI_MISC_SYSTEM_OPTION_STRING, SystemOptionString),
-};
-
+EFI_MISC_SMBIOS_DATA_TABLE  mMiscSubclassDataTable[] = {
+  MISC_SMBIOS_TABLE_ENTRY_DATA_AND_FUNCTION( MiscBaseBoardManufacturer, MiscBaseBoardManufacturer),
+  MISC_SMBIOS_TABLE_ENTRY_DATA_AND_FUNCTION( MiscBiosVendor,MiscBiosVendor ),
+  MISC_SMBIOS_TABLE_ENTRY_DATA_AND_FUNCTION( BootInformationStatus, BootInformationStatus),
+  MISC_SMBIOS_TABLE_ENTRY_DATA_AND_FUNCTION( MiscChassisManufacturer, MiscChassisManufacturer),
+  MISC_SMBIOS_TABLE_ENTRY_DATA_AND_FUNCTION(NumberOfInstallableLanguages, NumberOfInstallableLanguages),
+  MISC_SMBIOS_TABLE_ENTRY_DATA_AND_FUNCTION(OemString, OemString),
+  MISC_SMBIOS_TABLE_ENTRY_DATA_AND_FUNCTION( MiscPortInternalConnectorDesignator, MiscPortInternalConnectorDesignator),
+  MISC_SMBIOS_TABLE_ENTRY_DATA_AND_FUNCTION( MiscPortKeyboard, MiscPortInternalConnectorDesignator),
+  MISC_SMBIOS_TABLE_ENTRY_DATA_AND_FUNCTION( MiscPortMouse, MiscPortInternalConnectorDesignator),
+  MISC_SMBIOS_TABLE_ENTRY_DATA_AND_FUNCTION( MiscPortCom1, MiscPortInternalConnectorDesignator),
+  MISC_SMBIOS_TABLE_ENTRY_DATA_AND_FUNCTION( MiscPortCom2, MiscPortInternalConnectorDesignator),
+  MISC_SMBIOS_TABLE_ENTRY_DATA_AND_FUNCTION( MiscPortExtensionPower, MiscPortInternalConnectorDesignator),
+  MISC_SMBIOS_TABLE_ENTRY_DATA_AND_FUNCTION( MiscPortFloppy, MiscPortInternalConnectorDesignator),
+  MISC_SMBIOS_TABLE_ENTRY_DATA_AND_FUNCTION( MiscResetCapabilities, MiscResetCapabilities),
+  MISC_SMBIOS_TABLE_ENTRY_DATA_AND_FUNCTION(SystemLanguageString, SystemLanguageString),
+  MISC_SMBIOS_TABLE_ENTRY_DATA_AND_FUNCTION( MiscSystemManufacturer, MiscSystemManufacturer),
+  MISC_SMBIOS_TABLE_ENTRY_DATA_AND_FUNCTION( SystemOptionString, SystemOptionString),  
+  MISC_SMBIOS_TABLE_ENTRY_DATA_AND_FUNCTION( MiscSystemSlotDesignation, MiscSystemSlotDesignation),  
+  };
+ 
 //
 // Number of Data Table entries.
 //
-UINTN mMiscSubclassDataTableEntries = (sizeof mMiscSubclassDataTable) / sizeof (EFI_MISC_SUBCLASS_DATA_TABLE);
+UINTN mMiscSubclassDataTableEntries = (sizeof mMiscSubclassDataTable) / sizeof (EFI_MISC_SMBIOS_DATA_TABLE);
 
 /* eof - MiscSubclassDriverDataTable.c */

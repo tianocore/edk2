@@ -1,6 +1,6 @@
 /**@file
 
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -54,19 +54,6 @@ CPU_ARCH_PROTOCOL_PRIVATE mCpuTemplate = {
 #define EFI_CPU_DATA_MAXIMUM_LENGTH 0x100
 
 
-
-typedef union {
-  EFI_CPU_DATA_RECORD *DataRecord;
-  UINT8               *Raw;
-} EFI_CPU_DATA_RECORD_BUFFER;
-
-EFI_SUBCLASS_TYPE1_HEADER mCpuDataRecordHeader = {
-  EFI_PROCESSOR_SUBCLASS_VERSION,       // Version
-  sizeof (EFI_SUBCLASS_TYPE1_HEADER),   // Header Size
-  0,                                    // Instance, Initialize later
-  EFI_SUBCLASS_INSTANCE_NON_APPLICABLE, // SubInstance
-  0                                     // RecordType, Initialize later
-};
 
 //
 // Service routines for the driver
@@ -390,14 +377,42 @@ Returns:
 }
 
 
+
+/**
+  Logs SMBIOS record.
+
+  @param  Smbios   Pointer to SMBIOS protocol instance.
+  @param  Buffer   Pointer to the data buffer.
+
+**/
 VOID
-CpuUpdateDataHub (
+LogSmbiosData (
+  IN  EFI_SMBIOS_PROTOCOL        *Smbios,
+  IN  UINT8                      *Buffer
+  )
+{
+  EFI_STATUS         Status;
+  EFI_SMBIOS_HANDLE  SmbiosHandle;
+  
+  SmbiosHandle = 0;
+  Status = Smbios->Add (
+                     Smbios,
+                     NULL,
+                     &SmbiosHandle,
+                     (EFI_SMBIOS_TABLE_HEADER*)Buffer
+                     );
+  ASSERT_EFI_ERROR (Status);
+}
+
+
+VOID
+CpuUpdateSmbios (
   VOID
   )
 /*++
 
 Routine Description:
-  This function will log processor version and frequency data to data hub.
+  This function will log processor version and frequency data to Smbios.
 
 Arguments:
   Event        - Event whose notification function is being invoked.
@@ -409,29 +424,22 @@ Returns:
 --*/
 {
   EFI_STATUS                  Status;
-  EFI_CPU_DATA_RECORD_BUFFER  RecordBuffer;
-  UINT32                      HeaderSize;
   UINT32                      TotalSize;
-  EFI_DATA_HUB_PROTOCOL       *DataHub;
+  EFI_SMBIOS_PROTOCOL         *Smbios;
   EFI_HII_HANDLE              HiiHandle;
+  STRING_REF                  Token;
+  UINTN                       CpuVerStrLen;
+  EFI_STRING                  CpuVerStr;
+  SMBIOS_TABLE_TYPE4          *SmbiosRecord;
+  CHAR8                       *OptionalStrStart;
 
   //
-  // Locate DataHub protocol.
+  // Locate Smbios protocol.
   //
-  Status = gBS->LocateProtocol (&gEfiDataHubProtocolGuid, NULL, (VOID**)&DataHub);
+  Status = gBS->LocateProtocol (&gEfiSmbiosProtocolGuid, NULL, (VOID **)&Smbios);
+  
   if (EFI_ERROR (Status)) {
     return;
-  }
-
-  //
-  // Initialize data record header
-  //
-  mCpuDataRecordHeader.Instance = 1;
-  HeaderSize                    = sizeof (EFI_SUBCLASS_TYPE1_HEADER);
-
-  RecordBuffer.Raw              = AllocatePool (HeaderSize + EFI_CPU_DATA_MAXIMUM_LENGTH);
-  if (RecordBuffer.Raw == NULL) {
-    return ;
   }
 
   //
@@ -445,40 +453,40 @@ Returns:
                 );
   ASSERT (HiiHandle != NULL);
 
-  CopyMem (RecordBuffer.Raw, &mCpuDataRecordHeader, HeaderSize);
+  Token  = STRING_TOKEN (STR_PROCESSOR_VERSION);
+  CpuVerStr = HiiGetPackageString(&gEfiCallerIdGuid, Token, NULL);
+  CpuVerStrLen = StrLen(CpuVerStr);
+  ASSERT (CpuVerStrLen <= SMBIOS_STRING_MAX_LENGTH);
 
 
-  RecordBuffer.DataRecord->DataRecordHeader.RecordType      = ProcessorVersionRecordType;
-  RecordBuffer.DataRecord->VariableRecord.ProcessorVersion  = STRING_TOKEN (STR_PROCESSOR_VERSION);
-  TotalSize = HeaderSize + sizeof (EFI_PROCESSOR_VERSION_DATA);
+  TotalSize = sizeof(SMBIOS_TABLE_TYPE4) + CpuVerStrLen + 1 + 1;
+  SmbiosRecord = AllocatePool(TotalSize);
+  ZeroMem(SmbiosRecord, TotalSize);
 
-  Status = DataHub->LogData (
-                      DataHub,
-                      &gEfiProcessorSubClassGuid,
-                      &gEfiCallerIdGuid,
-                      EFI_DATA_RECORD_CLASS_DATA,
-                      RecordBuffer.Raw,
-                      TotalSize
-                      );
-
+  SmbiosRecord->Hdr.Type = EFI_SMBIOS_TYPE_PROCESSOR_INFORMATION;
+  SmbiosRecord->Hdr.Length = sizeof (SMBIOS_TABLE_TYPE4);
+  //
+  // Make handle chosen by smbios protocol.add automatically.
+  //
+  SmbiosRecord->Hdr.Handle = 0;  
+  //
+  // Processor version is the 1st string.
+  //
+  SmbiosRecord->ProcessorVersion = 1;
   //
   // Store CPU frequency data record to data hub - It's an emulator so make up a value
   //
-  RecordBuffer.DataRecord->DataRecordHeader.RecordType                    = ProcessorCoreFrequencyRecordType;
-  RecordBuffer.DataRecord->VariableRecord.ProcessorCoreFrequency.Value    = 1234;
-  RecordBuffer.DataRecord->VariableRecord.ProcessorCoreFrequency.Exponent = 6;
-  TotalSize = HeaderSize + sizeof (EFI_PROCESSOR_CORE_FREQUENCY_DATA);
+  SmbiosRecord->CurrentSpeed  = 1234;
 
-  Status = DataHub->LogData (
-                      DataHub,
-                      &gEfiProcessorSubClassGuid,
-                      &gEfiCallerIdGuid,
-                      EFI_DATA_RECORD_CLASS_DATA,
-                      RecordBuffer.Raw,
-                      TotalSize
-                      );
+  OptionalStrStart = (CHAR8 *)(SmbiosRecord + 1);
+  UnicodeStrToAsciiStr(CpuVerStr, OptionalStrStart);
 
-  FreePool (RecordBuffer.Raw);
+  //
+  // Now we have got the full smbios record, call smbios protocol to add this record.
+  //
+  LogSmbiosData(Smbios, (UINT8 *) SmbiosRecord);
+  FreePool (SmbiosRecord);
+
 }
 
 
@@ -512,7 +520,7 @@ Returns:
 {
   EFI_STATUS                Status;
 
-  CpuUpdateDataHub ();
+  CpuUpdateSmbios ();
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mCpuTemplate.Handle,
@@ -524,5 +532,3 @@ Returns:
 
   return Status;
 }
-
-

@@ -1,6 +1,6 @@
 /**@file
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -22,101 +22,119 @@ Abstract:
 
 #include "MiscSubclassDriver.h"
 
-BOOLEAN  mDone = FALSE;
-
-//
-//
-//
-MISC_SUBCLASS_TABLE_FUNCTION (
-  MiscSystemManufacturer
-  )
-/*++
-Description:
-
+/**
   This function makes boot time changes to the contents of the
-  MiscSystemManufacturer (Type 13).
+  MiscSystemManufacturer (Type 1).
 
-Parameters:
+  @param  RecordData                 Pointer to copy of RecordData from the Data Table.  
 
-  RecordType
-    Type of record to be processed from the Data Table.
-    mMiscSubclassDataTable[].RecordType
+  @retval EFI_SUCCESS                All parameters were valid.
+  @retval EFI_UNSUPPORTED            Unexpected RecordType value.
+  @retval EFI_INVALID_PARAMETER      Invalid parameter was found.
 
-  RecordLen
-    Size of static RecordData from the Data Table.
-    mMiscSubclassDataTable[].RecordLen
-
-  RecordData
-    Pointer to copy of RecordData from the Data Table.  Changes made
-    to this copy will be written to the Data Hub but will not alter
-    the contents of the static Data Table.
-
-  LogRecordData
-    Set *LogRecordData to TRUE to log RecordData to Data Hub.
-    Set *LogRecordData to FALSE when there is no more data to log.
-
-Returns:
-
-  EFI_SUCCESS
-    All parameters were valid and *RecordData and *LogRecordData have
-    been set.
-
-  EFI_UNSUPPORTED
-    Unexpected RecordType value.
-
-  EFI_INVALID_PARAMETER
-    One of the following parameter conditions was true:
-      RecordLen was zero.
-      RecordData was NULL.
-      LogRecordData was NULL.
---*/
+**/
+MISC_SMBIOS_TABLE_FUNCTION(MiscSystemManufacturer)
 {
+  CHAR8                             *OptionalStrStart;
+  UINTN                             ManuStrLen;
+  UINTN                             VerStrLen;
+  UINTN                             PdNameStrLen;
+  UINTN                             SerialNumStrLen;
+  EFI_STATUS                        Status;
+  EFI_STRING                        Manufacturer;
+  EFI_STRING                        ProductName;
+  EFI_STRING                        Version;
+  EFI_STRING                        SerialNumber;
+  STRING_REF                        TokenToGet;
+  EFI_SMBIOS_HANDLE                 SmbiosHandle;
+  SMBIOS_TABLE_TYPE1                *SmbiosRecord;
+  EFI_MISC_SYSTEM_MANUFACTURER      *ForType1InputData;
+
+  ForType1InputData = (EFI_MISC_SYSTEM_MANUFACTURER *)RecordData;
+
   //
   // First check for invalid parameters.
   //
-  if (*RecordLen == 0 || RecordData == NULL || LogRecordData == NULL) {
+  if (RecordData == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  //
-  // Then check for unsupported RecordType.
-  //
-  if (RecordType != EFI_MISC_SYSTEM_MANUFACTURER_RECORD_NUMBER) {
+
+  TokenToGet = STRING_TOKEN (STR_MISC_SYSTEM_MANUFACTURER);
+  Manufacturer = HiiGetPackageString(&gEfiCallerIdGuid, TokenToGet, NULL);
+  ManuStrLen = StrLen(Manufacturer);
+  if (ManuStrLen > SMBIOS_STRING_MAX_LENGTH) {
+    return EFI_UNSUPPORTED;
+  }
+
+  TokenToGet = STRING_TOKEN (STR_MISC_SYSTEM_PRODUCT_NAME);
+  ProductName = HiiGetPackageString(&gEfiCallerIdGuid, TokenToGet, NULL);
+  PdNameStrLen = StrLen(ProductName);
+  if (PdNameStrLen > SMBIOS_STRING_MAX_LENGTH) {
+    return EFI_UNSUPPORTED;
+  }
+
+  TokenToGet = STRING_TOKEN (STR_MISC_SYSTEM_VERSION);
+  Version = HiiGetPackageString(&gEfiCallerIdGuid, TokenToGet, NULL);
+  VerStrLen = StrLen(Version);
+  if (VerStrLen > SMBIOS_STRING_MAX_LENGTH) {
+    return EFI_UNSUPPORTED;
+  }
+
+  TokenToGet = STRING_TOKEN (STR_MISC_SYSTEM_SERIAL_NUMBER);
+  SerialNumber = HiiGetPackageString(&gEfiCallerIdGuid, TokenToGet, NULL);
+  SerialNumStrLen = StrLen(SerialNumber);
+  if (SerialNumStrLen > SMBIOS_STRING_MAX_LENGTH) {
     return EFI_UNSUPPORTED;
   }
   //
-  // Is this the first time through this function?
+  // Two zeros following the last string.
   //
-  if (!mDone) {
-    //
-    // Yes, this is the first time.  Inspect/Change the contents of the
-    // RecordData structure.
-    //
-    //
-    // Set system GUID.
-    //
-    // ((EFI_MISC_SYSTEM_MANUFACTURER_DATA *)RecordData)->SystemUuid = %%TBD
-    //
-    // Set power-on type.
-    //
-    // ((EFI_MISC_SYSTEM_MANUFACTURER_DATA *)RecordData)->SystemWakeupType = %%TBD
-    //
-    // Set mDone flag to TRUE for next pass through this function.
-    // Set *LogRecordData to TRUE so data will get logged to Data Hub.
-    //
-    mDone            = TRUE;
-    *LogRecordData  = TRUE;
-  } else {
-    //
-    // No, this is the second time.  Reset the state of the mDone flag
-    // to FALSE and tell the data logger that there is no more data
-    // to be logged for this record type.  If any memory allocations
-    // were made by earlier passes, they must be released now.
-    //
-    mDone            = FALSE;
-    *LogRecordData  = FALSE;
-  }
+  SmbiosRecord = AllocatePool(sizeof (SMBIOS_TABLE_TYPE1) + ManuStrLen + 1 + PdNameStrLen + 1 + VerStrLen + 1 + SerialNumStrLen + 1 + 1);
+  ZeroMem(SmbiosRecord, sizeof (SMBIOS_TABLE_TYPE1) + ManuStrLen + 1 + PdNameStrLen + 1 + VerStrLen + 1 + SerialNumStrLen + 1 + 1);
 
-  return EFI_SUCCESS;
+  SmbiosRecord->Hdr.Type = EFI_SMBIOS_TYPE_SYSTEM_INFORMATION;
+  SmbiosRecord->Hdr.Length = sizeof (SMBIOS_TABLE_TYPE1);
+  //
+  // Make handle chosen by smbios protocol.add automatically.
+  // 
+  SmbiosRecord->Hdr.Handle = 0;  
+  //
+  // Manu will be the 1st optional string following the formatted structure.
+  //
+  SmbiosRecord->Manufacturer = 1;
+  //
+  // ProductName will be the 2nd optional string following the formatted structure.
+  //
+  SmbiosRecord->ProductName = 2;  
+  //
+  // Version will be the 3rd optional string following the formatted structure.  
+  //
+  SmbiosRecord->Version = 3;  
+  //
+  // Version will be the 4th optional string following the formatted structure.
+  //
+  SmbiosRecord->SerialNumber = 4;
+  CopyMem ((UINT8 *) (&SmbiosRecord->Uuid),&ForType1InputData->SystemUuid,16);
+  SmbiosRecord->WakeUpType = (UINT8)ForType1InputData->SystemWakeupType;
+
+  OptionalStrStart = (CHAR8 *)(SmbiosRecord + 1);
+  UnicodeStrToAsciiStr(Manufacturer, OptionalStrStart);
+  UnicodeStrToAsciiStr(ProductName, OptionalStrStart + ManuStrLen + 1);
+  UnicodeStrToAsciiStr(Version, OptionalStrStart + ManuStrLen + 1 + PdNameStrLen + 1);
+  UnicodeStrToAsciiStr(SerialNumber, OptionalStrStart + ManuStrLen + 1 + PdNameStrLen + 1 + VerStrLen + 1);
+
+  //
+  // Now we have got the full smbios record, call smbios protocol to add this record.
+  //
+  SmbiosHandle = 0;
+  Status = Smbios-> Add(
+                      Smbios, 
+                      NULL,
+                      &SmbiosHandle, 
+                      (EFI_SMBIOS_TABLE_HEADER *) SmbiosRecord
+                      );
+  FreePool(SmbiosRecord);
+  return Status;
 }
 
 /* eof - MiscSystemManufacturerFunction.c */

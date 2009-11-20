@@ -1,6 +1,6 @@
 /**@file
 
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -22,98 +22,78 @@ Abstract:
 
 #include "MiscSubclassDriver.h"
 
+EFI_HII_HANDLE  mHiiHandle;
 
-extern UINT8  MiscSubclassStrings[];
+/**
+  This is the standard EFI driver point that detects whether there is a
+  MemoryConfigurationData Variable and, if so, reports memory configuration info
+  to the DataHub.
 
+  @param  ImageHandle  Handle for the image of this driver
+  @param  SystemTable  Pointer to the EFI System Table
 
-//
-//
-//
+  @return EFI_SUCCESS if the data is successfully reported
+  @return EFI_NOT_FOUND if the HOB list could not be located.
+
+**/
 EFI_STATUS
-LogRecordDataToDataHub (
-  EFI_DATA_HUB_PROTOCOL *DataHub,
-  UINT32                RecordType,
-  UINT32                RecordLen,
-  VOID                  *RecordData
+LogMemorySmbiosRecord (
+  VOID
   )
-/*++
-Description:
-
-Parameters:
-
-  DataHub
-    %%TBD
-
-  RecordType
-    %%TBD
-
-  RecordLen
-    %%TBD
-
-  RecordData
-    %%TBD
-
-Returns:
-
-  EFI_INVALID_PARAMETER
-
-  EFI_SUCCESS
-
-  Other Data Hub errors
-
---*/
 {
-  EFI_MISC_SUBCLASS_DRIVER_DATA MiscSubclass;
-  EFI_STATUS                    Status;
+  EFI_STATUS                      Status;
+  UINT64                          TotalMemorySize;
+  UINT8                           NumSlots;
+  SMBIOS_TABLE_TYPE19             *Type19Record;
+  EFI_SMBIOS_HANDLE               MemArrayMappedAddrSmbiosHandle;
+  EFI_SMBIOS_PROTOCOL             *Smbios;
+  CHAR16                          *Nt32MemString;
+
+  Status = gBS->LocateProtocol (&gEfiSmbiosProtocolGuid, NULL, (VOID**)&Smbios);
+  ASSERT_EFI_ERROR (Status);
+  
+  NumSlots        = 1;
 
   //
-  // Do nothing if data parameters are not valid.
+  // Process Memory String in form size!size ...
+  // So 64!64 is 128 MB
   //
-  if (RecordLen == 0 || RecordData == NULL) {
-    DEBUG (
-      (EFI_D_ERROR,
-      "RecordLen == %d  RecordData == %xh\n",
-      RecordLen,
-      RecordData)
-      );
-
-    return EFI_INVALID_PARAMETER;
+  Nt32MemString   = PcdGetPtr (PcdWinNtMemorySize);
+  for (TotalMemorySize = 0; *Nt32MemString != '\0';) {
+    TotalMemorySize += StrDecimalToUint64 (Nt32MemString);
+    while (*Nt32MemString != '\0') {
+      if (*Nt32MemString == '!') {
+        Nt32MemString++;       
+        break;
+      }
+      Nt32MemString++;
+    }
   }
-  //
-  // Assemble Data Hub record.
-  //
-  MiscSubclass.Header.Version     = EFI_MISC_SUBCLASS_VERSION;
-  MiscSubclass.Header.HeaderSize  = sizeof (EFI_SUBCLASS_TYPE1_HEADER);
-  MiscSubclass.Header.Instance    = 1;
-  MiscSubclass.Header.SubInstance = 1;
-  MiscSubclass.Header.RecordType  = RecordType;
-
-  CopyMem (
-    &MiscSubclass.Record,
-    RecordData,
-    RecordLen
-    );
 
   //
-  // Log Data Hub record.
+  // Convert Total Memory Size to based on KiloByte
   //
-  Status = DataHub->LogData (
-                        DataHub,
-                        &gEfiMiscSubClassGuid,
-                        &gEfiMiscSubClassGuid,
-                        EFI_DATA_RECORD_CLASS_DATA,
-                        &MiscSubclass,
-                        sizeof (EFI_SUBCLASS_TYPE1_HEADER) + RecordLen
-                        );
+  TotalMemorySize = LShiftU64 (TotalMemorySize, 20);
+  //
+  // Generate Memory Array Mapped Address info
+  //
+  Type19Record = AllocatePool(sizeof (SMBIOS_TABLE_TYPE19));
+  ZeroMem(Type19Record, sizeof(SMBIOS_TABLE_TYPE19));
+  Type19Record->Hdr.Type = EFI_SMBIOS_TYPE_MEMORY_ARRAY_MAPPED_ADDRESS;
+  Type19Record->Hdr.Length = sizeof(SMBIOS_TABLE_TYPE19);
+  Type19Record->Hdr.Handle = 0;
+  Type19Record->StartingAddress = 0;
+  Type19Record->EndingAddress =  (UINT32)RShiftU64(TotalMemorySize, 10) - 1;
+  Type19Record->MemoryArrayHandle = 0;
+  Type19Record->PartitionWidth = (UINT8)(NumSlots); 
 
-  if (EFI_ERROR (Status)) {
-    DEBUG (
-      (EFI_D_ERROR,
-      "LogData(%d bytes) == %r\n",
-      sizeof (EFI_SUBCLASS_TYPE1_HEADER) + RecordLen,
-      Status)
-      );
-  }
+  //
+  // Generate Memory Array Mapped Address info (TYPE 19)
+  //
+  MemArrayMappedAddrSmbiosHandle = 0;
+  Status = Smbios->Add (Smbios, NULL, &MemArrayMappedAddrSmbiosHandle, (EFI_SMBIOS_TABLE_HEADER*) Type19Record);
+  FreePool(Type19Record);
+  ASSERT_EFI_ERROR (Status);
 
   return Status;
 }
@@ -146,193 +126,45 @@ Returns:
 
 --*/
 {
-  EFI_MISC_SUBCLASS_DRIVER_DATA     RecordData;
-  EFI_DATA_HUB_PROTOCOL             *DataHub;
-  EFI_HII_HANDLE                    HiiHandle;
-  EFI_STATUS                        Status;
-  UINTN                             Index;
-  BOOLEAN                           LogRecordData;
-  EFI_MEMORY_SUBCLASS_DRIVER_DATA   MemorySubClassData; 
-  UINT64                            TotalMemorySize;
-  CHAR16                            *Nt32MemString;
+  UINTN                Index;
+  EFI_STATUS           EfiStatus;
+  EFI_SMBIOS_PROTOCOL  *Smbios;  
 
+  EfiStatus = gBS->LocateProtocol(&gEfiSmbiosProtocolGuid, NULL, (VOID**)&Smbios);
 
-  //
-  // Initialize constant portion of subclass header.
-  //
-  RecordData.Header.Version     = EFI_MISC_SUBCLASS_VERSION;
-  RecordData.Header.HeaderSize  = sizeof (EFI_SUBCLASS_TYPE1_HEADER);
-  RecordData.Header.Instance    = 1;
-  RecordData.Header.SubInstance = 1;
-
-  //
-  // Locate data hub protocol.
-  //
-  Status = gBS->LocateProtocol (&gEfiDataHubProtocolGuid, NULL, (VOID**)&DataHub);
-
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Could not locate DataHub protocol.  %r\n", Status));
-    return Status;
-  } else if (DataHub == NULL) {
-    DEBUG ((EFI_D_ERROR, "LocateProtocol(DataHub) returned NULL pointer!\n"));
-    return EFI_DEVICE_ERROR;
+  if (EFI_ERROR(EfiStatus)) {
+    DEBUG((EFI_D_ERROR, "Could not locate SMBIOS protocol.  %r\n", EfiStatus));
+    return EfiStatus;
   }
-  //
-  // Add our default strings to the HII database. They will be modified later.
-  //
-  HiiHandle = HiiAddPackages (
-                &gEfiMiscSubClassGuid,
-                NULL,
-                MiscSubclassStrings,
-                NULL
-                );
-  if (HiiHandle == NULL) {
-    DEBUG ((EFI_D_ERROR, "Could not log default strings to Hii.  %r\n", Status));
-    return EFI_OUT_OF_RESOURCES;
-  }
-  //
-  //
-  //
+
+  mHiiHandle = HiiAddPackages (
+                 &gEfiCallerIdGuid,
+                 NULL,
+                 MiscSubclassStrings,
+                 NULL
+                 );
+  ASSERT (mHiiHandle != NULL);
+
   for (Index = 0; Index < mMiscSubclassDataTableEntries; ++Index) {
     //
-    // Stupidity check!  Do nothing if RecordLen is zero.
-    // %%TBD - Should this be an error or a mechanism for ignoring
-    // records in the Data Table?
+    // If the entry have a function pointer, just log the data.
     //
-    if (mMiscSubclassDataTable[Index].RecordLen == 0) {
-      DEBUG (
-        (EFI_D_ERROR,
-        "mMiscSubclassDataTable[%d].RecordLen == 0\n",
-        Index)
-        );
-
-      continue;
-    }
-    //
-    // Initialize per-record portion of subclass header and
-    // copy static data into data portion of subclass record.
-    //
-    RecordData.Header.RecordType = mMiscSubclassDataTable[Index].RecordType;
-
-    if (mMiscSubclassDataTable[Index].RecordData == NULL) {
-      ZeroMem (
-        &RecordData.Record,
-        mMiscSubclassDataTable[Index].RecordLen
-        );
-    } else {
-      CopyMem (
-        &RecordData.Record,
+    if (mMiscSubclassDataTable[Index].Function != NULL) {
+      EfiStatus = (*mMiscSubclassDataTable[Index].Function)(
         mMiscSubclassDataTable[Index].RecordData,
-        mMiscSubclassDataTable[Index].RecordLen
+        Smbios
         );
-    }
-    //
-    // If the entry does not have a function pointer, just log the data.
-    //
-    if (mMiscSubclassDataTable[Index].Function == NULL) {
-      //
-      // Log RecordData to Data Hub.
-      //
-      Status = DataHub->LogData (
-                            DataHub,
-                            &gEfiMiscSubClassGuid,
-                            &gEfiMiscSubClassGuid,
-                            EFI_DATA_RECORD_CLASS_DATA,
-                            &RecordData,
-                            sizeof (EFI_SUBCLASS_TYPE1_HEADER) + mMiscSubclassDataTable[Index].RecordLen
-                            );
 
-      if (EFI_ERROR (Status)) {
-        DEBUG (
-          (EFI_D_ERROR,
-          "LogData(%d bytes) == %r\n",
-          sizeof (EFI_SUBCLASS_TYPE1_HEADER) + mMiscSubclassDataTable[Index].RecordLen,
-          Status)
-          );
-      }
-
-      continue;
-    }
-    //
-    // The entry has a valid function pointer.
-    // Keep calling the function and logging data until there
-    // is no more data to log.
-    //
-    for (;;) {
-      Status = (*mMiscSubclassDataTable[Index].Function)(mMiscSubclassDataTable[Index].RecordType, &mMiscSubclassDataTable[Index].RecordLen, &RecordData.Record, &LogRecordData);
-      if (EFI_ERROR (Status)) {
-        break;
-      }
-
-      if (!LogRecordData) {
-        break;
-      }
-
-      Status = DataHub->LogData (
-                            DataHub,
-                            &gEfiMiscSubClassGuid,
-                            &gEfiMiscSubClassGuid,
-                            EFI_DATA_RECORD_CLASS_DATA,
-                            &RecordData,
-                            sizeof (EFI_SUBCLASS_TYPE1_HEADER) + mMiscSubclassDataTable[Index].RecordLen
-                            );
-
-      if (EFI_ERROR (Status)) {
-        DEBUG (
-          (EFI_D_ERROR,
-          "LogData(%d bytes) == %r\n",
-          sizeof (EFI_SUBCLASS_TYPE1_HEADER) + mMiscSubclassDataTable[Index].RecordLen,
-          Status)
-          );
+      if (EFI_ERROR(EfiStatus)) {
+        DEBUG((EFI_D_ERROR, "Misc smbios store error.  Index=%d, ReturnStatus=%r\n", Index, EfiStatus));
+        return EfiStatus;
       }
     }
   }
 
-  
   //
-  // Log Memory Size info based on PCD setting.
+  // Log Memory SMBIOS Record
   //
-  MemorySubClassData.Header.Instance    = 1;
-  MemorySubClassData.Header.SubInstance = EFI_SUBCLASS_INSTANCE_NON_APPLICABLE;
-  MemorySubClassData.Header.RecordType  = EFI_MEMORY_ARRAY_START_ADDRESS_RECORD_NUMBER;
-
-  //
-  // Process Memory String in form size!size ...
-  // So 64!64 is 128 MB
-  //
-  Nt32MemString   = PcdGetPtr (PcdWinNtMemorySize);
-  for (TotalMemorySize = 0; *Nt32MemString != '\0';) {
-    TotalMemorySize += StrDecimalToUint64 (Nt32MemString);
-    while (*Nt32MemString != '\0') {
-      if (*Nt32MemString == '!') {
-        Nt32MemString++;       
-        break;
-      }
-      Nt32MemString++;
-    }
-  }
-
-  MemorySubClassData.Record.ArrayStartAddress.MemoryArrayStartAddress               = 0;
-  MemorySubClassData.Record.ArrayStartAddress.MemoryArrayEndAddress                 = LShiftU64 (TotalMemorySize, 20) - 1;
-  MemorySubClassData.Record.ArrayStartAddress.PhysicalMemoryArrayLink.ProducerName  = gEfiCallerIdGuid;
-  MemorySubClassData.Record.ArrayStartAddress.PhysicalMemoryArrayLink.Instance      = 1;
-  MemorySubClassData.Record.ArrayStartAddress.PhysicalMemoryArrayLink.SubInstance   = EFI_SUBCLASS_INSTANCE_NON_APPLICABLE;
-  MemorySubClassData.Record.ArrayStartAddress.MemoryArrayPartitionWidth             = 0;
-
-  //
-  // Store memory size data record to data hub.
-  //
-  Status = DataHub->LogData (
-                      DataHub,
-                      &gEfiMemorySubClassGuid,
-                      &gEfiCallerIdGuid,
-                      EFI_DATA_RECORD_CLASS_DATA,
-                      &MemorySubClassData,
-                      sizeof (EFI_SUBCLASS_TYPE1_HEADER) + sizeof (EFI_MEMORY_ARRAY_START_ADDRESS_DATA)
-                      );
-
-
-  return EFI_SUCCESS;
+  EfiStatus = LogMemorySmbiosRecord();
+  return EfiStatus;
 }
-
-

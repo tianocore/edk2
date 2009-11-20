@@ -2,7 +2,7 @@
 # Component description file for Cpu module.
 #
 # This CPU module abstracts the interrupt subsystem of a platform and the CPU-specific setjump-long pair.
-# Copyright (c) 2006 - 2007, Intel Corporation
+# Copyright (c) 2006 - 2009, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -51,16 +51,13 @@
   UefiDriverEntryPoint
   DebugLib
   HiiLib
-  
-[Guids]
-  gEfiProcessorSubClassGuid                     # SOMETIMES_CONSUMED
 
 [Protocols]
   gEfiWinNtIoProtocolGuid                       # PROTOCOL_NOTIFY SOMETIMES_CONSUMED
-  gEfiDataHubProtocolGuid                       # PROTOCOL SOMETIMES_CONSUMED
+  gEfiSmbiosProtocolGuid                        # PROTOCOL SOMETIMES_CONSUMED
   gEfiWinNtIoProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
   gEfiCpuIoProtocolGuid                         # PROTOCOL ALWAYS_PRODUCED
   gEfiCpuArchProtocolGuid                       # PROTOCOL ALWAYS_PRODUCED
 
 [Depex]
-  gEfiDataHubProtocolGuid
+  gEfiSmbiosProtocolGuid
