@@ -210,6 +210,7 @@ INF  MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
 INF  IntelFrameworkModulePkg/Bus/Pci/IdeBusDxe/IdeBusDxe.inf
 INF  UnixPkg/UnixBusDriverDxe/UnixBusDriver.inf
  
+INF  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
 INF  UnixPkg/UnixBlockIoDxe/UnixBlockIo.inf
 INF  UnixPkg/UnixSerialIoDxe/UnixSerialIo.inf
 INF  UnixPkg/UnixUgaDxe/UnixUga.inf

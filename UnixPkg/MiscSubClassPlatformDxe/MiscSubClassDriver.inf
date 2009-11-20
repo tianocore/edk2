@@ -5,7 +5,7 @@
 #  All .uni file who tagged with "ToolCode="DUMMY"" in following file list is included by
 #  MiscSubclassDriver.uni file, the StrGather tool will expand MiscSubclassDriver.uni file 
 #  and parse all .uni file.
-# Copyright (c) 2006, Intel Corporation
+# Copyright (c) 2006 - 2009, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -35,33 +35,44 @@
 #
 
 [Sources.common]
-  MiscPortInternalConnectorDesignatorFunction.c
-  MiscSystemSlotDesignationData.c
-  MiscSystemOptionStringData.c
-  MiscSystemManufacturerFunction.c
-  MiscSystemManufacturerData.c
-  MiscSystemLanguageStringData.c
-  MiscResetCapabilitiesData.c
-  MiscPortInternalConnectorDesignatorData.c
-  MiscOemStringData.c
-  MiscNumberOfInstallableLanguagesData.c
-  MiscChassisManufacturerData.c
-  MiscBootInformationData.c
-  MiscBiosVendorData.c
+  MiscBaseBoardManufacturer.uni
   MiscBaseBoardManufacturerData.c
+  MiscBaseBoardManufacturerFunction.c
+  MiscBiosVendor.uni
+  MiscBiosVendorData.c
+  MiscBiosVendorFunction.c
+  MiscBootInformationData.c  
+  MiscBootInformationFunction.c
+  MiscChassisManufacturer.uni
+  MiscChassisManufacturerData.c
+  MiscChassisManufacturerFunction.c
+  MiscNumberOfInstallableLanguagesData.c
+  MiscNumberOfInstallableLanguagesFunction.c
+  MiscOemString.uni  
+  MiscOemStringData.c  
+  MiscOemStringFunction.c  
+  MiscPortInternalConnectorDesignator.uni
+  MiscPortInternalConnectorDesignatorData.c  
+  MiscPortInternalConnectorDesignatorFunction.c
+  MiscResetCapabilitiesData.c
+  MiscResetCapabilitiesFunction.c
+  MiscSystemLanguageString.uni
+  MiscSystemLanguageStringData.c
+  MiscSystemLanguageStringFunction.c
+  MiscSystemManufacturer.uni
+  MiscSystemManufacturerData.c
+  MiscSystemManufacturerFunction.c
+  MiscSystemOptionString.uni
+  MiscSystemOptionStringData.c
+  MiscSystemOptionStringFunction.c
+  MiscSystemSlotDesignation.uni
+  MiscSystemSlotDesignationData.c
+  MiscSystemSlotDesignationFunction.c
+  MiscDevicePath.h
+  MiscSubClassDriver.h
+  MiscSubClassDriver.uni
   MiscSubclassDriverDataTable.c
   MiscSubclassDriverEntryPoint.c
-  MiscSubClassDriver.uni
-  MiscSystemSlotDesignation.uni
-  MiscSystemOptionString.uni
-  MiscSystemManufacturer.uni
-  MiscSystemLanguageString.uni
-  MiscPortInternalConnectorDesignator.uni
-  MiscOemString.uni
-  MiscChassisManufacturer.uni
-  MiscBiosVendor.uni
-  MiscBaseBoardManufacturer.uni
-
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -81,20 +92,19 @@
   DebugLib
   BaseLib
 
-
-[Guids]
-  gEfiMemorySubClassGuid                        # SOMETIMES_CONSUMED
-  gEfiProcessorSubClassGuid                     # SOMETIMES_CONSUMED
-  gEfiMiscSubClassGuid                          # ALWAYS_CONSUMED
-
+  PcdLib
 
 [Protocols]
   gEfiUnixIoProtocolGuid                        # PROTOCOL_NOTIFY SOMETIMES_CONSUMED
-  gEfiDataHubProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
+  gEfiSmbiosProtocolGuid                        # PROTOCOL ALWAYS_CONSUMED
+
+[FixedPcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareReleaseDateString
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
 
 [Pcd.common]
   gEfiUnixPkgTokenSpaceGuid.PcdUnixMemorySize
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang
 
 [Depex]
-  gEfiDataHubProtocolGuid
-
+  gEfiSmbiosProtocolGuid
