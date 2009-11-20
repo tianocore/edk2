@@ -27,6 +27,17 @@
 
 #include <PiDxe.h>
 
+///
+/// Note:
+///   To avoid name conflict between PI and Framework SMM spec, the following names defined
+///   in PI 1.2 SMM spec are renamed. These renamings are not yet in a public PI spec and errta.
+///
+///   EFI_SMM_OPEN         -> EFI_SMM_OPEN2
+///   EFI_SMM_CLOSE        -> EFI_SMM_CLOSE2
+///   EFI_SMM_LOCK         -> EFI_SMM_LOCK2
+///   EFI_SMM_CAPABILITIES -> EFI_SMM_CAPABILITIES2
+///
+
 #define EFI_SMM_ACCESS2_PROTOCOL_GUID \
   { \
      0xc2702b74, 0x800c, 0x4131, {0x87, 0x46, 0x8f, 0xb5, 0xb8, 0x9c, 0xe4, 0xac } \
@@ -88,7 +99,7 @@ typedef struct _EFI_SMM_ACCESS2_PROTOCOL  EFI_SMM_ACCESS2_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_OPEN)(
+(EFIAPI *EFI_SMM_OPEN2)(
   IN EFI_SMM_ACCESS2_PROTOCOL  *This
   );
 
@@ -106,7 +117,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_CLOSE)(
+(EFIAPI *EFI_SMM_CLOSE2)(
   IN EFI_SMM_ACCESS2_PROTOCOL  *This
   );
 
@@ -123,7 +134,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_LOCK)(
+(EFIAPI *EFI_SMM_LOCK2)(
   IN EFI_SMM_ACCESS2_PROTOCOL  *This
   );
 
@@ -140,7 +151,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_CAPABILITIES)(
+(EFIAPI *EFI_SMM_CAPABILITIES2)(
   IN CONST EFI_SMM_ACCESS2_PROTOCOL  *This,
   IN OUT UINTN                       *SmramMapSize,
   IN OUT EFI_SMRAM_DESCRIPTOR        *SmramMap
@@ -152,10 +163,10 @@ EFI_STATUS
 ///  that the north bridge or memory controller would publish this protocol.
 /// 
 struct _EFI_SMM_ACCESS2_PROTOCOL {
-  EFI_SMM_OPEN          Open;
-  EFI_SMM_CLOSE         Close;
-  EFI_SMM_LOCK          Lock;
-  EFI_SMM_CAPABILITIES  GetCapabilities;
+  EFI_SMM_OPEN2          Open;
+  EFI_SMM_CLOSE2         Close;
+  EFI_SMM_LOCK2          Lock;
+  EFI_SMM_CAPABILITIES2  GetCapabilities;
   ///
   /// Indicates the current state of the SMRAM. Set to TRUE if SMRAM is locked.
   ///

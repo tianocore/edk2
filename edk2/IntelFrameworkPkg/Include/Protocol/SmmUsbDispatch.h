@@ -19,6 +19,10 @@
 #ifndef _EFI_SMM_USB_DISPATCH_H_
 #define _EFI_SMM_USB_DISPATCH_H_
 
+//
+// Share some common definitions with PI SMM
+//
+#include <Protocol/SmmUsbDispatch2.h>
 
 //
 // Global ID for the USB Protocol
@@ -29,14 +33,6 @@
   }
 
 typedef struct _EFI_SMM_USB_DISPATCH_PROTOCOL  EFI_SMM_USB_DISPATCH_PROTOCOL;
-
-//
-// Related Definitions
-//
-typedef enum {
-  UsbLegacy,
-  UsbWake
-} EFI_USB_SMI_TYPE;
 
 typedef struct {
   ///

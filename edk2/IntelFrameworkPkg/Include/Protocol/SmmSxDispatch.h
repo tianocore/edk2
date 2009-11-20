@@ -19,6 +19,10 @@
 #ifndef _EFI_SMM_SX_DISPATCH_H_
 #define _EFI_SMM_SX_DISPATCH_H_
 
+//
+// Share some common definitions with PI SMM
+//
+#include <Protocol/SmmSxDispatch2.h>
 
 //
 // Global ID for the Sx SMI Protocol
@@ -29,24 +33,6 @@
   }
 
 typedef struct _EFI_SMM_SX_DISPATCH_PROTOCOL  EFI_SMM_SX_DISPATCH_PROTOCOL;
-//
-// Related Definitions
-//
-typedef enum {
-  SxS0,
-  SxS1,
-  SxS2,
-  SxS3,
-  SxS4,
-  SxS5,
-  EfiMaximumSleepType
-} EFI_SLEEP_TYPE;
-
-typedef enum {
-  SxEntry,
-  SxExit,
-  EfiMaximumPhase
-} EFI_SLEEP_PHASE;
 
 typedef struct {
   EFI_SLEEP_TYPE  Type;

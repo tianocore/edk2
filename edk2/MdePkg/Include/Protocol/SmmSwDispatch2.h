@@ -20,6 +20,15 @@
 
 #include <Pi/PiSmmCis.h>
 
+///
+/// Note:
+///   To avoid name conflict between PI and Framework SMM spec, the following names defined
+///   in PI 1.2 SMM spec are renamed. These renamings are not yet in a public PI spec and errta.
+///
+///   EFI_SMM_SW_REGISTER   -> EFI_SMM_SW_REGISTER2
+///   EFI_SMM_SW_UNREGISTER -> EFI_SMM_SW_UNREGISTER2
+///
+
 #define EFI_SMM_SW_DISPATCH2_PROTOCOL_GUID \
   { \
     0x18a3c6dc, 0x5eea, 0x48c8, {0xa1, 0xc1, 0xb5, 0x33, 0x89, 0xf9, 0x89, 0x99 } \
@@ -88,7 +97,7 @@ typedef struct _EFI_SMM_SW_DISPATCH2_PROTOCOL  EFI_SMM_SW_DISPATCH2_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_SW_REGISTER)(
+(EFIAPI *EFI_SMM_SW_REGISTER2)(
   IN  CONST EFI_SMM_SW_DISPATCH2_PROTOCOL  *This,
   IN        EFI_SMM_HANDLER_ENTRY_POINT2   DispatchFunction,
   IN  CONST EFI_SMM_SW_REGISTER_CONTEXT    *RegisterContext,
@@ -109,7 +118,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_SW_UNREGISTER)(
+(EFIAPI *EFI_SMM_SW_UNREGISTER2)(
   IN CONST EFI_SMM_SW_DISPATCH2_PROTOCOL  *This,
   IN       EFI_HANDLE                     DispatchHandle
 );
@@ -122,8 +131,8 @@ EFI_STATUS
 /// interrupt in the EFI_SMM_SW_REGISTER_CONTEXT is denoted by MaximumSwiValue.
 ///
 struct _EFI_SMM_SW_DISPATCH2_PROTOCOL {
-  EFI_SMM_SW_REGISTER    Register;
-  EFI_SMM_SW_UNREGISTER  UnRegister;
+  EFI_SMM_SW_REGISTER2    Register;
+  EFI_SMM_SW_UNREGISTER2  UnRegister;
   ///
   /// A read-only field that describes the maximum value that can be used in the 
   /// EFI_SMM_SW_DISPATCH2_PROTOCOL.Register() service.

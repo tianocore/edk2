@@ -16,6 +16,12 @@
 #ifndef _SMM_CIS_H_
 #define _SMM_CIS_H_
 
+//
+// Share some common definitions with PI SMM
+//
+#include <Pi/PiSmmCis.h>
+#include <Protocol/SmmCpuIo.h>
+
 #define EFI_SMM_CPU_IO_GUID \
   { \
     0x5f439a0b, 0x45d8, 0x4682, {0xa4, 0xf4, 0xf0, 0x57, 0x6b, 0x51, 0x34, 0x41 } \
@@ -28,20 +34,7 @@ typedef struct _EFI_SMM_CPU_IO_INTERFACE  EFI_SMM_CPU_IO_INTERFACE;
 //
 // SMM Base specification constant and types
 //
-#define SMM_SMST_SIGNATURE            SIGNATURE_32 ('S', 'M', 'S', 'T')
 #define EFI_SMM_SYSTEM_TABLE_REVISION (0 << 16) | (0x09)
-
-//
-// *******************************************************
-// EFI_SMM_IO_WIDTH
-// *******************************************************
-//
-typedef enum {
-  SMM_IO_UINT8  = 0,
-  SMM_IO_UINT16 = 1,
-  SMM_IO_UINT32 = 2,
-  SMM_IO_UINT64 = 3
-} EFI_SMM_IO_WIDTH;
 
 /**
   Provides the basic memory and I/O interfaces that are used to
@@ -179,35 +172,6 @@ EFI_STATUS
 (EFIAPI *EFI_SMMCORE_FREE_PAGES)(
   IN EFI_PHYSICAL_ADDRESS   Memory,
   IN UINTN                  NumberOfPages
-  );
-
-/**
-  Lets the caller get one distinct application processor (AP) in the enabled processor pool to execite a 
-  caller-provided code stream while in SMM. 
-
-  @param  Procedure         A pointer to the code stream to be run on the designated AP of the system.
-  @param  CpuNumber         The zero-based index of the processor number of the AP on which the code stream is
-                            supposed to run. If the processor number points to the current processor or a disabled
-                            processor, then it will not run the supplied code.
-  @param  ProcArguments     Allows the caller to pass a list of parameters to the code that is run by
-                            the AP. It is an optional common mailbox between APs and the BSP to share information.
-
-  @retval EFI_SUCCESS           The call was successful and the return parameters are valid.
-  @retval EFI_INVALID_PARAMETER The input arguments are out of range.
-  @retval EFI_INVALID_PARAMETER The CPU requested is not available on this SMI invocation.
-  @retval EFI_INVALID_PARAMETER The CPU cannot support an additional service invocation.
-  
-  @note: Inconsistent with specification here:
-         In Framework Spec, this definition does not exist. This method is introduced in PI1.0 spec for 
-         implementation needs.
-         
-**/
-typedef
-EFI_STATUS
-(EFIAPI *EFI_SMM_STARTUP_THIS_AP)(
-  IN  FRAMEWORK_EFI_AP_PROCEDURE          Procedure,
-  IN  UINTN                               CpuNumber,
-  IN  OUT VOID                            *ProcArguments OPTIONAL
   );
 
 ///
