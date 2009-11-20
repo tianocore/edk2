@@ -324,6 +324,7 @@ typedef struct {
   UINT8   Type;
   UINT8   Reserved[5];
   UINT64  FwVendorId;
+  UINT8   Reserved2[40];
 } SAL_UPDATE_PAL_DATA_BLOCK;
 ///
 /// Data structure pointed by parameter param_buf.
