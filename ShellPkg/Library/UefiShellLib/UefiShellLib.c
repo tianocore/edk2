@@ -1489,12 +1489,15 @@ ShellFindFilePath (
   CHAR16            *RetVal;
   CHAR16            *TestPath;
   CONST CHAR16      *Walker;
+  UINTN             Size;
 
   RetVal = NULL;
 
   Path = ShellGetEnvironmentVariable(L"cwd");
   if (Path != NULL) {
-    TestPath = AllocateZeroPool((StrSize(Path) + StrSize(FileName)));
+    Size = StrSize(Path);
+    Size += StrSize(FileName);
+    TestPath = AllocateZeroPool(Size);
     StrCpy(TestPath, Path);
     StrCat(TestPath, FileName);
     Status = ShellOpenFileByName(TestPath, &Handle, EFI_FILE_MODE_READ, 0);
@@ -1508,7 +1511,9 @@ ShellFindFilePath (
   }
   Path = ShellGetEnvironmentVariable(L"path");
   if (Path != NULL) {
-    TestPath = AllocateZeroPool((StrSize(Path)+StrSize(FileName)));
+    Size = StrSize(Path);
+    Size += StrSize(FileName);
+    TestPath = AllocateZeroPool(Size);
     Walker = (CHAR16*)Path; 
     do {
       CopyMem(TestPath, Walker, StrSize(Walker));
@@ -2130,6 +2135,52 @@ ShellCommandLineGetCount(
 }
 
 /**
+  Determins if a parameter is duplicated.
+
+  If Param is not NULL then it will point to a callee allocated string buffer 
+  with the parameter value if a duplicate is found.
+
+  If CheckPackage is NULL, then ASSERT.
+
+  @param[in] CheckPackage       The package of parsed command line arguments.
+  @param[out] Param             Upon finding one, a pointer to the duplicated parameter.
+
+  @retval EFI_SUCCESS           No parameters were duplicated.
+  @retval EFI_DEVICE_ERROR      A duplicate was found.
+  **/
+EFI_STATUS
+EFIAPI
+ShellCommandLineCheckDuplicate (
+  IN CONST LIST_ENTRY              *CheckPackage,
+  OUT CHAR16                       **Param
+  )
+{
+  LIST_ENTRY                    *Node1;
+  LIST_ENTRY                    *Node2;
+  
+  ASSERT(CheckPackage != NULL);
+
+  for ( Node1 = GetFirstNode(CheckPackage) 
+      ; !IsNull (CheckPackage, Node1) 
+      ; Node1 = GetNextNode(CheckPackage, Node1) 
+      ){
+    for ( Node2 = GetNextNode(CheckPackage, Node1) 
+        ; !IsNull (CheckPackage, Node2) 
+        ; Node2 = GetNextNode(CheckPackage, Node2) 
+        ){
+      if (StrCmp(((SHELL_PARAM_PACKAGE*)Node1)->Name, ((SHELL_PARAM_PACKAGE*)Node2)->Name) == 0) {
+        if (Param != NULL) {
+          *Param = NULL;
+          *Param = StrnCatGrow(Param, NULL, ((SHELL_PARAM_PACKAGE*)Node1)->Name, 0);
+        }
+        return (EFI_DEVICE_ERROR);
+      }
+    }
+  }
+  return (EFI_SUCCESS);
+}
+
+/**
   This is a find and replace function.  it will return the NewString as a copy of 
   SourceString with each instance of FindTarget replaced with ReplaceWith.
 
@@ -2452,6 +2503,39 @@ ShellIsDirectory(
   }
 
   if (FileHandleIsDirectory(Handle) == EFI_SUCCESS) {
+    ShellCloseFile(&Handle);
+    return (EFI_SUCCESS);
+  }
+  ShellCloseFile(&Handle);
+  return (EFI_NOT_FOUND);
+}
+
+/**
+  Function to determine if a given filename represents a file.
+
+  @param[in] Name         Path to file to test.
+
+  @retval EFI_SUCCESS     The Path represents a file.
+  @retval EFI_NOT_FOUND   The Path does not represent a file.
+  @retval other           The path failed to open.
+**/
+EFI_STATUS
+EFIAPI
+ShellIsFile(
+  IN CONST CHAR16 *Name
+  )
+{
+  EFI_STATUS        Status;
+  EFI_FILE_HANDLE   Handle;
+
+  Handle = NULL;
+
+  Status = ShellOpenFileByName(Name, &Handle, EFI_FILE_MODE_READ, 0);
+  if (EFI_ERROR(Status)) {
+    return (Status);
+  }
+
+  if (FileHandleIsDirectory(Handle) != EFI_SUCCESS) {
     ShellCloseFile(&Handle);
     return (EFI_SUCCESS);
   }

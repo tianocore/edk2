@@ -718,8 +718,8 @@ ShellCommandLineGetFlag (
   
   If CheckPackage is NULL, then return NULL.
 
-  @param CheckPackage           The package of parsed command line arguments.
-  @param KeyString              The Key of the command line argument to check for.
+  @param[in] CheckPackage       The package of parsed command line arguments.
+  @param[in] KeyString          The Key of the command line argument to check for.
 
   @retval NULL                  The flag is not on the command line.
   @retval !=NULL                Pointer to unicode string of the value.
@@ -736,10 +736,10 @@ ShellCommandLineGetValue (
 
   Raw value parameters are in the form of "value" in a specific position in the list.
   
-  If CheckPackage is NULL, then return NULL;
+  If CheckPackage is NULL, then return NULL.
 
-  @param CheckPackage           The package of parsed command line arguments.
-  @param Position               The position of the value.
+  @param[in] CheckPackage       The package of parsed command line arguments.
+  @param[in] Position           The position of the value.
 
   @retval NULL                  The flag is not on the command line.
   @retval !=NULL                Pointer to unicode string of the value.
@@ -763,6 +763,27 @@ UINTN
 EFIAPI
 ShellCommandLineGetCount(
   VOID
+  );
+
+/**
+  Determins if a parameter is duplicated.
+
+  If Param is not NULL then it will point to a callee allocated string buffer 
+  with the parameter value if a duplicate is found.
+
+  If CheckPackage is NULL, then ASSERT.
+
+  @param[in] CheckPackage       The package of parsed command line arguments.
+  @param[out] Param             Upon finding one, a pointer to the duplicated parameter.
+
+  @retval EFI_SUCCESS           No parameters were duplicated.
+  @retval EFI_DEVICE_ERROR      A duplicate was found.
+  **/
+EFI_STATUS
+EFIAPI
+ShellCommandLineCheckDuplicate (
+  IN CONST LIST_ENTRY              *CheckPackage,
+  OUT CHAR16                       **Param
   );
 
 /**
