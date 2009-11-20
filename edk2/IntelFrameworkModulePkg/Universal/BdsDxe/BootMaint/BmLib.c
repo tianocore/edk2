@@ -1,7 +1,7 @@
 /** @file
   Utility routines used by boot maintenance modules.
 
-Copyright (c) 2004 - 2008, Intel Corporation. <BR>
+Copyright (c) 2004 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -431,64 +431,5 @@ EfiLibStrFromDatahub (
   IN EFI_DEVICE_PATH_PROTOCOL                 *DevPath
   )
 {
-  EFI_STATUS                                  Status;
-  UINT16                                      *Desc;
-  EFI_DATA_HUB_PROTOCOL                       *Datahub;
-  UINT64                                      Count;
-  EFI_DATA_RECORD_HEADER                      *Record;
-  EFI_SUBCLASS_TYPE1_HEADER                   *DataHdr;
-  EFI_GUID                                    MiscGuid;
-  EFI_MISC_ONBOARD_DEVICE_DATA                *Ob;
-  EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA *Port;
-  EFI_TIME                                    CurTime;
-
-  CopyGuid (&MiscGuid, &gEfiMiscSubClassGuid);
-
-  Status = gBS->LocateProtocol (
-                  &gEfiDataHubProtocolGuid,
-                  NULL,
-                  (VOID **) &Datahub
-                  );
-  if (EFI_ERROR (Status)) {
-    return NULL;
-  }
-
-  Status = gRT->GetTime (&CurTime, NULL);
-  if (EFI_ERROR (Status)) {
-    return NULL;
-  }
-
-  Count = 0;
-  do {
-    Status = Datahub->GetNextRecord (Datahub, &Count, NULL, &Record);
-
-    if (EFI_ERROR (Status)) {
-      break;
-    }
-
-    if (Record->DataRecordClass == EFI_DATA_RECORD_CLASS_DATA && CompareGuid (&Record->DataRecordGuid, &MiscGuid)) {
-      //
-      // This record is what we need
-      //
-      DataHdr = (EFI_SUBCLASS_TYPE1_HEADER *) (Record + 1);
-      if (EFI_MISC_ONBOARD_DEVICE_RECORD_NUMBER == DataHdr->RecordType) {
-        Ob = (EFI_MISC_ONBOARD_DEVICE_DATA *) (DataHdr + 1);
-        if (BdsLibMatchDevicePaths ((EFI_DEVICE_PATH_PROTOCOL *) &Ob->OnBoardDevicePath, DevPath)) {
-          GetProducerString (&Record->ProducerName, Ob->OnBoardDeviceDescription, &Desc);
-          return Desc;
-        }
-      }
-
-      if (EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_RECORD_NUMBER == DataHdr->RecordType) {
-        Port = (EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA *) (DataHdr + 1);
-        if (BdsLibMatchDevicePaths ((EFI_DEVICE_PATH_PROTOCOL *) &Port->PortPath, DevPath)) {
-          GetProducerString (&Record->ProducerName, Port->PortExternalConnectorDesignator, &Desc);
-          return Desc;
-        }
-      }
-    }
-
-  } while (TimeCompare (&Record->LogTime, &CurTime) && Count != 0);
-
   return NULL;
 }

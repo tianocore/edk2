@@ -577,22 +577,24 @@ GetProducerString (
   Convert Processor Frequency Data to a string.
 
   @param ProcessorFrequency The frequency data to process
+  @param Base10Exponent     The exponent based on 10
   @param String             The string that is created
 
 **/
 VOID
 ConvertProcessorToString (
-  IN  EFI_PROCESSOR_CORE_FREQUENCY_DATA *ProcessorFrequency,
-  OUT CHAR16                            **String
+  IN  UINT16                               ProcessorFrequency,
+  IN  UINT16                               Base10Exponent,
+  OUT CHAR16                               **String
   )
 {
   CHAR16  *StringBuffer;
   UINTN   Index;
   UINT32  FreqMhz;
 
-  if (ProcessorFrequency->Exponent >= 6) {
-    FreqMhz = ProcessorFrequency->Value;
-    for (Index = 0; Index < (UINTN) (ProcessorFrequency->Exponent - 6); Index++) {
+  if (Base10Exponent >= 6) {
+    FreqMhz = ProcessorFrequency;
+    for (Index = 0; Index < (UINTN) (Base10Exponent - 6); Index++) {
       FreqMhz *= 10;
     }
   } else {
@@ -605,11 +607,10 @@ ConvertProcessorToString (
   StrCat (StringBuffer, L".");
   UnicodeValueToString (StringBuffer + Index + 1, PREFIX_ZERO, (FreqMhz % 1000) / 10, 2);
   StrCat (StringBuffer, L" GHz");
-
   *String = (CHAR16 *) StringBuffer;
-
   return ;
 }
+
 
 /**
   Convert Memory Size to a string.
@@ -637,6 +638,74 @@ ConvertMemorySizeToString (
 }
 
 /**
+
+  Acquire the string associated with the Index from smbios structure and return it.
+  The caller is responsible for free the string buffer.
+
+  @param    OptionalStrStart  The start position to search the string
+  @param    Index             The index of the string to extract
+  @param    String            The string that is extracted
+
+  @retval   EFI_SUCCESS       The function returns EFI_SUCCESS always.
+
+**/
+EFI_STATUS
+GetOptionalStringByIndex (
+  IN      CHAR8                   *OptionalStrStart,
+  IN      UINT8                   Index,
+  OUT     CHAR16                  **String
+  )
+{
+  UINT8          StrNum;
+  UINTN          CurrentStrLen;
+  CHAR8*         CharInStr;
+  EFI_STATUS     Status;
+
+  StrNum        = 0;
+  Status        = EFI_NOT_FOUND;
+  CharInStr     = OptionalStrStart;
+
+  if (Index != 1) {
+    CurrentStrLen = 0;
+    //
+    // look for the two consecutive zeros, check the string limit by the way.
+    //
+    while (*CharInStr != 0 || *(CharInStr+1) != 0) { 
+      if (*CharInStr == 0) {
+        StrNum += 1;
+        CharInStr++;
+      }
+  
+      if (StrNum == Index) {
+        Status = EFI_SUCCESS;
+        break;
+      }
+  
+      CurrentStrLen = AsciiStrLen(CharInStr);
+  
+      //
+      // forward the pointer
+      //
+      OptionalStrStart = CharInStr;
+      CharInStr += CurrentStrLen;
+    }
+  
+    if (EFI_ERROR (Status)) {
+      *String = GetStringById (STRING_TOKEN (STR_MISSING_STRING));
+      return Status;
+    }
+  } else {
+    CurrentStrLen = AsciiStrLen(CharInStr);
+  }
+
+  *String = AllocatePool((CurrentStrLen + 1)*sizeof(CHAR16));
+  AsciiStrToUnicodeStr(OptionalStrStart, *String);
+
+  return EFI_SUCCESS;
+}
+
+
+/**
   Update the banner information for the Front Page based on DataHub information.
 
 **/
@@ -645,19 +714,18 @@ UpdateFrontPageStrings (
   VOID
   )
 {
+  UINT8                             StrIndex;
+  CHAR16                            *NewString;
+  BOOLEAN                           Find[5];
   EFI_STATUS                        Status;
   EFI_STRING_ID                     TokenToUpdate;
-  CHAR16                            *NewString;
-  UINT64                            MonotonicCount;
-  EFI_DATA_HUB_PROTOCOL             *DataHub;
-  EFI_DATA_RECORD_HEADER            *Record;
-  EFI_SUBCLASS_TYPE1_HEADER         *DataHeader;
-  EFI_MISC_BIOS_VENDOR_DATA         *BiosVendor;
-  EFI_MISC_SYSTEM_MANUFACTURER_DATA *SystemManufacturer;
-  EFI_PROCESSOR_VERSION_DATA        *ProcessorVersion;
-  EFI_PROCESSOR_CORE_FREQUENCY_DATA *ProcessorFrequency;
-  EFI_MEMORY_ARRAY_START_ADDRESS_DATA    *MemoryArray;
-  BOOLEAN                           Find[5];
+  EFI_SMBIOS_HANDLE                 SmbiosHandle;
+  EFI_SMBIOS_PROTOCOL               *Smbios;
+  SMBIOS_TABLE_TYPE0                *Type0Record;
+  SMBIOS_TABLE_TYPE1                *Type1Record;
+  SMBIOS_TABLE_TYPE4                *Type4Record;
+  SMBIOS_TABLE_TYPE19               *Type19Record;
+  EFI_SMBIOS_TABLE_HEADER           *Record;
 
   ZeroMem (Find, sizeof (Find));
 
@@ -665,89 +733,79 @@ UpdateFrontPageStrings (
   // Update Front Page strings
   //
   Status = gBS->LocateProtocol (
-                  &gEfiDataHubProtocolGuid,
+                  &gEfiSmbiosProtocolGuid,
                   NULL,
-                  (VOID **) &DataHub
+                  (VOID **) &Smbios
                   );
   ASSERT_EFI_ERROR (Status);
 
-  MonotonicCount  = 0;
-  Record          = NULL;
+  SmbiosHandle = 0;
   do {
-    Status = DataHub->GetNextRecord (DataHub, &MonotonicCount, NULL, &Record);
-    if (EFI_ERROR (Status) || Record == NULL) {
+    Status = Smbios->GetNext (Smbios, &SmbiosHandle, NULL, &Record, NULL);
+    if (EFI_ERROR(Status)) {
       break;
     }
-    if (Record->DataRecordClass == EFI_DATA_RECORD_CLASS_DATA) {
-      DataHeader = (EFI_SUBCLASS_TYPE1_HEADER *) (Record + 1);
-      if (CompareGuid (&Record->DataRecordGuid, &gEfiMiscSubClassGuid) &&
-          (DataHeader->RecordType == EFI_MISC_BIOS_VENDOR_RECORD_NUMBER)
-          ) {
-        BiosVendor = (EFI_MISC_BIOS_VENDOR_DATA *) (DataHeader + 1);
-        GetProducerString (&Record->ProducerName, BiosVendor->BiosVersion, &NewString);
-        TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_BIOS_VERSION);
-        HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
-        FreePool (NewString);
-        Find[0] = TRUE;
-      }
 
-      if (CompareGuid (&Record->DataRecordGuid, &gEfiMiscSubClassGuid) &&
-          (DataHeader->RecordType == EFI_MISC_SYSTEM_MANUFACTURER_RECORD_NUMBER)
-          ) {
-        SystemManufacturer = (EFI_MISC_SYSTEM_MANUFACTURER_DATA *) (DataHeader + 1);
-        GetProducerString (&Record->ProducerName, SystemManufacturer->SystemProductName, &NewString);
-        TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_COMPUTER_MODEL);
-        HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
-        FreePool (NewString);
-        Find[1] = TRUE;
-      }
+    if (Record->Type == EFI_SMBIOS_TYPE_BIOS_INFORMATION) {
+      Type0Record = (SMBIOS_TABLE_TYPE0 *) Record;
+      StrIndex = Type0Record->BiosVersion;
+      GetOptionalStringByIndex ((CHAR8*)(Type0Record+1), StrIndex, &NewString);
+      TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_BIOS_VERSION);
+      HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
+      FreePool (NewString);
+      Find[0] = TRUE;
+    }  
 
-      if (CompareGuid (&Record->DataRecordGuid, &gEfiProcessorSubClassGuid) &&
-          (DataHeader->RecordType == ProcessorVersionRecordType)
-          ) {
-        ProcessorVersion = (EFI_PROCESSOR_VERSION_DATA *) (DataHeader + 1);
-        GetProducerString (&Record->ProducerName, *ProcessorVersion, &NewString);
-        TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_CPU_MODEL);
-        HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
-        FreePool (NewString);
-        Find[2] = TRUE;
-      }
-
-      if (CompareGuid (&Record->DataRecordGuid, &gEfiProcessorSubClassGuid) &&
-          (DataHeader->RecordType == ProcessorCoreFrequencyRecordType)
-          ) {
-        ProcessorFrequency = (EFI_PROCESSOR_CORE_FREQUENCY_DATA *) (DataHeader + 1);
-        ConvertProcessorToString (ProcessorFrequency, &NewString);
-        TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_CPU_SPEED);
-        HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
-        FreePool (NewString);
-        Find[3] = TRUE;
-      }
-
-      if (CompareGuid (&Record->DataRecordGuid, &gEfiMemorySubClassGuid) &&
-          (DataHeader->RecordType == EFI_MEMORY_ARRAY_START_ADDRESS_RECORD_NUMBER)
-          ) {
-        MemoryArray = (EFI_MEMORY_ARRAY_START_ADDRESS_DATA *) (DataHeader + 1);
-        ConvertMemorySizeToString (
-          (UINT32)(RShiftU64((MemoryArray->MemoryArrayEndAddress - MemoryArray->MemoryArrayStartAddress + 1), 20)),
-          &NewString
-          );
-        TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_MEMORY_SIZE);
-        HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
-        FreePool (NewString);
-        Find[4] = TRUE;
-      }
+    if (Record->Type == EFI_SMBIOS_TYPE_SYSTEM_INFORMATION) {
+      Type1Record = (SMBIOS_TABLE_TYPE1 *) Record;
+      StrIndex = Type1Record->ProductName;
+      GetOptionalStringByIndex ((CHAR8*)(Type1Record+1), StrIndex, &NewString);
+      TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_COMPUTER_MODEL);
+      HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
+      FreePool (NewString);
+      Find[1] = TRUE;
     }
-  } while (!EFI_ERROR (Status) && (MonotonicCount != 0) && !(Find[0] && Find[1] && Find[2] && Find[3] && Find[4]));
+      
+    if (Record->Type == EFI_SMBIOS_TYPE_PROCESSOR_INFORMATION) {
+      Type4Record = (SMBIOS_TABLE_TYPE4 *) Record;
+      StrIndex = Type4Record->ProcessorVersion;
+      GetOptionalStringByIndex ((CHAR8*)(Type4Record+1), StrIndex, &NewString);
+      TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_CPU_MODEL);
+      HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
+      FreePool (NewString);
+      Find[2] = TRUE;
+    }    
 
+    if (Record->Type == EFI_SMBIOS_TYPE_PROCESSOR_INFORMATION) {
+      Type4Record = (SMBIOS_TABLE_TYPE4 *) Record;
+      ConvertProcessorToString(Type4Record->CurrentSpeed, 6, &NewString);
+      TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_CPU_SPEED);
+      HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
+      FreePool (NewString);
+      Find[3] = TRUE;
+    } 
+
+    if ( Record->Type == EFI_SMBIOS_TYPE_MEMORY_ARRAY_MAPPED_ADDRESS ) {
+      Type19Record = (SMBIOS_TABLE_TYPE19 *) Record;
+      ConvertMemorySizeToString (
+        (UINT32)(RShiftU64((Type19Record->EndingAddress - Type19Record->StartingAddress + 1), 10)),
+        &NewString
+        );
+      TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_MEMORY_SIZE);
+      HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
+      FreePool (NewString);
+      Find[4] = TRUE;  
+    }
+  } while ( !(Find[0] && Find[1] && Find[2] && Find[3] && Find[4]));
   return ;
 }
+
 
 /**
   Function waits for a given event to fire, or for an optional timeout to expire.
 
-  @param Event              The event to wait for
-  @param Timeout            An optional timeout value in 100 ns units.
+  @param   Event              The event to wait for
+  @param   Timeout            An optional timeout value in 100 ns units.
 
   @retval  EFI_SUCCESS      Event fired before Timeout expired.
   @retval  EFI_TIME_OUT     Timout expired before Event fired..
@@ -759,8 +817,8 @@ WaitForSingleEvent (
   IN UINT64                     Timeout OPTIONAL
   )
 {
-  EFI_STATUS  Status;
   UINTN       Index;
+  EFI_STATUS  Status;
   EFI_EVENT   TimerEvent;
   EFI_EVENT   WaitList[2];
 
@@ -774,10 +832,10 @@ WaitForSingleEvent (
       // Set the timer event
       //
       gBS->SetTimer (
-            TimerEvent,
-            TimerRelative,
-            Timeout
-            );
+             TimerEvent,
+             TimerRelative,
+             Timeout
+             );
 
       //
       // Wait for the original event or the timer
@@ -810,7 +868,7 @@ WaitForSingleEvent (
   Function show progress bar to wait for user input.
 
 
-  @param TimeoutDefault  The fault time out value before the system continue to boot.
+  @param   TimeoutDefault  The fault time out value before the system continue to boot.
 
   @retval  EFI_SUCCESS       User pressed some key except "Enter"
   @retval  EFI_TIME_OUT      Timout expired or user press "Enter"
@@ -821,13 +879,13 @@ ShowProgress (
   IN UINT16                       TimeoutDefault
   )
 {
-  EFI_STATUS                    Status;
   CHAR16                        *TmpStr;
+  UINT16                        TimeoutRemain;
+  EFI_STATUS                    Status;
+  EFI_INPUT_KEY                 Key;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL Foreground;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL Background;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL Color;
-  EFI_INPUT_KEY                 Key;
-  UINT16                        TimeoutRemain;
 
   if (TimeoutDefault == 0) {
     return EFI_TIMEOUT;

@@ -20,13 +20,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/MdeModuleHii.h>
 #include <Guid/FileSystemVolumeLabelInfo.h>
 #include <Protocol/DevicePath.h>
-#include <Guid/DataHubRecords.h>
+#include <IndustryStandard/SmBios.h>
 #include <Protocol/LoadFile.h>
 #include <Protocol/CpuIo.h>
 #include <Guid/FileInfo.h>
 #include <Protocol/HiiConfigRouting.h>
 #include <Protocol/Bds.h>
-#include <Protocol/DataHub.h>
+#include <Protocol/Smbios.h>
 #include <Protocol/UgaDraw.h>
 #include <Protocol/BlockIo.h>
 #include <Guid/GlobalVariable.h>
