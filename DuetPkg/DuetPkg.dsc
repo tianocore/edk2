@@ -133,7 +133,7 @@
   MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
 
 
-  DuetPkg/DataHubGenDxe/DataHubGen.inf
+  DuetPkg/SmbiosGenDxe/SmbiosGen.inf
   #DuetPkg/FvbRuntimeService/DUETFwh.inf
   DuetPkg/EfiLdr/EfiLdr.inf {
     <LibraryClasses>
