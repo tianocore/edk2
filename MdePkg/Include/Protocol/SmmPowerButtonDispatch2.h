@@ -23,6 +23,15 @@
 
 #include <Pi/PiSmmCis.h>
 
+///
+/// Note:
+///   To avoid name conflict between PI and Framework SMM spec, the following names defined
+///   in PI 1.2 SMM spec are renamed. These renamings are not yet in a public PI spec and errta.
+///
+///   EFI_SMM_POWER_BUTTON_REGISTER   -> EFI_SMM_POWER_BUTTON_REGISTER2
+///   EFI_SMM_POWER_BUTTON_UNREGISTER -> EFI_SMM_POWER_BUTTON_UNREGISTER2
+///
+
 #define EFI_SMM_POWER_BUTTON_DISPATCH2_PROTOCOL_GUID \
   { \
     0x1b1183fa, 0x1823, 0x46a7, {0x88, 0x72, 0x9c, 0x57, 0x87, 0x55, 0x40, 0x9d } \
@@ -75,7 +84,7 @@ typedef struct _EFI_SMM_POWER_BUTTON_DISPATCH2_PROTOCOL EFI_SMM_POWER_BUTTON_DIS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_POWER_BUTTON_REGISTER)(
+(EFIAPI *EFI_SMM_POWER_BUTTON_REGISTER2)(
   IN CONST EFI_SMM_POWER_BUTTON_DISPATCH2_PROTOCOL  *This,
   IN       EFI_SMM_HANDLER_ENTRY_POINT2             DispatchFunction,
   IN       EFI_SMM_POWER_BUTTON_REGISTER_CONTEXT    *RegisterContext,
@@ -96,7 +105,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_POWER_BUTTON_UNREGISTER)(
+(EFIAPI *EFI_SMM_POWER_BUTTON_UNREGISTER2)(
   IN CONST EFI_SMM_POWER_BUTTON_DISPATCH2_PROTOCOL  *This,
   IN       EFI_HANDLE                               DispatchHandle
   );
@@ -107,8 +116,8 @@ EFI_STATUS
 /// This protocol provides the parent dispatch service for the power button SMI source generator.
 ///
 struct _EFI_SMM_POWER_BUTTON_DISPATCH2_PROTOCOL {
-  EFI_SMM_POWER_BUTTON_REGISTER    Register;
-  EFI_SMM_POWER_BUTTON_UNREGISTER  UnRegister;
+  EFI_SMM_POWER_BUTTON_REGISTER2    Register;
+  EFI_SMM_POWER_BUTTON_UNREGISTER2  UnRegister;
 };
 
 extern EFI_GUID gEfiSmmPowerButtonDispatch2ProtocolGuid;

@@ -23,6 +23,16 @@
 
 #include <Pi/PiSmmCis.h>
 
+///
+/// Note:
+///   To avoid name conflict between PI and Framework SMM spec, the following names defined
+///   in PI 1.2 SMM spec are renamed. These renamings are not yet in a public PI spec and errta.
+///
+///   EFI_SMM_PERIODIC_TIMER_REGISTER   -> EFI_SMM_PERIODIC_TIMER_REGISTER2
+///   EFI_SMM_PERIODIC_TIMER_UNREGISTER -> EFI_SMM_PERIODIC_TIMER_UNREGISTER2
+///   EFI_SMM_PERIODIC_TIMER_INTERVAL   -> EFI_SMM_PERIODIC_TIMER_INTERVAL2
+///
+
 #define EFI_SMM_PERIODIC_TIMER_DISPATCH2_PROTOCOL_GUID \
   { \
     0x4cec368e, 0x8e8e, 0x4d71, {0x8b, 0xe1, 0x95, 0x8c, 0x45, 0xfc, 0x8a, 0x53 } \
@@ -105,7 +115,7 @@ typedef struct _EFI_SMM_PERIODIC_TIMER_DISPATCH2_PROTOCOL  EFI_SMM_PERIODIC_TIME
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_PERIODIC_TIMER_REGISTER)(
+(EFIAPI *EFI_SMM_PERIODIC_TIMER_REGISTER2)(
   IN CONST EFI_SMM_PERIODIC_TIMER_DISPATCH2_PROTOCOL  *This,
   IN       EFI_SMM_HANDLER_ENTRY_POINT2               DispatchFunction,
   IN CONST EFI_SMM_PERIODIC_TIMER_REGISTER_CONTEXT    *RegisterContext,
@@ -126,7 +136,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_PERIODIC_TIMER_UNREGISTER)(
+(EFIAPI *EFI_SMM_PERIODIC_TIMER_UNREGISTER2)(
   IN CONST EFI_SMM_PERIODIC_TIMER_DISPATCH2_PROTOCOL  *This,
   IN       EFI_HANDLE                                 DispatchHandle
   );
@@ -148,7 +158,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_PERIODIC_TIMER_INTERVAL)(
+(EFIAPI *EFI_SMM_PERIODIC_TIMER_INTERVAL2)(
   IN CONST EFI_SMM_PERIODIC_TIMER_DISPATCH2_PROTOCOL  *This,
   IN OUT UINT64                                       **SmiTickInterval
   );
@@ -159,9 +169,9 @@ EFI_STATUS
 /// This protocol provides the parent dispatch service for the periodical timer SMI source generator.
 ///
 struct _EFI_SMM_PERIODIC_TIMER_DISPATCH2_PROTOCOL {
-  EFI_SMM_PERIODIC_TIMER_REGISTER    Register;
-  EFI_SMM_PERIODIC_TIMER_UNREGISTER  UnRegister;
-  EFI_SMM_PERIODIC_TIMER_INTERVAL    GetNextShorterInterval;
+  EFI_SMM_PERIODIC_TIMER_REGISTER2    Register;
+  EFI_SMM_PERIODIC_TIMER_UNREGISTER2  UnRegister;
+  EFI_SMM_PERIODIC_TIMER_INTERVAL2    GetNextShorterInterval;
 };
 
 extern EFI_GUID gEfiSmmPeriodicTimerDispatch2ProtocolGuid;

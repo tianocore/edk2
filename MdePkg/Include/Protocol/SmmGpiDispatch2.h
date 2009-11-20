@@ -28,6 +28,15 @@
 
 #include <Pi/PiSmmCis.h>
 
+///
+/// Note:
+///   To avoid name conflict between PI and Framework SMM spec, the following names defined
+///   in PI 1.2 SMM spec are renamed. These renamings are not yet in a public PI spec and errta.
+///
+///   EFI_SMM_GPI_REGISTER   -> EFI_SMM_GPI_REGISTER2
+///   EFI_SMM_GPI_UNREGISTER -> EFI_SMM_GPI_UNREGISTER2
+///
+
 #define EFI_SMM_GPI_DISPATCH2_PROTOCOL_GUID \
   { \
     0x25566b03, 0xb577, 0x4cbf, {0x95, 0x8c, 0xed, 0x66, 0x3e, 0xa2, 0x43, 0x80 } \
@@ -77,7 +86,7 @@ typedef struct _EFI_SMM_GPI_DISPATCH2_PROTOCOL EFI_SMM_GPI_DISPATCH2_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_GPI_REGISTER)(
+(EFIAPI *EFI_SMM_GPI_REGISTER2)(
   IN CONST EFI_SMM_GPI_DISPATCH2_PROTOCOL  *This,
   IN       EFI_SMM_HANDLER_ENTRY_POINT2    DispatchFunction,
   IN CONST EFI_SMM_GPI_REGISTER_CONTEXT    *RegisterContext,
@@ -98,7 +107,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_GPI_UNREGISTER)(
+(EFIAPI *EFI_SMM_GPI_UNREGISTER2)(
   IN CONST EFI_SMM_GPI_DISPATCH2_PROTOCOL  *This,
   IN       EFI_HANDLE                      DispatchHandle
   );
@@ -110,8 +119,8 @@ EFI_STATUS
 /// for the General Purpose Input (GPI) SMI source generator.
 ///
 struct _EFI_SMM_GPI_DISPATCH2_PROTOCOL {
-  EFI_SMM_GPI_REGISTER    Register;
-  EFI_SMM_GPI_UNREGISTER  UnRegister;
+  EFI_SMM_GPI_REGISTER2    Register;
+  EFI_SMM_GPI_UNREGISTER2  UnRegister;
   ///
   /// Denotes the maximum value of inputs that can have handlers attached.
   ///

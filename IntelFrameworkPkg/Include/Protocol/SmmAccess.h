@@ -33,19 +33,6 @@ typedef struct _EFI_SMM_ACCESS_PROTOCOL  EFI_SMM_ACCESS_PROTOCOL;
   }
 
 //
-// SMM Access specification constant and types
-//
-// *******************************************************
-//  EFI_SMRAM_STATE
-// *******************************************************
-//
-#define EFI_SMRAM_OPEN    0x00000001
-#define EFI_SMRAM_CLOSED  0x00000002
-#define EFI_SMRAM_LOCKED  0x00000004
-#define EFI_CACHEABLE     0x00000008
-#define EFI_ALLOCATED     0x00000010
-
-//
 // SMM Access specification Member Function
 //
 /**

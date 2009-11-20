@@ -20,6 +20,15 @@
 
 #include <Pi/PiSmmCis.h>
 
+///
+/// Note:
+///   To avoid name conflict between PI and Framework SMM spec, the following names defined
+///   in PI 1.2 SMM spec are renamed. These renamings are not yet in a public PI spec and errta.
+///
+///   EFI_SMM_SX_REGISTER   -> EFI_SMM_SX_REGISTER2
+///   EFI_SMM_SX_UNREGISTER -> EFI_SMM_SX_UNREGISTER2
+///
+
 #define EFI_SMM_SX_DISPATCH2_PROTOCOL_GUID \
   { \
     0x456d2859, 0xa84b, 0x4e47, {0xa2, 0xee, 0x32, 0x76, 0xd8, 0x86, 0x99, 0x7d } \
@@ -93,7 +102,7 @@ typedef struct _EFI_SMM_SX_DISPATCH2_PROTOCOL  EFI_SMM_SX_DISPATCH2_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_SX_REGISTER)(
+(EFIAPI *EFI_SMM_SX_REGISTER2)(
   IN  CONST EFI_SMM_SX_DISPATCH2_PROTOCOL  *This,
   IN        EFI_SMM_HANDLER_ENTRY_POINT2   DispatchFunction,
   IN  CONST EFI_SMM_SX_REGISTER_CONTEXT    *RegisterContext,
@@ -114,7 +123,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_SX_UNREGISTER)(
+(EFIAPI *EFI_SMM_SX_UNREGISTER2)(
   IN CONST EFI_SMM_SX_DISPATCH2_PROTOCOL  *This,
   IN       EFI_HANDLE                     DispatchHandle
   );
@@ -126,8 +135,8 @@ EFI_STATUS
 /// respond to sleep state related events.
 ///
 struct _EFI_SMM_SX_DISPATCH2_PROTOCOL {
-  EFI_SMM_SX_REGISTER    Register;
-  EFI_SMM_SX_UNREGISTER  UnRegister;
+  EFI_SMM_SX_REGISTER2    Register;
+  EFI_SMM_SX_UNREGISTER2  UnRegister;
 };
 
 extern EFI_GUID gEfiSmmSxDispatch2ProtocolGuid;

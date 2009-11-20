@@ -23,6 +23,15 @@
 
 #include <Pi/PiSmmCis.h>
 
+///
+/// Note:
+///   To avoid name conflict between PI and Framework SMM spec, the following names defined
+///   in PI 1.2 SMM spec are renamed. These renamings are not yet in a public PI spec and errta.
+///
+///   EFI_SMM_USB_REGISTER   -> EFI_SMM_USB_REGISTER2
+///   EFI_SMM_USB_UNREGISTER -> EFI_SMM_USB_UNREGISTER2
+///
+
 #define EFI_SMM_USB_DISPATCH2_PROTOCOL_GUID \
   { \
     0xee9b8d90, 0xc5a6, 0x40a2, {0xbd, 0xe2, 0x52, 0x55, 0x8d, 0x33, 0xcc, 0xa1 } \
@@ -85,7 +94,7 @@ typedef struct _EFI_SMM_USB_DISPATCH2_PROTOCOL EFI_SMM_USB_DISPATCH2_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_USB_REGISTER)(
+(EFIAPI *EFI_SMM_USB_REGISTER2)(
   IN  CONST EFI_SMM_USB_DISPATCH2_PROTOCOL  *This,
   IN        EFI_SMM_HANDLER_ENTRY_POINT2    DispatchFunction,
   IN  CONST EFI_SMM_USB_REGISTER_CONTEXT    *RegisterContext,
@@ -109,7 +118,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_USB_UNREGISTER)(
+(EFIAPI *EFI_SMM_USB_UNREGISTER2)(
   IN CONST EFI_SMM_USB_DISPATCH2_PROTOCOL  *This,
   IN       EFI_HANDLE                      DispatchHandle
   );
@@ -120,8 +129,8 @@ EFI_STATUS
 /// This protocol provides the parent dispatch service for the USB SMI source generator.
 ///
 struct _EFI_SMM_USB_DISPATCH2_PROTOCOL {
-  EFI_SMM_USB_REGISTER    Register;
-  EFI_SMM_USB_UNREGISTER  UnRegister;
+  EFI_SMM_USB_REGISTER2    Register;
+  EFI_SMM_USB_UNREGISTER2  UnRegister;
 };
 
 extern EFI_GUID gEfiSmmUsbDispatch2ProtocolGuid;

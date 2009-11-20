@@ -27,6 +27,15 @@
 
 #include <PiDxe.h>
 
+///
+/// Note:
+///   To avoid name conflict between PI and Framework SMM spec, the following names defined
+///   in PI 1.2 SMM spec are renamed. These renamings are not yet in a public PI spec and errta.
+///
+///   EFI_SMM_ACTIVATE   -> EFI_SMM_ACTIVATE2
+///   EFI_SMM_DEACTIVATE -> EFI_SMM_DEACTIVATE2
+///
+
 #define EFI_SMM_CONTROL2_PROTOCOL_GUID \
   { \
     0x843dc720, 0xab1e, 0x42cb, {0x93, 0x57, 0x8a, 0x0, 0x78, 0xf3, 0x56, 0x1b}  \
@@ -54,7 +63,7 @@ typedef UINTN  EFI_SMM_PERIOD;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_ACTIVATE)(
+(EFIAPI *EFI_SMM_ACTIVATE2)(
   IN CONST EFI_SMM_CONTROL2_PROTOCOL  *This,
   IN OUT UINT8                        *CommandPort       OPTIONAL,
   IN OUT UINT8                        *DataPort          OPTIONAL,
@@ -76,7 +85,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_DEACTIVATE)(
+(EFIAPI *EFI_SMM_DEACTIVATE2)(
   IN CONST EFI_SMM_CONTROL2_PROTOCOL  *This,
   IN BOOLEAN                          Periodic OPTIONAL
   );
@@ -88,8 +97,8 @@ EFI_STATUS
 /// these signals.
 ///
 struct _EFI_SMM_CONTROL2_PROTOCOL {
-  EFI_SMM_ACTIVATE    Trigger;
-  EFI_SMM_DEACTIVATE  Clear;
+  EFI_SMM_ACTIVATE2    Trigger;
+  EFI_SMM_DEACTIVATE2  Clear;
   ///
   /// Minimum interval at which the platform can set the period.  A maximum is not 
   /// specified in that the SMM infrastructure code can emulate a maximum interval that is 

@@ -24,6 +24,11 @@
 #define _EFI_SMM_STANDBY_BUTTON_DISPATCH_H_
 
 //
+// Share some common definitions with PI SMM
+//
+#include <Protocol/SmmStandbyButtonDispatch2.h>
+
+//
 // Global ID for the Standby Button SMI Protocol
 //
 #define EFI_SMM_STANDBY_BUTTON_DISPATCH_PROTOCOL_GUID \
@@ -36,16 +41,6 @@ typedef struct _EFI_SMM_STANDBY_BUTTON_DISPATCH_PROTOCOL  EFI_SMM_STANDBY_BUTTON
 //
 // Related Definitions
 //
-
-///
-/// Standby Button. Example, Use for changing LEDs before ACPI OS is on.
-///    - DXE/BDS Phase
-///    - OS Install Phase
-///
-typedef enum {
-  EfiStandbyButtonEntry,
-  EfiStandbyButtonExit
-} EFI_STANDBY_BUTTON_PHASE;
 
 typedef struct {
   ///  Describes whether the child handler should be invoked upon the entry to the button

@@ -17,6 +17,15 @@
 #ifndef _SMM_CPU_IO_H_
 #define _SMM_CPU_IO_H_
 
+///
+/// Note:
+///   To avoid name conflict between PI and Framework SMM spec, the following names defined
+///   in PI 1.2 SMM spec are renamed. These renamings are not yet in a public PI spec and errta.
+///
+///   EFI_SMM_CPU_IO    -> EFI_SMM_CPU_IO2
+///   EFI_SMM_IO_ACCESS -> EFI_SMM_IO_ACCESS2
+///
+
 #define EFI_SMM_CPU_IO_PROTOCOL_GUID \
   { \
     0x3242A9D8, 0xCE70, 0x4AA0, { 0x95, 0x5D, 0x5E, 0x7B, 0x14, 0x0D, 0xE4, 0xD2 } \
@@ -55,7 +64,7 @@ typedef enum {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_CPU_IO)(
+(EFIAPI *EFI_SMM_CPU_IO2)(
   IN CONST EFI_SMM_CPU_IO_PROTOCOL  *This,
   IN EFI_SMM_IO_WIDTH               Width,
   IN UINT64                         Address,
@@ -67,19 +76,19 @@ typedef struct {
   ///
   /// This service provides the various modalities of memory and I/O read.
   ///
-  EFI_SMM_CPU_IO  Read;
+  EFI_SMM_CPU_IO2  Read;
   ///
   /// This service provides the various modalities of memory and I/O write.
   ///
-  EFI_SMM_CPU_IO  Write;
-} EFI_SMM_IO_ACCESS;
+  EFI_SMM_CPU_IO2  Write;
+} EFI_SMM_IO_ACCESS2;
 
 ///
 /// SMM CPU I/O Protocol provides CPU I/O and memory access within SMM.
 ///
 typedef struct _EFI_SMM_CPU_IO_PROTOCOL {
-  EFI_SMM_IO_ACCESS Mem;  ///< Allows reads and writes to memory-mapped I/O space.
-  EFI_SMM_IO_ACCESS Io;   ///< Allows reads and writes to I/O space.
+  EFI_SMM_IO_ACCESS2 Mem;  ///< Allows reads and writes to memory-mapped I/O space.
+  EFI_SMM_IO_ACCESS2 Io;   ///< Allows reads and writes to I/O space.
 };
 
 extern EFI_GUID gEfiSmmCpuIoProtocolGuid;
