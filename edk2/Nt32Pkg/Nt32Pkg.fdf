@@ -188,6 +188,7 @@ INF  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
 INF  Nt32Pkg/FvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
 INF  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
 INF  IntelFrameworkModulePkg/Universal/DataHubDxe/DataHubDxe.inf
+INF  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
 INF  MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
 INF  MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
 INF  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf

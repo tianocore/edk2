@@ -394,6 +394,7 @@
   Nt32Pkg/FvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
   IntelFrameworkModulePkg/Universal/DataHubDxe/DataHubDxe.inf
+  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
   MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
   MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
   Nt32Pkg/WinNtThunkDxe/WinNtThunkDxe.inf
