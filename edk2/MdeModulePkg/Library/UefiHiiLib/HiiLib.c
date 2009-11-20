@@ -1,7 +1,7 @@
 /** @file
   HII Library implementation that uses DXE protocols and services.
 
-  Copyright (c) 2006 - 2008, Intel Corporation<BR>
+  Copyright (c) 2006 - 2009, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -105,10 +105,10 @@ InternalHiiExtractGuidFromHiiHandle (
 /**
   Registers a list of packages in the HII Database and returns the HII Handle
   associated with that registration.  If an HII Handle has already been registered
-  with the same PackageListGuid, then NULL is returned.  If there are not enough 
-  resources to perform the registration, then NULL is returned.  If an empty list 
-  of packages is passed in, then NULL is returned.  If the size of the list of 
-  package is 0, then NULL is returned.
+  with the same PackageListGuid and DeviceHandle, then NULL is returned.  If there
+  are not enough resources to perform the registration, then NULL is returned.
+  If an empty list of packages is passed in, then NULL is returned.  If the size of
+  the list of package is 0, then NULL is returned.
 
   The variable arguments are pointers which point to package header that defined 
   by UEFI VFR compiler and StringGather tool.
@@ -145,7 +145,6 @@ HiiAddPackages (
   )
 {
   EFI_STATUS                   Status;
-  EFI_HII_HANDLE               *HiiHandleBuffer;
   VA_LIST                      Args;
   UINT32                       *Package;
   EFI_HII_PACKAGE_LIST_HEADER  *PackageListHeader;
@@ -154,16 +153,6 @@ HiiAddPackages (
   UINT8                        *Data;
 
   ASSERT (PackageListGuid != NULL);
-
-  //
-  // Check to see if an HII Handle has already been registered with the same 
-  // PackageListGuid
-  //
-  HiiHandleBuffer = HiiGetHiiHandles (PackageListGuid);
-  if (HiiHandleBuffer != NULL) {
-    FreePool (HiiHandleBuffer);
-    return NULL;
-  }
 
   //
   // Calculate the length of all the packages in the variable argument list
@@ -192,7 +181,7 @@ HiiAddPackages (
   PackageListHeader = AllocateZeroPool (Length);
 
   //
-  // If the Packahge List can not be allocated, then return a NULL HII Handle
+  // If the Package List can not be allocated, then return a NULL HII Handle
   //
   if (PackageListHeader == NULL) {
     return NULL;

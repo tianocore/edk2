@@ -1,7 +1,7 @@
 /** @file
   Public include file for the HII Library
 
-  Copyright (c) 2007 - 2008, Intel Corporation                                                         
+  Copyright (c) 2007 - 2009, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -24,10 +24,10 @@
 /**
   Registers a list of packages in the HII Database and returns the HII Handle
   associated with that registration.  If an HII Handle has already been registered
-  with the same PackageListGuid, then NULL is returned.  If there are not enough 
-  resources to perform the registration, then NULL is returned.  If an empty list 
-  of packages is passed in, then NULL is returned.  If the size of the list of 
-  package is 0, then NULL is returned.
+  with the same PackageListGuid and DeviceHandle, then NULL is returned.  If there
+  are not enough resources to perform the registration, then NULL is returned.
+  If an empty list of packages is passed in, then NULL is returned.  If the size of
+  the list of package is 0, then NULL is returned.
 
   The variable arguments are pointers that point to package headers defined 
   by UEFI VFR compiler and StringGather tool.
