@@ -276,8 +276,7 @@ GetFirstNode (
   @param  List  A pointer to the head node of a doubly linked list.
   @param  Node  A pointer to a node in the doubly linked list.
 
-  @return Pointer to the next node if one exists. Otherwise a null value which
-          is actually List is returned.
+  @return Pointer to the next node if one exists. Otherwise List is returned.
 
 **/
 LIST_ENTRY *
@@ -293,6 +292,42 @@ GetNextNode (
   ASSERT (InternalBaseLibIsNodeInList (List, Node, TRUE));
 
   return Node->ForwardLink;
+}
+
+/**
+  Retrieves the previous node of a doubly linked list.
+ 
+  Returns the node of a doubly linked list that precedes Node.  
+  List must have been initialized with INTIALIZE_LIST_HEAD_VARIABLE()
+  or InitializeListHead().  If List is empty, then List is returned.
+ 
+  If List is NULL, then ASSERT().
+  If Node is NULL, then ASSERT().
+  If List was not initialized with INTIALIZE_LIST_HEAD_VARIABLE() or 
+  InitializeListHead(), then ASSERT().
+  If PcdMaximumLinkedListLenth is not zero, and List contains more than
+  PcdMaximumLinkedListLenth nodes, then ASSERT().
+  If PcdVerifyNodeInList is TRUE and Node is not a node in List, then ASSERT().
+ 
+  @param  List  A pointer to the head node of a doubly linked list.
+  @param  Node  A pointer to a node in the doubly linked list.
+ 
+  @return Pointer to the previous node if one exists. Otherwise List is returned.
+ 
+**/
+LIST_ENTRY *
+EFIAPI
+GetPreviousNode (
+  IN      CONST LIST_ENTRY          *List,
+  IN      CONST LIST_ENTRY          *Node
+  )
+{
+  //
+  // ASSERT List not too long and Node is one of the nodes of List
+  //
+  ASSERT (InternalBaseLibIsNodeInList (List, Node, TRUE));
+ 
+  return Node->BackLink;
 }
 
 /**
