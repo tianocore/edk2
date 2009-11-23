@@ -68,17 +68,6 @@ EFI_STATUS
   );
 
 /**
-  Function prototype for invoking a function on an Application Processor.
-
-  @param[in,out] Buffer  Pointer to private data buffer.
-**/
-typedef
-VOID
-(EFIAPI *EFI_AP_PROCEDURE)(
-  IN OUT VOID  *Buffer
-  );
-
-/**
   The SmmStartupThisAp() lets the caller to get one distinct application processor
   (AP) in the enabled processor pool to execute a caller-provided code stream
   while in SMM. It runs the given code on this processor and reports the status.

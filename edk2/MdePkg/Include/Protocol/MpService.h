@@ -141,20 +141,6 @@ typedef struct {
 } EFI_PROCESSOR_INFORMATION;
 
 /**
-  Functions of this type are passed into StartUpAllAPs() and StartThisAP() to
-  execute a procedure on enabled APs.  The context the AP should use durng 
-  execution is specified by ProcedureArgument.
-  
-  @param[in]  ProcedureArgument   Pointer to the procedure's argument.
-
-**/
-typedef
-VOID
-(EFIAPI *EFI_AP_PROCEDURE)(
-  IN  VOID  *ProcedureArgument
-  );
-
-/**
   This service retrieves the number of logical processor in the platform
   and the number of those logical processors that are enabled on this boot.
   This service may only be called from the BSP.

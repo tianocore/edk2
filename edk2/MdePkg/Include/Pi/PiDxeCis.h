@@ -695,4 +695,19 @@ typedef struct {
 
 typedef DXE_SERVICES EFI_DXE_SERVICES;
 
+
+/**
+  Function prototype for invoking a function on an Application Processor.
+
+  This definition is used by the UEFI MP Serices Protocol, and the
+  PI SMM System Table.
+
+  @param[in,out] Buffer  Pointer to private data buffer.
+**/
+typedef
+VOID
+(EFIAPI *EFI_AP_PROCEDURE)(
+  IN OUT VOID  *Buffer
+  );
+
 #endif
