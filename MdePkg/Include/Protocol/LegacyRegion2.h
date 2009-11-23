@@ -15,9 +15,7 @@
   This Protocol is defined in UEFI Platform Initialization Specification 1.2 
   Volume 5: Standards
 
-  @attention This protocol appears to be 'EFI_LEGACY_REGION_PROTOCOL' in current PI 1.2
-  public spec. Therefore, some names are different from public PI 1.2 spec and we should
-  remove this attention when they appear in public PI 1.2 spec in the future. 
+  @attention Some definitions in this file do not match the PI 1.2 Specification.
 
 **/
 
