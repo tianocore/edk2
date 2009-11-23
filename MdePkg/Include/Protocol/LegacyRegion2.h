@@ -174,14 +174,25 @@ typedef enum {
 
 
 typedef struct {
-  UINT32                      Start;       ///< The beginning of the physical address of this
-                                           ///< region.
-  UINT32                      Length;      ///< The number of bytes in this region.
-  EFI_LEGACY_REGION_ATTRIBUTE Attribute;   ///< Attribute of the Legacy Region Descriptor that
-                                           ///< describes the capabilities for that memory region.  
-  UINT32                      Granularity; ///< Describes the byte length programmability
-                                           ///< associated with the Start address and the specified
-                                           ///< Attribute setting.
+  ///
+  /// The beginning of the physical address of this
+  /// region.
+  ///
+  UINT32                      Start;
+  ///
+  /// The number of bytes in this region.
+  ///
+  UINT32                      Length;
+  ///
+  /// Attribute of the Legacy Region Descriptor that
+  /// describes the capabilities for that memory region.
+  ///
+  EFI_LEGACY_REGION_ATTRIBUTE Attribute;
+  ///
+  /// Describes the byte length programmability
+  /// associated with the Start address and the specified
+  /// Attribute setting.
+  UINT32                      Granularity;
 } EFI_LEGACY_REGION_DESCRIPTOR;
 
 
@@ -213,28 +224,18 @@ EFI_STATUS
   );
 
 
-/**
-  Abstracts the hardware control of the physical address region 0xC0000-0xFFFFF.
-
-  The EFI_LEGACY_REGION2_PROTOCOL is used to abstract the hardware control of the memory 
-  attributes of the Option ROM shadowing region, 0xC0000 to 0xFFFFF.
-  
-  There are three memory attributes that can be modified through this protocol: read, write and
-  boot-lock. These protocols may be set in any combination.
-
-**/
+/// 
+/// The EFI_LEGACY_REGION2_PROTOCOL is used to abstract the hardware control of the memory 
+/// attributes of the Option ROM shadowing region, 0xC0000 to 0xFFFFF.
+/// There are three memory attributes that can be modified through this protocol: read, write and
+/// boot-lock. These protocols may be set in any combination.
+///
 struct _EFI_LEGACY_REGION2_PROTOCOL {
-  EFI_LEGACY_REGION2_DECODE     Decode;     ///< Modify the read attribute of a memory region. See
-                                            ///< the Decode() function description.
-  EFI_LEGACY_REGION2_LOCK       Lock;       ///< Modify the write attribute of a memory region to
-                                            ///< prevent writes. See the Lock() function description.
-  EFI_LEGACY_REGION2_BOOT_LOCK  BootLock;   ///< Modify the boot-lock attribute of a memory region to
-                                            ///< prevent future changes to the memory attributes for
-                                            ///< this region. See the BootLock() function description.
-  EFI_LEGACY_REGION2_UNLOCK     UnLock;     ///< Modify the write attribute of a memory region to
-                                            ///< allow writes. See the Unlock() function description. 
-  EFI_LEGACY_REGION_GET_INFO    GetInfo;    ///< Modify the write attribute of a memory region to
-                                            ///< allow writes. See the GetInfo() function description.
+  EFI_LEGACY_REGION2_DECODE     Decode;
+  EFI_LEGACY_REGION2_LOCK       Lock;
+  EFI_LEGACY_REGION2_BOOT_LOCK  BootLock;
+  EFI_LEGACY_REGION2_UNLOCK     UnLock;
+  EFI_LEGACY_REGION_GET_INFO    GetInfo;
 };
 
 extern EFI_GUID gEfiLegacyRegion2ProtocolGuid;
