@@ -1,6 +1,7 @@
 /** @file
   PCD DXE driver manage all PCD entry initialized in PEI phase and DXE phase, and
-  produce the implementation of PCD protocol.
+  produce the implementation of native PCD protocol and EFI_PCD_PROTOCOL defined in
+  PI 1.2 Vol3.
 
 Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -27,6 +28,10 @@ EFI_GUID *TmpTokenSpaceBuffer[PEI_EXMAPPING_TABLE_SIZE + DXE_EXMAPPING_TABLE_SIZ
 ///
 EFI_LOCK mPcdDatabaseLock = EFI_INITIALIZE_LOCK_VARIABLE(TPL_NOTIFY);
 
+//
+// PCD_PROTOCOL the native implementation provided by MdePkg which support dynamic 
+// type and dynamicEx type PCD.
+//
 PCD_PROTOCOL mPcdInstance = {
   DxePcdSetSku,
 
@@ -66,6 +71,10 @@ PCD_PROTOCOL mPcdInstance = {
   DxePcdGetNextTokenSpace
 };
 
+//
+// EFI_PCD_PROTOCOL is defined in PI 1.2 Vol 3 which only support dynamicEx type
+// PCD.
+//
 EFI_PCD_PROTOCOL mEfiPcdInstance = {
   DxePcdSetSku,
   DxePcdGet8Ex,
@@ -87,10 +96,8 @@ EFI_PCD_PROTOCOL mEfiPcdInstance = {
   DxePcdGetNextTokenSpace
 };
 
-//
-// Static global to reduce the code size
-//
-EFI_HANDLE mNewHandle = NULL;
+
+
 
 /**
   Main entry for PCD DXE driver.
@@ -110,8 +117,9 @@ PcdDxeInit (
   IN EFI_SYSTEM_TABLE     *SystemTable
   )
 {
-  EFI_STATUS          Status;
-
+  EFI_STATUS Status;
+  EFI_HANDLE mNewHandle;
+  
   //
   // Make sure the Pcd Protocol is not already installed in the system
   //
@@ -120,26 +128,20 @@ PcdDxeInit (
 
   BuildPcdDxeDataBase ();
 
-  Status = gBS->InstallProtocolInterface (
-                  &mNewHandle,
-                  &gPcdProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  &mPcdInstance
-                  );
-
+  mNewHandle = NULL;
   
   //
-  // Also install gEfiPcdProtocolGuid which is only support dynamic-ex type 
-  // PCD.
+  // Install PCD_PROTOCOL to handle dynamic type PCD
+  // Install EFI_PCD_PROTOCOL to handle dynamicEx type PCD
   //
-  mNewHandle = NULL;
-  Status = gBS->InstallProtocolInterface (
+  Status = gBS->InstallMultipleProtocolInterfaces (
                   &mNewHandle,
+                  &gPcdProtocolGuid,
+                  &mPcdInstance,
                   &gEfiPcdProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
                   &mEfiPcdInstance
                   );
-                  
+                 
   ASSERT_EFI_ERROR (Status);
 
   return EFI_SUCCESS;
