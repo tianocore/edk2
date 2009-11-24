@@ -1,6 +1,14 @@
 #/** @file
 # PCD PEIM produces PCD database to manage all dynamic PCD in PEI phase and install Pcd Ppi service.
 #
+# There are two PCD PPIs as follows:
+#   1) PCD_PPI 
+#      It is EDKII implementation which support Dynamic/DynamicEx Pcds.
+#   2) EFI_PEI_PCD_PPI
+#      It is defined by PI specification 1.2, Vol 3 which only support dynamicEx 
+#      type Pcd.
+# For dynamicEx type PCD, it is compatible between PCD_PPI and EFI_PEI_PCD_PPI.
+#
 # ////////////////////////////////////////////////////////////////////////////////
 # //                                                                            //
 # //                      Introduction of PCD database                          //

@@ -1,6 +1,17 @@
 #/** @file
 # PCD DXE driver manage database contains all dynamic PCD entries initialized in 
 # PEI phase, DXE phase and produce the implementation of PCD protocol.
+#
+# There are two PCD Protocols as follows:
+#   1) PCD_PROTOCOL 
+#      It is EDKII implementation which support Dynamic/DynamicEx type Pcds.
+#   2) EFI_PCD_PROTOCOL_PPI
+#      It is defined by PI specification 1.2, Vol 3 which only support dynamicEx 
+#      type Pcd.
+#
+# For dynamicEx type PCD, it is compatible between PCD_PPI and EFI_PEI_PCD_PPI. 
+# PCD DXE driver will produce above two protocols at same time.
+#
 # PCD database structure is generated at autogen.h/autogen.c in build time.
 #
 # ////////////////////////////////////////////////////////////////////////////////
