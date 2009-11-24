@@ -14,10 +14,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Service.h"
 
-//
-// Instance of PCD_PPI protocol is native implementation by MdePkg.
-// This protocol instance support dynamic and dynamicEx type PCDs.
-//
+///
+/// Instance of PCD_PPI protocol is EDKII native implementation.
+/// This protocol instance support dynamic and dynamicEx type PCDs.
+///
 PCD_PPI mPcdPpiInstance = {
   PeiPcdSetSku,
 
@@ -57,10 +57,10 @@ PCD_PPI mPcdPpiInstance = {
   PeiPcdGetNextTokenSpace
 };
 
-//
-// Instance of EFI_PEI_PCD_PPI which is defined in PI 1.2 Vol 3.
-// This PPI instance only support dyanmicEx type PCD.
-//
+///
+/// Instance of EFI_PEI_PCD_PPI which is defined in PI 1.2 Vol 3.
+/// This PPI instance only support dyanmicEx type PCD.
+///
 EFI_PEI_PCD_PPI  mEfiPcdPpiInstance = {
   PeiPcdSetSku,
   
@@ -83,16 +83,17 @@ EFI_PEI_PCD_PPI  mEfiPcdPpiInstance = {
   PeiPcdGetNextTokenSpace
 };
 
-EFI_PEI_PPI_DESCRIPTOR  mPpiPCD = {
-  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
-  &gPcdPpiGuid,
-  &mPcdPpiInstance
-};
-
-EFI_PEI_PPI_DESCRIPTOR  mEfiPpiPCD = {
-  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
-  &gEfiPeiPcdPpiGuid,
-  &mEfiPcdPpiInstance
+EFI_PEI_PPI_DESCRIPTOR  mPpiList[] = {
+  {
+    EFI_PEI_PPI_DESCRIPTOR_PPI,
+    &gPcdPpiGuid,
+    &mPcdPpiInstance
+  },
+  {
+    (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+    &gEfiPeiPcdPpiGuid,
+    &mEfiPcdPpiInstance
+  }
 };
 
 /**
@@ -118,16 +119,9 @@ PcdPeimInit (
   BuildPcdDatabase ();
 
   //
-  // Install PCD_PPI which produce support for dynamic and dynamicEx PCD
+  // Install PCD_PPI and EFI_PEI_PCD_PPI.
   //
-  Status = PeiServicesInstallPpi (&mPpiPCD);
-  ASSERT_EFI_ERROR (Status);
-  
-  //
-  // Install EFI_PCD_PPI which produce support for dynamicEx PCD which is defined
-  // in PI 1.2 Vol 3 specification.
-  //
-  Status = PeiServicesInstallPpi (&mEfiPpiPCD);
+  Status = PeiServicesInstallPpi (&mPpiList[0]);
   ASSERT_EFI_ERROR (Status);
   
   return Status;
