@@ -55,7 +55,7 @@ PcdLibConstructor (
   // PI Pcd protocol defined in PI 1.2 vol3 should be installed before the module 
   // access DynamicEx type PCD.
   //
-  Status = gBS->LocateProtocol (&gEfiPcdProtocolGuid, NULL, (VOID **) mPiPcd);
+  Status = gBS->LocateProtocol (&gEfiPcdProtocolGuid, NULL, (VOID **) &mPiPcd);
   
   ASSERT_EFI_ERROR (Status);
   ASSERT (mPiPcd!= NULL);
