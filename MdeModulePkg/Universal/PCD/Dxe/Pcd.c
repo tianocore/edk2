@@ -28,10 +28,10 @@ EFI_GUID *TmpTokenSpaceBuffer[PEI_EXMAPPING_TABLE_SIZE + DXE_EXMAPPING_TABLE_SIZ
 ///
 EFI_LOCK mPcdDatabaseLock = EFI_INITIALIZE_LOCK_VARIABLE(TPL_NOTIFY);
 
-//
-// PCD_PROTOCOL the native implementation provided by MdePkg which support dynamic 
-// type and dynamicEx type PCD.
-//
+///
+/// PCD_PROTOCOL the EDKII native implementation which support dynamic 
+/// type and dynamicEx type PCDs.
+///
 PCD_PROTOCOL mPcdInstance = {
   DxePcdSetSku,
 
@@ -71,10 +71,10 @@ PCD_PROTOCOL mPcdInstance = {
   DxePcdGetNextTokenSpace
 };
 
-//
-// EFI_PCD_PROTOCOL is defined in PI 1.2 Vol 3 which only support dynamicEx type
-// PCD.
-//
+///
+/// EFI_PCD_PROTOCOL is defined in PI 1.2 Vol 3 which only support dynamicEx type
+/// PCD.
+///
 EFI_PCD_PROTOCOL mEfiPcdInstance = {
   DxePcdSetSku,
   DxePcdGet8Ex,
@@ -96,8 +96,7 @@ EFI_PCD_PROTOCOL mEfiPcdInstance = {
   DxePcdGetNextTokenSpace
 };
 
-
-
+EFI_HANDLE mPcdHandle = NULL;
 
 /**
   Main entry for PCD DXE driver.
@@ -118,7 +117,6 @@ PcdDxeInit (
   )
 {
   EFI_STATUS Status;
-  EFI_HANDLE mNewHandle;
   
   //
   // Make sure the Pcd Protocol is not already installed in the system
@@ -128,23 +126,20 @@ PcdDxeInit (
 
   BuildPcdDxeDataBase ();
 
-  mNewHandle = NULL;
-  
   //
   // Install PCD_PROTOCOL to handle dynamic type PCD
   // Install EFI_PCD_PROTOCOL to handle dynamicEx type PCD
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
-                  &mNewHandle,
-                  &gPcdProtocolGuid,
-                  &mPcdInstance,
-                  &gEfiPcdProtocolGuid,
-                  &mEfiPcdInstance
+                  &mPcdHandle,
+                  &gPcdProtocolGuid,     &mPcdInstance,
+                  &gEfiPcdProtocolGuid,  &mEfiPcdInstance,
+                  NULL
                   );
                  
   ASSERT_EFI_ERROR (Status);
 
-  return EFI_SUCCESS;
+  return Status;
 
 }
 
