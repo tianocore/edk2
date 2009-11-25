@@ -20,6 +20,7 @@
 #include <Library/PeiServicesLib.h>
 #include <Ppi/TemporaryRamSupport.h>
 #include <Library/PcdLib.h>
+#include <Library/UefiCpuLib.h>
 
 #include "SecMain.h"
 
@@ -71,6 +72,12 @@ SecCoreStartupWithStack (
   UINT8                       *TopOfTempRam;
   UINTN                       SizeOfTempRam;
   VOID                        *IdtPtr;
+
+  //
+  // Initialize floating point operating environment
+  // to be compliant with UEFI spec.
+  //
+  InitializeFloatingPointUnits ();
 
   DEBUG ((EFI_D_ERROR,
     "SecCoreStartupWithStack(0x%x, 0x%x, 0x%x, 0x%x)\n",
