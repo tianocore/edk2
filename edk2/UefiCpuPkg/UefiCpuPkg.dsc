@@ -50,4 +50,4 @@
 
 [Components.common]
   UefiCpuPkg/CpuIoDxe/CpuIo.inf
-
+  UefiCpuPkg/Library/BaseUefiCpuLib/BaseUefiCpuLib.inf

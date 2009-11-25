@@ -24,3 +24,8 @@
 [Includes.common]
   Include
 
+[LibraryClasses]
+  ##  @libraryclass  Defines some routines that are generic for IA32 family CPU
+  ##                 to be UEFI specification compliant.
+  ##
+  UefiCpuLib|Include/Library/UefiCpuLib.h
