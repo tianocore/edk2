@@ -642,6 +642,10 @@ PeiFfsFindNextVolume (
   PEI_CORE_INSTANCE  *Private;
   PEI_CORE_FV_HANDLE *CoreFvHandle;
   
+  if (VolumeHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
   Private = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
   
   CoreFvHandle = FindNextCoreFvHandle (Private, Instance);
