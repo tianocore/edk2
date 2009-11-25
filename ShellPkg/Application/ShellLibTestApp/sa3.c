@@ -48,15 +48,15 @@ UefiMain (
   EFI_FILE_HANDLE     FileHandle;
   EFI_STATUS          Status;
   CHAR16              FileName[100];
-//  UINTN               BufferSize;
-//  UINT64              Position;
-//  UINT8               Buffer[200];
+  UINTN               BufferSize;
+  UINT64              Position;
+  UINT8               Buffer[200];
   EFI_FILE_INFO       *pFileInfo;
   UINT64              Size;
   BOOLEAN             NoFile;
   EFI_SHELL_FILE_INFO *pShellFileInfo;
   LIST_ENTRY          *List;
-  CONST CHAR16              *Tester;
+  // CONST CHAR16              *Tester;
   
   FileHandle = NULL;
   StrCpy(FileName, L"testfile.txt");
@@ -76,8 +76,8 @@ UefiMain (
     ASSERT(ShellCommandLineGetFlag(List, L"/Param1") != FALSE);
     ASSERT(StrCmp(ShellCommandLineGetValue(List, L"/Param2"), L"Val1")==0);
     ASSERT(StrCmp(ShellCommandLineGetRawValue(List, 0), L"SimpleApplication.efi")==0);
-    Tester = ShellCommandLineGetValue(List, L"/Param3");
-    Tester = ShellCommandLineGetValue(List, L"/Param4");
+    // Tester = ShellCommandLineGetValue(List, L"/Param3");
+    // Tester = ShellCommandLineGetValue(List, L"/Param4");
 
     ShellCommandLineFreeVarList(List);
   } else {
