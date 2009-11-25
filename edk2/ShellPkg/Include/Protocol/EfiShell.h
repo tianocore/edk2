@@ -788,9 +788,9 @@ EFI_STATUS
                                 this is stored in a volatile fashion.  FALSE otherwise.
   @return                      	If Alias is not NULL, it will return a pointer to 
                                 the null-terminated command for that alias. 
-                                If Alias is NULL, ReturnedData points to a ‘;’ 
+                                If Alias is NULL, ReturnedData points to a ';' 
                                 delimited list of alias (e.g. 
-                                ReturnedData = “dir;del;copy;mfp”) that is null-terminated.  
+                                ReturnedData = "dir;del;copy;mfp") that is null-terminated.  
   @retval NULL                  An error ocurred.
   @retval NULL                  Alias was not a valid Alias.
 **/
