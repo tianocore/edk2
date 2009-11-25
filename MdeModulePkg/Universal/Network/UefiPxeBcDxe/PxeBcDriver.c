@@ -534,6 +534,14 @@ PxeBcDriverBindingStop (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+  
+  //
+  // Stop functionality of PXE Base Code protocol
+  //
+  Status = PxeBc->Stop (PxeBc);
+  if (Status != EFI_SUCCESS && Status != EFI_NOT_STARTED) {
+    return Status;
+  }
 
   Private = PXEBC_PRIVATE_DATA_FROM_PXEBC (PxeBc);
 

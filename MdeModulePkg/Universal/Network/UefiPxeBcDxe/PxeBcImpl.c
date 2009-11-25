@@ -2697,12 +2697,14 @@ EfiPxeLoadFile (
   // Check download status
   //
   if (Status == EFI_SUCCESS) {
+    PxeBc->Stop (PxeBc); 
     return EFI_SUCCESS;
 
   } else if (Status == EFI_BUFFER_TOO_SMALL) {
     if (Buffer != NULL) {
       AsciiPrint ("PXE-E05: Download buffer is smaller than requested file.\n");
     } else {
+      PxeBc->Stop (PxeBc); 
       return Status;
     }
 
