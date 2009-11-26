@@ -1,8 +1,7 @@
 /** @file
-  This driver implements a sample platform security service, which does 
-  nothing and always return EFI_SUCCESS.
-  
-  Copyright (c) 2006 - 2008, Intel Corporation                                              
+  This driver produces security architectural protocol based on SecurityManagementLib.
+ 
+  Copyright (c) 2006 - 2009, Intel Corporation                                              
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -19,6 +18,7 @@
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiDriverEntryPoint.h>
+#include <Library/SecurityManagementLib.h>
 
 //
 // Handle for the Security Architectural Protocol instance produced by this driver
@@ -68,11 +68,7 @@ SecurityStubAuthenticateState (
   IN CONST EFI_DEVICE_PATH_PROTOCOL    *File
   )
 {
-  if (File == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  return EFI_SUCCESS;
+  return ExecuteSecurityHandlers (AuthenticationStatus, File);
 }
 
 //
