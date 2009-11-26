@@ -24,6 +24,7 @@
 #include <Pi/PiHob.h>
 #include <Pi/PiDependency.h>
 #include <Pi/PiStatusCode.h>
+#include <Pi/PiS3BootScript.h>
 
 /**
   Produces an error code in the range reserved for use by the Platform Initialization
