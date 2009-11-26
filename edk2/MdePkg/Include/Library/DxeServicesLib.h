@@ -1,8 +1,8 @@
 /** @file
   MDE DXE Services Library provides functions that simplify the development of DXE Drivers.  
-  These functions help access data from sections of FFS files.
+  These functions help access data from sections of FFS files or from file path.
 
-  Copyright (c) 2008, Intel Corporation<BR>                                                         
+  Copyright (c) 2008 - 2009, Intel Corporation<BR>                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -152,6 +152,42 @@ GetSectionFromFfs (
   IN  UINTN                         SectionInstance,
   OUT VOID                          **Buffer,
   OUT UINTN                         *Size
+  );
+
+
+/**
+  Get the image file buffer data and buffer size by its device path. 
+  
+  Access the file either from a firmware volume, from a file system interface, 
+  or from the load file interface.
+  
+  Allocate memory to store the found image. The caller is responsible to free memory.
+
+  If File is NULL, then NULL is returned.
+  If FileSize is NULL, then NULL is returned.
+  If AuthenticationStatus is NULL, then NULL is returned.
+
+  @param[in]       BootPolicy 
+                             Policy for Open Image File.If TRUE, indicates that the request 
+                             originates from the boot manager, and that the boot manager is
+                             attempting to load FilePath as a boot selection. If FALSE, 
+                             then FilePath must match an exact file to be loaded.
+  @param[in]       File      Pointer to the device path of the file that is absracted to the file buffer.
+  @param[out]      FileSize  Pointer to the size of the abstracted file buffer.
+  @param[out]      AuthenticationStatus   
+                             Pointer to a caller-allocated UINT32 in which
+                             the authentication status is returned.
+
+  @retval NULL   File is NULL, or FileSize is NULL. Or the file can't be found.
+  @retval other  The abstracted file buffer. The caller is responsible to free memory.
+**/
+VOID *
+EFIAPI
+GetFileBufferByFilePath (
+  IN BOOLEAN                           BootPolicy,
+  IN CONST EFI_DEVICE_PATH_PROTOCOL    *FilePath,
+  OUT      UINTN                       *FileSize,
+  OUT UINT32                           *AuthenticationStatus
   );
 
 #endif

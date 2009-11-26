@@ -1,8 +1,8 @@
 /** @file
   MDE DXE Services Library provides functions that simplify the development of DXE Drivers.  
-  These functions help access data from sections of FFS files.
+  These functions help access data from sections of FFS files or from file path.
 
-  Copyright (c) 2007 - 2008, Intel Corporation<BR>
+  Copyright (c) 2007 - 2009, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -17,10 +17,15 @@
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/DevicePathLib.h>
+#include <Library/UefiLib.h>
 #include <Library/DxeServicesLib.h>
 #include <Protocol/FirmwareVolume2.h>
 #include <Protocol/LoadedImage.h>
-
+#include <Protocol/LoadFile2.h>
+#include <Protocol/LoadFile.h>
+#include <Protocol/SimpleFileSystem.h>
+#include <Guid/FileInfo.h>
 
 /**
   Identify the device handle from which the Image is loaded from. As this device handle is passed to
@@ -392,3 +397,332 @@ GetSectionFromFfs (
            );
 }
 
+
+/**
+  Get the image file buffer data and buffer size by its device path. 
+  
+  Access the file either from a a firmware volume, from a file system interface, 
+  or from the load file interface.
+  
+  Allocate memory to store the found image. The caller is responsible to free memory.
+
+  If File is NULL, then NULL is returned.
+  If FileSize is NULL, then NULL is returned.
+  If AuthenticationStatus is NULL, then NULL is returned.
+
+  @param[in]       BootPolicy 
+                             Policy for Open Image File.If TRUE, indicates that the request 
+                             originates from the boot manager, and that the boot manager is
+                             attempting to load FilePath as a boot selection. If FALSE, 
+                             then FilePath must match an exact file to be loaded.
+  @param[in]       FilePath  Pointer to the device path of the file that is absracted to the file buffer.
+  @param[out]      FileSize  Pointer to the size of the abstracted file buffer.
+  @param[out]      AuthenticationStatus   
+                             Pointer to a caller-allocated UINT32 in which
+                             the authentication status is returned.
+
+  @retval NULL   File is NULL, or FileSize is NULL. Or the file can't be found.
+  @retval other  The abstracted file buffer. The caller is responsible to free memory.
+**/
+VOID *
+EFIAPI
+GetFileBufferByFilePath (
+  IN BOOLEAN                           BootPolicy,
+  IN CONST EFI_DEVICE_PATH_PROTOCOL    *FilePath,
+  OUT      UINTN                       *FileSize,
+  OUT UINT32                           *AuthenticationStatus
+  )
+{
+  EFI_DEVICE_PATH_PROTOCOL          *DevicePathNode;
+  EFI_DEVICE_PATH_PROTOCOL          *OrigDevicePathNode;
+  EFI_HANDLE                        Handle;
+  EFI_GUID                          *FvNameGuid;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL     *FwVol;
+  EFI_SECTION_TYPE                  SectionType;
+  UINT8                             *ImageBuffer;
+  UINTN                             ImageBufferSize;
+  EFI_FV_FILETYPE                   Type;
+  EFI_FV_FILE_ATTRIBUTES            Attrib;
+  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL   *Volume;
+  EFI_FILE_HANDLE                   FileHandle;
+  EFI_FILE_HANDLE                   LastHandle;
+  EFI_FILE_INFO                     *FileInfo;
+  UINTN                             FileInfoSize;
+  EFI_LOAD_FILE_PROTOCOL            *LoadFile;
+  EFI_LOAD_FILE2_PROTOCOL           *LoadFile2;
+  EFI_STATUS                        Status;
+
+  //
+  // Check input File device path.
+  //
+  if (FilePath == NULL || FileSize == NULL || AuthenticationStatus == NULL) {
+    return NULL;
+  }
+
+  //
+  // Init local variable
+  //
+  FvNameGuid          = NULL;
+  FileInfo            = NULL;
+  FileHandle          = NULL;
+  ImageBuffer         = NULL;
+  ImageBufferSize     = 0;
+  *AuthenticationStatus = 0;
+  
+  //
+  // Copy File Device Path
+  //
+  OrigDevicePathNode = DuplicateDevicePath (FilePath);
+  if (OrigDevicePathNode == NULL) {
+    return NULL;
+  }
+
+  //
+  // Check whether this device path support FV2 protocol.
+  // Is so, this device path may contain a Image.
+  //
+  DevicePathNode = OrigDevicePathNode;
+  Status = gBS->LocateDevicePath (&gEfiFirmwareVolume2ProtocolGuid, &DevicePathNode, &Handle);
+  if (!EFI_ERROR (Status)) {
+    //
+    // For FwVol File system there is only a single file name that is a GUID.
+    //
+    FvNameGuid = EfiGetNameGuidFromFwVolDevicePathNode ((CONST MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *) DevicePathNode);
+    if (FvNameGuid == NULL) {
+      Status = EFI_INVALID_PARAMETER;
+    } else {
+      //
+      // Read image from the firmware file
+      //
+      Status = gBS->HandleProtocol (Handle, &gEfiFirmwareVolume2ProtocolGuid, (VOID**)&FwVol);
+      if (!EFI_ERROR (Status)) {
+        SectionType = EFI_SECTION_PE32;
+        ImageBuffer = NULL;
+        Status = FwVol->ReadSection (
+                          FwVol,
+                          FvNameGuid,
+                          SectionType,
+                          0,
+                          (VOID **)&ImageBuffer,
+                          &ImageBufferSize,
+                          AuthenticationStatus
+                          );
+        if (EFI_ERROR (Status)) {
+          //
+          // Try a raw file, since a PE32 SECTION does not exist
+          //
+          if (ImageBuffer != NULL) {
+            FreePool (ImageBuffer);
+            *AuthenticationStatus = 0;
+          }
+          ImageBuffer = NULL;
+          Status = FwVol->ReadFile (
+                            FwVol,
+                            FvNameGuid,
+                            (VOID **)&ImageBuffer,
+                            &ImageBufferSize,
+                            &Type,
+                            &Attrib,
+                            AuthenticationStatus
+                            );
+        }
+      }
+    }
+    goto Finish;
+  }
+
+  //
+  // Attempt to access the file via a file system interface
+  //
+  DevicePathNode = OrigDevicePathNode;
+  Status = gBS->LocateDevicePath (&gEfiSimpleFileSystemProtocolGuid, &DevicePathNode, &Handle);
+  if (!EFI_ERROR (Status)) {
+    Status = gBS->HandleProtocol (Handle, &gEfiSimpleFileSystemProtocolGuid, (VOID**)&Volume);
+    if (!EFI_ERROR (Status)) {
+      //
+      // Open the Volume to get the File System handle
+      //
+      Status = Volume->OpenVolume (Volume, &FileHandle);
+      if (!EFI_ERROR (Status)) {
+        //
+        // Parse each MEDIA_FILEPATH_DP node. There may be more than one, since the
+        // directory information and filename can be seperate. The goal is to inch
+        // our way down each device path node and close the previous node
+        //
+        while (!IsDevicePathEnd (DevicePathNode) && !EFI_ERROR (Status)) {
+          if (DevicePathType (DevicePathNode) != MEDIA_DEVICE_PATH ||
+              DevicePathSubType (DevicePathNode) != MEDIA_FILEPATH_DP) {
+            Status = EFI_UNSUPPORTED;
+            break;
+          }
+  
+          LastHandle = FileHandle;
+          FileHandle = NULL;
+  
+          Status = LastHandle->Open (
+                                LastHandle,
+                                &FileHandle,
+                                ((FILEPATH_DEVICE_PATH *) DevicePathNode)->PathName,
+                                EFI_FILE_MODE_READ,
+                                0
+                                );
+  
+          //
+          // Close the previous node
+          //
+          LastHandle->Close (LastHandle);
+  
+          DevicePathNode = NextDevicePathNode (DevicePathNode);
+        }
+  
+        if (!EFI_ERROR (Status)) {
+          //
+          // We have found the file. Now we need to read it. Before we can read the file we need to
+          // figure out how big the file is.
+          //
+          FileInfo = NULL;
+          FileInfoSize = 0;
+          Status = FileHandle->GetInfo (
+                                FileHandle,
+                                &gEfiFileInfoGuid,
+                                &FileInfoSize,
+                                FileInfo
+                                );
+  
+          if (Status == EFI_BUFFER_TOO_SMALL) {
+            FileInfo = AllocatePool (FileInfoSize);
+            if (FileInfo == NULL) {
+              Status = EFI_OUT_OF_RESOURCES;
+            } else {
+              Status = FileHandle->GetInfo (
+                                    FileHandle,
+                                    &gEfiFileInfoGuid,
+                                    &FileInfoSize,
+                                    FileInfo
+                                    );
+            }
+          }
+          
+          if (!EFI_ERROR (Status)) {
+            //
+            // Allocate space for the file
+            //
+            ImageBuffer = AllocatePool ((UINTN)FileInfo->FileSize);
+            if (ImageBuffer == NULL) {
+              Status = EFI_OUT_OF_RESOURCES;
+            } else {
+              //
+              // Read the file into the buffer we allocated
+              //
+              ImageBufferSize = (UINTN)FileInfo->FileSize;
+              Status          = FileHandle->Read (FileHandle, &ImageBufferSize, ImageBuffer);
+            }
+          }
+        }
+        //
+        // Close the file and Free FileInfo since we are done
+        // 
+        if (FileInfo != NULL) {
+          FreePool (FileInfo);
+        }
+        if (FileHandle != NULL) {
+          FileHandle->Close (FileHandle);
+        }
+      }
+    }
+    goto Finish;
+  }
+
+  //
+  // Attempt to access the file via LoadFile2 interface
+  //
+  if (!BootPolicy) {
+    DevicePathNode = OrigDevicePathNode;
+    Status = gBS->LocateDevicePath (&gEfiLoadFile2ProtocolGuid, &DevicePathNode, &Handle);
+    if (!EFI_ERROR (Status)) {
+      Status = gBS->HandleProtocol (Handle, &gEfiLoadFile2ProtocolGuid, (VOID**)&LoadFile2);
+      if (!EFI_ERROR (Status)) {
+        //
+        // Call LoadFile2 with the correct buffer size
+        //
+        ImageBufferSize = 0;
+        ImageBuffer     = NULL;
+        Status = LoadFile2->LoadFile (
+                             LoadFile2,
+                             DevicePathNode,
+                             FALSE,
+                             &ImageBufferSize,
+                             ImageBuffer
+                             );
+        if (Status == EFI_BUFFER_TOO_SMALL) {
+          ImageBuffer = AllocatePool (ImageBufferSize);
+          if (ImageBuffer == NULL) {
+            Status = EFI_OUT_OF_RESOURCES;
+          } else {
+            Status = LoadFile2->LoadFile (
+                                 LoadFile2,
+                                 DevicePathNode,
+                                 BootPolicy,
+                                 &ImageBufferSize,
+                                 ImageBuffer
+                                 );
+          }
+        }
+      }
+      goto Finish;
+    }
+  }
+
+  //
+  // Attempt to access the file via LoadFile interface
+  //
+  DevicePathNode = OrigDevicePathNode;
+  Status = gBS->LocateDevicePath (&gEfiLoadFileProtocolGuid, &DevicePathNode, &Handle);
+  if (!EFI_ERROR (Status)) {
+    Status = gBS->HandleProtocol (Handle, &gEfiLoadFileProtocolGuid, (VOID**)&LoadFile);
+    if (!EFI_ERROR (Status)) {
+      //
+      // Call LoadFile with the correct buffer size
+      //
+      ImageBufferSize = 0;
+      ImageBuffer     = NULL;
+      Status = LoadFile->LoadFile (
+                           LoadFile,
+                           DevicePathNode,
+                           BootPolicy,
+                           &ImageBufferSize,
+                           ImageBuffer
+                           );
+      if (Status == EFI_BUFFER_TOO_SMALL) {
+        ImageBuffer = AllocatePool (ImageBufferSize);
+        if (ImageBuffer == NULL) {
+          Status = EFI_OUT_OF_RESOURCES;
+        } else {
+          Status = LoadFile->LoadFile (
+                               LoadFile,
+                               DevicePathNode,
+                               BootPolicy,
+                               &ImageBufferSize,
+                               ImageBuffer
+                               );
+        }
+      }
+    }
+  }
+
+Finish:
+
+  if (EFI_ERROR (Status)) {
+    if (ImageBuffer != NULL) {
+      FreePool (ImageBuffer);
+      ImageBuffer = NULL;
+    }
+    *FileSize = 0;
+  } else {
+    *FileSize = ImageBufferSize;
+  }
+
+  FreePool (OrigDevicePathNode);
+
+  return ImageBuffer;
+}
