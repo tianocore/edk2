@@ -747,8 +747,8 @@ IsExpressionOpCode (
       (Operand == EFI_IFR_CATENATE_OP) ||
       (Operand == EFI_IFR_TO_LOWER_OP) ||
       (Operand == EFI_IFR_TO_UPPER_OP) ||
-      (Operand == EFI_IFR_VERSION_OP)
-     ) {
+      (Operand == EFI_IFR_VERSION_OP)  ||
+      (Operand == EFI_IFR_SECURITY_OP)) {
     return TRUE;
   } else {
     return FALSE;
@@ -980,6 +980,10 @@ ParseOpCodes (
       case EFI_IFR_THIS_OP:
         ASSERT (CurrentStatement != NULL);
         ExpressionOpCode->QuestionId = CurrentStatement->QuestionId;
+        break;
+
+      case EFI_IFR_SECURITY_OP:
+        CopyMem (&ExpressionOpCode->Guid, &((EFI_IFR_SECURITY *) OpCodeData)->Permissions, sizeof (EFI_GUID));
         break;
 
       case EFI_IFR_QUESTION_REF1_OP:

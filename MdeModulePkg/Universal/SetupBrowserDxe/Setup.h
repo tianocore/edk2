@@ -28,6 +28,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/HiiConfigRouting.h>
 #include <Protocol/HiiDatabase.h>
 #include <Protocol/HiiString.h>
+#include <Protocol/UserManager.h>
 
 #include <Guid/MdeModuleHii.h>
 #include <Guid/HiiPlatformSetupFormset.h>
