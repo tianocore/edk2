@@ -1,7 +1,7 @@
 /** @file
   Data structure and functions to load and unload PeImage.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -88,67 +88,6 @@ typedef struct {
   VOID                *Source;
   UINTN               SourceSize;
 } IMAGE_FILE_HANDLE;
-
-
-/**
-  Opens a file for (simple) reading.  The simple read abstraction
-  will access the file either from a memory copy, from a file
-  system interface, or from the load file interface.
-
-  @param  BootPolicy             Policy for Open Image File.
-  @param  SourceBuffer           Pointer to the memory location containing copy
-                                 of the image to be loaded.
-  @param  SourceSize             The size in bytes of SourceBuffer.
-  @param  FilePath               The specific file path from which the image is
-                                 loaded
-  @param  DeviceHandle           Pointer to the return device handle.
-  @param  ImageFileHandle        Pointer to the image file handle.
-  @param  AuthenticationStatus   Pointer to a caller-allocated UINT32 in which
-                                 the authentication status is returned.
-
-  @retval EFI_SUCCESS            Image file successfully opened.
-  @retval EFI_LOAD_ERROR         If the caller passed a copy of the file, and
-                                 SourceSize is 0.
-  @retval EFI_INVALID_PARAMETER  File path is not valid.
-  @retval EFI_NOT_FOUND          File not found.
-
-**/
-EFI_STATUS
-CoreOpenImageFile (
-  IN BOOLEAN                        BootPolicy,
-  IN VOID                           *SourceBuffer   OPTIONAL,
-  IN UINTN                          SourceSize,
-  IN OUT EFI_DEVICE_PATH_PROTOCOL   **FilePath,
-  OUT EFI_HANDLE                    *DeviceHandle,
-  IN IMAGE_FILE_HANDLE              *ImageFileHandle,
-  OUT UINT32                        *AuthenticationStatus
-  );
-
-
-
-/**
-  Read image file (specified by UserHandle) into user specified buffer with specified offset
-  and length.
-
-  @param  UserHandle             Image file handle
-  @param  Offset                 Offset to the source file
-  @param  ReadSize               For input, pointer of size to read; For output,
-                                 pointer of size actually read.
-  @param  Buffer                 Buffer to write into
-
-  @retval EFI_SUCCESS            Successfully read the specified part of file
-                                 into buffer.
-
-**/
-EFI_STATUS
-EFIAPI
-CoreReadImageFile (
-  IN     VOID    *UserHandle,
-  IN     UINTN   Offset,
-  IN OUT UINTN   *ReadSize,
-  OUT    VOID    *Buffer
-  );
-
 
 /**
   Loads an EFI image into memory and returns a handle to the image with extended parameters.

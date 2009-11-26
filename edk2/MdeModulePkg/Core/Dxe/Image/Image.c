@@ -1,7 +1,7 @@
 /** @file
   Core image handling services to load and unload PeImage.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -155,6 +155,49 @@ CoreInitializeImageServices (
            );
 }
 
+/**
+  Read image file (specified by UserHandle) into user specified buffer with specified offset
+  and length.
+
+  @param  UserHandle             Image file handle
+  @param  Offset                 Offset to the source file
+  @param  ReadSize               For input, pointer of size to read; For output,
+                                 pointer of size actually read.
+  @param  Buffer                 Buffer to write into
+
+  @retval EFI_SUCCESS            Successfully read the specified part of file
+                                 into buffer.
+
+**/
+EFI_STATUS
+EFIAPI
+CoreReadImageFile (
+  IN     VOID    *UserHandle,
+  IN     UINTN   Offset,
+  IN OUT UINTN   *ReadSize,
+  OUT    VOID    *Buffer
+  )
+{
+  UINTN               EndPosition;
+  IMAGE_FILE_HANDLE  *FHand;
+
+  FHand = (IMAGE_FILE_HANDLE  *)UserHandle;
+  ASSERT (FHand->Signature == IMAGE_FILE_HANDLE_SIGNATURE);
+
+  //
+  // Move data from our local copy of the file
+  //
+  EndPosition = Offset + *ReadSize;
+  if (EndPosition > FHand->SourceSize) {
+    *ReadSize = (UINT32)(FHand->SourceSize - Offset);
+  }
+  if (Offset >= FHand->SourceSize) {
+      *ReadSize = 0;
+  }
+
+  CopyMem (Buffer, (CHAR8 *)FHand->Source + Offset, *ReadSize);
+  return EFI_SUCCESS;
+}
 
 /**
   Loads, relocates, and invokes a PE/COFF image
@@ -766,19 +809,63 @@ CoreLoadImageCommon (
     return EFI_INVALID_PARAMETER;
   }
 
-  //
-  // Get simple read access to the source file
-  //
+  ZeroMem (&FHand, sizeof (IMAGE_FILE_HANDLE));
+  FHand.Signature  = IMAGE_FILE_HANDLE_SIGNATURE;
   OriginalFilePath = FilePath;
-  Status = CoreOpenImageFile (
-             BootPolicy,
-             SourceBuffer,
-             SourceSize,
-             &FilePath,
-             &DeviceHandle,
-             &FHand,
-             &AuthenticationStatus
-             );
+  HandleFilePath   = FilePath;
+  DeviceHandle     = NULL;
+  Status           = EFI_SUCCESS;
+  AuthenticationStatus = 0;
+  //
+  // If the caller passed a copy of the file, then just use it
+  //
+  if (SourceBuffer != NULL) {
+    FHand.Source     = SourceBuffer;
+    FHand.SourceSize = SourceSize;
+    CoreLocateDevicePath (&gEfiDevicePathProtocolGuid, &HandleFilePath, &DeviceHandle);
+    if (SourceSize > 0) {
+      Status = EFI_SUCCESS;
+    } else {
+      Status = EFI_LOAD_ERROR;
+    }
+  } else {
+    if (FilePath == NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
+    //
+    // Get the source file buffer by its device path.
+    //
+    FHand.Source = GetFileBufferByFilePath (
+                      BootPolicy, 
+                      FilePath,
+                      &FHand.SourceSize,
+                      &AuthenticationStatus
+                      );
+    if (FHand.Source == NULL) {
+      Status = EFI_LOAD_ERROR;
+    } else {
+      //
+      // Try to get the image device handle by checking the match protocol.
+      //
+      FHand.FreeBuffer = TRUE;
+      Status = CoreLocateDevicePath (&gEfiFirmwareVolume2ProtocolGuid, &HandleFilePath, &DeviceHandle);
+      if (EFI_ERROR (Status)) {
+        HandleFilePath = FilePath;
+        Status = CoreLocateDevicePath (&gEfiSimpleFileSystemProtocolGuid, &HandleFilePath, &DeviceHandle);
+        if (EFI_ERROR (Status)) {
+          if (!BootPolicy) {
+            HandleFilePath = FilePath;
+            Status = CoreLocateDevicePath (&gEfiLoadFile2ProtocolGuid, &HandleFilePath, &DeviceHandle);
+          }
+          if (EFI_ERROR (Status)) {
+            HandleFilePath = FilePath;
+            Status = CoreLocateDevicePath (&gEfiLoadFileProtocolGuid, &HandleFilePath, &DeviceHandle);
+          }
+        }
+      }
+    }
+  }
+
   if (Status == EFI_ALREADY_STARTED) {
     Image = NULL;
     goto Done;
