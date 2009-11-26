@@ -68,6 +68,10 @@
   #
   UefiHiiServicesLib|Include/Library/UefiHiiServicesLib.h
 
+  ##  @libraryclass    Provides a set of interfaces to abstract the policy of security measurement.
+  #
+  SecurityManagementLib|MdeModulePkg/Include/Library/SecurityManagementLib.h
+
 [Guids.common]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h

@@ -1,12 +1,14 @@
 #/** @file
-#  This driver produces security architectural protocol based on SecurityManagementLib.
+# Instance of SecurityManagementLib Library for DXE phase.
 #
-#  Copyright (c) 2006 - 2009, Intel Corporation
+# This library provides generic security measurement functions for DXE module.
+#
+#  Copyright (c) 2009, Intel Corporation.
+#
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
 #  http://opensource.org/licenses/bsd-license.php
-#
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
@@ -15,32 +17,27 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = SecurityStubDxe
-  FILE_GUID                      = F80697E9-7FD6-4665-8646-88E33EF71DFC
+  BASE_NAME                      = DxeSecurityManagementLib
+  FILE_GUID                      = 7F61122C-19DF-47c3-BA0D-6C1149E30FA1
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  ENTRY_POINT                    = SecurityStubInitialize
+  LIBRARY_CLASS                  = SecurityManagementLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER 
 
-
+#
+# The following information is for reference only and not required by the build tools.
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-[Sources.common]
-  SecurityStub.c
+[Sources]
+  DxeSecurityManagementLib.c
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
-  UefiDriverEntryPoint
-  UefiBootServicesTableLib
+  MemoryAllocationLib
   DebugLib
-  SecurityManagementLib
-
-[Protocols]
-  gEfiSecurityArchProtocolGuid                  ## PRODUCED
-
-[Depex]
-  TRUE
+  DxeServicesLib
+  
