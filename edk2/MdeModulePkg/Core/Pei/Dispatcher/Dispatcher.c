@@ -107,7 +107,7 @@ DiscoverPeimsAndOrderWithApriori (
       Status = FvPpi->GetFileInfo (FvPpi, AprioriFileHandle, &FileInfo);
       ASSERT_EFI_ERROR (Status);
       Private->AprioriCount = FileInfo.BufferSize & 0x00FFFFFF;
-      Private->AprioriCount -= sizeof (EFI_FFS_FILE_HEADER) - sizeof (EFI_COMMON_SECTION_HEADER);
+      Private->AprioriCount -= sizeof (EFI_COMMON_SECTION_HEADER);
       Private->AprioriCount /= sizeof (EFI_GUID);
 
       ZeroMem (FileGuid, sizeof (FileGuid));
