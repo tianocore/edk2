@@ -358,12 +358,12 @@ SmbiosAdd (
   //
   // Allocate internal buffer
   //
-  SmbiosEntry = AllocatePool (TotalSize);
+  SmbiosEntry = AllocateZeroPool (TotalSize);
   if (SmbiosEntry == NULL) {
     EfiReleaseLock (&Private->DataLock);
     return EFI_OUT_OF_RESOURCES;
   }
-  HandleEntry = AllocatePool (sizeof(SMBIOS_HANDLE_ENTRY));
+  HandleEntry = AllocateZeroPool (sizeof(SMBIOS_HANDLE_ENTRY));
   if (HandleEntry == NULL) {
     EfiReleaseLock (&Private->DataLock);
     return EFI_OUT_OF_RESOURCES;
@@ -372,12 +372,10 @@ SmbiosAdd (
   //
   // Build Handle Entry and insert into linked list
   //
-  ZeroMem(HandleEntry, sizeof(SMBIOS_HANDLE_ENTRY));
   HandleEntry->Signature     = SMBIOS_HANDLE_ENTRY_SIGNATURE;
   HandleEntry->SmbiosHandle  = *SmbiosHandle;
   InsertTailList(&Private->AllocatedHandleListHead, &HandleEntry->Link);
 
-  ZeroMem (SmbiosEntry, TotalSize);
   InternalRecord  = (EFI_SMBIOS_RECORD_HEADER *) (SmbiosEntry + 1);
   Raw     = (VOID *) (InternalRecord + 1);
 
@@ -528,14 +526,13 @@ SmbiosUpdateString (
       // Re-allocate buffer is needed.
       //
       NewEntrySize = SmbiosEntry->RecordSize + InputStrLen - TargetStrLen;
-      ResizedSmbiosEntry = AllocatePool (NewEntrySize);
+      ResizedSmbiosEntry = AllocateZeroPool (NewEntrySize);
 
       if (ResizedSmbiosEntry == NULL) {
         EfiReleaseLock (&Private->DataLock);
         return EFI_OUT_OF_RESOURCES;
       }
 
-      ZeroMem (ResizedSmbiosEntry, NewEntrySize);
       InternalRecord  = (EFI_SMBIOS_RECORD_HEADER *) (ResizedSmbiosEntry + 1);
       Raw     = (VOID *) (InternalRecord + 1);
 
@@ -811,7 +808,7 @@ SmbiosCreateTable (
   //
   // Free the original image
   //
-  if (EntryPointStructure->TableAddress) {
+  if (EntryPointStructure->TableAddress != 0) {
     FreePages (
           (VOID*)(UINTN)EntryPointStructure->TableAddress,
           EFI_SIZE_TO_PAGES (EntryPointStructure->TableLength)
@@ -822,8 +819,8 @@ SmbiosCreateTable (
   //
   // Locate smbios protocol to traverse smbios records.
   //
-  gBS->LocateProtocol (&gEfiSmbiosProtocolGuid, NULL, (VOID **) &SmbiosProtocol);
-  
+  Status = gBS->LocateProtocol (&gEfiSmbiosProtocolGuid, NULL, (VOID **) &SmbiosProtocol);
+  ASSERT_EFI_ERROR (Status);
   ASSERT (SmbiosProtocol != NULL);
 
   //
@@ -851,7 +848,7 @@ SmbiosCreateTable (
       //
       // Record NumberOfSmbiosStructures, TableLength and MaxStructureSize
       //
-      EntryPointStructure->NumberOfSmbiosStructures++;
+      EntryPointStructure->NumberOfSmbiosStructures ++;
       EntryPointStructure->TableLength = (UINT16) (EntryPointStructure->TableLength + RecordSize);
       if (RecordSize > EntryPointStructure->MaxStructureSize) {
         EntryPointStructure->MaxStructureSize = (UINT16) RecordSize;
