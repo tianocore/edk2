@@ -41,7 +41,10 @@ InitializeFloatingPointUnits PROC PUBLIC
     ;
     ; Initialize floating point units
     ;
-    finit
+    ; The following opcodes stand for instruction 'finit' 
+    ; to be supported by some 64-bit assemblers
+    ;
+    DB      9Bh, 0DBh, 0E3h
     fldcw   mFpuControlWord
     
     ;
