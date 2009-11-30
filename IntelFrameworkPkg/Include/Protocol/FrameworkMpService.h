@@ -47,6 +47,8 @@
 #ifndef _FRAMEWORK_MP_SERVICE_PROTOCOL_H_
 #define _FRAMEWORK_MP_SERVICE_PROTOCOL_H_
 
+#include <FrameworkDxe.h>
+
 ///
 /// Global ID for the FRAMEWORK_EFI_MP_SERVICES_PROTOCOL
 ///
@@ -644,7 +646,7 @@ EFI_STATUS
 ///
 /// Framework MP Services Protocol structure
 ///
-typedef struct _FRAMEWORK_EFI_MP_SERVICES_PROTOCOL {
+struct _FRAMEWORK_EFI_MP_SERVICES_PROTOCOL {
   EFI_MP_SERVICES_GET_GENERAL_MP_INFO              GetGeneralMPInfo;
   EFI_MP_SERVICES_GET_PROCESSOR_CONTEXT            GetProcessorContext;
   FRAMEWORK_EFI_MP_SERVICES_STARTUP_ALL_APS        StartupAllAPs;
