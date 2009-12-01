@@ -63,7 +63,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   [.precision]:
 
     - *
-      - The prevision of the field is specified by a UINTN argument in the 
+      - The precision of the field is specified by a UINTN argument in the 
         argument list.
     - number
       - The number specified as a decimal value represents the precision of 
