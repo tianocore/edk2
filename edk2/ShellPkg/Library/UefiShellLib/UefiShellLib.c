@@ -54,6 +54,8 @@ STATIC EFI_SHELL_PARAMETERS_PROTOCOL *mEfiShellParametersProtocol;
 STATIC EFI_HANDLE                    mEfiShellEnvironment2Handle;
 STATIC FILE_HANDLE_FUNCTION_MAP      FileFunctionMap;
 STATIC UINTN                         mTotalParameterCount;
+STATIC EFI_FILE_HANDLE               StdOut;
+STATIC EFI_FILE_HANDLE               StdErr;
 
 /**
   Check if a Unicode character is a hexadecimal character.
@@ -2245,6 +2247,34 @@ CopyReplace(
 }
 
 /**
+  Internal worker function to output a string.
+
+  This function will output a string to the correct StdOut.
+
+  @param[in] String       The string to print out.
+
+  @retval EFI_SUCCESS     The operation was sucessful.
+  @retval !EFI_SUCCESS    The operation failed.
+**/
+EFI_STATUS
+EFIAPI
+InternalPrintTo (
+  IN CONST CHAR16 *String
+  )
+{
+  UINTN Size;
+  Size = StrSize(String) - sizeof(CHAR16);
+  if (mEfiShellParametersProtocol != NULL) {
+    return (mEfiShellParametersProtocol->StdOut->Write(mEfiShellParametersProtocol->StdOut, &Size, (VOID*)String));
+  }
+  if (mEfiShellInterface          != NULL) {
+    return (         mEfiShellInterface->StdOut->Write(mEfiShellInterface->StdOut,          &Size, (VOID*)String));
+  }
+  ASSERT(FALSE);
+  return (EFI_UNSUPPORTED);
+}
+
+/**
   Print at a specific location on the screen.
 
   This function will move the cursor to a given screen location and print the specified string
@@ -2291,7 +2321,8 @@ InternalShellPrintWorker(
   CHAR16            *ResumeLocation;
   CHAR16            *FormatWalker;
   
-  BufferSize = (PcdGet32 (PcdUefiLibMaxPrintBufferSize) + 1) * sizeof (CHAR16);
+  BufferSize = PcdGet16 (PcdShellLibMaxPrintBufferSize);
+  ASSERT(PcdGet16 (PcdShellLibMaxPrintBufferSize) < PcdGet32 (PcdMaximumUnicodeStringLength));
   PostReplaceFormat = AllocateZeroPool (BufferSize);
   ASSERT (PostReplaceFormat != NULL);
   PostReplaceFormat2 = AllocateZeroPool (BufferSize);
@@ -2336,7 +2367,7 @@ InternalShellPrintWorker(
     //
     // print the current FormatWalker string
     //
-    Status = gST->ConOut->OutputString(gST->ConOut, FormatWalker);
+    Status = InternalPrintTo(FormatWalker);
     ASSERT_EFI_ERROR(Status);
     //
     // update the attribute
@@ -2359,7 +2390,12 @@ InternalShellPrintWorker(
           gST->ConOut->SetAttribute(gST->ConOut, EFI_TEXT_ATTR(EFI_GREEN, ((NormalAttribute&(BIT4|BIT5|BIT6))>>4)));
           break;
         default:
-          ASSERT(FALSE);
+          //
+          // Print a simple '%' symbol
+          //
+          Status = InternalPrintTo(L"%");
+          ASSERT_EFI_ERROR(Status);
+          ResumeLocation = ResumeLocation - 1;
           break;
       }
     } else {
@@ -2384,13 +2420,13 @@ InternalShellPrintWorker(
 /**
   Print at a specific location on the screen.
 
-  This function will move the cursor to a given screen location and print the specified string
+  This function will move the cursor to a given screen location and print the specified string.
   
   If -1 is specified for either the Row or Col the current screen location for BOTH 
   will be used.
 
-  if either Row or Col is out of range for the current console, then ASSERT
-  if Format is NULL, then ASSERT
+  If either Row or Col is out of range for the current console, then ASSERT.
+  If Format is NULL, then ASSERT.
 
   In addition to the standard %-based flags as supported by UefiLib Print() this supports 
   the following additional flags:
@@ -2419,21 +2455,23 @@ ShellPrintEx(
   ) 
 {
   VA_LIST           Marker;
+  EFI_STATUS        Status;
   VA_START (Marker, Format);
-  return (InternalShellPrintWorker(Col, Row, Format, Marker));
+  Status = InternalShellPrintWorker(Col, Row, Format, Marker);
+  VA_END(Marker);
+  return(Status);
 }
 
 /**
   Print at a specific location on the screen.
 
-  This function will move the cursor to a given screen location, print the specified string, 
-  and return the cursor to the original locaiton.  
+  This function will move the cursor to a given screen location and print the specified string.
   
   If -1 is specified for either the Row or Col the current screen location for BOTH 
-  will be used and the cursor's position will not be moved back to an original location.
+  will be used.
 
-  if either Row or Col is out of range for the current console, then ASSERT
-  if Format is NULL, then ASSERT
+  If either Row or Col is out of range for the current console, then ASSERT.
+  If Format is NULL, then ASSERT.
 
   In addition to the standard %-based flags as supported by UefiLib Print() this supports 
   the following additional flags:
@@ -2473,6 +2511,7 @@ ShellPrintHiiEx(
   RetVal = InternalShellPrintWorker(Col, Row, HiiFormatString, Marker);
 
   FreePool(HiiFormatString);
+  VA_END(Marker);
 
   return (RetVal);
 }

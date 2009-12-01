@@ -64,5 +64,6 @@
   gEfiShellEnvironment2ExtGuid                  # ALWAYS_CONSUMED
 
 [Pcd.common]
-  gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize  # ALWAYS_CONSUMED
-  gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize # ALWAYS_CONSUMED
+  gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize     # ALWAYS_CONSUMED
+  gEfiShellPkgTokenSpaceGuid.PcdShellLibMaxPrintBufferSize # ALWAYS_CONSUMED
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength   # ALWAYS_CONSUMED
