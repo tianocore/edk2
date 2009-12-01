@@ -28,9 +28,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param  FileHandle  The file handle of the file for which information is 
                       being requested.
 
-  @retval NULL information could not be retrieved.
+  @retval NULL        information could not be retrieved.
 
-  @return the information about the file
+  @return             the information about the file
 **/
 EFI_FILE_INFO*
 EFIAPI
@@ -43,7 +43,7 @@ ShellGetFileInfo (
   specified.
 
   @param  FileHandle            The file handle of the file for which information 
-                                is being set
+                                is being set.
 
   @param  FileInfo              The infotmation to set.
 
@@ -808,11 +808,10 @@ ShellInitialize (
 /**
   Print at a specific location on the screen.
 
-  This function will move the cursor to a given screen location, print the specified string, 
-  and return the cursor to the original location.  
+  This function will move the cursor to a given screen location and print the specified string.
   
   If -1 is specified for either the Row or Col the current screen location for BOTH 
-  will be used and the cursor's position will not be moved back to an original location.
+  will be used.
 
   If either Row or Col is out of range for the current console, then ASSERT.
   If Format is NULL, then ASSERT.
@@ -846,14 +845,13 @@ ShellPrintEx(
 /**
   Print at a specific location on the screen.
 
-  This function will move the cursor to a given screen location, print the specified string, 
-  and return the cursor to the original locaiton.  
+  This function will move the cursor to a given screen location and print the specified string.
   
   If -1 is specified for either the Row or Col the current screen location for BOTH 
-  will be used and the cursor's position will not be moved back to an original location.
+  will be used.
 
-  if either Row or Col is out of range for the current console, then ASSERT
-  if Format is NULL, then ASSERT
+  If either Row or Col is out of range for the current console, then ASSERT.
+  If Format is NULL, then ASSERT.
 
   In addition to the standard %-based flags as supported by UefiLib Print() this supports 
   the following additional flags:
