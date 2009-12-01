@@ -435,6 +435,7 @@ GetFileBufferByFilePath (
 {
   EFI_DEVICE_PATH_PROTOCOL          *DevicePathNode;
   EFI_DEVICE_PATH_PROTOCOL          *OrigDevicePathNode;
+  EFI_DEVICE_PATH_PROTOCOL          *TempDevicePathNode;
   EFI_HANDLE                        Handle;
   EFI_GUID                          *FvNameGuid;
   EFI_FIRMWARE_VOLUME2_PROTOCOL     *FwVol;
@@ -462,6 +463,7 @@ GetFileBufferByFilePath (
   //
   // Init local variable
   //
+  TempDevicePathNode  = NULL;
   FvNameGuid          = NULL;
   FileInfo            = NULL;
   FileHandle          = NULL;
@@ -545,10 +547,22 @@ GetFileBufferByFilePath (
       Status = Volume->OpenVolume (Volume, &FileHandle);
       if (!EFI_ERROR (Status)) {
         //
+        // Duplicate the device path to avoid the access to unaligned device path node.
+        // Because the device path consists of one or more FILE PATH MEDIA DEVICE PATH
+        // nodes, It assures the fields in device path nodes are 2 byte aligned.
+        //
+        TempDevicePathNode = DuplicateDevicePath (DevicePathNode);
+        if (TempDevicePathNode == NULL) {
+          FileHandle->Close (FileHandle);
+          Status = EFI_OUT_OF_RESOURCES;
+          goto Finish;
+        }
+        //
         // Parse each MEDIA_FILEPATH_DP node. There may be more than one, since the
         // directory information and filename can be seperate. The goal is to inch
         // our way down each device path node and close the previous node
         //
+        DevicePathNode = TempDevicePathNode;
         while (!IsDevicePathEnd (DevicePathNode) && !EFI_ERROR (Status)) {
           if (DevicePathType (DevicePathNode) != MEDIA_DEVICE_PATH ||
               DevicePathSubType (DevicePathNode) != MEDIA_FILEPATH_DP) {
@@ -620,7 +634,7 @@ GetFileBufferByFilePath (
           }
         }
         //
-        // Close the file and Free FileInfo since we are done
+        // Close the file and Free FileInfo and TempDevicePathNode since we are done
         // 
         if (FileInfo != NULL) {
           FreePool (FileInfo);
@@ -628,6 +642,7 @@ GetFileBufferByFilePath (
         if (FileHandle != NULL) {
           FileHandle->Close (FileHandle);
         }
+        FreePool (TempDevicePathNode);
       }
     }
     goto Finish;
