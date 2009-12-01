@@ -842,7 +842,7 @@ CoreLoadImageCommon (
                       &AuthenticationStatus
                       );
     if (FHand.Source == NULL) {
-      Status = EFI_LOAD_ERROR;
+      Status = EFI_NOT_FOUND;
     } else {
       //
       // Try to get the image device handle by checking the match protocol.
