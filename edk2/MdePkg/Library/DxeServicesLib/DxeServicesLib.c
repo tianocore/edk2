@@ -617,7 +617,7 @@ GetFileBufferByFilePath (
             }
           }
           
-          if (!EFI_ERROR (Status)) {
+          if (!EFI_ERROR (Status) && (FileInfo != NULL)) {
             //
             // Allocate space for the file
             //
