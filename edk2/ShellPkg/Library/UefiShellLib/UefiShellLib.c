@@ -54,8 +54,6 @@ STATIC EFI_SHELL_PARAMETERS_PROTOCOL *mEfiShellParametersProtocol;
 STATIC EFI_HANDLE                    mEfiShellEnvironment2Handle;
 STATIC FILE_HANDLE_FUNCTION_MAP      FileFunctionMap;
 STATIC UINTN                         mTotalParameterCount;
-STATIC EFI_FILE_HANDLE               StdOut;
-STATIC EFI_FILE_HANDLE               StdErr;
 
 /**
   Check if a Unicode character is a hexadecimal character.
