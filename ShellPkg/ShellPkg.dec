@@ -62,6 +62,6 @@
   gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|TRUE|BOOLEAN|0x00000005
 
   ## This is the max buffer for ShellLib printings.
-  gEfiShellPkgTokenSpaceGuid.PcdShellLibMaxPrintBufferSize|4000|UINT16|0x0000000C
+  gEfiShellPkgTokenSpaceGuid.PcdShellLibMaxPrintBufferSize|8000|UINT16|0x0000000C
 
 
