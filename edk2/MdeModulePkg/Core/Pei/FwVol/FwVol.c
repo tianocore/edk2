@@ -309,7 +309,23 @@ PeiInitializeFv (
            (UINTN)BfvHeader->FvLength,
            &FvHandle
            );
-                        
+
+  //
+  // Update internal PEI_CORE_FV array.
+  //
+  PrivateData->Fv[PrivateData->FvCount].FvHeader = BfvHeader;
+  PrivateData->Fv[PrivateData->FvCount].FvPpi    = FvPpi;
+  PrivateData->Fv[PrivateData->FvCount].FvHandle = FvHandle;
+  DEBUG ((
+    EFI_D_INFO, 
+    "The %dth FV start address is 0x%11p, size is 0x%08x, handle is 0x%p\n", 
+    (UINT32) PrivateData->FvCount, 
+    (VOID *) BfvHeader, 
+    BfvHeader->FvLength,
+    FvHandle
+    ));    
+  PrivateData->FvCount ++;
+                            
   //
   // Post a call-back for the FvInfoPPI services to expose
   // additional Fvs to PeiCore.
@@ -346,6 +362,8 @@ FirmwareVolmeInfoPpiNotifyCallback (
   EFI_STATUS                            Status;
   EFI_PEI_FV_HANDLE                     FvHandle;
   UINTN                                 FvIndex;
+  EFI_PEI_FILE_HANDLE                   FileHandle;
+  VOID                                  *DepexData;
   
   Status       = EFI_SUCCESS;
   PrivateData  = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
@@ -373,10 +391,67 @@ FirmwareVolmeInfoPpiNotifyCallback (
     //
     Status = FvPpi->ProcessVolume (FvPpi, FvInfoPpi->FvInfo, FvInfoPpi->FvInfoSize, &FvHandle);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "Fail to process new found FV, FV may be corrupted!"));
+      DEBUG ((EFI_D_ERROR, "Fail to process new found FV, FV may be corrupted!\n"));
       return Status;
     }
-    DEBUG ((EFI_D_INFO, "Found and process new FV %p, all fv's count is %d\n", FvHandle, PrivateData->FvCount));
+
+    //
+    // Check whether the FV has already been processed.
+    //
+    for (FvIndex = 0; FvIndex < PrivateData->FvCount; FvIndex ++) {
+      if (PrivateData->Fv[FvIndex].FvHandle == FvHandle) {
+        DEBUG ((EFI_D_INFO, "The Fv %p has already been processed!\n", FvInfoPpi->FvInfo));
+        return EFI_SUCCESS;
+      }
+    }
+
+    //
+    // Update internal PEI_CORE_FV array.
+    //
+    PrivateData->Fv[PrivateData->FvCount].FvHeader = (EFI_FIRMWARE_VOLUME_HEADER*) FvInfoPpi->FvInfo;
+    PrivateData->Fv[PrivateData->FvCount].FvPpi    = FvPpi;
+    PrivateData->Fv[PrivateData->FvCount].FvHandle = FvHandle;
+    DEBUG ((
+      EFI_D_INFO, 
+      "The %dth FV start address is 0x%11p, size is 0x%08x, handle is 0x%p\n", 
+      (UINT32) PrivateData->FvCount, 
+      (VOID *) FvInfoPpi->FvInfo, 
+      FvInfoPpi->FvInfoSize,
+      FvHandle
+      ));    
+    PrivateData->FvCount ++;
+
+    //
+    // Scan and process the new discoveried FV for EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE 
+    //
+    FileHandle = NULL;
+    do {
+      Status = FvPpi->FindFileByType (
+                        FvPpi,
+                        EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE,
+                        FvHandle,
+                        &FileHandle
+                       );
+      if (!EFI_ERROR (Status)) {
+        Status = FvPpi->FindSectionByType (
+                          FvPpi,
+                          EFI_SECTION_PEI_DEPEX,
+                          FileHandle,
+                          (VOID**)&DepexData
+                          );
+        if (!EFI_ERROR (Status)) {
+          if (!PeimDispatchReadiness (PeiServices, DepexData)) {
+            //
+            // Dependency is not satisfied.
+            //
+            continue;
+          }
+        }
+        
+        DEBUG ((EFI_D_INFO, "Found firmware volume Image File %p in FV[%d] %p\n", FileHandle, PrivateData->FvCount - 1, FvHandle));
+        ProcessFvFile (&PrivateData->Fv[PrivateData->FvCount - 1], FileHandle);
+      }
+    } while (FileHandle != NULL);
   } else {
     DEBUG ((EFI_D_ERROR, "Fail to process FV %p because no corresponding EFI_FIRMWARE_VOLUME_PPI is found!\n", FvInfoPpi->FvInfo));
     
@@ -924,14 +999,12 @@ PeiFfs2FvPpiProcessVolume (
   )
 {
   EFI_STATUS          Status;
-  PEI_CORE_INSTANCE   *PrivateData;
-  EFI_PEI_FILE_HANDLE FileHandle;
-  VOID                *DepexData;
-  EFI_PEI_SERVICES    **PeiServices;
-  UINTN               FvIndex;
   
-  PeiServices = (EFI_PEI_SERVICES**) GetPeiServicesTablePointer ();
-  PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
+  ASSERT (FvHandle != NULL);
+  
+  if (Buffer == NULL) {
+    return EFI_VOLUME_CORRUPTED;
+  }
   
   //
   // The build-in EFI_PEI_FIRMWARE_VOLUME_PPI for FFS2 support memory-mapped
@@ -947,61 +1020,6 @@ PeiFfs2FvPpiProcessVolume (
     DEBUG ((EFI_D_ERROR, "Fail to verify FV which address is 0x%11p", Buffer));
     return EFI_VOLUME_CORRUPTED;
   }
-
-  //
-  // Check whether the FV has already been processed.
-  //
-  for (FvIndex = 0; FvIndex < PrivateData->FvCount; FvIndex ++) {
-    if (PrivateData->Fv[FvIndex].FvHandle == *FvHandle) {
-      DEBUG ((EFI_D_INFO, "The Fv %p has already been processed!", Buffer));
-      return EFI_SUCCESS;
-    }
-  }
-  
-  //
-  // Update internal PEI_CORE_FV array.
-  //
-  PrivateData->Fv[PrivateData->FvCount].FvHeader = (EFI_FIRMWARE_VOLUME_HEADER*) Buffer;
-  PrivateData->Fv[PrivateData->FvCount].FvPpi    = (EFI_PEI_FIRMWARE_VOLUME_PPI*) This;
-  PrivateData->Fv[PrivateData->FvCount].FvHandle = *FvHandle;
-  
-  DEBUG ((EFI_D_INFO, 
-          "The %dth FV start address is 0x%11p and size is 0x%08x\n", 
-          (UINT32) PrivateData->FvCount, 
-          (VOID *) Buffer, 
-          BufferSize
-          ));
-  PrivateData->FvCount ++;
-  
-  FileHandle = NULL;
-  
-  do {
-    Status = This->FindFileByType (
-                     This,
-                     EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE,
-                     *FvHandle,
-                     &FileHandle
-                     );
-    if (!EFI_ERROR (Status)) {
-      Status = This->FindSectionByType (
-                       This,
-                       EFI_SECTION_PEI_DEPEX,
-                       FileHandle,
-                       (VOID**)&DepexData
-                       );
-      if (!EFI_ERROR (Status)) {
-        if (!PeimDispatchReadiness (PeiServices, DepexData)) {
-          //
-          // Dependency is not satisfied.
-          //
-          continue;
-        }
-      }
-      
-      DEBUG ((EFI_D_INFO, "Found firmware volume Image File %p in FV[%d] %p", FileHandle, PrivateData->FvCount - 1, *FvHandle));
-      ProcessFvFile (&PrivateData->Fv[PrivateData->FvCount - 1], FileHandle);
-    }
-  } while (FileHandle != NULL);
 
   return EFI_SUCCESS;
 }  
