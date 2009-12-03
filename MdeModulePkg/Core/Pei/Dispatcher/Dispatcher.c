@@ -721,6 +721,8 @@ InitializeDispatcherData (
   if (OldCoreData == NULL) {
     PrivateData->PeimDispatcherReenter = FALSE;
     PeiInitializeFv (PrivateData, SecCoreData);
+  } else {
+  	PeiReinitializeFv (PrivateData);
   }
 
   return;

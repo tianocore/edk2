@@ -1374,3 +1374,51 @@ FindNextCoreFvHandle (
 
   return &Private->Fv[Instance];
 }  
+
+/**
+  After PeiCore image is shadowed into permanent memory, all build-in FvPpi should
+  be re-installed with the instance in permanent memory and all cached FvPpi pointers in 
+  PrivateData->Fv[] array should be fixed up to be pointed to the one in permenant
+  memory.
+  
+  @param PrivateData   Pointer to PEI_CORE_INSTANCE.
+**/  
+VOID
+PeiReinitializeFv (
+  IN  PEI_CORE_INSTANCE           *PrivateData
+  )
+{
+	VOID           					*OldFfs2FvPpi;
+	EFI_PEI_PPI_DESCRIPTOR	*OldDescriptor;
+	UINTN                   Index;
+	EFI_STATUS              Status;
+
+	//
+	// Locate old build-in Ffs2 EFI_PEI_FIRMWARE_VOLUME_PPI which
+	// in flash.
+	//	
+	Status = PeiServicesLocatePpi (
+	           &gEfiFirmwareFileSystem2Guid,
+	           0,
+	           &OldDescriptor,
+	           &OldFfs2FvPpi
+	           );
+	ASSERT_EFI_ERROR (Status);
+
+	//
+	// Re-install the EFI_PEI_FIRMWARE_VOLUME_PPI for build-in Ffs2
+	// which is shadowed from flash to permanent memory within PeiCore image.
+	//
+	Status = PeiServicesReInstallPpi (OldDescriptor, &mPeiFfs2FvPpiList);
+	ASSERT_EFI_ERROR (Status);
+	
+	//
+	// Fixup all FvPpi pointers for the implementation in flash to permanent memory.
+	//
+	for (Index = 0; Index < FixedPcdGet32 (PcdPeiCoreMaxFvSupported); Index ++) {
+		if (PrivateData->Fv[Index].FvPpi == OldFfs2FvPpi) {
+			PrivateData->Fv[Index].FvPpi = &mPeiFfs2FvPpi;
+		}
+	}
+}  
+
