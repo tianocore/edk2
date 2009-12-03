@@ -1388,37 +1388,37 @@ PeiReinitializeFv (
   IN  PEI_CORE_INSTANCE           *PrivateData
   )
 {
-	VOID           					*OldFfs2FvPpi;
-	EFI_PEI_PPI_DESCRIPTOR	*OldDescriptor;
-	UINTN                   Index;
-	EFI_STATUS              Status;
+  VOID                    *OldFfs2FvPpi;
+  EFI_PEI_PPI_DESCRIPTOR  *OldDescriptor;
+  UINTN                   Index;
+  EFI_STATUS              Status;
 
-	//
-	// Locate old build-in Ffs2 EFI_PEI_FIRMWARE_VOLUME_PPI which
-	// in flash.
-	//	
-	Status = PeiServicesLocatePpi (
-	           &gEfiFirmwareFileSystem2Guid,
-	           0,
-	           &OldDescriptor,
-	           &OldFfs2FvPpi
-	           );
-	ASSERT_EFI_ERROR (Status);
+  //
+  // Locate old build-in Ffs2 EFI_PEI_FIRMWARE_VOLUME_PPI which
+  // in flash.
+  //
+  Status = PeiServicesLocatePpi (
+            &gEfiFirmwareFileSystem2Guid,
+            0,
+            &OldDescriptor,
+            &OldFfs2FvPpi
+            );
+  ASSERT_EFI_ERROR (Status);
 
-	//
-	// Re-install the EFI_PEI_FIRMWARE_VOLUME_PPI for build-in Ffs2
-	// which is shadowed from flash to permanent memory within PeiCore image.
-	//
-	Status = PeiServicesReInstallPpi (OldDescriptor, &mPeiFfs2FvPpiList);
-	ASSERT_EFI_ERROR (Status);
-	
-	//
-	// Fixup all FvPpi pointers for the implementation in flash to permanent memory.
-	//
-	for (Index = 0; Index < FixedPcdGet32 (PcdPeiCoreMaxFvSupported); Index ++) {
-		if (PrivateData->Fv[Index].FvPpi == OldFfs2FvPpi) {
-			PrivateData->Fv[Index].FvPpi = &mPeiFfs2FvPpi;
-		}
-	}
+  //
+  // Re-install the EFI_PEI_FIRMWARE_VOLUME_PPI for build-in Ffs2
+  // which is shadowed from flash to permanent memory within PeiCore image.
+  //
+  Status = PeiServicesReInstallPpi (OldDescriptor, &mPeiFfs2FvPpiList);
+  ASSERT_EFI_ERROR (Status);
+  
+  //
+  // Fixup all FvPpi pointers for the implementation in flash to permanent memory.
+  //
+  for (Index = 0; Index < FixedPcdGet32 (PcdPeiCoreMaxFvSupported); Index ++) {
+    if (PrivateData->Fv[Index].FvPpi == OldFfs2FvPpi) {
+      PrivateData->Fv[Index].FvPpi = &mPeiFfs2FvPpi;
+    }
+  }
 }  
 

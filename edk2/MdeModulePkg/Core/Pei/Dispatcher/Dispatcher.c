@@ -722,7 +722,7 @@ InitializeDispatcherData (
     PrivateData->PeimDispatcherReenter = FALSE;
     PeiInitializeFv (PrivateData, SecCoreData);
   } else {
-  	PeiReinitializeFv (PrivateData);
+    PeiReinitializeFv (PrivateData);
   }
 
   return;
