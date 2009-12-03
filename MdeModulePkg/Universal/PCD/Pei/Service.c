@@ -2,7 +2,7 @@
   The driver internal functions are implmented here.
   They build Pei PCD database, and provide access service to PCD database.
 
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -57,7 +57,10 @@ PeiRegisterCallBackWorker (
     ASSERT (TokenNumber + 1 < PEI_NEX_TOKEN_NUMBER + 1);
   } else {
     TokenNumber = GetExPcdTokenNumber (Guid, ExTokenNumber);
-
+    if (TokenNumber == PCD_INVALID_TOKEN_NUMBER) {
+      return EFI_NOT_FOUND;
+    }
+    
     //
     // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
     // We have to decrement TokenNumber by 1 to make it usable
@@ -519,7 +522,10 @@ ExSetWorker (
   }
 
   TokenNumber = GetExPcdTokenNumber (Guid, ExTokenNumber);
-
+  if (TokenNumber == PCD_INVALID_TOKEN_NUMBER) {
+    return EFI_NOT_FOUND;
+  }
+  
   InvokeCallbackOnSet (ExTokenNumber, Guid, TokenNumber, Data, *Size);
 
   return SetWorker (TokenNumber, Data, Size, PtrType);
@@ -702,9 +708,7 @@ GetExPcdTokenNumber (
     }
   }
   
-  ASSERT (FALSE);
-  
-  return 0;
+  return PCD_INVALID_TOKEN_NUMBER;
 }
 
 /**
