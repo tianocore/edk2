@@ -700,7 +700,7 @@ EFI_STATUS
 // PEI Specification Revision information
 //
 #define PEI_SPECIFICATION_MAJOR_REVISION  1
-#define PEI_SPECIFICATION_MINOR_REVISION  0
+#define PEI_SPECIFICATION_MINOR_REVISION  20
 ///
 /// Inconsistent with specification here: 
 /// In PI1.0 spec, PEI_SERVICES_SIGNATURE is defined as 0x5652455320494550. But 
