@@ -2,7 +2,7 @@
 //  
 //    Device Manager formset.
 //  
-//  Copyright (c) 2004 - 2008, Intel Corporation. <BR>
+//  Copyright (c) 2004 - 2009, Intel Corporation. <BR>
 //  All rights reserved. This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
 //  which accompanies this distribution.  The full text of the license may be found at
@@ -30,6 +30,8 @@
 #define FRONT_PAGE_SUBCLASS                0x0003
 
 #define DEVICE_MANAGER_FORM_ID             0x1000
+
+#define DEVICE_MANAGER_KEY_DRIVER_HEALTH   0x1111
 
 formset
   guid      = FORMSET_GUID,
@@ -64,12 +66,22 @@ formset
 
     label LABEL_DEVICES_LIST;
     label LABEL_END;
-
+    
+    subtitle text = STRING_TOKEN(STR_LAST_STRING);
+    subtitle text = STRING_TOKEN(STR_DM_DRIVER_HEALTH_TITLE); 
+    
+    text
+      help   = STRING_TOKEN(STR_DRIVER_HEALTH_STATUS_HELP),
+      text   = STRING_TOKEN(STR_DRIVER_HEALTH_ALL_HEALTHY),
+      text   = STRING_TOKEN(STR_LAST_STRING),
+      flags  = INTERACTIVE,
+      key    = DEVICE_MANAGER_KEY_DRIVER_HEALTH;   
+      
     subtitle text = STRING_TOKEN(STR_EMPTY_STRING);
 
     label LABEL_VBIOS;
     label LABEL_END;
-
+    
     subtitle text = STRING_TOKEN(STR_EMPTY_STRING);
     subtitle text = STRING_TOKEN(STR_EXIT_STRING);
 
