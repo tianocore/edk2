@@ -191,7 +191,7 @@ BdsBootDeviceSelect (
     //
     if (!IS_LOAD_OPTION_TYPE (BootOption->Attribute, LOAD_OPTION_ACTIVE)) {
       //
-      // skip the header of the link list, becuase it has no boot option
+      // skip the header of the link list, because it has no boot option
       //
       Link = Link->ForwardLink;
       continue;
@@ -239,7 +239,7 @@ BdsBootDeviceSelect (
       PlatformBdsEnterFrontPage (Timeout, FALSE);
 
       //
-      // Rescan the boot option list, avoid pertential risk of the boot
+      // Rescan the boot option list, avoid potential risk of the boot
       // option change in front page
       //
       if (BootNextExist) {

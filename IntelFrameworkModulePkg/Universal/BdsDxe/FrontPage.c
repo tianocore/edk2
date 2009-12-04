@@ -534,7 +534,7 @@ CallFrontPage (
                             &ActionRequest
                             );
   //
-  // Check whether user  change any option setting which needs a reset to be effective
+  // Check whether user change any option setting which needs a reset to be effective
   //
   if (ActionRequest == EFI_BROWSER_ACTION_REQUEST_RESET) {
     EnableResetRequired ();
@@ -871,7 +871,7 @@ WaitForSingleEvent (
   @param   TimeoutDefault  The fault time out value before the system continue to boot.
 
   @retval  EFI_SUCCESS       User pressed some key except "Enter"
-  @retval  EFI_TIME_OUT      Timout expired or user press "Enter"
+  @retval  EFI_TIME_OUT      Timeout expired or user press "Enter"
 
 **/
 EFI_STATUS
@@ -965,7 +965,7 @@ ShowProgress (
   @param TimeoutDefault     The fault time out value before the system
                             continue to boot.
   @param ConnectAllHappened The indicater to check if the connect all have
-                            already happended.
+                            already happened.
 
 **/
 VOID
@@ -1015,11 +1015,11 @@ PlatformBdsEnterFrontPage (
 
     //
     // If gCallbackKey is greater than 1 and less or equal to 5,
-    // it will lauch configuration utilities.
+    // it will launch configuration utilities.
     // 2 = set language
     // 3 = boot manager
     // 4 = device manager
-    // 5 = boot maintainenance manager
+    // 5 = boot maintenance manager
     //
     if (gCallbackKey != 0) {
       REPORT_STATUS_CODE (
@@ -1054,7 +1054,7 @@ PlatformBdsEnterFrontPage (
       //
       // User chose to run the Boot Manager
       //
-      CallBootManager ();
+      CallBootManager();
       break;
 
     case FRONT_PAGE_KEY_DEVICE_MANAGER:

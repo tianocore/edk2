@@ -929,7 +929,7 @@ InitializeBM (
   }
 
   //
-  // Post our Boot Maint VFR binnary to the HII database.
+  // Post our Boot Maint VFR binary to the HII database.
   //
   BmmCallbackInfo->BmmHiiHandle = HiiAddPackages (
                                     &mBootMaintGuid,
@@ -1161,7 +1161,7 @@ FreeAllMenu (
 }
 
 /**
-  Intialize all the string depositories.
+  Initialize all the string depositories.
 
 **/
 VOID

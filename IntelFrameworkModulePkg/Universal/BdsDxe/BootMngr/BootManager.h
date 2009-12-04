@@ -54,7 +54,7 @@ typedef struct {
 } BOOT_MANAGER_CALLBACK_DATA;
 
 /**
-  This call back funtion is registered with Boot Manager formset.
+  This call back function is registered with Boot Manager formset.
   When user selects a boot option, this call back function will
   be triggered. The boot option is saved for later processing.
 
@@ -97,7 +97,7 @@ InitializeBootManager (
   );
 
 /**
-  This funtion invokees Boot Manager. If all devices have not a chance to be connected,
+  This function invokes Boot Manager. If all devices have not a chance to be connected,
   the connect all will be triggered. It then enumerate all boot options. If 
   a boot option from the Boot Manager page is selected, Boot Manager will boot
   from this boot option.

@@ -232,7 +232,7 @@ TimeCompare (
   @param TimeoutDefault  - The fault time out value before the system
                          continue to boot.
   @param ConnectAllHappened - The indicater to check if the connect all have
-                         already happended.
+                         already happened.
 
 **/
 VOID
