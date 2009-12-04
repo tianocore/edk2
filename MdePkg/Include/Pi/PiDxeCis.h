@@ -655,7 +655,7 @@ EFI_STATUS
 // DXE Services Table
 //
 #define DXE_SERVICES_SIGNATURE  0x565245535f455844ULL
-#define DXE_SERVICES_REVISION   ((1<<16) | (00))
+#define DXE_SERVICES_REVISION   ((1<<16) | (20))
 
 typedef struct {
   ///
