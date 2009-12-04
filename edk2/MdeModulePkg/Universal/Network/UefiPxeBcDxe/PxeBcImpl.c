@@ -2697,7 +2697,10 @@ EfiPxeLoadFile (
   // Check download status
   //
   if (Status == EFI_SUCCESS) {
-    PxeBc->Stop (PxeBc); 
+    //
+    // The functionality of PXE Base Code protocol will not be stopped,
+    // when downloading is successfully.
+    //
     return EFI_SUCCESS;
 
   } else if (Status == EFI_BUFFER_TOO_SMALL) {
