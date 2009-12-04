@@ -19,6 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <IndustryStandard/PeImage.h>
 #include <Guid/MdeModuleHii.h>
 #include <Guid/FileSystemVolumeLabelInfo.h>
+#include <Guid/HiiPlatformSetupFormset.h>
 #include <Protocol/DevicePath.h>
 #include <IndustryStandard/SmBios.h>
 #include <Protocol/LoadFile.h>
@@ -42,6 +43,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SerialIo.h>
 #include <Protocol/LegacyBios.h>
 #include <Protocol/SimpleTextInEx.h>
+#include <Protocol/DriverHealth.h>
 
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/PrintLib.h>

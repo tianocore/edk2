@@ -55,6 +55,7 @@
 
   DeviceMngr/DeviceManager.h
   DeviceMngr/DeviceManagerVfr.Vfr
+  DeviceMngr/DriverHealthVfr.Vfr
   DeviceMngr/DeviceManagerStrings.uni
   DeviceMngr/DeviceManager.c
   BootMngr/BootManagerVfr.Vfr
@@ -132,22 +133,24 @@
   gEfiFileInfoGuid                              ## CONSUMES ## GUID (Indicate the information type is file)
   gEfiHiiPlatformSetupFormsetGuid               ## CONSUMES ## GUID (Indicate the formset class guid to be displayed)
   gEfiIfrTianoGuid                              ## CONSUMES ## GUID (Extended IFR Guid Opcode)
-
+  gEfiHiiDriverHealthFormsetGuid                ## CONSUMES ## GUID (Indicate the Driver Health formset class guid to be displayed)
+  
 [Protocols]
-  gEfiSimpleFileSystemProtocolGuid              # PROTOCOL ALWAYS_CONSUMES
-  gEfiLoadFileProtocolGuid                      # PROTOCOL ALWAYS_CONSUMES
-  gEfiBdsArchProtocolGuid                       # PROTOCOL ALWAYS_PRODUCES
-  gEfiSmbiosProtocolGuid                        # PROTOCOL ALWAYS_CONSUMED
-  gEfiGenericMemTestProtocolGuid                # PROTOCOL ALWAYS_CONSUMES
-  gEfiLegacyBiosProtocolGuid                    # PROTOCOL ALWAYS_CONSUMES
-  gEfiUgaDrawProtocolGuid |PcdUgaConsumeSupport # PROTOCOL SOMETIMES_CONSUMES
-  gEfiBlockIoProtocolGuid                       # PROTOCOL ALWAYS_CONSUMES
-  gEfiGraphicsOutputProtocolGuid                # PROTOCOL SOMETIMES_CONSUMES
-  gEfiSimpleTextInputExProtocolGuid             # PROTOCOL ALWAYS_CONSUMES
-  gEfiHiiConfigAccessProtocolGuid               # PROTOCOL ALWAYS_CONSUMES
-  gEfiFormBrowser2ProtocolGuid                  # PROTOCOL ALWAYS_CONSUMES
-  gEfiSerialIoProtocolGuid                      # PROTOCOL ALWAYS_CONSUMES
-  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMES
+  gEfiSimpleFileSystemProtocolGuid              ## PROTOCOL CONSUMES
+  gEfiLoadFileProtocolGuid                      ## PROTOCOL CONSUMES
+  gEfiBdsArchProtocolGuid                       ## PROTOCOL PRODUCES
+  gEfiSmbiosProtocolGuid                        ## PROTOCOL CONSUMES
+  gEfiGenericMemTestProtocolGuid                ## PROTOCOL CONSUMES
+  gEfiLegacyBiosProtocolGuid                    ## PROTOCOL CONSUMES
+  gEfiUgaDrawProtocolGuid |PcdUgaConsumeSupport ## PROTOCOL SOMETIMES_CONSUMES
+  gEfiBlockIoProtocolGuid                       ## PROTOCOL CONSUMES
+  gEfiGraphicsOutputProtocolGuid                ## PROTOCOL SOMETIMES_CONSUMES
+  gEfiSimpleTextInputExProtocolGuid             ## PROTOCOL CONSUMES
+  gEfiHiiConfigAccessProtocolGuid               ## PROTOCOL CONSUMES
+  gEfiFormBrowser2ProtocolGuid                  ## PROTOCOL CONSUMES
+  gEfiSerialIoProtocolGuid                      ## PROTOCOL CONSUMES
+  gEfiDevicePathProtocolGuid                    ## PROTOCOL CONSUMES
+  gEfiDriverHealthProtocolGuid                  ## PROTOCOL SOMETIMES_CONSUMES
 
 [FeaturePcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDeprecate
