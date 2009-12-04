@@ -77,7 +77,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define MAXIMUM_NORMAL_KEY_VALUE             0x11FF
 
 //
-// Varstore ID defined for Buffer Stoarge
+// Varstore ID defined for Buffer Storage
 //
 #define VARSTORE_ID_BOOT_MAINT               0x1000
 #define VARSTORE_ID_FILE_EXPLORER            0x1001
