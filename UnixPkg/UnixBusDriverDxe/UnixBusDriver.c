@@ -269,7 +269,7 @@ Returns:
     Status = EFI_UNSUPPORTED;
   }
 
-   //
+  //
   // Close protocol, don't use device path protocol in the Support() function
   //
   gBS->CloseProtocol (

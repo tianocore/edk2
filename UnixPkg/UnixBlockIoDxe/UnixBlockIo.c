@@ -774,12 +774,9 @@ Returns:
   //
   // Open the device
   //
-  Private->fd = Private->UnixThunk->Open
-    (Private->Filename, Private->Mode, 0644);
-
+  Private->fd = Private->UnixThunk->Open (Private->Filename, Private->Mode, 0644);
   if (Private->fd < 0) {
-    DEBUG ((EFI_D_INFO, "PlOpenBlock: Could not open %s\n",
-	    Private->Filename));
+    DEBUG ((EFI_D_INFO, "PlOpenBlock: Could not open %a\n", Private->Filename));
     BlockIo->Media->MediaPresent  = FALSE;
     Status                        = EFI_NO_MEDIA;
     goto Done;
@@ -798,16 +795,17 @@ Returns:
   // get the size of the file
   //
   Status = SetFilePointer64 (Private, 0, &FileSize, SEEK_END);
-
   if (EFI_ERROR (Status)) {
     FileSize = MultU64x32 (Private->NumberOfBlocks, Private->BlockSize);
-    DEBUG ((EFI_D_ERROR, "PlOpenBlock: Could not get filesize of %s\n", Private->Filename));
+    DEBUG ((EFI_D_ERROR, "PlOpenBlock: Could not get filesize of %a\n", Private->Filename));
     Status = EFI_UNSUPPORTED;
     goto Done;
   }
 
   if (Private->NumberOfBlocks == 0) {
     Private->NumberOfBlocks = DivU64x32 (FileSize, Private->BlockSize);
+    Private->LastBlock = Private->NumberOfBlocks - 1;
+    Private->Media.LastBlock = Private->LastBlock;
   }
 
   EndOfFile = MultU64x32 (Private->NumberOfBlocks, Private->BlockSize);
@@ -829,7 +827,7 @@ Returns:
     Private->UnixThunk->FTruncate (Private->fd, EndOfFile);
   }
 
-  DEBUG ((EFI_D_INIT, "%HPlOpenBlock: opened %s%N\n", Private->Filename));
+  DEBUG ((EFI_D_INIT, "%HPlOpenBlock: opened %a%N\n", Private->Filename));
   Status = EFI_SUCCESS;
 
 Done:

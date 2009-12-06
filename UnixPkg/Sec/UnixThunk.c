@@ -36,6 +36,10 @@ Abstract:
 #include "Uefi.h"
 #include "Library/UnixLib.h"
 
+#ifdef __APPLE__
+#include "Gasket.h"
+#endif
+
 int settimer_initialized;
 struct timeval settimer_timeval;
 void (*settimer_callback)(UINT64 delta);
@@ -150,74 +154,6 @@ GetErrno(void)
   return errno;
 }
 
-#if __APPLE__
-void GasketmsSleep (unsigned long Milliseconds);
-void Gasketexit (int status);
-void GasketSetTimer (UINT64 PeriodMs, VOID (*CallBack)(UINT64 DeltaMs));
-void GasketGetLocalTime (EFI_TIME *Time);
-struct tm *Gasketgmtime (const time_t *clock);
-long GasketGetTimeZone (void);
-int GasketGetDayLight (void);
-int Gasketpoll (struct pollfd *pfd, int nfds, int timeout);
-int Gasketread (int fd, void *buf, int count);
-int Gasketwrite (int fd, const void *buf, int count);
-char *Gasketgetenv (const char *name);
-int Gasketopen (const char *name, int flags, int mode);
-off_t Gasketlseek (int fd, off_t off, int whence);
-int Gasketftruncate (int fd, long int len);
-int Gasketclose (int fd);
-int Gasketmkdir (const char *pathname, mode_t mode);
-int Gasketrmdir (const char *pathname);
-int Gasketunlink (const char *pathname);
-int GasketGetErrno (void);
-DIR *Gasketopendir (const char *pathname);
-void *Gasketrewinddir (DIR *dir);
-struct dirent *Gasketreaddir (DIR *dir);
-int Gasketclosedir (DIR *dir);
-int Gasketstat (const char *path, struct stat *buf);
-int Gasketstatfs (const char *path, struct statfs *buf);
-int Gasketrename (const char *oldpath, const char *newpath);
-time_t Gasketmktime (struct tm *tm);
-int Gasketfsync (int fd);
-int Gasketchmod (const char *path, mode_t mode);
-int Gasketutime (const char *filename, const struct utimbuf *buf);
-int Gaskettcflush (int fildes, int queue_selector);
-EFI_STATUS GasketUgaCreate(struct _EFI_UNIX_UGA_IO_PROTOCOL **UgaIo, CONST CHAR16 *Title);
-void Gasketperror (__const char *__s);
-
-//
-// ... is always an int or pointer to device specific data structure
-//
-int Gasketioctl (int fd, unsigned long int __request, ...);
-int Gasketfcntl (int __fd, int __cmd, ...);
-
-int Gasketcfsetispeed (struct termios *__termios_p, speed_t __speed);
-int Gasketcfsetospeed (struct termios *__termios_p, speed_t __speed);
-int Gaskettcgetattr (int __fd, struct termios *__termios_p); 
-int Gaskettcsetattr (int __fd, int __optional_actions, __const struct termios *__termios_p);
-int Gasketsigaction (int sig, const struct sigaction *act, struct sigaction *oact);
-int Gasketsetcontext (const ucontext_t *ucp);
-int Gasketgetcontext (ucontext_t *ucp);
-int Gasketsigemptyset (sigset_t *set);
-int Gasketsigaltstack (const stack_t *ss, stack_t *oss);
-
-RETURN_STATUS
-GasketUnixPeCoffGetEntryPoint (
-  IN     VOID  *Pe32Data,
-  IN OUT VOID  **EntryPoint
-  );
-
-VOID
-GasketUnixPeCoffRelocateImageExtraAction (
-  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
-  );
-
-VOID
-GasketPeCoffLoaderUnloadImageExtraAction (
-  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
-  );
-
-#endif
 
 extern EFI_STATUS
 UgaCreate(struct _EFI_UNIX_UGA_IO_PROTOCOL **UgaIo, CONST CHAR16 *Title);
@@ -303,7 +239,7 @@ EFI_UNIX_THUNK_PROTOCOL mUnixThunkTable = {
   rewinddir,
   readdir,
   closedir,
-  stat,
+  (UnixStat)stat,
   statfs,
   rename,
   mktime,
