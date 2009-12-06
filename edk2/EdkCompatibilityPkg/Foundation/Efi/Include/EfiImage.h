@@ -48,6 +48,8 @@ Abstract:
 #define EFI_IMAGE_MACHINE_IA32      0x014c
 #define EFI_IMAGE_MACHINE_IA64      0x0200
 #define EFI_IMAGE_MACHINE_X64       0x8664
+#define EFI_IMAGE_MACHINE_ARMTHUMB_MIXED       0x01c2
+
 //
 // #define EFI_IMAGE_MACHINE_FCODE     0xfc0d
 //

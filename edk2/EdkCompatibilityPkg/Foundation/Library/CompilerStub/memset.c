@@ -30,7 +30,7 @@ Abstract:
 VOID *
 memset (
   OUT VOID    *Dest,
-  IN  UINTN   Char,
+  IN  int     Char,
   IN  UINTN   Count
   )
 {

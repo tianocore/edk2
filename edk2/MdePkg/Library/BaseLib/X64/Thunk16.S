@@ -30,23 +30,23 @@ ASM_GLOBAL ASM_PFX(mTransition)
 ASM_GLOBAL ASM_PFX(InternalAsmThunk16)
 
 # define the structure of IA32_REGS
-.equ  _EDI, 0       #size 4
-.equ  _ESI, 4       #size 4
-.equ  _EBP, 8       #size 4
-.equ  _ESP, 12      #size 4
-.equ  _EBX, 16      #size 4
-.equ  _EDX, 20      #size 4
-.equ  _ECX, 24      #size 4
-.equ  _EAX, 28      #size 4
-.equ  _DS,  32      #size 2
-.equ  _ES,  34      #size 2
-.equ  _FS,  36      #size 2
-.equ  _GS,  38      #size 2
-.equ  _EFLAGS, 40   #size 8
-.equ  _EIP, 48      #size 4
-.equ  _CS, 52       #size 2
-.equ  _SS, 54       #size 2
-.equ  IA32_REGS_SIZE, 56
+.set  _EDI, 0       #size 4
+.set  _ESI, 4       #size 4
+.set  _EBP, 8       #size 4
+.set  _ESP, 12      #size 4
+.set  _EBX, 16      #size 4
+.set  _EDX, 20      #size 4
+.set  _ECX, 24      #size 4
+.set  _EAX, 28      #size 4
+.set  _DS,  32      #size 2
+.set  _ES,  34      #size 2
+.set  _FS,  36      #size 2
+.set  _GS,  38      #size 2
+.set  _EFLAGS, 40   #size 8
+.set  _EIP, 48      #size 4
+.set  _CS, 52       #size 2
+.set  _SS, 54       #size 2
+.set  IA32_REGS_SIZE, 56
 
     .data
 
@@ -167,7 +167,7 @@ ASM_PFX(ToUserCode):
     movl    $0xc0000080,%ecx
     movq    %rax, %cr0
     rdmsr
-    andb    $0b11111110, %ah 
+    andb    $0xfe, %ah                  # $0b11111110
     wrmsr
     movq    %rbp, %cr4
     movl    %esi,%ss                    # set up 16-bit stack segment
@@ -193,9 +193,9 @@ L_RealMode:
     .byte 0x66                          # make the following retf 32-bit
     lret                                # transfer control to user code
 
-.equ  CODE16,  ASM_PFX(_16Code) - .
-.equ  DATA16,  ASM_PFX(_16Data) - .
-.equ  DATA32,  ASM_PFX(_32Data) - .
+.set  CODE16,  ASM_PFX(_16Code) - .
+.set  DATA16,  ASM_PFX(_16Data) - .
+.set  DATA32,  ASM_PFX(_32Data) - .
 
 ASM_PFX(NullSeg):   .quad      0
 ASM_PFX(_16Code):
@@ -220,7 +220,7 @@ ASM_PFX(_32Data):
             .byte 0xcf                  # 16-bit segment, 4GB limit
             .byte 0
 
-.equ  GDT_SIZE, . - ASM_PFX(NullSeg)
+.set  GDT_SIZE, . - ASM_PFX(NullSeg)
 
 #------------------------------------------------------------------------------
 # IA32_REGISTER_SET *
@@ -238,11 +238,11 @@ ASM_PFX(InternalAsmThunk16):
     pushq   %rsi
     pushq   %rdi
     
-    movq    %ds, %rbx
+    movl    %ds, %ebx
     pushq   %rbx      # Save ds segment register on the stack
-    movq    %es, %rbx
+    movl    %es, %ebx
     pushq   %rbx      # Save es segment register on the stack
-    movq    %ss, %rbx
+    movl    %ss, %ebx
     pushq   %rbx      # Save ss segment register on the stack
 
     .byte   0x0f, 0xa0                  #push   fs
@@ -267,7 +267,7 @@ ASM_PFX(InternalAsmThunk16):
     sgdt    0x60(%rsp)                  # save GDT stack in argument space
     movzwq  0x60(%rsp), %r10            # r10 <- GDT limit 
     lea     ((ASM_PFX(InternalAsmThunk16) - SavedCr4) + 0xf)(%rcx), %r11 
-    andq    $0xfffffff0, %r11            # r11 <- 16-byte aligned shadowed GDT table in real mode buffer      
+    andq    $0xfffffffffffffff0, %r11   # r11 <- 16-byte aligned shadowed GDT table in real mode buffer      
     
     movw    %r10w, (SavedGdt - SavedCr4)(%rcx)       # save the limit of shadowed GDT table
     movq    %r11, (SavedGdt - SavedCr4 + 0x2)(%rcx)  # save the base address of shadowed GDT table
@@ -311,11 +311,11 @@ L_RetFromRealMode:
     .byte 0x0f, 0xa1                    # pop fs
     
     popq     %rbx
-    movq     %rbx, %ss
+    movl     %ebx, %ss
     popq     %rbx
-    movq     %rbx, %es
+    movl     %ebx, %es
     popq     %rbx
-    movq     %rbx, %ds
+    movl     %ebx, %ds
     
     popq    %rdi
     popq    %rsi

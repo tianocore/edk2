@@ -60,7 +60,32 @@ Abstract:
 
 #define _EFI_INT_SIZE_OF(n) ((sizeof (n) + sizeof (UINTN) - 1) &~(sizeof (UINTN) - 1))
 
-#if defined(__GNUC__)
+#if defined(__CC_ARM)
+//
+// RVCT ARM variable argument list support.
+//
+
+///
+/// Variable used to traverse the list of arguments. This type can vary by 
+/// implementation and could be an array or structure. 
+///
+#ifdef __APCS_ADSABI
+  typedef int         *va_list[1];
+  #define VA_LIST     va_list
+#else
+  typedef struct __va_list { void *__ap; } va_list;
+  #define VA_LIST                          va_list
+#endif
+
+#define VA_START(Marker, Parameter)   __va_start(Marker, Parameter)
+
+#define VA_ARG(Marker, TYPE)          __va_arg(Marker, TYPE)
+
+#define VA_END(Marker)                ((void)0)
+
+#define VA_COPY(Dest, Start)          __va_copy (Dest, Start)
+
+#elif defined(__GNUC__)
 //
 // Use GCC built-in macros for variable argument lists.
 //
@@ -77,6 +102,8 @@ typedef __builtin_va_list VA_LIST;
 
 #define VA_END(Marker)               __builtin_va_end (Marker)
 
+#define VA_COPY(Dest, Start)         __builtin_va_copy (Dest, Start)
+
 #else
 
 //
@@ -88,6 +115,7 @@ typedef CHAR8 *VA_LIST;
 #define VA_START(ap, v) (ap = (VA_LIST) & (v) + _EFI_INT_SIZE_OF (v))
 #define VA_ARG(ap, t)   (*(t *) ((ap += _EFI_INT_SIZE_OF (t)) - _EFI_INT_SIZE_OF (t)))
 #define VA_END(ap)      (ap = (VA_LIST) 0)
+#define VA_COPY(dest, src) ((void)((dest) = (src)))
 
 #endif
 
