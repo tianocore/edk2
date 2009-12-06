@@ -1,0 +1,31 @@
+#%HEADER%
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ArmCortexArmLibPrePi
+  FILE_GUID                      = A150FA0C-F4E8-4207-9BEB-CD6DFB430D73
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmLib
+
+[Sources.common]
+  ../Common/ArmLibSupport.S    | GCC
+  ../Common/ArmLibSupport.asm  | RVCT
+  ../Common/ArmLib.c
+  
+  ArmCortexASupport.S    | GCC
+  ArmCortexASupport.asm  | RVCT
+
+  ArmCortexALib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  PrePiLib
+  
+[Protocols]
+  gEfiCpuArchProtocolGuid
+
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdArmCacheOperationThreshold

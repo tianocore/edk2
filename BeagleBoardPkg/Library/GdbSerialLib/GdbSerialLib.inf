@@ -1,0 +1,29 @@
+#%HEADER%
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = GdbSerialLib
+  FILE_GUID                      = E2423349-EF5D-439B-95F5-8B8D8E3B443F
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = GdbSerialLib
+
+  CONSTRUCTOR                    = GdbSerialLibConstructor
+
+
+[Sources.common]
+  GdbSerialLib.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  BeagleBoardPkg/BeagleBoardPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  IoLib
+  OmapLib    
+
+[FixedPcd]
+  gBeagleBoardTokenSpaceGuid.PcdBeagleConsoleUart
+

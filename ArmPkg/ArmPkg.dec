@@ -1,0 +1,36 @@
+#%HEADER%
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = ArmPkg
+  PACKAGE_GUID                   = 5CFBD99E-3C43-4E7F-8054-9CDEAFF7710F
+  PACKAGE_VERSION                = 0.1
+
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+#
+################################################################################
+[Includes.common]
+  Include                        # Root include for the package
+
+[LibraryClasses.common]
+  SemihostLib|Include/Library/Semihosting.h
+
+[Guids.common]
+  gArmTokenSpaceGuid       = { 0xBB11ECFE, 0x820F, 0x4968, { 0xBB, 0xA6, 0xF7, 0x6A, 0xFE, 0x30, 0x25, 0x96 } }
+
+[Protocols.common]
+  gTimerDebugSupportProtocolGuid = { 0x68300561, 0x0197, 0x465d, { 0xb5, 0xa1, 0x28, 0xeb, 0xa1, 0x98, 0xdd, 0x0b } }
+
+[PcdsFeatureFlag.common]
+  gArmTokenSpaceGuid.PcdCpuDxeProduceDebugSupport|FALSE|BOOLEAN|0x00000001
+
+[PcdsFixedAtBuild.common]
+  gArmTokenSpaceGuid.PcdArmUncachedMemoryMask|0x0000000080000000|UINT64|0x00000002
+  gArmTokenSpaceGuid.PcdArmCacheOperationThreshold|1024|UINT32|0x00000003
+  gArmTokenSpaceGuid.PcdCpuVectorBaseAddress|0xfff00000|UINT32|0x00000004
+  gArmTokenSpaceGuid.PcdCpuResetAddress|0x00000000|UINT32|0x00000005

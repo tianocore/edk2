@@ -1,0 +1,28 @@
+#%HEADER%
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ArmDebugSupportDxe
+  FILE_GUID                      = 2e7c151b-cbd8-4df6-a0e3-cde660067c6a
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = DebugSupportDxeInitialize
+
+[Sources.common]
+  DebugSupport.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedePkg/EmbeddedePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  CacheMaintenanceLib
+  UefiDriverEntryPoint
+  ArmLib
+
+[Protocols]
+  gEfiCpuArchProtocolGuid
+  gEfiDebugSupportProtocolGuid
+  gTimerDebugSupportProtocolGuid
+  

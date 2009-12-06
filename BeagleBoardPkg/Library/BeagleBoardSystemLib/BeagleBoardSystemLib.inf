@@ -1,0 +1,45 @@
+#%HEADER%
+#/** @file
+# Support for Airport libraries.
+#
+# Copyright (c) 2009, Apple Inc.
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BeagleBoardSystemLib
+  FILE_GUID                      = b15a2640-fef2-447c-98e1-9ce22cfa529c
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = BeagleBoardSystemLib
+
+[Sources.ARM]
+  BeagleBoardSystemLib.c
+  GoLittleEndian.asm | RVCT
+  GoLittleEndian.S   | GCC 
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPkg/ArmPkg.dec
+  BeagleBoardPkg/BeagleBoardPkg.dec
+  
+[LibraryClasses]
+  ArmLib
+  CacheMaintenanceLib
+  MemoryAllocationLib
+  UefiRuntimeServicesTableLib
+  TimerLib
+  UefiLib
+
+[Pcd]
+  gEmbeddedTokenSpaceGuid.PcdFlashFvMainBase

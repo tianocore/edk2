@@ -1,0 +1,126 @@
+#%HEADER%
+#/** @file
+# Framework Module Development Environment Industry Standards
+#
+# This Package provides headers and libraries that conform to EFI/PI Industry standards.
+# Copyright (c) 2007, Intel Corporation.
+#
+# All rights reserved.
+#    This program and the accompanying materials are licensed and made available under
+#    the terms and conditions of the BSD License which accompanies this distribution.
+#    The full text of the license may be found at
+#    http://opensource.org/licenses/bsd-license.php
+#
+#    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = EmbeddedPkg
+  PACKAGE_GUID                   = dea8e498-7e1b-47c1-b6fa-4bc04092587e
+  PACKAGE_VERSION                = 0.1
+
+
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+#
+################################################################################
+[Includes.common]
+  Include                        # Root include for the package
+
+[LibraryClasses.common]
+  EfiFileLib|Include/Library/EfiFileLib.h
+  PrePiLib|Include/Library/PrePiLib.h
+  RealTimeClockLib|Include/Library/RealTimeClockLib.h
+  EfiResetSystemLib|Include/Library/EfiResetSystemLib.h
+  EblCmdLib|Include/Library/EblCmdLib.h
+  EblAddExternalCommandLib|Library/EblAddExternalCommandLib.h
+  EblNetworkLib|Library/EblNetworkLib.h
+  GdbSerialLib|Include/Library/GdbSerialLib.h
+
+
+[Guids.common]
+  gEmbeddedTokenSpaceGuid       = { 0xe0d8ca17, 0x4276, 0x4386, { 0xbb, 0x79, 0x48, 0xcb, 0x81, 0x3d, 0x3c, 0x4f }}
+
+[Protocols.common]
+  gHardwareInterruptProtocolGuid =  { 0x2890B3EA, 0x053D, 0x1643, { 0xAD, 0x0C, 0xD6, 0x48, 0x08, 0xDA, 0x3F, 0xF1 } }
+  gEfiDebugSupportPeriodicCallbackProtocolGuid = { 0x9546e07c, 0x2cbb, 0x4c88, { 0x98, 0x6c, 0xcd, 0x34, 0x10, 0x86, 0xf0, 0x44 } }
+  gEfiEblAddCommandProtocolGuid =   { 0xaeda2428, 0x9a22, 0x4637, { 0x9b, 0x21, 0x54, 0x5e, 0x28, 0xfb, 0xb8, 0x29 } }
+  gEmbeddedDeviceGuid =   { 0xbf4b9d10, 0x13ec, 0x43dd, { 0x88, 0x80, 0xe9, 0xb, 0x71, 0x8f, 0x27, 0xde } }
+  gEmbeddedExternalDeviceProtocolGuid = { 0x735F8C64, 0xD696, 0x44D0, { 0xBD, 0xF2, 0x44, 0x7F, 0xD0, 0x5A, 0x54, 0x06 }}
+  gEmbeddedGpioProtocolGuid           = { 0x17a0a3d7, 0xc0a5, 0x4635, { 0xbb, 0xd5, 0x07, 0x21, 0x87, 0xdf, 0xe2, 0xee }}
+  
+[PcdsFeatureFlag.common]
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedMacBoot|FALSE|BOOLEAN|0x00000001
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedDirCmd|TRUE|BOOLEAN|0x00000002
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedHobCmd|TRUE|BOOLEAN|0x00000003
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedHwDebugCmd|TRUE|BOOLEAN|0x00000004
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedIoEnable|FALSE|BOOLEAN|0x00000005
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedScriptCmd|FALSE|BOOLEAN|0x00000006
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedPciDebugCmd|FALSE|BOOLEAN|0x00000041
+  gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|FALSE|BOOLEAN|0x0000001b
+  gEmbeddedTokenSpaceGuid.PcdCacheEnable|FALSE|BOOLEAN|0x00000042
+  gEmbeddedTokenSpaceGuid.PcdGdbSerial|FALSE|BOOLEAN|0x0000004d
+
+
+[PcdsFixedAtBuild.common]
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedAutomaticBootCommand|L""|VOID*|0x00000007
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedDefaultTextColor|0x07|UINT32|0x00000008
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedMemVariableStoreSize|0x10000|UINT32|0x00000009
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"Ebl"|VOID*|0x00000034
+
+  gEmbeddedTokenSpaceGuid.PcdPrePiHobBase|131072|UINT32|0x00000040
+  gEmbeddedTokenSpaceGuid.PcdPrePiStackBase|0|UINT32|0x0000000b
+  gEmbeddedTokenSpaceGuid.PcdPrePiStackSize|131072|UINT32|0x0000000c
+  gEmbeddedTokenSpaceGuid.PcdPrePiTempMemorySize|0|UINT32|0x000000d
+  gEmbeddedTokenSpaceGuid.PcdPrePiBfvBaseAddress|0|UINT32|0x000000e
+  gEmbeddedTokenSpaceGuid.PcdPrePiBfvSize|0|UINT32|0x0000000f
+  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|32|UINT8|0x00000010
+  gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|0|UINT8|0x00000011
+  
+  gEmbeddedTokenSpaceGuid.PcdFlashFvMainBase|0x0|UINT32|0x00000043
+  gEmbeddedTokenSpaceGuid.PcdFlashFvMainOffset|0x0|UINT32|0x00000044
+  gEmbeddedTokenSpaceGuid.PcdFlashFvMainSize|0x0|UINT32|0x000000045
+
+  
+# Used to help reduce fragmentation in the EFI memory map
+# EFI Pages (4K) are the units used
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory|0|UINT32|0x00000012
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS|0|UINT32|0x00000013
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType|0|UINT32|0x00000014
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|0|UINT32|0x00000015
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode|0|UINT32|0x00000016
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesCode|0|UINT32|0x00000017
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesData|0|UINT32|0x00000018
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderCode|0|UINT32|0x00000019
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderData|0|UINT32|0x0000001a
+
+  gEmbeddedTokenSpaceGuid.PcdTimerBaseAddress|0x3c700000|UINT32|0x0000001c
+  gEmbeddedTokenSpaceGuid.PcdTimerVector|7|UINT32|0x0000001d
+  gEmbeddedTokenSpaceGuid.PcdTimerPeriod|100000|UINT32|0x0000001e
+  gEmbeddedTokenSpaceGuid.PcdInterruptBaseAddress|0x38e00000|UINT32|0x0000001f
+  
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedFdBaseAddress|0xffff0000|UINT32|0x00000030
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedFdSize|0x0000000|UINT32|0x00000031
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterFreqencyInHz|0x0000000|UINT64|0x00000032
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedFdPerformanceCounterPeriodInNanoseconds|0x0000000|UINT32|0x00000033
+
+# Shell characteristics
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedShellCharacterEcho|TRUE|BOOLEAN|0x00000046
+
+  gEmbeddedTokenSpaceGuid.PcdGdbBaudRate|115200|UINT64|0x00000047
+  gEmbeddedTokenSpaceGuid.PcdGdbDataBits|8|UINT8|0x00000048
+  gEmbeddedTokenSpaceGuid.PcdGdbParity|1|UINT8|0x00000049
+  gEmbeddedTokenSpaceGuid.PcdGdbStopBits|1|UINT8|0x0000004a
+  gEmbeddedTokenSpaceGuid.PcdGdbUartPort|0x3f8|UINT32|0x0000004b
+  gEmbeddedTokenSpaceGuid.PcdGdbMaxPacketRetryCount|10000000|UINT32|0x0000004c
+  
+  
+

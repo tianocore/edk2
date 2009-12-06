@@ -1,0 +1,32 @@
+#%HEADER%
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SemihostLib
+  FILE_GUID                      = C40D08BA-DB7B-4F07-905A-C5FE4B5AF987
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SemihostLib
+
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = ARM
+#
+[Sources.ARM]
+  Arm/SemihostLib.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ArmPkg/ArmPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  
+[Protocols]
+  
+[Guids]
+ 
+[Pcd]
+ 

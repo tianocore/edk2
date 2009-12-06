@@ -1,0 +1,92 @@
+#%HEADER%
+#/** @file
+#  Base Library implementation.
+#
+#  Copyright (c) 2009, Apple, Inc.
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = CompilerIntrinsicsLib
+  FILE_GUID                      = 855274FA-3575-4C20-9709-C031DC5589FA
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CompilerIntrinsicsLib 
+
+
+[Sources.common]
+
+
+[Sources.ARM]
+  Arm/mullu.asm        | RVCT
+  Arm/switch.asm       | RVCT
+  Arm/llsr.asm         | RVCT
+  Arm/memcpy.asm       | RVCT
+  Arm/memcpy4.asm      | RVCT
+  Arm/uread.asm        | RVCT
+  Arm/uwrite.asm       | RVCT
+  Arm/lasr.asm         | RVCT
+  Arm/llsl.asm         | RVCT
+  Arm/div.asm          | RVCT
+  Arm/uldiv.asm        | RVCT
+  Arm/ldivmod.asm      | RVCT
+  
+
+#
+# Move .c to .s to work around LLVM issues
+#
+#  Arm/ashrdi3.c    | GCC
+#  Arm/ashldi3.c    | GCC
+#  Arm/divdi3.c     | GCC
+#  Arm/divsi3.c     | GCC
+#  Arm/lshrdi3.c    | GCC
+  Arm/ashrdi3.S    | GCC
+  Arm/ashldi3.S    | GCC
+  Arm/divdi3.S     | GCC
+  Arm/divsi3.S     | GCC
+  Arm/lshrdi3.S    | GCC
+
+  Arm/memcpy.S     | GCC
+  Arm/memset.S     | GCC
+  
+#  Arm/modsi3.c     | GCC
+#  Arm/moddi3.c     | GCC
+#  Arm/muldi3.c     | GCC  
+  Arm/modsi3.S     | GCC
+  Arm/moddi3.S     | GCC
+  Arm/muldi3.S     | GCC  
+
+#  Arm/udivsi3.c    | GCC
+#  Arm/umodsi3.c    | GCC
+#  Arm/udivdi3.c    | GCC
+#  Arm/umoddi3.c    | GCC
+#  Arm/udivmoddi4.c | GCC
+  Arm/udivsi3.S    | GCC
+  Arm/umodsi3.S    | GCC
+  Arm/udivdi3.S    | GCC
+  Arm/umoddi3.S    | GCC
+  Arm/udivmoddi4.S | GCC
+
+#  Arm/clzsi2.c     | GCC
+#  Arm/ctzsi2.c     | GCC
+#  Arm/ucmpdi2.c    | GCC
+  Arm/switch8.S    | GCC
+  Arm/switchu8.S   | GCC
+  Arm/switch16.S   | GCC
+  Arm/switch32.S   | GCC
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+

@@ -1,0 +1,28 @@
+#%HEADER%
+#
+# Copyright (c) 2005 - 2009 Apple Computer, Inc.  All rights reserved.
+#
+# 
+#
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = EblNetworkLib
+  FILE_GUID                      = D885869A-7869-47DB-9429-DE03C318BCFD
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = EblNetworkLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER
+
+[sources.common]
+  EblNetworkLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+
+[Protocols]
+  gEfiSimpleNetworkProtocolGuid
+  gEfiPxeBaseCodeProtocolGuid
+
+[Depex]
+  TRUE

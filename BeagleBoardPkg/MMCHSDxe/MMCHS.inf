@@ -1,0 +1,39 @@
+#%HEADER%
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MMCHS
+  FILE_GUID                      = 100c2cfa-b586-4198-9b4c-1683d195b1da
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = MMCHSInitialize
+
+
+[Sources.common]
+  MMCHS.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  BeagleBoardPkg/BeagleBoardPkg.dec
+
+[LibraryClasses]
+  PcdLib
+  UefiLib
+  UefiDriverEntryPoint
+  MemoryAllocationLib
+  IoLib
+
+[Guids]
+  
+[Protocols]
+  gEfiBlockIoProtocolGuid
+  gEfiCpuArchProtocolGuid
+  gEfiDevicePathProtocolGuid
+  gEmbeddedExternalDeviceProtocolGuid
+
+[Pcd]
+  gBeagleBoardTokenSpaceGuid.PcdBeagleMMCHS1Base
+
+[depex]
+  gEmbeddedExternalDeviceProtocolGuid
