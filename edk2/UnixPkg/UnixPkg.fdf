@@ -25,8 +25,13 @@
 #
 ################################################################################
 [FD.Fv_Recovery]
-BaseAddress   = 0x0|gEfiUnixPkgTokenSpaceGuid.PcdUnixFdBaseAddress  #The base address of the FLASH Device.
-Size          = 0x002a0000                                           #The size in bytes of the FLASH Device
+#
+# In OS X PEIMs are really XIP, so we need to make this address match the malloced 
+# buffer for the FD (0x41000000). If this address does not match the FV will get
+# relocated in place (works, but not a great idea).
+#
+BaseAddress   = 0x41000000|gEfiUnixPkgTokenSpaceGuid.PcdUnixFdBaseAddress   #The base address of the FLASH Device.
+Size          = 0x002a0000|gEfiUnixPkgTokenSpaceGuid.PcdUnixFirmwareFdSize  #The size in bytes of the FLASH Device
 ErasePolarity = 1
 BlockSize     = 0x10000
 NumBlocks     = 0x2a

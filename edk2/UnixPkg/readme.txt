@@ -20,6 +20,32 @@ UnixPkg is built with following command:
   Notes: ELFGCC is defined in <Workspace>/Conf/tools_def.txt file. This tool chain use native gcc/binutil instead of 
          cross-compiler like UNIXGCC tool chain.
 
+On Mac OS X you can cd into UnixPkg directory and execute ./build.sh to build. This does not require
+setting up the environment like running the build command. Note Snow Leopard or later is required. 
+This script should also work for any *INUX, but has not been tested. 
+
+./build.sh run will lanuch the emulator in gdb so you can source level debug via gdb. 
+
+
+Notes:
+=====
+On Mac OS X Snow Leopard you can use Xcode 3.2 as a GUI debugger. 
+Launch Xcode and open UnixPkg/Xcode/xcode_project/xcode_project.xcodeproj
+Under the build menu chose build and debug. shift-cmd-B shows the build results.
+
+Under most *INUX the EFI executables are placed in the emulated EFI memory by the EFI PE/COFF loader
+but dlopen() is used to also load the image into the process to support source level debug. 
+The entry point for the image is moved from the EFI emulator memory into the dlopen() image. This
+is not the case for Mac OS X. On Mac OS X a debugger script is used and the real EFI images in
+the emulator are the ones being debugged. 
+
+Also on Mac OS X the stack alignment requirements for IA-32 are 16 bytes and this is more strict
+than the EFI ABI. To work around this gasket code was introduced to ensure the stack is always
+16 byte aligned when making any POSIX call on Mac OS X. 
+
+To build PE/COFF images with Xcode 3.2 and extra tool call mtoc is required to convert Mach-O 
+images into PE/COFF images. The tool only supports EFI PE/COFF images and the instructions on 
+how to download it are on the edk2 website.
 
 FAQ
 ===

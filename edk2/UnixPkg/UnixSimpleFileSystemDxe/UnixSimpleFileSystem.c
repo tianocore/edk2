@@ -836,7 +836,7 @@ OpenRoot:
       NewPrivateFile->IsDirectoryPath = FALSE;
     }
   } else {
-    struct stat finfo;
+    STAT_FIX finfo;
     int res = NewPrivateFile->UnixThunk->Stat (NewPrivateFile->FileName, &finfo);
     if (res == 0 && S_ISDIR(finfo.st_mode))
       NewPrivateFile->IsDirectoryPath = TRUE;
@@ -1107,7 +1107,7 @@ Returns:
   struct tm *tm;
   tm = UnixThunk->GmTime (&SystemTime);
   Time->Year   = tm->tm_year;
-  Time->Month  = tm->tm_mon;
+  Time->Month  = tm->tm_mon + 1;
   Time->Day    = tm->tm_mday;
   Time->Hour   = tm->tm_hour;
   Time->Minute = tm->tm_min;
@@ -1151,10 +1151,10 @@ Returns:
   UINTN                       NameSize;
   UINTN                       ResultSize;
   EFI_FILE_INFO               *Info;
-  CHAR8                      *RealFileName;
-  CHAR8                      *TempPointer;
+  CHAR8                       *RealFileName;
+  CHAR8                       *TempPointer;
   CHAR16                      *BufferFileName;
-  struct stat                 buf;
+  STAT_FIX                    buf;
 
   if (FileName != NULL) {
     RealFileName = FileName;
@@ -1724,7 +1724,7 @@ Returns:
   UINTN                             OldInfoSize;
   EFI_TPL                           OldTpl;
   mode_t                            NewAttr;
-  struct stat                       OldAttr;
+  STAT_FIX                          OldAttr;
   CHAR8                             *OldFileName;
   CHAR8                             *NewFileName;
   CHAR8                             *CharPointer;

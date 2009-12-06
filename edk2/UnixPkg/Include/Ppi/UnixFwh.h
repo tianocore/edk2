@@ -34,7 +34,8 @@ EFI_STATUS
 (EFIAPI *UNIX_FWH_INFORMATION) (
   IN     UINTN                  Index,
   IN OUT EFI_PHYSICAL_ADDRESS   *FdBase,
-  IN OUT UINT64                 *FdSize
+  IN OUT UINT64                 *FdSize,
+  IN OUT EFI_PHYSICAL_ADDRESS   *FixUp
   );
 
 /*++
@@ -47,6 +48,7 @@ Arguments:
   Index  - Which FD, starts at zero.
   FdSize - Size of the FD in bytes
   FdBase - Start address of the FD. Assume it points to an FV Header
+  FixUp  - Difference between actual FD address and build address
 
 Returns:
   EFI_SUCCESS     - Return the Base address and size of the FV

@@ -123,19 +123,17 @@ TryCreateShmImage(UGA_IO_PRIVATE *drv)
   drv->xshm_info.shmid = shmget
                           (IPC_PRIVATE, drv->image->bytes_per_line * drv->image->height,
                           IPC_CREAT | 0777);
-  if (drv->xshm_info.shmid < 0)
-    {
-      XDestroyImage(drv->image);
-      return 0;
-    }
+  if (drv->xshm_info.shmid < 0) {
+    XDestroyImage(drv->image);
+    return 0;
+  }
       
   drv->image_data = shmat (drv->xshm_info.shmid, NULL, 0);
-  if(!drv->image_data)
-    {
-      shmctl (drv->xshm_info.shmid, IPC_RMID, NULL);
-      XDestroyImage(drv->image);
-      return 0;
-    }
+  if(!drv->image_data) {
+    shmctl (drv->xshm_info.shmid, IPC_RMID, NULL);
+    XDestroyImage(drv->image);
+    return 0;
+  }
   
 #ifndef __APPLE__  
   //
@@ -149,12 +147,11 @@ TryCreateShmImage(UGA_IO_PRIVATE *drv)
   drv->xshm_info.shmaddr = (char*)drv->image_data;
   drv->image->data = (char*)drv->image_data;
 
-  if (!XShmAttach (drv->display, &drv->xshm_info))
-    {
-      shmdt (drv->image_data);
-      XDestroyImage(drv->image);
-      return 0;
-    }
+  if (!XShmAttach (drv->display, &drv->xshm_info)) {
+    shmdt (drv->image_data);
+    XDestroyImage(drv->image);
+    return 0;
+  }
   return 1;
 }
 
@@ -386,7 +383,7 @@ UgaCheckKey(EFI_UNIX_UGA_IO_PROTOCOL *UgaIo)
 }
 
 EFI_STATUS
-UgaGetKey(EFI_UNIX_UGA_IO_PROTOCOL *UgaIo, EFI_INPUT_KEY *key)
+UgaGetKey (EFI_UNIX_UGA_IO_PROTOCOL *UgaIo, EFI_INPUT_KEY *key)
 {
   UGA_IO_PRIVATE *drv = (UGA_IO_PRIVATE *)UgaIo;
   EFI_STATUS status;

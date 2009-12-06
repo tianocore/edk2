@@ -36,6 +36,7 @@
   UnixThunk.c
   FwVol.c
   SecMain.c
+  Gasket.c
   
 [Sources.Ia32]  
   Ia32/Gasket.S
@@ -71,6 +72,7 @@
   gEfiUnixPkgTokenSpaceGuid.PcdUnixFirmwareVolume
   gEfiUnixPkgTokenSpaceGuid.PcdUnixMemorySizeForSecMain
   gEfiUnixPkgTokenSpaceGuid.PcdUnixFirmwareFdSize
+  gEfiUnixPkgTokenSpaceGuid.PcdUnixFdBaseAddress
 
 [BuildOptions.common]
    GCC:*_*_IA32_DLINK_FLAGS == -o $(BIN_DIR)/SecMain -m elf_i386 -dynamic-linker /lib/ld-linux.so.2 /usr/lib/crt1.o /usr/lib/crti.o -L/usr/X11R6/lib -lXext -lX11 /usr/lib/crtn.o
@@ -83,5 +85,5 @@
 # Need to do this link via gcc and not ld as the pathing to libraries changes from OS version to OS version
 #
    XCODE:*_*_IA32_DLINK_PATH == gcc
-   XCODE:*_*_IA32_DLINK_FLAGS == -arch i386  -L/usr/X11R6/lib -lXext -lX11 -lIOKit -framework Carbon		
+   XCODE:*_*_IA32_DLINK_FLAGS == -arch i386 -o $(BIN_DIR)/SecMain -L/usr/X11R6/lib -lXext -lX11 -lIOKit -framework Carbon		
    XCODE:*_*_IA32_ASM_FLAGS == -arch i386 -g

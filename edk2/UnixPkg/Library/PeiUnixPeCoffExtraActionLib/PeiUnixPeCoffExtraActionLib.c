@@ -87,7 +87,7 @@ PeCoffLoaderRelocateImageExtraAction (
   if (mUnix == NULL) {
     UnixPeCoffGetUnixThunkStucture ();
   }
-  mUnix->PeCoffRelocateImageExtraAction (ImageContext);
+    mUnix->PeCoffRelocateImageExtraAction (ImageContext);
   }
 
 

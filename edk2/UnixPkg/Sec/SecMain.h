@@ -157,9 +157,9 @@ EFI_STATUS
 EFIAPI
 SecPeiReportStatusCode (
   IN CONST EFI_PEI_SERVICES     **PeiServices,
-  IN EFI_STATUS_CODE_TYPE     CodeType,
-  IN EFI_STATUS_CODE_VALUE    Value,
-  IN UINT32                   Instance,
+  IN EFI_STATUS_CODE_TYPE       CodeType,
+  IN EFI_STATUS_CODE_VALUE      Value,
+  IN UINT32                     Instance,
   IN CONST EFI_GUID             *CallerId,
   IN CONST EFI_STATUS_CODE_DATA *Data OPTIONAL
   )
@@ -390,25 +390,9 @@ EFIAPI
 SecUnixFdAddress (
   IN     UINTN                 Index,
   IN OUT EFI_PHYSICAL_ADDRESS  *FdBase,
-  IN OUT UINT64                *FdSize
+  IN OUT UINT64                *FdSize,
+  IN OUT EFI_PHYSICAL_ADDRESS  *FixUp
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  Index   - TODO: add argument description
-  FdBase  - TODO: add argument description
-  FdSize  - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 ;
 
 EFI_STATUS
@@ -536,6 +520,17 @@ EFIAPI
 SecPeCoffLoaderUnloadImageExtraAction (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   );
+
+
+
+VOID SetTimer (UINT64 PeriodMs, VOID (*CallBack)(UINT64 DeltaMs));
+void msSleep (unsigned long Milliseconds);
+void GetLocalTime (EFI_TIME *Time);
+void TzSet (void);
+long GetTimeZone(void);
+int GetDayLight(void);
+int GetErrno(void);
+
 
 
 extern EFI_UNIX_THUNK_PROTOCOL  *gUnix;

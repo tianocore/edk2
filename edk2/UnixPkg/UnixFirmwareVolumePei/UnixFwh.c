@@ -50,8 +50,9 @@ Returns:
 {
   EFI_STATUS                  Status;
   EFI_PEI_PPI_DESCRIPTOR      *PpiDescriptor;
-  UNIX_FWH_PPI               *FwhPpi;
+  UNIX_FWH_PPI                *FwhPpi;
   EFI_PHYSICAL_ADDRESS        FdBase;
+  EFI_PHYSICAL_ADDRESS        FdFixUp;
   EFI_FIRMWARE_VOLUME_HEADER  *FvHeader;
   UINT64                      FdSize;
   UINTN                       Index;
@@ -75,7 +76,7 @@ Returns:
     //
     // Get information about all the FD's in the system
     //
-    Status = FwhPpi->UnixFwh (Index, &FdBase, &FdSize);
+    Status = FwhPpi->UnixFwh (Index, &FdBase, &FdSize, &FdFixUp);
     if (!EFI_ERROR (Status)) {
       //
       // Assume the FD starts with an FV header
@@ -116,7 +117,7 @@ Returns:
           PcdGet32 (PcdFlashNvStorageFtwSpareSize) +
           PcdGet32 (PcdUnixFlashNvStorageEventLogSize);
 
-        BuildFvHob (FdBase + PcdGet32 (PcdUnixFlashNvStorageVariableBase), FdSize);
+        BuildFvHob (FdFixUp + PcdGet32 (PcdUnixFlashNvStorageVariableBase), FdSize);
       } else {
         //
         // For other FD's just map them in.

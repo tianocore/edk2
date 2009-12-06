@@ -89,7 +89,6 @@ EFI_PEI_PPI_DESCRIPTOR  gPrivateDispatchTable[] = {
     &mSecTemporaryRamSupportPpi
   },
   {
-
     EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
     &gUnixFwhPpiGuid,
     &mSecFwhInformationPpi
@@ -142,6 +141,7 @@ MapFile (
   IN OUT  EFI_PHYSICAL_ADDRESS  *BaseAddress,
   OUT UINT64                    *Length
   );
+  
 EFI_STATUS
 EFIAPI
 SecNt32PeCoffRelocateImage (
@@ -200,7 +200,7 @@ Returns:
   // symbols when we load every PE/COFF image.
   //
   Index = strlen (*Argv);
-  gGdbWorkingFileName = malloc (Index + strlen(".gdb"));
+  gGdbWorkingFileName = malloc (Index + strlen(".gdb") + 1);
   strcpy (gGdbWorkingFileName, *Argv);
   strcat (gGdbWorkingFileName, ".gdb");
 #endif
@@ -783,6 +783,12 @@ Returns:
   if (EFI_ERROR (Status)) {
     return Status;
   }
+	
+  Status = PeCoffLoaderRelocateImage (&ImageContext);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+	
 
   SecPeCoffRelocateImageExtraAction (&ImageContext);
 
@@ -823,7 +829,8 @@ EFIAPI
 SecUnixFdAddress (
   IN     UINTN                 Index,
   IN OUT EFI_PHYSICAL_ADDRESS  *FdBase,
-  IN OUT UINT64                *FdSize
+  IN OUT UINT64                *FdSize,
+  IN OUT EFI_PHYSICAL_ADDRESS  *FixUp
   )
 /*++
 
@@ -835,6 +842,7 @@ Arguments:
   Index  - Which FD, starts at zero.
   FdSize - Size of the FD in bytes
   FdBase - Start address of the FD. Assume it points to an FV Header
+  FixUp  - Difference between actual FD address and build address
 
 Returns:
   EFI_SUCCESS     - Return the Base address and size of the FV
@@ -848,9 +856,19 @@ Returns:
 
   *FdBase = gFdInfo[Index].Address;
   *FdSize = gFdInfo[Index].Size;
+  *FixUp  = 0;
 
   if (*FdBase == 0 && *FdSize == 0) {
     return EFI_UNSUPPORTED;
+  }
+
+  if (Index == 0) {
+    //
+    // FD 0 has XIP code and well known PCD values 
+    // If the memory buffer could not be allocated at the FD build address
+    // the Fixup is the difference.
+    //
+    *FixUp = *FdBase - FixedPcdGet32 (PcdUnixFdBaseAddress);
   }
 
   return EFI_SUCCESS;
@@ -1109,13 +1127,6 @@ SecPeCoffRelocateImageExtraAction (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
   )
 {
-  EFI_STATUS Status;
-
-  Status = PeCoffLoaderRelocateImage (ImageContext);
-  if (EFI_ERROR (Status)) {
-    PrintLoadAddress (ImageContext);
-    return;
-  }
     
 #ifdef __APPLE__
   PrintLoadAddress (ImageContext);
@@ -1186,10 +1197,10 @@ SecPeCoffRelocateImageExtraAction (
      (unsigned long)ImageContext->ImageAddress,
      (unsigned long)ImageContext->EntryPoint);
 
-  Handle = dlopen(ImageContext->PdbPointer, RTLD_NOW);
+  Handle = dlopen (ImageContext->PdbPointer, RTLD_NOW);
   
   if (Handle) {
-    Entry = dlsym(Handle, "_ModuleEntryPoint");
+    Entry = dlsym (Handle, "_ModuleEntryPoint");
   } else {
     printf("%s\n", dlerror());  
   }

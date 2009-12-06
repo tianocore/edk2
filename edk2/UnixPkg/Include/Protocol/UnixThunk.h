@@ -62,10 +62,79 @@ Abstract:
 
 #include <utime.h>
 #include <dlfcn.h>
+#include <ucontext.h>
 
 #include <Base.h>
 #include <Library/PeCoffLib.h>
 
+
+#if __APPLE__
+//
+// EFI packing is not compatible witht he default OS packing for struct stat.
+// st_size is 64-bit but starts on a 32-bit offset in the structure. The compiler
+// flags used to produce compatible EFI images, break struct stat
+//
+#pragma pack(4)
+
+#if __DARWIN_64_BIT_INO_T
+
+typedef struct stat_fix { \
+	dev_t		st_dev;			/* [XSI] ID of device containing file */ 
+	mode_t		st_mode;		/* [XSI] Mode of file (see below) */ 
+	nlink_t		st_nlink;		/* [XSI] Number of hard links */ 
+	__darwin_ino64_t st_ino;		/* [XSI] File serial number */ 
+	uid_t		st_uid;			/* [XSI] User ID of the file */ 
+	gid_t		st_gid;			/* [XSI] Group ID of the file */ 
+	dev_t		st_rdev;		/* [XSI] Device ID */ 
+	__DARWIN_STRUCT_STAT64_TIMES 
+	off_t		st_size;		/* [XSI] file size, in bytes */ 
+	blkcnt_t	st_blocks;		/* [XSI] blocks allocated for file */ 
+	blksize_t	st_blksize;		/* [XSI] optimal blocksize for I/O */ 
+	__uint32_t	st_flags;		/* user defined flags for file */ 
+	__uint32_t	st_gen;			/* file generation number */ 
+	__int32_t	st_lspare;		/* RESERVED: DO NOT USE! */ 
+	__int64_t	st_qspare[2];		/* RESERVED: DO NOT USE! */ 
+} STAT_FIX;
+
+#else /* !__DARWIN_64_BIT_INO_T */
+
+typedef struct stat_fix {
+	dev_t	 	st_dev;		/* [XSI] ID of device containing file */
+	ino_t	  	st_ino;		/* [XSI] File serial number */
+	mode_t	 	st_mode;	/* [XSI] Mode of file (see below) */
+	nlink_t		st_nlink;	/* [XSI] Number of hard links */
+	uid_t		st_uid;		/* [XSI] User ID of the file */
+	gid_t		st_gid;		/* [XSI] Group ID of the file */
+	dev_t		st_rdev;	/* [XSI] Device ID */
+#if !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)
+	struct	timespec st_atimespec;	/* time of last access */
+	struct	timespec st_mtimespec;	/* time of last data modification */
+	struct	timespec st_ctimespec;	/* time of last status change */
+#else
+	time_t		st_atime;	/* [XSI] Time of last access */
+	long		st_atimensec;	/* nsec of last access */
+	time_t		st_mtime;	/* [XSI] Last data modification time */
+	long		st_mtimensec;	/* last data modification nsec */
+	time_t		st_ctime;	/* [XSI] Time of last status change */
+	long		st_ctimensec;	/* nsec of last status change */
+#endif
+	off_t		st_size;	/* [XSI] file size, in bytes */
+	blkcnt_t	st_blocks;	/* [XSI] blocks allocated for file */
+	blksize_t	st_blksize;	/* [XSI] optimal blocksize for I/O */
+	__uint32_t	st_flags;	/* user defined flags for file */
+	__uint32_t	st_gen;		/* file generation number */
+	__int32_t	st_lspare;	/* RESERVED: DO NOT USE! */
+	__int64_t	st_qspare[2];	/* RESERVED: DO NOT USE! */
+} STAT_FIX;
+
+#pragma pack()
+#endif
+
+#else 
+
+  typedef struct stat STAT_FIX;
+
+#endif
 
 #define EFI_UNIX_THUNK_PROTOCOL_GUID \
   { \
@@ -115,8 +184,8 @@ typedef
 int
 (*UnixOpen) (const char *name, int flags, int mode);
 typedef
-long int
-(*UnixSeek) (int fd, long int off, int whence);
+off_t
+(*UnixSeek) (int fd, off_t off, int whence);
 typedef
 int
 (*UnixFtruncate) (int fd, long int len);
@@ -150,7 +219,7 @@ int
 (*UnixCloseDir)(DIR *dir);
 typedef
 int
-(*UnixStat)(const char *path, struct stat *buf);
+(*UnixStat)(const char *path, STAT_FIX *buf);
 typedef
 int
 (*UnixStatFs)(const char *path, struct statfs *buf);
@@ -213,7 +282,7 @@ int
 (*UnixTcsetattr) (int __fd, int __optional_actions,
 		      __const struct termios *__termios_p);
 
-typedef
+typedef 
 VOID *
 (*UnixDlopen) (const char *FileName, int Flag);
 
@@ -230,20 +299,20 @@ VOID *
 // Work functions to enable source level debug in the emulator
 //
 
-typedef
+typedef 
 RETURN_STATUS
 (EFIAPI *UnixPeCoffGetEntryPoint) (
   IN     VOID  *Pe32Data,
   IN OUT VOID  **EntryPoint
   );
 
-typedef
+typedef 
 VOID
 (EFIAPI *UnixPeCoffRelocateImageExtraAction) (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   );
 
-typedef
+typedef 
 VOID
 (EFIAPI *UnixPeCoffLoaderUnloadImageExtraAction) (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext

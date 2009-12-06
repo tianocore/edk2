@@ -102,7 +102,7 @@ FvbEraseBlock (
 EFI_STATUS
 FvbSetVolumeAttributes (
   IN UINTN                                Instance,
-  IN OUT EFI_FVB_ATTRIBUTES_2               *Attributes,
+  IN OUT EFI_FVB_ATTRIBUTES_2             *Attributes,
   IN ESAL_FWB_GLOBAL                      *Global,
   IN BOOLEAN                              Virtual
   )
@@ -111,7 +111,7 @@ FvbSetVolumeAttributes (
 EFI_STATUS
 FvbGetVolumeAttributes (
   IN UINTN                                Instance,
-  OUT EFI_FVB_ATTRIBUTES_2                  *Attributes,
+  OUT EFI_FVB_ATTRIBUTES_2                *Attributes,
   IN ESAL_FWB_GLOBAL                      *Global,
   IN BOOLEAN                              Virtual
   )
@@ -162,7 +162,7 @@ EFI_STATUS
 EFIAPI
 FvbProtocolGetAttributes (
   IN  CONST EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
-  OUT EFI_FVB_ATTRIBUTES_2                          *Attributes
+  OUT       EFI_FVB_ATTRIBUTES_2                         *Attributes
   )
 ;
 
@@ -170,7 +170,7 @@ EFI_STATUS
 EFIAPI
 FvbProtocolSetAttributes (
   IN CONST EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
-  IN OUT EFI_FVB_ATTRIBUTES_2                       *Attributes
+  IN OUT   EFI_FVB_ATTRIBUTES_2                         *Attributes
   )
 ;
 
@@ -178,7 +178,7 @@ EFI_STATUS
 EFIAPI
 FvbProtocolGetPhysicalAddress (
   IN CONST EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL           *This,
-  OUT EFI_PHYSICAL_ADDRESS                        *Address
+  OUT      EFI_PHYSICAL_ADDRESS                         *Address
   )
 ;
 

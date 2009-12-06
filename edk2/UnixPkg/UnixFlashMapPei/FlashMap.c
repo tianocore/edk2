@@ -57,9 +57,10 @@ Returns:
 // TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_STATUS              Status;
-  UNIX_FWH_PPI           *UnixFwhPpi;
+  UNIX_FWH_PPI            *UnixFwhPpi;
   EFI_PEI_PPI_DESCRIPTOR  *PpiDescriptor;
   EFI_PHYSICAL_ADDRESS    FdBase;
+  EFI_PHYSICAL_ADDRESS    FdFixUp;
   UINT64                  FdSize;
 
   DEBUG ((EFI_D_ERROR, "NT 32 Flash Map PEIM Loaded\n"));
@@ -78,14 +79,14 @@ Returns:
   //
   // Assume that FD0 contains the Flash map.
   //
-  Status = UnixFwhPpi->UnixFwh (0, &FdBase, &FdSize);
+  Status = UnixFwhPpi->UnixFwh (0, &FdBase, &FdSize, &FdFixUp);
   if (EFI_ERROR (Status)) {
     return Status;
   }
   
-  PcdSet32 (PcdFlashNvStorageVariableBase, PcdGet32 (PcdUnixFlashNvStorageVariableBase) + (UINT32) FdBase);
-  PcdSet32 (PcdFlashNvStorageFtwWorkingBase, PcdGet32 (PcdUnixFlashNvStorageFtwWorkingBase) + (UINT32) FdBase);
-  PcdSet32 (PcdFlashNvStorageFtwSpareBase, PcdGet32 (PcdUnixFlashNvStorageFtwSpareBase) + (UINT32) FdBase);
+  PcdSet32 (PcdFlashNvStorageVariableBase, PcdGet32 (PcdUnixFlashNvStorageVariableBase) + (UINT32)FdFixUp);
+  PcdSet32 (PcdFlashNvStorageFtwWorkingBase, PcdGet32 (PcdUnixFlashNvStorageFtwWorkingBase) + (UINT32)FdFixUp);
+  PcdSet32 (PcdFlashNvStorageFtwSpareBase, PcdGet32 (PcdUnixFlashNvStorageFtwSpareBase) + (UINT32)FdFixUp);
 
   return EFI_SUCCESS;
 }
