@@ -1,0 +1,56 @@
+#%HEADER%
+#/** @file
+#  
+#  DXE CPU driver
+#  
+#  Copyright (c) 2009, Apple Inc. <BR>
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ArmCpuDxe
+  FILE_GUID                      = B8D9777E-D72A-451F-9BDB-BAFB52A68415
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = CpuDxeInitialize
+
+[Sources.ARM]
+  CpuDxe.c
+  CpuDxe.h
+  DebugSupport.c
+  Exception.c
+  ExceptionSupport.asm | RVCT
+  ExceptionSupport.S   | GCC
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  CacheMaintenanceLib
+  UefiDriverEntryPoint
+  ArmLib
+
+[Protocols]
+  gEfiCpuArchProtocolGuid
+  gEfiDebugSupportPeriodicCallbackProtocolGuid
+
+[Pcd.common]
+  gArmTokenSpaceGuid.PcdCpuVectorBaseAddress
+  
+[FeaturePcd.common]
+  gArmTokenSpaceGuid.PcdCpuDxeProduceDebugSupport
+
+[depex]
+  gHardwareInterruptProtocolGuid

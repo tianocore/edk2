@@ -1,0 +1,39 @@
+#------------------------------------------------------------------------------ 
+#
+# Copyright (c) 2008-2009 Apple Inc. All rights reserved.
+#
+# All rights reserved. This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution.  The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#------------------------------------------------------------------------------
+
+	.text
+	.align 2
+	.globl ___ashrdi3
+___ashrdi3:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	@ link register save eliminated.
+	cmp	r2, #31
+	@ lr needed for prologue
+	bls	L2
+	cmp	r2, #63
+	subls	r2, r2, #32
+	mov	ip, r1, asr #31
+	movls	r2, r1, asr r2
+	movhi	r2, ip
+	mov	r0, r2
+	mov	r1, ip
+	bx	lr
+L2:
+	cmp	r2, #0
+	rsbne	r3, r2, #32
+	movne	r3, r1, asl r3
+	movne	r1, r1, asr r2
+	orrne	r0, r3, r0, lsr r2
+	bx	lr

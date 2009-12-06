@@ -1,0 +1,58 @@
+#%HEADER%
+/** @file
+  
+ Copyright (c) 2009 Apple, Inc.  All rights reserved.                                                
+
+ This document is the property of Apple, Inc.
+ It is considered confidential and proprietary.
+ 
+ This document may not be reproduced or transmitted in any form,
+ in whole or in part, without the express written permission of
+ Apple, Inc.
+
+**/
+
+[Defines]
+  INF_VERSION                     = 0x00010005
+  BASE_NAME                       = BeagleBoardPciEmulation
+  FILE_GUID                       = feaa2e2b-53ac-4d5e-ae10-1efd5da4a2ba
+  MODULE_TYPE                     = DXE_DRIVER
+  VERSION_STRING                  = 1.0
+
+  ENTRY_POINT                     = PciEmulationEntryPoint
+
+[Sources.common]
+  PciRootBridgeIo.c
+  PciEmulation.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  ArmPkg/ArmPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  BeagleBoardPkg/BeagleBoardPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DxeServicesTableLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  UncachedMemoryAllocationLib
+  IoLib
+
+[Protocols]
+  gEfiPciRootBridgeIoProtocolGuid
+  gEfiDevicePathProtocolGuid
+  gEfiPciHostBridgeResourceAllocationProtocolGuid
+  gEfiCpuArchProtocolGuid
+  gEfiPciIoProtocolGuid
+  gEmbeddedExternalDeviceProtocolGuid
+
+[Depex]
+  gEfiMetronomeArchProtocolGuid AND 
+  gEfiCpuArchProtocolGuid AND
+  gEmbeddedExternalDeviceProtocolGuid
+  

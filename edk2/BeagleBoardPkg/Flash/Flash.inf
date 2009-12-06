@@ -1,0 +1,36 @@
+#%HEADER%
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = NandFlash
+  FILE_GUID                      = 4d00ef14-c4e0-426b-81b7-30a00a14aad6
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = NandFlashInitialize
+
+
+[Sources.common]
+  Flash.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  BeagleBoardPkg/BeagleBoardPkg.dec
+
+[LibraryClasses]
+  PcdLib
+  UefiLib
+  UefiDriverEntryPoint
+  MemoryAllocationLib
+  IoLib
+
+[Guids]
+  
+[Protocols]
+  gEfiBlockIoProtocolGuid
+  gEfiCpuArchProtocolGuid
+
+[Pcd]
+  gBeagleBoardTokenSpaceGuid.PcdBeagleGpmcOffset
+
+[depex]
+  TRUE
