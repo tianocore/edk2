@@ -29,7 +29,7 @@
   Scans a target buffer for a 16-bit value, and returns a pointer to the matching 16-bit value
   in the target buffer.
 
-  This function searches target the buffer specified by Buffer and Length from the lowest
+  This function searches the target buffer specified by Buffer and Length from the lowest
   address to the highest address for a 16-bit value that matches Value.  If a match is found,
   then a pointer to the matching byte in the target buffer is returned.  If no match is found,
   then NULL is returned.  If Length is 0, then NULL is returned.

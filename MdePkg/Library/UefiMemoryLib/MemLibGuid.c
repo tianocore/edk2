@@ -98,7 +98,7 @@ CompareGuid (
   Scans a target buffer for a GUID, and returns a pointer to the matching GUID
   in the target buffer.
 
-  This function searches target the buffer specified by Buffer and Length from
+  This function searches the target buffer specified by Buffer and Length from
   the lowest address to the highest address at 128-bit increments for the 128-bit
   GUID value that matches Guid.  If a match is found, then a pointer to the matching
   GUID in the target buffer is returned.  If no match is found, then NULL is returned.

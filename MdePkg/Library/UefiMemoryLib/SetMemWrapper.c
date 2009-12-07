@@ -85,6 +85,7 @@ SetMemN (
 {
   if (sizeof (UINTN) == sizeof (UINT64)) {
     return SetMem64 (Buffer, Length, (UINT64)Value);
+  } else {
+    return SetMem32 (Buffer, Length, (UINT32)Value);
   }
-  return SetMem32 (Buffer, Length, (UINT32)Value);
 }
