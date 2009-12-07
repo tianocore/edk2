@@ -80,7 +80,7 @@ INF  MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
 INF  DuetPkg/SmbiosGenDxe/SmbiosGen.inf
 #INF  DuetPkg/FvbRuntimeService/DUETFwh.inf
 INF  IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
-INF  UefiCpuPkg/CpuIoDxe/CpuIo.inf
+INF  UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
 INF  DuetPkg/CpuDxe/Cpu.inf
 
 INF  PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf
