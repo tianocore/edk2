@@ -23,7 +23,7 @@
   FILE_GUID                      = 35194660-7421-44ad-9636-e44885f092d1
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = BASE
+  LIBRARY_CLASS                  = NULL
   CONSTRUCTOR                    = LzmaDecompressLibConstructor
 
 #
