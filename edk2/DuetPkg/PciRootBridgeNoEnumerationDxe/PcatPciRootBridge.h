@@ -24,7 +24,7 @@ Abstract:
 #include <PiDxe.h>
 #include <Protocol/PciRootBridgeIo.h>
 #include <Protocol/DeviceIo.h>
-#include <Protocol/CpuIo.h>
+#include <Protocol/CpuIo2.h>
 
 #include <Library/UefiLib.h>
 #include <Library/BaseLib.h>
@@ -54,7 +54,7 @@ typedef struct {
                                     
   EFI_DEVICE_PATH_PROTOCOL          *DevicePath;
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL   Io;
-  EFI_CPU_IO_PROTOCOL               *CpuIo;
+  EFI_CPU_IO2_PROTOCOL              *CpuIo;
 
   UINT32                            RootBridgeNumber;
   UINT32                            PrimaryBus;
@@ -219,6 +219,6 @@ InitializePcatPciRootBridge (
   IN EFI_SYSTEM_TABLE *SystemTable
   );
 
-extern EFI_CPU_IO_PROTOCOL  *gCpuIo;
+extern EFI_CPU_IO2_PROTOCOL  *gCpuIo;
 
 #endif

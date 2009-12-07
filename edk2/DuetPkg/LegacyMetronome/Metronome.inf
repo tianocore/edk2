@@ -43,7 +43,7 @@
 
 [Protocols]
   gEfiMetronomeArchProtocolGuid
-  gEfiCpuIoProtocolGuid
+  gEfiCpuIo2ProtocolGuid
 
 [Depex]
-  gEfiCpuIoProtocolGuid
+  gEfiCpuIo2ProtocolGuid

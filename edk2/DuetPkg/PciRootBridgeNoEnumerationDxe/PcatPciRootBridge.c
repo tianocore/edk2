@@ -21,7 +21,7 @@ Abstract:
 #include "PcatPciRootBridge.h"
 #include "DeviceIo.h"
 
-EFI_CPU_IO_PROTOCOL *gCpuIo;
+EFI_CPU_IO2_PROTOCOL *gCpuIo;
 
 EFI_STATUS
 EFIAPI
@@ -62,7 +62,7 @@ Returns:
   //
   // Initialize gCpuIo now since the chipset init code requires it.
   //
-  Status = gBS->LocateProtocol (&gEfiCpuIoProtocolGuid, NULL, (VOID **)&gCpuIo);
+  Status = gBS->LocateProtocol (&gEfiCpuIo2ProtocolGuid, NULL, (VOID **)&gCpuIo);
   ASSERT_EFI_ERROR (Status);
 
   //
