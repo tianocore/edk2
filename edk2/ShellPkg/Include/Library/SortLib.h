@@ -63,16 +63,35 @@ PerformQuickSort (
 /**
   Function to compare 2 device paths for use as CompareFunction.
 
-  @param[in] Buffer1            pointer to Device Path to compare
-  @param[in] Buffer2            pointer to second DevicePath to compare
+  @param[in] Buffer1            Pointer to Device Path to compare.
+  @param[in] Buffer2            Pointer to second DevicePath to compare.
 
-  @retval 0                           Buffer1 equal to Buffer2
-  @return < 0                         Buffer1 is less than Buffer2
-  @return > 0                         Buffer1 is greater than Buffer2                     
+  @retval 0                     Buffer1 equal to Buffer2.
+  @return < 0                   Buffer1 is less than Buffer2.
+  @return > 0                   Buffer1 is greater than Buffer2.                 
 **/
 INTN
+EFIAPI
 DevicePathCompare (
   IN  VOID             *Buffer1,
   IN  VOID             *Buffer2
   );
+
+/**
+  Function to compare 2 strings without regard to case of the characters.
+
+  @param[in] Buffer1            Pointer to String to compare (CHAR16**). 
+  @param[in] Buffer2            Pointer to second String to compare (CHAR16**).
+
+  @retval 0                     Buffer1 equal to Buffer2.
+  @return < 0                   Buffer1 is less than Buffer2.
+  @return > 0                   Buffer1 is greater than Buffer2.                 
+**/
+INTN
+EFIAPI
+StringNoCaseCompare (
+  IN  VOID             *Buffer1,
+  IN  VOID             *Buffer2
+  );
+
 #endif //__SORT_LIB_H__
