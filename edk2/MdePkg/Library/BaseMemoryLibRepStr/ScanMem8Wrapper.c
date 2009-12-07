@@ -29,7 +29,7 @@
   Scans a target buffer for an 8-bit value, and returns a pointer to the matching 8-bit value
   in the target buffer.
 
-  This function searches target the buffer specified by Buffer and Length from the lowest
+  This function searches the target buffer specified by Buffer and Length from the lowest
   address to the highest address for an 8-bit value that matches Value.  If a match is found,
   then a pointer to the matching byte in the target buffer is returned.  If no match is found,
   then NULL is returned.  If Length is 0, then NULL is returned.
@@ -65,7 +65,7 @@ ScanMem8 (
   Scans a target buffer for a UINTN sized value, and returns a pointer to the matching 
   UINTN sized value in the target buffer.
 
-  This function searches target the buffer specified by Buffer and Length from the lowest
+  This function searches the target buffer specified by Buffer and Length from the lowest
   address to the highest address for a UINTN sized value that matches Value.  If a match is found,
   then a pointer to the matching byte in the target buffer is returned.  If no match is found,
   then NULL is returned.  If Length is 0, then NULL is returned.
@@ -92,7 +92,8 @@ ScanMemN (
 {
   if (sizeof (UINTN) == sizeof (UINT64)) {
     return ScanMem64 (Buffer, Length, (UINT64)Value);
+  } else {
+    return ScanMem32 (Buffer, Length, (UINT32)Value);
   }
-  return ScanMem32 (Buffer, Length, (UINT32)Value);
 }
 
