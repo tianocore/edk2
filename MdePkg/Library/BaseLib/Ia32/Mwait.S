@@ -34,5 +34,5 @@ ASM_GLOBAL ASM_PFX(AsmMwait)
 ASM_PFX(AsmMwait):
     movl    4(%esp), %eax
     movl    8(%esp), %ecx
-    mwait   %eax, %ecx                  # mwait
+    mwait
     ret
