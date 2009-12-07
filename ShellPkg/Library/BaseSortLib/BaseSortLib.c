@@ -185,3 +185,26 @@ DevicePathCompare (
   ASSERT(FALSE);
   return 0;
 }
+
+/**
+  Function to compare 2 strings without regard to case of the characters.
+
+  @param[in] Buffer1            Pointer to String to compare.
+  @param[in] Buffer2            Pointer to second String to compare.
+
+  @retval 0                     Buffer1 equal to Buffer2.
+  @return < 0                   Buffer1 is less than Buffer2.
+  @return > 0                   Buffer1 is greater than Buffer2.                 
+**/
+INTN
+EFIAPI
+StringNoCaseCompare (
+  IN  VOID             *Buffer1,
+  IN  VOID             *Buffer2
+  )
+{
+  ASSERT(FALSE);
+  return 0;
+}
+
+

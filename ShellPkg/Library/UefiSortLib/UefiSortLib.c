@@ -25,6 +25,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/SortLib.h> 
 
+STATIC EFI_DEVICE_PATH_TO_TEXT_PROTOCOL *mDevicePathToText = NULL;
+STATIC EFI_UNICODE_COLLATION_PROTOCOL   *mUnicodeCollation = NULL;
+
+
 /**
   Worker function for QuickSorting.  This function is identical to PerformQuickSort, 
   except that is uses the pre-allocated buffer so the in place sorting does not need to 
@@ -199,9 +203,6 @@ DevicePathCompare (
   EFI_STATUS                Status;
   INTN                      RetVal;
    
-  STATIC EFI_DEVICE_PATH_TO_TEXT_PROTOCOL *DevicePathToText = NULL;
-  STATIC EFI_UNICODE_COLLATION_PROTOCOL   *UnicodeCollation = NULL;
-
   DevicePath1 = *(EFI_DEVICE_PATH_PROTOCOL**)Buffer1;
   DevicePath2 = *(EFI_DEVICE_PATH_PROTOCOL**)Buffer2;
 
@@ -217,36 +218,36 @@ DevicePathCompare (
     return 1;
   }
   
-  if (DevicePathToText == NULL) {
+  if (mDevicePathToText == NULL) {
     Status = gBS->LocateProtocol(
       &gEfiDevicePathToTextProtocolGuid,
       NULL,
-      (VOID**)&DevicePathToText);
+      (VOID**)&mDevicePathToText);
 
     ASSERT_EFI_ERROR(Status);
   }
 
-  if (UnicodeCollation == NULL) {
+  if (mUnicodeCollation == NULL) {
     Status = gBS->LocateProtocol(
       &gEfiUnicodeCollation2ProtocolGuid,
       NULL,
-      (VOID**)&UnicodeCollation);
+      (VOID**)&mUnicodeCollation);
 
     ASSERT_EFI_ERROR(Status);
   }
 
-  TextPath1 = DevicePathToText->ConvertDevicePathToText(
+  TextPath1 = mDevicePathToText->ConvertDevicePathToText(
     DevicePath1,
     FALSE,
     FALSE);
 
-  TextPath2 = DevicePathToText->ConvertDevicePathToText(
+  TextPath2 = mDevicePathToText->ConvertDevicePathToText(
     DevicePath2,
     FALSE,
     FALSE);
   
-  RetVal = UnicodeCollation->StriColl(
-    UnicodeCollation,
+  RetVal = mUnicodeCollation->StriColl(
+    mUnicodeCollation,
     TextPath1,
     TextPath2);
 
@@ -255,3 +256,38 @@ DevicePathCompare (
 
   return (RetVal);
 }
+
+/**
+  Function to compare 2 strings without regard to case of the characters.
+
+  @param[in] Buffer1            Pointer to String to compare.
+  @param[in] Buffer2            Pointer to second String to compare.
+
+  @retval 0                     Buffer1 equal to Buffer2.
+  @return < 0                   Buffer1 is less than Buffer2.
+  @return > 0                   Buffer1 is greater than Buffer2.                 
+**/
+INTN
+EFIAPI
+StringNoCaseCompare (
+  IN  VOID             *Buffer1,
+  IN  VOID             *Buffer2
+  )
+{
+  EFI_STATUS                Status;
+  if (mUnicodeCollation == NULL) {
+    Status = gBS->LocateProtocol(
+      &gEfiUnicodeCollation2ProtocolGuid,
+      NULL,
+      (VOID**)&mUnicodeCollation);
+
+    ASSERT_EFI_ERROR(Status);
+  }
+
+  return (mUnicodeCollation->StriColl(
+    mUnicodeCollation,
+    *(CHAR16**)Buffer1,
+    *(CHAR16**)Buffer2));
+}
+
+
