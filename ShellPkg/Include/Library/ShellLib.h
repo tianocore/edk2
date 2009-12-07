@@ -23,14 +23,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   specified and store it in allocated pool memory.
 
   This function allocates a buffer to store the file's information. It is the 
-  caller's responsibility to free the buffer
+  caller's responsibility to free the buffer.
 
-  @param  FileHandle  The file handle of the file for which information is 
-                      being requested.
+  @param[in] FileHandle         The file handle of the file for which information is 
+                                being requested.
 
-  @retval NULL        information could not be retrieved.
+  @retval NULL                  Information could not be retrieved.
 
-  @return             the information about the file
+  @return                       The information about the file.
 **/
 EFI_FILE_INFO*
 EFIAPI
@@ -42,10 +42,10 @@ ShellGetFileInfo (
   This function will set the information about the file for the opened handle 
   specified.
 
-  @param  FileHandle            The file handle of the file for which information 
+  @param[in]  FileHandle        The file handle of the file for which information 
                                 is being set.
 
-  @param  FileInfo              The infotmation to set.
+  @param[in] FileInfo           The infotmation to set.
 
   @retval EFI_SUCCESS	          The information was set.
   @retval EFI_UNSUPPORTED       The InformationType is not known.
@@ -69,12 +69,12 @@ ShellSetFileInfo (
   This function opens a file with the open mode according to the file path. The 
   Attributes is valid only for EFI_FILE_MODE_CREATE.
 
-  @param  FilePath 		    On input the device path to the file.  On output 
-                          the remaining device path.
-  @param  DeviceHandle  	pointer to the system device handle.
-  @param  FileHandle		  pointer to the file handle.
-  @param  OpenMode	    	the mode to open the file with.
-  @param  Attributes	  	the file's file attributes.
+  @param[in]  FilePath 		    On input the device path to the file.  On output 
+                              the remaining device path.
+  @param[out]  DeviceHandle  	Pointer to the system device handle.
+  @param[out]  FileHandle		  Pointer to the file handle.
+  @param[in]  OpenMode	    	The mode to open the file with.
+  @param[in]  Attributes	  	The file's file attributes.
 
   @retval EFI_SUCCESS		        The information was set.
   @retval EFI_INVALID_PARAMETER	One of the parameters has an invalid value.
@@ -110,10 +110,10 @@ ShellOpenFileByDevicePath(
   otherwise, the Filehandle is NULL. The Attributes is valid only for 
   EFI_FILE_MODE_CREATE.
 
-  @param  FileName 		  pointer to file name
-  @param  FileHandle		pointer to the file handle.
-  @param  OpenMode		  the mode to open the file with.
-  @param  Attributes		the file's file attributes.
+  @param[in] FileName 		      Pointer to file name.
+  @param[out] FileHandle		    Pointer to the file handle.
+  @param[in] OpenMode		        The mode to open the file with.
+  @param[in] Attributes		      The file's file attributes.
 
   @retval EFI_SUCCESS		        The information was set.
   @retval EFI_INVALID_PARAMETER	One of the parameters has an invalid value.
@@ -142,14 +142,14 @@ ShellOpenFileByName(
   );
 
 /**
-  This function create a directory
+  This function creates a directory.
 
   If return is EFI_SUCCESS, the Filehandle is the opened directory's handle; 
   otherwise, the Filehandle is NULL. If the directory already existed, this 
   function opens the existing directory.
 
-  @param  DirectoryName         Pointer to Directory name.
-  @param  FileHandle		        Pointer to the file handle.
+  @param[in]  DirectoryName     Pointer to Directory name.
+  @param[out] FileHandle        Pointer to the file handle.
 
   @retval EFI_SUCCESS		        The information was set.
   @retval EFI_INVALID_PARAMETER	One of the parameters has an invalid value.
@@ -191,10 +191,10 @@ ShellCreateDirectory(
   are no more directory entries, the read returns a zero-length buffer. 
   EFI_FILE_INFO is the structure returned as the directory entry.
 
-  @param FileHandle             The opened file handle.
-  @param ReadSize               On input the size of buffer in bytes.  On return 
+  @param[in] FileHandle         The opened file handle.
+  @param[in] ReadSize           On input the size of buffer in bytes.  On return 
                                 the number of bytes written.
-  @param Buffer                 The buffer to put read data into.
+  @param[out] Buffer            The buffer to put read data into.
 
   @retval EFI_SUCCESS	          Data was read.
   @retval EFI_NO_MEDIA	        The device has no media.
@@ -222,12 +222,12 @@ ShellReadFile(
   The file is automatically grown to hold the data if required. Direct writes to 
   opened directories are not supported.
 
-  @param FileHandle             The opened file for writing.
+  @param[in] FileHandle         The opened file for writing.
 
-  @param BufferSize             On input the number of bytes in Buffer.  On output
+  @param[in] BufferSize         On input the number of bytes in Buffer.  On output
                                 the number of bytes written.
 
-  @param Buffer                 The buffer containing data to write is stored.
+  @param[in] Buffer             The buffer containing data to write is stored.
 
   @retval EFI_SUCCESS	          Data was written.
   @retval EFI_UNSUPPORTED	      Writes to an open directory are not supported.
@@ -253,7 +253,7 @@ ShellWriteFile(
   flushed to the device, and the file is closed. In all cases the handle is 
   closed.
 
-  @param FileHandle               The file handle to close.
+  @param[in] FileHandle           The file handle to close.
 
   @retval EFI_SUCCESS             The file handle was closed sucessfully.
   @retval INVALID_PARAMETER      	One of the parameters has an invalid value.
@@ -271,7 +271,7 @@ ShellCloseFile (
   If the file cannot be deleted, the warning code EFI_WARN_DELETE_FAILURE is 
   returned, but the handle is still closed.
 
-  @param FileHandle                 The file handle to delete.
+  @param[in] FileHandle             The file handle to delete.
 
   @retval EFI_SUCCESS               The file was closed sucessfully.
   @retval EFI_WARN_DELETE_FAILURE   The handle was closed, but the file was not 
@@ -295,12 +295,12 @@ ShellDeleteFile (
   If FileHandle is a directory, the only position that may be set is zero. This 
   has the effect of starting the read process of the directory entries over.
 
-  @param FileHandle             The file handle on which the position is being set
+  @param[in] FileHandle         The file handle on which the position is being set.
 
-  @param Position               Byte position from begining of file
+  @param[in] Position           Byte position from begining of file.
 
   @retval EFI_SUCCESS           Operation completed sucessfully.
-  @retval EFI_UNSUPPORTED       the seek request for non-zero is not valid on 
+  @retval EFI_UNSUPPORTED       The seek request for non-zero is not valid on 
                                 directories.
   @retval INVALID_PARAMETER     One of the parameters has an invalid value.
 **/
@@ -319,12 +319,12 @@ ShellSetFilePosition (
   system driver and as such the operation is not supported. An error is returned
   if FileHandle is a directory.
 
-  @param FileHandle             The open file handle on which to get the position.
-  @param Position               Byte position from begining of file.
+  @param[in] FileHandle         The open file handle on which to get the position.
+  @param[out] Position          Byte position from begining of file.
 
-  @retval EFI_SUCCESS           the operation completed sucessfully.
+  @retval EFI_SUCCESS           The operation completed sucessfully.
   @retval INVALID_PARAMETER     One of the parameters has an invalid value.
-  @retval EFI_UNSUPPORTED       the request is not valid on directories.
+  @retval EFI_UNSUPPORTED       The request is not valid on directories.
 **/
 EFI_STATUS
 EFIAPI
@@ -338,7 +338,7 @@ ShellGetFilePosition (
   
   This function flushes all modified data associated with a file to a device.
 
-  @param FileHandle             The file handle on which to flush data
+  @param[in] FileHandle         The file handle on which to flush data.
 
   @retval EFI_SUCCESS           The data was flushed.
   @retval EFI_NO_MEDIA          The device has no media.
@@ -362,8 +362,8 @@ ShellFlushFile (
 
   Caller must use FreePool on *Buffer opon completion of all file searching.
 
-  @param DirHandle              The file handle of the directory to search
-  @param Buffer                 Pointer to pointer to buffer for file's information
+  @param[in] DirHandle          The file handle of the directory to search
+  @param[out] Buffer            Pointer to pointer to buffer for file's information
 
   @retval EFI_SUCCESS           Found the first file.
   @retval EFI_NOT_FOUND         Cannot find the directory.
@@ -389,9 +389,9 @@ ShellFindFirstFile (
   call of this function has no file to get. *NoFile will be set to TRUE and the 
   data in Buffer is meaningless. 
 
-  @param DirHandle              the file handle of the directory
-  @param Buffer			            pointer to buffer for file's information
-  @param NoFile			            pointer to boolean when last file is found
+  @param[in] DirHandle          The file handle of the directory.
+  @param[out] Buffer			      Pointer to buffer for file's information.
+  @param[out] NoFile			      Pointer to boolean when last file is found.
 
   @retval EFI_SUCCESS           Found the next file.
   @retval EFI_NO_MEDIA          The device has no media.
@@ -412,8 +412,8 @@ ShellFindNextFile(
   This function extracts the file size info from the FileHandle's EFI_FILE_INFO 
   data.
 
-  @param FileHandle             The file handle from which size is retrieved.
-  @param Size                   Pointer to size.
+  @param[in] FileHandle         The file handle from which size is retrieved.
+  @param[out] Size              Pointer to size.
 
   @retval EFI_SUCCESS           The operation was completed sucessfully.
   @retval EFI_DEVICE_ERROR      Cannot access the file.
@@ -428,7 +428,7 @@ ShellGetFileSize (
 /**
   Retrieves the status of the break execution flag
 
-  this function is useful to check whether the application is being asked to halt by the shell.
+  This function is useful to check whether the application is being asked to halt by the shell.
 
   @retval TRUE                  the execution break is enabled
   @retval FALSE                 the execution break is not enabled
@@ -445,7 +445,7 @@ ShellGetExecutionBreakFlag(
   This function gets the value of the environment variable set by the 
   ShellSetEnvironmentVariable function.
 
-  @param EnvKey                 The key name of the environment variable.
+  @param[in] EnvKey             The key name of the environment variable.
 
   @retval NULL                  The named environment variable does not exist.
   @return != NULL               pointer to the value of the environment variable.
@@ -457,7 +457,7 @@ ShellGetEnvironmentVariable (
   );
 
 /**
-  set the value of an environment variable
+  Set the value of an environment variable.
 
   This function changes the current value of the specified environment variable. If the
   environment variable exists and the Value is an empty string, then the environment
@@ -469,9 +469,9 @@ ShellGetEnvironmentVariable (
 
   This is not supported pre-UEFI Shell 2.0.
 
-  @param EnvKey                 The key name of the environment variable.
-  @param EnvVal                 The Value of the environment variable
-  @param Volatile               Indicates whether the variable is non-volatile (FALSE) or volatile (TRUE).
+  @param[in] EnvKey             The key name of the environment variable.
+  @param[in] EnvVal             The Value of the environment variable
+  @param[in] Volatile           Indicates whether the variable is non-volatile (FALSE) or volatile (TRUE).
 
   @retval EFI_SUCCESS           the operation was completed sucessfully
   @retval EFI_UNSUPPORTED       This operation is not allowed in pre UEFI 2.0 Shell environments
@@ -496,21 +496,21 @@ ShellSetEnvironmentVariable (
   The CommandLine is executed from the current working directory on the current
   device.
 
-  EnvironmentVariables and Status are only supported for UEFI Shell 2.0.
+  EnvironmentVariables and Status are only supported for UEFI Shell 2.0 (or later).
   Output is only supported for pre-UEFI Shell 2.0
 
-  @param ImageHandle            Parent image that is starting the operation.
-  @param CommandLine            Pointer to null terminated command line.
-  @param Output                 True to display debug output.  false to hide it.
-  @param EnvironmentVariables   Optional pointer to array of environment variables
-                                in the form "x=y".  If NULL current set is used.
-  @param Status                 The status of the run command line.
+  @param[in] ImageHandle          Parent image that is starting the operation.
+  @param[in] CommandLine          Pointer to null terminated command line.
+  @param[in] Output               True to display debug output.  False to hide it.
+  @param[in] EnvironmentVariables Optional pointer to array of environment variables
+                                  in the form "x=y".  If NULL current set is used.
+  @param[out] Status              The status of the run command line.
 
-  @retval EFI_SUCCESS           The operation completed sucessfully.  Status
-                                contains the status code returned.
-  @retval EFI_INVALID_PARAMETER A parameter contains an invalid value.
-  @retval EFI_OUT_OF_RESOURCES  Out of resources.
-  @retval EFI_UNSUPPORTED       The operation is not allowed.
+  @retval EFI_SUCCESS             The operation completed sucessfully.  Status
+                                  contains the status code returned.
+  @retval EFI_INVALID_PARAMETER   A parameter contains an invalid value.
+  @retval EFI_OUT_OF_RESOURCES    Out of resources.
+  @retval EFI_UNSUPPORTED         The operation is not allowed.
 **/
 EFI_STATUS
 EFIAPI
@@ -529,10 +529,10 @@ ShellExecute (
   name. If the DeviceName is not NULL, it returns the current directory name 
   on specified drive.
 
-  @param DeviceName             The name of the file system to get directory on.
+  @param[in] DeviceName         The name of the file system to get directory on.
 
   @retval NULL                  The directory does not exist.
-  @return != NULL               The directory.
+  @retval != NULL               The directory.
 **/
 CONST CHAR16*
 EFIAPI
@@ -546,7 +546,7 @@ ShellGetCurrentDir (
   When page break mode is enabled the screen will stop scrolling 
   and wait for operator input before scrolling a subsequent screen.
 
-  @param CurrentState           TRUE to enable and FALSE to disable.
+  @param[in] CurrentState       TRUE to enable and FALSE to disable.
 **/
 VOID 
 EFIAPI
@@ -567,9 +567,9 @@ ShellSetPageBreakMode (
   If you are NOT appending to an existing list *ListHead must be NULL.  If 
   *ListHead is NULL then it must be callee freed.
 
-  @param Arg                    Pointer to path string.
-  @param OpenMode               Mode to open files with.
-  @param ListHead               Head of linked list of results.
+  @param[in] Arg                Pointer to path string.
+  @param[in] OpenMode           Mode to open files with.
+  @param[in] ListHead           Head of linked list of results.
 
   @retval EFI_SUCCESS           The operation was sucessful and the list head 
                                 contains the list of opened files.
@@ -588,7 +588,7 @@ ShellOpenFileMetaArg (
 /**
   Free the linked list returned from ShellOpenFileMetaArg.
 
-  @param ListHead               The pointer to free.
+  @param[in] ListHead           The pointer to free.
 
   @retval EFI_SUCCESS           The operation was sucessful.
   @retval EFI_INVALID_PARAMETER A parameter was invalid.
@@ -606,10 +606,10 @@ ShellCloseFileMetaArg (
 
   If the return value is not NULL then the memory must be caller freed.
 
-  @param FileName               Filename string.
+  @param[in] FileName           Filename string.
 
   @retval NULL                  The file was not found.
-  @return !NULL                 The path to the file.
+  @retval !NULL                 The path to the file.
 **/
 CHAR16 *
 EFIAPI
@@ -618,12 +618,12 @@ ShellFindFilePath (
   );
 
 typedef enum {
-  TypeFlag  = 0,    ///< a flag that is present or not present only (IE "-a").
-  TypeValue,        ///< a flag that has some data following it with a space (IE "-a 1").
-  TypePosition,     ///< some data that did not follow a parameter (IE "filename.txt").
-  TypeStart,        ///< a flag that has variable value appended to the end (IE "-ad", "-afd", "-adf", etc...).
-  TypeDoubleValue,  ///< a flag that has 2 space seperated value data following it (IE "-a 1 2").
-  TypeMaxValue,     ///< a flag followed by all the command line data before the next flag.
+  TypeFlag  = 0,    ///< A flag that is present or not present only (IE "-a").
+  TypeValue,        ///< A flag that has some data following it with a space (IE "-a 1").
+  TypePosition,     ///< Some data that did not follow a parameter (IE "filename.txt").
+  TypeStart,        ///< A flag that has variable value appended to the end (IE "-ad", "-afd", "-adf", etc...).
+  TypeDoubleValue,  ///< A flag that has 2 space seperated value data following it (IE "-a 1 2").
+  TypeMaxValue,     ///< A flag followed by all the command line data before the next flag.
   TypeMax,
 } ParamType;
 
@@ -642,16 +642,17 @@ extern SHELL_PARAM_ITEM EmptyParamList[];
   
   If no initialization is required, then return RETURN_SUCCESS.
   
-  @param CheckList              Pointer to list of parameters to check.
-  @param CheckPackage           Package of checked values.
-  @param ProblemParam           Optional pointer to pointer to unicode string for 
+  @param[in] CheckList          Pointer to list of parameters to check.
+  @param[out] CheckPackage      Package of checked values.
+  @param[out] ProblemParam      Optional pointer to pointer to unicode string for 
                                 the paramater that caused failure.
-  @param AutoPageBreak          Will automatically set PageBreakEnabled.
+  @param[in] AutoPageBreak      Will automatically set PageBreakEnabled.
+  @param[in] AlwaysAllowNumbers Will never fail for number based flags.
 
   @retval EFI_SUCCESS           The operation completed sucessfully.
   @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
   @retval EFI_INVALID_PARAMETER A parameter was invalid.
-  @retval EFI_VOLUME_CORRUPTED  The command line was corrupt.  an argument was 
+  @retval EFI_VOLUME_CORRUPTED  The command line was corrupt.  An argument was 
                                 duplicated.  The duplicated command line argument 
                                 was returned in ProblemParam if provided.
   @retval EFI_DEVICE_ERROR      The commands contained 2 opposing arguments.  One
@@ -671,7 +672,7 @@ ShellCommandLineParseEx (
   IN BOOLEAN                    AlwaysAllowNumbers
   );
 
-/// make it easy to upgrade from older versions of the shell library.
+/// Make it easy to upgrade from older versions of the shell library.
 #define ShellCommandLineParse(CheckList,CheckPackage,ProblemParam,AutoPageBreak) ShellCommandLineParseEx(CheckList,CheckPackage,ProblemParam,AutoPageBreak,FALSE)
 
 /**
@@ -682,7 +683,7 @@ ShellCommandLineParseEx (
 
   If CheckPackage is NULL, then return.
 
-  @param CheckPackage           The list to de-allocate.
+  @param[in] CheckPackage       The list to de-allocate.
   **/
 VOID
 EFIAPI
@@ -693,13 +694,13 @@ ShellCommandLineFreeVarList (
 /**
   Checks for presence of a flag parameter.
 
-  flag arguments are in the form of "-<Key>" or "/<Key>", but do not have a value following the key
+  Flag arguments are in the form of "-<Key>" or "/<Key>", but do not have a value following the key.
 
-  if CheckPackage is NULL then return FALSE.
-  if KeyString is NULL then ASSERT().
+  If CheckPackage is NULL then return FALSE.
+  If KeyString is NULL then ASSERT().
   
-  @param CheckPackage           The package of parsed command line arguments.
-  @param KeyString              The Key of the command line argument to check for.
+  @param[in] CheckPackage       The package of parsed command line arguments.
+  @param[in] KeyString          The Key of the command line argument to check for.
 
   @retval TRUE                  The flag is on the command line.
   @retval FALSE                 The flag is not on the command line.
@@ -714,7 +715,7 @@ ShellCommandLineGetFlag (
 /**
   Returns value from command line argument.
 
-  Value parameters are in the form of "-<Key> value" or "/<Key> value"
+  Value parameters are in the form of "-<Key> value" or "/<Key> value".
   
   If CheckPackage is NULL, then return NULL.
 
@@ -756,8 +757,8 @@ ShellCommandLineGetRawValue (
   
   This will not include flags.
 
-  @retval (UINTN)-1     No parsing has ocurred
-  @return               The number of value parameters found
+  @retval (UINTN)-1     No parsing has ocurred.
+  @return               The number of value parameters found.
 **/
 UINTN
 EFIAPI
@@ -826,11 +827,11 @@ ShellInitialize (
 
   Note: The background color is controlled by the shell command cls.
 
-  @param[in] Row        the row to print at
-  @param[in] Col        the column to print at
-  @param[in] Format     the format string
+  @param[in] Row        The row to print at.
+  @param[in] Col        The column to print at.
+  @param[in] Format     The format string.
 
-  @return the number of characters printed to the screen
+  @return The number of characters printed to the screen.
 **/
 
 UINTN
@@ -855,20 +856,20 @@ ShellPrintEx(
 
   In addition to the standard %-based flags as supported by UefiLib Print() this supports 
   the following additional flags:
-    %N       -   Set output attribute to normal
-    %H       -   Set output attribute to highlight
-    %E       -   Set output attribute to error
-    %B       -   Set output attribute to blue color
-    %V       -   Set output attribute to green color
+    %N       -   Set output attribute to normal.
+    %H       -   Set output attribute to highlight.
+    %E       -   Set output attribute to error.
+    %B       -   Set output attribute to blue color.
+    %V       -   Set output attribute to green color.
 
   Note: The background color is controlled by the shell command cls.
 
-  @param[in] Row                the row to print at
-  @param[in] Col                the column to print at
-  @param[in] HiiFormatStringId  the format string Id for getting from Hii
-  @param[in] HiiFormatHandle    the format string Handle for getting from Hii
+  @param[in] Row                The row to print at.
+  @param[in] Col                The column to print at.
+  @param[in] HiiFormatStringId  The format string Id for getting from Hii.
+  @param[in] HiiFormatHandle    The format string Handle for getting from Hii.
 
-  @return the number of characters printed to the screen
+  @return the number of characters printed to the screen.
 **/
 UINTN
 EFIAPI
@@ -882,6 +883,8 @@ ShellPrintHiiEx(
 
 /**
   Function to determine if a given filename represents a directory.
+
+  If DirName is NULL, then ASSERT.
 
   @param[in] DirName      Path to directory to test.
 
@@ -897,6 +900,8 @@ ShellIsDirectory(
 
 /**
   Function to determine if a given filename represents a file.
+
+  If Name is NULL, then ASSERT.
 
   @param[in] Name         Path to file to test.
 
@@ -942,19 +947,19 @@ ShellStrToUintn(
   If Source is NULL, there is nothing to append, just return the current buffer in 
   Destination.
 
-  if Destination is NULL, then ASSERT().
-  if Destination's current length (including NULL terminator) is already more then 
+  If Destination is NULL, then ASSERT().
+  If Destination's current length (including NULL terminator) is already more than 
   CurrentSize, then ASSERT().
 
   @param[in,out] Destination    The String to append onto.
   @param[in,out] CurrentSize    On call the number of bytes in Destination.  On 
-                                return possibly the new size (still in bytes).  if NULL
+                                return possibly the new size (still in bytes).  If NULL
                                 then allocate whatever is needed.
   @param[in]     Source         The String to append from.
   @param[in]     Count          Maximum number of characters to append.  If 0 then 
                                 all are appended.
 
-  @return                       the Destination after apending the Source.
+  @return                       The Destination after apending the Source.
 **/
 CHAR16* 
 EFIAPI
