@@ -23,7 +23,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/DevicePath.h>
 #include <IndustryStandard/SmBios.h>
 #include <Protocol/LoadFile.h>
-#include <Protocol/CpuIo.h>
 #include <Guid/FileInfo.h>
 #include <Protocol/HiiConfigRouting.h>
 #include <Protocol/Bds.h>
