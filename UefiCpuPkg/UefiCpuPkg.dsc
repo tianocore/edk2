@@ -49,5 +49,5 @@
 #
 
 [Components.common]
-  UefiCpuPkg/CpuIoDxe/CpuIo.inf
+  UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
   UefiCpuPkg/Library/BaseUefiCpuLib/BaseUefiCpuLib.inf
