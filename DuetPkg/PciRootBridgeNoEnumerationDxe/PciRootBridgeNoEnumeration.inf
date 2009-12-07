@@ -62,11 +62,11 @@
 [Protocols]
   gEfiPciRootBridgeIoProtocolGuid
   gEfiDeviceIoProtocolGuid
-  gEfiCpuIoProtocolGuid
+  gEfiCpuIo2ProtocolGuid
 
 [Guids]
   gEfiPciOptionRomTableGuid
   gEfiPciExpressBaseAddressGuid
 
 [Depex]
-  gEfiCpuIoProtocolGuid
+  gEfiCpuIo2ProtocolGuid
