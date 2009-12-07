@@ -26,7 +26,7 @@ Abstract:
 #include <Protocol/Cpu.h>
 #include <Protocol/Smbios.h>
 #include <Guid/DataHubRecords.h>
-#include <Protocol/CpuIo.h>
+#include <Protocol/CpuIo2.h>
 #include <Protocol/FrameworkHii.h>
 
 #include <Library/BaseLib.h>
@@ -540,7 +540,7 @@ Returns:
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mCpuTemplate.Handle,
                   &gEfiCpuArchProtocolGuid,   &mCpuTemplate.Cpu,
-                  &gEfiCpuIoProtocolGuid,     &mCpuTemplate.CpuIo,
+                  &gEfiCpuIo2ProtocolGuid,    &mCpuTemplate.CpuIo,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);

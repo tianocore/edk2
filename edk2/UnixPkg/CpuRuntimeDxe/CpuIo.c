@@ -26,7 +26,7 @@ Abstract:
 #include <Protocol/Cpu.h>
 #include <Protocol/DataHub.h>
 #include <Guid/DataHubRecords.h>
-#include <Protocol/CpuIo.h>
+#include <Protocol/CpuIo2.h>
 #include <Protocol/FrameworkHii.h>
 
 #include <Library/BaseLib.h>
@@ -42,8 +42,6 @@ Abstract:
 #define IA32_MAX_IO_ADDRESS   0xFFFF
 #define IA32_MAX_MEM_ADDRESS  0xFFFFFFFF
 
-EFI_CPU_IO_PROTOCOL mCpuIoProtocol;
-
 EFI_STATUS
 CpuIoCheckAddressRange (
   IN  EFI_CPU_IO_PROTOCOL_WIDTH         Width,
@@ -56,7 +54,7 @@ CpuIoCheckAddressRange (
 EFI_STATUS
 EFIAPI
 CpuMemoryServiceRead (
-  IN  EFI_CPU_IO_PROTOCOL               *This,
+  IN  EFI_CPU_IO2_PROTOCOL              *This,
   IN  EFI_CPU_IO_PROTOCOL_WIDTH         Width,
   IN  UINT64                            Address,
   IN  UINTN                             Count,
@@ -111,7 +109,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 CpuMemoryServiceWrite (
-  IN EFI_CPU_IO_PROTOCOL                *This,
+  IN EFI_CPU_IO2_PROTOCOL               *This,
   IN  EFI_CPU_IO_PROTOCOL_WIDTH         Width,
   IN  UINT64                            Address,
   IN  UINTN                             Count,
@@ -165,7 +163,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 CpuIoServiceRead (
-  IN EFI_CPU_IO_PROTOCOL                *This,
+  IN EFI_CPU_IO2_PROTOCOL               *This,
   IN  EFI_CPU_IO_PROTOCOL_WIDTH         Width,
   IN  UINT64                            UserAddress,
   IN  UINTN                             Count,
@@ -226,7 +224,7 @@ Returns:
 EFI_STATUS
 EFIAPI
 CpuIoServiceWrite (
-  IN EFI_CPU_IO_PROTOCOL                *This,
+  IN EFI_CPU_IO2_PROTOCOL               *This,
   IN  EFI_CPU_IO_PROTOCOL_WIDTH         Width,
   IN  UINT64                            UserAddress,
   IN  UINTN                             Count,

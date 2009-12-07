@@ -60,7 +60,7 @@
   gEfiUnixIoProtocolGuid                        # PROTOCOL_NOTIFY SOMETIMES_CONSUMED
   gEfiSmbiosProtocolGuid                        # PROTOCOL SOMETIMES_CONSUMED
   gEfiHiiProtocolGuid                           # PROTOCOL SOMETIMES_CONSUMED
-  gEfiCpuIoProtocolGuid                         # PROTOCOL ALWAYS_PRODUCED
+  gEfiCpuIo2ProtocolGuid                        # PROTOCOL ALWAYS_PRODUCED
   gEfiCpuArchProtocolGuid                       # PROTOCOL ALWAYS_PRODUCED
 
 [Depex]
