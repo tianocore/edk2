@@ -22,7 +22,7 @@
 
 #include <Protocol/PciHostBridgeResourceAllocation.h>
 #include <Protocol/PciRootBridgeIo.h>
-#include <Protocol/CpuIo.h>
+#include <Protocol/CpuIo2.h>
 #include <Protocol/Metronome.h>
 #include <Protocol/DevicePath.h>
 
