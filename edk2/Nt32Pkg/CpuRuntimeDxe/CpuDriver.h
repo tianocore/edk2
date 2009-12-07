@@ -29,7 +29,7 @@ Abstract:
 #include <Protocol/Smbios.h>
 #include <Protocol/FrameworkHii.h>
 #include <Guid/DataHubRecords.h>
-#include <Protocol/CpuIo.h>
+#include <Protocol/CpuIo2.h>
 #include <Protocol/WinNtIo.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
@@ -53,7 +53,7 @@ typedef struct {
   EFI_HANDLE            Handle;
 
   EFI_CPU_ARCH_PROTOCOL Cpu;
-  EFI_CPU_IO_PROTOCOL   CpuIo;
+  EFI_CPU_IO2_PROTOCOL  CpuIo;
 
   //
   // Local Data for CPU interface goes here
@@ -73,7 +73,7 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 CpuMemoryServiceRead (
-  IN  EFI_CPU_IO_PROTOCOL               *This,
+  IN  EFI_CPU_IO2_PROTOCOL              *This,
   IN  EFI_CPU_IO_PROTOCOL_WIDTH         Width,
   IN  UINT64                            Address,
   IN  UINTN                             Count,
@@ -83,7 +83,7 @@ CpuMemoryServiceRead (
 EFI_STATUS
 EFIAPI
 CpuMemoryServiceWrite (
-  IN EFI_CPU_IO_PROTOCOL                *This,
+  IN EFI_CPU_IO2_PROTOCOL               *This,
   IN  EFI_CPU_IO_PROTOCOL_WIDTH         Width,
   IN  UINT64                            Address,
   IN  UINTN                             Count,
@@ -93,7 +93,7 @@ CpuMemoryServiceWrite (
 EFI_STATUS
 EFIAPI
 CpuIoServiceRead (
-  IN EFI_CPU_IO_PROTOCOL                *This,
+  IN EFI_CPU_IO2_PROTOCOL               *This,
   IN  EFI_CPU_IO_PROTOCOL_WIDTH         Width,
   IN  UINT64                            UserAddress,
   IN  UINTN                             Count,
@@ -103,7 +103,7 @@ CpuIoServiceRead (
 EFI_STATUS
 EFIAPI
 CpuIoServiceWrite (
-  IN EFI_CPU_IO_PROTOCOL                *This,
+  IN EFI_CPU_IO2_PROTOCOL               *This,
   IN  EFI_CPU_IO_PROTOCOL_WIDTH         Width,
   IN  UINT64                            UserAddress,
   IN  UINTN                             Count,

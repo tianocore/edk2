@@ -525,7 +525,7 @@ Returns:
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mCpuTemplate.Handle,
                   &gEfiCpuArchProtocolGuid,   &mCpuTemplate.Cpu,
-                  &gEfiCpuIoProtocolGuid,     &mCpuTemplate.CpuIo,
+                  &gEfiCpuIo2ProtocolGuid,    &mCpuTemplate.CpuIo,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);

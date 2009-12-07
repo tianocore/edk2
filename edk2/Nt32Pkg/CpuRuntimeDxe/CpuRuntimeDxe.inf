@@ -56,7 +56,7 @@
   gEfiWinNtIoProtocolGuid                       # PROTOCOL_NOTIFY SOMETIMES_CONSUMED
   gEfiSmbiosProtocolGuid                        # PROTOCOL SOMETIMES_CONSUMED
   gEfiWinNtIoProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
-  gEfiCpuIoProtocolGuid                         # PROTOCOL ALWAYS_PRODUCED
+  gEfiCpuIo2ProtocolGuid                        # PROTOCOL ALWAYS_PRODUCED
   gEfiCpuArchProtocolGuid                       # PROTOCOL ALWAYS_PRODUCED
 
 [Depex]
