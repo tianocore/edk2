@@ -54,7 +54,8 @@ STATIC EFI_SHELL_PARAMETERS_PROTOCOL *mEfiShellParametersProtocol;
 STATIC EFI_HANDLE                    mEfiShellEnvironment2Handle;
 STATIC FILE_HANDLE_FUNCTION_MAP      FileFunctionMap;
 STATIC UINTN                         mTotalParameterCount;
-
+STATIC CHAR16                        *mPostReplaceFormat;
+STATIC CHAR16                        *mPostReplaceFormat2;
 /**
   Check if a Unicode character is a hexadecimal character.
 
@@ -159,6 +160,12 @@ ShellLibConstructorWorker (
   IN EFI_SYSTEM_TABLE  *SystemTable
   ) {
   EFI_STATUS Status;
+
+  ASSERT(PcdGet16 (PcdShellLibMaxPrintBufferSize) < PcdGet32 (PcdMaximumUnicodeStringLength));
+  mPostReplaceFormat = AllocateZeroPool (PcdGet16 (PcdShellLibMaxPrintBufferSize));
+  ASSERT (mPostReplaceFormat != NULL);
+  mPostReplaceFormat2 = AllocateZeroPool (PcdGet16 (PcdShellLibMaxPrintBufferSize));
+  ASSERT (mPostReplaceFormat2 != NULL);
 
   //
   // Set the parameter count to an invalid number
@@ -266,6 +273,8 @@ ShellLibConstructor (
   mEfiShellParametersProtocol = NULL;
   mEfiShellInterface          = NULL;
   mEfiShellEnvironment2Handle = NULL;
+  mPostReplaceFormat          = NULL;
+  mPostReplaceFormat2         = NULL;
 
   //
   // verify that auto initialize is not set false
@@ -315,6 +324,16 @@ ShellLibDestructor (
     mEfiShellParametersProtocol = NULL;
   }
   mEfiShellEnvironment2Handle = NULL;
+
+  if (mPostReplaceFormat != NULL) {
+    FreePool(mPostReplaceFormat);
+  }
+  if (mPostReplaceFormat2 != NULL) {
+    FreePool(mPostReplaceFormat2);
+  }
+  mPostReplaceFormat          = NULL;
+  mPostReplaceFormat2         = NULL;
+
   return (EFI_SUCCESS);
 }
 
@@ -2266,6 +2285,10 @@ InternalPrintTo (
     return (mEfiShellParametersProtocol->StdOut->Write(mEfiShellParametersProtocol->StdOut, &Size, (VOID*)String));
   }
   if (mEfiShellInterface          != NULL) {
+    //
+    // Divide in half for old shell.  Must be string length not size.
+    //
+    Size /= 2;
     return (         mEfiShellInterface->StdOut->Write(mEfiShellInterface->StdOut,          &Size, (VOID*)String));
   }
   ASSERT(FALSE);
@@ -2310,42 +2333,30 @@ InternalShellPrintWorker(
   VA_LIST                 Marker
   ) 
 {
-  UINTN             BufferSize;
-  CHAR16            *PostReplaceFormat;
-  CHAR16            *PostReplaceFormat2;
   UINTN             Return;
   EFI_STATUS        Status;
   UINTN             NormalAttribute;
   CHAR16            *ResumeLocation;
   CHAR16            *FormatWalker;
   
-  BufferSize = PcdGet16 (PcdShellLibMaxPrintBufferSize);
-  ASSERT(PcdGet16 (PcdShellLibMaxPrintBufferSize) < PcdGet32 (PcdMaximumUnicodeStringLength));
-  PostReplaceFormat = AllocateZeroPool (BufferSize);
-  ASSERT (PostReplaceFormat != NULL);
-  PostReplaceFormat2 = AllocateZeroPool (BufferSize);
-  ASSERT (PostReplaceFormat2 != NULL);
-
   //
   // Back and forth each time fixing up 1 of our flags...
   //
-  Status = CopyReplace(Format,             PostReplaceFormat,  BufferSize, L"%N", L"%%N");
+  Status = CopyReplace(Format,             mPostReplaceFormat,  PcdGet16 (PcdShellLibMaxPrintBufferSize), L"%N", L"%%N");
   ASSERT_EFI_ERROR(Status);
-  Status = CopyReplace(PostReplaceFormat,  PostReplaceFormat2, BufferSize, L"%E", L"%%E");
+  Status = CopyReplace(mPostReplaceFormat,  mPostReplaceFormat2, PcdGet16 (PcdShellLibMaxPrintBufferSize), L"%E", L"%%E");
   ASSERT_EFI_ERROR(Status);
-  Status = CopyReplace(PostReplaceFormat2, PostReplaceFormat,  BufferSize, L"%H", L"%%H");
+  Status = CopyReplace(mPostReplaceFormat2, mPostReplaceFormat,  PcdGet16 (PcdShellLibMaxPrintBufferSize), L"%H", L"%%H");
   ASSERT_EFI_ERROR(Status);
-  Status = CopyReplace(PostReplaceFormat,  PostReplaceFormat2, BufferSize, L"%B", L"%%B");
+  Status = CopyReplace(mPostReplaceFormat,  mPostReplaceFormat2, PcdGet16 (PcdShellLibMaxPrintBufferSize), L"%B", L"%%B");
   ASSERT_EFI_ERROR(Status);
-  Status = CopyReplace(PostReplaceFormat2, PostReplaceFormat,  BufferSize, L"%V", L"%%V");
+  Status = CopyReplace(mPostReplaceFormat2, mPostReplaceFormat,  PcdGet16 (PcdShellLibMaxPrintBufferSize), L"%V", L"%%V");
   ASSERT_EFI_ERROR(Status);
 
   //
   // Use the last buffer from replacing to print from...
   //
-  Return = UnicodeVSPrint (PostReplaceFormat2, BufferSize, PostReplaceFormat, Marker);
-
-  FreePool(PostReplaceFormat);
+  Return = UnicodeVSPrint (mPostReplaceFormat2, PcdGet16 (PcdShellLibMaxPrintBufferSize), mPostReplaceFormat, Marker);
 
   if (Col != -1 && Row != -1) {
     Status = gST->ConOut->SetCursorPosition(gST->ConOut, Col, Row);
@@ -2353,7 +2364,7 @@ InternalShellPrintWorker(
   }
 
   NormalAttribute = gST->ConOut->Mode->Attribute;
-  FormatWalker = PostReplaceFormat2;
+  FormatWalker = mPostReplaceFormat2;
   while (*FormatWalker != CHAR_NULL) {
     //
     // Find the next attribute change request
@@ -2409,8 +2420,6 @@ InternalShellPrintWorker(
     //
     FormatWalker = ResumeLocation + 2;
   }
-
-  FreePool(PostReplaceFormat2);
 
   return (Return);
 }
@@ -2532,6 +2541,8 @@ ShellIsDirectory(
   EFI_STATUS        Status;
   EFI_FILE_HANDLE   Handle;
 
+  ASSERT(DirName != NULL);
+
   Handle = NULL;
 
   Status = ShellOpenFileByName(DirName, &Handle, EFI_FILE_MODE_READ, 0);
@@ -2564,6 +2575,8 @@ ShellIsFile(
 {
   EFI_STATUS        Status;
   EFI_FILE_HANDLE   Handle;
+
+  ASSERT(Name != NULL);
 
   Handle = NULL;
 
