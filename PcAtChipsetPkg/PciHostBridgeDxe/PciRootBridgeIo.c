@@ -211,7 +211,7 @@ RootBridgeIoPciRW (
 // Memory Controller Pci Root Bridge Io Module Variables
 //
 EFI_METRONOME_ARCH_PROTOCOL *mMetronome;
-EFI_CPU_IO_PROTOCOL *mCpuIo;
+EFI_CPU_IO2_PROTOCOL *mCpuIo;
 
 EFI_STATUS
 RootBridgeConstructor (
@@ -313,7 +313,7 @@ Returns:
 
   Protocol->SegmentNumber  = 0;
 
-  Status = gBS->LocateProtocol (&gEfiCpuIoProtocolGuid, NULL, (VOID **)&mCpuIo);
+  Status = gBS->LocateProtocol (&gEfiCpuIo2ProtocolGuid, NULL, (VOID **)&mCpuIo);
   ASSERT_EFI_ERROR (Status);
 
   Status = gBS->LocateProtocol (&gEfiMetronomeArchProtocolGuid, NULL, (VOID **)&mMetronome);

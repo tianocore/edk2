@@ -47,9 +47,9 @@
 [Protocols]
   gEfiPciHostBridgeResourceAllocationProtocolGuid
   gEfiPciRootBridgeIoProtocolGuid
-  gEfiCpuIoProtocolGuid 
+  gEfiCpuIo2ProtocolGuid 
   gEfiMetronomeArchProtocolGuid
   gEfiDevicePathProtocolGuid
 
 [depex]
-  gEfiCpuIoProtocolGuid AND gEfiMetronomeArchProtocolGuid
+  gEfiCpuIo2ProtocolGuid AND gEfiMetronomeArchProtocolGuid

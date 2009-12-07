@@ -45,6 +45,6 @@
   gEfiResetArchProtocolGuid
 
 [Depex]
-  gEfiCpuIoProtocolGuid
+  gEfiCpuIo2ProtocolGuid
 
 
