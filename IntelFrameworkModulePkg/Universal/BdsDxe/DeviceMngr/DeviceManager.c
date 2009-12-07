@@ -505,6 +505,10 @@ CallDeviceManager (
   //
   if (gCallbackKey == DEVICE_MANAGER_KEY_DRIVER_HEALTH) {
     CallDriverHealth ();
+    //
+    // Force return to Device Manager
+    //
+    gCallbackKey = FRONT_PAGE_KEY_DEVICE_MANAGER;
   }
 
   //
@@ -849,7 +853,7 @@ CallDriverHealth (
   // a target to display.
   // Process the diver health status states here.
   // 
-  if (gCallbackKey >= DRIVER_HEALTH_KEY_OFFSET && gCallbackKey != DRIVER_HEALTH_REPAIR_ALL_KEY && gCallbackKey != FRONT_PAGE_KEY_DEVICE_MANAGER) {
+  if (gCallbackKey >= DRIVER_HEALTH_KEY_OFFSET && gCallbackKey != DRIVER_HEALTH_REPAIR_ALL_KEY) {
     ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
 
     Link = GetFirstNode (&DriverHealthList);
@@ -938,11 +942,11 @@ CallDriverHealth (
   HiiFreeOpCodeHandle (EndOpCodeHandleRepair); 
 
   if (gCallbackKey == DRIVER_HEALTH_RETURN_KEY) {
+    //
+    // Force return to Driver Health Form
+    //
     gCallbackKey = DEVICE_MANAGER_KEY_DRIVER_HEALTH;
     CallDriverHealth ();
-  }
-  if (gCallbackKey == DEVICE_MANAGER_KEY_DRIVER_HEALTH) {
-    CallDeviceManager();
   }
 }
 

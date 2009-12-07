@@ -1054,7 +1054,7 @@ PlatformBdsEnterFrontPage (
       //
       // User chose to run the Boot Manager
       //
-      CallBootManager();
+      CallBootManager ();
       break;
 
     case FRONT_PAGE_KEY_DEVICE_MANAGER:
@@ -1062,7 +1062,7 @@ PlatformBdsEnterFrontPage (
       // Display the Device Manager
       //
       do {
-        CallDeviceManager();
+        CallDeviceManager ();
       } while (gCallbackKey == FRONT_PAGE_KEY_DEVICE_MANAGER);
       break;
 
