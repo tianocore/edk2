@@ -701,8 +701,7 @@ DriverCallback (
     //
     Configuration = AllocateZeroPool (sizeof (DRIVER_SAMPLE_CONFIGURATION));
     ASSERT (Configuration != NULL);
-    Status = HiiGetBrowserData (&mFormSetGuid, VariableName, sizeof (DRIVER_SAMPLE_CONFIGURATION), (UINT8 *) Configuration);
-    if (!EFI_ERROR (Status)) {
+    if (HiiGetBrowserData (&mFormSetGuid, VariableName, sizeof (DRIVER_SAMPLE_CONFIGURATION), (UINT8 *) Configuration)) {
       Configuration->DynamicOneof = 2;
 
       //
