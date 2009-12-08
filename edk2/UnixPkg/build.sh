@@ -22,7 +22,11 @@ if [ -z "$WORKSPACE" ]
 then
   echo Initializing workspace
   cd ..
-  export EDK_TOOLS_PATH=`pwd`/BaseTools
+# This version is for the tools in the BaseTools project.
+# this assumes svn pulls have the same root dir
+  export EDK_TOOLS_PATH=`pwd`/../BaseTools
+# This version is for the tools source in edk2
+#  export EDK_TOOLS_PATH=`pwd`/BaseTools
   echo $EDK_TOOLS_PATH
   source edksetup.sh BaseTools
 else
@@ -90,7 +94,8 @@ done
 #
 echo $PATH
 echo `which build`
-build -p $WORKSPACE/EdkShellPkg/EdkShellPkg.dsc -a IA32 -t $TARGET_TOOLS $1 $2 $3 $4 $5 $6 $7 $8
+# Uncomment this if you want to build the shell. 
+#build -p $WORKSPACE/EdkShellPkg/EdkShellPkg.dsc -a IA32 -t $TARGET_TOOLS $1 $2 $3 $4 $5 $6 $7 $8
 build -p $WORKSPACE/UnixPkg/UnixPkg.dsc         -a IA32 -t $TARGET_TOOLS $1 $2 $3 $4 $5 $6 $7 $8
 exit $?
 
