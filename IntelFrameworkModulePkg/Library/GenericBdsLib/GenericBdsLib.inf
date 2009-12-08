@@ -107,7 +107,6 @@
   gEfiUgaDrawProtocolGuid |PcdUgaConsumeSupport # PROTOCOL SOMETIMES_CONSUMES
   gEfiOEMBadgingProtocolGuid                    # PROTOCOL CONSUMES
   gEfiHiiFontProtocolGuid                       # PROTOCOL CONSUMES
-  gEfiSecurityArchProtocolGuid                  # PROTOCOL CONSUMES
 
 [FeaturePcd]
   gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
