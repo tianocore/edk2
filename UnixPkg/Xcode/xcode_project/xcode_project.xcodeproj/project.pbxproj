@@ -6,15 +6,10 @@
 	objectVersion = 45;
 	objects = {
 
-/* Begin PBXFileReference section */
-		F27EDBED101FA6FC0097B575 /* PciIoKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PciIoKit.h; path = ../../Sec/PciIoKit.h; sourceTree = SOURCE_ROOT; };
-/* End PBXFileReference section */
-
 /* Begin PBXGroup section */
 		08FB7794FE84155DC02AAC07 /* xcode_project */ = {
 			isa = PBXGroup;
 			children = (
-				F27EDBED101FA6FC0097B575 /* PciIoKit.h */,
 			);
 			name = xcode_project;
 			sourceTree = "<group>";
