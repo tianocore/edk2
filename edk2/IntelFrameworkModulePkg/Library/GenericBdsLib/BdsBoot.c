@@ -145,7 +145,6 @@ BdsLibBootViaBootOption (
   EFI_DEVICE_PATH_PROTOCOL  *WorkingDevicePath;
   EFI_ACPI_S3_SAVE_PROTOCOL *AcpiS3Save;
   LIST_ENTRY                TempBootLists;
-  EFI_SECURITY_ARCH_PROTOCOL *SecurityProtocol;
 
   //
   // Record the performance data for End of BDS
@@ -241,18 +240,6 @@ BdsLibBootViaBootOption (
     DevicePath = Option->DevicePath;
   }
 
-  //
-  // Measure GPT Table by SAP protocol.
-  //
-  Status = gBS->LocateProtocol (
-                  &gEfiSecurityArchProtocolGuid,
-                  NULL,
-                  (VOID**) &SecurityProtocol
-                  );
-  if (!EFI_ERROR (Status)) {
-    Status = SecurityProtocol->FileAuthenticationState (SecurityProtocol, 0, DevicePath);
-  }
-
   DEBUG_CODE_BEGIN();
     UINTN                     DevicePathTypeValue;
     CHAR16                    *HiiString;
@@ -326,7 +313,7 @@ BdsLibBootViaBootOption (
                   );
 
   //
-  // If we didn't find an image directly, we need to try as if it is a removable device boot opotion
+  // If we didn't find an image directly, we need to try as if it is a removable device boot option
   // and load the image according to the default boot behavior for removable device.
   //
   if (EFI_ERROR (Status)) {
