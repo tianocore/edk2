@@ -677,7 +677,7 @@ GetFileBufferByFilePath (
             Status = LoadFile2->LoadFile (
                                  LoadFile2,
                                  DevicePathNode,
-                                 BootPolicy,
+                                 FALSE,
                                  &ImageBufferSize,
                                  ImageBuffer
                                  );
