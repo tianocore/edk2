@@ -69,6 +69,31 @@ HII_VENDOR_DEVICE_PATH  mDeviceManagerHiiVendorDevicePath = {
   }
 };
 
+HII_VENDOR_DEVICE_PATH  mDriverHealthHiiVendorDevicePath = {
+  {
+    {
+      HARDWARE_DEVICE_PATH,
+        HW_VENDOR_DP,
+      {
+        (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
+          (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
+      }
+    },
+    //
+    // {D8F76651-1675-4986-BED4-3824B2F1F4C8}
+    //
+    { 0xd8f76651, 0x1675, 0x4986, { 0xbe, 0xd4, 0x38, 0x24, 0xb2, 0xf1, 0xf4, 0xc8 } }
+  },
+  {
+    END_DEVICE_PATH_TYPE,
+      END_ENTIRE_DEVICE_PATH_SUBTYPE,
+    { 
+      (UINT8) (END_DEVICE_PATH_LENGTH),
+        (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
+    }
+  }
+};
+
 /**
   This function is invoked if user selected a interactive opcode from Device Manager's
   Formset. The decision by user is saved to gCallbackKey for later processing. If
@@ -141,6 +166,8 @@ InitializeDeviceManager (
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &gDeviceManagerPrivate.DriverHealthHandle,
+                  &gEfiDevicePathProtocolGuid,
+                  &mDriverHealthHiiVendorDevicePath,
                   &gEfiHiiConfigAccessProtocolGuid,
                   &gDeviceManagerPrivate.DriverHealthConfigAccess,
                   NULL
