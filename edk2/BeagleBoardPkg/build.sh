@@ -41,7 +41,10 @@ if [ -z "$WORKSPACE" ]
 then
   echo Initializing workspace
   cd ..
-  export EDK_TOOLS_PATH=`pwd`/BaseTools
+# Uses an external BaseTools project 
+  export EDK_TOOLS_PATH=`pwd`/../BaseTools
+# Uses the BaseTools in edk2
+#  export EDK_TOOLS_PATH=`pwd`/BaseTools
   source edksetup.sh BaseTools
 else
   echo Building from: $WORKSPACE
@@ -74,11 +77,11 @@ BUILD_ROOT=$WORKSPACE/Build/BeagleBoard/DEBUG_"$TARGET_TOOLS"
 GENERATE_IMAGE=$WORKSPACE/BeagleBoardPkg/Tools/generate_image
 FLASH_BOOT=$BUILD_ROOT/FV/BeagleBoard_EFI_flashboot.fd
 
-if  [[ ! -f `which build` || ! -f `which GenFv` ]];
+if  [[ ! -e $EDK_TOOLS_PATH/Source/C/bin ]];
 then
   # build the tools if they don't yet exist
-  echo Building tools
-  make -C $WORKSPACE/BaseTools
+  echo Building tools: $EDK_TOOLS_PATH
+  make -C $EDK_TOOLS_PATH
 else
   echo using prebuilt tools
 fi
@@ -94,7 +97,7 @@ do
     # no need to post process if we are doing a clean
     exit
   elif [[ $arg == cleanall ]]; then
-    make -C BaseTools/ clean
+    make -C $EDK_TOOLS_PATH clean
     make -C $WORKSPACE/BeagleBoardPkg/Tools clean
     exit
     
