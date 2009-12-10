@@ -64,6 +64,10 @@ LegacyRegion2Decode (
   IN  BOOLEAN                      *On
   )
 {
+  if ((Start < 0xC0000) || ((Start + Length - 1) > 0xFFFFF)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   ASSERT (Granularity != NULL);
   *Granularity = 0;
   return EFI_SUCCESS;
@@ -98,6 +102,10 @@ LegacyRegion2Lock (
   OUT UINT32                      *Granularity
   )
 {
+  if ((Start < 0xC0000) || ((Start + Length - 1) > 0xFFFFF)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   ASSERT (Granularity != NULL);
   *Granularity = 0;
   return EFI_SUCCESS;
@@ -137,6 +145,10 @@ LegacyRegion2BootLock (
   OUT UINT32                              *Granularity
   )
 {
+  if ((Start < 0xC0000) || ((Start + Length - 1) > 0xFFFFF)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   ASSERT (Granularity != NULL);
   *Granularity = 0;
   return EFI_SUCCESS;
@@ -171,6 +183,10 @@ LegacyRegion2Unlock (
   OUT UINT32                       *Granularity
   )
 {
+  if ((Start < 0xC0000) || ((Start + Length - 1) > 0xFFFFF)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   ASSERT (Granularity != NULL);
   *Granularity = 0;
   return EFI_SUCCESS;
