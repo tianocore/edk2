@@ -108,9 +108,7 @@ HiiResourcesSampleInit (
   }
 
   //
-  // Publish HII package list to HII Database. Here we use ImageHandle as
-  // the "Driver Handle" for HiiDatabase->NewPackageList(), since there will
-  // be EFI_LOADED_IMAGE_DEVICE_PATH_PROTOCOL installed on the ImageHandle.
+  // Publish HII package list to HII Database.
   //
   Status = gHiiDatabase->NewPackageList (
                           gHiiDatabase,
