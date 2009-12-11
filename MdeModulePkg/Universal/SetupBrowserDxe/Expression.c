@@ -1941,7 +1941,7 @@ EvaluateExpression (
         break;
 
       case EFI_IFR_NOT_EQUAL_OP:
-        Value->Value.b = (BOOLEAN) ((Result == 0) ? TRUE : FALSE);
+        Value->Value.b = (BOOLEAN) ((Result != 0) ? TRUE : FALSE);
         break;
 
       case EFI_IFR_GREATER_EQUAL_OP:

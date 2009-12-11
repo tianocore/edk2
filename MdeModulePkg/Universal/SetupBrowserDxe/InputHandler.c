@@ -455,12 +455,12 @@ TheKey2:
               //
               // Year
               //
-              UnicodeSPrint (FormattedNumber, 21 * sizeof (CHAR16), L"%04d", EditValue);
+              UnicodeSPrint (FormattedNumber, 21 * sizeof (CHAR16), L"%04d", (UINT16) EditValue);
             } else {
               //
               // Month/Day
               //
-              UnicodeSPrint (FormattedNumber, 21 * sizeof (CHAR16), L"%02d", EditValue);
+              UnicodeSPrint (FormattedNumber, 21 * sizeof (CHAR16), L"%02d", (UINT8) EditValue);
             }
 
             if (MenuOption->Sequence == 0) {
@@ -469,7 +469,7 @@ TheKey2:
               FormattedNumber[EraseLen - 1] = DATE_SEPARATOR;
             }
           } else if (Question->Operand == EFI_IFR_TIME_OP) {
-            UnicodeSPrint (FormattedNumber, 21 * sizeof (CHAR16), L"%02d", EditValue);
+            UnicodeSPrint (FormattedNumber, 21 * sizeof (CHAR16), L"%02d", (UINT8) EditValue);
 
             if (MenuOption->Sequence == 0) {
               FormattedNumber[EraseLen - 2] = TIME_SEPARATOR;
