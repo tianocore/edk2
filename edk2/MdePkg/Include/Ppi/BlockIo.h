@@ -103,6 +103,8 @@ typedef struct {
                                    instance.
   @param[out] NumberBlockDevices   The number of block I/O devices discovered.
 
+  @retval     EFI_SUCCESS          Operation performed successfully.
+
 **/
 typedef
 EFI_STATUS
