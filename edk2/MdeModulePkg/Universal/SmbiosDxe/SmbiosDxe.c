@@ -141,7 +141,6 @@ GetSmbiosStructureSize (
   //
   while (*CharInStr != 0 || *(CharInStr+1) != 0) { 
     if (*CharInStr == 0) {
-      *NumberOfStrings += 1;
       *Size += 1;
       CharInStr++;
     }
@@ -160,12 +159,9 @@ GetSmbiosStructureSize (
     //
     CharInStr += StrLen;
     *Size += StrLen;
-    
-  }
-
-  if (*NumberOfStrings > 0) {
     *NumberOfStrings += 1;
   }
+
   //
   // count ending two zeros.
   //
@@ -511,6 +507,11 @@ SmbiosUpdateString (
         } 
       }
 
+      if (*StrStart == 0) {
+        StrStart ++;
+        TargetStrOffset ++;
+      }
+      
       //
       // Now we get the string target
       //
@@ -548,9 +549,11 @@ SmbiosUpdateString (
       //
       // Copy smbios structure and optional strings.
       //
-      CopyMem (Raw, SmbiosEntry->RecordHeader + 1, sizeof(EFI_SMBIOS_TABLE_HEADER) + TargetStrOffset);
-      CopyMem ((VOID*)((UINTN)Raw + sizeof(EFI_SMBIOS_TABLE_HEADER) + TargetStrOffset), String, InputStrLen + 1);
-      AsciiStrCpy((CHAR8*)((UINTN)Raw + sizeof(EFI_SMBIOS_TABLE_HEADER) + TargetStrOffset + InputStrLen + 1), (CHAR8*)Record + Record->Length + TargetStrOffset + TargetStrLen + 1);
+      CopyMem (Raw, SmbiosEntry->RecordHeader + 1, Record->Length + TargetStrOffset);
+      CopyMem ((VOID*)((UINTN)Raw + Record->Length + TargetStrOffset), String, InputStrLen + 1);
+      CopyMem ((CHAR8*)((UINTN)Raw + Record->Length + TargetStrOffset + InputStrLen + 1),
+               (CHAR8*)Record + Record->Length + TargetStrOffset + TargetStrLen + 1,
+               SmbiosEntry->RecordHeader->RecordSize - sizeof (EFI_SMBIOS_RECORD_HEADER) - Record->Length - TargetStrOffset - TargetStrLen - 1);
 
       //
       // Insert new record
