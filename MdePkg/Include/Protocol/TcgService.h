@@ -2,7 +2,7 @@
   TCG Service Protocol as defined in TCG_EFI_Protocol_1_20_Final
   See http://trustedcomputinggroup.org for the latest specification
 
-  Copyright (c) 2007 - 2008, Intel Corporation 
+  Copyright (c) 2007 - 2009, Intel Corporation 
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -42,6 +42,12 @@ typedef struct _TCG_EFI_BOOT_SERVICE_CAPABILITY {
 
 typedef UINT32   TCG_ALGORITHM_ID;
 
+///
+/// Note:
+///   Status codes returned for functions of EFI_TCG_PROTOCOL do not exactly match
+///   those defined in the TCG EFI Protocol 1.20 Final Specification.
+///
+
 /**
   This service provides EFI protocol capability information, state information 
   about the TPM, and Event Log state information.
@@ -61,11 +67,7 @@ typedef UINT32   TCG_ALGORITHM_ID;
                                  the last entry in the event log in memory. 
 
   @retval EFI_SUCCESS            Operation completed successfully.
-  @retval EFI_DEVICE_ERROR       The command was unsuccessful.
-  @retval EFI_INVALID_PARAMETER  One or more of the parameters are incorrect.
-  @retval EFI_BUFFER_TOO_SMALL   The receive buffer is too small.
-  @retval EFI_NOT_FOUND          The component was not running
-
+  @retval EFI_INVALID_PARAMETER  ProtocolCapability does not match TCG capability.
 **/
 typedef
 EFI_STATUS
@@ -89,11 +91,11 @@ EFI_STATUS
   @param  HashedDataResult       Resultant buffer of the hashed data  
   
   @retval EFI_SUCCESS            Operation completed successfully.
-  @retval EFI_DEVICE_ERROR       The command was unsuccessful.
-  @retval EFI_INVALID_PARAMETER  One or more of the parameters are incorrect.
-  @retval EFI_BUFFER_TOO_SMALL   The receive buffer is too small.
-  @retval EFI_NOT_FOUND          The component was not running
-
+  @retval EFI_INVALID_PARAMETER  HashDataLen is NULL.
+  @retval EFI_INVALID_PARAMETER  HashDataLenResult is NULL.
+  @retval EFI_OUT_OF_RESOURCES   Cannot allocate buffer of size *HashedDataLen.
+  @retval EFI_UNSUPPORTED        AlgorithmId not supported.
+  @retval EFI_BUFFER_TOO_SMALL   *HashedDataLen < sizeof (TCG_DIGEST).
 **/
 typedef
 EFI_STATUS
@@ -120,10 +122,7 @@ EFI_STATUS
                                  other bits are reserved. 
  
   @retval EFI_SUCCESS            Operation completed successfully.
-  @retval EFI_DEVICE_ERROR       The command was unsuccessful.
-  @retval EFI_INVALID_PARAMETER  One or more of the parameters are incorrect.
-  @retval EFI_BUFFER_TOO_SMALL   The receive buffer is too small.
-  @retval EFI_NOT_FOUND          The component was not running
+  @retval EFI_OUT_OF_RESOURCES   Insufficient memory in the event log to complete this action.
 **/
 typedef
 EFI_STATUS
@@ -144,10 +143,9 @@ EFI_STATUS
   @param  TpmOutputParameterBlock     Pointer to the TPM output parameter block
 
   @retval EFI_SUCCESS            Operation completed successfully.
-  @retval EFI_DEVICE_ERROR       The command was unsuccessful.
-  @retval EFI_INVALID_PARAMETER  One or more of the parameters are incorrect.
-  @retval EFI_BUFFER_TOO_SMALL   The receive buffer is too small.
-  @retval EFI_NOT_FOUND          The component was not running
+  @retval EFI_INVALID_PARAMETER  Invalid ordinal.
+  @retval EFI_UNSUPPORTED        Current Task Priority Level  >= EFI_TPL_CALLBACK.
+  @retval EFI_TIMEOUT            The TIS timed-out.
 **/
 typedef
 EFI_STATUS
@@ -177,10 +175,9 @@ EFI_STATUS
                                  the start of the Event Log.
 
   @retval EFI_SUCCESS            Operation completed successfully.
+  @retval EFI_UNSUPPORTED        AlgorithmId != TPM_ALG_SHA.
+  @retval EFI_UNSUPPORTED        Current TPL >= EFI_TPL_CALLBACK.
   @retval EFI_DEVICE_ERROR       The command was unsuccessful.
-  @retval EFI_INVALID_PARAMETER  One or more of the parameters are incorrect.
-  @retval EFI_BUFFER_TOO_SMALL   The receive buffer is too small.
-  @retval EFI_NOT_FOUND          The component was not running
 **/
 typedef
 EFI_STATUS
