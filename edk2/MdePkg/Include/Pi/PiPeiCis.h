@@ -129,6 +129,21 @@ struct _EFI_PEI_NOTIFY_DESCRIPTOR {
   EFI_PEIM_NOTIFY_ENTRY_POINT Notify;
 };
 
+///
+/// This data structure is the means by which callable services are installed and
+/// notifications are registered in the PEI phase.
+///
+typedef union {
+  ///
+  /// The typedef structure of the notification descriptor.
+  ///
+  EFI_PEI_NOTIFY_DESCRIPTOR   Notify;
+  ///
+  /// The typedef structure of the PPI descriptor.
+  ///
+  EFI_PEI_PPI_DESCRIPTOR      Ppi;
+} EFI_PEI_DESCRIPTOR;
+
 /**
   This service is the first one provided by the PEI Foundation.  This function 
   installs an interface in the PEI PPI database by GUID.  The purpose of the 
