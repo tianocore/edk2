@@ -749,7 +749,7 @@ UpdateFrontPageStrings (
     if (Record->Type == EFI_SMBIOS_TYPE_BIOS_INFORMATION) {
       Type0Record = (SMBIOS_TABLE_TYPE0 *) Record;
       StrIndex = Type0Record->BiosVersion;
-      GetOptionalStringByIndex ((CHAR8*)(Type0Record+1), StrIndex, &NewString);
+      GetOptionalStringByIndex ((CHAR8*)((UINT8*)Type0Record + Type0Record->Hdr.Length + 1), StrIndex, &NewString);
       TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_BIOS_VERSION);
       HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
       FreePool (NewString);
@@ -759,7 +759,7 @@ UpdateFrontPageStrings (
     if (Record->Type == EFI_SMBIOS_TYPE_SYSTEM_INFORMATION) {
       Type1Record = (SMBIOS_TABLE_TYPE1 *) Record;
       StrIndex = Type1Record->ProductName;
-      GetOptionalStringByIndex ((CHAR8*)(Type1Record+1), StrIndex, &NewString);
+      GetOptionalStringByIndex ((CHAR8*)((UINT8*)Type1Record + Type1Record->Hdr.Length + 1), StrIndex, &NewString);
       TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_COMPUTER_MODEL);
       HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
       FreePool (NewString);
@@ -769,7 +769,7 @@ UpdateFrontPageStrings (
     if (Record->Type == EFI_SMBIOS_TYPE_PROCESSOR_INFORMATION) {
       Type4Record = (SMBIOS_TABLE_TYPE4 *) Record;
       StrIndex = Type4Record->ProcessorVersion;
-      GetOptionalStringByIndex ((CHAR8*)(Type4Record+1), StrIndex, &NewString);
+      GetOptionalStringByIndex ((CHAR8*)((UINT8*)Type4Record + Type4Record->Hdr.Length + 1), StrIndex, &NewString);
       TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_CPU_MODEL);
       HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
       FreePool (NewString);
