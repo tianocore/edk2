@@ -818,7 +818,7 @@ Returns:
     // will block forwarding 0x100-0x3ff for each 1KB in the 
     // first 64KB I/O range.
     //
-    if (!BridgeControl & EFI_PCI_BRIDGE_CONTROL_ISA) {
+    if ((BridgeControl & EFI_PCI_BRIDGE_CONTROL_ISA) != 0) {
       PciIoDevice->Attributes |= EFI_PCI_IO_ATTRIBUTE_ISA_IO;
     } 
 
