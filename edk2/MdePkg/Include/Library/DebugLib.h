@@ -3,7 +3,11 @@
   
   The Debug library supports debug print and asserts based on a combination of macros and code.
   The debug library can be turned on and off so that the debug code does not increase the size of an image.
-  
+
+  Note that a MDEPKG_NDEBUG macro is introduced to switch on/off debug and assert related macros.
+  1. If MDEPKG_NDEBUG is defined, then debug and assert related macros are NULL.
+  2. If MDEPKG_NDEBUG is not defined, then PcdDebugProperyMask is used to turn on/off these helper macros.
+
 Copyright (c) 2006 - 2008, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -241,71 +245,83 @@ DebugClearMemoryEnabled (
 /**  
   Macro that calls DebugAssert() if an expression evaluates to FALSE.
 
-  If the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of PcdDebugProperyMask is set, 
-  then this macro evaluates the Boolean expression specified by Expression.  If 
-  Expression evaluates to FALSE, then DebugAssert() is called passing in the 
-  source filename, source line number, and Expression.
+  If MDEPKG_NDEBUG is not defined and the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED 
+  bit of PcdDebugProperyMask is set, then this macro evaluates the Boolean 
+  expression specified by Expression.  If Expression evaluates to FALSE, then 
+  DebugAssert() is called passing in the source filename, source line number, 
+  and Expression.
 
   @param  Expression  Boolean expression
 
 **/
-#define ASSERT(Expression)        \
-  do {                            \
-    if (DebugAssertEnabled ()) {  \
-      if (!(Expression)) {        \
-        _ASSERT (Expression);     \
-      }                           \
-    }                             \
-  } while (FALSE)
-
+#if !defined(MDEPKG_NDEBUG)       
+  #define ASSERT(Expression)        \
+    do {                            \
+      if (DebugAssertEnabled ()) {  \
+        if (!(Expression)) {        \
+          _ASSERT (Expression);     \
+        }                           \
+      }                             \
+    } while (FALSE)
+#else
+  #define ASSERT(Expression)
+#endif
 
 /**  
   Macro that calls DebugPrint().
 
-  If the DEBUG_PROPERTY_DEBUG_PRINT_ENABLED bit of PcdDebugProperyMask is set, 
-  then this macro passes Expression to DebugPrint().
+  If MDEPKG_NDEBUG is not defined and the DEBUG_PROPERTY_DEBUG_PRINT_ENABLED 
+  bit of PcdDebugProperyMask is set, then this macro passes Expression to 
+  DebugPrint().
 
   @param  Expression  Expression containing an error level, a format string, 
                       and a variable argument list based on the format string.
   
 
 **/
-#define DEBUG(Expression)        \
-  do {                           \
-    if (DebugPrintEnabled ()) {  \
-      _DEBUG (Expression);       \
-    }                            \
-  } while (FALSE)
-
+#if !defined(MDEPKG_NDEBUG)      
+  #define DEBUG(Expression)        \
+    do {                           \
+      if (DebugPrintEnabled ()) {  \
+        _DEBUG (Expression);       \
+      }                            \
+    } while (FALSE)
+#else
+  #define DEBUG(Expression)
+#endif
 
 /**  
   Macro that calls DebugAssert() if an EFI_STATUS evaluates to an error code.
 
-  If the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of PcdDebugProperyMask is set, 
-  then this macro evaluates the EFI_STATUS value specified by StatusParameter.  
-  If StatusParameter is an error code, then DebugAssert() is called passing in 
-  the source filename, source line number, and StatusParameter.
+  If MDEPKG_NDEBUG is not defined and the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED 
+  bit of PcdDebugProperyMask is set, then this macro evaluates the EFI_STATUS 
+  value specified by StatusParameter.  If StatusParameter is an error code, 
+  then DebugAssert() is called passing in the source filename, source line 
+  number, and StatusParameter.
 
   @param  StatusParameter  EFI_STATUS value to evaluate.
 
 **/
-#define ASSERT_EFI_ERROR(StatusParameter)                                              \
-  do {                                                                                 \
-    if (DebugAssertEnabled ()) {                                                       \
-      if (EFI_ERROR (StatusParameter)) {                                               \
-        DEBUG ((EFI_D_ERROR, "\nASSERT_EFI_ERROR (Status = %r)\n", StatusParameter));  \
-        _ASSERT (!EFI_ERROR (StatusParameter));                                        \
-      }                                                                                \
-    }                                                                                  \
-  } while (FALSE)
-
+#if !defined(MDEPKG_NDEBUG)
+  #define ASSERT_EFI_ERROR(StatusParameter)                                              \
+    do {                                                                                 \
+      if (DebugAssertEnabled ()) {                                                       \
+        if (EFI_ERROR (StatusParameter)) {                                               \
+          DEBUG ((EFI_D_ERROR, "\nASSERT_EFI_ERROR (Status = %r)\n", StatusParameter));  \
+          _ASSERT (!EFI_ERROR (StatusParameter));                                        \
+        }                                                                                \
+      }                                                                                  \
+    } while (FALSE)
+#else
+  #define ASSERT_EFI_ERROR(StatusParameter)
+#endif
 
 /**  
   Macro that calls DebugAssert() if a protocol is already installed in the 
   handle database.
 
-  If the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of PcdDebugProperyMask is clear, 
-  then return.
+  If MDEPKG_NDEBUG is defined or the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit 
+  of PcdDebugProperyMask is clear, then return.
 
   If Handle is NULL, then a check is made to see if the protocol specified by Guid 
   is present on any handle in the handle database.  If Handle is not NULL, then 
@@ -322,23 +338,26 @@ DebugClearMemoryEnabled (
   @param  Guid    Pointer to a protocol GUID.
 
 **/
-#define ASSERT_PROTOCOL_ALREADY_INSTALLED(Handle, Guid)                               \
-  do {                                                                                \
-    if (DebugAssertEnabled ()) {                                                      \
-      VOID  *Instance;                                                                \
-      ASSERT (Guid != NULL);                                                          \
-      if (Handle == NULL) {                                                           \
-        if (!EFI_ERROR (gBS->LocateProtocol ((EFI_GUID *)Guid, NULL, &Instance))) {   \
-          _ASSERT (Guid already installed in database);                               \
-        }                                                                             \
-      } else {                                                                        \
-        if (!EFI_ERROR (gBS->HandleProtocol (Handle, (EFI_GUID *)Guid, &Instance))) { \
-          _ASSERT (Guid already installed on Handle);                                 \
-        }                                                                             \
-      }                                                                               \
-    }                                                                                 \
-  } while (FALSE)
-
+#if !defined(MDEPKG_NDEBUG)
+  #define ASSERT_PROTOCOL_ALREADY_INSTALLED(Handle, Guid)                               \
+    do {                                                                                \
+      if (DebugAssertEnabled ()) {                                                      \
+        VOID  *Instance;                                                                \
+        ASSERT (Guid != NULL);                                                          \
+        if (Handle == NULL) {                                                           \
+          if (!EFI_ERROR (gBS->LocateProtocol ((EFI_GUID *)Guid, NULL, &Instance))) {   \
+            _ASSERT (Guid already installed in database);                               \
+          }                                                                             \
+        } else {                                                                        \
+          if (!EFI_ERROR (gBS->HandleProtocol (Handle, (EFI_GUID *)Guid, &Instance))) { \
+            _ASSERT (Guid already installed on Handle);                                 \
+          }                                                                             \
+        }                                                                               \
+      }                                                                                 \
+    } while (FALSE)
+#else
+  #define ASSERT_PROTOCOL_ALREADY_INSTALLED(Handle, Guid)
+#endif
 
 /**
   Macro that marks the beginning of debug source code.
@@ -404,21 +423,21 @@ DebugClearMemoryEnabled (
   structure inside a larger private data structure and using a pointer to the 
   public data structure to retrieve a pointer to the private data structure.
 
-  If the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of PcdDebugProperyMask is clear, 
-  then this macro computes the offset, in bytes, of field specified by Field 
-  from the beginning of the  data structure specified by TYPE.  This offset is 
-  subtracted from Record, and is used to return a pointer to a data structure 
-  of the type specified by TYPE.
+  If MDEPKG_NDEBUG is defined or the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit 
+  of PcdDebugProperyMask is clear, then this macro computes the offset, in bytes,
+  of field specified by Field from the beginning of the  data structure specified 
+  by TYPE.  This offset is subtracted from Record, and is used to return a pointer 
+  to a data structure of the type specified by TYPE.
 
-  If the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of PcdDebugProperyMask is set,  
-  then this macro computes the offset, in bytes, of field specified by Field from 
-  the beginning of the data structure specified by TYPE.  This offset is 
-  subtracted from Record, and is used to compute a pointer to a data structure of 
-  the type specified by TYPE.  The Signature field of the data structure specified 
-  by TYPE is compared to TestSignature.  If the signatures match, then a pointer 
-  to the pointer to a data structure of the type specified by TYPE is returned.  
-  If the signatures do not match, then DebugAssert() is called with a description 
-  of "CR has a bad signature" and Record is returned.  
+  If MDEPKG_NDEBUG is not defined and the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit
+  of PcdDebugProperyMask is set, then this macro computes the offset, in bytes, 
+  of field specified by Field from the beginning of the data structure specified 
+  by TYPE.  This offset is subtracted from Record, and is used to compute a pointer
+  to a data structure of the type specified by TYPE.  The Signature field of the 
+  data structure specified by TYPE is compared to TestSignature.  If the signatures 
+  match, then a pointer to the pointer to a data structure of the type specified by 
+  TYPE is returned.  If the signatures do not match, then DebugAssert() is called 
+  with a description of "CR has a bad signature" and Record is returned.  
 
   If the data type specified by TYPE does not contain the field specified by Field, 
   then the module will not compile.
@@ -438,9 +457,14 @@ DebugClearMemoryEnabled (
   @param  TestSignature  The 32-bit signature value to match.
 
 **/
-#define CR(Record, TYPE, Field, TestSignature)                                                        \
-  (DebugAssertEnabled () && (BASE_CR (Record, TYPE, Field)->Signature != TestSignature)) ?  \
-  (TYPE *) (_ASSERT (CR has Bad Signature), Record) :                                                 \
-  BASE_CR (Record, TYPE, Field)
+#if !defined(MDEPKG_NDEBUG)
+  #define CR(Record, TYPE, Field, TestSignature)                                              \
+    (DebugAssertEnabled () && (BASE_CR (Record, TYPE, Field)->Signature != TestSignature)) ?  \
+    (TYPE *) (_ASSERT (CR has Bad Signature), Record) :                                       \
+    BASE_CR (Record, TYPE, Field)
+#else
+  #define CR(Record, TYPE, Field, TestSignature)                                              \
+    BASE_CR (Record, TYPE, Field)
+#endif
     
 #endif
