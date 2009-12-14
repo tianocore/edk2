@@ -21,11 +21,8 @@ To build DUET image, following tools are required:
   2). run "edksetup.bat"
   3). run "build -p DuetPkg\DuetPkg.dsc -a IA32" for IA32 architecture platform or 
           "build -p DuetPkg\DuetPkg.dsc -a X64" for X64 architecture platform.
-
-2.2 Build BootSector
-  1). run "build -p DuetPkg\DuetPkg.dsc -m DuetPkg\BootSector\BootSector.inf -a IA32"
-  
-2.3 Execute post build actions  
+ 
+2.2 Execute post build actions  
   1). enter <Workspace>\DuetPkg directory.
   2). run "PostBuild.bat IA32" for IA32 architecture platform or 
           "PostBuild.bat X64" for X64 architecture platform.
@@ -84,11 +81,8 @@ B. Build DUET image on Linux Platform
   2). run "edksetup.sh BaseTools"
   3). run "build -p DuetPkg/DuetPkg.dsc -a IA32 -t UNIXGCC" for IA32 architecture platform or 
           "build -p DuetPkg/DuetPkg.dsc -a X64 -t UNIXGCC" for X64 architecture platform.
-
-2.2 Build BootSector
-  1). run "build -p DuetPkg/DuetPkg.dsc -m DuetPkg/BootSector/BootSector.inf -a IA32 -t UNIXGCC"
   
-2.3 Execute post build actions  
+2.2 Execute post build actions  
   1). enter /R9_tree/DuetPkg directory.
   2). run "./PostBuild.sh IA32" for IA32 architecture platform or 
           "./PostBuild.sh X64" for X64 architecture platform.
