@@ -1,7 +1,7 @@
 /** @file
   Provides the basic UNID functions.
 
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -557,6 +557,8 @@ UNDI_RecFilter (
   UINT16                  copy_len;
   UINT8                   *ptr1;
   UINT8                   *ptr2;
+  BOOLEAN                 InvalidMacAddr;
+    
   OpFlags   = CdbPtr->OpFlags;
   NewFilter = (UINT16) (OpFlags & 0x1F);
 
@@ -609,8 +611,32 @@ UNDI_RecFilter (
       MacAddr   = (UINT8 *) ((UINTN) (CdbPtr->CPBaddr));
       MacCount  = CdbPtr->CPBsize / sizeof (PXE_MAC_ADDR);
 
+      //
+      // The format of Ethernet multicast address for IPv6 is defined in RFC2464,
+      // for IPv4 is defined in RFC1112. Check whether the address is valid.
+      //
+      InvalidMacAddr = FALSE;
+      
       for (; MacCount-- != 0; MacAddr += sizeof (PXE_MAC_ADDR)) {
-        if (MacAddr[0] != 0x01 || MacAddr[1] != 0x00 || MacAddr[2] != 0x5E || (MacAddr[3] & 0x80) != 0) {
+        if (MacAddr[0] == 0x01) {
+          //
+          // This multicast MAC address is mapped from IPv4 address.
+          //
+          if (MacAddr[1] != 0x00 || MacAddr[2] != 0x5E || (MacAddr[3] & 0x80) != 0) {
+            InvalidMacAddr = TRUE;
+          }          
+        } else if (MacAddr[0] == 0x33) {
+          //
+          // This multicast MAC address is mapped from IPv6 address.
+          //
+          if (MacAddr[1] != 0x33) {
+            InvalidMacAddr = TRUE;
+          }
+        } else {
+          InvalidMacAddr = TRUE;
+        }
+
+        if (InvalidMacAddr) {
           CdbPtr->StatFlags = PXE_STATFLAGS_COMMAND_FAILED;
           CdbPtr->StatCode  = PXE_STATCODE_INVALID_CPB;
           return ;
