@@ -56,8 +56,6 @@
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
-  UefiHiiServicesLib|MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
-  HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
 
 ################################################################################
 #
@@ -105,5 +103,4 @@
   OptionRomPkg/AtapiPassThruDxe/AtapiPassThruDxe.inf
   OptionRomPkg/CirrusLogic5430Dxe/CirrusLogic5430Dxe.inf
   OptionRomPkg/UndiRuntimeDxe/UndiRuntimeDxe.inf
-  OptionRomPkg/DriverHealthDxe/DriverHealthDxe.inf
 
