@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation                                                         
+Copyright (c) 2004 - 2009, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -337,7 +337,7 @@ Returns:
   UINT8                           *Buffer8;
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL *RootBridgeIo;
 
-  if (mPeiServices == NULL) {
+  if (mPeiServices != NULL) {
     //
     // The function is called in PEI phase, use PEI interfaces
     //
