@@ -1562,7 +1562,7 @@ DevPathRelativeOffsetRange (
   Offset = DevPath;
   CatPrint (
     Str,
-    L"Offset(%lx,%lx)",
+    L"Offset(0x%lx,0x%lx)",
     Offset->StartingOffset,
     Offset->EndingOffset
     );
