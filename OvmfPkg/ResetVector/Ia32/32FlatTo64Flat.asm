@@ -1,6 +1,8 @@
 ;------------------------------------------------------------------------------
+; @file
+; Transition from 32 bit flat protected mode into 64 bit flat protected mode
 ;
-; Copyright (c) 2008, Intel Corporation
+; Copyright (c) 2008 - 2009, Intel Corporation
 ; All rights reserved. This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -9,18 +11,13 @@
 ; THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 ; WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ;
-; Module Name:
-;
-;   32FlatTo64Flat.asm
-;
-; Abstract:
-;
-;   Transition from 32 bit flat protected mode into 64 bit flat protected mode
-;
 ;------------------------------------------------------------------------------
 
 BITS    32
 
+;
+; Modified:  EAX
+;
 Transition32FlatTo64Flat:
 
     mov     eax, ((ADDR_OF_START_OF_RESET_CODE & ~0xfff) - 0x1000)
@@ -43,9 +40,7 @@ Transition32FlatTo64Flat:
 BITS    64
 jumpTo64BitAndLandHere:
 
-    writeToSerialPort '6'
-    writeToSerialPort '4'
-    writeToSerialPort ' '
+    debugShowPostCode POSTCODE_64BIT_MODE
 
     OneTimeCallRet Transition32FlatTo64Flat
 

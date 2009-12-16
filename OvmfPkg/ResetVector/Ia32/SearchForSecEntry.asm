@@ -1,6 +1,8 @@
 ;------------------------------------------------------------------------------
+; @file
+; Search for the SEC Core entry point
 ;
-; Copyright (c) 2008, Intel Corporation
+; Copyright (c) 2008 - 2009, Intel Corporation
 ; All rights reserved. This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -9,40 +11,26 @@
 ; THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 ; WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ;
-; Module Name:
-;
-;   SearchForSecAndPeiEntry.asm
-;
-; Abstract:
-;
-;   Search for the SEC Core and PEI Core entry points
-;
 ;------------------------------------------------------------------------------
 
 BITS    32
 
 %define EFI_FV_FILETYPE_SECURITY_CORE         0x03
-%define EFI_FV_FILETYPE_PEI_CORE              0x04
 
 ;
-; Input:
-;   EBP - BFV Base Address
+; Modified:  EAX, EBX, ECX, EDX
+; Preserved: EDI, EBP, ESP
 ;
-; Output:
-;   ESI - SEC Core Entry Point Address (or 0 if not found)
-;   EDI - PEI Core Entry Point Address (or 0 if not found)
+; @param[in]   EBP  Address of Boot Firmware Volume (BFV)
+; @param[out]  ESI  SEC Core Entry Point Address
 ;
-; Modified:
-;   EAX, EBX, ECX
-;
-Flat32SearchForSecAndPeiEntries:
+Flat32SearchForSecEntryPoint:
 
     ;
     ; Initialize EBP and ESI to 0
     ;
     xor     ebx, ebx
     mov     esi, ebx
-    mov     edi, ebx
 
     ;
     ; Pass over the BFV header
@@ -50,7 +38,7 @@ Flat32SearchForSecAndPeiEntries:
     mov     eax, ebp
     mov     bx, [ebp + 0x30]
     add     eax, ebx
-    jc      doneSeachingForSecAndPeiEntries
+    jc      secEntryPointWasNotFound
 
     jmp     searchingForFfsFileHeaderLoop
 
@@ -59,17 +47,17 @@ moveForwardWhileSearchingForFfsFileHeaderLoop:
     ; Make forward progress in the search
     ;
     inc     eax
-    jc      doneSeachingForSecAndPeiEntries
+    jc      secEntryPointWasNotFound
 
 searchingForFfsFileHeaderLoop:
     test    eax, eax
-    jz      doneSeachingForSecAndPeiEntries
+    jz      secEntryPointWasNotFound
 
     ;
     ; Ensure 8 byte alignment
     ;
     add     eax, 7
-    jc      doneSeachingForSecAndPeiEntries
+    jc      secEntryPointWasNotFound
     and     al, 0xf8
 
     ;
@@ -82,7 +70,6 @@ searchingForFfsFileHeaderLoop:
     and     ecx, 0x00ffffff
     or      ecx, ecx
     jz      moveForwardWhileSearchingForFfsFileHeaderLoop
-;    jmp     $
     add     ecx, eax
     jz      jumpSinceWeFoundTheLastFfsFile
     jc      moveForwardWhileSearchingForFfsFileHeaderLoop
@@ -91,53 +78,41 @@ jumpSinceWeFoundTheLastFfsFile:
     ;
     ; There seems to be a valid file at eax
     ;
-    mov     bl, [eax + 0x12] ; BL - File Type
-    cmp     bl, EFI_FV_FILETYPE_PEI_CORE
-    je      fileTypeIsPeiCore
-    cmp     bl, EFI_FV_FILETYPE_SECURITY_CORE
+    cmp     byte [eax + 0x12], EFI_FV_FILETYPE_SECURITY_CORE ; Check File Type
     jne     readyToTryFfsFileAtEcx
 
 fileTypeIsSecCore:
-    callEdx GetEntryPointOfFfsFileReturnEdx
+    OneTimeCall GetEntryPointOfFfsFile
     test    eax, eax
-    jz      readyToTryFfsFileAtEcx
-
-    mov     esi, eax
-    jmp     readyToTryFfsFileAtEcx
-
-fileTypeIsPeiCore:
-    callEdx GetEntryPointOfFfsFileReturnEdx
-    test    eax, eax
-    jz      readyToTryFfsFileAtEcx
-
-    mov     edi, eax
+    jnz     doneSeachingForSecEntryPoint
 
 readyToTryFfsFileAtEcx:
+    ;
+    ; Try the next FFS file at ECX
+    ;
     mov     eax, ecx
     jmp     searchingForFfsFileHeaderLoop
 
-doneSeachingForSecAndPeiEntries:
+secEntryPointWasNotFound:
+    xor     eax, eax
+
+doneSeachingForSecEntryPoint:
+    mov     esi, eax
 
     test    esi, esi
     jnz     secCoreEntryPointWasFound
-    writeToSerialPort '!'
+
+secCoreEntryPointWasNotFound:
+    ;
+    ; Hang if the SEC entry point was not found
+    ;
+    debugShowPostCode POSTCODE_SEC_NOT_FOUND
+    jz      $
+
 secCoreEntryPointWasFound:
-    writeToSerialPort 'S'
-    writeToSerialPort 'E'
-    writeToSerialPort 'C'
-    writeToSerialPort ' '
+    debugShowPostCode POSTCODE_SEC_FOUND
 
-    test    edi, edi
-    jnz     peiCoreEntryPointWasFound
-    writeToSerialPort '!'
-peiCoreEntryPointWasFound:
-    writeToSerialPort 'P'
-    writeToSerialPort 'E'
-    writeToSerialPort 'I'
-    writeToSerialPort ' '
-
-    OneTimeCallRet Flat32SearchForSecAndPeiEntries
-
+    OneTimeCallRet Flat32SearchForSecEntryPoint
 
 %define EFI_SECTION_PE32                  0x10
 
@@ -152,7 +127,7 @@ peiCoreEntryPointWasFound:
 ; Modified:
 ;   EBX
 ;
-GetEntryPointOfFfsFileReturnEdx:
+GetEntryPointOfFfsFile:
     test    eax, eax
     jz      getEntryPointOfFfsFileErrorReturn
     add     eax, 0x18       ; EAX = Start of section
@@ -217,6 +192,5 @@ getEntryPointOfFfsFileErrorReturn:
     mov     eax, 0
 
 getEntryPointOfFfsFileReturn:
-    jmp     edx
-
+    OneTimeCallRet GetEntryPointOfFfsFile
 

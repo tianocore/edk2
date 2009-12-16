@@ -1,6 +1,8 @@
 ;------------------------------------------------------------------------------
+; @file
+; Serial port debug support macros
 ;
-; Copyright (c) 2008, Intel Corporation
+; Copyright (c) 2008 - 2009, Intel Corporation
 ; All rights reserved. This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -9,17 +11,7 @@
 ; THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 ; WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ;
-; Module Name:
-;
-;   SerialDebug.asm
-;
-; Abstract:
-;
-;   Serial port support macros
-;
 ;------------------------------------------------------------------------------
-
-BITS    16
 
 ;//---------------------------------------------
 ;// UART Register Offsets
@@ -88,12 +80,38 @@ BITS    16
     out     dx, al
 %endmacro
 
-%macro  writeToSerialPort 1
+%macro  debugShowCharacter 1
     waitForSerialTxReady
     outToSerialPort 0, %1
 %endmacro
 
-real16InitSerialPort:
+%macro  debugShowHexDigit 1
+  %if (%1 < 0xa)
+    debugShowCharacter BYTE ('0' + (%1))
+  %else
+    debugShowCharacter BYTE ('a' + ((%1) - 0xa))
+  %endif
+%endmacro
+
+%macro  debugNewline 0
+    debugShowCharacter `\r`
+    debugShowCharacter `\n`
+%endmacro
+
+%macro  debugShowPostCode 1
+    debugShowHexDigit (((%1) >> 4) & 0xf)
+    debugShowHexDigit ((%1) & 0xf)
+    debugNewline
+%endmacro
+
+BITS    16
+
+%macro  debugInitialize 0
+	jmp	real16InitDebug
+real16InitDebugReturn:
+%endmacro
+
+real16InitDebug:
     ;
     ; Set communications format
     ;
@@ -110,5 +128,5 @@ real16InitSerialPort:
     ;
     outToSerialPort LCR_OFFSET, SERIAL_DEFAULT_LCR
 
-    jmp     real16SerialPortInitReturn
+    jmp     real16InitDebugReturn
 
