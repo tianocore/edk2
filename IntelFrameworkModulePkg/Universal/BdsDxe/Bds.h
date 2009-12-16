@@ -152,6 +152,7 @@ BdsEntry (
 
 **/
 EFI_STATUS
+EFIAPI
 BdsMemoryTest (
   IN EXTENDMEM_COVERAGE_LEVEL Level
   );
@@ -177,6 +178,7 @@ BdsMemoryTest (
 
 **/
 EFI_STATUS
+EFIAPI
 BdsProcessCapsules (
   EFI_BOOT_MODE BootMode
   );

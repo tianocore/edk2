@@ -203,6 +203,7 @@ PlatformBdsShowProgress (
 
 **/
 EFI_STATUS
+EFIAPI
 BdsMemoryTest (
   IN EXTENDMEM_COVERAGE_LEVEL Level
   )
