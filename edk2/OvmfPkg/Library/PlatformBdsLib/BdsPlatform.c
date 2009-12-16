@@ -551,6 +551,7 @@ VisitAllPciInstances (
 
 **/
 EFI_STATUS
+EFIAPI
 DetectAndPreparePlatformPciDevicePath (
   IN EFI_HANDLE           Handle,
   IN EFI_PCI_IO_PROTOCOL  *PciIo,
