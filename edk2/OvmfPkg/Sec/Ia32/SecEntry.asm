@@ -25,16 +25,15 @@
 EXTERN SecCoreStartupWithStack:PROC
 
 ;
-;  SecCore Entry Point
+; SecCore Entry Point
 ;
-;  Processor is in flat protected mode
+; Processor is in flat protected mode
 ;
-;  @param  ESI  Pointer to SEC Core Entry Point (this function)
-;  @param  EDI  Pointer to PEI Core Entry Point
-;  @param  EBP  Pointer to the start of the Boot Firmware Volume
+; @param[in]  EAX   Initial value of the EAX register (BIST: Built-in Self Test)
+; @param[in]  DI    'BP': boot-strap processor, or 'AP': application processor
+; @param[in]  EBP   Pointer to the start of the Boot Firmware Volume
 ;
-;  @return None
-;
+; @return     None  This routine does not return
 ;
 _ModuleEntryPoint PROC PUBLIC
 
@@ -50,8 +49,6 @@ _ModuleEntryPoint PROC PUBLIC
     ; Call into C code
     ;
     push    eax
-    push    edi
-    push    esi
     push    ebp
     call    SecCoreStartupWithStack
 

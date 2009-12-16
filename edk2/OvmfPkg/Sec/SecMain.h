@@ -44,6 +44,13 @@ TemporaryRamMigration (
   IN UINTN                    CopySize
   );
 
+VOID
+EFIAPI
+FindPeiCoreEntryPoint (
+  IN  EFI_FIRMWARE_VOLUME_HEADER       *BootFirmwareVolumePtr,
+  OUT VOID                             **PeiCoreEntryPoint
+  );
+
 #define INITIAL_TOP_OF_STACK      BASE_128KB
 
 #endif // _PLATFORM_SECMAIN_H_
