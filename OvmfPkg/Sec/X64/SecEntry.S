@@ -1,5 +1,4 @@
 #      TITLE   SecEntry.asm
-
 #------------------------------------------------------------------------------
 #*
 #*   Copyright 2006 - 2009, Intel Corporation
@@ -23,16 +22,15 @@
 #EXTERN ASM_PFX(SecCoreStartupWithStack)
 
 #
-#  SecCore Entry Point
+# SecCore Entry Point
 #
-#  Processor is in flat protected mode
+# Processor is in flat protected mode
 #
-#  @param  ESI  Pointer to SEC Core Entry Point (this function)
-#  @param  EDI  Pointer to PEI Core Entry Point
-#  @param  EBP  Pointer to the start of the Boot Firmware Volume
+# @param[in]  RAX   Initial value of the EAX register (BIST: Built-in Self Test)
+# @param[in]  DI    'BP': boot-strap processor, or 'AP': application processor
+# @param[in]  RBP   Pointer to the start of the Boot Firmware Volume
 #
-#  @return None
-#
+# @return     None  This routine does not return
 #
 ASM_GLOBAL ASM_PFX(_ModuleEntryPoint)
 ASM_PFX(_ModuleEntryPoint):
@@ -47,14 +45,10 @@ ASM_PFX(_ModuleEntryPoint):
     #
     # Setup parameters and call SecCoreStartupWithStack
     #   rcx: BootFirmwareVolumePtr
-    #   rdx: SecCoreEntryPoint
-    #   r8:  PeiCoreEntryPoint
-    #   r9:  TopOfCurrentStack
+    #   rdx: TopOfCurrentStack
     #
-    movq    %rbp, %rcx 
-    movq    %rsi, %rdx
-    movq    %rdi, %r8
-    movq    %rsp, %r9
+    movq    %rbp, %rcx
+    movq    %rsp, %rdx
     subq    $0x20, %rsp
     call    ASM_PFX(SecCoreStartupWithStack)
 
