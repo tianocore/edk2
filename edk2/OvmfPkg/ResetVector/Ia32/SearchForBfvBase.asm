@@ -1,6 +1,8 @@
 ;------------------------------------------------------------------------------
+; @file
+; Search for the Boot Firmware Volume (BFV) base address
 ;
-; Copyright (c) 2008, Intel Corporation
+; Copyright (c) 2008 - 2009, Intel Corporation
 ; All rights reserved. This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -8,14 +10,6 @@
 ;
 ; THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 ; WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-;
-; Module Name:
-;
-;   SearchForBfvBase.asm
-;
-; Abstract:
-;
-;   Search for the Boot FV Base Address
 ;
 ;------------------------------------------------------------------------------
 
@@ -29,21 +23,21 @@
 BITS    32
 
 ;
-; Input:
-;   None
+; Modified:  EAX, EBX
+; Preserved: EDI, ESP
 ;
-; Output:
-;   EBP - BFV Base Address
-;
-; Modified:
-;   EAX, EBX
+; @param[out]  EBP  Address of Boot Firmware Volume (BFV)
 ;
 Flat32SearchForBfvBase:
 
     xor     eax, eax
 searchingForBfvHeaderLoop:
+    ;
+    ; We check for a firmware volume at every 4KB address in the top 16MB
+    ; just below 4GB.  (Addresses at 0xffHHH000 where H is any hex digit.)
+    ;
     sub     eax, 0x1000
-    cmp     eax, 0xff800000
+    cmp     eax, 0xff000000
     jb      searchedForBfvHeaderButNotFound
 
     ;
@@ -70,19 +64,23 @@ searchingForBfvHeaderLoop:
     jmp     searchedForBfvHeaderAndItWasFound
 
 searchedForBfvHeaderButNotFound:
-    writeToSerialPort '!'
-    xor     eax, eax
+    ;
+    ; Hang if the SEC entry point was not found
+    ;
+    debugShowPostCode POSTCODE_BFV_NOT_FOUND
+
+    ;
+    ; 0xbfbfbfbf in the EAX & EBP registers helps signal what failed
+    ; for debugging purposes.
+    ;
+    mov     eax, 0xBFBFBFBF
+    mov     ebp, eax
+    jmp     $
 
 searchedForBfvHeaderAndItWasFound:
     mov     ebp, eax
 
-    writeToSerialPort 'B'
-    writeToSerialPort 'F'
-    writeToSerialPort 'V'
-    writeToSerialPort ' '
-
-    or      ebp, ebp
-    jz      $
+    debugShowPostCode POSTCODE_BFV_FOUND
 
     OneTimeCallRet Flat32SearchForBfvBase
 

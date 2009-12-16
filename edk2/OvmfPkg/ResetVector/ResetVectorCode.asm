@@ -1,6 +1,8 @@
 ;------------------------------------------------------------------------------
+; @file
+; This file includes all other code files to assemble the reset vector code
 ;
-; Copyright (c) 2008, Intel Corporation
+; Copyright (c) 2008 - 2009, Intel Corporation
 ; All rights reserved. This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -8,14 +10,6 @@
 ;
 ; THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 ; WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-;
-; Module Name:
-;
-;   ResetVectorCode.asm
-;
-; Abstract:
-;
-;   Create code for VTF raw section.
 ;
 ;------------------------------------------------------------------------------
 
@@ -29,15 +23,30 @@
 %endif
 
 %include "CommonMacros.inc"
-%include "SerialDebug.asm"
+
+%include "PostCodes.inc"
+
+%ifdef DEBUG_NONE
+  %include "DebugDisabled.asm"
+%elifdef DEBUG_PORT80
+  %include "Port80Debug.asm"
+%elifdef DEBUG_SERIAL
+  %include "SerialDebug.asm"
+%else
+  %error "No debug type was specified."
+%endif
+
 %include "Ia32/SearchForBfvBase.asm"
-%include "Ia32/SearchForSecAndPeiEntries.asm"
-%include "JumpToSec.asm"
-%include "Ia16/16RealTo32Flat.asm"
+%include "Ia32/SearchForSecEntry.asm"
 
 %ifdef ARCH_X64
 %include "Ia32/32FlatTo64Flat.asm"
 %endif
+
+%include "Ia16/16RealTo32Flat.asm"
+%include "Ia16/Init16.asm"
+
+%include "Main.asm"
 
 %include "Ia16/ResetVectorVtf0.asm"
 
