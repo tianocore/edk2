@@ -457,6 +457,7 @@ UsbCbiExecCommand (
   //
   Status = UsbCbiSendCommand (UsbCbi, Cmd, CmdLen, Timeout);
   if (EFI_ERROR (Status)) {
+    gBS->Stall(10 * USB_MASS_1_MILLISECOND);
     DEBUG ((EFI_D_ERROR, "UsbCbiExecCommand: UsbCbiSendCommand (%r)\n",Status));
     return Status;
   }
@@ -486,10 +487,12 @@ UsbCbiExecCommand (
     //
     // For UFI device, ASC and ASCQ are returned.
     //
-    if (Result.Type != 0) {
+    // Do not set the USB_MASS_CMD_FAIL for a request sense command
+    // as a bad result type doesn't mean a cmd failure
+    //
+    if (Result.Type != 0 && *(UINT8*)Cmd != 0x03) {
       *CmdStatus = USB_MASS_CMD_FAIL;
     }
-
   } else {
     //
     // Check page 27, CBI spec 1.1 for vaious reture status.

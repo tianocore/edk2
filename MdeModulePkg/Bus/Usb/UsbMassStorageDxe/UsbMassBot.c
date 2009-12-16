@@ -273,9 +273,16 @@ UsbBotDataTransfer (
                             );
   if (EFI_ERROR (Status)) {
     if (USB_IS_ERROR (Result, EFI_USB_ERR_STALL)) {
+      DEBUG ((EFI_D_INFO, "UsbBotDataTransfer: (%r)\n", Status));      
+      DEBUG ((EFI_D_INFO, "UsbBotDataTransfer: DataIn Stall\n"));
       UsbClearEndpointStall (UsbBot->UsbIo, Endpoint->EndpointAddress);
     } else if (USB_IS_ERROR (Result, EFI_USB_ERR_NAK)) {
       Status = EFI_NOT_READY;
+    } else {
+      DEBUG ((EFI_D_ERROR, "UsbBotDataTransfer: (%r)\n", Status));
+    }
+    if(Status == EFI_TIMEOUT){
+      UsbBotResetDevice(UsbBot, FALSE);
     }
   }
 

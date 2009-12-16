@@ -802,7 +802,7 @@ InitUSBKeyboard (
   IN OUT USB_KB_DEV   *UsbKeyboardDevice
   )
 {
-  UINT8               ConfigValue;
+  UINT16              ConfigValue;
   UINT8               Protocol;
   UINT8               ReportId;
   UINT8               Duration;
@@ -818,12 +818,24 @@ InitUSBKeyboard (
   InitUSBKeyBuffer (&(UsbKeyboardDevice->KeyboardBuffer));
 
   //
-  // Uses default configuration to configure the USB keyboard device.
+  // Use the config out of the descriptor
+  // Assumed the first config is the correct one and this is not always the case
   //
-  ConfigValue = 0x01;
+  Status = UsbGetConfiguration (
+             UsbKeyboardDevice->UsbIo, 
+             &ConfigValue, 
+             &TransferResult
+             );
+  if (EFI_ERROR (Status)) {
+    ConfigValue = 0x01;
+  }
+  
+  //
+  // Uses default configuration to configure the USB Keyboard device.
+  //
   Status = UsbSetConfiguration (
              UsbKeyboardDevice->UsbIo,
-             (UINT16) ConfigValue,
+             ConfigValue,
              &TransferResult
              );
   if (EFI_ERROR (Status)) {
