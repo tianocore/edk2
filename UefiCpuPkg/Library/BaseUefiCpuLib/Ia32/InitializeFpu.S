@@ -35,6 +35,9 @@ ASM_PFX(mMmxControlWord): .long     0x01F80
 #
 ASM_GLOBAL ASM_PFX(InitializeFloatingPointUnits)
 ASM_PFX(InitializeFloatingPointUnits):
+
+    pushl   %ebx
+
     #
     # Initialize floating point units
     #
@@ -64,6 +67,8 @@ ASM_PFX(InitializeFloatingPointUnits):
     ldmxcsr ASM_PFX(mMmxControlWord)
 
 Done:
+    popl    %ebx
+
     ret
 
 #END
