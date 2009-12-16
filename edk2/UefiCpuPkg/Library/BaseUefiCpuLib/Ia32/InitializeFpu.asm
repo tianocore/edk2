@@ -39,6 +39,9 @@ mMmxControlWord       DD      01F80h
 ; for masked underflow).
 ;
 InitializeFloatingPointUnits PROC PUBLIC
+
+    push    ebx
+
     ;
     ; Initialize floating point units
     ;
@@ -67,6 +70,7 @@ InitializeFloatingPointUnits PROC PUBLIC
     ;
     ldmxcsr mMmxControlWord
 Done:
+    pop     ebx
 
     ret
 
