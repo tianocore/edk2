@@ -29,7 +29,9 @@
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/UefiRuntimeLib.h>
+#include "Library/UefiLib.h"
 
 #define RSC_HANDLER_CALLBACK_ENTRY_SIGNATURE  SIGNATURE_32 ('r', 'h', 'c', 'e')
 
@@ -37,17 +39,21 @@ typedef struct {
   UINTN                     Signature;
   EFI_RSC_HANDLER_CALLBACK  RscHandlerCallback;
   EFI_TPL                   Tpl;
+  EFI_EVENT                 Event;
+  EFI_PHYSICAL_ADDRESS      StatusCodeDataBuffer;
+  UINTN                     BufferSize;
+  EFI_PHYSICAL_ADDRESS      EndPointer;
   LIST_ENTRY                Node;
 } RSC_HANDLER_CALLBACK_ENTRY;
 
 typedef struct {
-  EFI_RSC_HANDLER_CALLBACK RscHandlerCallback;
-  EFI_STATUS_CODE_TYPE     Type;
-  EFI_STATUS_CODE_VALUE    Value;
-  UINT32                   Instance;
-  EFI_GUID                 *CallerId;
-  EFI_STATUS_CODE_DATA     *Data;
-} RSC_EVENT_CONTEXT;
+  EFI_STATUS_CODE_TYPE      Type;
+  EFI_STATUS_CODE_VALUE     Value;
+  UINT32                    Instance;
+  UINT32                    Reserved;
+  EFI_GUID                  CallerId;
+  EFI_STATUS_CODE_DATA      Data;
+} RSC_DATA_ENTRY;
 
 /**
   Register the callback function for ReportStatusCode() notification.

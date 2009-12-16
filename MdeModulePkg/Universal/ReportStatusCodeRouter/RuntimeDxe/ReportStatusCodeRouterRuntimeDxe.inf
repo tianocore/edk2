@@ -39,6 +39,7 @@
 [LibraryClasses]
   UefiRuntimeLib
   MemoryAllocationLib
+  BaseMemoryLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   HobLib
@@ -46,6 +47,7 @@
   DebugLib
   BaseLib
   SynchronizationLib
+  UefiLib
 
 [Guids]
   gEfiEventVirtualAddressChangeGuid               ## CONSUMES ## Event

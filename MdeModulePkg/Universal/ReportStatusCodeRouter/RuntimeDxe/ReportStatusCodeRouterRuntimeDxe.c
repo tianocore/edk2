@@ -35,6 +35,49 @@ EFI_RSC_HANDLER_PROTOCOL  mRscHandlerProtocol = {
   };
 
 /**
+  Event callback function to invoke status code handler in list.
+
+  @param  Event         Event whose notification function is being invoked.
+  @param  Context       Pointer to the notification function's context, which is
+                        always zero in current implementation.
+
+**/
+VOID
+EFIAPI
+RscHandlerNotification (
+  IN EFI_EVENT        Event,
+  IN VOID             *Context
+  )
+{
+  RSC_HANDLER_CALLBACK_ENTRY  *CallbackEntry;
+  EFI_PHYSICAL_ADDRESS        Address;
+  RSC_DATA_ENTRY              *RscData;
+
+  CallbackEntry = (RSC_HANDLER_CALLBACK_ENTRY *) Context;
+
+  //
+  // Traverse the status code data buffer to parse all
+  // data to report.
+  //
+  Address = CallbackEntry->StatusCodeDataBuffer;
+  while (Address < CallbackEntry->EndPointer) {
+    RscData = (RSC_DATA_ENTRY *) (UINTN) Address;
+    CallbackEntry->RscHandlerCallback (
+                     RscData->Type,
+                     RscData->Value,
+                     RscData->Instance,
+                     &RscData->CallerId,
+                     &RscData->Data
+                     );
+
+    Address += (sizeof (RSC_DATA_ENTRY) + RscData->Data.Size);
+    Address  = ALIGN_VARIABLE (Address);
+  }
+
+  CallbackEntry->EndPointer = CallbackEntry->StatusCodeDataBuffer;
+}
+
+/**
   Register the callback function for ReportStatusCode() notification.
   
   When this function is called the function pointer is added to an internal list and any future calls to
@@ -69,6 +112,7 @@ Register (
   IN EFI_TPL                    Tpl
   )
 {
+  EFI_STATUS                    Status;
   LIST_ENTRY                    *Link;
   RSC_HANDLER_CALLBACK_ENTRY    *CallbackEntry;
 
@@ -86,12 +130,34 @@ Register (
     }
   }
 
-  CallbackEntry = AllocatePool (sizeof (RSC_HANDLER_CALLBACK_ENTRY));
+  CallbackEntry = AllocateZeroPool (sizeof (RSC_HANDLER_CALLBACK_ENTRY));
   ASSERT (CallbackEntry != NULL);
 
   CallbackEntry->Signature          = RSC_HANDLER_CALLBACK_ENTRY_SIGNATURE;
   CallbackEntry->RscHandlerCallback = Callback;
   CallbackEntry->Tpl                = Tpl;
+
+  //
+  // If TPL of registered callback funtion is not TPL_HIGH_LEVEL, then event should be created
+  // for it, and related buffer for status code data should be prepared.
+  // Here the data buffer must be prepared in advance, because Report Status Code Protocol might
+  // be invoked under TPL_HIGH_LEVEL and no memory allocation is allowed then.
+  // If TPL is TPL_HIGH_LEVEL, then all status code will be reported immediately, without data
+  // buffer and event trigger.
+  //
+  if (Tpl != TPL_HIGH_LEVEL) {
+    CallbackEntry->StatusCodeDataBuffer = (EFI_PHYSICAL_ADDRESS) AllocatePool (EFI_PAGE_SIZE);
+    CallbackEntry->BufferSize           = EFI_PAGE_SIZE;
+    CallbackEntry->EndPointer           = CallbackEntry->StatusCodeDataBuffer;
+    Status = gBS->CreateEvent (
+                    EVT_NOTIFY_SIGNAL,
+                    Tpl,
+                    RscHandlerNotification,
+                    CallbackEntry,
+                    &CallbackEntry->Event
+                    );
+    ASSERT_EFI_ERROR (Status);
+  }
 
   InsertTailList (&mCallbackListHead, &CallbackEntry->Node);
 
@@ -131,6 +197,10 @@ Unregister (
       //
       // If the function is found in list, delete it and return.
       //
+      if (CallbackEntry->Tpl != TPL_HIGH_LEVEL) {
+        FreePool ((VOID *) (UINTN) CallbackEntry->StatusCodeDataBuffer);
+        gBS->CloseEvent (CallbackEntry->Event);
+      }
       RemoveEntryList (&CallbackEntry->Node);
       FreePool (CallbackEntry);
       return EFI_SUCCESS;
@@ -138,34 +208,6 @@ Unregister (
   }
 
   return EFI_NOT_FOUND;
-}
-
-/**
-  Event callback function to invoke status code handler in list.
-
-  @param  Event         Event whose notification function is being invoked.
-  @param  Context       Pointer to the notification function's context, which is
-                        always zero in current implementation.
-
-**/
-VOID
-EFIAPI
-RscHandlerNotification (
-  IN EFI_EVENT        Event,
-  IN VOID             *Context
-  )
-{
-  RSC_EVENT_CONTEXT  *RscContext;
-
-  RscContext = (RSC_EVENT_CONTEXT *) Context;
-
-  RscContext->RscHandlerCallback (
-                RscContext->Type,
-                RscContext->Value,
-                RscContext->Instance,
-                RscContext->CallerId,
-                RscContext->Data
-                );
 }
 
 /**
@@ -198,9 +240,9 @@ ReportDispatcher (
 {
   LIST_ENTRY                    *Link;
   RSC_HANDLER_CALLBACK_ENTRY    *CallbackEntry;
-  RSC_EVENT_CONTEXT             Context;
-  EFI_EVENT                     Event;
+  RSC_DATA_ENTRY                *RscData;
   EFI_STATUS                    Status;
+  VOID                          *NewBuffer;
 
   //
   // Use atom operation to avoid the reentant of report.
@@ -224,26 +266,53 @@ ReportDispatcher (
       continue;
     }
 
-    Context.RscHandlerCallback = CallbackEntry->RscHandlerCallback;
-    Context.Type               = Type;
-    Context.Value              = Value;
-    Context.Instance           = Instance;
-    Context.CallerId           = CallerId;
-    Context.Data               = Data;
+    //
+    // If callback is registered with TPL lower than TPL_HIGH_LEVEL, event must be signaled at boot time to possibly wait for
+    // allowed TPL to report status code. Related data should also be stored in data buffer.
+    //
+    CallbackEntry->EndPointer  = ALIGN_VARIABLE (CallbackEntry->EndPointer);
+    RscData = (RSC_DATA_ENTRY *) (UINTN) CallbackEntry->EndPointer;
+    CallbackEntry->EndPointer += sizeof (RSC_DATA_ENTRY);
+    if (Data != NULL) {
+      CallbackEntry->EndPointer += Data->Size;
+    }
 
-    Status = gBS->CreateEvent (
-                    EVT_NOTIFY_SIGNAL,
-                    CallbackEntry->Tpl,
-                    RscHandlerNotification,
-                    &Context,
-                    &Event
-                    );
-    ASSERT_EFI_ERROR (Status);
+    //
+    // If data buffer is about to be used up (7/8 here), try to reallocate a buffer with double size, if not at TPL_HIGH_LEVEL.
+    //
+    if (CallbackEntry->EndPointer > (CallbackEntry->StatusCodeDataBuffer + (CallbackEntry->BufferSize / 8) * 7)) {
+      if (EfiGetCurrentTpl () < TPL_HIGH_LEVEL) {
+        NewBuffer = ReallocatePool (
+                      CallbackEntry->BufferSize,
+                      CallbackEntry->BufferSize * 2,
+                      (VOID *) (UINTN) CallbackEntry->StatusCodeDataBuffer
+                      );
+        if (NewBuffer != NULL) {
+          CallbackEntry->EndPointer = (EFI_PHYSICAL_ADDRESS) NewBuffer + (CallbackEntry->EndPointer - CallbackEntry->StatusCodeDataBuffer);
+          CallbackEntry->StatusCodeDataBuffer = (EFI_PHYSICAL_ADDRESS) NewBuffer;
+          CallbackEntry->BufferSize *= 2;
+        }
+      }
+    }
 
-    Status = gBS->SignalEvent (Event);
-    ASSERT_EFI_ERROR (Status);
+    //
+    // If data buffer is used up, do not report for this time.
+    //
+    if (CallbackEntry->EndPointer > (CallbackEntry->StatusCodeDataBuffer + CallbackEntry->BufferSize)) {
+      continue;
+    }
 
-    Status = gBS->CloseEvent (Event);
+    RscData->Type      = Type;
+    RscData->Value     = Value;
+    RscData->Instance  = Instance;
+    if (CallerId != NULL) {
+      CopyGuid (&RscData->CallerId, CallerId);
+    }
+    if (Data != NULL) {
+      CopyMem (&RscData->Data, Data, Data->HeaderSize + Data->Size);
+    }
+
+    Status = gBS->SignalEvent (CallbackEntry->Event);
     ASSERT_EFI_ERROR (Status);
   }
 
