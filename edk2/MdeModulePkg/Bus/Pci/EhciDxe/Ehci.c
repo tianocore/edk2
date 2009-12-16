@@ -1885,6 +1885,12 @@ EhcDriverBindingStop (
   }
 
   //
+  // Disable routing of all ports to EHCI controller, so all ports are 
+  // routed back to the UHCI controller.
+  //
+  EhcClearOpRegBit (Ehc, EHC_CONFIG_FLAG_OFFSET, CONFIGFLAG_ROUTE_EHC);
+
+  //
   // Restore original PCI attributes
   //
   PciIo->Attributes (

@@ -235,11 +235,11 @@ UsbBootExecCmdWithRetry (
 {
   EFI_STATUS                  Status;
   UINTN                       Retry;
+  UINT8                       Terminate;
 
   Status  = EFI_SUCCESS;
 
-  for (Retry = 0; Retry < USB_BOOT_COMMAND_RETRY; Retry++) {
-
+  for (Retry = 0, Terminate = 0; Retry < USB_BOOT_COMMAND_RETRY; Retry++) {
     Status = UsbBootExecCmd (
                UsbMass,
                Cmd,
@@ -255,8 +255,9 @@ UsbBootExecCmdWithRetry (
     //
     // If the device isn't ready, just wait for it without limit on retrial times.
     //
-    if (Status == EFI_NOT_READY) {
+    if (Status == EFI_NOT_READY  && Terminate < 3) {
       Retry = 0;
+      Terminate++;
     }
   }
 
@@ -410,7 +411,10 @@ UsbBootReadCapacity (
 
   BlockSize           = SwapBytes32 (ReadUnaligned32 ((CONST UINT32 *) CapacityData.BlockLen));
   if (BlockSize == 0) {
-    return EFI_NOT_READY;
+    //
+    //  Get sense data  
+    //
+    return UsbBootRequestSense (UsbMass);
   } else {
     Media->BlockSize = BlockSize;
   }
@@ -418,7 +422,7 @@ UsbBootReadCapacity (
   DEBUG ((EFI_D_INFO, "UsbBootReadCapacity Success LBA=%ld BlockSize=%d\n",
           Media->LastBlock, Media->BlockSize));
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**

@@ -160,6 +160,35 @@ EhcWriteOpReg (
   IN UINT32               Data
   );
 
+/**
+  Set one bit of the operational register while keeping other bits.
+
+  @param  Ehc          The EHCI device.
+  @param  Offset       The offset of the operational register.
+  @param  Bit          The bit mask of the register to set.
+
+**/
+VOID
+EhcSetOpRegBit (
+  IN USB2_HC_DEV          *Ehc,
+  IN UINT32               Offset,
+  IN UINT32               Bit
+  );
+
+/**
+  Clear one bit of the operational register while keeping other bits.
+
+  @param  Ehc          The EHCI device.
+  @param  Offset       The offset of the operational register.
+  @param  Bit          The bit mask of the register to clear.
+
+**/
+VOID
+EhcClearOpRegBit (
+  IN USB2_HC_DEV          *Ehc,
+  IN UINT32               Offset,
+  IN UINT32               Bit
+  );
 
 /**
   Add support for UEFI Over Legacy (UoL) feature, stop

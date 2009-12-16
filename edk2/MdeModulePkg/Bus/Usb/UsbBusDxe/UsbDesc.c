@@ -42,7 +42,12 @@ UsbFreeInterfaceDesc (
       }
     }
 
-    FreePool (Setting->Endpoints);
+    //
+    // Only call FreePool() if NumEndpoints > 0.
+    //
+    if (Setting->Desc.NumEndpoints > 0) {
+      FreePool (Setting->Endpoints);
+    }
   }
 
   FreePool (Setting);
@@ -192,10 +197,13 @@ UsbCreateDesc (
     return NULL;
   }
 
-  Desc = AllocateCopyPool(CtrlLen, Head);
+  Desc = AllocateZeroPool (CtrlLen);
   if (Desc == NULL) {
     return NULL;
   }
+
+  CopyMem (Desc, Head, DescLen);
+
   *Consumed = Offset + Head->Len;
 
   return Desc;
@@ -344,7 +352,11 @@ UsbParseConfigDesc (
   DescBuf += Consumed;
   Len     -= Consumed;
 
-  while (Len > 0) {
+  //
+  // Make allowances for devices that return extra data at the 
+  // end of their config descriptors
+  //
+  while (Len >= sizeof (EFI_USB_INTERFACE_DESCRIPTOR)) {
     Setting = UsbParseInterfaceDesc (DescBuf, Len, &Consumed);
 
     if ((Setting == NULL)) {
