@@ -33,11 +33,11 @@ EFI_UDP4_PROTOCOL  mUdp4Protocol = {
   optionally to retrieve the operational mode data of underlying networks or
   drivers.
 
-  @param  This           Pointer to the EFI_UDP4_PROTOCOL instance.
-  @param  Udp4ConfigData Pointer to the buffer to receive the current configuration data.
-  @param  Ip4ModeData    Pointer to the EFI IPv4 Protocol mode data structure.
-  @param  MnpConfigData  Pointer to the managed network configuration data structure.
-  @param  SnpModeData    Pointer to the simple network mode data structure.
+  @param[in]  This              Pointer to the EFI_UDP4_PROTOCOL instance.
+  @param[out] Udp4ConfigData    Pointer to the buffer to receive the current configuration data.
+  @param[out] Ip4ModeData       Pointer to the EFI IPv4 Protocol mode data structure.
+  @param[out] MnpConfigData     Pointer to the managed network configuration data structure.
+  @param[out] SnpModeData       Pointer to the simple network mode data structure.
 
   @retval EFI_SUCCESS           The mode data was read.
   @retval EFI_NOT_STARTED       When Udp4ConfigData is queried, no configuration data is

@@ -243,10 +243,10 @@ Udp4DriverBindingStop (
   If ChildHandle is a pointer to NULL, then a new handle is created and returned in ChildHandle. 
   If ChildHandle is not a pointer to NULL, then the protocol installs on the existing ChildHandle.
 
-  @param  This        Pointer to the EFI_SERVICE_BINDING_PROTOCOL instance.
-  @param  ChildHandle Pointer to the handle of the child to create. If it is NULL,
-                      then a new handle is created. If it is a pointer to an existing UEFI handle, 
-                      then the protocol is added to the existing UEFI handle.
+  @param[in] This        Pointer to the EFI_SERVICE_BINDING_PROTOCOL instance.
+  @param[in] ChildHandle Pointer to the handle of the child to create. If it is NULL,
+                         then a new handle is created. If it is a pointer to an existing UEFI handle, 
+                         then the protocol is added to the existing UEFI handle.
 
   @retval EFI_SUCCES            The protocol was added to ChildHandle.
   @retval EFI_INVALID_PARAMETER ChildHandle is NULL.
@@ -365,8 +365,8 @@ ON_ERROR:
   that was installed by CreateChild() from ChildHandle. If the removed protocol is the 
   last protocol on ChildHandle, then ChildHandle is destroyed.
 
-  @param  This        Pointer to the EFI_SERVICE_BINDING_PROTOCOL instance.
-  @param  ChildHandle Handle of the child to destroy
+  @param[in] This        Pointer to the EFI_SERVICE_BINDING_PROTOCOL instance.
+  @param[in] ChildHandle Handle of the child to destroy
 
   @retval EFI_SUCCES            The protocol was removed from ChildHandle.
   @retval EFI_UNSUPPORTED       ChildHandle does not support the protocol that is being removed.
