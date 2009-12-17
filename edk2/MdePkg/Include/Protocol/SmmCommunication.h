@@ -59,7 +59,7 @@ typedef struct _EFI_SMM_COMMUNICATION_PROTOCOL  EFI_SMM_COMMUNICATION_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_COMMUNICATE)(
+(EFIAPI *EFI_SMM_COMMUNICATE2)(
   IN CONST EFI_SMM_COMMUNICATION_PROTOCOL  *This,
   IN OUT VOID                              *CommBuffer,
   IN OUT UINTN                             *CommSize
@@ -70,7 +70,7 @@ EFI_STATUS
 /// between DXE drivers and a registered SMI handler.
 ///
 struct _EFI_SMM_COMMUNICATION_PROTOCOL {
-  EFI_SMM_COMMUNICATE  Communicate;
+  EFI_SMM_COMMUNICATE2  Communicate;
 };
 
 extern EFI_GUID gEfiSmmCommunicationProtocolGuid;
