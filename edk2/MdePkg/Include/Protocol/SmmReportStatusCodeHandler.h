@@ -72,10 +72,10 @@ EFI_STATUS
 );
 
 typedef struct _EFI_SMM_RSC_HANDLER_PROTOCOL {
-  EFI_SMM_RSC_HANDLER_REGISTER  Register;
-  SMM_RSC_HANDLER_UNREGISTER    Unregister;
+  EFI_SMM_RSC_HANDLER_REGISTER      Register;
+  EFI_SMM_RSC_HANDLER_UNREGISTER    Unregister;
 } EFI_SMM_RSC_HANDLER_PROTOCOL;
 
-extern gEfiSmmRscHandlerProtocolGuid;
+extern EFI_GUID gEfiSmmRscHandlerProtocolGuid;
 
 #endif // __SMM_REPORT_STATUS_CODE_HANDLER_PROTOCOL_H__
