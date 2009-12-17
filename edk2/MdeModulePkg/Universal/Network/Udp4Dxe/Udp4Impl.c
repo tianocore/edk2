@@ -253,14 +253,14 @@ Udp4SendPortUnreach (
 /**
   Create the Udp service context data.
 
-  @param  Udp4Service            Pointer to the UDP4_SERVICE_DATA.
-  @param  ImageHandle            The image handle of this udp4 driver.
-  @param  ControllerHandle       The controller handle this udp4 driver binds on.
+  @param[in, out] Udp4Service      Pointer to the UDP4_SERVICE_DATA.
+  @param[in]      ImageHandle      The image handle of this udp4 driver.
+  @param[in]      ControllerHandle The controller handle this udp4 driver binds on.
 
-  @retval EFI_SUCCESS            The udp4 service context data is created and
-                                 initialized.
-  @retval EFI_OUT_OF_RESOURCES   Cannot allocate memory.
-  @retval other                  Other error occurs.
+  @retval EFI_SUCCESS              The udp4 service context data is created and
+                                   initialized.
+  @retval EFI_OUT_OF_RESOURCES     Cannot allocate memory.
+  @retval other                    Other error occurs.
 
 **/
 EFI_STATUS
@@ -444,8 +444,8 @@ Udp4CheckTimeout (
 /**
   This function intializes the new created udp instance.
 
-  @param  Udp4Service            Pointer to the UDP4_SERVICE_DATA.
-  @param  Instance               Pointer to the un-initialized UDP4_INSTANCE_DATA.
+  @param[in]      Udp4Service       Pointer to the UDP4_SERVICE_DATA.
+  @param[in, out] Instance          Pointer to the un-initialized UDP4_INSTANCE_DATA.
 
 **/
 VOID
@@ -560,9 +560,9 @@ Udp4FindInstanceByPort (
   This function tries to bind the udp instance according to the configured port
   allocation strategy.
 
-  @param  InstanceList           Pointer to the head of the list linking the udp
+  @param[in]      InstanceList   Pointer to the head of the list linking the udp
                                  instances.
-  @param  ConfigData             Pointer to the ConfigData of the instance to be
+  @param[in, out] ConfigData     Pointer to the ConfigData of the instance to be
                                  bound. ConfigData->StationPort will be assigned
                                  with an available port value on success.
 
@@ -945,8 +945,8 @@ Udp4Checksum (
 /**
   This function removes the specified Token from the TokenMap.
 
-  @param  TokenMap           Pointer to the NET_MAP containing the tokens.
-  @param  Token              Pointer to the Token to be removed.
+  @param[in, out] TokenMap       Pointer to the NET_MAP containing the tokens.
+  @param[in]      Token          Pointer to the Token to be removed.
 
   @retval EFI_SUCCESS            The specified Token is removed from the TokenMap.
   @retval EFI_NOT_FOUND          The specified Token is not found in the TokenMap.
@@ -1063,9 +1063,9 @@ Udp4DgramRcvd (
 /**
   This function removes the multicast group specified by Arg from the Map.
 
-  @param  Map                    Pointer to the NET_MAP.
-  @param  Item                   Pointer to the NET_MAP_ITEM.
-  @param  Arg                    Pointer to the Arg, it's the pointer to a
+  @param[in, out] Map            Pointer to the NET_MAP.
+  @param[in]      Item           Pointer to the NET_MAP_ITEM.
+  @param[in]      Arg            Pointer to the Arg, it's the pointer to a
                                  multicast IPv4 Address.
 
   @retval EFI_SUCCESS            The multicast address is removed.
@@ -1900,7 +1900,7 @@ Udp4NetVectorExtFree (
 /**
   Set the Udp4 variable data.
 
-  @param  Udp4Service            Udp4 service data.
+  @param[in] Udp4Service         Udp4 service data.
 
   @retval EFI_OUT_OF_RESOURCES   There are not enough resources to set the
                                  variable.
