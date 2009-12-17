@@ -146,7 +146,7 @@ Register (
   // buffer and event trigger.
   //
   if (Tpl != TPL_HIGH_LEVEL) {
-    CallbackEntry->StatusCodeDataBuffer = (EFI_PHYSICAL_ADDRESS) AllocatePool (EFI_PAGE_SIZE);
+    CallbackEntry->StatusCodeDataBuffer = (EFI_PHYSICAL_ADDRESS) (UINTN) AllocatePool (EFI_PAGE_SIZE);
     CallbackEntry->BufferSize           = EFI_PAGE_SIZE;
     CallbackEntry->EndPointer           = CallbackEntry->StatusCodeDataBuffer;
     Status = gBS->CreateEvent (
@@ -288,8 +288,8 @@ ReportDispatcher (
                       (VOID *) (UINTN) CallbackEntry->StatusCodeDataBuffer
                       );
         if (NewBuffer != NULL) {
-          CallbackEntry->EndPointer = (EFI_PHYSICAL_ADDRESS) NewBuffer + (CallbackEntry->EndPointer - CallbackEntry->StatusCodeDataBuffer);
-          CallbackEntry->StatusCodeDataBuffer = (EFI_PHYSICAL_ADDRESS) NewBuffer;
+          CallbackEntry->EndPointer = (EFI_PHYSICAL_ADDRESS) (UINTN) NewBuffer + (CallbackEntry->EndPointer - CallbackEntry->StatusCodeDataBuffer);
+          CallbackEntry->StatusCodeDataBuffer = (EFI_PHYSICAL_ADDRESS) (UINTN) NewBuffer;
           CallbackEntry->BufferSize *= 2;
         }
       }
