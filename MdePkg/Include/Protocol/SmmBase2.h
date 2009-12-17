@@ -44,7 +44,7 @@ typedef struct _EFI_SMM_BASE2_PROTOCOL  EFI_SMM_BASE2_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_INSIDE_OUT)(
+(EFIAPI *EFI_SMM_INSIDE_OUT2)(
   IN CONST EFI_SMM_BASE2_PROTOCOL  *This,
   OUT BOOLEAN                      *InSmram
   )
@@ -66,7 +66,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SMM_GET_SMST_LOCATION)(
+(EFIAPI *EFI_SMM_GET_SMST_LOCATION2)(
   IN CONST EFI_SMM_BASE2_PROTOCOL  *This,
   IN OUT EFI_SMM_SYSTEM_TABLE2     **Smst
   )
@@ -77,8 +77,8 @@ EFI_STATUS
 /// services and determine whether the driver is being invoked inside SMRAM or outside of SMRAM.
 ///
 struct _EFI_SMM_BASE2_PROTOCOL {
-  EFI_SMM_INSIDE_OUT         InSmm;
-  EFI_SMM_GET_SMST_LOCATION  GetSmstLocation;
+  EFI_SMM_INSIDE_OUT2         InSmm;
+  EFI_SMM_GET_SMST_LOCATION2  GetSmstLocation;
 };
 
 extern EFI_GUID gEfiSmmBase2ProtocolGuid;
