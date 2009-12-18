@@ -1895,7 +1895,7 @@ Returns:
   } else {
     Status = gBS->AllocatePool (
                     EfiBootServicesData,
-                    AsciiStrLen (PrivateFile->FileName) + 1 + StrLen (NewFileInfo->FileName) + 1,
+                    AsciiStrLen (PrivateFile->FileName) + 2 + StrLen (NewFileInfo->FileName) + 1,
                     (VOID **)&NewFileName
                     );
 
@@ -1905,8 +1905,11 @@ Returns:
 
     AsciiStrCpy (NewFileName, PrivateRoot->FilePath);
     AsciiFilePtr = NewFileName + AsciiStrLen(NewFileName);
-    while (AsciiFilePtr > NewFileName && AsciiFilePtr[-1] != '/') {
-      AsciiFilePtr--;
+    if ((AsciiFilePtr[-1] != '/') && (NewFileInfo->FileName[0] != '/')) {
+      // make sure there is a / between Root FilePath and NewFileInfo Filename
+      AsciiFilePtr[0] = '/';      
+      AsciiFilePtr[1] = '\0';
+      AsciiFilePtr++;
     }
     UnicodeFilePtr = NewFileInfo->FileName;
   }
@@ -2091,7 +2094,6 @@ Returns:
   }
 
   UnixStatus = PrivateFile->UnixThunk->Chmod (NewFileName, NewAttr);
-
   if (UnixStatus != 0) {
     Status    = EFI_DEVICE_ERROR;
   }
