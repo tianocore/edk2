@@ -89,7 +89,7 @@ Returns:
   //
   // Do nothing for Nt32 version
   //
-  return EFI_SUCCESS;
+  return EFI_UNSUPPORTED;
 }
 
 EFI_STATUS
@@ -143,7 +143,7 @@ Returns:
   //
   // Do nothing for Nt32 version
   //
-  return EFI_SUCCESS;
+  return EFI_UNSUPPORTED;
 }
 
 EFI_STATUS
@@ -204,7 +204,7 @@ Returns:
   //
   // Do nothing for Nt32 version
   //
-  return EFI_SUCCESS;
+  return EFI_UNSUPPORTED;
 }
 
 EFI_STATUS
@@ -269,7 +269,7 @@ Returns:
   //
   // Do nothing for Nt32 version
   //
-  return EFI_SUCCESS;
+  return EFI_UNSUPPORTED;
 }
 
 
