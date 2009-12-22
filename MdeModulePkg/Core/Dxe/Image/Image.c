@@ -144,15 +144,19 @@ CoreInitializeImageServices (
   gDxeCoreImageHandle = Image->Handle;
   gDxeCoreLoadedImage = &Image->Info;
 
-  //
-  // Export DXE Core PE Loader functionality
-  //
-  return CoreInstallProtocolInterface (
-           &mLoadPe32PrivateData.Handle,
-           &gEfiLoadPeImageProtocolGuid,
-           EFI_NATIVE_INTERFACE,
-           &mLoadPe32PrivateData.Pe32Image
-           );
+  if (FeaturePcdGet (PcdFrameworkCompatibilitySupport)) {
+    //
+    // Export DXE Core PE Loader functionality for backward compatibility.
+    //
+    Status = CoreInstallProtocolInterface (
+      &mLoadPe32PrivateData.Handle,
+      &gEfiLoadPeImageProtocolGuid,
+      EFI_NATIVE_INTERFACE,
+      &mLoadPe32PrivateData.Pe32Image
+      );
+  }
+
+  return Status;
 }
 
 /**

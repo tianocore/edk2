@@ -107,7 +107,7 @@
   gEfiStatusCodeRuntimeProtocolGuid             ## SOMETIMES_CONSUMES
   gEfiCapsuleArchProtocolGuid                   ## CONSUMES
   gEfiDecompressProtocolGuid                    ## CONSUMES
-  gEfiLoadPeImageProtocolGuid                   ## PRODUCES
+  gEfiLoadPeImageProtocolGuid                   ## SOMETIMES_PRODUCES (Produces when PcdFrameworkCompatibilitySupport is set)
   gEfiSimpleFileSystemProtocolGuid              ## CONSUMES
   gEfiLoadFileProtocolGuid                      ## CONSUMES
   gEfiLoadFile2ProtocolGuid                     ## CONSUMES
@@ -140,3 +140,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueBootServiceExit
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueDxeDriverBegin
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueDxeDriverEnd
+
+[FeaturePcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport	   ## CONSUMES
