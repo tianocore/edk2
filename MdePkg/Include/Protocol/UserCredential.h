@@ -540,4 +540,15 @@ struct _EFI_USER_CREDENTIAL_PROTOCOL {
 
 extern EFI_GUID gEfiUserCredentialProtocolGuid;
 
+extern EFI_GUID gEfiUserCredentialClassUnknownGuid;
+extern EFI_GUID gEfiUserCredentialClassPasswordGuid;
+extern EFI_GUID gEfiUserCredentialClassSmartCardGuid;
+extern EFI_GUID gEfiUserCredentialClassFingerprintGuid;
+extern EFI_GUID gEfiUserCredentialClassHandprintGuid;
+extern EFI_GUID gEfiUserCredentialClassSecureCardGuid;
+
+extern EFI_GUID gEfiUserInfoAccessSetupAdminGuid;
+extern EFI_GUID gEfiUserInfoAccessSetupNormalGuid;
+extern EFI_GUID gEfiUserInfoAccessSetupRestrictedGuid;
+
 #endif

@@ -333,5 +333,6 @@ struct _EFI_USER_MANAGER_PROTOCOL {
 };
 
 extern EFI_GUID gEfiUserManagerProtocolGuid;
+extern EFI_GUID gEfiEventUserProfileChangedGuid;
 
 #endif
