@@ -1288,6 +1288,10 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
   
+  if (DataSize != 0 && Data == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   //
   //  Make sure if runtime bit is set, boot service bit is set also
   //
