@@ -3,7 +3,7 @@
 #  Scsi Disk driver. This driver detects the Scsi disk media and installs Block I/O Protocol
 #  on the device handle that holds the SCSI I/O Portocol.
 #  
-#  Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+#  Copyright (c) 2006 - 2009, Intel Corporation. <BR>
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -50,11 +50,16 @@
   UefiLib
   UefiDriverEntryPoint
   DebugLib
-
+  DevicePathLib
 
 [Protocols]
+  gEfiDiskInfoProtocolGuid                      ## BY_START
   gEfiBlockIoProtocolGuid                       ## BY_START
   gEfiScsiIoProtocolGuid                        ## TO_START
   gEfiScsiPassThruProtocolGuid                  ## TO_START
   gEfiExtScsiPassThruProtocolGuid               ## TO_START
-  
+
+[Guids]
+  gEfiDiskInfoScsiInterfaceGuid                 ## SOMETIME_PRODUCES (The device is physical SCSI disk)
+  gEfiDiskInfoIdeInterfaceGuid                  ## SOMETIME_PRODUCES (The device is ATAPI device in IDE mode)
+  gEfiDiskInfoAhciInterfaceGuid                 ## SOMETIME_PRODUCES (The device is ATAPI device in AHCI mode)

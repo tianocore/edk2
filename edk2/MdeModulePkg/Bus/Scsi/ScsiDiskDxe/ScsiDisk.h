@@ -1,7 +1,7 @@
 /** @file
   Header file for SCSI Disk Driver.
 
-Copyright (c) 2004 - 2008, Intel Corporation. <BR>
+Copyright (c) 2004 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -25,6 +25,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/DriverBinding.h>
 #include <Protocol/ScsiPassThruExt.h>
 #include <Protocol/ScsiPassThru.h>
+#include <Protocol/DiskInfo.h>
+
 
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
@@ -33,8 +35,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiScsiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/DevicePathLib.h>
 
 #include <IndustryStandard/Scsi.h>
+#include <IndustryStandard/Atapi.h>
 
 #define IS_DEVICE_FIXED(a)        (a)->FixedDevice ? 1 : 0
 
@@ -58,9 +62,19 @@ typedef struct {
 
   EFI_UNICODE_STRING_TABLE  *ControllerNameTable;
 
+  EFI_DISK_INFO_PROTOCOL    DiskInfo;
+
+  //
+  // The following fields are only valid for ATAPI/SATA device
+  //
+  UINT32                    Channel;
+  UINT32                    Device;
+  ATAPI_IDENTIFY_DATA       IdentifyData;
 } SCSI_DISK_DEV;
 
 #define SCSI_DISK_DEV_FROM_THIS(a)  CR (a, SCSI_DISK_DEV, BlkIo, SCSI_DISK_DEV_SIGNATURE)
+
+#define SCSI_DISK_DEV_FROM_DISKINFO(a) CR (a, SCSI_DISK_DEV, DiskInfo, SCSI_DISK_DEV_SIGNATURE)
 
 //
 // Global Variables
@@ -385,8 +399,107 @@ ScsiDiskFlushBlocks (
   IN  EFI_BLOCK_IO_PROTOCOL   *This
   );
 
+
 /**
-  Dectect Device and read out capacity ,if error occurs, parse the sense key.
+  Provides inquiry information for the controller type.
+  
+  This function is used by the IDE bus driver to get inquiry data.  Data format
+  of Identify data is defined by the Interface GUID.
+
+  @param[in]     This              Pointer to the EFI_DISK_INFO_PROTOCOL instance.
+  @param[in,out] InquiryData       Pointer to a buffer for the inquiry data.
+  @param[in,out] InquiryDataSize   Pointer to the value for the inquiry data size.
+
+  @retval EFI_SUCCESS            The command was accepted without any errors.
+  @retval EFI_NOT_FOUND          Device does not support this data class 
+  @retval EFI_DEVICE_ERROR       Error reading InquiryData from device 
+  @retval EFI_BUFFER_TOO_SMALL   InquiryDataSize not big enough 
+
+**/
+EFI_STATUS
+EFIAPI
+ScsiDiskInfoInquiry (
+  IN     EFI_DISK_INFO_PROTOCOL   *This,
+  IN OUT VOID                     *InquiryData,
+  IN OUT UINT32                   *InquiryDataSize
+  );
+
+
+/**
+  Provides identify information for the controller type.
+
+  This function is used by the IDE bus driver to get identify data.  Data format
+  of Identify data is defined by the Interface GUID.
+
+  @param[in]     This               Pointer to the EFI_DISK_INFO_PROTOCOL 
+                                    instance.
+  @param[in,out] IdentifyData       Pointer to a buffer for the identify data.
+  @param[in,out] IdentifyDataSize   Pointer to the value for the identify data
+                                    size.
+
+  @retval EFI_SUCCESS            The command was accepted without any errors.
+  @retval EFI_NOT_FOUND          Device does not support this data class 
+  @retval EFI_DEVICE_ERROR       Error reading IdentifyData from device 
+  @retval EFI_BUFFER_TOO_SMALL   IdentifyDataSize not big enough 
+
+**/
+EFI_STATUS
+EFIAPI
+ScsiDiskInfoIdentify (
+  IN     EFI_DISK_INFO_PROTOCOL   *This,
+  IN OUT VOID                     *IdentifyData,
+  IN OUT UINT32                   *IdentifyDataSize
+  );
+
+
+/**
+  Provides sense data information for the controller type.
+  
+  This function is used by the IDE bus driver to get sense data. 
+  Data format of Sense data is defined by the Interface GUID.
+
+  @param[in]     This              Pointer to the EFI_DISK_INFO_PROTOCOL instance.
+  @param[in,out] SenseData         Pointer to the SenseData.
+  @param[in,out] SenseDataSize     Size of SenseData in bytes.
+  @param[out]    SenseDataNumber   Pointer to the value for the sense data size.
+
+  @retval EFI_SUCCESS            The command was accepted without any errors.
+  @retval EFI_NOT_FOUND          Device does not support this data class.
+  @retval EFI_DEVICE_ERROR       Error reading SenseData from device.
+  @retval EFI_BUFFER_TOO_SMALL   SenseDataSize not big enough.
+
+**/
+EFI_STATUS
+EFIAPI
+ScsiDiskInfoSenseData (
+  IN     EFI_DISK_INFO_PROTOCOL   *This,
+  IN OUT VOID                     *SenseData,
+  IN OUT UINT32                   *SenseDataSize,
+  OUT    UINT8                    *SenseDataNumber
+  );
+
+/**
+  This function is used by the IDE bus driver to get controller information.
+
+  @param[in]  This         Pointer to the EFI_DISK_INFO_PROTOCOL instance. 
+  @param[out] IdeChannel   Pointer to the Ide Channel number.  Primary or secondary.
+  @param[out] IdeDevice    Pointer to the Ide Device number.  Master or slave.
+
+  @retval EFI_SUCCESS       IdeChannel and IdeDevice are valid.
+  @retval EFI_UNSUPPORTED   This is not an IDE device.
+
+**/
+EFI_STATUS
+EFIAPI
+ScsiDiskInfoWhichIde (
+  IN  EFI_DISK_INFO_PROTOCOL   *This,
+  OUT UINT32                   *IdeChannel,
+  OUT UINT32                   *IdeDevice
+  );
+
+
+/**
+  Detect Device and read out capacity ,if error occurs, parse the sense key.
 
   @param  ScsiDiskDevice    The pointer of SCSI_DISK_DEV
   @param  MustReadCapacity  The flag about reading device capacity
@@ -404,7 +517,7 @@ ScsiDiskDetectMedia (
   );
 
 /**
-  To test deivice.
+  To test device.
 
   When Test Unit Ready command succeeds, retrieve Sense Keys via Request Sense;
   When Test Unit Ready command encounters any error caused by host adapter or
@@ -505,7 +618,7 @@ CheckTargetStatus (
   Retrieve all sense keys from the device.
 
   When encountering error during the process, if retrieve sense keys before
-  error encounterred, it returns the sense keys with return status set to EFI_SUCCESS,
+  error encountered, it returns the sense keys with return status set to EFI_SUCCESS,
   and NeedRetry set to FALSE; otherwize, return the proper return status.
 
   @param  ScsiDiskDevice     The pointer of SCSI_DISK_DEV
@@ -557,7 +670,7 @@ ParseInquiryData (
 /**
   Read sector from SCSI Disk.
 
-  @param  ScsiDiskDevice  The poiniter of SCSI_DISK_DEV
+  @param  ScsiDiskDevice  The pointer of SCSI_DISK_DEV
   @param  Buffer          The buffer to fill in the read out data
   @param  Lba             Logic block address
   @param  NumberOfBlocks  The number of blocks to read
@@ -577,7 +690,7 @@ ScsiDiskReadSectors (
 /**
   Write sector to SCSI Disk.
 
-  @param  ScsiDiskDevice  The poiniter of SCSI_DISK_DEV
+  @param  ScsiDiskDevice  The pointer of SCSI_DISK_DEV
   @param  Buffer          The buffer of data to be written into SCSI Disk
   @param  Lba             Logic block address
   @param  NumberOfBlocks  The number of blocks to read
@@ -595,7 +708,7 @@ ScsiDiskWriteSectors (
   );
 
 /**
-  Sumbmit Read command.
+  Submit Read command.
 
   @param  ScsiDiskDevice     The pointer of ScsiDiskDevice
   @param  NeedRetry          The pointer of flag indicates if needs retry if error happens
@@ -792,7 +905,7 @@ ReleaseScsiDiskDeviceResources (
   Determine if Block Io should be produced.
   
 
-  @param  ChildHandle  Child Handle to retrive Parent information.
+  @param  ChildHandle  Child Handle to retrieve Parent information.
   
   @retval  TRUE    Should produce Block Io.
   @retval  FALSE   Should not produce Block Io.
@@ -802,6 +915,24 @@ BOOLEAN
 DetermineInstallBlockIo (
   IN  EFI_HANDLE      ChildHandle
   );
+
+/**
+  Initialize the installation of DiskInfo protocol.
+
+  This function prepares for the installation of DiskInfo protocol on the child handle.
+  By default, it installs DiskInfo protocol with SCSI interface GUID. If it further
+  detects that the physical device is an ATAPI/AHCI device, it then updates interface GUID
+  to be IDE/AHCI interface GUID.
+
+  @param  ScsiDiskDevice  The pointer of SCSI_DISK_DEV.
+  @param  ChildHandle     Child handle to install DiskInfo protocol.
+  
+**/  
+VOID
+InitializeInstallDiskInfo (
+  IN  SCSI_DISK_DEV   *ScsiDiskDevice,
+  IN  EFI_HANDLE      ChildHandle
+  ); 
 
 /**
   Search protocol database and check to see if the protocol
