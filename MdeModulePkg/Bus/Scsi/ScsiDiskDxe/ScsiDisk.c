@@ -1,7 +1,7 @@
 /** @file
   SCSI disk driver that layers on every SCSI IO protocol in the system.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -15,7 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "ScsiDisk.h"
 
-
 EFI_DRIVER_BINDING_PROTOCOL gScsiDiskDriverBinding = {
   ScsiDiskDriverBindingSupported,
   ScsiDiskDriverBindingStart,
@@ -25,6 +24,13 @@ EFI_DRIVER_BINDING_PROTOCOL gScsiDiskDriverBinding = {
   NULL
 };
 
+EFI_DISK_INFO_PROTOCOL gScsiDiskInfoProtocolTemplate = {
+  EFI_DISK_INFO_SCSI_INTERFACE_GUID,
+  ScsiDiskInfoInquiry,
+  ScsiDiskInfoIdentify,
+  ScsiDiskInfoSenseData,
+  ScsiDiskInfoWhichIde
+};
 
 /**
   The user Entry Point for module ScsiDisk.
@@ -248,10 +254,13 @@ ScsiDiskDriverBindingStart (
     // Determine if Block IO should be produced on this controller handle
     //
     if (DetermineInstallBlockIo(Controller)) {
+      InitializeInstallDiskInfo(ScsiDiskDevice, Controller);
       Status = gBS->InstallMultipleProtocolInterfaces (
                       &Controller,
                       &gEfiBlockIoProtocolGuid,
                       &ScsiDiskDevice->BlkIo,
+                      &gEfiDiskInfoProtocolGuid,
+                      &ScsiDiskDevice->DiskInfo,
                       NULL
                       );
       if (!EFI_ERROR(Status)) {
@@ -333,10 +342,13 @@ ScsiDiskDriverBindingStop (
   }
 
   ScsiDiskDevice = SCSI_DISK_DEV_FROM_THIS (BlkIo);
-  Status = gBS->UninstallProtocolInterface (
+  Status = gBS->UninstallMultipleProtocolInterfaces (
                   Controller,
                   &gEfiBlockIoProtocolGuid,
-                  &ScsiDiskDevice->BlkIo
+                  &ScsiDiskDevice->BlkIo,
+                  &gEfiDiskInfoProtocolGuid,
+                  &ScsiDiskDevice->DiskInfo,
+                  NULL
                   );
   if (!EFI_ERROR (Status)) {
     gBS->CloseProtocol (
@@ -366,7 +378,7 @@ ScsiDiskDriverBindingStop (
   @retval EFI_SUCCESS          The device was reset.
   @retval EFI_DEVICE_ERROR     The device is not functioning properly and could
                                not be reset.
-  @return EFI_STATUS is retured from EFI_SCSI_IO_PROTOCOL.ResetDevice().
+  @return EFI_STATUS is returned from EFI_SCSI_IO_PROTOCOL.ResetDevice().
 
 **/
 EFI_STATUS
@@ -649,7 +661,7 @@ ScsiDiskFlushBlocks (
 
 
 /**
-  Dectect Device and read out capacity ,if error occurs, parse the sense key.
+  Detect Device and read out capacity ,if error occurs, parse the sense key.
 
   @param  ScsiDiskDevice    The pointer of SCSI_DISK_DEV
   @param  MustReadCapacity  The flag about reading device capacity
@@ -954,7 +966,7 @@ ScsiDiskInquiryDevice (
 }
 
 /**
-  To test deivice.
+  To test device.
 
   When Test Unit Ready command succeeds, retrieve Sense Keys via Request Sense;
   When Test Unit Ready command encounters any error caused by host adapter or
@@ -1380,7 +1392,7 @@ CheckTargetStatus (
   Retrieve all sense keys from the device.
 
   When encountering error during the process, if retrieve sense keys before
-  error encounterred, it returns the sense keys with return status set to EFI_SUCCESS,
+  error encountered, it returns the sense keys with return status set to EFI_SUCCESS,
   and NeedRetry set to FALSE; otherwize, return the proper return status.
 
   @param  ScsiDiskDevice     The pointer of SCSI_DISK_DEV
@@ -1484,7 +1496,7 @@ ScsiDiskRequestSenseKeys (
 **/
 VOID
 GetMediaInfo (
-  IN  OUT  SCSI_DISK_DEV                 *ScsiDiskDevice,
+  IN  OUT  SCSI_DISK_DEV          *ScsiDiskDevice,
   EFI_SCSI_DISK_CAPACITY_DATA     *Capacity10,
   EFI_SCSI_DISK_CAPACITY_DATA16   *Capacity16
   )
@@ -1560,7 +1572,7 @@ ParseInquiryData (
 /**
   Read sector from SCSI Disk.
 
-  @param  ScsiDiskDevice  The poiniter of SCSI_DISK_DEV
+  @param  ScsiDiskDevice  The pointer of SCSI_DISK_DEV
   @param  Buffer          The buffer to fill in the read out data
   @param  Lba             Logic block address
   @param  NumberOfBlocks  The number of blocks to read
@@ -1664,7 +1676,7 @@ ScsiDiskReadSectors (
 /**
   Write sector to SCSI Disk.
 
-  @param  ScsiDiskDevice  The poiniter of SCSI_DISK_DEV
+  @param  ScsiDiskDevice  The pointer of SCSI_DISK_DEV
   @param  Buffer          The buffer of data to be written into SCSI Disk
   @param  Lba             Logic block address
   @param  NumberOfBlocks  The number of blocks to read
@@ -1763,7 +1775,7 @@ ScsiDiskWriteSectors (
 
 
 /**
-  Sumbmit Read command.
+  Submit Read command.
 
   @param  ScsiDiskDevice     The pointer of ScsiDiskDevice
   @param  NeedRetry          The pointer of flag indicates if needs retry if error happens
@@ -2036,7 +2048,7 @@ ScsiDiskIsHardwareError (
   @param  SenseCounts  The number of sense key
 
   @retval TRUE   Media is changed.
-  @retval FALSE  Medit is NOT changed.
+  @retval FALSE  Media is NOT changed.
 **/
 BOOLEAN
 ScsiDiskIsMediaChange (
@@ -2256,7 +2268,7 @@ ReleaseScsiDiskDeviceResources (
   Determine if Block Io should be produced.
   
 
-  @param  ChildHandle  Child Handle to retrive Parent information.
+  @param  ChildHandle  Child Handle to retrieve Parent information.
   
   @retval  TRUE    Should produce Block Io.
   @retval  FALSE   Should not produce Block Io.
@@ -2353,3 +2365,276 @@ GetParentProtocol (
   return NULL;
 } 
 
+/**
+  Provides inquiry information for the controller type.
+  
+  This function is used by the IDE bus driver to get inquiry data.  Data format
+  of Identify data is defined by the Interface GUID.
+
+  @param[in]     This              Pointer to the EFI_DISK_INFO_PROTOCOL instance.
+  @param[in,out] InquiryData       Pointer to a buffer for the inquiry data.
+  @param[in,out] InquiryDataSize   Pointer to the value for the inquiry data size.
+
+  @retval EFI_SUCCESS            The command was accepted without any errors.
+  @retval EFI_NOT_FOUND          Device does not support this data class 
+  @retval EFI_DEVICE_ERROR       Error reading InquiryData from device 
+  @retval EFI_BUFFER_TOO_SMALL   InquiryDataSize not big enough 
+
+**/
+EFI_STATUS
+EFIAPI
+ScsiDiskInfoInquiry (
+  IN     EFI_DISK_INFO_PROTOCOL   *This,
+  IN OUT VOID                     *InquiryData,
+  IN OUT UINT32                   *InquiryDataSize
+  )
+{
+  EFI_STATUS      Status;
+  SCSI_DISK_DEV   *ScsiDiskDevice;
+
+  ScsiDiskDevice  = SCSI_DISK_DEV_FROM_DISKINFO (This);
+
+  Status = EFI_BUFFER_TOO_SMALL;
+  if (*InquiryDataSize >= sizeof (ScsiDiskDevice->InquiryData)) {
+    Status = EFI_SUCCESS;
+    CopyMem (InquiryData, &ScsiDiskDevice->InquiryData, sizeof (ScsiDiskDevice->InquiryData));
+  }
+  *InquiryDataSize = sizeof (ScsiDiskDevice->InquiryData);
+  return Status;
+}
+
+
+/**
+  Provides identify information for the controller type.
+
+  This function is used by the IDE bus driver to get identify data.  Data format
+  of Identify data is defined by the Interface GUID.
+
+  @param[in]     This               Pointer to the EFI_DISK_INFO_PROTOCOL 
+                                    instance.
+  @param[in,out] IdentifyData       Pointer to a buffer for the identify data.
+  @param[in,out] IdentifyDataSize   Pointer to the value for the identify data
+                                    size.
+
+  @retval EFI_SUCCESS            The command was accepted without any errors.
+  @retval EFI_NOT_FOUND          Device does not support this data class 
+  @retval EFI_DEVICE_ERROR       Error reading IdentifyData from device 
+  @retval EFI_BUFFER_TOO_SMALL   IdentifyDataSize not big enough 
+
+**/
+EFI_STATUS
+EFIAPI
+ScsiDiskInfoIdentify (
+  IN     EFI_DISK_INFO_PROTOCOL   *This,
+  IN OUT VOID                     *IdentifyData,
+  IN OUT UINT32                   *IdentifyDataSize
+  )
+{
+  EFI_STATUS      Status;
+  SCSI_DISK_DEV   *ScsiDiskDevice;
+
+  if (CompareGuid (&This->Interface, &gEfiDiskInfoScsiInterfaceGuid)) {
+    //
+    // Physical SCSI bus does not support this data class. 
+    //
+    return EFI_NOT_FOUND;
+  }
+
+  ScsiDiskDevice  = SCSI_DISK_DEV_FROM_DISKINFO (This);
+
+  Status = EFI_BUFFER_TOO_SMALL;
+  if (*IdentifyDataSize >= sizeof (ScsiDiskDevice->IdentifyData)) {
+    Status = EFI_SUCCESS;
+    CopyMem (IdentifyData, &ScsiDiskDevice->IdentifyData, sizeof (ScsiDiskDevice->IdentifyData));
+  }
+  *IdentifyDataSize = sizeof (ScsiDiskDevice->IdentifyData);
+  return Status;
+}
+
+/**
+  Provides sense data information for the controller type.
+  
+  This function is used by the IDE bus driver to get sense data. 
+  Data format of Sense data is defined by the Interface GUID.
+
+  @param[in]     This              Pointer to the EFI_DISK_INFO_PROTOCOL instance.
+  @param[in,out] SenseData         Pointer to the SenseData.
+  @param[in,out] SenseDataSize     Size of SenseData in bytes.
+  @param[out]    SenseDataNumber   Pointer to the value for the sense data size.
+
+  @retval EFI_SUCCESS            The command was accepted without any errors.
+  @retval EFI_NOT_FOUND          Device does not support this data class.
+  @retval EFI_DEVICE_ERROR       Error reading SenseData from device.
+  @retval EFI_BUFFER_TOO_SMALL   SenseDataSize not big enough.
+
+**/
+EFI_STATUS
+EFIAPI
+ScsiDiskInfoSenseData (
+  IN     EFI_DISK_INFO_PROTOCOL   *This,
+  IN OUT VOID                     *SenseData,
+  IN OUT UINT32                   *SenseDataSize,
+  OUT    UINT8                    *SenseDataNumber
+  )
+{
+  return EFI_NOT_FOUND;
+}
+
+
+/**
+  This function is used by the IDE bus driver to get controller information.
+
+  @param[in]  This         Pointer to the EFI_DISK_INFO_PROTOCOL instance. 
+  @param[out] IdeChannel   Pointer to the Ide Channel number.  Primary or secondary.
+  @param[out] IdeDevice    Pointer to the Ide Device number.  Master or slave.
+
+  @retval EFI_SUCCESS       IdeChannel and IdeDevice are valid.
+  @retval EFI_UNSUPPORTED   This is not an IDE device.
+
+**/
+EFI_STATUS
+EFIAPI
+ScsiDiskInfoWhichIde (
+  IN  EFI_DISK_INFO_PROTOCOL   *This,
+  OUT UINT32                   *IdeChannel,
+  OUT UINT32                   *IdeDevice
+  )
+{
+  SCSI_DISK_DEV   *ScsiDiskDevice;
+
+  if (CompareGuid (&This->Interface, &gEfiDiskInfoScsiInterfaceGuid)) {
+    //
+    // This is not an IDE physical device.
+    //
+    return EFI_UNSUPPORTED;
+  }
+
+  ScsiDiskDevice  = SCSI_DISK_DEV_FROM_DISKINFO (This);
+  *IdeChannel     = ScsiDiskDevice->Channel;
+  *IdeDevice      = ScsiDiskDevice->Device;
+
+  return EFI_SUCCESS;
+}
+
+
+/**
+  Issues ATA IDENTIFY DEVICE command to identify ATAPI device.
+
+  This function tries to fill 512-byte ATAPI_IDENTIFY_DATA for ATAPI device to
+  implement Identify() interface for DiskInfo protocol. The ATA command is sent
+  via SCSI Request Packet.
+
+  @param  ScsiDiskDevice  The pointer of SCSI_DISK_DEV
+  
+  @retval EFI_SUCCESS     The ATAPI device identify data were retrieved successfully.
+  @retval others          Some error occurred during the identification that ATAPI device.
+
+**/  
+EFI_STATUS
+AtapiIdentifyDevice (
+  IN OUT SCSI_DISK_DEV   *ScsiDiskDevice
+  )
+{
+  EFI_SCSI_IO_SCSI_REQUEST_PACKET CommandPacket;
+  UINT8                           Cdb[6];
+
+  //
+  // Initialize SCSI REQUEST_PACKET and 6-byte Cdb
+  //
+  ZeroMem (&CommandPacket, sizeof (CommandPacket));
+  ZeroMem (Cdb, sizeof (Cdb));
+
+  Cdb[0] = ATA_CMD_IDENTIFY_DEVICE;
+  CommandPacket.Timeout = EFI_TIMER_PERIOD_SECONDS (1);
+  CommandPacket.Cdb = Cdb;
+  CommandPacket.CdbLength = sizeof (Cdb);
+  CommandPacket.InDataBuffer = &ScsiDiskDevice->IdentifyData;
+  CommandPacket.InTransferLength = sizeof (ScsiDiskDevice->IdentifyData);
+
+  return ScsiDiskDevice->ScsiIo->ExecuteScsiCommand (ScsiDiskDevice->ScsiIo, &CommandPacket, NULL);
+}
+
+
+/**
+  Initialize the installation of DiskInfo protocol.
+
+  This function prepares for the installation of DiskInfo protocol on the child handle.
+  By default, it installs DiskInfo protocol with SCSI interface GUID. If it further
+  detects that the physical device is an ATAPI/AHCI device, it then updates interface GUID
+  to be IDE/AHCI interface GUID.
+
+  @param  ScsiDiskDevice  The pointer of SCSI_DISK_DEV.
+  @param  ChildHandle     Child handle to install DiskInfo protocol.
+  
+**/  
+VOID
+InitializeInstallDiskInfo (
+  IN  SCSI_DISK_DEV   *ScsiDiskDevice,
+  IN  EFI_HANDLE      ChildHandle
+  )
+{
+  EFI_STATUS                Status;
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePathNode;
+  EFI_DEVICE_PATH_PROTOCOL  *ChildDevicePathNode;
+  ATAPI_DEVICE_PATH         *AtapiDevicePath;
+  SATA_DEVICE_PATH          *SataDevicePath;
+  UINTN                     IdentifyRetry;
+
+  Status = gBS->HandleProtocol (ChildHandle, &gEfiDevicePathProtocolGuid, (VOID **) &DevicePathNode);
+  //
+  // Device Path protocol must be installed on the device handle. 
+  //
+  ASSERT_EFI_ERROR (Status);
+  //
+  // Copy the DiskInfo protocol template.
+  //
+  CopyMem (&ScsiDiskDevice->DiskInfo, &gScsiDiskInfoProtocolTemplate, sizeof (gScsiDiskInfoProtocolTemplate));
+
+  while (!IsDevicePathEnd (DevicePathNode)) {
+    ChildDevicePathNode = NextDevicePathNode (DevicePathNode);
+    if ((DevicePathType (DevicePathNode) == HARDWARE_DEVICE_PATH) &&
+        (DevicePathSubType (DevicePathNode) == HW_PCI_DP) &&
+        (DevicePathType (ChildDevicePathNode) == MESSAGING_DEVICE_PATH) &&
+       ((DevicePathSubType (ChildDevicePathNode) == MSG_ATAPI_DP) ||
+        (DevicePathSubType (ChildDevicePathNode) == MSG_SATA_DP))) {
+
+      IdentifyRetry = 3;
+      do {
+        //
+        // Issue ATA Identify Device Command via SCSI command, which is required to publish DiskInfo protocol
+        // with IDE/AHCI interface GUID.
+        //
+        Status = AtapiIdentifyDevice (ScsiDiskDevice);
+        if (!EFI_ERROR (Status)) {
+          if (DevicePathSubType(ChildDevicePathNode) == MSG_ATAPI_DP) {
+            //
+            // We find the valid ATAPI device path
+            //
+            AtapiDevicePath = (ATAPI_DEVICE_PATH *) ChildDevicePathNode;
+            ScsiDiskDevice->Channel = AtapiDevicePath->PrimarySecondary;
+            ScsiDiskDevice->Device = AtapiDevicePath->SlaveMaster;
+            //
+            // Update the DiskInfo.Interface to IDE interface GUID for the physical ATAPI device. 
+            //
+            CopyGuid (&ScsiDiskDevice->DiskInfo.Interface, &gEfiDiskInfoIdeInterfaceGuid);
+          } else {
+            //
+            // We find the valid SATA device path
+            //
+            SataDevicePath = (SATA_DEVICE_PATH *) ChildDevicePathNode;
+            ScsiDiskDevice->Channel = SataDevicePath->HBAPortNumber;
+            ScsiDiskDevice->Device = SataDevicePath->PortMultiplierPortNumber;
+            //
+            // Update the DiskInfo.Interface to AHCI interface GUID for the physical AHCI device. 
+            //
+            CopyGuid (&ScsiDiskDevice->DiskInfo.Interface, &gEfiDiskInfoAhciInterfaceGuid);
+          }
+          return;
+        }
+      } while (--IdentifyRetry > 0);
+    }
+    DevicePathNode = ChildDevicePathNode;
+  }
+
+  return;
+}
