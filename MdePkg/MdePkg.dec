@@ -74,6 +74,10 @@
   #                  Only available to DXE and UEFI module types.
   UefiBootServicesTableLib|Include/Library/UefiBootServicesTableLib.h
 
+  ##  @libraryclass  Provides a service to retrieve a pointer to the SMM Services Table.
+  #                  Only available to SMM/DXE Combined and SMM module types.
+  SmmServicesTableLib|Include/Library/SmmServicesTableLib.h
+
   ##  @libraryclass  Module entry point library for UEFI Applications.
   UefiApplicationEntryPoint|Include/Library/UefiApplicationEntryPoint.h
 
@@ -429,6 +433,8 @@
   #
   # GUID defined in PI1.2
   #
+  ## Include/Guid/EventGroup.h
+  gEfiEventDxeDispatchGuid       = { 0x7081E22F, 0xCAC6, 0x4053, { 0x94, 0x68, 0x67, 0x57, 0x82, 0xCF, 0x88, 0xE5 }}
 
   ## Guid for EFI_DISK_INFO_PROTOCOL.Interface to specify Ide interface.
   ## Include/Protocol/DiskInfo.h

@@ -7,7 +7,7 @@
 #  EFI Driver Model related protocols, manage Unicode string tables for UEFI Drivers, 
 #  and print messages on the console output and standard error devices.
 #
-# Copyright (c) 2007 - 2008, Intel Corporation
+# Copyright (c) 2007 - 2009, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -25,7 +25,7 @@
   FILE_GUID                      = 3a004ba5-efe0-4a61-9f1a-267a46ae5ba9
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = UefiLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  LIBRARY_CLASS                  = UefiLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER SMM_CORE
 
 
 #
