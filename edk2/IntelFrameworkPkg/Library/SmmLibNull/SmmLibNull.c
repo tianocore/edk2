@@ -87,3 +87,17 @@ IsRuntimeSoftwareSmi (
   return FALSE;
 }
 
+/**
+
+  Clear APM SMI Status Bit; Set the EOS bit. 
+  
+**/
+
+VOID
+EFIAPI
+ClearSmi (
+  VOID
+  )
+{
+  return;
+}
