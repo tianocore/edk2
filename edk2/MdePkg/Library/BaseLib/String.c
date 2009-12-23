@@ -425,7 +425,11 @@ StrnCat (
   IN      UINTN                     Length
   )
 {
-  StrnCpy (Destination + StrLen (Destination), Source, Length);
+  UINTN   DestinationLen;
+
+  DestinationLen = StrLen (Destination);
+  StrnCpy (Destination + DestinationLen, Source, Length);
+  Destination[DestinationLen + Length] = L'\0';
 
   //
   // Size of the resulting string should never be zero.
@@ -1566,7 +1570,11 @@ AsciiStrnCat (
   IN      UINTN                     Length
   )
 {
-  AsciiStrnCpy (Destination + AsciiStrLen (Destination), Source, Length);
+  UINTN   DestinationLen;
+
+  DestinationLen = AsciiStrLen (Destination);
+  AsciiStrnCpy (Destination + DestinationLen, Source, Length);
+  Destination[DestinationLen + Length] = '\0';
 
   //
   // Size of the resulting string should never be zero.
