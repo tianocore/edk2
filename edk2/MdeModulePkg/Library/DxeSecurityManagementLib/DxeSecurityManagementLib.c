@@ -229,7 +229,16 @@ ExecuteSecurityHandlers (
       // Try get file buffer when the handler requires image buffer.
       //
       if (FileBuffer == NULL) {
+        //
+        // Try to get image by FALSE boot policy for the exact boot file path.
+        //
         FileBuffer = GetFileBufferByFilePath (FALSE, FilePath, &FileSize, &AuthenticationStatus);
+        if (FileBuffer == NULL) {
+          //
+          // Try to get image by TRUE boot policy for the inexact boot file path.
+          //
+          FileBuffer = GetFileBufferByFilePath (TRUE, FilePath, &FileSize, &AuthenticationStatus);
+        }
       }
     }
     Status = mSecurityTable[Index].SecurityHandler (
