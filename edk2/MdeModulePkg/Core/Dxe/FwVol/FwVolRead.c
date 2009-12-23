@@ -1,7 +1,7 @@
 /** @file
   Implements functions to read firmware file
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -135,9 +135,9 @@ FvGetNextFile (
     return EFI_ACCESS_DENIED;
   }
 
-  if (*FileType > EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE) {
+  if (*FileType > EFI_FV_FILETYPE_SMM_CORE) {
     //
-    // File type needs to be in 0 - 0x0B
+    // File type needs to be in 0 - 0x0D
     //
     return EFI_NOT_FOUND;
   }

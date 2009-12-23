@@ -102,6 +102,8 @@
   gEfiHobListGuid                               ## CONSUMES ## GUID
   gEfiDxeServicesTableGuid                      ## CONSUMES ## GUID
   gEfiMemoryTypeInformationGuid                 ## CONSUMES ## GUID
+  gEfiEventDxeDispatchGuid                      ## CONSUMES ## GUID
+  
 
 [Protocols]
   gEfiStatusCodeRuntimeProtocolGuid             ## SOMETIMES_CONSUMES
