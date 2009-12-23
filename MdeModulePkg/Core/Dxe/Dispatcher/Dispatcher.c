@@ -26,7 +26,7 @@
   Depex - Dependency Expresion.
   SOR   - Schedule On Request - Don't schedule if this bit is set.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2009, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -78,6 +78,7 @@ VOID            *mFwVolEventRegistration;
 //
 EFI_FV_FILETYPE mDxeFileTypes[] = {
   EFI_FV_FILETYPE_DRIVER,
+  EFI_FV_FILETYPE_COMBINED_SMM_DXE,
   EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER,
   EFI_FV_FILETYPE_DXE_CORE,
   EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE
@@ -386,6 +387,23 @@ CoreTrust (
 }
 
 
+/**
+  An empty function to pass error checking of CreateEventEx ().
+
+  @param  Event                 Event whose notification function is being invoked.
+  @param  Context               Pointer to the notification function's context,
+                                which is implementation-dependent.
+
+**/
+VOID
+EFIAPI
+EmptyFuntion (
+  IN EFI_EVENT                Event,
+  IN VOID                     *Context
+  )
+{
+  return;
+}
 
 /**
   This is the main Dispatcher for DXE and it exits when there are no more
@@ -412,6 +430,8 @@ CoreDispatcher (
   LIST_ENTRY                      *Link;
   EFI_CORE_DRIVER_ENTRY           *DriverEntry;
   BOOLEAN                         ReadyToRun;
+  EFI_EVENT                       DxeDispatchEvent;
+  
 
   if (gDispatcherRunning) {
     //
@@ -422,6 +442,17 @@ CoreDispatcher (
 
   gDispatcherRunning = TRUE;
 
+  Status = CoreCreateEventEx (
+             EVT_NOTIFY_SIGNAL,
+             TPL_NOTIFY,
+             EmptyFuntion,
+             NULL,
+             &gEfiEventDxeDispatchGuid,
+             &DxeDispatchEvent
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   ReturnStatus = EFI_NOT_FOUND;
   do {
@@ -534,7 +565,21 @@ CoreDispatcher (
         }
       }
     }
+
+    //
+    // Now DXE Dispatcher finished one round of dispatch, signal an event group
+    // so that SMM Dispatcher get chance to dispatch SMM Drivers which depend
+    // on UEFI protocols
+    //
+    if (!EFI_ERROR (ReturnStatus)) {
+      CoreSignalEvent (DxeDispatchEvent);
+    }
   } while (ReadyToRun);
+
+  //
+  // Close DXE dispatch Event
+  //
+  CoreCloseEvent (DxeDispatchEvent);
 
   gDispatcherRunning = FALSE;
 

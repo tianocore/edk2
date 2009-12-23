@@ -1,0 +1,54 @@
+#/** @file
+#  Report Status Code Router Driver which produces Report Stataus Code Handler Protocol
+#  and Status Code Runtime Protocol.
+#
+#  Copyright (c) 2009, Intel Corporation.
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ReportStatusCodeRouterSmm
+  FILE_GUID                      = A6885402-D022-4b0e-A509-4711B90F2A39
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+  
+  ENTRY_POINT                    = GenericStatusCodeSmmEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources.common]
+  ReportStatusCodeRouterSmm.c
+  ReportStatusCodeRouterSmm.h
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiRuntimeLib
+  SmmServicesTableLib
+  UefiDriverEntryPoint
+  DebugLib
+  BaseLib
+  SynchronizationLib
+
+[Protocols]
+  gEfiSmmRscHandlerProtocolGuid               ## PRODUCES
+  gEfiSmmStatusCodeProtocolGuid               ## PRODUCES
+
+[Depex]
+  TRUE
