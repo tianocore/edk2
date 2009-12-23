@@ -1,8 +1,8 @@
 #/** @file
-#  Debug Library based on report status code library
+#  SMM report status code library
 #
-#  Debug Library for PEIMs and DXE drivers that sends debug messages to ReportStatusCode
-#  Copyright (c) 2006 - 2009, Intel Corporation.
+#  Retrieve status code and report status code in SMM phase
+#  Copyright (c) 2009, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -16,39 +16,42 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = PeiDxeDebugLibReportStatusCode
-  FILE_GUID                      = bda39d3a-451b-4350-8266-81ab10fa0523
-  MODULE_TYPE                    = PEIM
+  BASE_NAME                      = SmmReportStatusCodeLib
+  FILE_GUID                      = 67089D19-B3D6-4d9e-A0EB-FEDC1F83A1EE
+  MODULE_TYPE                    = DXE_SMM_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = DebugLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER SMM_CORE PEIM SEC PEI_CORE UEFI_APPLICATION UEFI_DRIVER
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+  
+  LIBRARY_CLASS                  = ReportStatusCodeLib| DXE_SMM_DRIVER SMM_CORE
 
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64
 #
 
 [Sources.common]
-  DebugLib.c
-
+  ReportStatusCodeLib.c
 
 [Packages]
   MdePkg/MdePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
-  
+
 [LibraryClasses]
   PcdLib
-  ReportStatusCodeLib
   BaseMemoryLib
-  BaseLib
+  SmmServicesTableLib
+  DebugLib
+  UefiDriverEntryPoint
+
+[Guids]
+  gEfiStatusCodeSpecificDataGuid                ## CONSUMES
+  gEfiStatusCodeDataTypeDebugGuid               ## CONSUMES
+
+[Protocols]
+  gEfiSmmStatusCodeProtocolGuid                 ## CONSUMES
 
 [Pcd.common]
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel
-  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask
+  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask
 
-[Guids.common]
-  gEfiStatusCodeDataTypeDebugGuid    ## CONSUMES
-  
-  
