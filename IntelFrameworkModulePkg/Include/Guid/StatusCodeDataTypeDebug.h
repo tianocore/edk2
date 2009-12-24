@@ -25,7 +25,7 @@
   }
 
 ///
-/// The maximum size of an EFI_DEBUG_INO structure
+/// The maximum size of an EFI_DEBUG_INFO structure
 ///
 #define EFI_STATUS_CODE_DATA_MAX_SIZE 200
 
