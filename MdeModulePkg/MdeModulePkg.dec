@@ -244,6 +244,9 @@
   ## This PCD specifies whether the Multi Root I/O virtualization support.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMrIovSupport|FALSE|BOOLEAN|0x10000046
 
+  ## This PCD specifies whether the PCI bus driver probes non-standard, 
+  #  such as 2K/1K/512, granularity for PCI to PCI bridge I/O window.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciBridgeIoAlignmentProbe|FALSE|BOOLEAN|0x10000047
 
 [PcdsFeatureFlag.IA32]
   ##

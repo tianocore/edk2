@@ -104,9 +104,11 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSupport
   gEfiMdeModulePkgTokenSpaceGuid.PcdAriSupport
   gEfiMdeModulePkgTokenSpaceGuid.PcdMrIovSupport
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciBridgeIoAlignmentProbe
 
 [FixedPcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize
+
 # [Event]
 #   ##
 #   # Notify event set by CreateEventForHpc () for PCI Hot Plug controller.

@@ -469,6 +469,36 @@ GatherPpbInfo (
     }
   }
 
+  //
+  // if PcdPciBridgeIoAlignmentProbe is TRUE, PCI bus driver probes
+  // PCI bridge supporting non-stardard I/O window alignment less than 4K.
+  //
+
+  PciIoDevice->BridgeIoAlignment = 0xFFF;
+  if (FeaturePcdGet (PcdPciBridgeIoAlignmentProbe)) {
+    //
+    // Check any bits of bit 3-1 of I/O Base Register are writable.
+    // if so, it is assumed non-stardard I/O window alignment is supported by this bridge.
+    // Per spec, bit 3-1 of I/O Base Register are reserved bits, so its content can't be assumed.
+    //
+    Value = Temp ^ (BIT3 | BIT2 | BIT1);
+    PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, 0x1C, 1, &Value);
+    PciIo->Pci.Read (PciIo, EfiPciIoWidthUint8, 0x1C, 1, &Value);
+    PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, 0x1C, 1, &Temp);
+    Value = (Value ^ Temp) & (BIT3 | BIT2 | BIT1);
+    switch (Value) {
+      case BIT3:
+        PciIoDevice->BridgeIoAlignment = 0x7FF;
+        break;
+      case BIT3 | BIT2:
+        PciIoDevice->BridgeIoAlignment = 0x3FF;
+        break;
+      case BIT3 | BIT2 | BIT1:
+        PciIoDevice->BridgeIoAlignment = 0x1FF;
+        break;
+    }
+  }
+
   Status = BarExisted (
             PciIoDevice,
             0x24,

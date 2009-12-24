@@ -1428,7 +1428,7 @@ PciBridgeResourceAllocator (
   IoBridge = CreateResourceNode (
                Bridge,
                0,
-               0xFFF,
+               Bridge->BridgeIoAlignment,
                0,
                PciBarTypeIo16,
                PciResUsageTypical

@@ -803,14 +803,12 @@ CreateResourceMap (
       //
       // If the device has children, create a bridge resource node for this PPB
       // Note: For PPB, memory aperture is aligned with 1MB and IO aperture
-      // is aligned with 4KB
-      // This device is typically a bridge device like PPB and P2C
-      // Note: 0x1000 aligned
+      // is aligned with 4KB (smaller alignments may be supported).
       //
       IoBridge = CreateResourceNode (
                    Temp,
                    0,
-                   0xFFF,
+                   Temp->BridgeIoAlignment,
                    PPB_IO_RANGE,
                    PciBarTypeIo16,
                    PciResUsageTypical
