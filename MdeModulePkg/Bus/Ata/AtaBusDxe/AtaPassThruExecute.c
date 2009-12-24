@@ -409,6 +409,11 @@ TransferAtaDevice (
   EFI_ATA_PASS_THRU_COMMAND_PACKET  *Packet;
 
   //
+  // Ensure AtaDevice->Lba48Bit and IsWrite are valid boolean values 
+  //
+  ASSERT ((UINTN) AtaDevice->Lba48Bit < 2);
+  ASSERT ((UINTN) IsWrite < 2);
+  //
   // Prepare for ATA command block.
   //
   Acb = ZeroMem (&AtaDevice->Acb, sizeof (*Acb));
@@ -417,15 +422,15 @@ TransferAtaDevice (
   Acb->AtaCylinderLow = (UINT8) RShiftU64 (StartLba, 8);
   Acb->AtaCylinderHigh = (UINT8) RShiftU64 (StartLba, 16);
   Acb->AtaDeviceHead = (UINT8) (BIT7 | BIT6 | BIT5 | (AtaDevice->PortMultiplierPort << 4)); 
+  Acb->AtaSectorCount = (UINT8) TransferLength;
   if (AtaDevice->Lba48Bit) {
     Acb->AtaSectorNumberExp = (UINT8) RShiftU64 (StartLba, 24);
+    Acb->AtaCylinderLowExp = (UINT8) RShiftU64 (StartLba, 32);
+    Acb->AtaCylinderHighExp = (UINT8) RShiftU64 (StartLba, 40);
+    Acb->AtaSectorCountExp = (UINT8) (TransferLength >> 8);
   } else {
     Acb->AtaDeviceHead = (UINT8) (Acb->AtaDeviceHead | RShiftU64 (StartLba, 24));
   }
-  Acb->AtaCylinderLowExp = (UINT8) RShiftU64 (StartLba, 32);
-  Acb->AtaCylinderHighExp = (UINT8) RShiftU64 (StartLba, 40);
-  Acb->AtaSectorCount = (UINT8) TransferLength;
-  Acb->AtaSectorCountExp = (UINT8) (TransferLength >> 8);
 
   //
   // Prepare for ATA pass through packet.
@@ -475,6 +480,10 @@ AccessAtaDevice(
   UINTN                             TransferBlockNumber;
   UINTN                             BlockSize;
  
+  //
+  // Ensure AtaDevice->Lba48Bit is a valid boolean value 
+  //
+  ASSERT ((UINTN) AtaDevice->Lba48Bit < 2);
   MaxTransferBlockNumber = mMaxTransferBlockNumber[AtaDevice->Lba48Bit];
   BlockSize = AtaDevice->BlockMedia.BlockSize;
   do {
