@@ -1,6 +1,9 @@
 /** @file
   Debug Library based on report status code library.
 
+  Note that if the debug message length is larger than the maximum allowable
+  record length, then the debug message will be ignored directly.
+
   Copyright (c) 2006 - 2009, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -31,6 +34,9 @@
   the debug output device.
 
   If Format is NULL, then ASSERT().
+
+  If the length of the message string specificed by Format is larger than the maximum allowable
+  record length, then directly return and not print it.
 
   @param  ErrorLevel  The error level of the debug message.
   @param  Format      Format string for the debug message to print.
