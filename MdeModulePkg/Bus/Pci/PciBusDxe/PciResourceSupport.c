@@ -1047,31 +1047,59 @@ DegradeResource (
   IN PCI_RESOURCE_NODE *PMem64Node
   )
 {
-  BOOLEAN              HasOprom;
   PCI_IO_DEVICE        *Temp;
   LIST_ENTRY           *CurrentLink;
+  PCI_RESOURCE_NODE    *TempNode;
 
   //
-  // For RootBridge, PPB , P2C, go recursively to traverse all its children
-  // to find if this bridge and downstream has OptionRom.
+  // If any child device has both option ROM and 64-bit BAR, degrade its PMEM64/MEM64
+  // requests in case that if a legacy option ROM image can not access 64-bit resources.
   //
-  HasOprom = FALSE;
   CurrentLink = Bridge->ChildList.ForwardLink;
   while (CurrentLink != NULL && CurrentLink != &Bridge->ChildList) {
-
     Temp = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
     if (Temp->RomSize != 0) {
-      HasOprom = TRUE;
-      break;
+      if (!IsListEmpty (&Mem64Node->ChildList)) {      
+        CurrentLink = Mem64Node->ChildList.ForwardLink;
+        while (CurrentLink != &Mem64Node->ChildList) {
+          TempNode = RESOURCE_NODE_FROM_LINK (CurrentLink);
+
+          if (TempNode->PciDev == Temp) {
+            RemoveEntryList (CurrentLink);
+            InsertResourceNode (Mem32Node, TempNode);
+          }
+          CurrentLink = TempNode->Link.ForwardLink;
+        }        
+      }
+
+      if (!IsListEmpty (&PMem64Node->ChildList)) {      
+        CurrentLink = PMem64Node->ChildList.ForwardLink;
+        while (CurrentLink != &PMem64Node->ChildList) {
+          TempNode = RESOURCE_NODE_FROM_LINK (CurrentLink);
+
+          if (TempNode->PciDev == Temp) {
+            RemoveEntryList (CurrentLink);
+            InsertResourceNode (PMem32Node, TempNode);
+          }
+          CurrentLink = TempNode->Link.ForwardLink;
+        }        
+      }
+
     }
     CurrentLink = CurrentLink->ForwardLink;
   }
 
   //
-  // If bridge doesn't support Prefetchable
-  // memory64, degrade it to Prefetchable memory32
+  // If firmware is in 32-bit mode,
+  // then degrade PMEM64/MEM64 requests
   //
-  if (!BridgeSupportResourceDecode (Bridge, EFI_BRIDGE_PMEM64_DECODE_SUPPORTED)) {
+  if (sizeof (UINTN) <= 4) {
+    MergeResourceTree (
+      Mem32Node,
+      Mem64Node,
+      TRUE
+      );
+
     MergeResourceTree (
       PMem32Node,
       PMem64Node,
@@ -1079,31 +1107,38 @@ DegradeResource (
       );
   } else {
     //
-    // if no PMem32 request and no OptionRom request, still keep PMem64. Otherwise degrade to PMem32
+    // if the bridge does not support MEM64, degrade MEM64 to MEM32
     //
-    if ((PMem32Node != NULL && (PMem32Node->Length != 0 && Bridge->Parent != NULL)) || HasOprom) {
-      //
-      // Fixed the issue that there is no resource for 64-bit (above 4G)
-      //
+    if (!BridgeSupportResourceDecode (Bridge, EFI_BRIDGE_MEM64_DECODE_SUPPORTED)) {
+        MergeResourceTree (
+          Mem32Node,
+          Mem64Node,
+          TRUE
+          );
+    }
+
+    //
+    // if the bridge does not support PMEM64, degrade PMEM64 to PMEM32
+    //
+    if (!BridgeSupportResourceDecode (Bridge, EFI_BRIDGE_PMEM64_DECODE_SUPPORTED)) {
       MergeResourceTree (
         PMem32Node,
         PMem64Node,
         TRUE
         );
+    } 
+
+    //
+    // if both PMEM64 and PMEM32 requests from child devices, which can not be satisfied
+    // by a P2P bridge simultaneously, keep PMEM64 and degrade PMEM32 to MEM32.
+    //
+    if (!IsListEmpty (&PMem64Node->ChildList) && Bridge->Parent != NULL) {
+      MergeResourceTree (
+        Mem32Node,
+        PMem32Node,
+        TRUE
+        );
     }
-  }
-
-
-  //
-  // If bridge doesn't support Mem64
-  // degrade it to mem32
-  //
-  if (!BridgeSupportResourceDecode (Bridge, EFI_BRIDGE_MEM64_DECODE_SUPPORTED)) {
-    MergeResourceTree (
-      Mem32Node,
-      Mem64Node,
-      TRUE
-      );
   }
 
   //
@@ -1119,7 +1154,7 @@ DegradeResource (
   }
 
   //
-  // if bridge supports combined Pmem Mem decoding
+  // if root bridge supports combined Pmem Mem decoding
   // merge these two type of resource
   //
   if (BridgeSupportResourceDecode (Bridge, EFI_BRIDGE_PMEM_MEM_COMBINE_SUPPORTED)) {
@@ -1129,6 +1164,11 @@ DegradeResource (
       FALSE
       );
 
+    //
+    // No need to check if to degrade MEM64 after merge, because
+    // if there are PMEM64 still here, 64-bit decode should be supported
+    // by the root bride.
+    //
     MergeResourceTree (
       Mem64Node,
       PMem64Node,
