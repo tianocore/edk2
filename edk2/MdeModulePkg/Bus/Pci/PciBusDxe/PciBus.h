@@ -268,6 +268,12 @@ struct _PCI_IO_DEVICE {
   UINT32                                    SystemPageSize;
   UINT16                                    InitialVFs;
   UINT16                                    ReservedBusNum;
+  //
+  // Per PCI to PCI Bridge spec, I/O window is 4K aligned,
+  // but some chipsets support non-stardard I/O window aligments less than 4K.
+  // This field is used to support this case.
+  //
+  UINT16                                    BridgeIoAlignment;
 };
 
 #define PCI_IO_DEVICE_FROM_PCI_IO_THIS(a) \
