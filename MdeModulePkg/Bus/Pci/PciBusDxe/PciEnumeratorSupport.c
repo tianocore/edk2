@@ -481,11 +481,11 @@ GatherPpbInfo (
     // if so, it is assumed non-stardard I/O window alignment is supported by this bridge.
     // Per spec, bit 3-1 of I/O Base Register are reserved bits, so its content can't be assumed.
     //
-    Value = Temp ^ (BIT3 | BIT2 | BIT1);
+    Value = (UINT8)(Temp ^ (BIT3 | BIT2 | BIT1));
     PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, 0x1C, 1, &Value);
     PciIo->Pci.Read (PciIo, EfiPciIoWidthUint8, 0x1C, 1, &Value);
     PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, 0x1C, 1, &Temp);
-    Value = (Value ^ Temp) & (BIT3 | BIT2 | BIT1);
+    Value = (UINT8)((Value ^ Temp) & (BIT3 | BIT2 | BIT1));
     switch (Value) {
       case BIT3:
         PciIoDevice->BridgeIoAlignment = 0x7FF;
