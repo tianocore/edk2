@@ -219,12 +219,6 @@
 
 [Components.IA32]
   IntelFrameworkModulePkg/Universal/StatusCode/RuntimeDxe/StatusCodeRuntimeDxe.inf
-  IntelFrameworkModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf
-  IntelFrameworkModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe.inf
-  IntelFrameworkModulePkg/Universal/StatusCodeHandler/Smm/StatusCodeHandlerSmm.inf
 
 [Components.X64]
   IntelFrameworkModulePkg/Universal/StatusCode/RuntimeDxe/StatusCodeRuntimeDxe.inf
-  IntelFrameworkModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf
-  IntelFrameworkModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe.inf
-  IntelFrameworkModulePkg/Universal/StatusCodeHandler/Smm/StatusCodeHandlerSmm.inf  
