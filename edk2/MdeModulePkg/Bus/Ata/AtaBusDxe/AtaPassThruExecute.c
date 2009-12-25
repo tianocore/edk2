@@ -409,8 +409,9 @@ TransferAtaDevice (
   EFI_ATA_PASS_THRU_COMMAND_PACKET  *Packet;
 
   //
-  // Ensure AtaDevice->Lba48Bit and IsWrite are valid boolean values 
+  // Ensure AtaDevice->UdmaValid, AtaDevice->Lba48Bit and IsWrite are valid boolean values 
   //
+  ASSERT ((UINTN) AtaDevice->UdmaValid < 2);
   ASSERT ((UINTN) AtaDevice->Lba48Bit < 2);
   ASSERT ((UINTN) IsWrite < 2);
   //
