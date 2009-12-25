@@ -327,11 +327,15 @@
   MdeModulePkg/Universal/HiiResourcesSampleDxe/HiiResourcesSampleDxe.inf
   MdeModulePkg/Universal/LegacyRegion2Dxe/LegacyRegion2Dxe.inf
 
+  MdeModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf
+  MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe.inf
+
 [Components.IA32, Components.X64]
   MdeModulePkg/Universal/DebugSupportDxe/DebugSupportDxe.inf
   MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
   MdeModulePkg/Universal/Variable/EmuRuntimeDxe/EmuVariableRuntimeDxe.inf
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+  MdeModulePkg/Universal/StatusCodeHandler/Smm/StatusCodeHandlerSmm.inf
 
 
 [Components.IPF]
