@@ -166,10 +166,10 @@
 ################################################################################
 [PcdsFeatureFlag.common]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseHardSerial|TRUE
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|TRUE
 
 [PcdsFixedAtBuild.common]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1
   gEfiSioTokenSpaceGuid.PcdSerialRegisterBase|0x3F8
   gEfiSioTokenSpaceGuid.PcdSerialLineControl|0x07
   gEfiSioTokenSpaceGuid.PcdSerialBoudRate|115200
