@@ -227,14 +227,16 @@ Tcp4FlushPcb (
     RemoveEntryList (&Tcb->List);
 
     //
-    // Uninstall the device path protocl.
+    // Uninstall the device path protocol.
     //
-    gBS->UninstallProtocolInterface (
-           Sock->SockHandle,
-           &gEfiDevicePathProtocolGuid,
-           Sock->DevicePath
-           );
-    FreePool (Sock->DevicePath);
+    if (Sock->DevicePath != NULL) {
+      gBS->UninstallProtocolInterface (
+             Sock->SockHandle,
+             &gEfiDevicePathProtocolGuid,
+             Sock->DevicePath
+             );
+      FreePool (Sock->DevicePath);
+    }
 
     TcpSetVariableData (TcpProto->TcpService);
   }
