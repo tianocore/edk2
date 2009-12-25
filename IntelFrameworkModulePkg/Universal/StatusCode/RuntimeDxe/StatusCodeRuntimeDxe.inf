@@ -40,6 +40,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
@@ -73,14 +74,14 @@
   gEfiDataHubProtocolGuid                       ## SOMETIMES_CONSUMES (Needed if Data Hub is supported for status code.)
 
 [FeaturePcd]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeReplayIn
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeReplayIn
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseOEM
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseDataHub
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial
 
 [Pcd]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize |128| PcdStatusCodeUseMemory
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize |128| PcdStatusCodeUseMemory
 
 [Depex]
   TRUE

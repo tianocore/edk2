@@ -12,8 +12,6 @@
 
 **/
 
-#include <FrameworkDxe.h>
-
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/DebugLib.h>
 #include <Library/SmmServicesTableLib.h>

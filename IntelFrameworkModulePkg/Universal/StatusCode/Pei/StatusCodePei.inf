@@ -37,6 +37,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
@@ -63,12 +64,12 @@
 
 [FeaturePcd.common]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseOEM
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial
 
 
 [Pcd.common]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1|PcdStatusCodeUseMemory
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1|PcdStatusCodeUseMemory
 
 [Depex]
   TRUE

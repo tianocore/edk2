@@ -35,7 +35,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   PeimEntryPoint
@@ -54,11 +54,11 @@
   gEfiPeiRscHandlerPpiGuid                      ## CONSUMES
 
 [FeaturePcd.common]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial
 
 [Pcd.common]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1|PcdStatusCodeUseMemory
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1|PcdStatusCodeUseMemory
 
 [Depex]
   gEfiPeiRscHandlerPpiGuid
