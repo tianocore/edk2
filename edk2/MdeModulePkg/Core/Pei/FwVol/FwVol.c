@@ -455,26 +455,7 @@ FirmwareVolmeInfoPpiNotifyCallback (
   } else {
     DEBUG ((EFI_D_ERROR, "Fail to process FV %p because no corresponding EFI_FIRMWARE_VOLUME_PPI is found!\n", FvInfoPpi->FvInfo));
     
-    //
-    // If can not find EFI_FIRMWARE_VOLUME_PPI to process firmware to get FvHandle, 
-    // use the address of FV buffer as its handle.
-    //
-    FvHandle = FvInfoPpi->FvInfo;
-    
-    //
-    // Check whether the FV has already been processed.
-    //
-    for (FvIndex = 0; FvIndex < PrivateData->FvCount; FvIndex ++) {
-      if (PrivateData->Fv[FvIndex].FvHandle == FvHandle) {
-        DEBUG ((EFI_D_INFO, "The Fv %p has already been processed!\n", FvHandle));
-        return EFI_SUCCESS;
-      }
-    }    
-    
-    PrivateData->Fv[PrivateData->FvCount].FvHeader = (EFI_FIRMWARE_VOLUME_HEADER*) FvInfoPpi->FvInfo;
-    PrivateData->Fv[PrivateData->FvCount].FvPpi    = NULL;
-    PrivateData->Fv[PrivateData->FvCount].FvHandle = FvHandle;
-    PrivateData->FvCount ++;
+    AddUnknownFormatFvInfo (PrivateData, &FvInfoPpi->FvFormat, FvInfoPpi->FvInfo, FvInfoPpi->FvInfoSize);
   }
   
   return EFI_SUCCESS;
@@ -1440,3 +1421,217 @@ PeiReinitializeFv (
   }
 }  
 
+/**
+  Report the information for a new discoveried FV in unknown third-party format.
+  
+  If the EFI_PEI_FIRMWARE_VOLUME_PPI has not been installed for third-party FV format, but
+  the FV in this format has been discoveried, then this FV's information will be cached into 
+  PEI_CORE_INSTANCE's UnknownFvInfo array.
+  Also a notification would be installed for unknown third-party FV format guid, if EFI_PEI_FIRMWARE_VOLUME_PPI
+  is installed later by platform's PEIM, the original unknown third-party FV will be processed by
+  using new installed EFI_PEI_FIRMWARE_VOLUME_PPI.
+  
+  @param PrivateData  Point to instance of PEI_CORE_INSTANCE
+  @param Format       Point to the unknown third-party format guid.
+  @param FvInfo       Point to FvInfo buffer.
+  @param FvInfoSize   The size of FvInfo buffer.
+  
+  @retval EFI_OUT_OF_RESOURCES  The FV info array in PEI_CORE_INSTANCE has no more spaces.
+  @retval EFI_SUCCESS           Success to add the information for unknown FV.
+**/
+EFI_STATUS
+AddUnknownFormatFvInfo (
+  IN PEI_CORE_INSTANCE *PrivateData,
+  IN EFI_GUID          *Format,
+  IN VOID              *FvInfo,
+  IN UINT32            FvInfoSize
+  )
+{
+  PEI_CORE_UNKNOW_FORMAT_FV_INFO    *NewUnknownFv;
+  
+  if (PrivateData->UnknownFvInfoCount + 1 >= FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv)) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  
+  NewUnknownFv = &PrivateData->UnknownFvInfo[PrivateData->UnknownFvInfoCount];
+  PrivateData->UnknownFvInfoCount ++;
+  
+  CopyGuid (&NewUnknownFv->FvFormat, Format);
+  NewUnknownFv->FvInfo     = FvInfo;
+  NewUnknownFv->FvInfoSize = FvInfoSize;
+  NewUnknownFv->NotifyDescriptor.Flags  = (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST);
+  NewUnknownFv->NotifyDescriptor.Guid   = &NewUnknownFv->FvFormat;
+  NewUnknownFv->NotifyDescriptor.Notify = ThirdPartyFvPpiNotifyCallback;
+  
+  PeiServicesNotifyPpi (&NewUnknownFv->NotifyDescriptor);
+  return EFI_SUCCESS;
+}
+
+/**
+  Find the FV information according to third-party FV format guid.
+  
+  This routine also will remove the FV information found by given FV format guid from
+  PrivateData->UnknownFvInfo[].
+  
+  @param PrivateData      Point to instance of PEI_CORE_INSTANCE
+  @param Format           Point to given FV format guid
+  @param FvInfo           On return, the pointer of FV information buffer
+  @param FvInfoSize       On return, the size of FV information buffer.
+  
+  @retval EFI_NOT_FOUND  The FV is not found for new installed EFI_PEI_FIRMWARE_VOLUME_PPI
+  @retval EFI_SUCCESS    Success to find a FV which could be processed by new installed EFI_PEI_FIRMWARE_VOLUME_PPI.
+**/
+EFI_STATUS
+FindUnknownFormatFvInfo (
+  IN  PEI_CORE_INSTANCE *PrivateData,
+  IN  EFI_GUID          *Format,
+  OUT VOID              **FvInfo,
+  OUT UINT32            *FvInfoSize
+  )
+{
+  UINTN Index;
+  UINTN Index2;
+
+  Index = 0;
+  for (; Index < PrivateData->UnknownFvInfoCount; Index ++) {
+    if (CompareGuid (Format, &PrivateData->UnknownFvInfo[Index].FvFormat)) {
+      break;
+    }
+  }
+  
+  if (Index == PrivateData->UnknownFvInfoCount) {
+    return EFI_NOT_FOUND;
+  }
+  
+  *FvInfo     = PrivateData->UnknownFvInfo[Index].FvInfo;
+  *FvInfoSize = PrivateData->UnknownFvInfo[Index].FvInfoSize;
+  
+  //
+  // Remove an entry from UnknownFvInfo array.
+  //
+  Index2 = Index + 1;
+  for (;Index2 < PrivateData->UnknownFvInfoCount; Index2 ++, Index ++) {
+    CopyMem (&PrivateData->UnknownFvInfo[Index], &PrivateData->UnknownFvInfo[Index2], sizeof (PEI_CORE_UNKNOW_FORMAT_FV_INFO));
+  }
+  PrivateData->UnknownFvInfoCount --;
+  return EFI_SUCCESS;
+}  
+
+/**
+  Notification callback function for EFI_PEI_FIRMWARE_VOLUME_PPI.
+  
+  When a EFI_PEI_FIRMWARE_VOLUME_PPI is installed to support new FV format, this 
+  routine is called to process all discoveried FVs in this format.
+  
+  @param PeiServices       An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation
+  @param NotifyDescriptor  Address of the notification descriptor data structure.
+  @param Ppi               Address of the PPI that was installed.
+  
+  @retval EFI_SUCCESS  The notification callback is processed correctly.
+**/
+EFI_STATUS
+EFIAPI
+ThirdPartyFvPpiNotifyCallback (
+  IN EFI_PEI_SERVICES              **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR     *NotifyDescriptor,
+  IN VOID                          *Ppi
+  )
+{
+  PEI_CORE_INSTANCE            *PrivateData;
+  EFI_PEI_FIRMWARE_VOLUME_PPI  *FvPpi;
+  VOID                         *FvInfo;
+  UINT32                       FvInfoSize;
+  EFI_STATUS                   Status;
+  EFI_PEI_FV_HANDLE            FvHandle;
+  BOOLEAN                      IsProcessed;
+  UINTN                        FvIndex;
+  EFI_PEI_FILE_HANDLE          FileHandle;
+  VOID                         *DepexData;  
+  
+  PrivateData  = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
+  FvPpi = (EFI_PEI_FIRMWARE_VOLUME_PPI*) Ppi;
+  
+  do {
+    Status = FindUnknownFormatFvInfo (PrivateData, NotifyDescriptor->Guid, &FvInfo, &FvInfoSize);
+    if (EFI_ERROR (Status)) {
+      return EFI_SUCCESS;
+    }
+    
+    //
+    // Process new found FV and get FV handle.
+    //
+    Status = FvPpi->ProcessVolume (FvPpi, FvInfo, FvInfoSize, &FvHandle);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "Fail to process the FV 0x%p, FV may be corrupted!\n", FvInfo));
+      continue;
+    }
+
+    //
+    // Check whether the FV has already been processed.
+    //
+    IsProcessed = FALSE;
+    for (FvIndex = 0; FvIndex < PrivateData->FvCount; FvIndex ++) {
+      if (PrivateData->Fv[FvIndex].FvHandle == FvHandle) {
+        DEBUG ((EFI_D_INFO, "The Fv %p has already been processed!\n", FvInfo));
+        IsProcessed = TRUE;
+        break;
+      }
+    }
+  
+    if (IsProcessed) {
+      continue;
+    }
+    
+    //
+    // Update internal PEI_CORE_FV array.
+    //
+    PrivateData->Fv[PrivateData->FvCount].FvHeader = (EFI_FIRMWARE_VOLUME_HEADER*) FvInfo;
+    PrivateData->Fv[PrivateData->FvCount].FvPpi    = FvPpi;
+    PrivateData->Fv[PrivateData->FvCount].FvHandle = FvHandle;
+    DEBUG ((
+      EFI_D_INFO, 
+      "The %dth FV start address is 0x%11p, size is 0x%08x, handle is 0x%p\n", 
+      (UINT32) PrivateData->FvCount, 
+      (VOID *) FvInfo, 
+      FvInfoSize,
+      FvHandle
+      ));    
+    PrivateData->FvCount ++;
+
+    //
+    // Scan and process the new discoveried FV for EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE 
+    //
+    FileHandle = NULL;
+    do {
+      Status = FvPpi->FindFileByType (
+                        FvPpi,
+                        EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE,
+                        FvHandle,
+                        &FileHandle
+                       );
+      if (!EFI_ERROR (Status)) {
+        Status = FvPpi->FindSectionByType (
+                          FvPpi,
+                          EFI_SECTION_PEI_DEPEX,
+                          FileHandle,
+                          (VOID**)&DepexData
+                          );
+        if (!EFI_ERROR (Status)) {
+          if (!PeimDispatchReadiness (PeiServices, DepexData)) {
+            //
+            // Dependency is not satisfied.
+            //
+            continue;
+          }
+        }
+        
+        DEBUG ((EFI_D_INFO, "Found firmware volume Image File %p in FV[%d] %p\n", FileHandle, PrivateData->FvCount - 1, FvHandle));
+        ProcessFvFile (&PrivateData->Fv[PrivateData->FvCount - 1], FileHandle);
+      }
+    } while (FileHandle != NULL);
+  } while (TRUE);
+  
+  return EFI_SUCCESS;
+}
+
+  

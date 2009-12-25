@@ -235,4 +235,72 @@ FindFileEx (
   IN OUT    EFI_PEI_FV_HANDLE        *AprioriFile  OPTIONAL
   );
 
+/**
+  Report the information for a new discoveried FV in unknown format.
+  
+  If the EFI_PEI_FIRMWARE_VOLUME_PPI has not been install for specifical FV format, but
+  the FV in this FV format has been discoveried, then the information of this FV
+  will be cached into PEI_CORE_INSTANCE's UnknownFvInfo array.
+  Also a notification would be installed for unknown FV format guid, if EFI_PEI_FIRMWARE_VOLUME_PPI
+  is installed later by platform's PEIM, the original unknown FV will be processed by
+  using new installed EFI_PEI_FIRMWARE_VOLUME_PPI.
+  
+  @param PrivateData  Point to instance of PEI_CORE_INSTANCE
+  @param Format       Point to the unknown FV format guid.
+  @param FvInfo       Point to FvInfo buffer.
+  @param FvInfoSize   The size of FvInfo buffer.
+  
+  @retval EFI_OUT_OF_RESOURCES  The FV info array in PEI_CORE_INSTANCE has no more spaces.
+  @retval EFI_SUCCESS           Success to add the information for unknown FV.
+**/
+EFI_STATUS
+AddUnknownFormatFvInfo (
+  IN PEI_CORE_INSTANCE *PrivateData,
+  IN EFI_GUID          *Format,
+  IN VOID              *FvInfo,
+  IN UINT32            FvInfoSize
+  );
+  
+/**
+  Find the FV information according to FV format guid.
+  
+  This routine also will remove the FV information found by given FV format guid from
+  PrivateData->UnknownFvInfo[].
+  
+  @param PrivateData      Point to instance of PEI_CORE_INSTANCE
+  @param Format           Point to given FV format guid
+  @param FvInfo           On return, the pointer of FV information buffer in given FV format guid
+  @param FvInfoSize       On return, the size of FV information buffer.
+  
+  @retval EFI_NOT_FOUND  The FV is not found for new installed EFI_PEI_FIRMWARE_VOLUME_PPI
+  @retval EFI_SUCCESS    Success to find a FV which could be processed by new installed EFI_PEI_FIRMWARE_VOLUME_PPI.
+**/
+EFI_STATUS
+FindUnknownFormatFvInfo (
+  IN  PEI_CORE_INSTANCE *PrivateData,
+  IN  EFI_GUID          *Format,
+  OUT VOID              **FvInfo,
+  OUT UINT32            *FvInfoSize
+  );
+  
+/**
+  Notification callback function for EFI_PEI_FIRMWARE_VOLUME_PPI.
+  
+  When a EFI_PEI_FIRMWARE_VOLUME_PPI is installed to support new FV format, this 
+  routine is called to process all discoveried FVs in this format.
+  
+  @param PeiServices       An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation
+  @param NotifyDescriptor  Address of the notification descriptor data structure.
+  @param Ppi               Address of the PPI that was installed.
+  
+  @retval EFI_SUCCESS  The notification callback is processed correctly.
+**/
+EFI_STATUS
+EFIAPI
+ThirdPartyFvPpiNotifyCallback (
+  IN EFI_PEI_SERVICES              **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR     *NotifyDescriptor,
+  IN VOID                          *Ppi
+  );  
+  
 #endif 

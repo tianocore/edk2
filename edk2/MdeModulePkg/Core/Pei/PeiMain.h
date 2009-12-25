@@ -112,6 +112,13 @@ typedef struct {
   BOOLEAN                             ScanFv;
 } PEI_CORE_FV_HANDLE;
 
+typedef struct {
+  EFI_GUID                            FvFormat;
+  VOID                                *FvInfo;
+  UINT32                              FvInfoSize;
+  EFI_PEI_NOTIFY_DESCRIPTOR           NotifyDescriptor;
+} PEI_CORE_UNKNOW_FORMAT_FV_INFO;
+
 #define CACHE_SETION_MAX_NUMBER       0x10
 typedef struct {
   EFI_COMMON_SECTION_HEADER*          Section[CACHE_SETION_MAX_NUMBER];
@@ -145,7 +152,9 @@ typedef struct{
   /// The instance arrary for FVs which contains FFS and could be dispatched by PeiCore.
   ///
   PEI_CORE_FV_HANDLE                 Fv[FixedPcdGet32 (PcdPeiCoreMaxFvSupported)];
-
+  PEI_CORE_UNKNOW_FORMAT_FV_INFO     UnknownFvInfo[FixedPcdGet32 (PcdPeiCoreMaxFvSupported)];
+  UINTN                              UnknownFvInfoCount;
+  
   EFI_PEI_FILE_HANDLE                CurrentFvFileHandles[FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv)];
   UINTN                              AprioriCount;
   UINTN                              CurrentPeimFvCount;
