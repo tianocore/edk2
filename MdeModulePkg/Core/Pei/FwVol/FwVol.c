@@ -1630,8 +1630,4 @@ ThirdPartyFvPpiNotifyCallback (
       }
     } while (FileHandle != NULL);
   } while (TRUE);
-  
-  return EFI_SUCCESS;
 }
-
-  
