@@ -215,7 +215,7 @@ typedef struct {
   EFI_GUID                FileName;
 } EFI_HOB_FIRMWARE_VOLUME2;
 
-#define EFI_HOB_TYPE_LOAD_PEIM            0x000A
+#define EFI_HOB_TYPE_LOAD_PEIM_UNUSED     0x000A
 
 #endif
 
