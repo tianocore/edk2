@@ -29,7 +29,7 @@
 #define EFI_HOB_TYPE_CPU                  0x0006
 #define EFI_HOB_TYPE_MEMORY_POOL          0x0007
 #define EFI_HOB_TYPE_FV2                  0x0009
-#define EFI_HOB_TYPE_LOAD_PEIM            0x000A
+#define EFI_HOB_TYPE_LOAD_PEIM_UNUSED     0x000A
 #define EFI_HOB_TYPE_UEFI_CAPSULE         0x000B
 #define EFI_HOB_TYPE_UNUSED               0xFFFE
 #define EFI_HOB_TYPE_END_OF_HOB_LIST      0xFFFF
