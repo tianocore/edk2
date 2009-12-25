@@ -131,6 +131,14 @@
   ## Include/Guid/StatusCodeCallbackGuid.h
   gStatusCodeCallbackGuid   = {0xe701458c, 0x4900, 0x4ca5, {0xb7, 0x72, 0x3d, 0x37, 0x94, 0x9f, 0x79, 0x27}}
 
+  ## GUID identifies status code records HOB that originate from the PEI status code
+  #  Include/Guid/MemoryStatusCodeRecord.h
+  gMemoryStatusCodeRecordGuid     = { 0x060CC026, 0x4C0D, 0x4DDA, { 0x8F, 0x41, 0x59, 0x5F, 0xEF, 0x00, 0xA5, 0x02 }}
+
+  ## GUID used to pass DEBUG() macro information through the Status Code Protocol and Status Code PPI
+  #  Include/Guid/StatusCodeDataTypeDebug.h
+  gEfiStatusCodeDataTypeDebugGuid  = { 0x9A4E9246, 0xD553, 0x11D5, { 0x87, 0xE2, 0x00, 0x06, 0x29, 0x45, 0xC3, 0xB9 }}
+
 [Protocols.common]
   ## Load File protocol provides capability to load and unload EFI image into memory and execute it.
   #  Include/Protocol/LoadPe32Image.h
@@ -247,6 +255,15 @@
   ## This PCD specifies whether the PCI bus driver probes non-standard, 
   #  such as 2K/1K/512, granularity for PCI to PCI bridge I/O window.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciBridgeIoAlignmentProbe|FALSE|BOOLEAN|0x10000047
+  ## This PCD specifies whether StatusCode is reported via Serial port.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|TRUE|BOOLEAN|0x00010022
+
+  ## This PCD specifies whether StatusCode is stored in memory.
+  #  The memory is boot time memory in PEI Phase and is runtime memory in DXE Phase.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory|FALSE|BOOLEAN|0x00010023
+
+  ## This PCD specifies whether Peiphase StatusCode is replayed in DxePhase.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeReplayIn|FALSE|BOOLEAN|0x0001002d
 
 [PcdsFeatureFlag.IA32]
   ##
@@ -378,4 +395,10 @@
 
   ## Null-terminated Unicode string that contains the date the formware was released
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareReleaseDateString|L""|VOID*|0x00010053
+
+  ## PcdStatusCodeMemorySize is used when PcdStatusCodeUseMemory is set to true
+  #  (PcdStatusCodeMemorySize * KBytes) is the total taken memory size.
+  #  The default value in PeiPhase is 1 KBytes.
+  #  The default value in DxePhase is 128 KBytes.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1|UINT16|0x00010054
 
