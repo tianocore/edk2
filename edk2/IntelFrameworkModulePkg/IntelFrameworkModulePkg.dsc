@@ -136,7 +136,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable|FALSE
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|FALSE
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSerialUseHalfHandshake|FALSE
 
 [PcdsFixedAtBuild.common]
@@ -159,10 +159,10 @@
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|0
 
 [PcdsDynamicDefault.PEIM.DEFAULT]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1
 
 [PcdsDynamicDefault.DXE_RUNTIME_DRIVER.DEFAULT]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|4
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|4
 
 [PcdsFixedAtBuild.IPF]
   gEfiMdePkgTokenSpaceGuid.PcdIoBlockBaseAddressForIpf|0x0ffffc000000

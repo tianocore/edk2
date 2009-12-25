@@ -35,7 +35,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   SerialPortLib
@@ -51,7 +51,6 @@
   SynchronizationLib
 
 [Guids]
-  gEfiStatusCodeDataTypeDebugGuid               ## SOMETIMES_CONSUMES (Needed if Data Hub is supported for status code.)
   gMemoryStatusCodeRecordGuid                   ## CONSUMES ## HOB
   gEfiEventVirtualAddressChangeGuid             ## CONSUMES ## Event
   gEfiEventExitBootServicesGuid                 ## CONSUMES ## Event
@@ -60,12 +59,12 @@
   gEfiRscHandlerProtocolGuid                    ## CONSUMES
 
 [FeaturePcd]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeReplayIn
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeReplayIn
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial
 
 [Pcd]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize |128| PcdStatusCodeUseMemory
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize |128| PcdStatusCodeUseMemory
 
 [Depex]
   gEfiRscHandlerProtocolGuid
