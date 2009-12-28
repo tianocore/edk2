@@ -1,4 +1,4 @@
-/**@file
+/** @file
   Common filling functions used in translating Datahub's record
   to PI SMBIOS's record.
   
@@ -105,7 +105,7 @@ SmbiosFldCacheType10 (
   @param StructureNode The structure node whose structure buffer is to be enlarged.
   @param NewLength     The new length of SMBIOS record which does not include unformat area.
   @param OldBufferSize The old size of SMBIOS record buffer.
-  @param NewSize       The new size is targeted for enlarged.
+  @param NewBufferSize The new size is targeted for enlarged.
   
   @retval EFI_OUT_OF_RESOURCES  No more memory to allocate new record
   @retval EFI_SUCCESS           Success to enlarge the record buffer size.
@@ -437,7 +437,7 @@ SmbiosFldInterLink (
     // Hang this in the link data fixup node
     //
     LinkDataFixupNode = AllocateZeroPool (sizeof (SMBIOS_LINK_DATA_FIXUP_NODE));
-    if (!LinkDataFixupNode) {
+    if (LinkDataFixupNode == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
 

@@ -1,4 +1,4 @@
-/**@file
+/** @file
   Translate the DataHub records via EFI_DATA_HUB_PROTOCOL to Smbios recorders 
   via EFI_SMBIOS_PROTOCOL.
   
@@ -168,7 +168,7 @@ SmbiosProcessDataRecord (
       //
       StructureNode = AllocateZeroPool (sizeof (SMBIOS_STRUCTURE_NODE));
 
-      if (!StructureNode) {
+      if (StructureNode == NULL) {
         goto Done;
       }
 
@@ -268,7 +268,7 @@ SmbiosProcessDataRecord (
       // record data needs to be transformed to be filled into the field,
       // so let the FieldFillingFunction do it.
       //
-      if (!(Conversion->FieldFillingFunction)) {
+      if (Conversion->FieldFillingFunction == NULL) {
         //
         // Invalid Conversion Table Entry
         //
@@ -297,7 +297,7 @@ SmbiosProcessDataRecord (
       // Both field offset and field content are determined by
       // FieldFillingFunction
       //
-      if (!(Conversion->FieldFillingFunction)) {
+      if (Conversion->FieldFillingFunction == NULL) {
         //
         // Invalid Conversion Table Entry
         //
@@ -327,7 +327,7 @@ SmbiosProcessDataRecord (
       // FieldFillingFunction and the function accepts the whole data record
       // including the data header
       //
-      if (!(Conversion->FieldFillingFunction)) {
+      if (Conversion->FieldFillingFunction == NULL) {
         //
         // Invalid Conversion Table Entry
         //
