@@ -243,6 +243,7 @@ define GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x00020000 -DPI_S
   EdkCompatibilityPkg/Compatibility/UcOnUc2Thunk/UcOnUc2Thunk.inf
   EdkCompatibilityPkg/Compatibility/PrintThunk/PrintThunk.inf
   EdkCompatibilityPkg/Compatibility/LegacyRegion2OnLegacyRegionThunk/LegacyRegion2OnLegacyRegionThunk.inf
+  EdkCompatibilityPkg/Compatibility/DataHubSmBiosRecordsOnPiSmBiosThunk/DataHubSmBiosRecordsOnPiSmBiosThunk.inf
   EdkCompatibilityPkg/Compatibility/CpuIo2OnCpuIoThunk/CpuIo2OnCpuIoThunk.inf
 
   #
