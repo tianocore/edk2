@@ -331,7 +331,7 @@ SmbiosFldMemoryType3 (
   }
 
   MemoryDeviceSize = MemoryDeviceSize & 0x7fff;
-  if (MemoryDeviceSize != 0 && MemoryDeviceSizeUnitMega == FALSE) {
+  if (MemoryDeviceSize != 0 && !MemoryDeviceSizeUnitMega) {
     MemoryDeviceSize |= 0x8000;
   }
 
