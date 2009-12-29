@@ -398,48 +398,158 @@ public:
   }
 };
 
-static CIfrQuestionHeader *gCurrentQuestion  = NULL;
-static CIfrObj            *gCurrentIfrOpcode = NULL;
-
 /*
  * The definition of CIfrMinMaxStepData
  */
 class CIfrMinMaxStepData {
 private:
   MINMAXSTEP_DATA *mMinMaxStepData;
+  BOOLEAN         ValueIsSet;
+  BOOLEAN         IsNumeric;
 
 public:
-  CIfrMinMaxStepData (MINMAXSTEP_DATA *DataAddr) : mMinMaxStepData (DataAddr) {
+  CIfrMinMaxStepData (MINMAXSTEP_DATA *DataAddr, BOOLEAN NumericOpcode=FALSE) : mMinMaxStepData (DataAddr) {
     mMinMaxStepData->u64.MinValue = 0;
     mMinMaxStepData->u64.MaxValue = 0;
     mMinMaxStepData->u64.Step     = 0;
+    ValueIsSet = FALSE;
+    IsNumeric = NumericOpcode;
   }
 
   VOID SetMinMaxStepData (IN UINT64 MinValue, IN UINT64 MaxValue, IN UINT64 Step) {
-    mMinMaxStepData->u64.MinValue = MinValue;
-    mMinMaxStepData->u64.MaxValue = MaxValue;
-    mMinMaxStepData->u64.Step     = Step;
+    if (!ValueIsSet) {
+      mMinMaxStepData->u64.MinValue = MinValue;
+      mMinMaxStepData->u64.MaxValue = MaxValue;
+      ValueIsSet = TRUE;
+    } else {
+      if (MinValue < mMinMaxStepData->u64.MinValue) {
+        mMinMaxStepData->u64.MinValue = MinValue;
+      }
+      if (MaxValue > mMinMaxStepData->u64.MaxValue) {
+        mMinMaxStepData->u64.MaxValue = MaxValue;
+      }
+    }
+    mMinMaxStepData->u64.Step = Step;
   }
 
   VOID SetMinMaxStepData (IN UINT32 MinValue, IN UINT32 MaxValue, IN UINT32 Step) {
-    mMinMaxStepData->u32.MinValue = MinValue;
-    mMinMaxStepData->u32.MaxValue = MaxValue;
-    mMinMaxStepData->u32.Step     = Step;
+    if (!ValueIsSet) {
+      mMinMaxStepData->u32.MinValue = MinValue;
+      mMinMaxStepData->u32.MaxValue = MaxValue;
+      ValueIsSet = TRUE;
+    } else {
+      if (MinValue < mMinMaxStepData->u32.MinValue) {
+        mMinMaxStepData->u32.MinValue = MinValue;
+      }
+      if (MaxValue > mMinMaxStepData->u32.MaxValue) {
+        mMinMaxStepData->u32.MaxValue = MaxValue;
+      }
+    }
+    mMinMaxStepData->u32.Step = Step;
   }
 
   VOID SetMinMaxStepData (IN UINT16 MinValue, IN UINT16 MaxValue, IN UINT16 Step) {
-    mMinMaxStepData->u16.MinValue = MinValue;
-    mMinMaxStepData->u16.MaxValue = MaxValue;
-    mMinMaxStepData->u16.Step     = Step;
+    if (!ValueIsSet) {
+      mMinMaxStepData->u16.MinValue = MinValue;
+      mMinMaxStepData->u16.MaxValue = MaxValue;
+      ValueIsSet = TRUE;
+    } else {
+      if (MinValue < mMinMaxStepData->u16.MinValue) {
+        mMinMaxStepData->u16.MinValue = MinValue;
+      }
+      if (MaxValue > mMinMaxStepData->u16.MaxValue) {
+        mMinMaxStepData->u16.MaxValue = MaxValue;
+      }
+    }
+    mMinMaxStepData->u16.Step = Step;
   }
 
   VOID SetMinMaxStepData (IN UINT8 MinValue, IN UINT8 MaxValue, IN UINT8 Step) {
-    mMinMaxStepData->u8.MinValue = MinValue;
-    mMinMaxStepData->u8.MaxValue = MaxValue;
-    mMinMaxStepData->u8.Step     = Step;
+    if (!ValueIsSet) {
+      mMinMaxStepData->u8.MinValue = MinValue;
+      mMinMaxStepData->u8.MaxValue = MaxValue;
+      ValueIsSet = TRUE;
+    } else {
+      if (MinValue < mMinMaxStepData->u8.MinValue) {
+        mMinMaxStepData->u8.MinValue = MinValue;
+      }
+      if (MaxValue > mMinMaxStepData->u8.MaxValue) {
+        mMinMaxStepData->u8.MaxValue = MaxValue;
+      }
+    }
+    mMinMaxStepData->u8.Step = Step;
   }
 
+  UINT64 GetMinData (UINT8 VarType) {
+    UINT64 MinValue = 0;
+    switch (VarType) {
+    case EFI_IFR_TYPE_NUM_SIZE_64:
+      MinValue = mMinMaxStepData->u64.MinValue;
+      break;
+    case EFI_IFR_TYPE_NUM_SIZE_32:
+      MinValue = (UINT64) mMinMaxStepData->u32.MinValue;
+      break;
+    case EFI_IFR_TYPE_NUM_SIZE_16:
+      MinValue = (UINT64) mMinMaxStepData->u16.MinValue;
+      break;
+    case EFI_IFR_TYPE_NUM_SIZE_8:
+      MinValue = (UINT64) mMinMaxStepData->u8.MinValue;
+      break;
+    default:
+      break;
+    }
+    return MinValue;
+  }
+
+  UINT64 GetMaxData (UINT8 VarType) {
+    UINT64 MaxValue = 0;
+    switch (VarType) {
+    case EFI_IFR_TYPE_NUM_SIZE_64:
+      MaxValue = mMinMaxStepData->u64.MaxValue;
+      break;
+    case EFI_IFR_TYPE_NUM_SIZE_32:
+      MaxValue = (UINT64) mMinMaxStepData->u32.MaxValue;
+      break;
+    case EFI_IFR_TYPE_NUM_SIZE_16:
+      MaxValue = (UINT64) mMinMaxStepData->u16.MaxValue;
+      break;
+    case EFI_IFR_TYPE_NUM_SIZE_8:
+      MaxValue = (UINT64) mMinMaxStepData->u8.MaxValue;
+      break;
+    default:
+      break;
+    }
+    return MaxValue;
+  }
+
+  UINT64 GetStepData (UINT8 VarType) {
+    UINT64 MaxValue = 0;
+    switch (VarType) {
+    case EFI_IFR_TYPE_NUM_SIZE_64:
+      MaxValue = mMinMaxStepData->u64.Step;
+      break;
+    case EFI_IFR_TYPE_NUM_SIZE_32:
+      MaxValue = (UINT64) mMinMaxStepData->u32.Step;
+      break;
+    case EFI_IFR_TYPE_NUM_SIZE_16:
+      MaxValue = (UINT64) mMinMaxStepData->u16.Step;
+      break;
+    case EFI_IFR_TYPE_NUM_SIZE_8:
+      MaxValue = (UINT64) mMinMaxStepData->u8.Step;
+      break;
+    default:
+      break;
+    }
+    return MaxValue;
+  }
+
+  BOOLEAN IsNumericOpcode () {
+    return IsNumeric;
+  }
 };
+
+static CIfrQuestionHeader *gCurrentQuestion  = NULL;
+static CIfrMinMaxStepData *gCurrentMinMaxData = NULL;
 
 /*
  * The definition of all of the UEFI IFR Objects
@@ -979,15 +1089,15 @@ public:
   CIfrNumeric () : CIfrObj (EFI_IFR_NUMERIC_OP, (CHAR8 **)&mNumeric),
                    CIfrOpHeader (EFI_IFR_NUMERIC_OP, &mNumeric->Header),
                    CIfrQuestionHeader (&mNumeric->Question),
-                   CIfrMinMaxStepData (&mNumeric->data) {
+                   CIfrMinMaxStepData (&mNumeric->data, TRUE) {
     mNumeric->Flags  = EFI_IFR_NUMERIC_SIZE_1 | EFI_IFR_DISPLAY_UINT_DEC;
-    gCurrentQuestion  = this;
-    gCurrentIfrOpcode = this;
+    gCurrentQuestion   = this;
+    gCurrentMinMaxData = this;
   }
 
   ~CIfrNumeric () {
-    gCurrentQuestion  = NULL;
-    gCurrentIfrOpcode = NULL;
+    gCurrentQuestion   = NULL;
+    gCurrentMinMaxData = NULL;
   }
 
   EFI_VFR_RETURN_CODE SetFlags (IN UINT8 HFlags, IN UINT8 LFlags) {
@@ -1017,13 +1127,13 @@ public:
                  CIfrQuestionHeader (&mOneOf->Question),
                  CIfrMinMaxStepData (&mOneOf->data) {
     mOneOf->Flags    = 0;
-    gCurrentQuestion  = this;
-    gCurrentIfrOpcode = this;
+    gCurrentQuestion   = this;
+    gCurrentMinMaxData = this;
   }
 
   ~CIfrOneOf () {
-    gCurrentQuestion  = NULL;
-    gCurrentIfrOpcode = NULL;
+    gCurrentQuestion   = NULL;
+    gCurrentMinMaxData = NULL;
   }
 
   EFI_VFR_RETURN_CODE SetFlags (IN UINT8 HFlags, IN UINT8 LFlags) {
@@ -1769,6 +1879,24 @@ public:
   ) : CIfrObj (EFI_IFR_THIS_OP, (CHAR8 **)&mThis),
       CIfrOpHeader (EFI_IFR_THIS_OP, &mThis->Header) {
     SetLineNo (LineNo);
+  }
+};
+
+class CIfrSecurity : public CIfrObj, public CIfrOpHeader {
+private:
+  EFI_IFR_SECURITY *mSecurity;
+
+public:
+  CIfrSecurity (
+  IN UINT32 LineNo
+  ) : CIfrObj (EFI_IFR_SECURITY_OP, (CHAR8 **)&mSecurity),
+      CIfrOpHeader (EFI_IFR_SECURITY_OP, &mSecurity->Header) {
+    SetLineNo (LineNo);
+    memset (&mSecurity->Permissions, 0, sizeof (EFI_GUID));
+  }
+
+  VOID SetPermissions (IN EFI_GUID *Permissions) {
+    memcpy (&mSecurity->Permissions, Permissions, sizeof (EFI_GUID));
   }
 };
 

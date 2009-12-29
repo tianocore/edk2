@@ -1265,9 +1265,9 @@ def MyOptionParser():
     Parser.add_option("-d", "--debug", action="store", type="int", help="Enable debug messages at specified level.")
     Parser.add_option("-D", "--define", action="append", type="string", dest="Macros", help="Macro: \"Name [= Value]\".")
 
-    Parser.add_option("-y", "--report-file", action="store", dest="ReportFile", help="Put build report in specified file.")
+    Parser.add_option("-y", "--report-file", action="store", dest="ReportFile", help="Create/overwrite the report to the specified filename.")
     Parser.add_option("-Y", "--report-type", action="append", type="choice", choices=['ALL','PCD',], dest="ReportType",
-        help="Flags that control the type of build report to generate.  Must be one of [ALL, PCD].  To specify more flags, please repeat this option.")
+        help="Flags that control the type of build report to generate.  Must be one of: [ALL, PCD].  To specify more than one flag, repeat this option on the command line.")
 
     (Opt, Args)=Parser.parse_args()
     return (Opt, Args)

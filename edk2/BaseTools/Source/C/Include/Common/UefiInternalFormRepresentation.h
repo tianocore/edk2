@@ -674,6 +674,7 @@ typedef union {
 #define EFI_IFR_DEFAULTSTORE_OP        0x5C
 #define EFI_IFR_CATENATE_OP            0x5E
 #define EFI_IFR_GUID_OP                0x5F
+#define EFI_IFR_SECURITY_OP            0x60
 
 
 typedef struct _EFI_IFR_OP_HEADER {
@@ -1275,6 +1276,17 @@ typedef struct _EFI_IFR_SPAN {
   EFI_IFR_OP_HEADER        Header;
   UINT8                    Flags;
 } EFI_IFR_SPAN;
+
+typedef struct _EFI_IFR_SECURITY {
+  ///
+  /// Standard opcode header, where Header.Op = EFI_IFR_SECURITY_OP.
+  ///
+  EFI_IFR_OP_HEADER        Header;
+  ///
+  /// Security permission level.
+  ///
+  EFI_GUID                 Permissions;
+} EFI_IFR_SECURITY;
 
 //
 // Keyboard Package

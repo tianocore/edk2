@@ -134,11 +134,11 @@ Returns:
   fprintf (stdout, "  -m logfile, --map logfile\n\
                         Logfile is the output fv map file name. if it is not\n\
                         given, the FvName.map will be the default map file name\n"); 
-  fprintf (stdout, "  -g Guid, --guid GuidValue\n\
+  fprintf (stdout, "  -g Guid, --guid Guid\n\
                         GuidValue is one specific capsule guid value\n\
                         or fv file system guid value.\n\
                         Its format is xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx\n");
-  fprintf (stdout, "  --FvNameGuid          GuidValue is the Fv Name Guid value.\n\
+  fprintf (stdout, "  --FvNameGuid Guid     Guid is used to specify Fv Name.\n\
                         Its format is xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx\n");
   fprintf (stdout, "  --capflag CapFlag     Capsule Reset Flag can be PersistAcrossReset,\n\
                         or PopulateSystemTable or InitiateReset or not set\n");

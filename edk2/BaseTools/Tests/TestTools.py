@@ -44,6 +44,11 @@ def MakeTheTestSuite(localItems):
 def GetBaseToolsPath():
     if sys.platform in ('win32', 'win64'):
         return os.path.join(BaseToolsDir, 'Bin', sys.platform.title())
+    elif sys.platform in ('cygwin'):
+        uname = os.popen('uname -sm').read().strip()
+        for char in (' ', '/'):
+            uname = uname.replace(char, '-')
+        return os.path.join(BaseToolsDir, 'Bin', uname)
     else:
         uname = os.popen('uname -sm').read().strip()
         for char in (' ', '/'):

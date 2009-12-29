@@ -110,6 +110,7 @@ Returns:
   }
 
   *FvHeader = mFvHeader;
+  *FvLength = mFvLength;
   return EFI_SUCCESS;
 }
 
@@ -200,7 +201,7 @@ Returns:
   //
   // Get next file, compensate for 8 byte alignment if necessary.
   //
-  *NextFile = (EFI_FFS_FILE_HEADER *) (((UINTN) CurrentFile + GetLength (CurrentFile->Size) + 0x07) & (-1 << 3));
+  *NextFile = (EFI_FFS_FILE_HEADER *) ((((UINTN) CurrentFile - (UINTN) mFvHeader + GetLength (CurrentFile->Size) + 0x07) & (-1 << 3)) + (UINT8 *) mFvHeader);
 
   //
   // Verify file is in this FV.

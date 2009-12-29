@@ -938,7 +938,7 @@ Returns:
       // Verify string is a integrator number
       //
       for (Index = 0; Index < strlen (argv[1]); Index++) {
-        if ((argv[1][Index] != '-') && (isdigit (argv[1][Index]) == 0)) {
+        if ((argv[1][Index] != '-') && (isdigit ((int)argv[1][Index]) == 0)) {
           Error (NULL, 0, 1003, "Invalid option value", "%s = %s", argv[0], argv[1]);
           goto Finish;
         }

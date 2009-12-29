@@ -2975,7 +2975,7 @@ Returns:
         return EFI_OUT_OF_RESOURCES;
       }
       memset ((VOID *) MemoryImagePointer, 0, (UINTN) ImageContext.ImageSize + ImageContext.SectionAlignment);
-      ImageContext.ImageAddress = ((UINTN) MemoryImagePointer + ImageContext.SectionAlignment - 1) & (~(ImageContext.SectionAlignment - 1));
+      ImageContext.ImageAddress = ((UINTN) MemoryImagePointer + ImageContext.SectionAlignment - 1) & (~((INT64)ImageContext.SectionAlignment - 1));
       
       Status =  PeCoffLoaderLoadImage (&ImageContext);
       if (EFI_ERROR (Status)) {
