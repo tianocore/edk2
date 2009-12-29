@@ -36,7 +36,7 @@
 [Packages]
   Nt32Pkg/Nt32Pkg.dec
   MdePkg/MdePkg.dec
-  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   DebugLib

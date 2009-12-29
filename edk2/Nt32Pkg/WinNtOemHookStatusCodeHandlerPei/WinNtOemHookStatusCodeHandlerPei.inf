@@ -35,7 +35,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   Nt32Pkg/Nt32Pkg.dec
 
 [LibraryClasses]
