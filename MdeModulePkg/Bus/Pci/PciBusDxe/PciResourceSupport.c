@@ -1048,45 +1048,46 @@ DegradeResource (
   )
 {
   PCI_IO_DEVICE        *Temp;
-  LIST_ENTRY           *CurrentLink;
+  LIST_ENTRY           *ChildDeviceLink;
+  LIST_ENTRY           *ChildNodeLink;
   PCI_RESOURCE_NODE    *TempNode;
 
   //
   // If any child device has both option ROM and 64-bit BAR, degrade its PMEM64/MEM64
   // requests in case that if a legacy option ROM image can not access 64-bit resources.
   //
-  CurrentLink = Bridge->ChildList.ForwardLink;
-  while (CurrentLink != NULL && CurrentLink != &Bridge->ChildList) {
-    Temp = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
+  ChildDeviceLink = Bridge->ChildList.ForwardLink;
+  while (ChildDeviceLink != NULL && ChildDeviceLink != &Bridge->ChildList) {
+    Temp = PCI_IO_DEVICE_FROM_LINK (ChildDeviceLink);
     if (Temp->RomSize != 0) {
       if (!IsListEmpty (&Mem64Node->ChildList)) {      
-        CurrentLink = Mem64Node->ChildList.ForwardLink;
-        while (CurrentLink != &Mem64Node->ChildList) {
-          TempNode = RESOURCE_NODE_FROM_LINK (CurrentLink);
+        ChildNodeLink = Mem64Node->ChildList.ForwardLink;
+        while (ChildNodeLink != &Mem64Node->ChildList) {
+          TempNode = RESOURCE_NODE_FROM_LINK (ChildNodeLink);
 
           if (TempNode->PciDev == Temp) {
-            RemoveEntryList (CurrentLink);
+            RemoveEntryList (ChildNodeLink);
             InsertResourceNode (Mem32Node, TempNode);
           }
-          CurrentLink = TempNode->Link.ForwardLink;
+          ChildNodeLink = TempNode->Link.ForwardLink;
         }        
       }
 
       if (!IsListEmpty (&PMem64Node->ChildList)) {      
-        CurrentLink = PMem64Node->ChildList.ForwardLink;
-        while (CurrentLink != &PMem64Node->ChildList) {
-          TempNode = RESOURCE_NODE_FROM_LINK (CurrentLink);
+        ChildNodeLink = PMem64Node->ChildList.ForwardLink;
+        while (ChildNodeLink != &PMem64Node->ChildList) {
+          TempNode = RESOURCE_NODE_FROM_LINK (ChildNodeLink);
 
           if (TempNode->PciDev == Temp) {
-            RemoveEntryList (CurrentLink);
+            RemoveEntryList (ChildNodeLink);
             InsertResourceNode (PMem32Node, TempNode);
           }
-          CurrentLink = TempNode->Link.ForwardLink;
+          ChildNodeLink = TempNode->Link.ForwardLink;
         }        
       }
 
     }
-    CurrentLink = CurrentLink->ForwardLink;
+    ChildDeviceLink = ChildDeviceLink->ForwardLink;
   }
 
   //
