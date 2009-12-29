@@ -32,4 +32,3 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
