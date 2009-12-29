@@ -12,8 +12,6 @@
 
 **/
 
-#include <FrameworkPei.h>
-
 #include <Guid/StatusCodeDataTypeId.h>
 #include <Guid/StatusCodeDataTypeDebug.h>
 
