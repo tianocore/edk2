@@ -1094,7 +1094,12 @@ class PlatformAutoGen(AutoGen):
         # for overridding library instances with module specific setting
         PlatformModule = self.Platform.Modules[str(Module)]
 
-        # add forced library instance
+        # add forced library instances (specified under LibraryClasses sections)
+        for LibraryClass in self.Platform.LibraryClasses.GetKeys():
+            if LibraryClass.startswith("NULL"):
+                Module.LibraryClasses[LibraryClass] = self.Platform.LibraryClasses[LibraryClass]
+
+        # add forced library instances (specified in module overrides)
         for LibraryClass in PlatformModule.LibraryClasses:
             if LibraryClass.startswith("NULL"):
                 Module.LibraryClasses[LibraryClass] = PlatformModule.LibraryClasses[LibraryClass]
@@ -1170,7 +1175,7 @@ class PlatformAutoGen(AutoGen):
             M = LibraryInstance[LibraryClassName]
             LibraryList.append(M)
             if ConsumedByList[M] == []:
-                Q.insert(0, M)
+                Q.append(M)
 
         #
         # start the  DAG algorithm
@@ -1939,7 +1944,7 @@ class ModuleAutoGen(AutoGen):
             if Source != File:
                 CreateDirectory(Source.Dir)
 
-            if File.IsBinary and File == Source:
+            if File.IsBinary and File == Source and self._BinaryFileList != None and File in self._BinaryFileList:
                 RuleObject = self.BuildRules[TAB_DEFAULT_BINARY_FILE]
             elif FileType in self.BuildRules:
                 RuleObject = self.BuildRules[FileType]

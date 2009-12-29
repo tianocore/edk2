@@ -25,14 +25,15 @@
 #
 import sys
 import os
-import subprocess 
+import subprocess
+import pipes
 
 #
 # Convert using cygpath command line tool
 # Currently not used, but just in case we need it in the future
 #
 def ConvertCygPathToDosViacygpath(CygPath):
-  p = subprocess.Popen("cygpath -m " + CygPath, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
+  p = subprocess.Popen("cygpath -m " + pipes.quote(CygPath), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
   return p.stdout.read().strip()
 
 #
@@ -45,32 +46,36 @@ def ConvertCygPathToDos(CygPath):
   else:
     DosPath = CygPath
   
-  # need the extra \\ as we are making a string to pass to a command
-  return DosPath.replace('/','\\\\')
+  # pipes.quote will add the extra \\ for us.
+  return DosPath.replace('/','\\')
 
 
+# we receive our options as a list, but we will be passing them to the shell as a line
+# this means we have to requote things as they will get one round of unquoting.
+# we can't set "shell=False" because we are running commands from the PATH and
+# if you don't use the shell you don't get a PATH search.
 def main(argv):
 
   # use 1st argument as name of tool to call
-  Command = sys.argv[1]
+  Command = pipes.quote(sys.argv[1]);
   
   ExceptionList = ["/interwork"]
   
   for arg in argv:
     if arg.find('/') == -1:
       # if we don't need to convert just add to the command line
-      Command = Command + ' ' + arg 
+      Command = Command + ' ' + pipes.quote(arg)
     elif arg in ExceptionList:
       # if it is in the list, then don't do a cygpath
       # assembler stuff after --apcs has the /.
-      Command = Command + ' ' + arg 
+      Command = Command + ' ' + pipes.quote(arg)
     else:
       if ((arg[0] == '-') and (arg[1] == 'I' or arg[1] == 'i')):
         CygPath = arg[0] + arg[1] + ConvertCygPathToDos(arg[2:])
       else:
         CygPath = ConvertCygPathToDos(arg)
-      
-      Command = Command + ' ' + CygPath
+
+      Command = Command + ' ' + pipes.quote(CygPath)
     
   # call the real tool with the converted paths
   return subprocess.call(Command, shell=True)

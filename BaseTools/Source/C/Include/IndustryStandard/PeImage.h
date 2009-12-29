@@ -638,6 +638,18 @@ typedef struct {
   //
 } EFI_IMAGE_DEBUG_CODEVIEW_RSDS_ENTRY;
 
+///
+/// Debug Data Structure defined by Apple Mach-O to Coff utility
+///
+#define CODEVIEW_SIGNATURE_MTOC  EFI_SIGNATURE_32('M', 'T', 'O', 'C')
+typedef struct {
+  UINT32    Signature;                       ///< "MTOC"
+  EFI_GUID  MachOUuid;
+  //
+  //  Filename of .DLL (Mach-O with debug info) goes here
+  //
+} EFI_IMAGE_DEBUG_CODEVIEW_MTOC_ENTRY;
+
 //
 // .pdata entries for X64
 //

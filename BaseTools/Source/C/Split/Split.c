@@ -124,14 +124,14 @@ GetSplitValue (
     }
   }
 
-  lastCHAR = (CHAR8)toupper(SplitValueString[len - 1]);
+  lastCHAR = (CHAR8)toupper((int)SplitValueString[len - 1]);
 
   if (lastCHAR != 'K' && lastCHAR != 'M' && lastCHAR != 'G') {
     return STATUS_ERROR;
   }
 
   for (;index < len - 1; ++index) {
-    if (!isdigit(SplitValueString[index])) {
+    if (!isdigit((int)SplitValueString[index])) {
       return EFI_ABORTED;
     }
   }

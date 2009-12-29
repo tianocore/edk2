@@ -203,7 +203,7 @@ Returns:
       //
       // Hex or decimal?
       //
-      if ((argv[1][0] == '0') && (tolower (argv[1][1]) == 'x')) {
+      if ((argv[1][0] == '0') && (tolower ((int)argv[1][1]) == 'x')) {
         if (sscanf (argv[1], "%x", &Offset) != 1) {
           Error (NULL, 0, 1003, "Invalid option value", "Offset = %s", argv[1]);
           return GetUtilityStatus ();
@@ -216,7 +216,7 @@ Returns:
         //
         // See if they said something like "64K"
         //
-        if (tolower (argv[1][strlen (argv[1]) - 1]) == 'k') {
+        if (tolower ((int)argv[1][strlen (argv[1]) - 1]) == 'k') {
           Offset *= 1024;
         }
       }

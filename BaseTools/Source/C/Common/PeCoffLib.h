@@ -134,4 +134,14 @@ PeCoffLoaderGetPdbPointer (
   IN VOID  *Pe32Data
   )
 ;
+
+RETURN_STATUS
+EFIAPI
+PeCoffLoaderGetEntryPoint (
+  IN  VOID  *Pe32Data,
+  OUT VOID  **EntryPoint,
+  OUT VOID  **BaseOfImage
+  )
+;
+
 #endif

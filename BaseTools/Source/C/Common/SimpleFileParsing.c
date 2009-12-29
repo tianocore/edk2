@@ -328,7 +328,7 @@ Notes:
   }
 
   if ((Len = t_strcmp (mGlobals.SourceFile.FileBufferPtr, Str)) > 0) {
-    if (isalnum (mGlobals.SourceFile.FileBufferPtr[Len])) {
+    if (isalnum ((int)mGlobals.SourceFile.FileBufferPtr[Len])) {
       return FALSE;
     }
 
@@ -543,26 +543,26 @@ Returns:
     return FALSE;
   }
 
-  if (isdigit (mGlobals.SourceFile.FileBufferPtr[0])) {
+  if (isdigit ((int)mGlobals.SourceFile.FileBufferPtr[0])) {
     //
     // Check for hex value
     //
     if ((mGlobals.SourceFile.FileBufferPtr[0] == T_CHAR_0) && (mGlobals.SourceFile.FileBufferPtr[1] == T_CHAR_LC_X)) {
-      if (!isxdigit (mGlobals.SourceFile.FileBufferPtr[2])) {
+      if (!isxdigit ((int)mGlobals.SourceFile.FileBufferPtr[2])) {
         return FALSE;
       }
 
       mGlobals.SourceFile.FileBufferPtr += 2;
       sscanf (mGlobals.SourceFile.FileBufferPtr, "%x", &Val);
       *Value = (UINT32) Val;
-      while (isxdigit (mGlobals.SourceFile.FileBufferPtr[0])) {
+      while (isxdigit ((int)mGlobals.SourceFile.FileBufferPtr[0])) {
         mGlobals.SourceFile.FileBufferPtr++;
       }
 
       return TRUE;
     } else {
       *Value = atoi (mGlobals.SourceFile.FileBufferPtr);
-      while (isdigit (mGlobals.SourceFile.FileBufferPtr[0])) {
+      while (isdigit ((int)mGlobals.SourceFile.FileBufferPtr[0])) {
         mGlobals.SourceFile.FileBufferPtr++;
       }
 
@@ -1239,7 +1239,7 @@ GetHexChars (
   UINT32  Len;
   Len = 0;
   while (!EndOfFile (&mGlobals.SourceFile) && (BufferLen > 0)) {
-    if (isxdigit (mGlobals.SourceFile.FileBufferPtr[0])) {
+    if (isxdigit ((int)mGlobals.SourceFile.FileBufferPtr[0])) {
       *Buffer = mGlobals.SourceFile.FileBufferPtr[0];
       Buffer++;
       Len++;

@@ -87,7 +87,7 @@ Returns:
   //
   // Remove leading whitespace
   //
-  for (Pos = String; isspace (*Pos); Pos++) {
+  for (Pos = String; isspace ((int)*Pos); Pos++) {
   }
   if (Pos != String) {
     memmove (String, Pos, strlen (Pos) + 1);
@@ -114,7 +114,7 @@ Returns:
   // Remove trailing whitespace
   //
   for (Pos = String + strlen (String);
-       ((Pos - 1) >= String) && (isspace (*(Pos - 1)));
+       ((Pos - 1) >= String) && (isspace ((int)*(Pos - 1)));
        Pos--
       ) {
   }
@@ -160,12 +160,12 @@ Returns:
   Output = NewStringList ();
 
   for (Pos = String, Item = 0; Pos < EndOfString; Item++) {
-    while (isspace (*Pos)) {
+    while (isspace ((int)*Pos)) {
       Pos++;
     }
 
     for (EndOfSubString=Pos;
-         (*EndOfSubString != '\0') && !isspace (*EndOfSubString);
+         (*EndOfSubString != '\0') && !isspace ((int)*EndOfSubString);
          EndOfSubString++
          ) {
     }

@@ -278,9 +278,13 @@ class FV (FvClassObject):
             #
             if TotalSize > 0:
                 FvExtHeaderFileName = os.path.join(GenFdsGlobalVariable.FvDir, self.UiFvName + '.ext')
-                FvExtHeaderFile = open (FvExtHeaderFileName,'wb')
+                FvExtHeaderFile = StringIO.StringIO()
                 FvExtHeaderFile.write(Buffer)
+                Changed = SaveFileOnChange(FvExtHeaderFileName, FvExtHeaderFile.getvalue(), True)
                 FvExtHeaderFile.close()
+                if Changed:
+                  if os.path.exists (self.InfFileName):
+                    os.remove (self.InfFileName)
                 self.FvInfFile.writelines("EFI_FV_EXT_HEADER_FILE_NAME = "      + \
                                            FvExtHeaderFileName                  + \
                                            T_CHAR_LF)

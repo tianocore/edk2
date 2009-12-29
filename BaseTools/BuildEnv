@@ -196,7 +196,7 @@ AddEdkToolsToPath() {
 
 CopySingleTemplateFile() {
 
-  SRC_FILENAME=BaseTools/Conf/$1.template
+  SRC_FILENAME=Conf/$1.template
   DST_FILENAME=Conf/$1.txt
 
   if [ -e $WORKSPACE/$DST_FILENAME ]
@@ -204,9 +204,9 @@ CopySingleTemplateFile() {
     return
   fi
 
-  echo "Copying \$WORKSPACE/$SRC_FILENAME"
+  echo "Copying \$EDK_TOOLS_PATH/$SRC_FILENAME"
   echo "     to \$WORKSPACE/$DST_FILENAME"
-  SRC_FILENAME=$WORKSPACE/$SRC_FILENAME
+  SRC_FILENAME=$EDK_TOOLS_PATH/$SRC_FILENAME
   DST_FILENAME=$WORKSPACE/$DST_FILENAME
   cp $SRC_FILENAME $DST_FILENAME
 

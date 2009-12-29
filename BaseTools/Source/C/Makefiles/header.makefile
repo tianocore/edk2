@@ -26,7 +26,19 @@ endif
 INCLUDE = $(TOOL_INCLUDE) -I $(MAKEROOT) -I $(MAKEROOT)/Include/Common -I $(MAKEROOT)/Include/ -I $(MAKEROOT)/Include/IndustryStandard -I $(MAKEROOT)/Common/ -I .. -I . $(ARCH_INCLUDE) 
 CPPFLAGS = $(INCLUDE)
 CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -fno-merge-constants -nostdlib -Wall -Werror -c -g
+LFLAGS =
 
+#
+# Snow Leopard  is a 32-bit and 64-bit environment. uname -m returns -i386, but gcc defaults 
+#  to x86_64. So make sure tools match uname -m
+#
+uname_s = $(shell uname -s)
+ifeq ($(uname_s),Darwin)
+  CFLAGS   += -arch i386
+  CPPFLAGS += -arch i386
+  LFLAGS   += -arch i386
+endif
+  
 .PHONY: all
 .PHONY: install
 .PHONY: clean

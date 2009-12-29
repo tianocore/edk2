@@ -1125,6 +1125,16 @@ class tdict:
             for Key in self.data:
                 self.data[Key].SetSingleMode()
 
+    def GetKeys(self, KeyIndex=0):
+        assert KeyIndex >= 0
+        if KeyIndex == 0:
+            return set(self.data.keys())
+        else:
+            keys = set()
+            for Key in self.data:
+                keys |= self.data[Key].GetKeys(KeyIndex - 1)
+            return keys
+
 ## Boolean chain list
 #
 class Blist(UserList):

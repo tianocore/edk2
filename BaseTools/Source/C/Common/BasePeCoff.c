@@ -1173,6 +1173,9 @@ Returns:
           ImageContext->PdbPointer = (CHAR8 *) ImageContext->CodeView + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_RSDS_ENTRY);
           break;
 
+        case CODEVIEW_SIGNATURE_MTOC:
+          ImageContext->PdbPointer = (CHAR8 *) ImageContext->CodeView + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_MTOC_ENTRY);
+
         default:
           break;
         }
@@ -1377,6 +1380,8 @@ PeCoffLoaderGetPdbPointer (
           return (VOID *) ((CHAR8 *)CodeViewEntryPointer + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY));
         case CODEVIEW_SIGNATURE_RSDS:
           return (VOID *) ((CHAR8 *)CodeViewEntryPointer + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_RSDS_ENTRY));
+        case CODEVIEW_SIGNATURE_MTOC:
+          return (VOID *) ((CHAR8 *)CodeViewEntryPointer + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_MTOC_ENTRY));
         default:
           break;
         }
@@ -1385,4 +1390,51 @@ PeCoffLoaderGetPdbPointer (
   }
 
   return NULL;
+}
+
+
+RETURN_STATUS
+EFIAPI
+PeCoffLoaderGetEntryPoint (
+  IN  VOID  *Pe32Data,
+  OUT VOID  **EntryPoint,
+  OUT VOID  **BaseOfImage
+  )
+{
+  EFI_IMAGE_DOS_HEADER                  *DosHdr;
+  EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION   Hdr;
+
+  DosHdr = (EFI_IMAGE_DOS_HEADER *)Pe32Data;
+  if (DosHdr->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
+    //
+    // DOS image header is present, so read the PE header after the DOS image header.
+    //
+    Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)((UINTN) Pe32Data + (UINTN) ((DosHdr->e_lfanew) & 0x0ffff));
+  } else {
+    //
+    // DOS image header is not present, so PE header is at the image base.
+    //
+    Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)Pe32Data;
+  }
+
+  //
+  // Calculate the entry point relative to the start of the image.
+  // AddressOfEntryPoint is common for PE32 & PE32+
+  //
+  if (Hdr.Te->Signature == EFI_TE_IMAGE_HEADER_SIGNATURE) {
+    *BaseOfImage = (VOID *)(UINTN)(Hdr.Te->ImageBase + Hdr.Te->StrippedSize - sizeof (EFI_TE_IMAGE_HEADER));
+    *EntryPoint = (VOID *)((UINTN)*BaseOfImage + (Hdr.Te->AddressOfEntryPoint & 0x0ffffffff) + sizeof(EFI_TE_IMAGE_HEADER) - Hdr.Te->StrippedSize);
+    return RETURN_SUCCESS;
+  } else if (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE) {
+    *EntryPoint = (VOID *)(UINTN)Hdr.Pe32->OptionalHeader.AddressOfEntryPoint;
+    if (Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+      *BaseOfImage = (VOID *)(UINTN)Hdr.Pe32->OptionalHeader.ImageBase;
+    } else {
+      *BaseOfImage = (VOID *)(UINTN)Hdr.Pe32Plus->OptionalHeader.ImageBase;
+    }
+    *EntryPoint = (VOID *)(UINTN)((UINTN)*EntryPoint + (UINTN)*BaseOfImage);
+    return RETURN_SUCCESS;
+  }
+
+  return RETURN_UNSUPPORTED;
 }

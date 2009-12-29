@@ -1,5 +1,5 @@
 /*++
-Copyright (c) 2004 - 2008, Intel Corporation
+Copyright (c) 2004 - 2009, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -547,7 +547,8 @@ vfrFormSetList :
     vfrStatementVarStoreEfi       |
     vfrStatementVarStoreNameValue |
     vfrStatementDefaultStore      |
-    vfrStatementDisableIfFormSet
+    vfrStatementDisableIfFormSet  |
+    vfrStatementSuppressIfFormSet
   )*
   ;
 
@@ -718,6 +719,21 @@ vfrStatementDisableIfFormSet :
   vfrFormSetList
   E:EndIf                                           << CRT_END_OP (E); >>
   ";"
+  ;
+
+vfrStatementSuppressIfFormSet :
+  << CIfrSuppressIf SIObj;>>
+  L:SuppressIf                                         <<
+                                                           if (mCompatibleMode) {
+                                                             _PCATCH (VFR_RETURN_UNSUPPORTED, L);
+                                                           }
+                                                           SIObj.SetLineNo(L->getLine()); 
+                                                       >>
+  { FLAGS "=" flagsField ( "\|" flagsField )* "," }
+  vfrStatementExpression[0] ";"
+  vfrFormSetList
+  E: EndIf 
+  ";"                                                  << CRT_END_OP (E); >>
   ;
 
 //*****************************************************************************
@@ -1089,66 +1105,10 @@ vfrStatementDefault :
     (
         vfrStatementValue ","                       << IsExp = TRUE; DObj.SetScope (1); CIfrEnd EndObj1; EndObj1.SetLineNo(D->getLine()); >>
       | "=" vfrConstantValueField[_GET_CURRQEST_DATATYPE()] > [Val] ","  << 
-
-                                                        if (gCurrentIfrOpcode != NULL && gCurrentIfrOpcode->GetObjBinAddr() != NULL) {
-                                                          EFI_IFR_OP_HEADER *TempOpCode;
-                                                          TempOpCode = (EFI_IFR_OP_HEADER *) gCurrentIfrOpcode->GetObjBinAddr();
-                                                          switch (TempOpCode->OpCode) {
-                                                          case EFI_IFR_NUMERIC_OP:
-                                                            EFI_IFR_NUMERIC *TempNumricCode;
-                                                            TempNumricCode = (EFI_IFR_NUMERIC *) TempOpCode;
-                                                            switch (_GET_CURRQEST_DATATYPE()) {
-                                                            case EFI_IFR_TYPE_NUM_SIZE_64:
-                                                              if (Val.u64 < TempNumricCode->data.u64.MinValue || Val.u64 > TempNumricCode->data.u64.MaxValue) {
-                                                                _PCATCH (VFR_RETURN_INVALID_PARAMETER, D->getLine(), "Numeric default value must be between MinValue and MaxValue.");
-                                                              }
-                                                              break;
-                                                            case EFI_IFR_TYPE_NUM_SIZE_32:
-                                                              if (Val.u32 < TempNumricCode->data.u32.MinValue || Val.u32 > TempNumricCode->data.u32.MaxValue) {
-                                                                _PCATCH (VFR_RETURN_INVALID_PARAMETER, D->getLine(), "Numeric default value must be between MinValue and MaxValue.");
-                                                              }
-                                                              break;
-                                                            case EFI_IFR_TYPE_NUM_SIZE_16:
-                                                              if (Val.u16 < TempNumricCode->data.u16.MinValue || Val.u16 > TempNumricCode->data.u16.MaxValue) {
-                                                                _PCATCH (VFR_RETURN_INVALID_PARAMETER, D->getLine(), "Numeric default value must be between MinValue and MaxValue.");
-                                                              }
-                                                              break;
-                                                            case EFI_IFR_TYPE_NUM_SIZE_8:
-                                                              if (Val.u8 < TempNumricCode->data.u8.MinValue || Val.u8 > TempNumricCode->data.u8.MaxValue) {
-                                                                _PCATCH (VFR_RETURN_INVALID_PARAMETER, D->getLine(), "Numeric default value must be between MinValue and MaxValue.");
-                                                              }
-                                                              break;
-                                                            }
-                                                            break;
-                                                          case EFI_IFR_ONE_OF_OP:
-                                                            EFI_IFR_ONE_OF *TempOneOfCode;
-                                                            TempOneOfCode = (EFI_IFR_ONE_OF *) TempOpCode;
-                                                            if (TempOneOfCode->data.u64.MinValue != 0 || TempOneOfCode->data.u64.MaxValue != 0 || TempOneOfCode->data.u64.Step != 0) {
-                                                              //OneOf MinMaxStep Data is set, Val value will be checked for MinMaxStep.
-                                                              switch (_GET_CURRQEST_DATATYPE()) {
-                                                              case EFI_IFR_TYPE_NUM_SIZE_64:
-                                                                if (Val.u64 < TempOneOfCode->data.u64.MinValue || Val.u64 > TempOneOfCode->data.u64.MaxValue) {
-                                                                  _PCATCH (VFR_RETURN_INVALID_PARAMETER, D->getLine(), "OneOf default value must be between MinValue and MaxValue.");
-                                                                }
-                                                                break;
-                                                              case EFI_IFR_TYPE_NUM_SIZE_32:
-                                                                if (Val.u32 < TempOneOfCode->data.u32.MinValue || Val.u32 > TempOneOfCode->data.u32.MaxValue) {
-                                                                  _PCATCH (VFR_RETURN_INVALID_PARAMETER, D->getLine(), "OneOf default value must be between MinValue and MaxValue.");
-                                                                }
-                                                                break;
-                                                              case EFI_IFR_TYPE_NUM_SIZE_16:
-                                                                if (Val.u16 < TempOneOfCode->data.u16.MinValue || Val.u16 > TempOneOfCode->data.u16.MaxValue) {
-                                                                  _PCATCH (VFR_RETURN_INVALID_PARAMETER, D->getLine(), "OneOf default value must be between MinValue and MaxValue.");
-                                                                }
-                                                                break;
-                                                              case EFI_IFR_TYPE_NUM_SIZE_8:
-                                                                if (Val.u8 < TempOneOfCode->data.u8.MinValue || Val.u8 > TempOneOfCode->data.u8.MaxValue) {
-                                                                  _PCATCH (VFR_RETURN_INVALID_PARAMETER, D->getLine(), "OneOf default value must be between MinValue and MaxValue.");
-                                                                }
-                                                                break;
-                                                              }
-                                                            }
-                                                            break;
+                                                        if (gCurrentMinMaxData != NULL && gCurrentMinMaxData->IsNumericOpcode()) {
+                                                          //check default value is valid for Numeric Opcode
+                                                          if (Val.u64 < gCurrentMinMaxData->GetMinData(_GET_CURRQEST_DATATYPE()) || Val.u64 > gCurrentMinMaxData->GetMaxData(_GET_CURRQEST_DATATYPE())) {
+                                                            _PCATCH (VFR_RETURN_INVALID_PARAMETER, D->getLine(), "Numeric default value must be between MinValue and MaxValue.");
                                                           }
                                                         }
                                                         DObj.SetType (_GET_CURRQEST_DATATYPE()); 
@@ -1711,7 +1671,7 @@ vfrSetMinMaxStep[CIfrMinMaxStepData & MMSDObj] :
   >>
   Minimum   "=" I:Number ","
                                                        <<
-                                                          switch (_GET_CURRQEST_DATATYPE ()) {
+                                                          switch (_GET_CURRQEST_DATATYPE()) {
                                                           case EFI_IFR_TYPE_NUM_SIZE_64 : MinU8 = _STOU64(I->getText()); break;
                                                           case EFI_IFR_TYPE_NUM_SIZE_32 : MinU4 = _STOU32(I->getText()); break;
                                                           case EFI_IFR_TYPE_NUM_SIZE_16 : MinU2 = _STOU16(I->getText()); break;
@@ -1720,7 +1680,7 @@ vfrSetMinMaxStep[CIfrMinMaxStepData & MMSDObj] :
                                                        >>
   Maximum   "=" A:Number ","
                                                        <<
-                                                          switch (_GET_CURRQEST_DATATYPE ()) {
+                                                          switch (_GET_CURRQEST_DATATYPE()) {
                                                           case EFI_IFR_TYPE_NUM_SIZE_64 : 
                                                             MaxU8 = _STOU64(A->getText()); 
                                                             if (MaxU8 < MinU8) {
@@ -1750,7 +1710,7 @@ vfrSetMinMaxStep[CIfrMinMaxStepData & MMSDObj] :
   {
     STEP    "=" S:Number ","
                                                        <<
-                                                          switch (_GET_CURRQEST_DATATYPE ()) {
+                                                          switch (_GET_CURRQEST_DATATYPE()) {
                                                           case EFI_IFR_TYPE_NUM_SIZE_64 : StepU8 = _STOU64(S->getText()); break;
                                                           case EFI_IFR_TYPE_NUM_SIZE_32 : StepU4 = _STOU32(S->getText()); break;
                                                           case EFI_IFR_TYPE_NUM_SIZE_16 : StepU2 = _STOU16(S->getText()); break;
@@ -1759,7 +1719,7 @@ vfrSetMinMaxStep[CIfrMinMaxStepData & MMSDObj] :
                                                        >>
   }
                                                        <<
-                                                          switch (_GET_CURRQEST_DATATYPE ()) {
+                                                          switch (_GET_CURRQEST_DATATYPE()) {
                                                           case EFI_IFR_TYPE_NUM_SIZE_64 : $MMSDObj.SetMinMaxStepData (MinU8, MaxU8, StepU8); break;
                                                           case EFI_IFR_TYPE_NUM_SIZE_32 : $MMSDObj.SetMinMaxStepData (MinU4, MaxU4, StepU4); break;
                                                           case EFI_IFR_TYPE_NUM_SIZE_16 : $MMSDObj.SetMinMaxStepData (MinU2, MaxU2, StepU2); break;
@@ -1793,18 +1753,38 @@ vfrStatementNumeric :
 
 vfrNumericFlags [CIfrNumeric & NObj, UINT32 LineNum] :
   <<
-     UINT8 LFlags = _GET_CURRQEST_DATATYPE();
+     UINT8 LFlags = _GET_CURRQEST_DATATYPE() & EFI_IFR_NUMERIC_SIZE;
      UINT8 HFlags = 0;
+     EFI_VFR_VARSTORE_TYPE VarStoreType = EFI_VFR_VARSTORE_INVALID;
   >>
   numericFlagsField[HFlags, LFlags] ( "\|" numericFlagsField[HFlags, LFlags] )*
-                                                       << _PCATCH(NObj.SetFlags (HFlags, LFlags), LineNum); >>
+                                                       <<
+                                                          //check data type flag
+                                                          VarStoreType = mCVfrDataStorage.GetVarStoreType (_GET_CURRQEST_VARTINFO().mVarStoreId);
+                                                          if (VarStoreType == EFI_VFR_VARSTORE_BUFFER || VarStoreType == EFI_VFR_VARSTORE_EFI) {
+                                                            if (_GET_CURRQEST_DATATYPE() != (LFlags & EFI_IFR_NUMERIC_SIZE)) {
+                                                              _PCATCH(VFR_RETURN_INVALID_PARAMETER, LineNum, "Numeric Flag is not same to Numeric VarData type");
+                                                            }
+                                                          } else {
+                                                            // update data type for name/value store
+                                                            UINT32 DataTypeSize;
+                                                            _GET_CURRQEST_VARTINFO().mVarType = LFlags & EFI_IFR_NUMERIC_SIZE;
+                                                            gCVfrVarDataTypeDB.GetDataTypeSize (_GET_CURRQEST_DATATYPE(), &DataTypeSize);
+                                                            _GET_CURRQEST_VARTINFO().mVarTotalSize = DataTypeSize;
+                                                          }
+                                                          _PCATCH(NObj.SetFlags (HFlags, LFlags), LineNum);
+                                                       >>
   ;
 
 numericFlagsField [UINT8 & HFlags, UINT8 & LFlags] :
     N:Number                                           << _PCATCH(_STOU8(N->getText()) == 0 ? VFR_RETURN_SUCCESS : VFR_RETURN_UNSUPPORTED, N->getLine()); >>
-  | "DISPLAY_INT_DEC"                                  << $LFlags |= 0x00; >>
-  | "DISPLAY_UINT_DEC"                                 << $LFlags |= 0x10; >>
-  | "DISPLAY_UINT_HEX"                                 << $LFlags |= 0x20; >>
+  | "NUMERIC_SIZE_1"                                   << $LFlags = ($LFlags & ~EFI_IFR_NUMERIC_SIZE) | EFI_IFR_NUMERIC_SIZE_1; >>
+  | "NUMERIC_SIZE_2"                                   << $LFlags = ($LFlags & ~EFI_IFR_NUMERIC_SIZE) | EFI_IFR_NUMERIC_SIZE_2; >>
+  | "NUMERIC_SIZE_4"                                   << $LFlags = ($LFlags & ~EFI_IFR_NUMERIC_SIZE) | EFI_IFR_NUMERIC_SIZE_4; >>
+  | "NUMERIC_SIZE_8"                                   << $LFlags = ($LFlags & ~EFI_IFR_NUMERIC_SIZE) | EFI_IFR_NUMERIC_SIZE_8; >>
+  | "DISPLAY_INT_DEC"                                  << $LFlags = ($LFlags & ~EFI_IFR_DISPLAY) | EFI_IFR_DISPLAY_INT_DEC; >>
+  | "DISPLAY_UINT_DEC"                                 << $LFlags = ($LFlags & ~EFI_IFR_DISPLAY) | EFI_IFR_DISPLAY_UINT_DEC; >>
+  | "DISPLAY_UINT_HEX"                                 << $LFlags = ($LFlags & ~EFI_IFR_DISPLAY) | EFI_IFR_DISPLAY_UINT_HEX; >>
   | questionheaderFlagsField[HFlags]
   ;
 
@@ -1832,11 +1812,27 @@ vfrStatementOneOf :
 
 vfrOneofFlagsField [CIfrOneOf & OObj, UINT32 LineNum] :
   <<
-     UINT8 LFlags = _GET_CURRQEST_DATATYPE();
+     UINT8 LFlags = _GET_CURRQEST_DATATYPE() & EFI_IFR_NUMERIC_SIZE;
      UINT8 HFlags = 0;
+     EFI_VFR_VARSTORE_TYPE VarStoreType = EFI_VFR_VARSTORE_INVALID;
   >>
   numericFlagsField[HFlags, LFlags] ( "\|" numericFlagsField[HFlags, LFlags] )*
-                                                       << _PCATCH(OObj.SetFlags (HFlags, LFlags), LineNum); >>
+                                                       <<
+                                                          //check data type flag
+                                                          VarStoreType = mCVfrDataStorage.GetVarStoreType (_GET_CURRQEST_VARTINFO().mVarStoreId);
+                                                          if (VarStoreType == EFI_VFR_VARSTORE_BUFFER || VarStoreType == EFI_VFR_VARSTORE_EFI) {
+                                                            if (_GET_CURRQEST_DATATYPE() != (LFlags & EFI_IFR_NUMERIC_SIZE)) {
+                                                              _PCATCH(VFR_RETURN_INVALID_PARAMETER, LineNum, "Numeric Flag is not same to Numeric VarData type");
+                                                            }
+                                                          } else {
+                                                            // update data type for Name/Value store
+                                                            UINT32 DataTypeSize;
+                                                            _GET_CURRQEST_VARTINFO().mVarType = LFlags & EFI_IFR_NUMERIC_SIZE;
+                                                            gCVfrVarDataTypeDB.GetDataTypeSize (_GET_CURRQEST_DATATYPE(), &DataTypeSize);
+                                                            _GET_CURRQEST_VARTINFO().mVarTotalSize = DataTypeSize;
+                                                          }
+                                                          _PCATCH(OObj.SetFlags (HFlags, LFlags), LineNum);
+                                                       >>
   ;
 
 vfrStatementStringType :
@@ -2080,10 +2076,9 @@ vfrStatementStatListOld :
 vfrStatementDisableIfStat :
   << 
     CIfrDisableIf DIObj; 
-    mConstantOnlyInExpression = TRUE;
   >>
   L:DisableIf                                          << DIObj.SetLineNo(L->getLine()); >>
-  vfrStatementExpression[0] ";"                        << mConstantOnlyInExpression = FALSE; >>
+  vfrStatementExpression[0] ";" 
   ( vfrStatementStatList )*
   E:EndIf                                              << CRT_END_OP (E); >>
   ";"
@@ -2227,10 +2222,9 @@ vfrStatementNoSubmitIf :
 vfrStatementDisableIfQuest :
   << 
     CIfrDisableIf DIObj; 
-    mConstantOnlyInExpression = TRUE;
   >>
   L:DisableIf                                          << DIObj.SetLineNo(L->getLine()); >>
-  vfrStatementExpression[0] ";"                        << mConstantOnlyInExpression = FALSE; >>
+  vfrStatementExpression[0] ";"
   vfrStatementQuestionOptionList
   E:EndIf                                              << CRT_END_OP (E); >>
   ;
@@ -2277,7 +2271,31 @@ vfrStatementOneOfOption :
   >>
   L:Option                                             << OOOObj.SetLineNo(L->getLine()); >>
   Text  "=" "STRING_TOKEN" "\(" S:Number "\)" ","      << OOOObj.SetOption (_STOSID(S->getText())); >>
-  Value "=" vfrConstantValueField[_GET_CURRQEST_DATATYPE()] >[Val] ","    << OOOObj.SetType (_GET_CURRQEST_DATATYPE()); OOOObj.SetValue (Val); >>
+  Value "=" vfrConstantValueField[_GET_CURRQEST_DATATYPE()] >[Val] ","    
+                                                       << 
+                                                          if (gCurrentMinMaxData != NULL) {
+                                                            //set min/max value for oneof opcode
+                                                            UINT64 Step = gCurrentMinMaxData->GetStepData(_GET_CURRQEST_DATATYPE());
+                                                            switch (_GET_CURRQEST_DATATYPE()) {
+                                                            case EFI_IFR_TYPE_NUM_SIZE_64:
+                                                              gCurrentMinMaxData->SetMinMaxStepData(Val.u64, Val.u64, Step);
+                                                              break;
+                                                            case EFI_IFR_TYPE_NUM_SIZE_32:
+                                                              gCurrentMinMaxData->SetMinMaxStepData(Val.u32, Val.u32, (UINT32) Step);
+                                                              break;
+                                                            case EFI_IFR_TYPE_NUM_SIZE_16:
+                                                              gCurrentMinMaxData->SetMinMaxStepData(Val.u16, Val.u16, (UINT16) Step);
+                                                              break;
+                                                            case EFI_IFR_TYPE_NUM_SIZE_8:
+                                                              gCurrentMinMaxData->SetMinMaxStepData(Val.u8, Val.u8, (UINT8) Step);
+                                                              break;
+                                                            default:
+                                                              break;
+                                                            }
+                                                          }
+                                                          OOOObj.SetType (_GET_CURRQEST_DATATYPE()); 
+                                                          OOOObj.SetValue (Val); 
+                                                       >>
   F:FLAGS "=" vfrOneOfOptionFlags[OOOObj, F->getLine()]
                                                        <<
                                                           _PCATCH(mCVfrDataStorage.GetVarStoreName (_GET_CURRQEST_VARTINFO().mVarStoreId, &VarStoreName), L->getLine());
@@ -2460,6 +2478,7 @@ vfrStatementInvalidSaveRestoreDefaults :
 #token RuleRef("ruleref")                       "ruleref"
 #token StringRef("stringref")                   "stringref"
 #token PushThis("pushthis")                     "pushthis"
+#token Security("security")                     "security"
 #token True("TRUE")                             "TRUE"
 #token False("FALSE")                           "FALSE"
 #token One("ONE")                               "ONE"
@@ -2685,6 +2704,7 @@ vfrExpressionBuildInFunction [UINT32 & RootLevel, UINT32 & ExpOpCount] :
   | rulerefExp[$RootLevel, $ExpOpCount]
   | stringref1Exp[$RootLevel, $ExpOpCount]
   | pushthisExp[$RootLevel, $ExpOpCount]
+  | securityExp[$RootLevel, $ExpOpCount]
   ;
 
 dupExp [UINT32 & RootLevel, UINT32 & ExpOpCount] :
@@ -2976,6 +2996,14 @@ stringref1Exp[UINT32 & RootLevel, UINT32 & ExpOpCount] :
 
 pushthisExp[UINT32 & RootLevel, UINT32 & ExpOpCount] :
   L:PushThis                                           << { CIfrThis TObj(L->getLine()); _SAVE_OPHDR_COND (TObj, ($ExpOpCount == 0), L->getLine()); $ExpOpCount++; } >>
+  ;
+
+securityExp[UINT32 & RootLevel, UINT32 & ExpOpCount] :
+  <<
+     EFI_GUID Guid;
+  >>
+  L:Security
+  "\(" guidDefinition[Guid] "\)"                       << { CIfrSecurity SObj(L->getLine()); _SAVE_OPHDR_COND (SObj, ($ExpOpCount == 0), L->getLine()); SObj.SetPermissions (&Guid); } $ExpOpCount++; >>
   ;
 
 vfrExpressionConstant[UINT32 & RootLevel, UINT32 & ExpOpCount] :

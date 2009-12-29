@@ -175,15 +175,15 @@ class SourceFiles:
 
     source_files_x64 = {
         'gcc': {
-            'url': 'http://gcc-ca.internet.bs/releases/' + \
+            'url': 'http://ftpmirror.gnu.org/gcc/' + \
                    'gcc-$version/gcc-$version.tar.bz2',
             'version': '4.3.0',
             'md5': '197ed8468b38db1d3481c3111691d85b',
             },
         'mingw_hdr': {
-            'url': 'http://downloads.sourceforge.net/project/' + \
-                   'mingw-w64/mingw-w64/mingw-w64-snapshot/' + \
-                   'mingw-w64-snapshot-$version.tar.bz2',
+            'url': 'http://sourceforge.net/projects/' + \
+                   'mingw-w64/files/mingw-w64/mingw-w64-snapshot/' + \
+                   'mingw-w64-snapshot-$version.tar.bz2/download',
             'extract-dir': os.path.join('trunk', 'mingw-w64-headers'),
             'version': '20090419',
             'md5': '9146ecfabaf172e4cc427b88e8d218c1',
@@ -193,10 +193,10 @@ class SourceFiles:
     source_files_ia32 = {
         'gcc': source_files_x64['gcc'],
         'mingw_hdr': {
-            'url': 'http://downloads.sourceforge.net/project/' + \
-                   'mingw/MinGW%20Runtime/' + \
-                   'Current%20Release_%20mingwrt-$version/' + \
-                   'mingwrt-$version-mingw32-src.tar.gz',
+            'url': 'http://sourceforge.net/projects/' + \
+                   'mingw/files/MinGW%20Runtime/' + \
+                   'mingwrt-$version/' + \
+                   'mingwrt-$version-mingw32-src.tar.gz/download',
             'extract-dir': 'mingwrt-$version-mingw32',
             'version': '3.15.2',
             'md5': '7bf0525f158213f3ac990ea68a5ec34d',
@@ -261,7 +261,7 @@ class SourceFiles:
                     self.dots = 0
                     local_file = os.path.join(self.config.src_dir, fdata['filename'])
                     url = fdata['url']
-                    print 'Downloading %s:' % fname,
+	            print 'Downloading %s:' % fname,
                     if retries > 0:
                         print '(retry)',
                     sys.stdout.flush()

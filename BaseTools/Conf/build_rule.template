@@ -237,6 +237,8 @@
 
     <Command.GCC>
         "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -\( $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST) -\) $(DLINK2_FLAGS)
+        "$(OBJCOPY)" --only-keep-debug ${dst} $(DEBUG_DIR)(+)$(MODULE_NAME).pdb
+        "$(OBJCOPY)" -S ${dst}
         "$(OBJCOPY)" $(OBJCOPY_FLAGS) ${dst}
 
     <Command.RVCT>
@@ -295,7 +297,7 @@
         "$(MTOC)" -subsystem $(MODULE_TYPE)  $(MTOC_FLAGS)  ${src}  $(DEBUG_DIR)(+)$(MODULE_NAME).pecoff
         # create symbol file for GDB debug
         -$(DSYMUTIL) ${src}
-        GenFw -e $(MODULE_TYPE) -o ${dst} $(DEBUG_DIR)(+)$(MODULE_NAME).pecoff 
+        GenFw --xip -e $(MODULE_TYPE) -o ${dst} $(DEBUG_DIR)(+)$(MODULE_NAME).pecoff 
         $(CP) ${dst} $(OUTPUT_DIR)
         $(CP) ${dst} $(BIN_DIR)
         -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
@@ -408,9 +410,9 @@
       otool -t $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.slib | hex2bin.py ${dst}
       
 
-[Microcode-File]
+[Microcode-File.USER_DEFINED, Microcode-File.Microcode]
     <InputFile>
-        ?.txt, ?.TXT, ?.Txt, ?.mut
+        ?.txt, ?.TXT, ?.Txt, ?.mut, ?.inc
 
     <OutputFile>
         $(OUTPUT_DIR)(+)${s_base}.mcb
@@ -497,5 +499,5 @@
         "$(RC)" /Fo${dst} $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc
 
     <Command.GCC>
-        GenFw -o $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc -g $(MODULE_GUID) --hiipackage $(HII_BINARY_PACKAGES)
-        "$(RC)" (RC_FLAGS) $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc ${dst}
+        GenFw -o $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc -g $(MODULE_GUID) --hiibinpackage $(HII_BINARY_PACKAGES)
+        "$(RC)" $(RC_FLAGS) $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc ${dst}

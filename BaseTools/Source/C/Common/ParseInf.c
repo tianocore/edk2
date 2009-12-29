@@ -506,7 +506,7 @@ Returns:
     // Verify string is a hex number
     //
     for (Index = 2; Index < strlen (AsciiString); Index++) {
-      if (isxdigit (AsciiString[Index]) == 0) {
+      if (isxdigit ((int)AsciiString[Index]) == 0) {
         return EFI_ABORTED;
       }
     }
@@ -536,7 +536,7 @@ Returns:
     // Verify string is a number
     //
     for (Index = 0; Index < strlen (AsciiString); Index++) {
-      if (isdigit (AsciiString[Index]) == 0) {
+      if (isdigit ((int)AsciiString[Index]) == 0) {
         return EFI_ABORTED;
       }
     }
