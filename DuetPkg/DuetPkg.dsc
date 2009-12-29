@@ -92,7 +92,7 @@
       # All other module can *not* output debug information even they are use not NULL library
       # instance for DebugLib and ReportStatusCodeLib
       #
-      ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
+      ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
   }
 
   MdeModulePkg/Core/Dxe/DxeMain.inf {
