@@ -1050,6 +1050,7 @@ DegradeResource (
   PCI_IO_DEVICE        *Temp;
   LIST_ENTRY           *ChildDeviceLink;
   LIST_ENTRY           *ChildNodeLink;
+  LIST_ENTRY           *NextChildNodeLink;
   PCI_RESOURCE_NODE    *TempNode;
 
   //
@@ -1064,12 +1065,13 @@ DegradeResource (
         ChildNodeLink = Mem64Node->ChildList.ForwardLink;
         while (ChildNodeLink != &Mem64Node->ChildList) {
           TempNode = RESOURCE_NODE_FROM_LINK (ChildNodeLink);
+          NextChildNodeLink = ChildNodeLink->ForwardLink;
 
           if (TempNode->PciDev == Temp) {
             RemoveEntryList (ChildNodeLink);
             InsertResourceNode (Mem32Node, TempNode);
           }
-          ChildNodeLink = TempNode->Link.ForwardLink;
+          ChildNodeLink = NextChildNodeLink;
         }        
       }
 
@@ -1077,12 +1079,13 @@ DegradeResource (
         ChildNodeLink = PMem64Node->ChildList.ForwardLink;
         while (ChildNodeLink != &PMem64Node->ChildList) {
           TempNode = RESOURCE_NODE_FROM_LINK (ChildNodeLink);
+          NextChildNodeLink = ChildNodeLink->ForwardLink;
 
           if (TempNode->PciDev == Temp) {
             RemoveEntryList (ChildNodeLink);
             InsertResourceNode (PMem32Node, TempNode);
           }
-          ChildNodeLink = TempNode->Link.ForwardLink;
+          ChildNodeLink = NextChildNodeLink;
         }        
       }
 
