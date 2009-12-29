@@ -37,13 +37,9 @@
 #define EFI_S3_SMM_SAVE_STATE_PROTOCOL_GUID \
     {0x320afe62, 0xe593, 0x49cb, { 0xa9, 0xf1, 0xd4, 0xc2, 0xf4, 0xaf, 0x1, 0x4c }}
     
-typedef struct _EFI_S3_SMM_SAVE_STATE_PROTOCOL {
-  EFI_S3_SAVE_STATE_WRITE   Write;
-  EFI_S3_SAVE_STATE_INSERT  Insert;
-  EFI_S3_SAVE_STATE_LABEL   Label;
-  EFI_S3_SAVE_STATE_COMPARE Compare;
-} EFI_S3_SMM_SAVE_STATE_PROTOCOL;    
-    
+
+typedef EFI_S3_SAVE_STATE_PROTOCOL EFI_S3_SMM_SAVE_STATE_PROTOCOL;
+
 extern EFI_GUID gEfiS3SmmSaveStateProtocolGuid;
     
 #endif // __S3_SMM_SAVE_STATE_H__
