@@ -95,7 +95,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_S3_SAVE_STATE_INSERT)(
-   IN       struct _EFI_S3_SAVE_STATE_PROTOCOL  *This,
+   IN CONST struct _EFI_S3_SAVE_STATE_PROTOCOL  *This,
    IN       BOOLEAN                             BeforeOrAfter,
    IN OUT   EFI_S3_BOOT_SCRIPT_POSITION         *Position       OPTIONAL,
    IN       UINT16                              OpCode,
@@ -132,11 +132,11 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_S3_SAVE_STATE_LABEL)(
-   IN     struct _EFI_S3_SAVE_STATE_PROTOCOL    *This,
-   IN     BOOLEAN                               BeforeOrAfter,
-   IN     BOOLEAN                               CreateIfNotFound,
-   IN OUT EFI_S3_BOOT_SCRIPT_POSITION           *Position OPTIONAL,
-   IN     CONST CHAR8                           *Label
+   IN CONST  struct _EFI_S3_SAVE_STATE_PROTOCOL    *This,
+   IN        BOOLEAN                               BeforeOrAfter,
+   IN        BOOLEAN                               CreateIfNotFound,
+   IN OUT    EFI_S3_BOOT_SCRIPT_POSITION           *Position OPTIONAL,
+   IN CONST  CHAR8                           *Label
 );
 
 /**
@@ -157,10 +157,10 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_S3_SAVE_STATE_COMPARE)(
-   IN   struct _EFI_S3_SAVE_STATE_PROTOCOL  *This,
-   IN   EFI_S3_BOOT_SCRIPT_POSITION         Position1,
-   IN   EFI_S3_BOOT_SCRIPT_POSITION         Position2,
-   OUT  UINTN                               *RelativePosition
+   IN CONST struct _EFI_S3_SAVE_STATE_PROTOCOL  *This,
+   IN       EFI_S3_BOOT_SCRIPT_POSITION         Position1,
+   IN       EFI_S3_BOOT_SCRIPT_POSITION         Position2,
+   OUT      UINTN                               *RelativePosition
 );
 
 struct _EFI_S3_SAVE_STATE_PROTOCOL {
