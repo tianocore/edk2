@@ -52,10 +52,10 @@ ATA_DEVICE gAtaDeviceTemplate = {
     FALSE,                     // ReadOnly
     FALSE,                     // WritingCache
     0x200,                     // BlockSize 
-    0,                         // LastBlock
     4,                         // IoAlign
-    1,                         // LogicalBlocksPerPhysicalBlock
-    0                          // LowestAlignedLba
+    0,                         // LastBlock
+    0,                         // LowestAlignedLba
+    1                          // LogicalBlocksPerPhysicalBlock
   },
   {                            // DiskInfo
     EFI_DISK_INFO_IDE_INTERFACE_GUID,
