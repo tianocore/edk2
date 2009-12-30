@@ -1,7 +1,7 @@
 /** @file
   Miscellaneous definitions for iSCSI driver.
 
-Copyright (c) 2004 - 2008, Intel Corporation.<BR>
+Copyright (c) 2004 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -115,14 +115,16 @@ IScsiUnicodeStrToAsciiStr (
 /**
   Convert the mac address into a hexadecimal encoded "-" seperated string.
 
-  @param[in]  Mac The mac address.
-  @param[in]  Len  Length in bytes of the mac address.
-  @param[out] Str The storage to return the mac string.
+  @param[in]  Mac     The mac address.
+  @param[in]  Len     Length in bytes of the mac address.
+  @param[in]  VlanId  VLAN ID of the network device.
+  @param[out] Str     The storage to return the mac string.
 **/
 VOID
 IScsiMacAddrToStr (
   IN  EFI_MAC_ADDRESS  *Mac,
   IN  UINT32           Len,
+  IN  UINT16           VlanId,
   OUT CHAR16           *Str
   );
 

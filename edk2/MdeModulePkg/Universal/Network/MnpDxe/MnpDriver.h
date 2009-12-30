@@ -1,11 +1,12 @@
 /** @file
   Declaration of strctures and functions for MnpDxe driver.
-    
-Copyright (c) 2005 - 2007, Intel Corporation. <BR> 
-All rights reserved. This program and the accompanying materials are licensed 
-and made available under the terms and conditions of the BSD License which 
-accompanies this distribution. The full text of the license may be found at 
-http://opensource.org/licenses/bsd-license.php 
+
+Copyright (c) 2005 - 2009, Intel Corporation.<BR>
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions
+of the BSD License which accompanies this distribution.  The full
+text of the license may be found at<BR>
+http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -14,11 +15,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #ifndef _MNP_DRIVER_H_
 #define _MNP_DRIVER_H_
+
 #include <Uefi.h>
 
 #include <Protocol/ManagedNetwork.h>
 #include <Protocol/SimpleNetwork.h>
 #include <Protocol/ServiceBinding.h>
+#include <Protocol/VlanConfig.h>
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -28,23 +31,31 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiLib.h>
 #include <Library/NetLib.h>
 #include <Library/DpcLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
+#include <Library/DevicePathLib.h>
 
 #include "ComponentName.h"
 
-#define MNP_SERVICE_DATA_SIGNATURE  SIGNATURE_32 ('M', 'n', 'p', 'S')
+#define MNP_DEVICE_DATA_SIGNATURE  SIGNATURE_32 ('M', 'n', 'p', 'D')
 
 typedef struct {
   UINT32                        Signature;
 
   EFI_HANDLE                    ControllerHandle;
+  EFI_HANDLE                    ImageHandle;
 
-  EFI_SERVICE_BINDING_PROTOCOL  ServiceBinding;
+  EFI_VLAN_CONFIG_PROTOCOL      VlanConfig;
+  UINTN                         NumberOfVlan;
+  CHAR16                        *MacString;
   EFI_SIMPLE_NETWORK_PROTOCOL   *Snp;
 
-  UINT32                        Mtu;
-
-  LIST_ENTRY                    ChildrenList;
-  UINTN                         ChildrenNumber;
+  //
+  // List of MNP_SERVICE_DATA
+  //
+  LIST_ENTRY                    ServiceList;
+  //
+  // Number of configured MNP Service Binding child
+  //
   UINTN                         ConfiguredChildrenNumber;
 
   LIST_ENTRY                    GroupAddressList;
@@ -73,7 +84,37 @@ typedef struct {
   UINT32                        PaddingSize;
   NET_BUF                       *RxNbufCache;
   UINT8                         *TxBuf;
+} MNP_DEVICE_DATA;
+
+#define MNP_DEVICE_DATA_FROM_THIS(a) \
+  CR ( \
+  (a), \
+  MNP_DEVICE_DATA, \
+  VlanConfig, \
+  MNP_DEVICE_DATA_SIGNATURE \
+  )
+
+#define MNP_SERVICE_DATA_SIGNATURE  SIGNATURE_32 ('M', 'n', 'p', 'S')
+
+typedef struct {
+  UINT32                        Signature;
+
+  LIST_ENTRY                    Link;
+
+  MNP_DEVICE_DATA               *MnpDeviceData;
+  EFI_HANDLE                    ServiceHandle;
+  EFI_SERVICE_BINDING_PROTOCOL  ServiceBinding;
+  EFI_DEVICE_PATH_PROTOCOL      *DevicePath;
+
+  LIST_ENTRY                    ChildrenList;
+  UINTN                         ChildrenNumber;
+
+  UINT32                        Mtu;
+
+  UINT16                        VlanId;
+  UINT8                         Priority;
 } MNP_SERVICE_DATA;
+
 
 #define MNP_SERVICE_DATA_FROM_THIS(a) \
   CR ( \
@@ -82,6 +123,15 @@ typedef struct {
   ServiceBinding, \
   MNP_SERVICE_DATA_SIGNATURE \
   )
+
+#define MNP_SERVICE_DATA_FROM_LINK(a) \
+  CR ( \
+  (a), \
+  MNP_SERVICE_DATA, \
+  Link, \
+  MNP_SERVICE_DATA_SIGNATURE \
+  )
+
 
 /**
   Test to see if this driver supports ControllerHandle. This service
@@ -93,7 +143,7 @@ typedef struct {
 
   @param[in]  This                 Protocol instance pointer.
   @param[in]  ControllerHandle     Handle of device to test.
-  @param[in]  RemainingDevicePath  Optional parameter use to pick a specific 
+  @param[in]  RemainingDevicePath  Optional parameter use to pick a specific
                                    child device to start.
 
   @retval EFI_SUCCESS              This driver supports this device.
@@ -104,50 +154,50 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 MnpDriverBindingSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
-  IN EFI_HANDLE                   ControllerHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
+  IN EFI_DRIVER_BINDING_PROTOCOL     *This,
+  IN EFI_HANDLE                      ControllerHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath OPTIONAL
   );
 
 /**
   Start this driver on ControllerHandle. This service is called by the
-  EFI boot service ConnectController(). In order to make drivers as small 
+  EFI boot service ConnectController(). In order to make drivers as small
   as possible, there are a few calling restrictions for this service.
   ConnectController() must follow these calling restrictions. If any other
   agent wishes to call Start() it must also follow these calling restrictions.
 
   @param[in]       This                 Protocol instance pointer.
   @param[in]       ControllerHandle     Handle of device to bind driver to.
-  @param[in]       RemainingDevicePath  Optional parameter use to pick a specific 
+  @param[in]       RemainingDevicePath  Optional parameter use to pick a specific
                                         child device to start.
 
   @retval EFI_SUCCESS           This driver is added to ControllerHandle.
   @retval EFI_ALREADY_STARTED   This driver is already running on ControllerHandle.
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate memory for Mnp Service Data.
   @retval Others                This driver does not support this device.
-  
+
 **/
 EFI_STATUS
 EFIAPI
 MnpDriverBindingStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
-  IN EFI_HANDLE                   ControllerHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
+  IN EFI_DRIVER_BINDING_PROTOCOL     *This,
+  IN EFI_HANDLE                      ControllerHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath OPTIONAL
   );
 
 
 /**
   Stop this driver on ControllerHandle. This service is called by the
-  EFI boot service DisconnectController(). In order to make drivers as 
-  small as possible, there are a few calling restrictions for this service. 
-  DisconnectController() must follow these calling restrictions. If any other 
+  EFI boot service DisconnectController(). In order to make drivers as
+  small as possible, there are a few calling restrictions for this service.
+  DisconnectController() must follow these calling restrictions. If any other
   agent wishes to call Stop() it must also follow these calling restrictions.
-  
+
   @param[in]  This               Protocol instance pointer.
   @param[in]  ControllerHandle   Handle of device to stop driver on.
-  @param[in]  NumberOfChildren   Number of Handles in ChildHandleBuffer. If 
-                                 number of children is zero stop the entire 
-								 bus driver.
+  @param[in]  NumberOfChildren   Number of Handles in ChildHandleBuffer. If
+                                 number of children is zero stop the entire
+                                 bus driver.
   @param[in]  ChildHandleBuffer  List of Child Handles to Stop.
 
   @retval EFI_SUCCESS            This driver is removed ControllerHandle.
@@ -157,10 +207,10 @@ MnpDriverBindingStart (
 EFI_STATUS
 EFIAPI
 MnpDriverBindingStop (
-  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
-  IN EFI_HANDLE                   ControllerHandle,
-  IN UINTN                        NumberOfChildren,
-  IN EFI_HANDLE                   *ChildHandleBuffer OPTIONAL
+  IN EFI_DRIVER_BINDING_PROTOCOL     *This,
+  IN EFI_HANDLE                      ControllerHandle,
+  IN UINTN                           NumberOfChildren,
+  IN EFI_HANDLE                      *ChildHandleBuffer OPTIONAL
   );
 
 /**
@@ -169,12 +219,12 @@ MnpDriverBindingStop (
   @param[in]       This              Protocol instance pointer.
   @param[in, out]  ChildHandle       Pointer to the handle of the child to create. If
                                      it is NULL, then a new handle is created. If
-									 it is not NULL, then the I/O services are added 
-									 to the existing child handle.
+                                     it is not NULL, then the I/O services are added
+                                     to the existing child handle.
 
-  @retval EFI_SUCCES                 The protocol was added to ChildHandle. 
-  @retval EFI_INVALID_PARAMETER      ChildHandle is NULL. 
-  @retval EFI_OUT_OF_RESOURCES       There are not enough resources availabe to 
+  @retval EFI_SUCCES                 The protocol was added to ChildHandle.
+  @retval EFI_INVALID_PARAMETER      ChildHandle is NULL.
+  @retval EFI_OUT_OF_RESOURCES       There are not enough resources availabe to
                                      create the child.
   @retval Others                     The child handle was not created.
 
@@ -182,22 +232,22 @@ MnpDriverBindingStop (
 EFI_STATUS
 EFIAPI
 MnpServiceBindingCreateChild (
-  IN EFI_SERVICE_BINDING_PROTOCOL  *This,
-  IN OUT EFI_HANDLE                *ChildHandle
+  IN     EFI_SERVICE_BINDING_PROTOCOL    *This,
+  IN OUT EFI_HANDLE                      *ChildHandle
   );
 
 /**
   Destroys a child handle with a set of I/O services.
-   
-  The DestroyChild() function does the opposite of CreateChild(). It removes a 
-  protocol that was installed by CreateChild() from ChildHandle. If the removed 
-  protocol is the last protocol on ChildHandle, then ChildHandle is destroyed. 
-   
-  @param[in]  This               Pointer to the EFI_SERVICE_BINDING_PROTOCOL 
+
+  The DestroyChild() function does the opposite of CreateChild(). It removes a
+  protocol that was installed by CreateChild() from ChildHandle. If the removed
+  protocol is the last protocol on ChildHandle, then ChildHandle is destroyed.
+
+  @param[in]  This               Pointer to the EFI_SERVICE_BINDING_PROTOCOL
                                  instance.
   @param[in]  ChildHandle        Handle of the child to destroy.
 
-  @retval EFI_SUCCES             The protocol was removed from ChildHandle. 
+  @retval EFI_SUCCES             The protocol was removed from ChildHandle.
   @retval EFI_UNSUPPORTED        ChildHandle does not support the protocol that
                                  is being removed.
   @retval EFI_INVALID_PARAMETER  ChildHandle is not a valid UEFI handle.
@@ -210,8 +260,8 @@ MnpServiceBindingCreateChild (
 EFI_STATUS
 EFIAPI
 MnpServiceBindingDestroyChild (
-  IN EFI_SERVICE_BINDING_PROTOCOL  *This,
-  IN EFI_HANDLE                    ChildHandle
+  IN EFI_SERVICE_BINDING_PROTOCOL    *This,
+  IN EFI_HANDLE                      ChildHandle
   );
 
 #endif

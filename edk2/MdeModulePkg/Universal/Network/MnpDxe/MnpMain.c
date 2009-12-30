@@ -1,10 +1,11 @@
 /** @file
   Implementation of Managed Network Protocol public services.
 
-Copyright (c) 2005 - 2009, Intel Corporation. <BR>
+Copyright (c) 2005 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
+are licensed and made available under the terms and conditions
+of the BSD License which accompanies this distribution.  The full
+text of the license may be found at<BR>
 http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -16,10 +17,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   Returns the operational parameters for the current MNP child driver. May also
-  support returning the underlying SNP driver mode data.   
-   
+  support returning the underlying SNP driver mode data.
+
   The GetModeData() function is used to read the current mode data (operational
-  parameters) from the MNP or the underlying SNP. 
+  parameters) from the MNP or the underlying SNP.
 
   @param[in]  This          Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
   @param[out] MnpConfigData Pointer to storage for MNP operational parameters. Type
@@ -28,7 +29,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param[out] SnpModeData   Pointer to storage for SNP operational parameters. This
                             feature may be unsupported. Type EFI_SIMPLE_NETWORK_MODE
                             is defined in the EFI_SIMPLE_NETWORK_PROTOCOL.
- 
+
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_INVALID_PARAMETER This is NULL.
   @retval EFI_UNSUPPORTED       The requested feature is unsupported in this
@@ -42,9 +43,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 EFI_STATUS
 EFIAPI
 MnpGetModeData (
-  IN  EFI_MANAGED_NETWORK_PROTOCOL     *This,
-  OUT EFI_MANAGED_NETWORK_CONFIG_DATA  *MnpConfigData, OPTIONAL
-  OUT EFI_SIMPLE_NETWORK_MODE          *SnpModeData    OPTIONAL
+  IN     EFI_MANAGED_NETWORK_PROTOCOL      *This,
+     OUT EFI_MANAGED_NETWORK_CONFIG_DATA   *MnpConfigData OPTIONAL,
+     OUT EFI_SIMPLE_NETWORK_MODE           *SnpModeData OPTIONAL
   )
 {
   MNP_INSTANCE_DATA           *Instance;
@@ -53,7 +54,6 @@ MnpGetModeData (
   EFI_STATUS                  Status;
 
   if (This == NULL) {
-
     return EFI_INVALID_PARAMETER;
   }
 
@@ -72,7 +72,7 @@ MnpGetModeData (
     //
     // Copy the underlayer Snp mode data.
     //
-    Snp = Instance->MnpServiceData->Snp;
+    Snp = Instance->MnpServiceData->MnpDeviceData->Snp;
     CopyMem (SnpModeData, Snp->Mode, sizeof (*SnpModeData));
   }
 
@@ -89,9 +89,9 @@ MnpGetModeData (
 
 
 /**
-  Sets or clears the operational parameters for the MNP child driver. 
-   
-  The Configure() function is used to set, change, or reset the operational 
+  Sets or clears the operational parameters for the MNP child driver.
+
+  The Configure() function is used to set, change, or reset the operational
   parameters for the MNP child driver instance. Until the operational parameters
   have been set, no network traffic can be sent or received by this MNP child
   driver instance. Once the operational parameters have been reset, no more
@@ -143,8 +143,8 @@ MnpGetModeData (
 EFI_STATUS
 EFIAPI
 MnpConfigure (
-  IN EFI_MANAGED_NETWORK_PROTOCOL     *This,
-  IN EFI_MANAGED_NETWORK_CONFIG_DATA  *MnpConfigData OPTIONAL
+  IN EFI_MANAGED_NETWORK_PROTOCOL        *This,
+  IN EFI_MANAGED_NETWORK_CONFIG_DATA     *MnpConfigData OPTIONAL
   )
 {
   MNP_INSTANCE_DATA  *Instance;
@@ -152,10 +152,10 @@ MnpConfigure (
   EFI_STATUS         Status;
 
   if ((This == NULL) ||
-    ((MnpConfigData != NULL) &&
-    (MnpConfigData->ProtocolTypeFilter > 0) &&
-    (MnpConfigData->ProtocolTypeFilter <= 1500))) {
-
+      ((MnpConfigData != NULL) &&
+       (MnpConfigData->ProtocolTypeFilter > 0) &&
+       (MnpConfigData->ProtocolTypeFilter <= 1500))
+     ) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -184,9 +184,9 @@ ON_EXIT:
 
 
 /**
-  Translates an IP multicast address to a hardware (MAC) multicast address. This 
-  function may be unsupported in some MNP implementations. 
-   
+  Translates an IP multicast address to a hardware (MAC) multicast address. This
+  function may be unsupported in some MNP implementations.
+
   The McastIpToMac() function translates an IP multicast address to a hardware
   (MAC) multicast address. This function may be implemented by calling the
   underlying EFI_SIMPLE_NETWORK. MCastIpToMac() function, which may also be
@@ -197,7 +197,7 @@ ON_EXIT:
                           Set to FALSE if IpAddress is an IPv4 multicast address.
   @param[in]  IpAddress   Pointer to the multicast IP address (in network byte
                           order) to convert.
-  @param[out] MacAddress  Pointer to the resulting multicast MAC address. 
+  @param[out] MacAddress  Pointer to the resulting multicast MAC address.
 
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_INVALID_PARAMETER One of the following conditions is TRUE:
@@ -216,10 +216,10 @@ ON_EXIT:
 EFI_STATUS
 EFIAPI
 MnpMcastIpToMac (
-  IN  EFI_MANAGED_NETWORK_PROTOCOL  *This,
-  IN  BOOLEAN                       Ipv6Flag,
-  IN  EFI_IP_ADDRESS                *IpAddress,
-  OUT EFI_MAC_ADDRESS               *MacAddress
+  IN     EFI_MANAGED_NETWORK_PROTOCOL    *This,
+  IN     BOOLEAN                         Ipv6Flag,
+  IN     EFI_IP_ADDRESS                  *IpAddress,
+     OUT EFI_MAC_ADDRESS                 *MacAddress
   )
 {
   EFI_STATUS                  Status;
@@ -229,7 +229,6 @@ MnpMcastIpToMac (
   EFI_IPv6_ADDRESS            *Ip6Address;
 
   if ((This == NULL) || (IpAddress == NULL) || (MacAddress == NULL)) {
-
     return EFI_INVALID_PARAMETER;
   }
 
@@ -254,10 +253,10 @@ MnpMcastIpToMac (
     goto ON_EXIT;
   }
 
-  Snp = Instance->MnpServiceData->Snp;
+  Snp = Instance->MnpServiceData->MnpDeviceData->Snp;
   ASSERT (Snp != NULL);
 
-  ZeroMem (MacAddress, sizeof (EFI_MAC_ADDRESS));  
+  ZeroMem (MacAddress, sizeof (EFI_MAC_ADDRESS));
 
   if (Snp->Mode->IfType == NET_IFTYPE_ETHERNET) {
     if (!Ipv6Flag) {
@@ -273,10 +272,10 @@ MnpMcastIpToMac (
       MacAddress->Addr[5] = IpAddress->v4.Addr[3];
     } else {
       //
-      // Translate the IPv6 address into a multicast MAC address if the NIC is an 
+      // Translate the IPv6 address into a multicast MAC address if the NIC is an
       // ethernet NIC according to RFC2464.
       //
-      
+
       MacAddress->Addr[0] = 0x33;
       MacAddress->Addr[1] = 0x33;
       MacAddress->Addr[2] = Ip6Address->Addr[12];
@@ -305,14 +304,14 @@ ON_EXIT:
 }
 
 /**
-  Enables and disables receive filters for multicast address. This function may 
+  Enables and disables receive filters for multicast address. This function may
   be unsupported in some MNP implementations.
-   
-  The Groups() function only adds and removes multicast MAC addresses from the 
+
+  The Groups() function only adds and removes multicast MAC addresses from the
   filter list. The MNP driver does not transmit or process Internet Group
   Management Protocol (IGMP) packets. If JoinFlag is FALSE and MacAddress is
   NULL, then all joined groups are left.
-   
+
   @param[in]  This        Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
   @param[in]  JoinFlag    Set to TRUE to join this multicast group.
                           Set to FALSE to leave this multicast group.
@@ -343,9 +342,9 @@ ON_EXIT:
 EFI_STATUS
 EFIAPI
 MnpGroups (
-  IN EFI_MANAGED_NETWORK_PROTOCOL  *This,
-  IN BOOLEAN                       JoinFlag,
-  IN EFI_MAC_ADDRESS               *MacAddress OPTIONAL
+  IN EFI_MANAGED_NETWORK_PROTOCOL    *This,
+  IN BOOLEAN                         JoinFlag,
+  IN EFI_MAC_ADDRESS                 *MacAddress OPTIONAL
   )
 {
   MNP_INSTANCE_DATA       *Instance;
@@ -365,12 +364,11 @@ MnpGroups (
   }
 
   Instance  = MNP_INSTANCE_DATA_FROM_THIS (This);
-  SnpMode   = Instance->MnpServiceData->Snp->Mode;
+  SnpMode   = Instance->MnpServiceData->MnpDeviceData->Snp->Mode;
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   if (!Instance->Configured) {
-
     Status = EFI_NOT_STARTED;
     goto ON_EXIT;
   }
@@ -452,8 +450,8 @@ ON_EXIT:
 
 /**
   Places asynchronous outgoing data packets into the transmit queue.
-   
-  The Transmit() function places a completion token into the transmit packet 
+
+  The Transmit() function places a completion token into the transmit packet
   queue. This function is always asynchronous.
   The caller must fill in the Token.Event and Token.TxData fields in the
   completion token, and these fields cannot be NULL. When the transmit operation
@@ -463,8 +461,8 @@ ON_EXIT:
   defragmented before it can be transmitted by the network device. Systems in
   which performance is critical should review the requirements and features of
   the underlying communications device and drivers.
- 
- 
+
+
   @param[in]  This    Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
   @param[in]  Token   Pointer to a token associated with the transmit data
                       descriptor. Type EFI_MANAGED_NETWORK_COMPLETION_TOKEN
@@ -497,7 +495,7 @@ ON_EXIT:
   @retval EFI_ACCESS_DENIED      The transmit completion token is already in the
                                  transmit queue.
   @retval EFI_OUT_OF_RESOURCES   The transmit data could not be queued due to a
-                                 lack of system resources (usually memory). 
+                                 lack of system resources (usually memory).
   @retval EFI_DEVICE_ERROR       An unexpected system or network error occurred.
                                  The MNP child driver instance has been reset to
                                  startup defaults.
@@ -508,8 +506,8 @@ ON_EXIT:
 EFI_STATUS
 EFIAPI
 MnpTransmit (
-  IN EFI_MANAGED_NETWORK_PROTOCOL          *This,
-  IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *Token
+  IN EFI_MANAGED_NETWORK_PROTOCOL            *This,
+  IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN    *Token
   )
 {
   EFI_STATUS        Status;
@@ -520,7 +518,6 @@ MnpTransmit (
   EFI_TPL           OldTpl;
 
   if ((This == NULL) || (Token == NULL)) {
-
     return EFI_INVALID_PARAMETER;
   }
 
@@ -564,14 +561,14 @@ ON_EXIT:
 
 /**
   Places an asynchronous receiving request into the receiving queue.
-   
-  The Receive() function places a completion token into the receive packet 
+
+  The Receive() function places a completion token into the receive packet
   queue. This function is always asynchronous.
   The caller must fill in the Token.Event field in the completion token, and
   this field cannot be NULL. When the receive operation completes, the MNP
   updates the Token.Status and Token.RxData fields and the Token.Event is
   signaled.
-   
+
   @param[in]  This      Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
   @param[in]  Token     Pointer to a token associated with the receive
                         data descriptor. Type
@@ -600,8 +597,8 @@ ON_EXIT:
 EFI_STATUS
 EFIAPI
 MnpReceive (
-  IN EFI_MANAGED_NETWORK_PROTOCOL          *This,
-  IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *Token
+  IN EFI_MANAGED_NETWORK_PROTOCOL            *This,
+  IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN    *Token
   )
 {
   EFI_STATUS         Status;
@@ -609,7 +606,6 @@ MnpReceive (
   EFI_TPL            OldTpl;
 
   if ((This == NULL) || (Token == NULL) || (Token->Event == NULL)) {
-
     return EFI_INVALID_PARAMETER;
   }
 
@@ -618,7 +614,6 @@ MnpReceive (
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   if (!Instance->Configured) {
-
     Status = EFI_NOT_STARTED;
     goto ON_EXIT;
   }
@@ -628,7 +623,6 @@ MnpReceive (
   //
   Status = NetMapIterate (&Instance->RxTokenMap, MnpTokenExist, (VOID *) Token);
   if (EFI_ERROR (Status)) {
-
     goto ON_EXIT;
   }
 
@@ -636,7 +630,6 @@ MnpReceive (
   // Insert the Token into the RxTokenMap.
   //
   Status = NetMapInsertTail (&Instance->RxTokenMap, (VOID *) Token, NULL);
-
   if (!EFI_ERROR (Status)) {
     //
     // Try to deliver any buffered packets.
@@ -656,8 +649,8 @@ ON_EXIT:
 }
 
 /**
-  Aborts an asynchronous transmit or receive request. 
-   
+  Aborts an asynchronous transmit or receive request.
+
   The Cancel() function is used to abort a pending transmit or receive request.
   If the token is in the transmit or receive request queues, after calling this
   function, Token.Status will be set to EFI_ABORTED and then Token.Event will be
@@ -668,7 +661,7 @@ ON_EXIT:
   @param[in]  This     Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
   @param[in]  Token    Pointer to a token that has been issued by
                        EFI_MANAGED_NETWORK_PROTOCOL.Transmit() or
-                       EFI_MANAGED_NETWORK_PROTOCOL.Receive(). If NULL, all 
+                       EFI_MANAGED_NETWORK_PROTOCOL.Receive(). If NULL, all
                        pending tokens are aborted.
 
   @retval EFI_SUCCESS            The asynchronous I/O request was aborted and
@@ -687,8 +680,8 @@ ON_EXIT:
 EFI_STATUS
 EFIAPI
 MnpCancel (
-  IN EFI_MANAGED_NETWORK_PROTOCOL          *This,
-  IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *Token OPTIONAL
+  IN EFI_MANAGED_NETWORK_PROTOCOL            *This,
+  IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN    *Token OPTIONAL
   )
 {
   EFI_STATUS         Status;
@@ -696,7 +689,6 @@ MnpCancel (
   EFI_TPL            OldTpl;
 
   if (This == NULL) {
-
     return EFI_INVALID_PARAMETER;
   }
 
@@ -705,7 +697,6 @@ MnpCancel (
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   if (!Instance->Configured) {
-
     Status = EFI_NOT_STARTED;
     goto ON_EXIT;
   }
@@ -714,9 +705,7 @@ MnpCancel (
   // Iterate the RxTokenMap to cancel the specified Token.
   //
   Status = NetMapIterate (&Instance->RxTokenMap, MnpCancelTokens, (VOID *) Token);
-
   if (Token != NULL) {
-
     Status = (Status == EFI_ABORTED) ? EFI_SUCCESS : EFI_NOT_FOUND;
   }
 
@@ -732,9 +721,9 @@ ON_EXIT:
 }
 
 /**
-  Polls for incoming data packets and processes outgoing data packets. 
-   
-  The Poll() function can be used by network drivers and applications to 
+  Polls for incoming data packets and processes outgoing data packets.
+
+  The Poll() function can be used by network drivers and applications to
   increase the rate that data packets are moved between the communications
   device and the transmit and receive queues.
   Normally, a periodic timer event internally calls the Poll() function. But, in
@@ -760,7 +749,7 @@ ON_EXIT:
 EFI_STATUS
 EFIAPI
 MnpPoll (
-  IN EFI_MANAGED_NETWORK_PROTOCOL  *This
+  IN EFI_MANAGED_NETWORK_PROTOCOL    *This
   )
 {
   EFI_STATUS         Status;
@@ -783,7 +772,7 @@ MnpPoll (
   //
   // Try to receive packets.
   //
-  Status = MnpReceivePacket (Instance->MnpServiceData);
+  Status = MnpReceivePacket (Instance->MnpServiceData->MnpDeviceData);
 
   //
   // Dispatch the DPC queued by the NotifyFunction of rx token's events.
@@ -795,4 +784,3 @@ ON_EXIT:
 
   return Status;
 }
-

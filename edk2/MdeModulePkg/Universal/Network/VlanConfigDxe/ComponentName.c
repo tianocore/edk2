@@ -1,7 +1,7 @@
 /** @file
-  The header file of UEFI Component Name(2) protocol.
+  UEFI Component Name(2) protocol implementation for VlanConfigDxe driver.
 
-Copyright (c) 2004 - 2009, Intel Corporation.<BR>
+Copyright (c) 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -13,14 +13,40 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _COMPONENT_NAME_H_
-#define _COMPONENT_NAME_H_
+#include "VlanConfigImpl.h"
 
-#include <Protocol/ComponentName.h>
-#include <Protocol/ComponentName2.h>
+//
+// EFI Component Name Protocol
+//
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL   gVlanConfigComponentName = {
+  VlanConfigComponentNameGetDriverName,
+  VlanConfigComponentNameGetControllerName,
+  "eng"
+};
 
-extern EFI_COMPONENT_NAME2_PROTOCOL gMnpComponentName2;
-extern EFI_COMPONENT_NAME_PROTOCOL  gMnpComponentName;
+//
+// EFI Component Name 2 Protocol
+//
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gVlanConfigComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) VlanConfigComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) VlanConfigComponentNameGetControllerName,
+  "en"
+};
+
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE      mVlanConfigDriverNameTable[] = {
+  {
+    "eng;en",
+    L"VLAN Configuration Driver"
+  },
+  {
+    NULL,
+    NULL
+  }
+};
+
+//
+// EFI Component Name Functions
+//
 
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
@@ -32,10 +58,9 @@ extern EFI_COMPONENT_NAME_PROTOCOL  gMnpComponentName;
   by This does not support the language specified by Language,
   then EFI_UNSUPPORTED is returned.
 
-  @param[in]   This             A pointer to the EFI_COMPONENT_NAME2_PROTOCOL or
+  @param  This[in]              A pointer to the EFI_COMPONENT_NAME2_PROTOCOL or
                                 EFI_COMPONENT_NAME_PROTOCOL instance.
-
-  @param[in]   Language         A pointer to a Null-terminated ASCII string
+  @param  Language[in]          A pointer to a Null-terminated ASCII string
                                 array indicating the language. This is the
                                 language of the driver name that the caller is
                                 requesting, and it must match one of the
@@ -43,8 +68,7 @@ extern EFI_COMPONENT_NAME_PROTOCOL  gMnpComponentName;
                                 number of languages supported by a driver is up
                                 to the driver writer. Language is specified
                                 in RFC 4646 or ISO 639-2 language code format.
-
-  @param[out]  DriverName       A pointer to the Unicode string to return.
+  @param  DriverName[out]       A pointer to the Unicode string to return.
                                 This Unicode string is the name of the
                                 driver specified by This in the language
                                 specified by Language.
@@ -52,22 +76,28 @@ extern EFI_COMPONENT_NAME_PROTOCOL  gMnpComponentName;
   @retval EFI_SUCCESS           The Unicode string for the Driver specified by
                                 This and the language specified by Language was
                                 returned in DriverName.
-
   @retval EFI_INVALID_PARAMETER Language is NULL.
-
   @retval EFI_INVALID_PARAMETER DriverName is NULL.
-
   @retval EFI_UNSUPPORTED       The driver specified by This does not support
                                 the language specified by Language.
 
 **/
 EFI_STATUS
 EFIAPI
-MnpComponentNameGetDriverName (
+VlanConfigComponentNameGetDriverName (
   IN     EFI_COMPONENT_NAME_PROTOCOL   *This,
   IN     CHAR8                         *Language,
      OUT CHAR16                        **DriverName
-  );
+  )
+{
+  return LookupUnicodeString2 (
+           Language,
+           This->SupportedLanguages,
+           mVlanConfigDriverNameTable,
+           DriverName,
+           (BOOLEAN)(This == &gVlanConfigComponentName)
+           );
+}
 
 /**
   Retrieves a Unicode string that is the user readable name of the controller
@@ -81,17 +111,14 @@ MnpComponentNameGetDriverName (
   managing the controller specified by ControllerHandle and ChildHandle,
   then EFI_UNSUPPORTED is returned.  If the driver specified by This does not
   support the language specified by Language, then EFI_UNSUPPORTED is returned.
-  Currently not implemented.
 
-  @param[in]   This             A pointer to the EFI_COMPONENT_NAME2_PROTOCOL or
+  @param  This[in]              A pointer to the EFI_COMPONENT_NAME2_PROTOCOL or
                                 EFI_COMPONENT_NAME_PROTOCOL instance.
-
-  @param[in]   ControllerHandle The handle of a controller that the driver
+  @param  ControllerHandle[in]  The handle of a controller that the driver
                                 specified by This is managing.  This handle
                                 specifies the controller whose name is to be
                                 returned.
-
-  @param[in]   ChildHandle      The handle of the child controller to retrieve
+  @param  ChildHandle[in]       The handle of the child controller to retrieve
                                 the name of.  This is an optional parameter that
                                 may be NULL.  It will be NULL for device
                                 drivers.  It will also be NULL for a bus drivers
@@ -99,8 +126,7 @@ MnpComponentNameGetDriverName (
                                 controller.  It will not be NULL for a bus
                                 driver that wishes to retrieve the name of a
                                 child controller.
-
-  @param[in]   Language         A pointer to a Null-terminated ASCII string
+  @param  Language[in]          A pointer to a Null-terminated ASCII string
                                 array indicating the language.  This is the
                                 language of the driver name that the caller is
                                 requesting, and it must match one of the
@@ -108,43 +134,38 @@ MnpComponentNameGetDriverName (
                                 number of languages supported by a driver is up
                                 to the driver writer. Language is specified in
                                 RFC 4646 or ISO 639-2 language code format.
-
-  @param[out]  ControllerName   A pointer to the Unicode string to return.
+  @param  ControllerName[out]   A pointer to the Unicode string to return.
                                 This Unicode string is the name of the
                                 controller specified by ControllerHandle and
                                 ChildHandle in the language specified by
                                 Language from the point of view of the driver
                                 specified by This.
 
-  @retval EFI_SUCCESS           The Unicode string for the user readable name
-                                specified by This, ControllerHandle, ChildHandle,
-                                and Language was returned in ControllerName.
-
+  @retval EFI_SUCCESS           The Unicode string for the user readable name in
+                                the language specified by Language for the
+                                driver specified by This was returned in
+                                DriverName.
   @retval EFI_INVALID_PARAMETER ControllerHandle is not a valid EFI_HANDLE.
-
   @retval EFI_INVALID_PARAMETER ChildHandle is not NULL and it is not a valid
                                 EFI_HANDLE.
-
   @retval EFI_INVALID_PARAMETER Language is NULL.
-
   @retval EFI_INVALID_PARAMETER ControllerName is NULL.
-
   @retval EFI_UNSUPPORTED       The driver specified by This is not currently
                                 managing the controller specified by
                                 ControllerHandle and ChildHandle.
-
   @retval EFI_UNSUPPORTED       The driver specified by This does not support
                                 the language specified by Language.
 
 **/
 EFI_STATUS
 EFIAPI
-MnpComponentNameGetControllerName (
+VlanConfigComponentNameGetControllerName (
   IN     EFI_COMPONENT_NAME_PROTOCOL   *This,
   IN     EFI_HANDLE                    ControllerHandle,
-  IN     EFI_HANDLE                    ChildHandle        OPTIONAL,
+  IN     EFI_HANDLE                    ChildHandle OPTIONAL,
   IN     CHAR8                         *Language,
      OUT CHAR16                        **ControllerName
-  );
-
-#endif
+  )
+{
+  return EFI_UNSUPPORTED;
+}

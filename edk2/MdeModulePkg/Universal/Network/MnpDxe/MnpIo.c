@@ -1,10 +1,11 @@
 /** @file
   Implementation of Managed Network Protocol I/O functions.
-    
-Copyright (c) 2005 - 2009, Intel Corporation. <BR>
+
+Copyright (c) 2005 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
+are licensed and made available under the terms and conditions
+of the BSD License which accompanies this distribution.  The full
+text of the license may be found at<BR>
 http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -13,6 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "MnpImpl.h"
+#include "MnpVlan.h"
 
 /**
   Validates the Mnp transmit token.
@@ -25,8 +27,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 BOOLEAN
 MnpIsValidTxToken (
-  IN MNP_INSTANCE_DATA                     *Instance,
-  IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *Token
+  IN MNP_INSTANCE_DATA                       *Instance,
+  IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN    *Token
   )
 {
   MNP_SERVICE_DATA                  *MnpServiceData;
@@ -38,7 +40,7 @@ MnpIsValidTxToken (
   MnpServiceData = Instance->MnpServiceData;
   NET_CHECK_SIGNATURE (MnpServiceData, MNP_SERVICE_DATA_SIGNATURE);
 
-  TxData  = Token->Packet.TxData;
+  TxData = Token->Packet.TxData;
 
   if ((Token->Event == NULL) || (TxData == NULL) || (TxData->FragmentCount == 0)) {
     //
@@ -105,25 +107,27 @@ MnpIsValidTxToken (
   Build the packet to transmit from the TxData passed in.
 
   @param[in]   MnpServiceData      Pointer to the mnp service context data.
-  @param[in]   TxData              Pointer to the transmit data containing the information 
+  @param[in]   TxData              Pointer to the transmit data containing the information
                                    to build the packet.
   @param[out]  PktBuf              Pointer to record the address of the packet.
-  @param[out]  PktLen              Pointer to a UINT32 variable used to record the packet's 
+  @param[out]  PktLen              Pointer to a UINT32 variable used to record the packet's
                                    length.
 
 **/
 VOID
 MnpBuildTxPacket (
-  IN  MNP_SERVICE_DATA                   *MnpServiceData,
-  IN  EFI_MANAGED_NETWORK_TRANSMIT_DATA  *TxData,
-  OUT UINT8                              **PktBuf,
-  OUT UINT32                             *PktLen
+  IN     MNP_SERVICE_DATA                    *MnpServiceData,
+  IN     EFI_MANAGED_NETWORK_TRANSMIT_DATA   *TxData,
+     OUT UINT8                               **PktBuf,
+     OUT UINT32                              *PktLen
   )
 {
   EFI_SIMPLE_NETWORK_MODE *SnpMode;
   UINT8                   *DstPos;
   UINT16                  Index;
+  MNP_DEVICE_DATA         *MnpDerviceData;
 
+  MnpDerviceData = MnpServiceData->MnpDeviceData;
   if ((TxData->DestinationAddress == NULL) && (TxData->FragmentCount == 1)) {
     //
     // Media header is in FragmentTable and there is only one fragment,
@@ -137,8 +141,8 @@ MnpBuildTxPacket (
     // one fragment, copy the data into the packet buffer. Reserve the
     // media header space if necessary.
     //
-    SnpMode = MnpServiceData->Snp->Mode;
-    DstPos  = MnpServiceData->TxBuf;
+    SnpMode = MnpDerviceData->Snp->Mode;
+    DstPos  = MnpDerviceData->TxBuf;
 
     *PktLen = 0;
     if (TxData->DestinationAddress != NULL) {
@@ -165,7 +169,7 @@ MnpBuildTxPacket (
     //
     // Set the buffer pointer and the buffer length.
     //
-    *PktBuf = MnpServiceData->TxBuf;
+    *PktBuf = MnpDerviceData->TxBuf;
     *PktLen += TxData->DataLength + TxData->HeaderLength;
   }
 }
@@ -186,10 +190,10 @@ MnpBuildTxPacket (
 **/
 EFI_STATUS
 MnpSyncSendPacket (
-  IN MNP_SERVICE_DATA                          *MnpServiceData,
-  IN UINT8                                     *Packet,
-  IN UINT32                                    Length,
-  IN OUT EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *Token
+  IN     MNP_SERVICE_DATA                        *MnpServiceData,
+  IN     UINT8                                   *Packet,
+  IN     UINT32                                  Length,
+  IN OUT EFI_MANAGED_NETWORK_COMPLETION_TOKEN    *Token
   )
 {
   EFI_STATUS                        Status;
@@ -197,24 +201,31 @@ MnpSyncSendPacket (
   EFI_MANAGED_NETWORK_TRANSMIT_DATA *TxData;
   UINT32                            HeaderSize;
   UINT8                             *TxBuf;
+  MNP_DEVICE_DATA                   *MnpDeviceData;
+  UINT16                            ProtocolType;
 
-  Snp         = MnpServiceData->Snp;
-  TxData      = Token->Packet.TxData;
+  MnpDeviceData = MnpServiceData->MnpDeviceData;
+  Snp           = MnpDeviceData->Snp;
+  TxData        = Token->Packet.TxData;
 
-  HeaderSize  = Snp->Mode->MediaHeaderSize - TxData->HeaderLength;
+  HeaderSize    = Snp->Mode->MediaHeaderSize - TxData->HeaderLength;
 
   //
   // Start the timeout event.
   //
   Status = gBS->SetTimer (
-                  MnpServiceData->TxTimeoutEvent,
+                  MnpDeviceData->TxTimeoutEvent,
                   TimerRelative,
                   MNP_TX_TIMEOUT_TIME
                   );
   if (EFI_ERROR (Status)) {
-
     goto SIGNAL_TOKEN;
   }
+
+  //
+  // Insert VLAN tag
+  //
+  MnpInsertVlanTag (MnpServiceData, TxData, &ProtocolType, &Packet, &Length);
 
   for (;;) {
     //
@@ -227,10 +238,9 @@ MnpSyncSendPacket (
                     Packet,
                     TxData->SourceAddress,
                     TxData->DestinationAddress,
-                    &TxData->ProtocolType
+                    &ProtocolType
                     );
     if ((Status != EFI_SUCCESS) && (Status != EFI_NOT_READY)) {
-
       Status = EFI_DEVICE_ERROR;
       break;
     }
@@ -247,22 +257,20 @@ MnpSyncSendPacket (
       //
       Snp->GetStatus (Snp, NULL, (VOID **) &TxBuf);
 
-      if (!EFI_ERROR (gBS->CheckEvent (MnpServiceData->TxTimeoutEvent))) {
-
+      if (!EFI_ERROR (gBS->CheckEvent (MnpDeviceData->TxTimeoutEvent))) {
         Status = EFI_TIMEOUT;
         break;
       }
     } while (TxBuf == NULL);
 
     if ((Status == EFI_SUCCESS) || (Status == EFI_TIMEOUT)) {
-
       break;
     } else {
       //
       // Status is EFI_NOT_READY. Restart the timer event and call Snp->Transmit again.
       //
       gBS->SetTimer (
-            MnpServiceData->TxTimeoutEvent,
+            MnpDeviceData->TxTimeoutEvent,
             TimerRelative,
             MNP_TX_TIMEOUT_TIME
             );
@@ -272,7 +280,7 @@ MnpSyncSendPacket (
   //
   // Cancel the timer event.
   //
-  gBS->SetTimer (MnpServiceData->TxTimeoutEvent, TimerCancel, 0);
+  gBS->SetTimer (MnpDeviceData->TxTimeoutEvent, TimerCancel, 0);
 
 SIGNAL_TOKEN:
 
@@ -301,18 +309,18 @@ SIGNAL_TOKEN:
 **/
 EFI_STATUS
 MnpInstanceDeliverPacket (
-  IN OUT MNP_INSTANCE_DATA  *Instance
+  IN OUT MNP_INSTANCE_DATA   *Instance
   )
 {
-  MNP_SERVICE_DATA                      *MnpServiceData;
+  MNP_DEVICE_DATA                       *MnpDeviceData;
   MNP_RXDATA_WRAP                       *RxDataWrap;
   NET_BUF                               *DupNbuf;
   EFI_MANAGED_NETWORK_RECEIVE_DATA      *RxData;
   EFI_SIMPLE_NETWORK_MODE               *SnpMode;
   EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *RxToken;
 
-  MnpServiceData = Instance->MnpServiceData;
-  NET_CHECK_SIGNATURE (MnpServiceData, MNP_SERVICE_DATA_SIGNATURE);
+  MnpDeviceData = Instance->MnpServiceData->MnpDeviceData;
+  NET_CHECK_SIGNATURE (MnpDeviceData, MNP_DEVICE_DATA_SIGNATURE);
 
   if (NetMapIsEmpty (&Instance->RxTokenMap) || IsListEmpty (&Instance->RcvdPacketQueue)) {
     //
@@ -329,7 +337,7 @@ MnpInstanceDeliverPacket (
     // There are other instances share this Nbuf, duplicate to get a
     // copy to allow the instance to do R/W operations.
     //
-    DupNbuf = MnpAllocNbuf (MnpServiceData);
+    DupNbuf = MnpAllocNbuf (MnpDeviceData);
     if (DupNbuf == NULL) {
       DEBUG ((EFI_D_WARN, "MnpDeliverPacket: Failed to allocate a free Nbuf.\n"));
 
@@ -340,7 +348,7 @@ MnpInstanceDeliverPacket (
     // Duplicate the net buffer.
     //
     NetbufDuplicate (RxDataWrap->Nbuf, DupNbuf, 0);
-    MnpFreeNbuf (MnpServiceData, RxDataWrap->Nbuf);
+    MnpFreeNbuf (MnpDeviceData, RxDataWrap->Nbuf);
     RxDataWrap->Nbuf = DupNbuf;
   }
 
@@ -351,7 +359,7 @@ MnpInstanceDeliverPacket (
   Instance->RcvdPacketQueueSize--;
 
   RxData  = &RxDataWrap->RxData;
-  SnpMode = MnpServiceData->Snp->Mode;
+  SnpMode = MnpDeviceData->Snp->Mode;
 
   //
   // Set all the buffer pointers.
@@ -390,7 +398,7 @@ MnpInstanceDeliverPacket (
 **/
 VOID
 MnpDeliverPacket (
-  IN MNP_SERVICE_DATA  *MnpServiceData
+  IN MNP_SERVICE_DATA    *MnpServiceData
   )
 {
   LIST_ENTRY        *Entry;
@@ -421,12 +429,12 @@ MnpDeliverPacket (
 VOID
 EFIAPI
 MnpRecycleRxData (
-  IN EFI_EVENT  Event,
-  IN VOID       *Context
+  IN EFI_EVENT     Event,
+  IN VOID          *Context
   )
 {
-  MNP_RXDATA_WRAP   *RxDataWrap;
-  MNP_SERVICE_DATA  *MnpServiceData;
+  MNP_RXDATA_WRAP *RxDataWrap;
+  MNP_DEVICE_DATA *MnpDeviceData;
 
   ASSERT (Context != NULL);
 
@@ -435,13 +443,13 @@ MnpRecycleRxData (
 
   ASSERT (RxDataWrap->Nbuf != NULL);
 
-  MnpServiceData = RxDataWrap->Instance->MnpServiceData;
-  NET_CHECK_SIGNATURE (MnpServiceData, MNP_SERVICE_DATA_SIGNATURE);
+  MnpDeviceData = RxDataWrap->Instance->MnpServiceData->MnpDeviceData;
+  NET_CHECK_SIGNATURE (MnpDeviceData, MNP_DEVICE_DATA_SIGNATURE);
 
   //
   // Free this Nbuf.
   //
-  MnpFreeNbuf (MnpServiceData, RxDataWrap->Nbuf);
+  MnpFreeNbuf (MnpDeviceData, RxDataWrap->Nbuf);
   RxDataWrap->Nbuf = NULL;
 
   //
@@ -467,8 +475,8 @@ MnpRecycleRxData (
 **/
 VOID
 MnpQueueRcvdPacket (
-  IN OUT MNP_INSTANCE_DATA  *Instance,
-  IN OUT MNP_RXDATA_WRAP    *RxDataWrap
+  IN OUT MNP_INSTANCE_DATA   *Instance,
+  IN OUT MNP_RXDATA_WRAP     *RxDataWrap
   )
 {
   MNP_RXDATA_WRAP *OldRxDataWrap;
@@ -528,10 +536,10 @@ MnpQueueRcvdPacket (
 **/
 BOOLEAN
 MnpMatchPacket (
-  IN MNP_INSTANCE_DATA                 *Instance,
-  IN EFI_MANAGED_NETWORK_RECEIVE_DATA  *RxData,
-  IN MNP_GROUP_ADDRESS                 *GroupAddress OPTIONAL,
-  IN UINT8                             PktAttr
+  IN MNP_INSTANCE_DATA                   *Instance,
+  IN EFI_MANAGED_NETWORK_RECEIVE_DATA    *RxData,
+  IN MNP_GROUP_ADDRESS                   *GroupAddress OPTIONAL,
+  IN UINT8                               PktAttr
   )
 {
   EFI_MANAGED_NETWORK_CONFIG_DATA *ConfigData;
@@ -607,18 +615,20 @@ MnpMatchPacket (
 **/
 VOID
 MnpAnalysePacket (
-  IN  MNP_SERVICE_DATA                      *MnpServiceData,
-  IN  NET_BUF                               *Nbuf,
-  IN  OUT EFI_MANAGED_NETWORK_RECEIVE_DATA  *RxData,
-  OUT MNP_GROUP_ADDRESS                     **GroupAddress,
-  OUT UINT8                                 *PktAttr
+  IN     MNP_SERVICE_DATA                    *MnpServiceData,
+  IN     NET_BUF                             *Nbuf,
+  IN OUT EFI_MANAGED_NETWORK_RECEIVE_DATA    *RxData,
+     OUT MNP_GROUP_ADDRESS                   **GroupAddress,
+     OUT UINT8                               *PktAttr
   )
 {
   EFI_SIMPLE_NETWORK_MODE *SnpMode;
+  MNP_DEVICE_DATA         *MnpDeviceData;
   UINT8                   *BufPtr;
   LIST_ENTRY              *Entry;
 
-  SnpMode = MnpServiceData->Snp->Mode;
+  MnpDeviceData = MnpServiceData->MnpDeviceData;
+  SnpMode       = MnpDeviceData->Snp->Mode;
 
   //
   // Get the packet buffer.
@@ -650,7 +660,7 @@ MnpAnalysePacket (
       //
       // It's multicast, try to match the multicast filters.
       //
-      NET_LIST_FOR_EACH (Entry, &MnpServiceData->GroupAddressList) {
+      NET_LIST_FOR_EACH (Entry, &MnpDeviceData->GroupAddressList) {
 
         *GroupAddress = NET_LIST_USER_STRUCT (Entry, MNP_GROUP_ADDRESS, AddrEntry);
         if (NET_MAC_EQUAL (BufPtr, &((*GroupAddress)->Address), SnpMode->HwAddressSize)) {
@@ -667,7 +677,7 @@ MnpAnalysePacket (
         *GroupAddress           = NULL;
         RxData->PromiscuousFlag = TRUE;
 
-        if (MnpServiceData->PromiscuousCount == 0) {
+        if (MnpDeviceData->PromiscuousCount == 0) {
           //
           // Skip the below code, there is no receiver of this packet.
           //
@@ -703,8 +713,8 @@ MnpAnalysePacket (
 **/
 MNP_RXDATA_WRAP *
 MnpWrapRxData (
-  IN MNP_INSTANCE_DATA                 *Instance,
-  IN EFI_MANAGED_NETWORK_RECEIVE_DATA  *RxData
+  IN MNP_INSTANCE_DATA                   *Instance,
+  IN EFI_MANAGED_NETWORK_RECEIVE_DATA    *RxData
   )
 {
   EFI_STATUS      Status;
@@ -737,8 +747,8 @@ MnpWrapRxData (
                   &RxDataWrap->RxData.RecycleEvent
                   );
   if (EFI_ERROR (Status)) {
-
     DEBUG ((EFI_D_ERROR, "MnpDispatchPacket: gBS->CreateEvent failed, %r.\n", Status));
+
     FreePool (RxDataWrap);
     return NULL;
   }
@@ -758,8 +768,8 @@ MnpWrapRxData (
 **/
 VOID
 MnpEnqueuePacket (
-  IN MNP_SERVICE_DATA   *MnpServiceData,
-  IN NET_BUF            *Nbuf
+  IN MNP_SERVICE_DATA    *MnpServiceData,
+  IN NET_BUF             *Nbuf
   )
 {
   LIST_ENTRY                        *Entry;
@@ -776,7 +786,7 @@ MnpEnqueuePacket (
   //
   MnpAnalysePacket (MnpServiceData, Nbuf, &RxData, &GroupAddress, &PktAttr);
 
-  if (RxData.PromiscuousFlag && (MnpServiceData->PromiscuousCount == 0)) {
+  if (RxData.PromiscuousFlag && (MnpServiceData->MnpDeviceData->PromiscuousCount == 0)) {
     //
     // No receivers, no more action need.
     //
@@ -799,7 +809,6 @@ MnpEnqueuePacket (
     // Check the packet against the instance receive filters.
     //
     if (MnpMatchPacket (Instance, &RxData, GroupAddress, PktAttr)) {
-
       //
       // Wrap the RxData.
       //
@@ -826,7 +835,7 @@ MnpEnqueuePacket (
 /**
   Try to receive a packet and deliver it.
 
-  @param[in, out]  MnpServiceData        Pointer to the mnp service context data.
+  @param[in, out]  MnpDeviceData        Pointer to the mnp device context data.
 
   @retval EFI_SUCCESS           add return value to function comment
   @retval EFI_NOT_STARTED       The simple network protocol is not started.
@@ -836,7 +845,7 @@ MnpEnqueuePacket (
 **/
 EFI_STATUS
 MnpReceivePacket (
-  IN OUT MNP_SERVICE_DATA  *MnpServiceData
+  IN OUT MNP_DEVICE_DATA   *MnpDeviceData
   )
 {
   EFI_STATUS                  Status;
@@ -846,10 +855,13 @@ MnpReceivePacket (
   UINTN                       BufLen;
   UINTN                       HeaderSize;
   UINT32                      Trimmed;
+  MNP_SERVICE_DATA            *MnpServiceData;
+  UINT16                      VlanId;
+  BOOLEAN                     IsVlanPacket;
 
-  NET_CHECK_SIGNATURE (MnpServiceData, MNP_SERVICE_DATA_SIGNATURE);
+  NET_CHECK_SIGNATURE (MnpDeviceData, MNP_DEVICE_DATA_SIGNATURE);
 
-  Snp = MnpServiceData->Snp;
+  Snp = MnpDeviceData->Snp;
   if (Snp->Mode->State != EfiSimpleNetworkInitialized) {
     //
     // The simple network protocol is not started.
@@ -857,20 +869,13 @@ MnpReceivePacket (
     return EFI_NOT_STARTED;
   }
 
-  if (IsListEmpty (&MnpServiceData->ChildrenList)) {
-    //
-    // There is no child, no need to receive packets.
-    //
-    return EFI_SUCCESS;
-  }
-
-  if (MnpServiceData->RxNbufCache == NULL) {
+  if (MnpDeviceData->RxNbufCache == NULL) {
     //
     // Try to get a new buffer as there may be buffers recycled.
     //
-    MnpServiceData->RxNbufCache = MnpAllocNbuf (MnpServiceData);
+    MnpDeviceData->RxNbufCache = MnpAllocNbuf (MnpDeviceData);
 
-    if (MnpServiceData->RxNbufCache == NULL) {
+    if (MnpDeviceData->RxNbufCache == NULL) {
       //
       // No availabe buffer in the buffer pool.
       //
@@ -878,13 +883,13 @@ MnpReceivePacket (
     }
 
     NetbufAllocSpace (
-      MnpServiceData->RxNbufCache,
-      MnpServiceData->BufferLength,
+      MnpDeviceData->RxNbufCache,
+      MnpDeviceData->BufferLength,
       NET_BUF_TAIL
       );
   }
 
-  Nbuf    = MnpServiceData->RxNbufCache;
+  Nbuf    = MnpDeviceData->RxNbufCache;
   BufLen  = Nbuf->TotalSize;
   BufPtr  = NetbufGetByte (Nbuf, 0, NULL);
   ASSERT (BufPtr != NULL);
@@ -894,7 +899,6 @@ MnpReceivePacket (
   //
   Status = Snp->Receive (Snp, &HeaderSize, &BufLen, BufPtr, NULL, NULL, NULL);
   if (EFI_ERROR (Status)) {
-
     DEBUG_CODE (
       if (Status != EFI_NOT_READY) {
         DEBUG ((EFI_D_WARN, "MnpReceivePacket: Snp->Receive() = %r.\n", Status));
@@ -908,7 +912,6 @@ MnpReceivePacket (
   // Sanity check.
   //
   if ((HeaderSize != Snp->Mode->MediaHeaderSize) || (BufLen < HeaderSize)) {
-
     DEBUG (
       (EFI_D_WARN,
       "MnpReceivePacket: Size error, HL:TL = %d:%d.\n",
@@ -927,6 +930,25 @@ MnpReceivePacket (
     ASSERT (Nbuf->TotalSize == BufLen);
   }
 
+  VlanId = 0;
+  IsVlanPacket = MnpRemoveVlanTag (MnpDeviceData, Nbuf, &VlanId);
+
+  MnpServiceData = MnpFindServiceData (MnpDeviceData, VlanId);
+  if (MnpServiceData == NULL) {
+    //
+    // VLAN is not set for this tagged frame, ignore this packet
+    //
+    if (Trimmed > 0) {
+      NetbufAllocSpace (Nbuf, Trimmed, NET_BUF_TAIL);
+    }
+
+    if (IsVlanPacket) {
+      NetbufAllocSpace (Nbuf, NET_VLAN_TAG_LEN, NET_BUF_HEAD);
+    }
+
+    goto EXIT;
+  }
+
   //
   // Enqueue the packet to the matched instances.
   //
@@ -937,22 +959,25 @@ MnpReceivePacket (
     // RefCnt > 2 indicates there is at least one receiver of this packet.
     // Free the current RxNbufCache and allocate a new one.
     //
-    MnpFreeNbuf (MnpServiceData, Nbuf);
+    MnpFreeNbuf (MnpDeviceData, Nbuf);
 
-    Nbuf                        = MnpAllocNbuf (MnpServiceData);
-    MnpServiceData->RxNbufCache = Nbuf;
+    Nbuf                       = MnpAllocNbuf (MnpDeviceData);
+    MnpDeviceData->RxNbufCache = Nbuf;
     if (Nbuf == NULL) {
       DEBUG ((EFI_D_ERROR, "MnpReceivePacket: Alloc packet for receiving cache failed.\n"));
       return EFI_DEVICE_ERROR;
     }
 
-    NetbufAllocSpace (Nbuf, MnpServiceData->BufferLength, NET_BUF_TAIL);
+    NetbufAllocSpace (Nbuf, MnpDeviceData->BufferLength, NET_BUF_TAIL);
   } else {
     //
     // No receiver for this packet.
     //
     if (Trimmed > 0) {
       NetbufAllocSpace (Nbuf, Trimmed, NET_BUF_TAIL);
+    }
+    if (IsVlanPacket) {
+      NetbufAllocSpace (Nbuf, NET_VLAN_TAG_LEN, NET_BUF_HEAD);
     }
 
     goto EXIT;
@@ -964,7 +989,7 @@ MnpReceivePacket (
 
 EXIT:
 
-  ASSERT (Nbuf->TotalSize == MnpServiceData->BufferLength);
+  ASSERT (Nbuf->TotalSize == MnpDeviceData->BufferLength);
 
   return Status;
 }
@@ -976,65 +1001,69 @@ EXIT:
   @param[in]  Event             The event this notify function registered to.
   @param[in]  Context           Pointer to the context data registered to the
                                 event.
-   
+
 **/
 VOID
 EFIAPI
 MnpCheckPacketTimeout (
-  IN EFI_EVENT  Event,
-  IN VOID       *Context
+  IN EFI_EVENT     Event,
+  IN VOID          *Context
   )
 {
+  MNP_DEVICE_DATA   *MnpDeviceData;
   MNP_SERVICE_DATA  *MnpServiceData;
   LIST_ENTRY        *Entry;
+  LIST_ENTRY        *ServiceEntry;
   LIST_ENTRY        *RxEntry;
   LIST_ENTRY        *NextEntry;
   MNP_INSTANCE_DATA *Instance;
   MNP_RXDATA_WRAP   *RxDataWrap;
   EFI_TPL           OldTpl;
 
-  MnpServiceData = (MNP_SERVICE_DATA *) Context;
-  NET_CHECK_SIGNATURE (MnpServiceData, MNP_SERVICE_DATA_SIGNATURE);
+  MnpDeviceData = (MNP_DEVICE_DATA *) Context;
+  NET_CHECK_SIGNATURE (MnpDeviceData, MNP_DEVICE_DATA_SIGNATURE);
 
-  NET_LIST_FOR_EACH (Entry, &MnpServiceData->ChildrenList) {
+  NET_LIST_FOR_EACH (ServiceEntry, &MnpDeviceData->ServiceList) {
+    MnpServiceData = MNP_SERVICE_DATA_FROM_LINK (ServiceEntry);
 
-    Instance = NET_LIST_USER_STRUCT (Entry, MNP_INSTANCE_DATA, InstEntry);
-    NET_CHECK_SIGNATURE (Instance, MNP_INSTANCE_DATA_SIGNATURE);
+    NET_LIST_FOR_EACH (Entry, &MnpServiceData->ChildrenList) {
 
-    if (!Instance->Configured || (Instance->ConfigData.ReceivedQueueTimeoutValue == 0)) {
-      //
-      // This instance is not configured or there is no receive time out,
-      // just skip to the next instance.
-      //
-      continue;
-    }
+      Instance = NET_LIST_USER_STRUCT (Entry, MNP_INSTANCE_DATA, InstEntry);
+      NET_CHECK_SIGNATURE (Instance, MNP_INSTANCE_DATA_SIGNATURE);
 
-    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
-
-    NET_LIST_FOR_EACH_SAFE (RxEntry, NextEntry, &Instance->RcvdPacketQueue) {
-
-      RxDataWrap = NET_LIST_USER_STRUCT (RxEntry, MNP_RXDATA_WRAP, WrapEntry);
-
-      //
-      // TimeoutTick unit is microsecond, MNP_TIMEOUT_CHECK_INTERVAL unit is 100ns.
-      //
-      if (RxDataWrap->TimeoutTick >= (MNP_TIMEOUT_CHECK_INTERVAL / 10)) {
-
-        RxDataWrap->TimeoutTick -= (MNP_TIMEOUT_CHECK_INTERVAL / 10);
-      } else {
+      if (!Instance->Configured || (Instance->ConfigData.ReceivedQueueTimeoutValue == 0)) {
         //
-        // Drop the timeout packet.
+        // This instance is not configured or there is no receive time out,
+        // just skip to the next instance.
         //
-        DEBUG ((EFI_D_WARN, "MnpCheckPacketTimeout: Received packet timeout.\n"));
-        MnpRecycleRxData (NULL, RxDataWrap);
-        Instance->RcvdPacketQueueSize--;
+        continue;
       }
-    }
 
-    gBS->RestoreTPL (OldTpl);
+      OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+
+      NET_LIST_FOR_EACH_SAFE (RxEntry, NextEntry, &Instance->RcvdPacketQueue) {
+
+        RxDataWrap = NET_LIST_USER_STRUCT (RxEntry, MNP_RXDATA_WRAP, WrapEntry);
+
+        //
+        // TimeoutTick unit is microsecond, MNP_TIMEOUT_CHECK_INTERVAL unit is 100ns.
+        //
+        if (RxDataWrap->TimeoutTick >= (MNP_TIMEOUT_CHECK_INTERVAL / 10)) {
+          RxDataWrap->TimeoutTick -= (MNP_TIMEOUT_CHECK_INTERVAL / 10);
+        } else {
+          //
+          // Drop the timeout packet.
+          //
+          DEBUG ((EFI_D_WARN, "MnpCheckPacketTimeout: Received packet timeout.\n"));
+          MnpRecycleRxData (NULL, RxDataWrap);
+          Instance->RcvdPacketQueueSize--;
+        }
+      }
+
+      gBS->RestoreTPL (OldTpl);
+    }
   }
 }
-
 
 /**
   Poll to receive the packets from Snp. This function is either called by upperlayer
@@ -1047,19 +1076,19 @@ MnpCheckPacketTimeout (
 VOID
 EFIAPI
 MnpSystemPoll (
-  IN EFI_EVENT  Event,
-  IN OUT VOID   *Context
+  IN     EFI_EVENT   Event,
+  IN OUT VOID        *Context
   )
 {
-  MNP_SERVICE_DATA  *MnpServiceData;
+  MNP_DEVICE_DATA  *MnpDeviceData;
 
-  MnpServiceData = (MNP_SERVICE_DATA *) Context;
-  NET_CHECK_SIGNATURE (MnpServiceData, MNP_SERVICE_DATA_SIGNATURE);
+  MnpDeviceData = (MNP_DEVICE_DATA *) Context;
+  NET_CHECK_SIGNATURE (MnpDeviceData, MNP_DEVICE_DATA_SIGNATURE);
 
   //
   // Try to receive packets from Snp.
   //
-  MnpReceivePacket (MnpServiceData);
+  MnpReceivePacket (MnpDeviceData);
 
   //
   // Dispatch the DPC queued by the NotifyFunction of rx token's events.

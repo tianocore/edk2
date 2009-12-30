@@ -353,18 +353,21 @@ IScsiAsciiStrToIp (
 /**
   Convert the mac address into a hexadecimal encoded "-" seperated string.
 
-  @param[in]  Mac The mac address.
-  @param[in]  Len  Length in bytes of the mac address.
-  @param[out] Str The storage to return the mac string.
+  @param[in]  Mac     The mac address.
+  @param[in]  Len     Length in bytes of the mac address.
+  @param[in]  VlanId  VLAN ID of the network device.
+  @param[out] Str     The storage to return the mac string.
 **/
 VOID
 IScsiMacAddrToStr (
   IN  EFI_MAC_ADDRESS  *Mac,
   IN  UINT32           Len,
+  IN  UINT16           VlanId,
   OUT CHAR16           *Str
   )
 {
   UINT32  Index;
+  CHAR16  *String;
 
   for (Index = 0; Index < Len; Index++) {
     Str[3 * Index]      = (CHAR16) IScsiHexString[(Mac->Addr[Index] >> 4) & 0x0F];
@@ -372,7 +375,12 @@ IScsiMacAddrToStr (
     Str[3 * Index + 2]  = L'-';
   }
 
-  Str[3 * Index - 1] = L'\0';
+  String = &Str[3 * Index - 1] ;
+  if (VlanId != 0) {
+    String += UnicodeSPrint (String, 6 * sizeof (CHAR16), L"\\%04x", (UINTN) VlanId);
+  }
+
+  *String = L'\0';
 }
 
 /**
@@ -625,9 +633,10 @@ IScsiGetConfigData (
   EFI_STATUS                  Status;
   ISCSI_SESSION               *Session;
   UINTN                       BufferSize;
-  EFI_SIMPLE_NETWORK_PROTOCOL *Snp;
-  EFI_SIMPLE_NETWORK_MODE     *Mode;
-  CHAR16                      MacString[65];
+  EFI_MAC_ADDRESS             MacAddress;
+  UINTN                       HwAddressSize;
+  UINT16                      VlanId;
+  CHAR16                      MacString[70];
 
   //
   // get the iSCSI Initiator Name
@@ -643,21 +652,13 @@ IScsiGetConfigData (
     return Status;
   }
 
-  Status = gBS->HandleProtocol (
-                  Private->Controller,
-                  &gEfiSimpleNetworkProtocolGuid,
-                  (VOID **)&Snp
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Mode = Snp->Mode;
-
   //
   // Get the mac string, it's the name of various variable
   //
-  IScsiMacAddrToStr (&Mode->PermanentAddress, Mode->HwAddressSize, MacString);
+  Status = NetLibGetMacAddress (Private->Controller, &MacAddress, &HwAddressSize);
+  ASSERT (Status == EFI_SUCCESS);
+  VlanId = NetLibGetVlanId (Private->Controller);
+  IScsiMacAddrToStr (&MacAddress, (UINT32) HwAddressSize, VlanId, MacString);
 
   //
   // Get the normal configuration.
