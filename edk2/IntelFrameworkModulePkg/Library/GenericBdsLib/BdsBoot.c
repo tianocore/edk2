@@ -986,8 +986,8 @@ BdsLibEnumerateAllBootOption (
   EFI_HANDLE                    *BlockIoHandles;
   EFI_BLOCK_IO_PROTOCOL         *BlkIo;
   UINTN                         Index;
-  UINTN                         NumberSimpleNetworkHandles;
-  EFI_HANDLE                    *SimpleNetworkHandles;
+  UINTN                         NumberNetworkHandles;
+  EFI_HANDLE                    *NetworkHandles;
   UINTN                         FvHandleCount;
   EFI_HANDLE                    *FvHandleBuffer;
   EFI_FV_FILETYPE               Type;
@@ -1166,21 +1166,37 @@ BdsLibEnumerateAllBootOption (
   //
   // Parse Network Boot Device
   //
+  NumberNetworkHandles = 0;
+  //
+  // Search MNP Service Binding protocol for UEFI network stack
+  //
   gBS->LocateHandleBuffer (
         ByProtocol,
-        &gEfiSimpleNetworkProtocolGuid,
+        &gEfiManagedNetworkServiceBindingProtocolGuid,
         NULL,
-        &NumberSimpleNetworkHandles,
-        &SimpleNetworkHandles
+        &NumberNetworkHandles,
+        &NetworkHandles
         );
-
-  for (Index = 0; Index < NumberSimpleNetworkHandles; Index++) {
-    UnicodeSPrint (Buffer, sizeof (Buffer), L"%d", Index);
-    BdsLibBuildOptionFromHandle (SimpleNetworkHandles[Index], BdsBootOptionList, Buffer);
+  if (NumberNetworkHandles == 0) {
+    //
+    // MNP Service Binding protocol not found, search SNP for EFI network stack
+    //
+    gBS->LocateHandleBuffer (
+          ByProtocol,
+          &gEfiSimpleNetworkProtocolGuid,
+          NULL,
+          &NumberNetworkHandles,
+          &NetworkHandles
+          );
   }
 
-  if (NumberSimpleNetworkHandles != 0) {
-    FreePool (SimpleNetworkHandles);
+  for (Index = 0; Index < NumberNetworkHandles; Index++) {
+    UnicodeSPrint (Buffer, sizeof (Buffer), L"%d", Index);
+    BdsLibBuildOptionFromHandle (NetworkHandles[Index], BdsBootOptionList, Buffer);
+  }
+
+  if (NumberNetworkHandles != 0) {
+    FreePool (NetworkHandles);
   }
 
   //
@@ -1534,7 +1550,17 @@ BdsLibNetworkBootWithMediaPresent (
   MediaPresent = FALSE;
 
   UpdatedDevicePath = DevicePath;
-  Status = gBS->LocateDevicePath (&gEfiSimpleNetworkProtocolGuid, &UpdatedDevicePath, &Handle);
+  //
+  // Locate MNP Service Binding protocol for UEFI network stack first
+  //
+  Status = gBS->LocateDevicePath (&gEfiManagedNetworkServiceBindingProtocolGuid, &UpdatedDevicePath, &Handle);
+  if (EFI_ERROR (Status)) {
+    //
+    // MNP Service Binding protocol not found, search SNP for EFI network stack
+    //
+    UpdatedDevicePath = DevicePath;
+    Status = gBS->LocateDevicePath (&gEfiSimpleNetworkProtocolGuid, &UpdatedDevicePath, &Handle);
+  }
   if (EFI_ERROR (Status)) {
     //
     // Device not present so see if we need to connect it
@@ -1544,12 +1570,32 @@ BdsLibNetworkBootWithMediaPresent (
       //
       // This one should work after we did the connect
       //
-      Status = gBS->LocateDevicePath (&gEfiSimpleNetworkProtocolGuid, &UpdatedDevicePath, &Handle);
+      Status = gBS->LocateDevicePath (&gEfiManagedNetworkServiceBindingProtocolGuid, &UpdatedDevicePath, &Handle);
+      if (EFI_ERROR (Status)) {
+        UpdatedDevicePath = DevicePath;
+        Status = gBS->LocateDevicePath (&gEfiSimpleNetworkProtocolGuid, &UpdatedDevicePath, &Handle);
+      }
     }
   }
 
   if (!EFI_ERROR (Status)) {
     Status = gBS->HandleProtocol (Handle, &gEfiSimpleNetworkProtocolGuid, (VOID **)&Snp);
+    if (EFI_ERROR (Status)) {
+      //
+      // Failed to open SNP from this handle, try to get SNP from parent handle
+      //
+      UpdatedDevicePath = DevicePathFromHandle (Handle);
+      if (UpdatedDevicePath != NULL) {
+        Status = gBS->LocateDevicePath (&gEfiSimpleNetworkProtocolGuid, &UpdatedDevicePath, &Handle);
+        if (!EFI_ERROR (Status)) {
+          //
+          // SNP handle found, get SNP from it
+          //
+          Status = gBS->HandleProtocol (Handle, &gEfiSimpleNetworkProtocolGuid, (VOID **) &Snp);
+        }
+      }
+    }
+
     if (!EFI_ERROR (Status)) {
       if (Snp->Mode->MediaPresentSupported) {
         if (Snp->Mode->State == EfiSimpleNetworkInitialized) {
@@ -1613,7 +1659,7 @@ BdsGetBootTypeFromDevicePath (
   ACPI_HID_DEVICE_PATH          *Acpi;
   EFI_DEVICE_PATH_PROTOCOL      *TempDevicePath;
   EFI_DEVICE_PATH_PROTOCOL      *LastDeviceNode;
-
+  UINT32                        BootType;
 
   if (NULL == DevicePath) {
     return BDS_EFI_UNSUPPORT;
@@ -1646,7 +1692,7 @@ BdsGetBootTypeFromDevicePath (
         if (DevicePathSubType(LastDeviceNode) == MSG_DEVICE_LOGICAL_UNIT_DP) {
           //
           // if the next node type is Device Logical Unit, which specify the Logical Unit Number (LUN),
-          // skit it
+          // skip it
           //
           LastDeviceNode = NextDevicePathNode (LastDeviceNode);
         }
@@ -1657,18 +1703,34 @@ BdsGetBootTypeFromDevicePath (
           break;
         }
 
-        if (DevicePathSubType(TempDevicePath) == MSG_ATAPI_DP) {
-          return BDS_EFI_MESSAGE_ATAPI_BOOT;
-        } else if (DevicePathSubType(TempDevicePath) == MSG_USB_DP) {
-          return BDS_EFI_MESSAGE_USB_DEVICE_BOOT;
-        } else if (DevicePathSubType(TempDevicePath) == MSG_SCSI_DP) {
-          return BDS_EFI_MESSAGE_SCSI_BOOT;
-        } else if (DevicePathSubType(TempDevicePath) == MSG_SATA_DP) {
-          return BDS_EFI_MESSAGE_SATA_BOOT;
-        } else if (DevicePathSubType(TempDevicePath) == MSG_MAC_ADDR_DP) {
-          return BDS_EFI_MESSAGE_MAC_BOOT;
+        switch (DevicePathSubType (TempDevicePath)) {
+        case MSG_ATAPI_DP:
+          BootType = BDS_EFI_MESSAGE_ATAPI_BOOT;
+          break;
+
+        case MSG_USB_DP:
+          BootType = BDS_EFI_MESSAGE_USB_DEVICE_BOOT;
+          break;
+
+        case MSG_SCSI_DP:
+          BootType = BDS_EFI_MESSAGE_SCSI_BOOT;
+          break;
+
+        case MSG_SATA_DP:
+          BootType = BDS_EFI_MESSAGE_SATA_BOOT;
+          break;
+
+        case MSG_MAC_ADDR_DP:
+        case MSG_VLAN_DP:
+          BootType = BDS_EFI_MESSAGE_MAC_BOOT;
+          break;
+
+        default:
+          BootType = BDS_EFI_MESSAGE_MISC_BOOT;
+          break;
         }
-        return BDS_EFI_MESSAGE_MISC_BOOT;
+        return BootType;
+
       default:
         break;
     }
@@ -1727,20 +1789,29 @@ BdsLibIsValidEFIBootOptDevicePathExt (
   EFI_DEVICE_PATH_PROTOCOL  *TempDevicePath;
   EFI_DEVICE_PATH_PROTOCOL  *LastDeviceNode;
   EFI_BLOCK_IO_PROTOCOL     *BlockIo;
+  EFI_LOAD_FILE_PROTOCOL    *LoadFile;
 
   TempDevicePath = DevPath;
   LastDeviceNode = DevPath;
 
   //
   // Check if it's a valid boot option for network boot device
-  // Only check if there is SimpleNetworkProtocol installed. If yes, that means
-  // there is the network card there.
+  // Check if there is MNP Service Binding Protocol or SimpleNetworkProtocol
+  // installed. If yes, that means there is the network card there.
   //
   Status = gBS->LocateDevicePath (
-                  &gEfiSimpleNetworkProtocolGuid,
+                  &gEfiManagedNetworkServiceBindingProtocolGuid,
                   &TempDevicePath,
                   &Handle
                   );
+  if (EFI_ERROR (Status)) {
+    TempDevicePath = DevPath;
+    Status = gBS->LocateDevicePath (
+                    &gEfiSimpleNetworkProtocolGuid,
+                    &TempDevicePath,
+                    &Handle
+                    );
+  }
   if (EFI_ERROR (Status)) {
     //
     // Device not present so see if we need to connect it
@@ -1748,22 +1819,43 @@ BdsLibIsValidEFIBootOptDevicePathExt (
     TempDevicePath = DevPath;
     BdsLibConnectDevicePath (TempDevicePath);
     Status = gBS->LocateDevicePath (
-                    &gEfiSimpleNetworkProtocolGuid,
+                    &gEfiManagedNetworkServiceBindingProtocolGuid,
                     &TempDevicePath,
                     &Handle
                     );
+    if (EFI_ERROR (Status)) {
+      TempDevicePath = DevPath;
+      Status = gBS->LocateDevicePath (
+                      &gEfiSimpleNetworkProtocolGuid,
+                      &TempDevicePath,
+                      &Handle
+                      );
+    }
   }
 
   if (!EFI_ERROR (Status)) {
-    if (CheckMedia) {
-      //
-      // Test if it is ready to boot now
-      //
-      if (BdsLibNetworkBootWithMediaPresent(DevPath)) {
+    //
+    // Check whether LoadFile protocol is installed
+    //
+    Status = gBS->HandleProtocol (Handle, &gEfiLoadFileProtocolGuid, (VOID **)&LoadFile);
+    if (!EFI_ERROR (Status)) {
+      if (!IsDevicePathEnd (TempDevicePath)) {
+        //
+        // LoadFile protocol is not installed on handle with exactly the same DevPath
+        //
+        return FALSE;
+      }
+
+      if (CheckMedia) {
+        //
+        // Test if it is ready to boot now
+        //
+        if (BdsLibNetworkBootWithMediaPresent(DevPath)) {
+          return TRUE;
+        }
+      } else {
         return TRUE;
       }
-    } else {
-      return TRUE;
     }
   }
 
