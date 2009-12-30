@@ -90,6 +90,8 @@
 
 [Protocols]
   gEfiSimpleFileSystemProtocolGuid              # PROTOCOL CONSUMES
+  gEfiManagedNetworkServiceBindingProtocolGuid  # PROTOCOL CONSUMES
+  gEfiLoadFileProtocolGuid                      # PROTOCOL CONSUMES
   gEfiSimpleTextOutProtocolGuid                 # PROTOCOL CONSUMES
   gEfiPciIoProtocolGuid                         # PROTOCOL CONSUMES
   gEfiLoadedImageProtocolGuid                   # PROTOCOL CONSUMES
