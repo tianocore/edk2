@@ -48,11 +48,11 @@
   OemHookStatusCodeLib
   DevicePathLib
   MemoryAllocationLib
+  UefiRuntimeLib
 
 [Guids]
   gEfiStatusCodeSpecificDataGuid                ## CONSUMES
   gEfiStatusCodeDataTypeDebugGuid               ## CONSUMES
-  gEfiEventExitBootServicesGuid                 ## CONSUMES ## Event
   gEfiEventVirtualAddressChangeGuid             ## CONSUMES ## Event
 
 

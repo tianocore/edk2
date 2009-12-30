@@ -14,11 +14,9 @@
 
 #include "ReportStatusCodeLibInternal.h"
 
-EFI_EVENT               mVirtualAddressChangeEvent;
-EFI_EVENT               mExitBootServicesEvent;
+EFI_EVENT               mStatusCodeVirtualAddressChangeEvent;
 EFI_STATUS_CODE_DATA    *mStatusCodeData;
-EFI_RUNTIME_SERVICES    *mInternalRT;
-BOOLEAN                 mHaveExitedBootServices = FALSE;
+EFI_RUNTIME_SERVICES    *mStatusCodeInternalRT;
 EFI_REPORT_STATUS_CODE  mReportStatusCode = NULL;
 
 /**
@@ -39,7 +37,7 @@ InternalGetReportStatusCode (
   EFI_STATUS_CODE_PROTOCOL  *StatusCodeProtocol;
   EFI_STATUS                Status;
 
-  if (!mHaveExitedBootServices) {
+  if (!EfiAtRuntime ()) {
   	//
   	// Check gBS just in case. ReportStatusCode is called before gBS is initialized.
   	//
@@ -122,27 +120,10 @@ ReportStatusCodeLibVirtualAddressChange (
   )
 {
   if (mReportStatusCode != NULL) {
-    mInternalRT->ConvertPointer (0, (VOID **) &mReportStatusCode);
+    mStatusCodeInternalRT->ConvertPointer (0, (VOID **) &mReportStatusCode);
   }
-  mInternalRT->ConvertPointer (0, (VOID **) &mStatusCodeData);
-  mInternalRT->ConvertPointer (0, (VOID **) &mInternalRT);
-}
-
-/**
-  Notification function of EVT_SIGNAL_EXIT_BOOT_SERVICES.
-
-  @param  Event        Event whose notification function is being invoked.
-  @param  Context      Pointer to the notification function's context
-
-**/
-VOID
-EFIAPI
-ReportStatusCodeLibExitBootServices (
-  IN EFI_EVENT        Event,
-  IN VOID             *Context
-  )
-{
-  mHaveExitedBootServices = TRUE;
+  mStatusCodeInternalRT->ConvertPointer (0, (VOID **) &mStatusCodeData);
+  mStatusCodeInternalRT->ConvertPointer (0, (VOID **) &mStatusCodeInternalRT);
 }
 
 /**
@@ -169,7 +150,7 @@ ReportStatusCodeLibConstruct (
   //
   // Library should not use the gRT directly, for it may be converted by other library instance.
   // 
-  mInternalRT = gRT;
+  mStatusCodeInternalRT = gRT;
 
   mStatusCodeData = AllocateRuntimePool (sizeof (EFI_STATUS_CODE_DATA) + EFI_STATUS_CODE_DATA_MAX_SIZE);
   ASSERT (mStatusCodeData != NULL);
@@ -187,20 +168,7 @@ ReportStatusCodeLibConstruct (
                   ReportStatusCodeLibVirtualAddressChange,
                   NULL,
                   &gEfiEventVirtualAddressChangeGuid,
-                  &mVirtualAddressChangeEvent
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // Register notify function for EVT_SIGNAL_EXIT_BOOT_SERVICES
-  // 
-  Status = gBS->CreateEventEx (
-                  EVT_NOTIFY_SIGNAL,
-                  TPL_NOTIFY,
-                  ReportStatusCodeLibExitBootServices,
-                  NULL,
-                  &gEfiEventExitBootServicesGuid,
-                  &mExitBootServicesEvent
+                  &mStatusCodeVirtualAddressChangeEvent
                   );
   ASSERT_EFI_ERROR (Status);
 
@@ -229,9 +197,7 @@ ReportStatusCodeLibDestruct (
   EFI_STATUS  Status;
 
   ASSERT (gBS != NULL);
-  Status = gBS->CloseEvent (mVirtualAddressChangeEvent);
-  ASSERT_EFI_ERROR (Status);
-  Status = gBS->CloseEvent (mExitBootServicesEvent);
+  Status = gBS->CloseEvent (mStatusCodeVirtualAddressChangeEvent);
   ASSERT_EFI_ERROR (Status);
 
   FreePool (mStatusCodeData);
