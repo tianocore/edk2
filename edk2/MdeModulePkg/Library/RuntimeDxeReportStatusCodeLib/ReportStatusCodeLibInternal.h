@@ -25,6 +25,7 @@
 #include <Library/DevicePathLib.h>
 #include <Library/OemHookStatusCodeLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/UefiRuntimeLib.h>
 
 #include <Guid/StatusCodeDataTypeId.h>
 #include <Guid/StatusCodeDataTypeDebug.h>
