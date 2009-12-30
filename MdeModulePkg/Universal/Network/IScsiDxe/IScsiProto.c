@@ -1857,7 +1857,7 @@ IScsiNewScsiCmdPdu (
   CopyMem (ScsiCmd->Cdb, Packet->Cdb, sizeof (ScsiCmd->Cdb));
 
   if (Packet->CdbLength > 16) {
-    Header->Length  = NTOHS (Packet->CdbLength - 15);
+    Header->Length  = NTOHS ((UINT16) (Packet->CdbLength - 15));
     Header->Type    = ISCSI_AHS_TYPE_EXT_CDB;
 
     CopyMem (Header + 1, (UINT8 *) Packet->Cdb + 16, Packet->CdbLength - 16);

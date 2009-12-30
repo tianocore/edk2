@@ -586,7 +586,7 @@ Udp4Transmit (
   //
   Udp4Header->SrcPort      = HTONS (ConfigData->StationPort);
   Udp4Header->DstPort      = HTONS (ConfigData->RemotePort);
-  Udp4Header->Length       = HTONS (Packet->TotalSize);
+  Udp4Header->Length       = HTONS ((UINT16) Packet->TotalSize);
   Udp4Header->Checksum     = 0;
 
   UdpSessionData = TxData->UdpSessionData;

@@ -799,7 +799,7 @@ TcpInput (
       Tcb     = TcpCloneTcb (Parent);
       if (Tcb == NULL) {
         DEBUG ((EFI_D_ERROR, "TcpInput: discard a segment because"
-          "failed to clone a child for TCB%x\n", Tcb));
+          " failed to clone a child for TCB%x\n", Tcb));
 
         goto DISCARD;
       }

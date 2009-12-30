@@ -54,6 +54,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 [Protocols]
   gEfiSimpleNetworkProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
+  gEfiManagedNetworkProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
+  gEfiManagedNetworkServiceBindingProtocolGuid  # PROTOCOL ALWAYS_CONSUMED
   gEfiComponentNameProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
   gEfiComponentName2ProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
   gEfiHiiConfigRoutingProtocolGuid              # PROTOCOL ALWAYS_CONSUMED

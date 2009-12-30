@@ -73,7 +73,7 @@ Ip4PrependHead (
   PacketHead->Ver       = 4;
   PacketHead->HeadLen   = (UINT8) (HeadLen >> 2);
   PacketHead->Tos       = Head->Tos;
-  PacketHead->TotalLen  = HTONS (Packet->TotalSize);
+  PacketHead->TotalLen  = HTONS ((UINT16) Packet->TotalSize);
   PacketHead->Id        = HTONS (Head->Id);
   PacketHead->Fragment  = HTONS (Head->Fragment);
   PacketHead->Checksum  = 0;

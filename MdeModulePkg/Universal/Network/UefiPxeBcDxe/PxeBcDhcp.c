@@ -1182,7 +1182,7 @@ PxeBcDiscvBootService (
        
   Xid                                 = NET_RANDOM (NetRandomInitSeed ());
   Token.Packet->Dhcp4.Header.Xid      = HTONL(Xid);
-  Token.Packet->Dhcp4.Header.Reserved = HTONS((IsBCast) ? 0x8000 : 0);
+  Token.Packet->Dhcp4.Header.Reserved = HTONS((UINT16) ((IsBCast) ? 0x8000 : 0));
   CopyMem (&Token.Packet->Dhcp4.Header.ClientAddr, &Private->StationIp, sizeof (EFI_IPv4_ADDRESS));
 
   Token.RemotePort = Sport;
