@@ -1,11 +1,12 @@
 /** @file
   Implementation of driver entry point and driver binding protocol.
 
-Copyright (c) 2005 - 2009, Intel Corporation. <BR> 
-All rights reserved. This program and the accompanying materials are licensed 
-and made available under the terms and conditions of the BSD License which 
-accompanies this distribution. The full text of the license may be found at 
-http://opensource.org/licenses/bsd-license.php 
+Copyright (c) 2005 - 2009, Intel Corporation.<BR>
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions
+of the BSD License which accompanies this distribution.  The full
+text of the license may be found at<BR>
+http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -14,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "MnpDriver.h"
 #include "MnpImpl.h"
-
+#include "MnpVlan.h"
 
 EFI_DRIVER_BINDING_PROTOCOL gMnpDriverBinding = {
   MnpDriverBindingSupported,
@@ -35,7 +36,7 @@ EFI_DRIVER_BINDING_PROTOCOL gMnpDriverBinding = {
 
   @param[in]  This                 Protocol instance pointer.
   @param[in]  ControllerHandle     Handle of device to test.
-  @param[in]  RemainingDevicePath  Optional parameter use to pick a specific 
+  @param[in]  RemainingDevicePath  Optional parameter use to pick a specific
                                    child device to start.
 
   @retval EFI_SUCCESS              This driver supports this device.
@@ -46,28 +47,13 @@ EFI_DRIVER_BINDING_PROTOCOL gMnpDriverBinding = {
 EFI_STATUS
 EFIAPI
 MnpDriverBindingSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
-  IN EFI_HANDLE                   ControllerHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
+  IN EFI_DRIVER_BINDING_PROTOCOL     *This,
+  IN EFI_HANDLE                      ControllerHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath OPTIONAL
   )
 {
   EFI_STATUS                   Status;
   EFI_SIMPLE_NETWORK_PROTOCOL  *Snp;
-
-  //
-  // Test to see if MNP is already installed.
-  //
-  Status = gBS->OpenProtocol (
-                  ControllerHandle,
-                  &gEfiManagedNetworkServiceBindingProtocolGuid,
-                  NULL,
-                  This->DriverBindingHandle,
-                  ControllerHandle,
-                  EFI_OPEN_PROTOCOL_TEST_PROTOCOL
-                  );
-  if (!EFI_ERROR (Status)) {
-    return EFI_ALREADY_STARTED;
-  }
 
   //
   // Test to open the Simple Network protocol BY_DRIVER.
@@ -80,7 +66,6 @@ MnpDriverBindingSupported (
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
-
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -101,77 +86,159 @@ MnpDriverBindingSupported (
 
 /**
   Start this driver on ControllerHandle. This service is called by the
-  EFI boot service ConnectController(). In order to make drivers as small 
+  EFI boot service ConnectController(). In order to make drivers as small
   as possible, there are a few calling restrictions for this service.
   ConnectController() must follow these calling restrictions. If any other
   agent wishes to call Start() it must also follow these calling restrictions.
 
   @param[in]       This                 Protocol instance pointer.
   @param[in]       ControllerHandle     Handle of device to bind driver to.
-  @param[in]       RemainingDevicePath  Optional parameter use to pick a specific 
+  @param[in]       RemainingDevicePath  Optional parameter use to pick a specific
                                         child device to start.
 
   @retval EFI_SUCCESS           This driver is added to ControllerHandle.
   @retval EFI_ALREADY_STARTED   This driver is already running on ControllerHandle.
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate memory for Mnp Service Data.
   @retval Others                This driver does not support this device.
-  
+
 **/
 EFI_STATUS
 EFIAPI
 MnpDriverBindingStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
-  IN EFI_HANDLE                   ControllerHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
+  IN EFI_DRIVER_BINDING_PROTOCOL     *This,
+  IN EFI_HANDLE                      ControllerHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath OPTIONAL
   )
 {
   EFI_STATUS        Status;
   MNP_SERVICE_DATA  *MnpServiceData;
-  BOOLEAN           MnpInitialized;
+  MNP_DEVICE_DATA   *MnpDeviceData;
+  LIST_ENTRY        *Entry;
+  VLAN_TCI          *VlanVariable;
+  UINTN             NumberOfVlan;
+  UINTN             Index;
 
-  MnpInitialized  = FALSE;
+  VlanVariable = NULL;
 
-  MnpServiceData  = AllocateZeroPool (sizeof (MNP_SERVICE_DATA));
-  if (MnpServiceData == NULL) {
-    DEBUG ((EFI_D_ERROR, "MnpDriverBindingStart(): Failed to allocate the Mnp Service Data.\n"));
+  //
+  // Initialize the Mnp Device Data
+  //
+  MnpDeviceData = AllocateZeroPool (sizeof (MNP_DEVICE_DATA));
+  if (MnpDeviceData == NULL) {
+    DEBUG ((EFI_D_ERROR, "MnpDriverBindingStart(): Failed to allocate the Mnp Device Data.\n"));
 
     return EFI_OUT_OF_RESOURCES;
   }
 
-  //
-  // Initialize the Mnp Service Data.
-  //
-  Status = MnpInitializeServiceData (MnpServiceData, This->DriverBindingHandle, ControllerHandle);
+  Status = MnpInitializeDeviceData (MnpDeviceData, This->DriverBindingHandle, ControllerHandle);
   if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "MnpDriverBindingStart: MnpInitializeDeviceData failed, %r.\n", Status));
 
-    DEBUG ((EFI_D_ERROR, "MnpDriverBindingStart: MnpInitializeServiceData failed, %r.\n",Status));
-    goto ErrorExit;
+    FreePool (MnpDeviceData);
+    return Status;
   }
 
-  MnpInitialized = TRUE;
+  //
+  // Check whether NIC driver has already produced VlanConfig protocol
+  //
+  Status = gBS->OpenProtocol (
+                  ControllerHandle,
+                  &gEfiVlanConfigProtocolGuid,
+                  NULL,
+                  This->DriverBindingHandle,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_TEST_PROTOCOL
+                  );
+  if (!EFI_ERROR (Status)) {
+    //
+    // NIC hardware already implement VLAN,
+    // no need to provide software VLAN implementation in MNP driver
+    //
+    MnpDeviceData->NumberOfVlan = 0;
+    ZeroMem (&MnpDeviceData->VlanConfig, sizeof (EFI_VLAN_CONFIG_PROTOCOL));
+    MnpServiceData = MnpCreateServiceData (MnpDeviceData, 0, 0);
+    Status = (MnpServiceData != NULL) ? EFI_SUCCESS : EFI_OUT_OF_RESOURCES;
+    goto Exit;
+  }
 
   //
-  // Install the MNP Service Binding Protocol.
+  // Install VLAN Config Protocol
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &ControllerHandle,
-                  &gEfiManagedNetworkServiceBindingProtocolGuid,
-                  &MnpServiceData->ServiceBinding,
+                  &gEfiVlanConfigProtocolGuid,
+                  &MnpDeviceData->VlanConfig,
                   NULL
                   );
+  if (EFI_ERROR (Status)) {
+    goto Exit;
+  }
 
-ErrorExit:
+  //
+  // Get current VLAN configuration from EFI Variable
+  //
+  NumberOfVlan = 0;
+  Status = MnpGetVlanVariable (MnpDeviceData, &NumberOfVlan, &VlanVariable);
+  if (EFI_ERROR (Status)) {
+    //
+    // No VLAN is set, create a default MNP service data for untagged frame
+    //
+    MnpDeviceData->NumberOfVlan = 0;
+    MnpServiceData = MnpCreateServiceData (MnpDeviceData, 0, 0);
+    Status = (MnpServiceData != NULL) ? EFI_SUCCESS : EFI_OUT_OF_RESOURCES;
+    goto Exit;
+  }
+
+  //
+  // Create MNP service data for each VLAN
+  //
+  MnpDeviceData->NumberOfVlan = NumberOfVlan;
+  for (Index = 0; Index < NumberOfVlan; Index++) {
+    MnpServiceData = MnpCreateServiceData (
+                       MnpDeviceData,
+                       VlanVariable[Index].Bits.Vid,
+                       (UINT8) VlanVariable[Index].Bits.Priority
+                       );
+
+    if (MnpServiceData == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+
+      goto Exit;
+    }
+  }
+
+Exit:
+  if (VlanVariable != NULL) {
+    FreePool (VlanVariable);
+  }
 
   if (EFI_ERROR (Status)) {
-
-    if (MnpInitialized) {
-      //
-      // Flush the Mnp Service Data.
-      //
-      MnpFlushServiceData (MnpServiceData, This->DriverBindingHandle);
+    //
+    // Destroy all MNP service data
+    //
+    while (!IsListEmpty (&MnpDeviceData->ServiceList)) {
+      Entry = GetFirstNode (&MnpDeviceData->ServiceList);
+      MnpServiceData = MNP_SERVICE_DATA_FROM_LINK (Entry);
+      MnpDestroyServiceData (MnpServiceData);
     }
 
-    FreePool (MnpServiceData);
+    //
+    // Uninstall the VLAN Config Protocol if any
+    //
+    if (MnpDeviceData->VlanConfig.Set != NULL) {
+      gBS->UninstallMultipleProtocolInterfaces (
+             MnpDeviceData->ControllerHandle,
+             &gEfiVlanConfigProtocolGuid,
+             &MnpDeviceData->VlanConfig,
+             NULL
+             );
+    }
+
+    //
+    // Destroy Mnp Device Data
+    //
+    MnpDestroyDeviceData (MnpDeviceData, This->DriverBindingHandle);
+    FreePool (MnpDeviceData);
   }
 
   return Status;
@@ -179,16 +246,16 @@ ErrorExit:
 
 /**
   Stop this driver on ControllerHandle. This service is called by the
-  EFI boot service DisconnectController(). In order to make drivers as 
-  small as possible, there are a few calling restrictions for this service. 
-  DisconnectController() must follow these calling restrictions. If any other 
+  EFI boot service DisconnectController(). In order to make drivers as
+  small as possible, there are a few calling restrictions for this service.
+  DisconnectController() must follow these calling restrictions. If any other
   agent wishes to call Stop() it must also follow these calling restrictions.
-  
+
   @param[in]  This               Protocol instance pointer.
   @param[in]  ControllerHandle   Handle of device to stop driver on.
-  @param[in]  NumberOfChildren   Number of Handles in ChildHandleBuffer. If 
-                                 number of children is zero stop the entire 
-								 bus driver.
+  @param[in]  NumberOfChildren   Number of Handles in ChildHandleBuffer. If
+                                 number of children is zero stop the entire
+                                 bus driver.
   @param[in]  ChildHandleBuffer  List of Child Handles to Stop.
 
   @retval EFI_SUCCESS            This driver is removed ControllerHandle.
@@ -198,19 +265,22 @@ ErrorExit:
 EFI_STATUS
 EFIAPI
 MnpDriverBindingStop (
-  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
-  IN EFI_HANDLE                   ControllerHandle,
-  IN UINTN                        NumberOfChildren,
-  IN EFI_HANDLE                   *ChildHandleBuffer OPTIONAL
+  IN EFI_DRIVER_BINDING_PROTOCOL     *This,
+  IN EFI_HANDLE                      ControllerHandle,
+  IN UINTN                           NumberOfChildren,
+  IN EFI_HANDLE                      *ChildHandleBuffer OPTIONAL
   )
 {
   EFI_STATUS                    Status;
   EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
+  EFI_VLAN_CONFIG_PROTOCOL      *VlanConfig;
+  MNP_DEVICE_DATA               *MnpDeviceData;
   MNP_SERVICE_DATA              *MnpServiceData;
-  MNP_INSTANCE_DATA             *Instance;
+  BOOLEAN                       AllChildrenStopped;
+  LIST_ENTRY                    *Entry;
 
   //
-  // Retrieve the MNP service binding protocol from the ControllerHandle.
+  // Try to retrieve MNP service binding protocol from the ControllerHandle
   //
   Status = gBS->OpenProtocol (
                   ControllerHandle,
@@ -221,51 +291,77 @@ MnpDriverBindingStop (
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
   if (EFI_ERROR (Status)) {
+    //
+    // Retrieve VLAN Config Protocol from the ControllerHandle
+    //
+    Status = gBS->OpenProtocol (
+                    ControllerHandle,
+                    &gEfiVlanConfigProtocolGuid,
+                    (VOID **) &VlanConfig,
+                    This->DriverBindingHandle,
+                    ControllerHandle,
+                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                    );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "MnpDriverBindingStop: try to stop unknown Controller.\n"));
+      return EFI_DEVICE_ERROR;
+    }
 
-    DEBUG (
-      (EFI_D_ERROR,
-      "MnpDriverBindingStop: Locate MNP Service Binding Protocol failed, %r.\n",
-      Status)
-      );
-    return EFI_DEVICE_ERROR;
+    MnpDeviceData = MNP_DEVICE_DATA_FROM_THIS (VlanConfig);
+  } else {
+    MnpServiceData = MNP_SERVICE_DATA_FROM_THIS (ServiceBinding);
+    MnpDeviceData = MnpServiceData->MnpDeviceData;
   }
-
-  MnpServiceData = MNP_SERVICE_DATA_FROM_THIS (ServiceBinding);
 
   if (NumberOfChildren == 0) {
     //
-    // Uninstall the MNP Service Binding Protocol.
+    // Destroy all MNP service data
     //
-    gBS->UninstallMultipleProtocolInterfaces (
-           ControllerHandle,
-           &gEfiManagedNetworkServiceBindingProtocolGuid,
-           ServiceBinding,
-           NULL
-           );
+    while (!IsListEmpty (&MnpDeviceData->ServiceList)) {
+      Entry = GetFirstNode (&MnpDeviceData->ServiceList);
+      MnpServiceData = MNP_SERVICE_DATA_FROM_LINK (Entry);
+      MnpDestroyServiceData (MnpServiceData);
+    }
 
     //
-    // Flush the Mnp service data.
+    // Uninstall the VLAN Config Protocol if any
     //
-    MnpFlushServiceData (MnpServiceData, This->DriverBindingHandle);
+    if (MnpDeviceData->VlanConfig.Set != NULL) {
+      gBS->UninstallMultipleProtocolInterfaces (
+             MnpDeviceData->ControllerHandle,
+             &gEfiVlanConfigProtocolGuid,
+             &MnpDeviceData->VlanConfig,
+             NULL
+             );
+    }
 
-    FreePool (MnpServiceData);
-  } else {
-    while (!IsListEmpty (&MnpServiceData->ChildrenList)) {
-      //
-      // Don't use NetListRemoveHead here, the remove opreration will be done
-      // in ServiceBindingDestroyChild.
-      //
-      Instance = NET_LIST_HEAD (
-                   &MnpServiceData->ChildrenList,
-                   MNP_INSTANCE_DATA,
-                   InstEntry
-                   );
+    //
+    // Destroy the Mnp device data
+    //
+    MnpDestroyDeviceData (MnpDeviceData, This->DriverBindingHandle);
+    FreePool (MnpDeviceData);
 
-      ServiceBinding->DestroyChild (ServiceBinding, Instance->Handle);
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Stop all MNP child
+  //
+  AllChildrenStopped = TRUE;
+  NET_LIST_FOR_EACH (Entry, &MnpDeviceData->ServiceList) {
+    MnpServiceData = MNP_SERVICE_DATA_FROM_LINK (Entry);
+
+    Status = MnpDestroyServiceChild (MnpServiceData);
+    if (EFI_ERROR (Status)) {
+      AllChildrenStopped = FALSE;
     }
   }
 
-  return Status;
+  if (!AllChildrenStopped) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  return EFI_SUCCESS;
 }
 
 
@@ -275,12 +371,12 @@ MnpDriverBindingStop (
   @param[in]       This              Protocol instance pointer.
   @param[in, out]  ChildHandle       Pointer to the handle of the child to create. If
                                      it is NULL, then a new handle is created. If
-									 it is not NULL, then the I/O services are added 
-									 to the existing child handle.
+                                     it is not NULL, then the I/O services are added
+                                     to the existing child handle.
 
-  @retval EFI_SUCCES                 The protocol was added to ChildHandle. 
-  @retval EFI_INVALID_PARAMETER      ChildHandle is NULL. 
-  @retval EFI_OUT_OF_RESOURCES       There are not enough resources availabe to 
+  @retval EFI_SUCCES                 The protocol was added to ChildHandle.
+  @retval EFI_INVALID_PARAMETER      ChildHandle is NULL.
+  @retval EFI_OUT_OF_RESOURCES       There are not enough resources availabe to
                                      create the child.
   @retval Others                     The child handle was not created.
 
@@ -288,18 +384,17 @@ MnpDriverBindingStop (
 EFI_STATUS
 EFIAPI
 MnpServiceBindingCreateChild (
-  IN EFI_SERVICE_BINDING_PROTOCOL  *This,
-  IN OUT EFI_HANDLE                *ChildHandle
+  IN     EFI_SERVICE_BINDING_PROTOCOL    *This,
+  IN OUT EFI_HANDLE                      *ChildHandle
   )
 {
   EFI_STATUS         Status;
   MNP_SERVICE_DATA   *MnpServiceData;
   MNP_INSTANCE_DATA  *Instance;
-  VOID               *Snp;
+  VOID               *MnpSb;
   EFI_TPL            OldTpl;
 
   if ((This == NULL) || (ChildHandle == NULL)) {
-
     return EFI_INVALID_PARAMETER;
   }
 
@@ -310,8 +405,8 @@ MnpServiceBindingCreateChild (
   //
   Instance = AllocateZeroPool (sizeof (MNP_INSTANCE_DATA));
   if (Instance == NULL) {
-
     DEBUG ((EFI_D_ERROR, "MnpServiceBindingCreateChild: Faild to allocate memory for the new instance.\n"));
+
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -327,12 +422,12 @@ MnpServiceBindingCreateChild (
                   NULL
                   );
   if (EFI_ERROR (Status)) {
-
     DEBUG (
       (EFI_D_ERROR,
       "MnpServiceBindingCreateChild: Failed to install the MNP protocol, %r.\n",
       Status)
       );
+
     goto ErrorExit;
   }
 
@@ -342,9 +437,9 @@ MnpServiceBindingCreateChild (
   Instance->Handle = *ChildHandle;
 
   Status = gBS->OpenProtocol (
-                  MnpServiceData->ControllerHandle,
-                  &gEfiSimpleNetworkProtocolGuid,
-                  (VOID **) &Snp,
+                  MnpServiceData->ServiceHandle,
+                  &gEfiManagedNetworkServiceBindingProtocolGuid,
+                  (VOID **) &MnpSb,
                   gMnpDriverBinding.DriverBindingHandle,
                   Instance->Handle,
                   EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
@@ -385,16 +480,16 @@ ErrorExit:
 
 /**
   Destroys a child handle with a set of I/O services.
-   
-  The DestroyChild() function does the opposite of CreateChild(). It removes a 
-  protocol that was installed by CreateChild() from ChildHandle. If the removed 
-  protocol is the last protocol on ChildHandle, then ChildHandle is destroyed. 
-   
-  @param[in]  This               Pointer to the EFI_SERVICE_BINDING_PROTOCOL 
+
+  The DestroyChild() function does the opposite of CreateChild(). It removes a
+  protocol that was installed by CreateChild() from ChildHandle. If the removed
+  protocol is the last protocol on ChildHandle, then ChildHandle is destroyed.
+
+  @param[in]  This               Pointer to the EFI_SERVICE_BINDING_PROTOCOL
                                  instance.
   @param[in]  ChildHandle        Handle of the child to destroy.
 
-  @retval EFI_SUCCES             The protocol was removed from ChildHandle. 
+  @retval EFI_SUCCES             The protocol was removed from ChildHandle.
   @retval EFI_UNSUPPORTED        ChildHandle does not support the protocol that
                                  is being removed.
   @retval EFI_INVALID_PARAMETER  ChildHandle is not a valid UEFI handle.
@@ -407,8 +502,8 @@ ErrorExit:
 EFI_STATUS
 EFIAPI
 MnpServiceBindingDestroyChild (
-  IN EFI_SERVICE_BINDING_PROTOCOL  *This,
-  IN EFI_HANDLE                    ChildHandle
+  IN EFI_SERVICE_BINDING_PROTOCOL    *This,
+  IN EFI_HANDLE                      ChildHandle
   )
 {
   EFI_STATUS                    Status;
@@ -418,7 +513,6 @@ MnpServiceBindingDestroyChild (
   EFI_TPL                       OldTpl;
 
   if ((This == NULL) || (ChildHandle == NULL)) {
-
     return EFI_INVALID_PARAMETER;
   }
 
@@ -436,7 +530,6 @@ MnpServiceBindingDestroyChild (
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
   if (EFI_ERROR (Status)) {
-
     return EFI_UNSUPPORTED;
   }
 
@@ -449,7 +542,6 @@ MnpServiceBindingDestroyChild (
   // will only excecute once.
   //
   if (Instance->Destroyed) {
-
     return EFI_SUCCESS;
   }
 
@@ -459,9 +551,9 @@ MnpServiceBindingDestroyChild (
   // Close the Simple Network protocol.
   //
   gBS->CloseProtocol (
-         MnpServiceData->ControllerHandle,
-         &gEfiSimpleNetworkProtocolGuid,
-         gMnpDriverBinding.DriverBindingHandle,
+         MnpServiceData->ServiceHandle,
+         &gEfiManagedNetworkServiceBindingProtocolGuid,
+         MnpServiceData->MnpDeviceData->ImageHandle,
          ChildHandle
          );
 
@@ -475,7 +567,6 @@ MnpServiceBindingDestroyChild (
                   NULL
                   );
   if (EFI_ERROR (Status)) {
-
     DEBUG (
       (EFI_D_ERROR,
       "MnpServiceBindingDestroyChild: Failed to uninstall the ManagedNetwork protocol, %r.\n",
@@ -523,7 +614,7 @@ MnpServiceBindingDestroyChild (
   @param[in]  ImageHandle  The image handle of the driver.
   @param[in]  SystemTable  The system table.
 
-  @retval EFI_SUCCES       The driver binding and component name protocols are 
+  @retval EFI_SUCCES       The driver binding and component name protocols are
                            successfully installed.
   @retval Others           Other errors as indicated.
 
@@ -531,8 +622,8 @@ MnpServiceBindingDestroyChild (
 EFI_STATUS
 EFIAPI
 MnpDriverEntryPoint (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+  IN EFI_HANDLE          ImageHandle,
+  IN EFI_SYSTEM_TABLE    *SystemTable
   )
 {
   return EfiLibInstallDriverBindingComponentName2 (

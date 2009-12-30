@@ -291,6 +291,12 @@ Ip4CreateService (
   InsertHeadList (&IpSb->Interfaces, &IpSb->DefaultInterface->Link);
 
   IpSb->MaxPacketSize = IpSb->SnpMode.MaxPacketSize - sizeof (IP4_HEAD);
+  if (NetLibGetVlanId (IpSb->Controller) != 0) {
+    //
+    // This is a VLAN device, reduce MTU by VLAN tag length
+    //
+    IpSb->MaxPacketSize -= NET_VLAN_TAG_LEN;
+  }
   IpSb->MacString = NULL;
 
   *Service = IpSb;

@@ -111,6 +111,21 @@ GLOBAL_REMOVE_IF_UNREFERENCED CHAR8 *mMonthName[] = {
   "Dec"
 };
 
+//
+// VLAN device path node template
+//
+GLOBAL_REMOVE_IF_UNREFERENCED VLAN_DEVICE_PATH mNetVlanDevicePathTemplate = {
+  {
+    MESSAGING_DEVICE_PATH,
+    MSG_VLAN_DP,
+    {
+      (UINT8) (sizeof (VLAN_DEVICE_PATH)),
+      (UINT8) ((sizeof (VLAN_DEVICE_PATH)) >> 8)
+    }
+  },
+  0
+};
+
 /**
   Locate the handles that support SNP, then open one of them
   to send the syslog packets. The caller isn't required to close
@@ -1772,18 +1787,289 @@ NetLibDestroyServiceChild (
   return Status;
 }
 
+/**
+  Get handle with Simple Network Protocol installed on it.
+
+  There should be MNP Service Binding Protocol installed on the input ServiceHandle.
+  If Simple Network Protocol is already installed on the ServiceHandle, the
+  ServiceHandle will be returned. If SNP is not installed on the ServiceHandle,
+  try to find its parent handle with SNP installed.
+
+  @param[in]   ServiceHandle    The handle where network service binding protocols are
+                                installed on.
+  @param[out]  Snp              The pointer to store the address of the SNP instance.
+                                This is an optional parameter that may be NULL.
+
+  @return The SNP handle, or NULL if not found.
+
+**/
+EFI_HANDLE
+EFIAPI
+NetLibGetSnpHandle (
+  IN   EFI_HANDLE                  ServiceHandle,
+  OUT  EFI_SIMPLE_NETWORK_PROTOCOL **Snp  OPTIONAL
+  )
+{
+  EFI_STATUS                   Status;
+  EFI_SIMPLE_NETWORK_PROTOCOL  *SnpInstance;
+  EFI_DEVICE_PATH_PROTOCOL     *DevicePath;
+  EFI_HANDLE                   SnpHandle;
+
+  //
+  // Try to open SNP from ServiceHandle
+  //
+  SnpInstance = NULL;
+  Status = gBS->HandleProtocol (ServiceHandle, &gEfiSimpleNetworkProtocolGuid, (VOID **) &SnpInstance);
+  if (!EFI_ERROR (Status)) {
+    if (Snp != NULL) {
+      *Snp = SnpInstance;
+    }
+    return ServiceHandle;
+  }
+
+  //
+  // Failed to open SNP, try to get SNP handle by LocateDevicePath()
+  //
+  DevicePath = DevicePathFromHandle (ServiceHandle);
+  if (DevicePath == NULL) {
+    return NULL;
+  }
+
+  SnpHandle = NULL;
+  Status = gBS->LocateDevicePath (&gEfiSimpleNetworkProtocolGuid, &DevicePath, &SnpHandle);
+  if (EFI_ERROR (Status)) {
+    //
+    // Failed to find SNP handle
+    //
+    return NULL;
+  }
+
+  Status = gBS->HandleProtocol (SnpHandle, &gEfiSimpleNetworkProtocolGuid, (VOID **) &SnpInstance);
+  if (!EFI_ERROR (Status)) {
+    if (Snp != NULL) {
+      *Snp = SnpInstance;
+    }
+    return SnpHandle;
+  }
+
+  return NULL;
+}
 
 /**
-  Convert the mac address of the simple network protocol installed on
-  SnpHandle to a unicode string. Callers are responsible for freeing the
-  string storage.
+  Retrieve VLAN ID of a VLAN device handle.
 
-  Get the mac address of the Simple Network protocol from the SnpHandle. Then convert
-  the mac address into a unicode string. It takes 2 unicode characters to represent 
-  a 1 byte binary buffer. Plus one unicode character for the null-terminator.
+  Search VLAN device path node in Device Path of specified ServiceHandle and
+  return its VLAN ID. If no VLAN device path node found, then this ServiceHandle
+  is not a VLAN device handle, and 0 will be returned.
 
+  @param[in]   ServiceHandle    The handle where network service binding protocols are
+                                installed on.
 
-  @param[in]   SnpHandle             The handle where the simple network protocol is
+  @return VLAN ID of the device handle, or 0 if not a VLAN device.
+
+**/
+UINT16
+EFIAPI
+NetLibGetVlanId (
+  IN EFI_HANDLE             ServiceHandle
+  )
+{
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+  EFI_DEVICE_PATH_PROTOCOL  *Node;
+
+  DevicePath = DevicePathFromHandle (ServiceHandle);
+  if (DevicePath == NULL) {
+    return 0;
+  }
+
+  Node = DevicePath;
+  while (!IsDevicePathEnd (Node)) {
+    if (Node->Type == MESSAGING_DEVICE_PATH && Node->SubType == MSG_VLAN_DP) {
+      return ((VLAN_DEVICE_PATH *) Node)->VlanId;
+    }
+    Node = NextDevicePathNode (Node);
+  }
+
+  return 0;
+}
+
+/**
+  Find VLAN device handle with specified VLAN ID.
+
+  The VLAN child device handle is created by VLAN Config Protocol on ControllerHandle.
+  This function will append VLAN device path node to the parent device path,
+  and then use LocateDevicePath() to find the correct VLAN device handle.
+
+  @param[in]   ServiceHandle    The handle where network service binding protocols are
+                                installed on.
+  @param[in]   VLanId           The configured VLAN ID for the VLAN device.
+
+  @return The VLAN device handle, or NULL if not found.
+
+**/
+EFI_HANDLE
+EFIAPI
+NetLibGetVlanHandle (
+  IN EFI_HANDLE             ControllerHandle,
+  IN UINT16                 VlanId
+  )
+{
+  EFI_DEVICE_PATH_PROTOCOL  *ParentDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL  *VlanDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+  VLAN_DEVICE_PATH          VlanNode;
+  EFI_HANDLE                Handle;
+
+  ParentDevicePath = DevicePathFromHandle (ControllerHandle);
+  if (ParentDevicePath == NULL) {
+    return NULL;
+  }
+
+  //
+  // Construct VLAN device path
+  //
+  CopyMem (&VlanNode, &mNetVlanDevicePathTemplate, sizeof (VLAN_DEVICE_PATH));
+  VlanNode.VlanId = VlanId;
+  VlanDevicePath = AppendDevicePathNode (
+                     ParentDevicePath,
+                     (EFI_DEVICE_PATH_PROTOCOL *) &VlanNode
+                     );
+  if (VlanDevicePath == NULL) {
+    return NULL;
+  }
+
+  //
+  // Find VLAN device handle
+  //
+  Handle = NULL;
+  DevicePath = VlanDevicePath;
+  gBS->LocateDevicePath (
+         &gEfiDevicePathProtocolGuid,
+         &DevicePath,
+         &Handle
+         );
+  if (!IsDevicePathEnd (DevicePath)) {
+    //
+    // Device path is not exactly match
+    //
+    Handle = NULL;
+  }
+
+  FreePool (VlanDevicePath);
+  return Handle;
+}
+
+/**
+  Get MAC address associated with the network service handle.
+
+  There should be MNP Service Binding Protocol installed on the input ServiceHandle.
+  If SNP is installed on the ServiceHandle or its parent handle, MAC address will
+  be retrieved from SNP. If no SNP found, try to get SNP mode data use MNP.
+
+  @param[in]   ServiceHandle    The handle where network service binding protocols are
+                                installed on.
+  @param[out]  MacAddress       The pointer to store the returned MAC address.
+  @param[out]  AddressSize      The length of returned MAC address.
+
+  @retval EFI_SUCCESS           MAC address is returned successfully.
+  @retval Others                Failed to get SNP mode data.
+
+**/
+EFI_STATUS
+EFIAPI
+NetLibGetMacAddress (
+  IN  EFI_HANDLE            ServiceHandle,
+  OUT EFI_MAC_ADDRESS       *MacAddress,
+  OUT UINTN                 *AddressSize
+  )
+{
+  EFI_STATUS                   Status;
+  EFI_SIMPLE_NETWORK_PROTOCOL  *Snp;
+  EFI_SIMPLE_NETWORK_MODE      *SnpMode;
+  EFI_SIMPLE_NETWORK_MODE      SnpModeData;
+  EFI_MANAGED_NETWORK_PROTOCOL *Mnp;
+  EFI_SERVICE_BINDING_PROTOCOL *MnpSb;
+  EFI_HANDLE                   *SnpHandle;
+  EFI_HANDLE                   MnpChildHandle;
+
+  ASSERT (MacAddress != NULL);
+  ASSERT (AddressSize != NULL);
+
+  //
+  // Try to get SNP handle
+  //
+  Snp = NULL;
+  SnpHandle = NetLibGetSnpHandle (ServiceHandle, &Snp);
+  if (SnpHandle != NULL) {
+    //
+    // SNP found, use it directly
+    //
+    SnpMode = Snp->Mode;
+  } else {
+    //
+    // Failed to get SNP handle, try to get MAC address from MNP
+    //
+    MnpChildHandle = NULL;
+    Status = gBS->HandleProtocol (
+                    ServiceHandle,
+                    &gEfiManagedNetworkServiceBindingProtocolGuid,
+                    (VOID **) &MnpSb
+                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // Create a MNP child
+    //
+    Status = MnpSb->CreateChild (MnpSb, &MnpChildHandle);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // Open MNP protocol
+    //
+    Status = gBS->HandleProtocol (
+                    MnpChildHandle,
+                    &gEfiManagedNetworkProtocolGuid,
+                    (VOID **) &Mnp
+                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // Try to get SNP mode from MNP
+    //
+    Status = Mnp->GetModeData (Mnp, NULL, &SnpModeData);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    SnpMode = &SnpModeData;
+
+    //
+    // Destroy the MNP child
+    //
+    MnpSb->DestroyChild (MnpSb, MnpChildHandle);
+  }
+
+  *AddressSize = SnpMode->HwAddressSize;
+  CopyMem (MacAddress->Addr, SnpMode->CurrentAddress.Addr, SnpMode->HwAddressSize);
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Convert MAC address of the NIC associated with specified Service Binding Handle
+  to a unicode string. Callers are responsible for freeing the string storage.
+
+  Locate simple network protocol associated with the Service Binding Handle and
+  get the mac address from SNP. Then convert the mac address into a unicode
+  string. It takes 2 unicode characters to represent a 1 byte binary buffer.
+  Plus one unicode character for the null-terminator.
+
+  @param[in]   ServiceHandle         The handle where network service binding protocol is
                                      installed on.
   @param[in]   ImageHandle           The image handle used to act as the agent handle to
                                      get the simple network protocol.
@@ -1798,57 +2084,61 @@ NetLibDestroyServiceChild (
 EFI_STATUS
 EFIAPI
 NetLibGetMacString (
-  IN  EFI_HANDLE            SnpHandle,
+  IN  EFI_HANDLE            ServiceHandle,
   IN  EFI_HANDLE            ImageHandle,
   OUT CHAR16                **MacString
   )
 {
   EFI_STATUS                   Status;
-  EFI_SIMPLE_NETWORK_PROTOCOL  *Snp;
-  EFI_SIMPLE_NETWORK_MODE      *Mode;
-  CHAR16                       *MacAddress;
+  EFI_MAC_ADDRESS              MacAddress;
   UINT8                        *HwAddress;
+  UINTN                        HwAddressSize;
+  UINT16                       VlanId;
+  CHAR16                       *String;
   UINTN                        Index;
 
-  *MacString = NULL;
+  ASSERT (MacString != NULL);
 
   //
-  // Get the Simple Network protocol from the SnpHandle.
+  // Get MAC address of the network device
   //
-  Status = gBS->OpenProtocol (
-                  SnpHandle,
-                  &gEfiSimpleNetworkProtocolGuid,
-                  (VOID **) &Snp,
-                  ImageHandle,
-                  SnpHandle,
-                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                  );
+  Status = NetLibGetMacAddress (ServiceHandle, &MacAddress, &HwAddressSize);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Mode = Snp->Mode;
-
   //
   // It takes 2 unicode characters to represent a 1 byte binary buffer.
+  // If VLAN is configured, it will need extra 5 characters like "\0005".
   // Plus one unicode character for the null-terminator.
   //
-  MacAddress = AllocatePool ((2 * Mode->HwAddressSize + 1) * sizeof (CHAR16));
-  if (MacAddress == NULL) {
+  String = AllocateZeroPool ((2 * HwAddressSize + 5 + 1) * sizeof (CHAR16));
+  if (String == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  *MacString = MacAddress;
+  *MacString = String;
 
   //
-  // Convert the mac address into a unicode string.
+  // Convert the MAC address into a unicode string.
   //
-  HwAddress = Mode->CurrentAddress.Addr;
-  for (Index = 0; Index < Mode->HwAddressSize; Index++) {
-    MacAddress += UnicodeValueToString (MacAddress, PREFIX_ZERO | RADIX_HEX, *(HwAddress++), 2);
+  HwAddress = &MacAddress.Addr[0];
+  for (Index = 0; Index < HwAddressSize; Index++) {
+    String += UnicodeValueToString (String, PREFIX_ZERO | RADIX_HEX, *(HwAddress++), 2);
   }
 
-  MacAddress[Mode->HwAddressSize * 2] = L'\0';
+  //
+  // Append VLAN ID if any
+  //
+  VlanId = NetLibGetVlanId (ServiceHandle);
+  if (VlanId != 0) {
+    *String++ = L'\\';
+    String += UnicodeValueToString (String, PREFIX_ZERO | RADIX_HEX, VlanId, 4);
+  }
 
+  //
+  // Null terminate the Unicode string
+  //
+  *String = L'\0';
 
   return EFI_SUCCESS;
 }

@@ -28,6 +28,9 @@ typedef UINT16          TCP_PORTNO;
 #define  NET_ETHER_ADDR_LEN    6
 #define  NET_IFTYPE_ETHERNET   0x01
 
+#define  NET_VLAN_TAG_LEN      4
+#define  ETHER_TYPE_VLAN       0x8100
+
 #define  EFI_IP_PROTO_UDP      0x11
 #define  EFI_IP_PROTO_TCP      0x06
 #define  EFI_IP_PROTO_ICMP     0x01
@@ -67,6 +70,20 @@ typedef struct {
   UINT16                EtherType;
 } ETHER_HEAD;
 
+//
+// 802.1Q VLAN Tag Control Information
+//
+typedef union {
+  struct {
+    UINT16              Vid      : 12;  // Unique VLAN identifier (0 to 4094)
+    UINT16              Cfi      : 1;   // Canonical Format Indicator
+    UINT16              Priority : 3;   // 802.1Q priority level (0 to 7)
+  } Bits;
+  UINT16                Uint16;
+} VLAN_TCI;
+
+#define VLAN_TCI_CFI_CANONICAL_MAC      0
+#define VLAN_TCI_CFI_NON_CANONICAL_MAC  1
 
 //
 // The EFI_IP4_HEADER is hard to use because the source and
@@ -960,18 +977,104 @@ NetLibDestroyServiceChild (
   );
 
 /**
-  Convert the mac address of the simple network protocol installed on
-  SnpHandle to a unicode string. Callers are responsible for freeing the
-  string storage.
+  Get handle with Simple Network Protocol installed on it.
 
-  Get the mac address of the Simple Network protocol from the SnpHandle. Then convert
-  the mac address into a unicode string. It takes 2 unicode characters to represent 
-  a 1 byte binary buffer, plus one unicode character for the null terminator.
+  There should be MNP Service Binding Protocol installed on the input ServiceHandle.
+  If Simple Network Protocol is already installed on the ServiceHandle, the
+  ServiceHandle will be returned. If SNP is not installed on the ServiceHandle,
+  try to find its parent handle with SNP installed.
 
+  @param[in]   ServiceHandle    The handle where network service binding protocols are
+                                installed on.
+  @param[out]  Snp              The pointer to store the address of the SNP instance.
+                                This is an optional parameter that may be NULL.
 
-  @param[in]   SnpHandle             The handle on which the simple network protocol is
-                                     installed.
-  @param[in]   ImageHandle           The image handle to act as the agent handle to
+  @return The SNP handle, or NULL if not found.
+
+**/
+EFI_HANDLE
+EFIAPI
+NetLibGetSnpHandle (
+  IN   EFI_HANDLE                  ServiceHandle,
+  OUT  EFI_SIMPLE_NETWORK_PROTOCOL **Snp  OPTIONAL
+  );
+
+/**
+  Retrieve VLAN ID of a VLAN device handle.
+
+  Search VLAN device path node in Device Path of specified ServiceHandle and
+  return its VLAN ID. If no VLAN device path node found, then this ServiceHandle
+  is not a VLAN device handle, and 0 will be returned.
+
+  @param[in]   ServiceHandle    The handle where network service binding protocols are
+                                installed on.
+
+  @return VLAN ID of the device handle, or 0 if not a VLAN device.
+
+**/
+UINT16
+EFIAPI
+NetLibGetVlanId (
+  IN EFI_HANDLE             ServiceHandle
+  );
+
+/**
+  Find VLAN device handle with specified VLAN ID.
+
+  The VLAN child device handle is created by VLAN Config Protocol on ControllerHandle.
+  This function will append VLAN device path node to the parent device path,
+  and then use LocateDevicePath() to find the correct VLAN device handle.
+
+  @param[in]   ServiceHandle    The handle where network service binding protocols are
+                                installed on.
+  @param[in]   VLanId           The configured VLAN ID for the VLAN device.
+
+  @return The VLAN device handle, or NULL if not found.
+
+**/
+EFI_HANDLE
+EFIAPI
+NetLibGetVlanHandle (
+  IN EFI_HANDLE             ControllerHandle,
+  IN UINT16                 VlanId
+  );
+
+/**
+  Get MAC address associated with the network service handle.
+
+  There should be MNP Service Binding Protocol installed on the input ServiceHandle.
+  If SNP is installed on the ServiceHandle or its parent handle, MAC address will
+  be retrieved from SNP. If no SNP found, try to get SNP mode data use MNP.
+
+  @param[in]   ServiceHandle    The handle where network service binding protocols are
+                                installed on.
+  @param[out]  MacAddress       The pointer to store the returned MAC address.
+  @param[out]  AddressSize      The length of returned MAC address.
+
+  @retval EFI_SUCCESS           MAC address is returned successfully.
+  @retval Others                Failed to get SNP mode data.
+
+**/
+EFI_STATUS
+EFIAPI
+NetLibGetMacAddress (
+  IN  EFI_HANDLE            ServiceHandle,
+  OUT EFI_MAC_ADDRESS       *MacAddress,
+  OUT UINTN                 *AddressSize
+  );
+
+/**
+  Convert MAC address of the NIC associated with specified Service Binding Handle
+  to a unicode string. Callers are responsible for freeing the string storage.
+
+  Locate simple network protocol associated with the Service Binding Handle and
+  get the mac address from SNP. Then convert the mac address into a unicode
+  string. It takes 2 unicode characters to represent a 1 byte binary buffer.
+  Plus one unicode character for the null-terminator.
+
+  @param[in]   ServiceHandle         The handle where network service binding protocol is
+                                     installed on.
+  @param[in]   ImageHandle           The image handle used to act as the agent handle to
                                      get the simple network protocol.
   @param[out]  MacString             The pointer to store the address of the string
                                      representation of  the mac address.
@@ -984,7 +1087,7 @@ NetLibDestroyServiceChild (
 EFI_STATUS
 EFIAPI
 NetLibGetMacString (
-  IN  EFI_HANDLE            SnpHandle,
+  IN  EFI_HANDLE            ServiceHandle,
   IN  EFI_HANDLE            ImageHandle,
   OUT CHAR16                **MacString
   );

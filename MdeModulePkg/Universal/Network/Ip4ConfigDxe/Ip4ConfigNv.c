@@ -970,7 +970,6 @@ Ip4ConfigUpdateForm (
   IP4CONFIG_FORM_ENTRY        *ConfigFormEntry;
   BOOLEAN                     EntryExisted;
   EFI_STATUS                  Status;
-  EFI_SIMPLE_NETWORK_PROTOCOL *Snp;
   CHAR16                      PortString[128];
   UINT16                      FormIndex;
   VOID                        *StartOpCodeHandle;
@@ -1006,18 +1005,8 @@ Ip4ConfigUpdateForm (
       InitializeListHead (&ConfigFormEntry->Link);
       ConfigFormEntry->Controller = Instance->Controller;
 
-      //
-      // Get the simple network protocol and convert the MAC address into
-      // the formatted string.
-      //
-      Status = gBS->HandleProtocol (
-                      Instance->Controller,
-                      &gEfiSimpleNetworkProtocolGuid,
-                      (VOID **)&Snp
-                      );
+      Status = NetLibGetMacString (Instance->Controller, Instance->Image, &ConfigFormEntry->MacString);
       ASSERT (Status == EFI_SUCCESS);
-
-      Ip4MacAddrToStr (&Snp->Mode->PermanentAddress, Snp->Mode->HwAddressSize, ConfigFormEntry->MacString);
 
       //
       // Compose the Port string and create a new EFI_STRING_ID.
@@ -1039,6 +1028,7 @@ Ip4ConfigUpdateForm (
 
     mNumberOfIp4Devices--;
     RemoveEntryList (&ConfigFormEntry->Link);
+    FreePool (ConfigFormEntry->MacString);
     FreePool (ConfigFormEntry);
   }
 

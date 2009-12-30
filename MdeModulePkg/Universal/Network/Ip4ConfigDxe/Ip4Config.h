@@ -89,7 +89,7 @@ typedef struct _IP4_CONFIG_FORM_ENTRY {
   LIST_ENTRY                    Link;
   IP4_CONFIG_INSTANCE           *Ip4ConfigInstance;
   EFI_HANDLE                    Controller;
-  CHAR16                        MacString[95];
+  CHAR16                        *MacString;
   EFI_STRING_ID                 PortTitleToken;
   EFI_STRING_ID                 PortTitleHelpToken;
   IP4_CONFIG_SESSION_DATA       SessionConfigData;

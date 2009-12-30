@@ -67,7 +67,7 @@ IScsiIpToStr (
 
 /**
   Update the list of iSCSI devices the iSCSI driver is controlling.
-  
+
   @retval EFI_SUCCESS            The callback successfully handled the action.
   @retval Others                 Other errors as indicated.   
 **/
@@ -84,19 +84,20 @@ IScsiUpdateDeviceList (
   UINTN                       HandleIndex;
   UINTN                       Index;
   UINTN                       LastDeviceIndex;
-  EFI_SIMPLE_NETWORK_PROTOCOL *Snp;
-  EFI_SIMPLE_NETWORK_MODE     *Mode;
+  EFI_MAC_ADDRESS             MacAddress;
+  UINTN                       HwAddressSize;
+  UINT16                      VlanId;
   ISCSI_MAC_INFO              *CurMacInfo;
   ISCSI_MAC_INFO              TempMacInfo;
-  CHAR16                      MacString[65];
+  CHAR16                      MacString[70];
   UINTN                       DeviceListSize;
 
   //
-  // Dump all the handles the Simple Network Protocol is installed on.
+  // Dump all the handles the Managed Network Service Binding Protocol is installed on.
   //
   Status = gBS->LocateHandleBuffer (
                   ByProtocol,
-                  &gEfiSimpleNetworkProtocolGuid,
+                  &gEfiManagedNetworkServiceBindingProtocolGuid,
                   NULL,
                   &NumHandles,
                   &Handles
@@ -127,14 +128,15 @@ IScsiUpdateDeviceList (
     LastDeviceIndex = 0;
 
     for (HandleIndex = 0; HandleIndex < NumHandles; HandleIndex++) {
-      gBS->HandleProtocol (Handles[HandleIndex], &gEfiSimpleNetworkProtocolGuid, (VOID **)&Snp);
-
-      Mode = Snp->Mode;
+      Status = NetLibGetMacAddress (Handles[HandleIndex], &MacAddress, &HwAddressSize);
+      ASSERT (Status == EFI_SUCCESS);
+      VlanId = NetLibGetVlanId (Handles[HandleIndex]);
 
       for (Index = LastDeviceIndex; Index < DeviceList->NumDevice; Index++) {
         CurMacInfo = &DeviceList->MacInfo[Index];
-        if ((CurMacInfo->Len == Mode->HwAddressSize) &&
-            (NET_MAC_EQUAL (&CurMacInfo->Mac, &Mode->PermanentAddress, Mode->HwAddressSize))
+        if ((CurMacInfo->Len == HwAddressSize) &&
+            (CurMacInfo->VlanId == VlanId) &&
+            (NET_MAC_EQUAL (&CurMacInfo->Mac, MacAddress.Addr, HwAddressSize))
             ) {
           //
           // The previous configured NIC is still here.
@@ -163,7 +165,7 @@ IScsiUpdateDeviceList (
       // delete the variables
       //
       CurMacInfo = &DeviceList->MacInfo[Index];
-      IScsiMacAddrToStr (&CurMacInfo->Mac, CurMacInfo->Len, MacString);
+      IScsiMacAddrToStr (&CurMacInfo->Mac, CurMacInfo->Len, CurMacInfo->VlanId, MacString);
       gRT->SetVariable (MacString, &gEfiIScsiInitiatorNameProtocolGuid, 0, 0, NULL);
       gRT->SetVariable (MacString, &mIScsiCHAPAuthInfoGuid, 0, 0, NULL);
     }
@@ -181,12 +183,12 @@ IScsiUpdateDeviceList (
   DeviceList->NumDevice = (UINT8) NumHandles;
 
   for (Index = 0; Index < NumHandles; Index++) {
-    gBS->HandleProtocol (Handles[Index], &gEfiSimpleNetworkProtocolGuid, (VOID **)&Snp);
-    Mode        = Snp->Mode;
+    NetLibGetMacAddress (Handles[Index], &MacAddress, &HwAddressSize);
 
     CurMacInfo  = &DeviceList->MacInfo[Index];
-    CopyMem (&CurMacInfo->Mac, &Mode->PermanentAddress, Mode->HwAddressSize);
-    CurMacInfo->Len = (UINT8) Mode->HwAddressSize;
+    CopyMem (&CurMacInfo->Mac, MacAddress.Addr, HwAddressSize);
+    CurMacInfo->Len = (UINT8) HwAddressSize;
+    CurMacInfo->VlanId = NetLibGetVlanId (Handles[Index]);
   }
 
   gRT->SetVariable (
@@ -776,7 +778,9 @@ IScsiConfigUpdateForm (
   ISCSI_CONFIG_FORM_ENTRY     *ConfigFormEntry;
   BOOLEAN                     EntryExisted;
   EFI_STATUS                  Status;
-  EFI_SIMPLE_NETWORK_PROTOCOL *Snp;
+  EFI_MAC_ADDRESS             MacAddress;
+  UINTN                       HwAddressSize;
+  UINT16                      VlanId;
   CHAR16                      PortString[128];
   UINT16                      FormIndex;
   UINTN                       BufferSize;
@@ -813,17 +817,13 @@ IScsiConfigUpdateForm (
       ConfigFormEntry->Controller = Controller;
 
       //
-      // Get the simple network protocol and convert the MAC address into
-      // the formatted string.
+      // Get the MAC address and convert it into the formatted string.
       //
-      Status = gBS->HandleProtocol (
-                      Controller,
-                      &gEfiSimpleNetworkProtocolGuid,
-                      (VOID **)&Snp
-                      );
+      Status = NetLibGetMacAddress (Controller, &MacAddress, &HwAddressSize);
       ASSERT (Status == EFI_SUCCESS);
+      VlanId = NetLibGetVlanId (Controller);
 
-      IScsiMacAddrToStr (&Snp->Mode->PermanentAddress, Snp->Mode->HwAddressSize, ConfigFormEntry->MacString);
+      IScsiMacAddrToStr (&MacAddress, (UINT32) HwAddressSize, VlanId, ConfigFormEntry->MacString);
 
       //
       // Get the normal session configuration data.

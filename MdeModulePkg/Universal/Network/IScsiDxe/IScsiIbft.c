@@ -247,31 +247,6 @@ IScsiGetNICPciLocation (
 }
 
 /**
-  Get the MAC address of the controller.
-  
-  @param[in]  Controller    The handle of the controller.
-
-  @return EFI_MAC_ADDRESS * The mac address.
-**/
-EFI_MAC_ADDRESS *
-IScsiGetMacAddress (
-  IN EFI_HANDLE  Controller
-  )
-{
-  EFI_STATUS                  Status;
-  EFI_SIMPLE_NETWORK_PROTOCOL *Snp;
-
-  Status = gBS->HandleProtocol (
-                  Controller,
-                  &gEfiSimpleNetworkProtocolGuid,
-                  (VOID **) &Snp
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  return &Snp->Mode->PermanentAddress;
-}
-
-/**
   Fill the NIC and target sections in iSCSI Boot Firmware Table.
 
   @param[in]       Table       The buffer of the ACPI table.
@@ -296,7 +271,8 @@ IScsiFillNICAndTargetSections (
   UINT16                                                *SectionOffset;
   UINTN                                                 Index;
   UINT16                                                Length;
-  EFI_MAC_ADDRESS                                       *Mac;
+  EFI_MAC_ADDRESS                                       MacAddress;
+  UINTN                                                 HwAddressSize;
   ISCSI_PRIVATE_PROTOCOL                                *IScsiIdentifier;
   EFI_STATUS                                            Status;
 
@@ -354,8 +330,11 @@ IScsiFillNICAndTargetSections (
     IScsiMapV4ToV6Addr (&SessionConfigData->SecondaryDns, &Nic->SecondaryDns);
     IScsiMapV4ToV6Addr (&SessionConfigData->DhcpServer, &Nic->DhcpServer);
 
-    Mac = IScsiGetMacAddress (DriverData->Controller);
-    CopyMem (Nic->Mac, Mac, sizeof (Nic->Mac));
+    Nic->VLanTag = NetLibGetVlanId (DriverData->Controller);
+
+    Status = NetLibGetMacAddress (DriverData->Controller, &MacAddress, &HwAddressSize);
+    ASSERT (Status == EFI_SUCCESS);
+    CopyMem (Nic->Mac, MacAddress.Addr, sizeof (Nic->Mac));
 
     //
     // Get the PCI location of the Nic.
