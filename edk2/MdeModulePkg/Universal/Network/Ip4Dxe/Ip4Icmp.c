@@ -105,6 +105,8 @@ Ip4ProcessIcmpRedirect (
   IP4_ROUTE_CACHE_ENTRY     *CacheEntry;
   IP4_INTERFACE             *IpIf;
   IP4_ADDR                  Gateway;
+  IP4_ADDR                  Src;
+  IP4_ADDR                  Dst;
 
   //
   // Find the interface whose IP address is the source of the
@@ -133,11 +135,9 @@ Ip4ProcessIcmpRedirect (
       continue;
     }
 
-    CacheEntry = Ip4FindRouteCache (
-                   Ip4Instance->RouteTable,
-                   NTOHL (Icmp->IpHead.Dst),
-                   NTOHL (Icmp->IpHead.Src)
-                   );
+    Dst = NTOHL (Icmp->IpHead.Dst);
+    Src = NTOHL (Icmp->IpHead.Src);
+    CacheEntry = Ip4FindRouteCache (Ip4Instance->RouteTable, Dst, Src);
 
     //
     // Only update the route cache's gateway if the source of the

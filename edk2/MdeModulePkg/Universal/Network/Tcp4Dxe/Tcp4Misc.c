@@ -1090,18 +1090,22 @@ TcpInstallDevicePath (
   TCP_CB             *Tcb;
   IPv4_DEVICE_PATH   Ip4DPathNode;
   EFI_STATUS         Status;
+  TCP_PORTNO         LocalPort;
+  TCP_PORTNO         RemotePort;
 
   TcpProto   = (TCP4_PROTO_DATA *) Sock->ProtoReserved;
   TcpService = TcpProto->TcpService;
   Tcb        = TcpProto->TcpPcb;
 
+  LocalPort = NTOHS (Tcb->LocalEnd.Port);
+  RemotePort = NTOHS (Tcb->RemoteEnd.Port);
   NetLibCreateIPv4DPathNode (
     &Ip4DPathNode,
     TcpService->ControllerHandle,
     Tcb->LocalEnd.Ip,
-    NTOHS (Tcb->LocalEnd.Port),
+    LocalPort,
     Tcb->RemoteEnd.Ip,
-    NTOHS (Tcb->RemoteEnd.Port),
+    RemotePort,
     EFI_IP_PROTO_TCP,
     Tcb->UseDefaultAddr
     );

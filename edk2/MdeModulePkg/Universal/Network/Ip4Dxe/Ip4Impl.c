@@ -561,6 +561,10 @@ Ip4AutoConfigCallBackDpc (
   EFI_STATUS                Status;
   UINTN                     Len;
   UINT32                    Index;
+  IP4_ADDR                  StationAddress;
+  IP4_ADDR                  SubnetMask;
+  IP4_ADDR                  SubnetAddress;
+  IP4_ADDR                  GatewayAddress;
 
   IpSb      = (IP4_SERVICE *) Context;
   NET_CHECK_SIGNATURE (IpSb, IP4_SERVICE_SIGNATURE);
@@ -646,11 +650,9 @@ Ip4AutoConfigCallBackDpc (
   // Set the default interface's address, then add a directed
   // route for it, that is, the route whose nexthop is zero.
   //
-  Status = Ip4SetAddress (
-             IpIf,
-             EFI_NTOHL (Data->StationAddress),
-             EFI_NTOHL (Data->SubnetMask)
-             );
+  StationAddress = EFI_NTOHL (Data->StationAddress);
+  SubnetMask = EFI_NTOHL (Data->SubnetMask);
+  Status = Ip4SetAddress (IpIf, StationAddress, SubnetMask);
 
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
@@ -658,8 +660,8 @@ Ip4AutoConfigCallBackDpc (
 
   Ip4AddRoute (
     IpSb->DefaultRouteTable,
-    EFI_NTOHL (Data->StationAddress),
-    EFI_NTOHL (Data->SubnetMask),
+    StationAddress,
+    SubnetMask,
     IP4_ALLZERO_ADDRESS
     );
 
@@ -669,12 +671,10 @@ Ip4AutoConfigCallBackDpc (
   for (Index = 0; Index < Data->RouteTableSize; Index++) {
     RouteEntry = &Data->RouteTable[Index];
 
-    Ip4AddRoute (
-      IpSb->DefaultRouteTable,
-      EFI_NTOHL (RouteEntry->SubnetAddress),
-      EFI_NTOHL (RouteEntry->SubnetMask),
-      EFI_NTOHL (RouteEntry->GatewayAddress)
-      );
+    SubnetAddress = EFI_NTOHL (RouteEntry->SubnetAddress);
+    SubnetMask = EFI_NTOHL (RouteEntry->SubnetMask);
+    GatewayAddress = EFI_NTOHL (RouteEntry->GatewayAddress);
+    Ip4AddRoute (IpSb->DefaultRouteTable, SubnetAddress, SubnetMask, GatewayAddress);
   }
 
   IpSb->State = IP4_SERVICE_CONFIGED;
