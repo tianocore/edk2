@@ -12,7 +12,198 @@
 
 **/
 
-#include "ReportStatusCodeLibInternal.h"
+#include <Library/ReportStatusCodeLib.h>
+#include <Library/BaseLib.h>
+#include <Library/DebugLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/PcdLib.h>
+#include <Library/DevicePathLib.h>
+#include <Library/UefiRuntimeLib.h>
+
+#include <Protocol/StatusCode.h>
+
+#include <Guid/StatusCodeDataTypeId.h>
+#include <Guid/StatusCodeDataTypeDebug.h>
+#include <Guid/EventGroup.h>
+
+EFI_STATUS_CODE_PROTOCOL  *mReportStatusCodeLibStatusCodeProtocol = NULL;
+EFI_EVENT                 mReportStatusCodeLibVirtualAddressChangeEvent;
+
+/**
+  Locate the report status code service.
+
+  Retrieve ReportStatusCode() API of Report Status Code Protocol.
+
+**/
+VOID
+InternalGetReportStatusCode (
+  VOID
+  )
+{
+  EFI_STATUS  Status;
+
+  if (mReportStatusCodeLibStatusCodeProtocol != NULL) {
+    return;
+  }
+  
+  if (EfiAtRuntime ()) {
+    return;
+  }
+  
+  //
+  // Check gBS just in case ReportStatusCode is called before gBS is initialized.
+  //
+  if (gBS != NULL && gBS->LocateProtocol != NULL) {
+    Status = gBS->LocateProtocol (&gEfiStatusCodeRuntimeProtocolGuid, NULL, (VOID**) &mReportStatusCodeLibStatusCodeProtocol);
+    if (EFI_ERROR (Status)) {
+      mReportStatusCodeLibStatusCodeProtocol = NULL;
+    }
+  }
+}
+
+/**
+  Notification function of EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE.
+
+  @param  Event        Event whose notification function is being invoked.
+  @param  Context      Pointer to the notification function's context
+
+**/
+VOID
+EFIAPI
+ReportStatusCodeLibVirtualAddressChange (
+  IN EFI_EVENT        Event,
+  IN VOID             *Context
+  )
+{
+  if (mReportStatusCodeLibStatusCodeProtocol == NULL) {
+    return;
+  }
+  EfiConvertPointer (0, (VOID **) &mReportStatusCodeLibStatusCodeProtocol);
+}
+
+/**
+  The constructor function of Runtime DXE Report Status Code Lib.
+
+  This function allocates memory for extended status code data, caches
+  the report status code service, and registers events.
+
+  @param  ImageHandle   The firmware allocated handle for the EFI image.
+  @param  SystemTable   A pointer to the EFI System Table.
+  
+  @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
+
+**/
+EFI_STATUS
+EFIAPI
+ReportStatusCodeLibConstructor (
+  IN EFI_HANDLE           ImageHandle,
+  IN EFI_SYSTEM_TABLE     *SystemTable
+  )
+{
+  EFI_STATUS  Status;
+
+  //
+  // Cache the report status code service
+  // 
+  InternalGetReportStatusCode ();
+
+  //
+  // Register notify function for EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE
+  // 
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  ReportStatusCodeLibVirtualAddressChange,
+                  NULL,
+                  &gEfiEventVirtualAddressChangeGuid,
+                  &mReportStatusCodeLibVirtualAddressChangeEvent
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  return EFI_SUCCESS;
+}
+
+/**
+  The destructor function of Runtime DXE Report Status Code Lib.
+  
+  The destructor function frees memory allocated by constructor, and closes related events.
+  It will ASSERT() if that related operation fails and it will always return EFI_SUCCESS. 
+
+  @param  ImageHandle   The firmware allocated handle for the EFI image.
+  @param  SystemTable   A pointer to the EFI System Table.
+  
+  @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
+
+**/
+EFI_STATUS
+EFIAPI
+ReportStatusCodeLibDestructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS  Status;
+
+  ASSERT (gBS != NULL);
+  Status = gBS->CloseEvent (mReportStatusCodeLibVirtualAddressChangeEvent);
+  ASSERT_EFI_ERROR (Status);
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Internal worker function that reports a status code through the Report Status Code Protocol.
+
+  If status code service is not cached, then this function checks if Report Status Code
+  Protocol is available in system.  If Report Status Code Protocol is not available, then
+  EFI_UNSUPPORTED is returned.  If Report Status Code Protocol is present, then it is
+  cached in mReportStatusCodeLibStatusCodeProtocol. Finally this function reports status
+  code through the Report Status Code Protocol.
+
+  @param  Type              Status code type.
+  @param  Value             Status code value.
+  @param  Instance          Status code instance number.
+  @param  CallerId          Pointer to a GUID that identifies the caller of this
+                            function.  This is an optional parameter that may be
+                            NULL.
+  @param  Data              Pointer to the extended data buffer.  This is an
+                            optional parameter that may be NULL.
+
+  @retval EFI_SUCCESS       The status code was reported.
+  @retval EFI_UNSUPPORTED   Report Status Code Protocol is not available.
+  @retval EFI_UNSUPPORTED   Status code type is not supported.
+
+**/
+EFI_STATUS
+InternalReportStatusCode (
+  IN EFI_STATUS_CODE_TYPE     Type,
+  IN EFI_STATUS_CODE_VALUE    Value,
+  IN UINT32                   Instance,
+  IN CONST EFI_GUID           *CallerId OPTIONAL,
+  IN EFI_STATUS_CODE_DATA     *Data     OPTIONAL
+  )
+{
+  if ((ReportProgressCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_PROGRESS_CODE) ||
+      (ReportErrorCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_ERROR_CODE) ||
+      (ReportDebugCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_DEBUG_CODE)) {
+    //
+    // If mReportStatusCodeLibStatusCodeProtocol is NULL, then check if Report Status Code Protocol is available in system.
+    //
+    InternalGetReportStatusCode ();
+    if (mReportStatusCodeLibStatusCodeProtocol == NULL) {
+      return EFI_UNSUPPORTED;
+    }
+
+    //
+    // A Report Status Code Protocol is present in system, so pass in all the parameters to the service.
+    //
+    return mReportStatusCodeLibStatusCodeProtocol->ReportStatusCode (Type, Value, Instance, (EFI_GUID *)CallerId, Data);
+  }
+  
+  return EFI_UNSUPPORTED;
+}
+
 
 /**
   Converts a status code to an 8-bit POST code value.
@@ -389,29 +580,47 @@ ReportStatusCodeEx (
   )
 {
   EFI_STATUS            Status;
+  EFI_STATUS_CODE_DATA  *StatusCodeData;
+  UINT8                 StatusCodeBuffer[EFI_STATUS_CODE_DATA_MAX_SIZE];
 
   ASSERT (!((ExtendedData == NULL) && (ExtendedDataSize != 0)));
   ASSERT (!((ExtendedData != NULL) && (ExtendedDataSize == 0)));
 
-  if (ExtendedDataSize > EFI_STATUS_CODE_DATA_MAX_SIZE) {
-    return EFI_OUT_OF_RESOURCES;
+  if (EfiAtRuntime ()) {
+    if (sizeof (EFI_STATUS_CODE_DATA) + ExtendedDataSize > EFI_STATUS_CODE_DATA_MAX_SIZE) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    StatusCodeData = (EFI_STATUS_CODE_DATA *)StatusCodeBuffer;
+  } else  {
+    if (gBS == NULL || gBS->AllocatePool == NULL || gBS->FreePool == NULL) {
+      return EFI_UNSUPPORTED;
+    }
+  
+    //
+    // Allocate space for the Status Code Header and its buffer
+    //
+    StatusCodeData = NULL;
+    gBS->AllocatePool (EfiBootServicesData, sizeof (EFI_STATUS_CODE_DATA) + ExtendedDataSize, (VOID **)&StatusCodeData);
+    if (StatusCodeData == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
   }
 
   //
   // Fill in the extended data header
   //
-  mStatusCodeData->HeaderSize = sizeof (EFI_STATUS_CODE_DATA);
-  mStatusCodeData->Size = (UINT16)ExtendedDataSize;
+  StatusCodeData->HeaderSize = sizeof (EFI_STATUS_CODE_DATA);
+  StatusCodeData->Size = (UINT16)ExtendedDataSize;
   if (ExtendedDataGuid == NULL) {
     ExtendedDataGuid = &gEfiStatusCodeSpecificDataGuid;
   }
-  CopyGuid (&mStatusCodeData->Type, ExtendedDataGuid);
+  CopyGuid (&StatusCodeData->Type, ExtendedDataGuid);
 
   //
   // Fill in the extended data buffer
   //
   if (ExtendedData != NULL) {
-    CopyMem (mStatusCodeData + 1, ExtendedData, ExtendedDataSize);
+    CopyMem (StatusCodeData + 1, ExtendedData, ExtendedDataSize);
   }
 
   //
@@ -420,7 +629,14 @@ ReportStatusCodeEx (
   if (CallerId == NULL) {
     CallerId = &gEfiCallerIdGuid;
   }
-  Status = InternalReportStatusCode (Type, Value, Instance, CallerId, mStatusCodeData);
+  Status = InternalReportStatusCode (Type, Value, Instance, CallerId, StatusCodeData);
+
+  //
+  // Free the allocated buffer
+  //
+  if (!EfiAtRuntime()) {
+    gBS->FreePool (StatusCodeData);
+  }
 
   return Status;
 }

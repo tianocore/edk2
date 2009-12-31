@@ -38,7 +38,6 @@
 [LibraryClasses]
   PcdLib
   BaseMemoryLib
-  MemoryAllocationLib
   UefiBootServicesTableLib
   DebugLib
   UefiRuntimeServicesTableLib
@@ -49,7 +48,7 @@
   gEfiStatusCodeDataTypeDebugGuid               ## CONSUMES
 
 [Protocols]
-  gEfiStatusCodeRuntimeProtocolGuid             ## SOMETIMES_CONSUMES (Used if revision of the EFI Specification is not less than 0x20000)
+  gEfiStatusCodeRuntimeProtocolGuid             ## CONSUMES
 
 [Pcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask
