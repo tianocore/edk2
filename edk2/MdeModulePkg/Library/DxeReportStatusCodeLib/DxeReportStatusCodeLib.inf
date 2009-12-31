@@ -28,7 +28,7 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-[Sources.common]
+[Sources]
   ReportStatusCodeLib.c
 
 [Packages]
@@ -36,11 +36,11 @@
   MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
-  PcdLib
-  BaseMemoryLib
-  UefiBootServicesTableLib
+  BaseLib
   DebugLib
-  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  BaseMemoryLib
+  PcdLib
   DevicePathLib
 
 [Guids]
@@ -50,6 +50,6 @@
 [Protocols]
   gEfiStatusCodeRuntimeProtocolGuid             ## CONSUMES
 
-[Pcd.common]
+[Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask
 
