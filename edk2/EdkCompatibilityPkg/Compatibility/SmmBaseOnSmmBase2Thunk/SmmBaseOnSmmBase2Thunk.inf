@@ -1,0 +1,53 @@
+## @file
+#  Component description file for SMM Base Protocol on SMM Base2 Protocol Thunk driver.
+#
+#  Copyright (c) 2009, Intel Corporation
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmmBaseOnSmmBase2Thunk
+  FILE_GUID                      = 21CCF0B7-246B-412c-A334-0B65A07B28DF
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SmmBaseThunkMain
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  SmmBaseOnSmmBase2Thunk.c
+  SmmBaseOnSmmBase2Thunk.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  EdkCompatibilityPkg/EdkCompatibilityPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  DebugLib
+  UefiLib
+
+[Protocols]
+  gEfiSmmBase2ProtocolGuid            # PROTOCOL SOMETIMES_CONSUMED
+  gEfiSmmCommunicationProtocolGuid    # PROTOCOL SOMETIMES_CONSUMED
+  gEfiSmmBaseHelperReadyProtocolGuid  # PROTOCOL SOMETIMES_CONSUMED
+  gEfiSmmBaseProtocolGuid             # PROTOCOL SOMETIMES_PRODUCED
+
+[Depex]
+  TRUE
+

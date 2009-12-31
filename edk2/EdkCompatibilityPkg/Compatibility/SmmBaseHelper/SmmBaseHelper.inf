@@ -1,0 +1,62 @@
+## @file
+#  Component description file for SMM Base Helper SMM driver.
+#
+#  Copyright (c) 2009, Intel Corporation.
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmmBaseHelper
+  FILE_GUID                      = 8C87E0A0-B390-4be3-819C-7C6C83CAE4EB
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+
+  ENTRY_POINT                    = SmmBaseHelperMain
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 
+#
+
+[Sources]
+  SmmBaseHelper.c
+  SmmBaseHelper.h
+ 
+[Packages]
+  MdePkg/MdePkg.dec
+  IA32FamilyCpuPkg/IA32FamilyCpuPkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  EdkCompatibilityPkg/EdkCompatibilityPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  SmmServicesTableLib
+  BaseMemoryLib
+  PeCoffLib
+  DevicePathLib
+  CacheMaintenanceLib
+
+[Guids]
+  gEfiSmmBaseThunkCommunicationGuid
+
+[Protocols]
+  gEfiSmmBaseHelperReadyProtocolGuid     # PROTOCOL ALWAYS_PRODUCED
+  gEfiSmmCpuProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
+  gEfiLoadedImageProtocolGuid            # PROTOCOL ALWAYS_CONSUMED
+  gEfiLoadedImageDevicePathProtocolGuid  # PROTOCOL ALWAYS_CONSUMED
+
+[Depex]
+  gEfiSmmCpuProtocolGuid
+
