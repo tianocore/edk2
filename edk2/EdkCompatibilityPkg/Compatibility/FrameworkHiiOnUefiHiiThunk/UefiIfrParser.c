@@ -12,24 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <PiDxe.h>
-
-#include <Protocol/HiiConfigAccess.h>
-#include <Protocol/HiiConfigRouting.h>
-#include <Protocol/HiiDatabase.h>
-#include <Protocol/HiiString.h>
-
-#include <Library/BaseLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/DebugLib.h>
-#include <Library/HiiLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/PrintLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-
-#include <Guid/MdeModuleHii.h>
-
-#include "UefiIfrParser.h"
+#include "HiiDatabase.h"
 
 #include "UefiIfrParserExpression.h"
 
@@ -518,12 +501,14 @@ ParseOpCodes (
   ONE_OF_OPTION_MAP_ENTRY *OneOfOptionMapEntry;
   UINT8                   OneOfType;
   EFI_IFR_ONE_OF          *OneOfOpcode;
+  HII_THUNK_CONTEXT       *ThunkContext;
 
-  mInScopeSubtitle         = FALSE;
-  mInScopeSuppress         = FALSE;
-  mInScopeGrayOut          = FALSE;
-  CurrentDefault           = NULL;
-  CurrentOption            = NULL;
+  mInScopeSubtitle = FALSE;
+  mInScopeSuppress = FALSE;
+  mInScopeGrayOut  = FALSE;
+  CurrentDefault   = NULL;
+  CurrentOption    = NULL;
+  ThunkContext     = UefiHiiHandleToThunkContext ((CONST HII_THUNK_PRIVATE_DATA*) mHiiThunkPrivateData, FormSet->HiiHandle);
 
   //
   // Set to a invalid value.
@@ -631,8 +616,12 @@ ParseOpCodes (
       break;
 
     case EFI_IFR_VARSTORE_NAME_VALUE_OP:
-      ASSERT (FALSE);
-
+      //
+      // Framework IFR doesn't support Name/Value VarStore opcode
+      //
+      if (ThunkContext != NULL && ThunkContext->ByFrameworkHiiNewPack) {
+        ASSERT (FALSE);
+      }
       break;
 
     case EFI_IFR_VARSTORE_EFI_OP:
@@ -907,8 +896,12 @@ ParseOpCodes (
       break;
 
     case EFI_IFR_DISABLE_IF_OP:
-      ASSERT (FALSE);
-
+      //
+      // Framework IFR doesn't support DisableIf opcode
+      //
+      if (ThunkContext != NULL && ThunkContext->ByFrameworkHiiNewPack) {
+        ASSERT (FALSE);
+      }
 
     //
     // Expression
