@@ -84,7 +84,7 @@ formset
   // Define a EFI variable Storage (EFI_IFR_VARSTORE_EFI)
   //
   efivarstore MyEfiVar,                           // Define referenced name in vfr
-    attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,  // EFI variable attribures
+    attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS,  // EFI variable attribures
     name      = STRING_TOKEN(STR_VAR_NAME),       // EFI variable name
     varsize   = 1,                                // Size of the EFI variable
     guid      = FORMSET_GUID;                     // EFI variable GUID
@@ -209,7 +209,7 @@ formset
 
     endif;    // end suppressif
 
-    suppressif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x2;
+    disableif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x2;
       orderedlist
         varid       = MyIfrNVData.OrderedList,
         prompt      = STRING_TOKEN(STR_TEST_OPCODE),
@@ -390,110 +390,112 @@ formset
 
   endform;
 
-  form formid = 2,               // SecondSetupPage,
-    title = STRING_TOKEN(STR_FORM2_TITLE);  // note formid is a variable (for readability) (UINT16) - also added Form to the line to signify the Op-Code
+  suppressif ideqval MyIfrNVData.BootOrderLarge == 0;
+    form formid = 2,               // SecondSetupPage,
+      title = STRING_TOKEN(STR_FORM2_TITLE);  // note formid is a variable (for readability) (UINT16) - also added Form to the line to signify the Op-Code
 
 
-    date    year varid  = Date.Year,    // Note that it is a member of NULL, so the RTC will be the system resource to retrieve and save from
-            prompt      = STRING_TOKEN(STR_DATE_PROMPT),
-            help        = STRING_TOKEN(STR_DATE_HELP),
-            minimum     = 1998,
-            maximum     = 2099,
-            step        = 1,
-            default     = 2004,
+      date    year varid  = Date.Year,    // Note that it is a member of NULL, so the RTC will be the system resource to retrieve and save from
+              prompt      = STRING_TOKEN(STR_DATE_PROMPT),
+              help        = STRING_TOKEN(STR_DATE_HELP),
+              minimum     = 1998,
+              maximum     = 2099,
+              step        = 1,
+              default     = 2004,
 
-            month varid = Date.Month,    // Note that it is a member of NULL, so the RTC will be the system resource to retrieve and save from
-            prompt      = STRING_TOKEN(STR_DATE_PROMPT),
-            help        = STRING_TOKEN(STR_DATE_HELP),
-            minimum     = 1,
-            maximum     = 12,
-            step        = 1,
-            default     = 1,
+              month varid = Date.Month,    // Note that it is a member of NULL, so the RTC will be the system resource to retrieve and save from
+              prompt      = STRING_TOKEN(STR_DATE_PROMPT),
+              help        = STRING_TOKEN(STR_DATE_HELP),
+              minimum     = 1,
+              maximum     = 12,
+              step        = 1,
+              default     = 1,
 
-            day varid   = Date.Day,          // Note that it is a member of NULL, so the RTC will be the system resource to retrieve and save from
-            prompt      = STRING_TOKEN(STR_DATE_PROMPT),
-            help        = STRING_TOKEN(STR_DATE_HELP),
-            minimum     = 1,
-            maximum     = 31,
-            step        = 0x1,
-            default     = 1,
+              day varid   = Date.Day,          // Note that it is a member of NULL, so the RTC will be the system resource to retrieve and save from
+              prompt      = STRING_TOKEN(STR_DATE_PROMPT),
+              help        = STRING_TOKEN(STR_DATE_HELP),
+              minimum     = 1,
+              maximum     = 31,
+              step        = 0x1,
+              default     = 1,
 
-      inconsistentif prompt = STRING_TOKEN(STR_ERROR_POPUP),
-        ideqval Date.Day == 31
-        AND
-        ideqvallist Date.Month == 2 4 6 9 11
-      endif
+        inconsistentif prompt = STRING_TOKEN(STR_ERROR_POPUP),
+          ideqval Date.Day == 31
+          AND
+          ideqvallist Date.Month == 2 4 6 9 11
+        endif
 
-      //
-      // If the day is 30 AND month is 2
-      //
-      inconsistentif prompt = STRING_TOKEN(STR_ERROR_POPUP),
-        ideqval Date.Day == 30
-        AND
-        ideqval Date.Month == 2
-      endif
+        //
+        // If the day is 30 AND month is 2
+        //
+        inconsistentif prompt = STRING_TOKEN(STR_ERROR_POPUP),
+          ideqval Date.Day == 30
+          AND
+          ideqval Date.Month == 2
+        endif
 
-      //
-      // If the day is 29 AND month is 2 AND it year is NOT a leapyear
-      //
-      inconsistentif prompt = STRING_TOKEN(STR_ERROR_POPUP),
-        ideqval Date.Day == 0x1D
-        AND
-        ideqval Date.Month == 2
-        AND
-        NOT
-        ideqvallist Date.Year == 2004 2008 20012 20016 2020 2024 2028 2032 2036
-      endif
+        //
+        // If the day is 29 AND month is 2 AND it year is NOT a leapyear
+        //
+        inconsistentif prompt = STRING_TOKEN(STR_ERROR_POPUP),
+          ideqval Date.Day == 0x1D
+          AND
+          ideqval Date.Month == 2
+          AND
+          NOT
+          ideqvallist Date.Year == 2004 2008 20012 20016 2020 2024 2028 2032 2036
+        endif
 
-    enddate;
+      enddate;
 
-    time    hour varid  = Time.Hours,         // Note that it is a member of NULL, so the RTC will be the system resource to retrieve and save from
-            prompt      = STRING_TOKEN(STR_TIME_PROMPT),
-            help        = STRING_TOKEN(STR_TIME_HELP),
-            minimum     = 0,
-            maximum     = 23,
-            step        = 1,
-            default     = 0,
+      time    hour varid  = Time.Hours,         // Note that it is a member of NULL, so the RTC will be the system resource to retrieve and save from
+              prompt      = STRING_TOKEN(STR_TIME_PROMPT),
+              help        = STRING_TOKEN(STR_TIME_HELP),
+              minimum     = 0,
+              maximum     = 23,
+              step        = 1,
+              default     = 0,
 
-            minute varid  = Time.Minutes,       // Note that it is a member of NULL, so the RTC will be the system resource to retrieve and save from
-            prompt        = STRING_TOKEN(STR_TIME_PROMPT),
-            help          = STRING_TOKEN(STR_TIME_HELP),
-            minimum       = 0,
-            maximum       = 59,
-            step          = 1,
-            default       = 0,
+              minute varid  = Time.Minutes,       // Note that it is a member of NULL, so the RTC will be the system resource to retrieve and save from
+              prompt        = STRING_TOKEN(STR_TIME_PROMPT),
+              help          = STRING_TOKEN(STR_TIME_HELP),
+              minimum       = 0,
+              maximum       = 59,
+              step          = 1,
+              default       = 0,
 
-            second varid  = Time.Seconds,       // Note that it is a member of NULL, so the RTC will be the system resource to retrieve and save from
-            prompt        = STRING_TOKEN(STR_TIME_PROMPT),
-            help          = STRING_TOKEN(STR_TIME_HELP),
-            minimum       = 0,
-            maximum       = 59,
-            step          = 1,
-            default       = 0,
+              second varid  = Time.Seconds,       // Note that it is a member of NULL, so the RTC will be the system resource to retrieve and save from
+              prompt        = STRING_TOKEN(STR_TIME_PROMPT),
+              help          = STRING_TOKEN(STR_TIME_HELP),
+              minimum       = 0,
+              maximum       = 59,
+              step          = 1,
+              default       = 0,
 
-    endtime;
+      endtime;
 
-    checkbox varid   = MyIfrNVData.ChooseToActivateNuclearWeaponry,
-            prompt   = STRING_TOKEN(STR_CHECK_BOX_PROMPT),
-            help     = STRING_TOKEN(STR_CHECK_BOX_HELP),
-            flags    = CHECKBOX_DEFAULT,
-            key      = 0,
-    endcheckbox;
+      checkbox varid   = MyIfrNVData.ChooseToActivateNuclearWeaponry,
+              prompt   = STRING_TOKEN(STR_CHECK_BOX_PROMPT),
+              help     = STRING_TOKEN(STR_CHECK_BOX_HELP),
+              flags    = CHECKBOX_DEFAULT,
+              key      = 0,
+      endcheckbox;
 
-    text
-      help = STRING_TOKEN(STR_TEXT_HELP),
-      text = STRING_TOKEN(STR_TEXT_TEXT_1);
+      text
+        help = STRING_TOKEN(STR_TEXT_HELP),
+        text = STRING_TOKEN(STR_TEXT_TEXT_1);
 
-    text
-      help   = STRING_TOKEN(STR_TEXT_HELP),
-      text   = STRING_TOKEN(STR_TEXT_TEXT_1),
-      text   = STRING_TOKEN(STR_TEXT_TEXT_2);
+      text
+        help   = STRING_TOKEN(STR_TEXT_HELP),
+        text   = STRING_TOKEN(STR_TEXT_TEXT_1),
+        text   = STRING_TOKEN(STR_TEXT_TEXT_2);
 
-    goto 1,
-      prompt = STRING_TOKEN(STR_GOTO_FORM1), //MainSetupPage  // this too has no end-op and basically it's a jump to a form ONLY
-      help   = STRING_TOKEN(STR_GOTO_HELP);
+      goto 1,
+        prompt = STRING_TOKEN(STR_GOTO_FORM1), //MainSetupPage  // this too has no end-op and basically it's a jump to a form ONLY
+        help   = STRING_TOKEN(STR_GOTO_HELP);
 
-  endform;
+    endform;
+  endif;
 
   form formid = 3, title = STRING_TOKEN(STR_FORM3_TITLE);  // note formid is a variable (for readability) (UINT16) - also added Form to the line to signify the Op-Code
 
