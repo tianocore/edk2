@@ -289,6 +289,7 @@ IdentifyAtaDevice (
   //
   BlockMedia = &AtaDevice->BlockMedia;
   BlockMedia->LastBlock = Capacity - 1;
+  BlockMedia->IoAlign = AtaDevice->AtaBusDriverData->AtaPassThru->Mode->IoAlign;
   //
   // Check whether Long Physical Sector Feature is supported
   //

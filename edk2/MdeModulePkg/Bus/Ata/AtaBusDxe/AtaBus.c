@@ -52,7 +52,7 @@ ATA_DEVICE gAtaDeviceTemplate = {
     FALSE,                     // ReadOnly
     FALSE,                     // WritingCache
     0x200,                     // BlockSize 
-    4,                         // IoAlign
+    0,                         // IoAlign
     0,                         // LastBlock
     0,                         // LowestAlignedLba
     1                          // LogicalBlocksPerPhysicalBlock
