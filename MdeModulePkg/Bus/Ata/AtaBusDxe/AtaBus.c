@@ -34,8 +34,8 @@ EFI_DRIVER_BINDING_PROTOCOL gAtaBusDriverBinding = {
 // Template for ATA Child Device.
 //
 ATA_DEVICE gAtaDeviceTemplate = {
-  ATA_DEVICE_SIGNATURE,        // Signature; 
-  NULL,                        // Handle;
+  ATA_DEVICE_SIGNATURE,        // Signature
+  NULL,                        // Handle
   {                            // BlockIo
     EFI_BLOCK_IO_PROTOCOL_REVISION,
     NULL,
@@ -64,10 +64,10 @@ ATA_DEVICE gAtaDeviceTemplate = {
     AtaDiskInfoSenseData,
     AtaDiskInfoWhichIde
   },
-  NULL,                        // DevicePath;
-  NULL,                        // AtaBusDriverData;
-  0,                           // Port,
-  0,                           // PortMultiplierPort;
+  NULL,                        // DevicePath
+  NULL,                        // AtaBusDriverData
+  0,                           // Port
+  0,                           // PortMultiplierPort
   { 0, },                      // Packet
   {{ 0}, },                    // Acb
   NULL,                        // Asb
@@ -106,7 +106,7 @@ AllocateAlignedBuffer (
   This function frees an aligned buffer for the ATA device to perform
   ATA pass through operations.
 
-  @param  AtaDevice         The ATA child device involved for the operation.
+  @param  Buffer            The aligned buffer to be freed.
   @param  BufferSize        The request buffer size.
 
 **/
@@ -153,7 +153,7 @@ ReleaseAtaResources (
   Then it will create child handle and install Block IO and Disk Info protocol on
   it.
 
-  @param  AtaDevice             The ATA child device involved for the operation.
+  @param  AtaBusDriverData      The parent ATA bus driver data structure.
   @param  Port                  The port number of the ATA device.
   @param  PortMultiplierPort    The port multiplier port number of the ATA device.
 
@@ -299,7 +299,7 @@ Done:
   This function removes the protocols installed on the controller handle and 
   frees the resources allocated for the ATA device. 
 
-  @param  AtaDevice             The ATA child device involved for the operation.
+  @param  This                  The pointer to EFI_DRIVER_BINDING_PROTOCOL instance.
   @param  Controller            The controller handle of the ATA device.
   @param  Handle                The child handle.
 
@@ -787,6 +787,7 @@ AtaBlockIoReset (
                      responsible for reading/writing to only legitimate locations.
   @param  BufferSize Size of Buffer, must be a multiple of device block size.
   @param  Buffer     A pointer to the destination/source buffer for the data.
+  @param  IsWrite    Indicates whether it is a write operation.
 
   @retval EFI_SUCCESS           The data was read/written correctly to the device.
   @retval EFI_WRITE_PROTECTED   The device can not be read/written to.
@@ -958,9 +959,9 @@ AtaBlockIoFlushBlocks (
   This function is used by the IDE bus driver to get inquiry data.  Data format
   of Identify data is defined by the Interface GUID.
 
-  @param[in]     This              Pointer to the EFI_DISK_INFO_PROTOCOL instance.
-  @param[in,out] InquiryData       Pointer to a buffer for the inquiry data.
-  @param[in,out] InquiryDataSize   Pointer to the value for the inquiry data size.
+  @param[in]      This             Pointer to the EFI_DISK_INFO_PROTOCOL instance.
+  @param[in, out] InquiryData      Pointer to a buffer for the inquiry data.
+  @param[in, out] InquiryDataSize  Pointer to the value for the inquiry data size.
 
   @retval EFI_SUCCESS            The command was accepted without any errors.
   @retval EFI_NOT_FOUND          Device does not support this data class 
@@ -986,10 +987,10 @@ AtaDiskInfoInquiry (
   This function is used by the IDE bus driver to get identify data.  Data format
   of Identify data is defined by the Interface GUID.
 
-  @param[in]     This               Pointer to the EFI_DISK_INFO_PROTOCOL 
+  @param[in]      This              Pointer to the EFI_DISK_INFO_PROTOCOL 
                                     instance.
-  @param[in,out] IdentifyData       Pointer to a buffer for the identify data.
-  @param[in,out] IdentifyDataSize   Pointer to the value for the identify data
+  @param[in, out] IdentifyData      Pointer to a buffer for the identify data.
+  @param[in, out] IdentifyDataSize  Pointer to the value for the identify data
                                     size.
 
   @retval EFI_SUCCESS            The command was accepted without any errors.
@@ -1028,10 +1029,10 @@ AtaDiskInfoIdentify (
   This function is used by the IDE bus driver to get sense data. 
   Data format of Sense data is defined by the Interface GUID.
 
-  @param[in]     This              Pointer to the EFI_DISK_INFO_PROTOCOL instance.
-  @param[in,out] SenseData         Pointer to the SenseData.
-  @param[in,out] SenseDataSize     Size of SenseData in bytes.
-  @param[out]    SenseDataNumber   Pointer to the value for the sense data size.
+  @param[in]      This             Pointer to the EFI_DISK_INFO_PROTOCOL instance.
+  @param[in, out] SenseData        Pointer to the SenseData.
+  @param[in, out] SenseDataSize    Size of SenseData in bytes.
+  @param[out]     SenseDataNumber  Pointer to the value for the sense data size.
 
   @retval EFI_SUCCESS            The command was accepted without any errors.
   @retval EFI_NOT_FOUND          Device does not support this data class.
