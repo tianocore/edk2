@@ -13,53 +13,56 @@
 **/
 
 #include <Library/ReportStatusCodeLib.h>
+#include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
-#include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/DevicePathLib.h>
+
+#include <Protocol/StatusCode.h>
 
 #include <Guid/StatusCodeDataTypeId.h>
 #include <Guid/StatusCodeDataTypeDebug.h>
-#include <Protocol/StatusCode.h>
 
-EFI_REPORT_STATUS_CODE  mReportStatusCode = NULL;
+EFI_STATUS_CODE_PROTOCOL  *mReportStatusCodeLibStatusCodeProtocol = NULL;
 
 /**
   Locate the report status code service.
 
-  @return   Function pointer to the report status code service.
-            NULL is returned if no status code service is available.
+  Retrieve ReportStatusCode() API of Report Status Code Protocol.
 
 **/
-EFI_REPORT_STATUS_CODE
+VOID
 InternalGetReportStatusCode (
   VOID
   )
 {
-  EFI_STATUS_CODE_PROTOCOL  *StatusCodeProtocol;
-  EFI_STATUS                Status;
+  EFI_STATUS  Status;
 
-  if (gBS != NULL && gBS->LocateProtocol != NULL) {
-    Status = gBS->LocateProtocol (&gEfiStatusCodeRuntimeProtocolGuid, NULL, (VOID**)&StatusCodeProtocol);
-    if (!EFI_ERROR (Status) && StatusCodeProtocol != NULL) {
-      return StatusCodeProtocol->ReportStatusCode;
-    }
+  if (mReportStatusCodeLibStatusCodeProtocol != NULL) {
+    return;
   }
 
-  return NULL;
+  //
+  // Check gBS just in case ReportStatusCode is called before gBS is initialized.
+  //
+  if (gBS != NULL && gBS->LocateProtocol != NULL) {
+    Status = gBS->LocateProtocol (&gEfiStatusCodeRuntimeProtocolGuid, NULL, (VOID**) &mReportStatusCodeLibStatusCodeProtocol);
+    if (EFI_ERROR (Status)) {
+      mReportStatusCodeLibStatusCodeProtocol = NULL;
+    }
+  }
 }
 
 /**
-  Internal worker function that reports a status code through the status code service.
+  Internal worker function that reports a status code through the Report Status Code Protocol.
 
-  If status code service is not cached, then this function checks if status code service is
-  available in system.  If status code service is not available, then EFI_UNSUPPORTED is
-  returned.  If status code service is present, then it is cached in mReportStatusCode.
-  Finally this function reports status code through the status code service.
+  If status code service is not cached, then this function checks if Report Status Code
+  Protocol is available in system.  If Report Status Code Protocol is not available, then
+  EFI_UNSUPPORTED is returned.  If Report Status Code Protocol is present, then it is
+  cached in mReportStatusCodeLibStatusCodeProtocol. Finally this function reports status
+  code through the Report Status Code Protocol.
 
   @param  Type              Status code type.
   @param  Value             Status code value.
@@ -71,7 +74,7 @@ InternalGetReportStatusCode (
                             optional parameter that may be NULL.
 
   @retval EFI_SUCCESS       The status code was reported.
-  @retval EFI_UNSUPPORTED   Status code service is not available.
+  @retval EFI_UNSUPPORTED   Report Status Code Protocol is not available.
   @retval EFI_UNSUPPORTED   Status code type is not supported.
 
 **/
@@ -88,19 +91,17 @@ InternalReportStatusCode (
       (ReportErrorCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_ERROR_CODE) ||
       (ReportDebugCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_DEBUG_CODE)) {
     //
-    // If mReportStatusCode is NULL, then check if status code service is available in system.
+    // If mReportStatusCodeLibStatusCodeProtocol is NULL, then check if Report Status Code Protocol is available in system.
     //
-    if (mReportStatusCode == NULL) {
-      mReportStatusCode = InternalGetReportStatusCode ();
-      if (mReportStatusCode == NULL) {
-        return EFI_UNSUPPORTED;
-      }
+    InternalGetReportStatusCode ();
+    if (mReportStatusCodeLibStatusCodeProtocol == NULL) {
+      return EFI_UNSUPPORTED;
     }
-  
+
     //
-    // A status code service is present in system, so pass in all the parameters to the service.
+    // A Report Status Code Protocol is present in system, so pass in all the parameters to the service.
     //
-    return (*mReportStatusCode) (Type, Value, Instance, (EFI_GUID *)CallerId, Data);
+    return mReportStatusCodeLibStatusCodeProtocol->ReportStatusCode (Type, Value, Instance, (EFI_GUID *)CallerId, Data);
   }
   
   return EFI_UNSUPPORTED;

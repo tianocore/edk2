@@ -26,13 +26,11 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
 [Sources.common]
   ReportStatusCodeLib.c
-  RuntimeDxeSupport.c
-  ReportStatusCodeLibInternal.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -43,11 +41,8 @@
   BaseMemoryLib
   BaseLib
   DebugLib
-  UefiRuntimeServicesTableLib
   UefiBootServicesTableLib
-  OemHookStatusCodeLib
   DevicePathLib
-  MemoryAllocationLib
   UefiRuntimeLib
 
 [Guids]
