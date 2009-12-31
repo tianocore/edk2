@@ -28,7 +28,7 @@
 #include <Protocol/SmmBaseHelperReady.h>
 #include <Protocol/SmmCpu.h>
 #include <Protocol/LoadedImage.h>
-#include <Common/CpuSaveState.h>
+#include "CpuSaveState.h"
 
 ///
 /// Structure for tracking paired information of registered Framework SMI handler
