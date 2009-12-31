@@ -552,9 +552,9 @@ AtaBlockIoFlushBlocks (
   This function is used by the IDE bus driver to get inquiry data.  Data format
   of Identify data is defined by the Interface GUID.
 
-  @param[in]     This              Pointer to the EFI_DISK_INFO_PROTOCOL instance.
-  @param[in,out] InquiryData       Pointer to a buffer for the inquiry data.
-  @param[in,out] InquiryDataSize   Pointer to the value for the inquiry data size.
+  @param[in]      This             Pointer to the EFI_DISK_INFO_PROTOCOL instance.
+  @param[in, out] InquiryData      Pointer to a buffer for the inquiry data.
+  @param[in, out] InquiryDataSize  Pointer to the value for the inquiry data size.
 
   @retval EFI_SUCCESS            The command was accepted without any errors.
   @retval EFI_NOT_FOUND          Device does not support this data class 
@@ -577,10 +577,10 @@ AtaDiskInfoInquiry (
   This function is used by the IDE bus driver to get identify data.  Data format
   of Identify data is defined by the Interface GUID.
 
-  @param[in]     This               Pointer to the EFI_DISK_INFO_PROTOCOL 
+  @param[in]      This              Pointer to the EFI_DISK_INFO_PROTOCOL 
                                     instance.
-  @param[in,out] IdentifyData       Pointer to a buffer for the identify data.
-  @param[in,out] IdentifyDataSize   Pointer to the value for the identify data
+  @param[in, out] IdentifyData      Pointer to a buffer for the identify data.
+  @param[in, out] IdentifyDataSize  Pointer to the value for the identify data
                                     size.
 
   @retval EFI_SUCCESS            The command was accepted without any errors.
@@ -604,10 +604,10 @@ AtaDiskInfoIdentify (
   This function is used by the IDE bus driver to get sense data. 
   Data format of Sense data is defined by the Interface GUID.
 
-  @param[in]     This              Pointer to the EFI_DISK_INFO_PROTOCOL instance.
-  @param[in,out] SenseData         Pointer to the SenseData.
-  @param[in,out] SenseDataSize     Size of SenseData in bytes.
-  @param[out]    SenseDataNumber   Pointer to the value for the sense data size.
+  @param[in]      This             Pointer to the EFI_DISK_INFO_PROTOCOL instance.
+  @param[in, out] SenseData        Pointer to the SenseData.
+  @param[in, out] SenseDataSize    Size of SenseData in bytes.
+  @param[out]     SenseDataNumber  Pointer to the value for the sense data size.
 
   @retval EFI_SUCCESS            The command was accepted without any errors.
   @retval EFI_NOT_FOUND          Device does not support this data class.
