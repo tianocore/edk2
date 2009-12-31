@@ -37,6 +37,12 @@
 #ifndef _SMM_BASE_H_
 #define _SMM_BASE_H_
 
+//
+// Share some common definitions with PI SMM
+//
+#include <Framework/SmmCis.h>
+#include <Protocol/SmmCommunication.h>
+
 ///
 /// Global ID for the EFI_SMM_BASE_PROTOCOL
 ///
@@ -59,24 +65,6 @@ typedef struct _EFI_SMM_BASE_PROTOCOL  EFI_SMM_BASE_PROTOCOL;
 #define EFI_HANDLER_SOURCE_QUIESCED 0x0002
 #define EFI_HANDLER_SOURCE_PENDING  0x0003
 ///@}
-
-///
-/// The header data is mandatory for messages sent into the SMM agent.
-///
-typedef struct {
-  ///
-  /// Allows for disambiguation of the message format.
-  ///
-  EFI_GUID                         HeaderGuid;
-  ///
-  /// Describes the size of the message, not including the header.
-  ///
-  UINTN                            MessageLength;
-  ///
-  /// Designates an array of bytes that is MessageLength in size.
-  ///
-  UINT8                            Data[1];
-} EFI_SMM_COMMUNICATE_HEADER;
 
 /**
   Entry Point to Callback service
@@ -127,7 +115,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_SMM_REGISTER_HANDLER)(
-  IN EFI_SMM_BASE_PROTOCOL                           *This,
+  IN  EFI_SMM_BASE_PROTOCOL                          *This,
   IN  EFI_DEVICE_PATH_PROTOCOL                       *FilePath,
   IN  VOID                                           *SourceBuffer OPTIONAL,
   IN  UINTN                                          SourceSize,
