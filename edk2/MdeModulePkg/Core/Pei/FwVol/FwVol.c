@@ -813,7 +813,7 @@ PeiFfsGetVolumeInfo (
 {
   PEI_CORE_FV_HANDLE                     *CoreHandle;
   
-  if (VolumeInfo == NULL) {
+  if ((VolumeInfo == NULL) || (VolumeHandle == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
   
@@ -1206,7 +1206,7 @@ PeiFfs2FvPpiGetVolumeInfo (
   EFI_FIRMWARE_VOLUME_HEADER             FwVolHeader;
   EFI_FIRMWARE_VOLUME_EXT_HEADER         *FwVolExHeaderInfo;
 
-  if (VolumeInfo == NULL) {
+  if ((VolumeInfo == NULL) || (FvHandle == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
   
