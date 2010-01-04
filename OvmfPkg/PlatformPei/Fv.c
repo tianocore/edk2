@@ -1,7 +1,7 @@
 /** @file
   Build FV related hobs for platform.
 
-  Copyright (c) 2006 - 2009, Intel Corporation
+  Copyright (c) 2006 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -14,10 +14,8 @@
 
 #include "PiPei.h"
 #include <Library/DebugLib.h>
-#include <Library/PeimEntryPoint.h>
 #include <Library/HobLib.h>
 #include <Library/PeiServicesLib.h>
-#include <Library/PeiServicesTablePointerLib.h>
 #include <Library/PcdLib.h>
 
 
@@ -35,25 +33,27 @@ PeiFvInitialization (
   VOID
   )
 {
-  EFI_PHYSICAL_ADDRESS FdBase;
+  EFI_PHYSICAL_ADDRESS        FdBase;
 
   DEBUG ((EFI_D_ERROR, "Platform PEI Firmware Volume Initialization\n"));
 
   DEBUG (
     (EFI_D_ERROR, "Firmware Volume HOB: 0x%x 0x%x\n",
-      PcdGet32 (PcdOvmfFlashFvRecoveryBase),
-      PcdGet32 (PcdOvmfFlashFvRecoverySize)
+      PcdGet32 (PcdOvmfMemFvBase),
+      PcdGet32 (PcdOvmfMemFvSize)
       )
     );
 
-  FdBase = PcdGet32 (PcdOvmfFlashFvRecoveryBase) - PcdGet32 (PcdVariableStoreSize) - PcdGet32 (PcdFlashNvStorageFtwSpareSize);
-  BuildFvHob (PcdGet32 (PcdOvmfFlashFvRecoveryBase), PcdGet32 (PcdOvmfFlashFvRecoverySize));
+  FdBase = PcdGet32 (PcdOvmfMemFvBase) - PcdGet32 (PcdVariableStoreSize) - PcdGet32 (PcdFlashNvStorageFtwSpareSize);
+  BuildFvHob (PcdGet32 (PcdOvmfMemFvBase), PcdGet32 (PcdOvmfMemFvSize));
 
-  BuildResourceDescriptorHob (
-    EFI_RESOURCE_FIRMWARE_DEVICE,
-    (EFI_RESOURCE_ATTRIBUTE_PRESENT | EFI_RESOURCE_ATTRIBUTE_INITIALIZED | EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE),
-    FdBase,
-    PcdGet32 (PcdOvmfFirmwareFdSize)
+  //
+  // Create a memory allocation HOB.
+  //
+  BuildMemoryAllocationHob (
+    PcdGet32 (PcdOvmfMemFvBase),
+    PcdGet32 (PcdOvmfMemFvSize),
+    EfiBootServicesData
     );
 
   return EFI_SUCCESS;

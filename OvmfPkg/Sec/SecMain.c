@@ -17,6 +17,7 @@
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/PeimEntryPoint.h>
 #include <Library/PeiServicesLib.h>
 #include <Ppi/TemporaryRamSupport.h>
 #include <Library/PcdLib.h>
@@ -61,7 +62,7 @@ InitializeIdtPtr (
 VOID
 EFIAPI
 SecCoreStartupWithStack (
-  IN EFI_FIRMWARE_VOLUME_HEADER       *BootFirmwareVolumePtr,
+  IN EFI_FIRMWARE_VOLUME_HEADER       *BootFv,
   IN VOID                             *TopOfCurrentStack
   )
 {
@@ -72,17 +73,19 @@ SecCoreStartupWithStack (
   VOID                        *IdtPtr;
   VOID                        *PeiCoreEntryPoint;
 
+  DEBUG ((EFI_D_INFO,
+    "SecCoreStartupWithStack(0x%x, 0x%x)\n",
+    (UINT32)(UINTN)BootFv,
+    (UINT32)(UINTN)TopOfCurrentStack
+    ));
+
+  ProcessLibraryConstructorList (NULL, NULL);
+
   //
   // Initialize floating point operating environment
   // to be compliant with UEFI spec.
   //
   InitializeFloatingPointUnits ();
-
-  DEBUG ((EFI_D_INFO,
-    "SecCoreStartupWithStack(0x%x, 0x%x)\n",
-    (UINT32)(UINTN)BootFirmwareVolumePtr,
-    (UINT32)(UINTN)TopOfCurrentStack
-    ));
 
   BottomOfTempRam = (UINT8*)(UINTN) INITIAL_TOP_OF_STACK;
   SizeOfTempRam = (UINTN) SIZE_64KB;
@@ -104,9 +107,6 @@ SecCoreStartupWithStack (
   SecCoreData = (EFI_SEC_PEI_HAND_OFF*)((UINTN) TopOfTempRam - SIZE_4KB);
   SecCoreData->DataSize = sizeof(EFI_SEC_PEI_HAND_OFF);
 
-  SecCoreData->BootFirmwareVolumeBase = (VOID*)(UINTN) PcdGet32 (PcdOvmfFlashFvRecoveryBase);
-  SecCoreData->BootFirmwareVolumeSize = PcdGet32 (PcdOvmfFlashFvRecoverySize);
-
   SecCoreData->TemporaryRamBase       = (VOID*) BottomOfTempRam;
   SecCoreData->TemporaryRamSize       = SizeOfTempRam;
 
@@ -124,7 +124,10 @@ SecCoreStartupWithStack (
   IdtPtr = ALIGN_POINTER(IdtPtr, 16);
   InitializeIdtPtr (IdtPtr);
 
-  FindPeiCoreEntryPoint (BootFirmwareVolumePtr, &PeiCoreEntryPoint);
+  FindPeiCoreEntryPoint (&BootFv, &PeiCoreEntryPoint);
+
+  SecCoreData->BootFirmwareVolumeBase = BootFv;
+  SecCoreData->BootFirmwareVolumeSize = BootFv->FvLength;
 
   if (PeiCoreEntryPoint != NULL) {
     DEBUG ((EFI_D_INFO,

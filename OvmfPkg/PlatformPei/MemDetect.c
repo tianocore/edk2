@@ -27,6 +27,7 @@ Module Name:
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 #include <Library/IoLib.h>
+#include <Library/PcdLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/ResourcePublicationLib.h>
 
@@ -79,8 +80,15 @@ MemDetect (
   //
   TotalMemorySize = (UINT64)GetSystemMemorySize ();
 
-  MemoryBase = 0x800000;
-  MemorySize = TotalMemorySize - MemoryBase - 0x100000;
+  //
+  // Determine the range of memory to use during PEI
+  //
+  MemoryBase = PcdGet32 (PcdOvmfMemFvBase) + PcdGet32 (PcdOvmfMemFvSize);
+  MemorySize = TotalMemorySize - MemoryBase;
+  if (MemorySize > SIZE_16MB) {
+    MemoryBase = TotalMemorySize - SIZE_16MB;
+    MemorySize = SIZE_16MB;
+  }
 
   //
   // Publish this memory to the PEI Core
@@ -92,8 +100,8 @@ MemDetect (
   // Create memory HOBs
   //
   AddMemoryBaseSizeHob (MemoryBase, MemorySize);
-  AddMemoryRangeHob (0x100000, 0x800000);
-  AddMemoryRangeHob (0x000000, 0x0A0000);
+  AddMemoryRangeHob (BASE_1MB, MemoryBase);
+  AddMemoryRangeHob (0, BASE_512KB + BASE_128KB);
 
   return EFI_SUCCESS;
 }

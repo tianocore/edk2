@@ -1,7 +1,7 @@
 #/** @file
 #  Open Virtual Machine Firmware: FDF
 #
-#  Copyright (c) 2006 - 2009, Intel Corporation
+#  Copyright (c) 2006 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -14,57 +14,33 @@
 #**/
 
 ################################################################################
-#
-# FD Section
-# The [FD] Section is made up of the definition statements and a
-# description of what goes into  the Flash Device Image.  Each FD section
-# defines one flash "device" image.  A flash device image may be one of
-# the following: Removable media bootable image (like a boot floppy
-# image,) an Option ROM image (that would be "flashed" into an add-in
-# card,) a System "Flash"  image (that would be burned into a system's
-# flash) or an Update ("Capsule") image that will be used to update and
-# existing system flash.
-#
-################################################################################
-[FD.OVMF]
-BaseAddress   = 0xFFE00000     # The base address of the FLASH Device.
-Size          = 0x00200000     # The size in bytes of the FLASH Device
+[FD.SEC]
+BaseAddress   = 0xFFFEE000
+Size          = 0x00012000
 ErasePolarity = 1
-BlockSize     = 0x10000
-NumBlocks     = 0x20
+BlockSize     = 0x1000
+NumBlocks     = 0x12
+
+0x0|0x12000
+FV = SECFV
 
 ################################################################################
-#
-# Following are lists of FD Region layout which correspond to the locations of different
-# images within the flash device.
-#
-# Regions must be defined in ascending order and may not overlap.
-#
-# A Layout Region start with a eight digit hex offset (leading "0x" required) followed by
-# the pipe "|" character, followed by the size of the region, also in hex with the leading
-# "0x" characters. Like:
-# Offset|Size
-# PcdOffsetCName|PcdSizeCName
-# RegionType <FV, DATA, or FILE>
-#
-################################################################################
-0x0|0x200000
-gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashFvRecoveryBase|gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashFvRecoverySize
+
+[FD.MEMFD]
+BaseAddress   = 0x800000|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvBase
+Size          = 0x400000|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvSize
+ErasePolarity = 1
+BlockSize     = 0x10000
+NumBlocks     = 0x40
+
+0x0|0x400000
 FV = MAINFV
 
 ################################################################################
-#
-# FV Section
-#
-# [FV] section is used to define what components or modules are placed within a flash
-# device file.  This section also defines order the components and modules are positioned
-# within the image.  The [FV] section consists of define statements, set statements and
-# module statements.
-#
-################################################################################
-[FV.DXEFV]
+
+[FV.SECFV]
 BlockSize          = 0x1000
-FvAlignment        = 16         #FV alignment and FV attributes setting.
+FvAlignment        = 16
 ERASE_POLARITY     = 1
 MEMORY_MAPPED      = TRUE
 STICKY_WRITE       = TRUE
@@ -82,7 +58,37 @@ READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
 #
-# Files to be placed in DXEFV
+# SEC Phase modules
+#
+# The code in this FV handles the initial firmware startup, and
+# decompresses the MAINFV which handles the majority of the boot sequence.
+#
+INF  OvmfPkg/Sec/SecMain.inf
+
+INF  RuleOverride=RESET_VECTOR OvmfPkg/ResetVector/Bin/ResetVector.inf
+
+################################################################################
+[FV.MAINFV]
+BlockSize          = 0x10000
+FvAlignment        = 16
+ERASE_POLARITY     = 1
+MEMORY_MAPPED      = TRUE
+STICKY_WRITE       = TRUE
+LOCK_CAP           = TRUE
+LOCK_STATUS        = TRUE
+WRITE_DISABLED_CAP = TRUE
+WRITE_ENABLED_CAP  = TRUE
+WRITE_STATUS       = TRUE
+WRITE_LOCK_CAP     = TRUE
+WRITE_LOCK_STATUS  = TRUE
+READ_DISABLED_CAP  = TRUE
+READ_ENABLED_CAP   = TRUE
+READ_STATUS        = TRUE
+READ_LOCK_CAP      = TRUE
+READ_LOCK_STATUS   = TRUE
+
+#
+# Files to be placed in MAIN FV
 #
 # This firmware volume will have files placed in it uncompressed,
 # and then then entire firmware volume will be compressed in a
@@ -90,10 +96,23 @@ READ_LOCK_STATUS   = TRUE
 # overall compression.
 #
 
+APRIORI PEI {
+  INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
+}
+
 APRIORI DXE {
   INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
   INF  IntelFrameworkModulePkg/Universal/DataHubDxe/DataHubDxe.inf
 }
+
+#
+#  PEI Phase modules
+#
+INF  MdeModulePkg/Core/Pei/PeiMain.inf
+INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
+INF  IntelFrameworkModulePkg/Universal/StatusCode/Pei/StatusCodePei.inf
+INF  OvmfPkg/PlatformPei/PlatformPei.inf
+INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 
 #
 # DXE Phase modules
@@ -163,7 +182,8 @@ FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
 
 ################################################################################
 
-[FV.MAINFV]
+[FV.OVMF]
+BlockSize          = 0x10000
 FvAlignment        = 16
 ERASE_POLARITY     = 1
 MEMORY_MAPPED      = TRUE
@@ -182,51 +202,27 @@ READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
 #
-# Files to be placed in MAINFV
-#
-# This firmware volume will have all the files placed in it which
-# must not be compressed at the initial boot phase.  The only
-# exception to this is the compressed 'DXEFV'.
-#
-
-APRIORI PEI {
-  INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
-}
-
-#
-#  SEC Phase modules
-#
-INF  OvmfPkg/Sec/SecMain.inf
-
-#
-#  PEI Phase modules
-#
-INF  MdeModulePkg/Core/Pei/PeiMain.inf
-INF  RuleOverride=NORELOC MdeModulePkg/Universal/PCD/Pei/Pcd.inf
-INF  RuleOverride=NORELOC IntelFrameworkModulePkg/Universal/StatusCode/Pei/StatusCodePei.inf
-INF  RuleOverride=NORELOC OvmfPkg/PlatformPei/PlatformPei.inf
-INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
-
-#
-# This file contains the compressed 'DXEFV', which is compressed
+# This file contains the compressed MAINFV, which is compressed
 # in a single compression operation in order to achieve better
 # overall compression.
 #
 FILE FV_IMAGE = 20bc8ac9-94d1-4208-ab28-5d673fd73486 {
    SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE { # LzmaCompress
-      SECTION FV_IMAGE = DXEFV
+      SECTION FV_IMAGE = MAINFV
    }
  }
 
-INF  RuleOverride=RESET_VECTOR OvmfPkg/ResetVector/Bin/ResetVector.inf
+#
+# This file contains the uncompressed SECFV, which contains the initial
+# boot code.  The code in this FV decompresses the MAINFV.
+#
+# It uses the Volume Top File (VTF) GUID so it will be placed at the
+# end of the FV.
+#
+FILE FREEFORM = 1BA0062E-C779-4582-8566-336AE8F78F09 {
+  SECTION Align=16 FV_IMAGE = SECFV
+}
 
-################################################################################
-#
-# Rules are use with the [FV] section's module INF type to define
-# how an FFS file is created for a given INF file. The following Rule are the default
-# rules for the different module type. User can add the customized rules to define the
-# content of the FFS file.
-#
 ################################################################################
 
 [Rule.Common.PEI_CORE]
