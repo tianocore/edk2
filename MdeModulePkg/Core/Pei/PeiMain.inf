@@ -47,6 +47,8 @@
   Dependency/Dependency.c
   Dependency/Dependency.h
   BootMode/BootMode.c
+  CpuIo/CpuIo.c
+  PciCfg2/PciCfg2.c
   PeiMain.h
 
 [Packages]
@@ -84,16 +86,18 @@
   gEfiPeiLoadFilePpiGuid                        ## PRODUCES ## SOMETIMES_CONSUMES (The default load PeImage logic will be used when this PPI doesn't exist)
   gEfiPeiSecurity2PpiGuid                       ## NOTIFY
   gEfiTemporaryRamSupportPpiGuid                ## CONSUMES
-
+  gEfiPeiCpuIoPpiInstalledGuid                  ## PRODUCES                                             ## PRODUCES
+  gEfiPciCfg2PpiGuid                            ## PRODUCES                                                                       ## PRODUCES
+  
 [FixedPcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported       ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeimPerFv         ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPpiSupported      ## CONSUMES
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeimDispatch	      ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeimDispatch       ## CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeiCoreEntry       ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeiStackSize      ## CONSUMES
 
 [FeaturePcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst   ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport	         ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport            ## CONSUMES
   
