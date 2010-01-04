@@ -1,0 +1,48 @@
+#/** @file
+# EFI_PEI_STALL implementation for NT32 simulation environment.
+#
+# Copyright (c) 2009, Intel Corporation
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Stall
+  FILE_GUID                      = 6807217E-E8DE-42d0-91D9-60AECED7420D
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeStall
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources.common]
+  Stall.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  Nt32Pkg/Nt32Pkg.dec
+
+[LibraryClasses]
+  PeimEntryPoint
+  DebugLib
+
+[Ppis]
+  gEfiPeiStallPpiGuid                           ## PRODUCES
+  gPeiNtThunkPpiGuid                            ## CONSUMES
+  
+[Depex]
+  TRUE
+

@@ -368,6 +368,7 @@
   MdeModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf
   Nt32Pkg/WinNtOemHookStatusCodeHandlerPei/WinNtOemHookStatusCodeHandlerPei.inf
   Nt32Pkg/BootModePei/BootModePei.inf
+  Nt32Pkg/StallPei/StallPei.inf
   Nt32Pkg/WinNtFlashMapPei/WinNtFlashMapPei.inf
   MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
   Nt32Pkg/WinNtAutoScanPei/WinNtAutoScanPei.inf
