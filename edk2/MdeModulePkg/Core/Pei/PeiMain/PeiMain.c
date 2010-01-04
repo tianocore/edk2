@@ -55,8 +55,8 @@ EFI_PEI_SERVICES  gPs = {
   PeiReportStatusCode,
   PeiResetSystem,
 
-  NULL,
-  NULL,
+  &gPeiDefaultCpuIoPpi,
+  &gPeiDefaultPciCfg2Ppi,
 
   PeiFfsFindFileByName,
   PeiFfsGetFileInfo,
