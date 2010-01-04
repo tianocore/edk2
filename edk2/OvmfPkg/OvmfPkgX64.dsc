@@ -29,6 +29,11 @@
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = OvmfPkg/OvmfPkg.fdf
 
+[BuildOptions]
+  GCC:*_*_*_CC_FLAGS             = -DMDEPKG_NDEBUG
+  INTEL:*_*_*_CC_FLAGS           = /D MDEPKG_NDEBUG
+  MSFT:*_*_*_CC_FLAGS            = /D MDEPKG_NDEBUG
+
 ################################################################################
 #
 # SKU Identification section - list of all SKU IDs supported by this Platform.
