@@ -105,13 +105,13 @@ formset
 
        goto FORM_BOOT_DEL_ID,
             prompt = STRING_TOKEN(STR_FORM_BOOT_DEL_TITLE),
-            help = STRING_TOKEN(STR_FORM_NEXT_BOOT_HELP),
+            help = STRING_TOKEN(STR_FORM_BOOT_IMMEDIATE_HELP),
             flags = INTERACTIVE,
             key = FORM_BOOT_DEL_ID;
 
        goto FORM_BOOT_CHG_ID,
             prompt = STRING_TOKEN(STR_FORM_BOOT_CHG_TITLE),
-            help = STRING_TOKEN(STR_FORM_NEXT_BOOT_HELP),
+            help = STRING_TOKEN(STR_FORM_BOOT_IMMEDIATE_HELP),
             flags = INTERACTIVE,
             key = FORM_BOOT_CHG_ID;
 
