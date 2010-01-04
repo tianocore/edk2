@@ -169,6 +169,7 @@ INF  MdeModulePkg/Universal/ReportStatusCodeRouter/Pei/ReportStatusCodeRouterPei
 INF  MdeModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf
 INF  Nt32Pkg/WinNtOemHookStatusCodeHandlerPei/WinNtOemHookStatusCodeHandlerPei.inf
 INF  Nt32Pkg/BootModePei/BootModePei.inf
+INF  Nt32Pkg/StallPei/StallPei.inf
 INF  Nt32Pkg/WinNtFlashMapPei/WinNtFlashMapPei.inf
 INF  Nt32Pkg/WinNtAutoScanPei/WinNtAutoScanPei.inf
 INF  Nt32Pkg/WinNtFirmwareVolumePei/WinNtFirmwareVolumePei.inf
