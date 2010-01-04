@@ -73,7 +73,7 @@ LzmaGuidedSectionGetInfo (
 
   return LzmaUefiDecompressGetInfo (
           (UINT8 *) InputSection + ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset,
-          (*(UINT32 *) (((EFI_COMMON_SECTION_HEADER *) InputSection)->Size) & 0x00ffffff) - ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset,
+          SECTION_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset,
           OutputBufferSize,
           ScratchBufferSize
           );
@@ -137,6 +137,7 @@ LzmaGuidedSectionExtraction (
 
   return LzmaUefiDecompress (
     (UINT8 *) InputSection + ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset,
+    SECTION_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset,
     *OutputBuffer,
     ScratchBuffer
     );

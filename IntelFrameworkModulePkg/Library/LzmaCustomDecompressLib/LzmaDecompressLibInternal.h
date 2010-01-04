@@ -86,6 +86,7 @@ RETURN_STATUS
 EFIAPI
 LzmaUefiDecompress (
   IN CONST VOID  *Source,
+  IN UINTN       SourceSize,
   IN OUT VOID    *Destination,
   IN OUT VOID    *Scratch
   );
