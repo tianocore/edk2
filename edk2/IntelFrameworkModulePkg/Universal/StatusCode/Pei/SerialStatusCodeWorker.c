@@ -94,7 +94,7 @@ SerialStatusCodeReportWorker (
 
     if (CallerId != NULL) {
       CharCount += AsciiSPrint (
-                     &Buffer[CharCount - 1],
+                     &Buffer[CharCount],
                      (sizeof (Buffer) - (sizeof (Buffer[0]) * CharCount)),
                      " %g",
                      CallerId
@@ -103,7 +103,7 @@ SerialStatusCodeReportWorker (
 
     if (Data != NULL) {
       CharCount += AsciiSPrint (
-                     &Buffer[CharCount - 1],
+                     &Buffer[CharCount],
                      (sizeof (Buffer) - (sizeof (Buffer[0]) * CharCount)),
                      " %x",
                      Data
@@ -111,7 +111,7 @@ SerialStatusCodeReportWorker (
     }
 
     CharCount += AsciiSPrint (
-                   &Buffer[CharCount - 1],
+                   &Buffer[CharCount],
                    (sizeof (Buffer) - (sizeof (Buffer[0]) * CharCount)),
                    "\n\r"
                    );
