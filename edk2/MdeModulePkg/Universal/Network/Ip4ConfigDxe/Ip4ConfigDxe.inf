@@ -1,7 +1,6 @@
 #/** @file
 # Component name for module Ip4Config
 #
-# FIX ME!
 # Copyright (c) 2006 - 2009, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
@@ -27,10 +26,6 @@
 # The following information is for reference only and not required by the build tools.
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
-#
-#  DRIVER_BINDING                =  gIp4ConfigDriverBinding                        
-#  COMPONENT_NAME                =  gIp4ConfigComponentName
-#  COMPONENT_NAME2               =  gIp4ConfigComponentName2
 #
 
 [Sources.common]
@@ -68,9 +63,8 @@
   gEfiIp4ConfigProtocolGuid                     # PROTOCOL ALWAYS_PRODUCED
   gEfiManagedNetworkProtocolGuid                # PROTOCOL ALWAYS_CONSUMED
   gEfiDhcp4ProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
-  gEfiHiiDatabaseProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
   gEfiHiiConfigAccessProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
 
 [Guids]
-  gEfiIfrTianoGuid                              ## CONSUMES ## Guid
   gEfiNicIp4ConfigVariableGuid                  ## CONSUMES ## Guid
+  

@@ -23,6 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/HiiConfigAccess.h>
 #include <Protocol/HiiDatabase.h>
 #include <Protocol/HiiConfigRouting.h>
+#include <Protocol/ServiceBinding.h>
 
 #include <Guid/MdeModuleHii.h>
 
@@ -38,6 +39,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/HiiLib.h>
 #include <Library/PrintLib.h>
 #include <Library/DpcLib.h>
+#include <Library/UefiHiiServicesLib.h>
 
 #include "NicIp4Variable.h"
 
@@ -49,7 +51,7 @@ typedef struct _IP4_CONFIG_INSTANCE IP4_CONFIG_INSTANCE;
 extern EFI_DRIVER_BINDING_PROTOCOL     gIp4ConfigDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL     gIp4ConfigComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL    gIp4ConfigComponentName2;
-                                      
+
 extern IP4_CONFIG_INSTANCE             *mIp4ConfigNicList[MAX_IP4_CONFIG_IN_VARIABLE];
 extern EFI_IP4_CONFIG_PROTOCOL         mIp4ConfigProtocolTemplate;
 
@@ -76,116 +78,89 @@ typedef struct {
 } IP4_CONFIG_DHCP4_OPTION;
 #pragma pack()
 
-
-typedef struct {
-  UINTN             DeviceNum;
-  BOOLEAN           Enabled;
-  EFI_IPv4_ADDRESS  LocalIp;
-  EFI_IPv4_ADDRESS  SubnetMask;
-  EFI_IPv4_ADDRESS  Gateway;
-} IP4_CONFIG_SESSION_DATA;
-
-typedef struct _IP4_CONFIG_FORM_ENTRY {
-  LIST_ENTRY                    Link;
-  IP4_CONFIG_INSTANCE           *Ip4ConfigInstance;
-  EFI_HANDLE                    Controller;
-  CHAR16                        *MacString;
-  EFI_STRING_ID                 PortTitleToken;
-  EFI_STRING_ID                 PortTitleHelpToken;
-  IP4_CONFIG_SESSION_DATA       SessionConfigData;
-} IP4CONFIG_FORM_ENTRY;
-
-#define IP4CONFIG_FORM_CALLBACK_INFO_SIGNATURE  SIGNATURE_32 ('I', 'P', '4', 'C')
-
-typedef struct _IP4_FORM_CALLBACK_INFO_INSTANCE {
-  UINTN                            Signature;
-  EFI_HANDLE                       DriverHandle;
-  EFI_HII_CONFIG_ACCESS_PROTOCOL   ConfigAccess;
-  EFI_HII_DATABASE_PROTOCOL        *HiiDatabase;
-  EFI_HII_CONFIG_ROUTING_PROTOCOL  *ConfigRouting;
-  EFI_HII_HANDLE                   RegisteredHandle;
-  IP4CONFIG_FORM_ENTRY             *Current;
-} IP4_FORM_CALLBACK_INFO;
-
-#define IP4CONFIG_FORM_CALLBACK_INFO_FROM_FORM_CALLBACK(Callback) \
-  CR ( \
-  Callback, \
-  IP4_FORM_CALLBACK_INFO, \
-  ConfigAccess, \
-  IP4CONFIG_FORM_CALLBACK_INFO_SIGNATURE \
-  )
+typedef struct _IP4CONFIG_CALLBACK_INFO {
+  BOOLEAN                          Enabled;
+  EFI_IPv4_ADDRESS                 LocalIp;
+  EFI_IPv4_ADDRESS                 SubnetMask;
+  EFI_IPv4_ADDRESS                 Gateway;
+} IP4_SETTING_INFO;
 
 struct _IP4_CONFIG_INSTANCE {
-  UINT32                        Signature;
-  EFI_HANDLE                    Controller;
-  EFI_HANDLE                    Image;
+  UINT32                          Signature;
+  EFI_HANDLE                      Controller;
+  EFI_HANDLE                      Image;
+  EFI_DEVICE_PATH_PROTOCOL        *ParentDevicePath;
 
-  EFI_IP4_CONFIG_PROTOCOL       Ip4ConfigProtocol;
+  EFI_IP4_CONFIG_PROTOCOL         Ip4ConfigProtocol;
 
-  IP4_FORM_CALLBACK_INFO        Ip4FormCallbackInfo;
+  EFI_HII_CONFIG_ACCESS_PROTOCOL  HiiConfigAccessProtocol;
+  EFI_HANDLE                      ChildHandle;
+  EFI_DEVICE_PATH_PROTOCOL        *HiiVendorDevicePath;
+  EFI_HII_HANDLE                  RegisteredHandle;
+  IP4_SETTING_INFO                Ip4ConfigCallbackInfo;
 
   //
   // NicConfig's state, such as IP4_CONFIG_STATE_IDLE
   //
-  INTN                          State;
+  INTN                            State;
 
   //
   // Mnp child to keep the connection with MNP.
   //
-  EFI_MANAGED_NETWORK_PROTOCOL  *Mnp;
-  EFI_HANDLE                    MnpHandle;
+  EFI_MANAGED_NETWORK_PROTOCOL    *Mnp;
+  EFI_HANDLE                      MnpHandle;
 
   //
   // User's requests data
   //
-  EFI_EVENT                     DoneEvent;
-  EFI_EVENT                     ReconfigEvent;
-  EFI_STATUS                    Result;
+  EFI_EVENT                       DoneEvent;
+  EFI_EVENT                       ReconfigEvent;
+  EFI_STATUS                      Result;
 
   //
   // Identity of this interface and some configuration info.
   //
-  NIC_ADDR                      NicAddr;
-  UINT16                        NicName[IP4_NIC_NAME_LENGTH];
-  UINT32                        NicIndex;
-  NIC_IP4_CONFIG_INFO           *NicConfig;
+  NIC_ADDR                        NicAddr;
+  UINT16                          NicName[IP4_NIC_NAME_LENGTH];
+  UINT32                          NicIndex;
+  NIC_IP4_CONFIG_INFO             *NicConfig;
 
   //
   // DHCP handles to access DHCP
   //
-  EFI_DHCP4_PROTOCOL            *Dhcp4;
-  EFI_HANDLE                    Dhcp4Handle;
-  EFI_EVENT                     Dhcp4Event;
+  EFI_DHCP4_PROTOCOL              *Dhcp4;
+  EFI_HANDLE                      Dhcp4Handle;
+  EFI_EVENT                       Dhcp4Event;
 };
 
 #define IP4_CONFIG_INSTANCE_FROM_IP4CONFIG(this) \
   CR (this, IP4_CONFIG_INSTANCE, Ip4ConfigProtocol, IP4_CONFIG_INSTANCE_SIGNATURE)
 
-#define IP4_CONFIG_INSTANCE_FROM_IP4FORM_CALLBACK_INFO(this) \
-  CR (this, IP4_CONFIG_INSTANCE, Ip4FormCallbackInfo, IP4_CONFIG_INSTANCE_SIGNATURE)
+#define IP4_CONFIG_INSTANCE_FROM_CONFIG_ACCESS(this) \
+  CR (this, IP4_CONFIG_INSTANCE, HiiConfigAccessProtocol, IP4_CONFIG_INSTANCE_SIGNATURE)
 
 
 /**
-  Set the IP configure parameters for this NIC. 
+  Set the IP configure parameters for this NIC.
 
-  If Reconfig is TRUE, the IP driver will be informed to discard current 
-  auto configure parameter and restart the auto configuration process. 
+  If Reconfig is TRUE, the IP driver will be informed to discard current
+  auto configure parameter and restart the auto configuration process.
   If current there is a pending auto configuration, EFI_ALREADY_STARTED is
   returned. You can only change the configure setting when either
   the configure has finished or not started yet. If NicConfig, the
   NIC's configure parameter is removed from the variable.
 
   @param  Instance               The IP4 CONFIG instance.
-  @param  NicConfig              The new NIC IP4 configure parameter
+  @param  NicConfig              The new NIC IP4 configure parameter.
   @param  Reconfig               Inform the IP4 driver to restart the auto
-                                 configuration
-                                 
-  @retval EFI_SUCCESS            The configure parameter for this NIC was 
-                                 set successfully .
+                                 configuration.
+
+  @retval EFI_SUCCESS            The configure parameter for this NIC was
+                                 set successfully.
   @retval EFI_INVALID_PARAMETER  This is NULL or the configure parameter is
                                  invalid.
   @retval EFI_ALREADY_STARTED    There is a pending auto configuration.
-  @retval EFI_NOT_FOUND          No auto configure parameter is found
+  @retval EFI_NOT_FOUND          No auto configure parameter is found.
 
 **/
 EFI_STATUS
@@ -204,12 +179,12 @@ EfiNicIp4ConfigSetInfo (
   @param  NicConfig              The buffer to receive the NIC's configure
                                  parameter.
 
-  @retval EFI_SUCCESS            The configure parameter for this NIC was 
+  @retval EFI_SUCCESS            The configure parameter for this NIC was
                                  obtained successfully .
   @retval EFI_INVALID_PARAMETER  This or ConfigLen is NULL.
   @retval EFI_NOT_FOUND          There is no configure parameter for the NIC in
                                  NVRam.
-  @retval EFI_BUFFER_TOO_SMALL   The ConfigLen is too small or the NicConfig is 
+  @retval EFI_BUFFER_TOO_SMALL   The ConfigLen is too small or the NicConfig is
                                  NULL.
 
 **/

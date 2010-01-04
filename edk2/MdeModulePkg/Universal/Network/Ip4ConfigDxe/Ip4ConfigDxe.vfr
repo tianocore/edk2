@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define EFI_NETWORK_DEVICE_CLASS  0x04
 
 formset
-  guid     = EFI_NIC_IP4_CONFIG_VARIABLE_GUID,
+  guid     = EFI_NIC_IP4_CONFIG_NVDATA_GUID,
   title    = STRING_TOKEN(STR_IP4_CONFIG_FORM_TITLE),
   help     = STRING_TOKEN(STR_IP4_CONFIG_FORM_HELP),
   class    = EFI_NETWORK_DEVICE_CLASS,
@@ -24,17 +24,9 @@ formset
 
   varstore IP4_CONFIG_IFR_NVDATA,
     name = EfiNicIp4ConfigVariable,
-    guid = EFI_NIC_IP4_CONFIG_VARIABLE_GUID;
+    guid = EFI_NIC_IP4_CONFIG_NVDATA_GUID;
 
   form formid = FORMID_MAIN_FORM,
-    title  = STRING_TOKEN(STR_IP4_MAIN_FORM_TITLE);
-
-    label DEVICE_ENTRY_LABEL;
-    label LABEL_END;
-
-  endform;
-
-  form formid = FORMID_DEVICE_FORM,
     title  = STRING_TOKEN(STR_IP4_DEVICE_FORM_TITLE);
 
     checkbox varid = EfiNicIp4ConfigVariable.DhcpEnable,
