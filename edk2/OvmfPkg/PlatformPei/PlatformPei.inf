@@ -54,10 +54,8 @@
   PeimEntryPoint
 
 [FixedPcd.common]
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashFvRecoveryBase
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashFvRecoverySize
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageVariableBase
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareFdSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize

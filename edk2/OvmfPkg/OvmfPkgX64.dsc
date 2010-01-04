@@ -1,7 +1,7 @@
 #/** @file
 #  EFI/Framework Open Virtual Machine Firmware (OVMF) platform
 #
-#  Copyright (c) 2006 - 2009, Intel Corporation
+#  Copyright (c) 2006 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -82,6 +82,7 @@
   BaseMemoryLib|MdePkg/Library/BaseMemoryLibSse2/BaseMemoryLibSse2.inf
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
   ReportStatusCodeLib|MdeModulePkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
+  ExtractGuidedSectionLib|OvmfPkg/Library/SecExtractGuidedSectionLib/SecExtractGuidedSectionLib.inf
 
 [LibraryClasses.common.PEI_CORE]
   BaseMemoryLib|MdePkg/Library/BaseMemoryLibOptPei/BaseMemoryLibOptPei.inf
@@ -129,7 +130,6 @@
   ReportStatusCodeLib|MdeModulePkg/Library/RuntimeDxeReportStatusCodeLib/RuntimeDxeReportStatusCodeLib.inf
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
-  ExtractGuidedSectionLib|MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
 
@@ -141,7 +141,6 @@
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
-  ExtractGuidedSectionLib|MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
@@ -180,11 +179,6 @@
   gEfiSioTokenSpaceGuid.PcdSerialLineControl|0x07
   gEfiSioTokenSpaceGuid.PcdSerialBoudRate|115200
 
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareFdSize|0x200000
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareBlockSize|0x10000
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashFvRecoveryBase|0xFFE00000
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashFvRecoverySize|0x00200000
-
   gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler|0x10
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported|6
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeimPerFv|32
@@ -212,7 +206,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x2F
 
-
 ################################################################################
 #
 # Pcd Dynamic Section - list of all EDK II PCD Entries defined by this Platform
@@ -235,7 +228,10 @@
   #
   # SEC Phase modules
   #
-  OvmfPkg/Sec/SecMain.inf
+  OvmfPkg/Sec/SecMain.inf {
+    <LibraryClasses>
+      NULL|IntelFrameworkModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
+  }
 
   #
   # PEI Phase modules
@@ -246,10 +242,7 @@
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
   IntelFrameworkModulePkg/Universal/StatusCode/Pei/StatusCodePei.inf
-  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf {
-    <LibraryClasses>
-      NULL|IntelFrameworkModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
-  }
+  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 
   OvmfPkg/PlatformPei/PlatformPei.inf {
     <LibraryClasses>
@@ -269,7 +262,7 @@
    <LibraryClasses>
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
-  
+
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
   IntelFrameworkModulePkg/Universal/DataHubDxe/DataHubDxe.inf
@@ -292,7 +285,7 @@
       TimerLib|OvmfPkg/Library/AcpiTimerLib/AcpiTimerLib.inf
   }
 
-  IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf  {
+  IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf {
     <LibraryClasses>
       TimerLib|OvmfPkg/Library/AcpiTimerLib/AcpiTimerLib.inf
   }

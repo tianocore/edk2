@@ -50,6 +50,8 @@
 
 [LibraryClasses]
   BaseLib
+  BaseMemoryLib
+  ExtractGuidedSectionLib
   PcdLib
   PeCoffGetEntryPointLib
   UefiCpuLib
@@ -58,6 +60,6 @@
   gEfiTemporaryRamSupportPpiGuid                # PPI ALWAYS_PRODUCED
 
 [FixedPcd.common]
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashFvRecoveryBase
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashFvRecoverySize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvSize
 

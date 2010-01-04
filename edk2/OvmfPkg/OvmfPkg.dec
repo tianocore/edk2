@@ -26,13 +26,8 @@
   gUefiOvmfPkgTokenSpaceGuid      = {0x93bb96af, 0xb9f2, 0x4eb8, {0x94, 0x62, 0xe0, 0xba, 0x74, 0x56, 0x42, 0x36}}
 
 [PcdsFixedAtBuild]
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageEventLogBase|0x0|UINT32|0
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageEventLogSize|0x0|UINT32|0
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashFvRecoveryBase|0x0|UINT32|0
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashFvRecoverySize|0x0|UINT32|0
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareFdSize|0x0|UINT32|0
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareBlockSize|0|UINT32|0
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageVariableBase|0x0|UINT32|0
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvBase|0x0|UINT32|0
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvSize|0x0|UINT32|0
 
 [PcdsDynamic]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|0
