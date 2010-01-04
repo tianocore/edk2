@@ -17,17 +17,14 @@
 #include "Sdk/C/7zVersion.h"
 #include "Sdk/C/LzmaDec.h"
 
-//
-// Global data
-//
-
-CONST VOID  *mSourceLastUsedWithGetInfo;
-UINT32      mSizeOfLastSource;
-UINT32      mDecompressedSizeForLastSource;
-VOID        *mScratchBuffer;
-UINTN       mScratchBufferSize;
-
 #define SCRATCH_BUFFER_REQUEST_SIZE SIZE_64KB
+
+typedef struct
+{
+  ISzAlloc Functions;
+  VOID     *Buffer;
+  UINTN    BufferSize;
+} ISzAllocWithData;
 
 /**
   Allocation routine used by LZMA decompression.
@@ -44,11 +41,12 @@ SzAlloc (
   )
 {
   VOID *Addr;
+  ISzAllocWithData *Private = (ISzAllocWithData*) P;
 
-  if (mScratchBufferSize >= Size) {
-    Addr = mScratchBuffer;
-    mScratchBuffer = (VOID*) ((UINT8*)Addr + Size);
-    mScratchBufferSize -= Size;
+  if (Private->BufferSize >= Size) {
+    Addr = Private->Buffer;
+    Private->Buffer = (VOID*) ((UINT8*)Addr + Size);
+    Private->BufferSize -= Size;
     return Addr;
   } else {
     ASSERT (FALSE);
@@ -74,8 +72,6 @@ SzFree (
   // of the decompression code.
   //
 }
-
-STATIC ISzAlloc g_Alloc = { SzAlloc, SzFree };
 
 #define LZMA_HEADER_SIZE (LZMA_PROPS_SIZE + 8)
 
@@ -151,14 +147,10 @@ LzmaUefiDecompressGetInfo (
 
   DecodedSize = GetDecodedSizeOfBuf((UINT8*)Source);
 
-  mSourceLastUsedWithGetInfo = Source;
-  mSizeOfLastSource = SourceSize;
-  mDecompressedSizeForLastSource = (UInt32)DecodedSize;
-  *DestinationSize = mDecompressedSizeForLastSource;
+  *DestinationSize = (UINT32)DecodedSize;
   *ScratchSize = SCRATCH_BUFFER_REQUEST_SIZE;
   return RETURN_SUCCESS;
 }
-
 
 /**
   Decompresses a Lzma compressed source buffer.
@@ -185,6 +177,7 @@ RETURN_STATUS
 EFIAPI
 LzmaUefiDecompress (
   IN CONST VOID  *Source,
+  IN UINTN       SourceSize,
   IN OUT VOID    *Destination,
   IN OUT VOID    *Scratch
   )
@@ -193,16 +186,14 @@ LzmaUefiDecompress (
   ELzmaStatus Status;
   SizeT       DecodedBufSize;
   SizeT       EncodedDataSize;
+  ISzAllocWithData AllocFuncs = {
+    { SzAlloc, SzFree },
+    Scratch,
+    SCRATCH_BUFFER_REQUEST_SIZE
+    };
 
-  if (Source != mSourceLastUsedWithGetInfo) {
-    return RETURN_INVALID_PARAMETER;
-  }
-
-  DecodedBufSize = (SizeT)mDecompressedSizeForLastSource;
-  EncodedDataSize = (SizeT)(mSizeOfLastSource - LZMA_HEADER_SIZE);
-
-  mScratchBuffer = Scratch;
-  mScratchBufferSize = SCRATCH_BUFFER_REQUEST_SIZE;
+  DecodedBufSize = GetDecodedSizeOfBuf((UINT8*)Source);
+  EncodedDataSize = (SizeT) (SourceSize - LZMA_HEADER_SIZE);
 
   LzmaResult = LzmaDecode(
     Destination,
@@ -213,7 +204,7 @@ LzmaUefiDecompress (
     LZMA_PROPS_SIZE,
     LZMA_FINISH_END,
     &Status,
-    &g_Alloc
+    (ISzAlloc*) &AllocFuncs
     );
 
   if (LzmaResult == SZ_OK) {
