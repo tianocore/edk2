@@ -1402,6 +1402,8 @@ RemoveTableFromList (
   EFI_ACPI_TABLE_LIST *Table;
   EFI_STATUS          Status;
 
+  Table = (EFI_ACPI_TABLE_LIST*) NULL;
+
   //
   // Check for invalid input parameters
   //
