@@ -2,7 +2,7 @@
 ; @file
 ; Transition from 16 bit real mode into 32 bit flat protected mode
 ;
-; Copyright (c) 2008 - 2009, Intel Corporation
+; Copyright (c) 2008 - 2010, Intel Corporation
 ; All rights reserved. This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -78,7 +78,7 @@ LINEAR_SEL      equ $-GDT_BASE
     dw      0FFFFh       ; limit 0xFFFFF
     dw      0            ; base 0
     db      0
-    db      092h         ; present, ring 0, data, expand-up, writable
+    db      093h         ; present, ring 0, data, expand-up, writable, accessed
     db      0CFh         ; page-granular, 32-bit
     db      0
 
@@ -87,7 +87,7 @@ LINEAR_CODE_SEL equ $-GDT_BASE
     dw      0FFFFh       ; limit 0xFFFFF
     dw      0            ; base 0
     db      0
-    db      09Ah         ; present, ring 0, data, expand-up, writable
+    db      09Bh         ; present, ring 0, data, expand-up, writable, accessed
     db      0CFh         ; page-granular, 32-bit
     db      0
 
@@ -96,7 +96,7 @@ SYS_DATA_SEL    equ $-GDT_BASE
     dw      0FFFFh       ; limit 0xFFFFF
     dw      0            ; base 0
     db      0
-    db      092h         ; present, ring 0, data, expand-up, writable
+    db      093h         ; present, ring 0, data, expand-up, writable, accessed
     db      0CFh         ; page-granular, 32-bit
     db      0
 
@@ -105,7 +105,7 @@ SYS_CODE_SEL    equ $-GDT_BASE
     dw      0FFFFh       ; limit 0xFFFFF
     dw      0            ; base 0
     db      0
-    db      09Ah         ; present, ring 0, data, expand-up, writable
+    db      09Bh         ; present, ring 0, data, expand-up, writable, accessed
     db      0CFh         ; page-granular, 32-bit
     db      0
 
