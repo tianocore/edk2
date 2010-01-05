@@ -182,17 +182,18 @@ LzmaUefiDecompress (
   IN OUT VOID    *Scratch
   )
 {
-  SRes        LzmaResult;
-  ELzmaStatus Status;
-  SizeT       DecodedBufSize;
-  SizeT       EncodedDataSize;
-  ISzAllocWithData AllocFuncs = {
-    { SzAlloc, SzFree },
-    Scratch,
-    SCRATCH_BUFFER_REQUEST_SIZE
-    };
+  SRes              LzmaResult;
+  ELzmaStatus       Status;
+  SizeT             DecodedBufSize;
+  SizeT             EncodedDataSize;
+  ISzAllocWithData  AllocFuncs;
 
-  DecodedBufSize = GetDecodedSizeOfBuf((UINT8*)Source);
+  AllocFuncs.Functions.Alloc  = SzAlloc;
+  AllocFuncs.Functions.Free   = SzFree;
+  AllocFuncs.Buffer           = Scratch;
+  AllocFuncs.BufferSize       = SCRATCH_BUFFER_REQUEST_SIZE;
+  
+  DecodedBufSize = (SizeT)GetDecodedSizeOfBuf((UINT8*)Source);
   EncodedDataSize = (SizeT) (SourceSize - LZMA_HEADER_SIZE);
 
   LzmaResult = LzmaDecode(
@@ -204,7 +205,7 @@ LzmaUefiDecompress (
     LZMA_PROPS_SIZE,
     LZMA_FINISH_END,
     &Status,
-    (ISzAlloc*) &AllocFuncs
+    &(AllocFuncs.Functions)
     );
 
   if (LzmaResult == SZ_OK) {
