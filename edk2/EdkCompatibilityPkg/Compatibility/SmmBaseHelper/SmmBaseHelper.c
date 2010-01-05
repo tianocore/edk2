@@ -124,11 +124,11 @@ ConstructFrameworkSmst (
 
   Status = gSmst->SmmAllocatePool (
                     EfiRuntimeServicesData,
-                    gSmst->NumberOfCpus * sizeof (EFI_SMI_CPU_SAVE_STATE),
+                    gSmst->NumberOfCpus * sizeof (EFI_SMM_CPU_SAVE_STATE),
                     (VOID **)&FrameworkSmst->CpuSaveState
                     );
   ASSERT_EFI_ERROR (Status);
-  ZeroMem (FrameworkSmst->CpuSaveState, gSmst->NumberOfCpus * sizeof (EFI_SMI_CPU_SAVE_STATE));
+  ZeroMem (FrameworkSmst->CpuSaveState, gSmst->NumberOfCpus * sizeof (EFI_SMM_CPU_SAVE_STATE));
 
   ///
   /// Do not support floating point state now
@@ -430,7 +430,7 @@ CallbackThunk (
       ///
       Status = mSmmCpu->ReadSaveState (
                           mSmmCpu,
-                          EFI_SMM_SAVE_STATE_IO_WIDTH_UINT32,
+                          (UINTN)sizeof (UINT32),
                           mCpuSaveStateConvTable[Index].Register,
                           CpuIndex,
                           ((UINT8 *)SaveState) + mCpuSaveStateConvTable[Index].Offset
@@ -462,7 +462,7 @@ CallbackThunk (
     for (Index = 0; Index < sizeof (mCpuSaveStateConvTable) / sizeof (CPU_SAVE_STATE_CONVERSION); Index++) {
       Status = mSmmCpu->WriteSaveState (
                           mSmmCpu,
-                          EFI_SMM_SAVE_STATE_IO_WIDTH_UINT32,
+                          (UINTN)sizeof (UINT32),
                           mCpuSaveStateConvTable[Index].Register,
                           CpuIndex,
                           ((UINT8 *)&mFrameworkSmst->CpuSaveState[CpuIndex].Ia32SaveState) + 
