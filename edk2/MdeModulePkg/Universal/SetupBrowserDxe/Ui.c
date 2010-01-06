@@ -1037,7 +1037,7 @@ UpdateStatusBar (
     break;
 
   case NV_UPDATE_REQUIRED:
-    if (gClassOfVfr != FORMSET_CLASS_FRONT_PAGE) {
+    if ((gClassOfVfr & FORMSET_CLASS_FRONT_PAGE) != FORMSET_CLASS_FRONT_PAGE) {
       if (State) {
         gST->ConOut->SetAttribute (gST->ConOut, INFO_TEXT);
         PrintStringAt (
@@ -1694,7 +1694,7 @@ UiDisplayMenu (
 
   ZeroMem (&Key, sizeof (EFI_INPUT_KEY));
 
-  if (gClassOfVfr == FORMSET_CLASS_FRONT_PAGE) {
+  if ((gClassOfVfr & FORMSET_CLASS_FRONT_PAGE) == FORMSET_CLASS_FRONT_PAGE){
     TopRow  = LocalScreen.TopRow + FRONT_PAGE_HEADER_HEIGHT + SCROLL_ARROW_HEIGHT;
     Row     = LocalScreen.TopRow + FRONT_PAGE_HEADER_HEIGHT + SCROLL_ARROW_HEIGHT;
   } else {
@@ -2404,7 +2404,7 @@ UiDisplayMenu (
         break;
 
       case ' ':
-        if (gClassOfVfr != FORMSET_CLASS_FRONT_PAGE) {
+        if ((gClassOfVfr & FORMSET_CLASS_FRONT_PAGE) != FORMSET_CLASS_FRONT_PAGE) {
           if (MenuOption->ThisTag->Operand == EFI_IFR_CHECKBOX_OP && !MenuOption->GrayOut) {
             ScreenOperation = UiSelect;
           }
@@ -2686,7 +2686,7 @@ UiDisplayMenu (
         break;
       }
 
-      if (gClassOfVfr == FORMSET_CLASS_FRONT_PAGE) {
+      if ((gClassOfVfr & FORMSET_CLASS_FRONT_PAGE) == FORMSET_CLASS_FRONT_PAGE) {
         //
         // We never exit FrontPage, so skip the ESC
         //

@@ -193,8 +193,8 @@ typedef struct {
 #define FORM_INCONSISTENT_VALIDATION         0
 #define FORM_NO_SUBMIT_VALIDATION            1
 
-#define FORMSET_CLASS_PLATFORM_SETUP         0
-#define FORMSET_CLASS_FRONT_PAGE             1
+#define FORMSET_CLASS_PLATFORM_SETUP         0x0001
+#define FORMSET_CLASS_FRONT_PAGE             0x0002
 
 typedef struct {
   UINT8               Type;

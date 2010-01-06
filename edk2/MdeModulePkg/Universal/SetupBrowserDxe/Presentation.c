@@ -208,7 +208,7 @@ DisplayPageFrame (
     Buffer[Index] = Character;
   }
 
-  if (gClassOfVfr == FORMSET_CLASS_FRONT_PAGE) {
+  if ((gClassOfVfr & FORMSET_CLASS_FRONT_PAGE) == FORMSET_CLASS_FRONT_PAGE) {
     //
     //    ClearLines(0, LocalScreen.RightColumn, 0, BANNER_HEIGHT-1, BANNER_TEXT | BANNER_BACKGROUND);
     //
@@ -289,7 +289,7 @@ DisplayPageFrame (
     KEYHELP_TEXT | KEYHELP_BACKGROUND
     );
 
-  if (gClassOfVfr != FORMSET_CLASS_FRONT_PAGE) {
+  if ((gClassOfVfr & FORMSET_CLASS_FRONT_PAGE) != FORMSET_CLASS_FRONT_PAGE) {
     ClearLines (
       LocalScreen.LeftColumn,
       LocalScreen.RightColumn,
@@ -324,7 +324,7 @@ DisplayPageFrame (
     Character = BOXDRAW_UP_LEFT;
     PrintChar (Character);
 
-    if (gClassOfVfr == FORMSET_CLASS_PLATFORM_SETUP) {
+    if ((gClassOfVfr & FORMSET_CLASS_PLATFORM_SETUP) == FORMSET_CLASS_PLATFORM_SETUP) {
       //
       // Print Bottom border line
       // +------------------------------------------------------------------------------+
@@ -472,7 +472,7 @@ DisplayForm (
 
   StringPtr = GetToken (Selection->Form->FormTitle, Handle);
 
-  if (gClassOfVfr != FORMSET_CLASS_FRONT_PAGE) {
+  if ((gClassOfVfr & FORMSET_CLASS_FRONT_PAGE) != FORMSET_CLASS_FRONT_PAGE) {
     gST->ConOut->SetAttribute (gST->ConOut, TITLE_TEXT | TITLE_BACKGROUND);
     PrintStringAt (
       (LocalScreen.RightColumn + LocalScreen.LeftColumn - GetStringWidth (StringPtr) / 2) / 2,
@@ -685,7 +685,7 @@ UpdateKeyHelp (
     ClearLines (LeftColumnOfHelp, RightColumnOfHelp, TopRowOfHelp, BottomRowOfHelp, KEYHELP_TEXT | KEYHELP_BACKGROUND);
 
     if (!Selected) {
-      if (gClassOfVfr == FORMSET_CLASS_PLATFORM_SETUP) {
+      if ((gClassOfVfr & FORMSET_CLASS_PLATFORM_SETUP) == FORMSET_CLASS_PLATFORM_SETUP) {
         if (Selection->FormEditable) {
           PrintStringAt (SecCol, TopRowOfHelp, gFunctionNineString);
           PrintStringAt (ThdCol, TopRowOfHelp, gFunctionTenString);
@@ -742,7 +742,7 @@ UpdateKeyHelp (
   case EFI_IFR_CHECKBOX_OP:
     ClearLines (LeftColumnOfHelp, RightColumnOfHelp, TopRowOfHelp, BottomRowOfHelp, KEYHELP_TEXT | KEYHELP_BACKGROUND);
 
-    if (gClassOfVfr == FORMSET_CLASS_PLATFORM_SETUP) {
+    if ((gClassOfVfr & FORMSET_CLASS_PLATFORM_SETUP) == FORMSET_CLASS_PLATFORM_SETUP) {
       if (Selection->FormEditable) {
         PrintStringAt (SecCol, TopRowOfHelp, gFunctionNineString);
         PrintStringAt (ThdCol, TopRowOfHelp, gFunctionTenString);
@@ -763,7 +763,7 @@ UpdateKeyHelp (
     ClearLines (LeftColumnOfHelp, RightColumnOfHelp, TopRowOfHelp, BottomRowOfHelp, KEYHELP_TEXT | KEYHELP_BACKGROUND);
 
     if (!Selected) {
-      if (gClassOfVfr == FORMSET_CLASS_PLATFORM_SETUP) {
+      if ((gClassOfVfr & FORMSET_CLASS_PLATFORM_SETUP) == FORMSET_CLASS_PLATFORM_SETUP) {
         if (Selection->FormEditable) {
           PrintStringAt (SecCol, TopRowOfHelp, gFunctionNineString);
           PrintStringAt (ThdCol, TopRowOfHelp, gFunctionTenString);
