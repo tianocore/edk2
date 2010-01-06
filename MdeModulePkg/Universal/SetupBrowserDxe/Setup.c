@@ -277,7 +277,6 @@ SendForm (
   InitializeBrowserStrings ();
 
   gFunctionKeySetting = DEFAULT_FUNCTION_KEY_SETTING;
-  gClassOfVfr         = FORMSET_CLASS_PLATFORM_SETUP;
 
   //
   // Ensure we are in Text mode
@@ -942,6 +941,10 @@ ConfigRespToStorage (
     break;
 
   case EFI_HII_VARSTORE_NAME_VALUE:
+    StrPtr = StrStr (ConfigResp, L"PATH");
+    if (StrPtr == NULL) {
+      break;
+    }
     StrPtr = StrStr (ConfigResp, L"&");
     while (StrPtr != NULL) {
       //
@@ -2584,9 +2587,25 @@ InitializeFormSet (
     return Status;
   }
 
+  //
+  // Set VFR type by FormSet SubClass field
+  //
   gClassOfVfr = FORMSET_CLASS_PLATFORM_SETUP;
   if (FormSet->SubClass == EFI_FRONT_PAGE_SUBCLASS) {
     gClassOfVfr = FORMSET_CLASS_FRONT_PAGE;
+  }
+  
+  //
+  // Set VFR type by FormSet class guid
+  //
+  for (Index = 0; Index < 3; Index ++) {
+    if (CompareGuid (&FormSet->ClassGuid[Index], &gEfiHiiPlatformSetupFormsetGuid)) {
+      gClassOfVfr |= FORMSET_CLASS_PLATFORM_SETUP;
+      break;
+    }
+  }
+
+  if ((gClassOfVfr & FORMSET_CLASS_FRONT_PAGE) == FORMSET_CLASS_FRONT_PAGE) {
     gFrontPageHandle = FormSet->HiiHandle;
   }
 
