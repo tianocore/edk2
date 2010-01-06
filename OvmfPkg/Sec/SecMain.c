@@ -127,7 +127,7 @@ SecCoreStartupWithStack (
   FindPeiCoreEntryPoint (&BootFv, &PeiCoreEntryPoint);
 
   SecCoreData->BootFirmwareVolumeBase = BootFv;
-  SecCoreData->BootFirmwareVolumeSize = BootFv->FvLength;
+  SecCoreData->BootFirmwareVolumeSize = (UINTN) BootFv->FvLength;
 
   if (PeiCoreEntryPoint != NULL) {
     DEBUG ((EFI_D_INFO,
