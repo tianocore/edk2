@@ -217,8 +217,6 @@ FindFfsFileAndSection (
       return Status;
     }
   }
-
-  return EFI_NOT_FOUND;
 }
 
 
