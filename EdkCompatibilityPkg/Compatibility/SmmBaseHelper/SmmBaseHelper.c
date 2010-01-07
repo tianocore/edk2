@@ -304,8 +304,8 @@ Error:
 /** 
   Thunk service of EFI_SMM_BASE_PROTOCOL.Register().
 
-  @param[in] FunctionData  Pointer to SMMBASE_FUNCTION_DATA.
-*/
+  @param[in, out] FunctionData  Pointer to SMMBASE_FUNCTION_DATA.
+**/
 VOID
 Register (
   IN OUT SMMBASE_FUNCTION_DATA *FunctionData
@@ -329,8 +329,8 @@ Register (
 /** 
   Thunk service of EFI_SMM_BASE_PROTOCOL.UnRegister().
 
-  @param[in] FunctionData  Pointer to SMMBASE_FUNCTION_DATA.
-*/
+  @param[in, out] FunctionData  Pointer to SMMBASE_FUNCTION_DATA.
+**/
 VOID
 UnRegister (
   IN OUT SMMBASE_FUNCTION_DATA *FunctionData
@@ -347,7 +347,7 @@ UnRegister (
 
   @param[in] DispatchHandle  The unique handle assigned by SmiHandlerRegister().  
 
-  @return  Pointer to CALLBACK_INFO.
+  @return  Pointer to CALLBACK_INFO. If NULL, no callback info record is found.
 **/
 CALLBACK_INFO *
 GetCallbackInfo (
@@ -492,8 +492,8 @@ CallbackThunk (
 /** 
   Thunk service of EFI_SMM_BASE_PROTOCOL.RegisterCallback().
 
-  @param[in] FunctionData  Pointer to SMMBASE_FUNCTION_DATA.
-*/
+  @param[in, out] FunctionData  Pointer to SMMBASE_FUNCTION_DATA.
+**/
 VOID
 RegisterCallback (
   IN OUT SMMBASE_FUNCTION_DATA *FunctionData
@@ -545,8 +545,8 @@ RegisterCallback (
 /** 
   Thunk service of EFI_SMM_BASE_PROTOCOL.SmmAllocatePool().
 
-  @param[in] FunctionData  Pointer to SMMBASE_FUNCTION_DATA.
-*/
+  @param[in, out] FunctionData  Pointer to SMMBASE_FUNCTION_DATA.
+**/
 VOID
 HelperAllocatePool (
   IN OUT SMMBASE_FUNCTION_DATA *FunctionData
@@ -562,8 +562,8 @@ HelperAllocatePool (
 /** 
   Thunk service of EFI_SMM_BASE_PROTOCOL.SmmFreePool().
 
-  @param[in] FunctionData  Pointer to SMMBASE_FUNCTION_DATA.
-*/
+  @param[in, out] FunctionData  Pointer to SMMBASE_FUNCTION_DATA.
+**/
 VOID
 HelperFreePool (
   IN OUT SMMBASE_FUNCTION_DATA *FunctionData
@@ -653,7 +653,7 @@ SmmBaseHelperMain (
   EFI_HANDLE  Handle = NULL;
 
   ///
-  /// Locate SMM CPU Protocol which is used later to update CPU Save States
+  /// Locate SMM CPU Protocol which is used later to retrieve/update CPU Save States
   ///
   Status = gSmst->SmmLocateProtocol (&gEfiSmmCpuProtocolGuid, NULL, (VOID **) &mSmmCpu);
   ASSERT_EFI_ERROR (Status);
