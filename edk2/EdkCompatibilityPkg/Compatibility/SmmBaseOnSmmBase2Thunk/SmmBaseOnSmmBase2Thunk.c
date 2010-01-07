@@ -42,6 +42,12 @@ EFI_SMM_BASE2_PROTOCOL             *mSmmBase2 = NULL;
 EFI_SMM_COMMUNICATION_PROTOCOL     *mSmmCommunication = NULL;
 EFI_SMM_BASE_HELPER_READY_PROTOCOL *mSmmBaseHelperReady = NULL;
 
+/**
+  Determine if in SMM mode.
+
+  @retval TRUE   In SMM mode.
+  @retval FALSE  Not in SMM mode.
+**/
 BOOLEAN
 IsInSmm (
   VOID
