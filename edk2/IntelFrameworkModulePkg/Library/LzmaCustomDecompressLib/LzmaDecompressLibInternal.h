@@ -1,7 +1,7 @@
 /** @file
   LZMA Decompress Library internal header file declares Lzma decompress interfaces.
 
-  Copyright (c) 2009, Intel Corporation<BR>
+  Copyright (c) 2009 - 2010, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -71,6 +71,7 @@ LzmaUefiDecompressGetInfo (
   then RETURN_INVALID_PARAMETER is returned.
 
   @param  Source      The source buffer containing the compressed data.
+  @param  SourceSize  The size of source buffer.
   @param  Destination The destination buffer to store the decompressed data
   @param  Scratch     A temporary scratch buffer that is used to perform the decompression.
                       This is an optional parameter that may be NULL if the 
