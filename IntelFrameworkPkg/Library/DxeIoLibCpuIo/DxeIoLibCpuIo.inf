@@ -3,7 +3,7 @@
 #
 # I/O Library implementation that uses the CPU I/O Protocol for I/O
 #  and MMIO operations.
-# Copyright (c) 2006, Intel Corporation.
+# Copyright (c) 2006 - 2010, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -22,8 +22,6 @@
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = IoLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
-  EFI_SPECIFICATION_VERSION      = 0x00020000
-
   CONSTRUCTOR                    = IoLibConstructor
 
 #
@@ -38,11 +36,9 @@
   IoHighLevel.c
   IoLib.c
 
-
 [Packages]
   MdePkg/MdePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
-
 
 [LibraryClasses]
   BaseLib
@@ -51,7 +47,6 @@
 
 [Protocols]
   gEfiCpuIoProtocolGuid                         # PROTOCOL ALWAYS_CONSUMED
-  gEfiPciRootBridgeIoProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
 
 [Depex]
-  gEfiCpuIoProtocolGuid OR gEfiPciRootBridgeIoProtocolGuid      
+  gEfiCpuIoProtocolGuid

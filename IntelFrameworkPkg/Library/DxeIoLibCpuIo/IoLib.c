@@ -3,7 +3,7 @@
   The implementation of I/O operation for this library instance 
   are based on EFI_CPU_IO_PROTOCOL.
   
-  Copyright (c) 2006, Intel Corporation<BR>
+  Copyright (c) 2006-2010, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -22,8 +22,7 @@
 //
 // Globle varible to cache pointer to CpuIo protocol.
 //
-EFI_CPU_IO_PROTOCOL              *mCpuIo = NULL;
-EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *mPciRootBridgeIo = NULL;
+EFI_CPU_IO_PROTOCOL  *mCpuIo = NULL;
 
 /**
   The constructor function caches the pointer to CpuIo protocol.
@@ -44,12 +43,9 @@ IoLibConstructor (
   IN      EFI_SYSTEM_TABLE          *SystemTable
   )
 {
-  EFI_STATUS                        Status;
+  EFI_STATUS  Status;
 
-  Status = gBS->LocateProtocol (&gEfiPciRootBridgeIoProtocolGuid, NULL, (VOID **) &mPciRootBridgeIo);
-  if (EFI_ERROR (Status)) {
-    Status = gBS->LocateProtocol (&gEfiCpuIoProtocolGuid, NULL, (VOID **) &mCpuIo);
-  }
+  Status = gBS->LocateProtocol (&gEfiCpuIoProtocolGuid, NULL, (VOID **) &mCpuIo);
   ASSERT_EFI_ERROR (Status);
 
   return Status;
@@ -72,18 +68,14 @@ IoLibConstructor (
 UINT64
 EFIAPI
 IoReadWorker (
-  IN      UINTN                     Port,
-  IN      EFI_CPU_IO_PROTOCOL_WIDTH Width
+  IN      UINTN                      Port,
+  IN      EFI_CPU_IO_PROTOCOL_WIDTH  Width
   )
 {
   EFI_STATUS                        Status;
   UINT64                            Data;
 
-  if (mPciRootBridgeIo != NULL) {
-    Status = mPciRootBridgeIo->Io.Read (mPciRootBridgeIo, (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width, Port, 1, &Data);
-  } else {
-    Status = mCpuIo->Io.Read (mCpuIo, Width, Port, 1, &Data);
-  }
+  Status = mCpuIo->Io.Read (mCpuIo, Width, Port, 1, &Data);
   ASSERT_EFI_ERROR (Status);
 
   return Data;
@@ -107,18 +99,14 @@ IoReadWorker (
 UINT64
 EFIAPI
 IoWriteWorker (
-  IN      UINTN                     Port,
-  IN      EFI_CPU_IO_PROTOCOL_WIDTH Width,
-  IN      UINT64                    Data
+  IN      UINTN                      Port,
+  IN      EFI_CPU_IO_PROTOCOL_WIDTH  Width,
+  IN      UINT64                     Data
   )
 {
-  EFI_STATUS                        Status;
+  EFI_STATUS  Status;
 
-  if (mPciRootBridgeIo != NULL) {
-    Status = mPciRootBridgeIo->Io.Write (mPciRootBridgeIo, (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width, Port, 1, &Data);
-  } else {
-    Status = mCpuIo->Io.Write (mCpuIo, Width, Port, 1, &Data);
-  }
+  Status = mCpuIo->Io.Write (mCpuIo, Width, Port, 1, &Data);
   ASSERT_EFI_ERROR (Status);
 
   return Data;
@@ -141,18 +129,14 @@ IoWriteWorker (
 UINT64
 EFIAPI
 MmioReadWorker (
-  IN      UINTN                     Address,
-  IN      EFI_CPU_IO_PROTOCOL_WIDTH Width
+  IN      UINTN                      Address,
+  IN      EFI_CPU_IO_PROTOCOL_WIDTH  Width
   )
 {
-  EFI_STATUS                        Status;
-  UINT64                            Data;
+  EFI_STATUS  Status;
+  UINT64      Data;
 
-  if (mPciRootBridgeIo != NULL) {
-    Status = mPciRootBridgeIo->Mem.Read (mPciRootBridgeIo, (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width, Address, 1, &Data);
-  } else {
-    Status = mCpuIo->Mem.Read (mCpuIo, Width, Address, 1, &Data);
-  }
+  Status = mCpuIo->Mem.Read (mCpuIo, Width, Address, 1, &Data);
   ASSERT_EFI_ERROR (Status);
 
   return Data;
@@ -176,18 +160,14 @@ MmioReadWorker (
 UINT64
 EFIAPI
 MmioWriteWorker (
-  IN      UINTN                     Address,
-  IN      EFI_CPU_IO_PROTOCOL_WIDTH Width,
-  IN      UINT64                    Data
+  IN      UINTN                      Address,
+  IN      EFI_CPU_IO_PROTOCOL_WIDTH  Width,
+  IN      UINT64                     Data
   )
 {
-  EFI_STATUS                        Status;
+  EFI_STATUS  Status;
 
-  if (mPciRootBridgeIo != NULL) {
-    Status = mPciRootBridgeIo->Mem.Write (mPciRootBridgeIo, (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width, Address, 1, &Data);
-  } else {
-    Status = mCpuIo->Mem.Write (mCpuIo, Width, Address, 1, &Data);
-  }
+  Status = mCpuIo->Mem.Write (mCpuIo, Width, Address, 1, &Data);
   ASSERT_EFI_ERROR (Status);
 
   return Data;
