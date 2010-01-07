@@ -4,7 +4,7 @@
     2) BDS boot device connect interface
     3) BDS Misc interfaces for mainting boot variable, ouput string.
 
-Copyright (c) 2004 - 2009, Intel Corporation. <BR>
+Copyright (c) 2004 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -566,10 +566,17 @@ typedef struct {
   UINTN   Maxlen;
 } POOL_PRINT;
 
+typedef
+VOID
+(*DEV_PATH_FUNCTION) (
+  IN OUT POOL_PRINT       *Str,
+  IN VOID                 *DevPath
+  );
+
 typedef struct {
-  UINT8 Type;
-  UINT8 SubType;
-  VOID (*Function) (POOL_PRINT *, VOID *);
+  UINT8             Type;
+  UINT8             SubType;
+  DEV_PATH_FUNCTION Function;
 } DEVICE_PATH_STRING_TABLE;
 
 extern EFI_GUID mEfiDevicePathMessagingUartFlowControlGuid;

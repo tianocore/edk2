@@ -1,7 +1,7 @@
 /** @file
   The platform device manager reference implementation
 
-Copyright (c) 2004 - 2009, Intel Corporation. <BR>
+Copyright (c) 2004 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -978,22 +978,19 @@ CallDriverHealth (
 }
 
 
-/*
+/**
   Check the Driver Health status of a single controller and try to process it if not healthy.
 
   This function called by CheckAllControllersHealthStatus () function in order to process a specify
   contoller's health state.
 
-  @param DriverHealth       A pointer to the EFI_DRIVER_HEALTH_PROTOCOL instance.
+  @param DriverHealthList   A Pointer to the list contain all of the platform driver health information. 
+  @param DriverHandle       The handle of driver.
   @param ControllerHandle   The class guid specifies which form set will be displayed.
   @param ChildHandle        The handle of the child controller to retrieve the health 
-                           status on.  This is an optional parameter that may be NULL. 
+                            status on.  This is an optional parameter that may be NULL. 
+  @param DriverHealth       A pointer to the EFI_DRIVER_HEALTH_PROTOCOL instance.
   @param HealthStatus       The health status of the controller.
-  @param MessageList        An array of warning or error messages associated 
-                           with the controller specified by ControllerHandle and 
-                           ChildHandle.  This is an optional parameter that may be NULL.
-  @param FormHiiHandle      The HII handle for an HII form associated with the 
-                           controller specified by ControllerHandle and ChildHandle.
 
   @retval EFI_INVALID_PARAMETER   HealthStatus or DriverHealth is NULL.
   @retval HealthStatus            The Health status of specify controller.
@@ -1001,7 +998,7 @@ CallDriverHealth (
   @retval EFI_NOT_FOUND           No controller in the platform install Driver Health Protocol.
   @retval EFI_SUCCESS             The Health related operation has been taken successfully.
 
-*/
+**/
 EFI_STATUS
 EFIAPI
 GetSingleControllerHealthStatus (
@@ -1306,14 +1303,14 @@ Done:
 }
 
 
-/*
+/**
   Check the healthy status of the platform, this function will return immediately while found one driver 
   in the platform are not healthy.
 
   @retval FALSE      at least one driver in the platform are not healthy.
   @retval TRUE       No controller install Driver Health Protocol,
                      or all controllers in the platform are in healthy status.
-*/
+**/
 BOOLEAN
 PlaformHealthStatusCheck (
   VOID
@@ -1570,7 +1567,7 @@ ProcessMessages (
 
 }
 
-/*
+/**
   Repair the whole platform.
 
   This function is the main entry for user choose "Repair All" in the front page.
@@ -1580,7 +1577,7 @@ ProcessMessages (
   @param DriverHealthList   A Pointer to the list contain all of the platform driver health
                             information.
 
-*/
+**/
 VOID
 PlatformRepairAll (
   IN LIST_ENTRY  *DriverHealthList
@@ -1671,10 +1668,10 @@ DriverHealthSelectBestLanguage (
   @param  SupportedLanguage    The best suitable language that matches the SupportedLangues interface for the 
                                located Component Name (2) instance.
 
-  @param  EFI_SUCCESS          The Component Name (2) protocol instance is successfully located and we find
+  @retval EFI_SUCCESS          The Component Name (2) protocol instance is successfully located and we find
                                the best matching language it support.
-  @param  EFI_UNSUPPORTED      The input Language is not supported by the Component Name (2) protocol.
-  @param  Other                Some error occurs when locating Component Name (2) protocol instance or finding
+  @retval EFI_UNSUPPORTED      The input Language is not supported by the Component Name (2) protocol.
+  @retval Other                Some error occurs when locating Component Name (2) protocol instance or finding
                                the supported language.
 
 **/
@@ -1893,7 +1890,6 @@ GetControllerNameWorker (
                                It will also be NULL for bus drivers that attempt to retrieve the name
                                of the bus controller. It will not be NULL for a bus driver that attempts
                                to retrieve the name of a child controller.
-  @param  Language             An ASCII string that represents the language command line option.
   @param  ControllerName       A pointer to the Unicode string to return. This Unicode string
                                is the name of the controller specified by ControllerHandle and ChildHandle.
 
