@@ -1,1 +1,217 @@
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><p><b><font size="4">Welcome to the home of EDK II Development!</font></b></p><p><font size="2">If you are new to the project, welcome! We are still in heavy development, but we wish to invite you to take a look at what we have done so far. </font></p><p><font size="2"><strong><font size="4">NEW on this project is the MdePkg version 1.01 and Core Stable version 0.90 release</font></strong>.&nbsp; (<a href="https://edk2.tianocore.org/servlets/ProjectDocumentList?folderID=108&amp;expandFolder=108&amp;folderID=0"><font size="3"><strong>here</strong></font></a>)&nbsp; </font></p><p><font size="2">This is&nbsp;a further extension of the&nbsp;EDK II,&nbsp;from the MdePkg 1.00 Package released June 14, 2009.&nbsp;&nbsp;This Package can be found in the EDK II SVN repository as r9029.&nbsp; This version&nbsp;represents the&nbsp;next major&nbsp;milestone in the EDK II development.</font></p><p><font size="2">Also with this release, the online help system for the MdePkg version 1.01 is now working and available (<a href="https://edk2.tianocore.org/nonav/MdeHelp/index.html"><font size="3"><strong>here</strong></font></a>) for use directly from the Open Source Community Website.&nbsp;</font></p><p><font size="2">The release contains the following components:</font></p><ul><li><font size="2">MdePkg version 1.01 - updates to the MdePkg 1.00 </font></li><li><font size="2">MdeModulePkg 0.90 </font></li><li><font size="2">IntelFrameworkPkg 0.90</font></li><li><font size="2">IntelFrameworkModulePkg 0.90</font></li><li><font size="2">EdkCompatibilityPkg 0.90</font></li><li><font size="2">Basetools - most recent Basetools since the MdePkg 1.00 release</font></li></ul><p><font size="2">Each package&nbsp;provides&nbsp;the sources.&nbsp; There are also downloads available&nbsp;of the documentation in CHM format and the documentation in HTML format, accessed via the &quot;Documents &amp; Files&quot; link within the EDK II Project (Here).&nbsp; The release also includes release notes providing more technical content regarding the entire EDKII Core Stable Release and its components.</font></p><font size="2"><p><font size="2"><strong>NOTE:</strong>&nbsp; There have been issues reported when attempting to use the CHM package after download from the website.&nbsp; There is now a document &quot;Notice on Downloading CHM format Files&quot; available to explain the issues and solutions in detail.</font></p><p><font size="2">Your feedback is critical to making EDK II a success! <i>Please</i> submit any enhancements, defects, or requests through the </font><a href="https://edk2.tianocore.org/servlets/Scarab"><u><font size="2">Project Tracker</font></u></a><font size="2"> tool. </font></p></font><p><strong><font size="4">Notes on the MdePkg version 1.00 release</font></strong></p><p><font size="2">This package contains the following significant features:</font></p><ul><li><font size="2">PROTOCOLs/PPIs/GUIDs and related data declarations in MdePkg/Include directory. They correspond to UEFI2.0, UEFI 2.1 and/or PI1.0 specifications published by the <a href="http://UEFI.org">UEFI Forum</a> and the EFI1.10 specification published by <a href="http://www.intel.com/technology.ef">Intel.</a> </font></li><li><font size="2">Data declarations in MdePkg/Include/IndustryStandard directory&nbsp; support applicable industry standards. </font></li><li><font size="2">Public library classes definitions in MdePkg/Include/Library support module development. </font></li><li><font size="2">Library instances&nbsp;in MdePkg/Library directory&nbsp; implement library classes for module build and platform integration&nbsp;of different CPU architectures and module types. </font></li><li><font size="2">Data structure declarations conform to the specification of &quot;PCD Infrastructure&quot;. . </font></li><li><font size="2">Build validation file of MdePkg/MdePkg.dsc lists the library instances under their supported CPU architectures and module types. </font></li></ul><p><font size="2">The MdePkg provides developers working on UEFI Applications, UEFI Drivers, UEFI Operating System Loaders, UEFI diagnostics, and UEFI Platform Initialization (PI) compliant silicon modules with a solid UEFI and PI compliant foundation from which to develop&nbsp;their modules under EDK II.&nbsp;&nbsp; </font></p><p><font size="2">The MdePkg 1.00&nbsp;also features the following quality metrics:</font></p><ul><li><font size="2">The MdePkg source code follows EDK II Coding Standard, which inludes the use of Doxygen style file and function headers.&nbsp; The documentation generated from the MdePkg is available in both CHM and HTML formats.</span /> </font></font /></li><li><font size="2">The MdePkg source code passed static code analysis and zero potential security violation is reported. </font></li><li><font size="2">All the library source code can build without errors across several operating systems and tool chains </font></li><li><font size="2">All MDE library interfaces and PCD entries&nbsp;are covered and verified by MDE library test cases at API level for functionality and conformance.&nbsp; </font></li></ul><p><font size="2">Of particular note to developers:&nbsp; the r8508 of the entire EDK II project contains the complete set of EDK II components used to test and validate this release.</font></p><p><font size="2">Also available are the Base Tools </font><font size="2">used to verify this package and&nbsp;documentation </font><font size="2">of the MdePkg.&nbsp; The BaseTools package provides both binaries build tools and source code files with configuration files to build the MdePkg.&nbsp; It facilitates the most common development under multiple operating systems.&nbsp;&nbsp; The help documentation is available both as linked HTML and as comress HTML in CHM file format.&nbsp; </font></p><p><font size="2"><b>The EDK II Project </b></font></p><p><font size="2">The EDK II project is the response to the EFI community&rsquo;s request for a better build and version tracking environment for UEFI and PI development. The main difference between the EDK II to the original EDK is the <b>Enhanced Build Environment </b>of the EDK II. <br />The advantages of the Enhanced Build Environment include: </font></p><p><font size="2">&bull;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; XML based build definition tools <br />&bull;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Operating System independence <br />&bull;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Flexibility in choosing the compiler and assembler tools <br />&bull;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The ability to generate working code using open source build tools and applications <br />&bull;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Enhanced development and build capability of modules and module packages <br />&bull;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Use of build configuration tools and data sets to provide flexible process<br />&bull;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Online source control allows users to contribute code and become participants\</font></p><p><font size="2">The EDK II enhanced build environment is a significant departure from the build environment of the original EDK. There are many new concepts and features in the EDK II, which have altered the environment. If you are familiar with the original EDK these changes will be obvious, while the benefits of them will be apparent to everyone. </font></p><p><font size="2">It is important to note, that the compiled results of the EDK II&nbsp;are equivalent to the original EDK, the changes are in the build environment and only affect the sources at that level. In other words, any differences in the code files are only to support the changes in the build environment, once the modules are created, they are functionally identical. </font></p><p><font size="2">In point of fact, the EDK II is classified at a development level project and the EDK is an official level project. The EDK is still intended to be used for volume production and shipments while the EDK II is being further refined through additional development. <br />As the EDK II project matures and the active participation of the EFI open source community members expand the project&rsquo;s scope (features, functionality, and support) the EDK II project will grow into an official level project. In the mean time, we are pleased in your interest in the EDK II project and encourage your participation and feedback. </font></p><p><font size="2"><b>Getting Started </b></font></p><p><font size="2">You will need to </font><a href="https://edk2.tianocore.org/installation.html"><b><u><font size="2">install some external tools</font></u></b></a><font size="2"> that are necessary to build the code. </font></p><p><font size="2">To get the code please follow this </font><a href="https://edk2.tianocore.org/subversion_setup.html"><u><font size="2">document</font></u></a><font size="2">. It will walk you through the installation of the Subversion Software Configuration management Client, <b>TortoiseSVN</b>, and show you how to pull the latest copy of the tree. </font></p><p><font size="2">Further instructions for using the EDK II are provided in the </font><a href="https://edk2.tianocore.org/source/browse/edk2/trunk/edk2/BuildNotes2.txt?rev=3765&amp;view=markup"><b><font size="2">BuildNotes2.txt</font></b></a><font size="2"> at the top of the edk2 directory tree. This file can be displayed using the </font><a href="https://edk2.tianocore.org/source/browse/edk2/trunk/edk2/"><u><font size="2">Subversion web interface</font></u></a><font size="2">. </font></p><p><font size="2">Additionally, we have provided some <a href="step-by-step-instructions.html"><u>step-by-step</u></a> instructions for helping new developers set up their build environment and build their first EDK II package.&nbsp; These instructions also cover setting up builds for Unix-like platforms, including building a GCC UEFI cross compiler for EDK II development. </font><br /></p><p><font size="2"><b>Help!</b> If you have questions about the code or run into obstacles getting things to work for you, please post a note on the </font><a href="mailto:dev@edk2.tianocore.org"><u><font size="2">dev@edk2.tianocore.org</font></u></a><font size="2"> mailing list. One of the friendly developers will be happy to help you. </font></p><p><font size="2">You are <b>not </b>signed up to the project mailing lists by default. We encourage you to <b>subscribe </b>to the mailing lists of the edk2 project </font><a href="https://edk2.tianocore.org/servlets/ProjectMailingListList"><u><font size="2">here</font></u></a><font size="2">. If you were </font><a href="https://www.tianocore.org/servlets/Join"><u><font size="2">registered</font></u></a><font size="2"> and </font><a href="https://www.tianocore.org/servlets/Login"><u><font size="2">logged in</font></u></a><font size="2">, you could join these lists. </font></p><p><font size="2"><b>Notes on FAT II Driver Project</b></font></p><p><font size="2">FAT Driver Projects are projects for the FAT32 File System Driver, which is based on Microsoft's FAT32 File System Driver Specification. The Fat Drivers are separate from the EDK projects only because the terms of use of the code are unique, requiring us to keep them in a separate code repository (the terms are basically that code developed using the FAT32 Specification must be associated with EFI). </font></p><p><font size="2">Since the EDK II involved making changes to the source files to support the enhanced build environment, FAT file system driver sources required changes to be compatible with the EDK II build environment. The FAT II sub-project provides those compatible sources without impacting the original FAT driver sub project of the current EDK. </font></p><p><font size="2">The FAT II Driver Project is a subproject of the EDK II project, and is only used to house the FAT32 code repository. All development tools in the EDK II project are integrated with this sub-project. This project is to be used only to update the repository or to get access to the latest code snapshots. Use the EDK II project to post issues, join mailing lists, participate in discussion forums, etc. In short, consider them one project with two code repositories. </font></p>
+<META http-equiv="Content-Type" content="text/html; charset=utf-8">
+<p><b><font size="4">Welcome to the home of EDK II Development!</font></b></p>
+<p><font size="2">If you are new to the project, welcome! We are still in heavy 
+		development, but we wish to invite you to take a look at what we have done so 
+		far. </font>
+</p>
+<p><font size="2"><strong><font size="4">NEW on this project is the MdePkg version 1.01 and 
+				Core Stable version 0.90 release</font></strong>.&nbsp; (<a href="https://edk2.tianocore.org/servlets/ProjectDocumentList?folderID=108&amp;expandFolder=108&amp;folderID=0"><font size="3"><strong>here</strong></font></a>)&nbsp;
+	</font>
+</p>
+<p><font size="2">This is&nbsp;a further extension of the&nbsp;EDK II,&nbsp;from the 
+		MdePkg 1.00 Package released June 14, 2009.&nbsp;&nbsp;This Package can be 
+		found in the EDK II SVN repository as r9029.&nbsp; This version&nbsp;represents 
+		the&nbsp;next major&nbsp;milestone in the EDK II development.</font></p>
+<p><FONT size="2">Also with this release, the online help system for the MdePkg version 
+		1.01 is now working and available (</FONT> <a href="https://edk2.tianocore.org/nonav/MdeHelp/index.html">
+		<strong><FONT size="2">here</FONT></strong></a><FONT size="2">) for use 
+		directly from the Open Source Community Website.&nbsp;</FONT></p>
+<p><font size="2">The release contains the following components:</font></p>
+<ul>
+	<li>
+		<font size="2">MdePkg version 1.01 - updates to the MdePkg 1.00 </font>
+	<li>
+		<font size="2">MdeModulePkg 0.90 </font>
+	<li>
+		<font size="2">IntelFrameworkPkg 0.90</font><li><font size="2">IntelFrameworkModulePkg 
+			0.90</font><li><font size="2">EdkCompatibilityPkg 0.90</font><li><font size="2">Basetools 
+			- most recent Basetools since the MdePkg 1.00 release</font></li></ul>
+<p><font size="2">Each package&nbsp;provides&nbsp;the sources.&nbsp; There are also 
+		downloads available&nbsp;of the documentation in CHM format and the 
+		documentation in HTML format, accessed via the "Documents &amp; Files" link 
+		within the EDK II Project (<A href="https://edk2.tianocore.org/servlets/ProjectDocumentList?folderID=103&amp;expandFolder=103&amp;folderID=0"><STRONG>here</STRONG></A>
+		).&nbsp; Also in the "Documents and &amp; Files" link are the release notes 
+		providing more technical content regarding the entire EDKII Core Stable Release 
+		and its components.</font></p>
+<font size="2">
+	<p><font size="2"><strong>NOTE:</strong>&nbsp; There have been issues reported when 
+			attempting to use the CHM package after download from the website.&nbsp; There 
+			is now a document "Notice on Downloading CHM format Files" available to explain 
+			the issues and solutions in detail.</font></p>
+	<p><font size="2">Your feedback is critical to making EDK II a success! <i>Please</i> submit 
+			any enhancements, defects, or requests through the </font><a href="https://edk2.tianocore.org/servlets/Scarab">
+			<u><font size="2">Project Tracker</font></u></a><font size="2"> tool. </font>
+	</p>
+</font>
+<p><strong><font size="4">Notes on the MdePkg version 1.00 release</font></strong></p>
+<p><font size="2">This package contains the following significant features:</font></p>
+<ul>
+	<li>
+		<font size="2">PROTOCOLs/PPIs/GUIDs and related data declarations in MdePkg/Include 
+			directory. They correspond to UEFI2.0, UEFI 2.1 and/or PI1.0 specifications 
+			published by the <a href="http://UEFI.org">UEFI Forum</a> and the EFI1.10 
+			specification published by <a href="http://www.intel.com/technology.ef">Intel.</a>
+		</font>
+	<li>
+		<font size="2">Data declarations in MdePkg/Include/IndustryStandard directory&nbsp; 
+			support applicable industry standards. </font>
+	<li>
+		<font size="2">Public library classes definitions in MdePkg/Include/Library support 
+			module development. </font>
+	<li>
+		<font size="2">Library instances&nbsp;in MdePkg/Library directory&nbsp; implement 
+			library classes for module build and platform integration&nbsp;of different CPU 
+			architectures and module types. </font>
+	<li>
+		<font size="2">Data structure declarations conform to the specification of "PCD 
+			Infrastructure". . </font>
+	<li>
+		<font size="2">Build validation file of MdePkg/MdePkg.dsc lists the library 
+			instances under their supported CPU architectures and module types. </font>
+	</li>
+</ul>
+<p><font size="2">The MdePkg provides developers working on UEFI Applications, UEFI 
+		Drivers, UEFI Operating System Loaders, UEFI diagnostics, and UEFI Platform 
+		Initialization (PI) compliant silicon modules with a solid UEFI and PI 
+		compliant foundation from which to develop&nbsp;their modules under EDK 
+		II.&nbsp;&nbsp; </font>
+</p>
+<p><font size="2">The MdePkg 1.00&nbsp;also features the following quality metrics:</font></p>
+<ul>
+	<li>
+		<font size="2">The MdePkg source code follows EDK II Coding Standard, which inludes 
+			the use of Doxygen style file and function headers.&nbsp; The documentation 
+			generated from the MdePkg is available in both CHM and HTML formats.</SPAN /> </font>
+	</FONT /><li><font size="2">The MdePkg source code passed static code analysis and zero 
+			potential security violation is reported. </font>
+	<li>
+		<font size="2">All the library source code can build without errors across several 
+			operating systems and tool chains </font>
+	<li>
+		<font size="2">All MDE library interfaces and PCD entries&nbsp;are covered and 
+			verified by MDE library test cases at API level for functionality and 
+			conformance.&nbsp; </font>
+	</li>
+</ul>
+<p><font size="2">Of particular note to developers:&nbsp; the r8508 of the entire EDK 
+		II project contains the complete set of EDK II components used to test and 
+		validate this release.</font></p>
+<p><font size="2">Also available are the Base Tools </font><font size="2">used to 
+		verify this package and&nbsp;documentation </font><font size="2">of the 
+		MdePkg.&nbsp; The BaseTools package provides both binaries build tools and 
+		source code files with configuration files to build the MdePkg.&nbsp; It 
+		facilitates the most common development under multiple operating 
+		systems.&nbsp;&nbsp; The help documentation is available both as linked HTML 
+		and as comress HTML in CHM file format.&nbsp; </font>
+</p>
+<p><font size="2"><b>The EDK II Project </b></font>
+</p>
+<p><font size="2">The EDK II project is the response to the EFI community’s request for 
+		a better build and version tracking environment for UEFI and PI development. 
+		The main difference between the EDK II to the original EDK is the <b>Enhanced Build 
+			Environment </b>of the EDK II.
+		<br>
+		The advantages of the Enhanced Build Environment include: </font>
+</p>
+<p><font size="2">•&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+		XML based build definition tools
+		<br>
+		•&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+		Operating System independence
+		<br>
+		•&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+		Flexibility in choosing the compiler and assembler tools
+		<br>
+		•&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+		The ability to generate working code using open source build tools and 
+		applications
+		<br>
+		•&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+		Enhanced development and build capability of modules and module packages
+		<br>
+		•&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+		Use of build configuration tools and data sets to provide flexible process<br>
+		•&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+		Online source control allows users to contribute code and become participants\</font></p>
+<p><font size="2">The EDK II enhanced build environment is a significant departure from 
+		the build environment of the original EDK. There are many new concepts and 
+		features in the EDK II, which have altered the environment. If you are familiar 
+		with the original EDK these changes will be obvious, while the benefits of them 
+		will be apparent to everyone. </font>
+</p>
+<p><font size="2">It is important to note, that the compiled results of the EDK 
+		II&nbsp;are equivalent to the original EDK, the changes are in the build 
+		environment and only affect the sources at that level. In other words, any 
+		differences in the code files are only to support the changes in the build 
+		environment, once the modules are created, they are functionally identical. </font>
+</p>
+<p><font size="2">In point of fact, the EDK II is classified at a development level 
+		project and the EDK is an official level project. The EDK is still intended to 
+		be used for volume production and shipments while the EDK II is being further 
+		refined through additional development.
+		<br>
+		As the EDK II project matures and the active participation of the EFI open 
+		source community members expand the project’s scope (features, functionality, 
+		and support) the EDK II project will grow into an official level project. In 
+		the mean time, we are pleased in your interest in the EDK II project and 
+		encourage your participation and feedback. </font>
+</p>
+<p><font size="2"><b>Getting Started </b></font>
+</p>
+<p><font size="2">You will need to </font><a href="https://edk2.tianocore.org/installation.html">
+		<b><u><font size="2">install some external tools</font></u></b></a><font size="2">
+		that are necessary to build the code. </font>
+</p>
+<p><font size="2">To get the code please follow this </font><a href="https://edk2.tianocore.org/subversion_setup.html">
+		<u><font size="2">document</font></u></a><font size="2">. It will walk you 
+		through the installation of the Subversion Software Configuration management 
+		Client, <b>TortoiseSVN</b>, and show you how to pull the latest copy of the 
+		tree. </font>
+</p>
+<p><font size="2">Further instructions for using the EDK II are provided in the </font>
+	<a href="https://edk2.tianocore.org/source/browse/edk2/trunk/edk2/BuildNotes2.txt?rev=3765&amp;view=markup">
+		<b><font size="2">BuildNotes2.txt</font></b></a><font size="2"> at the top of 
+		the edk2 directory tree. This file can be displayed using the </font><a href="https://edk2.tianocore.org/source/browse/edk2/trunk/edk2/">
+		<u><font size="2">Subversion web interface</font></u></a><font size="2">. </font>
+</p>
+<p><font size="2">Additionally, we have provided some <a href="step-by-step-instructions.html">
+			<u>step-by-step</u></a> instructions for helping new developers set up 
+		their build environment and build their first EDK II package.&nbsp; These 
+		instructions also cover setting up builds for Unix-like platforms, including 
+		building a GCC UEFI cross compiler for EDK II development. </font>
+	<br>
+</p>
+<p><font size="2"><b>Help!</b> If you have questions about the code or run into 
+		obstacles getting things to work for you, please post a note on the </font><a href="mailto:dev@edk2.tianocore.org">
+		<u><font size="2">dev@edk2.tianocore.org</font></u></a><font size="2"> mailing 
+		list. One of the friendly developers will be happy to help you. </font>
+</p>
+<p><font size="2">You are <b>not </b>signed up to the project mailing lists by default. 
+		We encourage you to <b>subscribe </b>to the mailing lists of the edk2 project </font>
+	<a href="https://edk2.tianocore.org/servlets/ProjectMailingListList"><u><font size="2">here</font></u></a><font size="2">. 
+		If you were </font><a href="https://www.tianocore.org/servlets/Join"><u><font size="2">registered</font></u></a><font size="2">
+		and </font><a href="https://www.tianocore.org/servlets/Login"><u><font size="2">logged 
+				in</font></u></a><font size="2">, you could join these lists. </font>
+</p>
+<p><font size="2"><b>Notes on FAT II Driver Project</b></font></p>
+<p><font size="2">FAT Driver Projects are projects for the FAT32 File System Driver, 
+		which is based on Microsoft's FAT32 File System Driver Specification. The Fat 
+		Drivers are separate from the EDK projects only because the terms of use of the 
+		code are unique, requiring us to keep them in a separate code repository (the 
+		terms are basically that code developed using the FAT32 Specification must be 
+		associated with EFI). </font>
+</p>
+<p><font size="2">Since the EDK II involved making changes to the source files to 
+		support the enhanced build environment, FAT file system driver sources required 
+		changes to be compatible with the EDK II build environment. The FAT II 
+		sub-project provides those compatible sources without impacting the original 
+		FAT driver sub project of the current EDK. </font>
+</p>
+<p><font size="2">The FAT II Driver Project is a subproject of the EDK II project, and 
+		is only used to house the FAT32 code repository. All development tools in the 
+		EDK II project are integrated with this sub-project. This project is to be used 
+		only to update the repository or to get access to the latest code snapshots. 
+		Use the EDK II project to post issues, join mailing lists, participate in 
+		discussion forums, etc. In short, consider them one project with two code 
+		repositories. </font>
+</p>
