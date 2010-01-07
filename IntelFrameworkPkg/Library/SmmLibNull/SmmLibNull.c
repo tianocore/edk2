@@ -1,7 +1,7 @@
 /** @file
   NULL instance of SMM Library.
 
-  Copyright (c) 2009, Intel Corporation<BR>
+  Copyright (c) 2009 - 2010, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -88,11 +88,9 @@ IsRuntimeSoftwareSmi (
 }
 
 /**
-
   Clear APM SMI Status Bit; Set the EOS bit. 
   
 **/
-
 VOID
 EFIAPI
 ClearSmi (
