@@ -9,7 +9,7 @@
   Thunk is the code that switches from 32-bit protected environment into the 16-bit real-mode
 	environment. Reverse thunk is the code that does the opposite.
 
-  Copyright (c) 2007 - 2009, Intel Corporation
+  Copyright (c) 2007 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -983,10 +983,10 @@ typedef struct _EFI_LEGACY_BIOS_PROTOCOL EFI_LEGACY_BIOS_PROTOCOL;
 /// are kept for backward compatibility only.  They convert 32-bit address (_Adr) 
 /// to Segment:Offset 16-bit form.
 ///
-/// @{
+///@{
 #define EFI_SEGMENT(_Adr)     (UINT16) ((UINT16) (((UINTN) (_Adr)) >> 4) & 0xf000)
 #define EFI_OFFSET(_Adr)      (UINT16) (((UINT16) ((UINTN) (_Adr))) & 0xffff)
-/// @}
+///@}
 
 #define CARRY_FLAG            0x01
 

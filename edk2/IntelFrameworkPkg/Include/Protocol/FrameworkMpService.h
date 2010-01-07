@@ -33,7 +33,7 @@
   APs to help test system memory in parallel with other device initialization.
   Diagnostics applications may also use this protocol for multi-processor.
 
-  Copyright (c) 1999 - 2002, 2009, Intel Corporation.<BR>
+  Copyright (c) 1999 - 2010, Intel Corporation.<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -42,7 +42,7 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
---*/
+**/
 
 #ifndef _FRAMEWORK_MP_SERVICE_PROTOCOL_H_
 #define _FRAMEWORK_MP_SERVICE_PROTOCOL_H_
