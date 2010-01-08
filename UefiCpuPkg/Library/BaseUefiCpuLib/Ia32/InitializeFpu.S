@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #*
-#*   Copyright 2009, Intel Corporation
+#*   Copyright 2009 - 2010, Intel Corporation
 #*   All rights reserved. This program and the accompanying materials
 #*   are licensed and made available under the terms and conditions of the BSD License
 #*   which accompanies this distribution.  The full text of the license may be found at
@@ -11,8 +11,6 @@
 #*
 #*
 #------------------------------------------------------------------------------
-
-
 
 #
 # Float control word initial value: 
@@ -57,7 +55,7 @@ ASM_PFX(InitializeFloatingPointUnits):
     # Set OSFXSR bit 9 in CR4
     #
     movl    %cr4, %eax 
-    or      $200, %eax
+    or      $0x200, %eax
     movl    %eax, %cr4
     
     #

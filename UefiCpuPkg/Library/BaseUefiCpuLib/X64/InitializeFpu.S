@@ -41,7 +41,7 @@ ASM_PFX(InitializeFloatingPointUnits):
     # Set OSFXSR bit 9 in CR4
     #
     movq    %cr4, %rax 
-    or      $200, %rax
+    or      $0x200, %rax
     movq    %rax, %cr4
 
     #
