@@ -1,7 +1,7 @@
 /** @file
   Helper functions for configuring or getting the parameters relating to Ip4.
 
-Copyright (c) 2009, Intel Corporation.<BR>
+Copyright (c) 2009 - 2010, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -152,13 +152,12 @@ Ip4ConfigConvertDeviceConfigDataToIfrNvData (
   NIC_IP4_CONFIG_INFO           *NicConfig;
   UINTN                         ConfigLen;
 
-  IfrFormNvData->DhcpEnable = 1;
-
   ConfigLen = sizeof (NIC_IP4_CONFIG_INFO) + sizeof (EFI_IP4_ROUTE_TABLE) * 2;
   NicConfig = AllocateZeroPool (ConfigLen);
   ASSERT (NicConfig != NULL);
   Status = EfiNicIp4ConfigGetInfo (Ip4ConfigInstance, &ConfigLen, NicConfig);
   if (!EFI_ERROR (Status)) {
+    IfrFormNvData->Configure = 1;
     if (NicConfig->Source == IP4_CONFIG_SOURCE_DHCP) {
       IfrFormNvData->DhcpEnable = 1;
     } else {
@@ -167,7 +166,10 @@ Ip4ConfigConvertDeviceConfigDataToIfrNvData (
       Ip4ConfigIpToStr (&NicConfig->Ip4Info.SubnetMask, IfrFormNvData->SubnetMask);
       Ip4ConfigIpToStr (&NicConfig->Ip4Info.RouteTable[1].GatewayAddress, IfrFormNvData->GatewayAddress);
     }
+  } else {
+    IfrFormNvData->Configure = 0;
   }
+
   FreePool (NicConfig);
 }
 
@@ -175,21 +177,20 @@ Ip4ConfigConvertDeviceConfigDataToIfrNvData (
   Convert the IFR data into the network configuration data and set the IP
   configure parameters for the NIC.
 
-  @param[in]       IfrFormNvData     The IFR nv data.
   @param[in, out]  Ip4ConfigInstance The IP4Config instance.
-                                 
-  @retval EFI_SUCCESS            The configure parameter for this NIC was 
+
+  @retval EFI_SUCCESS            The configure parameter for this NIC was
                                  set successfully.
   @retval EFI_ALREADY_STARTED    There is a pending auto configuration.
   @retval EFI_NOT_FOUND          No auto configure parameter is found.
-  
+
 **/
 EFI_STATUS
 Ip4ConfigConvertIfrNvDataToDeviceConfigData (
-  IN     IP4_CONFIG_IFR_NVDATA     *IfrFormNvData,
   IN OUT IP4_CONFIG_INSTANCE       *Ip4ConfigInstance
   )
 {
+  EFI_STATUS                Status;
   EFI_IP_ADDRESS            HostIp;
   EFI_IP_ADDRESS            SubnetMask;
   EFI_IP_ADDRESS            Gateway;
@@ -197,15 +198,38 @@ Ip4ConfigConvertIfrNvDataToDeviceConfigData (
   NIC_IP4_CONFIG_INFO       *NicInfo;
   EFI_IP_ADDRESS            Ip;
 
+  if (!Ip4ConfigInstance->Ip4ConfigCallbackInfo.Configured) {
+    //
+    // Clear the variable
+    //
+    ZeroMem (&Ip4ConfigInstance->Ip4ConfigCallbackInfo, sizeof (IP4_SETTING_INFO));
+
+    Status = EfiNicIp4ConfigSetInfo (Ip4ConfigInstance, NULL, TRUE);
+    if (Status == EFI_NOT_FOUND) {
+      return EFI_SUCCESS;
+    }
+
+    return Status;
+  }
+
   NicInfo = AllocateZeroPool (sizeof (NIC_IP4_CONFIG_INFO) + 2 * sizeof (EFI_IP4_ROUTE_TABLE));
   ASSERT (NicInfo != NULL);
 
   NicInfo->Ip4Info.RouteTable = (EFI_IP4_ROUTE_TABLE *) (NicInfo + 1);
 
-  if (!Ip4ConfigInstance->Ip4ConfigCallbackInfo.Enabled) {
+  if (!Ip4ConfigInstance->Ip4ConfigCallbackInfo.DhcpEnabled) {
     CopyMem (&HostIp.v4, &Ip4ConfigInstance->Ip4ConfigCallbackInfo.LocalIp, sizeof (HostIp.v4));
     CopyMem (&SubnetMask.v4, &Ip4ConfigInstance->Ip4ConfigCallbackInfo.SubnetMask, sizeof (SubnetMask.v4));
     CopyMem (&Gateway.v4, &Ip4ConfigInstance->Ip4ConfigCallbackInfo.Gateway, sizeof (Gateway.v4));
+
+    if (!NetIp4IsUnicast (NTOHL (HostIp.Addr[0]), 0)) {
+      CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid IP address!", NULL);
+      return EFI_INVALID_PARAMETER;
+    }
+    if (EFI_IP4_EQUAL (&SubnetMask, &mZeroIp4Addr)) {
+      CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid Subnet Mask!", NULL);
+      return EFI_INVALID_PARAMETER;
+    }
 
     if ((Gateway.Addr[0] != 0)) {
       if (SubnetMask.Addr[0] == 0) {
@@ -228,8 +252,12 @@ Ip4ConfigConvertIfrNvDataToDeviceConfigData (
     CopyMem (&NicInfo->Ip4Info.RouteTable[0].SubnetAddress, &Ip.v4, sizeof (EFI_IPv4_ADDRESS));
     CopyMem (&NicInfo->Ip4Info.RouteTable[0].SubnetMask, &SubnetMask.v4, sizeof (EFI_IPv4_ADDRESS));
     CopyMem (&NicInfo->Ip4Info.RouteTable[1].GatewayAddress, &Gateway.v4, sizeof (EFI_IPv4_ADDRESS));
+
   } else {
     NicInfo->Source = IP4_CONFIG_SOURCE_DHCP;
+    ZeroMem (&Ip4ConfigInstance->Ip4ConfigCallbackInfo.LocalIp, sizeof (EFI_IPv4_ADDRESS));
+    ZeroMem (&Ip4ConfigInstance->Ip4ConfigCallbackInfo.SubnetMask, sizeof (EFI_IPv4_ADDRESS));
+    ZeroMem (&Ip4ConfigInstance->Ip4ConfigCallbackInfo.Gateway, sizeof (EFI_IPv4_ADDRESS));
   }
 
   NicInfo->Perment = TRUE;
@@ -338,7 +366,7 @@ Ip4DeviceExtractConfig (
       FreePool (IfrDeviceNvData);
       return EFI_NOT_FOUND;
     }
-  
+
     //
     // Convert buffer data to <ConfigResp> by helper function BlockToConfig()
     //
@@ -350,7 +378,7 @@ Ip4DeviceExtractConfig (
                                   Results,
                                   Progress
                                   );
-  
+
     FreePool (IfrDeviceNvData);
 
   } else if (HiiIsConfigHdrMatch (Request, &mNicIp4ConfigNvDataGuid, EFI_NIC_IP4_CONFIG_VARIABLE)) {
@@ -359,9 +387,9 @@ Ip4DeviceExtractConfig (
     if (IfrFormNvData == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
-  
+
     Ip4ConfigConvertDeviceConfigDataToIfrNvData (Ip4ConfigInstance, IfrFormNvData);
-  
+
     //
     // Convert buffer data to <ConfigResp> by helper function BlockToConfig()
     //
@@ -373,7 +401,7 @@ Ip4DeviceExtractConfig (
                                   Results,
                                   Progress
                                   );
-  
+
     FreePool (IfrFormNvData);
 
   } else {
@@ -428,7 +456,7 @@ Ip4DeviceRouteConfig (
   EFI_STATUS                       Status;
   UINTN                            BufferSize;
   NIC_IP4_CONFIG_INFO              *IfrDeviceNvData;
-  IP4_CONFIG_IFR_NVDATA            *IfrFormNvData; 
+  IP4_CONFIG_IFR_NVDATA            *IfrFormNvData;
   NIC_IP4_CONFIG_INFO              *NicInfo;
   IP4_CONFIG_INSTANCE              *Ip4ConfigInstance;
   EFI_MAC_ADDRESS                  ZeroMac;
@@ -462,9 +490,9 @@ Ip4DeviceRouteConfig (
                                   Progress
                                   );
     if (!EFI_ERROR (Status)) {
-      Status = Ip4ConfigConvertIfrNvDataToDeviceConfigData (IfrFormNvData, Ip4ConfigInstance);
+      Status = Ip4ConfigConvertIfrNvDataToDeviceConfigData (Ip4ConfigInstance);
     }
-    
+
     FreePool (IfrFormNvData);
 
   } else if (HiiIsConfigHdrMatch (Configuration, &gEfiNicIp4ConfigVariableGuid, EFI_NIC_IP4_CONFIG_VARIABLE)) {
@@ -486,9 +514,10 @@ Ip4DeviceRouteConfig (
       ZeroMem (&ZeroMac, sizeof (EFI_MAC_ADDRESS));
       if (CompareMem (&IfrDeviceNvData->NicAddr.MacAddr, &ZeroMac, IfrDeviceNvData->NicAddr.Len) != 0) {
         BufferSize = sizeof (NIC_IP4_CONFIG_INFO) + sizeof (EFI_IP4_ROUTE_TABLE) * IfrDeviceNvData->Ip4Info.RouteTableSize;
-        NicInfo = AllocateCopyPool (BufferSize, IfrDeviceNvData); 
+        NicInfo = AllocateCopyPool (BufferSize, IfrDeviceNvData);
         Status = EfiNicIp4ConfigSetInfo (Ip4ConfigInstance, NicInfo, TRUE);
       } else {
+        ZeroMem (&Ip4ConfigInstance->Ip4ConfigCallbackInfo, sizeof (IP4_SETTING_INFO));
         Status = EfiNicIp4ConfigSetInfo (Ip4ConfigInstance, NULL, TRUE);
       }
     }
@@ -499,7 +528,7 @@ Ip4DeviceRouteConfig (
 
     return EFI_NOT_FOUND;
   }
-  
+
   return Status;
 
 }
@@ -569,11 +598,19 @@ Ip4FormCallback (
 
   switch (QuestionId) {
 
+  case KEY_ENABLE:
+    if (IfrFormNvData->Configure == 0) {
+      Ip4ConfigInstance->Ip4ConfigCallbackInfo.Configured = FALSE;
+    } else {
+      Ip4ConfigInstance->Ip4ConfigCallbackInfo.Configured = TRUE;
+    }
+    break;
+
   case KEY_DHCP_ENABLE:
     if (IfrFormNvData->DhcpEnable == 0) {
-      Ip4ConfigInstance->Ip4ConfigCallbackInfo.Enabled = FALSE;
+      Ip4ConfigInstance->Ip4ConfigCallbackInfo.DhcpEnabled = FALSE;
     } else {
-      Ip4ConfigInstance->Ip4ConfigCallbackInfo.Enabled = TRUE;
+      Ip4ConfigInstance->Ip4ConfigCallbackInfo.DhcpEnabled = TRUE;
     }
 
     break;
@@ -615,14 +652,15 @@ Ip4FormCallback (
     break;
 
   case KEY_SAVE_CHANGES:
-    Status = Ip4ConfigConvertIfrNvDataToDeviceConfigData (IfrFormNvData, Ip4ConfigInstance);
- 
+
+    Status = Ip4ConfigConvertIfrNvDataToDeviceConfigData (Ip4ConfigInstance);
+
     *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
 
     break;
 
   default:
-   
+
     break;
   }
 
@@ -690,7 +728,7 @@ Ip4ConfigDeviceInit (
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &Instance->ChildHandle,
                   &gEfiDevicePathProtocolGuid,
-                  Instance->HiiVendorDevicePath,      
+                  Instance->HiiVendorDevicePath,
                   &gEfiHiiConfigAccessProtocolGuid,
                   ConfigAccess,
                   NULL
@@ -704,13 +742,13 @@ Ip4ConfigDeviceInit (
                     &gEfiManagedNetworkServiceBindingProtocolGuid,
                     (VOID **) &MnpSb,
                     Instance->Image,
-                    Instance->ChildHandle, 
+                    Instance->ChildHandle,
                     EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
                     );
   }
 
   ASSERT_EFI_ERROR (Status);
- 
+
   //
   // Publish our HII data
   //
@@ -733,7 +771,7 @@ Ip4ConfigDeviceInit (
     OldMenuString = HiiGetString (Instance->RegisteredHandle, STRING_TOKEN (STR_IP4_CONFIG_FORM_TITLE), NULL);
     UnicodeSPrint (MenuString, 128, L"%s (MAC:%s)", OldMenuString, MacString);
     HiiSetString (Instance->RegisteredHandle, STRING_TOKEN (STR_IP4_CONFIG_FORM_TITLE), MenuString, NULL);
-  
+
     UnicodeSPrint (PortString, 128, L"MAC:%s", MacString);
     HiiSetString (Instance->RegisteredHandle, STRING_TOKEN (STR_IP4_DEVICE_FORM_TITLE), PortString, NULL);
     FreePool (MacString);
@@ -776,7 +814,7 @@ Ip4ConfigDeviceUnload (
   gBS->UninstallMultipleProtocolInterfaces (
          Instance->ChildHandle,
          &gEfiDevicePathProtocolGuid,
-         Instance->HiiVendorDevicePath, 
+         Instance->HiiVendorDevicePath,
          &gEfiHiiConfigAccessProtocolGuid,
          &Instance->HiiConfigAccessProtocol,
          NULL

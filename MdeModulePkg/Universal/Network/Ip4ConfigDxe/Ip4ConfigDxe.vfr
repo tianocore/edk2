@@ -1,7 +1,7 @@
 /** @file
   Vfr file for IP4 config.
 
-Copyright (c) 2009, Intel Corporation.<BR>
+Copyright (c) 2009 - 2010, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -29,40 +29,52 @@ formset
   form formid = FORMID_MAIN_FORM,
     title  = STRING_TOKEN(STR_IP4_DEVICE_FORM_TITLE);
 
-    checkbox varid = EfiNicIp4ConfigVariable.DhcpEnable,
-            prompt = STRING_TOKEN(STR_IP4_ENABLE_DHCP),
-            help   = STRING_TOKEN(STR_IP4_ENABLE_DHCP),
+    checkbox varid = EfiNicIp4ConfigVariable.Configure,
+            prompt = STRING_TOKEN(STR_IP4_CONFIGURE),
+            help   = STRING_TOKEN(STR_IP4_CONFIGURE),
             flags  = INTERACTIVE,
-            key    = KEY_DHCP_ENABLE,
+            key    = KEY_ENABLE,
     endcheckbox;
 
-    suppressif ideqval EfiNicIp4ConfigVariable.DhcpEnable == 0x01;
-    string  varid   = EfiNicIp4ConfigVariable.StationAddress,
-            prompt  = STRING_TOKEN(STR_IP4_LOCAL_IP_ADDRESS),
-            help    = STRING_TOKEN(STR_IP4_IP_ADDRESS_HELP),
-            flags   = INTERACTIVE,
-            key     = KEY_LOCAL_IP,
-            minsize = IP_MIN_SIZE,
-            maxsize = IP_MAX_SIZE,
-    endstring;
+    suppressif ideqval EfiNicIp4ConfigVariable.Configure == 0x00;
 
-    string  varid   = EfiNicIp4ConfigVariable.SubnetMask,
-            prompt  = STRING_TOKEN(STR_IP4_LOCAL_MASK),
-            help    = STRING_TOKEN(STR_IP4_IP_ADDRESS_HELP),
-            flags   = INTERACTIVE,
-            key     = KEY_SUBNET_MASK,
-            minsize = IP_MIN_SIZE,
-           maxsize = IP_MAX_SIZE,
-    endstring;
+      checkbox varid = EfiNicIp4ConfigVariable.DhcpEnable,
+              prompt = STRING_TOKEN(STR_IP4_ENABLE_DHCP),
+              help   = STRING_TOKEN(STR_IP4_ENABLE_DHCP),
+              flags  = INTERACTIVE,
+              key    = KEY_DHCP_ENABLE,
+      endcheckbox;
+    endif;
 
-    string  varid   = EfiNicIp4ConfigVariable.GatewayAddress,
-            prompt  = STRING_TOKEN(STR_IP4_LOCAL_GATEWAY),
-            help    = STRING_TOKEN(STR_IP4_IP_ADDRESS_HELP),
-            flags   = INTERACTIVE,
-            key     = KEY_GATE_WAY,
-            minsize = IP_MIN_SIZE,
-            maxsize = IP_MAX_SIZE,
-    endstring;
+    suppressif ideqval EfiNicIp4ConfigVariable.DhcpEnable == 0x01 OR ideqval EfiNicIp4ConfigVariable.Configure == 0x00;
+
+      string  varid   = EfiNicIp4ConfigVariable.StationAddress,
+              prompt  = STRING_TOKEN(STR_IP4_LOCAL_IP_ADDRESS),
+              help    = STRING_TOKEN(STR_IP4_IP_ADDRESS_HELP),
+              flags   = INTERACTIVE,
+              key     = KEY_LOCAL_IP,
+              minsize = IP_MIN_SIZE,
+              maxsize = IP_MAX_SIZE,
+      endstring;
+
+      string  varid   = EfiNicIp4ConfigVariable.SubnetMask,
+              prompt  = STRING_TOKEN(STR_IP4_LOCAL_MASK),
+              help    = STRING_TOKEN(STR_IP4_IP_ADDRESS_HELP),
+              flags   = INTERACTIVE,
+              key     = KEY_SUBNET_MASK,
+              minsize = IP_MIN_SIZE,
+             maxsize = IP_MAX_SIZE,
+      endstring;
+
+      string  varid   = EfiNicIp4ConfigVariable.GatewayAddress,
+              prompt  = STRING_TOKEN(STR_IP4_LOCAL_GATEWAY),
+              help    = STRING_TOKEN(STR_IP4_IP_ADDRESS_HELP),
+              flags   = INTERACTIVE,
+              key     = KEY_GATE_WAY,
+              minsize = IP_MIN_SIZE,
+              maxsize = IP_MAX_SIZE,
+      endstring;
+
     endif;
 
     subtitle text = STRING_TOKEN(STR_NULL);
@@ -72,11 +84,6 @@ formset
     help   = STRING_TOKEN (STR_SAVE_CHANGES),
     flags  = INTERACTIVE,
     key    = KEY_SAVE_CHANGES;
-
-    goto FORMID_MAIN_FORM,
-    prompt = STRING_TOKEN (STR_RETURN_MAIN_FORM),
-    help   = STRING_TOKEN (STR_RETURN_MAIN_FORM),
-    flags  = 0;
 
   endform;
 
