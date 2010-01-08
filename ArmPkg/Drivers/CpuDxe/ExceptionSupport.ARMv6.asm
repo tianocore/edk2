@@ -246,7 +246,7 @@ CommonCExceptionHandler (
   add       R3, SP, #0x54           ; Make R3 point to SVC LR saved on entry
   add       R2, SP, #0x38           ; Make R2 point to EFI_SYSTEM_CONTEXT_ARM.LR
   and       R1, R1, #0x1f           ; Check to see if User or System Mode
-  cmp       R1, #0x1f               ; if ((CPSR == 0x10) || (CPSR == 0x1df))
+  cmp       R1, #0x1f               ; if ((CPSR == 0x10) || (CPSR == 0x1f))
   cmpne     R1, #0x10               ;   
   ldmeqed   R2, {lr}^               ;   restore unbanked lr
                                     ; else
