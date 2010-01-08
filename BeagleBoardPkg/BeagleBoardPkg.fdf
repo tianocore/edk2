@@ -27,6 +27,7 @@
 
 
 [FD.BeagleBoard_EFI]
+####BaseAddress   = 0x80208000|gEmbeddedTokenSpaceGuid.PcdEmbeddedFdBaseAddress  #The base address of the FLASH Device.
 BaseAddress   = 0x80008000|gEmbeddedTokenSpaceGuid.PcdEmbeddedFdBaseAddress  #The base address of the FLASH Device.
 Size          = 0x00080000|gEmbeddedTokenSpaceGuid.PcdEmbeddedFdSize         #The size in bytes of the FLASH Device
 ErasePolarity = 1
@@ -172,7 +173,6 @@ READ_LOCK_STATUS   = TRUE
   # Gdb Stub
   #
   #INF ArmPkg/Drivers/DebugSupportDxe/DebugSupportDxe.inf
-  #INF ApplePkg/Universal/GdbStub/GdbStub.inf
 
 
 [FV.FVMAIN_COMPACT]
