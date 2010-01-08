@@ -72,7 +72,11 @@ TimerInterruptHandler (
 {
 	EFI_TPL							OriginalTPL;
 
-  // Mask all interrupts
+  //
+  // DXE core uses this callback for the EFI timer tick. The DXE core uses locks 
+  // that raise to TPL_HIGH and then restore back to current level. Thus we need
+  // to make sure TPL level is set to TPL_HIGH while we are handling the timer tick. 
+  //
 	OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
   MmioWrite32 (TIMER_CMD, 0);
