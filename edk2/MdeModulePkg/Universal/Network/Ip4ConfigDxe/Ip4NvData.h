@@ -1,7 +1,7 @@
 /** @file
   Routines used to operate the Ip4 configure variable.
 
-Copyright (c) 2009, Intel Corporation.<BR>
+Copyright (c) 2009 - 2010, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -23,6 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define FORMID_MAIN_FORM    1
 #define FORMID_DEVICE_FORM  2
 
+#define KEY_ENABLE                0x100
 #define KEY_DHCP_ENABLE           0x101
 #define KEY_LOCAL_IP              0x102
 #define KEY_SUBNET_MASK           0x103
@@ -40,7 +41,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ///
 typedef struct {
   UINT16          NicAddr[3];                        ///< NIC MAC address
-  UINT8           Reserved;                          ///< Reserved bits
+  UINT8           Configure;                         ///< NIC configure status
   UINT8           DhcpEnable;                        ///< Static or DHCP
   CHAR16          StationAddress[IP4_STR_MAX_SIZE];  ///< IP addresses
   CHAR16          SubnetMask[IP4_STR_MAX_SIZE];      ///< Subnet address

@@ -1,7 +1,7 @@
 /** @file
   Header file for IP4Config driver.
 
-Copyright (c) 2006 - 2009, Intel Corporation.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -79,7 +79,8 @@ typedef struct {
 #pragma pack()
 
 typedef struct _IP4CONFIG_CALLBACK_INFO {
-  BOOLEAN                          Enabled;
+  BOOLEAN                          Configured;
+  BOOLEAN                          DhcpEnabled;
   EFI_IPv4_ADDRESS                 LocalIp;
   EFI_IPv4_ADDRESS                 SubnetMask;
   EFI_IPv4_ADDRESS                 Gateway;
