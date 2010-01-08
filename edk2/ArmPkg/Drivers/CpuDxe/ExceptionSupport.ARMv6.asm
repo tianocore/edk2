@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------ 
 //
-// Copyright (c) 2008-2009 Apple Inc. All rights reserved.
+// Copyright (c) 2008-2010 Apple Inc. All rights reserved.
 //
 // All rights reserved. This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
@@ -16,8 +16,10 @@
 
 /*
 
-This is the stack constructed by the exception handler
-
+This is the stack constructed by the exception handler (low address to high address)
+                # R0 - IFAR is EFI_SYSTEM_CONTEXT for ARM
+  Reg   Offset
+  ===   ======              
   R0    0x00    # stmfd     SP!,{R0-R12}
   R1    0x04
   R2    0x08
@@ -43,7 +45,7 @@ This is the stack constructed by the exception handler
   LR    0x54    # SVC Link register (we need to restore it)
   
   LR    0x58    # pushed by srsfd    
-  CPSR  0x5c    # pushed by srsfd
+  CPSR  0x5c    
 
  */
  
@@ -57,6 +59,10 @@ This is the stack constructed by the exception handler
   PRESERVE8
   AREA  DxeExceptionHandlers, CODE, READONLY
   
+//
+// This code gets copied to the ARM vector table
+// ExceptionHandlersStart - ExceptionHandlersEnd gets copied
+//
 ExceptionHandlersStart
 
 Reset
@@ -85,101 +91,109 @@ Fiq
 
 ResetEntry
   srsfd     #0x13!                    ; Store return state on SVC stack
-  cpsid     if,#0x13                  ; Switch to SVC for common stack
+                                      ; We are already in SVC mode
   stmfd     SP!,{LR}                  ; Store the link register for the current mode
   sub       SP,SP,#0x20               ; Save space for SP, LR, PC, IFAR - CPSR
   stmfd     SP!,{R0-R12}              ; Store the register state
   
-  mov       R0,#0
+  mov       R0,#0                     ; ExceptionType
   ldr       R1,CommonExceptionEntry
   bx        R1
 
 UndefinedInstructionEntry
   srsfd     #0x13!                    ; Store return state on SVC stack
-  cpsid     i,#0x13                   ; Switch to SVC for common stack
+  cps       #0x13                     ; Switch to SVC for common stack
   stmfd     SP!,{LR}                  ; Store the link register for the current mode
   sub       SP,SP,#0x20               ; Save space for SP, LR, PC, IFAR - CPSR
   stmfd     SP!,{R0-R12}              ; Store the register state
 
-  mov       R0,#1
-  ldr       R1,CommonExceptionEntry
+  mov       R0,#1                     ; ExceptionType
+  ldr       R1,CommonExceptionEntry; 
   bx        R1
 
 SoftwareInterruptEntry
   srsfd     #0x13!                    ; Store return state on SVC stack
-  cpsid     i,#0x13                   ; Switch to SVC for common stack
+                                      ; We are already in SVC mode
   stmfd     SP!,{LR}                  ; Store the link register for the current mode
   sub       SP,SP,#0x20               ; Save space for SP, LR, PC, IFAR - CPSR
   stmfd     SP!,{R0-R12}              ; Store the register state
 
-  mov       R0,#2
+  mov       R0,#2                     ; ExceptionType
   ldr       R1,CommonExceptionEntry
   bx        R1
 
 PrefetchAbortEntry
   sub       LR,LR,#4
   srsfd     #0x13!                    ; Store return state on SVC stack
-  cpsid     i,#0x13                   ; Switch to SVC for common stack
+  cps       #0x13                     ; Switch to SVC for common stack
   stmfd     SP!,{LR}                  ; Store the link register for the current mode
   sub       SP,SP,#0x20               ; Save space for SP, LR, PC, IFAR - CPSR
   stmfd     SP!,{R0-R12}              ; Store the register state
 
-  mov       R0,#3
+  mov       R0,#3                     ; ExceptionType
   ldr       R1,CommonExceptionEntry
   bx        R1
 
 DataAbortEntry
   sub       LR,LR,#8
   srsfd     #0x13!                    ; Store return state on SVC stack
-  cpsid     i,#0x13                   ; Switch to SVC for common stack
+  cps       #0x13                     ; Switch to SVC for common stack
   stmfd     SP!,{LR}                  ; Store the link register for the current mode
   sub       SP,SP,#0x20               ; Save space for SP, LR, PC, IFAR - CPSR
   stmfd     SP!,{R0-R12}              ; Store the register state
 
-  mov       R0,#4
+  mov       R0,#4                     ; ExceptionType
   ldr       R1,CommonExceptionEntry
   bx        R1
 
 ReservedExceptionEntry
   srsfd     #0x13!                    ; Store return state on SVC stack
-  cpsid     if,#0x13                  ; Switch to SVC for common stack
+  cps       #0x13                     ; Switch to SVC for common stack
   stmfd     SP!,{LR}                  ; Store the link register for the current mode
   sub       SP,SP,#0x20               ; Save space for SP, LR, PC, IFAR - CPSR
   stmfd     SP!,{R0-R12}              ; Store the register state
 
-  mov       R0,#5
+  mov       R0,#5                     ; ExceptionType
   ldr       R1,CommonExceptionEntry
   bx        R1
 
 IrqEntry
   sub       LR,LR,#4
   srsfd     #0x13!                    ; Store return state on SVC stack
-  cpsid     i,#0x13                   ; Switch to SVC for common stack
+  cps       #0x13                     ; Switch to SVC for common stack
   stmfd     SP!,{LR}                  ; Store the link register for the current mode
   sub       SP,SP,#0x20               ; Save space for SP, LR, PC, IFAR - CPSR
   stmfd     SP!,{R0-R12}              ; Store the register state
 
-  mov       R0,#6
+  mov       R0,#6                     ; ExceptionType
   ldr       R1,CommonExceptionEntry
   bx        R1
 
 FiqEntry
   sub       LR,LR,#4
   srsfd     #0x13!                    ; Store return state on SVC stack
-  cpsid     if,#0x13                  ; Switch to SVC for common stack
+  cps       #0x13                     ; Switch to SVC for common stack
   stmfd     SP!,{LR}                  ; Store the link register for the current mode
   sub       SP,SP,#0x20               ; Save space for SP, LR, PC, IFAR - CPSR
   stmfd     SP!,{R0-R12}              ; Store the register state
-
-  mov       R0,#7
+                                      ; Since we have already switch to SVC R8_fiq - R12_fiq
+                                      ; never get used or saved
+  mov       R0,#7                     ; ExceptionType
   ldr       R1,CommonExceptionEntry
   bx        R1
 
+//
+// This gets patched by the C code that patches in the vector table
+//
 CommonExceptionEntry
   dcd       0x12345678
 
 ExceptionHandlersEnd
 
+//
+// This code runs from CpuDxe driver loaded address. It is patched into 
+// CommonExceptionEntry.
+//
 AsmCommonExceptionEntry
   mrc       p15, 0, R1, c6, c0, 2   ; Read IFAR
   str       R1, [SP, #0x50]         ; Store it in EFI_SYSTEM_CONTEXT_ARM.IFAR 
@@ -196,25 +210,50 @@ AsmCommonExceptionEntry
   ldr       R1, [SP, #0x5c]         ; srsfd saved pre-exception CPSR on the stack 
   str       R1, [SP, #0x40]         ; Store it in EFI_SYSTEM_CONTEXT_ARM.CPSR
 
+  add       R2, SP, #0x38           ; Make R2 point to EFI_SYSTEM_CONTEXT_ARM.LR
+  and       R1, R1, #0x1f           ; Check CPSR to see if User or System Mode
+  cmp       R1, #0x1f               ; if ((CPSR == 0x10) || (CPSR == 0x1df))
+  cmpne     R1, #0x10               ;   
+  stmeqed   R2, {lr}^               ;   save unbanked lr
+                                    ; else 
+  stmneed   R2, {lr}                ;   save SVC lr
+
   ldr       R1, [SP, #0x58]         ; PC is the LR pushed by srsfd 
   str       R1, [SP, #0x3c]         ; Store it in EFI_SYSTEM_CONTEXT_ARM.PC
-  str       R1, [SP, #0x38]         ; Store it in EFI_SYSTEM_CONTEXT_ARM.LR
   
   sub       R1, SP, #0x60           ; We pused 0x60 bytes on the stack 
   str       R1, [SP, #0x34]         ; Store it in EFI_SYSTEM_CONTEXT_ARM.SP
   
-                                    ; R0 is exception type 
-  mov       R1,SP                   ; Prepare System Context pointer as an argument for the exception handler
+                                    ; R0 is ExceptionType 
+  mov       R1,SP                   ; R1 is SystemContext 
+
+/* 
+VOID
+EFIAPI
+CommonCExceptionHandler (
+  IN     EFI_EXCEPTION_TYPE           ExceptionType,   R0
+  IN OUT EFI_SYSTEM_CONTEXT           SystemContext    R1
+  )
+*/
   blx       CommonCExceptionHandler ; Call exception handler
   
-  ldr       R2,[SP,#0x40]           ; EFI_SYSTEM_CONTEXT_ARM.CPSR
-  str       R2,[SP,#0x5c]           ; Store it back to srsfd stack slot so it can be restored 
+  ldr       R1,[SP,#0x3c]           ; EFI_SYSTEM_CONTEXT_ARM.PC
+  str       R1,[SP,#0x58]           ; Store it back to srsfd stack slot so it can be restored 
 
-  ldr       R2,[SP,#0x3c]           ; EFI_SYSTEM_CONTEXT_ARM.PC
-  str       R2,[SP,#0x58]           ; Store it back to srsfd stack slot so it can be restored 
-
+  ldr       R1,[SP,#0x40]           ; EFI_SYSTEM_CONTEXT_ARM.CPSR
+  str       R1,[SP,#0x5c]           ; Store it back to srsfd stack slot so it can be restored 
+  
+  add       R3, SP, #0x54           ; Make R3 point to SVC LR saved on entry
+  add       R2, SP, #0x38           ; Make R2 point to EFI_SYSTEM_CONTEXT_ARM.LR
+  and       R1, R1, #0x1f           ; Check to see if User or System Mode
+  cmp       R1, #0x1f               ; if ((CPSR == 0x10) || (CPSR == 0x1df))
+  cmpne     R1, #0x10               ;   
+  ldmeqed   R2, {lr}^               ;   restore unbanked lr
+                                    ; else
+  ldmneed   R3, {lr}                ;   restore SVC lr, via ldmfd SP!, {LR}
+  
   ldmfd     SP!,{R0-R12}            ; Restore general purpose registers
-                                    ; Exception handler can not change SP or LR as we would blow chunks
+                                    ; Exception handler can not change SP
                                     
   add       SP,SP,#0x20             ; Clear out the remaining stack space
   ldmfd     SP!,{LR}                ; restore the link register for this context

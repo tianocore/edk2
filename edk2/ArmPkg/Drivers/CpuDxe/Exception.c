@@ -15,6 +15,8 @@
 #include "CpuDxe.h" 
 #include <Library/CacheMaintenanceLib.h>
 
+extern BOOLEAN gExceptionContext;
+
 VOID
 ExceptionHandlersStart (
   VOID
@@ -120,7 +122,16 @@ RegisterDebuggerInterruptHandler (
   return EFI_SUCCESS;
 }
 
-
+CHAR8 *gExceptionTypeString[] = {
+  "Reset",
+  "Undefined Instruction",
+  "SWI",
+  "Prefetch Abort",
+  "Data Abort",
+  "Undefined",
+  "IRQ",
+  "FIQ"
+};
 
 VOID
 EFIAPI
@@ -130,6 +141,8 @@ CommonCExceptionHandler (
   )
 {
   BOOLEAN Dispatched = FALSE;
+ 
+  gExceptionContext = TRUE; 
   
   if (ExceptionType <= MAX_ARM_EXCEPTION) {
     if (gDebuggerExceptionHandlers[ExceptionType]) {
@@ -144,7 +157,12 @@ CommonCExceptionHandler (
       gExceptionHandlers[ExceptionType] (ExceptionType, SystemContext);
       Dispatched = TRUE;
     }
+  } else {
+    DEBUG ((EFI_D_ERROR, "Unknown exception type %d from %08x\n", ExceptionType, SystemContext.SystemContextArm->PC));
+    ASSERT (FALSE);
   }
+
+  gExceptionContext = FALSE; 
 
   if (Dispatched) {
     //
@@ -163,7 +181,7 @@ CommonCExceptionHandler (
   //
   // Code after here is the default exception handler...
   //
-  DEBUG ((EFI_D_ERROR, "Exception %d from %08x\n", ExceptionType, SystemContext.SystemContextArm->PC));
+  DEBUG ((EFI_D_ERROR, "%a Exception from %08x\n", gExceptionTypeString[ExceptionType], SystemContext.SystemContextArm->PC));
   ASSERT (FALSE);
 
 }
@@ -200,7 +218,7 @@ InitializeExceptions (
   }
   
   //
-  // Copy an implementation of the ARM exception vectors to 0x0.
+  // Copy an implementation of the ARM exception vectors to PcdCpuVectorBaseAddress.
   //
   Length = (UINTN)ExceptionHandlersEnd - (UINTN)ExceptionHandlersStart;
 
@@ -213,7 +231,7 @@ InitializeExceptions (
   // on embedded systems, for example, we don't want to hang up.  So we'll check here for a status of 
   // EFI_NOT_FOUND, and continue in that case.
   if (EFI_ERROR(Status) && (Status != EFI_NOT_FOUND)) {
-  ASSERT_EFI_ERROR (Status);
+    ASSERT_EFI_ERROR (Status);
   }
 
   CopyMem ((VOID *)(UINTN)PcdGet32 (PcdCpuVectorBaseAddress), (VOID *)ExceptionHandlersStart, Length);
@@ -225,7 +243,7 @@ InitializeExceptions (
   *(UINTN *) ((UINT8 *)(UINTN)PcdGet32 (PcdCpuVectorBaseAddress) + Offset) = (UINTN)AsmCommonExceptionEntry;
 
   // Flush Caches since we updated executable stuff
-  InvalidateInstructionCacheRange((VOID *)PcdGet32(PcdCpuVectorBaseAddress), Length);
+  InvalidateInstructionCacheRange ((VOID *)PcdGet32(PcdCpuVectorBaseAddress), Length);
 
   if (Enabled) {
     // 

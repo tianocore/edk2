@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------ 
 #
-# Copyright (c) 2008-2009 Apple Inc. All rights reserved.
+# Copyright (c) 2008-2010 Apple Inc. All rights reserved.
 #
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -48,54 +48,92 @@ ASM_PFX(Fiq):
   b ASM_PFX(FiqEntry)
 
 ASM_PFX(ResetEntry):
-  stmfd     sp!,{r0-r1}
-  mov       r0,#0
-  ldr       r1,ASM_PFX(CommonExceptionEntry)
-  bx        r1
+  srsdb     #0x13!                    @ Store return state on SVC stack
+  stmfd     SP!,{LR}                  @ Store the link register for the current mode
+  sub       SP,SP,#0x20               @ Save space for SP, LR, PC, IFAR - CPSR
+  stmfd     SP!,{R0-R12}              @ Store the register state
+  
+  mov       R0,#0
+  ldr       R1,ASM_PFX(CommonExceptionEntry)
+  bx        R1
 
 ASM_PFX(UndefinedInstructionEntry):
-  stmfd     sp!,{r0-r1}
+  srsdb     #0x13!                    @ Store return state on SVC stack
+  cps       #0x13                     @ Switch to SVC for common stack
+  stmfd     SP!,{LR}                  @ Store the link register for the current mode
+  sub       SP,SP,#0x20               @ Save space for SP, LR, PC, IFAR - CPSR
+  stmfd     SP!,{R0-R12}              @ Store the register state
+
   mov       r0,#1
   ldr       r1,ASM_PFX(CommonExceptionEntry)
   bx        r1
 
 ASM_PFX(SoftwareInterruptEntry):
-  stmfd     sp!,{r0-r1}
+  srsdb     #0x13!                    @ Store return state on SVC stack
+  stmfd     SP!,{LR}                  @ Store the link register for the current mode
+  sub       SP,SP,#0x20               @ Save space for SP, LR, PC, IFAR - CPSR
+  stmfd     SP!,{R0-R12}              @ Store the register state
+
   mov       r0,#2
   ldr       r1,ASM_PFX(CommonExceptionEntry)
   bx        r1
 
 ASM_PFX(PrefetchAbortEntry):
-  stmfd     sp!,{r0-r1}
+  sub       LR,LR,#4
+  srsdb     #0x13!                    @ Store return state on SVC stack
+  cps       #0x13                     @ Switch to SVC for common stack
+  stmfd     SP!,{LR}                  @ Store the link register for the current mode
+  sub       SP,SP,#0x20               @ Save space for SP, LR, PC, IFAR - CPSR
+  stmfd     SP!,{R0-R12}              @ Store the register state
+
   mov       r0,#3
-  sub       lr,lr,#4
   ldr       r1,ASM_PFX(CommonExceptionEntry)
   bx        r1
 
 ASM_PFX(DataAbortEntry):
-  stmfd     sp!,{r0-r1}
+  sub       LR,LR,#8
+  srsdb     #0x13!                    @ Store return state on SVC stack
+  cps       #0x13                     @ Switch to SVC for common stack
+  stmfd     SP!,{LR}                  @ Store the link register for the current mode
+  sub       SP,SP,#0x20               @ Save space for SP, LR, PC, IFAR - CPSR
+  stmfd     SP!,{R0-R12}              @ Store the register state
+
   mov       r0,#4
-  sub       lr,lr,#8
   ldr       r1,ASM_PFX(CommonExceptionEntry)
   bx        r1
 
 ASM_PFX(ReservedExceptionEntry):
-  stmfd     sp!,{r0-r1}
+  srsdb     #0x13!                    @ Store return state on SVC stack
+  cps       #0x13                     @ Switch to SVC for common stack
+  stmfd     SP!,{LR}                  @ Store the link register for the current mode
+  sub       SP,SP,#0x20               @ Save space for SP, LR, PC, IFAR - CPSR
+  stmfd     SP!,{R0-R12}              @ Store the register state
+
   mov       r0,#5
   ldr       r1,ASM_PFX(CommonExceptionEntry)
   bx        r1
 
 ASM_PFX(IrqEntry):
-  stmfd     sp!,{r0-r1}
+  sub       LR,LR,#4
+  srsdb     #0x13!                    @ Store return state on SVC stack
+  cps       #0x13                     @ Switch to SVC for common stack
+  stmfd     SP!,{LR}                  @ Store the link register for the current mode
+  sub       SP,SP,#0x20               @ Save space for SP, LR, PC, IFAR - CPSR
+  stmfd     SP!,{R0-R12}              @ Store the register state
+
   mov       r0,#6
-  sub       lr,lr,#4
   ldr       r1,ASM_PFX(CommonExceptionEntry)
   bx        r1
 
 ASM_PFX(FiqEntry):
-  stmfd     sp!,{r0-r1}
+  sub       LR,LR,#4
+  srsdb     #0x13!                    @ Store return state on SVC stack
+  cps       #0x13                     @ Switch to SVC for common stack
+  stmfd     SP!,{LR}                  @ Store the link register for the current mode
+  sub       SP,SP,#0x20               @ Save space for SP, LR, PC, IFAR - CPSR
+  stmfd     SP!,{R0-R12}              @ Store the register state
+
   mov       r0,#7
-  sub       lr,lr,#4
   ldr       r1,ASM_PFX(CommonExceptionEntry)
   bx        r1
 
@@ -108,45 +146,46 @@ ASM_PFX(CommonExceptionEntry):
 ASM_PFX(ExceptionHandlersEnd):
 
 ASM_PFX(AsmCommonExceptionEntry):
-  mrc       p15, 0, r1, c6, c0, 2   @ Read IFAR
-  stmfd     sp!,{r1}                @ Store the IFAR
+  mrc       p15, 0, R1, c6, c0, 2   @ Read IFAR
+  str       R1, [SP, #0x50]         @ Store it in EFI_SYSTEM_CONTEXT_ARM.IFAR 
   
-  mrc       p15, 0, r1, c5, c0, 1   @ Read IFSR
-  stmfd     sp!,{r1}                @ Store the IFSR
+  mrc       p15, 0, R1, c5, c0, 1   @ Read IFSR
+  str       R1, [SP, #0x4c]         @ Store it in EFI_SYSTEM_CONTEXT_ARM.IFSR
   
-  mrc       p15, 0, r1, c6, c0, 0   @ Read DFAR
-  stmfd     sp!,{r1}                @ Store the DFAR
+  mrc       p15, 0, R1, c6, c0, 0   @ Read DFAR
+  str       R1, [SP, #0x48]         @ Store it in EFI_SYSTEM_CONTEXT_ARM.DFAR
   
-  mrc       p15, 0, r1, c5, c0, 0   @ Read DFSR
-  stmfd     sp!,{r1}                @ Store the DFSR
+  mrc       p15, 0, R1, c5, c0, 0   @ Read DFSR
+  str       R1, [SP, #0x44]         @ Store it in EFI_SYSTEM_CONTEXT_ARM.DFSR
   
-  mrs       r1,spsr                 @ Read SPSR (which is the pre-exception CPSR)
-  stmfd     sp!,{r1}                @ Store the SPSR
-  
-  stmfd     sp!,{lr}                @ Store the link register (which is the pre-exception PC)
-  stmfd     sp,{sp,lr}^             @ Store user/system mode stack pointer and link register
-  nop                               @ Required by ARM architecture
-  sub       sp,sp,#0x08             @ Adjust stack pointer
-  stmfd     sp!,{r2-r12}            @ Store general purpose registers
-  
-  ldr       r3,[sp,#0x50]           @ Read saved R1 from the stack (it was saved by the exception entry routine)
-  ldr       r2,[sp,#0x4C]           @ Read saved R0 from the stack (it was saved by the exception entry routine)
-  stmfd     sp!,{r2-r3}	            @ Store general purpose registers R0 and R1
-  
-  mov       r1,sp                   @ Prepare System Context pointer as an argument for the exception handler
-  
-  sub       sp,sp,#4                @ Adjust SP to preserve 8-byte alignment
-  bl        ASM_PFX(CommonCExceptionHandler) @ Call exception handler
-  add       sp,sp,#4                @ Adjust SP back to where we were
-  
-  ldr       r2,[sp,#0x40]           @ Load CPSR from context, in case it has changed
-  msr       SPSR_cxsf,r2            @ Store it back to the SPSR to be restored when exiting this handler
+  ldr       R1, [SP, #0x5c]         @ srsdb saved pre-exception CPSR on the stack 
+  str       R1, [SP, #0x40]         @ Store it in EFI_SYSTEM_CONTEXT_ARM.CPSR
+  and       r1, r1, #0x1f           @ Check to see if User or System Mode
+  cmp       r1, #0x1f
+  cmpne     r1, #0x10
+  add       R2, SP, #0x38           @ Store it in EFI_SYSTEM_CONTEXT_ARM.LR
+  ldmneed   r2, {lr}^               @ User or System mode, use unbanked register
+  ldmneed   r2, {lr}                @ All other modes used banked register
 
-  ldmfd     sp!,{r0-r12}            @ Restore general purpose registers
-  ldmia     sp,{sp,lr}^             @ Restore user/system mode stack pointer and link register
-  nop                               @ Required by ARM architecture
-  add       sp,sp,#0x08             @ Adjust stack pointer
-  ldmfd     sp!,{lr}                @ Restore the link register (which is the pre-exception PC)
-  add       sp,sp,#0x1C             @ Clear out the remaining stack space
-  movs      pc,lr                   @ Return from exception
+  ldr       R1, [SP, #0x58]         @ PC is the LR pushed by srsdb 
+  str       R1, [SP, #0x3c]         @ Store it in EFI_SYSTEM_CONTEXT_ARM.PC
   
+  sub       R1, SP, #0x60           @ We pused 0x60 bytes on the stack 
+  str       R1, [SP, #0x34]         @ Store it in EFI_SYSTEM_CONTEXT_ARM.SP
+  
+                                              @ R0 is exception type 
+  mov       R1,SP                             @ Prepare System Context pointer as an argument for the exception handler
+  blx       ASM_PFX(CommonCExceptionHandler)  @ Call exception handler
+  
+  ldr       R2,[SP,#0x40]           @ EFI_SYSTEM_CONTEXT_ARM.CPSR
+  str       R2,[SP,#0x5c]           @ Store it back to srsdb stack slot so it can be restored 
+
+  ldr       R2,[SP,#0x3c]           @ EFI_SYSTEM_CONTEXT_ARM.PC
+  str       R2,[SP,#0x58]           @ Store it back to srsdb stack slot so it can be restored 
+
+  ldmfd     SP!,{R0-R12}            @ Restore general purpose registers
+                                    @ Exception handler can not change SP or LR as we would blow chunks
+                                    
+  add       SP,SP,#0x20             @ Clear out the remaining stack space
+  ldmfd     SP!,{LR}                @ restore the link register for this context
+  rfefd     SP!                     @ return from exception via srsdb stack slot

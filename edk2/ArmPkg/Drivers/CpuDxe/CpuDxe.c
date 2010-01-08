@@ -14,6 +14,9 @@
 
 #include "CpuDxe.h"
 
+BOOLEAN gExceptionContext = FALSE;
+BOOLEAN mInterruptState   = FALSE;
+
 EFI_STATUS
 EFIAPI
 CpuFlushCpuDataCache (
@@ -25,13 +28,13 @@ CpuFlushCpuDataCache (
 {
   switch (FlushType) {
     case EfiCpuFlushTypeWriteBack:
-      WriteBackDataCacheRange((VOID *)(UINTN)Start, (UINTN)Length);
+      WriteBackDataCacheRange ((VOID *)(UINTN)Start, (UINTN)Length);
       break;
     case EfiCpuFlushTypeInvalidate:
-      InvalidateDataCacheRange((VOID *)(UINTN)Start, (UINTN)Length);
+      InvalidateDataCacheRange ((VOID *)(UINTN)Start, (UINTN)Length);
       break;
     case EfiCpuFlushTypeWriteBackInvalidate:
-      WriteBackInvalidateDataCacheRange((VOID *)(UINTN)Start, (UINTN)Length);
+      WriteBackInvalidateDataCacheRange ((VOID *)(UINTN)Start, (UINTN)Length);
       break;
     default:
       return EFI_INVALID_PARAMETER;
@@ -46,9 +49,11 @@ CpuEnableInterrupt (
   IN EFI_CPU_ARCH_PROTOCOL          *This
   )
 {
-  if (ArmProcessorMode() != ARM_PROCESSOR_MODE_IRQ) {
-    ArmEnableInterrupts(); 
+  if (!gExceptionContext) {
+    ArmEnableInterrupts ();
   }
+
+  mInterruptState  = TRUE;
   return EFI_SUCCESS;
 }
 
@@ -59,9 +64,11 @@ CpuDisableInterrupt (
   IN EFI_CPU_ARCH_PROTOCOL          *This
   )
 {
-  if (ArmProcessorMode() != ARM_PROCESSOR_MODE_IRQ) {
-    ArmDisableInterrupts();
+  if (!gExceptionContext) {
+    ArmDisableInterrupts ();
   }
+
+  mInterruptState = FALSE;
   return EFI_SUCCESS;
 }
 
@@ -76,7 +83,7 @@ CpuGetInterruptState (
     return EFI_INVALID_PARAMETER;
   }
 
-  *State = ArmGetInterruptState();
+  *State = mInterruptState;
   return EFI_SUCCESS;
 }
 
@@ -98,7 +105,7 @@ CpuRegisterInterruptHandler (
   IN EFI_CPU_INTERRUPT_HANDLER      InterruptHandler
   )
 {
-  return RegisterInterruptHandler(InterruptType, InterruptHandler);
+  return RegisterInterruptHandler (InterruptType, InterruptHandler);
 }
 
 EFI_STATUS
@@ -147,8 +154,8 @@ CpuDxeInitialize (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
-{
-  InitializeExceptions(&mCpu);  
-  return gBS->InstallMultipleProtocolInterfaces(&mCpuHandle, &gEfiCpuArchProtocolGuid, &mCpu, NULL);
+{ 
+  InitializeExceptions (&mCpu);  
+  return gBS->InstallMultipleProtocolInterfaces (&mCpuHandle, &gEfiCpuArchProtocolGuid, &mCpu, NULL);
 }
 
