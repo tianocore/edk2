@@ -15,8 +15,6 @@
 #include "CpuDxe.h" 
 #include <Library/CacheMaintenanceLib.h>
 
-extern BOOLEAN gExceptionContext;
-
 VOID
 ExceptionHandlersStart (
   VOID
@@ -142,8 +140,7 @@ CommonCExceptionHandler (
 {
   BOOLEAN Dispatched = FALSE;
  
-  gExceptionContext = TRUE; 
-  
+ 
   if (ExceptionType <= MAX_ARM_EXCEPTION) {
     if (gDebuggerExceptionHandlers[ExceptionType]) {
       //
@@ -161,8 +158,6 @@ CommonCExceptionHandler (
     DEBUG ((EFI_D_ERROR, "Unknown exception type %d from %08x\n", ExceptionType, SystemContext.SystemContextArm->PC));
     ASSERT (FALSE);
   }
-
-  gExceptionContext = FALSE; 
 
   if (Dispatched) {
     //

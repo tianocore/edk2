@@ -234,12 +234,16 @@ IrqInterruptHandler (
   
   Vector = MmioRead32(INTCPS_SIR_IRQ) & INTCPS_SIR_IRQ_MASK;
 
+  // Needed to prevent infinite nesting if Time Driver lowers TPL
+  MmioWrite32(INTCPS_CONTROL, INTCPS_CONTROL_NEWIRQAGR);
+
   InterruptHandler = gRegisteredInterruptHandlers[Vector];
   if (InterruptHandler != NULL) {
     // Call the registered interrupt handler.
     InterruptHandler(Vector, SystemContext);
   }
   
+  // Needed to clear after running the handler
   MmioWrite32(INTCPS_CONTROL, INTCPS_CONTROL_NEWIRQAGR);
 }
 

@@ -14,7 +14,6 @@
 
 #include "CpuDxe.h"
 
-BOOLEAN gExceptionContext = FALSE;
 BOOLEAN mInterruptState   = FALSE;
 
 EFI_STATUS
@@ -49,9 +48,7 @@ CpuEnableInterrupt (
   IN EFI_CPU_ARCH_PROTOCOL          *This
   )
 {
-  if (!gExceptionContext) {
-    ArmEnableInterrupts ();
-  }
+  ArmEnableInterrupts ();
 
   mInterruptState  = TRUE;
   return EFI_SUCCESS;
@@ -64,9 +61,7 @@ CpuDisableInterrupt (
   IN EFI_CPU_ARCH_PROTOCOL          *This
   )
 {
-  if (!gExceptionContext) {
-    ArmDisableInterrupts ();
-  }
+  ArmDisableInterrupts ();
 
   mInterruptState = FALSE;
   return EFI_SUCCESS;
