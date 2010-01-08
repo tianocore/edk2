@@ -82,7 +82,7 @@ InitCache (
   MemoryTable[4].Length       = 0;
   MemoryTable[4].Attributes   = (ARM_MEMORY_REGION_ATTRIBUTES)0;
   
-  ArmConfigureMmu(MemoryTable, &TranslationTableBase, &TranslationTableSize);
+  ArmConfigureMmu (MemoryTable, &TranslationTableBase, &TranslationTableSize);
   
   BuildMemoryAllocationHob((EFI_PHYSICAL_ADDRESS)(UINTN)TranslationTableBase, TranslationTableSize, EfiBootServicesData);
 }

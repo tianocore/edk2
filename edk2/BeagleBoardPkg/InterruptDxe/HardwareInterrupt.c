@@ -93,7 +93,6 @@ RegisterInterruptSource (
   }
 
   gRegisteredInterruptHandlers[Source] = Handler;
-
   return This->EnableInterruptSource(This, Source);
 }
 
