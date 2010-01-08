@@ -1,11 +1,11 @@
 /** @file
   Implementation of driver entry point and driver binding protocol.
- 
-Copyright (c) 2004 - 2009, Intel Corporation. <BR> 
-All rights reserved. This program and the accompanying materials are licensed 
-and made available under the terms and conditions of the BSD License which 
-accompanies this distribution. The full text of the license may be found at 
-http://opensource.org/licenses/bsd-license.php 
+
+Copyright (c) 2004 - 2010, Intel Corporation. <BR>
+All rights reserved. This program and the accompanying materials are licensed
+and made available under the terms and conditions of the BSD License which
+accompanies this distribution. The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -49,13 +49,13 @@ SnpNotifyExitBootServices (
 
 /**
   Send command to UNDI. It does nothing currently.
-  
+
   @param Cdb   command to be sent to UNDI.
-   
-  @retval EFI_INVALID_PARAMETER  The command is 0. 
-  @retval EFI_UNSUPPORTED        Default return status because it's not 
+
+  @retval EFI_INVALID_PARAMETER  The command is 0.
+  @retval EFI_UNSUPPORTED        Default return status because it's not
                                  supported currently.
-   
+
 **/
 EFI_STATUS
 IssueHwUndiCommand (
@@ -81,7 +81,7 @@ IssueHwUndiCommand (
   @param  Buffer               Pointer to buffer.
   @param  Length               Length of buffer in bytes.
 
-  @return 8-bit checksum of all bytes in buffer, or zero if ptr is NULL or len 
+  @return 8-bit checksum of all bytes in buffer, or zero if ptr is NULL or len
           is zero.
 
 **/
@@ -178,7 +178,7 @@ SimpleNetworkDriverSupported (
   //
   // Check to see if !PXE structure is valid. Paragraph alignment of !PXE structure is required.
   //
-  if (NiiProtocol->Id & 0x0F) {
+  if ((NiiProtocol->Id & 0x0F) != 0) {
     DEBUG ((EFI_D_NET, "\n!PXE structure is not paragraph aligned.\n"));
     Status = EFI_UNSUPPORTED;
     goto Done;
@@ -615,7 +615,7 @@ SimpleNetworkDriverStart (
 
   }
 
-  if (Pxe->hw.Implementation & PXE_ROMID_IMP_PROMISCUOUS_MULTICAST_RX_SUPPORTED) {
+  if ((Pxe->hw.Implementation & PXE_ROMID_IMP_PROMISCUOUS_MULTICAST_RX_SUPPORTED) != 0) {
     Snp->Mode.ReceiveFilterMask |= EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS_MULTICAST;
 
   }
@@ -725,7 +725,7 @@ NiiError:
   restrictions for this service. DisconnectController()
   must follow these calling restrictions. If any other agent wishes
   to call Stop() it must also follow these calling restrictions.
-  
+
   @param  This              Protocol instance pointer.
   @param  ControllerHandle  Handle of device to stop driver on
   @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of

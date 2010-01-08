@@ -1,11 +1,11 @@
 /** @file
     Implementation of collecting the statistics on a network interface.
- 
-Copyright (c) 2004 - 2007, Intel Corporation. <BR> 
-All rights reserved. This program and the accompanying materials are licensed 
-and made available under the terms and conditions of the BSD License which 
-accompanies this distribution. The full text of the license may be found at 
-http://opensource.org/licenses/bsd-license.php 
+
+Copyright (c) 2004 - 2010, Intel Corporation. <BR>
+All rights reserved. This program and the accompanying materials are licensed
+and made available under the terms and conditions of the BSD License which
+accompanies this distribution. The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -18,15 +18,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   Resets or collects the statistics on a network interface.
-  
+
   This function resets or collects the statistics on a network interface. If the
   size of the statistics table specified by StatisticsSize is not big enough for
   all the statistics that are collected by the network interface, then a partial
-  buffer of statistics is returned in StatisticsTable, StatisticsSize is set to 
-  the size required to collect all the available statistics, and 
+  buffer of statistics is returned in StatisticsTable, StatisticsSize is set to
+  the size required to collect all the available statistics, and
   EFI_BUFFER_TOO_SMALL is returned.
-  If StatisticsSize is big enough for all the statistics, then StatisticsTable 
-  will be filled, StatisticsSize will be set to the size of the returned 
+  If StatisticsSize is big enough for all the statistics, then StatisticsTable
+  will be filled, StatisticsSize will be set to the size of the returned
   StatisticsTable structure, and EFI_SUCCESS is returned.
   If the driver has not been initialized, EFI_DEVICE_ERROR will be returned.
   If Reset is FALSE, and both StatisticsSize and StatisticsTable are NULL, then
@@ -36,30 +36,30 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @param This            A pointer to the EFI_SIMPLE_NETWORK_PROTOCOL instance.
   @param Reset           Set to TRUE to reset the statistics for the network interface.
-  @param StatisticsSize  On input the size, in bytes, of StatisticsTable. On output 
+  @param StatisticsSize  On input the size, in bytes, of StatisticsTable. On output
                          the size, in bytes, of the resulting table of statistics.
-  @param StatisticsTable A pointer to the EFI_NETWORK_STATISTICS structure that 
-                         contains the statistics. Type EFI_NETWORK_STATISTICS is 
-                         defined in "Related Definitions" below. 
-  
+  @param StatisticsTable A pointer to the EFI_NETWORK_STATISTICS structure that
+                         contains the statistics. Type EFI_NETWORK_STATISTICS is
+                         defined in "Related Definitions" below.
+
   @retval EFI_SUCCESS           The requested operation succeeded.
   @retval EFI_NOT_STARTED       The Simple Network Protocol interface has not been
                                 started by calling Start().
-  @retval EFI_BUFFER_TOO_SMALL  StatisticsSize is not NULL and StatisticsTable is 
-                                NULL. The current buffer size that is needed to 
+  @retval EFI_BUFFER_TOO_SMALL  StatisticsSize is not NULL and StatisticsTable is
+                                NULL. The current buffer size that is needed to
                                 hold all the statistics is returned in StatisticsSize.
-  @retval EFI_BUFFER_TOO_SMALL  StatisticsSize is not NULL and StatisticsTable is 
+  @retval EFI_BUFFER_TOO_SMALL  StatisticsSize is not NULL and StatisticsTable is
                                 not NULL. The current buffer size that is needed
-                                to hold all the statistics is returned in 
-                                StatisticsSize. A partial set of statistics is 
+                                to hold all the statistics is returned in
+                                StatisticsSize. A partial set of statistics is
                                 returned in StatisticsTable.
-  @retval EFI_INVALID_PARAMETER StatisticsSize is NULL and StatisticsTable is not 
+  @retval EFI_INVALID_PARAMETER StatisticsSize is NULL and StatisticsTable is not
                                 NULL.
-  @retval EFI_DEVICE_ERROR      The Simple Network Protocol interface has not 
+  @retval EFI_DEVICE_ERROR      The Simple Network Protocol interface has not
                                 been initialized by calling Initialize().
-  @retval EFI_DEVICE_ERROR      An error was encountered collecting statistics 
+  @retval EFI_DEVICE_ERROR      An error was encountered collecting statistics
                                 from the NIC.
-  @retval EFI_UNSUPPORTED       The NIC does not support collecting statistics 
+  @retval EFI_UNSUPPORTED       The NIC does not support collecting statistics
                                 from the network interface.
 
 **/
@@ -197,7 +197,7 @@ SnpUndi32Statistics (
       break;
     }
 
-    if (Db->Supported & Mask) {
+    if ((Db->Supported & Mask) != 0) {
       *Stp  = Db->Data[Index];
       Size  = Index + 1;
     } else {
@@ -208,7 +208,7 @@ SnpUndi32Statistics (
   // Compute size up to last supported statistic.
   //
   while (++Index < 64) {
-    if (Db->Supported & (Mask = LShiftU64 (Mask, 1))) {
+    if ((Db->Supported & (Mask = LShiftU64 (Mask, 1))) != 0) {
       Size = Index;
     }
   }

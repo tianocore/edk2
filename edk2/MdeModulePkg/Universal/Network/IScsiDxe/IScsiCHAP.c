@@ -1,7 +1,7 @@
 /** @file
   This file is for Challenge-Handshake Authentication Protocol (CHAP) Configuration.
- 
-Copyright (c) 2004 - 2009, Intel Corporation.<BR>
+
+Copyright (c) 2004 - 2010, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -18,19 +18,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 EFI_GUID  mIScsiCHAPAuthInfoGuid = ISCSI_CHAP_AUTH_INFO_GUID;
 
 /**
-  Initator caculates its own expected hash value. 
-  
-  @param[in]   ChapIdentifier     iSCSI CHAP identifier sent by authenticator.  
-  @param[in]   ChapSecret         iSCSI CHAP secret of the authenticator.   
+  Initator caculates its own expected hash value.
+
+  @param[in]   ChapIdentifier     iSCSI CHAP identifier sent by authenticator.
+  @param[in]   ChapSecret         iSCSI CHAP secret of the authenticator.
   @param[in]   SecretLength       The length of iSCSI CHAP secret.
-  @param[in]   ChapChallenge      The challenge message sent by authenticator.  
+  @param[in]   ChapChallenge      The challenge message sent by authenticator.
   @param[in]   ChallengeLength    The length of iSCSI CHAP challenge message.
   @param[out]  ChapResponse       The calculation of the expected hash value.
-  
+
   @retval EFI_SUCCESS             The expected hash value was caculatedly successfully.
-  @retval EFI_PROTOCOL_ERROR      The length of the secret should be at least the 
+  @retval EFI_PROTOCOL_ERROR      The length of the secret should be at least the
                                   length of the hash value for the hashing algorithm chosen.
-  @retval Others                  Other errors as indicated.                                
+  @retval Others                  Other errors as indicated.
 **/
 EFI_STATUS
 IScsiCHAPCalculateResponse (
@@ -75,10 +75,10 @@ IScsiCHAPCalculateResponse (
 
 /**
   The initator checks the CHAP response replied by target against its own
-  calculation of the expected hash value. 
-  
-  @param[in]   AuthData             iSCSI CHAP authentication data. 
-  @param[in]   TargetResponse       The response from target.    
+  calculation of the expected hash value.
+
+  @param[in]   AuthData             iSCSI CHAP authentication data.
+  @param[in]   TargetResponse       The response from target.
 
   @retval EFI_SUCCESS               The response from target passed authentication.
   @retval EFI_SECURITY_VIOLATION    The response from target was not expected value.
@@ -106,7 +106,7 @@ IScsiCHAPAuthTarget (
             VerifyRsp
             );
 
-  if (CompareMem (VerifyRsp, TargetResponse, ISCSI_CHAP_RSP_LEN)) {
+  if (CompareMem (VerifyRsp, TargetResponse, ISCSI_CHAP_RSP_LEN) != 0) {
     Status = EFI_SECURITY_VIOLATION;
   }
 
@@ -116,7 +116,7 @@ IScsiCHAPAuthTarget (
 /**
   This function checks the received iSCSI Login Response during the security
   negotiation stage.
-  
+
   @param[in] Conn             The iSCSI connection.
 
   @retval EFI_SUCCESS          The Login Response passed the CHAP validation.

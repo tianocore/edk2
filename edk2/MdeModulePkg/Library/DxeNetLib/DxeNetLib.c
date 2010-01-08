@@ -1,7 +1,7 @@
 /** @file
   Network library.
 
-Copyright (c) 2005 - 2009, Intel Corporation.<BR>
+Copyright (c) 2005 - 2010, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1530,7 +1530,7 @@ EFIAPI
 NetMapIterate (
   IN NET_MAP                *Map,
   IN NET_MAP_CALLBACK       CallBack,
-  IN VOID                   *Arg
+  IN VOID                   *Arg      OPTIONAL
   )
 {
 
@@ -1900,9 +1900,9 @@ NetLibGetVlanId (
   This function will append VLAN device path node to the parent device path,
   and then use LocateDevicePath() to find the correct VLAN device handle.
 
-  @param[in]   ServiceHandle    The handle where network service binding protocols are
+  @param[in]   ControllerHandle The handle where network service binding protocols are
                                 installed on.
-  @param[in]   VLanId           The configured VLAN ID for the VLAN device.
+  @param[in]   VlanId           The configured VLAN ID for the VLAN device.
 
   @return The VLAN device handle, or NULL if not found.
 
@@ -2399,7 +2399,7 @@ NetLibGetNicHandle (
   Handle = NULL;
 
   for (Index = 0; Index < OpenCount; Index++) {
-    if (OpenBuffer[Index].Attributes & EFI_OPEN_PROTOCOL_BY_DRIVER) {
+    if ((OpenBuffer[Index].Attributes & EFI_OPEN_PROTOCOL_BY_DRIVER) != 0) {
       Handle = OpenBuffer[Index].ControllerHandle;
       break;
     }

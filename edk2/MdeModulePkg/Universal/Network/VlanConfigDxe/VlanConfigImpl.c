@@ -1,7 +1,7 @@
 /** @file
   HII Config Access protocol implementation of VLAN configuration module.
 
-Copyright (c) 2009, Intel Corporation.<BR>
+Copyright (c) 2009 - 2010, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -238,6 +238,7 @@ VlanCallback (
     //
     // Remove VLAN
     //
+    ASSERT (PrivateData->NumberOfVlan <= MAX_VLAN_NUMBER);
     for (Index = 0; Index < PrivateData->NumberOfVlan; Index++) {
       if (Configuration->VlanList[Index] != 0) {
         //
@@ -421,7 +422,7 @@ InstallVlanConfigForm (
   EFI_STATUS                      Status;
   EFI_HII_HANDLE                  HiiHandle;
   EFI_HANDLE                      DriverHandle;
-  CHAR16                          Str[40];
+  CHAR16                          Str[26 + sizeof (EFI_MAC_ADDRESS) * 2 + 1];
   CHAR16                          *MacString;
   EFI_DEVICE_PATH_PROTOCOL        *ChildDevicePath;
   EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess;
@@ -479,6 +480,7 @@ InstallVlanConfigForm (
   PrivateData->MacString = MacString;
 
   StrCpy (Str, L"VLAN Configuration (MAC:");
+  ASSERT (StrLen (MacString) <= (sizeof (EFI_MAC_ADDRESS) * 2));
   StrCat (Str, MacString);
   StrCat (Str, L")");
   HiiSetString (
