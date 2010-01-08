@@ -1,7 +1,7 @@
 /** @file
   Implementation of Mtftp drivers.
-  
-Copyright (c) 2006 - 2009, Intel Corporation<BR>
+
+Copyright (c) 2006 - 2010, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -35,7 +35,7 @@ EFI_SERVICE_BINDING_PROTOCOL  gMtftp4ServiceBindingTemplete = {
   @param ImageHandle    The MTFTP's image handle.
   @param SystemTable    The system table.
 
-  @retval EFI_SUCCESS  The handles are successfully installed on the image. 
+  @retval EFI_SUCCESS  The handles are successfully installed on the image.
   @retval others       some EFI_ERROR occured.
 
 **/
@@ -67,14 +67,14 @@ Mtftp4DriverEntryPoint (
   @retval EFI_SUCCESS            The controller has UDP service binding protocol
                                  installed, MTFTP can support it.
   @retval EFI_ALREADY_STARTED    The device specified by ControllerHandle and
-                                 RemainingDevicePath is already being managed by 
+                                 RemainingDevicePath is already being managed by
                                  the driver specified by This.
   @retval EFI_ACCESS_DENIED      The device specified by ControllerHandle and
-                                 RemainingDevicePath is already being managed by a 
-                                 different driver or an application that requires 
+                                 RemainingDevicePath is already being managed by a
+                                 different driver or an application that requires
                                  exclusive access.
   @retval EFI_UNSUPPORTED        The device specified by ControllerHandle and
-                                 RemainingDevicePath is not supported by the driver 
+                                 RemainingDevicePath is not supported by the driver
                                  specified by This.
 
 **/
@@ -102,9 +102,9 @@ Mtftp4DriverBindingSupported (
 
 
 /**
-  Config a NULL UDP that is used to keep the connection between UDP and MTFTP. 
-  
-  Just leave the Udp child unconfigured. When UDP is unloaded, 
+  Config a NULL UDP that is used to keep the connection between UDP and MTFTP.
+
+  Just leave the Udp child unconfigured. When UDP is unloaded,
     MTFTP will be informed with DriverBinding Stop.
 
   @param  UdpIo                  The UDP_IO to configure
@@ -239,8 +239,8 @@ Mtftp4CleanService (
 
 
 /**
-  Start the MTFTP driver on this controller. 
-  
+  Start the MTFTP driver on this controller.
+
   MTFTP driver will install a MTFTP SERVICE BINDING protocol on the supported
   controller, which can be used to create/destroy MTFTP children.
 
@@ -286,6 +286,7 @@ Mtftp4DriverBindingStart (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+  ASSERT (MtftpSb != NULL);
 
   Status = gBS->SetTimer (MtftpSb->Timer, TimerPeriodic, TICKS_PER_SECOND);
 

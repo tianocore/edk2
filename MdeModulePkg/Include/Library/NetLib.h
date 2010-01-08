@@ -2,7 +2,7 @@
   This library is only intended to be used by UEFI network stack modules.
   It provides basic functions for the UEFI network stack.
 
-Copyright (c) 2005 - 2009, Intel Corporation
+Copyright (c) 2005 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1025,9 +1025,9 @@ NetLibGetVlanId (
   This function will append VLAN device path node to the parent device path,
   and then use LocateDevicePath() to find the correct VLAN device handle.
 
-  @param[in]   ServiceHandle    The handle where network service binding protocols are
+  @param[in]   ControllerHandle The handle where network service binding protocols are
                                 installed on.
-  @param[in]   VLanId           The configured VLAN ID for the VLAN device.
+  @param[in]   VlanId           The configured VLAN ID for the VLAN device.
 
   @return The VLAN device handle, or NULL if not found.
 

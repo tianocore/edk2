@@ -1,7 +1,7 @@
 /** @file
   Tcp request dispatcher implementation.
 
-Copyright (c) 2005 - 2009, Intel Corporation<BR>
+Copyright (c) 2005 - 2010, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -52,7 +52,7 @@ Tcp4Route (
               RouteInfo->SubnetMask,
               RouteInfo->GatewayAddress
               );
-              
+
 }
 
 
@@ -249,7 +249,7 @@ Tcp4FlushPcb (
   Attach a Pcb to the socket.
 
   @param  Sk                     Pointer to the socket of this TCP instance.
-  
+
   @retval EFI_SUCCESS            The operation is completed successfully.
   @retval EFI_OUT_OF_RESOURCES   Failed due to resource limit.
 
@@ -300,7 +300,7 @@ Tcp4AttachPcb (
   Detach the Pcb of the socket.
 
   @param  Sk                     Pointer to the socket of this TCP instance.
-  
+
 **/
 VOID
 Tcp4DetachPcb (
@@ -532,15 +532,15 @@ Tcp4ConfigurePcb (
                             (UINT32) (Option->ConnectionTimeout * TCP_TICK_HZ)
                             );
 
-    if (Option->EnableNagle == FALSE) {
+    if (!Option->EnableNagle) {
       TCP_SET_FLG (Tcb->CtrlFlag, TCP_CTRL_NO_NAGLE);
     }
 
-    if (Option->EnableTimeStamp == FALSE) {
+    if (!Option->EnableTimeStamp) {
       TCP_SET_FLG (Tcb->CtrlFlag, TCP_CTRL_NO_TS);
     }
 
-    if (Option->EnableWindowScaling == FALSE) {
+    if (!Option->EnableWindowScaling) {
       TCP_SET_FLG (Tcb->CtrlFlag, TCP_CTRL_NO_WS);
     }
   }
@@ -557,7 +557,7 @@ Tcp4ConfigurePcb (
   //
   // update state of Tcb and socket
   //
-  if (CfgData->AccessPoint.ActiveFlag == FALSE) {
+  if (!CfgData->AccessPoint.ActiveFlag) {
 
     TcpSetState (Tcb, TCP_LISTEN);
     SockSetState (Sk, SO_LISTENING);

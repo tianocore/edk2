@@ -51,7 +51,7 @@ typedef struct {
   UdpIoRecvDatagram() or UdpIoSendDatagram(). When receiving, Netbuf is allocated by the
   UDP access point and released by the user. When sending, the user allocates the the NetBuf, which is then
   provided to the callback as a reference.
-  
+
   @param[in] Packet       Packet received or sent
   @param[in] EndPoint     The UDP address pair corresponds to the UDP IO
   @param[in] IoStatus     Packet receiving or sending status
@@ -127,7 +127,7 @@ typedef struct {
 ///
 /// Type defined as UDP_IO.
 ///
-/// This data structure wraps the UDP instance and configuration. 
+/// This data structure wraps the UDP instance and configuration.
 /// UdpIo Library uses this structure for all Udp4 or Udp6 operations.
 ///
 struct _UDP_IO {
@@ -151,7 +151,7 @@ struct _UDP_IO {
   union {
     EFI_UDP4_PROTOCOL       *Udp4;
     EFI_UDP6_PROTOCOL       *Udp6;
-  } Protocol;  
+  } Protocol;
 
   union {
     EFI_UDP4_CONFIG_DATA    Udp4;
@@ -161,12 +161,12 @@ struct _UDP_IO {
 
 /**
   Prototype called when UdpIo Library configures a UDP instance.
-  
+
   The prototype is set and called when creating a UDP_IO in UdpIoCreatePort().
-  
+
   @param[in] UdpIo         The UDP_IO to configure
   @param[in] Context       User-defined data when calling UdpIoCreatePort()
-  
+
   @retval EFI_SUCCESS  The configuration succeeded
   @retval Others       The UDP_IO fails to configure indicating
                        UdpIoCreatePort() should fail
@@ -179,11 +179,11 @@ EFI_STATUS
   );
 
 /**
-  The select function to decide whether to cancel the UDP_TX_TOKEN. 
-  
+  The select function to decide whether to cancel the UDP_TX_TOKEN.
+
   @param[in] Token        The UDP_TX_TOKEN to decide whether to cancel
   @param[in] Context      User-defined data in UdpIoCancelDgrams()
-  
+
   @retval TRUE        Cancel the UDP_TX_TOKEN
   @retval FALSE       Do not cancel this UDP_TX_TOKEN
 
@@ -196,12 +196,13 @@ BOOLEAN
   );
 
 /**
-  Cancel all sent datagrams selected by the parameter ToCancel.
+  Cancel all the sent datagram that pass the selection criteria of ToCancel.
   If ToCancel is NULL, all the datagrams are cancelled.
 
   @param[in]  UdpIo                 The UDP_IO to cancel packet.
   @param[in]  IoStatus              The IoStatus to return to the packet owners.
-  @param[in]  ToCancel              Sets the criteria for canceling a packet. 
+  @param[in]  ToCancel              The select funtion to test whether to cancel this
+                                    packet or not.
   @param[in]  Context               The opaque parameter to the ToCancel.
 
 **/
@@ -210,19 +211,18 @@ EFIAPI
 UdpIoCancelDgrams (
   IN UDP_IO                 *UdpIo,
   IN EFI_STATUS             IoStatus,
-  IN UDP_IO_TO_CANCEL       ToCancel OPTIONAL,
+  IN UDP_IO_TO_CANCEL       ToCancel,        OPTIONAL
   IN VOID                   *Context
   );
 
 /**
   Creates a UDP_IO to access the UDP service. It creates and configures
   a UDP child.
-  
-  This function:
-  # locates the UDP service binding prototype on the Controller parameter
-  # uses the UDP service binding prototype to create a UDP child (also known as a UDP instance)
-  # configures the UDP child by calling Configure function prototype. 
-  Any failures in creating or configuring the UDP child return NULL for failure. 
+
+  It locates the UDP service binding prototype on the Controller parameter
+  uses the UDP service binding prototype to create a UDP child (also known as
+  a UDP instance) configures the UDP child by calling Configure function prototype.
+  Any failures in creating or configuring the UDP child return NULL for failure.
 
   @param[in]  Controller            The controller that has the UDP service binding.
                                     protocol installed.
@@ -246,7 +246,7 @@ UdpIoCreateIo (
 
 /**
   Free the UDP_IO and all its related resources.
-  
+
   The function cancels all sent datagrams and receive requests.
 
   @param[in]  UdpIo             The UDP_IO to free.
@@ -261,9 +261,9 @@ UdpIoFreeIo (
   );
 
 /**
-  Cleans up the UDP_IO without freeing it. Call this function 
+  Cleans up the UDP_IO without freeing it. Call this function
   if you intend to later re-use the UDP_IO.
-  
+
   This function releases all transmitted datagrams and receive requests and configures NULL for the UDP instance.
 
   @param[in]  UdpIo                 The UDP_IO to clean up.
@@ -277,7 +277,7 @@ UdpIoCleanIo (
 
 /**
   Send a packet through the UDP_IO.
-  
+
   The packet will be wrapped in UDP_TX_TOKEN. Function Callback will be called
   when the packet is sent. The optional parameter EndPoint overrides the default
   address pair if specified.
@@ -286,7 +286,7 @@ UdpIoCleanIo (
   @param[in]  Packet                The packet to send.
   @param[in]  EndPoint              The local and remote access point. Override the
                                     default address pair set during configuration.
-  @param[in]  Gateway               The gateway to use.  
+  @param[in]  Gateway               The gateway to use.
   @param[in]  CallBack              The function being called when packet is
                                     transmitted or failed.
   @param[in]  Context               The opaque parameter passed to CallBack.
@@ -310,7 +310,7 @@ UdpIoSendDatagram (
 /**
   Cancel a single sent datagram.
 
-  @param[in]  UdpIo                 The UDP_IO from which to cancel the packet 
+  @param[in]  UdpIo                 The UDP_IO from which to cancel the packet
   @param[in]  Packet                The packet to cancel
 
 **/
@@ -323,7 +323,7 @@ UdpIoCancelSentDatagram (
 
 /**
   Issue a receive request to the UDP_IO.
-  
+
   This function is called when upper-layer needs packet from UDP for processing.
   Only one receive request is acceptable at a time. Therefore, one common usage model is
   to invoke this function inside its Callback function when the former packet

@@ -1,7 +1,7 @@
 /** @file
   This file implement the EFI_DHCP4_PROTOCOL interface.
-  
-Copyright (c) 2006 - 2009, Intel Corporation.<BR>
+
+Copyright (c) 2006 - 2010, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   Returns the current operating mode and cached data packet for the EFI DHCPv4 Protocol driver.
-  
+
   The GetModeData() function returns the current operating mode and cached data
   packet for the EFI DHCPv4 Protocol driver.
 
@@ -82,7 +82,7 @@ EFIAPI
 EfiDhcp4Configure (
   IN EFI_DHCP4_PROTOCOL     *This,
   IN EFI_DHCP4_CONFIG_DATA  *Dhcp4CfgData       OPTIONAL
-  );  
+  );
 
 /**
   Starts the DHCP configuration process.
@@ -100,7 +100,7 @@ EfiDhcp4Configure (
   time when each event occurs in this process, the callback function that was set
   by EFI_DHCP4_PROTOCOL.Configure() will be called and the user can take this
   opportunity to control the process.
-  
+
   @param[in]  This            Pointer to the EFI_DHCP4_PROTOCOL instance.
   @param[in]  CompletionEvent If not NULL, indicates the event that will be signaled when the
                               EFI DHCPv4 Protocol driver is transferred into the
@@ -133,7 +133,7 @@ EfiDhcp4Start (
 
 /**
   Extends the lease time by sending a request packet.
-  
+
   The RenewRebind() function is used to manually extend the lease time when the
   EFI DHCPv4 Protocol driver is in the Dhcp4Bound state and the lease time has
   not expired yet. This function will send a request packet to the previously
@@ -206,7 +206,7 @@ EfiDhcp4Release (
 
 /**
   Stops the current address configuration.
-  
+
   The Stop() function is used to stop the DHCP configuration process. After this
   function is called successfully, the EFI DHCPv4 Protocol driver is transferred
   into the Dhcp4Stopped state. EFI_DHCP4_PROTOCOL.Configure() needs to be called
@@ -263,10 +263,10 @@ EfiDhcp4Build (
   IN EFI_DHCP4_PACKET_OPTION  *AppendList[] OPTIONAL,
   OUT EFI_DHCP4_PACKET        **NewPacket
   );
-  
+
 /**
   Transmits a DHCP formatted packet and optionally waits for responses.
-  
+
   The TransmitReceive() function is used to transmit a DHCP packet and optionally
   wait for the response from servers. This function does not change the state of
   the EFI DHCPv4 Protocol driver and thus can be used at any time.
@@ -292,7 +292,7 @@ EfiDhcp4TransmitReceive (
 
 /**
   Parses the packed DHCP option data.
-  
+
   The Parse() function is used to retrieve the option list from a DHCP packet.
   If *OptionCount isn't zero, and there is enough space for all the DHCP options
   in the Packet, each element of PacketOptionList is set to point to somewhere in
@@ -340,7 +340,7 @@ EFI_DHCP4_PROTOCOL  mDhcp4ProtocolTemplate = {
 
 /**
   Returns the current operating mode and cached data packet for the EFI DHCPv4 Protocol driver.
-  
+
   The GetModeData() function returns the current operating mode and cached data
   packet for the EFI DHCPv4 Protocol driver.
 
@@ -647,15 +647,15 @@ EfiDhcp4Configure (
   }
 
   if (Dhcp4CfgData != NULL) {
-    if (Dhcp4CfgData->DiscoverTryCount && (Dhcp4CfgData->DiscoverTimeout == NULL)) {
+    if ((Dhcp4CfgData->DiscoverTryCount != 0) && (Dhcp4CfgData->DiscoverTimeout == NULL)) {
       return EFI_INVALID_PARAMETER;
     }
 
-    if (Dhcp4CfgData->RequestTryCount && (Dhcp4CfgData->RequestTimeout == NULL)) {
+    if ((Dhcp4CfgData->RequestTryCount != 0) && (Dhcp4CfgData->RequestTimeout == NULL)) {
       return EFI_INVALID_PARAMETER;
     }
 
-    if (Dhcp4CfgData->OptionCount && (Dhcp4CfgData->OptionList == NULL)) {
+    if ((Dhcp4CfgData->OptionCount != 0) && (Dhcp4CfgData->OptionList == NULL)) {
       return EFI_INVALID_PARAMETER;
     }
 
@@ -748,7 +748,7 @@ ON_EXIT:
   time when each event occurs in this process, the callback function that was set
   by EFI_DHCP4_PROTOCOL.Configure() will be called and the user can take this
   opportunity to control the process.
-  
+
   @param[in]  This            Pointer to the EFI_DHCP4_PROTOCOL instance.
   @param[in]  CompletionEvent If not NULL, indicates the event that will be signaled when the
                               EFI DHCPv4 Protocol driver is transferred into the
@@ -842,7 +842,7 @@ ON_ERROR:
 
 /**
   Extends the lease time by sending a request packet.
-  
+
   The RenewRebind() function is used to manually extend the lease time when the
   EFI DHCPv4 Protocol driver is in the Dhcp4Bound state and the lease time has
   not expired yet. This function will send a request packet to the previously
@@ -1045,7 +1045,7 @@ ON_EXIT:
 
 /**
   Stops the current address configuration.
-  
+
   The Stop() function is used to stop the DHCP configuration process. After this
   function is called successfully, the EFI DHCPv4 Protocol driver is transferred
   into the Dhcp4Stopped state. EFI_DHCP4_PROTOCOL.Configure() needs to be called
@@ -1165,10 +1165,10 @@ EfiDhcp4Build (
 
 /**
   Callback by UdpIoCreatePort() when creating UdpIo for this Dhcp4 instance.
-  
+
   @param[in] UdpIo      The UdpIo being created.
   @param[in] Context    Dhcp4 instance.
-  
+
   @retval EFI_SUCCESS   UdpIo is configured successfully.
   @retval other         Other error occurs.
 **/
@@ -1212,9 +1212,9 @@ Dhcp4InstanceConfigUdpIo (
 
 /**
   Create UdpIo for this Dhcp4 instance.
-  
+
   @param Instance   The Dhcp4 instance.
-  
+
   @retval EFI_SUCCESS                UdpIo is created successfully.
   @retval EFI_OUT_OF_RESOURCES       Fails to create UdpIo because of limited
                                      resources or configuration failure.
@@ -1245,7 +1245,7 @@ Dhcp4InstanceCreateUdpIo (
 
 /**
   Callback of Dhcp packet. Does nothing.
-  
+
   @param Arg           The context.
 
 **/
@@ -1258,15 +1258,15 @@ DhcpDummyExtFree (
 
 /**
   Callback of UdpIoRecvDatagram() that handles a Dhcp4 packet.
-  
+
   Only BOOTP responses will be handled that correspond to the Xid of the request
   sent out. The packet will be queued to the response queue.
-  
+
   @param UdpPacket        The Dhcp4 packet.
   @param EndPoint         Udp4 address pair.
   @param IoStatus         Status of the input.
   @param Context          Extra info for the input.
-  
+
 **/
 VOID
 PxeDhcpInput (
@@ -1368,7 +1368,7 @@ RESTART:
 
 /**
   Complete a Dhcp4 transaction and signal the upper layer.
-  
+
   @param Instance      Dhcp4 instance.
 
 **/
@@ -1417,7 +1417,7 @@ SIGNAL_USER:
 
 /**
   Transmits a DHCP formatted packet and optionally waits for responses.
-  
+
   The TransmitReceive() function is used to transmit a DHCP packet and optionally
   wait for the response from servers. This function does not change the state of
   the EFI DHCPv4 Protocol driver and thus can be used at any time.
@@ -1643,7 +1643,7 @@ Dhcp4ParseCheckOption (
 
 /**
   Parses the packed DHCP option data.
-  
+
   The Parse() function is used to retrieve the option list from a DHCP packet.
   If *OptionCount isn't zero, and there is enough space for all the DHCP options
   in the Packet, each element of PacketOptionList is set to point to somewhere in

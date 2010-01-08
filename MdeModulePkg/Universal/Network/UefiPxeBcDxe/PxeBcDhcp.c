@@ -1,7 +1,7 @@
 /** @file
   Support for PxeBc dhcp functions.
-  
-Copyright (c) 2007 - 2009, Intel Corporation.<BR>                                                         
+
+Copyright (c) 2007 - 2010, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -33,7 +33,7 @@ UINT8 mInterestedDhcp4Tags[PXEBC_DHCP4_TAG_INDEX_MAX] = {
   This function initialize the DHCP4 message instance.
 
   This function will pad each item of dhcp4 message packet.
-  
+
   @param  Seed    Pointer to the message instance of the DHCP4 packet.
   @param  Udp4    Pointer to the EFI_UDP4_PROTOCOL instance.
 
@@ -181,7 +181,7 @@ PxeBcParseCachedDhcpPacket (
   // serverhostname option.
   //
   Option = Options[PXEBC_DHCP4_TAG_INDEX_OVERLOAD];
-  if ((Option != NULL) && (Option->Data[0] & PXEBC_DHCP4_OVERLOAD_FILE)) {
+  if ((Option != NULL) && ((Option->Data[0] & PXEBC_DHCP4_OVERLOAD_FILE) != 0)) {
 
     Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] = PxeBcParseExtendOptions (
                                                 (UINT8 *) Offer->Dhcp4.Header.BootFileName,
@@ -253,9 +253,9 @@ PxeBcParseCachedDhcpPacket (
                     the index is maximum offer number.
 
   @retval TRUE      Offer the service successfully under priority BINL.
-  @retval FALSE     Boot Service failed, parse cached dhcp packet failed or this 
+  @retval FALSE     Boot Service failed, parse cached dhcp packet failed or this
                     BINL ack cannot find options set or bootfile name specified.
-  
+
 **/
 BOOLEAN
 PxeBcTryBinl (
@@ -287,8 +287,8 @@ PxeBcTryBinl (
       );
   } else {
     CopyMem (
-      &ServerIp.Addr[0], 
-      &Offer->Dhcp4.Header.ServerAddr, 
+      &ServerIp.Addr[0],
+      &Offer->Dhcp4.Header.ServerAddr,
       sizeof (EFI_IPv4_ADDRESS)
       );
   }
@@ -338,7 +338,7 @@ PxeBcTryBinl (
   Offer dhcp service for each proxy with a BINL dhcp offer.
 
   @param  Private     Pointer to PxeBc private data
-  @param  OfferIndex  Pointer to the index of cached packets as complements of 
+  @param  OfferIndex  Pointer to the index of cached packets as complements of
                       pxe mode data, the index is maximum offer number.
 
   @return If there is no service needed offer return FALSE, otherwise TRUE.
@@ -408,8 +408,8 @@ PxeBcCheckSelectedOffer (
     }
   } else if (SelectedOffer->OfferType == DHCP4_PACKET_TYPE_DHCP_ONLY) {
     //
-    // The selected offer to finish the D.O.R.A. is a DHCP only offer, we need 
-    // try proxy offers if there are some, othewise the bootfile name must be 
+    // The selected offer to finish the D.O.R.A. is a DHCP only offer, we need
+    // try proxy offers if there are some, othewise the bootfile name must be
     // set in this DHCP only offer.
     //
     if (Private->GotProxyOffer) {
@@ -439,7 +439,7 @@ PxeBcCheckSelectedOffer (
         }
       } else {
         //
-        // The proxy offer type is not determined, choose proxy offer in the 
+        // The proxy offer type is not determined, choose proxy offer in the
         // received order.
         //
         Status = EFI_NO_RESPONSE;
@@ -615,7 +615,7 @@ PxeBcCacheDhcpOffer (
 /**
   Select the specified proxy offer, such as BINL, DHCP_ONLY and so on.
   If the proxy does not exist, try offers with bootfile.
-  
+
   @param  Private   Pointer to PxeBc private data.
 
 **/
@@ -733,7 +733,7 @@ PxeBcSelectOffer (
 
 /**
   Callback routine.
-  
+
   EFI_DHCP4_CALLBACK is provided by the consumer of the EFI DHCPv4 Protocol driver
   to intercept events that occurred in the configuration process. This structure
   provides advanced control of each state transition of the DHCP process. The
@@ -902,8 +902,8 @@ PxeBcDhcpCallBack (
 
   @param  Private          Pointer to PxeBc private data.
   @param  OptList          Pointer to a DHCP option list.
-                           
-  @param  IsDhcpDiscover   Discover dhcp option or not.     
+
+  @param  IsDhcpDiscover   Discover dhcp option or not.
 
   @return The index item number of the option list.
 
@@ -1048,7 +1048,7 @@ PxeBcBuildDhcpOptions (
   CvtNum (SYS_ARCH, OptEnt.Clid->ArchitectureType, sizeof (OptEnt.Clid->ArchitectureType));
 
   if (Private->Nii != NULL) {
-    // 
+    //
     // If NII protocol exists, update DHCP option data
     //
     CopyMem (OptEnt.Clid->InterfaceName, Private->Nii->StringId, sizeof (OptEnt.Clid->InterfaceName));
@@ -1069,8 +1069,8 @@ PxeBcBuildDhcpOptions (
   @param  Type                  PxeBc option boot item type
   @param  Layer                 PxeBc option boot item layer
   @param  UseBis                Use BIS or not
-  @param  DestIp                Ip address for server      
-  @param  IpCount               The total count of the server ip address    
+  @param  DestIp                Ip address for server
+  @param  IpCount               The total count of the server ip address
   @param  SrvList               Server list
   @param  IsDiscv               Discover the vendor or not
   @param  Reply                 The dhcp4 packet of Pxe reply
@@ -1078,8 +1078,8 @@ PxeBcBuildDhcpOptions (
   @retval EFI_SUCCESS           Operation succeeds.
   @retval EFI_OUT_OF_RESOURCES  Allocate memory pool failed.
   @retval EFI_NOT_FOUND         There is no vendor option exists.
-  @retval EFI_TIMEOUT           Send Pxe Discover time out. 
-  
+  @retval EFI_TIMEOUT           Send Pxe Discover time out.
+
 **/
 EFI_STATUS
 PxeBcDiscvBootService (
@@ -1179,7 +1179,7 @@ PxeBcDiscvBootService (
 
     DhcpHeader->HwAddrLen = sizeof (EFI_GUID);
   }
-       
+
   Xid                                 = NET_RANDOM (NetRandomInitSeed ());
   Token.Packet->Dhcp4.Header.Xid      = HTONL(Xid);
   Token.Packet->Dhcp4.Header.Reserved = HTONS((UINT16) ((IsBCast) ? 0x8000 : 0));
@@ -1288,7 +1288,7 @@ PxeBcDiscvBootService (
   @param  Length     The length of the dhcp options.
   @param  OptTag     The option OpCode.
 
-  @return NULL if the buffer length is 0 and OpCode is not 
+  @return NULL if the buffer length is 0 and OpCode is not
           PXEBC_DHCP4_TAG_EOP, or the pointer to the buffer.
 
 **/
@@ -1451,8 +1451,8 @@ PxeBcParseVendorOptions (
 /**
   This function display boot item detail.
 
-  If the length of the boot item string over 70 Char, just display 70 Char. 
-   
+  If the length of the boot item string over 70 Char, just display 70 Char.
+
   @param  Str     Pointer to a string (boot item string).
   @param  Len     The length of string.
 
@@ -1479,11 +1479,11 @@ PxeBcDisplayBootItem (
   @param  Private              Pointer to PxeBc private data.
 
   @retval EFI_SUCCESS          Select boot prompt done.
-  @retval EFI_TIMEOUT          Select boot prompt time out. 
+  @retval EFI_TIMEOUT          Select boot prompt time out.
   @retval EFI_NOT_FOUND        The proxy offer is not Pxe10.
   @retval EFI_ABORTED          User cancel the operation.
   @retval EFI_NOT_READY        Read the input key from the keybroad has not finish.
-  
+
 **/
 EFI_STATUS
 PxeBcSelectBootPrompt (
@@ -1657,10 +1657,10 @@ ON_EXIT:
   @param  Private         Pointer to PxeBc private data.
   @param  Type            The type of the menu.
   @param  UseDefaultItem  Use default item or not.
-  
+
   @retval EFI_ABORTED     User cancel operation.
   @retval EFI_SUCCESS     Select the boot menu success.
-  @retval EFI_NOT_READY   Read the input key from the keybroad has not finish.    
+  @retval EFI_NOT_READY   Read the input key from the keybroad has not finish.
 
 **/
 EFI_STATUS
@@ -1671,7 +1671,7 @@ PxeBcSelectBootMenu (
   )
 {
   PXEBC_CACHED_DHCP4_PACKET  *Packet;
-  PXEBC_VENDOR_OPTION       *VendorOpt;
+  PXEBC_VENDOR_OPTION        *VendorOpt;
   EFI_INPUT_KEY              InputKey;
   UINT8                      MenuSize;
   UINT8                      MenuNum;
@@ -1754,7 +1754,7 @@ PxeBcSelectBootMenu (
       gBS->Stall (10 * TICKS_PER_MS);
     }
 
-    if (!InputKey.ScanCode) {
+    if (InputKey.ScanCode != 0) {
       switch (InputKey.UnicodeChar) {
       case CTRL ('c'):
         InputKey.ScanCode = SCAN_ESC;
