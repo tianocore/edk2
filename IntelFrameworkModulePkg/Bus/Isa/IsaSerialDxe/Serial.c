@@ -1,7 +1,7 @@
 /** @file
   Serial driver for standard UARTS on an ISA bus.
 
-Copyright (c) 2006 - 2009, Intel Corporation<BR>
+Copyright (c) 2006 - 2010, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -361,7 +361,7 @@ SerialControllerDriverStart (
 
     Status = EFI_ALREADY_STARTED;
     for (Index = 0; Index < EntryCount; Index++) {
-      if (OpenInfoBuffer[Index].Attributes & EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER) {
+      if ((OpenInfoBuffer[Index].Attributes & EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER) != 0) {
         Status = gBS->OpenProtocol (
                         OpenInfoBuffer[Index].ControllerHandle,
                         &gEfiSerialIoProtocolGuid,

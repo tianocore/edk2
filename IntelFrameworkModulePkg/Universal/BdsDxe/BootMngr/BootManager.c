@@ -1,7 +1,7 @@
 /** @file
   The platform boot manager reference implementation
 
-Copyright (c) 2004 - 2008, Intel Corporation. <BR>
+Copyright (c) 2004 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -316,6 +316,7 @@ CallBootManager (
       BufferSize = StrSize(BootStringNumber);
       BufferSize += StrSize(HiiString);
       Option->Description = AllocateZeroPool(BufferSize);
+      ASSERT (Option->Description != NULL);
       StrCpy (Option->Description, HiiString);
       if (StrnCmp (BootStringNumber, L"0", 1) != 0) {
         StrCat (Option->Description, L" ");

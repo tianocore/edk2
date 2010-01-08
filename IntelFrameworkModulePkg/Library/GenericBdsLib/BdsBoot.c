@@ -1,7 +1,7 @@
 /** @file
   BDS Lib functions which relate with create or process the boot option.
 
-Copyright (c) 2004 - 2009, Intel Corporation. <BR>
+Copyright (c) 2004 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -290,6 +290,7 @@ BdsLibBootViaBootOption (
       BufferSize = StrSize(BootStringNumber);
       BufferSize += StrSize(HiiString);
       Option->Description = AllocateZeroPool(BufferSize);
+      ASSERT (Option->Description != NULL);
       StrCpy (Option->Description, HiiString);
       if (StrnCmp (BootStringNumber, L"0", 1) != 0) {
         StrCat (Option->Description, L" ");
