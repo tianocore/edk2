@@ -2,7 +2,7 @@
 # EDK Compatibility Package Build File
 #
 #
-# Copyright (c) 2008 - 2009, Intel Corporation
+# Copyright (c) 2008 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
