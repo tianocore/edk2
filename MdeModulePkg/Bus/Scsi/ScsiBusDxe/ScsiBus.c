@@ -174,6 +174,15 @@ SCSIBusDriverBindingSupported (
     // if yes, return EFI_SUCCESS.
     //
     if ((RemainingDevicePath == NULL) || IsDevicePathEnd (RemainingDevicePath)) {
+      //
+      // Close protocol regardless of RemainingDevicePath validation
+      //
+      gBS->CloseProtocol (
+             Controller,
+             &gEfiExtScsiPassThruProtocolGuid,
+             This->DriverBindingHandle,
+             Controller
+             );      
       return EFI_SUCCESS;
     } else {
       //
