@@ -192,8 +192,8 @@ PerformQuickSort (
 **/
 INTN
 DevicePathCompare (
-  IN  VOID             *Buffer1,
-  IN  VOID             *Buffer2
+  IN  CONST VOID             *Buffer1,
+  IN  CONST VOID             *Buffer2
   )
 {
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath1;
@@ -270,8 +270,8 @@ DevicePathCompare (
 INTN
 EFIAPI
 StringNoCaseCompare (
-  IN  VOID             *Buffer1,
-  IN  VOID             *Buffer2
+  IN  CONST VOID             *Buffer1,
+  IN  CONST VOID             *Buffer2
   )
 {
   EFI_STATUS                Status;

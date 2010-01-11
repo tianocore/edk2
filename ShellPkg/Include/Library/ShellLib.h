@@ -1,22 +1,28 @@
 /** @file
   Provides interface to shell functionality for shell commands and applications.
 
-Copyright (c) 2006 - 2009, Intel Corporation<BR>
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+  Copyright (c) 2006 - 2010, Intel Corporation<BR>
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
 #if !defined(__SHELL_LIB__)
 #define __SHELL_LIB__
 
+#include <Uefi.h>
+#include <Guid/FileInfo.h>
 #include <Protocol/SimpleFileSystem.h>
+#include <Protocol/LoadedImage.h>
+#include <Protocol/EfiShellInterface.h>
+#include <Protocol/EfiShellEnvironment2.h>
 #include <Protocol/EfiShell.h>
+#include <Protocol/EfiShellParameters.h>
 
 /**
   This function will retrieve the information about the file for the handle 
@@ -69,12 +75,12 @@ ShellSetFileInfo (
   This function opens a file with the open mode according to the file path. The 
   Attributes is valid only for EFI_FILE_MODE_CREATE.
 
-  @param[in]  FilePath 		    On input the device path to the file.  On output 
-                              the remaining device path.
-  @param[out]  DeviceHandle  	Pointer to the system device handle.
-  @param[out]  FileHandle		  Pointer to the file handle.
-  @param[in]  OpenMode	    	The mode to open the file with.
-  @param[in]  Attributes	  	The file's file attributes.
+  @param[in]  FilePath 		      On input the device path to the file.  On output 
+                                the remaining device path.
+  @param[out]  DeviceHandle  	  Pointer to the system device handle.
+  @param[out]  FileHandle		    Pointer to the file handle.
+  @param[in]  OpenMode	    	  The mode to open the file with.
+  @param[in]  Attributes	  	  The file's file attributes.
 
   @retval EFI_SUCCESS		        The information was set.
   @retval EFI_INVALID_PARAMETER	One of the parameters has an invalid value.
@@ -617,6 +623,29 @@ ShellFindFilePath (
   IN CONST CHAR16 *FileName
   );
 
+/**
+  Find a file by searching the CWD and then the path with a variable set of file 
+  extensions.  If the file is not found it will append each extension in the list 
+  in the order provided and return the first one that is successful.
+
+  If FileName is NULL, then ASSERT.
+  If FileExtension is NULL, then behavior is identical to ShellFindFilePath.
+
+  If the return value is not NULL then the memory must be caller freed.
+
+  @param[in] FileName           Filename string.
+  @param[in] FileExtension      Semi-colon delimeted list of possible extensions.
+
+  @retval NULL                  The file was not found.
+  @retval !NULL                 The path to the file.
+**/
+CHAR16 *
+EFIAPI
+ShellFindFilePathEx (
+  IN CONST CHAR16 *FileName,
+  IN CONST CHAR16 *FileExtension
+  );
+
 typedef enum {
   TypeFlag  = 0,    ///< A flag that is present or not present only (IE "-a").
   TypeValue,        ///< A flag that has some data following it with a space (IE "-a 1").
@@ -901,6 +930,8 @@ ShellIsDirectory(
 /**
   Function to determine if a given filename represents a file.
 
+  This will search the CWD only.
+
   If Name is NULL, then ASSERT.
 
   @param[in] Name         Path to file to test.
@@ -912,6 +943,25 @@ ShellIsDirectory(
 EFI_STATUS
 EFIAPI
 ShellIsFile(
+  IN CONST CHAR16 *Name
+  );
+
+/**
+  Function to determine if a given filename represents a file.
+
+  This will search the CWD and then the Path.
+
+  If Name is NULL, then ASSERT.
+
+  @param[in] Name         Path to file to test.
+
+  @retval EFI_SUCCESS     The Path represents a file.
+  @retval EFI_NOT_FOUND   The Path does not represent a file.
+  @retval other           The path failed to open.
+**/
+EFI_STATUS
+EFIAPI
+ShellIsFileInPath(
   IN CONST CHAR16 *Name
   );
 
@@ -968,6 +1018,60 @@ StrnCatGrow (
   IN OUT UINTN            *CurrentSize,
   IN     CONST CHAR16     *Source,
   IN     UINTN            Count
+  );
+
+/**
+  This is a find and replace function.  Upon successful return the NewString is a copy of 
+  SourceString with each instance of FindTarget replaced with ReplaceWith.
+
+  If SourceString and NewString overlap the behavior is undefined.
+
+  If the string would grow bigger than NewSize it will halt and return error.
+
+  @param[in] SourceString             String with source buffer.
+  @param[in,out] NewString            String with resultant buffer.
+  @param[in] NewSize                  Size in bytes of NewString.
+  @param[in] FindTarget               String to look for.
+  @param[in] ReplaceWith              String to replace FindTarget with.
+
+  @retval EFI_INVALID_PARAMETER       SourceString was NULL.
+  @retval EFI_INVALID_PARAMETER       NewString was NULL.
+  @retval EFI_INVALID_PARAMETER       FindTarget was NULL.
+  @retval EFI_INVALID_PARAMETER       ReplaceWith was NULL.
+  @retval EFI_INVALID_PARAMETER       FindTarget had length < 1.
+  @retval EFI_INVALID_PARAMETER       SourceString had length < 1.
+  @retval EFI_BUFFER_TOO_SMALL        NewSize was less than the minimum size to hold 
+                                      the new string (truncation occurred).
+  @retval EFI_SUCCESS                 the string was sucessfully copied with replacement.
+**/
+
+EFI_STATUS
+EFIAPI
+ShellLibCopySearchAndReplace(
+  IN CHAR16 CONST                     *SourceString,
+  IN CHAR16                           *NewString,
+  IN UINTN                            NewSize,
+  IN CONST CHAR16                     *FindTarget,
+  IN CONST CHAR16                     *ReplaceWith
+  );
+
+/**
+  Check if a Unicode character is a hexadecimal character.
+
+  This internal function checks if a Unicode character is a 
+  decimal character.  The valid hexadecimal character is 
+  L'0' to L'9', L'a' to L'f', or L'A' to L'F'.
+
+  @param[in]  Char  The character to check.
+
+  @retval TRUE      The Char is a hexadecmial character.
+  @retval FALSE     The Char is not a hexadecmial character.
+
+**/
+BOOLEAN
+EFIAPI
+ShellLibIsHexaDecimalDigitCharacter (
+  IN      CHAR16                    Char
   );
 
 #endif // __SHELL_LIB__

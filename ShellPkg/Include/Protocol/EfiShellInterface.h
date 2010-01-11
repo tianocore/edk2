@@ -23,10 +23,8 @@
 
 **/
 
-#ifndef _SHELLINTERFACE_H_
+#if !defined(_SHELLINTERFACE_H_)
 #define _SHELLINTERFACE_H_
-
-#include <Protocol/LoadedImage.h>
 
 #define SHELL_INTERFACE_PROTOCOL_GUID \
   { \

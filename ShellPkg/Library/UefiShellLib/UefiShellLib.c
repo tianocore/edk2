@@ -1,36 +1,16 @@
 /** @file
   Provides interface to shell functionality for shell commands and applications.
 
-Copyright (c) 2006 - 2009, Intel Corporation<BR>
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+  Copyright (c) 2006 - 2010, Intel Corporation<BR>
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
-
-#include <Uefi.h>
-#include <Library/ShellLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/BaseLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/DebugLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/DevicePathLib.h>
-#include <Library/PcdLib.h>
-#include <Library/FileHandleLib.h>
-#include <Library/PrintLib.h>
-#include <Library/UefiLib.h>
-#include <Library/HiiLib.h>
-
-#include <Protocol/EfiShellEnvironment2.h>
-#include <Protocol/EfiShellInterface.h>
-#include <Protocol/EfiShell.h>
-#include <Protocol/EfiShellParameters.h>
-#include <Protocol/SimpleFileSystem.h>
 
 #include "UefiShellLib.h"
 
@@ -56,6 +36,7 @@ STATIC FILE_HANDLE_FUNCTION_MAP      FileFunctionMap;
 STATIC UINTN                         mTotalParameterCount;
 STATIC CHAR16                        *mPostReplaceFormat;
 STATIC CHAR16                        *mPostReplaceFormat2;
+
 /**
   Check if a Unicode character is a hexadecimal character.
 
@@ -72,7 +53,7 @@ STATIC CHAR16                        *mPostReplaceFormat2;
 **/
 BOOLEAN
 EFIAPI
-ShellInternalIsHexaDecimalDigitCharacter (
+ShellLibIsHexaDecimalDigitCharacter (
   IN      CHAR16                    Char
   ) {
   return (BOOLEAN) ((Char >= L'0' && Char <= L'9') || (Char >= L'A' && Char <= L'F') || (Char >= L'a' && Char <= L'f'));
@@ -161,10 +142,10 @@ ShellLibConstructorWorker (
   ) {
   EFI_STATUS Status;
 
-  ASSERT(PcdGet16 (PcdShellLibMaxPrintBufferSize) < PcdGet32 (PcdMaximumUnicodeStringLength));
-  mPostReplaceFormat = AllocateZeroPool (PcdGet16 (PcdShellLibMaxPrintBufferSize));
+  ASSERT(PcdGet16 (PcdShellPrintBufferSize) < PcdGet32 (PcdMaximumUnicodeStringLength));
+  mPostReplaceFormat = AllocateZeroPool (PcdGet16 (PcdShellPrintBufferSize));
   ASSERT (mPostReplaceFormat != NULL);
-  mPostReplaceFormat2 = AllocateZeroPool (PcdGet16 (PcdShellLibMaxPrintBufferSize));
+  mPostReplaceFormat2 = AllocateZeroPool (PcdGet16 (PcdShellPrintBufferSize));
   ASSERT (mPostReplaceFormat2 != NULL);
 
   //
@@ -1487,9 +1468,9 @@ ShellCloseFileMetaArg (
 /**
   Find a file by searching the CWD and then the path.
 
-  if FileName is NULL then ASSERT.
+  If FileName is NULL then ASSERT.
 
-  if the return value is not NULL then the memory must be caller freed.
+  If the return value is not NULL then the memory must be caller freed.
 
   @param FileName               Filename string.
 
@@ -1554,6 +1535,62 @@ ShellFindFilePath (
     } while (Walker != NULL && Walker[0] != CHAR_NULL);
     FreePool(TestPath);
   }
+  return (RetVal);
+}
+
+/**
+  Find a file by searching the CWD and then the path with a variable set of file 
+  extensions.  If the file is not found it will append each extension in the list 
+  in the order provided and return the first one that is successful.
+
+  If FileName is NULL, then ASSERT.
+  If FileExtension is NULL, then behavior is identical to ShellFindFilePath.
+
+  If the return value is not NULL then the memory must be caller freed.
+
+  @param[in] FileName           Filename string.
+  @param[in] FileExtension      Semi-colon delimeted list of possible extensions.
+
+  @retval NULL                  The file was not found.
+  @retval !NULL                 The path to the file.
+**/
+CHAR16 *
+EFIAPI
+ShellFindFilePathEx (
+  IN CONST CHAR16 *FileName,
+  IN CONST CHAR16 *FileExtension
+  )
+{
+  CHAR16            *TestPath;
+  CHAR16            *RetVal;
+  CONST CHAR16      *ExtensionWalker;
+  ASSERT(FileName != NULL);
+  if (FileExtension == NULL) {
+    return (ShellFindFilePath(FileName));
+  }
+  RetVal = ShellFindFilePath(FileName);
+  if (RetVal != NULL) {
+    return (RetVal);
+  }
+  TestPath = AllocateZeroPool(StrSize(FileName) + StrSize(FileExtension));
+  for (ExtensionWalker = FileExtension ;  ; ExtensionWalker = StrStr(ExtensionWalker, L";") + 1 ){
+    StrCpy(TestPath, FileName);
+    StrCat(TestPath, ExtensionWalker);
+    if (StrStr(TestPath, L";") != NULL) {
+      *(StrStr(TestPath, L";")) = CHAR_NULL;
+    }
+    RetVal = ShellFindFilePath(TestPath);
+    if (RetVal != NULL) {
+      break;
+    }
+    //
+    // Must be after first loop...
+    //
+    if (StrStr(ExtensionWalker, L";") == NULL) {
+      break;
+    }
+  }
+  FreePool(TestPath);
   return (RetVal);
 }
 
@@ -1647,7 +1684,7 @@ InternalIsFlag (
   //
   // If we accept numbers then dont return TRUE. (they will be values)
   //
-  if (((Name[0] == L'-' || Name[0] == L'+') && ShellInternalIsHexaDecimalDigitCharacter(Name[1])) && AlwaysAllowNumbers == TRUE) {
+  if (((Name[0] == L'-' || Name[0] == L'+') && ShellLibIsHexaDecimalDigitCharacter(Name[1])) && AlwaysAllowNumbers != FALSE) {
     return (FALSE);
   }
 
@@ -1738,7 +1775,7 @@ InternalCommandLineParse (
       //
       // do nothing for NULL argv
       //
-    } else if (InternalIsOnCheckList(Argv[LoopCounter], CheckList, &CurrentItemType) == TRUE) {
+    } else if (InternalIsOnCheckList(Argv[LoopCounter], CheckList, &CurrentItemType) != FALSE) {
       //
       // We might have leftover if last parameter didnt have optional value
       //
@@ -2200,8 +2237,10 @@ ShellCommandLineCheckDuplicate (
 }
 
 /**
-  This is a find and replace function.  it will return the NewString as a copy of 
+  This is a find and replace function.  Upon successful return the NewString is a copy of 
   SourceString with each instance of FindTarget replaced with ReplaceWith.
+
+  If SourceString and NewString overlap the behavior is undefined.
 
   If the string would grow bigger than NewSize it will halt and return error.
 
@@ -2224,7 +2263,7 @@ ShellCommandLineCheckDuplicate (
 
 EFI_STATUS
 EFIAPI
-CopyReplace(
+ShellLibCopySearchAndReplace(
   IN CHAR16 CONST                     *SourceString,
   IN CHAR16                           *NewString,
   IN UINTN                            NewSize,
@@ -2342,21 +2381,21 @@ InternalShellPrintWorker(
   //
   // Back and forth each time fixing up 1 of our flags...
   //
-  Status = CopyReplace(Format,             mPostReplaceFormat,  PcdGet16 (PcdShellLibMaxPrintBufferSize), L"%N", L"%%N");
+  Status = ShellLibCopySearchAndReplace(Format,             mPostReplaceFormat,  PcdGet16 (PcdShellPrintBufferSize), L"%N", L"%%N");
   ASSERT_EFI_ERROR(Status);
-  Status = CopyReplace(mPostReplaceFormat,  mPostReplaceFormat2, PcdGet16 (PcdShellLibMaxPrintBufferSize), L"%E", L"%%E");
+  Status = ShellLibCopySearchAndReplace(mPostReplaceFormat,  mPostReplaceFormat2, PcdGet16 (PcdShellPrintBufferSize), L"%E", L"%%E");
   ASSERT_EFI_ERROR(Status);
-  Status = CopyReplace(mPostReplaceFormat2, mPostReplaceFormat,  PcdGet16 (PcdShellLibMaxPrintBufferSize), L"%H", L"%%H");
+  Status = ShellLibCopySearchAndReplace(mPostReplaceFormat2, mPostReplaceFormat,  PcdGet16 (PcdShellPrintBufferSize), L"%H", L"%%H");
   ASSERT_EFI_ERROR(Status);
-  Status = CopyReplace(mPostReplaceFormat,  mPostReplaceFormat2, PcdGet16 (PcdShellLibMaxPrintBufferSize), L"%B", L"%%B");
+  Status = ShellLibCopySearchAndReplace(mPostReplaceFormat,  mPostReplaceFormat2, PcdGet16 (PcdShellPrintBufferSize), L"%B", L"%%B");
   ASSERT_EFI_ERROR(Status);
-  Status = CopyReplace(mPostReplaceFormat2, mPostReplaceFormat,  PcdGet16 (PcdShellLibMaxPrintBufferSize), L"%V", L"%%V");
+  Status = ShellLibCopySearchAndReplace(mPostReplaceFormat2, mPostReplaceFormat,  PcdGet16 (PcdShellPrintBufferSize), L"%V", L"%%V");
   ASSERT_EFI_ERROR(Status);
 
   //
   // Use the last buffer from replacing to print from...
   //
-  Return = UnicodeVSPrint (mPostReplaceFormat2, PcdGet16 (PcdShellLibMaxPrintBufferSize), mPostReplaceFormat, Marker);
+  Return = UnicodeVSPrint (mPostReplaceFormat2, PcdGet16 (PcdShellPrintBufferSize), mPostReplaceFormat, Marker);
 
   if (Col != -1 && Row != -1) {
     Status = gST->ConOut->SetCursorPosition(gST->ConOut, Col, Row);
@@ -2594,6 +2633,39 @@ ShellIsFile(
 }
 
 /**
+  Function to determine if a given filename represents a file.
+
+  This will search the CWD and then the Path.
+
+  If Name is NULL, then ASSERT.
+
+  @param[in] Name         Path to file to test.
+
+  @retval EFI_SUCCESS     The Path represents a file.
+  @retval EFI_NOT_FOUND   The Path does not represent a file.
+  @retval other           The path failed to open.
+**/
+EFI_STATUS
+EFIAPI
+ShellIsFileInPath(
+  IN CONST CHAR16 *Name
+  ) {
+  CHAR16      *NewName;
+  EFI_STATUS  Status;
+
+  if (!EFI_ERROR(ShellIsFile(Name))) {
+    return (TRUE);
+  }
+
+  NewName = ShellFindFilePath(Name);
+  if (NewName == NULL) {
+    return (EFI_NOT_FOUND);
+  }
+  Status = ShellIsFile(NewName);
+  FreePool(NewName);
+  return (Status);
+}
+/**
   Function to determine whether a string is decimal or hex representation of a number 
   and return the number converted from the string.
 
@@ -2608,7 +2680,7 @@ ShellStrToUintn(
   )
 {
   CONST CHAR16  *Walker;
-  for (Walker = String; Walker != NULL && *Walker != CHAR_NULL && *Walker == L' '; Walker = Walker + 1);
+  for (Walker = String; Walker != NULL && *Walker != CHAR_NULL && *Walker == L' '; Walker++);
   if (StrnCmp(Walker, L"0x", 2) == 0 || StrnCmp(Walker, L"0X", 2) == 0){
     return (StrHexToUintn(Walker));
   }

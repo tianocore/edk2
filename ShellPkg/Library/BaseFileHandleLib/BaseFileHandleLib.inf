@@ -47,4 +47,4 @@
   gEfiFileInfoGuid                              # ALWAYS_CONSUMED
 
 [Pcd.common]
-  gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize # ALWAYS_CONSUMED
+  gEfiShellPkgTokenSpaceGuid.PcdShellPrintBufferSize # ALWAYS_CONSUMED

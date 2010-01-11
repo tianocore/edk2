@@ -1,36 +1,31 @@
 /** @file
   Defines for EFI shell environment 2 ported to EDK II build environment. (no spec)
 
-Copyright (c) 2005 - 2009, Intel Corporation<BR>
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+  Copyright (c) 2005 - 2010, Intel Corporation<BR>
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
   
-#ifndef _SHELLENV2_H_
-#define _SHELLENV2_H_
-
-#include <Protocol/SimpleTextIn.h>
-#include <Protocol/SimpleTextOut.h>
-#include <Protocol/EfiShellInterface.h>
+#if !defined (_SHELL_ENVIRONMENT_2_PROTOCOL_H_)
+#define _SHELL_ENVIRONMENT_2_PROTOCOL_H_
 
 #define DEFAULT_INIT_ROW    1
 #define DEFAULT_AUTO_LF     FALSE
-
 
 /**
   This function is a prototype for a function that dumps information on a protocol 
   to a given location.  The location is dependant on the implementation.  This is 
   used when programatically adding shell commands.
 
-  @param Handle                 the handle the protocol is on
-  @param Interface              the interface to the protocol
+  @param Handle                 The handle the protocol is on.
+  @param Interface              The interface to the protocol.
 
 **/
 typedef
@@ -68,7 +63,7 @@ EFI_STATUS
 
   @param Str                      Pointer to pointer to string to display for help.
 
-  @retval EFI_SUCCESS             Phe help string is in the parameter Str.
+  @retval EFI_SUCCESS             The help string is in the parameter Str.
 
 **/
 typedef
@@ -101,7 +96,7 @@ typedef struct {
 #define SHELL_FILE_ARG_SIGNATURE  SIGNATURE_32 ('g', 'r', 'a', 'f') 
 
 /**
-*  GUID for the shell environment2 and shell environment
+GUID for the shell environment2 and shell environment.
 **/
 #define SHELL_ENVIRONMENT_PROTOCOL_GUID \
   { \
@@ -109,7 +104,7 @@ typedef struct {
   }
 
 /**
-*  GUID for the shell environment2 extension (main GUID same as shell environment).
+GUID for the shell environment2 extension (main GUID above).
 **/
 #define EFI_SE_EXT_SIGNATURE_GUID \
   { \
@@ -127,7 +122,7 @@ typedef struct {
   encountered directly to the screen.
   
   @param ParentImageHandle      Handle of image executing this operation.
-  @param CommandLine            string command line to execute.
+  @param CommandLine            The string command line to execute.
   @param DebugOutput            TRUE indicates that errors should be printed directly.
                                 FALSE supresses error messages.
 
@@ -147,13 +142,13 @@ EFI_STATUS
   );
 
 /**
-  this function returns a shell environment variable value.
+  This function returns a shell environment variable value.
 
-  @param Name                   pointer to the string with the shell environment 
-                                variables name
+  @param Name                   Pointer to the string with the shell environment 
+                                variable name.
 
-  @retval NULL                  the shell environment variable's value could not be found
-  @retval !NULL                 the value of the shell environment variable Name
+  @retval NULL                  The shell environment variable's value could not be found.
+  @retval !NULL                 The value of the shell environment variable Name.
 
 **/
 typedef 
@@ -163,13 +158,13 @@ CHAR16 *
   );
 
 /**
-  this function returns a shell environment map value.
+  This function returns a shell environment map value.
 
-  @param Name                   pointer to the string with the shell environment 
-                                map name
+  @param Name                   Pointer to the string with the shell environment 
+                                map name.
 
-  @retval NULL                  the shell environment map's value could not be found
-  @retval !NULL                 the value of the shell environment map Name
+  @retval NULL                  The shell environment map's value could not be found.
+  @retval !NULL                 The value of the shell environment map Name.
 
 **/
 typedef 
@@ -184,12 +179,12 @@ CHAR16 *
   This will allocate all required memory, put the new command on the command
   list in the correct location.
 
-  @param Handler                the handler function to call when the command gets called
-  @param CmdStr                 The command name
-  @param GetLineHelp            function to call of get help for this command
+  @param Handler                The handler function to call when the command gets called.
+  @param CmdStr                 The command name.
+  @param GetLineHelp            Function to call of get help for this command.
 
-  @retval EFI_SUCCESS           the command is now part of the command list
-  @retval EFI_OUT_OF_RESOURCES  a memory allocation failed.
+  @retval EFI_SUCCESS           The command is now part of the command list.
+  @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
   @sa SHELLENV_INTERNAL_COMMAND
   @sa SHELLCMD_GET_LINE_HELP
 **/
@@ -208,13 +203,13 @@ EFI_STATUS
   This will get the current protocol info and add the new info or update existing info
   and then resave the info.
 
-  @param SaveId                 save this change as an EFI variable
-  @param Protocol               the protocol's GUID
+  @param SaveId                 Save this change as an EFI variable.
+  @param Protocol               The protocol's GUID.
   @param DumpToken              The function pointer to dump token function or 
-                                NULL
+                                NULL.
   @param DumpInfo               The function pointer to dump infomation function 
-                                or NULL
-  @param IdString               The english name of the protocol
+                                or NULL.
+  @param IdString               The english name of the protocol.
 **/
 typedef
 VOID
@@ -226,17 +221,17 @@ VOID
   );
 
 /**
-  this function finds a protocol handle by a GUID.  
+  This function finds a protocol handle by a GUID.  
 
   This function will check for already known protocols by GUID and if one is 
-  found it will return the name of that protocol.  if no name is found and 
+  found it will return the name of that protocol.  If no name is found and 
   GenId is TRUE it will generate ths string.
 
-  @param Protocol               the GUID of the protocol to look for.
-  @param GenId                  whether to generate a name string if its not found.
+  @param Protocol               The GUID of the protocol to look for.
+  @param GenId                  Whether to generate a name string if its not found.
 
-  @return !NULL                 the Name of the protocol.
-  @retval NULL                  the Name was not found and GenId was not TRUE.
+  @return !NULL                 The Name of the protocol.
+  @retval NULL                  The Name was not found and GenId was not TRUE.
 **/
 typedef 
 CHAR16*
@@ -246,15 +241,15 @@ CHAR16*
   );
 
 /**
-  this function returns the current directory on a given device
+  This function returns the current directory on a given device.
 
   If DeviceName is specified, then return the current shell directory on that 
   device.  If DeviceName is NULL, then return the current directory on the 
   current device.  The caller us responsible to free the returned string when
   no londer required.
 
-  @param DeviceName             the name of the device to get the current 
-                                directory on or NULL for current device
+  @param DeviceName             The name of the device to get the current 
+                                directory on or NULL for current device.
 
   @return The current directory on the current or specified device.
 
@@ -266,23 +261,23 @@ CHAR16*
   );
 
 /**
-  this function will open a group of files that match the Arg path, including 
-  support for wildcard characters ('?' and '*') in the Arg path.  if there are 
+  This function will open a group of files that match the Arg path, including 
+  support for wildcard characters ('?' and '*') in the Arg path.  If there are 
   any wildcard characters in the path this function will find any and all files
-  that match the wildcards.  the return is a double linked list based on the 
-  LIST_ENTRY linked list structure.  use this in conjunction with the 
+  that match the wildcards.  The return is a double linked list based on the 
+  LIST_ENTRY linked list structure.  Use this in conjunction with the 
   SHELL_FILE_ARG_SIGNATURE to get the SHELL_FILE_ARG structures that are returned.
   The memory allocated by the callee for this list is freed by making a call to 
   SHELLENV_FREE_FILE_LIST.
 
-  @param Arg                    pointer Path to files to open
-  @param ListHead               pointer to allocated and initialized list head 
+  @param Arg                    Pointer Path to files to open.
+  @param ListHead               Pointer to allocated and initialized list head 
                                 upon which to append all the opened file structures.
 
   @retval EFI_SUCCESS           1 or more files was opened and a struct of each file's
                                 information was appended to ListHead.
-  @retval EFI_OUT_OF_RESOURCES  a memory allocation failed.
-  @retval EFI_NOT_FOUND         no matching files could be found.
+  @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
+  @retval EFI_NOT_FOUND         No matching files could be found.
   @sa SHELLENV_FREE_FILE_LIST
 **/typedef
 EFI_STATUS
@@ -292,7 +287,7 @@ EFI_STATUS
   );
 
 /**
-  this frees all of the nodes under the ListHead, but not ListHead itself.
+  This frees all of the nodes under the ListHead, but not ListHead itself.
 
   @param ListHead               Pointer to list to free all nodes of.
 
@@ -305,14 +300,14 @@ EFI_STATUS
   );
 
 /**
-  this function creates a new instance of the ShellInterface protocol for use on 
+  This function creates a new instance of the ShellInterface protocol for use on 
   the ImageHandle.
 
-  This function is for internal shell usage.  this will allocate and then populate 
-  EFI_SHELL_INTERFACE protocol.  it is the caller's responsibility to free the 
+  This function is for internal shell usage.  This will allocate and then populate 
+  EFI_SHELL_INTERFACE protocol.  It is the caller's responsibility to free the 
   memory.
 
-  @param ImageHandle            the handle which will use the new ShellInterface 
+  @param ImageHandle            The handle which will use the new ShellInterface 
                                 protocol.
 
   @return the newly allocated shell interface protocol.
@@ -325,14 +320,14 @@ EFI_SHELL_INTERFACE*
   );
 
 /**
-  this function determins whether a script file is currently being processed.
+  This function determins whether a script file is currently being processed.
 
-  a script file (.nsh file) can contain a series of commands and this is useful to 
+  A script file (.nsh file) can contain a series of commands and this is useful to 
   know for some shell commands whether they are being run manually or as part of a 
   script.
 
-  @retval TRUE                  A script file is being processed
-  @return FALSE                 A script file is not being processed
+  @retval TRUE                  A script file is being processed.
+  @retval FALSE                 A script file is not being processed.
 **/
 typedef
 BOOLEAN
@@ -354,12 +349,12 @@ VOID
   This function enables the page break mode.
 
   This mode causes the output to pause after each complete screen to enable a 
-  user to more easily read it.  if AutoWrap is TRUE then rows with too many 
-  characters will be chopped and divided into 2 rows.  if FALSE then rows with 
+  user to more easily read it.  If AutoWrap is TRUE then rows with too many 
+  characters will be chopped and divided into 2 rows.  If FALSE then rows with 
   too many characters may not be fully visible to the user on the screen.
 
-  @param StartRow               the row number to start this on.
-  @param AutoWrap               whether to auto wrap rows that are 
+  @param StartRow               The row number to start this on.
+  @param AutoWrap               Whether to auto wrap rows that are too long.
 **/
 typedef
 VOID
@@ -371,7 +366,7 @@ VOID
 /**
   This function disables the page break mode.
 
-  disabling this causes the output to print out exactly as coded with no breaks 
+  Tisabling this causes the output to print out exactly as coded with no breaks 
   for readability.
 **/
 typedef
@@ -383,8 +378,8 @@ VOID
 /**
   Get the status of the page break output mode.
 
-  @retval FALSE                 page break output mode is not enabled
-  @retval TRUE                  page break output mode is enabled
+  @retval FALSE                 Page break output mode is not enabled.
+  @retval TRUE                  Page break output mode is enabled.
 **/
 typedef
 BOOLEAN
@@ -393,7 +388,7 @@ BOOLEAN
   );
 
 /**
-  this function sets the keys to filter for for the console in.  the valid 
+  This function sets the keys to filter for for the console in.  The valid 
   values to set are:
 
   #define EFI_OUTPUT_SCROLL   0x00000001
@@ -409,9 +404,9 @@ VOID
   );
 
 /**
-  this function gets the keys to filter for for the console in.  the valid 
-  values to get are:
+  This function gets the keys to filter for for the console in.  
 
+  The valid values to get are:
   #define EFI_OUTPUT_SCROLL   0x00000001
   #define EFI_OUTPUT_PAUSE    0x00000002
   #define EFI_EXECUTION_BREAK 0x00000004
@@ -425,14 +420,14 @@ UINT32
   );
 
 /**
-  this function determins if the shell application should break.
+  This function determins if the shell application should break.
 
   This is used to inform a shell application that a break condition has been 
-  initiated.  long loops should check this to prevent delays to the break.
+  initiated.  Long loops should check this to prevent delays to the break.
 
-  @retval TRUE                  a break has been signaled.  the application   
+  @retval TRUE                  A break has been signaled.  the application   
                                 should exit with EFI_ABORTED as soon as possible.
-  @retval FALSE                 continue as normal.
+  @retval FALSE                 Continue as normal.
 **/
 typedef
 BOOLEAN
@@ -460,10 +455,10 @@ VOID
   );
 
 /**
-  this function determins if the caller is running under the root shell.
+  This function determins if the caller is running under the root shell.
 
-  @retval TRUE                  The caller is running under the root shell
-  @retval FALSE                 The caller is not running under the root shell
+  @retval TRUE                  The caller is running under the root shell.
+  @retval FALSE                 The caller is not running under the root shell.
 
 **/
 typedef
@@ -475,14 +470,14 @@ BOOLEAN
 /**
   Close the console proxy to restore the original console.
 
-  This is an internal shell function to handle shell cascading.  it restores the 
+  This is an internal shell function to handle shell cascading.  It restores the 
   original set of console protocols.
   
   @param ConInHandle            The handle of ConIn.
-  @param ConIn                  pointer to the location to return the pointer to 
+  @param ConIn                  Pointer to the location to return the pointer to 
                                 the original console input.
   @param ConOutHandle           The handle of ConOut
-  @param ConOut                 pointer to the location to return the pointer to 
+  @param ConOut                 Pointer to the location to return the pointer to 
                                 the original console output.
 **/
 typedef
@@ -509,19 +504,19 @@ VOID
   );
 
 /**
-  this is an internal shell function to enumerate the handle database.
+  This is an internal shell function to enumerate the handle database.
 
-  this function gets the next handle in the handle database.  if no handles are 
-  found EFI_NOT_FOUND is returned.  if the previous Handle was the last handle 
+  This function gets the next handle in the handle database.  If no handles are 
+  found EFI_NOT_FOUND is returned.  If the previous Handle was the last handle 
   it is set to NULL before returning.
 
-  this must be called after INIT_HANDLE_ENUMERATOR and before CLOSE_HANDLE_ENUMERATOR.
+  This must be called after INIT_HANDLE_ENUMERATOR and before CLOSE_HANDLE_ENUMERATOR.
 
-  @param Handle                 pointer to pointer to Handle.  will be set
+  @param Handle                 Pointer to pointer to Handle.  Will be set
                                 on a sucessful return.
 
-  @retval EFI_SUCCESS           the next handle in the handle database is *Handle
-  @retval EFI_NOT_FOUND         there is not another handle.
+  @retval EFI_SUCCESS           The next handle in the handle database is *Handle.
+  @retval EFI_NOT_FOUND         There is not another handle.
 **/
 typedef
 EFI_STATUS
@@ -530,13 +525,13 @@ EFI_STATUS
   );
 
 /**
-  this is an internal shell function to enumerate the handle database.
+  This is an internal shell function to enumerate the handle database.
 
-  this function skips the next SkipNum handles in the handle database.  If there 
+  This function skips the next SkipNum handles in the handle database.  If there 
   are not enough handles left to skip that many EFI_ACCESS_DENIED is returned and 
   no skip is performed.
 
-  this must be called after INIT_HANDLE_ENUMERATOR and before CLOSE_HANDLE_ENUMERATOR.
+  This must be called after INIT_HANDLE_ENUMERATOR and before CLOSE_HANDLE_ENUMERATOR.
 
   @param SkipNum                how many handles to skip
 
@@ -550,16 +545,16 @@ EFI_STATUS
   );
 
 /**
-  this is an internal shell function to enumerate the handle database.
+  This is an internal shell function to enumerate the handle database.
 
-  this function resets the the handle database so that NEXT_HANDLE and SKIP_HANDLE 
+  This function resets the the handle database so that NEXT_HANDLE and SKIP_HANDLE 
   will start from EnumIndex on the next call. 
   
-  this must be called after INIT_HANDLE_ENUMERATOR and before CLOSE_HANDLE_ENUMERATOR.
+  This must be called after INIT_HANDLE_ENUMERATOR and before CLOSE_HANDLE_ENUMERATOR.
 
-  @param EnumIndex              where to start.
+  @param EnumIndex              Where to start.
 
-  @retval the number of handles either read out or skipped before this reset.
+  @return the number of handles either read out or skipped before this reset.
 **/
 typedef
 UINTN
@@ -568,12 +563,12 @@ UINTN
   );
 
 /**
-  this is an internal shell function to enumerate the handle database.
+  This is an internal shell function to enumerate the handle database.
   
-  this must be called after INIT_HANDLE_ENUMERATOR.
+  This must be called after INIT_HANDLE_ENUMERATOR.
 
-  this function releases all memory and resources associated with the handle database.
-  after this no other handle enumerator functions except INIT_HANDLE_ENUMERATOR will 
+  This function releases all memory and resources associated with the handle database.
+  Tfter this no other handle enumerator functions except INIT_HANDLE_ENUMERATOR will 
   function properly.
 **/
 typedef
@@ -583,13 +578,13 @@ VOID
   );
 
 /**
-  this is an internal shell function to enumerate the handle database.
+  This is an internal shell function to enumerate the handle database.
 
-  this function returns the number of handles in the handle database.
+  This function returns the number of handles in the handle database.
   
-  this must be called after INIT_HANDLE_ENUMERATOR and before CLOSE_HANDLE_ENUMERATOR.
+  This must be called after INIT_HANDLE_ENUMERATOR and before CLOSE_HANDLE_ENUMERATOR.
 
-  @retval the number of handles in the handle database.
+  @return the number of handles in the handle database.
 **/
 typedef
 UINTN
@@ -598,49 +593,50 @@ UINTN
   );
 
 /**
-Handle Enumerator structure
+Handle Enumerator structure.
 **/
 typedef struct {
-  INIT_HANDLE_ENUMERATOR  Init;   ///< pointer to INIT_HANDLE_ENUMERATOR function
-  NEXT_HANDLE             Next;   ///< pointer to NEXT_HANDLE function
-  SKIP_HANDLE             Skip;   ///< pointer to SKIP_HANDLE function
-  RESET_HANDLE_ENUMERATOR Reset;  ///< pointer to RESET_HANDLE_ENUMERATOR function
-  CLOSE_HANDLE_ENUMERATOR Close;  ///< pointer to CLOSE_HANDLE_ENUMERATOR function
-  GET_NUM                 GetNum; ///< pointer to GET_NUM function
+  INIT_HANDLE_ENUMERATOR  Init;   ///< Pointer to INIT_HANDLE_ENUMERATOR function.
+  NEXT_HANDLE             Next;   ///< Pointer to NEXT_HANDLE function.
+  SKIP_HANDLE             Skip;   ///< Pointer to SKIP_HANDLE function.
+  RESET_HANDLE_ENUMERATOR Reset;  ///< Pointer to RESET_HANDLE_ENUMERATOR function.
+  CLOSE_HANDLE_ENUMERATOR Close;  ///< Pointer to CLOSE_HANDLE_ENUMERATOR function.
+  GET_NUM                 GetNum; ///< Pointer to GET_NUM function.
 } HANDLE_ENUMERATOR;
+
 /**
-  signature for the PROTOCOL_INFO structure 
+  Signature for the PROTOCOL_INFO structure.
 **/
 #define PROTOCOL_INFO_SIGNATURE SIGNATURE_32 ('s', 'p', 'i', 'n')
+
 /**
   PROTOCOL_INFO structure for protocol enumerator functions.
-
 **/
 typedef struct {
-  UINTN                       Signature;   ///< PROTOCOL_INFO_SIGNATURE 
-  LIST_ENTRY                  Link;        ///< standard lined list helper member
+  UINTN                       Signature;   ///< PROTOCOL_INFO_SIGNATURE.
+  LIST_ENTRY                  Link;        ///< Standard lined list helper member.
   //
-  // parsing info for the protocol
+  // The parsing info for the protocol.
   //
-  EFI_GUID                    ProtocolId;  ///< GUID for the protocol
-  CHAR16                      *IdString;   ///< Name of the protocol
-  SHELLENV_DUMP_PROTOCOL_INFO DumpToken;   ///< pointer to DumpToken function for the protocol
-  SHELLENV_DUMP_PROTOCOL_INFO DumpInfo;    ///< pointer to DumpInfo function for the protocol
+  EFI_GUID                    ProtocolId;  ///< GUID for the protocol.
+  CHAR16                      *IdString;   ///< Name of the protocol.
+  SHELLENV_DUMP_PROTOCOL_INFO DumpToken;   ///< Pointer to DumpToken function for the protocol.
+  SHELLENV_DUMP_PROTOCOL_INFO DumpInfo;    ///< Pointer to DumpInfo function for the protocol.
   //
-  // database info on which handles are supporting this protocol
+  // Patabase info on which handles are supporting this protocol.
   //
-  UINTN                       NoHandles;   ///< how many handles produce this protocol
-  EFI_HANDLE                  *Handles;    ///< array of handles
+  UINTN                       NoHandles;   ///< How many handles produce this protocol.
+  EFI_HANDLE                  *Handles;    ///< The array of handles.
 
 } PROTOCOL_INFO;
 
 //
-// declarations of protocol info enumerator
+// Declarations of protocol info enumerator.
 //
 /**
-  this is an internal shell function to initialize the protocol enumerator.
+  This is an internal shell function to initialize the protocol enumerator.
 
-  this must be called before NEXT_PROTOCOL_INFO, SKIP_PROTOCOL_INFO, 
+  This must be called before NEXT_PROTOCOL_INFO, SKIP_PROTOCOL_INFO, 
   RESET_PROTOCOL_INFO_ENUMERATOR, and CLOSE_PROTOCOL_INFO_ENUMERATOR are
   called.
 **/
@@ -651,7 +647,7 @@ VOID
   );
 
 /**
-  this function is an internal shell function for enumeration of protocols.  
+  This function is an internal shell function for enumeration of protocols.  
 
   This functiol will return the next protocol in the list.  If this is called 
   immediately after initialization it will return the first.  If this is called
@@ -660,10 +656,10 @@ VOID
   This cannot be called after CLOSE_PROTOCOL_INFO_ENUMERATOR, but it must be 
   called after INIT_PROTOCOL_INFO_ENUMERATOR.
 
-  @param ProtocolInfo           pointer to pointer to protocol information structure.
+  @param ProtocolInfo           Pointer to pointer to protocol information structure.
 
-  @retval EFI_SUCCESS           the next protocol's information was sucessfully returned.  
-                                If there were no more protocols NULL was returned.
+  @retval EFI_SUCCESS           The next protocol's information was sucessfully returned.
+  @retval NULL                  There are no more protocols.
 **/
 typedef
 EFI_STATUS
@@ -672,14 +668,14 @@ EFI_STATUS
   );
 
 /**
-  this function is an internal shell function for enumeration of protocols.  
+  This function is an internal shell function for enumeration of protocols.  
 
   This cannot be called after CLOSE_PROTOCOL_INFO_ENUMERATOR, but it must be 
   called after INIT_PROTOCOL_INFO_ENUMERATOR.
 
-  this function does nothing and always returns EFI_SUCCESS.
+  This function does nothing and always returns EFI_SUCCESS.
 
-  @retval EFI_SUCCESS           always returned (see note).
+  @retval EFI_SUCCESS           always returned (see above).
 **/
 typedef
 EFI_STATUS
@@ -688,12 +684,12 @@ EFI_STATUS
   );
 
 /**
-  this function is an internal shell function for enumeration of protocols.  
+  This function is an internal shell function for enumeration of protocols.  
 
   This cannot be called after CLOSE_PROTOCOL_INFO_ENUMERATOR, but it must be 
   called after INIT_PROTOCOL_INFO_ENUMERATOR.
 
-  this function resets the list of protocols such that the next one in the 
+  This function resets the list of protocols such that the next one in the 
   list is the begining of the list.
 **/
 typedef
@@ -704,12 +700,12 @@ VOID
 
 
 /**
-  this function is an internal shell function for enumeration of protocols.  
+  This function is an internal shell function for enumeration of protocols.  
 
   This must be called after INIT_PROTOCOL_INFO_ENUMERATOR.  After this call
   no protocol enumerator calls except INIT_PROTOCOL_INFO_ENUMERATOR may be made.
 
-  this function frees any memory or resources associated with the protocol
+  This function frees any memory or resources associated with the protocol
   enumerator.
 **/
 typedef
@@ -719,18 +715,18 @@ VOID
   );
 
 /**
-*  protocol enumerator structure of function pointers.
+  Protocol enumerator structure of function pointers.
 **/
 typedef struct {
-  INIT_PROTOCOL_INFO_ENUMERATOR   Init;   ///< pointer to INIT_PROTOCOL_INFO_ENUMERATOR function
-  NEXT_PROTOCOL_INFO              Next;   ///< pointer to NEXT_PROTOCOL_INFO function
-  SKIP_PROTOCOL_INFO              Skip;   ///< pointer to SKIP_PROTOCOL_INFO function
-  RESET_PROTOCOL_INFO_ENUMERATOR  Reset;  ///< pointer to RESET_PROTOCOL_INFO_ENUMERATOR function
-  CLOSE_PROTOCOL_INFO_ENUMERATOR  Close;  ///< pointer to CLOSE_PROTOCOL_INFO_ENUMERATOR function
+  INIT_PROTOCOL_INFO_ENUMERATOR   Init;   ///< Pointer to INIT_PROTOCOL_INFO_ENUMERATOR function.
+  NEXT_PROTOCOL_INFO              Next;   ///< Pointer to NEXT_PROTOCOL_INFO function.
+  SKIP_PROTOCOL_INFO              Skip;   ///< Pointer to SKIP_PROTOCOL_INFO function.
+  RESET_PROTOCOL_INFO_ENUMERATOR  Reset;  ///< Pointer to RESET_PROTOCOL_INFO_ENUMERATOR function.
+  CLOSE_PROTOCOL_INFO_ENUMERATOR  Close;  ///< Pointer to CLOSE_PROTOCOL_INFO_ENUMERATOR function.
 } PROTOCOL_INFO_ENUMERATOR;
 
 /**
-  this function is used to retrieve a user-friendly display name for a handle.  
+  This function is used to retrieve a user-friendly display name for a handle.  
 
   If UseComponentName is TRUE then the component name protocol for this device 
   or it's parent device (if required) will be used to obtain the name of the 
@@ -748,17 +744,17 @@ typedef struct {
   
   Upon sucessful return the memory for *BestDeviceName is up to the caller to free.
 
-  @param DeviceHandle           the device handle whose name is desired
-  @param UseComponentName       whether to use the ComponentName protocol at all
-  @param UseDevicePath          whether to use the DevicePath protocol at all
-  @param Language               pointer to language string to use
-  @param BestDeviceName         pointer to pointer to string allocated with the name
-  @param ConfigurationStatus    pointer to status for opening a Configuration protocol
-  @param DiagnosticsStatus      pointer to status for opening a Diagnostics protocol
-  @param Display                Whether to Print this out to default Print location
-  @param Indent                 how many characters to indent the printing
+  @param DeviceHandle           The device handle whose name is desired.
+  @param UseComponentName       Whether to use the ComponentName protocol at all.
+  @param UseDevicePath          Whether to use the DevicePath protocol at all.
+  @param Language               Pointer to language string to use.
+  @param BestDeviceName         Pointer to pointer to string allocated with the name.
+  @param ConfigurationStatus    Pointer to status for opening a Configuration protocol.
+  @param DiagnosticsStatus      Pointer to status for opening a Diagnostics protocol.
+  @param Display                Whether to Print this out to default Print location.
+  @param Indent                 How many characters to indent the printing.
 
-  @retval EFI_SUCCESS           this function always returns EFI_SUCCESS
+  @retval EFI_SUCCESS           This function always returns EFI_SUCCESS.
 **/
 typedef
 EFI_STATUS
@@ -778,13 +774,13 @@ EFI_STATUS
 #define EFI_SHELL_ENHANCED_MODE_VER   L"1.1.2" ///< string for highest version this shell supports
 
 /**
-  this function gets the shell mode as stored in the shell environment 
-  "efishellmode".  it will not fail.
+  This function gets the shell mode as stored in the shell environment 
+  "efishellmode".  It will not fail.
 
-  @param Mode                   returns a string representing one of the 
+  @param Mode                   Returns a string representing one of the 
                                 2 supported modes of the shell.
 
-  @retval EFI_SUCCESS           this function always returns success
+  @retval EFI_SUCCESS           This function always returns success.
 **/
 typedef
 EFI_STATUS
@@ -793,17 +789,17 @@ EFI_STATUS
   );
 
 /**
-  Convert a file system style name to an file path
+  Convert a file system style name to a device path.
 
   This function will convert a shell path name to a Device Path Protocol path.
   This function will allocate any required memory for this operation and it 
   is the responsibility of the caller to free that memory when no longer required.
 
-  if anything prevents the complete conversion free any allocated memory and 
+  If anything prevents the complete conversion free any allocated memory and 
   return NULL.
 
-  @retval !NULL                 a pointer to the callee allocated Device Path
-  @retval NULL                  the operation could not be completed.
+  @retval !NULL                 A pointer to the callee allocated Device Path.
+  @retval NULL                  The operation could not be completed.
 **/
 typedef 
 EFI_DEVICE_PATH_PROTOCOL* 
@@ -812,25 +808,26 @@ EFI_DEVICE_PATH_PROTOCOL*
   );
 
 /**
-  converts a device path into a file system map name.
+  Converts a device path into a file system map name.
 
-  if DevPath is NULL then ASSERT
+  If DevPath is NULL, then ASSERT.
+
   This function looks through the shell environment map for a map whose device
   path matches the DevPath parameter.  If one is found the Name is returned via 
   Name parameter.  If sucessful the caller must free the memory allocated for
   Name.
 
-  this function will use the internal lock to prevent changes to the map during 
+  This function will use the internal lock to prevent changes to the map during 
   the lookup operation.
   
-  @param DevPath                The device path to search for a name for
-  @param ConsistMapping         what state to verify map flag VAR_ID_CONSIST
-  @param Name                   on sucessful return the name of that device path
+  @param DevPath                The device path to search for a name for.
+  @param ConsistMapping         What state to verify map flag VAR_ID_CONSIST.
+  @param Name                   On sucessful return the name of that device path.
 
-  @retval EFI_SUCCESS           the DevPath was found and the name returned
+  @retval EFI_SUCCESS           The DevPath was found and the name returned
                                 in Name.  
   @retval EFI_OUT_OF_RESOURCES  A required memory allocation failed.
-  @retval EFI_UNSUPPORTED       the DevPath was not found in the map
+  @retval EFI_UNSUPPORTED       The DevPath was not found in the map.
 **/
 typedef
 EFI_STATUS
@@ -841,23 +838,23 @@ EFI_STATUS
   );
 
 /**
-  this function will open a group of files that match the Arg path, but will not 
-  support the wildcard characters ('?' and '*') in the Arg path.  if there are 
+  This function will open a group of files that match the Arg path, but will not 
+  support the wildcard characters ('?' and '*') in the Arg path.  If there are 
   any wildcard characters in the path this function will return 
-  EFI_INVALID_PARAMETER.  the return is a double linked list based on the 
-  LIST_ENTRY linked list structure.  use this in conjunction with the 
+  EFI_INVALID_PARAMETER.  The return is a double linked list based on the 
+  LIST_ENTRY linked list structure.  Use this in conjunction with the 
   SHELL_FILE_ARG_SIGNATURE to get the SHELL_FILE_ARG structures that are returned.
   The memory allocated by the callee for this list is freed by making a call to 
   SHELLENV_FREE_FILE_LIST.
 
-  @param Arg                    pointer Path to files to open
-  @param ListHead               pointer to allocated and initialized list head 
+  @param Arg                    Pointer Path to files to open.
+  @param ListHead               Pointer to allocated and initialized list head 
                                 upon which to append all the opened file structures.
 
   @retval EFI_SUCCESS           1 or more files was opened and a struct of each file's
                                 information was appended to ListHead.
-  @retval EFI_OUT_OF_RESOURCES  a memory allocation failed.
-  @retval EFI_NOT_FOUND         no matching files could be found.
+  @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
+  @retval EFI_NOT_FOUND         No matching files could be found.
   @sa SHELLENV_FREE_FILE_LIST
 **/
 typedef
@@ -868,18 +865,18 @@ EFI_STATUS
   );
 
 /**
-  this function removes duplicate file listings from lists.
+  This function removes duplicate file listings from lists.
 
-  this is a function for use with SHELLENV_FILE_META_ARG_NO_WILDCARD and 
-  SHELLENV_FILE_META_ARG.  this function will verify that there are no duplicate
-  files in the list of returned files.  any file listed twice will have one of its
+  This is a function for use with SHELLENV_FILE_META_ARG_NO_WILDCARD and 
+  SHELLENV_FILE_META_ARG.  This function will verify that there are no duplicate
+  files in the list of returned files.  Any file listed twice will have one of its
   instances removed.
 
-  @param ListHead               pointer to linked list head that was returned from 
+  @param ListHead               Pointer to linked list head that was returned from 
                                 SHELLENV_FILE_META_ARG_NO_WILDCARD or
                                 SHELLENV_FILE_META_ARG.
 
-  @retval EFI_SUCCESS           this function always returns success.
+  @retval EFI_SUCCESS           This function always returns success.
 
 **/
 typedef
@@ -891,24 +888,24 @@ EFI_STATUS
 /**
   Converts a File System map name to a device path.
 
-  if DevPath is NULL then ASSERT()
+  if DevPath is NULL, then ASSERT().
 
   This function looks through the shell environment map for a map whose Name 
   matches the Name parameter.  If one is found the device path pointer is 
-  updated to point to that file systems device path.  the caller should not 
+  updated to point to that file systems device path.  The caller should not 
   free the memory from that device path.
 
-  this function will use the internal lock to prevent changes to the map during 
+  This function will use the internal lock to prevent changes to the map during 
   the lookup operation.
 
-  @param Name                   pointer to NULL terminated UNICODE string of the 
-                                file system name
-  @param DevPath                pointer to pointer to DevicePath.  only valid on 
-                                OUT if sucessful
+  @param Name                   Pointer to NULL terminated UNICODE string of the 
+                                file system name.
+  @param DevPath                Pointer to pointer to DevicePath.  only valid on 
+                                OUT if sucessful.
 
-  @retval EFI_SUCCESS           the conversion was successful and the device 
+  @retval EFI_SUCCESS           The conversion was successful and the device 
                                 path was returned.
-  @retval EFI_NOT_FOUND         the file system could not be found in the map.
+  @retval EFI_NOT_FOUND         The file system could not be found in the map.
 **/
 typedef
 EFI_STATUS
@@ -917,8 +914,7 @@ EFI_STATUS
   OUT EFI_DEVICE_PATH_PROTOCOL     **DevPath
   );
 
-/// EFI_SHELL_ENVIRONMENT2 protocol structure
-/// contains pointers to functions
+/// EFI_SHELL_ENVIRONMENT2 protocol structure.
 typedef struct {
   SHELLENV_EXECUTE                        Execute;
   SHELLENV_GET_ENV                        GetEnv;
@@ -931,7 +927,7 @@ typedef struct {
   SHELLENV_FREE_FILE_LIST                 FreeFileList;
 
   //
-  // The following services are only used by the shell itself
+  // The following services are only used by the shell itself.
   //
   SHELLENV_NEW_SHELL                      NewShell;
   SHELLENV_BATCH_IS_ACTIVE                BatchIsActive;
@@ -939,11 +935,11 @@ typedef struct {
   SHELLENV_FREE_RESOURCES                 FreeResources;
 
   //
-  // GUID to differentiate ShellEnvironment2 from ShellEnvironment
+  // GUID to differentiate ShellEnvironment2 from ShellEnvironment.
   //
   EFI_GUID                                SESGuid;
   //
-  // Major Version grows if shell environment interface has been changes
+  // Major Version grows if shell environment interface has been changes.
   //
   UINT32                                  MajorVersion;
   UINT32                                  MinorVersion;
@@ -973,4 +969,5 @@ typedef struct {
 
 extern EFI_GUID gEfiShellEnvironment2Guid;
 extern EFI_GUID gEfiShellEnvironment2ExtGuid;
-#endif // _SHELLENV_H_
+
+#endif // _SHELL_ENVIRONMENT_2_PROTOCOL_H_
