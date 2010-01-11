@@ -2,7 +2,7 @@
   SCSI Bus driver that layers on every SCSI Pass Thru and
   Extended SCSI Pass Thru protocol in the system.
 
-Copyright (c) 2006 - 2009, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -145,29 +145,17 @@ SCSIBusDriverBindingSupported (
   EFI_STATUS                      Status;
   EFI_SCSI_PASS_THRU_PROTOCOL     *PassThru;
   EFI_EXT_SCSI_PASS_THRU_PROTOCOL *ExtPassThru;
-  EFI_DEV_PATH                    *Node;
+  UINT64                          Lun;
+  UINT8                           *TargetId;
+  SCSI_TARGET_ID                  ScsiTargetId;
 
-  if (RemainingDevicePath != NULL) {
-    Node = (EFI_DEV_PATH *) RemainingDevicePath;
-    //
-    // Check if RemainingDevicePath is the End of Device Path Node, 
-    // if yes, go on checking other conditions
-    //
-    if (!IsDevicePathEnd (Node)) {
-      //
-      // If RemainingDevicePath isn't the End of Device Path Node,
-      // check its validation
-      //
-      if (Node->DevPath.Type != MESSAGING_DEVICE_PATH ||
-          Node->DevPath.SubType != MSG_SCSI_DP ||
-          DevicePathNodeLength(&Node->DevPath) != sizeof(SCSI_DEVICE_PATH)) {
-        return EFI_UNSUPPORTED;
-      }
-    }
-  }
+  TargetId = &ScsiTargetId.ScsiId.ExtScsi[0];
+  SetMem (TargetId, TARGET_MAX_BYTES, 0xFF);
 
   //
-  // Check for the existence of Extended SCSI Pass Thru Protocol and SCSI Pass Thru Protocol
+  // To keep backward compatibility, UEFI ExtPassThru Protocol is supported as well as 
+  // EFI PassThru Protocol. From priority perspective, ExtPassThru Protocol is firstly
+  // tried to open on host controller handle. If fails, then PassThru Protocol is tried instead.
   //
   Status = gBS->OpenProtocol (
                   Controller,
@@ -180,46 +168,69 @@ SCSIBusDriverBindingSupported (
 
   if (Status == EFI_ALREADY_STARTED) {
     return EFI_SUCCESS;
+  } else if (!EFI_ERROR(Status)) {
+    //
+    // Check if RemainingDevicePath is NULL or the End of Device Path Node,
+    // if yes, return EFI_SUCCESS.
+    //
+    if ((RemainingDevicePath == NULL) || IsDevicePathEnd (RemainingDevicePath)) {
+      return EFI_SUCCESS;
+    } else {
+      //
+      // If RemainingDevicePath isn't the End of Device Path Node, check its validation
+      //
+      Status = ExtPassThru->GetTargetLun (ExtPassThru, RemainingDevicePath, &TargetId, &Lun);
+      //
+      // Close protocol regardless of RemainingDevicePath validation
+      //
+      gBS->CloseProtocol (
+             Controller,
+             &gEfiExtScsiPassThruProtocolGuid,
+             This->DriverBindingHandle,
+             Controller
+             );      
+      if (!EFI_ERROR(Status)) {
+        return EFI_SUCCESS;
+      }
+    }
   }
 
-  if (EFI_ERROR (Status)) {
-    Status = gBS->OpenProtocol (
-                    Controller,
-                    &gEfiScsiPassThruProtocolGuid,
-                    (VOID **)&PassThru,
-                    This->DriverBindingHandle,
-                    Controller,
-                    EFI_OPEN_PROTOCOL_BY_DRIVER
-                    );
-
-    if (Status == EFI_ALREADY_STARTED) {
-      return EFI_SUCCESS;
-    }
-
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-
-    gBS->CloseProtocol (
-      Controller,
-      &gEfiScsiPassThruProtocolGuid,
-      This->DriverBindingHandle,
-      Controller
-      );
+  //
+  // Come here in 2 condition: 
+  // 1. ExtPassThru doesn't exist.
+  // 2. ExtPassThru exists but RemainingDevicePath is invalid.
+  //
+  Status = gBS->OpenProtocol (
+                  Controller,
+                  &gEfiScsiPassThruProtocolGuid,
+                  (VOID **)&PassThru,
+                  This->DriverBindingHandle,
+                  Controller,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
+  
+  if (Status == EFI_ALREADY_STARTED) {
     return EFI_SUCCESS;
   }
-
+  
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
   //
-  // Close the I/O Abstraction(s) used to perform the supported test
+  // Test RemainingDevicePath is valid or not.
   //
+  if ((RemainingDevicePath != NULL) && !IsDevicePathEnd (RemainingDevicePath)) {
+    Status = PassThru->GetTargetLun (PassThru, RemainingDevicePath, &ScsiTargetId.ScsiId.Scsi, &Lun);
+  }
+  
   gBS->CloseProtocol (
-    Controller,
-    &gEfiExtScsiPassThruProtocolGuid,
-    This->DriverBindingHandle,
-    Controller
-    );
-
-  return EFI_SUCCESS;
+         Controller,
+         &gEfiScsiPassThruProtocolGuid,
+         This->DriverBindingHandle,
+         Controller
+         );
+  return Status;
 }
 
 
@@ -259,25 +270,20 @@ SCSIBusDriverBindingStart (
   EFI_STATUS                            DevicePathStatus;
   EFI_STATUS                            PassThruStatus;
   SCSI_BUS_DEVICE                       *ScsiBusDev;
-  SCSI_TARGET_ID                        *ScsiTargetId;
+  SCSI_TARGET_ID                        ScsiTargetId;
   EFI_DEVICE_PATH_PROTOCOL              *ParentDevicePath;
   EFI_SCSI_PASS_THRU_PROTOCOL           *ScsiInterface;
   EFI_EXT_SCSI_PASS_THRU_PROTOCOL       *ExtScsiInterface;
   EFI_SCSI_BUS_PROTOCOL                 *BusIdentify;
 
   TargetId        = NULL;
-  ScsiTargetId    = NULL;
   ScanOtherPuns   = TRUE;
   FromFirstTarget = FALSE;
   ExtScsiSupport  = FALSE;
   PassThruStatus  = EFI_SUCCESS;
   
-  ScsiTargetId = AllocateZeroPool(sizeof(SCSI_TARGET_ID));
-  if (ScsiTargetId == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  TargetId = &ScsiTargetId->ScsiId.ExtScsi[0];
+  TargetId = &ScsiTargetId.ScsiId.ExtScsi[0];
+  SetMem (TargetId, TARGET_MAX_BYTES, 0xFF);
   
   DevicePathStatus = gBS->OpenProtocol (
                             Controller,
@@ -407,9 +413,7 @@ SCSIBusDriverBindingStart (
     // If RemainingDevicePath is NULL, 
     // must enumerate all SCSI devices anyway
     //
-    SetMem (ScsiTargetId, TARGET_MAX_BYTES,0xFF);
     FromFirstTarget = TRUE;
-
   } else if (!IsDevicePathEnd (RemainingDevicePath)) {
     //
     // If RemainingDevicePath isn't the End of Device Path Node, 
@@ -418,7 +422,7 @@ SCSIBusDriverBindingStart (
     if (ScsiBusDev->ExtScsiSupport) {
       ScsiBusDev->ExtScsiInterface->GetTargetLun (ScsiBusDev->ExtScsiInterface, RemainingDevicePath, &TargetId, &Lun);  
     } else {
-      ScsiBusDev->ScsiInterface->GetTargetLun (ScsiBusDev->ScsiInterface, RemainingDevicePath, &ScsiTargetId->ScsiId.Scsi, &Lun);
+      ScsiBusDev->ScsiInterface->GetTargetLun (ScsiBusDev->ScsiInterface, RemainingDevicePath, &ScsiTargetId.ScsiId.Scsi, &Lun);
     }
 
   } else {
@@ -438,7 +442,7 @@ SCSIBusDriverBindingStart (
       if (ScsiBusDev->ExtScsiSupport) {
         Status = ScsiBusDev->ExtScsiInterface->GetNextTargetLun (ScsiBusDev->ExtScsiInterface, &TargetId, &Lun);
       } else {
-        Status = ScsiBusDev->ScsiInterface->GetNextDevice (ScsiBusDev->ScsiInterface, &ScsiTargetId->ScsiId.Scsi, &Lun);
+        Status = ScsiBusDev->ScsiInterface->GetNextDevice (ScsiBusDev->ScsiInterface, &ScsiTargetId.ScsiId.Scsi, &Lun);
       }
       if (EFI_ERROR (Status)) {
         //
@@ -453,11 +457,11 @@ SCSIBusDriverBindingStart (
     // Avoid creating handle for the host adapter.
     //
     if (ScsiBusDev->ExtScsiSupport) {
-      if ((ScsiTargetId->ScsiId.Scsi) == ScsiBusDev->ExtScsiInterface->Mode->AdapterId) {
+      if ((ScsiTargetId.ScsiId.Scsi) == ScsiBusDev->ExtScsiInterface->Mode->AdapterId) {
         continue;
       }
     } else {
-      if ((ScsiTargetId->ScsiId.Scsi) == ScsiBusDev->ScsiInterface->Mode->AdapterId) {
+      if ((ScsiTargetId.ScsiId.Scsi) == ScsiBusDev->ScsiInterface->Mode->AdapterId) {
         continue;
       }
     }
@@ -465,9 +469,8 @@ SCSIBusDriverBindingStart (
     // Scan for the scsi device, if it attaches to the scsi bus,
     // then create handle and install scsi i/o protocol.
     //
-    Status = ScsiScanCreateDevice (This, Controller, ScsiTargetId, Lun, ScsiBusDev);
+    Status = ScsiScanCreateDevice (This, Controller, &ScsiTargetId, Lun, ScsiBusDev);
   }
-  FreePool (ScsiTargetId);
   return EFI_SUCCESS;
 
 ErrorExit:
