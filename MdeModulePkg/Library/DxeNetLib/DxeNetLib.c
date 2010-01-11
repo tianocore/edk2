@@ -375,6 +375,7 @@ SyslogBuildPacket (
   //
   Pri = ((NET_SYSLOG_FACILITY & 31) << 3) | (Level & 7);
   gRT->GetTime (&Time, NULL);
+  ASSERT (Time.Month <= 12);
 
   //
   // Use %a to format the ASCII strings, %s to format UNICODE strings
@@ -783,7 +784,7 @@ NetIp6IsNetEqual (
   UINT8 Bit;
   UINT8 Mask;
 
-  ASSERT (Ip1 != NULL && Ip2 != NULL);
+  ASSERT ((Ip1 != NULL) && (Ip2 != NULL) && (PrefixLength < IP6_PREFIX_NUM));
 
   if (PrefixLength == 0) {
     return TRUE;
@@ -799,6 +800,7 @@ NetIp6IsNetEqual (
   if (Bit > 0) {
     Mask = (UINT8) (0xFF << (8 - Bit));
 
+    ASSERT (Byte < 16);
     if ((Ip1->Addr[Byte] & Mask) != (Ip2->Addr[Byte] & Mask)) {
       return FALSE;
     }
@@ -2183,10 +2185,10 @@ NetLibDefaultAddressIsStatic (
   IsStatic         = TRUE;
 
   Status = gBS->LocateProtocol (
-                &gEfiHiiConfigRoutingProtocolGuid,
-                NULL,
-                (VOID **) &HiiConfigRouting
-                );
+                  &gEfiHiiConfigRoutingProtocolGuid,
+                  NULL,
+                  (VOID **) &HiiConfigRouting
+                  );
   if (EFI_ERROR (Status)) {
     return TRUE;
   }
