@@ -2,7 +2,7 @@
   Include file for definitions in the Intel Platform Innovation Framework for EFI
   System Management Mode Core Interface Specification (SMM CIS) version 0.90.
 
-  Copyright (c) 2007 - 2009, Intel Corporation
+  Copyright (c) 2007 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -95,7 +95,7 @@ struct _EFI_SMM_CPU_IO_INTERFACE {
   @retval EFI_SUCCESS           The requested number of bytes was allocated.
   @retval EFI_OUT_OF_RESOURCES  The pool requested could not be allocated.
   @retval EFI_UNSUPPORTED       In runtime.
-  @note: Inconsistent with specification here:
+  @note  Inconsistent with specification here:
          In Framework Spec, this definition is named EFI_SMM_ALLOCATE_POOL.  
          To avoid a naming conflict, the definition is renamed.
 **/
@@ -115,7 +115,7 @@ EFI_STATUS
   @retval EFI_SUCCESS           The memory was returned to the system.
   @retval EFI_INVALID_PARAMETER Buffer was invalid.
   @retval EFI_UNSUPPORTED       In runtime.
-  @note: Inconsistent with specification here:
+  @note  Inconsistent with specification here:
          In Framework Spec, this definition is named EFI_SMM_FREE_POOL.  
          To avoid a naming conflict, the definition is renamed. 
 **/
@@ -140,7 +140,7 @@ EFI_STATUS
   @retval EFI_NOT_FOUND         The requested pages could not be found.
   @retval EFI_INVALID_PARAMETER Type is not AllocateAnyPages or AllocateMaxAddress
                                 or AllocateAddress. Or MemoryType is in the range EfiMaxMemoryType..0x7FFFFFFF.
-  @note: Inconsistent with specification here:
+  @note  Inconsistent with specification here:
          In the Framework Spec, this definition is named EFI_SMM_ALLOCATE_PAGES.  
          To avoid a naming conflict, the definition here is renamed.
 **/
@@ -163,7 +163,7 @@ EFI_STATUS
   @retval EFI_INVALID_PARAMETER Memory is not a page-aligned address or NumberOfPages is invalid.
   @retval EFI_NOT_FOUND         The requested memory pages were not allocated with SmmAllocatePages().
   
-  @note: Inconsistent with specification here:
+  @note  Inconsistent with specification here:
          In the Framework Spec, this definition is named EFI_SMM_FREE_PAGES.  
          To avoid a naming conflict, the definition here is renamed.
 **/

@@ -3,7 +3,7 @@
   used by resources that want to publish IFR/Font/String data and have it
   collected by the Configuration engine.
 
-  Copyright (c) 2007 - 2009, Intel Corporation
+  Copyright (c) 2007 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -635,7 +635,7 @@ EFI_STATUS
 
   @retval EFI_SUCCESS           It worked.
   @retval EFI_NOT_FOUND         A glyph for a character was not found.
-  @note: Inconsistent with specification here:
+  @note  Inconsistent with specification here:
          In Framework Spec, HII spec 0.92. The type of 3rd, 4th and 8th parameter is EFI_UGA_PIXEL.
          Here the definition uses the EFI_GRAPHICS_OUTPUT_BLT_PIXEL, which is defined in UEFI 2.1 spec
 **/
