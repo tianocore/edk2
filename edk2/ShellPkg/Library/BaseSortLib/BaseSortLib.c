@@ -178,8 +178,8 @@ PerformQuickSort (
 **/
 INTN
 DevicePathCompare (
-  IN  VOID             *Buffer1,
-  IN  VOID             *Buffer2
+  IN  CONST VOID             *Buffer1,
+  IN  CONST VOID             *Buffer2
   )
 {
   ASSERT(FALSE);
@@ -199,8 +199,8 @@ DevicePathCompare (
 INTN
 EFIAPI
 StringNoCaseCompare (
-  IN  VOID             *Buffer1,
-  IN  VOID             *Buffer2
+  IN  CONST VOID             *Buffer1,
+  IN  CONST VOID             *Buffer2
   )
 {
   ASSERT(FALSE);

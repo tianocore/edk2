@@ -15,6 +15,13 @@
 **/
 
 #include <Uefi.h>
+#include <Guid/FileInfo.h>
+#include <Protocol/SimpleFileSystem.h>
+#include <Protocol/LoadedImage.h>
+#include <Protocol/EfiShellInterface.h>
+#include <Protocol/EfiShellEnvironment2.h>
+#include <Protocol/EfiShell.h>
+#include <Protocol/EfiShellParameters.h>
 #include <Library/UefiApplicationEntryPoint.h>
 #include <Library/UefiLib.h>
 #include <Library/ShellLib.h>

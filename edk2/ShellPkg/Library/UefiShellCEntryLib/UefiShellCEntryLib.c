@@ -15,6 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Base.h>
 
 #include <Protocol/SimpleFileSystem.h>
+#include <Protocol/LoadedImage.h>
 #include <Protocol/EfiShellInterface.h>
 #include <Protocol/EfiShellParameters.h>
 

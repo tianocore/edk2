@@ -28,8 +28,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 typedef
 INTN
 (EFIAPI *SORT_COMPARE)(
-  IN VOID           *Buffer1,
-  IN VOID           *Buffer2
+  IN CONST VOID                 *Buffer1,
+  IN CONST VOID                 *Buffer2
   );
 
 /**
@@ -53,10 +53,10 @@ INTN
 VOID
 EFIAPI
 PerformQuickSort (
-  IN OUT VOID                           *BufferToSort,
-  IN CONST UINTN                        Count,
-  IN CONST UINTN                        ElementSize,
-  IN       SORT_COMPARE                 CompareFunction
+  IN OUT VOID                   *BufferToSort,
+  IN CONST UINTN                Count,
+  IN CONST UINTN                ElementSize,
+  IN       SORT_COMPARE         CompareFunction
   );
 
 
@@ -73,8 +73,8 @@ PerformQuickSort (
 INTN
 EFIAPI
 DevicePathCompare (
-  IN  VOID             *Buffer1,
-  IN  VOID             *Buffer2
+  IN  CONST VOID                *Buffer1,
+  IN  CONST VOID                *Buffer2
   );
 
 /**
@@ -90,8 +90,8 @@ DevicePathCompare (
 INTN
 EFIAPI
 StringNoCaseCompare (
-  IN  VOID             *Buffer1,
-  IN  VOID             *Buffer2
+  IN  CONST VOID                *Buffer1,
+  IN  CONST VOID                *Buffer2
   );
 
 #endif //__SORT_LIB_H__
