@@ -1,4 +1,4 @@
-#%HEADER%
+
 #/** @file
 #  Base Library implementation.
 #
@@ -79,6 +79,9 @@
 #  Arm/clzsi2.c     | GCC
 #  Arm/ctzsi2.c     | GCC
 #  Arm/ucmpdi2.c    | GCC
+  Arm/clzsi2.S     | GCC
+  Arm/ctzsi2.S     | GCC
+  Arm/ucmpdi2.S    | GCC
   Arm/switch8.S    | GCC
   Arm/switchu8.S   | GCC
   Arm/switch16.S   | GCC
