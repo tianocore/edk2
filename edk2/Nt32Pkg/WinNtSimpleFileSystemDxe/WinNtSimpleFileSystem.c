@@ -1,6 +1,6 @@
 /**@file
 
-Copyright (c) 2006 - 2009, Intel Corporation
+Copyright (c) 2006 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1972,11 +1972,6 @@ Returns:
   SYSTEMTIME                  SystemTime;
   CHAR16                      *RealFileName;
   CHAR16                      *TempPointer;
-  EFI_FILE_INFO               *DirInfo;
-  UINTN                       ReadSize;
-  UINT64                      Location;
-  EFI_STATUS                  DirStatus;
-
 
   Size        = SIZE_OF_EFI_FILE_INFO;
   NameSize    = StrSize (PrivateFile->FileName);
@@ -2060,45 +2055,6 @@ Returns:
       *((CHAR8 *) Buffer + Size) = 0;
     } else {
       CopyMem ((CHAR8 *) Buffer + Size, RealFileName, NameSize);
-    }
-
-    if (Info->Attribute & EFI_FILE_DIRECTORY) {
-      //
-      // The GetFileInformationByHandle.nFileSizeLow is bogus for dir so we 
-      // need to do the same thing the caller would do to get the right value
-      //
-      ASSERT (PrivateFile->EfiFile.Read != NULL);
-      DirStatus = PrivateFile->EfiFile.GetPosition (&PrivateFile->EfiFile, &Location);
-      if (EFI_ERROR (DirStatus)) {
-        Location = 0;
-      }
-
-      PrivateFile->EfiFile.SetPosition (&PrivateFile->EfiFile, 0);
-      Info->FileSize = 0; 
-      do {
-        ReadSize = 0;
-        DirInfo = NULL;
-        DirStatus = PrivateFile->EfiFile.Read (&PrivateFile->EfiFile, &ReadSize, DirInfo);
-        if (DirStatus == EFI_BUFFER_TOO_SMALL) {
-          DirInfo = AllocatePool (ReadSize);
-          if (DirInfo != NULL) {
-            //
-            // Read each dir entry to figure out how big the directory is
-            //
-            DirStatus = PrivateFile->EfiFile.Read (&PrivateFile->EfiFile, &ReadSize, DirInfo);
-            if (!EFI_ERROR (DirStatus) && (ReadSize != 0)) {
-              Info->FileSize += ReadSize;
-            }
-            FreePool (DirInfo);
-          }
-        }
-        
-      } while (!EFI_ERROR (DirStatus) && (ReadSize != 0));
-
-      //
-      // reset the file possition back to the previous location
-      //
-      PrivateFile->EfiFile.SetPosition (&PrivateFile->EfiFile, Location);
     }
   }
 
