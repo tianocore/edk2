@@ -1,7 +1,7 @@
 /** @file
   Misc BDS library function
 
-Copyright (c) 2004 - 2008, Intel Corporation. <BR>
+Copyright (c) 2004 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1006,11 +1006,12 @@ BdsLibGetImageHeader (
     Root = NULL;
     goto Done;
   }
-
+  ASSERT (Root != NULL);
   Status = Root->Open (Root, &ThisFile, FileName, EFI_FILE_MODE_READ, 0);
   if (EFI_ERROR (Status)) {
     goto Done;
   }
+  ASSERT (ThisFile != NULL);
 
   //
   // Get file size
