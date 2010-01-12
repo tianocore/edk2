@@ -375,7 +375,7 @@ SyslogBuildPacket (
   //
   Pri = ((NET_SYSLOG_FACILITY & 31) << 3) | (Level & 7);
   gRT->GetTime (&Time, NULL);
-  ASSERT (Time.Month <= 12);
+  ASSERT ((Time.Month <= 12) && (Time.Month >= 1));
 
   //
   // Use %a to format the ASCII strings, %s to format UNICODE strings
