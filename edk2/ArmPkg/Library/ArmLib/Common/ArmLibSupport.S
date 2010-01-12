@@ -21,6 +21,7 @@
 .globl ASM_PFX(ArmGetInterruptState)
 .globl ASM_PFX(ArmInvalidateTlb)
 .globl ASM_PFX(ArmSetTranslationTableBaseAddress)
+.globl ASM_PFX(ArmGetTranslationTableBaseAddress)
 .globl ASM_PFX(ArmSetDomainAccessControl)
 .globl ASM_PFX(CPSRMaskInsert)
 .globl ASM_PFX(CPSRRead)
@@ -65,6 +66,11 @@ ASM_PFX(ArmInvalidateTlb):
 ASM_PFX(ArmSetTranslationTableBaseAddress):
   mcr     p15,0,r0,c2,c0,0
   bx      lr
+
+ASM_PFX(ArmGetTranslationTableBaseAddress):
+  mrc     p15,0,r0,c2,c0,0
+  bx      lr
+
 
 ASM_PFX(ArmSetDomainAccessControl):
   mcr     p15,0,r0,c3,c0,0

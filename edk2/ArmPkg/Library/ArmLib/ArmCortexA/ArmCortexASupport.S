@@ -24,6 +24,7 @@
 .globl ASM_PFX(ArmDrainWriteBuffer)
 .globl ASM_PFX(ArmEnableMmu)
 .globl ASM_PFX(ArmDisableMmu)
+.globl ASM_PFX(ArmMmuEnabled)
 .globl ASM_PFX(ArmEnableDataCache)
 .globl ASM_PFX(ArmDisableDataCache)
 .globl ASM_PFX(ArmEnableInstructionCache)
@@ -84,6 +85,12 @@ ASM_PFX(ArmEnableMmu):
   orr     R0,R0,#1
   mcr     p15,0,R0,c1,c0,0
   bx      LR
+
+ASM_PFX(ArmMmuEnabled):
+  mrc     p15,0,R0,c1,c0,0
+  and     R0,R0,#1
+  bx      LR
+
 
 ASM_PFX(ArmDisableMmu):
   mov     R0,#0
