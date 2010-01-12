@@ -22,6 +22,7 @@
     EXPORT  ArmDrainWriteBuffer
     EXPORT  ArmEnableMmu
     EXPORT  ArmDisableMmu
+    EXPORT  ArmMmuEnabled
     EXPORT  ArmEnableDataCache
     EXPORT  ArmDisableDataCache
     EXPORT  ArmEnableInstructionCache
@@ -84,6 +85,11 @@ ArmEnableMmu
   mrc     p15,0,R0,c1,c0,0
   orr     R0,R0,#1
   mcr     p15,0,R0,c1,c0,0
+  bx      LR
+
+ArmMmuEnabled
+  mrc     p15,0,R0,c1,c0,0
+  and     R0,R0,#1
   bx      LR
 
 ArmDisableMmu

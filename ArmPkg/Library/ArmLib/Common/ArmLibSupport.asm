@@ -20,6 +20,7 @@
     EXPORT  ArmGetInterruptState
     EXPORT  ArmInvalidateTlb
     EXPORT  ArmSetTranslationTableBaseAddress
+    EXPORT  ArmGetTranslationTableBaseAddress
     EXPORT  ArmSetDomainAccessControl
     EXPORT  CPSRMaskInsert
     EXPORT  CPSRRead
@@ -63,6 +64,10 @@ ArmInvalidateTlb
 
 ArmSetTranslationTableBaseAddress
   mcr     p15,0,r0,c2,c0,0
+  bx      lr
+
+ArmSetTranslationTableBaseAddress
+  mrc     p15,0,r0,c2,c0,0
   bx      lr
 
 ArmSetDomainAccessControl

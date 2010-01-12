@@ -50,8 +50,7 @@ FillTranslationTable (
   Entry    = TRANSLATION_TABLE_ENTRY_FOR_VIRTUAL_ADDRESS(TranslationTable, MemoryRegion->VirtualBase);
   Sections = MemoryRegion->Length / TT_DESCRIPTOR_SECTION_SIZE;
   
-  for (Index = 0; Index < Sections; Index++)
-  {
+  for (Index = 0; Index < Sections; Index++) {
     *Entry++     =  TT_DESCRIPTOR_SECTION_BASE_ADDRESS(PhysicalBase) | Attributes;
     PhysicalBase += TT_DESCRIPTOR_SECTION_SIZE;
   }
