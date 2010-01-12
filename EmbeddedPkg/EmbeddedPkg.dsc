@@ -1,4 +1,3 @@
-#%HEADER%
 #/** @file
 # Embedded Package
 #
