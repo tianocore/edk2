@@ -1,6 +1,5 @@
-#%HEADER%
 #/** @file
-# NT Emulation Reset Architectural Protocol Driver as defined in TIANO
+# Reset Architectural Protocol Driver as defined in PI
 #
 # This Reset module simulates system reset by process exit on NT.
 # Copyright (c) 2006 - 2007, Intel Corporation
