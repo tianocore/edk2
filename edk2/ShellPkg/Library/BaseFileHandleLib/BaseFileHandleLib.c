@@ -1073,7 +1073,11 @@ FileHandleEof(
     return (FALSE);
   } 
 
-  RetVal = (Pos == Info->FileSize)?TRUE:FALSE;
+  if (Pos == Info->FileSize) {
+    RetVal = TRUE;
+  } else {
+    RetVal = FALSE;
+  }
 
   FreePool (Info);
 
