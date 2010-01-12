@@ -1,4 +1,4 @@
-#%HEADER%
+
 #/** @file
 #  SEC - Reset vector code that jumps to C and loads DXE core
 #  
