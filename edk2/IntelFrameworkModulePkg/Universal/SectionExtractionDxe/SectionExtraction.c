@@ -1000,6 +1000,7 @@ FindChildNode (
       }
     }
     
+    ASSERT (CurrentChildNode != NULL);
     if (CurrentChildNode->EncapsulatedStreamHandle != NULL_STREAM_HANDLE) {
       //
       // If the current node is an encapsulating node, recurse into it...
@@ -1054,7 +1055,6 @@ FindChildNode (
         if (EFI_ERROR (Status)) {
           return Status;
         }
-        ASSERT (CurrentChildNode != NULL);
       } else {
         ASSERT (EFI_ERROR (ErrorStatus));
         return ErrorStatus;
