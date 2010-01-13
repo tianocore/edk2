@@ -80,6 +80,7 @@
   ArmPkg/Library/SemiHostingSerialPortLib/SemiHostingSerialPortLib.inf
   ArmPkg/Library/SemihostLib/SemihostLib.inf
   ArmPkg/Library/UncachedMemoryAllocationLib/UncachedMemoryAllocationLib.inf
+  ArmPkg/Library/DebugUncachedMemoryAllocationLib/DebugUncachedMemoryAllocationLib.inf
 
   ArmPkg/Drivers/CpuDxe/CpuDxe.inf
   ArmPkg/Drivers/DebugSupportDxe/DebugSupportDxe.inf
