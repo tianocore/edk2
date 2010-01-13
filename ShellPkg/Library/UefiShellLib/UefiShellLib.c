@@ -53,7 +53,7 @@ STATIC CHAR16                        *mPostReplaceFormat2;
 **/
 BOOLEAN
 EFIAPI
-ShellLibIsHexaDecimalDigitCharacter (
+ShellIsHexaDecimalDigitCharacter (
   IN      CHAR16                    Char
   ) {
   return (BOOLEAN) ((Char >= L'0' && Char <= L'9') || (Char >= L'A' && Char <= L'F') || (Char >= L'a' && Char <= L'f'));
@@ -1684,7 +1684,7 @@ InternalIsFlag (
   //
   // If we accept numbers then dont return TRUE. (they will be values)
   //
-  if (((Name[0] == L'-' || Name[0] == L'+') && ShellLibIsHexaDecimalDigitCharacter(Name[1])) && AlwaysAllowNumbers != FALSE) {
+  if (((Name[0] == L'-' || Name[0] == L'+') && ShellIsHexaDecimalDigitCharacter(Name[1])) && AlwaysAllowNumbers != FALSE) {
     return (FALSE);
   }
 
@@ -2249,26 +2249,29 @@ ShellCommandLineCheckDuplicate (
   @param[in] NewSize                  Size in bytes of NewString
   @param[in] FindTarget               String to look for
   @param[in[ ReplaceWith              String to replace FindTarget with
+  @param[in] SkipPreCarrot            If TRUE will skip a FindTarget that has a '^'
+                                      immediately before it.
 
-  @retval EFI_INVALID_PARAMETER       SourceString was NULL
-  @retval EFI_INVALID_PARAMETER       NewString was NULL
-  @retval EFI_INVALID_PARAMETER       FindTarget was NULL
-  @retval EFI_INVALID_PARAMETER       ReplaceWith was NULL
-  @retval EFI_INVALID_PARAMETER       FindTarget had length < 1
-  @retval EFI_INVALID_PARAMETER       SourceString had length < 1
+  @retval EFI_INVALID_PARAMETER       SourceString was NULL.
+  @retval EFI_INVALID_PARAMETER       NewString was NULL.
+  @retval EFI_INVALID_PARAMETER       FindTarget was NULL.
+  @retval EFI_INVALID_PARAMETER       ReplaceWith was NULL.
+  @retval EFI_INVALID_PARAMETER       FindTarget had length < 1.
+  @retval EFI_INVALID_PARAMETER       SourceString had length < 1.
   @retval EFI_BUFFER_TOO_SMALL        NewSize was less than the minimum size to hold 
-                                      the new string (truncation occurred)
-  @retval EFI_SUCCESS                 the string was sucessfully copied with replacement
+                                      the new string (truncation occurred).
+  @retval EFI_SUCCESS                 the string was sucessfully copied with replacement.
 **/
 
 EFI_STATUS
 EFIAPI
-ShellLibCopySearchAndReplace(
+ShellCopySearchAndReplace2(
   IN CHAR16 CONST                     *SourceString,
   IN CHAR16                           *NewString,
   IN UINTN                            NewSize,
   IN CONST CHAR16                     *FindTarget,
-  IN CONST CHAR16                     *ReplaceWith
+  IN CONST CHAR16                     *ReplaceWith,
+  IN CONST BOOLEAN                    SkipPreCarrot
   ) 
 {
   UINTN Size;
@@ -2283,7 +2286,13 @@ ShellLibCopySearchAndReplace(
   }
   NewString = SetMem16(NewString, NewSize, CHAR_NULL);
   while (*SourceString != CHAR_NULL) {
-    if (StrnCmp(SourceString, FindTarget, StrLen(FindTarget)) == 0) {
+    //
+    // if we find the FindTarget and either Skip == FALSE or Skip == TRUE and we 
+    // dont have a carrot do a replace...
+    //
+    if (StrnCmp(SourceString, FindTarget, StrLen(FindTarget)) == 0 
+      && ((SkipPreCarrot && *(SourceString-1) != L'^') || SkipPreCarrot == FALSE)
+      ){
       SourceString += StrLen(FindTarget);
       Size = StrSize(NewString);
       if ((Size + (StrLen(ReplaceWith)*sizeof(CHAR16))) > NewSize) {

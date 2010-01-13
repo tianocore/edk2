@@ -1033,6 +1033,8 @@ StrnCatGrow (
   @param[in] NewSize                  Size in bytes of NewString.
   @param[in] FindTarget               String to look for.
   @param[in] ReplaceWith              String to replace FindTarget with.
+  @param[in] SkipPreCarrot            If TRUE will skip a FindTarget that has a '^'
+                                      immediately before it.
 
   @retval EFI_INVALID_PARAMETER       SourceString was NULL.
   @retval EFI_INVALID_PARAMETER       NewString was NULL.
@@ -1042,18 +1044,24 @@ StrnCatGrow (
   @retval EFI_INVALID_PARAMETER       SourceString had length < 1.
   @retval EFI_BUFFER_TOO_SMALL        NewSize was less than the minimum size to hold 
                                       the new string (truncation occurred).
-  @retval EFI_SUCCESS                 the string was sucessfully copied with replacement.
+  @retval EFI_SUCCESS                 The string was sucessfully copied with replacement.
 **/
 
 EFI_STATUS
 EFIAPI
-ShellLibCopySearchAndReplace(
+ShellCopySearchAndReplace2(
   IN CHAR16 CONST                     *SourceString,
   IN CHAR16                           *NewString,
   IN UINTN                            NewSize,
   IN CONST CHAR16                     *FindTarget,
-  IN CONST CHAR16                     *ReplaceWith
+  IN CONST CHAR16                     *ReplaceWith,
+  IN CONST BOOLEAN                    SkipPreCarrot
   );
+
+///
+/// make upgrades easier from old version
+///
+#define ShellLibCopySearchAndReplace(a,b,c,d,e) ShellCopySearchAndReplace2(a,b,c,d,e,FALSE)
 
 /**
   Check if a Unicode character is a hexadecimal character.
@@ -1070,7 +1078,7 @@ ShellLibCopySearchAndReplace(
 **/
 BOOLEAN
 EFIAPI
-ShellLibIsHexaDecimalDigitCharacter (
+ShellIsHexaDecimalDigitCharacter (
   IN      CHAR16                    Char
   );
 
