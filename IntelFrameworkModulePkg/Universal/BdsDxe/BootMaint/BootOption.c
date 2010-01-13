@@ -1062,7 +1062,8 @@ BOpt_GetBootOptions (
       FreePool (HiiString);
     } else {
       NewLoadContext->Description = AllocateZeroPool (StrSize((UINT16*)LoadOptionPtr));
-      StrCpy(NewLoadContext->Description, (UINT16*)LoadOptionPtr);
+      ASSERT (NewLoadContext->Description != NULL);
+      StrCpy (NewLoadContext->Description, (UINT16*)LoadOptionPtr);
     }
     
     ASSERT (NewLoadContext->Description != NULL);
