@@ -1,7 +1,7 @@
 /** @file
   The internal header file declares the private functions used by PeiPcd driver.
 
-Copyright (c) 2006 - 2009, Intel Corporation
+Copyright (c) 2006 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -794,6 +794,7 @@ SetValueWorker (
 
   @retval EFI_INVALID_PARAMETER  If this PCD type is VPD, VPD PCD can not be set.
   @retval EFI_INVALID_PARAMETER  If Size can not be set to size table.
+  @retval EFI_INVALID_PARAMETER  If Size of non-Ptr type PCD does not match the size information in PCD database.
   @retval EFI_NOT_FOUND          If value type of PCD entry is intergrate, but not in
                                  range of UINT8, UINT16, UINT32, UINT64
   @retval EFI_NOT_FOUND          Can not find the PCD type according to token number.                                
