@@ -1,7 +1,7 @@
 ///**@file
 // Low leve x64 specific debug support functions.
 //
-// Copyright (c) 2006 - 2009, Intel Corporation
+// Copyright (c) 2006 - 2010, Intel Corporation
 // Portions copyright (c) 2008-2009 Apple Inc. All rights reserved.
 // All rights reserved. This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
@@ -11,15 +11,15 @@
 // THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 // WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
-//**/    
+//**/
 
 ASM_GLOBAL ASM_PFX(OrigVector)
 ASM_GLOBAL ASM_PFX(InterruptEntryStub)
 ASM_GLOBAL ASM_PFX(StubSize)
 ASM_GLOBAL ASM_PFX(CommonIdtEntry)
 ASM_GLOBAL ASM_PFX(FxStorSupport)
-     
-.data 
+
+.data
 
 ASM_PFX(StubSize):         .long   ASM_PFX(InterruptEntryStubEnd) - ASM_PFX(InterruptEntryStub)
 ASM_PFX(AppRsp):           .long   0x11111111 # ?
@@ -79,7 +79,7 @@ ASM_PFX(ExceptionNumber):  .long   0x77777777    # first entry will be the vecto
                            .long   0x77777777    # ?
 
 DebugStackBegin : .ascii    "<<<< DbgStkBegin"   # initial debug ESP == DebugStackBegin, set in stub
-           
+
 
 .text
 
@@ -92,7 +92,7 @@ DebugStackBegin : .ascii    "<<<< DbgStkBegin"   # initial debug ESP == DebugSta
 // Abstract: Returns TRUE if FxStor instructions are supported
 //
 ASM_GLOBAL ASM_PFX(FxStorSupport)
-ASM_PFX(FxStorSupport):  
+ASM_PFX(FxStorSupport):
 //
 // cpuid corrupts rbx which must be preserved per the C calling convention
 //
@@ -138,7 +138,7 @@ ASM_PFX(InterruptEntryStub):
 
                 pushq  $0                       # push vector number - will be modified before installed
                 jmp     ASM_PFX(CommonIdtEntry)
-                
+
 ASM_GLOBAL ASM_PFX(InterruptEntryStubEnd)
 ASM_PFX(InterruptEntryStubEnd):
 
@@ -249,7 +249,7 @@ ExtraPushOne:
 
 // If there's some extra data, save it also, and modify the saved AppRsp to effectively
 // pop this value off the application's stack.
-                movq    ASM_PFX(AppRsp)(%rip), %rax 
+                movq    ASM_PFX(AppRsp)(%rip), %rax
                 movq    (%rax), %rbx
                 movq    %rbx, ASM_PFX(ExceptData)(%rip)
                 addq    $8, %rax
@@ -262,11 +262,11 @@ ExtraPushDone:
 // debug RSP, and replace it with the application's last stack entry...
                 movq    24(%rsp), %rax
                 movq    %rax, ASM_PFX(DebugRsp)(%rip)
-                movq    ASM_PFX(AppRsp)(%rip), %rax 
-                addq    $40, %rax
+                movq    ASM_PFX(AppRsp)(%rip), %rax
+                movq    24(%rax), %rax
                 # application stack has ss, rsp, rflags, cs, & rip, so
-                # last actual application stack entry is 40 bytes
-                # into the application stack.
+                # last actual application stack entry is saved at offset
+                # 24 bytes from stack top.
                 movq    %rax, 24(%rsp)
 
 // continue building context record
@@ -288,7 +288,7 @@ ExtraPushDone:
                 pushq   %rax
 // UINT64  Rip;
                 # Rip from application is on top of application stack
-                movq    ASM_PFX(AppRsp)(%rip), %rax 
+                movq    ASM_PFX(AppRsp)(%rip), %rax
                 pushq   (%rax)
 // UINT64  Gdtr[2], Idtr[2];
                 push    $0
@@ -307,7 +307,7 @@ ExtraPushDone:
 
 // UINT64  RFlags;
 // Rflags from application is two entries back in application stack
-                movq    ASM_PFX(AppRsp)(%rip), %rax 
+                movq    ASM_PFX(AppRsp)(%rip), %rax
                 pushq   16(%rax)
 // UINT64  Cr0, Cr1, Cr2, Cr3, Cr4, Cr8;
 // insure FXSAVE/FXRSTOR is enabled in CR4...
@@ -353,7 +353,7 @@ ExtraPushDone:
                 # IMPORTANT!! The debug stack has been carefully constructed to
                 # insure that rsp and rdi are 16 byte aligned when we get here.
                 # They MUST be.  If they are not, a GP fault will occur.
-          
+
                 #     FXSTOR_RDI
                 fxsave      (%rdi)
 
@@ -364,7 +364,7 @@ ExtraPushDone:
 // call to C code which will in turn call registered handler
 // pass in the vector number
                 movq    %rsp, %rdx
-                movq    ASM_PFX(ExceptionNumber)(%rip), %rcx 
+                movq    ASM_PFX(ExceptionNumber)(%rip), %rcx
                 subq    $40, %rsp
                 call    ASM_PFX(InterruptDistrubutionHub)
                 addq    $40, %rsp
@@ -374,7 +374,7 @@ ExtraPushDone:
 
 // FX_SAVE_STATE_X64 FxSaveState;
                 movq    %rsp, %rsi
-            
+
                 #    FXRSTOR_RSI
                 fxrstor     (%rsi)
 
@@ -408,7 +408,7 @@ ExtraPushDone:
                 popq    %rax
                 movq    %rax, %cr8
 // UINT64  RFlags;
-                movq    ASM_PFX(AppRsp)(%rip), %rax 
+                movq    ASM_PFX(AppRsp)(%rip), %rax
                 popq    16(%rax)
 // UINT64  Ldtr, Tr;
 // UINT64  Gdtr[2], Idtr[2];
@@ -431,7 +431,7 @@ ExtraPushDone:
                 mov     %rax, %es
                 popq    %rax
                 mov     %rax, %ds
-                movq    ASM_PFX(AppRsp)(%rip), %rax 
+                movq    ASM_PFX(AppRsp)(%rip), %rax
                 popq    8(%rax)
                 popq    %rax
                 mov     %rax, %ss
@@ -444,12 +444,12 @@ ExtraPushDone:
 ## determine if we need to relocate the application stack.
 
                 movq    24(%rsp), %rbx  # move the potentially modified AppRsp into rbx
-                movq    ASM_PFX(AppRsp)(%rip), %rax 
-                addq    $40, %rax
+                movq    ASM_PFX(AppRsp)(%rip), %rax
+                movq    24(%rax), %rax
                 cmpq    %rax, %rbx
                 je      NoAppStackMove
 
-                movq    ASM_PFX(AppRsp)(%rip), %rax 
+                movq    ASM_PFX(AppRsp)(%rip), %rax
                 movq    (%rax), %rcx     # RIP
                 movq    %rcx, (%rbx)
 
@@ -479,7 +479,7 @@ Chain:
 
 // Restore rflags so when we chain, the flags will be exactly as if we were never here.
 // We gin up the stack to do an iretq so we can get ALL the flags.
-                movq    ASM_PFX(AppRsp)(%rip), %rax 
+                movq    ASM_PFX(AppRsp)(%rip), %rax
                 movq    40(%rax), %rbx
                 pushq   %rbx
                 mov     %ss, %rax
@@ -487,13 +487,13 @@ Chain:
                 movq    %rsp, %rax
                 addq    $16, %rax
                 pushq   %rax
-                movq    ASM_PFX(AppRsp)(%rip), %rax 
+                movq    ASM_PFX(AppRsp)(%rip), %rax
                 movq    16(%rax), %rbx
                 andq    $0xfffffffffffffcff, %rbx  # special handling for IF and TF
                 pushq   %rbx
                 mov     %cs, %rax
                 pushq   %rax
-                movq    PhonyIretq(%rip), %rax 
+                movq    PhonyIretq(%rip), %rax
                 pushq   %rax
                 iretq
 PhonyIretq:
@@ -518,7 +518,7 @@ PhonyIretq:
                 popq    %r15
 
 // Switch back to application stack
-                movq    ASM_PFX(AppRsp)(%rip), %rsp 
+                movq    ASM_PFX(AppRsp)(%rip), %rsp
 // Jump to original handler
                 jmp     ASM_PFX(OrigVector)
 NoChain:
@@ -542,7 +542,7 @@ NoChain:
                 popq    %r15
 
 // Switch back to application stack
-                movq    ASM_PFX(AppRsp)(%rip), %rsp 
+                movq    ASM_PFX(AppRsp)(%rip), %rsp
 
 // We're outa here...
                 iret
