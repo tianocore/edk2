@@ -7,7 +7,7 @@
 #  This library binds to the first PCI Root Bridge I/O Protocol in the platform. As a result,
 #  it should only be used on platforms that contain a single PCI root bridge.
 #
-# Copyright (c) 2009, Intel Corporation.
+# Copyright (c) 2009 - 2010, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -27,7 +27,6 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = PciLib|DXE_SMM_DRIVER SMM_CORE
   PI_SPECIFICATION_VERSION       = 0x0001000A
-
   CONSTRUCTOR                    = PciLibConstructor
 
 #
@@ -36,13 +35,11 @@
 #  VALID_ARCHITECTURES           = IA32 X64
 #
 
-[Sources.common]
+[Sources]
   PciLib.c
-
 
 [Packages]
   MdePkg/MdePkg.dec
-
 
 [LibraryClasses]
   BaseLib
@@ -51,4 +48,3 @@
 
 [Protocols]
   gEfiSmmPciRootBridgeIoProtocolGuid               ## CONSUMES
-
