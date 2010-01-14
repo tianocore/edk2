@@ -1,7 +1,7 @@
 /** @file
   Pei Core Firmware File System service routines.
   
-Copyright (c) 2006 - 2009, Intel Corporation                                                         
+Copyright (c) 2006 - 2010, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -1101,6 +1101,7 @@ PeiFfs2FvPpiFindFileByName (
         Status = FindFileEx (PrivateData->Fv[Index].FvHandle, FileName, 0, FileHandle, NULL);
         if (!EFI_ERROR (Status)) {
           *FvHandle = PrivateData->Fv[Index].FvHandle;
+          break;
         }
       }
     }
