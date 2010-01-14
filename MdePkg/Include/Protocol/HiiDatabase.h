@@ -2,7 +2,7 @@
   The file provides Database manager for HII-related data
   structures.
   
-  Copyright (c) 2006 - 2008, Intel Corporation
+  Copyright (c) 2006 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -81,11 +81,16 @@ EFI_STATUS
   corresponding call to
   EFI_HII_DATABASE_PROTOCOL.RemovePackageList().
 
+  Note: inconsistency with UEFI 2.3 spec that the parameter DriverHandle
+  is optional.
+  
   @param This           A pointer to the EFI_HII_DATABASE_PROTOCOL instance.
 
   @param PackageList    A pointer to an EFI_HII_PACKAGE_LIST_HEADER structure.
 
   @param DriverHandle   Associate the package list with this EFI handle.
+                        If a NULL is specified, this data will not be associate
+                        with any drivers and cannot have a callback induced.
   
   @param Handle         A pointer to the EFI_HII_HANDLE instance.
 
@@ -104,7 +109,7 @@ EFI_STATUS
 (EFIAPI *EFI_HII_DATABASE_NEW_PACK)(
   IN CONST  EFI_HII_DATABASE_PROTOCOL   *This,
   IN CONST  EFI_HII_PACKAGE_LIST_HEADER *PackageList,
-  IN        EFI_HANDLE                  DriverHandle,
+  IN        EFI_HANDLE                  DriverHandle, OPTIONAL
   OUT       EFI_HII_HANDLE               *Handle
 );
 
