@@ -23,7 +23,6 @@
 #include <Protocol/SmmCpuIo.h>
 
 typedef struct _EFI_SMM_SYSTEM_TABLE      EFI_SMM_SYSTEM_TABLE;
-typedef struct _EFI_SMM_CPU_IO_INTERFACE  EFI_SMM_CPU_IO_INTERFACE;
 
 //
 // SMM Base specification constant and types
