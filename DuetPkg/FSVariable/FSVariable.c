@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006 - 2009, Intel Corporation
+Copyright (c) 2006 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -755,7 +755,7 @@ AutoUpdateLangVariable(
     // Therefore, in variable driver, only store the original value for other use.
     //
     AsciiStrnCpy (mGlobal->LangCodes, Data, DataSize);
-  } else if (StrCmp (VariableName, L"PlatformLang") == 0) {
+  } else if ((StrCmp (VariableName, L"PlatformLang") == 0) && (DataSize != 0)) {
     ASSERT (AsciiStrLen (mGlobal->PlatformLangCodes) != 0);
 
     //
@@ -785,7 +785,7 @@ AutoUpdateLangVariable(
 
     ASSERT_EFI_ERROR(Status);
     
-  } else if (StrCmp (VariableName, L"Lang") == 0) {
+  } else if ((StrCmp (VariableName, L"Lang") == 0) && (DataSize != 0)) {
     ASSERT (AsciiStrLen (mGlobal->LangCodes) != 0);
 
     //
