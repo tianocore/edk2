@@ -1,7 +1,7 @@
 ;/** @file
 ;  Low level x64 routines used by the debug support driver.
 ;
-;  Copyright (c) 2007 - 2008, Intel Corporation.
+;  Copyright (c) 2007 - 2010, Intel Corporation.
 ;  All rights reserved. This program and the accompanying materials
 ;  are licensed and made available under the terms and conditions of the BSD License
 ;  which accompanies this distribution.  The full text of the license may be found at
@@ -296,10 +296,10 @@ ExtraPushDone:
                 mov     rax, [rsp + 24]
                 mov     DebugRsp, rax
                 mov     rax, AppRsp
-                add     rax, 40
+                mov     rax, QWORD PTR [rax + 24]
                 ; application stack has ss, rsp, rflags, cs, & rip, so
-                ; last actual application stack entry is
-                ; 40 bytes into the application stack.
+                ; last actual application stack entry is saved at offset
+                ; 24 bytes from stack top.
                 mov     [rsp + 24], rax
 
 ;; continue building context record
@@ -482,7 +482,7 @@ ExtraPushDone:
 
                 mov     rbx, [rsp + 24]  ; move the potentially modified AppRsp into rbx
                 mov     rax, AppRsp
-                add     rax, 40
+                mov     rax, QWORD PTR [rax + 24]
                 cmp     rbx, rax
                 je      NoAppStackMove
 
