@@ -1564,6 +1564,7 @@ ShellFindFilePathEx (
   CHAR16            *TestPath;
   CHAR16            *RetVal;
   CONST CHAR16      *ExtensionWalker;
+  UINTN             Size;
   ASSERT(FileName != NULL);
   if (FileExtension == NULL) {
     return (ShellFindFilePath(FileName));
@@ -1572,7 +1573,9 @@ ShellFindFilePathEx (
   if (RetVal != NULL) {
     return (RetVal);
   }
-  TestPath = AllocateZeroPool(StrSize(FileName) + StrSize(FileExtension));
+  Size =  StrSize(FileName);
+  Size += StrSize(FileExtension);
+  TestPath = AllocateZeroPool(Size);
   for (ExtensionWalker = FileExtension ;  ; ExtensionWalker = StrStr(ExtensionWalker, L";") + 1 ){
     StrCpy(TestPath, FileName);
     StrCat(TestPath, ExtensionWalker);
