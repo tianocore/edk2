@@ -52,7 +52,7 @@ EFI_STATUS
 
 struct _VIRTUAL_UNCACHED_PAGES_PROTOCOL {
   CONVERT_PAGES_TO_UNCACHED_VIRTUAL_ADDRESS  ConvertPages;
-  FREE_CONVERTED_PAGES                       FreeConvertedPages;
+  FREE_CONVERTED_PAGES                       RevertPages;
 };
 
 extern EFI_GUID gVirtualUncachedPagesProtocolGuid;

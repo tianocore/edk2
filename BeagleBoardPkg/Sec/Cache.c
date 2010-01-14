@@ -58,29 +58,23 @@ InitCache (
   MemoryTable[0].Length       = MemoryLength;
   MemoryTable[0].Attributes   = (ARM_MEMORY_REGION_ATTRIBUTES)CacheAttributes;
 
-  // Uncached DDR Mirror
-  MemoryTable[1].PhysicalBase = MemoryBase;
-  MemoryTable[1].VirtualBase  = MemoryBase | UncachedMemoryMask;
-  MemoryTable[1].Length       = MemoryLength;
-  MemoryTable[1].Attributes   = DDR_ATTRIBUTES_UNCACHED;
-
   // SOC Registers. L3 interconnects
-  MemoryTable[2].PhysicalBase = SOC_REGISTERS_L3_PHYSICAL_BASE;
-  MemoryTable[2].VirtualBase  = SOC_REGISTERS_L3_PHYSICAL_BASE;
-  MemoryTable[2].Length       = SOC_REGISTERS_L3_PHYSICAL_LENGTH;
-  MemoryTable[2].Attributes   = SOC_REGISTERS_L3_ATTRIBUTES;
+  MemoryTable[1].PhysicalBase = SOC_REGISTERS_L3_PHYSICAL_BASE;
+  MemoryTable[1].VirtualBase  = SOC_REGISTERS_L3_PHYSICAL_BASE;
+  MemoryTable[1].Length       = SOC_REGISTERS_L3_PHYSICAL_LENGTH;
+  MemoryTable[1].Attributes   = SOC_REGISTERS_L3_ATTRIBUTES;
   
   // SOC Registers. L4 interconnects
-  MemoryTable[3].PhysicalBase = SOC_REGISTERS_L4_PHYSICAL_BASE;
-  MemoryTable[3].VirtualBase  = SOC_REGISTERS_L4_PHYSICAL_BASE;
-  MemoryTable[3].Length       = SOC_REGISTERS_L4_PHYSICAL_LENGTH;
-  MemoryTable[3].Attributes   = SOC_REGISTERS_L4_ATTRIBUTES;
+  MemoryTable[2].PhysicalBase = SOC_REGISTERS_L4_PHYSICAL_BASE;
+  MemoryTable[2].VirtualBase  = SOC_REGISTERS_L4_PHYSICAL_BASE;
+  MemoryTable[2].Length       = SOC_REGISTERS_L4_PHYSICAL_LENGTH;
+  MemoryTable[2].Attributes   = SOC_REGISTERS_L4_ATTRIBUTES;
 
   // End of Table
-  MemoryTable[4].PhysicalBase = 0;
-  MemoryTable[4].VirtualBase  = 0;
-  MemoryTable[4].Length       = 0;
-  MemoryTable[4].Attributes   = (ARM_MEMORY_REGION_ATTRIBUTES)0;
+  MemoryTable[3].PhysicalBase = 0;
+  MemoryTable[3].VirtualBase  = 0;
+  MemoryTable[3].Length       = 0;
+  MemoryTable[3].Attributes   = (ARM_MEMORY_REGION_ATTRIBUTES)0;
   
   ArmConfigureMmu (MemoryTable, &TranslationTableBase, &TranslationTableSize);
   

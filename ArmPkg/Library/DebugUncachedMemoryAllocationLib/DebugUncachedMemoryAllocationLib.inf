@@ -29,19 +29,19 @@
   MdePkg/MdePkg.dec
   ArmPkg/ArmPkg.dec
 
-[Protocols]
-  gEfiCpuArchProtocolGuid
 
 [LibraryClasses]
   BaseLib
-  UefiMemoryAllocationLib
+  MemoryAllocationLib
   ArmLib
 
+[Protocols]
+  gEfiCpuArchProtocolGuid
+  gVirtualUncachedPagesProtocolGuid
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdArmUncachedMemoryMask
   
   
 [Depex]
-  gEfiCpuArchProtocolGuid
-  gVirtualUncachedPagesProtocolGuid
+  gEfiCpuArchProtocolGuid AND gVirtualUncachedPagesProtocolGuid

@@ -263,6 +263,7 @@ ArmSetTranslationTableBaseAddress (
 VOID *
 EFIAPI
 ArmGetTranslationTableBaseAddress (
+  VOID
   );
 
 VOID

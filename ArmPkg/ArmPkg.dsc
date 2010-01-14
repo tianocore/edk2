@@ -49,6 +49,7 @@
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
 
   ArmLib|ArmPkg/Library/ArmLib/ArmCortexA/ArmCortexArmLib.inf
+  CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
 
 [LibraryClasses.ARM]
   #
