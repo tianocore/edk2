@@ -69,6 +69,7 @@
 
 [Components.common]
   UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
+  UefiCpuPkg/CpuIoPei/CpuIoPei.inf
 
 [Components.IA32, Components.X64]
   UefiCpuPkg/CpuIo2Smm/CpuIo2Smm.inf
