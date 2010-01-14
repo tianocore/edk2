@@ -1,7 +1,7 @@
 /** @file
   Pei Core Main Entry Point
   
-Copyright (c) 2006 - 2009, Intel Corporation
+Copyright (c) 2006 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -184,7 +184,7 @@ PeiCore (
     //
     REPORT_STATUS_CODE (
       EFI_PROGRESS_CODE,
-      FixedPcdGet32 (PcdStatusCodeValuePeiCoreEntry)
+      PcdGet32 (PcdStatusCodeValuePeiCoreEntry)
       );
       
     PERF_START (NULL, "SEC", NULL, 1);
