@@ -49,7 +49,7 @@ typedef enum {
   Memory-based access services and I/O-based access services.
 
   @param[in]  PeiServices  An indirect pointer to the PEI Services Table
-                                published by the PEI Foundation.
+                           published by the PEI Foundation.
   @param[in]  This         Pointer to local data for the interface.
   @param[in]  Width        The width of the access. Enumerated in bytes.
   @param[in]  Address      The physical address of the access.
