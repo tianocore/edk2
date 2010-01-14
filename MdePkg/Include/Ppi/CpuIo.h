@@ -1,8 +1,8 @@
 /** @file
-  This PPI provides a set of memory- and I/O-based services. 
+  This PPI provides a set of memory and I/O-based services. 
   The perspective of the services is that of the processor, not the bus or system.
 
-  Copyright (c) 2006 - 2009, Intel Corporation                                                         
+  Copyright (c) 2006 - 2010, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -48,13 +48,13 @@ typedef enum {
 /**
   Memory-based access services and I/O-based access services.
 
-  @param  PeiServices           An indirect pointer to the PEI Services Table
+  @param[in]  PeiServices  An indirect pointer to the PEI Services Table
                                 published by the PEI Foundation.
-  @param  This                  Pointer to local data for the interface.
-  @param  Width                 The width of the access. Enumerated in bytes.
-  @param  Address               The physical address of the access.
-  @param  Count                 The number of accesses to perform.
-  @param  Buffer                A pointer to the buffer of data.
+  @param[in]  This         Pointer to local data for the interface.
+  @param[in]  Width        The width of the access. Enumerated in bytes.
+  @param[in]  Address      The physical address of the access.
+  @param[in]  Count        The number of accesses to perform.
+  @param[out] Buffer       A pointer to the buffer of data.
 
   @retval EFI_SUCCESS           The function completed successfully.
   @retval EFI_NOT_YET_AVAILABLE The service has not been installed.
@@ -90,9 +90,10 @@ typedef struct {
 /**
   8-bit I/O read operations.
 
-  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
-  @param  This           Pointer to local data for the interface.
-  @param  Address        The physical address of the access.
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+                          by the PEI Foundation.
+  @param[in] This         Pointer to local data for the interface.
+  @param[in] Address      The physical address of the access.
 
   @return An 8-bit value returned from the I/O space.
 
@@ -108,9 +109,10 @@ UINT8
 /**
   16-bit I/O read operations.
 
-  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
-  @param  This           Pointer to local data for the interface.
-  @param  Address        The physical address of the access.
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+                          by the PEI Foundation.
+  @param[in] This         Pointer to local data for the interface.
+  @param[in] Address      The physical address of the access.
 
   @return A 16-bit value returned from the I/O space.
 
@@ -126,9 +128,10 @@ UINT16
 /**
   32-bit I/O read operations.
 
-  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
-  @param  This           Pointer to local data for the interface.
-  @param  Address        The physical address of the access.
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+                          by the PEI Foundation.
+  @param[in] This         Pointer to local data for the interface.
+  @param[in] Address      The physical address of the access.
 
   @return A 32-bit value returned from the I/O space.
 
@@ -144,9 +147,10 @@ UINT32
 /**
   64-bit I/O read operations.
 
-  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
-  @param  This           Pointer to local data for the interface.
-  @param  Address        The physical address of the access.
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+                          by the PEI Foundation.
+  @param[in] This         Pointer to local data for the interface.
+  @param[in] Address      The physical address of the access.
 
   @return A 64-bit value returned from the I/O space.
 
@@ -162,10 +166,11 @@ UINT64
 /**
   8-bit I/O write operations.
 
-  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
-  @param  This           Pointer to local data for the interface.
-  @param  Address        The physical address of the access.
-  @param  Data           The data to write.
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+                          by the PEI Foundation.
+  @param[in] This         Pointer to local data for the interface.
+  @param[in] Address      The physical address of the access.
+  @param[in] Data         The data to write.
 
 **/
 typedef
@@ -180,10 +185,11 @@ VOID
 /**
   16-bit I/O write operations.
 
-  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
-  @param  This           Pointer to local data for the interface.
-  @param  Address        The physical address of the access.
-  @param  Data           The data to write.
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+                          by the PEI Foundation.
+  @param[in] This         Pointer to local data for the interface.
+  @param[in] Address      The physical address of the access.
+  @param[in] Data         The data to write.
 
 **/
 typedef
@@ -198,10 +204,11 @@ VOID
 /**
   32-bit I/O write operations.
 
-  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
-  @param  This           Pointer to local data for the interface.
-  @param  Address        The physical address of the access.
-  @param  Data           The data to write.
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+                          by the PEI Foundation.
+  @param[in] This         Pointer to local data for the interface.
+  @param[in] Address      The physical address of the access.
+  @param[in] Data         The data to write.
 
 **/
 typedef
@@ -216,10 +223,11 @@ VOID
 /**
   64-bit I/O write operations.
 
-  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
-  @param  This           Pointer to local data for the interface.
-  @param  Address        The physical address of the access.
-  @param  Data           The data to write.
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+                          by the PEI Foundation.
+  @param[in] This         Pointer to local data for the interface.
+  @param[in] Address      The physical address of the access.
+  @param[in] Data         The data to write.
 
 **/
 typedef
@@ -234,9 +242,10 @@ VOID
 /**
   8-bit memory read operations.
 
-  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
-  @param  This           Pointer to local data for the interface.
-  @param  Address        The physical address of the access.
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+                          by the PEI Foundation.
+  @param[in] This         Pointer to local data for the interface.
+  @param[in] Address      The physical address of the access.
 
   @return An 8-bit value returned from the memory space.
 
@@ -252,9 +261,10 @@ UINT8
 /**
   16-bit memory read operations.
 
-  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
-  @param  This           Pointer to local data for the interface.
-  @param  Address        The physical address of the access.
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+                          by the PEI Foundation.
+  @param[in] This         Pointer to local data for the interface.
+  @param[in] Address      The physical address of the access.
 
   @return A 16-bit value returned from the memory space.
 
@@ -270,9 +280,10 @@ UINT16
 /**
   32-bit memory read operations.
 
-  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
-  @param  This           Pointer to local data for the interface.
-  @param  Address        The physical address of the access.
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+                          by the PEI Foundation.
+  @param[in] This         Pointer to local data for the interface.
+  @param[in] Address      The physical address of the access.
 
   @return A 32-bit value returned from the memory space.
 
@@ -288,9 +299,10 @@ UINT32
 /**
   64-bit memory read operations.
 
-  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
-  @param  This           Pointer to local data for the interface.
-  @param  Address        The physical address of the access.
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+                          by the PEI Foundation.
+  @param[in] This         Pointer to local data for the interface.
+  @param[in] Address      The physical address of the access.
 
   @return A 64-bit value returned from the memory space.
 
@@ -306,10 +318,11 @@ UINT64
 /**
   8-bit memory write operations.
 
-  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
-  @param  This           Pointer to local data for the interface.
-  @param  Address        The physical address of the access.
-  @param  Data           The data to write.
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+                          by the PEI Foundation.
+  @param[in] This         Pointer to local data for the interface.
+  @param[in] Address      The physical address of the access.
+  @param[in] Data         The data to write.
 
 **/
 typedef
@@ -324,10 +337,11 @@ VOID
 /**
   16-bit memory write operations.
 
-  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
-  @param  This           Pointer to local data for the interface.
-  @param  Address        The physical address of the access.
-  @param  Data           The data to write.
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+                          by the PEI Foundation.
+  @param[in] This         Pointer to local data for the interface.
+  @param[in] Address      The physical address of the access.
+  @param[in] Data         The data to write.
 
 **/
 typedef
@@ -342,10 +356,11 @@ VOID
 /**
   32-bit memory write operations.
 
-  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
-  @param  This           Pointer to local data for the interface.
-  @param  Address        The physical address of the access.
-  @param  Data           The data to write.
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+                          by the PEI Foundation.
+  @param[in] This         Pointer to local data for the interface.
+  @param[in] Address      The physical address of the access.
+  @param[in] Data         The data to write.
 
 **/
 typedef
@@ -360,10 +375,11 @@ VOID
 /**
   64-bit memory write operations.
 
-  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
-  @param  This           Pointer to local data for the interface.
-  @param  Address        The physical address of the access.
-  @param  Data           The data to write.
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+                          by the PEI Foundation.
+  @param[in] This         Pointer to local data for the interface.
+  @param[in] Address      The physical address of the access.
+  @param[in] Data         The data to write.
 
 **/
 typedef
@@ -380,8 +396,14 @@ VOID
 /// The perspective of the services is that of the processor, not the bus or system.
 ///
 struct _EFI_PEI_CPU_IO_PPI {
-  EFI_PEI_CPU_IO_PPI_ACCESS       Mem;      ///< Collection of memory-access services.
-  EFI_PEI_CPU_IO_PPI_ACCESS       Io;       ///< Collection of I/O-access services.
+  ///
+  /// Collection of memory-access services.
+  ///
+  EFI_PEI_CPU_IO_PPI_ACCESS       Mem;
+  ///
+  /// Collection of I/O-access services.
+  ///
+  EFI_PEI_CPU_IO_PPI_ACCESS       Io;
 
   EFI_PEI_CPU_IO_PPI_IO_READ8     IoRead8;
   EFI_PEI_CPU_IO_PPI_IO_READ16    IoRead16;

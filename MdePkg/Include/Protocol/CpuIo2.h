@@ -12,7 +12,7 @@
   ExitBootServices(). It is different from the Framework CPU I/O Protocol, which is a runtime
   protocol and can be used by runtime drivers after ExitBootServices().
 
-  Copyright (c) 2007 - 2009, Intel Corporation
+  Copyright (c) 2007 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -30,14 +30,12 @@
 #ifndef __CPU_IO2_H__
 #define __CPU_IO2_H__
 
-
 #define EFI_CPU_IO2_PROTOCOL_GUID \
   { \
     0xad61f191, 0xae5f, 0x4c0e, {0xb9, 0xfa, 0xe8, 0x69, 0xd2, 0x88, 0xc6, 0x4f} \
   }
 
 typedef struct _EFI_CPU_IO2_PROTOCOL EFI_CPU_IO2_PROTOCOL;
-
 
 ///
 /// Enumeration that defines the width of the I/O operation.
@@ -57,7 +55,6 @@ typedef enum {
   EfiCpuIoWidthFillUint64,
   EfiCpuIoWidthMaximum
 } EFI_CPU_IO_PROTOCOL_WIDTH;
-
 
 /**
   Enables a driver to access registers in the PI CPU I/O space. 
@@ -109,7 +106,6 @@ EFI_STATUS
   IN OUT VOID                              *Buffer
   );
 
-
 ///
 /// Service for read and write accesses.
 ///
@@ -123,7 +119,6 @@ typedef struct {
   ///
   EFI_CPU_IO_PROTOCOL_IO_MEM  Write;
 } EFI_CPU_IO_PROTOCOL_ACCESS;
-
 
 ///
 /// Provides the basic memory and I/O interfaces that are used to abstract
