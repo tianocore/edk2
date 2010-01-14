@@ -1,7 +1,7 @@
 /** @file
   Report Status Code Router PEIM which produces Report Stataus Code Handler PPI and Status Code PPI.
 
-  Copyright (c) 2009, Intel Corporation
+  Copyright (c) 2009 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -23,12 +23,15 @@ EFI_PEI_PROGRESS_CODE_PPI     mStatusCodePpi = {
   ReportDispatcher
   };
 
-EFI_PEI_PPI_DESCRIPTOR   mStatusCodePpiList[] = {
+EFI_PEI_PPI_DESCRIPTOR   mRscHandlerPpiList[] = {
   {
-    EFI_PEI_PPI_DESCRIPTOR_PPI,
+    EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
     &gEfiPeiRscHandlerPpiGuid,
     &mRscHandlerPpi
-  },
+  }
+};
+
+EFI_PEI_PPI_DESCRIPTOR   mStatusCodePpiList[] = {
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
     &gEfiPeiStatusCodePpiGuid,
@@ -257,11 +260,35 @@ GenericStatusCodePeiEntry (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
-  EFI_STATUS     Status;
+  EFI_STATUS                 Status;
+  EFI_PEI_PPI_DESCRIPTOR     *OldDescriptor;
+  EFI_PEI_PROGRESS_CODE_PPI  *OldStatusCodePpi;
 
   CreateRscHandlerCallbackPacket ();
 
-  Status = PeiServicesInstallPpi (mStatusCodePpiList);
+  //
+  // Install Report Status Code Handler PPI
+  //
+  Status = PeiServicesInstallPpi (mRscHandlerPpiList);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Install Status Code PPI. PI spec specifies that there can be only one instance
+  // of this PPI in system. So first check if other instance already exists.
+  // If no other instance exists, then just install the PPI.
+  // If other instance already exists, then reinstall it.
+  //
+  Status = PeiServicesLocatePpi (
+             &gEfiPeiStatusCodePpiGuid,
+             0,
+             &OldDescriptor,
+             (VOID **) &OldStatusCodePpi
+             );
+  if (!EFI_ERROR (Status)) {
+    Status = PeiServicesReInstallPpi (OldDescriptor, mStatusCodePpiList);
+  } else {
+    Status = PeiServicesInstallPpi (mStatusCodePpiList);
+  }
   ASSERT_EFI_ERROR (Status);
 
   return EFI_SUCCESS;
