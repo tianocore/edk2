@@ -40,6 +40,7 @@
 
 
   ArmLib|ArmPkg/Library/ArmLib/ArmCortexA/ArmCortexArmLib.inf
+  MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
@@ -90,7 +91,10 @@
   UefiUsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
   EblAddExternalCommandLib|EmbeddedPkg/Library/EblAddExternalCommandLib/EblAddExternalCommandLib.inf
   
-  UncachedMemoryAllocationLib|ArmPkg/Library/UncachedMemoryAllocationLib/UncachedMemoryAllocationLib.inf
+ # UncachedMemoryAllocationLib|ArmPkg/Library/UncachedMemoryAllocationLib/UncachedMemoryAllocationLib.inf
+  UncachedMemoryAllocationLib|ArmPkg/Library/DebugUncachedMemoryAllocationLib/DebugUncachedMemoryAllocationLib.inf
+
+  CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
 
   TimerLib|BeagleBoardPkg/Library/BeagleBoardTimerLib/BeagleBoardTimerLib.inf  
   OmapLib|BeagleBoardPkg/Library/OmapLib/OmapLib.inf
@@ -206,49 +210,29 @@
   gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|320
 
 # DEBUG_ASSERT_ENABLED       0x01
-
 # DEBUG_PRINT_ENABLED        0x02
-
 # DEBUG_CODE_ENABLED         0x04
-
 # CLEAR_MEMORY_ENABLED       0x08
-
 # ASSERT_BREAKPOINT_ENABLED  0x10
-
 # ASSERT_DEADLOOP_ENABLED    0x20
 
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x2f
 
 #  DEBUG_INIT      0x00000001  // Initialization
-
 #  DEBUG_WARN      0x00000002  // Warnings
-
 #  DEBUG_LOAD      0x00000004  // Load events
-
 #  DEBUG_FS        0x00000008  // EFI File system
-
 #  DEBUG_POOL      0x00000010  // Alloc & Free's
-
 #  DEBUG_PAGE      0x00000020  // Alloc & Free's
-
 #  DEBUG_INFO      0x00000040  // Verbose
-
 #  DEBUG_DISPATCH  0x00000080  // PEI/DXE Dispatchers
-
 #  DEBUG_VARIABLE  0x00000100  // Variable
-
 #  DEBUG_BM        0x00000400  // Boot Manager
-
 #  DEBUG_BLKIO     0x00001000  // BlkIo Driver
-
 #  DEBUG_NET       0x00004000  // SNI Driver
-
 #  DEBUG_UNDI      0x00010000  // UNDI Driver
-
 #  DEBUG_LOADFILE  0x00020000  // UNDI Driver
-
 #  DEBUG_EVENT     0x00080000  // Event messages
-
 #  DEBUG_ERROR     0x80000000  // Error
 
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000004

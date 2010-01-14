@@ -27,19 +27,15 @@ CacheRangeOperation (
   UINTN ArmCacheLineAlignmentMask  = ArmCacheLineLength - 1;
   UINTN ArmCacheOperationThreshold = PcdGet32(PcdArmCacheOperationThreshold);
   
-  if ((CacheOperation != NULL) && (Length >= ArmCacheOperationThreshold))
-  {
-    CacheOperation();
-  }
-  else
-  {
+  if ((CacheOperation != NULL) && (Length >= ArmCacheOperationThreshold)) {
+    CacheOperation ();
+  } else {
     // Align address (rounding down)
     UINTN AlignedAddress = (UINTN)Start - ((UINTN)Start & ArmCacheLineAlignmentMask);
     UINTN EndAddress     = (UINTN)Start + Length;
 
     // Perform the line operation on an address in each cache line
-    while (AlignedAddress < EndAddress)
-    {
+    while (AlignedAddress < EndAddress) {
       LineOperation(AlignedAddress);
       AlignedAddress += ArmCacheLineLength;
     }

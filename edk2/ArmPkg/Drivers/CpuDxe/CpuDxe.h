@@ -19,14 +19,29 @@
 
 #include <Library/ArmLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/CacheMaintenanceLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/DxeServicesTableLib.h>
+#include <Library/CacheMaintenanceLib.h>
+#include <Library/PeCoffGetEntryPointLib.h>
+#include <Library/UefiLib.h>
+#include <Library/CpuLib.h>
 
+#include <Guid/DebugImageInfoTable.h>
 #include <Protocol/Cpu.h>
 #include <Protocol/DebugSupport.h>
 #include <Protocol/DebugSupportPeriodicCallback.h>
+#include <Protocol/VirtualUncachedPages.h>
+#include <Protocol/LoadedImage.h>
+
+
+#define EFI_MEMORY_CACHETYPE_MASK     (EFI_MEMORY_UC  | \
+                                       EFI_MEMORY_WC  | \
+                                       EFI_MEMORY_WT  | \
+                                       EFI_MEMORY_WB  | \
+                                       EFI_MEMORY_UCE   \
+                                       )
 
 
 /**
@@ -84,8 +99,30 @@ RegisterDebuggerInterruptHandler (
 
 
 EFI_STATUS
+EFIAPI
+CpuSetMemoryAttributes (
+  IN EFI_CPU_ARCH_PROTOCOL     *This,
+  IN EFI_PHYSICAL_ADDRESS      BaseAddress,
+  IN UINT64                    Length,
+  IN UINT64                    Attributes
+  );
+
+EFI_STATUS
 InitializeExceptions (
 	IN EFI_CPU_ARCH_PROTOCOL    *Cpu
 	);
+
+EFI_STATUS
+SyncCacheConfig (
+  IN  EFI_CPU_ARCH_PROTOCOL *CpuProtocol
+  );
+
+EFI_STATUS 
+ConvertSectionToPages (
+  IN EFI_PHYSICAL_ADDRESS  BaseAddress
+  );
+
+
+extern VIRTUAL_UNCACHED_PAGES_PROTOCOL  gVirtualUncachedPages;
 
 #endif // __CPU_DXE_ARM_EXCEPTION_H__

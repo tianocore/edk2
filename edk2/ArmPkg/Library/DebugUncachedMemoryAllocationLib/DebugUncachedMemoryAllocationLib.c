@@ -49,7 +49,7 @@ UncachedInternalAllocateAlignedPages (
   
   
 
-EFI_CPU_ARCH_PROTOCOL           *gCpu;
+EFI_CPU_ARCH_PROTOCOL           *gDebugUncachedCpu;
 VIRTUAL_UNCACHED_PAGES_PROTOCOL *gVirtualUncachedPages;
 
 //
@@ -641,7 +641,7 @@ DebugUncachedMemoryAllocationLibConstructor (
 {
   EFI_STATUS    Status;
   
-  Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&gCpu);
+  Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&gDebugUncachedCpu);
   ASSERT_EFI_ERROR(Status);
 
   Status = gBS->LocateProtocol (&gVirtualUncachedPagesProtocolGuid, NULL, (VOID **)&gVirtualUncachedPages);

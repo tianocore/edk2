@@ -39,6 +39,7 @@
 #
   ExceptionSupport.ARMv6.asm | RVCT
 #  ExceptionSupport.ARMv6.S   | GCC
+  Mmu.c
 
 [Packages]
   ArmPkg/ArmPkg.dec
@@ -50,10 +51,18 @@
   CacheMaintenanceLib
   UefiDriverEntryPoint
   ArmLib
+  DxeServicesTableLib
+  PeCoffGetEntryPointLib
+  UefiLib
+  CpuLib
 
 [Protocols]
   gEfiCpuArchProtocolGuid
   gEfiDebugSupportPeriodicCallbackProtocolGuid
+  gVirtualUncachedPagesProtocolGuid
+
+[Guids]
+  gEfiDebugImageInfoTableGuid
 
 [Pcd.common]
   gArmTokenSpaceGuid.PcdCpuVectorBaseAddress
