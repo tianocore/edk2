@@ -99,19 +99,19 @@ UINT8 mStride[] = {
 /**
   Check parameters to a SMM CPU I/O Protocol service request.
 
-  @param  Width                 Signifies the width of the I/O or Memory operation.
-  @param  Address               The base address of the I/O or Memory operation.
-  @param  Count                 The number of I/O or Memory operations to perform.
-                                The number of bytes moved is Width size * Count, starting at Address.
-  @param  Buffer                For read operations, the destination buffer to store the results.
-                                For write operations, the source buffer from which to write data.
-  @param  MmioOperation         TRUE for an MMIO operation, FALSE for I/O Port operation.
-  
-  @retval EFI_SUCCESS           The parameters for this request pass the checks.
-  @retval EFI_INVALID_PARAMETER Buffer is NULL or Width is not valid.
-  @retval EFI_UNSUPPORTED       The address range specified by Address, Width, and Count exceeds Limit.
-                                The Buffer is not aligned for the given Width.
+  @param[in]  MmioOperation  TRUE for an MMIO operation, FALSE for I/O Port operation.
+  @param[in]  Width          Signifies the width of the I/O operations.
+  @param[in]  Address        The base address of the I/O operations.  The caller is 
+                             responsible for aligning the Address if required. 
+  @param[in]  Count          The number of I/O operations to perform.
+  @param[out] Buffer         For read operations, the destination buffer to store 
+                             the results.  For write operations, the source buffer 
+                             from which to write data.
 
+  @retval EFI_SUCCESS            The data was read from or written to the device.
+  @retval EFI_UNSUPPORTED        The Address is not valid for this system.
+  @retval EFI_INVALID_PARAMETER  Width or Count, or both, were invalid.
+                                 
 **/
 EFI_STATUS
 CpuIoCheckParameter (
@@ -189,18 +189,24 @@ CpuIoCheckParameter (
 /**
   Reads memory-mapped registers.
 
-  @param  This                  A pointer to the EFI_SMM_CPU_IO2_PROTOCOL instance.
-  @param  Width                 Signifies the width of the I/O or Memory operation.
-  @param  Address               The base address of the I/O or Memoryoperation.
-  @param  Count                 The number of I/O or Memory operations to perform.
-                                The number of bytes moved is Width size * Count, starting at Address.
-  @param  Buffer                For read operations, the destination buffer to store the results.
-                                For write operations, the source buffer from which to write data.
+  The I/O operations are carried out exactly as requested.  The caller is 
+  responsible for any alignment and I/O width issues that the bus, device, 
+  platform, or type of I/O might require.
 
-  @retval EFI_SUCCESS           The data was read from or written to the EFI system.
-  @retval EFI_INVALID_PARAMETER Width is invalid for this EFI system.Or Buffer is NULL.
-  @retval EFI_UNSUPPORTED       The Buffer is not aligned for the given Width.
-                                Or,The address range specified by Address, Width, and Count is not valid for this EFI system.
+  @param[in]  This     The EFI_SMM_CPU_IO2_PROTOCOL instance.
+  @param[in]  Width    Signifies the width of the I/O operations.
+  @param[in]  Address  The base address of the I/O operations.  The caller is 
+                       responsible for aligning the Address if required. 
+  @param[in]  Count    The number of I/O operations to perform.
+  @param[out] Buffer   For read operations, the destination buffer to store 
+                       the results.  For write operations, the source buffer 
+                       from which to write data.
+
+  @retval EFI_SUCCESS            The data was read from or written to the device.
+  @retval EFI_UNSUPPORTED        The Address is not valid for this system.
+  @retval EFI_INVALID_PARAMETER  Width or Count, or both, were invalid.
+  @retval EFI_OUT_OF_RESOURCES   The request could not be completed due to a 
+                                 lack of resources
 
 **/
 EFI_STATUS
@@ -243,18 +249,24 @@ CpuMemoryServiceRead (
 /**
   Writes memory-mapped registers.
 
-  @param  This                  A pointer to the EFI_SMM_CPU_IO2_PROTOCOL instance.
-  @param  Width                 Signifies the width of the I/O or Memory operation.
-  @param  Address               The base address of the I/O or Memoryoperation.
-  @param  Count                 The number of I/O or Memory operations to perform.
-                                The number of bytes moved is Width size * Count, starting at Address.
-  @param  Buffer                For read operations, the destination buffer to store the results.
-                                For write operations, the source buffer from which to write data.
+  The I/O operations are carried out exactly as requested.  The caller is 
+  responsible for any alignment and I/O width issues that the bus, device, 
+  platform, or type of I/O might require.
 
-  @retval EFI_SUCCESS           The data was read from or written to the EFI system.
-  @retval EFI_INVALID_PARAMETER Width is invalid for this EFI system.Or Buffer is NULL.
-  @retval EFI_UNSUPPORTED       The Buffer is not aligned for the given Width.
-                                Or,The address range specified by Address, Width, and Count is not valid for this EFI system.
+  @param[in]  This     The EFI_SMM_CPU_IO2_PROTOCOL instance.
+  @param[in]  Width    Signifies the width of the I/O operations.
+  @param[in]  Address  The base address of the I/O operations.  The caller is 
+                       responsible for aligning the Address if required. 
+  @param[in]  Count    The number of I/O operations to perform.
+  @param[in]  Buffer   For read operations, the destination buffer to store 
+                       the results.  For write operations, the source buffer 
+                       from which to write data.
+
+  @retval EFI_SUCCESS            The data was read from or written to the device.
+  @retval EFI_UNSUPPORTED        The Address is not valid for this system.
+  @retval EFI_INVALID_PARAMETER  Width or Count, or both, were invalid.
+  @retval EFI_OUT_OF_RESOURCES   The request could not be completed due to a 
+                                 lack of resources
 
 **/
 EFI_STATUS
@@ -297,18 +309,24 @@ CpuMemoryServiceWrite (
 /**
   Reads I/O registers.
 
-  @param  This                  A pointer to the EFI_SMM_CPU_IO2_PROTOCOL instance.
-  @param  Width                 Signifies the width of the I/O or Memory operation.
-  @param  Address               The base address of the I/O or Memoryoperation.
-  @param  Count                 The number of I/O or Memory operations to perform.
-                                The number of bytes moved is Width size * Count, starting at Address.
-  @param  Buffer                For read operations, the destination buffer to store the results.
-                                For write operations, the source buffer from which to write data.
+  The I/O operations are carried out exactly as requested.  The caller is 
+  responsible for any alignment and I/O width issues that the bus, device, 
+  platform, or type of I/O might require.
 
-  @retval EFI_SUCCESS           The data was read from or written to the EFI system.
-  @retval EFI_INVALID_PARAMETER Width is invalid for this EFI system.Or Buffer is NULL.
-  @retval EFI_UNSUPPORTED       The Buffer is not aligned for the given Width.
-                                Or,The address range specified by Address, Width, and Count is not valid for this EFI system.
+  @param[in]  This     The EFI_SMM_CPU_IO2_PROTOCOL instance.
+  @param[in]  Width    Signifies the width of the I/O operations.
+  @param[in]  Address  The base address of the I/O operations.  The caller is 
+                       responsible for aligning the Address if required. 
+  @param[in]  Count    The number of I/O operations to perform.
+  @param[out] Buffer   For read operations, the destination buffer to store 
+                       the results.  For write operations, the source buffer 
+                       from which to write data.
+
+  @retval EFI_SUCCESS            The data was read from or written to the device.
+  @retval EFI_UNSUPPORTED        The Address is not valid for this system.
+  @retval EFI_INVALID_PARAMETER  Width or Count, or both, were invalid.
+  @retval EFI_OUT_OF_RESOURCES   The request could not be completed due to a 
+                                 lack of resources
 
 **/
 EFI_STATUS
@@ -350,18 +368,24 @@ CpuIoServiceRead (
 /**
   Write I/O registers.
 
-  @param  This                  A pointer to the EFI_SMM_CPU_IO2_PROTOCOL instance.
-  @param  Width                 Signifies the width of the I/O or Memory operation.
-  @param  Address               The base address of the I/O or Memoryoperation.
-  @param  Count                 The number of I/O or Memory operations to perform.
-                                The number of bytes moved is Width size * Count, starting at Address.
-  @param  Buffer                For read operations, the destination buffer to store the results.
-                                For write operations, the source buffer from which to write data.
+  The I/O operations are carried out exactly as requested.  The caller is 
+  responsible for any alignment and I/O width issues that the bus, device, 
+  platform, or type of I/O might require.
 
-  @retval EFI_SUCCESS           The data was read from or written to the EFI system.
-  @retval EFI_INVALID_PARAMETER Width is invalid for this EFI system.Or Buffer is NULL.
-  @retval EFI_UNSUPPORTED       The Buffer is not aligned for the given Width.
-                                Or,The address range specified by Address, Width, and Count is not valid for this EFI system.
+  @param[in]  This     The EFI_SMM_CPU_IO2_PROTOCOL instance.
+  @param[in]  Width    Signifies the width of the I/O operations.
+  @param[in]  Address  The base address of the I/O operations.  The caller is 
+                       responsible for aligning the Address if required. 
+  @param[in]  Count    The number of I/O operations to perform.
+  @param[in]  Buffer   For read operations, the destination buffer to store 
+                       the results.  For write operations, the source buffer 
+                       from which to write data.
+
+  @retval EFI_SUCCESS            The data was read from or written to the device.
+  @retval EFI_UNSUPPORTED        The Address is not valid for this system.
+  @retval EFI_INVALID_PARAMETER  Width or Count, or both, were invalid.
+  @retval EFI_OUT_OF_RESOURCES   The request could not be completed due to a 
+                                 lack of resources
 
 **/
 EFI_STATUS
@@ -406,11 +430,11 @@ CpuIoServiceWrite (
 /**
   The module Entry Point SmmCpuIoProtocol driver
 
-  @param  ImageHandle    The firmware allocated handle for the EFI image.
-  @param  SystemTable    A pointer to the EFI System Table.
+  @param[in] ImageHandle  The firmware allocated handle for the EFI image.
+  @param[in] SystemTable  A pointer to the EFI System Table.
 
-  @retval EFI_SUCCESS    The entry point is executed successfully.
-  @retval Other          Some error occurs when executing this entry point.
+  @retval EFI_SUCCESS  The entry point is executed successfully.
+  @retval Other        Some error occurs when executing this entry point.
 
 **/
 EFI_STATUS
