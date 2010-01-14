@@ -1,7 +1,7 @@
 /** @file
   PCI Library using SMM PCI Root Bridge I/O Protocol.
 
-  Copyright (c) 2009, Intel Corporation All rights
+  Copyright (c) 2009 - 2010, Intel Corporation All rights
   reserved. This program and the accompanying materials are
   licensed and made available under the terms and conditions of
   the BSD License which accompanies this distribution.  The full
@@ -13,7 +13,6 @@
 
 **/
 #include <PiSmm.h>
-#include <Protocol/SmmCpuIo.h>
 #include <Protocol/SmmPciRootBridgeIo.h>
 #include <Library/PciLib.h>
 #include <Library/DebugLib.h>
