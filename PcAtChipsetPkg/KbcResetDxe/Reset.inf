@@ -1,6 +1,6 @@
 #/*++
 # 
-# Copyright (c) 2006 - 2008, Intel Corporation                                                         
+# Copyright (c) 2006 - 2010, Intel Corporation                                                         
 # All rights reserved. This program and the accompanying materials                          
 # are licensed and made available under the terms and conditions of the BSD License         
 # which accompanies this distribution.  The full text of the license may be found at        
@@ -21,14 +21,10 @@
   FILE_GUID                      = 6F0198AA-1F1D-426D-AE3E-39AB633FCC28
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
-
   ENTRY_POINT                    = InitializeReset
 
 [Packages]
   MdePkg/MdePkg.dec
-  IntelFrameworkPkg/IntelFrameworkPkg.dec
 
 [LibraryClasses]
   DebugLib
@@ -36,7 +32,7 @@
   UefiDriverEntryPoint
   IoLib
 
-[Sources.common]
+[Sources]
   Reset.c
   Reset.h
   ResetEntry.c
@@ -45,6 +41,6 @@
   gEfiResetArchProtocolGuid
 
 [Depex]
-  gEfiCpuIo2ProtocolGuid
+  TRUE
 
 
