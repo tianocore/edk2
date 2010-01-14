@@ -146,9 +146,11 @@ PeCoffGetSizeOfHeaders (
   }
 
   if (Hdr.Te->Signature == EFI_TE_IMAGE_HEADER_SIGNATURE) {
-   SizeOfHeaders = sizeof (EFI_TE_IMAGE_HEADER) + (UINTN)Hdr.Te->BaseOfCode - (UINTN)Hdr.Te->StrippedSize;
+    SizeOfHeaders = sizeof (EFI_TE_IMAGE_HEADER) + (UINTN)Hdr.Te->BaseOfCode - (UINTN)Hdr.Te->StrippedSize;
   } else if (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE) {
     SizeOfHeaders = Hdr.Pe32->OptionalHeader.SizeOfHeaders;
+  } else {
+    SizeOfHeaders = 0;
   }
 
   return SizeOfHeaders;
@@ -177,7 +179,7 @@ GetImageName (
     if (DebugTable->NormalImage != NULL) {
       if ((DebugTable->NormalImage->ImageInfoType == EFI_DEBUG_IMAGE_INFO_TYPE_NORMAL) && 
           (DebugTable->NormalImage->LoadedImageProtocolInstance != NULL)) {
-        if ((Address >= DebugTable->NormalImage->LoadedImageProtocolInstance->ImageBase) &&
+        if ((Address >= (CHAR8 *)DebugTable->NormalImage->LoadedImageProtocolInstance->ImageBase) &&
             (Address <= ((CHAR8 *)DebugTable->NormalImage->LoadedImageProtocolInstance->ImageBase + DebugTable->NormalImage->LoadedImageProtocolInstance->ImageSize))) {
           *ImageBase = (UINT32)DebugTable->NormalImage->LoadedImageProtocolInstance->ImageBase;
           *PeCoffSizeOfHeaders = PeCoffGetSizeOfHeaders ((VOID *)(UINTN)*ImageBase);
