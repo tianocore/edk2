@@ -2040,7 +2040,7 @@ CreatePciIoDevice (
                  );
     DEBUG ((EFI_D_INFO, "PCI-IOV B%x.D%x.F%x - SupportedPageSize - 0x%x\n", (UINTN)Bus, (UINTN)Device, (UINTN)Func, PciIoDevice->SystemPageSize));
 
-    PciIoDevice->SystemPageSize = (PcdGet32(PcdSrIovSystemPageSize) & PciIoDevice->SystemPageSize);
+    PciIoDevice->SystemPageSize = (FixedPcdGet32(PcdSrIovSystemPageSize) & PciIoDevice->SystemPageSize);
     ASSERT (PciIoDevice->SystemPageSize != 0);
 
     PciIo->Pci.Write (

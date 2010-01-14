@@ -271,7 +271,7 @@ DxeLoadCore (
   //
   // Report Status Code EFI_SW_PEI_PC_HANDOFF_TO_NEXT
   //
-  REPORT_STATUS_CODE (EFI_PROGRESS_CODE, PcdGet32 (PcdStatusCodeValuePeiHandoffToDxe));
+  REPORT_STATUS_CODE (EFI_PROGRESS_CODE, FixedPcdGet32 (PcdStatusCodeValuePeiHandoffToDxe));
 
   DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Loading DXE CORE at 0x%11p EntryPoint=0x%11p\n", (VOID *)(UINTN)DxeCoreAddress, FUNCTION_ENTRY_POINT (DxeCoreEntryPoint)));
 

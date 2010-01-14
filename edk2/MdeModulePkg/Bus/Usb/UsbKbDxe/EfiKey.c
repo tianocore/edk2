@@ -193,7 +193,7 @@ USBKeyboardDriverBindingStart (
   //
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
-    PcdGet32 (PcdStatusCodeValueKeyboardEnable),
+    FixedPcdGet32 (PcdStatusCodeValueKeyboardEnable),
     UsbKeyboardDevice->DevicePath
     );
 
@@ -202,7 +202,7 @@ USBKeyboardDriverBindingStart (
   //
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
-    PcdGet32 (PcdStatusCodeValueKeyboardPresenceDetect),
+    FixedPcdGet32 (PcdStatusCodeValueKeyboardPresenceDetect),
     UsbKeyboardDevice->DevicePath
     );
 
@@ -473,7 +473,7 @@ USBKeyboardDriverBindingStop (
   //
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
-    PcdGet32 (PcdStatusCodeValueKeyboardDisable),
+    FixedPcdGet32 (PcdStatusCodeValueKeyboardDisable),
     UsbKeyboardDevice->DevicePath
     );
 
@@ -658,7 +658,7 @@ USBKeyboardReset (
 
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
-    PcdGet32 (PcdStatusCodeValueKeyboardReset),
+    FixedPcdGet32 (PcdStatusCodeValueKeyboardReset),
     UsbKeyboardDevice->DevicePath
     );
 
@@ -669,7 +669,7 @@ USBKeyboardReset (
   if (!ExtendedVerification) {
     REPORT_STATUS_CODE_WITH_DEVICE_PATH (
       EFI_PROGRESS_CODE,
-      PcdGet32 (PcdStatusCodeValueKeyboardClearBuffer),
+      FixedPcdGet32 (PcdStatusCodeValueKeyboardClearBuffer),
       UsbKeyboardDevice->DevicePath
       );
     //
