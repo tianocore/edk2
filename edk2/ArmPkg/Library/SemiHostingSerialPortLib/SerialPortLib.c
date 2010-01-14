@@ -129,7 +129,7 @@ SerialPortRead (
   Check to see if any data is avaiable to be read from the debug device.
 
   @retval TRUE       At least one byte of data is avaiable to be read
-  @retval FALS     No data is avaiable to be read
+  @retval FALSE      No data is avaiable to be read
 
 **/
 BOOLEAN

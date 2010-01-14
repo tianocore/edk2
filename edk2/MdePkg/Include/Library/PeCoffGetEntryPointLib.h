@@ -82,4 +82,23 @@ PeCoffLoaderGetPdbPointer (
   IN VOID  *Pe32Data
   );
 
+
+/**
+  Returns the size of the PE/COFF headers
+
+  Returns the size of the PE/COFF header specified by Pe32Data.
+  If Pe32Data is NULL, then ASSERT().
+
+  @param  Pe32Data   Pointer to the PE/COFF image that is loaded in system
+                     memory.
+
+  @return Size of PE/COFF header in bytes or zero if not a valid iamge.
+
+**/
+UINT32
+EFIAPI
+PeCoffGetSizeOfHeaders (
+  IN VOID     *Pe32Data
+  );
+
 #endif

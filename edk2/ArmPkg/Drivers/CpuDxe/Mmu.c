@@ -16,10 +16,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "CpuDxe.h"
 
-//
-// For debug switch me back to to EFI_D_PAGE when done
-//
-#define L_EFI_D_PAGE EFI_D_ERROR
 
 //
 // Translation/page table definitions
@@ -353,7 +349,7 @@ SyncCacheConfig (
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR     *MemorySpaceMap;
 
 
-  DEBUG ((L_EFI_D_PAGE, "SyncCacheConfig()\n"));
+  DEBUG ((EFI_D_PAGE, "SyncCacheConfig()\n"));
 
   // This code assumes MMU is enabled and filed with section translations
   ASSERT (ArmMmuEnabled ());
@@ -483,7 +479,7 @@ UpdatePageEntries (
       // Cause a page fault if these ranges are accessed.
       EntryMask   = 0x3;
       EntryValue = 0;
-      DEBUG ((L_EFI_D_PAGE, "SetMemoryAttributes(): setting page %lx with unsupported attribute %x will page fault on access\n", BaseAddress, Attributes));
+      DEBUG ((EFI_D_PAGE, "SetMemoryAttributes(): setting page %lx with unsupported attribute %x will page fault on access\n", BaseAddress, Attributes));
       break;
 
     default:
@@ -617,7 +613,7 @@ UpdateSectionEntries (
       // cannot be implemented UEFI definition unclear for ARM
       // Cause a page fault if these ranges are accessed.
       EntryValue = ARM_DESC_TYPE_FAULT;
-      DEBUG ((L_EFI_D_PAGE, "SetMemoryAttributes(): setting section %lx with unsupported attribute %x will page fault on access\n", BaseAddress, Attributes));
+      DEBUG ((EFI_D_PAGE, "SetMemoryAttributes(): setting section %lx with unsupported attribute %x will page fault on access\n", BaseAddress, Attributes));
       break;
 
 
@@ -680,7 +676,7 @@ ConvertSectionToPages (
   volatile ARM_FIRST_LEVEL_DESCRIPTOR   *FirstLevelTable;
   volatile ARM_PAGE_TABLE_ENTRY         *PageTable;
 
-  DEBUG ((L_EFI_D_PAGE, "Converting section at 0x%x to pages\n", (UINTN)BaseAddress));
+  DEBUG ((EFI_D_PAGE, "Converting section at 0x%x to pages\n", (UINTN)BaseAddress));
 
   // obtain page table base
   FirstLevelTable = (ARM_FIRST_LEVEL_DESCRIPTOR *)ArmGetTranslationTableBaseAddress ();
@@ -727,10 +723,6 @@ ConvertSectionToPages (
   }
 
   // flush d-cache so descriptors make it back to uncached memory for subsequent table walks
-  // TODO: change to use only PageTable base and length
-  // ArmInvalidateDataCache ();
-DEBUG ((EFI_D_ERROR, "InvalidateDataCacheRange (%x, %x)\n", (UINTN)PageTableAddr, EFI_PAGE_SIZE));
-
   InvalidateDataCacheRange ((VOID *)(UINTN)PageTableAddr, EFI_PAGE_SIZE);
 
   // formulate page table entry, Domain=0, NS=0
@@ -756,11 +748,11 @@ SetMemoryAttributes (
   
   if(((BaseAddress & 0xFFFFF) == 0) && ((Length & 0xFFFFF) == 0)) {
     // is the base and length a multiple of 1 MB?
-    DEBUG ((L_EFI_D_PAGE, "SetMemoryAttributes(): MMU section 0x%x length 0x%x to %lx\n", (UINTN)BaseAddress, (UINTN)Length, Attributes));
+    DEBUG ((EFI_D_PAGE, "SetMemoryAttributes(): MMU section 0x%x length 0x%x to %lx\n", (UINTN)BaseAddress, (UINTN)Length, Attributes));
     Status = UpdateSectionEntries (BaseAddress, Length, Attributes, VirtualMask);
   } else {
     // base and/or length is not a multiple of 1 MB
-    DEBUG ((L_EFI_D_PAGE, "SetMemoryAttributes(): MMU page 0x%x length 0x%x to %lx\n", (UINTN)BaseAddress, (UINTN)Length, Attributes));
+    DEBUG ((EFI_D_PAGE, "SetMemoryAttributes(): MMU page 0x%x length 0x%x to %lx\n", (UINTN)BaseAddress, (UINTN)Length, Attributes));
     Status = UpdatePageEntries (BaseAddress, Length, Attributes, VirtualMask);
   }
 
@@ -807,10 +799,10 @@ CpuSetMemoryAttributes (
   IN UINT64                    Attributes
   )
 {
-  DEBUG ((L_EFI_D_PAGE, "SetMemoryAttributes(%lx, %lx, %lx)\n", BaseAddress, Length, Attributes));
+  DEBUG ((EFI_D_PAGE, "SetMemoryAttributes(%lx, %lx, %lx)\n", BaseAddress, Length, Attributes));
   if ( ((BaseAddress & (EFI_PAGE_SIZE-1)) != 0) || ((Length & (EFI_PAGE_SIZE-1)) != 0)){
     // minimum granularity is EFI_PAGE_SIZE (4KB on ARM)
-    DEBUG ((L_EFI_D_PAGE, "SetMemoryAttributes(%lx, %lx, %lx): minimum ganularity is EFI_PAGE_SIZE\n", BaseAddress, Length, Attributes));
+    DEBUG ((EFI_D_PAGE, "SetMemoryAttributes(%lx, %lx, %lx): minimum ganularity is EFI_PAGE_SIZE\n", BaseAddress, Length, Attributes));
     return EFI_UNSUPPORTED;
   }
   
@@ -843,7 +835,7 @@ CpuConvertPagesToUncachedVirtualAddress (
       *Attributes = GcdDescriptor.Attributes;
     }
   }
-ASSERT (FALSE);  
+
   //
   // Make this address range page fault if accessed. If it is a DMA buffer than this would 
   // be the PCI address. Code should always use the CPU address, and we will or in VirtualMask
