@@ -204,6 +204,20 @@
 
 [Components.IA32]
   IntelFrameworkModulePkg/Universal/StatusCode/RuntimeDxe/StatusCodeRuntimeDxe.inf
+  IntelFrameworkModulePkg/Universal/CpuIoDxe/CpuIoDxe.inf {
+    <LibraryClasses>
+      IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
+  }
 
 [Components.X64]
   IntelFrameworkModulePkg/Universal/StatusCode/RuntimeDxe/StatusCodeRuntimeDxe.inf
+  IntelFrameworkModulePkg/Universal/CpuIoDxe/CpuIoDxe.inf {
+    <LibraryClasses>
+      IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
+  }
+  
+[Components.IPF]
+  IntelFrameworkModulePkg/Universal/CpuIoDxe/CpuIoDxe.inf {
+    <LibraryClasses>
+      IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
+  }
