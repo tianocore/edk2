@@ -66,7 +66,7 @@ WatchdogTimerDriverExpires (
   IN VOID         *Context
   )
 {
-  REPORT_STATUS_CODE (EFI_ERROR_CODE | EFI_ERROR_MINOR, PcdGet32 (PcdStatusCodeValueEfiWatchDogTimerExpired));
+  REPORT_STATUS_CODE (EFI_ERROR_CODE | EFI_ERROR_MINOR, FixedPcdGet32 (PcdStatusCodeValueEfiWatchDogTimerExpired));
 
   //
   // If a notification function has been registered, then call it

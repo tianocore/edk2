@@ -277,7 +277,7 @@ RuntimeDriverSetVirtualAddressMap (
   //
   // ReporstStatusCodeLib will check and make sure this service can be called in runtime mode.
   //
-  REPORT_STATUS_CODE (EFI_PROGRESS_CODE, PcdGet32 (PcdStatusCodeValueSetVirtualAddressMap));
+  REPORT_STATUS_CODE (EFI_PROGRESS_CODE, FixedPcdGet32 (PcdStatusCodeValueSetVirtualAddressMap));
 
   //
   // Signal all the EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE events.

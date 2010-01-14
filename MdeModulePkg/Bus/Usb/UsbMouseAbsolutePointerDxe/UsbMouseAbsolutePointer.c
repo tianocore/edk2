@@ -232,7 +232,7 @@ USBMouseAbsolutePointerDriverBindingStart (
     //
     REPORT_STATUS_CODE_WITH_DEVICE_PATH (
       EFI_ERROR_CODE | EFI_ERROR_MINOR,
-      PcdGet32 (PcdStatusCodeValueMouseInterfaceError),
+      FixedPcdGet32 (PcdStatusCodeValueMouseInterfaceError),
       UsbMouseAbsolutePointerDevice->DevicePath
       );
 
@@ -275,7 +275,7 @@ USBMouseAbsolutePointerDriverBindingStart (
   //
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
-    PcdGet32 (PcdStatusCodeValueMouseEnable),
+    FixedPcdGet32 (PcdStatusCodeValueMouseEnable),
     UsbMouseAbsolutePointerDevice->DevicePath
     );
 
@@ -401,7 +401,7 @@ USBMouseAbsolutePointerDriverBindingStop (
   //
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
-    PcdGet32 (PcdStatusCodeValueMouseDisable),
+    FixedPcdGet32 (PcdStatusCodeValueMouseDisable),
     UsbMouseAbsolutePointerDevice->DevicePath
     );
 
@@ -682,7 +682,7 @@ OnMouseInterruptComplete (
     //
     REPORT_STATUS_CODE_WITH_DEVICE_PATH (
       EFI_ERROR_CODE | EFI_ERROR_MINOR,
-      PcdGet32 (PcdStatusCodeValueMouseInputError),
+      FixedPcdGet32 (PcdStatusCodeValueMouseInputError),
       UsbMouseAbsolutePointerDevice->DevicePath
       );
 
@@ -833,7 +833,7 @@ UsbMouseAbsolutePointerReset (
 
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
-    PcdGet32 (PcdStatusCodeValueMouseReset),
+    FixedPcdGet32 (PcdStatusCodeValueMouseReset),
     UsbMouseAbsolutePointerDevice->DevicePath
     );
 

@@ -811,7 +811,7 @@ InitUSBKeyboard (
 
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
-    PcdGet32 (PcdStatusCodeValueKeyboardSelfTest),
+    FixedPcdGet32 (PcdStatusCodeValueKeyboardSelfTest),
     UsbKeyboardDevice->DevicePath
     );
 
@@ -846,7 +846,7 @@ InitUSBKeyboard (
     //
     REPORT_STATUS_CODE_WITH_DEVICE_PATH (
       EFI_ERROR_CODE | EFI_ERROR_MINOR,
-      PcdGet32 (PcdStatusCodeValueKeyboardInterfaceError),
+      FixedPcdGet32 (PcdStatusCodeValueKeyboardInterfaceError),
       UsbKeyboardDevice->DevicePath
       );
 
@@ -1012,7 +1012,7 @@ KeyboardHandler (
     //
     REPORT_STATUS_CODE_WITH_DEVICE_PATH (
       EFI_ERROR_CODE | EFI_ERROR_MINOR,
-      PcdGet32 (PcdStatusCodeValueKeyboardInputError),
+      FixedPcdGet32 (PcdStatusCodeValueKeyboardInputError),
       UsbKeyboardDevice->DevicePath
       );
 
