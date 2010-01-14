@@ -135,7 +135,7 @@ CpuIoCheckParameter (
   //
   // Check to see if Width is in the valid range
   //
-  if (Width > SMM_IO_UINT64) {
+  if (Width < 0 || Width > SMM_IO_UINT64) {
     return EFI_INVALID_PARAMETER;
   }
 
