@@ -3,7 +3,7 @@
   IFR is primarily consumed by the EFI presentation engine, and produced by EFI
   internal application and drivers as well as all add-in card option-ROM drivers
 
-  Copyright (c) 2006 - 2009, Intel Corporation                                                         
+  Copyright (c) 2006 - 2010, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -1892,7 +1892,7 @@ typedef struct _EFI_HII_ANIMATION_CELL {
 /// An animation block to describe an animation sequence that does not cycle, and
 /// where one image is simply displayed over the previous image.
 ///
-typedef struct _EFI_HII_AIBT_OVERLAY_IMAGES {
+typedef struct _EFI_HII_AIBT_OVERLAY_IMAGES_BLOCK {
   ///
   /// This is image that is to be reference by the image protocols, if the 
   /// animation function is not supported or disabled. This image can 
