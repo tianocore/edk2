@@ -46,6 +46,7 @@
   ExtractGuidedSectionLib
   LzmaDecompressLib
   OmapLib
+  PeCoffGetEntryPointLib
 
 [FeaturePcd]  
   gEmbeddedTokenSpaceGuid.PcdCacheEnable

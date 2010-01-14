@@ -59,7 +59,17 @@
   
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
+  
+  #
+  # Uncomment (and comment out the next line) For RealView Debugger. The Standard IO window 
+  # in the debugger will show load and unload commands for symbols. You can cut and paste this
+  # into the command window to load symbols. We should be able to use a script to do this, but
+  # the version of RVD I have does not support scipts accessing system memory.
+  #
+#  PeCoffExtraActionLib|ArmPkg/Library/RvdPeCoffExtraActionLib/RvdPeCoffExtraActionLib.inf
   PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
+
+  
   CacheMaintenanceLib|ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
   PrePiLib|EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
   

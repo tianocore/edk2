@@ -268,4 +268,49 @@ PeCoffLoaderGetPdbPointer (
   return NULL;
 }
 
+/**
+  Returns the size of the PE/COFF headers
+
+  Returns the size of the PE/COFF header specified by Pe32Data.
+  If Pe32Data is NULL, then ASSERT().
+
+  @param  Pe32Data   Pointer to the PE/COFF image that is loaded in system
+                     memory.
+
+  @return Size of PE/COFF header in bytes or zero if not a valid iamge.
+
+**/
+UINT32
+EFIAPI
+PeCoffGetSizeOfHeaders (
+  IN VOID     *Pe32Data
+  )
+{
+  EFI_IMAGE_DOS_HEADER                  *DosHdr;
+  EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION   Hdr;
+  UINTN                                 SizeOfHeaders;
+
+  ASSERT (Pe32Data   != NULL);
+ 
+  DosHdr = (EFI_IMAGE_DOS_HEADER *)Pe32Data;
+  if (DosHdr->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
+    //
+    // DOS image header is present, so read the PE header after the DOS image header.
+    //
+    Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)((UINTN) Pe32Data + (UINTN) ((DosHdr->e_lfanew) & 0x0ffff));
+  } else {
+    //
+    // DOS image header is not present, so PE header is at the image base.
+    //
+    Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)Pe32Data;
+  }
+
+  if (Hdr.Te->Signature == EFI_TE_IMAGE_HEADER_SIGNATURE) {
+   SizeOfHeaders = sizeof (EFI_TE_IMAGE_HEADER) + (UINTN)Hdr.Te->BaseOfCode - (UINTN)Hdr.Te->StrippedSize;
+  } else if (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE) {
+    SizeOfHeaders = Hdr.Pe32->OptionalHeader.SizeOfHeaders;
+  }
+
+  return SizeOfHeaders;
+}
 

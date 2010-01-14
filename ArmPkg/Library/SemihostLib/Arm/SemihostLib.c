@@ -36,8 +36,9 @@ SemihostFileOpen (
   SEMIHOST_FILE_OPEN_BLOCK  OpenBlock;
   INT32                     Result;
 
-  if (FileHandle == NULL)
+  if (FileHandle == NULL) {
     return EFI_INVALID_PARAMETER;
+  }
 
   OpenBlock.FileName    = FileName;
   OpenBlock.Mode        = Mode;
@@ -45,12 +46,9 @@ SemihostFileOpen (
 
   Result = Semihost_SYS_OPEN(&OpenBlock);
 
-  if (Result == -1)
-  {
+  if (Result == -1) {
     return EFI_NOT_FOUND;
-  }
-  else
-  {
+  } else {
     *FileHandle = Result;
     return EFI_SUCCESS;
   }
@@ -70,10 +68,11 @@ SemihostFileSeek (
 
   Result = Semihost_SYS_SEEK(&SeekBlock);
 
-  if (Result == 0)
+  if (Result == 0) {
     return EFI_SUCCESS;
-  else
+  } else {
     return EFI_ABORTED;
+  }
 }
 
 EFI_STATUS
@@ -86,8 +85,9 @@ SemihostFileRead (
   SEMIHOST_FILE_READ_WRITE_BLOCK  ReadBlock;
   UINT32                          Result;
 
-  if ((Length == NULL) || (Buffer == NULL))
-      return EFI_INVALID_PARAMETER;
+  if ((Length == NULL) || (Buffer == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   ReadBlock.Handle = FileHandle;
   ReadBlock.Buffer = Buffer;
@@ -95,12 +95,9 @@ SemihostFileRead (
 
   Result = Semihost_SYS_READ(&ReadBlock);
 
-  if (Result == *Length)
-  {
+  if (Result == *Length) {
     return EFI_ABORTED;
-  }
-  else
-  {
+  } else {
     *Length -= Result;
     return EFI_SUCCESS;
   }
@@ -115,8 +112,9 @@ SemihostFileWrite (
 {
   SEMIHOST_FILE_READ_WRITE_BLOCK  WriteBlock;
 
-  if ((Length == NULL) || (Buffer == NULL))
+  if ((Length == NULL) || (Buffer == NULL)) {
     return EFI_INVALID_PARAMETER;
+  }
 
   WriteBlock.Handle = FileHandle;
   WriteBlock.Buffer = Buffer;
@@ -134,10 +132,11 @@ SemihostFileClose (
 {
   INT32 Result = Semihost_SYS_CLOSE(&FileHandle);
 
-  if (Result == -1)
+  if (Result == -1) {
     return EFI_INVALID_PARAMETER;
-  else
+  } else {
     return EFI_SUCCESS;
+  }
 }
 
 EFI_STATUS
@@ -148,17 +147,15 @@ SemihostFileLength (
 {
   INT32       Result;
 
-  if (Length == NULL)
+  if (Length == NULL) {
     return EFI_INVALID_PARAMETER;
+  }
 
   Result = Semihost_SYS_FLEN(&FileHandle);
 
-  if (Result == -1)
-  {
+  if (Result == -1) {
     return EFI_ABORTED;
-  }
-  else
-  {
+  } else {
     *Length = Result;
     return EFI_SUCCESS;
   }
@@ -177,10 +174,11 @@ SemihostFileRemove (
 
   Result = Semihost_SYS_REMOVE(&RemoveBlock);
 
-  if (Result == 0)
+  if (Result == 0) {
     return EFI_SUCCESS;
-  else
+  } else {
     return EFI_ABORTED;
+  }
 }
 
 CHAR8
