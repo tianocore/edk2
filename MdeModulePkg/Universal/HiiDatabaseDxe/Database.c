@@ -1,7 +1,7 @@
 /** @file
 Implementation for EFI_HII_DATABASE_PROTOCOL.
 
-Copyright (c) 2007 - 2009, Intel Corporation
+Copyright (c) 2007 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2699,6 +2699,8 @@ ExportPackageList (
   @param  PackageList            A pointer to an EFI_HII_PACKAGE_LIST_HEADER
                                  structure.
   @param  DriverHandle           Associate the package list with this EFI handle.
+                                 If a NULL is specified, this data will not be associate
+                                 with any drivers and cannot have a callback induced.
   @param  Handle                 A pointer to the EFI_HII_HANDLE instance.
 
   @retval EFI_SUCCESS            The package list associated with the Handle was
@@ -2714,7 +2716,7 @@ EFIAPI
 HiiNewPackageList (
   IN CONST EFI_HII_DATABASE_PROTOCOL    *This,
   IN CONST EFI_HII_PACKAGE_LIST_HEADER  *PackageList,
-  IN CONST EFI_HANDLE                   DriverHandle,
+  IN CONST EFI_HANDLE                   DriverHandle, OPTIONAL
   OUT EFI_HII_HANDLE                    *Handle
   )
 {
