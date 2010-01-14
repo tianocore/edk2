@@ -22,66 +22,13 @@
 #include <Pi/PiSmmCis.h>
 #include <Protocol/SmmCpuIo.h>
 
-#define EFI_SMM_CPU_IO_GUID \
-  { \
-    0x5f439a0b, 0x45d8, 0x4682, {0xa4, 0xf4, 0xf0, 0x57, 0x6b, 0x51, 0x34, 0x41 } \
-  }
-
 typedef struct _EFI_SMM_SYSTEM_TABLE      EFI_SMM_SYSTEM_TABLE;
 typedef struct _EFI_SMM_CPU_IO_INTERFACE  EFI_SMM_CPU_IO_INTERFACE;
-
 
 //
 // SMM Base specification constant and types
 //
 #define EFI_SMM_SYSTEM_TABLE_REVISION (0 << 16) | (0x09)
-
-/**
-  Provides the basic memory and I/O interfaces that are used to
-  abstract accesses to devices.
-
-  @param  This             The EFI_SMM_CPU_IO_INTERFACE instance.
-  @param  Width            Signifies the width of the I/O operations.
-  @param  Address          The base address of the I/O operations.
-  @param  Count            The number of I/O operations to perform.
-  @param  Buffer           For read operations, the destination buffer to store the results (out parameter).
-                           For write operations, the source buffer from which to write data (in parameter).
-
-  @retval EFI_SUCCESS           The data was read from or written to the device.
-  @retval EFI_UNSUPPORTED       The Address is not valid for this system.
-  @retval EFI_INVALID_PARAMETER Width or Count, or both, were invalid.
-  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
-
-**/
-typedef
-EFI_STATUS
-(EFIAPI *EFI_SMM_CPU_IO)(
-  IN EFI_SMM_CPU_IO_INTERFACE         *This,
-  IN EFI_SMM_IO_WIDTH                 Width,
-  IN UINT64                           Address,
-  IN UINTN                            Count,
-  IN OUT VOID                         *Buffer
-  );
-
-typedef struct {
-  EFI_SMM_CPU_IO  Read;  ///< This service provides the various modalities of memory and I/O read.
-  EFI_SMM_CPU_IO  Write; ///< This service provides the various modalities of memory and I/O write.
-} EFI_SMM_IO_ACCESS;
-
-///
-/// The EFI_SMM_CPU_IO_INTERFACE service provides the basic memory, I/O, and PCI
-/// interfaces that are used to abstract accesses to devices.
-///
-struct _EFI_SMM_CPU_IO_INTERFACE {
-  ///
-  /// Allows reads and writes to memory-mapped I/O space. 
-  ///
-  EFI_SMM_IO_ACCESS Mem;
-  ///
-  /// Allows reads and writes to I/O space. 
-  ///
-  EFI_SMM_IO_ACCESS Io;
-};
 
 /**
   Allocates pool memory from SMRAM for IA-32 or runtime memory for

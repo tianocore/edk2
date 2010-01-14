@@ -2,7 +2,7 @@
 # Intel Framework Package Reference Implementations
 #
 # This package provides definitions and libraries that comply to Intel Framework Specifications.
-# Copyright (c) 2007 - 2009, Intel Corporation.
+# Copyright (c) 2007 - 2010, Intel Corporation.
 #
 # All rights reserved.
 #    This program and the accompanying materials are licensed and made available
@@ -141,6 +141,9 @@
   ## Include/Protocol/SmmStatusCode.h
   gEfiSmmStatusCodeProtocolGuid = { 0x6afd2b77, 0x98c1, 0x4acd, {0xa6, 0xf9, 0x8a, 0x94, 0x39, 0xde, 0xf, 0xb1 }}
 
+  ## Include/Protocol/SmmCpuIo.h
+  gEfiSmmCpuIoGuid  = { 0x5f439a0b, 0x45d8, 0x4682, {0xa4, 0xf4, 0xf0, 0x57, 0x6b, 0x51, 0x34, 0x41}}
+  
   ## Include/Protocol/FrameworkFormCallback.h
   gEfiFormCallbackProtocolGuid   = { 0xF3E4543D, 0xCF35, 0x6CEF, { 0x35, 0xC4, 0x4F, 0xE6, 0x34, 0x4D, 0xFC, 0x54 }}
 
