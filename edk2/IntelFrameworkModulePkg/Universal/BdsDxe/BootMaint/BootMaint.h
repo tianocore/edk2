@@ -591,6 +591,20 @@ BOpt_IsEfiApp (
 
   Get the Option Number that has not been allocated for use.
 
+  @param Type  The type of Option.
+
+  @return The available Option Number.
+
+**/
+UINT16
+BOpt_GetOptionNumber (
+  CHAR16        *Type
+  );
+
+/**
+
+  Get the Option Number for Boot#### that does not used.
+
   @return The available Option Number.
 
 **/
@@ -601,9 +615,9 @@ BOpt_GetBootOptionNumber (
 
 /**
 
-  Get the Option Number that is not in use.
+Get the Option Number for Driver#### that does not used.
 
-  @return The unused Option Number.
+@return The unused Option Number.
 
 **/
 UINT16
