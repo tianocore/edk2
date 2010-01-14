@@ -1,7 +1,7 @@
 /** @file
   EFI PEI Core dispatch services
   
-Copyright (c) 2006 - 2009, Intel Corporation
+Copyright (c) 2006 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -417,7 +417,7 @@ PeiDispatcher (
 
               REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
                 EFI_PROGRESS_CODE,
-                FixedPcdGet32(PcdStatusCodeValuePeimDispatch),
+                PcdGet32(PcdStatusCodeValuePeimDispatch),
                 (VOID *)(&ExtendedData),
                 sizeof (ExtendedData)
                 );
@@ -442,7 +442,7 @@ PeiDispatcher (
 
               REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
                 EFI_PROGRESS_CODE,
-                FixedPcdGet32(PcdStatusCodeValuePeimDispatch),
+                PcdGet32(PcdStatusCodeValuePeimDispatch),
                 (VOID *)(&ExtendedData),
                 sizeof (ExtendedData)
                 );
@@ -478,10 +478,10 @@ PeiDispatcher (
               //
               OldPeiStackSize = (UINT64) SecCoreData->StackSize;
               NewPeiStackSize = (RShiftU64 (Private->PhysicalMemoryLength, 1) + EFI_PAGE_MASK) & ~EFI_PAGE_MASK;
-              if (FixedPcdGet32(PcdPeiCoreMaxPeiStackSize) > (UINT32) NewPeiStackSize) {
+              if (PcdGet32(PcdPeiCoreMaxPeiStackSize) > (UINT32) NewPeiStackSize) {
                 Private->StackSize = NewPeiStackSize;
               } else {
-                Private->StackSize = FixedPcdGet32(PcdPeiCoreMaxPeiStackSize);
+                Private->StackSize = PcdGet32(PcdPeiCoreMaxPeiStackSize);
               }
 
               //

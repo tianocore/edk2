@@ -84,13 +84,15 @@
   gEfiPeiSecurity2PpiGuid                       ## NOTIFY
   gEfiTemporaryRamSupportPpiGuid                ## CONSUMES
 
-[Pcd]  
+[FixedPcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported       ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeimPerFv         ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPpiSupported      ## CONSUMES
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeimDispatch       ## CONSUMES
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeiCoreEntry       ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeiStackSize      ## CONSUMES
+
+[Pcd]  
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeimDispatch                    ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeiCoreEntry                    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeiStackSize                   ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst   ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport            ## CONSUMES
   
