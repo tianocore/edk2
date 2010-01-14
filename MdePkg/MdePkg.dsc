@@ -148,7 +148,7 @@
   MdePkg/Library/PeiServicesTablePointerLibIdt/PeiServicesTablePointerLibIdt.inf
   MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
   MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
-  MdePkg/Library/SmmIoLibCpuIo/SmmIoLibCpuIo.inf
+  MdePkg/Library/SmmIoLibSmmCpuIo2/SmmIoLibSmmCpuIo2.inf
   MdePkg/Library/SmmPciLibPciRootBridgeIo/SmmPciLibPciRootBridgeIo.inf
   MdePkg/Library/SmmServicesTableLib/SmmServicesTableLib.inf
 

@@ -3,7 +3,7 @@
 #
 # I/O Library implementation that uses the CPU I/O Protocol for I/O
 #  and MMIO operations.
-# Copyright (c) 2009, Intel Corporation.
+# Copyright (c) 2009 - 2010, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -12,19 +12,16 @@
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#
 #**/
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = SmmIoLibCpuIo
+  BASE_NAME                      = SmmIoLibSmmCpuIo2
   FILE_GUID                      = DEEEA15E-4A77-4513-BA75-71D26FEF78A1
   MODULE_TYPE                    = DXE_SMM_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = IoLib|DXE_SMM_DRIVER SMM_CORE
-  EFI_SPECIFICATION_VERSION      = 0x00020000
   PI_SPECIFICATION_VERSION       = 0x0001000A
-  
   CONSTRUCTOR                    = IoLibConstructor
 
 #
@@ -33,12 +30,11 @@
 #  VALID_ARCHITECTURES           = IA32 X64
 #
 
-[Sources.common]
+[Sources]
   IoLibMmioBuffer.c
   SmmCpuIoLibInternal.h
   IoHighLevel.c
   IoLib.c
-
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -49,8 +45,7 @@
   SmmServicesTableLib
 
 [Protocols]
-  gEfiSmmCpuIoProtocolGuid                         ## CONSUMES
-  gEfiSmmPciRootBridgeIoProtocolGuid               ## CONSUMES
+  gEfiSmmCpuIo2ProtocolGuid                         ## CONSUMES
 
 [Depex]
-  gEfiSmmCpuIoProtocolGuid OR gEfiSmmPciRootBridgeIoProtocolGuid      
+  gEfiSmmCpuIo2ProtocolGuid

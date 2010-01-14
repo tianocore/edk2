@@ -2,7 +2,7 @@
   Common definitions in the Platform Initialization Specification version 1.2
   VOLUME 4 System Management Mode Core Interface version.
 
-  Copyright (c) 2009, Intel Corporation
+  Copyright (c) 2009 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -17,7 +17,7 @@
 #define _PI_SMMCIS_H_
 
 #include <Pi/PiMultiPhase.h>
-#include <Protocol/SmmCpuIo.h>
+#include <Protocol/SmmCpuIo2.h>
 
 ///
 /// Note:
@@ -280,7 +280,7 @@ struct _EFI_SMM_SYSTEM_TABLE2 {
   ///
   /// I/O Service
   ///
-  EFI_SMM_CPU_IO_PROTOCOL              SmmIo;
+  EFI_SMM_CPU_IO2_PROTOCOL             SmmIo;
 
   ///
   /// Runtime memory services

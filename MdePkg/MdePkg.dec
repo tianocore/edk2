@@ -5,7 +5,7 @@
 # It also provides the definitions(including PPIs/PROTOCOLs/GUIDs) of
 # EFI1.10/UEFI2.0/UEFI2.1/PI1.0 and some Industry Standards.
 #
-# Copyright (c) 2007 - 2009, Intel Corporation.<BR>
+# Copyright (c) 2007 - 2010, Intel Corporation.<BR>
 # Portions copyright (c) 2008-2009 Apple Inc. All rights reserved.<BR>
 #
 # All rights reserved.
@@ -661,8 +661,8 @@
   ## Include/Protocol/SuperIo.h
   gEfiSioProtocolGuid             = { 0x215fdd18, 0xbd50, 0x4feb, { 0x89, 0xb, 0x58, 0xca, 0xb, 0x47, 0x39, 0xe9 }}
 
-  ## Include/Protocol/SmmCpuIo.h
-  gEfiSmmCpuIoProtocolGuid        = { 0x3242a9d8, 0xce70, 0x4aa0, { 0x95, 0x5d, 0x5e, 0x7b, 0x14, 0x0d, 0xe4, 0xd2 }}
+  ## Include/Protocol/SmmCpuIo2.h
+  gEfiSmmCpuIo2ProtocolGuid        = { 0x3242a9d8, 0xce70, 0x4aa0, { 0x95, 0x5d, 0x5e, 0x7b, 0x14, 0x0d, 0xe4, 0xd2 }}
 
   ## Include/Protocol/SmmBase2.h
   gEfiSmmBase2ProtocolGuid        = { 0xf4ccbfb7, 0xf6e0, 0x47fd, { 0x9d, 0xd4, 0x10, 0xa8, 0xf1, 0x50, 0xc1, 0x91 }}
