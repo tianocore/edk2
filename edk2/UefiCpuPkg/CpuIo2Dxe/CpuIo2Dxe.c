@@ -1,21 +1,80 @@
 /** @file
   Produces the CPU I/O 2 Protocol.
 
-Copyright (c) 2009, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2009 - 2010, Intel Corporation
+All rights reserved. This program and the accompanying materials                          
+are licensed and made available under the terms and conditions of the BSD License         
+which accompanies this distribution.  The full text of the license may be found at        
+http://opensource.org/licenses/bsd-license.php                                            
+                                                                                          
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
 **/
 
-#include "CpuIo2Dxe.h"
+#include <PiDxe.h>
 
-EFI_HANDLE           mHandle = NULL;
-EFI_CPU_IO2_PROTOCOL mCpuIo  = {
+#include <Protocol/CpuIo2.h>
+
+#include <Library/BaseLib.h>
+#include <Library/DebugLib.h>
+#include <Library/IoLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+
+#define MAX_IO_PORT_ADDRESS   0xFFFF
+
+//
+// Function Prototypes
+//
+EFI_STATUS
+EFIAPI
+CpuMemoryServiceRead (
+  IN  EFI_CPU_IO2_PROTOCOL       *This,
+  IN  EFI_CPU_IO_PROTOCOL_WIDTH  Width,
+  IN  UINT64                     Address,
+  IN  UINTN                      Count,
+  OUT VOID                       *Buffer
+  );
+
+EFI_STATUS
+EFIAPI
+CpuMemoryServiceWrite (
+  IN EFI_CPU_IO2_PROTOCOL       *This,
+  IN EFI_CPU_IO_PROTOCOL_WIDTH  Width,
+  IN UINT64                     Address,
+  IN UINTN                      Count,
+  IN VOID                       *Buffer
+  );
+
+EFI_STATUS
+EFIAPI
+CpuIoServiceRead (
+  IN  EFI_CPU_IO2_PROTOCOL       *This,
+  IN  EFI_CPU_IO_PROTOCOL_WIDTH  Width,
+  IN  UINT64                     Address,
+  IN  UINTN                      Count,
+  OUT VOID                       *Buffer
+  );
+
+EFI_STATUS
+EFIAPI
+CpuIoServiceWrite (
+  IN EFI_CPU_IO2_PROTOCOL       *This,
+  IN EFI_CPU_IO_PROTOCOL_WIDTH  Width,
+  IN UINT64                     Address,
+  IN UINTN                      Count,
+  IN VOID                       *Buffer
+  );
+
+//
+// Handle for the CPU I/O 2 Protocol
+//
+EFI_HANDLE  mHandle = NULL;
+
+//
+// CPU I/O 2 Protocol instance
+//
+EFI_CPU_IO2_PROTOCOL mCpuIo2 = {
   {
     CpuMemoryServiceRead,
     CpuMemoryServiceWrite
@@ -26,519 +85,485 @@ EFI_CPU_IO2_PROTOCOL mCpuIo  = {
   }
 };
 
+//
+// Lookup table for increment values based on transfer widths
+//
+UINT8 mInStride[] = {
+  1, // EfiCpuIoWidthUint8
+  2, // EfiCpuIoWidthUint16
+  4, // EfiCpuIoWidthUint32
+  8, // EfiCpuIoWidthUint64
+  0, // EfiCpuIoWidthFifoUint8
+  0, // EfiCpuIoWidthFifoUint16
+  0, // EfiCpuIoWidthFifoUint32
+  0, // EfiCpuIoWidthFifoUint64
+  1, // EfiCpuIoWidthFillUint8
+  2, // EfiCpuIoWidthFillUint16
+  4, // EfiCpuIoWidthFillUint32
+  8  // EfiCpuIoWidthFillUint64
+};
+
+//
+// Lookup table for increment values based on transfer widths
+//
+UINT8 mOutStride[] = {
+  1, // EfiCpuIoWidthUint8
+  2, // EfiCpuIoWidthUint16
+  4, // EfiCpuIoWidthUint32
+  8, // EfiCpuIoWidthUint64
+  1, // EfiCpuIoWidthFifoUint8
+  2, // EfiCpuIoWidthFifoUint16
+  4, // EfiCpuIoWidthFifoUint32
+  8, // EfiCpuIoWidthFifoUint64
+  0, // EfiCpuIoWidthFillUint8
+  0, // EfiCpuIoWidthFillUint16
+  0, // EfiCpuIoWidthFillUint32
+  0  // EfiCpuIoWidthFillUint64
+};
+
 /**
-  Worker function to check the validation of parameters for CPU I/O interface functions.
+  Check parameters to a CPU I/O 2 Protocol service request.
 
-  This function check the validation of parameters for CPU I/O interface functions.
+  The I/O operations are carried out exactly as requested. The caller is responsible 
+  for satisfying any alignment and I/O width restrictions that a PI System on a 
+  platform might require. For example on some platforms, width requests of 
+  EfiCpuIoWidthUint64 do not work. Misaligned buffers, on the other hand, will 
+  be handled by the driver.
+  
+  @param[in] MmioOperation  TRUE for an MMIO operation, FALSE for I/O Port operation.
+  @param[in] Width          Signifies the width of the I/O or Memory operation.
+  @param[in] Address        The base address of the I/O operation. 
+  @param[in] Count          The number of I/O operations to perform. The number of  
+                            bytes moved is Width size * Count, starting at Address.
+  @param[in] Buffer         For read operations, the destination buffer to store the results.
+                            For write operations, the source buffer from which to write data.
 
-  @param  Width                 Width of the Mmio/Io operation
-  @param  Address               Base address of the Mmio/Io operation
-  @param  Count                 Count of the number of accesses to perform
-  @param  Buffer                Pointer to the buffer to read from memory
-  @param  Limit                 Maximum address supported
-
-  @retval EFI_INVALID_PARAMETER Buffer is NULL
-  @retval EFI_UNSUPPORTED       The address range specified by Width, Address and Count is invalid
-  @retval EFI_UNSUPPORTED       The memory buffer is not aligned
-  @retval EFI_SUCCESS           Parameters are valid
+  @retval EFI_SUCCESS            The parameters for this request pass the checks.
+  @retval EFI_INVALID_PARAMETER  Width is invalid for this PI system.
+  @retval EFI_INVALID_PARAMETER  Buffer is NULL.
+  @retval EFI_UNSUPPORTED        The Buffer is not aligned for the given Width.
+  @retval EFI_UNSUPPORTED        The address range specified by Address, Width, 
+                                 and Count is not valid for this PI system.
 
 **/
 EFI_STATUS
 CpuIoCheckParameter (
+  IN BOOLEAN                    MmioOperation,
   IN EFI_CPU_IO_PROTOCOL_WIDTH  Width,
   IN UINT64                     Address,
   IN UINTN                      Count,
-  IN VOID                       *Buffer,
-  IN UINT64                     Limit
+  IN VOID                       *Buffer
   )
 {
-  UINTN AlignMask;
+  UINT64  MaxCount;
+  UINT64  Limit;
 
+  //
+  // Check to see if Buffer is NULL
+  //
   if (Buffer == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Address > Limit) {
-    return EFI_UNSUPPORTED;
+  //
+  // Check to see if Width is in the valid range
+  //
+  if (Width < 0 || Width >= EfiCpuIoWidthMaximum) {
+    return EFI_INVALID_PARAMETER;
   }
 
   //
-  // For FiFo type, the target address won't increase during the access,
-  // so treat count as 1
+  // For FIFO type, the target address won't increase during the access,
+  // so treat Count as 1
   //
   if (Width >= EfiCpuIoWidthFifoUint8 && Width <= EfiCpuIoWidthFifoUint64) {
     Count = 1;
   }
 
-  Width = (EFI_CPU_IO_PROTOCOL_WIDTH) (Width & 0x03);
-  if (Address - 1 + (UINT32)(1 << Width) * Count > Limit) {
-    return EFI_UNSUPPORTED;
-  }
-
-  AlignMask = (1 << Width) - 1;
-  if ((UINTN) Buffer & AlignMask) {
-    return EFI_UNSUPPORTED;
-  }
-
-  return EFI_SUCCESS;
-}
-
-/**
-  Worker function to update access width and count for access to the unaligned address.
-  Unaligned Io/MmIo address access, break up the request into word by word or byte by byte.
-
-  @param  Address               Base address of the Mmio/Io operation
-  @param  PtrWidth              Pointer to width of the Mmio/Io operation
-                                Out, this value will be updated for access to the unaligned address.
-  @param  PtrCount              Pointer to count of the number of accesses to perform
-                                Out, this value will be updated for access to the unaligned address.
-**/
-VOID
-CpuIoUpdateWidthCount (
-  IN     UINT64                     Address,
-  IN OUT EFI_CPU_IO_PROTOCOL_WIDTH  *PtrWidth,
-  IN OUT UINTN                      *PtrCount
-  )
-{
-  EFI_CPU_IO_PROTOCOL_WIDTH  BufferWidth;
-  UINTN                      BufferCount;
-
-  BufferWidth = *PtrWidth;
-  BufferCount = *PtrCount;
-  
-  switch (BufferWidth) {
-  case EfiCpuIoWidthUint8:
-    break;
-
-  case EfiCpuIoWidthUint16:
-    if ((Address & 0x01) == 0) {
-      break;
-    } else {
-      BufferCount = BufferCount * 2;
-      BufferWidth = EfiCpuIoWidthUint8;
-    }
-    break;
-
-  case EfiCpuIoWidthUint32:
-    if ((Address & 0x03) == 0) {
-      break;
-    } else if ((Address & 0x01) == 0) {
-      BufferCount = BufferCount * 2;
-      BufferWidth = EfiCpuIoWidthUint16;
-    } else {
-      BufferCount = BufferCount * 4;
-      BufferWidth = EfiCpuIoWidthUint8;
-    }
-    break;
-
-  case EfiCpuIoWidthUint64:
-    if ((Address & 0x07) == 0) {
-      break;
-    } else if ((Address & 0x03) == 0) {
-      BufferCount = BufferCount * 2;
-      BufferWidth = EfiCpuIoWidthUint32;
-    } else if ((Address & 0x01) == 0) {
-      BufferCount = BufferCount * 4;
-      BufferWidth = EfiCpuIoWidthUint16;
-    } else {
-      BufferCount = BufferCount * 8;
-      BufferWidth = EfiCpuIoWidthUint8;
-    }
-    break;
-
-  default:
-    return;
-  }
-
-  *PtrWidth = BufferWidth;
-  *PtrCount = BufferCount;
-
-  return;
-}
-
-/**
-  Worker function to perform memory mapped I/O read/write
-
-  This function provides private services to perform memory mapped I/O read/write.
-
-  @param  Width                 Width of the memory mapped I/O operation
-  @param  Count                 Count of the number of accesses to perform
-  @param  DestinationStrideFlag Boolean flag indicates if the destination is to be incremented
-  @param  Destination           Destination of the memory mapped I/O operation
-  @param  SourceStrideFlag      Boolean flag indicates if the source is to be incremented
-  @param  Source                Source of the memory mapped I/O operation
-
-  @retval EFI_SUCCESS           Successful operation
-  @retval EFI_INVALID_PARAMETER Width is invalid
-
-**/
-EFI_STATUS
-CpuIoMemRW (
-  IN  EFI_CPU_IO_PROTOCOL_WIDTH  Width,
-  IN  UINTN                      Count,
-  IN  BOOLEAN                    DestinationStrideFlag,
-  OUT PTR                        Destination,
-  IN  BOOLEAN                    SourceStrideFlag,
-  IN  PTR                        Source
-  )
-{
-  UINTN Stride;
-  UINTN DestinationStride;
-  UINTN SourceStride;
-
-  Width             = (EFI_CPU_IO_PROTOCOL_WIDTH) (Width & 0x03);
-  Stride            = (UINT32)(1 << Width);
-  DestinationStride = DestinationStrideFlag ? Stride : 0;
-  SourceStride      = SourceStrideFlag ? Stride : 0;
-
   //
-  // Loop for each iteration and move the data
+  // Check to see if Width is in the valid range for I/O Port operations
   //
-  switch (Width) {
-  case EfiCpuIoWidthUint8:
-    for (; Count > 0; Count--, Destination.Buf += DestinationStride, Source.Buf += SourceStride) {
-      MmioWrite8((UINTN)Destination.Ui8 , MmioRead8((UINTN)Source.Ui8));
-    }
-    break;
-
-  case EfiCpuIoWidthUint16:
-    for (; Count > 0; Count--, Destination.Buf += DestinationStride, Source.Buf += SourceStride) {
-      MmioWrite16((UINTN)Destination.Ui16 , MmioRead16((UINTN)Source.Ui16));
-    }
-    break;
-
-  case EfiCpuIoWidthUint32:
-    for (; Count > 0; Count--, Destination.Buf += DestinationStride, Source.Buf += SourceStride) {
-      MmioWrite32((UINTN)Destination.Ui32 , MmioRead32((UINTN)Source.Ui32));
-    }
-    break;
-
-  case EfiCpuIoWidthUint64:
-    for (; Count > 0; Count--, Destination.Buf += DestinationStride, Source.Buf += SourceStride) {
-      MmioWrite64((UINTN)Destination.Ui64 , MmioRead64((UINTN)Source.Ui64));
-    }
-    break;
-
-  default:
+  Width = Width & 0x03;
+  if (!MmioOperation && (Width == EfiCpuIoWidthUint64)) {
     return EFI_INVALID_PARAMETER;
   }
+  
+  //
+  // Check to see if Address is alligned
+  //
+  if ((Address & (UINT64)(mInStride[Width] - 1)) != 0) {
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Check to see if any address associated with this transfer exceeds the maximum 
+  // allowed address.  The maximum address implied by the parameters passed in is
+  // Address + Size * Count.  If the following condition is met, then the transfer
+  // is not supported.
+  //
+  //    Address + Size * Count > (MmioOperation ? MAX_ADDRESS : MAX_IO_PORT_ADDRESS) + 1
+  //
+  // Since MAX_ADDRESS can be the maximum integer value supported by the CPU and Count 
+  // can also be the maximum integer value supported by the CPU, this range
+  // check must be adjusted to avoid all oveflow conditions.
+  //   
+  // The follwing form of the range check is equivalent but assumes that 
+  // MAX_ADDRESS and MAX_IO_PORT_ADDRESS are of the form (2^n - 1).
+  //
+  Limit = (MmioOperation ? MAX_ADDRESS : MAX_IO_PORT_ADDRESS);
+  if (Count == 0) {
+    if (Address > Limit) {
+      return EFI_UNSUPPORTED;
+    }
+  } else {  
+    MaxCount = RShiftU64 (Limit, Width);
+    if (MaxCount < (Count - 1)) {
+      return EFI_UNSUPPORTED;
+    }
+    if (Address > LShiftU64 (MaxCount - Count + 1, Width)) {
+      return EFI_UNSUPPORTED;
+    }
+  }
+
+  //
+  // Check to see if Buffer is alligned
+  //
+  if (((UINTN)Buffer & (mInStride[Width] - 1)) != 0) {
+    return EFI_UNSUPPORTED;
+  }
 
   return EFI_SUCCESS;
 }
 
 /**
-  Enables a driver to read memory-mapped registers in the PI System memory space.
+  Reads memory-mapped registers.
 
-  @param[in]       This         A pointer to the EFI_CPU_IO2_PROTOCOL instance.
-  @param[in]       Width        Signifies the width of the memory operation.
-  @param[in]       Address      The base address of the memory operation.
-  @param[in]       Count        The number of memory operations to perform. The number of bytes moved
-                                is Width size * Count, starting at Address.
-  @param[out]      Buffer       The destination buffer to store the results.
+  The I/O operations are carried out exactly as requested. The caller is responsible 
+  for satisfying any alignment and I/O width restrictions that a PI System on a 
+  platform might require. For example on some platforms, width requests of 
+  EfiCpuIoWidthUint64 do not work. Misaligned buffers, on the other hand, will 
+  be handled by the driver.
+  
+  If Width is EfiCpuIoWidthUint8, EfiCpuIoWidthUint16, EfiCpuIoWidthUint32, 
+  or EfiCpuIoWidthUint64, then both Address and Buffer are incremented for 
+  each of the Count operations that is performed.
+  
+  If Width is EfiCpuIoWidthFifoUint8, EfiCpuIoWidthFifoUint16, 
+  EfiCpuIoWidthFifoUint32, or EfiCpuIoWidthFifoUint64, then only Buffer is 
+  incremented for each of the Count operations that is performed. The read or 
+  write operation is performed Count times on the same Address.
+  
+  If Width is EfiCpuIoWidthFillUint8, EfiCpuIoWidthFillUint16, 
+  EfiCpuIoWidthFillUint32, or EfiCpuIoWidthFillUint64, then only Address is 
+  incremented for each of the Count operations that is performed. The read or 
+  write operation is performed Count times from the first element of Buffer.
+  
+  @param[in]  This     A pointer to the EFI_CPU_IO2_PROTOCOL instance.
+  @param[in]  Width    Signifies the width of the I/O or Memory operation.
+  @param[in]  Address  The base address of the I/O operation. 
+  @param[in]  Count    The number of I/O operations to perform. The number of 
+                       bytes moved is Width size * Count, starting at Address.
+  @param[out] Buffer   For read operations, the destination buffer to store the results.
+                       For write operations, the source buffer from which to write data.
 
-  @retval EFI_SUCCESS           The data was read from or written to the EFI system.
-  @retval EFI_INVALID_PARAMETER Width is invalid for this EFI system. Or Buffer is NULL.
-  @retval EFI_UNSUPPORTED       The Buffer is not aligned for the given Width.
-                                Or,The address range specified by Address, Width, and Count is not valid for this EFI system.
+  @retval EFI_SUCCESS            The data was read from or written to the PI system.
+  @retval EFI_INVALID_PARAMETER  Width is invalid for this PI system.
+  @retval EFI_INVALID_PARAMETER  Buffer is NULL.
+  @retval EFI_UNSUPPORTED        The Buffer is not aligned for the given Width.
+  @retval EFI_UNSUPPORTED        The address range specified by Address, Width, 
+                                 and Count is not valid for this PI system.
 
 **/
 EFI_STATUS
 EFIAPI
 CpuMemoryServiceRead (
-  IN     EFI_CPU_IO2_PROTOCOL              *This,
-  IN     EFI_CPU_IO_PROTOCOL_WIDTH         Width,
-  IN     UINT64                            Address,
-  IN     UINTN                             Count,
-  OUT    VOID                              *Buffer
+  IN  EFI_CPU_IO2_PROTOCOL       *This,
+  IN  EFI_CPU_IO_PROTOCOL_WIDTH  Width,
+  IN  UINT64                     Address,
+  IN  UINTN                      Count,
+  OUT VOID                       *Buffer
   )
 {
-  PTR                           Source;
-  PTR                           Destination;
-  EFI_STATUS                    Status;
-  EFI_CPU_IO_PROTOCOL_WIDTH     BufferWidth;
+  EFI_STATUS                 Status;
+  UINT8                      InStride;
+  UINT8                      OutStride;
+  EFI_CPU_IO_PROTOCOL_WIDTH  OperationWidth;
+  UINT8                      *Uint8Buffer;
 
-  Status = CpuIoCheckParameter (Width, Address, Count, Buffer, MAX_ADDRESS);
+  Status = CpuIoCheckParameter (TRUE, Width, Address, Count, Buffer);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Destination.Buf = Buffer;
-  Source.Buf      = (VOID *) (UINTN) Address;
-  
   //
-  // Support access to unaligned mmio address.
-  // Break up the request into byte by byte
+  // Select loop based on the width of the transfer
   //
-  BufferWidth     = (EFI_CPU_IO_PROTOCOL_WIDTH) (Width & 0x03);
-  CpuIoUpdateWidthCount (Address, &BufferWidth, &Count);
-
-  if (Width >= EfiCpuIoWidthUint8 && Width <= EfiCpuIoWidthUint64) {
-    return CpuIoMemRW (BufferWidth, Count, TRUE, Destination, TRUE, Source);
+  InStride = mInStride[Width];
+  OutStride = mOutStride[Width];
+  OperationWidth = Width & 0x03;
+  for (Uint8Buffer = Buffer; Count > 0; Address += InStride, Uint8Buffer += OutStride, Count--) {
+    if (OperationWidth == EfiCpuIoWidthUint8) {
+      *Uint8Buffer = MmioRead8 ((UINTN)Address);
+    } else if (OperationWidth == EfiCpuIoWidthUint16) {
+      *((UINT16 *)Uint8Buffer) = MmioRead16 ((UINTN)Address);
+    } else if (OperationWidth == EfiCpuIoWidthUint32) {
+      *((UINT32 *)Uint8Buffer) = MmioRead32 ((UINTN)Address);
+    } else if (OperationWidth == EfiCpuIoWidthUint64) {
+      *((UINT64 *)Uint8Buffer) = MmioRead64 ((UINTN)Address);
+    }
   }
-
-  if (Width >= EfiCpuIoWidthFifoUint8 && Width <= EfiCpuIoWidthFifoUint64) {
-    return CpuIoMemRW (BufferWidth, Count, TRUE, Destination, FALSE, Source);
-  }
-
-  if (Width >= EfiCpuIoWidthFillUint8 && Width <= EfiCpuIoWidthFillUint64) {
-    return CpuIoMemRW (BufferWidth, Count, FALSE, Destination, TRUE, Source);
-  }
-
-  return EFI_INVALID_PARAMETER;
+  return EFI_SUCCESS;
 }
 
 /**
-  Enables a driver to write memory-mapped registers in the PI System memory space.
+  Writes memory-mapped registers.
 
-  @param[in]       This         A pointer to the EFI_CPU_IO2_PROTOCOL instance.
-  @param[in]       Width        Signifies the width of the memory operation.
-  @param[in]       Address      The base address of the memory operation.
-  @param[in]       Count        The number of memory operations to perform. The number of bytes moved
-                                is Width size * Count, starting at Address.
-  @param[in]       Buffer       The source buffer from which to write data.
+  The I/O operations are carried out exactly as requested. The caller is responsible 
+  for satisfying any alignment and I/O width restrictions that a PI System on a 
+  platform might require. For example on some platforms, width requests of 
+  EfiCpuIoWidthUint64 do not work. Misaligned buffers, on the other hand, will 
+  be handled by the driver.
+  
+  If Width is EfiCpuIoWidthUint8, EfiCpuIoWidthUint16, EfiCpuIoWidthUint32, 
+  or EfiCpuIoWidthUint64, then both Address and Buffer are incremented for 
+  each of the Count operations that is performed.
+  
+  If Width is EfiCpuIoWidthFifoUint8, EfiCpuIoWidthFifoUint16, 
+  EfiCpuIoWidthFifoUint32, or EfiCpuIoWidthFifoUint64, then only Buffer is 
+  incremented for each of the Count operations that is performed. The read or 
+  write operation is performed Count times on the same Address.
+  
+  If Width is EfiCpuIoWidthFillUint8, EfiCpuIoWidthFillUint16, 
+  EfiCpuIoWidthFillUint32, or EfiCpuIoWidthFillUint64, then only Address is 
+  incremented for each of the Count operations that is performed. The read or 
+  write operation is performed Count times from the first element of Buffer.
+  
+  @param[in]  This     A pointer to the EFI_CPU_IO2_PROTOCOL instance.
+  @param[in]  Width    Signifies the width of the I/O or Memory operation.
+  @param[in]  Address  The base address of the I/O operation. 
+  @param[in]  Count    The number of I/O operations to perform. The number of 
+                       bytes moved is Width size * Count, starting at Address.
+  @param[in]  Buffer   For read operations, the destination buffer to store the results.
+                       For write operations, the source buffer from which to write data.
 
-  @retval EFI_SUCCESS           The data was read from or written to the EFI system.
-  @retval EFI_INVALID_PARAMETER Width is invalid for this EFI system. Or Buffer is NULL.
-  @retval EFI_UNSUPPORTED       The Buffer is not aligned for the given Width.
-                                Or,The address range specified by Address, Width, and Count is not valid for this EFI system.
+  @retval EFI_SUCCESS            The data was read from or written to the PI system.
+  @retval EFI_INVALID_PARAMETER  Width is invalid for this PI system.
+  @retval EFI_INVALID_PARAMETER  Buffer is NULL.
+  @retval EFI_UNSUPPORTED        The Buffer is not aligned for the given Width.
+  @retval EFI_UNSUPPORTED        The address range specified by Address, Width, 
+                                 and Count is not valid for this PI system.
 
 **/
 EFI_STATUS
 EFIAPI
 CpuMemoryServiceWrite (
-  IN     EFI_CPU_IO2_PROTOCOL              *This,
-  IN     EFI_CPU_IO_PROTOCOL_WIDTH         Width,
-  IN     UINT64                            Address,
-  IN     UINTN                             Count,
-  IN     VOID                              *Buffer
+  IN EFI_CPU_IO2_PROTOCOL       *This,
+  IN EFI_CPU_IO_PROTOCOL_WIDTH  Width,
+  IN UINT64                     Address,
+  IN UINTN                      Count,
+  IN VOID                       *Buffer
   )
 {
-  PTR                        Source;
-  PTR                        Destination;
   EFI_STATUS                 Status;
-  EFI_CPU_IO_PROTOCOL_WIDTH  BufferWidth;
+  UINT8                      InStride;
+  UINT8                      OutStride;
+  EFI_CPU_IO_PROTOCOL_WIDTH  OperationWidth;
+  UINT8                      *Uint8Buffer;
 
-  Status = CpuIoCheckParameter (Width, Address, Count, Buffer, MAX_ADDRESS);
+  Status = CpuIoCheckParameter (TRUE, Width, Address, Count, Buffer);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Destination.Buf = (VOID *) (UINTN) Address;
-  Source.Buf      = Buffer;
-
   //
-  // Support access to unaligned mmio address.
-  // Break up the request into byte by byte
+  // Select loop based on the width of the transfer
   //
-  BufferWidth     = (EFI_CPU_IO_PROTOCOL_WIDTH) (Width & 0x03);
-  CpuIoUpdateWidthCount (Address, &BufferWidth, &Count);
-
-  if (Width >= EfiCpuIoWidthUint8 && Width <= EfiCpuIoWidthUint64) {
-    return CpuIoMemRW (BufferWidth, Count, TRUE, Destination, TRUE, Source);
+  InStride = mInStride[Width];
+  OutStride = mOutStride[Width];
+  OperationWidth = Width & 0x03;
+  for (Uint8Buffer = Buffer; Count > 0; Address += InStride, Uint8Buffer += OutStride, Count--) {
+    if (OperationWidth == EfiCpuIoWidthUint8) {
+      MmioWrite8 ((UINTN)Address, *Uint8Buffer);
+    } else if (OperationWidth == EfiCpuIoWidthUint16) {
+      MmioWrite16 ((UINTN)Address, *((UINT16 *)Uint8Buffer));
+    } else if (OperationWidth == EfiCpuIoWidthUint32) {
+      MmioWrite32 ((UINTN)Address, *((UINT32 *)Uint8Buffer));
+    } else if (OperationWidth == EfiCpuIoWidthUint64) {
+      MmioWrite64 ((UINTN)Address, *((UINT64 *)Uint8Buffer));
+    }
   }
-
-  if (Width >= EfiCpuIoWidthFifoUint8 && Width <= EfiCpuIoWidthFifoUint64) {
-    return CpuIoMemRW (BufferWidth, Count, FALSE, Destination, TRUE, Source);
-  }
-
-  if (Width >= EfiCpuIoWidthFillUint8 && Width <= EfiCpuIoWidthFillUint64) {
-    return CpuIoMemRW (BufferWidth, Count, TRUE, Destination, FALSE, Source);
-  }
-
-  return EFI_INVALID_PARAMETER;
+  return EFI_SUCCESS;
 }
 
 /**
-  Enables a driver to read registers in the PI CPU I/O space.
+  Reads I/O registers.
 
-  @param[in]       This         A pointer to the EFI_CPU_IO2_PROTOCOL instance.
-  @param[in]       Width        Signifies the width of the I/O operation.
-  @param[in]       UserAddress  The base address of the I/O operation. The caller is responsible
-                                for aligning the Address if required. 
-  @param[in]       Count        The number of I/O operations to perform. The number of bytes moved
-                                is Width size * Count, starting at Address.
-  @param[out]      UserBuffer   The destination buffer to store the results.
+  The I/O operations are carried out exactly as requested. The caller is responsible 
+  for satisfying any alignment and I/O width restrictions that a PI System on a 
+  platform might require. For example on some platforms, width requests of 
+  EfiCpuIoWidthUint64 do not work. Misaligned buffers, on the other hand, will 
+  be handled by the driver.
+  
+  If Width is EfiCpuIoWidthUint8, EfiCpuIoWidthUint16, EfiCpuIoWidthUint32, 
+  or EfiCpuIoWidthUint64, then both Address and Buffer are incremented for 
+  each of the Count operations that is performed.
+  
+  If Width is EfiCpuIoWidthFifoUint8, EfiCpuIoWidthFifoUint16, 
+  EfiCpuIoWidthFifoUint32, or EfiCpuIoWidthFifoUint64, then only Buffer is 
+  incremented for each of the Count operations that is performed. The read or 
+  write operation is performed Count times on the same Address.
+  
+  If Width is EfiCpuIoWidthFillUint8, EfiCpuIoWidthFillUint16, 
+  EfiCpuIoWidthFillUint32, or EfiCpuIoWidthFillUint64, then only Address is 
+  incremented for each of the Count operations that is performed. The read or 
+  write operation is performed Count times from the first element of Buffer.
+  
+  @param[in]  This     A pointer to the EFI_CPU_IO2_PROTOCOL instance.
+  @param[in]  Width    Signifies the width of the I/O or Memory operation.
+  @param[in]  Address  The base address of the I/O operation. 
+  @param[in]  Count    The number of I/O operations to perform. The number of 
+                       bytes moved is Width size * Count, starting at Address.
+  @param[out] Buffer   For read operations, the destination buffer to store the results.
+                       For write operations, the source buffer from which to write data.
 
-  @retval EFI_SUCCESS           The data was read from or written to the EFI system.
-  @retval EFI_INVALID_PARAMETER Width is invalid for this EFI system. Or Buffer is NULL.
-  @retval EFI_UNSUPPORTED       The Buffer is not aligned for the given Width.
-                                Or,The address range specified by Address, Width, and Count is not valid for this EFI system.
+  @retval EFI_SUCCESS            The data was read from or written to the PI system.
+  @retval EFI_INVALID_PARAMETER  Width is invalid for this PI system.
+  @retval EFI_INVALID_PARAMETER  Buffer is NULL.
+  @retval EFI_UNSUPPORTED        The Buffer is not aligned for the given Width.
+  @retval EFI_UNSUPPORTED        The address range specified by Address, Width, 
+                                 and Count is not valid for this PI system.
 
 **/
 EFI_STATUS
 EFIAPI
 CpuIoServiceRead (
-  IN     EFI_CPU_IO2_PROTOCOL              *This,
-  IN     EFI_CPU_IO_PROTOCOL_WIDTH         Width,
-  IN     UINT64                            UserAddress,
-  IN     UINTN                             Count,
-  OUT    VOID                              *UserBuffer
+  IN  EFI_CPU_IO2_PROTOCOL       *This,
+  IN  EFI_CPU_IO_PROTOCOL_WIDTH  Width,
+  IN  UINT64                     Address,
+  IN  UINTN                      Count,
+  OUT VOID                       *Buffer
   )
 {
-  UINTN                         InStride;
-  UINTN                         OutStride;
-  UINTN                         Address;
-  PTR                           Buffer;
-  EFI_STATUS                    Status;
-  EFI_CPU_IO_PROTOCOL_WIDTH     BufferWidth;  
+  EFI_STATUS                 Status;
+  UINT8                      InStride;
+  UINT8                      OutStride;
+  EFI_CPU_IO_PROTOCOL_WIDTH  OperationWidth;
+  UINT8                      *Uint8Buffer;
 
-  Buffer.Buf = (UINT8 *) UserBuffer;
-
-  if (Width >= EfiCpuIoWidthMaximum) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  Status = CpuIoCheckParameter (Width, UserAddress, Count, UserBuffer, IA32_MAX_IO_ADDRESS);
+  Status = CpuIoCheckParameter (FALSE, Width, Address, Count, Buffer);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
   //
-  // Support access to unaligned IO address.
-  // Break up the request into byte by byte
+  // Select loop based on the width of the transfer
   //
-  BufferWidth     = (EFI_CPU_IO_PROTOCOL_WIDTH) (Width & 0x03);
-  CpuIoUpdateWidthCount (UserAddress, &BufferWidth, &Count);
-
-  Address   = (UINTN) UserAddress;
-  InStride  = (UINT32)(1 << (BufferWidth & 0x03));
-  OutStride = InStride;
-  if (Width >= EfiCpuIoWidthFifoUint8 && Width <= EfiCpuIoWidthFifoUint64) {
-    InStride = 0;
-  }
-
-  if (Width >= EfiCpuIoWidthFillUint8 && Width <= EfiCpuIoWidthFillUint64) {
-    OutStride = 0;
-  }
-
-  //
-  // Loop for each iteration and move the data
-  //
-  switch (BufferWidth) {
-  case EfiCpuIoWidthUint8:
-    for (; Count > 0; Count--, Buffer.Buf += OutStride, Address += InStride) {
-      *Buffer.Ui8 = IoRead8 (Address);
+  InStride = mInStride[Width];
+  OutStride = mOutStride[Width];
+  OperationWidth = Width & 0x03;
+  for (Uint8Buffer = Buffer; Count > 0; Address += InStride, Uint8Buffer += OutStride, Count--) {
+    if (OperationWidth == EfiCpuIoWidthUint8) {
+      *Uint8Buffer = IoRead8 ((UINTN)Address);
+    } else if (OperationWidth == EfiCpuIoWidthUint16) {
+      *((UINT16 *)Uint8Buffer) = IoRead16 ((UINTN)Address);
+    } else if (OperationWidth == EfiCpuIoWidthUint32) {
+      *((UINT32 *)Uint8Buffer) = IoRead32 ((UINTN)Address);
     }
-    break;
-
-  case EfiCpuIoWidthUint16:
-    for (; Count > 0; Count--, Buffer.Buf += OutStride, Address += InStride) {
-      *Buffer.Ui16 = IoRead16 (Address);
-    }
-    break;
-
-  case EfiCpuIoWidthUint32:
-    for (; Count > 0; Count--, Buffer.Buf += OutStride, Address += InStride) {
-      *Buffer.Ui32 = IoRead32 (Address);
-    }
-    break;
-
-  default:
-    return EFI_INVALID_PARAMETER;
   }
 
   return EFI_SUCCESS;
 }
 
 /**
-  Enables a driver to write registers in the PI CPU I/O space.
+  Write I/O registers.
 
-  @param[in]       This         A pointer to the EFI_CPU_IO2_PROTOCOL instance.
-  @param[in]       Width        Signifies the width of the I/O operation.
-  @param[in]       UserAddress  The base address of the I/O operation. The caller is responsible
-                                for aligning the Address if required. 
-  @param[in]       Count        The number of I/O operations to perform. The number of bytes moved
-                                is Width size * Count, starting at Address.
-  @param[in]       UserBuffer   The source buffer from which to write data.
+  The I/O operations are carried out exactly as requested. The caller is responsible 
+  for satisfying any alignment and I/O width restrictions that a PI System on a 
+  platform might require. For example on some platforms, width requests of 
+  EfiCpuIoWidthUint64 do not work. Misaligned buffers, on the other hand, will 
+  be handled by the driver.
+  
+  If Width is EfiCpuIoWidthUint8, EfiCpuIoWidthUint16, EfiCpuIoWidthUint32, 
+  or EfiCpuIoWidthUint64, then both Address and Buffer are incremented for 
+  each of the Count operations that is performed.
+  
+  If Width is EfiCpuIoWidthFifoUint8, EfiCpuIoWidthFifoUint16, 
+  EfiCpuIoWidthFifoUint32, or EfiCpuIoWidthFifoUint64, then only Buffer is 
+  incremented for each of the Count operations that is performed. The read or 
+  write operation is performed Count times on the same Address.
+  
+  If Width is EfiCpuIoWidthFillUint8, EfiCpuIoWidthFillUint16, 
+  EfiCpuIoWidthFillUint32, or EfiCpuIoWidthFillUint64, then only Address is 
+  incremented for each of the Count operations that is performed. The read or 
+  write operation is performed Count times from the first element of Buffer.
+  
+  @param[in]  This     A pointer to the EFI_CPU_IO2_PROTOCOL instance.
+  @param[in]  Width    Signifies the width of the I/O or Memory operation.
+  @param[in]  Address  The base address of the I/O operation. 
+  @param[in]  Count    The number of I/O operations to perform. The number of 
+                       bytes moved is Width size * Count, starting at Address.
+  @param[in]  Buffer   For read operations, the destination buffer to store the results.
+                       For write operations, the source buffer from which to write data.
 
-  @retval EFI_SUCCESS           The data was read from or written to the EFI system.
-  @retval EFI_INVALID_PARAMETER Width is invalid for this EFI system. Or Buffer is NULL.
-  @retval EFI_UNSUPPORTED       The Buffer is not aligned for the given Width.
-                                Or,The address range specified by Address, Width, and Count is not valid for this EFI system.
-
+  @retval EFI_SUCCESS            The data was read from or written to the PI system.
+  @retval EFI_INVALID_PARAMETER  Width is invalid for this PI system.
+  @retval EFI_INVALID_PARAMETER  Buffer is NULL.
+  @retval EFI_UNSUPPORTED        The Buffer is not aligned for the given Width.
+  @retval EFI_UNSUPPORTED        The address range specified by Address, Width, 
+                                 and Count is not valid for this PI system.
+                                 
 **/
 EFI_STATUS
 EFIAPI
 CpuIoServiceWrite (
-  IN     EFI_CPU_IO2_PROTOCOL              *This,
-  IN     EFI_CPU_IO_PROTOCOL_WIDTH         Width,
-  IN     UINT64                            UserAddress,
-  IN     UINTN                             Count,
-  IN     VOID                              *UserBuffer
+  IN EFI_CPU_IO2_PROTOCOL       *This,
+  IN EFI_CPU_IO_PROTOCOL_WIDTH  Width,
+  IN UINT64                     Address,
+  IN UINTN                      Count,
+  IN VOID                       *Buffer
   )
 {
-  UINTN                         InStride;
-  UINTN                         OutStride;
-  UINTN                         Address;
-  PTR                           Buffer;
-  EFI_STATUS                    Status;
-  EFI_CPU_IO_PROTOCOL_WIDTH     BufferWidth;
+  EFI_STATUS                 Status;
+  UINT8                      InStride;
+  UINT8                      OutStride;
+  EFI_CPU_IO_PROTOCOL_WIDTH  OperationWidth;
+  UINT8                      *Uint8Buffer;
 
-  Buffer.Buf = (UINT8 *) UserBuffer;
-
-  if (Width >= EfiCpuIoWidthMaximum) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  Status = CpuIoCheckParameter (Width, UserAddress, Count, UserBuffer, IA32_MAX_IO_ADDRESS);
+  //
+  // Make sure the parameters are valid
+  //
+  Status = CpuIoCheckParameter (FALSE, Width, Address, Count, Buffer);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
   //
-  // Support access to unaligned IO address.
-  // Break up the request into byte by byte
+  // Select loop based on the width of the transfer
   //
-  BufferWidth = (EFI_CPU_IO_PROTOCOL_WIDTH) (Width & 0x03);
-  CpuIoUpdateWidthCount (UserAddress, &BufferWidth, &Count);
-
-  Address   = (UINTN) UserAddress;
-  InStride  = (UINT32)(1 << (BufferWidth & 0x03));
-  OutStride = InStride;
-  if (Width >= EfiCpuIoWidthFifoUint8 && Width <= EfiCpuIoWidthFifoUint64) {
-    InStride = 0;
-  }
-
-  if (Width >= EfiCpuIoWidthFillUint8 && Width <= EfiCpuIoWidthFillUint64) {
-    OutStride = 0;
-  }
-
-  //
-  // Loop for each iteration and move the data
-  //
-  switch (BufferWidth) {
-  case EfiCpuIoWidthUint8:
-    for (; Count > 0; Count--, Buffer.Buf += OutStride, Address += InStride) {
-      IoWrite8 (Address, *Buffer.Ui8);
+  InStride = mInStride[Width];
+  OutStride = mOutStride[Width];
+  OperationWidth = Width & 0x03;
+  for (Uint8Buffer = (UINT8 *)Buffer; Count > 0; Address += InStride, Uint8Buffer += OutStride, Count--) {
+    if (OperationWidth == EfiCpuIoWidthUint8) {
+      IoWrite8 ((UINTN)Address, *Uint8Buffer);
+    } else if (OperationWidth == EfiCpuIoWidthUint16) {
+      IoWrite16 ((UINTN)Address, *((UINT16 *)Uint8Buffer));
+    } else if (OperationWidth == EfiCpuIoWidthUint32) {
+      IoWrite32 ((UINTN)Address, *((UINT32 *)Uint8Buffer));
     }
-    break;
-
-  case EfiCpuIoWidthUint16:
-    for (; Count > 0; Count--, Buffer.Buf += OutStride, Address += InStride) {
-      IoWrite16 (Address, *Buffer.Ui16);
-    }
-    break;
-
-  case EfiCpuIoWidthUint32:
-    for (; Count > 0; Count--, Buffer.Buf += OutStride, Address += InStride) {
-      IoWrite32 (Address, *Buffer.Ui32);
-    }
-    break;
-
-  default:
-    return EFI_INVALID_PARAMETER;
   }
-
+  
   return EFI_SUCCESS;
 }
 
 /**
-  Entrypoint of CPU I/O 2 DXE module.
+  The user Entry Point for module CpuIo2Dxe. The user code starts with this function.
+
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] SystemTable    A pointer to the EFI System Table.
   
-  @param  ImageHandle   The firmware allocated handle for the EFI image.
-  @param  SystemTable   A pointer to the EFI System Table.
-  
-  @retval EFI_SUCCESS   The entry point is executed successfully.
+  @retval EFI_SUCCESS       The entry point is executed successfully.
+  @retval other             Some error occurs when executing this entry point.
 
 **/
 EFI_STATUS
@@ -548,13 +573,13 @@ CpuIo2Initialize (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS      Status;
+  EFI_STATUS Status;
 
-  Status = gBS->InstallProtocolInterface (
+  ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gEfiCpuIo2ProtocolGuid);
+  Status = gBS->InstallMultipleProtocolInterfaces (
                   &mHandle,
-                  &gEfiCpuIo2ProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  &mCpuIo
+                  &gEfiCpuIo2ProtocolGuid, &mCpuIo2,
+                  NULL
                   );
   ASSERT_EFI_ERROR (Status);
 
