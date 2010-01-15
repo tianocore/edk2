@@ -164,20 +164,6 @@ typedef struct {
   CHAR8   Char;
 } CPSR_CHAR;
 
-CPSR_CHAR gCpsrChar[] = {
-  { 31, 'n' },
-  { 30, 'z' },
-  { 29, 'c' },
-  { 28, 'v' },
-  { 27, 'q' },
-
-  { 8, 'a' },
-  { 7, 'i' },
-  { 6, 'f' },
-  { 5, 't' },
-  { 0, '?' }
-};
-
 
 VOID
 CpsrString (
@@ -188,10 +174,23 @@ CpsrString (
   UINTN Index;
   CHAR8 *Str = ReturnStr;
   CHAR8 *ModeStr;
+  CPSR_CHAR CpsrChar[] = {
+    { 31, 'n' },
+    { 30, 'z' },
+    { 29, 'c' },
+    { 28, 'v' },
+
+    { 9,  'e' },
+    { 8,  'a' },
+    { 7,  'i' },
+    { 6,  'f' },
+    { 5,  't' },
+    { 0,  '?' }
+  };
   
-  for (Index = 0; gCpsrChar[Index].Bit != 0; Index++, Str++) {
-    *Str = gCpsrChar[Index].Char;
-    if ((Cpsr & (1 << gCpsrChar[Index].Bit)) != 0) {
+  for (Index = 0; CpsrChar[Index].Bit != 0; Index++, Str++) {
+    *Str = CpsrChar[Index].Char;
+    if ((Cpsr & (1 << CpsrChar[Index].Bit)) != 0) {
       // Concert to upper case if bit is set
       *Str &= ~0x20;
     }
