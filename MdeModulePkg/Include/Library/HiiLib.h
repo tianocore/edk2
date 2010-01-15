@@ -1,7 +1,7 @@
 /** @file
   Public include file for the HII Library
 
-  Copyright (c) 2007 - 2009, Intel Corporation                                                         
+  Copyright (c) 2007 - 2010, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -354,12 +354,12 @@ HiiIsConfigHdrMatch (
   Retrieves uncommitted data from the Form Browser and converts it to a binary
   buffer.
 
-  @param[in]  VariableName  Pointer to a Null-terminated Unicode string.  This 
-                            is an optional parameter that may be NULL.
   @param[in]  VariableGuid  Pointer to an EFI_GUID structure.  This is an optional 
                             parameter that may be NULL.
-  @param[in]  BufferSize    Length in bytes of buffer to hold retrived data. 
-  @param[out] Block         Buffer of data to be updated.
+  @param[in]  VariableName  Pointer to a Null-terminated Unicode string.  This 
+                            is an optional parameter that may be NULL.
+  @param[in]  BufferSize    Length in bytes of buffer to hold retrieved data. 
+  @param[out] Buffer        Buffer of data to be updated.
 
   @retval FALSE  The uncommitted data could not be retrieved.
   @retval TRUE   The uncommitted data was retrieved.
@@ -370,8 +370,8 @@ EFIAPI
 HiiGetBrowserData (
   IN CONST EFI_GUID  *VariableGuid,  OPTIONAL
   IN CONST CHAR16    *VariableName,  OPTIONAL
-  IN UINTN           BlockSize,
-  OUT UINT8          *Block
+  IN UINTN           BufferSize,
+  OUT UINT8          *Buffer
   );
 
 /**
@@ -379,10 +379,10 @@ HiiGetBrowserData (
 
   If Buffer is NULL, then ASSERT().
 
-  @param[in]  VariableName    Pointer to a Null-terminated Unicode string.  This
-                              is an optional parameter that may be NULL.
   @param[in]  VariableGuid    Pointer to an EFI_GUID structure.  This is an optional
                               parameter that may be NULL.
+  @param[in]  VariableName    Pointer to a Null-terminated Unicode string.  This
+                              is an optional parameter that may be NULL.
   @param[in]  BufferSize      Length, in bytes, of Buffer.
   @param[in]  Buffer          Buffer of data to commit.
   @param[in]  RequestElement  An optional field to specify which part of the
@@ -428,7 +428,7 @@ HiiSetBrowserData (
   (UINT64)((Hour & 0xff) | ((Minute & 0xff) << 8) | ((Second & 0xff) << 16))
 
 /**
-  Returns a UINT64 value that contains bitfields for Year, Month, and Day.
+  Returns a UINT64 value that contains bit fields for Year, Month, and Day.
   The lower 16-bits of Year are placed in bits 0..15.  The lower 8-bits of Month 
   are placed in bits 16..23, and the lower 8-bits of Day are placed in bits 
   24..31.  This format is selected because it can be easily translated to 
@@ -458,11 +458,13 @@ HiiAllocateOpCodeHandle (
   );
 
 /**
-  Frees an OpCode Handle that was peviously allocated with HiiAllocateOpCodeHandle().
+  Frees an OpCode Handle that was previously allocated with HiiAllocateOpCodeHandle().
   When an OpCode Handle is freed, all of the opcodes associated with the OpCode
   Handle are also freed.
 
   If OpCodeHandle is NULL, then ASSERT().
+
+  @param[in]  OpCodeHandle   Handle to the buffer of opcodes.
 
 **/
 VOID
@@ -632,7 +634,7 @@ HiiCreateActionOpCode (
   @param[in]  Prompt      String ID for Prompt
   @param[in]  Help        String ID for Help
   @param[in]  Flags       Subtitle opcode flags
-  @param[in]  Scope       1 if this opcpde is the beginning of a new scope.
+  @param[in]  Scope       1 if this opcode is the beginning of a new scope.
                           0 if this opcode is within the current scope.
 
   @retval NULL   There is not enough space left in Buffer to add the opcode.
@@ -882,22 +884,22 @@ HiiCreateOrderedListOpCode (
   The form to update is specified by Handle, FormSetGuid, and FormId.  Binary 
   comparisons of IFR opcodes are performed from the beginning of the form being 
   updated until an IFR opcode is found that exactly matches the first IFR opcode 
-  specifed by StartOpCodeHandle.  The following rules are used to determine if
+  specified by StartOpCodeHandle.  The following rules are used to determine if
   an insert, replace, or delete operation is performed:
   
   1) If no matches are found, then NULL is returned.  
   2) If a match is found, and EndOpCodeHandle is NULL, then all of the IFR opcodes
-     from StartOpcodeHandle except the first opcode are inserted immediately after 
-     the matching IFR opcode in the form beng updated.
+     from StartOpCodeHandle except the first opcode are inserted immediately after 
+     the matching IFR opcode in the form to be updated.
   3) If a match is found, and EndOpCodeHandle is not NULL, then a search is made 
      from the matching IFR opcode until an IFR opcode exactly matches the first 
      IFR opcode specified by EndOpCodeHandle.  If no match is found for the first
      IFR opcode specified by EndOpCodeHandle, then NULL is returned.  If a match
      is found, then all of the IFR opcodes between the start match and the end 
      match are deleted from the form being updated and all of the IFR opcodes
-     from StartOpcodeHandle except the first opcode are inserted immediately after 
+     from StartOpCodeHandle except the first opcode are inserted immediately after 
      the matching start IFR opcode.  If StartOpCcodeHandle only contains one
-     IFR instruction, then the result of ths operation will delete all of the IFR
+     IFR instruction, then the result of this operation will delete all of the IFR
      opcodes between the start end matches.
 
   If HiiHandle is NULL, then ASSERT().
@@ -938,8 +940,8 @@ HiiUpdateForm (
   IN EFI_HII_HANDLE  HiiHandle,
   IN EFI_GUID        *FormSetGuid,        OPTIONAL
   IN EFI_FORM_ID     FormId,
-  IN VOID            *StartOpcodeHandle,
-  IN VOID            *EndOpcodeHandle     OPTIONAL
+  IN VOID            *StartOpCodeHandle,
+  IN VOID            *EndOpCodeHandle     OPTIONAL
   );
 
 #endif
