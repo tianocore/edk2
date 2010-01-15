@@ -81,7 +81,7 @@ EFI_STATUS
 **/  
 typedef
 EFI_STATUS
-(EFIAPI *EFI_ACPI_GET_ACPI_TABLE)(
+(EFIAPI *EFI_ACPI_GET_ACPI_TABLE2)(
   IN    UINTN                   Index,
   OUT   EFI_ACPI_SDT_HEADER     **Table,
   OUT   EFI_ACPI_TABLE_VERSION  *Version,
@@ -246,7 +246,10 @@ typedef struct _EFI_ACPI_SDT_PROTOCOL {
   /// Specifies the ACPI version supported by this protocol.
   ///
   EFI_ACPI_TABLE_VERSION    AcpiVersion;
-  EFI_ACPI_GET_ACPI_TABLE   GetAcpiTable;
+  //
+  // EFI_ACPI_GET_ACPI_TABLE2 not in public UEFI specification.
+  //
+  EFI_ACPI_GET_ACPI_TABLE2  GetAcpiTable;
   EFI_ACPI_REGISTER_NOTIFY  RegisterNotify;
   EFI_ACPI_OPEN             Open;
   EFI_ACPI_OPEN_SDT         OpenSdt;
