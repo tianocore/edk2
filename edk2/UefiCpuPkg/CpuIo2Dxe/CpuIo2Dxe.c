@@ -183,13 +183,13 @@ CpuIoCheckParameter (
   //
   // Check to see if Width is in the valid range for I/O Port operations
   //
-  Width = Width & 0x03;
+  Width = (EFI_CPU_IO_PROTOCOL_WIDTH) (Width & 0x03);
   if (!MmioOperation && (Width == EfiCpuIoWidthUint64)) {
     return EFI_INVALID_PARAMETER;
   }
   
   //
-  // Check to see if Address is alligned
+  // Check to see if Address is aligned
   //
   if ((Address & (UINT64)(mInStride[Width] - 1)) != 0) {
     return EFI_UNSUPPORTED;
@@ -207,7 +207,7 @@ CpuIoCheckParameter (
   // can also be the maximum integer value supported by the CPU, this range
   // check must be adjusted to avoid all oveflow conditions.
   //   
-  // The follwing form of the range check is equivalent but assumes that 
+  // The following form of the range check is equivalent but assumes that 
   // MAX_ADDRESS and MAX_IO_PORT_ADDRESS are of the form (2^n - 1).
   //
   Limit = (MmioOperation ? MAX_ADDRESS : MAX_IO_PORT_ADDRESS);
@@ -226,7 +226,7 @@ CpuIoCheckParameter (
   }
 
   //
-  // Check to see if Buffer is alligned
+  // Check to see if Buffer is aligned
   //
   if (((UINTN)Buffer & (mInStride[Width] - 1)) != 0) {
     return EFI_UNSUPPORTED;
@@ -300,7 +300,7 @@ CpuMemoryServiceRead (
   //
   InStride = mInStride[Width];
   OutStride = mOutStride[Width];
-  OperationWidth = Width & 0x03;
+  OperationWidth = (EFI_CPU_IO_PROTOCOL_WIDTH) (Width & 0x03);
   for (Uint8Buffer = Buffer; Count > 0; Address += InStride, Uint8Buffer += OutStride, Count--) {
     if (OperationWidth == EfiCpuIoWidthUint8) {
       *Uint8Buffer = MmioRead8 ((UINTN)Address);
@@ -380,7 +380,7 @@ CpuMemoryServiceWrite (
   //
   InStride = mInStride[Width];
   OutStride = mOutStride[Width];
-  OperationWidth = Width & 0x03;
+  OperationWidth = (EFI_CPU_IO_PROTOCOL_WIDTH) (Width & 0x03);
   for (Uint8Buffer = Buffer; Count > 0; Address += InStride, Uint8Buffer += OutStride, Count--) {
     if (OperationWidth == EfiCpuIoWidthUint8) {
       MmioWrite8 ((UINTN)Address, *Uint8Buffer);
@@ -460,7 +460,7 @@ CpuIoServiceRead (
   //
   InStride = mInStride[Width];
   OutStride = mOutStride[Width];
-  OperationWidth = Width & 0x03;
+  OperationWidth = (EFI_CPU_IO_PROTOCOL_WIDTH) (Width & 0x03);
   for (Uint8Buffer = Buffer; Count > 0; Address += InStride, Uint8Buffer += OutStride, Count--) {
     if (OperationWidth == EfiCpuIoWidthUint8) {
       *Uint8Buffer = IoRead8 ((UINTN)Address);
@@ -542,7 +542,7 @@ CpuIoServiceWrite (
   //
   InStride = mInStride[Width];
   OutStride = mOutStride[Width];
-  OperationWidth = Width & 0x03;
+  OperationWidth = (EFI_CPU_IO_PROTOCOL_WIDTH) (Width & 0x03);
   for (Uint8Buffer = (UINT8 *)Buffer; Count > 0; Address += InStride, Uint8Buffer += OutStride, Count--) {
     if (OperationWidth == EfiCpuIoWidthUint8) {
       IoWrite8 ((UINTN)Address, *Uint8Buffer);
