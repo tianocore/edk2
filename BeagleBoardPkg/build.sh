@@ -42,9 +42,9 @@ then
   echo Initializing workspace
   cd ..
 # Uses an external BaseTools project 
-  export EDK_TOOLS_PATH=`pwd`/../BaseTools
+#  export EDK_TOOLS_PATH=`pwd`/../BaseTools
 # Uses the BaseTools in edk2
-#  export EDK_TOOLS_PATH=`pwd`/BaseTools
+  export EDK_TOOLS_PATH=`pwd`/BaseTools
   source edksetup.sh BaseTools
 else
   echo Building from: $WORKSPACE

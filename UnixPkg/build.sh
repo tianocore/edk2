@@ -24,9 +24,9 @@ then
   cd ..
 # This version is for the tools in the BaseTools project.
 # this assumes svn pulls have the same root dir
-  export EDK_TOOLS_PATH=`pwd`/../BaseTools
+#  export EDK_TOOLS_PATH=`pwd`/../BaseTools
 # This version is for the tools source in edk2
-#  export EDK_TOOLS_PATH=`pwd`/BaseTools
+  export EDK_TOOLS_PATH=`pwd`/BaseTools
   echo $EDK_TOOLS_PATH
   source edksetup.sh BaseTools
 else
