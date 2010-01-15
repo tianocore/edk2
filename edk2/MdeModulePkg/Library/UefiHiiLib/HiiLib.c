@@ -1,7 +1,7 @@
 /** @file
   HII Library implementation that uses DXE protocols and services.
 
-  Copyright (c) 2006 - 2009, Intel Corporation<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -376,9 +376,9 @@ HiiGetHiiHandles (
   Converts all hex dtring characters in range ['A'..'F'] to ['a'..'f'] for 
   hex digits that appear between a '=' and a '&' in a config string.
 
-  If String is NULL, then ASSERT().
+  If ConfigString is NULL, then ASSERT().
 
-  @param[in] String  Pointer to a Null-terminated Unicode string.
+  @param[in] ConfigString  Pointer to a Null-terminated Unicode string.
 
   @return  Pointer to the Null-terminated Unicode result string.
 
@@ -463,10 +463,10 @@ InternalHiiBlockToConfig (
   allocated using AllocatePool().  The caller is then responsible for freeing 
   the buffer using FreePool().
 
-  @param[in]  VariableName    Pointer to a Null-terminated Unicode string.  This 
-                              is an optional parameter that may be NULL.
   @param[in]  VariableGuid    Pointer to an EFI_GUID structure.  This is an optional 
                               parameter that may be NULL.
+  @param[in]  VariableName    Pointer to a Null-terminated Unicode string.  This 
+                              is an optional parameter that may be NULL.
   @param[in]  SetResultsData  If not NULL, then this parameter specified the buffer
                               of uncommited data to set.  If this parameter is NULL,
                               then the caller is requesting to get the uncommited data
@@ -976,7 +976,7 @@ InternalHiiValidateCurrentSetting (
   StringPtr = StrStr (ConfigResp, L"&OFFSET");
   if (StringPtr == NULL) {
     //
-    // No ConfigBlock value is requied to be validated.
+    // No ConfigBlock value is required to be validated.
     // EFI_SUCCESS directly return.
     //
     return EFI_SUCCESS;
@@ -1179,7 +1179,7 @@ InternalHiiValidateCurrentSetting (
   }
 
   //
-  // 2. Check IFR value is in block data, then Validate Vaule
+  // 2. Check IFR value is in block data, then Validate Value
   //
   ZeroMem (&VarBlockData, sizeof (VarBlockData));
   VarValue      = 0;
@@ -1857,7 +1857,7 @@ InternalHiiIfrValueAction (
     
     //
     // 3. Call ConfigRouting GetAltCfg(ConfigRoute, <ConfigResponse>, Guid, Name, DevicePath, AltCfgId, AltCfgResp)
-    //    Get the default configuration string according to the found defaultname string ID.
+    //    Get the default configuration string according to the found default name string ID.
     //
     Status = gHiiConfigRouting->GetAltConfig (
                                   gHiiConfigRouting,
@@ -2087,7 +2087,7 @@ HiiSetToDefaults (
   @param StartSearchString  Pointer to the Null-terminated Unicode string that 
                             marks the start of the value string to compare.
   @param StopSearchString   Pointer to the Null-terminated Unicode string that 
-                            marks the end of the vakue string to compare.
+                            marks the end of the value string to compare.
 
   @retval FALSE             StartSearchString is not present in FirstString. 
   @retval FALSE             StartSearchString is not present in SecondString.
@@ -2203,15 +2203,15 @@ HiiIsConfigHdrMatch (
 }
 
 /**
-  Retrieves uncommited data from the Form Browser and converts it to a binary
+  Retrieves uncommitted data from the Form Browser and converts it to a binary
   buffer.
 
-  @param[in]  VariableName  Pointer to a Null-terminated Unicode string.  This 
-                            is an optional parameter that may be NULL.
   @param[in]  VariableGuid  Pointer to an EFI_GUID structure.  This is an optional 
                             parameter that may be NULL.
-  @param[in]  BufferSize    Length in bytes of buffer to hold retrived data. 
-  @param[out] Block         Buffer of data to be updated.
+  @param[in]  VariableName  Pointer to a Null-terminated Unicode string.  This 
+                            is an optional parameter that may be NULL.
+  @param[in]  BufferSize    Length in bytes of buffer to hold retrieved data. 
+  @param[out] Buffer        Buffer of data to be updated.
 
   @retval FALSE  The uncommitted data could not be retrieved.
   @retval TRUE   The uncommitted data was retrieved.
@@ -2222,8 +2222,8 @@ EFIAPI
 HiiGetBrowserData (
   IN CONST EFI_GUID  *VariableGuid,  OPTIONAL
   IN CONST CHAR16    *VariableName,  OPTIONAL
-  IN UINTN           BlockSize,
-  OUT UINT8          *Block
+  IN UINTN           BufferSize,
+  OUT UINT8          *Buffer
   )
 {
   EFI_STRING  ResultsData;
@@ -2262,8 +2262,8 @@ HiiGetBrowserData (
   Status = gHiiConfigRouting->ConfigToBlock (
                                 gHiiConfigRouting,
                                 ConfigResp,
-                                Block,
-                                &BlockSize,
+                                Buffer,
+                                &BufferSize,
                                 &Progress
                                 );
   //
@@ -2283,10 +2283,10 @@ HiiGetBrowserData (
 
   If Buffer is NULL, then ASSERT().
 
-  @param[in]  VariableName    Pointer to a Null-terminated Unicode string.  This
-                              is an optional parameter that may be NULL.
   @param[in]  VariableGuid    Pointer to an EFI_GUID structure.  This is an optional
                               parameter that may be NULL.
+  @param[in]  VariableName    Pointer to a Null-terminated Unicode string.  This
+                              is an optional parameter that may be NULL.
   @param[in]  BufferSize      Length, in bytes, of Buffer.
   @param[in]  Buffer          Buffer of data to commit.
   @param[in]  RequestElement  An optional field to specify which part of the
@@ -2418,11 +2418,13 @@ HiiAllocateOpCodeHandle (
 }
 
 /**
-  Frees an OpCode Handle that was peviously allocated with HiiAllocateOpCodeHandle().
+  Frees an OpCode Handle that was previously allocated with HiiAllocateOpCodeHandle().
   When an OpCode Handle is freed, all of the opcodes associated with the OpCode
   Handle are also freed.
 
   If OpCodeHandle is NULL, then ASSERT().
+
+  @param[in]  OpCodeHandle   Handle to the buffer of opcodes.
 
 **/
 VOID
@@ -2442,6 +2444,13 @@ HiiFreeOpCodeHandle (
   FreePool (OpCodeBuffer);
 }
 
+/**
+  Internal function gets the current position of opcode buffer.
+  
+  @param[in]  OpCodeHandle   Handle to the buffer of opcodes.
+
+  @return Current position of opcode buffer.
+**/
 UINTN
 EFIAPI
 InternalHiiOpCodeHandlePosition (
@@ -2451,6 +2460,13 @@ InternalHiiOpCodeHandlePosition (
   return ((HII_LIB_OPCODE_BUFFER  *)OpCodeHandle)->Position;
 }
 
+/**
+  Internal function gets the start pointer of opcode buffer.
+  
+  @param[in]  OpCodeHandle   Handle to the buffer of opcodes.
+
+  @return Pointer to the opcode buffer base.
+**/
 UINT8 *
 EFIAPI
 InternalHiiOpCodeHandleBuffer (
@@ -2460,11 +2476,20 @@ InternalHiiOpCodeHandleBuffer (
   return ((HII_LIB_OPCODE_BUFFER  *)OpCodeHandle)->Buffer;
 }
 
+/**
+  Internal function reserves the enough buffer for current opcode.
+  When the buffer is not enough, Opcode buffer will be extended.
+  
+  @param[in]  OpCodeHandle   Handle to the buffer of opcodes.
+  @param[in]  Size           Size of current opcode.
+
+  @return Pointer to the current opcode.
+**/
 UINT8 *
 EFIAPI
 InternalHiiGrowOpCodeHandle (
-  VOID   *OpCodeHandle,
-  UINTN  Size
+  IN VOID   *OpCodeHandle,
+  IN UINTN  Size
   )
 {
   HII_LIB_OPCODE_BUFFER  *OpCodeBuffer;
@@ -2490,6 +2515,18 @@ InternalHiiGrowOpCodeHandle (
   return Buffer;
 }
 
+/**
+  Internal function creates opcode based on the template opcode.
+  
+  @param[in]  OpCodeHandle    Handle to the buffer of opcodes.
+  @param[in]  OpCodeTemplate  Pointer to the template buffer of opcode.
+  @param[in]  OpCode          OpCode IFR value.
+  @param[in]  OpCodeSize      Size of opcode.
+  @param[in]  ExtensionSize   Size of extended opcode.
+  @param[in]  Scope           Scope bit of opcode.
+
+  @return Pointer to the current opcode with opcode data.
+**/
 UINT8 *
 EFIAPI
 InternalHiiCreateOpCodeExtended (
@@ -2515,6 +2552,16 @@ InternalHiiCreateOpCodeExtended (
   return (UINT8 *)CopyMem (Buffer, Header, OpCodeSize);
 }
 
+/**
+  Internal function creates opcode based on the template opcode for the normal opcode.
+  
+  @param[in]  OpCodeHandle    Handle to the buffer of opcodes.
+  @param[in]  OpCodeTemplate  Pointer to the template buffer of opcode.
+  @param[in]  OpCode          OpCode IFR value.
+  @param[in]  OpCodeSize      Size of opcode.
+
+  @return Pointer to the current opcode with opcode data.
+**/
 UINT8 *
 EFIAPI
 InternalHiiCreateOpCode (
@@ -3226,13 +3273,17 @@ HiiCreateOrderedListOpCode (
   This is the internal worker function to update the data in
   a form specified by FormSetGuid, FormId and Label.
 
-  @param FormSetGuid     The optional Formset GUID.
-  @param FormId          The Form ID.
-  @param Package         The package header.
-
-  @param TempPacakge     The resultant package.
+  @param[in] FormSetGuid       The optional Formset GUID.
+  @param[in] FormId            The Form ID.
+  @param[in] Package           The package header.
+  @param[in] OpCodeBufferStart An OpCode buffer that contains the set of IFR 
+                               opcodes to be inserted or replaced in the form.
+  @param[in] OpCodeBufferEnd   An OpCcode buffer that contains the IFR opcode
+                               that marks the end of a replace operation in the form.
+  @param[out] TempPackage      The resultant package.
 
   @retval EFI_SUCCESS    The function completes successfully.
+  @retval EFI_NOT_FOUND  The updated opcode or endopcode is not found.
 
 **/
 EFI_STATUS
@@ -3388,22 +3439,22 @@ InternalHiiUpdateFormPackageData (
   The form to update is specified by Handle, FormSetGuid, and FormId.  Binary 
   comparisons of IFR opcodes are performed from the beginning of the form being 
   updated until an IFR opcode is found that exactly matches the first IFR opcode 
-  specifed by StartOpCodeHandle.  The following rules are used to determine if
+  specified by StartOpCodeHandle.  The following rules are used to determine if
   an insert, replace, or delete operation is performed.
   
   1) If no matches are found, then NULL is returned.  
   2) If a match is found, and EndOpCodeHandle is NULL, then all of the IFR opcodes
-     from StartOpcodeHandle except the first opcode are inserted immediately after 
-     the matching IFR opcode in the form beng updated.
+     from StartOpCodeHandle except the first opcode are inserted immediately after 
+     the matching IFR opcode in the form to be updated.
   3) If a match is found, and EndOpCodeHandle is not NULL, then a search is made 
-     from the matching IFR opcode until an IFR opcode exatly matches the first 
+     from the matching IFR opcode until an IFR opcode exactly matches the first 
      IFR opcode specified by EndOpCodeHandle.  If no match is found for the first
      IFR opcode specified by EndOpCodeHandle, then NULL is returned.  If a match
      is found, then all of the IFR opcodes between the start match and the end 
      match are deleted from the form being updated and all of the IFR opcodes
-     from StartOpcodeHandle except the first opcode are inserted immediately after 
+     from StartOpCodeHandle except the first opcode are inserted immediately after 
      the matching start IFR opcode.  If StartOpCcodeHandle only contains one
-     IFR instruction, then the result of ths operation will delete all of the IFR
+     IFR instruction, then the result of this operation will delete all of the IFR
      opcodes between the start end matches.
 
   If HiiHandle is NULL, then ASSERT().
@@ -3444,8 +3495,8 @@ HiiUpdateForm (
   IN EFI_HII_HANDLE  HiiHandle,           
   IN EFI_GUID        *FormSetGuid,        OPTIONAL
   IN EFI_FORM_ID     FormId,
-  IN VOID            *StartOpcodeHandle,
-  IN VOID            *EndOpcodeHandle     OPTIONAL
+  IN VOID            *StartOpCodeHandle,
+  IN VOID            *EndOpCodeHandle     OPTIONAL
   )
 {
   EFI_STATUS                   Status;
@@ -3466,19 +3517,19 @@ HiiUpdateForm (
   // Input update data can't be NULL.
   //
   ASSERT (HiiHandle != NULL);
-  ASSERT (StartOpcodeHandle != NULL);
+  ASSERT (StartOpCodeHandle != NULL);
   UpdatePackageList = NULL;
   TempPacakge       = NULL;
   HiiPackageList    = NULL;
   
   //
-  // Restrive buffer data from Opcode Handle
+  // Retrieve buffer data from Opcode Handle
   //
-  OpCodeBufferStart = (HII_LIB_OPCODE_BUFFER *) StartOpcodeHandle;
-  OpCodeBufferEnd   = (HII_LIB_OPCODE_BUFFER *) EndOpcodeHandle;
+  OpCodeBufferStart = (HII_LIB_OPCODE_BUFFER *) StartOpCodeHandle;
+  OpCodeBufferEnd   = (HII_LIB_OPCODE_BUFFER *) EndOpCodeHandle;
   
   //
-  // Get the orginal package list
+  // Get the original package list
   //
   BufferSize = 0;
   HiiPackageList   = NULL;
@@ -3529,7 +3580,7 @@ HiiUpdateForm (
   UpdateBufferPos += sizeof (EFI_HII_PACKAGE_LIST_HEADER);
   
   //
-  // Go through each package to find the matched pacakge and update one by one
+  // Go through each package to find the matched package and update one by one
   //
   Updated = FALSE;
   Offset  = sizeof (EFI_HII_PACKAGE_LIST_HEADER);
@@ -3545,7 +3596,7 @@ HiiUpdateForm (
       //
       Status = InternalHiiUpdateFormPackageData (FormSetGuid, FormId, Package, OpCodeBufferStart, OpCodeBufferEnd, TempPacakge);
       //
-      // The matched package is found. Its pacakge buffer will be updated by the input new data.
+      // The matched package is found. Its package buffer will be updated by the input new data.
       //
       if (!EFI_ERROR(Status)) {
         //
@@ -3575,7 +3626,7 @@ HiiUpdateForm (
     WriteUnaligned32 (&UpdatePackageList->PackageLength, (UINT32) BufferSize);
     
     //
-    // Update Pacakge to show form
+    // Update Package to show form
     //
     Status = gHiiDatabase->UpdatePackageList (gHiiDatabase, HiiHandle, UpdatePackageList);
   } else {
