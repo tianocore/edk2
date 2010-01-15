@@ -156,9 +156,9 @@ CpuIoCheckParameter (
   //
   // Since MAX_ADDRESS can be the maximum integer value supported by the CPU and Count 
   // can also be the maximum integer value supported by the CPU, this range
-  // check must be adjusted to avoid all oveflow conditions.
+  // check must be adjusted to avoid all overflow conditions.
   //   
-  // The follwing form of the range check is equivalent but assumes that 
+  // The following form of the range check is equivalent but assumes that 
   // MAX_ADDRESS and MAX_IO_PORT_ADDRESS are of the form (2^n - 1).
   //
   Limit = (MmioOperation ? MAX_ADDRESS : MAX_IO_PORT_ADDRESS);
