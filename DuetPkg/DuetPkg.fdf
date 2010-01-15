@@ -77,6 +77,7 @@ INF  MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
 INF  IntelFrameworkModulePkg/Universal/DataHubDxe/DataHubDxe.inf
 INF  MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
 INF  MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
+INF  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
 INF  DuetPkg/SmbiosGenDxe/SmbiosGen.inf
 #INF  DuetPkg/FvbRuntimeService/DUETFwh.inf
 INF  IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf

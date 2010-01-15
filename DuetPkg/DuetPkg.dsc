@@ -132,6 +132,7 @@
   MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
   MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
   MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
+  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
 
 
   DuetPkg/SmbiosGenDxe/SmbiosGen.inf
