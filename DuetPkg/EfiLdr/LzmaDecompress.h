@@ -1,7 +1,7 @@
 /** @file
   LZMA Decompress Library header file
 
-  Copyright (c) 2006 - 2009, Intel Corporation<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -36,22 +36,35 @@ LzmaUefiDecompressGetInfo (
   );
 
 /**
-  The internal implementation of *_DECOMPRESS_PROTOCOL.Decompress().
-  
-  @param Source          - The source buffer containing the compressed data.
-  @param Destination     - The destination buffer to store the decompressed data
-  @param Scratch         - The buffer used internally by the decompress routine. This  buffer is needed to store intermediate data.
+  Decompresses a Lzma compressed source buffer.
 
-  @retval RETURN_SUCCESS           - Decompression is successfull
-  @retval RETURN_INVALID_PARAMETER - The source data is corrupted  
+  Extracts decompressed data to its original form.
+  If the compressed source data specified by Source is successfully decompressed 
+  into Destination, then RETURN_SUCCESS is returned.  If the compressed source data 
+  specified by Source is not in a valid compressed data format,
+  then RETURN_INVALID_PARAMETER is returned.
+
+  @param  Source      The source buffer containing the compressed data.
+  @param  SourceSize  The size of source buffer.
+  @param  Destination The destination buffer to store the decompressed data
+  @param  Scratch     A temporary scratch buffer that is used to perform the decompression.
+                      This is an optional parameter that may be NULL if the 
+                      required scratch buffer size is 0.
+                     
+  @retval  RETURN_SUCCESS Decompression completed successfully, and 
+                          the uncompressed buffer is returned in Destination.
+  @retval  RETURN_INVALID_PARAMETER 
+                          The source buffer specified by Source is corrupted 
+                          (not in a valid compressed format).
 **/
 RETURN_STATUS
 EFIAPI
 LzmaUefiDecompress (
   IN CONST VOID  *Source,
+  IN UINTN       SourceSize,
   IN OUT VOID    *Destination,
   IN OUT VOID    *Scratch
   );
-
+  
 #endif // __LZMADECOMPRESS_H__
 
