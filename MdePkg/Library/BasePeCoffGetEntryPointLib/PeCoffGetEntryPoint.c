@@ -309,6 +309,8 @@ PeCoffGetSizeOfHeaders (
    SizeOfHeaders = sizeof (EFI_TE_IMAGE_HEADER) + (UINTN)Hdr.Te->BaseOfCode - (UINTN)Hdr.Te->StrippedSize;
   } else if (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE) {
     SizeOfHeaders = Hdr.Pe32->OptionalHeader.SizeOfHeaders;
+  } else {
+    SizeOfHeaders = 0;
   }
 
   return SizeOfHeaders;
