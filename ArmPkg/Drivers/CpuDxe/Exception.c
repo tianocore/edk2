@@ -159,7 +159,79 @@ GetImageName (
   return NULL;
 }
 
+typedef struct {
+  UINT32  Bit;
+  CHAR8   Char;
+} CPSR_CHAR;
 
+CPSR_CHAR gCpsrChar[] = {
+  { 31, 'n' },
+  { 30, 'z' },
+  { 29, 'c' },
+  { 28, 'v' },
+  { 27, 'q' },
+
+  { 8, 'a' },
+  { 7, 'i' },
+  { 6, 'f' },
+  { 5, 't' },
+  { 0, '?' }
+};
+
+
+VOID
+CpsrString (
+  IN  UINT32  Cpsr,
+  OUT CHAR8   *ReturnStr
+  )
+{
+  UINTN Index;
+  CHAR8 *Str = ReturnStr;
+  CHAR8 *ModeStr;
+  
+  for (Index = 0; gCpsrChar[Index].Bit != 0; Index++, Str++) {
+    *Str = gCpsrChar[Index].Char;
+    if ((Cpsr & (1 << gCpsrChar[Index].Bit)) != 0) {
+      // Concert to upper case if bit is set
+      *Str &= ~0x20;
+    }
+  }
+  
+  *Str++ = '_';
+  *Str = '\0';
+  
+  switch (Cpsr & 0x1f) {
+  case 0x17:
+    ModeStr = "abt";
+    break;
+  case 0x011:
+    ModeStr = "fiq";
+    break;
+  case 0x12:
+    ModeStr = "irq";
+    break;
+  case 0x13:
+    ModeStr = "svc";
+    break;
+  case 0x1f:
+    ModeStr = "sys";
+    break;
+  case 0x1b:
+    ModeStr = "und";
+    break;
+  case 0x10:
+    ModeStr = "usr";
+    break;
+  
+  default:
+    ModeStr = "???";
+    break;
+  }
+  
+  AsciiStrCat (Str, ModeStr);
+  return;
+}  
+  
 CHAR8 *gExceptionTypeString[] = {
   "Reset",
   "Undefined Instruction",
@@ -216,12 +288,16 @@ CommonCExceptionHandler (
   //
   // Code after here is the default exception handler... Dump the context
   //
-  DEBUG ((EFI_D_ERROR, "\n%a Exception from instruction at 0x%08x  CPSR 0x%08x\n", gExceptionTypeString[ExceptionType], SystemContext.SystemContextArm->PC, SystemContext.SystemContextArm->CPSR));
+  DEBUG ((EFI_D_ERROR, "\n%a Exception PC at 0x%08x  CPSR 0x%08x ", gExceptionTypeString[ExceptionType], SystemContext.SystemContextArm->PC, SystemContext.SystemContextArm->CPSR));
   DEBUG_CODE_BEGIN ();
     CHAR8   *Pdb;
     UINT32  ImageBase;
     UINT32  PeCoffSizeOfHeader;
     UINT32  Offset;
+    CHAR8   CpsrStr[32];  // char per bit. Lower 5-bits are mode that is a 3 char string
+    
+    CpsrString (SystemContext.SystemContextArm->CPSR, CpsrStr);
+    DEBUG ((EFI_D_ERROR, "%a\n", CpsrStr));
   
     Pdb = GetImageName (SystemContext.SystemContextArm->PC, &ImageBase, &PeCoffSizeOfHeader);
     Offset = SystemContext.SystemContextArm->PC - ImageBase;
@@ -236,19 +312,16 @@ CommonCExceptionHandler (
       // you need to subtact out the size of the PE/COFF header to get
       // get the offset that matches the link map. 
       //
-      DEBUG ((EFI_D_ERROR, "loadded at 0x%08x (PE/COFF offset) 0x%08x (ELF or Mach-O offset) 0x%08x\n", ImageBase, Offset, Offset - PeCoffSizeOfHeader));
+      DEBUG ((EFI_D_ERROR, "loadded at 0x%08x (PE/COFF offset) 0x%x (ELF or Mach-O offset) 0x%x", ImageBase, Offset, Offset - PeCoffSizeOfHeader));
     }
   DEBUG_CODE_END ();
-  DEBUG ((EFI_D_ERROR, " R0 0x%08x  R1 0x%08x  R2 0x%08x  R3 0x%08x\n", SystemContext.SystemContextArm->R0, SystemContext.SystemContextArm->R1, SystemContext.SystemContextArm->R2, SystemContext.SystemContextArm->R3));
-  DEBUG ((EFI_D_ERROR, " R4 0x%08x  R5 0x%08x  R6 0x%08x  R7 0x%08x\n", SystemContext.SystemContextArm->R4, SystemContext.SystemContextArm->R5, SystemContext.SystemContextArm->R6, SystemContext.SystemContextArm->R7));
-  DEBUG ((EFI_D_ERROR, " R8 0x%08x  R9 0x%08x R10 0x%08x R11 0x%08x\n", SystemContext.SystemContextArm->R8, SystemContext.SystemContextArm->R9, SystemContext.SystemContextArm->R10, SystemContext.SystemContextArm->R11));
-  DEBUG ((EFI_D_ERROR, "R12 0x%08x  SP 0x%08x  LR 0x%08x  PC 0x%08x\n", SystemContext.SystemContextArm->R12, SystemContext.SystemContextArm->SP, SystemContext.SystemContextArm->LR, SystemContext.SystemContextArm->PC));
-  DEBUG ((EFI_D_ERROR, "DFSR 0x%08x  DFAR 0x%08x IFSR 0x%08x  IFAR 0x%08x\n\n", SystemContext.SystemContextArm->DFSR, SystemContext.SystemContextArm->DFAR, SystemContext.SystemContextArm->IFSR, SystemContext.SystemContextArm->IFAR));
+  DEBUG ((EFI_D_ERROR, "\n  R0 0x%08x   R1 0x%08x   R2 0x%08x   R3 0x%08x\n", SystemContext.SystemContextArm->R0, SystemContext.SystemContextArm->R1, SystemContext.SystemContextArm->R2, SystemContext.SystemContextArm->R3));
+  DEBUG ((EFI_D_ERROR, "  R4 0x%08x   R5 0x%08x   R6 0x%08x   R7 0x%08x\n", SystemContext.SystemContextArm->R4, SystemContext.SystemContextArm->R5, SystemContext.SystemContextArm->R6, SystemContext.SystemContextArm->R7));
+  DEBUG ((EFI_D_ERROR, "  R8 0x%08x   R9 0x%08x  R10 0x%08x  R11 0x%08x\n", SystemContext.SystemContextArm->R8, SystemContext.SystemContextArm->R9, SystemContext.SystemContextArm->R10, SystemContext.SystemContextArm->R11));
+  DEBUG ((EFI_D_ERROR, " R12 0x%08x   SP 0x%08x   LR 0x%08x   PC 0x%08x\n", SystemContext.SystemContextArm->R12, SystemContext.SystemContextArm->SP, SystemContext.SystemContextArm->LR, SystemContext.SystemContextArm->PC));
+  DEBUG ((EFI_D_ERROR, "DFSR 0x%08x DFAR 0x%08x IFSR 0x%08x IFAR 0x%08x\n\n", SystemContext.SystemContextArm->DFSR, SystemContext.SystemContextArm->DFAR, SystemContext.SystemContextArm->IFSR, SystemContext.SystemContextArm->IFAR));
 
   ASSERT (FALSE);
-//  while (TRUE) {
-//    CpuSleep ();
-//  }
 }
 
 
