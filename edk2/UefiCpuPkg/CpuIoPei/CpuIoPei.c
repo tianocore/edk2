@@ -334,7 +334,7 @@ CpuIoCheckParameter (
   //
   // Check to see if Width is in the valid range for I/O Port operations
   //
-  Width = Width & 0x03;
+  Width = (EFI_PEI_CPU_IO_PPI_WIDTH) (Width & 0x03);
   if (!MmioOperation && (Width == EfiPeiCpuIoWidthUint64)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -349,9 +349,9 @@ CpuIoCheckParameter (
   //
   // Since MAX_ADDRESS can be the maximum integer value supported by the CPU and Count 
   // can also be the maximum integer value supported by the CPU, this range
-  // check must be adjusted to avoid all oveflow conditions.
+  // check must be adjusted to avoid all overflow conditions.
   //   
-  // The follwing form of the range check is equivalent but assumes that 
+  // The following form of the range check is equivalent but assumes that 
   // MAX_ADDRESS and MAX_IO_PORT_ADDRESS are of the form (2^n - 1).
   //
   Limit = (MmioOperation ? MAX_ADDRESS : MAX_IO_PORT_ADDRESS);
@@ -418,7 +418,7 @@ CpuMemoryServiceRead (
   //
   InStride = mInStride[Width];
   OutStride = mOutStride[Width];
-  OperationWidth = Width & 0x03;
+  OperationWidth = (EFI_PEI_CPU_IO_PPI_WIDTH) (Width & 0x03);
   Aligned = (BOOLEAN)(((UINTN)Buffer & (mInStride[OperationWidth] - 1)) == 0x00);
   for (Uint8Buffer = Buffer; Count > 0; Address += InStride, Uint8Buffer += OutStride, Count--) {
     if (OperationWidth == EfiPeiCpuIoWidthUint8) {
@@ -492,7 +492,7 @@ CpuMemoryServiceWrite (
   //
   InStride = mInStride[Width];
   OutStride = mOutStride[Width];
-  OperationWidth = Width & 0x03;
+  OperationWidth = (EFI_PEI_CPU_IO_PPI_WIDTH) (Width & 0x03);
   Aligned = (BOOLEAN)(((UINTN)Buffer & (mInStride[OperationWidth] - 1)) == 0x00);
   for (Uint8Buffer = Buffer; Count > 0; Address += InStride, Uint8Buffer += OutStride, Count--) {
     if (OperationWidth == EfiPeiCpuIoWidthUint8) {
@@ -566,7 +566,7 @@ CpuIoServiceRead (
   //
   InStride = mInStride[Width];
   OutStride = mOutStride[Width];
-  OperationWidth = Width & 0x03;
+  OperationWidth = (EFI_PEI_CPU_IO_PPI_WIDTH) (Width & 0x03);
   Aligned = (BOOLEAN)(((UINTN)Buffer & (mInStride[OperationWidth] - 1)) == 0x00);
   for (Uint8Buffer = Buffer; Count > 0; Address += InStride, Uint8Buffer += OutStride, Count--) {
     if (OperationWidth == EfiPeiCpuIoWidthUint8) {
@@ -638,7 +638,7 @@ CpuIoServiceWrite (
   //
   InStride = mInStride[Width];
   OutStride = mOutStride[Width];
-  OperationWidth = Width & 0x03;
+  OperationWidth = (EFI_PEI_CPU_IO_PPI_WIDTH) (Width & 0x03);
   Aligned = (BOOLEAN)(((UINTN)Buffer & (mInStride[OperationWidth] - 1)) == 0x00);
   for (Uint8Buffer = (UINT8 *)Buffer; Count > 0; Address += InStride, Uint8Buffer += OutStride, Count--) {
     if (OperationWidth == EfiPeiCpuIoWidthUint8) {
