@@ -2,7 +2,7 @@
   Provides the services to get the entry point to a PE/COFF image that has either been 
   loaded into memory or is executing at it's linked address.
 
-  Copyright (c) 2006 - 2008, Intel Corporation<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation<BR>
   Portions copyright (c) 2008-2009 Apple Inc. All rights reserved.<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -313,6 +313,6 @@ PeCoffGetSizeOfHeaders (
     SizeOfHeaders = 0;
   }
 
-  return SizeOfHeaders;
+  return (UINT32) SizeOfHeaders;
 }
 
