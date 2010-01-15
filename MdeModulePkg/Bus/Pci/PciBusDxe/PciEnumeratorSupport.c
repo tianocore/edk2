@@ -1420,7 +1420,7 @@ PciIovParseVfBar (
   }
 
   PciIoDevice->VfPciBar[BarIndex].Offset = (UINT8) Offset;
-  if (Value & 0x01) {
+  if ((Value & 0x01) != 0) {
     //
     // Device I/Os. Impossible
     //
@@ -1439,7 +1439,7 @@ PciIovParseVfBar (
     //memory space; anywhere in 32 bit address space
     //
     case 0x00:
-      if (Value & 0x08) {
+      if ((Value & 0x08) != 0) {
         PciIoDevice->VfPciBar[BarIndex].BarType = PciBarTypePMem32;
       } else {
         PciIoDevice->VfPciBar[BarIndex].BarType = PciBarTypeMem32;
@@ -1465,7 +1465,7 @@ PciIovParseVfBar (
     // memory space; anywhere in 64 bit address space
     //
     case 0x04:
-      if (Value & 0x08) {
+      if ((Value & 0x08) != 0) {
         PciIoDevice->VfPciBar[BarIndex].BarType = PciBarTypePMem64;
       } else {
         PciIoDevice->VfPciBar[BarIndex].BarType = PciBarTypeMem64;

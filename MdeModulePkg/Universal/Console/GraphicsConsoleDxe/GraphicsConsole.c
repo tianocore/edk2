@@ -1847,6 +1847,14 @@ EraseCursor (
   return EFI_SUCCESS;
 }
 
+/**
+  HII Database Protocol notification event handler.
+
+  Register font package when HII Database Protocol has been installed.
+
+  @param[in] Event    Event whose notification function is being invoked.
+  @param[in] Context  Pointer to the notification function's context.
+**/
 VOID
 EFIAPI
 RegisterFontPackage (

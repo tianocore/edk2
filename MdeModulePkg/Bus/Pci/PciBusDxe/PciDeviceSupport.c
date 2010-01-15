@@ -267,7 +267,7 @@ RegisterPciDevice (
     ParrentPciIoDevice = PciIoDevice->Parent;
     ParrentPciIo = &(ParrentPciIoDevice->PciIo);
     ParrentPciIo->Pci.Read (PciIo, EfiPciIoWidthUint32, ParrentPciIoDevice->PciExpressCapabilityOffset + EFI_PCIE_CAPABILITY_DEVICE_CAPABILITIES_2_OFFSET, 1, &Data32);
-    if (Data32 & EFI_PCIE_CAPABILITY_DEVICE_CAPABILITIES_2_ARI_FORWARDING) {
+    if ((Data32 & EFI_PCIE_CAPABILITY_DEVICE_CAPABILITIES_2_ARI_FORWARDING) != 0) {
       //
       // ARI forward support in bridge, so enable it.
       //

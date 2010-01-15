@@ -168,7 +168,7 @@ GetDevicePath (
   Converts the unicode character of the string from uppercase to lowercase.
   This is a internal function.
 
-  @param Str     String to be converted
+  @param ConfigString  String to be converted
 
 **/
 VOID
@@ -773,7 +773,7 @@ InsertBlockData (
 /**
   This function checks VarOffset and VarWidth is in the block range.
 
-  @param  BlockArray         The block array is to be checked. 
+  @param  RequestBlockArray  The block array is to be checked. 
   @param  VarOffset          Offset of var to the structure
   @param  VarWidth           Width of var.
   
@@ -831,7 +831,7 @@ EFI_STATUS
 EFIAPI
 ParseIfrData (
   IN     UINT8               *Package,
-  IN     UINT32              PackageLenth,
+  IN     UINT32              PackageLength,
   IN     EFI_STRING          ConfigHdr,
   IN     IFR_BLOCK_DATA      *RequestBlockArray,
   IN OUT IFR_VARSTORAGE_DATA *VarStorageData,
@@ -874,7 +874,7 @@ ParseIfrData (
   // Go through the form package to parse OpCode one by one.
   //
   IfrOffset   = sizeof (EFI_HII_PACKAGE_HEADER);
-  while (IfrOffset < PackageLenth) {
+  while (IfrOffset < PackageLength) {
     IfrOpHdr  = (EFI_IFR_OP_HEADER *) (Package + IfrOffset);
 
     switch (IfrOpHdr->OpCode) {

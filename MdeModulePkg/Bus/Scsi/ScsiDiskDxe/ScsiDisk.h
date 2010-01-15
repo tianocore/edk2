@@ -773,9 +773,9 @@ ScsiDiskWrite10 (
 **/
 VOID
 GetMediaInfo (
-  SCSI_DISK_DEV                   *ScsiDiskDevice,
-  EFI_SCSI_DISK_CAPACITY_DATA     *Capacity10,
-  EFI_SCSI_DISK_CAPACITY_DATA16   *Capacity16
+  IN OUT SCSI_DISK_DEV                  *ScsiDiskDevice,
+  IN     EFI_SCSI_DISK_CAPACITY_DATA    *Capacity10,
+  IN     EFI_SCSI_DISK_CAPACITY_DATA16  *Capacity16
   );
 
 /**

@@ -634,7 +634,7 @@ PeiFfsFindSectionData (
   @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param SearchType      Filter to find only files of this type.
                          Type EFI_FV_FILETYPE_ALL causes no filtering to be done.
-  @param VolumeHandle    Handle of firmware volume in which to search.
+  @param FvHandle        Handle of firmware volume in which to search.
   @param FileHandle      On entry, points to the current handle from which to begin searching or NULL to start
                          at the beginning of the firmware volume. On exit, points the file handle of the next file
                          in the volume or NULL if there are no more files.
