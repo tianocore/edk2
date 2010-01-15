@@ -863,6 +863,14 @@ FtwGetLastWrite (
   return Status;
 }
 
+/**
+  Firmware Volume Block Protocol notification event handler.
+
+  Initialization for Fault Tolerant Write is done in this handler.
+
+  @param[in] Event    Event whose notification function is being invoked.
+  @param[in] Context  Pointer to the notification function's context.
+**/
 VOID
 EFIAPI
 FvbNotificationEvent (

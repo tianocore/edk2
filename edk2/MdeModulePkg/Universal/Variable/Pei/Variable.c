@@ -465,7 +465,7 @@ FindVariable (
       //
       // Record Variable in VariableIndex HOB
       //
-      if (IndexTable->Length < VARIABLE_INDEX_TABLE_VOLUME && StopRecord != TRUE) {
+      if (IndexTable->Length < VARIABLE_INDEX_TABLE_VOLUME && !StopRecord) {
         Offset = (UINT32)((UINTN)Variable - (UINTN)LastVariable);
         //
         // The distance of two neighbouring VAR_ADDED variable is larger than 2^16, 
@@ -476,7 +476,7 @@ FindVariable (
           StopRecord = TRUE;
         }
 
-        if (StopRecord != TRUE) {
+        if (!StopRecord) {
           IndexTable->Index[IndexTable->Length++] = (UINT16) Offset;
         }
         LastVariable = Variable;

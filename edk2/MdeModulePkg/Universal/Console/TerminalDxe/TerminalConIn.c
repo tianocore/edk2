@@ -1346,14 +1346,14 @@ UnicodeToEfiKey (
         if (TerminalDevice->ResetState == RESET_STATE_DEFAULT) {
           TerminalDevice->ResetState = RESET_STATE_ESC_R;
           SetDefaultResetState = FALSE;
-        } else if (TerminalDevice->ResetState == RESET_STATE_ESC_R_ESC_r) {
+        } else if (TerminalDevice->ResetState == RESET_STATE_ESC_R_ESC_R) {
           gRT->ResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
         }
         Key.ScanCode = SCAN_NULL;
         break;
       case 'r':
         if (TerminalDevice->ResetState == RESET_STATE_ESC_R) {
-          TerminalDevice->ResetState = RESET_STATE_ESC_R_ESC_r;
+          TerminalDevice->ResetState = RESET_STATE_ESC_R_ESC_R;
           SetDefaultResetState = FALSE;
         }
         Key.ScanCode = SCAN_NULL;

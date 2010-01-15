@@ -656,7 +656,7 @@ PeiCoreBuildHobHandoffInfoTable (
   @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param SearchType      Filter to find only files of this type.
                          Type EFI_FV_FILETYPE_ALL causes no filtering to be done.
-  @param VolumeHandle    Handle of firmware volume in which to search.
+  @param FvHandle        Handle of firmware volume in which to search.
   @param FileHandle      On entry, points to the current handle from which to begin searching or NULL to start
                          at the beginning of the firmware volume. On exit, points the file handle of the next file
                          in the volume or NULL if there are no more files.
@@ -715,7 +715,7 @@ EFIAPI
 PeiFfsFindNextVolume (
   IN CONST EFI_PEI_SERVICES          **PeiServices,
   IN UINTN                           Instance,
-  IN OUT EFI_PEI_FV_HANDLE           *FwVolHeader
+  IN OUT EFI_PEI_FV_HANDLE           *VolumeHandle
   );
 
 //
@@ -934,7 +934,7 @@ PeiFfsFindFileByName (
   Returns information about a specific file.
 
   @param FileHandle       Handle of the file.
-  @param FileInfo         Upon exit, points to the file’s information.
+  @param FileInfo         Upon exit, points to the file's information.
 
   @retval EFI_INVALID_PARAMETER If FileInfo is NULL.
   @retval EFI_INVALID_PARAMETER If FileHandle does not represent a valid file.
@@ -952,7 +952,7 @@ PeiFfsGetFileInfo (
   Returns information about the specified volume.
 
   @param VolumeHandle    Handle of the volume.
-  @param VolumeInfo      Upon exit, points to the volume’s information.
+  @param VolumeInfo      Upon exit, points to the volume's information.
 
   @retval EFI_INVALID_PARAMETER If VolumeHandle does not represent a valid volume.
   @retval EFI_INVALID_PARAMETER If VolumeInfo is NULL.

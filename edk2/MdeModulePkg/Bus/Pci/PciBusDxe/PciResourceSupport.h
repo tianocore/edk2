@@ -179,12 +179,15 @@ CreateResourceNode (
   This function is used to extract resource request from
   IOV VF device node list.
 
-  @param Bridge     Pci device instance.
-  @param IoNode     Resource info node for IO.
-  @param Mem32Node  Resource info node for 32-bit memory.
-  @param PMem32Node Resource info node for 32-bit Prefetchable Memory.
-  @param Mem64Node  Resource info node for 64-bit memory.
-  @param PMem64Node Resource info node for 64-bit Prefetchable Memory.
+  @param PciDev       Pci device instance.
+  @param Length       Length of Io/Memory resource.
+  @param Alignment    Alignment of resource.
+  @param Bar          Bar index.
+  @param ResType      Type of resource: IO/Memory.
+  @param ResUsage     Resource usage.
+
+  @return PCI resource node created for given PCI device.
+          NULL means PCI resource node is not created.
 
 **/
 PCI_RESOURCE_NODE *

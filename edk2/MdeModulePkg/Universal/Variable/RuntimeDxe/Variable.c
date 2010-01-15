@@ -2215,7 +2215,7 @@ ReclaimForOS(
 /**
   Initializes variable store area for non-volatile and volatile variable.
 
-  @param  SystemTable           The pointer of EFI_SYSTEM_TABLE.
+  @param  FvbProtocol           Pointer to an instance of EFI Firmware Volume Block Protocol.
 
   @retval EFI_SUCCESS           Function successfully executed.
   @retval EFI_OUT_OF_RESOURCES  Fail to allocate enough memory resource.
@@ -2240,6 +2240,7 @@ VariableCommonInitialize (
   UINT64                          VariableStoreLength;
   EFI_EVENT                       ReadyToBootEvent;
   UINTN                           ScratchSize;
+  UINTN                           VariableSize;
 
   Status = EFI_SUCCESS;
   //
@@ -2353,7 +2354,6 @@ VariableCommonInitialize (
     Status        = EFI_SUCCESS;
 
     while (IsValidVariableHeader (NextVariable)) {
-      UINTN VariableSize = 0;
       VariableSize = NextVariable->NameSize + NextVariable->DataSize + sizeof (VARIABLE_HEADER);
       if ((NextVariable->Attributes & (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) == (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
         mVariableModuleGlobal->HwErrVariableTotalSize += HEADER_ALIGN (VariableSize);
@@ -2449,6 +2449,14 @@ VariableClassAddressChangeEvent (
   EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal);
 }
 
+/**
+  Firmware Volume Block Protocol notification event handler.
+
+  Discover NV Variable Store and install Variable Arch Protocol.
+
+  @param[in] Event    Event whose notification function is being invoked.
+  @param[in] Context  Pointer to the notification function's context.
+**/
 VOID
 EFIAPI
 FvbNotificationEvent (

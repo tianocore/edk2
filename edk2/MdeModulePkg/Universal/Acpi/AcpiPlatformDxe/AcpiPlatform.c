@@ -29,7 +29,6 @@
   FV protocol, then it will return the first FV that contains the ACPI table
   storage file.
 
-  @param  Protocol      The protocol to find.
   @param  Instance      Return pointer to the first instance of the protocol
 
   @return EFI_SUCCESS           The function completed successfully.

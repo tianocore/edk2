@@ -1491,14 +1491,15 @@ ScsiDiskRequestSenseKeys (
   Get information from media read capacity command.
 
   @param  ScsiDiskDevice  The pointer of SCSI_DISK_DEV
-  @param  Capacity        The pointer of EFI_SCSI_DISK_CAPACITY_DATA
+  @param  Capacity10      The pointer of EFI_SCSI_DISK_CAPACITY_DATA
+  @param  Capacity16      The pointer of EFI_SCSI_DISK_CAPACITY_DATA16
 
 **/
 VOID
 GetMediaInfo (
-  IN  OUT  SCSI_DISK_DEV          *ScsiDiskDevice,
-  EFI_SCSI_DISK_CAPACITY_DATA     *Capacity10,
-  EFI_SCSI_DISK_CAPACITY_DATA16   *Capacity16
+  IN OUT SCSI_DISK_DEV                  *ScsiDiskDevice,
+  IN     EFI_SCSI_DISK_CAPACITY_DATA    *Capacity10,
+  IN     EFI_SCSI_DISK_CAPACITY_DATA16  *Capacity16
   )
 {
   UINT8       ScsiVersion;

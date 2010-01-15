@@ -1363,8 +1363,7 @@ EmuQueryVariableInfo (
 
   This function allocates memory space for variable store area and initializes its attributes.
 
-  @param  VariableBase         Base of the variable store area created
-  @param  LastVariableOffset   Size of VARIABLE_STORE_HEADER
+  @param  VolatileStore  Indicates if the variable store is volatile.
 
 **/
 EFI_STATUS
