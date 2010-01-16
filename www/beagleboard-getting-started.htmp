@@ -53,8 +53,7 @@
     vertical-align: top;
   }
   -->
-  </style>
-<!--
+  </style><!--
  #
  # Getting started for Windows systems
  #
@@ -86,10 +85,12 @@ interpreter.&nbsp; <br>
 References:<br>
 <a
  href="http://beagleboard.o%E2%80%8Brg/static/BBSRM_late%E2%80%8Bst.pdf">Beagle
-Board System Reference Manual</a> (Chapter 12 talks about booting) <br>
+Board
+System Reference Manual</a> (Chapter 12 talks about booting) <br>
 <a
  href="http://focus.ti.com/%E2%80%8Blit/ug/sprufn0/spruf%E2%80%8Bn0.pdf">OMAP
-35x Peripherals Overview Reference Guide</a> (Chapter 25 talks about
+35x
+Peripherals Overview Reference Guide</a> (Chapter 25 talks about
 booting) <br>
 <h3 class="build-step-title"> </h3>
 <h3 class="build-step-title"> </h3>
@@ -97,7 +98,8 @@ booting) <br>
 <br>
 <h2 class="main-title">Get the edk2 source tree and build
 BeagleBoardPkg in Windows<small><small><sup>TM</sup></small></small>&nbsp;
-Cygwin Bash shell<br>
+Cygwin
+Bash shell<br>
 </h2>
 <h3 class="build-step-title">Assumptions
 </h3>
@@ -118,7 +120,8 @@ directory with the following commands:
 <h3 class="build-step-title"> </h3>
 <h3 class="build-step-title"> Build the Beagle Board Package
 </h3>
-<p class="build-step-details"> Now you can run the build.sh script&nbsp;
+<p class="build-step-details"> Now you can run the build.sh
+script&nbsp;
 </p>
 <pre class="build-step-code">/cygdrive/c/edk2$ <span
  style="font-weight: bold;">cd /cygdrive/c/edk2/BeagleBoardPkg</span><br>/cygdrive/c/edk2$ <span
@@ -170,7 +173,8 @@ NAND into system memory and jumps to it. In the EFI world this NAND
 image is called an FD (Flash Device) image and it contains 520 bytes of
 image header for the mask ROM and an FV (Firmware Volume). The FV is a
 simple FLASH file system and the first 4 bytes of the FV contain a jump
-to the <a href="https://www.tianocore.org/acronyms.htm">SEC</a> (SEcuirty
+to the <a href="https://www.tianocore.org/acronyms.htm">SEC</a>
+(SEcuirty
 Core) module. The SEC is a PE/COFF image that contains the reset vector
 and it is located in an arbitrary location in the FV. When you boot
 from JTAG the mask ROM on the Beagle Board does not run and the RVD
@@ -320,7 +324,7 @@ d_EFI_flashboot.fd to a MMC/SD card<br>
 <p class="build-step-details">Step #2<br>
 Use the EFI EBL to flash the image<br>
 </p>
-<pre class="build-step-code">OMAP3 beagleboard.org # <big><big><span
+<pre class="build-step-code">BeagleEdk2&gt; <big><big><span
  style="font-family: monospace;">cp fs1:\Beagle Board_EFI_flashboot.fd blk0:</span></big></big>                </pre>
 <p class="build-step-details"><br>
 </p>
