@@ -154,7 +154,7 @@ RealView Debugger<br>
 up to your Beagle Board you can use
 /cygdrive/c/edk2/Build/BeagleBoa​rd/DEBUG_RVCT31CYGWI​
 N/rvi_boot_from_ram.​inc to down load the EFI image over JTAG and boot
-it. To load the script go to the Tools menu and select INclude Commands
+it. To load the script go to the Tools menu and select Include Commands
 from File... You can use
 edk2/Build/BeagleBoa​rd/DEBUG_RVCT31CYGWI​N/rvi_load_symbols.i​nc to
 load symbols for the multiple EFI images in the debugger. Note: Some
@@ -188,7 +188,7 @@ To boot from an SD card it has to be constructed as detailed in Step
 in) while holding down the USER button.&nbsp;</p>
 <p class="build-step-details">Step #1: <br>
 Follow the <a
- href="http://code.google.c%E2%80%8Bom/p/beagleboard/wik%E2%80%8Bi/BeagleboardRevCVal%E2%80%8Bidation">instructions</a>
+ href="http://code.google.com/p/beagleboard/wiki/BeagleboardRevCValidation">instructions</a>
 and build an MMC/SD card that boots the Beagle Board U-Boot. <br>
 </p>
 <p class="build-step-details">You only need to do the following steps:<br>
