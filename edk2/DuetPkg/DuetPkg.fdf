@@ -115,7 +115,7 @@ INF  IntelFrameworkModulePkg/Bus/Isa/IsaFloppyDxe/IsaFloppyDxe.inf
 INF  MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
 INF  MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 INF  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
-INF  DuetPkg/BiosVideoThunkDxe/BiosVideo.inf
+#INF  DuetPkg/BiosVideoThunkDxe/BiosVideo.inf
 
   # Binary INF file to support toggle among different CPU architectures.
 INF  FatBinPkg/EnhancedFatDxe/Fat.inf
