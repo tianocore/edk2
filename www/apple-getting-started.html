@@ -1,0 +1,252 @@
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+<style type="text/css">
+  <!--
+  .main-title, .main-details {
+    font-size: small;
+  }
+  
+  .main-details {
+    margin-top: 0.19in;
+    margin-bottom: 0.19in
+  }
+  
+  .main-title {
+    font-weight: bold;
+    margin-top: 0in;
+    margin-bottom: 0.08in;
+    border-bottom: thin solid black;
+  }
+
+  .build-step-title {
+    font-weight: bold;
+    margin-top: 0.19in;
+    margin-bottom: 0.19in
+  }
+  
+  .build-step-details {
+  }
+
+  .monospace, .build-step-code {
+    font-family: "courier new", "courier", "monospace";
+  }
+
+  .build-step-code {
+    border: 1px dashed;
+    margin-right: 0.25in;
+    padding: 2pt 4pt 2pt 4pt;
+    background-color: #F0F0F0;
+  }
+  
+  .build-step-details, .build-step-code, .build-step-title {
+    font-size: small;
+    margin-left: 0.25in;
+  }
+  
+  table.build-step-details td {
+    border-style: hidden;
+  }
+  
+  img.in-text {
+    vertical-align: top;
+  }
+  -->
+</style>
+
+<!--
+ #
+ # Getting started for Windows systems
+ #
+-->
+<h3 class="build-step-title">
+  Work in progress...
+</h3>
+
+<p class="build-step-details">
+  <b>Please note</b>: These instructions are currently under construction.
+</p>
+
+<h2 class="main-title">
+  Getting started for Windows operating systems
+</h2>
+
+<p class="build-step-details">
+  These instructions will be written as a series of commands executed from
+  a command terminal.
+</p>
+
+<p class="build-step-details">
+  Often these instructions will contain a command which needs to be
+  executed in the terminal window.&nbsp; For example:
+</p>
+
+<pre class="build-step-code">
+C:\> <b>echo this bold text is a sample command</b>
+</pre>
+
+<p class="build-step-details">
+  To execute this command, highlight the
+  <font class="monospace"><b>bold</b></font>
+  text of the 
+  command in your web browser.&nbsp;
+  Most web browsers should be able to copy the text by selecting <i>Copy</i>
+  under the <i>Edit</i> menu.&nbsp;
+  Now, change back to the terminal application, and there should be a
+  <i>Paste</i> operation under the <i>Edit</i> menu.&nbsp;
+  After pasting the command into the shell, you may need to press the
+  <i>enter</i> or <i>return</i> key to execute the command.&nbsp;
+</p>
+<p class="build-step-details">
+  Of course, there may be other ways to copy and paste the command into
+  the terminal which are specific to the windowing environment and
+  applications that you are using.&nbsp;
+  If all else fails, however, you can type the command by hand.
+</p>
+
+<p class="build-step-details">
+  Some commands are very long, and we use the caret character (^) to
+  tell the shell program that the command is not finished.&nbsp; For example:
+</p>
+
+<pre class="build-step-code">
+C:\> <b>echo this bold text is a sample command ^
+        which is broken into two lines</b>
+</pre>
+
+<p class="build-step-details">
+  When you copy and paste, make sure you include all lines of the command
+  (including the caret (^) characters).&nbsp;
+  If you are typing the command, you can remove the caret character (^)
+  and combine the lines into a single line if you prefer.
+</p>
+
+<p class="build-step-details">
+  For the purposes of this set of instructions, we will be using the
+  <font class="monospace"><b>C:\edk2</b></font> path for the
+  <a href="https://edk2.tianocore.org">edk2</a> source tree.
+</p>
+
+<h2 class="main-title">
+  Internet proxies
+</h2>
+
+<p class="build-step-details">
+  If your network utilizes a firewall with a web proxy, then you may
+  need to configure your proxy information for subversion to work.&nbsp;
+  Ask your network administrator to find
+  out the computer name and port to use for proxy setup and
+  refer to the manual for your subversion software to find out how
+  to configure the proxy information.&nbsp;
+</p>
+
+<h2 class="main-title">
+  Get the edk2 source tree and build MdeModulePkg
+</h2>
+
+<h3 class="build-step-title">
+  Checkout the edk2 source tree from subversion
+</h3>
+
+<p class="build-step-details">
+  If you use the command line version of subversion, then you can easily
+  checkout the edk2 to the <font class="monospace">C:\edk2</font>
+  directory with the following command:
+</p>
+
+<pre class="build-step-code">
+C:\> <b>svn co ^
+  https://edk2.tianocore.org/svn/edk2/trunk/edk2 ^
+  C:\edk2 ^
+  --username guest</b>
+</pre>
+
+<h3 class="build-step-title">
+  Setup build shell environment
+</h3>
+
+<pre class="build-step-code">
+C:\> <b>cd C:\edk2</b>
+C:\edk2> <b>edksetup.bat</b>
+</pre>
+
+<h3 class="build-step-title">
+  Modify Conf files
+</h3>
+
+<p class="build-step-details">
+  You will need to edit the Conf\target.txt file.&nbsp;
+  First, change the ACTIVE_PLATFORM to the MdeModulePkg:
+</p>
+
+<pre class="build-step-code">
+C:\edk2> <b>notepad Conf\target.txt</b>
+</pre>
+
+<p class="build-step-details">
+  ACTIVE_PLATFORM should look like this in Conf\target.txt:
+</p>
+
+<pre class="build-step-code">
+ACTIVE_PLATFORM       = MdeModulePkg/MdeModulePkg.dsc
+</pre>
+
+<p class="build-step-details">
+  Modify TOOL_CHAIN_TAG in target.txt for the toolchain installed on
+  your system.&nbsp;
+  There are many options, so review the tools_def.txt to
+  find the appropriate toolchain for your system.&nbsp;
+  Search for 'Supported Tool Chains' in tools_def.txt to see the
+  valid options for TOOL_CHAIN_TAG.
+</p>
+
+<p class="build-step-details">
+  Also, consider if you want to build a different processor architecture by
+  changing the TARGET_ARCH value in target.txt.&nbsp;
+  Please consider that certain toolchains only support building certain
+  processor architectures.
+</p>
+
+<h3 class="build-step-title">
+  Build Hello World!&nbsp; (and the rest of MdeModulePkg)
+</h3>
+
+<p class="build-step-details">
+  Now you should be able to simply run the <i>build</i> command to compile
+  the MdeModulePkg.
+</p>
+
+<pre class="build-step-code">
+C:\edk2> <b>build</b>
+</pre>
+
+<p class="build-step-details">
+  As a tangible result of the build, you should have the HelloWorld UEFI
+  application.&nbsp;
+  If you have a UEFI system available to you which matches the processor
+  architecture that you built, then this application
+  should be able to run successfully under the shell.
+</p>
+
+<pre class="build-step-code">
+C:\edk2> <b>dir /s Build\MdeModule\HelloWorld.efi</b>
+</pre>
+
+
+<!--
+ #
+ # Building OVMF
+ #
+-->
+<h2 class="main-title">
+  Build <a href="OVMF.html">OVMF</a> (OPTIONAL)
+</h2>
+
+<p class="build-step-details">
+  Once your build environment is set up you might be interested in
+  <a href="build-ovmf.html">building the OVMF</a>
+  platform which is included in the main edk2 source tree.&nbsp;
+  Since OVMF builds a full system firmware image
+  this may be of more interest to UEFI system firmware developers,
+  rather than application or driver developers.
+</p>
+
