@@ -83,14 +83,10 @@ only major feature missing in the edk2 ARM port is an EBC
 interpreter.&nbsp; <br>
 <br>
 References:<br>
-<a
- href="http://beagleboard.o%E2%80%8Brg/static/BBSRM_late%E2%80%8Bst.pdf">Beagle
-Board
-System Reference Manual</a> (Chapter 12 talks about booting) <br>
-<a
- href="http://focus.ti.com/%E2%80%8Blit/ug/sprufn0/spruf%E2%80%8Bn0.pdf">OMAP
-35x
-Peripherals Overview Reference Guide</a> (Chapter 25 talks about
+<a href="http://beagleboard.org/static/BBSRM_latest.pdf">Beagle
+Board System Reference Manual</a> (Chapter 12 talks about booting) <br>
+<a href="http://focus.ti.com/lit/ug/sprufn0/sprufn0.pdf">OMAP
+35x Peripherals Overview Reference Guide</a> (Chapter 25 talks about
 booting) <br>
 <h3 class="build-step-title"> </h3>
 <h3 class="build-step-title"> </h3>
@@ -316,12 +312,17 @@ U-Boot commands:<big></big><br>
 <h2 class="main-title">Put edk2 code in the Beagle Board NAND using EBL<br>
 </h2>
 <h3 class="build-step-title"> </h3>
-<p class="build-step-details">Step #1<br>
+<p class="build-step-details">Step #1:<br>
 Copy
 edk2\Build\BeagleB​oard\DEBUG_RVCT31CY​GWIN\FV\BeagleBoar​
 d_EFI_flashboot.fd to a MMC/SD card<br>
 </p>
-<p class="build-step-details">Step #2<br>
+<p class="build-step-details">Step #2:<br>
+Place SD card back in Beagle Board<br>
+Boot EFI on the Beagle Board (power cycle if you have it in NAND for
+example)<br>
+</p>
+<p class="build-step-details">Step #3:<br>
 Use the EFI EBL to flash the image<br>
 </p>
 <pre class="build-step-code">BeagleEdk2&gt; <big><big><span
