@@ -976,7 +976,7 @@ PeCoffLoaderGetDebuggerInfo (
         case CODEVIEW_SIGNATURE_RSDS:
           return (VOID *) ((CHAR8 *)CodeViewEntryPointer + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_RSDS_ENTRY));
         case CODEVIEW_SIGNATURE_MTOC:
-          *DebugBase = (VOID *)(UINTN)((UINTN)DebugBase + SizeOfHeaders);
+          *DebugBase = (VOID *)(UINTN)((UINTN)DebugBase - SizeOfHeaders);
           return (VOID *) ((CHAR8 *)CodeViewEntryPointer + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_MTOC_ENTRY));
         default:
           break;

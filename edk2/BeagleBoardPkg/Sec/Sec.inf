@@ -52,8 +52,6 @@
   gEmbeddedTokenSpaceGuid.PcdCacheEnable
 
 [FixedPcd]
-  gArmTokenSpaceGuid.PcdArmUncachedMemoryMask
-
   gEmbeddedTokenSpaceGuid.PcdEmbeddedFdBaseAddress
   gEmbeddedTokenSpaceGuid.PcdEmbeddedFdSize
   gEmbeddedTokenSpaceGuid.PcdFlashFvMainBase

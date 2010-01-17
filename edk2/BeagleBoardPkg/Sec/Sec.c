@@ -239,7 +239,7 @@ CEntryPoint (
         //
 #ifdef __CC_ARM
         // Print out the command for the RVD debugger to load symbols for this image
-        DEBUG ((EFI_D_ERROR, "load /a /ni /np %a &0x%08x\n", SecDeCygwinPathIfNeeded (FilePath), PeCoffImage + Offset));
+        DEBUG ((EFI_D_ERROR, "load /a /ni /np %a &0x%08x\n", SecDeCygwinPathIfNeeded (FilePath), (CHAR8 *)PeCoffImage + Offset));
 #elif __GNUC__
         // This may not work correctly if you generate PE/COFF directlyas then the Offset would not be required
         DEBUG ((EFI_D_ERROR, "add-symbol-file %a 0x%08x\n", FilePath, PeCoffImage + Offset));

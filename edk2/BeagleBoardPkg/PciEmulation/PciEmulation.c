@@ -436,7 +436,6 @@ PciIoAttributes (
   case EfiPciIoAttributeOperationDisable:
     // Since we are not a real PCI device no enable/set or disable operations exist.
     return EFI_SUCCESS;
-    break;
     
   default:
   ASSERT (FALSE);
