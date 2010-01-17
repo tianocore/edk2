@@ -92,44 +92,46 @@ booting) <br>
 <h3 class="build-step-title"> </h3>
 <br>
 <br>
-<h2 class="main-title">Get the edk2 source tree and build
-BeagleBoardPkg in Windows<small><small><sup>TM</sup></small></small>&nbsp;
+<h2 class="main-title"><big>Get the edk2 source tree and build
+BeagleBoardPkg in Windows</big><small><sup>TM</sup></small><big>&nbsp;
 Cygwin
-Bash
-shell<br>
+Bash shell</big><br>
 </h2>
-<h3 class="build-step-title">Assumptions
-</h3>
-<h3 class="build-step-title"> </h3>
-<p class="build-step-details"> The following instructions assume you
+<h3 class="build-step-title"><big>Assumptions
+</big></h3>
+<h3 class="build-step-title"><big> </big></h3>
+<p class="build-step-details"><big> The following instructions assume
+you
 have the ARM RealView Development Suite v3.1 and Cygwin&nbsp; installed
 on Windows. Other versions of the RealView Development Suite should
 work, but only v3.1 and v4.0 have been tested.
-</p>
-<h3 class="build-step-title"> </h3>
-<p class="build-step-details"> If you use the command line version of
+</big></p>
+<h3 class="build-step-title"><big> </big></h3>
+<p class="build-step-details"><big> If you use the command line version
+of
 subversion, then you can easily checkout the edk2 and source to the
 FAT32 driver to the <font class="monospace">/cygdrive/c/edk2</font>
 directory with the following commands:
-</p>
+</big></p>
 <pre class="build-step-code">/cygdrive/c$ <b>svn co https://edk2.tianocore.org/svn/edk2/trunk/edk2 edk2 --username guest</b><br>/cygdrive/c$ <b>cd edk2</b><br>/cygdrive/c/edk2$ <b>svn co fat-driver2.tianocore.org/svn/fat-driver2/trunk/FatPkg FatPkg --username guest</b><br></pre>
 <h3 class="build-step-title"> </h3>
 <h3 class="build-step-title"> </h3>
-<h3 class="build-step-title"> Build the Beagle Board Package
-</h3>
-<p class="build-step-details"> Now you can run the build.sh
+<h3 class="build-step-title"> <big>Build the Beagle Board Package
+</big></h3>
+<p class="build-step-details"><big> Now you can run the build.sh
 script&nbsp;
-</p>
+</big></p>
 <pre class="build-step-code">/cygdrive/c/edk2$ <span
  style="font-weight: bold;">cd /cygdrive/c/edk2/BeagleBoardPkg</span><br>/cygdrive/c/edk2$ <span
  style="font-weight: bold;">./build.sh</span><br></pre>
-<p class="build-step-details"> As a tangible result of the build, the
+<p class="build-step-details"> <big>As a tangible result of the build,
+the
 FLASH image for the Beagle Board will end up in
 /cygdrive/c/edk2/Build/BeagleBoa​rd/DEBUG_RVCT31CYGWI​N/FV/Beagle
 Board_EFI​
 _flashboot.fd.<br>
-</p>
-<p class="build-step-details">Note: You may get a build error that
+</big></p>
+<p class="build-step-details"><big>Note: You may get a build error that
 looks like:<br>
 /bin/sh: /cygdrive/c/Program
 Files/ARM/RVCT/Progr​ams/3.1/761/win_32-p​entium/armcc: No such file or
@@ -145,13 +147,15 @@ that is checked into source
 control. You can make local edits to the tools_def.txt version and not
 worry
 about accidentally checking it in to source control.<br>
+</big>
 <br>
 </p>
-<h2 class="main-title"> Boot EFI from RAM on Beagle Board using
+<h2 class="main-title"> <big>Boot EFI from RAM on Beagle Board using
 RealView Debugger<br>
-</h2>
-<h3 class="build-step-title"> </h3>
-<p class="build-step-details"> If you have an RealView Debugger hooked
+</big></h2>
+<h3 class="build-step-title"><big> </big></h3>
+<p class="build-step-details"><big> If you have an RealView Debugger
+hooked
 up to your Beagle Board you can use
 /cygdrive/c/edk2/Build/BeagleBoa​rd/DEBUG_RVCT31CYGWI​
 N/rvi_boot_from_ram.​inc to down load the EFI image over JTAG and boot
@@ -162,8 +166,9 @@ load symbols for the multiple EFI images in the debugger. Note: Some
 early versions of the RVI have a bug as the script can not access
 memory and does not work. You need to load the symbols after you break
 into the debugger.<br>
-</p>
-<p class="build-step-details">When the Beagle Board boots from the NAND
+</big></p>
+<p class="build-step-details"><big>When the Beagle Board boots from the
+NAND
 FLASH the mask ROM on the Beagle Board executes commands out of the
 start of the NAND to turn on memory and then copies the image from the
 NAND into system memory and jumps to it. In the EFI world this NAND
@@ -177,56 +182,58 @@ and it is located in an arbitrary location in the FV. When you boot
 from JTAG the mask ROM on the Beagle Board does not run and the RVD
 script copies the FD into system memory and sets the PC to first
 location in the FV. <br>
-</p>
-<p class="build-step-details">If you have the version of the debugger
-that does not support the rvi_load_symbols.inc script you can do the
-following to load symbols. <br>
+</big></p>
+<p class="build-step-details"><big>If you have the version of the
+debugger that does not support the rvi_load_symbols.inc script you can
+do the following to load symbols. <br>
 Edit the following lines of
-/cygdrive/c/edk2/BeagleBoardPkg/BeagleBoardPkg.dsc:<br>
+/cygdrive/c/edk2/BeagleBoardPkg/BeagleBoardPkg.dsc:</big><br>
 </p>
 <pre class="build-step-code"><span style="font-family: monospace;"><big>#  PeCoffExtraActionLib|ArmPkg/Library/RvdPeCoffExtraActionLib/RvdPeCoffExtraActionLib.inf<br>  PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf</big><br></span><big><big><span
  style="font-family: monospace;"></span></big></big></pre>
-<p class="build-step-details">and convert them to:<br>
+<p class="build-step-details"><big>and convert them to:</big><br>
 </p>
 <pre class="build-step-code"><small><span
  style="font-family: monospace;"><big><big>  PeCoffExtraActionLib|ArmPkg/Library/RvdPeCoffExtraActionLib/RvdPeCoffExtraActionLib.inf<br>#  PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf</big></big></span></small></pre>
-<p class="build-step-details">This will send a series of commands to
-the RVD console, via semihosting,&nbsp; that can be used to load
+<p class="build-step-details"><big>This will send a series of commands
+to the RVD console, via semihosting,&nbsp; that can be used to load
 symbols. Please note that sending all this data via semihosting slows
 boot down a lot. After the system gets to the point where you would
 like to source level debug stop execution on the target. Copy the
 contents of the StdIO window to a file, and use Tools Include Commands
 from File...&nbsp; You should now have source level debug for any EFI
 module that was loaded in memory. <br>
-</p>
-<p class="build-step-details">The reset vector code exists in the SEC
-module located in the FV.&nbsp; The SEC was relocated to its execution
-address by the build tool that constructed the FV.&nbsp; Since this
-code runs from a fixed address you have to manually load symbols for
-this code. The SEC loads the DXE Core and that should be the first load
-command you see in the StdIO window of the debugger.&nbsp; The
-following is an example of the first prints that come out of the SEC
-code. You can cut the load command and past it directly into the RVD
-Cmd window to source level debug the SEC.<br>
-</p>
+</big></p>
+<p class="build-step-details"><big>The reset vector code exists in the
+SEC module located in the FV.&nbsp; The SEC was relocated to its
+execution address by the build tool that constructed the FV.&nbsp;
+Since this code runs from a fixed address you have to manually load
+symbols for this code. The SEC loads the DXE Core and that should be
+the first load command you see in the StdIO window of the
+debugger.&nbsp; The following is an example of the first prints that
+come out of the SEC code. You can cut the load command and past it
+directly into the RVD Cmd window to source level debug the SEC.<br>
+</big></p>
 <pre style="font-family: monospace;" class="build-step-code"><big>UART Enabled<br>load /a /ni /np c:\work\edk2\Build\BeagleBoard\DEBUG_RVCT31CYGWIN\ARM\BeagleBoardPkg\Sec\Sec\DEBUG\BeagleBoardSec.dll &amp;0x80008360</big></pre>
 <p class="build-step-details"><br>
 </p>
-<h2 class="main-title">Put edk2 code in the Beagle Board NAND using
+<h2 class="main-title"><big>Put edk2 code in the Beagle Board NAND
+using
 U-Boot<br>
-</h2>
-<h3 class="build-step-title"> </h3>
-<p class="build-step-details"> The OMAP mask ROM can boot from the
+</big></h2>
+<h3 class="build-step-title"><big> </big></h3>
+<p class="build-step-details"><big> The OMAP mask ROM can boot from the
 MMC/SD card regardless of the state of the NAND (normal boot location).
 To boot from an SD card it has to be constructed as detailed in Step
 #1. You then power cycle the Beagle Board (unplug it and plug it back
-in) while holding down the USER button.&nbsp;</p>
-<p class="build-step-details">Step #1: <br>
+in) while holding down the USER button.&nbsp;</big></p>
+<p class="build-step-details"><big>Step #1: <br>
 Follow the <a
  href="http://code.google.com/p/beagleboard/wiki/BeagleboardRevCValidation">instructions</a>
 and build an MMC/SD card that boots the Beagle Board U-Boot. <br>
-</p>
-<p class="build-step-details">You only need to do the following steps:<br>
+</big></p>
+<p class="build-step-details"><big>You only need to do the following
+steps:<br>
 Prepare MMC/SD card for Validation<br>
 Copy the following files on to MMC in the following order:<br>
 When copying files to the SD card make sure you follow the NOTE and
@@ -234,16 +241,16 @@ copy "Regular script file" as boot.scr. <br>
 In addition to the above instructions copy
 edk2\Build\BeagleB​oard\DEBUG_RVCT31CY​GWIN\FV\BeagleBoar​
 d_EFI_flashboot.fd to MMC/SD card.<br>
-</p>
-<p class="build-step-details">Step #2 <br>
+</big></p>
+<p class="build-step-details"><big>Step #2 <br>
 Place SD card back in Beagle Board<br>
 power cycle while holding down USER button<br>
 hit a key on the serial console to stop u-boot from loading Linux<br>
-</p>
-<p class="build-step-details">Step #3: <br>
+</big></p>
+<p class="build-step-details"><big>Step #3: <br>
 At the U-Boot prompt (currently OMAP3 beagleboard.org # ) type the
 following commands to put the EFI code in the NAND:<big><big><span
- style="font-family: monospace;"></span></big></big><br>
+ style="font-family: monospace;"></span></big></big></big><br>
 </p>
 <pre class="build-step-code">OMAP3 beagleboard.org # <big><big><span
  style="font-family: monospace;">mmcinit</span></big></big><br>OMAP3 beagleboard.org # <big><big><span
@@ -251,32 +258,33 @@ following commands to put the EFI code in the NAND:<big><big><span
  style="font-family: monospace;">nandecc hw</span></big></big><br>OMAP3 beagleboard.org # <big><big><span
  style="font-family: monospace;">nand erase 0 80000</span></big></big><br>OMAP3 beagleboard.org # <big><big><span
  style="font-family: monospace;">nand write 80200000 0 80000</span></big></big></pre>
-<p class="build-step-details"><br>
-</p>
-<p class="build-step-details">Step #4<br>
+<p class="build-step-details"><big>Step #4<br>
 Hit the reset button and you should see DEBUG prints from EFI. You
-should get to the prompt and it will look like:<br>
+should get to the prompt and it will look like:</big><br>
 </p>
 <pre class="build-step-code"><big><span style="font-family: monospace;">Embedded Boot Loader (EBL) prototype. Built at 16:18:20 on Dec 9 2009</span><br><span
  style="font-family: monospace;">THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN 'AS IS' BASIS,</span><br><span
  style="font-family: monospace;">WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</span><br><span
  style="font-family: monospace;">Please send feedback to dev@edk2.tianocore.org</span><br><span
  style="font-family: monospace;">BeagleEdk2&gt;</span></big></pre>
-<p class="build-step-details">This works for getting the EFI image in
+<p class="build-step-details"><big>This works for getting the EFI image
+in
 the NAND the 1st time, and is also a way to recover the image if the
 NAND ever gets into a bad state.<br>
 <br>
-</p>
-<h2 class="main-title">Put edk2 code in the Beagle Board DRAM using
+</big></p>
+<h2 class="main-title"><big>Put edk2 code in the Beagle Board DRAM
+using
 U-Boot<br>
-</h2>
-<h3 class="build-step-title"> </h3>
-<p class="build-step-details"> If we modify the target address of the
+</big></h2>
+<h3 class="build-step-title"><big> </big></h3>
+<p class="build-step-details"><big> If we modify the target address of
+the
 EFI image it is possible to boot it on top of U-Boot. This is a useful
 way to do development so you can test your EFI image before you place
 it in NAND.<br>
-</p>
-<p class="build-step-details">Step #1 <br>
+</big></p>
+<p class="build-step-details"><big>Step #1 <br>
 We need to modify target address of the EFI image to boot it on top of
 u-boot.<br>
 In edk2/BeagleBoardPkg/​BeagleBoardPkg.fdf change:<br>
@@ -293,14 +301,14 @@ address of the FLASH Device.<br>
 ####BaseAddress =
 0x80008000|gEmbedded​TokenSpaceGuid.PcdEm​beddedFdBaseAddress #The base
 address of the FLASH Device.<br>
-</p>
-<p class="build-step-details">Step #2 <br>
+</big></p>
+<p class="build-step-details"><big>Step #2 <br>
 Then rebuild:<br>
-</p>
+</big></p>
 <pre class="build-step-code">/cygdrive/c/edk2$ <span
  style="font-weight: bold;">cd /cygdrive/c/edk2/BeagleBoardPkg</span><br>/cygdrive/c/edk2$ <span
  style="font-weight: bold;">./build.sh</span></pre>
-<p class="build-step-details">Step #3<br>
+<p class="build-step-details"><big>Step #3<br>
 Copy
 edk2\Build\BeagleB​oard\DEBUG_RVCT31CY​GWIN\FV\BeagleBoar​
 d_EFI_flashboot.fd to a MMC/SD card. Note: this path includes the name
@@ -309,19 +317,20 @@ different. <br>
 Place SD card back in Beagle Board<br>
 power cycle while holding down USER button<br>
 hit a key on the serial console to stop u-boot from loading Linux<br>
-</p>
-<p class="build-step-details">Step #4<br>
+</big></p>
+<p class="build-step-details"><big>Step #4<br>
 At the prompt (currently OMAP3 beagleboard.org # ) type these following
 u-boot commands to boot EFI code from DRAM:<big><big><span
- style="font-family: monospace;"></span></big></big><br>
-</p>
+ style="font-family: monospace;"></span></big><br>
+</big></big></p>
 <pre class="build-step-code">OMAP3 beagleboard.org # <big><big><span
  style="font-family: monospace;">mmcinit</span></big></big><br>OMAP3 beagleboard.org # <big><big><span
  style="font-family: monospace;">fatload mmc 0 80200000 Beagle Board_EFI_flashboot.fd</span></big></big><br>OMAP3 beagleboard.org # <big><big><span
  style="font-family: monospace;">go 80208208</span></big></big><big><big><span
  style="font-family: monospace;"><br></span></big></big></pre>
-<p class="build-step-details">You should see DEBUG prints from EFI, and
-when you get to the prompt it will look like this:<br>
+<p class="build-step-details"><big>You should see DEBUG prints from
+EFI, and
+when you get to the prompt it will look like this:</big><br>
 </p>
 <pre class="build-step-code"><big><span style="font-family: monospace;">Embedded Boot Loader (EBL) prototype. Built at 16:18:20 on Dec 9 2009</span><br><span
  style="font-family: monospace;">THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN 'AS IS' BASIS,</span><br><span
@@ -330,11 +339,12 @@ when you get to the prompt it will look like this:<br>
  style="font-family: monospace;">BeagleEdk2&gt;</span></big><big><big><span
  style="font-family: monospace;"></span></big></big></pre>
 <p class="build-step-details"><br>
-If your Beagle Board has u-boot in the NAND you don't need to make the
+<big>If your Beagle Board has u-boot in the NAND you don't need to make
+the
 SD card bootable via u-boot. You can just copy Beagle
 Board_EFI_flashboot.fd to the SD card.<br>
 It should also be possible to boot EFI from USB using the following
-U-Boot commands:<br>
+U-Boot commands:</big><br>
 </p>
 <pre class="build-step-code">OMAP3 beagleboard.org # <big><big><span
  style="font-family: monospace;">usb reset</span></big></big><br>OMAP3 beagleboard.org # <big><big><span
@@ -344,69 +354,75 @@ U-Boot commands:<br>
  style="font-family: monospace;"><br></span></big></big></pre>
 <p class="build-step-details"><br>
 </p>
-<h2 class="main-title">Put edk2 code in the Beagle Board NAND using EBL<br>
-</h2>
-<h3 class="build-step-title"> </h3>
-<p class="build-step-details">Step #1:<br>
+<h2 class="main-title"><big>Put edk2 code in the Beagle Board NAND
+using EBL<br>
+</big></h2>
+<h3 class="build-step-title"><big> </big></h3>
+<p class="build-step-details"><big>Step #1:<br>
 Copy
 edk2\Build\BeagleB​oard\DEBUG_RVCT31CY​GWIN\FV\BeagleBoar​
 d_EFI_flashboot.fd to a MMC/SD card<br>
-</p>
-<p class="build-step-details">Step #2:<br>
+</big></p>
+<p class="build-step-details"><big>Step #2:<br>
 Place SD card back in Beagle Board<br>
 Boot EFI on the Beagle Board (power cycle if you have it in NAND for
 example)<br>
-</p>
-<p class="build-step-details">Step #3:<br>
-Use the EFI EBL to flash the image<br>
+</big></p>
+<p class="build-step-details"><big>Step #3:<br>
+Use the EFI EBL to flash the image</big><br>
 </p>
 <pre class="build-step-code">BeagleEdk2&gt; <big><big><span
  style="font-family: monospace;">cp fs1:\Beagle Board_EFI_flashboot.fd blk0:</span></big></big>                </pre>
 <p class="build-step-details"><br>
 </p>
-<h2 class="main-title"> Get the edk2 source tree and build
-BeagleBoardPkg in Windows<small><small><sup>TM</sup></small></small>
+<h2 class="main-title"> <big>Get the edk2 source tree and build
+BeagleBoardPkg in Windows</big><small><sup>TM</sup></small><big>
 DOS Box<br>
-</h2>
-<h3 class="build-step-title">Assumptions
-</h3>
-<h3 class="build-step-title"> </h3>
-<p class="build-step-details"> The following instructions assume you
+</big></h2>
+<h3 class="build-step-title"><big>Assumptions
+</big></h3>
+<h3 class="build-step-title"><big> </big></h3>
+<p class="build-step-details"><big> The following instructions assume
+you
 have the ARM RealView Development Suite v3.1 and Subversion&nbsp;
 installed
 on Windows. Other versions of the RealView Development Suite should
 work, but only v3.1 and v4.0 have been tested.<br>
-</p>
-<p class="build-step-details">If you don't have Cygwin installed you
+</big></p>
+<p class="build-step-details"><big>If you don't have Cygwin installed
+you
 can't use the build.sh Bash script in the BeagleBoardPkg directory.
 Building on Windows is a little simpler as binary versions of all the
 tools are checked in, but if you don't run the build.sh script the
 RealView Debugger scripts will not be created.<br>
-</p>
-<h3 class="build-step-title"> </h3>
-<p class="build-step-details"> If you use the command line version of
+</big></p>
+<h3 class="build-step-title"><big> </big></h3>
+<p class="build-step-details"><big> If you use the command line version
+of
 subversion, then you can easily checkout the edk2 to the <font
  class="monospace">C:\edk2</font> directory with the following command:
-</p>
+</big></p>
 <pre class="build-step-code">C:\&gt; <b>svn co https://edk2.tianocore.org/svn/edk2/trunk/edk2 C:\edk2 --username guest</b><br>C:\&gt; <b>cd C:\edk2</b><br>C:\edk2&gt; <b>svn co fat-driver2.tianocore.org/svn/fat-driver2/trunk/FatPkg FatPkg --username guest</b><br></pre>
 <h3 class="build-step-title"> </h3>
-<h3 class="build-step-title">Setup the build shell environment for
+<h3 class="build-step-title"><big>Setup the build shell environment for
 Windows DOS box<br>
-</h3>
-<h3 class="build-step-title"> </h3>
-<p class="build-step-details">You only need to do this when you open a
-new shell window.<br>
+</big></h3>
+<h3 class="build-step-title"><big> </big></h3>
+<p class="build-step-details"><big>You only need to do this when you
+open a
+new shell window.</big><br>
 </p>
 <pre class="build-step-code">C:\&gt; <b>cd C:\edk2</b><br>C:\edk2&gt; <b>edksetup.bat</b><br></pre>
-<h3 class="build-step-title"> Build the Beagle Board Package
-</h3>
+<h3 class="build-step-title"><big> Build the Beagle Board Package
+</big></h3>
 <pre class="build-step-code">C:\edk2&gt; <b>build -p BeagleBoardPkg\BeagleBoardPkg.dsc -a ARM -t RVCT31</b><br></pre>
-<p class="build-step-details"> As a tangible result of the build, the
+<p class="build-step-details"> <big>As a tangible result of the build,
+the
 FLASH image for the Beagle Board will end up in
 c:\edk2\Build\BeagleBoa​rd\DEBUG_RVCT31\FV\Beagle Board_EFI​
 _flashboot.fd.<br>
-</p>
-<p class="build-step-details">Note: You may get a build error that
+</big></p>
+<p class="build-step-details"><big>Note: You may get a build error that
 looks like:<br>
 NMAKE : fatal error U1077: '"c:/Program
 Files/ARM/RVCT/Programs/3.1/761/win_32-pentium/armcc"' : return code
@@ -420,7 +436,7 @@ environment. It is copied from edk2\BaseTools\Con​f\tools_def.template​
 that is checked into source
 control. You can make local edits to the .txt version and not worry
 about accidentally checking it in to source control.<br>
-</p>
+</big></p>
 <p class="build-step-details"><br>
 </p>
 <br>
