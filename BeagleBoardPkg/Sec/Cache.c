@@ -38,13 +38,10 @@ InitCache (
   IN  UINT32  MemoryLength
   )
 {
-  UINTN                         UncachedMemoryMask;
   UINT32                        CacheAttributes;
   ARM_MEMORY_REGION_DESCRIPTOR  MemoryTable[5];
   VOID                          *TranslationTableBase;
   UINTN                         TranslationTableSize;
-
-  UncachedMemoryMask = PcdGet64(PcdArmUncachedMemoryMask);
 
   if (FeaturePcdGet(PcdCacheEnable) == TRUE) {
     CacheAttributes = DDR_ATTRIBUTES_CACHED;
