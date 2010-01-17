@@ -292,7 +292,7 @@ UncachedFreeAlignedPages (
   Status = gVirtualUncachedPages->RevertPages (gVirtualUncachedPages, Memory, Pages * EFI_PAGE_SIZE, PcdGet64 (PcdArmUncachedMemoryMask), gAttributes);
 
   
-  Status = gBS->FreePages ((EFI_PHYSICAL_ADDRESS) (UINTN) Buffer, Pages);
+  Status = gBS->FreePages ((EFI_PHYSICAL_ADDRESS) (UINTN) Memory, Pages);
   ASSERT_EFI_ERROR (Status);
 }
 

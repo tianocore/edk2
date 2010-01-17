@@ -440,36 +440,37 @@ UpdatePageEntries (
 
   // EntryMask: bitmask of values to change (1 = change this value, 0 = leave alone)
   // EntryValue: values at bit positions specified by EntryMask
-
+  EntryMask = ARM_PAGE_DESC_TYPE_MASK;
+  EntryValue = ARM_PAGE_TYPE_SMALL;
   // Although the PI spec is unclear on this the GCD guarantees that only
   // one Attribute bit is set at a time, so we can safely use a switch statement
   switch (Attributes) {
     case EFI_MEMORY_UC:
       // modify cacheability attributes
-      EntryMask = ARM_SMALL_PAGE_TEX_MASK | ARM_PAGE_C | ARM_PAGE_B;
+      EntryMask |= ARM_SMALL_PAGE_TEX_MASK | ARM_PAGE_C | ARM_PAGE_B;
       // map to strongly ordered
-      EntryValue = 0; // TEX[2:0] = 0, C=0, B=0
+      EntryValue |= 0; // TEX[2:0] = 0, C=0, B=0
       break;
 
     case EFI_MEMORY_WC:
       // modify cacheability attributes
-      EntryMask = ARM_SMALL_PAGE_TEX_MASK | ARM_PAGE_C | ARM_PAGE_B;
+      EntryMask |= ARM_SMALL_PAGE_TEX_MASK | ARM_PAGE_C | ARM_PAGE_B;
       // map to normal non-cachable
-      EntryValue = (0x1 << ARM_SMALL_PAGE_TEX_SHIFT); // TEX [2:0]= 001 = 0x2, B=0, C=0
+      EntryValue |= (0x1 << ARM_SMALL_PAGE_TEX_SHIFT); // TEX [2:0]= 001 = 0x2, B=0, C=0
       break;
 
     case EFI_MEMORY_WT:
       // modify cacheability attributes
-      EntryMask = ARM_SMALL_PAGE_TEX_MASK | ARM_PAGE_C | ARM_PAGE_B;
+      EntryMask |= ARM_SMALL_PAGE_TEX_MASK | ARM_PAGE_C | ARM_PAGE_B;
       // write through with no-allocate
-      EntryValue = ARM_PAGE_C; // TEX [2:0] = 0, C=1, B=0
+      EntryValue |= ARM_PAGE_C; // TEX [2:0] = 0, C=1, B=0
       break;
 
     case EFI_MEMORY_WB:
       // modify cacheability attributes
-      EntryMask = ARM_SMALL_PAGE_TEX_MASK | ARM_PAGE_C | ARM_PAGE_B;
+      EntryMask |= ARM_SMALL_PAGE_TEX_MASK | ARM_PAGE_C | ARM_PAGE_B;
       // write back (with allocate)
-      EntryValue = (0x1 << ARM_SMALL_PAGE_TEX_SHIFT) | ARM_PAGE_C | ARM_PAGE_B; // TEX [2:0] = 001, C=1, B=1
+      EntryValue |= (0x1 << ARM_SMALL_PAGE_TEX_SHIFT) | ARM_PAGE_C | ARM_PAGE_B; // TEX [2:0] = 001, C=1, B=1
       break;
 
     case EFI_MEMORY_WP:
@@ -477,8 +478,7 @@ UpdatePageEntries (
     case EFI_MEMORY_UCE:
       // cannot be implemented UEFI definition unclear for ARM
       // Cause a page fault if these ranges are accessed.
-      EntryMask   = 0x3;
-      EntryValue = 0;
+      EntryValue = ARM_PAGE_TYPE_FAULT;
       DEBUG ((EFI_D_PAGE, "SetMemoryAttributes(): setting page %lx with unsupported attribute %x will page fault on access\n", BaseAddress, Attributes));
       break;
 
@@ -861,8 +861,9 @@ CpuReconvertPagesPages (
   )
 {
   EFI_STATUS      Status;
-  
-  //
+DEBUG ((EFI_D_ERROR, "CpuReconvertPagesPages(%lx, %x, %lx, %lx)\n", Address, Length, VirtualMask, Attributes));
+ASSERT (FALSE);
+//
   // Unmap the alaised Address
   //
   Status = SetMemoryAttributes (Address | VirtualMask, Length, EFI_MEMORY_WP, 0);

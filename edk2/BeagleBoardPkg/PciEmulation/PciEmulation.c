@@ -318,12 +318,7 @@ PciIoUnmap (
     // Make sure we read buffer from uncached memory and not the cache
     //
     gCpu->FlushDataCache (gCpu, Map->HostAddress, Map->NumberOfBytes, EfiCpuFlushTypeInvalidate);
-  } else if (Map->Operation == EfiPciOperationBusMasterCommonBuffer) {
-    //
-    // CPU was using uncached address, so anything in the cached range is bogus
-    //
-    gCpu->FlushDataCache (gCpu, Map->DeviceAddress, Map->NumberOfBytes, EfiCpuFlushTypeInvalidate);   
-  }
+  } 
   
   FreePool (Map);
 
