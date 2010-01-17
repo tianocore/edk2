@@ -117,7 +117,7 @@ Returns:
   //
   // Set the position
   //
-  if (Position == -1) {
+  if (Position == (UINT64)-1) {
     Position = OFile->FileSize;
   }
   //
