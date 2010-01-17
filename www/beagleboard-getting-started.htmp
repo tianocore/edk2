@@ -113,7 +113,7 @@ subversion, then you can easily checkout the edk2 and source to the
 FAT32 driver to the <font class="monospace">/cygdrive/c/edk2</font>
 directory with the following commands:
 </big></p>
-<pre class="build-step-code">/cygdrive/c$ <b>svn co https://edk2.tianocore.org/svn/edk2/trunk/edk2 edk2 --username guest</b><br>/cygdrive/c$ <b>cd edk2</b><br>/cygdrive/c/edk2$ <b>svn co fat-driver2.tianocore.org/svn/fat-driver2/trunk/FatPkg FatPkg --username guest</b><br></pre>
+<pre class="build-step-code">/cygdrive/c$ <b>svn co https://edk2.tianocore.org/svn/edk2/trunk/edk2 edk2 --username guest</b><br>/cygdrive/c$ <b>cd edk2</b><br>/cygdrive/c/edk2$ <b>svn co </b><b><b>https://</b></b><b>fat-driver2.tianocore.org/svn/fat-driver2/trunk/FatPkg FatPkg --username guest</b><br></pre>
 <h3 class="build-step-title"> </h3>
 <h3 class="build-step-title"> </h3>
 <h3 class="build-step-title"> <big>Build the Beagle Board Package
@@ -402,7 +402,7 @@ of
 subversion, then you can easily checkout the edk2 to the <font
  class="monospace">C:\edk2</font> directory with the following command:
 </big></p>
-<pre class="build-step-code">C:\&gt; <b>svn co https://edk2.tianocore.org/svn/edk2/trunk/edk2 C:\edk2 --username guest</b><br>C:\&gt; <b>cd C:\edk2</b><br>C:\edk2&gt; <b>svn co fat-driver2.tianocore.org/svn/fat-driver2/trunk/FatPkg FatPkg --username guest</b><br></pre>
+<pre class="build-step-code">C:\&gt; <b>svn co https://edk2.tianocore.org/svn/edk2/trunk/edk2 C:\edk2 --username guest</b><br>C:\&gt; <b>cd C:\edk2</b><br>C:\edk2&gt; <b>svn co </b><b><b>https://</b></b><b>fat-driver2.tianocore.org/svn/fat-driver2/trunk/FatPkg FatPkg --username guest</b><br></pre>
 <h3 class="build-step-title"> </h3>
 <h3 class="build-step-title"><big>Setup the build shell environment for
 Windows DOS box<br>
@@ -422,6 +422,18 @@ FLASH image for the Beagle Board will end up in
 c:\edk2\Build\BeagleBoa​rd\DEBUG_RVCT31\FV\Beagle Board_EFI​
 _flashboot.fd.<br>
 </big></p>
+<p class="build-step-details"><big><span
+ style="color: rgb(255, 102, 102);">WARNING: This image can not run
+from NAND</span><br>
+</big></p>
+<p class="build-step-details"><big>Beagle Board_EFI​
+_flashboot.fd needs to be patched with the
+edk2\BeagleBoardPkg\Tools\generate_image tool so it contains the
+information needed by the Beagle Board mask ROM. The generate_image
+tool has not yet been ported to Windows. </big><big>Beagle Board_EFI​
+_flashboot.fd can still be booted from DRAM using the RealView Debugger
+or U-Boot.&nbsp;</big>
+</p>
 <p class="build-step-details"><big>Note: You may get a build error that
 looks like:<br>
 NMAKE : fatal error U1077: '"c:/Program
