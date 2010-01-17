@@ -209,7 +209,7 @@ following is an example of the first prints that come out of the SEC
 code. You can cut the load command and past it directly into the RVD
 Cmd window to source level debug the SEC.<br>
 </p>
-<pre class="build-step-code">UART Enabled<br>load /a /ni /np c:\work\edk2\Build\BeagleBoard\DEBUG_RVCT31CYGWIN\ARM\BeagleBoardPkg\Sec\Sec\DEBUG\BeagleBoardSec.dll &amp;0x80008360</pre>
+<pre style="font-family: monospace;" class="build-step-code"><big>UART Enabled<br>load /a /ni /np c:\work\edk2\Build\BeagleBoard\DEBUG_RVCT31CYGWIN\ARM\BeagleBoardPkg\Sec\Sec\DEBUG\BeagleBoardSec.dll &amp;0x80008360</big></pre>
 <p class="build-step-details"><br>
 </p>
 <h2 class="main-title">Put edk2 code in the Beagle Board NAND using
