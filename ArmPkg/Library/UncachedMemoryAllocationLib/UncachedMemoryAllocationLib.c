@@ -207,7 +207,7 @@ UncachedInternalAllocateAlignedPages (
   }
   
   if (AlignedMemory != 0) {
-    FlushCache(AlignedMemory, EFI_PAGES_TO_SIZE(Pages));
+    FlushCache (AlignedMemory, EFI_PAGES_TO_SIZE(Pages));
     AlignedMemory = (UINTN)ConvertToUncachedAddress((VOID *)AlignedMemory);
   }
   
@@ -318,7 +318,7 @@ UncachedInternalAllocateAlignedPool (
   *FreePointer        = RawAddress;
 
   if (AlignedAddress != 0) {
-    FlushCache(AlignedAddress, AllocationSize);
+    FlushCache (AlignedAddress, AllocationSize);
     AlignedAddress = (UINTN)ConvertToUncachedAddress((VOID *)AlignedAddress);
   }
 
