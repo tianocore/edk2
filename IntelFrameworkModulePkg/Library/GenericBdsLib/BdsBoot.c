@@ -567,7 +567,9 @@ BdsExpandPartitionPartialDevicePathToFull (
 
           TempNewDevicePath = CachedDevicePath;
           CachedDevicePath = AppendDevicePathInstance (BlockIoDevicePath, CachedDevicePath);
-          FreePool(TempNewDevicePath);
+          if (TempNewDevicePath != NULL) {
+            FreePool(TempNewDevicePath);
+          }
         } else {
           TempNewDevicePath = CachedDevicePath;
           CachedDevicePath = AppendDevicePathInstance (BlockIoDevicePath, CachedDevicePath);
@@ -616,7 +618,9 @@ BdsExpandPartitionPartialDevicePathToFull (
     }
   }
 
-  FreePool (CachedDevicePath);
+  if (CachedDevicePath != NULL) {
+    FreePool (CachedDevicePath);
+  }
   if (BlockIoBuffer != NULL) {
     FreePool (BlockIoBuffer);
   }
