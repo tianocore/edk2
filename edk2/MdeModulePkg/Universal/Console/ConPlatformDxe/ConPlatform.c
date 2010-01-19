@@ -2,7 +2,7 @@
   Console Platform DXE Driver, install Console Device Guids and update Console
   Environment Variables.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -263,7 +263,7 @@ ConPlatformTextInDriverBindingStart (
   Status = ConPlatformUpdateDeviceVariable (
              L"ConIn",
              DevicePath,
-             CHECK
+             Check
              );
   if (!EFI_ERROR (Status)) {
     IsInConInVariable = TRUE;
@@ -289,7 +289,7 @@ ConPlatformTextInDriverBindingStart (
       ConPlatformUpdateDeviceVariable (
         L"ConInDev",
         DevicePath,
-        APPEND
+        Append
         );
     }
   } else {
@@ -300,7 +300,7 @@ ConPlatformTextInDriverBindingStart (
     ConPlatformUpdateDeviceVariable (
       L"ConInDev",
       DevicePath,
-      APPEND
+      Append
       );
 
     //
@@ -399,7 +399,7 @@ ConPlatformTextOutDriverBindingStart (
   Status = ConPlatformUpdateDeviceVariable (
              L"ConOut",
              DevicePath,
-             CHECK
+             Check
              );
   if (!EFI_ERROR (Status)) {
     IsInConOutVariable = TRUE;
@@ -409,7 +409,7 @@ ConPlatformTextOutDriverBindingStart (
   Status = ConPlatformUpdateDeviceVariable (
              L"ErrOut",
              DevicePath,
-             CHECK
+             Check
              );
   if (!EFI_ERROR (Status)) {
     IsInErrOutVariable = TRUE;
@@ -435,7 +435,7 @@ ConPlatformTextOutDriverBindingStart (
       ConPlatformUpdateDeviceVariable (
         L"ConOutDev",
         DevicePath,
-        APPEND
+        Append
         );
     }
     //
@@ -445,7 +445,7 @@ ConPlatformTextOutDriverBindingStart (
       ConPlatformUpdateDeviceVariable (
         L"ErrOutDev",
         DevicePath,
-        APPEND
+        Append
         );
     }
   } else {
@@ -456,7 +456,7 @@ ConPlatformTextOutDriverBindingStart (
     ConPlatformUpdateDeviceVariable (
       L"ConOutDev",
       DevicePath,
-      APPEND
+      Append
       );
     //
     // Then append the device path to the ErrOutDev environment variable
@@ -464,7 +464,7 @@ ConPlatformTextOutDriverBindingStart (
     ConPlatformUpdateDeviceVariable (
       L"ErrOutDev",
       DevicePath,
-      APPEND
+      Append
       );
 
     //
@@ -554,7 +554,7 @@ ConPlatformTextInDriverBindingStop (
     ConPlatformUpdateDeviceVariable (
       L"ConInDev",
       DevicePath,
-      DELETE
+      Delete
       );
   }
 
@@ -625,12 +625,12 @@ ConPlatformTextOutDriverBindingStop (
     ConPlatformUpdateDeviceVariable (
       L"ConOutDev",
       DevicePath,
-      DELETE
+      Delete
       );
     ConPlatformUpdateDeviceVariable (
       L"ErrOutDev",
       DevicePath,
-      DELETE
+      Delete
       );
   }
 
@@ -901,7 +901,7 @@ ConPlatformUpdateDeviceVariable (
   //
   VariableDevicePath = ConPlatformGetVariable (VariableName);
 
-  if (Operation != DELETE) {
+  if (Operation != Delete) {
     //
     // Match specified DevicePath in Console Variable.
     // 
@@ -912,7 +912,7 @@ ConPlatformUpdateDeviceVariable (
                FALSE
                );
 
-    if ((Operation == CHECK) || (!EFI_ERROR (Status))) {
+    if ((Operation == Check) || (!EFI_ERROR (Status))) {
       //
       // Branch here includes 2 cases:
       // 1. Operation is CHECK, simply return Status.

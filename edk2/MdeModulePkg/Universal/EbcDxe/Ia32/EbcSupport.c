@@ -2,7 +2,7 @@
   This module contains EBC support routines that are customized based on
   the target processor.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -108,11 +108,11 @@ Action:
     // put our return address and frame pointer on the VM stack.
     // Then set the VM's IP to new EBC code.
     //
-    VmPtr->R[0] -= 8;
-    VmWriteMemN (VmPtr, (UINTN) VmPtr->R[0], (UINTN) FramePtr);
-    VmPtr->FramePtr = (VOID *) (UINTN) VmPtr->R[0];
-    VmPtr->R[0] -= 8;
-    VmWriteMem64 (VmPtr, (UINTN) VmPtr->R[0], (UINT64) (UINTN) (VmPtr->Ip + Size));
+    VmPtr->Gpr[0] -= 8;
+    VmWriteMemN (VmPtr, (UINTN) VmPtr->Gpr[0], (UINTN) FramePtr);
+    VmPtr->FramePtr = (VOID *) (UINTN) VmPtr->Gpr[0];
+    VmPtr->Gpr[0] -= 8;
+    VmWriteMem64 (VmPtr, (UINTN) VmPtr->Gpr[0], (UINT64) (UINTN) (VmPtr->Ip + Size));
 
     VmPtr->Ip = (VMIP) (UINTN) TargetEbcAddr;
   } else {
@@ -124,7 +124,7 @@ Action:
     //
     // Get return value and advance the IP.
     //
-    VmPtr->R[7] = EbcLLGetReturnValue ();
+    VmPtr->Gpr[7] = EbcLLGetReturnValue ();
     VmPtr->Ip += Size;
   }
 }
@@ -218,55 +218,55 @@ EbcInterpret (
     return Status;
   }
   VmContext.StackTop = (UINT8*)VmContext.StackPool + (STACK_REMAIN_SIZE);
-  VmContext.R[0] = (UINT64)(UINTN) ((UINT8*)VmContext.StackPool + STACK_POOL_SIZE);
-  VmContext.HighStackBottom = (UINTN)VmContext.R[0];
-  VmContext.R[0] &= ~(sizeof (UINTN) - 1);
-  VmContext.R[0] -= sizeof (UINTN);
+  VmContext.Gpr[0] = (UINT64)(UINTN) ((UINT8*)VmContext.StackPool + STACK_POOL_SIZE);
+  VmContext.HighStackBottom = (UINTN)VmContext.Gpr[0];
+  VmContext.Gpr[0] &= ~(sizeof (UINTN) - 1);
+  VmContext.Gpr[0] -= sizeof (UINTN);
 
   //
   // Put a magic value in the stack gap, then adjust down again
   //
-  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) VM_STACK_KEY_VALUE;
-  VmContext.StackMagicPtr             = (UINTN *) (UINTN) VmContext.R[0];
-  VmContext.LowStackTop   = (UINTN) VmContext.R[0];
+  *(UINTN *) (UINTN) (VmContext.Gpr[0]) = (UINTN) VM_STACK_KEY_VALUE;
+  VmContext.StackMagicPtr             = (UINTN *) (UINTN) VmContext.Gpr[0];
+  VmContext.LowStackTop   = (UINTN) VmContext.Gpr[0];
 
   //
   // For IA32, this is where we say our return address is
   //
-  VmContext.R[0] -= sizeof (UINTN);
-  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg16;
-  VmContext.R[0] -= sizeof (UINTN);
-  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg15;
-  VmContext.R[0] -= sizeof (UINTN);
-  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg14;
-  VmContext.R[0] -= sizeof (UINTN);
-  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg13;
-  VmContext.R[0] -= sizeof (UINTN);
-  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg12;
-  VmContext.R[0] -= sizeof (UINTN);
-  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg11;
-  VmContext.R[0] -= sizeof (UINTN);
-  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg10;
-  VmContext.R[0] -= sizeof (UINTN);
-  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg9;
-  VmContext.R[0] -= sizeof (UINTN);
-  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg8;
-  VmContext.R[0] -= sizeof (UINTN);
-  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg7;
-  VmContext.R[0] -= sizeof (UINTN);
-  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg6;
-  VmContext.R[0] -= sizeof (UINTN);
-  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg5;
-  VmContext.R[0] -= sizeof (UINTN);
-  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg4;
-  VmContext.R[0] -= sizeof (UINTN);
-  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg3;
-  VmContext.R[0] -= sizeof (UINTN);
-  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg2;
-  VmContext.R[0] -= sizeof (UINTN);
-  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) Arg1;
-  VmContext.R[0] -= 16;
-  VmContext.StackRetAddr  = (UINT64) VmContext.R[0];
+  VmContext.Gpr[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.Gpr[0]) = (UINTN) Arg16;
+  VmContext.Gpr[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.Gpr[0]) = (UINTN) Arg15;
+  VmContext.Gpr[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.Gpr[0]) = (UINTN) Arg14;
+  VmContext.Gpr[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.Gpr[0]) = (UINTN) Arg13;
+  VmContext.Gpr[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.Gpr[0]) = (UINTN) Arg12;
+  VmContext.Gpr[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.Gpr[0]) = (UINTN) Arg11;
+  VmContext.Gpr[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.Gpr[0]) = (UINTN) Arg10;
+  VmContext.Gpr[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.Gpr[0]) = (UINTN) Arg9;
+  VmContext.Gpr[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.Gpr[0]) = (UINTN) Arg8;
+  VmContext.Gpr[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.Gpr[0]) = (UINTN) Arg7;
+  VmContext.Gpr[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.Gpr[0]) = (UINTN) Arg6;
+  VmContext.Gpr[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.Gpr[0]) = (UINTN) Arg5;
+  VmContext.Gpr[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.Gpr[0]) = (UINTN) Arg4;
+  VmContext.Gpr[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.Gpr[0]) = (UINTN) Arg3;
+  VmContext.Gpr[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.Gpr[0]) = (UINTN) Arg2;
+  VmContext.Gpr[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.Gpr[0]) = (UINTN) Arg1;
+  VmContext.Gpr[0] -= 16;
+  VmContext.StackRetAddr  = (UINT64) VmContext.Gpr[0];
 
   //
   // We need to keep track of where the EBC stack starts. This way, if the EBC
@@ -291,7 +291,7 @@ EbcInterpret (
   // Return the value in R[7] unless there was an error
   //
   ReturnEBCStack(StackIndex);
-  return (UINT64) VmContext.R[7];
+  return (UINT64) VmContext.Gpr[7];
 }
 
 
@@ -360,28 +360,28 @@ ExecuteEbcImageEntryPoint (
     return Status;
   }
   VmContext.StackTop = (UINT8*)VmContext.StackPool + (STACK_REMAIN_SIZE);
-  VmContext.R[0] = (UINT64)(UINTN) ((UINT8*)VmContext.StackPool + STACK_POOL_SIZE);
-  VmContext.HighStackBottom = (UINTN)VmContext.R[0];
-  VmContext.R[0] -= sizeof (UINTN);
+  VmContext.Gpr[0] = (UINT64)(UINTN) ((UINT8*)VmContext.StackPool + STACK_POOL_SIZE);
+  VmContext.HighStackBottom = (UINTN)VmContext.Gpr[0];
+  VmContext.Gpr[0] -= sizeof (UINTN);
 
   //
   // Put a magic value in the stack gap, then adjust down again
   //
-  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) VM_STACK_KEY_VALUE;
-  VmContext.StackMagicPtr             = (UINTN *) (UINTN) VmContext.R[0];
+  *(UINTN *) (UINTN) (VmContext.Gpr[0]) = (UINTN) VM_STACK_KEY_VALUE;
+  VmContext.StackMagicPtr             = (UINTN *) (UINTN) VmContext.Gpr[0];
 
   //
   // Align the stack on a natural boundary
-  //  VmContext.R[0] &= ~(sizeof(UINTN) - 1);
+  //  VmContext.Gpr[0] &= ~(sizeof(UINTN) - 1);
   //
-  VmContext.LowStackTop   = (UINTN) VmContext.R[0];
-  VmContext.R[0] -= sizeof (UINTN);
-  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) SystemTable;
-  VmContext.R[0] -= sizeof (UINTN);
-  *(UINTN *) (UINTN) (VmContext.R[0]) = (UINTN) ImageHandle;
+  VmContext.LowStackTop   = (UINTN) VmContext.Gpr[0];
+  VmContext.Gpr[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.Gpr[0]) = (UINTN) SystemTable;
+  VmContext.Gpr[0] -= sizeof (UINTN);
+  *(UINTN *) (UINTN) (VmContext.Gpr[0]) = (UINTN) ImageHandle;
 
-  VmContext.R[0] -= 16;
-  VmContext.StackRetAddr  = (UINT64) VmContext.R[0];
+  VmContext.Gpr[0] -= 16;
+  VmContext.StackRetAddr  = (UINT64) VmContext.Gpr[0];
   //
   // VM pushes 16-bytes for return address. Simulate that here.
   //
@@ -394,7 +394,7 @@ ExecuteEbcImageEntryPoint (
   //
   // Return the value in R[7] unless there was an error
   //
-  return (UINT64) VmContext.R[7];
+  return (UINT64) VmContext.Gpr[7];
 }
 
 

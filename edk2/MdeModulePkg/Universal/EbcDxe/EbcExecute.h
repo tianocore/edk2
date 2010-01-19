@@ -3,7 +3,7 @@
   be of use to a disassembler for the most part. Also provides function
   prototypes for VM functions.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -125,8 +125,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define OPERAND1_CHAR(op)         ('0' + OPERAND1_REGNUM (op))
 #define OPERAND2_CHAR(op)         ('0' + OPERAND2_REGNUM (op))
 
-#define OPERAND1_REGDATA(pvm, op) pvm->R[OPERAND1_REGNUM (op)]
-#define OPERAND2_REGDATA(pvm, op) pvm->R[OPERAND2_REGNUM (op)]
+#define OPERAND1_REGDATA(pvm, op) pvm->Gpr[OPERAND1_REGNUM (op)]
+#define OPERAND2_REGDATA(pvm, op) pvm->Gpr[OPERAND2_REGNUM (op)]
 
 //
 // Condition masks usually for byte 1 encodings of code

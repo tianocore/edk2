@@ -2,7 +2,7 @@
 
   The definition for UHCI driver model and HC protocol routines.
 
-Copyright (c) 2004 - 2009, Intel Corporation
+Copyright (c) 2004 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -45,38 +45,39 @@ typedef struct _USB_HC_DEV  USB_HC_DEV;
 #include "UhciDebug.h"
 #include "ComponentName.h"
 
-typedef enum {
-  UHC_1_MICROSECOND             = 1,
-  UHC_1_MILLISECOND             = 1000 * UHC_1_MICROSECOND,
-  UHC_1_SECOND                  = 1000 * UHC_1_MILLISECOND,
+//
+// UHC timeout experience values
+//
 
-  //
-  // UHCI register operation timeout, set by experience
-  //
-  UHC_GENERIC_TIMEOUT           = UHC_1_SECOND,
+#define UHC_1_MICROSECOND             1
+#define UHC_1_MILLISECOND             (1000 * UHC_1_MICROSECOND)
+#define UHC_1_SECOND                  (1000 * UHC_1_MILLISECOND)
 
-  //
-  // Wait for force global resume(FGR) complete, refers to
-  // specification[UHCI11-2.1.1]
-  //
-  UHC_FORCE_GLOBAL_RESUME_STALL = 20 * UHC_1_MILLISECOND,
+//
+// UHCI register operation timeout, set by experience
+//
+#define UHC_GENERIC_TIMEOUT           UHC_1_SECOND
 
-  //
-  // Wait for roothub port reset and recovery, reset stall
-  // is set by experience, and recovery stall refers to
-  // specification[UHCI11-2.1.1]
-  //
-  UHC_ROOT_PORT_RESET_STALL     = 50 * UHC_1_MILLISECOND,
-  UHC_ROOT_PORT_RECOVERY_STALL  = 10 * UHC_1_MILLISECOND,
+//
+// Wait for force global resume(FGR) complete, refers to
+// specification[UHCI11-2.1.1]
+//
+#define UHC_FORCE_GLOBAL_RESUME_STALL (20 * UHC_1_MILLISECOND)
 
-  //
-  // Sync and Async transfer polling interval, set by experience,
-  // and the unit of Async is 100us.
-  //
-  UHC_SYNC_POLL_INTERVAL        = 1 * UHC_1_MILLISECOND,
-  UHC_ASYNC_POLL_INTERVAL       = 50 * 10000UL
-}UHC_TIMEOUT_EXPERIENCE_VALUE;
+//
+// Wait for roothub port reset and recovery, reset stall
+// is set by experience, and recovery stall refers to
+// specification[UHCI11-2.1.1]
+//
+#define UHC_ROOT_PORT_RESET_STALL     (50 * UHC_1_MILLISECOND)
+#define UHC_ROOT_PORT_RECOVERY_STALL  (10 * UHC_1_MILLISECOND)
 
+//
+// Sync and Async transfer polling interval, set by experience,
+// and the unit of Async is 100us.
+//
+#define UHC_SYNC_POLL_INTERVAL        (1 * UHC_1_MILLISECOND)
+#define UHC_ASYNC_POLL_INTERVAL       (50 * 10000UL)
 
 //
 // UHC raises TPL to TPL_NOTIFY to serialize all its operations
@@ -88,7 +89,7 @@ typedef enum {
 
 #pragma pack(1)
 typedef struct {
-  UINT8               PI;
+  UINT8               ProgInterface;
   UINT8               SubClassCode;
   UINT8               BaseCode;
 } USB_CLASSC;

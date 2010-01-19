@@ -1,7 +1,7 @@
 /** @file
   IPF specific types, macros, and definitions for Debug Support Driver.
 
-Copyright (c) 2004 - 2008, Intel Corporation
+Copyright (c) 2004 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -31,9 +31,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define EFI_ISA IsaIpf
 
 typedef struct {
-  UINT64  low;
-  UINT64  high;
+  UINT64  Low;
+  UINT64  High;
 } BUNDLE;
+
+typedef
+VOID
+(*CALLBACK_FUNC) (
+  );
 
 /**
   IPF specific DebugSupport driver initialization.
@@ -250,7 +255,7 @@ EFI_STATUS
 ManageIvtEntryTable (
   IN  EFI_EXCEPTION_TYPE    ExceptionType,
   IN  BUNDLE                NewBundles[4],
-  IN  VOID                  (*NewCallback) ()
+  IN  CALLBACK_FUNC         NewCallback
   );
 
 /**
@@ -266,7 +271,7 @@ VOID
 HookEntry (
   IN  EFI_EXCEPTION_TYPE    ExceptionType,
   IN  BUNDLE                NewBundles[4],
-  IN  VOID                  (*NewCallback) ()
+  IN  CALLBACK_FUNC         NewCallback
   );
 
 /**
@@ -290,7 +295,7 @@ UnhookEntry (
 **/
 VOID
 ChainExternalInterrupt (
-  IN  VOID                  (*NewCallback) ()
+  IN  CALLBACK_FUNC         NewCallback
   );
 
 /**

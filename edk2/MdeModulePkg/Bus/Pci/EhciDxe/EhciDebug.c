@@ -2,7 +2,7 @@
 
   This file provides the information dump support for EHCI when in debug mode.
 
-Copyright (c) 2007 - 2009, Intel Corporation
+Copyright (c) 2007 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -105,7 +105,7 @@ EhcDumpQtd (
 
   DEBUG ((EFI_D_INFO, "Error Count  : %d\n", QtdHw->ErrCnt));
   DEBUG ((EFI_D_INFO, "Current Page : %d\n", QtdHw->CurPage));
-  DEBUG ((EFI_D_INFO, "IOC          : %d\n", QtdHw->IOC));
+  DEBUG ((EFI_D_INFO, "IOC          : %d\n", QtdHw->Ioc));
   DEBUG ((EFI_D_INFO, "Total Bytes  : %d\n", QtdHw->TotalBytes));
   DEBUG ((EFI_D_INFO, "Data Toggle  : %d\n", QtdHw->DataToggle));
 
@@ -181,7 +181,7 @@ EhcDumpQh (
 
   DEBUG ((EFI_D_INFO, "Error Count   : %d\n", QhHw->ErrCnt));
   DEBUG ((EFI_D_INFO, "Current Page  : %d\n", QhHw->CurPage));
-  DEBUG ((EFI_D_INFO, "IOC           : %d\n", QhHw->IOC));
+  DEBUG ((EFI_D_INFO, "IOC           : %d\n", QhHw->Ioc));
   DEBUG ((EFI_D_INFO, "Total Bytes   : %d\n", QhHw->TotalBytes));
   DEBUG ((EFI_D_INFO, "Data Toggle   : %d\n", QhHw->DataToggle));
 

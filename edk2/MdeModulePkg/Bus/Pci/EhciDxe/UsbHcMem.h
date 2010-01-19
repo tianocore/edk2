@@ -2,7 +2,7 @@
 
   This file contains the definination for host controller memory management routines.
 
-Copyright (c) 2007 - 2009, Intel Corporation
+Copyright (c) 2007 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -24,15 +24,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define USB_HC_HIGH_32BIT(Addr64)    \
           ((UINT32)(RShiftU64((UINTN)(Addr64), 32) & 0XFFFFFFFF))
 
-typedef struct _USBHC_MEM_BLOCK {
+typedef struct _USBHC_MEM_BLOCK USBHC_MEM_BLOCK;
+struct _USBHC_MEM_BLOCK {
   UINT8                   *Bits;    // Bit array to record which unit is allocated
   UINTN                   BitsLen;
   UINT8                   *Buf;
   UINT8                   *BufHost;
   UINTN                   BufLen;   // Memory size in bytes
   VOID                    *Mapping;
-  struct _USBHC_MEM_BLOCK *Next;
-} USBHC_MEM_BLOCK;
+  USBHC_MEM_BLOCK         *Next;
+};
 
 //
 // USBHC_MEM_POOL is used to manage the memory used by USB
@@ -46,12 +47,13 @@ typedef struct _USBHC_MEM_POOL {
   USBHC_MEM_BLOCK         *Head;
 } USBHC_MEM_POOL;
 
-typedef enum {
-  USBHC_MEM_UNIT           = 64,     // Memory allocation unit, must be 2^n, n>4
+//
+// Memory allocation unit, must be 2^n, n>4
+//
+#define USBHC_MEM_UNIT           64
 
-  USBHC_MEM_UNIT_MASK      = USBHC_MEM_UNIT - 1,
-  USBHC_MEM_DEFAULT_PAGES  = 16
-} USBHC_MEM_UNIT_DATA;
+#define USBHC_MEM_UNIT_MASK      (USBHC_MEM_UNIT - 1)
+#define USBHC_MEM_DEFAULT_PAGES  16
 
 #define USBHC_MEM_ROUND(Len)  (((Len) + USBHC_MEM_UNIT_MASK) & (~USBHC_MEM_UNIT_MASK))
 

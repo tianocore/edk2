@@ -1,7 +1,7 @@
 /** @file
   IA32 specific functions to support Debug Support protocol.
 
-Copyright (c) 2008 - 2009, Intel Corporation
+Copyright (c) 2008 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -107,7 +107,7 @@ CreateEntryStub (
 **/
 EFI_STATUS
 ManageIdtEntryTable (
-  VOID               (EFIAPI *NewCallback)(),
+  CALLBACK_FUNC      NewCallback,
   EFI_EXCEPTION_TYPE ExceptionType
   )
 {

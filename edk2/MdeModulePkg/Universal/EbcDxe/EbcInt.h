@@ -2,7 +2,7 @@
   Main routines for the EBC interpreter.  Includes the initialization and
   main interpreter routines.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -34,7 +34,7 @@ typedef UINT8   *VMIP;      // instruction pointer for the VM
 typedef UINT32  EXCEPTION_FLAGS;
 
 typedef struct {
-  VM_REGISTER       R[8];                   // General purpose registers.
+  VM_REGISTER       Gpr[8];                 // General purpose registers.
   UINT64            Flags;                  // Flags register:
                                             //   0  Set to 1 if the result of the last compare was true
                                             //   1  Set to 1 if stepping

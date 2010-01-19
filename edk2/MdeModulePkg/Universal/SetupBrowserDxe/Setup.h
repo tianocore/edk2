@@ -316,6 +316,12 @@ typedef struct {
 #define QUESTION_OPTION_FROM_LINK(a)  CR (a, QUESTION_OPTION, Link, QUESTION_OPTION_SIGNATURE)
 
 #define FORM_BROWSER_STATEMENT_SIGNATURE  SIGNATURE_32 ('F', 'S', 'T', 'A')
+
+typedef union {
+  EFI_STRING_ID         VarName;
+  UINT16                VarOffset;
+} VAR_STORE_INFO;
+
 typedef struct {
   UINTN                 Signature;
   LIST_ENTRY            Link;
@@ -335,10 +341,7 @@ typedef struct {
   EFI_QUESTION_ID       QuestionId;       // The value of zero is reserved
   EFI_VARSTORE_ID       VarStoreId;       // A value of zero indicates no variable storage
   FORMSET_STORAGE       *Storage;
-  union {
-    EFI_STRING_ID       VarName;
-    UINT16              VarOffset;
-  }  VarStoreInfo;
+  VAR_STORE_INFO        VarStoreInfo;
   UINT16                StorageWidth;
   UINT8                 QuestionFlags;
   CHAR16                *VariableName;    // Name/Value or EFI Variable name

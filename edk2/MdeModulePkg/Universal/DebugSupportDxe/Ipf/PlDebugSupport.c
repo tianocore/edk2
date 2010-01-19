@@ -1,7 +1,7 @@
 /** @file
   IPF specific functions to support Debug Support protocol.
 
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2006 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -23,8 +23,8 @@ BOOLEAN  mInHandler = FALSE;
 #define NUM_IVT_ENTRIES     64
 
 typedef struct {
-  BUNDLE  OrigBundles[NUM_BUNDLES_IN_STUB];
-  VOID (*RegisteredCallback) ();
+  BUNDLE         OrigBundles[NUM_BUNDLES_IN_STUB];
+  CALLBACK_FUNC  RegisteredCallback;
 } IVT_ENTRY;
 
 IVT_ENTRY IvtEntryTable[NUM_IVT_ENTRIES];
@@ -183,7 +183,7 @@ EFI_STATUS
 ManageIvtEntryTable (
   IN  EFI_EXCEPTION_TYPE           ExceptionType,
   IN  BUNDLE                       NewBundles[NUM_BUNDLES_IN_STUB],
-  IN  VOID                         (*NewCallback) ()
+  IN  CALLBACK_FUNC                NewCallback
   )
 {
   BUNDLE  *B0Ptr;
@@ -257,7 +257,7 @@ VOID
 HookEntry (
   IN  EFI_EXCEPTION_TYPE  ExceptionType,
   IN  BUNDLE              NewBundles[4],
-  IN  VOID                (*NewCallback) ()
+  IN  CALLBACK_FUNC       NewCallback
   )
 {
   BUNDLE  *FixupBundle;
@@ -285,7 +285,7 @@ HookEntry (
   // fixup IVT entry so it stores its index and whether or not to chain...
   //
   FixupBundle = B0Ptr + 2;
-  FixupBundle->high |= ExceptionType << 36;
+  FixupBundle->High |= ExceptionType << 36;
 
   InstructionCacheFlush (B0Ptr, 5);
   IvtEntryTable[ExceptionType].RegisteredCallback = NewCallback;
@@ -329,7 +329,7 @@ UnhookEntry (
 **/
 VOID
 ChainExternalInterrupt (
-  IN  VOID  (*NewCallback) ()
+  IN  CALLBACK_FUNC  NewCallback
   )
 {
   VOID  *Start;

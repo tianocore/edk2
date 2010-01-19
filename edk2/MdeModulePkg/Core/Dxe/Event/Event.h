@@ -1,7 +1,7 @@
 /** @file
   UEFI Event support functions and structure.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -23,6 +23,16 @@ extern  UINTN                   gEventPending;
 //
 // EFI_EVENT
 //
+
+///
+/// Timer event information
+///
+typedef struct {
+  LIST_ENTRY      Link;
+  UINT64          TriggerTime;
+  UINT64          Period;
+} TIMER_EVENT_INFO;
+
 #define EVENT_SIGNATURE         SIGNATURE_32('e','v','n','t')
 typedef struct {
   UINTN                   Signature;
@@ -44,21 +54,8 @@ typedef struct {
   ///
   /// A list of all runtime events
   ///
-  EFI_RUNTIME_EVENT_ENTRY   RuntimeData;
-  ///
-  /// Information by event type
-  ///
-  union {
-    ///
-    /// For timer events
-    ///
-    struct {
-      LIST_ENTRY      Link;
-      UINT64          TriggerTime;
-      UINT64          Period;
-    } Timer;
-  } u;
-
+  EFI_RUNTIME_EVENT_ENTRY RuntimeData;
+  TIMER_EVENT_INFO        Timer;
 } IEVENT;
 
 //

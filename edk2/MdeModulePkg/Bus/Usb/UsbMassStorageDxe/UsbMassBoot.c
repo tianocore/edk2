@@ -2,7 +2,7 @@
   Implementation of the command set of USB Mass Storage Specification
   for Bootability, Revision 1.0.
 
-Copyright (c) 2007 - 2008, Intel Corporation
+Copyright (c) 2007 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -92,10 +92,10 @@ UsbBootRequestSense (
 
   case USB_BOOT_SENSE_NOT_READY:
     Status = EFI_DEVICE_ERROR;
-    if (SenseData.ASC == USB_BOOT_ASC_NO_MEDIA) {
+    if (SenseData.Asc == USB_BOOT_ASC_NO_MEDIA) {
       Media->MediaPresent = FALSE;
       Status = EFI_NO_MEDIA;
-    } else if (SenseData.ASC == USB_BOOT_ASC_NOT_READY) {
+    } else if (SenseData.Asc == USB_BOOT_ASC_NOT_READY) {
       Status = EFI_NOT_READY;
     }
     break;
@@ -106,7 +106,7 @@ UsbBootRequestSense (
 
   case USB_BOOT_SENSE_UNIT_ATTENTION:
     Status = EFI_DEVICE_ERROR;
-    if (SenseData.ASC == USB_BOOT_ASC_MEDIA_CHANGE) {
+    if (SenseData.Asc == USB_BOOT_ASC_MEDIA_CHANGE) {
       //
       // If MediaChange, reset ReadOnly and new MediaId
       //
@@ -129,8 +129,8 @@ UsbBootRequestSense (
   DEBUG ((EFI_D_INFO, "UsbBootRequestSense: (%r) with sense key %x/%x/%x\n",
           Status,
           USB_BOOT_SENSE_KEY (SenseData.SenseKey),
-          SenseData.ASC,
-          SenseData.ASCQ
+          SenseData.Asc,
+          SenseData.Ascq
           ));
 
   return Status;

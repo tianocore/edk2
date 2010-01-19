@@ -2,7 +2,7 @@
 
     Usb Bus Driver Binding and Bus IO Protocol.
 
-Copyright (c) 2004 - 2007, Intel Corporation
+Copyright (c) 2004 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -47,81 +47,83 @@ typedef struct _USB_HUB_API    USB_HUB_API;
 #include "UsbHub.h"
 #include "UsbEnumer.h"
 
-typedef enum {
-  USB_MAX_LANG_ID           = 16,
-  USB_MAX_INTERFACE         = 16,
-  USB_MAX_DEVICES           = 128,
+//
+// USB bus timeout experience values
+//
 
-  USB_BUS_1_MILLISECOND     = 1000,
+#define USB_MAX_LANG_ID           16
+#define USB_MAX_INTERFACE         16
+#define USB_MAX_DEVICES           128
 
-  //
-  // Roothub and hub's polling interval, set by experience,
-  // The unit of roothub is 100us, means 1s as interval, and
-  // the unit of hub is 1ms, means 64ms as interval.
-  //
-  USB_ROOTHUB_POLL_INTERVAL = 1000 * 10000U,
-  USB_HUB_POLL_INTERVAL     = 64,
+#define USB_BUS_1_MILLISECOND     1000
 
-  //
-  // Wait for port stable to work, refers to specification
-  // [USB20-9.1.2]
-  //
-  USB_WAIT_PORT_STABLE_STALL     = 100 * USB_BUS_1_MILLISECOND,
+//
+// Roothub and hub's polling interval, set by experience,
+// The unit of roothub is 100us, means 1s as interval, and
+// the unit of hub is 1ms, means 64ms as interval.
+//
+#define USB_ROOTHUB_POLL_INTERVAL (1000 * 10000U)
+#define USB_HUB_POLL_INTERVAL     64
 
-  //
-  // Wait for port statue reg change, set by experience
-  //
-  USB_WAIT_PORT_STS_CHANGE_STALL = 5 * USB_BUS_1_MILLISECOND,
+//
+// Wait for port stable to work, refers to specification
+// [USB20-9.1.2]
+//
+#define USB_WAIT_PORT_STABLE_STALL  (100 * USB_BUS_1_MILLISECOND)
 
-  //
-  // Wait for set device address, refers to specification
-  // [USB20-9.2.6.3, it says 2ms]
-  //
-  USB_SET_DEVICE_ADDRESS_STALL   = 20 * USB_BUS_1_MILLISECOND,
+//
+// Wait for port statue reg change, set by experience
+//
+#define USB_WAIT_PORT_STS_CHANGE_STALL (5 * USB_BUS_1_MILLISECOND)
 
-  //
-  // Wait for retry max packet size, set by experience
-  //
-  USB_RETRY_MAX_PACK_SIZE_STALL  = 100 * USB_BUS_1_MILLISECOND,
+//
+// Wait for set device address, refers to specification
+// [USB20-9.2.6.3, it says 2ms]
+//
+#define USB_SET_DEVICE_ADDRESS_STALL   (20 * USB_BUS_1_MILLISECOND)
 
-  //
-  // Wait for hub port power-on, refers to specification
-  // [USB20-11.23.2]
-  //
-  USB_SET_PORT_POWER_STALL       = 2 * USB_BUS_1_MILLISECOND,
+//
+// Wait for retry max packet size, set by experience
+//
+#define USB_RETRY_MAX_PACK_SIZE_STALL  (100 * USB_BUS_1_MILLISECOND)
 
-  //
-  // Wait for port reset, refers to specification
-  // [USB20-7.1.7.5, it says 10ms for hub and 50ms for
-  // root hub]
-  //
-  USB_SET_PORT_RESET_STALL       = 20 * USB_BUS_1_MILLISECOND,
-  USB_SET_ROOT_PORT_RESET_STALL  = 50 * USB_BUS_1_MILLISECOND,
+//
+// Wait for hub port power-on, refers to specification
+// [USB20-11.23.2]
+//
+#define USB_SET_PORT_POWER_STALL       (2 * USB_BUS_1_MILLISECOND)
 
-  //
-  // Wait for clear roothub port reset, set by experience
-  //
-  USB_CLR_ROOT_PORT_RESET_STALL  = 20 * USB_BUS_1_MILLISECOND,
+//
+// Wait for port reset, refers to specification
+// [USB20-7.1.7.5, it says 10ms for hub and 50ms for
+// root hub]
+//
+#define USB_SET_PORT_RESET_STALL       (20 * USB_BUS_1_MILLISECOND)
+#define USB_SET_ROOT_PORT_RESET_STALL  (50 * USB_BUS_1_MILLISECOND)
 
-  //
-  // Wait for set roothub port enable, set by experience
-  //
-  USB_SET_ROOT_PORT_ENABLE_STALL = 20 * USB_BUS_1_MILLISECOND,
+//
+// Wait for clear roothub port reset, set by experience
+//
+#define USB_CLR_ROOT_PORT_RESET_STALL  (20 * USB_BUS_1_MILLISECOND)
 
-  //
-  // Send general device request timeout.
-  // 
-  // The USB Specification 2.0, section 11.24.1 recommends a value of
-  // 50 milliseconds.  We use a value of 100 milliseconds to work
-  // around slower hubs and devices.
-  //
-  USB_GENERAL_DEVICE_REQUEST_TIMEOUT = 100,
+//
+// Wait for set roothub port enable, set by experience
+//
+#define USB_SET_ROOT_PORT_ENABLE_STALL (20 * USB_BUS_1_MILLISECOND)
 
-  //
-  // Send clear feature request timeout, set by experience
-  //
-  USB_CLEAR_FEATURE_REQUEST_TIMEOUT  = 10
-}USB_BUS_TIMEOUT_EXPERIENCE_VALUE;
+//
+// Send general device request timeout.
+// 
+// The USB Specification 2.0, section 11.24.1 recommends a value of
+// 50 milliseconds.  We use a value of 100 milliseconds to work
+// around slower hubs and devices.
+//
+#define USB_GENERAL_DEVICE_REQUEST_TIMEOUT 100
+
+//
+// Send clear feature request timeout, set by experience
+//
+#define USB_CLEAR_FEATURE_REQUEST_TIMEOUT  10
 
 //
 // Bus raises TPL to TPL_NOTIFY to serialize all its operations
