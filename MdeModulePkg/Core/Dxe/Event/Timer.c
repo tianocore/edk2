@@ -1,7 +1,7 @@
 /** @file
   Core Timer Services
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -51,20 +51,20 @@ CoreInsertEventTimer (
   //
   // Get the timer's trigger time
   //
-  TriggerTime = Event->u.Timer.TriggerTime;
+  TriggerTime = Event->Timer.TriggerTime;
 
   //
   // Insert the timer into the timer database in assending sorted order
   //
   for (Link = mEfiTimerList.ForwardLink; Link != &mEfiTimerList; Link = Link->ForwardLink) {
-    Event2 = CR (Link, IEVENT, u.Timer.Link, EVENT_SIGNATURE);
+    Event2 = CR (Link, IEVENT, Timer.Link, EVENT_SIGNATURE);
 
-    if (Event2->u.Timer.TriggerTime > TriggerTime) {
+    if (Event2->Timer.TriggerTime > TriggerTime) {
       break;
     }
   }
 
-  InsertTailList (Link, &Event->u.Timer.Link);
+  InsertTailList (Link, &Event->Timer.Link);
 }
 
 /**
@@ -112,12 +112,12 @@ CoreCheckTimers (
   SystemTime = CoreCurrentSystemTime ();
 
   while (!IsListEmpty (&mEfiTimerList)) {
-    Event = CR (mEfiTimerList.ForwardLink, IEVENT, u.Timer.Link, EVENT_SIGNATURE);
+    Event = CR (mEfiTimerList.ForwardLink, IEVENT, Timer.Link, EVENT_SIGNATURE);
 
     //
     // If this timer is not expired, then we're done
     //
-    if (Event->u.Timer.TriggerTime > SystemTime) {
+    if (Event->Timer.TriggerTime > SystemTime) {
       break;
     }
 
@@ -125,8 +125,8 @@ CoreCheckTimers (
     // Remove this timer from the timer queue
     //
 
-    RemoveEntryList (&Event->u.Timer.Link);
-    Event->u.Timer.Link.ForwardLink = NULL;
+    RemoveEntryList (&Event->Timer.Link);
+    Event->Timer.Link.ForwardLink = NULL;
 
     //
     // Signal it
@@ -136,17 +136,17 @@ CoreCheckTimers (
     //
     // If this is a periodic timer, set it
     //
-    if (Event->u.Timer.Period) {
+    if (Event->Timer.Period != 0) {
       //
       // Compute the timers new trigger time
       //
-      Event->u.Timer.TriggerTime = Event->u.Timer.TriggerTime + Event->u.Timer.Period;
+      Event->Timer.TriggerTime = Event->Timer.TriggerTime + Event->Timer.Period;
 
       //
       // If that's before now, then reset the timer to start from now
       //
-      if (Event->u.Timer.TriggerTime <= SystemTime) {
-        Event->u.Timer.TriggerTime = SystemTime;
+      if (Event->Timer.TriggerTime <= SystemTime) {
+        Event->Timer.TriggerTime = SystemTime;
         CoreSignalEvent (mEfiCheckTimerEvent);
       }
 
@@ -213,9 +213,9 @@ CoreTimerTick (
   // to process it
   //
   if (!IsListEmpty (&mEfiTimerList)) {
-    Event = CR (mEfiTimerList.ForwardLink, IEVENT, u.Timer.Link, EVENT_SIGNATURE);
+    Event = CR (mEfiTimerList.ForwardLink, IEVENT, Timer.Link, EVENT_SIGNATURE);
 
-    if (Event->u.Timer.TriggerTime <= mEfiSystemTime) {
+    if (Event->Timer.TriggerTime <= mEfiSystemTime) {
       CoreSignalEvent (mEfiCheckTimerEvent);
     }
   }
@@ -269,21 +269,21 @@ CoreSetTimer (
   //
   // If the timer is queued to the timer database, remove it
   //
-  if (Event->u.Timer.Link.ForwardLink != NULL) {
-    RemoveEntryList (&Event->u.Timer.Link);
-    Event->u.Timer.Link.ForwardLink = NULL;
+  if (Event->Timer.Link.ForwardLink != NULL) {
+    RemoveEntryList (&Event->Timer.Link);
+    Event->Timer.Link.ForwardLink = NULL;
   }
 
-  Event->u.Timer.TriggerTime = 0;
-  Event->u.Timer.Period = 0;
+  Event->Timer.TriggerTime = 0;
+  Event->Timer.Period = 0;
 
   if (Type != TimerCancel) {
 
     if (Type == TimerPeriodic) {
-      Event->u.Timer.Period = TriggerTime;
+      Event->Timer.Period = TriggerTime;
     }
 
-    Event->u.Timer.TriggerTime = CoreCurrentSystemTime () + TriggerTime;
+    Event->Timer.TriggerTime = CoreCurrentSystemTime () + TriggerTime;
     CoreInsertEventTimer (Event);
 
     if (TriggerTime == 0) {

@@ -2,7 +2,7 @@
 
   Provides some data struct used by EHCI controller driver.
 
-Copyright (c) 2006 - 2009, Intel Corporation
+Copyright (c) 2006 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -44,30 +44,31 @@ typedef struct _USB2_HC_DEV  USB2_HC_DEV;
 #include "EhciDebug.h"
 #include "ComponentName.h"
 
-typedef enum {
-  EHC_1_MICROSECOND            = 1,
-  EHC_1_MILLISECOND            = 1000 * EHC_1_MICROSECOND,
-  EHC_1_SECOND                 = 1000 * EHC_1_MILLISECOND,
+//
+// EHC timeout experience values
+//
 
-  //
-  // EHCI register operation timeout, set by experience
-  //
-  EHC_RESET_TIMEOUT            = 1 * EHC_1_SECOND,
-  EHC_GENERIC_TIMEOUT          = 10 * EHC_1_MILLISECOND,
+#define EHC_1_MICROSECOND            1
+#define EHC_1_MILLISECOND            (1000 * EHC_1_MICROSECOND)
+#define EHC_1_SECOND                 (1000 * EHC_1_MILLISECOND)
 
-  //
-  // Wait for roothub port power stable, refers to Spec[EHCI1.0-2.3.9]
-  //
-  EHC_ROOT_PORT_RECOVERY_STALL = 20 * EHC_1_MILLISECOND,
+//
+// EHCI register operation timeout, set by experience
+//
+#define EHC_RESET_TIMEOUT            (1 * EHC_1_SECOND)
+#define EHC_GENERIC_TIMEOUT          (10 * EHC_1_MILLISECOND)
 
-  //
-  // Sync and Async transfer polling interval, set by experience,
-  // and the unit of Async is 100us, means 50ms as interval.
-  //
-  EHC_SYNC_POLL_INTERVAL       = 1 * EHC_1_MILLISECOND,
-  EHC_ASYNC_POLL_INTERVAL      = 50 * 10000U
-} EHC_TIMEOUT_EXPERIENCE_VALUE;
+//
+// Wait for roothub port power stable, refers to Spec[EHCI1.0-2.3.9]
+//
+#define EHC_ROOT_PORT_RECOVERY_STALL (20 * EHC_1_MILLISECOND)
 
+//
+// Sync and Async transfer polling interval, set by experience,
+// and the unit of Async is 100us, means 50ms as interval.
+//
+#define EHC_SYNC_POLL_INTERVAL       (1 * EHC_1_MILLISECOND)
+#define EHC_ASYNC_POLL_INTERVAL      (50 * 10000U)
 
 //
 // EHC raises TPL to TPL_NOTIFY to serialize all its operations

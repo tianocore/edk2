@@ -2,7 +2,7 @@
   Definition of USB Mass Storage Class and its value, USB Mass Transport Protocol, 
   and other common definitions.
 
-Copyright (c) 2007 - 2008, Intel Corporation
+Copyright (c) 2007 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -38,36 +38,34 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define USB_IS_INTERRUPT_ENDPOINT(Attribute)  (((Attribute) & (BIT0 | BIT1)) == USB_ENDPOINT_INTERRUPT)
 #define USB_IS_ERROR(Result, Error)           (((Result) & (Error)) != 0)
 
-typedef enum {
-  //
-  // Usb mass storage class code
-  //
-  USB_MASS_STORE_CLASS    = 0x08,
+//
+// Usb mass storage class code
+//
+#define USB_MASS_STORE_CLASS    0x08
 
-  //
-  // Usb mass storage subclass code, specify the command set used.
-  //
-  USB_MASS_STORE_RBC      = 0x01, ///< Reduced Block Commands
-  USB_MASS_STORE_8020I    = 0x02, ///< SFF-8020i, typically a CD/DVD device
-  USB_MASS_STORE_QIC      = 0x03, ///< Typically a tape device
-  USB_MASS_STORE_UFI      = 0x04, ///< Typically a floppy disk driver device
-  USB_MASS_STORE_8070I    = 0x05, ///< SFF-8070i, typically a floppy disk driver device.
-  USB_MASS_STORE_SCSI     = 0x06, ///< SCSI transparent command set
+//
+// Usb mass storage subclass code, specify the command set used.
+//
+#define USB_MASS_STORE_RBC      0x01 ///< Reduced Block Commands
+#define USB_MASS_STORE_8020I    0x02 ///< SFF-8020i, typically a CD/DVD device
+#define USB_MASS_STORE_QIC      0x03 ///< Typically a tape device
+#define USB_MASS_STORE_UFI      0x04 ///< Typically a floppy disk driver device
+#define USB_MASS_STORE_8070I    0x05 ///< SFF-8070i, typically a floppy disk driver device.
+#define USB_MASS_STORE_SCSI     0x06 ///< SCSI transparent command set
 
-  //
-  // Usb mass storage protocol code, specify the transport protocol
-  //
-  USB_MASS_STORE_CBI0     = 0x00, ///< CBI protocol with command completion interrupt
-  USB_MASS_STORE_CBI1     = 0x01, ///< CBI protocol without command completion interrupt
-  USB_MASS_STORE_BOT      = 0x50, ///< Bulk-Only Transport
+//
+// Usb mass storage protocol code, specify the transport protocol
+//
+#define USB_MASS_STORE_CBI0     0x00 ///< CBI protocol with command completion interrupt
+#define USB_MASS_STORE_CBI1     0x01 ///< CBI protocol without command completion interrupt
+#define USB_MASS_STORE_BOT      0x50 ///< Bulk-Only Transport
 
-  USB_MASS_1_MILLISECOND  = 1000,
-  USB_MASS_1_SECOND       = 1000 * USB_MASS_1_MILLISECOND,
+#define USB_MASS_1_MILLISECOND  1000
+#define USB_MASS_1_SECOND       (1000 * USB_MASS_1_MILLISECOND)
 
-  USB_MASS_CMD_SUCCESS    = 0,
-  USB_MASS_CMD_FAIL,
-  USB_MASS_CMD_PERSISTENT
-} USB_MASS_DEV_CLASS_AND_VALUE;
+#define USB_MASS_CMD_SUCCESS    0
+#define USB_MASS_CMD_FAIL       1
+#define USB_MASS_CMD_PERSISTENT 2
 
 /**
   Initializes USB transport protocol.

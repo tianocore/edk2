@@ -2,7 +2,7 @@
   Definition of the command set of USB Mass Storage Specification
   for Bootability, Revision 1.0.
 
-Copyright (c) 2007 - 2008, Intel Corporation
+Copyright (c) 2007 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -18,79 +18,77 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "UsbMass.h"
 
-typedef enum {
-  //
-  // The opcodes of various USB boot commands:
-  // INQUIRY/REQUEST_SENSE are "No Timeout Commands" as specified
-  // by Multi-Media Commands (MMC) set.
-  // Others are "Group 1 Timeout Commands". That is,
-  // they should be retried if driver is ready. 
-  //
-  USB_BOOT_INQUIRY_OPCODE         = 0x12,
-  USB_BOOT_REQUEST_SENSE_OPCODE   = 0x03,
-  USB_BOOT_MODE_SENSE10_OPCODE    = 0x5A,
-  USB_BOOT_READ_CAPACITY_OPCODE   = 0x25,
-  USB_BOOT_TEST_UNIT_READY_OPCODE = 0x00,
-  USB_BOOT_READ10_OPCODE          = 0x28,
-  USB_BOOT_WRITE10_OPCODE         = 0x2A,
+//
+// The opcodes of various USB boot commands:
+// INQUIRY/REQUEST_SENSE are "No Timeout Commands" as specified
+// by Multi-Media Commands (MMC) set.
+// Others are "Group 1 Timeout Commands". That is,
+// they should be retried if driver is ready. 
+//
+#define USB_BOOT_INQUIRY_OPCODE         0x12
+#define USB_BOOT_REQUEST_SENSE_OPCODE   0x03
+#define USB_BOOT_MODE_SENSE10_OPCODE    0x5A
+#define USB_BOOT_READ_CAPACITY_OPCODE   0x25
+#define USB_BOOT_TEST_UNIT_READY_OPCODE 0x00
+#define USB_BOOT_READ10_OPCODE          0x28
+#define USB_BOOT_WRITE10_OPCODE         0x2A
 
-  USB_SCSI_MODE_SENSE6_OPCODE     = 0x1A,
-  
-  //
-  // The Sense Key part of the sense data. Sense data has three levels:
-  // Sense key, Additional Sense Code and Additional Sense Code Qualifier
-  //
-  USB_BOOT_SENSE_NO_SENSE         = 0x00, ///< No sense key
-  USB_BOOT_SENSE_RECOVERED        = 0x01, ///< Last command succeed with recovery actions
-  USB_BOOT_SENSE_NOT_READY        = 0x02, ///< Device not ready
-  USB_BOOT_SNESE_MEDIUM_ERROR     = 0X03, ///< Failed probably because flaw in the media
-  USB_BOOT_SENSE_HARDWARE_ERROR   = 0X04, ///< Non-recoverable hardware failure
-  USB_BOOT_SENSE_ILLEGAL_REQUEST  = 0X05, ///< Illegal parameters in the request
-  USB_BOOT_SENSE_UNIT_ATTENTION   = 0X06, ///< Removable medium may have been changed
-  USB_BOOT_SENSE_DATA_PROTECT     = 0X07, ///< Write protected
-  USB_BOOT_SENSE_BLANK_CHECK      = 0X08, ///< Blank/non-blank medium while reading/writing
-  USB_BOOT_SENSE_VENDOR           = 0X09, ///< Vendor specific sense key
-  USB_BOOT_SENSE_ABORTED          = 0X0B, ///< Command aborted by the device
-  USB_BOOT_SENSE_VOLUME_OVERFLOW  = 0x0D, ///< Partition overflow
-  USB_BOOT_SENSE_MISCOMPARE       = 0x0E, ///< Source data mis-match while verfying.
+#define USB_SCSI_MODE_SENSE6_OPCODE     0x1A
 
-  USB_BOOT_ASC_NOT_READY          = 0x04,
-  USB_BOOT_ASC_NO_MEDIA           = 0x3A,
-  USB_BOOT_ASC_MEDIA_CHANGE       = 0x28,
+//
+// The Sense Key part of the sense data. Sense data has three levels:
+// Sense key, Additional Sense Code and Additional Sense Code Qualifier
+//
+#define USB_BOOT_SENSE_NO_SENSE         0x00 ///< No sense key
+#define USB_BOOT_SENSE_RECOVERED        0x01 ///< Last command succeed with recovery actions
+#define USB_BOOT_SENSE_NOT_READY        0x02 ///< Device not ready
+#define USB_BOOT_SNESE_MEDIUM_ERROR     0X03 ///< Failed probably because flaw in the media
+#define USB_BOOT_SENSE_HARDWARE_ERROR   0X04 ///< Non-recoverable hardware failure
+#define USB_BOOT_SENSE_ILLEGAL_REQUEST  0X05 ///< Illegal parameters in the request
+#define USB_BOOT_SENSE_UNIT_ATTENTION   0X06 ///< Removable medium may have been changed
+#define USB_BOOT_SENSE_DATA_PROTECT     0X07 ///< Write protected
+#define USB_BOOT_SENSE_BLANK_CHECK      0X08 ///< Blank/non-blank medium while reading/writing
+#define USB_BOOT_SENSE_VENDOR           0X09 ///< Vendor specific sense key
+#define USB_BOOT_SENSE_ABORTED          0X0B ///< Command aborted by the device
+#define USB_BOOT_SENSE_VOLUME_OVERFLOW  0x0D ///< Partition overflow
+#define USB_BOOT_SENSE_MISCOMPARE       0x0E ///< Source data mis-match while verfying.
 
-  //
-  // Supported PDT codes, or Peripheral Device Type
-  //
-  USB_PDT_DIRECT_ACCESS           = 0x00,       ///< Direct access device
-  USB_PDT_CDROM                   = 0x05,       ///< CDROM
-  USB_PDT_OPTICAL                 = 0x07,       ///< Non-CD optical disks
-  USB_PDT_SIMPLE_DIRECT           = 0x0E,       ///< Simplified direct access device
-  
-  //
-  // Other parameters, Max carried size is 512B * 128 = 64KB
-  //
-  USB_BOOT_IO_BLOCKS              = 128,
+#define USB_BOOT_ASC_NOT_READY          0x04
+#define USB_BOOT_ASC_NO_MEDIA           0x3A
+#define USB_BOOT_ASC_MEDIA_CHANGE       0x28
 
-  //
-  // Retry mass command times, set by experience
-  //
-  USB_BOOT_COMMAND_RETRY          = 5,
-  USB_BOOT_INIT_MEDIA_RETRY       = 5,
+//
+// Supported PDT codes, or Peripheral Device Type
+//
+#define USB_PDT_DIRECT_ACCESS           0x00       ///< Direct access device
+#define USB_PDT_CDROM                   0x05       ///< CDROM
+#define USB_PDT_OPTICAL                 0x07       ///< Non-CD optical disks
+#define USB_PDT_SIMPLE_DIRECT           0x0E       ///< Simplified direct access device
 
-  //
-  // Wait for unit ready command, set by experience
-  //
-  USB_BOOT_RETRY_UNIT_READY_STALL = 500 * USB_MASS_1_MILLISECOND,
+//
+// Other parameters, Max carried size is 512B * 128 = 64KB
+//
+#define USB_BOOT_IO_BLOCKS              128
 
-  //
-  // Mass command timeout, refers to specification[USB20-9.2.6.1]
-  //
-  // USB2.0 Spec define the up-limit timeout 5s for all command. USB floppy, 
-  // USB CD-Rom and iPod devices are much slower than USB key when reponse 
-  // most of commands, So we set 5s as timeout here.
-  // 
-  USB_BOOT_GENERAL_CMD_TIMEOUT    = 5 * USB_MASS_1_SECOND
-}USB_BOOT_OPTCODE;
+//
+// Retry mass command times, set by experience
+//
+#define USB_BOOT_COMMAND_RETRY          5
+#define USB_BOOT_INIT_MEDIA_RETRY       5
+
+//
+// Wait for unit ready command, set by experience
+//
+#define USB_BOOT_RETRY_UNIT_READY_STALL (500 * USB_MASS_1_MILLISECOND)
+
+//
+// Mass command timeout, refers to specification[USB20-9.2.6.1]
+//
+// USB2.0 Spec define the up-limit timeout 5s for all command. USB floppy, 
+// USB CD-Rom and iPod devices are much slower than USB key when reponse 
+// most of commands, So we set 5s as timeout here.
+// 
+#define USB_BOOT_GENERAL_CMD_TIMEOUT    (5 * USB_MASS_1_SECOND)
 
 //
 // The required commands are INQUIRY, READ CAPACITY, TEST UNIT READY,
@@ -193,8 +191,8 @@ typedef struct {
   UINT8             Infor[4];
   UINT8             AddLen;         ///< Additional Sense length, 10
   UINT8             Reserved1[4];
-  UINT8             ASC;            ///< Additional Sense Code
-  UINT8             ASCQ;           ///< Additional Sense Code Qualifier
+  UINT8             Asc;            ///< Additional Sense Code
+  UINT8             Ascq;           ///< Additional Sense Code Qualifier
   UINT8             Reserverd2[4];
 } USB_BOOT_REQUEST_SENSE_DATA;
 

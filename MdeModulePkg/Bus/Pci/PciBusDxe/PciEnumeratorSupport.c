@@ -1,7 +1,7 @@
 /** @file
   PCI emumeration support functions implementation for PCI Bus module.
 
-Copyright (c) 2006 - 2009, Intel Corporation
+Copyright (c) 2006 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2062,7 +2062,7 @@ CreatePciIoDevice (
   if ((PciIoDevice->SrIovCapabilityOffset != 0) && ((FeaturePcdGet(PcdSrIovSupport)& EFI_PCI_IOV_POLICY_SRIOV) != 0)) {
     UINT16    VFStride;
     UINT16    FirstVFOffset;
-    UINT32    PFRID;
+    UINT32    PFRid;
     UINT32    LastVF;
 
     //
@@ -2098,8 +2098,8 @@ CreatePciIoDevice (
     //
     // Calculate LastVF
     //
-    PFRID = EFI_PCI_RID(Bus, Device, Func);
-    LastVF = PFRID + FirstVFOffset + (PciIoDevice->InitialVFs - 1) * VFStride;
+    PFRid = EFI_PCI_RID(Bus, Device, Func);
+    LastVF = PFRid + FirstVFOffset + (PciIoDevice->InitialVFs - 1) * VFStride;
 
     //
     // Calculate ReservedBusNum for this PF

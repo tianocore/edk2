@@ -2,7 +2,7 @@
   This module contains EBC support routines that are customized based on
   the target processor.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -60,8 +60,8 @@ PushU64 (
   // Advance the VM stack down, and then copy the argument to the stack.
   // Hope it's aligned.
   //
-  VmPtr->R[0] -= sizeof (UINT64);
-  *(UINT64 *) VmPtr->R[0] = Arg;
+  VmPtr->Gpr[0] -= sizeof (UINT64);
+  *(UINT64 *) VmPtr->Gpr[0] = Arg;
 }
 
 /**
@@ -176,14 +176,14 @@ EbcInterpret (
     return Status;
   }
   VmContext.StackTop = (UINT8*)VmContext.StackPool + (STACK_REMAIN_SIZE);
-  VmContext.R[0] = (UINT64) ((UINT8*)VmContext.StackPool + STACK_POOL_SIZE);
-  VmContext.HighStackBottom = (UINTN) VmContext.R[0];
-  VmContext.R[0] -= sizeof (UINTN);
+  VmContext.Gpr[0] = (UINT64) ((UINT8*)VmContext.StackPool + STACK_POOL_SIZE);
+  VmContext.HighStackBottom = (UINTN) VmContext.Gpr[0];
+  VmContext.Gpr[0] -= sizeof (UINTN);
 
 
   PushU64 (&VmContext, (UINT64) VM_STACK_KEY_VALUE);
-  VmContext.StackMagicPtr = (UINTN *) VmContext.R[0];
-  VmContext.LowStackTop   = (UINTN) VmContext.R[0];
+  VmContext.StackMagicPtr = (UINTN *) VmContext.Gpr[0];
+  VmContext.LowStackTop   = (UINTN) VmContext.Gpr[0];
   //
   // Push the EBC arguments on the stack. Does not matter that they may not
   // all be valid.
@@ -211,7 +211,7 @@ EbcInterpret (
   //
   PushU64 (&VmContext, 0);
   PushU64 (&VmContext, 0xDEADBEEFDEADBEEF);
-  VmContext.StackRetAddr = (UINT64) VmContext.R[0];
+  VmContext.StackRetAddr = (UINT64) VmContext.Gpr[0];
   //
   // Begin executing the EBC code
   //
@@ -220,7 +220,7 @@ EbcInterpret (
   // Return the value in R[7] unless there was an error
   //
   ReturnEBCStack(StackIndex);
-  return (UINT64) VmContext.R[7];
+  return (UINT64) VmContext.Gpr[7];
 }
 
 
@@ -283,9 +283,9 @@ ExecuteEbcImageEntryPoint (
     return Status;
   }
   VmContext.StackTop = (UINT8*)VmContext.StackPool + (STACK_REMAIN_SIZE);
-  VmContext.R[0] = (UINT64) ((UINT8*)VmContext.StackPool + STACK_POOL_SIZE);
-  VmContext.HighStackBottom = (UINTN) VmContext.R[0];
-  VmContext.R[0] -= sizeof (UINTN);
+  VmContext.Gpr[0] = (UINT64) ((UINT8*)VmContext.StackPool + STACK_POOL_SIZE);
+  VmContext.HighStackBottom = (UINTN) VmContext.Gpr[0];
+  VmContext.Gpr[0] -= sizeof (UINTN);
 
 
   //
@@ -293,7 +293,7 @@ ExecuteEbcImageEntryPoint (
   // at the bottom so we can detect stack corruption.
   //
   PushU64 (&VmContext, (UINT64) VM_STACK_KEY_VALUE);
-  VmContext.StackMagicPtr = (UINTN *) (UINTN) VmContext.R[0];
+  VmContext.StackMagicPtr = (UINTN *) (UINTN) VmContext.Gpr[0];
 
   //
   // When we thunk to external native code, we copy the last 8 qwords from
@@ -304,15 +304,15 @@ ExecuteEbcImageEntryPoint (
   // Therefore, leave another gap below the magic value. Pick 10 qwords down,
   // just as a starting point.
   //
-  VmContext.R[0] -= 10 * sizeof (UINT64);
+  VmContext.Gpr[0] -= 10 * sizeof (UINT64);
 
   //
   // Align the stack pointer such that after pushing the system table,
   // image handle, and return address on the stack, it's aligned on a 16-byte
   // boundary as required for IPF.
   //
-  VmContext.R[0] &= (INT64)~0x0f;
-  VmContext.LowStackTop = (UINTN) VmContext.R[0];
+  VmContext.Gpr[0] &= (INT64)~0x0f;
+  VmContext.LowStackTop = (UINTN) VmContext.Gpr[0];
   //
   // Simply copy the image handle and system table onto the EBC stack.
   // Greatly simplifies things by not having to spill the args
@@ -327,7 +327,7 @@ ExecuteEbcImageEntryPoint (
   //
   PushU64 (&VmContext, (UINT64) 0);
   PushU64 (&VmContext, (UINT64) 0x1234567887654321);
-  VmContext.StackRetAddr = (UINT64) VmContext.R[0];
+  VmContext.StackRetAddr = (UINT64) VmContext.Gpr[0];
 
   //
   // Begin executing the EBC code
@@ -338,7 +338,7 @@ ExecuteEbcImageEntryPoint (
   // Return the value in R[7] unless there was an error
   //
   ReturnEBCStack(StackIndex);
-  return (UINT64) VmContext.R[7];
+  return (UINT64) VmContext.Gpr[7];
 }
 
 
@@ -855,11 +855,11 @@ Action:
     // put our return address and frame pointer on the VM stack.
     // Then set the VM's IP to new EBC code.
     //
-    VmPtr->R[0] -= 8;
-    VmWriteMemN (VmPtr, (UINTN) VmPtr->R[0], (UINTN) FramePtr);
-    VmPtr->FramePtr = (VOID *) (UINTN) VmPtr->R[0];
-    VmPtr->R[0] -= 8;
-    VmWriteMem64 (VmPtr, (UINTN) VmPtr->R[0], (UINT64) (VmPtr->Ip + Size));
+    VmPtr->Gpr[0] -= 8;
+    VmWriteMemN (VmPtr, (UINTN) VmPtr->Gpr[0], (UINTN) FramePtr);
+    VmPtr->FramePtr = (VOID *) (UINTN) VmPtr->Gpr[0];
+    VmPtr->Gpr[0] -= 8;
+    VmWriteMem64 (VmPtr, (UINTN) VmPtr->Gpr[0], (UINT64) (VmPtr->Ip + Size));
 
     VmPtr->Ip = (VMIP) (UINTN) TargetEbcAddr;
   } else {
@@ -871,7 +871,7 @@ Action:
     //
     // Get return value and advance the IP.
     //
-    VmPtr->R[7] = EbcLLGetReturnValue ();
+    VmPtr->Gpr[7] = EbcLLGetReturnValue ();
     VmPtr->Ip += Size;
   }
 }

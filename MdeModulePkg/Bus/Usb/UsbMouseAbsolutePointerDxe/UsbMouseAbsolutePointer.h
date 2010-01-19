@@ -1,7 +1,7 @@
 /** @file
   Helper routine and corresponding data struct used by USB Mouse Absolute Pointer Driver.
 
-Copyright (c) 2004 - 2008, Intel Corporation
+Copyright (c) 2004 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -79,20 +79,23 @@ typedef struct {
 ///
 /// General HID Item structure
 ///
+
+typedef union {
+  UINT8   U8;
+  UINT16  U16;
+  UINT32  U32;
+  INT8    I8;
+  INT16   I16;
+  INT32   I32;
+  UINT8   *LongData;
+} HID_DATA;
+
 typedef struct {
-  UINT16  Format;
-  UINT8   Size;
-  UINT8   Type;
-  UINT8   Tag;
-  union {
-    UINT8   U8;
-    UINT16  U16;
-    UINT32  U32;
-    INT8    I8;
-    INT16   I16;
-    INT32   I32;
-    UINT8   *LongData;
-  } Data;
+  UINT16    Format;
+  UINT8     Size;
+  UINT8     Type;
+  UINT8     Tag;
+  HID_DATA  Data;
 } HID_ITEM;
 
 #define USB_MOUSE_ABSOLUTE_POINTER_DEV_FROM_MOUSE_PROTOCOL(a) \

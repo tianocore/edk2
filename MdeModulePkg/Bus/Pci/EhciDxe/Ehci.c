@@ -10,7 +10,7 @@
   This way avoids the control transfer on a shared port between EHCI and companion host
   controller when UHCI gets attached earlier than EHCI and a USB 2.0 device inserts.
 
-Copyright (c) 2006 - 2009, Intel Corporation
+Copyright (c) 2006 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1363,7 +1363,7 @@ EhcDriverBindingSupported (
   // Test whether the controller belongs to Ehci type
   //
   if ((UsbClassCReg.BaseCode != PCI_CLASS_SERIAL) || (UsbClassCReg.SubClassCode != PCI_CLASS_SERIAL_USB)
-      || ((UsbClassCReg.PI != PCI_IF_EHCI) && (UsbClassCReg.PI !=PCI_IF_UHCI))) {
+      || ((UsbClassCReg.ProgInterface != PCI_IF_EHCI) && (UsbClassCReg.ProgInterface !=PCI_IF_UHCI))) {
 
     Status = EFI_UNSUPPORTED;
   }
@@ -1598,7 +1598,7 @@ EhcDriverBindingStart (
   // companion usb ehci host controller and force EHCI driver get attached to it before
   // UHCI driver attaches to UHCI host controller.
   //
-  if ((UsbClassCReg.PI == PCI_IF_UHCI) &&
+  if ((UsbClassCReg.ProgInterface == PCI_IF_UHCI) &&
        (UsbClassCReg.BaseCode == PCI_CLASS_SERIAL) && 
        (UsbClassCReg.SubClassCode == PCI_CLASS_SERIAL_USB)) {
     Status = PciIo->GetLocation (
@@ -1647,7 +1647,7 @@ EhcDriverBindingStart (
         goto CLOSE_PCIIO;
       }
 
-      if ((UsbClassCReg.PI == PCI_IF_EHCI) &&
+      if ((UsbClassCReg.ProgInterface == PCI_IF_EHCI) &&
            (UsbClassCReg.BaseCode == PCI_CLASS_SERIAL) && 
            (UsbClassCReg.SubClassCode == PCI_CLASS_SERIAL_USB)) {
         Status = Instance->GetLocation (

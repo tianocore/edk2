@@ -2,7 +2,7 @@
 
   The definition for UHCI register operation routines.
 
-Copyright (c) 2007 - 2008, Intel Corporation
+Copyright (c) 2007 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -16,81 +16,83 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _EFI_UHCI_REG_H_
 #define _EFI_UHCI_REG_H_
 
-typedef enum {
-  UHCI_FRAME_NUM        = 1024,
+//
+// UHCI register offset
+//
 
-  //
-  // Register offset and PCI related staff
-  //
-  USB_BAR_INDEX         = 4,
+#define UHCI_FRAME_NUM        1024
 
-  USBCMD_OFFSET         = 0,
-  USBSTS_OFFSET         = 2,
-  USBINTR_OFFSET        = 4,
-  USBPORTSC_OFFSET      = 0x10,
-  USB_FRAME_NO_OFFSET   = 6,
-  USB_FRAME_BASE_OFFSET = 8,
-  USB_EMULATION_OFFSET  = 0xC0,
+//
+// Register offset and PCI related staff
+//
+#define USB_BAR_INDEX         4
 
-  //
-  // Packet IDs
-  //
-  SETUP_PACKET_ID       = 0x2D,
-  INPUT_PACKET_ID       = 0x69,
-  OUTPUT_PACKET_ID      = 0xE1,
-  ERROR_PACKET_ID       = 0x55,
+#define USBCMD_OFFSET         0
+#define USBSTS_OFFSET         2
+#define USBINTR_OFFSET        4
+#define USBPORTSC_OFFSET      0x10
+#define USB_FRAME_NO_OFFSET   6
+#define USB_FRAME_BASE_OFFSET 8
+#define USB_EMULATION_OFFSET  0xC0
 
-  //
-  // USB port status and control bit definition.
-  //
-  USBPORTSC_CCS         = BIT0,  // Current Connect Status
-  USBPORTSC_CSC         = BIT1,  // Connect Status Change
-  USBPORTSC_PED         = BIT2,  // Port Enable / Disable
-  USBPORTSC_PEDC        = BIT3,  // Port Enable / Disable Change
-  USBPORTSC_LSL         = BIT4,  // Line Status Low BIT
-  USBPORTSC_LSH         = BIT5,  // Line Status High BIT
-  USBPORTSC_RD          = BIT6,  // Resume Detect
-  USBPORTSC_LSDA        = BIT8,  // Low Speed Device Attached
-  USBPORTSC_PR          = BIT9,  // Port Reset
-  USBPORTSC_SUSP        = BIT12, // Suspend
+//
+// Packet IDs
+//
+#define SETUP_PACKET_ID       0x2D
+#define INPUT_PACKET_ID       0x69
+#define OUTPUT_PACKET_ID      0xE1
+#define ERROR_PACKET_ID       0x55
 
-  //
-  // UHCI Spec said it must implement 2 ports each host at least,
-  // and if more, check whether the bit7 of PORTSC is always 1.
-  // So here assume the max of port number each host is 16.
-  //
-  USB_MAX_ROOTHUB_PORT  = 0x0F,
-  
-  //
-  // Command register bit definitions
-  //
-  USBCMD_RS             = BIT0,  // Run/Stop
-  USBCMD_HCRESET        = BIT1,  // Host reset
-  USBCMD_GRESET         = BIT2,  // Global reset
-  USBCMD_EGSM           = BIT3,  // Global Suspend Mode
-  USBCMD_FGR            = BIT4,  // Force Global Resume
-  USBCMD_SWDBG          = BIT5,  // SW Debug mode
-  USBCMD_CF             = BIT6,  // Config Flag (sw only)
-  USBCMD_MAXP           = BIT7,  // Max Packet (0 = 32, 1 = 64)
+//
+// USB port status and control bit definition.
+//
+#define USBPORTSC_CCS         BIT0  // Current Connect Status
+#define USBPORTSC_CSC         BIT1  // Connect Status Change
+#define USBPORTSC_PED         BIT2  // Port Enable / Disable
+#define USBPORTSC_PEDC        BIT3  // Port Enable / Disable Change
+#define USBPORTSC_LSL         BIT4  // Line Status Low BIT
+#define USBPORTSC_LSH         BIT5  // Line Status High BIT
+#define USBPORTSC_RD          BIT6  // Resume Detect
+#define USBPORTSC_LSDA        BIT8  // Low Speed Device Attached
+#define USBPORTSC_PR          BIT9  // Port Reset
+#define USBPORTSC_SUSP        BIT12 // Suspend
 
-  //
-  // USB Status register bit definitions
-  //
-  USBSTS_USBINT         = BIT0,  // Interrupt due to IOC
-  USBSTS_ERROR          = BIT1,  // Interrupt due to error
-  USBSTS_RD             = BIT2,  // Resume Detect
-  USBSTS_HSE            = BIT3,  // Host System Error
-  USBSTS_HCPE           = BIT4,  // Host Controller Process Error
-  USBSTS_HCH            = BIT5,  // HC Halted
+//
+// UHCI Spec said it must implement 2 ports each host at least,
+// and if more, check whether the bit7 of PORTSC is always 1.
+// So here assume the max of port number each host is 16.
+//
+#define USB_MAX_ROOTHUB_PORT  0x0F
 
-  USBTD_ACTIVE          = BIT7,  // TD is still active
-  USBTD_STALLED         = BIT6,  // TD is stalled
-  USBTD_BUFFERR         = BIT5,  // Buffer underflow or overflow
-  USBTD_BABBLE          = BIT4,  // Babble condition
-  USBTD_NAK             = BIT3,  // NAK is received
-  USBTD_CRC             = BIT2,  // CRC/Time out error
-  USBTD_BITSTUFF        = BIT1  // Bit stuff error
-}UHCI_REGISTER_OFFSET;
+//
+// Command register bit definitions
+//
+#define USBCMD_RS             BIT0  // Run/Stop
+#define USBCMD_HCRESET        BIT1  // Host reset
+#define USBCMD_GRESET         BIT2  // Global reset
+#define USBCMD_EGSM           BIT3  // Global Suspend Mode
+#define USBCMD_FGR            BIT4  // Force Global Resume
+#define USBCMD_SWDBG          BIT5  // SW Debug mode
+#define USBCMD_CF             BIT6  // Config Flag (sw only)
+#define USBCMD_MAXP           BIT7  // Max Packet (0 = 32, 1 = 64)
+
+//
+// USB Status register bit definitions
+//
+#define USBSTS_USBINT         BIT0  // Interrupt due to IOC
+#define USBSTS_ERROR          BIT1  // Interrupt due to error
+#define USBSTS_RD             BIT2  // Resume Detect
+#define USBSTS_HSE            BIT3  // Host System Error
+#define USBSTS_HCPE           BIT4  // Host Controller Process Error
+#define USBSTS_HCH            BIT5  // HC Halted
+
+#define USBTD_ACTIVE          BIT7  // TD is still active
+#define USBTD_STALLED         BIT6  // TD is stalled
+#define USBTD_BUFFERR         BIT5  // Buffer underflow or overflow
+#define USBTD_BABBLE          BIT4  // Babble condition
+#define USBTD_NAK             BIT3  // NAK is received
+#define USBTD_CRC             BIT2  // CRC/Time out error
+#define USBTD_BITSTUFF        BIT1  // Bit stuff error
 
 
 /**

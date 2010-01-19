@@ -3,7 +3,7 @@
     This file contains URB request, each request is warpped in a
     URB (Usb Request Block).
 
-Copyright (c) 2007 - 2009, Intel Corporation
+Copyright (c) 2007 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -22,61 +22,59 @@ typedef struct _EHC_QTD  EHC_QTD;
 typedef struct _EHC_QH   EHC_QH;
 typedef struct _URB      URB;
 
-typedef enum {
-  //
-  // Transfer types, used in URB to identify the transfer type
-  //
-  EHC_CTRL_TRANSFER       = 0x01,
-  EHC_BULK_TRANSFER       = 0x02,
-  EHC_INT_TRANSFER_SYNC   = 0x04,
-  EHC_INT_TRANSFER_ASYNC  = 0x08,
+//
+// Transfer types, used in URB to identify the transfer type
+//
+#define EHC_CTRL_TRANSFER       0x01
+#define EHC_BULK_TRANSFER       0x02
+#define EHC_INT_TRANSFER_SYNC   0x04
+#define EHC_INT_TRANSFER_ASYNC  0x08
 
-  EHC_QTD_SIG             = SIGNATURE_32 ('U', 'S', 'B', 'T'),
-  EHC_QH_SIG              = SIGNATURE_32 ('U', 'S', 'B', 'H'),
-  EHC_URB_SIG             = SIGNATURE_32 ('U', 'S', 'B', 'R'),
+#define EHC_QTD_SIG             SIGNATURE_32 ('U', 'S', 'B', 'T')
+#define EHC_QH_SIG              SIGNATURE_32 ('U', 'S', 'B', 'H')
+#define EHC_URB_SIG             SIGNATURE_32 ('U', 'S', 'B', 'R')
 
-  //
-  // Hardware related bit definitions
-  //
-  EHC_TYPE_ITD            = 0x00,
-  EHC_TYPE_QH             = 0x02,
-  EHC_TYPE_SITD           = 0x04,
-  EHC_TYPE_FSTN           = 0x06,
+//
+// Hardware related bit definitions
+//
+#define EHC_TYPE_ITD            0x00
+#define EHC_TYPE_QH             0x02
+#define EHC_TYPE_SITD           0x04
+#define EHC_TYPE_FSTN           0x06
 
-  QH_NAK_RELOAD           = 3,
-  QH_HSHBW_MULTI          = 1,
+#define QH_NAK_RELOAD           3
+#define QH_HSHBW_MULTI          1
 
-  QTD_MAX_ERR             = 3,
-  QTD_PID_OUTPUT          = 0x00,
-  QTD_PID_INPUT           = 0x01,
-  QTD_PID_SETUP           = 0x02,
+#define QTD_MAX_ERR             3
+#define QTD_PID_OUTPUT          0x00
+#define QTD_PID_INPUT           0x01
+#define QTD_PID_SETUP           0x02
 
-  QTD_STAT_DO_OUT         = 0,
-  QTD_STAT_DO_SS          = 0,
-  QTD_STAT_DO_PING        = 0x01,
-  QTD_STAT_DO_CS          = 0x02,
-  QTD_STAT_TRANS_ERR      = 0x08,
-  QTD_STAT_BABBLE_ERR     = 0x10,
-  QTD_STAT_BUFF_ERR       = 0x20,
-  QTD_STAT_HALTED         = 0x40,
-  QTD_STAT_ACTIVE         = 0x80,
-  QTD_STAT_ERR_MASK       = QTD_STAT_TRANS_ERR | QTD_STAT_BABBLE_ERR | QTD_STAT_BUFF_ERR,
+#define QTD_STAT_DO_OUT         0
+#define QTD_STAT_DO_SS          0
+#define QTD_STAT_DO_PING        0x01
+#define QTD_STAT_DO_CS          0x02
+#define QTD_STAT_TRANS_ERR      0x08
+#define QTD_STAT_BABBLE_ERR     0x10
+#define QTD_STAT_BUFF_ERR       0x20
+#define QTD_STAT_HALTED         0x40
+#define QTD_STAT_ACTIVE         0x80
+#define QTD_STAT_ERR_MASK       (QTD_STAT_TRANS_ERR | QTD_STAT_BABBLE_ERR | QTD_STAT_BUFF_ERR)
 
-  QTD_MAX_BUFFER          = 4,
-  QTD_BUF_LEN             = 4096,
-  QTD_BUF_MASK            = 0x0FFF,
+#define QTD_MAX_BUFFER          4
+#define QTD_BUF_LEN             4096
+#define QTD_BUF_MASK            0x0FFF
 
-  QH_MICROFRAME_0         = 0x01,
-  QH_MICROFRAME_1         = 0x02,
-  QH_MICROFRAME_2         = 0x04,
-  QH_MICROFRAME_3         = 0x08,
-  QH_MICROFRAME_4         = 0x10,
-  QH_MICROFRAME_5         = 0x20,
-  QH_MICROFRAME_6         = 0x40,
-  QH_MICROFRAME_7         = 0x80,
+#define QH_MICROFRAME_0         0x01
+#define QH_MICROFRAME_1         0x02
+#define QH_MICROFRAME_2         0x04
+#define QH_MICROFRAME_3         0x08
+#define QH_MICROFRAME_4         0x10
+#define QH_MICROFRAME_5         0x20
+#define QH_MICROFRAME_6         0x40
+#define QH_MICROFRAME_7         0x80
 
-  USB_ERR_SHORT_PACKET    = 0x200
-}EHCI_URB_FLAG_VALUE;
+#define USB_ERR_SHORT_PACKET    0x200
 
 //
 // Fill in the hardware link point: pass in a EHC_QH/QH_HW
@@ -102,7 +100,7 @@ typedef struct {
   UINT32                  Pid          : 2;
   UINT32                  ErrCnt       : 2;
   UINT32                  CurPage      : 3;
-  UINT32                  IOC          : 1;
+  UINT32                  Ioc          : 1;
   UINT32                  TotalBytes   : 15;
   UINT32                  DataToggle   : 1;
 
@@ -142,7 +140,7 @@ typedef struct {
   UINT32                  Pid          : 2;
   UINT32                  ErrCnt       : 2;
   UINT32                  CurPage      : 3;
-  UINT32                  IOC          : 1;
+  UINT32                  Ioc          : 1;
   UINT32                  TotalBytes   : 15;
   UINT32                  DataToggle   : 1;
 

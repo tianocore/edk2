@@ -2,7 +2,7 @@
 
   The UHCI driver model and HC protocol routines.
 
-Copyright (c) 2004 - 2009, Intel Corporation
+Copyright (c) 2004 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1411,7 +1411,7 @@ UhciDriverBindingSupported (
   //
   if ((UsbClassCReg.BaseCode != PCI_CLASS_SERIAL) ||
       (UsbClassCReg.SubClassCode != PCI_CLASS_SERIAL_USB) ||
-      (UsbClassCReg.PI != PCI_IF_UHCI)
+      (UsbClassCReg.ProgInterface != PCI_IF_UHCI)
       ) {
 
     Status = EFI_UNSUPPORTED;

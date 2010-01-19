@@ -1,7 +1,7 @@
 /** @file
   Definition for Device Path Utilities driver
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -65,10 +65,19 @@ EFI_DEVICE_PATH_PROTOCOL  *
   IN  CHAR16 *DeviceNodeStr
   );
 
+typedef
+VOID
+(*DEVICE_PATH_TO_TEXT_FUNC) (
+  IN OUT POOL_PRINT  *Str,
+  IN VOID            *DevPath,
+  IN BOOLEAN         DisplayOnly,
+  IN BOOLEAN         AllowShortcuts
+  );
+
 typedef struct {
-  UINT8   Type;
-  UINT8   SubType;
-  VOID    (*Function) (POOL_PRINT *, VOID *, BOOLEAN, BOOLEAN);
+  UINT8                     Type;
+  UINT8                     SubType;
+  DEVICE_PATH_TO_TEXT_FUNC  Function;
 } DEVICE_PATH_TO_TEXT_TABLE;
 
 typedef struct {
@@ -123,9 +132,9 @@ typedef struct {
 
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL  Header;
-  UINT32                    HID;
-  UINT32                    UID;
-  UINT32                    CID;
+  UINT32                    Hid;
+  UINT32                    Uid;
+  UINT32                    Cid;
   CHAR8                     HidUidCidStr[3];
 } ACPI_EXTENDED_HID_DEVICE_PATH_WITH_STR;
 

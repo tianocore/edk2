@@ -1,7 +1,7 @@
 /** @file
   Header file for Console Platfrom DXE Driver.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -47,9 +47,9 @@ extern EFI_COMPONENT_NAME2_PROTOCOL gConPlatformComponentName2;
 
 
 typedef enum {
-  CHECK,
-  APPEND,
-  DELETE
+  Check,
+  Append,
+  Delete
 } CONPLATFORM_VAR_OPERATION;
 
 /**

@@ -2,7 +2,7 @@
   Defination for the USB mass storage Control/Bulk/Interrupt (CBI) transport,
   according to USB Mass Storage Class Control/Bulk/Interrupt (CBI) Transport, Revision 1.1.
 
-Copyright (c) 2007 - 2008, Intel Corporation
+Copyright (c) 2007 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -21,25 +21,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 extern USB_MASS_TRANSPORT mUsbCbi0Transport;
 extern USB_MASS_TRANSPORT mUsbCbi1Transport;
 
-typedef enum {
-  USB_CBI_MAX_PACKET_NUM        = 16,
-  USB_CBI_RESET_CMD_LEN         = 12,
-
-  //
-  // USB CBI retry C/B/I transport times, set by experience
-  //
-  USB_CBI_MAX_RETRY             = 3,
-
-  //
-  // Time to wait for USB CBI reset to complete, set by experience
-  //  
-  USB_CBI_RESET_DEVICE_STALL    = 50 * USB_MASS_1_MILLISECOND,
-
-  //
-  // USB CBI transport timeout, set by experience
-  //
-  USB_CBI_RESET_DEVICE_TIMEOUT  = 1 * USB_MASS_1_SECOND
-} USB_CBI_DATA;
+#define USB_CBI_MAX_PACKET_NUM        16
+#define USB_CBI_RESET_CMD_LEN         12
+//
+// USB CBI retry C/B/I transport times, set by experience
+//
+#define USB_CBI_MAX_RETRY             3
+//
+// Time to wait for USB CBI reset to complete, set by experience
+//  
+#define USB_CBI_RESET_DEVICE_STALL    (50 * USB_MASS_1_MILLISECOND)
+//
+// USB CBI transport timeout, set by experience
+//
+#define USB_CBI_RESET_DEVICE_TIMEOUT  (1 * USB_MASS_1_SECOND)
 
 typedef struct {
   //

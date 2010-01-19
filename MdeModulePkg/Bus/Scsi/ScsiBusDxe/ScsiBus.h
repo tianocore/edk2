@@ -1,7 +1,7 @@
 /** @file
   Header file for SCSI Bus Driver.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -38,11 +38,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define SCSI_IO_DEV_SIGNATURE SIGNATURE_32 ('s', 'c', 'i', 'o')
 
+typedef union {
+  UINT32  Scsi;
+  UINT8   ExtScsi[4];   
+} SCSI_ID;
+
 typedef struct _SCSI_TARGET_ID {
- union {
-   UINT32  Scsi;
-   UINT8   ExtScsi[4];   
- } ScsiId;
+  SCSI_ID ScsiId;
   UINT8   ExtScsiId[12];
 }SCSI_TARGET_ID;
 

@@ -3,7 +3,7 @@
   Provides auxiliary support routines for the VM. That is, routines
   that are not particularly related to VM execution of EBC instructions.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -23,16 +23,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // image handles, with each having a linked list of thunks allocated
 // to that image handle.
 //
-typedef struct _EBC_THUNK_LIST {
-  VOID                    *ThunkBuffer;
-  struct _EBC_THUNK_LIST  *Next;
-} EBC_THUNK_LIST;
+typedef struct _EBC_THUNK_LIST EBC_THUNK_LIST;
+struct _EBC_THUNK_LIST {
+  VOID            *ThunkBuffer;
+  EBC_THUNK_LIST  *Next;
+};
 
-typedef struct _EBC_IMAGE_LIST {
-  struct _EBC_IMAGE_LIST  *Next;
-  EFI_HANDLE              ImageHandle;
-  EBC_THUNK_LIST          *ThunkList;
-} EBC_IMAGE_LIST;
+typedef struct _EBC_IMAGE_LIST EBC_IMAGE_LIST;
+struct _EBC_IMAGE_LIST {
+  EBC_IMAGE_LIST  *Next;
+  EFI_HANDLE      ImageHandle;
+  EBC_THUNK_LIST  *ThunkList;
+};
 
 /**
   This routine is called by the core when an image is being unloaded from
@@ -765,14 +767,14 @@ EbcDebugSignalException (
     //
     // Initialize the context structure
     //
-    EbcContext.R0                   = VmPtr->R[0];
-    EbcContext.R1                   = VmPtr->R[1];
-    EbcContext.R2                   = VmPtr->R[2];
-    EbcContext.R3                   = VmPtr->R[3];
-    EbcContext.R4                   = VmPtr->R[4];
-    EbcContext.R5                   = VmPtr->R[5];
-    EbcContext.R6                   = VmPtr->R[6];
-    EbcContext.R7                   = VmPtr->R[7];
+    EbcContext.R0                   = VmPtr->Gpr[0];
+    EbcContext.R1                   = VmPtr->Gpr[1];
+    EbcContext.R2                   = VmPtr->Gpr[2];
+    EbcContext.R3                   = VmPtr->Gpr[3];
+    EbcContext.R4                   = VmPtr->Gpr[4];
+    EbcContext.R5                   = VmPtr->Gpr[5];
+    EbcContext.R6                   = VmPtr->Gpr[6];
+    EbcContext.R7                   = VmPtr->Gpr[7];
     EbcContext.Ip                   = (UINT64)(UINTN)VmPtr->Ip;
     EbcContext.Flags                = VmPtr->Flags;
     EbcContext.ControlFlags         = 0;
@@ -782,14 +784,14 @@ EbcDebugSignalException (
     //
     // Restore the context structure and continue to execute
     //
-    VmPtr->R[0]  = EbcContext.R0;
-    VmPtr->R[1]  = EbcContext.R1;
-    VmPtr->R[2]  = EbcContext.R2;
-    VmPtr->R[3]  = EbcContext.R3;
-    VmPtr->R[4]  = EbcContext.R4;
-    VmPtr->R[5]  = EbcContext.R5;
-    VmPtr->R[6]  = EbcContext.R6;
-    VmPtr->R[7]  = EbcContext.R7;
+    VmPtr->Gpr[0]  = EbcContext.R0;
+    VmPtr->Gpr[1]  = EbcContext.R1;
+    VmPtr->Gpr[2]  = EbcContext.R2;
+    VmPtr->Gpr[3]  = EbcContext.R3;
+    VmPtr->Gpr[4]  = EbcContext.R4;
+    VmPtr->Gpr[5]  = EbcContext.R5;
+    VmPtr->Gpr[6]  = EbcContext.R6;
+    VmPtr->Gpr[7]  = EbcContext.R7;
     VmPtr->Ip    = (VMIP)(UINTN)EbcContext.Ip;
     VmPtr->Flags = EbcContext.Flags;
   }
@@ -935,14 +937,14 @@ EbcDebugPeriodic (
     //
     // Initialize the context structure
     //
-    EbcContext.R0                   = VmPtr->R[0];
-    EbcContext.R1                   = VmPtr->R[1];
-    EbcContext.R2                   = VmPtr->R[2];
-    EbcContext.R3                   = VmPtr->R[3];
-    EbcContext.R4                   = VmPtr->R[4];
-    EbcContext.R5                   = VmPtr->R[5];
-    EbcContext.R6                   = VmPtr->R[6];
-    EbcContext.R7                   = VmPtr->R[7];
+    EbcContext.R0                   = VmPtr->Gpr[0];
+    EbcContext.R1                   = VmPtr->Gpr[1];
+    EbcContext.R2                   = VmPtr->Gpr[2];
+    EbcContext.R3                   = VmPtr->Gpr[3];
+    EbcContext.R4                   = VmPtr->Gpr[4];
+    EbcContext.R5                   = VmPtr->Gpr[5];
+    EbcContext.R6                   = VmPtr->Gpr[6];
+    EbcContext.R7                   = VmPtr->Gpr[7];
     EbcContext.Ip                   = (UINT64)(UINTN)VmPtr->Ip;
     EbcContext.Flags                = VmPtr->Flags;
     EbcContext.ControlFlags         = 0;
@@ -953,14 +955,14 @@ EbcDebugPeriodic (
     //
     // Restore the context structure and continue to execute
     //
-    VmPtr->R[0]  = EbcContext.R0;
-    VmPtr->R[1]  = EbcContext.R1;
-    VmPtr->R[2]  = EbcContext.R2;
-    VmPtr->R[3]  = EbcContext.R3;
-    VmPtr->R[4]  = EbcContext.R4;
-    VmPtr->R[5]  = EbcContext.R5;
-    VmPtr->R[6]  = EbcContext.R6;
-    VmPtr->R[7]  = EbcContext.R7;
+    VmPtr->Gpr[0]  = EbcContext.R0;
+    VmPtr->Gpr[1]  = EbcContext.R1;
+    VmPtr->Gpr[2]  = EbcContext.R2;
+    VmPtr->Gpr[3]  = EbcContext.R3;
+    VmPtr->Gpr[4]  = EbcContext.R4;
+    VmPtr->Gpr[5]  = EbcContext.R5;
+    VmPtr->Gpr[6]  = EbcContext.R6;
+    VmPtr->Gpr[7]  = EbcContext.R7;
     VmPtr->Ip    = (VMIP)(UINTN)EbcContext.Ip;
     VmPtr->Flags = EbcContext.Flags;
   }

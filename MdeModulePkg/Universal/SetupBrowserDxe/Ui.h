@@ -1,7 +1,7 @@
 /** @file
 Private structure, MACRO and function definitions for User Interface related functionalities.
 
-Copyright (c) 2004 - 2009, Intel Corporation
+Copyright (c) 2004 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -168,14 +168,15 @@ struct _UI_MENU_LIST {
 
 #define UI_MENU_LIST_FROM_LINK(a)  CR (a, UI_MENU_LIST, Link, UI_MENU_LIST_SIGNATURE)
 
-typedef struct _MENU_REFRESH_ENTRY {
-  struct _MENU_REFRESH_ENTRY  *Next;
+typedef struct _MENU_REFRESH_ENTRY MENU_REFRESH_ENTRY;
+struct _MENU_REFRESH_ENTRY {
+  MENU_REFRESH_ENTRY          *Next;
   UI_MENU_OPTION              *MenuOption;  // Describes the entry needing an update
   UI_MENU_SELECTION           *Selection;
   UINTN                       CurrentColumn;
   UINTN                       CurrentRow;
   UINTN                       CurrentAttribute;
-} MENU_REFRESH_ENTRY;
+};
 
 typedef struct {
   UINT16              ScanCode;
