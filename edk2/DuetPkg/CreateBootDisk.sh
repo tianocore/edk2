@@ -14,8 +14,8 @@ if [ \
      "$*" = "--help" \
    ]
 then
-	echo "Usage: CreateBootDisk [usb|floppy|ide] MediaPath DevicePath [FAT12|FAT16|FAT32]"
-	echo "e.g. : CreateBootDisk floppy /media/floppy0 /dev/fd0 FAT12 "
+	echo "Usage: CreateBootDisk [usb|floppy|ide] MediaPath DevicePath [FAT12|FAT16|FAT32] [IA32|X64]"
+	echo "e.g. : CreateBootDisk floppy /media/floppy0 /dev/fd0 FAT12 IA32"
 	PROCESS_MARK=FALSE
 fi
 
@@ -44,9 +44,17 @@ then
 	
 				mkdir -p $EFI_BOOT_MEDIA/efi
 				mkdir -p $EFI_BOOT_MEDIA/efi/boot
-
-				cp $WORKSPACE/EdkShellBinPkg/MinimumShell/Ia32/Shell.efi $EFI_BOOT_MEDIA/efi/boot/bootia32.efi 
-	
+				if [ "$5" = IA32 ]
+				then
+					cp $WORKSPACE/EdkShellBinPkg/MinimumShell/Ia32/Shell.efi $EFI_BOOT_MEDIA/efi/boot/bootia32.efi 
+				else
+					if [ "$5" = X64 ]
+					then
+						cp $WORKSPACE/EdkShellBinPkg/MinimumShell/X64/Shell.efi $EFI_BOOT_MEDIA/efi/boot/bootx64.efi 
+					else
+						echo Wrong Arch!
+					fi
+				fi
 				echo Done.
 			else
 				echo "Wrong FAT type $4 for floppy!"
@@ -73,11 +81,21 @@ then
 
 			if [ "$4" = FAT16 ]
 			then
-				if [ "$5" = step2 ]
+				if [ "$6" = step2 ]
 				then
 					cp $BUILD_DIR/FV/Efildr16 $EFI_BOOT_MEDIA
 					mkdir $EFI_BOOT_MEDIA/efi/boot
-					cp $WORKSPACE/EdkShellBinPkg/MinimumShell/ia32/Shell.efi $EFI_BOOT_MEDIA/efi/boot/bootia32.efi
+					if [ "$5" = IA32 ]
+					then
+						cp $WORKSPACE/EdkShellBinPkg/MinimumShell/Ia32/Shell.efi $EFI_BOOT_MEDIA/efi/boot/bootia32.efi 
+					else
+						if [ "$5" = X64 ]
+						then
+							cp $WORKSPACE/EdkShellBinPkg/MinimumShell/X64/Shell.efi $EFI_BOOT_MEDIA/efi/boot/bootx64.efi 
+						else
+							echo Wrong Arch!
+						fi
+					fi
 					echo "step2 Done!"
 				else
 					echo Format $EFI_BOOT_DEVICE ...
@@ -93,11 +111,21 @@ then
 				fi
 			elif [ "$4" = FAT32 ]
 			then 
-				if [ "$5" = step2 ]
+				if [ "$6" = step2 ]
 				then
 					cp $BUILD_DIR/FV/Efildr20 $EFI_BOOT_MEDIA
 					mkdir $EFI_BOOT_MEDIA/efi/boot
-					cp $WORKSPACE/EdkShellBinPkg/MinimumShell/ia32/Shell.efi $EFI_BOOT_MEDIA/efi/boot/bootia32.efi
+					if [ "$5" = IA32 ]
+					then
+						cp $WORKSPACE/EdkShellBinPkg/MinimumShell/Ia32/Shell.efi $EFI_BOOT_MEDIA/efi/boot/bootia32.efi 
+					else
+						if [ "$5" = X64 ]
+						then
+							cp $WORKSPACE/EdkShellBinPkg/MinimumShell/X64/Shell.efi $EFI_BOOT_MEDIA/efi/boot/bootx64.efi 
+						else
+							echo Wrong Arch!
+						fi
+					fi
 					echo "step2 Done!"
 				else
 					echo Format $EFI_BOOT_DEVICE ...
