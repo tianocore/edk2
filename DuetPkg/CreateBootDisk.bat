@@ -6,17 +6,23 @@
 @set BUILD_DIR=%WORKSPACE%\Build\DuetPkg\DEBUG_MYTOOLS
 @set BOOTSECTOR_BIN_DIR=%WORKSPACE%\DuetPkg\BootSector\bin
 @set DISK_LABEL=DUET
-@echo on
+@set PROCESSOR=""
 
+@echo on
 
 @if "%1"=="" goto Help
 @if "%2"=="" goto Help
 @if "%3"=="" goto Help
+@if "%4"=="" goto NoArch
 @set EFI_BOOT_DISK=%2
+@if "%4"=="IA32" set PROCESSOR=IA32
+@if "%4"=="X64" set PROCESSOR=X64
+@if %PROCESSOR%=="" goto WrongArch
 @if "%1"=="floppy" goto CreateFloppy
 @if "%1"=="file" goto CreateFile
 @if "%1"=="usb" goto CreateUsb
 @if "%1"=="ide" goto CreateIde
+
 goto Help
 
 :CreateFloppy
@@ -35,7 +41,8 @@ goto Help
 @echo Done.
 copy %BUILD_DIR%\FV\EfiLdr %EFI_BOOT_DISK%
 mkdir %EFI_BOOT_DISK%\efi\boot
-copy %WORKSPACE%\EdkShellBinPkg\MinimumShell\ia32\Shell.efi %EFI_BOOT_DISK%\efi\boot\bootia32.efi /y
+@if "%PROCESSOR%"=="IA32" goto CreateBootFileForIA32
+@if "%PROCESSOR%"=="X64" goto CreateBootFileForX64
 @goto end
 
 :CreateFile
@@ -56,7 +63,7 @@ copy %WORKSPACE%\EdkShellBinPkg\MinimumShell\ia32\Shell.efi %EFI_BOOT_DISK%\efi\
 @if "%3"=="FAT12" goto WrongFATType
 
 :CreateUsb_FAT16
-@if "%4"=="step2" goto CreateUsb_FAT16_step2
+@if "%5"=="step2" goto CreateUsb_FAT16_step2
 @echo Format %EFI_BOOT_DISK% ...
 @echo.> FormatCommandInput.txt
 @format /FS:FAT /v:%DISK_LABEL% /q %EFI_BOOT_DISK% < FormatCommandInput.txt > NUL
@@ -73,11 +80,12 @@ copy %WORKSPACE%\EdkShellBinPkg\MinimumShell\ia32\Shell.efi %EFI_BOOT_DISK%\efi\
 :CreateUsb_FAT16_step2
 @copy %BUILD_DIR%\FV\EfiLdr16 %EFI_BOOT_DISK%
 @mkdir %EFI_BOOT_DISK%\efi\boot
-copy %WORKSPACE%\EdkShellBinPkg\MinimumShell\Ia32\Shell.efi %EFI_BOOT_DISK%\efi\boot\bootia32.efi /y
+@if "%PROCESSOR%"=="IA32" goto CreateBootFileForIA32
+@if "%PROCESSOR%"=="X64" goto CreateBootFileForX64
 @goto end
 
 :CreateUsb_FAT32
-@if "%4"=="step2" goto CreateUsb_FAT32_step2
+@if "%5"=="step2" goto CreateUsb_FAT32_step2
 @echo Format %EFI_BOOT_DISK% ...
 @echo.> FormatCommandInput.txt
 @format /FS:FAT32 /v:%DISK_LABEL% /q %EFI_BOOT_DISK% < FormatCommandInput.txt > NUL
@@ -95,17 +103,34 @@ copy %WORKSPACE%\EdkShellBinPkg\MinimumShell\Ia32\Shell.efi %EFI_BOOT_DISK%\efi\
 :CreateUsb_FAT32_step2
 @copy %BUILD_DIR%\FV\EfiLdr20 %EFI_BOOT_DISK%
 @mkdir %EFI_BOOT_DISK%\efi\boot
-@copy %WORKSPACE%\EdkShellBinPkg\MinimumShell\ia32\Shell.efi %EFI_BOOT_DISK%\efi\boot\bootia32.efi /y
+@if "%PROCESSOR%"=="IA32" goto CreateBootFileForIA32
+@if "%PROCESSOR%"=="X64" goto CreateBootFileForX64
 @goto end
 
 :CreateIde
+@goto end
+
+:CreateBootFileForIA32
+copy %WORKSPACE%\EdkShellBinPkg\MinimumShell\IA32\Shell.efi %EFI_BOOT_DISK%\efi\boot\bootia32.efi /y
+@goto end
+
+:CreateBootFileForX64
+copy %WORKSPACE%\EdkShellBinPkg\MinimumShell\X64\Shell.efi %EFI_BOOT_DISK%\efi\boot\bootx64.efi /y
 @goto end
 
 :WrongFATType
 @echo Wrong FAT type %3 for %1
 @goto end
 
+:NoArch
+@echo Error! Please specific the architecture.
+@goto Help
+
+:WrongArch
+@echo Error! Wrong architecture.
+@goto Help
+
 :Help
-@echo "Usage: CreateBootDisk [usb|floppy|ide] DiskNumber [FAT12|FAT16|FAT32]"
+@echo "Usage: CreateBootDisk [usb|floppy|ide] DiskNumber [FAT12|FAT16|FAT32] [IA32|X64]"
 :end
 @echo on

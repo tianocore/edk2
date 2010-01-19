@@ -26,7 +26,7 @@ Revision History:
 #define EFI_MEMORY_BELOW_1MB_START     0x86000
 #define EFI_MEMORY_BELOW_1MB_END       0x9F800
 #define EFI_MEMORY_STACK_PAGE_NUM      0x20
-#define CONSUMED_MEMORY                0x2000000
+#define CONSUMED_MEMORY                0x100000 * 80
 
 #define NV_STORAGE_START               0x15000
 #define NV_STORAGE_STATE               0x19000

@@ -36,17 +36,21 @@ Create bootable disk
 3.1 Create floppy boot disk
   1). enter <Workspace>\DuetPkg directory.
   2). Insert a floppy disk to drive
-  3). run "CreateBootDisk.bat floppy a: FAT12" if floppy drive is a: disk.
-  
+  3). run "CreateBootDisk.bat floppy a: FAT12 IA32" if floppy drive is a: disk and Arch to boot is IA32.
+      or
+      run "CreateBootDisk.bat floppy a: FAT12 X64" if floppy drive is a: disk and Arch to boot is X64.
 3.2 Create usb boot disk
   1). enter <Workspace>\DuetPkg directory.
   2). Plugin usb disk
-  3). run "CreateBootDisk.bat usb e: FAT16" if usb drive is e: and FAT format is FAT16 or
-          "CreateBootDisk.bat usb e: FAT32" if usb drive is e: and FAT format is FAT32
+  3). run "CreateBootDisk.bat usb e: FAT16 IA32" if usb drive is e: and FAT format is FAT16 and Arch to boot is IA32.
+      or "CreateBootDisk.bat usb e: FAT16 X64" if usb drive is e: and FAT format is FAT16 and Arch to boot is X64.
+      or "CreateBootDisk.bat usb e: FAT32 IA32" if usb drive is e: and FAT format is FAT32 and Arch to boot is IA32.
+      or "CreateBootDisk.bat usb e: FAT32 X64" if usb drive is e: and FAT format is FAT32 and Arch to boot is X64.
   4). UnPlug usb disk and plugin it again.
-  5). run "CreateBootDisk.bat usb e: FAT16 step2" if usb drive is e: and FAT format is FAT16 or 
-          "CreateBootDisk.bat usb e: FAT32 step2" if usb drive is e: and FAT format is FAT32.
-          
+  5). run "CreateBootDisk.bat usb e: FAT16 IA32 step2" if usb drive is e: and FAT format is FAT16 and Arch to boot is IA32.
+      or "CreateBootDisk.bat usb e: FAT16 X64 step2" if usb drive is e: and FAT format is FAT16 and Arch to boot is X64.
+      or "CreateBootDisk.bat usb e: FAT32 IA32 step2" if usb drive is e: and FAT format is FAT32 and Arch to boot is IA32.
+      or "CreateBootDisk.bat usb e: FAT32 X64 step2" if usb drive is e: and FAT format is FAT32 and Arch to boot is X64.
           
 B. Build DUET image on Linux Platform
 ======================================        
@@ -98,4 +102,4 @@ B. Build DUET image on Linux Platform
 	  1). enter /R9_tree/DuetPkg directory.
 	  2). Insert a floppy disk to drive
 	  3). run "CreateBootDisk.sh" to build floppy drive
-		  such as "./CreateBootDisk.sh floppy /media/floppy0 /dev/fd0 FAT12"
+		  such as "./CreateBootDisk.sh floppy /media/floppy0 /dev/fd0 FAT12 IA32"

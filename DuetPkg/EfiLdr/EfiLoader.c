@@ -56,7 +56,7 @@ EfiLoader (
   
   PrintHeader ('A');
   
-  AsciiSPrint (PrintBuffer, 256, "Enter DUET Loader ...\n", BiosMemoryMapBaseAddress);
+  AsciiSPrint (PrintBuffer, 256, "Enter DUET Loader...\n");
   PrintString (PrintBuffer);
 
   AsciiSPrint (PrintBuffer, 256, "BiosMemoryMapBaseAddress = 0x%x\n", BiosMemoryMapBaseAddress);
