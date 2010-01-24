@@ -221,6 +221,7 @@ ShadowPeiCore(
   Status = PeiLoadImage (
               PeiServices,
               *((EFI_PEI_FILE_HANDLE*)&PeiCoreFileHandle),
+              PEIM_STATE_REGISITER_FOR_SHADOW,
               &EntryPoint,
               &AuthenticationState
               );
@@ -298,6 +299,7 @@ PeiDispatcher (
           Status = PeiLoadImage (
                     (CONST EFI_PEI_SERVICES **) &Private->PS,
                     PeimFileHandle,
+                    PEIM_STATE_REGISITER_FOR_SHADOW,
                     &EntryPoint,
                     &AuthenticationState
                     );
@@ -401,6 +403,7 @@ PeiDispatcher (
               Status = PeiLoadImage (
                          PeiServices,
                          PeimFileHandle,
+                         PEIM_STATE_NOT_DISPATCHED,
                          &EntryPoint,
                          &AuthenticationState
                          );
@@ -818,5 +821,6 @@ PeiRegisterForShadow (
 
   return EFI_SUCCESS;
 }
+
 
 

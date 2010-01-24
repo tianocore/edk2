@@ -1,7 +1,7 @@
 /** @file
   Definition of Pei Core Structures and Services
   
-Copyright (c) 2006 - 2009, Intel Corporation
+Copyright (c) 2006 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -815,6 +815,7 @@ PeiAllocatePool (
 
   @param PeiServices            An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param FileHandle             Pointer to the FFS file header of the image.
+  @param PeimState              The dispatch state of the input PEIM handle.
   @param EntryPoint             Pointer to entry point of specified image file for output.
   @param AuthenticationState    Pointer to attestation authentication state of image.
 
@@ -827,6 +828,7 @@ EFI_STATUS
 PeiLoadImage (
   IN  CONST EFI_PEI_SERVICES      **PeiServices,
   IN  EFI_PEI_FILE_HANDLE         FileHandle,
+  IN  UINT8                       PeimState,
   OUT    EFI_PHYSICAL_ADDRESS     *EntryPoint,
   OUT    UINT32                   *AuthenticationState
   );
