@@ -1,7 +1,7 @@
 /** @file
   Pei Core Load Image Support
   
-Copyright (c) 2006 - 2009, Intel Corporation                                                         
+Copyright (c) 2006 - 2010, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -100,7 +100,7 @@ GetImageReadFunction (
 /**
 
   Loads and relocates a PE/COFF image into memory.
-
+  If the image is not relocatable, it will not be loaded into memory and be loaded as XIP image.
 
   @param Pe32Data        - The base address of the PE/COFF file that is to be loaded and relocated
   @param ImageAddress    - The base address of the relocated PE/COFF image
@@ -109,7 +109,6 @@ GetImageReadFunction (
 
   @retval EFI_SUCCESS           The file was loaded and relocated
   @retval EFI_OUT_OF_RESOURCES  There was not enough memory to load and relocate the PE/COFF file
-  @retval EFI_INVALID_PARAMETER The image withou .reloc section can't be relocated.
 
 **/
 EFI_STATUS
@@ -140,14 +139,23 @@ LoadAndRelocatePeCoffImage (
   // When Image has no reloc section, it can't be relocated into memory.
   //
   if (ImageContext.RelocationsStripped) {
-    DEBUG ((EFI_D_ERROR, "The image at 0x%08x without reloc section can't be loaded into memory\n", (UINTN) Pe32Data));
+    DEBUG ((EFI_D_INFO, "The image at 0x%08x without reloc section can't be loaded into memory\n", (UINTN) Pe32Data));
   }
+  
   //
-  // Allocate Memory for the image
+  // Set default base address to current image address.
+  //
+  ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)(UINTN) Pe32Data;
+  
+  //
+  // Allocate Memory for the image when memory is ready, boot mode is not S3, and image is relocatable.
   //
   if ((!ImageContext.RelocationsStripped) && (Private->PeiMemoryInstalled) && (Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME)) {
     ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)(UINTN) AllocatePages (EFI_SIZE_TO_PAGES ((UINT32) ImageContext.ImageSize));
     ASSERT (ImageContext.ImageAddress != 0);
+    if (ImageContext.ImageAddress == 0) {
+      return EFI_OUT_OF_RESOURCES;
+    }
     
     //
     // Skip the reserved space for the stripped PeHeader when load TeImage into memory.
@@ -157,8 +165,6 @@ LoadAndRelocatePeCoffImage (
                                   ((EFI_TE_IMAGE_HEADER *) Pe32Data)->StrippedSize -
                                   sizeof (EFI_TE_IMAGE_HEADER);
     }
-  } else {
-    ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)(UINTN) Pe32Data;
   }
 
   //
@@ -179,7 +185,7 @@ LoadAndRelocatePeCoffImage (
   //
   // Flush the instruction cache so the image data is written before we execute it
   //
-  if ((Private->PeiMemoryInstalled) && (Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME)) {
+  if ((!ImageContext.RelocationsStripped) && (Private->PeiMemoryInstalled) && (Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME)) {
     InvalidateInstructionCacheRange ((VOID *)(UINTN)ImageContext.ImageAddress, (UINTN)ImageContext.ImageSize);
   }
 
@@ -387,12 +393,73 @@ PeiLoadImageLoadImageWrapper (
 }
 
 /**
+  Check whether the input image has the relocation.
+
+  @param  Pe32Data   Pointer to the PE/COFF or TE image.
+
+  @retval TRUE       Relocation is stripped.
+  @retval FALSE      Relocation is not stripped.
+
+**/
+BOOLEAN
+RelocationIsStrip (
+  IN VOID  *Pe32Data
+  )
+{
+  EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION  Hdr;
+  EFI_IMAGE_DOS_HEADER                 *DosHdr;
+
+  ASSERT (Pe32Data != NULL);
+
+  DosHdr = (EFI_IMAGE_DOS_HEADER *)Pe32Data;
+  if (DosHdr->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
+    //
+    // DOS image header is present, so read the PE header after the DOS image header.
+    //
+    Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)((UINTN) Pe32Data + (UINTN) ((DosHdr->e_lfanew) & 0x0ffff));
+  } else {
+    //
+    // DOS image header is not present, so PE header is at the image base.
+    //
+    Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)Pe32Data;
+  }
+
+  //
+  // Three cases with regards to relocations:
+  // - Image has base relocs, RELOCS_STRIPPED==0    => image is relocatable
+  // - Image has no base relocs, RELOCS_STRIPPED==1 => Image is not relocatable
+  // - Image has no base relocs, RELOCS_STRIPPED==0 => Image is relocatable but
+  //   has no base relocs to apply
+  // Obviously having base relocations with RELOCS_STRIPPED==1 is invalid.
+  //
+  // Look at the file header to determine if relocations have been stripped, and
+  // save this info in the image context for later use.
+  //
+  if (Hdr.Te->Signature == EFI_TE_IMAGE_HEADER_SIGNATURE) {
+    if ((Hdr.Te->DataDirectory[0].Size == 0) && (Hdr.Te->DataDirectory[0].VirtualAddress == 0)) {
+      return TRUE;
+    } else {
+      return FALSE;
+    }
+  } else if (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE)  {
+    if ((Hdr.Pe32->FileHeader.Characteristics & EFI_IMAGE_FILE_RELOCS_STRIPPED) != 0) {
+      return TRUE;
+    } else {
+      return FALSE;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
   Routine to load image file for subsequent execution by LoadFile Ppi.
   If any LoadFile Ppi is not found, the build-in support function for the PE32+/TE 
   XIP image format is used.
 
   @param PeiServices     - An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation
   @param FileHandle      - Pointer to the FFS file header of the image.
+  @param PeimState       - The dispatch state of the input PEIM handle.
   @param EntryPoint      - Pointer to entry point of specified image file for output.
   @param AuthenticationState - Pointer to attestation authentication state of image.
 
@@ -405,6 +472,7 @@ EFI_STATUS
 PeiLoadImage (
   IN     CONST EFI_PEI_SERVICES       **PeiServices,
   IN     EFI_PEI_FILE_HANDLE          FileHandle,
+  IN     UINT8                        PeimState,
   OUT    EFI_PHYSICAL_ADDRESS         *EntryPoint,
   OUT    UINT32                       *AuthenticationState
   )
@@ -415,7 +483,9 @@ PeiLoadImage (
   EFI_PEI_LOAD_FILE_PPI   *LoadFile;
   EFI_PHYSICAL_ADDRESS    ImageAddress;
   UINT64                  ImageSize;
+  BOOLEAN                 IsStrip;
 
+  IsStrip = FALSE;
   //
   // If any instances of PEI_LOAD_FILE_PPI are installed, they are called.
   // one at a time, until one reports EFI_SUCCESS.
@@ -438,6 +508,17 @@ PeiLoadImage (
                           AuthenticationState
                           );
       if (!EFI_ERROR (Status)) {
+        //
+        // The shadowed PEIM must be relocatable.
+        //
+        if (PeimState == PEIM_STATE_REGISITER_FOR_SHADOW) {
+          IsStrip = RelocationIsStrip ((VOID *) (UINTN) ImageAddress);
+          ASSERT (!IsStrip);
+          if (IsStrip) {
+            return EFI_UNSUPPORTED;
+          }
+        }
+
         //
         // The image to be started must have the machine type supported by PeiCore.
         //
@@ -485,6 +566,7 @@ InitializeImageServices (
     PeiServicesReInstallPpi (PrivateData->XipLoadFile, &gPpiLoadFilePpiList); 
   }
 }
+
 
 
 
