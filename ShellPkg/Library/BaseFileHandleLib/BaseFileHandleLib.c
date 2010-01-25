@@ -1,14 +1,14 @@
 /** @file
   Provides interface to EFI_FILE_HANDLE functionality.
 
-Copyright (c) 2006 - 2009, Intel Corporation<BR>
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved. <BR>
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -624,9 +624,9 @@ FileHandleGetSize (
   append the first D characters of Source to the end of Destination, where D is 
   the lesser of Count and the StrLen() of Source. If appending those D characters 
   will fit within Destination (whose Size is given as CurrentSize) and 
-  still leave room for a null terminator, then those characters are appended, 
-  starting at the original terminating null of Destination, and a new terminating 
-  null is appended.
+  still leave room for a NULL terminator, then those characters are appended, 
+  starting at the original terminating NULL of Destination, and a new terminating 
+  NULL is appended.
 
   If appending D characters onto Destination will result in a overflow of the size
   given in CurrentSize the string will be grown such that the copy can be performed
@@ -979,12 +979,12 @@ FileHandleWriteLine(
     return (EFI_SUCCESS);
   }
 
-  Size = StrLen(Buffer);
+  Size = StrSize(Buffer) - sizeof(Buffer[0]);
   Status = FileHandleWrite(Handle, &Size, Buffer);
   if (EFI_ERROR(Status)) {
     return (Status);
   }
-  Size = StrLen(L"\r\n");
+  Size = StrSize(L"\r\n") - sizeof(CHAR16);
   return FileHandleWrite(Handle, &Size, L"\r\n");
 }
 
