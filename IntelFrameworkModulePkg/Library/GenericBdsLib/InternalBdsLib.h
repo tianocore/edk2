@@ -1,7 +1,7 @@
 /** @file
   BDS library definition, include the file and data structure
 
-Copyright (c) 2004 - 2009, Intel Corporation. <BR>
+Copyright (c) 2004 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -24,7 +24,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/LoadedImage.h>
 #include <Protocol/Cpu.h>
 #include <Protocol/SimpleFileSystem.h>
-#include <Protocol/ManagedNetwork.h>
 #include <Protocol/LoadFile.h>
 #include <Protocol/DebugPort.h>
 #include <Protocol/DevicePath.h>

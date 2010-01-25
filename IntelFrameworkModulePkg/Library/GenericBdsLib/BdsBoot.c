@@ -991,8 +991,8 @@ BdsLibEnumerateAllBootOption (
   EFI_HANDLE                    *BlockIoHandles;
   EFI_BLOCK_IO_PROTOCOL         *BlkIo;
   UINTN                         Index;
-  UINTN                         NumberNetworkHandles;
-  EFI_HANDLE                    *NetworkHandles;
+  UINTN                         NumOfLoadFileHandles;
+  EFI_HANDLE                    *LoadFileHandles;
   UINTN                         FvHandleCount;
   EFI_HANDLE                    *FvHandleBuffer;
   EFI_FV_FILETYPE               Type;
@@ -1171,37 +1171,25 @@ BdsLibEnumerateAllBootOption (
   //
   // Parse Network Boot Device
   //
-  NumberNetworkHandles = 0;
+  NumOfLoadFileHandles = 0;
   //
-  // Search MNP Service Binding protocol for UEFI network stack
+  // Search Load File protocol for PXE boot option.
   //
   gBS->LocateHandleBuffer (
         ByProtocol,
-        &gEfiManagedNetworkServiceBindingProtocolGuid,
+        &gEfiLoadFileProtocolGuid,
         NULL,
-        &NumberNetworkHandles,
-        &NetworkHandles
+        &NumOfLoadFileHandles,
+        &LoadFileHandles
         );
-  if (NumberNetworkHandles == 0) {
-    //
-    // MNP Service Binding protocol not found, search SNP for EFI network stack
-    //
-    gBS->LocateHandleBuffer (
-          ByProtocol,
-          &gEfiSimpleNetworkProtocolGuid,
-          NULL,
-          &NumberNetworkHandles,
-          &NetworkHandles
-          );
-  }
 
-  for (Index = 0; Index < NumberNetworkHandles; Index++) {
+  for (Index = 0; Index < NumOfLoadFileHandles; Index++) {
     UnicodeSPrint (Buffer, sizeof (Buffer), L"%d", Index);
-    BdsLibBuildOptionFromHandle (NetworkHandles[Index], BdsBootOptionList, Buffer);
+    BdsLibBuildOptionFromHandle (LoadFileHandles[Index], BdsBootOptionList, Buffer);
   }
 
-  if (NumberNetworkHandles != 0) {
-    FreePool (NetworkHandles);
+  if (NumOfLoadFileHandles != 0) {
+    FreePool (LoadFileHandles);
   }
 
   //
@@ -1556,16 +1544,9 @@ BdsLibNetworkBootWithMediaPresent (
 
   UpdatedDevicePath = DevicePath;
   //
-  // Locate MNP Service Binding protocol for UEFI network stack first
+  // Locate Load File Protocol for PXE boot option first
   //
-  Status = gBS->LocateDevicePath (&gEfiManagedNetworkServiceBindingProtocolGuid, &UpdatedDevicePath, &Handle);
-  if (EFI_ERROR (Status)) {
-    //
-    // MNP Service Binding protocol not found, search SNP for EFI network stack
-    //
-    UpdatedDevicePath = DevicePath;
-    Status = gBS->LocateDevicePath (&gEfiSimpleNetworkProtocolGuid, &UpdatedDevicePath, &Handle);
-  }
+  Status = gBS->LocateDevicePath (&gEfiLoadFileProtocolGuid, &UpdatedDevicePath, &Handle);
   if (EFI_ERROR (Status)) {
     //
     // Device not present so see if we need to connect it
@@ -1575,11 +1556,7 @@ BdsLibNetworkBootWithMediaPresent (
       //
       // This one should work after we did the connect
       //
-      Status = gBS->LocateDevicePath (&gEfiManagedNetworkServiceBindingProtocolGuid, &UpdatedDevicePath, &Handle);
-      if (EFI_ERROR (Status)) {
-        UpdatedDevicePath = DevicePath;
-        Status = gBS->LocateDevicePath (&gEfiSimpleNetworkProtocolGuid, &UpdatedDevicePath, &Handle);
-      }
+      Status = gBS->LocateDevicePath (&gEfiLoadFileProtocolGuid, &UpdatedDevicePath, &Handle);
     }
   }
 
@@ -1727,6 +1704,8 @@ BdsGetBootTypeFromDevicePath (
 
         case MSG_MAC_ADDR_DP:
         case MSG_VLAN_DP:
+        case MSG_IPv4_DP:
+        case MSG_IPv6_DP:
           BootType = BDS_EFI_MESSAGE_MAC_BOOT;
           break;
 
@@ -1794,29 +1773,20 @@ BdsLibIsValidEFIBootOptDevicePathExt (
   EFI_DEVICE_PATH_PROTOCOL  *TempDevicePath;
   EFI_DEVICE_PATH_PROTOCOL  *LastDeviceNode;
   EFI_BLOCK_IO_PROTOCOL     *BlockIo;
-  EFI_LOAD_FILE_PROTOCOL    *LoadFile;
 
   TempDevicePath = DevPath;
   LastDeviceNode = DevPath;
 
   //
-  // Check if it's a valid boot option for network boot device
-  // Check if there is MNP Service Binding Protocol or SimpleNetworkProtocol
-  // installed. If yes, that means there is the network card there.
+  // Check if it's a valid boot option for network boot device.
+  // Check if there is EfiLoadFileProtocol installed. 
+  // If yes, that means there is a boot option for network.
   //
   Status = gBS->LocateDevicePath (
-                  &gEfiManagedNetworkServiceBindingProtocolGuid,
+                  &gEfiLoadFileProtocolGuid,
                   &TempDevicePath,
                   &Handle
                   );
-  if (EFI_ERROR (Status)) {
-    TempDevicePath = DevPath;
-    Status = gBS->LocateDevicePath (
-                    &gEfiSimpleNetworkProtocolGuid,
-                    &TempDevicePath,
-                    &Handle
-                    );
-  }
   if (EFI_ERROR (Status)) {
     //
     // Device not present so see if we need to connect it
@@ -1824,44 +1794,30 @@ BdsLibIsValidEFIBootOptDevicePathExt (
     TempDevicePath = DevPath;
     BdsLibConnectDevicePath (TempDevicePath);
     Status = gBS->LocateDevicePath (
-                    &gEfiManagedNetworkServiceBindingProtocolGuid,
+                    &gEfiLoadFileProtocolGuid,
                     &TempDevicePath,
                     &Handle
                     );
-    if (EFI_ERROR (Status)) {
-      TempDevicePath = DevPath;
-      Status = gBS->LocateDevicePath (
-                      &gEfiSimpleNetworkProtocolGuid,
-                      &TempDevicePath,
-                      &Handle
-                      );
-    }
   }
 
   if (!EFI_ERROR (Status)) {
-    //
-    // Check whether LoadFile protocol is installed
-    //
-    Status = gBS->HandleProtocol (Handle, &gEfiLoadFileProtocolGuid, (VOID **)&LoadFile);
-    if (!EFI_ERROR (Status)) {
-      if (!IsDevicePathEnd (TempDevicePath)) {
-        //
-        // LoadFile protocol is not installed on handle with exactly the same DevPath
-        //
-        return FALSE;
-      }
+    if (!IsDevicePathEnd (TempDevicePath)) {
+      //
+      // LoadFile protocol is not installed on handle with exactly the same DevPath
+      //
+      return FALSE;
+    }
 
-      if (CheckMedia) {
-        //
-        // Test if it is ready to boot now
-        //
-        if (BdsLibNetworkBootWithMediaPresent(DevPath)) {
-          return TRUE;
-        }
-      } else {
+    if (CheckMedia) {
+      //
+      // Test if it is ready to boot now
+      //
+      if (BdsLibNetworkBootWithMediaPresent(DevPath)) {
         return TRUE;
       }
-    }
+    } else {
+      return TRUE;
+    }    
   }
 
   //
