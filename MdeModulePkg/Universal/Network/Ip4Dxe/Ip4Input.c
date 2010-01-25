@@ -1,7 +1,7 @@
 /** @file
   IP4 input process.
   
-Copyright (c) 2005 - 2009, Intel Corporation.<BR>
+Copyright (c) 2005 - 2010, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -881,11 +881,11 @@ Ip4InstanceFrameAcceptable (
   //
   // Use protocol from the IP header embedded in the ICMP error
   // message to filter, instead of ICMP itself. ICMP handle will
-  // can Ip4Demultiplex to deliver ICMP errors.
+  // call Ip4Demultiplex to deliver ICMP errors.
   //
   Proto = Head->Protocol;
 
-  if (Proto == EFI_IP_PROTO_ICMP) {
+  if ((Proto == EFI_IP_PROTO_ICMP) && (!Config->AcceptAnyProtocol) && (Proto != Config->DefaultProtocol)) {
     NetbufCopy (Packet, 0, sizeof (Icmp.Head), (UINT8 *) &Icmp.Head);
 
     if (mIcmpClass[Icmp.Head.Type].IcmpClass == ICMP_ERROR_MESSAGE) {
