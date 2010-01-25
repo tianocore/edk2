@@ -1,7 +1,7 @@
 /** @file
   DevicePathToText protocol as defined in the UEFI 2.0 specification.
 
-Copyright (c) 2006 - 2009, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -997,6 +997,28 @@ DevPathToTextMacAddr (
 }
 
 /**
+  Converts network protocol string to its text representation.
+
+  @param Str             The string representative of input device.
+  @param Protocol        The network protocol ID.
+
+**/
+VOID
+CatNetworkProtocol (
+  IN OUT POOL_PRINT  *Str,
+  IN UINT16          Protocol
+  )
+{
+  if (Protocol == RFC_1700_TCP_PROTOCOL) {
+    CatPrint (Str, L"TCP");
+  } else if (Protocol == RFC_1700_UDP_PROTOCOL) {
+    CatPrint (Str, L"UDP");
+  } else {
+    CatPrint (Str, L"0x%x", Protocol);
+  }
+}
+
+/**
   Converts a IPv4 device path structure to its string representative.
 
   @param Str             The string representative of input device.
@@ -1034,12 +1056,21 @@ DevPathToTextIPv4 (
 
   CatPrint (
     Str,
-    L"IPv4(%d.%d.%d.%d,%s,%s,%d.%d.%d.%d)",
+    L"IPv4(%d.%d.%d.%d,",
     (UINTN) IPDevPath->RemoteIpAddress.Addr[0],
     (UINTN) IPDevPath->RemoteIpAddress.Addr[1],
     (UINTN) IPDevPath->RemoteIpAddress.Addr[2],
-    (UINTN) IPDevPath->RemoteIpAddress.Addr[3],
-    (IPDevPath->Protocol == 1) ? L"TCP" : L"UDP",
+    (UINTN) IPDevPath->RemoteIpAddress.Addr[3]
+    );
+
+  CatNetworkProtocol (
+    Str,
+    IPDevPath->Protocol
+    );
+
+  CatPrint (
+    Str,
+    L",%s,%d.%d.%d.%d)",
     IPDevPath->StaticIpAddress ? L"Static" : L"DHCP",
     (UINTN) IPDevPath->LocalIpAddress.Addr[0],
     (UINTN) IPDevPath->LocalIpAddress.Addr[1],
@@ -1098,7 +1129,7 @@ DevPathToTextIPv6 (
 
   CatPrint (
     Str,
-    L"IPv6(%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x,%s,%s,%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x)",
+    L"IPv6(%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x,",
     (UINTN) IPDevPath->RemoteIpAddress.Addr[0],
     (UINTN) IPDevPath->RemoteIpAddress.Addr[1],
     (UINTN) IPDevPath->RemoteIpAddress.Addr[2],
@@ -1114,8 +1145,17 @@ DevPathToTextIPv6 (
     (UINTN) IPDevPath->RemoteIpAddress.Addr[12],
     (UINTN) IPDevPath->RemoteIpAddress.Addr[13],
     (UINTN) IPDevPath->RemoteIpAddress.Addr[14],
-    (UINTN) IPDevPath->RemoteIpAddress.Addr[15],
-    (IPDevPath->Protocol == 1) ? L"TCP" : L"UDP",
+    (UINTN) IPDevPath->RemoteIpAddress.Addr[15]
+    );
+    
+  CatNetworkProtocol (
+    Str,
+    IPDevPath->Protocol
+    );
+
+  CatPrint (
+    Str,
+    L"%s,%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x)",
     IPDevPath->StaticIpAddress ? L"Static" : L"DHCP",
     (UINTN) IPDevPath->LocalIpAddress.Addr[0],
     (UINTN) IPDevPath->LocalIpAddress.Addr[1],

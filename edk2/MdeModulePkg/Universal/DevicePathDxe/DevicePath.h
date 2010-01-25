@@ -110,6 +110,9 @@ typedef struct {
 #define USB_SUBCLASS_IRDA_BRIDGE   2
 #define USB_SUBCLASS_TEST          3
 
+#define RFC_1700_UDP_PROTOCOL      17
+#define RFC_1700_TCP_PROTOCOL      6
+
 #pragma pack(1)
 
 typedef struct {
