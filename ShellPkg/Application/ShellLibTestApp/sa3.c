@@ -3,14 +3,14 @@
 
   This should be executed with "/Param2 Val1" and "/Param1" as the 2 command line options!
 
-  Copyright (c) 2008-2009, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2008-2010, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -38,9 +38,9 @@ SHELL_PARAM_ITEM ParamList[] = {
 /**
   as the real entry point for the application.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
   @retval other             Some error occurs when executing this entry point.
 
@@ -64,7 +64,7 @@ UefiMain (
   EFI_SHELL_FILE_INFO *pShellFileInfo;
   LIST_ENTRY          *List;
   // CONST CHAR16              *Tester;
-  
+
   FileHandle = NULL;
   StrCpy(FileName, L"testfile.txt");
 //  Position = 0;
@@ -100,9 +100,9 @@ UefiMain (
 
   ShellSetPageBreakMode(TRUE);
 
-  Status = ShellOpenFileByName(FileName, 
-                               &FileHandle, 
-                               EFI_FILE_MODE_CREATE|EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE, 
+  Status = ShellOpenFileByName(FileName,
+                               &FileHandle,
+                               EFI_FILE_MODE_CREATE|EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE,
                                0
                                );
   ASSERT_EFI_ERROR(Status);
@@ -130,9 +130,9 @@ UefiMain (
   ASSERT_EFI_ERROR(Status);
   Print(L"read, write, create, getinfo - pass\r\n");
 
-  Status = ShellOpenFileByName(FileName, 
-                               &FileHandle, 
-                               EFI_FILE_MODE_CREATE|EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE, 
+  Status = ShellOpenFileByName(FileName,
+                               &FileHandle,
+                               EFI_FILE_MODE_CREATE|EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE,
                                0
                                );
   ASSERT_EFI_ERROR(Status);
@@ -141,7 +141,7 @@ UefiMain (
   pFileInfo->FileSize = 0x20;
   Status = ShellSetFileInfo(FileHandle, pFileInfo);
   FreePool(pFileInfo);
-  pFileInfo = NULL; 
+  pFileInfo = NULL;
   ASSERT_EFI_ERROR(Status);
   pFileInfo = ShellGetFileInfo(FileHandle);
   ASSERT(pFileInfo != NULL);
@@ -156,10 +156,10 @@ UefiMain (
   Status = ShellCloseFile(&FileHandle);
   ASSERT_EFI_ERROR(Status);
   Print(L"setinfo and change size, getsize - pass\r\n");
-  
-  Status = ShellOpenFileByName(FileName, 
-                               &FileHandle, 
-                               EFI_FILE_MODE_CREATE|EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE, 
+
+  Status = ShellOpenFileByName(FileName,
+                               &FileHandle,
+                               EFI_FILE_MODE_CREATE|EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE,
                                0
                                );
   ASSERT_EFI_ERROR(Status);
@@ -171,14 +171,14 @@ UefiMain (
   ASSERT(pFileInfo->FileSize == 0x20);
   ASSERT((pFileInfo->Attribute&EFI_FILE_DIRECTORY)==0);
   FreePool(pFileInfo);
-  pFileInfo = NULL;   
+  pFileInfo = NULL;
   Status = ShellDeleteFile(&FileHandle);
   ASSERT_EFI_ERROR(Status);
   Print(L"reopen file - pass\r\n");
 
-  Status = ShellOpenFileByName(FileName, 
-                               &FileHandle, 
-                               EFI_FILE_MODE_CREATE|EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE, 
+  Status = ShellOpenFileByName(FileName,
+                               &FileHandle,
+                               EFI_FILE_MODE_CREATE|EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE,
                                0
                                );
   ASSERT_EFI_ERROR(Status);
@@ -193,9 +193,9 @@ UefiMain (
   ASSERT_EFI_ERROR(Status);
   Print(L"size of empty - pass\r\n");
 
-  Status = ShellOpenFileByName(FileName, 
-                               &FileHandle, 
-                               EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE, 
+  Status = ShellOpenFileByName(FileName,
+                               &FileHandle,
+                               EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE,
                                0
                                );
   ASSERT(Status == EFI_NOT_FOUND);
@@ -211,23 +211,23 @@ UefiMain (
   Status = ShellDeleteFile(&FileHandle);
   ASSERT_EFI_ERROR(Status);
   Print(L"Directory create - pass\r\n");
-  
+
   // FindFirst and FindNext
   StrCpy(FileName, L"testDir");
   Status = ShellCreateDirectory(FileName, &FileHandle);
   Status = ShellCloseFile(&FileHandle);
   StrCat(FileName, L"\\File.txt");
-  Status = ShellOpenFileByName(FileName, 
-                               &FileHandle, 
-                               EFI_FILE_MODE_CREATE|EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE, 
+  Status = ShellOpenFileByName(FileName,
+                               &FileHandle,
+                               EFI_FILE_MODE_CREATE|EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE,
                                0
                                );
   ASSERT_EFI_ERROR(Status);
   Status = ShellCloseFile(&FileHandle);
   StrCpy(FileName, L"testDir");
-  Status = ShellOpenFileByName(FileName, 
-                               &FileHandle, 
-                               EFI_FILE_MODE_CREATE|EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE, 
+  Status = ShellOpenFileByName(FileName,
+                               &FileHandle,
+                               EFI_FILE_MODE_CREATE|EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE,
                                0
                                );
   ASSERT_EFI_ERROR(Status);
@@ -264,18 +264,18 @@ UefiMain (
 
   // now delete that file and that directory
   StrCat(FileName, L"\\File.txt");
-  Status = ShellOpenFileByName(FileName, 
-                               &FileHandle, 
-                               EFI_FILE_MODE_CREATE|EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE, 
+  Status = ShellOpenFileByName(FileName,
+                               &FileHandle,
+                               EFI_FILE_MODE_CREATE|EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE,
                                0
                                );
   ASSERT_EFI_ERROR(Status);
   Status = ShellDeleteFile(&FileHandle);
   StrCpy(FileName, L"testDir");
   ASSERT_EFI_ERROR(Status);
-  Status = ShellOpenFileByName(FileName, 
-                               &FileHandle, 
-                               EFI_FILE_MODE_CREATE|EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE, 
+  Status = ShellOpenFileByName(FileName,
+                               &FileHandle,
+                               EFI_FILE_MODE_CREATE|EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE,
                                0
                                );
   Status = ShellDeleteFile(&FileHandle);
