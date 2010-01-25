@@ -1195,9 +1195,97 @@ NetLibDefaultUnload (
   IN EFI_HANDLE             ImageHandle
   );
 
+/**
+  Convert one Null-terminated ASCII string (decimal dotted) to EFI_IPv4_ADDRESS.
+
+  @param[in]      String         The pointer to the Ascii string.
+  @param[out]     Ip4Address     The pointer to the converted IPv4 address.
+
+  @retval EFI_SUCCESS            Convert to IPv4 address successfully.  
+  @retval EFI_INVALID_PARAMETER  The string is mal-formated or Ip4Address is NULL.
+
+**/
+EFI_STATUS
+NetLibAsciiStrToIp4 (
+  IN CONST CHAR8                 *String,
+  OUT      EFI_IPv4_ADDRESS      *Ip4Address
+  );
+
+/**
+  Convert one Null-terminated ASCII string to EFI_IPv6_ADDRESS. The format of the
+  string is defined in RFC 4291 - Text Pepresentation of Addresses.
+
+  @param[in]      String         The pointer to the Ascii string.
+  @param[out]     Ip6Address     The pointer to the converted IPv6 address.
+
+  @retval EFI_SUCCESS            Convert to IPv6 address successfully.  
+  @retval EFI_INVALID_PARAMETER  The string is mal-formated or Ip6Address is NULL.
+
+**/
+EFI_STATUS
+NetLibAsciiStrToIp6 (
+  IN CONST CHAR8                 *String,
+  OUT      EFI_IPv6_ADDRESS      *Ip6Address
+  );
+
+/**
+  Convert one Null-terminated Unicode string (decimal dotted) to EFI_IPv4_ADDRESS.
+
+  @param[in]      String         The pointer to the Ascii string.
+  @param[out]     Ip4Address     The pointer to the converted IPv4 address.
+
+  @retval EFI_SUCCESS            Convert to IPv4 address successfully.  
+  @retval EFI_INVALID_PARAMETER  The string is mal-formated or Ip4Address is NULL.
+  @retval EFI_OUT_OF_RESOURCES   Fail to perform the operation due to lack of resource.
+
+**/
+EFI_STATUS
+NetLibStrToIp4 (
+  IN CONST CHAR16                *String,
+  OUT      EFI_IPv4_ADDRESS      *Ip4Address
+  );
+
+/**
+  Convert one Null-terminated Unicode string to EFI_IPv6_ADDRESS.  The format of
+  the string is defined in RFC 4291 - Text Pepresentation of Addresses.
+
+  @param[in]      String         The pointer to the Ascii string.
+  @param[out]     Ip6Address     The pointer to the converted IPv6 address.
+
+  @retval EFI_SUCCESS            Convert to IPv6 address successfully.  
+  @retval EFI_INVALID_PARAMETER  The string is mal-formated or Ip6Address is NULL.
+  @retval EFI_OUT_OF_RESOURCES   Fail to perform the operation due to lack of resource.
+
+**/
+EFI_STATUS
+NetLibStrToIp6 (
+  IN CONST CHAR16                *String,
+  OUT      EFI_IPv6_ADDRESS      *Ip6Address
+  );
+
+/**
+  Convert one Null-terminated Unicode string to EFI_IPv6_ADDRESS and prefix length.
+  The format of the string is defined in RFC 4291 - Text Pepresentation of Addresses
+  Prefixes: ipv6-address/prefix-length.
+
+  @param[in]      String         The pointer to the Ascii string.
+  @param[out]     Ip6Address     The pointer to the converted IPv6 address.
+  @param[out]     PrefixLength   The pointer to the converted prefix length.
+
+  @retval EFI_SUCCESS            Convert to IPv6 address successfully.  
+  @retval EFI_INVALID_PARAMETER  The string is mal-formated or Ip6Address is NULL.
+  @retval EFI_OUT_OF_RESOURCES   Fail to perform the operation due to lack of resource.
+
+**/
+EFI_STATUS
+NetLibStrToIp6andPrefix (
+  IN CONST CHAR16                *String,
+  OUT      EFI_IPv6_ADDRESS      *Ip6Address,
+  OUT      UINT8                 *PrefixLength
+  );
 
 //
-//Various signatures
+// Various signatures
 //
 #define  NET_BUF_SIGNATURE    SIGNATURE_32 ('n', 'b', 'u', 'f')
 #define  NET_VECTOR_SIGNATURE SIGNATURE_32 ('n', 'v', 'e', 'c')
