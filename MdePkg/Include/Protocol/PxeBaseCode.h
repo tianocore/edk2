@@ -2,7 +2,7 @@
   EFI PXE Base Code Protocol definitions, which is used to access PXE-compatible 
   devices for network access and network booting.
 
-  Copyright (c) 2006 - 2009, Intel Corporation                                                         
+  Copyright (c) 2006 - 2010, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -219,14 +219,27 @@ typedef struct {
 } EFI_PXE_BASE_CODE_DHCPV4_PACKET;
 
 ///
+/// Note: EFI_PXE_BASE_CODE_DHCPV6_PACKET and EFI_PXE_BASE_CODE_PACKET are not
+///       consistent with the current UEFI2.3 specification. It's supposed that
+///       they will be consistent in the next version.
+///
+
+///
+/// DHCPV6 Packet structure.
+///
+typedef struct {
+  UINT32  MessageType:8;
+  UINT32  TransactionId:24;
+  UINT8   DhcpOptions[1024];
+} EFI_PXE_BASE_CODE_DHCPV6_PACKET;
+
+///
 /// Packet structure
 ///
 typedef union {
   UINT8                           Raw[1472];
   EFI_PXE_BASE_CODE_DHCPV4_PACKET Dhcpv4;
-  //
-  //  EFI_PXE_BASE_CODE_DHCPV6_PACKET     Dhcpv6;
-  //
+  EFI_PXE_BASE_CODE_DHCPV6_PACKET Dhcpv6;
 } EFI_PXE_BASE_CODE_PACKET;
 
 //
