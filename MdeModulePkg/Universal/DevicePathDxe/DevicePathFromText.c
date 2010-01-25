@@ -1,7 +1,7 @@
 /** @file
   DevicePathFromText protocol as defined in the UEFI 2.0 specification.
 
-Copyright (c) 2006 - 2009, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1646,6 +1646,32 @@ DevPathFromTextMAC (
   return (EFI_DEVICE_PATH_PROTOCOL *) MACDevPath;
 }
 
+
+/**
+  Converts a text format to the network protocol ID.
+
+  @param Text  String of protocol field.
+
+  @return Network protocol ID .
+
+**/
+UINTN
+NetworkProtocolFromText (
+  IN CHAR16 *Text
+  )
+{
+  if (StrCmp (Text, L"UDP") == 0) {
+    return RFC_1700_UDP_PROTOCOL;
+  }
+
+  if (StrCmp (Text, L"TCP") == 0) {
+    return RFC_1700_TCP_PROTOCOL;
+  }
+
+  return Strtoi (Text);
+}
+
+
 /**
   Converts a text device path node to IPV4 device path structure.
 
@@ -1676,7 +1702,7 @@ DevPathFromTextIPv4 (
                                                  );
 
   StrToIPv4Addr (&RemoteIPStr, &IPv4->RemoteIpAddress);
-  IPv4->Protocol = (UINT16) ((StrCmp (ProtocolStr, L"UDP") == 0) ? 0 : 1);
+  IPv4->Protocol = (UINT16) NetworkProtocolFromText (ProtocolStr);
   if (StrCmp (TypeStr, L"Static") == 0) {
     IPv4->StaticIpAddress = TRUE;
   } else {
@@ -1721,7 +1747,7 @@ DevPathFromTextIPv6 (
                                                  );
 
   StrToIPv6Addr (&RemoteIPStr, &IPv6->RemoteIpAddress);
-  IPv6->Protocol        = (UINT16) ((StrCmp (ProtocolStr, L"UDP") == 0) ? 0 : 1);
+  IPv6->Protocol        = (UINT16) NetworkProtocolFromText (ProtocolStr);
   if (StrCmp (TypeStr, L"Static") == 0) {
     IPv6->StaticIpAddress = TRUE;
   } else {
