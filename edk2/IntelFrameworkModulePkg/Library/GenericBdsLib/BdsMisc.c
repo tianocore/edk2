@@ -572,9 +572,9 @@ BdsLibBuildOptionFromVar (
     }
 
     Option              = BdsLibVariableToOption (BdsCommonOptionList, OptionName);
-    ASSERT (Option != NULL);
-    Option->BootCurrent = OptionOrder[Index];
-
+    if (Option != NULL) {
+      Option->BootCurrent = OptionOrder[Index];
+    }
   }
 
   FreePool (OptionOrder);
