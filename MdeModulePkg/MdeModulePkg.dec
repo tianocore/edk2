@@ -4,7 +4,7 @@
 # It also provides the defintions(including PPIs/PROTOCOLs/GUIDs and library classes)
 # and libraries instances, which are used for those modules.
 #
-# Copyright (c) 2007 - 2009, Intel Corporation.
+# Copyright (c) 2007 - 2010, Intel Corporation.
 #
 # All rights reserved.
 # This program and the accompanying materials are licensed and made available under
@@ -269,7 +269,7 @@
   ## This PCD specifies whether Peiphase StatusCode is replayed in DxePhase.
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeReplayIn|FALSE|BOOLEAN|0x0001002d
 
-[PcdsFeatureFlag.IA32]
+[PcdsFeatureFlag.IA32, PcdsFeatureFlag.X64]
   ##
   # This feature flag specifies whether DxeIpl switches to long mode to enter DXE phase.
   # If it is TRUE, DxeIpl will load a 64-bit DxeCore and switch to long mode to hand over to DxeCore;
