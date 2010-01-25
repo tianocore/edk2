@@ -1,14 +1,14 @@
 /** @file
   This is a test application that demonstrates how to use the sorting functions.
 
-  Copyright (c) 2009, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2009-2010, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -43,10 +43,10 @@ INTN Test(CONST VOID*b1, CONST VOID*b2)
   @retval  Other           An error occurred.
 
 **/
-INTN 
-EFIAPI 
+INTN
+EFIAPI
 ShellAppMain (
-  IN UINTN Argc, 
+  IN UINTN Argc,
   IN CHAR16 **Argv
   )
 {

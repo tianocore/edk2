@@ -1,14 +1,14 @@
 /** @file
-  Provides application point extension for "C" style main funciton 
+  Provides application point extension for "C" style main funciton
 
-Copyright (c) 2009, Intel Corporation<BR>
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+  Copyright (c) 2009-2010, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -53,7 +53,7 @@ ShellCEntryLib (
   EfiShellParametersProtocol = NULL;
   EfiShellInterface = NULL;
 
-  Status = SystemTable->BootServices->OpenProtocol(ImageHandle, 
+  Status = SystemTable->BootServices->OpenProtocol(ImageHandle,
                              &gEfiShellParametersProtocolGuid,
                              (VOID **)&EfiShellParametersProtocol,
                              ImageHandle,
@@ -72,7 +72,7 @@ ShellCEntryLib (
     //
     // try to get shell 1.0 interface instead.
     //
-    Status = SystemTable->BootServices->OpenProtocol(ImageHandle, 
+    Status = SystemTable->BootServices->OpenProtocol(ImageHandle,
                                &gEfiShellInterfaceGuid,
                                (VOID **)&EfiShellInterface,
                                ImageHandle,
@@ -82,7 +82,7 @@ ShellCEntryLib (
     if (!EFI_ERROR(Status)) {
       //
       // use shell 1.0 interface
-      // 
+      //
       ReturnFromMain = ShellAppMain (
                          EfiShellInterface->Argc,
                          EfiShellInterface->Argv

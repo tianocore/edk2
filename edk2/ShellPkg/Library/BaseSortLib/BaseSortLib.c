@@ -1,14 +1,14 @@
 /** @file
   Library used for sorting routines.
 
-Copyright (c) 2009, Intel Corporation<BR>
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+  Copyright (c) 2009-2010, Intel Corporation. All rights reserved. <BR>
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -18,11 +18,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/SortLib.h> 
+#include <Library/SortLib.h>
 
 /**
-  Worker function for QuickSorting.  This function is identical to PerformQuickSort, 
-  except that is uses the pre-allocated buffer so the in place sorting does not need to 
+  Worker function for QuickSorting.  This function is identical to PerformQuickSort,
+  except that is uses the pre-allocated buffer so the in place sorting does not need to
   allocate and free buffers constantly.
 
   Each element must be equal sized.
@@ -38,7 +38,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                                 on return a buffer of sorted elements
   @param[in] Count              the number of elements in the buffer to sort
   @param[in] ElementSize        Size of an element in bytes
-  @param[in] CompareFunction    The function to call to perform the comparison 
+  @param[in] CompareFunction    The function to call to perform the comparison
                                 of any 2 elements
   @param[in] Buffer             Buffer of size ElementSize for use in swapping
 **/
@@ -60,7 +60,7 @@ QuickSortWorker (
   ASSERT(CompareFunction  != NULL);
   ASSERT(Buffer  != NULL);
 
-  if ( Count < 2 
+  if ( Count < 2
     || ElementSize  < 1
     ){
     return;
@@ -78,7 +78,7 @@ QuickSortWorker (
   // and everything "right" are above it
   //
   for ( LoopCount = 0
-      ; LoopCount < Count -1 
+      ; LoopCount < Count -1
       ; LoopCount++
       ){
     //
@@ -86,7 +86,7 @@ QuickSortWorker (
     //
     if (CompareFunction((VOID*)((UINT8*)BufferToSort+((LoopCount)*ElementSize)),Pivot) <= 0){
       //
-      // swap 
+      // swap
       //
       CopyMem (Buffer, (UINT8*)BufferToSort+(NextSwapLocation*ElementSize), ElementSize);
       CopyMem ((UINT8*)BufferToSort+(NextSwapLocation*ElementSize), (UINT8*)BufferToSort+((LoopCount)*ElementSize), ElementSize);
@@ -94,7 +94,7 @@ QuickSortWorker (
 
       //
       // increment NextSwapLocation
-      // 
+      //
       NextSwapLocation++;
     }
   }
@@ -106,20 +106,20 @@ QuickSortWorker (
   CopyMem ((UINT8*)BufferToSort+(NextSwapLocation*ElementSize), Buffer, ElementSize);
 
   //
-  // Now recurse on 2 paritial lists.  neither of these will have the 'pivot' element 
+  // Now recurse on 2 paritial lists.  neither of these will have the 'pivot' element
   // IE list is sorted left half, pivot element, sorted right half...
   //
   QuickSortWorker(
-    BufferToSort, 
-    NextSwapLocation, 
-    ElementSize, 
+    BufferToSort,
+    NextSwapLocation,
+    ElementSize,
     CompareFunction,
     Buffer);
 
   QuickSortWorker(
     (UINT8 *)BufferToSort + (NextSwapLocation+1) * ElementSize,
-    Count - NextSwapLocation - 1, 
-    ElementSize, 
+    Count - NextSwapLocation - 1,
+    ElementSize,
     CompareFunction,
     Buffer);
 
@@ -140,7 +140,7 @@ QuickSortWorker (
                                 on return a buffer of sorted elements
   @param[in] Count              the number of elements in the buffer to sort
   @param[in] ElementSize        Size of an element in bytes
-  @param[in] CompareFunction    The function to call to perform the comparison 
+  @param[in] CompareFunction    The function to call to perform the comparison
                                 of any 2 elements
 **/
 VOID
@@ -173,7 +173,7 @@ PerformQuickSort (
 
 /**
   Not supported in Base version.
-  
+
   ASSERT and return 0.
 **/
 INTN
@@ -194,7 +194,7 @@ DevicePathCompare (
 
   @retval 0                     Buffer1 equal to Buffer2.
   @return < 0                   Buffer1 is less than Buffer2.
-  @return > 0                   Buffer1 is greater than Buffer2.                 
+  @return > 0                   Buffer1 is greater than Buffer2.
 **/
 INTN
 EFIAPI
