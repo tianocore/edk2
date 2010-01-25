@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2009, Intel Corporation                                                         
+Copyright (c) 2009 - 2010, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -30,11 +30,8 @@ GetSmbiosTablesFromHob (
 {
   EFI_PHYSICAL_ADDRESS       *Table;
   EFI_PEI_HOB_POINTERS        GuidHob;
-  //
-  // Get Hob List
-  //
-  GuidHob.Raw = GetHobList ();
-  GuidHob.Raw = GetNextGuidHob (&gEfiSmbiosTableGuid, GuidHob.Raw);
+
+  GuidHob.Raw = GetFirstGuidHob (&gEfiSmbiosTableGuid);
   if (GuidHob.Raw != NULL) {
     Table = GET_GUID_HOB_DATA (GuidHob.Guid);
     if (Table != NULL) {

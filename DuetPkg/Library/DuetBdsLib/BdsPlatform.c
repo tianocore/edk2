@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006 - 2008, Intel Corporation                                                         
+Copyright (c) 2006 - 2010, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -153,12 +153,8 @@ UpdateMemoryMap (
   UINTN                           Index;
   EFI_PHYSICAL_ADDRESS            Memory;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR Descriptor;
-  //
-  // Get Hob List
-  //
-  GuidHob.Raw = GetHobList();
   
-  GuidHob.Raw = GetNextGuidHob (&gEfiLdrMemoryDescriptorGuid, GuidHob.Raw);
+  GuidHob.Raw = GetFirstGuidHob (&gEfiLdrMemoryDescriptorGuid);
   if (GuidHob.Raw == NULL) {
     DEBUG ((EFI_D_ERROR, "Fail to get gEfiLdrMemoryDescriptorGuid from GUID HOB LIST!\n"));
     return;
