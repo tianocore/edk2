@@ -2458,6 +2458,10 @@ NetLibAsciiStrToIp4 (
       }
     }
 
+    //
+    // Convert the string to IPv4 address. AsciiStrDecimalToUintn stops at the
+    // first character that is not a valid decimal character, '.' or '\0' here. 
+    //
     NodeVal = AsciiStrDecimalToUintn (TempStr);
     if (NodeVal > 0xFF) {
       return EFI_INVALID_PARAMETER;
@@ -2525,7 +2529,7 @@ NetLibAsciiStrToIp6 (
   Short       = FALSE;
   Update      = FALSE;
 
-  for (Index = 0; (Index + 1) < 16; Index = (UINT8) (Index + 2)) {
+  for (Index = 0; Index < 15; Index = (UINT8) (Index + 2)) {
     TempStr = Ip6Str;
 
     while ((*Ip6Str != '\0') && (*Ip6Str != ':')) {
@@ -2587,7 +2591,8 @@ NetLibAsciiStrToIp6 (
     }    
 
     //
-    // Convert the Str to IPv6 address.
+    // Convert the string to IPv6 address. AsciiStrHexToUintn stops at the first
+    // character that is not a valid hexadecimal character, ':' or '\0' here. 
     //
     NodeVal = AsciiStrHexToUintn (TempStr);
     if ((NodeVal > 0xFFFF) || (Index > 14)) {
