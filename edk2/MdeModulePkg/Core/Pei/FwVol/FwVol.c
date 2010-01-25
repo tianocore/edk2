@@ -853,6 +853,7 @@ ProcessFvFile (
   EFI_PEI_FV_HANDLE             ParentFvHandle;
   EFI_FIRMWARE_VOLUME_HEADER    *FvHeader;
   EFI_FV_FILE_INFO              FileInfo;
+  UINT64                        FvLength;
   
   //
   // Check if this EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE file has already
@@ -890,7 +891,7 @@ ProcessFvFile (
   //
   // FvAlignment must be more than 8 bytes required by FvHeader structure.
   //
-  FvAlignment = 1 << ((FvHeader->Attributes & EFI_FVB2_ALIGNMENT) >> 16);
+  FvAlignment = 1 << ((ReadUnaligned32 (&FvHeader->Attributes) & EFI_FVB2_ALIGNMENT) >> 16);
   if (FvAlignment < 8) {
     FvAlignment = 8;
   }
@@ -899,11 +900,12 @@ ProcessFvFile (
   // Check FvImage
   //
   if ((UINTN) FvHeader % FvAlignment != 0) {
-    NewFvBuffer = AllocateAlignedPages (EFI_SIZE_TO_PAGES ((UINT32) FvHeader->FvLength), FvAlignment);
+    FvLength    = ReadUnaligned64 (&FvHeader->FvLength);
+    NewFvBuffer = AllocateAlignedPages (EFI_SIZE_TO_PAGES ((UINT32) FvLength), FvAlignment);
     if (NewFvBuffer == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
-    CopyMem (NewFvBuffer, FvHeader, (UINTN) FvHeader->FvLength);
+    CopyMem (NewFvBuffer, FvHeader, (UINTN) FvLength);
     FvHeader = (EFI_FIRMWARE_VOLUME_HEADER*) NewFvBuffer;
   }
   
