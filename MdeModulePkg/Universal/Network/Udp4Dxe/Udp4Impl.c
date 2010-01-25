@@ -1,7 +1,7 @@
 /** @file
   The implementation of the Udp4 protocol.
   
-Copyright (c) 2006 - 2009, Intel Corporation.<BR>                                                         
+Copyright (c) 2006 - 2010, Intel Corporation.<BR>                                                         
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1804,16 +1804,7 @@ Udp4IcmpHandler (
     //
     Instance = NET_LIST_USER_STRUCT (Entry, UDP4_INSTANCE_DATA, Link);
 
-    if (!Instance->Configured ||
-        Instance->ConfigData.AcceptPromiscuous ||
-        Instance->ConfigData.AcceptAnyPort ||
-        EFI_IP4_EQUAL (&Instance->ConfigData.StationAddress, &mZeroIp4Addr)
-        ) {
-      //
-      // Don't try to deliver the ICMP error to this instance if it is not configured,
-      // or it's configured to be promiscuous or accept any port or accept all the
-      // datagrams.
-      //
+    if (!Instance->Configured) {
       continue;
     }
 
