@@ -5,7 +5,7 @@
   It transforms the high level identity, read/write, reset command to ATA pass
   through command and protocol. 
     
-  Copyright (c) 2009 Intel Corporation. <BR>
+  Copyright (c) 2009 - 2010 Intel Corporation. <BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -164,7 +164,7 @@ PrintAtaModelName (
   CHAR8   *Source;
   CHAR16  *Destination;
 
-  Source = AtaDevice->IdentifyData->AtaData.ModelName;
+  Source = AtaDevice->IdentifyData->ModelName;
   Destination = AtaDevice->ModelName;
 
   //
@@ -198,10 +198,10 @@ GetAtapi6Capacity (
   EFI_LBA                       Capacity;
   EFI_LBA                       TmpLba;
   UINTN                         Index;
-  ATAPI_IDENTIFY_DATA           *IdentifyData;
+  ATA_IDENTIFY_DATA             *IdentifyData;
 
-  IdentifyData = (ATAPI_IDENTIFY_DATA *) AtaDevice->IdentifyData;
-  if ((IdentifyData->cmd_set_support_83 & BIT10) == 0) {
+  IdentifyData = AtaDevice->IdentifyData;
+  if ((IdentifyData->command_set_supported_83 & BIT10) == 0) {
     //
     // The device doesn't support 48 bit addressing
     //
@@ -216,7 +216,7 @@ GetAtapi6Capacity (
     //
     // Lower byte goes first: word[100] is the lowest word, word[103] is highest
     //
-    TmpLba = IdentifyData->max_user_lba_for_48bit_addr[Index];
+    TmpLba = IdentifyData->maximum_lba_for_48bit_addressing[Index];
     Capacity |= LShiftU64 (TmpLba, 16 * Index);
   }
 
@@ -242,13 +242,13 @@ IdentifyAtaDevice (
   IN OUT ATA_DEVICE                 *AtaDevice
   )
 {
-  EFI_ATA_IDENTIFY_DATA             *IdentifyData;
+  ATA_IDENTIFY_DATA                 *IdentifyData;
   EFI_BLOCK_IO_MEDIA                *BlockMedia;
   EFI_LBA                           Capacity;
   UINT16                            PhyLogicSectorSupport;
   UINT16                            UdmaMode;
 
-  IdentifyData = &AtaDevice->IdentifyData->AtaData;
+  IdentifyData = AtaDevice->IdentifyData;
 
   if ((IdentifyData->config & BIT15) != 0) {
     //
