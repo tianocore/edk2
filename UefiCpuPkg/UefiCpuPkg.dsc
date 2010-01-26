@@ -74,3 +74,4 @@
 [Components.IA32, Components.X64]
   UefiCpuPkg/CpuIo2Smm/CpuIo2Smm.inf
   UefiCpuPkg/Library/BaseUefiCpuLib/BaseUefiCpuLib.inf
+  UefiCpuPkg/Library/MtrrLib/MtrrLib.inf
