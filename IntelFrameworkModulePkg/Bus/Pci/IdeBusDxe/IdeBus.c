@@ -3,7 +3,7 @@
   Child device(Disk, CDROM, etc) enumeration and child handler installation, and 
   driver stop.
     
-  Copyright (c) 2006 - 2009, Intel Corporation
+  Copyright (c) 2006 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -767,8 +767,8 @@ IDEBusDriverBindingStart (
       //
       // Init driver parameters
       //
-      DriveParameters.Sector          = (UINT8) IdeBlkIoDevicePtr->IdData->AtaData.sectors_per_track;
-      DriveParameters.Heads           = (UINT8) (IdeBlkIoDevicePtr->IdData->AtaData.heads - 1);
+      DriveParameters.Sector          = (UINT8) ((ATA5_IDENTIFY_DATA *) IdeBlkIoDevicePtr->IdData)->sectors_per_track;
+      DriveParameters.Heads           = (UINT8) (((ATA5_IDENTIFY_DATA *) IdeBlkIoDevicePtr->IdData)->heads - 1);
       DriveParameters.MultipleSector  = (UINT8) IdeBlkIoDevicePtr->IdData->AtaData.multi_sector_cmd_max_sct_cnt;
       //
       // Set Parameters for the device:
