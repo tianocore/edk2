@@ -13,7 +13,7 @@
   
   A device handle for an IDE controller must contain an EFI_DEVICE_PATH_PROTOCOL.
 
-  Copyright (c) 2007 - 2009, Intel Corporation
+  Copyright (c) 2007 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -30,6 +30,8 @@
 
 #ifndef _EFI_IDE_CONTROLLER_INIT_PROTOCOL_H_
 #define _EFI_IDE_CONTROLLER_INIT_PROTOCOL_H_
+
+#include <IndustryStandard/Atapi.h>
 
 ///
 /// Global ID for the EFI_IDE_CONTROLLER_INIT_PROTOCOL
@@ -199,147 +201,14 @@ typedef struct {
 } EFI_ATA_COLLECTIVE_MODE;
 
 ///
-/// EFI_ATA_IDENTIFY_DATA structure
+/// EFI_ATA_IDENTIFY_DATA & EFI_ATAPI_IDENTIFY_DATA structure
 ///
-/// This structure definition is not part of the protocol
-/// definition because the ATA/ATAPI Specification controls
-/// the definition of all the fields. The ATA/ATAPI
-/// Specification can obsolete old fields or redefine existing
-/// fields. This definition is provided here for reference only.
-///
-#pragma pack(1)
-typedef struct {
-  UINT16  config;                 ///< General Configuration
-  UINT16  cylinders;              ///< Number of Cylinders
-  UINT16  reserved_2;
-  UINT16  heads;                  ///< Number of logical heads
-  UINT16  vendor_data1;
-  UINT16  vendor_data2;
-  UINT16  sectors_per_track;
-  UINT16  vendor_specific_7_9[3];
-  CHAR8   SerialNo[20];           ///< ASCII
-  UINT16  vendor_specific_20_21[2];
-  UINT16  ecc_bytes_available;
-  CHAR8   FirmwareVer[8];         ///< ASCII
-  CHAR8   ModelName[40];          ///< ASCII
-  UINT16  multi_sector_cmd_max_sct_cnt;
-  UINT16  reserved_48;
-  UINT16  capabilities;
-  UINT16  reserved_50;
-  UINT16  pio_cycle_timing;
-  UINT16  reserved_52;
-  UINT16  field_validity;
-  UINT16  current_cylinders;
-  UINT16  current_heads;
-  UINT16  current_sectors;
-  UINT16  CurrentCapacityLsb;
-  UINT16  CurrentCapacityMsb;
-  UINT16  reserved_59;
-  UINT16  user_addressable_sectors_lo;
-  UINT16  user_addressable_sectors_hi;
-  UINT16  reserved_62;
-  UINT16  multi_word_dma_mode;
-  UINT16  advanced_pio_modes;
-  UINT16  min_multi_word_dma_cycle_time;
-  UINT16  rec_multi_word_dma_cycle_time;
-  UINT16  min_pio_cycle_time_without_flow_control;
-  UINT16  min_pio_cycle_time_with_flow_control;
-  UINT16  reserved_69_79[11];
-  UINT16  major_version_no;
-  UINT16  minor_version_no;
-  UINT16  command_set_supported_82;   ///< word 82
-  UINT16  command_set_supported_83;   ///< word 83
-  UINT16  command_set_feature_extn;   ///< word 84
-  UINT16  command_set_feature_enb_85; ///< word 85
-  UINT16  command_set_feature_enb_86; ///< word 86
-  UINT16  command_set_feature_default; ///< word 87
-  UINT16  ultra_dma_mode;             ///< word 88
-  UINT16  reserved_89_105[17];
-  UINT16  phy_logic_sector_support;   ///< word 106
-  UINT16  reserved_107_116[10];
-  UINT16  logic_sector_size_lo;       ///< word 117
-  UINT16  logic_sector_size_hi;       ///< word 118
-  UINT16  reserved_119_127[9];
-  UINT16  security_status;
-  UINT16  vendor_data_129_159[31];
-  UINT16  reserved_160_208[49];
-  UINT16  alignment_logic_in_phy_blocks; ///< word 209
-  UINT16  reserved_210_255[46];
-} EFI_ATA_IDENTIFY_DATA;
-#pragma pack()
-
-///
-/// EFI_ATAPI_IDENTIFY_DATA structure
-///
-/// This structure definition is not part of the protocol
-/// definition because the ATA/ATAPI Specification controls
-/// the definition of all the fields. The ATA/ATAPI
-/// Specification can obsolete old fields or redefine existing
-/// fields. This definition is provided here for reference only.
-///
-#pragma pack(1)
-typedef struct {
-    UINT16  config;             ///< General Configuration
-    UINT16  obsolete_1;
-    UINT16  specific_config;
-    UINT16  obsolete_3;
-    UINT16  retired_4_5[2];
-    UINT16  obsolete_6;
-    UINT16  cfa_reserved_7_8[2];
-    UINT16  retired_9;
-    CHAR8   SerialNo[20];       ///< ASCII
-    UINT16  retired_20_21[2];
-    UINT16  obsolete_22;
-    CHAR8   FirmwareVer[8];     ///< ASCII
-    CHAR8   ModelName[40];      ///< ASCII
-    UINT16  multi_sector_cmd_max_sct_cnt;
-    UINT16  reserved_48;
-    UINT16  capabilities_49;
-    UINT16  capabilities_50;
-    UINT16  obsolete_51_52[2];
-    UINT16  field_validity;
-    UINT16  obsolete_54_58[5];
-    UINT16  mutil_sector_setting;
-    UINT16  user_addressable_sectors_lo;
-    UINT16  user_addressable_sectors_hi;
-    UINT16  obsolete_62;
-    UINT16  multi_word_dma_mode;
-    UINT16  advanced_pio_modes;
-    UINT16  min_multi_word_dma_cycle_time;
-    UINT16  rec_multi_word_dma_cycle_time;
-    UINT16  min_pio_cycle_time_without_flow_control;
-    UINT16  min_pio_cycle_time_with_flow_control;
-    UINT16  reserved_69_74[6];
-    UINT16  queue_depth;
-    UINT16  reserved_76_79[4];
-    UINT16  major_version_no;
-    UINT16  minor_version_no;
-    UINT16  cmd_set_support_82;
-    UINT16  cmd_set_support_83;
-    UINT16  cmd_feature_support;
-    UINT16  cmd_feature_enable_85;
-    UINT16  cmd_feature_enable_86;
-    UINT16  cmd_feature_default;
-    UINT16  ultra_dma_select;
-    UINT16  time_required_for_sec_erase;
-    UINT16  time_required_for_enhanced_sec_erase;
-    UINT16  current_advanced_power_mgmt_value;
-    UINT16  master_pwd_revison_code;
-    UINT16  hardware_reset_result;
-    UINT16  current_auto_acoustic_mgmt_value;
-    UINT16  reserved_95_99[5];
-    UINT16  max_user_lba_for_48bit_addr[4];
-    UINT16  reserved_104_126[23];
-    UINT16  removable_media_status_notification_support;
-    UINT16  security_status;
-    UINT16  vendor_data_129_159[31];
-    UINT16  cfa_power_mode;
-    UINT16  cfa_reserved_161_175[15];
-    UINT16  current_media_serial_no[30];
-    UINT16  reserved_206_254[49];
-    UINT16  integrity_word;
-} EFI_ATAPI_IDENTIFY_DATA;
-#pragma pack()
+/// The definition of these two structures is not part of the protocol
+/// definition because the ATA/ATAPI Specification controls the definition
+/// of all the fields. The ATA/ATAPI Specification can obsolete old fields
+/// or redefine existing fields. 
+typedef ATA_IDENTIFY_DATA   EFI_ATA_IDENTIFY_DATA;
+typedef ATAPI_IDENTIFY_DATA EFI_ATAPI_IDENTIFY_DATA;
 
 ///
 /// This flag indicates whether the IDENTIFY data is a response from an ATA device
