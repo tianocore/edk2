@@ -113,7 +113,9 @@ subversion, then you can easily checkout the edk2 and source to the
 FAT32 driver to the <font class="monospace">/cygdrive/c/edk2</font>
 directory with the following commands:
 </big></p>
-<pre class="build-step-code">/cygdrive/c$ <b>svn co https://edk2.tianocore.org/svn/edk2/trunk/edk2 edk2 --username guest</b><br>/cygdrive/c$ <b>cd edk2</b><br>/cygdrive/c/edk2$ <b>svn co </b><b><b>https://</b></b><b>fat-driver2.tianocore.org/svn/fat-driver2/trunk/FatPkg FatPkg --username guest</b><br></pre>
+<pre class="build-step-code">/cygdrive/c$ <b>svn co <a
+ href="https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2">https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2</a> edk2 --username guest</b><br>/cygdrive/c$ <b>cd edk2</b><br>/cygdrive/c/edk2$ <b>svn co <a
+ href="https://edk2-fatdriver2.svn.sourceforge.net/svnroot/edk2-fatdriver2/trunk/FatPkg">https://edk2-fatdriver2.svn.sourceforge.net/svnroot/edk2-fatdriver2/trunk/FatPkg</a></b><b> FatPkg --username guest</b><br></pre>
 <h3 class="build-step-title"> </h3>
 <h3 class="build-step-title"> </h3>
 <h3 class="build-step-title"> <big>Build the Beagle Board Package
@@ -372,7 +374,7 @@ example)<br>
 Use the EFI EBL to flash the image</big><br>
 </p>
 <pre class="build-step-code">BeagleEdk2&gt; <big><big><span
- style="font-family: monospace;">cp fs1:\Beagle Board_EFI_flashboot.fd blk0:</span></big></big>                </pre>
+ style="font-family: monospace;">cp fs1:\BeagleBoard_EFI_flashboot.fd blk0:</span></big></big>                </pre>
 <p class="build-step-details"><br>
 </p>
 <h2 class="main-title"> <big>Get the edk2 source tree and build
@@ -402,7 +404,9 @@ of
 subversion, then you can easily checkout the edk2 to the <font
  class="monospace">C:\edk2</font> directory with the following command:
 </big></p>
-<pre class="build-step-code">C:\&gt; <b>svn co https://edk2.tianocore.org/svn/edk2/trunk/edk2 C:\edk2 --username guest</b><br>C:\&gt; <b>cd C:\edk2</b><br>C:\edk2&gt; <b>svn co </b><b><b>https://</b></b><b>fat-driver2.tianocore.org/svn/fat-driver2/trunk/FatPkg FatPkg --username guest</b><br></pre>
+<pre class="build-step-code">C:\&gt; <b>svn co </b><b><b><a
+ href="https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2">https://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2</a></b></b><b> C:\edk2 --username guest</b><br>C:\&gt; <b>cd C:\edk2</b><br>C:\edk2&gt; <b>svn co </b><b><b><a
+ href="https://edk2-fatdriver2.svn.sourceforge.net/svnroot/edk2-fatdriver2/trunk/FatPkg">https://edk2-fatdriver2.svn.sourceforge.net/svnroot/edk2-fatdriver2/trunk/FatPkg</a></b></b><b> FatPkg --username guest</b><br></pre>
 <h3 class="build-step-title"> </h3>
 <h3 class="build-step-title"><big>Setup the build shell environment for
 Windows DOS box<br>
@@ -419,8 +423,7 @@ new shell window.</big><br>
 <p class="build-step-details"> <big>As a tangible result of the build,
 the
 FLASH image for the Beagle Board will end up in
-c:\edk2\Build\BeagleBoa​rd\DEBUG_RVCT31\FV\Beagle Board_EFI​
-_flashboot.fd.<br>
+c:\edk2\Build\BeagleBoa​rd\DEBUG_RVCT31\FV\BeagleBoard_EFI_flashboot.fd.<br>
 </big></p>
 <p class="build-step-details"><big><span
  style="color: rgb(255, 102, 102);">WARNING: This image can not run
