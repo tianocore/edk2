@@ -1,7 +1,7 @@
 /** @file
   EFI PEI Core memory services
   
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2010, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -240,7 +240,10 @@ PeiAllocatePool (
   // Generally, the size of heap in temporary memory does not exceed to 64K,
   // so the maxmium size of pool is 0x10000 - sizeof (EFI_HOB_MEMORY_POOL)
   //
-  ASSERT (Size < 0x10000 - sizeof (EFI_HOB_MEMORY_POOL));
+  if (Size >= (0x10000 - sizeof (EFI_HOB_MEMORY_POOL))) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  
   Status = PeiServicesCreateHob (
              EFI_HOB_TYPE_MEMORY_POOL,
              (UINT16)(sizeof (EFI_HOB_MEMORY_POOL) + Size),
