@@ -29,8 +29,21 @@
 @REM
 pushd .
 cd %~dp0
-set WORKSPACE=%CD%
 
+if defined WORKSPACE (
+  if %WORKSPACE% == %CD% (
+    @REM workspace is not changed.
+    @goto ParseArgs
+  )
+)
+
+@REM set new workspace
+@REM clear EFI_SOURCE and EDK_SOURCE for the new workspace
+set WORKSPACE=%CD%
+set EFI_SOURCE=
+set EDK_SOURCE=
+
+:ParseArgs
 @if /I "%1"=="-h" goto Usage
 @if /I "%1"=="-help" goto Usage
 @if /I "%1"=="--help" goto Usage
