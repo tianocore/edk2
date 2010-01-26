@@ -175,7 +175,7 @@ NAND into system memory and jumps to it. In the EFI world this NAND
 image is called an FD (Flash Device) image and it contains 520 bytes of
 image header for the mask ROM and an FV (Firmware Volume). The FV is a
 simple FLASH file system and the first 4 bytes of the FV contain a jump
-to the <a href="https://www.tianocore.org/acronyms.htm">SEC</a>
+to the <a href="https://sourceforge.net/apps/mediawiki/tianocore/index.php?title=Acronyms">SEC</a>
 (SEcuirty
 Core) module. The SEC is a PE/COFF image that contains the reset vector
 and it is located in an arbitrary location in the FV. When you boot
