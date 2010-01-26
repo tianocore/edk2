@@ -1,7 +1,7 @@
 /** @file
   This file contains all helper functions on the ATA command 
   
-  Copyright (c) 2006 - 2008, Intel Corporation.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation.<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -75,12 +75,12 @@ AtaAtapi6Identify (
   //
   // 48 bit address feature set is supported, get maximum capacity
   //
-  Capacity = Atapi6IdentifyStruct->AtapiData.max_user_lba_for_48bit_addr[0];
+  Capacity = Atapi6IdentifyStruct->AtaData.maximum_lba_for_48bit_addressing[0];
   for (Index = 1; Index < 4; Index++) {
     //
     // Lower byte goes first: word[100] is the lowest word, word[103] is highest
     //
-    TmpLba = Atapi6IdentifyStruct->AtapiData.max_user_lba_for_48bit_addr[Index];
+    TmpLba = Atapi6IdentifyStruct->AtaData.maximum_lba_for_48bit_addressing[Index];
     Capacity |= LShiftU64 (TmpLba, 16 * Index);
   }
 
