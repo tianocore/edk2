@@ -30,13 +30,16 @@
 pushd .
 cd %~dp0
 
-if defined WORKSPACE (
-  if %WORKSPACE% == %CD% (
-    @REM workspace is not changed.
-    @goto ParseArgs
-  )
+if not defined WORKSPACE (
+  @goto SetWorkSpace
 )
 
+if %WORKSPACE% == %CD% (
+  @REM Workspace is not changed.
+  @goto ParseArgs
+)
+
+:SetWorkSpace
 @REM set new workspace
 @REM clear EFI_SOURCE and EDK_SOURCE for the new workspace
 set WORKSPACE=%CD%
