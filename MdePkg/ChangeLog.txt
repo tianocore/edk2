@@ -326,3 +326,12 @@ Possible impacts:
 	This is a source level compatible change, but not binary level. We might need to rebuild some old binary modules to work with newer version of MdePkg.
 
 
+EDK_9815: Non-Compatible: qhuang8
+	Scrub EFI_ATA_IDENTIFY_DATA and EFI_ATAPI_IDENTIFY_DATA to strict follow newest ATA spec (ATA-8). This is a build non-backward compatible changes for ATA-related modules.
+	The ATA5_IDENTIFY_DATA in MdePkg\IndustryStandards\Atapi.h is exactly the same as the original ATA_IDENTIFY_DATA for backward compatibility support to follow ATA-5 spec. 
+
+Possible impacts:
+	We can fix the build breaks for some renaming issues (e.g. Word 49 in EFI_ATA_IDENTIFY_DATA renamed from "capabilities" to "capabilities_49")
+	For the fields that are "obsolete" in newest ATA spec, we can use type-cast to older ATA spec structure (e.g. ATA5_IDENTIFY_DATA). 
+	(There  should not be any runtime issues if the build issues have got solved in the source correctly.)
+
