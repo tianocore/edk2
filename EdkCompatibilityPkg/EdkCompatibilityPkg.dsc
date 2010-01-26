@@ -252,7 +252,7 @@ define GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x00020000 -DPI_S
   EdkCompatibilityPkg/Compatibility/LegacyRegion2OnLegacyRegionThunk/LegacyRegion2OnLegacyRegionThunk.inf
   EdkCompatibilityPkg/Compatibility/PiSmbiosRecordOnDataHubSmbiosRecordThunk/PiSmbiosRecordOnDataHubSmbiosRecordThunk.inf
   EdkCompatibilityPkg/Compatibility/CpuIo2OnCpuIoThunk/CpuIo2OnCpuIoThunk.inf
-  EdkCompatibilityPkg/Compatibility/BootScriptSaveOnS3SaveStateTunk/BootScriptSaveOnS3SaveStateTunk.inf
+  EdkCompatibilityPkg/Compatibility/BootScriptSaveOnS3SaveStateThunk/BootScriptSaveOnS3SaveStateThunk.inf
 
   #
   # User needs to turn on the compatibility switches for VFRC and EDK II build tool for Framework HII modules 
