@@ -3,7 +3,7 @@
 #
 # This DSC file is used for Package Level build.
 #
-# Copyright (c) 2007 - 2009, Intel Corporation
+# Copyright (c) 2007 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -30,22 +30,21 @@
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
 
-
 ################################################################################
 #
 # Pcd Section - list of all EDK II PCD Entries defined by this Platform
 #
 ################################################################################
-[PcdsFixedAtBuild.common]
+[PcdsFixedAtBuild]
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0f
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x06
   gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue|0xAF
   gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|320
 
-[PcdsPatchableInModule.common]
+[PcdsPatchableInModule]
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
 
-[PcdsFeatureFlag.common]
+[PcdsFeatureFlag]
   gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|FALSE
@@ -69,11 +68,10 @@
 #       generated for it, but the binary will not be put into any firmware volume.
 #
 ###################################################################################################
-[Components.common]
+[Components]
   IntelFrameworkPkg/Library/DxeIoLibCpuIo/DxeIoLibCpuIo.inf
   IntelFrameworkPkg/Library/FrameworkUefiLib/FrameworkUefiLib.inf
   IntelFrameworkPkg/Library/DxeSmmDriverEntryPoint/DxeSmmDriverEntryPoint.inf
   IntelFrameworkPkg/Library/PeiSmbusLibSmbusPpi/PeiSmbusLibSmbusPpi.inf
   IntelFrameworkPkg/Library/PeiHobLibFramework/PeiHobLibFramework.inf
-  IntelFrameworkPkg/Library/SmmLibNull/SmmLibNull.inf
 
