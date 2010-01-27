@@ -297,7 +297,7 @@
         "$(MTOC)" -subsystem $(MODULE_TYPE)  $(MTOC_FLAGS)  ${src}  $(DEBUG_DIR)(+)$(MODULE_NAME).pecoff
         # create symbol file for GDB debug
         -$(DSYMUTIL) ${src}
-        GenFw --xip -e $(MODULE_TYPE) -o ${dst} $(DEBUG_DIR)(+)$(MODULE_NAME).pecoff 
+        GenFw -e $(MODULE_TYPE) -o ${dst} $(DEBUG_DIR)(+)$(MODULE_NAME).pecoff 
         $(CP) ${dst} $(OUTPUT_DIR)
         $(CP) ${dst} $(BIN_DIR)
         -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
