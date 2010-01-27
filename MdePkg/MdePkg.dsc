@@ -1,7 +1,7 @@
 #/** @file
 # EFI/PI MdePkg Package
 #
-# Copyright (c) 2007 - 2009, Intel Corporation<BR>
+# Copyright (c) 2007 - 2010, Intel Corporation<BR>
 # Portions copyright (c) 2008-2009 Apple Inc. All rights reserved.<BR>
 #
 #  All rights reserved. This program and the accompanying materials
@@ -137,6 +137,7 @@
   MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
   MdePkg/Library/UefiPciLibPciRootBridgeIo/UefiPciLibPciRootBridgeIo.inf
   MdePkg/Library/UefiPciSegmentLibPciRootBridgeIo/UefiPciSegmentLibPciRootBridgeIo.inf
+  MdePkg/Library/SmmLibNull/SmmLibNull.inf
 
 [Components.IA32, Components.X64]
   MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
