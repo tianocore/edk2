@@ -146,7 +146,7 @@ typedef struct {
   UINT16  logic_sector_size_hi;                    ///< word 118
   UINT16  features_and_command_sets_supported_ext; ///< word 119
   UINT16  features_and_command_sets_enabled_ext;   ///< word 120
-  UINT16  reserved_121_126[8];
+  UINT16  reserved_121_126[6];
   UINT16  obsolete_127;
   UINT16  security_status;                         ///< word 128
   UINT16  vendor_specific_129_159[31]; 
