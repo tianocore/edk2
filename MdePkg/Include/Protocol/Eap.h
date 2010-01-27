@@ -5,7 +5,7 @@
   The definitions in this file are defined in UEFI Specification 2.3, which have
   not been verified by one implementation yet.
 
-  Copyright (c) 2009, Intel Corporation
+  Copyright (c) 2009 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -101,7 +101,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_EAP_SET_DESIRED_AUTHENTICATION_METHOD)(
-  IN struct _EFI_EAP_PROTOCOL    *This, 
+  IN EFI_EAP_PROTOCOL            *This, 
   IN UINT8                       EapAuthType
   );
 
@@ -131,7 +131,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_EAP_REGISTER_AUTHENTICATION_METHOD)(
-  IN struct _EFI_EAP_PROTOCOL             *This, 
+  IN EFI_EAP_PROTOCOL                     *This, 
   IN UINT8                                EapAuthType, 
   IN EFI_EAP_BUILD_RESPONSE_PACKET        Handler
   );

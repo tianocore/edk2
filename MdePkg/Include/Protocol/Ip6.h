@@ -10,7 +10,7 @@
   Listener Discovery Protocol (MLD), and a subset of the Internet Control
   Message Protocol (ICMPv6).
   
-  Copyright (c) 2008 - 2009, Intel Corporation                                                         
+  Copyright (c) 2008 - 2010, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -838,7 +838,7 @@ EFI_STATUS
   is signaled.
 
   @param[in]  This               Pointer to the EFI_IP6_PROTOCOL instance.
-  @param]in]  Token              Pointer to a token that is associated with the receive data descriptor.
+  @param[in]  Token              Pointer to a token that is associated with the receive data descriptor.
                                  
   @retval EFI_SUCCESS            The receive completion token was cached.
   @retval EFI_NOT_STARTED        This EFI IPv6 Protocol instance has not been started.

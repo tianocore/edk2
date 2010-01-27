@@ -6,7 +6,7 @@
   The definitions in this file are defined in UEFI Specification 2.2, which have
   not been verified by one implementation yet.
 
-  Copyright (c) 2009, Intel Corporation
+  Copyright (c) 2009 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -202,7 +202,7 @@ typedef struct _EFI_EAPOL_SUPPLICANT_PAE_STATISTICS {
 typedef
 EFI_STATUS
 (EFIAPI *EFI_EAP_GET_SYSTEM_CONFIGURATION)(
-  IN struct _EFI_EAP_MANAGEMENT_PROTOCOL  *This, 
+  IN EFI_EAP_MANAGEMENT_PROTOCOL          *This, 
   OUT BOOLEAN                             *SystemAuthControl, 
   OUT EFI_EAPOL_PORT_INFO                 *PortInfo OPTIONAL
   );
@@ -226,7 +226,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_EAP_SET_SYSTEM_CONFIGURATION)(
-  IN struct _EFI_EAP_MANAGEMENT_PROTOCOL  *This, 
+  IN EFI_EAP_MANAGEMENT_PROTOCOL          *This, 
   IN BOOLEAN                              SystemAuthControl
   );
 
@@ -244,7 +244,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_EAP_INITIALIZE_PORT)(
-  IN struct _EFI_EAP_MANAGEMENT_PROTOCOL  *This
+  IN EFI_EAP_MANAGEMENT_PROTOCOL            *This
   );
 
 /**
@@ -262,7 +262,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_EAP_USER_LOGON)(
-  IN struct _EFI_EAP_MANAGEMENT_PROTOCOL  *This
+  IN EFI_EAP_MANAGEMENT_PROTOCOL          *This
   );
 
 /**
@@ -280,7 +280,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_EAP_USER_LOGOFF)(
-  IN struct _EFI_EAP_MANAGEMENT_PROTOCOL  *This
+  IN EFI_EAP_MANAGEMENT_PROTOCOL          *This
   );
 
 /**
@@ -318,7 +318,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_EAP_GET_SUPPLICANT_STATUS)(
-  IN struct _EFI_EAP_MANAGEMENT_PROTOCOL          *This, 
+  IN EFI_EAP_MANAGEMENT_PROTOCOL                  *This, 
   OUT EFI_EAPOL_SUPPLICANT_PAE_STATE              *CurrentState, 
   IN OUT EFI_EAPOL_SUPPLICANT_PAE_CONFIGURATION   *Configuration  OPTIONAL
   );
@@ -349,7 +349,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_EAP_SET_SUPPLICANT_CONFIGURATION)(
-  IN struct _EFI_EAP_MANAGEMENT_PROTOCOL      *This, 
+  IN EFI_EAP_MANAGEMENT_PROTOCOL              *This, 
   IN EFI_EAPOL_SUPPLICANT_PAE_CONFIGURATION   *Configuration
   );
 
@@ -375,7 +375,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_EAP_GET_SUPPLICANT_STATISTICS)(
-  IN struct _EFI_EAP_MANAGEMENT_PROTOCOL      *This, 
+  IN EFI_EAP_MANAGEMENT_PROTOCOL              *This, 
   OUT EFI_EAPOL_SUPPLICANT_PAE_STATISTICS     *Statistics
   );
 

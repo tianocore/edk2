@@ -1,7 +1,7 @@
 /** @file
   GCC inline implementation of BaseLib processor specific functions.
   
-  Copyright (c) 2006 - 2007, Intel Corporation<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation<BR>
   Portions copyright (c) 2008-2009 Apple Inc. All rights reserved.<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1078,12 +1078,12 @@ InternalX86WriteGdtr (
 VOID
 EFIAPI
 InternalX86ReadIdtr (
-  OUT     IA32_DESCRIPTOR           *Ldtr
+  OUT     IA32_DESCRIPTOR           *Idtr
   )
 {
   __asm__ __volatile__ (
     "sldt  %0"
-    : "=m" (*Ldtr)
+    : "=m" (*Idtr)
     );
 }
 
@@ -1100,13 +1100,13 @@ InternalX86ReadIdtr (
 VOID
 EFIAPI
 InternalX86WriteIdtr (
-  IN      CONST IA32_DESCRIPTOR     *Ldtr
+  IN      CONST IA32_DESCRIPTOR     *Idtr
   )
 {
   __asm__ __volatile__ (
     "lidt %0"
     :
-    : "m" (*Ldtr)
+    : "m" (*Idtr)
     );
 }
 

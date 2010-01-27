@@ -3,7 +3,7 @@
   to send ATA Command Blocks to any ATA device attached to that ATA controller. The information
   includes the attributes of the ATA controller.
 
-  Copyright (c) 2009, Intel Corporation                                                         
+  Copyright (c) 2009 - 2010, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -74,10 +74,10 @@ typedef struct _EFI_ATA_STATUS_BLOCK {
   UINT8 AtaSectorNumberExp;
   UINT8 AtaCylinderLowExp;
   UINT8 AtaCylinderHighExp; 
-  UINT8 Reserved;
+  UINT8 Reserved2;
   UINT8 AtaSectorCount;
   UINT8 AtaSectorCountExp;
-  UINT8 Reserved2[6];
+  UINT8 Reserved3[6];
 } EFI_ATA_STATUS_BLOCK;
 
 typedef UINT8 EFI_ATA_PASS_THRU_CMD_PROTOCOL;
