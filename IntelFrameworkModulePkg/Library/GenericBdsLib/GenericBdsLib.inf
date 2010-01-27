@@ -23,6 +23,7 @@
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = GenericBdsLib|DXE_DRIVER UEFI_APPLICATION 
+  CONSTRUCTOR                    = GenericBdsLibConstructor
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -39,6 +40,9 @@
   BdsBoot.c
   InternalBdsLib.h
   Bmp.h
+  String.h
+  String.c
+  GenericBdsStrings.uni
   
 [Sources.IPF]
   Ipf/ShadowRom.c
@@ -67,6 +71,7 @@
   TimerLib
   PcdLib
   DxeServicesLib
+  HiiLib
 
 [Guids]
   gEfiVT100PlusGuid                             ## CONSUMES ## GUID (The type of terminal)

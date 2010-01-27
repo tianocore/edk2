@@ -201,10 +201,6 @@ CallBootManager (
   VOID                        *EndOpCodeHandle;
   EFI_IFR_GUID_LABEL          *StartLabel;
   EFI_IFR_GUID_LABEL          *EndLabel;
-  CHAR16                      *HiiString;
-  CHAR16                      *BootStringNumber;
-  UINTN                       DevicePathType;
-  UINTN                       BufferSize;
 
   gOption = NULL;
   InitializeListHead (&BdsBootOptionList);
@@ -266,67 +262,7 @@ CallBootManager (
     if ((Option->Attribute & LOAD_OPTION_HIDDEN) != 0) {
       continue;
     }
-    
-    //
-    // Replace description string with UNI file string.
-    //
-    BootStringNumber = NULL;
-    
-    DevicePathType = BdsGetBootTypeFromDevicePath (Option->DevicePath);
-
-    //
-    // store number string of boot option temporary.
-    //
-    HiiString = NULL;
-    switch (DevicePathType) {
-    case BDS_EFI_ACPI_FLOPPY_BOOT:
-      HiiString = GetStringById (STRING_TOKEN (STR_DESCRIPTION_FLOPPY));
-      break;
-    case BDS_EFI_MEDIA_CDROM_BOOT:
-    case BDS_EFI_MESSAGE_SATA_BOOT:
-    case BDS_EFI_MESSAGE_ATAPI_BOOT:
-      HiiString = GetStringById (STRING_TOKEN (STR_DESCRIPTION_DVD));
-      break;
-    case BDS_EFI_MESSAGE_USB_DEVICE_BOOT:
-      HiiString = GetStringById (STRING_TOKEN (STR_DESCRIPTION_USB));
-      break;
-    case BDS_EFI_MESSAGE_SCSI_BOOT:
-      HiiString = GetStringById (STRING_TOKEN (STR_DESCRIPTION_SCSI));
-      break;
-    case BDS_EFI_MESSAGE_MISC_BOOT:
-      HiiString = GetStringById (STRING_TOKEN (STR_DESCRIPTION_MISC));
-      break;
-    case BDS_EFI_MESSAGE_MAC_BOOT:
-      HiiString = GetStringById (STRING_TOKEN (STR_DESCRIPTION_NETWORK));
-      break;
-    case BBS_DEVICE_PATH:
-      //
-      // Do nothing for legacy boot option.
-      //
-      break;
-    default:
-      DEBUG((EFI_D_INFO, "Can not find HiiString for given device path type 0x%x\n", DevicePathType));
-    }
-
-    //
-    // If found Hii description string then cat Hii string with original description.
-    //
-    if (HiiString != NULL) {
-      BootStringNumber = Option->Description;
-      BufferSize = StrSize(BootStringNumber);
-      BufferSize += StrSize(HiiString);
-      Option->Description = AllocateZeroPool(BufferSize);
-      ASSERT (Option->Description != NULL);
-      StrCpy (Option->Description, HiiString);
-      if (StrnCmp (BootStringNumber, L"0", 1) != 0) {
-        StrCat (Option->Description, L" ");
-        StrCat (Option->Description, BootStringNumber);
-      } 
       
-      FreePool (HiiString);
-      FreePool (BootStringNumber);
-    }
-    
     ASSERT (Option->Description != NULL);
     
     Token = HiiSetString (HiiHandle, 0, Option->Description, NULL);
