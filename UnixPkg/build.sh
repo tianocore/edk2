@@ -57,8 +57,13 @@ BUILD_ROOT_ARCH=$WORKSPACE/Build/Unix/DEBUG_"$TARGET_TOOLS"/IA32
 
 if  [[ ! -f `which build` || ! -f `which GenFv` ]];
 then
-  # build the tools if they don't yet exist
-  echo Building tools
+  # build the tools if they don't yet exist. Bin scheme
+  echo Building tools as they are not in the path
+  make -C $WORKSPACE/BaseTools
+elif [[ ( -f `which build` ||  -f `which GenFv` )  && ! -d  $EDK_TOOLS_PATH/Source/C/bin ]];
+then
+  # build the tools if they don't yet exist. BinWrapper scheme
+  echo Building tools no $EDK_TOOLS_PATH/Source/C/bin directory
   make -C $WORKSPACE/BaseTools
 else
   echo using prebuilt tools
