@@ -22,9 +22,6 @@
 [Includes]
   Include                        # Root include for the package
 
-[LibraryClasses]
-  SmmLib|Include/Library/SmmLib.h
-
 [Guids]
   ## Include/Guid/DataHubRecords.h
   gEfiCacheSubClassGuid          = { 0x7f0013a7, 0xdc79, 0x4b22, { 0x80, 0x99, 0x11, 0xf7, 0x5f, 0xdc, 0x82, 0x9d }}
@@ -155,6 +152,9 @@
   
   ## Include/Protocol/FrameworkFirmwareVolumeBlock.h
   gFramerworkEfiFirmwareVolumeBlockProtocolGuid = { 0xDE28BC59, 0x6228, 0x41BD, { 0xBD, 0xF6, 0xA3, 0xB9, 0xAD, 0xB5, 0x8D, 0xA1 }}    
+
+  ## Include/Protocol/SmmCpuSaveState.h
+  gEfiSmmCpuSaveStateProtocolGuid = { 0x21f302ad, 0x6e94, 0x471b, {0x84, 0xbc, 0xb1, 0x48, 0x0, 0x40, 0x3a, 0x1d}}
 
 [Ppis]
   ## Include/Ppi/BootScriptExecuter.h
