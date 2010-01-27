@@ -83,18 +83,6 @@
 
 #define MAX_RETRY_COUNT          1500
 
-EFI_BLOCK_IO_MEDIA NandFlashMedia = {
-  SIGNATURE_32('n','a','n','d'),  // MediaId
-  FALSE,                                    // RemovableMedia
-  TRUE,                                     // MediaPresent
-  TRUE,                                     // LogicalPartition
-  FALSE,                                    // ReadOnly
-  FALSE,                                    // WriteCaching
-  0,                                        // BlockSize
-  2,                                        // IoAlign
-  0,                                        // Pad
-  0                                         // LastBlock
-};
 
 typedef struct {
   UINT8 ManufactureId;

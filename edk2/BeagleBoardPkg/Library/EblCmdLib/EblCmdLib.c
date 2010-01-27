@@ -27,8 +27,38 @@
 #include <Library/EfiFileLib.h>
 
 
+//PcdEmbeddedFdBaseAddress
+
+/**
+  Fill Me In
+
+  Argv[0] - "%CommandName%"
+
+  @param  Argc   Number of command arguments in Argv
+  @param  Argv   Array of strings that represent the parsed command line. 
+                 Argv[0] is the comamnd name
+
+  @return EFI_SUCCESS
+
+**/
+EFI_STATUS
+EblEdk2Cmd (
+  IN UINTN  Argc,
+  IN CHAR8  **Argv
+  )
+{
+  return EFI_SUCCESS;
+}
+
+
 GLOBAL_REMOVE_IF_UNREFERENCED const EBL_COMMAND_TABLE mLibCmdTemplate[] =
 {
+  {
+    "edk2",
+    " filename ; Load FD into memory and boot from it",
+    NULL,
+    EblEdk2Cmd
+  }
 };
 
 

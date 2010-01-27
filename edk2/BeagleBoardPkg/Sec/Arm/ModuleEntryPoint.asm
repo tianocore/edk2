@@ -60,7 +60,7 @@ stack_pointer_setup
 
   // Call C entry point
   mov     r0, #0x80000000   /* memory base arg0          */
-  mov     r1, #0x08000000   /* memory size arg1          */
+  mov     r1, #0x10000000   /* memory size arg1          */
   blx     CEntryPoint       /* Assume C code is thumb    */
 
 ShouldNeverGetHere

@@ -17,10 +17,10 @@
 #include "MMCHS.h"
 
 EFI_BLOCK_IO_MEDIA MMCHSMedia = {
-  SIGNATURE_32('s','d','i','o'),  // MediaId
-  FALSE,                                    // RemovableMedia
+  SIGNATURE_32('s','d','i','o'),            // MediaId
+  TRUE,                                     // RemovableMedia
   TRUE,                                     // MediaPresent
-  TRUE,                                     // LogicalPartition
+  FALSE,                                    // LogicalPartition
   FALSE,                                    // ReadOnly
   FALSE,                                    // WriteCaching
   512,                                      // BlockSize
@@ -52,7 +52,7 @@ MMCHS_DEVICE_PATH gMmcHsDevicePath =
 };
 
 CARD_INFO                  *gCardInfo;
-EMBEDDED_EXTERNAL_DEVICE *gTPS65950;
+EMBEDDED_EXTERNAL_DEVICE   *gTPS65950;
 
 //
 // Internal Functions

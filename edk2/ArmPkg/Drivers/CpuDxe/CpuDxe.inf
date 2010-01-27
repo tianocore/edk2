@@ -41,6 +41,7 @@
 #  ExceptionSupport.ARMv6.S   | GCC
   Mmu.c
 
+
 [Packages]
   ArmPkg/ArmPkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
@@ -55,6 +56,7 @@
   PeCoffGetEntryPointLib
   UefiLib
   CpuLib
+  DefaultExceptioHandlerLib
 
 [Protocols]
   gEfiCpuArchProtocolGuid

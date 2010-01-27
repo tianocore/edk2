@@ -101,6 +101,7 @@ ResetEntry
   bx        R1
 
 UndefinedInstructionEntry
+  sub       LR, LR, #4                ; Only -2 for Thumb, adjust in CommonExceptionEntry
   srsfd     #0x13!                    ; Store return state on SVC stack
   cps       #0x13                     ; Switch to SVC for common stack
   stmfd     SP!,{LR}                  ; Store the link register for the current mode
@@ -112,6 +113,7 @@ UndefinedInstructionEntry
   bx        R1
 
 SoftwareInterruptEntry
+  sub       LR, LR, #4                ; Only -2 for Thumb, adjust in CommonExceptionEntry
   srsfd     #0x13!                    ; Store return state on SVC stack
                                       ; We are already in SVC mode
   stmfd     SP!,{LR}                  ; Store the link register for the current mode
@@ -211,15 +213,26 @@ AsmCommonExceptionEntry
   str       R1, [SP, #0x40]         ; Store it in EFI_SYSTEM_CONTEXT_ARM.CPSR
 
   add       R2, SP, #0x38           ; Make R2 point to EFI_SYSTEM_CONTEXT_ARM.LR
-  and       R1, R1, #0x1f           ; Check CPSR to see if User or System Mode
-  cmp       R1, #0x1f               ; if ((CPSR == 0x10) || (CPSR == 0x1df))
-  cmpne     R1, #0x10               ;   
+  and       R3, R1, #0x1f           ; Check CPSR to see if User or System Mode
+  cmp       R3, #0x1f               ; if ((CPSR == 0x10) || (CPSR == 0x1df))
+  cmpne     R3, #0x10               ;   
   stmeqed   R2, {lr}^               ;   save unbanked lr
                                     ; else 
   stmneed   R2, {lr}                ;   save SVC lr
 
-  ldr       R1, [SP, #0x58]         ; PC is the LR pushed by srsfd 
-  str       R1, [SP, #0x3c]         ; Store it in EFI_SYSTEM_CONTEXT_ARM.PC
+
+  ldr       R5, [SP, #0x58]         ; PC is the LR pushed by srsfd 
+                                    ; Check to see if we have to adjust for Thumb entry
+  sub       r4, r0, #1              ; if (ExceptionType == 1 || ExceptionType ==2)) {
+  cmp       r4, #1                  ;   // UND & SVC have differnt LR adjust for Thumb 
+  bhi       NoAdjustNeeded
+  
+  tst       r1, #0x20               ;   if ((CPSR & T)) == T) {  // Thumb Mode on entry 
+  addne     R5, R5, #2              ;     PC += 2;
+  
+NoAdjustNeeded
+
+  str       R5, [SP, #0x3c]         ; Store it in EFI_SYSTEM_CONTEXT_ARM.PC
   
   sub       R1, SP, #0x60           ; We pused 0x60 bytes on the stack 
   str       R1, [SP, #0x34]         ; Store it in EFI_SYSTEM_CONTEXT_ARM.SP
@@ -234,6 +247,7 @@ CommonCExceptionHandler (
   IN     EFI_EXCEPTION_TYPE           ExceptionType,   R0
   IN OUT EFI_SYSTEM_CONTEXT           SystemContext    R1
   )
+
 */
   blx       CommonCExceptionHandler ; Call exception handler
   
