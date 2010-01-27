@@ -1,7 +1,7 @@
 /** @file
   DXE Core Main Entry Point
 
-Copyright (c) 2006 - 2009, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -290,7 +290,7 @@ DxeMain (
   //
   REPORT_STATUS_CODE (
     EFI_PROGRESS_CODE,
-    FixedPcdGet32(PcdStatusCodeValueDxeCoreEntry)
+    (EFI_SOFTWARE_DXE_CORE | EFI_SW_DXE_CORE_PC_ENTRY_POINT)
     );
 
   //
@@ -416,7 +416,7 @@ DxeMain (
   //
   REPORT_STATUS_CODE (
     EFI_PROGRESS_CODE,
-    FixedPcdGet32 (PcdStatusCodeValueDxeCoreHandoffToBds)
+    (EFI_SOFTWARE_DXE_CORE | EFI_SW_DXE_CORE_PC_HANDOFF_TO_NEXT)
     );
 
   //
@@ -670,7 +670,7 @@ CoreExitBootServices (
   //
   REPORT_STATUS_CODE (
     EFI_PROGRESS_CODE,
-    FixedPcdGet32 (PcdStatusCodeValueBootServiceExit)
+    (EFI_SOFTWARE_EFI_BOOT_SERVICE | EFI_SW_BS_PC_EXIT_BOOT_SERVICES)
     );
 
   //

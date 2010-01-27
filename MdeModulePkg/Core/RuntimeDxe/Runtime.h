@@ -3,7 +3,7 @@
 
   This code is used to produce the EFI runtime architectural protocol.
 
-Copyright (c) 2006, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -29,7 +29,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiLib.h>
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/PeCoffLib.h>
-#include <Library/PcdLib.h>
 
 
 //

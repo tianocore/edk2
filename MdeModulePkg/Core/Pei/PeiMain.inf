@@ -90,8 +90,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPpiSupported      ## CONSUMES
 
 [Pcd]  
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeimDispatch                    ## CONSUMES
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValuePeiCoreEntry                    ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeiStackSize                   ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst   ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport            ## CONSUMES

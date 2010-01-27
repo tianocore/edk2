@@ -35,7 +35,7 @@ Revision History:
   Table now contains an item named CalculateCrc32.
 
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -277,7 +277,7 @@ RuntimeDriverSetVirtualAddressMap (
   //
   // ReporstStatusCodeLib will check and make sure this service can be called in runtime mode.
   //
-  REPORT_STATUS_CODE (EFI_PROGRESS_CODE, FixedPcdGet32 (PcdStatusCodeValueSetVirtualAddressMap));
+  REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE_EFI_RUNTIME_SERVICE | EFI_SW_RS_PC_SET_VIRTUAL_ADDRESS_MAP));
 
   //
   // Signal all the EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE events.

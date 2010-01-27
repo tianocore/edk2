@@ -2,7 +2,7 @@
   Produces Simple Text Input Protocol, Simple Text Input Extended Protocol and
   Simple Text Output Protocol upon Serial IO Protocol.
 
-Copyright (c) 2006 - 2009, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -670,7 +670,7 @@ ReportError:
   //
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_ERROR_CODE | EFI_ERROR_MINOR,
-    PcdGet32 (PcdStatusCodeValueRemoteConsoleError),
+    (EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_CONTROLLER_ERROR),
     DevicePath
     );
 

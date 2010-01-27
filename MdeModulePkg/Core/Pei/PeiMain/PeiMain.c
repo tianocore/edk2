@@ -184,7 +184,7 @@ PeiCore (
     //
     REPORT_STATUS_CODE (
       EFI_PROGRESS_CODE,
-      PcdGet32 (PcdStatusCodeValuePeiCoreEntry)
+      (EFI_SOFTWARE_PEI_CORE | EFI_SW_PC_INIT)
       );
       
     PERF_START (NULL, "SEC", NULL, 1);

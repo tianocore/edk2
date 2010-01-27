@@ -2,7 +2,7 @@
   Last PEIM.
   Responsibility of this module is to load the DXE Core from a Firmware Volume.
 
-Copyright (c) 2006 - 2009, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -271,7 +271,7 @@ DxeLoadCore (
   //
   // Report Status Code EFI_SW_PEI_PC_HANDOFF_TO_NEXT
   //
-  REPORT_STATUS_CODE (EFI_PROGRESS_CODE, FixedPcdGet32 (PcdStatusCodeValuePeiHandoffToDxe));
+  REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE_PEI_CORE | EFI_SW_PEI_CORE_PC_HANDOFF_TO_NEXT));
 
   DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Loading DXE CORE at 0x%11p EntryPoint=0x%11p\n", (VOID *)(UINTN)DxeCoreAddress, FUNCTION_ENTRY_POINT (DxeCoreEntryPoint)));
 
