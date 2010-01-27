@@ -1,7 +1,7 @@
 /** @file
   USB Mouse Driver that manages USB mouse and produces Absolute Pointer Protocol.
 
-Copyright (c) 2004 - 2008, Intel Corporation
+Copyright (c) 2004 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -232,7 +232,7 @@ USBMouseAbsolutePointerDriverBindingStart (
     //
     REPORT_STATUS_CODE_WITH_DEVICE_PATH (
       EFI_ERROR_CODE | EFI_ERROR_MINOR,
-      FixedPcdGet32 (PcdStatusCodeValueMouseInterfaceError),
+      (EFI_PERIPHERAL_MOUSE | EFI_P_EC_INTERFACE_ERROR),
       UsbMouseAbsolutePointerDevice->DevicePath
       );
 
@@ -275,7 +275,7 @@ USBMouseAbsolutePointerDriverBindingStart (
   //
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
-    FixedPcdGet32 (PcdStatusCodeValueMouseEnable),
+    (EFI_PERIPHERAL_MOUSE | EFI_P_PC_ENABLE),
     UsbMouseAbsolutePointerDevice->DevicePath
     );
 
@@ -401,7 +401,7 @@ USBMouseAbsolutePointerDriverBindingStop (
   //
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
-    FixedPcdGet32 (PcdStatusCodeValueMouseDisable),
+    (EFI_PERIPHERAL_MOUSE | EFI_P_PC_DISABLE),
     UsbMouseAbsolutePointerDevice->DevicePath
     );
 
@@ -682,7 +682,7 @@ OnMouseInterruptComplete (
     //
     REPORT_STATUS_CODE_WITH_DEVICE_PATH (
       EFI_ERROR_CODE | EFI_ERROR_MINOR,
-      FixedPcdGet32 (PcdStatusCodeValueMouseInputError),
+      (EFI_PERIPHERAL_MOUSE | EFI_P_EC_INPUT_ERROR),
       UsbMouseAbsolutePointerDevice->DevicePath
       );
 
@@ -833,7 +833,7 @@ UsbMouseAbsolutePointerReset (
 
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
-    FixedPcdGet32 (PcdStatusCodeValueMouseReset),
+    (EFI_PERIPHERAL_MOUSE | EFI_P_PC_RESET),
     UsbMouseAbsolutePointerDevice->DevicePath
     );
 

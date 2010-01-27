@@ -26,7 +26,7 @@
   Depex - Dependency Expresion.
   SOR   - Schedule On Request - Don't schedule if this bit is set.
 
-Copyright (c) 2006 - 2009, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -527,7 +527,7 @@ CoreDispatcher (
  
       REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
         EFI_PROGRESS_CODE,
-        FixedPcdGet32(PcdStatusCodeValueDxeDriverBegin),
+        (EFI_SOFTWARE_DXE_CORE | EFI_SW_PC_INIT_BEGIN),
         &DriverEntry->ImageHandle,
         sizeof (DriverEntry->ImageHandle)
         );
@@ -536,7 +536,7 @@ CoreDispatcher (
 
       REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
         EFI_PROGRESS_CODE,
-        FixedPcdGet32(PcdStatusCodeValueDxeDriverEnd),
+        (EFI_SOFTWARE_DXE_CORE | EFI_SW_PC_INIT_END),
         &DriverEntry->ImageHandle,
         sizeof (DriverEntry->ImageHandle)
         );

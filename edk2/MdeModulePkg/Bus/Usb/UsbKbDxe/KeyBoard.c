@@ -1,7 +1,7 @@
 /** @file
   Helper functions for USB Keyboard Driver.
 
-Copyright (c) 2004 - 2008, Intel Corporation
+Copyright (c) 2004 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -811,7 +811,7 @@ InitUSBKeyboard (
 
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
-    FixedPcdGet32 (PcdStatusCodeValueKeyboardSelfTest),
+    (EFI_PERIPHERAL_KEYBOARD | EFI_P_KEYBOARD_PC_SELF_TEST),
     UsbKeyboardDevice->DevicePath
     );
 
@@ -846,7 +846,7 @@ InitUSBKeyboard (
     //
     REPORT_STATUS_CODE_WITH_DEVICE_PATH (
       EFI_ERROR_CODE | EFI_ERROR_MINOR,
-      FixedPcdGet32 (PcdStatusCodeValueKeyboardInterfaceError),
+      (EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_INTERFACE_ERROR),
       UsbKeyboardDevice->DevicePath
       );
 
@@ -1012,7 +1012,7 @@ KeyboardHandler (
     //
     REPORT_STATUS_CODE_WITH_DEVICE_PATH (
       EFI_ERROR_CODE | EFI_ERROR_MINOR,
-      FixedPcdGet32 (PcdStatusCodeValueKeyboardInputError),
+      (EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_INPUT_ERROR),
       UsbKeyboardDevice->DevicePath
       );
 

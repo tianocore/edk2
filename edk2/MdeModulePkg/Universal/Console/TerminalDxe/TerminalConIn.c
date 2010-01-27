@@ -1,7 +1,7 @@
 /** @file
   Implementation for EFI_SIMPLE_TEXT_INPUT_PROTOCOL protocol.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -113,7 +113,7 @@ TerminalConInReset (
   //
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
-    PcdGet32 (PcdStatusCodeValueRemoteConsoleReset),
+    (EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_PC_RESET),
     TerminalDevice->DevicePath
     );
 
@@ -129,7 +129,7 @@ TerminalConInReset (
   if (EFI_ERROR (Status)) {
     REPORT_STATUS_CODE_WITH_DEVICE_PATH (
       EFI_ERROR_CODE | EFI_ERROR_MINOR,
-      PcdGet32 (PcdStatusCodeValueRemoteConsoleError),
+      (EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_CONTROLLER_ERROR),
       TerminalDevice->DevicePath
       );
   }
@@ -636,7 +636,7 @@ TerminalConInCheckForKey (
       if (Status == EFI_DEVICE_ERROR) {
         REPORT_STATUS_CODE_WITH_DEVICE_PATH (
           EFI_ERROR_CODE | EFI_ERROR_MINOR,
-          PcdGet32 (PcdStatusCodeValueRemoteConsoleInputError),
+          (EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_INPUT_ERROR),
           TerminalDevice->DevicePath
           );
       }

@@ -13,7 +13,7 @@
 # 2. Universal Serial Bus HID Usage Tables, ver 1.12
 # 3. UEFI Specification, v2.1
 #
-# Copyright (c) 2006 - 2008, Intel Corporation. 
+# Copyright (c) 2006 - 2010, Intel Corporation. 
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -87,18 +87,7 @@
   gEfiHiiDatabaseProtocolGuid                   ## SOMETIMES_CONSUMES (Default value is used if it's absent.)
   
 [FeaturePcd.common]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDisableDefaultKeyboardLayoutInUsbKbDriver ## SOMETIME_CONSUMES (Checked when no layout is provided by HII.)
-  
-[FixedPcd]
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardEnable
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardPresenceDetect
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardDisable
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardReset
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardClearBuffer
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardSelfTest
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardInterfaceError
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueKeyboardInputError
-  
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDisableDefaultKeyboardLayoutInUsbKbDriver ## SOMETIME_CONSUMES (Checked when no layout is provided by HII.) 
 
 # [Event]
 #   ##

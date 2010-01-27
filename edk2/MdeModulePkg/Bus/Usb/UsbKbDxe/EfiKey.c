@@ -2,7 +2,7 @@
   USB Keyboard Driver that manages USB keyboard and produces Simple Text Input
   Protocol and Simple Text Input Ex Protocol.
 
-Copyright (c) 2004 - 2008, Intel Corporation
+Copyright (c) 2004 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -193,7 +193,7 @@ USBKeyboardDriverBindingStart (
   //
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
-    FixedPcdGet32 (PcdStatusCodeValueKeyboardEnable),
+    (EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_ENABLE),
     UsbKeyboardDevice->DevicePath
     );
 
@@ -202,7 +202,7 @@ USBKeyboardDriverBindingStart (
   //
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
-    FixedPcdGet32 (PcdStatusCodeValueKeyboardPresenceDetect),
+    (EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_PRESENCE_DETECT),
     UsbKeyboardDevice->DevicePath
     );
 
@@ -473,7 +473,7 @@ USBKeyboardDriverBindingStop (
   //
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
-    FixedPcdGet32 (PcdStatusCodeValueKeyboardDisable),
+    (EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_DISABLE),
     UsbKeyboardDevice->DevicePath
     );
 
@@ -658,7 +658,7 @@ USBKeyboardReset (
 
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
-    FixedPcdGet32 (PcdStatusCodeValueKeyboardReset),
+    (EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_RESET),
     UsbKeyboardDevice->DevicePath
     );
 
@@ -669,7 +669,7 @@ USBKeyboardReset (
   if (!ExtendedVerification) {
     REPORT_STATUS_CODE_WITH_DEVICE_PATH (
       EFI_PROGRESS_CODE,
-      FixedPcdGet32 (PcdStatusCodeValueKeyboardClearBuffer),
+      (EFI_PERIPHERAL_KEYBOARD | EFI_P_KEYBOARD_PC_CLEAR_BUFFER),
       UsbKeyboardDevice->DevicePath
       );
     //

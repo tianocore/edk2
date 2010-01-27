@@ -1,7 +1,7 @@
 /** @file
   Implementation of Watchdog Timer Architectural Protocol using UEFI APIs.
   
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2006 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -66,7 +66,7 @@ WatchdogTimerDriverExpires (
   IN VOID         *Context
   )
 {
-  REPORT_STATUS_CODE (EFI_ERROR_CODE | EFI_ERROR_MINOR, FixedPcdGet32 (PcdStatusCodeValueEfiWatchDogTimerExpired));
+  REPORT_STATUS_CODE (EFI_ERROR_CODE | EFI_ERROR_MINOR, (EFI_COMPUTING_UNIT_HOST_PROCESSOR | EFI_CU_HP_EC_TIMER_EXPIRED));
 
   //
   // If a notification function has been registered, then call it

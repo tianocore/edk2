@@ -1,7 +1,7 @@
 #/** @file
 # Generic watchdog timer driver produceing Watchdog Timer Architectural Protocol using UEFI APIs.
 #
-# Copyright (c) 2006 - 2008, Intel Corporation
+# Copyright (c) 2006 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -40,13 +40,9 @@
   ReportStatusCodeLib
   UefiDriverEntryPoint
   DebugLib
-  PcdLib
 
 [Protocols]
   gEfiWatchdogTimerArchProtocolGuid             ## PRODUCES
-
-[FixedPcd.common]
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueEfiWatchDogTimerExpired
 
 [depex]
   gEfiTimerArchProtocolGuid
