@@ -876,8 +876,6 @@ BOpt_GetBootOptions (
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
   UINTN                     MenuCount;
   UINT8                     *Ptr;
-  UINTN                     DevicePathType;
-  CHAR16                    *HiiString;
   
   MenuCount         = 0;
   BootOrderListSize = 0;
@@ -1015,56 +1013,10 @@ BOpt_GetBootOptions (
     LoadOptionPtr += sizeof (UINT16);
     
     StringSize = StrSize((UINT16*)LoadOptionPtr);
-    //
-    // Get Hii description string according to device path type
-    //
-    HiiString        = NULL;
-    DevicePathType   = BdsGetBootTypeFromDevicePath (DevicePath);
-    switch (DevicePathType) {
-    case BDS_EFI_ACPI_FLOPPY_BOOT:
-      HiiString = GetStringById (STRING_TOKEN (STR_DESCRIPTION_FLOPPY));
-      break;
-    case BDS_EFI_MESSAGE_SATA_BOOT:
-    case BDS_EFI_MESSAGE_ATAPI_BOOT:
-    case BDS_EFI_MEDIA_CDROM_BOOT:
-      HiiString = GetStringById (STRING_TOKEN (STR_DESCRIPTION_DVD));
-      break;
-    case BDS_EFI_MESSAGE_USB_DEVICE_BOOT:
-      HiiString = GetStringById (STRING_TOKEN (STR_DESCRIPTION_USB));
-      break;
-    case BDS_EFI_MESSAGE_SCSI_BOOT:
-      HiiString = GetStringById (STRING_TOKEN (STR_DESCRIPTION_SCSI));
-      break;
-    case BDS_EFI_MESSAGE_MISC_BOOT:
-      HiiString = GetStringById (STRING_TOKEN (STR_DESCRIPTION_MISC));
-      break;
-    case BDS_EFI_MESSAGE_MAC_BOOT:
-      HiiString = GetStringById (STRING_TOKEN (STR_DESCRIPTION_NETWORK));
-      break;
-    case BBS_DEVICE_PATH:
-      //
-      // Do nothing for legacy boot option.
-      //
-      break;      
-    default:
-      DEBUG((EFI_D_INFO, "Can not find HiiString for given device path type 0x%x\n", DevicePathType));
-    }
-    
-    if (HiiString != NULL) {
-      NewLoadContext->Description = AllocateZeroPool(StringSize + StrSize(HiiString));
-      ASSERT (NewLoadContext->Description != NULL);
-      StrCpy (NewLoadContext->Description, HiiString);
-      if (StrnCmp ((UINT16*)LoadOptionPtr, L"0", 1) != 0) {
-        StrCat (NewLoadContext->Description, L" ");
-        StrCat (NewLoadContext->Description, (UINT16*)LoadOptionPtr);
-      } 
-      
-      FreePool (HiiString);
-    } else {
-      NewLoadContext->Description = AllocateZeroPool (StrSize((UINT16*)LoadOptionPtr));
-      ASSERT (NewLoadContext->Description != NULL);
-      StrCpy (NewLoadContext->Description, (UINT16*)LoadOptionPtr);
-    }
+
+    NewLoadContext->Description = AllocateZeroPool (StrSize((UINT16*)LoadOptionPtr));
+    ASSERT (NewLoadContext->Description != NULL);
+    StrCpy (NewLoadContext->Description, (UINT16*)LoadOptionPtr);
     
     ASSERT (NewLoadContext->Description != NULL);
     NewMenuEntry->DisplayString = NewLoadContext->Description;
