@@ -243,6 +243,8 @@ INF  MdeModulePkg/Application/HelloWorld/HelloWorld.inf
 #INF  MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
 #INF  UnixPkg/SnpUnixDxe/SnpUnixDxe.inf
 
+#INF FatPkg/EnhancedFatDxe/Fat.inf
+
 
    
 ################################################################################
@@ -257,6 +259,7 @@ FILE APPLICATION = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile) {
     SECTION COMPRESS PI_STD {
       SECTION GUIDED {
         SECTION PE32 = EdkShellBinPkg/FullShell/Ia32/Shell_Full.efi
+#        SECTION PE32 =Build/GccShellPkg/DEBUG_XCODE32/IA32/ShellFull.efi
       }
     }
   }
