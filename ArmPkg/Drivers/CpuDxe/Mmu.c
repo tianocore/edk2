@@ -848,13 +848,15 @@ CpuConvertPagesToUncachedVirtualAddress (
     Status = SetMemoryAttributes (Address | VirtualMask, Length, EFI_MEMORY_UC, VirtualMask);
   }
 
+  DEBUG ((DEBUG_INFO | DEBUG_LOAD, "ConvertPagesToUncachedVirtualAddress()\n    Unmapped 0x%08lx Mapped 0x%08lx 0x%x bytes\n", Address, Address | VirtualMask, Length));
+
   return Status;
 }
 
 
 EFI_STATUS
 EFIAPI
-CpuReconvertPagesPages (
+CpuReconvertPages (
   IN  VIRTUAL_UNCACHED_PAGES_PROTOCOL   *This,
   IN  EFI_PHYSICAL_ADDRESS              Address,
   IN  UINTN                             Length,
@@ -863,9 +865,10 @@ CpuReconvertPagesPages (
   )
 {
   EFI_STATUS      Status;
-DEBUG ((EFI_D_ERROR, "CpuReconvertPagesPages(%lx, %x, %lx, %lx)\n", Address, Length, VirtualMask, Attributes));
-ASSERT (FALSE);
-//
+
+  DEBUG ((DEBUG_INFO | DEBUG_LOAD, "CpuReconvertPages(%lx, %x, %lx, %lx)\n", Address, Length, VirtualMask, Attributes));
+  
+  //
   // Unmap the alaised Address
   //
   Status = SetMemoryAttributes (Address | VirtualMask, Length, EFI_MEMORY_WP, 0);
@@ -882,7 +885,7 @@ ASSERT (FALSE);
 
 VIRTUAL_UNCACHED_PAGES_PROTOCOL  gVirtualUncachedPages = {
   CpuConvertPagesToUncachedVirtualAddress,
-  CpuReconvertPagesPages
+  CpuReconvertPages
 };
 
 

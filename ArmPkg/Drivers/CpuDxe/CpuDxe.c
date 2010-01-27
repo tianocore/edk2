@@ -53,7 +53,6 @@ CpuFlushCpuDataCache (
   IN EFI_CPU_FLUSH_TYPE              FlushType
   )
 {
-  DEBUG ((EFI_D_ERROR, "CpuFlushCpuDataCache (%lx, %lx, %x)\n", Start, Length, FlushType));
 
   switch (FlushType) {
     case EfiCpuFlushTypeWriteBack:

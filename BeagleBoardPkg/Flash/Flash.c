@@ -682,10 +682,25 @@ NandFlashFlushBlocks (
   return EFI_SUCCESS;
 }
 
+
+
+EFI_BLOCK_IO_MEDIA gNandFlashMedia = {
+  SIGNATURE_32('n','a','n','d'),            // MediaId
+  FALSE,                                    // RemovableMedia
+  TRUE,                                     // MediaPresent
+  FALSE,                                    // LogicalPartition
+  FALSE,                                    // ReadOnly
+  FALSE,                                    // WriteCaching
+  0,                                        // BlockSize
+  2,                                        // IoAlign
+  0,                                        // Pad
+  0                                         // LastBlock
+};
+
 EFI_BLOCK_IO_PROTOCOL BlockIo = 
 {
   EFI_BLOCK_IO_INTERFACE_REVISION,  // Revision
-  &NandFlashMedia,                  // *Media
+  &gNandFlashMedia,                  // *Media
   NandFlashReset,                   // Reset
   NandFlashReadBlocks,              // ReadBlocks
   NandFlashWriteBlocks,             // WriteBlocks
@@ -700,7 +715,7 @@ NandFlashInitialize (
 {
   EFI_STATUS  Status;
   
-  gNandFlashInfo = (NAND_FLASH_INFO *)AllocateZeroPool(sizeof(NAND_FLASH_INFO));
+  gNandFlashInfo = (NAND_FLASH_INFO *)AllocateZeroPool (sizeof(NAND_FLASH_INFO));
 
   //Initialize GPMC module.
   GpmcInit();
@@ -709,7 +724,7 @@ NandFlashInitialize (
   NandFlashReset(&BlockIo, FALSE);
 
   //Detect NAND part and populate gNandFlashInfo structure
-  Status = NandDetectPart();
+  Status = NandDetectPart ();
   if (EFI_ERROR(Status)) {
     DEBUG((EFI_D_ERROR, "Nand part id detection failure: Status: %x\n", Status));
     return Status;
@@ -730,11 +745,11 @@ NandFlashInitialize (
   }
 
   //Configure ECC
-  NandConfigureEcc();
+  NandConfigureEcc ();
 
   //Patch EFI_BLOCK_IO_MEDIA structure.
-  NandFlashMedia.BlockSize = gNandFlashInfo->BlockSize;
-  NandFlashMedia.LastBlock = LAST_BLOCK;
+  gNandFlashMedia.BlockSize = gNandFlashInfo->BlockSize;
+  gNandFlashMedia.LastBlock = LAST_BLOCK;
 
   //Publish BlockIO.
   Status = gBS->InstallMultipleProtocolInterfaces (

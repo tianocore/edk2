@@ -81,13 +81,33 @@ EblPrintBlkIoInfo (
   )
 {
   UINT64                    DeviceSize;
-
+  UINTN                     Index;
+  UINTN                     Max;
+  EFI_OPEN_FILE             *FsFile;
 
   if (File == NULL) {
     return;
   }
 
   AsciiPrint ("  %a: ", File->DeviceName);
+
+  // print out name of file system, if any, on this block device
+  Max = EfiGetDeviceCounts (EfiOpenFileSystem);
+  if (Max != 0) {
+    for (Index = 0; Index < Max; Index++) {
+      FsFile = EfiDeviceOpenByType (EfiOpenFileSystem, Index);
+      if (FsFile != NULL) {
+        if (FsFile->EfiHandle == File->EfiHandle) {
+          AsciiPrint ("fs%d: ", Index);
+          EfiClose (FsFile);
+          break;
+        }
+      }
+      EfiClose (FsFile);
+    }
+  }
+
+  // Print out useful Block IO media properties
   if (File->FsBlockIoMedia.RemovableMedia) {
     AsciiPrint ("Removable ");
   }
@@ -102,7 +122,6 @@ EblPrintBlkIoInfo (
 
   EfiClose (File);
 }
-
 
  /**
   Print information about the Load File devices.

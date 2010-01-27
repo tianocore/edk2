@@ -250,6 +250,12 @@ ArmInvalidateTlb (
   
 VOID
 EFIAPI
+ArmUpdateTranslationTableEntry (
+  IN  UINTN    Mva
+  );
+  
+VOID
+EFIAPI
 ArmSetDomainAccessControl (
   IN  UINT32  Domain
   );
