@@ -32,7 +32,7 @@ TransitionFromReal16To32BitFlat:
 
     mov     bx, ADDR16_OF(gdtr)
 
-o32 lgdt    [bx]
+o32 lgdt    [cs:bx]
 
     mov     eax, SEC_DEFAULT_CR0
     mov     cr0, eax
