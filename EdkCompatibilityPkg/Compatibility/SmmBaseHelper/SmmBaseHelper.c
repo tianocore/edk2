@@ -4,7 +4,7 @@
   This driver is the counterpart of the SMM Base On SMM Base2 Thunk driver. It
   provides helping services in SMM to the SMM Base On SMM Base2 Thunk driver.
 
-  Copyright (c) 2009, Intel Corporation
+  Copyright (c) 2009 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -15,7 +15,45 @@
 
 **/
 
-#include "SmmBaseHelper.h"
+#include <PiSmm.h>
+#include <Library/DebugLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/SmmServicesTableLib.h>
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/PeCoffLib.h>
+#include <Library/DevicePathLib.h>
+#include <Library/CacheMaintenanceLib.h>
+#include <Guid/SmmBaseThunkCommunication.h>
+#include <Protocol/SmmBaseHelperReady.h>
+#include <Protocol/SmmCpu.h>
+#include <Protocol/LoadedImage.h>
+#include <Protocol/SmmCpuSaveState.h>
+
+///
+/// Structure for tracking paired information of registered Framework SMI handler
+/// and correpsonding dispatch handle for SMI handler thunk.
+///
+typedef struct {
+  LIST_ENTRY                    Link;
+  EFI_HANDLE                    DispatchHandle;
+  EFI_HANDLE                    SmmImageHandle;
+  EFI_SMM_CALLBACK_ENTRY_POINT  CallbackAddress;
+} CALLBACK_INFO;
+
+typedef struct {
+  ///
+  /// PI SMM CPU Save State register index
+  ///
+  EFI_SMM_SAVE_STATE_REGISTER   Register;
+  ///
+  /// Offset in Framework SMST
+  ///
+  UINTN                         Offset;
+} CPU_SAVE_STATE_CONVERSION;
+
+#define CPU_SAVE_STATE_GET_OFFSET(Field)  (UINTN)(&(((EFI_SMM_CPU_SAVE_STATE *) 0)->Ia32SaveState.Field))
+
 
 EFI_HANDLE                         mDispatchHandle;
 EFI_SMM_CPU_PROTOCOL               *mSmmCpu;
