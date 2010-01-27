@@ -468,3 +468,5 @@
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
 
+  #FatPkg/EnhancedFatDxe/Fat.inf
+  
