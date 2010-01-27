@@ -1,7 +1,7 @@
 /** @file
   Network library functions providing net buffer operation support.
 
-Copyright (c) 2005 - 2009, Intel Corporation.<BR>
+Copyright (c) 2005 - 2010, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -508,7 +508,6 @@ NetbufGetFragmentFree (
 }
 
 
-
 /**
   Create a NET_BUF structure which contains Len byte data of Nbuf starting from
   Offset.
@@ -579,9 +578,6 @@ NetbufGetFragment (
   FirstSkip = Offset - Cur;
   FirstLen  = BlockOp[Index].Size - FirstSkip;
 
-  //
-  //redundant assignment to make compiler happy.
-  //
   Last      = 0;
   LastLen   = 0;
 
@@ -605,6 +601,7 @@ NetbufGetFragment (
     FirstLen = Len;
   }
 
+  ASSERT (Last >= First);
   BlockOpNum = Last - First + 1;
   CurBlockOp = 0;
 
@@ -640,7 +637,7 @@ NetbufGetFragment (
     Child->BlockOp[0].Size =  0;
     CurBlockOp++;
 
-  }else {
+  } else {
     Child = NetbufAllocStruct (0, BlockOpNum);
 
     if (Child == NULL) {
@@ -664,7 +661,7 @@ NetbufGetFragment (
     CurBlockOp++
     );
 
-  for (Index = First + 1; Index <= Last - 1 ; Index++) {
+  for (Index = First + 1; Index < Last; Index++) {
     NetbufSetBlockOp (
       Child,
       BlockOp[Index].Head,
