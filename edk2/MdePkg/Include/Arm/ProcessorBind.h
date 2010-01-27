@@ -1,8 +1,7 @@
-
 /** @file
   Processor or Compiler specific defines and types for ARM.
 
-  Copyright (c) 2006 - 2009, Intel Corporation<BR>                                                         
+  Copyright (c) 2006 - 2010, Intel Corporation<BR>                                                         
   Portions copyright (c) 2008-2009 Apple Inc. All rights reserved.<BR>
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         

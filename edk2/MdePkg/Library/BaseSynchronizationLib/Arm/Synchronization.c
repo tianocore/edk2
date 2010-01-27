@@ -1,7 +1,7 @@
 /** @file
   Implementation of synchronization functions. Still needs to be ported
 
-  Copyright (c) 2006 - 2009, Intel Corporation<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation<BR>
   Portions copyright (c) 2008-2009 Apple Inc. All rights reserved.<BR> 
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -13,6 +13,23 @@
 
 **/
 
+/**
+  Performs an atomic compare exchange operation on a 32-bit unsigned integer.
+
+  Performs an atomic compare exchange operation on the 32-bit unsigned integer
+  specified by Value.  If Value is equal to CompareValue, then Value is set to
+  ExchangeValue and CompareValue is returned.  If Value is not equal to CompareValue,
+  then Value is returned.  The compare exchange operation must be performed using
+  MP safe mechanisms.
+
+  @param  Value         A pointer to the 32-bit value for the compare exchange
+                        operation.
+  @param  CompareValue  32-bit value used in compare operation.
+  @param  ExchangeValue 32-bit value used in exchange operation.
+
+  @return The original *Value before exchange.
+
+**/
 UINT32
 EFIAPI
 InternalSyncCompareExchange32 (

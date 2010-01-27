@@ -1,7 +1,7 @@
 /** @file
   GCC inline implementation of BaseLib processor specific functions.
   
-  Copyright (c) 2006 - 2007, Intel Corporation<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation<BR>
   Portions copyright (c) 2008-2009 Apple Inc. All rights reserved.<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -37,11 +37,26 @@ CpuPause (
     );
 }
 
+/**
+  Transfers control to a function starting with a new stack.
+
+  This internal worker function transfers control to the function
+  specified by EntryPoint using the new stack specified by NewStack
+  and passing in the parameters specified by Context1 and Context2.
+  Context1 and Context2 are optional and may be NULL.
+  The function EntryPoint must never return.
+
+  @param EntryPoint   The pointer to the function to enter.
+  @param Context1     The first parameter to pass in.
+  @param Context2     The second Parameter to pass in
+  @param NewStack     The new Location of the stack
+
+**/
 VOID
 EFIAPI
 InternalSwitchStackAsm (
   SWITCH_STACK_ENTRY_POINT EntryPoint,
-  VOID  *Context,
+  VOID  *Context1,
   VOID  *Context2,
   VOID  *NewStack
   )
@@ -54,7 +69,7 @@ InternalSwitchStackAsm (
     "bx   lr\n\t"
     : /* no output operand */
     : "r" (EntryPoint),
-      "r" (Context),
+      "r" (Context1),
       "r" (Context2),
       "r" (NewStack)
     );

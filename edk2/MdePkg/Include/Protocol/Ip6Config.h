@@ -2,7 +2,7 @@
   This file provides a definition of the EFI IPv6 Configuration
   Protocol.
 
-Copyright (c) 2008 - 2009, Intel Corporation.<BR>
+Copyright (c) 2008 - 2010, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -231,7 +231,7 @@ typedef struct {
                                 - Data is NULL.
                                 - One or more fields in Data do not match the requirement of the 
                                   data type indicated by DataType. 
-  @rerval EFI_WRITE_PROTECTED   The specified configuration data is read-only or the specified 
+  @retval EFI_WRITE_PROTECTED   The specified configuration data is read-only or the specified 
                                 configuration data can not be set under the current policy
   @retval EFI_ACCESS_DENIED     Another set operation on the specified configuration 
                                 data is already in process.
@@ -283,7 +283,7 @@ EFI_STATUS
                                 - This is NULL.
                                 - DataSize is NULL.
                                 - Data is NULL if *DataSize is not zero.
-  @rerval EFI_BUFFER_TOO_SMALL  The size of Data is too small for the specified configuration data 
+  @retval EFI_BUFFER_TOO_SMALL  The size of Data is too small for the specified configuration data 
                                 and the required size is returned in DataSize.
   @retval EFI_NOT_READY         The specified configuration data is not ready due to an already in 
                                 progress asynchronous configuration process.
@@ -315,7 +315,7 @@ EFI_STATUS
   @retval EFI_SUCCESS           The notification event for the specified configuration data is 
                                 registered.
   @retval EFI_INVALID_PARAMETER This is NULL or Event is NULL.
-  @rerval EFI_UNSUPPORTED       The configuration data type specified by DataType is not 
+  @retval EFI_UNSUPPORTED       The configuration data type specified by DataType is not 
                                 supported.
   @retval EFI_OUT_OF_RESOURCES  Required system resources could not be allocated.
   @retval EFI_ACCESS_DENIED     The Event is already registered for the DataType.
@@ -340,7 +340,7 @@ EFI_STATUS
   
   @retval EFI_SUCCESS           The event registered for the specified configuration data is removed.
   @retval EFI_INVALID_PARAMETER This is NULL or Event is NULL.
-  @rerval EFI_NOT_FOUND         The Event has not been registered for the specified 
+  @retval EFI_NOT_FOUND         The Event has not been registered for the specified 
                                 DataType.
   
 **/

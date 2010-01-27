@@ -4,7 +4,7 @@
   build for a particular platform easily if an optimized version
   is desired.
 
-  Copyright (c) 2006 - 2008, Intel Corporation<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -33,7 +33,7 @@
 VOID *
 EFIAPI
 InternalMemSetMem (
-  IN      VOID                      *Buffer,
+  OUT     VOID                      *Buffer,
   IN      UINTN                     Length,
   IN      UINT8                     Value
   )
