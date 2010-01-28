@@ -1,7 +1,7 @@
       TITLE   CpuInterrupt.asm: 
 ;------------------------------------------------------------------------------
 ;*
-;*   Copyright 2006, Intel Corporation                                                         
+;*   Copyright 2006 - 2010, Intel Corporation                                                         
 ;*   All rights reserved. This program and the accompanying materials                          
 ;*   are licensed and made available under the terms and conditions of the BSD License         
 ;*   which accompanies this distribution.  The full text of the license may be found at        
@@ -447,7 +447,6 @@ ExceptionDone:
 ; data
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-        align 010h
 
 gdtr    dw GDT_END - GDT_BASE - 1   ; GDT limit
         dq 0                        ; (GDT base gets set above)
@@ -455,12 +454,12 @@ gdtr    dw GDT_END - GDT_BASE - 1   ; GDT limit
 ;   global descriptor table (GDT)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-        align 010h
+        align 010h                      ; make GDT 16-byte align
 
 public GDT_BASE
 GDT_BASE:
 ; null descriptor
-NULL_SEL            equ $-GDT_BASE          ; Selector [0x0]
+NULL_SEL        equ $-GDT_BASE          ; Selector [0x0]
         dw 0            ; limit 15:0
         dw 0            ; base 15:0
         db 0            ; base 23:16
@@ -474,7 +473,7 @@ LINEAR_SEL      equ $-GDT_BASE          ; Selector [0x8]
         dw 0            ; base 0
         db 0
         db 092h         ; present, ring 0, data, expand-up, writable
-        db 0CFh                 ; page-granular, 32-bit
+        db 0CFh         ; page-granular, 32-bit
         db 0
 
 ; linear code segment descriptor
@@ -482,8 +481,8 @@ LINEAR_CODE_SEL equ $-GDT_BASE          ; Selector [0x10]
         dw 0FFFFh       ; limit 0xFFFFF
         dw 0            ; base 0
         db 0
-        db 09Ah         ; present, ring 0, data, expand-up, writable
-        db 0CFh                 ; page-granular, 32-bit
+        db 09Ah         ; present, ring 0, code, expand-up, writable
+        db 0CFh         ; page-granular, 32-bit
         db 0
 
 ; system data segment descriptor
@@ -492,7 +491,7 @@ SYS_DATA_SEL    equ $-GDT_BASE          ; Selector [0x18]
         dw 0            ; base 0
         db 0
         db 092h         ; present, ring 0, data, expand-up, writable
-        db 0CFh                 ; page-granular, 32-bit
+        db 0CFh         ; page-granular, 32-bit
         db 0
 
 ; system code segment descriptor
@@ -500,55 +499,47 @@ SYS_CODE_SEL    equ $-GDT_BASE          ; Selector [0x20]
         dw 0FFFFh       ; limit 0xFFFFF
         dw 0            ; base 0
         db 0
-        db 09Ah         ; present, ring 0, data, expand-up, writable
-        db 0CFh                 ; page-granular, 32-bit
+        db 09Ah         ; present, ring 0, code, expand-up, writable
+        db 0CFh         ; page-granular, 32-bit
         db 0
 
 ; spare segment descriptor
-SPARE3_SEL  equ $-GDT_BASE          ; Selector [0x28]
-        dw 0            ; limit 0xFFFFF
-        dw 0            ; base 0
+SPARE3_SEL      equ $-GDT_BASE          ; Selector [0x28]
+        dw 0
+        dw 0
         db 0
-        db 0            ; present, ring 0, data, expand-up, writable
-        db 0            ; page-granular, 32-bit
+        db 0
+        db 0
         db 0
 
-;
 ; system data segment descriptor
-;
 SYS_DATA64_SEL    equ $-GDT_BASE          ; Selector [0x30]
         dw 0FFFFh       ; limit 0xFFFFF
         dw 0            ; base 0
         db 0
-        db 092h         ; P | DPL [1..2] | 1   | 1   | C | R | A
-        db 0CFh         ; G | D   | L    | AVL | Segment [19..16]
+        db 092h         ; present, ring 0, data, expand-up, writable
+        db 0CFh         ; page-granular, 32-bit
         db 0
 
-;
 ; system code segment descriptor
-;
 SYS_CODE64_SEL    equ $-GDT_BASE          ; Selector [0x38]
         dw 0FFFFh       ; limit 0xFFFFF
         dw 0            ; base 0
         db 0
-        db 09Ah         ; P | DPL [1..2] | 1   | 1   | C | R | A
-        db 0AFh         ; G | D   | L    | AVL | Segment [19..16]
+        db 09Ah         ; present, ring 0, code, expand-up, writable
+        db 0AFh         ; page-granular, 64-bit
         db 0
 
 ; spare segment descriptor
 SPARE4_SEL  equ $-GDT_BASE            ; Selector [0x40]
-        dw 0            ; limit 0xFFFFF
-        dw 0            ; base 0
+        dw 0
+        dw 0
         db 0
-        db 0            ; present, ring 0, data, expand-up, writable
-        db 0            ; page-granular, 32-bit
+        db 0
+        db 0
         db 0
 
 GDT_END:
-
-        align 02h
-
-
 
 idtr    dw IDT_END - IDT_BASE - 1   ; IDT limit
         dq 0                        ; (IDT base gets set above)
@@ -562,8 +553,7 @@ idtr    dw IDT_END - IDT_BASE - 1   ; IDT limit
 ;       for convenience.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;idt_tag db "IDT",0     
-        align 02h
+        align 08h       ; make IDT 8-byte align
 
 public IDT_BASE
 IDT_BASE:
@@ -767,7 +757,7 @@ SIMD_EXCEPTION_SEL  equ $-IDT_BASE
         dd 0            ; offset 63:32
         dd 0            ; 0 for reserved
 
-REPEAT  (32 - 20)
+REPEAT  (32 - 20)  
         dw 0            ; offset 15:0
         dw SYS_CODE64_SEL ; selector 15:0
         db 0            ; 0 for interrupt gate
@@ -944,6 +934,5 @@ IRQ15_SEL            equ $-IDT_BASE
 
 IDT_END:
 
-        align 02h
 
 END
