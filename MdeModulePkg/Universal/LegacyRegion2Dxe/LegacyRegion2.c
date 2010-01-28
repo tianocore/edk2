@@ -7,7 +7,7 @@
   be used as a template driver for implementing the Legacy Region 2 Protocol on
   a platform that does support HW locking of the legacy memory regions.
 
-Copyright (c) 2009, Intel Corporation
+Copyright (c) 2009 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -149,9 +149,7 @@ LegacyRegion2BootLock (
     return EFI_INVALID_PARAMETER;
   }
 
-  ASSERT (Granularity != NULL);
-  *Granularity = 0;
-  return EFI_SUCCESS;
+  return EFI_UNSUPPORTED;
 }
 
 /**
@@ -199,7 +197,7 @@ LegacyRegion2Unlock (
   region. Each attribute may have a different granularity and the granularity may not be the same
   for all memory ranges in the legacy region.  
 
-  @param  This[in]              Indicates the EFI_LEGACY_REGION_PROTOCOL instance.
+  @param  This[in]              Indicates the EFI_LEGACY_REGION2_PROTOCOL instance.
   @param  DescriptorCount[out]  The number of region descriptor entries returned in the Descriptor
                                 buffer.
   @param  Descriptor[out]       A pointer to a pointer used to return a buffer where the legacy
@@ -207,8 +205,8 @@ LegacyRegion2Unlock (
                                 DescriptorCount number of region descriptors.  This function will
                                 provide the memory for the buffer.
 
-  @retval EFI_SUCCESS           The region's attributes were successfully modified.
-  @retval EFI_INVALID_PARAMETER If Start or Length describe an address not in the Legacy Region.
+  @retval EFI_SUCCESS           The information structure was returned.
+  @retval EFI_UNSUPPORTED       This function is not supported.
 
 **/
 EFI_STATUS
@@ -219,13 +217,7 @@ LegacyRegionGetInfo (
   OUT EFI_LEGACY_REGION_DESCRIPTOR  **Descriptor
   )
 {
-  ASSERT (DescriptorCount != NULL);
-  ASSERT (Descriptor != NULL);
-
-  *DescriptorCount = 0;
-  *Descriptor      = NULL;
-
-  return EFI_SUCCESS;
+  return EFI_UNSUPPORTED;
 }
 
 /**
