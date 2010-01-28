@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007 - 2008, Intel Corporation.<BR>                                                         
+Copyright (c) 2007 - 2010, Intel Corporation.<BR>                                                         
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -42,7 +42,6 @@ typedef struct _PXEBC_PRIVATE_DATA  PXEBC_PRIVATE_DATA;
 #include <Library/DpcLib.h>
 
 #include "PxeBcDriver.h"
-#include "PxeArch.h"
 #include "PxeBcDhcp.h"
 #include "PxeBcMtftp.h"
 #include "PxeBcSupport.h"

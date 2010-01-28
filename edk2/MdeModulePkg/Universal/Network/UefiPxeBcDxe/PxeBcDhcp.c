@@ -1033,7 +1033,7 @@ PxeBcBuildDhcpOptions (
   OptList[Index]->OpCode  = PXEBC_PXE_DHCP4_TAG_ARCH;
   OptList[Index]->Length  = sizeof (PXEBC_DHCP4_OPTION_ARCH);
   OptEnt.Arch             = (PXEBC_DHCP4_OPTION_ARCH *) OptList[Index]->Data;
-  Value                   = HTONS (SYS_ARCH);
+  Value                   = HTONS (EFI_PXE_CLIENT_SYSTEM_ARCHITECTURE);
   CopyMem (&OptEnt.Arch->Type, &Value, sizeof (UINT16));
   Index++;
   OptList[Index]          = GET_NEXT_DHCP_OPTION (OptList[Index - 1]);
@@ -1045,7 +1045,7 @@ PxeBcBuildDhcpOptions (
   OptList[Index]->Length  = sizeof (PXEBC_DHCP4_OPTION_CLID);
   OptEnt.Clid             = (PXEBC_DHCP4_OPTION_CLID *) OptList[Index]->Data;
   CopyMem (OptEnt.Clid, DEFAULT_CLASS_ID_DATA, sizeof (PXEBC_DHCP4_OPTION_CLID));
-  CvtNum (SYS_ARCH, OptEnt.Clid->ArchitectureType, sizeof (OptEnt.Clid->ArchitectureType));
+  CvtNum (EFI_PXE_CLIENT_SYSTEM_ARCHITECTURE, OptEnt.Clid->ArchitectureType, sizeof (OptEnt.Clid->ArchitectureType));
 
   if (Private->Nii != NULL) {
     //
