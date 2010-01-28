@@ -145,6 +145,21 @@ typedef UINT16  EFI_PXE_BASE_CODE_UDP_PORT;
 #define EFI_PXE_BASE_CODE_BOOT_LAYER_MASK     0x7FFF
 #define EFI_PXE_BASE_CODE_BOOT_LAYER_INITIAL  0x0000
 
+//
+// PXE Tag definition that identifies the processor 
+// and programming environment of the client system.
+//
+#if defined (MDE_CPU_IA32)
+#define EFI_PXE_CLIENT_SYSTEM_ARCHITECTURE    0x0006
+#elif defined (MDE_CPU_IPF) 
+#define EFI_PXE_CLIENT_SYSTEM_ARCHITECTURE    0x0002
+#elif defined (MDE_CPU_X64)
+#define EFI_PXE_CLIENT_SYSTEM_ARCHITECTURE    0x0007
+#elif defined (MDE_CPU_ARM)
+#define EFI_PXE_CLIENT_SYSTEM_ARCHITECTURE    0x000A
+#endif
+
+
 ///
 /// Discover() server list structure.
 ///
