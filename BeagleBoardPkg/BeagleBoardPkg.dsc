@@ -74,7 +74,7 @@
   DefaultExceptioHandlerLib|ArmPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLib.inf
   PrePiLib|EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
   
-  SerialPortLib|BeagleBoardPkg/Library/SerialPortLib/SerialPortLib.inf
+  SerialPortLib|Omap35xxPkg/Library/SerialPortLib/SerialPortLib.inf
   SemihostLib|ArmPkg/Library/SemihostLib/SemihostLib.inf
   
   RealTimeClockLib|EmbeddedPkg/Library/TemplateRealTimeClockLib/TemplateRealTimeClockLib.inf
@@ -107,11 +107,11 @@
 
   CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
 
-  TimerLib|BeagleBoardPkg/Library/BeagleBoardTimerLib/BeagleBoardTimerLib.inf  
-  OmapLib|BeagleBoardPkg/Library/OmapLib/OmapLib.inf
+  TimerLib|Omap35xxPkg/Library/BeagleBoardTimerLib/BeagleBoardTimerLib.inf  
+  OmapLib|Omap35xxPkg/Library/OmapLib/OmapLib.inf
   EblNetworkLib|EmbeddedPkg/Library/EblNetworkLib/EblNetworkLib.inf
   
-  GdbSerialLib|BeagleBoardPkg/Library/GdbSerialLib/GdbSerialLib.inf
+  GdbSerialLib|Omap35xxPkg/Library/GdbSerialLib/GdbSerialLib.inf
 
 
 [LibraryClasses.common.SEC]
@@ -363,7 +363,7 @@
   #
   # USB
   #
-  BeagleBoardPkg/PciEmulation/PciEmulation.inf
+  Omap35xxPkg/PciEmulation/PciEmulation.inf
 
   #NOTE: Open source EHCI stack doesn't work on Beagleboard.
   #NOTE: UsbBus and UsbMassStorage don't work using iPhone SDK tool chain.
@@ -377,29 +377,29 @@
   #
   # Nand Flash
   #
-  BeagleBoardPkg/Flash/Flash.inf
+  Omap35xxPkg/Flash/Flash.inf
 
   #
   # MMC/SD
   #
-  BeagleBoardPkg/MMCHSDxe/MMCHS.inf
+  Omap35xxPkg/MMCHSDxe/MMCHS.inf
   
   #
   # I2C
   #
-  BeagleBoardPkg/SmbusDxe/Smbus.inf
+  Omap35xxPkg/SmbusDxe/Smbus.inf
   
   #
   # SoC Drivers
   #
-  BeagleBoardPkg/Gpio/Gpio.inf
-  BeagleBoardPkg/InterruptDxe/InterruptDxe.inf
-  BeagleBoardPkg/TimerDxe/TimerDxe.inf 
+  Omap35xxPkg/Gpio/Gpio.inf
+  Omap35xxPkg/InterruptDxe/InterruptDxe.inf
+  Omap35xxPkg/TimerDxe/TimerDxe.inf 
   
   #
   # Power IC
   #
-  BeagleBoardPkg/TPS65950Dxe/TPS65950.inf
+  Omap35xxPkg/TPS65950Dxe/TPS65950.inf
   
   #
   # Application

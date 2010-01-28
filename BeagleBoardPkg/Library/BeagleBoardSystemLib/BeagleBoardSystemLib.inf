@@ -30,6 +30,7 @@
   MdePkg/MdePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   ArmPkg/ArmPkg.dec
+  Omap35xxPkg/Omap35xxPkg.dec
   BeagleBoardPkg/BeagleBoardPkg.dec
   
 [LibraryClasses]
