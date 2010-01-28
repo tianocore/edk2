@@ -1,7 +1,7 @@
 /** @file
   Header file for Terminal driver.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -834,26 +834,6 @@ VOID
 TerminalRemoveConsoleDevVariable (
   IN CHAR16                    *VariableName,
   IN EFI_DEVICE_PATH_PROTOCOL  *ParentDevicePath
-  );
-
-/**
-  Read the EFI variable (VendorGuid/Name) and return a dynamically allocated
-  buffer, and the size of the buffer. On failure return NULL.
-
-  @param  Name                   String part of EFI variable name
-  @param  VendorGuid             GUID part of EFI variable name
-  @param  VariableSize           Returns the size of the EFI variable that was read
-
-  @return Dynamically allocated memory that contains a copy of the EFI variable.
-          Caller is repsoncible freeing the buffer. If variable was not read,
-          NULL regturned.
-
-**/
-VOID *
-TerminalGetVariableAndSize (
-  IN  CHAR16              *Name,
-  IN  EFI_GUID            *VendorGuid,
-  OUT UINTN               *VariableSize
   );
 
 /**
