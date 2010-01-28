@@ -35,30 +35,3 @@
 [Guids.common]
   gBeagleBoardTokenSpaceGuid    =  { 0x6834fe45, 0x4aee, 0x4fc6, { 0xbc, 0xb5, 0xff, 0x45, 0xb7, 0xa8, 0x71, 0xe2 } }
 
-#[PcdsEnumerations.common]
-#  OMAP3530_GPTIMER:
-#    OMAP3530_GPTIMER1|1
-#    OMAP3530_GPTIMER2|2
-#    OMAP3530_GPTIMER3|3
-#    OMAP3530_GPTIMER4|4
-#    OMAP3530_GPTIMER5|5
-#    OMAP3530_GPTIMER6|6
-#    OMAP3530_GPTIMER7|7
-#    OMAP3530_GPTIMER8|8
-#    OMAP3530_GPTIMER9|9
-#   OMAP3530_GPTIMER10|10
-#    OMAP3530_GPTIMER11|11
-#    OMAP3530_GPTIMER12|12
-
-[PcdsFeatureFlag.common]
-
-[PcdsFixedAtBuild.common]
-  gBeagleBoardTokenSpaceGuid.PcdBeagleBoardIRAMFullSize|0x00000000|UINT32|0x00000201
-  gBeagleBoardTokenSpaceGuid.PcdBeagleConsoleUart|3|UINT32|0x00000202
-  gBeagleBoardTokenSpaceGuid.PcdBeagleGpmcOffset|0x00000000|UINT32|0x00000203
-  gBeagleBoardTokenSpaceGuid.PcdBeagleMMCHS1Base|0x00000000|UINT32|0x00000204
-#  gBeagleBoardTokenSpaceGuid.PcdBeagleArchTimer|OMAP3530_GPTIMER3|OMAP3530_GPTIMER|0x00000205
-  gBeagleBoardTokenSpaceGuid.PcdBeagleArchTimer|3|UINT32|0x00000205
-#  gBeagleBoardTokenSpaceGuid.PcdBeagleFreeTimer|OMAP3530_GPTIMER4|OMAP3530_GPTIMER|0x00000206
-  gBeagleBoardTokenSpaceGuid.PcdBeagleFreeTimer|4|UINT32|0x00000206
-  

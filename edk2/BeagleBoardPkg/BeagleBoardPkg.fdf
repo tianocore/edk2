@@ -114,29 +114,29 @@ READ_LOCK_STATUS   = TRUE
   #
   # Nand Flash
   #
-  INF BeagleBoardPkg/Flash/Flash.inf
+  INF Omap35xxPkg/Flash/Flash.inf
 
   #
   # MMC/SD
   #
-  INF BeagleBoardPkg/MMCHSDxe/MMCHS.inf
+  INF Omap35xxPkg/MMCHSDxe/MMCHS.inf
   
   #
   # I2C
   #
-  INF BeagleBoardPkg/SmbusDxe/Smbus.inf
+  INF Omap35xxPkg/SmbusDxe/Smbus.inf
   
   #
   # SoC Drivers
   #
-  INF BeagleBoardPkg/Gpio/Gpio.inf
-  INF BeagleBoardPkg/InterruptDxe/InterruptDxe.inf
-  INF BeagleBoardPkg/TimerDxe/TimerDxe.inf 
+  INF Omap35xxPkg/Gpio/Gpio.inf
+  INF Omap35xxPkg/InterruptDxe/InterruptDxe.inf
+  INF Omap35xxPkg/TimerDxe/TimerDxe.inf 
 
   #
   # Power IC
   #
-  INF BeagleBoardPkg/TPS65950Dxe/TPS65950.inf
+  INF Omap35xxPkg/TPS65950Dxe/TPS65950.inf
 
   #
   # FAT filesystem + GPT/MBR partitioning
@@ -150,7 +150,7 @@ READ_LOCK_STATUS   = TRUE
   # USB Support
   #
 
-  INF BeagleBoardPkg/PciEmulation/PciEmulation.inf
+  INF Omap35xxPkg/PciEmulation/PciEmulation.inf
 
   #NOTE: Open source EHCI stack doesn't work on Beagleboard.
   #NOTE: UsbBus and UsbMassStorage don't work using iPhond SDK tool chain.
