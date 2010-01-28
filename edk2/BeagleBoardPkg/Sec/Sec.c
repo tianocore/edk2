@@ -260,6 +260,8 @@ CEntryPoint (
   ExtractGuidedSectionLibConstructor();
   LzmaDecompressLibConstructor();
 
+  DecompressFirstFv ();
+
   // Load the DXE Core and transfer control to it
   LoadDxeCoreFromFv(NULL, 0);
   

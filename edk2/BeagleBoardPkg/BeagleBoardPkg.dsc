@@ -32,12 +32,8 @@
 
 
 [LibraryClasses.common]
-!if TARGET_HACK == DEBUG
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
-!else
-  DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
-!endif
-
+#  DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
 
   ArmLib|ArmPkg/Library/ArmLib/ArmCortexA/ArmCortexArmLib.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
@@ -169,10 +165,10 @@
   XCODE:*_*_ARM_ARCHCC_FLAGS     == -arch armv6 -march=armv6
   XCODE:*_*_ARM_ARCHASM_FLAGS    == -arch armv6
   XCODE:*_*_ARM_ARCHDLINK_FLAGS  == -arch armv6
+  XCODE:RELEASE_*_*_CC_FLAGS     = -DMDEPKG_NDEBUG 
 
-  RVCT:*_*_ARM_ARCHCC_FLAGS     == --cpu Cortex-A8
-  RVCT:*_*_ARM_ARCHASM_FLAGS    == --cpu Cortex-A8
- 
+  RVCT:*_*_ARM_ARCHCC_FLAGS == --cpu Cortex-A8 
+  RVCT:RELEASE_*_*_CC_FLAGS = -DMDEPKG_NDEBUG 
 
 ################################################################################
 #
