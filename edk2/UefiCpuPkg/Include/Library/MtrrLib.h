@@ -1,7 +1,7 @@
 /** @file
   MTRR setting library
 
-  Copyright (c) 2008 - 2009, Intel Corporation
+  Copyright (c) 2008 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -110,16 +110,6 @@ typedef enum {
 #define  MTRR_CACHE_WRITE_PROTECTED  5
 #define  MTRR_CACHE_WRITE_BACK       6
 #define  MTRR_CACHE_INVALID_TYPE     7
-
-//
-// structure for memory attribute descriptor according MTRR setting
-//
-typedef struct _MTRR_MEMORY_ATTRIBUTE_MAP_ {
-	PHYSICAL_ADDRESS       StartAddress;
-	PHYSICAL_ADDRESS       EndAddress;
-	MTRR_MEMORY_CACHE_TYPE Attribute;
-} MTRR_MEMORY_ATTRIBUTE_MAP;
-
 
 /**
   This function attempts to set the attributes for a memory range.
