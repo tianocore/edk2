@@ -1,6 +1,6 @@
-# This is NT32 FDF file with UEFI HII features enabled
+# This is DUET FDF file with UEFI HII features enabled
 #
-# Copyright (c) 2007, Intel Corporation
+# Copyright (c) 2007 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -115,7 +115,7 @@ INF  IntelFrameworkModulePkg/Bus/Isa/IsaFloppyDxe/IsaFloppyDxe.inf
 INF  MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
 INF  MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 INF  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
-#INF  DuetPkg/BiosVideoThunkDxe/BiosVideo.inf
+INF  DuetPkg/BiosVideoThunkDxe/BiosVideo.inf
 
   # Binary INF file to support toggle among different CPU architectures.
 INF  FatBinPkg/EnhancedFatDxe/Fat.inf
