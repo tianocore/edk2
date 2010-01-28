@@ -30,7 +30,5 @@
 #include <Library/PrintLib.h>
 #include <Library/IoLib.h>
 
-#include <CpuIA32.h>
-
 #endif // _DUET_DXEIPL_H_
 

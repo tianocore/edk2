@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2007, Intel Corporation                                                         
+Copyright (c) 2006 - 2010, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -26,7 +26,8 @@ Revision History:
 #define EFI_DXE_FILE_GUID \
   { 0xb1644c1a, 0xc16a, 0x4c5b, {0x88, 0xde, 0xea, 0xfb, 0xa9, 0x7e, 0x74, 0xd8 }}
 
-#define CPUID_EXTENDED_ADD_SIZE  0x80000008
+#define EFI_CPUID_EXTENDED_FUNCTION  0x80000000
+#define CPUID_EXTENDED_ADD_SIZE      0x80000008
 
 HOB_TEMPLATE  gHobTemplate = {
   { // Phit
@@ -957,21 +958,18 @@ PrepareHobCpu (
   VOID
   )
 {
-  EFI_CPUID_REGISTER          Reg;
-  UINT8                       CpuMemoryAddrBitNumber;
+  UINT32  CpuidEax;
 
   //
   // Create a CPU hand-off information
   //
-  CpuMemoryAddrBitNumber = 36;
-  AsmCpuid (EFI_CPUID_EXTENDED_FUNCTION, &Reg.RegEax, &Reg.RegEbx, &Reg.RegEcx, &Reg.RegEdx);
+  gHob->Cpu.SizeOfMemorySpace = 36;
 
-  if (Reg.RegEax >= CPUID_EXTENDED_ADD_SIZE) {
-    AsmCpuid (CPUID_EXTENDED_ADD_SIZE, &Reg.RegEax, &Reg.RegEbx, &Reg.RegEcx, &Reg.RegEdx);
-    CpuMemoryAddrBitNumber = (UINT8)(UINTN)(Reg.RegEax & 0xFF);
+  AsmCpuid (EFI_CPUID_EXTENDED_FUNCTION, &CpuidEax, NULL, NULL, NULL);
+  if (CpuidEax >= CPUID_EXTENDED_ADD_SIZE) {
+    AsmCpuid (CPUID_EXTENDED_ADD_SIZE, &CpuidEax, NULL, NULL, NULL);
+    gHob->Cpu.SizeOfMemorySpace = (UINT8)(CpuidEax & 0xFF);
   }
-  
-  gHob->Cpu.SizeOfMemorySpace = CpuMemoryAddrBitNumber;
 }
 
 VOID
