@@ -70,8 +70,8 @@ FV = FVMAIN_COMPACT
 
 [FV.FvMain]
 BlockSize          = 0x40
-NumBlocks          = 0x9000
-FvAlignment        = 8         #FV alignment and FV attributes setting.
+NumBlocks          = 0         # This FV gets compressed so make it just big enough
+FvAlignment        = 8         # FV alignment and FV attributes setting.
 ERASE_POLARITY     = 1
 MEMORY_MAPPED      = TRUE
 STICKY_WRITE       = TRUE
@@ -87,6 +87,8 @@ READ_ENABLED_CAP   = TRUE
 READ_STATUS        = TRUE
 READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
+
+  INF MdeModulePkg/Core/Dxe/DxeMain.inf 
 
   #
   # PI DXE Drivers producing Architectural Protocols (EFI Services) 
@@ -194,7 +196,7 @@ READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
   INF BeagleBoardPkg/Sec/Sec.inf
-  INF MdeModulePkg/Core/Dxe/DxeMain.inf 
+#  INF MdeModulePkg/Core/Dxe/DxeMain.inf 
 
   FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
     SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {
@@ -260,10 +262,8 @@ READ_LOCK_STATUS   = TRUE
 
 [Rule.Common.DXE_CORE]
   FILE DXE_CORE = $(NAMED_GUID) {
-    GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {
-      PE32     PE32           |.efi
-      UI       STRING="$(MODULE_NAME)" Optional
-    }
+    PE32     PE32           |.efi
+    UI       STRING="$(MODULE_NAME)" Optional
   }
 
 
