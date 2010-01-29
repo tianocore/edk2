@@ -3,7 +3,7 @@
 #
 # This DXE runtime driver implements and produces the Fimware Volue Block Protocol on
 #  NT32 emulator.
-# Copyright (c) 2006 - 2007, Intel Corporation
+# Copyright (c) 2006 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -21,9 +21,6 @@
   FILE_GUID                      = BDFE5FAA-2A35-44bb-B17A-8084D4E2B9E9
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
-
   ENTRY_POINT                    = FvbInitialize
 
 #
@@ -32,17 +29,15 @@
 #  VALID_ARCHITECTURES           = IA32
 #
 
-[Sources.common]
+[Sources]
   FvbInfo.c
   FwBlockService.h
   FWBlockService.c
-
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   Nt32Pkg/Nt32Pkg.dec
-
 
 [LibraryClasses]
   UefiBootServicesTableLib
@@ -57,7 +52,6 @@
   UefiLib
   PcdLib
 
-
 [Guids]
   gEfiEventVirtualAddressChangeGuid             # ALWAYS_CONSUMED  Create Event: EVENT_GROUP_GUID
 
@@ -65,23 +59,22 @@
   gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL ALWAYS_PRODUCED
   gEfiDevicePathProtocolGuid                    # PROTOCOL SOMETIMES_PRODUCED
 
-[FixedPcd.common]
-  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareFdSize
-  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareBlockSize
-
-  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashFvRecoveryBase
+[FixedPcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashFvRecoverySize
-  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageEventLogBase
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareBlockSize
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageEventLogSize
 
-[Pcd.common]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
+[Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareFdSize
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashFvRecoveryBase
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageEventLogBase
 
-[depex]
+[Depex]
   TRUE
   

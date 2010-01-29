@@ -5,7 +5,7 @@
 #  All .uni file who tagged with "ToolCode="DUMMY"" in following file list is included by
 #  MiscSubclassDriver.uni file, the StrGather tool will expand MiscSubclassDriver.uni file
 #  and parse all .uni file.
-# Copyright (c) 2006 - 2009, Intel Corporation
+# Copyright (c) 2006 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -23,9 +23,6 @@
   FILE_GUID                      = 4A9B9DB8-EC62-4A92-818F-8AA0246D246E
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
-
   ENTRY_POINT                    = MiscSubclassDriverEntryPoint
 
 #
@@ -34,7 +31,7 @@
 #  VALID_ARCHITECTURES           = IA32
 #
 
-[Sources.common]
+[Sources]
   MiscBaseBoardManufacturerData.c
   MiscBaseBoardManufacturerFunction.c
   MiscBiosVendorData.c
@@ -72,7 +69,6 @@
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
   Nt32Pkg/Nt32Pkg.dec
 
-
 [LibraryClasses]
   DevicePathLib
   UefiBootServicesTableLib
@@ -89,11 +85,9 @@
   gEfiWinNtIoProtocolGuid                       # PROTOCOL_NOTIFY SOMETIMES_CONSUMED
   gEfiSmbiosProtocolGuid                        # PROTOCOL ALWAYS_CONSUMED
 
-[FixedPcd.common]
+[Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareReleaseDateString
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
-
-[Pcd.common]
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtMemorySize
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang
 
