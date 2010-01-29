@@ -1,7 +1,7 @@
 #/** @file
 # Serial driver for standard UARTS on an ISA bus.
 #
-# Copyright (c) 2007 - 2009, Intel Corporation
+# Copyright (c) 2007 - 2010, Intel Corporation
 #
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -19,7 +19,6 @@
   FILE_GUID                      = 93B80003-9FB3-11d4-9A3A-0090273FC14D
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  EFI_SPECIFICATION_VERSION      = 0x00020000
   ENTRY_POINT                    = InitializeIsaSerial
 
 #
@@ -32,7 +31,7 @@
 #  COMPONENT_NAME2               =  gIsaSerialComponentName2
 #
 
-[Sources.common]
+[Sources]
   ComponentName.c
   Serial.h
   Serial.c
@@ -58,11 +57,12 @@
   gEfiDevicePathProtocolGuid                    ## TO_START
   gEfiSerialIoProtocolGuid                      ## BY_START
 
-[FixedPcd.common]
+[FeaturePcd]
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSerialUseHalfHandshake|FALSE
+  
+[FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|115200
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits|8
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity|1
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits|1
 
-[FeaturePcd.common]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSerialUseHalfHandshake|FALSE
