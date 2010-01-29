@@ -76,7 +76,8 @@ esac
 TARGET=DEBUG
 for arg in "$@"
 do
-  if [[ $arg == RELEASE ]]; then
+  if [[ $arg == RELEASE ]]; 
+  then
     TARGET=RELEASE
   fi
 done
@@ -97,7 +98,12 @@ fi
 #
 # Build the edk2 BeagleBoard code
 #
-build -p $WORKSPACE/BeagleBoardPkg/BeagleBoardPkg.dsc -a ARM -t $TARGET_TOOLS -b $TARGET $1 $2 $3 $4 $5 $6 $7 $8
+if [[ $TARGET == RELEASE ]]; then
+  build -p $WORKSPACE/BeagleBoardPkg/BeagleBoardPkg.dsc -a ARM -t $TARGET_TOOLS -b $1 $2 $3 $4 $5 $6 $7 $8
+else
+  build -p $WORKSPACE/BeagleBoardPkg/BeagleBoardPkg.dsc -a ARM -t $TARGET_TOOLS -b $TARGET $1 $2 $3 $4 $5 $6 $7 $8
+fi
+
 
 for arg in "$@"
 do
