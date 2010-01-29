@@ -1,6 +1,6 @@
 /**@file
 
-Copyright (c) 2006, Intel Corporation
+Copyright (c) 2006 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -168,8 +168,8 @@ Returns:
   CHAR16                *FirmwareVolumesStr;
   UINTN                 *StackPointer;
 
-  MemorySizeStr      = (CHAR16 *) FixedPcdGetPtr (PcdWinNtMemorySizeForSecMain);
-  FirmwareVolumesStr = (CHAR16 *) FixedPcdGetPtr (PcdWinNtFirmwareVolume);
+  MemorySizeStr      = (CHAR16 *) PcdGetPtr (PcdWinNtMemorySizeForSecMain);
+  FirmwareVolumesStr = (CHAR16 *) PcdGetPtr (PcdWinNtFirmwareVolume);
 
   SecPrint ("\nEDK II SEC Main NT Emulation Environment from www.TianoCore.org\n");
 
@@ -201,7 +201,7 @@ Returns:
   //
   // Setup Boot Mode. If BootModeStr == "" then BootMode = 0 (BOOT_WITH_FULL_CONFIGURATION)
   //
-  SecPrint ("  BootMode 0x%02x\n", FixedPcdGet32 (PcdWinNtBootMode));
+  SecPrint ("  BootMode 0x%02x\n", PcdGet32 (PcdWinNtBootMode));
 
   //
   //  Allocate 128K memory to emulate temp memory for PEI.
@@ -606,7 +606,7 @@ Returns:
   SecCoreData                        = (EFI_SEC_PEI_HAND_OFF*)(UINTN) TopOfStack;
   SecCoreData->DataSize               = sizeof(EFI_SEC_PEI_HAND_OFF);
   SecCoreData->BootFirmwareVolumeBase = (VOID*)BootFirmwareVolumeBase;
-  SecCoreData->BootFirmwareVolumeSize = FixedPcdGet32(PcdWinNtFirmwareFdSize);
+  SecCoreData->BootFirmwareVolumeSize = PcdGet32(PcdWinNtFirmwareFdSize);
   SecCoreData->TemporaryRamBase       = (VOID*)(UINTN)LargestRegion; 
   SecCoreData->TemporaryRamSize       = STACK_SIZE;
   SecCoreData->StackBase              = SecCoreData->TemporaryRamBase;

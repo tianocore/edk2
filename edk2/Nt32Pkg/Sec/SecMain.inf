@@ -3,7 +3,7 @@
 #
 # Main executable file of NT32 Emulator that loads PEI core after initialization finished.
 #
-#  Copyright (c) 2007, Intel Corporation
+#  Copyright (c) 2007 - 2010, Intel Corporation
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
@@ -19,8 +19,6 @@
   FILE_GUID                      = 4b837b03-6587-4d19-b82b-edfad836c0a0
   MODULE_TYPE                    = USER_DEFINED
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -28,7 +26,7 @@
 #  VALID_ARCHITECTURES           = IA32
 #
 
-[Sources.common]
+[Sources]
   SecMain.h
   WinNtThunk.c
   FwVol.c
@@ -50,7 +48,6 @@
   PeCoffLib
   ReportStatusCodeLib
 
-
 [Ppis]
   gNtPeiLoadFilePpiGuid                         # PPI ALWAYS_PRODUCED
   gEfiPeiStatusCodePpiGuid                      # PPI ALWAYS_PRODUCED
@@ -59,8 +56,7 @@
   gPeiNtThunkPpiGuid                            # PPI ALWAYS_PRODUCED
   gEfiTemporaryRamSupportPpiGuid
 
-
-[FixedPcd.common]
+[Pcd]
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtBootMode
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareFdSize
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtMemorySizeForSecMain
