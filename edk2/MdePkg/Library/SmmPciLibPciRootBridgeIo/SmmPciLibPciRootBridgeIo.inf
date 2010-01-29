@@ -48,3 +48,6 @@
 
 [Protocols]
   gEfiSmmPciRootBridgeIoProtocolGuid               ## CONSUMES
+  
+[Depex]
+  gEfiSmmPciRootBridgeIoProtocolGuid
