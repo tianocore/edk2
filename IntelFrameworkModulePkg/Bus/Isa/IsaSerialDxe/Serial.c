@@ -1117,7 +1117,7 @@ IsaSerialSetAttributes (
   // Check for default settings and fill in actual values.
   //
   if (BaudRate == 0) {
-    BaudRate = FixedPcdGet64 (PcdUartDefaultBaudRate);
+    BaudRate = PcdGet64 (PcdUartDefaultBaudRate);
   }
 
   if (ReceiveFifoDepth == 0) {
@@ -1129,15 +1129,15 @@ IsaSerialSetAttributes (
   }
 
   if (Parity == DefaultParity) {
-    Parity = (EFI_PARITY_TYPE)FixedPcdGet8 (PcdUartDefaultParity);
+    Parity = (EFI_PARITY_TYPE)PcdGet8 (PcdUartDefaultParity);
   }
 
   if (DataBits == 0) {
-    DataBits = FixedPcdGet8 (PcdUartDefaultDataBits);
+    DataBits = PcdGet8 (PcdUartDefaultDataBits);
   }
 
   if (StopBits == DefaultStopBits) {
-    StopBits = (EFI_STOP_BITS_TYPE) FixedPcdGet8 (PcdUartDefaultStopBits);
+    StopBits = (EFI_STOP_BITS_TYPE) PcdGet8 (PcdUartDefaultStopBits);
   }
   //
   // 5 and 6 data bits can not be verified on a 16550A UART
