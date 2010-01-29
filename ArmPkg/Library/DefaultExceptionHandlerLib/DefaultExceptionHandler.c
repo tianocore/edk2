@@ -178,7 +178,37 @@ CpsrString (
   AsciiStrCat (Str, ModeStr);
   return;
 }  
-  
+
+CHAR8 *
+FaultStatusToString (
+  IN  UINT32  Status
+  )
+{
+  CHAR8 *FaultSource;
+
+  switch (Status) {
+    case 0x01: FaultSource = "Alignment fault"; break;
+    case 0x02: FaultSource = "Debug event fault"; break;
+    case 0x03: FaultSource = "Access Flag fault on Section"; break;
+    case 0x04: FaultSource = "Cache maintenance operation fault[2]"; break;
+    case 0x05: FaultSource = "Translation fault on Section"; break;
+    case 0x06: FaultSource = "Access Flag fault on Page"; break;
+    case 0x07: FaultSource = "Translation fault on Page"; break;
+    case 0x08: FaultSource = "Precise External Abort"; break;
+    case 0x09: FaultSource = "Domain fault on Section"; break;
+    case 0x0b: FaultSource = "Domain fault on Page"; break;
+    case 0x0c: FaultSource = "External abort on translation, first level"; break;
+    case 0x0d: FaultSource = "Permission fault on Section"; break;
+    case 0x0e: FaultSource = "External abort on translation, second level"; break;
+    case 0x0f: FaultSource = "Permission fault on Page"; break;
+    case 0x16: FaultSource = "Imprecise External Abort"; break;
+    default:   FaultSource = "No function"; break;
+    }
+
+  return FaultSource;
+}
+
+
 CHAR8 *gExceptionTypeString[] = {
   "Reset",
   "Undefined OpCode",
@@ -207,6 +237,8 @@ DefaultExceptionHandler (
   IN OUT EFI_SYSTEM_CONTEXT           SystemContext
   )
 {
+  UINT32    DfsrStatus;
+  BOOLEAN   DfsrWrite;
 
   DEBUG ((EFI_D_ERROR, "\n%a Exception PC at 0x%08x  CPSR 0x%08x ", gExceptionTypeString[ExceptionType], SystemContext.SystemContextArm->PC, SystemContext.SystemContextArm->CPSR));
   DEBUG_CODE_BEGIN ();
@@ -242,7 +274,8 @@ DefaultExceptionHandler (
         DEBUG ((EFI_D_ERROR, "\n%a", Buffer));
       } else {
         // Thumb
-        DEBUG ((EFI_D_ERROR, "\nFaulting Instruction 0x%04x", (UINT16 *)(UINTN)SystemContext.SystemContextArm->PC));
+        DisassembleThumbInstruction ((UINT16 *)(UINTN)SystemContext.SystemContextArm->PC, Buffer, sizeof (Buffer));
+        DEBUG ((EFI_D_ERROR, "\n%a", Buffer));
       }
     }
   DEBUG_CODE_END ();
@@ -250,8 +283,19 @@ DefaultExceptionHandler (
   DEBUG ((EFI_D_ERROR, "  R4 0x%08x   R5 0x%08x   R6 0x%08x   R7 0x%08x\n", SystemContext.SystemContextArm->R4, SystemContext.SystemContextArm->R5, SystemContext.SystemContextArm->R6, SystemContext.SystemContextArm->R7));
   DEBUG ((EFI_D_ERROR, "  R8 0x%08x   R9 0x%08x  R10 0x%08x  R11 0x%08x\n", SystemContext.SystemContextArm->R8, SystemContext.SystemContextArm->R9, SystemContext.SystemContextArm->R10, SystemContext.SystemContextArm->R11));
   DEBUG ((EFI_D_ERROR, " R12 0x%08x   SP 0x%08x   LR 0x%08x   PC 0x%08x\n", SystemContext.SystemContextArm->R12, SystemContext.SystemContextArm->SP, SystemContext.SystemContextArm->LR, SystemContext.SystemContextArm->PC));
-  DEBUG ((EFI_D_ERROR, "DFSR 0x%08x DFAR 0x%08x IFSR 0x%08x IFAR 0x%08x\n\n", SystemContext.SystemContextArm->DFSR, SystemContext.SystemContextArm->DFAR, SystemContext.SystemContextArm->IFSR, SystemContext.SystemContextArm->IFAR));
+  DEBUG ((EFI_D_ERROR, "DFSR 0x%08x DFAR 0x%08x IFSR 0x%08x IFAR 0x%08x\n", SystemContext.SystemContextArm->DFSR, SystemContext.SystemContextArm->DFAR, SystemContext.SystemContextArm->IFSR, SystemContext.SystemContextArm->IFAR));
 
+  // Bit10 is Status[4] Bit3:0 is Status[3:0]
+  DfsrStatus = (SystemContext.SystemContextArm->DFSR & 0xf) | ((SystemContext.SystemContextArm->DFSR >> 6) & 0x10);
+  DfsrWrite = (SystemContext.SystemContextArm->DFSR & BIT11) != 0;
+  if (DfsrStatus != 0x00) {
+    DEBUG ((EFI_D_ERROR, " %a: %a 0x%08x\n", FaultStatusToString (DfsrStatus), DfsrWrite ? "write to" : "read from", SystemContext.SystemContextArm->DFAR));
+  }
+  if (SystemContext.SystemContextArm->IFSR & 0xf != 0x00) {
+    DEBUG ((EFI_D_ERROR, "Instruction %a at 0x%08x, \n", FaultStatusToString (SystemContext.SystemContextArm->IFSR & 0xf), SystemContext.SystemContextArm->IFAR));
+  }
+
+  DEBUG ((EFI_D_ERROR, "\n"));
   ASSERT (FALSE);
 }
 
