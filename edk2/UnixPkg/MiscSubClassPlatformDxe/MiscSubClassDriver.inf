@@ -5,7 +5,7 @@
 #  All .uni file who tagged with "ToolCode="DUMMY"" in following file list is included by
 #  MiscSubclassDriver.uni file, the StrGather tool will expand MiscSubclassDriver.uni file 
 #  and parse all .uni file.
-# Copyright (c) 2006 - 2009, Intel Corporation
+# Copyright (c) 2006 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -23,9 +23,6 @@
   FILE_GUID                      = f2fbd108-8985-11db-b06a-0040d02b1835
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
-
   ENTRY_POINT                    = MiscSubclassDriverEntryPoint
 
 #
@@ -34,7 +31,7 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-[Sources.common]
+[Sources]
   MiscBaseBoardManufacturer.uni
   MiscBaseBoardManufacturerData.c
   MiscBaseBoardManufacturerFunction.c
@@ -91,18 +88,15 @@
   HiiLib
   DebugLib
   BaseLib
-
   PcdLib
 
 [Protocols]
   gEfiUnixIoProtocolGuid                        # PROTOCOL_NOTIFY SOMETIMES_CONSUMED
   gEfiSmbiosProtocolGuid                        # PROTOCOL ALWAYS_CONSUMED
 
-[FixedPcd.common]
+[Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareReleaseDateString
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
-
-[Pcd.common]
   gEfiUnixPkgTokenSpaceGuid.PcdUnixMemorySize
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang
 

@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006 - 2009 Intel Corporation.
+Copyright (c) 2006 - 2010, Intel Corporation.
 Portions copyright (c) 2008-2009 Apple Inc.
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -188,8 +188,8 @@ Returns:
   setbuf(stdout, 0);
   setbuf(stderr, 0);
 
-  MemorySizeStr      = (CHAR16 *) FixedPcdGetPtr (PcdUnixMemorySizeForSecMain);
-  FirmwareVolumesStr = (CHAR16 *) FixedPcdGetPtr (PcdUnixFirmwareVolume);
+  MemorySizeStr      = (CHAR16 *) PcdGetPtr (PcdUnixMemorySizeForSecMain);
+  FirmwareVolumesStr = (CHAR16 *) PcdGetPtr (PcdUnixFirmwareVolume);
 
   printf ("\nEDK SEC Main UNIX Emulation Environment from www.TianoCore.org\n");
 
@@ -227,7 +227,7 @@ Returns:
   //
   // Setup Boot Mode. If BootModeStr == "" then BootMode = 0 (BOOT_WITH_FULL_CONFIGURATION)
   //
-  printf ("  BootMode 0x%02x\n", (unsigned int)FixedPcdGet32 (PcdUnixBootMode));
+  printf ("  BootMode 0x%02x\n", (unsigned int)PcdGet32 (PcdUnixBootMode));
 
   //
   // Open up a 128K file to emulate temp memory for PEI.
@@ -621,7 +621,7 @@ Returns:
   SecCoreData                        = (EFI_SEC_PEI_HAND_OFF*)(UINTN) TopOfStack;
   SecCoreData->DataSize               = sizeof(EFI_SEC_PEI_HAND_OFF);
   SecCoreData->BootFirmwareVolumeBase = (VOID*)BootFirmwareVolumeBase;
-  SecCoreData->BootFirmwareVolumeSize = FixedPcdGet32(PcdUnixFirmwareFdSize);
+  SecCoreData->BootFirmwareVolumeSize = PcdGet32 (PcdUnixFirmwareFdSize);
   SecCoreData->TemporaryRamBase       = (VOID*)(UINTN)LargestRegion; 
   SecCoreData->TemporaryRamSize       = STACK_SIZE;
   SecCoreData->StackBase              = SecCoreData->TemporaryRamBase;
@@ -868,7 +868,7 @@ Returns:
     // If the memory buffer could not be allocated at the FD build address
     // the Fixup is the difference.
     //
-    *FixUp = *FdBase - FixedPcdGet32 (PcdUnixFdBaseAddress);
+    *FixUp = *FdBase - PcdGet32 (PcdUnixFdBaseAddress);
   }
 
   return EFI_SUCCESS;
