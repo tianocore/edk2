@@ -3,7 +3,7 @@
 #
 # This DXE runtime driver implements and produces the Fimware Volue Block Protocol on 
 #  Unix emulator.
-# Copyright (c) 2008, Intel Corporation
+# Copyright (c) 2008 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -21,9 +21,6 @@
   FILE_GUID                      = f42fd042-8985-11db-a7db-0040d02b1835
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
-
   ENTRY_POINT                    = FvbInitialize
 
 #
@@ -32,16 +29,14 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-[Sources.Ia32]
+[Sources]
   FvbInfo.c
   FWBlockService.c
-
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   UnixPkg/UnixPkg.dec
-
 
 [LibraryClasses]
   UefiBootServicesTableLib
@@ -56,7 +51,6 @@
   UefiLib
   DevicePathLib
 
-
 [Guids]
   gEfiEventVirtualAddressChangeGuid             # ALWAYS_CONSUMED  Create Event: EVENT_GROUP_GUID
 
@@ -64,24 +58,21 @@
   gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL ALWAYS_PRODUCED
   gEfiDevicePathProtocolGuid                    # PROTOCOL SOMETIMES_PRODUCED
 
-
-[FixedPcd.common]
+[FixedPcd]
   gEfiUnixPkgTokenSpaceGuid.PcdUnixFirmwareFdSize
   gEfiUnixPkgTokenSpaceGuid.PcdUnixFirmwareBlockSize
-
   gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashFvRecoveryBase
   gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashFvRecoverySize
   gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashNvStorageEventLogBase
   gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashNvStorageEventLogSize
 
-[Pcd.common]
+[Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
-
 
 [Depex]
   TRUE

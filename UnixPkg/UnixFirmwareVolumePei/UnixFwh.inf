@@ -3,7 +3,7 @@
 #
 # This PEIM will produce the HOB to describe Firmware Volume, Firmware Devices
 #  on the NT32 emulator.
-# Copyright (c) 2006, Intel Corporation
+# Copyright (c) 2006 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -21,9 +21,6 @@
   FILE_GUID                      = f40b7864-8985-11db-af21-0040d02b1835
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
-
   ENTRY_POINT                    = PeimInitializeUnixFwh
 
 #
@@ -32,15 +29,13 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-[Sources.common]
+[Sources]
   UnixFwh.c
-
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   UnixPkg/UnixPkg.dec
-
 
 [LibraryClasses]
   PeiServicesTablePointerLib
@@ -49,19 +44,15 @@
   PeimEntryPoint
   DebugLib
 
-
-[FixedPcd.common]
+[Pcd]
   gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashNvStorageEventLogSize
   gEfiUnixPkgTokenSpaceGuid.PcdUnixFlashNvStorageVariableBase
-
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
 
-
 [Ppis]
   gUnixFwhPpiGuid                               # PPI ALWAYS_CONSUMED
-
 
 [Depex]
   gUnixFwhPpiGuid AND gEfiPeiMemoryDiscoveredPpiGuid
