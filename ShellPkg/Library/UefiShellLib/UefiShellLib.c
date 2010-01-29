@@ -107,7 +107,7 @@ ShellFindSE2 (
                                   Buffer
                                   );
     }
-    if (!EFI_ERROR (Status)) {
+    if (!EFI_ERROR (Status) && Buffer != NULL) {
       //
       // now parse the list of returned handles
       //
@@ -1490,6 +1490,7 @@ ShellFindFilePath (
   CHAR16            *TestPath;
   CONST CHAR16      *Walker;
   UINTN             Size;
+  CHAR16            *TempChar;
 
   RetVal = NULL;
 
@@ -1517,8 +1518,9 @@ ShellFindFilePath (
     Walker = (CHAR16*)Path;
     do {
       CopyMem(TestPath, Walker, StrSize(Walker));
-      if (StrStr(TestPath, L";") != NULL) {
-        *(StrStr(TestPath, L";")) = CHAR_NULL;
+      TempChar = StrStr(TestPath, L";");
+      if (TempChar != NULL) {
+        *TempChar = CHAR_NULL;
       }
       StrCat(TestPath, FileName);
       if (StrStr(Walker, L";") != NULL) {
@@ -1565,6 +1567,8 @@ ShellFindFilePathEx (
   CHAR16            *RetVal;
   CONST CHAR16      *ExtensionWalker;
   UINTN             Size;
+  CHAR16            *TempChar;
+
   ASSERT(FileName != NULL);
   if (FileExtension == NULL) {
     return (ShellFindFilePath(FileName));
@@ -1578,9 +1582,12 @@ ShellFindFilePathEx (
   TestPath = AllocateZeroPool(Size);
   for (ExtensionWalker = FileExtension ;  ; ExtensionWalker = StrStr(ExtensionWalker, L";") + 1 ){
     StrCpy(TestPath, FileName);
-    StrCat(TestPath, ExtensionWalker);
-    if (StrStr(TestPath, L";") != NULL) {
-      *(StrStr(TestPath, L";")) = CHAR_NULL;
+    if (ExtensionWalker != NULL) {
+      StrCat(TestPath, ExtensionWalker);
+    }
+    TempChar = StrStr(TestPath, L";");
+    if (TempChar != NULL) {
+      *TempChar = CHAR_NULL;
     }
     RetVal = ShellFindFilePath(TestPath);
     if (RetVal != NULL) {
@@ -2696,10 +2703,15 @@ ShellStrToUintn(
 {
   CONST CHAR16  *Walker;
   for (Walker = String; Walker != NULL && *Walker != CHAR_NULL && *Walker == L' '; Walker++);
-  if (StrnCmp(Walker, L"0x", 2) == 0 || StrnCmp(Walker, L"0X", 2) == 0){
-    return (StrHexToUintn(Walker));
+  if (Walker == NULL || *Walker == CHAR_NULL) {
+    ASSERT(FALSE);
+    return ((UINTN)(-1));
+  } else {
+    if (StrnCmp(Walker, L"0x", 2) == 0 || StrnCmp(Walker, L"0X", 2) == 0){
+      return (StrHexToUintn(Walker));
+    }
+    return (StrDecimalToUintn(Walker));
   }
-  return (StrDecimalToUintn(Walker));
 }
 
 /**
