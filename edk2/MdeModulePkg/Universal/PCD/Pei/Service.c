@@ -87,13 +87,13 @@ PeiRegisterCallBackWorker (
   ASSERT (GuidHob != NULL);
   
   CallbackTable = GET_GUID_HOB_DATA (GuidHob);
-  CallbackTable = CallbackTable + (TokenNumber * FixedPcdGet32(PcdMaxPeiPcdCallBackNumberPerPcdEntry));
+  CallbackTable = CallbackTable + (TokenNumber * PcdGet32 (PcdMaxPeiPcdCallBackNumberPerPcdEntry));
 
   Compare = Register? NULL: CallBackFunction;
   Assign  = Register? CallBackFunction: NULL;
 
 
-  for (Idx = 0; Idx < FixedPcdGet32(PcdMaxPeiPcdCallBackNumberPerPcdEntry); Idx++) {
+  for (Idx = 0; Idx < PcdGet32 (PcdMaxPeiPcdCallBackNumberPerPcdEntry); Idx++) {
     if (CallbackTable[Idx] == Compare) {
       CallbackTable[Idx] = Assign;
       return EFI_SUCCESS;
@@ -126,7 +126,7 @@ BuildPcdDatabase (
   
   CopyMem (&Database->Init, &gPEIPcdDbInit, sizeof (gPEIPcdDbInit));
 
-  SizeOfCallbackFnTable = PEI_LOCAL_TOKEN_NUMBER * sizeof (PCD_PPI_CALLBACK) * FixedPcdGet32(PcdMaxPeiPcdCallBackNumberPerPcdEntry);
+  SizeOfCallbackFnTable = PEI_LOCAL_TOKEN_NUMBER * sizeof (PCD_PPI_CALLBACK) * PcdGet32 (PcdMaxPeiPcdCallBackNumberPerPcdEntry);
 
   CallbackFnTable = BuildGuidHob (&gEfiCallerIdGuid, SizeOfCallbackFnTable);
   
@@ -300,9 +300,9 @@ InvokeCallbackOnSet (
   
   CallbackTable = GET_GUID_HOB_DATA (GuidHob);
 
-  CallbackTable += (TokenNumber * FixedPcdGet32(PcdMaxPeiPcdCallBackNumberPerPcdEntry));
+  CallbackTable += (TokenNumber * PcdGet32 (PcdMaxPeiPcdCallBackNumberPerPcdEntry));
 
-  for (Idx = 0; Idx < FixedPcdGet32(PcdMaxPeiPcdCallBackNumberPerPcdEntry); Idx++) {
+  for (Idx = 0; Idx < PcdGet32 (PcdMaxPeiPcdCallBackNumberPerPcdEntry); Idx++) {
     if (CallbackTable[Idx] != NULL) {
       CallbackTable[Idx] (Guid,
                           (Guid == NULL)? TokenNumber: ExTokenNumber,
@@ -621,7 +621,7 @@ GetWorker (
     {
       VPD_HEAD *VpdHead;
       VpdHead = (VPD_HEAD *) ((UINT8 *)PeiPcdDb + Offset);
-      return (VOID *) (UINTN) (FixedPcdGet32(PcdVpdBaseAddress) + VpdHead->Offset);
+      return (VOID *) (UINTN) (PcdGet32 (PcdVpdBaseAddress) + VpdHead->Offset);
     }
       
     case PCD_TYPE_HII:

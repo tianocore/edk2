@@ -3,7 +3,7 @@
   Emulation Variable services operate on the runtime volatile memory.
   The nonvolatile variable space doesn't exist.
 
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2006 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -767,9 +767,9 @@ UpdateVariable (
   if ((Attributes & EFI_VARIABLE_NON_VOLATILE) != 0) {
     NonVolatileVarableStoreSize = ((VARIABLE_STORE_HEADER *)(UINTN)(Global->NonVolatileVariableBase))->Size;
     if ((((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != 0) 
-      && ((VarSize + mVariableModuleGlobal->HwErrVariableTotalSize) > FixedPcdGet32(PcdHwErrStorageSize)))
+      && ((VarSize + mVariableModuleGlobal->HwErrVariableTotalSize) > PcdGet32 (PcdHwErrStorageSize)))
       || (((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == 0) 
-      && ((VarSize + mVariableModuleGlobal->CommonVariableTotalSize) > NonVolatileVarableStoreSize - sizeof (VARIABLE_STORE_HEADER) - FixedPcdGet32(PcdHwErrStorageSize)))) {
+      && ((VarSize + mVariableModuleGlobal->CommonVariableTotalSize) > NonVolatileVarableStoreSize - sizeof (VARIABLE_STORE_HEADER) - PcdGet32 (PcdHwErrStorageSize)))) {
       Status = EFI_OUT_OF_RESOURCES;
       goto Done;
     }
@@ -1166,12 +1166,12 @@ EmuSetVariable (
   }
   //
   //  The size of the VariableName, including the Unicode Null in bytes plus
-  //  the DataSize is limited to maximum size of FixedPcdGet32(PcdMaxHardwareErrorVariableSize)
-  //  bytes for HwErrRec, and FixedPcdGet32(PcdMaxVariableSize) bytes for the others.
+  //  the DataSize is limited to maximum size of PcdGet32 (PcdMaxHardwareErrorVariableSize)
+  //  bytes for HwErrRec, and PcdGet32 (PcdMaxVariableSize) bytes for the others.
   //
   if ((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
-    if ((DataSize > FixedPcdGet32(PcdMaxHardwareErrorVariableSize)) ||                                                       
-        (sizeof (VARIABLE_HEADER) + StrSize (VariableName) + DataSize > FixedPcdGet32(PcdMaxHardwareErrorVariableSize))) {
+    if ((DataSize > PcdGet32 (PcdMaxHardwareErrorVariableSize)) ||                                                       
+        (sizeof (VARIABLE_HEADER) + StrSize (VariableName) + DataSize > PcdGet32 (PcdMaxHardwareErrorVariableSize))) {
       return EFI_INVALID_PARAMETER;
     }
     //
@@ -1183,10 +1183,10 @@ EmuSetVariable (
   } else {
   //
   //  The size of the VariableName, including the Unicode Null in bytes plus
-  //  the DataSize is limited to maximum size of FixedPcdGet32(PcdMaxVariableSize) bytes.
+  //  the DataSize is limited to maximum size of PcdGet32 (PcdMaxVariableSize) bytes.
   //
-    if ((DataSize > FixedPcdGet32(PcdMaxVariableSize)) ||
-        (sizeof (VARIABLE_HEADER) + StrSize (VariableName) + DataSize > FixedPcdGet32(PcdMaxVariableSize))) {
+    if ((DataSize > PcdGet32 (PcdMaxVariableSize)) ||
+        (sizeof (VARIABLE_HEADER) + StrSize (VariableName) + DataSize > PcdGet32 (PcdMaxVariableSize))) {
       return EFI_INVALID_PARAMETER;
     }  
   }
@@ -1301,18 +1301,18 @@ EmuQueryVariableInfo (
   // Harware error record variable needs larger size.
   //
   if ((Attributes & (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) == (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
-    *MaximumVariableStorageSize = FixedPcdGet32(PcdHwErrStorageSize);
-    *MaximumVariableSize = FixedPcdGet32(PcdMaxHardwareErrorVariableSize) - sizeof (VARIABLE_HEADER);
+    *MaximumVariableStorageSize = PcdGet32 (PcdHwErrStorageSize);
+    *MaximumVariableSize = PcdGet32 (PcdMaxHardwareErrorVariableSize) - sizeof (VARIABLE_HEADER);
   } else {
     if ((Attributes & EFI_VARIABLE_NON_VOLATILE) != 0) {
-      ASSERT (FixedPcdGet32(PcdHwErrStorageSize) < VariableStoreHeader->Size);
-      *MaximumVariableStorageSize = VariableStoreHeader->Size - sizeof (VARIABLE_STORE_HEADER) - FixedPcdGet32(PcdHwErrStorageSize);
+      ASSERT (PcdGet32 (PcdHwErrStorageSize) < VariableStoreHeader->Size);
+      *MaximumVariableStorageSize = VariableStoreHeader->Size - sizeof (VARIABLE_STORE_HEADER) - PcdGet32 (PcdHwErrStorageSize);
     }
 
     //
-    // Let *MaximumVariableSize be FixedPcdGet32(PcdMaxVariableSize) with the exception of the variable header size.
+    // Let *MaximumVariableSize be PcdGet32 (PcdMaxVariableSize) with the exception of the variable header size.
     //
-    *MaximumVariableSize = FixedPcdGet32(PcdMaxVariableSize) - sizeof (VARIABLE_HEADER);
+    *MaximumVariableSize = PcdGet32 (PcdMaxVariableSize) - sizeof (VARIABLE_HEADER);
   }
 
   //
@@ -1392,15 +1392,13 @@ InitializeVariableStore (
   // ensure that the value of PcdHwErrStorageSize is less than or equal to the value of 
   // PcdVariableStoreSize.
   //
-  ASSERT (FixedPcdGet32(PcdHwErrStorageSize) <= FixedPcdGet32(PcdVariableStoreSize));
+  ASSERT (PcdGet32 (PcdHwErrStorageSize) <= PcdGet32 (PcdVariableStoreSize));
 
   //
   // Allocate memory for variable store.
   //
   if (VolatileStore || (PcdGet64 (PcdEmuVariableNvStoreReserved) == 0)) {
-    VariableStore = (VARIABLE_STORE_HEADER *) AllocateRuntimePool (
-                                                FixedPcdGet32(PcdVariableStoreSize)
-                                                );
+    VariableStore = (VARIABLE_STORE_HEADER *) AllocateRuntimePool (PcdGet32 (PcdVariableStoreSize));
   } else {
     //
     // A memory location has been reserved for the NV variable store.  Certain
@@ -1411,7 +1409,7 @@ InitializeVariableStore (
       (VARIABLE_STORE_HEADER *)(VOID*)(UINTN)
         PcdGet64 (PcdEmuVariableNvStoreReserved);
     if (
-         (VariableStore->Size == FixedPcdGet32(PcdVariableStoreSize)) &&
+         (VariableStore->Size == PcdGet32 (PcdVariableStoreSize)) &&
          (VariableStore->Format == VARIABLE_STORE_FORMATTED) &&
          (VariableStore->State == VARIABLE_STORE_HEALTHY)
        ) {
@@ -1429,7 +1427,7 @@ InitializeVariableStore (
   }
 
   if (FullyInitializeStore) {
-    SetMem (VariableStore, FixedPcdGet32(PcdVariableStoreSize), 0xff);
+    SetMem (VariableStore, PcdGet32 (PcdVariableStoreSize), 0xff);
   }
 
   //
@@ -1439,7 +1437,7 @@ InitializeVariableStore (
   InitializeLocationForLastVariableOffset (VariableStore, LastVariableOffset);
 
   CopyGuid (&VariableStore->Signature, &gEfiVariableGuid);
-  VariableStore->Size       = FixedPcdGet32(PcdVariableStoreSize);
+  VariableStore->Size       = PcdGet32 (PcdVariableStoreSize);
   VariableStore->Format     = VARIABLE_STORE_FORMATTED;
   VariableStore->State      = VARIABLE_STORE_HEALTHY;
   VariableStore->Reserved   = 0;

@@ -75,7 +75,7 @@ DiscoverPeimsAndOrderWithApriori (
   //
   // Go ahead to scan this Fv, and cache FileHandles within it.
   //
-  for (PeimCount = 0; PeimCount < FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv); PeimCount++) {
+  for (PeimCount = 0; PeimCount < PcdGet32 (PcdPeiCoreMaxPeimPerFv); PeimCount++) {
     Status = FvPpi->FindFileByType (FvPpi, PEI_CORE_INTERNAL_FFS_FILE_DISPATCH_TYPE, CoreFileHandle->FvHandle, &FileHandle);
     if (Status != EFI_SUCCESS) {
       break;
@@ -88,7 +88,7 @@ DiscoverPeimsAndOrderWithApriori (
   // Check whether the count of Peims exceeds the max support PEIMs in a FV image
   // If more Peims are required in a FV image, PcdPeiCoreMaxPeimPerFv can be set to a larger value in DSC file.
   //
-  ASSERT (PeimCount < FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv));
+  ASSERT (PeimCount < PcdGet32 (PcdPeiCoreMaxPeimPerFv));
 
   //
   // Get Apriori File handle
@@ -293,7 +293,7 @@ PeiDispatcher (
     SaveCurrentFileHandle =  Private->CurrentFileHandle;
 
     for (Index1 = 0; Index1 <= SaveCurrentFvCount; Index1++) {
-      for (Index2 = 0; (Index2 < FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv)) && (Private->Fv[Index1].FvFileHandles[Index2] != NULL); Index2++) {
+      for (Index2 = 0; (Index2 < PcdGet32 (PcdPeiCoreMaxPeimPerFv)) && (Private->Fv[Index1].FvFileHandles[Index2] != NULL); Index2++) {
         if (Private->Fv[Index1].PeimState[Index2] == PEIM_STATE_REGISITER_FOR_SHADOW) {
           PeimFileHandle = Private->Fv[Index1].FvFileHandles[Index2];
           Status = PeiLoadImage (
@@ -379,7 +379,7 @@ PeiDispatcher (
       // Start to dispatch all modules within the current Fv.
       //
       for (PeimCount = Private->CurrentPeimCount;
-           (PeimCount < FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv)) && (Private->CurrentFvFileHandles[PeimCount] != NULL);
+           (PeimCount < PcdGet32 (PcdPeiCoreMaxPeimPerFv)) && (Private->CurrentFvFileHandles[PeimCount] != NULL);
            PeimCount++) {
         Private->CurrentPeimCount  = PeimCount;
         PeimFileHandle = Private->CurrentFileHandle = Private->CurrentFvFileHandles[PeimCount];

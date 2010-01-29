@@ -1,7 +1,7 @@
 /** @file
   Sample ACPI Platform Driver
 
-  Copyright (c) 2008 - 2009, Intel Corporation<BR>
+  Copyright (c) 2008 - 2010, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -93,7 +93,7 @@ LocateFvInstanceWithTables (
     //
     Status = FvInstance->ReadFile (
                            FvInstance,
-                           (EFI_GUID*)FixedPcdGetPtr (PcdAcpiTableStorageFile),
+                           (EFI_GUID*)PcdGetPtr (PcdAcpiTableStorageFile),
                            NULL,
                            &Size,
                            &FileType,
@@ -207,7 +207,7 @@ AcpiPlatformEntryPoint (
 
     Status = FwVol->ReadSection (
                       FwVol,
-                      (EFI_GUID*)FixedPcdGetPtr (PcdAcpiTableStorageFile),
+                      (EFI_GUID*)PcdGetPtr (PcdAcpiTableStorageFile),
                       EFI_SECTION_RAW,
                       Instance,
                       (VOID**) &CurrentTable,
