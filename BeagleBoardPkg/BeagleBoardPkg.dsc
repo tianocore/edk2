@@ -344,7 +344,7 @@
   
   EmbeddedPkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
   EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
-  EmbeddedPkg/TemplateMetronomeDxe/TemplateMetronomeDxe.inf
+  EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
 
   #
   # Semi-hosting filesystem
