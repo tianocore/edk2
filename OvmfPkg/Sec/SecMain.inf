@@ -1,7 +1,7 @@
 #/** @file
 #  SEC Driver
 #
-#  Copyright (c) 2008 - 2009, Intel Corporation
+#  Copyright (c) 2008 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -19,8 +19,6 @@
   FILE_GUID                      = df1ccef6-f301-4a63-9661-fc6030dcc880
   MODULE_TYPE                    = SEC
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
   ENTRY_POINT                    = SecMain
 
 #
@@ -59,7 +57,7 @@
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid                # PPI ALWAYS_PRODUCED
 
-[FixedPcd.common]
+[Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfMemFvSize
 
