@@ -15,12 +15,11 @@
 
 **/
 
-#include <PiDxe.h>
-#include <Library/BaseLib.h>
-#include <Library/EblAddExternalCommandLib.h>
-#include <Library/UefiBootServicesTableLib.h>
+#include <Uefi.h>
 #include <Library/UefiLib.h>
-
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/EblAddExternalCommandLib.h>
+#include <Protocol/EblAddCommand.h>
 
 STATIC BOOLEAN   gInstalledCommand = FALSE;
 STATIC EFI_EVENT mEblCommandRegistration = NULL;

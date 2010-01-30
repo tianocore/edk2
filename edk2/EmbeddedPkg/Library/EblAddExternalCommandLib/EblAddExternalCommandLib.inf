@@ -39,8 +39,10 @@
 [LibraryClasses]
   UefiBootServicesTableLib
   UefiLib
+  EblAddExternalCommandLib
   
 [Protocols]
+  gEfiEblAddCommandProtocolGuid
   
 [Guids]
  

@@ -65,6 +65,7 @@
 
 [Protocols]
   gEfiStatusCodeRuntimeProtocolGuid
+  gPeCoffLoaderProtocolGuid
   
 
 [FixedPcd.common]
