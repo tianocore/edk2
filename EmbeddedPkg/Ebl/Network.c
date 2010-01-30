@@ -21,13 +21,13 @@ ParseIp (
   OUT EFI_IP_ADDRESS  *Address
   )
 {
-  Address->v4.Addr[0] = AsciiStrDecimalToUintn(String);
+  Address->v4.Addr[0] = (UINT8)AsciiStrDecimalToUintn (String);
   String = AsciiStrStr(String, ".") + 1;
-  Address->v4.Addr[1] = AsciiStrDecimalToUintn(String);
+  Address->v4.Addr[1] = (UINT8)AsciiStrDecimalToUintn (String);
   String = AsciiStrStr(String, ".") + 1;
-  Address->v4.Addr[2] = AsciiStrDecimalToUintn(String);
+  Address->v4.Addr[2] = (UINT8)AsciiStrDecimalToUintn (String);
   String = AsciiStrStr(String, ".") + 1;
-  Address->v4.Addr[3] = AsciiStrDecimalToUintn(String);
+  Address->v4.Addr[3] = (UINT8)AsciiStrDecimalToUintn (String);
   
   return EFI_SUCCESS;
 }
