@@ -157,10 +157,6 @@
 
 
 [LibraryClasses.ARM]
-  #
-  # Note: This NULL library feature is not yet in the edk2/BaseTools, but it is checked in to 
-  # the BaseTools project. So you need to build with the BaseTools project util this feature gets synced.
-  #
   NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
 
 
@@ -170,7 +166,7 @@
   XCODE:*_*_ARM_ARCHDLINK_FLAGS  == -arch armv6
   XCODE:RELEASE_*_*_CC_FLAGS     = -DMDEPKG_NDEBUG 
 
-  RVCT:*_*_ARM_ARCHCC_FLAGS == --cpu Cortex-A8 
+  RVCT:*_*_ARM_ARCHCC_FLAGS == --cpu Cortex-A8 --thumb
   RVCT:RELEASE_*_*_CC_FLAGS = -DMDEPKG_NDEBUG 
 
 ################################################################################
