@@ -124,8 +124,8 @@ DEFINE ICC_WIN_ASLCC_FLAGS     = /Y- /TC /WX- /Od /Dmain=ReferenceAcpiTable
 DEFINE ICC_WIN_ASLDLINK_FLAGS  = /NODEFAULTLIB /ENTRY:ReferenceAcpiTable /SUBSYSTEM:CONSOLE /NODEFAULTLIB:libmmt /NODEFAULTLIB:libirc
 
 DEFINE IPHONE_TOOLS            = /Developer/Platforms/iPhoneOS.platform/Developer
-DEFINE RVCT31_TOOLS_PATH       = c:/Program Files/ARM/RVCT/Programs/3.1/761/win_32-pentium
-DEFINE RVCT31CYGWIN_TOOLS_PATH = /cygdrive/c/Program Files/ARM/RVCT/Programs/3.1/761/win_32-pentium
+DEFINE RVCT31_TOOLS_PATH       = c:/Program Files/ARM/RVCT/Programs/3.1/569/win_32-pentium
+DEFINE RVCT31CYGWIN_TOOLS_PATH = /cygdrive/c/Program Files/ARM/RVCT/Programs/3.1/569/win_32-pentium
 
 # Update to the location of the gcc executables
 DEFINE ARMGCC_BIN              = /
@@ -2291,8 +2291,8 @@ RELEASE_XCODE32_ARM_CC_FLAGS   = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -mthumb-inter
 #
 # Use default values, or override in DSC file
 #
-*_RVCT31_ARM_ARCHCC_FLAGS    = --thumb --cpu ARM1176JZF-S
-*_RVCT31_ARM_ARCHASM_FLAGS   = --cpu ARM1176JZF-S
+*_RVCT31_ARM_ARCHCC_FLAGS    = --cpu Cortex-A8 --thumb
+*_RVCT31_ARM_ARCHASM_FLAGS   = --cpu Cortex-A8
 *_RVCT31_ARM_ARCHDLINK_FLAGS = 
 *_RVCT31_ARM_PLATFORM_FLAGS  =
 
@@ -2305,8 +2305,8 @@ RELEASE_RVCT31_ARM_DLINK_FLAGS     = $(ARCHDLINK_FLAGS) --entry $(IMAGE_ENTRY_PO
 *_RVCT31_ARM_VFRPP_FLAGS     = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -E  -DVFRCOMPILE --preinclude $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h
 *_RVCT31_ARM_MAKE_PATH       = nmake
 *_RVCT31_ARM_SLINK_FLAGS     = --partial -o
-  DEBUG_RVCT31_ARM_CC_FLAGS  = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) --c90 -g -Ospace --thumb --no_autoinline --asm --gnu --apcs /interwork --signed_chars --no_unaligned_access --split_sections --enum_is_int --preinclude AutoGen.h --diag_warning 167
-RELEASE_RVCT31_ARM_CC_FLAGS  = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) --c90 -Ospace --thumb -c --no_autoinline --asm --gnu --apcs /interwork --signed_chars --no_unaligned_access --split_sections --enum_is_int --preinclude AutoGen.h --diag_warning 167
+  DEBUG_RVCT31_ARM_CC_FLAGS  = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) --c90 -g -Ospace -c --no_autoinline --asm --gnu --apcs /interwork --signed_chars --no_unaligned_access --split_sections --enum_is_int --preinclude AutoGen.h --diag_warning 167
+RELEASE_RVCT31_ARM_CC_FLAGS  = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) --c90    -Ospace -c --no_autoinline --asm --gnu --apcs /interwork --signed_chars --no_unaligned_access --split_sections --enum_is_int --preinclude AutoGen.h --diag_warning 167
 
 ##################
 # ARM definitions
@@ -2341,8 +2341,8 @@ RELEASE_RVCT31_ARM_CC_FLAGS  = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) --c90 -Ospace -
 #
 # Use default values, or override in DSC file
 #
-*_RVCT31CYGWIN_ARM_ARCHCC_FLAGS    = --thumb --cpu ARM1176JZF-S
-*_RVCT31CYGWIN_ARM_ARCHASM_FLAGS   = --cpu ARM1176JZF-S
+*_RVCT31CYGWIN_ARM_ARCHCC_FLAGS    = --cpu Cortex-A8 --thumb
+*_RVCT31CYGWIN_ARM_ARCHASM_FLAGS   = --cpu Cortex-A8 
 *_RVCT31CYGWIN_ARM_ARCHDLINK_FLAGS = 
 *_RVCT31CYGWIN_ARM_PLATFORM_FLAGS  =
 
@@ -2354,8 +2354,8 @@ RELEASE_RVCT31CYGWIN_ARM_DLINK_FLAGS     = "$(DLINKPATH_FLAG)" $(ARCHDLINK_FLAGS
 *_RVCT31CYGWIN_ARM_VFRPP_FLAGS     = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -E  -DVFRCOMPILE --preinclude `cygpath -m $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h`
 *_RVCT31CYGWIN_ARM_MAKE_PATH       = make
 *_RVCT31CYGWIN_ARM_SLINK_FLAGS     = "$(SLINKPATH_FLAG)" --partial -o
-  DEBUG_RVCT31CYGWIN_ARM_CC_FLAGS  = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) --c90 -c -g -Ospace --thumb --no_autoinline --asm --gnu --apcs /interwork --signed_chars --no_unaligned_access --split_sections --preinclude AutoGen.h --diag_warning 167
-RELEASE_RVCT31CYGWIN_ARM_CC_FLAGS  = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) --c90 -c -Ospace --thumb --no_autoinline --asm --gnu --apcs /interwork --signed_chars --no_unaligned_access --split_sections --preinclude AutoGen.h --diag_warning 167
+  DEBUG_RVCT31CYGWIN_ARM_CC_FLAGS  = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) --c90 -c -g -Ospace --no_autoinline --asm --gnu --apcs /interwork --signed_chars --no_unaligned_access --split_sections --preinclude AutoGen.h --diag_warning 167
+RELEASE_RVCT31CYGWIN_ARM_CC_FLAGS  = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) --c90 -c    -Ospace --no_autoinline --asm --gnu --apcs /interwork --signed_chars --no_unaligned_access --split_sections --preinclude AutoGen.h --diag_warning 167
 
 ##################
 # ARM definitions
