@@ -2,7 +2,7 @@
 #  Firmware Block Services to support emulating non-volatile variables
 #  by pretending that a memory buffer is storage for the NV variables.
 #
-#  Copyright (c) 2008 - 2009, Intel Corporation
+#  Copyright (c) 2008 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -19,9 +19,6 @@
   FILE_GUID                      = 22dc2b60-fe40-42ac-b01f-3ab1fad9aad8
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
-
   ENTRY_POINT                    = FvbInitialize
 
 #
@@ -30,15 +27,13 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-[Sources.common]
+[Sources]
   Fvb.c
-
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   OvmfPkg/OvmfPkg.dec
-
 
 [LibraryClasses]
   BaseLib
@@ -54,29 +49,24 @@
   UefiLib
   UefiRuntimeLib
 
-
 [Guids]
   gEfiEventVirtualAddressChangeGuid             # ALWAYS_CONSUMED  Create Event: EVENT_GROUP_GUID
-
 
 [Protocols]
   gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL ALWAYS_PRODUCED
   gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_PRODUCED
 
-
 [FixedPcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
 
-
 [Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved
-
 
 [Depex]
   TRUE

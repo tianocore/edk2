@@ -2,7 +2,7 @@
   Firmware Block Services to support emulating non-volatile variables
   by pretending that a memory buffer is storage for the NV variables.
 
-  Copyright (c) 2006 - 2009, Intel Corporation
+  Copyright (c) 2006 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -769,8 +769,8 @@ FvbInitialize (
   // Verify that the PCD's are set correctly.
   //
   if (
-       (FixedPcdGet32 (PcdVariableStoreSize) +
-        FixedPcdGet32 (PcdFlashNvStorageFtwWorkingSize)
+       (PcdGet32 (PcdVariableStoreSize) +
+        PcdGet32 (PcdFlashNvStorageFtwWorkingSize)
        ) >
        EMU_FVB_BLOCK_SIZE
      ) {
@@ -820,7 +820,7 @@ FvbInitialize (
   //
   // Initialize the Fault Tolerant Write data area
   //
-  SubPtr = (VOID*) ((UINT8*) Ptr + FixedPcdGet32 (PcdVariableStoreSize));
+  SubPtr = (VOID*) ((UINT8*) Ptr + PcdGet32 (PcdVariableStoreSize));
   if (Initialize) {
     InitializeFtwState (SubPtr);
   }
