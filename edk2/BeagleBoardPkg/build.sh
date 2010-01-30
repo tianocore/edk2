@@ -99,7 +99,7 @@ fi
 # Build the edk2 BeagleBoard code
 #
 if [[ $TARGET == RELEASE ]]; then
-  build -p $WORKSPACE/BeagleBoardPkg/BeagleBoardPkg.dsc -a ARM -t $TARGET_TOOLS -b $1 $2 $3 $4 $5 $6 $7 $8
+  build -p $WORKSPACE/BeagleBoardPkg/BeagleBoardPkg.dsc -a ARM -t $TARGET_TOOLS -b -D DEBUG_TARGET=RELEASE $1 $2 $3 $4 $5 $6 $7 $8
 else
   build -p $WORKSPACE/BeagleBoardPkg/BeagleBoardPkg.dsc -a ARM -t $TARGET_TOOLS -b $TARGET $1 $2 $3 $4 $5 $6 $7 $8
 fi
