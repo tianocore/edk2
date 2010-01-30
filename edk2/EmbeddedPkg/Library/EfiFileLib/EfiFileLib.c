@@ -1074,7 +1074,7 @@ EfiTell (
       return 0;
     }
 
-    File->Size        = BufferSize;
+    File->Size        = (UINTN)BufferSize;
     File->MaxPosition = File->Size;
   }
 
@@ -1451,7 +1451,7 @@ EfiWrite (
 
       TempBuffer = File->Buffer;
 
-      File->Buffer = AllocatePool (File->CurrentPosition + *BufferSize);
+      File->Buffer = AllocatePool ((UINTN)(File->CurrentPosition + *BufferSize));
       if (File->Buffer == NULL) {
         return EFI_OUT_OF_RESOURCES;
       }
@@ -1460,8 +1460,8 @@ EfiWrite (
 
       FreePool (TempBuffer);
 
-      File->Size = File->CurrentPosition + *BufferSize;
-      File->MaxPosition = File->Size;
+      File->Size = (UINTN)(File->CurrentPosition + *BufferSize);
+      File->MaxPosition = (UINT64)File->Size;
     }
 
     // Copy in the requested data
