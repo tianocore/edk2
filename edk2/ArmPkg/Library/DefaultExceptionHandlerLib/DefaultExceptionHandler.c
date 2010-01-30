@@ -291,7 +291,7 @@ DefaultExceptionHandler (
   if (DfsrStatus != 0x00) {
     DEBUG ((EFI_D_ERROR, " %a: %a 0x%08x\n", FaultStatusToString (DfsrStatus), DfsrWrite ? "write to" : "read from", SystemContext.SystemContextArm->DFAR));
   }
-  if (SystemContext.SystemContextArm->IFSR & 0xf != 0x00) {
+  if ((SystemContext.SystemContextArm->IFSR & 0xf) != 0x00) {
     DEBUG ((EFI_D_ERROR, "Instruction %a at 0x%08x, \n", FaultStatusToString (SystemContext.SystemContextArm->IFSR & 0xf), SystemContext.SystemContextArm->IFAR));
   }
 
