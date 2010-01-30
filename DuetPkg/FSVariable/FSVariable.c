@@ -1301,12 +1301,12 @@ Returns:
   
   //
   //  The size of the VariableName, including the Unicode Null in bytes plus
-  //  the DataSize is limited to maximum size of FixedPcdGet32(PcdMaxHardwareErrorVariableSize)
-  //  bytes for HwErrRec, and FixedPcdGet32(PcdMaxVariableSize) bytes for the others.
+  //  the DataSize is limited to maximum size of PcdGet32 (PcdMaxHardwareErrorVariableSize)
+  //  bytes for HwErrRec, and PcdGet32 (PcdMaxVariableSize) bytes for the others.
   //
   if ((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == EFI_VARIABLE_HARDWARE_ERROR_RECORD) {
-    if ((DataSize > FixedPcdGet32(PcdMaxHardwareErrorVariableSize)) ||                                                       
-        (sizeof (VARIABLE_HEADER) + StrSize (VariableName) + DataSize > FixedPcdGet32(PcdMaxHardwareErrorVariableSize))) {
+    if ((DataSize > PcdGet32(PcdMaxHardwareErrorVariableSize)) ||                                                       
+        (sizeof (VARIABLE_HEADER) + StrSize (VariableName) + DataSize > PcdGet32(PcdMaxHardwareErrorVariableSize))) {
       return EFI_INVALID_PARAMETER;
     }
     //
@@ -1316,8 +1316,8 @@ Returns:
       return EFI_INVALID_PARAMETER;
     }
   } else {
-    if ((DataSize > FixedPcdGet32(PcdMaxVariableSize)) ||
-        (sizeof (VARIABLE_HEADER) + StrSize (VariableName) + DataSize > FixedPcdGet32(PcdMaxVariableSize))) {
+    if ((DataSize > PcdGet32(PcdMaxVariableSize)) ||
+        (sizeof (VARIABLE_HEADER) + StrSize (VariableName) + DataSize > PcdGet32(PcdMaxVariableSize))) {
       return EFI_INVALID_PARAMETER;
     }  
   }  
@@ -1421,18 +1421,18 @@ Returns:
   // Harware error record variable needs larger size.
   //
   if ((Attributes & (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) == (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) {
-    *MaximumVariableStorageSize = FixedPcdGet32(PcdHwErrStorageSize);
-    *MaximumVariableSize = FixedPcdGet32(PcdMaxHardwareErrorVariableSize) - sizeof (VARIABLE_HEADER);
+    *MaximumVariableStorageSize = PcdGet32(PcdHwErrStorageSize);
+    *MaximumVariableSize = PcdGet32(PcdMaxHardwareErrorVariableSize) - sizeof (VARIABLE_HEADER);
   } else {
     if ((Attributes & EFI_VARIABLE_NON_VOLATILE) != 0) {
-      ASSERT (FixedPcdGet32(PcdHwErrStorageSize) < VariableStoreHeader->Size);
-      *MaximumVariableStorageSize = VariableStoreHeader->Size - sizeof (VARIABLE_STORE_HEADER) - FixedPcdGet32(PcdHwErrStorageSize);
+      ASSERT (PcdGet32(PcdHwErrStorageSize) < VariableStoreHeader->Size);
+      *MaximumVariableStorageSize = VariableStoreHeader->Size - sizeof (VARIABLE_STORE_HEADER) - PcdGet32(PcdHwErrStorageSize);
     }
 
     //
-    // Let *MaximumVariableSize be FixedPcdGet32(PcdMaxVariableSize) with the exception of the variable header size.
+    // Let *MaximumVariableSize be PcdGet32(PcdMaxVariableSize) with the exception of the variable header size.
     //
-    *MaximumVariableSize = FixedPcdGet32(PcdMaxVariableSize) - sizeof (VARIABLE_HEADER);
+    *MaximumVariableSize = PcdGet32(PcdMaxVariableSize) - sizeof (VARIABLE_HEADER);
   }
   
   //
