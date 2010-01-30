@@ -256,10 +256,7 @@
   EmbeddedPkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
   EmbeddedPkg/SerialDxe/SerialDxe.inf
   EmbeddedPkg/SimpleTextInOutSerial/SimpleTextInOutSerial.inf
-  EmbeddedPkg/TemplateBds/TemplateBds.inf
-  EmbeddedPkg/TemplateMetronomeDxe/TemplateMetronomeDxe.inf
-  EmbeddedPkg/TemplateSec/TemplateSec.inf
-  EmbeddedPkg/TemplateTimerDxe/TemplateTimerDxe.inf
+  EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
 
   
   
