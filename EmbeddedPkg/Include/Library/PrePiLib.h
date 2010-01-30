@@ -16,6 +16,8 @@
 #ifndef __PRE_PI_LIB_H__
 #define __PRE_PI_LIB_H__
 
+#include <Guid/ExtractSection.h>
+
 /**
   This service enables discovery of additional firmware volumes.
 
@@ -662,6 +664,20 @@ BuildMemoryAllocationHob (
   IN EFI_PHYSICAL_ADDRESS        BaseAddress,
   IN UINT64                      Length,
   IN EFI_MEMORY_TYPE             MemoryType
+  );
+
+
+VOID
+EFIAPI
+BuildExtractSectionHob (
+  IN  EFI_GUID                                  *Guid,
+  IN  EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER   SectionGetInfo,
+  IN  EXTRACT_GUIDED_SECTION_DECODE_HANDLER     SectionExtraction
+  );
+
+VOID
+EFIAPI
+BuildPeCoffLoaderHob (
   );
 
 
