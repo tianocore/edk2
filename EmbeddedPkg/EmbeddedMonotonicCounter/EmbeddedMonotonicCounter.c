@@ -49,7 +49,7 @@ GetNextHighMonotonicCount (
   
   gCurrentMonotonicCount += 0x0000000100000000ULL;
   
-  *HighCount = RShiftU64 (gCurrentMonotonicCount, 32) & 0xFFFFFFFF;
+  *HighCount = (UINT32)RShiftU64 (gCurrentMonotonicCount, 32) & 0xFFFFFFFF;
 
   return EFI_SUCCESS;
 }
