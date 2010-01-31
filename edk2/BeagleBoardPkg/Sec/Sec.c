@@ -24,8 +24,10 @@
 #include <Library/PeCoffGetEntryPointLib.h>
 
 #include <Ppi/GuidedSectionExtraction.h>
-
+#include <Guid/LzmaDecompress.h>
 #include <Omap3530/Omap3530.h>
+
+#include "LzmaDecompress.h"
 
 VOID
 EFIAPI 
@@ -259,6 +261,16 @@ CEntryPoint (
   // SEC phase needs to run library constructors by hand.
   ExtractGuidedSectionLibConstructor();
   LzmaDecompressLibConstructor();
+
+  // Build HOBs to pass up our version of stuff the DXE Core needs to save space
+#if 0
+  BuildPeCoffLoaderHob ();
+  BuildExtractSectionHob (
+    &gLzmaCustomDecompressGuid,
+    LzmaGuidedSectionGetInfo,
+    LzmaGuidedSectionExtraction
+    );
+#endif
 
   DecompressFirstFv ();
 

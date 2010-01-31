@@ -21,6 +21,9 @@
 #include <Protocol/PeCoffLoader.h>
 
 
+PE_COFF_LOADER_PROTOCOL  *gPeCoffLoader = NULL;
+
+
 /**
   Retrieves information about a PE/COFF image.
 
@@ -167,11 +170,11 @@ PeCoffLoaderImageReadFromMemory (
   OUT    VOID    *Buffer
   )
 {
-  return gPeCoffLoader->RelocateImageForRuntime (
-                          *FileHandle,
+  return gPeCoffLoader->ReadFromMemory (
+                          FileHandle,
                           FileOffset,
-                          *ReadSize,
-                          *Buffer
+                          ReadSize,
+                          Buffer
                           );
                           
 }
@@ -214,7 +217,7 @@ PeCoffLoaderRelocateImageForRuntime (
                           ImageBase,
                           VirtImageBase,
                           ImageSize,
-                          *RelocationData
+                          RelocationData
                           );
 }
 
@@ -244,27 +247,42 @@ PeCoffLoaderUnloadImage (
   return gPeCoffLoader->UnloadImage (ImageContext);
 }
 
+typedef struct {
+  EFI_HOB_GUID_TYPE             Hob;
+  VOID                          *Interface;
+} PROTOCOL_HOB;
 
 
 /**
-  Register LzmaDecompress and LzmaDecompressGetInfo handlers with LzmaCustomerDecompressGuid.
+  The constructor function caches the pointer of DXE Services Table.
 
-  @retval  RETURN_SUCCESS            Register successfully.
-  @retval  RETURN_OUT_OF_RESOURCES   No enough memory to store this handler.
+  The constructor function caches the pointer of DXE Services Table.
+  It will ASSERT() if that operation fails.
+  It will ASSERT() if the pointer of DXE Services Table is NULL.
+  It will always return EFI_SUCCESS.
+
+  @param  ImageHandle   The firmware allocated handle for the EFI image.
+  @param  SystemTable   A pointer to the EFI System Table.
+
+  @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
+
 **/
 EFI_STATUS
 EFIAPI
 DxeHobPeCoffLibConstructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   PROTOCOL_HOB   *Hob;
-  
+
   Hob = GetFirstGuidHob (&gPeCoffLoaderProtocolGuid);
   if (Hob == NULL) {
     return EFI_NOT_FOUND;
   }
   
   gPeCoffLoader = Hob->Interface;
+  return EFI_SUCCESS;
 }
 
 

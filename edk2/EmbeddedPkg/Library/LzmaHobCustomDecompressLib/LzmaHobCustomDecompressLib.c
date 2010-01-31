@@ -44,7 +44,7 @@ LzmaDecompressLibConstructor (
 
   return ExtractGuidedSectionRegisterHandlers (
           &gLzmaCustomDecompressGuid,
-          Hob->SectionGetInfo,
-          Hob->SectionExtraction
+          Hob->Data.SectionGetInfo,
+          Hob->Data.SectionExtraction
           );      
 }
