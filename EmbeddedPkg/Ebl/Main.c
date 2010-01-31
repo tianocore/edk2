@@ -451,7 +451,7 @@ EblPrintStartupBanner (
   EblSetTextColor (0);
   AsciiPrint (") prototype. Built at %a on %a\n",__TIME__, __DATE__);
   AsciiPrint ("THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN 'AS IS' BASIS,\nWITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.\n");
-  AsciiPrint ("Please send feedback to dev@edk2.tianocore.org\n");
+  AsciiPrint ("Please send feedback to edk2-devel@lists.sourceforge.net\n");
 }
 
 
