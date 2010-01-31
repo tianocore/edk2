@@ -678,6 +678,7 @@ BuildExtractSectionHob (
 VOID
 EFIAPI
 BuildPeCoffLoaderHob (
+  VOID
   );
 
 

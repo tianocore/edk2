@@ -818,11 +818,11 @@ BuildExtractSectionHob (
   IN  EXTRACT_GUIDED_SECTION_DECODE_HANDLER     SectionExtraction
   )
 {
-  EXTRACT_SECTION_HOB  Hob;
+  EXTRACT_SECTION_DATA Data;
   
-  Hob.SectionGetInfo    = SectionGetInfo;
-  Hob.SectionExtraction = SectionExtraction;
-  BuildGuidDataHob (Guid, &Hob, sizeof (EXTRACT_SECTION_HOB));
+  Data.SectionGetInfo    = SectionGetInfo;
+  Data.SectionExtraction = SectionExtraction;
+  BuildGuidDataHob (Guid, &Data, sizeof (Data));
 }
 
 PE_COFF_LOADER_PROTOCOL gPeCoffProtocol = {
@@ -834,22 +834,18 @@ PE_COFF_LOADER_PROTOCOL gPeCoffProtocol = {
   PeCoffLoaderUnloadImage
 };
 
-typedef struct {
-  EFI_HOB_GUID_TYPE             Hob;
-  VOID                          *Interface;
-} PROTOCOL_HOB;
-
 
 
 VOID
 EFIAPI
 BuildPeCoffLoaderHob (
+  VOID
   )
 {
-  PROTOCOL_HOB  Hob;      
+  VOID  *Ptr;      
   
-  Hob.Interface = &gPeCoffProtocol;
-  BuildGuidDataHob (&gPeCoffLoaderProtocolGuid, &Hob, sizeof (PROTOCOL_HOB));  
+  Ptr = &gPeCoffProtocol;
+  BuildGuidDataHob (&gPeCoffLoaderProtocolGuid, &Ptr, sizeof (VOID *));  
 }
 
 

@@ -15,6 +15,9 @@
 #ifndef __PE_COFF_LOADER_H__
 #define __PE_COFF_LOADER_H__
 
+// Needed for PE_COFF_LOADER_IMAGE_CONTEXT
+#include <Library/PeCoffLib.h>
+
 // B323179B-97FB-477E-B0FE-D88591FA11AB
 #define PE_COFF_LOADER_PROTOCOL_GUID \
   { 0xB323179B, 0x97FB, 0x477E, { 0xB0, 0xFE, 0xD8, 0x85, 0x91, 0xFA, 0x11, 0xAB } }
