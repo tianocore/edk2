@@ -1,7 +1,7 @@
 /** @file
   PCI Segment Library implementation using PCI Root Bridge I/O Protocol.
 
-  Copyright (c) 2007 - 2009, Intel Corporation All rights
+  Copyright (c) 2007 - 2010, Intel Corporation All rights
   reserved. This program and the accompanying materials are
   licensed and made available under the terms and conditions of
   the BSD License which accompanies this distribution.  The full
@@ -16,13 +16,13 @@
 #include "PciSegmentLib.h"
 
 //
-// Global varible to record data of PCI Root Bridge I/O Protcol instances
+// Global variable to record data of PCI Root Bridge I/O Protocol instances
 //
 PCI_ROOT_BRIDGE_DATA   *mPciRootBridgeData     = NULL;
 UINTN                  mNumberOfPciRootBridges = 0;
 
 /**
-  The constructor function caches data of PCI Root Bridge I/O Protcol instances.
+  The constructor function caches data of PCI Root Bridge I/O Protocol instances.
   
   The constructor function locates PCI Root Bridge I/O protocol instances,
   and caches the protocol instances, together with their segment numbers and bus ranges.

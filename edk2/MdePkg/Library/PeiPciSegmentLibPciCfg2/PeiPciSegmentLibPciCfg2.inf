@@ -6,7 +6,7 @@
 #  EFI_PEI_PCI CFG2 PPIs are typically produced by a chipset specific PEIM.
 #  This library instance should only be used platforms with multiple PCI segments.
 #
-# Copyright (c) 2007 - 2008, Intel Corporation.
+# Copyright (c) 2007 - 2010, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -48,4 +48,7 @@
 
 [Ppis]
   gEfiPciCfg2PpiGuid                            ##  CONSUMES
+
+[Depex]
+  gEfiPciCfg2PpiGuid
 

@@ -4,7 +4,7 @@
 # This instance of SAL library retrieves the SAL Entry Point from the SAL System Table
 # register in the EFI System Confguration Table.
 #
-# Copyright (c) 2007 - 2008, Intel Corporation.
+# Copyright (c) 2007 - 2010, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -31,7 +31,7 @@
 #  VALID_ARCHITECTURES           = IPF
 #
 
-[Sources.IPF]
+[Sources]
   UefiSalLib.c
 
 [Packages]
@@ -40,3 +40,6 @@
 [LibraryClasses]
   UefiLib
   DebugLib
+
+[Guids]
+  gEfiSalSystemTableGuid        ## CONSUMES ## GUID
