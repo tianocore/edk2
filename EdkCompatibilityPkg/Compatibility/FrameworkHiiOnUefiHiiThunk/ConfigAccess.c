@@ -3,7 +3,7 @@
   by HII Thunk Modules. These Config access Protocols are used to thunk UEFI Config 
   Access Callback to Framework HII Callback and EFI Variable Set/Get operations.
   
-Copyright (c) 2008, Intel Corporation
+Copyright (c) 2008 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -700,6 +700,10 @@ CreateIfrDataArray (
         Size = StrSize (String);
       }
       break;
+
+    case EFI_IFR_TYPE_ACTION:
+      Size = 0;
+      break;
       
     default:
       ASSERT (FALSE);
@@ -755,6 +759,10 @@ CreateIfrDataArray (
           FreePool (String);
         }
         break;
+
+      case EFI_IFR_TYPE_ACTION:
+        break;
+
       default:
         ASSERT (FALSE);
         break;
