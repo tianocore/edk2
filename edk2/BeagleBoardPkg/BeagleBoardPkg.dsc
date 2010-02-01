@@ -110,6 +110,7 @@
   EblNetworkLib|EmbeddedPkg/Library/EblNetworkLib/EblNetworkLib.inf
   
   GdbSerialLib|Omap35xxPkg/Library/GdbSerialLib/GdbSerialLib.inf
+  ArmDisassemblerLib|ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
 
 
 [LibraryClasses.common.SEC]

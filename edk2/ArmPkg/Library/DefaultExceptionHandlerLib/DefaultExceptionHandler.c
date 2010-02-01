@@ -18,25 +18,11 @@
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PeCoffGetEntryPointLib.h>
+#include <Library/ArmDisassemblerLib.h>
 
 #include <Guid/DebugImageInfoTable.h>
 #include <Protocol/DebugSupport.h>
 #include <Protocol/LoadedImage.h>
-
-
-VOID
-DisassembleArmInstruction (
-  IN  UINT32    *OpCodePtr,
-  OUT CHAR8     *Buf,
-  OUT UINTN     Size
-  );
-
-VOID
-DisassembleThumbInstruction (
-  IN  UINT16    *OpCodePtr,
-  OUT CHAR8     *Buf,
-  OUT UINTN     Size
-  );
 
 
 EFI_DEBUG_IMAGE_INFO_TABLE_HEADER *gDebugImageTableHeader = NULL;
@@ -248,6 +234,7 @@ DefaultExceptionHandler (
     UINT32  Offset;
     CHAR8   CpsrStr[32];  // char per bit. Lower 5-bits are mode that is a 3 char string
     CHAR8   Buffer[80];
+    UINT8   *DisAsm;
     
     CpsrString (SystemContext.SystemContextArm->CPSR, CpsrStr);
     DEBUG ((EFI_D_ERROR, "%a\n", CpsrStr));
@@ -268,15 +255,10 @@ DefaultExceptionHandler (
       DEBUG ((EFI_D_ERROR, "loaded at 0x%08x (PE/COFF offset) 0x%x (ELF or Mach-O offset) 0x%x", ImageBase, Offset, Offset - PeCoffSizeOfHeader));
       
       // If we come from an image it is safe to show the instruction. We know it should not fault
-      if ((SystemContext.SystemContextArm->CPSR & 0x20) == 0) {
-        // ARM
-        DisassembleArmInstruction ((UINT32 *)(UINTN)SystemContext.SystemContextArm->PC, Buffer, sizeof (Buffer));
-        DEBUG ((EFI_D_ERROR, "\n%a", Buffer));
-      } else {
-        // Thumb
-        DisassembleThumbInstruction ((UINT16 *)(UINTN)SystemContext.SystemContextArm->PC, Buffer, sizeof (Buffer));
-        DEBUG ((EFI_D_ERROR, "\n%a", Buffer));
-      }
+      DisAsm = (UINT8 *)(UINTN)SystemContext.SystemContextArm->PC;
+      DisassembleInstruction (&DisAsm, (SystemContext.SystemContextArm->CPSR & BIT5) == BIT5, Buffer, sizeof (Buffer));
+      DEBUG ((EFI_D_ERROR, "\n%a", Buffer));
+
     }
   DEBUG_CODE_END ();
   DEBUG ((EFI_D_ERROR, "\n  R0 0x%08x   R1 0x%08x   R2 0x%08x   R3 0x%08x\n", SystemContext.SystemContextArm->R0, SystemContext.SystemContextArm->R1, SystemContext.SystemContextArm->R2, SystemContext.SystemContextArm->R3));

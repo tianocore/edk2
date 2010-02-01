@@ -50,7 +50,7 @@ typedef struct {
   UINT32  AddressMode;
 } THUMB_INSTRUCTIONS;
 
-THUMB_INSTRUCTIONS gOp[] = {
+THUMB_INSTRUCTIONS gOpThumb[] = {
 // Thumb 16-bit instrucitons
 //         Op      Mask    Format
   { "ADC" , 0x4140, 0xffc0, DATA_FORMAT5 },
@@ -144,8 +144,10 @@ THUMB_INSTRUCTIONS gOp[] = {
   { "TST" , 0x4200, 0xffc0, DATA_FORMAT5 },
   { "UXTB", 0xb2c0, 0xffc0, DATA_FORMAT5 },
   { "UXTH", 0xb280, 0xffc0, DATA_FORMAT5 }
-  
+};
+
 #if 0  
+THUMB_INSTRUCTIONS gOpThumb2[] = {
   ,
   
   // 32-bit Thumb instructions  op1 01
@@ -193,9 +195,8 @@ THUMB_INSTRUCTIONS gOp[] = {
   //  1111 1 011 0xxx xxxx xxxx xxxx xxxx xxxx Multiply
   //  1111 1 011 1xxx xxxx xxxx xxxx xxxx xxxx Long Multiply
   //  1111 1 1xx xxxx xxxx xxxx xxxx xxxx xxxx Coprocessor 
-#endif
 };
-
+#endif
 
 CHAR8 mThumbMregListStr[4*15 + 1];
 
@@ -253,26 +254,39 @@ SignExtend (
 }
 
 /**
-  DEBUG print the faulting instruction. We cheat and only decode instructions that access 
+  Place a dissasembly of of **OpCodePtr into buffer, and update OpCodePtr to 
+  point to next instructin. 
+  
+  We cheat and only decode instructions that access 
   memory. If the instruction is not found we dump the instruction in hex.
    
-  @param  Insturction   ARM instruction to disassemble.  
+  @param  OpCodePtrPtr  Pointer to pointer of ARM Thumb instruction to disassemble.  
+  @param  Buf           Buffer to sprintf disassembly into.
+  @param  Size          Size of Buf in bytes. 
   
 **/
 VOID
 DisassembleThumbInstruction (
-  IN  UINT16    *OpCodePtr,
+  IN  UINT16    **OpCodePtrPtr,
   OUT CHAR8     *Buf,
   OUT UINTN     Size
   )
 {
-  UINT16  OpCode = *OpCodePtr;
+  UINT16  *OpCodePtr;
+  UINT16  OpCode;
+  UINT16  OpCode32;
   UINT32  Index;
   UINT32  Offset;
   UINT16  Rd, Rn, Rm;
   INT32   target_addr;
   BOOLEAN H1, H2, imod;
   UINT32  PC;
+
+  OpCodePtr = *OpCodePtrPtr;
+  OpCode = **OpCodePtrPtr;
+  
+  // Thumb2 is a stream of 16-bit instructions not a 32-bit instruction.
+  OpCode32 = (OpCode << 16) | *(OpCodePtr + 1);
 
   // These register names match branch form, but not others
   Rd = OpCode & 0x7;
@@ -283,10 +297,13 @@ DisassembleThumbInstruction (
   imod = (OpCode & BIT4) != 0;
   PC = (UINT32)(UINTN)*OpCodePtr;
 
-  for (Index = 0; Index < sizeof (gOp)/sizeof (THUMB_INSTRUCTIONS); Index++) {
-    if ((OpCode & gOp[Index].Mask) == gOp[Index].OpCode) {
-      Offset = AsciiSPrint (Buf, Size, "%a", gOp[Index].Start);   
-      switch (gOp[Index].AddressMode) {
+  // Increment by the minimum instruction size, Thumb2 could be bigger
+  *OpCodePtrPtr += 1;
+  
+  for (Index = 0; Index < sizeof (gOpThumb)/sizeof (THUMB_INSTRUCTIONS); Index++) {
+    if ((OpCode & gOpThumb[Index].Mask) == gOpThumb[Index].OpCode) {
+      Offset = AsciiSPrint (Buf, Size, "%a", gOpThumb[Index].Start);   
+      switch (gOpThumb[Index].AddressMode) {
       case LOAD_STORE_FORMAT1:
         // A6.5.1  <Rd>, [<Rn>, #<5_bit_offset>]
         AsciiSPrint (&Buf[Offset], Size - Offset, " r%d, [r%d #0x%x]", Rd, (OpCode >> 7) & 7, (OpCode >> 6) & 0x1f);   
@@ -392,8 +409,54 @@ DisassembleThumbInstruction (
       }
     }
   }
-      
-
+#if 0  
+  // Thumb2 are 32-bit instructions
+  *OpCodePtrPtr += 1;
+  for (Index = 0; Index < sizeof (gOpThumb2)/sizeof (THUMB_INSTRUCTIONS); Index++) {
+    if ((OpCode32 & gOpThumb2[Index].Mask) == gOpThumb2[Index].OpCode) {
+    }
+  }
+#endif
+  // Unknown instruction is 16-bits
+  *OpCodePtrPtr -= 1;
+  AsciiSPrint (Buf, Size, "0x%04x", OpCode);
 }
 
+
+
+VOID
+DisassembleArmInstruction (
+  IN  UINT32    **OpCodePtr,
+  OUT CHAR8     *Buf,
+  OUT UINTN     Size
+  );
+
+
+/**
+  Place a dissasembly of of **OpCodePtr into buffer, and update OpCodePtr to 
+  point to next instructin. 
+  
+  We cheat and only decode instructions that access 
+  memory. If the instruction is not found we dump the instruction in hex.
+   
+  @param  OpCodePtrPtr  Pointer to pointer of ARM Thumb instruction to disassemble.  
+  @param  Thumb         TRUE for Thumb(2), FALSE for ARM instruction stream
+  @param  Buf           Buffer to sprintf disassembly into.
+  @param  Size          Size of Buf in bytes. 
+  
+**/
+VOID
+DisassembleInstruction (
+  IN  UINT8     **OpCodePtr,
+  IN  BOOLEAN   Thumb,
+  OUT CHAR8     *Buf,
+  OUT UINTN     Size
+  )
+{
+  if (Thumb) {
+    DisassembleThumbInstruction ((UINT16 **)OpCodePtr, Buf, Size);
+  } else {
+    DisassembleArmInstruction ((UINT32 **)OpCodePtr, Buf, Size);
+  }
+}
  

@@ -15,16 +15,16 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = DefaultExceptionHandlerLib
-  FILE_GUID                      = EACDB354-DF1A-4AF9-A171-499737ED818F
-  MODULE_TYPE                    = UEFI_DRIVER
+  BASE_NAME                      = SemiHostingSerialPortLib
+  FILE_GUID                      = 7ACEC173-F15D-426C-8F2F-BD86B4183EF1
+  MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = DefaultExceptionHandlerLib
-  CONSTRUCTOR                    = DefaultExceptionHandlerConstructor
+  LIBRARY_CLASS                  = ArmDisassemblerLib
 
 
 [Sources.common]
-  DefaultExceptionHandler.c
+  ArmDisassembler.c
+  ThumbDisassembler.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -36,6 +36,5 @@
   PrintLib
   DebugLib
   PeCoffGetEntryPointLib
-  ArmDisassemblerLib
 
 
