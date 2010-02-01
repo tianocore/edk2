@@ -1,7 +1,7 @@
 /** @file
-  Industry Standard Definitions of SMBIOS Table Specification v2.6
+  Industry Standard Definitions of SMBIOS Table Specification v2.6.1
 
-  Copyright (c) 2006 - 2009, Intel Corporation All rights
+  Copyright (c) 2006 - 2010, Intel Corporation All rights
   reserved. This program and the accompanying materials are
   licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at        
@@ -409,6 +409,10 @@ typedef enum {
   ProcessorFamilyPowerPC620             = 0x25,
   ProcessorFamilyPowerPCx704            = 0x26,
   ProcessorFamilyPowerPC750             = 0x27,
+  ProcessorFamilyIntelCoreDuo           = 0x28,
+  ProcessorFamilyIntelCoreDuoMobile     = 0x29,
+  ProcessorFamilyIntelCoreSoloMobile    = 0x2A,
+  ProcessorFamilyIntelAtom              = 0x2B,
   ProcessorFamilyAlpha3                 = 0x30,
   ProcessorFamilyAlpha21064             = 0x31,
   ProcessorFamilyAlpha21066             = 0x32,
@@ -451,6 +455,12 @@ typedef enum {
   ProcessorFamilyDualCoreAmdOpteron     = 0x87,
   ProcessorFamilyAmdAthlon64X2DualCore  = 0x88,
   ProcessorFamilyAmdTurion64X2Mobile    = 0x89,
+  ProcessorFamilyQuadCoreAmdOpteron     = 0x8A,
+  ProcessorFamilyThirdGenerationAmdOpteron = 0x8B,
+  ProcessorFamilyAmdPhenomFxQuadCore    = 0x8C,
+  ProcessorFamilyAmdPhenomX4QuadCore    = 0x8D,
+  ProcessorFamilyAmdPhenomX2DualCore    = 0x8E,
+  ProcessorFamilyAmdAthlonX2DualCore    = 0x8F,  
   ProcessorFamilyPARISC                 = 0x90,
   ProcessorFamilyPaRisc8500             = 0x91,
   ProcessorFamilyPaRisc8000             = 0x92,
@@ -459,6 +469,21 @@ typedef enum {
   ProcessorFamilyPaRisc7100LC           = 0x95,
   ProcessorFamilyPaRisc7100             = 0x96,
   ProcessorFamilyV30                    = 0xA0,
+  ProcessorFamilyQuadCoreIntelXeon3200Series  = 0xA1,
+  ProcessorFamilyDualCoreIntelXeon3000Series  = 0xA2,
+  ProcessorFamilyQuadCoreIntelXeon5300Series  = 0xA3,
+  ProcessorFamilyDualCoreIntelXeon5100Series  = 0xA4,
+  ProcessorFamilyDualCoreIntelXeon5000Series  = 0xA5,
+  ProcessorFamilyDualCoreIntelXeonLV          = 0xA6,
+  ProcessorFamilyDualCoreIntelXeonULV         = 0xA7,
+  ProcessorFamilyDualCoreIntelXeon7100Series  = 0xA8,
+  ProcessorFamilyQuadCoreIntelXeon5400Series  = 0xA9,
+  ProcessorFamilyQuadCoreIntelXeon            = 0xAA,
+  ProcessorFamilyDualCoreIntelXeon5200Series  = 0xAB,
+  ProcessorFamilyDualCoreIntelXeon7200Series  = 0xAC,
+  ProcessorFamilyQuadCoreIntelXeon7300Series  = 0xAD,
+  ProcessorFamilyQuadCoreIntelXeon7400Series  = 0xAE,
+  ProcessorFamilyMultiCoreIntelXeon7400Series = 0xAF,
   ProcessorFamilyPentiumIIIXeon         = 0xB0,
   ProcessorFamilyPentiumIIISpeedStep    = 0xB1,
   ProcessorFamilyPentium4               = 0xB2,
@@ -475,6 +500,14 @@ typedef enum {
   ProcessorFamilyIntelCoreSolo          = 0xBD,  ///< SMBIOS spec 2.6 correct this value
   ProcessorFamilyReserved               = 0xBE,
   ProcessorFamilyIntelCore2             = 0xBF,
+  ProcessorFamilyIntelCore2Solo         = 0xC0,
+  ProcessorFamilyIntelCore2Extreme      = 0xC1,
+  ProcessorFamilyIntelCore2Quad         = 0xC2,
+  ProcessorFamilyIntelCore2ExtremeMobile = 0xC3,
+  ProcessorFamilyIntelCore2DuoMobile    = 0xC4,
+  ProcessorFamilyIntelCore2SoloMobile   = 0xC5,
+  ProcessorFamilyIntelCoreI7            = 0xC6,
+  ProcessorFamilyDualCoreIntelCeleron   = 0xC7,  
   ProcessorFamilyIBM390                 = 0xC8,
   ProcessorFamilyG4                     = 0xC9,
   ProcessorFamilyG5                     = 0xCA,
@@ -484,6 +517,20 @@ typedef enum {
   ProcessorFamilyViaC7D                 = 0xD3,
   ProcessorFamilyViaC7                  = 0xD4,
   ProcessorFamilyViaEden                = 0xD5,
+  ProcessorFamilyMultiCoreIntelXeon           = 0xD6,
+  ProcessorFamilyDualCoreIntelXeon3Series     = 0xD7,
+  ProcessorFamilyQuadCoreIntelXeon3Series     = 0xD8,
+  ProcessorFamilyDualCoreIntelXeon5Series     = 0xDA,
+  ProcessorFamilyQuadCoreIntelXeon5Series     = 0xDB,
+  ProcessorFamilyDualCoreIntelXeon7Series     = 0xDD,
+  ProcessorFamilyQuadCoreIntelXeon7Series     = 0xDE,
+  ProcessorFamilyMultiCoreIntelXeon7Series    = 0xDF,
+  ProcessorFamilyEmbeddedAmdOpteronQuadCore   = 0xE6,
+  ProcessorFamilyAmdPhenomTripleCore          = 0xE7,
+  ProcessorFamilyAmdTurionUltraDualCoreMobile = 0xE8,
+  ProcessorFamilyAmdTurionDualCoreMobile      = 0xE9,
+  ProcessorFamilyAmdAthlonDualCore            = 0xEA,
+  ProcessorFamilyAmdSempronSI                 = 0xEB,
   ProcessorFamilyi860                   = 0xFA,
   ProcessorFamilyi960                   = 0xFB,
   ProcessorFamilyIndicatorFamily2       = 0xFE,
@@ -529,7 +576,8 @@ typedef enum {
   ProcessorUpgradeSocketLGA775  = 0x15,
   ProcessorUpgradeSocketS1      = 0x16,
   ProcessorUpgradeAM2           = 0x17,
-  ProcessorUpgradeF1207         = 0x18
+  ProcessorUpgradeF1207         = 0x18,
+  ProcessorSocketLGA1366        = 0x19
 } PROCESSOR_UPGRADE;
 
 ///
@@ -802,7 +850,11 @@ typedef enum {
   CacheAssociativityFully        = 0x06,
   CacheAssociativity8Way         = 0x07,
   CacheAssociativity16Way        = 0x08,
-  CacheAssociativity24Way        = 0x09
+  CacheAssociativity12Way        = 0x09,
+  CacheAssociativity24Way        = 0x0A,
+  CacheAssociativity32Way        = 0x0B,
+  CacheAssociativity48Way        = 0x0C,
+  CacheAssociativity64Way        = 0x0D
 } CACHE_ASSOCIATIVITY_DATA;
 
 ///
@@ -963,7 +1015,13 @@ typedef enum {
   SlotTypePciExpressX2                 = 0xA7,
   SlotTypePciExpressX4                 = 0xA8,
   SlotTypePciExpressX8                 = 0xA9,
-  SlotTypePciExpressX16                = 0xAA
+  SlotTypePciExpressX16                = 0xAA,
+  SlotTypePciExpressGen2               = 0xAB,
+  SlotTypePciExpressGen2X1             = 0xAC,
+  SlotTypePciExpressGen2X2             = 0xAD,
+  SlotTypePciExpressGen2X4             = 0xAE,
+  SlotTypePciExpressGen2X8             = 0xAF,
+  SlotTypePciExpressGen2X16            = 0xB0
 } MISC_SLOT_TYPE;
 
 ///
@@ -1330,7 +1388,9 @@ typedef enum {
   MemoryTypeRdram                          = 0x11,
   MemoryTypeDdr                            = 0x12,
   MemoryTypeDdr2                           = 0x13,
-  MemoryTypeDdr2FbDimm                     = 0x14
+  MemoryTypeDdr2FbDimm                     = 0x14,
+  MemoryTypeDdr3                           = 0x18,
+  MemoryTypeFbd2                           = 0x19
 } MEMORY_DEVICE_TYPE;
 
 typedef struct {
