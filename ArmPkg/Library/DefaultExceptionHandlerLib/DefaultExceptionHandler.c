@@ -256,7 +256,7 @@ DefaultExceptionHandler (
       
       // If we come from an image it is safe to show the instruction. We know it should not fault
       DisAsm = (UINT8 *)(UINTN)SystemContext.SystemContextArm->PC;
-      DisassembleInstruction (&DisAsm, (SystemContext.SystemContextArm->CPSR & BIT5) == BIT5, Buffer, sizeof (Buffer));
+      DisassembleInstruction (&DisAsm, (SystemContext.SystemContextArm->CPSR & BIT5) == BIT5, TRUE, Buffer, sizeof (Buffer));
       DEBUG ((EFI_D_ERROR, "\n%a", Buffer));
 
     }

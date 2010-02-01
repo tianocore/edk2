@@ -25,7 +25,7 @@
 #include <Library/UefiLib.h>
 #include <Library/PcdLib.h>
 #include <Library/EfiFileLib.h>
-
+#include <Library/ArmDisassemblerLib.h>
 
 //PcdEmbeddedFdBaseAddress
 
@@ -42,11 +42,29 @@
 
 **/
 EFI_STATUS
-EblEdk2Cmd (
+EblDisassembler (
   IN UINTN  Argc,
   IN CHAR8  **Argv
   )
 {
+  UINT8   *Ptr;
+  UINT32  Address;
+  UINT32  Count;
+  CHAR8   Buffer[80];
+  
+  if (Argc < 2) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
+  Address = AsciiStrHexToUintn (Argv[1]);
+  Count   = (Argc > 2) ? (UINT32)AsciiStrHexToUintn (Argv[2]) : 10;
+
+  Ptr = (UINT8 *)(UINTN)Address;  
+  while (Count-- > 0) {
+    DisassembleInstruction (&Ptr, TRUE, TRUE, Buffer, sizeof (Buffer));
+    AsciiPrint ("0x%08x: %a", Address, Buffer);
+  }
+
   return EFI_SUCCESS;
 }
 
@@ -54,10 +72,10 @@ EblEdk2Cmd (
 GLOBAL_REMOVE_IF_UNREFERENCED const EBL_COMMAND_TABLE mLibCmdTemplate[] =
 {
   {
-    "edk2",
-    " filename ; Load FD into memory and boot from it",
+    "disasm address [count]",
+    " disassemble count instructions",
     NULL,
-    EblEdk2Cmd
+    EblDisassembler
   }
 };
 

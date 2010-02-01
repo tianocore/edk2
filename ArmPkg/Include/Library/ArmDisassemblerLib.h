@@ -24,6 +24,7 @@
    
   @param  OpCodePtrPtr  Pointer to pointer of ARM Thumb instruction to disassemble.  
   @param  Thumb         TRUE for Thumb(2), FALSE for ARM instruction stream
+  @param  Extended      TRUE dump hex for instruction too.
   @param  Buf           Buffer to sprintf disassembly into.
   @param  Size          Size of Buf in bytes. 
   
@@ -32,6 +33,7 @@ VOID
 DisassembleInstruction (
   IN  UINT8     **OpCodePtr,
   IN  BOOLEAN   Thumb,
+  IN  BOOLEAN   Extended,
   OUT CHAR8     *Buf,
   OUT UINTN     Size
   );
