@@ -342,6 +342,9 @@
   #  BIT0 set indicates 4KB alignment
   #  BIT1 set indicates 8KB alignment
   gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize|0x1|UINT32|0x10000047
+  
+  ## Smbios version
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0206|UINT16|0x00010055
 
 [PcdsFixedAtBuild,PcdsPatchableInModule]
   ## Maximun number of performance log entries during PEI phase.

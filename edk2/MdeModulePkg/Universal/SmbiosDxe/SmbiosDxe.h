@@ -1,7 +1,7 @@
 /** @file
   This code supports the implementation of the Smbios protocol
   
-Copyright (c) 2009, Intel Corporation                                                         
+Copyright (c) 2009 - 2010, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -29,10 +29,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-
-#define SMBIOS_MAJOR_VERSION 2
-#define SMBIOS_MINOR_VERSION 4
-
+#include <Library/PcdLib.h>
 
 #define SMBIOS_INSTANCE_SIGNATURE SIGNATURE_32 ('S', 'B', 'i', 's')
 typedef struct {
