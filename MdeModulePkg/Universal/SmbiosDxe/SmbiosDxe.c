@@ -2,7 +2,7 @@
   This code produces the Smbios protocol. It also responsible for constructing 
   SMBIOS table into system table.
   
-Copyright (c) 2009, Intel Corporation                                                         
+Copyright (c) 2009 - 2010, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -45,13 +45,13 @@ SMBIOS_TABLE_ENTRY_POINT EntryPointStructureData = {
   //
   0x1f,
   //
-  // MajorVersion: 2 (Version 2.4)
+  // MajorVersion
   //
-  0x02,
+  (UINT8) (FixedPcdGet16 (PcdSmbiosVersion) >> 8),
   //
-  // MinorVersion: 4 (Version 2.4)
+  // MinorVersion
   //
-  0x04,
+  (UINT8) (FixedPcdGet16 (PcdSmbiosVersion) & 0x00ff),
   //
   // MaxStructureSize, TO BE FILLED
   //
@@ -997,8 +997,8 @@ SmbiosDriverEntryPoint (
   mPrivateData.Smbios.UpdateString      = SmbiosUpdateString;
   mPrivateData.Smbios.Remove            = SmbiosRemove;
   mPrivateData.Smbios.GetNext           = SmbiosGetNext;
-  mPrivateData.Smbios.MajorVersion      = SMBIOS_MAJOR_VERSION;
-  mPrivateData.Smbios.MinorVersion      = SMBIOS_MINOR_VERSION;
+  mPrivateData.Smbios.MajorVersion      = (UINT8) (FixedPcdGet16 (PcdSmbiosVersion) >> 8);
+  mPrivateData.Smbios.MinorVersion      = (UINT8) (FixedPcdGet16 (PcdSmbiosVersion) & 0x00ff);
 
   InitializeListHead (&mPrivateData.DataListHead);
   InitializeListHead (&mPrivateData.AllocatedHandleListHead);
