@@ -1,6 +1,6 @@
 /**@file
 
-Copyright (c) 2006 - 2007, Intel Corporation
+Copyright (c) 2006 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -283,7 +283,7 @@ PeCoffLoaderGetPdbPointer (
   @param  Pe32Data   Pointer to the PE/COFF image that is loaded in system
                      memory.
 
-  @return Size of PE/COFF header in bytes or zero if not a valid iamge.
+  @return Size of PE/COFF header in bytes or zero if not a valid image.
 
 **/
 UINT32
@@ -312,9 +312,11 @@ PeCoffGetSizeOfHeaders (
   }
 
   if (Hdr.Te->Signature == EFI_TE_IMAGE_HEADER_SIGNATURE) {
-   SizeOfHeaders = sizeof (EFI_TE_IMAGE_HEADER) + (UINTN)Hdr.Te->BaseOfCode - (UINTN)Hdr.Te->StrippedSize;
+    SizeOfHeaders = sizeof (EFI_TE_IMAGE_HEADER) + (UINTN)Hdr.Te->BaseOfCode - (UINTN)Hdr.Te->StrippedSize;
   } else if (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE) {
     SizeOfHeaders = Hdr.Pe32->OptionalHeader.SizeOfHeaders;
+  } else {
+    SizeOfHeaders = 0;
   }
 
   return SizeOfHeaders;
