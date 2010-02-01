@@ -15,9 +15,8 @@
 
 #include <Base.h>
 #include <Library/BaseLib.h>
-#include <Library/UefiLib.h>
 #include <Library/PrintLib.h>
-
+#include <Library/ArmDisassemblerLib.h>
 
 CHAR8 *gCondition[] = {
   "EQ",
@@ -146,20 +145,25 @@ RotateRight (
 
 
 /**
-  DEBUG print the faulting instruction. We cheat and only decode instructions that access 
+  Place a dissasembly of of **OpCodePtr into buffer, and update OpCodePtr to 
+  point to next instructin. 
+  
+  We cheat and only decode instructions that access 
   memory. If the instruction is not found we dump the instruction in hex.
    
-  @param  Insturction   ARM instruction to disassemble.  
+  @param  OpCodePtr   Pointer to pointer of ARM instruction to disassemble.  
+  @param  Buf         Buffer to sprintf disassembly into.
+  @param  Size        Size of Buf in bytes. 
   
 **/
 VOID
 DisassembleArmInstruction (
-  IN  UINT32    *OpCodePtr,
+  IN  UINT32    **OpCodePtr,
   OUT CHAR8     *Buf,
   OUT UINTN     Size
   )
 {
-  UINT32    OpCode = *OpCodePtr;
+  UINT32    OpCode = **OpCodePtr;
   CHAR8     *Type, *Root;
   BOOLEAN   I, P, U, B, W, L, S, H;
   UINT32    Rn, Rd, Rm;
@@ -437,6 +441,8 @@ DisassembleArmInstruction (
   }
 
   AsciiSPrint (Buf, Size, "Faulting OpCode 0x%08x", OpCode);
+  
+  *OpCodePtr += 1;
   return;
 }
 
