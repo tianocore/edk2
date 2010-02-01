@@ -347,6 +347,11 @@ EfiPxeBcStart (
     return Status;
   }
 
+  //
+  // Configure block size for TFTP as a default value to handle all link layers.
+  // 
+  Private->BlockSize   = (UINTN) (MIN (Private->Ip4MaxPacketSize, PXEBC_DEFAULT_PACKET_SIZE) - 
+                           PXEBC_DEFAULT_UDP_OVERHEAD_SIZE - PXEBC_DEFAULT_TFTP_OVERHEAD_SIZE);
   Private->AddressIsOk = FALSE;
 
   ZeroMem (Mode, sizeof (EFI_PXE_BASE_CODE_MODE));
@@ -2421,7 +2426,6 @@ DiscoverBootFile (
   UINT16                      Type;
   UINT16                      Layer;
   BOOLEAN                     UseBis;
-  UINTN                       BlockSize;
   PXEBC_CACHED_DHCP4_PACKET   *Packet;
   UINT16                      Value;
 
@@ -2466,7 +2470,6 @@ DiscoverBootFile (
   }
 
   *BufferSize = 0;
-  BlockSize   = 0x8000;
 
   //
   // Get bootfile name and (m)tftp server ip addresss
@@ -2526,7 +2529,7 @@ DiscoverBootFile (
                       Buffer,
                       FALSE,
                       BufferSize,
-                      &BlockSize,
+                      &Private->BlockSize,
                       &Private->ServerIp,
                       (UINT8 *) Private->BootFileName,
                       NULL,
@@ -2580,14 +2583,12 @@ EfiPxeLoadFile (
   PXEBC_PRIVATE_DATA          *Private;
   EFI_PXE_BASE_CODE_PROTOCOL  *PxeBc;
   BOOLEAN                     NewMakeCallback;
-  UINTN                       BlockSize;
   EFI_STATUS                  Status;
   UINT64                      TmpBufSize;
 
   Private         = PXEBC_PRIVATE_DATA_FROM_LOADFILE (This);
   PxeBc           = &Private->PxeBc;
   NewMakeCallback = FALSE;
-  BlockSize       = 0x8000;
   Status          = EFI_DEVICE_ERROR;
 
   if (This == NULL || BufferSize == NULL) {
@@ -2646,7 +2647,7 @@ EfiPxeLoadFile (
                         Buffer,
                         FALSE,
                         &TmpBufSize,
-                        &BlockSize,
+                        &Private->BlockSize,
                         &Private->ServerIp,
                         (UINT8 *) Private->BootFileName,
                         NULL,
@@ -2670,7 +2671,7 @@ EfiPxeLoadFile (
                       Buffer,
                       FALSE,
                       &TmpBufSize,
-                      &BlockSize,
+                      &Private->BlockSize,
                       &Private->ServerIp,
                       (UINT8 *) Private->BootFileName,
                       NULL,

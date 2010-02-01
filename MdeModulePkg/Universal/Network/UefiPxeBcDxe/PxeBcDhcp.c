@@ -1270,7 +1270,9 @@ PxeBcDiscvBootService (
     //
     // free the responselist
     //
-    FreePool (Token.ResponseList);
+    if (Token.ResponseList != NULL) {
+      FreePool (Token.ResponseList);
+    }
   }
   //
   // Free the dhcp packet

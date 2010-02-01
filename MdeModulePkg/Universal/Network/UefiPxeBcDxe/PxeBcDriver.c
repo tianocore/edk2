@@ -152,6 +152,7 @@ PxeBcDriverBindingStart (
   PXEBC_PRIVATE_DATA  *Private;
   UINTN               Index;
   EFI_STATUS          Status;
+  EFI_IP4_MODE_DATA   Ip4ModeData;
 
   Private = AllocateZeroPool (sizeof (PXEBC_PRIVATE_DATA));
   if (Private == NULL) {
@@ -253,6 +254,16 @@ PxeBcDriverBindingStart (
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
   }
+
+  //
+  // Get max packet size from Ip4 to calculate block size for Tftp later.
+  //
+  Status = Private->Ip4->GetModeData (Private->Ip4, &Ip4ModeData, NULL, NULL);
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;  
+  }
+
+  Private->Ip4MaxPacketSize = Ip4ModeData.MaxPacketSize;
 
   Status = NetLibCreateServiceChild (
              ControllerHandle,
