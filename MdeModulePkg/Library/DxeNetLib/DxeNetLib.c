@@ -2760,13 +2760,17 @@ NetLibStrToIp6andPrefix (
   }
 
   //
+  // If input string doesn't indicate the prefix length, return 0xff.
+  //
+  Length = 0xFF;
+  
+  //
   // Convert the string to prefix length
   //
-  Length = 0;
   if (PrefixStr != NULL) {
 
     Status = EFI_INVALID_PARAMETER;
-
+    Length = 0;
     while (*PrefixStr != '\0') {
       if (NET_IS_DIGIT (*PrefixStr)) {
         Length = (UINT8) (Length * 10 + (*PrefixStr - '0'));
