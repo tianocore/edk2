@@ -20,8 +20,6 @@
 #ifndef _SMM_CPU_H_
 #define _SMM_CPU_H_
 
-#include <Pi/PiSmmCis.h>
-
 #define EFI_SMM_CPU_PROTOCOL_GUID \
   { \
     0xeb346b97, 0x975f, 0x4a9f, { 0x8b, 0x22, 0xf8, 0xe9, 0x2b, 0xb3, 0xd5, 0x69 } \
