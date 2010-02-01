@@ -1,7 +1,7 @@
 /** @file
   Define NVData structures used by the iSCSI configuration component
 
-Copyright (c) 2004 - 2007, Intel Corporation.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -30,6 +30,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Vfr has a limit on the size, it's 255 bytes.
 //
+#define ISCSI_NAME_IFR_MIN_SIZE   4
 #define ISCSI_NAME_IFR_MAX_SIZE   223
 
 #define IP_MIN_SIZE               7
@@ -77,7 +78,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #pragma pack(1)
 typedef struct {
-  CHAR16  InitiatorName[ISCSI_NAME_IFR_MAX_SIZE];
+  CHAR16  InitiatorName[ISCSI_NAME_MAX_SIZE];
 
   UINT8   Enabled;
 
@@ -86,7 +87,7 @@ typedef struct {
   CHAR16  SubnetMask[IP4_STR_MAX_SIZE];
   CHAR16  Gateway[IP4_STR_MAX_SIZE];
 
-  CHAR16  TargetName[ISCSI_NAME_IFR_MAX_SIZE];
+  CHAR16  TargetName[ISCSI_NAME_MAX_SIZE];
   CHAR16  TargetIp[IP4_STR_MAX_SIZE];
   UINT16  TargetPort;
   CHAR16  BootLun[ISCSI_LUN_STR_MAX_LEN];

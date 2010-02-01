@@ -1,7 +1,7 @@
 /** @file
   Implementation for iSCSI Boot Firmware Table publication.
 
-Copyright (c) 2004 - 2009, Intel Corporation.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -45,7 +45,7 @@ IScsiInitIbfTableHeader (
   Header->OemId[4]  = 'L';
   
   CopyMem (Header->OemId, OemId, sizeof (Header->OemId));
-  Header->OemTableId = *OemTableId;
+  CopyMem (&Header->OemTableId, OemTableId, sizeof (UINT64));
 }
 
 /**
