@@ -18,6 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _GENERIC_BDS_LIB_H_
 #define _GENERIC_BDS_LIB_H_
 
+#include <Protocol/UserManager.h>
 extern EFI_HANDLE mBdsImageHandle;
 
 ///
@@ -952,6 +953,21 @@ BdsLibSaveMemoryTypeInformation (
   VOID
   );
   
+/**
+  Identify a user and, if authenticated, returns the current user profile handle.
+
+  @param[out]  User           Point to user profile handle.
+  
+  @retval EFI_SUCCESS         User is successfully identified, or user identification
+                              is not supported.
+  @retval EFI_ACCESS_DENIED   User is not successfully identified
+
+**/
+EFI_STATUS
+EFIAPI
+BdsLibUserIdentify (
+  OUT EFI_USER_PROFILE_HANDLE         *User
+  );  
 
 /**
   This function checks if a Fv file device path is valid, according to a file GUID. If it is invalid,
