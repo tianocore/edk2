@@ -1,7 +1,7 @@
 /** @file
   Provides a service to retrieve the PE/COFF entry point from a PE/COFF image.
 
-Copyright (c) 2006 - 2008, Intel Corporation                                                         
+Copyright (c) 2006 - 2010, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -48,7 +48,7 @@ PeCoffLoaderGetEntryPoint (
   @param  Pe32Data   Pointer to the PE/COFF image that is loaded in system
                      memory.
 
-  @return Machine type or zero if not a valid iamge.
+  @return Machine type or zero if not a valid image.
 
 **/
 UINT16
@@ -92,7 +92,7 @@ PeCoffLoaderGetPdbPointer (
   @param  Pe32Data   Pointer to the PE/COFF image that is loaded in system
                      memory.
 
-  @return Size of PE/COFF header in bytes or zero if not a valid iamge.
+  @return Size of PE/COFF header in bytes or zero if not a valid image.
 
 **/
 UINT32
