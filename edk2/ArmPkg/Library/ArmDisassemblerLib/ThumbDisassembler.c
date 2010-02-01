@@ -263,13 +263,15 @@ SignExtend (
   @param  OpCodePtrPtr  Pointer to pointer of ARM Thumb instruction to disassemble.  
   @param  Buf           Buffer to sprintf disassembly into.
   @param  Size          Size of Buf in bytes. 
+  @param  Extended    TRUE dump hex for instruction too.
   
 **/
 VOID
 DisassembleThumbInstruction (
   IN  UINT16    **OpCodePtrPtr,
   OUT CHAR8     *Buf,
-  OUT UINTN     Size
+  OUT UINTN     Size,
+  IN  BOOLEAN   Extended
   )
 {
   UINT16  *OpCodePtr;
@@ -302,7 +304,11 @@ DisassembleThumbInstruction (
   
   for (Index = 0; Index < sizeof (gOpThumb)/sizeof (THUMB_INSTRUCTIONS); Index++) {
     if ((OpCode & gOpThumb[Index].Mask) == gOpThumb[Index].OpCode) {
-      Offset = AsciiSPrint (Buf, Size, "%a", gOpThumb[Index].Start);   
+      if (Extended) {
+        Offset = AsciiSPrint (Buf, Size, "0x%04x       %a", OpCode, gOpThumb[Index].Start);   
+      } else {
+        Offset = AsciiSPrint (Buf, Size, "%a", gOpThumb[Index].Start);   
+      }
       switch (gOpThumb[Index].AddressMode) {
       case LOAD_STORE_FORMAT1:
         // A6.5.1  <Rd>, [<Rn>, #<5_bit_offset>]
@@ -414,12 +420,21 @@ DisassembleThumbInstruction (
   *OpCodePtrPtr += 1;
   for (Index = 0; Index < sizeof (gOpThumb2)/sizeof (THUMB_INSTRUCTIONS); Index++) {
     if ((OpCode32 & gOpThumb2[Index].Mask) == gOpThumb2[Index].OpCode) {
+      if (Extended) {
+        Offset = AsciiSPrint (Buf, Size, "0x%04x   %a", OpCode32, gOpThumb2[Index].Start);   
+      } else {
+        Offset = AsciiSPrint (Buf, Size, "%a", gOpThumb2[Index].Start);   
+      }
+      switch (gOpThumb2[Index].AddressMode) {
+      }
     }
   }
 #endif
   // Unknown instruction is 16-bits
   *OpCodePtrPtr -= 1;
-  AsciiSPrint (Buf, Size, "0x%04x", OpCode);
+  if (!Extended) {
+    AsciiSPrint (Buf, Size, "0x%04x", OpCode);
+  }
 }
 
 
@@ -428,7 +443,8 @@ VOID
 DisassembleArmInstruction (
   IN  UINT32    **OpCodePtr,
   OUT CHAR8     *Buf,
-  OUT UINTN     Size
+  OUT UINTN     Size,
+  IN  BOOLEAN   Extended
   );
 
 
@@ -441,6 +457,7 @@ DisassembleArmInstruction (
    
   @param  OpCodePtrPtr  Pointer to pointer of ARM Thumb instruction to disassemble.  
   @param  Thumb         TRUE for Thumb(2), FALSE for ARM instruction stream
+  @param  Extended      TRUE dump hex for instruction too.
   @param  Buf           Buffer to sprintf disassembly into.
   @param  Size          Size of Buf in bytes. 
   
@@ -449,14 +466,15 @@ VOID
 DisassembleInstruction (
   IN  UINT8     **OpCodePtr,
   IN  BOOLEAN   Thumb,
+  IN  BOOLEAN   Extended,
   OUT CHAR8     *Buf,
   OUT UINTN     Size
   )
 {
   if (Thumb) {
-    DisassembleThumbInstruction ((UINT16 **)OpCodePtr, Buf, Size);
+    DisassembleThumbInstruction ((UINT16 **)OpCodePtr, Buf, Size, Extended);
   } else {
-    DisassembleArmInstruction ((UINT32 **)OpCodePtr, Buf, Size);
+    DisassembleArmInstruction ((UINT32 **)OpCodePtr, Buf, Size, Extended);
   }
 }
  

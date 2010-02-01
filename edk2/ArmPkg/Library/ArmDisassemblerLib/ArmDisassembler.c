@@ -154,13 +154,15 @@ RotateRight (
   @param  OpCodePtr   Pointer to pointer of ARM instruction to disassemble.  
   @param  Buf         Buffer to sprintf disassembly into.
   @param  Size        Size of Buf in bytes. 
+  @param  Extended    TRUE dump hex for instruction too.
   
 **/
 VOID
 DisassembleArmInstruction (
   IN  UINT32    **OpCodePtr,
   OUT CHAR8     *Buf,
-  OUT UINTN     Size
+  OUT UINTN     Size,
+  IN  BOOLEAN   Extended
   )
 {
   UINT32    OpCode = **OpCodePtr;
@@ -182,6 +184,13 @@ DisassembleArmInstruction (
   Rn = (OpCode >> 16) & 0xf;
   Rd = (OpCode >> 12) & 0xf;
   Rm = (OpCode & 0xf);
+
+
+  if (Extended) {
+    Index = AsciiSPrint (Buf, Size, "0x%08x   ", OpCode);
+    Buf += Index;
+    Size -= Index;
+  }
 
   // LDREX, STREX
   if ((OpCode  & 0x0fe000f0) == 0x01800090) {
