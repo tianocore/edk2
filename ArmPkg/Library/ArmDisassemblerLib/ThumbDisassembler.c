@@ -157,7 +157,7 @@ THUMB_INSTRUCTIONS gOpThumb2[] = {
   { "B",    0xf0009000, 0xf800d000, B_T4  },
   { "BL",   0xf000d000, 0xf800d000, B_T4  },
   { "BLX",  0xf000c000, 0xf800d000, BL_T2 }
-  
+  // ADD POP PUSH STR(B)(D) LDR(B)(D) EOR MOV ADDS SUBS STM
 #if 0  
   
   // 32-bit Thumb instructions  op1 01
@@ -444,9 +444,9 @@ DisassembleThumbInstruction (
   for (Index = 0; Index < sizeof (gOpThumb2)/sizeof (THUMB_INSTRUCTIONS); Index++) {
     if ((OpCode32 & gOpThumb2[Index].Mask) == gOpThumb2[Index].OpCode) {
       if (Extended) {
-        Offset = AsciiSPrint (Buf, Size, "0x%04x       %-6a", OpCode32, gOpThumb2[Index].Start);   
+        Offset = AsciiSPrint (Buf, Size, "0x%04x   %-6a", OpCode32, gOpThumb2[Index].Start);   
       } else {
-        Offset = AsciiSPrint (Buf, Size, "       %-6a", gOpThumb2[Index].Start);   
+        Offset = AsciiSPrint (Buf, Size, "   %-6a", gOpThumb2[Index].Start);   
       }
       switch (gOpThumb2[Index].AddressMode) {
       case B_T3:
@@ -455,36 +455,36 @@ DisassembleThumbInstruction (
         Buf[Offset-4] = *Cond;
         // S:J2:J1:imm6:imm11:0
         Target = ((OpCode32 << 1) & 0xffe) + ((OpCode32 >> 4) & 0x3f000);
-        Target |= (OpCode & BIT11) ? BIT18 : 0;  // J2
-        Target |= (OpCode & BIT13) ? BIT17 : 0;  // J1
-        Target |= (OpCode & BIT26) ? BIT19 : 0;  // S
-        Target = SignExtend32 (Target, BIT19);
-        AsciiSPrint (&Buf[Offset], Size - Offset, " 0x%08x", Target);   
+        Target |= ((OpCode32 & BIT11) == BIT11)? BIT19 : 0;  // J2
+        Target |= ((OpCode32 & BIT13) == BIT13)? BIT18 : 0;  // J1
+        Target |= ((OpCode32 & BIT26) == BIT26)? BIT20 : 0;  // S
+        Target = SignExtend32 (Target, BIT20);
+        AsciiSPrint (&Buf[Offset], Size - Offset, " 0x%08x", PC + 4 + Target);   
         return;
       case B_T4:
         // S:I1:I2:imm10:imm11:0
         Target = ((OpCode32 << 1) & 0xffe) + ((OpCode32 >> 4) & 0x3ff000);
-        S  = (OpCode & BIT26);
-        J1 = (OpCode & BIT13);
-        J2 = (OpCode & BIT11);
-        Target |= !(J2 ^ S) ? BIT21 : 0;  // I2
-        Target |= !(J1 ^ S) ? BIT22 : 0;  // I1
-        Target |= (OpCode & BIT26) ? BIT23 : 0;  // S
-        Target = SignExtend32 (Target, BIT23);
-        AsciiSPrint (&Buf[Offset], Size - Offset, " 0x%08x", Target);   
+        S  = (OpCode32 & BIT26) == BIT26;
+        J1 = (OpCode32 & BIT13) == BIT13;
+        J2 = (OpCode32 & BIT11) == BIT11;
+        Target |= (!(J2 ^ S) ? BIT22 : 0);  // I2
+        Target |= (!(J1 ^ S) ? BIT23 : 0);  // I1
+        Target |= (S ? BIT24 : 0);  // S
+        Target = SignExtend32 (Target, BIT24);
+        AsciiSPrint (&Buf[Offset], Size - Offset, " 0x%08x", PC + 4 + Target);   
         return;
 
       case BL_T2:
-        // S:I1:I2:imm10:imm11:0
+        // S:I1:I2:imm10:imm11:00
         Target = ((OpCode32 << 2) & 0x1ffc) + ((OpCode32 >> 3) & 0x7fe000);
-        S  = (OpCode & BIT26);
-        J1 = (OpCode & BIT13);
-        J2 = (OpCode & BIT11);
-        Target |= !(J2 ^ S) ? BIT22 : 0;  // I2
-        Target |= !(J1 ^ S) ? BIT23 : 0;  // I1
-        Target |= (OpCode & BIT26) ? BIT24 : 0;  // S
-        Target = SignExtend32 (Target, BIT24);
-        AsciiSPrint (&Buf[Offset], Size - Offset, " 0x%08x", Target);   
+        S  = (OpCode32 & BIT26) == BIT26;
+        J1 = (OpCode32 & BIT13) == BIT13;
+        J2 = (OpCode32 & BIT11) == BIT11;
+        Target |= (!(J2 ^ S) ? BIT23 : 0);  // I2
+        Target |= (!(J1 ^ S) ? BIT24 : 0);  // I1
+        Target |= (S ? BIT25 : 0);  // S
+        Target = SignExtend32 (Target, BIT25);
+        AsciiSPrint (&Buf[Offset], Size - Offset, " 0x%08x", PC + 4 + Target);   
         return;
       }
     }
