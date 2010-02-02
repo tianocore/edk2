@@ -66,7 +66,7 @@ READ_LOCK_STATUS   = TRUE
 INF  OvmfPkg/Sec/SecMain.inf
 
 FILE RAW = 1BA0062E-C779-4582-8566-336AE8F78F09 {
-    SECTION RAW = OvmfPkg/ResetVector/Bin/ResetVector.ia32.raw
+    SECTION RAW = UefiCpuPkg/ResetVector/Vtf0/Bin/ResetVector.ia32.raw
   }
 
 ################################################################################
