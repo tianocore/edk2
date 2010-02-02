@@ -8,7 +8,11 @@
   EFI Driver Model related protocols, manage Unicode string tables for UEFI Drivers, 
   and print messages on the console output and standard error devices.
 
-Copyright (c) 2006 - 2008, Intel Corporation<BR>
+  Note that a reserved macro named MDEPKG_NDEBUG is introduced for the intention
+  of size reduction when compiler optimization is disabled. If MDEPKG_NDEBUG is
+  defined, then debug and assert related macros wrapped by it are the NULL implementations.
+
+Copyright (c) 2006 - 2010, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -280,24 +284,30 @@ EfiInitializeLock (
 /**
   Macro that calls DebugAssert() if an EFI_LOCK structure is not in the locked state.
 
-  If the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of PcdDebugProperyMask is set, 
-  then this macro evaluates the EFI_LOCK structure specified by Lock.  If Lock 
-  is not in the locked state, then DebugAssert() is called passing in the source 
-  filename, source line number, and Lock.
+  If MDEPKG_NDEBUG is not defined and the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED 
+  bit of PcdDebugProperyMask is set, then this macro evaluates the EFI_LOCK 
+  structure specified by Lock.  If Lock is not in the locked state, then
+  DebugAssert() is called passing in the source filename, source line number, 
+  and Lock.
+
   If Lock is NULL, then ASSERT().
 
   @param  LockParameter  A pointer to the lock to acquire.
 
 **/
-#define ASSERT_LOCKED(LockParameter)                  \
-  do {                                                \
-    if (DebugAssertEnabled ()) {                      \
-      ASSERT (LockParameter != NULL);                 \
-      if ((LockParameter)->Lock != EfiLockAcquired) { \
-        _ASSERT (LockParameter not locked);           \
-      }                                               \
-    }                                                 \
-  } while (FALSE)
+#if !defined(MDEPKG_NDEBUG)       
+  #define ASSERT_LOCKED(LockParameter)                  \
+    do {                                                \
+      if (DebugAssertEnabled ()) {                      \
+        ASSERT (LockParameter != NULL);                 \
+        if ((LockParameter)->Lock != EfiLockAcquired) { \
+          _ASSERT (LockParameter not locked);           \
+        }                                               \
+      }                                                 \
+    } while (FALSE)
+#else
+  #define ASSERT_LOCKED(LockParameter)
+#endif
 
 
 /**
