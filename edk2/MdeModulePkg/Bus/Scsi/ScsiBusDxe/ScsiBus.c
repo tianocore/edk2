@@ -429,11 +429,14 @@ SCSIBusDriverBindingStart (
     // only scan the specified device by RemainingDevicePath
     //
     if (ScsiBusDev->ExtScsiSupport) {
-      ScsiBusDev->ExtScsiInterface->GetTargetLun (ScsiBusDev->ExtScsiInterface, RemainingDevicePath, &TargetId, &Lun);  
+      Status = ScsiBusDev->ExtScsiInterface->GetTargetLun (ScsiBusDev->ExtScsiInterface, RemainingDevicePath, &TargetId, &Lun);  
     } else {
-      ScsiBusDev->ScsiInterface->GetTargetLun (ScsiBusDev->ScsiInterface, RemainingDevicePath, &ScsiTargetId.ScsiId.Scsi, &Lun);
+      Status = ScsiBusDev->ScsiInterface->GetTargetLun (ScsiBusDev->ScsiInterface, RemainingDevicePath, &ScsiTargetId.ScsiId.Scsi, &Lun);
     }
 
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
   } else {
     //
     // If RemainingDevicePath is the End of Device Path Node,
