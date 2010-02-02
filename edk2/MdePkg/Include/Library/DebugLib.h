@@ -4,11 +4,11 @@
   The Debug library supports debug print and asserts based on a combination of macros and code.
   The debug library can be turned on and off so that the debug code does not increase the size of an image.
 
-  Note that a MDEPKG_NDEBUG macro is introduced to switch on/off debug and assert related macros.
-  1. If MDEPKG_NDEBUG is defined, then debug and assert related macros are NULL.
-  2. If MDEPKG_NDEBUG is not defined, then PcdDebugProperyMask is used to turn on/off these helper macros.
+  Note that a reserved macro named MDEPKG_NDEBUG is introduced for the intention
+  of size reduction when compiler optimization is disabled. If MDEPKG_NDEBUG is
+  defined, then debug and assert related macros wrapped by it are the NULL implementations.
 
-Copyright (c) 2006 - 2008, Intel Corporation<BR>
+Copyright (c) 2006 - 2010, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
