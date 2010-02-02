@@ -294,18 +294,25 @@ ExtractDisplayedHiiFormFromHiiHandle (
         OpCodeData = Package + Offset2;
 
         if (((EFI_IFR_OP_HEADER *) OpCodeData)->OpCode == EFI_IFR_FORM_SET_OP) {
-          //
-          // Find FormSet OpCode
-          //
-          ClassGuidNum = ((EFI_IFR_FORM_SET *) OpCodeData)->Flags;
-          ClassGuid = (EFI_GUID *) (VOID *)(OpCodeData + sizeof (EFI_IFR_FORM_SET));
-          while (ClassGuidNum-- > 0) {
-            if (CompareGuid (SetupClassGuid, ClassGuid)) {
-              CopyMem (FormSetTitle, &((EFI_IFR_FORM_SET *) OpCodeData)->FormSetTitle, sizeof (EFI_STRING_ID));
-              CopyMem (FormSetHelp, &((EFI_IFR_FORM_SET *) OpCodeData)->Help, sizeof (EFI_STRING_ID));
-              FreePool (HiiPackageList);
-              return TRUE;
+          if (((EFI_IFR_OP_HEADER *) OpCodeData)->Length > OFFSET_OF (EFI_IFR_FORM_SET, Flags)) {
+            //
+            // Find FormSet OpCode
+            //
+            ClassGuidNum = ((EFI_IFR_FORM_SET *) OpCodeData)->Flags;
+            ClassGuid = (EFI_GUID *) (VOID *)(OpCodeData + sizeof (EFI_IFR_FORM_SET));
+            while (ClassGuidNum-- > 0) {
+              if (CompareGuid (SetupClassGuid, ClassGuid)) {
+                CopyMem (FormSetTitle, &((EFI_IFR_FORM_SET *) OpCodeData)->FormSetTitle, sizeof (EFI_STRING_ID));
+                CopyMem (FormSetHelp, &((EFI_IFR_FORM_SET *) OpCodeData)->Help, sizeof (EFI_STRING_ID));
+                FreePool (HiiPackageList);
+                return TRUE;
+              }
             }
+           } else {
+             CopyMem (FormSetTitle, &((EFI_IFR_FORM_SET *) OpCodeData)->FormSetTitle, sizeof (EFI_STRING_ID));
+             CopyMem (FormSetHelp, &((EFI_IFR_FORM_SET *) OpCodeData)->Help, sizeof (EFI_STRING_ID));
+             FreePool (HiiPackageList);
+             return TRUE;
           }
         }
         
