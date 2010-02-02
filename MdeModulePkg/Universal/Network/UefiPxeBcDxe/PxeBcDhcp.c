@@ -1217,6 +1217,13 @@ PxeBcDiscvBootService (
     }
   }
 
+  if (TryIndex > PXEBC_BOOT_REQUEST_RETRIES) {
+    //
+    // No server response our PXE request
+    //
+    Status = EFI_TIMEOUT;
+  }
+
   if (!EFI_ERROR (Status)) {
     //
     // Find Pxe Reply

@@ -22,6 +22,7 @@
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = PxeBcDriverEntryPoint
+  UNLOAD_IMAGE                   = NetLibDefaultUnload
 
 #
 # The following information is for reference only and not required by the build tools.
