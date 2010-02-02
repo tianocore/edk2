@@ -2461,18 +2461,23 @@ GetIfrBinaryData (
             break;
           }
 
-          //
-          // Try to compare against formset class GUID
-          //
-          NumberOfClassGuid = (UINT8) (((EFI_IFR_FORM_SET *) OpCodeData)->Flags & 0x3);
-          ClassGuid         = (EFI_GUID *) (OpCodeData + sizeof (EFI_IFR_FORM_SET));
-          for (Index = 0; Index < NumberOfClassGuid; Index++) {
-            if (CompareGuid (ComparingGuid, ClassGuid + Index)) {
-              ClassGuidMatch = TRUE;
+          if (((EFI_IFR_OP_HEADER *) OpCodeData)->Length > OFFSET_OF (EFI_IFR_FORM_SET, Flags)) {
+            //
+            // Try to compare against formset class GUID
+            //
+            NumberOfClassGuid = (UINT8) (((EFI_IFR_FORM_SET *) OpCodeData)->Flags & 0x3);
+            ClassGuid         = (EFI_GUID *) (OpCodeData + sizeof (EFI_IFR_FORM_SET));
+            for (Index = 0; Index < NumberOfClassGuid; Index++) {
+              if (CompareGuid (ComparingGuid, ClassGuid + Index)) {
+                ClassGuidMatch = TRUE;
+                break;
+              }
+            }
+            if (ClassGuidMatch) {
               break;
             }
-          }
-          if (ClassGuidMatch) {
+          } else if (ComparingGuid == &gEfiHiiPlatformSetupFormsetGuid) {
+            ClassGuidMatch = TRUE;
             break;
           }
         }
