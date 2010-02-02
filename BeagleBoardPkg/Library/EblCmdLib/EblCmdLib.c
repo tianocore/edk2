@@ -47,7 +47,7 @@ EblDisassembler (
   IN CHAR8  **Argv
   )
 {
-  UINT8   *Ptr;
+  UINT8   *Ptr, *CurrentAddress;
   UINT32  Address;
   UINT32  Count;
   CHAR8   Buffer[80];
@@ -57,13 +57,15 @@ EblDisassembler (
   }
   
   Address = AsciiStrHexToUintn (Argv[1]);
-  Count   = (Argc > 2) ? (UINT32)AsciiStrHexToUintn (Argv[2]) : 10;
+  Count   = (Argc > 2) ? (UINT32)AsciiStrHexToUintn (Argv[2]) : 20;
 
   Ptr = (UINT8 *)(UINTN)Address;  
-  while (Count-- > 0) {
+  do {
+    CurrentAddress = Ptr;
     DisassembleInstruction (&Ptr, TRUE, TRUE, Buffer, sizeof (Buffer));
-    AsciiPrint ("0x%08x: %a", Address, Buffer);
-  }
+    AsciiPrint ("0x%08x: %a\n", CurrentAddress, Buffer);
+  } while (Count-- > 0);
+ 
 
   return EFI_SUCCESS;
 }
