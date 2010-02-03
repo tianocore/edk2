@@ -1,7 +1,7 @@
 /** @file
   Interface routine for Mtftp4.
   
-Copyright (c) 2006 - 2009, Intel Corporation<BR>
+Copyright (c) 2006 - 2010, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -776,6 +776,7 @@ EfiMtftp4ParseOptions (
   @retval EFI_TIMEOUT           No responses were received from the MTFTPv4 server.
   @retval EFI_TFTP_ERROR        An MTFTPv4 ERROR packet was received.
   @retval EFI_DEVICE_ERROR      An unexpected network error or system error occurred.
+  @retval EFI_NO_MEDIA          There was a media error.
 
 **/
 EFI_STATUS
@@ -971,7 +972,8 @@ EfiMtftp4ReadDirectory (
                                  in the Buffer.
   @retval EFI_TIMEOUT            No responses were received from the MTFTPv4 server.
   @retval EFI_DEVICE_ERROR       An unexpected network error or system error occurred.
-  
+  @retval EFI_NO_MEDIA           There was a media error.
+
 **/
 EFI_STATUS
 EFIAPI

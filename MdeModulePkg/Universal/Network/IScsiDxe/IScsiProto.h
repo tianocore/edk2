@@ -1,7 +1,7 @@
 /** @file
   The header file of iSCSI Protocol that defines many specific data structures.
 
-Copyright (c) 2004 - 2009, Intel Corporation.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -692,7 +692,9 @@ IScsiDestroyConnection (
 
   @retval EFI_SUCCESS          The iSCSI session login procedure finished.
   @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
+  @retval EFI_NO_MEDIA         There was a media error.
   @retval Others               Other errors as indicated.
+
 **/
 EFI_STATUS
 IScsiSessionLogin (

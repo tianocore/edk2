@@ -2585,6 +2585,7 @@ EfiPxeLoadFile (
   BOOLEAN                     NewMakeCallback;
   EFI_STATUS                  Status;
   UINT64                      TmpBufSize;
+  BOOLEAN                     MediaPresent;
 
   Private         = PXEBC_PRIVATE_DATA_FROM_LOADFILE (This);
   PxeBc           = &Private->PxeBc;
@@ -2601,6 +2602,15 @@ EfiPxeLoadFile (
   //
   if (!BootPolicy) {
     return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Check media status before PXE start
+  //
+  MediaPresent = TRUE;
+  NetLibDetectMedia (Private->Controller, &MediaPresent);
+  if (!MediaPresent) {
+    return EFI_NO_MEDIA;
   }
 
   Status = PxeBc->Start (PxeBc, FALSE);

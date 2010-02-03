@@ -1,7 +1,7 @@
 /** @file
   The implementation of iSCSI protocol based on RFC3720.
 
-Copyright (c) 2004 - 2009, Intel Corporation.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -276,7 +276,9 @@ IScsiDestroyConnection (
 
   @retval EFI_SUCCESS          The iSCSI session login procedure finished.
   @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
+  @retval EFI_NO_MEDIA         There was a media error.
   @retval Others               Other errors as indicated.
+
 **/
 EFI_STATUS
 IScsiSessionLogin (
@@ -287,8 +289,18 @@ IScsiSessionLogin (
   ISCSI_SESSION     *Session;
   ISCSI_CONNECTION  *Conn;
   EFI_TCP4_PROTOCOL *Tcp4;
+  BOOLEAN           MediaPresent;
 
   Session = &Private->Session;
+
+  //
+  // Check media status before session login
+  //
+  MediaPresent = TRUE;
+  NetLibDetectMedia (Private->Controller, &MediaPresent);
+  if (!MediaPresent) {
+    return EFI_NO_MEDIA;
+  }
 
   //
   // Create a connection for the session.

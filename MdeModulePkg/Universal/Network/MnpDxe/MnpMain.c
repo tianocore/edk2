@@ -1,7 +1,7 @@
 /** @file
   Implementation of Managed Network Protocol public services.
 
-Copyright (c) 2005 - 2009, Intel Corporation.<BR>
+Copyright (c) 2005 - 2010, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -52,6 +52,7 @@ MnpGetModeData (
   EFI_SIMPLE_NETWORK_PROTOCOL *Snp;
   EFI_TPL                     OldTpl;
   EFI_STATUS                  Status;
+  UINT32                      InterruptStatus;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -73,6 +74,12 @@ MnpGetModeData (
     // Copy the underlayer Snp mode data.
     //
     Snp = Instance->MnpServiceData->MnpDeviceData->Snp;
+
+    //
+    // Upon successful return of GetStatus(), the Snp->Mode->MediaPresent
+    // will be updated to reflect any change of media status
+    //
+    Snp->GetStatus (Snp, &InterruptStatus, NULL);
     CopyMem (SnpModeData, Snp->Mode, sizeof (*SnpModeData));
   }
 

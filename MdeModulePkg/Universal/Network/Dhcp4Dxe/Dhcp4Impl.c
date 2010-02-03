@@ -770,6 +770,7 @@ ON_EXIT:
   @retval EFI_ALREADY_STARTED   Some other EFI DHCPv4 Protocol instance already started the
                                 DHCP process.
   @retval EFI_DEVICE_ERROR      An unexpected system or network error occurred.
+  @retval EFI_NO_MEDIA          There was a media error.
 
 **/
 EFI_STATUS

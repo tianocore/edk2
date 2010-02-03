@@ -1,7 +1,7 @@
 /** @file
   Declaration of strctures and functions for MnpDxe driver.
 
-Copyright (c) 2005 - 2009, Intel Corporation.<BR>
+Copyright (c) 2005 - 2010, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -70,6 +70,7 @@ typedef struct {
   BOOLEAN                       EnableSystemPoll;
 
   EFI_EVENT                     TimeoutCheckTimer;
+  EFI_EVENT                     MediaDetectTimer;
 
   UINT32                        UnicastCount;
   UINT32                        BroadcastCount;
