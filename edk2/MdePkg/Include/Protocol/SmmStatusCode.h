@@ -3,7 +3,7 @@
 
   This protocol provides the basic status code services while in SMM. 
 
-  Copyright (c) 2009, Intel Corporation                                                         
+  Copyright (c) 2009 - 2010, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -17,8 +17,6 @@
 #ifndef _SMM_STATUS_CODE_H__
 #define _SMM_STATUS_CODE_H__
 
-#include <Uefi/UefiBaseType.h>
-#include <Pi/PiMultiPhase.h>
 
 #define EFI_SMM_STATUS_CODE_PROTOCOL_GUID \
   { \
