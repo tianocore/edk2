@@ -197,6 +197,7 @@ ShellLibConstructorWorker (
       mEfiShellInterface = NULL;
     }
   }
+
   //
   // only success getting 2 of either the old or new, but no 1/2 and 1/2
   //
@@ -246,7 +247,6 @@ ShellLibConstructor (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   ) {
-
 
   mEfiShellEnvironment2       = NULL;
   mEfiShellProtocol           = NULL;
@@ -1278,6 +1278,10 @@ InternalShellConvertFileListType (
     // allocate a new EFI_SHELL_FILE_INFO object
     //
     NewInfo               = AllocateZeroPool(sizeof(EFI_SHELL_FILE_INFO));
+    ASSERT(NewInfo != NULL);
+    if (NewInfo == NULL) {
+      break;
+    }
 
     //
     // copy the simple items
@@ -1498,6 +1502,10 @@ ShellFindFilePath (
     Size = StrSize(Path);
     Size += StrSize(FileName);
     TestPath = AllocateZeroPool(Size);
+    ASSERT(TestPath != NULL);
+    if (TestPath == NULL) {
+      return (NULL);
+    }
     StrCpy(TestPath, Path);
     StrCat(TestPath, FileName);
     Status = ShellOpenFileByName(TestPath, &Handle, EFI_FILE_MODE_READ, 0);
@@ -1567,6 +1575,7 @@ ShellFindFilePathEx (
   CONST CHAR16      *ExtensionWalker;
   UINTN             Size;
   CHAR16            *TempChar;
+  CHAR16            *TempChar2;
 
   ASSERT(FileName != NULL);
   if (FileExtension == NULL) {
@@ -1579,7 +1588,11 @@ ShellFindFilePathEx (
   Size =  StrSize(FileName);
   Size += StrSize(FileExtension);
   TestPath = AllocateZeroPool(Size);
-  for (ExtensionWalker = FileExtension ;  ; ExtensionWalker = StrStr(ExtensionWalker, L";") + 1 ){
+  ASSERT(TestPath != NULL);
+  if (TestPath == NULL) {
+    return (NULL);
+  }
+  for (ExtensionWalker = FileExtension, TempChar2 = (CHAR16*)FileExtension;  TempChar2 != NULL ; ExtensionWalker = TempChar2 + 1 ){
     StrCpy(TestPath, FileName);
     if (ExtensionWalker != NULL) {
       StrCat(TestPath, ExtensionWalker);
@@ -1592,12 +1605,7 @@ ShellFindFilePathEx (
     if (RetVal != NULL) {
       break;
     }
-    //
-    // Must be after first loop...
-    //
-    if (StrStr(ExtensionWalker, L";") == NULL) {
-      break;
-    }
+    TempChar2 = StrStr(ExtensionWalker, L";");
   }
   FreePool(TestPath);
   return (RetVal);
@@ -2804,13 +2812,185 @@ StrnCatGrow (
       NewSize += 2 * Count * sizeof(CHAR16);
     }
     *Destination = ReallocatePool(*CurrentSize, NewSize, *Destination);
+    ASSERT(*Destination != NULL);
     *CurrentSize = NewSize;
   } else {
     *Destination = AllocateZeroPool((Count+1)*sizeof(CHAR16));
+    ASSERT(*Destination != NULL);
   }
 
   //
   // Now use standard StrnCat on a big enough buffer
   //
+  if (*Destination == NULL) {
+    return (NULL);
+  }
   return StrnCat(*Destination, Source, Count);
 }
+
+/**
+  Prompt the user and return the resultant answer to the requestor.
+
+  This function will display the requested question on the shell prompt and then
+  wait for an apropriate answer to be input from the console.
+
+  if the SHELL_PROMPT_REQUEST_TYPE is SHELL_PROMPT_REQUEST_TYPE_YESNO, SHELL_PROMPT_REQUEST_TYPE_QUIT_CONTINUE
+  or SHELL_PROMPT_REQUEST_TYPE_YESNOCANCEL then *Response is of type SHELL_PROMPT_RESPONSE.
+
+  if the SHELL_PROMPT_REQUEST_TYPE is SHELL_PROMPT_REQUEST_TYPE_FREEFORM then *Response is of type
+  CHAR16*.
+
+  In either case *Response must be callee freed if Response was not NULL;
+
+  @param Type                     What type of question is asked.  This is used to filter the input
+                                  to prevent invalid answers to question.
+  @param Prompt                   Pointer to string prompt to use to request input.
+  @param Response                 Pointer to Response which will be populated upon return.
+
+  @retval EFI_SUCCESS             The operation was sucessful.
+  @retval EFI_UNSUPPORTED         The operation is not supported as requested.
+  @retval EFI_INVALID_PARAMETER   A parameter was invalid.
+  @return other                   The operation failed.
+**/
+EFI_STATUS
+EFIAPI
+ShellPromptForResponse (
+  IN SHELL_PROMPT_REQUEST_TYPE   Type,
+  IN CHAR16         *Prompt OPTIONAL,
+  IN OUT VOID       **Response OPTIONAL
+  )
+{
+  EFI_STATUS        Status;
+  EFI_INPUT_KEY     Key;
+  UINTN             EventIndex;
+  SHELL_PROMPT_RESPONSE          *Resp;
+
+  Status = EFI_SUCCESS;
+  Resp = (SHELL_PROMPT_RESPONSE*)AllocatePool(sizeof(SHELL_PROMPT_RESPONSE));
+
+  switch(Type) {
+    case SHELL_PROMPT_REQUEST_TYPE_QUIT_CONTINUE:
+      if (Prompt != NULL) {
+        ShellPrintEx(-1, -1, L"%s", Prompt);
+      }
+      //
+      // wait for valid response
+      //
+      gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &EventIndex);
+      Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+      ASSERT_EFI_ERROR(Status);
+      ShellPrintEx(-1, -1, L"%c", Key.UnicodeChar);
+      if (Key.UnicodeChar == L'Q' || Key.UnicodeChar ==L'q') {
+        *Resp = SHELL_PROMPT_RESPONSE_QUIT;
+      } else {
+        *Resp = SHELL_PROMPT_RESPONSE_CONTINUE;
+      }
+      break;
+    case SHELL_PROMPT_REQUEST_TYPE_YES_NO_ALL_CANCEL:
+       if (Prompt != NULL) {
+        ShellPrintEx(-1, -1, L"%s", Prompt);
+      }
+      //
+      // wait for valid response
+      //
+      *Resp = SHELL_PROMPT_RESPONSE_MAX;
+      while (*Resp == SHELL_PROMPT_RESPONSE_MAX) {
+        gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &EventIndex);
+        Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+        ASSERT_EFI_ERROR(Status);
+        ShellPrintEx(-1, -1, L"%c", Key.UnicodeChar);
+        switch (Key.UnicodeChar) {
+          case L'Y':
+          case L'y':
+            *Resp = SHELL_PROMPT_RESPONSE_YES;
+            break;
+          case L'N':
+          case L'n':
+            *Resp = SHELL_PROMPT_RESPONSE_NO;
+            break;
+          case L'A':
+          case L'a':
+            *Resp = SHELL_PROMPT_RESPONSE_ALL;
+            break;
+          case L'C':
+          case L'c':
+            *Resp = SHELL_PROMPT_RESPONSE_CANCEL;
+            break;
+        }
+      }
+      break;
+    case SHELL_PROMPT_REQUEST_TYPE_ENTER_TO_COMTINUE:
+    case SHELL_PROMPT_REQUEST_TYPE_ANYKEY_TO_COMTINUE:
+      if (Prompt != NULL) {
+        ShellPrintEx(-1, -1, L"%s", Prompt);
+      }
+      //
+      // wait for valid response
+      //
+      *Resp = SHELL_PROMPT_RESPONSE_MAX;
+      while (*Resp == SHELL_PROMPT_RESPONSE_MAX) {
+        gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &EventIndex);
+        if (Type == SHELL_PROMPT_REQUEST_TYPE_ENTER_TO_COMTINUE) {
+          Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+          ASSERT_EFI_ERROR(Status);
+          ShellPrintEx(-1, -1, L"%c", Key.UnicodeChar);
+          if (Key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
+            *Resp = SHELL_PROMPT_RESPONSE_CONTINUE;
+            break;
+          }
+        }
+        if (Type == SHELL_PROMPT_REQUEST_TYPE_ANYKEY_TO_COMTINUE) {
+          *Resp = SHELL_PROMPT_RESPONSE_CONTINUE;
+          break;
+        }
+      }
+      break;
+    ///@todo add more request types here!
+    default:
+      Status = EFI_UNSUPPORTED;
+  }
+
+  if (Response != NULL) {
+    *Response = Resp;
+  } else {
+    FreePool(Resp);
+  }
+
+  return (Status);
+}
+
+/**
+  Prompt the user and return the resultant answer to the requestor.
+
+  This function is the same as ShellPromptForResponse, except that the prompt is
+  automatically pulled from HII.
+
+  @param Type     What type of question is asked.  This is used to filter the input
+                  to prevent invalid answers to question.
+  @param Prompt   Pointer to string prompt to use to request input.
+  @param Response Pointer to Response which will be populated upon return.
+
+  @retval EFI_SUCCESS the operation was sucessful.
+  @return other       the operation failed.
+
+  @sa ShellPromptForResponse
+**/
+EFI_STATUS
+EFIAPI
+ShellPromptForResponseHii (
+  IN SHELL_PROMPT_REQUEST_TYPE         Type,
+  IN CONST EFI_STRING_ID  HiiFormatStringId,
+  IN CONST EFI_HANDLE     HiiFormatHandle,
+  IN OUT VOID             **Response
+  )
+{
+  CHAR16      *Prompt;
+  EFI_STATUS  Status;
+
+  Prompt = HiiGetString(HiiFormatHandle, HiiFormatStringId, NULL);
+  Status = ShellPromptForResponse(Type, Prompt, Response);
+  FreePool(Prompt);
+  return (Status);
+}
+
+
