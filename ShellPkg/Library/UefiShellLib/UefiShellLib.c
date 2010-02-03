@@ -142,7 +142,6 @@ ShellLibConstructorWorker (
   ) {
   EFI_STATUS Status;
 
-  ASSERT(PcdGet16 (PcdShellPrintBufferSize) < PcdGet32 (PcdMaximumUnicodeStringLength));
   mPostReplaceFormat = AllocateZeroPool (PcdGet16 (PcdShellPrintBufferSize));
   ASSERT (mPostReplaceFormat != NULL);
   mPostReplaceFormat2 = AllocateZeroPool (PcdGet16 (PcdShellPrintBufferSize));
