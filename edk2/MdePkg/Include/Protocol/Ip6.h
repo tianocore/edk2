@@ -538,6 +538,7 @@ typedef struct {
   ///   error occurred.
   /// - EFI_SECURITY_VIOLATION: The transmit or receive was 
   ///   failed because of an IPsec policy check.
+  /// - EFI_NO_MEDIA: There was a media error.
   ///
   EFI_STATUS              Status;
   union {

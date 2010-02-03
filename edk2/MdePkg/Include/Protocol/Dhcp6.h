@@ -2,7 +2,7 @@
   UEFI Dynamic Host Configuration Protocol 6 Definition, which is used to get IPv6
   addresses and other configuration parameters from DHCPv6 servers.
 
-  Copyright (c) 2008 - 2009, Intel Corporation                                                         
+  Copyright (c) 2008 - 2010, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -504,6 +504,7 @@ EFI_STATUS
   @retval EFI_NO_MAPPING        No IPv6 address has been bound to the configured IA after the 
                                 DHCPv6 S.A.R.R process.
   @retval EFI_ABORTED           The DHCPv6 S.A.R.R process aborted by user.
+  @retval EFI_NO_MEDIA          There was a media error.
 
 **/
 typedef 
