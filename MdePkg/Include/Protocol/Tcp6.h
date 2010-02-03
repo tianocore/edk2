@@ -4,7 +4,7 @@
   and destroy child of the driver to communicate with other host using TCP protocol.
   The EFI TCPv6 Protocol provides services to send and receive data stream.
 
-  Copyright (c) 2008 - 2009, Intel Corporation
+  Copyright (c) 2008 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -307,6 +307,7 @@ typedef struct {
   ///                           out and some other ICMP error is received.
   /// EFI_DEVICE_ERROR:         An unexpected system or network error occurred.
   /// EFI_SECURITY_VIOLATION:   The active open was failed because of IPSec policy check.
+  /// EFI_NO_MEDIA:             There was a media error.
   /// 
   EFI_TCP6_COMPLETION_TOKEN CompletionToken;
 } EFI_TCP6_CONNECTION_TOKEN;
@@ -435,6 +436,7 @@ typedef struct {
   /// EFI_DEVICE_ERROR:         An unexpected system or network error occurs.
   /// EFI_SECURITY_VIOLATION:   The receiving or transmission 
   ///                           operation was failed because of IPSec policy check
+  /// EFI_NO_MEDIA:             There was a media error.
   ///
   EFI_TCP6_COMPLETION_TOKEN CompletionToken;
   union {

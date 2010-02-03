@@ -3,7 +3,7 @@
   the EFI UDPv6 Protocol and provides basic services for client-side unicast and/or
   multicast TFTP operations.
 
-  Copyright (c) 2008 - 2009, Intel Corporation                                                         
+  Copyright (c) 2008 - 2010, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -576,6 +576,7 @@ EFI_STATUS
   @retval  EFI_PROTOCOL_ERROR       An unexpected MTFTPv6 packet was received and is in the Packet.
   @retval  EFI_TIMEOUT              No responses were received from the MTFTPv6 server.
   @retval  EFI_DEVICE_ERROR         An unexpected network error or system error occurred.
+  @retval  EFI_NO_MEDIA             There was a media error.
 
 **/
 typedef 
@@ -668,6 +669,7 @@ EFI_STATUS
   @retval  EFI_TIMEOUT              No responses were received from the MTFTPv6 server.
   @retval  EFI_TFTP_ERROR           An MTFTPv6 ERROR packet was received.
   @retval  EFI_DEVICE_ERROR         An unexpected network error or system error occurred.
+  @retval  EFI_NO_MEDIA             There was a media error.
 
 **/
 typedef 

@@ -4,7 +4,7 @@
   These protocols are used to collect configuration information for the EFI IPv4 Protocol
   drivers and to provide DHCPv4 server and PXE boot server discovery services.
 
-  Copyright (c) 2006 - 2009, Intel Corporation
+  Copyright (c) 2006 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -532,6 +532,7 @@ EFI_STATUS
   @retval EFI_ALREADY_STARTED   Some other EFI DHCPv4 Protocol instance already started the
                                 DHCP process.
   @retval EFI_DEVICE_ERROR      An unexpected system or network error occurred.
+  @retval EFI_NO_MEDIA          There was a media error.
 
 **/
 typedef

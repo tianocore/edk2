@@ -1,7 +1,7 @@
 /** @file
   EFI Multicast Trivial File Tranfer Protocol Definition
 
-  Copyright (c) 2006 - 2009, Intel Corporation                                                         
+  Copyright (c) 2006 - 2010, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -354,6 +354,7 @@ EFI_STATUS
                                    Note: It does not match UEFI 2.3 Specification.
   @retval EFI_TIMEOUT              No responses were received from the MTFTPv4 server.
   @retval EFI_DEVICE_ERROR         An unexpected network error or system error occurred.
+  @retval EFI_NO_MEDIA             There was a media error.
 
 **/
 typedef 
@@ -428,6 +429,7 @@ EFI_STATUS
   @retval EFI_TIMEOUT              No responses were received from the MTFTPv4 server.
   @retval EFI_TFTP_ERROR           An MTFTPv4 ERROR packet was received.
   @retval EFI_DEVICE_ERROR         An unexpected network error or system error occurred.
+  @retval EFI_NO_MEDIA             There was a media error.
 
 **/
 typedef 

@@ -3,7 +3,7 @@
   the EFI IPv6 Protocol and provides simple packet-oriented services to transmit and receive
   UDP packets.
 
-  Copyright (c) 2008 - 2009, Intel Corporation                                                         
+  Copyright (c) 2008 - 2010, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -276,6 +276,7 @@ typedef struct {
   ///     and the destination sent an ICMP source quench report. RxData is set to NULL in this situation.
   ///   - EFI_DEVICE_ERROR: An unexpected system or network error occurred.
   ///   - EFI_SECURITY_VIOLATION: The transmit or receive was failed because of IPsec policy check.
+  ///   - EFI_NO_MEDIA: There was a media error.
   ///
   EFI_STATUS                            Status;
   union {

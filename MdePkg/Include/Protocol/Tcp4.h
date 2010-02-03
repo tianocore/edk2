@@ -4,7 +4,7 @@
   and destroy child of the driver to communicate with other host using TCP protocol.
   The EFI TCPv4 Protocol provides services to send and receive data stream.
 
-  Copyright (c) 2006 - 2009, Intel Corporation
+  Copyright (c) 2006 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -143,6 +143,7 @@ typedef struct {
   /// EFI_ICMP_ERROR:           The connection establishment timer timeout and some other ICMP
   ///                           error is received.
   /// EFI_DEVICE_ERROR:         An unexpected system or network error occurred.
+  /// EFI_NO_MEDIA:             There was a media error.
   /// 
   EFI_TCP4_COMPLETION_TOKEN CompletionToken;
 } EFI_TCP4_CONNECTION_TOKEN;
