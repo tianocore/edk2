@@ -1,5 +1,12 @@
 /** @file
-  Default exception handler
+  Thumb Dissassembler. Still a work in progress.
+
+  Wrong output is a bug, so please fix it. 
+  Hex output means there is not yet an entry or a decode bug.
+  gOpThumb[] are Thumb 16-bit, and gOpThumb2[] work on the 32-bit 
+  16-bit stream of Thumb2 instruction. Then there are big case 
+  statements to print everything out. If you are adding instructions
+  try to reuse existing case entries if possible.
 
   Copyright (c) 2008-2010, Apple Inc. All rights reserved.
   
@@ -21,6 +28,7 @@ extern CHAR8 *gCondition[];
 
 extern CHAR8 *gReg[];
 
+// Thumb address modes
 #define LOAD_STORE_FORMAT1            1
 #define LOAD_STORE_FORMAT2            2
 #define LOAD_STORE_FORMAT3            3
@@ -44,10 +52,30 @@ extern CHAR8 *gReg[];
 #define DATA_FORMAT8                 19
 #define CPS_FORMAT                   20
 #define ENDIAN_FORMAT                21
-     
+#define DATA_CBZ                     22
+#define ADR_FORMAT                   23
+
+// Thumb2 address modes
 #define B_T3                        200
 #define B_T4                        201
 #define BL_T2                       202
+#define POP_T2                      203
+#define POP_T3                      204
+#define STM_FORMAT                  205
+#define LDM_REG_IMM12_SIGNED        206
+#define LDM_REG_IMM12_LSL           207
+#define LDM_REG_IMM8                208
+#define LDM_REG_IMM12               209
+#define LDM_REG_INDIRECT_LSL        210
+#define LDM_REG_IMM8_SIGNED         211
+#define LDRD_REG_IMM8               212
+#define LDREXB                      213
+#define LDREXD                      214
+#define SRS_FORMAT                  215
+#define RFE_FORMAT                  216
+#define LDRD_REG_IMM8_SIGNED        217
+
+
 
 
 typedef struct {
@@ -59,9 +87,9 @@ typedef struct {
 
 THUMB_INSTRUCTIONS gOpThumb[] = {
 // Thumb 16-bit instrucitons
-//         Op      Mask    Format
+//          Op       Mask   Format
   { "ADC" , 0x4140, 0xffc0, DATA_FORMAT5 },
-
+  { "ADR",  0xa000, 0xf800, ADR_FORMAT   },  // ADR <Rd>, <label>
   { "ADD" , 0x1c00, 0xfe00, DATA_FORMAT2 },
   { "ADD" , 0x3000, 0xf800, DATA_FORMAT3 },
   { "ADD" , 0x1800, 0xfe00, DATA_FORMAT1 },
@@ -82,6 +110,8 @@ THUMB_INSTRUCTIONS gOpThumb[] = {
 
   { "BIC" , 0x4380, 0xffc0, DATA_FORMAT5 },
   { "BKPT", 0xdf00, 0xff00, IMMED_8 },
+  { "CBZ",  0xb100, 0xfd00, DATA_CBZ },
+  { "CBNZ", 0xb900, 0xfd00, DATA_CBZ },
   { "CMN" , 0x42c0, 0xffc0, DATA_FORMAT5 },
 
   { "CMP" , 0x2800, 0xf800, DATA_FORMAT3 },
@@ -150,62 +180,87 @@ THUMB_INSTRUCTIONS gOpThumb[] = {
   { "TST" , 0x4200, 0xffc0, DATA_FORMAT5 },
   { "UXTB", 0xb2c0, 0xffc0, DATA_FORMAT5 },
   { "UXTH", 0xb280, 0xffc0, DATA_FORMAT5 }
+
 };
 
 THUMB_INSTRUCTIONS gOpThumb2[] = {
-  { "B",    0xf0008000, 0xf800d000, B_T3  },
-  { "B",    0xf0009000, 0xf800d000, B_T4  },
-  { "BL",   0xf000d000, 0xf800d000, B_T4  },
-  { "BLX",  0xf000c000, 0xf800d000, BL_T2 }
-  // ADD POP PUSH STR(B)(D) LDR(B)(D) EOR MOV ADDS SUBS STM
-#if 0  
+//Instruct  OpCode      OpCode Mask  Addressig Mode
+  { "B",    0xf0008000, 0xf800d000, B_T3  },             // B<c> <label>
+  { "B",    0xf0009000, 0xf800d000, B_T4  },             // B<c> <label>
+  { "BL",   0xf000d000, 0xf800d000, B_T4  },             // BL<c> <label>
+  { "BLX",  0xf000c000, 0xf800d000, BL_T2 },             // BLX<c> <label>
+
+  { "POP",   0xe8bd0000, 0xffff2000, POP_T2 },           // POP <registers>
+  { "POP",   0xf85d0b04, 0xffff0fff, POP_T3 },           // POP <register>
+  { "PUSH",  0xe8ad0000, 0xffffa000, POP_T2 },           // PUSH <registers>
+  { "PUSH",  0xf84d0d04, 0xffff0fff, POP_T3 },           // PUSH <register>
+  { "STM"  , 0xe8800000, 0xffd0a000,  STM_FORMAT },      // STM <Rn>{!},<registers>
+  { "STMDB", 0xe9800000, 0xffd0a000,  STM_FORMAT },      // STMDB <Rn>{!},<registers>
+  { "LDM"  , 0xe8900000, 0xffd02000,  STM_FORMAT },      // LDM <Rn>{!},<registers>
+  { "LDMDB", 0xe9100000, 0xffd02000,  STM_FORMAT },      // LDMDB <Rn>{!},<registers>
   
-  // 32-bit Thumb instructions  op1 01
+  { "LDR",   0xf8d00000, 0xfff00000,  LDM_REG_IMM12 },          // LDR   <rt>, [<rn>, {, #<imm12>]}
+  { "LDRB",  0xf8900000, 0xfff00000,  LDM_REG_IMM12 },          // LDRB  <rt>, [<rn>, {, #<imm12>]}
+  { "LDRH",  0xf8b00000, 0xfff00000,  LDM_REG_IMM12 },          // LDRH  <rt>, [<rn>, {, #<imm12>]}
+  { "LDRSB", 0xf9900000, 0xfff00000,  LDM_REG_IMM12 },          // LDRSB <rt>, [<rn>, {, #<imm12>]}
+  { "LDRSH", 0xf9b00000, 0xfff00000,  LDM_REG_IMM12 },          // LDRSH <rt>, [<rn>, {, #<imm12>]}
+
+  { "LDR",   0xf85f0000, 0xff7f0000,  LDM_REG_IMM12_SIGNED },   // LDR   <Rt>, <label> 
+  { "LDRB",  0xf81f0000, 0xff7f0000,  LDM_REG_IMM12_SIGNED },   // LDRB  <Rt>, <label> 
+  { "LDRH",  0xf83f0000, 0xff7f0000,  LDM_REG_IMM12_SIGNED },   // LDRH  <Rt>, <label> 
+  { "LDRSB", 0xf91f0000, 0xff7f0000,  LDM_REG_IMM12_SIGNED },   // LDRSB <Rt>, <label> 
+  { "LDRSH", 0xf93f0000, 0xff7f0000,  LDM_REG_IMM12_SIGNED },   // LDRSB <Rt>, <label> 
   
-  //  1110 100x x0xx xxxx xxxx xxxx xxxx xxxx Load/store multiple
+  { "LDR",   0xf8500000, 0xfff00fc0,  LDM_REG_INDIRECT_LSL },   // LDR   <rt>, [<rn>, <rm> {, LSL #<imm2>]}
+  { "LDRB",  0xf8100000, 0xfff00fc0,  LDM_REG_INDIRECT_LSL },   // LDRB  <rt>, [<rn>, <rm> {, LSL #<imm2>]}
+  { "LDRH",  0xf8300000, 0xfff00fc0,  LDM_REG_INDIRECT_LSL },   // LDRH  <rt>, [<rn>, <rm> {, LSL #<imm2>]}
+  { "LDRSB", 0xf9100000, 0xfff00fc0,  LDM_REG_INDIRECT_LSL },   // LDRSB <rt>, [<rn>, <rm> {, LSL #<imm2>]}
+  { "LDRSH", 0xf9300000, 0xfff00fc0,  LDM_REG_INDIRECT_LSL },   // LDRSH <rt>, [<rn>, <rm> {, LSL #<imm2>]}
+
+  { "LDR",   0xf8500800, 0xfff00800,  LDM_REG_IMM8 },           // LDR    <rt>, [<rn>, {, #<imm8>]}
+  { "LDRBT", 0xf8100e00, 0xfff00f00,  LDM_REG_IMM8 },           // LDRBT  <rt>, [<rn>, {, #<imm8>]}
+  { "LDRHT", 0xf8300e00, 0xfff00f00,  LDM_REG_IMM8 },           // LDRHT  <rt>, [<rn>, {, #<imm8>]}
+  { "LDRSB", 0xf9900800, 0xfff00800,  LDM_REG_IMM8 },           // LDRHT  <rt>, [<rn>, {, #<imm8>]}  {!} form? 
+  { "LDRSBT",0xf9100e00, 0xfff00f00,  LDM_REG_IMM8 },           // LDRHBT <rt>, [<rn>, {, #<imm8>]}  {!} form? 
+  { "LDRSH" ,0xf9300800, 0xfff00800,  LDM_REG_IMM8 },           // LDRSH  <rt>, [<rn>, {, #<imm8>]}  
+  { "LDRSHT",0xf9300e00, 0xfff00f00,  LDM_REG_IMM8 },           // LDRSHT <rt>, [<rn>, {, #<imm8>]}   
+  { "LDRT",  0xf8500e00, 0xfff00f00,  LDM_REG_IMM8 },           // LDRT   <rt>, [<rn>, {, #<imm8>]}    
+
+  { "LDRD",  0xe8500000, 0xfe500000,  LDRD_REG_IMM8_SIGNED },   // LDRD <rt>, <rt2>, [<rn>, {, #<imm8>]}{!}
+  { "LDRD",  0xe8500000, 0xfe500000,  LDRD_REG_IMM8       },    // LDRD <rt>, <rt2>, <label>
+   
+  { "LDREX",  0xe8500f00, 0xfff00f00,  LDM_REG_IMM8 },           // LDREX <Rt>, [Rn, {#imm8}]]                     
+  { "LDREXB", 0xe8d00f4f, 0xfff00fff,  LDREXB  },                // LDREXB <Rt>, [<Rn>]                     
+  { "LDREXH", 0xe8d00f5f, 0xfff00fff,  LDREXB  },                // LDREXH <Rt>, [<Rn>]                     
+ 
+  { "LDREXD", 0xe8d00f4f, 0xfff00fff,  LDREXD  },                // LDREXD <Rt>, <Rt2>, [<Rn>]                     
+
+  { "STR",   0xf8c00000, 0xfff00000,  LDM_REG_IMM12 },          // STR   <rt>, [<rn>, {, #<imm12>]}  
+  { "STRB",  0xf8800000, 0xfff00000,  LDM_REG_IMM12 },          // STRB  <rt>, [<rn>, {, #<imm12>]}
+  { "STRH",  0xf8a00000, 0xfff00000,  LDM_REG_IMM12 },          // STRH  <rt>, [<rn>, {, #<imm12>]}
+ 
+  { "STR",   0xf8400000, 0xfff00fc0,  LDM_REG_INDIRECT_LSL },   // STR   <rt>, [<rn>, <rm> {, LSL #<imm2>]}
+  { "STRB",  0xf8000000, 0xfff00fc0,  LDM_REG_INDIRECT_LSL },   // STRB  <rt>, [<rn>, <rm> {, LSL #<imm2>]}
+  { "STRH",  0xf8200000, 0xfff00fc0,  LDM_REG_INDIRECT_LSL },   // STRH  <rt>, [<rn>, <rm> {, LSL #<imm2>]}
+
+  { "STR",   0xf8400800, 0xfff00800,  LDM_REG_IMM8 },           // STR    <rt>, [<rn>, {, #<imm8>]}
+  { "STRH",  0xf8200800, 0xfff00800,  LDM_REG_IMM8 },           // STRH   <rt>, [<rn>, {, #<imm8>]}
+  { "STRBT", 0xf8000e00, 0xfff00f00,  LDM_REG_IMM8 },           // STRBT  <rt>, [<rn>, {, #<imm8>]}
+  { "STRHT", 0xf8200e00, 0xfff00f00,  LDM_REG_IMM8 },           // STRHT  <rt>, [<rn>, {, #<imm8>]}
+  { "STRT",  0xf8400e00, 0xfff00f00,  LDM_REG_IMM8 },           // STRT   <rt>, [<rn>, {, #<imm8>]}    
+
+  { "STRD",  0xe8400000, 0xfe500000,  LDRD_REG_IMM8_SIGNED },    // STRD <rt>, <rt2>, [<rn>, {, #<imm8>]}{!}
+
+  { "STREX",  0xe8400f00, 0xfff00f00,  LDM_REG_IMM8 },           // STREX <Rt>, [Rn, {#imm8}]]                     
+  { "STREXB", 0xe8c00f4f, 0xfff00fff,  LDREXB  },                // STREXB <Rd>, <Rt>, [<Rn>]                     
+  { "STREXH", 0xe8c00f5f, 0xfff00fff,  LDREXB  },                // STREXH <Rd>, <Rt>, [<Rn>]                     
+ 
+  { "STREXD", 0xe8d00f4f, 0xfff00fff,  LDREXD  },                // STREXD <Rd>, <Rt>, <Rt2>, [<Rn>]                     
+
   { "SRSDB", 0xe80dc000, 0xffdffff0, SRS_FORMAT },       // SRSDB<c> SP{!},#<mode>
-  { "SRS"  , 0xe98dc000, 0xffdffff0, SRS_IA_FORMAT },    // SRS{IA}<c> SP{!},#<mode>
+  { "SRS"  , 0xe98dc000, 0xffdffff0, SRS_FORMAT },       // SRS{IA}<c> SP{!},#<mode>
   { "RFEDB", 0xe810c000, 0xffd0ffff, RFE_FORMAT },       // RFEDB<c> <Rn>{!}
-  { "RFE"  , 0xe990c000, 0xffd0ffff, RFE_IA_FORMAT },    // RFE{IA}<c> <Rn>{!}
-  
-  { "STM"  , 0xe8800000, 0xffd00000,  STM_FORMAT },      // STM<c>.W <Rn>{!},<registers>
-  { "LDM"  , 0xe8900000, 0xffd00000,  STM_FORMAT },      // LDR<c>.W <Rt>,[<Rn>,<Rm>{,LSL #<imm2>}]
-  { "POP"  , 0xe8bd0000, 0xffff2000,  REGLIST_FORMAT },  // POP<c>.W <registers> >1 register
-  { "POP"  , 0xf85d0b04, 0xffff0fff,  RT_FORMAT },       // POP<c>.W <registers>  1 register
-
-  { "STMDB", 0xe9000000, 0xffd00000,  STM_FORMAT },      // STMDB
-  { "PUSH" , 0xe8bd0000, 0xffffa000,  REGLIST_FORMAT },  // PUSH<c>.W <registers>  >1 register
-  { "PUSH" , 0xf84d0b04, 0xffff0fff,  RT_FORMAT },       // PUSH<c>.W <registers>   1 register
-  { "LDMDB", 0xe9102000, 0xffd02000,  STM_FORMAT },      // LDMDB<c> <Rn>{!},<registers>
-
-  //  1110 100x x1xx xxxx xxxx xxxx xxxx xxxx Load/store dual,
-  { "STREX" , 0xe0400000, 0xfff000f0, 3REG_IMM8_FORMAT },  // STREX<c> <Rd>,<Rt>,[<Rn>{,#<imm>}]
-  { "STREXB", 0xe8c00f40, 0xfff00ff0, 3REG_FORMAT },       // STREXB<c> <Rd>,<Rt>,[<Rn>]
-  { "STREXD", 0xe8c00070, 0xfff000f0, 4REG_FORMAT },       // STREXD<c> <Rd>,<Rt>,<Rt2>,[<Rn>]
-  { "STREXH", 0xe8c00f70, 0xfff00ff0, 3REG_FORMAT },       // STREXH<c> <Rd>,<Rt>,[<Rn>]
-  { "STRH",   0xf8c00000, 0xfff00000, 2REG_IMM8_FORMAT },  // STRH<c>.W <Rt>,[<Rn>{,#<imm12>}]
-  { "STRH",   0xf8200000, 0xfff00000,  },                  // STRH<c>.W <Rt>,[<Rn>,<Rm>{,LSL #<imm2>}]
-
-
-
-  //  1110 101x xxxx xxxx xxxx xxxx xxxx xxxx Data-processing
-  //  1110 11xx xxxx xxxx xxxx xxxx xxxx xxxx Coprocessor
-  
-  //  1111 0x0x xxxx xxxx 0xxx xxxx xxxx xxxx Data-processing modified immediate
-  //  1111 0x1x xxxx xxxx 0xxx xxxx xxxx xxxx Data-processing plain immediate
-  //  1111 0xxx xxxx xxxx 1xxx xxxx xxxx xxxx Branches
-  
-  //  1111 1000 xxx0 xxxx xxxx xxxx xxxx xxxx Store single data item
-  //  1111 1001 xxx0 xxxx xxxx xxxx xxxx xxxx SIMD or load/store
-  //  1111 100x x001 xxxx xxxx xxxx xxxx xxxx Load byte, memory hints 
-  //  1111 100x x011 xxxx xxxx xxxx xxxx xxxx Load halfword, memory hints
-  //  1111 100x x101 xxxx xxxx xxxx xxxx xxxx Load word 
-
-  //  1111 1 010 xxxx xxxx xxxx xxxx xxxx xxxx Data-processing register
-  //  1111 1 011 0xxx xxxx xxxx xxxx xxxx xxxx Multiply
-  //  1111 1 011 1xxx xxxx xxxx xxxx xxxx xxxx Long Multiply
-  //  1111 1 1xx xxxx xxxx xxxx xxxx xxxx xxxx Coprocessor 
-#endif
+  { "RFE"  , 0xe990c000, 0xffd0ffff, RFE_FORMAT }        // RFE{IA}<c> <Rn>{!}
 };
 
 CHAR8 mThumbMregListStr[4*15 + 1];
@@ -298,11 +353,11 @@ DisassembleThumbInstruction (
   UINT32  OpCode32;
   UINT32  Index;
   UINT32  Offset;
-  UINT16  Rd, Rn, Rm;
+  UINT16  Rd, Rn, Rm, Rt, Rt2;
   BOOLEAN H1, H2, imod;
   UINT32  PC, Target;
   CHAR8   *Cond;
-  BOOLEAN S, J1, J2;
+  BOOLEAN S, J1, J2, P, U, W;
 
   OpCodePtr = *OpCodePtrPtr;
   OpCode = **OpCodePtrPtr;
@@ -341,12 +396,12 @@ DisassembleThumbInstruction (
       case LOAD_STORE_FORMAT3:
         // A6.5.1 <Rd>, [PC, #<8_bit_offset>]
         Target = (OpCode & 0xff) << 2;
-        AsciiSPrint (&Buf[Offset], Size - Offset, " r%d, [pc, #0x%x] ;0x%08x", (OpCode >> 8) & 7, Target, PC + 4 + Target);   
+        AsciiSPrint (&Buf[Offset], Size - Offset, " r%d, [pc, #0x%x] ;0x%08x", (OpCode >> 8) & 7, Target, PC + 2 + Target);   
         return;
       case LOAD_STORE_FORMAT4:
         // Rt, [SP, #imm8]
         Target = (OpCode & 0xff) << 2;
-        AsciiSPrint (&Buf[Offset], Size - Offset, " r%d, [sp, #0x%x]", (OpCode >> 8) & 7, Target, PC + 3 + Target);   
+        AsciiSPrint (&Buf[Offset], Size - Offset, " r%d, [sp, #0x%x]", (OpCode >> 8) & 7, Target, PC + 2 + Target);   
         return;
       
       case LOAD_STORE_MULTIPLE_FORMAT1:
@@ -434,6 +489,18 @@ DisassembleThumbInstruction (
         // A7.1.24
         AsciiSPrint (&Buf[Offset], Size - Offset, " %a", (OpCode & BIT3) == 0 ? "LE":"BE");   
         return;
+
+      case DATA_CBZ:
+        // CB{N}Z <Rn>, <Lable>
+        Target = ((OpCode >> 2) & 0x3e) | (((OpCode & BIT9) == BIT9) ? BIT6 : 0);
+        AsciiSPrint (&Buf[Offset], Size - Offset, " %a, %08x", gReg[Rd], PC + 4 + Target); 
+        return;
+
+      case ADR_FORMAT:
+        // ADR <Rd>, <Label>
+        Target = (OpCode & 0xff) << 2;
+        AsciiSPrint (&Buf[Offset], Size - Offset, " %a, %08x", gReg[(OpCode >> 8) & 7], PC + 4 + Target); 
+        return;
       }
     }
   }
@@ -441,6 +508,10 @@ DisassembleThumbInstruction (
   
   // Thumb2 are 32-bit instructions
   *OpCodePtrPtr += 1;
+  Rt  = (OpCode32 >> 12) & 0xf;
+  Rt2 = (OpCode32 >> 8) & 0xf;
+  Rm  = (OpCode32 & 0xf);
+  Rn  = (OpCode32 >> 16) & 0xf;
   for (Index = 0; Index < sizeof (gOpThumb2)/sizeof (THUMB_INSTRUCTIONS); Index++) {
     if ((OpCode32 & gOpThumb2[Index].Mask) == gOpThumb2[Index].OpCode) {
       if (Extended) {
@@ -486,6 +557,120 @@ DisassembleThumbInstruction (
         Target = SignExtend32 (Target, BIT25);
         AsciiSPrint (&Buf[Offset], Size - Offset, " 0x%08x", PC + 4 + Target);   
         return;
+
+      case POP_T2:
+        // <reglist>  some must be zero, handled in table
+        AsciiSPrint (&Buf[Offset], Size - Offset, " %a", ThumbMRegList (OpCode32 & 0xffff));
+        return;
+
+      case POP_T3:
+        // <register> 
+        AsciiSPrint (&Buf[Offset], Size - Offset, " %a", gReg[(OpCode32 >> 12) & 0xf]);
+        return;
+
+      case STM_FORMAT:
+        // <Rn>{!}, <registers>
+        W = (OpCode32 & BIT21) == BIT21;
+        AsciiSPrint (&Buf[Offset], Size - Offset, " %a %a", gReg[(OpCode32 >> 16) & 0xf], W ? "!":"", ThumbMRegList (OpCode32 & 0xffff));
+        return;
+
+      case LDM_REG_IMM12_SIGNED:
+        // <rt>, <label>
+        Target = OpCode32 & 0xfff; 
+        if ((OpCode32 & BIT23) == 0) {
+          // U == 0 means subtrack, U == 1 means add
+          Target = -Target;
+        }
+        AsciiSPrint (&Buf[Offset], Size - Offset, " %a, %a", gReg[(OpCode32 >> 12) & 0xf], PC + 4 + Target);
+        return;
+
+      case LDM_REG_INDIRECT_LSL:
+        // <rt>, [<rn>, <rm> {, LSL #<imm2>]}
+        Offset += AsciiSPrint (&Buf[Offset], Size - Offset, " %a, [%a, %a", gReg[Rt], gReg[Rn], gReg[Rm]);
+        if (((OpCode32 >> 4) && 3) == 0) {
+          AsciiSPrint (&Buf[Offset], Size - Offset, "]");
+        } else {
+          AsciiSPrint (&Buf[Offset], Size - Offset, ", LSL #%d]", (OpCode32 >> 4) && 3);
+        }
+        return;
+      
+      case LDM_REG_IMM12:
+        // <rt>, [<rn>, {, #<imm12>]}
+        Offset += AsciiSPrint (&Buf[Offset], Size - Offset, " %a, [%a", gReg[Rt], gReg[Rn]);
+        if ((OpCode32 && 0xfff) == 0) {
+          AsciiSPrint (&Buf[Offset], Size - Offset, "]");
+        } else {
+          AsciiSPrint (&Buf[Offset], Size - Offset, ", #0x%x]", OpCode32 & 0xfff);
+        }
+        return;
+
+      case LDM_REG_IMM8:
+        // <rt>, [<rn>, {, #<imm8>}]{!}
+        W = (OpCode32 & BIT8) == BIT8;
+        U = (OpCode32 & BIT9) == BIT9;
+        P = (OpCode32 & BIT10) == BIT10;
+        Offset += AsciiSPrint (&Buf[Offset], Size - Offset, " %a, [%a", gReg[Rt], gReg[Rn]);
+        if (P) {
+          if ((OpCode32 && 0xff) == 0) {
+            AsciiSPrint (&Buf[Offset], Size - Offset, "]%a", W?"!":"");
+          } else {
+            AsciiSPrint (&Buf[Offset], Size - Offset, ", #%a0x%x]%a", OpCode32 & 0xff, U?"":"-" ,W?"!":"");
+          }
+        } else {
+          AsciiSPrint (&Buf[Offset], Size - Offset, "], #%a0x%x]%a", OpCode32 & 0xff, U?"":"-");
+        }
+        return;
+
+      case LDRD_REG_IMM8_SIGNED:
+        // LDRD <rt>, <rt2>, [<rn>, {, #<imm8>]}{!}
+        P = (OpCode32 & BIT24) == BIT24;  // index = P
+        U = (OpCode32 & BIT23) == BIT23;  
+        W = (OpCode32 & BIT21) == BIT21;
+        Offset += AsciiSPrint (&Buf[Offset], Size - Offset, " %a, %a, [%a", gReg[Rt], gReg[Rt2], gReg[Rn]);
+        if (P) {
+          if ((OpCode32 && 0xff) == 0) {
+            AsciiSPrint (&Buf[Offset], Size - Offset, "]");
+          } else {
+            AsciiSPrint (&Buf[Offset], Size - Offset, ", #%a0x%x]%a", U?"":"-", (OpCode32 & 0xff) << 2, W?"!":"");
+          }
+        } else {
+          if ((OpCode32 && 0xff) != 0) {
+            AsciiSPrint (&Buf[Offset], Size - Offset, ", #%a0x%x", U?"":"-", (OpCode32 & 0xff) << 2);
+          }
+        }
+        return;
+
+      case LDRD_REG_IMM8: 
+        // LDRD <rt>, <rt2>, <label>   
+        Target = (OpCode32 & 0xff) << 2; 
+        if ((OpCode32 & BIT23) == 0) {
+          // U == 0 means subtrack, U == 1 means add
+          Target = -Target;
+        }
+        AsciiSPrint (&Buf[Offset], Size - Offset, " %a, %a, %a", gReg[Rt], gReg[Rt2], PC + 4 + Target);
+        return;
+
+      case LDREXB:
+        // LDREXB <Rt>, [Rn]
+        AsciiSPrint (&Buf[Offset], Size - Offset, " %a, [%a]", gReg[Rt], gReg[Rn]);
+        return;
+
+      case LDREXD:
+        // LDREXD <Rt>, <Rt2>, [<Rn>]
+        AsciiSPrint (&Buf[Offset], Size - Offset, " %a, ,%a, [%a]", gReg[Rt], gReg[Rt2], gReg[Rn]);
+        return;
+      
+      case SRS_FORMAT:
+        // SP{!}, #<mode>
+        W = (OpCode32 & BIT21) == BIT21;
+        AsciiSPrint (&Buf[Offset], Size - Offset, " SP%a, #0x%x", W?"!":"", OpCode32 & 0x1f);
+        return;
+
+      case RFE_FORMAT:
+        // <Rn>{!}
+        AsciiSPrint (&Buf[Offset], Size - Offset, " %a%a, #0x%x", gReg[Rn], W?"!":"");
+        return;
+
       }
     }
   }
