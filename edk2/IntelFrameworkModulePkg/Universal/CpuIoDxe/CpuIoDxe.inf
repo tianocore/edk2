@@ -27,6 +27,7 @@
 
 [Sources]
   CpuIo.c
+  CpuIo.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -40,7 +41,7 @@
   UefiBootServicesTableLib
 
 [Protocols]
-  gEfiCpuIoProtocolGuid                         # PROTOCOL SOMETIMES_PRODUCED
+  gEfiCpuIoProtocolGuid                         ## PRODUCES
 
 [Depex]
   TRUE
