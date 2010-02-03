@@ -1085,4 +1085,89 @@ ShellIsHexaDecimalDigitCharacter (
   IN      CHAR16                    Char
   );
 
+///
+/// What type of answer is requested
+///
+typedef enum {
+  SHELL_PROMPT_REQUEST_TYPE_YES_NO,
+  SHELL_PROMPT_REQUEST_TYPE_YES_NO_CANCEL,
+  SHELL_PROMPT_REQUEST_TYPE_FREEFORM,
+  SHELL_PROMPT_REQUEST_TYPE_QUIT_CONTINUE,
+  SHELL_PROMPT_REQUEST_TYPE_YES_NO_ALL_CANCEL,
+  SHELL_PROMPT_REQUEST_TYPE_ENTER_TO_COMTINUE,
+  SHELL_PROMPT_REQUEST_TYPE_ANYKEY_TO_COMTINUE,
+  SHELL_PROMPT_REQUEST_TYPE_MAX
+} SHELL_PROMPT_REQUEST_TYPE;
+
+///
+/// what answer was given
+///
+typedef enum {
+  SHELL_PROMPT_RESPONSE_YES,
+  SHELL_PROMPT_RESPONSE_NO,
+  SHELL_PROMPT_RESPONSE_CANCEL,
+  SHELL_PROMPT_RESPONSE_QUIT,
+  SHELL_PROMPT_RESPONSE_CONTINUE,
+  SHELL_PROMPT_RESPONSE_ALL,
+  SHELL_PROMPT_RESPONSE_MAX
+} SHELL_PROMPT_RESPONSE;
+
+/**
+  Prompt the user and return the resultant answer to the requestor.
+
+  This function will display the requested question on the shell prompt and then
+  wait for an apropriate answer to be input from the console.
+
+  if the SHELL_PROMPT_REQUEST_TYPE is SHELL_PROMPT_REQUEST_TYPE_YESNO, SHELL_PROMPT_REQUEST_TYPE_QUIT_CONTINUE
+  or SHELL_PROMPT_REQUEST_TYPE_YESNOCANCEL then *Response is of type SHELL_PROMPT_RESPONSE.
+
+  if the SHELL_PROMPT_REQUEST_TYPE is SHELL_PROMPT_REQUEST_TYPE_FREEFORM then *Response is of type
+  CHAR16*.
+
+  In either case *Response must be callee freed if Response was not NULL;
+
+  @param Type                     What type of question is asked.  This is used to filter the input
+                                  to prevent invalid answers to question.
+  @param Prompt                   Pointer to string prompt to use to request input.
+  @param Response                 Pointer to Response which will be populated upon return.
+
+  @retval EFI_SUCCESS             The operation was sucessful.
+  @retval EFI_UNSUPPORTED         The operation is not supported as requested.
+  @retval EFI_INVALID_PARAMETER   A parameter was invalid.
+  @return other                   The operation failed.
+**/
+EFI_STATUS
+EFIAPI
+ShellPromptForResponse (
+  IN SHELL_PROMPT_REQUEST_TYPE   Type,
+  IN CHAR16         *Prompt OPTIONAL,
+  IN OUT VOID       **Response OPTIONAL
+  );
+
+/**
+  Prompt the user and return the resultant answer to the requestor.
+
+  This function is the same as ShellPromptForResponse, except that the prompt is
+  automatically pulled from HII.
+
+  @param Type     What type of question is asked.  This is used to filter the input
+                  to prevent invalid answers to question.
+  @param Prompt   Pointer to string prompt to use to request input.
+  @param Response Pointer to Response which will be populated upon return.
+
+  @retval EFI_SUCCESS the operation was sucessful.
+  @return other       the operation failed.
+
+  @sa ShellPromptForResponse
+**/
+EFI_STATUS
+EFIAPI
+ShellPromptForResponseHii (
+  IN SHELL_PROMPT_REQUEST_TYPE         Type,
+  IN CONST EFI_STRING_ID  HiiFormatStringId,
+  IN CONST EFI_HANDLE     HiiFormatHandle,
+  IN OUT VOID             **Response
+  );
+
+
 #endif // __SHELL_LIB__
