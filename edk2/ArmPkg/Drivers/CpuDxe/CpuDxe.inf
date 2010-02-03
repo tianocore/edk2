@@ -57,6 +57,7 @@
   UefiLib
   CpuLib
   DefaultExceptioHandlerLib
+  DebugLib
 
 [Protocols]
   gEfiCpuArchProtocolGuid

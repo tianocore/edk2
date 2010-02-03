@@ -22,6 +22,7 @@
 
 #include <Base.h>
 #include <Library/BaseLib.h>
+#include <Library/DebugLib.h>
 #include <Library/PrintLib.h>
 
 extern CHAR8 *gCondition[];
@@ -30,6 +31,8 @@ extern CHAR8 *gReg[];
 
 // Thumb address modes
 #define LOAD_STORE_FORMAT1            1
+#define LOAD_STORE_FORMAT1_H        101
+#define LOAD_STORE_FORMAT1_B        111 
 #define LOAD_STORE_FORMAT2            2
 #define LOAD_STORE_FORMAT3            3
 #define LOAD_STORE_FORMAT4            4
@@ -74,9 +77,10 @@ extern CHAR8 *gReg[];
 #define SRS_FORMAT                  215
 #define RFE_FORMAT                  216
 #define LDRD_REG_IMM8_SIGNED        217
-
-
-
+#define ADD_IMM12                   218
+#define ADD_IMM5                    219
+#define ADR_THUMB2                  220
+#define CMN_THUMB2                  221
 
 typedef struct {
   CHAR8   *Start;
@@ -127,9 +131,9 @@ THUMB_INSTRUCTIONS gOpThumb[] = {
   { "LDR"   , 0x5800, 0xfe00, LOAD_STORE_FORMAT2 },
   { "LDR"   , 0x4800, 0xf800, LOAD_STORE_FORMAT3 },
   { "LDR"   , 0x9800, 0xf800, LOAD_STORE_FORMAT4 },
-  { "LDRB"  , 0x7800, 0xf800, LOAD_STORE_FORMAT1 },
+  { "LDRB"  , 0x7800, 0xf800, LOAD_STORE_FORMAT1_B },
   { "LDRB"  , 0x5c00, 0xfe00, LOAD_STORE_FORMAT2 },
-  { "LDRH"  , 0x8800, 0xf800, LOAD_STORE_FORMAT1 },
+  { "LDRH"  , 0x8800, 0xf800, LOAD_STORE_FORMAT1_H },
   { "LDRH"  , 0x7a00, 0xfe00, LOAD_STORE_FORMAT2 },
   { "LDRSB" , 0x5600, 0xfe00, LOAD_STORE_FORMAT2 },
   { "LDRSH" , 0x5e00, 0xfe00, LOAD_STORE_FORMAT2 },
@@ -164,9 +168,9 @@ THUMB_INSTRUCTIONS gOpThumb[] = {
   { "STR"   , 0x5000, 0xfe00, LOAD_STORE_FORMAT2 },
   { "STR"   , 0x4000, 0xf800, LOAD_STORE_FORMAT3 },
   { "STR"   , 0x9000, 0xf800, LOAD_STORE_FORMAT4 },
-  { "STRB"  , 0x7000, 0xf800, LOAD_STORE_FORMAT1 },
+  { "STRB"  , 0x7000, 0xf800, LOAD_STORE_FORMAT1_B },
   { "STRB"  , 0x5800, 0xfe00, LOAD_STORE_FORMAT2 },
-  { "STRH"  , 0x8000, 0xf800, LOAD_STORE_FORMAT1 },
+  { "STRH"  , 0x8000, 0xf800, LOAD_STORE_FORMAT1_H },
   { "STRH"  , 0x5200, 0xfe00, LOAD_STORE_FORMAT2 },
 
   { "SUB" , 0x1e00, 0xfe00, DATA_FORMAT2 },
@@ -185,6 +189,32 @@ THUMB_INSTRUCTIONS gOpThumb[] = {
 
 THUMB_INSTRUCTIONS gOpThumb2[] = {
 //Instruct  OpCode      OpCode Mask  Addressig Mode
+  
+  { "ADR", 0xf2af0000, 0xfbff8000, ADR_THUMB2 },  // ADDR <Rd>, <label> ;Needs to go before ADDW 
+  { "CMN", 0xf1100f00, 0xfff08f00, CMN_THUMB2 },  // CMN <Rn>, <Rm>, {,<shift> #<const>} ;Needs to go before ADD
+
+  { "ADC",  0xf1400000, 0xfbe08000, ADD_IMM12 }, // ADC{S}  <Rd>, <Rn>, #<const>
+  { "ADC",  0xeb400000, 0xffe08000, ADD_IMM5  }, // ADC{S}  <Rd>, <Rn>, <Rm> {,<shift> #<const>}
+  { "ADD",  0xf1000000, 0xfbe08000, ADD_IMM12 }, // ADD{S}  <Rd>, <Rn>, #<const>
+  { "ADD",  0xeb000000, 0xffe08000, ADD_IMM5  }, // ADD{S}  <Rd>, <Rn>, <Rm> {,<shift> #<const>}
+  { "ADDW", 0xf2000000, 0xfbe08000, ADD_IMM12 }, // ADDW{S} <Rd>, <Rn>, #<const>
+  { "AND",  0xf0000000, 0xfbe08000, ADD_IMM12 }, // AND{S}  <Rd>, <Rn>, #<const>
+  { "AND",  0xea000000, 0xffe08000, ADD_IMM5  }, // AND{S}  <Rd>, <Rn>, <Rm> {,<shift> #<const>}
+  { "BIC",  0xf0200000, 0xfbe08000, ADD_IMM12 }, // BIC{S}  <Rd>, <Rn>, #<const>
+  { "BIC",  0xea200000, 0xffe08000, ADD_IMM5  }, // BIC{S}  <Rd>, <Rn>, <Rm> {,<shift> #<const>}
+  { "EOR",  0xf0800000, 0xfbe08000, ADD_IMM12 }, // EOR{S}  <Rd>, <Rn>, #<const>
+  { "EOR",  0xea800000, 0xffe08000, ADD_IMM5  }, // EOR{S}  <Rd>, <Rn>, <Rm> {,<shift> #<const>}
+  { "ORN",  0xf0600000, 0xfbe08000, ADD_IMM12 }, // ORN{S}  <Rd>, <Rn>, #<const>
+  { "ORN",  0xea600000, 0xffe08000, ADD_IMM5  }, // ORN{S}  <Rd>, <Rn>, <Rm> {,<shift> #<const>}
+  { "ORR",  0xf0400000, 0xfbe08000, ADD_IMM12 }, // ORR{S}  <Rd>, <Rn>, #<const>
+  { "ORR",  0xea400000, 0xffe08000, ADD_IMM5  }, // ORR{S}  <Rd>, <Rn>, <Rm> {,<shift> #<const>}
+  { "RSB",  0xf1c00000, 0xfbe08000, ADD_IMM12 }, // RSB{S}  <Rd>, <Rn>, #<const>
+  { "RSB",  0xebc00000, 0xffe08000, ADD_IMM5  }, // RSB{S}  <Rd>, <Rn>, <Rm> {,<shift> #<const>}
+  { "SBC",  0xf1600000, 0xfbe08000, ADD_IMM12 }, // SBC{S}  <Rd>, <Rn>, #<const>
+  { "SBC",  0xeb600000, 0xffe08000, ADD_IMM5  }, // SBC{S}  <Rd>, <Rn>, <Rm> {,<shift> #<const>}
+  { "SUB",  0xf1a00000, 0xfbe08000, ADD_IMM12 }, // SUB{S}  <Rd>, <Rn>, #<const>
+  { "SUB",  0xeba00000, 0xffe08000, ADD_IMM5  }, // SUB{S}  <Rd>, <Rn>, <Rm> {,<shift> #<const>}
+
   { "B",    0xf0008000, 0xf800d000, B_T3  },             // B<c> <label>
   { "B",    0xf0009000, 0xf800d000, B_T4  },             // B<c> <label>
   { "BL",   0xf000d000, 0xf800d000, B_T4  },             // BL<c> <label>
@@ -263,6 +293,13 @@ THUMB_INSTRUCTIONS gOpThumb2[] = {
   { "RFE"  , 0xe990c000, 0xffd0ffff, RFE_FORMAT }        // RFE{IA}<c> <Rn>{!}
 };
 
+CHAR8 *gShiftType[] = {
+  "LSL",
+  "LSR",
+  "ASR",
+  "ROR"
+};
+
 CHAR8 mThumbMregListStr[4*15 + 1];
 
 CHAR8 *
@@ -277,7 +314,7 @@ ThumbMRegList (
   Str = mThumbMregListStr;
   *Str = '\0';
   AsciiStrCat  (Str, "{");
-  // R0 - R7, PC
+  
   for (Index = 0, First = TRUE; Index <= 15; Index++) {
     if ((RegBitMask & (1 << Index)) != 0) {
       Start = End = Index;
@@ -325,6 +362,18 @@ SignExtend32 (
   } while ((TopBit & BIT31) != BIT31);
 
   return Data;
+}
+
+//
+// Some instructions specify the PC is always considered aligned 
+// The PC is after the instruction that is excuting. So you pass
+// in the instruction address and you get back the aligned answer
+//
+PCAlign4 (
+  IN  UINT32  Data
+  )
+{
+  return (Data + 4) & 0xfffffffc;
 }
 
 /**
@@ -389,6 +438,15 @@ DisassembleThumbInstruction (
         // A6.5.1  <Rd>, [<Rn>, #<5_bit_offset>]
         AsciiSPrint (&Buf[Offset], Size - Offset, " r%d, [r%d #0x%x]", Rd, Rn, (OpCode >> 4) & 0x7c);   
         return;
+      case LOAD_STORE_FORMAT1_H:
+        // A6.5.1  <Rd>, [<Rn>, #<5_bit_offset>]
+        AsciiSPrint (&Buf[Offset], Size - Offset, " r%d, [r%d #0x%x]", Rd, Rn, (OpCode >> 5) & 0x3f);   
+        return;
+      case LOAD_STORE_FORMAT1_B:
+        // A6.5.1  <Rd>, [<Rn>, #<5_bit_offset>]
+        AsciiSPrint (&Buf[Offset], Size - Offset, " r%d, [r%d #0x%x]", Rd, Rn, (OpCode >> 6) & 0x1f);   
+        return;
+
       case LOAD_STORE_FORMAT2:
         // A6.5.1  <Rd>, [<Rn>, <Rm>]
         AsciiSPrint (&Buf[Offset], Size - Offset, " r%d, [r%d, r%d]", Rd, Rn, Rm);   
@@ -396,12 +454,12 @@ DisassembleThumbInstruction (
       case LOAD_STORE_FORMAT3:
         // A6.5.1 <Rd>, [PC, #<8_bit_offset>]
         Target = (OpCode & 0xff) << 2;
-        AsciiSPrint (&Buf[Offset], Size - Offset, " r%d, [pc, #0x%x] ;0x%08x", (OpCode >> 8) & 7, Target, PC + 2 + Target);   
+        AsciiSPrint (&Buf[Offset], Size - Offset, " r%d, [pc, #0x%x] ;0x%08x", (OpCode >> 8) & 7, Target, PCAlign4 (PC) + Target);   
         return;
       case LOAD_STORE_FORMAT4:
         // Rt, [SP, #imm8]
         Target = (OpCode & 0xff) << 2;
-        AsciiSPrint (&Buf[Offset], Size - Offset, " r%d, [sp, #0x%x]", (OpCode >> 8) & 7, Target, PC + 2 + Target);   
+        AsciiSPrint (&Buf[Offset], Size - Offset, " r%d, [sp, #0x%x]", (OpCode >> 8) & 7, Target);   
         return;
       
       case LOAD_STORE_MULTIPLE_FORMAT1:
@@ -499,7 +557,7 @@ DisassembleThumbInstruction (
       case ADR_FORMAT:
         // ADR <Rd>, <Label>
         Target = (OpCode & 0xff) << 2;
-        AsciiSPrint (&Buf[Offset], Size - Offset, " %a, %08x", gReg[(OpCode >> 8) & 7], PC + 4 + Target); 
+        AsciiSPrint (&Buf[Offset], Size - Offset, " %a, %08x", gReg[(OpCode >> 8) & 7], PCAlign4 (PC) + Target); 
         return;
       }
     }
@@ -510,6 +568,7 @@ DisassembleThumbInstruction (
   *OpCodePtrPtr += 1;
   Rt  = (OpCode32 >> 12) & 0xf;
   Rt2 = (OpCode32 >> 8) & 0xf;
+  Rd  = (OpCode32 >> 8) & 0xf;
   Rm  = (OpCode32 & 0xf);
   Rn  = (OpCode32 >> 16) & 0xf;
   for (Index = 0; Index < sizeof (gOpThumb2)/sizeof (THUMB_INSTRUCTIONS); Index++) {
@@ -546,8 +605,8 @@ DisassembleThumbInstruction (
         return;
 
       case BL_T2:
-        // S:I1:I2:imm10:imm11:00
-        Target = ((OpCode32 << 2) & 0x1ffc) + ((OpCode32 >> 3) & 0x7fe000);
+        // BLX  S:I1:I2:imm10:imm11:0
+        Target = ((OpCode32 << 1) & 0xffc) + ((OpCode32 >> 4) & 0x3ff000);
         S  = (OpCode32 & BIT26) == BIT26;
         J1 = (OpCode32 & BIT13) == BIT13;
         J2 = (OpCode32 & BIT11) == BIT11;
@@ -555,7 +614,7 @@ DisassembleThumbInstruction (
         Target |= (!(J1 ^ S) ? BIT24 : 0);  // I1
         Target |= (S ? BIT25 : 0);  // S
         Target = SignExtend32 (Target, BIT25);
-        AsciiSPrint (&Buf[Offset], Size - Offset, " 0x%08x", PC + 4 + Target);   
+        AsciiSPrint (&Buf[Offset], Size - Offset, " 0x%08x", PCAlign4 (PC) + Target);   
         return;
 
       case POP_T2:
@@ -571,7 +630,7 @@ DisassembleThumbInstruction (
       case STM_FORMAT:
         // <Rn>{!}, <registers>
         W = (OpCode32 & BIT21) == BIT21;
-        AsciiSPrint (&Buf[Offset], Size - Offset, " %a %a", gReg[(OpCode32 >> 16) & 0xf], W ? "!":"", ThumbMRegList (OpCode32 & 0xffff));
+        AsciiSPrint (&Buf[Offset], Size - Offset, " %a%a, %a", gReg[(OpCode32 >> 16) & 0xf], W ? "!":"", ThumbMRegList (OpCode32 & 0xffff));
         return;
 
       case LDM_REG_IMM12_SIGNED:
@@ -581,7 +640,7 @@ DisassembleThumbInstruction (
           // U == 0 means subtrack, U == 1 means add
           Target = -Target;
         }
-        AsciiSPrint (&Buf[Offset], Size - Offset, " %a, %a", gReg[(OpCode32 >> 12) & 0xf], PC + 4 + Target);
+        AsciiSPrint (&Buf[Offset], Size - Offset, " %a, %a", gReg[(OpCode32 >> 12) & 0xf], PCAlign4 (PC) + Target);
         return;
 
       case LDM_REG_INDIRECT_LSL:
@@ -605,6 +664,7 @@ DisassembleThumbInstruction (
         return;
 
       case LDM_REG_IMM8:
+        ASSERT (FALSE);
         // <rt>, [<rn>, {, #<imm8>}]{!}
         W = (OpCode32 & BIT8) == BIT8;
         U = (OpCode32 & BIT9) == BIT9;
@@ -614,10 +674,10 @@ DisassembleThumbInstruction (
           if ((OpCode32 && 0xff) == 0) {
             AsciiSPrint (&Buf[Offset], Size - Offset, "]%a", W?"!":"");
           } else {
-            AsciiSPrint (&Buf[Offset], Size - Offset, ", #%a0x%x]%a", OpCode32 & 0xff, U?"":"-" ,W?"!":"");
+            AsciiSPrint (&Buf[Offset], Size - Offset, ", #%a0x%x]%a", OpCode32 & 0xff, U?"":"-" , W?"!":"");
           }
         } else {
-          AsciiSPrint (&Buf[Offset], Size - Offset, "], #%a0x%x]%a", OpCode32 & 0xff, U?"":"-");
+          AsciiSPrint (&Buf[Offset], Size - Offset, "], #%a0x%x]", OpCode32 & 0xff, U?"":"-");
         }
         return;
 
@@ -670,7 +730,50 @@ DisassembleThumbInstruction (
         // <Rn>{!}
         AsciiSPrint (&Buf[Offset], Size - Offset, " %a%a, #0x%x", gReg[Rn], W?"!":"");
         return;
+      
+      case ADD_IMM12:
+        // ADD{S} <Rd>, <Rn>, #<const>   i:imm3:imm8
+        if ((OpCode32 & BIT20) == BIT20) {
+          Buf[Offset - 3] = 'S';  // assume %-6a
+        }
+        Target = (OpCode32 & 0xff) | ((OpCode32 >> 4) & 0x700) | ((OpCode & BIT26) == BIT26 ? BIT11 : 0);
+        AsciiSPrint (&Buf[Offset], Size - Offset, " %a, ,%a, #0x%x", gReg[Rd], gReg[Rn], Target); 
+        return;
 
+      case ADD_IMM5:
+        // ADC  <Rd>, <Rn>, <Rm> {,LSL #<const>} imm3:imm2
+        if ((OpCode32 & BIT20) == BIT20) {
+          Buf[Offset - 3] = 'S';  // assume %-6a
+        }
+        Target = ((OpCode32 >> 6) & 3) | ((OpCode32 >> 10) & 0x1c0);
+        Offset += AsciiSPrint (&Buf[Offset], Size - Offset, " %a, ,%a, %a", gReg[Rd], gReg[Rn], gReg[Rm]); 
+        if (Target != 0) {
+          AsciiSPrint (&Buf[Offset], Size - Offset, ", LSL %d", gShiftType[(OpCode >> 5) & 3], Target); 
+        }
+        return;
+
+      case ADR_THUMB2:
+        // ADDR <Rd>, <label>
+        Target = (OpCode32 & 0xff) | ((OpCode32 >> 8) & 0x700) | ((OpCode & BIT26) == BIT26 ? BIT11 : 0);
+        if ((OpCode & (BIT23 | BIT21)) == (BIT23 | BIT21)) {
+          Target = PCAlign4 (PC) - Target;
+        } else {
+          Target = PCAlign4 (PC) + Target;
+        }
+        AsciiSPrint (&Buf[Offset], Size - Offset, " %a, 0x%08x", gReg[Rd], Target); 
+        return;
+
+      case CMN_THUMB2:
+        // CMN <Rn>, <Rm>, {,<shift> #<const>}
+        if ((OpCode32 & BIT20) == BIT20) {
+          Buf[Offset - 3] = 'S';  // assume %-6a
+        }
+        Target = ((OpCode32 >> 6) & 3) | ((OpCode32 >> 10) & 0x1c0);
+        Offset += AsciiSPrint (&Buf[Offset], Size - Offset, " %a, ,%a", gReg[Rn], gReg[Rm]); 
+        if (Target != 0) {
+          AsciiSPrint (&Buf[Offset], Size - Offset, ", LSL %d", gShiftType[(OpCode >> 5) & 3], Target); 
+        }
+        return;
       }
     }
   }
