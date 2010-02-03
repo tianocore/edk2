@@ -1,7 +1,7 @@
 /** @file
   Implementation of Managed Network Protocol I/O functions.
 
-Copyright (c) 2005 - 2009, Intel Corporation.<BR>
+Copyright (c) 2005 - 2010, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -209,6 +209,18 @@ MnpSyncSendPacket (
   TxData        = Token->Packet.TxData;
 
   HeaderSize    = Snp->Mode->MediaHeaderSize - TxData->HeaderLength;
+
+  //
+  // Check media status before transmit packet.
+  // Note: media status will be updated by periodic timer MediaDetectTimer.
+  //
+  if (!Snp->Mode->MediaPresent) {
+    //
+    // Media not present, skip packet transmit and report EFI_NO_MEDIA
+    //
+    Status = EFI_NO_MEDIA;
+    goto SIGNAL_TOKEN;
+  }
 
   //
   // Start the timeout event.
@@ -998,9 +1010,8 @@ EXIT:
 /**
   Remove the received packets if timeout occurs.
 
-  @param[in]  Event             The event this notify function registered to.
-  @param[in]  Context           Pointer to the context data registered to the
-                                event.
+  @param[in]  Event        The event this notify function registered to.
+  @param[in]  Context      Pointer to the context data registered to the event.
 
 **/
 VOID
@@ -1066,18 +1077,49 @@ MnpCheckPacketTimeout (
 }
 
 /**
+  Poll to update MediaPresent field in SNP ModeData by Snp->GetStatus().
+
+  @param[in]  Event        The event this notify function registered to.
+  @param[in]  Context      Pointer to the context data registered to the event.
+
+**/
+VOID
+EFIAPI
+MnpCheckMediaStatus (
+  IN EFI_EVENT     Event,
+  IN VOID          *Context
+  )
+{
+  MNP_DEVICE_DATA             *MnpDeviceData;
+  EFI_SIMPLE_NETWORK_PROTOCOL *Snp;
+  UINT32                      InterruptStatus;
+
+  MnpDeviceData = (MNP_DEVICE_DATA *) Context;
+  NET_CHECK_SIGNATURE (MnpDeviceData, MNP_DEVICE_DATA_SIGNATURE);
+
+  Snp = MnpDeviceData->Snp;
+  if (Snp->Mode->MediaPresentSupported) {
+    //
+    // Upon successful return of GetStatus(), the MediaPresent field of
+    // EFI_SIMPLE_NETWORK_MODE will be updated to reflect any change of media status
+    //
+    Snp->GetStatus (Snp, &InterruptStatus, NULL);
+  }
+}
+
+/**
   Poll to receive the packets from Snp. This function is either called by upperlayer
   protocols/applications or the system poll timer notify mechanism.
 
-  @param[in]       Event        The event this notify function registered to.
-  @param[in, out]  Context      Pointer to the context data registered to the event.
+  @param[in]  Event        The event this notify function registered to.
+  @param[in]  Context      Pointer to the context data registered to the event.
 
 **/
 VOID
 EFIAPI
 MnpSystemPoll (
-  IN     EFI_EVENT   Event,
-  IN OUT VOID        *Context
+  IN EFI_EVENT     Event,
+  IN VOID          *Context
   )
 {
   MNP_DEVICE_DATA  *MnpDeviceData;

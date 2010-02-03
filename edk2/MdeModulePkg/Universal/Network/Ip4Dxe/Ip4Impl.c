@@ -440,16 +440,13 @@ EfiIp4GetModeData (
     }
   }
 
-  if (MnpConfigData != NULL) {
-    CopyMem (MnpConfigData, &IpSb->MnpConfigData, sizeof (*MnpConfigData));
-  }
-
-  if (SnpModeData != NULL) {
-    CopyMem (SnpModeData, &IpSb->SnpMode, sizeof (*SnpModeData));
-  }
+  //
+  // Get fresh mode data from MNP, since underlying media status may change
+  //
+  Status = IpSb->Mnp->GetModeData (IpSb->Mnp, MnpConfigData, SnpModeData);
 
   gBS->RestoreTPL (OldTpl);
-  return EFI_SUCCESS;
+  return Status;
 }
 
 

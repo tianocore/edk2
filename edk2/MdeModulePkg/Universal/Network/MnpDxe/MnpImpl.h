@@ -1,7 +1,7 @@
 /** @file
   Declaration of structures and functions of MnpDxe driver.
 
-Copyright (c) 2005 - 2009, Intel Corporation.<BR>
+Copyright (c) 2005 - 2010, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -22,6 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define MNP_SYS_POLL_INTERVAL         (10 * TICKS_PER_MS)   // 10 milliseconds
 #define MNP_TIMEOUT_CHECK_INTERVAL    (50 * TICKS_PER_MS)   // 50 milliseconds
+#define MNP_MEDIA_DETECT_INTERVAL     (500 * TICKS_PER_MS)  // 500 milliseconds
 #define MNP_TX_TIMEOUT_TIME           (500 * TICKS_PER_MS)  // 500 milliseconds
 #define MNP_INIT_NET_BUFFER_NUM       512
 #define MNP_NET_BUFFER_INCREASEMENT   64
@@ -448,9 +449,8 @@ MnpFreeNbuf (
 /**
   Remove the received packets if timeout occurs.
 
-  @param[in]  Event             The event this notify function registered to.
-  @param[in]  Context           Pointer to the context data registered to the
-                                event.
+  @param[in]  Event        The event this notify function registered to.
+  @param[in]  Context      Pointer to the context data registered to the event.
 
 **/
 VOID
@@ -461,18 +461,32 @@ MnpCheckPacketTimeout (
   );
 
 /**
+  Poll to update MediaPresent field in SNP ModeData by Snp.GetStatus().
+
+  @param[in]  Event        The event this notify function registered to.
+  @param[in]  Context      Pointer to the context data registered to the event.
+
+**/
+VOID
+EFIAPI
+MnpCheckMediaStatus (
+  IN EFI_EVENT     Event,
+  IN VOID          *Context
+  );
+
+/**
   Poll to receive the packets from Snp. This function is either called by upperlayer
   protocols/applications or the system poll timer notify mechanism.
 
-  @param[in]       Event        The event this notify function registered to.
-  @param[in, out]  Context      Pointer to the context data registered to the event.
+  @param[in]  Event        The event this notify function registered to.
+  @param[in]  Context      Pointer to the context data registered to the event.
 
 **/
 VOID
 EFIAPI
 MnpSystemPoll (
-  IN     EFI_EVENT   Event,
-  IN OUT VOID        *Context
+  IN EFI_EVENT     Event,
+  IN VOID          *Context
   );
 
 /**

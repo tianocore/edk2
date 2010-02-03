@@ -1,7 +1,7 @@
 /** @file
   Implementation of driver entry point and driver binding protocol.
 
-Copyright (c) 2005 - 2009, Intel Corporation.<BR>
+Copyright (c) 2005 - 2010, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -336,7 +336,7 @@ MnpDriverBindingStop (
     }
 
     //
-    // Destroy the Mnp device data
+    // Destroy Mnp Device Data
     //
     MnpDestroyDeviceData (MnpDeviceData, This->DriverBindingHandle);
     FreePool (MnpDeviceData);

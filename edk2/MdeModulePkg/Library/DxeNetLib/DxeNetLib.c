@@ -2146,6 +2146,213 @@ NetLibGetMacString (
 }
 
 /**
+  Detect media status for specified network device.
+
+  The underlying UNDI driver may or may not support reporting media status from
+  GET_STATUS command (PXE_STATFLAGS_GET_STATUS_NO_MEDIA_SUPPORTED). This routine
+  will try to invoke Snp->GetStatus() to get the media status: if media already
+  present, it return directly; if media not present, it will stop SNP and then
+  restart SNP to get the latest media status, this give chance to get the correct
+  media status for old UNDI driver which doesn't support reporting media status
+  from GET_STATUS command.
+  Note: there will be two limitations for current algorithm:
+  1) for UNDI with this capability, in case of cable is not attached, there will
+     be an redundant Stop/Start() process;
+  2) for UNDI without this capability, in case cable is attached in UNDI
+     initialize while unattached latter, NetLibDetectMedia() will report
+     MediaPresent as TRUE, this cause upper layer apps wait for timeout time.
+
+  @param[in]   ServiceHandle    The handle where network service binding protocols are
+                                installed on.
+  @param[out]  MediaPresent     The pointer to store the media status.
+
+  @retval EFI_SUCCESS           Media detection success.
+  @retval EFI_INVALID_PARAMETER ServiceHandle is not valid network device handle.
+  @retval EFI_UNSUPPORTED       Network device does not support media detection.
+  @retval EFI_DEVICE_ERROR      SNP is in unknown state.
+
+**/
+EFI_STATUS
+EFIAPI
+NetLibDetectMedia (
+  IN  EFI_HANDLE            ServiceHandle,
+  OUT BOOLEAN               *MediaPresent
+  )
+{
+  EFI_STATUS                   Status;
+  EFI_HANDLE                   SnpHandle;
+  EFI_SIMPLE_NETWORK_PROTOCOL  *Snp;
+  UINT32                       InterruptStatus;
+  UINT32                       OldState;
+  EFI_MAC_ADDRESS              *MCastFilter;
+  UINT32                       MCastFilterCount;
+  UINT32                       EnableFilterBits;
+  UINT32                       DisableFilterBits;
+  BOOLEAN                      ResetMCastFilters;
+
+  ASSERT (MediaPresent != NULL);
+
+  //
+  // Get SNP handle
+  //
+  Snp = NULL;
+  SnpHandle = NetLibGetSnpHandle (ServiceHandle, &Snp);
+  if (SnpHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Check whether SNP support media detection
+  //
+  if (!Snp->Mode->MediaPresentSupported) {
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Invoke Snp->GetStatus() to refresh MediaPresent field in SNP mode data
+  //
+  Status = Snp->GetStatus (Snp, &InterruptStatus, NULL);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (Snp->Mode->MediaPresent) {
+    //
+    // Media is present, return directly
+    //
+    *MediaPresent = TRUE;
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Till now, GetStatus() report no media; while, in case UNDI not support
+  // reporting media status from GetStatus(), this media status may be incorrect.
+  // So, we will stop SNP and then restart it to get the correct media status.
+  //
+  OldState = Snp->Mode->State;
+  if (OldState >= EfiSimpleNetworkMaxState) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  MCastFilter = NULL;
+
+  if (OldState == EfiSimpleNetworkInitialized) {
+    //
+    // SNP is already in use, need Shutdown/Stop and then Start/Initialize
+    //
+
+    //
+    // Backup current SNP receive filter settings
+    //
+    EnableFilterBits  = Snp->Mode->ReceiveFilterSetting;
+    DisableFilterBits = Snp->Mode->ReceiveFilterMask ^ EnableFilterBits;
+
+    ResetMCastFilters = TRUE;
+    MCastFilterCount  = Snp->Mode->MCastFilterCount;
+    if (MCastFilterCount != 0) {
+      MCastFilter = AllocateCopyPool (
+                      MCastFilterCount * sizeof (EFI_MAC_ADDRESS),
+                      Snp->Mode->MCastFilter
+                      );
+      ASSERT (MCastFilter != NULL);
+
+      ResetMCastFilters = FALSE;
+    }
+
+    //
+    // Shutdown/Stop the simple network
+    //
+    Status = Snp->Shutdown (Snp);
+    if (!EFI_ERROR (Status)) {
+      Status = Snp->Stop (Snp);
+    }
+    if (EFI_ERROR (Status)) {
+      goto Exit;
+    }
+
+    //
+    // Start/Initialize the simple network
+    //
+    Status = Snp->Start (Snp);
+    if (!EFI_ERROR (Status)) {
+      Status = Snp->Initialize (Snp, 0, 0);
+    }
+    if (EFI_ERROR (Status)) {
+      goto Exit;
+    }
+
+    //
+    // Here we get the correct media status
+    //
+    *MediaPresent = Snp->Mode->MediaPresent;
+
+    //
+    // Restore SNP receive filter settings
+    //
+    Status = Snp->ReceiveFilters (
+                    Snp,
+                    EnableFilterBits,
+                    DisableFilterBits,
+                    ResetMCastFilters,
+                    MCastFilterCount,
+                    MCastFilter
+                    );
+
+    if (MCastFilter != NULL) {
+      FreePool (MCastFilter);
+    }
+
+    return Status;
+  }
+
+  //
+  // SNP is not in use, it's in state of EfiSimpleNetworkStopped or EfiSimpleNetworkStarted
+  //
+  if (OldState == EfiSimpleNetworkStopped) {
+    //
+    // SNP not start yet, start it
+    //
+    Status = Snp->Start (Snp);
+    if (EFI_ERROR (Status)) {
+      goto Exit;
+    }
+  }
+
+  //
+  // Initialize the simple network
+  //
+  Status = Snp->Initialize (Snp, 0, 0);
+  if (EFI_ERROR (Status)) {
+    Status = EFI_DEVICE_ERROR;
+    goto Exit;
+  }
+
+  //
+  // Here we get the correct media status
+  //
+  *MediaPresent = Snp->Mode->MediaPresent;
+
+  //
+  // Shut down the simple network
+  //
+  Snp->Shutdown (Snp);
+
+Exit:
+  if (OldState == EfiSimpleNetworkStopped) {
+    //
+    // Original SNP sate is Stopped, restore to original state
+    //
+    Snp->Stop (Snp);
+  }
+
+  if (MCastFilter != NULL) {
+    FreePool (MCastFilter);
+  }
+
+  return Status;
+}
+
+/**
   Check the default address used by the IPv4 driver is static or dynamic (acquired
   from DHCP).
 
@@ -2417,7 +2624,7 @@ NetLibGetNicHandle (
   @param[in]      String         The pointer to the Ascii string.
   @param[out]     Ip4Address     The pointer to the converted IPv4 address.
 
-  @retval EFI_SUCCESS            Convert to IPv4 address successfully.  
+  @retval EFI_SUCCESS            Convert to IPv4 address successfully.
   @retval EFI_INVALID_PARAMETER  The string is mal-formated or Ip4Address is NULL.
 
 **/
@@ -2460,7 +2667,7 @@ NetLibAsciiStrToIp4 (
 
     //
     // Convert the string to IPv4 address. AsciiStrDecimalToUintn stops at the
-    // first character that is not a valid decimal character, '.' or '\0' here. 
+    // first character that is not a valid decimal character, '.' or '\0' here.
     //
     NodeVal = AsciiStrDecimalToUintn (TempStr);
     if (NodeVal > 0xFF) {
@@ -2483,7 +2690,7 @@ NetLibAsciiStrToIp4 (
   @param[in]      String         The pointer to the Ascii string.
   @param[out]     Ip6Address     The pointer to the converted IPv6 address.
 
-  @retval EFI_SUCCESS            Convert to IPv6 address successfully.  
+  @retval EFI_SUCCESS            Convert to IPv6 address successfully.
   @retval EFI_INVALID_PARAMETER  The string is mal-formated or Ip6Address is NULL.
 
 **/
@@ -2519,7 +2726,7 @@ NetLibAsciiStrToIp6 (
       return EFI_INVALID_PARAMETER;
     } else {
       AllowedCnt = 7;
-    }    
+    }
   }
 
   ZeroMem (Ip6Address, sizeof (EFI_IPv6_ADDRESS));
@@ -2547,7 +2754,7 @@ NetLibAsciiStrToIp6 (
           // ::0 looks strange. report error to user.
           //
           return EFI_INVALID_PARAMETER;
-        }           
+        }
 
         //
         // Skip the abbreviation part of IPv6 address.
@@ -2561,7 +2768,7 @@ NetLibAsciiStrToIp6 (
               //
               return EFI_INVALID_PARAMETER;
             }
-            
+
             TailNodeCnt++;
             if (TailNodeCnt >= (AllowedCnt - NodeCnt)) {
               //
@@ -2572,7 +2779,7 @@ NetLibAsciiStrToIp6 (
           }
 
           TempStr2++;
-        }       
+        }
 
         Short  = TRUE;
         Update = TRUE;
@@ -2587,12 +2794,12 @@ NetLibAsciiStrToIp6 (
           //
           return EFI_INVALID_PARAMETER;
         }
-      }      
-    }    
+      }
+    }
 
     //
     // Convert the string to IPv6 address. AsciiStrHexToUintn stops at the first
-    // character that is not a valid hexadecimal character, ':' or '\0' here. 
+    // character that is not a valid hexadecimal character, ':' or '\0' here.
     //
     NodeVal = AsciiStrHexToUintn (TempStr);
     if ((NodeVal > 0xFFFF) || (Index > 14)) {
@@ -2625,7 +2832,7 @@ NetLibAsciiStrToIp6 (
   @param[in]      String         The pointer to the Ascii string.
   @param[out]     Ip4Address     The pointer to the converted IPv4 address.
 
-  @retval EFI_SUCCESS            Convert to IPv4 address successfully.  
+  @retval EFI_SUCCESS            Convert to IPv4 address successfully.
   @retval EFI_INVALID_PARAMETER  The string is mal-formated or Ip4Address is NULL.
   @retval EFI_OUT_OF_RESOURCES   Fail to perform the operation due to lack of resource.
 
@@ -2638,7 +2845,7 @@ NetLibStrToIp4 (
 {
   CHAR8                          *Ip4Str;
   EFI_STATUS                     Status;
-  
+
   if ((String == NULL) || (Ip4Address == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -2665,7 +2872,7 @@ NetLibStrToIp4 (
   @param[in]      String         The pointer to the Ascii string.
   @param[out]     Ip6Address     The pointer to the converted IPv6 address.
 
-  @retval EFI_SUCCESS            Convert to IPv6 address successfully.  
+  @retval EFI_SUCCESS            Convert to IPv6 address successfully.
   @retval EFI_INVALID_PARAMETER  The string is mal-formated or Ip6Address is NULL.
   @retval EFI_OUT_OF_RESOURCES   Fail to perform the operation due to lack of resource.
 
@@ -2674,11 +2881,11 @@ EFI_STATUS
 NetLibStrToIp6 (
   IN CONST CHAR16                *String,
   OUT      EFI_IPv6_ADDRESS      *Ip6Address
-  ) 
+  )
 {
   CHAR8                          *Ip6Str;
   EFI_STATUS                     Status;
-  
+
   if ((String == NULL) || (Ip6Address == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -2706,7 +2913,7 @@ NetLibStrToIp6 (
   @param[out]     Ip6Address     The pointer to the converted IPv6 address.
   @param[out]     PrefixLength   The pointer to the converted prefix length.
 
-  @retval EFI_SUCCESS            Convert to IPv6 address successfully.  
+  @retval EFI_SUCCESS            Convert to IPv6 address successfully.
   @retval EFI_INVALID_PARAMETER  The string is mal-formated or Ip6Address is NULL.
   @retval EFI_OUT_OF_RESOURCES   Fail to perform the operation due to lack of resource.
 
@@ -2716,14 +2923,14 @@ NetLibStrToIp6andPrefix (
   IN CONST CHAR16                *String,
   OUT      EFI_IPv6_ADDRESS      *Ip6Address,
   OUT      UINT8                 *PrefixLength
-  ) 
+  )
 {
-  CHAR8                          *Ip6Str;  
+  CHAR8                          *Ip6Str;
   CHAR8                          *PrefixStr;
   CHAR8                          *TempStr;
   EFI_STATUS                     Status;
   UINT8                          Length;
-  
+
   if ((String == NULL) || (Ip6Address == NULL) || (PrefixLength == NULL)) {
     return EFI_INVALID_PARAMETER;
   }

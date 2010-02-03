@@ -1,7 +1,7 @@
 /** @file
   iSCSI DHCP related configuration routines.
 
-Copyright (c) 2004 - 2009, Intel Corporation.<BR>
+Copyright (c) 2004 - 2010, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -344,7 +344,9 @@ IScsiParseDhcpAck (
 
   @retval EFI_SUCCESS           The DNS information is got from the DHCP ACK.
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate memory.
+  @retval EFI_NO_MEDIA          There was a media error.
   @retval Others                Other errors as indicated.
+
 **/
 EFI_STATUS
 IScsiDoDhcp (
@@ -358,10 +360,20 @@ IScsiDoDhcp (
   EFI_STATUS              Status;
   EFI_DHCP4_PACKET_OPTION *ParaList;
   EFI_DHCP4_CONFIG_DATA   Dhcp4ConfigData;
+  BOOLEAN                 MediaPresent;
 
   Dhcp4Handle = NULL;
   Dhcp4       = NULL;
   ParaList    = NULL;
+
+  //
+  // Check media status before do DHCP
+  //
+  MediaPresent = TRUE;
+  NetLibDetectMedia (Controller, &MediaPresent);
+  if (!MediaPresent) {
+    return EFI_NO_MEDIA;
+  }
 
   //
   // Create a DHCP4 child instance and get the protocol.

@@ -1,7 +1,7 @@
 /** @file
   Implementation of Managed Network Protocol private services.
 
-Copyright (c) 2005 - 2009, Intel Corporation.<BR>
+Copyright (c) 2005 - 2010, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -356,6 +356,22 @@ MnpInitializeDeviceData (
   }
 
   //
+  // Create the timer for media detection.
+  //
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_SIGNAL | EVT_TIMER,
+                  TPL_CALLBACK,
+                  MnpCheckMediaStatus,
+                  MnpDeviceData,
+                  &MnpDeviceData->MediaDetectTimer
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "MnpInitializeDeviceData: CreateEvent for media detection failed.\n"));
+
+    goto ERROR;
+  }
+
+  //
   // Create the timer for tx timeout check.
   //
   Status = gBS->CreateEvent (
@@ -380,6 +396,10 @@ ERROR:
 
     if (MnpDeviceData->TimeoutCheckTimer != NULL) {
       gBS->CloseEvent (MnpDeviceData->TimeoutCheckTimer);
+    }
+
+    if (MnpDeviceData->MediaDetectTimer != NULL) {
+      gBS->CloseEvent (MnpDeviceData->MediaDetectTimer);
     }
 
     if (MnpDeviceData->PollTimer != NULL) {
@@ -443,9 +463,10 @@ MnpDestroyDeviceData (
   //
   // Close the event.
   //
-  gBS->CloseEvent (&MnpDeviceData->TxTimeoutEvent);
-  gBS->CloseEvent (&MnpDeviceData->TimeoutCheckTimer);
-  gBS->CloseEvent (&MnpDeviceData->PollTimer);
+  gBS->CloseEvent (MnpDeviceData->TxTimeoutEvent);
+  gBS->CloseEvent (MnpDeviceData->TimeoutCheckTimer);
+  gBS->CloseEvent (MnpDeviceData->MediaDetectTimer);
+  gBS->CloseEvent (MnpDeviceData->PollTimer);
 
   //
   // Free the tx buffer.
@@ -1010,6 +1031,24 @@ MnpStart (
 
         goto ErrorExit;
       }
+
+      //
+      // Start the media detection timer.
+      //
+      Status = gBS->SetTimer (
+                      MnpDeviceData->MediaDetectTimer,
+                      TimerPeriodic,
+                      MNP_MEDIA_DETECT_INTERVAL
+                      );
+      if (EFI_ERROR (Status)) {
+        DEBUG (
+          (EFI_D_ERROR,
+          "MnpStart, gBS->SetTimer for MediaDetectTimer %r.\n",
+          Status)
+          );
+
+        goto ErrorExit;
+      }
     }
   }
 
@@ -1094,6 +1133,11 @@ MnpStop (
   // Cancel the timeout timer.
   //
   Status = gBS->SetTimer (MnpDeviceData->TimeoutCheckTimer, TimerCancel, 0);
+
+  //
+  // Cancel the media detect timer.
+  //
+  Status = gBS->SetTimer (MnpDeviceData->MediaDetectTimer, TimerCancel, 0);
 
   //
   // Stop the simple network.
