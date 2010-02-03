@@ -38,6 +38,7 @@
   PcdLib
   PrintLib
   SemihostLib
+  DebugLib
 
 [Pcd.common]
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel

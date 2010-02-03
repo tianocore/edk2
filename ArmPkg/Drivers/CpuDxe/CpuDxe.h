@@ -28,6 +28,7 @@
 #include <Library/UefiLib.h>
 #include <Library/CpuLib.h>
 #include <Library/DefaultExceptionHandlerLib.h>
+#include <Library/DebugLib.h>
 
 #include <Guid/DebugImageInfoTable.h>
 #include <Protocol/Cpu.h>
