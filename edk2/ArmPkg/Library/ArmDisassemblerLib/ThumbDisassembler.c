@@ -369,6 +369,7 @@ SignExtend32 (
 // The PC is after the instruction that is excuting. So you pass
 // in the instruction address and you get back the aligned answer
 //
+UINT32
 PCAlign4 (
   IN  UINT32  Data
   )
@@ -728,6 +729,7 @@ DisassembleThumbInstruction (
 
       case RFE_FORMAT:
         // <Rn>{!}
+        W = (OpCode32 & BIT21) == BIT21;
         AsciiSPrint (&Buf[Offset], Size - Offset, " %a%a, #0x%x", gReg[Rn], W?"!":"");
         return;
       
