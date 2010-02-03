@@ -12,59 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <PiDxe.h>
-
-#include <Protocol/CpuIo.h>
-
-#include <Library/BaseLib.h>
-#include <Library/DebugLib.h>
-#include <Library/IoLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-
-#define MAX_IO_PORT_ADDRESS   0xFFFF
-
-//
-// Function Prototypes
-//
-EFI_STATUS
-EFIAPI
-CpuMemoryServiceRead (
-  IN  EFI_CPU_IO_PROTOCOL        *This,
-  IN  EFI_CPU_IO_PROTOCOL_WIDTH  Width,
-  IN  UINT64                     Address,
-  IN  UINTN                      Count,
-  OUT VOID                       *Buffer
-  );
-
-EFI_STATUS
-EFIAPI
-CpuMemoryServiceWrite (
-  IN EFI_CPU_IO_PROTOCOL        *This,
-  IN EFI_CPU_IO_PROTOCOL_WIDTH  Width,
-  IN UINT64                     Address,
-  IN UINTN                      Count,
-  IN VOID                       *Buffer
-  );
-
-EFI_STATUS
-EFIAPI
-CpuIoServiceRead (
-  IN  EFI_CPU_IO_PROTOCOL        *This,
-  IN  EFI_CPU_IO_PROTOCOL_WIDTH  Width,
-  IN  UINT64                     Address,
-  IN  UINTN                      Count,
-  OUT VOID                       *Buffer
-  );
-
-EFI_STATUS
-EFIAPI
-CpuIoServiceWrite (
-  IN EFI_CPU_IO_PROTOCOL        *This,
-  IN EFI_CPU_IO_PROTOCOL_WIDTH  Width,
-  IN UINT64                     Address,
-  IN UINTN                      Count,
-  IN VOID                       *Buffer
-  );
+#include "CpuIo.h"
 
 //
 // Handle for the CPU I/O Protocol
