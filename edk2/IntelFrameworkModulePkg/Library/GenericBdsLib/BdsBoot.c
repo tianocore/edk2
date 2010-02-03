@@ -1576,6 +1576,7 @@ BdsLibNetworkBootWithMediaPresent (
   EFI_HANDLE                      Handle;
   EFI_SIMPLE_NETWORK_PROTOCOL     *Snp;
   BOOLEAN                         MediaPresent;
+  UINT32                          InterruptStatus;
 
   MediaPresent = FALSE;
 
@@ -1618,6 +1619,11 @@ BdsLibNetworkBootWithMediaPresent (
     if (!EFI_ERROR (Status)) {
       if (Snp->Mode->MediaPresentSupported) {
         if (Snp->Mode->State == EfiSimpleNetworkInitialized) {
+          //
+          // Invoke Snp->GetStatus() to refresh the media status
+          //
+          Snp->GetStatus (Snp, &InterruptStatus, NULL);
+
           //
           // In case some one else is using the SNP check to see if it's connected
           //
