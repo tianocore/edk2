@@ -298,7 +298,7 @@ ExtractDisplayedHiiFormFromHiiHandle (
             //
             // Find FormSet OpCode
             //
-            ClassGuidNum = ((EFI_IFR_FORM_SET *) OpCodeData)->Flags & 0x3;
+            ClassGuidNum = (UINT8) (((EFI_IFR_FORM_SET *) OpCodeData)->Flags & 0x3);
             ClassGuid = (EFI_GUID *) (VOID *)(OpCodeData + sizeof (EFI_IFR_FORM_SET));
             while (ClassGuidNum-- > 0) {
               if (CompareGuid (SetupClassGuid, ClassGuid)) {
