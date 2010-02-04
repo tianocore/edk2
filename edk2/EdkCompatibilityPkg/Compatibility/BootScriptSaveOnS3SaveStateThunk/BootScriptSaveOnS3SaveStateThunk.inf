@@ -41,7 +41,6 @@
   MdePkg/MdePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  TianoModulePkg/TianoModulePkg.dec
 
 
 [LibraryClasses]
