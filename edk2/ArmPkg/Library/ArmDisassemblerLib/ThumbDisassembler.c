@@ -90,6 +90,14 @@ extern CHAR8 *gReg[];
 #define ADD_IMM5_2REG               228
 #define CPD_THUMB2                  229
 #define THUMB2_4REGS                230
+#define ADD_IMM12_1REG              231
+#define THUMB2_IMM16                232
+#define MRC_THUMB2                  233 
+#define MRRC_THUMB2                 234 
+#define THUMB2_MRS                  235
+#define THUMB2_MSR                  236
+
+
 
 
 typedef struct {
@@ -210,6 +218,10 @@ THUMB_INSTRUCTIONS gOpThumb2[] = {
   { "TST", 0xf0100f00, 0xfff08f00, CMN_THUMB2    },  // CMP <Rn>, #<const>
   { "TST", 0xea100f00, 0xfff08f00, ADD_IMM5_2REG },  // TST <Rn>, <Rm> {,<shift> #<const>}
 
+  { "MOV",  0xf04f0000, 0xfbef8000, ADD_IMM12_1REG }, // MOV  <Rd>, #<const>
+  { "MOVW", 0xf2400000, 0xfbe08000, THUMB2_IMM16 },   // MOVW <Rd>, #<const>
+  { "MOVT", 0xf2c00000, 0xfbe08000, THUMB2_IMM16 },   // MOVT <Rd>, #<const>
+  
   { "ADC",  0xf1400000, 0xfbe08000, ADD_IMM12 }, // ADC{S}  <Rd>, <Rn>, #<const>
   { "ADC",  0xeb400000, 0xffe08000, ADD_IMM5  }, // ADC{S}  <Rd>, <Rn>, <Rm> {,<shift> #<const>}
   { "ADD",  0xf1000000, 0xfbe08000, ADD_IMM12 }, // ADD{S}  <Rd>, <Rn>, #<const>
@@ -247,6 +259,14 @@ THUMB_INSTRUCTIONS gOpThumb2[] = {
   { "CPD",  0xee000000, 0xff000010, CPD_THUMB2 },  // CPD <coproc>,<opc1>,<CRd>,<CRn>,<CRm>,<opc2>
   { "CPD2", 0xfe000000, 0xff000010, CPD_THUMB2 },  // CPD <coproc>,<opc1>,<CRd>,<CRn>,<CRm>,<opc2>
 
+  { "MRC",   0xee100000, 0xff100000, MRC_THUMB2 },  // MRC  <coproc>,<opc1>,<Rt>,<CRn>,<CRm>,<opc2>
+  { "MRC2",  0xfe100000, 0xff100000, MRC_THUMB2 },  // MRC2 <coproc>,<opc1>,<Rt>,<CRn>,<CRm>,<opc2>
+  { "MRRC",  0xec500000, 0xfff00000, MRRC_THUMB2 },  // MRRC <coproc>,<opc1>,<Rt>,<Rt2>,<CRm>
+  { "MRRC2", 0xfc500000, 0xfff00000, MRRC_THUMB2 },  // MRR2 <coproc>,<opc1>,<Rt>,<Rt2>,<CRm>
+
+  { "MRS",   0xf3ef8000, 0xfffff0ff, THUMB2_MRS  }, // MRS  <Rd>, CPSR
+  { "MSR",   0xf3808000, 0xfff0fcff, THUMB2_MSR  }, // MSR  CPSR_fs, <Rn>
+
   { "CLREX", 0xf3bf8f2f, 0xfffffff, THUMB2_NO_ARGS }, // CLREX
 
   { "CLZ",   0xfab0f080, 0xfff0f0f0, THUMB2_2REGS },  // CLZ    <Rd>,<Rm>
@@ -267,17 +287,17 @@ THUMB_INSTRUCTIONS gOpThumb2[] = {
   { "SMLABT",  0xfb100010, 0xfff000f0, THUMB2_4REGS }, // SMLABT   <Rd>, <Rn>, <Rm>, <Ra>
   { "SMLABB",  0xfb100020, 0xfff000f0, THUMB2_4REGS }, // SMLATB   <Rd>, <Rn>, <Rm>, <Ra>
   { "SMLATT",  0xfb100030, 0xfff000f0, THUMB2_4REGS }, // SMLATT   <Rd>, <Rn>, <Rm>, <Ra>
-  { "SMLAWB",  0xfb300000, 0xfff000f0, THUMB2_4REGS },// SMLAWB   <Rd>, <Rn>, <Rm>, <Ra>
-  { "SMLAWT",  0xfb300010, 0xfff000f0, THUMB2_4REGS },// SMLAWT   <Rd>, <Rn>, <Rm>, <Ra>
-  { "SMLSD",   0xfb400000, 0xfff000f0, THUMB2_4REGS },// SMLSD    <Rd>, <Rn>, <Rm>, <Ra>
-  { "SMLSDX",  0xfb400010, 0xfff000f0, THUMB2_4REGS },// SMLSDX   <Rd>, <Rn>, <Rm>, <Ra>
-  { "SMMLA",   0xfb500000, 0xfff000f0, THUMB2_4REGS },// SMMLA    <Rd>, <Rn>, <Rm>, <Ra>
-  { "SMMLAR",  0xfb500010, 0xfff000f0, THUMB2_4REGS },// SMMLAR   <Rd>, <Rn>, <Rm>, <Ra>
-  { "SMMLS",   0xfb600000, 0xfff000f0, THUMB2_4REGS },// SMMLS    <Rd>, <Rn>, <Rm>, <Ra>
-  { "SMMLSR",  0xfb600010, 0xfff000f0, THUMB2_4REGS },// SMMLSR   <Rd>, <Rn>, <Rm>, <Ra>
-  { "USADA8",  0xfb700000, 0xfff000f0, THUMB2_4REGS },// USADA8   <Rd>, <Rn>, <Rm>, <Ra>
-  { "SMLAD",   0xfb200000, 0xfff000f0, THUMB2_4REGS },// SMLAD    <Rd>, <Rn>, <Rm>, <Ra>
-  { "SMLADX",  0xfb200010, 0xfff000f0, THUMB2_4REGS },// SMLADX   <Rd>, <Rn>, <Rm>, <Ra>
+  { "SMLAWB",  0xfb300000, 0xfff000f0, THUMB2_4REGS }, // SMLAWB   <Rd>, <Rn>, <Rm>, <Ra>
+  { "SMLAWT",  0xfb300010, 0xfff000f0, THUMB2_4REGS }, // SMLAWT   <Rd>, <Rn>, <Rm>, <Ra>
+  { "SMLSD",   0xfb400000, 0xfff000f0, THUMB2_4REGS }, // SMLSD    <Rd>, <Rn>, <Rm>, <Ra>
+  { "SMLSDX",  0xfb400010, 0xfff000f0, THUMB2_4REGS }, // SMLSDX   <Rd>, <Rn>, <Rm>, <Ra>
+  { "SMMLA",   0xfb500000, 0xfff000f0, THUMB2_4REGS }, // SMMLA    <Rd>, <Rn>, <Rm>, <Ra>
+  { "SMMLAR",  0xfb500010, 0xfff000f0, THUMB2_4REGS }, // SMMLAR   <Rd>, <Rn>, <Rm>, <Ra>
+  { "SMMLS",   0xfb600000, 0xfff000f0, THUMB2_4REGS }, // SMMLS    <Rd>, <Rn>, <Rm>, <Ra>
+  { "SMMLSR",  0xfb600010, 0xfff000f0, THUMB2_4REGS }, // SMMLSR   <Rd>, <Rn>, <Rm>, <Ra>
+  { "USADA8",  0xfb700000, 0xfff000f0, THUMB2_4REGS }, // USADA8   <Rd>, <Rn>, <Rm>, <Ra>
+  { "SMLAD",   0xfb200000, 0xfff000f0, THUMB2_4REGS }, // SMLAD    <Rd>, <Rn>, <Rm>, <Ra>
+  { "SMLADX",  0xfb200010, 0xfff000f0, THUMB2_4REGS }, // SMLADX   <Rd>, <Rn>, <Rm>, <Ra>
 
 
   { "B",    0xf0008000, 0xf800d000, B_T3  },             // B<c> <label>
@@ -808,6 +828,22 @@ DisassembleThumbInstruction (
         AsciiSPrint (&Buf[Offset], Size - Offset, " %a, %a, #0x%x", gReg[Rd], gReg[Rn], Target); 
         return;
 
+      case ADD_IMM12_1REG:
+        // MOV{S} <Rd>, #<const>   i:imm3:imm8
+        if ((OpCode32 & BIT20) == BIT20) {
+          Buf[Offset - 3] = 'S';  // assume %-6a
+        }
+        Target = (OpCode32 & 0xff) | ((OpCode32 >> 4) & 0x700) | ((OpCode & BIT26) == BIT26 ? BIT11 : 0);
+        AsciiSPrint (&Buf[Offset], Size - Offset, " %a, #0x%x", gReg[Rd], Target); 
+        return;
+
+      case THUMB2_IMM16:
+        // MOVW <Rd>, #<const>   i:imm3:imm8
+        Target = (OpCode32 & 0xff) | ((OpCode32 >> 4) & 0x700) | ((OpCode & BIT26) == BIT26 ? BIT11 : 0);
+        Target |= ((OpCode32 >> 4) & 0xf0000);
+        AsciiSPrint (&Buf[Offset], Size - Offset, " %a, #0x%x", gReg[Rd], Target); 
+        return;
+
       case ADD_IMM5:
         // ADC{S}  <Rd>, <Rn>, <Rm> {,LSL #<const>} imm3:imm2
         if ((OpCode32 & BIT20) == BIT20) {
@@ -891,6 +927,28 @@ DisassembleThumbInstruction (
         }
         return;
 
+      case MRC_THUMB2:
+        // MRC  <coproc>,<opc1>,<Rt>,<CRn>,<CRm>,<opc2>
+        coproc = (OpCode32 >> 8)  & 0xf;
+        opc1   = (OpCode32 >> 20) & 0xf;
+        opc2   = (OpCode32 >> 5)  & 0x7;
+        CRn    = (OpCode32 >> 16) & 0xf;
+        CRm    = OpCode32 & 0xf;
+        Offset += AsciiSPrint (&Buf[Offset], Size - Offset, " p%d,#%d,%a,c%d,c%d", coproc, opc1, gReg[Rt], CRn, CRm);
+        if (opc2 != 0) {
+          AsciiSPrint (&Buf[Offset], Size - Offset, ",#%d,", opc2);
+        }
+        return;  
+
+      case MRRC_THUMB2:
+        // MRC  <coproc>,<opc1>,<Rt>,<Rt2>,<CRm>,<opc2>
+        coproc = (OpCode32 >> 8)  & 0xf;
+        opc1   = (OpCode32 >> 20) & 0xf;
+        CRn    = (OpCode32 >> 16) & 0xf;
+        CRm    = OpCode32 & 0xf;
+        Offset += AsciiSPrint (&Buf[Offset], Size - Offset, " p%d,#%d,%a,%a,c%d", coproc, opc1, gReg[Rt], gReg[Rt2], CRm);
+        return;  
+
       case THUMB2_2REGS:
         // <Rd>, <Rm>
         AsciiSPrint (&Buf[Offset], Size - Offset, " %a, %a", gReg[Rd], gReg[Rm]);
@@ -899,6 +957,17 @@ DisassembleThumbInstruction (
       case THUMB2_4REGS:
         // <Rd>, <Rn>, <Rm>, <Ra>
         AsciiSPrint (&Buf[Offset], Size - Offset, " %a, %a, %a, %a", gReg[Rd], gReg[Rn], gReg[Rm], gReg[Rt]);
+        return;
+
+      case THUMB2_MRS:
+        // MRS <Rd>, CPSR
+        AsciiSPrint (&Buf[Offset], Size - Offset, " %a, CPSR", gReg[Rd]);
+        return;
+        
+      case THUMB2_MSR:
+        // MRS CPSR_<fields>, <Rd>
+        Target = (OpCode32 >> 10) & 3;
+        AsciiSPrint (&Buf[Offset], Size - Offset, " CPSR_%a%a, %a", (Target & 2) == 0 ? "":"f", (Target & 1) == 0 ? "":"s", gReg[Rd]);
         return;
 
       case THUMB2_NO_ARGS:
