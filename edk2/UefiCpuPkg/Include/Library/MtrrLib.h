@@ -19,9 +19,19 @@
 // According to IA32 SDM, MTRRs number and msr offset are always consistent
 // for IA32 processor family
 //
-#define  MTRR_NUMBER_OF_VARIABLE_MTRR   8
+
+//
+// We can not use Pcd as macro to define structure, so we have to define MAX_MTRR_NUMBER_OF_VARIABLE_MTRR
+//
+#define  MAX_MTRR_NUMBER_OF_VARIABLE_MTRR  32
+//
+// Firmware need reserve 2 MTRR for OS
+//
+#define  RESERVED_FIRMWARE_VARIABLE_MTRR_NUMBER  2
+
 #define  MTRR_NUMBER_OF_FIXED_MTRR      11
-#define  FIRMWARE_VARIABLE_MTRR_NUMBER  6
+#define  MTRR_LIB_IA32_MTRR_CAP                      0x0FE
+#define  MTRR_LIB_IA32_MTRR_CAP_VCNT_MASK            0x0FF
 #define  MTRR_LIB_IA32_MTRR_FIX64K_00000             0x250
 #define  MTRR_LIB_IA32_MTRR_FIX16K_80000             0x258
 #define  MTRR_LIB_IA32_MTRR_FIX16K_A0000             0x259
@@ -34,7 +44,6 @@
 #define  MTRR_LIB_IA32_MTRR_FIX4K_F0000              0x26E
 #define  MTRR_LIB_IA32_MTRR_FIX4K_F8000              0x26F
 #define  MTRR_LIB_IA32_VARIABLE_MTRR_BASE            0x200
-#define  MTRR_LIB_IA32_VARIABLE_MTRR_END             0x20F
 #define  MTRR_LIB_IA32_MTRR_DEF_TYPE                 0x2FF
 #define  MTRR_LIB_MSR_VALID_MASK                     0xFFFFFFFFFULL
 #define  MTRR_LIB_CACHE_VALID_ADDRESS                0xFFFFFF000ULL
@@ -74,7 +83,7 @@ typedef struct _MTRR_VARIABLE_SETTING_ {
 // Array for variable MTRRs
 //
 typedef struct _MTRR_VARIABLE_SETTINGS_ {
-	MTRR_VARIABLE_SETTING   Mtrr[MTRR_NUMBER_OF_VARIABLE_MTRR];
+	MTRR_VARIABLE_SETTING   Mtrr[MAX_MTRR_NUMBER_OF_VARIABLE_MTRR];
 }	MTRR_VARIABLE_SETTINGS;
 
 //
@@ -110,6 +119,28 @@ typedef enum {
 #define  MTRR_CACHE_WRITE_PROTECTED  5
 #define  MTRR_CACHE_WRITE_BACK       6
 #define  MTRR_CACHE_INVALID_TYPE     7
+
+/**
+  Returns the variable MTRR count for the CPU.
+
+  @return Variable MTRR count
+
+**/
+UINT32
+GetVariableMtrrCount (
+  VOID
+  );
+
+/**
+  Returns the firmware usable variable MTRR count for the CPU.
+
+  @return Firmware usable variable MTRR count
+
+**/
+UINT32
+GetFirmwareVariableMtrrCount (
+  VOID
+  );
 
 /**
   This function attempts to set the attributes for a memory range.
@@ -251,19 +282,25 @@ MtrrSetAllMtrrs (
   This function shadows the content of variable MTRRs into
   an internal array: VariableMtrr
 
-  @param  MtrrValidBitsMask     The mask for the valid bit of the MTRR
-  @param  MtrrValidAddressMask  The valid address mask for MTRR since the base address in
-                                MTRR must align to 4K, so valid address mask equal to
-                                MtrrValidBitsMask & 0xfffffffffffff000ULL
-  @param  VariableMtrr          The array to shadow variable MTRRs content
-  @return                       The ruturn value of this paramter indicates the number of
-                                MTRRs which has been used.
+  @param  MtrrValidBitsMask        The mask for the valid bit of the MTRR
+  @param  MtrrValidAddressMask     The valid address mask for MTRR since the base address in
+                                   MTRR must align to 4K, so valid address mask equal to
+                                   MtrrValidBitsMask & 0xfffffffffffff000ULL
+  @param  VariableMtrrCount        On input, it means the array number of variable MTRRs passed in.
+                                   On output, it means the number of MTRRs which has been used if EFI_SUCCESS,
+                                   or the number of MTRR required if BUFFER_TOO_SMALL.
+  @param  VariableMtrr             The array to shadow variable MTRRs content
+
+  @retval RETURN_SUCCESS           The variable MTRRs are returned.
+  @retval RETURN_BUFFER_TOO_SMALL  The input buffer is too small to hold the variable MTRRs.
+
 **/
-UINT32
+RETURN_STATUS
 EFIAPI
 MtrrGetMemoryAttributeInVariableMtrr (
   IN  UINT64                    MtrrValidBitsMask,
   IN  UINT64                    MtrrValidAddressMask,
+  IN OUT UINT32                 *VariableMtrrCount,
   OUT VARIABLE_MTRR             *VariableMtrr
   );
 
