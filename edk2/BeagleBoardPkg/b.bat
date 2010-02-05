@@ -15,19 +15,23 @@
 @REM b release clean
 @REM b -v -y build.log
 
-
+ECHO OFF
+@REM Setup Build environment. Sets WORKSPACE and puts build in path
 CALL ..\edksetup.bat
+
+@REM Set for tools chain. Currently RVCT31
 SET TARGET_TOOLS=RVCT31
 SET TARGET=DEBUG
 
 @if /I "%1"=="RELEASE" (
+  @REM If 1st argument is release set TARGET to RELEASE and shift arguments to remove it 
   SET TARGET=RELEASE
   shift /1
 )
 
 SET BUILD_ROOT=%WORKSPACE%\Build\BeagleBoard\%TARGET%_%TARGET_TOOLS%
-BUILD_ROOT=$WORKSPACE/Build/BeagleBoard/"$TARGET"_"$TARGET_TOOLS"
 
+@REM Build the Beagle Board firmware and creat an FD (FLASH Device) Image.
 CALL build -p BeagleBoardPkg\BeagleBoardPkg.dsc -a ARM -t RVCT31 -b %TARGET% %1 %2 %3 %4 %5 %6 %7 %8
 
 @if /I "%1"=="CLEAN" goto Clean
@@ -45,12 +49,12 @@ ECHO Building tools...
 CALL nmake 
 
 ECHO Patching image with ConfigurationHeader.dat
-CALL GenerateImage -D ConfigurationHeader.dat -E 0x80008208 -I ../../Build/FV/BEAGLEBOARD_EFI.fd -O ../../Build/FV/BeagleBoard_EFI_flashboot.fd
+CALL GenerateImage -D ..\ConfigurationHeader.dat -E 0x80008208 -I %BUILD_ROOT%\FV\BEAGLEBOARD_EFI.fd -O %BUILD_ROOT%\FV\BeagleBoard_EFI_flashboot.fd
 
 ECHO Patching ..\Debugger_scripts ...
 SET DEBUGGER_SCRIPT=..\Debugger_scripts
-for /f %%a IN ('dir /b %DEBUGGER_SCRIPT%\*.inc %DEBUGGER_SCRIPT%\*.cmm') do (
-  CALL replace %DEBUGGER_SCRIPT%\%%a %BUILD_ROOT%\%%a ZZZZZZ %BUILD_ROOT% WWWWWW  %WORKSPACE%
+@for /f %%a IN ('dir /b %DEBUGGER_SCRIPT%\*.inc %DEBUGGER_SCRIPT%\*.cmm') do (
+  @CALL replace %DEBUGGER_SCRIPT%\%%a %BUILD_ROOT%\%%a ZZZZZZ %BUILD_ROOT% WWWWWW  %WORKSPACE%
 )
 
 cd ..
