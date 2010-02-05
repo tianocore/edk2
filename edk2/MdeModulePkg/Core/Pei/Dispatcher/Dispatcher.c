@@ -286,16 +286,16 @@ PeiLoadFixAddressHook(
   // The top reserved memory include 3 parts: the topest range is for DXE core initialization with the size  MINIMUM_INITIAL_MEMORY_SIZE
   // then RuntimeCodePage range and Boot time code range.
   //  
-  TotalReservedMemorySize = EFI_PAGES_TO_SIZE(PcdGet32(PcdLoadFixAddressRuntimeCodePageNumber)+ PcdGet32(PcdLoadFixAddressBootTimeCodePageNumber))
-                               + MINIMUM_INITIAL_MEMORY_SIZE;  
- 
-  DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: PcdLoadFixAddressRuntimeCodePageNumber= %x.\n", PcdGet32(PcdLoadFixAddressRuntimeCodePageNumber)));
-  DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: PcdLoadFixAddressBootTimeCodePageNumber= %x.\n", PcdGet32(PcdLoadFixAddressBootTimeCodePageNumber)));
-  DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: PcdLoadFixAddressPeiCodePageNumber= %x.\n", PcdGet32(PcdLoadFixAddressPeiCodePageNumber)));   
+  TotalReservedMemorySize = MINIMUM_INITIAL_MEMORY_SIZE + EFI_PAGES_TO_SIZE(PcdGet32(PcdLoadFixAddressRuntimeCodePageNumber));
+  TotalReservedMemorySize+= EFI_PAGES_TO_SIZE(PcdGet32(PcdLoadFixAddressBootTimeCodePageNumber)) ;  
   //
   // PEI memory range lies below the top reserved memory
   // 
   TotalReservedMemorySize += PeiMemorySize;
+  
+  DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: PcdLoadFixAddressRuntimeCodePageNumber= %x.\n", PcdGet32(PcdLoadFixAddressRuntimeCodePageNumber)));
+  DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: PcdLoadFixAddressBootTimeCodePageNumber= %x.\n", PcdGet32(PcdLoadFixAddressBootTimeCodePageNumber)));
+  DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: PcdLoadFixAddressPeiCodePageNumber= %x.\n", PcdGet32(PcdLoadFixAddressPeiCodePageNumber)));   
   DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: Total Reserved Memory Size = %lx.\n", TotalReservedMemorySize));
   //
   // Loop through the system memory typed hob to merge the adjacent memory range 
