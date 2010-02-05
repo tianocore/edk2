@@ -300,49 +300,35 @@ ProgramFixedMtrr (
 /**
   Get the attribute of variable MTRRs.
 
-  This function shadows the content of variable MTRRs into
-  an internal array: VariableMtrr
+  This function shadows the content of variable MTRRs into an
+  internal array: VariableMtrr.
 
-  @param  MtrrValidBitsMask        The mask for the valid bit of the MTRR
-  @param  MtrrValidAddressMask     The valid address mask for MTRR since the base address in
-                                   MTRR must align to 4K, so valid address mask equal to
-                                   MtrrValidBitsMask & 0xfffffffffffff000ULL
-  @param  VariableMtrrCount        On input, it means the array number of variable MTRRs passed in.
-                                   On output, it means the number of MTRRs which has been used if EFI_SUCCESS,
-                                   or the number of MTRR required if BUFFER_TOO_SMALL.
-  @param  VariableMtrr             The array to shadow variable MTRRs content
+  @param  MtrrValidBitsMask     The mask for the valid bit of the MTRR
+  @param  MtrrValidAddressMask  The valid address mask for MTRR
+  @param  VariableMtrr          The array to shadow variable MTRRs content
 
-  @retval RETURN_SUCCESS           The variable MTRRs are returned.
-  @retval RETURN_BUFFER_TOO_SMALL  The input buffer is too small to hold the variable MTRRs.
+  @return                       The return value of this paramter indicates the
+                                number of MTRRs which has been used.
 
 **/
-RETURN_STATUS
+UINT32
 EFIAPI
 MtrrGetMemoryAttributeInVariableMtrr (
   IN  UINT64                    MtrrValidBitsMask,
   IN  UINT64                    MtrrValidAddressMask,
-  IN OUT UINT32                 *VariableMtrrCount,
   OUT VARIABLE_MTRR             *VariableMtrr
   )
 {
   UINTN   Index;
   UINT32  MsrNum;
   UINT32  UsedMtrr;
-  UINTN   FirmwareVariableMtrrCount;
+  UINT32  FirmwareVariableMtrrCount;
   UINT32  VariableMtrrEnd;
 
-  //
-  // Check if input buffer is large enough
-  //
   FirmwareVariableMtrrCount = GetFirmwareVariableMtrrCount ();
-  if (*VariableMtrrCount < FirmwareVariableMtrrCount) {
-    *VariableMtrrCount = (UINT32)FirmwareVariableMtrrCount;
-    return RETURN_BUFFER_TOO_SMALL;
-  }
-
   VariableMtrrEnd = MTRR_LIB_IA32_VARIABLE_MTRR_BASE + (2 * GetVariableMtrrCount ()) - 1;
 
-  ZeroMem (VariableMtrr, sizeof (VARIABLE_MTRR) * (*VariableMtrrCount));
+  ZeroMem (VariableMtrr, sizeof (VARIABLE_MTRR) * MTRR_NUMBER_OF_VARIABLE_MTRR);
   UsedMtrr = 0;
 
   for (MsrNum = MTRR_LIB_IA32_VARIABLE_MTRR_BASE, Index = 0;
@@ -368,8 +354,7 @@ MtrrGetMemoryAttributeInVariableMtrr (
       Index++;
     }
   }
-  *VariableMtrrCount = UsedMtrr;
-  return RETURN_SUCCESS;
+  return UsedMtrr;
 }
 
 
@@ -882,7 +867,7 @@ MtrrSetMemoryAttribute (
   BOOLEAN                   Positive;
   UINT32                    MsrNum;
   UINTN                     MtrrNumber;
-  VARIABLE_MTRR             VariableMtrr[MAX_MTRR_NUMBER_OF_VARIABLE_MTRR];
+  VARIABLE_MTRR             VariableMtrr[MTRR_NUMBER_OF_VARIABLE_MTRR];
   UINT32                    UsedMtrr;
   UINT64                    MtrrValidBitsMask;
   UINT64                    MtrrValidAddressMask;
@@ -960,8 +945,7 @@ MtrrSetMemoryAttribute (
   //
   // Check for overlap
   //
-  UsedMtrr = MAX_MTRR_NUMBER_OF_VARIABLE_MTRR;
-  MtrrGetMemoryAttributeInVariableMtrr (MtrrValidBitsMask, MtrrValidAddressMask, &UsedMtrr, VariableMtrr);
+  UsedMtrr = MtrrGetMemoryAttributeInVariableMtrr (MtrrValidBitsMask, MtrrValidAddressMask, VariableMtrr);
   OverLap = CheckMemoryAttributeOverlap (BaseAddress, BaseAddress + Length - 1, VariableMtrr);
   if (OverLap) {
     Status = CombineMemoryAttribute (MemoryType, &BaseAddress, &Length, VariableMtrr, &UsedMtrr, &OverwriteExistingMtrr);
@@ -1127,11 +1111,10 @@ MtrrGetMemoryAttribute (
   UINT64                  MtrrType;
   UINT64                  TempMtrrType;
   MTRR_MEMORY_CACHE_TYPE  CacheType;
-  VARIABLE_MTRR           VariableMtrr[MAX_MTRR_NUMBER_OF_VARIABLE_MTRR];
+  VARIABLE_MTRR           VariableMtrr[MTRR_NUMBER_OF_VARIABLE_MTRR];
   UINT64                  MtrrValidBitsMask;
   UINT64                  MtrrValidAddressMask;
   UINTN                   VariableMtrrCount;
-  UINT32                  UsedMtrr;
 
   //
   // Check if MTRR is enabled, if not, return UC as attribute
@@ -1169,11 +1152,9 @@ MtrrGetMemoryAttribute (
     }
   }
   MtrrLibInitializeMtrrMask(&MtrrValidBitsMask, &MtrrValidAddressMask);
-  UsedMtrr = MAX_MTRR_NUMBER_OF_VARIABLE_MTRR;
   MtrrGetMemoryAttributeInVariableMtrr(
     MtrrValidBitsMask,
     MtrrValidAddressMask,
-    &UsedMtrr,
     VariableMtrr
     );
 
