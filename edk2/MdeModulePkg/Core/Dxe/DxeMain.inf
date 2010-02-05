@@ -103,6 +103,7 @@
   gEfiDxeServicesTableGuid                      ## CONSUMES ## GUID
   gEfiMemoryTypeInformationGuid                 ## CONSUMES ## GUID
   gEfiEventDxeDispatchGuid                      ## CONSUMES ## GUID
+  gLoadFixedAddressConfigurationTableGuid       ## SOMETIMES_CONSUMES
   
 
 [Protocols]
@@ -138,3 +139,10 @@
 
 [FeaturePcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport	   ## CONSUMES
+
+[FixedPcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadModuleAtFixAddressEnable           ## CONSUMES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressBootTimeCodePageNumber    ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressRuntimeCodePageNumber     ## SOMETIMES_CONSUMES

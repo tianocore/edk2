@@ -60,7 +60,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/MemoryAllocationHob.h>
 #include <Guid/EventLegacyBios.h>
 #include <Guid/EventGroup.h>
-
+#include <Guid/LoadModuleAtFixedAddress.h>
 
 #include <Library/DxeCoreEntryPoint.h>
 #include <Library/DebugLib.h>
@@ -80,6 +80,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/TimerLib.h>
 #include <Library/DxeServicesLib.h>
+
 
 //
 // attributes for reserved memory before it is promoted to system memory
@@ -204,6 +205,8 @@ extern EFI_MEMORY_TYPE_INFORMATION              gMemoryTypeInformation[EfiMaxMem
 extern BOOLEAN                                  gDispatcherRunning;
 extern EFI_RUNTIME_ARCH_PROTOCOL                gRuntimeTemplate;
 
+extern EFI_LOAD_FIXED_ADDRESS_CONFIGURATION_TABLE    gLoadModuleAtFixAddressConfigurationTable;
+extern BOOLEAN                                       gLoadFixedAddressCodeMemoryReady;
 //
 // Service Initialization Functions
 //

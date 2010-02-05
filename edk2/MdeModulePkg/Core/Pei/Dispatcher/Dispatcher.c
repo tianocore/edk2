@@ -233,7 +233,326 @@ ShadowPeiCore(
   //
   return (VOID*) ((UINTN) EntryPoint + (UINTN) PeiCore - (UINTN) _ModuleEntryPoint);
 }
+//
+// This is the minimum memory required by DxeCore initialization. When LMFA feature enabled,
+// This part of memory still need reserved on the very top of memory so that the DXE Core could  
+// use these memory for data initialization. This macro should be sync with the same marco
+// defined in DXE Core.
+//
+#define MINIMUM_INITIAL_MEMORY_SIZE 0x10000
+/**
+  Hook function for Loading Module at Fixed Address feature
+  
+  This function should only be invoked when Loading Module at Fixed Address(LMFA) feature is enabled. When feature is
+  configured as Load Modules at Fix Absolute Address, this function is to validate the top address assigned by user. When 
+  feature is configured as Load Modules at Fixed Offset, the functino is to find the top address which is TOLM-TSEG in general.  
+  And also the function will re-install PEI memory. 
 
+  @param PrivateData         Pointer to the private data passed in from caller
+
+**/
+VOID
+PeiLoadFixAddressHook(
+  IN PEI_CORE_INSTANCE           *PrivateData
+  )
+{
+  EFI_PHYSICAL_ADDRESS               TopLoadingAddress;
+  UINT64                             PeiMemorySize;
+  UINT64                             TotalReservedMemorySize;
+  UINT64                             MemoryRangeEnd;
+  EFI_PHYSICAL_ADDRESS               HighAddress; 
+  EFI_HOB_RESOURCE_DESCRIPTOR        *ResourceHob;
+  EFI_HOB_RESOURCE_DESCRIPTOR        *NextResourceHob;
+  EFI_HOB_RESOURCE_DESCRIPTOR        *CurrentResourceHob;
+  EFI_PEI_HOB_POINTERS               CurrentHob;
+  EFI_PEI_HOB_POINTERS               Hob;
+  EFI_PEI_HOB_POINTERS               NextHob;
+  EFI_PHYSICAL_ADDRESS               MaxMemoryBaseAddress;
+  UINT64                             MaxMemoryLength;
+  //
+  // Initialize Local Variables
+  //
+  CurrentResourceHob    = NULL;
+  ResourceHob           = NULL;
+  NextResourceHob       = NULL;
+  MaxMemoryBaseAddress  = 0;
+  MaxMemoryLength       = 0;
+  HighAddress           = 0;
+  TopLoadingAddress     = 0;
+  MemoryRangeEnd      = 0;
+  CurrentHob.Raw      = PrivateData->HobList.Raw;
+  PeiMemorySize = PrivateData->PhysicalMemoryLength;
+  //
+  // The top reserved memory include 3 parts: the topest range is for DXE core initialization with the size  MINIMUM_INITIAL_MEMORY_SIZE
+  // then RuntimeCodePage range and Boot time code range.
+  //  
+  TotalReservedMemorySize = EFI_PAGES_TO_SIZE(PcdGet32(PcdLoadFixAddressRuntimeCodePageNumber)+ PcdGet32(PcdLoadFixAddressBootTimeCodePageNumber))
+                               + MINIMUM_INITIAL_MEMORY_SIZE;  
+ 
+  DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: PcdLoadFixAddressRuntimeCodePageNumber= %x.\n", PcdGet32(PcdLoadFixAddressRuntimeCodePageNumber)));
+  DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: PcdLoadFixAddressBootTimeCodePageNumber= %x.\n", PcdGet32(PcdLoadFixAddressBootTimeCodePageNumber)));
+  DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: PcdLoadFixAddressPeiCodePageNumber= %x.\n", PcdGet32(PcdLoadFixAddressPeiCodePageNumber)));   
+  //
+  // PEI memory range lies below the top reserved memory
+  // 
+  TotalReservedMemorySize += PeiMemorySize;
+  DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: Total Reserved Memory Size = %lx.\n", TotalReservedMemorySize));
+  //
+  // Loop through the system memory typed hob to merge the adjacent memory range 
+  //
+  for (Hob.Raw = PrivateData->HobList.Raw; !END_OF_HOB_LIST(Hob); Hob.Raw = GET_NEXT_HOB(Hob)) {
+    //                                                              
+    // See if this is a resource descriptor HOB                     
+    //
+    if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+      
+      ResourceHob = Hob.ResourceDescriptor;  
+      //
+      // If range described in this hob is not system memory or heigher than MAX_ADDRESS, ignored.
+      //
+      if (ResourceHob->ResourceType != EFI_RESOURCE_SYSTEM_MEMORY &&
+          ResourceHob->PhysicalStart + ResourceHob->ResourceLength > MAX_ADDRESS)   {
+        continue;
+      }   
+      
+      for (NextHob.Raw = PrivateData->HobList.Raw; !END_OF_HOB_LIST(NextHob); NextHob.Raw = GET_NEXT_HOB(NextHob)) {       
+        if (NextHob.Raw == Hob.Raw){
+          continue;
+        }  
+        //
+        // See if this is a resource descriptor HOB
+        //
+        if (GET_HOB_TYPE (NextHob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+      
+          NextResourceHob = NextHob.ResourceDescriptor;
+          //
+          // test if range described in this NextResourceHob is system memory and have the same attribute.
+          // Note: Here is a assumption that system memory should always be healthy even without test.
+          //    
+          if (NextResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY &&
+             (((NextResourceHob->ResourceAttribute^ResourceHob->ResourceAttribute)&(~EFI_RESOURCE_ATTRIBUTE_TESTED)) == 0)){
+              
+              //
+              // See if the memory range described in ResourceHob and NextResourceHob is adjacent
+              //
+              if ((ResourceHob->PhysicalStart <= NextResourceHob->PhysicalStart && 
+                    ResourceHob->PhysicalStart + ResourceHob->ResourceLength >= NextResourceHob->PhysicalStart)|| 
+                  (ResourceHob->PhysicalStart >= NextResourceHob->PhysicalStart&&
+                     ResourceHob->PhysicalStart <= NextResourceHob->PhysicalStart + NextResourceHob->ResourceLength)) {
+             
+                MemoryRangeEnd = ((ResourceHob->PhysicalStart + ResourceHob->ResourceLength)>(NextResourceHob->PhysicalStart + NextResourceHob->ResourceLength)) ?
+                                     (ResourceHob->PhysicalStart + ResourceHob->ResourceLength):(NextResourceHob->PhysicalStart + NextResourceHob->ResourceLength);
+          
+                ResourceHob->PhysicalStart = (ResourceHob->PhysicalStart < NextResourceHob->PhysicalStart) ? 
+                                                    ResourceHob->PhysicalStart : NextResourceHob->PhysicalStart;
+                
+               
+                ResourceHob->ResourceLength = (MemoryRangeEnd - ResourceHob->PhysicalStart);
+                
+                ResourceHob->ResourceAttribute = ResourceHob->ResourceAttribute & (~EFI_RESOURCE_ATTRIBUTE_TESTED);
+                //
+                // Delete the NextResourceHob by marking it as unused.
+                //
+                GET_HOB_TYPE (NextHob) = EFI_HOB_TYPE_UNUSED;
+                
+              }
+           }
+        } 
+      }
+    } 
+  }
+  //
+  // Try to find and validate the TOP address.
+  //  
+  if ((INT64)FixedPcdGet64(PcdLoadModuleAtFixAddressEnable) > 0 ) {
+    //
+    // The LMFA feature is enabled as load module at fixed absolute address.
+    //
+    TopLoadingAddress = (EFI_PHYSICAL_ADDRESS)FixedPcdGet64(PcdLoadModuleAtFixAddressEnable);
+    DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: Loading module at fixed absolute address.\n"));
+    //
+    // validate the Address. Loop the resource descriptor HOB to make sure the address is in valid memory range
+    //
+    if ((TopLoadingAddress & EFI_PAGE_MASK) != 0) {
+      DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED ERROR:Top Address %lx is invalid since top address should be page align. \n", TopLoadingAddress)); 
+      ASSERT (FALSE);    
+    }
+    //
+    // Search for a memory region that is below MAX_ADDRESS and in which TopLoadingAddress lies 
+    //
+    for (Hob.Raw = PrivateData->HobList.Raw; !END_OF_HOB_LIST(Hob); Hob.Raw = GET_NEXT_HOB(Hob)) {
+      //
+      // See if this is a resource descriptor HOB
+      //
+      if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+
+        ResourceHob = Hob.ResourceDescriptor;
+        //
+        // See if this resource descrior HOB describes tested system memory below MAX_ADDRESS
+        //    
+        if (ResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY &&
+            ResourceHob->PhysicalStart + ResourceHob->ResourceLength <= MAX_ADDRESS) {
+            //
+            // See if Top address specified by user is valid.
+            //
+            if (ResourceHob->PhysicalStart + TotalReservedMemorySize < TopLoadingAddress && 
+                (ResourceHob->PhysicalStart + ResourceHob->ResourceLength - MINIMUM_INITIAL_MEMORY_SIZE) >= TopLoadingAddress) {
+              CurrentResourceHob = ResourceHob; 
+              CurrentHob = Hob;
+              break;
+            }
+        }
+      }  
+    }  
+    if (CurrentResourceHob != NULL) {
+      DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO:Top Address %lx is valid \n",  TopLoadingAddress));
+      TopLoadingAddress += MINIMUM_INITIAL_MEMORY_SIZE; 
+    } else {
+      DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED ERROR:Top Address %lx is invalid \n",  TopLoadingAddress)); 
+      DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED ERROR:The recommended Top Address for the platform is: \n")); 
+      //
+      // Print the recomended Top address range.
+      // 
+      for (Hob.Raw = PrivateData->HobList.Raw; !END_OF_HOB_LIST(Hob); Hob.Raw = GET_NEXT_HOB(Hob)) {
+        //
+        // See if this is a resource descriptor HOB
+        //
+        if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+        
+          ResourceHob = Hob.ResourceDescriptor;
+          //
+          // See if this resource descrior HOB describes tested system memory below MAX_ADDRESS
+          //    
+          if (ResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY &&
+              ResourceHob->PhysicalStart + ResourceHob->ResourceLength <= MAX_ADDRESS) {
+              //
+              // See if Top address specified by user is valid.
+              //
+              if (ResourceHob->ResourceLength > TotalReservedMemorySize) {
+                 DEBUG ((EFI_D_INFO, "(%lx, %lx)\n",  
+                          (ResourceHob->PhysicalStart + TotalReservedMemorySize -MINIMUM_INITIAL_MEMORY_SIZE), 
+                          (ResourceHob->PhysicalStart + ResourceHob->ResourceLength -MINIMUM_INITIAL_MEMORY_SIZE) 
+                        )); 
+              }
+          }
+        }
+      }  
+      //
+      // Assert here 
+      //
+      ASSERT (FALSE);      
+    }     
+  } else {
+    //
+    // The LMFA feature is enabled as load module at fixed offset relative to TOLM
+    // Parse the Hob list to find the topest available memory. Generally it is (TOLM - TSEG)
+    //
+    //
+    // Search for a tested memory region that is below MAX_ADDRESS
+    //
+    for (Hob.Raw = PrivateData->HobList.Raw; !END_OF_HOB_LIST(Hob); Hob.Raw = GET_NEXT_HOB(Hob)) {
+      //
+      // See if this is a resource descriptor HOB 
+      //
+      if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+        
+        ResourceHob = Hob.ResourceDescriptor;                                                                                                                                                                                                                               
+        //
+        // See if this resource descrior HOB describes tested system memory below MAX_ADDRESS
+        //
+        if (ResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY && 
+            ResourceHob->PhysicalStart + ResourceHob->ResourceLength <= MAX_ADDRESS &&
+            ResourceHob->ResourceLength > TotalReservedMemorySize) {
+          //
+          // See if this is the highest largest system memory region below MaxAddress
+          //
+          if (ResourceHob->PhysicalStart > HighAddress) {
+             CurrentResourceHob = ResourceHob;
+             CurrentHob = Hob;
+             HighAddress = CurrentResourceHob->PhysicalStart;
+          }
+        }
+      }  
+    }
+    if (CurrentResourceHob == NULL) {
+      DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED ERROR:The System Memory is too small\n")); 
+      //
+      // Assert here 
+      //
+      ASSERT (FALSE);      
+    } else {
+      TopLoadingAddress = CurrentResourceHob->PhysicalStart + CurrentResourceHob->ResourceLength ; 
+    }         
+  }
+  
+  if (CurrentResourceHob != NULL) {
+    //
+    // rebuild hob for PEI memmory and reserved memory
+    //
+    BuildResourceDescriptorHob (
+      EFI_RESOURCE_SYSTEM_MEMORY,                       // MemoryType,
+      (
+      EFI_RESOURCE_ATTRIBUTE_PRESENT |
+      EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+      EFI_RESOURCE_ATTRIBUTE_TESTED |
+      EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
+      EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
+      EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
+      EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE
+      ),
+      (TopLoadingAddress - TotalReservedMemorySize),                             // MemoryBegin
+      TotalReservedMemorySize      // MemoryLength
+    );
+    //
+    // rebuild hob for the remain memory if necessary
+    //
+    if (CurrentResourceHob->PhysicalStart < TopLoadingAddress - TotalReservedMemorySize) {
+      BuildResourceDescriptorHob (
+        EFI_RESOURCE_SYSTEM_MEMORY,                       // MemoryType,
+        (
+         EFI_RESOURCE_ATTRIBUTE_PRESENT |
+         EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+         EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
+         EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
+         EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
+         EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE
+         ),
+         CurrentResourceHob->PhysicalStart,                             // MemoryBegin
+         (TopLoadingAddress - TotalReservedMemorySize - CurrentResourceHob->PhysicalStart)      // MemoryLength
+       );
+    }
+    if (CurrentResourceHob->PhysicalStart + CurrentResourceHob->ResourceLength  > TopLoadingAddress ) {
+      BuildResourceDescriptorHob (
+        EFI_RESOURCE_SYSTEM_MEMORY,                     
+        (
+         EFI_RESOURCE_ATTRIBUTE_PRESENT |
+         EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+         EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
+         EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
+         EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
+         EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE
+         ),
+         TopLoadingAddress,                            
+         (CurrentResourceHob->PhysicalStart + CurrentResourceHob->ResourceLength  - TopLoadingAddress)     
+       );
+    }
+    //
+    // Delete CurrentHob by marking it as unused since the the memory range described by is rebuilt.
+    //
+    GET_HOB_TYPE (CurrentHob) = EFI_HOB_TYPE_UNUSED;         
+  }
+
+  //
+  // Cache the top address for Loading Module at Fixed Address feature
+  //
+  PrivateData->LoadModuleAtFixAddressTopAddress = TopLoadingAddress - MINIMUM_INITIAL_MEMORY_SIZE;
+  DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: Top address = %lx\n",  PrivateData->LoadModuleAtFixAddressTopAddress)); 
+  //
+  // reinstall the PEI memory relative to TopLoadingAddress
+  //
+  PrivateData->PhysicalMemoryBegin   = TopLoadingAddress - TotalReservedMemorySize;
+  PrivateData->FreePhysicalMemoryTop = PrivateData->PhysicalMemoryBegin + PeiMemorySize;
+}
 /**
   Conduct PEIM dispatch.
 
@@ -277,6 +596,7 @@ PeiDispatcher (
   UINTN                               OldCheckingTop;
   UINTN                               OldCheckingBottom;
   PEI_CORE_FV_HANDLE                  *CoreFvHandle;
+  VOID                                *LoadFixPeiCodeBegin;
 
   PeiServices = (CONST EFI_PEI_SERVICES **) &Private->PS;
   PeimEntryPoint = NULL;
@@ -476,6 +796,13 @@ PeiDispatcher (
                       ));
               DEBUG_CODE_END ();
               
+              if (FixedPcdGet64(PcdLoadModuleAtFixAddressEnable) != 0) {
+                //
+                // Loading Module at Fixed Address is enabled
+                //
+                PeiLoadFixAddressHook(Private);
+              }
+              
               //
               // Reserve the size of new stack at bottom of physical memory
               //
@@ -613,6 +940,19 @@ PeiDispatcher (
               //
               PrivateInMem->PeimDispatcherReenter  = TRUE;
               
+              if (FixedPcdGet64(PcdLoadModuleAtFixAddressEnable) != 0) {
+                //
+                // if Loading Module at Fixed Address is enabled, This is the first invoke to page 
+                // allocation for Pei Core segment. This memory segment should be reserved for loading PEIM
+                //
+                LoadFixPeiCodeBegin = AllocatePages((UINTN)PcdGet32(PcdLoadFixAddressPeiCodePageNumber));
+                DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: PeiCodeBegin = %x, PeiCodeTop= %x\n", (UINTN)LoadFixPeiCodeBegin, ((UINTN)LoadFixPeiCodeBegin) + PcdGet32(PcdLoadFixAddressPeiCodePageNumber) * EFI_PAGE_SIZE));                 
+                //
+                // if Loading Module at Fixed Address is enabled, allocate the PEI code memory range usage bit map array.
+                // Every bit in the array indicate the status of the corresponding memory page, available or not
+                //
+                PrivateInMem->PeiCodeMemoryRangeUsageBitMap = AllocateZeroPool (((PcdGet32(PcdLoadFixAddressPeiCodePageNumber)>>6) + 1)*sizeof(UINT64));
+              }
               //
               // Shadow PEI Core. When permanent memory is avaiable, shadow
               // PEI Core and PEIMs to get high performance.

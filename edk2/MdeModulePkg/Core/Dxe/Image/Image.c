@@ -70,8 +70,12 @@ LOADED_IMAGE_PRIVATE_DATA mCorePrivateImage  = {
   NULL,                       // RuntimeData
   NULL                        // LoadedImageDevicePath
 };
-
-
+//
+// The field is define for Loading modules at fixed address feature to tracker the PEI code
+// memory range usage. It is a bit mapped array in which every bit indicates the correspoding memory page
+// available or not. 
+//
+GLOBAL_REMOVE_IF_UNREFERENCED    UINT64                *mDxeCodeMemoryRangeUsageBitMap=NULL;
 
 /**
   Add the Image Services to EFI Boot Services Table and install the protocol
@@ -202,7 +206,170 @@ CoreReadImageFile (
   CopyMem (Buffer, (CHAR8 *)FHand->Source + Offset, *ReadSize);
   return EFI_SUCCESS;
 }
+/**
+  To check memory usage bit map arry to figure out if the memory range the image will be loaded in is available or not. If 
+  memory range is avaliable, the function will mark the correponding bits to 1 which indicates the memory range is used.
+  The function is only invoked when load modules at fixed address feature is enabled. 
+  
+  @param  ImageBase                The base addres the image will be loaded at.
+  @param  ImageSize                The size of the image
+  
+  @retval EFI_SUCCESS              The memory range the image will be loaded in is available
+  @retval EFI_NOT_FOUND            The memory range the image will be loaded in is not available
+**/
+EFI_STATUS
+CheckAndMarkFixLoadingMemoryUsageBitMap (
+  IN  EFI_PHYSICAL_ADDRESS          ImageBase,
+  IN  UINTN                         ImageSize
+  )
+{
+   UINT32                             DxeCodePageNumber;
+   UINT64                             DxeCodeSize; 
+   EFI_PHYSICAL_ADDRESS               DxeCodeBase;
+   UINTN                              BaseOffsetPageNumber;
+   UINTN                              TopOffsetPageNumber;
+   UINTN                              Index;
+   //
+   // The DXE code range includes RuntimeCodePage range and Boot time code range.
+   //  
+   DxeCodePageNumber = PcdGet32(PcdLoadFixAddressRuntimeCodePageNumber);
+   DxeCodePageNumber += PcdGet32(PcdLoadFixAddressBootTimeCodePageNumber);
+   DxeCodeSize       = EFI_PAGES_TO_SIZE(DxeCodePageNumber);
+   DxeCodeBase       =  gLoadModuleAtFixAddressConfigurationTable.DxeCodeTopAddress - DxeCodeSize;
+   
+   //
+   // If the memory usage bit map is not initialized,  do it. Every bit in the array 
+   // indicate the status of the corresponding memory page, available or not
+   // 
+   if (mDxeCodeMemoryRangeUsageBitMap == NULL) {
+     mDxeCodeMemoryRangeUsageBitMap = AllocateZeroPool(((DxeCodePageNumber/64) + 1)*sizeof(UINT64));
+   }
+   //
+   // If the Dxe code memory range is not allocated or the bit map array allocation failed, return EFI_NOT_FOUND
+   //
+   if (!gLoadFixedAddressCodeMemoryReady || mDxeCodeMemoryRangeUsageBitMap == NULL) {
+     return EFI_NOT_FOUND;
+   }
+   //
+   // Test the memory range for loading the image in the DXE code range.
+   //
+   if (gLoadModuleAtFixAddressConfigurationTable.DxeCodeTopAddress <  ImageBase + ImageSize ||
+       DxeCodeBase >  ImageBase) {
+     return EFI_NOT_FOUND;   
+   }   
+   //
+   // Test if the memory is avalaible or not.
+   // 
+   BaseOffsetPageNumber = (UINTN)EFI_SIZE_TO_PAGES((UINT32)(ImageBase - DxeCodeBase));
+   TopOffsetPageNumber  = (UINTN)EFI_SIZE_TO_PAGES((UINT32)(ImageBase + ImageSize - DxeCodeBase));
+   for (Index = BaseOffsetPageNumber; Index < TopOffsetPageNumber; Index ++) {
+     if ((mDxeCodeMemoryRangeUsageBitMap[Index / 64] & LShiftU64(1, (Index % 64))) != 0) {
+       //
+       // This page is already used.
+       //
+       return EFI_NOT_FOUND;  
+     }
+   }
+   
+   //
+   // Being here means the memory range is available.  So mark the bits for the memory range
+   // 
+   for (Index = BaseOffsetPageNumber; Index < TopOffsetPageNumber; Index ++) {
+     mDxeCodeMemoryRangeUsageBitMap[Index / 64] |= LShiftU64(1, (Index % 64));
+   }
+   return  EFI_SUCCESS;   
+}
+/**
 
+  Get the fixed loadding address from image header assigned by build tool. This function only be called
+  when Loading module at Fixed address feature enabled.
+
+  @param  ImageContext              Pointer to the image context structure that describes the PE/COFF
+                                    image that needs to be examined by this function.
+  @retval EFI_SUCCESS               An fixed loading address is assigned to this image by build tools .
+  @retval EFI_NOT_FOUND             The image has no assigned fixed loadding address.
+
+**/
+EFI_STATUS
+GetPeCoffImageFixLoadingAssignedAddress(
+  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
+  )
+{
+   UINTN                              SectionHeaderOffset;
+   EFI_STATUS                         Status;
+   EFI_IMAGE_SECTION_HEADER           SectionHeader;
+   EFI_IMAGE_OPTIONAL_HEADER_UNION    *ImgHdr;
+   UINT16                             Index;
+   UINTN                              Size;
+   UINT16                             NumberOfSections;
+   IMAGE_FILE_HANDLE                  *Handle;
+   UINT64                             ValueInSectionHeader;
+                             
+
+   Status = EFI_NOT_FOUND;
+ 
+   //
+   // Get PeHeader pointer
+   //
+   Handle = (IMAGE_FILE_HANDLE*)ImageContext->Handle;
+   ImgHdr = (EFI_IMAGE_OPTIONAL_HEADER_UNION *)((CHAR8* )Handle->Source + ImageContext->PeCoffHeaderOffset);
+   SectionHeaderOffset = (UINTN)(
+                                 ImageContext->PeCoffHeaderOffset +
+                                 sizeof (UINT32) +
+                                 sizeof (EFI_IMAGE_FILE_HEADER) +
+                                 ImgHdr->Pe32.FileHeader.SizeOfOptionalHeader
+                                 );
+   NumberOfSections = ImgHdr->Pe32.FileHeader.NumberOfSections;
+
+   //
+   // Get base address from the first section header that doesn't point to code section.
+   //
+   for (Index = 0; Index < NumberOfSections; Index++) {
+     //
+     // Read section header from file
+     //
+     Size = sizeof (EFI_IMAGE_SECTION_HEADER);
+     Status = ImageContext->ImageRead (
+                              ImageContext->Handle,
+                              SectionHeaderOffset,
+                              &Size,
+                              &SectionHeader
+                              );
+     if (EFI_ERROR (Status)) {
+       return Status;
+     }
+     
+     Status = EFI_NOT_FOUND;
+     
+     if ((SectionHeader.Characteristics & EFI_IMAGE_SCN_CNT_CODE) == 0) {
+       //
+       // Build tool will save the address in PointerToRelocations & PointerToLineNumbers fields in the first section header
+       // that doesn't point to code section in image header, as well as ImageBase field of image header. And there is an 
+       // assumption that when the feature is enabled, if a module is assigned a loading address by tools, PointerToRelocations  
+       // & PointerToLineNumbers fields should NOT be Zero, or else, these 2 fileds should be set to Zero
+       //
+       ValueInSectionHeader = ReadUnaligned64((UINT64*)&SectionHeader.PointerToRelocations);
+       if (ValueInSectionHeader != 0) {
+         //
+         // When the feature is configured as load module at fixed absolute address, the ImageAddress field of ImageContext 
+         // hold the spcified address. If the feature is configured as load module at fixed offset, ImageAddress hold an offset
+         // relative to top address
+         //
+         if ((INT64)PcdGet64(PcdLoadModuleAtFixAddressEnable) < 0) {
+         	 ImageContext->ImageAddress = gLoadModuleAtFixAddressConfigurationTable.DxeCodeTopAddress + (INT64)ImageContext->ImageAddress;
+         }
+         //
+         // Check if the memory range is avaliable.
+         //
+         Status = CheckAndMarkFixLoadingMemoryUsageBitMap (ImageContext->ImageAddress, (UINTN)(ImageContext->ImageSize + ImageContext->SectionAlignment));
+       }
+       break; 
+     }
+     SectionHeaderOffset += sizeof (EFI_IMAGE_SECTION_HEADER);
+   }
+   DEBUG ((EFI_D_INFO|EFI_D_LOAD, "LOADING MODULE FIXED INFO: Loading module at fixed address %x. Status = %r \n", ImageContext->ImageAddress, Status));
+   return Status;
+}
 /**
   Loads, relocates, and invokes a PE/COFF image
 
@@ -308,21 +475,43 @@ CoreLoadPeImage (
     // no modules whose preferred load addresses are below 1MB.
     //
     Status = EFI_OUT_OF_RESOURCES;
-    if (Image->ImageContext.ImageAddress >= 0x100000 || Image->ImageContext.RelocationsStripped) {
-      Status = CoreAllocatePages (
-                 AllocateAddress,
-                 (EFI_MEMORY_TYPE) (Image->ImageContext.ImageCodeMemoryType),
-                 Image->NumberOfPages,
-                 &Image->ImageContext.ImageAddress
-                 );
-    }
-    if (EFI_ERROR (Status) && !Image->ImageContext.RelocationsStripped) {
-      Status = CoreAllocatePages (
-                 AllocateAnyPages,
-                 (EFI_MEMORY_TYPE) (Image->ImageContext.ImageCodeMemoryType),
-                 Image->NumberOfPages,
-                 &Image->ImageContext.ImageAddress
-                 );
+    //
+    // If Loading Module At Fixed Address feature is enabled, the module should be loaded to
+    // a specified address.
+    //
+    if (FixedPcdGet64(PcdLoadModuleAtFixAddressEnable) != 0 ) {
+      Status = GetPeCoffImageFixLoadingAssignedAddress (&(Image->ImageContext));
+
+      if (EFI_ERROR (Status))  {
+          //
+      	  // If the code memory is not ready, invoke CoreAllocatePage with AllocateAnyPages to load the driver.
+      	  //
+          DEBUG ((EFI_D_INFO|EFI_D_LOAD, "LOADING MODULE FIXED ERROR: Loading module at fixed address failed since specified memory is not available.\n"));
+        
+          Status = CoreAllocatePages (
+                     AllocateAnyPages,
+                     (EFI_MEMORY_TYPE) (Image->ImageContext.ImageCodeMemoryType),
+                     Image->NumberOfPages,
+                     &Image->ImageContext.ImageAddress
+                     );         
+      } 
+    } else {
+      if (Image->ImageContext.ImageAddress >= 0x100000 || Image->ImageContext.RelocationsStripped) {
+        Status = CoreAllocatePages (
+                   AllocateAddress,
+                   (EFI_MEMORY_TYPE) (Image->ImageContext.ImageCodeMemoryType),
+                   Image->NumberOfPages,
+                   &Image->ImageContext.ImageAddress
+                   );
+      }
+      if (EFI_ERROR (Status) && !Image->ImageContext.RelocationsStripped) {
+        Status = CoreAllocatePages (
+                   AllocateAnyPages,
+                   (EFI_MEMORY_TYPE) (Image->ImageContext.ImageCodeMemoryType),
+                   Image->NumberOfPages,
+                   &Image->ImageContext.ImageAddress
+                   );
+      }
     }
     if (EFI_ERROR (Status)) {
       return Status;
@@ -355,9 +544,9 @@ CoreLoadPeImage (
 
   Image->ImageBasePage = Image->ImageContext.ImageAddress;
   if (!Image->ImageContext.IsTeImage) {
-	  Image->ImageContext.ImageAddress =
-	      (Image->ImageContext.ImageAddress + Image->ImageContext.SectionAlignment - 1) &
-	      ~((UINTN)Image->ImageContext.SectionAlignment - 1);
+    Image->ImageContext.ImageAddress =
+        (Image->ImageContext.ImageAddress + Image->ImageContext.SectionAlignment - 1) &
+        ~((UINTN)Image->ImageContext.SectionAlignment - 1);
   }
 
   //

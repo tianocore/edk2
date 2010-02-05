@@ -177,6 +177,18 @@ typedef struct{
   EFI_PHYSICAL_ADDRESS               FreePhysicalMemoryTop;
   VOID*                              ShadowedPeiCore;
   CACHE_SECTION_DATA                 CacheSection;
+  //
+  // For Loading modules at fixed address feature to cache the top address below which the 
+  // Runtime code, boot time code and PEI memory will be placed. Please note that the offset between this field 
+  // and  PS should not be changed since maybe user could get this top address by using the offet to PS. 
+  //
+  EFI_PHYSICAL_ADDRESS               LoadModuleAtFixAddressTopAddress;
+  //
+  // The field is define for Loading modules at fixed address feature to tracker the PEI code
+  // memory range usage. It is a bit mapped array in which every bit indicates the correspoding memory page
+  // available or not. 
+  //
+  UINT64                            *PeiCodeMemoryRangeUsageBitMap;
 } PEI_CORE_INSTANCE;
 
 ///
