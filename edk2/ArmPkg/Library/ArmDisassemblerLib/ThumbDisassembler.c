@@ -57,6 +57,7 @@ extern CHAR8 *gReg[];
 #define ENDIAN_FORMAT                21
 #define DATA_CBZ                     22
 #define ADR_FORMAT                   23
+#define IT_BLOCK                     24
 
 // Thumb2 address modes
 #define B_T3                        200
@@ -110,7 +111,7 @@ typedef struct {
 THUMB_INSTRUCTIONS gOpThumb[] = {
 // Thumb 16-bit instrucitons
 //          Op       Mask   Format
-  { "ADC" , 0x4140, 0xffc0, DATA_FORMAT5 },
+  { "ADC" , 0x4140, 0xffc0, DATA_FORMAT5 },  // ADC <Rndn>, <Rm>
   { "ADR",  0xa000, 0xf800, ADR_FORMAT   },  // ADR <Rd>, <label>
   { "ADD" , 0x1c00, 0xfe00, DATA_FORMAT2 },
   { "ADD" , 0x3000, 0xf800, DATA_FORMAT3 },
@@ -145,15 +146,15 @@ THUMB_INSTRUCTIONS gOpThumb[] = {
   { "EOR" , 0x4040, 0xffc0, DATA_FORMAT5 },
 
   { "LDMIA" , 0xc800, 0xf800, LOAD_STORE_MULTIPLE_FORMAT1 },
-  { "LDR"   , 0x6800, 0xf800, LOAD_STORE_FORMAT1 },
-  { "LDR"   , 0x5800, 0xfe00, LOAD_STORE_FORMAT2 },
+  { "LDR"   , 0x6800, 0xf800, LOAD_STORE_FORMAT1 },  // LDR <Rt>, [<Rn> {,#<imm>}]
+  { "LDR"   , 0x5800, 0xfe00, LOAD_STORE_FORMAT2 },  // STR <Rt>, [<Rn>, <Rm>]
   { "LDR"   , 0x4800, 0xf800, LOAD_STORE_FORMAT3 },
-  { "LDR"   , 0x9800, 0xf800, LOAD_STORE_FORMAT4 },
+  { "LDR"   , 0x9800, 0xf800, LOAD_STORE_FORMAT4 },  // LDR <Rt>, [SP, #<imm>]
   { "LDRB"  , 0x7800, 0xf800, LOAD_STORE_FORMAT1_B },
-  { "LDRB"  , 0x5c00, 0xfe00, LOAD_STORE_FORMAT2 },
+  { "LDRB"  , 0x5c00, 0xfe00, LOAD_STORE_FORMAT2 },  // STR <Rt>, [<Rn>, <Rm>]
   { "LDRH"  , 0x8800, 0xf800, LOAD_STORE_FORMAT1_H },
   { "LDRH"  , 0x7a00, 0xfe00, LOAD_STORE_FORMAT2 },
-  { "LDRSB" , 0x5600, 0xfe00, LOAD_STORE_FORMAT2 },
+  { "LDRSB" , 0x5600, 0xfe00, LOAD_STORE_FORMAT2 },  // STR <Rt>, [<Rn>, <Rm>]
   { "LDRSH" , 0x5e00, 0xfe00, LOAD_STORE_FORMAT2 },
  
   { "MOVS", 0x0000, 0xffc0, DATA_FORMAT5 },   // LSL with imm5 == 0 is a MOVS, so this must go before LSL
@@ -170,7 +171,7 @@ THUMB_INSTRUCTIONS gOpThumb[] = {
   { "MUL" , 0x4340, 0xffc0, DATA_FORMAT5 },
   { "MVN" , 0x41c0, 0xffc0, DATA_FORMAT5 },
   { "NEG" , 0x4240, 0xffc0, DATA_FORMAT5 },
-  { "ORR" , 0x4180, 0xffc0, DATA_FORMAT5 },
+  { "ORR" , 0x4300, 0xffc0, DATA_FORMAT5 },
   { "POP" , 0xbc00, 0xfe00, POP_FORMAT },
   { "PUSH", 0xb400, 0xfe00, PUSH_FORMAT },
 
@@ -183,26 +184,29 @@ THUMB_INSTRUCTIONS gOpThumb[] = {
   { "SETEND" , 0xb650, 0xfff0, ENDIAN_FORMAT },
 
   { "STMIA" , 0xc000, 0xf800, LOAD_STORE_MULTIPLE_FORMAT1 },
-  { "STR"   , 0x6000, 0xf800, LOAD_STORE_FORMAT1 },
-  { "STR"   , 0x5000, 0xfe00, LOAD_STORE_FORMAT2 },
-  { "STR"   , 0x4000, 0xf800, LOAD_STORE_FORMAT3 },
-  { "STR"   , 0x9000, 0xf800, LOAD_STORE_FORMAT4 },
-  { "STRB"  , 0x7000, 0xf800, LOAD_STORE_FORMAT1_B },
-  { "STRB"  , 0x5800, 0xfe00, LOAD_STORE_FORMAT2 },
-  { "STRH"  , 0x8000, 0xf800, LOAD_STORE_FORMAT1_H },
-  { "STRH"  , 0x5200, 0xfe00, LOAD_STORE_FORMAT2 },
+  { "STR"   , 0x6000, 0xf800, LOAD_STORE_FORMAT1 },   // STR  <Rt>, [<Rn> {,#<imm>}]
+  { "STR"   , 0x5000, 0xfe00, LOAD_STORE_FORMAT2 },   // STR  <Rt>, [<Rn>, <Rm>]
+  { "STR"   , 0x9000, 0xf800, LOAD_STORE_FORMAT4 },   // STR  <Rt>, [SP, #<imm>]
+  { "STRB"  , 0x7000, 0xf800, LOAD_STORE_FORMAT1_B }, // STRB <Rt>, [<Rn>, #<imm5>]
+  { "STRB"  , 0x5400, 0xfe00, LOAD_STORE_FORMAT2 },   // STRB <Rt>, [<Rn>, <Rm>]
+  { "STRH"  , 0x8000, 0xf800, LOAD_STORE_FORMAT1_H }, // STRH <Rt>, [<Rn>{,#<imm>}]
+  { "STRH"  , 0x5200, 0xfe00, LOAD_STORE_FORMAT2 },   // STRH <Rt>, [<Rn>, <Rm>]
 
   { "SUB" , 0x1e00, 0xfe00, DATA_FORMAT2 },
   { "SUB" , 0x3800, 0xf800, DATA_FORMAT3 },
   { "SUB" , 0x1a00, 0xfe00, DATA_FORMAT1 },
   { "SUB" , 0xb080, 0xff80, DATA_FORMAT7 },
 
+  { "SBC" , 0x4180, 0xffc0, DATA_FORMAT5 },
+
   { "SWI" , 0xdf00, 0xff00, IMMED_8 },
   { "SXTB", 0xb240, 0xffc0, DATA_FORMAT5 },
   { "SXTH", 0xb200, 0xffc0, DATA_FORMAT5 },
   { "TST" , 0x4200, 0xffc0, DATA_FORMAT5 },
   { "UXTB", 0xb2c0, 0xffc0, DATA_FORMAT5 },
-  { "UXTH", 0xb280, 0xffc0, DATA_FORMAT5 }
+  { "UXTH", 0xb280, 0xffc0, DATA_FORMAT5 },
+
+  { "IT",   0xbf00, 0xff00, IT_BLOCK }
 
 };
 
@@ -480,6 +484,7 @@ DisassembleThumbInstruction (
   IN  UINT16    **OpCodePtrPtr,
   OUT CHAR8     *Buf,
   OUT UINTN     Size,
+  OUT UINT32    *ItBlock,
   IN  BOOLEAN   Extended
   )
 {
@@ -490,10 +495,12 @@ DisassembleThumbInstruction (
   UINT32  Offset;
   UINT16  Rd, Rn, Rm, Rt, Rt2;
   BOOLEAN H1, H2, imod;
+  BOOLEAN ItFlag;
   UINT32  PC, Target, msbit, lsbit;
   CHAR8   *Cond;
   BOOLEAN S, J1, J2, P, U, W;
   UINT32  coproc, opc1, opc2, CRd, CRn, CRm; 
+  UINT32  Mask;
 
   OpCodePtr = *OpCodePtrPtr;
   OpCode = **OpCodePtrPtr;
@@ -513,6 +520,14 @@ DisassembleThumbInstruction (
   // Increment by the minimum instruction size, Thumb2 could be bigger
   *OpCodePtrPtr += 1;
   
+  // Manage IT Block ItFlag TRUE means we are in an IT block
+  if (*ItBlock != 0) {
+    ItFlag = TRUE;
+    *ItBlock -= 1;
+  } else {
+    ItFlag = FALSE;
+  }
+
   for (Index = 0; Index < sizeof (gOpThumb)/sizeof (THUMB_INSTRUCTIONS); Index++) {
     if ((OpCode & gOpThumb[Index].Mask) == gOpThumb[Index].OpCode) {
       if (Extended) {
@@ -645,6 +660,31 @@ DisassembleThumbInstruction (
         // ADR <Rd>, <Label>
         Target = (OpCode & 0xff) << 2;
         AsciiSPrint (&Buf[Offset], Size - Offset, " %a, %08x", gReg[(OpCode >> 8) & 7], PCAlign4 (PC) + Target); 
+        return;
+
+      case IT_BLOCK:
+        // ITSTATE = cond:mask   OpCode[7:4]:OpCode[3:0]
+        // ITSTATE[7:5] == cond[3:1]
+        // ITSTATE[4] == 1st Instruction cond[0]  
+        // ITSTATE[3] == 2st Instruction cond[0]  
+        // ITSTATE[2] == 3st Instruction cond[0]  
+        // ITSTATE[1] == 4st Instruction cond[0]
+        // ITSTATE[0] == 1 4 instruction IT block. 0 means 0,1,2 or 3 instructions
+        // 1st one  in ITSTATE low bits defines the number of instructions
+        Mask = (OpCode & 0xf);
+        if ((Mask & 0x1) == 0x1) {
+          *ItBlock = 4;
+          Offset +=  AsciiSPrint (&Buf[Offset], Size - Offset, "%a%a%a", (Mask & BIT3)?"T":"E", (Mask & BIT2)?"T":"E", (Mask & BIT1)?"T":"E");
+        } else if ((OpCode & 0x3) == 0x2) {
+          *ItBlock = 3;
+          Offset +=  AsciiSPrint (&Buf[Offset], Size - Offset, "%a%a", (Mask & BIT3)?"T":"E", (Mask & BIT2)?"T":"E");
+        } else if ((OpCode & 0x7) == 0x4) {
+          *ItBlock = 2;
+          Offset +=  AsciiSPrint (&Buf[Offset], Size - Offset, "%a", (Mask & BIT3)?"T":"E");
+        } else if ((OpCode & 0xf) == 0x8) {
+          *ItBlock = 1;
+        }
+        AsciiSPrint (&Buf[Offset], Size - Offset, " %a", gCondition[(OpCode >> 4) & 0xf]); 
         return;
       }
     }
@@ -1001,6 +1041,7 @@ DisassembleArmInstruction (
   @param  OpCodePtrPtr  Pointer to pointer of ARM Thumb instruction to disassemble.  
   @param  Thumb         TRUE for Thumb(2), FALSE for ARM instruction stream
   @param  Extended      TRUE dump hex for instruction too.
+  @param  ItBlock       Size of IT Block
   @param  Buf           Buffer to sprintf disassembly into.
   @param  Size          Size of Buf in bytes. 
   
@@ -1010,12 +1051,13 @@ DisassembleInstruction (
   IN  UINT8     **OpCodePtr,
   IN  BOOLEAN   Thumb,
   IN  BOOLEAN   Extended,
+  IN OUT UINT32 *ItBlock,
   OUT CHAR8     *Buf,
   OUT UINTN     Size
   )
 {
   if (Thumb) {
-    DisassembleThumbInstruction ((UINT16 **)OpCodePtr, Buf, Size, Extended);
+    DisassembleThumbInstruction ((UINT16 **)OpCodePtr, Buf, Size, &ItBlock, Extended);
   } else {
     DisassembleArmInstruction ((UINT32 **)OpCodePtr, Buf, Size, Extended);
   }

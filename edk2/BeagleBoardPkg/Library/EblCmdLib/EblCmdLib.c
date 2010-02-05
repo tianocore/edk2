@@ -51,6 +51,7 @@ EblDisassembler (
   UINT32  Address;
   UINT32  Count;
   CHAR8   Buffer[80];
+  UINT32  ItBlock;
   
   if (Argc < 2) {
     return EFI_INVALID_PARAMETER;
@@ -60,9 +61,10 @@ EblDisassembler (
   Count   = (Argc > 2) ? (UINT32)AsciiStrHexToUintn (Argv[2]) : 20;
 
   Ptr = (UINT8 *)(UINTN)Address;  
+  ItBlock = 0;
   do {
     CurrentAddress = Ptr;
-    DisassembleInstruction (&Ptr, TRUE, TRUE, Buffer, sizeof (Buffer));
+    DisassembleInstruction (&Ptr, TRUE, TRUE, &ItBlock, Buffer, sizeof (Buffer));
     AsciiPrint ("0x%08x: %a\n", CurrentAddress, Buffer);
   } while (Count-- > 0);
  
