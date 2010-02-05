@@ -255,7 +255,7 @@ PrepareConfigurationHeader (
   // Open data file
   DataFile = fopen(gDataFile, "rb");
   if (DataFile == NULL) {
-    fprintf(stderr, "Can't open data file %s.\n", gOutputImageFile);
+    fprintf(stderr, "Can't open data file %s.\n", gDataFile);
     exit(1);
   }
   
@@ -394,7 +394,6 @@ main (
         default:
           abort ();
       }
-      printf ("\n%d(%x) - %s %s", i, TwoArg, argv[i], TwoArg ? argv[i+1] : &argv[i][2]); 
     }
   }
 
