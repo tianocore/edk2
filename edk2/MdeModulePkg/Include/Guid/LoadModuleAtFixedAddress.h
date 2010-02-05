@@ -1,6 +1,6 @@
 /** @file
-  This file defines:
-  A configuration Table Guid for Load module at fixed address. 
+  This file defines a configuration Table Guid for Load module at fixed address.
+   
   This configuration table is to hold  the top address below which the Dxe runtime code and 
   boot time code will be loaded and Tseg base. When this feature is enabled, Build tools will assigned 
   module loading address relative to these 2 address.
