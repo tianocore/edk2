@@ -1765,6 +1765,7 @@ CoreInitializeMemoryServices (
   EFI_PHYSICAL_ADDRESS               HighAddress;
   EFI_HOB_RESOURCE_DESCRIPTOR        *MaxResourceHob;
   EFI_HOB_GUID_TYPE                  *GuidHob;
+  UINT32                              ReservedCodePageNumber;
 
   //
   // Point at the first HOB.  This must be the PHIT HOB.
@@ -1795,7 +1796,17 @@ CoreInitializeMemoryServices (
   // Cache the PHIT HOB for later use
   //
   PhitHob = Hob.HandoffInformationTable;
-
+  
+  if (FixedPcdGet64(PcdLoadModuleAtFixAddressEnable) != 0) {
+  	ReservedCodePageNumber = PcdGet32(PcdLoadFixAddressRuntimeCodePageNumber);
+  	ReservedCodePageNumber += PcdGet32(PcdLoadFixAddressBootTimeCodePageNumber);
+   
+  	//
+  	// cache the Top address for loading modules at Fixed Address 
+  	//
+    gLoadModuleAtFixAddressConfigurationTable.DxeCodeTopAddress = PhitHob->EfiMemoryTop 
+                                                                   + EFI_PAGES_TO_SIZE(ReservedCodePageNumber);
+  }
   //
   // See if a Memory Type Information HOB is available
   //

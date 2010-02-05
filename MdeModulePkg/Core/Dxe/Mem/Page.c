@@ -89,7 +89,12 @@ EFI_MEMORY_TYPE_INFORMATION gMemoryTypeInformation[EfiMaxMemoryType + 1] = {
   { EfiPalCode,                 0 },
   { EfiMaxMemoryType,           0 }
 };
-
+//
+// Only used when load module at fixed address feature is enabled. True means the memory is alreay successfully allocated
+// and ready to load the module in to specified address.or else, the memory is not ready and module will be loaded at a 
+//  address assigned by DXE core.
+//
+GLOBAL_REMOVE_IF_UNREFERENCED   BOOLEAN       gLoadFixedAddressCodeMemoryReady = FALSE;
 
 /**
   Enter critical section by gaining lock on gMemoryLock.
@@ -419,7 +424,70 @@ PromoteMemoryResource (
 
   return;
 }
+/**
+  This function try to allocate Runtime code & Boot time code memory range. If LMFA enabled, 2 patchable PCD 
+  PcdLoadFixAddressRuntimeCodePageNumber & PcdLoadFixAddressBootTimeCodePageNumber which are set by tools will record the 
+  size of boot time and runtime code.
 
+**/
+VOID
+CoreLoadingFixedAddressHook (
+  VOID
+  )
+{
+   UINT32                     RuntimeCodePageNumber;
+   UINT32                     BootTimeCodePageNumber;
+   EFI_PHYSICAL_ADDRESS       RuntimeCodeBase;
+   EFI_PHYSICAL_ADDRESS       BootTimeCodeBase;
+   EFI_STATUS                 Status;
+
+   //
+   // Make sure these 2 areas are not initialzied.
+   //
+   if (!gLoadFixedAddressCodeMemoryReady) {   
+     RuntimeCodePageNumber = PcdGet32(PcdLoadFixAddressRuntimeCodePageNumber);
+     BootTimeCodePageNumber= PcdGet32(PcdLoadFixAddressBootTimeCodePageNumber);
+     RuntimeCodeBase       = (EFI_PHYSICAL_ADDRESS)(gLoadModuleAtFixAddressConfigurationTable.DxeCodeTopAddress - EFI_PAGES_TO_SIZE (RuntimeCodePageNumber));
+     BootTimeCodeBase      = (EFI_PHYSICAL_ADDRESS)(RuntimeCodeBase - EFI_PAGES_TO_SIZE (BootTimeCodePageNumber));
+     //
+     // Try to allocate runtime memory.
+     //
+     Status = CoreAllocatePages (
+                       AllocateAddress,
+                       EfiRuntimeServicesCode,
+                       RuntimeCodePageNumber,
+                       &RuntimeCodeBase
+                       );
+     if (EFI_ERROR(Status)) {
+       //
+       // Runtime memory allocation failed 
+       //
+       return;
+     }
+     //
+     // Try to allocate boot memory.
+     //
+     Status = CoreAllocatePages (
+                       AllocateAddress,
+                       EfiBootServicesCode,
+                       BootTimeCodePageNumber,
+                       &BootTimeCodeBase
+                       );
+     if (EFI_ERROR(Status)) {
+       //
+     	 // boot memory allocation failed. Free Runtime code range and will try the allocation again when 
+     	 // new memory range is installed.
+     	 //
+     	 CoreFreePages (
+              RuntimeCodeBase,
+              RuntimeCodePageNumber
+              );
+       return;
+     }
+     gLoadFixedAddressCodeMemoryReady = TRUE;
+   } 
+   return;
+}  
 
 /**
   Called to initialize the memory map and add descriptors to
@@ -448,7 +516,7 @@ CoreAddMemoryDescriptor (
   EFI_STATUS                  Status;
   UINTN                       Index;
   UINTN                       FreeIndex;
-
+  
   if ((Start & EFI_PAGE_MASK) != 0) {
     return;
   }
@@ -456,7 +524,6 @@ CoreAddMemoryDescriptor (
   if (Type >= EfiMaxMemoryType && Type <= 0x7fffffff) {
     return;
   }
-
   CoreAcquireMemoryLock ();
   End = Start + LShiftU64 (NumberOfPages, EFI_PAGE_SHIFT) - 1;
   CoreAddRange (Type, Start, End, Attribute);
@@ -464,12 +531,20 @@ CoreAddMemoryDescriptor (
   CoreReleaseMemoryLock ();
 
   //
+  // If Loading Module At Fixed Address feature is enabled. try to allocate memory with Runtime code & Boot time code type
+  //
+  if (FixedPcdGet64(PcdLoadModuleAtFixAddressEnable) != 0) {
+    CoreLoadingFixedAddressHook();
+  }
+  
+  //
   // Check to see if the statistics for the different memory types have already been established
   //
   if (mMemoryTypeInformationInitialized) {
     return;
   }
 
+  
   //
   // Loop through each memory type in the order specified by the gMemoryTypeInformation[] array
   //
@@ -481,7 +556,6 @@ CoreAddMemoryDescriptor (
     if (Type < 0 || Type > EfiMaxMemoryType) {
       continue;
     }
-
     if (gMemoryTypeInformation[Index].NumberOfPages != 0) {
       //
       // Allocate pages for the current memory type from the top of available memory
@@ -549,7 +623,6 @@ CoreAddMemoryDescriptor (
     if (Type < 0 || Type > EfiMaxMemoryType) {
       continue;
     }
-
     if (gMemoryTypeInformation[Index].NumberOfPages != 0) {
       CoreFreePages (
         mMemoryTypeStatistics[Type].BaseAddress,
