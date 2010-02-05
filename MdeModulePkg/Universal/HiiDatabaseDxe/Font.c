@@ -2,7 +2,7 @@
 Implementation for EFI_HII_FONT_PROTOCOL.
 
 
-Copyright (c) 2007 - 2009, Intel Corporation
+Copyright (c) 2007 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2392,6 +2392,7 @@ HiiGetGlyph (
     if (EFI_ERROR (Status)) {
       goto Exit;
     }
+    ASSERT (StringInfoOut != NULL);
     FontInfo   = &StringInfoOut->FontInfo;
     Foreground = StringInfoOut->ForegroundColor;
     Background = StringInfoOut->BackgroundColor;
@@ -2622,7 +2623,7 @@ HiiGetFontInfo (
     InfoOut.BackgroundColor = SystemDefault->BackgroundColor;
   }
   
-
+  ASSERT (FontInfo != NULL);
   FontInfo->FontSize  = InfoOut.FontInfo.FontSize;
   FontInfo->FontStyle = InfoOut.FontInfo.FontStyle;
 

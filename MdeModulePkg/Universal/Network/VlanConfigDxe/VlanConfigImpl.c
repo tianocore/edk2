@@ -480,8 +480,7 @@ InstallVlanConfigForm (
   PrivateData->MacString = MacString;
 
   StrCpy (Str, L"VLAN Configuration (MAC:");
-  ASSERT (StrLen (MacString) <= (sizeof (EFI_MAC_ADDRESS) * 2));
-  StrCat (Str, MacString);
+  StrnCat (Str, MacString, sizeof (EFI_MAC_ADDRESS) * 2);
   StrCat (Str, L")");
   HiiSetString (
     HiiHandle,
