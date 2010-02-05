@@ -1138,11 +1138,13 @@ GetQuestionValue (
       //
       CopyMem (Dst, Storage->EditBuffer + Question->VarStoreInfo.VarOffset, StorageWidth);
     } else {
+      Value = NULL;
       Status = GetValueByName (Storage, Question->VariableName, &Value);
       if (EFI_ERROR (Status)) {
         return Status;
       }
 
+      ASSERT (Value != NULL);
       LengthStr = StrLen (Value);
       Status    = EFI_SUCCESS;
       if (IsString) {

@@ -1505,6 +1505,7 @@ ParseOpCodes (
       //
       // Now we know the Storage width of nested Ordered List
       //
+      ASSERT (CurrentStatement != NULL);
       if ((CurrentStatement->Operand == EFI_IFR_ORDERED_LIST_OP) && (CurrentStatement->BufferValue == NULL)) {
         Width = 1;
         switch (CurrentOption->Value.Type) {
