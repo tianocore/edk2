@@ -1,7 +1,7 @@
 /** @file
   CPU DXE Module.
 
-  Copyright (c) 2008 - 2009, Intel Corporation
+  Copyright (c) 2008 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -852,8 +852,12 @@ RefreshGcdMemoryAttributes (
   UINTN                               NumberOfDescriptors;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR     *MemorySpaceMap;
   UINT64                              DefaultAttributes;
-  VARIABLE_MTRR                       VariableMtrr[MTRR_NUMBER_OF_VARIABLE_MTRR];
+  VARIABLE_MTRR                       VariableMtrr[MAX_MTRR_NUMBER_OF_VARIABLE_MTRR];
   MTRR_FIXED_SETTINGS                 MtrrFixedSettings;
+  UINT32                              FirmwareVariableMtrrCount;
+  UINT32                              UsedMtrr;
+
+  FirmwareVariableMtrrCount = GetFirmwareVariableMtrrCount ();
 
 //  mIsFlushingGCD = TRUE;
   mIsFlushingGCD = FALSE;
@@ -867,9 +871,11 @@ RefreshGcdMemoryAttributes (
   //
   // Get the memory attribute of variable MTRRs
   //
+  UsedMtrr = MAX_MTRR_NUMBER_OF_VARIABLE_MTRR;
   MtrrGetMemoryAttributeInVariableMtrr (
     mValidMtrrBitsMask,
     mValidMtrrAddressMask,
+    &UsedMtrr,
     VariableMtrr
     );
 
@@ -902,7 +908,7 @@ RefreshGcdMemoryAttributes (
   //
   // Go for variable MTRRs with WB attribute
   //
-  for (Index = 0; Index < FIRMWARE_VARIABLE_MTRR_NUMBER; Index++) {
+  for (Index = 0; Index < FirmwareVariableMtrrCount; Index++) {
     if (VariableMtrr[Index].Valid &&
         VariableMtrr[Index].Type == MTRR_CACHE_WRITE_BACK) {
       SetGcdMemorySpaceAttributes (
@@ -917,7 +923,7 @@ RefreshGcdMemoryAttributes (
   //
   // Go for variable MTRRs with Non-WB attribute
   //
-  for (Index = 0; Index < FIRMWARE_VARIABLE_MTRR_NUMBER; Index++) {
+  for (Index = 0; Index < FirmwareVariableMtrrCount; Index++) {
     if (VariableMtrr[Index].Valid &&
         VariableMtrr[Index].Type != MTRR_CACHE_WRITE_BACK) {
       Attributes = GetMemorySpaceAttributeFromMtrrType ((UINT8) VariableMtrr[Index].Type);
