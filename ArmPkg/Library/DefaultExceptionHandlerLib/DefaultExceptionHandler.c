@@ -235,6 +235,7 @@ DefaultExceptionHandler (
     CHAR8   CpsrStr[32];  // char per bit. Lower 5-bits are mode that is a 3 char string
     CHAR8   Buffer[80];
     UINT8   *DisAsm;
+    UINT32  ItBlock;
     
     CpsrString (SystemContext.SystemContextArm->CPSR, CpsrStr);
     DEBUG ((EFI_D_ERROR, "%a\n", CpsrStr));
@@ -256,7 +257,8 @@ DefaultExceptionHandler (
       
       // If we come from an image it is safe to show the instruction. We know it should not fault
       DisAsm = (UINT8 *)(UINTN)SystemContext.SystemContextArm->PC;
-      DisassembleInstruction (&DisAsm, (SystemContext.SystemContextArm->CPSR & BIT5) == BIT5, TRUE, Buffer, sizeof (Buffer));
+      ItBlock = 0;
+      DisassembleInstruction (&DisAsm, (SystemContext.SystemContextArm->CPSR & BIT5) == BIT5, TRUE, &ItBlock, Buffer, sizeof (Buffer));
       DEBUG ((EFI_D_ERROR, "\n%a", Buffer));
 
     }

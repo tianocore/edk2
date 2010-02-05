@@ -11,14 +11,14 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
+
+
 
 //TOC structure as defined by OMAP35XX TRM.
 typedef struct {
@@ -353,53 +353,52 @@ ConstructImage (
   fclose(OutputFile);
 }
 
+
 int 
 main (
   int    argc, 
   char** argv
   )
 {
-  char Ch;
+  char          Ch;
   unsigned char *ptr;
+  int           i;
+  int           TwoArg;  
 
   if (argc == 1) {
     PrintUsage ();
     exit(1);
   }
 
-  while ((Ch = getopt(argc, argv, "D:E:I:O:")) != -1) {
-    switch (Ch) {
-      case 'E': /* Image execution address */
-        gImageExecutionAddress = strtoul (optarg, (char **)&ptr, 16);
-        break;
-      
-      case 'I': /* Input image file */
-        gInputImageFile = optarg;
-        break;
+  for (i=1; i < argc; i++) {
+    if (argv[i][0] == '-') {
+      // TwoArg TRUE -E 0x123, FALSE -E0x1234
+      TwoArg = (argv[i][2] != ' ');
+      switch (argv[i][1]) {
+        case 'E': /* Image execution address */
+          gImageExecutionAddress = strtoul (TwoArg ? argv[i+1] : &argv[i][2], (char **)&ptr, 16);
+          break;
+        
+        case 'I': /* Input image file */
+          gInputImageFile = TwoArg ? argv[i+1] : &argv[i][2];
+          break;
 
-      case 'O': /* Output image file */
-        gOutputImageFile = optarg;
-        break;
-      
-      case 'D': /* Data file */
-        gDataFile = optarg;
-        break;
+        case 'O': /* Output image file */
+          gOutputImageFile = TwoArg ? argv[i+1] : &argv[i][2];
+          break;
+        
+        case 'D': /* Data file */
+          gDataFile = TwoArg ? argv[i+1] : &argv[i][2];
+          break;
 
-      case '?':
-        if ((optopt == 'E') || (optopt == 'I') || (optopt == 'O')) {
-          fprintf (stderr, "Option -%c requires an argument.\n", optopt);
-        } else if (isprint (optopt)) {
-          fprintf (stderr, "Unknown option `-%c'.\n", optopt);
-        } else {
-          fprintf (stderr, "Unknown option character `\\x%x'.\n", optopt);
-        }
-        return 1;
-
-      default:
-        abort ();
+        default:
+          abort ();
+      }
+      printf ("\n%d(%x) - %s %s", i, TwoArg, argv[i], TwoArg ? argv[i+1] : &argv[i][2]); 
     }
   }
 
+ 
   //Prepare configuration header
   PrepareConfigurationHeader ();
 
