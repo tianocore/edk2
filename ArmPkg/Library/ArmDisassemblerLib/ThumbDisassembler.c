@@ -1057,7 +1057,7 @@ DisassembleInstruction (
   )
 {
   if (Thumb) {
-    DisassembleThumbInstruction ((UINT16 **)OpCodePtr, Buf, Size, &ItBlock, Extended);
+    DisassembleThumbInstruction ((UINT16 **)OpCodePtr, Buf, Size, ItBlock, Extended);
   } else {
     DisassembleArmInstruction ((UINT32 **)OpCodePtr, Buf, Size, Extended);
   }
