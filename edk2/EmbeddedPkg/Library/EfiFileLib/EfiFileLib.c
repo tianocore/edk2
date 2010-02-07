@@ -55,6 +55,9 @@
 #include <Library/EblNetworkLib.h>
 
 
+CHAR8 *gCwd = NULL;
+
+
 #define EFI_OPEN_FILE_GUARD_HEADER  0x4B4D4641
 #define EFI_OPEN_FILE_GUARD_FOOTER  0x444D5A56
 
@@ -635,6 +638,7 @@ EfiOpen (
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
   UINTN                     Size;
   EFI_IP_ADDRESS            Ip;
+  CHAR8                     *CwdPlusPathName;
 
   EblUpdateDeviceLists ();
  
@@ -656,8 +660,22 @@ EfiOpen (
   }
 
   if (FileStart == 0) {
+    if (gCwd == NULL) {
+      // No CWD
+      return NULL;
+    }
+    
     // We could add a current working diretory concept 
-    return NULL;
+    CwdPlusPathName = AllocatePool (AsciiStrSize (gCwd) + AsciiStrSize (PathName));
+    if (CwdPlusPathName == NULL) {
+      return NULL;
+    }
+    
+    AsciiStrCpy (CwdPlusPathName, gCwd);
+    AsciiStrCat (CwdPlusPathName, PathName);
+    File = EfiOpen (CwdPlusPathName, OpenMode, SectionType);
+    FreePool (CwdPlusPathName);
+    return File;
   }
 
   //
@@ -1480,4 +1498,67 @@ EfiWrite (
 
   return Status;
 }
+
+
+
+/**
+  Set the Curent Working Directory (CWD). If a call is made to EfiOpen () and 
+  the path does not contain a device name, The CWD is prepended to the path.
+  
+  @param  Cwd     Current Working Directory to set
+
+
+  @return EFI_SUCCESS           CWD is set
+  @return EFI_INVALID_PARAMETER Cwd is not a valid device:path
+
+**/
+EFI_STATUS
+EfiSetCwd (
+  IN  CHAR8   *Cwd
+  ) 
+{
+  EFI_OPEN_FILE *File;
+  
+  File = EfiOpen (Cwd, EFI_FILE_MODE_READ, 0);
+  if (File == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
+  EfiClose (File);
+  
+  if (gCwd != NULL) {
+    FreePool (gCwd);
+  }
+  
+  gCwd = AllocatePool (AsciiStrSize (Cwd));
+  if (gCwd == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  AsciiStrCpy (gCwd, Cwd);
+  return EFI_SUCCESS;
+}
+
+
+/**
+  Set the Curent Working Directory (CWD). If a call is made to EfiOpen () and 
+  the path does not contain a device name, The CWD is prepended to the path.
+  The CWD buffer is only valid until a new call is made to EfiSetCwd(). After
+  a call to EfiSetCwd() it is not legal to use the pointer returned by 
+  this funciton.
+  
+  @param  Cwd     Current Working Directory 
+
+
+  @return NULL    No CWD set
+  @return 'other' Returns buffer that contains CWD.
+  
+**/
+CHAR8 *
+EfiGettCwd (
+  VOID
+  )
+{
+  return gCwd;
+}
+
 

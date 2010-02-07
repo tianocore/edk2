@@ -311,5 +311,38 @@ UINTN
 EfiGetDeviceCounts (
   IN  EFI_OPEN_FILE_TYPE     Type
   );
+  
+
+/**
+  Set the Curent Working Directory (CWD). If a call is made to EfiOpen () and 
+  the path does not contain a device name, The CWD is prepended to the path.
+  
+  @param  Cwd     Current Working Directory to set
+
+
+  @return EFI_SUCCESS           CWD is set
+  @return EFI_INVALID_PARAMETER Cwd is not a valid device:path
+
+**/
+EFI_STATUS
+EfiSetCwd (
+  IN  CHAR8   *Cwd
+  );  
+
+/**
+  Set the Curent Working Directory (CWD). If a call is made to EfiOpen () and 
+  the path does not contain a device name, The CWD is prepended to the path.
+  
+  @param  Cwd     Current Working Directory 
+
+
+  @return NULL    No CWD set
+  @return 'other' malloc'ed buffer contains CWD.
+  
+**/
+CHAR8 *
+EfiGettCwd (
+  VOID
+  );  
 
 #endif

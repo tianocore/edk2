@@ -287,7 +287,7 @@ EblExitCmd (
   EFI_MEMORY_DESCRIPTOR   *MemoryMap;
   UINTN                   MapKey;
   UINTN                   DescriptorSize;
-  UINTN                   DescriptorVersion;
+  UINT32                  DescriptorVersion;
   UINTN                   Pages;
 
   if (Argc > 1) { 
