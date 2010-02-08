@@ -163,6 +163,7 @@
     <LibraryClasses>
       PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
   }
+  MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
   UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
   DuetPkg/CpuDxe/Cpu.inf
   PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf
