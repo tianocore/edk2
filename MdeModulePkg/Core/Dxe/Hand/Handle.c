@@ -1,7 +1,7 @@
 /** @file
   UEFI handle & protocol handling.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -23,9 +23,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // gHandleDatabaseKey    -  The Key to show that the handle has been created/modified
 //
 LIST_ENTRY      mProtocolDatabase     = INITIALIZE_LIST_HEAD_VARIABLE (mProtocolDatabase);
-LIST_ENTRY             gHandleList           = INITIALIZE_LIST_HEAD_VARIABLE (gHandleList);
-EFI_LOCK               gProtocolDatabaseLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_NOTIFY);
-UINT64                 gHandleDatabaseKey    = 0;
+LIST_ENTRY      gHandleList           = INITIALIZE_LIST_HEAD_VARIABLE (gHandleList);
+EFI_LOCK        gProtocolDatabaseLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_NOTIFY);
+UINT64          gHandleDatabaseKey    = 0;
 
 
 
@@ -365,7 +365,7 @@ CoreInstallProtocolInterfaceNotify (
   //
   // Print debug message
   //
-  DEBUG((DEBUG_LOAD | DEBUG_INFO, "InstallProtocolInterface: %g %p\n", Protocol, Interface));
+  DEBUG((DEBUG_INFO, "InstallProtocolInterface: %g %p\n", Protocol, Interface));
 
   Status = EFI_OUT_OF_RESOURCES;
   Prot = NULL;
