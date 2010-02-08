@@ -3,7 +3,7 @@
   to provide read, write and modify access to Pci configuration space in PEI phase. 
   To follow PI specification, these services also support access to the unaligned Pci address.
 
-  Copyright (c) 2006 - 2008, Intel Corporation
+  Copyright (c) 2006 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -20,6 +20,7 @@
 #include <Library/DebugLib.h>
 #include <Library/PciLib.h>
 #include <Library/PeimEntryPoint.h>
+#include <Library/PeiServicesLib.h>
 #include <IndustryStandard/Pci.h>
 
 /**
@@ -308,10 +309,9 @@ PeimInitializePciCfg (
 {
   EFI_STATUS            Status;
 
-  ASSERT ((**PeiServices).Hdr.Revision >= PI_SPECIFICATION_VERSION);
-
   (**(EFI_PEI_SERVICES **)PeiServices).PciCfg = &gPciCfg2Ppi;
-  Status = (**PeiServices).InstallPpi (PeiServices, &gPciCfg2PpiList);
+  Status = PeiServicesInstallPpi (&gPciCfg2PpiList);
+  ASSERT_EFI_ERROR (Status);
 
   return Status;
 }
