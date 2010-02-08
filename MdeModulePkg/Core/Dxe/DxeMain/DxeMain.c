@@ -213,7 +213,7 @@ EFI_DECOMPRESS_PROTOCOL  gEfiDecompress = {
 // For Loading modules at fixed address feature, the configuration table is to cache the top address below which to load 
 // Runtime code&boot time code 
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_LOAD_FIXED_ADDRESS_CONFIGURATION_TABLE    gLoadModuleAtFixAddressConfigurationTable;
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_LOAD_FIXED_ADDRESS_CONFIGURATION_TABLE    gLoadModuleAtFixAddressConfigurationTable = {0, 0};
 
 // Main entry point to the DXE Core
 //
