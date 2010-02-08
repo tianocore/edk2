@@ -263,6 +263,12 @@ WriteBootToOsPerformanceData (
       }
       EntryIndex++;
       if ((Handle == Handles[Index]) && (EndTicker != 0)) {
+        if (StartTicker == 1) {
+          StartTicker = StartValue;
+        }
+        if (EndTicker == 1) {
+          EndTicker = StartValue;
+        }
         Ticker += CountUp ? (EndTicker - StartTicker) : (StartTicker - EndTicker);
       }
     }
@@ -303,6 +309,12 @@ WriteBootToOsPerformanceData (
       ZeroMem (&mPerfData, sizeof (PERF_DATA));
 
       AsciiStrnCpy (mPerfData.Token, Token, PERF_TOKEN_LENGTH);
+      if (StartTicker == 1) {
+        StartTicker = StartValue;
+      }
+      if (EndTicker == 1) {
+        EndTicker = StartValue;
+      }
       Ticker = CountUp ? (EndTicker - StartTicker) : (StartTicker - EndTicker);
 
       mPerfData.Duration = (UINT32) DivU64x32 (Ticker, (UINT32) Freq);
