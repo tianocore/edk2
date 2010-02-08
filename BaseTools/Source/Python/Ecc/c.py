@@ -742,7 +742,7 @@ def SplitPredicateByOp(Str, Op, IsFuncCalling = False):
             return [Name]
         
         Name = Str[0:Index + IndexInRemainingStr].strip()
-        Value = Str[Index+IndexInRemainingStr+len(Op):].strip()
+        Value = Str[Index+IndexInRemainingStr+len(Op):].strip().strip(')')
         return [Name, Value]
     
     TmpStr = Str.rstrip(';').rstrip(')')
@@ -759,6 +759,8 @@ def SplitPredicateByOp(Str, Op, IsFuncCalling = False):
         TmpStr = Str[0:Index - 1]
 
 def SplitPredicateStr(Str):
+    
+    Str = Str.lstrip('(')
     IsFuncCalling = False
     p = GetFuncDeclPattern()
     TmpStr = Str.replace('.', '').replace('->', '')
@@ -1218,6 +1220,16 @@ def GetVarInfo(PredVarList, FuncRecord, FullFileName, IsFuncCall = False, Target
                 TypedefDict = GetTypedefDict(FullFileName)
                 Type = GetRealType(Type, TypedefDict, TargetType)
                 return Type
+
+def GetTypeFromArray(Type, Var):
+    Count = Var.count('[')
+    
+    while Count > 0:
+        Type = Type.strip()
+        Type = Type.rstrip('*')
+        Count = Count - 1
+
+    return Type
 
 def CheckFuncLayoutReturnType(FullFileName):
     ErrorMsgList = []
@@ -1931,6 +1943,7 @@ def CheckPointerNullComparison(FullFileName):
                     FuncReturnTypeDict[PredVarStr] = Type
                 if Type == None:
                     continue
+                Type = GetTypeFromArray(Type, PredVarStr)
                 if Type.find('*') != -1:
                     PrintErrorMsg(ERROR_PREDICATE_EXPRESSION_CHECK_COMPARISON_NULL_TYPE, 'Predicate Expression: %s' % Exp, FileTable, Str[2])
 
