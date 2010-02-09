@@ -1,7 +1,7 @@
 /** @file
   HII Library implementation that uses DXE protocols and services.
 
-  Copyright (c) 2006 - 2008, Intel Corporation<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -66,7 +66,6 @@ HiiSetString (
   CHAR8          *AllocatedLanguages;
   CHAR8          *Supported;
   CHAR8          *Language;
-  EFI_STRING_ID  NewStringId;
 
   ASSERT (HiiHandle != NULL);
   ASSERT (String != NULL);
@@ -90,7 +89,6 @@ HiiSetString (
     return (EFI_STRING_ID)(0);
   }
 
-  NewStringId = 0;
   Status = EFI_INVALID_PARAMETER;
   //
   // Loop through each language that the string supports
@@ -113,7 +111,7 @@ HiiSetString (
     // If StringId is 0, then call NewString().  Otherwise, call SetString()
     //
     if (StringId == (EFI_STRING_ID)(0)) {
-      Status = gHiiString->NewString (gHiiString, HiiHandle, &NewStringId, Language, NULL, String, NULL);
+      Status = gHiiString->NewString (gHiiString, HiiHandle, &StringId, Language, NULL, String, NULL);
     } else {
       Status = gHiiString->SetString (gHiiString, HiiHandle, StringId, Language, String, NULL);
     }
@@ -133,8 +131,6 @@ HiiSetString (
 
   if (EFI_ERROR (Status)) {
     return (EFI_STRING_ID)(0);
-  } else if (StringId == (EFI_STRING_ID)(0)) {
-    return NewStringId;
   } else {
     return StringId;
   }

@@ -1,7 +1,7 @@
 /** @file
   The file provides services to manipulate string data.
   
-  Copyright (c) 2006 - 2008, Intel Corporation
+  Copyright (c) 2006 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -25,6 +25,8 @@ typedef struct _EFI_HII_STRING_PROTOCOL EFI_HII_STRING_PROTOCOL;
 /**
   This function adds the string String to the group of strings owned by PackageList, with the
   specified font information StringFontInfo and returns a new string id.
+  The new string identifier is guaranteed to be unique within the package list. 
+  That new string identifier is reserved for all languages in the package list. 
 
   @param  This                   A pointer to the EFI_HII_STRING_PROTOCOL instance.
   @param  PackageList            Handle of the package list where this string will
