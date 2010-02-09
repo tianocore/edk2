@@ -355,7 +355,7 @@ GetPeCoffImageFixLoadingAssignedAddress(
          // hold the spcified address. If the feature is configured as load module at fixed offset, ImageAddress hold an offset
          // relative to top address
          //
-         if ((INT64)PcdGet64(PcdLoadModuleAtFixAddressEnable) < 0) {
+         if ((INT64)FixedPcdGet64(PcdLoadModuleAtFixAddressEnable) < 0) {
          	 ImageContext->ImageAddress = gLoadModuleAtFixAddressConfigurationTable.DxeCodeTopAddress + (INT64)ImageContext->ImageAddress;
          }
          //
