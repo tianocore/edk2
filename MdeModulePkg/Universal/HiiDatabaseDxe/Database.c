@@ -857,7 +857,7 @@ InsertStringPackage (
   //
   // Collect all font block info
   //
-  Status = FindStringBlock (Private, StringPackage, (EFI_STRING_ID) (-1), NULL, NULL, NULL, NULL);
+  Status = FindStringBlock (Private, StringPackage, (EFI_STRING_ID) (-1), NULL, NULL, NULL, &StringPackage->MaxStringId);
   if (EFI_ERROR (Status)) {
     return Status;
   }

@@ -127,6 +127,7 @@ typedef struct _HII_STRING_PACKAGE_INSTANCE {
   LIST_ENTRY                            StringEntry;
   LIST_ENTRY                            FontInfoList;  // local font info list
   UINT8                                 FontId;
+  EFI_STRING_ID                         MaxStringId;   // record StringId
 } HII_STRING_PACKAGE_INSTANCE;
 
 //
@@ -422,8 +423,9 @@ GetSystemFont (
 /**
   Parse all string blocks to find a String block specified by StringId.
   If StringId = (EFI_STRING_ID) (-1), find out all EFI_HII_SIBT_FONT blocks
-  within this string package and backup its information.
-  If StringId = 0, output the string id of last string block (EFI_HII_SIBT_END).
+  within this string package and backup its information. If LastStringId is 
+  specified, the string id of last string block will also be output.
+  If StringId = 0, output the string id of last string block (EFI_HII_SIBT_STRING).
 
   @param  Private                 Hii database private structure.
   @param  StringPackage           Hii string package instance.
@@ -433,7 +435,7 @@ GetSystemFont (
   @param  StringBlockAddr         Output the block address of found string block.
   @param  StringTextOffset        Offset, relative to the found block address, of
                                   the  string text information.
-  @param  LastStringId            Output the last string id when StringId = 0.
+  @param  LastStringId            Output the last string id when StringId = 0 or StringId = -1.
 
   @retval EFI_SUCCESS             The string text and font is retrieved
                                   successfully.
