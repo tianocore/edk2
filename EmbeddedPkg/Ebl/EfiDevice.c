@@ -31,13 +31,22 @@ EblPrintFsInfo (
   IN  EFI_OPEN_FILE   *File
   )
 {
+  CHAR16 *Str;
+
   if (File == NULL) {
     return;
   }
 
   AsciiPrint ("  %a: ", File->DeviceName);
   if (File->FsInfo != NULL) {
-    AsciiPrint ("%s: ", File->FsInfo->VolumeLabel);
+    for (Str = File->FsInfo->VolumeLabel; *Str != '\0'; Str++) {
+      if (*Str == ' ') {
+        // UI makes you enter _ for space, so make the printout match that
+        *Str = '_';
+      }
+      AsciiPrint ("%c", *Str);
+    }
+    AsciiPrint (":");
     if (File->FsInfo->ReadOnly) {
       AsciiPrint ("ReadOnly");
     }
