@@ -852,10 +852,9 @@ RefreshGcdMemoryAttributes (
   UINTN                               NumberOfDescriptors;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR     *MemorySpaceMap;
   UINT64                              DefaultAttributes;
-  VARIABLE_MTRR                       VariableMtrr[MAX_MTRR_NUMBER_OF_VARIABLE_MTRR];
+  VARIABLE_MTRR                       VariableMtrr[MTRR_NUMBER_OF_VARIABLE_MTRR];
   MTRR_FIXED_SETTINGS                 MtrrFixedSettings;
   UINT32                              FirmwareVariableMtrrCount;
-  UINT32                              UsedMtrr;
 
   FirmwareVariableMtrrCount = GetFirmwareVariableMtrrCount ();
 
@@ -871,11 +870,9 @@ RefreshGcdMemoryAttributes (
   //
   // Get the memory attribute of variable MTRRs
   //
-  UsedMtrr = MAX_MTRR_NUMBER_OF_VARIABLE_MTRR;
   MtrrGetMemoryAttributeInVariableMtrr (
     mValidMtrrBitsMask,
     mValidMtrrAddressMask,
-    &UsedMtrr,
     VariableMtrr
     );
 
