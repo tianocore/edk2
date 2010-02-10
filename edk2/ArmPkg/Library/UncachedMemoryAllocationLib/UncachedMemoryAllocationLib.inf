@@ -32,8 +32,9 @@
   gEfiCpuArchProtocolGuid
 
 [LibraryClasses]
+  BaseLib
   ArmLib
+  MemoryAllocationLib
+  DxeServicesTableLib
 
-[FixedPcd]
-  gArmTokenSpaceGuid.PcdArmUncachedMemoryMask
   

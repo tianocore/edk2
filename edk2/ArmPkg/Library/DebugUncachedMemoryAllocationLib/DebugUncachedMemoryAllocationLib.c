@@ -83,7 +83,8 @@ AddPagesToList (
   
   NewNode->Buffer     = Buffer;
   NewNode->Allocation = Allocation;
-  
+  NewNode->Pages      = Pages;
+
   InsertTailList (&mPageList, &NewNode->Link);
 }
 

@@ -1,6 +1,8 @@
 /** @file
+  UncachedMemoryAllocation lib that uses DXE CPU driver to chnage cachability for
+  a buffer.
 
-  Copyright (c) 2008-2009, Apple Inc. All rights reserved.
+  Copyright (c) 2008-2010, Apple Inc. All rights reserved.
   
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -12,63 +14,111 @@
 
 **/
 
+#include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UncachedMemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/ArmLib.h>
+#include <Library/DxeServicesTableLib.h>
+
 #include <Protocol/Cpu.h>
 
+VOID *
+UncachedInternalAllocatePages (
+  IN EFI_MEMORY_TYPE  MemoryType,  
+  IN UINTN            Pages
+  );
+
+VOID *
+UncachedInternalAllocateAlignedPages (
+  IN EFI_MEMORY_TYPE  MemoryType,  
+  IN UINTN            Pages,
+  IN UINTN            Alignment
+  );
+  
+  
+
+EFI_CPU_ARCH_PROTOCOL           *gDebugUncachedCpu;
+
+//
+// Assume all of memory has the same cache attributes, unless we do our magic
+//
+UINT64  gAttributes;
+
+typedef struct {
+  VOID        *Allocation;
+  UINTN       Pages;
+  LIST_ENTRY  Link;
+} FREE_PAGE_NODE;
+
+LIST_ENTRY  mPageList = INITIALIZE_LIST_HEAD_VARIABLE (mPageList);
+
+VOID
+AddPagesToList (
+  IN VOID   *Allocation,
+  UINTN     Pages
+  )
+{
+  FREE_PAGE_NODE  *NewNode;
+  
+  NewNode = AllocatePool (sizeof (LIST_ENTRY));
+  if (NewNode == NULL) {
+    ASSERT (FALSE);
+    return;
+  }
+  
+  NewNode->Allocation = Allocation;
+  NewNode->Pages      = Pages;
+  
+  InsertTailList (&mPageList, &NewNode->Link);
+}
+
+
+VOID
+RemovePagesFromList (
+  OUT VOID  *Allocation,
+  OUT UINTN *Pages
+  )
+{
+  LIST_ENTRY      *Link;
+  FREE_PAGE_NODE  *OldNode;
+
+  *Pages = 0;
+  
+  for (Link = mPageList.ForwardLink; Link != &mPageList; Link = Link->ForwardLink) {
+    OldNode = BASE_CR (Link, FREE_PAGE_NODE, Link);
+    if (OldNode->Allocation == Allocation) {
+      *Pages = OldNode->Pages;
+      
+      RemoveEntryList (&OldNode->Link);
+      FreePool (OldNode);
+      return;
+    }
+  }
+
+  return;
+}
+
+
+/**
+  Converts a cached or uncached address to a physical address suitable for use in SoC registers.
+
+  @param  VirtualAddress                 The pointer to convert.
+
+  @return The physical address of the supplied virtual pointer.
+
+**/
 EFI_PHYSICAL_ADDRESS
 ConvertToPhysicalAddress (
   IN VOID *VirtualAddress
   )
 {
-  UINTN UncachedMemoryMask = (UINTN)PcdGet64(PcdArmUncachedMemoryMask);
-  UINTN PhysicalAddress;
-  
-  PhysicalAddress = (UINTN)VirtualAddress & ~UncachedMemoryMask;
-  
-  return (EFI_PHYSICAL_ADDRESS)PhysicalAddress;
+  return (EFI_PHYSICAL_ADDRESS)(UINTN)VirtualAddress;
 }
 
-VOID *
-ConvertToCachedAddress (
-  IN VOID *Address
-  )
-{
-  return (VOID *)(UINTN)ConvertToPhysicalAddress(Address);
-}
-
-VOID *
-ConvertToUncachedAddress (
-  IN VOID *Address
-  )
-{
-  UINTN UncachedMemoryMask = (UINTN)PcdGet64(PcdArmUncachedMemoryMask);
-  UINTN UncachedAddress;
-  
-  UncachedAddress = (UINTN)Address | UncachedMemoryMask;
-  
-  return (VOID *)UncachedAddress;
-}
-
-VOID
-FlushCache (
-  IN EFI_PHYSICAL_ADDRESS Address,
-  IN UINTN                Size
-  )
-{
-  EFI_CPU_ARCH_PROTOCOL *Cpu;
-  EFI_STATUS            Status;
-  
-  Status = gBS->LocateProtocol(&gEfiCpuArchProtocolGuid, NULL, (VOID **)&Cpu);
-  ASSERT_EFI_ERROR(Status);
-  
-  Status = Cpu->FlushDataCache(Cpu, Address, Size, EfiCpuFlushTypeWriteBackInvalidate);
-  ASSERT_EFI_ERROR(Status);
-}
 
 VOID *
 UncachedInternalAllocatePages (
@@ -76,25 +126,9 @@ UncachedInternalAllocatePages (
   IN UINTN            Pages
   )
 {
-  EFI_STATUS            Status;
-  EFI_PHYSICAL_ADDRESS  Memory; 
-
-  if (Pages == 0) {
-    return NULL;
-  }
-
-  Status = gBS->AllocatePages (AllocateAnyPages, MemoryType, Pages, &Memory);
-  if (EFI_ERROR (Status)) {
-    Memory = 0;
-  }
-  
-  if (Memory != 0) {
-    FlushCache(Memory, EFI_PAGES_TO_SIZE(Pages));
-    Memory = (EFI_PHYSICAL_ADDRESS)(UINTN)ConvertToUncachedAddress((VOID *)(UINTN)Memory);
-  }
-  
-  return (VOID *) (UINTN) Memory;
+  return UncachedInternalAllocateAlignedPages (MemoryType, Pages, EFI_PAGE_SIZE);
 }
+
 
 VOID *
 EFIAPI
@@ -123,6 +157,8 @@ UncachedAllocateReservedPages (
   return UncachedInternalAllocatePages (EfiReservedMemoryType, Pages);
 }
 
+
+
 VOID
 EFIAPI
 UncachedFreePages (
@@ -130,15 +166,10 @@ UncachedFreePages (
   IN UINTN  Pages
   )
 {
-  EFI_STATUS  Status;
-
-  ASSERT (Pages != 0);
-  
-  Buffer = ConvertToCachedAddress(Buffer);
-  
-  Status = gBS->FreePages ((EFI_PHYSICAL_ADDRESS) (UINTN) Buffer, Pages);
-  ASSERT_EFI_ERROR (Status);
+  UncachedFreeAlignedPages (Buffer, Pages);
+  return;
 }
+
 
 VOID *
 UncachedInternalAllocateAlignedPages (
@@ -147,12 +178,13 @@ UncachedInternalAllocateAlignedPages (
   IN UINTN            Alignment
   )
 {
-  EFI_STATUS            Status;
-  EFI_PHYSICAL_ADDRESS  Memory;
-  UINTN                 AlignedMemory;
-  UINTN                 AlignmentMask;
-  UINTN                 UnalignedPages;
-  UINTN                 RealPages;
+  EFI_STATUS                        Status;
+  EFI_PHYSICAL_ADDRESS              Memory;
+  EFI_PHYSICAL_ADDRESS              AlignedMemory;
+  UINTN                             AlignmentMask;
+  UINTN                             UnalignedPages;
+  UINTN                             RealPages;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR   Descriptor;
 
   //
   // Alignment must be a power of two or zero.
@@ -206,43 +238,20 @@ UncachedInternalAllocateAlignedPages (
     AlignedMemory  = (UINTN) Memory;
   }
   
-  if (AlignedMemory != 0) {
-    FlushCache (AlignedMemory, EFI_PAGES_TO_SIZE(Pages));
-    AlignedMemory = (UINTN)ConvertToUncachedAddress((VOID *)AlignedMemory);
+  Status = gDS->GetMemorySpaceDescriptor (Memory, &Descriptor);
+  if (!EFI_ERROR (Status)) {
+    // We are making an assumption that all of memory has the same default attributes
+    gAttributes = Descriptor.Attributes;
   }
   
-  return (VOID *) AlignedMemory;
+  Status = gDebugUncachedCpu->SetMemoryAttributes (gDebugUncachedCpu, Memory, EFI_PAGES_TO_SIZE (Pages), EFI_MEMORY_UC);
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+  
+  return (VOID *)(UINTN)Memory;
 }
 
-VOID *
-EFIAPI
-UncachedAllocateAlignedPages (
-  IN UINTN  Pages,
-  IN UINTN  Alignment
-  )
-{
-  return UncachedInternalAllocateAlignedPages (EfiBootServicesData, Pages, Alignment);
-}
-
-VOID *
-EFIAPI
-UncachedAllocateAlignedRuntimePages (
-  IN UINTN  Pages,
-  IN UINTN  Alignment
-  )
-{
-  return UncachedInternalAllocateAlignedPages (EfiRuntimeServicesData, Pages, Alignment);
-}
-
-VOID *
-EFIAPI
-UncachedAllocateAlignedReservedPages (
-  IN UINTN  Pages,
-  IN UINTN  Alignment
-  )
-{
-  return UncachedInternalAllocateAlignedPages (EfiReservedMemoryType, Pages, Alignment);
-}
 
 VOID
 EFIAPI
@@ -251,15 +260,20 @@ UncachedFreeAlignedPages (
   IN UINTN  Pages
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS            Status;
+  EFI_PHYSICAL_ADDRESS  Memory; 
 
   ASSERT (Pages != 0);
   
-  Buffer = ConvertToCachedAddress(Buffer);
+  Memory = (EFI_PHYSICAL_ADDRESS) (UINTN) Buffer;
+  Status = gDebugUncachedCpu->SetMemoryAttributes (gDebugUncachedCpu, Memory, EFI_PAGES_TO_SIZE (Pages), gAttributes);
   
-  Status = gBS->FreePages ((EFI_PHYSICAL_ADDRESS) (UINTN) Buffer, Pages);
+  Status = gBS->FreePages (Memory, Pages);
   ASSERT_EFI_ERROR (Status);
 }
+
+
+
 
 VOID *
 UncachedInternalAllocateAlignedPool (
@@ -268,59 +282,23 @@ UncachedInternalAllocateAlignedPool (
   IN UINTN            Alignment
   )
 {
-  VOID        *RawAddress;
-  UINTN       AlignedAddress;
-  UINTN       AlignmentMask;
-  UINTN       OverAllocationSize;
-  UINTN       RealAllocationSize;
-  VOID        **FreePointer;
-  UINTN       DataCacheLineLength;
-  EFI_STATUS  Status;
-
+  VOID      *AlignedAddress;
+  
   //
   // Alignment must be a power of two or zero.
   //
   ASSERT ((Alignment & (Alignment - 1)) == 0);
 
-  DataCacheLineLength = ArmDataCacheLineLength();
-  
-  // Alignment must be at least cache-line aligned
-  if (Alignment < DataCacheLineLength) {
-    Alignment = DataCacheLineLength;
-  }
-  
-  if (Alignment == 0) {
-    AlignmentMask = Alignment;
-  } else {
-    AlignmentMask = Alignment - 1;
+  if (Alignment < EFI_PAGE_SIZE) {
+    Alignment = EFI_PAGE_SIZE;
   }
     
-  //
-  // Calculate the extra memory size, over-allocate memory pool and get the aligned memory address. 
-  //
-  OverAllocationSize  = sizeof (RawAddress) + AlignmentMask;
-  RealAllocationSize  = AllocationSize + OverAllocationSize;
-  //
-  // Make sure that AllocationSize plus OverAllocationSize does not overflow. 
-  //
-  ASSERT (RealAllocationSize > AllocationSize); 
-
-  Status = gBS->AllocatePool (PoolType, RealAllocationSize, &RawAddress);
-  if (EFI_ERROR (Status)) {
+  AlignedAddress = UncachedInternalAllocateAlignedPages (PoolType, EFI_SIZE_TO_PAGES (AllocationSize), Alignment);
+  if (AlignedAddress == NULL) {
     return NULL;
   }
 
-  AlignedAddress      = ((UINTN) RawAddress + OverAllocationSize) & ~AlignmentMask;
-  //
-  // Save the original memory address just before the aligned address.
-  //
-  FreePointer         = (VOID **)(AlignedAddress - sizeof (RawAddress));
-  *FreePointer        = RawAddress;
-
-  if (AlignedAddress != 0) {
-    FlushCache (AlignedAddress, AllocationSize);
-    AlignedAddress = (UINTN)ConvertToUncachedAddress((VOID *)AlignedAddress);
-  }
+  AddPagesToList ((VOID *)(UINTN)AlignedAddress, EFI_SIZE_TO_PAGES (AllocationSize));
 
   return (VOID *) AlignedAddress;
 }
@@ -456,23 +434,14 @@ UncachedAllocateAlignedReservedCopyPool (
 VOID
 EFIAPI
 UncachedFreeAlignedPool (
-  IN VOID   *Buffer
+  IN VOID   *Allocation
   )
 {
-  VOID        *RawAddress;
-  VOID        **FreePointer;
-  EFI_STATUS  Status;
-
-  Buffer = ConvertToCachedAddress(Buffer);
+  UINTN   Pages;
   
-  //
-  // Get the pre-saved original address in the over-allocate pool.
-  //
-  FreePointer = (VOID **)((UINTN) Buffer - sizeof (RawAddress));
-  RawAddress  = *FreePointer;
+  RemovePagesFromList (Allocation, &Pages);
 
-  Status = gBS->FreePool (RawAddress);
-  ASSERT_EFI_ERROR (Status);
+  UncachedFreePages (Allocation, Pages);
 }
 
 VOID *
@@ -481,8 +450,8 @@ UncachedInternalAllocatePool (
   IN UINTN            AllocationSize
   )
 {
-  UINTN CacheLineLength = ArmDataCacheLineLength();
-  return UncachedInternalAllocateAlignedPool(MemoryType, AllocationSize, CacheLineLength);
+  UINTN CacheLineLength = ArmDataCacheLineLength ();
+  return UncachedInternalAllocateAlignedPool (MemoryType, AllocationSize, CacheLineLength);
 }
 
 VOID *
@@ -609,7 +578,7 @@ UncachedFreePool (
   IN VOID   *Buffer
   )
 {
-  UncachedFreeAlignedPool(Buffer);
+  UncachedFreeAlignedPool (Buffer);
 }
 
 VOID
@@ -623,4 +592,36 @@ UncachedSafeFreePool (
     Buffer = NULL;
   }
 }
+
+/**
+  The constructor function caches the pointer of DXE Services Table.
+
+  The constructor function caches the pointer of DXE Services Table.
+  It will ASSERT() if that operation fails.
+  It will ASSERT() if the pointer of DXE Services Table is NULL.
+  It will always return EFI_SUCCESS.
+
+  @param  ImageHandle   The firmware allocated handle for the EFI image.
+  @param  SystemTable   A pointer to the EFI System Table.
+
+  @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
+
+**/
+EFI_STATUS
+EFIAPI
+DebugUncachedMemoryAllocationLibConstructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS    Status;
+  
+  Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&gDebugUncachedCpu);
+  ASSERT_EFI_ERROR(Status);
+
+
+  return Status;
+}
+
+
 
