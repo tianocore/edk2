@@ -1,7 +1,7 @@
 ## @file
 #  Component description file for SMM Base Protocol on SMM Base2 Protocol Thunk driver.
 #
-#  Copyright (c) 2009, Intel Corporation
+#  Copyright (c) 2009 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -41,6 +41,10 @@
   UefiBootServicesTableLib
   DebugLib
   UefiLib
+  UefiRuntimeLib
+
+[Guids]
+  gEfiEventVirtualAddressChangeGuid   # GUID ALWAYS_CONSUMED
 
 [Protocols]
   gEfiSmmBase2ProtocolGuid            # PROTOCOL SOMETIMES_CONSUMED
