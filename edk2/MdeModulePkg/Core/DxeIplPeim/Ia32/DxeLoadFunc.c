@@ -1,7 +1,7 @@
 /** @file
   Ia32-specific functionality for DxeLoad.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -19,8 +19,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // Global Descriptor Table (GDT)
 //
 GLOBAL_REMOVE_IF_UNREFERENCED IA32_GDT gGdtEntries[] = {
-/* selector { Global Segment Descriptor                              } */  
-/* 0x00 */  {{0,      0,  0,  0,    0,  0,  0,  0,    0,  0, 0,  0,  0}}, //null descriptor 
+/* selector { Global Segment Descriptor                              } */
+/* 0x00 */  {{0,      0,  0,  0,    0,  0,  0,  0,    0,  0, 0,  0,  0}}, //null descriptor
 /* 0x08 */  {{0xffff, 0,  0,  0x2,  1,  0,  1,  0xf,  0,  0, 1,  1,  0}}, //linear data segment descriptor
 /* 0x10 */  {{0xffff, 0,  0,  0xf,  1,  0,  1,  0xf,  0,  0, 1,  1,  0}}, //linear code segment descriptor
 /* 0x18 */  {{0xffff, 0,  0,  0x3,  1,  0,  1,  0xf,  0,  0, 1,  1,  0}}, //system data segment descriptor
@@ -70,19 +70,21 @@ HandOffToDxeCore (
   VOID                      *TemplateBase;
   EFI_PHYSICAL_ADDRESS      VectorAddress;
   UINT32                    Index;
+  BOOLEAN                   InterruptState;
+
 
   Status = PeiServicesAllocatePages (EfiBootServicesData, EFI_SIZE_TO_PAGES (STACK_SIZE), &BaseOfStack);
   ASSERT_EFI_ERROR (Status);
-  
+
   if (FeaturePcdGet(PcdDxeIplSwitchToLongMode)) {
     //
-    // Compute the top of the stack we were allocated, which is used to load X64 dxe core. 
+    // Compute the top of the stack we were allocated, which is used to load X64 dxe core.
     // Pre-allocate a 32 bytes which confroms to x64 calling convention.
     //
-    // The first four parameters to a function are passed in rcx, rdx, r8 and r9. 
-    // Any further parameters are pushed on the stack. Furthermore, space (4 * 8bytes) for the 
-    // register parameters is reserved on the stack, in case the called function 
-    // wants to spill them; this is important if the function is variadic. 
+    // The first four parameters to a function are passed in rcx, rdx, r8 and r9.
+    // Any further parameters are pushed on the stack. Furthermore, space (4 * 8bytes) for the
+    // register parameters is reserved on the stack, in case the called function
+    // wants to spill them; this is important if the function is variadic.
     //
     TopOfStack = BaseOfStack + EFI_SIZE_TO_PAGES (STACK_SIZE) * EFI_PAGE_SIZE - 32;
 
@@ -93,7 +95,7 @@ HandOffToDxeCore (
 
     //
     // Load the GDT of Go64. Since the GDT of 32-bit Tiano locates in the BS_DATA
-    // memory, it may be corrupted when copying FV to high-end memory 
+    // memory, it may be corrupted when copying FV to high-end memory
     //
     AsmWriteGdtr (&gGdt);
     //
@@ -106,19 +108,19 @@ HandOffToDxeCore (
     //
     Status = PeiServicesInstallPpi (&gEndOfPeiSignalPpi);
     ASSERT_EFI_ERROR (Status);
-    
+
     AsmWriteCr3 (PageTables);
 
     //
     // Update the contents of BSP stack HOB to reflect the real stack info passed to DxeCore.
-    //    
+    //
     UpdateStackHob (BaseOfStack, STACK_SIZE);
 
     SizeOfTemplate = AsmGetVectorTemplatInfo (&TemplateBase);
 
     Status = PeiServicesAllocatePages (
-               EfiBootServicesData, 
-               EFI_SIZE_TO_PAGES((SizeOfTemplate + sizeof (X64_IDT_GATE_DESCRIPTOR)) * 32), 
+               EfiBootServicesData,
+               EFI_SIZE_TO_PAGES((SizeOfTemplate + sizeof (X64_IDT_GATE_DESCRIPTOR)) * 32),
                &VectorAddress
                );
     ASSERT_EFI_ERROR (Status);
@@ -141,14 +143,24 @@ HandOffToDxeCore (
     }
 
     gLidtDescriptor.Base = (UINTN) IdtTable;
+
+    //
+    // Disable interrupts and save the current interrupt state
+    //
+    InterruptState = SaveAndDisableInterrupts ();
+
     AsmWriteIdtr (&gLidtDescriptor);
 
-      
+    //
+    // Restore the interrupt state
+    //
+    SetInterruptState (InterruptState);
+
     //
     // Go to Long Mode and transfer control to DxeCore.
     // Interrupts will not get turned on until the CPU AP is loaded.
     // Call x64 drivers passing in single argument, a pointer to the HOBs.
-    // 
+    //
     AsmEnablePaging64 (
       SYS_CODE64_SEL,
       DxeCoreEntryPoint,
@@ -172,9 +184,9 @@ HandOffToDxeCore (
 
     //
     // Update the contents of BSP stack HOB to reflect the real stack info passed to DxeCore.
-    //    
+    //
     UpdateStackHob (BaseOfStack, STACK_SIZE);
-    
+
     //
     // Transfer the control to the entry point of DxeCore.
     //
@@ -184,6 +196,6 @@ HandOffToDxeCore (
       NULL,
       (VOID *) (UINTN) TopOfStack
       );
-  } 
+  }
 }
 
