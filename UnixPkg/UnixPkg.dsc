@@ -68,6 +68,11 @@
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   SecurityManagementLib|MdeModulePkg/Library/DxeSecurityManagementLib/DxeSecurityManagementLib.inf
 
+  EfiFileLib|EmbeddedPkg/Library/EfiFileLib/EfiFileLib.inf
+  EblCmdLib|EmbeddedPkg/Library/EblCmdLibNull/EblCmdLibNull.inf
+  EblNetworkLib|EmbeddedPkg/Library/EblNetworkLib/EblNetworkLib.inf
+  
+
 [LibraryClasses.common.USER_DEFINED]
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
@@ -275,6 +280,9 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x400
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize|0x8000
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x10000
+  
+  
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"%a"
 
 [PcdsFeatureFlag.common]
   gEfiEdkModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|FALSE
@@ -470,3 +478,4 @@
 
   #FatPkg/EnhancedFatDxe/Fat.inf
   
+  EmbeddedPkg/Ebl/Ebl.inf
