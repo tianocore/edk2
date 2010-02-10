@@ -1665,7 +1665,7 @@ EfiSetCwd (
   
   // Use the info returned from EfiOpen as it can add in CWD if needed. So Cwd could be
   // relative to the current gCwd or not.
-  gCwd = AllocatePool (AsciiStrSize (File->DeviceName) + AsciiStrSize (File->FileName) + 1);
+  gCwd = AllocatePool (AsciiStrSize (File->DeviceName) + AsciiStrSize (File->FileName) + 10);
   if (gCwd == NULL) {
     return EFI_INVALID_PARAMETER;
   }
