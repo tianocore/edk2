@@ -25,7 +25,6 @@
   ENTRY_POINT                    = InitializeCpu
 
 [Packages]
-  OvmfPkg/OvmfPkg.dec
   MdePkg/MdePkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
 
