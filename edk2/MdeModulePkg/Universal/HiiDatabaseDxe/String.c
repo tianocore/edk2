@@ -560,7 +560,7 @@ FindStringBlock (
   // Get last string ID
   //
   if (StringId == (EFI_STRING_ID) (-1)) {
-    *LastStringId = CurrentStringId - 1;
+    *LastStringId = (EFI_STRING_ID) (CurrentStringId - 1);
     return EFI_SUCCESS;
   }
 
@@ -1103,7 +1103,7 @@ HiiNewString (
     //
     // Set new StringId
     //
-    *StringId = NewStringId + 1;
+    *StringId = (EFI_STRING_ID) (NewStringId + 1);
   }
 
   if (MatchStringPackage != NULL) {
