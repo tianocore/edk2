@@ -184,6 +184,13 @@ OutputData (
   IN UINTN  Width,
   IN UINTN  Offset
   );
+  
+UINTN
+WidthFromCommandName (
+  IN CHAR8  *Argv,
+  IN UINTN  Default
+  );
+
 
 extern UINTN    gScreenColumns;
 extern UINTN    gScreenRows;

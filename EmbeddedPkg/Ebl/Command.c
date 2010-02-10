@@ -186,8 +186,16 @@ EblGetCommand (
   UINTN               BestMatchCount;
   UINTN               Length;
   EBL_COMMAND_TABLE   *Match;
+  CHAR8               *Str;
 
   Length = AsciiStrLen (CommandName);
+  Str = AsciiStrStr (CommandName, ".");
+  if (Str != NULL) {
+    // If the command includes a trailing . command extension skip it for the match.
+    // Example: hexdump.4
+    Length = (UINTN)(Str - CommandName); 
+  }
+  
   for (Index = 0, BestMatchCount = 0, Match = NULL; Index < mCmdTableNextFreeIndex; Index++) {
     if (AsciiStriCmp (mCmdTable[Index]->Name,  CommandName) == 0) {
       // match a command exactly
@@ -650,8 +658,60 @@ OutputData (
   return EFI_SUCCESS;
 }
 
+
+/**
+  See if command contains .# where # is a number. Return # as the Width
+  or 1 as the default Width for commands. 
+  
+  Example hexdump.4 returns a width of 4.
+
+  @param  Argv   Argv[0] is the comamnd name
+
+  @return Width of command
+
+**/
+UINTN
+WidthFromCommandName (
+  IN CHAR8  *Argv,
+  IN UINTN  Default
+  )
+{
+  CHAR8         *Str;
+  UINTN         Width;
+  
+  //Hexdump.2 HexDump.4 mean use a different width
+  Str = AsciiStrStr (Argv, ".");
+  if (Str != NULL) {
+    Width = AsciiStrDecimalToUintn (Str + 1);
+    if (Width == 0) {
+      Width = Default;
+    }
+  } else {
+    // Default answer
+    return Default;
+  }
+
+  return Width;
+}
+
 #define HEXDUMP_CHUNK 1024
 
+/**
+  Toggle page break global. This turns on and off prompting to Quit or hit any
+  key to continue when a command is about to scroll the screen with its output
+
+  Argv[0] - "hexdump"[.#]  # is optional 1,2, or 4 for width  
+  Argv[1] - Device or File to dump. 
+  Argv[2] - Optional offset to start dumping
+  Argv[3] - Optional number of bytes to dump
+
+  @param  Argc   Number of command arguments in Argv
+  @param  Argv   Array of strings that represent the parsed command line. 
+                 Argv[0] is the comamnd name
+
+  @return EFI_SUCCESS
+
+**/
 EFI_STATUS
 EblHexdumpCmd (
   IN UINTN  Argc,
@@ -661,19 +721,16 @@ EblHexdumpCmd (
   EFI_OPEN_FILE *File;
   VOID          *Location;
   UINTN         Size;
-  UINTN         Width = 1;
+  UINTN         Width;
   UINTN         Offset = 0;
   EFI_STATUS    Status;
   UINTN         Chunk = HEXDUMP_CHUNK;
 
-  if ((Argc < 2) || (Argc > 3)) {
+  if ((Argc < 2) || (Argc > 4)) {
     return EFI_INVALID_PARAMETER;
   }
   
-  if (Argc == 3) {
-      Width = AsciiStrDecimalToUintn(Argv[2]);
-  }
-  
+  Width = WidthFromCommandName (Argv[0], 1);
   if ((Width != 1) && (Width != 2) && (Width != 4)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -684,14 +741,26 @@ EblHexdumpCmd (
   }
 
   Location = AllocatePool (Chunk);
-  Size     = EfiTell(File, NULL);
+  Size     = (Argc > 3) ? AsciiStrHexToUintn (Argv[3]) : EfiTell (File, NULL);
 
-  for (Offset = 0; Offset + HEXDUMP_CHUNK <= Size; Offset += Chunk) {
+  Offset = 0;
+  if (Argc > 2) {
+    Offset = AsciiStrHexToUintn (Argv[2]);
+    if (Offset > 0) {
+      // Make sure size includes the part of the file we have skipped
+      Size += Offset;
+    }
+  } 
+
+  Status = EfiSeek (File, Offset, EfiSeekStart);
+  if (EFI_ERROR (Status)) {
+    goto Exit;
+  }
+  
+  for (; Offset + HEXDUMP_CHUNK <= Size; Offset += Chunk) {
     Chunk = HEXDUMP_CHUNK;
-    
     Status = EfiRead (File, Location, &Chunk);
-    if (EFI_ERROR(Status))
-    {
+    if (EFI_ERROR(Status)) {
       AsciiPrint ("Error reading file content\n");
       goto Exit;
     }
@@ -778,7 +847,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED const EBL_COMMAND_TABLE mCmdTemplate[] =
   },
   {
     "hexdump",
-    " filename ; dump a file as hex bytes",
+    "[.{1|2|4}] filename [Offset] [Size]; dump a file as hex bytes at a given width",
     NULL,
     EblHexdumpCmd
   }
