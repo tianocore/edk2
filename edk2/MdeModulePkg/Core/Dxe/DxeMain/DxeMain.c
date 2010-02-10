@@ -295,7 +295,7 @@ DxeMain (
   // Configuration Table so that user could easily to retrieve the top address to load Dxe and PEI
   // Code and Tseg base to load SMM driver. 
   //
-  if (FixedPcdGet64(PcdLoadModuleAtFixAddressEnable) != 0) {
+  if (PcdGet64(PcdLoadModuleAtFixAddressEnable) != 0) {
     Status = CoreInstallConfigurationTable (&gLoadFixedAddressConfigurationTableGuid, &gLoadModuleAtFixAddressConfigurationTable);
     ASSERT_EFI_ERROR (Status);
   }

@@ -355,7 +355,7 @@ GetPeCoffImageFixLoadingAssignedAddress(
          // hold the spcified address. If the feature is configured as load module at fixed offset, ImageAddress hold an offset
          // relative to top address
          //
-         if ((INT64)FixedPcdGet64(PcdLoadModuleAtFixAddressEnable) < 0) {
+         if ((INT64)PcdGet64(PcdLoadModuleAtFixAddressEnable) < 0) {
          	 ImageContext->ImageAddress = gLoadModuleAtFixAddressConfigurationTable.DxeCodeTopAddress + (INT64)ImageContext->ImageAddress;
          }
          //
@@ -367,7 +367,7 @@ GetPeCoffImageFixLoadingAssignedAddress(
      }
      SectionHeaderOffset += sizeof (EFI_IMAGE_SECTION_HEADER);
    }
-   DEBUG ((EFI_D_INFO|EFI_D_LOAD, "LOADING MODULE FIXED INFO: Loading module at fixed address %x. Status = %r \n", ImageContext->ImageAddress, Status));
+   DEBUG ((EFI_D_INFO|EFI_D_LOAD, "LOADING MODULE FIXED INFO: Loading module at fixed address 0x%11p. Status = %r \n", (VOID *)(UINTN)(ImageContext->ImageAddress), Status));
    return Status;
 }
 /**
@@ -479,7 +479,7 @@ CoreLoadPeImage (
     // If Loading Module At Fixed Address feature is enabled, the module should be loaded to
     // a specified address.
     //
-    if (FixedPcdGet64(PcdLoadModuleAtFixAddressEnable) != 0 ) {
+    if (PcdGet64(PcdLoadModuleAtFixAddressEnable) != 0 ) {
       Status = GetPeCoffImageFixLoadingAssignedAddress (&(Image->ImageContext));
 
       if (EFI_ERROR (Status))  {
