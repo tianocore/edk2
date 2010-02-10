@@ -1797,7 +1797,7 @@ CoreInitializeMemoryServices (
   //
   PhitHob = Hob.HandoffInformationTable;
   
-  if (FixedPcdGet64(PcdLoadModuleAtFixAddressEnable) != 0) {
+  if (PcdGet64(PcdLoadModuleAtFixAddressEnable) != 0) {
   	ReservedCodePageNumber = PcdGet32(PcdLoadFixAddressRuntimeCodePageNumber);
   	ReservedCodePageNumber += PcdGet32(PcdLoadFixAddressBootTimeCodePageNumber);
    

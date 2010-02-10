@@ -533,7 +533,7 @@ CoreAddMemoryDescriptor (
   //
   // If Loading Module At Fixed Address feature is enabled. try to allocate memory with Runtime code & Boot time code type
   //
-  if (FixedPcdGet64(PcdLoadModuleAtFixAddressEnable) != 0) {
+  if (PcdGet64(PcdLoadModuleAtFixAddressEnable) != 0) {
     CoreLoadingFixedAddressHook();
   }
   

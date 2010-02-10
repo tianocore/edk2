@@ -293,10 +293,10 @@ PeiLoadFixAddressHook(
   // 
   TotalReservedMemorySize += PeiMemorySize;
   
-  DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: PcdLoadFixAddressRuntimeCodePageNumber= %x.\n", PcdGet32(PcdLoadFixAddressRuntimeCodePageNumber)));
-  DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: PcdLoadFixAddressBootTimeCodePageNumber= %x.\n", PcdGet32(PcdLoadFixAddressBootTimeCodePageNumber)));
-  DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: PcdLoadFixAddressPeiCodePageNumber= %x.\n", PcdGet32(PcdLoadFixAddressPeiCodePageNumber)));   
-  DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: Total Reserved Memory Size = %lx.\n", TotalReservedMemorySize));
+  DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: PcdLoadFixAddressRuntimeCodePageNumber= 0x%x.\n", PcdGet32(PcdLoadFixAddressRuntimeCodePageNumber)));
+  DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: PcdLoadFixAddressBootTimeCodePageNumber= 0x%x.\n", PcdGet32(PcdLoadFixAddressBootTimeCodePageNumber)));
+  DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: PcdLoadFixAddressPeiCodePageNumber= 0x%x.\n", PcdGet32(PcdLoadFixAddressPeiCodePageNumber)));   
+  DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: Total Reserved Memory Size = 0x%lx.\n", TotalReservedMemorySize));
   //
   // Loop through the system memory typed hob to merge the adjacent memory range 
   //
@@ -364,17 +364,17 @@ PeiLoadFixAddressHook(
   //
   // Try to find and validate the TOP address.
   //  
-  if ((INT64)FixedPcdGet64(PcdLoadModuleAtFixAddressEnable) > 0 ) {
+  if ((INT64)PcdGet64(PcdLoadModuleAtFixAddressEnable) > 0 ) {
     //
     // The LMFA feature is enabled as load module at fixed absolute address.
     //
-    TopLoadingAddress = (EFI_PHYSICAL_ADDRESS)FixedPcdGet64(PcdLoadModuleAtFixAddressEnable);
+    TopLoadingAddress = (EFI_PHYSICAL_ADDRESS)PcdGet64(PcdLoadModuleAtFixAddressEnable);
     DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: Loading module at fixed absolute address.\n"));
     //
     // validate the Address. Loop the resource descriptor HOB to make sure the address is in valid memory range
     //
     if ((TopLoadingAddress & EFI_PAGE_MASK) != 0) {
-      DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED ERROR:Top Address %lx is invalid since top address should be page align. \n", TopLoadingAddress)); 
+      DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED ERROR:Top Address 0x%lx is invalid since top address should be page align. \n", TopLoadingAddress)); 
       ASSERT (FALSE);    
     }
     //
@@ -405,10 +405,10 @@ PeiLoadFixAddressHook(
       }  
     }  
     if (CurrentResourceHob != NULL) {
-      DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO:Top Address %lx is valid \n",  TopLoadingAddress));
+      DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO:Top Address 0x%lx is valid \n",  TopLoadingAddress));
       TopLoadingAddress += MINIMUM_INITIAL_MEMORY_SIZE; 
     } else {
-      DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED ERROR:Top Address %lx is invalid \n",  TopLoadingAddress)); 
+      DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED ERROR:Top Address 0x%lx is invalid \n",  TopLoadingAddress)); 
       DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED ERROR:The recommended Top Address for the platform is: \n")); 
       //
       // Print the recomended Top address range.
@@ -429,7 +429,7 @@ PeiLoadFixAddressHook(
               // See if Top address specified by user is valid.
               //
               if (ResourceHob->ResourceLength > TotalReservedMemorySize) {
-                 DEBUG ((EFI_D_INFO, "(%lx, %lx)\n",  
+                 DEBUG ((EFI_D_INFO, "(0x%lx, 0x%lx)\n",  
                           (ResourceHob->PhysicalStart + TotalReservedMemorySize -MINIMUM_INITIAL_MEMORY_SIZE), 
                           (ResourceHob->PhysicalStart + ResourceHob->ResourceLength -MINIMUM_INITIAL_MEMORY_SIZE) 
                         )); 
@@ -546,7 +546,7 @@ PeiLoadFixAddressHook(
   // Cache the top address for Loading Module at Fixed Address feature
   //
   PrivateData->LoadModuleAtFixAddressTopAddress = TopLoadingAddress - MINIMUM_INITIAL_MEMORY_SIZE;
-  DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: Top address = %lx\n",  PrivateData->LoadModuleAtFixAddressTopAddress)); 
+  DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: Top address = 0x%lx\n",  PrivateData->LoadModuleAtFixAddressTopAddress)); 
   //
   // reinstall the PEI memory relative to TopLoadingAddress
   //
@@ -796,7 +796,7 @@ PeiDispatcher (
                       ));
               DEBUG_CODE_END ();
               
-              if (FixedPcdGet64(PcdLoadModuleAtFixAddressEnable) != 0) {
+              if (PcdGet64(PcdLoadModuleAtFixAddressEnable) != 0) {
                 //
                 // Loading Module at Fixed Address is enabled
                 //
@@ -940,13 +940,13 @@ PeiDispatcher (
               //
               PrivateInMem->PeimDispatcherReenter  = TRUE;
               
-              if (FixedPcdGet64(PcdLoadModuleAtFixAddressEnable) != 0) {
+              if (PcdGet64(PcdLoadModuleAtFixAddressEnable) != 0) {
                 //
                 // if Loading Module at Fixed Address is enabled, This is the first invoke to page 
                 // allocation for Pei Core segment. This memory segment should be reserved for loading PEIM
                 //
                 LoadFixPeiCodeBegin = AllocatePages((UINTN)PcdGet32(PcdLoadFixAddressPeiCodePageNumber));
-                DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: PeiCodeBegin = %x, PeiCodeTop= %x\n", (UINTN)LoadFixPeiCodeBegin, ((UINTN)LoadFixPeiCodeBegin) + PcdGet32(PcdLoadFixAddressPeiCodePageNumber) * EFI_PAGE_SIZE));                 
+                DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: PeiCodeBegin = 0x%lx, PeiCodeTop= 0xl%x\n", (UINTN)LoadFixPeiCodeBegin, ((UINTN)LoadFixPeiCodeBegin) + PcdGet32(PcdLoadFixAddressPeiCodePageNumber) * EFI_PAGE_SIZE));                 
                 //
                 // if Loading Module at Fixed Address is enabled, allocate the PEI code memory range usage bit map array.
                 // Every bit in the array indicate the status of the corresponding memory page, available or not

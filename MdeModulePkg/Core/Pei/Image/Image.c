@@ -251,7 +251,7 @@ GetPeCoffImageFixLoadingAssignedAddress(
          //
          // Found first section header that doesn't point to code section.
          //
-         if ((INT64)FixedPcdGet64(PcdLoadModuleAtFixAddressEnable) > 0) {
+         if ((INT64)PcdGet64(PcdLoadModuleAtFixAddressEnable) > 0) {
            //
            // When LMFA feature is configured as Load Module at Fixed Absolute Address mode, PointerToRelocations & PointerToLineNumbers field
            // hold the absolute address of image base runing in memory
@@ -279,7 +279,7 @@ GetPeCoffImageFixLoadingAssignedAddress(
      }
      SectionHeaderOffset += sizeof (EFI_IMAGE_SECTION_HEADER);
    }
-   DEBUG ((EFI_D_INFO|EFI_D_LOAD, "LOADING MODULE FIXED INFO: Loading module at fixed address %lx. Status= %r \n", FixLoaddingAddress, Status));
+   DEBUG ((EFI_D_INFO|EFI_D_LOAD, "LOADING MODULE FIXED INFO: Loading module at fixed address 0x%11p. Status= %r \n", (VOID *)(UINTN)FixLoaddingAddress, Status));
    return Status;
 }
 /**
@@ -336,7 +336,7 @@ LoadAndRelocatePeCoffImage (
   // Allocate Memory for the image when memory is ready, boot mode is not S3, and image is relocatable.
   //
   if ((!ImageContext.RelocationsStripped) && (Private->PeiMemoryInstalled) && (Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME)) {
-    if (FixedPcdGet64(PcdLoadModuleAtFixAddressEnable) != 0) {
+    if (PcdGet64(PcdLoadModuleAtFixAddressEnable) != 0) {
       Status = GetPeCoffImageFixLoadingAssignedAddress(&ImageContext, Private);
       if (EFI_ERROR (Status)){
         DEBUG ((EFI_D_INFO|EFI_D_LOAD, "LOADING MODULE FIXED ERROR: Failed to load module at fixed address. \n"));

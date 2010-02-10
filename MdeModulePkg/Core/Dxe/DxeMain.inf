@@ -140,9 +140,7 @@
 [FeaturePcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport	   ## CONSUMES
 
-[FixedPcd.common]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadModuleAtFixAddressEnable           ## CONSUMES
-
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressBootTimeCodePageNumber    ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressRuntimeCodePageNumber     ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadModuleAtFixAddressEnable            ## CONSUMES
