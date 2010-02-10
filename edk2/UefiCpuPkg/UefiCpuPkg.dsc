@@ -34,9 +34,12 @@
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
+  IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
+  MtrrLib|UefiCpuPkg/Library/MtrrLib/MtrrLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
-  IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
+  UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
+  UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
 
 [LibraryClasses.common.PEIM]
   PeimEntryPoint|MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
@@ -72,6 +75,7 @@
   UefiCpuPkg/CpuIoPei/CpuIoPei.inf
 
 [Components.IA32, Components.X64]
+  UefiCpuPkg/CpuDxe/CpuDxe.inf
   UefiCpuPkg/CpuIo2Smm/CpuIo2Smm.inf
   UefiCpuPkg/Library/BaseUefiCpuLib/BaseUefiCpuLib.inf
   UefiCpuPkg/Library/MtrrLib/MtrrLib.inf
