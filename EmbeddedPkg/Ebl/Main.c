@@ -464,7 +464,7 @@ EblPrompt (
   )
 {
   EblSetTextColor (EFI_YELLOW);
-  AsciiPrint ((CHAR8 *)PcdGetPtr (PcdEmbeddedPrompt));
+  AsciiPrint ((CHAR8 *)PcdGetPtr (PcdEmbeddedPrompt), EfiGetCwd ());
   EblSetTextColor (0);
   AsciiPrint ("%a", ">");
 }
@@ -559,6 +559,9 @@ EdkBootLoaderEntry (
   EblInitializeExternalCmd ();
   EblInitializeNetworkCmd();
   
+  // Disable the 5 minute EFI watchdog time so we don't get automatically reset
+  gBS->SetWatchdogTimer (0, 0, 0, NULL);
+
   if (FeaturePcdGet (PcdEmbeddedMacBoot)) {
     // A MAC will boot in graphics mode, so turn it back to text here
     // This protocol was removed from edk2. It is only an edk thing. We need to make our own copy.
@@ -567,8 +570,6 @@ EdkBootLoaderEntry (
     // Enable the biggest output screen size possible
     gST->ConOut->SetMode (gST->ConOut, (UINTN)gST->ConOut->Mode->MaxMode - 1);
 
-    // Disable the 5 minute EFI watchdog time so we don't get automatically reset
-    gBS->SetWatchdogTimer (0, 0, 0, NULL);
   }
 
   // Save current screen mode

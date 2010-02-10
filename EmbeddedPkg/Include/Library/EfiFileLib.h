@@ -341,7 +341,7 @@ EfiSetCwd (
   
 **/
 CHAR8 *
-EfiGettCwd (
+EfiGetCwd (
   VOID
   );  
 

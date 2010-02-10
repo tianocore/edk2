@@ -647,7 +647,7 @@ EfiOpen (
   File->FvSectionType = SectionType;
 
   StrLen = AsciiStrSize (PathName);
-  if (StrLen <= 2) {
+  if (StrLen <= 1) {
     // Smallest valid path is 1 char and a null
     return NULL;
   }
@@ -659,7 +659,7 @@ EfiOpen (
     }
   }
 
-  if (FileStart == 0) {
+  if (FileStart == StrLen) {
     if (gCwd == NULL) {
       // No CWD
       return NULL;
@@ -671,8 +671,31 @@ EfiOpen (
       return NULL;
     }
     
-    AsciiStrCpy (CwdPlusPathName, gCwd);
+    if ((PathName[0] == '/') || (PathName[0] == '\\')) {
+      // PathName starts in / so this means we go to the root of the device in the CWD. 
+      CwdPlusPathName[0] = '\0';
+      for (FileStart = 0; gCwd[FileStart] != '\0'; FileStart++) {
+        CwdPlusPathName[FileStart] = gCwd[FileStart];
+        if (gCwd[FileStart] == ':') {
+          FileStart++;
+          CwdPlusPathName[FileStart] = '\0';
+          break;
+        }
+      }
+    } else {
+      AsciiStrCpy (CwdPlusPathName, gCwd);
+      StrLen = AsciiStrLen (gCwd);
+      if ((*PathName != '/') && (*PathName != '\\') && (gCwd[StrLen-1] != '/') && (gCwd[StrLen-1] != '\\')) {
+        AsciiStrCat (CwdPlusPathName, "/");
+      }
+    }
+    
     AsciiStrCat (CwdPlusPathName, PathName);
+    if (AsciiStrStr (CwdPlusPathName, ":") == NULL) {
+      // Extra error check to make sure we don't recusre and blow stack
+      return NULL;
+    }
+        
     File = EfiOpen (CwdPlusPathName, OpenMode, SectionType);
     FreePool (CwdPlusPathName);
     return File;
@@ -690,6 +713,10 @@ EfiOpen (
   AsciiStrCpy (File->DeviceName, PathName);
   File->DeviceName[FileStart - 1] = '\0';
   File->FileName = &File->DeviceName[FileStart];
+  if (File->FileName[0] == '\0') {
+    // if it is just a file name use / as root
+    File->FileName = "/";
+  } 
 
   //
   // Use best match algorithm on the dev names so we only need to look at the
@@ -1500,6 +1527,82 @@ EfiWrite (
 }
 
 
+/**
+  Given Cwd expand Path to remove .. and replace them with real 
+  directory names.
+  
+  @param  Cwd     Current Working Directory
+  @param  Path    Path to expand
+
+  @return NULL     Cwd or Path are not valid
+  @return 'other'  Path with .. expanded
+
+**/
+CHAR8 *
+ExpandPath (
+  IN CHAR8    *Cwd,
+  IN CHAR8    *Path
+  )
+{
+  CHAR8   *NewPath;
+  CHAR8   *Work, *Start, *End;
+  UINTN   StrLen;
+  UINTN   i;
+  
+  if (Cwd == NULL || Path == NULL) {
+    return NULL;
+  }
+  
+  StrLen = AsciiStrSize (Cwd);
+  if (StrLen <= 2) {
+    // Smallest valid path is 1 char and a null
+    return NULL;
+  }
+
+  StrLen = AsciiStrSize (Path);
+  NewPath = AllocatePool (AsciiStrSize (Cwd) + StrLen + 1);
+  if (NewPath == NULL) {
+    return NULL;
+  }
+  AsciiStrCpy (NewPath, Cwd);
+  
+  End = Path + StrLen;
+  for (Start = Path ;;) {
+    Work = AsciiStrStr (Start, "..") ;
+    if (Work == NULL) {
+      // Remaining part of Path contains no more ..
+      break;
+    } 
+ 
+    // append path prior to .. 
+    AsciiStrnCat (NewPath, Start, Work - Start);
+    StrLen = AsciiStrLen (NewPath);
+    for (i = StrLen; i >= 0; i--) {
+      if (NewPath[i] == ':') {
+        // too many ..
+        return NULL;
+      }
+      if (NewPath[i] == '/' || NewPath[i] == '\\') {
+        if ((i > 0) && (NewPath[i-1] == ':')) {
+          // leave the / before a :
+          NewPath[i+1] = '\0';
+        } else {
+          // replace / will Null to remove trailing file/dir reference
+          NewPath[i] = '\0';
+        }
+        break;
+      }
+    }
+    
+    Start = Work + 3;
+  } 
+  
+  // Handle the path that remains after the ..
+  AsciiStrnCat (NewPath, Start, End - Start);
+  
+  return NewPath;
+}
+
 
 /**
   Set the Curent Working Directory (CWD). If a call is made to EfiOpen () and 
@@ -1518,23 +1621,65 @@ EfiSetCwd (
   ) 
 {
   EFI_OPEN_FILE *File;
+  UINTN         Len;
+  CHAR8         *Path;
   
-  File = EfiOpen (Cwd, EFI_FILE_MODE_READ, 0);
-  if (File == NULL) {
+  if (Cwd == NULL) {
     return EFI_INVALID_PARAMETER;
   }
   
-  EfiClose (File);
+  if (AsciiStrCmp (Cwd, ".") == 0) {
+    // cd . is a no-op
+    return EFI_SUCCESS;
+  }
   
+  Path = Cwd;
+  if (AsciiStrStr (Cwd, "..") != NULL) {
+    if (gCwd == NULL) {
+      // no parent 
+      return EFI_SUCCESS;
+    }
+    
+    Len = AsciiStrLen (gCwd);
+    if ((gCwd[Len-2] == ':') && ((gCwd[Len-1] == '/') || (gCwd[Len-1] == '\\'))) {
+      // parent is device so nothing to do
+      return EFI_SUCCESS;
+    }
+    
+    // Expand .. in Cwd, given we know current working directory
+    Path = ExpandPath (gCwd, Cwd);
+    if (Path == NULL) {
+      return EFI_NOT_FOUND;
+    }
+  }
+  
+  File = EfiOpen (Path, EFI_FILE_MODE_READ, 0);
+  if (File == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+    
   if (gCwd != NULL) {
     FreePool (gCwd);
   }
   
-  gCwd = AllocatePool (AsciiStrSize (Cwd));
+  // Use the info returned from EfiOpen as it can add in CWD if needed. So Cwd could be
+  // relative to the current gCwd or not.
+  gCwd = AllocatePool (AsciiStrSize (File->DeviceName) + AsciiStrSize (File->FileName) + 1);
   if (gCwd == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  AsciiStrCpy (gCwd, Cwd);
+  AsciiStrCpy (gCwd, File->DeviceName);
+  if (File->FileName == NULL) {
+    AsciiStrCat (gCwd, ":\\");
+  } else {
+    AsciiStrCat (gCwd, ":");
+    AsciiStrCat (gCwd, File->FileName);
+  }
+  
+  EfiClose (File);
+  if (Path != Cwd) {
+    FreePool (Path);
+  }
   return EFI_SUCCESS;
 }
 
@@ -1549,15 +1694,18 @@ EfiSetCwd (
   @param  Cwd     Current Working Directory 
 
 
-  @return NULL    No CWD set
+  @return ""      No CWD set
   @return 'other' Returns buffer that contains CWD.
   
 **/
 CHAR8 *
-EfiGettCwd (
+EfiGetCwd (
   VOID
   )
 {
+  if (gCwd == NULL) {
+    return "";
+  }
   return gCwd;
 }
 
