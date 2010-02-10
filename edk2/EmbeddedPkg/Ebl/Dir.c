@@ -52,7 +52,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED   CHAR8 *gFvFileType[] = {
                       only print out files that contain the string *.efi
   dir fv1:\         ; perform a dir on fv1: device in the efi directory 
                     NOTE: fv devices do not contian subdirs 
-  dir fv1:\ * PEIM  ; will match all files of type SEC
+  dir fv1:\ * PEIM  ; will match all files of type PEIM
 
   @param  Argc   Number of command arguments in Argv
   @param  Argv   Array of strings that represent the parsed command line. 
@@ -88,14 +88,19 @@ EblDirCmd (
   UINTN                         Length;
   UINTN                         BestMatchCount;
   CHAR16                        UnicodeFileName[MAX_CMD_LINE];
+  CHAR8                         *Path;
 
 
   if (Argc <= 1) {
-    // CWD not currently supported 
-    return EFI_SUCCESS;
+    Path = EfiGetCwd ();
+    if (Path == NULL) {
+      return EFI_SUCCESS;
+    }
+  } else {
+    Path = Argv[1];
   }
 
-  File = EfiOpen (Argv[1], EFI_FILE_MODE_READ, 0);
+  File = EfiOpen (Path, EFI_FILE_MODE_READ, 0);
   if (File == NULL) {
     return EFI_SUCCESS;
   }
@@ -277,6 +282,32 @@ Done:
   return EFI_SUCCESS;
 }
 
+/**
+  Change the Current Working Directory
+
+  Argv[0] - "cd"
+  Argv[1] - Device Name:path. Path is optional 
+
+  @param  Argc   Number of command arguments in Argv
+  @param  Argv   Array of strings that represent the parsed command line. 
+                 Argv[0] is the comamnd name
+
+  @return EFI_SUCCESS
+
+**/
+EFI_STATUS
+EblCdCmd (
+  IN UINTN  Argc,
+  IN CHAR8  **Argv
+  )
+{
+  if (Argc <= 1) {
+    return EFI_SUCCESS;
+  } 
+  
+  return EfiSetCwd (Argv[1]);
+}
+
 
 
 GLOBAL_REMOVE_IF_UNREFERENCED const EBL_COMMAND_TABLE mCmdDirTemplate[] =
@@ -286,6 +317,12 @@ GLOBAL_REMOVE_IF_UNREFERENCED const EBL_COMMAND_TABLE mCmdDirTemplate[] =
     " dirdev [*match]; directory listing of dirdev. opt match a substring",
     NULL,
     EblDirCmd
+  },
+  {
+    "cd",
+    " device - set the current working directory",
+    NULL,
+    EblCdCmd
   }
 };
 
