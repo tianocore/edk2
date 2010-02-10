@@ -1,7 +1,7 @@
 /** @file
   Include file for SMM Base Protocol on SMM Base2 Protocol Thunk driver.
   
-  Copyright (c) 2009, Intel Corporation
+  Copyright (c) 2009 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -21,7 +21,9 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiLib.h>
+#include <Library/UefiRuntimeLib.h>
 #include <Guid/SmmBaseThunkCommunication.h>
+#include <Guid/EventGroup.h>
 #include <Protocol/SmmBase2.h>
 #include <Protocol/SmmCommunication.h>
 #include <Protocol/SmmBaseHelperReady.h>

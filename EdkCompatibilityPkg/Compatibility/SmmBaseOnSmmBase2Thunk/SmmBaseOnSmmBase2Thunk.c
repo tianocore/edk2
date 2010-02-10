@@ -8,7 +8,7 @@
   SMM BASE Protocol can be published immediately after SMM Base2 Protocol is installed to
   make SMM Base Protocol.InSmm() as early as possible.
 
-  Copyright (c) 2009 Intel Corporation
+  Copyright (c) 2009 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -457,6 +457,27 @@ SmmBaseHelperReadyProtocolNotification (
 }
 
 /**
+  Notification function of EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE
+
+  This is a notification function registered on EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE event.
+  It convers pointer to new virtual address.
+
+  @param  Event        Event whose notification function is being invoked
+  @param  Context      Pointer to the notification function's context
+**/
+VOID
+EFIAPI
+SmmBaseAddressChangeEvent (
+  IN EFI_EVENT        Event,
+  IN VOID             *Context
+  )
+{
+  if (mSmmCommunication != NULL) {
+    EfiConvertPointer (0x0, (VOID **) &mSmmCommunication);
+  }
+}
+
+/**
   Entry Point for SMM Base Protocol on SMM Base2 Protocol Thunk driver.
 
   @param[in] ImageHandle  Image handle of this driver.
@@ -471,7 +492,9 @@ SmmBaseThunkMain (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  VOID *Registration;
+  VOID       *Registration;
+  EFI_EVENT  VirtualAddressChangeEvent;
+  EFI_STATUS Status;
 
   mImageHandle = ImageHandle;
 
@@ -512,6 +535,16 @@ SmmBaseThunkMain (
     NULL,
     &Registration
     );
+
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  SmmBaseAddressChangeEvent,
+                  NULL,
+                  &gEfiEventVirtualAddressChangeGuid,
+                  &VirtualAddressChangeEvent
+                  );
+  ASSERT_EFI_ERROR (Status);
 
   return EFI_SUCCESS;
 }
