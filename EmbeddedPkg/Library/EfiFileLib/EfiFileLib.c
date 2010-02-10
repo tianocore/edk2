@@ -686,7 +686,7 @@ EfiOpen (
       AsciiStrCpy (CwdPlusPathName, gCwd);
       StrLen = AsciiStrLen (gCwd);
       if ((*PathName != '/') && (*PathName != '\\') && (gCwd[StrLen-1] != '/') && (gCwd[StrLen-1] != '\\')) {
-        AsciiStrCat (CwdPlusPathName, "/");
+        AsciiStrCat (CwdPlusPathName, "\\");
       }
     }
     
@@ -715,7 +715,7 @@ EfiOpen (
   File->FileName = &File->DeviceName[FileStart];
   if (File->FileName[0] == '\0') {
     // if it is just a file name use / as root
-    File->FileName = "/";
+    File->FileName = "\\";
   } 
 
   //
