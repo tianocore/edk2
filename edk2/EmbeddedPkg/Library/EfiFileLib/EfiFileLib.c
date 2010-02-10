@@ -57,6 +57,7 @@
 
 CHAR8 *gCwd = NULL;
 
+CONST EFI_GUID gZeroGuid  = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
 
 #define EFI_OPEN_FILE_GUARD_HEADER  0x4B4D4641
 #define EFI_OPEN_FILE_GUARD_FOOTER  0x444D5A56
@@ -525,10 +526,27 @@ EblFvFileDevicePath (
     return Status;
   }
 
+  // Get FVB Info about the handle
+  Status = gBS->HandleProtocol (File->EfiHandle, &gEfiFirmwareVolumeBlockProtocolGuid, (VOID **)&Fvb);
+  if (!EFI_ERROR (Status)) {
+    Status = Fvb->GetPhysicalAddress (Fvb, &File->FvStart);
+    if (!EFI_ERROR (Status)) {
+      for (Lba = 0, File->FvSize = 0; ; File->FvSize += (BlockSize * NumberOfBlocks), Lba += NumberOfBlocks) {
+        Status = Fvb->GetBlockSize (Fvb, Lba, &BlockSize, &NumberOfBlocks);
+        if (EFI_ERROR (Status)) {
+          break;
+        }
+      }
+    }
+  }
+
+
   DevicePath = DevicePathFromHandle (File->EfiHandle);
 
   if (*FileName == '\0') {
     File->DevicePath = DuplicateDevicePath (DevicePath);
+    File->Size = File->FvSize;
+    File->MaxPosition = File->Size;
   } else {
     Key = 0;
     do {
@@ -579,21 +597,7 @@ EblFvFileDevicePath (
     File->DevicePath = AppendDevicePathNode (DevicePath, (EFI_DEVICE_PATH_PROTOCOL *)&DevicePathNode);
   }
 
-  
-  // Get FVB Info about the handle
-  Status = gBS->HandleProtocol (File->EfiHandle, &gEfiFirmwareVolumeBlockProtocolGuid, (VOID **)&Fvb);
-  if (!EFI_ERROR (Status)) {
-    Status = Fvb->GetPhysicalAddress (Fvb, &File->FvStart);
-    if (!EFI_ERROR (Status)) {
-      for (Lba = 0, File->FvSize = 0; ; File->FvSize += (BlockSize * NumberOfBlocks), Lba += NumberOfBlocks) {
-        Status = Fvb->GetBlockSize (Fvb, Lba, &BlockSize, &NumberOfBlocks);
-        if (EFI_ERROR (Status)) {
-          break;
-        }
-      }
-    }
-  }
-  
+    
   // FVB not required if FV was soft loaded...
   return EFI_SUCCESS;
 }
@@ -1164,8 +1168,11 @@ EfiSeek (
   }
 
   if (File->Type == EfiOpenLoadFile || File->Type == EfiOpenFirmwareVolume) {
-    // LoadFile and FV do not support Seek
-    return EFI_UNSUPPORTED;
+    if (!CompareGuid (&File->FvNameGuid, &gZeroGuid)) {
+      // LoadFile and FV do not support Seek
+      // You can seek on a raw FV device
+      return EFI_UNSUPPORTED;
+    }
   }
 
   CurrentPosition = File->CurrentPosition;
@@ -1304,26 +1311,33 @@ EfiRead (
     break;
   
   case EfiOpenFirmwareVolume:
-    if (File->FvSectionType == EFI_SECTION_ALL) {
-      Status = File->Fv->ReadFile (
-                            File->Fv,
-                            &File->FvNameGuid,
-                            &Buffer,
-                            BufferSize,
-                            &File->FvType,
-                            &File->FvAttributes,
-                            &AuthenticationStatus
-                            );
+    if (CompareGuid (&File->FvNameGuid, &gZeroGuid)) {
+      // This is the entire FV device, so treat like a memory buffer 
+      CopyMem (Buffer, (VOID *)(UINTN)(File->FvStart + File->CurrentPosition), *BufferSize);
+      File->CurrentPosition += *BufferSize;
+      Status = EFI_SUCCESS;
     } else {
-      Status = File->Fv->ReadSection (
-                            File->Fv,
-                            &File->FvNameGuid,
-                            File->FvSectionType,
-                            0,
-                            &Buffer,
-                            BufferSize,
-                            &AuthenticationStatus
-                            );
+      if (File->FvSectionType == EFI_SECTION_ALL) {
+        Status = File->Fv->ReadFile (
+                              File->Fv,
+                              &File->FvNameGuid,
+                              &Buffer,
+                              BufferSize,
+                              &File->FvType,
+                              &File->FvAttributes,
+                              &AuthenticationStatus
+                              );
+      } else {
+        Status = File->Fv->ReadSection (
+                              File->Fv,
+                              &File->FvNameGuid,
+                              File->FvSectionType,
+                              0,
+                              &Buffer,
+                              BufferSize,
+                              &AuthenticationStatus
+                              );
+      }
     }
     break;
 

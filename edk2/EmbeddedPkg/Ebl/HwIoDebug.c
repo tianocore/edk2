@@ -24,12 +24,11 @@
 /**
   Read from IO space
 
-  Argv[0] - "ioread"
+  Argv[0] - "ioread"[.#] # is optiona width 1, 2, or 4. Default 1
   Argv[1] - Hex IO address
-  Argv[2] - IO Width [1|2|4] with a default of 1
 
-  ior 0x3f8 4  ;Do a 32-bit IO Read from 0x3f8
-  ior 0x3f8 1  ;Do a  8-bit IO Read from 0x3f8
+  ior.4 0x3f8  ;Do a 32-bit IO Read from 0x3f8
+  ior   0x3f8  ;Do a  8-bit IO Read from 0x3f8
 
   @param  Argc   Number of command arguments in Argv
   @param  Argv   Array of strings that represent the parsed command line. 
@@ -53,7 +52,7 @@ EblIoReadCmd (
   }
 
   Port = AsciiStrHexToUintn (Argv[1]);
-  Width = (Argc > 2) ? AsciiStrHexToUintn (Argv[2]) : 1;
+  Width = WidthFromCommandName (Argv[0], 1);
 
   if (Width == 1) {
     Data = IoRead8 (Port);
@@ -74,13 +73,12 @@ EblIoReadCmd (
 /**
   Write to IO space
 
-  Argv[0] - "iowrite"
+  Argv[0] - "iowrite"[.#] # is optiona width 1, 2, or 4. Default 1
   Argv[1] - Hex IO address
   Argv[2] - Hex data to write
-  Argv[3] - IO Width [1|2|4] with a default of 1
 
-  iow 0x3f8 af 4  ;Do a 32-bit IO write of af to 0x3f8
-  iow 0x3f8 af    ;Do an 8-bit IO write of af to 0x3f8
+  iow.4 0x3f8 af  ;Do a 32-bit IO write of af to 0x3f8
+  iow   0x3f8 af  ;Do an 8-bit IO write of af to 0x3f8
 
   @param  Argc   Number of command arguments in Argv
   @param  Argv   Array of strings that represent the parsed command line. 
@@ -105,7 +103,7 @@ EblIoWriteCmd (
 
   Port = AsciiStrHexToUintn (Argv[1]);
   Data = AsciiStrHexToUintn (Argv[2]);
-  Width = (Argc > 3) ? AsciiStrHexToUintn (Argv[3]) : 1;
+  Width = WidthFromCommandName (Argv[0], 1);
  
   if (Width == 1) {
     IoWrite8 (Port, (UINT8)Data);
@@ -124,13 +122,13 @@ GLOBAL_REMOVE_IF_UNREFERENCED const EBL_COMMAND_TABLE mCmdHwIoDebugTemplate[] =
 {
   {
     "ioread",
-    " Port [1|2|4]; IO read of width[1] byte(s) from Port",
+    "[.{1|2|4}] Port ; IO read of width byte(s) from Port",
     NULL,
     EblIoReadCmd
   },
   {
     "iowrite",
-    " Port Data [1|2|4]; IO write Data of width[1] byte(s) to Port",
+    "[.{1|2|4}] Port Data ; IO write Data of width byte(s) to Port",
     NULL,
     EblIoWriteCmd
   }

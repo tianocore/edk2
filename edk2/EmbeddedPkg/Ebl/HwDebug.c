@@ -24,14 +24,13 @@
 /**
   Dump memory
 
-  Argv[0] - "md"
+  Argv[0] - "md"[.#] # is optiona width 1, 2, 4, or 8. Default 1
   Argv[1] - Hex Address to dump
   Argv[2] - Number of hex bytes to dump (0x20 is default)
-  Argv[3] - [1|2|4|8] byte width of the dump
 
-  md 0x123445678 50 4 ; Dump 0x50 4 byte quantities starting at 0x123445678
-  md 0x123445678 40   ; Dump 0x40 1 byte quantities starting at 0x123445678
-  md 0x123445678      ; Dump 0x20 1 byte quantities starting at 0x123445678
+  md.4 0x123445678 50 ; Dump 0x50 4 byte quantities starting at 0x123445678
+  md   0x123445678 40 ; Dump 0x40 1 byte quantities starting at 0x123445678
+  md   0x123445678    ; Dump 0x20 1 byte quantities starting at 0x123445678
 
   @param  Argc   Number of command arguments in Argv
   @param  Argv   Array of strings that represent the parsed command line. 
@@ -48,21 +47,20 @@ EblMdCmd (
 {
   STATIC UINT8  *Address = NULL;
   STATIC UINTN  Length   = 0x20;
-  STATIC UINTN  Width    = 1;
+  STATIC UINTN  Width;
 
-  switch (Argc)
-  {
-    case 4:
-      Width = AsciiStrHexToUintn(Argv[3]);
+  Width = WidthFromCommandName (Argv[0], 1);
+
+  switch (Argc) {
     case 3:
       Length = AsciiStrHexToUintn(Argv[2]);
     case 2:
-      Address = (UINT8 *)AsciiStrHexToUintn(Argv[1]);
+      Address = (UINT8 *)AsciiStrHexToUintn (Argv[1]);
     default:
       break;
   }
 
-  OutputData(Address, Length, Width, (UINTN)Address);
+  OutputData (Address, Length, Width, (UINTN)Address);
 
   Address += Length;
   
@@ -73,14 +71,13 @@ EblMdCmd (
 /**
   Fill Memory with data
 
-  Argv[0] - "mfill"
+  Argv[0] - "mfill"[.#] # is optiona width 1, 2, 4, or 8. Default 4
   Argv[1] - Hex Address to fill
   Argv[2] - Data to write (0x00 is default)
   Argv[3] - Number of units to dump.
-  Argv[4] - [1|2|4|8] byte width of the dump
 
-  mf 0x123445678 aa 1 100 ; Start at 0x123445678 and write aa (1 byte) to the next 100 bytes
-  mf 0x123445678 aa 4 100 ; Start at 0x123445678 and write aa (4 byte) to the next 400 bytes
+  mf.1 0x123445678 aa 100 ; Start at 0x123445678 and write aa (1 byte) to the next 100 bytes
+  mf.4 0x123445678 aa 100 ; Start at 0x123445678 and write aa (4 byte) to the next 400 bytes
   mf 0x123445678 aa       ; Start at 0x123445678 and write aa (4 byte) to the next 1 byte
   mf 0x123445678          ; Start at 0x123445678 and write 00 (4 byte) to the next 1 byte
 
@@ -107,10 +104,11 @@ EblMfillCmd (
     return EFI_INVALID_PARAMETER;
   }
 
+  Width = WidthFromCommandName (Argv[0], 4);
+
   Address = AsciiStrHexToUintn (Argv[1]);
   Data    = (Argc > 2) ? (UINT32)AsciiStrHexToUintn (Argv[2]) : 0;
-  Width   = (Argc > 3) ? AsciiStrHexToUintn (Argv[3]) : 4;
-  Length  = (Argc > 4) ? AsciiStrHexToUintn (Argv[4]) : 1;
+  Length  = (Argc > 3) ? AsciiStrHexToUintn (Argv[3]) : 1;
 
   for (EndAddress = Address + (Length * Width); Address < EndAddress; Address += Width) {
     if (Width == 4) {
@@ -310,13 +308,13 @@ GLOBAL_REMOVE_IF_UNREFERENCED const EBL_COMMAND_TABLE mCmdHwDebugTemplate[] =
 {
   {
     "md",
-    " [Addr] [Len] [1|2|4]; Memory Dump from Addr Len bytes",
+    "[.{1|2|4}] [Addr] [Len] [1|2|4]; Memory Dump from Addr Len bytes",
     NULL,
     EblMdCmd
   },
   {
     "mfill",
-    " Addr Len [data] [1|2|4]; Memory Fill Addr Len*(1|2|4) bytes of data(0)",
+    "[.{1|2|4}] Addr Len [data] [1|2|4]; Memory Fill Addr Len*(1|2|4) bytes of data(0)",
     NULL,
     EblMfillCmd
   },
