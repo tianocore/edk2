@@ -478,4 +478,4 @@
 
   #FatPkg/EnhancedFatDxe/Fat.inf
   
-  EmbeddedPkg/Ebl/Ebl.inf
+  #EmbeddedPkg/Ebl/Ebl.inf

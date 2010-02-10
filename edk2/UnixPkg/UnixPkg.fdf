@@ -258,9 +258,9 @@ INF  MdeModulePkg/Application/HelloWorld/HelloWorld.inf
 FILE APPLICATION = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile) {
     SECTION COMPRESS PI_STD {
       SECTION GUIDED {
-#        SECTION PE32 = EdkShellBinPkg/FullShell/Ia32/Shell_Full.efi
+        SECTION PE32 = EdkShellBinPkg/FullShell/Ia32/Shell_Full.efi
 #        SECTION PE32 =Build/GccShellPkg/DEBUG_XCODE32/IA32/ShellFull.efi
-        SECTION PE32 = Build/Unix/DEBUG_XCODE32/IA32/Ebl.efi
+#        SECTION PE32 = Build/Unix/DEBUG_XCODE32/IA32/Ebl.efi
       }
     }
   }
