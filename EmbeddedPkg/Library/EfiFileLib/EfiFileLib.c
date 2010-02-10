@@ -659,53 +659,54 @@ EfiOpen (
     }
   }
 
-  if (FileStart == StrLen) {
-    if (gCwd == NULL) {
-      // No CWD
-      return NULL;
-    }
-    
-    // We could add a current working diretory concept 
-    CwdPlusPathName = AllocatePool (AsciiStrSize (gCwd) + AsciiStrSize (PathName));
-    if (CwdPlusPathName == NULL) {
-      return NULL;
-    }
-    
-    if ((PathName[0] == '/') || (PathName[0] == '\\')) {
-      // PathName starts in / so this means we go to the root of the device in the CWD. 
-      CwdPlusPathName[0] = '\0';
-      for (FileStart = 0; gCwd[FileStart] != '\0'; FileStart++) {
-        CwdPlusPathName[FileStart] = gCwd[FileStart];
-        if (gCwd[FileStart] == ':') {
-          FileStart++;
-          CwdPlusPathName[FileStart] = '\0';
-          break;
-        }
-      }
-    } else {
-      AsciiStrCpy (CwdPlusPathName, gCwd);
-      StrLen = AsciiStrLen (gCwd);
-      if ((*PathName != '/') && (*PathName != '\\') && (gCwd[StrLen-1] != '/') && (gCwd[StrLen-1] != '\\')) {
-        AsciiStrCat (CwdPlusPathName, "\\");
-      }
-    }
-    
-    AsciiStrCat (CwdPlusPathName, PathName);
-    if (AsciiStrStr (CwdPlusPathName, ":") == NULL) {
-      // Extra error check to make sure we don't recusre and blow stack
-      return NULL;
-    }
-        
-    File = EfiOpen (CwdPlusPathName, OpenMode, SectionType);
-    FreePool (CwdPlusPathName);
-    return File;
-  }
-
   //
   // Matching volume name has precedence over handle based names
   //
   VolumeNameMatch = EblMatchVolumeName (PathName, FileStart, &DevNumber);
   if (!VolumeNameMatch) {
+    if (FileStart == StrLen) {
+      // No Volume name or device name, so try Current Working Directory
+      if (gCwd == NULL) {
+        // No CWD
+        return NULL;
+      }
+      
+      // We could add a current working diretory concept 
+      CwdPlusPathName = AllocatePool (AsciiStrSize (gCwd) + AsciiStrSize (PathName));
+      if (CwdPlusPathName == NULL) {
+        return NULL;
+      }
+      
+      if ((PathName[0] == '/') || (PathName[0] == '\\')) {
+        // PathName starts in / so this means we go to the root of the device in the CWD. 
+        CwdPlusPathName[0] = '\0';
+        for (FileStart = 0; gCwd[FileStart] != '\0'; FileStart++) {
+          CwdPlusPathName[FileStart] = gCwd[FileStart];
+          if (gCwd[FileStart] == ':') {
+            FileStart++;
+            CwdPlusPathName[FileStart] = '\0';
+            break;
+          }
+        }
+      } else {
+        AsciiStrCpy (CwdPlusPathName, gCwd);
+        StrLen = AsciiStrLen (gCwd);
+        if ((*PathName != '/') && (*PathName != '\\') && (gCwd[StrLen-1] != '/') && (gCwd[StrLen-1] != '\\')) {
+          AsciiStrCat (CwdPlusPathName, "\\");
+        }
+      }
+      
+      AsciiStrCat (CwdPlusPathName, PathName);
+      if (AsciiStrStr (CwdPlusPathName, ":") == NULL) {
+        // Extra error check to make sure we don't recusre and blow stack
+        return NULL;
+      }
+          
+      File = EfiOpen (CwdPlusPathName, OpenMode, SectionType);
+      FreePool (CwdPlusPathName);
+      return File;
+    }
+
     DevNumber = EblConvertDevStringToNumber ((CHAR8 *)PathName); 
   }
 
