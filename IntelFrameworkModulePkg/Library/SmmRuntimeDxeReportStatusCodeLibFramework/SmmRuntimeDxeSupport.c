@@ -1,7 +1,7 @@
 /** @file
   Library constructor & destructor, event handlers, and other internal worker functions.
 
-  Copyright (c) 2006 - 2009, Intel Corporation<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -14,19 +14,71 @@
 
 #include "ReportStatusCodeLibInternal.h"
 
-EFI_EVENT               mVirtualAddressChangeEvent;
-EFI_EVENT               mExitBootServicesEvent;
-EFI_STATUS_CODE_DATA    *mStatusCodeData;
-BOOLEAN                 mInSmm;
-EFI_SMM_BASE_PROTOCOL   *mSmmBase;
-EFI_RUNTIME_SERVICES    *mInternalRT;
-BOOLEAN                 mHaveExitedBootServices = FALSE;
-EFI_REPORT_STATUS_CODE  mReportStatusCode = NULL;
+EFI_EVENT                     mVirtualAddressChangeEvent;
+EFI_EVENT                     mExitBootServicesEvent;
+EFI_STATUS_CODE_DATA          *mStatusCodeData;
+BOOLEAN                       mInSmm;
+EFI_SMM_BASE_PROTOCOL         *mSmmBase;
+EFI_RUNTIME_SERVICES          *mInternalRT;
+BOOLEAN                       mHaveExitedBootServices = FALSE;
+EFI_REPORT_STATUS_CODE        mReportStatusCode = NULL;
+EFI_SMM_STATUS_CODE_PROTOCOL  *mSmmStatusCodeProtocol;
+
+/**
+  Locates and caches SMM Status Code Protocol.
+ 
+**/
+VOID
+SmmStatusCodeInitialize (
+  VOID
+  )
+{
+  EFI_STATUS Status;
+
+  Status = gBS->LocateProtocol (&gEfiSmmStatusCodeProtocolGuid, NULL, (VOID **) &mSmmStatusCodeProtocol);
+  if (EFI_ERROR (Status)) {
+    mSmmStatusCodeProtocol = NULL;
+  }
+}
+
+/**
+  Report status code via SMM Status Code Protocol.
+ 
+  @param  Type          Indicates the type of status code being reported.
+  @param  Value         Describes the current status of a hardware or software entity.  
+                        This included information about the class and subclass that is used to classify the entity 
+                        as well as an operation.  For progress codes, the operation is the current activity. 
+                        For error codes, it is the exception.  For debug codes, it is not defined at this time. 
+  @param  Instance      The enumeration of a hardware or software entity within the system.  
+                        A system may contain multiple entities that match a class/subclass pairing. 
+                        The instance differentiates between them.  An instance of 0 indicates that instance information is unavailable, 
+                        not meaningful, or not relevant.  Valid instance numbers start with 1.
+  @param  CallerId      This optional parameter may be used to identify the caller. 
+                        This parameter allows the status code driver to apply different rules to different callers. 
+  @param  Data          This optional parameter may be used to pass additional data
+ 
+  @retval EFI_SUCCESS   Always return EFI_SUCCESS.
+
+**/
+EFI_STATUS
+SmmStatusCodeReport (
+  IN EFI_STATUS_CODE_TYPE     Type,
+  IN EFI_STATUS_CODE_VALUE    Value,
+  IN UINT32                   Instance,
+  IN EFI_GUID                 *CallerId OPTIONAL,
+  IN EFI_STATUS_CODE_DATA     *Data     OPTIONAL
+  )
+{
+  if (mSmmStatusCodeProtocol != NULL) {
+    (mSmmStatusCodeProtocol->ReportStatusCode) (mSmmStatusCodeProtocol, Type, Value, Instance, CallerId, Data);
+  }
+  return EFI_SUCCESS;
+}
 
 /**
   Locate the report status code service.
 
-  In SMM, it retrieves OemHookStatusCodeReport() from customized OEM Hook Status Code Lib.
+  In SMM, it tries to retrieve SMM Status Code Protocol.
   Otherwise, it first tries to retrieve ReportStatusCode() in Runtime Services Table.
   If not found, it then tries to retrieve ReportStatusCode() API of Report Status Code Protocol.
 
@@ -43,7 +95,7 @@ InternalGetReportStatusCode (
   EFI_STATUS                Status;
 
   if (mInSmm) {
-    return (EFI_REPORT_STATUS_CODE) OemHookStatusCodeReport;
+    return (EFI_REPORT_STATUS_CODE) SmmStatusCodeReport;
   } else if (mInternalRT != NULL && mInternalRT->Hdr.Revision < 0x20000) {
     return ((FRAMEWORK_EFI_RUNTIME_SERVICES*)mInternalRT)->ReportStatusCode;
   } else if (!mHaveExitedBootServices) {
@@ -187,7 +239,7 @@ ReportStatusCodeLibConstruct (
                            (VOID **) &mStatusCodeData
                            );
       ASSERT_EFI_ERROR (Status);
-      OemHookStatusCodeInitialize ();
+      SmmStatusCodeInitialize ();
       return EFI_SUCCESS;
     }
   }

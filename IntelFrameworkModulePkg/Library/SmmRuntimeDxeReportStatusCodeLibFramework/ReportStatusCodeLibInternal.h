@@ -2,7 +2,7 @@
   Internal Header file of Report Status Code Library for RUNTIME
   DXE Phase.
 
-  Copyright (c) 2006 - 2009, Intel Corporation<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -25,34 +25,18 @@
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DevicePathLib.h>
-#include <Library/OemHookStatusCodeLib.h>
 #include <Library/MemoryAllocationLib.h>
 
 #include <Guid/StatusCodeDataTypeId.h>
 #include <Guid/StatusCodeDataTypeDebug.h>
 #include <Guid/EventGroup.h>
 
+#include <Protocol/SmmStatusCode.h>
 #include <Protocol/StatusCode.h>
 #include <Protocol/SmmBase.h>
 
 
 extern EFI_STATUS_CODE_DATA    *mStatusCodeData;
-
-/**
-  Locate the report status code service.
-
-  In SMM, it retrieves OemHookStatusCodeReport() from customized OEM Hook Status Code Lib.
-  Otherwise, it first tries to retrieve ReportStatusCode() in Runtime Services Table.
-  If not found, it then tries to retrieve ReportStatusCode() API of Report Status Code Protocol.
-
-  @return   Function pointer to the report status code service.
-            NULL is returned if no status code service is available.
-
-**/
-EFI_REPORT_STATUS_CODE
-InternalGetReportStatusCode (
-  VOID
-  );
 
 /**
   Internal worker function that reports a status code through the status code service.
