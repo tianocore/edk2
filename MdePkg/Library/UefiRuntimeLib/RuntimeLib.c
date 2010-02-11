@@ -6,7 +6,7 @@
   OS virtual address space. All pointer values are different for a virtual 
   mapping than from the normal physical mapping at boot services time.
 
-Copyright (c) 2006 - 2009 Intel Corporation. <BR>
+Copyright (c) 2006 - 2010 Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -47,11 +47,6 @@ RuntimeLibExitBootServicesEvent (
   IN VOID             *Context
   )
 {
-  //
-  // Clear out BootService globals
-  //
-  gBS             = NULL;
-
   mEfiAtRuntime = TRUE;
 }
 
