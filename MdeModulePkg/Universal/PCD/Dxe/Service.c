@@ -122,6 +122,7 @@ GetWorker (
       RetPtr = (VOID *) (UINTN) (PcdGet32 (PcdVpdBaseAddress) + VpdHead->Offset);
       break;
       
+    case PCD_TYPE_HII|PCD_TYPE_STRING:
     case PCD_TYPE_HII:
       if (IsPeiDb) {
         GuidTable = (EFI_GUID *) (&mPcdDatabase->PeiDb.Init.GuidTable[0]);
@@ -130,34 +131,56 @@ GetWorker (
       }
                               
       VariableHead = (VARIABLE_HEAD *) (PcdDb + Offset);
-      
       Guid = GuidTable + VariableHead->GuidTableIndex;
       Name = (UINT16*)(StringTable + VariableHead->StringIndex);
-      VaraiableDefaultBuffer = (UINT8 *) PcdDb + VariableHead->DefaultValueOffset;
-
-      Status = GetHiiVariable (Guid, Name, &Data, &DataSize);
-      if (Status == EFI_SUCCESS) {
-        if (GetSize == 0) {
-          //
-          // It is a pointer type. So get the MaxSize reserved for
-          // this PCD entry.
-          //
-          GetPtrTypeSize (TmpTokenNumber, &GetSize);
+      
+      if ((LocalTokenNumber & PCD_TYPE_ALL_SET) == (PCD_TYPE_HII|PCD_TYPE_STRING)) {
+	    //
+		// If a HII type PCD's datum type is VOID*, the DefaultValueOffset is the index of 
+		// string array in string table.
+		//
+        StringTableIdx = *(UINT16*)((UINT8 *) PcdDb + VariableHead->DefaultValueOffset);   
+        VaraiableDefaultBuffer = (VOID *) (StringTable + StringTableIdx);     
+        Status = GetHiiVariable (Guid, Name, &Data, &DataSize);
+        if (Status == EFI_SUCCESS) {
+          if (GetSize == 0) {
+            //
+            // It is a pointer type. So get the MaxSize reserved for
+            // this PCD entry.
+            //
+            GetPtrTypeSize (TmpTokenNumber, &GetSize);
+          }
+          CopyMem (VaraiableDefaultBuffer, Data + VariableHead->Offset, GetSize);
+          FreePool (Data);
         }
-        CopyMem (VaraiableDefaultBuffer, Data + VariableHead->Offset, GetSize);
-        FreePool (Data);
+        RetPtr = (VOID *) VaraiableDefaultBuffer;                
+      } else {
+        VaraiableDefaultBuffer = (UINT8 *) PcdDb + VariableHead->DefaultValueOffset;
+  
+        Status = GetHiiVariable (Guid, Name, &Data, &DataSize);
+        if (Status == EFI_SUCCESS) {
+          if (GetSize == 0) {
+            //
+            // It is a pointer type. So get the MaxSize reserved for
+            // this PCD entry.
+            //
+            GetPtrTypeSize (TmpTokenNumber, &GetSize);
+          }
+          CopyMem (VaraiableDefaultBuffer, Data + VariableHead->Offset, GetSize);
+          FreePool (Data);
+        }
+        //
+        // If the operation is successful, we copy the data
+        // to the default value buffer in the PCD Database.
+        // So that we can free the Data allocated in GetHiiVariable.
+        //
+        //
+        // If the operation is not successful, 
+        // Return 1) either the default value specified by Platform Integrator 
+        //        2) Or the value Set by a PCD set operation.
+        //
+        RetPtr = (VOID *) VaraiableDefaultBuffer;
       }
-      //
-      // If the operation is successful, we copy the data
-      // to the default value buffer in the PCD Database.
-      // So that we can free the Data allocated in GetHiiVariable.
-      //
-      //
-      // If the operation is not successful, 
-      // Return 1) either the default value specified by Platform Integrator 
-      //        2) Or the value Set by a PCD set operation.
-      //
-      RetPtr = (VOID *) VaraiableDefaultBuffer;
       break;
 
     case PCD_TYPE_STRING:
@@ -788,6 +811,7 @@ SetWorker (
       }
       break;
 
+    case PCD_TYPE_HII|PCD_TYPE_STRING:
     case PCD_TYPE_HII:
       if (PtrType) {
         if (!SetPtrTypeSize (TmpTokenNumber, Size)) {
@@ -807,13 +831,20 @@ SetWorker (
       Guid = GuidTable + VariableHead->GuidTableIndex;
       Name = (UINT16*) (StringTable + VariableHead->StringIndex);
       VariableOffset = VariableHead->Offset;
-
       Status = SetHiiVariable (Guid, Name, Data, *Size, VariableOffset);
-
+      
       if (EFI_NOT_FOUND == Status) {
-        CopyMem (PcdDb + VariableHead->DefaultValueOffset, Data, *Size);
+        if ((LocalTokenNumber & PCD_TYPE_ALL_SET) == (PCD_TYPE_HII|PCD_TYPE_STRING))  {
+          CopyMem (
+            StringTable + *(UINT16 *)(PcdDb + VariableHead->DefaultValueOffset),
+            Data,
+            *Size
+            );
+        } else {
+          CopyMem (PcdDb + VariableHead->DefaultValueOffset, Data, *Size);
+        } 
         Status = EFI_SUCCESS;
-      } 
+      }
       break;
       
     case PCD_TYPE_DATA:
