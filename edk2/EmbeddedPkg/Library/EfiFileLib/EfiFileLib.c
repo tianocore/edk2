@@ -560,14 +560,13 @@ EblFvFileDevicePath (
                                       &File->Size
                                       );
       if (!EFI_ERROR (GetNextFileStatus)) {
-        Section = NULL;
-
         // Compare GUID first
         Status = CompareGuidToString (&File->FvNameGuid, FileName);
         if (!EFI_ERROR(Status)) {
           break;
         }
             
+        Section = NULL;
         Status = File->Fv->ReadSection (
                             File->Fv,
                             &File->FvNameGuid,
@@ -590,6 +589,24 @@ EblFvFileDevicePath (
 
     if (EFI_ERROR (GetNextFileStatus)) {
       return GetNextFileStatus;
+    }
+
+    if (OpenMode != EFI_SECTION_ALL) {
+      // Calculate the size of the section we are targeting
+      Section = NULL;
+      File->Size = 0;
+      Status = File->Fv->ReadSection (
+                          File->Fv,
+                          &File->FvNameGuid,
+                          OpenMode,
+                          0,
+                          &Section,
+                          &File->Size,
+                          &AuthenticationStatus
+                          );
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
     }
 
     File->MaxPosition = File->Size;
@@ -643,12 +660,13 @@ EfiOpen (
   UINTN                     Size;
   EFI_IP_ADDRESS            Ip;
   CHAR8                     *CwdPlusPathName;
+  UINTN                     Index;
+  EFI_SECTION_TYPE          ModifiedSectionType;
 
   EblUpdateDeviceLists ();
  
   File = &FileData;
   ZeroMem (File, sizeof (EFI_OPEN_FILE));
-  File->FvSectionType = SectionType;
 
   StrLen = AsciiStrSize (PathName);
   if (StrLen <= 1) {
@@ -749,7 +767,19 @@ EfiOpen (
         // Skip leading / as its not really needed for the FV since no directories are supported
         FileStart++;
       }
-      Status = EblFvFileDevicePath (File, &PathName[FileStart], OpenMode);
+      
+      // Check for 2nd :
+      ModifiedSectionType = SectionType;
+      for (Index = FileStart; PathName[Index] != '\0'; Index++) {
+        if (PathName[Index] == ':') {
+          // Support fv0:\DxeCore:0x10
+          // This means open the PE32 Section of the file 
+          ModifiedSectionType = AsciiStrHexToUintn (&PathName[Index + 1]);
+          PathName[Index] = '\0';
+        }
+      }
+      File->FvSectionType = ModifiedSectionType;
+      Status = EblFvFileDevicePath (File, &PathName[FileStart], ModifiedSectionType);
     }
   } else if ((*PathName == 'A') || (*PathName == 'a')) {
     // Handle a:0x10000000:0x1234 address form a:ADDRESS:SIZE
@@ -884,14 +914,14 @@ EfiCopyFile (
   UINTN         Offset;
   UINTN         Chunk = FILE_COPY_CHUNK;
   
-  Source = EfiOpen(SourceFile, EFI_FILE_MODE_READ, 0);
+  Source = EfiOpen (SourceFile, EFI_FILE_MODE_READ, 0);
   if (Source == NULL) {
     AsciiPrint("Source file open error.\n");
     Status = EFI_NOT_FOUND;
     goto Exit;
   }
   
-  Destination = EfiOpen(DestinationFile, EFI_FILE_MODE_WRITE | EFI_FILE_MODE_CREATE, 0);
+  Destination = EfiOpen (DestinationFile, EFI_FILE_MODE_WRITE | EFI_FILE_MODE_CREATE, 0);
   if (Destination == NULL) {
     AsciiPrint("Destination file open error.\n");
     Status = EFI_NOT_FOUND;
@@ -1050,7 +1080,8 @@ EfiClose (
   }
 
   if ((File->Type == EfiOpenLoadFile) || 
-      ((File->Type == EfiOpenTftp) && (File->IsBufferValid == TRUE))) {
+      ((File->Type == EfiOpenTftp) && (File->IsBufferValid == TRUE)) ||
+      ((File->Type == EfiOpenFirmwareVolume) && (File->IsBufferValid == TRUE))) {
     EblFreePool(File->Buffer);
   }
 
@@ -1167,14 +1198,9 @@ EfiSeek (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (File->Type == EfiOpenLoadFile || File->Type == EfiOpenFirmwareVolume) {
-    if (!CompareGuid (&File->FvNameGuid, &gZeroGuid)) {
-      if ((SeekType != EfiSeekStart) && (Offset != 0)) {
-        // LoadFile and FV do not support Seek
-        // You can seek on a raw FV device
-        return EFI_UNSUPPORTED;
-      }
-    }
+  if (File->Type == EfiOpenLoadFile) {
+    // LoadFile does not support Seek
+    return EFI_UNSUPPORTED;
   }
 
   CurrentPosition = File->CurrentPosition;
@@ -1299,12 +1325,6 @@ EfiRead (
   }
 
   switch (File->Type) {
-  case EfiOpenMemoryBuffer:
-    CopyMem (Buffer, File->Buffer + File->CurrentPosition, *BufferSize);
-    File->CurrentPosition += *BufferSize;
-    Status = EFI_SUCCESS;
-    break;
-
   case EfiOpenLoadFile:
     // Figure out the File->Size
     EfiTell (File, NULL);
@@ -1319,28 +1339,44 @@ EfiRead (
       File->CurrentPosition += *BufferSize;
       Status = EFI_SUCCESS;
     } else {
-      if (File->FvSectionType == EFI_SECTION_ALL) {
-        Status = File->Fv->ReadFile (
-                              File->Fv,
-                              &File->FvNameGuid,
-                              &Buffer,
-                              BufferSize,
-                              &File->FvType,
-                              &File->FvAttributes,
-                              &AuthenticationStatus
-                              );
-      } else {
-        Status = File->Fv->ReadSection (
-                              File->Fv,
-                              &File->FvNameGuid,
-                              File->FvSectionType,
-                              0,
-                              &Buffer,
-                              BufferSize,
-                              &AuthenticationStatus
-                              );
+      if (File->Buffer == NULL) {
+        if (File->FvSectionType == EFI_SECTION_ALL) {
+          Status = File->Fv->ReadFile (
+                                File->Fv,
+                                &File->FvNameGuid,
+                                (VOID **)&File->Buffer,
+                                &File->Size,
+                                &File->FvType,
+                                &File->FvAttributes,
+                                &AuthenticationStatus
+                                );
+        } else {
+          Status = File->Fv->ReadSection (
+                                File->Fv,
+                                &File->FvNameGuid,
+                                File->FvSectionType,
+                                0,
+                                (VOID **)&File->Buffer,
+                                &File->Size,
+                                &AuthenticationStatus
+                                );
+        }
+        if (EFI_ERROR (Status)) {
+          return Status;
+        }
+        File->IsBufferValid = TRUE;
       }
+      // Operate on the cached buffer so Seek will work
+      CopyMem (Buffer, File->Buffer + File->CurrentPosition, *BufferSize);
+      File->CurrentPosition += *BufferSize;
+      Status = EFI_SUCCESS;
     }
+    break;
+    
+  case EfiOpenMemoryBuffer:
+    CopyMem (Buffer, File->Buffer + File->CurrentPosition, *BufferSize);
+    File->CurrentPosition += *BufferSize;
+    Status = EFI_SUCCESS;
     break;
 
   case EfiOpenFileSystem:
