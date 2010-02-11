@@ -305,7 +305,7 @@ InvokeCallbackOnSet (
   for (Idx = 0; Idx < PcdGet32 (PcdMaxPeiPcdCallBackNumberPerPcdEntry); Idx++) {
     if (CallbackTable[Idx] != NULL) {
       CallbackTable[Idx] (Guid,
-                          (Guid == NULL)? TokenNumber: ExTokenNumber,
+                          (Guid == NULL) ? (TokenNumber + 1) : ExTokenNumber,
                           Data,
                           Size
                           );
