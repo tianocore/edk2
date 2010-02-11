@@ -72,7 +72,12 @@
 
 [Guids]  
   gEfiGlobalVariableGuid  ## SOMETIMES_CONSUMES ## Variable:"PlatformLang"
-  
+  ##
+  # Event registered to EFI_HII_SET_KEYBOARD_LAYOUT_EVENT_GUID group,
+  # which will be triggered by EFI_HII_DATABASE_PROTOCOL.SetKeyboardLayout().
+  ##
+  gEfiHiiKeyBoardLayoutGuid  ## SOMETIME_CONSUMES  ## Event
+
 [Depex]
   TRUE
 
