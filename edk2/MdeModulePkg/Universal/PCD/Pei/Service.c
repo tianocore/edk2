@@ -412,6 +412,7 @@ SetWorker (
   switch (LocalTokenNumber & PCD_TYPE_ALL_SET) {
     case PCD_TYPE_VPD:
     case PCD_TYPE_HII:
+    case PCD_TYPE_HII|PCD_TYPE_STRING:
     {
       ASSERT (FALSE);
       return EFI_INVALID_PARAMETER;
@@ -624,6 +625,7 @@ GetWorker (
       return (VOID *) (UINTN) (PcdGet32 (PcdVpdBaseAddress) + VpdHead->Offset);
     }
       
+    case PCD_TYPE_HII|PCD_TYPE_STRING:
     case PCD_TYPE_HII:
     {
       VariableHead = (VARIABLE_HEAD *) ((UINT8 *)PeiPcdDb + Offset);
@@ -639,7 +641,11 @@ GetWorker (
         //
         // Return the default value specified by Platform Integrator 
         //
-        return (VOID *) ((UINT8 *) PeiPcdDb + VariableHead->DefaultValueOffset);
+        if ((LocalTokenNumber & PCD_TYPE_ALL_SET) == (PCD_TYPE_HII|PCD_TYPE_STRING)) {
+          return (VOID*)&StringTable[*(UINT16*)((UINT8*)PeiPcdDb + VariableHead->DefaultValueOffset)];
+        } else {
+          return (VOID *) ((UINT8 *) PeiPcdDb + VariableHead->DefaultValueOffset);
+        }
       }
     }
 
