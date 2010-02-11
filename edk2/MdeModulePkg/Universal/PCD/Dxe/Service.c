@@ -14,9 +14,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Service.h"
 
-PCD_DATABASE * mPcdDatabase;
+PCD_DATABASE  *mPcdDatabase;
 
-LIST_ENTRY *mCallbackFnTable;
+LIST_ENTRY    *mCallbackFnTable;
 
 /**
   Get the PCD entry pointer in PCD database.
@@ -213,11 +213,9 @@ DxeRegisterCallBackWorker (
   //
   // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
   // We have to decrement TokenNumber by 1 to make it usable
-  // as the array index.
+  // as the array index of mCallbackFnTable[].
   //
-  TokenNumber--;
-
-  ListHead = &mCallbackFnTable[TokenNumber];
+  ListHead = &mCallbackFnTable[TokenNumber - 1];
   ListNode = GetFirstNode (ListHead);
 
   while (ListNode != ListHead) {
@@ -274,11 +272,9 @@ DxeUnRegisterCallBackWorker (
   //
   // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
   // We have to decrement TokenNumber by 1 to make it usable
-  // as the array index.
+  // as the array index of mCallbackFnTable[].
   //
-  TokenNumber--;
-
-  ListHead = &mCallbackFnTable[TokenNumber];
+  ListHead = &mCallbackFnTable[TokenNumber - 1];
   ListNode = GetFirstNode (ListHead);
 
   while (ListNode != ListHead) {
@@ -624,15 +620,13 @@ InvokeCallbackOnSet (
   //
   // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
   // We have to decrement TokenNumber by 1 to make it usable
-  // as the array index.
+  // as the array index of mCallbackFnTable[].
   //
-  TokenNumber--;
-  
-  ListHead = &mCallbackFnTable[TokenNumber];
+  ListHead = &mCallbackFnTable[TokenNumber - 1];
   ListNode = GetFirstNode (ListHead);
 
   while (ListNode != ListHead) {
-    FnTableEntry = CR_FNENTRY_FROM_LISTNODE(ListNode, CALLBACK_FN_ENTRY, Node);
+    FnTableEntry = CR_FNENTRY_FROM_LISTNODE (ListNode, CALLBACK_FN_ENTRY, Node);
 
     FnTableEntry->CallbackFn(Guid, 
                     (Guid == NULL) ? TokenNumber : ExTokenNumber,
@@ -708,11 +702,6 @@ SetWorker (
   UINTN               TmpTokenNumber;
 
   //
-  // Aquire lock to prevent reentrance from TPL_CALLBACK level
-  //
-  EfiAcquireLock (&mPcdDatabaseLock);
-
-  //
   // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
   // We have to decrement TokenNumber by 1 to make it usable
   // as the array index.
@@ -731,16 +720,6 @@ SetWorker (
   if ((!PtrType) && (*Size != DxePcdGetSize (TokenNumber + 1))) {
     return EFI_INVALID_PARAMETER;
   }
-  
-  //
-  // EBC compiler is very choosy. It may report warning about comparison
-  // between UINTN and 0 . So we add 1 in each size of the 
-  // comparison.
-  //
-  IsPeiDb = (BOOLEAN) ((TokenNumber + 1 < PEI_LOCAL_TOKEN_NUMBER + 1) ? TRUE : FALSE);
-
-  LocalTokenNumberTable  = IsPeiDb ? mPcdDatabase->PeiDb.Init.LocalTokenNumberTable : 
-                                     mPcdDatabase->DxeDb.Init.LocalTokenNumberTable;
 
   //
   // EBC compiler is very choosy. It may report warning about comparison
@@ -751,6 +730,21 @@ SetWorker (
       (TokenNumber + 1 >= PEI_LOCAL_TOKEN_NUMBER + 1 || TokenNumber + 1 < (PEI_LOCAL_TOKEN_NUMBER + DXE_NEX_TOKEN_NUMBER + 1))) {
     InvokeCallbackOnSet (0, NULL, TokenNumber + 1, Data, *Size);
   }
+
+  //
+  // Aquire lock to prevent reentrance from TPL_CALLBACK level
+  //
+  EfiAcquireLock (&mPcdDatabaseLock);
+
+  //
+  // EBC compiler is very choosy. It may report warning about comparison
+  // between UINTN and 0 . So we add 1 in each size of the 
+  // comparison.
+  //
+  IsPeiDb = (BOOLEAN) ((TokenNumber + 1 < PEI_LOCAL_TOKEN_NUMBER + 1) ? TRUE : FALSE);
+
+  LocalTokenNumberTable  = IsPeiDb ? mPcdDatabase->PeiDb.Init.LocalTokenNumberTable : 
+                                     mPcdDatabase->DxeDb.Init.LocalTokenNumberTable;
 
   TokenNumber = IsPeiDb ? TokenNumber
                         : TokenNumber - PEI_LOCAL_TOKEN_NUMBER;
