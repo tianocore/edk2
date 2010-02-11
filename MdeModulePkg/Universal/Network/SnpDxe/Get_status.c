@@ -1,8 +1,8 @@
 /** @file
- 		Implementation of reading the current interrupt status and recycled transmit
- 	  buffer status from a network interface.
+  Implementation of reading the current interrupt status and recycled transmit
+  buffer status from a network interface.
 
-Copyright (c) 2004 - 2007, Intel Corporation. <BR> 
+Copyright (c) 2004 - 2010, Intel Corporation. <BR> 
 All rights reserved. This program and the accompanying materials are licensed 
 and made available under the terms and conditions of the BSD License which 
 accompanies this distribution. The full text of the license may be found at 
@@ -115,8 +115,8 @@ PxeGetStatus (
   if (TransmitBufferListPtr != NULL) {
     *TransmitBufferListPtr =
       (
-        (Snp->Cdb.StatFlags & PXE_STATFLAGS_GET_STATUS_NO_TXBUFS_WRITTEN) ||
-        (Snp->Cdb.StatFlags & PXE_STATFLAGS_GET_STATUS_TXBUF_QUEUE_EMPTY)
+        ((Snp->Cdb.StatFlags & PXE_STATFLAGS_GET_STATUS_NO_TXBUFS_WRITTEN) != 0) ||
+        ((Snp->Cdb.StatFlags & PXE_STATFLAGS_GET_STATUS_TXBUF_QUEUE_EMPTY) != 0)
       ) ? 0 : (VOID *) (UINTN) Db->TxBuffer[0];
 
   }

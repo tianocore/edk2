@@ -75,7 +75,7 @@ DiscoverPeimsAndOrderWithApriori (
   //
   // Go ahead to scan this Fv, and cache FileHandles within it.
   //
-  for (PeimCount = 0; PeimCount < PcdGet32 (PcdPeiCoreMaxPeimPerFv); PeimCount++) {
+  for (PeimCount = 0; PeimCount < FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv); PeimCount++) {
     Status = FvPpi->FindFileByType (FvPpi, PEI_CORE_INTERNAL_FFS_FILE_DISPATCH_TYPE, CoreFileHandle->FvHandle, &FileHandle);
     if (Status != EFI_SUCCESS) {
       break;
@@ -88,7 +88,7 @@ DiscoverPeimsAndOrderWithApriori (
   // Check whether the count of Peims exceeds the max support PEIMs in a FV image
   // If more Peims are required in a FV image, PcdPeiCoreMaxPeimPerFv can be set to a larger value in DSC file.
   //
-  ASSERT (PeimCount < PcdGet32 (PcdPeiCoreMaxPeimPerFv));
+  ASSERT (PeimCount < FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv));
 
   //
   // Get Apriori File handle
@@ -598,7 +598,7 @@ PeiDispatcher (
   PEI_CORE_FV_HANDLE                  *CoreFvHandle;
   VOID                                *LoadFixPeiCodeBegin;
 
-  PeiServices = (CONST EFI_PEI_SERVICES **) &Private->PS;
+  PeiServices = (CONST EFI_PEI_SERVICES **) &Private->Ps;
   PeimEntryPoint = NULL;
   PeimFileHandle = NULL;
   EntryPoint     = 0;
@@ -613,11 +613,11 @@ PeiDispatcher (
     SaveCurrentFileHandle =  Private->CurrentFileHandle;
 
     for (Index1 = 0; Index1 <= SaveCurrentFvCount; Index1++) {
-      for (Index2 = 0; (Index2 < PcdGet32 (PcdPeiCoreMaxPeimPerFv)) && (Private->Fv[Index1].FvFileHandles[Index2] != NULL); Index2++) {
+      for (Index2 = 0; (Index2 < FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv)) && (Private->Fv[Index1].FvFileHandles[Index2] != NULL); Index2++) {
         if (Private->Fv[Index1].PeimState[Index2] == PEIM_STATE_REGISITER_FOR_SHADOW) {
           PeimFileHandle = Private->Fv[Index1].FvFileHandles[Index2];
           Status = PeiLoadImage (
-                    (CONST EFI_PEI_SERVICES **) &Private->PS,
+                    (CONST EFI_PEI_SERVICES **) &Private->Ps,
                     PeimFileHandle,
                     PEIM_STATE_REGISITER_FOR_SHADOW,
                     &EntryPoint,
@@ -637,7 +637,7 @@ PeiDispatcher (
             PeimEntryPoint = (EFI_PEIM_ENTRY_POINT2)(UINTN)EntryPoint;
 
             PERF_START (PeimFileHandle, "PEIM", NULL, 0);
-            PeimEntryPoint(PeimFileHandle, (const EFI_PEI_SERVICES **) &Private->PS);
+            PeimEntryPoint(PeimFileHandle, (const EFI_PEI_SERVICES **) &Private->Ps);
             PERF_END (PeimFileHandle, "PEIM", NULL, 0);
           }
 
@@ -699,7 +699,7 @@ PeiDispatcher (
       // Start to dispatch all modules within the current Fv.
       //
       for (PeimCount = Private->CurrentPeimCount;
-           (PeimCount < PcdGet32 (PcdPeiCoreMaxPeimPerFv)) && (Private->CurrentFvFileHandles[PeimCount] != NULL);
+           (PeimCount < FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv)) && (Private->CurrentFvFileHandles[PeimCount] != NULL);
            PeimCount++) {
         Private->CurrentPeimCount  = PeimCount;
         PeimFileHandle = Private->CurrentFileHandle = Private->CurrentFvFileHandles[PeimCount];
@@ -891,12 +891,12 @@ PeiDispatcher (
               //
               // Fixup the PeiCore's private data
               //
-              PrivateInMem->PS          = &PrivateInMem->ServiceTableShadow;
+              PrivateInMem->Ps          = &PrivateInMem->ServiceTableShadow;
               PrivateInMem->CpuIo       = &PrivateInMem->ServiceTableShadow.CpuIo;
               PrivateInMem->HobList.Raw = (VOID*) ((UINTN) PrivateInMem->HobList.Raw + HeapOffset);
               PrivateInMem->StackBase   = (EFI_PHYSICAL_ADDRESS)(((UINTN)PrivateInMem->PhysicalMemoryBegin + EFI_PAGE_MASK) & ~EFI_PAGE_MASK);
 
-              PeiServices = (CONST EFI_PEI_SERVICES **) &PrivateInMem->PS;
+              PeiServices = (CONST EFI_PEI_SERVICES **) &PrivateInMem->Ps;
 
               //
               // Fixup for PeiService's address
@@ -1120,7 +1120,7 @@ DepexSatisfied (
   //
   // Evaluate a given DEPEX
   //
-  return PeimDispatchReadiness (&Private->PS, DepexData);
+  return PeimDispatchReadiness (&Private->Ps, DepexData);
 }
 
 /**

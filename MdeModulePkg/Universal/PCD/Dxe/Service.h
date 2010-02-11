@@ -699,7 +699,7 @@ DxeUnRegisterCallBackOnSet (
   @param[in]      Guid    The 128-bit unique value that designates the namespace from which to retrieve the next token. 
                           This is an optional parameter that may be NULL.  If this parameter is NULL, then a request is 
                           being made to retrieve tokens from the default token space.
-  @param[in,out]  TokenNumber 
+  @param[in, out] TokenNumber 
                           A pointer to the PCD token number to use to find the subsequent token number.  
 
   @retval EFI_SUCCESS   The PCD service retrieved the next valid token number. Or the input token number 

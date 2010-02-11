@@ -4,18 +4,18 @@
   enter Long Mode (x64 64-bit mode).
 
   While we make a 1:1 mapping (identity mapping) for all physical pages 
-  we still need to use the MTRR's to ensure that the cachability attirbutes
+  we still need to use the MTRR's to ensure that the cachability attributes
   for all memory regions is correct.
 
   The basic idea is to use 2MB page table entries where ever possible. If
   more granularity of cachability is required then 4K page tables are used.
 
   References:
-    1) IA-32 Intel(R) Atchitecture Software Developer's Manual Volume 1:Basic Architecture, Intel
-    2) IA-32 Intel(R) Atchitecture Software Developer's Manual Volume 2:Instruction Set Reference, Intel
-    3) IA-32 Intel(R) Atchitecture Software Developer's Manual Volume 3:System Programmer's Guide, Intel
+    1) IA-32 Intel(R) Architecture Software Developer's Manual Volume 1:Basic Architecture, Intel
+    2) IA-32 Intel(R) Architecture Software Developer's Manual Volume 2:Instruction Set Reference, Intel
+    3) IA-32 Intel(R) Architecture Software Developer's Manual Volume 3:System Programmer's Guide, Intel
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -51,8 +51,8 @@ CreateIdentityMappingPageTables (
   UINTN                                         IndexOfPml4Entries;
   UINTN                                         IndexOfPdpEntries;
   UINTN                                         IndexOfPageDirectoryEntries;
-  UINTN                                         NumberOfPml4EntriesNeeded;
-  UINTN                                         NumberOfPdpEntriesNeeded;
+  UINT32                                        NumberOfPml4EntriesNeeded;
+  UINT32                                        NumberOfPdpEntriesNeeded;
   PAGE_MAP_AND_DIRECTORY_POINTER                *PageMapLevel4Entry;
   PAGE_MAP_AND_DIRECTORY_POINTER                *PageMap;
   PAGE_MAP_AND_DIRECTORY_POINTER                *PageDirectoryPointerEntry;
@@ -72,13 +72,21 @@ CreateIdentityMappingPageTables (
   }
 
   //
+  // IA-32e paging translates 48-bit linear addresses to 52-bit physical addresses.
+  //
+  ASSERT (PhysicalAddressBits <= 52);
+  if (PhysicalAddressBits > 48) {
+    PhysicalAddressBits = 48;
+  }
+
+  //
   // Calculate the table entries needed.
   //
   if (PhysicalAddressBits <= 39 ) {
     NumberOfPml4EntriesNeeded = 1;
-    NumberOfPdpEntriesNeeded =  LShiftU64 (1, (PhysicalAddressBits - 30));
+    NumberOfPdpEntriesNeeded =  1 << (PhysicalAddressBits - 30);
   } else {
-    NumberOfPml4EntriesNeeded = LShiftU64 (1, (PhysicalAddressBits - 39));
+    NumberOfPml4EntriesNeeded = 1 << (PhysicalAddressBits - 39);
     NumberOfPdpEntriesNeeded = 512;
   }
 

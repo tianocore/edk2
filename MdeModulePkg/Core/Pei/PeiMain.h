@@ -140,7 +140,7 @@ typedef struct{
   ///
   /// Point to ServiceTableShadow
   ///
-  EFI_PEI_SERVICES                   *PS;
+  EFI_PEI_SERVICES                   *Ps;
   PEI_PPI_DATABASE                   PpiData;
   
   ///
@@ -180,7 +180,7 @@ typedef struct{
   //
   // For Loading modules at fixed address feature to cache the top address below which the 
   // Runtime code, boot time code and PEI memory will be placed. Please note that the offset between this field 
-  // and  PS should not be changed since maybe user could get this top address by using the offet to PS. 
+  // and  Ps should not be changed since maybe user could get this top address by using the offet to Ps. 
   //
   EFI_PHYSICAL_ADDRESS               LoadModuleAtFixAddressTopAddress;
   //
@@ -195,7 +195,7 @@ typedef struct{
 /// Pei Core Instance Data Macros
 ///
 #define PEI_CORE_INSTANCE_FROM_PS_THIS(a) \
-  CR(a, PEI_CORE_INSTANCE, PS, PEI_CORE_HANDLE_SIGNATURE)
+  CR(a, PEI_CORE_INSTANCE, Ps, PEI_CORE_HANDLE_SIGNATURE)
 
 /**
   Function Pointer type for PeiCore function.

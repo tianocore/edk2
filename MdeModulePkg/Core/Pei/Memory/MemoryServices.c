@@ -52,9 +52,9 @@ InitializeMemoryServices (
       );
 
     //
-    // Set PS to point to ServiceTableShadow in Cache
+    // Set Ps to point to ServiceTableShadow in Cache
     //
-    PrivateData->PS = &(PrivateData->ServiceTableShadow);
+    PrivateData->Ps = &(PrivateData->ServiceTableShadow);
   }
   
   return;

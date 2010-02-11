@@ -80,12 +80,12 @@ typedef struct {
 ///
 
 typedef union {
-  UINT8   U8;
-  UINT16  U16;
-  UINT32  U32;
-  INT8    I8;
-  INT16   I16;
-  INT32   I32;
+  UINT8   Uint8;
+  UINT16  Uint16;
+  UINT32  Uint32;
+  INT8    Int8;
+  INT16   Int16;
+  INT32   Int32;
   UINT8   *LongData;
 } HID_DATA;
 

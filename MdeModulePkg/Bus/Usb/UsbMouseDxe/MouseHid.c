@@ -1,7 +1,7 @@
 /** @file
   Helper functions to parse HID report descriptor and items.
 
-Copyright (c) 2004 - 2008, Intel Corporation
+Copyright (c) 2004 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -92,7 +92,7 @@ GetNextHidItem (
       // 1-byte data
       //
       if ((EndPos - StartPos) >= 1) {
-        HidItem->Data.U8 = *StartPos++;
+        HidItem->Data.Uint8 = *StartPos++;
         return StartPos;
       }
 
@@ -101,7 +101,7 @@ GetNextHidItem (
       // 2-byte data
       //
       if ((EndPos - StartPos) >= 2) {
-        CopyMem (&HidItem->Data.U16, StartPos, sizeof (UINT16));
+        CopyMem (&HidItem->Data.Uint16, StartPos, sizeof (UINT16));
         StartPos += 2;
         return StartPos;
       }
@@ -112,7 +112,7 @@ GetNextHidItem (
       //
       HidItem->Size = 4;
       if ((EndPos - StartPos) >= 4) {
-        CopyMem (&HidItem->Data.U32, StartPos, sizeof (UINT32));
+        CopyMem (&HidItem->Data.Uint32, StartPos, sizeof (UINT32));
         StartPos += 4;
         return StartPos;
       }
@@ -145,11 +145,11 @@ GetItemData (
   //
   switch (HidItem->Size) {
   case 1:
-    return HidItem->Data.U8;
+    return HidItem->Data.Uint8;
   case 2:
-    return HidItem->Data.U16;
+    return HidItem->Data.Uint16;
   case 4:
-    return HidItem->Data.U32;
+    return HidItem->Data.Uint32;
   }
   return 0;
 }

@@ -3,7 +3,7 @@
   produce the implementation of native PCD protocol and EFI_PCD_PROTOCOL defined in
   PI 1.2 Vol3.
 
-Copyright (c) 2006 - 2009, Intel Corporation
+Copyright (c) 2006 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -968,7 +968,7 @@ DxeUnRegisterCallBackOnSet (
   @param[in]      Guid    The 128-bit unique value that designates the namespace from which to retrieve the next token. 
                           This is an optional parameter that may be NULL.  If this parameter is NULL, then a request is 
                           being made to retrieve tokens from the default token space.
-  @param[in,out]  TokenNumber 
+  @param[in, out] TokenNumber 
                           A pointer to the PCD token number to use to find the subsequent token number.  
 
   @retval EFI_SUCCESS   The PCD service retrieved the next valid token number. Or the input token number 
