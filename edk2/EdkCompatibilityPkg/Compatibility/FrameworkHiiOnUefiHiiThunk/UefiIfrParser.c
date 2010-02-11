@@ -622,6 +622,16 @@ ParseOpCodes (
       if (ThunkContext != NULL && ThunkContext->ByFrameworkHiiNewPack) {
         ASSERT (FALSE);
       }
+
+      //
+      // Create a name/value Storage for this FormSet
+      //
+      Storage = CreateStorage (FormSet);
+      Storage->Type = EFI_HII_VARSTORE_NAME_VALUE;
+
+      CopyMem (&Storage->VarStoreId, &((EFI_IFR_VARSTORE_NAME_VALUE *) OpCodeData)->VarStoreId, sizeof (EFI_VARSTORE_ID));
+      CopyMem (&Storage->Guid,       &((EFI_IFR_VARSTORE_NAME_VALUE *) OpCodeData)->Guid,       sizeof (EFI_GUID));
+
       break;
 
     case EFI_IFR_VARSTORE_EFI_OP:
