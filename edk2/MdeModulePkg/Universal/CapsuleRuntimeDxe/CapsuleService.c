@@ -4,7 +4,7 @@
   It installs the Capsule Architectural Protocol defined in PI1.0a to signify 
   the capsule runtime services are ready.
 
-Copyright (c) 2006 - 2009, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -164,20 +164,20 @@ UpdateCapsule (
   // system reset. Set its value into NV storage to let pre-boot driver to pick it up 
   // after coming through a system reset.
   //
-  Status = gRT->SetVariable (
-                 EFI_CAPSULE_VARIABLE_NAME,
-                 &gEfiCapsuleVendorGuid,
-                 EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                 sizeof (UINTN),
-                 (VOID *) &ScatterGatherList
-                 );
+  Status = EfiSetVariable (
+             EFI_CAPSULE_VARIABLE_NAME,
+             &gEfiCapsuleVendorGuid,
+             EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+             sizeof (UINTN),
+             (VOID *) &ScatterGatherList
+             );
   if (!EFI_ERROR (Status) && InitiateReset) {
     //
     // Firmware that encounters a capsule which has the CAPSULE_FLAGS_INITIATE_RESET Flag set in its header
     // will initiate a reset of the platform which is compatible with the passed-in capsule request and will 
     // not return back to the caller.
     //
-    gRT->ResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
+    EfiResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
   }
   return Status;
 }
