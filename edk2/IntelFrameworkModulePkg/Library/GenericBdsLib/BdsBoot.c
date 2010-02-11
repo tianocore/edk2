@@ -1454,6 +1454,11 @@ BdsLibGetBootableHandle (
     }
   } else {
     //
+    // For removable device boot option, its contained device path only point to the removable device handle, 
+    // should make sure all its children handles (its child partion or media handles) are created and connected. 
+    //
+    gBS->ConnectController (Handle, NULL, NULL, TRUE); 
+    //
     // Get BlockIo protocol and check removable attribute
     //
     Status = gBS->HandleProtocol (Handle, &gEfiBlockIoProtocolGuid, (VOID **)&BlockIo);
