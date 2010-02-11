@@ -89,6 +89,15 @@ formset
     varsize   = 1,                                // Size of the EFI variable
     guid      = FORMSET_GUID;                     // EFI variable GUID
 
+  //
+  // Define a Name/Value Storage (EFI_IFR_VARSTORE_NAME_VALUE)
+  //
+  namevaluevarstore MyNameValueVar,                // Define storage reference name in vfr
+    name = STRING_TOKEN(STR_NAME_VALUE_VAR_NAME0), // Define Name list of this storage, refer it by MyNameValueVar[0]
+    name = STRING_TOKEN(STR_NAME_VALUE_VAR_NAME1), // Define Name list of this storage, refer it by MyNameValueVar[1]
+    name = STRING_TOKEN(STR_NAME_VALUE_VAR_NAME2), // Define Name list of this storage, refer it by MyNameValueVar[2]
+    guid = FORMSET_GUID;                           // GUID of this Name/Value storage
+
   defaultstore MyStandardDefault,
     prompt      = STRING_TOKEN(STR_STANDARD_DEFAULT_PROMPT),
     attribute   = 0x0000;                         // Default ID: 0000 standard default
@@ -322,6 +331,41 @@ formset
             default = 175,
 
     endnumeric;
+
+    //
+    // Define numeric using Name/Value Storage
+    //
+    numeric varid   = MyNameValueVar[0],     // This numeric take NameValueVar0 as storage
+            prompt  = STRING_TOKEN(STR_NAME_VALUE_VAR_NAME0),
+            help    = STRING_TOKEN(STR_NAME_VALUE_VAR_NAME0_HELP),
+            //
+            // Size should be defined for numeric when use Name/Value storage
+            // Valid value for numerice size are: NUMERIC_SIZE_1, NUMERIC_SIZE_2, NUMERIC_SIZE_4 and NUMERIC_SIZE_8
+            //
+            flags   = NUMERIC_SIZE_1,        // Size of this numeric is 1 byte
+            minimum = 0,
+            maximum = 0xff,
+            step    = 0,
+    endnumeric;
+
+    numeric varid   = MyNameValueVar[1],     // This numeric take NameValueVar1 as storage
+            prompt  = STRING_TOKEN(STR_NAME_VALUE_VAR_NAME1),
+            help    = STRING_TOKEN(STR_NAME_VALUE_VAR_NAME1_HELP),
+            flags   = NUMERIC_SIZE_2,        // Size of this numeric is 2 bytes
+            minimum = 0,
+            maximum = 0xffff,
+            step    = 0,
+    endnumeric;
+
+    //
+    // Define string using Name/Value Storage
+    //
+    string    varid    = MyNameValueVar[2],     // This string take NameValueVar2 as storage
+              prompt   = STRING_TOKEN(STR_NAME_VALUE_VAR_NAME2),
+              help     = STRING_TOKEN(STR_NAME_VALUE_VAR_NAME2_HELP),
+              minsize  = 2,
+              maxsize  = 0x14,
+    endstring;
 
     label LABEL_1_VALUE;
     label LABEL_2_VALUE;

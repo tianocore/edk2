@@ -301,6 +301,38 @@ SetPassword (
   return Status;
 }
 
+/**
+ Update names of Name/Value storage to current language.
+
+ @param PrivateData   Points to the driver private data.
+
+ @retval EFI_SUCCESS   All names are successfully updated.
+ @retval EFI_NOT_FOUND Failed to get Name from HII database.
+
+**/
+EFI_STATUS
+LoadNameValueNames (
+  IN DRIVER_SAMPLE_PRIVATE_DATA      *PrivateData
+  )
+{
+  UINTN      Index;
+
+  //
+  // Get Name/Value name string of current language
+  //
+  for (Index = 0; Index < NAME_VALUE_NAME_NUMBER; Index++) {
+    PrivateData->NameValueName[Index] = HiiGetString (
+                                         PrivateData->HiiHandle[0],
+                                         PrivateData->NameStringId[Index],
+                                         NULL
+                                         );
+    if (PrivateData->NameValueName[Index] == NULL) {
+      return EFI_NOT_FOUND;
+    }
+  }
+
+  return EFI_SUCCESS;
+}
 
 /**
   This function allows a caller to extract the current configuration for one
@@ -344,6 +376,11 @@ ExtractConfig (
   EFI_STRING                       ConfigRequest;
   EFI_STRING                       ConfigRequestHdr;
   UINTN                            Size;
+  EFI_STRING                       Value;
+  UINTN                            ValueStrLen;
+  CHAR16                           BackupChar;
+  CHAR16                           *StrPointer;
+
 
   if (Progress == NULL || Results == NULL || Request == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -394,10 +431,96 @@ ExtractConfig (
     // Check routing data in <ConfigHdr>.
     // Note: if only one Storage is used, then this checking could be skipped.
     //
-    if (!HiiIsConfigHdrMatch (Request, &mFormSetGuid, VariableName)) {
+    if (!HiiIsConfigHdrMatch (Request, &mFormSetGuid, NULL)) {
       return EFI_NOT_FOUND;
     }
     ConfigRequest = Request;
+
+    //
+    // Check if requesting Name/Value storage
+    //
+    if (StrStr (Request, L"OFFSET") == NULL) {
+      //
+      // Update Name/Value storage Names
+      //
+      Status = LoadNameValueNames (PrivateData);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+
+      //
+      // Allocate memory for <ConfigResp>, e.g. Name0=0x11, Name1=0x1234, Name2="ABCD"
+      // <Request>   ::=<ConfigHdr>&Name0&Name1&Name2
+      // <ConfigResp>::=<ConfigHdr>&Name0=11&Name1=1234&Name2=0041004200430044
+      //
+      BufferSize = (StrLen (Request) +
+        1 + sizeof (PrivateData->Configuration.NameValueVar0) * 2 +
+        1 + sizeof (PrivateData->Configuration.NameValueVar1) * 2 +
+        1 + sizeof (PrivateData->Configuration.NameValueVar2) * 2 + 1) * sizeof (CHAR16);
+      *Results = AllocateZeroPool (BufferSize);
+      ASSERT (*Results != NULL);
+      StrCpy (*Results, Request);
+      Value = *Results;
+
+      //
+      // Append value of NameValueVar0, type is UINT8
+      //
+      if ((Value = StrStr (*Results, PrivateData->NameValueName[0])) != NULL) {
+        Value += StrLen (PrivateData->NameValueName[0]);
+        ValueStrLen = ((sizeof (PrivateData->Configuration.NameValueVar0) * 2) + 1);
+        CopyMem (Value + ValueStrLen, Value, StrSize (Value));
+
+        BackupChar = Value[ValueStrLen];
+        *Value++   = L'=';
+        Value += UnicodeValueToString (
+                   Value, 
+                   PREFIX_ZERO | RADIX_HEX, 
+                   PrivateData->Configuration.NameValueVar0, 
+                   sizeof (PrivateData->Configuration.NameValueVar0) * 2
+                   );
+        *Value = BackupChar;
+      }
+
+      //
+      // Append value of NameValueVar1, type is UINT16
+      //
+      if ((Value = StrStr (*Results, PrivateData->NameValueName[1])) != NULL) {
+        Value += StrLen (PrivateData->NameValueName[1]);
+        ValueStrLen = ((sizeof (PrivateData->Configuration.NameValueVar1) * 2) + 1);
+        CopyMem (Value + ValueStrLen, Value, StrSize (Value));
+
+        BackupChar = Value[ValueStrLen];
+        *Value++   = L'=';
+        Value += UnicodeValueToString (
+                  Value, 
+                  PREFIX_ZERO | RADIX_HEX, 
+                  PrivateData->Configuration.NameValueVar1, 
+                  sizeof (PrivateData->Configuration.NameValueVar1) * 2
+                  );
+        *Value = BackupChar;
+      }
+
+      //
+      // Append value of NameValueVar2, type is CHAR16 *
+      //
+      if ((Value = StrStr (*Results, PrivateData->NameValueName[2])) != NULL) {
+        Value += StrLen (PrivateData->NameValueName[2]);
+        ValueStrLen = StrLen (PrivateData->Configuration.NameValueVar2) * 4 + 1;
+        CopyMem (Value + ValueStrLen, Value, StrSize (Value));
+
+        *Value++ = L'=';
+        //
+        // Convert Unicode String to Config String, e.g. "ABCD" => "0041004200430044"
+        //
+        StrPointer = (CHAR16 *) PrivateData->Configuration.NameValueVar2;
+        for (; *StrPointer != L'\0'; StrPointer++) {
+          Value += UnicodeValueToString (Value, PREFIX_ZERO | RADIX_HEX, *StrPointer, 4);
+        }
+      }
+
+      Progress = (EFI_STRING *) Request + StrLen (Request);
+      return EFI_SUCCESS;
+    }
   }
 
   //
@@ -451,6 +574,13 @@ RouteConfig (
   UINTN                            BufferSize;
   DRIVER_SAMPLE_PRIVATE_DATA       *PrivateData;
   EFI_HII_CONFIG_ROUTING_PROTOCOL  *HiiConfigRouting;
+  CHAR16                           *Value;
+  CHAR16                           *StrPtr;
+  CHAR16                           TemStr[5];
+  UINT8                            *DataBuffer;
+  UINT8                            DigitUint8;
+  UINTN                            Index;
+  CHAR16                           *StrBuffer;
 
   if (Configuration == NULL || Progress == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -464,7 +594,7 @@ RouteConfig (
   // Check routing data in <ConfigHdr>.
   // Note: if only one Storage is used, then this checking could be skipped.
   //
-  if (!HiiIsConfigHdrMatch (Configuration, &mFormSetGuid, VariableName)) {
+  if (!HiiIsConfigHdrMatch (Configuration, &mFormSetGuid, NULL)) {
     return EFI_NOT_FOUND;
   }
 
@@ -480,6 +610,125 @@ RouteConfig (
             &PrivateData->Configuration
             );
   if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Check if configuring Name/Value storage
+  //
+  if (StrStr (Configuration, L"OFFSET") == NULL) {
+    //
+    // Update Name/Value storage Names
+    //
+    Status = LoadNameValueNames (PrivateData);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // Convert value for NameValueVar0
+    //
+    if ((Value = StrStr (Configuration, PrivateData->NameValueName[0])) != NULL) {
+      //
+      // Skip "Name="
+      //
+      Value += StrLen (PrivateData->NameValueName[0]);
+      Value++;
+      //
+      // Get Value String
+      //
+      StrPtr = StrStr (Value, L"&");
+      if (StrPtr == NULL) {
+        StrPtr = Value + StrLen (Value);
+      }
+      //
+      // Convert Value to Buffer data
+      //
+      DataBuffer = (UINT8 *) &PrivateData->Configuration.NameValueVar0;
+      ZeroMem (TemStr, sizeof (TemStr));
+      for (Index = 0, StrPtr --; StrPtr >= Value; StrPtr --, Index ++) {
+        TemStr[0] = *StrPtr;
+        DigitUint8 = (UINT8) StrHexToUint64 (TemStr);
+        if ((Index & 1) == 0) {
+          DataBuffer [Index/2] = DigitUint8;
+        } else {
+          DataBuffer [Index/2] = (UINT8) ((UINT8) (DigitUint8 << 4) + DataBuffer [Index/2]);
+        }
+      }
+    }
+
+    //
+    // Convert value for NameValueVar1
+    //
+    if ((Value = StrStr (Configuration, PrivateData->NameValueName[1])) != NULL) {
+      //
+      // Skip "Name="
+      //
+      Value += StrLen (PrivateData->NameValueName[1]);
+      Value++;
+      //
+      // Get Value String
+      //
+      StrPtr = StrStr (Value, L"&");
+      if (StrPtr == NULL) {
+        StrPtr = Value + StrLen (Value);
+      }
+      //
+      // Convert Value to Buffer data
+      //
+      DataBuffer = (UINT8 *) &PrivateData->Configuration.NameValueVar1;
+      ZeroMem (TemStr, sizeof (TemStr));
+      for (Index = 0, StrPtr --; StrPtr >= Value; StrPtr --, Index ++) {
+        TemStr[0] = *StrPtr;
+        DigitUint8 = (UINT8) StrHexToUint64 (TemStr);
+        if ((Index & 1) == 0) {
+          DataBuffer [Index/2] = DigitUint8;
+        } else {
+          DataBuffer [Index/2] = (UINT8) ((UINT8) (DigitUint8 << 4) + DataBuffer [Index/2]);
+        }
+      }
+    }
+
+    //
+    // Convert value for NameValueVar2
+    //
+    if ((Value = StrStr (Configuration, PrivateData->NameValueName[2])) != NULL) {
+      //
+      // Skip "Name="
+      //
+      Value += StrLen (PrivateData->NameValueName[2]);
+      Value++;
+      //
+      // Get Value String
+      //
+      StrPtr = StrStr (Value, L"&");
+      if (StrPtr == NULL) {
+        StrPtr = Value + StrLen (Value);
+      }
+      //
+      // Convert Config String to Unicode String, e.g "0041004200430044" => "ABCD"
+      //
+      StrBuffer = (CHAR16 *) PrivateData->Configuration.NameValueVar2;
+      ZeroMem (TemStr, sizeof (TemStr));
+      while (Value < StrPtr) {
+        StrnCpy (TemStr, Value, 4);
+        *(StrBuffer++) = (CHAR16) StrHexToUint64 (TemStr);
+        Value += 4;
+      }
+      *StrBuffer = L'\0';
+    }
+
+    //
+    // Store Buffer Storage back to EFI variable
+    //
+    Status = gRT->SetVariable(
+      VariableName,
+      &mFormSetGuid,
+      EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+      sizeof (DRIVER_SAMPLE_CONFIGURATION),
+      &PrivateData->Configuration
+      );
+
     return Status;
   }
 
@@ -1035,6 +1284,7 @@ DriverSampleInit (
                    NULL
                    );
   if (HiiHandle[1] == NULL) {
+    DriverSampleUnload (ImageHandle);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -1047,8 +1297,18 @@ DriverSampleInit (
   NewString = L"700 Mhz";
 
   if (HiiSetString (HiiHandle[0], STRING_TOKEN (STR_CPU_STRING2), NewString, NULL) == 0) {
+    DriverSampleUnload (ImageHandle);
     return EFI_OUT_OF_RESOURCES;
   }
+
+  HiiSetString (HiiHandle[0], 0, NewString, NULL);
+
+  //
+  // Initialize Name/Value name String ID
+  //
+  PrivateData->NameStringId[0] = STR_NAME_VALUE_VAR_NAME0;
+  PrivateData->NameStringId[1] = STR_NAME_VALUE_VAR_NAME1;
+  PrivateData->NameStringId[2] = STR_NAME_VALUE_VAR_NAME2;
 
   //
   // Initialize configuration data
@@ -1138,6 +1398,7 @@ DriverSampleUnload (
   IN EFI_HANDLE  ImageHandle
   )
 {
+  UINTN Index;
   if (DriverHandle[0] != NULL) {
     gBS->UninstallMultipleProtocolInterfaces (
             DriverHandle[0],
@@ -1169,6 +1430,11 @@ DriverSampleUnload (
   }
 
   if (PrivateData != NULL) {
+    for (Index = 0; Index < NAME_VALUE_NAME_NUMBER; Index++) {
+      if (PrivateData->NameValueName[Index] != NULL) {
+        FreePool (PrivateData->NameValueName[Index]);
+      }
+    }
     FreePool (PrivateData);
     PrivateData = NULL;
   }
