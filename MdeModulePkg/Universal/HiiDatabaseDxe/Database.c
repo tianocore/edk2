@@ -775,7 +775,6 @@ InsertStringPackage (
   IN     EFI_HII_DATABASE_NOTIFY_TYPE       NotifyType,
   IN OUT HII_DATABASE_PACKAGE_LIST_INSTANCE *PackageList,
   OUT    HII_STRING_PACKAGE_INSTANCE        **Package
-
   )
 {
   HII_STRING_PACKAGE_INSTANCE *StringPackage;
@@ -889,6 +888,83 @@ Error:
 
 }
 
+/**
+ Adjust all string packages in a single package list to have the same max string ID.
+ 
+ @param  PackageList        Pointer to a package list which will be adjusted.
+
+ @retval EFI_SUCCESS  Adjust all string packages successfully.
+ @retval others       Can't adjust string packges.
+
+**/
+EFI_STATUS
+AdjustStringPackage (
+  IN OUT HII_DATABASE_PACKAGE_LIST_INSTANCE *PackageList
+)
+{
+  LIST_ENTRY                  *Link;
+  HII_STRING_PACKAGE_INSTANCE *StringPackage;
+  UINT32                      Skip2BlockSize;
+  UINT32                      OldBlockSize;
+  UINT8                       *StringBlock;
+  UINT8                       *BlockPtr;
+  EFI_STRING_ID               MaxStringId;
+  UINT16                      SkipCount;
+
+  MaxStringId = 0;
+  for (Link = PackageList->StringPkgHdr.ForwardLink;
+       Link != &PackageList->StringPkgHdr;
+       Link = Link->ForwardLink
+      ) {
+    StringPackage = CR (Link, HII_STRING_PACKAGE_INSTANCE, StringEntry, HII_STRING_PACKAGE_SIGNATURE);
+    if (MaxStringId < StringPackage->MaxStringId) {
+      MaxStringId = StringPackage->MaxStringId;
+    }
+  }
+
+  for (Link = PackageList->StringPkgHdr.ForwardLink;
+       Link != &PackageList->StringPkgHdr;
+       Link = Link->ForwardLink
+      ) {
+    StringPackage = CR (Link, HII_STRING_PACKAGE_INSTANCE, StringEntry, HII_STRING_PACKAGE_SIGNATURE);
+    if (StringPackage->MaxStringId < MaxStringId) {
+      OldBlockSize = StringPackage->StringPkgHdr->Header.Length - StringPackage->StringPkgHdr->HdrSize;
+      //
+      // Create SKIP2 EFI_HII_SIBT_SKIP2_BLOCKs to reserve the missing string IDs.
+      //
+      SkipCount      = (UINT16) (MaxStringId - StringPackage->MaxStringId);
+      Skip2BlockSize = (UINT32) sizeof (EFI_HII_SIBT_SKIP2_BLOCK);
+
+      StringBlock = (UINT8 *) AllocateZeroPool (OldBlockSize + Skip2BlockSize);
+      if (StringBlock == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+      //
+      // Copy original string blocks, except the EFI_HII_SIBT_END.
+      //
+      CopyMem (StringBlock, StringPackage->StringBlock, OldBlockSize - sizeof (EFI_HII_SIBT_END_BLOCK));
+      //
+      // Create SKIP2 EFI_HII_SIBT_SKIP2_BLOCK blocks
+      //
+      BlockPtr  = StringBlock + OldBlockSize - sizeof (EFI_HII_SIBT_END_BLOCK);
+      *BlockPtr = EFI_HII_SIBT_SKIP2;
+      CopyMem (BlockPtr + 1, &SkipCount, sizeof (UINT16));
+      BlockPtr  += sizeof (EFI_HII_SIBT_SKIP2_BLOCK);
+
+      //
+      // Append a EFI_HII_SIBT_END block to the end.
+      //
+      *BlockPtr = EFI_HII_SIBT_END;
+      FreePool (StringPackage->StringBlock);
+      StringPackage->StringBlock = StringBlock;
+      StringPackage->StringPkgHdr->Header.Length += Skip2BlockSize;
+      PackageList->PackageListHdr.PackageLength += Skip2BlockSize;
+      StringPackage->MaxStringId = MaxStringId;
+    }
+  }
+
+  return EFI_SUCCESS;
+}
 
 /**
   This function exports String packages to a buffer.
@@ -2342,10 +2418,12 @@ AddPackages (
   EFI_HII_PACKAGE_HEADER               *PackageHdrPtr;
   EFI_HII_PACKAGE_HEADER               PackageHeader;
   UINT32                               OldPackageListLen;
+  BOOLEAN                              StringPkgIsAdd;
 
   //
   // Initialize Variables
   //
+  StringPkgIsAdd = FALSE;
   FontPackage = NULL;
 
   //
@@ -2440,6 +2518,7 @@ AddPackages (
                  (UINT8) (PackageHeader.Type),
                  DatabaseRecord->Handle
                  );
+      StringPkgIsAdd = TRUE;
       break;
     case EFI_HII_PACKAGE_FONTS:
       Status = InsertFontPackage (
@@ -2516,6 +2595,13 @@ AddPackages (
     //
     PackageHdrPtr = (EFI_HII_PACKAGE_HEADER *) ((UINT8 *) PackageHdrPtr + PackageHeader.Length);
     CopyMem (&PackageHeader, PackageHdrPtr, sizeof (EFI_HII_PACKAGE_HEADER));
+  }
+  
+  //
+  // Adjust String Package to make sure all string packages have the same max string ID.
+  //
+  if (!EFI_ERROR (Status) && StringPkgIsAdd) {
+    Status = AdjustStringPackage (DatabaseRecord->PackageList);
   }
 
   return Status;
