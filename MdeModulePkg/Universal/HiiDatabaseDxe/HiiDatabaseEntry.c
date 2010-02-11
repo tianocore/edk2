@@ -20,7 +20,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // Global variables
 //
 EFI_EVENT gHiiKeyboardLayoutChanged;
-EFI_GUID gHiiSetKbdLayoutEventGuid = EFI_HII_SET_KEYBOARD_LAYOUT_EVENT_GUID;
 
 HII_DATABASE_PRIVATE_DATA mPrivate = {
   HII_DATABASE_PRIVATE_DATA_SIGNATURE,
@@ -168,7 +167,7 @@ InitializeHiiDatabase (
                   TPL_NOTIFY,
                   KeyboardLayoutChangeNullEvent,
                   NULL,
-                  &gHiiSetKbdLayoutEventGuid,
+                  &gEfiHiiKeyBoardLayoutGuid,
                   &gHiiKeyboardLayoutChanged
                   );
   if (EFI_ERROR (Status)) {

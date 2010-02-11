@@ -395,10 +395,8 @@ ErrorExit:
       gBS->CloseEvent (UsbKeyboardDevice->SimpleInputEx.WaitForKeyEx);
     }
     if (UsbKeyboardDevice->KeyboardLayoutEvent != NULL) {
+      ReleaseKeyboardLayoutResources (UsbKeyboardDevice);
       gBS->CloseEvent (UsbKeyboardDevice->KeyboardLayoutEvent);
-    }
-    if (UsbKeyboardDevice->KeyConvertionTable != NULL) {
-      FreePool (UsbKeyboardDevice->KeyConvertionTable);
     }
     FreePool (UsbKeyboardDevice);
     UsbKeyboardDevice = NULL;
