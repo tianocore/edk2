@@ -48,13 +48,6 @@ Revision History
 #include "NVDataStruc.h"
 
 //
-// This is the generated <AltResp> for defaults defined in VFR
-//
-extern UINT8 VfrMyIfrNVDataDefault0000[];
-extern UINT8 VfrMyIfrNVDataDefault0001[];
-extern UINT8 VfrMyIfrNVDataBlockName[];
-
-//
 // This is the generated IFR binary data for each formset defined in VFR.
 // This data array is ready to be used as input of HiiAddPackages() to
 // create a packagelist (which contains Form packages, String packages, etc).
@@ -72,6 +65,11 @@ extern UINT8  DriverSampleStrings[];
 #define DYNAMIC_ONE_OF_VAR_OFFSET        OFFSET_OF (DRIVER_SAMPLE_CONFIGURATION, DynamicOneof)
 #define DYNAMIC_ORDERED_LIST_VAR_OFFSET  OFFSET_OF (DRIVER_SAMPLE_CONFIGURATION, DynamicOrderedList)
 
+//
+// Number of name in Name/Value storage
+//
+#define NAME_VALUE_NAME_NUMBER       3
+
 #define DRIVER_SAMPLE_PRIVATE_SIGNATURE SIGNATURE_32 ('D', 'S', 'p', 's')
 
 typedef struct {
@@ -81,6 +79,12 @@ typedef struct {
   EFI_HII_HANDLE                   HiiHandle[2];
   DRIVER_SAMPLE_CONFIGURATION      Configuration;
   UINT8                            PasswordState;
+
+  //
+  // Name/Value storage Name list
+  //
+  EFI_STRING_ID                    NameStringId[NAME_VALUE_NAME_NUMBER];
+  EFI_STRING                       NameValueName[NAME_VALUE_NAME_NUMBER];
 
   //
   // Consumed protocol

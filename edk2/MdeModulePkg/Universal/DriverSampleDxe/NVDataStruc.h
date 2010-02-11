@@ -62,6 +62,10 @@ typedef struct {
   UINT8   DynamicRefresh;
   UINT8   DynamicOneof;
   UINT8   DynamicOrderedList[5];
+  UINT8   Reserved;
+  UINT8   NameValueVar0;
+  UINT16  NameValueVar1;
+  UINT16  NameValueVar2[20];
 } DRIVER_SAMPLE_CONFIGURATION;
 
 //
