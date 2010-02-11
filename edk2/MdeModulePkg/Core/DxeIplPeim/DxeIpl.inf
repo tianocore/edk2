@@ -36,8 +36,8 @@
   DxeLoad.c
 
 [Sources.Ia32]
-  Ia32/VirtualMemory.h ||||PcdDxeIplSwitchToLongMode
-  Ia32/VirtualMemory.c ||||PcdDxeIplSwitchToLongMode
+  X64/VirtualMemory.h  ||||PcdDxeIplSwitchToLongMode
+  X64/VirtualMemory.c  ||||PcdDxeIplSwitchToLongMode
   Ia32/DxeLoadFunc.c
   Ia32/IdtVectorAsm.asm||||PcdDxeIplSwitchToLongMode
   Ia32/IdtVectorAsm.S  ||||PcdDxeIplSwitchToLongMode

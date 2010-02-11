@@ -1,7 +1,7 @@
 /** @file
- 		Implementation of receiving a packet from a network interface.
+  Implementation of receiving a packet from a network interface.
 
-Copyright (c) 2004 - 2007, Intel Corporation. <BR>
+Copyright (c) 2004 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials are licensed
 and made available under the terms and conditions of the BSD License which
 accompanies this distribution. The full text of the license may be found at
@@ -225,7 +225,7 @@ SnpUndi32Receive (
     goto ON_EXIT;
   }
 
-  if (!Snp->Mode.ReceiveFilterSetting) {
+  if (Snp->Mode.ReceiveFilterSetting == 0) {
     Status = EFI_DEVICE_ERROR;
     goto ON_EXIT;
   }

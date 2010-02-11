@@ -910,7 +910,7 @@ DevPathToTextSata (
   SATA_DEVICE_PATH *Sata;
 
   Sata = DevPath;
-  if (Sata->PortMultiplierPortNumber & SATA_HBA_DIRECT_CONNECT_FLAG) {
+  if ((Sata->PortMultiplierPortNumber & SATA_HBA_DIRECT_CONNECT_FLAG) != 0) {
     CatPrint (
       Str,
       L"Sata(0x%x,0x%x)",

@@ -1,7 +1,7 @@
 /** @file
   EFI PEI Core Security services
   
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2010, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -113,7 +113,7 @@ VerifyPeim (
     // Check to see if the image is OK
     //
     Status = PrivateData->PrivateSecurityPpi->AuthenticationState (
-                                                (CONST EFI_PEI_SERVICES **) &PrivateData->PS,
+                                                (CONST EFI_PEI_SERVICES **) &PrivateData->Ps,
                                                 PrivateData->PrivateSecurityPpi,
                                                 AuthenticationStatus,
                                                 VolumeHandle,

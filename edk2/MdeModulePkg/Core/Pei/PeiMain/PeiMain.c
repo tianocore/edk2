@@ -148,12 +148,12 @@ PeiCore (
     CopyMem (&PrivateData.ServiceTableShadow, &gPs, sizeof (gPs));
   }
 
-  PrivateData.PS = &PrivateData.ServiceTableShadow;
+  PrivateData.Ps = &PrivateData.ServiceTableShadow;
 
   //
   // Initialize libraries that the PeiCore is linked against
   //
-  ProcessLibraryConstructorList (NULL, (CONST EFI_PEI_SERVICES **)&PrivateData.PS);
+  ProcessLibraryConstructorList (NULL, (CONST EFI_PEI_SERVICES **)&PrivateData.Ps);
 
   InitializeMemoryServices (&PrivateData, SecCoreData, OldCoreData);
 
@@ -162,7 +162,7 @@ PeiCore (
   //
   // Save PeiServicePointer so that it can be retrieved anywhere.
   //
-  SetPeiServicesTablePointer((CONST EFI_PEI_SERVICES **) &PrivateData.PS);
+  SetPeiServicesTablePointer((CONST EFI_PEI_SERVICES **) &PrivateData.Ps);
   
   if (OldCoreData != NULL) {
 
@@ -205,7 +205,7 @@ PeiCore (
     }
   }
 
-  InitializeSecurityServices (&PrivateData.PS, OldCoreData);
+  InitializeSecurityServices (&PrivateData.Ps, OldCoreData);
 
   InitializeDispatcherData (&PrivateData, OldCoreData, SecCoreData);
 
@@ -244,7 +244,7 @@ PeiCore (
   DEBUG ((EFI_D_INFO, "DXE IPL Entry\n"));
   Status = TempPtr.DxeIpl->Entry (
                              TempPtr.DxeIpl,
-                             &PrivateData.PS,
+                             &PrivateData.Ps,
                              PrivateData.HobList
                              );
   //

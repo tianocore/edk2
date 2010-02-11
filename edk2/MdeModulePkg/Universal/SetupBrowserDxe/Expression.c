@@ -1,7 +1,7 @@
 /** @file
 Utility functions for expression evaluation.
 
-Copyright (c) 2007 - 2009, Intel Corporation
+Copyright (c) 2007 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1717,7 +1717,7 @@ EvaluateExpression (
         // When converting from an unsigned integer, zero will be converted to
         // FALSE and any other value will be converted to TRUE.
         //
-        Value->Value.b = (BOOLEAN) ((Value->Value.u64) ? TRUE : FALSE);
+        Value->Value.b = (BOOLEAN) (Value->Value.u64 != 0);
 
         Value->Type = EFI_IFR_TYPE_BOOLEAN;
       } else if (Value->Type == EFI_IFR_TYPE_STRING) {
