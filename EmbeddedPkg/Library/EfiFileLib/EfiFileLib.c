@@ -1169,9 +1169,11 @@ EfiSeek (
 
   if (File->Type == EfiOpenLoadFile || File->Type == EfiOpenFirmwareVolume) {
     if (!CompareGuid (&File->FvNameGuid, &gZeroGuid)) {
-      // LoadFile and FV do not support Seek
-      // You can seek on a raw FV device
-      return EFI_UNSUPPORTED;
+      if ((SeekType != EfiSeekStart) && (Offset != 0)) {
+        // LoadFile and FV do not support Seek
+        // You can seek on a raw FV device
+        return EFI_UNSUPPORTED;
+      }
     }
   }
 
