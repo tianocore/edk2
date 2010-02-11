@@ -160,6 +160,16 @@ AddModHandle (
   PDB_NAME_TO_MOD_HANDLE  *TempArray;
   HANDLE                  Handle;
 
+  //
+  // Return EFI_ALREADY_STARTED if this DLL has already been loaded
+  //
+  Array = mPdbNameModHandleArray;
+  for (Index = 0; Index < mPdbNameModHandleArraySize; Index++, Array++) {
+    if (Array->PdbPointer != NULL && Array->ModHandle == ModHandle) {
+      return EFI_ALREADY_STARTED;
+    }
+  }
+  
   Array = mPdbNameModHandleArray;
   for (Index = 0; Index < mPdbNameModHandleArraySize; Index++, Array++) {
     if (Array->PdbPointer == NULL) {
@@ -266,6 +276,7 @@ PeCoffLoaderRelocateImageExtraAction (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
+  EFI_STATUS        Status;
   VOID              *DllEntryPoint;
   CHAR16            *DllFileName;
   HMODULE           Library;
@@ -333,10 +344,24 @@ PeCoffLoaderRelocateImageExtraAction (
     }
 
     if ((Library != NULL) && (DllEntryPoint != NULL)) {
-      AddModHandle (ImageContext, Library);
-      ImageContext->EntryPoint  = (EFI_PHYSICAL_ADDRESS) (UINTN) DllEntryPoint;
-      DEBUG ((EFI_D_INFO, "LoadLibraryEx (%s,\n               NULL, DONT_RESOLVE_DLL_REFERENCES)\n", DllFileName));
+      Status = AddModHandle (ImageContext, Library);
+      if (Status == EFI_ALREADY_STARTED) {
+        //
+        // If the DLL has already been loaded before, then this instance of the DLL can not be debugged.
+        //
+        ImageContext->PdbPointer = NULL;
+        DEBUG ((EFI_D_ERROR, "WARNING: DLL already loaded.  No source level debug %s. \n", DllFileName));
+      } else {
+        //
+        // This DLL is not already loaded, so source level debugging is suported.
+        //
+        ImageContext->EntryPoint  = (EFI_PHYSICAL_ADDRESS) (UINTN) DllEntryPoint;
+        DEBUG ((EFI_D_INFO, "LoadLibraryEx (%s,\n               NULL, DONT_RESOLVE_DLL_REFERENCES)\n", DllFileName));
+      }
     } else {
+      //
+      // This DLL does not support source level debugging at all.
+      //
       DEBUG ((EFI_D_ERROR, "WARNING: No source level debug %s. \n", DllFileName));
     }
 
