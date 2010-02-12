@@ -2,11 +2,11 @@
   Implementation of reading the current interrupt status and recycled transmit
   buffer status from a network interface.
 
-Copyright (c) 2004 - 2010, Intel Corporation. <BR> 
-All rights reserved. This program and the accompanying materials are licensed 
-and made available under the terms and conditions of the BSD License which 
-accompanies this distribution. The full text of the license may be found at 
-http://opensource.org/licenses/bsd-license.php 
+Copyright (c) 2004 - 2010, Intel Corporation. <BR>
+All rights reserved. This program and the accompanying materials are licensed
+and made available under the terms and conditions of the BSD License which
+accompanies this distribution. The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -16,18 +16,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Snp.h"
 
 /**
-  Call undi to get the status of the interrupts, get the list of transmit 
-  buffers that completed transmitting. 
+  Call undi to get the status of the interrupts, get the list of transmit
+  buffers that completed transmitting.
 
   @param  Snp                     Pointer to snp driver structure.
-  @param  InterruptStatusPtr      A non null pointer to contain the interrupt 
+  @param  InterruptStatusPtr      A non null pointer to contain the interrupt
                                   status.
-  @param  TransmitBufferListPtrs  A non null pointer to contain the list of 
+  @param  TransmitBufferListPtrs  A non null pointer to contain the list of
                                   pointers of previous transmitted buffers whose
                                   transmission was completed asynchrnously.
-   
+
   @retval EFI_SUCCESS         The status of the network interface was retrieved.
-  @retval EFI_DEVICE_ERROR    The command could not be sent to the network 
+  @retval EFI_DEVICE_ERROR    The command could not be sent to the network
                               interface.
 
 **/
@@ -52,6 +52,10 @@ PxeGetStatus (
 
   if (InterruptStatusPtr != NULL) {
     Snp->Cdb.OpFlags |= PXE_OPFLAGS_GET_INTERRUPT_STATUS;
+  }
+
+  if (Snp->MediaStatusSupported) {
+    Snp->Cdb.OpFlags |= PXE_OPFLAGS_GET_MEDIA_STATUS;
   }
 
   Snp->Cdb.CPBsize  = PXE_CPBSIZE_NOT_USED;
@@ -121,44 +125,53 @@ PxeGetStatus (
 
   }
 
+  //
+  // Update MediaPresent field of EFI_SIMPLE_NETWORK_MODE if the UNDI support
+  // returning media status from GET_STATUS command
+  //
+  if (Snp->MediaStatusSupported) {
+    Snp->Snp.Mode->MediaPresent =
+      (BOOLEAN) (((Snp->Cdb.StatFlags & PXE_STATFLAGS_GET_STATUS_NO_MEDIA) != 0) ? FALSE : TRUE);
+  }
+
   return EFI_SUCCESS;
 }
 
 /**
   Reads the current interrupt status and recycled transmit buffer status from a
   network interface.
-  
-  This function gets the current interrupt and recycled transmit buffer status 
+
+  This function gets the current interrupt and recycled transmit buffer status
   from the network interface. The interrupt status is returned as a bit mask in
   InterruptStatus. If InterruptStatus is NULL, the interrupt status will not be
   read. If TxBuf is not NULL, a recycled transmit buffer address will be retrieved.
   If a recycled transmit buffer address is returned in TxBuf, then the buffer has
   been successfully transmitted, and the status for that buffer is cleared. If
-  the status of the network interface is successfully collected, EFI_SUCCESS 
+  the status of the network interface is successfully collected, EFI_SUCCESS
   will be returned. If the driver has not been initialized, EFI_DEVICE_ERROR will
   be returned.
 
   @param This            A pointer to the EFI_SIMPLE_NETWORK_PROTOCOL instance.
-  @param InterruptStatus A pointer to the bit mask of the currently active 
+  @param InterruptStatus A pointer to the bit mask of the currently active
                          interrupts (see "Related Definitions"). If this is NULL,
                          the interrupt status will not be read from the device.
                          If this is not NULL, the interrupt status will be read
-                         from the device. When the interrupt status is read, it 
-                         will also be cleared. Clearing the transmit interrupt does 
+                         from the device. When the interrupt status is read, it
+                         will also be cleared. Clearing the transmit interrupt does
                          not empty the recycled transmit buffer array.
   @param TxBuf           Recycled transmit buffer address. The network interface
-                         will not transmit if its internal recycled transmit 
+                         will not transmit if its internal recycled transmit
                          buffer array is full. Reading the transmit buffer does
                          not clear the transmit interrupt. If this is NULL, then
-                         the transmit buffer status will not be read. If there 
-                         are no transmit buffers to recycle and TxBuf is not NULL, 
+                         the transmit buffer status will not be read. If there
+                         are no transmit buffers to recycle and TxBuf is not NULL,
                          TxBuf will be set to NULL.
 
   @retval EFI_SUCCESS           The status of the network interface was retrieved.
   @retval EFI_NOT_STARTED       The network interface has not been started.
-  @retval EFI_INVALID_PARAMETER This parameter was NULL or did not point to a valid 
+  @retval EFI_INVALID_PARAMETER This parameter was NULL or did not point to a valid
                                 EFI_SIMPLE_NETWORK_PROTOCOL structure.
-  @retval EFI_DEVICE_ERROR      The command could not be sent to the network 
+  @retval EFI_DEVICE_ERROR      The command could not be sent to the network
                                 interface.
 
 **/
