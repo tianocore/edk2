@@ -24,15 +24,15 @@
 
 GLOBAL_REMOVE_IF_UNREFERENCED   CHAR8 *gFvFileType[] = {
   "All",
-  "Raw",
-  "Freeform",
+  "Bin",
+  "section",
   "SEC",
   "PeiCore",
   "DxeCore",
   "PEIM",
   "Driver",
-  "Combo Driver",
-  "Application",
+  "Combo",
+  "App",
   "NULL",
   "FV"
 };
@@ -89,6 +89,7 @@ EblDirCmd (
   UINTN                         BestMatchCount;
   CHAR16                        UnicodeFileName[MAX_CMD_LINE];
   CHAR8                         *Path;
+  CHAR8                         *TypeStr;
 
 
   if (Argc <= 1) {
@@ -156,10 +157,10 @@ EblDirCmd (
                                 &Size
                                 );
       if (!EFI_ERROR (GetNextFileStatus)) {
-         // Calculate size of entire file
-         Section = NULL;
-         Size = 0;
-         Status = Fv->ReadFile (
+        // Calculate size of entire file
+        Section = NULL;
+        Size = 0;
+        Status = Fv->ReadFile (
                       Fv,
                       &NameGuid, 
                       Section,
@@ -168,10 +169,12 @@ EblDirCmd (
                       &Attributes,
                       &AuthenticationStatus
                       );
-         if (!((Status == EFI_BUFFER_TOO_SMALL) || !EFI_ERROR (Status))) {
-          // EFI_SUCCESS or EFI_BUFFER_TOO_SMALL mean size is valid 
-          Size = 0;
-         }
+        if (!((Status == EFI_BUFFER_TOO_SMALL) || !EFI_ERROR (Status))) {
+           // EFI_SUCCESS or EFI_BUFFER_TOO_SMALL mean size is valid 
+            Size = 0;
+        }
+        
+        TypeStr = (Type <= EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE) ? gFvFileType[Type] : "UNKNOWN";
 
         // read the UI seciton to do a name match.
         Section = NULL;
@@ -186,7 +189,7 @@ EblDirCmd (
                         );
         if (!EFI_ERROR (Status)) {
           if (StrStr (Section, MatchSubString) != NULL) {
-            AsciiPrint ("  %g %s %a %,d\n", &NameGuid, Section, gFvFileType[Type], Size);
+            AsciiPrint ("%,6d %7a %g %s\n", Size, TypeStr, &NameGuid, Section);
             if (EblAnyKeyToContinueQtoQuit (&CurrentRow, FALSE)) {
               break;
             }
@@ -194,7 +197,7 @@ EblDirCmd (
           FreePool (Section);
         } else {
           if (*MatchSubString == '\0') {
-            AsciiPrint ("  %g %a %,d\n", &NameGuid, gFvFileType[Type], Size);
+            AsciiPrint ("%,6d %7a %g\n", Size, TypeStr, &NameGuid);
             if (EblAnyKeyToContinueQtoQuit (&CurrentRow, FALSE)) {
               break;
             }
