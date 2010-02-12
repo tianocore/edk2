@@ -581,6 +581,16 @@ SimpleNetworkDriverStart (
     Snp->Mode.MediaPresentSupported = FALSE;
   }
 
+  switch (InitStatFlags & PXE_STATFLAGS_GET_STATUS_NO_MEDIA_MASK) {
+  case PXE_STATFLAGS_GET_STATUS_NO_MEDIA_SUPPORTED:
+    Snp->MediaStatusSupported = TRUE;
+    break;
+
+  case PXE_STATFLAGS_GET_STATUS_NO_MEDIA_NOT_SUPPORTED:
+  default:
+    Snp->MediaStatusSupported = FALSE;
+  }
+
   if ((Pxe->hw.Implementation & PXE_ROMID_IMP_STATION_ADDR_SETTABLE) != 0) {
     Snp->Mode.MacAddressChangeable = TRUE;
   } else {
