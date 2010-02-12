@@ -3,7 +3,7 @@
   structure prototypes, global variables and constants that
   are needed for porting PXE to EFI.
   
-  Copyright (c) 2006 - 2008, Intel Corporation                                                         
+  Copyright (c) 2006 - 2010, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -15,6 +15,10 @@
   @par Revision Reference:
   32/64-bit PXE specification:
   alpha-4, 99-Dec-17
+
+  @attention The PXE_OPFLAGS_GET_MEDIA_STATUS and PXE_STATFLAGS_GET_STATUS_NO_MEDIA_xxx
+  are not defined in current UEFI spec (v2.3, approved May, 09), they will be
+  added by following erratas.
   
 **/
 
@@ -369,6 +373,11 @@ typedef PXE_UINT16  PXE_OPFLAGS;
 #define PXE_OPFLAGS_GET_TRANSMITTED_BUFFERS 0x0002
 
 ///
+/// Return current media status.
+///
+#define PXE_OPFLAGS_GET_MEDIA_STATUS    0x0004
+
+///
 /// UNDI Fill Header
 ///
 #define PXE_OPFLAGS_FILL_HEADER_OPMASK      0x0001
@@ -437,6 +446,10 @@ typedef PXE_UINT16  PXE_STATFLAGS;
 #define PXE_STATFLAGS_CABLE_DETECT_MASK           0x0001
 #define PXE_STATFLAGS_CABLE_DETECT_NOT_SUPPORTED  0x0000
 #define PXE_STATFLAGS_CABLE_DETECT_SUPPORTED      0x0001
+
+#define PXE_STATFLAGS_GET_STATUS_NO_MEDIA_MASK           0x0002
+#define PXE_STATFLAGS_GET_STATUS_NO_MEDIA_NOT_SUPPORTED  0x0000
+#define PXE_STATFLAGS_GET_STATUS_NO_MEDIA_SUPPORTED      0x0002
 
 ///
 /// UNDI Initialize
@@ -565,6 +578,11 @@ typedef PXE_UINT16  PXE_STATFLAGS;
 /// into the DB.  (This could be because DBsize was too small.)
 ///
 #define PXE_STATFLAGS_GET_STATUS_NO_TXBUFS_WRITTEN  0x0020
+
+///
+/// This flag is set if there is no media detected.
+///
+#define PXE_STATFLAGS_GET_STATUS_NO_MEDIA  0x0040
 
 ///
 /// UNDI Fill Header
