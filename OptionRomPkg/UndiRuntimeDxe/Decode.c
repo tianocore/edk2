@@ -1,7 +1,7 @@
 /** @file
   Provides the basic UNID functions.
 
-Copyright (c) 2006 - 2009, Intel Corporation
+Copyright (c) 2006 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -264,7 +264,8 @@ UNDI_GetInitInfo (
   DbPtr->SupportedLoopBackModes = PXE_LOOPBACK_INTERNAL_SUPPORTED |
                     PXE_LOOPBACK_EXTERNAL_SUPPORTED;
 
-  CdbPtr->StatFlags |= PXE_STATFLAGS_CABLE_DETECT_SUPPORTED;
+  CdbPtr->StatFlags |= (PXE_STATFLAGS_CABLE_DETECT_SUPPORTED |
+                        PXE_STATFLAGS_GET_STATUS_NO_MEDIA_SUPPORTED);
   return ;
 }
 
@@ -1083,6 +1084,18 @@ UNDI_Status (
 
     if ((Status & SCB_STATUS_SWI) != 0) {
       CdbPtr->StatFlags |= PXE_STATFLAGS_GET_STATUS_SOFTWARE;
+    }
+  }
+
+  //
+  // Return current media status
+  //
+  if ((CdbPtr->OpFlags & PXE_OPFLAGS_GET_MEDIA_STATUS) != 0) {
+    AdapterInfo->PhyAddress = 0xFF;
+    AdapterInfo->CableDetect = 1;
+
+    if (!PhyDetect (AdapterInfo)) {
+      CdbPtr->StatFlags |= PXE_STATFLAGS_GET_STATUS_NO_MEDIA;
     }
   }
 
