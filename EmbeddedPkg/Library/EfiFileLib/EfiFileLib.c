@@ -519,6 +519,8 @@ EblFvFileDevicePath (
   EFI_LBA                             Lba;
   UINTN                               BlockSize;
   UINTN                               NumberOfBlocks;
+  EFI_FIRMWARE_VOLUME_HEADER          *FvHeader = NULL;
+  UINTN                               Index;
 
 
   Status = gBS->HandleProtocol (File->EfiHandle, &gEfiFirmwareVolume2ProtocolGuid, (VOID **)&File->Fv);
@@ -531,7 +533,13 @@ EblFvFileDevicePath (
   if (!EFI_ERROR (Status)) {
     Status = Fvb->GetPhysicalAddress (Fvb, &File->FvStart);
     if (!EFI_ERROR (Status)) {
-      for (Lba = 0, File->FvSize = 0; ; File->FvSize += (BlockSize * NumberOfBlocks), Lba += NumberOfBlocks) {
+      FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)File->FvStart;
+      File->FvHeaderSize = sizeof (EFI_FIRMWARE_VOLUME_HEADER);
+      for (Index = 0; FvHeader->BlockMap[Index].Length !=0; Index++) {
+        File->FvHeaderSize += sizeof (EFI_FV_BLOCK_MAP_ENTRY);
+      }
+      
+      for (Lba = 0, File->FvSize = 0, NumberOfBlocks = 0; ; File->FvSize += (BlockSize * NumberOfBlocks), Lba += NumberOfBlocks) {
         Status = Fvb->GetBlockSize (Fvb, Lba, &BlockSize, &NumberOfBlocks);
         if (EFI_ERROR (Status)) {
           break;

@@ -314,7 +314,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED const EBL_COMMAND_TABLE mCmdHwDebugTemplate[] =
   },
   {
     "mfill",
-    "[.{1|2|4}] Addr Len [data] [1|2|4]; Memory Fill Addr Len*(1|2|4) bytes of data(0)",
+    "[.{1|2|4}] Addr Len [data]; Memory Fill Addr Len*(1|2|4) bytes of data(0)",
     NULL,
     EblMfillCmd
   },

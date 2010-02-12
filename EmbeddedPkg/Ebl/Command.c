@@ -220,6 +220,26 @@ EblGetCommand (
 }
 
 
+UINTN
+CountNewLines (
+  IN CHAR8  *Str
+  )
+{
+  UINTN Count;
+  
+  if (Str == NULL) {
+    return 0;
+  }
+  
+  for (Count = 0; *Str != '\0'; Str++) {
+    if (Str[Count] == '\n') {
+      Count++;
+    }
+  }
+  
+  return Count;
+}
+
 
 /**
   List out help information on all the commands or print extended information 
@@ -243,16 +263,22 @@ EblHelpCmd (
 {
   UINTN   Index;
   CHAR8   *Ptr;
-  UINTN   CurrentRow;
+  UINTN   CurrentRow = 0;
 
   if (Argc == 1) {
     // Print all the commands
     AsciiPrint ("Embedded Boot Loader (EBL) commands (help command for more info):\n");
+    CurrentRow++;
     for (Index = 0; Index < mCmdTableNextFreeIndex; Index++) {
       EblSetTextColor (EFI_YELLOW);
       AsciiPrint (" %a", mCmdTable[Index]->Name);
       EblSetTextColor (0);
       AsciiPrint ("%a\n", mCmdTable[Index]->HelpSummary);
+      // Handle multi line help summaries
+      CurrentRow += CountNewLines (mCmdTable[Index]->HelpSummary);
+      if (EblAnyKeyToContinueQtoQuit (&CurrentRow, FALSE)) {
+        break;
+      }
     }
   } else if (Argv[1] != NULL) {
     // Print specific help 
@@ -260,6 +286,8 @@ EblHelpCmd (
       if (AsciiStriCmp (Argv[1], mCmdTable[Index]->Name) == 0) {
         Ptr = (mCmdTable[Index]->Help == NULL) ? mCmdTable[Index]->HelpSummary : mCmdTable[Index]->Help;
         AsciiPrint ("%a%a\n", Argv[1], Ptr);
+        // Handle multi line help summaries
+        CurrentRow += CountNewLines (Ptr);
         if (EblAnyKeyToContinueQtoQuit (&CurrentRow, FALSE)) {
           break;
         }
@@ -847,7 +875,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED const EBL_COMMAND_TABLE mCmdTemplate[] =
   },
   {
     "hexdump",
-    "[.{1|2|4}] filename [Offset] [Size]; dump a file as hex bytes at a given width",
+    "[.{1|2|4}] filename [Offset] [Size]; dump a file as hex .width",
     NULL,
     EblHexdumpCmd
   }

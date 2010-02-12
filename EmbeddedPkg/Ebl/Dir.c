@@ -90,6 +90,7 @@ EblDirCmd (
   CHAR16                        UnicodeFileName[MAX_CMD_LINE];
   CHAR8                         *Path;
   CHAR8                         *TypeStr;
+  UINTN                         TotalSize;
 
 
   if (Argc <= 1) {
@@ -143,6 +144,7 @@ EblDirCmd (
       }
     }
 
+    TotalSize = 0;
     Fv = File->Fv;
     Key = 0;
     CurrentRow = 0;
@@ -157,6 +159,7 @@ EblDirCmd (
                                 &Size
                                 );
       if (!EFI_ERROR (GetNextFileStatus)) {
+        TotalSize += Size;
         // Calculate size of entire file
         Section = NULL;
         Size = 0;
@@ -170,8 +173,8 @@ EblDirCmd (
                       &AuthenticationStatus
                       );
         if (!((Status == EFI_BUFFER_TOO_SMALL) || !EFI_ERROR (Status))) {
-           // EFI_SUCCESS or EFI_BUFFER_TOO_SMALL mean size is valid 
-            Size = 0;
+          // EFI_SUCCESS or EFI_BUFFER_TOO_SMALL mean size is valid 
+          Size = 0;
         }
         
         TypeStr = (Type <= EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE) ? gFvFileType[Type] : "UNKNOWN";
@@ -189,7 +192,7 @@ EblDirCmd (
                         );
         if (!EFI_ERROR (Status)) {
           if (StrStr (Section, MatchSubString) != NULL) {
-            AsciiPrint ("%,6d %7a %g %s\n", Size, TypeStr, &NameGuid, Section);
+            AsciiPrint ("%,9d %7a %g %s\n", Size, TypeStr, &NameGuid, Section);
             if (EblAnyKeyToContinueQtoQuit (&CurrentRow, FALSE)) {
               break;
             }
@@ -197,7 +200,7 @@ EblDirCmd (
           FreePool (Section);
         } else {
           if (*MatchSubString == '\0') {
-            AsciiPrint ("%,6d %7a %g\n", Size, TypeStr, &NameGuid);
+            AsciiPrint ("%,9d %7a %g\n", Size, TypeStr, &NameGuid);
             if (EblAnyKeyToContinueQtoQuit (&CurrentRow, FALSE)) {
               break;
             }
@@ -206,6 +209,11 @@ EblDirCmd (
       }
     } while (!EFI_ERROR (GetNextFileStatus));
        
+    if (SearchType == EFI_FV_FILETYPE_ALL) {
+      AsciiPrint ("%,20d bytes in files %,d bytes free\n", TotalSize, File->FvSize - File->FvHeaderSize - TotalSize);
+    }
+    
+    
   } else if ((File->Type == EfiOpenFileSystem) || (File->Type == EfiOpenBlockIo)) {
     // Simple File System DIR
 

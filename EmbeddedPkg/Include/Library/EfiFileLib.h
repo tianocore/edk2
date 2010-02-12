@@ -87,7 +87,8 @@ typedef struct {
   EFI_FV_FILE_ATTRIBUTES        FvAttributes;     
 
   EFI_PHYSICAL_ADDRESS          FvStart;          
-  UINTN                         FvSize;           
+  UINTN                         FvSize;      
+  UINTN                         FvHeaderSize;
 
   EFI_FILE                      *FsFileHandle;    // Information valid for Fs#:
   EFI_FILE_SYSTEM_INFO          *FsInfo;
