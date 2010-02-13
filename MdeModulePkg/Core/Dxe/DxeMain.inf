@@ -136,6 +136,7 @@
   gEfiHiiPackageListProtocolGuid                ## SOMETIMES_PRODUCES
   gEfiEbcProtocolGuid                           ## SOMETIMES_CONSUMES
   gEfiLoadedImageDevicePathProtocolGuid         ## PRODUCES
+  gEfiSmmBase2ProtocolGuid                      ## SOMETIMES_CONSUMES
 
 [FeaturePcd.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport	   ## CONSUMES

@@ -30,6 +30,11 @@ EFI_BDS_ARCH_PROTOCOL             *gBds           = NULL;
 EFI_WATCHDOG_TIMER_ARCH_PROTOCOL  *gWatchdogTimer = NULL;
 
 //
+// DXE Core globals for optional protocol dependencies
+//
+EFI_SMM_BASE2_PROTOCOL            *gSmmBase2      = NULL;
+
+//
 // DXE Core Global used to update core loaded image protocol handle
 //
 EFI_GUID                           *gDxeCoreFileName;
