@@ -1,7 +1,7 @@
 /** @file
   Task priority (TPL) functions.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -26,12 +26,23 @@ CoreSetInterruptState (
   IN BOOLEAN      Enable
   )
 {
-  if (gCpu != NULL) {
-    if (Enable) {
-      gCpu->EnableInterrupt(gCpu);
-    } else {
-      gCpu->DisableInterrupt(gCpu);
-    }
+  EFI_STATUS  Status;
+  BOOLEAN     InSmm;
+  
+  if (gCpu == NULL) {
+    return;
+  }
+  if (!Enable) {
+    gCpu->DisableInterrupt (gCpu);
+    return;
+  }
+  if (gSmmBase2 == NULL) {
+    gCpu->EnableInterrupt (gCpu);
+    return;
+  }
+  Status = gSmmBase2->InSmm (gSmmBase2, &InSmm);
+  if (!EFI_ERROR (Status) && !InSmm) {
+    gCpu->EnableInterrupt(gCpu);
   }
 }
 

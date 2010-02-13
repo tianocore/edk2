@@ -2,7 +2,7 @@
   The internal header file includes the common header files, defines
   internal structure and functions used by DxeCore module.
 
-Copyright (c) 2006 - 2009, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -50,6 +50,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/BusSpecificDriverOverride.h>
 #include <Protocol/TcgService.h>
 #include <Protocol/HiiPackageList.h>
+#include <Protocol/SmmBase2.h>
 #include <Guid/MemoryTypeInformation.h>
 #include <Guid/FirmwareFileSystem2.h>
 #include <Guid/HobList.h>
@@ -116,6 +117,7 @@ typedef struct {
   EFI_EVENT                   Event;
   VOID                        *Registration;
   BOOLEAN                     Present;
+  BOOLEAN                     ArchitecturalProtocol;
 } ARCHITECTURAL_PROTOCOL_ENTRY;
 
 //
@@ -194,6 +196,7 @@ extern EFI_METRONOME_ARCH_PROTOCOL              *gMetronome;
 extern EFI_TIMER_ARCH_PROTOCOL                  *gTimer;
 extern EFI_SECURITY_ARCH_PROTOCOL               *gSecurity;
 extern EFI_BDS_ARCH_PROTOCOL                    *gBds;
+extern EFI_SMM_BASE2_PROTOCOL                   *gSmmBase2;
 
 extern EFI_TPL                                  gEfiCurrentTpl;
 

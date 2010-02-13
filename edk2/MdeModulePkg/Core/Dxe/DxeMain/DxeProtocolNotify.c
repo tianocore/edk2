@@ -3,7 +3,7 @@
   the Dxe Core. The mArchProtocols[] array represents a list of
   events that represent the Architectural Protocols.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -27,19 +27,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 
 ARCHITECTURAL_PROTOCOL_ENTRY  mArchProtocols[] = {
-  { &gEfiSecurityArchProtocolGuid,         (VOID **)&gSecurity,      NULL, NULL, FALSE },
-  { &gEfiCpuArchProtocolGuid,              (VOID **)&gCpu,           NULL, NULL, FALSE },
-  { &gEfiMetronomeArchProtocolGuid,        (VOID **)&gMetronome,     NULL, NULL, FALSE },
-  { &gEfiTimerArchProtocolGuid,            (VOID **)&gTimer,         NULL, NULL, FALSE },
-  { &gEfiBdsArchProtocolGuid,              (VOID **)&gBds,           NULL, NULL, FALSE },
-  { &gEfiWatchdogTimerArchProtocolGuid,    (VOID **)&gWatchdogTimer, NULL, NULL, FALSE },
-  { &gEfiRuntimeArchProtocolGuid,          (VOID **)&gRuntime,       NULL, NULL, FALSE },
-  { &gEfiVariableArchProtocolGuid,         (VOID **)NULL,            NULL, NULL, FALSE },
-  { &gEfiVariableWriteArchProtocolGuid,    (VOID **)NULL,            NULL, NULL, FALSE },
-  { &gEfiCapsuleArchProtocolGuid,          (VOID **)NULL,            NULL, NULL, FALSE },
-  { &gEfiMonotonicCounterArchProtocolGuid, (VOID **)NULL,            NULL, NULL, FALSE },
-  { &gEfiResetArchProtocolGuid,            (VOID **)NULL,            NULL, NULL, FALSE },
-  { &gEfiRealTimeClockArchProtocolGuid,    (VOID **)NULL,            NULL, NULL, FALSE }
+  { &gEfiSecurityArchProtocolGuid,         (VOID **)&gSecurity,      NULL, NULL, FALSE, TRUE  },
+  { &gEfiCpuArchProtocolGuid,              (VOID **)&gCpu,           NULL, NULL, FALSE, TRUE  },
+  { &gEfiMetronomeArchProtocolGuid,        (VOID **)&gMetronome,     NULL, NULL, FALSE, TRUE  },
+  { &gEfiTimerArchProtocolGuid,            (VOID **)&gTimer,         NULL, NULL, FALSE, TRUE  },
+  { &gEfiBdsArchProtocolGuid,              (VOID **)&gBds,           NULL, NULL, FALSE, TRUE  },
+  { &gEfiWatchdogTimerArchProtocolGuid,    (VOID **)&gWatchdogTimer, NULL, NULL, FALSE, TRUE  },
+  { &gEfiRuntimeArchProtocolGuid,          (VOID **)&gRuntime,       NULL, NULL, FALSE, TRUE  },
+  { &gEfiVariableArchProtocolGuid,         (VOID **)NULL,            NULL, NULL, FALSE, TRUE  },
+  { &gEfiVariableWriteArchProtocolGuid,    (VOID **)NULL,            NULL, NULL, FALSE, TRUE  },
+  { &gEfiCapsuleArchProtocolGuid,          (VOID **)NULL,            NULL, NULL, FALSE, TRUE  },
+  { &gEfiMonotonicCounterArchProtocolGuid, (VOID **)NULL,            NULL, NULL, FALSE, TRUE  },
+  { &gEfiResetArchProtocolGuid,            (VOID **)NULL,            NULL, NULL, FALSE, TRUE  },
+  { &gEfiRealTimeClockArchProtocolGuid,    (VOID **)NULL,            NULL, NULL, FALSE, TRUE  },
+  { &gEfiSmmBase2ProtocolGuid,             (VOID **)&gSmmBase2,      NULL, NULL, FALSE, FALSE }
 };
 
 //
@@ -81,7 +82,7 @@ CoreAllEfiServicesAvailable (
   UINTN        Index;
 
   for (Index = 0; Index < sizeof (mArchProtocols) / sizeof (mArchProtocols[0]); Index++) {
-    if (!mArchProtocols[Index].Present) {
+    if (mArchProtocols[Index].ArchitecturalProtocol && !mArchProtocols[Index].Present) {
       return EFI_NOT_FOUND;
     }
   }
