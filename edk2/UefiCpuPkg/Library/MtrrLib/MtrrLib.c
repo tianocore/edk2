@@ -144,28 +144,27 @@ PreMtrrChange (
   //
   // Enter no fill cache mode, CD=1(Bit30), NW=0 (Bit29)
   //
-  Value = AsmReadCr0 ();
-  Value = (UINTN) BitFieldWrite64 (Value, 30, 30, 1);
-  Value = (UINTN) BitFieldWrite64 (Value, 29, 29, 0);
-  AsmWriteCr0 (Value);
+  AsmDisableCache ();
+
   //
-  // Flush cache
-  //
-  AsmWbinvd ();
-  //
-  // Clear PGE flag Bit 7
+  // Save original CR4 value and clear PGE flag (Bit 7)
   //
   Value = AsmReadCr4 ();
-  AsmWriteCr4 ((UINTN) BitFieldWrite64 (Value, 7, 7, 0));
+  AsmWriteCr4 (Value & (~BIT7));
+
   //
   // Flush all TLBs
   //
   CpuFlushTlb ();
+
   //
   // Disable Mtrrs
   //
   AsmMsrBitFieldWrite64 (MTRR_LIB_IA32_MTRR_DEF_TYPE, 10, 11, 0);
 
+  //
+  // Return original CR4 value
+  //
   return Value;
 }
 
@@ -184,30 +183,25 @@ PostMtrrChange (
   UINTN Cr4
   )
 {
-  UINTN  Value;
-
   //
   // Enable Cache MTRR
   //
   AsmMsrBitFieldWrite64 (MTRR_LIB_IA32_MTRR_DEF_TYPE, 10, 11, 3);
 
   //
-  // Flush all TLBs and cache the second time
+  // Flush all TLBs 
   //
-  AsmWbinvd ();
   CpuFlushTlb ();
 
   //
   // Enable Normal Mode caching CD=NW=0, CD(Bit30), NW(Bit29)
   //
-  Value = AsmReadCr0 ();
-  Value = (UINTN) BitFieldWrite64 (Value, 30, 30, 0);
-  Value = (UINTN) BitFieldWrite64 (Value, 29, 29, 0);
-  AsmWriteCr0 (Value);
+  AsmEnableCache ();
 
+  //
+  // Restore original CR4 value
+  //
   AsmWriteCr4 (Cr4);
-
-  return ;
 }
 
 
