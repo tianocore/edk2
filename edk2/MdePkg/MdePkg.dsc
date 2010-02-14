@@ -152,6 +152,7 @@
   MdePkg/Library/SmmIoLibSmmCpuIo2/SmmIoLibSmmCpuIo2.inf
   MdePkg/Library/SmmPciLibPciRootBridgeIo/SmmPciLibPciRootBridgeIo.inf
   MdePkg/Library/SmmServicesTableLib/SmmServicesTableLib.inf
+  MdePkg/Library/SmmMemoryAllocationLib/SmmMemoryAllocationLib.inf
 
 [Components.IPF]
   MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
