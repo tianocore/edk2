@@ -16,38 +16,6 @@
 
 #include "SmmCpuIoLibInternal.h"
 
-//
-// Globle varible to cache pointer to CpuIo protocol.
-//
-EFI_SMM_CPU_IO2_PROTOCOL  *mCpuIo2 = NULL;
-
-/**
-  The constructor function caches the pointer to CpuIo protocol.
-
-  The constructor function locates CpuIo protocol from protocol database.
-  It will ASSERT() if that operation fails and it will always return EFI_SUCCESS.
-
-  @param  ImageHandle   The firmware allocated handle for the EFI image.
-  @param  SystemTable   A pointer to the EFI System Table.
-
-  @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
-
-**/
-EFI_STATUS
-EFIAPI
-IoLibConstructor (
-  IN      EFI_HANDLE                ImageHandle,
-  IN      EFI_SYSTEM_TABLE          *SystemTable
-  )
-{
-  EFI_STATUS                        Status;
-
-  Status = gSmst->SmmLocateProtocol (&gEfiSmmCpuIo2ProtocolGuid, NULL, (VOID **) &mCpuIo2);
-  ASSERT_EFI_ERROR (Status);
-
-  return Status;
-}
-
 /**
   Reads registers in the EFI CPU I/O space.
 
@@ -72,7 +40,7 @@ IoReadWorker (
   EFI_STATUS                        Status;
   UINT64                            Data;
 
-  Status = mCpuIo2->Io.Read (mCpuIo2, Width, Port, 1, &Data);
+  Status = gSmst->SmmIo.Io.Read (&gSmst->SmmIo, Width, Port, 1, &Data);
   ASSERT_EFI_ERROR (Status);
 
   return Data;
@@ -103,7 +71,7 @@ IoWriteWorker (
 {
   EFI_STATUS                        Status;
 
-  Status = mCpuIo2->Io.Write (mCpuIo2, Width, Port, 1, &Data);
+  Status = gSmst->SmmIo.Io.Write (&gSmst->SmmIo, Width, Port, 1, &Data);
   ASSERT_EFI_ERROR (Status);
 
   return Data;
@@ -133,7 +101,7 @@ MmioReadWorker (
   EFI_STATUS                        Status;
   UINT64                            Data;
 
-  Status = mCpuIo2->Mem.Read (mCpuIo2, Width, Address, 1, &Data);
+  Status = gSmst->SmmIo.Mem.Read (&gSmst->SmmIo, Width, Address, 1, &Data);
   ASSERT_EFI_ERROR (Status);
 
   return Data;
@@ -164,7 +132,7 @@ MmioWriteWorker (
 {
   EFI_STATUS                        Status;
 
-  Status = mCpuIo2->Mem.Write (mCpuIo2, Width, Address, 1, &Data);
+  Status = gSmst->SmmIo.Mem.Write (&gSmst->SmmIo, Width, Address, 1, &Data);
   ASSERT_EFI_ERROR (Status);
 
   return Data;
