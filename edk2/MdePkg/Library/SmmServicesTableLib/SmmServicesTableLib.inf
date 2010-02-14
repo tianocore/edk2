@@ -1,7 +1,7 @@
 #/** @file
 # SMM Services Table Library.
 #
-# Copyright (c) 2009, Intel Corporation.
+# Copyright (c) 2009 - 2010, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -20,28 +20,24 @@
   MODULE_TYPE                    = DXE_SMM_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = SmmServicesTableLib|SMM_CORE DXE_SMM_DRIVER
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
   PI_SPECIFICATION_VERSION       = 0x0001000A
-
   CONSTRUCTOR                    = SmmServicesTableLibConstructor
 
 #
 #  VALID_ARCHITECTURES           = IA32 X64
 #
 
-[Sources.common]
+[Sources]
   SmmServicesTableLib.c
 
 [Packages]
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
-  UefiBootServicesTableLib
   DebugLib
 
 [Protocols]
   gEfiSmmBase2ProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED
 
-[Depex.common.DXE_DRIVER]
+[Depex]
   gEfiSmmBase2ProtocolGuid
