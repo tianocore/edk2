@@ -22,7 +22,6 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = IoLib|DXE_SMM_DRIVER SMM_CORE
   PI_SPECIFICATION_VERSION       = 0x0001000A
-  CONSTRUCTOR                    = IoLibConstructor
 
 #
 # The following information is for reference only and not required by the build tools.
