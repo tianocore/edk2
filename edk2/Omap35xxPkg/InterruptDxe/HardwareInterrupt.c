@@ -54,10 +54,10 @@ ExitBootServicesEvent (
   )
 {
   // Disable all interrupts
-  MmioWrite32(INTCPS_MIR(0), 0xFFFFFFFF);
-  MmioWrite32(INTCPS_MIR(1), 0xFFFFFFFF);
-  MmioWrite32(INTCPS_MIR(2), 0xFFFFFFFF);
-  MmioWrite32(INTCPS_CONTROL, INTCPS_CONTROL_NEWIRQAGR);
+  MmioWrite32 (INTCPS_MIR(0), 0xFFFFFFFF);
+  MmioWrite32 (INTCPS_MIR(1), 0xFFFFFFFF);
+  MmioWrite32 (INTCPS_MIR(2), 0xFFFFFFFF);
+  MmioWrite32 (INTCPS_CONTROL, INTCPS_CONTROL_NEWIRQAGR);
 }
 
 /**
@@ -125,7 +125,7 @@ EnableInterruptSource (
   Bank = Source / 32;
   Bit  = 1UL << (Source % 32);
   
-  MmioWrite32(INTCPS_MIR_CLEAR(Bank), Bit);
+  MmioWrite32 (INTCPS_MIR_CLEAR(Bank), Bit);
   
   return EFI_SUCCESS;
 }
@@ -159,7 +159,7 @@ DisableInterruptSource(
   Bank = Source / 32;
   Bit  = 1UL << (Source % 32);
   
-  MmioWrite32(INTCPS_MIR_SET(Bank), Bit);
+  MmioWrite32 (INTCPS_MIR_SET(Bank), Bit);
   
   return EFI_SUCCESS;
 }
@@ -235,7 +235,7 @@ IrqInterruptHandler (
   Vector = MmioRead32(INTCPS_SIR_IRQ) & INTCPS_SIR_IRQ_MASK;
 
   // Needed to prevent infinite nesting when Time Driver lowers TPL
-  MmioWrite32(INTCPS_CONTROL, INTCPS_CONTROL_NEWIRQAGR);
+  MmioWrite32 (INTCPS_CONTROL, INTCPS_CONTROL_NEWIRQAGR);
 
   InterruptHandler = gRegisteredInterruptHandlers[Vector];
   if (InterruptHandler != NULL) {
@@ -244,7 +244,7 @@ IrqInterruptHandler (
   }
   
   // Needed to clear after running the handler
-  MmioWrite32(INTCPS_CONTROL, INTCPS_CONTROL_NEWIRQAGR);
+  MmioWrite32 (INTCPS_CONTROL, INTCPS_CONTROL_NEWIRQAGR);
 }
 
 //
@@ -316,10 +316,10 @@ InterruptDxeInitialize (
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gHardwareInterruptProtocolGuid);
 
   // Make sure all interrupts are disabled by default.
-  MmioWrite32(INTCPS_MIR(0), 0xFFFFFFFF);
-  MmioWrite32(INTCPS_MIR(1), 0xFFFFFFFF);
-  MmioWrite32(INTCPS_MIR(2), 0xFFFFFFFF);
-  MmioWrite32(INTCPS_CONTROL, INTCPS_CONTROL_NEWIRQAGR);
+  MmioWrite32 (INTCPS_MIR(0), 0xFFFFFFFF);
+  MmioWrite32 (INTCPS_MIR(1), 0xFFFFFFFF);
+  MmioWrite32 (INTCPS_MIR(2), 0xFFFFFFFF);
+  MmioWrite32 (INTCPS_CONTROL, INTCPS_CONTROL_NEWIRQAGR);
  
   Status = gBS->InstallMultipleProtocolInterfaces(&gHardwareInterruptHandle,
                                                   &gHardwareInterruptProtocolGuid,   &gHardwareInterruptProtocol,

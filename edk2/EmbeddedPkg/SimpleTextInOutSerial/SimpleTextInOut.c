@@ -64,10 +64,12 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
 #include <Library/SerialPortLib.h>
+#include <Library/PcdLib.h>
 
 #include <Protocol/SerialIo.h>
 #include <Protocol/SimpleTextIn.h>
 #include <Protocol/SimpleTextOut.h>
+#include <Protocol/DevicePath.h>
 
 
 #define MODE0_COLUMN_COUNT        80
@@ -198,7 +200,30 @@ EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL mSimpleTextOut = {
   &mSimpleTextOutMode
 };
 
- EFI_HANDLE           mInstallHandle = NULL;
+EFI_HANDLE           mInstallHandle = NULL;
+
+typedef struct {
+  VENDOR_DEVICE_PATH        Guid;
+  UART_DEVICE_PATH          Uart;
+  EFI_DEVICE_PATH_PROTOCOL  End;
+} SIMPLE_TEXT_OUT_DEVICE_PATH;
+
+SIMPLE_TEXT_OUT_DEVICE_PATH mDevicePath = {
+  {
+    { HARDWARE_DEVICE_PATH, HW_VENDOR_DP, sizeof (VENDOR_DEVICE_PATH), 0},
+    EFI_CALLER_ID_GUID
+  },
+  {
+    { END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE, sizeof (UART_DEVICE_PATH), 0},
+    0,        // Reserved
+    FixedPcdGet64 (PcdUartDefaultBaudRate),   // BaudRate
+    FixedPcdGet8 (PcdUartDefaultDataBits),    // DataBits
+    FixedPcdGet8 (PcdUartDefaultParity),      // Parity (N)
+    FixedPcdGet8 (PcdUartDefaultStopBits)     // StopBits
+  },
+  { END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE, sizeof (EFI_DEVICE_PATH_PROTOCOL), 0}
+};
+
 
 
 
@@ -270,6 +295,10 @@ ReadKeyStroke (
   )
 {
   CHAR8             Char;
+  
+  if (!SerialPortPoll ()) {
+    return EFI_NOT_READY;
+  }
   
   SerialPortRead ((UINT8 *)&Char, 1);
   
@@ -660,7 +689,8 @@ SimpleTextInOutEntryPoint (
                   &mInstallHandle,
                   &gEfiSimpleTextInProtocolGuid,   &mSimpleTextIn,
                   &gEfiSimpleTextOutProtocolGuid,  &mSimpleTextOut,
-                  NULL 
+                  &gEfiDevicePathProtocolGuid,     &mDevicePath,
+                  NULL
                   );
   if (!EFI_ERROR (Status)) {
     gST->ConOut = &mSimpleTextOut;

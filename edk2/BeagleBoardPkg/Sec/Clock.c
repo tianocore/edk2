@@ -25,9 +25,9 @@ ClockInit (
   //DPLL1 - DPLL4 are configured part of Configuration header which OMAP3 ROM parses.
 
   // Enable PLL5 and set to 120 MHz as a reference clock.
-  MmioWrite32(CM_CLKSEL4_PLL, CM_CLKSEL_PLL_MULT(120) | CM_CLKSEL_PLL_DIV(13));
-  MmioWrite32(CM_CLKSEL5_PLL, CM_CLKSEL_DIV_120M(1));
-  MmioWrite32(CM_CLKEN2_PLL, CM_CLKEN_FREQSEL_075_100 | CM_CLKEN_ENABLE);
+  MmioWrite32 (CM_CLKSEL4_PLL, CM_CLKSEL_PLL_MULT(120) | CM_CLKSEL_PLL_DIV(13));
+  MmioWrite32 (CM_CLKSEL5_PLL, CM_CLKSEL_DIV_120M(1));
+  MmioWrite32 (CM_CLKEN2_PLL, CM_CLKEN_FREQSEL_075_100 | CM_CLKEN_ENABLE);
 
   // Turn on functional & interface clocks to the USBHOST power domain
   MmioOr32(CM_FCLKEN_USBHOST, CM_FCLKEN_USBHOST_EN_USBHOST2_ENABLE

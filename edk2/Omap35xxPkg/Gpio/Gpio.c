@@ -79,12 +79,12 @@ Set (
       break;
 
     case GPIO_MODE_OUTPUT_0:
-      MmioWrite32(ClearDataOutRegister, GPIO_CLEARDATAOUT_BIT(Pin));
+      MmioWrite32 (ClearDataOutRegister, GPIO_CLEARDATAOUT_BIT(Pin));
       MmioAndThenOr32(OutputEnableRegister, ~GPIO_OE_MASK(Pin), GPIO_OE_OUTPUT(Pin));
       break;
 
     case GPIO_MODE_OUTPUT_1:
-      MmioWrite32(SetDataOutRegister, GPIO_SETDATAOUT_BIT(Pin));
+      MmioWrite32 (SetDataOutRegister, GPIO_SETDATAOUT_BIT(Pin));
       MmioAndThenOr32(OutputEnableRegister, ~GPIO_OE_MASK(Pin), GPIO_OE_OUTPUT(Pin));
       break;
 

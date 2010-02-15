@@ -53,6 +53,7 @@
   gEmbeddedTokenSpaceGuid.PcdCacheEnable
 
 [FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
   gEmbeddedTokenSpaceGuid.PcdEmbeddedFdBaseAddress
   gEmbeddedTokenSpaceGuid.PcdEmbeddedFdSize
   gEmbeddedTokenSpaceGuid.PcdFlashFvMainBase

@@ -51,5 +51,12 @@
   gEfiSerialIoProtocolGuid    
   gEfiDevicePathProtocolGuid
 
+[FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits
+
+
 [depex]
   TRUE

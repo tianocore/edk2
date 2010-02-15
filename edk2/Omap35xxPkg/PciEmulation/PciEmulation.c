@@ -63,12 +63,12 @@ ConfigureUSBHost (
   UINT8      Data = 0;
 
   // Take USB host out of force-standby mode
-  MmioWrite32(UHH_SYSCONFIG, UHH_SYSCONFIG_MIDLEMODE_NO_STANDBY
+  MmioWrite32 (UHH_SYSCONFIG, UHH_SYSCONFIG_MIDLEMODE_NO_STANDBY
                              | UHH_SYSCONFIG_CLOCKACTIVITY_ON
                              | UHH_SYSCONFIG_SIDLEMODE_NO_STANDBY
                              | UHH_SYSCONFIG_ENAWAKEUP_ENABLE    
                              | UHH_SYSCONFIG_AUTOIDLE_ALWAYS_RUN);
-  MmioWrite32(UHH_HOSTCONFIG, UHH_HOSTCONFIG_P3_CONNECT_STATUS_DISCONNECT
+  MmioWrite32 (UHH_HOSTCONFIG, UHH_HOSTCONFIG_P3_CONNECT_STATUS_DISCONNECT
                               | UHH_HOSTCONFIG_P2_CONNECT_STATUS_DISCONNECT
                               | UHH_HOSTCONFIG_P1_CONNECT_STATUS_DISCONNECT
                               | UHH_HOSTCONFIG_ENA_INCR_ALIGN_DISABLE      
@@ -80,7 +80,7 @@ ConfigureUSBHost (
 
   // USB reset (GPIO 147 - Port 5 pin 19) output high
   MmioAnd32(GPIO5_BASE + GPIO_OE, ~BIT19);
-  MmioWrite32(GPIO5_BASE + GPIO_SETDATAOUT, BIT19);
+  MmioWrite32 (GPIO5_BASE + GPIO_SETDATAOUT, BIT19);
 
   // Get the Power IC protocol.
   Status = gBS->LocateProtocol(&gEmbeddedExternalDeviceProtocolGuid, NULL, (VOID **)&gTPS65950);
