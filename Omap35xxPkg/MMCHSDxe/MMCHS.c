@@ -113,22 +113,22 @@ SendCmd (
   while ((MmioRead32(MMCHS_PSTATE) & DATI_MASK) == DATI_NOT_ALLOWED);
 
   //Provide the block size.
-  MmioWrite32(MMCHS_BLK, BLEN_512BYTES);
+  MmioWrite32 (MMCHS_BLK, BLEN_512BYTES);
 
   //Setting Data timeout counter value to max value.
   MmioAndThenOr32(MMCHS_SYSCTL, ~DTO_MASK, DTO_VAL);
 
   //Clear Status register.
-  MmioWrite32(MMCHS_STAT, 0xFFFFFFFF);
+  MmioWrite32 (MMCHS_STAT, 0xFFFFFFFF);
 
   //Set command argument register
-  MmioWrite32(MMCHS_ARG, CmdArgument);
+  MmioWrite32 (MMCHS_ARG, CmdArgument);
 
   //Enable interrupt enable events to occur
-  MmioWrite32(MMCHS_IE, CmdInterruptEnableVal);
+  MmioWrite32 (MMCHS_IE, CmdInterruptEnableVal);
 
   //Send a command
-  MmioWrite32(MMCHS_CMD, Cmd);
+  MmioWrite32 (MMCHS_CMD, Cmd);
 
   //Check for the command status.
   while (RetryCount < MAX_RETRY_COUNT) {
@@ -149,7 +149,7 @@ SendCmd (
 
     //Check if command is completed.
     if ((MmcStatus & CC) == CC) {
-      MmioWrite32(MMCHS_STAT, CC);
+      MmioWrite32 (MMCHS_STAT, CC);
       break;
     }
 
@@ -354,12 +354,12 @@ InitializeMMCHS (
   MmioOr32(CONTROL_PBIAS_LITE, (PBIASLITEVMODE0 | PBIASLITEPWRDNZ0 | PBIASSPEEDCTRL0 | PBIASLITEVMODE1 | PBIASLITEWRDNZ1));
 
   //Software reset of the MMCHS host controller.
-  MmioWrite32(MMCHS_SYSCONFIG, SOFTRESET);
+  MmioWrite32 (MMCHS_SYSCONFIG, SOFTRESET);
   gBS->Stall(1000);
   while ((MmioRead32(MMCHS_SYSSTATUS) & RESETDONE_MASK) != RESETDONE);
 
   //Soft reset for all.
-  MmioWrite32(MMCHS_SYSCTL, SRA);
+  MmioWrite32 (MMCHS_SYSCTL, SRA);
   gBS->Stall(1000);
   while ((MmioRead32(MMCHS_SYSCTL) & SRA) != 0x0);
 
@@ -373,7 +373,7 @@ InitializeMMCHS (
   //MMCHS Controller default initialization
   MmioOr32(MMCHS_CON, (OD | DW8_1_4_BIT | CEATA_OFF));
 
-  MmioWrite32(MMCHS_HCTL, (SDVS_3_0_V | DTW_1_BIT | SDBP_OFF));
+  MmioWrite32 (MMCHS_HCTL, (SDVS_3_0_V | DTW_1_BIT | SDBP_OFF));
 
   //Enable internal clock
   MmioOr32(MMCHS_SYSCTL, ICE);
@@ -403,12 +403,12 @@ PerformCardIdenfication (
   BOOLEAN    SDCmd8Supported = FALSE;
 
   //Enable interrupts.
-	MmioWrite32(MMCHS_IE, (BADA_EN | CERR_EN | DEB_EN | DCRC_EN | DTO_EN | CIE_EN |
+	MmioWrite32 (MMCHS_IE, (BADA_EN | CERR_EN | DEB_EN | DCRC_EN | DTO_EN | CIE_EN |
     CEB_EN | CCRC_EN | CTO_EN | BRR_EN | BWR_EN | TC_EN | CC_EN));
 
   //Controller INIT procedure start.
   MmioOr32(MMCHS_CON, INIT);
-  MmioWrite32(MMCHS_CMD, 0x00000000);
+  MmioWrite32 (MMCHS_CMD, 0x00000000);
   while (!(MmioRead32(MMCHS_STAT) & CC));
 
   //Wait for 1 ms
@@ -418,7 +418,7 @@ PerformCardIdenfication (
   MmioOr32(MMCHS_STAT, CC);
 
   //Retry INIT procedure.
-  MmioWrite32(MMCHS_CMD, 0x00000000);
+  MmioWrite32 (MMCHS_CMD, 0x00000000);
   while (!(MmioRead32(MMCHS_STAT) & CC));
 
   //End initialization sequence
@@ -713,7 +713,7 @@ WriteBlockData(
 
       //Write block worth of data.
       for (Count = 0; Count < DataSize; Count++) {
-        MmioWrite32(MMCHS_DATA, *DataBuffer++);
+        MmioWrite32 (MMCHS_DATA, *DataBuffer++);
       }
 
       break;

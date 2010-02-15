@@ -23,6 +23,7 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
 #include <Library/SerialPortLib.h>
+#include <Library/PcdLib.h>
 
 #include <Protocol/SerialIo.h>
 
@@ -189,7 +190,7 @@ SerialRead (
 {
   UINTN Count;
   
-  Count = SerialPortWrite (Buffer, *BufferSize);
+  Count = SerialPortRead (Buffer, *BufferSize);
   *BufferSize = Count;
   return (Count == 0) ? EFI_DEVICE_ERROR : EFI_SUCCESS;
 }
@@ -201,13 +202,13 @@ EFI_HANDLE  gHandle = NULL;
 // Template used to initailize the GDB Serial IO protocols
 //
 EFI_SERIAL_IO_MODE gSerialIoMode = {
-  0,      // ControlMask
-  0,      // Timeout
-  0,      // BaudRate
-  1,      // RceiveFifoDepth
-  0,      // DataBits
-  0,      // Parity
-  0       // StopBits
+  0,                                          // ControlMask
+  0,                                          // Timeout
+  FixedPcdGet64 (PcdUartDefaultBaudRate),     // BaudRate
+  1,                                          // RceiveFifoDepth
+  FixedPcdGet8 (PcdUartDefaultDataBits),      // DataBits
+  FixedPcdGet8 (PcdUartDefaultParity),        // Parity
+  FixedPcdGet8 (PcdUartDefaultStopBits)       // StopBits
 };
 
 
@@ -222,6 +223,28 @@ EFI_SERIAL_IO_PROTOCOL gSerialIoTemplate = {
   &gSerialIoMode
 };
   
+typedef struct {
+  VENDOR_DEVICE_PATH        Guid;
+  UART_DEVICE_PATH          Uart;
+  EFI_DEVICE_PATH_PROTOCOL  End;
+} SIMPLE_TEXT_OUT_DEVICE_PATH;
+
+SIMPLE_TEXT_OUT_DEVICE_PATH mDevicePath = {
+  {
+    { HARDWARE_DEVICE_PATH, HW_VENDOR_DP, sizeof (VENDOR_DEVICE_PATH), 0},
+    EFI_CALLER_ID_GUID // Use the drivers GUID
+  },
+  {
+    { END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE, sizeof (UART_DEVICE_PATH), 0},
+    0,        // Reserved
+    FixedPcdGet64 (PcdUartDefaultBaudRate),   // BaudRate
+    FixedPcdGet8 (PcdUartDefaultDataBits),    // DataBits
+    FixedPcdGet8 (PcdUartDefaultParity),      // Parity (N)
+    FixedPcdGet8 (PcdUartDefaultStopBits)     // StopBits
+  },
+  { END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE, sizeof (EFI_DEVICE_PATH_PROTOCOL), 0}
+};
+
 
 /**
   Initialize the state information for the Serial Io Protocol
@@ -248,7 +271,7 @@ SerialDxeInitialize (
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &gHandle, 
                   &gEfiSerialIoProtocolGuid,   &gSerialIoTemplate,
-                  &gEfiDevicePathProtocolGuid, NULL, // BugBug: Need a device path
+                  &gEfiDevicePathProtocolGuid, &mDevicePath, 
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);

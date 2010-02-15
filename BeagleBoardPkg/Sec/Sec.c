@@ -63,19 +63,19 @@ TimerInit (
                           | CM_CLKSEL_PER_CLKSEL_GPT4_SYS);
 
   // Set count & reload registers
-  MmioWrite32(TimerBaseAddress + GPTIMER_TCRR, 0x00000000);
-  MmioWrite32(TimerBaseAddress + GPTIMER_TLDR, 0x00000000);
+  MmioWrite32 (TimerBaseAddress + GPTIMER_TCRR, 0x00000000);
+  MmioWrite32 (TimerBaseAddress + GPTIMER_TLDR, 0x00000000);
 
   // Disable interrupts
-  MmioWrite32(TimerBaseAddress + GPTIMER_TIER, TIER_TCAR_IT_DISABLE | TIER_OVF_IT_DISABLE | TIER_MAT_IT_DISABLE);
+  MmioWrite32 (TimerBaseAddress + GPTIMER_TIER, TIER_TCAR_IT_DISABLE | TIER_OVF_IT_DISABLE | TIER_MAT_IT_DISABLE);
 
   // Start Timer
-  MmioWrite32(TimerBaseAddress + GPTIMER_TCLR, TCLR_AR_AUTORELOAD | TCLR_ST_ON);
+  MmioWrite32 (TimerBaseAddress + GPTIMER_TCLR, TCLR_AR_AUTORELOAD | TCLR_ST_ON);
 
   //Disable OMAP Watchdog timer (WDT2)
-  MmioWrite32(WDTIMER2_BASE + WSPR, 0xAAAA);
+  MmioWrite32 (WDTIMER2_BASE + WSPR, 0xAAAA);
   DEBUG ((EFI_D_ERROR, "Magic delay to disable watchdog timers properly.\n"));
-  MmioWrite32(WDTIMER2_BASE + WSPR, 0x5555);
+  MmioWrite32 (WDTIMER2_BASE + WSPR, 0x5555);
 }
 
 VOID
@@ -87,26 +87,26 @@ UartInit (
   UINT32  UartBaseAddress = UartBase(Uart);
 
   // Set MODE_SELECT=DISABLE before trying to initialize or modify DLL, DLH registers.
-  MmioWrite32(UartBaseAddress + UART_MDR1_REG, UART_MDR1_MODE_SELECT_DISABLE);
+  MmioWrite32 (UartBaseAddress + UART_MDR1_REG, UART_MDR1_MODE_SELECT_DISABLE);
 
   // Put device in configuration mode.
-  MmioWrite32(UartBaseAddress + UART_LCR_REG, UART_LCR_DIV_EN_ENABLE);
+  MmioWrite32 (UartBaseAddress + UART_LCR_REG, UART_LCR_DIV_EN_ENABLE);
 
   // Programmable divisor N = 48Mhz/16/115200 = 26
-  MmioWrite32(UartBaseAddress + UART_DLL_REG, 26); // low divisor
-  MmioWrite32(UartBaseAddress + UART_DLH_REG,  0); // high divisor
+  MmioWrite32 (UartBaseAddress + UART_DLL_REG, 3000000/FixedPcdGet64 (PcdUartDefaultBaudRate)); // low divisor
+  MmioWrite32 (UartBaseAddress + UART_DLH_REG,  0); // high divisor
 
   // Enter into UART operational mode.
-  MmioWrite32(UartBaseAddress + UART_LCR_REG, UART_LCR_DIV_EN_DISABLE | UART_LCR_CHAR_LENGTH_8);
+  MmioWrite32 (UartBaseAddress + UART_LCR_REG, UART_LCR_DIV_EN_DISABLE | UART_LCR_CHAR_LENGTH_8);
 
   // Force DTR and RTS output to active
-  MmioWrite32(UartBaseAddress + UART_MCR_REG, UART_MCR_RTS_FORCE_ACTIVE | UART_MCR_DTR_FORCE_ACTIVE);
+  MmioWrite32 (UartBaseAddress + UART_MCR_REG, UART_MCR_RTS_FORCE_ACTIVE | UART_MCR_DTR_FORCE_ACTIVE);
 
   // Clear & enable fifos
-  MmioWrite32(UartBaseAddress + UART_FCR_REG, UART_FCR_TX_FIFO_CLEAR | UART_FCR_RX_FIFO_CLEAR | UART_FCR_FIFO_ENABLE);  
+  MmioWrite32 (UartBaseAddress + UART_FCR_REG, UART_FCR_TX_FIFO_CLEAR | UART_FCR_RX_FIFO_CLEAR | UART_FCR_FIFO_ENABLE);  
 
   // Restore MODE_SELECT 
-  MmioWrite32(UartBaseAddress + UART_MDR1_REG, UART_MDR1_MODE_SELECT_UART_16X);
+  MmioWrite32 (UartBaseAddress + UART_MDR1_REG, UART_MDR1_MODE_SELECT_UART_16X);
 }
 
 VOID
@@ -185,30 +185,30 @@ CEntryPoint (
   VOID *HobBase;
 
   //Set up Pin muxing.
-  PadConfiguration();
+  PadConfiguration ();
 
   // Set up system clocking
-  ClockInit();
+  ClockInit ();
 
   // Build a basic HOB list
   HobBase      = (VOID *)(UINTN)(FixedPcdGet32(PcdEmbeddedFdBaseAddress) + FixedPcdGet32(PcdEmbeddedFdSize));
-  CreateHobList(MemoryBase, MemorySize, HobBase, StackBase);
+  CreateHobList (MemoryBase, MemorySize, HobBase, StackBase);
 
   // Enable program flow prediction, if supported.
-  ArmEnableBranchPrediction();
+  ArmEnableBranchPrediction ();
 
   // Initialize CPU cache
-  InitCache((UINT32)MemoryBase, (UINT32)MemorySize);
+  InitCache ((UINT32)MemoryBase, (UINT32)MemorySize);
 
   // Add memory allocation hob for relocated FD
-  BuildMemoryAllocationHob(FixedPcdGet32(PcdEmbeddedFdBaseAddress), FixedPcdGet32(PcdEmbeddedFdSize), EfiBootServicesData);
+  BuildMemoryAllocationHob (FixedPcdGet32(PcdEmbeddedFdBaseAddress), FixedPcdGet32(PcdEmbeddedFdSize), EfiBootServicesData);
 
   // Add the FVs to the hob list
-  BuildFvHob(PcdGet32(PcdFlashFvMainBase), PcdGet32(PcdFlashFvMainSize));
+  BuildFvHob (PcdGet32(PcdFlashFvMainBase), PcdGet32(PcdFlashFvMainSize));
 
   // Start talking
-  UartInit();
-  DEBUG((EFI_D_ERROR, "UART Enabled\n"));
+  UartInit ();
+  DEBUG ((EFI_D_ERROR, "UART Enabled\n"));
 
   DEBUG_CODE_BEGIN ();
     //
@@ -251,33 +251,32 @@ CEntryPoint (
       }
     }
 
-   DEBUG_CODE_END ();
+   
+  DEBUG_CODE_END ();
 
 
 
   // Start up a free running time so that the timer lib will work
-  TimerInit();
+  TimerInit ();
 
   // SEC phase needs to run library constructors by hand.
-  ExtractGuidedSectionLibConstructor();
-  LzmaDecompressLibConstructor();
+  ExtractGuidedSectionLibConstructor ();
+  LzmaDecompressLibConstructor ();
 
   // Build HOBs to pass up our version of stuff the DXE Core needs to save space
-#if 0
   BuildPeCoffLoaderHob ();
   BuildExtractSectionHob (
     &gLzmaCustomDecompressGuid,
     LzmaGuidedSectionGetInfo,
     LzmaGuidedSectionExtraction
     );
-#endif
 
   DecompressFirstFv ();
 
   // Load the DXE Core and transfer control to it
-  LoadDxeCoreFromFv(NULL, 0);
+  LoadDxeCoreFromFv (NULL, 0);
   
   // DXE Core should always load and never return
-  ASSERT(FALSE);
+  ASSERT (FALSE);
 }
 
