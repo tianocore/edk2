@@ -609,7 +609,7 @@ UncachedSafeFreePool (
 **/
 EFI_STATUS
 EFIAPI
-DebugUncachedMemoryAllocationLibConstructor (
+UncachedMemoryAllocationLibConstructor (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )

@@ -339,7 +339,7 @@ THUMB_INSTRUCTIONS gOpThumb2[] = {
   { "LDR",   0xf8500800, 0xfff00800,  LDM_REG_IMM8 },           // LDR    <rt>, [<rn>, {, #<imm8>]}
   { "LDRBT", 0xf8100e00, 0xfff00f00,  LDM_REG_IMM8 },           // LDRBT  <rt>, [<rn>, {, #<imm8>]}
   { "LDRHT", 0xf8300e00, 0xfff00f00,  LDM_REG_IMM8 },           // LDRHT  <rt>, [<rn>, {, #<imm8>]}
-  { "LDRSB", 0xf9900800, 0xfff00800,  LDM_REG_IMM8 },           // LDRHT  <rt>, [<rn>, {, #<imm8>]}  {!} form? 
+  { "LDRSB", 0xf9100800, 0xfff00800,  LDM_REG_IMM8 },           // LDRHT  <rt>, [<rn>, {, #<imm8>]}  {!} form? 
   { "LDRSBT",0xf9100e00, 0xfff00f00,  LDM_REG_IMM8 },           // LDRHBT <rt>, [<rn>, {, #<imm8>]}  {!} form? 
   { "LDRSH" ,0xf9300800, 0xfff00800,  LDM_REG_IMM8 },           // LDRSH  <rt>, [<rn>, {, #<imm8>]}  
   { "LDRSHT",0xf9300e00, 0xfff00f00,  LDM_REG_IMM8 },           // LDRSHT <rt>, [<rn>, {, #<imm8>]}   
@@ -791,7 +791,6 @@ DisassembleThumbInstruction (
         return;
 
       case LDM_REG_IMM8:
-        ASSERT (FALSE);
         // <rt>, [<rn>, {, #<imm8>}]{!}
         W = (OpCode32 & BIT8) == BIT8;
         U = (OpCode32 & BIT9) == BIT9;
@@ -801,10 +800,10 @@ DisassembleThumbInstruction (
           if ((OpCode32 && 0xff) == 0) {
             AsciiSPrint (&Buf[Offset], Size - Offset, "]%a", W?"!":"");
           } else {
-            AsciiSPrint (&Buf[Offset], Size - Offset, ", #%a0x%x]%a", OpCode32 & 0xff, U?"":"-" , W?"!":"");
+            AsciiSPrint (&Buf[Offset], Size - Offset, ", #%a0x%x]%a", U?"":"-" , OpCode32 & 0xff, W?"!":"");
           }
         } else {
-          AsciiSPrint (&Buf[Offset], Size - Offset, "], #%a0x%x]", OpCode32 & 0xff, U?"":"-");
+          AsciiSPrint (&Buf[Offset], Size - Offset, "], #%a0x%x", U?"":"-", OpCode32 & 0xff);
         }
         return;
 
