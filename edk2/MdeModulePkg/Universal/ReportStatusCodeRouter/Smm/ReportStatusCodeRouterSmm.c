@@ -2,7 +2,7 @@
   Report Status Code Router Driver which produces SMM Report Stataus Code Handler Protocol
   and SMM Status Code Protocol.
 
-  Copyright (c) 2009, Intel Corporation
+  Copyright (c) 2009 -2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -54,9 +54,8 @@ Register (
   IN EFI_SMM_RSC_HANDLER_CALLBACK   Callback
   )
 {
-  EFI_STATUS                        Status;
-  LIST_ENTRY                        *Link;
-  SMM_RSC_HANDLER_CALLBACK_ENTRY    *CallbackEntry;
+  LIST_ENTRY                      *Link;
+  SMM_RSC_HANDLER_CALLBACK_ENTRY  *CallbackEntry;
 
   if (Callback == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -72,13 +71,7 @@ Register (
     }
   }
 
-  Status = gSmst->SmmAllocatePool (
-                    EfiRuntimeServicesData,
-                    sizeof (SMM_RSC_HANDLER_CALLBACK_ENTRY),
-                    (VOID**)&CallbackEntry
-                    );
-
-  ASSERT_EFI_ERROR(Status);
+  CallbackEntry = (SMM_RSC_HANDLER_CALLBACK_ENTRY *)AllocatePool (sizeof (SMM_RSC_HANDLER_CALLBACK_ENTRY));
   ASSERT (CallbackEntry != NULL);
 
   CallbackEntry->Signature          = SMM_RSC_HANDLER_CALLBACK_ENTRY_SIGNATURE;
@@ -122,7 +115,7 @@ Unregister (
       // If the function is found in list, delete it and return.
       //
       RemoveEntryList (&CallbackEntry->Node);
-      gSmst->SmmFreePool (CallbackEntry);
+      FreePool (CallbackEntry);
       return EFI_SUCCESS;
     }
   }

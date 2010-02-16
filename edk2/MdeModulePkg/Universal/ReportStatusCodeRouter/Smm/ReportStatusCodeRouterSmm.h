@@ -1,7 +1,7 @@
 /** @file
   Internal include file for Report Status Code Router Driver.
 
-  Copyright (c) 2009, Intel Corporation
+  Copyright (c) 2009 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -25,6 +25,7 @@
 #include <Library/PcdLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/SmmServicesTableLib.h>
+#include <Library/MemoryAllocationLib.h>
 
 #define SMM_RSC_HANDLER_CALLBACK_ENTRY_SIGNATURE  SIGNATURE_32 ('s', 'h', 'c', 'e')
 
