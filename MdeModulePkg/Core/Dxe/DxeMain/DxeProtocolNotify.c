@@ -16,7 +16,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "DxeMain.h"
 
-
 //
 // DXE Core Global Variables for all of the Architectural Protocols.
 // If a protocol is installed mArchProtocols[].Present will be TRUE.
@@ -25,30 +24,37 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // and mArchProtocols[].Registration as it creates events for every array
 // entry.
 //
+EFI_CORE_PROTOCOL_NOTIFY_ENTRY  mArchProtocols[] = {
+  { &gEfiSecurityArchProtocolGuid,         (VOID **)&gSecurity,      NULL, NULL, FALSE },
+  { &gEfiCpuArchProtocolGuid,              (VOID **)&gCpu,           NULL, NULL, FALSE },
+  { &gEfiMetronomeArchProtocolGuid,        (VOID **)&gMetronome,     NULL, NULL, FALSE },
+  { &gEfiTimerArchProtocolGuid,            (VOID **)&gTimer,         NULL, NULL, FALSE },
+  { &gEfiBdsArchProtocolGuid,              (VOID **)&gBds,           NULL, NULL, FALSE },
+  { &gEfiWatchdogTimerArchProtocolGuid,    (VOID **)&gWatchdogTimer, NULL, NULL, FALSE },
+  { &gEfiRuntimeArchProtocolGuid,          (VOID **)&gRuntime,       NULL, NULL, FALSE },
+  { &gEfiVariableArchProtocolGuid,         (VOID **)NULL,            NULL, NULL, FALSE },
+  { &gEfiVariableWriteArchProtocolGuid,    (VOID **)NULL,            NULL, NULL, FALSE },
+  { &gEfiCapsuleArchProtocolGuid,          (VOID **)NULL,            NULL, NULL, FALSE },
+  { &gEfiMonotonicCounterArchProtocolGuid, (VOID **)NULL,            NULL, NULL, FALSE },
+  { &gEfiResetArchProtocolGuid,            (VOID **)NULL,            NULL, NULL, FALSE },
+  { &gEfiRealTimeClockArchProtocolGuid,    (VOID **)NULL,            NULL, NULL, FALSE },
+  { NULL,                                  (VOID **)NULL,            NULL, NULL, FALSE }
+};
 
-ARCHITECTURAL_PROTOCOL_ENTRY  mArchProtocols[] = {
-  { &gEfiSecurityArchProtocolGuid,         (VOID **)&gSecurity,      NULL, NULL, FALSE, TRUE  },
-  { &gEfiCpuArchProtocolGuid,              (VOID **)&gCpu,           NULL, NULL, FALSE, TRUE  },
-  { &gEfiMetronomeArchProtocolGuid,        (VOID **)&gMetronome,     NULL, NULL, FALSE, TRUE  },
-  { &gEfiTimerArchProtocolGuid,            (VOID **)&gTimer,         NULL, NULL, FALSE, TRUE  },
-  { &gEfiBdsArchProtocolGuid,              (VOID **)&gBds,           NULL, NULL, FALSE, TRUE  },
-  { &gEfiWatchdogTimerArchProtocolGuid,    (VOID **)&gWatchdogTimer, NULL, NULL, FALSE, TRUE  },
-  { &gEfiRuntimeArchProtocolGuid,          (VOID **)&gRuntime,       NULL, NULL, FALSE, TRUE  },
-  { &gEfiVariableArchProtocolGuid,         (VOID **)NULL,            NULL, NULL, FALSE, TRUE  },
-  { &gEfiVariableWriteArchProtocolGuid,    (VOID **)NULL,            NULL, NULL, FALSE, TRUE  },
-  { &gEfiCapsuleArchProtocolGuid,          (VOID **)NULL,            NULL, NULL, FALSE, TRUE  },
-  { &gEfiMonotonicCounterArchProtocolGuid, (VOID **)NULL,            NULL, NULL, FALSE, TRUE  },
-  { &gEfiResetArchProtocolGuid,            (VOID **)NULL,            NULL, NULL, FALSE, TRUE  },
-  { &gEfiRealTimeClockArchProtocolGuid,    (VOID **)NULL,            NULL, NULL, FALSE, TRUE  },
-  { &gEfiSmmBase2ProtocolGuid,             (VOID **)&gSmmBase2,      NULL, NULL, FALSE, FALSE }
+//
+// Optional protocols that the DXE Core will use if they are present
+//
+EFI_CORE_PROTOCOL_NOTIFY_ENTRY  mOptionalProtocols[] = {
+  { &gEfiSmmBase2ProtocolGuid,             (VOID **)&gSmmBase2,      NULL, NULL, FALSE },
+  { NULL,                                  (VOID **)NULL,            NULL, NULL, FALSE }
 };
 
 //
 // Following is needed to display missing architectural protocols in debug builds
 //
 typedef struct {
-  EFI_GUID                     *ProtocolGuid;
-  CHAR8                        *GuidString;
+  EFI_GUID  *ProtocolGuid;
+  CHAR8     *GuidString;
 } GUID_TO_STRING_PROTOCOL_ENTRY;
 
 GLOBAL_REMOVE_IF_UNREFERENCED CONST GUID_TO_STRING_PROTOCOL_ENTRY mMissingProtocols[] = {
@@ -64,7 +70,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST GUID_TO_STRING_PROTOCOL_ENTRY mMissingProtoc
   { &gEfiCapsuleArchProtocolGuid,          "Capsule"            },
   { &gEfiMonotonicCounterArchProtocolGuid, "Monotonic Counter"  },
   { &gEfiResetArchProtocolGuid,            "Reset"              },
-  { &gEfiRealTimeClockArchProtocolGuid,    "Real Time Clock"    }
+  { &gEfiRealTimeClockArchProtocolGuid,    "Real Time Clock"    },
+  { NULL,                                  ""                   }
 };
 
 /**
@@ -79,14 +86,13 @@ CoreAllEfiServicesAvailable (
   VOID
   )
 {
-  UINTN        Index;
+  EFI_CORE_PROTOCOL_NOTIFY_ENTRY  *Entry;
 
-  for (Index = 0; Index < sizeof (mArchProtocols) / sizeof (mArchProtocols[0]); Index++) {
-    if (mArchProtocols[Index].ArchitecturalProtocol && !mArchProtocols[Index].Present) {
+  for (Entry = mArchProtocols; Entry->ProtocolGuid != NULL; Entry++) {
+    if (!Entry->Present) {
       return EFI_NOT_FOUND;
     }
   }
-
   return EFI_SUCCESS;
 }
 
@@ -104,119 +110,119 @@ CoreAllEfiServicesAvailable (
 **/
 VOID
 EFIAPI
-GenericArchProtocolNotify (
-  IN  EFI_EVENT       Event,
-  IN  VOID            *Context
+GenericProtocolNotify (
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
   )
 {
   EFI_STATUS                      Status;
-  ARCHITECTURAL_PROTOCOL_ENTRY    *Entry;
+  EFI_CORE_PROTOCOL_NOTIFY_ENTRY  *Entry;
   VOID                            *Protocol;
-  BOOLEAN                         Found;
   LIST_ENTRY                      *Link;
   LIST_ENTRY                      TempLinkNode;
-  UINTN                           Index;
 
-  Found = FALSE;
-  for (Index = 0; Index < sizeof (mArchProtocols) / sizeof (mArchProtocols[0]); Index++) {
-    Entry = &mArchProtocols[Index];
+  //
+  // Get Entry from Context
+  //
+  Entry = (EFI_CORE_PROTOCOL_NOTIFY_ENTRY *)Context;
 
-    Status = CoreLocateProtocol (Entry->ProtocolGuid, Entry->Registration, &Protocol);
-    if (EFI_ERROR (Status)) {
-      continue;
-    }
+  //
+  // See if the expected protocol is present in the handle database
+  //
+  Status = CoreLocateProtocol (Entry->ProtocolGuid, Entry->Registration, &Protocol);
+  if (EFI_ERROR (Status)) {
+    return;
+  }
 
-    Found = TRUE;
-    Entry->Present = TRUE;
+  //
+  // Mark the protocol as present
+  //
+  Entry->Present = TRUE;
+
+  //
+  // Update protocol global variable if one exists. Entry->Protocol points to a global variable
+  // if one exists in the DXE core for this Architectural Protocol
+  //
+  if (Entry->Protocol != NULL) {
+    *(Entry->Protocol) = Protocol;
+  }
+
+  //
+  // Do special operations for Architectural Protocols
+  //
+
+  if (CompareGuid (Entry->ProtocolGuid, &gEfiTimerArchProtocolGuid)) {
+    //
+    // Register the Core timer tick handler with the Timer AP
+    //
+    gTimer->RegisterHandler (gTimer, CoreTimerTick);
+  }
+
+  if (CompareGuid (Entry->ProtocolGuid, &gEfiRuntimeArchProtocolGuid)) {
+    //
+    // When runtime architectural protocol is available, updates CRC32 in the Debug Table
+    //
+    CoreUpdateDebugTableCrc32 ();
 
     //
-    // Update protocol global variable if one exists. Entry->Protocol points to a global variable
-    // if one exists in the DXE core for this Architectural Protocol
+    // Update the Runtime Architectural protocol with the template that the core was
+    // using so there would not need to be a dependency on the Runtime AP
     //
-    if (Entry->Protocol != NULL) {
-      *(Entry->Protocol) = Protocol;
+
+    //
+    // Copy all the registered Image to new gRuntime protocol
+    //
+    for (Link = gRuntimeTemplate.ImageHead.ForwardLink; Link != &gRuntimeTemplate.ImageHead; Link = TempLinkNode.ForwardLink) {
+      CopyMem (&TempLinkNode, Link, sizeof(LIST_ENTRY));
+      InsertTailList (&gRuntime->ImageHead, Link);
+    }
+    //
+    // Copy all the registered Event to new gRuntime protocol
+    //
+    for (Link = gRuntimeTemplate.EventHead.ForwardLink; Link != &gRuntimeTemplate.EventHead; Link = TempLinkNode.ForwardLink) {
+      CopyMem (&TempLinkNode, Link, sizeof(LIST_ENTRY));
+      InsertTailList (&gRuntime->EventHead, Link);
     }
 
-    if (CompareGuid (Entry->ProtocolGuid, &gEfiTimerArchProtocolGuid)) {
-      //
-      // Register the Core timer tick handler with the Timer AP
-      //
-      gTimer->RegisterHandler (gTimer, CoreTimerTick);
-    }
-
-    if (CompareGuid (Entry->ProtocolGuid, &gEfiRuntimeArchProtocolGuid)) {
-      //
-      // When runtime architectural protocol is available, updates CRC32 in the Debug Table
-      //
-      CoreUpdateDebugTableCrc32 ();
-
-      //
-      // Update the Runtime Architectural protocol with the template that the core was
-      // using so there would not need to be a dependency on the Runtime AP
-      //
-
-      //
-      // Copy all the registered Image to new gRuntime protocol
-      //
-      for (Link = gRuntimeTemplate.ImageHead.ForwardLink; Link != &gRuntimeTemplate.ImageHead; Link = TempLinkNode.ForwardLink) {
-        CopyMem (&TempLinkNode, Link, sizeof(LIST_ENTRY));
-        InsertTailList (&gRuntime->ImageHead, Link);
-      }
-      //
-      // Copy all the registered Event to new gRuntime protocol
-      //
-      for (Link = gRuntimeTemplate.EventHead.ForwardLink; Link != &gRuntimeTemplate.EventHead; Link = TempLinkNode.ForwardLink) {
-        CopyMem (&TempLinkNode, Link, sizeof(LIST_ENTRY));
-        InsertTailList (&gRuntime->EventHead, Link);
-      }
-
-      //
-      // Clean up gRuntimeTemplate
-      //
-      gRuntimeTemplate.ImageHead.ForwardLink = &gRuntimeTemplate.ImageHead;
-      gRuntimeTemplate.ImageHead.BackLink    = &gRuntimeTemplate.ImageHead;
-      gRuntimeTemplate.EventHead.ForwardLink = &gRuntimeTemplate.EventHead;
-      gRuntimeTemplate.EventHead.BackLink    = &gRuntimeTemplate.EventHead;
-    }
+    //
+    // Clean up gRuntimeTemplate
+    //
+    gRuntimeTemplate.ImageHead.ForwardLink = &gRuntimeTemplate.ImageHead;
+    gRuntimeTemplate.ImageHead.BackLink    = &gRuntimeTemplate.ImageHead;
+    gRuntimeTemplate.EventHead.ForwardLink = &gRuntimeTemplate.EventHead;
+    gRuntimeTemplate.EventHead.BackLink    = &gRuntimeTemplate.EventHead;
   }
 
   //
   // It's over kill to do them all every time, but it saves a lot of code.
   //
-  if (Found) {
-    CalculateEfiHdrCrc (&gDxeCoreRT->Hdr);
-    CalculateEfiHdrCrc (&gBS->Hdr);
-    CalculateEfiHdrCrc (&gDxeCoreST->Hdr);
-    CalculateEfiHdrCrc (&gDxeCoreDS->Hdr);
-  }
+  CalculateEfiHdrCrc (&gDxeCoreRT->Hdr);
+  CalculateEfiHdrCrc (&gBS->Hdr);
+  CalculateEfiHdrCrc (&gDxeCoreST->Hdr);
+  CalculateEfiHdrCrc (&gDxeCoreDS->Hdr);
 }
 
-
-
 /**
-  Creates an event that is fired everytime a Protocol of a specific type is installed.
+  Creates an event for each entry in a table that is fired everytime a Protocol 
+  of a specific type is installed.
 
 **/
 VOID
-CoreNotifyOnArchProtocolInstallation (
-  VOID
+CoreNotifyOnProtocolEntryTable (
+  EFI_CORE_PROTOCOL_NOTIFY_ENTRY  *Entry
   )
 {
-  EFI_STATUS                      Status;
-  ARCHITECTURAL_PROTOCOL_ENTRY    *Entry;
-  UINTN                           Index;
+  EFI_STATUS  Status;
 
-  for (Index = 0; Index < sizeof (mArchProtocols) / sizeof (mArchProtocols[0]); Index++) {
-    Entry = &mArchProtocols[Index];
-
+  for (; Entry->ProtocolGuid != NULL; Entry++) {
     //
     // Create the event
     //
     Status = CoreCreateEvent (
               EVT_NOTIFY_SIGNAL,
               TPL_CALLBACK,
-              GenericArchProtocolNotify,
-              NULL,
+              GenericProtocolNotify,
+              Entry,
               &Entry->Event
               );
     ASSERT_EFI_ERROR(Status);
@@ -230,8 +236,21 @@ CoreNotifyOnArchProtocolInstallation (
               &Entry->Registration
               );
     ASSERT_EFI_ERROR(Status);
-
   }
+}
+
+/**
+  Creates an events for the Architectural Protocols and the optional protocols 
+  that are fired everytime a Protocol of a specific type is installed.
+
+**/
+VOID
+CoreNotifyOnProtocolInstallation (
+  VOID
+  )
+{
+  CoreNotifyOnProtocolEntryTable (mArchProtocols);
+  CoreNotifyOnProtocolEntryTable (mOptionalProtocols);
 }
 
 
@@ -245,14 +264,12 @@ CoreDisplayMissingArchProtocols (
   VOID
   )
 {
+  EFI_CORE_PROTOCOL_NOTIFY_ENTRY       *Entry;
   CONST GUID_TO_STRING_PROTOCOL_ENTRY  *MissingEntry;
-  ARCHITECTURAL_PROTOCOL_ENTRY         *Entry;
-  UINTN                                Index;
 
-  for (Index = 0; Index < sizeof (mArchProtocols) / sizeof (mArchProtocols[0]); Index++) {
-    Entry = &mArchProtocols[Index];
-    if (!Entry->Present && Entry->ArchitecturalProtocol) {
-      for (MissingEntry = mMissingProtocols; MissingEntry < sizeof (mMissingProtocols)/sizeof (mMissingProtocols[0]) ; MissingEntry++) {
+  for (Entry = mArchProtocols; Entry->ProtocolGuid != NULL; Entry++) {
+    if (!Entry->Present) {
+      for (MissingEntry = mMissingProtocols; MissingEntry->ProtocolGuid != NULL; MissingEntry++) {
         if (CompareGuid (Entry->ProtocolGuid, MissingEntry->ProtocolGuid)) {
           DEBUG ((DEBUG_ERROR, "\n%a Arch Protocol not present!!\n", MissingEntry->GuidString));
           break;
