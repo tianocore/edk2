@@ -114,9 +114,9 @@ EblMfillCmd (
     if (Width == 4) {
       MmioWrite32 (Address, Data);
     } else if (Width == 2) {
-      MmioWrite32 (Address, (UINT16)Data);
+      MmioWrite16 (Address, (UINT16)Data);
     } else {
-      MmioWrite32 (Address, (UINT8)Data);
+      MmioWrite8 (Address, (UINT8)Data);
     }
   }
   
