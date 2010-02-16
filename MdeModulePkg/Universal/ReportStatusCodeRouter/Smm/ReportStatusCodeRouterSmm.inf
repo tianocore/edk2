@@ -20,7 +20,6 @@
   FILE_GUID                      = A6885402-D022-4b0e-A509-4711B90F2A39
   MODULE_TYPE                    = DXE_SMM_DRIVER
   PI_SPECIFICATION_VERSION       = 0x0001000A
-  
   ENTRY_POINT                    = GenericStatusCodeSmmEntry
 
 #
@@ -29,10 +28,9 @@
 #  VALID_ARCHITECTURES           = IA32 X64
 #
 
-[Sources.common]
+[Sources]
   ReportStatusCodeRouterSmm.c
   ReportStatusCodeRouterSmm.h
-
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -44,6 +42,7 @@
   DebugLib
   BaseLib
   SynchronizationLib
+  MemoryAllocationLib
 
 [Protocols]
   gEfiSmmRscHandlerProtocolGuid               ## PRODUCES

@@ -1,7 +1,7 @@
 /** @file
   Runtime memory status code worker.
 
-  Copyright (c) 2006 - 2009, Intel Corporation                                                         
+  Copyright (c) 2006 - 2010, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -27,24 +27,13 @@ MemoryStatusCodeInitializeWorker (
   VOID
   )
 {
-  EFI_STATUS  Status;
   //
   // Allocate SMM memory status code pool.
   //
-  Status = gSmst->SmmAllocatePool (
-                       EfiRuntimeServicesData,
-                       sizeof (RUNTIME_MEMORY_STATUSCODE_HEADER) + PcdGet16 (PcdStatusCodeMemorySize) * 1024,
-                       (VOID**)&mSmmMemoryStatusCodeTable
-                       );
-
-  ASSERT_EFI_ERROR(Status);
+  mSmmMemoryStatusCodeTable = (RUNTIME_MEMORY_STATUSCODE_HEADER *)AllocateZeroPool (sizeof (RUNTIME_MEMORY_STATUSCODE_HEADER) + PcdGet16 (PcdStatusCodeMemorySize) * 1024);
   ASSERT (mSmmMemoryStatusCodeTable != NULL);
 
-  mSmmMemoryStatusCodeTable->RecordIndex      = 0;
-  mSmmMemoryStatusCodeTable->NumberOfRecords  = 0;
-  mSmmMemoryStatusCodeTable->MaxRecordsNumber = 
-    (PcdGet16 (PcdStatusCodeMemorySize) * 1024) / sizeof (MEMORY_STATUSCODE_RECORD);
-
+  mSmmMemoryStatusCodeTable->MaxRecordsNumber = (PcdGet16 (PcdStatusCodeMemorySize) * 1024) / sizeof (MEMORY_STATUSCODE_RECORD);
   return EFI_SUCCESS;
 }
 
