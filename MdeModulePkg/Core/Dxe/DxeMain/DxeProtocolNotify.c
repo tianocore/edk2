@@ -51,7 +51,7 @@ typedef struct {
   CHAR8                        *GuidString;
 } GUID_TO_STRING_PROTOCOL_ENTRY;
 
-GLOBAL_REMOVE_IF_UNREFERENCED CONST GUID_TO_STRING_PROTOCOL_ENTRY MissingProtocols[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED CONST GUID_TO_STRING_PROTOCOL_ENTRY mMissingProtocols[] = {
   { &gEfiSecurityArchProtocolGuid,         "Security"           },
   { &gEfiCpuArchProtocolGuid,              "CPU"                },
   { &gEfiMetronomeArchProtocolGuid,        "Metronome"          },
@@ -251,8 +251,8 @@ CoreDisplayMissingArchProtocols (
 
   for (Index = 0; Index < sizeof (mArchProtocols) / sizeof (mArchProtocols[0]); Index++) {
     Entry = &mArchProtocols[Index];
-    if (!Entry->Present) {
-      for (MissingEntry = MissingProtocols; TRUE ; MissingEntry++) {
+    if (!Entry->Present && Entry->ArchitecturalProtocol) {
+      for (MissingEntry = mMissingProtocols; MissingEntry < sizeof (mMissingProtocols)/sizeof (mMissingProtocols[0]) ; MissingEntry++) {
         if (CompareGuid (Entry->ProtocolGuid, MissingEntry->ProtocolGuid)) {
           DEBUG ((DEBUG_ERROR, "\n%a Arch Protocol not present!!\n", MissingEntry->GuidString));
           break;
