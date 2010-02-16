@@ -1,7 +1,7 @@
 /** @file
   Report Status Code Library for SMM Phase.
 
-  Copyright (c)  2009, Intel Corporation<BR>
+  Copyright (c)  2009 -2010, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -18,6 +18,7 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/PcdLib.h>
+#include <Library/MemoryAllocationLib.h>
 
 #include <Guid/StatusCodeDataTypeId.h>
 #include <Guid/StatusCodeDataTypeDebug.h>
@@ -436,15 +437,10 @@ ReportStatusCodeEx (
   ASSERT (!((ExtendedData == NULL) && (ExtendedDataSize != 0)));
   ASSERT (!((ExtendedData != NULL) && (ExtendedDataSize == 0)));
 
-  if (gSmst == NULL || gSmst->SmmAllocatePool == NULL || gSmst->SmmFreePool == NULL) {
-    return EFI_UNSUPPORTED;
-  }
-
   //
   // Allocate space for the Status Code Header and its buffer
   //
-  StatusCodeData = NULL;
-  gSmst->SmmAllocatePool (EfiRuntimeServicesData, sizeof (EFI_STATUS_CODE_DATA) + ExtendedDataSize, (VOID **)&StatusCodeData);
+  StatusCodeData = AllocatePool (sizeof (EFI_STATUS_CODE_DATA) + ExtendedDataSize);
   if (StatusCodeData == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -477,7 +473,7 @@ ReportStatusCodeEx (
   //
   // Free the allocated buffer
   //
-  gSmst->SmmFreePool (StatusCodeData);
+  FreePool (StatusCodeData);
 
   return Status;
 }
