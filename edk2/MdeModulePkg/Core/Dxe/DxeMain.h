@@ -117,8 +117,7 @@ typedef struct {
   EFI_EVENT                   Event;
   VOID                        *Registration;
   BOOLEAN                     Present;
-  BOOLEAN                     ArchitecturalProtocol;
-} ARCHITECTURAL_PROTOCOL_ENTRY;
+} EFI_CORE_PROTOCOL_NOTIFY_ENTRY;
 
 //
 // DXE Dispatcher Data structures
@@ -348,7 +347,7 @@ CoreInitializeImageServices (
 
 **/
 VOID
-CoreNotifyOnArchProtocolInstallation (
+CoreNotifyOnProtocolInstallation (
   VOID
   );
 

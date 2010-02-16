@@ -378,8 +378,9 @@ DxeMain (
   //
   // Register for the GUIDs of the Architectural Protocols, so the rest of the
   // EFI Boot Services and EFI Runtime Services tables can be filled in.
+  // Also register for the GUIDs of optional protocols.
   //
-  CoreNotifyOnArchProtocolInstallation ();
+  CoreNotifyOnProtocolInstallation ();
 
   //
   // Produce Firmware Volume Protocols, one for each FV in the HOB list.
