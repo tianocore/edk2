@@ -229,6 +229,7 @@ AsmCommonExceptionEntry
   
   tst       r1, #0x20               ;   if ((CPSR & T)) == T) {  // Thumb Mode on entry 
   addne     R5, R5, #2              ;     PC += 2;
+  str       R5,[SP,#0x58]           ; Update LR value pused by srsfd 
   
 NoAdjustNeeded
 

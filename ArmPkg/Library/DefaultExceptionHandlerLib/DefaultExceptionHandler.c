@@ -224,6 +224,7 @@ DefaultExceptionHandler (
   )
 {
   UINT32    DfsrStatus;
+  UINT32    IfsrStatus;
   BOOLEAN   DfsrWrite;
   UINT32    PcAdjust = 0;
 
@@ -289,8 +290,10 @@ DefaultExceptionHandler (
   if (DfsrStatus != 0x00) {
     DEBUG ((EFI_D_ERROR, " %a: %a 0x%08x\n", FaultStatusToString (DfsrStatus), DfsrWrite ? "write to" : "read from", SystemContext.SystemContextArm->DFAR));
   }
-  if ((SystemContext.SystemContextArm->IFSR & 0xf) != 0x00) {
-    DEBUG ((EFI_D_ERROR, "Instruction %a at 0x%08x, \n", FaultStatusToString (SystemContext.SystemContextArm->IFSR & 0xf), SystemContext.SystemContextArm->IFAR));
+
+  IfsrStatus = (SystemContext.SystemContextArm->IFSR & 0xf) | ((SystemContext.SystemContextArm->IFSR >> 6) & 0x10);
+  if (IfsrStatus != 0) {
+    DEBUG ((EFI_D_ERROR, " Instruction %a at 0x%08x\n", FaultStatusToString (SystemContext.SystemContextArm->IFSR & 0xf), SystemContext.SystemContextArm->IFAR));
   }
 
   DEBUG ((EFI_D_ERROR, "\n"));
