@@ -225,6 +225,7 @@ DefaultExceptionHandler (
 {
   UINT32    DfsrStatus;
   BOOLEAN   DfsrWrite;
+  UINT32    PcAdjust = 0;
 
   DEBUG ((EFI_D_ERROR, "\n%a Exception PC at 0x%08x  CPSR 0x%08x ", gExceptionTypeString[ExceptionType], SystemContext.SystemContextArm->PC, SystemContext.SystemContextArm->CPSR));
   DEBUG_CODE_BEGIN ();
@@ -260,6 +261,19 @@ DefaultExceptionHandler (
       ItBlock = 0;
       DisassembleInstruction (&DisAsm, (SystemContext.SystemContextArm->CPSR & BIT5) == BIT5, TRUE, &ItBlock, Buffer, sizeof (Buffer));
       DEBUG ((EFI_D_ERROR, "\n%a", Buffer));
+      
+      switch (ExceptionType) {
+      case EXCEPT_ARM_UNDEFINED_INSTRUCTION:
+      case EXCEPT_ARM_SOFTWARE_INTERRUPT:
+      case EXCEPT_ARM_PREFETCH_ABORT:
+      case EXCEPT_ARM_DATA_ABORT:
+        // advance PC past the faulting instruction
+        PcAdjust = (UINTN)DisAsm - SystemContext.SystemContextArm->PC;
+        break;
+      
+      default:
+        break;
+      }
 
     }
   DEBUG_CODE_END ();
@@ -281,6 +295,9 @@ DefaultExceptionHandler (
 
   DEBUG ((EFI_D_ERROR, "\n"));
   ASSERT (FALSE);
+  
+  // If some one is stepping past the exception handler adjust the PC to point to the next instruction 
+  SystemContext.SystemContextArm->PC += PcAdjust;
 }
 
 
