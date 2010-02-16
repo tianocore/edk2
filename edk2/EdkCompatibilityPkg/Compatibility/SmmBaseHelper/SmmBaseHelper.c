@@ -24,6 +24,7 @@
 #include <Library/PeCoffLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/CacheMaintenanceLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Guid/SmmBaseThunkCommunication.h>
 #include <Protocol/SmmBaseHelperReady.h>
 #include <Protocol/SmmCpu.h>
@@ -134,15 +135,10 @@ ConstructFrameworkSmst (
   VOID
   )
 {
-  EFI_STATUS            Status;
   EFI_SMM_SYSTEM_TABLE  *FrameworkSmst;
 
-  Status = gSmst->SmmAllocatePool (
-                    EfiRuntimeServicesData,
-                    sizeof (EFI_SMM_SYSTEM_TABLE),
-                    (VOID **)&FrameworkSmst
-                    );
-  ASSERT_EFI_ERROR (Status);
+  FrameworkSmst = (EFI_SMM_SYSTEM_TABLE  *)AllocatePool (sizeof (EFI_SMM_SYSTEM_TABLE));
+  ASSERT (FrameworkSmst != NULL);
 
   ///
   /// Copy same things from PI SMST to Framework SMST
@@ -160,13 +156,8 @@ ConstructFrameworkSmst (
   FrameworkSmst->Hdr.Revision = EFI_SMM_SYSTEM_TABLE_REVISION;
   CopyGuid (&FrameworkSmst->EfiSmmCpuIoGuid, &mEfiSmmCpuIoGuid);
 
-  Status = gSmst->SmmAllocatePool (
-                    EfiRuntimeServicesData,
-                    gSmst->NumberOfCpus * sizeof (EFI_SMM_CPU_SAVE_STATE),
-                    (VOID **)&FrameworkSmst->CpuSaveState
-                    );
-  ASSERT_EFI_ERROR (Status);
-  ZeroMem (FrameworkSmst->CpuSaveState, gSmst->NumberOfCpus * sizeof (EFI_SMM_CPU_SAVE_STATE));
+  FrameworkSmst->CpuSaveState = (EFI_SMM_CPU_SAVE_STATE *)AllocateZeroPool (gSmst->NumberOfCpus * sizeof (EFI_SMM_CPU_SAVE_STATE));
+  ASSERT (FrameworkSmst->CpuSaveState != NULL);
 
   ///
   /// Do not support floating point state now
@@ -335,8 +326,8 @@ LoadImage (
   }
 
 Error:
-  gSmst->SmmFreePages (Buffer, PageCount);
-  return Status;
+  FreePages ((VOID *)(UINTN)Buffer, PageCount);
+  return EFI_SUCCESS;
 }
 
 /** 
@@ -534,10 +525,9 @@ CallbackThunk (
 **/
 VOID
 RegisterCallback (
-  IN OUT SMMBASE_FUNCTION_DATA *FunctionData
+  IN OUT SMMBASE_FUNCTION_DATA  *FunctionData
   )
 {
-  EFI_STATUS     Status;
   CALLBACK_INFO  *Buffer;
 
   ///
@@ -547,36 +537,35 @@ RegisterCallback (
   ///
   /// Allocate buffer for callback thunk information
   ///
-  Status = gSmst->SmmAllocatePool (
-                    EfiRuntimeServicesCode,
-                    sizeof (CALLBACK_INFO),
-                    (VOID **)&Buffer
-                    );
-  if (!EFI_ERROR (Status)) {
-    ///
-    /// Fill SmmImageHandle and CallbackAddress into the thunk
-    ///
-    Buffer->SmmImageHandle = FunctionData->Args.RegisterCallback.SmmImageHandle;
-    Buffer->CallbackAddress = FunctionData->Args.RegisterCallback.CallbackAddress;
-
-    ///
-    /// Register the thunk code as a root SMI handler
-    ///
-    Status = gSmst->SmiHandlerRegister (
-                      CallbackThunk,
-                      NULL,
-                      &Buffer->DispatchHandle
-                      );
-    if (!EFI_ERROR (Status)) {
-      ///
-      /// Save this callback info
-      ///
-      InsertTailList (&mCallbackInfoListHead, &Buffer->Link);
-    } else {
-      gSmst->SmmFreePool (Buffer);
-    }
+  Buffer = (CALLBACK_INFO *)AllocatePool (sizeof (CALLBACK_INFO));
+  if (Buffer == NULL) {
+    FunctionData->Status = EFI_OUT_OF_RESOURCES;
+    return;
   }
-  FunctionData->Status = Status;
+
+  ///
+  /// Fill SmmImageHandle and CallbackAddress into the thunk
+  ///
+  Buffer->SmmImageHandle = FunctionData->Args.RegisterCallback.SmmImageHandle;
+  Buffer->CallbackAddress = FunctionData->Args.RegisterCallback.CallbackAddress;
+
+  ///
+  /// Register the thunk code as a root SMI handler
+  ///
+  FunctionData->Status = gSmst->SmiHandlerRegister (
+                                  CallbackThunk,
+                                  NULL,
+                                  &Buffer->DispatchHandle
+                                  );
+  if (EFI_ERROR (FunctionData->Status)) {
+    FreePool (Buffer);
+    return;
+  }
+
+  ///
+  /// Save this callback info
+  ///
+  InsertTailList (&mCallbackInfoListHead, &Buffer->Link);
 }
 
 
@@ -607,9 +596,8 @@ HelperFreePool (
   IN OUT SMMBASE_FUNCTION_DATA *FunctionData
   )
 {
-  FunctionData->Status = gSmst->SmmFreePool (
-                                  FunctionData->Args.FreePool.Buffer
-                                  );
+  FreePool (FunctionData->Args.FreePool.Buffer);
+  FunctionData->Status = EFI_SUCCESS;
 }
 
 /**
