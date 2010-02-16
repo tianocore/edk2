@@ -331,7 +331,7 @@ DxeMain (
 
     for (Hob.Raw = HobStart; !END_OF_HOB_LIST(Hob); Hob.Raw = GET_NEXT_HOB(Hob)) {
       if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_MEMORY_ALLOCATION) {
-        DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Memory Allocation %08x %0lx - %0lx\n", \
+        DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Memory Allocation 0x%08x 0x%0lx - 0x%0lx\n", \
           Hob.MemoryAllocation->AllocDescriptor.MemoryType,                      \
           Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress,               \
           Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress + Hob.MemoryAllocation->AllocDescriptor.MemoryLength - 1));
@@ -339,9 +339,9 @@ DxeMain (
     }
     for (Hob.Raw = HobStart; !END_OF_HOB_LIST(Hob); Hob.Raw = GET_NEXT_HOB(Hob)) {
       if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_FV2) {
-        DEBUG ((DEBUG_INFO | DEBUG_LOAD, "FV2 Hob           %08x %0lx - %0lx\n", Hob.FirmwareVolume2->BaseAddress, Hob.FirmwareVolume2->BaseAddress + Hob.FirmwareVolume2->Length - 1, Hob.ResourceDescriptor->ResourceType));
+        DEBUG ((DEBUG_INFO | DEBUG_LOAD, "FV2 Hob           0x%08x 0x%0lx - 0x%0lx\n", Hob.ResourceDescriptor->ResourceType, Hob.FirmwareVolume2->BaseAddress, Hob.FirmwareVolume2->BaseAddress + Hob.FirmwareVolume2->Length - 1));
       } else if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_FV) {
-        DEBUG ((DEBUG_INFO | DEBUG_LOAD, "FV Hob            %08x %0lx - %0lx\n", Hob.FirmwareVolume->BaseAddress, Hob.FirmwareVolume->BaseAddress + Hob.FirmwareVolume2->Length - 1, Hob.ResourceDescriptor->ResourceType));
+        DEBUG ((DEBUG_INFO | DEBUG_LOAD, "FV Hob            0x%08x 0x%0lx - 0x%0lx\n", Hob.ResourceDescriptor->ResourceType, Hob.FirmwareVolume->BaseAddress, Hob.FirmwareVolume->BaseAddress + Hob.FirmwareVolume2->Length - 1));
       }
     }
   DEBUG_CODE_END ();
