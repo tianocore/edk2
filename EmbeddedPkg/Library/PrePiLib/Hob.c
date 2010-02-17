@@ -16,7 +16,7 @@
 #include <Protocol/PeCoffLoader.h>
 #include <Guid/ExtractSection.h>
 #include <Guid/MemoryTypeInformation.h>
-#include <Library/PeCoffLib.H>
+#include <Library/PeCoffLib.h>
 
 //
 // Have to use build system to set the original value in case we are running
