@@ -12,12 +12,12 @@
 
 **/
 
-#include <Chipset/Cortex-A8.h>
+#include <Chipset/ArmV7.h>
 #include <Library/ArmLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include "ArmCortexALib.h"
+#include "ArmV7Lib.h"
 
 VOID
 FillTranslationTable (
@@ -220,8 +220,8 @@ ArmInstructionCacheLineLength (
 }
 
 VOID
-ArmCortexADataCacheOperation (
-  IN  ARM_CORTEX_A_CACHE_OPERATION  DataCacheOperation
+ArmV7DataCacheOperation (
+  IN  ARM_V7_CACHE_OPERATION  DataCacheOperation
   )
 {
   UINTN     Set;
@@ -236,7 +236,7 @@ ArmCortexADataCacheOperation (
   SetCount = ArmDataCacheSets();
   WayCount = ArmDataCacheAssociativity();
 
-  // Cortex-A8 Manual, System Control Coprocessor chapter
+  // ARMv7 Manual, System Control Coprocessor chapter
   SetShift = 6;
   WayShift = 32 - LowBitSet32 ((UINT32)WayCount);
   
@@ -265,7 +265,7 @@ ArmInvalidateDataCache (
   VOID
   )
 {
-  ArmCortexADataCacheOperation(ArmInvalidateDataCacheEntryBySetWay);
+  ArmV7DataCacheOperation(ArmInvalidateDataCacheEntryBySetWay);
 }
 
 VOID
@@ -274,7 +274,7 @@ ArmCleanInvalidateDataCache (
   VOID
   )
 {
-  ArmCortexADataCacheOperation(ArmCleanInvalidateDataCacheEntryBySetWay);
+  ArmV7DataCacheOperation(ArmCleanInvalidateDataCacheEntryBySetWay);
 }
 
 VOID
@@ -283,5 +283,5 @@ ArmCleanDataCache (
   VOID
   )
 {
-  ArmCortexADataCacheOperation(ArmCleanDataCacheEntryBySetWay);
+  ArmV7DataCacheOperation(ArmCleanDataCacheEntryBySetWay);
 }

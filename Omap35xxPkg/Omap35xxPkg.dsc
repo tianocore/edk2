@@ -33,7 +33,7 @@
 [LibraryClasses.common]
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
 
-  ArmLib|ArmPkg/Library/ArmLib/ArmCortexA/ArmCortexArmLib.inf
+  ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
@@ -90,8 +90,8 @@
   XCODE:*_*_ARM_ARCHASM_FLAGS    == -arch armv6
   XCODE:*_*_ARM_ARCHDLINK_FLAGS  == -arch armv6
 
-  RVCT:*_*_ARM_ARCHCC_FLAGS     == --cpu Cortex-A8
-  RVCT:*_*_ARM_ARCHASM_FLAGS    == --cpu Cortex-A8
+  RVCT:*_*_ARM_ARCHCC_FLAGS     == --cpu 7-A
+  RVCT:*_*_ARM_ARCHASM_FLAGS    == --cpu 7-A
  
 
 ################################################################################
