@@ -12,8 +12,8 @@
 
 **/
 
-#ifndef __CORTEX_A8_H__
-#define __CORTEX_A8_H__
+#ifndef __ARM_V7_H__
+#define __ARM_V7_H__
 
 // Domain Access Control Register
 #define DOMAIN_ACCESS_CONTROL_MASK(a)     (3UL << (2 * (a)))
@@ -101,4 +101,4 @@
                                                    TT_DESCRIPTOR_SECTION_AP_RW_RW                          | \
                                                    TT_DESCRIPTOR_SECTION_CACHE_POLICY_NON_CACHEABLE)
 
-#endif // __CORTEX_A8_H__
+#endif // __ARM_V7_H__

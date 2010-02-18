@@ -50,7 +50,7 @@
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   DefaultExceptioHandlerLib|ArmPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLib.inf
 
-  ArmLib|ArmPkg/Library/ArmLib/ArmCortexA/ArmCortexArmLib.inf
+  ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
   CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
   ArmDisassemblerLib|ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
 
@@ -64,8 +64,8 @@
   ArmPkg/Library/ArmLib/Arm11/Arm11ArmLibPrePi.inf
   ArmPkg/Library/ArmLib/Arm9/Arm9ArmLib.inf
   ArmPkg/Library/ArmLib/Arm9/Arm9ArmLibPrePi.inf
-  ArmPkg/Library/ArmLib/ArmCortexA/ArmCortexArmLib.inf
-  ArmPkg/Library/ArmLib/ArmCortexA/ArmCortexArmLibPrePi.inf
+  ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
+  ArmPkg/Library/ArmLib/ArmV7/ArmV7LibPrePi.inf
   ArmPkg/Library/ArmLib/Null/NullArmLib.inf
   ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
   ArmPkg/Library/SemiHostingDebugLib/SemiHostingDebugLib.inf

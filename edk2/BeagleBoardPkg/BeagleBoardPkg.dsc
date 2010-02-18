@@ -38,7 +38,7 @@
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
 !endif
 
-  ArmLib|ArmPkg/Library/ArmLib/ArmCortexA/ArmCortexArmLib.inf
+  ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
@@ -114,7 +114,7 @@
 
 
 [LibraryClasses.common.SEC]
-  ArmLib|ArmPkg/Library/ArmLib/ArmCortexA/ArmCortexArmLibPrePi.inf
+  ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7LibPrePi.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   ReportStatusCodeLib|IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
   UefiDecompressLib|MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
@@ -171,7 +171,7 @@
   XCODE:*_*_ARM_ARCHDLINK_FLAGS  == -arch armv6
   XCODE:RELEASE_*_*_CC_FLAGS     = -DMDEPKG_NDEBUG 
 
-  RVCT:*_*_ARM_ARCHCC_FLAGS == --cpu Cortex-A8 --thumb
+  RVCT:*_*_ARM_ARCHCC_FLAGS == --cpu 7-A --thumb
   RVCT:RELEASE_*_*_CC_FLAGS = -DMDEPKG_NDEBUG 
 
 ################################################################################

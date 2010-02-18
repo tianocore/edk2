@@ -15,7 +15,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = ArmCortexArmLib
+  BASE_NAME                      = ArmV7Lib
   FILE_GUID                      = 411cdfd8-f964-4b9d-a3e3-1719a9c15559
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -26,10 +26,10 @@
   ../Common/ArmLibSupport.asm  | RVCT
   ../Common/ArmLib.c
   
-  ArmCortexASupport.S    | GCC
-  ArmCortexASupport.asm  | RVCT
+  ArmV7Support.S    | GCC
+  ArmV7Support.asm  | RVCT
 
-  ArmCortexALib.c
+  ArmV7Lib.c
 
 [Packages]
   ArmPkg/ArmPkg.dec

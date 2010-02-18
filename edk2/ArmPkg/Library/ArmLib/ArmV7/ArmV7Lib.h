@@ -12,10 +12,10 @@
 
 **/
 
-#ifndef __ARMCORTEXALIB_H__
-#define __ARMCORTEXALIB_H__
+#ifndef __ARM_V7_LIB_H__
+#define __ARM_V7_LIB_H__
 
-typedef VOID (*ARM_CORTEX_A_CACHE_OPERATION)(UINT32);
+typedef VOID (*ARM_V7_CACHE_OPERATION)(UINT32);
 
 VOID
 EFIAPI
@@ -41,5 +41,5 @@ ArmCleanInvalidateDataCacheEntryBySetWay (
   IN  UINT32   SetWayFormat
   );
 
-#endif // __ARMCORTEXALIB_H__
+#endif // __ARM_V7_LIB_H__
 
