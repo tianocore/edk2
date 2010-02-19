@@ -1,5 +1,7 @@
 //------------------------------------------------------------------------------ 
 //
+// Use ARMv6 instruction to operate on a single stack
+//
 // Copyright (c) 2008-2010 Apple Inc. All rights reserved.
 //
 // All rights reserved. This program and the accompanying materials

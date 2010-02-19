@@ -11,13 +11,14 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
-
+#include <Uefi.h>
 #include <Chipset/ArmV7.h>
 #include <Library/ArmLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include "ArmV7Lib.h"
+#include "ArmLibPrivate.h"
 
 VOID
 FillTranslationTable (
@@ -136,7 +137,9 @@ ArmCacheArchitecture (
   VOID
   )
 {
-  return ARM_CACHE_ARCHITECTURE_SEPARATE;
+  UINT32 CLIDR = ReadCLIDR ();
+
+  return CLIDR; // BugBug Fix Me
 }
 
 BOOLEAN
@@ -145,7 +148,18 @@ ArmDataCachePresent (
   VOID
   )
 {
-  return TRUE;
+  UINT32 CLIDR = ReadCLIDR ();
+  
+  if ((CLIDR & 0x2) == 0x2) {
+    // Instruction cache exists
+    return TRUE;
+  }
+  if ((CLIDR & 0x7) == 0x4) {
+    // Unified cache
+    return TRUE;
+  }
+  
+  return FALSE;
 }
   
 UINTN
@@ -154,7 +168,17 @@ ArmDataCacheSize (
   VOID
   )
 {
-  return  16 * 1024;      
+  UINT32 NumSets;
+  UINT32 Associativity;
+  UINT32 LineSize;
+  UINT32 CCSIDR = ReadCCSIDR (0);
+  
+  LineSize      = (1 << (CCSIDR + 2));
+  Associativity = ((CCSIDR >> 3) & 0x3ff) + 1;
+  NumSets       = ((CCSIDR >> 13) & 0x7fff) + 1;
+
+  // LineSize is in words (4 byte chunks)
+  return  NumSets * Associativity * LineSize * 4;      
 }
   
 UINTN
@@ -163,7 +187,9 @@ ArmDataCacheAssociativity (
   VOID
   )
 {
-  return 4;
+  UINT32 CCSIDR = ReadCCSIDR (0);
+
+  return ((CCSIDR >> 3) & 0x3ff) + 1;
 }
   
 UINTN
@@ -171,7 +197,9 @@ ArmDataCacheSets (
   VOID
   )
 {
-  return 64;
+  UINT32 CCSIDR = ReadCCSIDR (0);
+  
+  return ((CCSIDR >> 13) & 0x7fff) + 1;
 }
 
 UINTN
@@ -180,7 +208,10 @@ ArmDataCacheLineLength (
   VOID
   )
 {
-  return 64;
+  UINT32 CCSIDR = ReadCCSIDR (0) & 7;
+
+  // * 4 converts to bytes
+  return (1 << (CCSIDR + 2)) * 4;
 }
   
 BOOLEAN
@@ -189,7 +220,18 @@ ArmInstructionCachePresent (
   VOID
   )
 {
-  return TRUE;
+  UINT32 CLIDR = ReadCLIDR ();
+  
+  if ((CLIDR & 1) == 1) {
+    // Instruction cache exists
+    return TRUE;
+  }
+  if ((CLIDR & 0x7) == 0x4) {
+    // Unified cache
+    return TRUE;
+  }
+  
+  return FALSE;
 }
   
 UINTN
@@ -198,7 +240,17 @@ ArmInstructionCacheSize (
   VOID
   )
 {
-  return  16 * 1024;      
+  UINT32 NumSets;
+  UINT32 Associativity;
+  UINT32 LineSize;
+  UINT32 CCSIDR = ReadCCSIDR (1);
+  
+  LineSize      = (1 << (CCSIDR + 2));
+  Associativity = ((CCSIDR >> 3) & 0x3ff) + 1;
+  NumSets       = ((CCSIDR >> 13) & 0x7fff) + 1;
+
+  // LineSize is in words (4 byte chunks)
+  return  NumSets * Associativity * LineSize * 4;      
 }
   
 UINTN
@@ -207,55 +259,53 @@ ArmInstructionCacheAssociativity (
   VOID
   )
 {
-  return 4;
+  UINT32 CCSIDR = ReadCCSIDR (1);
+
+  return ((CCSIDR >> 3) & 0x3ff) + 1;
+//  return 4;
 }
   
+UINTN
+EFIAPI
+ArmInstructionCacheSets (
+  VOID
+  )
+{
+  UINT32 CCSIDR = ReadCCSIDR (1);
+  
+  return ((CCSIDR >> 13) & 0x7fff) + 1;
+}
+
 UINTN
 EFIAPI
 ArmInstructionCacheLineLength (
   VOID
   )
 {
-  return 64;
+  UINT32 CCSIDR = ReadCCSIDR (1) & 7;
+
+  // * 4 converts to bytes
+  return (1 << (CCSIDR + 2)) * 4;
+
+//  return 64;
 }
+
 
 VOID
 ArmV7DataCacheOperation (
   IN  ARM_V7_CACHE_OPERATION  DataCacheOperation
   )
 {
-  UINTN     Set;
-  UINTN     SetCount;
-  UINTN     SetShift;
-  UINTN     Way;
-  UINTN     WayCount;
-  UINTN     WayShift;
-  UINT32    SetWayFormat;
   UINTN     SavedInterruptState;
 
-  SetCount = ArmDataCacheSets();
-  WayCount = ArmDataCacheAssociativity();
+  SavedInterruptState = ArmGetInterruptState ();
 
-  // ARMv7 Manual, System Control Coprocessor chapter
-  SetShift = 6;
-  WayShift = 32 - LowBitSet32 ((UINT32)WayCount);
+  ArmV7AllDataCachesOperation (DataCacheOperation);
   
-  SavedInterruptState = ArmDisableInterrupts();
-      
-  for (Way = 0; Way < WayCount; Way++) {
-    for (Set = 0; Set < SetCount; Set++) {      
-      // Build the format that the CP15 instruction can understand
-      SetWayFormat = (Way << WayShift) | (Set << SetShift);
-
-      // Pass it through
-      (*DataCacheOperation)(SetWayFormat);
-    }
-  }
-  
-  ArmDrainWriteBuffer();
+  ArmDrainWriteBuffer ();
   
   if (SavedInterruptState) {
-    ArmEnableInterrupts();
+    ArmEnableInterrupts ();
   }
 }
 
@@ -265,7 +315,7 @@ ArmInvalidateDataCache (
   VOID
   )
 {
-  ArmV7DataCacheOperation(ArmInvalidateDataCacheEntryBySetWay);
+  ArmV7DataCacheOperation (ArmInvalidateDataCacheEntryBySetWay);
 }
 
 VOID
@@ -274,7 +324,7 @@ ArmCleanInvalidateDataCache (
   VOID
   )
 {
-  ArmV7DataCacheOperation(ArmCleanInvalidateDataCacheEntryBySetWay);
+  ArmV7DataCacheOperation (ArmCleanInvalidateDataCacheEntryBySetWay);
 }
 
 VOID
@@ -283,5 +333,5 @@ ArmCleanDataCache (
   VOID
   )
 {
-  ArmV7DataCacheOperation(ArmCleanDataCacheEntryBySetWay);
+  ArmV7DataCacheOperation (ArmCleanDataCacheEntryBySetWay);
 }

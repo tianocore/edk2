@@ -25,6 +25,9 @@
 .globl ASM_PFX(ArmSetDomainAccessControl)
 .globl ASM_PFX(CPSRMaskInsert)
 .globl ASM_PFX(CPSRRead)
+.globl ASM_PFX(ReadCCSIDR)
+.globl ASM_PFX(ReadCLIDR)
+
 
 #------------------------------------------------------------------------------
 
@@ -37,18 +40,11 @@ ASM_PFX(Cp15CacheInfo):
   bx      LR
 
 ASM_PFX(ArmEnableInterrupts):
-	mrs     R0,CPSR
-	bic     R0,R0,#0x80		@Enable IRQ interrupts
-	msr     CPSR_c,R0
+  cpsie   i
 	bx      LR
 
 ASM_PFX(ArmDisableInterrupts):
-	mrs     R0,CPSR
-	orr     R1,R0,#0x80		@Disable IRQ interrupts
-	msr     CPSR_c,R1
-  tst     R0,#0x80
-  moveq   R0,#1
-  movne   R0,#0
+  cpsid   i
 	bx      LR
 
 ASM_PFX(ArmGetInterruptState):
@@ -61,10 +57,12 @@ ASM_PFX(ArmGetInterruptState):
 ASM_PFX(ArmInvalidateTlb):
   mov     r0,#0
   mcr     p15,0,r0,c8,c7,0
+  isb
   bx      lr
 
 ASM_PFX(ArmSetTranslationTableBaseAddress):
   mcr     p15,0,r0,c2,c0,0
+  isb
   bx      lr
 
 ASM_PFX(ArmGetTranslationTableBaseAddress):
@@ -74,6 +72,7 @@ ASM_PFX(ArmGetTranslationTableBaseAddress):
 
 ASM_PFX(ArmSetDomainAccessControl):
   mcr     p15,0,r0,c3,c0,0
+  isb
   bx      lr
 
 ASM_PFX(CPSRMaskInsert):    @ on entry, r0 is the mask and r1 is the field to insert
@@ -92,4 +91,14 @@ ASM_PFX(CPSRRead):
   mrs     r0, cpsr
   bx      lr
   
+ASM_PFX(ReadCCSIDR):
+  mcr p15,2,r0,c0,c0,0   @ Write Cache Size Selection Register (CSSELR)
+  isb
+  mrc p15,1,r0,c0,c0,0   @ Read current CP15 Cache Size ID Register (CCSIDR)
+  bx  lr
+  
+
+ASM_PFX(ReadCLIDR):
+  mrc p15,1,r0,c0,c0,1 @ Read CP15 Cache Level ID Register
+
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED

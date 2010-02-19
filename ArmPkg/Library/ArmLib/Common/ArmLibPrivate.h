@@ -56,6 +56,8 @@
 #define CACHE_ARCHITECTURE_UNIFIED            (0UL)
 #define CACHE_ARCHITECTURE_SEPARATE           (1UL)
 
+typedef VOID (*ARM_V7_CACHE_OPERATION)(UINT32);
+
 VOID
 CPSRMaskInsert (
   IN  UINT32  Mask,
@@ -66,5 +68,23 @@ UINT32
 CPSRRead (
   VOID
   );
+
+
+UINT32 
+ReadCCSIDR (
+  IN UINT32 CSSELR
+  );  
+  
+
+UINT32
+ReadCLIDR (
+  VOID
+  );
+  
+VOID
+ArmV7AllDataCachesOperation (
+  IN  ARM_V7_CACHE_OPERATION  DataCacheOperation
+  );
+
 
 #endif // __ARM_LIB_PRIVATE_H__
