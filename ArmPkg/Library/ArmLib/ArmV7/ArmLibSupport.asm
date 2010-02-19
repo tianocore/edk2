@@ -25,7 +25,8 @@
     EXPORT  CPSRMaskInsert
     EXPORT  CPSRRead
     EXPORT  ReadCCSIDR
-
+    EXPORT  ReadCLIDR
+    
     AREA ArmLibSupport, CODE, READONLY
 
 Cp15IdCode

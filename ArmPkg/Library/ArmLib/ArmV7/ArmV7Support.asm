@@ -29,6 +29,7 @@
     EXPORT  ArmDisableInstructionCache
     EXPORT  ArmEnableBranchPrediction
     EXPORT  ArmDisableBranchPrediction
+    EXPORT  ArmV7AllDataCachesOperation
 
 DC_ON       EQU     ( 0x1:SHL:2 )
 IC_ON       EQU     ( 0x1:SHL:12 )
