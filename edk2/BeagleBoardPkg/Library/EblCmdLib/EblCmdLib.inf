@@ -43,7 +43,9 @@
   ArmDisassemblerLib
   
 [Protocols]
+ gEfiDebugSupportProtocolGuid
+ gEfiLoadedImageProtocolGuid
   
 [Guids]
+ gEfiDebugImageInfoTableGuid
  
-[Pcd]
