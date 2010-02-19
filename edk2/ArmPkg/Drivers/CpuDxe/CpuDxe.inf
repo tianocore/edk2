@@ -32,13 +32,13 @@
 # Prior to ARMv6 we have multiple stacks, one per mode
 #
 #  ExceptionSupport.asm | RVCT
-  ExceptionSupport.S         | GCC
+#  ExceptionSupport.S   | GCC
 
 #
 # ARMv6 or later uses a single stack via srs/stm instructions
 #
   ExceptionSupport.ARMv6.asm | RVCT
-#  ExceptionSupport.ARMv6.S   | GCC
+  ExceptionSupport.ARMv6.S   | GCC
   Mmu.c
 
 

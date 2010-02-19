@@ -15,7 +15,6 @@
 #ifndef __ARM_V7_LIB_H__
 #define __ARM_V7_LIB_H__
 
-typedef VOID (*ARM_V7_CACHE_OPERATION)(UINT32);
 
 VOID
 EFIAPI
