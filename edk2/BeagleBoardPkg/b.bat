@@ -33,6 +33,7 @@ SET BUILD_ROOT=%WORKSPACE%\Build\BeagleBoard\%TARGET%_%TARGET_TOOLS%
 
 @REM Build the Beagle Board firmware and creat an FD (FLASH Device) Image.
 CALL build -p BeagleBoardPkg\BeagleBoardPkg.dsc -a ARM -t RVCT31 -b %TARGET% %1 %2 %3 %4 %5 %6 %7 %8
+if ERRORLEVEL 1 goto Exit
 
 @if /I "%1"=="CLEAN" goto Clean
 
@@ -58,6 +59,7 @@ SET DEBUGGER_SCRIPT=..\Debugger_scripts
 )
 
 cd ..
+:Exit
 EXIT /B
 
 :Clean
