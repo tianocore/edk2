@@ -166,9 +166,9 @@
 
 
 [BuildOptions]
-  XCODE:*_*_ARM_ARCHCC_FLAGS     == -arch armv6 -march=armv6
-  XCODE:*_*_ARM_ARCHASM_FLAGS    == -arch armv6
-  XCODE:*_*_ARM_ARCHDLINK_FLAGS  == -arch armv6
+  XCODE:*_*_ARM_ARCHCC_FLAGS     == -arch armv7 -march=armv7
+  XCODE:*_*_ARM_ARCHASM_FLAGS    == -arch armv7
+  XCODE:*_*_ARM_ARCHDLINK_FLAGS  == -arch armv7
   XCODE:RELEASE_*_*_CC_FLAGS     = -DMDEPKG_NDEBUG 
 
   RVCT:*_*_ARM_ARCHCC_FLAGS == --cpu 7-A --thumb
