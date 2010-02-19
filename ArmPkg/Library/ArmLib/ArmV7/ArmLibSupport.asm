@@ -97,7 +97,7 @@ CPSRRead
 ReadCCSIDR
   MCR p15,2,r0,c0,c0,0   ; Write Cache Size Selection Register (CSSELR)
   ISB
-  MRC p15,1,<Rt>,c0,c0,0 ; Read current CP15 Cache Size ID Register (CCSIDR)
+  MRC p15,1,r0,c0,c0,0 ; Read current CP15 Cache Size ID Register (CCSIDR)
   BX  lr
   
 
@@ -106,7 +106,7 @@ ReadCCSIDR
 //   IN UINT32 CSSELR
 //   )  
 ReadCLIDR
-  MRC p15,1,<Rt>,c0,c0,1 ; Read CP15 Cache Level ID Register
+  MRC p15,1,r0,c0,c0,1 ; Read CP15 Cache Level ID Register
   END
 
 
