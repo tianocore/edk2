@@ -219,7 +219,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst|TRUE|BOOLEAN|0x00010044
 
   ## If TRUE, force to switch off the support of legacy usb. So legacy usb device driver can not make use of SMI
-  #  interrupt to access usb device in the case of absence of usb stack.
+  #  interrupt to access usb device in the case of absence of usb stack. 
+  #  DUET platform requires the token to be TRUE.
   gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|FALSE|BOOLEAN|0x00010047
 
   ## If TRUE, HiiImageProtocol will be installed.

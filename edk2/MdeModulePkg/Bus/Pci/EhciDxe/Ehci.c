@@ -1704,7 +1704,7 @@ EhcDriverBindingStart (
   }
 
   //
-  // Robustnesss improvement such as for UoL
+  // Robustnesss improvement such as for Duet platform
   // Default is not required.
   //
   if (FeaturePcdGet (PcdTurnOffUsbLegacySupport)) {
