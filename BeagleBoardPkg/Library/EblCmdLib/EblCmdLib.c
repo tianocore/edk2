@@ -63,7 +63,7 @@ EblSymbolTable (
   BOOLEAN                           Elf;
   
   // Need to add lots of error checking on the passed in string
-  Format = (Argc > 1) ? Argv[1] : "load /a /ni /np %a & 0x%x\n";
+  Format = (Argc > 1) ? Argv[1] : "load /a /ni /np %a & 0x%x";
   Elf = (Argc > 2) ? FALSE : TRUE;
   
   Status = EfiGetSystemConfigurationTable (&gEfiDebugImageInfoTableGuid, (VOID **)&DebugImageTableHeader);
@@ -87,6 +87,7 @@ EblSymbolTable (
           ImageBase += PeCoffSizeOfHeaders;
         } 
         AsciiPrint (Format, Pdb, ImageBase);
+        AsciiPrint ("\n");
       }
     }  
   }
