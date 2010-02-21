@@ -30,6 +30,7 @@
 #include <Protocol/SmmCpu.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/SmmCpuSaveState.h>
+#include <Protocol/MpService.h>
 
 ///
 /// Structure for tracking paired information of registered Framework SMI handler
@@ -61,6 +62,7 @@ EFI_SMM_CPU_PROTOCOL               *mSmmCpu;
 EFI_GUID                           mEfiSmmCpuIoGuid = EFI_SMM_CPU_IO_GUID;
 EFI_SMM_BASE_HELPER_READY_PROTOCOL *mSmmBaseHelperReady;
 EFI_SMM_SYSTEM_TABLE               *mFrameworkSmst;
+UINTN                              mNumberOfProcessors;
 
 LIST_ENTRY mCallbackInfoListHead = INITIALIZE_LIST_HEAD_VARIABLE (mCallbackInfoListHead);
 
@@ -156,7 +158,7 @@ ConstructFrameworkSmst (
   FrameworkSmst->Hdr.Revision = EFI_SMM_SYSTEM_TABLE_REVISION;
   CopyGuid (&FrameworkSmst->EfiSmmCpuIoGuid, &mEfiSmmCpuIoGuid);
 
-  FrameworkSmst->CpuSaveState = (EFI_SMM_CPU_SAVE_STATE *)AllocateZeroPool (gSmst->NumberOfCpus * sizeof (EFI_SMM_CPU_SAVE_STATE));
+  FrameworkSmst->CpuSaveState = (EFI_SMM_CPU_SAVE_STATE *)AllocateZeroPool (mNumberOfProcessors * sizeof (EFI_SMM_CPU_SAVE_STATE));
   ASSERT (FrameworkSmst->CpuSaveState != NULL);
 
   ///
@@ -437,7 +439,7 @@ CallbackThunk (
   /// and MP states in the Framework SMST.
   ///
 
-  for (CpuIndex = 0; CpuIndex < gSmst->NumberOfCpus; CpuIndex++) {
+  for (CpuIndex = 0; CpuIndex < mNumberOfProcessors; CpuIndex++) {
     State = (EFI_SMM_CPU_STATE *)gSmst->CpuSaveState[CpuIndex];
     SaveState = &mFrameworkSmst->CpuSaveState[CpuIndex].Ia32SaveState;
 
@@ -487,7 +489,7 @@ CallbackThunk (
   ///
   /// Save CPU Save States in case any of them was modified
   ///
-  for (CpuIndex = 0; CpuIndex < gSmst->NumberOfCpus; CpuIndex++) {
+  for (CpuIndex = 0; CpuIndex < mNumberOfProcessors; CpuIndex++) {
     for (Index = 0; Index < sizeof (mCpuSaveStateConvTable) / sizeof (CPU_SAVE_STATE_CONVERSION); Index++) {
       Status = mSmmCpu->WriteSaveState (
                           mSmmCpu,
@@ -676,7 +678,9 @@ SmmBaseHelperMain (
   )
 {
   EFI_STATUS  Status;
+  EFI_MP_SERVICES_PROTOCOL   *MpServices;
   EFI_HANDLE  Handle = NULL;
+  UINTN                      NumberOfEnabledProcessors;
 
   ///
   /// Locate SMM CPU Protocol which is used later to retrieve/update CPU Save States
@@ -684,6 +688,18 @@ SmmBaseHelperMain (
   Status = gSmst->SmmLocateProtocol (&gEfiSmmCpuProtocolGuid, NULL, (VOID **) &mSmmCpu);
   ASSERT_EFI_ERROR (Status);
 
+  //
+  // Get MP Services Protocol
+  //
+  Status = SystemTable->BootServices->LocateProtocol (&gEfiMpServiceProtocolGuid, NULL, (VOID **)&MpServices);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Use MP Services Protocol to retrieve the number of processors and number of enabled processors
+  //
+  Status = MpServices->GetNumberOfProcessors (MpServices, &mNumberOfProcessors, &NumberOfEnabledProcessors);
+  ASSERT_EFI_ERROR (Status);
+  
   ///
   /// Interface structure of SMM BASE Helper Ready Protocol is allocated from UEFI pool
   /// instead of SMM pool so that SMM Base Thunk driver can access it in Non-SMM mode.
