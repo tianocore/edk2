@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006, Intel Corporation                                                         
+Copyright (c) 2006 - 2010, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -22,7 +22,6 @@ Revision History:
 #include "HobGeneration.h"
 #include "Debug.h"
 
-#define ACPI_RSD_PTR      0x2052545020445352LL
 #define MPS_PTR           SIGNATURE_32('_','M','P','_')
 #define SMBIOS_PTR        SIGNATURE_32('_','S','M','_')
 
@@ -40,7 +39,7 @@ FindAcpiRsdPtr (
   // First Seach 0x0e0000 - 0x0fffff for RSD Ptr
   //
   for (Address = 0xe0000; Address < 0xfffff; Address += 0x10) {
-    if (*(UINT64 *)(Address) == ACPI_RSD_PTR) {
+    if (*(UINT64 *)(Address) == EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER_SIGNATURE) {
       return (VOID *)Address;
     }
   }
@@ -51,7 +50,7 @@ FindAcpiRsdPtr (
 
   Address = (*(UINT16 *)(UINTN)(EBDA_BASE_ADDRESS)) << 4;
   for (Index = 0; Index < 0x400 ; Index += 16) {
-    if (*(UINT64 *)(Address + Index) == ACPI_RSD_PTR) {
+    if (*(UINT64 *)(Address + Index) == EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER_SIGNATURE) {
       return (VOID *)Address;
     }
   }
@@ -107,69 +106,38 @@ FindMPSPtr (
 }
 
 #pragma pack(1)
-typedef struct {
-  UINT8           Signature[8];
-  UINT8           Checksum;
-  UINT8           OemId[6];
-  UINT8           Revision;
-  UINT32          RsdtAddress;
-  UINT32          Length;
-  UINT64          XsdtAddress;
-  UINT8           ExtendedChecksum;
-  UINT8           Reserved[3];
-} RSDP_TABLE;
 
 typedef struct {
-  UINT32          Signature;
-  UINT32          Length;
-  UINT8           Revision;
-  UINT8           Checksum;
-  UINT8           OemId[6];
-  UINT8           OemTableId[8];
-  UINT32          OemRevision;
-  UINT8           CreatorId[4];
-  UINT32          CreatorRevision;
-} DESCRIPTION_HEADER;
-
-typedef struct {
-  DESCRIPTION_HEADER    Header;
-  UINT32                Entry;
+  EFI_ACPI_DESCRIPTION_HEADER  Header;
+  UINT32                       Entry;
 } RSDT_TABLE;
 
 typedef struct {
-  DESCRIPTION_HEADER    Header;
-  UINT64                Entry;
+  EFI_ACPI_DESCRIPTION_HEADER  Header;
+  UINT64                       Entry;
 } XSDT_TABLE;
-
-typedef struct {
-  UINT8                 Address_Space_ID;
-  UINT8                 Register_Bit_Width;
-  UINT8                 Register_Bit_Offset;
-  UINT8                 Access_Size;
-  UINT64                Address;
-} GADDRESS_STRUCTURE;
 
 #pragma pack()
 
 VOID
 ScanTableInRSDT (
-  RSDT_TABLE            *Rsdt,
-  UINT32                Signature,
-  DESCRIPTION_HEADER    **FoundTable
+  RSDT_TABLE                   *Rsdt,
+  UINT32                       Signature,
+  EFI_ACPI_DESCRIPTION_HEADER  **FoundTable
   )
 {
-  UINTN                     Index;
-  UINT32                    EntryCount;
-  UINT32                    *EntryPtr;
-  DESCRIPTION_HEADER        *Table;
+  UINTN                         Index;
+  UINT32                        EntryCount;
+  UINT32                        *EntryPtr;
+  EFI_ACPI_DESCRIPTION_HEADER   *Table;
   
   *FoundTable = NULL;
   
-  EntryCount = (Rsdt->Header.Length - sizeof (DESCRIPTION_HEADER)) / sizeof(UINT32);
+  EntryCount = (Rsdt->Header.Length - sizeof (EFI_ACPI_DESCRIPTION_HEADER)) / sizeof(UINT32);
   
   EntryPtr = &Rsdt->Entry;
   for (Index = 0; Index < EntryCount; Index ++, EntryPtr ++) {
-    Table = (DESCRIPTION_HEADER*)((UINTN)(*EntryPtr));
+    Table = (EFI_ACPI_DESCRIPTION_HEADER*)((UINTN)(*EntryPtr));
     if (Table->Signature == Signature) {
       *FoundTable = Table;
       break;
@@ -181,26 +149,25 @@ ScanTableInRSDT (
 
 VOID
 ScanTableInXSDT (
-  XSDT_TABLE            *Xsdt,
-  UINT32                Signature,
-  DESCRIPTION_HEADER    **FoundTable
+  XSDT_TABLE                   *Xsdt,
+  UINT32                       Signature,
+  EFI_ACPI_DESCRIPTION_HEADER  **FoundTable
   )
 {
-  UINTN         Index;
-  UINT32        EntryCount;
-  UINT64        EntryPtr;
-  UINTN         BasePtr;
-  
-  DESCRIPTION_HEADER    *Table;
+  UINTN                        Index;
+  UINT32                       EntryCount;
+  UINT64                       EntryPtr;
+  UINTN                        BasePtr;
+  EFI_ACPI_DESCRIPTION_HEADER  *Table;
   
   *FoundTable = NULL;
   
-  EntryCount = (Xsdt->Header.Length - sizeof (DESCRIPTION_HEADER)) / sizeof(UINT64);
+  EntryCount = (Xsdt->Header.Length - sizeof (EFI_ACPI_DESCRIPTION_HEADER)) / sizeof(UINT64);
   
   BasePtr = (UINTN)(&(Xsdt->Entry));
   for (Index = 0; Index < EntryCount; Index ++) {
     CopyMem (&EntryPtr, (VOID *)(BasePtr + Index * sizeof(UINT64)), sizeof(UINT64));
-    Table = (DESCRIPTION_HEADER*)((UINTN)(EntryPtr));
+    Table = (EFI_ACPI_DESCRIPTION_HEADER*)((UINTN)(EntryPtr));
     if (Table->Signature == Signature) {
       *FoundTable = Table;
       break;
@@ -216,10 +183,10 @@ FindAcpiPtr (
   UINT32           Signature
   )
 {
-  DESCRIPTION_HEADER    *AcpiTable;
-  RSDP_TABLE            *Rsdp;
-  RSDT_TABLE            *Rsdt;
-  XSDT_TABLE            *Xsdt;
+  EFI_ACPI_DESCRIPTION_HEADER                    *AcpiTable;
+  EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER   *Rsdp;
+  RSDT_TABLE                                     *Rsdt;
+  XSDT_TABLE                                     *Xsdt;
  
   AcpiTable = NULL;
 
@@ -227,7 +194,7 @@ FindAcpiPtr (
   // Check ACPI2.0 table
   //
   if ((int)Hob->Acpi20.Table != -1) {
-    Rsdp = (RSDP_TABLE *)(UINTN)Hob->Acpi20.Table;
+    Rsdp = (EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER *)(UINTN)Hob->Acpi20.Table;
     Rsdt = (RSDT_TABLE *)(UINTN)Rsdp->RsdtAddress;
     Xsdt = NULL;
     if ((Rsdp->Revision >= 2) && (Rsdp->XsdtAddress < (UINT64)(UINTN)-1)) {
@@ -251,7 +218,7 @@ FindAcpiPtr (
   // Check ACPI1.0 table
   //
   if ((AcpiTable == NULL) && ((int)Hob->Acpi.Table != -1)) {
-    Rsdp = (RSDP_TABLE *)(UINTN)Hob->Acpi.Table;
+    Rsdp = (EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER *)(UINTN)Hob->Acpi.Table;
     Rsdt = (RSDT_TABLE *)(UINTN)Rsdp->RsdtAddress;
     //
     // Check Rsdt
@@ -265,8 +232,6 @@ FindAcpiPtr (
 }
 
 #pragma pack(1)
-//#define MCFG_SIGNATURE  0x4746434D
-#define MCFG_SIGNATURE SIGNATURE_32 ('M', 'C', 'F', 'G')
 typedef struct {
   UINT64  BaseAddress;
   UINT16  PciSegmentGroupNumber;
@@ -274,63 +239,6 @@ typedef struct {
   UINT8   EndBusNumber;
   UINT32  Reserved;
 } MCFG_STRUCTURE;
-
-#define FADT_SIGNATURE SIGNATURE_32 ('F', 'A', 'C', 'P')
-typedef struct {
-  DESCRIPTION_HEADER    Header;
-  UINT32                FIRMWARE_CTRL;
-  UINT32                DSDT;
-  UINT8                 INT_MODEL;
-  UINT8                 Preferred_PM_Profile;
-  UINT16                SCI_INIT;
-  UINT32                SMI_CMD;
-  UINT8                 ACPI_ENABLE;
-  UINT8                 ACPI_DISABLE;
-  UINT8                 S4BIOS_REQ;
-  UINT8                 PSTATE_CNT;
-  UINT32                PM1a_EVT_BLK;
-  UINT32                PM1b_EVT_BLK;
-  UINT32                PM1a_CNT_BLK;
-  UINT32                PM1b_CNT_BLK;
-  UINT32                PM2_CNT_BLK;
-  UINT32                PM_TMR_BLK;
-  UINT32                GPE0_BLK;
-  UINT32                GPE1_BLK;
-  UINT8                 PM1_EVT_LEN;
-  UINT8                 PM1_CNT_LEN;
-  UINT8                 PM2_CNT_LEN;
-  UINT8                 PM_TMR_LEN;
-  UINT8                 GPE0_BLK_LEN;
-  UINT8                 GPE1_BLK_LEN;
-  UINT8                 GPE1_BASE;
-  UINT8                 CST_CNT;
-  UINT16                P_LVL2_LAT;
-  UINT16                P_LVL3_LAT;
-  UINT16                FLUSH_SIZE;
-  UINT16                FLUSH_STRIDE;
-  UINT8                 DUTY_OFFSET;
-  UINT8                 DUTY_WIDTH;
-  UINT8                 DAY_ALARM;
-  UINT8                 MON_ALARM;
-  UINT8                 CENTRY;
-  UINT16                IAPC_BOOT_ARCH;
-  UINT8                 Reserved_111;
-  UINT32                Flags;
-  GADDRESS_STRUCTURE    RESET_REG;
-  UINT8                 RESET_VALUE;
-  UINT8                 Reserved_129[3];
-  UINT64                X_FIRMWARE_CTRL;
-  UINT64                X_DSDT;
-  GADDRESS_STRUCTURE    X_PM1a_EVT_BLK;
-  GADDRESS_STRUCTURE    X_PM1b_EVT_BLK;
-  GADDRESS_STRUCTURE    X_PM1a_CNT_BLK;
-  GADDRESS_STRUCTURE    X_PM1b_CNT_BLK;
-  GADDRESS_STRUCTURE    X_PM2_CNT_BLK;
-  GADDRESS_STRUCTURE    X_PM_TMR_BLK;
-  GADDRESS_STRUCTURE    X_GPE0_BLK;
-  GADDRESS_STRUCTURE    X_GPE1_BLK;
-} FADT_TABLE;
-
 #pragma pack()
 
 VOID
@@ -338,18 +246,18 @@ PrepareMcfgTable (
   IN HOB_TEMPLATE  *Hob
   )
 {
-  DESCRIPTION_HEADER    *McfgTable;
-  MCFG_STRUCTURE        *Mcfg;
-  UINTN                 McfgCount;
-  UINTN                 Index;
+  EFI_ACPI_DESCRIPTION_HEADER  *McfgTable;
+  MCFG_STRUCTURE               *Mcfg;
+  UINTN                        McfgCount;
+  UINTN                        Index;
 
-  McfgTable = FindAcpiPtr (Hob, MCFG_SIGNATURE);
+  McfgTable = FindAcpiPtr (Hob, EFI_ACPI_3_0_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE);
   if (McfgTable == NULL) {
     return ;
   }
 
-  Mcfg = (MCFG_STRUCTURE *)((UINTN)McfgTable + sizeof(DESCRIPTION_HEADER) + sizeof(UINT64));
-  McfgCount = (McfgTable->Length - sizeof(DESCRIPTION_HEADER) - sizeof(UINT64)) / sizeof(MCFG_STRUCTURE);
+  Mcfg = (MCFG_STRUCTURE *)((UINTN)McfgTable + sizeof(EFI_ACPI_DESCRIPTION_HEADER) + sizeof(UINT64));
+  McfgCount = (McfgTable->Length - sizeof(EFI_ACPI_DESCRIPTION_HEADER) - sizeof(UINT64)) / sizeof(MCFG_STRUCTURE);
 
   //
   // Fill PciExpress info on Hob
@@ -370,10 +278,10 @@ PrepareFadtTable (
   IN HOB_TEMPLATE  *Hob
   )
 {
-  FADT_TABLE            *Fadt;
-  EFI_ACPI_DESCRIPTION  *AcpiDescription;
+  EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE   *Fadt;
+  EFI_ACPI_DESCRIPTION                        *AcpiDescription;
 
-  Fadt = FindAcpiPtr (Hob, FADT_SIGNATURE);
+  Fadt = FindAcpiPtr (Hob, EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE);
   if (Fadt == NULL) {
     return ;
   }
@@ -383,24 +291,31 @@ PrepareFadtTable (
   // Fill AcpiDescription according to FADT
   // Currently, only for PM_TMR
   //
-  AcpiDescription->PM_TMR_LEN = Fadt->PM_TMR_LEN;
+  AcpiDescription->PM_TMR_LEN = Fadt->PmTmrLen;
   AcpiDescription->TMR_VAL_EXT = (UINT8)((Fadt->Flags & 0x100) != 0);
-  if ((Fadt->Header.Revision >= 3) && (Fadt->Header.Length >= sizeof(FADT_TABLE))) {
+ 
+  //
+  // For fields not included in ACPI 1.0 spec, we get the value based on table length
+  //
+  if (Fadt->Header.Length >= OFFSET_OF (EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE, XPmTmrBlk) + sizeof (Fadt->XPmTmrBlk)) {
     CopyMem (
       &AcpiDescription->PM_TMR_BLK,
-      &Fadt->X_PM_TMR_BLK,
-      sizeof(GADDRESS_STRUCTURE)
+      &Fadt->XPmTmrBlk,
+      sizeof(EFI_ACPI_3_0_GENERIC_ADDRESS_STRUCTURE)
       );
+  }
+  if (Fadt->Header.Length >= OFFSET_OF (EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE, ResetValue) + sizeof (Fadt->ResetValue)) {
     CopyMem (
       &AcpiDescription->RESET_REG,
-      &Fadt->RESET_REG,
-      sizeof(GADDRESS_STRUCTURE)
+      &Fadt->ResetReg,
+      sizeof(EFI_ACPI_3_0_GENERIC_ADDRESS_STRUCTURE)
       );
-    AcpiDescription->RESET_VALUE = Fadt->RESET_VALUE;
+    AcpiDescription->RESET_VALUE = Fadt->ResetValue;
   }
+
   if (AcpiDescription->PM_TMR_BLK.Address == 0) {
-    AcpiDescription->PM_TMR_BLK.Address          = Fadt->PM_TMR_BLK;
-    AcpiDescription->PM_TMR_BLK.AddressSpaceId   = ACPI_ADDRESS_ID_IO;
+    AcpiDescription->PM_TMR_BLK.Address          = Fadt->PmTmrBlk;
+    AcpiDescription->PM_TMR_BLK.AddressSpaceId   = EFI_ACPI_3_0_SYSTEM_IO;
     AcpiDescription->PM_TMR_BLK.RegisterBitWidth = (UINT8) ((AcpiDescription->TMR_VAL_EXT == 0) ? 24 : 32);
   }
 

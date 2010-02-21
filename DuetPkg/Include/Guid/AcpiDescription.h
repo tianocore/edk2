@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2007, Intel Corporation                                                         
+Copyright (c) 2006 - 2010, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -23,30 +23,12 @@ Abstract:
 #ifndef _EFI_ACPI_DESCRIPTION_H_
 #define _EFI_ACPI_DESCRIPTION_H_
 
+#include <IndustryStandard/Acpi.h>
+
 #define EFI_ACPI_DESCRIPTION_GUID \
   { \
   0x3c699197, 0x93c, 0x4c69, {0xb0, 0x6b, 0x12, 0x8a, 0xe3, 0x48, 0x1d, 0xc9} \
   }
-
-typedef struct {
-  UINT8   AddressSpaceId;
-  UINT8   RegisterBitWidth;
-  UINT8   RegisterBitOffset;
-  UINT8   AccessSize;
-  UINT64  Address;
-} EFI_ACPI_GENERIC_ADDRESS_STRUCTURE;
-
-#define ACPI_ADDRESS_ID_MEMORY    0
-#define ACPI_ADDRESS_ID_IO        1
-#define ACPI_ADDRESS_ID_PCI       2
-#define ACPI_ADDRESS_ID_EC        3
-#define ACPI_ADDRESS_ID_SMBUS     4
-
-#define ACPI_ADDRESS_ACCESS_ANY   0
-#define ACPI_ADDRESS_ACCESS_BYTE  1
-#define ACPI_ADDRESS_ACCESS_WORD  2
-#define ACPI_ADDRESS_ACCESS_DWORD 3
-#define ACPI_ADDRESS_ACCESS_QWORD 4
 
 //
 // Following structure defines ACPI Description information.
@@ -57,7 +39,7 @@ typedef struct _EFI_ACPI_DESCRIPTION {
   //
   // For Timer
   //
-  EFI_ACPI_GENERIC_ADDRESS_STRUCTURE       PM_TMR_BLK;
+  EFI_ACPI_3_0_GENERIC_ADDRESS_STRUCTURE   PM_TMR_BLK;
   UINT8                                    PM_TMR_LEN;
   UINT8                                    TMR_VAL_EXT;
 
@@ -71,17 +53,17 @@ typedef struct _EFI_ACPI_DESCRIPTION {
   //
   // For Reset
   //
-  EFI_ACPI_GENERIC_ADDRESS_STRUCTURE       RESET_REG;
+  EFI_ACPI_3_0_GENERIC_ADDRESS_STRUCTURE   RESET_REG;
   UINT8                                    RESET_VALUE;
 
   //
   // For Shutdown
   //
-  EFI_ACPI_GENERIC_ADDRESS_STRUCTURE       PM1a_EVT_BLK;
-  EFI_ACPI_GENERIC_ADDRESS_STRUCTURE       PM1b_EVT_BLK;
-  EFI_ACPI_GENERIC_ADDRESS_STRUCTURE       PM1a_CNT_BLK;
-  EFI_ACPI_GENERIC_ADDRESS_STRUCTURE       PM1b_CNT_BLK;
-  EFI_ACPI_GENERIC_ADDRESS_STRUCTURE       PM2_CNT_BLK;
+  EFI_ACPI_3_0_GENERIC_ADDRESS_STRUCTURE   PM1a_EVT_BLK;
+  EFI_ACPI_3_0_GENERIC_ADDRESS_STRUCTURE   PM1b_EVT_BLK;
+  EFI_ACPI_3_0_GENERIC_ADDRESS_STRUCTURE   PM1a_CNT_BLK;
+  EFI_ACPI_3_0_GENERIC_ADDRESS_STRUCTURE   PM1b_CNT_BLK;
+  EFI_ACPI_3_0_GENERIC_ADDRESS_STRUCTURE   PM2_CNT_BLK;
   UINT8                                    PM1_EVT_LEN;
   UINT8                                    PM1_CNT_LEN;
   UINT8                                    PM2_CNT_LEN;
@@ -103,8 +85,8 @@ typedef struct _EFI_ACPI_DESCRIPTION {
   //
   // GPE
   //
-  EFI_ACPI_GENERIC_ADDRESS_STRUCTURE       GPE0_BLK;
-  EFI_ACPI_GENERIC_ADDRESS_STRUCTURE       GPE1_BLK;
+  EFI_ACPI_3_0_GENERIC_ADDRESS_STRUCTURE   GPE0_BLK;
+  EFI_ACPI_3_0_GENERIC_ADDRESS_STRUCTURE   GPE1_BLK;
   UINT8                                    GPE0_BLK_LEN;
   UINT8                                    GPE1_BLK_LEN;
   UINT8                                    GPE1_BASE;

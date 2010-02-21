@@ -57,6 +57,8 @@
   PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
   OemHookStatusCodeLib|MdeModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
+  PciLib|MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
+  PciCf8Lib|MdePkg/Library/BasePciCf8Lib/BasePciCf8Lib.inf
   TimerLib|DuetPkg/Library/DuetTimerLib/DuetTimerLib.inf
   UefiUsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -170,7 +172,7 @@
   UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
   DuetPkg/CpuDxe/Cpu.inf
   PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf
-  PcAtChipsetPkg/KbcResetDxe/Reset.inf
+  DuetPkg/AcpiResetDxe/Reset.inf
   DuetPkg/LegacyMetronome/Metronome.inf
 
   PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
