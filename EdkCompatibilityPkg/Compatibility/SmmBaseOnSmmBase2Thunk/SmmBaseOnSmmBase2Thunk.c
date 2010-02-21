@@ -19,9 +19,96 @@
 
 **/
 
-#include  "SmmBaseOnSmmBase2Thunk.h"
+#include <PiDxe.h>
+#include <FrameworkSmm.h>
 
-EFI_SMM_BASE_PROTOCOL gSmmBase = {
+#include <Protocol/SmmBase2.h>
+#include <Protocol/SmmCommunication.h>
+#include <Protocol/SmmBaseHelperReady.h>
+
+#include <Guid/SmmBaseThunkCommunication.h>
+#include <Guid/EventGroup.h>
+
+#include <Library/DebugLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiDriverEntryPoint.h>
+#include <Library/UefiLib.h>
+#include <Library/UefiRuntimeLib.h>
+
+//
+// SMM Base Protocol function ptoyotypes
+//
+EFI_STATUS
+EFIAPI
+SmmBaseRegister (
+  IN      EFI_SMM_BASE_PROTOCOL     *This,
+  IN      EFI_DEVICE_PATH_PROTOCOL  *FilePath,
+  IN      VOID                      *SourceBuffer,
+  IN      UINTN                     SourceSize,
+  OUT     EFI_HANDLE                *ImageHandle,
+  IN      BOOLEAN                   LegacyIA32Binary
+  );
+
+EFI_STATUS
+EFIAPI
+SmmBaseUnregister (
+  IN      EFI_SMM_BASE_PROTOCOL     *This,
+  IN      EFI_HANDLE                ImageHandle
+  );
+
+EFI_STATUS
+EFIAPI
+SmmBaseCommunicate (
+  IN      EFI_SMM_BASE_PROTOCOL     *This,
+  IN      EFI_HANDLE                ImageHandle,
+  IN OUT  VOID                      *CommunicationBuffer,
+  IN OUT  UINTN                     *BufferSize
+  );
+
+EFI_STATUS
+EFIAPI
+SmmBaseRegisterCallback (
+  IN      EFI_SMM_BASE_PROTOCOL         *This,
+  IN      EFI_HANDLE                    SmmImageHandle,
+  IN      EFI_SMM_CALLBACK_ENTRY_POINT  CallbackAddress,
+  IN      BOOLEAN                       MakeLast,
+  IN      BOOLEAN                       FloatingPointSave
+  );
+
+EFI_STATUS
+EFIAPI
+SmmBaseInSmm (
+  IN      EFI_SMM_BASE_PROTOCOL     *This,
+  OUT     BOOLEAN                   *InSmm
+  );
+
+EFI_STATUS
+EFIAPI
+SmmBaseSmmAllocatePool (
+  IN      EFI_SMM_BASE_PROTOCOL     *This,
+  IN      EFI_MEMORY_TYPE           PoolType,
+  IN      UINTN                     Size,
+  OUT     VOID                      **Buffer
+  );
+
+EFI_STATUS
+EFIAPI
+SmmBaseSmmFreePool (
+  IN      EFI_SMM_BASE_PROTOCOL     *This,
+  IN      VOID                      *Buffer
+  );
+
+EFI_STATUS
+EFIAPI
+SmmBaseGetSmstLocation (
+  IN      EFI_SMM_BASE_PROTOCOL     *This,
+  OUT     EFI_SMM_SYSTEM_TABLE      **Smst
+  );
+
+///
+/// SMM Base Protocol instance
+///
+EFI_SMM_BASE_PROTOCOL  mSmmBase = {
   SmmBaseRegister,
   SmmBaseUnregister,
   SmmBaseCommunicate,
@@ -32,12 +119,12 @@ EFI_SMM_BASE_PROTOCOL gSmmBase = {
   SmmBaseGetSmstLocation
 };
 
-SMMBASETHUNK_COMMUNICATION_DATA gCommunicationData = {
+SMMBASETHUNK_COMMUNICATION_DATA  mCommunicationData = {
   EFI_SMM_BASE_THUNK_COMMUNICATION_GUID,
   sizeof (SMMBASE_FUNCTION_DATA)
 };
 
-EFI_HANDLE                         mImageHandle;
+EFI_HANDLE                         mSmmBaseHandle = NULL;
 EFI_SMM_BASE2_PROTOCOL             *mSmmBase2 = NULL;
 EFI_SMM_COMMUNICATION_PROTOCOL     *mSmmCommunication = NULL;
 EFI_SMM_BASE_HELPER_READY_PROTOCOL *mSmmBaseHelperReady = NULL;
@@ -71,7 +158,7 @@ SmmBaseHelperService (
 {
   UINTN DataSize;
 
-  gCommunicationData.FunctionData.Status = EFI_UNSUPPORTED;
+  mCommunicationData.FunctionData.Status = EFI_UNSUPPORTED;
 
   if (IsInSmm()) {
     ///
@@ -86,7 +173,7 @@ SmmBaseHelperService (
     mSmmBaseHelperReady->ServiceEntry (
                            NULL,
                            NULL,
-                           &gCommunicationData.FunctionData,
+                           &mCommunicationData.FunctionData,
                            &DataSize
                            );
   } else {
@@ -98,10 +185,10 @@ SmmBaseHelperService (
       return;
     }
 
-    DataSize = (UINTN)(sizeof (gCommunicationData));
+    DataSize = (UINTN)(sizeof (mCommunicationData));
     mSmmCommunication->Communicate (
                          mSmmCommunication,
-                         &gCommunicationData,
+                         &mCommunicationData,
                          &DataSize
                          );
   }
@@ -143,15 +230,15 @@ SmmBaseRegister (
     return EFI_UNSUPPORTED;
   }
 
-  gCommunicationData.FunctionData.Function = SMMBASE_REGISTER;
-  gCommunicationData.FunctionData.Args.Register.FilePath = FilePath;
-  gCommunicationData.FunctionData.Args.Register.SourceBuffer = SourceBuffer;
-  gCommunicationData.FunctionData.Args.Register.SourceSize = SourceSize;
-  gCommunicationData.FunctionData.Args.Register.ImageHandle = ImageHandle;
-  gCommunicationData.FunctionData.Args.Register.LegacyIA32Binary = LegacyIA32Binary;
+  mCommunicationData.FunctionData.Function = SMMBASE_REGISTER;
+  mCommunicationData.FunctionData.Args.Register.FilePath = FilePath;
+  mCommunicationData.FunctionData.Args.Register.SourceBuffer = SourceBuffer;
+  mCommunicationData.FunctionData.Args.Register.SourceSize = SourceSize;
+  mCommunicationData.FunctionData.Args.Register.ImageHandle = ImageHandle;
+  mCommunicationData.FunctionData.Args.Register.LegacyIA32Binary = LegacyIA32Binary;
 
   SmmBaseHelperService ();
-  return gCommunicationData.FunctionData.Status;
+  return mCommunicationData.FunctionData.Status;
 }
 
 /**
@@ -172,11 +259,11 @@ SmmBaseUnregister (
   IN      EFI_HANDLE                ImageHandle
   )
 {
-  gCommunicationData.FunctionData.Function = SMMBASE_UNREGISTER;
-  gCommunicationData.FunctionData.Args.UnRegister.ImageHandle = ImageHandle;
+  mCommunicationData.FunctionData.Function = SMMBASE_UNREGISTER;
+  mCommunicationData.FunctionData.Args.UnRegister.ImageHandle = ImageHandle;
 
   SmmBaseHelperService ();
-  return gCommunicationData.FunctionData.Status;
+  return mCommunicationData.FunctionData.Status;
 }
 
 /**
@@ -249,14 +336,14 @@ SmmBaseRegisterCallback (
     return EFI_UNSUPPORTED;
   }
 
-  gCommunicationData.FunctionData.Function = SMMBASE_REGISTER_CALLBACK;
-  gCommunicationData.FunctionData.Args.RegisterCallback.SmmImageHandle = SmmImageHandle;
-  gCommunicationData.FunctionData.Args.RegisterCallback.CallbackAddress = CallbackAddress;
-  gCommunicationData.FunctionData.Args.RegisterCallback.MakeLast = MakeLast;
-  gCommunicationData.FunctionData.Args.RegisterCallback.FloatingPointSave = FloatingPointSave;
+  mCommunicationData.FunctionData.Function = SMMBASE_REGISTER_CALLBACK;
+  mCommunicationData.FunctionData.Args.RegisterCallback.SmmImageHandle = SmmImageHandle;
+  mCommunicationData.FunctionData.Args.RegisterCallback.CallbackAddress = CallbackAddress;
+  mCommunicationData.FunctionData.Args.RegisterCallback.MakeLast = MakeLast;
+  mCommunicationData.FunctionData.Args.RegisterCallback.FloatingPointSave = FloatingPointSave;
 
   SmmBaseHelperService();
-  return gCommunicationData.FunctionData.Status;
+  return mCommunicationData.FunctionData.Status;
 }
 
 /**
@@ -309,13 +396,13 @@ SmmBaseSmmAllocatePool (
   OUT     VOID                      **Buffer
   )
 {
-  gCommunicationData.FunctionData.Function = SMMBASE_ALLOCATE_POOL;
-  gCommunicationData.FunctionData.Args.AllocatePool.PoolType = PoolType;
-  gCommunicationData.FunctionData.Args.AllocatePool.Size = Size;
-  gCommunicationData.FunctionData.Args.AllocatePool.Buffer = Buffer;
+  mCommunicationData.FunctionData.Function = SMMBASE_ALLOCATE_POOL;
+  mCommunicationData.FunctionData.Args.AllocatePool.PoolType = PoolType;
+  mCommunicationData.FunctionData.Args.AllocatePool.Size = Size;
+  mCommunicationData.FunctionData.Args.AllocatePool.Buffer = Buffer;
 
   SmmBaseHelperService ();
-  return gCommunicationData.FunctionData.Status;
+  return mCommunicationData.FunctionData.Status;
 }
 
 /**
@@ -337,11 +424,11 @@ SmmBaseSmmFreePool (
   IN      VOID                      *Buffer
   )
 {
-  gCommunicationData.FunctionData.Function = SMMBASE_FREE_POOL;
-  gCommunicationData.FunctionData.Args.FreePool.Buffer = Buffer;
+  mCommunicationData.FunctionData.Function = SMMBASE_FREE_POOL;
+  mCommunicationData.FunctionData.Args.FreePool.Buffer = Buffer;
 
   SmmBaseHelperService ();
-  return gCommunicationData.FunctionData.Status;
+  return mCommunicationData.FunctionData.Status;
 }
 
 /**
@@ -382,81 +469,6 @@ SmmBaseGetSmstLocation (
 }
 
 /**
-  SMM Base Protocol notification event handler.
-
-  @param[in] Event    Event whose notification function is being invoked.
-  @param[in] Context  Pointer to the notification function's context.
-**/
-VOID
-EFIAPI
-SmmBaseProtocolNotification (
-  IN EFI_EVENT  Event,
-  IN VOID       *Context
-  )
-{
-  EFI_STATUS Status;
-
-  ///
-  /// Assume only one instance of SMM Base2 Protocol in the system
-  /// Locate SMM Base2 Protocol
-  ///
-  Status = gBS->LocateProtocol (&gEfiSmmBase2ProtocolGuid, NULL, (VOID **) &mSmmBase2);
-  if (!EFI_ERROR (Status)) {
-    ///
-    /// Publish Framework SMM BASE Protocol immediately after SMM Base2 Protocol is installed to
-    /// make SMM Base Protocol.InSmm() available as early as possible.
-    ///
-    Status = gBS->InstallProtocolInterface (
-                    &mImageHandle,
-                    &gEfiSmmBaseProtocolGuid,
-                    EFI_NATIVE_INTERFACE,
-                    &gSmmBase
-                    );
-    ASSERT_EFI_ERROR (Status);
-  }
-}
-
-/**
-  SMM Communication Protocol notification event handler.
-
-  @param[in] Event    Event whose notification function is being invoked.
-  @param[in] Context  Pointer to the notification function's context.
-**/
-VOID
-EFIAPI
-SmmCommunicationProtocolNotification (
-  IN EFI_EVENT  Event,
-  IN VOID       *Context
-  )
-{
-  ///
-  /// Assume only one instance of SMM Communication Protocol in the system
-  /// Locate SMM Communication Protocol
-  ///
-  gBS->LocateProtocol (&gEfiSmmCommunicationProtocolGuid, NULL, (VOID **) &mSmmCommunication);
-}
-
-/**
-  SMM Base Helper Ready Protocol notification event handler.
-
-  @param[in] Event    Event whose notification function is being invoked.
-  @param[in] Context  Pointer to the notification function's context.
-**/
-VOID
-EFIAPI
-SmmBaseHelperReadyProtocolNotification (
-  IN EFI_EVENT  Event,
-  IN VOID       *Context
-  )
-{
-  ///
-  /// Assume only one instance of SMM Base Helper Ready Protocol in the system
-  /// Locate SMM Base Helper Ready Protocol
-  ///
-  gBS->LocateProtocol (&gEfiSmmBaseHelperReadyProtocolGuid, NULL, (VOID **) &mSmmBaseHelperReady);
-}
-
-/**
   Notification function of EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE
 
   This is a notification function registered on EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE event.
@@ -492,60 +504,53 @@ SmmBaseThunkMain (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  VOID       *Registration;
-  EFI_EVENT  VirtualAddressChangeEvent;
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
+  EFI_EVENT   Event;
 
-  mImageHandle = ImageHandle;
+  //
+  // Assume only one instance of SMM Base2 Protocol in the system
+  // Locate SMM Base2 Protocol
+  //
+  Status = gBS->LocateProtocol (&gEfiSmmBase2ProtocolGuid, NULL, (VOID **) &mSmmBase2);
+  ASSERT_EFI_ERROR (Status);
 
-  ///
-  /// Install notifications for required protocols
-  ///
-  /// Note we use protocol notifications here so as that this thunk driver can be
-  /// loaded before PI SMM IPL driver. Framework SMM BASE Protocol will be published 
-  /// immediately after SMM Base2 Protocol is installed to make SMM Base Protocol.InSmm()
-  /// available as early as possible because some Framework code's behavior depends on
-  /// correct detection of SMM mode via SMM Base Protocol.InSmm().
-  ///
-  /// Also SMM Base Helper driver is expected to be dispatched
-  /// in the earliest round of SMM driver dispatch just after SMM IPL driver loads SMM Foundation.
-  /// So the full functionality of SMM Base Protocol is ready immediately after SMM IPL driver is
-  /// loaded. Since that point Framework SMM driver can be succesufully supported.
-  ///
-  EfiCreateProtocolNotifyEvent (
-    &gEfiSmmBase2ProtocolGuid,
-    TPL_CALLBACK,
-    SmmBaseProtocolNotification,
-    NULL,
-    &Registration
-    );
+  //
+  // Assume only one instance of SMM Communication Protocol in the system
+  // Locate SMM Communication Protocol
+  //
+  gBS->LocateProtocol (&gEfiSmmCommunicationProtocolGuid, NULL, (VOID **) &mSmmCommunication);
+  ASSERT_EFI_ERROR (Status);
 
-  EfiCreateProtocolNotifyEvent (
-    &gEfiSmmCommunicationProtocolGuid,
-    TPL_CALLBACK,
-    SmmCommunicationProtocolNotification,
-    NULL,
-    &Registration
-    );
+  //
+  // Assume only one instance of SMM Base Helper Ready Protocol in the system
+  // Locate SMM Base Helper Ready Protocol
+  //
+  Status = gBS->LocateProtocol (&gEfiSmmBaseHelperReadyProtocolGuid, NULL, (VOID **) &mSmmBaseHelperReady);
+  ASSERT_EFI_ERROR (Status);
 
-  EfiCreateProtocolNotifyEvent (
-    &gEfiSmmBaseHelperReadyProtocolGuid,
-    TPL_CALLBACK,
-    SmmBaseHelperReadyProtocolNotification,
-    NULL,
-    &Registration
-    );
-
+  //
+  // Create event on SetVirtualAddressMap() to convert mSmmCommunication from a physical address to a virtual address
+  //
   Status = gBS->CreateEventEx (
                   EVT_NOTIFY_SIGNAL,
                   TPL_NOTIFY,
                   SmmBaseAddressChangeEvent,
                   NULL,
                   &gEfiEventVirtualAddressChangeGuid,
-                  &VirtualAddressChangeEvent
+                  &Event
                   );
   ASSERT_EFI_ERROR (Status);
-
+  
+  //
+  // Publish Framework SMM BASE Protocol immediately after SMM Base2 Protocol is installed to
+  // make SMM Base Protocol.InSmm() available as early as possible.
+  //
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &mSmmBaseHandle,
+                  &gEfiSmmBaseProtocolGuid, &mSmmBase,
+                  NULL
+                  );
+  ASSERT_EFI_ERROR (Status);
+  
   return EFI_SUCCESS;
 }
-

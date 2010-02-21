@@ -29,7 +29,6 @@
 
 [Sources]
   SmmBaseOnSmmBase2Thunk.c
-  SmmBaseOnSmmBase2Thunk.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -47,11 +46,10 @@
   gEfiEventVirtualAddressChangeGuid   # GUID ALWAYS_CONSUMED
 
 [Protocols]
-  gEfiSmmBase2ProtocolGuid            # PROTOCOL SOMETIMES_CONSUMED
-  gEfiSmmCommunicationProtocolGuid    # PROTOCOL SOMETIMES_CONSUMED
-  gEfiSmmBaseHelperReadyProtocolGuid  # PROTOCOL SOMETIMES_CONSUMED
-  gEfiSmmBaseProtocolGuid             # PROTOCOL SOMETIMES_PRODUCED
+  gEfiSmmBase2ProtocolGuid            # PROTOCOL ALWAYS_CONSUMED
+  gEfiSmmCommunicationProtocolGuid    # PROTOCOL ALWAYS_CONSUMED
+  gEfiSmmBaseHelperReadyProtocolGuid  # PROTOCOL ALWAYS_CONSUMED
+  gEfiSmmBaseProtocolGuid             # PROTOCOL ALWAYS_PRODUCED
 
 [Depex]
-  TRUE
-
+  gEfiSmmBase2ProtocolGuid AND gEfiSmmCommunicationProtocolGuid AND gEfiSmmBaseHelperReadyProtocolGuid
