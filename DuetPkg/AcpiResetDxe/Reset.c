@@ -12,115 +12,29 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 --*/
 
-#include "Reset.h"
+#include <PiDxe.h>
 
-/**
-  Use ACPI method to reset the sytem. If fail, use legacy 8042 method to reset the system
+#include <Protocol/Reset.h>
 
-  @param[in] AcpiDescription   Global variable to record reset info
+#include <Guid/AcpiDescription.h>
 
-**/
-VOID
-SystemReset (
-  IN EFI_ACPI_DESCRIPTION *AcpiDescription
-  )
-{
-  UINT8   Dev;
-  UINT8   Func;
-  UINT8   Register;
+#include <Library/BaseLib.h>
+#include <Library/IoLib.h>
+#include <Library/PciLib.h>
+#include <Library/HobLib.h>
+#include <Library/DebugLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 
-  if ((AcpiDescription->RESET_REG.Address != 0) &&
-      ((AcpiDescription->RESET_REG.AddressSpaceId == EFI_ACPI_3_0_SYSTEM_IO) ||
-       (AcpiDescription->RESET_REG.AddressSpaceId == EFI_ACPI_3_0_SYSTEM_MEMORY) ||
-       (AcpiDescription->RESET_REG.AddressSpaceId == EFI_ACPI_3_0_PCI_CONFIGURATION_SPACE))) {
-    //
-    // Use ACPI System Reset
-    //
-    switch (AcpiDescription->RESET_REG.AddressSpaceId) {
-    case EFI_ACPI_3_0_SYSTEM_IO:
-      IoWrite8 ((UINTN) AcpiDescription->RESET_REG.Address, AcpiDescription->RESET_VALUE);
-      break;
-    case EFI_ACPI_3_0_SYSTEM_MEMORY:
-      MmioWrite8 ((UINTN) AcpiDescription->RESET_REG.Address, AcpiDescription->RESET_VALUE);
-      break;
-    case EFI_ACPI_3_0_PCI_CONFIGURATION_SPACE:
-      Register = (UINT8) AcpiDescription->RESET_REG.Address;
-      Func     = (UINT8) (RShiftU64 (AcpiDescription->RESET_REG.Address, 16) & 0x7);
-      Dev      = (UINT8) (RShiftU64 (AcpiDescription->RESET_REG.Address, 32) & 0x1F);
-      PciWrite8 (PCI_LIB_ADDRESS (0, Dev, Func, Register), AcpiDescription->RESET_VALUE);
-      break;
-    }
-  }
+///
+/// Handle for the Reset Architectural Protocol
+///
+EFI_HANDLE            mResetHandle = NULL;
 
-  //
-  // If system comes here, means ACPI reset fail, do Legacy System Reset, assume 8042 available
-  //
-  Register = 0xfe;
-  IoWrite8 (0x64, Register);
-
-  //
-  // System should reset now
-  //
-
-  return ;
-}
-
-/**
-  Use ACPI method to shutdown the sytem
-
-  @param[in] AcpiDescription   Global variable to record reset info
-
-  @retval EFI_UNSUPPORTED      Shutdown fails
-
-**/
-EFI_STATUS
-SystemShutdown (
-  IN EFI_ACPI_DESCRIPTION *AcpiDescription
-  )
-{
-  UINT16  Value;
-
-  //
-  // 1. Write SLP_TYPa
-  //
-  if ((AcpiDescription->PM1a_CNT_BLK.Address != 0) && (AcpiDescription->SLP_TYPa != 0)) {
-    switch (AcpiDescription->PM1a_CNT_BLK.AddressSpaceId) {
-    case EFI_ACPI_3_0_SYSTEM_IO:
-      Value = IoRead16 ((UINTN) AcpiDescription->PM1a_CNT_BLK.Address);
-      Value = (Value & 0xc3ff) | 0x2000 | (AcpiDescription->SLP_TYPa << 10);
-      IoWrite16 ((UINTN) AcpiDescription->PM1a_CNT_BLK.Address, Value);
-      break;
-    case EFI_ACPI_3_0_SYSTEM_MEMORY:
-      Value = MmioRead16 ((UINTN) AcpiDescription->PM1a_CNT_BLK.Address);
-      Value = (Value & 0xc3ff) | 0x2000 | (AcpiDescription->SLP_TYPa << 10);
-      MmioWrite16 ((UINTN) AcpiDescription->PM1a_CNT_BLK.Address, Value);
-      break;
-    }
-  }
-
-  //
-  // 2. Write SLP_TYPb
-  //
-  if ((AcpiDescription->PM1b_CNT_BLK.Address != 0) && (AcpiDescription->SLP_TYPb != 0)) {
-    switch (AcpiDescription->PM1b_CNT_BLK.AddressSpaceId) {
-    case EFI_ACPI_3_0_SYSTEM_IO:
-      Value = IoRead16 ((UINTN) AcpiDescription->PM1b_CNT_BLK.Address);
-      Value = (Value & 0xc3ff) | 0x2000 | (AcpiDescription->SLP_TYPb << 10);
-      IoWrite16 ((UINTN) AcpiDescription->PM1b_CNT_BLK.Address, Value);
-      break;
-    case EFI_ACPI_3_0_SYSTEM_MEMORY:
-      Value = MmioRead16 ((UINTN) AcpiDescription->PM1b_CNT_BLK.Address);
-      Value = (Value & 0xc3ff) | 0x2000 | (AcpiDescription->SLP_TYPb << 10);
-      MmioWrite16 ((UINTN) AcpiDescription->PM1b_CNT_BLK.Address, Value);
-      break;
-    }
-  }
-
-  //
-  // Done, if code runs here, mean not shutdown correctly
-  //
-  return EFI_UNSUPPORTED;
-}
+///
+/// Copy of ACPI Description HOB in runtime memory
+///
+EFI_ACPI_DESCRIPTION  mAcpiDescription;
 
 /**
   Reset the system.
@@ -129,66 +43,167 @@ SystemShutdown (
   @param[in] ResetStatus     Possible cause of reset
   @param[in] DataSize        Size of ResetData in bytes
   @param[in] ResetData       Optional Unicode string
-  @param[in] AcpiDescription Global variable to record reset info
 
 **/
 VOID
 EFIAPI
-AcpiResetSystem (
+EfiAcpiResetSystem (
   IN EFI_RESET_TYPE   ResetType,
   IN EFI_STATUS       ResetStatus,
   IN UINTN            DataSize,
-  IN CHAR16           *ResetData, OPTIONAL
-  IN EFI_ACPI_DESCRIPTION *AcpiDescription
+  IN VOID             *ResetData OPTIONAL
   )
 {
-  EFI_STATUS  Status;
-
+  UINT8   Dev;
+  UINT8   Func;
+  UINT8   Register;
+  
   switch (ResetType) {
+  case EfiResetShutdown:
+    //
+    // 1. Write SLP_TYPa
+    //
+    if ((mAcpiDescription.PM1a_CNT_BLK.Address != 0) && (mAcpiDescription.SLP_TYPa != 0)) {
+      switch (mAcpiDescription.PM1a_CNT_BLK.AddressSpaceId) {
+      case EFI_ACPI_3_0_SYSTEM_IO:
+        IoAndThenOr16 ((UINTN)mAcpiDescription.PM1a_CNT_BLK.Address, 0xc3ff, (UINT16)(0x2000 | (mAcpiDescription.SLP_TYPa << 10)));
+        break;
+      case EFI_ACPI_3_0_SYSTEM_MEMORY:
+        MmioAndThenOr16 ((UINTN)mAcpiDescription.PM1a_CNT_BLK.Address, 0xc3ff, (UINT16)(0x2000 | (mAcpiDescription.SLP_TYPa << 10)));
+        break;
+      }
+    }
+
+    //
+    // 2. Write SLP_TYPb
+    //
+    if ((mAcpiDescription.PM1b_CNT_BLK.Address != 0) && (mAcpiDescription.SLP_TYPb != 0)) {
+      switch (mAcpiDescription.PM1b_CNT_BLK.AddressSpaceId) {
+      case EFI_ACPI_3_0_SYSTEM_IO:
+        IoAndThenOr16 ((UINTN)mAcpiDescription.PM1b_CNT_BLK.Address, 0xc3ff, (UINT16)(0x2000 | (mAcpiDescription.SLP_TYPb << 10)));
+        break;
+      case EFI_ACPI_3_0_SYSTEM_MEMORY:
+        MmioAndThenOr16 ((UINTN)mAcpiDescription.PM1b_CNT_BLK.Address, 0xc3ff, (UINT16)(0x2000 | (mAcpiDescription.SLP_TYPb << 10)));
+        break;
+      }
+    }
+    //
+    // If Shutdown fails, then let fall through to reset 
+    //
   case EfiResetWarm:
   case EfiResetCold:
-    SystemReset (AcpiDescription);
-    break;
-
-  case EfiResetShutdown:
-    Status = SystemShutdown (AcpiDescription);
-    if (EFI_ERROR (Status)) {
-      SystemReset (AcpiDescription);
+    if ((mAcpiDescription.RESET_REG.Address != 0) &&
+        ((mAcpiDescription.RESET_REG.AddressSpaceId == EFI_ACPI_3_0_SYSTEM_IO) ||
+         (mAcpiDescription.RESET_REG.AddressSpaceId == EFI_ACPI_3_0_SYSTEM_MEMORY) ||
+         (mAcpiDescription.RESET_REG.AddressSpaceId == EFI_ACPI_3_0_PCI_CONFIGURATION_SPACE))) {
+      //
+      // Use ACPI System Reset
+      //
+      switch (mAcpiDescription.RESET_REG.AddressSpaceId) {
+      case EFI_ACPI_3_0_SYSTEM_IO:
+        //
+        // Send reset request through I/O port register
+        //
+        IoWrite8 ((UINTN)mAcpiDescription.RESET_REG.Address, mAcpiDescription.RESET_VALUE);
+        //
+        // Halt 
+        //
+        CpuDeadLoop ();
+      case EFI_ACPI_3_0_SYSTEM_MEMORY:
+        //
+        // Send reset request through MMIO register
+        //
+        MmioWrite8 ((UINTN)mAcpiDescription.RESET_REG.Address, mAcpiDescription.RESET_VALUE);
+        //
+        // Halt 
+        //
+        CpuDeadLoop ();
+      case EFI_ACPI_3_0_PCI_CONFIGURATION_SPACE:
+        //
+        // Send reset request through PCI register
+        //
+        Register = (UINT8)mAcpiDescription.RESET_REG.Address;
+        Func     = (UINT8) (RShiftU64 (mAcpiDescription.RESET_REG.Address, 16) & 0x7);
+        Dev      = (UINT8) (RShiftU64 (mAcpiDescription.RESET_REG.Address, 32) & 0x1F);
+        PciWrite8 (PCI_LIB_ADDRESS (0, Dev, Func, Register), mAcpiDescription.RESET_VALUE);
+        //
+        // Halt 
+        //
+        CpuDeadLoop ();
+      }
     }
-    break;
 
-  default:
-    return ;
+    //
+    // If system comes here, means ACPI reset is not supported, so do Legacy System Reset, assume 8042 available
+    //
+    IoWrite8 (0x64, 0xfe);
+    CpuDeadLoop ();
   }
 
   //
   // Given we should have reset getting here would be bad
   //
   ASSERT (FALSE);
+  CpuDeadLoop();
 }
 
-BOOLEAN
-GetAcpiDescription (
-  IN EFI_ACPI_DESCRIPTION *AcpiDescription
+/**
+  Initialize the state information for the Reset Architectural Protocol.
+
+  @param[in] ImageHandle  Image handle of the loaded driver
+  @param[in] SystemTable  Pointer to the System Table
+
+  @retval EFI_SUCCESS           Thread can be successfully created
+  @retval EFI_UNSUPPORTED       Cannot find the info to reset system
+
+**/
+EFI_STATUS
+EFIAPI
+InitializeReset (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_HOB_GUID_TYPE       *HobAcpiDescription;
+  EFI_STATUS         Status;
+  EFI_HOB_GUID_TYPE  *HobAcpiDescription;
+
   //
-  // Get AcpiDescription Hob
+  // Make sure the Reset Architectural Protocol is not already installed in the system
+  //
+  ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gEfiResetArchProtocolGuid);
+
+  //
+  // Get ACPI Description HOB
   //
   HobAcpiDescription = GetFirstGuidHob (&gEfiAcpiDescriptionGuid);
   if (HobAcpiDescription == NULL) {
-    return FALSE;
+    return EFI_UNSUPPORTED;
   }
 
   //
   // Copy it to Runtime Memory
   //
   ASSERT (sizeof (EFI_ACPI_DESCRIPTION) == GET_GUID_HOB_DATA_SIZE (HobAcpiDescription));
-  CopyMem (AcpiDescription, GET_GUID_HOB_DATA (HobAcpiDescription), sizeof (EFI_ACPI_DESCRIPTION));
+  CopyMem (&mAcpiDescription, GET_GUID_HOB_DATA (HobAcpiDescription), sizeof (EFI_ACPI_DESCRIPTION));
 
-  DEBUG ((EFI_D_ERROR, "ACPI Reset Base - %lx\n", AcpiDescription->RESET_REG.Address));
-  DEBUG ((EFI_D_ERROR, "ACPI Reset Value - %02x\n", (UINTN)AcpiDescription->RESET_VALUE));
-  DEBUG ((EFI_D_ERROR, "IAPC support - %x\n", (UINTN)(AcpiDescription->IAPC_BOOT_ARCH)));
-  return TRUE;
+  DEBUG ((DEBUG_INFO, "ACPI Reset Base  - %lx\n", mAcpiDescription.RESET_REG.Address));
+  DEBUG ((DEBUG_INFO, "ACPI Reset Value - %02x\n", (UINTN)mAcpiDescription.RESET_VALUE));
+  DEBUG ((DEBUG_INFO, "IAPC support     - %x\n", (UINTN)(mAcpiDescription.IAPC_BOOT_ARCH)));
+  
+  //
+  // Hook the runtime service table
+  //
+  SystemTable->RuntimeServices->ResetSystem = EfiAcpiResetSystem;
+
+  //
+  // Install the Reset Architectural Protocol onto a new handle
+  //
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &mResetHandle,
+                  &gEfiResetArchProtocolGuid, NULL,
+                  NULL
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  return Status;
 }
