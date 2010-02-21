@@ -36,8 +36,6 @@
 
 [Sources]
   Reset.c
-  Reset.h
-  ResetEntry.c
 
 [Protocols]
   gEfiResetArchProtocolGuid
@@ -47,8 +45,3 @@
 
 [Depex]
   TRUE
-
-[BuildOptions]
-  MSFT:*_*_IA32_CC_FLAGS  = /Od
-
-
