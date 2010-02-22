@@ -599,7 +599,7 @@ GetStringWorker (
   IN  HII_STRING_PACKAGE_INSTANCE     *StringPackage,
   IN  EFI_STRING_ID                   StringId,
   OUT EFI_STRING                      String,
-  IN  OUT UINTN                       *StringSize,
+  IN  OUT UINTN                       *StringSize, OPTIONAL
   OUT EFI_FONT_INFO                   **StringFontInfo OPTIONAL
   )
 {
@@ -610,7 +610,7 @@ GetStringWorker (
   EFI_STATUS                           Status;
   UINT8                                FontId;
 
-  ASSERT (StringPackage != NULL && StringSize != NULL);
+  ASSERT (StringPackage != NULL);
   ASSERT (Private != NULL && Private->Signature == HII_DATABASE_PRIVATE_DATA_SIGNATURE);
 
   //
@@ -627,6 +627,13 @@ GetStringWorker (
              );
   if (EFI_ERROR (Status)) {
     return Status;
+  }
+
+  if (StringSize == NULL) {
+    //
+    // String text buffer is not requested
+    //
+    return EFI_SUCCESS;
   }
 
   //
@@ -1471,7 +1478,7 @@ HiiGetString (
            Link =  Link->ForwardLink
           ) {
       StringPackage = CR (Link, HII_STRING_PACKAGE_INSTANCE, StringEntry, HII_STRING_PACKAGE_SIGNATURE);      
-      Status = GetStringWorker (Private, StringPackage, StringId, String, StringSize, StringFontInfo);
+      Status = GetStringWorker (Private, StringPackage, StringId, NULL, NULL, NULL);
       if (!EFI_ERROR (Status)) {
         return EFI_INVALID_LANGUAGE;
       }

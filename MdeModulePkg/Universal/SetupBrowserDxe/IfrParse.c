@@ -590,6 +590,9 @@ DestroyStatement (
   if (Statement->BlockName != NULL) {
     FreePool (Statement->BlockName);
   }
+  if (Statement->BufferValue != NULL) {
+    FreePool (Statement->BufferValue);
+  }
 }
 
 
@@ -1352,6 +1355,7 @@ ParseOpCodes (
       CurrentStatement->MaxContainers = ((EFI_IFR_ORDERED_LIST *) OpCodeData)->MaxContainers;
 
       CurrentStatement->HiiValue.Type = EFI_IFR_TYPE_BUFFER;
+      CurrentStatement->BufferValue = NULL;
 
       if (Scope != 0) {
         SuppressForOption = TRUE;
