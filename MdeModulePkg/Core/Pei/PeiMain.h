@@ -189,6 +189,10 @@ typedef struct{
   // available or not. 
   //
   UINT64                            *PeiCodeMemoryRangeUsageBitMap;
+  //
+  // This field points to the shadowed image read function
+  //
+  PE_COFF_LOADER_READ_FILE          ShadowedImageRead;
 } PEI_CORE_INSTANCE;
 
 ///
