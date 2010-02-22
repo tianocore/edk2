@@ -26,7 +26,7 @@ EFI_GUID *TmpTokenSpaceBuffer[PEI_EXMAPPING_TABLE_SIZE + DXE_EXMAPPING_TABLE_SIZ
 ///
 /// PCD database lock.
 ///
-EFI_LOCK mPcdDatabaseLock = EFI_INITIALIZE_LOCK_VARIABLE(TPL_NOTIFY);
+EFI_LOCK mPcdDatabaseLock = EFI_INITIALIZE_LOCK_VARIABLE(TPL_CALLBACK);
 
 ///
 /// PCD_PROTOCOL the EDKII native implementation which support dynamic 
