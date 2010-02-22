@@ -28,8 +28,8 @@ EFI_PEI_PPI_DESCRIPTOR     gPpiLoadFilePpiList = {
 
 /**
 
-  Support routine for the PE/COFF Loader that reads a buffer from a PE/COFF file
-
+  Support routine for the PE/COFF Loader that reads a buffer from a PE/COFF file.
+  The function is used for XIP code to have optimized memory copy.
 
   @param FileHandle      - The handle to the PE/COFF file
   @param FileOffset      - The offset, in bytes, into the file to read
@@ -42,6 +42,40 @@ EFI_PEI_PPI_DESCRIPTOR     gPpiLoadFilePpiList = {
 EFI_STATUS
 EFIAPI
 PeiImageRead (
+  IN     VOID    *FileHandle,
+  IN     UINTN   FileOffset,
+  IN     UINTN   *ReadSize,
+  OUT    VOID    *Buffer
+  )
+{
+  CHAR8 *Destination8;
+  CHAR8 *Source8;
+  
+  Destination8  = Buffer;
+  Source8       = (CHAR8 *) ((UINTN) FileHandle + FileOffset);
+  if (Destination8 != Source8) {
+    CopyMem (Destination8, Source8, *ReadSize);
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+
+  Support routine for the PE/COFF Loader that reads a buffer from a PE/COFF file.
+  The function is implemented as PIC so as to support shadowing.
+
+  @param FileHandle      - The handle to the PE/COFF file
+  @param FileOffset      - The offset, in bytes, into the file to read
+  @param ReadSize        - The number of bytes to read from the file starting at FileOffset
+  @param Buffer          - A pointer to the buffer to read the data into.
+
+  @return EFI_SUCCESS - ReadSize bytes of data were read into Buffer from the PE/COFF file starting at FileOffset
+
+**/
+EFI_STATUS
+EFIAPI
+PeiImageReadForShadow (
   IN     VOID    *FileHandle,
   IN     UINTN   FileOffset,
   IN     UINTN   *ReadSize,
@@ -86,12 +120,14 @@ GetImageReadFunction (
   if (!Private->PeiMemoryInstalled || (Private->HobList.HandoffInformationTable->BootMode == BOOT_ON_S3_RESUME)) {
     ImageContext->ImageRead = PeiImageRead;
   } else {
-    MemoryBuffer = AllocatePages (0x400 / EFI_PAGE_SIZE + 1);
-    ASSERT (MemoryBuffer != NULL);
+    if (Private->ShadowedImageRead == NULL) {
+      MemoryBuffer = AllocatePages (0x400 / EFI_PAGE_SIZE + 1);
+      ASSERT (MemoryBuffer != NULL);
+      CopyMem (MemoryBuffer, (CONST VOID *) (UINTN) PeiImageReadForShadow, 0x400);
+      Private->ShadowedImageRead = (PE_COFF_LOADER_READ_FILE) (UINTN) MemoryBuffer;
+    }
 
-    CopyMem (MemoryBuffer, (CONST VOID *) (UINTN) PeiImageRead, 0x400);
-
-    ImageContext->ImageRead = (PE_COFF_LOADER_READ_FILE) (UINTN) MemoryBuffer;
+    ImageContext->ImageRead = Private->ShadowedImageRead;
   }
 
   return EFI_SUCCESS;
