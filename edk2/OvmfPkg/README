@@ -5,7 +5,7 @@ The Open Virtual Machine Firmware (OVMF) project aims
 to support firmware for Virtual Machines using the edk2
 code base.  More information can be found at:
 
-  https://edk2.tianocore.org/OVMF.html
+http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=OVMF
 
 === STATUS ===
 
@@ -48,16 +48,18 @@ Following the edk2 build process, you will find the OVMF binaries
 under the $WORKSPACE/Build/*/*/FV directory.  The actual path will
 depend on how your build is configured.  You can expect to find
 these binary outputs:
-* OVMF.fd 
+* OVMF.Fv
+  * Please note!  This filename has changed.  Older releases used OVMF.fd.
 * CirrusLogic5446.rom
 
 More information on building OVMF can be found at:
-* https://edk2.tianocore.org/build-ovmf.html
+
+http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=How_to_build_OVMF
 
 === RUNNING OVMF on QEMU ===
 
 * QEMU 0.9.1 or later is required.
-* Either copy, rename or symlink OVMF.fd => bios.bin
+* Either copy, rename or symlink OVMF.Fv => bios.bin
 * Either copy, rename or symlink CirrusLogic5446.rom => vgabios-cirrus.bin
 * Be sure to use qemu-system-x86_64, if you are using and X64 firmware.
   (qemu-system-x86_64 works for the IA32 firmware as well, of course.)
@@ -68,4 +70,6 @@ More information on building OVMF can be found at:
 * The EFI shell is built into OVMF builds at this time, so it should
   run automatically if a UEFI boot application is not found on the
   removable media.
+* On Linux, newer version of QEMU may enable KVM feature, and this might cause OVMF
+  to fail to boot.  The QEMU '-no-kvm' may allow OVMF to boot.
 
