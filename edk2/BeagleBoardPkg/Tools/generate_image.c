@@ -1,6 +1,13 @@
 /** @file
+ The data structures in this code come from:
+ OMAP35x Applications Processor Technical Reference Manual chapter 25
+ OMAP34xx Multimedia Device Technical Reference Manual chapter 26.4.8.
+ 
+ You should use the OMAP35x manual when possible. Some things, like SectionKey, 
+ are not defined in the OMAP35x manual and you have to use the OMAP34xx manual
+ to find the data. 
 
-  Copyright (c) 2008-2009, Apple Inc. All rights reserved.
+  Copyright (c) 2008-2010, Apple Inc. All rights reserved.
   
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
