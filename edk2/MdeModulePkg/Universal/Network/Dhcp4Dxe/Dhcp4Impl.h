@@ -6,7 +6,7 @@
   RFC 1534: Interoperation Between DHCP and BOOTP
   RFC 3396: Encoding Long Options in DHCP.
   
-Copyright (c) 2006 - 2009, Intel Corporation.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -161,13 +161,26 @@ DhcpYieldControl (
 
 /**
   Complete a Dhcp4 transaction and signal the upper layer.
-  
+
   @param Instance      Dhcp4 instance.
 
 **/
 VOID
 PxeDhcpDone (
   IN DHCP_PROTOCOL  *Instance
+  );
+
+/**
+  Free the resource related to the configure parameters.
+  DHCP driver will make a copy of the user's configure
+  such as the time out value.
+
+  @param  Config                 The DHCP configure data
+
+**/
+VOID
+DhcpCleanConfigure (
+  IN OUT EFI_DHCP4_CONFIG_DATA  *Config
   );
 
 #endif

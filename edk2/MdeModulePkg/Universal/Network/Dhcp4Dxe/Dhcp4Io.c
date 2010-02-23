@@ -1,7 +1,7 @@
 /** @file
   EFI DHCP protocol implementation.
   
-Copyright (c) 2006 - 2009, Intel Corporation.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -272,7 +272,7 @@ DhcpSetTransmitTimer (
 
   @param  DhcpSb                The DHCP service instance
   @param  Para                  The DHCP parameter extracted from the server's
-                                response.                             
+                                response.
 **/
 VOID
 DhcpComputeLease (
@@ -482,6 +482,11 @@ DhcpCleanLease (
   DhcpSb->CurRetry      = 0;
   DhcpSb->MaxRetries    = 0;
   DhcpSb->LeaseLife     = 0;
+
+  //
+  // Clean active config data.
+  //
+  DhcpCleanConfigure (&DhcpSb->ActiveConfig);
 }
 
 
