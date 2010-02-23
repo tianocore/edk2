@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2006, Intel Corporation
+; Copyright (c) 2006 - 2010, Intel Corporation
 ; All rights reserved. This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -34,7 +34,10 @@
 ;------------------------------------------------------------------------------
 InternalX86WriteIdtr  PROC
     mov     eax, [esp + 4]
+    pushfd
+    cli
     lidt    fword ptr [eax]
+    popfd
     ret
 InternalX86WriteIdtr  ENDP
 
