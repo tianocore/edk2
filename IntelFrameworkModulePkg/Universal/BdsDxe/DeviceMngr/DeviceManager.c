@@ -464,13 +464,24 @@ CallDeviceManager (
                 &NumHandles,
                 &DriverHealthHandles
                 );
+
   //
-  // If there are no drivers installed driver health protocol
+  // If there are no drivers installed driver health protocol, do not create driver health entry in UI
   //
-  if (NumHandles == 0) {
-    HiiSetString (HiiHandle, STRING_TOKEN (STR_DM_DRIVER_HEALTH_TITLE), GetStringById (STRING_TOKEN (STR_EMPTY_STRING)), NULL);
-    HiiSetString (HiiHandle, STRING_TOKEN (STR_DRIVER_HEALTH_ALL_HEALTHY), GetStringById (STRING_TOKEN (STR_EMPTY_STRING)), NULL);
-  } else {
+  if (NumHandles != 0) {
+    //
+    // If driver health protocol is installed, create Driver Health subtitle and entry
+    //
+    HiiCreateSubTitleOpCode (StartOpCodeHandle, STRING_TOKEN (STR_DM_DRIVER_HEALTH_TITLE), 0, 0, 0);
+    HiiCreateActionOpCode (
+      StartOpCodeHandle,                                // Container for dynamic created opcodes
+      DEVICE_MANAGER_KEY_DRIVER_HEALTH,                 // Question ID
+      STRING_TOKEN(STR_DRIVER_HEALTH_ALL_HEALTHY),      // Prompt text
+      STRING_TOKEN(STR_DRIVER_HEALTH_STATUS_HELP),      // Help text
+      EFI_IFR_FLAG_CALLBACK,                            // Question flag
+      0                                                 // Action String ID
+    );
+
     //
     // Check All Driver health status
     //
