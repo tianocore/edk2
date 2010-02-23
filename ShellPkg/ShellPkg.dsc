@@ -1,7 +1,7 @@
-#/** @file
+## @file
 # Shell Package
 #
-# Copyright (c) 2007 - 2008, Intel Corporation
+# Copyright (c) 2007 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -11,7 +11,7 @@
 #    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#**/
+##
 
 [Defines]
   PLATFORM_NAME                  = Shell
@@ -23,7 +23,7 @@
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
 
-[LibraryClasses.common]
+[LibraryClasses]
   UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
@@ -43,9 +43,9 @@
   ShellCEntryLib|ShellPkg/Library/UefiShellCEntryLib/UefiShellCEntryLib.inf
   SortLib|ShellPkg/Library/BaseSortLib/BaseSortLib.inf
 
-[PcdsFixedAtBuild.common]
+[PcdsFixedAtBuild]
 
-[Components.common]
+[Components]
   ShellPkg/Application/ShellExecTestApp/SA.inf
   ShellPkg/Application/ShellLibTestApp/SA3.inf
   ShellPkg/Library/BaseFileHandleLib/BaseFileHandleLib.inf

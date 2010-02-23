@@ -1,4 +1,4 @@
-#/** @file
+## @file
 # Component description file for Nt32 Fimware Volume Block DXE driver module.
 #
 # This DXE runtime driver implements and produces the Fimware Volue Block Protocol on
@@ -13,7 +13,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005

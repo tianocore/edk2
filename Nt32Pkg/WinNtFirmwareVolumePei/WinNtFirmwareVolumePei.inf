@@ -1,4 +1,4 @@
-#/** @file
+## @file
 # Component description file for WinNtFwh module
 #
 # This PEIM will produce the HOB to describe Firmware Volume, Firmware Devices
@@ -13,7 +13,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005

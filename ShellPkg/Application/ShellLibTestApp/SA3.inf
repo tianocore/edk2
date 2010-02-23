@@ -1,9 +1,9 @@
-#/** @file
+## @file
 #  Sample UEFI Application Reference EDKII Module
 #
 #  This is a simple shell application
 #
-#  Copyright (c) 2009-2010, Intel Corporation. All rights reserved. <BR>
+#  Copyright (c) 2009- 2010, Intel Corporation. All rights reserved. <BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -13,7 +13,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005

@@ -1,10 +1,10 @@
-#/** @file
+## @file
 # Public definitions for PcAtChipset package.
 #
 # This package is designed to public interfaces and implementation which follows
 # PcAt defacto standard.
 #
-# Copyright (c) 2009, Intel Corporation.
+# Copyright (c) 2009 - 2010, Intel Corporation.
 #
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -14,7 +14,7 @@
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#**/
+##
 
 [Defines]
   DEC_SPECIFICATION              = 0x00010005
@@ -22,7 +22,7 @@
   PACKAGE_GUID                   = B728689A-52D3-4b8c-AE89-2CE5514CC6DC
   PACKAGE_VERSION                = 0.1
 
-[PcdsFixedAtBuild.common]
+[PcdsFixedAtBuild]
   ## Pcd8259LegacyModeMask defines the default mask value for platform. This value is determined
   #  1) If platform only support pure UEFI, value should be set to 0xFFFF or 0xFFFE;
   #     Because only clock interrupt is allowed in legacy mode in pure UEFI platform.
@@ -45,6 +45,6 @@
   ## Pcd8259LegacyModeEdgeLevel defines the default edge level for legacy mode's interrrupt controller.
   gPcAtChipsetPkgTokenSpaceGuid.Pcd8259LegacyModeEdgeLevel|0x00000002|UINT16|0x0000
   
-[Guids.common]
+[Guids]
   gPcAtChipsetPkgTokenSpaceGuid = { 0x326ae723, 0xae32, 0x4589, { 0x98, 0xb8, 0xca, 0xc2, 0x3c, 0xdc, 0xc1, 0xb1 } }
 

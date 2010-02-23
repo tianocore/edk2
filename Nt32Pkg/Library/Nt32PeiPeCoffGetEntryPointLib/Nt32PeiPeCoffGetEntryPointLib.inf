@@ -1,8 +1,8 @@
-#/** @file
+## @file
 # Component description file for the EdkNt32PeiPeCoffGetEntryPointLib library.
 #
 # PeCoffGetEntryPointLib library class for NT32 instance implemented by use NTPeiLoadFile PPI.
-# Copyright (c) 2006 - 2007, Intel Corporation
+# Copyright (c) 2006 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -12,7 +12,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -31,7 +31,7 @@
 #  VALID_ARCHITECTURES           = IA32
 #
 
-[Sources.common]
+[Sources]
   PeCoffGetEntryPoint.c
 
 [Packages]

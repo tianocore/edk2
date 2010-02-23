@@ -1,10 +1,10 @@
-#/** @file
+## @file
 #
 # EFI/Framework Emulation Platform with UEFI HII interface supported.
 #
 # The Emulation Platform can be used to debug individual modules, prior to creating
 #       a real platform. This also provides an example for how an DSC is created.
-# Copyright (c) 2006 - 2009, Intel Corporation
+# Copyright (c) 2006 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -14,7 +14,7 @@
 #    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#**/
+##
 
 ################################################################################
 #
@@ -45,7 +45,7 @@
 # Library Class section - list of all Library Classes needed by this Platform.
 #
 ################################################################################
-[LibraryClasses.common]
+[LibraryClasses]
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
@@ -284,7 +284,7 @@
   
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"%a"
 
-[PcdsFeatureFlag.common]
+[PcdsFeatureFlag]
   gEfiEdkModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|FALSE
   gEfiEdkModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory|FALSE
   gEfiEdkModulePkgTokenSpaceGuid.PcdStatusCodeUseOEM|TRUE

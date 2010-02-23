@@ -1,4 +1,4 @@
-#/** @file
+## @file
 # 8259 Interrupt Controller driver
 #
 # Copyright (c) 2005 - 2010, Intel Corporation                                                         
@@ -10,7 +10,7 @@
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005

@@ -1,4 +1,4 @@
-#/** @file
+## @file
 # Option Rom Package build validation file for All Architectures.
 #
 # This package is designed to interoperate with the EDK II open source project
@@ -6,7 +6,7 @@
 # Option ROM image for all CPU architectures, including EBC target.
 # A single driver can support mixes of EFI 1.1, UEFI 2.0 and UEFI 2.1.
 #
-# Copyright (c) 2007 - 2009, Intel Corporation
+# Copyright (c) 2007 - 2010, Intel Corporation
 #
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -16,7 +16,7 @@
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#**/
+##
 
 ################################################################################
 #
@@ -42,7 +42,7 @@
 [SkuIds]
   0|DEFAULT              # The entry: 0|DEFAULT is reserved and always required.
 
-[LibraryClasses.common]
+[LibraryClasses]
   DebugLib|MdePkg/Library/UefiDebugLibStdErr/UefiDebugLibStdErr.inf
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
@@ -62,7 +62,7 @@
 # Pcd Section - list of all EDK II PCD Entries defined by this Platform
 #
 ################################################################################
-[PcdsFeatureFlag.common]
+[PcdsFeatureFlag]
   gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|FALSE
@@ -70,7 +70,7 @@
   gOptionRomPkgTokenSpaceGuid.PcdSupportScsiPassThru|TRUE
   gOptionRomPkgTokenSpaceGuid.PcdSupportExtScsiPassThru|TRUE
 
-[PcdsFixedAtBuild.common]
+[PcdsFixedAtBuild]
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|0x0
   gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength|0x0
   gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength|0x0
@@ -99,7 +99,7 @@
 #
 ###################################################################################################
 
-[Components.common]
+[Components]
   OptionRomPkg/AtapiPassThruDxe/AtapiPassThruDxe.inf
   OptionRomPkg/CirrusLogic5430Dxe/CirrusLogic5430Dxe.inf
   OptionRomPkg/UndiRuntimeDxe/UndiRuntimeDxe.inf

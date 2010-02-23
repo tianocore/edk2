@@ -1,4 +1,4 @@
-#/** @file
+## @file
 #  Platform PEI driver
 #
 #  This module provides platform specific function to detect boot mode.
@@ -12,7 +12,7 @@
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005

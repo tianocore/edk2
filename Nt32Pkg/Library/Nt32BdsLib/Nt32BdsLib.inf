@@ -1,8 +1,8 @@
-#/** @file
+## @file
 # Component name for module GenericBdsLib
 #
 # FIX ME!
-# Copyright (c) 2007, Intel Corporation. All rights reserved.
+# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.
 #
 #  All rights reserved. This program and the accompanying materials       
 #  are licensed and made available under the terms and conditions of the BSD License   
@@ -13,7 +13,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -32,7 +32,7 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-[Sources.common]
+[Sources]
   BdsPlatform.c
   PlatformData.c
   BdsPlatform.h
@@ -56,7 +56,7 @@
 [Guids]
   gEfiWinNtSystemConfigGuid
 
-[Pcd.common]
+[Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut
