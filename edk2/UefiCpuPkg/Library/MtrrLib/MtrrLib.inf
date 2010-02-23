@@ -1,4 +1,4 @@
-#/** @file
+## @file
 #  MTRR library provides API for MTRR operation
 #
 #  Copyright (c) 2006 - 2010, Intel Corporation. <BR>
@@ -10,7 +10,7 @@
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #  
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005

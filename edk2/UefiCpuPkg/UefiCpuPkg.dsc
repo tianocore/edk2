@@ -1,4 +1,4 @@
-#/** @file
+## @file
 #  UefiCpuPkg Package
 #
 #  Copyright (c) 2007 - 2010, Intel Corporation
@@ -11,7 +11,7 @@
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#**/
+##
 
 [Defines]
   PLATFORM_NAME                  = UefiCpu
@@ -27,7 +27,7 @@
 # External libraries to build package
 #
 
-[LibraryClasses.common]
+[LibraryClasses]
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
@@ -71,7 +71,7 @@
 # Drivers/Libraries within this package
 #
 
-[Components.common]
+[Components]
   UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
   UefiCpuPkg/CpuIoPei/CpuIoPei.inf
 

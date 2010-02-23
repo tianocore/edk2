@@ -1,11 +1,11 @@
-#/** @file
+## @file
 # Gop Driver
 #
 # GOP is short hand for UEFI Graphics Output protocol.
 #  This file is a verision of GopIo the uses WinNtThunk system calls as an IO
 #  abstraction. For a PCI device WinNtIo would be replaced with
 #  a PCI IO abstraction that abstracted a specific PCI device.
-# Copyright (c) 2006 - 2007, Intel Corporation
+# Copyright (c) 2006 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -15,7 +15,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -37,7 +37,7 @@
 #  COMPONENT_NAME                =  gWinNtGopComponentName                       
 #
 
-[Sources.common]
+[Sources]
   WinNtGopDriver.c
   ComponentName.c
   WinNtGop.h

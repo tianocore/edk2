@@ -1,4 +1,4 @@
-#/** @file
+## @file
 # Entry Point of NT32 Emulator
 #
 # Main executable file of NT32 Emulator that loads PEI core after initialization finished.
@@ -11,7 +11,7 @@
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -62,7 +62,7 @@
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtMemorySizeForSecMain
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareVolume
   
-[BuildOptions.common]
+[BuildOptions]
   MSFT:*_*_IA32_DLINK_FLAGS == /out:"$(BIN_DIR)\SecMain.exe" /base:0x10000000 /pdb:"$(BIN_DIR)\SecMain.pdb" /LIBPATH:"$(VCINSTALLDIR)\Lib" /LIBPATH:"$(VCINSTALLDIR)\PlatformSdk\Lib" /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF /DEBUG /MACHINE:I386 /LTCG Kernel32.lib MSVCRTD.lib Gdi32.lib User32.lib Winmm.lib
   MSFT:*_*_IA32_CC_FLAGS == /nologo /W4 /WX /Gy /c /D UNICODE /Od /FI$(DEST_DIR_DEBUG)/AutoGen.h /EHs-c- /GF /Gs8192 /Zi /Gm /D _CRT_SECURE_NO_WARNINGS /D _CRT_SECURE_NO_DEPRECATE
   MSFT:*_*_IA32_PP_FLAGS == /nologo /E /TC /FI$(DEST_DIR_DEBUG)/AutoGen.h

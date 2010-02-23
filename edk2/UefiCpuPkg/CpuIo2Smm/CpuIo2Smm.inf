@@ -1,4 +1,4 @@
-#/** @file
+## @file
 #  Module that produces the SMM CPU I/O 2 Protocol using the services of the I/O Library
 #
 #  Copyright (c) 2009 - 2010, Intel Corporation.  <BR>
@@ -9,7 +9,7 @@
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005

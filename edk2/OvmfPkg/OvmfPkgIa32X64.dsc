@@ -1,4 +1,4 @@
-#/** @file
+## @file
 #  EFI/Framework Open Virtual Machine Firmware (OVMF) platform
 #
 #  Copyright (c) 2006 - 2010, Intel Corporation
@@ -11,7 +11,7 @@
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#**/
+##
 
 ################################################################################
 #
@@ -47,7 +47,7 @@
 # Library Class section - list of all Library Classes needed by this Platform.
 #
 ################################################################################
-[LibraryClasses.common]
+[LibraryClasses]
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   TimerLib|OvmfPkg/Library/AcpiTimerLib/AcpiTimerLib.inf
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
@@ -174,11 +174,11 @@
 # Pcd Section - list of all EDK II PCD Entries defined by this Platform.
 #
 ################################################################################
-[PcdsFeatureFlag.common]
+[PcdsFeatureFlag]
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory|TRUE
 
-[PcdsFixedAtBuild.common]
+[PcdsFixedAtBuild]
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1
   gEfiSioTokenSpaceGuid.PcdSerialRegisterBase|0x3F8
   gEfiSioTokenSpaceGuid.PcdSerialLineControl|0x07
@@ -197,7 +197,7 @@
   gEfiEdkModulePkgTokenSpaceGuid.PcdDxePcdDatabaseTraverseEnabled|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress|0x0
 
-[PcdsFeatureFlag.common]
+[PcdsFeatureFlag]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportUefiDecompress|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode|TRUE
 
@@ -206,7 +206,7 @@
   gOptionRomPkgTokenSpaceGuid.PcdSupportGop|TRUE
   gOptionRomPkgTokenSpaceGuid.PcdSupportUga|FALSE
 
-[PcdsFixedAtBuild.common]
+[PcdsFixedAtBuild]
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x07
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x2F
@@ -217,7 +217,7 @@
 #
 ################################################################################
 
-[PcdsDynamicDefault.common]
+[PcdsDynamicDefault]
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|0

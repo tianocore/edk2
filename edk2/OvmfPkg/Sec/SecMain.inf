@@ -1,4 +1,4 @@
-#/** @file
+## @file
 #  SEC Driver
 #
 #  Copyright (c) 2008 - 2010, Intel Corporation
@@ -11,7 +11,7 @@
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -27,7 +27,7 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-[Sources.common]
+[Sources]
   FindPeiCore.c
   SecMain.c
 

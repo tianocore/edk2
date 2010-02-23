@@ -1,4 +1,4 @@
-#/** @file
+## @file
 # Serial I/O driver
 #
 # Our DriverBinding member functions operate on the handles
@@ -13,7 +13,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005

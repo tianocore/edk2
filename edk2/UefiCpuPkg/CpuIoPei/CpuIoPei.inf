@@ -1,4 +1,4 @@
-#/** @file
+## @file
 #  Produces the CPU I/O PPI.
 #
 #  This PEIM produces of the CPU I/O PPI.
@@ -12,7 +12,7 @@
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005

@@ -1,4 +1,4 @@
-#/** @file
+## @file
 # Option Rom Package Reference Implementations.
 #
 # This package is designed to interoperate with the EDK II open source project
@@ -6,7 +6,7 @@
 # Option ROM image for all CPU architectures, including EBC target.
 # A single driver can support mixes of EFI 1.1, UEFI 2.0 and UEFI 2.1.
 #
-# Copyright (c) 2007 - 2009, Intel Corporation.
+# Copyright (c) 2007 - 2010, Intel Corporation.
 #
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -16,7 +16,7 @@
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#**/
+##
 
 [Defines]
   DEC_SPECIFICATION              = 0x00010005
@@ -24,18 +24,18 @@
   PACKAGE_GUID                   = AA3865E8-7F30-4f59-8696-99F560101852
   PACKAGE_VERSION                = 0.1
 
-[PcdsFeatureFlag.common]
+[PcdsFeatureFlag]
   gOptionRomPkgTokenSpaceGuid.PcdSupportScsiPassThru|TRUE|BOOLEAN|0x00010001
   gOptionRomPkgTokenSpaceGuid.PcdSupportExtScsiPassThru|TRUE|BOOLEAN|0x00010002
   gOptionRomPkgTokenSpaceGuid.PcdSupportGop|TRUE|BOOLEAN|0x00010004
   gOptionRomPkgTokenSpaceGuid.PcdSupportUga|TRUE|BOOLEAN|0x00010005
 
-[PcdsFixedAtBuild.common]
+[PcdsFixedAtBuild]
   gOptionRomPkgTokenSpaceGuid.PcdDriverSupportedEfiVersion|0x0002000a|UINT32|0x00010003
 
-[PcdsPatchableInModule.common]
+[PcdsPatchableInModule]
   gOptionRomPkgTokenSpaceGuid.PcdDriverSupportedEfiVersion|0x0002000a|UINT32|0x00010003
 
-[Guids.common]
+[Guids]
   gOptionRomPkgTokenSpaceGuid = { 0x1e43298f, 0x3478, 0x41a7, { 0xb5, 0x77, 0x86, 0x6, 0x46, 0x35, 0xc7, 0x28 } }
 

@@ -1,11 +1,11 @@
-#/** @file
+## @file
 # Simple filesystem driver
 #
 # Produce Simple File System abstractions for directories on your PC using Win32 APIs.
 #  The configuration of what devices to mount or emulate comes from NT
 #  environment variables. The variables must be visible to the Microsoft*
 #  Developer Studio for them to work.
-# Copyright (c) 2006 - 2007, Intel Corporation
+# Copyright (c) 2006 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -15,7 +15,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -37,7 +37,7 @@
 #  COMPONENT_NAME                =  gWinNtSimpleFileSystemComponentName          
 #
 
-[Sources.common]
+[Sources]
   ComponentName.c
   WinNtSimpleFileSystem.c
   WinNtSimpleFileSystem.h

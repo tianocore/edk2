@@ -2,7 +2,7 @@
 #
 # This Package provides all definitions for EFI and UEFI Shell
 #
-# Copyright (c) 2009, Intel Corporation.
+# Copyright (c) 2009 - 2010, Intel Corporation.
 #
 # All rights reserved.
 # This program and the accompanying materials are licensed and made available under
@@ -23,10 +23,10 @@
   PACKAGE_VERSION                = 0.2
 
 
-[Includes.common]
+[Includes]
   Include
 
-[LibraryClasses.common]
+[LibraryClasses]
   ##  @libraryclass  Provides most Shell APIs.
   #                  Only available for Shell applications
   ##
@@ -46,11 +46,11 @@
   SortLib|Include/Library/Sortlib.h
 
 
-[Guids.common]
+[Guids]
   gEfiShellEnvironment2ExtGuid    = {0xd2c18636, 0x40e5, 0x4eb5, {0xa3, 0x1b, 0x36, 0x69, 0x5f, 0xd4, 0x2c, 0x87}}
   gEfiShellPkgTokenSpaceGuid	  = {0x171e9188, 0x31d3, 0x40f5, {0xb1, 0x0c, 0x53, 0x9b, 0x2d, 0xb9, 0x40, 0xcd}}
 
-[Protocols.common]
+[Protocols]
   gEfiShellProtocolGuid           = {0x6302d008, 0x7f9b, 0x4f30, {0x87, 0xac, 0x60, 0xc9, 0xfe, 0xf5, 0xda, 0x4e}}
   gEfiShellParametersProtocolGuid = {0x752f3136, 0x4e16, 0x4fdc, {0xa2, 0x2a, 0xe5, 0xf4, 0x68, 0x12, 0xf4, 0xca}}
   gEfiShellEnvironment2Guid       = {0x47c7b221, 0xc42a, 0x11d2, {0x8e, 0x57, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}}

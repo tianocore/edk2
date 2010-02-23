@@ -1,11 +1,11 @@
-#/** @file
+## @file
 # Uga driver
 #
 # UGA is short hand for Universal Graphics Abstraction protocol.
 #  This file is a verision of UgaIo the uses UnixThunk system calls as an IO
 #  abstraction. For a PCI device UnixIo would be replaced with
 #  a PCI IO abstraction that abstracted a specific PCI device.
-# Copyright (c) 2006, Intel Corporation
+# Copyright (c) 2006 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -15,7 +15,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -37,7 +37,7 @@
 #  COMPONENT_NAME                =  gUnixUgaComponentName                        
 #
 
-[Sources.common]
+[Sources]
   ComponentName.c
   UnixUgaScreen.c
   UnixUgaDriver.c
