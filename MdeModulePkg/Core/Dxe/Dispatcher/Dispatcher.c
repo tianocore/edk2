@@ -1018,8 +1018,7 @@ CoreFwVolEventProtocolNotify (
     Status = CoreHandleProtocol (FvHandle, &gEfiFirmwareVolume2ProtocolGuid, (VOID **)&Fv);
     if (EFI_ERROR (Status)) {
       //
-      // The Handle has a FirmwareVolumeDispatch protocol and should also contiain
-      // a FirmwareVolume protocol thus we should never get here.
+      // FvHandle must have Firmware Volume2 protocol thus we should never get here.
       //
       ASSERT (FALSE);
       continue;
