@@ -1,9 +1,9 @@
-#/** @file
+## @file
 # This package build validate file is used to build validate EDK Shell source, 
 # EDK Compatibility Package and the backward compatibility support of EDK II
 # build tool.
 #
-# Copyright (c) 2008. Intel Corporation
+# Copyright (c) 2008 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -13,7 +13,7 @@
 #    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#**/
+##
 
 [Defines]
   PLATFORM_NAME                  = EdkShellPkg
