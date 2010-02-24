@@ -206,6 +206,8 @@ GenericProtocolNotify (
   Creates an event for each entry in a table that is fired everytime a Protocol 
   of a specific type is installed.
 
+  @param Entry  Pointer to EFI_CORE_PROTOCOL_NOTIFY_ENTRY.
+
 **/
 VOID
 CoreNotifyOnProtocolEntryTable (
