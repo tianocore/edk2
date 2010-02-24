@@ -1011,7 +1011,6 @@ InitInterruptDescriptorTable (
   IA32_DESCRIPTOR *IdtPtr;
   UINTN           Index;
   UINTN           CurrentHandler;
-  BOOLEAN         InterruptState;
 
   SetMem (ExternalVectorTable, sizeof(ExternalVectorTable), 0);
 
@@ -1039,17 +1038,7 @@ InitInterruptDescriptorTable (
   IdtPtr->Base = (UINT32)(((UINTN)(VOID*) gIdtTable) & (BASE_4GB-1));
   IdtPtr->Limit = sizeof (gIdtTable) - 1;
 
-  //
-  // Disable interrupts and save the current interrupt state
-  //
-  InterruptState = SaveAndDisableInterrupts ();
-
   AsmWriteIdtr (IdtPtr);
-
-  //
-  // Restore the interrupt state
-  //
-  SetInterruptState (InterruptState);
 
   FreePool (IdtPtrAlignmentBuffer);
 
