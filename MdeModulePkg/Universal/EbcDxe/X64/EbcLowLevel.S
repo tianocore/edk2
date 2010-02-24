@@ -47,19 +47,19 @@ ASM_PFX(EbcLLCALLEXNative):
       mov    %rcx, %rbx
 
       # Set stack pointer to new value
-      sub    %r8,  %rdx
-      sub    %rsp, %r8
+      sub    %rdx, %r8  
+      sub    %r8,  %rsp 
       mov    %rsp, %rcx
-      sub    %rsp, 0x20
+      sub    $0x20, %rsp 
       call   ASM_PFX(CopyMem)
-      add    %rsp, 0x20
+      add    $0x20, %rsp
 
       # Considering the worst case, load 4 potiential arguments
       # into registers.
       mov    (%rsp), %rcx
-      mov    8(%rsp), %rdx
-      mov    10(%rsp), %r8
-      mov    18(%rsp), %r9
+      mov    0x8(%rsp), %rdx
+      mov    0x10(%rsp), %r8
+      mov    0x18(%rsp), %r9
 
       # Now call the external routine
       call  *%rbx
