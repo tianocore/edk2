@@ -9,7 +9,7 @@
   @par Note: EDKII implementation of capsule updating has discarded this capsule GUID HOB data
              structur and used one UEFI Capsule HOB (defined in PI Specification 1.2) instead.
 
-Copyright (c) 2006 - 2009, Intel Corporation
+Copyright (c) 2006 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -47,6 +47,21 @@ typedef struct {
   EFI_PHYSICAL_ADDRESS BaseAddress;  ///< Capsule data start address
   UINT32 Length;                     ///< Length of capsule data.
 } CAPSULE_HOB_INFO;
+
+///
+/// The variable describes the long mode buffer used by 32-bit Capsule PEIM
+/// to handle capsule above 4G.
+///
+#define EFI_CAPSULE_LONG_MODE_BUFFER_NAME L"CapsuleLongModeBuffer"
+
+///
+/// Data structure for base address and length of the long mode buffer used by 32-bit Capsule PEIM
+/// to handle capsule above 4G
+///
+typedef struct {
+  UINT64   Base;    ///< Base address of the long mode buffer.
+  UINT64   Length;  ///< Length of the long mode buffer.
+} EFI_CAPSULE_LONG_MODE_BUFFER;
 
 extern EFI_GUID gEfiCapsuleVendorGuid;
 
