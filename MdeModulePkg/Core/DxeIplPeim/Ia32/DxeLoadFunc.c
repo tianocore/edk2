@@ -70,8 +70,6 @@ HandOffToDxeCore (
   VOID                      *TemplateBase;
   EFI_PHYSICAL_ADDRESS      VectorAddress;
   UINT32                    Index;
-  BOOLEAN                   InterruptState;
-
 
   Status = PeiServicesAllocatePages (EfiBootServicesData, EFI_SIZE_TO_PAGES (STACK_SIZE), &BaseOfStack);
   ASSERT_EFI_ERROR (Status);
@@ -144,17 +142,7 @@ HandOffToDxeCore (
 
     gLidtDescriptor.Base = (UINTN) IdtTable;
 
-    //
-    // Disable interrupts and save the current interrupt state
-    //
-    InterruptState = SaveAndDisableInterrupts ();
-
     AsmWriteIdtr (&gLidtDescriptor);
-
-    //
-    // Restore the interrupt state
-    //
-    SetInterruptState (InterruptState);
 
     //
     // Go to Long Mode and transfer control to DxeCore.
