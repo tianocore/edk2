@@ -117,7 +117,7 @@ GetImageReadFunction (
 
   Private = PEI_CORE_INSTANCE_FROM_PS_THIS (GetPeiServicesTablePointer ());
 
-  if (!Private->PeiMemoryInstalled || (Private->HobList.HandoffInformationTable->BootMode == BOOT_ON_S3_RESUME)) {
+  if (!Private->PeiMemoryInstalled || (Private->HobList.HandoffInformationTable->BootMode == BOOT_ON_S3_RESUME) || EFI_IMAGE_MACHINE_TYPE_SUPPORTED(EFI_IMAGE_MACHINE_IA64)) {
     ImageContext->ImageRead = PeiImageRead;
   } else {
     if (Private->ShadowedImageRead == NULL) {
