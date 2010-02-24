@@ -1,4 +1,4 @@
-#/** @file
+## @file
 # EFI/PI MdePkg Package
 #
 # Copyright (c) 2007 - 2010, Intel Corporation<BR>
@@ -12,7 +12,7 @@
 #    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#**/
+##
 
 [Defines]
   PLATFORM_NAME                  = Mde
@@ -24,14 +24,14 @@
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
 
-[PcdsFeatureFlag.common]
+[PcdsFeatureFlag]
   gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport|TRUE
 
-[PcdsFixedAtBuild.common]
+[PcdsFixedAtBuild]
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1000000
   gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength|1000000
   gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength|1000000
@@ -70,7 +70,7 @@
 #
 ###################################################################################################
 
-[Components.common]
+[Components]
   MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
   MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
   MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf

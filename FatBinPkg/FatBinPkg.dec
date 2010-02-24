@@ -1,8 +1,8 @@
-#/** @file
+## @file
 # This package provides binary device drivers to support the FAT32 file system. This package is separated from other packages because it uses a different license. 
 #
 # This package provides FAT drivers which are not licensed under BSD.
-# Copyright (c) 2007, Intel Corporation.
+# Copyright (c) 2007 - 2010, Intel Corporation.
 #
 # All rights reserved.
 #    This program and the accompanying materials are licensed and made available 
@@ -11,7 +11,7 @@
 #    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES
 #    OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#**/
+##
 
 
 ################################################################################

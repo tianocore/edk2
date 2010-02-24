@@ -1,4 +1,4 @@
-#/** @file
+## @file
 #  This is core module in DXE phase. It provides an implementation of DXE Core that is
 #  compliant with DXE CIS.  
 #  
@@ -11,7 +11,7 @@
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #  
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -29,7 +29,7 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC (EBC is for build only)
 #
 
-[Sources.common]
+[Sources]
   DxeMain.h
   SectionExtraction/CoreSectionExtraction.c
   Image/Image.c
@@ -138,7 +138,7 @@
   gEfiLoadedImageDevicePathProtocolGuid         ## PRODUCES
   gEfiSmmBase2ProtocolGuid                      ## SOMETIMES_CONSUMES
 
-[FeaturePcd.common]
+[FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport	   ## CONSUMES
 
 [Pcd]

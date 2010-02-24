@@ -1,4 +1,4 @@
-#/** @file
+## @file
 # The DXE driver produces FORM BROWSER protocols defined in UEFI HII 2.1 specificatin.
 #
 # Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.
@@ -12,7 +12,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -28,7 +28,7 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-[Sources.common]
+[Sources]
   SetupBrowserStr.uni
   Setup.c
   Setup.h
@@ -73,7 +73,7 @@
   gEfiUnicodeCollation2ProtocolGuid             ## CONSUMES
   gEfiUserManagerProtocolGuid                   ## SOMETIMES_CONSUMES
 
-[FeaturePcd.common]
+[FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport
 
 [Depex]

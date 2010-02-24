@@ -1,4 +1,4 @@
-#/** @file
+## @file
 #
 #  Binary FAT32 EFI Driver for IA32, X64, IPF and EBC arch.
 #
@@ -6,7 +6,7 @@
 #  It also produces the Simple File System protocol for the consumer to
 #  perform file and directory operations on the disk.
 #
-#  Copyright 2007 - 2009, Intel Corporation
+#  Copyright 2007 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -16,7 +16,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005

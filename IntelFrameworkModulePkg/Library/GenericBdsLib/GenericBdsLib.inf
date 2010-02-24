@@ -31,7 +31,7 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-[Sources.common]
+[Sources]
   DevicePath.c
   Performance.c
   BdsConnect.c

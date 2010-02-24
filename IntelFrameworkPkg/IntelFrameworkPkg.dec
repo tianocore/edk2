@@ -1,4 +1,4 @@
-#/** @file
+## @file
 # Intel Framework Package Reference Implementations
 #
 # This package provides definitions and libraries that comply to Intel Framework Specifications.
@@ -11,7 +11,7 @@
 #    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES
 #    OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#**/
+##
 
 [Defines]
   DEC_SPECIFICATION              = 0x00010005

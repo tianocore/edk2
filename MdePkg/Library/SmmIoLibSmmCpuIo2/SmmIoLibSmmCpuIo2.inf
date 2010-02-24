@@ -1,4 +1,4 @@
-#/** @file
+## @file
 # Component description file for Cpu Io SMM Io Library.
 #
 # I/O Library implementation that uses the CPU I/O Protocol for I/O
@@ -12,7 +12,7 @@
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005

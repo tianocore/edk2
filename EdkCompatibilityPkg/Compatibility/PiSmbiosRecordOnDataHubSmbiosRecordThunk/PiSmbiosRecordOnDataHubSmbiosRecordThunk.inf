@@ -1,9 +1,9 @@
-#/** @file
+## @file
 #  This thunk driver register a filter for DataHub protocol, once a data hub record
 #  is added via EFI_DATA_HUB_PROTOCOL->LogData(), this filter will be invoked to 
 #  translate the datahub's record to SMBIOS record.
 #
-#  Copyright (c) 2009, Intel Corporation
+#  Copyright (c) 2009 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -13,7 +13,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -32,7 +32,7 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-[Sources.common]
+[Sources]
   Thunk.c
   Thunk.h
   Translate.c

@@ -1,4 +1,4 @@
-#/*++
+## @file
 #
 # Copyright (c) 2006 - 2010 Intel Corporation                                                         
 # All rights reserved. This program and the accompanying materials                          
@@ -17,7 +17,7 @@
 #
 #    Component description file for variable module
 #
-#--*/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -34,14 +34,14 @@
   DuetPkg/DuetPkg.dec
   MdeModulePkg/MdeModulePkg.dec
 
-[Sources.common]
+[Sources]
   FSVariable.h
   VariableStorage.h
   FSVariable.c
   FileStorage.c
   MemStorage.c
 
-[LibraryClasses.common]
+[LibraryClasses]
   PcdLib
   BaseMemoryLib
   BaseLib

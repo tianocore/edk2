@@ -1,4 +1,4 @@
-#/** @file
+## @file
 #
 #  BDSDxe module is core driver for BDS phase. 
 #  When DxeCore dispatching all DXE driver, this module will produce architecture protocol 
@@ -14,7 +14,7 @@
 #  BDSDxe also maintain the UI for "Boot Manager, Boot Maintaince Manager, Device Manager" which
 #  is used for user to configure boot option or maintain hardware device.
 #  
-#  Copyright (c) 2008 - 2009, Intel Corporation. <BR>
+#  Copyright (c) 2008 - 2010, Intel Corporation. <BR>
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -23,7 +23,7 @@
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #  
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -40,7 +40,7 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-[Sources.common]
+[Sources]
   FrontPage.h
   Language.h
   Bds.h
@@ -152,11 +152,11 @@
   gEfiDevicePathProtocolGuid                    ## PROTOCOL CONSUMES
   gEfiDriverHealthProtocolGuid                  ## PROTOCOL SOMETIMES_CONSUMES
 
-[FeaturePcd.common]
+[FeaturePcd]
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDeprecate
   gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
 
-[Pcd.common]
+[Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangCodes
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLang
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLangCodes

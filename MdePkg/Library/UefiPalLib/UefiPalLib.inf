@@ -1,4 +1,4 @@
-# @file
+## @file
 # UEFI Instance of PAL Library Class.
 #
 # This instance of PAL library retrieves the PAL Entry Point from the SAL System Table

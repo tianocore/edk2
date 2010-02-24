@@ -25,7 +25,7 @@
 
 
 
-[LibraryClasses.common]
+[LibraryClasses]
   CacheMaintenanceLib|MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
@@ -138,7 +138,7 @@
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   DebugLib|MdePkg/Library/UefiDebugLibStdErr/UefiDebugLibStdErr.inf
 
-[PcdsFeatureFlag.common]
+[PcdsFeatureFlag]
   gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|TRUE
@@ -154,7 +154,7 @@
 [PcdsFeatureFlag.IA32]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode|TRUE
 
-[PcdsFixedAtBuild.common]
+[PcdsFixedAtBuild]
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1000000
   gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength|1000000
   gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength|1000000
@@ -214,7 +214,7 @@
 #
 ###################################################################################################
 
-[Components.common]
+[Components]
   MdeModulePkg/Application/HelloWorld/HelloWorld.inf
 
   MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf

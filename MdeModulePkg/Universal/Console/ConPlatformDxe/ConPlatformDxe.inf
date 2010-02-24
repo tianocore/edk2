@@ -1,8 +1,8 @@
-#/** @file
+## @file
 # Console Platfrom DXE Driver that specifies whether device can be used as console
 # input/output device or error output device and update global variables accordingly.
 #
-# Copyright (c) 2006 - 2008, Intel Corporation
+# Copyright (c) 2006 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -12,7 +12,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -35,7 +35,7 @@
 #  COMPONENT_NAME2               =  gConPlatformComponentName2
 #
 
-[Sources.common]
+[Sources]
   ComponentName.c
   ConPlatform.h
   ConPlatform.c

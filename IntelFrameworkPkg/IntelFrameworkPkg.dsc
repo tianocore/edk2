@@ -1,4 +1,4 @@
-#/** @file
+## @file
 # Intel Framework Package Reference Implementations
 #
 # This DSC file is used for Package Level build.
@@ -13,7 +13,7 @@
 #    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#**/
+##
 
 ################################################################################
 #

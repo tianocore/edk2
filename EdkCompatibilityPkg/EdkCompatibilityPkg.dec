@@ -1,11 +1,11 @@
-#/** @file
+## @file
 # The EdkCompatibilityPkg provides header files and libraries that enable you to build the EDK module 
 # in UEFI 2.0 + Framework 0.9x mode. This package also provides Thunk modules that enable Framework 0.9x modules to work with UEFI2.1/PI1.0 EDK II Cores.
 # EdkCompatibilityPkg is based on the EDK 1.01 release, found at http://edk.tianocore.org. This package only 
 # contains the header files and libraries found in the original EDK. EdkCompatibilityPkg code is ANSI C compliant, so the modules can be built with GCC tool-chains. 
 # This package also incorporates bug fixes released in EDK 1.04.
 # 
-# Copyright (c) 2008 - 2009, Intel Corporation
+# Copyright (c) 2008 - 2010, Intel Corporation
 #
 # All rights reserved.
 #    This program and the accompanying materials are licensed and made available under
@@ -16,7 +16,7 @@
 #    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#**/
+##
 
 ################################################################################
 #
@@ -40,7 +40,7 @@
 #  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
 #
 ################################################################################
-[Includes.common]
+[Includes]
   Compatibility/Include
 
 ################################################################################
@@ -49,19 +49,19 @@
 #                                provided by this package.
 #
 ################################################################################
-[LibraryClasses.common]
+[LibraryClasses]
   ##  @libraryclass  Provides functions for language conversion between
   #                  ISO 639-2 and RFC 4646 styles.
   ##
   LanguageLib|Compatibility/Include/Library/LanguageLib.h
 
-[Guids.common]
+[Guids]
   gEfiSmmBaseThunkCommunicationGuid       = { 0x6568a3d6, 0x15f, 0x4b4a, { 0x9c, 0x89, 0x1d, 0x14, 0x63, 0x14, 0x13, 0xa } }
 
-[Ppis.common]
+[Ppis]
   gEcpPeiPciCfgPpiGuid                    = { 0xb0ee53d4, 0xa049, 0x4a79, { 0xb2, 0xff, 0x19, 0xd9, 0xfa, 0xef, 0xaa, 0x94 }} 
 
-[Protocols.common]
+[Protocols]
   gEfiPrintProtocolGuid                   = { 0xdf2d868e, 0x32fc, 0x4cf0, {0x8e, 0x6b, 0xff, 0xd9, 0x5d, 0x13, 0x43, 0xd0} }
   gEfiSmmBaseHelperReadyProtocolGuid      = { 0x910dca07, 0x1f94, 0x4ee7, { 0xaf, 0x2f, 0xff, 0x72, 0xf3, 0x15, 0x43, 0x53 } }
 

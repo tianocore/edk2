@@ -1,10 +1,10 @@
-#/** @file
+## @file
 #  Instance of Performance Library based on Base Library.
 #
 #  Performance Library that layers on top of the Base Library to measure start
 #  and end times using CPU specific timer services if they are available.
 #
-#  Copyright (c) 2007 - 2008, Intel Corporation.
+#  Copyright (c) 2007 - 2010, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -14,7 +14,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -29,7 +29,7 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-[Sources.common]
+[Sources]
   PerformanceLib.c
 
 
@@ -42,6 +42,6 @@
   DebugLib
 
 
-[Pcd.common]
+[Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask
 

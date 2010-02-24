@@ -1,11 +1,11 @@
-#/** @file
+## @file
 # Instance of UEFI Runtime Library.
 #
 # Instance of UEFI Runtime Library, with hooked EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE and
 #  EVT_SIGNAL_EXIT_BOOT_SERVICES event, to provide runtime services.
 # This instance also supports SAL drivers for better performance.
 #
-# Copyright (c) 2006 - 2008, Intel Corporation.
+# Copyright (c) 2006 - 2010, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -15,7 +15,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -33,7 +33,7 @@
 #
 
 
-[Sources.common]
+[Sources]
   RuntimeLib.c
 
 [Packages]

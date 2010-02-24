@@ -1,7 +1,7 @@
-#/** @file
+## @file
 # Component name for module Ip4
 #
-# Copyright (c) 2007 - 2009, Intel Corporation
+# Copyright (c) 2007 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -12,7 +12,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -33,7 +33,7 @@
 #  COMPONENT_NAME2               =  gIp4ComponentName2
 #
 
-[Sources.common]
+[Sources]
   Ip4Driver.c
   Ip4Option.h
   Ip4Route.h

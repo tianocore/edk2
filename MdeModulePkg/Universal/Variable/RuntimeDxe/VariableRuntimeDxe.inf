@@ -1,8 +1,8 @@
-#/** @file
+## @file
 # Component description file for Variable module.
 #
 # This module installs three EFI_RUNTIME_SERVICES: SetVariable, GetVariable, GetNextVariableName.
-# Copyright (c) 2006 - 2007, Intel Corporation
+# Copyright (c) 2006 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -12,7 +12,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -30,7 +30,7 @@
 #  VIRTUAL_ADDRESS_MAP_CALLBACK  =  VariableClassAddressChangeEvent
 #
 
-[Sources.common]
+[Sources]
   Reclaim.c
   Variable.c
   Variable.h
@@ -63,7 +63,7 @@
   gEfiGlobalVariableGuid                        ## PRODUCES ## Variable Guid
   gEfiEventVirtualAddressChangeGuid             ## PRODUCES ## Event
 
-[Pcd.common]
+[Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize
@@ -71,7 +71,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdHwErrStorageSize
   
-[FeaturePcd.common]
+[FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics  ## SOMETIME_CONSUMES (statistic the information of variable.)
 
 [Depex]

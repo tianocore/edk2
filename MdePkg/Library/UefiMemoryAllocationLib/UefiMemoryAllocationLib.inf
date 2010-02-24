@@ -1,4 +1,4 @@
-#/** @file
+## @file
 # Instance of Memory Allocation Library using EFI Boot Services.
 #
 # Memory Allocation Library that uses EFI Boot Services to allocate
@@ -14,7 +14,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005

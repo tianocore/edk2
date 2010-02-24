@@ -1,4 +1,4 @@
-# @file
+## @file
 # PCI Library that layers on top of the PCI CFG2 PPI.
 #
 # This library produces the APIs from the PCI Library and implements
@@ -34,7 +34,7 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC (EBC is for build only)
 #
 
-[Sources.common]
+[Sources]
   PciLib.c
 
 

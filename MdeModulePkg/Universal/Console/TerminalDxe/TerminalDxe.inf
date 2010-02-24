@@ -1,4 +1,4 @@
-#/** @file
+## @file
 #
 #  Component description file for Terminal module.
 #
@@ -13,7 +13,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -33,7 +33,7 @@
 #  COMPONENT_NAME2               =  gTerminalComponentName2
 #
 
-[Sources.common]
+[Sources]
   ComponentName.c
   Vtutf8.c
   Ansi.c

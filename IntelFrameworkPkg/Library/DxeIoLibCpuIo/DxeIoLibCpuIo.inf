@@ -1,4 +1,4 @@
-#/** @file
+## @file
 # Component description file for Cpu Io Dxe Io Library.
 #
 # I/O Library implementation that uses the CPU I/O Protocol for I/O
@@ -13,7 +13,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -30,7 +30,7 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-[Sources.common]
+[Sources]
   IoLibMmioBuffer.c
   DxeCpuIoLibInternal.h
   IoHighLevel.c

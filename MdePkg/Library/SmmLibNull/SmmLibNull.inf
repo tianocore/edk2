@@ -1,4 +1,4 @@
-#/** @file
+## @file
 # NULL instance of SMM Library.
 #
 #  Copyright (c) 2009 - 2010, Intel Corporation.
@@ -11,7 +11,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
