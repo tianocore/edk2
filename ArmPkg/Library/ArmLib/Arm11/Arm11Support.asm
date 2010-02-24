@@ -28,6 +28,9 @@
     EXPORT  ArmDisableInstructionCache
     EXPORT  ArmEnableBranchPrediction
     EXPORT  ArmDisableBranchPrediction
+    EXPORT  ArmDataMemoryBarrier
+    EXPORT  ArmDataSyncronizationBarrier
+    EXPORT  ArmInstructionSynchronizationBarrier
 
 
 DC_ON       EQU     ( 0x1:SHL:2 )
@@ -134,6 +137,21 @@ ArmDisableBranchPrediction
   mrc     p15, 0, r0, c1, c0, 0
   bic     r0, r0, #0x00000800
   mcr     p15, 0, r0, c1, c0, 0
+  bx      LR
+
+ASM_PFX(ArmDataMemoryBarrier):
+  mov R0, #0
+  mcr P15, #0, R0, C7, C10, #5 
+  bx      LR
+  
+ASM_PFX(ArmDataSyncronizationBarrier):
+  mov R0, #0
+  mcr P15, #0, R0, C7, C10, #4 
+  bx      LR
+  
+ASM_PFX(ArmInstructionSynchronizationBarrier):
+  MOV R0, #0
+  MCR P15, #0, R0, C7, C5, #4 
   bx      LR
 
     END

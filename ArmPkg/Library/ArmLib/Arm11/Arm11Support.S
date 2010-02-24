@@ -30,6 +30,10 @@
 .globl ASM_PFX(ArmDisableInstructionCache)
 .globl ASM_PFX(ArmEnableBranchPrediction)
 .globl ASM_PFX(ArmDisableBranchPrediction)
+.globl ASM_PFX(ArmDataMemoryBarrier)
+.globl ASM_PFX(ArmDataSyncronizationBarrier) 
+.globl ASM_PFX(ArmInstructionSynchronizationBarrier)
+
 
 .set DC_ON, (0x1<<2)
 .set IC_ON, (0x1<<12)
@@ -131,5 +135,21 @@ ASM_PFX(ArmDisableBranchPrediction):
   bic     r0, r0, #0x00000800
   mcr     p15, 0, r0, c1, c0, 0
   bx      LR
+
+ASM_PFX(ArmDataMemoryBarrier):
+  mov R0, #0
+  mcr P15, #0, R0, C7, C10, #5 
+  bx      LR
+  
+ASM_PFX(ArmDataSyncronizationBarrier):
+  mov R0, #0
+  mcr P15, #0, R0, C7, C10, #4 
+  bx      LR
+  
+ASM_PFX(ArmInstructionSynchronizationBarrier):
+  mov R0, #0
+  mcr P15, #0, R0, C7, C5, #4 
+  bx      LR
+  
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED
