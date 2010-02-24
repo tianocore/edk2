@@ -309,5 +309,23 @@ EFIAPI
 ArmDisableBranchPrediction (
   VOID
   );
-
+  
+VOID
+EFIAPI
+ArmDataMemoryBarrier (
+  VOID
+  );
+  
+VOID
+EFIAPI
+ArmDataSyncronizationBarrier (
+  VOID
+  );
+  
+VOID
+EFIAPI
+ArmInstructionSynchronizationBarrier (
+  VOID
+  );
+  
 #endif // __ARM_LIB__

@@ -1,7 +1,7 @@
 /** @file
-  Template for Metronome Architecture Protocol driver of the ARM flavor
+  Handle OMAP35xx interrupt controller 
 
-  Copyright (c) 2008-2009, Apple Inc. All rights reserved.
+  Copyright (c) 2008-2010, Apple Inc. All rights reserved.
   
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -21,6 +21,7 @@
 #include <Library/UefiLib.h>
 #include <Library/PcdLib.h>
 #include <Library/IoLib.h>
+#include <Library/ArmLib.h>
 
 #include <Protocol/Cpu.h>
 #include <Protocol/HardwareInterrupt.h>
@@ -143,7 +144,7 @@ EnableInterruptSource (
 **/
 EFI_STATUS
 EFIAPI
-DisableInterruptSource(
+DisableInterruptSource (
   IN EFI_HARDWARE_INTERRUPT_PROTOCOL    *This,
   IN HARDWARE_INTERRUPT_SOURCE          Source
   )
@@ -209,6 +210,28 @@ GetInterruptSourceState (
   return EFI_SUCCESS;
 }
 
+/**
+  Signal to the hardware that the End Of Intrrupt state 
+  has been reached.
+
+  @param This     Instance pointer for this protocol
+  @param Source   Hardware source of the interrupt
+
+  @retval EFI_SUCCESS       Source interrupt EOI'ed.
+  @retval EFI_DEVICE_ERROR  Hardware could not be programmed.
+
+**/
+EFI_STATUS
+EFIAPI
+EndOfInterrupt (
+  IN EFI_HARDWARE_INTERRUPT_PROTOCOL    *This,
+  IN HARDWARE_INTERRUPT_SOURCE          Source
+  )
+{
+  MmioWrite32 (INTCPS_CONTROL, INTCPS_CONTROL_NEWIRQAGR);
+  ArmDataSyncronizationBarrier ();
+  return EFI_SUCCESS;
+}
 
 
 /**
@@ -232,19 +255,21 @@ IrqInterruptHandler (
   UINT32                     Vector;
   HARDWARE_INTERRUPT_HANDLER InterruptHandler;
   
-  Vector = MmioRead32(INTCPS_SIR_IRQ) & INTCPS_SIR_IRQ_MASK;
+  Vector = MmioRead32 (INTCPS_SIR_IRQ) & INTCPS_SIR_IRQ_MASK;
 
   // Needed to prevent infinite nesting when Time Driver lowers TPL
   MmioWrite32 (INTCPS_CONTROL, INTCPS_CONTROL_NEWIRQAGR);
-
+  ArmDataSyncronizationBarrier ();
+  
   InterruptHandler = gRegisteredInterruptHandlers[Vector];
   if (InterruptHandler != NULL) {
     // Call the registered interrupt handler.
-    InterruptHandler(Vector, SystemContext);
+    InterruptHandler (Vector, SystemContext);
   }
   
   // Needed to clear after running the handler
   MmioWrite32 (INTCPS_CONTROL, INTCPS_CONTROL_NEWIRQAGR);
+  ArmDataSyncronizationBarrier ();
 }
 
 //
@@ -259,7 +284,8 @@ EFI_HARDWARE_INTERRUPT_PROTOCOL gHardwareInterruptProtocol = {
   RegisterInterruptSource,
   EnableInterruptSource,
   DisableInterruptSource,
-  GetInterruptSourceState
+  GetInterruptSourceState,
+  EndOfInterrupt
 };
 
 //
@@ -277,19 +303,19 @@ CpuProtocolInstalledNotification (
   //
   // Get the cpu protocol that this driver requires.
   //
-  Status = gBS->LocateProtocol(&gEfiCpuArchProtocolGuid, NULL, (VOID **)&Cpu);
+  Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&Cpu);
   ASSERT_EFI_ERROR(Status);
 
   //
   // Unregister the default exception handler.
   //
-  Status = Cpu->RegisterInterruptHandler(Cpu, EXCEPT_ARM_IRQ, NULL);
+  Status = Cpu->RegisterInterruptHandler (Cpu, EXCEPT_ARM_IRQ, NULL);
   ASSERT_EFI_ERROR(Status);
 
   //
   // Register to receive interrupts
   //
-  Status = Cpu->RegisterInterruptHandler(Cpu, EXCEPT_ARM_IRQ, IrqInterruptHandler);
+  Status = Cpu->RegisterInterruptHandler (Cpu, EXCEPT_ARM_IRQ, IrqInterruptHandler);
   ASSERT_EFI_ERROR(Status);
 }
 

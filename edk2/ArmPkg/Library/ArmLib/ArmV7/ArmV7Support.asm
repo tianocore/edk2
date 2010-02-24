@@ -30,6 +30,10 @@
     EXPORT  ArmEnableBranchPrediction
     EXPORT  ArmDisableBranchPrediction
     EXPORT  ArmV7AllDataCachesOperation
+    EXPORT  ArmDataMemoryBarrier
+    EXPORT  ArmDataSyncronizationBarrier
+    EXPORT  ArmInstructionSynchronizationBarrier
+
 
 DC_ON       EQU     ( 0x1:SHL:2 )
 IC_ON       EQU     ( 0x1:SHL:12 )
@@ -216,5 +220,18 @@ Skip
 Finished
   LDMFD SP!, {r4-r12, lr}
   BX    LR
+
+
+ArmDataMemoryBarrier
+  DMB
+  BX      LR
+  
+ArmDataSyncronizationBarrier
+  DSB
+  BX      LR
+  
+ArmInstructionSynchronizationBarrier
+  ISB
+  BX      LR
 
     END

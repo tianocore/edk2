@@ -34,6 +34,10 @@
 .globl ASM_PFX(ArmEnableBranchPrediction)
 .globl ASM_PFX(ArmDisableBranchPrediction)
 .globl ASM_PFX(ArmV7AllDataCachesOperation)
+.globl ASM_PFX(ArmDataMemoryBarrier)
+.globl ASM_PFX(ArmDataSyncronizationBarrier) 
+.globl ASM_PFX(ArmInstructionSynchronizationBarrier)
+
 
 .set DC_ON, (0x1<<2)
 .set IC_ON, (0x1<<12)
@@ -222,5 +226,17 @@ L_Finished:
   ldmfd SP!, {r4-r12, lr}
   bx    LR
 
+ASM_PFX(ArmDataMemoryBarrier):
+  dmb
+  bx      LR
+  
+ASM_PFX(ArmDataSyncronizationBarrier):
+  dsb
+  bx      LR
+  
+ASM_PFX(ArmInstructionSynchronizationBarrier):
+  isb
+  bx      LR
+ 
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED
