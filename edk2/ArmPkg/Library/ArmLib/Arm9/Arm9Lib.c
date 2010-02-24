@@ -118,28 +118,4 @@ ArmConfigureMmu (
 }
 
 
-VOID
-EFIAPI
-ArmDataMemoryBarrier (
-  VOID
-  )
-{
-}
-  
-VOID
-EFIAPI
-ArmDataSyncronizationBarrier (
-  VOID
-  )
-{
-}
-
-VOID
-EFIAPI
-ArmInstructionSynchronizationBarrier (
-  VOID
-  )
-{
-}
-
 
