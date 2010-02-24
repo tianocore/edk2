@@ -184,15 +184,16 @@ CEntryPoint (
 {
   VOID *HobBase;
 
+  // Build a basic HOB list
+  HobBase      = (VOID *)(UINTN)(FixedPcdGet32(PcdEmbeddedFdBaseAddress) + FixedPcdGet32(PcdEmbeddedFdSize));
+  CreateHobList (MemoryBase, MemorySize, HobBase, StackBase);
+
   //Set up Pin muxing.
   PadConfiguration ();
 
   // Set up system clocking
   ClockInit ();
 
-  // Build a basic HOB list
-  HobBase      = (VOID *)(UINTN)(FixedPcdGet32(PcdEmbeddedFdBaseAddress) + FixedPcdGet32(PcdEmbeddedFdSize));
-  CreateHobList (MemoryBase, MemorySize, HobBase, StackBase);
 
   // Enable program flow prediction, if supported.
   ArmEnableBranchPrediction ();
@@ -222,7 +223,6 @@ CEntryPoint (
     VOID                *PeCoffImage;
     UINT32              Offset;
     CHAR8               *FilePath;
-
     FfsAnyFvFindFirstFile (EFI_FV_FILETYPE_SECURITY_CORE, &VolumeHandle, &FileHandle);
     Status = FfsFindSectionData (EFI_SECTION_TE, FileHandle, &PeCoffImage);
     if (EFI_ERROR (Status)) {
@@ -271,6 +271,7 @@ CEntryPoint (
     LzmaGuidedSectionExtraction
     );
 
+  // Assume the FV that contains the SEC (our code) also contains a compressed FV.
   DecompressFirstFv ();
 
   // Load the DXE Core and transfer control to it
