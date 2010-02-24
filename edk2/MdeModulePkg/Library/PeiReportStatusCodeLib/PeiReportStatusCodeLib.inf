@@ -1,11 +1,11 @@
-#/** @file
+## @file
 #  Instance of Report Status Code Library for PEI Phase.
 #
 #  Instance of Report Status Code Library for PEI Phase. It first tries to report status
 #  code via PEI Status Code Service. If the service is not available, it then tries calling
 #  OEM Hook Status Code Library.
 #
-#  Copyright (c) 2006 - 2009, Intel Corporation.
+#  Copyright (c) 2006 - 2010, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -15,7 +15,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -31,7 +31,7 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC (EBC is for build only)
 #
 
-[Sources.common]
+[Sources]
   ReportStatusCodeLib.c
 
 
@@ -53,6 +53,6 @@
   gEfiStatusCodeDataTypeDebugGuid               ## CONSUMES
 
 
-[Pcd.common]
+[Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask
 

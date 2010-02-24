@@ -1,4 +1,4 @@
-# @file
+## @file
 # PCI Library that layers on top of the PCI Root Bridge I/O Protocol.
 #
 # This library produces the APIs from the PCI Library and implements these APIs
@@ -35,7 +35,7 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-[Sources.common]
+[Sources]
   PciLib.c
 
 

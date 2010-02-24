@@ -1,4 +1,4 @@
-#/** @file
+## @file
 # PCD DXE driver manage database contains all dynamic PCD entries initialized in 
 # PEI phase, DXE phase and produce the implementation of PCD protocol.
 #
@@ -286,7 +286,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005

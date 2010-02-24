@@ -1,4 +1,4 @@
-#/** @file
+## @file
 # USB Keyboard Driver that manages USB keyboard and produces Simple Text Input
 # Protocol and Simple Text Input Ex Protocol.
 #
@@ -24,7 +24,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -44,7 +44,7 @@
 #  COMPONENT_NAME2               =  gUsbKeyboardComponentName2
 #
 
-[Sources.common]
+[Sources]
   EfiKey.c
   EfiKey.h
   KeyBoard.c
@@ -86,7 +86,7 @@
   #
   gEfiHiiDatabaseProtocolGuid                   ## SOMETIMES_CONSUMES (Default value is used if it's absent.)
   
-[FeaturePcd.common]
+[FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDisableDefaultKeyboardLayoutInUsbKbDriver ## SOMETIME_CONSUMES (Checked when no layout is provided by HII.) 
 
 # [Event]

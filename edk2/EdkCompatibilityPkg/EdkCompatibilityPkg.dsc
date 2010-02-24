@@ -1,4 +1,4 @@
-#/** @file
+## @file
 # EDK Compatibility Package Build File
 #
 #
@@ -12,7 +12,7 @@
 #    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#**/
+##
 
 ################################################################################
 #
@@ -41,7 +41,7 @@ define GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x00020000 -DPI_S
 [SkuIds]
   0|DEFAULT              # The entry: 0|DEFAULT is reserved and always required.
 
-[LibraryClasses.common]
+[LibraryClasses]
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   SynchronizationLib|MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
@@ -160,7 +160,7 @@ define GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x00020000 -DPI_S
 #
 ###################################################################################################
 
-[Components.Common]
+[Components]
 
 # All Libraries Instances listed in Alphabetic Order
   EdkCompatibilityPkg/Foundation/Core/Dxe/ArchProtocol/ArchProtocolLib.inf
@@ -288,7 +288,7 @@ define GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x00020000 -DPI_S
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/EdkDxeSalLib/EdkDxeSalLib.inf
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/PeiServicesTablePointerLibKr1/PeiServicesTablePointerLibKr1.inf
 
-[Libraries.Common]
+[Libraries]
   #
   # Libraries common to PEI and DXE
   #

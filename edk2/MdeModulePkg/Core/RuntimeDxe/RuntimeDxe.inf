@@ -1,4 +1,4 @@
-#/** @file
+## @file
 #  Module that produces EFI runtime virtual switch over services.
 #
 #  This runtime module installs Runtime Architectural Protocol and registers
@@ -15,7 +15,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 
 [Defines]
@@ -33,7 +33,7 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-[Sources.common]
+[Sources]
   Crc32.c
   Runtime.h
   Runtime.c

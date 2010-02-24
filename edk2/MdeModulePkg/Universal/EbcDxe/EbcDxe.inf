@@ -1,11 +1,11 @@
-#/** @file
+## @file
 #  Module that produces EBC Interprete and EBC Debug Support protocols.
 #  
 #  This module implements EFI Byte Code (EBC) Virtual Machine that can provide 
 #  platform and processor-independent mechanisms for loading and executing EFI
 #  device drivers.
 #
-#  Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+#  Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -14,7 +14,7 @@
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #  
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -30,7 +30,7 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF
 #
 
-[Sources.common]
+[Sources]
   EbcExecute.h
   EbcExecute.c
   EbcInt.h

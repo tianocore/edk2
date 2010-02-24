@@ -1,4 +1,4 @@
-#/** @file
+## @file
 #  Last PEIM executed in PEI phase to load DXE Core from a Firmware Volume.
 #  
 #  This module produces a special PPI named the DXE Initial Program Load (IPL)
@@ -14,7 +14,7 @@
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #  
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -31,7 +31,7 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC (EBC is for build only)
 #
 
-[Sources.common]
+[Sources]
   DxeIpl.h
   DxeLoad.c
 
@@ -89,7 +89,7 @@
 [FeaturePcd.IA32]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
 
-[FeaturePcd.common]
+[FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportUefiDecompress
 
 [Depex]

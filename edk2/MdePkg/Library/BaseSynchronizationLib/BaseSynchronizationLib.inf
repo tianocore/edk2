@@ -1,4 +1,4 @@
-#/** @file
+## @file
 #  Base Synchronization Library implementation.
 #
 #  Copyright (c) 2007 - 2010, Intel Corporation.<BR>
@@ -12,7 +12,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -25,7 +25,7 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC ARM
 #
-[Sources.Common]
+[Sources]
   BaseSynchronizationLibInternals.h
 
 [Sources.IA32]
@@ -95,5 +95,5 @@
   DebugLib
   BaseMemoryLib
 
-[Pcd.common]
+[Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdSpinLockTimeout

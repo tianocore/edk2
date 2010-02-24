@@ -1,4 +1,4 @@
-#/** @file
+## @file
 #  NULL instance of Timer Library as a template.
 #
 #  A non-functional instance of the Timer Library that can be used as a template
@@ -6,7 +6,7 @@
 #  also be used to test build DXE, Runtime, DXE SAL, and DXE SMM modules that require timer
 #  services as well as EBC modules that require timer services.
 #
-#  Copyright (c) 2007 - 2008, Intel Corporation.
+#  Copyright (c) 2007 - 2010, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -16,7 +16,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -31,7 +31,7 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-[Sources.common]
+[Sources]
   TimerLibNull.c
 
 

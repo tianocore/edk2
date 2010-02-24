@@ -34,7 +34,7 @@
 #  COMPONENT_NAME2               =  gPxeBcComponentName2
 #
 
-[Sources.common]
+[Sources]
   PxeBcMtftp.c
   PxeBcSupport.h
   PxeBcSupport.c

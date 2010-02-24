@@ -1,4 +1,4 @@
-#/** @file
+## @file
 # Component description file for IsaBus module.
 #
 # Discovers all the ISA Controllers and their resources by using the ISA ACPI 
@@ -6,7 +6,7 @@
 # Controller found. This driver is designed to manage a PCI-to-ISA bridge Device
 # such as LPC bridge.
 #
-# Copyright (c) 2007 - 2009, Intel Corporation
+# Copyright (c) 2007 - 2010, Intel Corporation
 #
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -15,7 +15,7 @@
 #
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -33,7 +33,7 @@
 #  COMPONENT_NAME2               = gIsaBusComponentName2;
 #
 
-[Sources.common]
+[Sources]
   ComponentName.c
   IsaIo.c
   IsaBus.c
@@ -65,7 +65,7 @@
   gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
   gEfiGenericMemTestProtocolGuid                # PROTOCOL TO_START
 
-[Pcd.common]
+[Pcd]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSupportedFeatures
 
 

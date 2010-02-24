@@ -1,8 +1,8 @@
-#/** @file
+## @file
 #  Status Code Handler Driver which produces general handlers and hook them
 #  onto the DXE status code router.
 #
-#  Copyright (c) 2006 - 2009, Intel Corporation.
+#  Copyright (c) 2006 - 2010, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -12,7 +12,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -27,7 +27,7 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-[Sources.common]
+[Sources]
   StatusCodeHandlerRuntimeDxe.c
   StatusCodeHandlerRuntimeDxe.h
   SerialStatusCodeWorker.c

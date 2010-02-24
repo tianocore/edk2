@@ -1,10 +1,10 @@
-#/** @file
+## @file
 # Instance of Usb Library.
 #
 # This library instance provides most usb APIs to support the Hid requests defined in
 # Usb Hid 1.1 spec and the standard requests defined in Usb 1.1 spec.
 #
-# Copyright (c) 2006 - 2008, Intel Corporation.
+# Copyright (c) 2006 - 2010, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -14,7 +14,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -29,7 +29,7 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-[Sources.common]
+[Sources]
   UefiUsbLibInternal.h
   Hid.c
   UsbDxeLib.c

@@ -1,4 +1,4 @@
-#/*++
+## @file
 #
 # Copyright (c) 2007 - 2010, Intel Corporation                                                         
 # All rights reserved. This program and the accompanying materials                          
@@ -17,7 +17,7 @@
 #
 #    Component description file for DUET Module
 #
-#--*/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -34,7 +34,7 @@
   MdeModulePkg/MdeModulePkg.dec
   DuetPkg/DuetPkg.dec
 
-[Sources.common]
+[Sources]
   FWBlockService.c
   FwBlockService.h
   FvbInfo.c

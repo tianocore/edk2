@@ -1,8 +1,8 @@
-#/** @file
+## @file
 # Component name for module Udp4
 #
 # FIX ME!
-# Copyright (c) 2006, Intel Corporation.
+# Copyright (c) 2006 - 2010, Intel Corporation.
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -13,7 +13,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -33,7 +33,7 @@
 #  COMPONENT_NAME2               =  gUdp4ComponentName2
 #
 
-[Sources.common]
+[Sources]
   Udp4Impl.h
   Udp4Main.c
   ComponentName.c

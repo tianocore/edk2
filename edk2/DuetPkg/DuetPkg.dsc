@@ -1,10 +1,10 @@
-#/** @file
+## @file
 #  An EFI/Framework Emulation Platform with UEFI HII interface supported. 
 #
 #  Developer's UEFI Emulation. DUET provides an EFI/UEFI IA32/X64 environment on legacy BIOS, 
 #  to help developing and debugging native EFI/UEFI drivers.
 #  
-#  Copyright (c) 2010, Intel Corporation. All rights reserved. <BR>
+#  Copyright (c) 2010 - 2010, Intel Corporation. All rights reserved. <BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -14,7 +14,7 @@
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#**/
+##
 
 [Defines]
   PLATFORM_NAME                  = DuetPkg
@@ -27,7 +27,7 @@
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = DuetPkg/DuetPkg.fdf
 
-[LibraryClasses.common]
+[LibraryClasses]
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   SynchronizationLib|MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
@@ -84,7 +84,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x0
 
-[PcdsFeatureFlag.common]
+[PcdsFeatureFlag]
   gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|TRUE
 
 [PcdsDynamicHii.common.DEFAULT]
@@ -111,7 +111,7 @@
 #
 ###################################################################################################
 
-[Components.common]
+[Components]
   DuetPkg/DxeIpl/DxeIpl.inf {
     <LibraryClasses>
       #
@@ -217,6 +217,6 @@
   #
   MdeModulePkg/Application/HelloWorld/HelloWorld.inf
 
-[BuildOptions.common]
+[BuildOptions]
   MSFT:*_*_*_CC_FLAGS = /FAsc /FR$(@R).SBR
 

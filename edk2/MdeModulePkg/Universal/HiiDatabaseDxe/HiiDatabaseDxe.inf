@@ -1,7 +1,7 @@
-#/** @file
+## @file
 # The DXE driver produces HII protocols defined in UEFI HII 2.1 specificatin.
 #
-# Copyright (c) 2007, Intel Corporation. All rights reserved.
+# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.
 #
 #  All rights reserved. This program and the accompanying materials       
 #  are licensed and made available under the terms and conditions of the BSD License   
@@ -12,7 +12,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -28,7 +28,7 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-[Sources.common]
+[Sources]
   HiiDatabaseEntry.c
   Image.c
   HiiDatabase.h
@@ -64,10 +64,10 @@
   gEfiHiiFontProtocolGuid                                               ## PRODUCES
   gEfiHiiConfigAccessProtocolGuid                                       ## CONSUMES
 
-[FeaturePcd.common]
+[FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportHiiImageProtocol
 
-[Pcd.common]
+[Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang
 
 [Guids]  

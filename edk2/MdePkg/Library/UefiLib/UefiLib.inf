@@ -1,4 +1,4 @@
-#/** @file
+## @file
 # Instance of UEFI Library.
 #
 # The UEFI Library provides functions and macros that simplify the development of 
@@ -7,7 +7,7 @@
 #  EFI Driver Model related protocols, manage Unicode string tables for UEFI Drivers, 
 #  and print messages on the console output and standard error devices.
 #
-# Copyright (c) 2007 - 2009, Intel Corporation
+# Copyright (c) 2007 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -17,7 +17,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -32,7 +32,7 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 
-[Sources.common]
+[Sources]
   UefiLibPrint.c
   UefiNotTiano.c
   UefiDriverModel.c
@@ -75,10 +75,10 @@
   gEfiDriverDiagnostics2ProtocolGuid| NOT PcdDriverDiagnostics2Disable ## SOMETIMES_CONSUMES (User chooses to produce it)
 
 
-[Pcd.common]
+[Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize   ## CONSUMES
 
-[FeaturePcd.common]
+[FeaturePcd]
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable    ## CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable        ## CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable   ## CONSUMES

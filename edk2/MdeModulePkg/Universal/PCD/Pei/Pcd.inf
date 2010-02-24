@@ -1,4 +1,4 @@
-#/** @file
+## @file
 # PCD PEIM produces PCD database to manage all dynamic PCD in PEI phase and install Pcd Ppi service.
 #
 # There are two PCD PPIs as follows:
@@ -281,7 +281,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005

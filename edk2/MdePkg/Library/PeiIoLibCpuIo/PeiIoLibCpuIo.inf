@@ -1,4 +1,4 @@
-#/** @file
+## @file
 # Instance of I/O Library using CPU I/O PPI.
 #
 # I/O Library implementation that uses the CPU I/O PPI for I/O
@@ -14,7 +14,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005

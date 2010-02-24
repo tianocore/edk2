@@ -1,7 +1,7 @@
-#/** @file
+## @file
 # Component name for module Dhcp4
 #
-# Copyright (c) 2007, Intel Corporation
+# Copyright (c) 2007 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -12,7 +12,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -32,7 +32,7 @@
 #  COMPONENT_NAME2               =  gDhcp4ComponentName2
 #
 
-[Sources.common]
+[Sources]
   Dhcp4Impl.c
   Dhcp4Io.c
   Dhcp4Io.h

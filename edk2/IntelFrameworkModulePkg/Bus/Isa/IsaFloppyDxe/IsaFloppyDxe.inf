@@ -1,4 +1,4 @@
-#/** @file
+## @file
 # Component description file for IsaFloppy module.
 #
 # ISA Floppy Disk UEFI Driver conforming to the UEFI driver model
@@ -10,7 +10,7 @@
 #  4. Do not use interrupt
 #  5. Support diskette change line signal and write protect
 #
-# Copyright (c) 2007 - 2009, Intel Corporation
+# Copyright (c) 2007 - 2010, Intel Corporation
 #
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -20,7 +20,7 @@
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -37,7 +37,7 @@
 #  COMPONENT_NAME                = gIsaFloppyComponentName;
 #  COMPONENT_NAME2               = gIsaFloppyComponentName2;
 #
-[Sources.common]
+[Sources]
   ComponentName.c
   ComponentName.h
   IsaFloppyCtrl.c
@@ -67,6 +67,6 @@
   gEfiBlockIoProtocolGuid                       # PROTOCOL BY_START
   gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
 
-[FeaturePcd.common]
+[FeaturePcd]
   gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable        # CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable       # CONSUMES

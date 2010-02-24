@@ -1,4 +1,4 @@
-#/** @file
+## @file
 #  Component description file for PciBus module.
 #
 #  PCI bus driver. This module will probe all PCI devices and allocate MMIO and IO
@@ -15,7 +15,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005

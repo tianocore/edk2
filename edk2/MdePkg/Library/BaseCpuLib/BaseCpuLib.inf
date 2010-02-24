@@ -1,4 +1,4 @@
-#/** @file
+## @file
 #  Instance of CPU Library for various architecture.
 #
 #  CPU Library implemented using ASM functions for IA-32 and X64,
@@ -15,7 +15,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005

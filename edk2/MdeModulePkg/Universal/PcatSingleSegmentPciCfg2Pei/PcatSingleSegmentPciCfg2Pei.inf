@@ -1,4 +1,4 @@
-#/** @file
+## @file
 #  This driver installs Single Segment Pci Configuration 2 PPI 
 #  to provide read, write and modify access to Pci configuration space in PEI phase. 
 #  To follow PI specification, these services also support access to the unaligned Pci address.
@@ -13,7 +13,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -29,7 +29,7 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC (EBC is for build only)
 #
 
-[Sources.common]
+[Sources]
   PciCfg2.c
 
 [Packages]

@@ -1,4 +1,4 @@
-#/** @file
+## @file
 # USB Mouse Driver that manages USB mouse and produces Simple Pointer Protocol.
 #
 # USB Mouse Driver consumes USB I/O Protocol and Device Path Protocol, and produces
@@ -20,7 +20,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -40,7 +40,7 @@
 #  COMPONENT_NAME2               =  gUsbMouseComponentName2
 #
 
-[Sources.common]
+[Sources]
   ComponentName.c
   MouseHid.c
   UsbMouse.c
