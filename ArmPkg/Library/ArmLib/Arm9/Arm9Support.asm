@@ -28,6 +28,9 @@
     EXPORT  ArmDisableInstructionCache
     EXPORT  ArmEnableBranchPrediction
     EXPORT  ArmDisableBranchPrediction
+    EXPORT  ArmDataMemoryBarrier
+    EXPORT  ArmDataSyncronizationBarrier
+    EXPORT  ArmInstructionSynchronizationBarrier
 
 
 DC_ON       EQU     ( 0x1:SHL:2 )
@@ -131,5 +134,20 @@ ArmEnableBranchPrediction
 
 ArmDisableBranchPrediction
   bx      LR                    ;Branch prediction is not supported.
+
+ASM_PFX(ArmDataMemoryBarrier):
+  mov R0, #0
+  mcr P15, #0, R0, C7, C10, #5  ; Check to see if this is correct
+  bx      LR
+  
+ASM_PFX(ArmDataSyncronizationBarrier):
+  mov R0, #0
+  mcr P15, #0, R0, C7, C10, #4 ; Check to see if this is correct
+  bx      LR
+  
+ASM_PFX(ArmInstructionSynchronizationBarrier):
+  MOV R0, #0
+  MCR P15, #0, R0, C7, C5, #4 ; Check to see if this is correct
+  bx      LR
 
     END

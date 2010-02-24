@@ -118,32 +118,5 @@ ArmConfigureMmu (
 }
 
 
-VOID
-EFIAPI
-ArmDataMemoryBarrier (
-  VOID
-  )
-{
-  // Should move to assembly with the 
-}
-  
-VOID
-EFIAPI
-ArmDataSyncronizationBarrier (
-  VOID
-  )
-{
-// MOV R0, #0
-// MCR P15, #0, R0, C7, C10, #4}
-}
-
-
-VOID
-EFIAPI
-ArmInstructionSynchronizationBarrier (
-  VOID
-  )
-{
-}
 
 

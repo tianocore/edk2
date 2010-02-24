@@ -30,6 +30,10 @@
 .globl ASM_PFX(ArmDisableInstructionCache)
 .globl ASM_PFX(ArmEnableBranchPrediction)
 .globl ASM_PFX(ArmDisableBranchPrediction)
+.globl ASM_PFX(ArmDataMemoryBarrier)
+.globl ASM_PFX(ArmDataSyncronizationBarrier) 
+.globl ASM_PFX(ArmInstructionSynchronizationBarrier)
+
 
 .set DC_ON, (1<<2)
 .set IC_ON, (1<<12)
@@ -129,6 +133,21 @@ ASM_PFX(ArmEnableBranchPrediction):
 
 ASM_PFX(ArmDisableBranchPrediction):
   bx      LR                      @Branch prediction is not supported.
+
+ASM_PFX(ArmDataMemoryBarrier):
+  mov R0, #0
+  mcr P15, #0, R0, C7, C10, #5    @ check if this is OK?
+  bx      LR
+  
+ASM_PFX(ArmDataSyncronizationBarrier):
+  mov R0, #0
+  mcr P15, #0, R0, C7, C10, #4   @ check if this is OK?
+  bx      LR
+  
+ASM_PFX(ArmInstructionSynchronizationBarrier):
+  mov R0, #0
+  mcr P15, #0, R0, C7, C5, #4     @ check if this is OK?
+  bx      LR
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED
 
