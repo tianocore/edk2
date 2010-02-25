@@ -35,7 +35,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/HiiConfigRouting.h>
 #include <Protocol/HiiConfigAccess.h>
 #include <Protocol/UgaDraw.h>
-
+#include <Guid/HiiFormMapMethodGuid.h>
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>

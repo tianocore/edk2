@@ -85,6 +85,7 @@
 [Guids]
   gEfiIfrTianoGuid
   gEfiIfrFrameworkGuid
+  gEfiHiiStandardFormGuid
 
 [Protocols]
   gEfiHiiImageProtocolGuid

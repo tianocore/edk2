@@ -408,9 +408,14 @@ IsExpressionOpCode (
   )
 {
   if (((Operand >= EFI_IFR_EQ_ID_VAL_OP) && (Operand <= EFI_IFR_NOT_OP)) ||
-      ((Operand >= EFI_IFR_MATCH_OP) && (Operand <= EFI_IFR_SPAN_OP)) ||
-      (Operand == EFI_IFR_CATENATE_OP)
-     ) {
+      ((Operand >= EFI_IFR_MATCH_OP) && (Operand <= EFI_IFR_SET_OP))  ||
+      ((Operand >= EFI_IFR_EQUAL_OP) && (Operand <= EFI_IFR_SPAN_OP)) ||
+      (Operand == EFI_IFR_CATENATE_OP) ||
+      (Operand == EFI_IFR_TO_LOWER_OP) ||
+      (Operand == EFI_IFR_TO_UPPER_OP) ||
+      (Operand == EFI_IFR_MAP_OP)      ||
+      (Operand == EFI_IFR_VERSION_OP)  ||
+      (Operand == EFI_IFR_SECURITY_OP)) {
     return TRUE;
   } else {
     return FALSE;
@@ -502,12 +507,14 @@ ParseOpCodes (
   UINT8                   OneOfType;
   EFI_IFR_ONE_OF          *OneOfOpcode;
   HII_THUNK_CONTEXT       *ThunkContext;
+  EFI_IFR_FORM_MAP_METHOD *MapMethod;
 
   mInScopeSubtitle = FALSE;
   mInScopeSuppress = FALSE;
   mInScopeGrayOut  = FALSE;
   CurrentDefault   = NULL;
   CurrentOption    = NULL;
+  MapMethod        = NULL;
   ThunkContext     = UefiHiiHandleToThunkContext ((CONST HII_THUNK_PRIVATE_DATA*) mHiiThunkPrivateData, FormSet->HiiHandle);
 
   //
@@ -585,6 +592,49 @@ ParseOpCodes (
 
       CopyMem (&CurrentForm->FormId,    &((EFI_IFR_FORM *) OpCodeData)->FormId,    sizeof (UINT16));
       CopyMem (&CurrentForm->FormTitle, &((EFI_IFR_FORM *) OpCodeData)->FormTitle, sizeof (EFI_STRING_ID));
+
+      //
+      // Insert into Form list of this FormSet
+      //
+      InsertTailList (&FormSet->FormListHead, &CurrentForm->Link);
+      break;
+
+    case EFI_IFR_FORM_MAP_OP:
+      //
+      // Create a new Form Map for this FormSet
+      //
+      CurrentForm = AllocateZeroPool (sizeof (FORM_BROWSER_FORM));
+      CurrentForm->Signature = FORM_BROWSER_FORM_SIGNATURE;
+
+      InitializeListHead (&CurrentForm->StatementListHead);
+
+      CopyMem (&CurrentForm->FormId, &((EFI_IFR_FORM *) OpCodeData)->FormId, sizeof (UINT16));
+      MapMethod = (EFI_IFR_FORM_MAP_METHOD *) (OpCodeData + sizeof (EFI_IFR_FORM_MAP));
+
+      //
+      // FormMap Form must contain at least one Map Method.
+      //
+      if (((EFI_IFR_OP_HEADER *) OpCodeData)->Length < ((UINTN) (UINT8 *) (MapMethod + 1) - (UINTN) OpCodeData)) {
+        return EFI_INVALID_PARAMETER;
+      }
+
+      //
+      // Try to find the standard form map method.
+      //
+      while (((UINTN) (UINT8 *) MapMethod - (UINTN) OpCodeData) < ((EFI_IFR_OP_HEADER *) OpCodeData)->Length) {
+        if (CompareGuid ((EFI_GUID *) (VOID *) &MapMethod->MethodIdentifier, &gEfiHiiStandardFormGuid)) {
+          CopyMem (&CurrentForm->FormTitle, &MapMethod->MethodTitle, sizeof (EFI_STRING_ID));
+          break;
+        }
+        MapMethod ++;
+      }
+      //
+      // If the standard form map method is not found, the first map method title will be used.
+      //
+      if (CurrentForm->FormTitle == 0) {
+        MapMethod = (EFI_IFR_FORM_MAP_METHOD *) (OpCodeData + sizeof (EFI_IFR_FORM_MAP));
+        CopyMem (&CurrentForm->FormTitle, &MapMethod->MethodTitle, sizeof (EFI_STRING_ID));
+      }
 
       //
       // Insert into Form list of this FormSet
@@ -917,6 +967,8 @@ ParseOpCodes (
     // Expression
     //
     case EFI_IFR_VALUE_OP:
+    case EFI_IFR_READ_OP:
+    case EFI_IFR_WRITE_OP:
       break;
 
     case EFI_IFR_RULE_OP:
@@ -938,6 +990,7 @@ ParseOpCodes (
         break;
 
       case EFI_IFR_FORM_OP:
+      case EFI_IFR_FORM_MAP_OP:
         ImageId = &CurrentForm->ImageId;
         break;
 
@@ -1040,6 +1093,7 @@ ParseOpCodes (
         break;
 
       case EFI_IFR_FORM_OP:
+      case EFI_IFR_FORM_MAP_OP:
         //
         // End of Form
         //
