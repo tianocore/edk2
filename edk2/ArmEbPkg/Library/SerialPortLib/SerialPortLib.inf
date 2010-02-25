@@ -1,0 +1,42 @@
+#/** @file
+# EDK Serial port lib
+#
+# Copyright (c) 2009, Apple Inc.
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ArmEbSerialPortLib
+  FILE_GUID                      = 3019EF69-DDE6-4E23-A511-1A8C0279345A
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SerialPortLib
+
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources.common]
+  SerialPortLib.c
+
+[LibraryClasses]
+  DebugLib
+  IoLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ArmEbPkg/ArmEbPkg.dec
+  
+[FixedPcd]
+  gArmEbTokenSpaceGuid.PcdConsoleUart
+
