@@ -21,8 +21,6 @@
   FILE_GUID                      = f2765dec-6b41-11d5-8e71-00902707b35e
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
 
   ENTRY_POINT                    = TimerDriverInitialize
 
