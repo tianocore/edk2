@@ -81,10 +81,11 @@ stack_pointer_setup:
   mov     r13,r4
 
   // Call C entry point
-  mov     r0, #0x80000000   /* memory base arg0          */
-  mov     r1, #0x10000000   /* memory size arg1          */
+  LoadConstantToReg (FixedPcdGet32(PcdMemorySize) ,r1)    /* memory size arg1          */
+  LoadConstantToReg (FixedPcdGet32(PcdMemoryBase) ,r0)    /* memory size arg0         */
+  
 
-  bl      ASM_PFX(CEntryPoint) /* Assume C code is ARM      */
+  blx      ASM_PFX(CEntryPoint) /* Assume C code is ARM      */
 
 ShouldNeverGetHere:
   /* _CEntryPoint should never return */

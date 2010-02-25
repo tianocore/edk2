@@ -133,7 +133,25 @@ EFI_STATUS
 (EFIAPI *HARDWARE_INTERRUPT_INTERRUPT_STATE) (
   IN EFI_HARDWARE_INTERRUPT_PROTOCOL    *This,
   IN HARDWARE_INTERRUPT_SOURCE          Source,
-  IN BOOLEAN                            *InterruptState
+  IN BOOLEAN                            *InterruptState  
+  );
+
+/**
+  Signal to the hardware that the End Of Intrrupt state 
+  has been reached.
+
+  @param This     Instance pointer for this protocol
+  @param Source   Hardware source of the interrupt
+
+  @retval EFI_SUCCESS       Source interrupt EOI'ed.
+  @retval EFI_DEVICE_ERROR  Hardware could not be programmed.
+
+**/
+typedef
+EFI_STATUS
+(EFIAPI *HARDWARE_INTERRUPT_END_OF_INTERRUPT) (
+  IN EFI_HARDWARE_INTERRUPT_PROTOCOL    *This,
+  IN HARDWARE_INTERRUPT_SOURCE          Source
   );
 
 
@@ -142,6 +160,7 @@ struct _EFI_HARDWARE_INTERRUPT_PROTOCOL {
   HARDWARE_INTERRUPT_ENABLE           EnableInterruptSource;
   HARDWARE_INTERRUPT_DISABLE          DisableInterruptSource;
   HARDWARE_INTERRUPT_INTERRUPT_STATE  GetInterruptSourceState;
+  HARDWARE_INTERRUPT_END_OF_INTERRUPT EndOfInterrupt;
 };
 
 extern EFI_GUID gHardwareInterruptProtocolGuid;
