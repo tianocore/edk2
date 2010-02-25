@@ -161,7 +161,7 @@ SmbiosProcessDataRecord (
       }
     }
 
-    if (Link == &mStructureList) {
+    if (Link == &mStructureList || StructureNode == NULL) {
 
       //
       // Not found, create a new structure

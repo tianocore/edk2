@@ -401,8 +401,12 @@ FindStringPackAndUpdatePackListWithOnlyIfrPack (
 
     if (ThunkContext != IfrThunkContext) {
       if (CompareGuid (&IfrThunkContext->TagGuid, &ThunkContext->TagGuid) && (ThunkContext->IfrPackageCount == 0)) {
+        StringPackageListHeader = NULL;
         Status = ExportPackageLists (ThunkContext->UefiHiiHandle, &StringPackageListHeader, &Size);
         ASSERT_EFI_ERROR (Status);
+        if (StringPackageListHeader == NULL) {
+          return EFI_NOT_FOUND;
+        }
 
         IfrThunkContext->StringPackageCount = GetPackageCountByType (StringPackageListHeader, EFI_HII_PACKAGE_STRINGS);
         //
@@ -506,6 +510,10 @@ UefiRegisterPackageList (
     ASSERT ((StringPackageCount >=1 && IfrPackageCount == 1) || (FontPackageCount > 0));
     if (IfrPackageCount > 0) {
       IfrPackage = GetIfrPackage (Packages);
+      if (IfrPackage == NULL) {
+        Status = EFI_NOT_FOUND;
+        goto Done;
+      }
       GetFormSetGuid (IfrPackage, &ThunkContext->TagGuid);
     } else {
       ASSERT (FontPackageCount > 0);
@@ -860,8 +868,12 @@ RemovePackNotify (
   //
   if (ThunkContext != NULL) {
     if (!ThunkContext->ByFrameworkHiiNewPack) {
+      HiiPackageList = NULL;
       Status = ExportPackageLists (Handle, &HiiPackageList, &BufferSize);
       ASSERT_EFI_ERROR (Status);
+      if (HiiPackageList == NULL) {
+        return EFI_NOT_FOUND;
+      }
 
       if (GetPackageCountByType (HiiPackageList, EFI_HII_PACKAGE_STRINGS) == 1) {
         //
