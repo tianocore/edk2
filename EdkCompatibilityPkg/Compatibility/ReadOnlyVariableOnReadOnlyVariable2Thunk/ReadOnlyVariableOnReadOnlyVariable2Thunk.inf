@@ -29,8 +29,6 @@
   FILE_GUID                      = 0FDB764B-E669-4c69-83AC-5EDD99A2711E
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
 
   ENTRY_POINT                    = PeimInitializeReadOnlyVariable
 
