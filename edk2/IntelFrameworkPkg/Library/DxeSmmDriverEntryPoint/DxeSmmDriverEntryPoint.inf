@@ -21,7 +21,6 @@
   MODULE_TYPE                    = DXE_SMM_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = UefiDriverEntryPoint|DXE_SMM_DRIVER
-  EFI_SPECIFICATION_VERSION      = 0x00020000
 
 
 #
