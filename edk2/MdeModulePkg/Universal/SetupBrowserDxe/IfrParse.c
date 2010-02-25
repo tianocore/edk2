@@ -450,6 +450,8 @@ DestroyExpression (
 {
   LIST_ENTRY         *Link;
   EXPRESSION_OPCODE  *OpCode;
+  LIST_ENTRY         *SubExpressionLink;
+  FORM_EXPRESSION    *SubExpression;
 
   while (!IsListEmpty (&Expression->OpCodeListHead)) {
     Link = GetFirstNode (&Expression->OpCodeListHead);
@@ -458,6 +460,19 @@ DestroyExpression (
 
     if (OpCode->ValueList != NULL) {
       FreePool (OpCode->ValueList);
+    }
+
+    if (OpCode->ValueName != NULL) {
+      FreePool (OpCode->ValueName);
+    }
+
+    if (OpCode->MapExpressionList.ForwardLink != NULL) {
+      while (!IsListEmpty (&OpCode->MapExpressionList)) {
+        SubExpressionLink = GetFirstNode(&OpCode->MapExpressionList);
+        SubExpression     = FORM_EXPRESSION_FROM_LINK (SubExpressionLink);
+        RemoveEntryList(&SubExpression->Link);
+        DestroyExpression (SubExpression);
+      }
     }
   }
 
@@ -746,10 +761,12 @@ IsExpressionOpCode (
   )
 {
   if (((Operand >= EFI_IFR_EQ_ID_VAL_OP) && (Operand <= EFI_IFR_NOT_OP)) ||
-      ((Operand >= EFI_IFR_MATCH_OP) && (Operand <= EFI_IFR_SPAN_OP)) ||
+      ((Operand >= EFI_IFR_MATCH_OP) && (Operand <= EFI_IFR_SET_OP))  ||
+      ((Operand >= EFI_IFR_EQUAL_OP) && (Operand <= EFI_IFR_SPAN_OP)) ||
       (Operand == EFI_IFR_CATENATE_OP) ||
       (Operand == EFI_IFR_TO_LOWER_OP) ||
       (Operand == EFI_IFR_TO_UPPER_OP) ||
+      (Operand == EFI_IFR_MAP_OP)      ||
       (Operand == EFI_IFR_VERSION_OP)  ||
       (Operand == EFI_IFR_SECURITY_OP)) {
     return TRUE;
@@ -848,6 +865,12 @@ ParseOpCodes (
   BOOLEAN                 SingleOpCodeExpression;
   BOOLEAN                 InScopeDefault;
   EFI_HII_VALUE           *Value;
+  EFI_IFR_FORM_MAP_METHOD *MapMethod;
+  UINT8                   MapScopeDepth;
+  LIST_ENTRY              *Link;
+  FORMSET_STORAGE         *VarStorage;
+  LIST_ENTRY              *MapExpressionList;
+  EFI_VARSTORE_ID         TempVarstoreId;
 
   mInScopeSubtitle         = FALSE;
   SuppressForQuestion      = FALSE;
@@ -867,6 +890,12 @@ ParseOpCodes (
   OptionSuppressExpression = NULL;
   FormSuppressExpression   = NULL;
   ImageId                  = NULL;
+  MapMethod                = NULL;
+  MapScopeDepth            = 0;
+  Link                     = NULL;
+  VarStorage               = NULL;
+  MapExpressionList        = NULL;
+  TempVarstoreId           = 0;
 
   //
   // Get the number of Statements and Expressions
@@ -888,6 +917,8 @@ ParseOpCodes (
   InitializeListHead (&FormSet->StorageListHead);
   InitializeListHead (&FormSet->DefaultStoreListHead);
   InitializeListHead (&FormSet->FormListHead);
+  ResetCurrentExpressionStack ();
+  ResetMapExpressionListStack ();
 
   CurrentForm = NULL;
   CurrentStatement = NULL;
@@ -989,6 +1020,81 @@ ParseOpCodes (
         CopyMem (&ExpressionOpCode->Guid, &((EFI_IFR_SECURITY *) OpCodeData)->Permissions, sizeof (EFI_GUID));
         break;
 
+      case EFI_IFR_GET_OP:
+      case EFI_IFR_SET_OP:
+        CopyMem (&TempVarstoreId, &((EFI_IFR_GET *) OpCodeData)->VarStoreId, sizeof (TempVarstoreId));
+        if (TempVarstoreId != 0) {
+          if (FormSet->StorageListHead.ForwardLink != NULL) {
+            Link = GetFirstNode (&FormSet->StorageListHead);
+            while (!IsNull (&FormSet->StorageListHead, Link)) {
+              VarStorage = FORMSET_STORAGE_FROM_LINK (Link);
+              if (VarStorage->VarStoreId == ((EFI_IFR_GET *) OpCodeData)->VarStoreId) {
+                ExpressionOpCode->VarStorage = VarStorage;
+                break;
+              }
+              Link = GetNextNode (&FormSet->StorageListHead, Link);
+            }
+          }
+          if (ExpressionOpCode->VarStorage == NULL) {
+            //
+            // VarStorage is not found.
+            //
+            return EFI_INVALID_PARAMETER;
+          }
+        }
+        ExpressionOpCode->ValueType = ((EFI_IFR_GET *) OpCodeData)->VarStoreType;
+        switch (ExpressionOpCode->ValueType) {
+        case EFI_IFR_TYPE_BOOLEAN:
+        case EFI_IFR_TYPE_NUM_SIZE_8: 
+          ExpressionOpCode->ValueWidth = 1;
+          break;
+
+        case EFI_IFR_TYPE_NUM_SIZE_16:
+        case EFI_IFR_TYPE_STRING:
+          ExpressionOpCode->ValueWidth = 2;
+          break;
+
+        case EFI_IFR_TYPE_NUM_SIZE_32:
+          ExpressionOpCode->ValueWidth = 4;
+          break;
+
+        case EFI_IFR_TYPE_NUM_SIZE_64:
+          ExpressionOpCode->ValueWidth = 8;
+          break;
+
+        case EFI_IFR_TYPE_DATE:
+          ExpressionOpCode->ValueWidth = sizeof (EFI_IFR_DATE);
+          break;
+
+        case EFI_IFR_TYPE_TIME:
+          ExpressionOpCode->ValueWidth = sizeof (EFI_IFR_TIME);
+          break;
+
+        case EFI_IFR_TYPE_OTHER:
+        case EFI_IFR_TYPE_UNDEFINED:
+        case EFI_IFR_TYPE_ACTION:
+        case EFI_IFR_TYPE_BUFFER:
+        default:
+          //
+          // Invalid value type for Get/Set opcode.
+          //
+          return EFI_INVALID_PARAMETER;
+        }
+        CopyMem (&ExpressionOpCode->VarStoreInfo.VarName,   &((EFI_IFR_GET *) OpCodeData)->VarStoreInfo.VarName,   sizeof (EFI_STRING_ID));
+        CopyMem (&ExpressionOpCode->VarStoreInfo.VarOffset, &((EFI_IFR_GET *) OpCodeData)->VarStoreInfo.VarOffset, sizeof (UINT16));
+        if ((ExpressionOpCode->VarStorage != NULL) && 
+            (ExpressionOpCode->VarStorage->Type == EFI_HII_VARSTORE_NAME_VALUE || 
+             ExpressionOpCode->VarStorage->Type == EFI_HII_VARSTORE_EFI_VARIABLE)) {
+          ExpressionOpCode->ValueName = GetToken (ExpressionOpCode->VarStoreInfo.VarName, FormSet->HiiHandle);
+          if (ExpressionOpCode->ValueName == NULL) {
+            //
+            // String ID is invalid.
+            //
+            return EFI_INVALID_PARAMETER;
+          }
+        }
+        break;
+
       case EFI_IFR_QUESTION_REF1_OP:
         CopyMem (&ExpressionOpCode->QuestionId, &((EFI_IFR_EQ_ID_VAL_LIST *) OpCodeData)->QuestionId, sizeof (EFI_QUESTION_ID));
         break;
@@ -1063,11 +1169,37 @@ ParseOpCodes (
       default:
         break;
       }
-
+      //
+      // Create sub expression nested in MAP opcode
+      //
+      if (CurrentExpression == NULL && MapScopeDepth > 0) {
+        CurrentExpression = CreateExpression (CurrentForm);
+        InsertTailList (MapExpressionList, &CurrentExpression->Link);
+        if (Scope == 0) {
+          SingleOpCodeExpression = TRUE;
+        }
+      }
       ASSERT (CurrentExpression != NULL);
       InsertTailList (&CurrentExpression->OpCodeListHead, &ExpressionOpCode->Link);
-
-      if (SingleOpCodeExpression) {
+      if (Operand == EFI_IFR_MAP_OP) {
+        //
+        // Store current Map Expression List.
+        //
+        if (MapExpressionList != NULL) {
+          PushMapExpressionList (MapExpressionList);
+        }
+        //
+        // Initialize new Map Expression List.
+        //
+        MapExpressionList = &ExpressionOpCode->MapExpressionList;
+        InitializeListHead (MapExpressionList);
+        //
+        // Store current expression.
+        //
+        PushCurrentExpression (CurrentExpression);
+        CurrentExpression = NULL;
+        MapScopeDepth ++;
+      } else if (SingleOpCodeExpression) {
         //
         // There are two cases to indicate the end of an Expression:
         // for single OpCode expression: one Expression OpCode
@@ -1134,8 +1266,66 @@ ParseOpCodes (
       InitializeListHead (&CurrentForm->ExpressionListHead);
       InitializeListHead (&CurrentForm->StatementListHead);
 
+      CurrentForm->FormType = STANDARD_MAP_FORM_TYPE;
       CopyMem (&CurrentForm->FormId,    &((EFI_IFR_FORM *) OpCodeData)->FormId,    sizeof (UINT16));
       CopyMem (&CurrentForm->FormTitle, &((EFI_IFR_FORM *) OpCodeData)->FormTitle, sizeof (EFI_STRING_ID));
+
+      if (InScopeFormSuppress) {
+        //
+        // Form is inside of suppressif
+        //
+        CurrentForm->SuppressExpression = FormSuppressExpression;
+      }
+
+      if (Scope != 0) {
+        //
+        // Enter scope of a Form, suppressif will be used for Question or Option
+        //
+        SuppressForQuestion = TRUE;
+      }
+
+      //
+      // Insert into Form list of this FormSet
+      //
+      InsertTailList (&FormSet->FormListHead, &CurrentForm->Link);
+      break;
+
+    case EFI_IFR_FORM_MAP_OP:
+      //
+      // Create a new Form for this FormSet
+      //
+      CurrentForm = AllocateZeroPool (sizeof (FORM_BROWSER_FORM));
+      ASSERT (CurrentForm != NULL);
+      CurrentForm->Signature = FORM_BROWSER_FORM_SIGNATURE;
+      InitializeListHead (&CurrentForm->ExpressionListHead);
+      InitializeListHead (&CurrentForm->StatementListHead);
+      CopyMem (&CurrentForm->FormId, &((EFI_IFR_FORM *) OpCodeData)->FormId, sizeof (UINT16));
+
+      MapMethod = (EFI_IFR_FORM_MAP_METHOD *) (OpCodeData + sizeof (EFI_IFR_FORM_MAP));
+      //
+      // FormMap Form must contain at least one Map Method.
+      //
+      if (((EFI_IFR_OP_HEADER *) OpCodeData)->Length < ((UINTN) (UINT8 *) (MapMethod + 1) - (UINTN) OpCodeData)) {
+        return EFI_INVALID_PARAMETER;
+      }
+      //
+      // Try to find the standard form map method.
+      //
+      while (((UINTN) (UINT8 *) MapMethod - (UINTN) OpCodeData) < ((EFI_IFR_OP_HEADER *) OpCodeData)->Length) {
+        if (CompareGuid ((EFI_GUID *) (VOID *) &MapMethod->MethodIdentifier, &gEfiHiiStandardFormGuid)) {
+          CopyMem (&CurrentForm->FormTitle, &MapMethod->MethodTitle, sizeof (EFI_STRING_ID));
+          CurrentForm->FormType = STANDARD_MAP_FORM_TYPE;
+          break;
+        }
+        MapMethod ++;
+      }
+      //
+      // If the standard form map method is not found, the first map method title will be used.
+      //
+      if (CurrentForm->FormTitle == 0) {
+        MapMethod = (EFI_IFR_FORM_MAP_METHOD *) (OpCodeData + sizeof (EFI_IFR_FORM_MAP));
+        CopyMem (&CurrentForm->FormTitle, &MapMethod->MethodTitle, sizeof (EFI_STRING_ID));
+      }
 
       if (InScopeFormSuppress) {
         //
@@ -1707,6 +1897,50 @@ ParseOpCodes (
       }
       break;
 
+    case EFI_IFR_READ_OP:
+      CurrentExpression = CreateExpression (CurrentForm);
+      CurrentExpression->Type = EFI_HII_EXPRESSION_READ;
+      InsertTailList (&CurrentForm->ExpressionListHead, &CurrentExpression->Link);
+
+      //
+      // Make sure CurrentStatement is not NULL.
+      // If it is NULL, 1) ParseOpCodes functions may parse the IFR wrongly. Or 2) the IFR
+      // file is wrongly generated by tools such as VFR Compiler. There may be a bug in VFR Compiler.
+      //
+      ASSERT (CurrentStatement != NULL);
+      CurrentStatement->ReadExpression = CurrentExpression;
+
+      //
+      // Take a look at next OpCode to see whether current expression consists
+      // of single OpCode
+      //
+      if (((EFI_IFR_OP_HEADER *) (OpCodeData + OpCodeLength))->Scope == 0) {
+        SingleOpCodeExpression = TRUE;
+      }
+      break;
+
+    case EFI_IFR_WRITE_OP:
+      CurrentExpression = CreateExpression (CurrentForm);
+      CurrentExpression->Type = EFI_HII_EXPRESSION_WRITE;
+      InsertTailList (&CurrentForm->ExpressionListHead, &CurrentExpression->Link);
+
+      //
+      // Make sure CurrentStatement is not NULL.
+      // If it is NULL, 1) ParseOpCodes functions may parse the IFR wrongly. Or 2) the IFR
+      // file is wrongly generated by tools such as VFR Compiler. There may be a bug in VFR Compiler.
+      //
+      ASSERT (CurrentStatement != NULL);
+      CurrentStatement->WriteExpression = CurrentExpression;
+
+      //
+      // Take a look at next OpCode to see whether current expression consists
+      // of single OpCode
+      //
+      if (((EFI_IFR_OP_HEADER *) (OpCodeData + OpCodeLength))->Scope == 0) {
+        SingleOpCodeExpression = TRUE;
+      }
+      break;
+
     //
     // Image
     //
@@ -1723,6 +1957,7 @@ ParseOpCodes (
         break;
 
       case EFI_IFR_FORM_OP:
+      case EFI_IFR_FORM_MAP_OP:
         ASSERT (CurrentForm != NULL);
         ImageId = &CurrentForm->ImageId;
         break;
@@ -1818,6 +2053,7 @@ ParseOpCodes (
         break;
 
       case EFI_IFR_FORM_OP:
+      case EFI_IFR_FORM_MAP_OP:
         //
         // End of Form
         //
@@ -1871,6 +2107,22 @@ ParseOpCodes (
         InScopeDefault = FALSE;
         break;
 
+      case EFI_IFR_MAP_OP:
+        //
+        // Get current Map Expression List.
+        //
+        Status = PopMapExpressionList ((VOID **) &MapExpressionList);
+        if (Status == EFI_ACCESS_DENIED) {
+          MapExpressionList = NULL;
+        }
+        //
+        // Get current expression.
+        //
+        Status = PopCurrentExpression ((VOID **) &CurrentExpression);
+        ASSERT_EFI_ERROR (Status);
+        MapScopeDepth --;
+        break;
+
       default:
         if (IsExpressionOpCode (ScopeOpCode)) {
           if (mInScopeDisable && CurrentForm == NULL) {
@@ -1889,7 +2141,7 @@ ParseOpCodes (
 
             OpCodeDisabled = CurrentExpression->Result.Value.b;
             //
-            // DisableIf Expression is only used once and not quequed, free it
+            // DisableIf Expression is only used once and not queued, free it
             //
             DestroyExpression (CurrentExpression);
           }

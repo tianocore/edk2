@@ -715,8 +715,8 @@ typedef union {
 #define EFI_IFR_VERSION_OP             0x28
 #define EFI_IFR_END_OP                 0x29
 #define EFI_IFR_MATCH_OP               0x2A
-#define EFI_IFR_SET_OP                 0x2C
 #define EFI_IFR_GET_OP                 0x2B
+#define EFI_IFR_SET_OP                 0x2C
 #define EFI_IFR_READ_OP                0x2D
 #define EFI_IFR_WRITE_OP               0x2E
 #define EFI_IFR_EQUAL_OP               0x2F
@@ -1459,7 +1459,7 @@ typedef struct _EFI_IFR_FORM_MAP {
   ///
   /// One or more configuration method's name and unique identifier.
   ///
-  EFI_IFR_FORM_MAP_METHOD  Methods[1];
+  // EFI_IFR_FORM_MAP_METHOD  Methods[];
 } EFI_IFR_FORM_MAP;
 
 typedef struct _EFI_IFR_SET {
@@ -1483,6 +1483,10 @@ typedef struct _EFI_IFR_SET {
     ///
     UINT16           VarOffset;
   }                  VarStoreInfo;
+  ///
+  /// Specifies the type used for storage. 
+  ///
+  UINT8              VarStoreType;
 } EFI_IFR_SET;
 
 typedef struct _EFI_IFR_GET {

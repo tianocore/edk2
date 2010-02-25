@@ -1229,6 +1229,7 @@ InternalHiiValidateCurrentSetting (
           }
           break;
         case EFI_IFR_FORM_OP:
+        case EFI_IFR_FORM_MAP_OP:
           //
           // Check the matched VarStoreId is found.
           //
@@ -3333,7 +3334,7 @@ InternalHiiUpdateFormPackageData (
       } else {
         GetFormSet = FALSE;
       }
-    } else if (IfrOpHdr->OpCode == EFI_IFR_FORM_OP) {
+    } else if (IfrOpHdr->OpCode == EFI_IFR_FORM_OP || IfrOpHdr->OpCode == EFI_IFR_FORM_MAP_OP) {
       if (CompareMem (&((EFI_IFR_FORM *) IfrOpHdr)->FormId, &FormId, sizeof (EFI_FORM_ID)) == 0) {
         GetForm = TRUE;
       } else {

@@ -661,6 +661,10 @@ GetToken (
 {
   EFI_STRING  String;
 
+  if (HiiHandle == NULL) {
+    return NULL;
+  }
+
   String = HiiGetString (HiiHandle, Token, NULL);
   if (String == NULL) {
     String = AllocateCopyPool (sizeof (mUnknownString), mUnknownString);
@@ -1041,6 +1045,20 @@ GetQuestionValue (
     }
     return Status;
   }
+  
+  //
+  // Get question value by read expression.
+  //
+  if (Question->ReadExpression != NULL && Form->FormType == STANDARD_MAP_FORM_TYPE) {
+    Status = EvaluateExpression (FormSet, Form, Question->ReadExpression);
+    if (!EFI_ERROR (Status) && (Question->ReadExpression->Result.Type < EFI_IFR_TYPE_OTHER)) {
+      //
+      // Only update question value to the valid result.
+      //
+      CopyMem (&Question->HiiValue, &Question->ReadExpression->Result, sizeof (EFI_HII_VALUE));
+      return EFI_SUCCESS;
+    }
+  }
 
   //
   // Question value is provided by RTC
@@ -1368,6 +1386,16 @@ SetQuestionValue (
   //
   if (Question->ValueExpression != NULL) {
     return Status;
+  }
+  
+  //
+  // Before set question value, evaluate its write expression.
+  //
+  if (Question->WriteExpression != NULL && Form->FormType == STANDARD_MAP_FORM_TYPE) {
+    Status = EvaluateExpression (FormSet, Form, Question->WriteExpression);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
   }
 
   //
