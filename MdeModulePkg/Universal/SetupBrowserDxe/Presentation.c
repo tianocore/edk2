@@ -387,9 +387,11 @@ EvaluateFormExpressions (
     Link = GetNextNode (&Form->ExpressionListHead, Link);
 
     if (Expression->Type == EFI_HII_EXPRESSION_INCONSISTENT_IF ||
-        Expression->Type == EFI_HII_EXPRESSION_NO_SUBMIT_IF) {
+        Expression->Type == EFI_HII_EXPRESSION_NO_SUBMIT_IF ||
+        Expression->Type == EFI_HII_EXPRESSION_WRITE ||
+        (Expression->Type == EFI_HII_EXPRESSION_READ && Form->FormType != STANDARD_MAP_FORM_TYPE)) {
       //
-      // Postpone Form validation to Question editing or Form submiting
+      // Postpone Form validation to Question editing or Form submitting or Question Write or Question Read for nonstandard form.
       //
       continue;
     }

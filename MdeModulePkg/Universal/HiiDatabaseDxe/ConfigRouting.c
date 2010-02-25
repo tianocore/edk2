@@ -1,7 +1,7 @@
 /** @file
 Implementation of interfaces function for EFI_HII_CONFIG_ROUTING_PROTOCOL.
 
-Copyright (c) 2007 - 2008, Intel Corporation
+Copyright (c) 2007 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -951,6 +951,7 @@ ParseIfrData (
       break;
 
     case EFI_IFR_FORM_OP:
+    case EFI_IFR_FORM_MAP_OP:
       //
       // No matched varstore is found and directly return.
       //

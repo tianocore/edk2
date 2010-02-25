@@ -32,6 +32,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Guid/MdeModuleHii.h>
 #include <Guid/HiiPlatformSetupFormset.h>
+#include <Guid/HiiFormMapMethodGuid.h>
 
 #include <Library/PrintLib.h>
 #include <Library/DebugLib.h>
@@ -183,6 +184,8 @@ typedef struct {
 #define EFI_HII_EXPRESSION_DISABLE_IF        4
 #define EFI_HII_EXPRESSION_VALUE             5
 #define EFI_HII_EXPRESSION_RULE              6
+#define EFI_HII_EXPRESSION_READ              7
+#define EFI_HII_EXPRESSION_WRITE             8
 
 #define EFI_HII_VARSTORE_BUFFER              0
 #define EFI_HII_VARSTORE_NAME_VALUE          1
@@ -239,6 +242,11 @@ typedef struct {
 
 #define FORMSET_STORAGE_FROM_LINK(a)  CR (a, FORMSET_STORAGE, Link, FORMSET_STORAGE_SIGNATURE)
 
+typedef union {
+  EFI_STRING_ID         VarName;
+  UINT16                VarOffset;
+} VAR_STORE_INFO;
+
 #define EXPRESSION_OPCODE_SIGNATURE  SIGNATURE_32 ('E', 'X', 'O', 'P')
 
 typedef struct {
@@ -261,6 +269,13 @@ typedef struct {
 
   EFI_STRING_ID     DevicePath;  // For EFI_IFR_QUESTION_REF3_2, EFI_IFR_QUESTION_REF3_3
   EFI_GUID          Guid;
+
+  FORMSET_STORAGE   *VarStorage; // For EFI_IFR_SET, EFI_IFR_GET
+  VAR_STORE_INFO    VarStoreInfo;// For EFI_IFR_SET, EFI_IFR_GET
+  UINT8             ValueType;   // For EFI_IFR_SET, EFI_IFR_GET
+  UINT8             ValueWidth;  // For EFI_IFR_SET, EFI_IFR_GET
+  CHAR16            *ValueName;  // For EFI_IFR_SET, EFI_IFR_GET
+  LIST_ENTRY        MapExpressionList;   // nested expressions inside of Map opcode.
 } EXPRESSION_OPCODE;
 
 #define EXPRESSION_OPCODE_FROM_LINK(a)  CR (a, EXPRESSION_OPCODE, Link, EXPRESSION_OPCODE_SIGNATURE)
@@ -314,11 +329,6 @@ typedef struct {
 #define QUESTION_OPTION_FROM_LINK(a)  CR (a, QUESTION_OPTION, Link, QUESTION_OPTION_SIGNATURE)
 
 #define FORM_BROWSER_STATEMENT_SIGNATURE  SIGNATURE_32 ('F', 'S', 'T', 'A')
-
-typedef union {
-  EFI_STRING_ID         VarName;
-  UINT16                VarOffset;
-} VAR_STORE_INFO;
 
 typedef struct {
   UINTN                 Signature;
@@ -386,18 +396,22 @@ typedef struct {
   FORM_EXPRESSION       *SuppressExpression; // nesting inside of SuppressIf
   FORM_EXPRESSION       *DisableExpression;  // nesting inside of DisableIf
 
+  FORM_EXPRESSION       *ReadExpression;     // nested EFI_IFR_READ, provide this question value by read expression.
+  FORM_EXPRESSION       *WriteExpression;    // nested EFI_IFR_WRITE, evaluate write expression after this question value is set.
 } FORM_BROWSER_STATEMENT;
 
 #define FORM_BROWSER_STATEMENT_FROM_LINK(a)  CR (a, FORM_BROWSER_STATEMENT, Link, FORM_BROWSER_STATEMENT_SIGNATURE)
 
 #define FORM_BROWSER_FORM_SIGNATURE  SIGNATURE_32 ('F', 'F', 'R', 'M')
+#define STANDARD_MAP_FORM_TYPE 0x01
 
 typedef struct {
   UINTN             Signature;
   LIST_ENTRY        Link;
 
-  UINT16            FormId;
-  EFI_STRING_ID     FormTitle;
+  UINT16            FormId;               // FormId of normal form or formmap form.
+  EFI_STRING_ID     FormTitle;            // FormTile of normal form, or FormMapMethod title of formmap form.
+  UINT16            FormType;             // Specific form type for the different form.
 
   EFI_IMAGE_ID      ImageId;
 
@@ -793,6 +807,42 @@ CreateDialog (
   OUT CHAR16                      *StringBuffer,
   OUT EFI_INPUT_KEY               *KeyValue,
   ...
+  );
+
+/**
+  Get Value for given Name from a NameValue Storage.
+
+  @param  Storage                The NameValue Storage.
+  @param  Name                   The Name.
+  @param  Value                  The retured Value.
+
+  @retval EFI_SUCCESS            Value found for given Name.
+  @retval EFI_NOT_FOUND          No such Name found in NameValue storage.
+
+**/
+EFI_STATUS
+GetValueByName (
+  IN FORMSET_STORAGE         *Storage,
+  IN CHAR16                  *Name,
+  IN OUT CHAR16              **Value
+  );
+
+/**
+  Set Value of given Name in a NameValue Storage.
+
+  @param  Storage                The NameValue Storage.
+  @param  Name                   The Name.
+  @param  Value                  The Value to set.
+
+  @retval EFI_SUCCESS            Value found for given Name.
+  @retval EFI_NOT_FOUND          No such Name found in NameValue storage.
+
+**/
+EFI_STATUS
+SetValueByName (
+  IN FORMSET_STORAGE         *Storage,
+  IN CHAR16                  *Name,
+  IN CHAR16                  *Value
   );
 
 /**

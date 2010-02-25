@@ -736,6 +736,80 @@ PopScope (
   );
 
 /**
+  Reset stack pointer to begin of the stack.
+
+**/
+VOID
+ResetCurrentExpressionStack (
+  VOID
+  );
+
+/**
+  Push current expression onto the Stack
+
+  @param  Pointer                Pointer to current expression.
+
+  @retval EFI_SUCCESS            The value was pushed onto the stack.
+  @retval EFI_OUT_OF_RESOURCES   There is not enough system memory to grow the stack.
+
+**/
+EFI_STATUS
+PushCurrentExpression (
+  IN VOID  *Pointer
+  );
+
+/**
+  Pop current expression from the Stack
+
+  @param  Pointer                Pointer to current expression to be pop.
+
+  @retval EFI_SUCCESS            The value was pushed onto the stack.
+  @retval EFI_OUT_OF_RESOURCES   There is not enough system memory to grow the stack.
+
+**/
+EFI_STATUS
+PopCurrentExpression (
+  OUT VOID    **Pointer
+  );
+
+/**
+  Reset stack pointer to begin of the stack.
+
+**/
+VOID
+ResetMapExpressionListStack (
+  VOID
+  );
+
+/**
+  Push the list of map expression onto the Stack
+
+  @param  Pointer                Pointer to the list of map expression to be pushed.
+
+  @retval EFI_SUCCESS            The value was pushed onto the stack.
+  @retval EFI_OUT_OF_RESOURCES   There is not enough system memory to grow the stack.
+
+**/
+EFI_STATUS
+PushMapExpressionList (
+  IN VOID  *Pointer
+  );
+
+/**
+  Pop the list of map expression from the Stack
+
+  @param  Pointer                Pointer to the list of map expression to be pop.
+
+  @retval EFI_SUCCESS            The value was pushed onto the stack.
+  @retval EFI_OUT_OF_RESOURCES   There is not enough system memory to grow the stack.
+
+**/
+EFI_STATUS
+PopMapExpressionList (
+  OUT VOID    **Pointer
+  );
+
+/**
   Get Form given its FormId.
 
   @param  FormSet                The formset which contains this form.
