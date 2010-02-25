@@ -2,7 +2,7 @@
   GUID and data structures for communication between SMM Base on SMM Base2 Thunk driver
   and SmmBaseHelper driver.
 
-  Copyright (c) 2009, Intel Corporation
+  Copyright (c) 2009 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -49,12 +49,19 @@ typedef struct {
   VOID                           *Buffer;
 } SMMBASE_FREE_POOL_ARG;
 
+typedef struct {
+  EFI_HANDLE                     ImageHandle;
+  VOID                           *CommunicationBuffer;
+  UINTN                          *SourceSize;
+} SMMBASE_COMMUNICATE_ARG;
+
 typedef union {
   SMMBASE_REGISTER_ARG           Register;
   SMMBASE_UNREGISTER_ARG         UnRegister;
   SMMBASE_REGISTER_CALLBACK_ARG  RegisterCallback;
   SMMBASE_ALLOCATE_POOL_ARG      AllocatePool;
   SMMBASE_FREE_POOL_ARG          FreePool;
+  SMMBASE_COMMUNICATE_ARG        Communicate;
 } SMMBASE_FUNCTION_ARGS;
 
 typedef enum {
@@ -63,6 +70,7 @@ typedef enum {
   SMMBASE_REGISTER_CALLBACK,
   SMMBASE_ALLOCATE_POOL,
   SMMBASE_FREE_POOL,
+  SMMBASE_COMMUNICATE,
 } SMMBASE_FUNCTION;
 
 typedef struct {
