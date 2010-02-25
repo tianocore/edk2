@@ -25,8 +25,6 @@
   FILE_GUID                      = BDFE5FAA-2A35-44bb-B17A-8084D4E2B9E9
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
   ENTRY_POINT                    = FvbInitialize
 
 [Packages]

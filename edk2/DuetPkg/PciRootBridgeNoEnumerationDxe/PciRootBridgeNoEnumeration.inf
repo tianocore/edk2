@@ -22,8 +22,6 @@
   FILE_GUID                      = 0F7EC77A-1EE1-400f-A99D-7CBD1FEB181E
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
 
   ENTRY_POINT                    = InitializePcatPciRootBridge
 
