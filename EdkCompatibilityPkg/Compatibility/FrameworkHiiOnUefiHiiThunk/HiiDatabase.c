@@ -243,7 +243,7 @@ InitializeHiiDatabase (
   @param This                 A pointer to the EFI_HII_PROTOCOL instance.
   @param HandleBufferLength   On input, a pointer to the length of the handle buffer. 
                               On output, the length of the handle buffer that is required for the handles found.
-  @param Handle               An array of EFI_HII_HANDLE instances returned. 
+  @param Handle               Pointer to an array of EFI_HII_HANDLE instances returned. 
                               Type EFI_HII_HANDLE is defined in EFI_HII_PROTOCOL.NewPack() in the Packages section.
 
   @retval EFI_SUCCESS         Handle was updated successfully.
@@ -257,13 +257,13 @@ EFIAPI
 HiiFindHandles (
   IN     EFI_HII_PROTOCOL *This,
   IN OUT UINT16           *HandleBufferLength,
-  OUT    FRAMEWORK_EFI_HII_HANDLE    Handle[1]
+  OUT    FRAMEWORK_EFI_HII_HANDLE    *Handle
   )
 {
-  UINT16                                     Count;
-  LIST_ENTRY                                *Link;
-  HII_THUNK_CONTEXT *ThunkContext;
-  HII_THUNK_PRIVATE_DATA               *Private;
+  UINT16                      Count;
+  LIST_ENTRY                  *Link;
+  HII_THUNK_CONTEXT           *ThunkContext;
+  HII_THUNK_PRIVATE_DATA      *Private;
 
   if (HandleBufferLength == NULL) {
     return EFI_INVALID_PARAMETER;

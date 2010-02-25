@@ -102,7 +102,7 @@ PlatformBdsShowProgress (
                     (VOID **) &UgaDraw
                     );
   }
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || (GraphicsOutput == NULL && UgaDraw == NULL)) {
     return EFI_UNSUPPORTED;
   }
 

@@ -727,8 +727,8 @@ GetIfrBinaryData (
 
     Status = mHiiDatabase->ExportPackageLists (mHiiDatabase, Handle, &BufferSize, HiiPackageList);
   }
-  if (EFI_ERROR (Status)) {
-    return Status;
+  if (EFI_ERROR (Status) || HiiPackageList == NULL) {
+    return EFI_NOT_FOUND;
   }
 
   //

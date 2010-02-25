@@ -377,7 +377,7 @@ SmbiosFindHandle (
     }
   }
 
-  if (Link == &mStructureList) {
+  if (Link == &mStructureList || StructureNode == NULL) {
     return EFI_NOT_FOUND;
   } else {
     *HandleNum = StructureNode->Structure->Handle;
