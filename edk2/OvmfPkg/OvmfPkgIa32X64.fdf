@@ -102,11 +102,6 @@ APRIORI PEI {
   INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
 }
 
-APRIORI DXE {
-  INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
-  INF  IntelFrameworkModulePkg/Universal/DataHubDxe/DataHubDxe.inf
-}
-
 #
 #  PEI Phase modules
 #
@@ -115,6 +110,36 @@ INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
 INF  IntelFrameworkModulePkg/Universal/StatusCode/Pei/StatusCodePei.inf
 INF  OvmfPkg/PlatformPei/PlatformPei.inf
 INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
+
+FILE FV_IMAGE = 20bc8ac9-94d1-4208-ab28-5d673fd73486 {
+  SECTION FV_IMAGE = DXEFV
+}
+
+################################################################################
+
+[FV.DXEFV]
+BlockSize          = 0x10000
+FvAlignment        = 16
+ERASE_POLARITY     = 1
+MEMORY_MAPPED      = TRUE
+STICKY_WRITE       = TRUE
+LOCK_CAP           = TRUE
+LOCK_STATUS        = TRUE
+WRITE_DISABLED_CAP = TRUE
+WRITE_ENABLED_CAP  = TRUE
+WRITE_STATUS       = TRUE
+WRITE_LOCK_CAP     = TRUE
+WRITE_LOCK_STATUS  = TRUE
+READ_DISABLED_CAP  = TRUE
+READ_ENABLED_CAP   = TRUE
+READ_STATUS        = TRUE
+READ_LOCK_CAP      = TRUE
+READ_LOCK_STATUS   = TRUE
+
+APRIORI DXE {
+  INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
+  INF  IntelFrameworkModulePkg/Universal/DataHubDxe/DataHubDxe.inf
+}
 
 #
 # DXE Phase modules
