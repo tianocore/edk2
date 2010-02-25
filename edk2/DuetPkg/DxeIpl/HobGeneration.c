@@ -353,7 +353,7 @@ HOB_TEMPLATE  gHobTemplate = {
       },
       EFI_STATUS_CODE_RUNTIME_PROTOCOL_GUID
     },
-    NULL
+    0
   },
   { // EFILDR Memory Descriptor
     {
