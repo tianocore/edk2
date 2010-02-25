@@ -19,7 +19,6 @@
   FILE_GUID                      = 1EC0F53A-FDE0-4576-8F25-7A1A410F58EB
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  EFI_SPECIFICATION_VERSION      = 0x00020000
   ENTRY_POINT                    = PeiStatusCodeDriverEntry
 
 #

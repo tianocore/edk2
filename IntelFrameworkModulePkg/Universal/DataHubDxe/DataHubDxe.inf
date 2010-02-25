@@ -39,7 +39,6 @@
   FILE_GUID                      = 53BCC14F-C24F-434C-B294-8ED2D4CC1860
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  EFI_SPECIFICATION_VERSION      = 0x00020000
   ENTRY_POINT                    = DataHubInstall
 
 #

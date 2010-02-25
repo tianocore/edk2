@@ -18,7 +18,6 @@
   FILE_GUID                      = CA515306-00CE-4032-874E-11B755FF6866
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  EFI_SPECIFICATION_VERSION      = 0x00020000
   ENTRY_POINT                    = DataHubStdErrInitialize
 
 #

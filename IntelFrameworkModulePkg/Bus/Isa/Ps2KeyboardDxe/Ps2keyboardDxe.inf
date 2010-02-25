@@ -23,7 +23,6 @@
   FILE_GUID                      = 3DC82376-637B-40a6-A8FC-A565417F2C38
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  EFI_SPECIFICATION_VERSION      = 0x00020000
   ENTRY_POINT                    = InitializePs2Keyboard
 
 #

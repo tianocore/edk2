@@ -20,7 +20,6 @@
   FILE_GUID                      = FEDE0A1B-BCA2-4A9F-BB2B-D9FD7DEC2E9F
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
-  EFI_SPECIFICATION_VERSION      = 0x00020000
   ENTRY_POINT                    = StatusCodeRuntimeDxeEntry
 
 #

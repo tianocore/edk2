@@ -28,7 +28,6 @@
   FILE_GUID                      = 0abd8284-6da3-4616-971a-83a5148067ba
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  EFI_SPECIFICATION_VERSION      = 0x00020000
   ENTRY_POINT                    = InitializeIsaFloppy
 
 #
