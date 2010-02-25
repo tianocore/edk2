@@ -20,8 +20,6 @@
   FILE_GUID                      = D0893F05-B06D-4161-B947-9BE9B85AC3A1
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
 
   ENTRY_POINT                    = InitializeSnpNt32Driver
   UNLOAD_IMAGE                   = SnpNt32Unload

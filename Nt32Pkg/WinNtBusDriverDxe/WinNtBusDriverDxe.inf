@@ -22,8 +22,6 @@
   FILE_GUID                      = BD7E9A27-D6C5-416a-B245-5F507D95B2BD
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
 
   ENTRY_POINT                    = InitializeWinNtBusDriver
 

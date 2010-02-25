@@ -20,8 +20,6 @@
   FILE_GUID                      = 154CAB4A-52B5-46CD-99C3-4368ABBACFFD
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
 
   ENTRY_POINT                    = WinNtMetronomeDriverInitialize
 
