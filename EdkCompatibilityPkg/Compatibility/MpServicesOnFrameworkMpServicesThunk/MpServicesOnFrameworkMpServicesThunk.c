@@ -4,7 +4,7 @@ Produces PI MP Services Protocol on top of Framework MP Services Protocol.
 Intel's Framework MP Services Protocol is replaced by EFI_MP_SERVICES_PROTOCOL in PI 1.1.
 This module produces PI MP Services Protocol on top of Framework MP Services Protocol.
 
-Copyright (c) 2009 Intel Corporation. <BR>
+Copyright (c) 2009 - 2010 Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -898,6 +898,8 @@ CheckThisAP (
   CPU_DATA_BLOCK  *CpuData;
   CPU_STATE       CpuState;
 
+  ASSERT (ProcessorNumber < mNumberOfProcessors);
+
   CpuData = &mMPSystemData.CpuData[ProcessorNumber];
 
   //
@@ -1217,6 +1219,8 @@ WakeUpAp (
   CPU_DATA_BLOCK               *CpuData;
   EFI_PROCESSOR_INFORMATION    ProcessorInfoBuffer;
 
+  ASSERT (ProcessorNumber < mNumberOfProcessors);
+
   CpuData = &mMPSystemData.CpuData[ProcessorNumber];
 
   AcquireSpinLock (&CpuData->CpuDataLock);
@@ -1294,6 +1298,8 @@ ChangeCpuState (
   )
 {
   CPU_DATA_BLOCK  *CpuData;
+
+  ASSERT (ProcessorNumber < mNumberOfProcessors);
 
   CpuData = &mMPSystemData.CpuData[ProcessorNumber];
 
@@ -1578,6 +1584,7 @@ InitializeMpServicesProtocol (
                                   NULL
                                   );
   ASSERT_EFI_ERROR (Status);
+  ASSERT (mNumberOfProcessors < MAX_CPU_NUMBER);
 
   //
   // Create timer event to check AP state for non-blocking execution.
