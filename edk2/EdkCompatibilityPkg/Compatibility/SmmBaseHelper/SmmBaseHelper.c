@@ -602,6 +602,49 @@ HelperFreePool (
   FunctionData->Status = EFI_SUCCESS;
 }
 
+/** 
+  Thunk service of EFI_SMM_BASE_PROTOCOL.Communicate().
+
+  @param[in, out] FunctionData  Pointer to SMMBASE_FUNCTION_DATA.
+**/
+VOID
+HelperCommunicate (
+  IN OUT SMMBASE_FUNCTION_DATA *FunctionData
+  )
+{
+  LIST_ENTRY     *Node;
+  CALLBACK_INFO  *CallbackInfo;
+
+  if (FunctionData->Args.Communicate.CommunicationBuffer == NULL) {
+    FunctionData->Status = EFI_INVALID_PARAMETER;
+    return;
+  }
+
+  Node = GetFirstNode (&mCallbackInfoListHead);
+  while (!IsNull (&mCallbackInfoListHead, Node)) {
+    CallbackInfo = (CALLBACK_INFO *)Node;
+
+    if (FunctionData->Args.Communicate.ImageHandle == CallbackInfo->SmmImageHandle) {
+      ///
+      /// Thunk into original Framwork SMI handler
+      ///
+      (CallbackInfo->CallbackAddress) (
+                       CallbackInfo->SmmImageHandle,
+                       FunctionData->Args.Communicate.CommunicationBuffer,
+                       FunctionData->Args.Communicate.SourceSize
+                       );
+      ///
+      /// The message was successfully posted.
+      ///
+      FunctionData->Status = EFI_SUCCESS;
+      return;
+    }
+    Node = GetNextNode (&mCallbackInfoListHead, Node);
+  }
+
+  FunctionData->Status = EFI_INVALID_PARAMETER;
+}
+
 /**
   Communication service SMI Handler entry.
 
@@ -653,6 +696,9 @@ SmmHandlerEntry (
       break;
     case SMMBASE_FREE_POOL:
       HelperFreePool (FunctionData);
+      break;
+    case SMMBASE_COMMUNICATE:
+      HelperCommunicate (FunctionData);
       break;
     default:
       ASSERT (FALSE);

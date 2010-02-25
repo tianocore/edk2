@@ -160,15 +160,10 @@ SmmBaseHelperService (
 
   mCommunicationData.FunctionData.Status = EFI_UNSUPPORTED;
 
-  if (IsInSmm()) {
+  if ((mCommunicationData.FunctionData.Function != SMMBASE_COMMUNICATE) && IsInSmm()) {
     ///
     /// If in SMM mode, directly call services in SMM Base Helper.
     ///
-    if (mSmmBaseHelperReady == NULL) {
-      ASSERT (FALSE);
-      return;
-    }
-
     DataSize = (UINTN)(sizeof (SMMBASE_FUNCTION_DATA));
     mSmmBaseHelperReady->ServiceEntry (
                            NULL,
@@ -178,13 +173,8 @@ SmmBaseHelperService (
                            );
   } else {
     ///
-    /// If in non-SMM mode, call services in SMM Base Helper via SMM Communication Protocol.
+    /// Call services in SMM Base Helper via SMM Communication Protocol.
     ///
-    if (mSmmCommunication == NULL) {
-      ASSERT (FALSE);
-      return;
-    }
-
     DataSize = (UINTN)(sizeof (mCommunicationData));
     mSmmCommunication->Communicate (
                          mSmmCommunication,
@@ -291,16 +281,17 @@ SmmBaseCommunicate (
   IN OUT  UINTN                     *BufferSize
   )
 {
-  if (mSmmCommunication == NULL) {
-    ASSERT (FALSE);
-    return EFI_UNSUPPORTED;
-  }
+  ///
+  /// Note this is a runtime interface
+  ///
 
-  return mSmmCommunication->Communicate (
-                              mSmmCommunication,
-                              CommunicationBuffer,
-                              BufferSize
-                              );
+  mCommunicationData.FunctionData.Function = SMMBASE_COMMUNICATE;
+  mCommunicationData.FunctionData.Args.Communicate.ImageHandle = ImageHandle;
+  mCommunicationData.FunctionData.Args.Communicate.CommunicationBuffer = CommunicationBuffer;
+  mCommunicationData.FunctionData.Args.Communicate.SourceSize = BufferSize;
+
+  SmmBaseHelperService ();
+  return mCommunicationData.FunctionData.Status;
 }
 
 /**
@@ -451,11 +442,6 @@ SmmBaseGetSmstLocation (
   OUT     EFI_SMM_SYSTEM_TABLE      **Smst
   )
 {
-  if (mSmmBaseHelperReady == NULL) {
-    ASSERT (FALSE);
-    return EFI_UNSUPPORTED;
-  }
-
   if (!IsInSmm ()) {
     return EFI_UNSUPPORTED;
   }
@@ -484,9 +470,7 @@ SmmBaseAddressChangeEvent (
   IN VOID             *Context
   )
 {
-  if (mSmmCommunication != NULL) {
-    EfiConvertPointer (0x0, (VOID **) &mSmmCommunication);
-  }
+  EfiConvertPointer (0x0, (VOID **) &mSmmCommunication);
 }
 
 /**
