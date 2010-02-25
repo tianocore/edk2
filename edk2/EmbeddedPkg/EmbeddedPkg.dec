@@ -85,6 +85,9 @@
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|32|UINT8|0x00000010
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|0|UINT8|0x00000011
   
+  gEmbeddedTokenSpaceGuid.PcdMemoryBase|0x0|UINT32|0x0000004e
+  gEmbeddedTokenSpaceGuid.PcdMemorySize|0x0|UINT32|0x0000004f
+
   gEmbeddedTokenSpaceGuid.PcdFlashFvMainBase|0x0|UINT32|0x00000043
   gEmbeddedTokenSpaceGuid.PcdFlashFvMainOffset|0x0|UINT32|0x00000044
   gEmbeddedTokenSpaceGuid.PcdFlashFvMainSize|0x0|UINT32|0x000000045

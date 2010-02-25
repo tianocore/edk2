@@ -60,8 +60,9 @@
   gEmbeddedTokenSpaceGuid.PcdFlashFvMainSize
   gEmbeddedTokenSpaceGuid.PcdPrePiStackSize
   gEmbeddedTokenSpaceGuid.PcdPrePiStackBase
+  gEmbeddedTokenSpaceGuid.PcdMemoryBase
+  gEmbeddedTokenSpaceGuid.PcdMemorySize
   
   gOmap35xxTokenSpaceGuid.PcdBeagleConsoleUart
   gOmap35xxTokenSpaceGuid.PcdBeagleFreeTimer
-  gOmap35xxTokenSpaceGuid.PcdBeagleBoardIRAMFullSize
 
