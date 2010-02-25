@@ -23,8 +23,6 @@
   FILE_GUID                      = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
 
   ENTRY_POINT                    = FatEntryPoint
   UNLOAD_IMAGE                   = FatUnload
