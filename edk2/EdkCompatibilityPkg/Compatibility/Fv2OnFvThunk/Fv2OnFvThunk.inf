@@ -27,8 +27,6 @@
   FILE_GUID                      = D8A6F4A6-0E97-4a8b-A475-39F1B28B5AEC
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
   ENTRY_POINT                    = InitializeFirmwareVolume
 
 #
