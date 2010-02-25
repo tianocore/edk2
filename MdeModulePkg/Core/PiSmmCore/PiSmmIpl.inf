@@ -1,0 +1,66 @@
+## @file
+#   This module provide an SMM CIS compliant implementation of SMM IPL.
+#
+# Copyright (c) 2009 - 2010, Intel Corporation
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PiSmmIpl
+  FILE_GUID                      = 2FA2A6DA-11D5-4dc3-999A-749648B03C56
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+  ENTRY_POINT                    = SmmIplEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  PiSmmIpl.c
+  PiSmmCorePrivateData.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  
+[LibraryClasses]
+  UefiDriverEntryPoint
+  BaseLib
+  BaseMemoryLib
+  PeCoffLib
+  CacheMaintenanceLib  
+  MemoryAllocationLib
+  DebugLib
+  UefiBootServicesTableLib
+  DxeServicesTableLib
+  UefiLib
+  UefiRuntimeLib
+  
+[Protocols]
+  gEfiSmmBase2ProtocolGuid                      # PROTOCOL ALWAYS_PRODUCED
+  gEfiSmmCommunicationProtocolGuid              # PROTOCOL ALWAYS_PRODUCED
+  gEfiSmmAccess2ProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
+  gEfiSmmConfigurationProtocolGuid              # PROTOCOL ALWAYS_CONSUMED
+  gEfiSmmControl2ProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
+  gEfiDxeSmmReadyToLockProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
+  gEfiFirmwareVolume2ProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
+
+[Guids]
+  gEfiEventDxeDispatchGuid                      # ALWAYS_CONSUMED
+  gEfiEventReadyToBootGuid                      # ALWAYS_CONSUMED
+  gEfiEventLegacyBootGuid                       # ALWAYS_CONSUMED
+  gEfiEventVirtualAddressChangeGuid             # ALWAYS_CONSUMED
+  
+[Depex]
+  gEfiSmmAccess2ProtocolGuid AND gEfiSmmControl2ProtocolGuid
