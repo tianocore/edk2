@@ -19,7 +19,7 @@
   FILE_GUID                      = D6A2CB7F-6A18-4e2f-B43B-9920A733700A
   MODULE_TYPE                    = DXE_CORE
   VERSION_STRING                 = 1.0
-  PI_SPECIFICATION_VERSION       = 0x00010000
+
 
   ENTRY_POINT                    = DxeMain
 

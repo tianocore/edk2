@@ -20,8 +20,6 @@
   FILE_GUID                      = F9D88642-0737-49bc-81B5-6889CD57D9EA
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
 
   ENTRY_POINT                    = SmbiosDriverEntryPoint
 
