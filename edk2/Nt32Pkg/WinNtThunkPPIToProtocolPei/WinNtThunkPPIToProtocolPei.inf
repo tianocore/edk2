@@ -20,8 +20,6 @@
   FILE_GUID                      = D3AAD8DC-3A48-46ac-B1C7-28A9D3CF6755
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
 
   ENTRY_POINT                    = PeimInitializeWinNtThunkPPIToProtocolPeim
 

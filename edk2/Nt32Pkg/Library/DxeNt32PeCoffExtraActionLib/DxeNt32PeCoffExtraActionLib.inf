@@ -22,8 +22,6 @@
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = PeCoffExtraActionLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_DRIVER
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
 
   CONSTRUCTOR                    = DxeNt32PeCoffLibExtraActionConstructor
 

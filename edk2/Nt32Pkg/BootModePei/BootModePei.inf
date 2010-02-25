@@ -20,8 +20,6 @@
   FILE_GUID                      = B7611005-1F26-45ba-A3DB-01F39DDB2785
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
 
   ENTRY_POINT                    = InitializeBootMode
 

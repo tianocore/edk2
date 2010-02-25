@@ -20,8 +20,6 @@
   FILE_GUID                      = BE0FEABA-3443-4919-9F3A-2D4216329EA9
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
 
   ENTRY_POINT                    = PeimInitializeWinNtAutoScan
 

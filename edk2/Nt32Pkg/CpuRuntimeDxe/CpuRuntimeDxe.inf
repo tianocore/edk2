@@ -20,8 +20,6 @@
   FILE_GUID                      = ee993080-5197-4d4e-b63c-f1f7413e33ce
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
 
   ENTRY_POINT                    = InitializeCpu
 
