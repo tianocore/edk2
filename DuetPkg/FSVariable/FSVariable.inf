@@ -25,8 +25,6 @@
   FILE_GUID                      = A36495C1-C205-414e-B71F-4BE3476D699C
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
-  EDK_RELEASE_VERSION            = 0x00020000
-  EFI_SPECIFICATION_VERSION      = 0x00020000
   ENTRY_POINT                    = VariableServiceInitialize
   
 [Packages]

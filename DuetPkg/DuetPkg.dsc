@@ -137,7 +137,7 @@
       ReportStatusCodeLib|DuetPkg/Library/DxeCoreReportStatusCodeLibFromHob/DxeCoreReportStatusCodeLibFromHob.inf
       SerialPortLib|PcAtChipsetPkg/Library/SerialIoLib/SerialIoLib.inf
   }
-  
+
   MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
