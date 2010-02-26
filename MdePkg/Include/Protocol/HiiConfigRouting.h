@@ -5,7 +5,7 @@
   information from configuration applications, routing the
   results to the appropriate drivers.
   
-  Copyright (c) 2006 - 2009, Intel Corporation
+  Copyright (c) 2006 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -56,10 +56,7 @@ typedef struct _EFI_HII_CONFIG_ROUTING_PROTOCOL EFI_HII_CONFIG_ROUTING_PROTOCOL;
   @param This       Points to the EFI_HII_CONFIG_ROUTING_PROTOCOL
                     instance.
 
-  @param Request    A null-terminated string in <MultiConfigRequest>
-                    format. If a NULL is passed in for the Request field,
-                    all of the settings being abstracted by this function
-                    will be returned in the Results field.
+  @param Request    A null-terminated string in <MultiConfigRequest> format.
 
   @param Progress   On return, points to a character in the
                     Request string. Points to the string's null
@@ -70,11 +67,9 @@ typedef struct _EFI_HII_CONFIG_ROUTING_PROTOCOL EFI_HII_CONFIG_ROUTING_PROTOCOL;
                     name / value pair) if the request was not
                     successful
 
-  @param Results    A null-terminated string in <ConfigAltResp> format
+  @param Results    A null-terminated string in <MultiConfigAltResp> format
                     which has all values filled in for the names in the
-                    Request string. If the Request string was NULL, the data
-                    returned is in <MultiConfigAltResp> format. String to be
-                    allocated by the called function.
+                    Request string.
 
   @retval EFI_SUCCESS             The Results string is filled with the
                                   values corresponding to all requested
@@ -228,7 +223,8 @@ EFI_STATUS
 
   @param Config     Filled-in configuration string. String
                     allocated by the function. Returned only if
-                    call is successful.
+                    call is successful. The null-terminated string 
+                    will be <ConfigResp> format.
 
   @param Progress   A pointer to a string filled in with the
                     offset of the most recent '&' before the
@@ -349,7 +345,7 @@ EFI_STATUS
   a larger configuration string.
           
   @param This              A pointer to the EFI_HII_CONFIG_ROUTING_PROTOCOL instance.
-  @param Configuration     A null-terminated string in <MultiConfigAltResp> format.
+  @param ConfigResp        A null-terminated string in <ConfigAltResp> format.
   @param Guid              A pointer to the GUID value to search for in the 
                            routing portion of the ConfigResp string when retrieving 
                            the requested data. If Guid is NULL, then all GUID 
@@ -369,6 +365,7 @@ EFI_STATUS
   @param AltCfgResp        A pointer to a buffer which will be allocated by the 
                            function which contains the retrieved string as requested.  
                            This buffer is only allocated if the call was successful. 
+                           The null-terminated string will be <ConfigResp> format.
   
   @retval EFI_SUCCESS             The request succeeded. The requested data was extracted 
                                   and placed in the newly allocated AltCfgResp buffer.
@@ -380,7 +377,7 @@ typedef
 EFI_STATUS 
 (EFIAPI * EFI_HII_GET_ALT_CFG)(
   IN  CONST EFI_HII_CONFIG_ROUTING_PROTOCOL    *This, 
-  IN  CONST EFI_STRING                         Configuration, 
+  IN  CONST EFI_STRING                         ConfigResp, 
   IN  CONST EFI_GUID                           *Guid, 
   IN  CONST EFI_STRING                         Name, 
   IN  CONST EFI_DEVICE_PATH_PROTOCOL           *DevicePath,  

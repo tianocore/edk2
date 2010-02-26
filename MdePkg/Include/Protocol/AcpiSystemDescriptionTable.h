@@ -1,7 +1,7 @@
 /** @file
   This protocol provides services for creating ACPI system description tables.
   
-  Copyright (c) 2006 - 2008, Intel Corporation
+  Copyright (c) 2006 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -246,9 +246,6 @@ typedef struct _EFI_ACPI_SDT_PROTOCOL {
   /// Specifies the ACPI version supported by this protocol.
   ///
   EFI_ACPI_TABLE_VERSION    AcpiVersion;
-  //
-  // EFI_ACPI_GET_ACPI_TABLE2 not in public UEFI specification.
-  //
   EFI_ACPI_GET_ACPI_TABLE2  GetAcpiTable;
   EFI_ACPI_REGISTER_NOTIFY  RegisterNotify;
   EFI_ACPI_OPEN             Open;

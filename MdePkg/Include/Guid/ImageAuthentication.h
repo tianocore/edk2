@@ -2,7 +2,7 @@
   Platform Key, Key Exchange Key, and Image signature database are defined 
   for the signed image validation.
 
-  Copyright (c) 2009, Intel Corporation
+  Copyright (c) 2009 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -206,16 +206,23 @@ typedef struct {
   ///
 
   ///
-  /// The image digest of the image. The certificate type must be one of the hash types. 
-  /// The hash type must match the type used in the Signature field.
-  ///
-  WIN_CERTIFICATE               ImageHash;
-  ///
   /// Zero or more image signatures. If the image contained no signatures, 
   /// then this field is empty.
   ///
-  WIN_CERTIFICATE               Signature;
+  EFI_SIGNATURE_LIST            Signature;
 } EFI_IMAGE_EXECUTION_INFO;
+
+
+typedef struct {
+  ///
+  /// Number of EFI_IMAGE_EXECUTION_INFO structures.
+  ///
+  UINTN                     NumberOfImages; 
+  ///
+  /// Number of image instances of EFI_IMAGE_EXECUTION_INFO structures.
+  ///
+  // EFI_IMAGE_EXECUTION_INFO  InformationInfo[] 
+} EFI_IMAGE_EXECUTION_INFO_TABLE;
 
 extern EFI_GUID gEfiImageSecurityDatabaseGuid;
 extern EFI_GUID gEfiCertSha256Guid;
