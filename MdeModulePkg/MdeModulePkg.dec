@@ -76,6 +76,9 @@
   #
   OemHookStatusCodeLib|Include/Library/OemHookStatusCodeLib.h
 
+  ##  @libraryclass  Debug Agent is used to provide soft debug capability.
+  #
+  DebugAgentLib|Include/Library/DebugAgentLib.h
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
