@@ -8,7 +8,7 @@
   * the GUID specific data structure of HOB for reserving SMRAM regions.
   This GUIDed HOB can be used to convey the existence of the T-SEG reservation and H-SEG usage
 
-  Copyright (c) 2007 - 2009, Intel Corporation
+  Copyright (c) 2007 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -24,11 +24,6 @@
 
 #ifndef _EFI_SMM_PEI_SMRAM_MEMORY_RESERVE_H_
 #define _EFI_SMM_PEI_SMRAM_MEMORY_RESERVE_H_
-
-//
-// Share some common definitions with PI SMM
-//
-#include <Protocol/SmmAccess2.h>
 
 #define EFI_SMM_PEI_SMRAM_MEMORY_RESERVE \
   { \
