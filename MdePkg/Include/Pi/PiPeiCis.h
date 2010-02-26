@@ -424,7 +424,9 @@ EFI_STATUS
 
   @retval EFI_SUCCESS           The memory range was successfully allocated.
   @retval EFI_OUT_OF_RESOURCES  The pages could not be allocated.
-  @retval EFI_INVALID_PARAMETER Type is not equal to AllocateAnyPages.
+  @retval EFI_INVALID_PARAMETER Type is not equal to EfiLoaderCode, EfiLoaderData, EfiRuntimeServicesCode, 
+                                EfiRuntimeServicesData, EfiBootServicesCode, EfiBootServicesData,
+                                EfiACPIReclaimMemory, or EfiACPIMemoryNVS.
 
 **/
 typedef
