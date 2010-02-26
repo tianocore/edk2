@@ -1,7 +1,7 @@
 /** @file
   Support functions to connect/disconnect UEFI Driver model Protocol
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -766,7 +766,7 @@ CoreDisconnectController (
                &gEfiDriverBindingProtocolGuid,
                (VOID **)&DriverBinding
                );
-    if (EFI_ERROR (Status)) {
+    if (EFI_ERROR (Status) || DriverBinding == NULL) {
       Status = EFI_INVALID_PARAMETER;
       goto Done;
     }

@@ -1,7 +1,7 @@
 /** @file
   Locate handle functions
 
-Copyright (c) 2006 - 2009, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -200,6 +200,7 @@ CoreLocateHandle (
     return Status;
   }
 
+  ASSERT (GetNext != NULL);
   //
   // Enumerate out the matching handles
   //
@@ -246,6 +247,7 @@ CoreLocateHandle (
       // If this is a search by register notify and a handle was
       // returned, update the register notification position
       //
+      ASSERT (SearchKey != NULL);
       ProtNotify = SearchKey;
       ProtNotify->Position = ProtNotify->Position->ForwardLink;
     }
