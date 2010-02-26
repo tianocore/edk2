@@ -110,20 +110,20 @@ PeiInstallPeiMemory (
 }
 
 /**
+  The purpose of the service is to publish an interface that allows 
+  PEIMs to allocate memory ranges that are managed by the PEI Foundation.
 
-  Memory allocation service on permanent memory,
-  not usable prior to the memory installation.
+  @param  PeiServices      An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param  MemoryType       The type of memory to allocate.
+  @param  Pages            The number of contiguous 4 KB pages to allocate.
+  @param  Memory           Pointer to a physical address. On output, the address is set to the base 
+                           of the page range that was allocated.
 
-
-  @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
-  @param MemoryType      Type of memory to allocate.
-  @param Pages           Number of pages to allocate.
-  @param Memory          Pointer of memory allocated.
-
-  @retval EFI_SUCCESS              The allocation was successful
-  @retval EFI_NOT_AVAILABLE_YET    Called with permanent memory not available
-  @retval EFI_OUT_OF_RESOURCES     There is not enough HOB heap to satisfy the requirement
-                                   to allocate the number of pages.
+  @retval EFI_SUCCESS           The memory range was successfully allocated.
+  @retval EFI_OUT_OF_RESOURCES  The pages could not be allocated.
+  @retval EFI_INVALID_PARAMETER Type is not equal to EfiLoaderCode, EfiLoaderData, EfiRuntimeServicesCode, 
+                                EfiRuntimeServicesData, EfiBootServicesCode, EfiBootServicesData,
+                                EfiACPIReclaimMemory, or EfiACPIMemoryNVS.
 
 **/
 EFI_STATUS
@@ -140,6 +140,17 @@ PeiAllocatePages (
   EFI_PHYSICAL_ADDRESS                    *FreeMemoryTop;
   EFI_PHYSICAL_ADDRESS                    *FreeMemoryBottom;
   UINTN                                   RemainingPages;
+
+  if ((MemoryType != EfiLoaderCode) &&
+      (MemoryType != EfiLoaderData) &&
+      (MemoryType != EfiRuntimeServicesCode) &&
+      (MemoryType != EfiRuntimeServicesData) &&
+      (MemoryType != EfiBootServicesCode) &&
+      (MemoryType != EfiBootServicesData) &&
+      (MemoryType != EfiACPIReclaimMemory) &&
+      (MemoryType != EfiACPIMemoryNVS)) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
   Hob.Raw     = PrivateData->HobList.Raw;
