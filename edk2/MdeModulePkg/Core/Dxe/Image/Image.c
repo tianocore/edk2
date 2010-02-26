@@ -1,7 +1,7 @@
 /** @file
   Core image handling services to load and unload PeImage.
 
-Copyright (c) 2006 - 2009, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -603,7 +603,7 @@ CoreLoadPeImage (
     // Locate the EBC interpreter protocol
     //
     Status = CoreLocateProtocol (&gEfiEbcProtocolGuid, NULL, (VOID **)&Image->Ebc);
-    if (EFI_ERROR(Status)) {
+    if (EFI_ERROR(Status) || Image->Ebc == NULL) {
       DEBUG ((DEBUG_LOAD | DEBUG_ERROR, "CoreLoadPeImage: There is no EBC interpreter for an EBC image.\n"));
       goto Done;
     }
@@ -1095,12 +1095,13 @@ CoreLoadImageCommon (
   // Pull out just the file portion of the DevicePath for the LoadedImage FilePath
   //
   FilePath = OriginalFilePath;
-  Status = CoreHandleProtocol (DeviceHandle, &gEfiDevicePathProtocolGuid, (VOID **)&HandleFilePath);
-  if (!EFI_ERROR (Status)) {
-    FilePathSize = GetDevicePathSize (HandleFilePath) - sizeof(EFI_DEVICE_PATH_PROTOCOL);
-    FilePath = (EFI_DEVICE_PATH_PROTOCOL *) (((UINT8 *)FilePath) + FilePathSize );
+  if (DeviceHandle != NULL) {
+    Status = CoreHandleProtocol (DeviceHandle, &gEfiDevicePathProtocolGuid, (VOID **)&HandleFilePath);
+    if (!EFI_ERROR (Status)) {
+      FilePathSize = GetDevicePathSize (HandleFilePath) - sizeof(EFI_DEVICE_PATH_PROTOCOL);
+      FilePath = (EFI_DEVICE_PATH_PROTOCOL *) (((UINT8 *)FilePath) + FilePathSize );
+    }
   }
-
   //
   // Initialize the fields for an internal driver
   //

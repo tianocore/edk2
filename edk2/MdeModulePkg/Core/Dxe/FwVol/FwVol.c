@@ -3,7 +3,7 @@
   Layers on top of Firmware Block protocol to produce a file abstraction
   of FV based files.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -565,6 +565,7 @@ NotifyFwVolBlock (
     if (EFI_ERROR (Status)) {
       return;
     }
+    ASSERT (FwVolHeader != NULL);
 
     if (!VerifyFvHeaderChecksum (FwVolHeader)) {
       CoreFreePool (FwVolHeader);

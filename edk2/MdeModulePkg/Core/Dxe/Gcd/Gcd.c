@@ -3,7 +3,7 @@
   The GCD services are used to manage the memory and I/O regions that
   are accessible to the CPU that is executing the DXE core.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -599,6 +599,7 @@ CoreConvertSpace (
 
     goto Done;
   }
+  ASSERT (StartLink != NULL && EndLink != NULL);
 
   //
   // Verify that the list of descriptors are unallocated non-existent memory.
@@ -684,6 +685,7 @@ CoreConvertSpace (
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
+  ASSERT (TopEntry != NULL && BottomEntry != NULL);
 
   if (Operation == GCD_SET_ATTRIBUTES_MEMORY_OPERATION) {
     //
@@ -692,7 +694,7 @@ CoreConvertSpace (
     CpuArchAttributes = ConverToCpuArchAttributes (Attributes);
     if ( CpuArchAttributes != INVALID_CPU_ARCH_ATTRIBUTES ) {
       Status = CoreLocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&CpuArch);
-      if (EFI_ERROR (Status)) {
+      if (EFI_ERROR (Status) || CpuArch == NULL) {
         Status = EFI_ACCESS_DENIED;
         goto Done;
       }
@@ -926,6 +928,7 @@ CoreAllocateSpace (
       Status = EFI_NOT_FOUND;
       goto Done;
     }
+    ASSERT (StartLink != NULL && EndLink != NULL);
 
     //
     // Verify that the list of descriptors are unallocated memory matching GcdMemoryType.
@@ -1009,6 +1012,7 @@ CoreAllocateSpace (
         Status = EFI_NOT_FOUND;
         goto Done;
       }
+      ASSERT (StartLink != NULL && EndLink != NULL);
 
       Link = StartLink;
       //
@@ -1044,6 +1048,7 @@ CoreAllocateSpace (
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
+  ASSERT (TopEntry != NULL && BottomEntry != NULL);
 
   //
   // Convert/Insert the list of descriptors from StartLink to EndLink
@@ -1330,6 +1335,7 @@ CoreGetMemorySpaceDescriptor (
   if (EFI_ERROR (Status)) {
     Status = EFI_NOT_FOUND;
   } else {
+    ASSERT (StartLink != NULL && EndLink != NULL);
     //
     // Copy the contents of the found descriptor into Descriptor
     //
@@ -1609,6 +1615,7 @@ CoreGetIoSpaceDescriptor (
   if (EFI_ERROR (Status)) {
     Status = EFI_NOT_FOUND;
   } else {
+    ASSERT (StartLink != NULL && EndLink != NULL);
     //
     // Copy the contents of the found descriptor into Descriptor
     //

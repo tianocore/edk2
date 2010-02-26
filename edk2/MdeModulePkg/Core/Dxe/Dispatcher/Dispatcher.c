@@ -1016,7 +1016,7 @@ CoreFwVolEventProtocolNotify (
     FvIsBeingProcesssed (FvHandle);
 
     Status = CoreHandleProtocol (FvHandle, &gEfiFirmwareVolume2ProtocolGuid, (VOID **)&Fv);
-    if (EFI_ERROR (Status)) {
+    if (EFI_ERROR (Status) || Fv == NULL) {
       //
       // FvHandle must have Firmware Volume2 protocol thus we should never get here.
       //
