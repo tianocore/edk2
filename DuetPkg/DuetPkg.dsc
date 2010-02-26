@@ -1,9 +1,9 @@
 ## @file
-#  An EFI/Framework Emulation Platform with UEFI HII interface supported. 
+#  An EFI/Framework Emulation Platform with UEFI HII interface supported.
 #
-#  Developer's UEFI Emulation. DUET provides an EFI/UEFI IA32/X64 environment on legacy BIOS, 
+#  Developer's UEFI Emulation. DUET provides an EFI/UEFI IA32/X64 environment on legacy BIOS,
 #  to help developing and debugging native EFI/UEFI drivers.
-#  
+#
 #  Copyright (c) 2010 - 2010, Intel Corporation. All rights reserved. <BR>
 #
 #  This program and the accompanying materials
@@ -64,14 +64,15 @@
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   SecurityManagementLib|MdeModulePkg/Library/DxeSecurityManagementLib/DxeSecurityManagementLib.inf
-  
+  DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
+
   #
   # To save size, use NULL library for DebugLib and ReportStatusCodeLib.
   # If need status code output, do library instance overriden as below DxeMain.inf does
   #
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   ReportStatusCodeLib|MdePkg/Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.inf
-  
+
 [LibraryClasses.common.DXE_CORE]
   HobLib|MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
   DxeCoreEntryPoint|MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
@@ -115,7 +116,7 @@
   DuetPkg/DxeIpl/DxeIpl.inf {
     <LibraryClasses>
       #
-      # If no following overriden for ReportStatusCodeLib library class, 
+      # If no following overriden for ReportStatusCodeLib library class,
       # All other module can *not* output debug information even they are use not NULL library
       # instance for DebugLib and ReportStatusCodeLib
       #
@@ -190,7 +191,7 @@
   # IDE Support
   IntelFrameworkModulePkg/Bus/Pci/IdeBusDxe/IdeBusDxe.inf
   PcAtChipsetPkg/Bus/Pci/IdeControllerDxe/IdeControllerDxe.inf
-  
+
   # Usb Support
   MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
   MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
