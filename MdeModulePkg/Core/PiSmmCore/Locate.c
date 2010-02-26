@@ -321,14 +321,13 @@ SmmLocateHandle (
     break;
 
   case ByRegisterNotify:
+    GetNext = SmmGetNextLocateByRegisterNotify;
     //
     // Must have SearchKey for locate ByRegisterNotify
     //
     if (SearchKey == NULL) {
       Status = EFI_INVALID_PARAMETER;
-      break;
     }
-    GetNext = SmmGetNextLocateByRegisterNotify;
     break;
 
   case ByProtocol:
