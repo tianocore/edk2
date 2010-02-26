@@ -5,7 +5,7 @@
   This protocol is published by drivers providing and requesting 
   configuration data from HII. It may only be invoked by HII.
   
-  Copyright (c) 2006 - 2009, Intel Corporation
+  Copyright (c) 2006 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -57,7 +57,13 @@ typedef UINTN EFI_BROWSER_ACTION;
                     includes the routing information as well as
                     the configurable name / value pairs. It is
                     invalid for this string to be in
-                    <MultiConfigRequest> format.
+                    <MultiConfigRequest> format. 
+                    If a NULL is passed in for the Request field, 
+                    all of the settings being abstracted by this function 
+                    will be returned in the Results field.  In addition, 
+                    if a ConfigHdr is passed in with no request elements, 
+                    all of the settings being abstracted for that particular 
+                    ConfigHdr reference will be returned in the Results Field.
 
   @param Progress   On return, points to a character in the
                     Request string. Points to the string's null
@@ -69,7 +75,7 @@ typedef UINTN EFI_BROWSER_ACTION;
                     successful
 
   @param Results    A null-terminated Unicode string in
-                    <ConfigAltResp> format which has all values
+                    <MultiConfigAltResp> format which has all values
                     filled in for the names in the Request string.
                     String to be allocated by the called function.
 
@@ -81,13 +87,6 @@ typedef UINTN EFI_BROWSER_ACTION;
                                   parts of the results that must be
                                   stored awaiting possible future
                                   protocols.
-
-  @retval EFI_INVALID_PARAMETER   For example, passing in a NULL
-                                  for the Request parameter
-                                  would result in this type of
-                                  error. In this case, the
-                                  Progress parameter would be
-                                  set to NULL. 
 
   @retval EFI_NOT_FOUND           Routing data doesn't match any
                                   known driver. Progress set to the
