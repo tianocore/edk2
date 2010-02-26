@@ -801,6 +801,12 @@ PeiDispatcher (
                 // Loading Module at Fixed Address is enabled
                 //
                 PeiLoadFixAddressHook(Private);
+                //
+                // if Loading Module at Fixed Address is enabled, This is the first invoke to page
+                // allocation for Pei Code range. This memory range should be reserved for loading PEIMs
+                //
+                LoadFixPeiCodeBegin = AllocatePages((UINTN)PcdGet32(PcdLoadFixAddressPeiCodePageNumber));
+                DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: PeiCodeBegin = 0x%lX, PeiCodeTop= 0x%lX\n", (UINT64)LoadFixPeiCodeBegin, (UINT64)((UINTN)LoadFixPeiCodeBegin + PcdGet32(PcdLoadFixAddressPeiCodePageNumber) * EFI_PAGE_SIZE)));
               }
               
               //
@@ -942,14 +948,8 @@ PeiDispatcher (
               
               if (PcdGet64(PcdLoadModuleAtFixAddressEnable) != 0) {
                 //
-                // if Loading Module at Fixed Address is enabled, This is the first invoke to page 
-                // allocation for Pei Core segment. This memory segment should be reserved for loading PEIM
-                //
-                LoadFixPeiCodeBegin = AllocatePages((UINTN)PcdGet32(PcdLoadFixAddressPeiCodePageNumber));
-                DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: PeiCodeBegin = 0x%lx, PeiCodeTop= 0xl%x\n", (UINTN)LoadFixPeiCodeBegin, ((UINTN)LoadFixPeiCodeBegin) + PcdGet32(PcdLoadFixAddressPeiCodePageNumber) * EFI_PAGE_SIZE));                 
-                //
                 // if Loading Module at Fixed Address is enabled, allocate the PEI code memory range usage bit map array.
-                // Every bit in the array indicate the status of the corresponding memory page, available or not
+                // Every bit in the array indicate the status of the corresponding memory page available or not
                 //
                 PrivateInMem->PeiCodeMemoryRangeUsageBitMap = AllocateZeroPool (((PcdGet32(PcdLoadFixAddressPeiCodePageNumber)>>6) + 1)*sizeof(UINT64));
               }
