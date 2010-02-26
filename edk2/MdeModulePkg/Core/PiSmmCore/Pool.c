@@ -101,7 +101,7 @@ InternalAllocPoolByIndex (
   if (PoolIndex == MAX_POOL_INDEX) {
     Hdr = (FREE_POOL_HEADER *)AllocatePages (EFI_SIZE_TO_PAGES (MAX_POOL_SIZE << 1));
     if (Hdr == NULL) {
-      Status = EFI_OUT_OF_RESOURCES;
+      return EFI_OUT_OF_RESOURCES;
     }
   } else if (!IsListEmpty (&mSmmPoolLists[PoolIndex])) {
     Hdr = BASE_CR (GetFirstNode (&mSmmPoolLists[PoolIndex]), FREE_POOL_HEADER, Link);
@@ -146,6 +146,7 @@ InternalFreePoolByIndex (
 
   PoolIndex = HighBitSet32 ((UINT32)FreePoolHdr->Header.Size) - MIN_POOL_SHIFT;
   FreePoolHdr->Header.Available = TRUE;
+  ASSERT (PoolIndex < MAX_POOL_INDEX);
   InsertHeadList (&mSmmPoolLists[PoolIndex], &FreePoolHdr->Link);
   return EFI_SUCCESS;
 }
