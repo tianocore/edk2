@@ -1,7 +1,7 @@
 /** @file
   Include file matches things in PI for multiple module types.
 
-  Copyright (c) 2006 - 2009, Intel Corporation                                                         
+  Copyright (c) 2006 - 2010, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -93,5 +93,44 @@
 #define EFI_AUTH_STATUS_TEST_FAILED         0x08
 #define EFI_AUTH_STATUS_ALL                 0x0f
 ///@}
+
+///
+/// SMRAM states and capabilities
+///
+#define EFI_SMRAM_OPEN                  0x00000001
+#define EFI_SMRAM_CLOSED                0x00000002
+#define EFI_SMRAM_LOCKED                0x00000004
+#define EFI_CACHEABLE                   0x00000008
+#define EFI_ALLOCATED                   0x00000010
+#define EFI_NEEDS_TESTING               0x00000020
+#define EFI_NEEDS_ECC_INITIALIZATION    0x00000040
+
+///
+/// Structure describing a SMRAM region and its accessibility attributes
+///
+typedef struct {
+  ///
+  /// Designates the physical address of the SMRAM in memory. This view of memory is 
+  /// the same as seen by I/O-based agents, for example, but it may not be the address seen 
+  /// by the processors.
+  ///
+  EFI_PHYSICAL_ADDRESS  PhysicalStart;
+  ///
+  /// Designates the address of the SMRAM, as seen by software executing on the 
+  /// processors. This address may or may not match PhysicalStart.
+  ///
+  EFI_PHYSICAL_ADDRESS  CpuStart;       
+  ///
+  /// Describes the number of bytes in the SMRAM region.
+  ///
+  UINT64                PhysicalSize;
+  ///
+  /// Describes the accessibility attributes of the SMRAM.  These attributes include the 
+  /// hardware state (e.g., Open/Closed/Locked), capability (e.g., cacheable), logical 
+  /// allocation (e.g., allocated), and pre-use initialization (e.g., needs testing/ECC 
+  /// initialization).
+  ///
+  UINT64                RegionState;
+} EFI_SMRAM_DESCRIPTOR;
 
 #endif
