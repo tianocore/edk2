@@ -2,24 +2,20 @@
   This header file contains all of the PXE type definitions,
   structure prototypes, global variables and constants that
   are needed for porting PXE to EFI.
-  
-  Copyright (c) 2006 - 2010, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-  
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-  
+
+  Copyright (c) 2006 - 2010, Intel Corporation
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
   @par Revision Reference:
   32/64-bit PXE specification:
   alpha-4, 99-Dec-17
 
-  @attention The PXE_OPFLAGS_GET_MEDIA_STATUS and PXE_STATFLAGS_GET_STATUS_NO_MEDIA_xxx
-  are not defined in current UEFI spec (v2.3, approved May, 09), they will be
-  added by following erratas.
-  
 **/
 
 #ifndef __EFI_PXE_H__
@@ -78,7 +74,7 @@ typedef UINT8          PXE_UINT8;
 typedef UINT16         PXE_UINT16;
 typedef UINT32         PXE_UINT32;
 typedef UINTN          PXE_UINTN;
- 
+
 ///
 /// typedef unsigned long PXE_UINT64;
 ///
@@ -270,7 +266,7 @@ typedef PXE_UINT16  PXE_OPFLAGS;
 ///
 #define PXE_OPFLAGS_INTERRUPT_SOFTWARE  0x0008
 
-/// 
+///
 /// UNDI Receive Filters
 ///
 ///
@@ -318,7 +314,7 @@ typedef PXE_UINT16  PXE_OPFLAGS;
 ///
 #define PXE_OPFLAGS_RECEIVE_FILTER_ALL_MULTICAST  0x0010
 
-/// 
+///
 /// UNDI Station Address
 ///
 #define PXE_OPFLAGS_STATION_ADDRESS_READ   0x0000
@@ -400,7 +396,7 @@ typedef PXE_UINT16  PXE_OPFLAGS;
 #define PXE_OPFLAGS_TRANSMIT_FRAGMENTED 0x0002
 #define PXE_OPFLAGS_TRANSMIT_WHOLE      0x0000
 
-/// 
+///
 /// UNDI Receive
 ///
 /// No OpFlags
@@ -675,7 +671,7 @@ typedef PXE_UINT8   PXE_FRAME_TYPE;
 #define PXE_FRAME_TYPE_PROMISCUOUS              0x04
 #define PXE_FRAME_TYPE_PROMISCUOUS_MULTICAST    0x05
 
-#define PXE_FRAME_TYPE_MULTICAST                PXE_FRAME_TYPE_FILTERED_MULTICAST       
+#define PXE_FRAME_TYPE_MULTICAST                PXE_FRAME_TYPE_FILTERED_MULTICAST
 
 typedef PXE_UINT32  PXE_IPV4;
 
