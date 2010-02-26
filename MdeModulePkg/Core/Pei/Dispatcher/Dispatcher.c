@@ -806,7 +806,7 @@ PeiDispatcher (
                 // allocation for Pei Code range. This memory range should be reserved for loading PEIMs
                 //
                 LoadFixPeiCodeBegin = AllocatePages((UINTN)PcdGet32(PcdLoadFixAddressPeiCodePageNumber));
-                DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: PeiCodeBegin = 0x%lX, PeiCodeTop= 0x%lX\n", (UINT64)LoadFixPeiCodeBegin, (UINT64)((UINTN)LoadFixPeiCodeBegin + PcdGet32(PcdLoadFixAddressPeiCodePageNumber) * EFI_PAGE_SIZE)));
+                DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: PeiCodeBegin = 0x%lX, PeiCodeTop= 0x%lX\n", (UINT64)(UINTN)LoadFixPeiCodeBegin, (UINT64)((UINTN)LoadFixPeiCodeBegin + PcdGet32(PcdLoadFixAddressPeiCodePageNumber) * EFI_PAGE_SIZE)));
               }
               
               //
