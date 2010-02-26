@@ -31,7 +31,7 @@
   BUILD_TARGETS                  = DEBUG
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = Nt32Pkg/Nt32Pkg.fdf
- 
+
 
 ################################################################################
 #
@@ -72,7 +72,8 @@
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   SecurityManagementLib|MdeModulePkg/Library/DxeSecurityManagementLib/DxeSecurityManagementLib.inf
-  
+  DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
+
 [LibraryClasses.common.USER_DEFINED]
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
@@ -330,7 +331,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|L"Setup"|gEfiWinNtSystemConfigGuid|0x4|25
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|10
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|L"HwErrRecSupport"|gEfiGlobalVariableGuid|0x0|1
-  
+
 ###################################################################################################
 #
 # Components Section - list of the modules and components that will be processed by compilation
@@ -382,7 +383,7 @@
     <LibraryClasses>
       NULL|MdeModulePkg/Library/DxeCrc32GuidedSectionExtractLib/DxeCrc32GuidedSectionExtractLib.inf
     <BuildOptions>
-      *_*_IA32_CC_FLAGS = 
+      *_*_IA32_CC_FLAGS =
   }
 
   MdeModulePkg/Universal/PCD/Dxe/Pcd.inf {
@@ -455,7 +456,7 @@
 
   MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
 
-  IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf 
+  IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
   MdeModulePkg/Universal/PrintDxe/PrintDxe.inf
@@ -464,7 +465,7 @@
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
   MdeModulePkg/Application/VariableInfo/VariableInfo.inf
-  
+
   MdeModulePkg/Universal/PlatformDriOverrideDxe/PlatformDriOverrideDxe.inf
 
 [BuildOptions]
@@ -481,7 +482,7 @@
 # If you want build R8 module for Nt32 platform, please uncomment [Libraries.IA32] section and
 # libraries used by that R8 module.
 # Currently, Nt32 platform do not has any R8 style module
-#  
+#
 #
 #[Libraries.IA32]
   #
