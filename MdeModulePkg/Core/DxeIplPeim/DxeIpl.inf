@@ -1,6 +1,6 @@
 ## @file
 #  Last PEIM executed in PEI phase to load DXE Core from a Firmware Volume.
-#  
+#
 #  This module produces a special PPI named the DXE Initial Program Load (IPL)
 #  PPI to discover and dispatch the DXE Foundation and components that are
 #  needed to run the DXE Foundation.
@@ -10,10 +10,10 @@
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
 #  http://opensource.org/licenses/bsd-license.php
-#  
+#
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#  
+#
 ##
 
 [Defines]
@@ -72,6 +72,7 @@
   BaseLib
   PeimEntryPoint
   DebugLib
+  DebugAgentLib
 
 [Ppis]
   gEfiDxeIplPpiGuid                 ## PRODUCES
@@ -96,11 +97,11 @@
   gEfiPeiMemoryDiscoveredPpiGuid AND gEfiPeiLoadFilePpiGuid
 
 #
-# [BootMode] 
+# [BootMode]
 #   S3_RESUME                       ## SOMETIMES_CONSUMES
 #   RECOVERY                        ## SOMETIMES_CONSUMES
 #
-#  
+#
 # [Hob]
 #   ##
 #   # New Stack HoB
@@ -114,4 +115,4 @@
 #   # BSP Stack HOB for IPF
 #   MEMORY_ALLOCATION               ## PRODUCES
 #
-# 
+#

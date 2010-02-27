@@ -32,20 +32,23 @@ InitializeDebugAgent (
 }
 
 /**
-  Enable/Disable the interrupt of debug timer.
+  Enable/Disable the interrupt of debug timer and return the interrupt state
+  prior to the operation.
 
   If EnableStatus is TRUE, enable the interrupt of debug timer.
   If EnableStatus is FALSE, disable the interrupt of debug timer.
 
   @param[in] EnableStatus    Enable/Disable.
 
+  @return FALSE always.
+
 **/
-VOID
+BOOLEAN
 EFIAPI
-SetDebugTimerInterrupt (
+SaveAndSetDebugTimerInterrupt (
   IN BOOLEAN                EnableStatus
   )
 {
-
+  return FALSE;
 }
 

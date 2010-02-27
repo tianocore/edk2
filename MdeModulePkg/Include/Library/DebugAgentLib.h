@@ -19,7 +19,8 @@
 #define DEBUG_AGENT_INIT_POSTMEM_SEC     2
 #define DEBUG_AGENT_INIT_DXE             3
 #define DEBUG_AGENT_INIT_SMM             4
-#define DEBUG_AGENT_INIT_SMI             5
+#define DEBUG_AGENT_INIT_ENTER_SMI       5
+#define DEBUG_AGENT_INIT_EXIT_SMI        6
 
 /**
   Initialize debug agent.
@@ -38,17 +39,21 @@ InitializeDebugAgent (
   );
 
 /**
-  Enable/Disable the interrupt of debug timer.
+  Enable/Disable the interrupt of debug timer and return the interrupt state
+  prior to the operation.
 
   If EnableStatus is TRUE, enable the interrupt of debug timer.
   If EnableStatus is FALSE, disable the interrupt of debug timer.
 
   @param[in] EnableStatus    Enable/Disable.
 
+  @retval TRUE  Debug timer interrupt were enabled on entry to this call.
+  @retval FALSE Debug timer interrupt were disabled on entry to this call.
+
 **/
-VOID
+BOOLEAN
 EFIAPI
-SetDebugTimerInterrupt (
+SaveAndSetDebugTimerInterrupt (
   IN BOOLEAN                EnableStatus
   );
 

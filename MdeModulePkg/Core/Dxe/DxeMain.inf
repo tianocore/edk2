@@ -89,6 +89,7 @@
   ReportStatusCodeLib
   TimerLib
   DxeServicesLib
+  DebugAgentLib
 
 [Guids]
   gEfiEventMemoryMapChangeGuid                  ## CONSUMES ## Event

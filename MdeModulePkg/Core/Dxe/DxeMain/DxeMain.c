@@ -215,8 +215,8 @@ EFI_DECOMPRESS_PROTOCOL  gEfiDecompress = {
 };
 
 //
-// For Loading modules at fixed address feature, the configuration table is to cache the top address below which to load 
-// Runtime code&boot time code 
+// For Loading modules at fixed address feature, the configuration table is to cache the top address below which to load
+// Runtime code&boot time code
 //
 GLOBAL_REMOVE_IF_UNREFERENCED EFI_LOAD_FIXED_ADDRESS_CONFIGURATION_TABLE    gLoadModuleAtFixAddressConfigurationTable = {0, 0};
 
@@ -240,6 +240,11 @@ DxeMain (
   EFI_STATUS                         Status;
   EFI_PHYSICAL_ADDRESS               MemoryBaseAddress;
   UINT64                             MemoryLength;
+
+  //
+  // Initialize Debug Agent to support source level debug in DXE phase
+  //
+  InitializeDebugAgent (DEBUG_AGENT_INIT_DXE, HobStart);
 
   //
   // Initialize Memory Services
@@ -294,11 +299,11 @@ DxeMain (
   //
   Status = CoreInstallConfigurationTable (&gEfiMemoryTypeInformationGuid, &gMemoryTypeInformation);
   ASSERT_EFI_ERROR (Status);
-  
+
   //
-  // If Loading modules At fixed address feature is enabled, install Load moduels at fixed address 
+  // If Loading modules At fixed address feature is enabled, install Load moduels at fixed address
   // Configuration Table so that user could easily to retrieve the top address to load Dxe and PEI
-  // Code and Tseg base to load SMM driver. 
+  // Code and Tseg base to load SMM driver.
   //
   if (PcdGet64(PcdLoadModuleAtFixAddressEnable) != 0) {
     Status = CoreInstallConfigurationTable (&gLoadFixedAddressConfigurationTableGuid, &gLoadModuleAtFixAddressConfigurationTable);
