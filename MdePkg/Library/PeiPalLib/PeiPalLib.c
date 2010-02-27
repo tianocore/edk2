@@ -1,7 +1,7 @@
 /** @file
   PAL Call Services Function.
 
-  Copyright (c) 2006 - 2008, Intel Corporation<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -57,13 +57,13 @@ PalCall (
   IN UINT64                  Arg4
   )
 {
-  UINT64                            PalCallAddress;
-  PAL_CALL_RETURN                   ReturnVal;
-  CONST EFI_PEI_SERVICES            **PeiServices;
-  EFI_STATUS                        Status;
-  EFI_SEC_PLATFORM_INFORMATION_PPI  *SecPlatformPpi;
-  IPF_HANDOFF_STATUS                IpfStatus;
-  UINT64                            RecordSize;
+  UINT64                              PalCallAddress;
+  PAL_CALL_RETURN                     ReturnVal;
+  CONST EFI_PEI_SERVICES              **PeiServices;
+  EFI_STATUS                          Status;
+  EFI_SEC_PLATFORM_INFORMATION_PPI    *SecPlatformPpi;
+  EFI_SEC_PLATFORM_INFORMATION_RECORD SecPlatformInfoRecord;
+  UINT64                              RecordSize;
 
   //
   // Get PEI Service Table Pointer
@@ -84,13 +84,13 @@ PalCall (
   //
   // Retrieve PAL call address from platform information reported by the PPI
   //
-  RecordSize = sizeof (IpfStatus);
+  RecordSize = sizeof (SecPlatformInfoRecord);
   SecPlatformPpi->PlatformInformation (
                     PeiServices,
                     &RecordSize,
-                    (EFI_SEC_PLATFORM_INFORMATION_RECORD *) &IpfStatus
+                    &SecPlatformInfoRecord
                     );
-  PalCallAddress = IpfStatus.PalCallAddress;
+  PalCallAddress = SecPlatformInfoRecord.ItaniumHealthFlags.PalCallAddress;
 
   ReturnVal = AsmPalCall (PalCallAddress, Index, Arg2, Arg3, Arg4);
 
