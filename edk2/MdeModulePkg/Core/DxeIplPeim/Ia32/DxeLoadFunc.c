@@ -15,6 +15,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "DxeIpl.h"
 #include "VirtualMemory.h"
 
+#define IDT_ENTRY_COUNT       33
+
 //
 // Global Descriptor Table (GDT)
 //
@@ -40,7 +42,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST IA32_DESCRIPTOR gGdt = {
   };
 
 GLOBAL_REMOVE_IF_UNREFERENCED  IA32_DESCRIPTOR gLidtDescriptor = {
-  sizeof (X64_IDT_GATE_DESCRIPTOR) * 32 - 1,
+  sizeof (X64_IDT_GATE_DESCRIPTOR) * IDT_ENTRY_COUNT - 1,
   0
 };
 
@@ -118,13 +120,13 @@ HandOffToDxeCore (
 
     Status = PeiServicesAllocatePages (
                EfiBootServicesData,
-               EFI_SIZE_TO_PAGES((SizeOfTemplate + sizeof (X64_IDT_GATE_DESCRIPTOR)) * 32),
+               EFI_SIZE_TO_PAGES((SizeOfTemplate + sizeof (X64_IDT_GATE_DESCRIPTOR)) * IDT_ENTRY_COUNT),
                &VectorAddress
                );
     ASSERT_EFI_ERROR (Status);
 
-    IdtTable      = (X64_IDT_GATE_DESCRIPTOR *) (UINTN) (VectorAddress + SizeOfTemplate * 32);
-    for (Index = 0; Index < 32; Index++) {
+    IdtTable      = (X64_IDT_GATE_DESCRIPTOR *) (UINTN) (VectorAddress + SizeOfTemplate * IDT_ENTRY_COUNT);
+    for (Index = 0; Index < IDT_ENTRY_COUNT; Index++) {
       IdtTable[Index].Ia32IdtEntry.Bits.GateType    =  0x8e;
       IdtTable[Index].Ia32IdtEntry.Bits.Reserved_0  =  0;
       IdtTable[Index].Ia32IdtEntry.Bits.Selector    =  SYS_CODE64_SEL;
@@ -141,6 +143,11 @@ HandOffToDxeCore (
     }
 
     gLidtDescriptor.Base = (UINTN) IdtTable;
+
+    //
+    // Disable interrupt of Debug timer, since new IDT table cannot handle it.
+    //
+    SaveAndSetDebugTimerInterrupt (FALSE);
 
     AsmWriteIdtr (&gLidtDescriptor);
 

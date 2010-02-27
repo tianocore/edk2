@@ -2,7 +2,7 @@
   Master header file for DxeIpl PEIM. All source files in this module should
   include this file for common definitions.
 
-Copyright (c) 2006 - 2009, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -45,13 +45,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PcdLib.h>
 #include <Library/S3Lib.h>
 #include <Library/RecoveryLib.h>
+#include <Library/DebugAgentLib.h>
 
 #define STACK_SIZE      0x20000
 #define BSP_STORE_SIZE  0x4000
 
 
 //
-// This PPI is installed to indicate the end of the PEI usage of memory 
+// This PPI is installed to indicate the end of the PEI usage of memory
 //
 extern CONST EFI_PEI_PPI_DESCRIPTOR gEndOfPeiSignalPpi;
 
@@ -61,7 +62,7 @@ extern CONST EFI_PEI_PPI_DESCRIPTOR gEndOfPeiSignalPpi;
    instance that contains DxeCore.
 
    @return FileHandle of DxeCore to load DxeCore.
-   
+
 **/
 EFI_PEI_FILE_HANDLE
 DxeIplFindDxeCore (
@@ -70,13 +71,13 @@ DxeIplFindDxeCore (
 
 
 /**
-   Main entry point to last PEIM 
-    
+   Main entry point to last PEIM
+
    @param This          Entry point for DXE IPL PPI
    @param PeiServices   General purpose services available to every PEIM.
    @param HobList       Address to the Pei HOB list
-   
-   @return EFI_SUCCESS              DXE core was successfully loaded. 
+
+   @return EFI_SUCCESS              DXE core was successfully loaded.
    @return EFI_OUT_OF_RESOURCES     There are not enough resources to load DXE core.
 
 **/
@@ -156,7 +157,7 @@ UpdateStackHob (
                                 output buffer. If the input
                                 section's GuidedSectionHeader.
                                 Attributes field has the
-                                EFI_GUIDED_SECTION_AUTH_STATUS_VALID 
+                                EFI_GUIDED_SECTION_AUTH_STATUS_VALID
                                 bit as clear,
                                 AuthenticationStatus must return
                                 zero. These bits reflect the
@@ -166,14 +167,14 @@ UpdateStackHob (
                                 EFI_SUCCESS, the value of
                                 AuthenticationStatus is
                                 undefined.
-  
+
   @retval EFI_SUCCESS           The InputSection was
                                 successfully processed and the
                                 section contents were returned.
-  
+
   @retval EFI_OUT_OF_RESOURCES  The system has insufficient
                                 resources to process the request.
-  
+
   @retval EFI_INVALID_PARAMETER The GUID in InputSection does
                                 not match this instance of the
                                 GUIDed Section Extraction PPI.
@@ -196,7 +197,7 @@ CustomGuidedSectionExtract (
    This function looks up the compression type field in the input section and
    applies the appropriate compression algorithm to compress the section to a
    callee allocated buffer.
-    
+
    @param  This                  Points to this instance of the
                                  EFI_PEI_DECOMPRESS_PEI PPI.
    @param  CompressionSection    Points to the compressed section.
@@ -204,14 +205,14 @@ CustomGuidedSectionExtract (
                                  sections.
    @param  OutputSize            Holds the returned size of the decompress
                                  section streams.
-   
+
    @retval EFI_SUCCESS           The section was decompressed successfully.
                                  OutputBuffer contains the resulting data and
                                  OutputSize contains the resulting size.
 
 **/
 EFI_STATUS
-EFIAPI 
+EFIAPI
 Decompress (
   IN CONST  EFI_PEI_DECOMPRESS_PPI  *This,
   IN CONST  EFI_COMPRESSION_SECTION *CompressionSection,
