@@ -29,9 +29,10 @@ typedef struct _EFI_USER_CREDENTIAL_PROTOCOL  EFI_USER_CREDENTIAL_PROTOCOL;
 /**
   Enroll a user on a credential provider.
 
-  This function enrolls a user profile using this credential provider. If a user profile is successfully 
-  enrolled, it calls the User Manager Protocol function Notify() to notify the user manager driver 
-  that credential information has changed.
+  This function enrolls and deletes a user profile using this credential provider. If a user profile
+  is successfully enrolled, it calls the User Manager Protocol function Notify() to notify the user 
+  manager driver that credential information has changed. If an enrolled user does exist, delete the 
+  user on the credential provider.
 
   @param[in] This                Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
   @param[in] User                The user profile to enroll.
@@ -60,14 +61,16 @@ EFI_STATUS
   the user credential provider does not require a form to identify the user, then this function should 
   return EFI_NOT_FOUND.
 
-  @param[in]  This       Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
-  @param[out] Hii        On return, holds the HII database handle.
-  @param[out] FormSetId  On return, holds the identifier of the form set which contains
-                         the form used during user identification.
-  @param[out] FormId     On return, holds the identifier of the form used during user identification.
+  @param[in]  This               Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
+  @param[out] Hii                On return, holds the HII database handle.
+  @param[out] FormSetId          On return, holds the identifier of the form set which contains
+                                 the form used during user identification.
+  @param[out] FormId             On return, holds the identifier of the form used during user 
+                                 identification.
  
-  @retval EFI_SUCCESS    Form returned successfully.
-  @retval EFI_NOT_FOUND  Form not returned.
+  @retval EFI_SUCCESS            Form returned successfully.
+  @retval EFI_NOT_FOUND          Form not returned.
+  @retval EFI_INVALID_PARAMETER  Hii is NULL or FormSetId is NULL or FormId is NULL.
 **/
 typedef
 EFI_STATUS
@@ -84,16 +87,19 @@ EFI_STATUS
   This optional function returns a bitmap which is less than or equal to the number of pixels specified 
   by Width and Height. If no such bitmap exists, then EFI_NOT_FOUND is returned. 
 
-  @param[in]     This    Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
-  @param[in,out] Width   On entry, points to the desired bitmap width. If NULL then no bitmap information will 
-                         be returned. On exit, points to the width of the bitmap returned.
-  @param[in,out] Height  On entry, points to the desired bitmap height. If NULL then no bitmap information will 
-                         be returned. On exit, points to the height of the bitmap returned
-  @param[out]    Hii     On return, holds the HII database handle. 
-  @param[out]    Image   On return, holds the HII image identifier. 
+  @param[in]      This           Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
+  @param[in, out] Width          On entry, points to the desired bitmap width. If NULL then no bitmap
+                                 information will be returned. On exit, points to the width of the  
+                                 bitmap returned.
+  @param[in, out] Height         On entry, points to the desired bitmap height. If NULL then no bitmap 
+                                 information will be returned. On exit, points to the height of the  
+                                 bitmap returned
+  @param[out]     Hii            On return, holds the HII database handle. 
+  @param[out]     Image          On return, holds the HII image identifier. 
  
-  @retval EFI_SUCCESS    Image identifier returned successfully.
-  @retval EFI_NOT_FOUND  Image identifier not returned.
+  @retval EFI_SUCCESS            Image identifier returned successfully.
+  @retval EFI_NOT_FOUND          Image identifier not returned.
+  @retval EFI_INVALID_PARAMETER  Hii is NULL or Image is NULL.
 **/
 typedef
 EFI_STATUS
@@ -111,12 +117,13 @@ EFI_STATUS
   This function returns a string which describes the credential provider. If no such string exists, then 
   EFI_NOT_FOUND is returned. 
 
-  @param[in]  This       Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
-  @param[out] Hii        On return, holds the HII database handle.
-  @param[out] String     On return, holds the HII string identifier.
+  @param[in]  This               Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
+  @param[out] Hii                On return, holds the HII database handle.
+  @param[out] String             On return, holds the HII string identifier.
  
-  @retval EFI_SUCCESS    String identifier returned successfully.
-  @retval EFI_NOT_FOUND  String identifier not returned.
+  @retval EFI_SUCCESS            String identifier returned successfully.
+  @retval EFI_NOT_FOUND          String identifier not returned.
+  @retval EFI_INVALID_PARAMETER  Hii is NULL or String is NULL.
 **/
 typedef
 EFI_STATUS
@@ -133,14 +140,18 @@ EFI_STATUS
   function is called after the credential-related information has been submitted on a form OR after a 
   call to Default() has returned that this credential is ready to log on.
 
-  @param[in]  This           Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
-  @param[in]  User           The user profile handle of the user profile currently being considered by the user 
-                             identity manager. If NULL, then no user profile is currently under consideration.
-  @param[out] Identifier     On return, points to the user identifier. 
+  @param[in]  This               Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
+  @param[in]  User               The user profile handle of the user profile currently being considered 
+                                 by the user identity manager. If NULL, then no user profile is currently 
+                                 under consideration.
+  @param[out] Identifier         On return, points to the user identifier. 
  
-  @retval EFI_SUCCESS        User identifier returned successfully.
-  @retval EFI_NOT_READY      No user identifier can be returned.
-  @retval EFI_ACCESS_DENIED  The user has been locked out of this user credential.
+  @retval EFI_SUCCESS            User identifier returned successfully.
+  @retval EFI_NOT_READY          No user identifier can be returned.
+  @retval EFI_ACCESS_DENIED      The user has been locked out of this user credential.
+  @retval EFI_NOT_FOUND          User is not NULL, and the specified user handle can't be found in user 
+                                 profile database 
+  @retval EFI_INVALID_PARAMETER  Identifier is NULL.
 **/
 typedef
 EFI_STATUS
@@ -156,11 +167,12 @@ EFI_STATUS
   This function is called when a credential provider is selected by the user. If AutoLogon returns 
   FALSE, then the user interface will be constructed by the User Identity Manager. 
 
-  @param[in]  This       Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
-  @param[out] AutoLogon  On return, points to the credential provider's capabilities after the credential provider 
-                         has been selected by the user. 
+  @param[in]  This               Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
+  @param[out] AutoLogon          On return, points to the credential provider's capabilities after 
+                                 the credential provider has been selected by the user. 
  
-  @retval EFI_SUCCESS    Credential provider successfully selected.
+  @retval EFI_SUCCESS            Credential provider successfully selected.
+  @retval EFI_INVALID_PARAMETER  AutoLogon is NULL.
 **/
 typedef
 EFI_STATUS
@@ -189,11 +201,12 @@ EFI_STATUS
 
   This function reports the default login behavior regarding this credential provider.  
 
-  @param[in]  This       Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
-  @param[out] AutoLogon  On return, holds whether the credential provider should be used by default to 
-                         automatically log on the user.  
+  @param[in]  This               Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
+  @param[out] AutoLogon          On return, holds whether the credential provider should be 
+                                 used by default to automatically log on the user.  
  
-  @retval EFI_SUCCESS    Default information successfully returned.
+  @retval EFI_SUCCESS            Default information successfully returned.
+  @retval EFI_INVALID_PARAMETER  AutoLogon is NULL.
 **/
 typedef 
 EFI_STATUS
@@ -217,10 +230,10 @@ EFI_STATUS
                                 information. 
  
   @retval EFI_SUCCESS           Information returned successfully.
-  @retval EFI_ACCESS_DENIED     The information about the specified user cannot be accessed by the 
-                                current user.
   @retval EFI_BUFFER_TOO_SMALL  The size specified by InfoSize is too small to hold all of the user 
                                 information. The size required is returned in *InfoSize.
+  @retval EFI_NOT_FOUND         The specified UserInfo does not refer to a valid user info handle.
+  @retval EFI_INVALID_PARAMETER Info is NULL or InfoSize is NULL.                                
 **/
 typedef
 EFI_STATUS
@@ -232,19 +245,20 @@ EFI_STATUS
   );
 
 /**
-  Enumerate all of the enrolled users on the platform.
+  Enumerate all of the user information records on the credential provider.
 
   This function returns the next user information record. To retrieve the first user information record 
   handle, point UserInfo at a NULL. Each subsequent call will retrieve another user information 
   record handle until there are no more, at which point UserInfo will point to NULL. 
 
-  @param[in]     This      Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
-  @param[in,out] UserInfo  On entry, points to the previous user information handle or NULL to start 
-                           enumeration. On exit, points to the next user information handle or NULL if there is 
-                           no more user information.
+  @param[in]     This            Points to this instance of the EFI_USER_CREDENTIAL_PROTOCOL.
+  @param[in,out] UserInfo        On entry, points to the previous user information handle or NULL to  
+                                 start enumeration. On exit, points to the next user information handle 
+                                 or NULL if there is no more user information.
  
-  @retval EFI_SUCCESS      User information returned.
-  @retval EFI_NOT_FOUND    No more user information found.
+  @retval EFI_SUCCESS            User information returned.
+  @retval EFI_NOT_FOUND          No more user information found.
+  @retval EFI_INVALID_PARAMETER  UserInfo is NULL.
 **/
 typedef
 EFI_STATUS

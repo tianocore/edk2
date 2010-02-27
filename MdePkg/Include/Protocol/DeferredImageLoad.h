@@ -41,19 +41,21 @@ typedef struct _EFI_DEFERRED_IMAGE_LOAD_PROTOCOL  EFI_DEFERRED_IMAGE_LOAD_PROTOC
   of the location of the executable image rather than its actual contents.  record handle until
   there are no more, at which point UserInfo will point to NULL. 
 
-  @param[in]  This             Points to this instance of the EFI_DEFERRED_IMAGE_LOAD_PROTOCOL.
-  @param[in]  ImageIndex       Zero-based index of the deferred index.
-  @param[out] ImageDevicePath  On return, points to a pointer to the device path of the image. The device path should 
-                               not be freed by the caller. 
-  @param[out] Image            On return, points to the first byte of the image or NULL if the image is not available. 
-                               The image should not be freed by the caller unless LoadImage() has been called 
-                               successfully.  
-  @param[out] ImageSize        On return, the size of the image, or 0 if the image is not available.
-  @param[out] BootOption       On return, points to TRUE if the image was intended as a boot option or FALSE if it 
-                               was not intended as a boot option. 
+  @param[in]  This               Points to this instance of the EFI_DEFERRED_IMAGE_LOAD_PROTOCOL.
+  @param[in]  ImageIndex         Zero-based index of the deferred index.
+  @param[out] ImageDevicePath    On return, points to a pointer to the device path of the image. 
+                                 The device path should not be freed by the caller. 
+  @param[out] Image              On return, points to the first byte of the image or NULL if the  
+                                 image is not available. The image should not be freed by the caller 
+                                 unless LoadImage() has been called successfully.  
+  @param[out] ImageSize          On return, the size of the image, or 0 if the image is not available.
+  @param[out] BootOption         On return, points to TRUE if the image was intended as a boot option 
+                                 or FALSE if it was not intended as a boot option. 
  
-  @retval EFI_SUCCESS          Image information returned successfully.
-  @retval EFI_NOT_FOUND        ImageIndex does not refer to a valid image.
+  @retval EFI_SUCCESS            Image information returned successfully.
+  @retval EFI_NOT_FOUND          ImageIndex does not refer to a valid image.
+  @retval EFI_INVALID_PARAMETER  ImageDevicePath is NULL or Image is NULL or ImageSize is NULL or 
+                                 BootOption is NULL.
 **/
 typedef
 EFI_STATUS
