@@ -410,7 +410,7 @@ EFI_STATUS
   with the user information record handle following UserInfo and continues until either the 
   information is found or there are no more user profiles.
   A match occurs when the Info.InfoType field matches the user information record type and the 
-  user information record data matches the portion of Info passed the EFI_USER_INFO header.
+  user information record data matches the portion of Info.
 
   @param[in]     This      Points to this instance of the EFI_USER_MANAGER_PROTOCOL.
   @param[in,out] User      On entry, points to the previously returned user profile handle or NULL to start 
@@ -421,14 +421,16 @@ EFI_STATUS
                            information record or NULL if not found. Can be NULL, in which case only one user 
                            information record per user can be returned. 
   @param[in]     Info      Points to the buffer containing the user information to be compared to the user 
-                           information record. If NULL, then only the user information record type is compared. 
+                           information record. If the user information record data is empty, then only the user 
+                           information record type is compared. 
                            If InfoSize is 0, then the user information record must be empty.
 
   @param[in]     InfoSize  The size of Info, in bytes. 
 
-  @retval EFI_SUCCESS      User information was found. User points to the user profile handle and 
-                           UserInfo points to the user information handle.
-  @retval EFI_NOT_FOUND    User information was not found. User points to NULL and UserInfo points to NULL.
+  @retval EFI_SUCCESS           User information was found. User points to the user profile handle and UserInfo
+                                points to the user information handle.
+  @retval EFI_NOT_FOUND         User information was not found. User points to NULL and UserInfo points to NULL.
+  @retval EFI_INVALID_PARAMETER User is NULL. Or Info is NULL.
 **/
 typedef
 EFI_STATUS
@@ -489,6 +491,9 @@ EFI_STATUS
   @retval EFI_ACCESS_DENIED     The information about the specified user cannot be accessed by the current user.
   @retval EFI_BUFFER_TOO_SMALL  The number of bytes specified by *InfoSize is too small to hold 
                                 the returned data. The actual size required is returned in *InfoSize.
+  @retval EFI_NOT_FOUND         User does not refer to a valid user profile or UserInfo does not refer to a valid
+                                user info handle.
+  @retval EFI_INVALID_PARAMETER Info is NULL or InfoSize is NULL.
 **/  
 typedef
 EFI_STATUS
@@ -524,6 +529,9 @@ EFI_STATUS
   @retval EFI_ACCESS_DENIED       The record is exclusive.
   @retval EFI_SECURITY_VIOLATION  The current user does not have permission to change the specified 
                                   user profile or user information record.
+  @retval EFI_NOT_FOUND           User does not refer to a valid user profile or UserInfo does not refer to a valid
+                                  user info handle.
+  @retval EFI_INVALID_PARAMETER   UserInfo is NULL or Info is NULL. 
 **/  
 typedef
 EFI_STATUS
@@ -563,15 +571,13 @@ EFI_STATUS
   handle, point UserInfo at a NULL. Each subsequent call will retrieve another user information 
   record handle until there are no more, at which point UserInfo will point to NULL. 
 
-  Note: in-consistency between code and the UEFI 2.3 specification that the type of the User parameter
-  is EFI_USER_PROFILE_HANDLE. It should be spec error and wait for spec update.
+  @param[in]     This           Points to this instance of the EFI_USER_MANAGER_PROTOCOL.
+  @param[in]     User           Handle of the user whose information will be deleted.
+  @param[in,out] UserInfo       Handle of the user information to remove.
 
-  @param[in]     This      Points to this instance of the EFI_USER_MANAGER_PROTOCOL.
-  @param[in]     User      Handle of the user whose information will be deleted.
-  @param[in,out] UserInfo  Handle of the user information to remove.
-
-  @retval EFI_SUCCESS      User information returned.
-  @retval EFI_NOT_FOUND    No more user information found.
+  @retval EFI_SUCCESS           User information returned.
+  @retval EFI_NOT_FOUND         No more user information found.
+  @retval EFI_INVALID_PARAMETER UserInfo is NULL.
 **/ 
 typedef
 EFI_STATUS
