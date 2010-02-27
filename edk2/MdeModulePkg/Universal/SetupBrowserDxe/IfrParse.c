@@ -1174,6 +1174,7 @@ ParseOpCodes (
       //
       if (CurrentExpression == NULL && MapScopeDepth > 0) {
         CurrentExpression = CreateExpression (CurrentForm);
+        ASSERT (MapExpressionList != NULL);
         InsertTailList (MapExpressionList, &CurrentExpression->Link);
         if (Scope == 0) {
           SingleOpCodeExpression = TRUE;
@@ -2120,6 +2121,7 @@ ParseOpCodes (
         //
         Status = PopCurrentExpression ((VOID **) &CurrentExpression);
         ASSERT_EFI_ERROR (Status);
+        ASSERT (MapScopeDepth > 0);
         MapScopeDepth --;
         break;
 

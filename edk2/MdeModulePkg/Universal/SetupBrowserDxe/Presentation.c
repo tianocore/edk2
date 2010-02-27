@@ -109,6 +109,8 @@ NewStrCat (
   hit, then 2 Unicode character will consume an output storage
   space with size of CHAR16 till a NARROW_CHAR is hit.
 
+  If String is NULL, then ASSERT ().
+
   @param String          The input string to be counted.
 
   @return Storage space for the input string.
@@ -122,6 +124,11 @@ GetStringWidth (
   UINTN Index;
   UINTN Count;
   UINTN IncrementValue;
+
+  ASSERT (String != NULL);
+  if (String == NULL) {
+    return 0;
+  }
 
   Index           = 0;
   Count           = 0;
