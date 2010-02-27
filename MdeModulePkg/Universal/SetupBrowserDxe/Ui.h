@@ -623,6 +623,8 @@ ClearLines (
   hit, then 2 Unicode character will consume an output storage
   space with size of CHAR16 till a NARROW_CHAR is hit.
 
+  If String is NULL, then ASSERT ().
+
   @param String          The input string to be counted.
 
   @return Storage space for the input string.

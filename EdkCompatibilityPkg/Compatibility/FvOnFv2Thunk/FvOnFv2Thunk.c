@@ -7,7 +7,7 @@ these two conditions are true:
 1) Framework module consuming FV is present
 2) And the platform only produces FV2
 
-Copyright (c) 2006 - 2008 Intel Corporation. <BR>
+Copyright (c) 2006 - 2010 Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -597,6 +597,7 @@ FvWriteFile (
   FirmwareVolume2 = Private->FirmwareVolume2;
 
   PiFileData = AllocateCopyPool (sizeof (EFI_FV_WRITE_FILE_DATA), FileData);
+  ASSERT (PiFileData != NULL);
 
   //
   // Framework Spec assume firmware files are Memory-Mapped.

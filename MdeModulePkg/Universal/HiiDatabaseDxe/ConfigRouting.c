@@ -3192,7 +3192,7 @@ Exit:
   @param  This                   A pointer to the EFI_HII_CONFIG_ROUTING_PROTOCOL
                                  instance.
   @param  ConfigResp             A null-terminated Unicode string in <ConfigResp>
-                                 format. It can be ConfigAltResp format string.
+                                 format.
   @param  Block                  A possibly null array of bytes representing the
                                  current  block. Only bytes referenced in the
                                  ConfigResp string  in the block are modified. If
@@ -3415,7 +3415,7 @@ Exit:
   @param  This                   A pointer to the EFI_HII_CONFIG_ROUTING_PROTOCOL
                                  instance.
   @param  Configuration          A null-terminated Unicode string in
-                                 <MultiConfigAltResp> format. It is <ConfigAltResp> format.
+                                 <MultiConfigAltResp> format.
   @param  Guid                   A pointer to the GUID value to search for in the
                                  routing portion of the ConfigResp string when
                                  retrieving  the requested data. If Guid is NULL,
