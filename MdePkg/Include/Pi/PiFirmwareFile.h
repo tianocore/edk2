@@ -1,7 +1,7 @@
 /** @file
   The firmware file related definitions in PI.
 
-  Copyright (c) 2006 - 2009, Intel Corporation                                                         
+  Copyright (c) 2006 - 2010, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -38,7 +38,7 @@ typedef union {
     /// and the checksum is calculated such that the entire file sums to zero.
     /// If the FFS_ATTRIB_CHECKSUM bit of the Attributes field is cleared to zero,
     /// the IntegrityCheck.Checksum.File field must be initialized with a value of
-    /// 0x55AA. The IntegrityCheck.Checksum.File field is valid any time the
+    /// 0xAA. The IntegrityCheck.Checksum.File field is valid any time the
     /// EFI_FILE_DATA_VALID bit is set in the State field.
     ///
     UINT8   File;
@@ -48,6 +48,12 @@ typedef union {
   ///
   UINT16    Checksum16;
 } EFI_FFS_INTEGRITY_CHECK;
+
+///
+/// FFS_FIXED_CHECKSUM is the checksum value used when the
+/// FFS_ATTRIB_CHECKSUM attribute bit is clear
+///
+#define FFS_FIXED_CHECKSUM  0xAA
 
 typedef UINT8 EFI_FV_FILETYPE;
 typedef UINT8 EFI_FFS_FILE_ATTRIBUTES;
