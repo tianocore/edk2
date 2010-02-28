@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define a class object to describe a module
 #
-# Copyright (c) 2007, Intel Corporation
+# Copyright (c) 2007 - 2010, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.    The full text of the license may be found at
@@ -34,7 +34,7 @@ from CommonClass import *
 #                                PEI_PCD_DRIVER | DXE_PCD_DRIVER
 # @var TianoR8FlashMap_h:        To store value for TianoR8FlashMap_h
 # @var InfVersion:               To store value for InfVersion
-# @var EfiSpecificationVersion:  To store value for EfiSpecificationVersion
+# @var UefiSpecificationVersion: To store value for UefiSpecificationVersion
 # @var EdkReleaseVersion:        To store value for EdkReleaseVersion
 # @var LibraryClass:             To store value for LibraryClass, it is a set structure as
 #                                [ LibraryClassClass, ...]
@@ -65,7 +65,6 @@ class ModuleHeaderClass(IdentificationClass, CommonHeaderClass, DefineClass):
         self.PcdIsDriver = ''
         self.TianoR8FlashMap_h = False
         self.InfVersion = ''
-        self.EfiSpecificationVersion = ''
         self.PiSpecificationVersion = ''
         self.UefiSpecificationVersion = ''
         self.EdkReleaseVersion = ''

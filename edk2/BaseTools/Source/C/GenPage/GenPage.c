@@ -1,6 +1,6 @@
 /** @file
 
-Copyright 2006 - 2008, Intel Corporation                                                         
+Copyright 2006 - 2010, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -92,7 +92,7 @@ Returns:
 --*/
 {
   printf ("%s v%d.%d -Utility to generate the EfiLoader image containing page table.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
-  printf ("Copyright (c) 2008 - 2009 Intel Corporation. All rights reserved.\n");
+  printf ("Copyright (c) 2008 - 2010 Intel Corporation. All rights reserved.\n");
 }
 
 VOID

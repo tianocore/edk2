@@ -1,6 +1,6 @@
 /** @file
 
-Copyright 2006 - 2009, Intel Corporation                                                         
+Copyright 2006 - 2010, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -273,7 +273,7 @@ Version (
   )
 {
   printf ("%s v%d.%d -Utility to retrieve and update the boot sector or MBR.\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION);
-  printf ("Copyright (c) 2007-2009 Intel Corporation. All rights reserved.\n");
+  printf ("Copyright (c) 2007-2010 Intel Corporation. All rights reserved.\n");
 }
 
 

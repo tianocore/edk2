@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2004 - 2008, Intel Corporation                                                         
+Copyright (c) 2004 - 2010, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -31,6 +31,7 @@ Abstract:
 #define MAX_VFR_LINE_LEN         4096
 
 #define EFI_IFR_MAX_LENGTH       0xFF
+#define MAX_IFR_EXPRESSION_DEPTH 0x9
 
 #define EFI_VARSTORE_ID_INVALID  0
 #define EFI_VAROFFSET_INVALID    0xFFFF

@@ -406,18 +406,10 @@ class UniFileClassObject(object):
     #
     # Load multiple .uni files
     #
-    def LoadUniFiles(self, FileList = []):
+    def LoadUniFiles(self, FileList):
         if len(FileList) > 0:
-            if len(FileList) > 1:
-                NewList = [];
-                for File in FileList:
-                    NewList.append (File)
-                NewList.sort()
-                for File in NewList:
-                    self.LoadUniFile(File)
-            else:
-                for File in FileList:
-                    self.LoadUniFile(File)
+            for File in FileList:
+                self.LoadUniFile(File)
 
     #
     # Add a string to list
@@ -488,7 +480,6 @@ class UniFileClassObject(object):
                         EdkLogger.debug(EdkLogger.DEBUG_5, Name)
                         Token = len(self.OrderedStringList[LangFind])
                         self.AddStringToList(Name, LangFind, Value, Token, Referenced, LangKey, Index)
-
         #
         # Retoken
         #
@@ -497,7 +488,17 @@ class UniFileClassObject(object):
         ReferencedStringList = []
         NotReferencedStringList = []
         Token = 0
+
+        #
+        # Order UNI token by their String Name
+        #
+        StringNameList = []
         for Item in self.OrderedStringList[LangName]:
+            StringNameList.append (Item.StringName)
+        StringNameList.sort()
+
+        for Name in StringNameList:
+            Item = self.FindStringValue (Name, LangName)
             if Item.Referenced == True:
                 Item.Token = Token
                 ReferencedStringList.append(Item)

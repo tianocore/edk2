@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007 - 2009, Intel Corporation                                                         
+Copyright (c) 2007 - 2010, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -40,7 +40,7 @@ Abstract:
 //
 #define UTILITY_MAJOR_VERSION 0
 #define UTILITY_MINOR_VERSION 1
-#define GENFV_UPDATE_TIME           " updated on 2008/11/21"
+#define GENFV_UPDATE_TIME           " updated on 2010/2/1"
 
 EFI_GUID  mEfiFirmwareFileSystem2Guid = EFI_FIRMWARE_FILE_SYSTEM2_GUID;
 
@@ -97,7 +97,7 @@ Returns:
   //
   // Copyright declaration
   // 
-  fprintf (stdout, "Copyright (c) 2007, Intel Corporation. All rights reserved.\n\n");
+  fprintf (stdout, "Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.\n\n");
 
   //
   // Details Option
@@ -126,11 +126,8 @@ Returns:
                         run in Flash. It supports DEC or HEX digital format.\n\
                         If it is set to zero, no rebase action will be taken\n");
   fprintf (stdout, "  -a AddressFile, --addrfile AddressFile\n\
-                        AddressFile is one file used to record boot driver base\n\
-                        address and runtime driver base address. And this tool\n\
-                        will update these two addresses after it relocates all\n\
-                        boot drivers and runtime drivers in this fv iamge to\n\
-                        the preferred loaded memory address.\n");
+                        AddressFile is one file used to record the child\n\
+                        FV base address when current FV base address is set.\n");
   fprintf (stdout, "  -m logfile, --map logfile\n\
                         Logfile is the output fv map file name. if it is not\n\
                         given, the FvName.map will be the default map file name\n"); 
@@ -194,10 +191,8 @@ Returns:
   CHAR8                 *InfFileImage;
   UINT32                InfFileSize;
   CHAR8                 *OutFileName;
-  CHAR8                 ValueString[_MAX_PATH];
   BOOLEAN               CapsuleFlag;
   BOOLEAN               DumpCapsule;
-  MEMORY_FILE           AddrMemoryFile;
   FILE                  *FpFile;
   EFI_CAPSULE_HEADER    *CapsuleHeader;
   UINT64                LogLevel, TempNumber;
@@ -546,62 +541,6 @@ Returns:
   }
   
   //
-  // Read boot and runtime address from address file
-  //
-  if (AddrFileName != NULL) {
-    VerboseMsg ("the input address file name is %s", AddrFileName);
-    Status = GetFileImage (AddrFileName, &InfFileImage, &InfFileSize);
-    if (EFI_ERROR (Status)) {
-      return STATUS_ERROR;
-    }
-
-    AddrMemoryFile.FileImage           = InfFileImage;
-    AddrMemoryFile.CurrentFilePointer  = InfFileImage;
-    AddrMemoryFile.Eof                 = InfFileImage + InfFileSize;
-
-    //
-    // Read the boot driver base address for this FV image
-    //
-    Status = FindToken (&AddrMemoryFile, OPTIONS_SECTION_STRING, EFI_FV_BOOT_DRIVER_BASE_ADDRESS_STRING, 0, ValueString);
-    if (Status == EFI_SUCCESS) {
-      //
-      // Get the base address
-      //
-      Status = AsciiStringToUint64 (ValueString, FALSE, &TempNumber);
-      if (EFI_ERROR (Status)) {
-        Error (NULL, 0, 2000, "Invalid parameter", "%s = %s", EFI_FV_BOOT_DRIVER_BASE_ADDRESS_STRING, ValueString);
-        return STATUS_ERROR;
-      }
-      mFvDataInfo.BootBaseAddress = TempNumber;
-      DebugMsg (NULL, 0, 9, "Boot driver base address", "%s = %s", EFI_FV_BOOT_DRIVER_BASE_ADDRESS_STRING, ValueString);
-    }
-  
-    //
-    // Read the FV runtime driver base address
-    //
-    Status = FindToken (&AddrMemoryFile, OPTIONS_SECTION_STRING, EFI_FV_RUNTIME_DRIVER_BASE_ADDRESS_STRING, 0, ValueString);
-    if (Status == EFI_SUCCESS) {
-      //
-      // Get the base address
-      //
-      Status = AsciiStringToUint64 (ValueString, FALSE, &TempNumber);
-      if (EFI_ERROR (Status)) {
-        Error (NULL, 0, 2000, "Invalid parameter", "%s = %s", EFI_FV_RUNTIME_DRIVER_BASE_ADDRESS_STRING, ValueString);
-        return STATUS_ERROR;
-      }
-      mFvDataInfo.RuntimeBaseAddress = TempNumber;
-      DebugMsg (NULL, 0, 9, "Runtime driver base address", "%s = %s", EFI_FV_RUNTIME_DRIVER_BASE_ADDRESS_STRING, ValueString);
-    }
-    
-    //
-    // free the allocated memory space for addr file.
-    //
-    free (InfFileImage);
-    InfFileImage = NULL;
-    InfFileSize  = 0;
-  }
-
-  //
   // Read the INF file image
   //
   if (InfFileName != NULL) {
@@ -683,32 +622,22 @@ Returns:
   //
   //  update boot driver address and runtime driver address in address file
   //
-  if (Status == EFI_SUCCESS && AddrFileName != NULL) {
+  if (Status == EFI_SUCCESS && AddrFileName != NULL && mFvBaseAddressNumber > 0) {
     FpFile = fopen (AddrFileName, "w");
     if (FpFile == NULL) {
       Error (NULL, 0, 0001, "Error opening file", AddrFileName);
       return STATUS_ERROR;
     }
-    fprintf (FpFile, OPTIONS_SECTION_STRING);
+    fprintf (FpFile, FV_BASE_ADDRESS_STRING);
     fprintf (FpFile, "\n");
-    if (mFvDataInfo.BootBaseAddress != 0) {
-      fprintf (FpFile, EFI_FV_BOOT_DRIVER_BASE_ADDRESS_STRING);
+    for (Index = 0; Index < mFvBaseAddressNumber; Index ++) {
       fprintf (
         FpFile,
-        " = 0x%llx\n",
-        (unsigned long long)mFvDataInfo.BootBaseAddress
+        "0x%llx\n",
+        (unsigned long long)mFvBaseAddress[Index]
         );
-      DebugMsg (NULL, 0, 9, "Updated boot driver base address", "%s = 0x%llx", EFI_FV_RUNTIME_DRIVER_BASE_ADDRESS_STRING, (unsigned long long) mFvDataInfo.BootBaseAddress);
     }
-    if (mFvDataInfo.RuntimeBaseAddress != 0) {
-      fprintf (FpFile, EFI_FV_RUNTIME_DRIVER_BASE_ADDRESS_STRING);
-      fprintf (
-        FpFile,
-        " = 0x%llx\n",
-        (unsigned long long)mFvDataInfo.RuntimeBaseAddress
-        );
-      DebugMsg (NULL, 0, 9, "Updated runtime driver base address", "%s = 0x%llx", EFI_FV_RUNTIME_DRIVER_BASE_ADDRESS_STRING, (unsigned long long) mFvDataInfo.RuntimeBaseAddress);
-    }
+    fflush (FpFile);
     fclose (FpFile);
   }
   

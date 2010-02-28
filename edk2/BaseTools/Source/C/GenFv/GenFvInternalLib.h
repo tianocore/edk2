@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2004 - 2008, Intel Corporation                                                         
+Copyright (c) 2004 - 2010, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -67,6 +67,7 @@ Abstract:
 #define OPTIONS_SECTION_STRING                "[options]"
 #define ATTRIBUTES_SECTION_STRING             "[attributes]"
 #define FILES_SECTION_STRING                  "[files]"
+#define FV_BASE_ADDRESS_STRING                "[FV_BASE_ADDRESS]"
 
 //
 // Options section
@@ -82,8 +83,6 @@ Abstract:
 #define EFI_CAPSULE_HEADER_SIZE_STRING    "EFI_CAPSULE_HEADER_SIZE"
 #define EFI_CAPSULE_FLAGS_STRING          "EFI_CAPSULE_FLAGS"
 #define EFI_CAPSULE_VERSION_STRING        "EFI_CAPSULE_VERSION"
-#define EFI_FV_BOOT_DRIVER_BASE_ADDRESS_STRING    "EFI_BOOT_DRIVER_BASE_ADDRESS"
-#define EFI_FV_RUNTIME_DRIVER_BASE_ADDRESS_STRING "EFI_RUNTIME_DRIVER_BASE_ADDRESS"
 
 #define EFI_FV_TOTAL_SIZE_STRING    "EFI_FV_TOTAL_SIZE"
 #define EFI_FV_TAKEN_SIZE_STRING    "EFI_FV_TAKEN_SIZE"
@@ -205,13 +204,6 @@ Abstract:
 #define CHECKSUM_BIT_MASK     0x80
 
 //
-// Rebase File type
-//
-#define REBASE_XIP_FILE       0x1
-#define REBASE_BOOTTIME_FILE  0x2
-#define REBASE_RUNTIME_FILE   0x4
-
-//
 // Private data types
 //
 //
@@ -228,8 +220,6 @@ typedef struct {
 typedef struct {
   BOOLEAN                 BaseAddressSet;
   EFI_PHYSICAL_ADDRESS    BaseAddress;
-  EFI_PHYSICAL_ADDRESS    BootBaseAddress;
-  EFI_PHYSICAL_ADDRESS    RuntimeBaseAddress;  
   EFI_GUID                FvFileSystemGuid;
   BOOLEAN                 FvFileSystemGuidSet;
   EFI_GUID                FvNameGuid;
@@ -270,6 +260,9 @@ extern CAP_INFO   mCapDataInfo;
 extern EFI_GUID   mEfiFirmwareFileSystem2Guid;
 extern UINT32     mFvTotalSize;
 extern UINT32     mFvTakenSize;
+
+extern EFI_PHYSICAL_ADDRESS mFvBaseAddress[];
+extern UINT32               mFvBaseAddressNumber;
 //
 // Local function prototypes
 //

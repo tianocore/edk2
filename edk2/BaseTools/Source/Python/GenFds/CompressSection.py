@@ -29,8 +29,8 @@ class CompressSection (CompressSectionClassObject) :
 
     ## compress types: PI standard and non PI standard
     CompTypeDict = {
-        'PI_STD'     : 'PI_STD',
-        'NON_PI_STD' : 'NON_PI_STD'
+        'PI_STD'  : 'PI_STD',
+        'PI_NONE' : 'PI_NONE'
     }
 
     ## The constructor

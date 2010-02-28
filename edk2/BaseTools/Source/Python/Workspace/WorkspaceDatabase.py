@@ -1,7 +1,7 @@
 ## @file
 # This file is used to create a database used by build tool
 #
-# Copyright (c) 2008 - 2009, Intel Corporation
+# Copyright (c) 2008 - 2010, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -134,6 +134,7 @@ class DscBuildData(PlatformBuildClassObject):
         self._LibraryClasses    = None
         self._Pcds              = None
         self._BuildOptions      = None
+        self._LoadFixAddress    = None
 
     ## Get architecture
     def _GetArch(self):
@@ -185,6 +186,8 @@ class DscBuildData(PlatformBuildClassObject):
             elif Name == TAB_DSC_DEFINES_SKUID_IDENTIFIER:
                 if self._SkuName == None:
                     self._SkuName = Record[1]
+            elif Name == TAB_FIX_LOAD_TOP_MEMORY_ADDRESS:
+                self._LoadFixAddress = Record[1]
         # set _Header to non-None in order to avoid database re-querying
         self._Header = 'DUMMY'
 
@@ -308,6 +311,15 @@ class DscBuildData(PlatformBuildClassObject):
             if self._RtBaseAddress == None:
                 self._RtBaseAddress = ''
         return self._RtBaseAddress
+
+    ## Retrieve the top address for the load fix address
+    def _GetLoadFixAddress(self):
+        if self._LoadFixAddress == None:
+            if self._Header == None:
+                self._GetHeaderInfo()
+            if self._LoadFixAddress == None:
+                self._LoadFixAddress = ''
+        return self._LoadFixAddress
 
     ## Retrieve [SkuIds] section information
     def _GetSkuIds(self):
@@ -513,9 +525,18 @@ class DscBuildData(PlatformBuildClassObject):
     def _GetBuildOptions(self):
         if self._BuildOptions == None:
             self._BuildOptions = {}
-            RecordList = self._RawData[MODEL_META_DATA_BUILD_OPTION]
+            #
+            # Retrieve build option for EDKII style module
+            #
+            RecordList = self._RawData[MODEL_META_DATA_BUILD_OPTION, 'COMMON', EDKII_NAME]
             for ToolChainFamily, ToolChain, Option, Dummy1, Dummy2, Dummy3, Dummy4 in RecordList:
-                self._BuildOptions[ToolChainFamily, ToolChain] = Option
+                self._BuildOptions[ToolChainFamily, ToolChain, EDKII_NAME] = Option
+            #
+            # Retrieve build option for EDK style module
+            #
+            RecordList = self._RawData[MODEL_META_DATA_BUILD_OPTION, 'COMMON', EDK_NAME]     
+            for ToolChainFamily, ToolChain, Option, Dummy1, Dummy2, Dummy3, Dummy4 in RecordList:
+                self._BuildOptions[ToolChainFamily, ToolChain, EDK_NAME] = Option
         return self._BuildOptions
 
     ## Retrieve non-dynamic PCD settings
@@ -730,6 +751,7 @@ class DscBuildData(PlatformBuildClassObject):
     MakefileName        = property(_GetMakefileName)
     BsBaseAddress       = property(_GetBsBaseAddress)
     RtBaseAddress       = property(_GetRtBaseAddress)
+    LoadFixAddress      = property(_GetLoadFixAddress)
 
     SkuIds              = property(_GetSkuIds)
     Modules             = property(_GetModules)
@@ -1254,10 +1276,10 @@ class InfBuildData(ModuleBuildClassObject):
             if Name in self:
                 self[Name] = Record[1]
             # some special items in [Defines] section need special treatment
-            elif Name == 'EFI_SPECIFICATION_VERSION':
+            elif Name in ('EFI_SPECIFICATION_VERSION', 'UEFI_SPECIFICATION_VERSION'):
                 if self._Specification == None:
                     self._Specification = sdict()
-                self._Specification[Name] = Record[1]
+                self._Specification['UEFI_SPECIFICATION_VERSION'] = Record[1]
             elif Name == 'EDK_RELEASE_VERSION':
                 if self._Specification == None:
                     self._Specification = sdict()

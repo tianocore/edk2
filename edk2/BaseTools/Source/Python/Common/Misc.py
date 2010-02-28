@@ -22,6 +22,7 @@ import threading
 import time
 import re
 import cPickle
+import array
 from UserDict import IterableUserDict
 from UserList import UserList
 
@@ -1343,6 +1344,90 @@ class PathClass(object):
 
     Key = property(_GetFileKey)
 
+## Parse PE image to get the required PE informaion.
+#
+class PeImageClass():
+    ## Constructor
+    #
+    #   @param  File FilePath of PeImage
+    #
+    def __init__(self, PeFile):
+        self.FileName   = PeFile
+        self.IsValid    = False
+        self.Size       = 0
+        self.EntryPoint = 0
+        self.SectionAlignment  = 0
+        self.SectionHeaderList = []
+        self.ErrorInfo = ''
+        try:
+             PeObject = open(PeFile, 'rb')
+        except:
+            self.ErrorInfo = self.FileName + ' can not be found\n'
+            return
+        # Read DOS header
+        ByteArray = array.array('B')
+        ByteArray.fromfile(PeObject, 0x3E)
+        ByteList = ByteArray.tolist()
+        # DOS signature should be 'MZ'
+        if self._ByteListToStr (ByteList[0x0:0x2]) != 'MZ':
+            self.ErrorInfo = self.FileName + ' has no valid DOS signature MZ'
+            return
+
+        # Read 4 byte PE Signature
+        PeOffset = self._ByteListToInt(ByteList[0x3C:0x3E])
+        PeObject.seek(PeOffset)
+        ByteArray = array.array('B')
+        ByteArray.fromfile(PeObject, 4)
+        # PE signature should be 'PE\0\0'
+        if ByteArray.tostring() != 'PE\0\0':
+            self.ErrorInfo = self.FileName + ' has no valid PE signature PE00'
+            return
+
+        # Read PE file header
+        ByteArray = array.array('B')
+        ByteArray.fromfile(PeObject, 0x14)
+        ByteList = ByteArray.tolist()
+        SecNumber = self._ByteListToInt(ByteList[0x2:0x4])
+        if SecNumber == 0:
+            self.ErrorInfo = self.FileName + ' has no section header'
+            return
+
+        # Read PE optional header
+        OptionalHeaderSize = self._ByteListToInt(ByteArray[0x10:0x12])
+        ByteArray = array.array('B')
+        ByteArray.fromfile(PeObject, OptionalHeaderSize)
+        ByteList = ByteArray.tolist()
+        self.EntryPoint       = self._ByteListToInt(ByteList[0x10:0x14])
+        self.SectionAlignment = self._ByteListToInt(ByteList[0x20:0x24])
+        self.Size             = self._ByteListToInt(ByteList[0x38:0x3C])
+
+        # Read each Section Header
+        for Index in range(SecNumber):
+            ByteArray = array.array('B')
+            ByteArray.fromfile(PeObject, 0x28)
+            ByteList = ByteArray.tolist()
+            SecName  = self._ByteListToStr(ByteList[0:8])
+            SecVirtualSize = self._ByteListToInt(ByteList[8:12])
+            SecRawAddress  = self._ByteListToInt(ByteList[20:24])
+            SecVirtualAddress = self._ByteListToInt(ByteList[12:16])
+            self.SectionHeaderList.append((SecName, SecVirtualAddress, SecRawAddress, SecVirtualSize))
+        self.IsValid = True
+        PeObject.close()
+
+    def _ByteListToStr(self, ByteList):
+        String = ''
+        for index in range(len(ByteList)):
+            if ByteList[index] == 0: 
+                break
+            String += chr(ByteList[index])
+        return String
+
+    def _ByteListToInt(self, ByteList):
+        Value = 0
+        for index in range(len(ByteList) - 1, -1, -1):
+            Value = (Value << 8) | int(ByteList[index])
+        return Value
+        
 ##
 #
 # This acts like the main() function for the script, unless it is 'import'ed into another

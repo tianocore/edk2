@@ -1,6 +1,6 @@
 /**
 
-Copyright (c) 2004-2008, Intel Corporation                                                         
+Copyright (c) 2004-2010, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -119,7 +119,7 @@ Returns:
   //
   // Copyright declaration
   // 
-  fprintf (stdout, "Copyright (c) 2007, Intel Corporation. All rights reserved.\n\n");
+  fprintf (stdout, "Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.\n\n");
 
   //
   // Details Option
@@ -287,6 +287,8 @@ Returns:
   EFI_COMMON_SECTION_HEADER  TempSectHeader;
   EFI_TE_IMAGE_HEADER        TeHeader;
   UINT32                     TeOffset;
+  EFI_GUID_DEFINED_SECTION   GuidSectHeader;
+  UINT32                     HeaderSize;
 
   Size          = 0;
   Offset        = 0;
@@ -330,6 +332,7 @@ Returns:
     // Check this section is Te/Pe section, and Calculate the numbers of Te/Pe section.
     //
     TeOffset = 0;
+    HeaderSize = sizeof (EFI_COMMON_SECTION_HEADER);
     fread (&TempSectHeader, 1, sizeof (TempSectHeader), InFile);
     if (TempSectHeader.Type == EFI_SECTION_TE) {
       (*PESectionNum) ++;
@@ -339,8 +342,14 @@ Returns:
       }
     } else if (TempSectHeader.Type == EFI_SECTION_PE32) {
       (*PESectionNum) ++;
+    } else if (TempSectHeader.Type == EFI_SECTION_GUID_DEFINED) {
+      fseek (InFile, 0, SEEK_SET);
+      fread (&GuidSectHeader, 1, sizeof (GuidSectHeader), InFile);
+      if ((GuidSectHeader.Attributes & EFI_GUIDED_SECTION_PROCESSING_REQUIRED) == 0) {
+        HeaderSize = GuidSectHeader.DataOffset;
+      }
+      (*PESectionNum) ++;
     } else if (TempSectHeader.Type == EFI_SECTION_COMPRESSION || 
-               TempSectHeader.Type == EFI_SECTION_GUID_DEFINED ||
                TempSectHeader.Type == EFI_SECTION_FIRMWARE_VOLUME_IMAGE) {
       //
       // for the encapsulated section, assume it contains Pe/Te section 
@@ -358,17 +367,18 @@ Returns:
       TeOffset = InputFileAlign [Index] - (TeOffset % InputFileAlign [Index]);
       TeOffset = TeOffset % InputFileAlign [Index];
     }
-     
+
     //
     // make sure section data meet its alignment requirement by adding one raw pad section.
     // But the different sections have the different section header. Necessary or not?
     // Based on section type to adjust offset? Todo
     //
-    if ((InputFileAlign [Index] != 0) && (((Size + sizeof (EFI_COMMON_SECTION_HEADER) + TeOffset) % InputFileAlign [Index]) != 0)) {
-      Offset = (Size + 2 * sizeof (EFI_COMMON_SECTION_HEADER) + TeOffset + InputFileAlign [Index] - 1) & ~(InputFileAlign [Index] - 1);
-      Offset = Offset - Size - sizeof (EFI_COMMON_SECTION_HEADER) - TeOffset;
+    if ((InputFileAlign [Index] != 0) && (((Size + HeaderSize + TeOffset) % InputFileAlign [Index]) != 0)) {
+      Offset = (Size + sizeof (EFI_COMMON_SECTION_HEADER) + HeaderSize + TeOffset + InputFileAlign [Index] - 1) & ~(InputFileAlign [Index] - 1);
+      Offset = Offset - Size - HeaderSize - TeOffset;
        
       if (FileBuffer != NULL && ((Size + Offset) < *BufferLength)) {
+        memset (FileBuffer + Size, 0, Offset);
         SectHeader          = (EFI_COMMON_SECTION_HEADER *) (FileBuffer + Size);
         SectHeader->Type    = EFI_SECTION_RAW;
         SectHeader->Size[0] = (UINT8) (Offset & 0xff);

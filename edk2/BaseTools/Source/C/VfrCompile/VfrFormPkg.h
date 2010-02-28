@@ -2,7 +2,7 @@
   
   The definition of CFormPkg's member function
 
-Copyright (c) 2004 - 2009, Intel Corporation                                                         
+Copyright (c) 2004 - 2010, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -81,7 +81,7 @@ struct SPendingAssign {
   CHAR8                   *mMsg;
   struct SPendingAssign   *mNext;
 
-  SPendingAssign (IN CHAR8 *, IN VOID *, IN UINT32, IN UINT32, IN CHAR8 *);
+  SPendingAssign (IN CHAR8 *, IN VOID *, IN UINT32, IN UINT32, IN CONST CHAR8 *);
   ~SPendingAssign ();
 
   VOID   SetAddrAndLen (IN VOID *, IN UINT32);
@@ -108,8 +108,8 @@ private:
 
   UINT32              mPkgLength;
 
-  VOID                _WRITE_PKG_LINE (IN FILE *, IN UINT32 , IN CHAR8 *, IN CHAR8 *, IN UINT32);
-  VOID                _WRITE_PKG_END (IN FILE *, IN UINT32 , IN CHAR8 *, IN CHAR8 *, IN UINT32);
+  VOID                _WRITE_PKG_LINE (IN FILE *, IN UINT32 , IN CONST CHAR8 *, IN CHAR8 *, IN UINT32);
+  VOID                _WRITE_PKG_END (IN FILE *, IN UINT32 , IN CONST CHAR8 *, IN CHAR8 *, IN UINT32);
 
 private:
   SPendingAssign      *PendingAssignList;
@@ -131,7 +131,7 @@ public:
   EFI_VFR_RETURN_CODE GenCFile (IN CHAR8 *, IN FILE *, IN PACKAGE_DATA *PkgData = NULL);
 
 public:
-  EFI_VFR_RETURN_CODE AssignPending (IN CHAR8 *, IN VOID *, IN UINT32, IN UINT32, IN CHAR8 *Msg = NULL);
+  EFI_VFR_RETURN_CODE AssignPending (IN CHAR8 *, IN VOID *, IN UINT32, IN UINT32, IN CONST CHAR8 *Msg = NULL);
   VOID                DoPendingAssign (IN CHAR8 *, IN VOID *, IN UINT32);
   bool                HavePendingUnassigned (VOID);
   VOID                PendingAssignPrintAll (VOID);
@@ -195,11 +195,11 @@ extern CIfrRecordInfoDB gCIfrRecordInfoDB;
 /*
  * The definition of CIfrObj
  */
-extern bool  gCreateOp;
+extern BOOLEAN  gCreateOp;
 
 class CIfrObj {
 private:
-  bool    mDelayEmit;
+  BOOLEAN mDelayEmit;
 
   CHAR8   *mObjBinBuf;
   UINT8   mObjBinLen;
@@ -227,7 +227,7 @@ public:
 
   inline bool ExpendObjBin (IN UINT8 Size) {
     if ((mDelayEmit == TRUE) && ((mObjBinLen + Size) > mObjBinLen)) {
-      mObjBinLen += Size;
+      mObjBinLen = mObjBinLen + Size;
       return TRUE;
     } else {
       return FALSE;
@@ -248,7 +248,7 @@ public:
 
   VOID IncLength (UINT8 Size) {
     if ((mHeader->Length + Size) > mHeader->Length) {
-      mHeader->Length += Size;
+      mHeader->Length = mHeader->Length + Size;
     }
   }
 
@@ -557,6 +557,7 @@ static CIfrMinMaxStepData *gCurrentMinMaxData = NULL;
 class CIfrFormSet : public CIfrObj, public CIfrOpHeader {
 private:
   EFI_IFR_FORM_SET *mFormSet;
+  EFI_GUID *mClassGuid;
 
 public:
   CIfrFormSet (UINT8 Size) : CIfrObj (EFI_IFR_FORM_SET_OP, (CHAR8 **)&mFormSet, Size),
@@ -565,6 +566,7 @@ public:
     mFormSet->FormSetTitle = EFI_STRING_ID_INVALID;
     mFormSet->Flags        = 0;
     memset (&mFormSet->Guid, 0, sizeof (EFI_GUID));
+    mClassGuid = (EFI_GUID *) (mFormSet + 1);
   }
 
   VOID SetGuid (IN EFI_GUID *Guid) {
@@ -580,7 +582,7 @@ public:
   }
 
   VOID SetClassGuid (IN EFI_GUID *Guid) {
-    memcpy (&(mFormSet->ClassGuid[mFormSet->Flags++]), Guid, sizeof (EFI_GUID));
+    memcpy (&(mClassGuid[mFormSet->Flags++]), Guid, sizeof (EFI_GUID));
   }
 
   UINT8 GetFlags() {
@@ -620,10 +622,8 @@ public:
 #define EFI_FORM_ID_MAX                    0xFFFF
 #define EFI_FREE_FORM_ID_BITMAP_SIZE     ((EFI_FORM_ID_MAX + 1) / EFI_BITS_PER_UINT32)
 
-class CIfrForm : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_FORM  *mForm;
-
+class CIfrFormId {
+public:
   STATIC UINT32 FormIdBitMap[EFI_FREE_FORM_ID_BITMAP_SIZE];
 
   STATIC BOOLEAN ChekFormIdFree (IN EFI_FORM_ID FormId) {
@@ -639,6 +639,11 @@ private:
 
     FormIdBitMap[Index] |= (0x80000000 >> Offset);
   }
+};
+
+class CIfrForm : public CIfrObj, public CIfrOpHeader {
+private:
+  EFI_IFR_FORM  *mForm;
 
 public:
   CIfrForm () : CIfrObj (EFI_IFR_FORM_OP, (CHAR8 **)&mForm), 
@@ -654,16 +659,54 @@ public:
       //
       return VFR_RETURN_INVALID_PARAMETER;
     }
-    if (CIfrForm::ChekFormIdFree (FormId) == FALSE) {
+    if (CIfrFormId::ChekFormIdFree (FormId) == FALSE) {
       return VFR_RETURN_FORMID_REDEFINED;
     }
     mForm->FormId = FormId;
-    CIfrForm::MarkFormIdUsed (FormId);
+    CIfrFormId::MarkFormIdUsed (FormId);
     return VFR_RETURN_SUCCESS;
   }
 
   VOID SetFormTitle (IN EFI_STRING_ID FormTitle) {
     mForm->FormTitle = FormTitle;
+  }
+};
+
+class CIfrFormMap : public CIfrObj, public CIfrOpHeader {
+private:
+  EFI_IFR_FORM_MAP        *mFormMap;
+  EFI_IFR_FORM_MAP_METHOD *mMethodMap;
+
+public:
+  CIfrFormMap () : CIfrObj (EFI_IFR_FORM_MAP_OP, (CHAR8 **)&mFormMap, sizeof (EFI_IFR_FORM_MAP), TRUE), 
+                   CIfrOpHeader (EFI_IFR_FORM_MAP_OP, &mFormMap->Header) {
+    mFormMap->FormId = 0;
+    mMethodMap       = (EFI_IFR_FORM_MAP_METHOD *) (mFormMap + 1);
+  }
+
+  EFI_VFR_RETURN_CODE SetFormId (IN EFI_FORM_ID FormId) {
+    if (FormId == 0) {
+      //
+      // FormId can't be 0.
+      //
+      return VFR_RETURN_INVALID_PARAMETER;
+    }
+    if (CIfrFormId::ChekFormIdFree (FormId) == FALSE) {
+      return VFR_RETURN_FORMID_REDEFINED;
+    }
+    mFormMap->FormId = FormId;
+    CIfrFormId::MarkFormIdUsed (FormId);
+    return VFR_RETURN_SUCCESS;
+  }
+
+  VOID SetFormMapMethod (IN EFI_STRING_ID MethodTitle, IN EFI_GUID *MethodGuid) {
+    if (ExpendObjBin (sizeof (EFI_IFR_FORM_MAP_METHOD))) {
+      IncLength (sizeof (EFI_IFR_FORM_MAP_METHOD));
+
+      mMethodMap->MethodTitle = MethodTitle;
+      memcpy (&(mMethodMap->MethodIdentifier), MethodGuid, sizeof (EFI_GUID));
+      mMethodMap ++;
+    }
   }
 };
 
@@ -696,7 +739,7 @@ public:
     UINT8 Len;
 
     if (Name != NULL) {
-      Len = strlen (Name);
+      Len = (UINT8) strlen (Name);
       if (Len != 0) {
         if (ExpendObjBin (Len) == TRUE) {
           IncLength (Len);
@@ -830,6 +873,66 @@ public:
   CIfrValue () : CIfrObj (EFI_IFR_VALUE_OP, (CHAR8 **)&mValue),
                 CIfrOpHeader (EFI_IFR_VALUE_OP, &mValue->Header) {}
 
+};
+
+class CIfrRead : public CIfrObj, public CIfrOpHeader{
+private:
+  EFI_IFR_READ *mRead;
+
+public:
+  CIfrRead () : CIfrObj (EFI_IFR_READ_OP, (CHAR8 **)&mRead),
+                CIfrOpHeader (EFI_IFR_READ_OP, &mRead->Header) {}
+
+};
+
+class CIfrWrite : public CIfrObj, public CIfrOpHeader{
+private:
+  EFI_IFR_WRITE *mWrite;
+
+public:
+  CIfrWrite () : CIfrObj (EFI_IFR_WRITE_OP, (CHAR8 **)&mWrite),
+                CIfrOpHeader (EFI_IFR_WRITE_OP, &mWrite->Header) {}
+
+};
+
+class CIfrGet : public CIfrObj, public CIfrOpHeader{
+private:
+  EFI_IFR_GET *mGet;
+
+public:
+  CIfrGet (
+  IN UINT32 LineNo  
+  ) : CIfrObj (EFI_IFR_GET_OP, (CHAR8 **)&mGet),
+      CIfrOpHeader (EFI_IFR_GET_OP, &mGet->Header) {
+    SetLineNo (LineNo);
+  }
+
+  VOID SetVarInfo (IN EFI_VARSTORE_INFO *Info) {
+    mGet->VarStoreId             = Info->mVarStoreId;
+    mGet->VarStoreInfo.VarName   = Info->mInfo.mVarName;
+    mGet->VarStoreInfo.VarOffset = Info->mInfo.mVarOffset;
+    mGet->VarStoreType           = Info->mVarType;
+  }
+};
+
+class CIfrSet : public CIfrObj, public CIfrOpHeader{
+private:
+  EFI_IFR_SET *mSet;
+
+public:
+  CIfrSet (
+  IN UINT32 LineNo
+  ) : CIfrObj (EFI_IFR_SET_OP, (CHAR8 **)&mSet),
+      CIfrOpHeader (EFI_IFR_SET_OP, &mSet->Header) {
+    SetLineNo (LineNo);
+  }
+
+  VOID SetVarInfo (IN EFI_VARSTORE_INFO *Info) {
+    mSet->VarStoreId             = Info->mVarStoreId;
+    mSet->VarStoreInfo.VarName   = Info->mInfo.mVarName;
+    mSet->VarStoreInfo.VarOffset = Info->mInfo.mVarOffset;
+    mSet->VarStoreType           = Info->mVarType;
+  }
 };
 
 class CIfrSubtitle : public CIfrObj, public CIfrOpHeader, public CIfrStatementHeader {
@@ -2306,6 +2409,19 @@ public:
   IN UINT32 LineNo
   ) : CIfrObj (EFI_IFR_LESS_THAN_OP, (CHAR8 **)&mLessThan),
       CIfrOpHeader (EFI_IFR_LESS_THAN_OP, &mLessThan->Header) {
+    SetLineNo (LineNo);
+  }
+};
+
+class CIfrMap : public CIfrObj, public CIfrOpHeader{
+private:
+  EFI_IFR_MAP *mMap;
+
+public:
+  CIfrMap (
+  IN UINT32 LineNo  
+  ) : CIfrObj (EFI_IFR_MAP_OP, (CHAR8 **)&mMap),
+      CIfrOpHeader (EFI_IFR_MAP_OP, &mMap->Header) {
     SetLineNo (LineNo);
   }
 };

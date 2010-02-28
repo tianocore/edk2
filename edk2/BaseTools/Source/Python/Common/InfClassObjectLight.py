@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define each component of INF file
 #
-# Copyright (c) 2007, Intel Corporation
+# Copyright (c) 2007 - 2010, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -71,7 +71,8 @@ class InfHeader(ModuleHeaderClass):
         TAB_INF_DEFINES_BASE_NAME                   : "Name",
         TAB_INF_DEFINES_FILE_GUID                   : "Guid",
         TAB_INF_DEFINES_MODULE_TYPE                 : "ModuleType",
-        TAB_INF_DEFINES_EFI_SPECIFICATION_VERSION   : "EfiSpecificationVersion",
+        TAB_INF_DEFINES_EFI_SPECIFICATION_VERSION   : "UefiSpecificationVersion",
+        TAB_INF_DEFINES_UEFI_SPECIFICATION_VERSION  : "UefiSpecificationVersion",
         TAB_INF_DEFINES_EDK_RELEASE_VERSION         : "EdkReleaseVersion",        
 
         # Optional Fields
@@ -583,7 +584,7 @@ class Inf(InfObject):
                     ModuleHeader.PcdIsDriver = Value
                 elif Name == TAB_INF_DEFINES_MODULE_TYPE:
                     ModuleHeader.ModuleType = Value
-                elif Name == TAB_INF_DEFINES_UEFI_SPECIFICATION_VERSION:
+                elif Name in (TAB_INF_DEFINES_UEFI_SPECIFICATION_VERSION, TAB_INF_DEFINES_UEFI_SPECIFICATION_VERSION):
                     ModuleHeader.UefiSpecificationVersion = Value
                 elif Name == TAB_INF_DEFINES_PI_SPECIFICATION_VERSION:
                     ModuleHeader.PiSpecificationVersion = Value

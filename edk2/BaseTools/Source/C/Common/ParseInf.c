@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2004 - 2008, Intel Corporation                                                         
+Copyright (c) 2004 - 2010, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -484,13 +484,14 @@ Returns:
 --*/
 {
   UINT8   Index;
-  UINT64  HexNumber;
+  UINT64  Value;
   CHAR8   CurrentChar;
   
   //
   // Initialize the result
   //
-  HexNumber = 0;
+  Value = 0;
+  Index = 0;
   
   //
   // Check input paramter
@@ -498,50 +499,65 @@ Returns:
   if (AsciiString == NULL || ReturnValue == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+  while (AsciiString[Index] == ' ') {
+    Index ++;
+  }
+  
   //
   // Add each character to the result
   //
-  if (IsHex || (AsciiString[0] == '0' && (AsciiString[1] == 'x' || AsciiString[1] == 'X'))) {
-    //
-    // Verify string is a hex number
-    //
-    for (Index = 2; Index < strlen (AsciiString); Index++) {
-      if (isxdigit ((int)AsciiString[Index]) == 0) {
-        return EFI_ABORTED;
-      }
-    }
+  if (IsHex || (AsciiString[Index] == '0' && (AsciiString[Index + 1] == 'x' || AsciiString[Index + 1] == 'X'))) {
     //
     // Convert the hex string.
     //
-    for (Index = 2; AsciiString[Index] != '\0'; Index++) {
+    for (Index = Index + 2; AsciiString[Index] != '\0'; Index++) {
       CurrentChar = AsciiString[Index];
-      HexNumber *= 16;
-      if (CurrentChar >= '0' && CurrentChar <= '9') {
-        HexNumber += CurrentChar - '0';
-      } else if (CurrentChar >= 'a' && CurrentChar <= 'f') {
-        HexNumber += CurrentChar - 'a' + 10;
-      } else if (CurrentChar >= 'A' && CurrentChar <= 'F') {
-        HexNumber += CurrentChar - 'A' + 10;
-      } else {
-        //
-        // Unrecognized character
-        //
+      if (CurrentChar == ' ') {
+        break;
+      }
+      //
+      // Verify Hex string
+      //
+      if (isxdigit ((int)CurrentChar) == 0) {
         return EFI_ABORTED;
+      }
+      //
+      // Add hex value
+      //
+      Value *= 16;
+      if (CurrentChar >= '0' && CurrentChar <= '9') {
+        Value += CurrentChar - '0';
+      } else if (CurrentChar >= 'a' && CurrentChar <= 'f') {
+        Value += CurrentChar - 'a' + 10;
+      } else if (CurrentChar >= 'A' && CurrentChar <= 'F') {
+        Value += CurrentChar - 'A' + 10;
       }
     }
 
-    *ReturnValue = HexNumber;
+    *ReturnValue = Value;
   } else {
     //
-    // Verify string is a number
+    // Convert dec string is a number
     //
-    for (Index = 0; Index < strlen (AsciiString); Index++) {
-      if (isdigit ((int)AsciiString[Index]) == 0) {
+    for (; Index < strlen (AsciiString); Index++) {
+      CurrentChar = AsciiString[Index];
+      if (CurrentChar == ' ') {
+        break;
+      }
+      //
+      // Verify Dec string
+      //
+      if (isdigit ((int)CurrentChar) == 0) {
         return EFI_ABORTED;
       }
+      //
+      // Add dec value
+      //
+      Value = Value * 10;
+      Value += CurrentChar - '0';
     }
 
-    *ReturnValue = atol (AsciiString);
+    *ReturnValue = Value;
   }
 
   return EFI_SUCCESS;

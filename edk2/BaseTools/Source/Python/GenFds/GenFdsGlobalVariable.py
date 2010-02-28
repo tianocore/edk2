@@ -1,7 +1,7 @@
 ## @file
 # Global variables for GenFds
 #
-#  Copyright (c) 2007, Intel Corporation
+#  Copyright (c) 2007 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -54,6 +54,7 @@ class GenFdsGlobalVariable:
     FdfFile = ''
     FdfFileTimeStamp = 0
     FixedLoadAddress = False
+    PlatformName = ''
 
     SectionHeader = struct.Struct("3B 1B")
 
@@ -154,7 +155,7 @@ class GenFdsGlobalVariable:
 
     @staticmethod
     def GenerateSection(Output, Input, Type=None, CompressionType=None, Guid=None,
-                        GuidHdrLen=None, GuidAttr=None, Ui=None, Ver=None):
+                        GuidHdrLen=None, GuidAttr=[], Ui=None, Ver=None, InputAlign=None):
         if not GenFdsGlobalVariable.NeedsUpdate(Output, Input):
             return
         GenFdsGlobalVariable.DebugLogger(EdkLogger.DEBUG_5, "%s needs update because of newer %s" % (Output, Input))
@@ -168,8 +169,14 @@ class GenFdsGlobalVariable:
             Cmd += ["-g", Guid]
         if GuidHdrLen not in [None, '']:
             Cmd += ["-l", GuidHdrLen]
-        if GuidAttr not in [None, '']:
-            Cmd += ["-r", GuidAttr]
+        if len(GuidAttr) != 0:
+            #Add each guided attribute
+            for Attr in GuidAttr:
+                Cmd += ["-r", Attr]
+        if InputAlign != None:
+            #Section Align is only for dummy section without section type
+            for SecAlign in InputAlign:
+                Cmd += ["--sectionalign", SecAlign]
 
         if Ui not in [None, '']:
             #Cmd += ["-n", '"' + Ui + '"']
@@ -193,6 +200,15 @@ class GenFdsGlobalVariable:
             Cmd += ["-o", Output]
             Cmd += Input
             GenFdsGlobalVariable.CallExternalTool(Cmd, "Failed to generate section")
+
+    @staticmethod
+    def GetAlignment (AlignString):
+        if AlignString == None:
+            return 0
+        if AlignString in ("1K", "2K", "4K", "8K", "16K", "32K", "64K"):
+            return int (AlignString.rstrip('K')) * 1024
+        else:
+            return int (AlignString)
 
     @staticmethod
     def GenerateFfs(Output, Input, Type, Guid, Fixed=False, CheckSum=False, Align=None,
@@ -331,18 +347,19 @@ class GenFdsGlobalVariable:
         GenFdsGlobalVariable.CallExternalTool(Cmd, "Failed to generate option rom")
 
     @staticmethod
-    def GuidTool(Output, Input, ToolPath, Options=''):
+    def GuidTool(Output, Input, ToolPath, Options='', returnValue=[]):
         if not GenFdsGlobalVariable.NeedsUpdate(Output, Input):
             return
         GenFdsGlobalVariable.DebugLogger(EdkLogger.DEBUG_5, "%s needs update because of newer %s" % (Output, Input))
 
-        Cmd = [ToolPath, Options]
+        Cmd = [ToolPath, ]
+        Cmd += Options.split(' ')
         Cmd += ["-o", Output]
         Cmd += Input
 
-        GenFdsGlobalVariable.CallExternalTool(Cmd, "Failed to call " + ToolPath)
+        GenFdsGlobalVariable.CallExternalTool(Cmd, "Failed to call " + ToolPath, returnValue)
 
-    def CallExternalTool (cmd, errorMess):
+    def CallExternalTool (cmd, errorMess, returnValue=[]):
 
         if type(cmd) not in (tuple, list):
             GenFdsGlobalVariable.ErrorLogger("ToolError!  Invalid parameter type in call to CallExternalTool")
@@ -369,6 +386,10 @@ class GenFdsGlobalVariable:
 
         while PopenObject.returncode == None :
             PopenObject.wait()
+        if returnValue != [] and returnValue[0] != 0:
+            #get command return value
+            returnValue[0] = PopenObject.returncode
+            return
         if PopenObject.returncode != 0 or GenFdsGlobalVariable.VerboseMode or GenFdsGlobalVariable.DebugLevel != -1:
             GenFdsGlobalVariable.InfLogger ("Return Value = %d" %PopenObject.returncode)
             GenFdsGlobalVariable.InfLogger (out)

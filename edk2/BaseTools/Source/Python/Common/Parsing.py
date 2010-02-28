@@ -1,7 +1,7 @@
 ## @file
-# This file is used to define common parsing related functions used in parsing INF/DEC/DSC process 
+# This file is used to define common parsing related functions used in parsing INF/DEC/DSC process
 #
-# Copyright (c) 2008, Intel Corporation
+# Copyright (c) 2008 ~ 2010, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -31,7 +31,7 @@ def ParseContent(Lines, ):
         Line = CleanString(Line)
         if Line == '':
             continue
-        
+
         #
         # Find a new section tab
         # First insert previous section items
@@ -48,7 +48,7 @@ def ParseContent(Lines, ):
             SectionItemList = []
             ArchList = []
             ThirdList = []
-            
+
             LineList = GetSplitValueList(Line[len(TAB_SECTION_START):len(Line) - len(TAB_SECTION_END)], TAB_COMMA_SPLIT)
             for Item in LineList:
                 ItemList = GetSplitValueList(Item, TAB_SPLIT)
@@ -66,7 +66,7 @@ def ParseContent(Lines, ):
                     ThirdList.append(ItemList[2])
 
             continue
-        
+
         #
         # Not in any defined section
         #
@@ -97,13 +97,13 @@ def ParseDefineMacro2(Table, RecordSets, GlobalMacro):
     RecordSet = Table.Exec(SqlCommand)
     for Record in RecordSet:
         Macros[Record[0]] = Record[1]
-    
+
     #
     # Overrided by Global Macros
     #
     for Key in GlobalMacro.keys():
         Macros[Key] = GlobalMacro[Key]
-    
+
     #
     # Replace the Macros
     #
@@ -111,7 +111,7 @@ def ParseDefineMacro2(Table, RecordSets, GlobalMacro):
         if RecordSets[Key] != []:
             for Item in RecordSets[Key]:
                 Item[0] = ReplaceMacro(Item[0], Macros)
-    
+
 ## ParseDefineMacro
 #
 # Search whole table to find all defined Macro and replaced them with the real values
@@ -130,22 +130,22 @@ def ParseDefineMacro(Table, GlobalMacro):
 #            The follow SqlCommand (expr replace) is not supported in Sqlite 3.3.4 which is used in Python 2.5                                     *
 #            Reserved Only                                                                                                                         *
 #            SqlCommand = """update %s set Value1 = replace(Value1, '%s', '%s')                                                                    *
-#                            where ID in (select ID from %s                                                                                        * 
+#                            where ID in (select ID from %s                                                                                        *
 #                                         where Model = %s                                                                                         *
 #                                         and Value1 like '%%%s%%'                                                                                 *
 #                                         and StartLine > %s                                                                                       *
 #                                         and Enabled > -1                                                                                         *
-#                                         and Arch = '%s')""" % \                                                                                  *  
+#                                         and Arch = '%s')""" % \                                                                                  *
 #                                         (self.TblDsc.Table, Record[0], Record[1], self.TblDsc.Table, Record[2], Record[1], Record[3], Record[4]) *
 #***************************************************************************************************************************************************
         Macros[Record[0]] = Record[1]
-    
+
     #
     # Overrided by Global Macros
     #
     for Key in GlobalMacro.keys():
         Macros[Key] = GlobalMacro[Key]
-    
+
     #
     # Found all defined macro and replaced
     #
@@ -228,7 +228,7 @@ def QueryDefinesItem2(Table, Arch, BelongsToFile):
                     and BelongsToFile = %s
                     and Enabled > -1""" % (Table.Table, MODEL_META_DATA_HEADER, ConvertToSqlString2(TAB_ARCH_COMMON), BelongsToFile)
         RecordSet = Table.Exec(SqlCommand)
-    
+
     return RecordSet
 
 ##QueryDscItem
@@ -307,7 +307,7 @@ def GetBuildOption(String, File, LineNo = -1):
 ## Get Library Class
 #
 # Get Library of Dsc as <LibraryClassKeyWord>|<LibraryInstance>
-# 
+#
 # @param Item:           String as <LibraryClassKeyWord>|<LibraryInstance>
 # @param ContainerFile:  The file which describes the library class, used for error report
 #
@@ -329,7 +329,7 @@ def GetLibraryClass(Item, ContainerFile, WorkspaceDir, LineNo = -1):
 ## Get Library Class
 #
 # Get Library of Dsc as <LibraryClassKeyWord>[|<LibraryInstance>][|<TokenSpaceGuidCName>.<PcdCName>]
-# 
+#
 # @param Item:           String as <LibraryClassKeyWord>|<LibraryInstance>
 # @param ContainerFile:  The file which describes the library class, used for error report
 #
@@ -349,7 +349,7 @@ def GetLibraryClassOfInf(Item, ContainerFile, WorkspaceDir, LineNo = -1):
         if Item[1] != '':
             SupMod = Item[1]
 
-    return (ItemList[0], ItemList[1], ItemList[2], SupMod)    
+    return (ItemList[0], ItemList[1], ItemList[2], SupMod)
 
 ## CheckPcdTokenInfo
 #
@@ -373,7 +373,7 @@ def CheckPcdTokenInfo(TokenInfoString, Section, File, LineNo = -1):
 ## Get Pcd
 #
 # Get Pcd of Dsc as <PcdTokenSpaceGuidCName>.<TokenCName>|<Value>[|<Type>|<MaximumDatumSize>]
-# 
+#
 # @param Item:           String as <PcdTokenSpaceGuidCName>.<TokenCName>|<Value>[|<Type>|<MaximumDatumSize>]
 # @param ContainerFile:  The file which describes the pcd, used for error report
 #
@@ -382,23 +382,23 @@ def CheckPcdTokenInfo(TokenInfoString, Section, File, LineNo = -1):
 def GetPcd(Item, Type, ContainerFile, LineNo = -1):
     TokenGuid, TokenName, Value, MaximumDatumSize, Token = '', '', '', '', ''
     List = GetSplitValueList(Item + TAB_VALUE_SPLIT * 2)
-    
+
     if len(List) < 4 or len(List) > 6:
         RaiseParserError(Item, 'Pcds' + Type, ContainerFile, '<PcdTokenSpaceGuidCName>.<TokenCName>|<Value>[|<Type>|<MaximumDatumSize>]', LineNo)
     else:
         Value = List[1]
         MaximumDatumSize = List[2]
         Token = List[3]
-        
+
     if CheckPcdTokenInfo(List[0], 'Pcds' + Type, ContainerFile, LineNo):
         (TokenGuid, TokenName) = GetSplitValueList(List[0], TAB_SPLIT)
-    
+
     return (TokenName, TokenGuid, Value, MaximumDatumSize, Token, Type)
 
 ## Get FeatureFlagPcd
 #
 # Get FeatureFlagPcd of Dsc as <PcdTokenSpaceGuidCName>.<TokenCName>|TRUE/FALSE
-# 
+#
 # @param Item:           String as <PcdTokenSpaceGuidCName>.<TokenCName>|TRUE/FALSE
 # @param ContainerFile:  The file which describes the pcd, used for error report
 #
@@ -413,13 +413,13 @@ def GetFeatureFlagPcd(Item, Type, ContainerFile, LineNo = -1):
         Value = List[1]
     if CheckPcdTokenInfo(List[0], 'Pcds' + Type, ContainerFile, LineNo):
         (TokenGuid, TokenName) = GetSplitValueList(List[0], DataType.TAB_SPLIT)
-    
+
     return (TokenName, TokenGuid, Value, Type)
 
 ## Get DynamicDefaultPcd
 #
 # Get DynamicDefaultPcd of Dsc as <PcdTokenSpaceGuidCName>.<TokenCName>|<Value>[|<DatumTyp>[|<MaxDatumSize>]]
-# 
+#
 # @param Item:           String as <PcdTokenSpaceGuidCName>.<TokenCName>|TRUE/FALSE
 # @param ContainerFile:  The file which describes the pcd, used for error report
 #
@@ -436,13 +436,13 @@ def GetDynamicDefaultPcd(Item, Type, ContainerFile, LineNo = -1):
         MaxDatumSize = List[3]
     if CheckPcdTokenInfo(List[0], 'Pcds' + Type, ContainerFile, LineNo):
         (TokenGuid, TokenName) = GetSplitValueList(List[0], TAB_SPLIT)
-    
+
     return (TokenName, TokenGuid, Value, DatumTyp, MaxDatumSize, Type)
 
 ## Get DynamicHiiPcd
 #
 # Get DynamicHiiPcd of Dsc as <PcdTokenSpaceGuidCName>.<TokenCName>|<String>|<VariableGuidCName>|<VariableOffset>[|<DefaultValue>[|<MaximumDatumSize>]]
-# 
+#
 # @param Item:           String as <PcdTokenSpaceGuidCName>.<TokenCName>|TRUE/FALSE
 # @param ContainerFile:  The file which describes the pcd, used for error report
 #
@@ -457,13 +457,13 @@ def GetDynamicHiiPcd(Item, Type, ContainerFile, LineNo = -1):
         L1, L2, L3, L4, L5 = List[1], List[2], List[3], List[4], List[5]
     if CheckPcdTokenInfo(List[0], 'Pcds' + Type, ContainerFile, LineNo):
         (TokenGuid, TokenName) = GetSplitValueList(List[0], DataType.TAB_SPLIT)
-    
+
     return (TokenName, TokenGuid, L1, L2, L3, L4, L5, Type)
 
 ## Get DynamicVpdPcd
 #
 # Get DynamicVpdPcd of Dsc as <PcdTokenSpaceGuidCName>.<TokenCName>|<VpdOffset>[|<MaximumDatumSize>]
-# 
+#
 # @param Item:           String as <PcdTokenSpaceGuidCName>.<TokenCName>|TRUE/FALSE
 # @param ContainerFile:  The file which describes the pcd, used for error report
 #
@@ -478,7 +478,7 @@ def GetDynamicVpdPcd(Item, Type, ContainerFile, LineNo = -1):
         L1, L2 = List[1], List[2]
     if CheckPcdTokenInfo(List[0], 'Pcds' + Type, ContainerFile, LineNo):
         (TokenGuid, TokenName) = GetSplitValueList(List[0], DataType.TAB_SPLIT)
-    
+
     return (TokenName, TokenGuid, L1, L2, Type)
 
 ## GetComponent
@@ -500,13 +500,13 @@ def GetComponent(Lines, KeyValues):
 
     for Line in Lines:
         Line = Line[0]
-        
+
         #
         # Ignore !include statement
         #
         if Line.upper().find(TAB_INCLUDE.upper() + ' ') > -1 or Line.upper().find(TAB_DEFINE + ' ') > -1:
             continue
-        
+
         if findBlock == False:
             ListItem = Line
             #
@@ -596,7 +596,7 @@ def GetExec(String):
 # Set KeyValues as [ ['component name', [lib1, lib2, lib3], [bo1, bo2, bo3], [pcd1, pcd2, pcd3]], ...]
 #
 # @param Lines:             The content to be parsed
-# @param Key:               Reserved 
+# @param Key:               Reserved
 # @param KeyValues:         To store data after parsing
 # @param CommentCharacter:  Comment char, used to ignore comment content
 #
@@ -683,7 +683,7 @@ def GetComponents(Lines, Key, KeyValues, CommentCharacter):
 ## Get Source
 #
 # Get Source of Inf as <Filename>[|<Family>[|<TagName>[|<ToolCode>[|<PcdFeatureFlag>]]]]
-# 
+#
 # @param Item:           String as <Filename>[|<Family>[|<TagName>[|<ToolCode>[|<PcdFeatureFlag>]]]]
 # @param ContainerFile:  The file which describes the library class, used for error report
 #
@@ -704,11 +704,12 @@ def GetSource(Item, ContainerFile, FileRelativePath, LineNo = -1):
 ## Get Binary
 #
 # Get Binary of Inf as <Filename>[|<Family>[|<TagName>[|<ToolCode>[|<PcdFeatureFlag>]]]]
-# 
+#
 # @param Item:           String as <Filename>[|<Family>[|<TagName>[|<ToolCode>[|<PcdFeatureFlag>]]]]
 # @param ContainerFile:  The file which describes the library class, used for error report
 #
 # @retval (List[0], List[1], List[2], List[3])
+# @retval List
 #
 def GetBinary(Item, ContainerFile, FileRelativePath, LineNo = -1):
     ItemNew = Item + DataType.TAB_VALUE_SPLIT
@@ -718,15 +719,22 @@ def GetBinary(Item, ContainerFile, FileRelativePath, LineNo = -1):
     else:
         if List[3] != '':
             CheckPcdTokenInfo(List[3], 'Binaries', ContainerFile, LineNo)
-    
-    return (List[0], List[1], List[2], List[3])
+
+    if len(List) == 4:
+        return (List[0], List[1], List[2], List[3])
+    elif len(List) == 3:
+        return (List[0], List[1], List[2], '')
+    elif len(List) == 2:
+        return (List[0], List[1], '', '')
+    elif len(List) == 1:
+        return (List[0], '', '', '')
 
 ## Get Guids/Protocols/Ppis
 #
 # Get Guids/Protocols/Ppis of Inf as <GuidCName>[|<PcdFeatureFlag>]
 #
 # @param Item:           String as <GuidCName>[|<PcdFeatureFlag>]
-# @param Type:           Type of parsing string 
+# @param Type:           Type of parsing string
 # @param ContainerFile:  The file which describes the library class, used for error report
 #
 # @retval (List[0], List[1])
@@ -736,7 +744,7 @@ def GetGuidsProtocolsPpisOfInf(Item, Type, ContainerFile, LineNo = -1):
     List = GetSplitValueList(ItemNew)
     if List[1] != '':
         CheckPcdTokenInfo(List[1], Type, ContainerFile, LineNo)
-    
+
     return (List[0], List[1])
 
 ## Get Guids/Protocols/Ppis
@@ -744,7 +752,7 @@ def GetGuidsProtocolsPpisOfInf(Item, Type, ContainerFile, LineNo = -1):
 # Get Guids/Protocols/Ppis of Dec as <GuidCName>=<GuidValue>
 #
 # @param Item:           String as <GuidCName>=<GuidValue>
-# @param Type:           Type of parsing string 
+# @param Type:           Type of parsing string
 # @param ContainerFile:  The file which describes the library class, used for error report
 #
 # @retval (List[0], List[1])
@@ -753,7 +761,7 @@ def GetGuidsProtocolsPpisOfDec(Item, Type, ContainerFile, LineNo = -1):
     List = GetSplitValueList(Item, DataType.TAB_EQUAL_SPLIT)
     if len(List) != 2:
         RaiseParserError(Item, Type, ContainerFile, '<CName>=<GuidValue>', LineNo)
-    
+
     return (List[0], List[1])
 
 ## GetPackage
@@ -761,7 +769,7 @@ def GetGuidsProtocolsPpisOfDec(Item, Type, ContainerFile, LineNo = -1):
 # Get Package of Inf as <PackagePath>[|<PcdFeatureFlag>]
 #
 # @param Item:           String as <PackagePath>[|<PcdFeatureFlag>]
-# @param Type:           Type of parsing string 
+# @param Type:           Type of parsing string
 # @param ContainerFile:  The file which describes the library class, used for error report
 #
 # @retval (List[0], List[1])
@@ -771,10 +779,10 @@ def GetPackage(Item, ContainerFile, FileRelativePath, LineNo = -1):
     List = GetSplitValueList(ItemNew)
     CheckFileType(List[0], '.Dec', ContainerFile, 'package', List[0], LineNo)
     CheckFileExist(FileRelativePath, List[0], ContainerFile, 'Packages', List[0], LineNo)
-    
+
     if List[1] != '':
         CheckPcdTokenInfo(List[1], 'Packages', ContainerFile, LineNo)
-    
+
     return (List[0], List[1])
 
 ## Get Pcd Values of Inf
@@ -790,15 +798,15 @@ def GetPackage(Item, ContainerFile, FileRelativePath, LineNo = -1):
 def GetPcdOfInf(Item, Type, File, LineNo):
     Format = '<TokenSpaceGuidCName>.<PcdCName>[|<Value>]'
     TokenGuid, TokenName, Value, InfType = '', '', '', ''
-    
+
     if Type == TAB_PCDS_FIXED_AT_BUILD:
         InfType = TAB_INF_FIXED_PCD
     elif Type == TAB_PCDS_PATCHABLE_IN_MODULE:
         InfType = TAB_INF_PATCH_PCD
     elif Type == TAB_PCDS_FEATURE_FLAG:
-        InfType = TAB_INF_FEATURE_PCD        
+        InfType = TAB_INF_FEATURE_PCD
     elif Type == TAB_PCDS_DYNAMIC_EX:
-        InfType = TAB_INF_PCD_EX        
+        InfType = TAB_INF_PCD_EX
     elif Type == TAB_PCDS_DYNAMIC:
         InfType = TAB_INF_PCD
     List = GetSplitValueList(Item + DataType.TAB_VALUE_SPLIT)
@@ -815,7 +823,7 @@ def GetPcdOfInf(Item, Type, File, LineNo):
 
     return (TokenGuid, TokenName, Value, Type)
 
-    
+
 ## Get Pcd Values of Dec
 #
 # Get Pcd of Dec as <TokenSpcCName>.<TokenCName>|<Value>|<DatumType>|<Token>
@@ -837,7 +845,7 @@ def GetPcdOfDec(Item, Type, File, LineNo = -1):
     else:
         TokenGuid = TokenInfo[0]
         TokenName = TokenInfo[1]
-    
+
     return (TokenGuid, TokenName, Value, DatumType, Token, Type)
 
 ## Parse DEFINE statement
@@ -854,7 +862,7 @@ def ParseDefine(LineValue, StartLine, Table, FileID, Filename, SectionName, Sect
     Table.Insert(MODEL_META_DATA_DEFINE, Define[0], Define[1], '', '', '', Arch, SectionModel, FileID, StartLine, -1, StartLine, -1, 0)
 
 ## InsertSectionItems
-# 
+#
 # Insert item data of a section to a dict
 #
 def InsertSectionItems(Model, CurrentSection, SectionItemList, ArchList, ThirdList, RecordSet):
@@ -869,23 +877,23 @@ def InsertSectionItems(Model, CurrentSection, SectionItemList, ArchList, ThirdLi
         for SectionItem in SectionItemList:
             BelongsToItem, EndLine, EndColumn = -1, -1, -1
             LineValue, StartLine, EndLine, Comment = SectionItem[0], SectionItem[1], SectionItem[1], SectionItem[2]
-            
+
             EdkLogger.debug(4, "Parsing %s ..." %LineValue)
             # And then parse DEFINE statement
             if LineValue.upper().find(DataType.TAB_DEFINE.upper() + ' ') > -1:
                 continue
-            
+
             # At last parse other sections
             ID = -1
             Records.append([LineValue, Arch, StartLine, ID, Third, Comment])
-        
+
         if RecordSet != {}:
             RecordSet[Model] = Records
 
 ## Insert records to database
-# 
+#
 # Insert item data of a section to database
-# @param Table:            The Table to be inserted 
+# @param Table:            The Table to be inserted
 # @param FileID:           The ID of belonging file
 # @param Filename:         The name of belonging file
 # @param CurrentSection:   The name of currect section
@@ -893,7 +901,7 @@ def InsertSectionItems(Model, CurrentSection, SectionItemList, ArchList, ThirdLi
 # @param ArchList:         A list of arches
 # @param ThirdList:        A list of third parameters, ModuleType for LibraryClass and SkuId for Dynamic Pcds
 # @param IfDefList:        A list of all conditional statements
-# @param RecordSet:        A dict of all parsed records 
+# @param RecordSet:        A dict of all parsed records
 #
 def InsertSectionItemsIntoDatabase(Table, FileID, Filename, Model, CurrentSection, SectionItemList, ArchList, ThirdList, IfDefList, RecordSet):
     #
@@ -909,7 +917,7 @@ def InsertSectionItemsIntoDatabase(Table, FileID, Filename, Model, CurrentSectio
         for SectionItem in SectionItemList:
             BelongsToItem, EndLine, EndColumn = -1, -1, -1
             LineValue, StartLine, EndLine = SectionItem[0], SectionItem[1], SectionItem[1]
-            
+
             EdkLogger.debug(4, "Parsing %s ..." %LineValue)
             #
             # And then parse DEFINE statement
@@ -917,13 +925,13 @@ def InsertSectionItemsIntoDatabase(Table, FileID, Filename, Model, CurrentSectio
             if LineValue.upper().find(DataType.TAB_DEFINE.upper() + ' ') > -1:
                 ParseDefine(LineValue, StartLine, Table, FileID, Filename, CurrentSection, Model, Arch)
                 continue
-            
+
             #
             # At last parse other sections
             #
             ID = Table.Insert(Model, LineValue, Third, Third, '', '', Arch, -1, FileID, StartLine, -1, StartLine, -1, 0)
             Records.append([LineValue, Arch, StartLine, ID, Third])
-        
+
         if RecordSet != {}:
             RecordSet[Model] = Records
 
@@ -932,4 +940,4 @@ def GenMetaDatSectionItem(Key, Value, List):
     if Key not in List:
         List[Key] = [Value]
     else:
-        List[Key].append(Value) 
+        List[Key].append(Value)

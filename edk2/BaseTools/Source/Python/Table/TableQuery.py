@@ -21,7 +21,7 @@ from Table import Table
 ## TableQuery
 #
 # This class defined a table used for Query
-# 
+#
 # @param object:       Inherited from object class
 #
 #
@@ -29,19 +29,21 @@ class TableQuery(Table):
     def __init__(self, Cursor):
         Table.__init__(self, Cursor)
         self.Table = 'Query'
-    
+
     ## Create table
     #
     # Create table Query
     #
     # @param ID:                 ID of a Query
-    # @param Name:               Modifier of a Query
+    # @param Name:               Name of a Query
+    # @param Modifer:            Modifier of a Query
     # @param Value:              Type of a Query
     # @param Model:              Model of a Query
     #
     def Create(self):
         SqlCommand = """create table IF NOT EXISTS %s(ID INTEGER PRIMARY KEY,
                                                       Name TEXT DEFAULT '',
+                                                      Modifier TEXT DEFAULT '',
                                                       Value TEXT DEFAULT '',
                                                       Model INTEGER DEFAULT 0
                                                      )""" % self.Table
@@ -52,15 +54,15 @@ class TableQuery(Table):
     # Insert a record into table Query
     #
     # @param ID:                 ID of a Query
-    # @param Name:               Modifier of a Query
-    # @param Value:              Type of a Query
+    # @param Name:               Name of a Query
+    # @param Modifier:           Modifier of a Query
+    # @param Value:              Value of a Query
     # @param Model:              Model of a Query
     #
-    def Insert(self, Name, Value, Model):
+    def Insert(self, Name, Modifier, Value, Model):
         self.ID = self.ID + 1
-        SqlCommand = """insert into %s values(%s, '%s', '%s', %s)""" \
-                                           % (self.Table, self.ID, Name, Value, Model)
+        SqlCommand = """insert into %s values(%s, '%s', '%s', '%s', %s)""" \
+                                           % (self.Table, self.ID, Name, Modifier, Value, Model)
         Table.Insert(self, SqlCommand)
 
         return self.ID
-    

@@ -135,7 +135,6 @@ CVfrErrorHandle::ParseFileScopeRecord (
   IN UINT32    WholeScopeLine
   )
 {
-  CHAR8               *FullPathName = NULL;
   SVfrFileScopeRecord *pNode        = NULL;
 
   if (Record == NULL) {
@@ -195,19 +194,19 @@ VOID
 CVfrErrorHandle::PrintMsg (
   IN UINT32               LineNum,
   IN CHAR8                *TokName,
-  IN CHAR8                *MsgType,
-  IN CHAR8                *ErrorMsg
+  IN CONST CHAR8          *MsgType,
+  IN CONST CHAR8          *ErrorMsg
   )
 {
   CHAR8                  *FileName = NULL;
   UINT32                 FileLine;
   
   if (strncmp ("Warning", MsgType, strlen ("Warning")) == 0) {
-    VerboseMsg (ErrorMsg);
+    VerboseMsg ((CHAR8 *) ErrorMsg);
     return;
   }
   GetFileNameLineNum (LineNum, &FileName, &FileLine);
-  Error (FileName, FileLine, 0x3000, TokName, "\t%s\n", ErrorMsg);
+  Error (FileName, FileLine, 0x3000, TokName, (CHAR8 *) "\t%s\n", (CHAR8 *) ErrorMsg);
 }
 
 UINT8
@@ -220,7 +219,7 @@ CVfrErrorHandle::HandleError (
   UINT32                 Index;
   CHAR8                  *FileName = NULL;
   UINT32                 FileLine;
-  CHAR8                  *ErrorMsg = NULL;
+  CONST CHAR8            *ErrorMsg = NULL;
 
   if (mVfrErrorHandleTable == NULL) {
     return 1;
@@ -235,7 +234,7 @@ CVfrErrorHandle::HandleError (
 
   if (ErrorMsg != NULL) {
     GetFileNameLineNum (LineNum, &FileName, &FileLine);
-    Error (FileName, FileLine, 0x3000, TokName, "\t%s\n", ErrorMsg);
+    Error (FileName, FileLine, 0x3000, TokName, (CHAR8 *) "\t%s\n", (CHAR8 *) ErrorMsg);
     return 1;
   } else {
     return 0;

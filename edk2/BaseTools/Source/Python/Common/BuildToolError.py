@@ -84,7 +84,7 @@ UNKNOWN_ERROR = 0xFFFF
 
 ## Error message of each error code
 gErrorMessage = {
-    FILE_NOT_FOUND          :   "File/directory not found",
+    FILE_NOT_FOUND          :   "File/directory not found in workspace",
     FILE_OPEN_FAILURE       :   "File open failure",
     FILE_WRITE_FAILURE      :   "File write failure",
     FILE_PARSE_FAILURE      :   "File parse failure",

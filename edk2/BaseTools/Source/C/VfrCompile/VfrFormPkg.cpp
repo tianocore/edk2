@@ -2,7 +2,7 @@
   
   The definition of CFormPkg's member function
 
-Copyright (c) 2004 - 2009, Intel Corporation                                                         
+Copyright (c) 2004 - 2010, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -25,7 +25,7 @@ SPendingAssign::SPendingAssign (
   IN VOID   *Addr, 
   IN UINT32 Len, 
   IN UINT32 LineNo,
-  IN CHAR8  *Msg
+  IN CONST CHAR8  *Msg
   )
 {
   mKey    = NULL;
@@ -352,11 +352,11 @@ CFormPkg::BuildPkg (
 
 VOID
 CFormPkg::_WRITE_PKG_LINE (
-  IN FILE   *pFile,
-  IN UINT32 LineBytes,
-  IN CHAR8  *LineHeader,
-  IN CHAR8  *BlkBuf,
-  IN UINT32 BlkSize
+  IN FILE         *pFile,
+  IN UINT32       LineBytes,
+  IN CONST CHAR8  *LineHeader,
+  IN CHAR8        *BlkBuf,
+  IN UINT32       BlkSize
   )
 {
   UINT32    Index;
@@ -375,11 +375,11 @@ CFormPkg::_WRITE_PKG_LINE (
 
 VOID
 CFormPkg::_WRITE_PKG_END (
-  IN FILE   *pFile,
-  IN UINT32 LineBytes,
-  IN CHAR8  *LineHeader,
-  IN CHAR8  *BlkBuf,
-  IN UINT32 BlkSize
+  IN FILE         *pFile,
+  IN UINT32       LineBytes,
+  IN CONST CHAR8  *LineHeader,
+  IN CHAR8        *BlkBuf,
+  IN UINT32       BlkSize
   )
 {
   UINT32    Index;
@@ -483,7 +483,7 @@ CFormPkg::AssignPending (
   IN VOID   *ValAddr, 
   IN UINT32 ValLen,
   IN UINT32 LineNo,
-  IN CHAR8  *Msg
+  IN CONST CHAR8  *Msg
   )
 {
   SPendingAssign *pNew;
@@ -1242,7 +1242,7 @@ static struct {
   { 0, 0 },                                    // 0x1F
   { sizeof (EFI_IFR_TO_LOWER), 0 },            // EFI_IFR_TO_LOWER_OP - 0x20
   { sizeof (EFI_IFR_TO_UPPER), 0 },            // EFI_IFR_TO_UPPER_OP - 0x21
-  { 0, 0 },                                    // 0x22
+  { sizeof (EFI_IFR_MAP), 1 },                 // EFI_IFR_MAP - 0x22
   { sizeof (EFI_IFR_ORDERED_LIST), 1 },        // EFI_IFR_ORDERED_LIST_OP - 0x23
   { sizeof (EFI_IFR_VARSTORE), 0 },            // EFI_IFR_VARSTORE_OP
   { sizeof (EFI_IFR_VARSTORE_NAME_VALUE), 0 }, // EFI_IFR_VARSTORE_NAME_VALUE_OP
@@ -1250,8 +1250,11 @@ static struct {
   { sizeof (EFI_IFR_VARSTORE_DEVICE), 1 },     // EFI_IFR_VARSTORE_DEVICE_OP
   { sizeof (EFI_IFR_VERSION), 0 },             // EFI_IFR_VERSION_OP - 0x28
   { sizeof (EFI_IFR_END), 0 },                 // EFI_IFR_END_OP
-  { sizeof (EFI_IFR_MATCH), 1 },               // EFI_IFR_MATCH_OP - 0x2A
-  { 0, 0 }, { 0, 0} , { 0, 0} , { 0, 0} ,      // 0x2B ~ 0x2E
+  { sizeof (EFI_IFR_MATCH), 0 },               // EFI_IFR_MATCH_OP - 0x2A
+  { sizeof (EFI_IFR_GET), 0 },                 // EFI_IFR_GET - 0x2B
+  { sizeof (EFI_IFR_SET), 0 },                 // EFI_IFR_SET - 0x2C
+  { sizeof (EFI_IFR_READ), 0 },                // EFI_IFR_READ - 0x2D
+  { sizeof (EFI_IFR_WRITE), 0 },               // EFI_IFR_WRITE - 0x2E
   { sizeof (EFI_IFR_EQUAL), 0 },               // EFI_IFR_EQUAL_OP - 0x2F
   { sizeof (EFI_IFR_NOT_EQUAL), 0 },           // EFI_IFR_NOT_EQUAL_OP
   { sizeof (EFI_IFR_GREATER_THAN), 0 },        // EFI_IFR_GREATER_THAN_OP
@@ -1298,7 +1301,7 @@ static struct {
   { sizeof (EFI_IFR_VALUE), 1 },               // EFI_IFR_VALUE_OP
   { sizeof (EFI_IFR_DEFAULT), 0 },             // EFI_IFR_DEFAULT_OP
   { sizeof (EFI_IFR_DEFAULTSTORE), 0 },        // EFI_IFR_DEFAULTSTORE_OP - 0x5C
-  { 0, 0},                                     // 0x5D
+  { sizeof (EFI_IFR_FORM_MAP), 1},             // EFI_IFR_FORM_MAP_OP - 0x5D
   { sizeof (EFI_IFR_CATENATE), 0 },            // EFI_IFR_CATENATE_OP
   { sizeof (EFI_IFR_GUID), 0 },                // EFI_IFR_GUID_OP
   { sizeof (EFI_IFR_SECURITY), 0 },            // EFI_IFR_SECURITY_OP - 0x60
@@ -1313,9 +1316,9 @@ static struct {
   "EFI_IFR_ACTION",     "EFI_IFR_RESET_BUTTON",         "EFI_IFR_FORM_SET",      "EFI_IFR_REF",             "EFI_IFR_NO_SUBMIT_IF",  "EFI_IFR_INCONSISTENT_IF",
   "EFI_IFR_EQ_ID_VAL",  "EFI_IFR_EQ_ID_ID",             "EFI_IFR_EQ_ID_LIST",    "EFI_IFR_AND",             "EFI_IFR_OR",            "EFI_IFR_NOT",
   "EFI_IFR_RULE",       "EFI_IFR_GRAY_OUT_IF",          "EFI_IFR_DATE",          "EFI_IFR_TIME",            "EFI_IFR_STRING",        "EFI_IFR_REFRESH",
-  "EFI_IFR_DISABLE_IF", "EFI_IFR_INVALID",              "EFI_IFR_TO_LOWER",      "EFI_IFR_TO_UPPER",        "EFI_IFR_INVALID",       "EFI_IFR_ORDERED_LIST",
+  "EFI_IFR_DISABLE_IF", "EFI_IFR_INVALID",              "EFI_IFR_TO_LOWER",      "EFI_IFR_TO_UPPER",        "EFI_IFR_MAP",           "EFI_IFR_ORDERED_LIST",
   "EFI_IFR_VARSTORE",   "EFI_IFR_VARSTORE_NAME_VALUE",  "EFI_IFR_VARSTORE_EFI",  "EFI_IFR_VARSTORE_DEVICE", "EFI_IFR_VERSION",       "EFI_IFR_END",
-  "EFI_IFR_MATCH",      "EFI_IFR_INVALID",              "EFI_IFR_INVALID",       "EFI_IFR_INVALID",         "EFI_IFR_INVALID",       "EFI_IFR_EQUAL",
+  "EFI_IFR_MATCH",      "EFI_IFR_GET",                  "EFI_IFR_SET",           "EFI_IFR_READ",            "EFI_IFR_WRITE",         "EFI_IFR_EQUAL",
   "EFI_IFR_NOT_EQUAL",  "EFI_IFR_GREATER_THAN",         "EFI_IFR_GREATER_EQUAL", "EFI_IFR_LESS_THAN",       "EFI_IFR_LESS_EQUAL",    "EFI_IFR_BITWISE_AND",
   "EFI_IFR_BITWISE_OR", "EFI_IFR_BITWISE_NOT",          "EFI_IFR_SHIFT_LEFT",    "EFI_IFR_SHIFT_RIGHT",     "EFI_IFR_ADD",           "EFI_IFR_SUBTRACT",
   "EFI_IFR_MULTIPLY",   "EFI_IFR_DIVIDE",               "EFI_IFR_MODULO",        "EFI_IFR_RULE_REF",        "EFI_IFR_QUESTION_REF1", "EFI_IFR_QUESTION_REF2",
@@ -1323,7 +1326,7 @@ static struct {
   "EFI_IFR_TO_UINT",    "EFI_IFR_TO_STRING",            "EFI_IFR_TO_BOOLEAN",    "EFI_IFR_MID",             "EFI_IFR_FIND",          "EFI_IFR_TOKEN",
   "EFI_IFR_STRING_REF1","EFI_IFR_STRING_REF2",          "EFI_IFR_CONDITIONAL",   "EFI_IFR_QUESTION_REF3",   "EFI_IFR_ZERO",          "EFI_IFR_ONE",
   "EFI_IFR_ONES",       "EFI_IFR_UNDEFINED",            "EFI_IFR_LENGTH",        "EFI_IFR_DUP",             "EFI_IFR_THIS",          "EFI_IFR_SPAN",
-  "EFI_IFR_VALUE",      "EFI_IFR_DEFAULT",              "EFI_IFR_DEFAULTSTORE",  "EFI_IFR_INVALID",         "EFI_IFR_CATENATE",      "EFI_IFR_GUID",
+  "EFI_IFR_VALUE",      "EFI_IFR_DEFAULT",              "EFI_IFR_DEFAULTSTORE",  "EFI_IFR_FORM_MAP",        "EFI_IFR_CATENATE",      "EFI_IFR_GUID",
   "EFI_IFR_SECURITY",
 };
 
@@ -1340,7 +1343,7 @@ CIFROBJ_DEBUG_PRINT (
 
 #endif
 
-bool gCreateOp = TRUE;
+BOOLEAN gCreateOp = TRUE;
 
 CIfrObj::CIfrObj (
   IN  UINT8   OpCode,
@@ -1396,4 +1399,4 @@ CIfrOpHeader::CIfrOpHeader (
   mHeader = OpHdr.mHeader;
 }
 
-UINT32 CIfrForm::FormIdBitMap[EFI_FREE_FORM_ID_BITMAP_SIZE] = {0, };
+UINT32 CIfrFormId::FormIdBitMap[EFI_FREE_FORM_ID_BITMAP_SIZE] = {0, };

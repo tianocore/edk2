@@ -1,7 +1,7 @@
 ## @file
 # generate flash image
 #
-#  Copyright (c) 2007, Intel Corporation
+#  Copyright (c) 2007 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -39,7 +39,7 @@ from Common.Misc import DirCache,PathClass
 ## Version and Copyright
 versionNumber = "1.0"
 __version__ = "%prog Version " + versionNumber
-__copyright__ = "Copyright (c) 2007, Intel Corporation  All rights reserved."
+__copyright__ = "Copyright (c) 2007 - 2010, Intel Corporation  All rights reserved."
 
 ## Tool entrance method
 #
@@ -94,6 +94,18 @@ def main():
         if (Options.filename):
             FdfFilename = Options.filename
             FdfFilename = GenFdsGlobalVariable.ReplaceWorkspaceMacro(FdfFilename)
+
+            if FdfFilename[0:2] == '..':
+                FdfFilename = os.path.realpath(FdfFilename)
+            if not os.path.isabs (FdfFilename):
+                FdfFilename = os.path.join(GenFdsGlobalVariable.WorkSpaceDir, FdfFilename)
+            if not os.path.exists(FdfFilename):
+                EdkLogger.error("GenFds", FILE_NOT_FOUND, ExtraData=FdfFilename)
+            if os.path.normcase (FdfFilename).find(Workspace) != 0:
+                EdkLogger.error("GenFds", FILE_NOT_FOUND, "FdfFile doesn't exist in Workspace!")
+
+            GenFdsGlobalVariable.FdfFile = FdfFilename
+            GenFdsGlobalVariable.FdfFileTimeStamp = os.path.getmtime(FdfFilename)
         else:
             EdkLogger.error("GenFds", OPTION_MISSING, "Missing FDF filename")
 
@@ -107,16 +119,6 @@ def main():
         else:
             EdkLogger.error("GenFds", OPTION_MISSING, "Missing tool chain tag")
 
-        if FdfFilename[0:2] == '..':
-            FdfFilename = os.path.realpath(FdfFilename)
-        if FdfFilename[1] != ':':
-            FdfFilename = os.path.join(GenFdsGlobalVariable.WorkSpaceDir, FdfFilename)
-
-        if not os.path.exists(FdfFilename):
-            EdkLogger.error("GenFds", FILE_NOT_FOUND, ExtraData=FdfFilename)
-        GenFdsGlobalVariable.FdfFile = FdfFilename
-        GenFdsGlobalVariable.FdfFileTimeStamp = os.path.getmtime(FdfFilename)
-
         if (Options.activePlatform):
             ActivePlatform = Options.activePlatform
             ActivePlatform = GenFdsGlobalVariable.ReplaceWorkspaceMacro(ActivePlatform)
@@ -124,22 +126,22 @@ def main():
             if ActivePlatform[0:2] == '..':
                 ActivePlatform = os.path.realpath(ActivePlatform)
 
-            if ActivePlatform[1] != ':':
+            if not os.path.isabs (ActivePlatform):
                 ActivePlatform = os.path.join(GenFdsGlobalVariable.WorkSpaceDir, ActivePlatform)
 
             if not os.path.exists(ActivePlatform)  :
                 EdkLogger.error("GenFds", FILE_NOT_FOUND, "ActivePlatform doesn't exist!")
 
-            if ActivePlatform.find(Workspace) == -1:
+            if os.path.normcase (ActivePlatform).find(Workspace) != 0:
                 EdkLogger.error("GenFds", FILE_NOT_FOUND, "ActivePlatform doesn't exist in Workspace!")
 
-            ActivePlatform = ActivePlatform.replace(Workspace, '')
+            ActivePlatform = ActivePlatform[len(Workspace):]
             if len(ActivePlatform) > 0 :
                 if ActivePlatform[0] == '\\' or ActivePlatform[0] == '/':
                     ActivePlatform = ActivePlatform[1:]
             else:
                 EdkLogger.error("GenFds", FILE_NOT_FOUND, "ActivePlatform doesn't exist!")
-        else :
+        else:
             EdkLogger.error("GenFds", OPTION_MISSING, "Missing active platform")
 
         GenFdsGlobalVariable.ActivePlatform = PathClass(NormPath(ActivePlatform), Workspace)
@@ -190,9 +192,14 @@ def main():
         
         for Arch in ArchList:
             GenFdsGlobalVariable.OutputDirFromDscDict[Arch] = NormPath(BuildWorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch].OutputDirectory)
+            GenFdsGlobalVariable.PlatformName = BuildWorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch].PlatformName
 
         if (Options.outputDir):
             OutputDirFromCommandLine = GenFdsGlobalVariable.ReplaceWorkspaceMacro(Options.outputDir)
+            if not os.path.isabs (Options.outputDir):
+                Options.outputDir = os.path.join(GenFdsGlobalVariable.WorkSpaceDir, Options.outputDir)
+            if os.path.normcase (Options.outputDir).find(Workspace) != 0:
+                EdkLogger.error("GenFds", FILE_NOT_FOUND, "OutputDir doesn't exist in Workspace!")
             for Arch in ArchList:
                 GenFdsGlobalVariable.OutputDirDict[Arch] = OutputDirFromCommandLine
         else:
@@ -237,10 +244,13 @@ def main():
             GenFds.PreprocessImage(BuildWorkSpace, GenFdsGlobalVariable.ActivePlatform)
         """Call GenFds"""
         GenFds.GenFd('', FdfParserObj, BuildWorkSpace, ArchList)
-        
+
+        """Generate GUID cross reference file"""
+        GenFds.GenerateGuidXRefFile(BuildWorkSpace, ArchList)
+
         """Display FV space info."""
         GenFds.DisplayFvSpaceInfo(FdfParserObj)
-        
+
     except FdfParser.Warning, X:
         EdkLogger.error(X.ToolName, FORMAT_INVALID, File=X.FileName, Line=X.LineNumber, ExtraData=X.Message, RaiseError = False)
         ReturnCode = FORMAT_INVALID
@@ -352,7 +362,7 @@ class GenFds :
                 # Get FV base Address
                 FvObj.AddToBuffer(Buffer, None, GenFds.GetFvBlockSize(FvObj))
                 Buffer.close()
-
+        
         if GenFds.OnlyGenerateThisFv == None and GenFds.OnlyGenerateThisFd == None:
             if GenFdsGlobalVariable.FdfParser.Profile.CapsuleDict != {}:
                 GenFdsGlobalVariable.VerboseLogger("\n Generate other Capsule images!")
@@ -372,7 +382,7 @@ class GenFds :
     #   @retval int             Block size value
     #
     def GetFvBlockSize(FvObj):
-        DefaultBlockSize = 0x10000
+        DefaultBlockSize = 0x1
         FdObj = None
         if GenFds.OnlyGenerateThisFd != None and GenFds.OnlyGenerateThisFd.upper() in GenFdsGlobalVariable.FdfParser.Profile.FdDict.keys():
             FdObj = GenFdsGlobalVariable.FdfParser.Profile.FdDict[GenFds.OnlyGenerateThisFd.upper()]
@@ -476,11 +486,23 @@ class GenFds :
             ModuleObj = BuildDb.BuildObject[Key, 'COMMON']
             print ModuleObj.BaseName + ' ' + ModuleObj.ModuleType
 
+    def GenerateGuidXRefFile(BuildDb, ArchList):
+        GuidXRefFileName = os.path.join(GenFdsGlobalVariable.FvDir, "Guid.xref")
+        GuidXRefFile = open(GuidXRefFileName, "w+")
+        for Arch in ArchList:
+            PlatformDataBase = BuildDb.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch]
+            for ModuleFile in PlatformDataBase.Modules:
+                Module = BuildDb.BuildObject[ModuleFile, Arch]
+                GuidXRefFile.write("%s %s\n" % (Module.Guid, Module.BaseName))
+        GuidXRefFile.close()
+        GenFdsGlobalVariable.InfLogger("\nGUID cross reference file saved to %s" % GuidXRefFileName)
+        
     ##Define GenFd as static function
     GenFd = staticmethod(GenFd)
     GetFvBlockSize = staticmethod(GetFvBlockSize)
     DisplayFvSpaceInfo = staticmethod(DisplayFvSpaceInfo)
     PreprocessImage = staticmethod(PreprocessImage)
+    GenerateGuidXRefFile = staticmethod(GenerateGuidXRefFile)
 
 if __name__ == '__main__':
     r = main()

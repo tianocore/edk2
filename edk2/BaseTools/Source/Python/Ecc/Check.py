@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define checkpoints used by ECC tool
 #
-# Copyright (c) 2008, Intel Corporation
+# Copyright (c) 2008 - 2010, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -298,7 +298,11 @@ class Check(object):
             for Key in RecordDict:
                 if len(RecordDict[Key]) > 1:
                     for Item in RecordDict[Key]:
-                        EccGlobalData.gDb.TblReport.Insert(ERROR_INCLUDE_FILE_CHECK_NAME, OtherMsg = "The file name for '%s' is duplicate" % (Item[1]), BelongsToTable = 'File', BelongsToItem = Item[0])
+                        Path = Item[1].replace(EccGlobalData.gWorkspace, '')
+                        if Path.startswith('\\') or Path.startswith('/'):
+                            Path = Path[1:]
+                        if not EccGlobalData.gException.IsException(ERROR_INCLUDE_FILE_CHECK_NAME, Path):
+                            EccGlobalData.gDb.TblReport.Insert(ERROR_INCLUDE_FILE_CHECK_NAME, OtherMsg = "The file name for [%s] is duplicate" % Path, BelongsToTable = 'File', BelongsToItem = Item[0])
 
     # Check whether all include file contents is guarded by a #ifndef statement.
     def IncludeFileCheckIfndef(self):
@@ -527,7 +531,7 @@ class Check(object):
         if EccGlobalData.gConfig.MetaDataFileCheckPcdDuplicate == '1' or EccGlobalData.gConfig.MetaDataFileCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
             EdkLogger.quiet("Checking for duplicate PCDs defined in both DSC and FDF files ...")
             SqlCommand = """
-                         select A.ID, A.Value2, B.ID, B.Value2 from Dsc as A, Fdf as B
+                         select A.ID, A.Value2, A.BelongsToFile, B.ID, B.Value2, B.BelongsToFile from Dsc as A, Fdf as B
                          where A.Model >= %s and A.Model < %s
                          and B.Model >= %s and B.Model < %s
                          and A.Value2 = B.Value2
@@ -537,10 +541,17 @@ class Check(object):
                          """% (MODEL_PCD, MODEL_META_DATA_HEADER, MODEL_PCD, MODEL_META_DATA_HEADER)
             RecordSet = EccGlobalData.gDb.TblDsc.Exec(SqlCommand)
             for Record in RecordSet:
+                SqlCommand1 = """select Name from File where ID = %s""" %Record[2]
+                SqlCommand2 = """select Name from File where ID = %s""" %Record[5]
+                DscFileName = os.path.splitext(EccGlobalData.gDb.TblDsc.Exec(SqlCommand1)[0][0])[0]
+                FdfFileName = os.path.splitext(EccGlobalData.gDb.TblDsc.Exec(SqlCommand2)[0][0])[0]
+                print DscFileName, 111, FdfFileName
+                if DscFileName != FdfFileName:
+                    continue
                 if not EccGlobalData.gException.IsException(ERROR_META_DATA_FILE_CHECK_PCD_DUPLICATE, Record[1]):
                     EccGlobalData.gDb.TblReport.Insert(ERROR_META_DATA_FILE_CHECK_PCD_DUPLICATE, OtherMsg = "The PCD [%s] is defined in both FDF file and DSC file" % (Record[1]), BelongsToTable = 'Dsc', BelongsToItem = Record[0])
                 if not EccGlobalData.gException.IsException(ERROR_META_DATA_FILE_CHECK_PCD_DUPLICATE, Record[3]):
-                    EccGlobalData.gDb.TblReport.Insert(ERROR_META_DATA_FILE_CHECK_PCD_DUPLICATE, OtherMsg = "The PCD [%s] is defined in both FDF file and DSC file" % (Record[3]), BelongsToTable = 'Fdf', BelongsToItem = Record[2])
+                    EccGlobalData.gDb.TblReport.Insert(ERROR_META_DATA_FILE_CHECK_PCD_DUPLICATE, OtherMsg = "The PCD [%s] is defined in both FDF file and DSC file" % (Record[4]), BelongsToTable = 'Fdf', BelongsToItem = Record[3])
 
             EdkLogger.quiet("Checking for duplicate PCDs defined in DEC files ...")
             SqlCommand = """
@@ -664,7 +675,7 @@ class Check(object):
                 for Tbl in TableSet:
                     TblName = 'Identifier' + str(Tbl[0])
                     SqlCommand = """
-                                 select Name, ID from %s where value like '%%%s%%' and Model = %s
+                                 select Name, ID from %s where value like '%s' and Model = %s
                                  """ % (TblName, PcdName, MODEL_IDENTIFIER_FUNCTION_CALLING)
                     RecordSet = EccGlobalData.gDb.TblInf.Exec(SqlCommand)
                     TblNumber = TblName.replace('Identifier', '')
@@ -726,29 +737,35 @@ class Check(object):
 
     # Naming Convention Check
     def NamingConventionCheck(self):
-
-        for Dirpath, Dirnames, Filenames in self.WalkTree():
-            for F in Filenames:
-                if os.path.splitext(F)[1] in ('.h', '.c'):
-                    FullName = os.path.join(Dirpath, F)
-                    Id = c.GetTableID(FullName)
-                    if Id < 0:
-                        continue
-                    FileTable = 'Identifier' + str(Id)
-                    self.NamingConventionCheckDefineStatement(FileTable)
-                    self.NamingConventionCheckTypedefStatement(FileTable)
-                    self.NamingConventionCheckIfndefStatement(FileTable)
-                    self.NamingConventionCheckVariableName(FileTable)           
-                    self.NamingConventionCheckSingleCharacterVariable(FileTable)
+        if EccGlobalData.gConfig.NamingConventionCheckDefineStatement == '1' \
+        or EccGlobalData.gConfig.NamingConventionCheckTypedefStatement == '1' \
+        or EccGlobalData.gConfig.NamingConventionCheckIfndefStatement == '1' \
+        or EccGlobalData.gConfig.NamingConventionCheckVariableName == '1' \
+        or EccGlobalData.gConfig.NamingConventionCheckSingleCharacterVariable == '1' \
+        or EccGlobalData.gConfig.NamingConventionCheckAll == '1'\
+        or EccGlobalData.gConfig.CheckAll == '1':
+            for Dirpath, Dirnames, Filenames in self.WalkTree():
+                for F in Filenames:
+                    if os.path.splitext(F)[1] in ('.h', '.c'):
+                        FullName = os.path.join(Dirpath, F)
+                        Id = c.GetTableID(FullName)
+                        if Id < 0:
+                            continue
+                        FileTable = 'Identifier' + str(Id)
+                        self.NamingConventionCheckDefineStatement(FileTable)
+                        self.NamingConventionCheckTypedefStatement(FileTable)
+                        self.NamingConventionCheckIfndefStatement(FileTable)
+                        self.NamingConventionCheckVariableName(FileTable)
+                        self.NamingConventionCheckSingleCharacterVariable(FileTable)
 
         self.NamingConventionCheckPathName()
         self.NamingConventionCheckFunctionName()
-        
+
     # Check whether only capital letters are used for #define declarations
     def NamingConventionCheckDefineStatement(self, FileTable):
         if EccGlobalData.gConfig.NamingConventionCheckDefineStatement == '1' or EccGlobalData.gConfig.NamingConventionCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
             EdkLogger.quiet("Checking naming covention of #define statement ...")
-            
+
             SqlCommand = """select ID, Value from %s where Model = %s""" %(FileTable, MODEL_IDENTIFIER_MACRO_DEFINE)
             RecordSet = EccGlobalData.gDb.TblFile.Exec(SqlCommand)
             for Record in RecordSet:
@@ -763,7 +780,7 @@ class Check(object):
     def NamingConventionCheckTypedefStatement(self, FileTable):
         if EccGlobalData.gConfig.NamingConventionCheckTypedefStatement == '1' or EccGlobalData.gConfig.NamingConventionCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
             EdkLogger.quiet("Checking naming covention of #typedef statement ...")
-            
+
             SqlCommand = """select ID, Name from %s where Model = %s""" %(FileTable, MODEL_IDENTIFIER_TYPEDEF)
             RecordSet = EccGlobalData.gDb.TblFile.Exec(SqlCommand)
             for Record in RecordSet:
@@ -783,7 +800,7 @@ class Check(object):
     def NamingConventionCheckIfndefStatement(self, FileTable):
         if EccGlobalData.gConfig.NamingConventionCheckTypedefStatement == '1' or EccGlobalData.gConfig.NamingConventionCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
             EdkLogger.quiet("Checking naming covention of #ifndef statement ...")
-            
+
             SqlCommand = """select ID, Value from %s where Model = %s""" %(FileTable, MODEL_IDENTIFIER_MACRO_IFNDEF)
             RecordSet = EccGlobalData.gDb.TblFile.Exec(SqlCommand)
             for Record in RecordSet:
@@ -818,7 +835,7 @@ class Check(object):
         if EccGlobalData.gConfig.NamingConventionCheckVariableName == '1' or EccGlobalData.gConfig.NamingConventionCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
             EdkLogger.quiet("Checking naming covention of variable name ...")
             Pattern = re.compile(r'^[A-Zgm]+\S*[a-z]\S*$')
-            
+
             SqlCommand = """select ID, Name from %s where Model = %s""" %(FileTable, MODEL_IDENTIFIER_VARIABLE)
             RecordSet = EccGlobalData.gDb.TblFile.Exec(SqlCommand)
             for Record in RecordSet:
@@ -846,7 +863,7 @@ class Check(object):
     def NamingConventionCheckSingleCharacterVariable(self, FileTable):
         if EccGlobalData.gConfig.NamingConventionCheckSingleCharacterVariable == '1' or EccGlobalData.gConfig.NamingConventionCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
             EdkLogger.quiet("Checking naming covention of single character variable name ...")
-            
+
             SqlCommand = """select ID, Name from %s where Model = %s""" %(FileTable, MODEL_IDENTIFIER_VARIABLE)
             RecordSet = EccGlobalData.gDb.TblFile.Exec(SqlCommand)
             for Record in RecordSet:

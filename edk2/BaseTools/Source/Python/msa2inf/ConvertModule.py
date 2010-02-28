@@ -2,7 +2,7 @@
 # Convert an MSA Module class object ot an INF Module class object by filling
 # several info required by INF file.
 #
-# Copyright (c) 2007, Intel Corporation
+# Copyright (c) 2007 - 2010, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -35,7 +35,7 @@ def AddModuleMiscVersion(Module):
     Module.Header.InfVersion = Version
 
     Version = Module.Header.Specification.get("EFI_SPECIFICATION_VERSION", "")
-    Module.Header.EfiSpecificationVersion = Version
+    Module.Header.UefiSpecificationVersion = Version
     
     Version = Module.Header.Specification.get("EDK_RELEASE_VERSION", "")
     Module.Header.EdkReleaseVersion = Version

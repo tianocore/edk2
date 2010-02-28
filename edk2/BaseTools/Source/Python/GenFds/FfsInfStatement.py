@@ -1,7 +1,7 @@
 ## @file
 # process FFS generation from INF statement
 #
-#  Copyright (c) 2007, Intel Corporation
+#  Copyright (c) 2007 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -31,6 +31,9 @@ from Common.Misc import PathClass
 from Common.Misc import GuidStructureByteArrayToGuidString
 from Common import EdkLogger
 from Common.BuildToolError import *
+from GuidSection import GuidSection
+from FvImageSection import FvImageSection
+from Common.Misc import PeImageClass
 
 ## generate FFS from INF
 #
@@ -146,11 +149,13 @@ class FfsInfStatement(FfsInfStatementClassObject):
     #
     #   Generate FFS
     #
-    #   @param  self        The object pointer
-    #   @param  Dict        dictionary contains macro and value pair
-    #   @retval string      Generated FFS file name
+    #   @param  self         The object pointer
+    #   @param  Dict         dictionary contains macro and value pair
+    #   @param  FvChildAddr  Array of the inside FvImage base address
+    #   @param  FvParentAddr Parent Fv base address
+    #   @retval string       Generated FFS file name
     #
-    def GenFfs(self, Dict = {}):
+    def GenFfs(self, Dict = {}, FvChildAddr = [], FvParentAddr=None):
         #
         # Parse Inf file get Module related information
         #
@@ -184,7 +189,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
         # For Rule has ComplexFile
         #
         elif isinstance(Rule, RuleComplexFile.RuleComplexFile):
-            InputSectList, InputSectAlignments = self.__GenComplexFileSection__(Rule)
+            InputSectList, InputSectAlignments = self.__GenComplexFileSection__(Rule, FvChildAddr, FvParentAddr)
             FfsOutput = self.__GenComplexFileFfs__(Rule, InputSectList, InputSectAlignments)
 
             return FfsOutput
@@ -393,8 +398,13 @@ class FfsInfStatement(FfsInfStatementClassObject):
         #
         FileList = []
         OutputFileList = []
+        GenSecInputFile = None
         if Rule.FileName != None:
             GenSecInputFile = self.__ExtendMacro__(Rule.FileName)
+            if os.path.isabs(GenSecInputFile):
+                GenSecInputFile = os.path.normpath(GenSecInputFile)
+            else:
+                GenSecInputFile = os.path.normpath(os.path.join(self.EfiOutputPath, GenSecInputFile))
         else:
             FileList, IsSect = Section.Section.GetFileList(self, '', Rule.FileExtension)
 
@@ -429,6 +439,15 @@ class FfsInfStatement(FfsInfStatementClassObject):
                               Ffs.Ffs.SectionSuffix[SectionType] + 'SEC' + SecNum
                 Index = Index + 1
                 OutputFile = os.path.join(self.OutputPath, GenSecOutputFile)
+                File = GenFdsGlobalVariable.MacroExtend(File, Dict, self.CurrentArch)
+
+                #Get PE Section alignment when align is set to AUTO
+                if self.Alignment == 'Auto' and (SectionType == 'PE32' or SectionType == 'TE'):
+                    ImageObj = PeImageClass (File)
+                    if ImageObj.SectionAlignment < 0x400:
+                        self.Alignment = str (ImageObj.SectionAlignment)
+                    else:
+                        self.Alignment = str (ImageObj.SectionAlignment / 0x400) + 'K'
 
                 if not NoStrip:
                     FileBeforeStrip = os.path.join(self.OutputPath, ModuleName + '.reloc')
@@ -438,7 +457,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
                     StrippedFile = os.path.join(self.OutputPath, ModuleName + '.stipped')
                     GenFdsGlobalVariable.GenerateFirmwareImage(
                                             StrippedFile,
-                                            [GenFdsGlobalVariable.MacroExtend(File, Dict, self.CurrentArch)],
+                                            [File],
                                             Strip=True
                                             )
                     File = StrippedFile
@@ -447,7 +466,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
                     TeFile = os.path.join( self.OutputPath, self.ModuleGuid + 'Te.raw')
                     GenFdsGlobalVariable.GenerateFirmwareImage(
                                             TeFile,
-                                            [GenFdsGlobalVariable.MacroExtend(File, Dict, self.CurrentArch)],
+                                            [File],
                                             Type='te'
                                             )
                     File = TeFile
@@ -459,6 +478,15 @@ class FfsInfStatement(FfsInfStatementClassObject):
             GenSecOutputFile= self.__ExtendMacro__(Rule.NameGuid) + \
                               Ffs.Ffs.SectionSuffix[SectionType] + 'SEC' + SecNum
             OutputFile = os.path.join(self.OutputPath, GenSecOutputFile)
+            GenSecInputFile = GenFdsGlobalVariable.MacroExtend(GenSecInputFile, Dict, self.CurrentArch)
+
+            #Get PE Section alignment when align is set to AUTO
+            if self.Alignment == 'Auto' and (SectionType == 'PE32' or SectionType == 'TE'):
+                ImageObj = PeImageClass (GenSecInputFile)
+                if ImageObj.SectionAlignment < 0x400:
+                    self.Alignment = str (ImageObj.SectionAlignment)
+                else:
+                    self.Alignment = str (ImageObj.SectionAlignment / 0x400) + 'K'
 
             if not NoStrip:
                 FileBeforeStrip = os.path.join(self.OutputPath, ModuleName + '.reloc')
@@ -468,7 +496,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
                 StrippedFile = os.path.join(self.OutputPath, ModuleName + '.stipped')
                 GenFdsGlobalVariable.GenerateFirmwareImage(
                                         StrippedFile,
-                                        [GenFdsGlobalVariable.MacroExtend(GenSecInputFile, Dict, self.CurrentArch)],
+                                        [GenSecInputFile],
                                         Strip=True
                                         )
                 GenSecInputFile = StrippedFile
@@ -477,7 +505,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
                 TeFile = os.path.join( self.OutputPath, self.ModuleGuid + 'Te.raw')
                 GenFdsGlobalVariable.GenerateFirmwareImage(
                                         TeFile,
-                                        [GenFdsGlobalVariable.MacroExtend(File, Dict, self.CurrentArch)],
+                                        [GenSecInputFile],
                                         Type='te'
                                         )
                 GenSecInputFile = TeFile
@@ -507,7 +535,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
         SectionAlignments = []
         for InputFile in InputFileList:
             InputSection.append(InputFile)
-            SectionAlignments.append(Rule.Alignment)
+            SectionAlignments.append(Rule.SectAlignment)
 
         if Rule.NameGuid != None and Rule.NameGuid.startswith('PCD('):
             PcdValue = GenFdsGlobalVariable.GetPcdValue(Rule.NameGuid)
@@ -534,11 +562,13 @@ class FfsInfStatement(FfsInfStatementClassObject):
     #
     #   Generate section by sections in Rule
     #
-    #   @param  self        The object pointer
-    #   @param  Rule        The rule object used to generate section
-    #   @retval string      File name of the generated section file
+    #   @param  self         The object pointer
+    #   @param  Rule         The rule object used to generate section
+    #   @param  FvChildAddr  Array of the inside FvImage base address
+    #   @param  FvParentAddr Parent Fv base address
+    #   @retval string       File name of the generated section file
     #
-    def __GenComplexFileSection__(self, Rule):
+    def __GenComplexFileSection__(self, Rule, FvChildAddr, FvParentAddr):
         if self.ModuleType in ('SEC', 'PEI_CORE', 'PEIM'):
             if Rule.KeepReloc != None:
                 self.KeepRelocFromRule = Rule.KeepReloc
@@ -560,6 +590,17 @@ class FfsInfStatement(FfsInfStatementClassObject):
             if self.ModuleType == 'DXE_SMM_DRIVER' and self.PiSpecVersion < 0x0001000A:
                 if Sect.SectionType == 'SMM_DEPEX':
                     EdkLogger.error("GenFds", FORMAT_NOT_SUPPORTED, "Framework SMM module doesn't support SMM_DEPEX section type", File=self.InfFileName)
+            #
+            # process the inside FvImage from FvSection or GuidSection
+            #
+            if FvChildAddr != []:
+                if isinstance(Sect, FvImageSection):
+                    Sect.FvAddr = FvChildAddr.pop(0)
+                elif isinstance(Sect, GuidSection):
+                    Sect.FvAddr = FvChildAddr
+            if FvParentAddr != None and isinstance(Sect, GuidSection):
+                Sect.FvParentAddr = FvParentAddr
+            
             if Rule.KeyStringList != []:
                 SectList, Align = Sect.GenSection(self.OutputPath , self.ModuleGuid, SecIndex, Rule.KeyStringList, self)
             else :

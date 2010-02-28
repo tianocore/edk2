@@ -1,7 +1,7 @@
 ## @file
 # build a platform or a module
 #
-#  Copyright (c) 2007, Intel Corporation
+#  Copyright (c) 2007 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -17,12 +17,14 @@
 #
 import os
 import re
+import StringIO
 import sys
 import glob
 import time
 import platform
 import traceback
 
+from struct import *
 from threading import *
 from optparse import OptionParser
 from subprocess import *
@@ -35,13 +37,17 @@ from AutoGen.AutoGen import *
 from Common.BuildToolError import *
 from Workspace.WorkspaceDatabase import *
 
+from BuildReport import BuildReport
+from GenPatchPcdTable.GenPatchPcdTable import *
+from PatchPcdValue.PatchPcdValue import *
+
 import Common.EdkLogger
 import Common.GlobalData as GlobalData
 
 # Version and Copyright
 VersionNumber = "0.5"
 __version__ = "%prog Version " + VersionNumber
-__copyright__ = "Copyright (c) 2007, Intel Corporation  All rights reserved."
+__copyright__ = "Copyright (c) 2007 - 2010, Intel Corporation  All rights reserved."
 
 ## standard targets of build command
 gSupportedTarget = ['all', 'genc', 'genmake', 'modules', 'libraries', 'fds', 'clean', 'cleanall', 'cleanlib', 'run']
@@ -640,6 +646,27 @@ class BuildTask:
         self.BuildTread.setDaemon(False)
         self.BuildTread.start()
 
+## The class contains the information related to EFI image
+#
+class PeImageInfo():
+    ## Constructor
+    #
+    # Constructor will load all required image information.
+    #
+    #   @param  BaseName          The full file path of image. 
+    #   @param  Guid              The GUID for image.
+    #   @param  Arch              Arch of this image.
+    #   @param  OutpuDir          The output directory for image.
+    #   @param  ImageClass        PeImage Information
+    #
+    def __init__(self, BaseName, Guid, Arch, OutpuDir, ImageClass):
+        self.BaseName         = BaseName
+        self.Guid             = Guid
+        self.Arch             = Arch
+        self.OutpuDir         = OutpuDir
+        self.Image            = ImageClass
+        self.Image.Size       = (self.Image.Size / 0x1000 + 1) * 0x1000
+
 ## The class implementing the EDK2 build process
 #
 #   The build process includes:
@@ -696,18 +723,14 @@ class Build():
         self.Reparse        = Reparse
         self.SkuId          = SkuId
         self.SpawnMode      = True
-        self.ReportFile     = ReportFile
-        if ReportType == None:
-          self.ReportType   = ['ALL']
-        else:
-          self.ReportType   = ReportType
-
+        self.BuildReport    = BuildReport(ReportFile, ReportType)
         self.TargetTxt      = TargetTxtClassObject()
         self.ToolDef        = ToolDefClassObject()
         self.Db             = WorkspaceDatabase(None, GlobalData.gGlobalDefines, self.Reparse)
         #self.Db             = WorkspaceDatabase(None, {}, self.Reparse)
         self.BuildDatabase  = self.Db.BuildObject
         self.Platform       = None
+        self.LoadFixAddress = 0
 
         # print dot charater during doing some time-consuming work
         self.Progress = Utils.Progressor()
@@ -838,6 +861,25 @@ class Build():
         self.Platform = self.BuildDatabase[self.PlatformFile, 'COMMON']
         if not self.Fdf:
             self.Fdf = self.Platform.FlashDefinition
+        
+        LoadFixAddressString = None
+        if TAB_FIX_LOAD_TOP_MEMORY_ADDRESS in GlobalData.gGlobalDefines:
+            LoadFixAddressString = GlobalData.gGlobalDefines[TAB_FIX_LOAD_TOP_MEMORY_ADDRESS]
+        else:
+            LoadFixAddressString = self.Platform.LoadFixAddress
+
+        if LoadFixAddressString != None and LoadFixAddressString != '':
+            try:
+                if LoadFixAddressString.upper().startswith('0X'):
+                    self.LoadFixAddress = int (LoadFixAddressString, 16)
+                else:
+                    self.LoadFixAddress = int (LoadFixAddressString)
+            except:
+                EdkLogger.error("build", PARAMETER_INVALID, "FIX_LOAD_TOP_MEMORY_ADDRESS %s is not valid dec or hex string" % (LoadFixAddressString))
+            if self.LoadFixAddress < 0:
+                EdkLogger.error("build", PARAMETER_INVALID, "FIX_LOAD_TOP_MEMORY_ADDRESS is set to the invalid negative value %s" % (LoadFixAddressString))
+            if self.LoadFixAddress != 0xFFFFFFFFFFFFFFFF and self.LoadFixAddress % 0x1000 != 0:
+                EdkLogger.error("build", PARAMETER_INVALID, "FIX_LOAD_TOP_MEMORY_ADDRESS is set to the invalid unaligned 4K value %s" % (LoadFixAddressString))
 
         if self.SkuId == None or self.SkuId == '':
             self.SkuId = self.Platform.SkuName
@@ -943,6 +985,273 @@ class Build():
                 EdkLogger.error("build", FILE_DELETE_FAILURE, ExtraData=str(X))
         return True
 
+    ## Rebase module image and Get function address for the inpug module list.
+    #
+    def _RebaseModule (self, MapBuffer, BaseAddress, ModuleList, AddrIsOffset = True, ModeIsSmm = False):
+        if ModeIsSmm:
+            AddrIsOffset = False
+        InfFileNameList = ModuleList.keys()
+        #InfFileNameList.sort()
+        for InfFile in InfFileNameList:
+            sys.stdout.write (".")
+            sys.stdout.flush()
+            ModuleInfo = ModuleList[InfFile]
+            ModuleName = ModuleInfo.BaseName
+            ## for SMM module in SMRAM, the SMRAM will be allocated from base to top.
+            if not ModeIsSmm:
+                BaseAddress = BaseAddress - ModuleInfo.Image.Size
+                #
+                # Update Image to new BaseAddress by GenFw tool
+                #
+                LaunchCommand(["GenFw", "--rebase", str(BaseAddress), "-r", ModuleInfo.Image.FileName], ModuleInfo.OutpuDir)
+            else:
+                #
+                # Set new address to the section header only for SMM driver.
+                #
+                LaunchCommand(["GenFw", "--address", str(BaseAddress), "-r", ModuleInfo.Image.FileName], ModuleInfo.OutpuDir)
+            #
+            # Collect funtion address from Map file
+            #
+            ImageMapTable = ModuleInfo.Image.FileName.replace('.efi', '.map')
+            FunctionList = []
+            if os.path.exists(ImageMapTable):
+                OrigImageBaseAddress = 0
+                ImageMap = open (ImageMapTable, 'r')
+                for LinStr in ImageMap:
+                    if len (LinStr.strip()) == 0:
+                        continue
+                    #
+                    # Get the preferred address set on link time.
+                    #
+                    if LinStr.find ('Preferred load address is') != -1:
+                        StrList = LinStr.split()
+                        OrigImageBaseAddress = int (StrList[len(StrList) - 1], 16)
+
+                    StrList = LinStr.split()
+                    if len (StrList) > 4:
+                        if StrList[3] == 'f' or StrList[3] =='F':
+                            Name = StrList[1]
+                            RelativeAddress = int (StrList[2], 16) - OrigImageBaseAddress
+                            FunctionList.append ((Name, RelativeAddress))
+                            if ModuleInfo.Arch == 'IPF' and Name.endswith('_ModuleEntryPoint'):
+                                #
+                                # Get the real entry point address for IPF image.
+                                #
+                                ModuleInfo.Image.EntryPoint = RelativeAddress
+                ImageMap.close()
+            #
+            # Add general information.
+            #
+            if ModeIsSmm:
+                MapBuffer.write('\n\n%s (Fixed SMRAM Offset,   BaseAddress=0x%010X,  EntryPoint=0x%010X)\n' % (ModuleName, BaseAddress, BaseAddress + ModuleInfo.Image.EntryPoint))
+            elif AddrIsOffset:
+                MapBuffer.write('\n\n%s (Fixed Memory Offset,  BaseAddress=-0x%010X, EntryPoint=-0x%010X)\n' % (ModuleName, 0 - BaseAddress, 0 - (BaseAddress + ModuleInfo.Image.EntryPoint)))
+            else:
+                MapBuffer.write('\n\n%s (Fixed Memory Address, BaseAddress=0x%010X,  EntryPoint=0x%010X)\n' % (ModuleName, BaseAddress, BaseAddress + ModuleInfo.Image.EntryPoint))
+            #
+            # Add guid and general seciton section.
+            #
+            TextSectionAddress = 0
+            DataSectionAddress = 0
+            for SectionHeader in ModuleInfo.Image.SectionHeaderList:
+                if SectionHeader[0] == '.text':
+                    TextSectionAddress = SectionHeader[1]
+                elif SectionHeader[0] in ['.data', '.sdata']:
+                    DataSectionAddress = SectionHeader[1]
+            if AddrIsOffset:
+                MapBuffer.write('(GUID=%s, .textbaseaddress=-0x%010X, .databaseaddress=-0x%010X)\n\n' % (ModuleInfo.Guid, 0 - (BaseAddress + TextSectionAddress), 0 - (BaseAddress + DataSectionAddress))) 
+            else:
+                MapBuffer.write('(GUID=%s, .textbaseaddress=0x%010X, .databaseaddress=0x%010X)\n\n' % (ModuleInfo.Guid, BaseAddress + TextSectionAddress, BaseAddress + DataSectionAddress)) 
+            #
+            # Add funtion address
+            #
+            for Function in FunctionList:
+                if AddrIsOffset:
+                    MapBuffer.write('  -0x%010X    %s\n' % (0 - (BaseAddress + Function[1]), Function[0]))
+                else:
+                    MapBuffer.write('  0x%010X    %s\n' % (BaseAddress + Function[1], Function[0]))
+            ImageMap.close()
+
+            #
+            # for SMM module in SMRAM, the SMRAM will be allocated from base to top.
+            #
+            if ModeIsSmm:
+                BaseAddress = BaseAddress + ModuleInfo.Image.Size
+
+    ## Collect MAP information of all FVs
+    #
+    def _CollectFvMapBuffer (self, MapBuffer, Wa):
+        if self.Fdf != '':
+            # First get the XIP base address for FV map file.
+            for FvName in Wa.FdfProfile.FvDict.keys():
+                FvMapBuffer = os.path.join(Wa.FvDir, FvName + '.Fv.map')
+                if not os.path.exists(FvMapBuffer):
+                    continue
+                FvMap = open (FvMapBuffer, 'r')
+                #skip FV size information
+                FvMap.readline()
+                FvMap.readline()
+                FvMap.readline()
+                FvMap.readline()
+                MapBuffer.write(FvMap.read())
+                FvMap.close()
+
+    ## Collect MAP information of all modules
+    #
+    def _CollectModuleMapBuffer (self, MapBuffer, ModuleList):
+        sys.stdout.write ("Generate Load Module At Fix Address Map")
+        sys.stdout.flush()
+        PatchEfiImageList = []
+        PeiModuleList  = {}
+        BtModuleList   = {}
+        RtModuleList   = {}
+        SmmModuleList  = {}
+        PeiSize = 0
+        BtSize  = 0
+        RtSize  = 0
+        # reserve 4K size in SMRAM to make SMM module address not from 0.
+        SmmSize = 0x1000
+        IsIpfPlatform = False
+        if 'IPF' in self.ArchList:
+            IsIpfPlatform = True
+        for Module in ModuleList:
+            GlobalData.gProcessingFile = "%s [%s, %s, %s]" % (Module.MetaFile, Module.Arch, Module.ToolChain, Module.BuildTarget)
+            
+            OutputImageFile = ''
+            for ResultFile in Module.CodaTargetList:
+                if str(ResultFile.Target).endswith('.efi'):
+                    #
+                    # module list for PEI, DXE, RUNTIME and SMM
+                    #
+                    OutputImageFile = os.path.join(Module.OutputDir, Module.Name + '.efi')
+                    ImageClass = PeImageClass (OutputImageFile)
+                    if not ImageClass.IsValid:
+                        EdkLogger.error("build", FILE_PARSE_FAILURE, ExtraData=ImageClass.ErrorInfo)
+                    ImageInfo = PeImageInfo(Module.Name, Module.Guid, Module.Arch, Module.OutputDir, ImageClass)
+                    if Module.ModuleType in ['PEI_CORE', 'PEIM', 'COMBINED_PEIM_DRIVER','PIC_PEIM', 'RELOCATABLE_PEIM', 'DXE_CORE']:
+                        PeiModuleList[Module.MetaFile] = ImageInfo
+                        PeiSize += ImageInfo.Image.Size
+                    elif Module.ModuleType in ['BS_DRIVER', 'DXE_DRIVER', 'UEFI_DRIVER']:
+                        BtModuleList[Module.MetaFile] = ImageInfo
+                        BtSize += ImageInfo.Image.Size
+                    elif Module.ModuleType in ['DXE_RUNTIME_DRIVER', 'RT_DRIVER', 'DXE_SAL_DRIVER', 'SAL_RT_DRIVER']:
+                        RtModuleList[Module.MetaFile] = ImageInfo
+                        #IPF runtime driver needs to be at 2 page alignment.
+                        if IsIpfPlatform and ImageInfo.Image.Size % 0x2000 != 0:
+                            ImageInfo.Image.Size = (ImageInfo.Image.Size / 0x2000 + 1) * 0x2000
+                        RtSize += ImageInfo.Image.Size
+                    elif Module.ModuleType in ['SMM_CORE', 'DXE_SMM_DRIVER']:
+                        SmmModuleList[Module.MetaFile] = ImageInfo
+                        SmmSize += ImageInfo.Image.Size
+                        if Module.ModuleType == 'DXE_SMM_DRIVER':
+                            PiSpecVersion = 0
+                            if 'PI_SPECIFICATION_VERSION' in Module.Module.Specification:
+                                PiSpecVersion = Module.Module.Specification['PI_SPECIFICATION_VERSION']
+                            # for PI specification < PI1.1, DXE_SMM_DRIVER also runs as BOOT time driver.
+                            if PiSpecVersion < 0x0001000A:
+                                BtModuleList[Module.MetaFile] = ImageInfo
+                                BtSize += ImageInfo.Image.Size
+                    break
+            #
+            # EFI image is final target.
+            # Check EFI image contains patchable FixAddress related PCDs.
+            #
+            if OutputImageFile != '':
+                ModuleIsPatch = False
+                for Pcd in Module.ModulePcdList:
+                    if Pcd.Type == TAB_PCDS_PATCHABLE_IN_MODULE and Pcd.TokenCName in TAB_PCDS_PATCHABLE_LOAD_FIX_ADDRESS_LIST:
+                        ModuleIsPatch = True
+                        break
+                if not ModuleIsPatch:
+                    for Pcd in Module.LibraryPcdList:
+                        if Pcd.Type == TAB_PCDS_PATCHABLE_IN_MODULE and Pcd.TokenCName in TAB_PCDS_PATCHABLE_LOAD_FIX_ADDRESS_LIST:
+                            ModuleIsPatch = True
+                            break
+                
+                if not ModuleIsPatch:
+                    continue
+                #
+                # Module includes the patchable load fix address PCDs.
+                # It will be fixed up later. 
+                #
+                PatchEfiImageList.append (OutputImageFile)
+        
+        #
+        # Get Top Memory address
+        #
+        ReservedRuntimeMemorySize = 0
+        TopMemoryAddress = 0
+        if self.LoadFixAddress == 0xFFFFFFFFFFFFFFFF:
+            TopMemoryAddress = 0
+        else:
+            TopMemoryAddress = self.LoadFixAddress
+            if TopMemoryAddress < RtSize + BtSize + PeiSize:
+                EdkLogger.error("build", PARAMETER_INVALID, "FIX_LOAD_TOP_MEMORY_ADDRESS is too low to load driver")
+            # Make IPF runtime driver at 2 page alignment.
+            if IsIpfPlatform:
+                ReservedRuntimeMemorySize = TopMemoryAddress % 0x2000
+                RtSize = RtSize + ReservedRuntimeMemorySize
+
+        #
+        # Patch FixAddress related PCDs into EFI image
+        #
+        for EfiImage in PatchEfiImageList: 
+            EfiImageMap = EfiImage.replace('.efi', '.map')
+            if not os.path.exists(EfiImageMap):
+                continue
+            #
+            # Get PCD offset in EFI image by GenPatchPcdTable function
+            #
+            PcdTable = parsePcdInfoFromMapFile(EfiImageMap, EfiImage) 
+            #
+            # Patch real PCD value by PatchPcdValue tool
+            #
+            for PcdInfo in PcdTable:
+                ReturnValue = 0
+                if PcdInfo[0] == TAB_PCDS_PATCHABLE_LOAD_FIX_ADDRESS_PEI_PAGE_SIZE:
+                    ReturnValue, ErrorInfo = PatchBinaryFile (EfiImage, PcdInfo[1], TAB_PCDS_PATCHABLE_LOAD_FIX_ADDRESS_PEI_PAGE_SIZE_DATA_TYPE, str (PeiSize/0x1000))
+                elif PcdInfo[0] == TAB_PCDS_PATCHABLE_LOAD_FIX_ADDRESS_DXE_PAGE_SIZE:
+                    ReturnValue, ErrorInfo = PatchBinaryFile (EfiImage, PcdInfo[1], TAB_PCDS_PATCHABLE_LOAD_FIX_ADDRESS_DXE_PAGE_SIZE_DATA_TYPE, str (BtSize/0x1000))
+                elif PcdInfo[0] == TAB_PCDS_PATCHABLE_LOAD_FIX_ADDRESS_RUNTIME_PAGE_SIZE:
+                    ReturnValue, ErrorInfo = PatchBinaryFile (EfiImage, PcdInfo[1], TAB_PCDS_PATCHABLE_LOAD_FIX_ADDRESS_RUNTIME_PAGE_SIZE_DATA_TYPE, str (RtSize/0x1000))
+                elif PcdInfo[0] == TAB_PCDS_PATCHABLE_LOAD_FIX_ADDRESS_SMM_PAGE_SIZE and len (SmmModuleList) > 0:
+                    ReturnValue, ErrorInfo = PatchBinaryFile (EfiImage, PcdInfo[1], TAB_PCDS_PATCHABLE_LOAD_FIX_ADDRESS_SMM_PAGE_SIZE_DATA_TYPE, str (SmmSize/0x1000))
+                if ReturnValue != 0:
+                    EdkLogger.error("build", PARAMETER_INVALID, "Patch PCD value failed", ExtraData=ErrorInfo)
+        
+        MapBuffer.write('PEI_CODE_PAGE_NUMBER      = 0x%x\n' % (PeiSize/0x1000))
+        MapBuffer.write('BOOT_CODE_PAGE_NUMBER     = 0x%x\n' % (BtSize/0x1000))
+        MapBuffer.write('RUNTIME_CODE_PAGE_NUMBER  = 0x%x\n' % (RtSize/0x1000))
+        if len (SmmModuleList) > 0:
+            MapBuffer.write('SMM_CODE_PAGE_NUMBER      = 0x%x\n' % (SmmSize/0x1000))
+        
+        PeiBaseAddr = TopMemoryAddress - RtSize - BtSize
+        BtBaseAddr  = TopMemoryAddress - RtSize
+        RtBaseAddr  = TopMemoryAddress - ReservedRuntimeMemorySize
+
+        self._RebaseModule (MapBuffer, PeiBaseAddr, PeiModuleList, TopMemoryAddress == 0)
+        self._RebaseModule (MapBuffer, BtBaseAddr, BtModuleList, TopMemoryAddress == 0)
+        self._RebaseModule (MapBuffer, RtBaseAddr, RtModuleList, TopMemoryAddress == 0)
+        self._RebaseModule (MapBuffer, 0x1000, SmmModuleList, AddrIsOffset = False, ModeIsSmm = True)
+        MapBuffer.write('\n\n')
+        sys.stdout.write ("\n")
+        sys.stdout.flush()
+    
+    ## Save platform Map file
+    #
+    def _SaveMapFile (self, MapBuffer, Wa):
+        #
+        # Map file path is got.
+        #
+        MapFilePath = os.path.join(Wa.BuildDir, Wa.Name + '.map')
+        #
+        # Save address map into MAP file.
+        #
+        SaveFileOnChange(MapFilePath, MapBuffer.getvalue(), False)
+        MapBuffer.close()
+        sys.stdout.write ("\nLoad Module At Fix Address Map file saved to %s\n" %(MapFilePath))
+        sys.stdout.flush()
+
     ## Build active platform for different build targets and different tool chains
     #
     def _BuildPlatform(self):
@@ -960,12 +1269,49 @@ class Build():
                         self.Fdf,
                         self.FdList,
                         self.FvList,
-                        self.SkuId,
-                        self.ReportFile,
-                        self.ReportType
+                        self.SkuId
                         )
+                self.BuildReport.AddPlatformReport(Wa)
                 self.Progress.Stop("done!")
                 self._Build(self.Target, Wa)
+                
+                # Create MAP file when Load Fix Address is enabled.
+                if self.Target in ["", "all", "fds"] and self.LoadFixAddress != 0:
+                    for Arch in self.ArchList:
+                        #
+                        # Check whether the set fix address is above 4G for 32bit image.
+                        #
+                        if (Arch == 'IA32' or Arch == 'ARM') and self.LoadFixAddress != 0xFFFFFFFFFFFFFFFF and self.LoadFixAddress >= 0x100000000:
+                            EdkLogger.error("build", PARAMETER_INVALID, "FIX_LOAD_TOP_MEMORY_ADDRESS can't be set to larger than or equal to 4G for the platorm with IA32 or ARM arch modules")
+                    #
+                    # Get Module List
+                    #
+                    ModuleList = []
+                    for Pa in Wa.AutoGenObjectList:
+                        for Ma in Pa.ModuleAutoGenList:
+                            if Ma == None:
+                                continue
+                            if not Ma.IsLibrary:
+                                ModuleList.append (Ma)
+
+                    MapBuffer = StringIO('')
+                    #
+                    # Rebase module to the preferred memory address before GenFds
+                    #
+                    self._CollectModuleMapBuffer(MapBuffer, ModuleList)
+                    if self.Fdf != '':
+                        #
+                        # create FDS again for the updated EFI image
+                        #
+                        self._Build("fds", Wa)
+                        #
+                        # Create MAP file for all platform FVs after GenFds.
+                        #
+                        self._CollectFvMapBuffer(MapBuffer, Wa)
+                    #
+                    # Save MAP buffer into MAP file.
+                    #
+                    self._SaveMapFile (MapBuffer, Wa)
 
     ## Build active module for different build targets, different tool chains and different archs
     #
@@ -988,10 +1334,9 @@ class Build():
                         self.Fdf,
                         self.FdList,
                         self.FvList,
-                        self.SkuId,
-                        self.ReportFile,
-                        self.ReportType
+                        self.SkuId
                         )
+                self.BuildReport.AddPlatformReport(Wa)
                 Wa.CreateMakeFile(False)
                 self.Progress.Stop("done!")
                 MaList = []
@@ -1010,6 +1355,42 @@ class Build():
                                     (', '.join(self.ArchList), self.Platform),
                                 ExtraData=self.ModuleFile
                                 )
+                # Create MAP file when Load Fix Address is enabled.
+                if self.LoadFixAddress != 0 and self.Target == "fds" and self.Fdf != '':
+                    for Arch in self.ArchList:
+                        #
+                        # Check whether the set fix address is above 4G for 32bit image.
+                        #
+                        if (Arch == 'IA32' or Arch == 'ARM') and self.LoadFixAddress != 0xFFFFFFFFFFFFFFFF and self.LoadFixAddress >= 0x100000000:
+                            EdkLogger.error("build", PARAMETER_INVALID, "FIX_LOAD_TOP_MEMORY_ADDRESS can't be set to larger than or equal to 4G for the platorm with IA32 or ARM arch modules")
+                    #
+                    # Get Module List
+                    #
+                    ModuleList = []
+                    for Pa in Wa.AutoGenObjectList:
+                        for Ma in Pa.ModuleAutoGenList:
+                            if Ma == None:
+                                continue
+                            if not Ma.IsLibrary:
+                                ModuleList.append (Ma)
+
+                    MapBuffer = StringIO('')
+                    #
+                    # Rebase module to the preferred memory address before GenFds
+                    #
+                    self._CollectModuleMapBuffer(MapBuffer, ModuleList)
+                    #
+                    # create FDS again for the updated EFI image
+                    #
+                    self._Build("fds", Wa)
+                    #
+                    # Create MAP file for all platform FVs after GenFds.
+                    #
+                    self._CollectFvMapBuffer(MapBuffer, Wa)
+                    #
+                    # Save MAP buffer into MAP file.
+                    #
+                    self._SaveMapFile (MapBuffer, Wa)
 
     ## Build a platform in multi-thread mode
     #
@@ -1028,10 +1409,9 @@ class Build():
                         self.Fdf,
                         self.FdList,
                         self.FvList,
-                        self.SkuId,
-                        self.ReportFile,
-                        self.ReportType
+                        self.SkuId
                         )
+                self.BuildReport.AddPlatformReport(Wa)
                 Wa.CreateMakeFile(False)
 
                 # multi-thread exit flag
@@ -1091,9 +1471,45 @@ class Build():
                 if BuildTask.HasError():
                     EdkLogger.error("build", BUILD_ERROR, "Failed to build module", ExtraData=GlobalData.gBuildingModule)
 
+                # Create MAP file when Load Fix Address is enabled.
+                if self.Target in ["", "all", "fds"] and self.LoadFixAddress != 0:
+                    for Arch in self.ArchList:
+                        #
+                        # Check whether the set fix address is above 4G for 32bit image.
+                        #
+                        if (Arch == 'IA32' or Arch == 'ARM') and self.LoadFixAddress != 0xFFFFFFFFFFFFFFFF and self.LoadFixAddress >= 0x100000000:
+                            EdkLogger.error("build", PARAMETER_INVALID, "FIX_LOAD_TOP_MEMORY_ADDRESS can't be set to larger than or equal to 4G for the platorm with IA32 or ARM arch modules")
+                    #
+                    # Get Module List
+                    #
+                    ModuleList = []
+                    for Pa in Wa.AutoGenObjectList:
+                        for Ma in Pa.ModuleAutoGenList:
+                            if Ma == None:
+                                continue
+                            if not Ma.IsLibrary:
+                                ModuleList.append (Ma)
+                    #
+                    # Rebase module to the preferred memory address before GenFds
+                    #
+                    MapBuffer = StringIO('')
+                    self._CollectModuleMapBuffer(MapBuffer, ModuleList)
+
                 # Generate FD image if there's a FDF file found
                 if self.Fdf != '' and self.Target in ["", "all", "fds"]:
                     LaunchCommand(Wa.BuildCommand + ["fds"], Wa.MakeFileDir)
+
+                # Create MAP file for all platform FV after GenFds
+                if self.Target in ["", "all", "fds"] and self.LoadFixAddress != 0:
+                    if self.Fdf != '':
+                        #
+                        # Create MAP file for all platform FVs after GenFds.
+                        #
+                        self._CollectFvMapBuffer(MapBuffer, Wa)
+                    #
+                    # Save MAP buffer into MAP file.
+                    #
+                    self._SaveMapFile(MapBuffer, Wa)
 
     ## Generate GuidedSectionTools.txt in the FV directories.
     #
@@ -1266,8 +1682,9 @@ def MyOptionParser():
     Parser.add_option("-D", "--define", action="append", type="string", dest="Macros", help="Macro: \"Name [= Value]\".")
 
     Parser.add_option("-y", "--report-file", action="store", dest="ReportFile", help="Create/overwrite the report to the specified filename.")
-    Parser.add_option("-Y", "--report-type", action="append", type="choice", choices=['ALL','PCD',], dest="ReportType",
-        help="Flags that control the type of build report to generate.  Must be one of: [ALL, PCD].  To specify more than one flag, repeat this option on the command line.")
+    Parser.add_option("-Y", "--report-type", action="append", type="choice", choices=['PCD','LIBRARY','FLASH','DEPEX','BUILD_FLAGS','FIXED_ADDRESS', 'EXECUTION_ORDER'], dest="ReportType", default=[],
+        help="Flags that control the type of build report to generate.  Must be one of: [PCD, LIBRARY, FLASH, DEPEX, BUILD_FLAGS, FIXED_ADDRESS, EXECUTION_ORDER].  "\
+             "To specify more than one flag, repeat this option on the command line and the default flag set is [PCD, LIBRARY, FLASH, DEPEX, BUILD_FLAGS, FIXED_ADDRESS]")
 
     (Opt, Args)=Parser.parse_args()
     return (Opt, Args)
@@ -1353,18 +1770,27 @@ def Main():
                 Option.ModuleFile = NormFile(FileList[0], Workspace)
 
         if Option.ModuleFile:
+            if os.path.isabs (Option.ModuleFile):
+                if os.path.normcase (os.path.normpath(Option.ModuleFile)).find (Workspace) == 0:
+                    Option.ModuleFile = NormFile(os.path.normpath(Option.ModuleFile), Workspace)
             Option.ModuleFile = PathClass(Option.ModuleFile, Workspace)
             ErrorCode, ErrorInfo = Option.ModuleFile.Validate(".inf", False)
             if ErrorCode != 0:
                 EdkLogger.error("build", ErrorCode, ExtraData=ErrorInfo)
 
         if Option.PlatformFile != None:
+            if os.path.isabs (Option.PlatformFile):
+                if os.path.normcase (os.path.normpath(Option.PlatformFile)).find (Workspace) == 0:
+                    Option.PlatformFile = NormFile(os.path.normpath(Option.PlatformFile), Workspace)
             Option.PlatformFile = PathClass(Option.PlatformFile, Workspace)
             ErrorCode, ErrorInfo = Option.PlatformFile.Validate(".dsc", False)
             if ErrorCode != 0:
                 EdkLogger.error("build", ErrorCode, ExtraData=ErrorInfo)
 
         if Option.FdfFile != None:
+            if os.path.isabs (Option.FdfFile):
+                if os.path.normcase (os.path.normpath(Option.FdfFile)).find (Workspace) == 0:
+                    Option.FdfFile = NormFile(os.path.normpath(Option.FdfFile), Workspace)
             Option.FdfFile = PathClass(Option.FdfFile, Workspace)
             ErrorCode, ErrorInfo = Option.FdfFile.Validate(".fdf", False)
             if ErrorCode != 0:
@@ -1415,16 +1841,13 @@ def Main():
                     "\nbuild",
                     CODE_ERROR,
                     "Unknown fatal error when processing [%s]" % MetaFile,
-                    ExtraData="\n(Please send email to dev@buildtools.tianocore.org for help, attaching following call stack trace!)\n",
+                    ExtraData="\n(Please send email to edk2-buildtools-devel@lists.sourceforge.net for help, attaching following call stack trace!)\n",
                     RaiseError=False
                     )
         EdkLogger.quiet("(Python %s on %s) " % (platform.python_version(), sys.platform) + traceback.format_exc())
         ReturnCode = CODE_ERROR
     finally:
         Utils.Progressor.Abort()
-
-    if MyBuild != None:
-        MyBuild.Db.Close()
 
     if ReturnCode == 0:
         Conclusion = "Done"
@@ -1434,6 +1857,9 @@ def Main():
         Conclusion = "Failed"
     FinishTime = time.time()
     BuildDuration = time.strftime("%M:%S", time.gmtime(int(round(FinishTime - StartTime))))
+    if MyBuild != None:
+        MyBuild.BuildReport.GenerateReport(BuildDuration)
+        MyBuild.Db.Close()
     EdkLogger.SetLevel(EdkLogger.QUIET)
     EdkLogger.quiet("\n- %s -\n%s [%s]" % (Conclusion, time.strftime("%H:%M:%S, %b.%d %Y", time.localtime()), BuildDuration))
 

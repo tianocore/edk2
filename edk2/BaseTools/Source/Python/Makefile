@@ -10,7 +10,7 @@ MODULES=encodings.cp437,encodings.gbk,encodings.utf_16,encodings.utf_8,encodings
 BIN_DIR=$(EDK_TOOLS_PATH)\Bin\Win32
 
 
-APPLICATIONS=$(BIN_DIR)\build.exe $(BIN_DIR)\GenFds.exe $(BIN_DIR)\Trim.exe $(BIN_DIR)\MigrationMsa2Inf.exe $(BIN_DIR)\Fpd2Dsc.exe $(BIN_DIR)\TargetTool.exe $(BIN_DIR)\spd2dec.exe $(BIN_DIR)\GenDepex.exe
+APPLICATIONS=$(BIN_DIR)\build.exe $(BIN_DIR)\GenFds.exe $(BIN_DIR)\Trim.exe $(BIN_DIR)\MigrationMsa2Inf.exe $(BIN_DIR)\Fpd2Dsc.exe $(BIN_DIR)\TargetTool.exe $(BIN_DIR)\spd2dec.exe $(BIN_DIR)\GenDepex.exe $(BIN_DIR)\GenPatchPcdTable.exe $(BIN_DIR)\PatchPcdValue.exe
 
 COMMON_PYTHON=$(BASE_TOOLS_PATH)\Source\Python\Common\BuildToolError.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\Database.py \
@@ -81,6 +81,12 @@ $(BIN_DIR)\GenDepex.exe: $(BASE_TOOLS_PATH)\Source\Python\AutoGen\GenDepex.py $(
 
 $(BIN_DIR)\TargetTool.exe: $(BASE_TOOLS_PATH)\Source\Python\TargetTool\TargetTool.py $(COMMON_PYTHON)
   @pushd . & @cd TargetTool & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) TargetTool.py & @popd
+
+$(BIN_DIR)\GenPatchPcdTable.exe: $(BASE_TOOLS_PATH)\Source\Python\GenPatchPcdTable\GenPatchPcdTable.py $(COMMON_PYTHON)
+  @pushd . & @cd GenPatchPcdTable & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) GenPatchPcdTable.py & @popd
+
+$(BIN_DIR)\PatchPcdValue.exe: $(BASE_TOOLS_PATH)\Source\Python\PatchPcdValue\PatchPcdValue.py $(COMMON_PYTHON)
+  @pushd . & @cd PatchPcdValue & @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) PatchPcdValue.py & @popd
 
 clean:
 cleanall:  

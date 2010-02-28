@@ -1,7 +1,7 @@
 ## @file
 # classes represent data in FDF
 #
-#  Copyright (c) 2007, Intel Corporation
+#  Copyright (c) 2007 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -168,6 +168,7 @@ class DepexSectionClassObject (SectionClassObject):
     def __init__(self):
         self.DepexType = None
         self.Expression = None
+        self.ExpressionProcessed = False
 
 ## Compress section data in FDF
 #
@@ -231,6 +232,7 @@ class FvImageSectionClassObject (SectionClassObject):
         self.FvFileType = None
         self.FvFileName = None
         self.FvFileExtension = None
+        self.FvAddr = None
 
 ## GUIDed section data in FDF
 #
@@ -247,6 +249,9 @@ class GuidSectionClassObject (SectionClassObject) :
         self.SectionType = None
         self.ProcessRequired = False
         self.AuthStatusValid = False
+        self.FvAddr = []
+        self.FvParentAddr = None
+        self.IncludeFvSection = False
 
 ## UI section data in FDF
 #
@@ -290,6 +295,7 @@ class RuleClassObject :
         self.NameGuid = None
         self.Fixed = False
         self.Alignment = None
+        self.SectAlignment = None
         self.CheckSum = False
         self.FvFileType = None       # for Ffs File Type
         self.KeyStringList = []
@@ -399,4 +405,4 @@ class OptionRomClassObject:
     def __init__(self):
         self.DriverName = None
         self.FfsList = []
-        
+       

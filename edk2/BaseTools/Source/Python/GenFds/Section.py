@@ -140,7 +140,6 @@ class Section (SectionClassObject):
                     GenFdsGlobalVariable.InfLogger ("\nCurrent ARCH \'%s\' of File %s is not in the Support Arch Scope of %s specified by INF %s in FDF" %(FfsInf.CurrentArch, File.File, File.Arch, FfsInf.InfFileName))
 
         if Suffix != None and os.path.exists(FfsInf.EfiOutputPath):
-#            FileList.extend(glob.glob(os.path.join(FfsInf.EfiOutputPath, "*" + Suffix)))
             # Update to search files with suffix in all sub-dirs.
             Tuple = os.walk(FfsInf.EfiOutputPath)
             for Dirpath, Dirnames, Filenames in Tuple:
@@ -148,6 +147,10 @@ class Section (SectionClassObject):
                     if os.path.splitext(F)[1] in (Suffix):
                         FullName = os.path.join(Dirpath, F)
                         FileList.append(FullName)
+
+        #Process the file lists is alphabetical for a same section type
+        if len (FileList) > 1:
+            FileList.sort()
 
         return FileList, IsSect
     GetFileList = staticmethod(GetFileList)

@@ -20,11 +20,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 VOID
 CVfrBinaryOutput::WriteLine (
-  IN FILE   *pFile,
-  IN UINT32 LineBytes,
-  IN CHAR8  *LineHeader,
-  IN CHAR8  *BlkBuf,
-  IN UINT32 BlkSize
+  IN FILE         *pFile,
+  IN UINT32       LineBytes,
+  IN CONST CHAR8  *LineHeader,
+  IN CHAR8        *BlkBuf,
+  IN UINT32       BlkSize
   )
 {
   UINT32    Index;
@@ -43,11 +43,11 @@ CVfrBinaryOutput::WriteLine (
 
 VOID
 CVfrBinaryOutput::WriteEnd (
-  IN FILE   *pFile,
-  IN UINT32 LineBytes,
-  IN CHAR8  *LineHeader,
-  IN CHAR8  *BlkBuf,
-  IN UINT32 BlkSize
+  IN FILE         *pFile,
+  IN UINT32       LineBytes,
+  IN CONST CHAR8  *LineHeader,
+  IN CHAR8        *BlkBuf,
+  IN UINT32       BlkSize
   )
 {
   UINT32    Index;
@@ -287,7 +287,7 @@ CVfrBufferConfig::Write (
   switch (Mode) {
   case 'a' : // add
     if (Select (Name, Id) != 0) {
-      if ((pItem = new SConfigItem (Name, Id, Type, Offset, Width, Value)) == NULL) {
+      if ((pItem = new SConfigItem (Name, Id, Type, Offset, (UINT16) Width, Value)) == NULL) {
         return 2;
       }
       if (mItemListHead == NULL) {
@@ -455,7 +455,7 @@ CVfrBufferConfig::~CVfrBufferConfig (
 CVfrBufferConfig gCVfrBufferConfig;
 
 static struct {
-  CHAR8  *mTypeName;
+  CONST CHAR8  *mTypeName;
   UINT8  mType;
   UINT32 mSize;
   UINT32 mAlign;
@@ -744,20 +744,20 @@ CVfrVarDataTypeDB::InternalTypesListInit (
         SVfrDataField *pDayField   = new SVfrDataField;
 
         strcpy (pYearField->mFieldName, "Year");
-        GetDataType ("UINT8", &pYearField->mFieldType);
+        GetDataType ((CHAR8 *)"UINT16", &pYearField->mFieldType);
         pYearField->mOffset      = 0;
         pYearField->mNext        = pMonthField;
         pYearField->mArrayNum    = 0;
 
         strcpy (pMonthField->mFieldName, "Month");
-        GetDataType ("UINT8", &pMonthField->mFieldType);
-        pMonthField->mOffset     = 1;
+        GetDataType ((CHAR8 *)"UINT8", &pMonthField->mFieldType);
+        pMonthField->mOffset     = 2;
         pMonthField->mNext       = pDayField;
         pMonthField->mArrayNum   = 0;
 
         strcpy (pDayField->mFieldName, "Day");
-        GetDataType ("UINT8", &pDayField->mFieldType);
-        pDayField->mOffset       = 2;
+        GetDataType ((CHAR8 *)"UINT8", &pDayField->mFieldType);
+        pDayField->mOffset       = 3;
         pDayField->mNext         = NULL;
         pDayField->mArrayNum     = 0;
 
@@ -768,19 +768,19 @@ CVfrVarDataTypeDB::InternalTypesListInit (
         SVfrDataField *pSecondsField = new SVfrDataField;
 
         strcpy (pHoursField->mFieldName, "Hours");
-        GetDataType ("UINT8", &pHoursField->mFieldType);
+        GetDataType ((CHAR8 *)"UINT8", &pHoursField->mFieldType);
         pHoursField->mOffset     = 0;
         pHoursField->mNext       = pMinutesField;
         pHoursField->mArrayNum   = 0;
 
         strcpy (pMinutesField->mFieldName, "Minutes");
-        GetDataType ("UINT8", &pMinutesField->mFieldType);
+        GetDataType ((CHAR8 *)"UINT8", &pMinutesField->mFieldType);
         pMinutesField->mOffset   = 1;
         pMinutesField->mNext     = pSecondsField;
         pMinutesField->mArrayNum = 0;
 
         strcpy (pSecondsField->mFieldName, "Seconds");
-        GetDataType ("UINT8", &pSecondsField->mFieldType);
+        GetDataType ((CHAR8 *)"UINT8", &pSecondsField->mFieldType);
         pSecondsField->mOffset   = 2;
         pSecondsField->mNext     = NULL;
         pSecondsField->mArrayNum = 0;
@@ -853,7 +853,7 @@ CVfrVarDataTypeDB::Pack (
 
   if (Action & VFR_PACK_SHOW) {
     sprintf (Msg, "value of pragma pack(show) == %d", mPackAlign);
-    gCVfrErrorHandle.PrintMsg (LineNum, "", "Warning", Msg);
+    gCVfrErrorHandle.PrintMsg (LineNum, NULL, "Warning", Msg);
   }
 
   if (Action & VFR_PACK_PUSH) {
@@ -870,7 +870,7 @@ CVfrVarDataTypeDB::Pack (
     SVfrPackStackNode *pNode = NULL;
 
     if (mPackStack == NULL) {
-      gCVfrErrorHandle.PrintMsg (LineNum, "", "Error", "#pragma pack(pop...) : more pops than pushes");
+      gCVfrErrorHandle.PrintMsg (LineNum, NULL, "Error", "#pragma pack(pop...) : more pops than pushes");
     }
 
     for (pNode = mPackStack; pNode != NULL; pNode = pNode->mNext) {
@@ -884,7 +884,7 @@ CVfrVarDataTypeDB::Pack (
   if (Action & VFR_PACK_ASSIGN) {
     PackAlign = (Number > 1) ? Number + Number % 2 : Number;
     if ((PackAlign == 0) || (PackAlign > 16)) {
-      gCVfrErrorHandle.PrintMsg (LineNum, "", "Error", "expected pragma parameter to be '1', '2', '4', '8', or '16'");
+      gCVfrErrorHandle.PrintMsg (LineNum, NULL, "Error", "expected pragma parameter to be '1', '2', '4', '8', or '16'");
     } else {
       mPackAlign = PackAlign;
     }
@@ -1127,7 +1127,7 @@ CVfrVarDataTypeDB::GetDataFieldInfo (
     CHECK_ERROR_RETURN(GetTypeField (FName, pType, pField), VFR_RETURN_SUCCESS);
     pType  = pField->mFieldType;
     CHECK_ERROR_RETURN(GetFieldOffset (pField, ArrayIdx, Tmp), VFR_RETURN_SUCCESS);
-    Offset += Tmp;
+    Offset = (UINT16) (Offset + Tmp);
     Type   = GetFieldWidth (pField);
     Size   = GetFieldSize (pField, ArrayIdx);
   }
@@ -1386,6 +1386,7 @@ CVfrDataStorage::GetFreeVarStoreId (
   //
   // Assign the different ID range for the different type VarStore to support Framework Vfr
   //
+  Index = 0;
   if ((!VfrCompatibleMode) || (VarType == EFI_VFR_VARSTORE_BUFFER)) {
     Index = 0;
   } else if (VarType == EFI_VFR_VARSTORE_EFI) {
@@ -1838,13 +1839,11 @@ CVfrDataStorage::BufferVarStoreRequestElementAdd (
   IN EFI_VARSTORE_INFO &Info
   )
 {
-  CHAR8                 NewReqElt[128] = {'\0',};
-  CHAR8                 *OldReqElt = NULL;
   SVfrVarStorageNode    *pNode = NULL;
   EFI_IFR_TYPE_VALUE    Value = gZeroEfiIfrTypeValue;
 
   for (pNode = mBufferVarStoreList; pNode != NULL; pNode = pNode->mNext) {
-    if (strcmp (pNode->mVarStoreName, StoreName) == NULL) {
+    if (strcmp (pNode->mVarStoreName, StoreName) == 0) {
       break;
     }
   }
@@ -2022,85 +2021,6 @@ CVfrDefaultStore::GetDefaultId (
   }
 
   return VFR_RETURN_UNDEFINED;
-}
-
-STATIC
-EFI_VFR_RETURN_CODE
-AltCfgItemPrintToBuffer (
-  IN CHAR8              *NewAltCfg, 
-  IN EFI_VARSTORE_INFO  Info, 
-  IN UINT8              Type,
-  IN EFI_IFR_TYPE_VALUE Value
-  )
-{
-  UINT32 Index;
-  UINT8  *BufChar = NULL;
-  UINT32 Count    = 0;
-
-  if (NewAltCfg != NULL) {
-    Count = sprintf (
-              NewAltCfg,
-              "&OFFSET=%x&WIDTH=%x&VALUE=",
-              Info.mInfo.mVarOffset,
-              Info.mVarTotalSize
-              );
-    NewAltCfg += Count;
-
-    switch (Type) {
-    case EFI_IFR_TYPE_NUM_SIZE_8 :
-      Count = sprintf (NewAltCfg, "%x", Value.u8);
-      NewAltCfg += Count;
-      break;
-    case EFI_IFR_TYPE_NUM_SIZE_16 :
-      Count = sprintf (NewAltCfg, "%x", Value.u16);
-      NewAltCfg += Count;
-      break;
-    case EFI_IFR_TYPE_NUM_SIZE_32 :
-      Count = sprintf (NewAltCfg, "%x", Value.u32);
-      NewAltCfg += Count;
-      break;
-    case EFI_IFR_TYPE_NUM_SIZE_64 :
-      Count = sprintf (NewAltCfg, "%x", Value.u64);
-      NewAltCfg += Count;
-      break;
-    case EFI_IFR_TYPE_BOOLEAN :
-      Count = sprintf (NewAltCfg, "%x", Value.b);
-      NewAltCfg += Count;
-      break;
-    case EFI_IFR_TYPE_TIME :
-#if 1
-      Count = sprintf (NewAltCfg, "%x", *((UINT32 *)(&Value.time)));
-      NewAltCfg += Count;
-#else
-      BufChar = (UINT8 *)&Value.time;
-      for (Index = 0; Index < sizeof(EFI_HII_TIME); Index++) {
-        Count = sprintf (NewAltCfg, "%02x", (UINT8)BufChar[Index]);
-        NewAltCfg += Count;
-      }
-#endif
-      break;
-    case EFI_IFR_TYPE_DATE :
-#if 1
-      Count = sprintf (NewAltCfg, "%x", *((UINT32 *)(&Value.date)));
-      NewAltCfg += Count;
-#else
-      BufChar = (UINT8 *)&Value.date;
-      for (Index = 0; Index < sizeof(EFI_HII_DATE); Index++) {
-        Count = sprintf (NewAltCfg, "%02x", (UINT8)BufChar[Index]);
-        NewAltCfg += Count;
-      }
-#endif
-      break;
-    case EFI_IFR_TYPE_STRING :
-      Count = sprintf (NewAltCfg, "%x", Value.string);
-      NewAltCfg += Count;
-      break;
-    case EFI_IFR_TYPE_OTHER :
-      return VFR_RETURN_UNSUPPORTED;
-	}
-  }
-
-  return VFR_RETURN_FATAL_ERROR;
 }
 
 EFI_VFR_RETURN_CODE
@@ -2340,6 +2260,7 @@ SVfrQuestionNode::SVfrQuestionNode (
   mQuestionId = EFI_QUESTION_ID_INVALID;
   mBitMask    = BitMask;
   mNext       = NULL;
+  mQtype      = QUESTION_NORMAL;
 
   if (Name == NULL) {
     mName = new CHAR8[strlen ("$DEFAULT") + 1];
@@ -2509,6 +2430,9 @@ CVfrQuestionDB::RegisterOldDateQuestion (
   pNode[0]->mQuestionId = QuestionId;
   pNode[1]->mQuestionId = QuestionId;
   pNode[2]->mQuestionId = QuestionId;
+  pNode[0]->mQtype      = QUESTION_DATE;
+  pNode[1]->mQtype      = QUESTION_DATE;
+  pNode[2]->mQtype      = QUESTION_DATE;
   pNode[0]->mNext       = pNode[1];
   pNode[1]->mNext       = pNode[2];
   pNode[2]->mNext       = mQuestionList;
@@ -2585,6 +2509,9 @@ CVfrQuestionDB::RegisterNewDateQuestion (
   pNode[0]->mQuestionId = QuestionId;
   pNode[1]->mQuestionId = QuestionId;
   pNode[2]->mQuestionId = QuestionId;
+  pNode[0]->mQtype      = QUESTION_DATE;
+  pNode[1]->mQtype      = QUESTION_DATE;
+  pNode[2]->mQtype      = QUESTION_DATE;
   pNode[0]->mNext       = pNode[1];
   pNode[1]->mNext       = pNode[2];
   pNode[2]->mNext       = mQuestionList;
@@ -2651,6 +2578,9 @@ CVfrQuestionDB::RegisterOldTimeQuestion (
   pNode[0]->mQuestionId = QuestionId;
   pNode[1]->mQuestionId = QuestionId;
   pNode[2]->mQuestionId = QuestionId;
+  pNode[0]->mQtype      = QUESTION_TIME;
+  pNode[1]->mQtype      = QUESTION_TIME;
+  pNode[2]->mQtype      = QUESTION_TIME;
   pNode[0]->mNext       = pNode[1];
   pNode[1]->mNext       = pNode[2];
   pNode[2]->mNext       = mQuestionList;
@@ -2727,6 +2657,9 @@ CVfrQuestionDB::RegisterNewTimeQuestion (
   pNode[0]->mQuestionId = QuestionId;
   pNode[1]->mQuestionId = QuestionId;
   pNode[2]->mQuestionId = QuestionId;
+  pNode[0]->mQtype      = QUESTION_TIME;
+  pNode[1]->mQtype      = QUESTION_TIME;
+  pNode[2]->mQtype      = QUESTION_TIME;
   pNode[0]->mNext       = pNode[1];
   pNode[1]->mNext       = pNode[2];
   pNode[2]->mNext       = mQuestionList;
@@ -2800,13 +2733,17 @@ CVfrQuestionDB::GetQuestionId (
   IN  CHAR8             *Name,
   IN  CHAR8             *VarIdStr,
   OUT EFI_QUESTION_ID   &QuestionId,
-  OUT UINT32            &BitMask
+  OUT UINT32            &BitMask,
+  OUT EFI_QUESION_TYPE  *QType
   )
 {
   SVfrQuestionNode *pNode;
 
   QuestionId = EFI_QUESTION_ID_INVALID;
   BitMask    = 0x00000000;
+  if (QType != NULL) {
+    *QType = QUESTION_NORMAL;
+  }
 
   if ((Name == NULL) && (VarIdStr == NULL)) {
     return ;
@@ -2827,6 +2764,9 @@ CVfrQuestionDB::GetQuestionId (
 
     QuestionId = pNode->mQuestionId;
     BitMask    = pNode->mBitMask;
+    if (QType != NULL) {
+      *QType     = pNode->mQtype;
+    }
     break;
   }
 
@@ -2876,4 +2816,5 @@ CVfrQuestionDB::FindQuestion (
 BOOLEAN  VfrCompatibleMode = FALSE;
 
 CVfrVarDataTypeDB gCVfrVarDataTypeDB;
+
 
