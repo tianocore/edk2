@@ -68,12 +68,10 @@ typedef UINT8 EFI_FFS_FILE_STATE;
 #define FFS_ATTRIB_DATA_ALIGNMENT     0x38
 #define FFS_ATTRIB_CHECKSUM           0x40
 //
-// FFS_FIXED_CHECKSUM is the default checksum value used when the
+// FFS_FIXED_CHECKSUM is the checksum value used when the
 // FFS_ATTRIB_CHECKSUM attribute bit is clear
-// note this is NOT an architecturally defined value, but is in this file for
-// implementation convenience
 //
-#define FFS_FIXED_CHECKSUM  0x5A
+#define FFS_FIXED_CHECKSUM  0xAA
 
 // 
 // FFS File State Bits.

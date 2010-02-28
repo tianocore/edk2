@@ -1,7 +1,7 @@
 ## @file
 # This file is used to generate DEPEX file for module's dependency expression
 #
-# Copyright (c) 2007, Intel Corporation
+# Copyright (c) 2007 - 2010, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.    The full text of the license may be found at
@@ -356,7 +356,7 @@ class DependencyExpression:
 
 versionNumber = "0.04"
 __version__ = "%prog Version " + versionNumber
-__copyright__ = "Copyright (c) 2007-2008, Intel Corporation  All rights reserved."
+__copyright__ = "Copyright (c) 2007-2010, Intel Corporation  All rights reserved."
 __usage__ = "%prog [options] [dependency_expression_file]"
 
 ## Parse command line options

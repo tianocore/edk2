@@ -1,7 +1,7 @@
 ## @file
 # This file is used to be the main entrance of ECC tool
 #
-# Copyright (c) 2009, Intel Corporation
+# Copyright (c) 2009 - 2010, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -43,7 +43,7 @@ class Ecc(object):
         # Version and Copyright
         self.VersionNumber = "0.01"
         self.Version = "%prog Version " + self.VersionNumber
-        self.Copyright = "Copyright (c) 2009, Intel Corporation  All rights reserved."
+        self.Copyright = "Copyright (c) 2009 - 2010, Intel Corporation  All rights reserved."
 
         self.InitDefaultConfigIni()
         self.OutputFile = 'output.txt'
@@ -225,6 +225,9 @@ class Ecc(object):
         EdkLogger.quiet("Loading ECC configuration ... done")
         (Options, Target) = self.EccOptionParser()
 
+        if Options.Workspace:
+            os.environ["WORKSPACE"] = Options.Workspace
+            
         # Check workspace envirnoment
         if "WORKSPACE" not in os.environ:
             EdkLogger.error("ECC", BuildToolError.ATTRIBUTE_NOT_AVAILABLE, "Environment variable not found",
@@ -244,6 +247,8 @@ class Ecc(object):
             self.OutputFile = Options.OutputFile
         if Options.ReportFile != None:
             self.ReportFile = Options.ReportFile
+        if Options.ExceptionFile != None:
+            self.ExceptionFile = Options.ExceptionFile
         if Options.Target != None:
             if not os.path.isdir(Options.Target):
                 EdkLogger.error("ECC", BuildToolError.OPTION_VALUE_INVALID, ExtraData="Target [%s] does NOT exist" % Options.Target)
@@ -294,6 +299,8 @@ class Ecc(object):
             help="Specify the name of an output file, if and only if one filename was specified.")
         Parser.add_option("-r", "--reportfile filename", action="store", type="string", dest="ReportFile",
             help="Specify the name of an report file, if and only if one filename was specified.")
+        Parser.add_option("-e", "--exceptionfile filename", action="store", type="string", dest="ExceptionFile",
+            help="Specify the name of an exception file, if and only if one filename was specified.")
         Parser.add_option("-m", "--metadata", action="store_true", type=None, help="Only scan meta-data files information if this option is specified.")
         Parser.add_option("-s", "--sourcecode", action="store_true", type=None, help="Only scan source code files information if this option is specified.")
         Parser.add_option("-k", "--keepdatabase", action="store_true", type=None, help="The existing Ecc database will not be cleaned except report information if this option is specified.")
@@ -307,6 +314,7 @@ class Ecc(object):
                                                                                    "including library instances selected, final dependency expression, "\
                                                                                    "and warning messages, etc.")
         Parser.add_option("-d", "--debug", action="store", type="int", help="Enable debug messages at specified level.")
+        Parser.add_option("-w", "--workspace", action="store", type="string", dest='Workspace', help="Specify workspace.")
 
         (Opt, Args)=Parser.parse_args()
 

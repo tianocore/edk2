@@ -1,7 +1,7 @@
 ## @file
 # process FFS generation from FILE statement
 #
-#  Copyright (c) 2007, Intel Corporation
+#  Copyright (c) 2007 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -17,14 +17,17 @@
 #
 import Ffs
 import Rule
-from GenFdsGlobalVariable import GenFdsGlobalVariable
 import os
 import StringIO
 import subprocess
+
+from GenFdsGlobalVariable import GenFdsGlobalVariable
 from CommonDataClass.FdfClass import FileStatementClassObject
 from Common import EdkLogger
 from Common.BuildToolError import *
 from Common.Misc import GuidStructureByteArrayToGuidString
+from GuidSection import GuidSection
+from FvImageSection import FvImageSection
 
 ## generate FFS from FILE
 #
@@ -41,11 +44,13 @@ class FileStatement (FileStatementClassObject) :
     #
     #   Generate FFS
     #
-    #   @param  self        The object pointer
-    #   @param  Dict        dictionary contains macro and value pair
-    #   @retval string      Generated FFS file name
+    #   @param  self         The object pointer
+    #   @param  Dict         dictionary contains macro and value pair
+    #   @param  FvChildAddr  Array of the inside FvImage base address
+    #   @param  FvParentAddr Parent Fv base address
+    #   @retval string       Generated FFS file name
     #
-    def GenFfs(self, Dict = {}):
+    def GenFfs(self, Dict = {}, FvChildAddr=[], FvParentAddr=None):
         
         if self.NameGuid != None and self.NameGuid.startswith('PCD('):
             PcdValue = GenFdsGlobalVariable.GetPcdValue(self.NameGuid)
@@ -92,6 +97,15 @@ class FileStatement (FileStatementClassObject) :
             for section in self.SectionList :
                 Index = Index + 1
                 SecIndex = '%d' %Index
+                # process the inside FvImage from FvSection or GuidSection
+                if FvChildAddr != []:
+                    if isinstance(section, FvImageSection):
+                        section.FvAddr = FvChildAddr.pop(0)
+                    elif isinstance(section, GuidSection):
+                        section.FvAddr = FvChildAddr
+                if FvParentAddr != None and isinstance(section, GuidSection):
+                    section.FvParentAddr = FvParentAddr
+
                 sectList, align = section.GenSection(OutputDir, self.NameGuid, SecIndex, self.KeyStringList, None, Dict)
                 if sectList != []:
                     for sect in sectList:

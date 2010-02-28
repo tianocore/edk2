@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2007-2009, Intel Corporation
+#  Copyright (c) 2007-2010, Intel Corporation
 #  Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -237,8 +237,6 @@
 
     <Command.GCC>
         "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -\( $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST) -\) $(DLINK2_FLAGS)
-        "$(OBJCOPY)" --only-keep-debug ${dst} $(DEBUG_DIR)(+)$(MODULE_NAME).pdb
-        "$(OBJCOPY)" -S ${dst}
         "$(OBJCOPY)" $(OBJCOPY_FLAGS) ${dst}
 
     <Command.RVCT>
@@ -286,7 +284,16 @@
     <OutputFile>
         $(DEBUG_DIR)(+)$(MODULE_NAME).efi
 
-    <Command.MSFT, Command.INTEL, Command.GCC, Command.RVCT>      
+    <Command.MSFT, Command.INTEL, Command.RVCT>  
+        GenFw -e $(MODULE_TYPE) -o ${dst} ${src}
+        $(CP) ${dst} $(OUTPUT_DIR)
+        $(CP) ${dst} $(BIN_DIR)
+        -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
+
+    <Command.GCC>
+        $(OBJCOPY) --only-keep-debug ${src} $(BIN_DIR)(+)$(MODULE_NAME).debug
+        $(OBJCOPY) --strip-unneeded ${src}
+        $(OBJCOPY) --add-gnu-debuglink=$(BIN_DIR)(+)$(MODULE_NAME).debug ${src}
         GenFw -e $(MODULE_TYPE) -o ${dst} ${src}
         $(CP) ${dst} $(OUTPUT_DIR)
         $(CP) ${dst} $(BIN_DIR)
@@ -423,6 +430,9 @@
 [Microcode-Binary-File]
     <InputFile>
         *.mcb
+
+    <ExtraDependency>
+        $(MAKE_FILE)
 
     <OutputFile>
         $(OUTPUT_DIR)(+)$(MODULE_NAME).bin

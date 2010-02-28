@@ -71,6 +71,17 @@ SetUtilityName (
 ;
 
 VOID
+PrintMessage (
+  CHAR8   *Type,
+  CHAR8   *FileName,
+  UINT32  LineNumber,
+  UINT32  MessageCode,
+  CHAR8   *Text,
+  CHAR8   *MsgFmt,
+  va_list List
+  );
+
+VOID
 Error (
   CHAR8   *FileName,
   UINT32  LineNumber,

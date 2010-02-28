@@ -1,7 +1,7 @@
 ## @file
 # Routines for generating AutoGen.h and AutoGen.c
 #
-# Copyright (c) 2007, Intel Corporation
+# Copyright (c) 2007 - 2010, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -162,7 +162,7 @@ ${END}
   GUID               GuidTable[${PHASE}_GUID_TABLE_SIZE];
 ${BEGIN}  STRING_HEAD        ${STRING_HEAD_CNAME_DECL}_${STRING_HEAD_GUID_DECL}[${STRING_HEAD_NUMSKUS_DECL}];
 ${END}
-${BEGIN}  VARIABLE_HEAD      ${VARIABLE_HEAD_CNAME_DECL}_${VARIABLE_HEAD_GUID_DECL}[${VARIABLE_HEAD_NUMSKUS_DECL}];
+${BEGIN}  VARIABLE_HEAD      ${VARIABLE_HEAD_CNAME_DECL}_${VARIABLE_HEAD_GUID_DECL}_Variable_Header[${VARIABLE_HEAD_NUMSKUS_DECL}];
 ${END}
 ${BEGIN}  UINT8              StringTable${STRING_TABLE_INDEX}[${STRING_TABLE_LENGTH}]; /* ${STRING_TABLE_CNAME}_${STRING_TABLE_GUID} */
 ${END}
@@ -253,7 +253,7 @@ ${END}
   },
   /* LocalTokenNumberTable */
   {
-${BEGIN}    offsetof(${PHASE}_PCD_DATABASE, ${TOKEN_INIT}.${TOKEN_CNAME}_${TOKEN_GUID}) | ${TOKEN_TYPE},
+${BEGIN}    offsetof(${PHASE}_PCD_DATABASE, ${TOKEN_INIT}.${TOKEN_CNAME}_${TOKEN_GUID}${VARDEF_HEADER}) | ${TOKEN_TYPE},
 ${END}
   },
   /* GuidTable */
@@ -263,7 +263,7 @@ ${END}
   },
 ${BEGIN}  { ${STRING_HEAD_VALUE} }, /* ${STRING_HEAD_CNAME_DECL}_${STRING_HEAD_GUID_DECL}[${STRING_HEAD_NUMSKUS_DECL}] */
 ${END}
-${BEGIN}  /* ${VARIABLE_HEAD_CNAME_DECL}_${VARIABLE_HEAD_GUID_DECL}[${VARIABLE_HEAD_NUMSKUS_DECL}] */
+${BEGIN}  /* ${VARIABLE_HEAD_CNAME_DECL}_${VARIABLE_HEAD_GUID_DECL}_Variable_Header[${VARIABLE_HEAD_NUMSKUS_DECL}] */
   {
     ${VARIABLE_HEAD_VALUE}
   },
@@ -453,7 +453,7 @@ ${END}
 
 gSmmCoreEntryPointString = TemplateString("""
 ${BEGIN}
-const UINT32 _gUefiDriverRevision = ${EfiSpecVersion};
+const UINT32 _gUefiDriverRevision = ${UefiSpecVersion};
 const UINT32 _gDxeRevision = ${PiSpecVersion};
 
 EFI_STATUS
@@ -482,7 +482,7 @@ ${END}
 
 gDxeSmmEntryPointString = [
 TemplateString("""
-const UINT32 _gUefiDriverRevision = ${EfiSpecVersion};
+const UINT32 _gUefiDriverRevision = ${UefiSpecVersion};
 const UINT32 _gDxeRevision = ${PiSpecVersion};
 
 EFI_STATUS
@@ -497,11 +497,11 @@ ProcessModuleEntryPointList (
 }
 """),
 TemplateString("""
-const UINT32 _gUefiDriverRevision = ${EfiSpecVersion};
+const UINT32 _gUefiDriverRevision = ${UefiSpecVersion};
 const UINT32 _gDxeRevision = ${PiSpecVersion};
 
 static BASE_LIBRARY_JUMP_BUFFER  mJumpContext;
-static EFI_STATUS  mDriverEntryPointStatus = EFI_LOAD_ERROR;
+static EFI_STATUS  mDriverEntryPointStatus;
 
 VOID
 EFIAPI
@@ -522,8 +522,9 @@ ProcessModuleEntryPointList (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
-
 {
+  mDriverEntryPointStatus = EFI_LOAD_ERROR;
+
 ${BEGIN}
   if (SetJump (&mJumpContext) == 0) {
     ExitDriver (${Function} (ImageHandle, SystemTable));
@@ -550,7 +551,7 @@ ${END}
 
 gUefiDriverEntryPointString = [
 TemplateString("""
-const UINT32 _gUefiDriverRevision = ${EfiSpecVersion};
+const UINT32 _gUefiDriverRevision = ${UefiSpecVersion};
 const UINT32 _gDxeRevision = ${PiSpecVersion};
 
 EFI_STATUS
@@ -564,7 +565,7 @@ ProcessModuleEntryPointList (
 }
 """),
 TemplateString("""
-const UINT32 _gUefiDriverRevision = ${EfiSpecVersion};
+const UINT32 _gUefiDriverRevision = ${UefiSpecVersion};
 const UINT32 _gDxeRevision = ${PiSpecVersion};
 
 ${BEGIN}
@@ -592,8 +593,11 @@ ExitDriver (
 }
 """),
 TemplateString("""
-const UINT32 _gUefiDriverRevision = ${EfiSpecVersion};
+const UINT32 _gUefiDriverRevision = ${UefiSpecVersion};
 const UINT32 _gDxeRevision = ${PiSpecVersion};
+
+static BASE_LIBRARY_JUMP_BUFFER  mJumpContext;
+static EFI_STATUS  mDriverEntryPointStatus;
 
 EFI_STATUS
 EFIAPI
@@ -601,8 +605,8 @@ ProcessModuleEntryPointList (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
-
 {
+  mDriverEntryPointStatus = EFI_LOAD_ERROR;
   ${BEGIN}
   if (SetJump (&mJumpContext) == 0) {
     ExitDriver (${Function} (ImageHandle, SystemTable));
@@ -611,9 +615,6 @@ ProcessModuleEntryPointList (
   ${END}
   return mDriverEntryPointStatus;
 }
-
-static BASE_LIBRARY_JUMP_BUFFER  mJumpContext;
-static EFI_STATUS  mDriverEntryPointStatus = EFI_LOAD_ERROR;
 
 VOID
 EFIAPI
@@ -645,7 +646,7 @@ ${END}
 
 gUefiApplicationEntryPointString = [
 TemplateString("""
-const UINT32 _gUefiDriverRevision = ${EfiSpecVersion};
+const UINT32 _gUefiDriverRevision = ${UefiSpecVersion};
 
 EFI_STATUS
 EFIAPI
@@ -658,7 +659,7 @@ ProcessModuleEntryPointList (
 }
 """),
 TemplateString("""
-const UINT32 _gUefiDriverRevision = ${EfiSpecVersion};
+const UINT32 _gUefiDriverRevision = ${UefiSpecVersion};
 
 ${BEGIN}
 EFI_STATUS
@@ -685,7 +686,7 @@ ExitDriver (
 }
 """),
 TemplateString("""
-const UINT32 _gUefiDriverRevision = ${EfiSpecVersion};
+const UINT32 _gUefiDriverRevision = ${UefiSpecVersion};
 
 EFI_STATUS
 EFIAPI
@@ -876,13 +877,6 @@ ${FunctionCall}${END}
 """),
 }
 
-gSpecificationString = TemplateString("""
-${BEGIN}
-#undef ${SpecificationName}
-#define ${SpecificationName} ${SpecificationValue}
-${END}
-""")
-
 gBasicHeaderFile = "Base.h"
 
 gModuleTypeHeaderFile = {
@@ -961,9 +955,55 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
         Array = ''
         Value = Pcd.DefaultValue
         Unicode = False
-        if Pcd.DatumType == 'UINT64':
-            if not Value.endswith('ULL'):
-                Value += 'ULL'
+        ValueNumber = 0
+        if Pcd.DatumType in ['UINT64', 'UINT32', 'UINT16', 'UINT8']:
+            try:
+                if Value.upper().startswith('0X'):
+                    ValueNumber = int (Value, 16)
+                else:
+                    ValueNumber = int (Value)
+            except:
+                EdkLogger.error("build", AUTOGEN_ERROR,
+                                "PCD value is not valid dec or hex number for datum type [%s] of PCD %s.%s" % (Pcd.DatumType, Pcd.TokenSpaceGuidCName, Pcd.TokenCName),
+                                ExtraData="[%s]" % str(Info))
+            if Pcd.DatumType == 'UINT64':
+                if ValueNumber < 0:
+                    EdkLogger.error("build", AUTOGEN_ERROR,
+                                    "PCD can't be set to negative value for datum type [%s] of PCD %s.%s" % (Pcd.DatumType, Pcd.TokenSpaceGuidCName, Pcd.TokenCName),
+                                    ExtraData="[%s]" % str(Info))
+                elif ValueNumber >= 0x10000000000000000:
+                    EdkLogger.error("build", AUTOGEN_ERROR,
+                                    "Too large PCD value for datum type [%s] of PCD %s.%s" % (Pcd.DatumType, Pcd.TokenSpaceGuidCName, Pcd.TokenCName),
+                                    ExtraData="[%s]" % str(Info))
+                if not Value.endswith('ULL'):
+                    Value += 'ULL'
+            elif Pcd.DatumType == 'UINT32':
+                if ValueNumber < 0:
+                    EdkLogger.error("build", AUTOGEN_ERROR,
+                                    "PCD can't be set to negative value for datum type [%s] of PCD %s.%s" % (Pcd.DatumType, Pcd.TokenSpaceGuidCName, Pcd.TokenCName),
+                                    ExtraData="[%s]" % str(Info))
+                elif ValueNumber >= 0x100000000:
+                    EdkLogger.error("build", AUTOGEN_ERROR,
+                                    "Too large PCD value for datum type [%s] of PCD %s.%s" % (Pcd.DatumType, Pcd.TokenSpaceGuidCName, Pcd.TokenCName),
+                                    ExtraData="[%s]" % str(Info))
+            elif Pcd.DatumType == 'UINT16':
+                if ValueNumber < 0:
+                    EdkLogger.error("build", AUTOGEN_ERROR,
+                                    "PCD can't be set to negative value for datum type [%s] of PCD %s.%s" % (Pcd.DatumType, Pcd.TokenSpaceGuidCName, Pcd.TokenCName),
+                                    ExtraData="[%s]" % str(Info))
+                elif ValueNumber >= 0x10000:
+                    EdkLogger.error("build", AUTOGEN_ERROR,
+                                    "Too large PCD value for datum type [%s] of PCD %s.%s" % (Pcd.DatumType, Pcd.TokenSpaceGuidCName, Pcd.TokenCName),
+                                    ExtraData="[%s]" % str(Info))
+            elif Pcd.DatumType == 'UINT8':
+                if ValueNumber < 0:
+                    EdkLogger.error("build", AUTOGEN_ERROR,
+                                    "PCD can't be set to negative value for datum type [%s] of PCD %s.%s" % (Pcd.DatumType, Pcd.TokenSpaceGuidCName, Pcd.TokenCName),
+                                    ExtraData="[%s]" % str(Info))
+                elif ValueNumber >= 0x100:
+                    EdkLogger.error("build", AUTOGEN_ERROR,
+                                    "Too large PCD value for datum type [%s] of PCD %s.%s" % (Pcd.DatumType, Pcd.TokenSpaceGuidCName, Pcd.TokenCName),
+                                    ExtraData="[%s]" % str(Info))
         if Pcd.DatumType == 'VOID*':
             if Pcd.MaxDatumSize == None or Pcd.MaxDatumSize == '':
                 EdkLogger.error("build", AUTOGEN_ERROR,
@@ -1021,7 +1061,7 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
                 AutoGenH.Append('#define %s  %s%s\n' %(GetModeName, Type, PcdVariableName))
         elif Pcd.Type == TAB_PCDS_PATCHABLE_IN_MODULE:
             AutoGenH.Append('#define %s  %s\n' %(PcdValueName, Value))
-            AutoGenC.Append('GLOBAL_REMOVE_IF_UNREFERENCED volatile %s %s %s = %s;\n' %(Const, Pcd.DatumType, PcdVariableName, PcdValueName))
+            AutoGenC.Append('volatile %s %s %s = %s;\n' %(Const, Pcd.DatumType, PcdVariableName, PcdValueName))
             AutoGenH.Append('extern volatile %s  %s  %s%s;\n' % (Const, Pcd.DatumType, PcdVariableName, Array))
             AutoGenH.Append('#define %s  %s%s\n' % (GetModeName, Type, PcdVariableName))
         else:
@@ -1139,7 +1179,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
         'SYSTEM_SKU_ID_VALUE'           : '0'
     }
 
-    for DatumType in ['UINT64','UINT32','UINT16','UINT8','BOOLEAN']:
+    for DatumType in ['UINT64','UINT32','UINT16','UINT8','BOOLEAN', "VOID*"]:
         Dict['VARDEF_CNAME_' + DatumType] = []
         Dict['VARDEF_GUID_' + DatumType]  = []
         Dict['VARDEF_SKUID_' + DatumType] = []
@@ -1174,7 +1214,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
     Dict['GUID_STRUCTURE'] = []
 
     Dict['SKUID_VALUE'] = []
-
+    Dict['VARDEF_HEADER'] = []
     if Phase == 'DXE':
         Dict['SYSTEM_SKU_ID'] = ''
         Dict['SYSTEM_SKU_ID_VALUE'] = ''
@@ -1223,7 +1263,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
         Pcd.InitString = 'UNINIT'
 
         if Pcd.DatumType == 'VOID*':
-            Pcd.TokenTypeList = ['PCD_DATUM_TYPE_POINTER']
+            Pcd.TokenTypeList = ['PCD_TYPE_STRING']
         elif Pcd.DatumType == 'BOOLEAN':
             Pcd.TokenTypeList = ['PCD_DATUM_TYPE_UINT8']
         else:
@@ -1270,53 +1310,65 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
                     Dict['GUID_STRUCTURE'].append(VariableGuidStructure)
                 VariableHeadGuidIndex = GuidList.index(VariableGuid)
 
-                VariableHeadValueList.append('%d, %d, %s, offsetof(%s_PCD_DATABASE, Init.%s_%s_VariableDefault_%s)' %
-                                             (VariableHeadGuidIndex, VariableHeadStringIndex, Sku.VariableOffset,
-                                              Phase, CName, TokenSpaceGuid, SkuIdIndex))
+                if "PCD_TYPE_STRING" in Pcd.TokenTypeList:
+                    VariableHeadValueList.append('%d, %d, %s, offsetof(%s_PCD_DATABASE, Init.%s_%s)' %
+                                                 (VariableHeadGuidIndex, VariableHeadStringIndex, Sku.VariableOffset,
+                                                  Phase, CName, TokenSpaceGuid))
+                else:
+                    VariableHeadValueList.append('%d, %d, %s, offsetof(%s_PCD_DATABASE, Init.%s_%s_VariableDefault_%s)' %
+                                                 (VariableHeadGuidIndex, VariableHeadStringIndex, Sku.VariableOffset,
+                                                  Phase, CName, TokenSpaceGuid, SkuIdIndex))
                 Dict['VARDEF_CNAME_'+Pcd.DatumType].append(CName)
                 Dict['VARDEF_GUID_'+Pcd.DatumType].append(TokenSpaceGuid)
                 Dict['VARDEF_SKUID_'+Pcd.DatumType].append(SkuIdIndex)
-                Dict['VARDEF_VALUE_'+Pcd.DatumType].append(Sku.HiiDefaultValue)
+                if "PCD_TYPE_STRING" in  Pcd.TokenTypeList:
+                    Dict['VARDEF_VALUE_' + Pcd.DatumType].append("%s_%s[%d]" % (Pcd.TokenCName, TokenSpaceGuid, SkuIdIndex))
+                else:
+                    Dict['VARDEF_VALUE_'+Pcd.DatumType].append(Sku.HiiDefaultValue)
             elif Sku.VpdOffset != '':
                 Pcd.TokenTypeList += ['PCD_TYPE_VPD']
                 Pcd.InitString = 'INIT'
                 VpdHeadOffsetList.append(Sku.VpdOffset)
+            
+          
+            if Pcd.DatumType == 'VOID*':
+                Pcd.TokenTypeList += ['PCD_TYPE_STRING']
+                Pcd.InitString = 'INIT'
+                if Sku.HiiDefaultValue != '' and Sku.DefaultValue == '':
+                    Sku.DefaultValue = Sku.HiiDefaultValue
+                if Sku.DefaultValue != '':
+                    NumberOfSizeItems += 1
+                    Dict['STRING_TABLE_CNAME'].append(CName)
+                    Dict['STRING_TABLE_GUID'].append(TokenSpaceGuid)
+
+                    if StringTableIndex == 0:
+                        Dict['STRING_TABLE_INDEX'].append('')
+                    else:
+                        Dict['STRING_TABLE_INDEX'].append('_%d' % StringTableIndex)
+                    if Sku.DefaultValue[0] == 'L':
+                        Size = (len(Sku.DefaultValue) - 3 + 1) * 2
+                        Dict['STRING_TABLE_VALUE'].append(StringToArray(Sku.DefaultValue))
+                    elif Sku.DefaultValue[0] == '"':
+                        Size = len(Sku.DefaultValue) - 2 + 1
+                        Dict['STRING_TABLE_VALUE'].append(StringToArray(Sku.DefaultValue))
+                    elif Sku.DefaultValue[0] == '{':
+                        Size = len(Sku.DefaultValue.replace(',',' ').split())
+                        Dict['STRING_TABLE_VALUE'].append(Sku.DefaultValue)
+
+                    StringHeadOffsetList.append(str(StringTableSize))
+                    Dict['SIZE_TABLE_CNAME'].append(CName)
+                    Dict['SIZE_TABLE_GUID'].append(TokenSpaceGuid)
+                    Dict['SIZE_TABLE_CURRENT_LENGTH'].append(Size)
+                    Dict['SIZE_TABLE_MAXIMUM_LENGTH'].append(Pcd.MaxDatumSize)
+                    if Pcd.MaxDatumSize != '':
+                        MaxDatumSize = int(Pcd.MaxDatumSize, 0)
+                        if MaxDatumSize > Size:
+                            Size = MaxDatumSize
+                    Dict['STRING_TABLE_LENGTH'].append(Size)
+                    StringTableIndex += 1
+                    StringTableSize += (Size)
             else:
-                if Pcd.DatumType == 'VOID*':
-                    Pcd.TokenTypeList += ['PCD_TYPE_STRING']
-                    Pcd.InitString = 'INIT'
-                    if Sku.DefaultValue != '':
-                        NumberOfSizeItems += 1
-                        Dict['STRING_TABLE_CNAME'].append(CName)
-                        Dict['STRING_TABLE_GUID'].append(TokenSpaceGuid)
-
-                        if StringTableIndex == 0:
-                            Dict['STRING_TABLE_INDEX'].append('')
-                        else:
-                            Dict['STRING_TABLE_INDEX'].append('_%d' % StringTableIndex)
-                        if Sku.DefaultValue[0] == 'L':
-                            Size = (len(Sku.DefaultValue) - 3 + 1) * 2
-                            Dict['STRING_TABLE_VALUE'].append(StringToArray(Sku.DefaultValue))
-                        elif Sku.DefaultValue[0] == '"':
-                            Size = len(Sku.DefaultValue) - 2 + 1
-                            Dict['STRING_TABLE_VALUE'].append(StringToArray(Sku.DefaultValue))
-                        elif Sku.DefaultValue[0] == '{':
-                            Size = len(Sku.DefaultValue.replace(',',' ').split())
-                            Dict['STRING_TABLE_VALUE'].append(Sku.DefaultValue)
-
-                        StringHeadOffsetList.append(str(StringTableSize))
-                        Dict['SIZE_TABLE_CNAME'].append(CName)
-                        Dict['SIZE_TABLE_GUID'].append(TokenSpaceGuid)
-                        Dict['SIZE_TABLE_CURRENT_LENGTH'].append(Size)
-                        Dict['SIZE_TABLE_MAXIMUM_LENGTH'].append(Pcd.MaxDatumSize)
-                        if Pcd.MaxDatumSize != '':
-                            MaxDatumSize = int(Pcd.MaxDatumSize, 0)
-                            if MaxDatumSize > Size:
-                                Size = MaxDatumSize
-                        Dict['STRING_TABLE_LENGTH'].append(Size)
-                        StringTableIndex += 1
-                        StringTableSize += (Size)
-                else:
+                if "PCD_TYPE_HII" not in Pcd.TokenTypeList:
                     Pcd.TokenTypeList += ['PCD_TYPE_DATA']
                     if Sku.DefaultValue == 'TRUE':
                         Pcd.InitString = 'INIT'
@@ -1326,23 +1378,27 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
                                 Pcd.InitString = 'INIT'
                         except:
                             pass
-                    
-                    #
-                    # For UNIT64 type PCD's value, ULL should be append to avoid
-                    # warning under linux building environment.
-                    #
-                    if Pcd.DatumType == "UINT64":
-                        ValueList.append(Sku.DefaultValue + "ULL")
-                    else:
-                        ValueList.append(Sku.DefaultValue)
+                
+                #
+                # For UNIT64 type PCD's value, ULL should be append to avoid
+                # warning under linux building environment.
+                #
+                if Pcd.DatumType == "UINT64":
+                    ValueList.append(Sku.DefaultValue + "ULL")
+                else:
+                    ValueList.append(Sku.DefaultValue)
 
         Pcd.TokenTypeList = list(set(Pcd.TokenTypeList))
+        
 
         if 'PCD_TYPE_HII' in Pcd.TokenTypeList:
             Dict['VARIABLE_HEAD_CNAME_DECL'].append(CName)
             Dict['VARIABLE_HEAD_GUID_DECL'].append(TokenSpaceGuid)
             Dict['VARIABLE_HEAD_NUMSKUS_DECL'].append(len(Pcd.SkuInfoList))
             Dict['VARIABLE_HEAD_VALUE'].append('{ %s }\n' % ' },\n    { '.join(VariableHeadValueList))
+            Dict['VARDEF_HEADER'].append('_Variable_Header')
+        else:
+            Dict['VARDEF_HEADER'].append('')
         if 'PCD_TYPE_VPD' in Pcd.TokenTypeList:
             Dict['VPD_HEAD_CNAME_DECL'].append(CName)
             Dict['VPD_HEAD_GUID_DECL'].append(TokenSpaceGuid)
@@ -1371,7 +1427,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
     Dict['TOKEN_CNAME']      = ['' for x in range(NumberOfLocalTokens)]
     Dict['TOKEN_GUID']       = ['' for x in range(NumberOfLocalTokens)]
     Dict['TOKEN_TYPE']       = ['' for x in range(NumberOfLocalTokens)]
-
+    
     for Pcd in Platform.DynamicPcdList:
         CName = Pcd.TokenCName
         TokenSpaceGuidCName = Pcd.TokenSpaceGuidCName
@@ -1614,14 +1670,14 @@ def CreateModuleEntryPointCode(Info, AutoGenC, AutoGenH):
         PiSpecVersion = Info.Module.Specification['PI_SPECIFICATION_VERSION']
     else:
         PiSpecVersion = 0
-    if 'EFI_SPECIFICATION_VERSION' in Info.Module.Specification:
-        EfiSpecVersion = Info.Module.Specification['EFI_SPECIFICATION_VERSION']
+    if 'UEFI_SPECIFICATION_VERSION' in Info.Module.Specification:
+        UefiSpecVersion = Info.Module.Specification['UEFI_SPECIFICATION_VERSION']
     else:
-        EfiSpecVersion = 0
+        UefiSpecVersion = 0
     Dict = {
-        'Function'      :   Info.Module.ModuleEntryPointList,
-        'PiSpecVersion' :   PiSpecVersion,
-        'EfiSpecVersion':   EfiSpecVersion
+        'Function'       :   Info.Module.ModuleEntryPointList,
+        'PiSpecVersion'  :   PiSpecVersion,
+        'UefiSpecVersion':   UefiSpecVersion
     }
 
     if Info.ModuleType in ['PEI_CORE', 'DXE_CORE', 'SMM_CORE']:
@@ -1853,9 +1909,6 @@ def CreateHeaderCode(Info, AutoGenC, AutoGenH):
     # header file Prologue
     AutoGenH.Append(gAutoGenHPrologueString.Replace({'File':'AUTOGENH','Guid':Info.Guid.replace('-','_')}))
     if Info.AutoGenVersion >= 0x00010005:
-        # specification macros
-        AutoGenH.Append(gSpecificationString.Replace({'SpecificationName':Info.Specification.keys(),
-                                                      'SpecificationValue':Info.Specification.values()}))
         # header files includes
         AutoGenH.Append("#include <%s>\n" % gBasicHeaderFile)
         if Info.ModuleType in gModuleTypeHeaderFile \

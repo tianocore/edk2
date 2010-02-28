@@ -18,8 +18,8 @@ import Common.EdkLogger as EdkLogger
 import os, time
 from Table import Table
 from Common.String import ConvertToSqlString2
-import EotToolError as EotToolError
-import EotGlobalData as EotGlobalData
+import Eot.EotToolError as EotToolError
+import Eot.EotGlobalData as EotGlobalData
 
 ## TableReport
 #

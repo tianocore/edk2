@@ -47,7 +47,7 @@ typedef enum {
 
 typedef struct _SVFR_ERROR_HANDLE {
   EFI_VFR_RETURN_CODE    mErrorCode;
-  CHAR8                  *mErrorMsg;
+  CONST CHAR8            *mErrorMsg;
 } SVFR_ERROR_HANDLE;
 
 struct SVfrFileScopeRecord {
@@ -74,8 +74,8 @@ public:
   VOID  SetInputFile (IN CHAR8 *);
   VOID  ParseFileScopeRecord (IN CHAR8 *, IN UINT32);
   VOID  GetFileNameLineNum (IN UINT32, OUT CHAR8 **, OUT UINT32 *);
-  UINT8 HandleError (IN EFI_VFR_RETURN_CODE, IN UINT32 LineNum = 0, IN CHAR8 *TokName = "\0");
-  VOID  PrintMsg (IN UINT32 LineNum = 0, IN CHAR8 *TokName = "\0", IN CHAR8 *MsgType = "Error", IN CHAR8 *ErrorMsg = "\0");
+  UINT8 HandleError (IN EFI_VFR_RETURN_CODE, IN UINT32 LineNum = 0, IN CHAR8 *TokName = NULL);
+  VOID  PrintMsg (IN UINT32 LineNum = 0, IN CHAR8 *TokName = NULL, IN CONST CHAR8 *MsgType = "Error", IN CONST CHAR8 *ErrorMsg = "");
 };
 
 #define CHECK_ERROR_RETURN(f, v) do { EFI_VFR_RETURN_CODE r; if ((r = (f)) != (v)) { return r; } } while (0)

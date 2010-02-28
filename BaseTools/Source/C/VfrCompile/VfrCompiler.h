@@ -102,7 +102,7 @@ public:
   VOID                GenBinary (VOID);
   VOID                GenCFile (VOID);
   VOID                GenRecordListFile (VOID);
-  VOID                DebugError (VOID);
+  VOID                DebugError (IN CHAR8*, IN UINT32, IN UINT32, IN CONST CHAR8*, IN CONST CHAR8*, ...);
 };
 
 #endif

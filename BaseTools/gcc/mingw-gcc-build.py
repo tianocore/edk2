@@ -1,10 +1,21 @@
 #!/usr/bin/env python
 
+## @file
 #
 # Automation of instructions from:
 #   http://mingw-w64.svn.sourceforge.net/viewvc/mingw-w64/trunk/mingw-w64-doc/
 #     howto-build/mingw-w64-howto-build.txt?revision=216&view=markup
 #
+# Copyright (c) 2008 - 2010, Intel Corporation
+# All rights reserved. This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution.    The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+
 
 from optparse import OptionParser
 import os
@@ -31,7 +42,7 @@ if sys.version_info < (2, 5):
 #
 VersionNumber = "0.01"
 __version__ = "%prog Version " + VersionNumber
-__copyright__ = "Copyright (c) 2008, Intel Corporation.  All rights reserved."
+__copyright__ = "Copyright (c) 2008 - 2010, Intel Corporation.  All rights reserved."
 
 class Config:
     """class Config
@@ -82,6 +93,18 @@ class Config:
             help = "Prefix to install binutils/gcc into"
             )
         Parser.add_option(
+            "--skip-binutils",
+            action = "store_true", dest = "skip_binutils",
+            default = False,
+            help = "Will skip building binutils"
+            )
+        Parser.add_option(
+            "--skip-gcc",
+            action = "store_true", dest = "skip_gcc",
+            default = False,
+            help = "Will skip building GCC"
+            )
+        Parser.add_option(
             "--symlinks",
             action = "store", type = "string", dest = "symlinks",
             default = os.path.join(self.base_dir, 'symlinks'),
@@ -116,13 +139,25 @@ class Config:
         self.symlinks = os.path.realpath(os.path.expanduser(self.options.symlinks))
 
     def IsConfigOk(self):
-                
+
+        building = []
+        if not self.options.skip_binutils:
+            building.append('binutils')
+        if not self.options.skip_gcc:
+            building.append('gcc')
+        if len(building) == 0:
+            print "Nothing will be built!"
+            print
+            print "Please try using --help and then change the configuration."
+            return False
+
         print "Current directory:"
         print "   ", self.base_dir
         print "Sources download/extraction:", self.Relative(self.src_dir)
         print "Build directory            :", self.Relative(self.build_dir)
         print "Prefix (install) directory :", self.Relative(self.prefix)
         print "Create symlinks directory  :", self.Relative(self.symlinks)
+        print "Building                   :", ', '.join(building)
         print
         answer = raw_input("Is this configuration ok? (default = no): ")
         if (answer.lower() not in ('y', 'yes')):
@@ -164,12 +199,19 @@ class SourceFiles:
         self.config = config
         self.source_files = self.source_files[config.arch]
 
+        if config.options.skip_binutils:
+            del self.source_files['binutils']
+
+        if config.options.skip_gcc:
+            del self.source_files['gcc']
+            del self.source_files['mingw_hdr']
+
     source_files_common = {
         'binutils': {
             'url': 'http://www.kernel.org/pub/linux/devel/binutils/' + \
                    'binutils-$version.tar.bz2',
-            'version': '2.18.50.0.5',
-            'md5': 'daee18dbbf0a6ccfc186141bee18bf62',
+            'version': '2.20.51.0.5',
+            'md5': '6d2de7cdf7a8389e70b124e3d73b4d37',
             },
         }
 
@@ -183,10 +225,10 @@ class SourceFiles:
         'mingw_hdr': {
             'url': 'http://sourceforge.net/projects/' + \
                    'mingw-w64/files/mingw-w64/mingw-w64-snapshot/' + \
-                   'mingw-w64-snapshot-$version.tar.bz2/download',
+                   'mingw-w64-trunk-snapshot-$version.tar.bz2/download',
             'extract-dir': os.path.join('trunk', 'mingw-w64-headers'),
-            'version': '20090419',
-            'md5': '9146ecfabaf172e4cc427b88e8d218c1',
+            'version': '20091222',
+            'md5': 'fbcf282d1a05df121088d775e02095d6',
             },
         }
 
@@ -261,7 +303,7 @@ class SourceFiles:
                     self.dots = 0
                     local_file = os.path.join(self.config.src_dir, fdata['filename'])
                     url = fdata['url']
-	            print 'Downloading %s:' % fname,
+	            print 'Downloading %s:' % fname, url
                     if retries > 0:
                         print '(retry)',
                     sys.stdout.flush()
@@ -312,8 +354,8 @@ class SourceFiles:
                     print '[KeyboardInterrupt]'
                     return False
 
-                except:
-                    pass
+                except Exception, e:
+                    print e
 
             if not completed: return False
 
@@ -394,10 +436,12 @@ class Builder:
         self.config = config
 
     def Build(self):
-        self.BuildModule('binutils')
-        self.CopyIncludeDirectory()
-        self.BuildModule('gcc')
-        self.MakeSymLinks()
+        if not self.config.options.skip_binutils:
+            self.BuildModule('binutils')
+        if not self.config.options.skip_gcc:
+            self.CopyIncludeDirectory()
+            self.BuildModule('gcc')
+            self.MakeSymLinks()
 
     def IsBuildStepComplete(self, step):
         return \

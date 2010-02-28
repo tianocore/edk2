@@ -1,7 +1,7 @@
 ## @file
 # Trim files preprocessed by compiler
 #
-# Copyright (c) 2007, Intel Corporation
+# Copyright (c) 2007 - 2010, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -28,7 +28,7 @@ import Common.EdkLogger as EdkLogger
 # Version and Copyright
 __version_number__ = "0.10"
 __version__ = "%prog Version " + __version_number__
-__copyright__ = "Copyright (c) 2007-2008, Intel Corporation. All rights reserved."
+__copyright__ = "Copyright (c) 2007-2010, Intel Corporation. All rights reserved."
 
 ## Regular expression for matching Line Control directive like "#line xxx"
 gLineControlDirective = re.compile('^\s*#(?:line)?\s+([0-9]+)\s+"*([^"]*)"')
@@ -79,6 +79,21 @@ gImportCodePatterns = [
     [
         re.compile('#include\s+["<]LoadFile\.h[">]', re.MULTILINE),
         '#include <FvLoadFile.h>'
+    ],
+
+    [
+        re.compile('#include\s+EFI_GUID_DEFINITION\s*\(FirmwareFileSystem\)', re.MULTILINE),
+        '#include EFI_GUID_DEFINITION (FirmwareFileSystem)\n#include EFI_GUID_DEFINITION (FirmwareFileSystem2)'
+    ],
+
+    [
+        re.compile('gEfiFirmwareFileSystemGuid', re.MULTILINE),
+        'gEfiFirmwareFileSystem2Guid'
+    ],
+
+    [
+        re.compile('EFI_FVH_REVISION', re.MULTILINE),
+        'EFI_FVH_PI_REVISION'
     ],
 
     [
@@ -504,7 +519,7 @@ def Main():
                     "\nTrim",
                     CODE_ERROR,
                     "Unknown fatal error when trimming [%s]" % InputFile,
-                    ExtraData="\n(Please send email to dev@buildtools.tianocore.org for help, attaching following call stack trace!)\n",
+                    ExtraData="\n(Please send email to edk2-buildtools-devel@lists.sourceforge.net for help, attaching following call stack trace!)\n",
                     RaiseError=False
                     )
         EdkLogger.quiet("(Python %s on %s) " % (platform.python_version(), sys.platform) + traceback.format_exc())

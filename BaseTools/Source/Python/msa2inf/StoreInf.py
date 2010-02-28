@@ -64,8 +64,8 @@ def StoreModuleDefinesSection(InfFile, Module):
     if ModuleHeader.ModuleType != "":
         DefinesTupleList.append(("MODULE_TYPE", ModuleHeader.ModuleType))
 
-    if ModuleHeader.EfiSpecificationVersion != "":
-        DefinesTupleList.append(("EFI_SPECIFICATION_VERSION", ModuleHeader.EfiSpecificationVersion))
+    if ModuleHeader.UefiSpecificationVersion != "":
+        DefinesTupleList.append(("UEFI_SPECIFICATION_VERSION", ModuleHeader.UefiSpecificationVersion))
     
     if ModuleHeader.EdkReleaseVersion != "":
         DefinesTupleList.append(("EDK_RELEASE_VERSION", ModuleHeader.EdkReleaseVersion))

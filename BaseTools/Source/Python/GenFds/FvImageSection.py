@@ -73,7 +73,13 @@ class FvImageSection(FvImageSectionClassObject):
             Fv = GenFdsGlobalVariable.FdfParser.Profile.FvDict.get(self.FvName)
             if Fv != None:
                 self.Fv = Fv
-                FvFileName = self.Fv.AddToBuffer(Buffer, MacroDict = Dict)
+                FvFileName = Fv.AddToBuffer(Buffer, self.FvAddr, MacroDict = Dict)
+                if Fv.FvAlignment != None:
+                    if self.Alignment == None:
+                        self.Alignment = Fv.FvAlignment
+                    else:
+                        if GenFdsGlobalVariable.GetAlignment (Fv.FvAlignment) > GenFdsGlobalVariable.GetAlignment (self.Alignment):
+                            self.Alignment = Fv.FvAlignment
             else:
                 if self.FvFileName != None:
                     FvFileName = GenFdsGlobalVariable.ReplaceWorkspaceMacro(self.FvFileName)

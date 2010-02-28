@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define each component of the build database
 #
-# Copyright (c) 2007 ~ 2008, Intel Corporation
+# Copyright (c) 2007 - 2010, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -748,7 +748,8 @@ class WorkspaceBuild(object):
                 #
                 Pb.Specification = ModuleHeader.Specification
                 Pb.Specification[TAB_INF_DEFINES_EDK_RELEASE_VERSION] = ModuleHeader.EdkReleaseVersion
-                Pb.Specification[TAB_INF_DEFINES_EFI_SPECIFICATION_VERSION] = ModuleHeader.EfiSpecificationVersion
+                Pb.Specification[TAB_INF_DEFINES_EFI_SPECIFICATION_VERSION] = ModuleHeader.UefiSpecificationVersion
+                Pb.Specification[TAB_INF_DEFINES_UEFI_SPECIFICATION_VERSION] = ModuleHeader.UefiSpecificationVersion
                 Pb.AutoGenVersion = int(ModuleHeader.InfVersion, 0)
 
                 #

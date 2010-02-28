@@ -1,7 +1,7 @@
 ## @file
 # Convert an XML-based FPD file to a text-based DSC file.
 #
-# Copyright (c) 2007, Intel Corporation
+# Copyright (c) 2007 - 2010, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -22,7 +22,7 @@ from optparse import OptionParser
 # Version and Copyright
 __version_number__ = "1.0"
 __version__ = "%prog Version " + __version_number__
-__copyright__ = "Copyright (c) 2007, Intel Corporation  All rights reserved."
+__copyright__ = "Copyright (c) 2007 - 2010, Intel Corporation  All rights reserved."
 
 ## Parse command line options
 #

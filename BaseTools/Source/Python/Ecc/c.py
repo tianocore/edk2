@@ -1,3 +1,16 @@
+## @file
+# This file is used to be the c coding style checking of ECC tool
+#
+# Copyright (c) 2009 - 2010, Intel Corporation
+# All rights reserved. This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution.  The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+
 import sys
 import os
 import re
@@ -82,16 +95,16 @@ def GetIdentifierList():
     for comment in FileProfile.CommentList:
         IdComment = DataClass.IdentifierClass(-1, '', '', '', comment.Content, DataClass.MODEL_IDENTIFIER_COMMENT, -1, -1, comment.StartPos[0],comment.StartPos[1],comment.EndPos[0],comment.EndPos[1])
         IdList.append(IdComment)
-        
+
     for pp in FileProfile.PPDirectiveList:
         Type = GetIdType(pp.Content)
         IdPP = DataClass.IdentifierClass(-1, '', '', '', pp.Content, Type, -1, -1, pp.StartPos[0],pp.StartPos[1],pp.EndPos[0],pp.EndPos[1])
         IdList.append(IdPP)
-        
+
     for pe in FileProfile.PredicateExpressionList:
         IdPE = DataClass.IdentifierClass(-1, '', '', '', pe.Content, DataClass.MODEL_IDENTIFIER_PREDICATE_EXPRESSION, -1, -1, pe.StartPos[0],pe.StartPos[1],pe.EndPos[0],pe.EndPos[1])
         IdList.append(IdPE)
-        
+
     FuncDeclPattern = GetFuncDeclPattern()
     ArrayPattern = GetArrayPattern()
     for var in FileProfile.VariableDeclarationList:
@@ -125,10 +138,10 @@ def GetIdentifierList():
                 DeclText = DeclText[1:]
                 VarNameStartColumn += 1
             FirstChar = DeclText[0]
-            
+
         var.Declarator = DeclText
         if FuncDeclPattern.match(var.Declarator):
-            DeclSplitList = var.Declarator.split('(')     
+            DeclSplitList = var.Declarator.split('(')
             FuncName = DeclSplitList[0].strip()
             FuncNamePartList = FuncName.split()
             if len(FuncNamePartList) > 1:
@@ -168,8 +181,8 @@ def GetIdentifierList():
             IdVar = DataClass.IdentifierClass(-1, var.Modifier, '', var.Declarator, FuncName, DataClass.MODEL_IDENTIFIER_FUNCTION_DECLARATION, -1, -1, var.StartPos[0], var.StartPos[1], VarNameStartLine, VarNameStartColumn)
             IdList.append(IdVar)
             continue
-        
-        if var.Declarator.find('{') == -1:      
+
+        if var.Declarator.find('{') == -1:
             for decl in var.Declarator.split(','):
                 DeclList = decl.split('=')
                 Name = DeclList[0].strip()
@@ -177,7 +190,7 @@ def GetIdentifierList():
                     LSBPos = var.Declarator.find('[')
                     var.Modifier += ' ' + Name[LSBPos:]
                     Name = Name[0:LSBPos]
-            
+
                 IdVar = DataClass.IdentifierClass(-1, var.Modifier, '', Name, (len(DeclList) > 1 and [DeclList[1]]or [''])[0], DataClass.MODEL_IDENTIFIER_VARIABLE, -1, -1, var.StartPos[0],var.StartPos[1], VarNameStartLine, VarNameStartColumn)
                 IdList.append(IdVar)
         else:
@@ -189,7 +202,7 @@ def GetIdentifierList():
                 Name = Name[0:LSBPos]
             IdVar = DataClass.IdentifierClass(-1, var.Modifier, '', Name, (len(DeclList) > 1 and [DeclList[1]]or [''])[0], DataClass.MODEL_IDENTIFIER_VARIABLE, -1, -1, var.StartPos[0],var.StartPos[1], VarNameStartLine, VarNameStartColumn)
             IdList.append(IdVar)
-            
+
     for enum in FileProfile.EnumerationDefinitionList:
         LBPos = enum.Content.find('{')
         RBPos = enum.Content.find('}')
@@ -197,7 +210,7 @@ def GetIdentifierList():
         Value = enum.Content[LBPos+1:RBPos]
         IdEnum = DataClass.IdentifierClass(-1, '', '', Name, Value, DataClass.MODEL_IDENTIFIER_ENUMERATE, -1, -1, enum.StartPos[0],enum.StartPos[1],enum.EndPos[0],enum.EndPos[1])
         IdList.append(IdEnum)
-        
+
     for su in FileProfile.StructUnionDefinitionList:
         if SuOccurInTypedef(su, FileProfile.TypedefDefinitionList):
             continue
@@ -216,8 +229,8 @@ def GetIdentifierList():
             Value = su.Content[LBPos:RBPos+1]
         IdPE = DataClass.IdentifierClass(-1, '', '', Name, Value, Type, -1, -1, su.StartPos[0],su.StartPos[1],su.EndPos[0],su.EndPos[1])
         IdList.append(IdPE)
-    
-    TdFuncPointerPattern = GetTypedefFuncPointerPattern()    
+
+    TdFuncPointerPattern = GetTypedefFuncPointerPattern()
     for td in FileProfile.TypedefDefinitionList:
         Modifier = ''
         Name = td.ToType
@@ -240,16 +253,16 @@ def GetIdentifierList():
             while Name.startswith('*'):
                 Value += ' ' + '*'
                 Name = Name.lstrip('*').strip()
-                
+
         if Name.find('[') != -1:
             LBPos = Name.find('[')
             RBPos = Name.rfind(']')
             Value += Name[LBPos : RBPos + 1]
             Name = Name[0 : LBPos]
-                
+
         IdTd = DataClass.IdentifierClass(-1, Modifier, '', Name, Value, DataClass.MODEL_IDENTIFIER_TYPEDEF, -1, -1, td.StartPos[0],td.StartPos[1],td.EndPos[0],td.EndPos[1])
         IdList.append(IdTd)
-        
+
     for funcCall in FileProfile.FunctionCallingList:
         IdFC = DataClass.IdentifierClass(-1, '', '', funcCall.FuncName, funcCall.ParamList, DataClass.MODEL_IDENTIFIER_FUNCTION_CALLING, -1, -1, funcCall.StartPos[0],funcCall.StartPos[1],funcCall.EndPos[0],funcCall.EndPos[1])
         IdList.append(IdFC)
@@ -278,7 +291,7 @@ def GetParamList(FuncDeclarator, FuncNameLine = 0, FuncNameOffset = 0):
     OffsetSkipped = 0
     TailChar = FuncName[-1]
     while not TailChar.isalpha() and TailChar != '_':
-        
+
         if TailChar == '\n':
             FuncName = FuncName.rstrip('\r\n').rstrip('\n')
             LineSkipped += 1
@@ -296,9 +309,9 @@ def GetParamList(FuncDeclarator, FuncNameLine = 0, FuncNameOffset = 0):
         else:
             FuncName = FuncName[:-1]
         TailChar = FuncName[-1]
-               
+
     OffsetSkipped += 1 #skip '('
-    
+
     for p in ParamStr.split(','):
         ListP = p.split()
         if len(ListP) == 0:
@@ -325,13 +338,13 @@ def GetParamList(FuncDeclarator, FuncNameLine = 0, FuncNameOffset = 0):
         LBIndex = ParamName.find('[')
         if LBIndex != -1:
             ParamName = ParamName[0:LBIndex]
-        
+
         Start = RightSpacePos
         Index = 0
         PreChar = ''
         while Index < Start:
             FirstChar = p[Index]
-                
+
             if FirstChar == '\r':
                 Index += 1
                 LineSkipped += 1
@@ -351,15 +364,15 @@ def GetParamList(FuncDeclarator, FuncNameLine = 0, FuncNameOffset = 0):
                 Index += 1
                 OffsetSkipped += 1
             PreChar = FirstChar
-            
+
         ParamBeginLine = FuncNameLine + LineSkipped
         ParamBeginOffset = FuncNameOffset + OffsetSkipped
-        
+
         Index = Start + len(ParamName)
         PreChar = ''
         while Index < len(p):
             FirstChar = p[Index]
-                
+
             if FirstChar == '\r':
                 Index += 1
                 LineSkipped += 1
@@ -379,18 +392,18 @@ def GetParamList(FuncDeclarator, FuncNameLine = 0, FuncNameOffset = 0):
                 Index += 1
                 OffsetSkipped += 1
             PreChar = FirstChar
-        
+
         ParamEndLine = FuncNameLine + LineSkipped
         ParamEndOffset = FuncNameOffset + OffsetSkipped
         if ParamName != '...':
             ParamName = StripNonAlnumChars(ParamName)
         IdParam = DataClass.IdentifierClass(-1, ParamModifier, '', ParamName, '', DataClass.MODEL_IDENTIFIER_PARAMETER, -1, -1, ParamBeginLine, ParamBeginOffset, ParamEndLine, ParamEndOffset)
         ParamIdList.append(IdParam)
-        
+
         OffsetSkipped += 1 #skip ','
-    
+
     return ParamIdList
-    
+
 def GetFunctionList():
     FuncObjList = []
     for FuncDef in FileProfile.FunctionDefinitionList:
@@ -422,12 +435,12 @@ def GetFunctionList():
                 DeclText = DeclText[1:]
                 FuncNameStartColumn += 1
             FirstChar = DeclText[0]
-        
+
         FuncDef.Declarator = DeclText
         DeclSplitList = FuncDef.Declarator.split('(')
         if len(DeclSplitList) < 2:
             continue
-        
+
         FuncName = DeclSplitList[0]
         FuncNamePartList = FuncName.split()
         if len(FuncNamePartList) > 1:
@@ -463,10 +476,10 @@ def GetFunctionList():
                         Index += 1
                         FuncNameStartColumn += 1
                     PreChar = FirstChar
-                
+
         FuncObj = DataClass.FunctionClass(-1, FuncDef.Declarator, FuncDef.Modifier, FuncName.strip(), '', FuncDef.StartPos[0],FuncDef.StartPos[1],FuncDef.EndPos[0],FuncDef.EndPos[1], FuncDef.LeftBracePos[0], FuncDef.LeftBracePos[1], -1, ParamIdList, [], FuncNameStartLine, FuncNameStartColumn)
         FuncObjList.append(FuncObj)
-        
+
     return FuncObjList
 
 def GetFileModificationTimeFromDB(FullFileName):
@@ -519,13 +532,13 @@ def CollectSourceCodeDataIntoDB(RootDir):
                 ModifiedTime = os.path.getmtime(FullName)
                 FileObj = DataClass.FileClass(-1, BaseName, Ext, DirName, FullName, model, ModifiedTime, GetFunctionList(), GetIdentifierList(), [])
                 FileObjList.append(FileObj)
-                collector.CleanFileProfileBuffer()   
-    
+                collector.CleanFileProfileBuffer()
+
     if len(ParseErrorFileList) > 0:
         EdkLogger.info("Found unrecoverable error during parsing:\n\t%s\n" % "\n\t".join(ParseErrorFileList))
-    
-    Db = GetDB()    
-    for file in FileObjList:    
+
+    Db = GetDB()
+    for file in FileObjList:
         Db.InsertOneFile(file)
 
     Db.UpdateIdentifierBelongsToFunction()
@@ -533,13 +546,13 @@ def CollectSourceCodeDataIntoDB(RootDir):
 def GetTableID(FullFileName, ErrorMsgList = None):
     if ErrorMsgList == None:
         ErrorMsgList = []
-        
+
     Db = GetDB()
     SqlStatement = """ select ID
                        from File
                        where FullPath like '%s'
                    """ % FullFileName
-    
+
     ResultSet = Db.TblFile.Exec(SqlStatement)
 
     FileID = -1
@@ -557,11 +570,11 @@ def GetIncludeFileList(FullFileName):
     IFList = IncludeFileListDict.get(FullFileName)
     if IFList != None:
         return IFList
-    
+
     FileID = GetTableID(FullFileName)
     if FileID < 0:
         return []
-    
+
     Db = GetDB()
     FileTable = 'Identifier' + str(FileID)
     SqlStatement = """ select Value
@@ -583,7 +596,7 @@ def GetFullPathOfIncludeFile(Str, IncludePathList):
 def GetAllIncludeFiles(FullFileName):
     if AllIncludeFileListDict.get(FullFileName) != None:
         return AllIncludeFileListDict.get(FullFileName)
-    
+
     FileDirName = os.path.dirname(FullFileName)
     IncludePathList = IncludePathListDict.get(FileDirName)
     if IncludePathList == None:
@@ -600,7 +613,7 @@ def GetAllIncludeFiles(FullFileName):
         FullPath = GetFullPathOfIncludeFile(FileName, IncludePathList)
         if FullPath != None:
             IncludeFileQueue.append(FullPath)
-        
+
     i = 0
     while i < len(IncludeFileQueue):
         for IncludeFile in GetIncludeFileList(IncludeFileQueue[i]):
@@ -612,7 +625,7 @@ def GetAllIncludeFiles(FullFileName):
             if FullPath != None and FullPath not in IncludeFileQueue:
                 IncludeFileQueue.insert(i + 1, FullPath)
         i += 1
-    
+
     AllIncludeFileListDict[FullFileName] = IncludeFileQueue
     return IncludeFileQueue
 
@@ -637,7 +650,7 @@ def GetPredicateListFromPredicateExpStr(PES):
             else:
                 PredicateList.append(Exp.rstrip(';').rstrip(')').strip())
         i += 1
-    
+
     if PredicateBegin > LogicOpPos:
         while PredicateBegin < len(PES):
             if PES[PredicateBegin].isalnum() or PES[PredicateBegin] == '_' or PES[PredicateBegin] == '*':
@@ -651,7 +664,7 @@ def GetPredicateListFromPredicateExpStr(PES):
         else:
             PredicateList.append(Exp.rstrip(';').rstrip(')').strip())
     return PredicateList
-    
+
 def GetCNameList(Lvalue, StarList = []):
     Lvalue += ' '
     i = 0
@@ -659,7 +672,7 @@ def GetCNameList(Lvalue, StarList = []):
     VarStart = -1
     VarEnd = -1
     VarList = []
-    
+
     while SearchBegin < len(Lvalue):
         while i < len(Lvalue):
             if Lvalue[i].isalnum() or Lvalue[i] == '_':
@@ -677,8 +690,8 @@ def GetCNameList(Lvalue, StarList = []):
                 i += 1
         if VarEnd == -1:
             break
-        
-        
+
+
         DotIndex = Lvalue[VarEnd:].find('.')
         ArrowIndex = Lvalue[VarEnd:].find('->')
         if DotIndex == -1 and ArrowIndex == -1:
@@ -688,19 +701,19 @@ def GetCNameList(Lvalue, StarList = []):
         elif ArrowIndex == -1 and DotIndex != -1:
             SearchBegin = VarEnd + DotIndex
         else:
-            SearchBegin = VarEnd + ((DotIndex < ArrowIndex) and DotIndex or ArrowIndex) 
-            
+            SearchBegin = VarEnd + ((DotIndex < ArrowIndex) and DotIndex or ArrowIndex)
+
         i = SearchBegin
         VarStart = -1
         VarEnd = -1
-    
-    return VarList    
+
+    return VarList
 
 def SplitPredicateByOp(Str, Op, IsFuncCalling = False):
 
     Name = Str.strip()
     Value = None
-    
+
     if IsFuncCalling:
         Index = 0
         LBFound = False
@@ -708,7 +721,7 @@ def SplitPredicateByOp(Str, Op, IsFuncCalling = False):
         while Index < len(Str):
             while not LBFound and Str[Index] != '_' and not Str[Index].isalnum():
                 Index += 1
-            
+
             while not LBFound and (Str[Index].isalnum() or Str[Index] == '_'):
                 Index += 1
             # maybe type-cast at the begining, skip it.
@@ -716,79 +729,81 @@ def SplitPredicateByOp(Str, Op, IsFuncCalling = False):
             if RemainingStr.startswith(')') and not LBFound:
                 Index += 1
                 continue
-            
+
             if RemainingStr.startswith('(') and not LBFound:
                 LBFound = True
-                
+
             if Str[Index] == '(':
                 UnmatchedLBCount += 1
                 Index += 1
                 continue
-                
+
             if Str[Index] == ')':
                 UnmatchedLBCount -= 1
                 Index += 1
                 if UnmatchedLBCount == 0:
                     break
                 continue
-            
+
             Index += 1
-                
+
         if UnmatchedLBCount > 0:
             return [Name]
-            
+
         IndexInRemainingStr = Str[Index:].find(Op)
         if IndexInRemainingStr == -1:
             return [Name]
-        
+
         Name = Str[0:Index + IndexInRemainingStr].strip()
-        Value = Str[Index+IndexInRemainingStr+len(Op):].strip()
+        Value = Str[Index+IndexInRemainingStr+len(Op):].strip().strip(')')
         return [Name, Value]
-    
+
     TmpStr = Str.rstrip(';').rstrip(')')
     while True:
         Index = TmpStr.rfind(Op)
         if Index == -1:
             return [Name]
-        
+
         if Str[Index - 1].isalnum() or Str[Index - 1].isspace() or Str[Index - 1] == ')':
             Name = Str[0:Index].strip()
             Value = Str[Index + len(Op):].strip()
-            return [Name, Value]   
-    
+            return [Name, Value]
+
         TmpStr = Str[0:Index - 1]
 
 def SplitPredicateStr(Str):
+
+    Str = Str.lstrip('(')
     IsFuncCalling = False
     p = GetFuncDeclPattern()
     TmpStr = Str.replace('.', '').replace('->', '')
     if p.match(TmpStr):
         IsFuncCalling = True
-    
+
     PredPartList = SplitPredicateByOp(Str, '==', IsFuncCalling)
     if len(PredPartList) > 1:
         return [PredPartList, '==']
-    
+
     PredPartList = SplitPredicateByOp(Str, '!=', IsFuncCalling)
     if len(PredPartList) > 1:
         return [PredPartList, '!=']
-    
+
     PredPartList = SplitPredicateByOp(Str, '>=', IsFuncCalling)
     if len(PredPartList) > 1:
         return [PredPartList, '>=']
-        
+
     PredPartList = SplitPredicateByOp(Str, '<=', IsFuncCalling)
     if len(PredPartList) > 1:
         return [PredPartList, '<=']
-        
+
     PredPartList = SplitPredicateByOp(Str, '>', IsFuncCalling)
     if len(PredPartList) > 1:
         return [PredPartList, '>']
-        
+
     PredPartList = SplitPredicateByOp(Str, '<', IsFuncCalling)
     if len(PredPartList) > 1:
         return [PredPartList, '<']
-        
+
     return [[Str, None], None]
 
 def GetFuncContainsPE(ExpLine, ResultSet):
@@ -812,11 +827,11 @@ def GetDataTypeFromModifier(ModifierStr):
         # remove array sufix
         if M.startswith('['):
             MList.remove(M)
-            
+
     ReturnType = ''
     for M in MList:
         ReturnType += M + ' '
-        
+
     ReturnType = ReturnType.strip()
     if len(ReturnType) == 0:
         ReturnType = 'VOID'
@@ -829,13 +844,13 @@ def DiffModifier(Str1, Str2):
         return False
     else:
         return True
-    
+
 def GetTypedefDict(FullFileName):
-    
+
     Dict = ComplexTypeDict.get(FullFileName)
     if Dict != None:
         return Dict
-    
+
     FileID = GetTableID(FullFileName)
     FileTable = 'Identifier' + str(FileID)
     Db = GetDB()
@@ -844,25 +859,25 @@ def GetTypedefDict(FullFileName):
                        where Model = %d
                    """ % (FileTable, DataClass.MODEL_IDENTIFIER_TYPEDEF)
     ResultSet = Db.TblFile.Exec(SqlStatement)
-    
+
     Dict = {}
     for Result in ResultSet:
         if len(Result[0]) == 0:
             Dict[Result[1]] = Result[2]
-        
+
     IncludeFileList = GetAllIncludeFiles(FullFileName)
     for F in IncludeFileList:
         FileID = GetTableID(F)
         if FileID < 0:
             continue
-    
+
         FileTable = 'Identifier' + str(FileID)
         SqlStatement = """ select Modifier, Name, Value, ID
                        from %s
                        where Model = %d
                    """ % (FileTable, DataClass.MODEL_IDENTIFIER_TYPEDEF)
         ResultSet = Db.TblFile.Exec(SqlStatement)
-    
+
         for Result in ResultSet:
             if not Result[2].startswith('FP ('):
                 Dict[Result[1]] = Result[2]
@@ -871,16 +886,16 @@ def GetTypedefDict(FullFileName):
                     Dict[Result[1]] = 'VOID'
                 else:
                     Dict[Result[1]] = GetDataTypeFromModifier(Result[0])
-                
+
     ComplexTypeDict[FullFileName] = Dict
     return Dict
 
 def GetSUDict(FullFileName):
-    
+
     Dict = SUDict.get(FullFileName)
     if Dict != None:
         return Dict
-    
+
     FileID = GetTableID(FullFileName)
     FileTable = 'Identifier' + str(FileID)
     Db = GetDB()
@@ -889,36 +904,36 @@ def GetSUDict(FullFileName):
                        where Model = %d or Model = %d
                    """ % (FileTable, DataClass.MODEL_IDENTIFIER_STRUCTURE, DataClass.MODEL_IDENTIFIER_UNION)
     ResultSet = Db.TblFile.Exec(SqlStatement)
-    
+
     Dict = {}
     for Result in ResultSet:
         if len(Result[1]) > 0:
             Dict[Result[0]] = Result[1]
-        
+
     IncludeFileList = GetAllIncludeFiles(FullFileName)
     for F in IncludeFileList:
         FileID = GetTableID(F)
         if FileID < 0:
             continue
-    
+
         FileTable = 'Identifier' + str(FileID)
         SqlStatement = """ select Name, Value, ID
                        from %s
                        where Model = %d or Model = %d
                    """ % (FileTable, DataClass.MODEL_IDENTIFIER_STRUCTURE, DataClass.MODEL_IDENTIFIER_UNION)
         ResultSet = Db.TblFile.Exec(SqlStatement)
-    
+
         for Result in ResultSet:
             if len(Result[1]) > 0:
                 Dict[Result[0]] = Result[1]
-                
+
     SUDict[FullFileName] = Dict
     return Dict
 
 def StripComments(Str):
     Str += '   '
     ListFromStr = list(Str)
-    
+
     InComment = False
     DoubleSlashComment = False
     Index = 0
@@ -944,7 +959,7 @@ def StripComments(Str):
         elif ListFromStr[Index] == '/' and ListFromStr[Index+1] == '/' and ListFromStr[Index+2] != '\n':
             InComment = True
             DoubleSlashComment = True
-        
+
         # check for /* comment start
         elif ListFromStr[Index] == '/' and ListFromStr[Index+1] == '*':
             ListFromStr[Index] = ' '
@@ -958,7 +973,7 @@ def StripComments(Str):
     # restore from List to String
     Str = "".join(ListFromStr)
     Str = Str.rstrip(' ')
-             
+
     return Str
 
 def GetFinalTypeValue(Type, FieldName, TypedefDict, SUDict):
@@ -967,7 +982,7 @@ def GetFinalTypeValue(Type, FieldName, TypedefDict, SUDict):
         Value = SUDict.get(Type)
     if Value == None:
         return None
-    
+
     LBPos = Value.find('{')
     while LBPos == -1:
         FTList = Value.split()
@@ -977,12 +992,12 @@ def GetFinalTypeValue(Type, FieldName, TypedefDict, SUDict):
                 if Value == None:
                     Value = SUDict.get(FT)
                 break
-        
+
         if Value == None:
             return None
-     
+
         LBPos = Value.find('{')
-     
+
 #    RBPos = Value.find('}')
     Fields = Value[LBPos + 1:]
     Fields = StripComments(Fields)
@@ -997,13 +1012,13 @@ def GetFinalTypeValue(Type, FieldName, TypedefDict, SUDict):
                 Type = GetDataTypeFromModifier(Field[0:Index])
                 return Type.strip()
             else:
-            # For the condition that the field in struct is an array with [] sufixes...               
+            # For the condition that the field in struct is an array with [] sufixes...
                 if not Field[Index + len(FieldName)].isalnum():
                     Type = GetDataTypeFromModifier(Field[0:Index])
                     return Type.strip()
-                
+
     return None
-    
+
 def GetRealType(Type, TypedefDict, TargetType = None):
     if TargetType != None and Type == TargetType:
             return Type
@@ -1017,7 +1032,7 @@ def GetTypeInfo(RefList, Modifier, FullFileName, TargetType = None):
     TypedefDict = GetTypedefDict(FullFileName)
     SUDict = GetSUDict(FullFileName)
     Type = GetDataTypeFromModifier(Modifier).replace('*', '').strip()
-    
+
     Type = Type.split()[-1]
     Index = 0
     while Index < len(RefList):
@@ -1034,7 +1049,7 @@ def GetTypeInfo(RefList, Modifier, FullFileName, TargetType = None):
             if Type.find('*') != -1 and Index == len(RefList)-1:
                 return Type
             Type = FromType.split()[0]
-            
+
         Index += 1
 
     Type = GetRealType(Type, TypedefDict, TargetType)
@@ -1042,14 +1057,14 @@ def GetTypeInfo(RefList, Modifier, FullFileName, TargetType = None):
     return Type
 
 def GetVarInfo(PredVarList, FuncRecord, FullFileName, IsFuncCall = False, TargetType = None, StarList = None):
-    
+
     PredVar = PredVarList[0]
     FileID = GetTableID(FullFileName)
-    
+
     Db = GetDB()
     FileTable = 'Identifier' + str(FileID)
     # search variable in include files
-    
+
     # it is a function call, search function declarations and definitions
     if IsFuncCall:
         SqlStatement = """ select Modifier, ID
@@ -1057,65 +1072,65 @@ def GetVarInfo(PredVarList, FuncRecord, FullFileName, IsFuncCall = False, Target
                        where Model = %d and Value = \'%s\'
                    """ % (FileTable, DataClass.MODEL_IDENTIFIER_FUNCTION_DECLARATION, PredVar)
         ResultSet = Db.TblFile.Exec(SqlStatement)
-    
-        for Result in ResultSet:        
+
+        for Result in ResultSet:
             Type = GetDataTypeFromModifier(Result[0]).split()[-1]
             TypedefDict = GetTypedefDict(FullFileName)
             Type = GetRealType(Type, TypedefDict, TargetType)
             return Type
-        
+
         IncludeFileList = GetAllIncludeFiles(FullFileName)
         for F in IncludeFileList:
             FileID = GetTableID(F)
             if FileID < 0:
                 continue
-        
+
             FileTable = 'Identifier' + str(FileID)
             SqlStatement = """ select Modifier, ID
                            from %s
                            where Model = %d and Value = \'%s\'
                        """ % (FileTable, DataClass.MODEL_IDENTIFIER_FUNCTION_DECLARATION, PredVar)
             ResultSet = Db.TblFile.Exec(SqlStatement)
-    
+
             for Result in ResultSet:
                 Type = GetDataTypeFromModifier(Result[0]).split()[-1]
                 TypedefDict = GetTypedefDict(FullFileName)
                 Type = GetRealType(Type, TypedefDict, TargetType)
                 return Type
-    
+
         FileID = GetTableID(FullFileName)
         SqlStatement = """ select Modifier, ID
                        from Function
                        where BelongsToFile = %d and Name = \'%s\'
                    """ % (FileID, PredVar)
         ResultSet = Db.TblFile.Exec(SqlStatement)
-    
-        for Result in ResultSet:        
+
+        for Result in ResultSet:
             Type = GetDataTypeFromModifier(Result[0]).split()[-1]
             TypedefDict = GetTypedefDict(FullFileName)
             Type = GetRealType(Type, TypedefDict, TargetType)
             return Type
-        
+
         for F in IncludeFileList:
             FileID = GetTableID(F)
             if FileID < 0:
                 continue
-        
+
             FileTable = 'Identifier' + str(FileID)
             SqlStatement = """ select Modifier, ID
                            from Function
                            where BelongsToFile = %d and Name = \'%s\'
                        """ % (FileID, PredVar)
             ResultSet = Db.TblFile.Exec(SqlStatement)
-    
+
             for Result in ResultSet:
                 Type = GetDataTypeFromModifier(Result[0]).split()[-1]
                 TypedefDict = GetTypedefDict(FullFileName)
                 Type = GetRealType(Type, TypedefDict, TargetType)
                 return Type
-         
+
         return None
-       
+
     # really variable, search local variable first
     SqlStatement = """ select Modifier, ID
                        from %s
@@ -1141,7 +1156,7 @@ def GetVarInfo(PredVarList, FuncRecord, FullFileName, IsFuncCall = False, Target
             TypedefDict = GetTypedefDict(FullFileName)
             Type = GetRealType(Type, TypedefDict, TargetType)
             return Type
-                
+
     # search function parameters second
     ParamList = GetParamList(FuncRecord[2])
     for Param in ParamList:
@@ -1162,7 +1177,7 @@ def GetVarInfo(PredVarList, FuncRecord, FullFileName, IsFuncCall = False, Target
                 TypedefDict = GetTypedefDict(FullFileName)
                 Type = GetRealType(Type, TypedefDict, TargetType)
                 return Type
-          
+
     # search global variable next
     SqlStatement = """ select Modifier, ID
            from %s
@@ -1187,13 +1202,13 @@ def GetVarInfo(PredVarList, FuncRecord, FullFileName, IsFuncCall = False, Target
             TypedefDict = GetTypedefDict(FullFileName)
             Type = GetRealType(Type, TypedefDict, TargetType)
             return Type
-    
+
     IncludeFileList = GetAllIncludeFiles(FullFileName)
     for F in IncludeFileList:
         FileID = GetTableID(F)
         if FileID < 0:
             continue
-    
+
         FileTable = 'Identifier' + str(FileID)
         SqlStatement = """ select Modifier, ID
                        from %s
@@ -1219,16 +1234,26 @@ def GetVarInfo(PredVarList, FuncRecord, FullFileName, IsFuncCall = False, Target
                 Type = GetRealType(Type, TypedefDict, TargetType)
                 return Type
 
+def GetTypeFromArray(Type, Var):
+    Count = Var.count('[')
+
+    while Count > 0:
+        Type = Type.strip()
+        Type = Type.rstrip('*')
+        Count = Count - 1
+
+    return Type
+
 def CheckFuncLayoutReturnType(FullFileName):
     ErrorMsgList = []
-    
+
     FileID = GetTableID(FullFileName, ErrorMsgList)
     if FileID < 0:
         return ErrorMsgList
-    
+
     Db = GetDB()
     FileTable = 'Identifier' + str(FileID)
-    SqlStatement = """ select Modifier, ID, StartLine, StartColumn, EndLine, Value 
+    SqlStatement = """ select Modifier, ID, StartLine, StartColumn, EndLine, Value
                        from %s
                        where Model = %d
                    """ % (FileTable, DataClass.MODEL_IDENTIFIER_FUNCTION_DECLARATION)
@@ -1242,10 +1267,10 @@ def CheckFuncLayoutReturnType(FullFileName):
         Index = Result[0].find(TypeStart)
         if Index != 0 or Result[3] != 0:
             PrintErrorMsg(ERROR_C_FUNCTION_LAYOUT_CHECK_RETURN_TYPE, '[%s] Return Type should appear at the start of line' % FuncName, FileTable, Result[1])
-            
+
         if Result[2] == Result[4]:
             PrintErrorMsg(ERROR_C_FUNCTION_LAYOUT_CHECK_RETURN_TYPE, '[%s] Return Type should appear on its own line' % FuncName, FileTable, Result[1])
-            
+
     SqlStatement = """ select Modifier, ID, StartLine, StartColumn, FunNameStartLine, Name
                        from Function
                        where BelongsToFile = %d
@@ -1260,17 +1285,17 @@ def CheckFuncLayoutReturnType(FullFileName):
         Index = Result[0].find(ReturnType)
         if Index != 0 or Result[3] != 0:
             PrintErrorMsg(ERROR_C_FUNCTION_LAYOUT_CHECK_RETURN_TYPE, '[%s] Return Type should appear at the start of line' % FuncName, 'Function', Result[1])
-            
+
         if Result[2] == Result[4]:
             PrintErrorMsg(ERROR_C_FUNCTION_LAYOUT_CHECK_RETURN_TYPE, '[%s] Return Type should appear on its own line' % FuncName, 'Function', Result[1])
-    
+
 def CheckFuncLayoutModifier(FullFileName):
     ErrorMsgList = []
-    
+
     FileID = GetTableID(FullFileName, ErrorMsgList)
     if FileID < 0:
         return ErrorMsgList
-    
+
     Db = GetDB()
     FileTable = 'Identifier' + str(FileID)
     SqlStatement = """ select Modifier, ID
@@ -1286,7 +1311,7 @@ def CheckFuncLayoutModifier(FullFileName):
         Index = Result[0].find(TypeStart)
         if Index != 0:
             PrintErrorMsg(ERROR_C_FUNCTION_LAYOUT_CHECK_OPTIONAL_FUNCTIONAL_MODIFIER, '', FileTable, Result[1])
-            
+
     SqlStatement = """ select Modifier, ID
                        from Function
                        where BelongsToFile = %d
@@ -1309,7 +1334,7 @@ def CheckFuncLayoutName(FullFileName):
     FileID = GetTableID(FullFileName, ErrorMsgList)
     if FileID < 0:
         return ErrorMsgList
-    
+
     Db = GetDB()
     FileTable = 'Identifier' + str(FileID)
     SqlStatement = """ select Name, ID, EndColumn, Value
@@ -1331,14 +1356,14 @@ def CheckFuncLayoutName(FullFileName):
             if Param.StartLine <= StartLine:
                 PrintErrorMsg(ERROR_C_FUNCTION_LAYOUT_CHECK_FUNCTION_NAME, 'Parameter %s should be in its own line.' % Param.Name, FileTable, Result[1])
             if Param.StartLine - StartLine > 1:
-                PrintErrorMsg(ERROR_C_FUNCTION_LAYOUT_CHECK_FUNCTION_NAME, 'Empty line appears before Parameter %s.' % Param.Name, FileTable, Result[1])    
+                PrintErrorMsg(ERROR_C_FUNCTION_LAYOUT_CHECK_FUNCTION_NAME, 'Empty line appears before Parameter %s.' % Param.Name, FileTable, Result[1])
             if not Pattern.match(Param.Name) and not Param.Name in ParamIgnoreList and not EccGlobalData.gException.IsException(ERROR_NAMING_CONVENTION_CHECK_VARIABLE_NAME, Param.Name):
                 PrintErrorMsg(ERROR_NAMING_CONVENTION_CHECK_VARIABLE_NAME, 'Parameter [%s] NOT follow naming convention.' % Param.Name, FileTable, Result[1])
             StartLine = Param.StartLine
-            
+
         if not Result[0].endswith('\n  )') and not Result[0].endswith('\r  )'):
             PrintErrorMsg(ERROR_C_FUNCTION_LAYOUT_CHECK_FUNCTION_NAME, '\')\' should be on a new line and indented two spaces', FileTable, Result[1])
-            
+
     SqlStatement = """ select Modifier, ID, FunNameStartColumn, Name
                        from Function
                        where BelongsToFile = %d
@@ -1367,11 +1392,11 @@ def CheckFuncLayoutName(FullFileName):
 
 def CheckFuncLayoutPrototype(FullFileName):
     ErrorMsgList = []
-    
+
     FileID = GetTableID(FullFileName, ErrorMsgList)
     if FileID < 0:
         return ErrorMsgList
-    
+
     FileTable = 'Identifier' + str(FileID)
     Db = GetDB()
     SqlStatement = """ select Modifier, Header, Name, ID
@@ -1381,11 +1406,11 @@ def CheckFuncLayoutPrototype(FullFileName):
     ResultSet = Db.TblFile.Exec(SqlStatement)
     if len(ResultSet) == 0:
         return ErrorMsgList
-    
+
     FuncDefList = []
     for Result in ResultSet:
         FuncDefList.append(Result)
-        
+
     SqlStatement = """ select Modifier, Name, ID
                        from %s
                        where Model = %d
@@ -1394,7 +1419,7 @@ def CheckFuncLayoutPrototype(FullFileName):
     FuncDeclList = []
     for Result in ResultSet:
         FuncDeclList.append(Result)
-    
+
     UndeclFuncList = []
     for FuncDef in FuncDefList:
         FuncName = FuncDef[2].strip()
@@ -1409,26 +1434,26 @@ def CheckFuncLayoutPrototype(FullFileName):
                     PrintErrorMsg(ERROR_C_FUNCTION_LAYOUT_CHECK_FUNCTION_PROTO_TYPE, 'Function [%s] modifier different with prototype.' % FuncName, 'Function', FuncDef[3])
                 ParamListOfDef = GetParamList(FuncDefHeader)
                 ParamListOfDecl = GetParamList(FuncDecl[1])
-                if len(ParamListOfDef) != len(ParamListOfDecl):
-                    PrintErrorMsg(ERROR_C_FUNCTION_LAYOUT_CHECK_FUNCTION_PROTO_TYPE, 'Parameter number different.', 'Function', FuncDef[3])
+                if len(ParamListOfDef) != len(ParamListOfDecl) and not EccGlobalData.gException.IsException(ERROR_C_FUNCTION_LAYOUT_CHECK_FUNCTION_PROTO_TYPE_2, FuncName):
+                    PrintErrorMsg(ERROR_C_FUNCTION_LAYOUT_CHECK_FUNCTION_PROTO_TYPE_2, 'Parameter number different in function [%s].' % FuncName, 'Function', FuncDef[3])
                     break
 
                 Index = 0
                 while Index < len(ParamListOfDef):
-                    if DiffModifier(ParamListOfDef[Index].Modifier, ParamListOfDecl[Index].Modifier):
-                        PrintErrorMsg(ERROR_C_FUNCTION_LAYOUT_CHECK_FUNCTION_PROTO_TYPE, 'Parameter %s has different modifier with prototype.' % ParamListOfDef[Index].Name, 'Function', FuncDef[3])
+                    if DiffModifier(ParamListOfDef[Index].Modifier, ParamListOfDecl[Index].Modifier) and not EccGlobalData.gException.IsException(ERROR_C_FUNCTION_LAYOUT_CHECK_FUNCTION_PROTO_TYPE_3, FuncName):
+                        PrintErrorMsg(ERROR_C_FUNCTION_LAYOUT_CHECK_FUNCTION_PROTO_TYPE_3, 'Parameter %s has different modifier with prototype in function [%s].' % (ParamListOfDef[Index].Name, FuncName), 'Function', FuncDef[3])
                     Index += 1
                 break
         else:
             UndeclFuncList.append(FuncDef)
-            
+
     IncludeFileList = GetAllIncludeFiles(FullFileName)
     FuncDeclList = []
     for F in IncludeFileList:
         FileID = GetTableID(F, ErrorMsgList)
         if FileID < 0:
             continue
-    
+
         FileTable = 'Identifier' + str(FileID)
         SqlStatement = """ select Modifier, Name, ID
                        from %s
@@ -1438,7 +1463,7 @@ def CheckFuncLayoutPrototype(FullFileName):
 
         for Result in ResultSet:
             FuncDeclList.append(Result)
-            
+
     for FuncDef in UndeclFuncList:
         FuncName = FuncDef[2].strip()
         FuncModifier = FuncDef[0]
@@ -1452,24 +1477,24 @@ def CheckFuncLayoutPrototype(FullFileName):
                     PrintErrorMsg(ERROR_C_FUNCTION_LAYOUT_CHECK_FUNCTION_PROTO_TYPE, 'Function [%s] modifier different with prototype.' % FuncName, 'Function', FuncDef[3])
                 ParamListOfDef = GetParamList(FuncDefHeader)
                 ParamListOfDecl = GetParamList(FuncDecl[1])
-                if len(ParamListOfDef) != len(ParamListOfDecl):
-                    PrintErrorMsg(ERROR_C_FUNCTION_LAYOUT_CHECK_FUNCTION_PROTO_TYPE, 'Parameter number different.', 'Function', FuncDef[3])
+                if len(ParamListOfDef) != len(ParamListOfDecl) and not EccGlobalData.gException.IsException(ERROR_C_FUNCTION_LAYOUT_CHECK_FUNCTION_PROTO_TYPE_2, FuncName):
+                    PrintErrorMsg(ERROR_C_FUNCTION_LAYOUT_CHECK_FUNCTION_PROTO_TYPE_2, 'Parameter number different in function [%s].' % FuncName, 'Function', FuncDef[3])
                     break
 
                 Index = 0
                 while Index < len(ParamListOfDef):
-                    if DiffModifier(ParamListOfDef[Index].Modifier, ParamListOfDecl[Index].Modifier):
-                        PrintErrorMsg(ERROR_C_FUNCTION_LAYOUT_CHECK_FUNCTION_PROTO_TYPE, 'Parameter %s has different modifier with prototype.' % ParamListOfDef[Index].Name, 'Function', FuncDef[3])
+                    if DiffModifier(ParamListOfDef[Index].Modifier, ParamListOfDecl[Index].Modifier) and not EccGlobalData.gException.IsException(ERROR_C_FUNCTION_LAYOUT_CHECK_FUNCTION_PROTO_TYPE_3, FuncName):
+                        PrintErrorMsg(ERROR_C_FUNCTION_LAYOUT_CHECK_FUNCTION_PROTO_TYPE_3, 'Parameter %s has different modifier with prototype in function [%s].' % (ParamListOfDef[Index].Name, FuncName), 'Function', FuncDef[3])
                     Index += 1
                 break
-    
+
 def CheckFuncLayoutBody(FullFileName):
     ErrorMsgList = []
-    
+
     FileID = GetTableID(FullFileName, ErrorMsgList)
     if FileID < 0:
         return ErrorMsgList
-    
+
     FileTable = 'Identifier' + str(FileID)
     Db = GetDB()
     SqlStatement = """ select BodyStartColumn, EndColumn, ID
@@ -1487,11 +1512,11 @@ def CheckFuncLayoutBody(FullFileName):
 
 def CheckFuncLayoutLocalVariable(FullFileName):
     ErrorMsgList = []
-    
+
     FileID = GetTableID(FullFileName, ErrorMsgList)
     if FileID < 0:
         return ErrorMsgList
-    
+
     Db = GetDB()
     FileTable = 'Identifier' + str(FileID)
     SqlStatement = """ select ID
@@ -1504,7 +1529,7 @@ def CheckFuncLayoutLocalVariable(FullFileName):
     FL = []
     for Result in ResultSet:
         FL.append(Result)
-        
+
     for F in FL:
         SqlStatement = """ select Name, Value, ID
                        from %s
@@ -1513,21 +1538,21 @@ def CheckFuncLayoutLocalVariable(FullFileName):
         ResultSet = Db.TblFile.Exec(SqlStatement)
         if len(ResultSet) == 0:
             continue
-        
+
         for Result in ResultSet:
             if len(Result[1]) > 0:
                 PrintErrorMsg(ERROR_C_FUNCTION_LAYOUT_CHECK_NO_INIT_OF_VARIABLE, 'Variable Name: %s' % Result[0], FileTable, Result[2])
-        
+
 def CheckMemberVariableFormat(Name, Value, FileTable, TdId, ModelId):
     ErrMsgList = []
     # Member variable format pattern.
     Pattern = re.compile(r'^[A-Z]+\S*[a-z]\S*$')
-    
+
     LBPos = Value.find('{')
     RBPos = Value.rfind('}')
     if LBPos == -1 or RBPos == -1:
         return ErrMsgList
-    
+
     Fields = Value[LBPos + 1 : RBPos]
     Fields = StripComments(Fields).strip()
     NestPos = Fields.find ('struct')
@@ -1548,7 +1573,7 @@ def CheckMemberVariableFormat(Name, Value, FileTable, TdId, ModelId):
             if not EccGlobalData.gException.IsException(ERROR_DECLARATION_DATA_TYPE_CHECK_NESTED_STRUCTURE, Name):
                 PrintErrorMsg(ERROR_DECLARATION_DATA_TYPE_CHECK_NESTED_STRUCTURE, 'Nested enum in [%s].' % (Name), FileTable, TdId)
             return ErrMsgList
-            
+
     if ModelId == DataClass.MODEL_IDENTIFIER_ENUMERATE:
         FieldsList = Fields.split(',')
         # deal with enum is pre-assigned a value by function call ( , , , ...)
@@ -1557,34 +1582,34 @@ def CheckMemberVariableFormat(Name, Value, FileTable, TdId, ModelId):
         RemoveCurrentElement = False
         while Index < len(FieldsList):
             Field = FieldsList[Index]
-                
+
             if Field.find('(') != -1:
                 QuoteCount += 1
                 RemoveCurrentElement = True
                 Index += 1
                 continue
-                
+
             if Field.find(')') != -1 and QuoteCount > 0:
                 QuoteCount -= 1
 
-            if RemoveCurrentElement:    
+            if RemoveCurrentElement:
                 FieldsList.remove(Field)
                 if QuoteCount == 0:
                     RemoveCurrentElement = False
                 continue
-                
+
             if QuoteCount == 0:
                 RemoveCurrentElement = False
-                
+
             Index += 1
     else:
         FieldsList = Fields.split(';')
-    
+
     for Field in FieldsList:
         Field = Field.strip()
         if Field == '':
             continue
-        # For the condition that the field in struct is an array with [] sufixes...               
+        # For the condition that the field in struct is an array with [] sufixes...
         if Field[-1] == ']':
             LBPos = Field.find('[')
             Field = Field[0:LBPos]
@@ -1592,26 +1617,26 @@ def CheckMemberVariableFormat(Name, Value, FileTable, TdId, ModelId):
         if Field.find(':') != -1:
             ColonPos = Field.find(':')
             Field = Field[0:ColonPos]
-            
+
         Field = Field.strip()
         if Field == '':
             continue
         # Enum could directly assign value to variable
         Field = Field.split('=')[0].strip()
-        TokenList = Field.split() 
+        TokenList = Field.split()
         # Remove pointers before variable
         if not Pattern.match(TokenList[-1].lstrip('*')):
             ErrMsgList.append(TokenList[-1].lstrip('*'))
-        
+
     return ErrMsgList
 
 def CheckDeclTypedefFormat(FullFileName, ModelId):
     ErrorMsgList = []
-    
+
     FileID = GetTableID(FullFileName, ErrorMsgList)
     if FileID < 0:
         return ErrorMsgList
-    
+
     Db = GetDB()
     FileTable = 'Identifier' + str(FileID)
     SqlStatement = """ select Name, StartLine, EndLine, ID, Value
@@ -1622,7 +1647,7 @@ def CheckDeclTypedefFormat(FullFileName, ModelId):
     ResultList = []
     for Result in ResultSet:
         ResultList.append(Result)
-    
+
     ErrorType = ERROR_DECLARATION_DATA_TYPE_CHECK_ALL
     if ModelId == DataClass.MODEL_IDENTIFIER_STRUCTURE:
         ErrorType = ERROR_DECLARATION_DATA_TYPE_CHECK_STRUCTURE_DECLARATION
@@ -1630,7 +1655,7 @@ def CheckDeclTypedefFormat(FullFileName, ModelId):
         ErrorType = ERROR_DECLARATION_DATA_TYPE_CHECK_ENUMERATED_TYPE
     elif ModelId == DataClass.MODEL_IDENTIFIER_UNION:
         ErrorType = ERROR_DECLARATION_DATA_TYPE_CHECK_UNION_TYPE
-    
+
     SqlStatement = """ select Modifier, Name, Value, StartLine, EndLine, ID
                        from %s
                        where Model = %d
@@ -1651,7 +1676,7 @@ def CheckDeclTypedefFormat(FullFileName, ModelId):
             ValueModelId = DataClass.MODEL_IDENTIFIER_UNION
         else:
             continue
-        
+
         if ValueModelId != ModelId:
             continue
         # Check member variable format.
@@ -1660,7 +1685,7 @@ def CheckDeclTypedefFormat(FullFileName, ModelId):
             if EccGlobalData.gException.IsException(ERROR_NAMING_CONVENTION_CHECK_VARIABLE_NAME, Name+'.'+ErrMsg):
                 continue
             PrintErrorMsg(ERROR_NAMING_CONVENTION_CHECK_VARIABLE_NAME, 'Member variable [%s] NOT follow naming convention.' % (Name+'.'+ErrMsg), FileTable, Td[5])
-    
+
     # First check in current file to see whether struct/union/enum is typedef-ed.
     UntypedefedList = []
     for Result in ResultList:
@@ -1675,7 +1700,7 @@ def CheckDeclTypedefFormat(FullFileName, ModelId):
             ValueModelId = DataClass.MODEL_IDENTIFIER_UNION
         else:
             continue
-        
+
         if ValueModelId != ModelId:
             continue
         ErrMsgList = CheckMemberVariableFormat(Name, Value, FileTable, Result[3], ModelId)
@@ -1699,21 +1724,21 @@ def CheckDeclTypedefFormat(FullFileName, ModelId):
                     PrintErrorMsg(ErrorType, 'Typedef should be UPPER case', FileTable, Td[5])
             if Found:
                 break
-        
+
         if not Found:
             UntypedefedList.append(Result)
             continue
-    
+
     if len(UntypedefedList) == 0:
         return
-    
+
     IncludeFileList = GetAllIncludeFiles(FullFileName)
     TdList = []
     for F in IncludeFileList:
         FileID = GetTableID(F, ErrorMsgList)
         if FileID < 0:
             continue
-    
+
         IncludeFileTable = 'Identifier' + str(FileID)
         SqlStatement = """ select Modifier, Name, Value, StartLine, EndLine, ID
                        from %s
@@ -1721,13 +1746,13 @@ def CheckDeclTypedefFormat(FullFileName, ModelId):
                    """ % (IncludeFileTable, DataClass.MODEL_IDENTIFIER_TYPEDEF)
         ResultSet = Db.TblFile.Exec(SqlStatement)
         TdList.extend(ResultSet)
-            
+
     for Result in UntypedefedList:
-        
+
         # Check whether it is typedefed.
         Found = False
         for Td in TdList:
-            
+
             if len(Td[0]) > 0:
                 continue
             if Result[1] >= Td[3] and Td[4] >= Result[2]:
@@ -1740,27 +1765,27 @@ def CheckDeclTypedefFormat(FullFileName, ModelId):
                     PrintErrorMsg(ErrorType, 'Typedef should be UPPER case', FileTable, Td[5])
             if Found:
                 break
-                    
+
         if not Found:
             PrintErrorMsg(ErrorType, 'No Typedef for %s' % Result[0], FileTable, Result[3])
             continue
-                
+
 def CheckDeclStructTypedef(FullFileName):
     CheckDeclTypedefFormat(FullFileName, DataClass.MODEL_IDENTIFIER_STRUCTURE)
 
 def CheckDeclEnumTypedef(FullFileName):
     CheckDeclTypedefFormat(FullFileName, DataClass.MODEL_IDENTIFIER_ENUMERATE)
-    
+
 def CheckDeclUnionTypedef(FullFileName):
     CheckDeclTypedefFormat(FullFileName, DataClass.MODEL_IDENTIFIER_UNION)
 
 def CheckDeclArgModifier(FullFileName):
     ErrorMsgList = []
-    
+
     FileID = GetTableID(FullFileName, ErrorMsgList)
     if FileID < 0:
         return ErrorMsgList
-    
+
     Db = GetDB()
     FileTable = 'Identifier' + str(FileID)
     SqlStatement = """ select Modifier, Name, ID
@@ -1775,7 +1800,7 @@ def CheckDeclArgModifier(FullFileName):
             if PatternInModifier(Result[0], Modifier) and len(Result[0]) < MAX_MODIFIER_LENGTH:
                 PrintErrorMsg(ERROR_DECLARATION_DATA_TYPE_CHECK_IN_OUT_MODIFIER, 'Variable Modifier %s' % Result[0], FileTable, Result[2])
                 break
-    
+
     SqlStatement = """ select Modifier, Name, ID
                        from %s
                        where Model = %d
@@ -1786,7 +1811,7 @@ def CheckDeclArgModifier(FullFileName):
             if PatternInModifier(Result[0], Modifier):
                 PrintErrorMsg(ERROR_DECLARATION_DATA_TYPE_CHECK_IN_OUT_MODIFIER, 'Return Type Modifier %s' % Result[0], FileTable, Result[2])
                 break
-                    
+
     SqlStatement = """ select Modifier, Header, ID
                        from Function
                        where BelongsToFile = %d
@@ -1800,11 +1825,11 @@ def CheckDeclArgModifier(FullFileName):
 
 def CheckDeclNoUseCType(FullFileName):
     ErrorMsgList = []
-    
+
     FileID = GetTableID(FullFileName, ErrorMsgList)
     if FileID < 0:
         return ErrorMsgList
-    
+
     Db = GetDB()
     FileTable = 'Identifier' + str(FileID)
     SqlStatement = """ select Modifier, Name, ID
@@ -1818,7 +1843,7 @@ def CheckDeclNoUseCType(FullFileName):
             if PatternInModifier(Result[0], Type):
                 PrintErrorMsg(ERROR_DECLARATION_DATA_TYPE_CHECK_NO_USE_C_TYPE, 'Variable type %s' % Type, FileTable, Result[2])
                 break
-    
+
     SqlStatement = """ select Modifier, Name, ID, Value
                        from %s
                        where Model = %d
@@ -1832,11 +1857,11 @@ def CheckDeclNoUseCType(FullFileName):
         for Type in CTypeTuple:
             if PatternInModifier(Result[0], Type):
                 PrintErrorMsg(ERROR_DECLARATION_DATA_TYPE_CHECK_NO_USE_C_TYPE, '%s Return type %s' % (FuncName, Result[0]), FileTable, Result[2])
-            
+
             for Param in ParamList:
                 if PatternInModifier(Param.Modifier, Type):
                     PrintErrorMsg(ERROR_DECLARATION_DATA_TYPE_CHECK_NO_USE_C_TYPE, 'Parameter %s' % Param.Name, FileTable, Result[2])
-                    
+
     SqlStatement = """ select Modifier, Header, ID, Name
                        from Function
                        where BelongsToFile = %d
@@ -1850,22 +1875,22 @@ def CheckDeclNoUseCType(FullFileName):
         for Type in CTypeTuple:
             if PatternInModifier(Result[0], Type):
                 PrintErrorMsg(ERROR_DECLARATION_DATA_TYPE_CHECK_NO_USE_C_TYPE, '[%s] Return type %s' % (FuncName, Result[0]), FileTable, Result[2])
-            
+
             for Param in ParamList:
                 if PatternInModifier(Param.Modifier, Type):
                     PrintErrorMsg(ERROR_DECLARATION_DATA_TYPE_CHECK_NO_USE_C_TYPE, 'Parameter %s' % Param.Name, FileTable, Result[2])
-            
+
 
 def CheckPointerNullComparison(FullFileName):
     ErrorMsgList = []
-    
+
     FileID = GetTableID(FullFileName, ErrorMsgList)
     if FileID < 0:
         return ErrorMsgList
-    
+
     # cache the found function return type to accelerate later checking in this file.
     FuncReturnTypeDict = {}
-    
+
     Db = GetDB()
     FileTable = 'Identifier' + str(FileID)
     SqlStatement = """ select Value, StartLine, ID
@@ -1878,7 +1903,7 @@ def CheckPointerNullComparison(FullFileName):
     PSL = []
     for Result in ResultSet:
         PSL.append([Result[0], Result[1], Result[2]])
-    
+
     SqlStatement = """ select BodyStartLine, EndLine, Header, Modifier, ID
                        from Function
                        where BelongsToFile = %d
@@ -1887,13 +1912,13 @@ def CheckPointerNullComparison(FullFileName):
     FL = []
     for Result in ResultSet:
         FL.append([Result[0], Result[1], Result[2], Result[3], Result[4]])
-    
+
     p = GetFuncDeclPattern()
     for Str in PSL:
         FuncRecord = GetFuncContainsPE(Str[1], FL)
         if FuncRecord == None:
             continue
-        
+
         for Exp in GetPredicateListFromPredicateExpStr(Str[0]):
             PredInfo = SplitPredicateStr(Exp)
             if PredInfo[1] == None:
@@ -1906,9 +1931,9 @@ def CheckPointerNullComparison(FullFileName):
                     PredVarStr = PredVarStr[0:PredVarStr.find('(')]
                     SearchInCache = True
                     # Only direct function call using IsFuncCall branch. Multi-level ref. function call is considered a variable.
-                    if TmpStr.startswith(PredVarStr):    
+                    if TmpStr.startswith(PredVarStr):
                         IsFuncCall = True
-                    
+
                 if PredVarStr.strip() in IgnoredKeywordList:
                     continue
                 StarList = []
@@ -1922,28 +1947,29 @@ def CheckPointerNullComparison(FullFileName):
                         if Type.find('*') != -1:
                             PrintErrorMsg(ERROR_PREDICATE_EXPRESSION_CHECK_COMPARISON_NULL_TYPE, 'Predicate Expression: %s' % Exp, FileTable, Str[2])
                         continue
-                    
+
                     if PredVarStr in FuncReturnTypeDict:
                         continue
-                
+
                 Type = GetVarInfo(PredVarList, FuncRecord, FullFileName, IsFuncCall, None, StarList)
                 if SearchInCache:
                     FuncReturnTypeDict[PredVarStr] = Type
                 if Type == None:
                     continue
+                Type = GetTypeFromArray(Type, PredVarStr)
                 if Type.find('*') != -1:
                     PrintErrorMsg(ERROR_PREDICATE_EXPRESSION_CHECK_COMPARISON_NULL_TYPE, 'Predicate Expression: %s' % Exp, FileTable, Str[2])
 
 def CheckNonBooleanValueComparison(FullFileName):
     ErrorMsgList = []
-    
+
     FileID = GetTableID(FullFileName, ErrorMsgList)
     if FileID < 0:
         return ErrorMsgList
-    
+
     # cache the found function return type to accelerate later checking in this file.
     FuncReturnTypeDict = {}
-    
+
     Db = GetDB()
     FileTable = 'Identifier' + str(FileID)
     SqlStatement = """ select Value, StartLine, ID
@@ -1956,7 +1982,7 @@ def CheckNonBooleanValueComparison(FullFileName):
     PSL = []
     for Result in ResultSet:
         PSL.append([Result[0], Result[1], Result[2]])
-    
+
     SqlStatement = """ select BodyStartLine, EndLine, Header, Modifier, ID
                        from Function
                        where BelongsToFile = %d
@@ -1965,13 +1991,13 @@ def CheckNonBooleanValueComparison(FullFileName):
     FL = []
     for Result in ResultSet:
         FL.append([Result[0], Result[1], Result[2], Result[3], Result[4]])
-    
+
     p = GetFuncDeclPattern()
     for Str in PSL:
         FuncRecord = GetFuncContainsPE(Str[1], FL)
         if FuncRecord == None:
             continue
-        
+
         for Exp in GetPredicateListFromPredicateExpStr(Str[0]):
 #            if p.match(Exp):
 #                continue
@@ -1986,9 +2012,9 @@ def CheckNonBooleanValueComparison(FullFileName):
                     PredVarStr = PredVarStr[0:PredVarStr.find('(')]
                     SearchInCache = True
                     # Only direct function call using IsFuncCall branch. Multi-level ref. function call is considered a variable.
-                    if TmpStr.startswith(PredVarStr):    
+                    if TmpStr.startswith(PredVarStr):
                         IsFuncCall = True
-                    
+
                 if PredVarStr.strip() in IgnoredKeywordList:
                     continue
                 StarList = []
@@ -1996,17 +2022,17 @@ def CheckNonBooleanValueComparison(FullFileName):
                 # No variable found, maybe value first? like (0 == VarName)
                 if len(PredVarList) == 0:
                     continue
-                   
+
                 if SearchInCache:
                     Type = FuncReturnTypeDict.get(PredVarStr)
                     if Type != None:
                         if Type.find('BOOLEAN') == -1:
                             PrintErrorMsg(ERROR_PREDICATE_EXPRESSION_CHECK_NO_BOOLEAN_OPERATOR, 'Predicate Expression: %s' % Exp, FileTable, Str[2])
                         continue
-                    
+
                     if PredVarStr in FuncReturnTypeDict:
                         continue
-                    
+
                 Type = GetVarInfo(PredVarList, FuncRecord, FullFileName, IsFuncCall, 'BOOLEAN', StarList)
                 if SearchInCache:
                     FuncReturnTypeDict[PredVarStr] = Type
@@ -2014,18 +2040,18 @@ def CheckNonBooleanValueComparison(FullFileName):
                     continue
                 if Type.find('BOOLEAN') == -1:
                     PrintErrorMsg(ERROR_PREDICATE_EXPRESSION_CHECK_NO_BOOLEAN_OPERATOR, 'Predicate Expression: %s' % Exp, FileTable, Str[2])
-            
+
 
 def CheckBooleanValueComparison(FullFileName):
     ErrorMsgList = []
-    
+
     FileID = GetTableID(FullFileName, ErrorMsgList)
     if FileID < 0:
         return ErrorMsgList
-    
+
     # cache the found function return type to accelerate later checking in this file.
     FuncReturnTypeDict = {}
-    
+
     Db = GetDB()
     FileTable = 'Identifier' + str(FileID)
     SqlStatement = """ select Value, StartLine, ID
@@ -2038,7 +2064,7 @@ def CheckBooleanValueComparison(FullFileName):
     PSL = []
     for Result in ResultSet:
         PSL.append([Result[0], Result[1], Result[2]])
-    
+
     SqlStatement = """ select BodyStartLine, EndLine, Header, Modifier, ID
                        from Function
                        where BelongsToFile = %d
@@ -2047,13 +2073,13 @@ def CheckBooleanValueComparison(FullFileName):
     FL = []
     for Result in ResultSet:
         FL.append([Result[0], Result[1], Result[2], Result[3], Result[4]])
-    
+
     p = GetFuncDeclPattern()
     for Str in PSL:
         FuncRecord = GetFuncContainsPE(Str[1], FL)
         if FuncRecord == None:
             continue
-        
+
         for Exp in GetPredicateListFromPredicateExpStr(Str[0]):
             PredInfo = SplitPredicateStr(Exp)
             if PredInfo[1] in ('==', '!=') and PredInfo[0][1] in ('TRUE', 'FALSE'):
@@ -2066,9 +2092,9 @@ def CheckBooleanValueComparison(FullFileName):
                     PredVarStr = PredVarStr[0:PredVarStr.find('(')]
                     SearchInCache = True
                     # Only direct function call using IsFuncCall branch. Multi-level ref. function call is considered a variable.
-                    if TmpStr.startswith(PredVarStr):    
+                    if TmpStr.startswith(PredVarStr):
                         IsFuncCall = True
-                    
+
                 if PredVarStr.strip() in IgnoredKeywordList:
                     continue
                 StarList = []
@@ -2076,17 +2102,17 @@ def CheckBooleanValueComparison(FullFileName):
                 # No variable found, maybe value first? like (0 == VarName)
                 if len(PredVarList) == 0:
                     continue
-          
+
                 if SearchInCache:
                     Type = FuncReturnTypeDict.get(PredVarStr)
                     if Type != None:
                         if Type.find('BOOLEAN') != -1:
                             PrintErrorMsg(ERROR_PREDICATE_EXPRESSION_CHECK_BOOLEAN_VALUE, 'Predicate Expression: %s' % Exp, FileTable, Str[2])
                         continue
-                    
+
                     if PredVarStr in FuncReturnTypeDict:
                         continue
-                
+
                 Type = GetVarInfo(PredVarList, FuncRecord, FullFileName, IsFuncCall, 'BOOLEAN', StarList)
                 if SearchInCache:
                     FuncReturnTypeDict[PredVarStr] = Type
@@ -2094,15 +2120,15 @@ def CheckBooleanValueComparison(FullFileName):
                     continue
                 if Type.find('BOOLEAN') != -1:
                     PrintErrorMsg(ERROR_PREDICATE_EXPRESSION_CHECK_BOOLEAN_VALUE, 'Predicate Expression: %s' % Exp, FileTable, Str[2])
-                
+
 
 def CheckHeaderFileData(FullFileName):
     ErrorMsgList = []
-    
+
     FileID = GetTableID(FullFileName, ErrorMsgList)
     if FileID < 0:
         return ErrorMsgList
-    
+
     Db = GetDB()
     FileTable = 'Identifier' + str(FileID)
     SqlStatement = """ select ID, Modifier
@@ -2113,7 +2139,7 @@ def CheckHeaderFileData(FullFileName):
     for Result in ResultSet:
         if not Result[1].startswith('extern'):
             PrintErrorMsg(ERROR_INCLUDE_FILE_CHECK_DATA, 'Variable definition appears in header file', FileTable, Result[0])
-        
+
     SqlStatement = """ select ID
                        from Function
                        where BelongsToFile = %d
@@ -2126,11 +2152,11 @@ def CheckHeaderFileData(FullFileName):
 
 def CheckHeaderFileIfndef(FullFileName):
     ErrorMsgList = []
-    
+
     FileID = GetTableID(FullFileName, ErrorMsgList)
     if FileID < 0:
         return ErrorMsgList
-    
+
     Db = GetDB()
     FileTable = 'Identifier' + str(FileID)
     SqlStatement = """ select Value, StartLine
@@ -2151,7 +2177,7 @@ def CheckHeaderFileIfndef(FullFileName):
             if not Result[0].startswith('/*') and not Result[0].startswith('//'):
                 PrintErrorMsg(ERROR_INCLUDE_FILE_CHECK_IFNDEF_STATEMENT_2, '', 'File', FileID)
         break
-    
+
     SqlStatement = """ select Value
                        from %s
                        where StartLine > (select max(EndLine) from %s where Model = %d)
@@ -2164,11 +2190,11 @@ def CheckHeaderFileIfndef(FullFileName):
 
 def CheckDoxygenCommand(FullFileName):
     ErrorMsgList = []
-    
+
     FileID = GetTableID(FullFileName, ErrorMsgList)
     if FileID < 0:
         return ErrorMsgList
-    
+
     Db = GetDB()
     FileTable = 'Identifier' + str(FileID)
     SqlStatement = """ select Value, ID
@@ -2198,17 +2224,17 @@ def CheckDoxygenCommand(FullFileName):
                     RealCmd = Part[1:Index]
                     if RealCmd not in DoxygenCommandList:
                         PrintErrorMsg(ERROR_DOXYGEN_CHECK_COMMAND, 'Unknown doxygen command %s' % Part, FileTable, Result[1])
-        
-    
+
+
 def CheckDoxygenTripleForwardSlash(FullFileName):
     ErrorMsgList = []
-    
+
     FileID = GetTableID(FullFileName, ErrorMsgList)
     if FileID < 0:
         return ErrorMsgList
-    
+
     Db = GetDB()
-    
+
     SqlStatement = """ select ID, BodyStartLine, BodyStartColumn, EndLine, EndColumn
                        from Function
                        where BelongsToFile = %d
@@ -2216,17 +2242,17 @@ def CheckDoxygenTripleForwardSlash(FullFileName):
     ResultSet = Db.TblFile.Exec(SqlStatement)
     if len(ResultSet) == 0:
         return
-    
-    FuncDefSet = []    
+
+    FuncDefSet = []
     for Result in ResultSet:
         FuncDefSet.append(Result)
-    
-    
+
+
     FileTable = 'Identifier' + str(FileID)
     SqlStatement = """ select Value, ID, StartLine, StartColumn, EndLine, EndColumn
                        from %s
-                       where Model = %d 
-                       
+                       where Model = %d
+
                    """ % (FileTable, DataClass.MODEL_IDENTIFIER_COMMENT)
     ResultSet = Db.TblFile.Exec(SqlStatement)
     CommentSet = []
@@ -2235,8 +2261,8 @@ def CheckDoxygenTripleForwardSlash(FullFileName):
             CommentSet.append(Result)
     except:
         print 'Unrecognized chars in comment of file %s', FullFileName
-    
-    
+
+
     for Result in CommentSet:
         CommentStr = Result[0]
         StartLine = Result[2]
@@ -2245,7 +2271,7 @@ def CheckDoxygenTripleForwardSlash(FullFileName):
         EndColumn = Result[5]
         if not CommentStr.startswith('///<'):
             continue
-        
+
         Found = False
         for FuncDef in FuncDefSet:
             if StartLine == FuncDef[1] and StartColumn > FuncDef[2] and EndLine == FuncDef[3] and EndColumn < FuncDef[4]:
@@ -2266,11 +2292,11 @@ def CheckDoxygenTripleForwardSlash(FullFileName):
 
 def CheckFileHeaderDoxygenComments(FullFileName):
     ErrorMsgList = []
-    
+
     FileID = GetTableID(FullFileName, ErrorMsgList)
     if FileID < 0:
         return ErrorMsgList
-    
+
     Db = GetDB()
     FileTable = 'Identifier' + str(FileID)
     SqlStatement = """ select Value, ID
@@ -2281,7 +2307,7 @@ def CheckFileHeaderDoxygenComments(FullFileName):
     if len(ResultSet) == 0:
         PrintErrorMsg(ERROR_HEADER_CHECK_FILE, 'No Comment appear at the very beginning of file.', 'File', FileID)
         return ErrorMsgList
-    
+
     for Result in ResultSet:
         CommentStr = Result[0]
         if not CommentStr.startswith('/** @file'):
@@ -2293,18 +2319,18 @@ def CheckFileHeaderDoxygenComments(FullFileName):
 
 def CheckFuncHeaderDoxygenComments(FullFileName):
     ErrorMsgList = []
-    
+
     FileID = GetTableID(FullFileName, ErrorMsgList)
     if FileID < 0:
         return ErrorMsgList
-    
+
     Db = GetDB()
     FileTable = 'Identifier' + str(FileID)
     SqlStatement = """ select Value, StartLine, EndLine, ID
                        from %s
                        where Model = %d
                    """ % (FileTable, DataClass.MODEL_IDENTIFIER_COMMENT)
-    
+
     ResultSet = Db.TblFile.Exec(SqlStatement)
     CommentSet = []
     try:
@@ -2312,7 +2338,7 @@ def CheckFuncHeaderDoxygenComments(FullFileName):
             CommentSet.append(Result)
     except:
         print 'Unrecognized chars in comment of file %s', FullFileName
-    
+
     # Func Decl check
     SqlStatement = """ select Modifier, Name, StartLine, ID, Value
                        from %s
@@ -2329,13 +2355,13 @@ def CheckFuncHeaderDoxygenComments(FullFileName):
                 continue
             ErrorMsgList.append('Line %d :Function %s has NO comment immediately preceding it.' % (Result[2], Result[1]))
             PrintErrorMsg(ERROR_HEADER_CHECK_FUNCTION, 'Function [%s] has NO comment immediately preceding it.' % (FuncName), FileTable, Result[3])
-    
+
     # Func Def check
     SqlStatement = """ select Value, StartLine, EndLine, ID
                        from %s
                        where Model = %d
                    """ % (FileTable, DataClass.MODEL_IDENTIFIER_FUNCTION_HEADER)
-    
+
     ResultSet = Db.TblFile.Exec(SqlStatement)
     CommentSet = []
     try:
@@ -2343,7 +2369,7 @@ def CheckFuncHeaderDoxygenComments(FullFileName):
             CommentSet.append(Result)
     except:
         print 'Unrecognized chars in comment of file %s', FullFileName
-    
+
     SqlStatement = """ select Modifier, Header, StartLine, ID, Name
                        from Function
                        where BelongsToFile = %d
@@ -2376,9 +2402,9 @@ def GetDoxygenStrFromComment(Str):
         while i < len(ParamTagList):
             DoxygenStrList.append('@param' + ParamTagList[i])
             i += 1
-    
+
     Str = ParamTagList[0]
-            
+
     RetvalTagList = ParamTagList[-1].split('@retval')
     if len(RetvalTagList) > 1:
         if len(ParamTagList) > 1:
@@ -2387,7 +2413,7 @@ def GetDoxygenStrFromComment(Str):
         while i < len(RetvalTagList):
             DoxygenStrList.append('@retval' + RetvalTagList[i])
             i += 1
-    
+
     ReturnTagList = RetvalTagList[-1].split('@return')
     if len(ReturnTagList) > 1:
         if len(RetvalTagList) > 1:
@@ -2398,12 +2424,12 @@ def GetDoxygenStrFromComment(Str):
         while i < len(ReturnTagList):
             DoxygenStrList.append('@return' + ReturnTagList[i])
             i += 1
-    
+
     if len(DoxygenStrList) > 0:
         DoxygenStrList[-1] = DoxygenStrList[-1].rstrip('--*/')
-    
+
     return DoxygenStrList
-    
+
 def CheckGeneralDoxygenCommentLayout(Str, StartLine, ErrorMsgList, CommentId = -1, TableName = ''):
     #/** --*/ @retval after @param
     if not Str.startswith('/**'):
@@ -2417,10 +2443,10 @@ def CheckGeneralDoxygenCommentLayout(Str, StartLine, ErrorMsgList, CommentId = -
     if (FirstRetvalIndex > 0) and (LastParamIndex > 0) and (FirstRetvalIndex < LastParamIndex):
         ErrorMsgList.append('Line %d : @retval appear before @param ' % StartLine)
         PrintErrorMsg(ERROR_DOXYGEN_CHECK_FUNCTION_HEADER, 'in Comment, @retval appear before @param  ', TableName, CommentId)
-    
+
 def CheckFunctionHeaderConsistentWithDoxygenComment(FuncModifier, FuncHeader, FuncStartLine, CommentStr, CommentStartLine, ErrorMsgList, CommentId = -1, TableName = ''):
-    
-    ParamList = GetParamList(FuncHeader) 
+
+    ParamList = GetParamList(FuncHeader)
     CheckGeneralDoxygenCommentLayout(CommentStr, CommentStartLine, ErrorMsgList, CommentId, TableName)
     DescriptionStr = CommentStr
     DoxygenStrList = GetDoxygenStrFromComment(DescriptionStr)
@@ -2456,32 +2482,32 @@ def CheckFunctionHeaderConsistentWithDoxygenComment(FuncModifier, FuncHeader, Fu
                     if Part.strip() == 'IN':
                         InOutStr += 'in'
                     if Part.strip() == 'OUT':
-                        if InOutStr != '':    
+                        if InOutStr != '':
                             InOutStr += ', out'
                         else:
                             InOutStr = 'out'
-                
+
                 if InOutStr != '':
                     if Tag.find('['+InOutStr+']') == -1:
-                        ErrorMsgList.append('Line %d : in Comment, \"%s\" does NOT have %s ' % (CommentStartLine, (TagPartList[0] + ' ' +TagPartList[1]).replace('\n', '').replace('\r', ''), '['+InOutStr+']'))    
+                        ErrorMsgList.append('Line %d : in Comment, \"%s\" does NOT have %s ' % (CommentStartLine, (TagPartList[0] + ' ' +TagPartList[1]).replace('\n', '').replace('\r', ''), '['+InOutStr+']'))
                         PrintErrorMsg(ERROR_DOXYGEN_CHECK_FUNCTION_HEADER, 'in Comment, \"%s\" does NOT have %s ' % ((TagPartList[0] + ' ' +TagPartList[1]).replace('\n', '').replace('\r', ''), '['+InOutStr+']'), TableName, CommentId)
             if Tag.find(ParamName) == -1 and ParamName != 'VOID' and ParamName != 'void':
-                ErrorMsgList.append('Line %d : in Comment, \"%s\" does NOT consistent with parameter name %s ' % (CommentStartLine, (TagPartList[0] + ' ' +TagPartList[1]).replace('\n', '').replace('\r', ''), ParamName))    
+                ErrorMsgList.append('Line %d : in Comment, \"%s\" does NOT consistent with parameter name %s ' % (CommentStartLine, (TagPartList[0] + ' ' +TagPartList[1]).replace('\n', '').replace('\r', ''), ParamName))
                 PrintErrorMsg(ERROR_DOXYGEN_CHECK_FUNCTION_HEADER, 'in Comment, \"%s\" does NOT consistent with parameter name %s ' % ((TagPartList[0] + ' ' +TagPartList[1]).replace('\n', '').replace('\r', ''), ParamName), TableName, CommentId)
             Index += 1
-        
+
         if Index < ParamNumber:
             ErrorMsgList.append('Line %d : Number of doxygen tags in comment less than number of function parameters' % CommentStartLine)
             PrintErrorMsg(ERROR_DOXYGEN_CHECK_FUNCTION_HEADER, 'Number of doxygen tags in comment less than number of function parameters ', TableName, CommentId)
         # VOID return type, NOT VOID*. VOID* should be matched with a doxygen tag.
         if (FuncModifier.find('VOID') != -1 or FuncModifier.find('void') != -1) and FuncModifier.find('*') == -1:
-            
+
             # assume we allow a return description tag for void func. return. that's why 'DoxygenTagNumber - 1' is used instead of 'DoxygenTagNumber'
             if Index < DoxygenTagNumber - 1 or (Index < DoxygenTagNumber and DoxygenStrList[Index].startswith('@retval')):
                 ErrorMsgList.append('Line %d : VOID return type need NO doxygen tags in comment' % CommentStartLine)
                 PrintErrorMsg(ERROR_DOXYGEN_CHECK_FUNCTION_HEADER, 'VOID return type need no doxygen tags in comment ', TableName, CommentId)
         else:
-            if Index < DoxygenTagNumber and not DoxygenStrList[Index].startswith('@retval') and not DoxygenStrList[Index].startswith('@return'): 
+            if Index < DoxygenTagNumber and not DoxygenStrList[Index].startswith('@retval') and not DoxygenStrList[Index].startswith('@return'):
                 ErrorMsgList.append('Line %d : Number of @param doxygen tags in comment does NOT match number of function parameters' % CommentStartLine)
                 PrintErrorMsg(ERROR_DOXYGEN_CHECK_FUNCTION_HEADER, 'Number of @param doxygen tags in comment does NOT match number of function parameters ', TableName, CommentId)
     else:
@@ -2496,7 +2522,7 @@ if __name__ == '__main__':
 
 #    EdkLogger.Initialize()
 #    EdkLogger.SetLevel(EdkLogger.QUIET)
-#    CollectSourceCodeDataIntoDB(sys.argv[1])       
+#    CollectSourceCodeDataIntoDB(sys.argv[1])
     MsgList = CheckFuncHeaderDoxygenComments('C:\\Combo\\R9\\LakeportX64Dev\\FlashDevicePkg\\Library\\SpiFlashChipM25P64\\SpiFlashChipM25P64.c')
     for Msg in MsgList:
         print Msg

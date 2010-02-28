@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2004 - 2008, Intel Corporation                                                         
+Copyright (c) 2004 - 2010, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -27,6 +27,7 @@ Abstract:
 #include <Common/UefiBaseTypes.h>
 #include <Common/PiFirmwareFile.h>
 #include <Protocol/GuidedSectionExtraction.h>
+#include <IndustryStandard/PeImage.h>
 
 #include "CommonLib.h"
 #include "Compress.h"
@@ -79,6 +80,11 @@ STATIC CHAR8      *mCompressionTypeName[]    = { "PI_NONE", "PI_STD" };
 
 #define EFI_GUIDED_SECTION_NONE 0x80
 STATIC CHAR8      *mGUIDedSectionAttribue[]  = { "NONE", "PROCESSING_REQUIRED", "AUTH_STATUS_VALID"};
+
+STATIC CHAR8 *mAlignName[] = {
+  "1", "2", "4", "8", "16", "32", "64", "128", "256", "512",
+  "1K", "2K", "4K", "8K", "16K", "32K", "64K"
+};
 
 //
 // Crc32 GUID section related definitions.
@@ -144,7 +150,7 @@ Returns:
   //
   // Copyright declaration
   // 
-  fprintf (stdout, "Copyright (c) 2007, Intel Corporation. All rights reserved.\n\n");
+  fprintf (stdout, "Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.\n\n");
 
   //
   // Details Option
@@ -180,6 +186,10 @@ Returns:
   fprintf (stdout, "  -j Number, --buildnumber Number\n\
                         Number is an integer value between 0000 and 9999\n\
                         used in Ver section.\n");
+  fprintf (stdout, "  --sectionalign SectionAlign\n\
+                        SectionAlign points to section alignment, which support\n\
+                        the alignment scope 1~64K. It is specified in same\n\
+                        order that the section file is input.\n");
   fprintf (stdout, "  -v, --verbose         Turn on verbose output with informational messages.\n");
   fprintf (stdout, "  -q, --quiet           Disable all messages except key message and fatal error\n");
   fprintf (stdout, "  -d, --debug level     Enable debug messages, at input debug level.\n");
@@ -329,9 +339,50 @@ Done:
   return Status;
 }
 
+STATIC
+EFI_STATUS
+StringtoAlignment (
+  IN  CHAR8  *AlignBuffer,
+  OUT UINT32 *AlignNumber
+  )
+/*++
+
+Routine Description:
+
+  Converts Align String to align value (1~64K). 
+
+Arguments:
+
+  AlignBuffer    - Pointer to Align string.
+  AlignNumber    - Pointer to Align value.
+
+Returns:
+
+  EFI_SUCCESS             Successfully convert align string to align value.
+  EFI_INVALID_PARAMETER   Align string is invalid or align value is not in scope.
+
+--*/
+{
+  UINT32 Index = 0;
+  //
+  // Check AlignBuffer
+  //
+  if (AlignBuffer == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  for (Index = 0; Index < sizeof (mAlignName) / sizeof (CHAR8 *); Index ++) {
+    if (stricmp (AlignBuffer, mAlignName [Index]) == 0) {
+      *AlignNumber = 1 << Index;
+      return EFI_SUCCESS;
+    }
+  }
+  return EFI_INVALID_PARAMETER;
+}
+
 EFI_STATUS
 GetSectionContents (
   CHAR8   **InputFileName,
+  UINT32  *InputFileAlign,
   UINT32  InputFileNum,
   UINT8   *FileBuffer,
   UINT32  *BufferLength
@@ -346,7 +397,9 @@ Routine Description:
 Arguments:
                
   InputFileName  - Name of the input file.
-                
+
+  InputFileAlign - Alignment required by the input file data.
+
   InputFileNum   - Number of input files. Should be at least 1.
 
   FileBuffer     - Output buffer to contain data
@@ -362,10 +415,17 @@ Returns:
   EFI_BUFFER_TOO_SMALL FileBuffer is not enough to contain all file data.
 --*/
 {
-  UINT32   Size;
-  UINT32   FileSize;
-  UINT32   Index;
-  FILE    *InFile;
+  UINT32                     Size;
+  UINT32                     Offset;
+  UINT32                     FileSize;
+  UINT32                     Index;
+  FILE                       *InFile;
+  EFI_COMMON_SECTION_HEADER  *SectHeader;
+  EFI_COMMON_SECTION_HEADER  TempSectHeader;
+  EFI_TE_IMAGE_HEADER        TeHeader;
+  UINT32                     TeOffset;
+  EFI_GUID_DEFINED_SECTION   GuidSectHeader;
+  UINT32                     HeaderSize;
 
   if (InputFileNum < 1) {
     Error (NULL, 0, 2000, "Invalid paramter", "must specify at least one input file");
@@ -377,7 +437,9 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  Size = 0;
+  Size          = 0;
+  Offset        = 0;
+  TeOffset      = 0;
   //
   // Go through our array of file names and copy their contents
   // to the output buffer.
@@ -407,10 +469,65 @@ Returns:
     fseek (InFile, 0, SEEK_SET);
     DebugMsg (NULL, 0, 9, "Input files", "the input file name is %s and the size is %u bytes", InputFileName[Index], (unsigned) FileSize); 
     //
+    // Adjust section buffer when section alignment is required.
+    //
+    if (InputFileAlign != NULL) {
+      //
+      // Check this section is Te/Pe section, and Calculate the numbers of Te/Pe section.
+      //
+      TeOffset = 0;
+      HeaderSize = sizeof (EFI_COMMON_SECTION_HEADER);
+      fread (&TempSectHeader, 1, sizeof (TempSectHeader), InFile);
+      if (TempSectHeader.Type == EFI_SECTION_TE) {
+        fread (&TeHeader, 1, sizeof (TeHeader), InFile);
+        if (TeHeader.Signature == EFI_TE_IMAGE_HEADER_SIGNATURE) {
+          TeOffset = TeHeader.StrippedSize - sizeof (TeHeader);
+        }
+      } else if (TempSectHeader.Type == EFI_SECTION_GUID_DEFINED) {
+        fseek (InFile, 0, SEEK_SET);
+        fread (&GuidSectHeader, 1, sizeof (GuidSectHeader), InFile);
+        if ((GuidSectHeader.Attributes & EFI_GUIDED_SECTION_PROCESSING_REQUIRED) == 0) {
+          HeaderSize = GuidSectHeader.DataOffset;
+        }
+      } 
+
+      fseek (InFile, 0, SEEK_SET);
+
+      //
+      // Revert TeOffset to the converse value relative to Alignment
+      // This is to assure the original PeImage Header at Alignment.
+      //
+      if (TeOffset != 0) {
+        TeOffset = InputFileAlign [Index] - (TeOffset % InputFileAlign [Index]);
+        TeOffset = TeOffset % InputFileAlign [Index];
+      }
+
+      //
+      // make sure section data meet its alignment requirement by adding one raw pad section.
+      //
+      if ((InputFileAlign [Index] != 0) && (((Size + HeaderSize + TeOffset) % InputFileAlign [Index]) != 0)) {
+        Offset = (Size + sizeof (EFI_COMMON_SECTION_HEADER) + HeaderSize + TeOffset + InputFileAlign [Index] - 1) & ~(InputFileAlign [Index] - 1);
+        Offset = Offset - Size - HeaderSize - TeOffset;
+         
+        if (FileBuffer != NULL && ((Size + Offset) < *BufferLength)) {
+          memset (FileBuffer + Size, 0, Offset);
+          SectHeader          = (EFI_COMMON_SECTION_HEADER *) (FileBuffer + Size);
+          SectHeader->Type    = EFI_SECTION_RAW;
+          SectHeader->Size[0] = (UINT8) (Offset & 0xff);
+          SectHeader->Size[1] = (UINT8) ((Offset & 0xff00) >> 8);
+          SectHeader->Size[2] = (UINT8) ((Offset & 0xff0000) >> 16);
+        }
+        DebugMsg (NULL, 0, 9, "Pad raw section for section data alignment", "Pad Raw section size is %u", (unsigned) Offset);
+
+        Size = Size + Offset;
+      }
+    }
+
+    //
     // Now read the contents of the file into the buffer
     // Buffer must be enough to contain the file content.
     //
-    if (FileSize > 0 && FileBuffer != NULL && (Size + FileSize) <= *BufferLength) {
+    if ((FileSize > 0) && (FileBuffer != NULL) && ((Size + FileSize) <= *BufferLength)) {
       if (fread (FileBuffer + Size, (size_t) FileSize, 1, InFile) != 1) {
         Error (NULL, 0, 0004, "Error reading file", InputFileName[Index]);
         fclose (InFile);
@@ -437,6 +554,7 @@ Returns:
 EFI_STATUS
 GenSectionCompressionSection (
   CHAR8   **InputFileName,
+  UINT32  *InputFileAlign,
   UINT32  InputFileNum,
   UINT8   SectCompSubType,
   UINT8   **OutFileBuffer
@@ -453,7 +571,9 @@ Routine Description:
 Arguments:
                
   InputFileName  - Name of the input file.
-                
+
+  InputFileAlign - Alignment required by the input file data.
+
   InputFileNum   - Number of input files. Should be at least 1.
 
   SectCompSubType - Specify the compression algorithm requested. 
@@ -487,6 +607,7 @@ Returns:
   //
   Status = GetSectionContents (
             InputFileName,
+            InputFileAlign,
             InputFileNum,
             FileBuffer,
             &InputLength
@@ -503,6 +624,7 @@ Returns:
     //
     Status = GetSectionContents (
               InputFileName,
+              InputFileAlign,
               InputFileNum,
               FileBuffer,
               &InputLength
@@ -524,6 +646,16 @@ Returns:
   switch (SectCompSubType) {
   case EFI_NOT_COMPRESSED:
     CompressedLength = InputLength;
+    //
+    // Copy file buffer to the none compressed data.
+    //
+    OutputBuffer = malloc (CompressedLength + sizeof (EFI_COMPRESSION_SECTION));
+    if (OutputBuffer == NULL) {
+      free (FileBuffer);
+      return EFI_OUT_OF_RESOURCES;
+    }
+    memcpy (OutputBuffer + sizeof (EFI_COMPRESSION_SECTION), FileBuffer, CompressedLength);
+    FileBuffer = OutputBuffer;
     break;
 
   case EFI_STANDARD_COMPRESSION:
@@ -599,6 +731,7 @@ Returns:
 EFI_STATUS
 GenSectionGuidDefinedSection (
   CHAR8    **InputFileName,
+  UINT32   *InputFileAlign,
   UINT32   InputFileNum,
   EFI_GUID *VendorGuid,
   UINT16   DataAttribute,
@@ -618,6 +751,8 @@ Arguments:
                
   InputFileName - Name of the input file.
                 
+  InputFileAlign - Alignment required by the input file data.
+
   InputFileNum  - Number of input files. Should be at least 1.
 
   VendorGuid    - Specify vendor guid value.
@@ -662,6 +797,7 @@ Returns:
   //
   Status = GetSectionContents (
             InputFileName,
+            InputFileAlign,
             InputFileNum,
             FileBuffer,
             &InputLength
@@ -678,6 +814,7 @@ Returns:
     //
     Status = GetSectionContents (
               InputFileName,
+              InputFileAlign,
               InputFileNum,
               FileBuffer + Offset,
               &InputLength
@@ -797,7 +934,11 @@ Returns:
   UINT8                     *OutFileBuffer;
   EFI_STATUS                Status;
   UINT64                    LogLevel;
-  
+  UINT32                    *InputFileAlign;
+  UINT32                    InputFileAlignNum;
+
+  InputFileAlign        = NULL;
+  InputFileAlignNum     = 0;
   InputFileName         = NULL;
   OutputFileName        = NULL;
   SectionName           = NULL;
@@ -809,7 +950,7 @@ Returns:
   InputFileNum          = 0;
   SectType              = EFI_SECTION_ALL;
   SectCompSubType       = 0;
-  SectGuidAttribute     = 0;
+  SectGuidAttribute     = EFI_GUIDED_SECTION_NONE;
   OutFileBuffer         = NULL;
   InputLength           = 0;
   Status                = STATUS_SUCCESS;
@@ -984,6 +1125,41 @@ Returns:
     }
 
     //
+    // Section File alignment requirement
+    //
+    if (stricmp (argv[0], "--sectionalign") == 0) {
+      if (InputFileAlignNum == 0) {
+        InputFileAlign = (UINT32 *) malloc (MAXIMUM_INPUT_FILE_NUM * sizeof (UINT32));
+        if (InputFileAlign == NULL) {
+          Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
+          return 1;
+        }
+        memset (InputFileAlign, 1, MAXIMUM_INPUT_FILE_NUM * sizeof (UINT32));
+      } else if (InputFileAlignNum % MAXIMUM_INPUT_FILE_NUM == 0) {
+        InputFileAlign = (UINT32 *) realloc (
+          InputFileAlign,
+          (InputFileNum + MAXIMUM_INPUT_FILE_NUM) * sizeof (UINT32)
+          );
+
+        if (InputFileAlign == NULL) {
+          Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
+          return 1;
+        }
+        memset (&(InputFileAlign[InputFileNum]), 1, (MAXIMUM_INPUT_FILE_NUM * sizeof (UINT32)));
+      }
+      
+      Status = StringtoAlignment (argv[1], &(InputFileAlign[InputFileAlignNum]));
+      if (EFI_ERROR (Status)) {
+        Error (NULL, 0, 1003, "Invalid option value", "%s = %s", argv[0], argv[1]);
+        goto Finish;
+      }
+      argc -= 2;
+      argv += 2;
+      InputFileAlignNum ++;
+      continue; 
+    }
+
+    //
     // Get Input file name
     //
     if ((InputFileNum == 0) && (InputFileName == NULL)) {
@@ -992,7 +1168,6 @@ Returns:
         Error (NULL, 0, 4001, "Resource", "memory cannot be allcoated");
         return 1;
       }
-
       memset (InputFileName, 0, (MAXIMUM_INPUT_FILE_NUM * sizeof (CHAR8 *)));
     } else if (InputFileNum % MAXIMUM_INPUT_FILE_NUM == 0) {
       //
@@ -1007,13 +1182,17 @@ Returns:
         Error (NULL, 0, 4001, "Resource", "memory cannot be allcoated");
         return 1;
       }
-
       memset (&(InputFileName[InputFileNum]), 0, (MAXIMUM_INPUT_FILE_NUM * sizeof (CHAR8 *)));
     }
 
     InputFileName[InputFileNum++] = argv[0];
     argc --;
     argv ++;
+  }
+
+  if (InputFileAlignNum > 0 && InputFileAlignNum != InputFileNum) {
+    Error (NULL, 0, 1003, "Invalid option", "section alignment must be set for each section");
+    goto Finish;
   }
 
   VerboseMsg ("%s tool start.", UTILITY_NAME);
@@ -1050,14 +1229,11 @@ Returns:
       memcpy (&VendorGuid, &mEfiCrc32SectionGuid, sizeof (EFI_GUID));
     }
     
-    if (SectGuidAttribute == 0) {
-      SectGuidAttribute = EFI_GUIDED_SECTION_PROCESSING_REQUIRED;
-    }
     if ((SectGuidAttribute & EFI_GUIDED_SECTION_NONE) != 0) {
       //
       // NONE attribute, clear attribute value.
       //
-      SectGuidAttribute = 0;
+      SectGuidAttribute = SectGuidAttribute & ~EFI_GUIDED_SECTION_NONE;
     }
     VerboseMsg ("Vendor Guid is %08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X", 
                 (unsigned) VendorGuid.Data1,
@@ -1161,8 +1337,13 @@ Returns:
   //
   switch (SectType) {
   case EFI_SECTION_COMPRESSION:
+    if (InputFileAlign != NULL) {
+      free (InputFileAlign);
+      InputFileAlign = NULL;
+    }
     Status = GenSectionCompressionSection (
               InputFileName,
+              InputFileAlign,
               InputFileNum,
               SectCompSubType,
               &OutFileBuffer
@@ -1170,8 +1351,17 @@ Returns:
     break;
 
   case EFI_SECTION_GUID_DEFINED:
+    if (InputFileAlign != NULL && (CompareGuid (&VendorGuid, &mEfiCrc32SectionGuid) != 0)) {
+      //
+      // Only process alignment for the default known CRC32 guided section.
+      // For the unknown guided section, the alignment is processed when the dummy all section (EFI_SECTION_ALL) is generated.
+      //
+      free (InputFileAlign);
+      InputFileAlign = NULL;
+    }
     Status = GenSectionGuidDefinedSection (
               InputFileName,
+              InputFileAlign,
               InputFileNum,
               &VendorGuid,
               SectGuidAttribute,
@@ -1232,6 +1422,7 @@ Returns:
     //
     Status = GetSectionContents (
               InputFileName,
+              InputFileAlign,
               InputFileNum,
               OutFileBuffer,
               &InputLength
@@ -1248,6 +1439,7 @@ Returns:
       //
       Status = GetSectionContents (
                 InputFileName,
+                InputFileAlign,
                 InputFileNum,
                 OutFileBuffer,
                 &InputLength
@@ -1294,6 +1486,10 @@ Returns:
 Finish:
   if (InputFileName != NULL) {
     free (InputFileName);
+  }
+
+  if (InputFileAlign != NULL) {
+    free (InputFileAlign);
   }
 
   if (OutFileBuffer != NULL) {

@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2007, Intel Corporation
+#  Copyright (c) 2007 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -175,7 +175,7 @@ def GetConfigureKeyValue(self, Key):
 
 VersionNumber = "0.01"
 __version__ = "%prog Version " + VersionNumber
-__copyright__ = "Copyright (c) 2007, Intel Corporation  All rights reserved."
+__copyright__ = "Copyright (c) 2007 - 2010, Intel Corporation  All rights reserved."
 __usage__ = "%prog [options] {args} \
 \nArgs:                                                  \
 \n Clean  clean the all default configuration of target.txt. \

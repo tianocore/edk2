@@ -2,7 +2,7 @@
   
   Vfr common library functions.
 
-Copyright (c) 2004 - 2009, Intel Corporation                                                         
+Copyright (c) 2004 - 2010, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -36,8 +36,8 @@ extern BOOLEAN  VfrCompatibleMode;
 
 class CVfrBinaryOutput {
 public:
-  virtual VOID WriteLine (IN FILE *, IN UINT32, IN CHAR8 *, IN CHAR8 *, IN UINT32);
-  virtual VOID WriteEnd (IN FILE *, IN UINT32, IN CHAR8 *, IN CHAR8 *, IN UINT32);
+  virtual VOID WriteLine (IN FILE *, IN UINT32, IN CONST CHAR8 *, IN CHAR8 *, IN UINT32);
+  virtual VOID WriteEnd (IN FILE *, IN UINT32, IN CONST CHAR8 *, IN CHAR8 *, IN UINT32);
 };
 
 UINT32
@@ -332,6 +332,7 @@ struct SVfrQuestionNode {
   EFI_QUESTION_ID           mQuestionId;
   UINT32                    mBitMask;
   SVfrQuestionNode          *mNext;
+  EFI_QUESION_TYPE          mQtype;
 
   SVfrQuestionNode (IN CHAR8 *, IN CHAR8 *, IN UINT32 BitMask = 0);
   ~SVfrQuestionNode ();
@@ -358,7 +359,7 @@ public:
   VOID                RegisterOldTimeQuestion (IN CHAR8 *, IN CHAR8 *, IN CHAR8 *, IN OUT EFI_QUESTION_ID &);
   VOID                RegisterNewTimeQuestion (IN CHAR8 *, IN CHAR8 *, IN OUT EFI_QUESTION_ID &);
   EFI_VFR_RETURN_CODE UpdateQuestionId (IN EFI_QUESTION_ID, IN EFI_QUESTION_ID);
-  VOID                GetQuestionId (IN CHAR8 *, IN CHAR8 *, OUT EFI_QUESTION_ID &, OUT UINT32 &);
+  VOID                GetQuestionId (IN CHAR8 *, IN CHAR8 *, OUT EFI_QUESTION_ID &, OUT UINT32 &, OUT EFI_QUESION_TYPE *QType = NULL);
   EFI_VFR_RETURN_CODE FindQuestion (IN EFI_QUESTION_ID);
   EFI_VFR_RETURN_CODE FindQuestion (IN CHAR8 *);
   VOID                PrintAllQuestion (IN VOID);

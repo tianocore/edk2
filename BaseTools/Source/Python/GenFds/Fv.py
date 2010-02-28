@@ -1,7 +1,7 @@
 ## @file
 # process FV generation
 #
-#  Copyright (c) 2007, Intel Corporation
+#  Copyright (c) 2007 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -63,7 +63,7 @@ class FV (FvClassObject):
     #
     def AddToBuffer (self, Buffer, BaseAddress=None, BlockSize= None, BlockNum=None, ErasePloarity='1', VtfDict=None, MacroDict = {}) :
 
-        if self.UiFvName.upper() + 'fv' in GenFds.ImageBinDict.keys():
+        if BaseAddress == None and self.UiFvName.upper() + 'fv' in GenFds.ImageBinDict.keys():
             return GenFds.ImageBinDict[self.UiFvName.upper() + 'fv']
         
         #
@@ -103,7 +103,7 @@ class FV (FvClassObject):
 
         # Process Modules in FfsList
         for FfsFile in self.FfsList :
-            FileName = FfsFile.GenFfs(MacroDict)
+            FileName = FfsFile.GenFfs(MacroDict, FvParentAddr=BaseAddress)
             FfsFileList.append(FileName)
             self.FvInfFile.writelines("EFI_FILE_NAME = " + \
                                        FileName          + \
@@ -122,12 +122,44 @@ class FV (FvClassObject):
 
         FvInfoFileName = os.path.join(GenFdsGlobalVariable.FfsDir, self.UiFvName + '.inf')
         shutil.copy(GenFdsGlobalVariable.FvAddressFileName, FvInfoFileName)
+        OrigFvInfo = None
+        if os.path.exists (FvInfoFileName):
+            OrigFvInfo = open(FvInfoFileName, 'r').read()
         GenFdsGlobalVariable.GenerateFirmwareVolume(
                                 FvOutputFile,
                                 [self.InfFileName],
                                 AddressFile=FvInfoFileName,
                                 FfsList=FfsFileList
                                 )
+
+        NewFvInfo = None
+        if os.path.exists (FvInfoFileName):
+            NewFvInfo = open(FvInfoFileName, 'r').read()
+        if NewFvInfo != None and NewFvInfo != OrigFvInfo:
+            FvChildAddr = []
+            AddFileObj = open(FvInfoFileName, 'r')
+            AddrStrings = AddFileObj.readlines()
+            AddrKeyFound = False
+            for AddrString in AddrStrings:
+                if AddrKeyFound:
+                    #get base address for the inside FvImage
+                    FvChildAddr.append (AddrString)
+                elif AddrString.find ("[FV_BASE_ADDRESS]") != -1:
+                    AddrKeyFound = True
+            AddFileObj.close()
+
+            if FvChildAddr != []:
+                # Update Ffs again
+                for FfsFile in self.FfsList :
+                    FileName = FfsFile.GenFfs(MacroDict, FvChildAddr, BaseAddress)
+                
+                #Update GenFv again
+                GenFdsGlobalVariable.GenerateFirmwareVolume(
+                                        FvOutputFile,
+                                        [self.InfFileName],
+                                        AddressFile=FvInfoFileName,
+                                        FfsList=FfsFileList
+                                        )
 
         #
         # Write the Fv contents to Buffer
@@ -138,6 +170,21 @@ class FV (FvClassObject):
         GenFdsGlobalVariable.SharpCounter = 0
 
         Buffer.write(FvFileObj.read())
+        FvFileObj.seek(0)
+        # PI FvHeader is 0x48 byte
+        FvHeaderBuffer = FvFileObj.read(0x48)
+        # FV alignment position.
+        FvAlignmentValue = 1 << (ord (FvHeaderBuffer[0x2E]) & 0x1F)
+        # FvAlignmentValue is larger than or equal to 1K
+        if FvAlignmentValue >= 0x400:
+            if FvAlignmentValue >= 0x10000:
+                #The max alignment supported by FFS is 64K.
+                self.FvAlignment = "64K"
+            else:
+                self.FvAlignment = str (FvAlignmentValue / 0x400) + "K"
+        else:
+            # FvAlignmentValue is less than 1K
+            self.FvAlignment = str (FvAlignmentValue)
         FvFileObj.close()
         GenFds.ImageBinDict[self.UiFvName.upper() + 'fv'] = FvOutputFile
         return FvOutputFile
@@ -179,6 +226,10 @@ class FV (FvClassObject):
                                       ' 0x%X' %BlockNum    + \
                                       T_CHAR_LF)
         else:
+            if self.BlockSizeList == []:
+                #set default block size is 1
+                self.FvInfFile.writelines("EFI_BLOCK_SIZE  = 0x1" + T_CHAR_LF)
+            
             for BlockSize in self.BlockSizeList :
                 if BlockSize[0] != None:
                     self.FvInfFile.writelines("EFI_BLOCK_SIZE  = "  + \

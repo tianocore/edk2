@@ -3,7 +3,7 @@
   IFR is primarily consumed by the EFI presentation engine, and produced by EFI
   internal application and drivers as well as all add-in card option-ROM drivers
 
-  Copyright (c) 2006 - 2009, Intel Corporation  All rights reserved.
+  Copyright (c) 2006 - 2010, Intel Corporation  All rights reserved.
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -618,6 +618,7 @@ typedef union {
 #define EFI_IFR_DISABLE_IF_OP          0x1E
 #define EFI_IFR_TO_LOWER_OP            0x20
 #define EFI_IFR_TO_UPPER_OP            0x21
+#define EFI_IFR_MAP_OP                 0x22
 #define EFI_IFR_ORDERED_LIST_OP        0x23
 #define EFI_IFR_VARSTORE_OP            0x24
 #define EFI_IFR_VARSTORE_NAME_VALUE_OP 0x25
@@ -626,6 +627,10 @@ typedef union {
 #define EFI_IFR_VERSION_OP             0x28
 #define EFI_IFR_END_OP                 0x29
 #define EFI_IFR_MATCH_OP               0x2A
+#define EFI_IFR_GET_OP                 0x2B
+#define EFI_IFR_SET_OP                 0x2C
+#define EFI_IFR_READ_OP                0x2D
+#define EFI_IFR_WRITE_OP               0x2E
 #define EFI_IFR_EQUAL_OP               0x2F
 #define EFI_IFR_NOT_EQUAL_OP           0x30
 #define EFI_IFR_GREATER_THAN_OP        0x31
@@ -672,6 +677,7 @@ typedef union {
 #define EFI_IFR_VALUE_OP               0x5A
 #define EFI_IFR_DEFAULT_OP             0x5B
 #define EFI_IFR_DEFAULTSTORE_OP        0x5C
+#define EFI_IFR_FORM_MAP_OP            0x5D
 #define EFI_IFR_CATENATE_OP            0x5E
 #define EFI_IFR_GUID_OP                0x5F
 #define EFI_IFR_SECURITY_OP            0x60
@@ -730,14 +736,14 @@ typedef struct _EFI_IFR_VARSTORE {
 
 typedef struct _EFI_IFR_VARSTORE_EFI {
   EFI_IFR_OP_HEADER        Header;
-  UINT16                   VarStoreId;
+  EFI_VARSTORE_ID          VarStoreId;
   EFI_GUID                 Guid;
   UINT32                   Attributes;
 } EFI_IFR_VARSTORE_EFI;
 
 typedef struct _EFI_IFR_VARSTORE_NAME_VALUE {
   EFI_IFR_OP_HEADER        Header;
-  UINT16                   VarStoreId;
+  EFI_VARSTORE_ID          VarStoreId;
   EFI_GUID                 Guid;
 } EFI_IFR_VARSTORE_NAME_VALUE;
 
@@ -747,7 +753,7 @@ typedef struct _EFI_IFR_FORM_SET {
   EFI_STRING_ID            FormSetTitle;
   EFI_STRING_ID            Help;
   UINT8                    Flags;
-  EFI_GUID                 ClassGuid[1];
+  // EFI_GUID              ClassGuid[];
 } EFI_IFR_FORM_SET;
 
 typedef struct _EFI_IFR_END {
@@ -1009,6 +1015,9 @@ typedef struct _EFI_IFR_ONE_OF_OPTION {
 #define EFI_IFR_TYPE_DATE              0x06
 #define EFI_IFR_TYPE_STRING            0x07
 #define EFI_IFR_TYPE_OTHER             0x08
+#define EFI_IFR_TYPE_UNDEFINED         0x09
+#define EFI_IFR_TYPE_ACTION            0x0A
+#define EFI_IFR_TYPE_BUFFER            0x0B
 
 #define EFI_IFR_OPTION_DEFAULT         0x10
 #define EFI_IFR_OPTION_DEFAULT_MFG     0x20
@@ -1288,6 +1297,100 @@ typedef struct _EFI_IFR_SECURITY {
   EFI_GUID                 Permissions;
 } EFI_IFR_SECURITY;
 
+typedef struct _EFI_IFR_FORM_MAP_METHOD {
+  ///
+  /// The string identifier which provides the human-readable name of 
+  /// the configuration method for this standards map form.
+  ///
+  EFI_STRING_ID            MethodTitle;
+  ///
+  /// Identifier which uniquely specifies the configuration methods 
+  /// associated with this standards map form.
+  ///
+  EFI_GUID                 MethodIdentifier;
+} EFI_IFR_FORM_MAP_METHOD;
+
+typedef struct _EFI_IFR_FORM_MAP {
+  ///
+  /// The sequence that defines the type of opcode as well as the length 
+  /// of the opcode being defined. Header.OpCode = EFI_IFR_FORM_MAP_OP. 
+  ///
+  EFI_IFR_OP_HEADER        Header;
+  ///
+  /// The unique identifier for this particular form.
+  ///
+  EFI_FORM_ID              FormId;
+  ///
+  /// One or more configuration method's name and unique identifier.
+  ///
+  // EFI_IFR_FORM_MAP_METHOD  Methods[];
+} EFI_IFR_FORM_MAP;
+
+typedef struct _EFI_IFR_SET {
+  ///
+  /// The sequence that defines the type of opcode as well as the length 
+  /// of the opcode being defined. Header.OpCode = EFI_IFR_SET_OP. 
+  ///
+  EFI_IFR_OP_HEADER  Header;
+  ///
+  /// Specifies the identifier of a previously declared variable store to 
+  /// use when storing the question's value. 
+  ///
+  EFI_VARSTORE_ID    VarStoreId;
+  union {
+    ///
+    /// A 16-bit Buffer Storage offset.
+    ///
+    EFI_STRING_ID    VarName;
+    ///
+    /// A Name Value or EFI Variable name (VarName).
+    ///
+    UINT16           VarOffset;
+  }                  VarStoreInfo;
+  ///
+  /// Specifies the type used for storage. 
+  ///
+  UINT8              VarStoreType;
+} EFI_IFR_SET;
+
+typedef struct _EFI_IFR_GET {
+  ///
+  /// The sequence that defines the type of opcode as well as the length 
+  /// of the opcode being defined. Header.OpCode = EFI_IFR_GET_OP. 
+  ///
+  EFI_IFR_OP_HEADER  Header;
+  ///
+  /// Specifies the identifier of a previously declared variable store to 
+  /// use when retrieving the value. 
+  ///
+  EFI_VARSTORE_ID    VarStoreId;
+  union {
+    ///
+    /// A 16-bit Buffer Storage offset.
+    ///
+    EFI_STRING_ID    VarName;
+    ///
+    /// A Name Value or EFI Variable name (VarName).
+    ///
+    UINT16           VarOffset;
+  }                  VarStoreInfo;
+  ///
+  /// Specifies the type used for storage. 
+  ///
+  UINT8              VarStoreType;
+} EFI_IFR_GET;
+
+typedef struct _EFI_IFR_READ {
+  EFI_IFR_OP_HEADER       Header;
+} EFI_IFR_READ;
+
+typedef struct _EFI_IFR_WRITE {
+  EFI_IFR_OP_HEADER      Header;
+} EFI_IFR_WRITE;
+
+typedef struct _EFI_IFR_MAP {
+  EFI_IFR_OP_HEADER      Header;
+} EFI_IFR_MAP;
 //
 // Keyboard Package
 //

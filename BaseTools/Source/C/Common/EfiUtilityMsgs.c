@@ -46,18 +46,6 @@ STATIC INT8   mPrintLimitsSet         = 0;
 
 STATIC
 VOID
-PrintMessage (
-  CHAR8   *Type,
-  CHAR8   *FileName,
-  UINT32  LineNumber,
-  UINT32  MessageCode,
-  CHAR8   *Text,
-  CHAR8   *MsgFmt,
-  va_list List
-  );
-
-STATIC
-VOID
 PrintLimitExceeded (
   VOID
   );
@@ -151,12 +139,6 @@ Notes:
   va_start (List, MsgFmt);
   PrintMessage ("ERROR", FileName, LineNumber, MessageCode, Text, MsgFmt, List);
   va_end (List);
-  //
-  // Set status accordingly
-  //
-  if (mStatus < STATUS_ERROR) {
-    mStatus = STATUS_ERROR;
-  }
 }
 
 VOID
@@ -211,12 +193,6 @@ Returns:
   va_start (List, MsgFmt);
   PrintMessage ("ERROR", mSourceFileName, mSourceFileLineNum, MessageCode, Text, MsgFmt, List);
   va_end (List);
-  //
-  // Set status accordingly
-  //
-  if (mStatus < STATUS_ERROR) {
-    mStatus = STATUS_ERROR;
-  }
 }
 
 VOID
@@ -396,7 +372,6 @@ Returns:
   va_end (List);
 }
 
-STATIC
 VOID
 PrintMessage (
   CHAR8   *Type,
@@ -517,6 +492,15 @@ Notes:
         sprintf (Line, "%s", mUtilityName);
       }
     }
+
+    if (strcmp (Type, "ERROR") == 0) {
+      //
+      // Set status accordingly for ERROR information.
+      //
+      if (mStatus < STATUS_ERROR) {
+        mStatus = STATUS_ERROR;
+      }
+    }
   }
 
   //
@@ -545,6 +529,7 @@ Notes:
     vsprintf (Line2, MsgFmt, List);
     fprintf (stdout, "  %s\n", Line2);
   }
+
 }
 
 STATIC

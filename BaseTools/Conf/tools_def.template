@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2006-2009, Intel Corporation
+#  Copyright (c) 2006-2010, Intel Corporation
 #  Portions copyright (c) 2008-2009 Apple Inc. All rights reserved.
 #
 #  All rights reserved. This program and the accompanying materials
@@ -27,6 +27,19 @@ DEFINE VS2005x86_DLL    = C:\Program Files (x86)\Microsoft Visual Studio 8\Commo
 DEFINE VS2005x86_BINX64 = DEF(VS2005x86_BIN)\x86_amd64
 DEFINE VS2005x86_BIN64  = DEF(VS2005x86_BIN)\x86_ia64
 
+DEFINE VS2008_BIN      = C:\Program Files\Microsoft Visual Studio 9.0\Vc\bin
+DEFINE VS2008_DLL      = C:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE
+DEFINE VS2008_BINX64   = DEF(VS2008_BIN)\x86_amd64
+DEFINE VS2008_BIN64    = DEF(VS2008_BIN)\x86_ia64
+
+DEFINE VS2008x86_BIN    = C:\Program Files (x86)\Microsoft Visual Studio 9.0\Vc\bin
+DEFINE VS2008x86_DLL    = C:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\IDE
+DEFINE VS2008x86_BINX64 = DEF(VS2008x86_BIN)\x86_amd64
+DEFINE VS2008x86_BIN64  = DEF(VS2008x86_BIN)\x86_ia64
+
+DEFINE WINSDK_VERSION   = v6.0A
+DEFINE WINSDK_BIN       = c:\Program Files\Microsoft SDKs\Windows\DEF(WINSDK_VERSION)\bin
+DEFINE WINSDKx86_BIN    = c:\Program Files (x86)\Microsoft SDKs\Windows\DEF(WINSDK_VERSION)\bin
 
 # These defines are needed for certain Microsoft Visual Studio tools that
 # are used by other toolchains.  An example is that ICC on Windows normally
@@ -158,6 +171,7 @@ DEFINE ARMGCC_BIN              = /
 # =====================
 #   VS2003                 - win32 - Microsoft Visual Studio .NET 2003, Intel EBC, Intel ASL
 #   VS2005                 - win32 - Microsoft Visual Studio 2005 Team Suite Edition, Intel EBC, Intel ASL (also compatible with VS 2005 Express, Standard, and Pro)
+#   VS2008                 - win32 - Microsoft Visual Studio 2008 Team Suite with Intel ASL
 #   DDK3790                - win32 - Microsoft Windows DDK 3790.1830, Intel EBC, Intel ASL
 #   UNIXGCC                - UNIX GCC, No EBC, Intel ASL
 #   ELFGCC                 - Linux ELF GCC, No EBC, Intel ASL
@@ -166,12 +180,15 @@ DEFINE ARMGCC_BIN              = /
 #   MYTOOLS                - win32 - VS2005 for IA32/X64, WINDDK 3790.1830 for IPF, Intel EBC, Intel ASL
 #   VS2003xASL             - win32 - Microsoft Visual Studio .NET 2003, Intel EBC, Microsoft ASL
 #   VS2005xASL             - win32 - Microsoft Visual Studio 2005 Team Suite Edition, Intel EBC, Microsoft ASL
+#   VS2008xASL             - win32 - Microsoft Visual Studio 2008 Team Suite with Microsoft ASL
 #   DDK3790xASL            - win32 - Microsoft Windows DDK 3790.1830, Intel EBC, Microsoft ASL
 #   CYGGCCxASL             - win32 - CygWin GCC, Intel EBC, Microsoft ASL
 #   ICCxASL                - win32 - Intel C Compiler V9.1, Intel EBC, Microsoft ASL
 #   VS2005x86              - win64 - Microsoft Visual Studio 2005 Team Suite Edition (x86), Intel EBC, Intel ASL (also compatible with VS 2005 Express, Standard, and Pro)
+#   VS2008x86              - Microsoft Visual Studio 2008 (x86) w/ Intel ASL
 #   ICCx86                 - win64 - Intel C Compiler V9.1 (x86), Intel EBC, Intel ASL
 #   VS2005x86xASL          - win64 - Microsoft Visual Studio 2005 Team Suite Edition (x86), Intel EBC, Microsoft ASL (also compatible with VS 2005 Express, Standard, and Pro)
+#   VS2008x86xASL          - Microsoft Visual Studio 2008 (x86) w/ Microsoft ASL
 #   ICCx86xASL             - win64 - Intel C Compiler V9.1 (x86), Intel EBC, Microsoft ASL
 #   CYGGCCx86              - win64 - CygWin GCC (x86), Intel EBC (x86), Intel ASL
 #   CYGGCCx86xASL          - win64 - CygWin GCC (x86), Intel EBC (x86), Microsoft ASL
@@ -853,6 +870,454 @@ RELEASE_VS2005x86xASL_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:R
 *_VS2005x86xASL_EBC_SLINK_FLAGS         = /lib /NOLOGO /MACHINE:EBC
 *_VS2005x86xASL_EBC_DLINK_FLAGS         = "C:\Program Files (x86)\Intel\EBC\Lib\EbcLib.lib" /NOLOGO /NODEFAULTLIB /MACHINE:EBC /OPT:REF /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /MAP
 
+
+
+####################################################################################
+#
+# Microsoft Visual Studio 2008
+#
+#   VS2008  - Microsoft Visual Studio 2005 All Edition, including Standard, Professional, Express, TeamSuite
+#   ASL     - Intel ACPI Source Language Compiler
+####################################################################################
+#   VS2008           - Microsoft Visual Studio 2008 ALL Edition, including Standard, Professional, Express, TeamSuite
+*_VS2008_*_*_FAMILY               = MSFT
+
+*_VS2008_*_MAKE_PATH              = DEF(VS2008_BIN)\nmake.exe
+*_VS2008_*_MAKE_FLAGS             = /nologo
+*_VS2008_*_RC_PATH                = DEF(WINSDK_BIN)\rc.exe
+
+*_VS2008_*_SLINK_FLAGS            = /NOLOGO /LTCG
+*_VS2008_*_APP_FLAGS              = /nologo /E /TC
+*_VS2008_*_PP_FLAGS               = /nologo /E /TC /FIAutoGen.h
+*_VS2008_*_VFRPP_FLAGS            = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
+
+##################
+# ASL definitions
+##################
+*_VS2008_*_ASL_PATH               = DEF(DEFAULT_WIN_ASL_BIN)
+*_VS2008_*_ASL_FLAGS              = DEF(DEFAULT_WIN_ASL_FLAGS)
+*_VS2008_*_ASL_OUTFLAGS           = DEF(DEFAULT_WIN_ASL_OUTFLAGS)
+*_VS2008_*_ASLCC_FLAGS            = DEF(MSFT_ASLCC_FLAGS)
+*_VS2008_*_ASLPP_FLAGS            = DEF(MSFT_ASLPP_FLAGS)
+*_VS2008_*_ASLDLINK_FLAGS         = DEF(MSFT_ASLDLINK_FLAGS)
+
+##################
+# IA32 definitions
+##################
+*_VS2008_IA32_*_DLL               = DEF(VS2008_DLL)
+
+*_VS2008_IA32_MAKE_PATH           = DEF(VS2008_BIN)\nmake.exe
+*_VS2008_IA32_CC_PATH             = DEF(VS2008_BIN)\cl.exe
+*_VS2008_IA32_VFRPP_PATH          = DEF(VS2008_BIN)\cl.exe
+*_VS2008_IA32_SLINK_PATH          = DEF(VS2008_BIN)\lib.exe
+*_VS2008_IA32_DLINK_PATH          = DEF(VS2008_BIN)\link.exe
+*_VS2008_IA32_ASMLINK_PATH        = DEF(WINDDK_BIN16)\link16.exe
+*_VS2008_IA32_APP_PATH            = DEF(VS2008_BIN)\cl.exe
+*_VS2008_IA32_PP_PATH             = DEF(VS2008_BIN)\cl.exe
+*_VS2008_IA32_ASM_PATH            = DEF(VS2008_BIN)\ml.exe
+*_VS2008_IA32_ASLCC_PATH          = DEF(VS2008_BIN)\cl.exe
+*_VS2008_IA32_ASLPP_PATH          = DEF(VS2008_BIN)\cl.exe
+*_VS2008_IA32_ASLDLINK_PATH       = DEF(VS2008_BIN)\link.exe
+
+      *_VS2008_IA32_MAKE_FLAGS    = /nologo
+  DEBUG_VS2008_IA32_CC_FLAGS      = /nologo /c /WX /GS- /W4 /Gs8192 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
+RELEASE_VS2008_IA32_CC_FLAGS      = /nologo /c /WX /GS- /W4 /Gs8192 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
+  DEBUG_VS2008_IA32_ASM_FLAGS     = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
+RELEASE_VS2008_IA32_ASM_FLAGS     = /nologo /c /WX /W3 /Cx /coff /Zd
+  DEBUG_VS2008_IA32_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:I386 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+RELEASE_VS2008_IA32_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:I386 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.data=.text /MERGE:.rdata=.text
+      *_VS2008_IA32_ASMLINK_FLAGS = /nologo /tiny
+
+##################
+# X64 definitions
+##################
+*_VS2008_X64_*_DLL         = DEF(VS2008_DLL)
+
+*_VS2008_X64_CC_PATH       = DEF(VS2008_BINX64)\cl.exe
+*_VS2008_X64_PP_PATH       = DEF(VS2008_BINX64)\cl.exe
+*_VS2008_X64_APP_PATH      = DEF(VS2008_BINX64)\cl.exe
+*_VS2008_X64_VFRPP_PATH    = DEF(VS2008_BINX64)\cl.exe
+*_VS2008_X64_ASM_PATH      = DEF(VS2008_BINX64)\ml64.exe
+*_VS2008_X64_SLINK_PATH    = DEF(VS2008_BINX64)\lib.exe
+*_VS2008_X64_DLINK_PATH    = DEF(VS2008_BINX64)\link.exe
+*_VS2008_X64_ASLCC_PATH    = DEF(VS2008_BINX64)\cl.exe
+*_VS2008_X64_ASLPP_PATH    = DEF(VS2008_BINX64)\cl.exe
+*_VS2008_X64_ASLDLINK_PATH = DEF(VS2008_BINX64)\link.exe
+
+
+  DEBUG_VS2008_X64_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /Gs8192 /D UNICODE /O1ib2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm
+RELEASE_VS2008_X64_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /Gs8192 /D UNICODE /O1ib2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF
+  DEBUG_VS2008_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd /Zi
+RELEASE_VS2008_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd
+  DEBUG_VS2008_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:AMD64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+RELEASE_VS2008_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:AMD64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.data=.text /MERGE:.rdata=.text
+
+##################
+# IPF definitions
+##################
+*_VS2008_IPF_*_DLL         = DEF(VS2008_DLL)
+
+*_VS2008_IPF_PP_PATH       = DEF(VS2008_BIN64)\cl.exe
+*_VS2008_IPF_APP_PATH      = DEF(VS2008_BIN64)\cl.exe
+*_VS2008_IPF_VFRPP_PATH    = DEF(VS2008_BIN64)\cl.exe
+*_VS2008_IPF_CC_PATH       = DEF(VS2008_BIN64)\cl.exe
+*_VS2008_IPF_ASM_PATH      = DEF(VS2008_BIN64)\ias.exe
+*_VS2008_IPF_SLINK_PATH    = DEF(VS2008_BIN64)\lib.exe
+*_VS2008_IPF_DLINK_PATH    = DEF(VS2008_BIN64)\link.exe
+*_VS2008_IPF_ASLCC_PATH    = DEF(VS2008_BIN64)\cl.exe
+*_VS2008_IPF_ASLPP_PATH    = DEF(VS2008_BIN64)\cl.exe
+*_VS2008_IPF_ASLDLINK_PATH = DEF(VS2008_BIN64)\link.exe
+
+  DEBUG_VS2008_IPF_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /EHs-c- /GR- /Gy /Os /GL /FIAutoGen.h /QIPF_fr32 /Zi
+RELEASE_VS2008_IPF_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /EHs-c- /GR- /Gy /Os /GL /FIAutoGen.h /QIPF_fr32
+  DEBUG_VS2008_IPF_ASM_FLAGS    = -N us -X explicit -M ilp64 -N so -W4 -d debug
+RELEASE_VS2008_IPF_ASM_FLAGS    = -N us -X explicit -M ilp64 -N so -W4
+  DEBUG_VS2008_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGNORE:4086 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:IA64 /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MAP:$(DEBUG_DIR)/$(BASE_NAME).map /PDB:$(DEBUG_DIR)/$(BASE_NAME).pdb /DEBUG
+RELEASE_VS2008_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF.ICF /IGNORE:4086 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:IA64 /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MAP:$(DEBUG_DIR)/$(BASE_NAME).map /PDB:$(DEBUG_DIR)/$(BASE_NAME).pdb
+
+##################
+# EBC definitions
+##################
+*_VS2008_EBC_*_FAMILY            = INTEL
+
+*_VS2008_EBC_MAKE_PATH           = DEF(VS2008_BIN)\nmake.exe
+*_VS2008_EBC_PP_PATH             = DEF(EBC_BIN)\iec.exe
+*_VS2008_EBC_VFRPP_PATH          = DEF(EBC_BIN)\iec.exe
+*_VS2008_EBC_CC_PATH             = DEF(EBC_BIN)\iec.exe
+*_VS2008_EBC_SLINK_PATH          = DEF(EBC_BIN)\link.exe
+*_VS2008_EBC_DLINK_PATH          = DEF(EBC_BIN)\link.exe
+
+*_VS2008_EBC_MAKE_FLAGS          = /nologo
+*_VS2008_EBC_PP_FLAGS            = /nologo /E /TC /FIAutoGen.h
+*_VS2008_EBC_CC_FLAGS            = /nologo /c /WX /W3 /FIAutoGen.h /D$(MODULE_ENTRY_POINT)=$(ARCH_ENTRY_POINT)
+*_VS2008_EBC_VFRPP_FLAGS         = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
+*_VS2008_EBC_SLINK_FLAGS         = /lib /NOLOGO /MACHINE:EBC
+*_VS2008_EBC_DLINK_FLAGS         = "C:\Program Files\Intel\EBC\Lib\EbcLib.lib" /NOLOGO /NODEFAULTLIB /MACHINE:EBC /OPT:REF /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /MAP
+
+####################################################################################
+#
+# Microsoft Visual Studio 2008
+#
+#   VS2008  - Microsoft Visual Studio 2008 All Edition, including Standard, Professional, Express, TeamSuite
+#   ASL     - Microsoft ACPI Source Language Compiler (asl.exe)
+####################################################################################
+#   VS2008xASL           - Microsoft Visual Studio 2008 ALL Edition, including Standard, Professional, Express, TeamSuite
+*_VS2008xASL_*_*_FAMILY        = MSFT
+
+*_VS2008xASL_*_MAKE_PATH       = DEF(VS2008_BIN)\nmake.exe
+*_VS2008xASL_*_MAKE_FLAG       = /nologo
+*_VS2008xASL_*_RC_PATH         = DEF(WINSDK_BIN)\rc.exe
+
+*_VS2008xASL_*_SLINK_FLAGS     = /NOLOGO /LTCG
+*_VS2008xASL_*_APP_FLAGS       = /nologo /E /TC
+*_VS2008xASL_*_PP_FLAGS        = /nologo /E /TC /FIAutoGen.h
+*_VS2008xASL_*_VFRPP_FLAGS     = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
+
+##################
+# ASL definitions
+##################
+*_VS2008xASL_*_ASL_PATH        = DEF(WIN_ASL_BIN)
+*_VS2008xASL_*_ASL_FLAGS       = 
+*_VS2008xASL_*_ASL_OUTFLAGS    = DEF(MS_ASL_OUTFLAGS)
+*_VS2008xASL_*_ASLCC_FLAGS     = DEF(MSFT_ASLCC_FLAGS)
+*_VS2008xASL_*_ASLPP_FLAGS     = DEF(MSFT_ASLPP_FLAGS)
+*_VS2008xASL_*_ASLDLINK_FLAGS  = DEF(MSFT_ASLDLINK_FLAGS)
+
+##################
+# IA32 definitions
+##################
+*_VS2008xASL_IA32_*_DLL        = DEF(VS2008_DLL)
+
+*_VS2008xASL_IA32_MAKE_PATH    = DEF(VS2008_BIN)\nmake.exe
+*_VS2008xASL_IA32_CC_PATH      = DEF(VS2008_BIN)\cl.exe
+*_VS2008xASL_IA32_VFRPP_PATH   = DEF(VS2008_BIN)\cl.exe
+*_VS2008xASL_IA32_SLINK_PATH   = DEF(VS2008_BIN)\lib.exe
+*_VS2008xASL_IA32_DLINK_PATH   = DEF(VS2008_BIN)\link.exe
+*_VS2008xASL_IA32_ASMLINK_PATH = DEF(WINDDK_BIN16)\link16.exe
+*_VS2008xASL_IA32_APP_PATH     = DEF(VS2008_BIN)\cl.exe
+*_VS2008xASL_IA32_PP_PATH      = DEF(VS2008_BIN)\cl.exe
+*_VS2008xASL_IA32_ASM_PATH     = DEF(VS2008_BIN)\ml.exe
+*_VS2008xASL_IA32_ASLCC_PATH    = DEF(VS2008_BIN)\cl.exe
+*_VS2008xASL_IA32_ASLPP_PATH    = DEF(VS2008_BIN)\cl.exe
+*_VS2008xASL_IA32_ASLDLINK_PATH = DEF(VS2008_BIN)\link.exe
+
+      *_VS2008xASL_IA32_MAKE_FLAGS  = /nologo
+  DEBUG_VS2008xASL_IA32_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs8192 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
+RELEASE_VS2008xASL_IA32_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs8192 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
+  DEBUG_VS2008xASL_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
+RELEASE_VS2008xASL_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd
+  DEBUG_VS2008xASL_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:I386 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+RELEASE_VS2008xASL_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:I386 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.data=.text /MERGE:.rdata=.text
+      *_VS2008xASL_IA32_ASMLINK_FLAGS= /nologo /tiny
+
+##################
+# X64 definitions
+##################
+*_VS2008xASL_X64_*_DLL         = DEF(VS2008_DLL)
+
+*_VS2008xASL_X64_CC_PATH       = DEF(VS2008_BINX64)\cl.exe
+*_VS2008xASL_X64_PP_PATH       = DEF(VS2008_BINX64)\cl.exe
+*_VS2008xASL_X64_APP_PATH      = DEF(VS2008_BINX64)\cl.exe
+*_VS2008xASL_X64_VFRPP_PATH    = DEF(VS2008_BINX64)\cl.exe
+*_VS2008xASL_X64_ASM_PATH      = DEF(VS2008_BINX64)\ml64.exe
+*_VS2008xASL_X64_SLINK_PATH    = DEF(VS2008_BINX64)\lib.exe
+*_VS2008xASL_X64_DLINK_PATH    = DEF(VS2008_BINX64)\link.exe
+*_VS2008xASL_X64_ASLCC_PATH    = DEF(VS2008_BINX64)\cl.exe
+*_VS2008xASL_X64_ASLPP_PATH    = DEF(VS2008_BINX64)\cl.exe
+*_VS2008xASL_X64_ASLDLINK_PATH = DEF(VS2008_BINX64)\link.exe
+
+
+  DEBUG_VS2008xASL_X64_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /Gs8192 /D UNICODE /O1ib2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm
+RELEASE_VS2008xASL_X64_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /Gs8192 /D UNICODE /O1ib2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF
+  DEBUG_VS2008xASL_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd /Zi
+RELEASE_VS2008xASL_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd
+  DEBUG_VS2008xASL_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:AMD64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+RELEASE_VS2008xASL_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:AMD64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.data=.text /MERGE:.rdata=.text
+
+##################
+# IPF definitions
+##################
+*_VS2008xASL_IPF_*_DLL         = DEF(VS2008_DLL)
+
+*_VS2008xASL_IPF_PP_PATH       = DEF(VS2008_BIN64)\cl.exe
+*_VS2008xASL_IPF_APP_PATH      = DEF(VS2008_BIN64)\cl.exe
+*_VS2008xASL_IPF_VFRPP_PATH    = DEF(VS2008_BIN64)\cl.exe
+*_VS2008xASL_IPF_CC_PATH       = DEF(VS2008_BIN64)\cl.exe
+*_VS2008xASL_IPF_ASM_PATH      = DEF(VS2008_BIN64)\ias.exe
+*_VS2008xASL_IPF_SLINK_PATH    = DEF(VS2008_BIN64)\lib.exe
+*_VS2008xASL_IPF_DLINK_PATH    = DEF(VS2008_BIN64)\link.exe
+*_VS2008xASL_IPF_ASLCC_PATH    = DEF(VS2008_BIN64)\cl.exe
+*_VS2008xASL_IPF_ASLPP_PATH    = DEF(VS2008_BIN64)\cl.exe
+*_VS2008xASL_IPF_ASLDLINK_PATH = DEF(VS2008_BIN64)\link.exe
+
+  DEBUG_VS2008xASL_IPF_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /EHs-c- /GR- /Gy /Os /GL /FIAutoGen.h /QIPF_fr32 /Zi
+RELEASE_VS2008xASL_IPF_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /EHs-c- /GR- /Gy /Os /GL /FIAutoGen.h /QIPF_fr32
+  DEBUG_VS2008xASL_IPF_ASM_FLAGS    = -N us -X explicit -M ilp64 -N so -W4 -d debug
+RELEASE_VS2008xASL_IPF_ASM_FLAGS    = -N us -X explicit -M ilp64 -N so -W4
+  DEBUG_VS2008xASL_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGNORE:4086 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:IA64 /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MAP:$(DEBUG_DIR)/$(BASE_NAME).map /PDB:$(DEBUG_DIR)/$(BASE_NAME).pdb /DEBUG
+RELEASE_VS2008xASL_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF.ICF /IGNORE:4086 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:IA64 /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MAP:$(DEBUG_DIR)/$(BASE_NAME).map /PDB:$(DEBUG_DIR)/$(BASE_NAME).pdb
+
+##################
+# EBC definitions
+##################
+*_VS2008xASL_EBC_*_FAMILY            = INTEL
+
+*_VS2008xASL_EBC_MAKE_PATH           = DEF(VS2008_BIN)\nmake.exe
+*_VS2008xASL_EBC_PP_PATH             = DEF(EBC_BIN)\iec.exe
+*_VS2008xASL_EBC_VFRPP_PATH          = DEF(EBC_BIN)\iec.exe
+*_VS2008xASL_EBC_CC_PATH             = DEF(EBC_BIN)\iec.exe
+*_VS2008xASL_EBC_SLINK_PATH          = DEF(EBC_BIN)\link.exe
+*_VS2008xASL_EBC_DLINK_PATH          = DEF(EBC_BIN)\link.exe
+
+*_VS2008xASL_EBC_MAKE_FLAGS          = /nologo
+*_VS2008xASL_EBC_PP_FLAGS            = /nologo /E /TC /FIAutoGen.h
+*_VS2008xASL_EBC_CC_FLAGS            = /nologo /c /WX /W3 /FIAutoGen.h /D$(MODULE_ENTRY_POINT)=$(ARCH_ENTRY_POINT)
+*_VS2008xASL_EBC_VFRPP_FLAGS         = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
+*_VS2008xASL_EBC_SLINK_FLAGS         = /lib /NOLOGO /MACHINE:EBC
+*_VS2008xASL_EBC_DLINK_FLAGS         = "C:\Program Files\Intel\EBC\Lib\EbcLib.lib" /NOLOGO /NODEFAULTLIB /MACHINE:EBC /OPT:REF /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /MAP
+
+
+####################################################################################
+#   VS2008x86       - Microsoft Visual Studio 2008 (x86) with Intel ASL
+#   ASL  - Intel ACPI Source Language Compiler (iasl.exe)
+####################################################################################
+#   VS2008x86           - Microsoft Visual Studio 2008 (x86) ALL Edition with Intel ASL
+*_VS2008x86_*_*_FAMILY        = MSFT
+
+*_VS2008x86_*_MAKE_PATH       = DEF(VS2008x86_BIN)\nmake.exe
+*_VS2008xASL_*_MAKE_FLAG       = /nologo
+*_VS2008xASL_*_RC_PATH         = DEF(WINSDKx86_BIN)\rc.exe
+
+*_VS2008x86_*_MAKE_FLAGS      = /nologo
+*_VS2008x86_*_SLINK_FLAGS     = /NOLOGO /LTCG
+*_VS2008x86_*_APP_FLAGS       = /nologo /E /TC
+*_VS2008x86_*_PP_FLAGS        = /nologo /E /TC /FIAutoGen.h
+*_VS2008x86_*_VFRPP_FLAGS     = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
+
+##################
+# ASL definitions
+##################
+*_VS2008x86_*_ASL_PATH        = DEF(WIN_IASL_BIN)
+*_VS2008x86_*_ASL_FLAGS       = DEF(DEFAULT_WIN_ASL_FLAGS)
+*_VS2008x86_*_ASL_OUTFLAGS    = DEF(DEFAULT_WIN_ASL_OUTFLAGS)
+*_VS2008x86_*_ASLCC_FLAGS     = DEF(MSFT_ASLCC_FLAGS)
+*_VS2008x86_*_ASLPP_FLAGS     = DEF(MSFT_ASLPP_FLAGS)
+*_VS2008x86_*_ASLDLINK_FLAGS  = DEF(MSFT_ASLDLINK_FLAGS)
+
+##################
+# IA32 definitions
+##################
+*_VS2008x86_IA32_*_DLL        = DEF(VS2008x86_DLL)
+
+*_VS2008x86_IA32_MAKE_PATH    = DEF(VS2008x86_BIN)\nmake.exe
+*_VS2008x86_IA32_CC_PATH      = DEF(VS2008x86_BIN)\cl.exe
+*_VS2008x86_IA32_VFRPP_PATH   = DEF(VS2008x86_BIN)\cl.exe
+*_VS2008x86_IA32_ASLCC_PATH   = DEF(VS2008x86_BIN)\cl.exe
+*_VS2008x86_IA32_ASLPP_PATH   = DEF(VS2008x86_BIN)\cl.exe
+*_VS2008x86_IA32_SLINK_PATH   = DEF(VS2008x86_BIN)\lib.exe
+*_VS2008x86_IA32_DLINK_PATH   = DEF(VS2008x86_BIN)\link.exe
+*_VS2008x86_IA32_ASLDLINK_PATH= DEF(VS2008x86_BIN)\link.exe
+*_VS2008x86_IA32_ASMLINK_PATH = DEF(WINDDK_BIN16)\link.exe
+*_VS2008x86_IA32_APP_PATH     = DEF(VS2008x86_BIN)\cl.exe
+*_VS2008x86_IA32_PP_PATH      = DEF(VS2008x86_BIN)\cl.exe
+*_VS2008x86_IA32_ASM_PATH     = DEF(VS2008x86_BIN)\ml.exe
+
+      *_VS2008x86_IA32_MAKE_FLAGS  = /nologo
+  DEBUG_VS2008x86_IA32_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs8192 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
+RELEASE_VS2008x86_IA32_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs8192 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
+  DEBUG_VS2008x86_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd /Zi  
+RELEASE_VS2008x86_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd
+  DEBUG_VS2008x86_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /MACHINE:I386 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /DEBUG   
+RELEASE_VS2008x86_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /MACHINE:I386 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.data=.text /MERGE:.rdata=.text
+      *_VS2008x86_IA32_ASMLINK_FLAGS= /nologo /tiny
+
+##################
+# X64 definitions
+##################
+*_VS2008x86_X64_*_DLL         = DEF(VS2008x86_DLL)
+
+*_VS2008x86_X64_CC_PATH       = DEF(VS2008x86_BINX64)\cl.exe
+*_VS2008x86_X64_PP_PATH       = DEF(VS2008x86_BINX64)\cl.exe
+*_VS2008x86_X64_APP_PATH      = DEF(VS2008x86_BINX64)\cl.exe
+*_VS2008x86_X64_VFRPP_PATH    = DEF(VS2008x86_BINX64)\cl.exe
+*_VS2008x86_X64_ASLCC_PATH    = DEF(VS2008x86_BINX64)\cl.exe
+*_VS2008x86_X64_ASLPP_PATH    = DEF(VS2008x86_BINX64)\cl.exe
+*_VS2008x86_X64_ASM_PATH      = DEF(VS2008x86_BINX64)\ml64.exe
+*_VS2008x86_X64_SLINK_PATH    = DEF(VS2008x86_BINX64)\lib.exe
+*_VS2008x86_X64_DLINK_PATH    = DEF(VS2008x86_BINX64)\link.exe
+*_VS2008x86_X64_ASLDLINK_PATH = DEF(VS2008x86_BINX64)\link.exe
+
+  DEBUG_VS2008x86_X64_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /Gs8192 /D UNICODE /O1ib2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm 
+RELEASE_VS2008x86_X64_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /Gs8192 /D UNICODE /O1ib2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF
+  DEBUG_VS2008x86_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd /Zi
+RELEASE_VS2008x86_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd
+  DEBUG_VS2008x86_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /Machine:AMD64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+RELEASE_VS2008x86_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /Machine:AMD64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.data=.text /MERGE:.rdata=.text
+
+##################
+# IPF definitions
+##################
+*_VS2008x86_IPF_*_DLL         = DEF(VS2008x86_DLL)
+
+*_VS2008x86_IPF_PP_PATH       = DEF(VS2008x86_BIN64)\cl.exe
+*_VS2008x86_IPF_APP_PATH      = DEF(VS2008x86_BIN64)\cl.exe
+*_VS2008x86_IPF_VFRPP_PATH    = DEF(VS2008x86_BIN64)\cl.exe
+*_VS2008x86_IPF_ASLCC_PATH    = DEF(VS2008x86_BIN64)\cl.exe
+*_VS2008x86_IPF_ASLPP_PATH    = DEF(VS2008x86_BIN64)\cl.exe
+*_VS2008x86_IPF_CC_PATH       = DEF(VS2008x86_BIN64)\cl.exe
+*_VS2008x86_IPF_ASM_PATH      = DEF(VS2008x86_BIN64)\ias.exe
+*_VS2008x86_IPF_SLINK_PATH    = DEF(VS2008x86_BIN64)\lib.exe
+*_VS2008x86_IPF_DLINK_PATH    = DEF(VS2008x86_BIN64)\link.exe
+*_VS2008x86_IPF_ASLDLINK_PATH = DEF(VS2008x86_BIN64)\link.exe
+
+  DEBUG_VS2008x86_IPF_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /EHs-c- /GR- /Gy /Os /GL /FIAutoGen.h /QIPF_fr32 /Zi
+RELEASE_VS2008x86_IPF_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /EHs-c- /GR- /Gy /Os /GL /FIAutoGen.h /QIPF_fr32
+  DEBUG_VS2008x86_IPF_ASM_FLAGS    = -N us -X explicit -M ilp64 -N so -W4 -d debug
+RELEASE_VS2008x86_IPF_ASM_FLAGS    = -N us -X explicit -M ilp64 -N so -W4
+  DEBUG_VS2008x86_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGNORE:4086 /MAP /ALIGN:32 /MACHINE:IA64 /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MAP:$(DEBUG_DIR)/$(BASE_NAME).map /PDB:$(DEBUG_DIR)/$(BASE_NAME).pdb /DEBUG
+RELEASE_VS2008x86_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGNORE:4086 /MAP /ALIGN:32 /MACHINE:IA64 /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MAP:$(DEBUG_DIR)/$(BASE_NAME).map /PDB:$(DEBUG_DIR)/$(BASE_NAME).pdb
+
+
+####################################################################################
+#   VS2008x86xASL     - Microsoft Visual Studio 2008 with Microsoft ASL
+#   ASL  - Microsoft ACPI Source Language Compiler (asl.exe)
+####################################################################################
+*_VS2008x86xASL_*_*_FAMILY        = MSFT
+
+*_VS2008x86xASL_*_MAKE_PATH       = DEF(VS2008x86_BIN)\nmake.exe
+*_VS2008xASL_*_MAKE_FLAG       = /nologo
+*_VS2008xASL_*_RC_PATH         = DEF(WINSDKx86_BIN)\rc.exe
+
+*_VS2008x86xASL_*_MAKE_FLAGS      = /nologo
+*_VS2008x86xASL_*_SLINK_FLAGS     = /NOLOGO /LTCG
+*_VS2008x86xASL_*_APP_FLAGS       = /nologo /E /TC
+*_VS2008x86xASL_*_PP_FLAGS        = /nologo /E /TC /FIAutoGen.h
+*_VS2008x86xASL_*_VFRPP_FLAGS     = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
+
+##################
+# ASL definitions
+##################
+*_VS2008x86xASL_*_ASL_PATH        = DEF(WIN_ASL_BIN)
+*_VS2008x86xASL_*_ASL_FLAGS       = DEF(MS_ASL_FLAGS)
+*_VS2008x86xASL_*_ASL_OUTFLAGS    = DEF(MS_ASL_OUTFLAGS)
+*_VS2008x86xASL_*_ASLCC_FLAGS     = DEF(MSFT_ASLCC_FLAGS)
+*_VS2008x86xASL_*_ASLPP_FLAGS     = DEF(MSFT_ASLPP_FLAGS)
+*_VS2008x86xASL_*_ASLDLINK_FLAGS  = DEF(MSFT_ASLDLINK_FLAGS)
+
+##################
+# IA32 definitions
+##################
+*_VS2008x86xASL_IA32_*_DLL        = DEF(VS2008x86_DLL)
+
+*_VS2008x86xASL_IA32_MAKE_PATH    = DEF(VS2008x86_BIN)\nmake.exe
+*_VS2008x86xASL_IA32_CC_PATH      = DEF(VS2008x86_BIN)\cl.exe
+*_VS2008x86xASL_IA32_VFRPP_PATH   = DEF(VS2008x86_BIN)\cl.exe
+*_VS2008x86xASL_IA32_ASLCC_PATH   = DEF(VS2008x86_BIN)\cl.exe
+*_VS2008x86xASL_IA32_ASLPP_PATH   = DEF(VS2008x86_BIN)\cl.exe
+*_VS2008x86xASL_IA32_SLINK_PATH   = DEF(VS2008x86_BIN)\lib.exe
+*_VS2008x86xASL_IA32_DLINK_PATH   = DEF(VS2008x86_BIN)\link.exe
+*_VS2008x86xASL_IA32_ASLDLINK_PATH= DEF(VS2008x86_BIN)\link.exe
+*_VS2008x86xASL_IA32_ASMLINK_PATH = DEF(WINDDK_BIN16)\link.exe
+*_VS2008x86xASL_IA32_APP_PATH     = DEF(VS2008x86_BIN)\cl.exe
+*_VS2008x86xASL_IA32_PP_PATH      = DEF(VS2008x86_BIN)\cl.exe
+*_VS2008x86xASL_IA32_ASM_PATH     = DEF(VS2008x86_BIN)\ml.exe
+
+      *_VS2008x86xASL_IA32_MAKE_FLAGS  = /nologo
+  DEBUG_VS2008x86xASL_IA32_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs8192 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
+RELEASE_VS2008x86xASL_IA32_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs8192 /D UNICODE /O1ib2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
+  DEBUG_VS2008x86xASL_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd /Zi  
+RELEASE_VS2008x86xASL_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd
+  DEBUG_VS2008x86xASL_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /MACHINE:I386 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /DEBUG   
+RELEASE_VS2008x86xASL_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /MACHINE:I386 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.data=.text /MERGE:.rdata=.text
+      *_VS2008x86xASL_IA32_ASMLINK_FLAGS= /nologo /tiny
+
+##################
+# X64 definitions
+##################
+*_VS2008x86xASL_X64_*_DLL         = DEF(VS2008x86_DLL)
+
+*_VS2008x86xASL_X64_CC_PATH       = DEF(VS2008x86_BINX64)\cl.exe
+*_VS2008x86xASL_X64_PP_PATH       = DEF(VS2008x86_BINX64)\cl.exe
+*_VS2008x86xASL_X64_APP_PATH      = DEF(VS2008x86_BINX64)\cl.exe
+*_VS2008x86xASL_X64_VFRPP_PATH    = DEF(VS2008x86_BINX64)\cl.exe
+*_VS2008x86xASL_X64_ASLCC_PATH    = DEF(VS2008x86_BINX64)\cl.exe
+*_VS2008x86xASL_X64_ASLPP_PATH    = DEF(VS2008x86_BINX64)\cl.exe
+*_VS2008x86xASL_X64_ASM_PATH      = DEF(VS2008x86_BINX64)\ml64.exe
+*_VS2008x86xASL_X64_SLINK_PATH    = DEF(VS2008x86_BINX64)\lib.exe
+*_VS2008x86xASL_X64_DLINK_PATH    = DEF(VS2008x86_BINX64)\link.exe
+*_VS2008x86xASL_X64_ASLDLINK_PATH = DEF(VS2008x86_BINX64)\link.exe
+
+  DEBUG_VS2008x86xASL_X64_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /Gs8192 /D UNICODE /O1ib2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm 
+RELEASE_VS2008x86xASL_X64_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /Gs8192 /D UNICODE /O1ib2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF
+  DEBUG_VS2008x86xASL_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd /Zi
+RELEASE_VS2008x86xASL_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd
+  DEBUG_VS2008x86xASL_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /Machine:AMD64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+RELEASE_VS2008x86xASL_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4086 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /Machine:AMD64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.data=.text /MERGE:.rdata=.text
+
+##################
+# IPF definitions
+##################
+*_VS2008x86xASL_IPF_*_DLL         = DEF(VS2008x86_DLL)
+
+*_VS2008x86xASL_IPF_PP_PATH       = DEF(VS2008x86_BIN64)\cl.exe
+*_VS2008x86xASL_IPF_APP_PATH      = DEF(VS2008x86_BIN64)\cl.exe
+*_VS2008x86xASL_IPF_VFRPP_PATH    = DEF(VS2008x86_BIN64)\cl.exe
+*_VS2008x86xASL_IPF_ASLCC_PATH    = DEF(VS2008x86_BIN64)\cl.exe
+*_VS2008x86xASL_IPF_ASLPP_PATH    = DEF(VS2008x86_BIN64)\cl.exe
+*_VS2008x86xASL_IPF_CC_PATH       = DEF(VS2008x86_BIN64)\cl.exe
+*_VS2008x86xASL_IPF_ASM_PATH      = DEF(VS2008x86_BIN64)\ias.exe
+*_VS2008x86xASL_IPF_SLINK_PATH    = DEF(VS2008x86_BIN64)\lib.exe
+*_VS2008x86xASL_IPF_DLINK_PATH    = DEF(VS2008x86_BIN64)\link.exe
+*_VS2008x86xASL_IPF_ASLDLINK_PATH = DEF(VS2008x86_BIN64)\link.exe
+
+  DEBUG_VS2008x86xASL_IPF_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /EHs-c- /GR- /Gy /Os /GL /FIAutoGen.h /QIPF_fr32 /Zi
+RELEASE_VS2008x86xASL_IPF_CC_FLAGS     = /nologo /c /WX /GS- /X /W4 /EHs-c- /GR- /Gy /Os /GL /FIAutoGen.h /QIPF_fr32
+  DEBUG_VS2008x86xASL_IPF_ASM_FLAGS    = -N us -X explicit -M ilp64 -N so -W4 -d debug
+RELEASE_VS2008x86xASL_IPF_ASM_FLAGS    = -N us -X explicit -M ilp64 -N so -W4
+  DEBUG_VS2008x86xASL_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGNORE:4086 /MAP /ALIGN:32 /MACHINE:IA64 /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MAP:$(DEBUG_DIR)/$(BASE_NAME).map /PDB:$(DEBUG_DIR)/$(BASE_NAME).pdb /DEBUG
+RELEASE_VS2008x86xASL_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF,ICF /IGNORE:4086 /MAP /ALIGN:32 /MACHINE:IA64 /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MAP:$(DEBUG_DIR)/$(BASE_NAME).map /PDB:$(DEBUG_DIR)/$(BASE_NAME).pdb
+
+
 ####################################################################################
 #
 # Microsoft Device Driver Kit 3790.1830 (IA-32, X64, Itanium, with Link Time Code Generation)
@@ -1083,11 +1548,11 @@ RELEASE_DDK3790xASL_IPF_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF
 *_*_*_SYMRENAME_PATH            = echo
 *_*_*_SYMRENAME_FLAGS           = Symbol renaming not needed for
 
-DEFINE GCC_ALL_CC_FLAGS            = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -Wno-array-bounds -c -include AutoGen.h
+DEFINE GCC_ALL_CC_FLAGS            = -g -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -Wno-array-bounds -c -include AutoGen.h
 DEFINE GCC_IA32_CC_FLAGS           = DEF(GCC_ALL_CC_FLAGS) -m32 -malign-double -freorder-blocks -freorder-blocks-and-partition -O2
 DEFINE GCC_X64_CC_FLAGS            = DEF(GCC_ALL_CC_FLAGS) -mno-red-zone -Wno-address
 DEFINE GCC_IPF_CC_FLAGS            = DEF(GCC_ALL_CC_FLAGS) -minline-int-divide-min-latency
-DEFINE GCC_DLINK_FLAGS_COMMON      = -nostdlib -s --pie
+DEFINE GCC_DLINK_FLAGS_COMMON      = -nostdlib --pie
 DEFINE GCC_IA32_X64_DLINK_COMMON   = DEF(GCC_DLINK_FLAGS_COMMON) --gc-sections
 DEFINE GCC_IA32_X64_ASLDLINK_FLAGS = DEF(GCC_IA32_X64_DLINK_COMMON) --entry _ReferenceAcpiTable -u $(IMAGE_ENTRY_POINT)
 DEFINE GCC_IA32_X64_DLINK_FLAGS    = DEF(GCC_IA32_X64_DLINK_COMMON) --entry _$(IMAGE_ENTRY_POINT) --file-alignment 0x20 --section-alignment 0x20 -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
@@ -1104,9 +1569,9 @@ DEFINE GCC_IA32_RC_FLAGS           = -I binary -O elf32-i386        -B i386 --re
 DEFINE GCC_X64_RC_FLAGS            = -I binary -O elf64-x86-64      -B i386 --rename-section .data=.hii
 DEFINE GCC_IPF_RC_FLAGS            = -I binary -O elf64-ia64-little -B ia64 --rename-section .data=.hii
 
-DEFINE GCC44_ALL_CC_FLAGS            = -fshort-wchar -fno-stack-protector -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -Wno-array-bounds -ffunction-sections -c -include AutoGen.h -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings
+DEFINE GCC44_ALL_CC_FLAGS            = -g -fshort-wchar -fno-stack-protector -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -Wno-array-bounds -ffunction-sections -fdata-sections -c -include AutoGen.h -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings
 DEFINE GCC44_IA32_CC_FLAGS           = DEF(GCC44_ALL_CC_FLAGS) -m32 -malign-double -D EFI32
-DEFINE GCC44_X64_CC_FLAGS            = DEF(GCC44_ALL_CC_FLAGS) "-DEFIAPI=__attribute__((ms_abi))" -mno-red-zone -Wno-address
+DEFINE GCC44_X64_CC_FLAGS            = DEF(GCC44_ALL_CC_FLAGS) -m64 "-DEFIAPI=__attribute__((ms_abi))" -mno-red-zone -Wno-address
 DEFINE GCC44_IA32_X64_DLINK_COMMON   = -nostdlib -n -q --gc-sections
 DEFINE GCC44_IA32_X64_ASLDLINK_FLAGS = DEF(GCC44_IA32_X64_DLINK_COMMON) --entry ReferenceAcpiTable -u ReferenceAcpiTable
 DEFINE GCC44_IA32_X64_DLINK_FLAGS    = DEF(GCC44_IA32_X64_DLINK_COMMON) --entry $(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT) -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
@@ -1169,9 +1634,11 @@ DEFINE GCC44_ASM_FLAGS               = DEF(GCC_ASM_FLAGS)
 *_UNIXGCC_X64_ASLPP_PATH            = DEF(UNIXGCC_X64_PETOOLS_PREFIX)gcc
 *_UNIXGCC_X64_VFRPP_PATH            = DEF(UNIXGCC_X64_PETOOLS_PREFIX)gcc
 *_UNIXGCC_X64_RC_PATH               = DEF(UNIXGCC_X64_PETOOLS_PREFIX)objcopy
+*_UNIXGCC_X64_OBJCOPY_PATH          = DEF(UNIXGCC_X64_PETOOLS_PREFIX)objcopy
 
 *_UNIXGCC_X64_CC_FLAGS              = DEF(GCC_X64_CC_FLAGS)
 *_UNIXGCC_X64_RC_FLAGS              = DEF(GCC_X64_RC_FLAGS)
+*_UNIXGCC_X64_OBJCOPY_FLAGS         =
 
 ##################
 # IPF definitions
@@ -1228,15 +1695,14 @@ DEFINE GCC44_ASM_FLAGS               = DEF(GCC_ASM_FLAGS)
 *_GCC44_IA32_ASLCC_PATH           = DEF(GCC44_IA32_PREFIX)gcc
 *_GCC44_IA32_ASLPP_PATH           = DEF(GCC44_IA32_PREFIX)gcc
 *_GCC44_IA32_RC_PATH              = DEF(GCC44_IA32_PREFIX)objcopy
-*_GCC44_IA32_OBJCOPY_PATH         = DEF(GCC44_IA32_PREFIX)objcopy
 
 *_GCC44_IA32_ASLCC_FLAGS          = DEF(GCC_ASLCC_FLAGS) -m32
 *_GCC44_IA32_ASLDLINK_FLAGS       = DEF(GCC44_IA32_X64_ASLDLINK_FLAGS) -m elf_i386
 *_GCC44_IA32_ASM_FLAGS            = DEF(GCC44_ASM_FLAGS) -m32 --32 -march=i386
-*_GCC44_IA32_CC_FLAGS             = DEF(GCC44_IA32_CC_FLAGS)
+*_GCC44_IA32_CC_FLAGS             = DEF(GCC44_IA32_CC_FLAGS) -Os
 *_GCC44_IA32_DLINK_FLAGS          = DEF(GCC44_IA32_X64_DLINK_FLAGS) -m elf_i386 --oformat=elf32-i386
 *_GCC44_IA32_RC_FLAGS             = DEF(GCC_IA32_RC_FLAGS)
-*_GCC44_IA32_OBJCOPY_FLAGS        =
+
 
 ####################################################################################
 #
@@ -2250,17 +2716,17 @@ RELEASE_XCODE32_X64_ASM_FLAGS  = -arch x86_64
 RELEASE_XCODE32_X64_CC_FLAGS   = -arch x86_64 -Oz -combine -mms-bitfields -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-missing-braces -Wno-address  -fomit-frame-pointer -static  -c -include AutoGen.h -fno-stack-protector
 
 ##################
-# ARM definitions - still a work in progress (Assumes iPhone SDK installed)
+# ARM definitions - (Assumes iPhone SDK installed on Snow Leopard)
 ##################
 
-*_XCODE32_ARM_ARCHCC_FLAGS    = -arch armv6 -march=armv6 -mthumb
-*_XCODE32_ARM_ARCHASM_FLAGS   = -arch armv6 
-*_XCODE32_ARM_ARCHDLINK_FLAGS = -arch armv6 
+*_XCODE32_ARM_ARCHCC_FLAGS    = -arch armv7 -march=armv7 -mthumb
+*_XCODE32_ARM_ARCHASM_FLAGS   = -arch armv7 
+*_XCODE32_ARM_ARCHDLINK_FLAGS = -arch armv7 
 *_XCODE32_ARM_PLATFORM_FLAGS  =
 
 *_XCODE32_ARM_CC_PATH       = DEF(IPHONE_TOOLS)/usr/bin/gcc
 *_XCODE32_ARM_SLINK_PATH    = DEF(IPHONE_TOOLS)/usr/bin/libtool
-*_XCODE32_ARM_DLINK_PATH    = DEF(IPHONE_TOOLS)/usr/bin/ld
+*_XCODE32_ARM_DLINK_PATH    = ld
 *_XCODE32_ARM_ASM_PATH      = DEF(IPHONE_TOOLS)/usr/bin/as
 *_XCODE32_ARM_PP_PATH       = DEF(IPHONE_TOOLS)/usr/bin/gcc
 *_XCODE32_ARM_VFRPP_PATH    = DEF(IPHONE_TOOLS)/usr/bin/gcc
@@ -2291,8 +2757,8 @@ RELEASE_XCODE32_ARM_CC_FLAGS   = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -mthumb-inter
 #
 # Use default values, or override in DSC file
 #
-*_RVCT31_ARM_ARCHCC_FLAGS    = --cpu Cortex-A8 --thumb
-*_RVCT31_ARM_ARCHASM_FLAGS   = --cpu Cortex-A8
+*_RVCT31_ARM_ARCHCC_FLAGS    = --thumb --cpu 7-A
+*_RVCT31_ARM_ARCHASM_FLAGS   = --cpu 7-A
 *_RVCT31_ARM_ARCHDLINK_FLAGS = 
 *_RVCT31_ARM_PLATFORM_FLAGS  =
 
@@ -2341,8 +2807,8 @@ RELEASE_RVCT31_ARM_CC_FLAGS  = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) --c90    -Ospac
 #
 # Use default values, or override in DSC file
 #
-*_RVCT31CYGWIN_ARM_ARCHCC_FLAGS    = --cpu Cortex-A8 --thumb
-*_RVCT31CYGWIN_ARM_ARCHASM_FLAGS   = --cpu Cortex-A8 
+*_RVCT31CYGWIN_ARM_ARCHCC_FLAGS    = --thumb --cpu 7-A
+*_RVCT31CYGWIN_ARM_ARCHASM_FLAGS   = --cpu 7-A
 *_RVCT31CYGWIN_ARM_ARCHDLINK_FLAGS = 
 *_RVCT31CYGWIN_ARM_PLATFORM_FLAGS  =
 

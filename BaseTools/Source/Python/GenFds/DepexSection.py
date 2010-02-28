@@ -62,24 +62,27 @@ class DepexSection (DepexSectionClassObject):
     #   @retval tuple       (Generated file name list, section alignment)
     #
     def GenSection(self, OutputPath, ModuleName, SecNum, keyStringList, FfsFile = None, Dict = {}):
+        
+        if self.ExpressionProcessed == False:
+            self.Expression = self.Expression.replace("\n", " ").replace("\r", " ")
+            ExpList = self.Expression.split()
+            ExpGuidDict = {}
 
-        self.Expression = self.Expression.replace("\n", " ").replace("\r", " ")
-        ExpList = self.Expression.split()
-        ExpGuidDict = {}
+            for Exp in ExpList:
+                if Exp.upper() not in ('AND', 'OR', 'NOT', 'TRUE', 'FALSE', 'SOR', 'BEFORE', 'AFTER', 'END'):
+                    GuidStr = self.__FindGuidValue(Exp)
+                    if GuidStr == None:
+                        EdkLogger.error("GenFds", RESOURCE_NOT_AVAILABLE,
+                                        "Depex GUID %s could not be found in build DB! (ModuleName: %s)" % (Exp, ModuleName))
 
-        for Exp in ExpList:
-            if Exp.upper() not in ('AND', 'OR', 'NOT', 'TRUE', 'FALSE', 'SOR', 'BEFORE', 'AFTER', 'END'):
-                GuidStr = self.__FindGuidValue(Exp)
-                if GuidStr == None:
-                    EdkLogger.error("GenFds", RESOURCE_NOT_AVAILABLE,
-                                    "Depex GUID %s could not be found in build DB! (ModuleName: %s)" % (Exp, ModuleName))
+                    ExpGuidDict[Exp] = GuidStr
 
-                ExpGuidDict[Exp] = GuidStr
+            for Item in ExpGuidDict:
+                self.Expression = self.Expression.replace(Item, ExpGuidDict[Item])
 
-        for Item in ExpGuidDict:
-            self.Expression = self.Expression.replace(Item, ExpGuidDict[Item])
+            self.Expression = self.Expression.strip()
+            self.ExpressionProcessed = True
 
-        self.Expression = self.Expression.strip()
         if self.DepexType == 'PEI_DEPEX_EXP':
             ModuleType = 'PEIM'
             SecType    = 'PEI_DEPEX'
