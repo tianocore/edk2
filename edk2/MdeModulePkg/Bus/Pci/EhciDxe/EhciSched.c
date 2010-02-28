@@ -116,7 +116,6 @@ EhcInitSched (
   UINTN                 Pages;
   UINTN                 Bytes;
   UINTN                 Index;
-  UINT32                *Desc;
   EFI_STATUS            Status;
   EFI_PHYSICAL_ADDRESS  PciAddr;
 
@@ -159,10 +158,17 @@ EhcInitSched (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Ehc->PeriodFrameHost  = Buf;
-  Ehc->PeriodFrame      = (VOID *) ((UINTN) PhyAddr);
+  Ehc->PeriodFrame      = Buf;
   Ehc->PeriodFrameMap   = Map;
-  Ehc->High32bitAddr    = EHC_HIGH_32BIT (PhyAddr);
+
+  //
+  // Program the FRAMELISTBASE register with the low 32 bit addr
+  //
+  EhcWriteOpReg (Ehc, EHC_FRAME_BASE_OFFSET, EHC_LOW_32BIT (PhyAddr));
+  //
+  // Program the CTRLDSSEGMENT register with the high 32 bit addr
+  //
+  EhcWriteOpReg (Ehc, EHC_CTRLDSSEG_OFFSET, EHC_HIGH_32BIT (PhyAddr));
 
   //
   // Init memory pool management then create the helper
@@ -172,30 +178,40 @@ EhcInitSched (
   Ehc->MemPool = UsbHcInitMemPool (
                    PciIo,
                    EHC_BIT_IS_SET (Ehc->HcCapParams, HCCP_64BIT),
-                   Ehc->High32bitAddr
+                   EHC_HIGH_32BIT (PhyAddr)
                    );
 
   if (Ehc->MemPool == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+    goto ErrorExit;
   }
 
   Status = EhcCreateHelpQ (Ehc);
 
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto ErrorExit;
   }
 
   //
   // Initialize the frame list entries then set the registers
   //
-  Desc = (UINT32 *) Ehc->PeriodFrameHost;
-
-  for (Index = 0; Index < EHC_FRAME_LEN; Index++) {
-    PciAddr     = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Ehc->PeriodOne, sizeof (EHC_QH));
-    Desc[Index] = QH_LINK (PciAddr, EHC_TYPE_QH, FALSE);
+  Ehc->PeriodFrameHost      = AllocateZeroPool (EHC_FRAME_LEN * sizeof (UINTN));
+  if (Ehc->PeriodFrameHost == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ErrorExit;
   }
 
-  EhcWriteOpReg (Ehc, EHC_FRAME_BASE_OFFSET, EHC_LOW_32BIT (Ehc->PeriodFrame));
+  PciAddr  = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Ehc->PeriodOne, sizeof (EHC_QH));
+
+  for (Index = 0; Index < EHC_FRAME_LEN; Index++) {
+    //
+    // Store the pci bus address of the QH in period frame list which will be accessed by pci bus master.
+    //
+    ((UINT32 *)(Ehc->PeriodFrame))[Index] = QH_LINK (PciAddr, EHC_TYPE_QH, FALSE);
+    //
+    // Store the host address of the QH in period frame list which will be accessed by host.
+    //
+    ((UINTN *)(Ehc->PeriodFrameHost))[Index] = (UINTN)Ehc->PeriodOne;
+  }
 
   //
   // Second initialize the asynchronous schedule:
@@ -205,6 +221,26 @@ EhcInitSched (
   PciAddr = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Ehc->ReclaimHead, sizeof (EHC_QH));
   EhcWriteOpReg (Ehc, EHC_ASYNC_HEAD_OFFSET, EHC_LOW_32BIT (PciAddr));
   return EFI_SUCCESS;
+
+ErrorExit:
+  PciIo->FreeBuffer (PciIo, Pages, Buf);
+  PciIo->Unmap (PciIo, Map);
+
+  if (Ehc->PeriodOne != NULL) {
+    UsbHcFreeMem (Ehc->MemPool, Ehc->PeriodOne, sizeof (EHC_QH));
+    Ehc->PeriodOne = NULL;
+  }
+
+  if (Ehc->ReclaimHead != NULL) {
+    UsbHcFreeMem (Ehc->MemPool, Ehc->ReclaimHead, sizeof (EHC_QH));
+    Ehc->ReclaimHead = NULL;
+  }
+
+  if (Ehc->ShortReadStop != NULL) {
+    UsbHcFreeMem (Ehc->MemPool, Ehc->ShortReadStop, sizeof (EHC_QTD));
+    Ehc->ShortReadStop = NULL;
+  }
+  return Status;
 }
 
 
@@ -244,7 +280,7 @@ EhcFreeSched (
     Ehc->MemPool = NULL;
   }
 
-  if (Ehc->PeriodFrameHost != NULL) {
+  if (Ehc->PeriodFrame != NULL) {
     PciIo = Ehc->PciIo;
     ASSERT (PciIo != NULL);
 
@@ -253,11 +289,15 @@ EhcFreeSched (
     PciIo->FreeBuffer (
              PciIo,
              EFI_SIZE_TO_PAGES (EFI_PAGE_SIZE),
-             Ehc->PeriodFrameHost
+             Ehc->PeriodFrame
              );
 
+    Ehc->PeriodFrame = NULL;
+  }
+
+  if (Ehc->PeriodFrameHost != NULL) {
+    FreePool (Ehc->PeriodFrameHost);
     Ehc->PeriodFrameHost = NULL;
-    Ehc->PeriodFrame     = NULL;
   }
 }
 
@@ -293,7 +333,7 @@ EhcLinkQhToAsync (
   Head->NextQh            = Qh;
 
   PciAddr = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Head, sizeof (EHC_QH));
-  Qh->QhHw.HorizonLink    = QH_LINK (PciAddr, EHC_TYPE_QH, FALSE);;
+  Qh->QhHw.HorizonLink    = QH_LINK (PciAddr, EHC_TYPE_QH, FALSE);
   PciAddr = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Qh, sizeof (EHC_QH));
   Head->QhHw.HorizonLink  = QH_LINK (PciAddr, EHC_TYPE_QH, FALSE);
 }
@@ -358,21 +398,18 @@ EhcLinkQhToPeriod (
   IN EHC_QH               *Qh
   )
 {
-  UINT32                  *Frames;
   UINTN                   Index;
   EHC_QH                  *Prev;
   EHC_QH                  *Next;
   EFI_PHYSICAL_ADDRESS    PciAddr;
-
-  Frames = Ehc->PeriodFrameHost;
 
   for (Index = 0; Index < EHC_FRAME_LEN; Index += Qh->Interval) {
     //
     // First QH can't be NULL because we always keep PeriodOne
     // heads on the frame list
     //
-    ASSERT (!EHC_LINK_TERMINATED (Frames[Index]));
-    Next  = EHC_ADDR (Ehc->High32bitAddr, Frames[Index]);
+    ASSERT (!EHC_LINK_TERMINATED (((UINT32*)Ehc->PeriodFrame)[Index]));
+    Next  = (EHC_QH*)((UINTN*)Ehc->PeriodFrameHost)[Index];
     Prev  = NULL;
 
     //
@@ -439,7 +476,8 @@ EhcLinkQhToPeriod (
     PciAddr = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Qh, sizeof (EHC_QH));
 
     if (Prev == NULL) {
-      Frames[Index] = QH_LINK (PciAddr, EHC_TYPE_QH, FALSE);
+      ((UINT32*)Ehc->PeriodFrame)[Index]     = QH_LINK (PciAddr, EHC_TYPE_QH, FALSE);
+      ((UINTN*)Ehc->PeriodFrameHost)[Index]  = (UINTN)Qh;
     } else {
       Prev->NextQh            = Qh;
       Prev->QhHw.HorizonLink  = QH_LINK (PciAddr, EHC_TYPE_QH, FALSE);
@@ -462,20 +500,17 @@ EhcUnlinkQhFromPeriod (
   IN EHC_QH               *Qh
   )
 {
-  UINT32                  *Frames;
   UINTN                   Index;
   EHC_QH                  *Prev;
   EHC_QH                  *This;
-
-  Frames = Ehc->PeriodFrameHost;
 
   for (Index = 0; Index < EHC_FRAME_LEN; Index += Qh->Interval) {
     //
     // Frame link can't be NULL because we always keep PeroidOne
     // on the frame list
     //
-    ASSERT (!EHC_LINK_TERMINATED (Frames[Index]));
-    This  = EHC_ADDR (Ehc->High32bitAddr, Frames[Index]);
+    ASSERT (!EHC_LINK_TERMINATED (((UINT32*)Ehc->PeriodFrame)[Index]));
+    This  = (EHC_QH*)((UINTN*)Ehc->PeriodFrameHost)[Index];
     Prev  = NULL;
 
     //
@@ -499,7 +534,8 @@ EhcUnlinkQhFromPeriod (
       //
       // Qh is the first entry in the frame
       //
-      Frames[Index] = Qh->QhHw.HorizonLink;
+      ((UINT32*)Ehc->PeriodFrame)[Index] = Qh->QhHw.HorizonLink;
+      ((UINTN*)Ehc->PeriodFrameHost)[Index] = (UINTN)Qh->NextQh;
     } else {
       Prev->NextQh            = Qh->NextQh;
       Prev->QhHw.HorizonLink  = Qh->QhHw.HorizonLink;

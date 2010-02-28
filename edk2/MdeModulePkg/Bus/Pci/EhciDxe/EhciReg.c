@@ -564,7 +564,7 @@ EhcInitHC (
   // Allocate the periodic frame and associated memeory
   // management facilities if not already done.
   //
-  if (Ehc->PeriodFrameHost != NULL) {
+  if (Ehc->PeriodFrame != NULL) {
     EhcFreeSched (Ehc);
   }
 
@@ -573,24 +573,20 @@ EhcInitHC (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  //
-  // 1. Program the CTRLDSSEGMENT register with the high 32 bit addr
-  //
-  EhcWriteOpReg (Ehc, EHC_CTRLDSSEG_OFFSET, Ehc->High32bitAddr);
 
   //
-  // 2. Clear USBINTR to disable all the interrupt. UEFI works by polling
+  // 1. Clear USBINTR to disable all the interrupt. UEFI works by polling
   //
   EhcWriteOpReg (Ehc, EHC_USBINTR_OFFSET, 0);
 
   //
-  // 3. Program periodic frame list, already done in EhcInitSched
-  // 4. Start the Host Controller
+  // 2. Program periodic frame list, already done in EhcInitSched
+  // 3. Start the Host Controller
   //
   EhcSetOpRegBit (Ehc, EHC_USBCMD_OFFSET, USBCMD_RUN);
 
   //
-  // 5. Set all ports routing to EHC
+  // 4. Set all ports routing to EHC
   //
   EhcSetOpRegBit (Ehc, EHC_CONFIG_FLAG_OFFSET, CONFIGFLAG_ROUTE_EHC);
 

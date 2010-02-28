@@ -218,15 +218,15 @@ UsbHcAllocMemFromBlock (
     NEXT_BIT (Byte, Bit);
   }
 
-  return Block->Buf + (StartByte * 8 + StartBit) * USBHC_MEM_UNIT;
+  return Block->BufHost + (StartByte * 8 + StartBit) * USBHC_MEM_UNIT;
 }
 
 /**
-  Get the pci memory address according to the allocated host memory address.
+  Calculate the corresponding pci bus address according to the Mem parameter.
 
   @param  Pool           The memory pool of the host controller.
-  @param  Mem            The memory to free.
-  @param  Size           The size of the memory to free.
+  @param  Mem            The pointer to host memory.
+  @param  Size           The size of the memory region.
 
   @return the pci memory address
 **/
@@ -251,7 +251,7 @@ UsbHcGetPciAddressForHostMem (
     // scan the memory block list for the memory block that
     // completely contains the allocated memory.
     //
-    if ((Block->Buf <= (UINT8 *) Mem) && (((UINT8 *) Mem + AllocSize) <= (Block->Buf + Block->BufLen))) {
+    if ((Block->BufHost <= (UINT8 *) Mem) && (((UINT8 *) Mem + AllocSize) <= (Block->BufHost + Block->BufLen))) {
       break;
     }
   }
@@ -522,12 +522,12 @@ UsbHcFreeMem (
     // scan the memory block list for the memory block that
     // completely contains the memory to free.
     //
-    if ((Block->Buf <= ToFree) && ((ToFree + AllocSize) <= (Block->Buf + Block->BufLen))) {
+    if ((Block->BufHost <= ToFree) && ((ToFree + AllocSize) <= (Block->BufHost + Block->BufLen))) {
       //
       // compute the start byte and bit in the bit array
       //
-      Byte  = ((ToFree - Block->Buf) / USBHC_MEM_UNIT) / 8;
-      Bit   = ((ToFree - Block->Buf) / USBHC_MEM_UNIT) % 8;
+      Byte  = ((ToFree - Block->BufHost) / USBHC_MEM_UNIT) / 8;
+      Bit   = ((ToFree - Block->BufHost) / USBHC_MEM_UNIT) % 8;
 
       //
       // reset associated bits in bit arry

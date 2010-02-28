@@ -139,8 +139,8 @@ struct _USB2_HC_DEV {
   //
   // Peroidic (interrupt) transfer schedule data:
   //
-  VOID                      *PeriodFrame;     // Mapped as common buffer
-  VOID                      *PeriodFrameHost;
+  VOID                      *PeriodFrame;     // the buffer pointed by this pointer is used to store pci bus address of the QH descriptor.
+  VOID                      *PeriodFrameHost; // the buffer pointed by this pointer is used to store host memory address of the QH descriptor.
   VOID                      *PeriodFrameMap;
 
   EHC_QH                    *PeriodOne;
@@ -152,7 +152,6 @@ struct _USB2_HC_DEV {
   UINT32                    HcStructParams; // Cache of HC structure parameter, EHC_HCSPARAMS_OFFSET
   UINT32                    HcCapParams;    // Cache of HC capability parameter, HCCPARAMS
   UINT32                    CapLen;         // Capability length
-  UINT32                    High32bitAddr;
 
   //
   // Misc
