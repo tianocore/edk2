@@ -2,7 +2,7 @@
 //
 //    Sample Setup formset.
 //
-//  Copyright (c) 2004 - 2008, Intel Corporation. <BR>
+//  Copyright (c) 2004 - 2010, Intel Corporation. <BR>
 //  All rights reserved. This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
 //  which accompanies this distribution.  The full text of the license may be found at
@@ -84,7 +84,7 @@ formset
   // Define a EFI variable Storage (EFI_IFR_VARSTORE_EFI)
   //
   efivarstore MyEfiVar,                           // Define referenced name in vfr
-    attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS,  // EFI variable attribures
+    attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,  // EFI variable attribures
     name      = STRING_TOKEN(STR_VAR_NAME),       // EFI variable name
     varsize   = 1,                                // Size of the EFI variable
     guid      = FORMSET_GUID;                     // EFI variable GUID
@@ -432,6 +432,10 @@ formset
       prompt = STRING_TOKEN(STR_GOTO_FORM3), //ThirdSetupPage  // this too has no end-op and basically it's a jump to a form ONLY
       help   = STRING_TOKEN(STR_GOTO_HELP);
 
+    goto 4,
+      prompt = STRING_TOKEN(STR_GOTO_FORM4), //FourthSetupPage  // this too has no end-op and basically it's a jump to a form ONLY
+      help   = STRING_TOKEN(STR_GOTO_HELP);
+
   endform;
 
   suppressif ideqval MyIfrNVData.BootOrderLarge == 0;
@@ -570,7 +574,62 @@ formset
 
   endform;
 
-  form formid = 4, title = STRING_TOKEN(STR_FORM3_TITLE);
+  formmap formid = 4,            
+    maptitle = STRING_TOKEN(STR_SAMPL_MAP_METHOD);  
+    mapguid  = FORMSET_GUID;
+    maptitle = STRING_TOKEN(STR_STANDARD_MAP_METHOD);  
+    mapguid  = EFI_HII_STANDARD_FORM_GUID;
+
+    oneof varid = MyIfrNVData.SerialPortNo,    
+      prompt  = STRING_TOKEN(STR_SERIAL_PORT),
+      help    = STRING_TOKEN(STR_ONE_OF_HELP),
+
+      read    cond (get(MyIfrNVData.SerialPortStatus) != 0 ? 0 : cond ((get(MyIfrNVData.SerialPortIo) & 0xF00) >> 0x8 == get(MyIfrNVData.SerialPortIrq) - 1 ? UNDEFINED : map (get(MyIfrNVData.SerialPortIo) : 0x3f8,1; 0x2F8,2; 0x3E8,3; 0x2E8,4;)));
+      write   set(MyIfrNVData.SerialPortStatus, pushthis != 0) AND set(MyIfrNVData.SerialPortIo, map (pushthis : 1,0x3F8; 2,0x2F8; 3,0x3E8; 4,0x2E8;)) AND set (MyIfrNVData.SerialPortIrq, map (pushthis: 1,4; 2,3; 3,4; 4,3;));
+      
+      option text = STRING_TOKEN(STR_SERIAL_PORT_DISABLE), value = 0x0, flags = DEFAULT;
+      option text = STRING_TOKEN(STR_SERIAL_PORT1), value = 0x1, flags = 0;
+      option text = STRING_TOKEN(STR_SERIAL_PORT2), value = 0x2, flags = 0;
+      option text = STRING_TOKEN(STR_SERIAL_PORT3), value = 0x3, flags = 0;
+      option text = STRING_TOKEN(STR_SERIAL_PORT4), value = 0x4, flags = 0;
+    endoneof;
+
+    grayoutif TRUE;
+      checkbox varid = MyIfrNVData.SerialPortStatus,
+        prompt   = STRING_TOKEN(STR_SERIAL_PORT_STATUS),
+        help     = STRING_TOKEN(STR_CHECK_BOX_HELP),
+      endcheckbox;
+    endif;
+
+    grayoutif TRUE;
+      suppressif ideqval MyIfrNVData.SerialPortStatus == 0;
+        oneof varid = MyIfrNVData.SerialPortIo,    
+          prompt  = STRING_TOKEN(STR_SERIAL_PORT_IO_ADDRESS),
+          help    = STRING_TOKEN(STR_ONE_OF_HELP),
+          
+          option text = STRING_TOKEN(STR_SERIAL_PORT1_IOADDR), value = 0x3F8, flags = DEFAULT;
+          option text = STRING_TOKEN(STR_SERIAL_PORT2_IOADDR), value = 0x2F8, flags = 0;
+          option text = STRING_TOKEN(STR_SERIAL_PORT3_IOADDR), value = 0x3E8, flags = 0;
+          option text = STRING_TOKEN(STR_SERIAL_PORT4_IOADDR), value = 0x2E8, flags = 0;
+        endoneof;
+      endif;
+    endif;
+
+    grayoutif TRUE;
+      suppressif ideqval MyIfrNVData.SerialPortStatus == 0;
+        oneof varid = MyIfrNVData.SerialPortIrq,    
+          prompt  = STRING_TOKEN(STR_SERIAL_PORT_IRQ),
+          help    = STRING_TOKEN(STR_ONE_OF_HELP),
+          
+          option text = STRING_TOKEN(STR_SERIAL_PORT13_IRQ), value = 0x4, flags = DEFAULT;
+          option text = STRING_TOKEN(STR_SERIAL_PORT24_IRQ), value = 0x3, flags = 0;
+        endoneof;
+      endif;
+    endif;
+
+    goto 1,
+      prompt = STRING_TOKEN(STR_GOTO_FORM1), //MainSetupPage
+      help   = STRING_TOKEN(STR_GOTO_HELP);
 
   endform;
 

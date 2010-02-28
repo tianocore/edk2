@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007 - 2009, Intel Corporation
+Copyright (c) 2007 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -26,6 +26,7 @@ Revision History:
 #define _NVDATASTRUC_H_
 
 #include <Guid/HiiPlatformSetupFormset.h>
+#include <Guid/HiiFormMapMethodGuid.h>
 
 #define FORMSET_GUID \
   { \
@@ -66,6 +67,10 @@ typedef struct {
   UINT8   NameValueVar0;
   UINT16  NameValueVar1;
   UINT16  NameValueVar2[20];
+  UINT8   SerialPortNo;
+  UINT8   SerialPortStatus;
+  UINT16  SerialPortIo;
+  UINT8   SerialPortIrq;
 } DRIVER_SAMPLE_CONFIGURATION;
 
 //
