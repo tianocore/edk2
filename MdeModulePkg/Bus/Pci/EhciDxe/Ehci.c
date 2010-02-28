@@ -969,7 +969,8 @@ EhcAsyncInterruptTransfer (
   //
   // Validate parameters
   //
-  if (!EHCI_IS_DATAIN (EndPointAddress)) {
+  if (!(EndPointAddress >= 0x01 && EndPointAddress <= 0x0F)
+    && !(EndPointAddress >= 0x81 && EndPointAddress <= 0x8F)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1118,7 +1119,8 @@ EhcSyncInterruptTransfer (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (!EHCI_IS_DATAIN (EndPointAddress)) {
+  if (!(EndPointAddress >= 0x01 && EndPointAddress <= 0x0F)
+    && !(EndPointAddress >= 0x81 && EndPointAddress <= 0x8F)) {
     return EFI_INVALID_PARAMETER;
   }
 

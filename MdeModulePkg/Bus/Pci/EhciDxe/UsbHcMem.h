@@ -139,11 +139,11 @@ UsbHcFreeMem (
   );
 
 /**
-  Get the pci memory address according to the allocated host memory address.
+  Calculate the corresponding pci bus address according to the Mem parameter.
 
   @param  Pool           The memory pool of the host controller.
-  @param  Mem            The memory to free.
-  @param  Size           The size of the memory to free.
+  @param  Mem            The pointer to host memory.
+  @param  Size           The size of the memory region.
 
   @return the pci memory address
 **/
