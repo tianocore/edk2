@@ -80,7 +80,7 @@
   gEfiPeiDecompressPpiGuid          ## SOMETIMES_PRODUCES
   gEfiPeiReadOnlyVariable2PpiGuid   ## SOMETIMES_CONSUMES
   gEfiPeiLoadFilePpiGuid            ## CONSUMES
-  gEfiPeiS3ResumePpiGuid            ## SOMETIMES_CONSUMES(Consumed on S3 boot path)
+  gEfiPeiS3Resume2PpiGuid           ## SOMETIMES_CONSUMES(Consumed on S3 boot path)
   gEfiPeiRecoveryModulePpiGuid      ## SOMETIMES_CONSUMES(Consumed on recovery boot path)
 
 [Guids]
