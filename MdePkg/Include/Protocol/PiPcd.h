@@ -67,7 +67,7 @@ VOID
 **/
 typedef
 UINT8
-(EFIAPI *EFI_PCD_PROTOCOL_GET_8)(
+(EFIAPI *EFI_PCD_PROTOCOL_GET_EX_8)(
   IN CONST EFI_GUID   *Guid,
   IN       UINTN      TokenNumber
 );
@@ -83,7 +83,7 @@ UINT8
 **/
 typedef
 UINT16
-(EFIAPI *EFI_PCD_PROTOCOL_GET_16)(
+(EFIAPI *EFI_PCD_PROTOCOL_GET_EX_16)(
   IN CONST  EFI_GUID  *Guid,
   IN        UINTN     TokenNumber
 );
@@ -99,7 +99,7 @@ UINT16
 **/
 typedef
 UINT32
-(EFIAPI *EFI_PCD_PROTOCOL_GET_32)(
+(EFIAPI *EFI_PCD_PROTOCOL_GET_EX_32)(
   IN CONST  EFI_GUID  *Guid,
   IN        UINTN     TokenNumber
 );
@@ -116,7 +116,7 @@ UINT32
 **/
 typedef
 UINT64
-(EFIAPI *EFI_PCD_PROTOCOL_GET_64)(
+(EFIAPI *EFI_PCD_PROTOCOL_GET_EX_64)(
   IN CONST  EFI_GUID  *Guid,
   IN        UINTN     TokenNumber
 );
@@ -133,7 +133,7 @@ UINT64
 **/
 typedef
 VOID *
-(EFIAPI *EFI_PCD_PROTOCOL_GET_POINTER)(
+(EFIAPI *EFI_PCD_PROTOCOL_GET_EX_POINTER)(
   IN CONST  EFI_GUID  *Guid,
   IN        UINTN     TokenNumber
 );
@@ -149,7 +149,7 @@ VOID *
 **/
 typedef
 BOOLEAN
-(EFIAPI *EFI_PCD_PROTOCOL_GET_BOOLEAN)(
+(EFIAPI *EFI_PCD_PROTOCOL_GET_EX_BOOLEAN)(
   IN CONST  EFI_GUID  *Guid,
   IN        UINTN     TokenNumber
 );
@@ -165,7 +165,7 @@ BOOLEAN
 **/
 typedef
 UINTN
-(EFIAPI *EFI_PCD_PROTOCOL_GET_SIZE)(
+(EFIAPI *EFI_PCD_PROTOCOL_GET_EX_SIZE)(
   IN CONST  EFI_GUID  *Guid,
   IN        UINTN     TokenNumber
 );
@@ -188,7 +188,7 @@ UINTN
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PCD_PROTOCOL_SET_8)(
+(EFIAPI *EFI_PCD_PROTOCOL_SET_EX_8)(
   IN CONST  EFI_GUID  *Guid,
   IN        UINTN     TokenNumber,
   IN        UINT8     Value
@@ -212,7 +212,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PCD_PROTOCOL_SET_16)(
+(EFIAPI *EFI_PCD_PROTOCOL_SET_EX_16)(
   IN CONST  EFI_GUID  *Guid,
   IN        UINTN     TokenNumber,
   IN        UINT16    Value
@@ -236,7 +236,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PCD_PROTOCOL_SET_32)(
+(EFIAPI *EFI_PCD_PROTOCOL_SET_EX_32)(
   IN CONST  EFI_GUID  *Guid,
   IN        UINTN     TokenNumber,
   IN        UINT32    Value
@@ -260,7 +260,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PCD_PROTOCOL_SET_64)(
+(EFIAPI *EFI_PCD_PROTOCOL_SET_EX_64)(
   IN CONST  EFI_GUID  *Guid,
   IN        UINTN     TokenNumber,
   IN        UINT64    Value
@@ -287,7 +287,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PCD_PROTOCOL_SET_POINTER)(
+(EFIAPI *EFI_PCD_PROTOCOL_SET_EX_POINTER)(
   IN CONST  EFI_GUID  *Guid,
   IN        UINTN     TokenNumber,
   IN OUT    UINTN     *SizeOfValue,
@@ -312,7 +312,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PCD_PROTOCOL_SET_BOOLEAN)(
+(EFIAPI *EFI_PCD_PROTOCOL_SET_EX_BOOLEAN)(
   IN CONST  EFI_GUID  *Guid,
   IN        UINTN     TokenNumber,
   IN        BOOLEAN   Value
@@ -402,19 +402,19 @@ EFI_STATUS
 
 typedef struct _EFI_PCD_PROTOCOL {
   EFI_PCD_PROTOCOL_SET_SKU              SetSku;
-  EFI_PCD_PROTOCOL_GET_8                Get8Ex;
-  EFI_PCD_PROTOCOL_GET_16               Get16Ex;
-  EFI_PCD_PROTOCOL_GET_32               Get32Ex;
-  EFI_PCD_PROTOCOL_GET_64               Get64Ex;
-  EFI_PCD_PROTOCOL_GET_POINTER          GetPtrEx;
-  EFI_PCD_PROTOCOL_GET_BOOLEAN          GetBoolEx;
-  EFI_PCD_PROTOCOL_GET_SIZE             GetSizeEx;
-  EFI_PCD_PROTOCOL_SET_8                Set8Ex;
-  EFI_PCD_PROTOCOL_SET_16               Set16Ex;
-  EFI_PCD_PROTOCOL_SET_32               Set32Ex;
-  EFI_PCD_PROTOCOL_SET_64               Set64Ex;
-  EFI_PCD_PROTOCOL_SET_POINTER          SetPtrEx;
-  EFI_PCD_PROTOCOL_SET_BOOLEAN          SetBoolEx;
+  EFI_PCD_PROTOCOL_GET_EX_8             Get8Ex;
+  EFI_PCD_PROTOCOL_GET_EX_16            Get16Ex;
+  EFI_PCD_PROTOCOL_GET_EX_32            Get32Ex;
+  EFI_PCD_PROTOCOL_GET_EX_64            Get64Ex;
+  EFI_PCD_PROTOCOL_GET_EX_POINTER       GetPtrEx;
+  EFI_PCD_PROTOCOL_GET_EX_BOOLEAN       GetBoolEx;
+  EFI_PCD_PROTOCOL_GET_EX_SIZE          GetSizeEx;
+  EFI_PCD_PROTOCOL_SET_EX_8             Set8Ex;
+  EFI_PCD_PROTOCOL_SET_EX_16            Set16Ex;
+  EFI_PCD_PROTOCOL_SET_EX_32            Set32Ex;
+  EFI_PCD_PROTOCOL_SET_EX_64            Set64Ex;
+  EFI_PCD_PROTOCOL_SET_EX_POINTER       SetPtrEx;
+  EFI_PCD_PROTOCOL_SET_EX_BOOLEAN       SetBoolEx;
   EFI_PCD_PROTOCOL_CALLBACK_ON_SET      CallbackOnSet;
   EFI_PCD_PROTOCOL_CANCEL_CALLBACK      CancelCallback;
   EFI_PCD_PROTOCOL_GET_NEXT_TOKEN       GetNextToken;
