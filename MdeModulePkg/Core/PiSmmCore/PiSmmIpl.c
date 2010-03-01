@@ -398,6 +398,13 @@ SmmCommunicationCommunicate (
   }
 
   //
+  // Don't allow call SmiManage() directly when SMRAM is closed or locked.
+  //
+  if (!mSmmAccess->OpenState || mSmmAccess->LockState) {
+    return EFI_INVALID_PARAMETER;
+  }
+ 
+  //
   // Save current InSmm state and set InSmm state to TRUE
   //
   OldInSmm = gSmmCorePrivate->InSmm;

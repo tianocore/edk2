@@ -245,7 +245,6 @@ SmmEntryPoint (
 {
   EFI_STATUS                  Status;
   EFI_SMM_COMMUNICATE_HEADER  *CommunicateHeader;
-  BOOLEAN                     OldInSmm;
 
   //
   // Update SMST using the context
@@ -264,9 +263,8 @@ SmmEntryPoint (
   }
 
   //
-  // Save current InSmm state and set InSmm state to TRUE, it will be used by SmmBase2 protocol
+  // Mark the InSmm flag as TRUE, it will be used by SmmBase2 protocol
   //
-  OldInSmm = gSmmCorePrivate->InSmm;
   gSmmCorePrivate->InSmm = TRUE;
 
   //
@@ -301,9 +299,9 @@ SmmEntryPoint (
   }
 
   //
-  // Restore original InSmm state as we are going to leave SMM
+  // Clear the InSmm flag as we are going to leave SMM
   //
-  gSmmCorePrivate->InSmm = OldInSmm;
+  gSmmCorePrivate->InSmm = FALSE;
 }
 
 /**
