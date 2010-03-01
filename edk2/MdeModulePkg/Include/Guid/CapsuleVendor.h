@@ -48,21 +48,6 @@ typedef struct {
   UINT32 Length;                     ///< Length of capsule data.
 } CAPSULE_HOB_INFO;
 
-///
-/// The variable describes the long mode buffer used by 32-bit Capsule PEIM
-/// to handle capsule above 4G.
-///
-#define EFI_CAPSULE_LONG_MODE_BUFFER_NAME L"CapsuleLongModeBuffer"
-
-///
-/// Data structure for base address and length of the long mode buffer used by 32-bit Capsule PEIM
-/// to handle capsule above 4G
-///
-typedef struct {
-  UINT64   Base;    ///< Base address of the long mode buffer.
-  UINT64   Length;  ///< Length of the long mode buffer.
-} EFI_CAPSULE_LONG_MODE_BUFFER;
-
 extern EFI_GUID gEfiCapsuleVendorGuid;
 
 #endif // #ifndef _EFI_CAPSULE_VENDOR_GUID_H_
