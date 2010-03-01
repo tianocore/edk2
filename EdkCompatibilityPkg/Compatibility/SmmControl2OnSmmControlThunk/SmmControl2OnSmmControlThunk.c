@@ -1,7 +1,7 @@
 /** @file
   SMM Control2 Protocol on SMM Control Protocol Thunk driver.
 
-  Copyright (c) 2009 Intel Corporation
+  Copyright (c) 2009 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -29,8 +29,8 @@ UINT8                      mDataPort;
   This function generates an SMI.
 
   @param[in]     This                The EFI_SMM_CONTROL2_PROTOCOL instance.
-  @param[in,out] CommandPort         The value written to the command port.
-  @param[in,out] DataPort            The value written to the data port.
+  @param[in, out] CommandPort         The value written to the command port.
+  @param[in, out] DataPort            The value written to the data port.
   @param[in]     Periodic            Optional mechanism to engender a periodic stream.
   @param[in]     ActivationInterval  Optional parameter to repeat at this period one
                                      time or, if the Periodic Boolean is set, periodically.
@@ -50,8 +50,9 @@ SmmControl2Trigger (
   IN UINTN                            ActivationInterval OPTIONAL
   )
 {
-  UINTN  ArgumentBufferSize = 0;
+  UINTN  ArgumentBufferSize;
 
+  ArgumentBufferSize = 0;
   if (CommandPort != NULL) {
     ArgumentBufferSize = 1;
   }

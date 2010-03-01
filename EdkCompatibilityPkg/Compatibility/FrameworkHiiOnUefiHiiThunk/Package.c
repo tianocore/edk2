@@ -1,7 +1,7 @@
-/**@file
+/** @file
   Implement protocol interface related to package registrations.
 
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2006 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -27,15 +27,16 @@ EFI_GUID mGuidBase = { 0x14f95e01, 0xd562, 0x432e, { 0x84, 0x4a, 0x95, 0xa4, 0x3
 
 
 /**
-  Get the number of package IFR and STRING packages in the package list passed in.
+  Get the number of Form, STRING and Font packages in the package list passed in.
 
   @param Packages             Package List.
   @param IfrPackageCount      Number of IFR Packages.
   @param StringPackageCount   Number of String Packages.
+  @param FontPackageCount     Number of Font Packages.
 
   @retval EFI_INVALID_PARAMETER If the Package List has package with type of 
                                 EFI_HII_PACKAGE_KEYBOARD_LAYOUT, EFI_HII_PACKAGE_FONTS, EFI_HII_PACKAGE_IMAGES.
-  @reval  EFI_SUCCESS           Successfully get the number of IFR and STRING package.
+  @retval EFI_SUCCESS           Successfully get the number of IFR and STRING package.
                                  
 
 **/
@@ -159,7 +160,7 @@ UpdatePackListWithOnlyIfrPack (
 
   If the Package Header is not of EFI_HII_FONT type, then ASSERT.
 
-  @param   The Package header of the Framework Font Package.
+  @param   PackHeader Pointer to Framework Font Package.
   
   @return  The size of the UEFI Simple Font Package.
   
@@ -191,9 +192,9 @@ GetUefiSimpleFontPackSize (
 
   If memory allocation fails, then ASSERT.
 
-  @param FwFontPack        Framework Font Package.
+  @param PackHeader        Pointer to Framework Font Package header.
 
-  @reture UEFI Simple Font Package.
+  @return UEFI Simple Font Package.
 **/
 EFI_HII_SIMPLE_FONT_PACKAGE_HDR *
 FrameworkFontPackToUefiSimpliedFont (
@@ -450,7 +451,7 @@ FindStringPackAndUpdatePackListWithOnlyIfrPack (
   @param This                         The EFI_HII_PROTOCOL context data. Only used
                                       to call HiiRemovePack.
   @param Private                      The HII THUNK driver context data.
-  @param Package                      Package List.
+  @param Packages                     Package List.
   @param Handle                       On output, a FRAMEWORK_EFI_HII_HANDLE number is
                                       returned.
 

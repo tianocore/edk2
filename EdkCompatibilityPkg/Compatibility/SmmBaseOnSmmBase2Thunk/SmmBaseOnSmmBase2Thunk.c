@@ -35,90 +35,6 @@
 #include <Library/UefiLib.h>
 #include <Library/UefiRuntimeLib.h>
 
-//
-// SMM Base Protocol function ptoyotypes
-//
-EFI_STATUS
-EFIAPI
-SmmBaseRegister (
-  IN      EFI_SMM_BASE_PROTOCOL     *This,
-  IN      EFI_DEVICE_PATH_PROTOCOL  *FilePath,
-  IN      VOID                      *SourceBuffer,
-  IN      UINTN                     SourceSize,
-  OUT     EFI_HANDLE                *ImageHandle,
-  IN      BOOLEAN                   LegacyIA32Binary
-  );
-
-EFI_STATUS
-EFIAPI
-SmmBaseUnregister (
-  IN      EFI_SMM_BASE_PROTOCOL     *This,
-  IN      EFI_HANDLE                ImageHandle
-  );
-
-EFI_STATUS
-EFIAPI
-SmmBaseCommunicate (
-  IN      EFI_SMM_BASE_PROTOCOL     *This,
-  IN      EFI_HANDLE                ImageHandle,
-  IN OUT  VOID                      *CommunicationBuffer,
-  IN OUT  UINTN                     *BufferSize
-  );
-
-EFI_STATUS
-EFIAPI
-SmmBaseRegisterCallback (
-  IN      EFI_SMM_BASE_PROTOCOL         *This,
-  IN      EFI_HANDLE                    SmmImageHandle,
-  IN      EFI_SMM_CALLBACK_ENTRY_POINT  CallbackAddress,
-  IN      BOOLEAN                       MakeLast,
-  IN      BOOLEAN                       FloatingPointSave
-  );
-
-EFI_STATUS
-EFIAPI
-SmmBaseInSmm (
-  IN      EFI_SMM_BASE_PROTOCOL     *This,
-  OUT     BOOLEAN                   *InSmm
-  );
-
-EFI_STATUS
-EFIAPI
-SmmBaseSmmAllocatePool (
-  IN      EFI_SMM_BASE_PROTOCOL     *This,
-  IN      EFI_MEMORY_TYPE           PoolType,
-  IN      UINTN                     Size,
-  OUT     VOID                      **Buffer
-  );
-
-EFI_STATUS
-EFIAPI
-SmmBaseSmmFreePool (
-  IN      EFI_SMM_BASE_PROTOCOL     *This,
-  IN      VOID                      *Buffer
-  );
-
-EFI_STATUS
-EFIAPI
-SmmBaseGetSmstLocation (
-  IN      EFI_SMM_BASE_PROTOCOL     *This,
-  OUT     EFI_SMM_SYSTEM_TABLE      **Smst
-  );
-
-///
-/// SMM Base Protocol instance
-///
-EFI_SMM_BASE_PROTOCOL  mSmmBase = {
-  SmmBaseRegister,
-  SmmBaseUnregister,
-  SmmBaseCommunicate,
-  SmmBaseRegisterCallback,
-  SmmBaseInSmm,
-  SmmBaseSmmAllocatePool,
-  SmmBaseSmmFreePool,
-  SmmBaseGetSmstLocation
-};
-
 SMMBASETHUNK_COMMUNICATION_DATA  mCommunicationData = {
   EFI_SMM_BASE_THUNK_COMMUNICATION_GUID,
   sizeof (SMMBASE_FUNCTION_DATA)
@@ -160,7 +76,7 @@ SmmBaseHelperService (
 
   mCommunicationData.FunctionData.Status = EFI_UNSUPPORTED;
 
-  if ((mCommunicationData.FunctionData.Function != SMMBASE_COMMUNICATE) && IsInSmm()) {
+  if ((mCommunicationData.FunctionData.Function != SmmBaseFunctionCommunicate) && IsInSmm()) {
     ///
     /// If in SMM mode, directly call services in SMM Base Helper.
     ///
@@ -220,7 +136,7 @@ SmmBaseRegister (
     return EFI_UNSUPPORTED;
   }
 
-  mCommunicationData.FunctionData.Function = SMMBASE_REGISTER;
+  mCommunicationData.FunctionData.Function = SmmBaseFunctionRegister;
   mCommunicationData.FunctionData.Args.Register.FilePath = FilePath;
   mCommunicationData.FunctionData.Args.Register.SourceBuffer = SourceBuffer;
   mCommunicationData.FunctionData.Args.Register.SourceSize = SourceSize;
@@ -249,7 +165,7 @@ SmmBaseUnregister (
   IN      EFI_HANDLE                ImageHandle
   )
 {
-  mCommunicationData.FunctionData.Function = SMMBASE_UNREGISTER;
+  mCommunicationData.FunctionData.Function = SmmBaseFunctionUnregister;
   mCommunicationData.FunctionData.Args.UnRegister.ImageHandle = ImageHandle;
 
   SmmBaseHelperService ();
@@ -264,8 +180,8 @@ SmmBaseUnregister (
 
   @param[in]      This                  Protocol instance pointer.
   @param[in]      ImageHandle           The handle of the registered driver.
-  @param[in,out]  CommunicationBuffer   Pointer to the buffer to convey into SMRAM.
-  @param[in,out]  BufferSize            The size of the data buffer being passed in.
+  @param[in, out]  CommunicationBuffer   Pointer to the buffer to convey into SMRAM.
+  @param[in, out]  BufferSize            The size of the data buffer being passed in.
                                         On exit, the size of data being returned.
                                         Zero if the handler does not wish to reply with any data.
 
@@ -285,7 +201,7 @@ SmmBaseCommunicate (
   /// Note this is a runtime interface
   ///
 
-  mCommunicationData.FunctionData.Function = SMMBASE_COMMUNICATE;
+  mCommunicationData.FunctionData.Function = SmmBaseFunctionCommunicate;
   mCommunicationData.FunctionData.Args.Communicate.ImageHandle = ImageHandle;
   mCommunicationData.FunctionData.Args.Communicate.CommunicationBuffer = CommunicationBuffer;
   mCommunicationData.FunctionData.Args.Communicate.SourceSize = BufferSize;
@@ -327,7 +243,7 @@ SmmBaseRegisterCallback (
     return EFI_UNSUPPORTED;
   }
 
-  mCommunicationData.FunctionData.Function = SMMBASE_REGISTER_CALLBACK;
+  mCommunicationData.FunctionData.Function = SmmBaseFunctionRegisterCallback;
   mCommunicationData.FunctionData.Args.RegisterCallback.SmmImageHandle = SmmImageHandle;
   mCommunicationData.FunctionData.Args.RegisterCallback.CallbackAddress = CallbackAddress;
   mCommunicationData.FunctionData.Args.RegisterCallback.MakeLast = MakeLast;
@@ -387,7 +303,7 @@ SmmBaseSmmAllocatePool (
   OUT     VOID                      **Buffer
   )
 {
-  mCommunicationData.FunctionData.Function = SMMBASE_ALLOCATE_POOL;
+  mCommunicationData.FunctionData.Function = SmmBaseFunctionAllocatePool;
   mCommunicationData.FunctionData.Args.AllocatePool.PoolType = PoolType;
   mCommunicationData.FunctionData.Args.AllocatePool.Size = Size;
   mCommunicationData.FunctionData.Args.AllocatePool.Buffer = Buffer;
@@ -415,7 +331,7 @@ SmmBaseSmmFreePool (
   IN      VOID                      *Buffer
   )
 {
-  mCommunicationData.FunctionData.Function = SMMBASE_FREE_POOL;
+  mCommunicationData.FunctionData.Function = SmmBaseFunctionFreePool;
   mCommunicationData.FunctionData.Args.FreePool.Buffer = Buffer;
 
   SmmBaseHelperService ();
@@ -429,7 +345,7 @@ SmmBaseSmmFreePool (
   global variable so that the SMST can be invoked in subsequent callbacks.
 
   @param[in]  This                  Protocol instance pointer.
-  @param[in]  Smst                  Pointer to the SMST.
+  @param[out] Smst                  Pointer to the SMST.
 
   @retval     EFI_SUCCESS           The operation was successful
   @retval     EFI_INVALID_PARAMETER Smst was invalid.
@@ -472,6 +388,20 @@ SmmBaseAddressChangeEvent (
 {
   EfiConvertPointer (0x0, (VOID **) &mSmmCommunication);
 }
+
+///
+/// SMM Base Protocol instance
+///
+EFI_SMM_BASE_PROTOCOL  mSmmBase = {
+  SmmBaseRegister,
+  SmmBaseUnregister,
+  SmmBaseCommunicate,
+  SmmBaseRegisterCallback,
+  SmmBaseInSmm,
+  SmmBaseSmmAllocatePool,
+  SmmBaseSmmFreePool,
+  SmmBaseGetSmstLocation
+};
 
 /**
   Entry Point for SMM Base Protocol on SMM Base2 Protocol Thunk driver.

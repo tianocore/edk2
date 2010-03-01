@@ -1,7 +1,7 @@
 /** @file
   Function and Macro defintions for to extract default values from UEFI Form package.
 
-  Copyright (c) 2008, Intel Corporation
+  Copyright (c) 2008 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -32,8 +32,6 @@ extern CONST EFI_HII_CONFIG_ROUTING_PROTOCOL      *mHiiConfigRoutingProtocol;
   @param Value                    The input value.
   @param Offset                   The offset in Node->Buffer for the update.
   @param Width                    The length of the Value.
-  
-  @retval VOID
 
 **/
 VOID
@@ -52,27 +50,27 @@ SetNodeBuffer (
 
 
 /**
-  Reset Question to its default value.
+  Get question default value, and set it into the match var storage.
 
   Note Framework 0.92's HII Implementation does not support for default value for these opcodes:
   EFI_IFR_ORDERED_LIST_OP:
   EFI_IFR_PASSWORD_OP:
   EFI_IFR_STRING_OP:
 
-  @param  FormSet                FormSet data structure.
+  @param  Question               Question to be set to its default value.
   @param  DefaultId              The Class of the default.
+  @param  VarStoreId             Id of var storage. 
+  @param  Node                   Var storage buffer to store the got default value.
 
   @retval EFI_SUCCESS            Question is reset to default value.
 
 **/
 EFI_STATUS
 GetQuestionDefault (
-  IN FORM_BROWSER_FORMSET             *FormSet,
-  IN FORM_BROWSER_FORM                *Form,
   IN FORM_BROWSER_STATEMENT           *Question,
   IN UINT16                           DefaultId,
   IN UINT16                           VarStoreId,
-  OUT UEFI_IFR_BUFFER_STORAGE_NODE        *Node
+  OUT UEFI_IFR_BUFFER_STORAGE_NODE    *Node
   )
 {
   EFI_STATUS              Status;
@@ -138,8 +136,8 @@ GetQuestionDefault (
       while (!IsNull (&Question->OptionListHead, Link)) {
         Option = QUESTION_OPTION_FROM_LINK (Link);
 
-        if (((DefaultId == EFI_HII_DEFAULT_CLASS_STANDARD) && (Option->Flags & EFI_IFR_OPTION_DEFAULT)) ||
-            ((DefaultId == EFI_HII_DEFAULT_CLASS_MANUFACTURING) && (Option->Flags & EFI_IFR_OPTION_DEFAULT_MFG))
+        if (((DefaultId == EFI_HII_DEFAULT_CLASS_STANDARD) && ((Option->Flags & EFI_IFR_OPTION_DEFAULT) == EFI_IFR_OPTION_DEFAULT)) ||
+            ((DefaultId == EFI_HII_DEFAULT_CLASS_MANUFACTURING) && ((Option->Flags & EFI_IFR_OPTION_DEFAULT_MFG) == EFI_IFR_OPTION_DEFAULT_MFG))
            ) {
           CopyMem (HiiValue, &Option->Value, sizeof (EFI_HII_VALUE));
 
@@ -160,8 +158,8 @@ GetQuestionDefault (
       //
       // Checkbox could only provide Standard and Manufacturing default
       //
-      if (((DefaultId == EFI_HII_DEFAULT_CLASS_STANDARD) && (Question->Flags & EFI_IFR_CHECKBOX_DEFAULT)) ||
-          ((DefaultId == EFI_HII_DEFAULT_CLASS_MANUFACTURING) && (Question->Flags & EFI_IFR_CHECKBOX_DEFAULT_MFG))
+      if (((DefaultId == EFI_HII_DEFAULT_CLASS_STANDARD) && ((Question->Flags & EFI_IFR_CHECKBOX_DEFAULT) == EFI_IFR_CHECKBOX_DEFAULT)) ||
+          ((DefaultId == EFI_HII_DEFAULT_CLASS_MANUFACTURING) && ((Question->Flags & EFI_IFR_CHECKBOX_DEFAULT_MFG) == EFI_IFR_CHECKBOX_DEFAULT_MFG))
          ) {
         HiiValue->Value.b = TRUE;
       } else {
@@ -178,22 +176,23 @@ GetQuestionDefault (
 
 
 /**
-  Reset Questions in a Form to their default value.
+  Extract the default values from all questions in the input Form, 
+  and set default value into the matched var storage.
 
-  @param  FormSet                FormSet data structure.
   @param  Form                   The Form which to be reset.
   @param  DefaultId              The Class of the default.
+  @param  VarStoreId             Id of var storage. 
+  @param  Node                   Var storage buffer to store the got default value.
 
   @retval EFI_SUCCESS            The function completed successfully.
 
 **/
 EFI_STATUS
 ExtractFormDefault (
-  IN FORM_BROWSER_FORMSET             *FormSet,
   IN FORM_BROWSER_FORM                *Form,
   IN UINT16                           DefaultId,
   IN UINT16                           VarStoreId,
-  OUT UEFI_IFR_BUFFER_STORAGE_NODE        *Node
+  OUT UEFI_IFR_BUFFER_STORAGE_NODE    *Node
   )
 {
   EFI_STATUS              Status;
@@ -206,7 +205,7 @@ ExtractFormDefault (
     //
     // Reset Question to its default value
     //
-    Status = GetQuestionDefault (FormSet, Form, Question, DefaultId, VarStoreId, Node);
+    Status = GetQuestionDefault (Question, DefaultId, VarStoreId, Node);
     if (EFI_ERROR (Status)) {
       continue;
     }
@@ -222,10 +221,7 @@ ExtractFormDefault (
   UEFI_IFR_BUFFER_STORAGE_NODE. The Node itself
   will be freed too.
 
-  @param  FormSet                FormSet data structure.
-  @param  DefaultId              The Class of the default.
-
-  @retval   VOID
+  @param  Node                Var storage buffer.
 
 **/
 VOID
@@ -245,10 +241,10 @@ DestroyDefaultNode (
   The result is in the a instance of UEFI_IFR_BUFFER_STORAGE_NODE
   allocated by this function. It is inserted to the link list.
   
-  @param  DefaultStore            The Default Store.
-  @param  Storage                   The Storage.
-  @param  FormSet                  The Form Set.
-  @param  UefiDefaultsListHead The head of link list for the output.
+  @param  DefaultStore           The Default Store.
+  @param  Storage                The Storage.
+  @param  FormSet                The Form Set.
+  @param  UefiDefaultsListHead   The head of link list for the output.
 
   @retval   EFI_SUCCESS          Successful.
   
@@ -283,7 +279,7 @@ GetBufferTypeDefaultIdAndStorageId (
   while (!IsNull (&FormSet->FormListHead, Link)) {
     Form = FORM_BROWSER_FORM_FROM_LINK (Link);
 
-    Status = ExtractFormDefault (FormSet, Form, DefaultStore->DefaultId, Storage->VarStoreId, Node);
+    Status = ExtractFormDefault (Form, DefaultStore->DefaultId, Storage->VarStoreId, Node);
     ASSERT_EFI_ERROR (Status);
 
     Link = GetNextNode (&FormSet->FormListHead, Link);
@@ -338,14 +334,13 @@ GetBufferTypeDefaultId (
 
 
 /**
-  Get the default value for Buffer Type storage from the first FormSet
-  in the Package List specified by a EFI_HII_HANDLE.
+  Get the default value for Buffer Type storage from the FormSet in ThunkContext.
   
   The results can be multiple instances of UEFI_IFR_BUFFER_STORAGE_NODE. 
   They are inserted to the link list.
   
-  @param  UefiHiiHandle           The handle for the package list.
-  @param  UefiDefaultsListHead The head of link list for the output.
+  @param  ThunkContext  Hii thunk context.
+  @param  UefiDefaults  The head of link list for the output.
 
   @retval   EFI_SUCCESS          Successful.
   
@@ -384,20 +379,19 @@ UefiIfrGetBufferTypeDefaults (
   Convert the UEFI Buffer Type default values to a Framework HII default
   values specified by a EFI_HII_VARIABLE_PACK_LIST structure.
   
-  @param  ListHead                  The link list of UEFI_IFR_BUFFER_STORAGE_NODE
-                                              which contains the default values retrived from
-                                              a UEFI form set.
-  @param  DefaultMask            The default mask.
-                                             The valid values are EFI_IFR_FLAG_DEFAULT
-                                             and EFI_IFR_FLAG_MANUFACTURING.
-                                            UEFI spec only map EFI_IFR_FLAG_DEFAULT and EFI_IFR_FLAG_MANUFACTURING 
-                                            from specification to valid default class.
+  @param  ListHead             The link list of UEFI_IFR_BUFFER_STORAGE_NODE
+                               which contains the default values retrived from a UEFI form set.
+  @param  DefaultMask          The default mask.
+                               The valid values are EFI_IFR_FLAG_DEFAULT and EFI_IFR_FLAG_MANUFACTURING.
+                               UEFI spec only map EFI_IFR_FLAG_DEFAULT and EFI_IFR_FLAG_MANUFACTURING 
+                               from specification to valid default class.
+  @param  UefiFormSetDefaultVarStoreId
+                               ID of the default varstore in FormSet.
   @param  VariablePackList     The output default value in a format defined in Framework.
-                                             
 
-  @retval   EFI_SUCCESS                       Successful.
+  @retval   EFI_SUCCESS                Successful.
   @retval   EFI_INVALID_PARAMETER      The default mask is not EFI_IFR_FLAG_DEFAULT or 
-                                                           EFI_IFR_FLAG_MANUFACTURING.
+                                       EFI_IFR_FLAG_MANUFACTURING.
 **/
 EFI_STATUS
 UefiDefaultsToFwDefaults (
@@ -522,11 +516,9 @@ UefiDefaultsToFwDefaults (
   Free up all buffer allocated for the link list of UEFI_IFR_BUFFER_STORAGE_NODE.
     
   @param  ListHead                  The link list of UEFI_IFR_BUFFER_STORAGE_NODE
-                                              which contains the default values retrived from
-                                              a UEFI form set.
-                                             
+                                    which contains the default values retrived from
+                                    a UEFI form set.
 
-  @retval   VOID
 **/
 VOID
 FreeDefaultList (

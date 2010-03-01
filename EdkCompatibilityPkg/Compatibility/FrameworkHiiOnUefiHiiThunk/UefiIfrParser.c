@@ -25,6 +25,15 @@ BOOLEAN          mInScopeGrayOut;
 EFI_GUID  mFrameworkHiiCompatibilityGuid = EFI_IFR_FRAMEWORK_GUID;
 extern EFI_GUID mTianoHiiIfrGuid;
 
+/**
+  Find the question's OneOfOptionMap list in FormSet 
+  based on the input question Id. 
+  
+  @param FormSet     FormSet context.
+  @param QuestionId  Unique ID to specicy the question in FormSet.
+  
+  @return the found OneOfOptionMap list. If not found, NULL will return.
+**/
 LIST_ENTRY *
 GetOneOfOptionMapEntryListHead (
   IN CONST FORM_BROWSER_FORMSET  *FormSet,
@@ -47,6 +56,12 @@ GetOneOfOptionMapEntryListHead (
   return NULL;
 }
 
+/**
+  Free OneOfOption map list.
+  
+  @param OneOfOptionMapListHead Pointer to list header of OneOfOptionMap list.
+
+**/
 VOID
 DestoryOneOfOptionMap (
   IN LIST_ENTRY     *OneOfOptionMapListHead

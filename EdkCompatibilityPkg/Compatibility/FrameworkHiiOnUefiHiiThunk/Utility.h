@@ -1,8 +1,8 @@
-/**@file
+/** @file
 
   This file contains utility functions by HII Thunk Modules.
   
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2006 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _HII_THUNK_UTILITY_H
-#define _HII_THUNK_UTILITY_H
+#ifndef _HII_THUNK_UTILITY_H_
+#define _HII_THUNK_UTILITY_H_
 
 /**
   
@@ -111,73 +111,121 @@ ExtractGuidFromHiiHandle (
 ;
 
 /**
-  Find the UefiHiiHandle based on a Framework HII Handle returned by
-  the HII Thunk to Framework HII code.
+  Find the corressponding UEFI HII Handle from a Framework HII Handle given.
 
-  @param Private                        The pointer to the private data of Hii Thunk.
-  @param FwHiiHandle     Framework HII Handle returned by  the HII Thunk to Framework HII code.
+  @param Private      The HII Thunk Module Private context.
+  @param FwHiiHandle  The Framemwork HII Handle.
 
-  @retval  NULL                           If Framework HII Handle passed in does not have matching UEFI HII handle.
-  @retval  !NULL                         If the match is found.
-  
+  @return NULL        If Framework HII Handle is invalid.
+  @return The corresponding UEFI HII Handle.
 **/
 EFI_HII_HANDLE
 FwHiiHandleToUefiHiiHandle (
-  IN CONST HII_THUNK_PRIVATE_DATA *Private,
+  IN CONST HII_THUNK_PRIVATE_DATA      *Private,
   IN FRAMEWORK_EFI_HII_HANDLE          FwHiiHandle
   );
 
+/**
+  Find the corressponding HII Thunk Context from a Framework HII Handle given.
+
+  @param Private      The HII Thunk Module Private context.
+  @param FwHiiHandle  The Framemwork HII Handle.
+
+  @return NULL        If Framework HII Handle is invalid.
+  @return The corresponding HII Thunk Context.
+**/
 HII_THUNK_CONTEXT *
 FwHiiHandleToThunkContext (
-  IN CONST HII_THUNK_PRIVATE_DATA *Private,
+  IN CONST HII_THUNK_PRIVATE_DATA      *Private,
   IN FRAMEWORK_EFI_HII_HANDLE          FwHiiHandle
   );
 
+/**
+  Find the corressponding HII Thunk Context from a UEFI HII Handle given.
+
+  @param Private        The HII Thunk Module Private context.
+  @param UefiHiiHandle  The UEFI HII Handle.
+
+  @return NULL        If UEFI HII Handle is invalid.
+  @return The corresponding HII Thunk Context.
+**/
 HII_THUNK_CONTEXT *
 UefiHiiHandleToThunkContext (
-  IN CONST HII_THUNK_PRIVATE_DATA *Private,
+  IN CONST HII_THUNK_PRIVATE_DATA     *Private,
   IN EFI_HII_HANDLE                   UefiHiiHandle
   );
 
+/**
+  Find the corressponding HII Thunk Context from a Tag GUID.
+
+  @param Private      The HII Thunk Module Private context.
+  @param Guid         The Tag GUID.
+
+  @return NULL        No HII Thunk Context matched the Tag GUID.
+  @return The corresponding HII Thunk Context.
+**/
 HII_THUNK_CONTEXT *
 TagGuidToIfrPackThunkContext (
   IN CONST HII_THUNK_PRIVATE_DATA *Private,
   IN CONST EFI_GUID                   *Guid
   );
 
+/**
+  This function create a HII_THUNK_CONTEXT for the input UEFI HiiHandle
+  that is created when a package list registered by a module calling 
+  EFI_HII_DATABASE_PROTOCOL.NewPackageList. 
+  This function records the PackageListGuid of EFI_HII_PACKAGE_LIST_HEADER 
+  into the TagGuid of the created HII_THUNK_CONTEXT.
+
+  @param UefiHiiHandle  The UEFI HII Handle.
+  
+  @return the new created Hii thunk context.
+
+**/
 HII_THUNK_CONTEXT *
 CreateThunkContextForUefiHiiHandle (
   IN  EFI_HII_HANDLE             UefiHiiHandle
- );
+  );
 
+/**
+  Clean up the HII Thunk Context for a UEFI HII Handle.
+
+  @param Private        The HII Thunk Module Private context.
+  @param UefiHiiHandle  The UEFI HII Handle.
+
+**/
 VOID
 DestroyThunkContextForUefiHiiHandle (
   IN HII_THUNK_PRIVATE_DATA     *Private,
   IN EFI_HII_HANDLE             UefiHiiHandle
- );
+  );
 
+/**
+  Get the number of HII Package for a Package type.
+
+  @param PackageListHeader      The Package List.
+  @param PackageType            The Package Type.
+
+  @return The number of Package for given type.
+**/
 UINTN
 GetPackageCountByType (
   IN CONST EFI_HII_PACKAGE_LIST_HEADER     *PackageListHeader,
   IN       UINT8                           PackageType
   );
 
-EFI_STATUS
-CreateQuestionIdMap (
-  IN    OUT HII_THUNK_CONTEXT  *ThunkContext
-  );
+/**
+  Creat a Thunk Context.
 
-VOID
-GetAttributesOfFirstFormSet (
-  IN    OUT HII_THUNK_CONTEXT  *ThunkContext
-  );
+  ASSERT if no FormSet Opcode is found.
 
-LIST_ENTRY *
-GetMapEntryListHead (
-  IN CONST HII_THUNK_CONTEXT  *ThunkContext,
-  IN       UINT16             VarStoreId
-  );
+  @param Private             The HII Thunk Private Context.
+  @param StringPackageCount  The String package count.
+  @param IfrPackageCount     The IFR Package count.
 
+  @return  A newly created Thunk Context.
+  @retval  NULL  No resource to create a new Thunk Context.
+**/
 HII_THUNK_CONTEXT *
 CreateThunkContext (
   IN  HII_THUNK_PRIVATE_DATA      *Private,
@@ -185,33 +233,55 @@ CreateThunkContext (
   IN  UINTN                       IfrPackageCount
   );
 
+/**
+  Destroy the Thunk Context and free up all resource.
+
+  @param ThunkContext        The HII Thunk Private Context to be freed.
+
+**/
 VOID
 DestroyThunkContext (
   IN HII_THUNK_CONTEXT          *ThunkContext
   );
 
-VOID
-DestoryOneOfOptionMap (
-  IN LIST_ENTRY     *OneOfOptionMapListHead
-  );
+/**
+  Get FormSet GUID.
 
+  ASSERT if no FormSet Opcode is found.
+
+  @param Packages             Form Framework Package.
+  @param FormSetGuid          Return the FormSet Guid.
+
+**/
 VOID
 GetFormSetGuid (
   IN  EFI_HII_PACKAGE_HEADER  *Package,
   OUT EFI_GUID                *FormSetGuid
-  )
-;
+  );
 
+/**
+  Get the Form Package from a Framework Package List.
+
+  @param Packages               Framework Package List.
+
+  @return The Form Package Header found.
+**/
 EFI_HII_PACKAGE_HEADER *
 GetIfrPackage (
   IN CONST EFI_HII_PACKAGES               *Packages
-  )
-;
+  );
 
+/**
+  Parse the Form Package and build a FORM_BROWSER_FORMSET structure.
+
+  @param  UefiHiiHandle          PackageList Handle
+
+  @return A pointer to FORM_BROWSER_FORMSET.
+
+**/
 FORM_BROWSER_FORMSET *
 ParseFormSet (
   IN EFI_HII_HANDLE   UefiHiiHandle
-  )
-;
+  );
 
 #endif

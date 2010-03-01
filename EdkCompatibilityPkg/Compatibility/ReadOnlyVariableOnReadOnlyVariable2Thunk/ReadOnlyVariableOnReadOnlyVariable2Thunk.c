@@ -10,7 +10,7 @@ UEFI PI Spec supersedes Intel's Framework Specs.
 
 This module can't be used together with ReadOnlyVariable2ToReadOnlyVariableThunk module.
 
-Copyright (c) 2006 - 2008 Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -28,80 +28,18 @@ Module Name:
 #include <Library/DebugLib.h>
 #include <Library/PeiServicesLib.h>
 
-//
-// Function Prototypes
-//
-EFI_STATUS
-EFIAPI
-PeiGetVariable (
-  IN  EFI_PEI_SERVICES  **PeiServices,
-  IN  CHAR16            *VariableName,
-  IN  EFI_GUID          *VendorGuid,
-  OUT UINT32            *Attributes OPTIONAL,
-  IN  OUT UINTN         *DataSize,
-  OUT VOID              *Data
-  );
-
-EFI_STATUS
-EFIAPI
-PeiGetNextVariableName (
-  IN EFI_PEI_SERVICES  **PeiServices,
-  IN OUT UINTN         *VariableNameSize,
-  IN OUT CHAR16        *VariableName,
-  IN OUT EFI_GUID      *VendorGuid
-  );
-
-//
-// Module globals
-//
-EFI_PEI_READ_ONLY_VARIABLE_PPI mVariablePpi = {
-  PeiGetVariable,
-  PeiGetNextVariableName
-};
-
-EFI_PEI_PPI_DESCRIPTOR     mPpiListVariable = {
-  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
-  &gEfiPeiReadOnlyVariablePpiGuid,
-  &mVariablePpi
-};
-
-
-
-/**
-  Standard entry point of a PEIM.
-
-  @param FfsHeadher  The FFS file header
-  @param PeiServices  General purpose services available to every PEIM.
-
-  @retval EFI_SUCCESS If the gEfiPeiReadOnlyVariablePpiGuid interface could be successfully installed.
-
-**/
-EFI_STATUS
-EFIAPI
-PeimInitializeReadOnlyVariable (
-  IN EFI_PEI_FILE_HANDLE     FfsHeader,
-  IN CONST EFI_PEI_SERVICES  **PeiServices
-  )
-{
-  //
-  //Developer should make sure ReadOnlyVariableToReadOnlyVariable2 module is not present. If so, the call chain will form a
-  // infinite loop: ReadOnlyVariable -> ReadOnlyVariable2 -> ReadOnlyVariable -> ....
-  //
-  //
-  // Publish the variable capability to other modules
-  //
-  return (*PeiServices)->InstallPpi (PeiServices, &mPpiListVariable);
-}
-
 /**
   Provide the read variable functionality of the variable services.
 
-  @param  PeiServices           General purpose services available to every PEIM.
-  @param  VariableName          The variable name
-  @param  VendorGuid            The vendor's GUID
-  @param  Attributes            Pointer to the attribute
-  @param  DataSize              Size of data
-  @param  Data                  Pointer to data
+  @param[in]  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
+  @param[in]  VariableName   A NULL-terminated Unicode string that is the name of the vendor's variable.
+  @param[in]  VendorGuid     A unique identifier for the vendor.
+  @param[out] Attributes     This OPTIONAL parameter may be either NULL or
+                             a pointer to the location in which to return
+                             the attributes bitmask for the variable.
+  @param[in, out]  DataSize   On input, the size in bytes of the return Data buffer.
+                             On output, the size of data returned in Data.
+  @param[out] Data           The buffer to return the contents of the variable.
 
   @retval EFI_SUCCESS           The interface could be successfully installed
   @retval EFI_NOT_FOUND         The variable could not be discovered
@@ -144,13 +82,14 @@ PeiGetVariable (
 /**
   Provide the get next variable functionality of the variable services.
 
-  @param  PeiServices           General purpose services available to every PEIM.
-  @param  VariabvleNameSize     The variable name's size.
-  @param  VariableName          A pointer to the variable's name.
-  @param  VariableGuid          A pointer to the EFI_GUID structure.
-  @param  VariableNameSize      Size of the variable name
-  @param  VariableName          The variable name
-  @param  VendorGuid            The vendor's GUID
+  @param[in]     PeiServices       An indirect pointer to the PEI Services Table published by the PEI Foundation.
+  @param[in, out] VariableNameSize  The size of the VariableName buffer.
+  @param[in, out] VariableName      On input, supplies the last VariableName that was
+                                   returned by GetNextVariableName(). On output, returns the Null-terminated
+                                   Unicode string of the current variable.
+  @param[in, out] VendorGuid        On input, supplies the last VendorGuid that was
+                                   returned by GetNextVariableName(). On output, returns the VendorGuid
+                                   of the current variable.
 
   @retval EFI_SUCCESS           The interface could be successfully installed
   @retval EFI_NOT_FOUND         The variable could not be discovered
@@ -183,4 +122,44 @@ PeiGetNextVariableName (
                               VariableName,
                               VendorGuid
                               );
+}
+
+//
+// Module globals
+//
+EFI_PEI_READ_ONLY_VARIABLE_PPI mVariablePpi = {
+  PeiGetVariable,
+  PeiGetNextVariableName
+};
+
+EFI_PEI_PPI_DESCRIPTOR     mPpiListVariable = {
+  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+  &gEfiPeiReadOnlyVariablePpiGuid,
+  &mVariablePpi
+};
+
+/**
+  Standard entry point of a PEIM.
+
+  @param FileHandle   Handle of the file being invoked.
+  @param PeiServices  General purpose services available to every PEIM.
+
+  @retval EFI_SUCCESS If the gEfiPeiReadOnlyVariablePpiGuid interface could be successfully installed.
+
+**/
+EFI_STATUS
+EFIAPI
+PeimInitializeReadOnlyVariable (
+  IN EFI_PEI_FILE_HANDLE     FileHandle,
+  IN CONST EFI_PEI_SERVICES  **PeiServices
+  )
+{
+  //
+  //Developer should make sure ReadOnlyVariableToReadOnlyVariable2 module is not present. If so, the call chain will form a
+  // infinite loop: ReadOnlyVariable -> ReadOnlyVariable2 -> ReadOnlyVariable -> ....
+  //
+  //
+  // Publish the variable capability to other modules
+  //
+  return (*PeiServices)->InstallPpi (PeiServices, &mPpiListVariable);
 }

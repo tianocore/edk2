@@ -2,7 +2,7 @@
   Language Library implementation that provides functions for language conversion
   between ISO 639-2 and RFC 4646 language codes.
 
-  Copyright (c) 2009, Intel Corporation<BR>
+  Copyright (c) 2009 - 2010, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -406,7 +406,7 @@ ConvertLanguagesIso639ToRfc4646 (
   // The length of ISO 639-2 lanugage codes string must be multiple of 3
   //
   Length = AsciiStrLen (Iso639Languages);
-  if (Length % 3) {
+  if (Length % 3 != 0) {
     return NULL;
   }
   

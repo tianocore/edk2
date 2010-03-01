@@ -1,4 +1,4 @@
-/**
+/** @file
 Module produce FV2 on top of FV.
 
 UEFI PI specification supersedes Inte's Framework Specification.
@@ -9,7 +9,7 @@ these two conditions are true:
 1) Framework module producing FV is present
 2) And the rest of modules on the platform consume FV2
 
-Copyright (c) 2006 - 2008 Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -164,8 +164,8 @@ Fv2SetVolumeAttributes (
   ReadFile() is used to retrieve any file from a firmware volume
   during the DXE phase. The actual binary encoding of the file in
   the firmware volume media may be in any arbitrary format as long
-  as it does the following: ?It is accessed using the Firmware
-  Volume Protocol. ?The image that is returned follows the image
+  as it does the following: It is accessed using the Firmware
+  Volume Protocol. The image that is returned follows the image
   format defined in Code Definitions: PI Firmware File Format.
   If the input value of Buffer==NULL, it indicates the caller is
   requesting only that the type, attributes, and size of the
@@ -238,7 +238,7 @@ Fv2SetVolumeAttributes (
 
   @retval EFI_OUT_OF_RESOURCES  An allocation failure occurred.
 
-  @retavl EFI_NOT_FOUND   Name was not found in the firmware
+  @retval EFI_NOT_FOUND   Name was not found in the firmware
                           volume.
 
   @retval EFI_DEVICE_ERROR  A hardware error occurred when
@@ -265,11 +265,10 @@ Fv2ReadFile (
   ReadSection() is used to retrieve a specific section from a file
   within a firmware volume. The section returned is determined
   using a depth-first, left-to-right search algorithm through all
-  sections found in the specified file. See
-   ????Firmware File Sections???? on page 9 for more details about
-  sections. The output buffer is specified by a double indirection
-  of the Buffer parameter. The input value of Buffer is used to
-  determine if the output buffer is caller allocated or is
+  sections found in the specified file. The output buffer is 
+  specified by a double indirection of the Buffer parameter. 
+  The input value of Buffer is used to determine 
+  if the output buffer is caller allocated or is
   dynamically allocated by ReadSection(). If the input value of
   Buffer!=NULL, it indicates that the output buffer is caller
   allocated. In this case, the input value of *BufferSize
@@ -392,10 +391,10 @@ Fv2ReadSection (
   undefined. Type EFI_TPL is defined in RaiseTPL() in the UEFI 2.0
   specification.
 
-  @param This Indicates the EFI_FIRMWARE_VOLUME2_PROTOCOL
-              instance. NumberOfFiles Indicates the number of
-              elements in the array pointed to by FileData.
+  @param This           Indicates the EFI_FIRMWARE_VOLUME2_PROTOCOL instance. 
 
+  @param NumberOfFiles  Indicates the number of elements in the 
+                        array pointed to by FileData.
 
   @param WritePolicy  Indicates the level of reliability for the
                       write in the event of a power failure or
@@ -467,7 +466,9 @@ Fv2WriteFile (
 
 
   @param This Indicates the EFI_FIRMWARE_VOLUME2_PROTOCOL
-              instance. Key Pointer to a caller-allocated buffer
+              instance. 
+
+  @param Key  Pointer to a caller-allocated buffer
               that contains implementation-specific data that is
               used to track where to begin the search for the
               next file. The size of the buffer must be at least
@@ -674,7 +675,15 @@ FIRMWARE_VOLUME2_PRIVATE_DATA gFirmwareVolume2PrivateDataTemplate = {
 //
 // Module globals
 //
+/**
+  This notification function is invoked when an instance of the
+  EFI_FIRMWARE_VOLUME_PROTOCOL is produced. It installs another instance of the
+  EFI_FIRMWARE_VOLUME2_PROTOCOL on the same handle.
 
+  @param  Event                 The event that occured
+  @param  Context               Context of event. Not used in this nofication function.
+
+**/
 VOID
 EFIAPI
 Fv2NotificationEvent (
@@ -958,7 +967,7 @@ Fv2SetVolumeAttributes (
   EFI_STATUS                     Status;
   UINTN                          Shift;
 
-  if (*FvAttributes & (EFI_FV2_READ_LOCK_STATUS | EFI_FV2_WRITE_LOCK_STATUS)) {
+  if ((*FvAttributes & (EFI_FV2_READ_LOCK_STATUS | EFI_FV2_WRITE_LOCK_STATUS)) != 0) {
     //
     // Framework FV protocol does not support EFI_FV2_READ_LOCK_* | EFI_FV2_WRITE_LOCK_*
     //
@@ -990,8 +999,8 @@ Fv2SetVolumeAttributes (
   ReadFile() is used to retrieve any file from a firmware volume
   during the DXE phase. The actual binary encoding of the file in
   the firmware volume media may be in any arbitrary format as long
-  as it does the following: ?It is accessed using the Firmware
-  Volume Protocol. ?The image that is returned follows the image
+  as it does the following: It is accessed using the Firmware
+  Volume Protocol. The image that is returned follows the image
   format defined in Code Definitions: PI Firmware File Format.
   If the input value of Buffer==NULL, it indicates the caller is
   requesting only that the type, attributes, and size of the
@@ -1064,7 +1073,7 @@ Fv2SetVolumeAttributes (
 
   @retval EFI_OUT_OF_RESOURCES  An allocation failure occurred.
 
-  @retavl EFI_NOT_FOUND   Name was not found in the firmware
+  @retval EFI_NOT_FOUND   Name was not found in the firmware
                           volume.
 
   @retval EFI_DEVICE_ERROR  A hardware error occurred when
@@ -1108,11 +1117,9 @@ Fv2ReadFile (
   ReadSection() is used to retrieve a specific section from a file
   within a firmware volume. The section returned is determined
   using a depth-first, left-to-right search algorithm through all
-  sections found in the specified file. See
-   ????Firmware File Sections???? on page 9 for more details about
-  sections. The output buffer is specified by a double indirection
-  of the Buffer parameter. The input value of Buffer is used to
-  determine if the output buffer is caller allocated or is
+  sections found in the specified file.The output buffer is specified 
+  by a double indirection of the Buffer parameter. The input value of Buffer 
+  is used to determine if the output buffer is caller allocated or is
   dynamically allocated by ReadSection(). If the input value of
   Buffer!=NULL, it indicates that the output buffer is caller
   allocated. In this case, the input value of *BufferSize
@@ -1252,9 +1259,10 @@ Fv2ReadSection (
   undefined. Type EFI_TPL is defined in RaiseTPL() in the UEFI 2.0
   specification.
 
-  @param This Indicates the EFI_FIRMWARE_VOLUME2_PROTOCOL
-              instance. NumberOfFiles Indicates the number of
-              elements in the array pointed to by FileData.
+  @param This           Indicates the EFI_FIRMWARE_VOLUME2_PROTOCOL instance. 
+
+  @param NumberOfFiles  Indicates the number of
+                        elements in the array pointed to by FileData.
 
 
   @param WritePolicy  Indicates the level of reliability for the
@@ -1341,7 +1349,9 @@ Fv2WriteFile (
 
 
   @param This Indicates the EFI_FIRMWARE_VOLUME2_PROTOCOL
-              instance. Key Pointer to a caller-allocated buffer
+              instance. 
+
+  @param Key  Pointer to a caller-allocated buffer
               that contains implementation-specific data that is
               used to track where to begin the search for the
               next file. The size of the buffer must be at least

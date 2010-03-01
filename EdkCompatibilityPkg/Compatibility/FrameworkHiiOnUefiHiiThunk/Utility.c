@@ -1,8 +1,8 @@
-/**@file
+/** @file
 
   This file contains the keyboard processing code to the HII database.
 
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2006 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -303,8 +303,8 @@ FwHiiHandleToThunkContext (
 /**
   Find the corressponding HII Thunk Context from a UEFI HII Handle given.
 
-  @param Private      The HII Thunk Module Private context.
-  @param UEFIHiiHandle  The UEFI HII Handle.
+  @param Private        The HII Thunk Module Private context.
+  @param UefiHiiHandle  The UEFI HII Handle.
 
   @return NULL        If UEFI HII Handle is invalid.
   @return The corresponding HII Thunk Context.
@@ -369,15 +369,15 @@ TagGuidToIfrPackThunkContext (
 /**
   Clean up the HII Thunk Context for a UEFI HII Handle.
 
-  @param Private      The HII Thunk Module Private context.
-  @param UEFIHiiHandle  The UEFI HII Handle.
+  @param Private        The HII Thunk Module Private context.
+  @param UefiHiiHandle  The UEFI HII Handle.
 
 **/
 VOID
 DestroyThunkContextForUefiHiiHandle (
   IN HII_THUNK_PRIVATE_DATA     *Private,
   IN EFI_HII_HANDLE             UefiHiiHandle
- )
+  )
 {
   HII_THUNK_CONTEXT     *ThunkContext;
 
@@ -389,16 +389,21 @@ DestroyThunkContextForUefiHiiHandle (
 
 
 /**
-  This function create a HII_THUNK_CONTEXT for a package list registered
-  by a module calling EFI_HII_DATABASE_PROTOCOL.NewPackageList. It records
-  the PackageListGuid in EFI_HII_PACKAGE_LIST_HEADER in the TagGuid in 
-  HII_THUNK_CONTEXT created. This TagGuid will be used as a key to s
+  This function create a HII_THUNK_CONTEXT for the input UEFI HiiHandle
+  that is created when a package list registered by a module calling 
+  EFI_HII_DATABASE_PROTOCOL.NewPackageList. 
+  This function records the PackageListGuid of EFI_HII_PACKAGE_LIST_HEADER 
+  into the TagGuid of the created HII_THUNK_CONTEXT.
+
+  @param UefiHiiHandle  The UEFI HII Handle.
+  
+  @return the new created Hii thunk context.
 
 **/
 HII_THUNK_CONTEXT *
 CreateThunkContextForUefiHiiHandle (
   IN  EFI_HII_HANDLE             UefiHiiHandle
- )
+  )
 {
   EFI_STATUS            Status;
   EFI_GUID              PackageGuid;
@@ -551,7 +556,7 @@ GetFormSetGuid (
 
   @param Private             The HII Thunk Private Context.
   @param StringPackageCount  The String package count.
-  @param FormSetGuid         The IFR Package count.
+  @param IfrPackageCount     The IFR Package count.
 
   @return  A newly created Thunk Context.
   @retval  NULL  No resource to create a new Thunk Context.

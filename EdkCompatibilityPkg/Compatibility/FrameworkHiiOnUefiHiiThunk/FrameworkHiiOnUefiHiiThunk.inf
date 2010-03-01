@@ -36,6 +36,7 @@
 
 [Sources]
   SetupBrowser.c
+  SetupBrowser.h
   HiiHandle.c
   HiiHandle.h
   ConfigAccess.c

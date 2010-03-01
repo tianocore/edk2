@@ -1,7 +1,7 @@
-/**@file
+/** @file
   This file contains the form processing code to the HII database.
 
-Copyright (c) 2006 - 2008 Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -289,7 +289,7 @@ GetPackageData (
   EFI_HII_PACKAGE_HEADER        *Package;
   UINT32                        Offset;
   UINT32                        PackageListLength;
-  EFI_HII_PACKAGE_HEADER        PackageHeader = {0, 0};
+  EFI_HII_PACKAGE_HEADER        PackageHeader;
 
   ASSERT(HiiPackageList != NULL);
 
@@ -297,6 +297,7 @@ GetPackageData (
     return EFI_INVALID_PARAMETER;
   }
 
+  ZeroMem (&PackageHeader, sizeof (PackageHeader));
   Package = NULL;
   Index   = 0;
   Offset  = sizeof (EFI_HII_PACKAGE_LIST_HEADER);
@@ -407,13 +408,15 @@ LocateLabel (
   with value as the same as the input Label in the Formset registered with UefiHiiHandle. The FormSet GUID 
   and Form ID is returned if such Label is found.
 
+  @param Handle       Uefi Hii Handle to be searched.
+  @param Label        The first Label ID to be found.
+  @param FormsetGuid  The matched FormSet GUID.
+  @param FormId       The matched Form ID.
   
   @retval EFI_INVALID_PARAMETER If UefiHiiHandle is not a valid handle.
-  @retval EFI_NOT_FOUND   The package list identified by UefiHiiHandle deos not contain FormSet or
-                                         There is no Form ID with value Label found in all Form Sets in the pacakge
-                                         list.
-                                         
-  @retval EFI_SUCCESS       The first found Form ID is returned in FormId.
+  @retval EFI_NOT_FOUND         The package list identified by UefiHiiHandle deos not contain FormSet or
+                                Form ID with value Label found in all Form Sets in the pacakge list.
+  @retval EFI_SUCCESS           The first found Form ID is returned in FormId.
 **/
 EFI_STATUS
 LocateFormId (

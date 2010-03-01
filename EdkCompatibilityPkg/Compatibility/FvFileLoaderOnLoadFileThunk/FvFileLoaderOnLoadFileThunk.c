@@ -9,7 +9,7 @@ This module is used on platform when both of these two conditions are true:
 1) Framework module consumes EFI_PEI_FV_FILE_LOADER_PPI is present.
 2) The platform has PI modules that produce EFI_PEI_LOAD_FILE_PPI.
 
-Copyright (c) 2008, Intel Corporation
+Copyright (c) 2008 - 2010, Intel Corporation
 
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -32,16 +32,16 @@ Module Name:
 
   Wrap the call to PI's EFI_PEI_LOAD_FILE_PPI.
 
-  @param This                  A pointer to EFI_PEI_FV_FILE_LOADER_PPI.
-  @param FileHeader         The pointer to the file header to be loaded by the Pe/Coff loader.
+  @param This           A pointer to EFI_PEI_FV_FILE_LOADER_PPI.
+  @param FfsHeader      Pointer to the FFS header of the file to load.
   @param ImageAddress   The loaded address of the Image.
-  @param ImageSize         Pointer to the size of the loaded image.
-  @param EntryPoint          Pointer to the entry point of the image.
+  @param ImageSize      Pointer to the size of the loaded image.
+  @param EntryPoint     Pointer to the entry point of the image.
 
-  @retval  EFI_SUCCESS                  The image was loaded successfully.
+  @retval  EFI_SUCCESS           The image was loaded successfully.
   @retval  EFI_OUT_OF_RESOURCE   There was not enought memory.
   @retval  EFI_INVALID_PARAMETER The contents of the FFS file did not contain a valid PE/COFF image that could be loaded.
---*/  
+**/  
 EFI_STATUS
 EFIAPI
 FrameworkLoadFile (
@@ -65,12 +65,12 @@ EFI_PEI_PPI_DESCRIPTOR     mPpiFrameworkLoadFile = {
 /**
   Standard entry point of a PEIM.
 
-  @param FfsHeadher  The FFS file header
+  @param FfsHeader    The FFS file header
   @param PeiServices  General purpose services available to every PEIM.
 
   @retval EFI_SUCCESS If the gEfiPeiReadOnlyVariablePpiGuid interface could be successfully installed.
 
---*/
+**/
 EFI_STATUS
 EFIAPI
 InitPeim (
@@ -92,16 +92,16 @@ InitPeim (
 
   Wrap the call to PI's EFI_PEI_LOAD_FILE_PPI.
 
-  @param This                  A pointer to EFI_PEI_FV_FILE_LOADER_PPI.
-  @param FileHeader         The pointer to the file header to be loaded by the Pe/Coff loader.
+  @param This           A pointer to EFI_PEI_FV_FILE_LOADER_PPI.
+  @param FfsHeader      The pointer to the file header to be loaded by the Pe/Coff loader.
   @param ImageAddress   The loaded address of the Image.
-  @param ImageSize         Pointer to the size of the loaded image.
-  @param EntryPoint          Pointer to the entry point of the image.
+  @param ImageSize      Pointer to the size of the loaded image.
+  @param EntryPoint     Pointer to the entry point of the image.
 
-  @retval  EFI_SUCCESS                  The image was loaded successfully.
+  @retval  EFI_SUCCESS           The image was loaded successfully.
   @retval  EFI_OUT_OF_RESOURCE   There was not enought memory.
   @retval  EFI_INVALID_PARAMETER The contents of the FFS file did not contain a valid PE/COFF image that could be loaded.
---*/  
+**/  
 EFI_STATUS
 EFIAPI
 FrameworkLoadFile (

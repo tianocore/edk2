@@ -1,7 +1,7 @@
-/**@file
+/** @file
   This file implements the protocol functions related to string package.
   
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2006 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -135,7 +135,7 @@ UpdateString (
                          identifier, indicating the language to print. A string consisting of
                          all spaces indicates that the string is applicable to all languages.
   @param Handle          The handle of the language pack to which the string is to be added.
-  @param Token           The string token assigned to the string.
+  @param Reference       The string token assigned to the string.
   @param NewString       The string to be added.
 
 
@@ -143,7 +143,6 @@ UpdateString (
   @retval EFI_INVALID_PARAMETER   The Handle was unknown. The string is not created or updated in the
                                   the string package.
 **/
-
 EFI_STATUS
 EFIAPI
 HiiNewString (
@@ -292,7 +291,7 @@ HiiThunkGetString (
   IN     STRING_REF                 Token,
   IN     BOOLEAN                    Raw,
   IN     CHAR16                     *LanguageString,
-  IN OUT UINTN                      *BufferLengthTemp,
+  IN OUT UINTN                      *BufferLength,
   OUT    EFI_STRING                 StringBuffer
   )
 {
@@ -370,7 +369,7 @@ HiiThunkGetString (
                                  UefiHiiHandle,
                                  Token,
                                  StringBuffer,
-                                 BufferLengthTemp,
+                                 BufferLength,
                                  NULL
                                  );
     FreePool (BestLanguage);
@@ -405,9 +404,10 @@ Done:
   @param This            A pointer to the EFI_HII_PROTOCOL instance.
   @param Handle          The HII handle on which the string resides.
   @param Token           The string token assigned to the string.
-  @param Raw             If TRUE, the string is returned unedited in the internal storage format described
-                         above. If false, the string returned is edited by replacing <cr> with <space>
-                         and by removing special characters such as the <wide> prefix.
+  @param Index           On input, the offset into the string where the line is to start.
+                         On output, the index is updated to point to beyond the last character returned
+                         in the call.
+  @param LineWidth       The maximum width of the line in units of narrow glyphs.
   @param LanguageString  Pointer to a NULL-terminated string containing a single ISO 639-2 language
                          identifier, indicating the language to print. If the LanguageString is empty (starts
                          with a NULL), the default system language will be used to determine the language.

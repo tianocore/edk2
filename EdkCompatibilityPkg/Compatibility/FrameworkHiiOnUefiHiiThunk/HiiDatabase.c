@@ -1,8 +1,8 @@
-/**@file
+/** @file
 Framework to UEFI 2.1 HII Thunk. The driver consume UEFI HII protocols
 to produce a Framework HII protocol.
 
-Copyright (c) 2008, Intel Corporation
+Copyright (c) 2008 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -318,9 +318,9 @@ HiiFindHandles (
                         registered on the handle. The routine will not return the three-spaces language identifier used in 
                         other functions to indicate non-language-specific strings.
 
-  @reval EFI_SUCCESS            LanguageString was correctly returned.
+  @retval EFI_SUCCESS            LanguageString was correctly returned.
  
-  @reval EFI_INVALID_PARAMETER The Handle was unknown.
+  @retval EFI_INVALID_PARAMETER  The Handle was unknown.
 **/
 EFI_STATUS
 EFIAPI
@@ -451,8 +451,8 @@ HiiGetSupportedSecondaryLanguages (
                          but returns a NULL LanguageString if there are no secondary languages associated with the input Handle and 
                          PrimaryLanguage pair. Type EFI_STRING is defined in String.
   
-  @reval EFI_SUCCESS            LanguageString was correctly returned.
-  @reval EFI_INVALID_PARAMETER  The Handle was unknown.
+  @retval EFI_SUCCESS            LanguageString was correctly returned.
+  @retval EFI_INVALID_PARAMETER  The Handle was unknown.
 **/
 EFI_STATUS
 EFIAPI

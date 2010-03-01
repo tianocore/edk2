@@ -14,7 +14,7 @@ that produce PCI CFG2 can also produce PCI CFG by setting Pcd Feature Flag gEfiI
 to FALSE.
 
 
-Copyright (c) 2006 - 2008 Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -160,18 +160,16 @@ EFI_PEI_PPI_DESCRIPTOR     mPpiListPciCfg = {
 
   Standard PEIM entry point.
 
-  @param FfsHeadher   The FFS file header
-  @param PeiServices   General purpose services available to every PEIM.
+  @param FileHandle   Handle of the file being invoked.
+  @param PeiServices  General purpose services available to every PEIM.
 
+  @retval EFI_SUCCESS The interface could be successfully installed.
 
-  @retval EFI_SUCCESS if the interface could be successfully
-                                    installed
-
---*/
+**/
 EFI_STATUS
 EFIAPI
 PeimInitializePciCfg (
-  IN EFI_PEI_FILE_HANDLE     FfsHeader,
+  IN EFI_PEI_FILE_HANDLE     FileHandle,
   IN CONST EFI_PEI_SERVICES  **PeiServices
   )
 {

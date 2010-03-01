@@ -4,7 +4,7 @@
   Intel's Framework CPU I/O Protocol is replaced by CPU I/O 2 Protocol in PI.
   This module produces PI CPU I/O 2 Protocol on top of Framework CPU I/O Protocol.
 
-Copyright (c) 2009, Intel Corporation
+Copyright (c) 2009 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -38,7 +38,7 @@ EFI_CPU_IO2_PROTOCOL mCpuIo2 = {
   @param[in]       Address      The base address of the memory operation.
   @param[in]       Count        The number of memory operations to perform. The number of bytes moved
                                 is Width size * Count, starting at Address.
-  @param[out]      Buffer       The destination buffer to store the results.
+  @param[in, out]   Buffer       The destination buffer to store the results.
 
   @retval EFI_SUCCESS           The data was read from or written to the EFI system.
   @retval EFI_INVALID_PARAMETER Width is invalid for this EFI system. Or Buffer is NULL.
@@ -53,7 +53,7 @@ CpuMemoryServiceRead (
   IN     EFI_CPU_IO_PROTOCOL_WIDTH         Width,
   IN     UINT64                            Address,
   IN     UINTN                             Count,
-  OUT    VOID                              *Buffer
+  IN OUT VOID                              *Buffer
   )
 {
   return mCpuIo->Mem.Read (
@@ -73,7 +73,7 @@ CpuMemoryServiceRead (
   @param[in]       Address      The base address of the memory operation.
   @param[in]       Count        The number of memory operations to perform. The number of bytes moved
                                 is Width size * Count, starting at Address.
-  @param[in]       Buffer       The source buffer from which to write data.
+  @param[in, out]   Buffer       The source buffer from which to write data.
 
   @retval EFI_SUCCESS           The data was read from or written to the EFI system.
   @retval EFI_INVALID_PARAMETER Width is invalid for this EFI system. Or Buffer is NULL.
@@ -88,7 +88,7 @@ CpuMemoryServiceWrite (
   IN     EFI_CPU_IO_PROTOCOL_WIDTH         Width,
   IN     UINT64                            Address,
   IN     UINTN                             Count,
-  IN     VOID                              *Buffer
+  IN OUT VOID                              *Buffer
   )
 {
   return mCpuIo->Mem.Write (
@@ -109,7 +109,7 @@ CpuMemoryServiceWrite (
                                 for aligning the Address if required. 
   @param[in]       Count        The number of I/O operations to perform. The number of bytes moved
                                 is Width size * Count, starting at Address.
-  @param[out]      Buffer       The destination buffer to store the results.
+  @param[in, out]   Buffer       The destination buffer to store the results.
 
   @retval EFI_SUCCESS           The data was read from or written to the EFI system.
   @retval EFI_INVALID_PARAMETER Width is invalid for this EFI system. Or Buffer is NULL.
@@ -124,7 +124,7 @@ CpuIoServiceRead (
   IN     EFI_CPU_IO_PROTOCOL_WIDTH         Width,
   IN     UINT64                            Address,
   IN     UINTN                             Count,
-  OUT    VOID                              *Buffer
+  IN OUT VOID                              *Buffer
   )
 {
   return mCpuIo->Io.Read (
@@ -145,7 +145,7 @@ CpuIoServiceRead (
                                 for aligning the Address if required. 
   @param[in]       Count        The number of I/O operations to perform. The number of bytes moved
                                 is Width size * Count, starting at Address.
-  @param[in]       Buffer       The source buffer from which to write data.
+  @param[in, out]   Buffer       The source buffer from which to write data.
 
   @retval EFI_SUCCESS           The data was read from or written to the EFI system.
   @retval EFI_INVALID_PARAMETER Width is invalid for this EFI system. Or Buffer is NULL.
@@ -160,7 +160,7 @@ CpuIoServiceWrite (
   IN     EFI_CPU_IO_PROTOCOL_WIDTH         Width,
   IN     UINT64                            Address,
   IN     UINTN                             Count,
-  IN     VOID                              *Buffer
+  IN OUT VOID                              *Buffer
   )
 {
   return mCpuIo->Io.Write (

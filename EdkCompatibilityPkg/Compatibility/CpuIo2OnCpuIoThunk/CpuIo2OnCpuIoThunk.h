@@ -1,7 +1,7 @@
 /** @file
   Internal include file for the CPU I/O 2 Protocol thunk driver.
 
-Copyright (c) 2009, Intel Corporation
+Copyright (c) 2009 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -29,7 +29,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param[in]       Address      The base address of the memory operation.
   @param[in]       Count        The number of memory operations to perform. The number of bytes moved
                                 is Width size * Count, starting at Address.
-  @param[out]      Buffer       The destination buffer to store the results.
+  @param[in, out]      Buffer       The destination buffer to store the results.
 
   @retval EFI_SUCCESS           The data was read from or written to the EFI system.
   @retval EFI_INVALID_PARAMETER Width is invalid for this EFI system. Or Buffer is NULL.
@@ -55,7 +55,7 @@ CpuMemoryServiceRead (
   @param[in]       Address      The base address of the memory operation.
   @param[in]       Count        The number of memory operations to perform. The number of bytes moved
                                 is Width size * Count, starting at Address.
-  @param[in]       Buffer       The source buffer from which to write data.
+  @param[in, out]       Buffer       The source buffer from which to write data.
 
   @retval EFI_SUCCESS           The data was read from or written to the EFI system.
   @retval EFI_INVALID_PARAMETER Width is invalid for this EFI system. Or Buffer is NULL.
@@ -82,7 +82,7 @@ CpuMemoryServiceWrite (
                                 for aligning the Address if required. 
   @param[in]       Count        The number of I/O operations to perform. The number of bytes moved
                                 is Width size * Count, starting at Address.
-  @param[out]      Buffer       The destination buffer to store the results.
+  @param[in, out]      Buffer       The destination buffer to store the results.
 
   @retval EFI_SUCCESS           The data was read from or written to the EFI system.
   @retval EFI_INVALID_PARAMETER Width is invalid for this EFI system. Or Buffer is NULL.
@@ -109,7 +109,7 @@ CpuIoServiceRead (
                                 for aligning the Address if required. 
   @param[in]       Count        The number of I/O operations to perform. The number of bytes moved
                                 is Width size * Count, starting at Address.
-  @param[in]       Buffer       The source buffer from which to write data.
+  @param[in, out]       Buffer       The source buffer from which to write data.
 
   @retval EFI_SUCCESS           The data was read from or written to the EFI system.
   @retval EFI_INVALID_PARAMETER Width is invalid for this EFI system. Or Buffer is NULL.

@@ -2,7 +2,7 @@
   Translate the DataHub records via EFI_DATA_HUB_PROTOCOL to Smbios recorders 
   via EFI_SMBIOS_PROTOCOL.
   
-Copyright (c) 2009, Intel Corporation
+Copyright (c) 2009 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -117,7 +117,7 @@ SmbiosProcessDataRecord (
                         SMBIOS_STRUCTURE_NODE_SIGNATURE
                         );
 
-      if (Conversion->StructureLocatingMethod == BY_SUBCLASS_INSTANCE_SUBINSTANCE_PRODUCER) {
+      if (Conversion->StructureLocatingMethod == BySubclassInstanceSubinstanceProducer) {
         //
         // Look at SubClass, Instance, SubInstance and ProducerName for a matching
         // node
@@ -136,7 +136,7 @@ SmbiosProcessDataRecord (
           }
         }
 
-      } else if (Conversion->StructureLocatingMethod == BY_SUBCLASS_INSTANCE_PRODUCER) {
+      } else if (Conversion->StructureLocatingMethod == BySubClassInstanceProducer) {
         //
         // Look at SubClass, Instance and ProducerName for a matching node
         //
@@ -172,7 +172,7 @@ SmbiosProcessDataRecord (
         goto Done;
       }
 
-      if (Conversion->StructureLocatingMethod == BY_SUBCLASS_INSTANCE_SUBINSTANCE_PRODUCER) {
+      if (Conversion->StructureLocatingMethod == BySubclassInstanceSubinstanceProducer) {
         //
         // Fill in SubClass, Instance, SubInstance and ProducerName
         //
@@ -181,7 +181,7 @@ SmbiosProcessDataRecord (
         StructureNode->SubInstance  = DataHeader->SubInstance;
         CopyMem (&(StructureNode->ProducerName), &(RecordHeader->ProducerName), sizeof (EFI_GUID));
 
-      } else if (Conversion->StructureLocatingMethod == BY_SUBCLASS_INSTANCE_PRODUCER) {
+      } else if (Conversion->StructureLocatingMethod == BySubClassInstanceProducer) {
         //
         // Fill in at SubClass, Instance and ProducerName, mark SubInstance as Non
         // Applicable
@@ -244,7 +244,7 @@ SmbiosProcessDataRecord (
     //
     // Fill the Structure's field corresponding to this data record
     //
-    if (Conversion->FieldFillingMethod == RECORD_DATA_UNCHANGED_OFFSET_SPECIFIED) {
+    if (Conversion->FieldFillingMethod == RecordDataUnchangedOffsetSpecified) {
       //
       // Field data is just the record data without transforming and
       // offset is specified directly in the conversion table entry
@@ -262,7 +262,7 @@ SmbiosProcessDataRecord (
       
       CopyMem ((UINT8 *) (StructureNode->Structure) + Conversion->FieldOffset, SrcData, SrcDataSize);
 
-    } else if (Conversion->FieldFillingMethod == BY_FUNCTION_WITH_OFFSET_SPECIFIED) {
+    } else if (Conversion->FieldFillingMethod == ByFunctionWithOffsetSpecified) {
       //
       // Field offfset is specified in the conversion table entry, but
       // record data needs to be transformed to be filled into the field,
@@ -292,7 +292,7 @@ SmbiosProcessDataRecord (
 
         goto Done;
       }
-    } else if (Conversion->FieldFillingMethod == BY_FUNCTION) {
+    } else if (Conversion->FieldFillingMethod == ByFunction) {
       //
       // Both field offset and field content are determined by
       // FieldFillingFunction
@@ -321,7 +321,7 @@ SmbiosProcessDataRecord (
 
         goto Done;
       }
-    } else if (Conversion->FieldFillingMethod == BY_FUNCTION_WITH_WHOLE_DATA_RECORD) {
+    } else if (Conversion->FieldFillingMethod == ByFunctionWithWholeDataRecord) {
       //
       // Both field offset and field content are determined by
       // FieldFillingFunction and the function accepts the whole data record
