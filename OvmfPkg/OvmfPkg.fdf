@@ -109,8 +109,10 @@ INF  IntelFrameworkModulePkg/Universal/StatusCode/Pei/StatusCodePei.inf
 INF  OvmfPkg/PlatformPei/PlatformPei.inf
 INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 
-FILE FV_IMAGE = 20bc8ac9-94d1-4208-ab28-5d673fd73486 {
-  SECTION FV_IMAGE = DXEFV
+FILE FV_IMAGE = A4EF5A93-3F1B-4232-A1C4-F0910E6D1D9C {
+  SECTION COMPRESS PI_NONE {
+    SECTION FV_IMAGE = DXEFV
+  }
 }
 
 ################################################################################
