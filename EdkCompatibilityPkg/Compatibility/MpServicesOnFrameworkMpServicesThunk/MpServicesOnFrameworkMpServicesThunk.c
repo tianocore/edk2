@@ -899,6 +899,7 @@ CheckThisAP (
   CPU_STATE       CpuState;
 
   ASSERT (ProcessorNumber < mNumberOfProcessors);
+  ASSERT (ProcessorNumber < MAX_CPU_NUMBER);
 
   CpuData = &mMPSystemData.CpuData[ProcessorNumber];
 
@@ -1220,6 +1221,7 @@ WakeUpAp (
   EFI_PROCESSOR_INFORMATION    ProcessorInfoBuffer;
 
   ASSERT (ProcessorNumber < mNumberOfProcessors);
+  ASSERT (ProcessorNumber < MAX_CPU_NUMBER);
 
   CpuData = &mMPSystemData.CpuData[ProcessorNumber];
 
@@ -1300,6 +1302,7 @@ ChangeCpuState (
   CPU_DATA_BLOCK  *CpuData;
 
   ASSERT (ProcessorNumber < mNumberOfProcessors);
+  ASSERT (ProcessorNumber < MAX_CPU_NUMBER);
 
   CpuData = &mMPSystemData.CpuData[ProcessorNumber];
 
