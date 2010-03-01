@@ -87,8 +87,8 @@ SmmBase2GetSmstLocation (
   after SetVirtualAddressMap().
 
   @param[in]     This                The EFI_SMM_COMMUNICATION_PROTOCOL instance.
-  @param[in out] CommBuffer          A pointer to the buffer to convey into SMRAM.
-  @param[in out] CommSize            The size of the data buffer being passed in.On exit, the size of data
+  @param[in, out] CommBuffer          A pointer to the buffer to convey into SMRAM.
+  @param[in, out] CommSize            The size of the data buffer being passed in.On exit, the size of data
                                      being returned. Zero if the handler does not wish to reply with any data.
 
   @retval EFI_SUCCESS                The message was successfully posted.
@@ -337,8 +337,8 @@ SmmBase2GetSmstLocation (
   after SetVirtualAddressMap().
 
   @param[in] This                The EFI_SMM_COMMUNICATION_PROTOCOL instance.
-  @param[in out] CommBuffer          A pointer to the buffer to convey into SMRAM.
-  @param[in out] CommSize            The size of the data buffer being passed in.On exit, the size of data
+  @param[in, out] CommBuffer          A pointer to the buffer to convey into SMRAM.
+  @param[in, out] CommSize            The size of the data buffer being passed in.On exit, the size of data
                                  being returned. Zero if the handler does not wish to reply with any data.
 
   @retval EFI_SUCCESS            The message was successfully posted.
