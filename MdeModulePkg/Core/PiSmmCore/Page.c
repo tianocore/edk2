@@ -312,6 +312,16 @@ SmmAddMemoryRegion (
 {
   UINTN  AlignedMemBase;
 
+  //
+  // Do not add memory regions that is already allocated, needs testing, or needs ECC initialization
+  //
+  if ((Attributes & (EFI_ALLOCATED | EFI_NEEDS_TESTING | EFI_NEEDS_ECC_INITIALIZATION)) != 0) {
+    return;
+  }
+  
+  //
+  // Align range on an EFI_PAGE_SIZE boundary
+  //  
   AlignedMemBase = (UINTN)(MemBase + EFI_PAGE_MASK) & ~EFI_PAGE_MASK;
   MemLength -= AlignedMemBase - MemBase;
   SmmFreePages (AlignedMemBase, TRUNCATE_TO_PAGES ((UINTN)MemLength));
