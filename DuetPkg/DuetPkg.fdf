@@ -129,29 +129,29 @@ FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
 
 [Rule.Common.DXE_CORE]
   FILE DXE_CORE = $(NAMED_GUID) {
-      PE32     PE32           |.efi
+      PE32     PE32           $(MODULE_NAME).efi
   }
 
 [Rule.Common.UEFI_DRIVER]
   FILE DRIVER = $(NAMED_GUID) {
-    DXE_DEPEX    DXE_DEPEX Optional      |.depex
-        PE32     PE32                    |.efi
+    DXE_DEPEX    DXE_DEPEX Optional      $(MODULE_NAME).depex
+        PE32     PE32                    $(MODULE_NAME).efi
   }
 
 [Rule.Common.DXE_DRIVER]
   FILE DRIVER = $(NAMED_GUID) {
-    DXE_DEPEX    DXE_DEPEX Optional      |.depex
-        PE32     PE32                    |.efi
+    DXE_DEPEX    DXE_DEPEX Optional      $(MODULE_NAME).depex
+        PE32     PE32                    $(MODULE_NAME).efi
   }
 
 [Rule.Common.DXE_RUNTIME_DRIVER]
   FILE DRIVER = $(NAMED_GUID) {
-    DXE_DEPEX    DXE_DEPEX Optional      |.depex
-        PE32     PE32                    |.efi
+    DXE_DEPEX    DXE_DEPEX Optional      $(MODULE_NAME).depex
+        PE32     PE32                    $(MODULE_NAME).efi
   }
 
 [Rule.Common.UEFI_APPLICATION]
   FILE APPLICATION = $(NAMED_GUID) {
-        PE32     PE32                    |.efi
+        PE32     PE32                    $(MODULE_NAME).efi
   }
 
