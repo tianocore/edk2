@@ -893,7 +893,7 @@ LibPcdCallbackOnSet (
 
   ASSERT (NotificationFunction != NULL);
 
-  Status = (GetPiPcdPpiPointer ())->CallbackOnSet (Guid, TokenNumber, (EFI_PCD_PPI_CALLBACK) NotificationFunction);
+  Status = (GetPiPcdPpiPointer ())->CallbackOnSet (Guid, TokenNumber, (EFI_PEI_PCD_PPI_CALLBACK) NotificationFunction);
 
   ASSERT_EFI_ERROR (Status);
 
@@ -927,7 +927,7 @@ LibPcdCancelCallback (
 
   ASSERT (NotificationFunction != NULL);
 
-  Status = (GetPiPcdPpiPointer ())->CancelCallback (Guid, TokenNumber, (EFI_PCD_PPI_CALLBACK) NotificationFunction);
+  Status = (GetPiPcdPpiPointer ())->CancelCallback (Guid, TokenNumber, (EFI_PEI_PCD_PPI_CALLBACK) NotificationFunction);
 
   ASSERT_EFI_ERROR (Status);
 
