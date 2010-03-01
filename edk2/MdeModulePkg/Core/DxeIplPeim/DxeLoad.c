@@ -158,7 +158,7 @@ DxeLoadCore (
   UINTN                                     Instance;
   UINT32                                    AuthenticationState;
   UINTN                                     DataSize;
-  EFI_PEI_S3_RESUME_PPI                     *S3Resume;
+  EFI_PEI_S3_RESUME2_PPI                    *S3Resume;
   EFI_PEI_RECOVERY_MODULE_PPI               *PeiRecovery;
   EFI_MEMORY_TYPE_INFORMATION               MemoryData[EfiMaxMemoryType + 1];
 
@@ -169,14 +169,14 @@ DxeLoadCore (
 
   if (BootMode == BOOT_ON_S3_RESUME) {
     Status = PeiServicesLocatePpi (
-               &gEfiPeiS3ResumePpiGuid,
+               &gEfiPeiS3Resume2PpiGuid,
                0,
                NULL,
                (VOID **) &S3Resume
                );
     ASSERT_EFI_ERROR (Status);
     
-    Status = S3Resume->S3RestoreConfig (PeiServices);
+    Status = S3Resume->S3RestoreConfig2 (S3Resume);
     ASSERT_EFI_ERROR (Status);
   } else if (BootMode == BOOT_IN_RECOVERY_MODE) {
     Status = PeiServicesLocatePpi (

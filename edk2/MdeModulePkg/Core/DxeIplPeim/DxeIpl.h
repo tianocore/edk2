@@ -25,7 +25,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Ppi/FirmwareVolumeInfo.h>
 #include <Ppi/GuidedSectionExtraction.h>
 #include <Ppi/LoadFile.h>
-#include <Ppi/S3Resume.h>
+#include <Ppi/S3Resume2.h>
 #include <Ppi/RecoveryModule.h>
 
 #include <Guid/MemoryTypeInformation.h>
