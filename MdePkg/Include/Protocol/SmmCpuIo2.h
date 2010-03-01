@@ -17,15 +17,6 @@
 #ifndef _SMM_CPU_IO2_H_
 #define _SMM_CPU_IO2_H_
 
-///
-/// Note:
-///   To avoid name conflict between PI and Framework SMM spec, the following names defined
-///   in PI 1.2 SMM spec are renamed.
-///
-///   *EFI_SMM_CPU_IO*    -> *EFI_SMM_CPU_IO2*
-///   *EFI_SMM_IO_ACCESS* -> *EFI_SMM_IO_ACCESS2*
-///
-
 #define EFI_SMM_CPU_IO2_PROTOCOL_GUID \
   { \
     0x3242A9D8, 0xCE70, 0x4AA0, { 0x95, 0x5D, 0x5E, 0x7B, 0x14, 0x0D, 0xE4, 0xD2 } \

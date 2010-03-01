@@ -9,7 +9,7 @@
   given event types.  Several inputs can be enabled.  This purpose of this interface is to generate an 
   SMI in response to any of these inputs having a true value provided.
 
-  Copyright (c) 2009, Intel Corporation
+  Copyright (c) 2009 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -27,15 +27,6 @@
 #define _SMM_GPI_DISPATCH2_H_
 
 #include <Pi/PiSmmCis.h>
-
-///
-/// Note:
-///   To avoid name conflict between PI and Framework SMM spec, the following names defined
-///   in PI 1.2 SMM spec are renamed. These renamings are not yet in a public PI spec and errta.
-///
-///   EFI_SMM_GPI_REGISTER   -> EFI_SMM_GPI_REGISTER2
-///   EFI_SMM_GPI_UNREGISTER -> EFI_SMM_GPI_UNREGISTER2
-///
 
 #define EFI_SMM_GPI_DISPATCH2_PROTOCOL_GUID \
   { \
