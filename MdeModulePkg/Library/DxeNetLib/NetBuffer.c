@@ -1050,6 +1050,8 @@ NetbufAllocSpace (
   UINT32                    Index;
   UINT8                     *SavedTail;
 
+  Index = 0;
+
   NET_CHECK_SIGNATURE (Nbuf, NET_BUF_SIGNATURE);
   NET_CHECK_SIGNATURE (Nbuf->Vector, NET_VECTOR_SIGNATURE);
 
