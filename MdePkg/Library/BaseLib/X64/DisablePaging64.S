@@ -40,10 +40,12 @@ ASM_PFX(InternalX86DisablePaging64):
     cli    
     lea    L1(%rip), %rsi                 # rsi <- The start address of transition code
     mov    0x28(%rsp), %edi               # rdi <- New stack
-    sub    $64, %edi                      # rdi <- use 64 byte in stack to hold transition code  
-    mov    %edi, %r10d                    # r10 <- The start address of transicition code below 4G
     lea    _mTransitionEnd(%rip), %rax    # rax <- end of transition code
     sub    %rsi, %rax                     # rax <- The size of transition piece code
+    add    $4, %rax                       # round rax up to the next 4 byte boundary
+    and    $0x0fffffffc, %rax
+    sub    %rax, %rdi                     # rdi <- use stack to hold transition code 
+    mov    %edi, %r10d                    # r10 <- The start address of transicition code below 4G
     push   %rcx                           # save rcx to stack
     mov    %rax, %rcx                     # rcx <- The size of transition piece code
     rep
@@ -52,18 +54,19 @@ ASM_PFX(InternalX86DisablePaging64):
    
     mov    %r8d, %esi 
     mov    %r9d, %edi 
-    mov    0x28(%rsp), %eax               # eax <- New Stack
+    mov    %r10d, %eax
+    sub    $4, %eax
     push   %rcx                           # push Cs to stack
-    push   %r10
+    push   %r10                           # push address of transition code on stack  
     .byte  0x48, 0xcb                     # retq: Use far return to load CS register from stack
                                           # (Use raw byte code since some GNU assemblers generates incorrect code for "retq")  
 L1:
     mov    %eax,%esp                      # set up new stack
     mov    %cr0,%rax
-    btr    $0x1f,%eax
+    btr    $0x1f,%eax                     # clear CR0.PG
     mov    %rax,%cr0                      # disable paging
 
-    mov    %rdx,%rbx                      # save EntryPoint to rbx, for rdmsr will overwrite rdx
+    mov    %edx,%ebx                      # save EntryPoint to ebx, for rdmsr will overwrite edx
     mov    $0xc0000080,%ecx
     rdmsr  
     and    $0xfe,%ah                      # clear LME
