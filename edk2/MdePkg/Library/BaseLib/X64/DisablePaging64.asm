@@ -38,20 +38,23 @@ InternalX86DisablePaging64    PROC
     cli
     lea     rsi, @F                     ; rsi <- The start address of transition code
     mov     edi, [rsp + 28h]            ; rdi <- New stack
-    sub     edi, 64                     ; rdi <- use 64 byte in stack to hold transition code  
-    mov     r10d, edi                   ; r10 <- The start address of transicition code below 4G
     lea     rax, mTransitionEnd         ; rax <- end of transition code
     sub     rax, rsi                    ; rax <- The size of transition piece code 
+    add     rax, 4                      ; Round RAX up to the next 4 byte boundary
+    and     rax, 0fffffffch
+    sub     rdi, rax                    ; rdi <- Use stack to hold transition code
+    mov     r10d, edi                   ; r10 <- The start address of transicition code below 4G
     push    rcx                         ; save rcx to stack
     mov     rcx, rax                    ; rcx <- The size of transition piece code
-    rep     movsb                       ; copy transition code to (new stack - 64byte) below 4G
+    rep     movsb                       ; copy transition code to top of new stack which must be below 4GB
     pop     rcx                         ; restore rcx
     
     mov     esi, r8d
     mov     edi, r9d
-    mov     eax, [rsp + 28h]            ; eax <- New Stack
+    mov     eax, r10d                   ; eax <- start of the transition code on the stack
+    sub     eax, 4                      ; eax <- One slot below transition code on the stack
     push    rcx                         ; push Cs to stack
-    push    r10
+    push    r10                         ; push address of tansition code on stack
     DB      48h                         ; prefix to composite "retq" with next "retf"
     retf                                ; Use far return to load CS register from stack
 
@@ -59,10 +62,10 @@ InternalX86DisablePaging64    PROC
 @@:
     mov     esp, eax                    ; set up new stack
     mov     rax, cr0
-    btr     eax, 31
-    mov     cr0, rax                    ; disable paging
-
-    mov     rbx, rdx                    ; save EntryPoint to rbx, for rdmsr will overwrite rdx
+    btr     eax, 31                     ; Clear CR0.PG
+    mov     cr0, rax                    ; disable paging and caches
+    
+    mov     ebx, edx                    ; save EntryPoint to rbx, for rdmsr will overwrite rdx
     mov     ecx, 0c0000080h
     rdmsr
     and     ah, NOT 1                   ; clear LME
