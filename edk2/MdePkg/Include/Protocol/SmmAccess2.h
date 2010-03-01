@@ -25,17 +25,6 @@
 #ifndef _SMM_ACCESS2_H_
 #define _SMM_ACCESS2_H_
 
-///
-/// Note:
-///   To avoid name conflict between PI and Framework SMM spec, the following names defined
-///   in PI 1.2 SMM spec are renamed. These renamings are not yet in a public PI spec and errta.
-///
-///   EFI_SMM_OPEN         -> EFI_SMM_OPEN2
-///   EFI_SMM_CLOSE        -> EFI_SMM_CLOSE2
-///   EFI_SMM_LOCK         -> EFI_SMM_LOCK2
-///   EFI_SMM_CAPABILITIES -> EFI_SMM_CAPABILITIES2
-///
-
 #define EFI_SMM_ACCESS2_PROTOCOL_GUID \
   { \
      0xc2702b74, 0x800c, 0x4131, {0x87, 0x46, 0x8f, 0xb5, 0xb8, 0x9c, 0xe4, 0xac } \

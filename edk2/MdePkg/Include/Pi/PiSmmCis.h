@@ -19,16 +19,6 @@
 #include <Pi/PiMultiPhase.h>
 #include <Protocol/SmmCpuIo2.h>
 
-///
-/// Note:
-///   To avoid name conflict between PI and Framework SMM spec, the following names defined
-///   in PI 1.2 SMM spec are renamed. These renamings are not yet in a public PI spec and errta.
-///
-///   EFI_SMM_SYSTEM_TABLE                -> EFI_SMM_SYSTEM_TABLE2
-///   EFI_SMM_SYSTEM_TABLE_REVISION       -> EFI_SMM_SYSTEM_TABLE2_REVISION
-///   EFI_SMM_INSTALL_CONFIGURATION_TABLE -> EFI_SMM_INSTALL_CONFIGURATION_TABLE2
-///
-
 typedef struct _EFI_SMM_SYSTEM_TABLE2  EFI_SMM_SYSTEM_TABLE2;
 
 ///

@@ -80,9 +80,6 @@ EFI_STATUS
   be called. For each call to NewPackageList(), there should be a
   corresponding call to
   EFI_HII_DATABASE_PROTOCOL.RemovePackageList().
-
-  Note: inconsistency with UEFI 2.3 spec that the parameter DriverHandle
-  is optional.
   
   @param This           A pointer to the EFI_HII_DATABASE_PROTOCOL instance.
 

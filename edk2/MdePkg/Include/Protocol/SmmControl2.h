@@ -11,7 +11,7 @@
   accessed, will generate the SMI.  Also, the hardware optionally supports the periodic generation of 
   these signals.
 
-  Copyright (c) 2009, Intel Corporation                                                         
+  Copyright (c) 2009 - 2010, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -26,15 +26,6 @@
 #define _SMM_CONTROL2_H_
 
 #include <PiDxe.h>
-
-///
-/// Note:
-///   To avoid name conflict between PI and Framework SMM spec, the following names defined
-///   in PI 1.2 SMM spec are renamed. These renamings are not yet in a public PI spec and errta.
-///
-///   EFI_SMM_ACTIVATE   -> EFI_SMM_ACTIVATE2
-///   EFI_SMM_DEACTIVATE -> EFI_SMM_DEACTIVATE2
-///
 
 #define EFI_SMM_CONTROL2_PROTOCOL_GUID \
   { \

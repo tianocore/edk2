@@ -4,7 +4,7 @@
 
   This protocol provides the parent dispatch service for the standby button SMI source generator.
 
-  Copyright (c) 2009, Intel Corporation
+  Copyright (c) 2009 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -22,15 +22,6 @@
 #define _SMM_STANDBY_BUTTON_DISPATCH2_H_
 
 #include <Pi/PiSmmCis.h>
-
-///
-/// Note:
-///   To avoid name conflict between PI and Framework SMM spec, the following names defined
-///   in PI 1.2 SMM spec are renamed. These renamings are not yet in a public PI spec and errta.
-///
-///   EFI_SMM_STANDBY_BUTTON_REGISTER   -> EFI_SMM_STANDBY_BUTTON_REGISTER2
-///   EFI_SMM_STANDBY_BUTTON_UNREGISTER -> EFI_SMM_STANDBY_BUTTON_UNREGISTER2
-///
 
 #define EFI_SMM_STANDBY_BUTTON_DISPATCH2_PROTOCOL_GUID \
   { \
