@@ -621,6 +621,7 @@ ParseOpCodes (
       // Create a new Form Map for this FormSet
       //
       CurrentForm = AllocateZeroPool (sizeof (FORM_BROWSER_FORM));
+      ASSERT (CurrentForm != NULL);
       CurrentForm->Signature = FORM_BROWSER_FORM_SIGNATURE;
 
       InitializeListHead (&CurrentForm->StatementListHead);
