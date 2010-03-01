@@ -8,7 +8,7 @@
   2) Ignore the IFR opcode which is invalid for Form Package
      generated using Framework VFR file.
 
-  Copyright (c) 2008 - 2009, Intel Corporation
+  Copyright (c) 2008 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -170,12 +170,14 @@ typedef struct {
   EFI_HII_VALUE       Value;
   EFI_IMAGE_ID        ImageId;
 
-#if 0
-  FORM_EXPRESSION     *SuppressExpression; // Non-NULL indicates nested inside of SuppressIf
-#endif
 } QUESTION_OPTION;
 
 #define QUESTION_OPTION_FROM_LINK(a)  CR (a, QUESTION_OPTION, Link, QUESTION_OPTION_SIGNATURE)
+
+typedef union {
+  EFI_STRING_ID       VarName;
+  UINT16              VarOffset;
+} VAR_STORE_INFO;
 
 #define FORM_BROWSER_STATEMENT_SIGNATURE  SIGNATURE_32 ('F', 'S', 'T', 'A')
 typedef struct {
@@ -197,21 +199,10 @@ typedef struct {
   EFI_QUESTION_ID       QuestionId;       // The value of zero is reserved
   EFI_VARSTORE_ID       VarStoreId;       // A value of zero indicates no variable storage
   FORMSET_STORAGE       *Storage;
-  union {
-    EFI_STRING_ID       VarName;
-    UINT16              VarOffset;
-  }  VarStoreInfo;
-#if 0
-  CHAR16                *UnicodeVarName;
-#endif
+  VAR_STORE_INFO        VarStoreInfo;
   
   UINT16                StorageWidth;
   UINT8                 QuestionFlags;
-
-#if 0
-  CHAR16                *VariableName;    // Name/Value or EFI Variable name
-  CHAR16                *BlockName;       // Buffer storage block name: "OFFSET=...WIDTH=..."
-#endif
 
   EFI_HII_VALUE         HiiValue;         // Edit copy for checkbox, numberic, oneof
   UINT8                 *BufferValue;     // Edit copy for string, password, orderedlist
@@ -239,22 +230,12 @@ typedef struct {
   //
   // Get from IFR parsing
   //
-#if 0
-  FORM_EXPRESSION       *ValueExpression;    // nested EFI_IFR_VALUE, provide Question value and indicate Question is ReadOnly
-#endif
   LIST_ENTRY            DefaultListHead;     // nested EFI_IFR_DEFAULT list (QUESTION_DEFAULT), provide default values
   LIST_ENTRY            OptionListHead;      // nested EFI_IFR_ONE_OF_OPTION list (QUESTION_OPTION)
 
   EFI_IMAGE_ID          ImageId;             // nested EFI_IFR_IMAGE
   UINT8                 RefreshInterval;     // nested EFI_IFR_REFRESH, refresh interval(in seconds) for Question value, 0 means no refresh
   BOOLEAN               InSubtitle;          // nesting inside of EFI_IFR_SUBTITLE
-
-#if 0
-  LIST_ENTRY            InconsistentListHead;// nested inconsistent expression list (FORM_EXPRESSION)
-  LIST_ENTRY            NoSubmitListHead;    // nested nosubmit expression list (FORM_EXPRESSION)
-  FORM_EXPRESSION       *GrayOutExpression;  // nesting inside of GrayOutIf
-  FORM_EXPRESSION       *SuppressExpression; // nesting inside of SuppressIf
-#endif
 
 } FORM_BROWSER_STATEMENT;
 
@@ -330,11 +311,28 @@ typedef struct {
 } FORM_BROWSER_FORMSET;
 
 
+/**
+  Parse opcodes in the formset IFR binary.
+
+  @param  FormSet                Pointer of the FormSet data structure.
+
+  @retval EFI_SUCCESS            Opcode parse success.
+  @retval Other                  Opcode parse fail.
+
+**/
 EFI_STATUS
 ParseOpCodes (
   IN FORM_BROWSER_FORMSET              *FormSet
   );
 
+/**
+  Free resources allocated for a FormSet
+
+  @param  FormSet                Pointer of the FormSet
+
+  @return None.
+
+**/
 VOID
 DestroyFormSet (
   IN OUT FORM_BROWSER_FORMSET  *FormSet

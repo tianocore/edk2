@@ -2,7 +2,7 @@
 Implement Functions to convert IFR Opcode in format defined in Framework HII specification to
 format defined in UEFI HII Specification.
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -26,7 +26,7 @@ typedef struct {
   UINT8 UefiIfrOp;
 } IFR_OPCODE_MAP;
   
-IFR_OPCODE_MAP mQuestionOpcodeMap [] = {
+IFR_OPCODE_MAP QuestionOpcodeMap[] = {
   { FRAMEWORK_EFI_IFR_ONE_OF_OP,        EFI_IFR_ONE_OF_OP},
   { FRAMEWORK_EFI_IFR_CHECKBOX_OP,      EFI_IFR_CHECKBOX_OP},
   { FRAMEWORK_EFI_IFR_NUMERIC_OP,       EFI_IFR_NUMERIC_OP},
@@ -51,9 +51,9 @@ QuestionOpFwToUefi (
 {
   UINTN       Index;
 
-  for (Index = 0; Index < sizeof (mQuestionOpcodeMap) / sizeof (mQuestionOpcodeMap[0]); Index++) {
-    if (FwOp == mQuestionOpcodeMap[Index].FrameworkIfrOp) {
-      *UefiOp = mQuestionOpcodeMap[Index].UefiIfrOp;
+  for (Index = 0; Index < sizeof (QuestionOpcodeMap) / sizeof (QuestionOpcodeMap[0]); Index++) {
+    if (FwOp == QuestionOpcodeMap[Index].FrameworkIfrOp) {
+      *UefiOp = QuestionOpcodeMap[Index].UefiIfrOp;
       return EFI_SUCCESS;
     }
   }
@@ -63,13 +63,15 @@ QuestionOpFwToUefi (
 }
 
 /**
-  Translate a Framework Question Opcode to UEFI Question Opcode.
+  Translate a Framework Question ID to UEFI Question ID.
 
-  @param FwOp     Framework Opcode.
-  @param UefiOp   UEFI Opcode.
+  @param FormSet   FormSet context
+  @param FwOpCode  Framework Opcode
+  @param FwQId     Framework Question Id
+  @param UefiQId   UEFI Question ID.
 
-  @retval     EFI_SUCCESS     The UEFI opcode is found and returned.
-  @retval     EFI_NOT_FOUND   The UEFI opcode is not found.
+  @retval     EFI_SUCCESS     The UEFI Question Id is found and returned.
+  @retval     EFI_NOT_FOUND   The UEFI Question Id is not found.
 **/
 EFI_STATUS
 FwQIdToUefiQId (
@@ -150,6 +152,9 @@ FwQIdToUefiQId (
 
   If FwQuestionId is not 0, then it is used as the Framework Question ID.
 
+  @param FwQuestionId 
+  @param FormSet      
+
   @return The Framework Question ID.
 **/
 EFI_QUESTION_ID
@@ -169,8 +174,8 @@ AssignQuestionId (
 /**
   Create UEFI HII Text Opcode from a Framework HII Text Opcode.
 
-  @param FwOpcode              The input Framework Opcode.
   @param UefiUpdateDataHandle  The newly created UEFI HII opcode is appended to UefiUpdateDataHandle.
+  @param FwOpcode              The input Framework Opcode.
 
   @retval NULL   There is not enough space left in Buffer to add the opcode.
   @retval Other  A pointer to the created opcode.
@@ -207,8 +212,8 @@ F2UCreateTextOpCode (
 /**
   Create UEFI HII Reference Opcode from a Framework HII Reference Opcode.
 
-  @param FwOpcode              The input Framework Opcode.
   @param UefiUpdateDataHandle  The newly created UEFI HII opcode is appended to UefiUpdateDataHandle.
+  @param FwOpcode              The input Framework Opcode.
 
   @retval NULL   There is not enough space left in Buffer to add the opcode.
   @retval Other  A pointer to the created opcode.
@@ -245,9 +250,9 @@ F2UCreateReferenceOpCode (
 /**
   Create UEFI HII "One Of Option" Opcode from a Framework HII "One Of Option" Opcode.
 
+  @param UefiUpdateDataHandle  The newly created UEFI HII opcode is appended to UefiUpdateDataHandle.
   @param FwOpcode              The input Framework Opcode.
   @param Width                 The size of the One Of Option. 1 bytes or 2 bytes.
-  @param UefiUpdateDataHandle  The newly created UEFI HII opcode is appended to UefiUpdateDataHandle.
 
   @retval NULL   There is not enough space left in Buffer to add the opcode.
   @retval Other  A pointer to the created opcode.
@@ -300,10 +305,10 @@ F2UCreateOneOfOptionOpCode (
   to a UEFI Question ID. This information is used to invoke the Framework HII Browser Callback
   function. The opcode is appened to UefiUpdateDataHandle.
 
+  @param    UefiUpdateDataHandle  The UEFI Update Data buffer.
   @param    QuestionId            The UEFI Question ID.
   @param    OptionValue           The value of the "One Of Option".
   @param    KeyValue              The Framework "One Of Option" callback key.
-  @param    UefiUpdateDataHandle  The UEFI Update Data buffer.
 
   @retval NULL   There is not enough space left in Buffer to add the opcode.
   @retval Other  A pointer to the created opcode.
@@ -336,9 +341,9 @@ CreateGuidOptionKeyOpCode (
 /**
   Create UEFI HII "One Of" Opcode from a Framework HII "One Of" Opcode.
 
+  @param UefiUpdateDataHandle     The newly created UEFI HII opcode is appended to UefiUpdateDataHandle.
   @param ThunkContext             The HII Thunk Context.
   @param FwOpcode                 The input Framework Opcode.
-  @param UefiUpdateDataHandle     The newly created UEFI HII opcode is appended to UefiUpdateDataHandle.
   @param NextFwOpcode             Returns the position of the next Framework Opcode after EFI_IFR_END_ONE_OF_OP of
                                   the "One Of Option".
   @param OpcodeCount              The number of Opcode for the complete Framework "One Of" Opcode.
@@ -456,9 +461,9 @@ F2UCreateOneOfOpCode (
 /**
   Create UEFI HII "Ordered List" Opcode from a Framework HII "Ordered List" Opcode.
 
+  @param UefiUpdateDataHandle The newly created UEFI HII opcode is appended to UefiUpdateDataHandle.
   @param ThunkContext         The HII Thunk Context.
   @param FwOpcode             The input Framework Opcode.
-  @param UefiUpdateDataHandle The newly created UEFI HII opcode is appended to UefiUpdateDataHandle.
   @param NextFwOpcode         Returns the position of the next Framework Opcode after EFI_IFR_END_ONE_OF_OP of
                               the "Ordered List".
   @param OpcodeCount          The number of Opcode for the complete Framework "Ordered List" Opcode.
@@ -562,9 +567,9 @@ F2UCreateOrderedListOpCode (
 /**
   Create UEFI HII CheckBox Opcode from a Framework HII Checkbox Opcode.
 
+  @param UefiUpdateDataHandle  The newly created UEFI HII opcode is appended to UefiUpdateDataHandle.
   @param ThunkContext          The HII Thunk Context.
   @param FwOpcode              The input Framework Opcode.
-  @param UefiUpdateDataHandle  The newly created UEFI HII opcode is appended to UefiUpdateDataHandle.
 
   @retval NULL   There is not enough space left in Buffer to add the opcode.
   @retval Other  A pointer to the created opcode.
@@ -627,9 +632,9 @@ F2UCreateCheckBoxOpCode (
 /**
   Create UEFI HII Numeric Opcode from a Framework HII Numeric Opcode.
 
+  @param UefiUpdateDataHandle    The newly created UEFI HII opcode is appended to UefiUpdateDataHandle.
   @param ThunkContext            The HII Thunk Context.
   @param FwOpcode                The input Framework Opcode.
-  @param UefiUpdateDataHandle    The newly created UEFI HII opcode is appended to UefiUpdateDataHandle.
 
   @retval NULL   There is not enough space left in Buffer to add the opcode.
   @retval Other  A pointer to the created opcode.
@@ -749,9 +754,9 @@ F2UCreateNumericOpCode (
 /**
   Create UEFI HII String Opcode from a Framework HII String Opcode.
 
+  @param UefiUpdateDataHandle     The newly created UEFI HII opcode is appended to UefiUpdateDataHandle.
   @param ThunkContext             The HII Thunk Context.
   @param FwOpcode                 The input Framework Opcode.
-  @param UefiUpdateDataHandle     The newly created UEFI HII opcode is appended to UefiUpdateDataHandle.
 
   @retval NULL   There is not enough space left in Buffer to add the opcode.
   @retval Other  A pointer to the created opcode.
@@ -802,8 +807,8 @@ F2UCreateStringOpCode (
 /**
   Create UEFI HII Banner Opcode from a Framework HII Banner Opcode.
 
-  @param FwOpcode                 The input Framework Opcode.
   @param UefiUpdateDataHandle     The newly created UEFI HII opcode is appended to UefiUpdateDataHandle.
+  @param FwOpcode                 The input Framework Opcode.
 
   @retval NULL   There is not enough space left in Buffer to add the opcode.
   @retval Other  A pointer to the created opcode.
@@ -837,7 +842,7 @@ F2UCreateBannerOpCode (
 
   @param ThunkContext         The HII Thunk Context.
   @param FwUpdateData         The Framework Update Data.
-  @param UefiUpdateData       The UEFI Update Data.
+  @param UefiOpCodeHandle     The UEFI opcode hanlde.
 
   @retval EFI_SUCCESS       The UEFI Update Data is created successfully.
   @retval EFI_UNSUPPORTED   There is unsupported opcode in FwUpdateData.

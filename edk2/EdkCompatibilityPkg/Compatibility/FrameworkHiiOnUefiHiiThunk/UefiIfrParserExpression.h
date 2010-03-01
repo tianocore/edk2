@@ -2,7 +2,7 @@
   Internal Function and Macro defintions for IFR Expression evaluation used in Ifr Parsing. This header file should only
   be included by UefiIfrParserExpression.c and UefiIfrParser.c
 
-  Copyright (c) 2008, Intel Corporation
+  Copyright (c) 2008 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -18,10 +18,6 @@
 
 /**
   Reset stack pointer to begin of the stack.
-
-  None.
-
-  @return None.
 
 **/
 VOID

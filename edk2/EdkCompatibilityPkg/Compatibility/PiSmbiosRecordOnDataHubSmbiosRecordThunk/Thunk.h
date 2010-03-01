@@ -1,7 +1,7 @@
 /** @file
   The common header file for the thunk driver.
   
-Copyright (c) 2009 Intel Corporation. <BR>
+Copyright (c) 2009 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -41,17 +41,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // Data Hub Data Records of certain SubClass and RecordNumber
 //
 typedef enum {
-  BY_SUBCLASS_INSTANCE_SUBINSTANCE_PRODUCER,
-  BY_SUBCLASS_INSTANCE_PRODUCER,
-  MAX_LOCATING_METHOD
+  BySubclassInstanceSubinstanceProducer,
+  BySubClassInstanceProducer,
+  MaxLocatingMethod
 } SMBIOS_STRUCTURE_LOCATING_METHOD;
 
 typedef enum {
-  RECORD_DATA_UNCHANGED_OFFSET_SPECIFIED,
-  BY_FUNCTION_WITH_OFFSET_SPECIFIED,
-  BY_FUNCTION,
-  BY_FUNCTION_WITH_WHOLE_DATA_RECORD,
-  MAX_FIELD_FILLING_METHOD
+  RecordDataUnchangedOffsetSpecified,
+  ByFunctionWithOffsetSpecified,
+  ByFunction,
+  ByFunctionWithWholeDataRecord,
+  MaxFieldFillingMethod
 } SMBIOS_FIELD_FILLING_METHOD;
 
 typedef struct _SMBIOS_STRUCTURE_NODE SMBIOS_STRUCTURE_NODE;
@@ -229,8 +229,7 @@ SmbiosDataFilter (
 VOID
 SmbiosProcessDataRecord (
   IN EFI_DATA_RECORD_HEADER  *Record
-  )
-;
+  );
 
 /**
   Calculate the minimal length for a SMBIOS type. This length maybe not equal
@@ -243,8 +242,7 @@ SmbiosProcessDataRecord (
 UINT32
 SmbiosGetTypeMinimalLength (
   IN UINT8  Type
-  )
-;
+  );
 
 /**
   Enlarge the structure buffer of a structure node in SMBIOS database.
@@ -267,10 +265,10 @@ SmbiosEnlargeStructureBuffer (
   );
 
 /**
-  Field Filling Function. Fill a standard Smbios string field. 
-  Convert the unicode string to single byte chars.
-  Only English language is supported.
-
+  Fill a standard Smbios string field. 
+  
+  This function will convert the unicode string to single byte chars, and only
+  English language is supported.
   This function changes the Structure pointer value of the structure node, 
   which should be noted by Caller.
   
@@ -289,8 +287,7 @@ SmbiosFldString (
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
 /**
   Fill the inter link field for a SMBIOS recorder.
@@ -315,8 +312,7 @@ SmbiosFldInterLink (
   IN      UINT8                     LinkSmbiosType,
   IN      EFI_INTER_LINK_DATA       *InterLink,
   IN      EFI_GUID                  *SubClassGuid
-  )
-;
+  );
 
 /**
   Find a handle that matches the Link Data and the target Smbios type.
@@ -335,323 +331,675 @@ SmbiosFindHandle (
   IN      EFI_GUID            *SubClass,
   IN      EFI_INTER_LINK_DATA *LinkData,
   IN OUT  UINT16              *HandleNum
-  )
-;
+  );
 
+/**
+  Field Filling Function. Transform an EFI_EXP_BASE10_DATA to a word, with 'Mega'
+  as the unit.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_INVALID_PARAMETER  RecordDataSize is invalid. 
+  @retval EFI_SUCCESS            RecordData is successed to be filled into given SMBIOS record.
+**/
 EFI_STATUS
 SmbiosFldBase10ToWordWithMega (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function. Transform an EFI_EXP_BASE2_DATA to a word, with 'Kilo'
+  as the unit. Granularity implemented for Cache Size.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_INVALID_PARAMETER  RecordDataSize is invalid. 
+  @retval EFI_SUCCESS            RecordData is successed to be filled into given SMBIOS record.
+**/
 EFI_STATUS
 SmbiosFldBase2ToWordWithKilo (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function: truncate record data to byte and fill in the
+  field as indicated by Offset.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_INVALID_PARAMETER  RecordDataSize is invalid. 
+  @retval EFI_SUCCESS            RecordData is successed to be filled into given SMBIOS record.
+**/
 EFI_STATUS
 SmbiosFldTruncateToByte (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Processor SubClass record type 6 -- ProcessorID.
+  Offset is mandatory.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldProcessorType6 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Processor SubClass record type 9 -- Voltage.
+  Offset is mandatory.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldProcessorType9 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Processor SubClass record type 17 -- Cache association.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldProcessorType17 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function. Transform an EFI_EXP_BASE2_DATA to a word, with 10exp-9
+  as the unit.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_INVALID_PARAMETER  RecordDataSize is invalid. 
+  @retval EFI_SUCCESS            RecordData is successed to be filled into given SMBIOS record.
+**/
 EFI_STATUS
 SmbiosFldBase10ToByteWithNano (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function: truncate record data to byte and fill in the
+  field as indicated by Offset.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_INVALID_PARAMETER  RecordDataSize is invalid. 
+  @retval EFI_SUCCESS            RecordData is successed to be filled into given SMBIOS record.
+**/
 EFI_STATUS
 SmbiosFldTruncateToWord (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Cache SubClass record type 10 -- Cache Config.
+  Offset is mandatory
+
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldCacheType10 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Check if OEM structure has included 2 trailing 0s in data record.
+  
+  @param RecordData       Point to record data will be checked.
+  @param RecordDataSize   The size of record data.
+  
+  @retval 0    2 trailing 0s exist in unformatted section
+  @retval 1    1 trailing 0 exists at the end of unformatted section
+  @retval -1   There is no 0 at the end of unformatted section
+**/
 INT8
 SmbiosCheckTrailingZero (
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Cache SubClass record type 5&6 -- Cache SRAM type.
+  Offset is mandatory
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldCacheType5 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Memory SubClass record type 2 -- Physical Memory
+  Array.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMemoryType2 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Memory SubClass record type 3 -
+  - Memory Device: SMBIOS Type 17
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMemoryType3 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Memory SubClass record type 4
+  -- Memory Array Mapped Address: SMBIOS Type 19
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMemoryType4 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Memory SubClass record type 5
+  -- Memory Device Mapped Address: SMBIOS Type 20
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMemoryType5 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Memory SubClass record type 6
+  -- Memory Channel Type: SMBIOS Type 37
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMemoryType6 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Memory SubClass record type 7
+  -- Memory Channel Device: SMBIOS Type 37
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMemoryType7 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Memory SubClass record type 8
+  -- Memory Controller information: SMBIOS Type 5
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMemoryType8 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Memory SubClass record type 
+  -- Memory 32 Bit Error Information: SMBIOS Type 18
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMemoryType9 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Memory SubClass record type 
+  -- Memory 64 Bit Error Information: SMBIOS Type 33
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMemoryType10 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Misc SubClass record type 0 -- Bios Information.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMiscType0 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function. Transform an EFI_EXP_BASE2_DATA to a byte, with '64k'
+  as the unit.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_INVALID_PARAMETER  RecordDataSize is invalid. 
+  @retval EFI_SUCCESS            RecordData is successed to be filled into given SMBIOS record.
+**/
 EFI_STATUS
 SmbiosFldBase2ToByteWith64K (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Misc SubClass record type 1 -- System Information.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMiscType1 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for record type 2 -- Base Board Manufacture.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMiscType2 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Misc SubClass record type 3 -
+  - System Enclosure or Chassis.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMiscType3 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Misc SubClass record type 8 -- Port Connector.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMiscType8 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Misc SubClass record type 9 -- System slot.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMiscType9 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Misc SubClass record type 10 - Onboard Device.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMiscType10 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Misc SubClass record type 11 - OEM Strings.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMiscType11 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Misc SubClass record type 12 - System Options.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMiscType12 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Misc SubClass record type 13 - BIOS Language.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMiscType13 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Misc SubClass record type 14 - System Language String
+  Current solution assumes that EFI_MISC_SYSTEM_LANGUAGE_STRINGs are logged with
+  their LanguageId having ascending orders.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMiscType14 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Misc SubClass record type 15 -- System Event Log.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMiscType15 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Misc SubClass record type 21 - Pointing Device.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMiscType21 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
 
+/**
+  Field Filling Function for Misc SubClass record type 32 -- System Boot Information.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMiscType32 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Misc SubClass record type 38 -- IPMI device info.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMiscType38 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
@@ -660,170 +1008,349 @@ SmbiosFldMiscType38 (
   IN      UINT32                    RecordDataSize
   );
 
+/**
+  Field Filling Function for Misc SubClass record type 0x80-0xFF -- OEM.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMiscTypeOEM (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Memory SubClass record type 3 -
+  - Memory Device: SMBIOS Type 6
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldSMBIOSType6 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
-  IN      UINT32                    Offset, 
+  IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Misc SubClass record type 22 - Portable Battery.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMiscType22 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Misc SubClass record type 22 - Portable Battery.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMiscType22 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Misc SubClass record type 23 - System Reset.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMiscType23 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Misc SubClass record type 24 - Hardware Security.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMiscType24 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Misc SubClass record type 25 - System Power Controls.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMiscType25 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Misc SubClass record type 26 - Voltage Probe.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMiscType26 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Misc SubClass record type 27 - Cooling Device.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMiscType27 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Misc SubClass record type 28 -- Temperature Probe.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMiscType28 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Misc SubClass record type 29 -- Electrical Current Probe.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMiscType29 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Misc SubClass record type 30 -- Out-of-Band Remote Access.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMiscType30 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Misc SubClass record type 34 -- Management Device.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMiscType34 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Misc SubClass record type 36 -- Management Device Threshold.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMiscType36 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Misc SubClass record type 38 -- IPMI device info.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMiscType38 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Misc SubClass record type 39 -- Power supply.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMiscType39 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
 
+/**
+  Field Filling Function for Misc SubClass record type 127 - End-of-Table.
+  
+  @param StructureNode    Pointer to SMBIOS_STRUCTURE_NODE which is current processed.
+  @param Offset           Offset of SMBIOS record which RecordData will be filled.
+  @param RecordData       RecordData buffer will be filled.
+  @param RecordDataSize   The size of RecordData buffer.
+  
+  @retval EFI_SUCCESS   Success fill RecordData into SMBIOS's record buffer.
+**/
 EFI_STATUS
 SmbiosFldMiscType127 (
   IN OUT  SMBIOS_STRUCTURE_NODE     *StructureNode,
   IN      UINT32                    Offset,
   IN      VOID                      *RecordData,
   IN      UINT32                    RecordDataSize
-  )
-;
+  );
     
+/**
+  Create a blank smbios record. The datahub record is only a field of smbios record.
+  So before fill any field from datahub's record. A blank smbios record need to be 
+  created.
+  
+  @param ProducerHandle   The produce handle for a datahub record
+  @param StructureNode    Point to SMBIOS_STRUCTURE_NODE
+  
+  @retval EFI_OUT_OF_RESOURCES Fail to allocate memory for new blank SMBIOS record.
+  @retval EFI_SUCCESS          Success to create blank smbios record.
+**/
 EFI_STATUS
 SmbiosProtocolCreateRecord (
   IN      EFI_HANDLE              ProducerHandle, OPTIONAL
   IN      SMBIOS_STRUCTURE_NODE   *StructureNode
   );
   
+/**
+  Get pointer of EFI_SMBIOS_PROTOCOL.
+  
+  @return pointer of EFI_SMBIOS_PROTOCOL.
+**/
 EFI_SMBIOS_PROTOCOL*
 GetSmbiosProtocol (
   VOID
   );
     
+/**
+  Get pointer of a SMBIOS record's buffer according to its handle.
+  
+  @param Handle         The handle of SMBIOS record want to be searched.
+  @param Type           The type of SMBIOS record want to be searched.
+  @param ProducerHandle The producer handle of SMBIOS record.
+  
+  @return EFI_SMBIOS_TABLE_HEADER Point to a SMBIOS record's buffer.
+**/  
 EFI_SMBIOS_TABLE_HEADER*
 GetSmbiosBufferFromHandle (
   IN  EFI_SMBIOS_HANDLE  Handle,
@@ -831,6 +1358,18 @@ GetSmbiosBufferFromHandle (
   IN  EFI_HANDLE         ProducerHandle  OPTIONAL
   );
           
+/**
+
+  Get the full size of smbios structure including optional strings that follow the formatted structure.
+
+  @param Head                   Pointer to the beginning of smbios structure.
+  @param Size                   The returned size.
+  @param NumberOfStrings        The returned number of optional strings that follow the formatted structure.
+
+  @retval EFI_SUCCESS           Size retured in Size.
+  @retval EFI_INVALID_PARAMETER Input smbios structure mal-formed or Size is NULL.
+  
+**/
 EFI_STATUS
 EFIAPI
 GetSmbiosStructureSize (

@@ -1,8 +1,8 @@
-/**@file
+/** @file
 Framework to UEFI 2.1 Setup Browser Thunk. The file consume EFI_FORM_BROWSER2_PROTOCOL
 to produce a EFI_FORM_BROWSER_PROTOCOL.
 
-Copyright (c) 2008, Intel Corporation
+Copyright (c) 2008 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -399,12 +399,17 @@ GetTimeout (
                         current settings and the caller needs to provide to the browser the
                         current settings for the the "fake" NV variable. If used, no saving of
                         an NV variable is possbile. This parameter is also ignored if Handle is NULL.
+  @param ScreenDimensions 
+                        Allows the browser to be called so that it occupies a portion of the physical 
+                        screen instead of dynamically determining the screen dimensions.
+  @param ResetRequired  This BOOLEAN value denotes whether a reset is required based on the data that 
+                        might have been changed. The ResetRequired parameter is primarily applicable 
+                        for configuration applications, and is an optional parameter.
 
   @retval EFI_SUCCESS             If the Formset is displayed correctly.
   @retval EFI_UNSUPPORTED         If UseDatabase is FALSE or HandleCount is not 1.
   @retval EFI_INVALID_PARAMETER   If the *Handle passed in is not found in the database.
 **/
-
 EFI_STATUS
 EFIAPI 
 ThunkSendForm (

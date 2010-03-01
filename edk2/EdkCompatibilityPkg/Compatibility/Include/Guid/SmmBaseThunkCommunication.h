@@ -65,12 +65,12 @@ typedef union {
 } SMMBASE_FUNCTION_ARGS;
 
 typedef enum {
-  SMMBASE_REGISTER,
-  SMMBASE_UNREGISTER,
-  SMMBASE_REGISTER_CALLBACK,
-  SMMBASE_ALLOCATE_POOL,
-  SMMBASE_FREE_POOL,
-  SMMBASE_COMMUNICATE,
+  SmmBaseFunctionRegister,
+  SmmBaseFunctionUnregister,
+  SmmBaseFunctionRegisterCallback,
+  SmmBaseFunctionAllocatePool,
+  SmmBaseFunctionFreePool,
+  SmmBaseFunctionCommunicate
 } SMMBASE_FUNCTION;
 
 typedef struct {

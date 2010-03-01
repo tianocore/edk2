@@ -406,9 +406,9 @@ GetCallbackInfo (
   @param[in]     DispatchHandle  The unique handle assigned to this handler by SmiHandlerRegister().
   @param[in]     Context         Points to an optional handler context which was specified when the
                                  handler was registered.
-  @param[in,out] CommBuffer      A pointer to a collection of data in memory that will
+  @param[in, out] CommBuffer      A pointer to a collection of data in memory that will
                                  be conveyed from a non-SMM environment into an SMM environment.
-  @param[in,out] CommBufferSize  The size of the CommBuffer.
+  @param[in, out] CommBufferSize  The size of the CommBuffer.
 
   @retval EFI_SUCCESS                         The interrupt was handled and quiesced. No other handlers 
                                               should still be called.
@@ -651,11 +651,11 @@ HelperCommunicate (
   This SMI handler provides services for the SMM Base Thunk driver.
 
   @param[in]     DispatchHandle  The unique handle assigned to this handler by SmiHandlerRegister().
-  @param[in]     Context         Points to an optional handler context which was specified when the
+  @param[in]     RegisterContext Points to an optional handler context which was specified when the
                                  handler was registered.
-  @param[in,out] CommBuffer      A pointer to a collection of data in memory that will
+  @param[in, out] CommBuffer      A pointer to a collection of data in memory that will
                                  be conveyed from a non-SMM environment into an SMM environment.
-  @param[in,out] CommBufferSize  The size of the CommBuffer.
+  @param[in, out] CommBufferSize  The size of the CommBuffer.
 
   @retval EFI_SUCCESS                         The interrupt was handled and quiesced. No other handlers 
                                               should still be called.
@@ -682,22 +682,22 @@ SmmHandlerEntry (
   FunctionData = (SMMBASE_FUNCTION_DATA *)CommBuffer;
 
   switch (FunctionData->Function) {
-    case SMMBASE_REGISTER:
+    case SmmBaseFunctionRegister:
       Register (FunctionData);
       break;
-    case SMMBASE_UNREGISTER:
+    case SmmBaseFunctionUnregister:
       UnRegister (FunctionData);
       break;
-    case SMMBASE_REGISTER_CALLBACK:
+    case SmmBaseFunctionRegisterCallback:
       RegisterCallback (FunctionData);
       break;
-    case SMMBASE_ALLOCATE_POOL:
+    case SmmBaseFunctionAllocatePool:
       HelperAllocatePool (FunctionData);
       break;
-    case SMMBASE_FREE_POOL:
+    case SmmBaseFunctionFreePool:
       HelperFreePool (FunctionData);
       break;
-    case SMMBASE_COMMUNICATE:
+    case SmmBaseFunctionCommunicate:
       HelperCommunicate (FunctionData);
       break;
     default:
@@ -725,9 +725,10 @@ SmmBaseHelperMain (
 {
   EFI_STATUS  Status;
   EFI_MP_SERVICES_PROTOCOL   *MpServices;
-  EFI_HANDLE  Handle = NULL;
+  EFI_HANDLE                 Handle;
   UINTN                      NumberOfEnabledProcessors;
-
+  
+  Handle = NULL;
   ///
   /// Locate SMM CPU Protocol which is used later to retrieve/update CPU Save States
   ///

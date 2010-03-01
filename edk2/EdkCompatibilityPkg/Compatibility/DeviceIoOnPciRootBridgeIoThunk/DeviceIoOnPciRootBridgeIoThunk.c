@@ -12,7 +12,7 @@ This module module layers Device I/O on top of PCI Root Bridge I/O (Segment 0)
    Platform required to support EFI drivers that consume Device I/O
    Platform required to support EFI applications that consume Device I/O
 
-Copyright (c) 2008 Intel Corporation. <BR>
+Copyright (c) 2008 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -389,6 +389,15 @@ DEVICE_IO_PRIVATE_DATA gDeviceIoPrivateDataTemplate = {
   255   // SubordinateBus
 };
 
+/**
+  This notification function is invoked when an instance of the
+  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL is produced. It installs another instance of the
+  EFI_DEVICE_IO_PROTOCOL on the same handle.
+
+  @param  Event                 The event that occured
+  @param  Context               Context of event. Not used in this nofication function.
+
+**/
 VOID
 EFIAPI
 PciRootBridgeIoNotificationEvent (

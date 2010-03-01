@@ -1,7 +1,7 @@
-/**@file
+/** @file
   This file contains the Glyph related function.
 
-Copyright (c) 2006 - 2008, Intel Corporation
+Copyright (c) 2006 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -167,18 +167,18 @@ HiiGlyphToBlt (
   IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL *BltBuffer
   )
 {
-  UINTN X;
-  UINTN Y;
+  UINTN Xpos;
+  UINTN Ypos;
 
   //
   // Convert Monochrome bitmap of the Glyph to BltBuffer structure
   //
-  for (Y = 0; Y < Height; Y++) {
-    for (X = 0; X < Width; X++) {
-      if ((((EFI_NARROW_GLYPH *) GlyphBuffer)->GlyphCol1[Y] & (1 << X)) != 0) {
-        BltBuffer[Y * Width * Count + (Width - X - 1)] = Foreground;
+  for (Ypos = 0; Ypos < Height; Ypos++) {
+    for (Xpos = 0; Xpos < Width; Xpos++) {
+      if ((((EFI_NARROW_GLYPH *) GlyphBuffer)->GlyphCol1[Ypos] & (1 << Xpos)) != 0) {
+        BltBuffer[Ypos * Width * Count + (Width - Xpos - 1)] = Foreground;
       } else {
-        BltBuffer[Y * Width * Count + (Width - X - 1)] = Background;
+        BltBuffer[Ypos * Width * Count + (Width - Xpos - 1)] = Background;
       }
     }
   }

@@ -1,7 +1,7 @@
-/**@file
+/** @file
   This file is for functins related to assign and free Framework HII handle number.
   
-Copyright (c) 2008, Intel Corporation
+Copyright (c) 2008 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at

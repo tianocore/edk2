@@ -1,7 +1,7 @@
 /** @file
   SMM Access2 Protocol on SMM Access Protocol Thunk driver.
 
-  Copyright (c) 2009 Intel Corporation
+  Copyright (c) 2009 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -68,7 +68,7 @@ SmmAccess2Open (
   This function "closes" SMRAM so that it is not visible while outside of SMM. The function should 
   return EFI_UNSUPPORTED if the hardware does not support hiding of SMRAM.
 
-  @param[in] This           The EFI_SMM_ACCESS2_PROTOCOL instance.
+  @param [in] This           The EFI_SMM_ACCESS2_PROTOCOL instance.
 
   @retval EFI_SUCCESS       The operation was successful.
   @retval EFI_UNSUPPORTED   The system does not support opening and closing of SMRAM.
@@ -135,8 +135,8 @@ SmmAccess2Lock (
   Queries the memory controller for the possible regions that will support SMRAM.
 
   @param[in]     This           The EFI_SMM_ACCESS2_PROTOCOL instance.
-  @param[in,out] SmramMapSize   A pointer to the size, in bytes, of the SmramMemoryMap buffer.
-  @param[in,out] SmramMap       A pointer to the buffer in which firmware places the current memory map.
+  @param[in, out] SmramMapSize   A pointer to the size, in bytes, of the SmramMemoryMap buffer.
+  @param[in, out] SmramMap       A pointer to the buffer in which firmware places the current memory map.
 
   @retval EFI_SUCCESS           The chipset supported the given resource.
   @retval EFI_BUFFER_TOO_SMALL  The SmramMap parameter was too small.  The current buffer size 

@@ -9,7 +9,7 @@ these two conditions are true:
 1) EFI 1.10 module producing UC present
 2) And the rest of modules on the platform consume UC2
 
-Copyright (c) 2006 - 2008 Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -153,11 +153,11 @@ StrToFat (
 
 typedef struct {
   UINT32                          Signature;
-  EFI_UNICODE_COLLATION_PROTOCOL  UC2;
-  EFI_UNICODE_COLLATION_PROTOCOL *UC;
+  EFI_UNICODE_COLLATION_PROTOCOL  Uc2;
+  EFI_UNICODE_COLLATION_PROTOCOL *Uc;
 } UC2_PRIVATE_DATA;
 
-#define UC2_PRIVATE_DATA_FROM_THIS(a) CR (a, UC2_PRIVATE_DATA, UC2, UC2_PRIVATE_DATA_SIGNATURE)
+#define UC2_PRIVATE_DATA_FROM_THIS(a) CR (a, UC2_PRIVATE_DATA, Uc2, UC2_PRIVATE_DATA_SIGNATURE)
 
 //
 // Firmware Volume Protocol template
@@ -181,7 +181,15 @@ UC2_PRIVATE_DATA gUC2PrivateDataTemplate = {
 //
 // Module globals
 //
+/**
+  This notification function is invoked when an instance of the
+  EFI_UNICODE_COLLATION_PROTOCOL is produced. It installs another instance of the
+  EFI_UNICODE_COLLATION_PROTOCOL2 on the same handle.
 
+  @param  Event                 The event that occured
+  @param  Context               Context of event. Not used in this nofication function.
+
+**/
 VOID
 EFIAPI
 UcNotificationEvent (
@@ -237,23 +245,23 @@ UcNotificationEvent (
     Status = gBS->HandleProtocol (
                     Handle,
                     &gEfiUnicodeCollationProtocolGuid,
-                    (VOID **)&Private->UC
+                    (VOID **)&Private->Uc
                     );
     ASSERT_EFI_ERROR (Status);
 
     //
     // Fill in rest of private data structure
     //
-    Private->UC2.SupportedLanguages = ConvertLanguagesIso639ToRfc4646 (Private->UC->SupportedLanguages);
-    if (Private->UC2.SupportedLanguages != NULL) {
+    Private->Uc2.SupportedLanguages = ConvertLanguagesIso639ToRfc4646 (Private->Uc->SupportedLanguages);
+    if (Private->Uc2.SupportedLanguages != NULL) {
 
       //
-      // Install Firmware Volume Protocol onto same handle
+      // Install UC2 Protocol onto same handle
       //
       Status = gBS->InstallMultipleProtocolInterfaces (
                       &Handle,
                       &gEfiUnicodeCollation2ProtocolGuid,
-                      &Private->UC2,
+                      &Private->Uc2,
                       NULL
                       );
       ASSERT_EFI_ERROR (Status);
@@ -317,7 +325,7 @@ StriColl (
   
   Private = UC2_PRIVATE_DATA_FROM_THIS (This);
   
-  return Private->UC->StriColl (Private->UC, Str1, Str2);
+  return Private->Uc->StriColl (Private->Uc, Str1, Str2);
 }
 
 
@@ -340,7 +348,7 @@ StrLwr (
   
   Private = UC2_PRIVATE_DATA_FROM_THIS (This);
   
-  Private->UC->StrLwr (Private->UC, Str);
+  Private->Uc->StrLwr (Private->Uc, Str);
 }
 
 
@@ -363,7 +371,7 @@ StrUpr (
   
   Private = UC2_PRIVATE_DATA_FROM_THIS (This);
   
-  Private->UC->StrUpr (Private->UC, Str);
+  Private->Uc->StrUpr (Private->Uc, Str);
 }
 
 /**
@@ -390,7 +398,7 @@ MetaiMatch (
   
   Private = UC2_PRIVATE_DATA_FROM_THIS (This);
   
-  return Private->UC->MetaiMatch (Private->UC, String, Pattern);
+  return Private->Uc->MetaiMatch (Private->Uc, String, Pattern);
 }
 
 
@@ -419,7 +427,7 @@ FatToStr (
   
   Private = UC2_PRIVATE_DATA_FROM_THIS (This);
   
-  Private->UC->FatToStr (Private->UC, FatSize, Fat, String);
+  Private->Uc->FatToStr (Private->Uc, FatSize, Fat, String);
 }
 
 
@@ -451,6 +459,6 @@ StrToFat (
   
   Private = UC2_PRIVATE_DATA_FROM_THIS (This);
   
-  return Private->UC->StrToFat (Private->UC, String, FatSize, Fat);
+  return Private->Uc->StrToFat (Private->Uc, String, FatSize, Fat);
 }
 

@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -50,13 +50,12 @@ EFI_HII_VALUE *mExpressionEvaluationStackPointer = NULL;
   @param  Stack                  On input: old stack; On output: new stack
   @param  StackPtr               On input: old stack pointer; On output: new stack
                                  pointer
-  @param  StackPtr               On input: old stack end; On output: new stack end
+  @param  StackEnd               On input: old stack end; On output: new stack end
 
   @retval EFI_SUCCESS            Grow stack success.
   @retval EFI_OUT_OF_RESOURCES   No enough memory for stack space.
 
 **/
-STATIC
 EFI_STATUS
 GrowStack (
   IN OUT EFI_HII_VALUE  **Stack,
@@ -110,7 +109,7 @@ GrowStack (
   @param  Stack                  On input: old stack; On output: new stack
   @param  StackPtr               On input: old stack pointer; On output: new stack
                                  pointer
-  @param  StackPtr               On input: old stack end; On output: new stack end
+  @param  StackEnd               On input: old stack end; On output: new stack end
   @param  Data                   Data to push.
 
   @retval EFI_SUCCESS            Push stack success.
@@ -155,7 +154,7 @@ PushStack (
   @param  Stack                  On input: old stack; On output: new stack
   @param  StackPtr               On input: old stack pointer; On output: new stack
                                  pointer
-  @param  StackPtr               On input: old stack end; On output: new stack end
+  @param  StackEnd               On input: old stack end; On output: new stack end
   @param  Data                   Data to pop.
 
   @retval EFI_SUCCESS            The value was popped onto the stack.
@@ -187,10 +186,6 @@ PopStack (
 
 /**
   Reset stack pointer to begin of the stack.
-
-  None.
-
-  @return None.
 
 **/
 VOID
@@ -264,10 +259,6 @@ PopScope (
 
 /**
   Reset stack pointer to begin of the stack.
-
-  None.
-
-  @return None.
 
 **/
 VOID

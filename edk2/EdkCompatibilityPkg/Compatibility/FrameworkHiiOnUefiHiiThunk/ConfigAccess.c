@@ -1,4 +1,4 @@
-/**@file
+/** @file
   This file implements functions related to Config Access Protocols installed by
   by HII Thunk Modules. These Config access Protocols are used to thunk UEFI Config 
   Access Callback to Framework HII Callback and EFI Variable Set/Get operations.
@@ -122,38 +122,6 @@ GetStorageFromQuestionId (
     }
 
     FormList = GetNextNode (&FormSet->FormListHead, FormList);
-  }
-  
-  return NULL;
-}
-
-/**
-  Get the EFI_IFR_VARSTORE based the ID.
-    
-  @param FormSet                  The Form Set.
-   
-  @retval FORMSET_STORAGE *       The EFI_IFR_VARSTORE with the ID.
-  @retval NULL                    If the Form Set does not have EFI_IFR_VARSTORE with such ID.
-**/
-FORMSET_STORAGE *
-GetStorageFromVarStoreId (
-  IN CONST FORM_BROWSER_FORMSET * FormSet,
-  IN       EFI_VARSTORE_ID        VarStoreId
-  )
-{
-  LIST_ENTRY             *StorageList;
-  FORMSET_STORAGE        *Storage;
-
-  StorageList = GetFirstNode (&FormSet->StorageListHead);
-
-  while (!IsNull (&FormSet->StorageListHead, StorageList)) {
-    Storage = FORMSET_STORAGE_FROM_LINK (StorageList);
-
-    if (VarStoreId == Storage->VarStoreId) {
-      return Storage;
-    }
-
-    StorageList = GetNextNode (&FormSet->StorageListHead, StorageList);
   }
   
   return NULL;
@@ -377,7 +345,6 @@ CallFormCallBack (
    @retval EFI_INVALID_PARAMETER   If the UEFI Variable Get Service return the size information of the data
                                    does not match what has been recorded early in he BUFFER_STORAGE_ENTRY.
  **/
-
 EFI_STATUS
 GetUefiVariable (
   IN       FORMSET_STORAGE                            *BufferStorage,
@@ -651,7 +618,7 @@ Done:
 
   ASSERT if the Question Type is not EFI_IFR_TYPE_NUM_SIZE_* or EFI_IFR_TYPE_STRING.
   
-   @param This             Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL
+   @param ConfigAccess     Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL
    @param QuestionId       The Question ID.
    @param Type             The Question Type.
    @param Value            The Question Value.

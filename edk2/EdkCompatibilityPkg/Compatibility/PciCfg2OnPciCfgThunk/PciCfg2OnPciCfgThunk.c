@@ -58,7 +58,7 @@ these two conditions are true:
 1) Framework module present that produces PCI CFG PPI  AND
 2) PI module that produces PCI CFG2 is not present
 
-Copyright (c) 2006 - 2008 Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -139,25 +139,24 @@ PciCfg2Read (
 /**
   Write to a given location in the PCI configuration space.
 
-  @param  PeiServices                   An indirect pointer to the PEI Services Table published by the PEI Foundation.
+  @param  PeiServices           An indirect pointer to the PEI Services Table published by the PEI Foundation.
 
-  @param  This                              Pointer to local data for the interface.
+  @param  This                  Pointer to local data for the interface.
 
-  @param  Width                            The width of the access. Enumerated in bytes.
-                                                    See EFI_PEI_PCI_CFG_PPI_WIDTH above.
+  @param  Width                 The width of the access. Enumerated in bytes.
+                                See EFI_PEI_PCI_CFG_PPI_WIDTH above.
 
-  @param  Address                         The physical address of the access. The format of
-                                                    the address is described by EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS.
+  @param  Address               The physical address of the access. The format of
+                                the address is described by EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS.
 
-  @param  Buffer                            A pointer to the buffer of data..
+  @param  Buffer                A pointer to the buffer of data..
 
 
-  @retval EFI_SUCCESS                   The function completed successfully.
+  @retval EFI_SUCCESS           The function completed successfully.
 
-  @retval EFI_DEVICE_ERROR          There was a problem with the transaction.
+  @retval EFI_DEVICE_ERROR      There was a problem with the transaction.
 
-  @retval EFI_DEVICE_NOT_READY  The device is not capable of supporting the operation at this
-                                                     time.
+  @retval EFI_DEVICE_NOT_READY  The device is not capable of supporting the operation at this time.
 
 **/
 EFI_STATUS
@@ -236,18 +235,16 @@ EFI_PEI_PPI_DESCRIPTOR mPpiListPciCfg2 = {
 
   Standard PEIM entry point.
 
-  @param FfsHeadher   The FFS file header
-  @param PeiServices   General purpose services available to every PEIM.
+  @param FileHandle   Handle of the file being invoked.
+  @param PeiServices  General purpose services available to every PEIM.
 
+  @retval EFI_SUCCESS The interface could be successfully installed.
 
-  @retval EFI_SUCCESS if the interface could be successfully
-                                    installed
-
---*/
+**/
 EFI_STATUS
 EFIAPI
 PeimInitializePciCfg2 (
-  IN EFI_PEI_FILE_HANDLE     FfsHeader,
+  IN EFI_PEI_FILE_HANDLE     FileHandle,
   IN CONST EFI_PEI_SERVICES  **PeiServices
   )
 {

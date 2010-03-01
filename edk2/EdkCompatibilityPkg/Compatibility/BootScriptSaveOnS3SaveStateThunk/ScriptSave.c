@@ -516,6 +516,7 @@ BootScriptInformation (
   @param  TableName             Name of the script table. Currently, the only meaningful value is
                                 EFI_ACPI_S3_RESUME_SCRIPT_TABLE.
   @param  OpCode                The operation code (opcode) number.
+  @param  ...                   Argument list that is specific to each opcode. 
 
   @retval EFI_SUCCESS           The operation succeeded. A record was added into the
                                 specified script table.
@@ -689,7 +690,7 @@ BootScriptCloseTable (
 /**
   This routine is entry point of ScriptSave driver.
 
-  @param  Imagehandle           Handle for this drivers loaded image protocol.
+  @param  ImageHandle           Handle for this drivers loaded image protocol.
   @param  SystemTable           EFI system table.
 
   @retval EFI_OUT_OF_RESOURCES  No enough resource

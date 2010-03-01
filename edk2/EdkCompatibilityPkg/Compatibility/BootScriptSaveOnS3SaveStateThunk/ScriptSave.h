@@ -45,6 +45,7 @@
   @param  TableName             Name of the script table. Currently, the only meaningful value is
                                 EFI_ACPI_S3_RESUME_SCRIPT_TABLE.
   @param  OpCode                The operation code (opcode) number.
+  @param  ...                   Argument list that is specific to each opcode. 
 
   @retval EFI_SUCCESS           The operation succeeded. A record was added into the
                                 specified script table.
