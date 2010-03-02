@@ -5,7 +5,7 @@
   drivers to update the SAL System Table and register Extended SAL Procedures that are
   callable in physical or virtual mode using the SAL calling convention.
 
-  Copyright (c) 2009, Intel Corporation                                                         
+  Copyright (c) 2009 - 2010, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -48,7 +48,7 @@ typedef struct _EXTENDED_SAL_BOOT_SERVICE_PROTOCOL EXTENDED_SAL_BOOT_SERVICE_PRO
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EXTENDED_SAL_ADD_SST_INFO) (
+(EFIAPI *EXTENDED_SAL_ADD_SST_INFO)(
   IN EXTENDED_SAL_BOOT_SERVICE_PROTOCOL  *This,
   IN UINT16                              SalAVersion,
   IN UINT16                              SalBVersion,
@@ -75,7 +75,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EXTENDED_SAL_ADD_SST_ENTRY) (
+(EFIAPI *EXTENDED_SAL_ADD_SST_ENTRY)(
   IN EXTENDED_SAL_BOOT_SERVICE_PROTOCOL  *This,
   IN UINT8                               *TableEntry,
   IN UINTN                               EntrySize
@@ -104,7 +104,7 @@ EFI_STATUS
 **/
 typedef
 SAL_RETURN_REGS
-(EFIAPI *SAL_INTERNAL_EXTENDED_SAL_PROC) (
+(EFIAPI *SAL_INTERNAL_EXTENDED_SAL_PROC)(
   IN  UINT64   FunctionId,
   IN  UINT64   Arg2,
   IN  UINT64   Arg3,
@@ -145,7 +145,7 @@ SAL_RETURN_REGS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EXTENDED_SAL_REGISTER_INTERNAL_PROC) (
+(EFIAPI *EXTENDED_SAL_REGISTER_INTERNAL_PROC)(
   IN EXTENDED_SAL_BOOT_SERVICE_PROTOCOL  *This,
   IN UINT64                              ClassGuidLo,
   IN UINT64                              ClassGuidHi,
@@ -184,7 +184,7 @@ EFI_STATUS
 **/
 typedef
 SAL_RETURN_REGS
-(EFIAPI *EXTENDED_SAL_PROC) (
+(EFIAPI *EXTENDED_SAL_PROC)(
   IN UINT64  ClassGuidLo,
   IN UINT64  ClassGuidHi,
   IN UINT64  FunctionId,

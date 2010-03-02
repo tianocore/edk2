@@ -5,7 +5,7 @@
   Initialization (INIT) events, and Platform Management Interrupt (PMI) events
   on an Intel Itanium Processor Family based system.
 
-  Copyright (c) 2009, Intel Corporation                                                         
+  Copyright (c) 2009 - 2010, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -63,7 +63,7 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SAL_MCA_HANDLER) (
+(EFIAPI *EFI_SAL_MCA_HANDLER)(
   IN  VOID                    *ModuleGlobal,
   IN  UINT64                  ProcessorStateParameters,
   IN  EFI_PHYSICAL_ADDRESS    MinstateBase,
@@ -89,7 +89,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SAL_INIT_HANDLER) (
+(EFIAPI *EFI_SAL_INIT_HANDLER)(
   IN  VOID                     *ModuleGlobal,
   IN  UINT64                   ProcessorStateParameters,
   IN  EFI_PHYSICAL_ADDRESS     MinstateBase,
@@ -111,7 +111,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SAL_PMI_HANDLER) (
+(EFIAPI *EFI_SAL_PMI_HANDLER)(
   IN VOID          *ModuleGlobal,
   IN UINT64        CpuIndex,
   IN UINT64        PmiVector
@@ -133,7 +133,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SAL_REGISTER_MCA_HANDLER) (
+(EFIAPI *EFI_SAL_REGISTER_MCA_HANDLER)(
   IN  EFI_SAL_MCA_INIT_PMI_PROTOCOL         *This,
   IN  EFI_SAL_MCA_HANDLER                   McaHandler,
   IN  VOID                                  *ModuleGlobal,
@@ -157,7 +157,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SAL_REGISTER_INIT_HANDLER) (
+(EFIAPI *EFI_SAL_REGISTER_INIT_HANDLER)(
   IN  EFI_SAL_MCA_INIT_PMI_PROTOCOL         *This,
   IN  EFI_SAL_INIT_HANDLER                  InitHandler,
   IN  VOID                                  *ModuleGlobal,
@@ -181,7 +181,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SAL_REGISTER_PMI_HANDLER) (
+(EFIAPI *EFI_SAL_REGISTER_PMI_HANDLER)(
   IN  EFI_SAL_MCA_INIT_PMI_PROTOCOL         *This,
   IN  EFI_SAL_PMI_HANDLER                   PmiHandler,
   IN  VOID                                  *ModuleGlobal,

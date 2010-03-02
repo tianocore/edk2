@@ -54,7 +54,7 @@ typedef struct _EFI_LEGACY_REGION2_PROTOCOL EFI_LEGACY_REGION2_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LEGACY_REGION2_DECODE) (
+(EFIAPI *EFI_LEGACY_REGION2_DECODE)(
  IN  EFI_LEGACY_REGION2_PROTOCOL  *This,
  IN  UINT32                       Start,
  IN  UINT32                       Length,
@@ -85,7 +85,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LEGACY_REGION2_LOCK) (
+(EFIAPI *EFI_LEGACY_REGION2_LOCK)(
  IN  EFI_LEGACY_REGION2_PROTOCOL   *This,
  IN  UINT32                        Start,
  IN  UINT32                        Length,
@@ -150,7 +150,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LEGACY_REGION2_UNLOCK) (
+(EFIAPI *EFI_LEGACY_REGION2_UNLOCK)(
  IN  EFI_LEGACY_REGION2_PROTOCOL  *This,
  IN  UINT32                       Start,
  IN  UINT32                       Length,
@@ -213,7 +213,7 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_LEGACY_REGION_GET_INFO) (
+(EFIAPI *EFI_LEGACY_REGION_GET_INFO)(
   IN  EFI_LEGACY_REGION2_PROTOCOL   *This,
   OUT UINT32                        *DescriptorCount,
   OUT EFI_LEGACY_REGION_DESCRIPTOR  **Descriptor
