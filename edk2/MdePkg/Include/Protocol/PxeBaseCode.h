@@ -234,12 +234,6 @@ typedef struct {
 } EFI_PXE_BASE_CODE_DHCPV4_PACKET;
 
 ///
-/// Note: EFI_PXE_BASE_CODE_DHCPV6_PACKET and EFI_PXE_BASE_CODE_PACKET are not
-///       consistent with the current UEFI2.3 specification. It's supposed that
-///       they will be consistent in the next version.
-///
-
-///
 /// DHCPV6 Packet structure.
 ///
 typedef struct {
