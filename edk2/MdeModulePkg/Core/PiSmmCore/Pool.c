@@ -97,6 +97,7 @@ InternalAllocPoolByIndex (
   EFI_STATUS        Status;
   FREE_POOL_HEADER  *Hdr;
 
+  ASSERT (PoolIndex <= MAX_POOL_INDEX);
   Status = EFI_SUCCESS;
   if (PoolIndex == MAX_POOL_INDEX) {
     Hdr = (FREE_POOL_HEADER *)AllocatePages (EFI_SIZE_TO_PAGES (MAX_POOL_SIZE << 1));

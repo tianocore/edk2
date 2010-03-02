@@ -398,6 +398,7 @@ SmmLocateHandle (
     *BufferSize = ResultSize;
 
     if (SearchType == ByRegisterNotify && !EFI_ERROR(Status)) {
+      ASSERT (SearchKey != NULL);
       //
       // If this is a search by register notify and a handle was
       // returned, update the register notification position
