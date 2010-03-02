@@ -3,7 +3,7 @@
   The EFI_IPSEC_CONFIG_PROTOCOL provides the mechanism to set and retrieve security and 
   policy related information for the EFI IPsec protocol driver.
 
-  Copyright (c) 2009, Intel Corporation
+  Copyright (c) 2009 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -619,7 +619,7 @@ typedef struct _EFI_IPSEC_PAD_DATA {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_IPSEC_CONFIG_SET_DATA) (
+(EFIAPI *EFI_IPSEC_CONFIG_SET_DATA)(
   IN EFI_IPSEC_CONFIG_PROTOCOL        *This,
   IN EFI_IPSEC_CONFIG_DATA_TYPE       DataType,
   IN EFI_IPSEC_CONFIG_SELECTOR        *Selector,
@@ -656,7 +656,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_IPSEC_CONFIG_GET_DATA) (
+(EFIAPI *EFI_IPSEC_CONFIG_GET_DATA)(
   IN EFI_IPSEC_CONFIG_PROTOCOL        *This,
   IN EFI_IPSEC_CONFIG_DATA_TYPE       DataType,
   IN EFI_IPSEC_CONFIG_SELECTOR        *Selector,
@@ -703,7 +703,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_IPSEC_CONFIG_GET_NEXT_SELECTOR) (
+(EFIAPI *EFI_IPSEC_CONFIG_GET_NEXT_SELECTOR)(
   IN EFI_IPSEC_CONFIG_PROTOCOL        *This,
   IN EFI_IPSEC_CONFIG_DATA_TYPE       DataType,
   IN OUT UINTN                        *SelectorSize,
@@ -733,7 +733,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_IPSEC_CONFIG_REGISTER_NOTIFY) (
+(EFIAPI *EFI_IPSEC_CONFIG_REGISTER_NOTIFY)(
   IN EFI_IPSEC_CONFIG_PROTOCOL        *This,
   IN EFI_IPSEC_CONFIG_DATA_TYPE       DataType,
   IN EFI_EVENT                        Event
@@ -759,7 +759,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_IPSEC_CONFIG_UNREGISTER_NOTIFY) (
+(EFIAPI *EFI_IPSEC_CONFIG_UNREGISTER_NOTIFY)(
   IN EFI_IPSEC_CONFIG_PROTOCOL        *This,
   IN EFI_IPSEC_CONFIG_DATA_TYPE       DataType,
   IN EFI_EVENT                        Event

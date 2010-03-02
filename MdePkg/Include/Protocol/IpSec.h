@@ -3,7 +3,7 @@
   The EFI_IPSEC_PROTOCOL is used to abstract the ability to deal with the individual
   packets sent and received by the host and provide packet-level security for IP datagram.
 
-  Copyright (c) 2009, Intel Corporation
+  Copyright (c) 2009 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -65,7 +65,7 @@ typedef struct _EFI_IPSEC_FRAGMENT_DATA {
 **/
 typedef
 EFI_STATUS
-(EFIAPI  *EFI_IPSEC_PROCESS) (
+(EFIAPI  *EFI_IPSEC_PROCESS)(
   IN     EFI_IPSEC_PROTOCOL      *This,
   IN     EFI_HANDLE              NicHandle,
   IN     UINT8                   IpVer,
