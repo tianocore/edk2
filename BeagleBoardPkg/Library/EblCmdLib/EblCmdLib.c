@@ -63,7 +63,8 @@ EblSymbolTable (
   BOOLEAN                           Elf;
   
   // Need to add lots of error checking on the passed in string
-  Format = (Argc > 1) ? Argv[1] : "load /a /ni /np %a & 0x%x";
+  // Default string is for RealView debugger
+  Format = (Argc > 1) ? Argv[1] : "load /a /ni /np %a &0x%x";
   Elf = (Argc > 2) ? FALSE : TRUE;
   
   Status = EfiGetSystemConfigurationTable (&gEfiDebugImageInfoTableGuid, (VOID **)&DebugImageTableHeader);
@@ -82,12 +83,15 @@ EblSymbolTable (
         ImageBase = (UINT32)DebugTable->NormalImage->LoadedImageProtocolInstance->ImageBase;
         PeCoffSizeOfHeaders = PeCoffGetSizeOfHeaders ((VOID *)(UINTN)ImageBase);
         Pdb = PeCoffLoaderGetPdbPointer (DebugTable->NormalImage->LoadedImageProtocolInstance->ImageBase);
-        if (Elf) {
-          // ELF and Mach-O images don't include the header so the linked address does not include header
-          ImageBase += PeCoffSizeOfHeaders;
-        } 
-        AsciiPrint (Format, Pdb, ImageBase);
-        AsciiPrint ("\n");
+        if (Pdb != NULL) {
+          if (Elf) {
+            // ELF and Mach-O images don't include the header so the linked address does not include header
+            ImageBase += PeCoffSizeOfHeaders;
+          } 
+          AsciiPrint (Format, Pdb, ImageBase);
+          AsciiPrint ("\n");
+        } else {
+        }
       }
     }  
   }
@@ -151,7 +155,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED const EBL_COMMAND_TABLE mLibCmdTemplate[] =
     EblDisassembler
   },
   {
-    "symboltable [\"format string\"] [TRUE]",
+    "symboltable [\"format string\"] [PECOFF]",
     " show symbol table commands for debugger",
     NULL,
     EblSymbolTable
