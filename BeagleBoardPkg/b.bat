@@ -33,7 +33,7 @@ SET BUILD_ROOT=%WORKSPACE%\Build\BeagleBoard\%TARGET%_%TARGET_TOOLS%
 
 @REM Build the Beagle Board firmware and creat an FD (FLASH Device) Image.
 CALL build -p BeagleBoardPkg\BeagleBoardPkg.dsc -a ARM -t RVCT31 -b %TARGET% %1 %2 %3 %4 %5 %6 %7 %8
-if ERRORLEVEL 1 goto Exit
+@if ERRORLEVEL 1 goto Exit
 
 @if /I "%1"=="CLEAN" goto Clean
 
@@ -44,7 +44,7 @@ if ERRORLEVEL 1 goto Exit
 @REM point looks so strange. 
 @REM OMAP 3430 TRM section 26.4.8 has Image header information. (missing in OMAP 3530 TRM)
 @REM
-cd Tools
+@cd Tools
 
 ECHO Building tools...
 CALL nmake 
