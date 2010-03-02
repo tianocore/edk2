@@ -69,9 +69,6 @@
   SecurityManagementLib|MdeModulePkg/Library/DxeSecurityManagementLib/DxeSecurityManagementLib.inf
   DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
 
-  #EfiFileLib|EmbeddedPkg/Library/EfiFileLib/EfiFileLib.inf
-  EblCmdLib|EmbeddedPkg/Library/EblCmdLibNull/EblCmdLibNull.inf
-  EblNetworkLib|EmbeddedPkg/Library/EblNetworkLib/EblNetworkLib.inf
 
 
 [LibraryClasses.common.USER_DEFINED]
@@ -283,8 +280,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x10000
 
 
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"%a"
-
 [PcdsFeatureFlag]
   gEfiEdkModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|FALSE
   gEfiEdkModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory|FALSE
@@ -478,4 +473,3 @@
 
   #FatPkg/EnhancedFatDxe/Fat.inf
 
-  #EmbeddedPkg/Ebl/Ebl.inf
