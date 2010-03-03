@@ -28,7 +28,6 @@
   DuetPkg/DuetPkg.dec
   MdeModulePkg/MdeModulePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
-  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
 [LibraryClasses]
   BaseLib
