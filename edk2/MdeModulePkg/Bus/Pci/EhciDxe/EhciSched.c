@@ -182,7 +182,8 @@ EhcInitSched (
                    );
 
   if (Ehc->MemPool == NULL) {
-    goto ErrorExit;
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ErrorExit1;
   }
 
   Status = EhcCreateHelpQ (Ehc);
@@ -223,9 +224,6 @@ EhcInitSched (
   return EFI_SUCCESS;
 
 ErrorExit:
-  PciIo->FreeBuffer (PciIo, Pages, Buf);
-  PciIo->Unmap (PciIo, Map);
-
   if (Ehc->PeriodOne != NULL) {
     UsbHcFreeMem (Ehc->MemPool, Ehc->PeriodOne, sizeof (EHC_QH));
     Ehc->PeriodOne = NULL;
@@ -240,6 +238,11 @@ ErrorExit:
     UsbHcFreeMem (Ehc->MemPool, Ehc->ShortReadStop, sizeof (EHC_QTD));
     Ehc->ShortReadStop = NULL;
   }
+
+ErrorExit1:
+  PciIo->FreeBuffer (PciIo, Pages, Buf);
+  PciIo->Unmap (PciIo, Map);
+
   return Status;
 }
 
