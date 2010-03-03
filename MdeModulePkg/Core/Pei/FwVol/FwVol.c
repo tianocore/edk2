@@ -1391,6 +1391,7 @@ FindNextCoreFvHandle (
     }
   }
 
+  ASSERT (Private->FvCount <= FixedPcdGet32 (PcdPeiCoreMaxFvSupported));
   if (Instance >= Private->FvCount) {
     return NULL;
   }
@@ -1473,7 +1474,7 @@ AddUnknownFormatFvInfo (
 {
   PEI_CORE_UNKNOW_FORMAT_FV_INFO    *NewUnknownFv;
   
-  if (PrivateData->UnknownFvInfoCount + 1 >= FixedPcdGet32 (PcdPeiCoreMaxPeimPerFv)) {
+  if (PrivateData->UnknownFvInfoCount + 1 >= FixedPcdGet32 (PcdPeiCoreMaxFvSupported)) {
     return EFI_OUT_OF_RESOURCES;
   }
   

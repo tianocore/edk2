@@ -807,6 +807,7 @@ FindChildNode (
   CurrentChildNode = CHILD_SECTION_NODE_FROM_LINK (GetFirstNode(&SourceStream->Children));
 
   for (;;) {
+    ASSERT (CurrentChildNode != NULL);
     if (ChildIsType (SourceStream, CurrentChildNode, SearchType, SectionDefinitionGuid)) {
       //
       // The type matches, so check the instance count to see if it's the one we want
@@ -877,7 +878,6 @@ FindChildNode (
         if (EFI_ERROR (Status)) {
           return Status;
         }
-        ASSERT (CurrentChildNode != NULL);
       } else {
         ASSERT (EFI_ERROR (ErrorStatus));
         return ErrorStatus;
