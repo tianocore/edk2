@@ -39,6 +39,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   
 [LibraryClasses]
   UefiDriverEntryPoint
@@ -52,6 +53,7 @@
   UefiLib                     
   UefiBootServicesTableLib    
   MemoryAllocationLib
+  PcdLib
   
 [Protocols]
   gEfiDxeSmmReadyToLockProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
@@ -62,6 +64,10 @@
   gEfiLoadedImageProtocolGuid                   # PROTOCOL SOMETIMES_PRODUCED
   gEfiDevicePathProtocolGuid                    # PROTOCOL SOMETIMES_CONSUMED
 
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressSmmCodePageNumber    # SIMETIMES_CONSUMED 
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadModuleAtFixAddressEnable       # ALWAYS_CONSUMED
+  
 [Guids]
   gAprioriGuid                                  # ALWAYS_CONSUMED
   gEfiEventDxeDispatchGuid                      # ALWAYS_CONSUMED

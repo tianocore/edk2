@@ -33,6 +33,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   
 [LibraryClasses]
   UefiDriverEntryPoint
@@ -62,6 +63,12 @@
   gEfiEventReadyToBootGuid                      # ALWAYS_CONSUMED
   gEfiEventLegacyBootGuid                       # ALWAYS_CONSUMED
   gEfiEventVirtualAddressChangeGuid             # ALWAYS_CONSUMED
-  
+  gLoadFixedAddressConfigurationTableGuid       # SIMETIMES_CONSUMED
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressSmmCodePageNumber    # SIMETIMES_CONSUMED 
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadModuleAtFixAddressEnable       # ALWAYS_CONSUMED
+
+ 
 [Depex]
   gEfiSmmAccess2ProtocolGuid AND gEfiSmmControl2ProtocolGuid AND gEfiCpuArchProtocolGuid

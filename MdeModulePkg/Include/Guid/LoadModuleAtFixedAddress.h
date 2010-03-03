@@ -28,7 +28,7 @@ extern EFI_GUID gLoadFixedAddressConfigurationTableGuid;
 
 typedef struct {
   EFI_PHYSICAL_ADDRESS    DxeCodeTopAddress;             ///< The top address  below which the Dxe runtime code and  below which the Dxe runtime/boot code and PEI code.
-  EFI_PHYSICAL_ADDRESS    TsegBase;                      ///< Tseg base. build tool will assigned an offset relative to Tseg base to SMM driver
+  EFI_PHYSICAL_ADDRESS    SmramBase;                      ///< SMM RAME base. build tool will assigned an offset relative to SMRAM base for SMM driver
 } EFI_LOAD_FIXED_ADDRESS_CONFIGURATION_TABLE;
 
 #endif

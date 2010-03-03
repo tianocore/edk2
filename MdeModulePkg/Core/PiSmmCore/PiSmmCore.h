@@ -41,7 +41,8 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DevicePathLib.h>             
 #include <Library/UefiLib.h>                   
-#include <Library/UefiBootServicesTableLib.h>  
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/PcdLib.h>
 
 #include "PiSmmCorePrivateData.h"
 
@@ -178,6 +179,7 @@ typedef struct {
 extern SMM_CORE_PRIVATE_DATA  *gSmmCorePrivate;
 extern EFI_SMM_SYSTEM_TABLE2  gSmmCoreSmst;
 extern LIST_ENTRY             gHandleList;
+extern EFI_PHYSICAL_ADDRESS   gLoadModuleAtFixAddressSmramBase;
 
 /**
   Called to initialize the memory service.
