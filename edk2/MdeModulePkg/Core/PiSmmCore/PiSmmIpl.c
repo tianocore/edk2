@@ -920,10 +920,10 @@ SmmIplEntry (
   }
   
   //
-  // Find the largest SMRAM range between 1MB and 4GB that is at least 1MB in size
+  // Find the largest SMRAM range between 1MB and 4GB that is at least 256KB - 4K in size
   //
   mCurrentSmramRange = NULL;
-  for (Index = 0, MaxSize = SIZE_1MB; Index < gSmmCorePrivate->SmramRangeCount; Index++) {
+  for (Index = 0, MaxSize = SIZE_256KB - EFI_PAGE_SIZE; Index < gSmmCorePrivate->SmramRangeCount; Index++) {
     if (gSmmCorePrivate->SmramRanges[Index].CpuStart >= BASE_1MB) {
       if ((gSmmCorePrivate->SmramRanges[Index].CpuStart + gSmmCorePrivate->SmramRanges[Index].PhysicalSize) <= BASE_4GB) {
         if (gSmmCorePrivate->SmramRanges[Index].PhysicalSize >= MaxSize) {
