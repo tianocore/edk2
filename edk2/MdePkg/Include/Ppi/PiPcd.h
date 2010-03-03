@@ -67,7 +67,7 @@ VOID
 **/
 typedef
 UINT8
-(EFIAPI *EFI_PEI_PCD_PPI_GET_EX_8)(
+(EFIAPI *EFI_PEI_PCD_PPI_GET_8)(
   IN CONST  EFI_GUID  *Guid,
   IN        UINTN     TokenNumber
 );
@@ -83,7 +83,7 @@ UINT8
 **/
 typedef
 UINT16
-(EFIAPI *EFI_PEI_PCD_PPI_GET_EX_16)(
+(EFIAPI *EFI_PEI_PCD_PPI_GET_16)(
   IN CONST  EFI_GUID  *Guid,
   IN        UINTN     TokenNumber
 );
@@ -99,7 +99,7 @@ UINT16
 **/
 typedef
 UINT32
-(EFIAPI *EFI_PEI_PCD_PPI_GET_EX_32)(
+(EFIAPI *EFI_PEI_PCD_PPI_GET_32)(
   IN CONST  EFI_GUID  *Guid,
   IN        UINTN     TokenNumber
 );
@@ -115,7 +115,7 @@ UINT32
 **/
 typedef
 UINT64
-(EFIAPI *EFI_PEI_PCD_PPI_GET_EX_64)(
+(EFIAPI *EFI_PEI_PCD_PPI_GET_64)(
   IN CONST  EFI_GUID  *Guid,
   IN        UINTN     TokenNumber
 );
@@ -130,7 +130,7 @@ UINT64
 **/
 typedef
 VOID *
-(EFIAPI *EFI_PEI_PCD_PPI_GET_EX_POINTER)(
+(EFIAPI *EFI_PEI_PCD_PPI_GET_POINTER)(
   IN CONST  EFI_GUID  *Guid,
   IN        UINTN     TokenNumber
 );
@@ -146,7 +146,7 @@ VOID *
 **/
 typedef
 BOOLEAN
-(EFIAPI *EFI_PEI_PCD_PPI_GET_EX_BOOLEAN)(
+(EFIAPI *EFI_PEI_PCD_PPI_GET_BOOLEAN)(
   IN CONST  EFI_GUID  *Guid,
   IN        UINTN     TokenNumber
 );
@@ -162,7 +162,7 @@ BOOLEAN
 **/
 typedef
 UINTN
-(EFIAPI *EFI_PEI_PCD_PPI_GET_EX_SIZE)(
+(EFIAPI *EFI_PEI_PCD_PPI_GET_SIZE)(
   IN CONST  EFI_GUID  *Guid,
   IN        UINTN     TokenNumber
 );
@@ -185,7 +185,7 @@ UINTN
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_PCD_PPI_SET_EX_8)(
+(EFIAPI *EFI_PEI_PCD_PPI_SET_8)(
   IN CONST  EFI_GUID  *Guid,
   IN        UINTN     TokenNumber,
   IN        UINT8     Value
@@ -209,7 +209,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_PCD_PPI_SET_EX_16)(
+(EFIAPI *EFI_PEI_PCD_PPI_SET_16)(
   IN CONST  EFI_GUID  *Guid,
   IN        UINTN     TokenNumber,
   IN        UINT16    Value
@@ -233,7 +233,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_PCD_PPI_SET_EX_32)(
+(EFIAPI *EFI_PEI_PCD_PPI_SET_32)(
   IN CONST  EFI_GUID  *Guid,
   IN        UINTN     TokenNumber,
   IN        UINT32    Value
@@ -257,7 +257,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_PCD_PPI_SET_EX_64)(
+(EFIAPI *EFI_PEI_PCD_PPI_SET_64)(
   IN CONST  EFI_GUID  *Guid,
   IN        UINTN     TokenNumber,
   IN        UINT64    Value
@@ -284,7 +284,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_PCD_PPI_SET_EX_POINTER)(
+(EFIAPI *EFI_PEI_PCD_PPI_SET_POINTER)(
   IN CONST  EFI_GUID  *Guid,
   IN        UINTN     TokenNumber,
   IN OUT    UINTN     *SizeOfValue,
@@ -309,7 +309,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_PCD_PPI_SET_EX_BOOLEAN)(
+(EFIAPI *EFI_PEI_PCD_PPI_SET_BOOLEAN)(
   IN CONST  EFI_GUID  *Guid,
   IN        UINTN     TokenNumber,
   IN        BOOLEAN   Value
@@ -410,19 +410,19 @@ EFI_STATUS
 
 typedef struct {
   EFI_PEI_PCD_PPI_SET_SKU               SetSku;
-  EFI_PEI_PCD_PPI_GET_EX_8              GetEx8;
-  EFI_PEI_PCD_PPI_GET_EX_16             GetEx16;
-  EFI_PEI_PCD_PPI_GET_EX_32             GetEx32;
-  EFI_PEI_PCD_PPI_GET_EX_64             GetEx64;
-  EFI_PEI_PCD_PPI_GET_EX_POINTER        GetExPtr;
-  EFI_PEI_PCD_PPI_GET_EX_BOOLEAN        GetExBool;
-  EFI_PEI_PCD_PPI_GET_EX_SIZE           GetExSize;
-  EFI_PEI_PCD_PPI_SET_EX_8              SetEx8;
-  EFI_PEI_PCD_PPI_SET_EX_16             SetEx16;
-  EFI_PEI_PCD_PPI_SET_EX_32             SetEx32;
-  EFI_PEI_PCD_PPI_SET_EX_64             SetEx64;
-  EFI_PEI_PCD_PPI_SET_EX_POINTER        SetExPtr;
-  EFI_PEI_PCD_PPI_SET_EX_BOOLEAN        SetExBool;
+  EFI_PEI_PCD_PPI_GET_8                 Get8;
+  EFI_PEI_PCD_PPI_GET_16                Get16;
+  EFI_PEI_PCD_PPI_GET_32                Get32;
+  EFI_PEI_PCD_PPI_GET_64                Get64;
+  EFI_PEI_PCD_PPI_GET_POINTER           GetPtr;
+  EFI_PEI_PCD_PPI_GET_BOOLEAN           GetBool;
+  EFI_PEI_PCD_PPI_GET_SIZE              GetSize;
+  EFI_PEI_PCD_PPI_SET_8                 Set8;
+  EFI_PEI_PCD_PPI_SET_16                Set16;
+  EFI_PEI_PCD_PPI_SET_32                Set32;
+  EFI_PEI_PCD_PPI_SET_64                Set64;
+  EFI_PEI_PCD_PPI_SET_POINTER           SetPtr;
+  EFI_PEI_PCD_PPI_SET_BOOLEAN           SetBool;
   EFI_PEI_PCD_PPI_CALLBACK_ON_SET       CallbackOnSet;
   EFI_PEI_PCD_PPI_CANCEL_CALLBACK       CancelCallback;
   EFI_PEI_PCD_PPI_GET_NEXT_TOKEN        GetNextToken;

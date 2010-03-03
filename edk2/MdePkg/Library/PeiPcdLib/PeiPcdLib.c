@@ -1,7 +1,7 @@
 /** @file
 Implementation of PcdLib class library for PEI phase.
 
-Copyright (c) 2006 - 2009, Intel Corporation<BR>
+Copyright (c) 2006 - 2010, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -268,7 +268,7 @@ LibPcdGetEx8 (
 {
   ASSERT (Guid != NULL);
 
-  return (GetPiPcdPpiPointer ())->GetEx8 (Guid, TokenNumber);
+  return (GetPiPcdPpiPointer ())->Get8 (Guid, TokenNumber);
 }
 
 
@@ -297,7 +297,7 @@ LibPcdGetEx16 (
 
   ASSERT (Guid != NULL);
 
-  return (GetPiPcdPpiPointer ())->GetEx16 (Guid, TokenNumber);
+  return (GetPiPcdPpiPointer ())->Get16 (Guid, TokenNumber);
 }
 
 
@@ -322,7 +322,7 @@ LibPcdGetEx32 (
 {
   ASSERT (Guid != NULL);
 
-  return (GetPiPcdPpiPointer ())->GetEx32 (Guid, TokenNumber);
+  return (GetPiPcdPpiPointer ())->Get32 (Guid, TokenNumber);
 }
 
 
@@ -350,7 +350,7 @@ LibPcdGetEx64 (
   )
 {
   ASSERT (Guid != NULL);
-  return (GetPiPcdPpiPointer ())->GetEx64 (Guid, TokenNumber);
+  return (GetPiPcdPpiPointer ())->Get64 (Guid, TokenNumber);
 }
 
 
@@ -378,7 +378,7 @@ LibPcdGetExPtr (
 {
   ASSERT (Guid != NULL);
 
-  return (GetPiPcdPpiPointer ())->GetExPtr (Guid, TokenNumber);
+  return (GetPiPcdPpiPointer ())->GetPtr (Guid, TokenNumber);
 }
 
 
@@ -405,7 +405,7 @@ LibPcdGetExBool (
   )
 {
   ASSERT (Guid != NULL);
-  return (GetPiPcdPpiPointer ())->GetExBool (Guid, TokenNumber);
+  return (GetPiPcdPpiPointer ())->GetBool (Guid, TokenNumber);
 }
 
 
@@ -432,7 +432,7 @@ LibPcdGetExSize (
   )
 {
   ASSERT (Guid != NULL);
-  return (GetPiPcdPpiPointer ())->GetExSize (Guid, TokenNumber);
+  return (GetPiPcdPpiPointer ())->GetSize (Guid, TokenNumber);
 }
 
 
@@ -664,7 +664,7 @@ LibPcdSetEx8 (
 
   ASSERT (Guid != NULL);
 
-  Status = (GetPiPcdPpiPointer ())->SetEx8 (Guid, TokenNumber, Value);
+  Status = (GetPiPcdPpiPointer ())->Set8 (Guid, TokenNumber, Value);
 
   ASSERT_EFI_ERROR (Status);
 
@@ -699,7 +699,7 @@ LibPcdSetEx16 (
 {
   EFI_STATUS Status;
   ASSERT (Guid != NULL);
-  Status = (GetPiPcdPpiPointer ())->SetEx16 (Guid, TokenNumber, Value);
+  Status = (GetPiPcdPpiPointer ())->Set16 (Guid, TokenNumber, Value);
 
   ASSERT_EFI_ERROR (Status);
 
@@ -736,7 +736,7 @@ LibPcdSetEx32 (
 
   ASSERT (Guid != NULL);
 
-  Status = (GetPiPcdPpiPointer ())->SetEx32 (Guid, TokenNumber, Value);
+  Status = (GetPiPcdPpiPointer ())->Set32 (Guid, TokenNumber, Value);
 
   ASSERT_EFI_ERROR (Status);
 
@@ -771,7 +771,7 @@ LibPcdSetEx64 (
   EFI_STATUS Status;
   ASSERT (Guid != NULL);
 
-  Status = (GetPiPcdPpiPointer ())->SetEx64 (Guid, TokenNumber, Value);
+  Status = (GetPiPcdPpiPointer ())->Set64 (Guid, TokenNumber, Value);
 
   ASSERT_EFI_ERROR (Status);
 
@@ -818,7 +818,7 @@ LibPcdSetExPtr (
   }
   ASSERT (Guid != NULL);
 
-  Status = (GetPiPcdPpiPointer ())->SetExPtr (Guid, TokenNumber, SizeOfBuffer, Buffer);
+  Status = (GetPiPcdPpiPointer ())->SetPtr (Guid, TokenNumber, SizeOfBuffer, Buffer);
 
   if (EFI_ERROR (Status)) {
     return NULL;
@@ -856,7 +856,7 @@ LibPcdSetExBool (
   EFI_STATUS Status;
 
   ASSERT (Guid != NULL);
-  Status = (GetPiPcdPpiPointer ())->SetExBool (Guid, TokenNumber, Value);
+  Status = (GetPiPcdPpiPointer ())->SetBool (Guid, TokenNumber, Value);
 
   ASSERT_EFI_ERROR (Status);
 

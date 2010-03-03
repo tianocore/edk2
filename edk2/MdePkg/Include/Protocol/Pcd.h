@@ -1,7 +1,12 @@
 /** @file
-  Platform Configuration Database (PCD) Protocol
+  Native Platform Configuration Database (PCD) Protocol
 
-  Copyright (c) 2006 - 2009, Intel Corporation                                                         
+  Different with the EFI_PCD_PROTOCOL defined in PI 1.2 specification, the native
+  PCD protocol provide interfaces for dynamic and dynamic-ex type PCD. 
+  The interfaces in dynamic type PCD do not require the token space guid as parameter,
+  but interfaces in dynamic-ex type PCD require token space guid as parameter.
+  
+  Copyright (c) 2006 - 2010, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
