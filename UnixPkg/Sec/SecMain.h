@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006 - 2009, Intel Corporation                                                         
+Copyright (c) 2006 - 2010, Intel Corporation                                                         
 Portions copyright (c) 2008-2009 Apple Inc.
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -18,7 +18,7 @@ Abstract:
   Include file for host API based SEC
 
 --*/
-#include <FrameworkPei.h>
+#include <PiPei.h>
 
 #include <Protocol/UnixThunk.h>
 #include <Ppi/StatusCode.h>
