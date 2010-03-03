@@ -34,9 +34,7 @@
 
 
 [Packages]
-#  MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
-#  IntelFrameworkPkg/IntelFrameworkPkg.dec
   UnixPkg/UnixPkg.dec
 
 

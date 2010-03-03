@@ -35,7 +35,6 @@
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
-  IntelFrameworkPkg/IntelFrameworkPkg.dec
   UnixPkg/UnixPkg.dec
 
 [LibraryClasses]
@@ -46,10 +45,6 @@
   HobLib
   PeimEntryPoint
   DebugLib
-
-
-[Guids]
-  gEfiFirmwareFileSystemGuid                    # ALWAYS_CONSUMED
 
 [Protocols]
   gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL ALWAYS_CONSUMED
