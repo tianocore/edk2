@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2007, Intel Corporation                                                         
+Copyright (c) 2006 - 2010, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -45,17 +45,9 @@ Abstract:
 
 #define   FIRMWARE_PRODUCT_NAME         (PRODUCT_NAME L": ")
 #ifdef EFI32
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
 #define   FIRMWARE_BIOS_VERSIONE        (PRODUCT_NAME L"(IA32.UEFI)" PRODUCT_VERSION L": ")
-#else
-#define   FIRMWARE_BIOS_VERSIONE        (PRODUCT_NAME L"(IA32.EFI)"  PRODUCT_VERSION L": ")
-#endif
 #else  // EFIX64
-#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
 #define   FIRMWARE_BIOS_VERSIONE        (PRODUCT_NAME L"(X64.UEFI)"  PRODUCT_VERSION L": ")
-#else
-#define   FIRMWARE_BIOS_VERSIONE        (PRODUCT_NAME L"(X64.EFI)"   PRODUCT_VERSION L": ")
-#endif
 #endif
 
 SMBIOS_STRUCTURE_POINTER
