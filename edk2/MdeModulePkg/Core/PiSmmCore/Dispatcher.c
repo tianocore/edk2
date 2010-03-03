@@ -122,6 +122,176 @@ FV_FILEPATH_DEVICE_PATH  mFvDevicePath;
 //
 EFI_SECURITY_ARCH_PROTOCOL  *mSecurity = NULL;
 
+//
+// The global variable is defined for Loading modules at fixed address feature to track the SMM code
+// memory range usage. It is a bit mapped array in which every bit indicates the correspoding 
+// memory page available or not. 
+//
+GLOBAL_REMOVE_IF_UNREFERENCED    UINT64                *mSmmCodeMemoryRangeUsageBitMap=NULL;
+
+/**
+  To check memory usage bit map array to figure out if the memory range in which the image will be loaded is available or not. If 
+  memory range is avaliable, the function will mark the correponding bits to 1 which indicates the memory range is used.
+  The function is only invoked when load modules at fixed address feature is enabled. 
+  
+  @param  ImageBase                The base addres the image will be loaded at.
+  @param  ImageSize                The size of the image
+  
+  @retval EFI_SUCCESS              The memory range the image will be loaded in is available
+  @retval EFI_NOT_FOUND            The memory range the image will be loaded in is not available
+**/
+EFI_STATUS
+CheckAndMarkFixLoadingMemoryUsageBitMap (
+  IN  EFI_PHYSICAL_ADDRESS          ImageBase,
+  IN  UINTN                         ImageSize
+  )
+{
+   UINT32                             SmmCodePageNumber;
+   UINT64                             SmmCodeSize; 
+   EFI_PHYSICAL_ADDRESS               SmmCodeBase;
+   UINTN                              BaseOffsetPageNumber;
+   UINTN                              TopOffsetPageNumber;
+   UINTN                              Index;
+   //
+   // Build tool will calculate the smm code size and then patch the PcdLoadFixAddressSmmCodePageNumber
+   //
+   SmmCodePageNumber = PcdGet32(PcdLoadFixAddressSmmCodePageNumber);
+   SmmCodeSize = EFI_PAGES_TO_SIZE (SmmCodePageNumber);
+   SmmCodeBase = gLoadModuleAtFixAddressSmramBase;
+   
+   //
+   // If the memory usage bit map is not initialized,  do it. Every bit in the array 
+   // indicate the status of the corresponding memory page, available or not
+   // 
+   if (mSmmCodeMemoryRangeUsageBitMap == NULL) {
+     mSmmCodeMemoryRangeUsageBitMap = AllocateZeroPool(((SmmCodePageNumber / 64) + 1)*sizeof(UINT64));
+   }
+   //
+   // If the Dxe code memory range is not allocated or the bit map array allocation failed, return EFI_NOT_FOUND
+   //
+   if (mSmmCodeMemoryRangeUsageBitMap == NULL) {
+     return EFI_NOT_FOUND;
+   }
+   //
+   // see if the memory range for loading the image is in the SMM code range.
+   //
+   if (SmmCodeBase + SmmCodeSize <  ImageBase + ImageSize || SmmCodeBase >  ImageBase) {
+     return EFI_NOT_FOUND;   
+   }   
+   //
+   // Test if the memory is avalaible or not.
+   // 
+   BaseOffsetPageNumber = (UINTN)EFI_SIZE_TO_PAGES((UINT32)(ImageBase - SmmCodeBase));
+   TopOffsetPageNumber  = (UINTN)EFI_SIZE_TO_PAGES((UINT32)(ImageBase + ImageSize - SmmCodeBase));
+   for (Index = BaseOffsetPageNumber; Index < TopOffsetPageNumber; Index ++) {
+     if ((mSmmCodeMemoryRangeUsageBitMap[Index / 64] & LShiftU64(1, (Index % 64))) != 0) {
+       //
+       // This page is already used.
+       //
+       return EFI_NOT_FOUND;  
+     }
+   }
+   
+   //
+   // Being here means the memory range is available.  So mark the bits for the memory range
+   // 
+   for (Index = BaseOffsetPageNumber; Index < TopOffsetPageNumber; Index ++) {
+     mSmmCodeMemoryRangeUsageBitMap[Index / 64] |= LShiftU64(1, (Index % 64));
+   }
+   return  EFI_SUCCESS;   
+}
+/**
+  Get the fixed loadding address from image header assigned by build tool. This function only be called 
+  when Loading module at Fixed address feature enabled.
+  
+  @param  ImageContext              Pointer to the image context structure that describes the PE/COFF
+                                    image that needs to be examined by this function.
+  @retval EFI_SUCCESS               An fixed loading address is assigned to this image by build tools .
+  @retval EFI_NOT_FOUND             The image has no assigned fixed loadding address.
+
+**/
+EFI_STATUS
+GetPeCoffImageFixLoadingAssignedAddress(
+  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
+  )
+{
+	 UINTN                              SectionHeaderOffset;
+	 EFI_STATUS                         Status;
+	 EFI_IMAGE_SECTION_HEADER           SectionHeader;
+	 EFI_IMAGE_OPTIONAL_HEADER_UNION    *ImgHdr;
+	 EFI_PHYSICAL_ADDRESS               FixLoaddingAddress;
+	 UINT16                             Index;
+	 UINTN                              Size; 
+	 UINT16                             NumberOfSections;
+	 UINT64                             ValueInSectionHeader;
+	 
+	 FixLoaddingAddress = 0;
+	 Status = EFI_NOT_FOUND;
+	
+	 //
+   // Get PeHeader pointer
+   //
+   ImgHdr = (EFI_IMAGE_OPTIONAL_HEADER_UNION *)((CHAR8* )ImageContext->Handle + ImageContext->PeCoffHeaderOffset);
+	 SectionHeaderOffset = (UINTN)(
+                                 ImageContext->PeCoffHeaderOffset +
+                                 sizeof (UINT32) +
+                                 sizeof (EFI_IMAGE_FILE_HEADER) +
+                                 ImgHdr->Pe32.FileHeader.SizeOfOptionalHeader
+                                 );
+   NumberOfSections = ImgHdr->Pe32.FileHeader.NumberOfSections;
+     
+   //
+   // Get base address from the first section header that doesn't point to code section.
+   //
+   for (Index = 0; Index < NumberOfSections; Index++) {
+     //
+     // Read section header from file
+     //
+     Size = sizeof (EFI_IMAGE_SECTION_HEADER);
+     Status = ImageContext->ImageRead (
+                              ImageContext->Handle,
+                              SectionHeaderOffset,
+                              &Size,
+                              &SectionHeader
+                              );
+     if (EFI_ERROR (Status)) {
+       return Status;
+     }
+     
+     Status = EFI_NOT_FOUND;
+     
+     if ((SectionHeader.Characteristics & EFI_IMAGE_SCN_CNT_CODE) == 0) {
+       //
+       // Build tool will save the address in PointerToRelocations & PointerToLineNumbers fields in the first section header 
+       // that doesn't point to code section in image header.So there is an assumption that when the feature is enabled,
+       // if a module with a loading address assigned by tools, the PointerToRelocations & PointerToLineNumbers fields
+       // should not be Zero, or else, these 2 fileds should be set to Zero
+       //
+       ValueInSectionHeader = ReadUnaligned64((UINT64*)&SectionHeader.PointerToRelocations);
+       if (ValueInSectionHeader != 0) {
+         //
+         // Found first section header that doesn't point to code section in which uild tool saves the
+         // offset to SMRAM base as image base in PointerToRelocations & PointerToLineNumbers fields
+         //      
+         FixLoaddingAddress = (EFI_PHYSICAL_ADDRESS)(gLoadModuleAtFixAddressSmramBase + (INT64)ValueInSectionHeader);
+         //
+         // Check if the memory range is avaliable.
+         //
+         Status = CheckAndMarkFixLoadingMemoryUsageBitMap (FixLoaddingAddress, (UINTN)(ImageContext->ImageSize + ImageContext->SectionAlignment));
+         if (!EFI_ERROR(Status)) {
+           //
+           // The assigned address is valid. Return the specified loadding address
+           //
+           ImageContext->ImageAddress = FixLoaddingAddress;
+         }
+       }
+       break;     
+     }
+     SectionHeaderOffset += sizeof (EFI_IMAGE_SECTION_HEADER);     
+   }
+   DEBUG ((EFI_D_INFO|EFI_D_LOAD, "LOADING MODULE FIXED INFO: Loading module at fixed address %x, Status = %r\n", FixLoaddingAddress, Status));
+   return Status;
+}
 /**
   Loads an EFI image into SMRAM.
 
@@ -258,24 +428,63 @@ SmmLoadImage (
     }
     return Status;
   }
-
-  PageCount = (UINTN)EFI_SIZE_TO_PAGES(ImageContext.ImageSize + ImageContext.SectionAlignment);
-  DstBuffer = (UINTN)(-1);
-  
-  Status = SmmAllocatePages (
-             AllocateMaxAddress,
-             EfiRuntimeServicesCode,
-             PageCount,
-             &DstBuffer
-             );
-  if (EFI_ERROR (Status)) {
-    if (Buffer != NULL) {
-      Status = gBS->FreePool (Buffer);
+  //
+  // if Loading module at Fixed Address feature is enabled, then  cut out a memory range started from TESG BASE
+  // to hold the Smm driver code
+  //
+  if (PcdGet64(PcdLoadModuleAtFixAddressEnable) != 0) {
+    //
+    // Get the fixed loading address assigned by Build tool
+    //
+    Status = GetPeCoffImageFixLoadingAssignedAddress (&ImageContext);
+    if (!EFI_ERROR (Status)) {
+      //
+      // Since the memory range to load Smm core alreay been cut out, so no need to allocate and free this range
+      // following statements is to bypass SmmFreePages
+      //
+      PageCount = 0;
+      DstBuffer = (UINTN)gLoadModuleAtFixAddressSmramBase;   
+    } else {
+       DEBUG ((EFI_D_INFO|EFI_D_LOAD, "LOADING MODULE FIXED ERROR: Failed to load module at fixed address. \n"));
+       //
+       // allocate the memory to load the SMM driver
+       //
+       PageCount = (UINTN)EFI_SIZE_TO_PAGES(ImageContext.ImageSize + ImageContext.SectionAlignment);
+       DstBuffer = (UINTN)(-1);
+     
+       Status = SmmAllocatePages (
+                   AllocateMaxAddress,
+                   EfiRuntimeServicesCode,
+                   PageCount,
+                   &DstBuffer
+                   );
+       if (EFI_ERROR (Status)) {
+         if (Buffer != NULL) {
+           Status = gBS->FreePool (Buffer);
+         } 
+         return Status;
+       }     
+      ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)DstBuffer;
     }
-    return Status;
+  } else {
+     PageCount = (UINTN)EFI_SIZE_TO_PAGES(ImageContext.ImageSize + ImageContext.SectionAlignment);
+     DstBuffer = (UINTN)(-1);
+     
+     Status = SmmAllocatePages (
+                  AllocateMaxAddress,
+                  EfiRuntimeServicesCode,
+                  PageCount,
+                  &DstBuffer
+                  );
+     if (EFI_ERROR (Status)) {
+       if (Buffer != NULL) {
+         Status = gBS->FreePool (Buffer);
+       }
+       return Status;
+     }
+     
+     ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)DstBuffer;
   }
-
-  ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)DstBuffer;
   //
   // Align buffer on section boundry
   //
