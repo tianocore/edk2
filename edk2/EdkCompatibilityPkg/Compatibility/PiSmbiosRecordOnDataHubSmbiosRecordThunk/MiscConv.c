@@ -1,7 +1,7 @@
 /** @file
   Routines that support Misc SubClass data records translation.
   
-Copyright (c) 2009, Intel Corporation
+Copyright (c) 2009 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -480,7 +480,7 @@ SmbiosFldMiscType3 (
             OFFSET_OF (SMBIOS_TABLE_TYPE3, ContainedElementCount)) 
             = (UINT8)Ec->ChassisElementCount;
 
-  if( Ec->ChassisElementCount ) {
+  if(Ec->ChassisElementCount > 0) {
     //
     // Element Record Length
     // Current solution covers first 3 bytes; user can extend to meet its requirements.

@@ -898,7 +898,7 @@ AppendPciDevicePath (
               return ReturnDevicePath;
             }
           }
-          if (ThisFunc == 0 && !(PciPtr->Hdr.HeaderType & HEADER_TYPE_MULTI_FUNCTION)) {
+          if (ThisFunc == 0 && ((PciPtr->Hdr.HeaderType & HEADER_TYPE_MULTI_FUNCTION) != HEADER_TYPE_MULTI_FUNCTION)) {
             //
             // Skip sub functions, this is not a multi function device
             //

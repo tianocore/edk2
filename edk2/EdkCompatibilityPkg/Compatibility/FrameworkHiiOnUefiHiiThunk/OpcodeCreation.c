@@ -403,7 +403,7 @@ F2UCreateOneOfOpCode (
 
     }
 
-    if (FwOneOfOp->Flags & EFI_IFR_FLAG_RESET_REQUIRED) {
+    if ((FwOneOfOp->Flags & EFI_IFR_FLAG_RESET_REQUIRED) == EFI_IFR_FLAG_RESET_REQUIRED) {
       UOpcode.Question.Flags |= EFI_IFR_FLAG_RESET_REQUIRED;
     }
 
@@ -522,7 +522,7 @@ F2UCreateOrderedListOpCode (
       }
     }
 
-    if (FwOneOfOp->Flags & EFI_IFR_FLAG_RESET_REQUIRED) {
+    if ((FwOneOfOp->Flags & EFI_IFR_FLAG_RESET_REQUIRED) ==  EFI_IFR_FLAG_RESET_REQUIRED) {
       UOpcode.Question.Flags |= EFI_IFR_FLAG_RESET_REQUIRED;
     }
 
