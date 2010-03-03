@@ -12,8 +12,6 @@
 #
 #------------------------------------------------------------------------------
 
-.text
-.align 2
 .globl ASM_PFX(ArmInvalidateInstructionCache)
 .globl ASM_PFX(ArmInvalidateDataCacheEntryByMVA)
 .globl ASM_PFX(ArmCleanDataCacheEntryByMVA)
@@ -29,8 +27,6 @@
 .globl ASM_PFX(ArmDisableDataCache)
 .globl ASM_PFX(ArmEnableInstructionCache)
 .globl ASM_PFX(ArmDisableInstructionCache)
-.globl ASM_PFX(ArmEnableExtendPTConfig)
-.globl ASM_PFX(ArmDisableExtendPTConfig)
 .globl ASM_PFX(ArmEnableBranchPrediction)
 .globl ASM_PFX(ArmDisableBranchPrediction)
 .globl ASM_PFX(ArmV7AllDataCachesOperation)
@@ -38,6 +34,8 @@
 .globl ASM_PFX(ArmDataSyncronizationBarrier) 
 .globl ASM_PFX(ArmInstructionSynchronizationBarrier)
 
+.text
+.align 2
 
 .set DC_ON, (0x1<<2)
 .set IC_ON, (0x1<<12)
@@ -104,11 +102,14 @@ ASM_PFX(ArmEnableMmu):
   mrc     p15,0,R0,c1,c0,0
   orr     R0,R0,#1
   mcr     p15,0,R0,c1,c0,0
+  dsb
+  isb
   bx      LR
 
 ASM_PFX(ArmMmuEnabled):
   mrc     p15,0,R0,c1,c0,0
   and     R0,R0,#1
+  isb
   bx      LR
 
 
@@ -118,7 +119,6 @@ ASM_PFX(ArmDisableMmu):
   mrc     p15,0,R0,c1,c0,0
   bic     R0,R0,#1
   mcr     p15,0,R0,c1,c0,0      @Disable MMU
-  mov     R0,#0
   dsb
   isb
   bx      LR
@@ -192,14 +192,16 @@ Loop1:
   cmp   R12, #2
   blt   L_Skip                  @ no cache or only instruction cache at this level
   mcr   p15, 2, R10, c0, c0, 0  @ write the Cache Size selection register (CSSELR) // OR in 1 for Instruction
-  isb                           @ ISB to sync the change to the CacheSizeID reg 
-  mcr   p15, 1, R12, c0, c0, 0  @ reads current Cache Size ID register (CCSIDR)
+  isb                           @ isb to sync the change to the CacheSizeID reg 
+  mrc   p15, 1, R12, c0, c0, 0  @ reads current Cache Size ID register (CCSIDR)
   and   R2, R12, #0x7           @ extract the line length field
-  and   R2, R2, #4              @ add 4 for the line length offset (log2 16 bytes)
+  add   R2, R2, #4              @ add 4 for the line length offset (log2 16 bytes)
+@  ldr   R4, =0x3FF
   mov   R4, #0x400
   sub   R4, R4, #1
   ands  R4, R4, R12, LSR #3     @ R4 is the max number on the way size (right aligned)
   clz   R5, R4                  @ R5 is the bit position of the way size increment
+@  ldr   R7, =0x00007FFF
   mov   R7, #0x00008000
   sub   R7, R7, #1
   ands  R7, R7, R12, LSR #13    @ R7 is the max number of the index size (right aligned)
