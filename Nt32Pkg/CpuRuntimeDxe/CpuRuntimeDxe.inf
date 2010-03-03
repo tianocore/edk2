@@ -40,7 +40,6 @@
   MdeModulePkg/MdeModulePkg.dec
   Nt32Pkg/Nt32Pkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
-  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
 [LibraryClasses]
   UefiBootServicesTableLib
