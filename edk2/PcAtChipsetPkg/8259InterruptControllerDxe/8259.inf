@@ -27,7 +27,6 @@
 [Packages]
   MdePkg/MdePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
-  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
   PcAtChipsetPkg/PcAtChipsetPkg.dec
   
 [LibraryClasses]
