@@ -75,13 +75,28 @@ VlanExtractConfig (
        OUT EFI_STRING                            *Results
   )
 {
-  EFI_STATUS          Status;
-  UINTN               BufferSize;
-  VLAN_CONFIGURATION  Configuration;
+  EFI_STATUS                 Status;
+  UINTN                      BufferSize;
+  VLAN_CONFIGURATION         Configuration;
+  VLAN_CONFIG_PRIVATE_DATA  *PrivateData;
+  EFI_STRING                 ConfigRequestHdr;
+  EFI_STRING                 ConfigRequest;
+  BOOLEAN                    AllocatedRequest;
+  UINTN                      Size;
 
-  if (Request == NULL) {
+  if (Progress == NULL || Results == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
+  *Progress = Request;
+  if ((Request != NULL) && !HiiIsConfigHdrMatch (Request, &mVlanFormSetGuid, mVlanStorageName)) {
+    return EFI_NOT_FOUND;
+  }
+
+  ConfigRequestHdr = NULL;
+  ConfigRequest    = NULL;
+  AllocatedRequest = FALSE;
+  Size             = 0;
 
   //
   // Retrieve the pointer to the UEFI HII Config Routing Protocol
@@ -94,16 +109,49 @@ VlanExtractConfig (
   //
   // Convert buffer data to <ConfigResp> by helper function BlockToConfig()
   //
+  PrivateData = VLAN_CONFIG_PRIVATE_DATA_FROM_THIS (This);
   ZeroMem (&Configuration, sizeof (VLAN_CONFIGURATION));
   BufferSize = sizeof (VLAN_CONFIG_PRIVATE_DATA);
+  ConfigRequest = Request;
+  if ((Request == NULL) || (StrStr (Request, L"OFFSET") == NULL)) {
+    //
+    // Request has no request element, construct full request string.
+    // Allocate and fill a buffer large enough to hold the <ConfigHdr> template
+    // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
+    //
+    ConfigRequestHdr = HiiConstructConfigHdr (&mVlanFormSetGuid, mVlanStorageName, PrivateData->DriverHandle);
+    Size = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
+    ConfigRequest = AllocateZeroPool (Size);
+    ASSERT (ConfigRequest != NULL);
+    AllocatedRequest = TRUE;
+    UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64)BufferSize);
+    FreePool (ConfigRequestHdr);
+  }
+
   Status = mHiiConfigRouting->BlockToConfig (
                                 mHiiConfigRouting,
-                                Request,
+                                ConfigRequest,
                                 (UINT8 *) &Configuration,
                                 BufferSize,
                                 Results,
                                 Progress
                                 );
+  //
+  // Free the allocated config request string.
+  //
+  if (AllocatedRequest) {
+    FreePool (ConfigRequest);
+    ConfigRequest = NULL;
+  }
+  //
+  // Set Progress string to the original request string.
+  //
+  if (Request == NULL) {
+    *Progress = NULL;
+  } else if (StrStr (Request, L"OFFSET") == NULL) {
+    *Progress = Request + StrLen (Request);
+  }
+
   return Status;
 }
 

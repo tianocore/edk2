@@ -13,7 +13,7 @@
   4. It save all the mapping info in NV variables which will be consumed
      by platform override protocol driver to publish the platform override protocol.
 
-Copyright (c) 2007 - 2009, Intel Corporation
+Copyright (c) 2007 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1161,25 +1161,73 @@ PlatOverMngrExtractConfig (
   EFI_STATUS                       Status;
   EFI_CALLBACK_INFO                *Private;
   EFI_HII_CONFIG_ROUTING_PROTOCOL  *HiiConfigRouting;
+  EFI_STRING                       ConfigRequestHdr;
+  EFI_STRING                       ConfigRequest;
+  BOOLEAN                          AllocatedRequest;
+  UINTN                            Size;
+  UINTN                            BufferSize;
 
-  if (Progress == NULL || Results == NULL || Request == NULL) {
+  if (Progress == NULL || Results == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  *Progress        = Request;
+
+  *Progress = Request;
+  if ((Request != NULL) && !HiiIsConfigHdrMatch (Request, &mPlatformOverridesManagerGuid, mVariableName)) {
+    return EFI_NOT_FOUND;
+  }
+
+  ConfigRequestHdr = NULL;
+  ConfigRequest    = NULL;
+  Size             = 0;
+  AllocatedRequest = FALSE;
+
   Private          = EFI_CALLBACK_INFO_FROM_THIS (This);
   HiiConfigRouting = Private->HiiConfigRouting;
+  ConfigRequest = Request;
+  if ((Request == NULL) || (StrStr (Request, L"OFFSET") == NULL)) {
+    //
+    // Request has no request element, construct full request string.
+    // Allocate and fill a buffer large enough to hold the <ConfigHdr> template
+    // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
+    //
+    ConfigRequestHdr = HiiConstructConfigHdr (&mPlatformOverridesManagerGuid, mVariableName, Private->DriverHandle);
+    Size = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
+    ConfigRequest = AllocateZeroPool (Size);
+    ASSERT (ConfigRequest != NULL);
+    AllocatedRequest = TRUE;
+    BufferSize = sizeof (PLAT_OVER_MNGR_DATA);
+    UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64)BufferSize);
+    FreePool (ConfigRequestHdr);
+  }
 
   //
   // Convert buffer data to <ConfigResp> by helper function BlockToConfig()
   //
   Status = HiiConfigRouting->BlockToConfig (
                                 HiiConfigRouting,
-                                Request,
+                                ConfigRequest,
                                 (UINT8 *) &Private->FakeNvData,
                                 sizeof (PLAT_OVER_MNGR_DATA),
                                 Results,
                                 Progress
                                 );
+
+  //
+  // Free the allocated config request string.
+  //
+  if (AllocatedRequest) {
+    FreePool (ConfigRequest);
+    ConfigRequest = NULL;
+  }
+  //
+  // Set Progress string to the original request string.
+  //
+  if (Request == NULL) {
+    *Progress = NULL;
+  } else if (StrStr (Request, L"OFFSET") == NULL) {
+    *Progress = Request + StrLen (Request);
+  }
+
   return Status;
 }
 

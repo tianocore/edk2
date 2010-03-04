@@ -78,7 +78,7 @@ HII_VENDOR_DEVICE_PATH  mFrontPageHiiVendorDevicePath = {
 
   @retval  EFI_SUCCESS            The Results is filled with the requested values.
   @retval  EFI_OUT_OF_RESOURCES   Not enough memory to store the results.
-  @retval  EFI_INVALID_PARAMETER  Request is NULL, illegal syntax, or unknown name.
+  @retval  EFI_INVALID_PARAMETER  Request is illegal syntax, or unknown name.
   @retval  EFI_NOT_FOUND          Routing data doesn't match any storage in this driver.
 
 **/
@@ -91,7 +91,7 @@ FakeExtractConfig (
   OUT EFI_STRING                             *Results
   )
 {
-  if (Request == NULL || Progress == NULL || Results == NULL) {
+  if (Progress == NULL || Results == NULL) {
     return EFI_INVALID_PARAMETER;
   }
   *Progress = Request;
@@ -310,6 +310,7 @@ InitializeFrontPage (
   EFI_IFR_GUID_LABEL          *StartLabel;
   EFI_IFR_GUID_LABEL          *EndLabel;
   BOOLEAN                     FirstFlag;
+  EFI_STRING_ID               Temp;
 
   if (InitializeHiiData) {
     //
@@ -424,10 +425,12 @@ InitializeFrontPage (
       GetNextLanguage (&LangCode, Lang);
       OptionCount ++;
     }
-    gFrontPagePrivate.LanguageToken = AllocatePool (OptionCount * sizeof (EFI_STRING_ID));
+    gFrontPagePrivate.LanguageToken = AllocatePool ((OptionCount + 1) * sizeof (EFI_STRING_ID));
     ASSERT (gFrontPagePrivate.LanguageToken != NULL);
     FirstFlag = TRUE;
   }
+
+  Status = gHiiString->NewString (gHiiString, HiiHandle, &Temp, "de-DE", L"Dedede", L"TEST", NULL);
 
   OptionCount = 0;
   LangCode = LanguageString;
