@@ -1,6 +1,6 @@
 /** @file
   Include file for definitions in the Intel Platform Innovation Framework for EFI
-  System Management Mode Core Interface Specification (SMM CIS) version 0.90.
+  System Management Mode Core Interface Specification (SMM CIS) version 0.91.
 
   Copyright (c) 2007 - 2010, Intel Corporation
   All rights reserved. This program and the accompanying materials
