@@ -227,3 +227,32 @@ EhcDumpBuf (
 
   DEBUG ((EFI_D_INFO, "\n"));
 }
+
+/**
+  Dump the EHCI status registers
+
+  @param  Ehc    USB EHCI Host Controller instance
+
+**/
+VOID
+EhcDumpRegs (
+  IN  USB2_HC_DEV         *Ehc
+  )
+{
+  UINTN   Index;
+
+  DEBUG ((EFI_D_INFO, "  EHC_CAPLENGTH_OFFSET   = 0x%08x\n", EhcReadCapRegister (Ehc, EHC_CAPLENGTH_OFFSET)));
+  DEBUG ((EFI_D_INFO, "  EHC_HCSPARAMS_OFFSET   = 0x%08x\n", EhcReadCapRegister (Ehc, EHC_HCSPARAMS_OFFSET)));
+  DEBUG ((EFI_D_INFO, "  EHC_HCCPARAMS_OFFSET   = 0x%08x\n", EhcReadCapRegister (Ehc, EHC_HCCPARAMS_OFFSET)));
+  DEBUG ((EFI_D_INFO, "  EHC_USBCMD_OFFSET      = 0x%08x\n", EhcReadOpReg (Ehc, EHC_USBCMD_OFFSET)));
+  DEBUG ((EFI_D_INFO, "  EHC_USBSTS_OFFSET      = 0x%08x\n", EhcReadOpReg (Ehc, EHC_USBSTS_OFFSET)));
+  DEBUG ((EFI_D_INFO, "  EHC_USBINTR_OFFSET     = 0x%08x\n", EhcReadOpReg (Ehc, EHC_USBINTR_OFFSET)));
+  DEBUG ((EFI_D_INFO, "  EHC_FRINDEX_OFFSET     = 0x%08x\n", EhcReadOpReg (Ehc, EHC_FRINDEX_OFFSET)));
+  DEBUG ((EFI_D_INFO, "  EHC_CTRLDSSEG_OFFSET   = 0x%08x\n", EhcReadOpReg (Ehc,  EHC_CTRLDSSEG_OFFSET)));
+  DEBUG ((EFI_D_INFO, "  EHC_FRAME_BASE_OFFSET  = 0x%08x\n", EhcReadOpReg (Ehc,  EHC_FRAME_BASE_OFFSET)));
+  DEBUG ((EFI_D_INFO, "  EHC_ASYNC_HEAD_OFFSET  = 0x%08x\n", EhcReadOpReg (Ehc, EHC_ASYNC_HEAD_OFFSET)));
+  DEBUG ((EFI_D_INFO, "  EHC_CONFIG_FLAG_OFFSET = 0x%08x\n", EhcReadOpReg (Ehc, EHC_CONFIG_FLAG_OFFSET)));
+  for (Index = 0; Index < (UINT8) (Ehc->HcStructParams & HCSP_NPORTS); Index++) {
+    DEBUG ((EFI_D_INFO, "  EHC_PORT_STAT_OFFSET(%d)  = 0x%08x\n", Index, EhcReadOpReg (Ehc, EHC_PORT_STAT_OFFSET + (4 * Index))));
+  }
+}
