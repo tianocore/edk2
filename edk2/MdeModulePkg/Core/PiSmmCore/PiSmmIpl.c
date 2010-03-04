@@ -1109,11 +1109,11 @@ SmmIplEntry (
                );
       if (!EFI_ERROR (Status) && LMFAConfigurationTable != NULL) {
         LMFAConfigurationTable->SmramBase = mCurrentSmramRange->CpuStart;
+        //
+        // Print the SMRAM base
+        //
+        DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: TSEG BASE is %x. \n", LMFAConfigurationTable->SmramBase));
       }
-      //
-      // Print the SMRAM base
-      //
-      DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: TSEG BASE is %x. \n", LMFAConfigurationTable->SmramBase));
     }
     //
     // Load SMM Core into SMRAM and execute it from SMRAM
