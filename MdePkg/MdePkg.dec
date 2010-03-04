@@ -74,10 +74,6 @@
   #                  Only available to DXE and UEFI module types.
   UefiBootServicesTableLib|Include/Library/UefiBootServicesTableLib.h
 
-  ##  @libraryclass  Provides a service to retrieve a pointer to the SMM Services Table.
-  #                  Only available to SMM/DXE Combined and SMM module types.
-  SmmServicesTableLib|Include/Library/SmmServicesTableLib.h
-
   ##  @libraryclass  Module entry point library for UEFI Applications.
   UefiApplicationEntryPoint|Include/Library/UefiApplicationEntryPoint.h
 
@@ -200,6 +196,10 @@
   ##  @libraryclass  Abstracts both S/W SMI generation and detection.
   ##
   SmmLib|Include/Library/SmmLib.h
+
+  ##  @libraryclass  Provides a service to retrieve a pointer to the SMM Services Table.
+  #                  Only available to SMM/DXE Combined and SMM module types.
+  SmmServicesTableLib|Include/Library/SmmServicesTableLib.h
 
 [LibraryClasses.IPF]
   ##  @libraryclass  The SAL Library provides a service to make a SAL CALL.
