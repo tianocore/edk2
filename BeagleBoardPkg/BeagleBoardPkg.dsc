@@ -209,9 +209,7 @@
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|TRUE
   gArmTokenSpaceGuid.PcdCpuDxeProduceDebugSupport|FALSE
 
-  #
-  # Beagle board Specific PCDs
-  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|TRUE
   
 [PcdsFixedAtBuild.common]
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"BeagleEdk2"
