@@ -1,7 +1,7 @@
 ## @file
-#  GNU Make makefile for BaseTools/Source/C.
+#  GNU Make makefile for C tools build.
 #
-#  Copyright (c) 2007 - 2009, Intel Corporation
+#  Copyright (c) 2007 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
