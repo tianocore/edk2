@@ -44,10 +44,4 @@
 
 [Depex]
   TRUE
-
-[BuildOptions]
-# It is required for IA32-version consumer of CryptoLib to add the 
-# following build options to avoid the build issues.
-  MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:256
-  INTEL:*_*_IA32_DLINK_FLAGS = /ALIGN:256
   
