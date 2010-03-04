@@ -60,4 +60,16 @@ EhcDumpBuf (
   IN UINTN                Len
   );
 
+
+/**
+  Dump the EHCI status registers
+
+  @param  Ehc    USB EHCI Host Controller instance
+
+**/
+VOID
+EhcDumpRegs (
+  IN  USB2_HC_DEV         *Ehc
+  );
+
 #endif
