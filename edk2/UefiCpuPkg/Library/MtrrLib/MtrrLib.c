@@ -1156,6 +1156,8 @@ MtrrGetMemoryAttribute (
   // Go through the variable MTRR
   //
   VariableMtrrCount = GetVariableMtrrCount ();
+  ASSERT (VariableMtrrCount <= MTRR_NUMBER_OF_VARIABLE_MTRR);
+
   for (Index = 0; Index < VariableMtrrCount; Index++) {
     if (VariableMtrr[Index].Valid) {
       if (Address >= VariableMtrr[Index].BaseAddress &&
@@ -1189,6 +1191,8 @@ MtrrGetVariableMtrr (
   UINT32  VariableMtrrCount;
 
   VariableMtrrCount = GetVariableMtrrCount ();
+  ASSERT (VariableMtrrCount <= MTRR_NUMBER_OF_VARIABLE_MTRR);
+
   for (Index = 0; Index < VariableMtrrCount; Index++) {
     VariableSettings->Mtrr[Index].Base =
       AsmReadMsr64 (MTRR_LIB_IA32_VARIABLE_MTRR_BASE + (Index << 1));
@@ -1215,6 +1219,8 @@ MtrrSetVariableMtrrWorker (
   UINT32  VariableMtrrCount;
 
   VariableMtrrCount = GetVariableMtrrCount ();
+  ASSERT (VariableMtrrCount <= MTRR_NUMBER_OF_VARIABLE_MTRR);
+
   for (Index = 0; Index < VariableMtrrCount; Index++) {
     AsmWriteMsr64 (
       MTRR_LIB_IA32_VARIABLE_MTRR_BASE + (Index << 1),
