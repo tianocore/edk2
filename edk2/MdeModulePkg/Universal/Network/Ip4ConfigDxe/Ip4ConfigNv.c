@@ -307,12 +307,6 @@ Ip4ConfigConvertIfrNvDataToDeviceConfigData (
                                   parts of the results that must be
                                   stored awaiting possible future
                                   protocols.
-  @retval EFI_INVALID_PARAMETER   For example, passing in a NULL
-                                  for the Request parameter
-                                  would result in this type of
-                                  error. In this case, the
-                                  Progress parameter would be
-                                  set to NULL.
   @retval EFI_NOT_FOUND           Routing data doesn't match any
                                   known driver. Progress set to the
                                   first character in the routing header.
@@ -488,9 +482,9 @@ Ip4DeviceExtractConfig (
     StrCpy (StrPointer + 1, FormResult);
     FreePool (DeviceResult);
     FreePool (FormResult);
-  } else if (HiiIsConfigHdrMatch (ConfigRequest, &gEfiNicIp4ConfigVariableGuid, EFI_NIC_IP4_CONFIG_VARIABLE)) {
+  } else if (HiiIsConfigHdrMatch (Request, &gEfiNicIp4ConfigVariableGuid, EFI_NIC_IP4_CONFIG_VARIABLE)) {
     *Results = DeviceResult;
-  } else if (HiiIsConfigHdrMatch (ConfigRequest, &mNicIp4ConfigNvDataGuid, EFI_NIC_IP4_CONFIG_VARIABLE)) {
+  } else if (HiiIsConfigHdrMatch (Request, &mNicIp4ConfigNvDataGuid, EFI_NIC_IP4_CONFIG_VARIABLE)) {
     *Results = FormResult;
   } else {
     return EFI_NOT_FOUND;
