@@ -66,7 +66,7 @@ Notes:
 	 or modules because the AutoGen.* files have been be removed. The "makefile" itself
 	 cannot generate AutoGen.* files. Only "build" command can.
 3) All .exe binary file including C and python tools are generated from:
-    r1707 <buildtools_project>\BaseTools\Source\ + r1707 VfrCompiler tool update
+    r1911 <buildtools_project>\BaseTools\Source\.
 
 Brief usage for Migration Tool MigrationMsa2Inf.exe:
 1. Command line format:
@@ -125,30 +125,7 @@ Brief usage for Migration Tool MigrationMsa2Inf.exe:
    f. When tool generates [LibraryClasses] section, the recommended library instances are lost. (No impact to build)
  
 7. Pyton Source
-   r682 <buildtools_project>\BaseTools\Source\Python\MigrationMsa2Inf
-
-
-Brief Usage for PcdSyntax Update:
-Usage:
-  PcdSyntaxUpdate.exe <directory_name>
-It searches all INF, DEC and DSC file under <directory_name> and update them with the following rules:
-1. Update INF files to conform to INF spec 0.44: 
-   a. Rename PCD section name: e.g. [PcdsFeatureFlag] -> [FeaturePcd]
-   b. Adjust PCD section item format: e.g. PcdDebugClearMemoryValue|gEfiMdePkgTokenSpaceGuid -> gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue
-   c. Update the syntax of binary INF file (not PCD related) 
-2. Update DEC files to confirm to DEC spec 0.36
-   Adjust PCD section item format: e.g. PcdWinNtPhysicalDisk|0x00001000|gEfiNt32PkgTokenSpaceGuid|VOID*|L"E:RW;245760;512"-> gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashFvRecoverySize|0x0|UINT32|0x00001011
-3. Update DSC files to confirm to DSC spec 
-   a. Adjust string/array typed PCD item format: e.g. PcdWinNtMemorySizeForSecMain|gEfiNt32PkgTokenSpaceGuid|L"64!64"|12 -> gEfiNt32PkgTokenSpaceGuid.PcdWinNtMemorySizeForSecMain|L"64!64"|VOID*|12
-   b. Adjust non-string/array typed PCD item format: e.g. PcdWinNtBootMode|gEfiNt32PkgTokenSpaceGuid|1 -> gEfiNt32PkgTokenSpaceGuid.PcdWinNtBootMode|1
-   c. Update the override library class in [Components] section: e.g.
-   <LibraryClass> {
-      PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
-   }
-   To 
-   <LibraryClasses> {
-      PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
-   }
+   BaseTools\Source\Python\MigrationMsa2Inf
 
 Brief usage for Migration Tool Spd2Dec.exe:
 1. Command line format:
@@ -164,7 +141,7 @@ Brief usage for Migration Tool Spd2Dec.exe:
    Example a & b are equivalent to migrate Nt32 package SPD file from EDKII to EDKII' snytax.
   
 6. Pyton Source
-   r777 <buildtools_project>\BaseTools\Source\Python\spd2Dec
+   BaseTools\Source\Python\spd2dec
 
 Brief usage for Migration Tool Fpd2Dsc.exe:
 1. Command line format:
@@ -188,6 +165,6 @@ Brief usage for Migration Tool Fpd2Dsc.exe:
    b. If MSA file which is corresponds to module guid could not be found in currect workspace, tool will dump the module guid.
  
 7. Pyton Source
-   r767 <buildtools_project>\BaseTools\Source\Python\Fpd2Dsc
+   BaseTools\Source\Python\fpd2dsc
 
-10-Sep-2009
+4-Mar-2010

@@ -196,10 +196,8 @@ def main():
 
         if (Options.outputDir):
             OutputDirFromCommandLine = GenFdsGlobalVariable.ReplaceWorkspaceMacro(Options.outputDir)
-            if not os.path.isabs (Options.outputDir):
-                Options.outputDir = os.path.join(GenFdsGlobalVariable.WorkSpaceDir, Options.outputDir)
-            if os.path.normcase (Options.outputDir).find(Workspace) != 0:
-                EdkLogger.error("GenFds", FILE_NOT_FOUND, "OutputDir doesn't exist in Workspace!")
+            if not os.path.isabs (OutputDirFromCommandLine):
+                OutputDirFromCommandLine = os.path.join(GenFdsGlobalVariable.WorkSpaceDir, OutputDirFromCommandLine)
             for Arch in ArchList:
                 GenFdsGlobalVariable.OutputDirDict[Arch] = OutputDirFromCommandLine
         else:

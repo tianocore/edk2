@@ -667,31 +667,31 @@ class PcdReport(object):
                         if DecDefaultValue == None:
                             DecMatch = True
                         else:
-                            DecMatch = (DecDefaultValue == PcdValue)
+                            DecMatch = (DecDefaultValue.strip() == PcdValue.strip())
 
                         if InfDefaultValue == None:
                             InfMatch = True
                         else:
-                            InfMatch = (InfDefaultValue == PcdValue)
+                            InfMatch = (InfDefaultValue.strip() == PcdValue.strip())
 
                         if DscDefaultValue == None:
                             DscMatch = True
                         else:
-                            DscMatch = (DscDefaultValue == PcdValue)
+                            DscMatch = (DscDefaultValue.strip() == PcdValue.strip())
 
                     #
                     # Report PCD item according to their override relationship
                     #
                     if DecMatch and InfMatch:
-                        FileWrite(File, '    %-*s: %6s %10s = %-22s' % (self.MaxLen, Pcd.TokenCName, TypeName, '('+Pcd.DatumType+')', PcdValue))
+                        FileWrite(File, '    %-*s: %6s %10s = %-22s' % (self.MaxLen, Pcd.TokenCName, TypeName, '('+Pcd.DatumType+')', PcdValue.strip()))
                     else:
                         if DscMatch:
                             if (Pcd.TokenCName, Key) in self.FdfPcdSet:
-                                FileWrite(File, ' *F %-*s: %6s %10s = %-22s' % (self.MaxLen, Pcd.TokenCName, TypeName, '('+Pcd.DatumType+')', PcdValue))
+                                FileWrite(File, ' *F %-*s: %6s %10s = %-22s' % (self.MaxLen, Pcd.TokenCName, TypeName, '('+Pcd.DatumType+')', PcdValue.strip()))
                             else:
-                                FileWrite(File, ' *P %-*s: %6s %10s = %-22s' % (self.MaxLen, Pcd.TokenCName, TypeName, '('+Pcd.DatumType+')', PcdValue))
+                                FileWrite(File, ' *P %-*s: %6s %10s = %-22s' % (self.MaxLen, Pcd.TokenCName, TypeName, '('+Pcd.DatumType+')', PcdValue.strip()))
                         else:
-                            FileWrite(File, ' *M %-*s: %6s %10s = %-22s' % (self.MaxLen, Pcd.TokenCName, TypeName, '('+Pcd.DatumType+')', PcdValue))
+                            FileWrite(File, ' *M %-*s: %6s %10s = %-22s' % (self.MaxLen, Pcd.TokenCName, TypeName, '('+Pcd.DatumType+')', PcdValue.strip()))
                     
                     if TypeName in ('DYNHII', 'DEXHII', 'DYNVPD', 'DEXVPD'):
                         for SkuInfo in Pcd.SkuInfoList.values():
@@ -701,13 +701,13 @@ class PcdReport(object):
                                 FileWrite(File, '%*s' % (self.MaxLen + 4, SkuInfo.VpdOffset))
                                
                     if not DscMatch and DscDefaultValue != None:
-                        FileWrite(File, '    %*s = %s' % (self.MaxLen + 19, 'DSC DEFAULT', DscDefaultValue))
+                        FileWrite(File, '    %*s = %s' % (self.MaxLen + 19, 'DSC DEFAULT', DscDefaultValue.strip()))
 
                     if not InfMatch and InfDefaultValue != None:
-                        FileWrite(File, '    %*s = %s' % (self.MaxLen + 19, 'INF DEFAULT', InfDefaultValue))
+                        FileWrite(File, '    %*s = %s' % (self.MaxLen + 19, 'INF DEFAULT', InfDefaultValue.strip()))
 
                     if not DecMatch and DecDefaultValue != None:
-                        FileWrite(File, '    %*s = %s' % (self.MaxLen + 19, 'DEC DEFAULT', DecDefaultValue))
+                        FileWrite(File, '    %*s = %s' % (self.MaxLen + 19, 'DEC DEFAULT', DecDefaultValue.strip()))
 
                     if ModulePcdSet == None:
                         ModuleOverride = self.ModulePcdOverride.get((Pcd.TokenCName, Pcd.TokenSpaceGuidCName), {})
@@ -717,10 +717,10 @@ class PcdReport(object):
                                 ModulePcdDefaultValueNumber = int(ModuleDefault.strip(), 0)
                                 Match = (ModulePcdDefaultValueNumber == PcdValueNumber)
                             else:
-                                Match = (ModuleDefault == PcdValue)
+                                Match = (ModuleDefault.strip() == PcdValue.strip())
                             if Match:
                                 continue
-                            FileWrite(File, ' *M %-*s = %s' % (self.MaxLen + 19, ModulePath, ModuleDefault))
+                            FileWrite(File, ' *M %-*s = %s' % (self.MaxLen + 19, ModulePath, ModuleDefault.strip()))
 
         if ModulePcdSet == None:
             FileWrite(File, gSectionEnd)
@@ -1283,8 +1283,9 @@ class PlatformReport(object):
     #
     # @param self            The object pointer
     # @param Wa              Workspace context information
+    # @param MaList          The list of modules in the platform build
     #
-    def __init__(self, Wa, ReportType):
+    def __init__(self, Wa, MaList, ReportType):
         self._WorkspaceDir = Wa.WorkspaceDir
         self.PlatformName = Wa.Name
         self.PlatformDscPath = Wa.Platform
@@ -1299,7 +1300,7 @@ class PlatformReport(object):
             self.PcdReport = PcdReport(Wa)
 
         self.FdReportList = []
-        if "FLASH" in ReportType and Wa.FdfProfile:
+        if "FLASH" in ReportType and Wa.FdfProfile and MaList == None:
             for Fd in Wa.FdfProfile.FdDict:
                 self.FdReportList.append(FdReport(Wa.FdfProfile.FdDict[Fd], Wa))
 
@@ -1308,9 +1309,13 @@ class PlatformReport(object):
             self.PredictionReport = PredictionReport(Wa)
 
         self.ModuleReportList = []
-        for Pa in Wa.AutoGenObjectList:
-            for ModuleKey in Pa.Platform.Modules:
-                self.ModuleReportList.append(ModuleReport(Pa.Platform.Modules[ModuleKey].M, ReportType))
+        if MaList != None:
+            for Ma in MaList:
+                self.ModuleReportList.append(ModuleReport(Ma, ReportType))
+        else:
+            for Pa in Wa.AutoGenObjectList:
+                for ModuleKey in Pa.Platform.Modules:
+                    self.ModuleReportList.append(ModuleReport(Pa.Platform.Modules[ModuleKey].M, ReportType))
 
 
 
@@ -1386,10 +1391,11 @@ class BuildReport(object):
     #
     # @param self            The object pointer
     # @param Wa              Workspace context information
+    # @param MaList          The list of modules in the platform build
     #
-    def AddPlatformReport(self, Wa):
+    def AddPlatformReport(self, Wa, MaList=None):
         if self.ReportFile:
-            self.ReportList.append(Wa)
+            self.ReportList.append((Wa, MaList))
 
     ##
     # Generates the final report.
@@ -1407,8 +1413,8 @@ class BuildReport(object):
             except IOError:
                 EdkLogger.error(None, FILE_OPEN_FAILURE, ExtraData=self.ReportFile)
             try:
-                for Wa in self.ReportList:
-                    PlatformReport(Wa, self.ReportType).GenerateReport(File, BuildDuration, self.ReportType)
+                for (Wa, MaList) in self.ReportList:
+                    PlatformReport(Wa, MaList, self.ReportType).GenerateReport(File, BuildDuration, self.ReportType)
                 EdkLogger.quiet("Report successfully saved to %s" % os.path.abspath(self.ReportFile))
             except IOError:
                 EdkLogger.error(None, FILE_WRITE_FAILURE, ExtraData=self.ReportFile)

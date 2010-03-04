@@ -1,7 +1,7 @@
 ## @file
 # parse FDF file
 #
-#  Copyright (c) 2007, Intel Corporation
+#  Copyright (c) 2007 - 2010, Intel Corporation
 #
 #  All rights reserved. This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -383,7 +383,22 @@ class FdfParser(object):
         while Offset <= EndPos[1]:
             self.Profile.FileLinesList[EndPos[0]][Offset] = Value
             Offset += 1
-            
+
+
+    def __GetMacroName(self):
+        if not self.__GetNextToken():
+            raise Warning("expected Macro name", self.FileName, self.CurrentLineNumber)
+        MacroName = self.__Token
+        NotFlag = False
+        if MacroName.startswith('!'):
+            NotFlag = True
+            MacroName = MacroName[1:].strip()
+         
+        if not MacroName.startswith('$(') or not MacroName.endswith(')'):
+            raise Warning("Macro name expected(Please use '$(%(Token)s)' if '%(Token)s' is a macro.)" % {"Token" : MacroName},
+                          self.FileName, self.CurrentLineNumber)
+        MacroName = MacroName[2:-1]
+        return MacroName, NotFlag
     
     ## PreprocessFile() method
     #
@@ -554,14 +569,7 @@ class FdfParser(object):
                 IfList.append([IfStartPos, None, None])
                 CondLabel = self.__Token
                 
-                if not self.__GetNextToken():
-                    raise Warning("expected Macro name At Line ", self.FileName, self.CurrentLineNumber)
-                MacroName = self.__Token
-                NotFlag = False
-                if MacroName.startswith('!'):
-                    NotFlag = True
-                    MacroName = MacroName[1:]
-
+                MacroName, NotFlag = self.__GetMacroName() 
                 NotDefineFlag = False
                 if CondLabel == '!ifndef':
                     NotDefineFlag = True
@@ -615,14 +623,7 @@ class FdfParser(object):
                     self.__WipeOffArea.append((IfList[-1][0], ElseStartPos))
                     IfList[-1] = [ElseStartPos, True, IfList[-1][2]]
                     if self.__Token == '!elseif':
-                        if not self.__GetNextToken():
-                            raise Warning("expected Macro name At Line ", self.FileName, self.CurrentLineNumber)
-                        MacroName = self.__Token
-                        NotFlag = False
-                        if MacroName.startswith('!'):
-                            NotFlag = True
-                            MacroName = MacroName[1:]
-
+                        MacroName, NotFlag = self.__GetMacroName() 
                         if not self.__GetNextOp():
                             raise Warning("expected !endif At Line ", self.FileName, self.CurrentLineNumber)
                     
