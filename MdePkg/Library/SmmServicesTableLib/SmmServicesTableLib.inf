@@ -19,7 +19,7 @@
   FILE_GUID                      = 064B4C5B-C5EF-4eff-85DF-65518EF1314D
   MODULE_TYPE                    = DXE_SMM_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = SmmServicesTableLib|SMM_CORE DXE_SMM_DRIVER
+  LIBRARY_CLASS                  = SmmServicesTableLib|DXE_SMM_DRIVER
   PI_SPECIFICATION_VERSION       = 0x0001000A
   CONSTRUCTOR                    = SmmServicesTableLibConstructor
 
