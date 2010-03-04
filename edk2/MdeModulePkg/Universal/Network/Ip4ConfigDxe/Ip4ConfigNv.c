@@ -342,19 +342,32 @@ Ip4DeviceExtractConfig (
   NIC_IP4_CONFIG_INFO              *IfrDeviceNvData;
   IP4_CONFIG_INSTANCE              *Ip4ConfigInstance;
   IP4_CONFIG_IFR_NVDATA            *IfrFormNvData;
+  EFI_STRING                       ConfigRequestHdr;
+  EFI_STRING                       ConfigRequest;
+  EFI_STRING                       DeviceResult;
+  EFI_STRING                       FormResult;
+  CHAR16                           *StrPointer;
+  BOOLEAN                          AllocatedRequest;
+  UINTN                            Size;
+  UINTN                            BufferSize;
 
-  if (Request == NULL || Progress == NULL || Results == NULL) {
+  if (Progress == NULL || Results == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  *Progress = Request;
-
+  *Progress     = Request;
+  Size          = 0;
+  DeviceResult  = NULL;
+  FormResult    = NULL;
+  ConfigRequest = NULL;
+  Status        = EFI_SUCCESS;
+  AllocatedRequest  = FALSE;
   Ip4ConfigInstance = IP4_CONFIG_INSTANCE_FROM_CONFIG_ACCESS (This);
 
   //
   // Check Request data in <ConfigHdr>.
   //
-  if (HiiIsConfigHdrMatch (Request, &gEfiNicIp4ConfigVariableGuid, EFI_NIC_IP4_CONFIG_VARIABLE)) {
+  if ((Request == NULL) || HiiIsConfigHdrMatch (Request, &gEfiNicIp4ConfigVariableGuid, EFI_NIC_IP4_CONFIG_VARIABLE)) {
     IfrDeviceNvData = AllocateZeroPool (NIC_ITEM_CONFIG_SIZE);
     if (IfrDeviceNvData == NULL) {
       return EFI_OUT_OF_RESOURCES;
@@ -367,21 +380,50 @@ Ip4DeviceExtractConfig (
       return EFI_NOT_FOUND;
     }
 
+    ConfigRequest = Request;
+    if ((Request == NULL) || (StrStr (Request, L"OFFSET") == NULL)) {
+      //
+      // Request has no request element, construct full request string.
+      // Allocate and fill a buffer large enough to hold the <ConfigHdr> template
+      // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
+      //
+      ConfigRequestHdr = HiiConstructConfigHdr (&gEfiNicIp4ConfigVariableGuid, EFI_NIC_IP4_CONFIG_VARIABLE, Ip4ConfigInstance->ChildHandle);
+      Size = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
+      ConfigRequest = AllocateZeroPool (Size);
+      ASSERT (ConfigRequest != NULL);
+      AllocatedRequest = TRUE;
+      BufferSize = NIC_ITEM_CONFIG_SIZE;
+      UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64)BufferSize);
+      FreePool (ConfigRequestHdr);
+    }
+
     //
     // Convert buffer data to <ConfigResp> by helper function BlockToConfig()
     //
     Status = gHiiConfigRouting->BlockToConfig (
                                   gHiiConfigRouting,
-                                  Request,
+                                  ConfigRequest,
                                   (UINT8 *) IfrDeviceNvData,
                                   NIC_ITEM_CONFIG_SIZE,
-                                  Results,
+                                  &DeviceResult,
                                   Progress
                                   );
 
     FreePool (IfrDeviceNvData);
+    //
+    // Free the allocated config request string.
+    //
+    if (AllocatedRequest) {
+      FreePool (ConfigRequest);
+      ConfigRequest = NULL;
+    }
 
-  } else if (HiiIsConfigHdrMatch (Request, &mNicIp4ConfigNvDataGuid, EFI_NIC_IP4_CONFIG_VARIABLE)) {
+    if (EFI_ERROR (Status)) {
+      goto Failure;
+    }
+  } 
+  
+  if ((Request == NULL) || HiiIsConfigHdrMatch (Request, &mNicIp4ConfigNvDataGuid, EFI_NIC_IP4_CONFIG_VARIABLE)) {
 
     IfrFormNvData = AllocateZeroPool (NIC_ITEM_CONFIG_SIZE);
     if (IfrFormNvData == NULL) {
@@ -390,25 +432,80 @@ Ip4DeviceExtractConfig (
 
     Ip4ConfigConvertDeviceConfigDataToIfrNvData (Ip4ConfigInstance, IfrFormNvData);
 
+    ConfigRequest = Request;
+    if ((Request == NULL) || (StrStr (Request, L"OFFSET") == NULL)) {
+      //
+      // Request has no request element, construct full request string.
+      // Allocate and fill a buffer large enough to hold the <ConfigHdr> template
+      // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
+      //
+      ConfigRequestHdr = HiiConstructConfigHdr (&mNicIp4ConfigNvDataGuid, EFI_NIC_IP4_CONFIG_VARIABLE, Ip4ConfigInstance->ChildHandle);
+      Size = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
+      ConfigRequest = AllocateZeroPool (Size);
+      ASSERT (ConfigRequest != NULL);
+      AllocatedRequest = TRUE;
+      BufferSize = sizeof (IP4_CONFIG_IFR_NVDATA);
+      UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64)BufferSize);
+      FreePool (ConfigRequestHdr);
+    }
+ 
     //
     // Convert buffer data to <ConfigResp> by helper function BlockToConfig()
     //
     Status = gHiiConfigRouting->BlockToConfig (
                                   gHiiConfigRouting,
-                                  Request,
+                                  ConfigRequest,
                                   (UINT8 *) IfrFormNvData,
                                   sizeof (IP4_CONFIG_IFR_NVDATA),
-                                  Results,
+                                  &FormResult,
                                   Progress
                                   );
 
     FreePool (IfrFormNvData);
+    //
+    // Free the allocated config request string.
+    //
+    if (AllocatedRequest) {
+      FreePool (ConfigRequest);
+      ConfigRequest = NULL;
+    }
 
+    if (EFI_ERROR (Status)) {
+      goto Failure;
+    }
+  }
+
+  if (Request == NULL) {
+    Size = StrLen (DeviceResult);
+    Size = Size + 1;
+    Size = Size + StrLen (FormResult) + 1;
+    *Results = AllocateZeroPool (Size * sizeof (CHAR16));
+    ASSERT (*Results != NULL);
+    StrPointer  = *Results;
+    StrCpy (StrPointer, DeviceResult);
+    StrPointer  = StrPointer + StrLen (StrPointer);
+    *StrPointer = L'&';
+    StrCpy (StrPointer + 1, FormResult);
+    FreePool (DeviceResult);
+    FreePool (FormResult);
+  } else if (HiiIsConfigHdrMatch (ConfigRequest, &gEfiNicIp4ConfigVariableGuid, EFI_NIC_IP4_CONFIG_VARIABLE)) {
+    *Results = DeviceResult;
+  } else if (HiiIsConfigHdrMatch (ConfigRequest, &mNicIp4ConfigNvDataGuid, EFI_NIC_IP4_CONFIG_VARIABLE)) {
+    *Results = FormResult;
   } else {
     return EFI_NOT_FOUND;
   }
 
-
+Failure:
+  //
+  // Set Progress string to the original request string.
+  //
+  if (Request == NULL) {
+    *Progress = NULL;
+  } else if (StrStr (Request, L"OFFSET") == NULL) {
+    *Progress = Request + StrLen (Request);
+  }
+  
   return Status;
 }
 

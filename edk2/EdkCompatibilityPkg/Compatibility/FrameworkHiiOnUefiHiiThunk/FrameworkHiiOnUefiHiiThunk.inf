@@ -80,6 +80,7 @@
   UefiLib
   PcdLib
   LanguageLib
+  PrintLib
 
 [Guids]
   gEfiIfrTianoGuid

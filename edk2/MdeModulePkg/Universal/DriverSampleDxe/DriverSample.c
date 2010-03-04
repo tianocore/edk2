@@ -2,7 +2,7 @@
 This is an example of how a driver might export data to the HII protocol to be
 later utilized by the Setup Protocol
 
-Copyright (c) 2004 - 2009, Intel Corporation
+Copyright (c) 2004 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -380,9 +380,9 @@ ExtractConfig (
   UINTN                            ValueStrLen;
   CHAR16                           BackupChar;
   CHAR16                           *StrPointer;
+  BOOLEAN                          AllocatedRequest;
 
-
-  if (Progress == NULL || Results == NULL || Request == NULL) {
+  if (Progress == NULL || Results == NULL) {
     return EFI_INVALID_PARAMETER;
   }
   //
@@ -392,6 +392,7 @@ ExtractConfig (
   ConfigRequest     = NULL;
   Size              = 0;
   *Progress         = Request;
+  AllocatedRequest  = FALSE;
 
   PrivateData = DRIVER_SAMPLE_PRIVATE_FROM_THIS (This);
   HiiConfigRouting = PrivateData->HiiConfigRouting;
@@ -422,8 +423,9 @@ ExtractConfig (
     // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
     //
     ConfigRequestHdr = HiiConstructConfigHdr (&mFormSetGuid, VariableName, PrivateData->DriverHandle[0]);
-    Size = (StrLen (ConfigRequest) + 32 + 1) * sizeof (CHAR16);
+    Size = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
     ConfigRequest = AllocateZeroPool (Size);
+    AllocatedRequest = TRUE;
     UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64)BufferSize);
     FreePool (ConfigRequestHdr);
   } else {
@@ -434,110 +436,140 @@ ExtractConfig (
     if (!HiiIsConfigHdrMatch (Request, &mFormSetGuid, NULL)) {
       return EFI_NOT_FOUND;
     }
-    ConfigRequest = Request;
-
     //
-    // Check if requesting Name/Value storage
+    // Set Request to the unified request string.
+    //
+    ConfigRequest = Request;
+    //
+    // Check whether Request includes Request Element.
     //
     if (StrStr (Request, L"OFFSET") == NULL) {
       //
-      // Update Name/Value storage Names
+      // Check Request Element does exist in Reques String
       //
-      Status = LoadNameValueNames (PrivateData);
-      if (EFI_ERROR (Status)) {
-        return Status;
+      StrPointer = StrStr (Request, L"PATH");
+      if (StrPointer == NULL) {
+        return EFI_INVALID_PARAMETER;
       }
-
-      //
-      // Allocate memory for <ConfigResp>, e.g. Name0=0x11, Name1=0x1234, Name2="ABCD"
-      // <Request>   ::=<ConfigHdr>&Name0&Name1&Name2
-      // <ConfigResp>::=<ConfigHdr>&Name0=11&Name1=1234&Name2=0041004200430044
-      //
-      BufferSize = (StrLen (Request) +
-        1 + sizeof (PrivateData->Configuration.NameValueVar0) * 2 +
-        1 + sizeof (PrivateData->Configuration.NameValueVar1) * 2 +
-        1 + sizeof (PrivateData->Configuration.NameValueVar2) * 2 + 1) * sizeof (CHAR16);
-      *Results = AllocateZeroPool (BufferSize);
-      ASSERT (*Results != NULL);
-      StrCpy (*Results, Request);
-      Value = *Results;
-
-      //
-      // Append value of NameValueVar0, type is UINT8
-      //
-      if ((Value = StrStr (*Results, PrivateData->NameValueName[0])) != NULL) {
-        Value += StrLen (PrivateData->NameValueName[0]);
-        ValueStrLen = ((sizeof (PrivateData->Configuration.NameValueVar0) * 2) + 1);
-        CopyMem (Value + ValueStrLen, Value, StrSize (Value));
-
-        BackupChar = Value[ValueStrLen];
-        *Value++   = L'=';
-        Value += UnicodeValueToString (
-                   Value, 
-                   PREFIX_ZERO | RADIX_HEX, 
-                   PrivateData->Configuration.NameValueVar0, 
-                   sizeof (PrivateData->Configuration.NameValueVar0) * 2
-                   );
-        *Value = BackupChar;
+      if (StrStr (StrPointer, L"&") == NULL) {
+        Size = (StrLen (Request) + 32 + 1) * sizeof (CHAR16);
+        ConfigRequest    = AllocateZeroPool (Size);
+        AllocatedRequest = TRUE;
+        UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", Request, (UINT64)BufferSize);
       }
-
-      //
-      // Append value of NameValueVar1, type is UINT16
-      //
-      if ((Value = StrStr (*Results, PrivateData->NameValueName[1])) != NULL) {
-        Value += StrLen (PrivateData->NameValueName[1]);
-        ValueStrLen = ((sizeof (PrivateData->Configuration.NameValueVar1) * 2) + 1);
-        CopyMem (Value + ValueStrLen, Value, StrSize (Value));
-
-        BackupChar = Value[ValueStrLen];
-        *Value++   = L'=';
-        Value += UnicodeValueToString (
-                  Value, 
-                  PREFIX_ZERO | RADIX_HEX, 
-                  PrivateData->Configuration.NameValueVar1, 
-                  sizeof (PrivateData->Configuration.NameValueVar1) * 2
-                  );
-        *Value = BackupChar;
-      }
-
-      //
-      // Append value of NameValueVar2, type is CHAR16 *
-      //
-      if ((Value = StrStr (*Results, PrivateData->NameValueName[2])) != NULL) {
-        Value += StrLen (PrivateData->NameValueName[2]);
-        ValueStrLen = StrLen (PrivateData->Configuration.NameValueVar2) * 4 + 1;
-        CopyMem (Value + ValueStrLen, Value, StrSize (Value));
-
-        *Value++ = L'=';
-        //
-        // Convert Unicode String to Config String, e.g. "ABCD" => "0041004200430044"
-        //
-        StrPointer = (CHAR16 *) PrivateData->Configuration.NameValueVar2;
-        for (; *StrPointer != L'\0'; StrPointer++) {
-          Value += UnicodeValueToString (Value, PREFIX_ZERO | RADIX_HEX, *StrPointer, 4);
-        }
-      }
-
-      Progress = (EFI_STRING *) Request + StrLen (Request);
-      return EFI_SUCCESS;
     }
   }
 
   //
-  // Convert buffer data to <ConfigResp> by helper function BlockToConfig()
+  // Check if requesting Name/Value storage
   //
-  Status = HiiConfigRouting->BlockToConfig (
-                                HiiConfigRouting,
-                                ConfigRequest,
-                                (UINT8 *) &PrivateData->Configuration,
-                                BufferSize,
-                                Results,
-                                Progress
-                                );
+  if (StrStr (ConfigRequest, L"OFFSET") == NULL) {
+    //
+    // Update Name/Value storage Names
+    //
+    Status = LoadNameValueNames (PrivateData);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
 
-  if (Request == NULL) {
+    //
+    // Allocate memory for <ConfigResp>, e.g. Name0=0x11, Name1=0x1234, Name2="ABCD"
+    // <Request>   ::=<ConfigHdr>&Name0&Name1&Name2
+    // <ConfigResp>::=<ConfigHdr>&Name0=11&Name1=1234&Name2=0041004200430044
+    //
+    BufferSize = (StrLen (ConfigRequest) +
+      1 + sizeof (PrivateData->Configuration.NameValueVar0) * 2 +
+      1 + sizeof (PrivateData->Configuration.NameValueVar1) * 2 +
+      1 + sizeof (PrivateData->Configuration.NameValueVar2) * 2 + 1) * sizeof (CHAR16);
+    *Results = AllocateZeroPool (BufferSize);
+    ASSERT (*Results != NULL);
+    StrCpy (*Results, ConfigRequest);
+    Value = *Results;
+
+    //
+    // Append value of NameValueVar0, type is UINT8
+    //
+    if ((Value = StrStr (*Results, PrivateData->NameValueName[0])) != NULL) {
+      Value += StrLen (PrivateData->NameValueName[0]);
+      ValueStrLen = ((sizeof (PrivateData->Configuration.NameValueVar0) * 2) + 1);
+      CopyMem (Value + ValueStrLen, Value, StrSize (Value));
+
+      BackupChar = Value[ValueStrLen];
+      *Value++   = L'=';
+      Value += UnicodeValueToString (
+                 Value, 
+                 PREFIX_ZERO | RADIX_HEX, 
+                 PrivateData->Configuration.NameValueVar0, 
+                 sizeof (PrivateData->Configuration.NameValueVar0) * 2
+                 );
+      *Value = BackupChar;
+    }
+
+    //
+    // Append value of NameValueVar1, type is UINT16
+    //
+    if ((Value = StrStr (*Results, PrivateData->NameValueName[1])) != NULL) {
+      Value += StrLen (PrivateData->NameValueName[1]);
+      ValueStrLen = ((sizeof (PrivateData->Configuration.NameValueVar1) * 2) + 1);
+      CopyMem (Value + ValueStrLen, Value, StrSize (Value));
+
+      BackupChar = Value[ValueStrLen];
+      *Value++   = L'=';
+      Value += UnicodeValueToString (
+                Value, 
+                PREFIX_ZERO | RADIX_HEX, 
+                PrivateData->Configuration.NameValueVar1, 
+                sizeof (PrivateData->Configuration.NameValueVar1) * 2
+                );
+      *Value = BackupChar;
+    }
+
+    //
+    // Append value of NameValueVar2, type is CHAR16 *
+    //
+    if ((Value = StrStr (*Results, PrivateData->NameValueName[2])) != NULL) {
+      Value += StrLen (PrivateData->NameValueName[2]);
+      ValueStrLen = StrLen (PrivateData->Configuration.NameValueVar2) * 4 + 1;
+      CopyMem (Value + ValueStrLen, Value, StrSize (Value));
+
+      *Value++ = L'=';
+      //
+      // Convert Unicode String to Config String, e.g. "ABCD" => "0041004200430044"
+      //
+      StrPointer = (CHAR16 *) PrivateData->Configuration.NameValueVar2;
+      for (; *StrPointer != L'\0'; StrPointer++) {
+        Value += UnicodeValueToString (Value, PREFIX_ZERO | RADIX_HEX, *StrPointer, 4);
+      }
+    }
+    
+    Status = EFI_SUCCESS;
+  } else {
+    //
+    // Convert buffer data to <ConfigResp> by helper function BlockToConfig()
+    //
+    Status = HiiConfigRouting->BlockToConfig (
+                                  HiiConfigRouting,
+                                  ConfigRequest,
+                                  (UINT8 *) &PrivateData->Configuration,
+                                  BufferSize,
+                                  Results,
+                                  Progress
+                                  );
+  }
+
+  //
+  // Free the allocated config request string.
+  //
+  if (AllocatedRequest) {
     FreePool (ConfigRequest);
+  }
+  //
+  // Set Progress string to the original request string.
+  //
+  if (Request == NULL) {
     *Progress = NULL;
+  } else if (StrStr (Request, L"OFFSET") == NULL) {
+    *Progress = Request + StrLen (Request);
   }
 
   return Status;

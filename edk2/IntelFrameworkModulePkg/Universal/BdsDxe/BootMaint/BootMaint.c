@@ -1,7 +1,7 @@
 /** @file
   The functions for Boot Maintainence Main menu.
 
-Copyright (c) 2004 - 2009, Intel Corporation. <BR>
+Copyright (c) 2004 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -184,25 +184,70 @@ BootMaintExtractConfig (
   EFI_STATUS         Status;
   UINTN              BufferSize;
   BMM_CALLBACK_DATA  *Private;
+  EFI_STRING                       ConfigRequestHdr;
+  EFI_STRING                       ConfigRequest;
+  BOOLEAN                          AllocatedRequest;
+  UINTN                            Size;
 
-  if (Request == NULL) {
+  if (Progress == NULL || Results == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  Private = BMM_CALLBACK_DATA_FROM_THIS (This);
+  *Progress = Request;
+  if ((Request != NULL) && !HiiIsConfigHdrMatch (Request, &mBootMaintGuid, mBootMaintStorageName)) {
+    return EFI_NOT_FOUND;
+  }
 
+  ConfigRequestHdr = NULL;
+  ConfigRequest    = NULL;
+  AllocatedRequest = FALSE;
+  Size             = 0;
+
+  Private = BMM_CALLBACK_DATA_FROM_THIS (This);
   //
   // Convert buffer data to <ConfigResp> by helper function BlockToConfig()
   //
   BufferSize = sizeof (BMM_FAKE_NV_DATA);
+  ConfigRequest = Request;
+  if ((Request == NULL) || (StrStr (Request, L"OFFSET") == NULL)) {
+    //
+    // Request has no request element, construct full request string.
+    // Allocate and fill a buffer large enough to hold the <ConfigHdr> template
+    // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
+    //
+    ConfigRequestHdr = HiiConstructConfigHdr (&mBootMaintGuid, mBootMaintStorageName, Private->BmmDriverHandle);
+    Size = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
+    ConfigRequest = AllocateZeroPool (Size);
+    ASSERT (ConfigRequest != NULL);
+    AllocatedRequest = TRUE;
+    UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64)BufferSize);
+    FreePool (ConfigRequestHdr);
+  }
+
   Status = gHiiConfigRouting->BlockToConfig (
                                 gHiiConfigRouting,
-                                Request,
+                                ConfigRequest,
                                 (UINT8 *) &Private->BmmFakeNvData,
                                 BufferSize,
                                 Results,
                                 Progress
                                 );
+  //
+  // Free the allocated config request string.
+  //
+  if (AllocatedRequest) {
+    FreePool (ConfigRequest);
+    ConfigRequest = NULL;
+  }
+  //
+  // Set Progress string to the original request string.
+  //
+  if (Request == NULL) {
+    *Progress = NULL;
+  } else if (StrStr (Request, L"OFFSET") == NULL) {
+    *Progress = Request + StrLen (Request);
+  }
+
   return Status;
 }
 

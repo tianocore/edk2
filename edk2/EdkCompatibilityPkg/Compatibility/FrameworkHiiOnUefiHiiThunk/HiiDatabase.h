@@ -48,6 +48,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiLib.h>
 #include <Library/PcdLib.h>
 #include <Library/LanguageLib.h>
+#include <Library/PrintLib.h>
 
 #include <Guid/MdeModuleHii.h>
 
