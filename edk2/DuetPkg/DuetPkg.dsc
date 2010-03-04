@@ -88,10 +88,6 @@
 [PcdsFeatureFlag]
   gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|TRUE
 
-[PcdsDynamicHii.common.DEFAULT]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|10 # Variable: L"Timeout"
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|L"ConOutConfig"|gDuetConsoleOutConfigGuid|0x0|80
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|L"ConOutConfig"|gDuetConsoleOutConfigGuid|0x4|25
 
 ###################################################################################################
 #
