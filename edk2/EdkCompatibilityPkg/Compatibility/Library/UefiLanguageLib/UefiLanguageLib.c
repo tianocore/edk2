@@ -384,7 +384,7 @@ ConvertRfc4646ToIso639 (
   
   @retval NULL                Invalid ISO 639-2 language code found.
   @retval NULL                Out of memory.
-  @retval !NULL               Pointer to the allocate buffer containing the Null-terminated converted language codes string.
+  @return                     Pointer to the allocate buffer containing the Null-terminated converted language codes string.
                               This string is composed of one or more RFC4646 language codes each of which has only
                               ISO 639-1 2-letter primary language subtag.
 
@@ -442,7 +442,7 @@ ConvertLanguagesIso639ToRfc4646 (
   
   @retval NULL                 Invalid or unsupported RFC 4646 language code found.
   @retval NULL                 Out of memory.
-  @retval !NULL                Pointer to the allocate buffer containing the Null-terminated converted language codes string.
+  @return                      Pointer to the allocate buffer containing the Null-terminated converted language codes string.
                                This string is composed of one or more ISO 639-2 language codes.
 
 **/

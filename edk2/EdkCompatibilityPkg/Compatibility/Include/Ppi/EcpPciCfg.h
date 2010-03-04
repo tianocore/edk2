@@ -1,7 +1,7 @@
 /** @file
 This PPI is the same as the PPI in the framework PciCfg, with one exception: this PPI does not include a modify API, while the PPI in the framework PciCfg does. 
 
-Copyright (c) 2008 - 2009, Intel Corporation                                                         
+Copyright (c) 2008 - 2010, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -39,7 +39,7 @@ typedef struct _ECP_PEI_PCI_CFG_PPI ECP_PEI_PCI_CFG_PPI;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *ECP_PEI_PCI_CFG_PPI_IO) (
+(EFIAPI *ECP_PEI_PCI_CFG_PPI_IO)(
   IN EFI_PEI_SERVICES         **PeiServices,
   IN EFI_PEI_PCI_CFG_PPI      * This,
   IN EFI_PEI_PCI_CFG_PPI_WIDTH Width,
