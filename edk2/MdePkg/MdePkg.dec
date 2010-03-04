@@ -196,6 +196,11 @@
   ##
   SynchronizationLib|Include/Library/SynchronizationLib.h
 
+[LibraryClasses.IA32, LibraryClasses.X64]
+  ##  @libraryclass  Abstracts both S/W SMI generation and detection.
+  ##
+  SmmLib|Include/Library/SmmLib.h
+
 [LibraryClasses.IPF]
   ##  @libraryclass  The SAL Library provides a service to make a SAL CALL.
   SalLib|Include/Library/SalLib.h
