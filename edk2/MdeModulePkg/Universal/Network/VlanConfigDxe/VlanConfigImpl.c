@@ -61,7 +61,7 @@ VENDOR_DEVICE_PATH              mHiiVendorDevicePathNode = {
 
   @retval EFI_SUCCESS            The Results is filled with the requested values.
   @retval EFI_OUT_OF_RESOURCES   Not enough memory to store the results.
-  @retval EFI_INVALID_PARAMETER  Request is NULL, illegal syntax, or unknown name.
+  @retval EFI_INVALID_PARAMETER  Request is illegal syntax, or unknown name.
   @retval EFI_NOT_FOUND          Routing data doesn't match any storage in this
                                  driver.
 
@@ -111,7 +111,7 @@ VlanExtractConfig (
   //
   PrivateData = VLAN_CONFIG_PRIVATE_DATA_FROM_THIS (This);
   ZeroMem (&Configuration, sizeof (VLAN_CONFIGURATION));
-  BufferSize = sizeof (VLAN_CONFIG_PRIVATE_DATA);
+  BufferSize = sizeof (Configuration);
   ConfigRequest = Request;
   if ((Request == NULL) || (StrStr (Request, L"OFFSET") == NULL)) {
     //
