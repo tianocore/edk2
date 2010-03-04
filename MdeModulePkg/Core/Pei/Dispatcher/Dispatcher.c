@@ -796,7 +796,7 @@ PeiDispatcher (
                       ));
               DEBUG_CODE_END ();
               
-              if (PcdGet64(PcdLoadModuleAtFixAddressEnable) != 0) {
+              if (PcdGet64(PcdLoadModuleAtFixAddressEnable) != 0 && (Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME)) {
                 //
                 // Loading Module at Fixed Address is enabled
                 //
