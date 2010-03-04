@@ -224,11 +224,6 @@ SmmAllocatePool (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Size == 0) {
-    *Buffer = NULL;
-    return EFI_SUCCESS;
-  }
-
   Size += sizeof (*PoolHdr);
   if (Size > MAX_POOL_SIZE) {
     Size = EFI_SIZE_TO_PAGES (Size);
