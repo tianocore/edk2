@@ -857,6 +857,7 @@ RefreshGcdMemoryAttributes (
   UINT32                              FirmwareVariableMtrrCount;
 
   FirmwareVariableMtrrCount = GetFirmwareVariableMtrrCount ();
+  ASSERT (FirmwareVariableMtrrCount <= MTRR_NUMBER_OF_VARIABLE_MTRR);
 
 //  mIsFlushingGCD = TRUE;
   mIsFlushingGCD = FALSE;
