@@ -74,6 +74,7 @@ EhcCreateHelpQ (
   QhHw->HorizonLink = QH_LINK (PciAddr + OFFSET_OF(EHC_QH, QhHw), EHC_TYPE_QH, FALSE);
   QhHw->Status      = QTD_STAT_HALTED;
   QhHw->ReclaimHead = 1;
+  Qh->NextQh        = Qh;
   Ehc->ReclaimHead  = Qh;
 
   //
@@ -335,9 +336,9 @@ EhcLinkQhToAsync (
   Qh->NextQh              = Head->NextQh;
   Head->NextQh            = Qh;
 
-  PciAddr = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Head, sizeof (EHC_QH));
+  PciAddr = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Qh->NextQh, sizeof (EHC_QH));
   Qh->QhHw.HorizonLink    = QH_LINK (PciAddr, EHC_TYPE_QH, FALSE);
-  PciAddr = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Qh, sizeof (EHC_QH));
+  PciAddr = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Head->NextQh, sizeof (EHC_QH));
   Head->QhHw.HorizonLink  = QH_LINK (PciAddr, EHC_TYPE_QH, FALSE);
 }
 
@@ -372,7 +373,7 @@ EhcUnlinkQhFromAsync (
   Head->NextQh            = Qh->NextQh;
   Qh->NextQh              = NULL;
 
-  PciAddr = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Head, sizeof (EHC_QH));
+  PciAddr = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Head->NextQh, sizeof (EHC_QH));
   Head->QhHw.HorizonLink  = QH_LINK (PciAddr, EHC_TYPE_QH, FALSE);
 
   //

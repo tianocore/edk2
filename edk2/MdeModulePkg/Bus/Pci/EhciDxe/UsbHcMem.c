@@ -246,6 +246,10 @@ UsbHcGetPciAddressForHostMem (
   Head      = Pool->Head;
   AllocSize = USBHC_MEM_ROUND (Size);
 
+  if (Mem == NULL) {
+    return 0;
+  }
+
   for (Block = Head; Block != NULL; Block = Block->Next) {
     //
     // scan the memory block list for the memory block that
