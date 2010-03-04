@@ -225,10 +225,10 @@ class SourceFiles:
         'mingw_hdr': {
             'url': 'http://sourceforge.net/projects/' + \
                    'mingw-w64/files/mingw-w64/mingw-w64-snapshot/' + \
-                   'mingw-w64-trunk-snapshot-$version.tar.bz2/download',
-            'extract-dir': os.path.join('trunk', 'mingw-w64-headers'),
-            'version': '20091222',
-            'md5': 'fbcf282d1a05df121088d775e02095d6',
+                   'mingw-w64-v1.0-snapshot-$version.tar.bz2/download',
+            'extract-dir': os.path.join('mingw-w64-v1.0-$version', 'mingw-w64-headers'),
+            'version': '20100223',
+            'md5': '700b9f54e740b1b962c8a3a0f52b7c04',
             },
         }
 
