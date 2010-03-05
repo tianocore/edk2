@@ -39,6 +39,8 @@ ASM_PFX(_ModuleEntryPoint):
   // Set CPU vectors to start of DRAM
   mov     r0, #0x80000000
   mcr     p15, 0, r0, c12, c0, 0
+  isb                               // Sync changes to control registers
+
   /* before we call C code, lets setup the stack pointer in internal RAM*/
 stack_pointer_setup:
 
