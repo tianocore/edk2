@@ -178,17 +178,24 @@ InitializeExceptions (
   UINTN                Offset;
   UINTN                Length;
   UINTN                Index;
-  BOOLEAN              Enabled;
+  BOOLEAN              IrqEnabled;
+  BOOLEAN              FiqEnabled;
   EFI_PHYSICAL_ADDRESS Base;
   UINT32               *VectorBase;
 
   //
   // Disable interrupts
   //
-  Cpu->GetInterruptState (Cpu, &Enabled);
+  Cpu->GetInterruptState (Cpu, &IrqEnabled);
   Cpu->DisableInterrupt (Cpu);
 
-  
+  //
+  // EFI does not use the FIQ, but a debugger might so we must disable 
+  // as we take over the exception vectors. 
+  //
+  FiqEnabled = ArmGetFiqState ();
+  ArmDisableFiq ();
+
   //
   // Copy an implementation of the ARM exception vectors to PcdCpuVectorBaseAddress.
   //
@@ -236,7 +243,11 @@ InitializeExceptions (
   // Flush Caches since we updated executable stuff
   InvalidateInstructionCacheRange ((VOID *)PcdGet32(PcdCpuVectorBaseAddress), Length);
 
-  if (Enabled) {
+  if (FiqEnabled) {
+    ArmEnableFiq ();
+  }
+
+  if (IrqEnabled) {
     // 
     // Restore interrupt state
     //
