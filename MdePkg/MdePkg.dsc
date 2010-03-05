@@ -17,7 +17,7 @@
 [Defines]
   PLATFORM_NAME                  = Mde
   PLATFORM_GUID                  = 082F8BFC-0455-4859-AE3C-ECD64FB81642
-  PLATFORM_VERSION               = 1.01
+  PLATFORM_VERSION               = 1.02
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/Mde
   SUPPORTED_ARCHITECTURES        = IA32|IPF|X64|EBC|ARM
