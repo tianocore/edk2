@@ -239,7 +239,7 @@ EhcDumpRegs (
   IN  USB2_HC_DEV         *Ehc
   )
 {
-  UINTN   Index;
+  UINT8   Index;
 
   DEBUG ((EFI_D_INFO, "  EHC_CAPLENGTH_OFFSET   = 0x%08x\n", EhcReadCapRegister (Ehc, EHC_CAPLENGTH_OFFSET)));
   DEBUG ((EFI_D_INFO, "  EHC_HCSPARAMS_OFFSET   = 0x%08x\n", EhcReadCapRegister (Ehc, EHC_HCSPARAMS_OFFSET)));
