@@ -18,6 +18,9 @@
     EXPORT  ArmEnableInterrupts
     EXPORT  ArmDisableInterrupts
     EXPORT  ArmGetInterruptState
+    EXPORT  ArmEnableFiq
+    EXPORT  ArmDisableFiq
+    EXPORT  ArmGetFiqState
     EXPORT  ArmInvalidateTlb
     EXPORT  ArmSetTranslationTableBaseAddress
     EXPORT  ArmGetTranslationTableBaseAddress
@@ -48,6 +51,21 @@ ArmDisableInterrupts
 ArmGetInterruptState
 	mrs     R0,CPSR
 	tst     R0,#0x80	    ;Check if IRQ is enabled.
+	moveq   R0,#1
+	movne   R0,#0
+	bx      LR
+	
+ArmEnableFiq
+  CPSIE   f
+	bx      LR
+
+ArmDisableFiq
+  CPSID   f
+	bx      LR
+
+ArmGetFiqState
+	mrs     R0,CPSR
+	tst     R0,#0x40	    ;Check if IRQ is enabled.
 	moveq   R0,#1
 	movne   R0,#0
 	bx      LR

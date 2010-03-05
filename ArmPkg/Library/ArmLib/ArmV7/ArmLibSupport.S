@@ -19,6 +19,9 @@
 .globl ASM_PFX(ArmEnableInterrupts)
 .globl ASM_PFX(ArmDisableInterrupts)
 .globl ASM_PFX(ArmGetInterruptState)
+.globl ASM_PFX(ArmEnableFiq)
+.globl ASM_PFX(ArmDisableFiq)
+.globl ASM_PFX(ArmGetFiqState)
 .globl ASM_PFX(ArmInvalidateTlb)
 .globl ASM_PFX(ArmSetTranslationTableBaseAddress)
 .globl ASM_PFX(ArmGetTranslationTableBaseAddress)
@@ -50,6 +53,21 @@ ASM_PFX(ArmDisableInterrupts):
 ASM_PFX(ArmGetInterruptState):
 	mrs     R0,CPSR
 	tst     R0,#0x80	    @Check if IRQ is enabled.
+	moveq   R0,#1
+	movne   R0,#0
+	bx      LR
+
+ASM_PFX(ArmEnableFiq):
+  cpsie   f
+	bx      LR
+
+ASM_PFX(ArmDisableFiq):
+  cpsid   f
+	bx      LR
+
+ASM_PFX(ArmGetFiqState):
+	mrs     R0,CPSR
+	tst     R0,#0x30	    @Check if IRQ is enabled.
 	moveq   R0,#1
 	movne   R0,#0
 	bx      LR

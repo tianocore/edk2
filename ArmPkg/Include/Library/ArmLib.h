@@ -241,6 +241,23 @@ EFIAPI
 ArmGetInterruptState (
   VOID
   );
+VOID
+EFIAPI
+ArmEnableFiq (
+  VOID
+  );
+
+UINTN
+EFIAPI
+ArmDisableFiq (
+  VOID
+  );
+  
+BOOLEAN
+EFIAPI
+ArmGetFiqState (
+  VOID
+  );
 
 VOID
 EFIAPI
