@@ -4,7 +4,7 @@ write capability for block devices.  The protocol provides for non-volatile
 storage of the intermediate data and private information a caller would need to 
 recover from a critical fault, such as a power failure.   
 
-Copyright (c) 2009, Intel Corporation                                                         
+Copyright (c) 2009 - 2010, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -42,7 +42,7 @@ typedef struct _EFI_FAULT_TOLERANT_WRITE_PROTOCOL  EFI_FAULT_TOLERANT_WRITE_PROT
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_FAULT_TOLERANT_WRITE_GET_MAX_BLOCK_SIZE) (
+(EFIAPI *EFI_FAULT_TOLERANT_WRITE_GET_MAX_BLOCK_SIZE)(
   IN EFI_FAULT_TOLERANT_WRITE_PROTOCOL    * This,
   OUT UINTN                               *BlockSize
   );
@@ -70,7 +70,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_FAULT_TOLERANT_WRITE_ALLOCATE) (
+(EFIAPI *EFI_FAULT_TOLERANT_WRITE_ALLOCATE)(
   IN EFI_FAULT_TOLERANT_WRITE_PROTOCOL    * This,
   IN EFI_GUID                             * CallerId,
   IN UINTN                                PrivateDataSize,
@@ -106,7 +106,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_FAULT_TOLERANT_WRITE_WRITE) (
+(EFIAPI *EFI_FAULT_TOLERANT_WRITE_WRITE)(
   IN EFI_FAULT_TOLERANT_WRITE_PROTOCOL     * This,
   IN EFI_LBA                               Lba,
   IN UINTN                                 Offset,
@@ -131,7 +131,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_FAULT_TOLERANT_WRITE_RESTART) (
+(EFIAPI *EFI_FAULT_TOLERANT_WRITE_RESTART)(
   IN EFI_FAULT_TOLERANT_WRITE_PROTOCOL     * This,
   IN EFI_HANDLE                            FvbHandle
   );
@@ -148,7 +148,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_FAULT_TOLERANT_WRITE_ABORT) (
+(EFIAPI *EFI_FAULT_TOLERANT_WRITE_ABORT)(
   IN EFI_FAULT_TOLERANT_WRITE_PROTOCOL     * This
   );
 
@@ -179,7 +179,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_FAULT_TOLERANT_WRITE_GET_LAST_WRITE) (
+(EFIAPI *EFI_FAULT_TOLERANT_WRITE_GET_LAST_WRITE)(
   IN EFI_FAULT_TOLERANT_WRITE_PROTOCOL     * This,
   OUT EFI_GUID                             * CallerId,
   OUT EFI_LBA                              *Lba,

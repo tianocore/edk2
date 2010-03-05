@@ -3,7 +3,7 @@
   This print protocol defines six basic print functions to 
   print the format unicode and ascii string.
 
-Copyright (c) 2006 - 2009, Intel Corporation
+Copyright (c) 2006 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -60,7 +60,7 @@ typedef struct _EFI_PRINT2_PROTOCOL  EFI_PRINT2_PROTOCOL;
 **/
 typedef
 UINTN
-(EFIAPI *UNICODE_BS_PRINT) (
+(EFIAPI *UNICODE_BS_PRINT)(
   OUT CHAR16        *StartOfBuffer,
   IN  UINTN         BufferSize,
   IN  CONST CHAR16  *FormatString,
@@ -102,7 +102,7 @@ UINTN
 **/
 typedef
 UINTN
-(EFIAPI *UNICODE_S_PRINT) (
+(EFIAPI *UNICODE_S_PRINT)(
   OUT CHAR16        *StartOfBuffer,
   IN  UINTN         BufferSize,
   IN  CONST CHAR16  *FormatString,
@@ -143,7 +143,7 @@ UINTN
 **/
 typedef
 UINTN
-(EFIAPI *UNICODE_BS_PRINT_ASCII_FORMAT) (
+(EFIAPI *UNICODE_BS_PRINT_ASCII_FORMAT)(
   OUT CHAR16       *StartOfBuffer,
   IN  UINTN        BufferSize,
   IN  CONST CHAR8  *FormatString,
@@ -184,7 +184,7 @@ UINTN
 **/
 typedef
 UINTN
-(EFIAPI *UNICODE_S_PRINT_ASCII_FORMAT) (
+(EFIAPI *UNICODE_S_PRINT_ASCII_FORMAT)(
   OUT CHAR16       *StartOfBuffer,
   IN  UINTN        BufferSize,
   IN  CONST CHAR8  *FormatString,
@@ -234,7 +234,7 @@ UINTN
 **/
 typedef
 UINTN
-(EFIAPI *UNICODE_VALUE_TO_STRING) (
+(EFIAPI *UNICODE_VALUE_TO_STRING)(
   IN OUT CHAR16  *Buffer,
   IN UINTN       Flags,
   IN INT64       Value,
@@ -274,7 +274,7 @@ UINTN
 **/
 typedef
 UINTN
-(EFIAPI *ASCII_BS_PRINT) (
+(EFIAPI *ASCII_BS_PRINT)(
   OUT CHAR8         *StartOfBuffer,
   IN  UINTN         BufferSize,
   IN  CONST CHAR8   *FormatString,
@@ -314,7 +314,7 @@ UINTN
 **/
 typedef
 UINTN
-(EFIAPI *ASCII_S_PRINT) (
+(EFIAPI *ASCII_S_PRINT)(
   OUT CHAR8        *StartOfBuffer,
   IN  UINTN        BufferSize,
   IN  CONST CHAR8  *FormatString,
@@ -355,7 +355,7 @@ UINTN
 **/
 typedef
 UINTN
-(EFIAPI *ASCII_BS_PRINT_UNICODE_FORMAT) (
+(EFIAPI *ASCII_BS_PRINT_UNICODE_FORMAT)(
   OUT CHAR8         *StartOfBuffer,
   IN  UINTN         BufferSize,
   IN  CONST CHAR16  *FormatString,
@@ -396,7 +396,7 @@ UINTN
 **/
 typedef
 UINTN
-(EFIAPI *ASCII_S_PRINT_UNICODE_FORMAT) (
+(EFIAPI *ASCII_S_PRINT_UNICODE_FORMAT)(
   OUT CHAR8         *StartOfBuffer,
   IN  UINTN         BufferSize,
   IN  CONST CHAR16  *FormatString,
@@ -444,7 +444,7 @@ UINTN
 **/
 typedef
 UINTN
-(EFIAPI *ASCII_VALUE_TO_STRING) (
+(EFIAPI *ASCII_VALUE_TO_STRING)(
   OUT CHAR8      *Buffer,
   IN  UINTN      Flags,
   IN  INT64      Value,

@@ -5,7 +5,7 @@ power failure happens during the boot block update, the swapped backup block (no
 can boot the machine with the old boot block backed up in it. The swap operation is platform dependent, so 
 other protocols such as FTW (Fault Tolerant Write) should use this protocol instead of handling hardware directly.
 
-Copyright (c) 2009, Intel Corporation                                                         
+Copyright (c) 2009 - 2010, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -54,7 +54,7 @@ typedef UINT8 EFI_SWAP_LOCK_CAPABILITY;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_GET_RANGE_LOCATION) (
+(EFIAPI *EFI_GET_RANGE_LOCATION)(
   IN EFI_SWAP_ADDRESS_RANGE_PROTOCOL            *This,
   OUT EFI_PHYSICAL_ADDRESS                      *BootBlockBase,
   OUT UINTN                                     *BootBlockSize,
@@ -74,7 +74,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_GET_SWAP_STATE) (
+(EFIAPI *EFI_GET_SWAP_STATE)(
   IN EFI_SWAP_ADDRESS_RANGE_PROTOCOL            *This,
   OUT BOOLEAN                                   *SwapState
   );
@@ -94,7 +94,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SET_SWAP_STATE) (
+(EFIAPI *EFI_SET_SWAP_STATE)(
   IN EFI_SWAP_ADDRESS_RANGE_PROTOCOL            *This,
   IN BOOLEAN                                    NewSwapState
   );
@@ -115,7 +115,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_GET_RTC_POWER_STATUS) (
+(EFIAPI *EFI_GET_RTC_POWER_STATUS)(
   IN EFI_SWAP_ADDRESS_RANGE_PROTOCOL            *This,
   OUT BOOLEAN                                   *RtcPowerFailed
   );
@@ -132,7 +132,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_GET_SWAP_LOCK_CAPABILITY) (
+(EFIAPI *EFI_GET_SWAP_LOCK_CAPABILITY)(
   IN EFI_SWAP_ADDRESS_RANGE_PROTOCOL            *This,
   OUT EFI_SWAP_LOCK_CAPABILITY                  *LockCapability
   );
@@ -153,7 +153,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SET_SWAP_LOCK) (
+(EFIAPI *EFI_SET_SWAP_LOCK)(
   IN EFI_SWAP_ADDRESS_RANGE_PROTOCOL            *This,
   IN EFI_SWAP_LOCK_CAPABILITY                   LockCapability,
   IN BOOLEAN                                    NewLockState
