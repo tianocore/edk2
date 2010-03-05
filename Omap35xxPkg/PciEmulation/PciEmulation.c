@@ -62,6 +62,12 @@ ConfigureUSBHost (
   EFI_STATUS Status;
   UINT8      Data = 0;
 
+  // Do a softreset 
+  MmioOr32 (UHH_SYSCONFIG, UHH_SYSCONFIG_SOFTRESET);
+  // When the bit clears reset is complete
+  while ((MmioRead32 (UHH_SYSCONFIG) & UHH_SYSCONFIG_SOFTRESET) == UHH_SYSCONFIG_SOFTRESET);
+
+
   // Take USB host out of force-standby mode
   MmioWrite32 (UHH_SYSCONFIG, UHH_SYSCONFIG_MIDLEMODE_NO_STANDBY
                              | UHH_SYSCONFIG_CLOCKACTIVITY_ON
