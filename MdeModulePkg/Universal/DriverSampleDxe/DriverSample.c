@@ -425,6 +425,7 @@ ExtractConfig (
     ConfigRequestHdr = HiiConstructConfigHdr (&mFormSetGuid, VariableName, PrivateData->DriverHandle[0]);
     Size = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
     ConfigRequest = AllocateZeroPool (Size);
+    ASSERT (ConfigRequest != NULL);
     AllocatedRequest = TRUE;
     UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64)BufferSize);
     FreePool (ConfigRequestHdr);
@@ -454,6 +455,7 @@ ExtractConfig (
       if (StrStr (StrPointer, L"&") == NULL) {
         Size = (StrLen (Request) + 32 + 1) * sizeof (CHAR16);
         ConfigRequest    = AllocateZeroPool (Size);
+        ASSERT (ConfigRequest != NULL);
         AllocatedRequest = TRUE;
         UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", Request, (UINT64)BufferSize);
       }
