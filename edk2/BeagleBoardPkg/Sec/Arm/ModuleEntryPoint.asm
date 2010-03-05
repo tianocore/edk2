@@ -40,8 +40,19 @@ _ModuleEntryPoint
   mcr     p15, 0, r0, c1, c0, 0
  
   // Set CPU vectors to start of DRAM
-  mov     r0, #0x80000000
+  LoadConstantToReg (FixedPcdGet32(PcdMemoryBase) ,r0) /* memory size arg0         */
   mcr     p15, 0, r0, c12, c0, 0
+  isb                               // Sync changes to control registers
+
+  // Fill vector table with branchs to current pc (jmp $)
+  ldr     r1, ShouldNeverGetHere
+  movs    r2, #0
+FillVectors
+  str     r1, [r0, r2]
+  adds    r2, r2, #4
+  cmp     r2, #32
+  bne     FillVectors
+   
   /* before we call C code, lets setup the stack pointer in internal RAM*/
 stack_pointer_setup
 
@@ -54,13 +65,13 @@ stack_pointer_setup
   add     r4, r2, r3
 
   //Enter SVC mode and set up SVC stack pointer
-  mov     r0,#0x13|0x80|0x40
-  msr     CPSR_c,r0
+  mov     r5,#0x13|0x80|0x40
+  msr     CPSR_c,r5
   mov     r13,r4
 
   // Call C entry point
   LoadConstantToReg (FixedPcdGet32(PcdMemorySize) ,r1)    /* memory size arg1          */
-  LoadConstantToReg (FixedPcdGet32(PcdMemoryBase) ,r0)    /* memory size arg0         */
+//  LoadConstantToReg (FixedPcdGet32(PcdMemoryBase) ,r0)  Done above  
   blx     CEntryPoint       /* Assume C code is thumb    */
 
 ShouldNeverGetHere
