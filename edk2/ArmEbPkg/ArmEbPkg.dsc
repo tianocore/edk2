@@ -34,7 +34,7 @@
 
 
 [LibraryClasses.common]
-!if DEBUG_TARGET == RELEASE
+!if $(BUILD_TARGETS) == RELEASE
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
 !else
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
