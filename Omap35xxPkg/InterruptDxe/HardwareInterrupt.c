@@ -345,7 +345,7 @@ InterruptDxeInitialize (
   MmioWrite32 (INTCPS_MIR(0), 0xFFFFFFFF);
   MmioWrite32 (INTCPS_MIR(1), 0xFFFFFFFF);
   MmioWrite32 (INTCPS_MIR(2), 0xFFFFFFFF);
-  MmioWrite32 (INTCPS_CONTROL, INTCPS_CONTROL_NEWIRQAGR);
+  MmioOr32 (INTCPS_CONTROL, INTCPS_CONTROL_NEWIRQAGR);
  
   Status = gBS->InstallMultipleProtocolInterfaces(&gHardwareInterruptHandle,
                                                   &gHardwareInterruptProtocolGuid,   &gHardwareInterruptProtocol,

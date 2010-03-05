@@ -180,6 +180,7 @@ InitializeExceptions (
   UINTN                Index;
   BOOLEAN              Enabled;
   EFI_PHYSICAL_ADDRESS Base;
+  UINT32               *VectorBase;
 
   //
   // Disable interrupts
@@ -187,16 +188,6 @@ InitializeExceptions (
   Cpu->GetInterruptState (Cpu, &Enabled);
   Cpu->DisableInterrupt (Cpu);
 
-  //
-  // Initialize the C entry points for interrupts
-  //
-  for (Index = 0; Index <= MAX_ARM_EXCEPTION; Index++) {
-    Status = RegisterInterruptHandler (Index, NULL);
-    ASSERT_EFI_ERROR (Status);
-    
-    Status = RegisterDebuggerInterruptHandler (Index, NULL);
-    ASSERT_EFI_ERROR (Status);
-  }
   
   //
   // Copy an implementation of the ARM exception vectors to PcdCpuVectorBaseAddress.
@@ -207,6 +198,7 @@ InitializeExceptions (
   // Reserve space for the exception handlers
   //
   Base = (EFI_PHYSICAL_ADDRESS)PcdGet32 (PcdCpuVectorBaseAddress);
+  VectorBase = (UINT32 *)(UINTN)Base;
   Status = gBS->AllocatePages (AllocateAddress, EfiBootServicesCode, EFI_SIZE_TO_PAGES (Length), &Base);
   // If the request was for memory that's not in the memory map (which is often the case for 0x00000000
   // on embedded systems, for example, we don't want to hang up.  So we'll check here for a status of 
@@ -215,7 +207,25 @@ InitializeExceptions (
     ASSERT_EFI_ERROR (Status);
   }
 
-  CopyMem ((VOID *)(UINTN)PcdGet32 (PcdCpuVectorBaseAddress), (VOID *)ExceptionHandlersStart, Length);
+  // Save existing vector table, in case debugger is already hooked in
+  CopyMem ((VOID *)gDebuggerExceptionHandlers, (VOID *)VectorBase, sizeof (gDebuggerExceptionHandlers));
+
+  //
+  // Initialize the C entry points for interrupts
+  //
+  for (Index = 0; Index <= MAX_ARM_EXCEPTION; Index++) {
+    Status = RegisterInterruptHandler (Index, NULL);
+    ASSERT_EFI_ERROR (Status);
+    
+    if (VectorBase[Index] == 0xEAFFFFFE) {
+      // Exception handler contains branch to vector location (jmp $) so no handler
+      // NOTE: This code assumes vectors are ARM and not Thumb code
+      gDebuggerExceptionHandlers[Index] = NULL;
+    }
+  }
+
+  // Copy our assembly code into the page that contains the exception vectors. 
+  CopyMem ((VOID *)VectorBase, (VOID *)ExceptionHandlersStart, Length);
 
   //
   // Patch in the common Assembly exception handler
