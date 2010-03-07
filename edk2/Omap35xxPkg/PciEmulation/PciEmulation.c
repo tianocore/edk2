@@ -95,7 +95,7 @@ ConfigureUSBHost (
                              | UHH_SYSCONFIG_ENAWAKEUP_ENABLE    
                              | UHH_SYSCONFIG_SOFTRESET
                              );
-   while ((MmioRead32 (UHH_SYSSTATUS) & UHH_SYSSTATUS_RESETDONE) == UHH_SYSSTATUS_RESETDONE);
+   while ((MmioRead32 (UHH_SYSSTATUS) & UHH_SYSSTATUS_RESETDONE) != UHH_SYSSTATUS_RESETDONE);
 
   MmioWrite32 (UHH_SYSCONFIG,  UHH_SYSCONFIG_CLOCKACTIVITY_ON
                              | UHH_SYSCONFIG_SIDLEMODE_NO_STANDBY
