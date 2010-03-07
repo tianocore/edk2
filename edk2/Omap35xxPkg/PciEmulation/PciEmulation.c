@@ -62,32 +62,6 @@ ConfigureUSBHost (
   EFI_STATUS Status;
   UINT8      Data = 0;
 
-  // Do a softreset 
-  MmioOr32 (UHH_SYSCONFIG, UHH_SYSCONFIG_SOFTRESET);
-  // When the bit clears reset is complete
-  while ((MmioRead32 (UHH_SYSCONFIG) & UHH_SYSCONFIG_SOFTRESET) == UHH_SYSCONFIG_SOFTRESET);
-
-
-  // Take USB host out of force-standby mode
-  MmioWrite32 (UHH_SYSCONFIG, UHH_SYSCONFIG_MIDLEMODE_NO_STANDBY
-                             | UHH_SYSCONFIG_CLOCKACTIVITY_ON
-                             | UHH_SYSCONFIG_SIDLEMODE_NO_STANDBY
-                             | UHH_SYSCONFIG_ENAWAKEUP_ENABLE    
-                             | UHH_SYSCONFIG_AUTOIDLE_ALWAYS_RUN);
-  MmioWrite32 (UHH_HOSTCONFIG, UHH_HOSTCONFIG_P3_CONNECT_STATUS_DISCONNECT
-                              | UHH_HOSTCONFIG_P2_CONNECT_STATUS_DISCONNECT
-                              | UHH_HOSTCONFIG_P1_CONNECT_STATUS_DISCONNECT
-                              | UHH_HOSTCONFIG_ENA_INCR_ALIGN_DISABLE      
-                              | UHH_HOSTCONFIG_ENA_INCR16_ENABLE           
-                              | UHH_HOSTCONFIG_ENA_INCR8_ENABLE            
-                              | UHH_HOSTCONFIG_ENA_INCR4_ENABLE            
-                              | UHH_HOSTCONFIG_AUTOPPD_ON_OVERCUR_EN_ON    
-                              | UHH_HOSTCONFIG_P1_ULPI_BYPASS_ULPI_MODE);
-
-  // USB reset (GPIO 147 - Port 5 pin 19) output high
-  MmioAnd32(GPIO5_BASE + GPIO_OE, ~BIT19);
-  MmioWrite32 (GPIO5_BASE + GPIO_SETDATAOUT, BIT19);
-
   // Get the Power IC protocol.
   Status = gBS->LocateProtocol(&gEmbeddedExternalDeviceProtocolGuid, NULL, (VOID **)&gTPS65950);
   ASSERT_EFI_ERROR(Status);
@@ -101,6 +75,42 @@ ConfigureUSBHost (
 
   Status = gTPS65950->Write(gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID3, LEDEN), 1, &Data);
   ASSERT_EFI_ERROR(Status);
+
+  // USB reset (GPIO 147 - Port 5 pin 19) output low
+  MmioAnd32 (GPIO5_BASE + GPIO_OE, ~BIT19);
+  MmioWrite32 (GPIO5_BASE + GPIO_CLEARDATAOUT, BIT19);
+  
+  // Turn on functional & interface clocks to the USBHOST power domain
+  MmioOr32 (CM_FCLKEN_USBHOST, CM_FCLKEN_USBHOST_EN_USBHOST2_ENABLE | CM_FCLKEN_USBHOST_EN_USBHOST1_ENABLE);
+  MmioOr32 (CM_ICLKEN_USBHOST, CM_ICLKEN_USBHOST_EN_USBHOST_ENABLE);
+  // Wait for clock to become active
+  while (0 == (MmioRead32 (CM_CLKSTST_USBHOST) & 1));
+
+
+
+  // Take USB host out of force-standby mode
+  MmioWrite32 (UHH_SYSCONFIG,  UHH_SYSCONFIG_MIDLEMODE_NO_STANDBY
+                             | UHH_SYSCONFIG_CLOCKACTIVITY_ON
+                             | UHH_SYSCONFIG_SIDLEMODE_NO_STANDBY
+                             | UHH_SYSCONFIG_ENAWAKEUP_ENABLE    
+                             | UHH_SYSCONFIG_SOFTRESET
+                             );
+   while ((MmioRead32 (UHH_SYSSTATUS) & UHH_SYSSTATUS_RESETDONE) == UHH_SYSSTATUS_RESETDONE);
+
+  MmioWrite32 (UHH_SYSCONFIG,  UHH_SYSCONFIG_CLOCKACTIVITY_ON
+                             | UHH_SYSCONFIG_SIDLEMODE_NO_STANDBY
+                             | UHH_SYSCONFIG_ENAWAKEUP_ENABLE    
+                             );
+                             
+                             
+  MmioWrite32 (UHH_HOSTCONFIG,  UHH_HOSTCONFIG_ENA_INCR16_ENABLE           
+                              | UHH_HOSTCONFIG_ENA_INCR8_ENABLE            
+                              | UHH_HOSTCONFIG_ENA_INCR4_ENABLE            
+                              );
+
+  // USB reset output high
+  MmioWrite32 (GPIO5_BASE + GPIO_SETDATAOUT, BIT19);
+
 }
 
 EFI_STATUS
