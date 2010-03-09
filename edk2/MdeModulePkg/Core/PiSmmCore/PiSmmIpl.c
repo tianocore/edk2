@@ -227,6 +227,8 @@ EFI_SMM_CONTROL2_PROTOCOL  *mSmmControl2;
 EFI_SMM_ACCESS2_PROTOCOL   *mSmmAccess;
 EFI_SMRAM_DESCRIPTOR       *mCurrentSmramRange;
 BOOLEAN                    mSmmLocked = FALSE;
+EFI_PHYSICAL_ADDRESS       mSmramCacheBase;
+UINT64                     mSmramCacheSize;
 
 //
 // Table of Protocol notification and GUIDed Event notifications that the SMM IPL requires
@@ -271,6 +273,49 @@ SMM_IPL_EVENT_NOTIFICATION  mSmmIplEvents[] = {
   //
   { FALSE, FALSE, NULL,                               NULL,                              NULL,                               NULL }
 };
+
+/**
+  Find the maximum SMRAM cache range that covers the range specified by SmramRange.
+  
+  This function searches and joins all adjacent ranges of SmramRange into a range to be cached.
+
+  @param   SmramRange       The SMRAM range to search from.
+  @param   SmramCacheBase   The returned cache range base.
+  @param   SmramCacheSize   The returned cache range size.
+
+**/
+VOID
+GetSmramCacheRange (
+  IN  EFI_SMRAM_DESCRIPTOR *SmramRange,
+  OUT EFI_PHYSICAL_ADDRESS *SmramCacheBase,
+  OUT UINT64               *SmramCacheSize
+  )
+{
+  UINTN                Index;
+  EFI_PHYSICAL_ADDRESS RangeCpuStart;
+  UINT64               RangePhysicalSize;
+  BOOLEAN              FoundAjacentRange;
+
+  *SmramCacheBase = SmramRange->CpuStart;
+  *SmramCacheSize = SmramRange->PhysicalSize;
+
+  do {
+    FoundAjacentRange = FALSE;
+    for (Index = 0; Index < gSmmCorePrivate->SmramRangeCount; Index++) {
+      RangeCpuStart     = gSmmCorePrivate->SmramRanges[Index].CpuStart;
+      RangePhysicalSize = gSmmCorePrivate->SmramRanges[Index].PhysicalSize;
+      if (RangeCpuStart < *SmramCacheBase && *SmramCacheBase == (RangeCpuStart + RangePhysicalSize)) {
+        *SmramCacheBase   = RangeCpuStart;
+        *SmramCacheSize  += RangePhysicalSize;
+        FoundAjacentRange = TRUE;
+      } else if ((*SmramCacheBase + *SmramCacheSize) == RangeCpuStart && RangePhysicalSize > 0) {
+        *SmramCacheSize  += RangePhysicalSize;
+        FoundAjacentRange = TRUE;
+      }
+    }
+  } while (FoundAjacentRange);
+  
+}
 
 /**
   Indicate whether the driver is currently executing in the SMM Initialization phase.
@@ -515,8 +560,8 @@ SmmIplSmmConfigurationEventNotify (
   // Attempt to reset SMRAM cacheability to UC
   //
   Status = gDS->SetMemorySpaceAttributes(
-                  mCurrentSmramRange->CpuStart, 
-                  mCurrentSmramRange->PhysicalSize,
+                  mSmramCacheBase, 
+                  mSmramCacheSize,
                   EFI_MEMORY_UC
                   );
   if (EFI_ERROR (Status)) {
@@ -1076,12 +1121,13 @@ SmmIplEntry (
       (VOID *)(UINTN)(mCurrentSmramRange->CpuStart + mCurrentSmramRange->PhysicalSize - 1)
       ));
 
+    GetSmramCacheRange (mCurrentSmramRange, &mSmramCacheBase, &mSmramCacheSize);
     //
     // Attempt to set SMRAM cacheability to WB
     //
     Status = gDS->SetMemorySpaceAttributes(
-                    mCurrentSmramRange->CpuStart, 
-                    mCurrentSmramRange->PhysicalSize,
+                    mSmramCacheBase, 
+                    mSmramCacheSize,
                     EFI_MEMORY_WB
                     );
     if (EFI_ERROR (Status)) {
@@ -1129,8 +1175,8 @@ SmmIplEntry (
       // Attempt to reset SMRAM cacheability to UC
       //
       Status = gDS->SetMemorySpaceAttributes(
-                      mCurrentSmramRange->CpuStart, 
-                      mCurrentSmramRange->PhysicalSize,
+                      mSmramCacheBase, 
+                      mSmramCacheSize,
                       EFI_MEMORY_UC
                       );
       if (EFI_ERROR (Status)) {
