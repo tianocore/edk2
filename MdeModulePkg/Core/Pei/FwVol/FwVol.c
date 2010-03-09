@@ -755,7 +755,7 @@ PeiFfsFindFileByName (
   Returns information about a specific file.
 
   @param FileHandle       Handle of the file.
-  @param FileInfo         Upon exit, points to the file’s information.
+  @param FileInfo         Upon exit, points to the file's information.
 
   @retval EFI_INVALID_PARAMETER If FileInfo is NULL.
   @retval EFI_INVALID_PARAMETER If FileHandle does not represent a valid file.
