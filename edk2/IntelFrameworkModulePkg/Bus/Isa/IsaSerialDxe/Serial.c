@@ -909,7 +909,7 @@ IsaSerialReceiveTransmit (
           //
           TimeOut   = 0;
           Msr.Data  = READ_MSR (SerialDevice->IsaIo, SerialDevice->BaseAddress);
-          while ((Msr.Bits.Dcd == 1) && ((Msr.Bits.Cts == 0) || FeaturePcdGet(PcdIsaBusSerialUseHalfHandshake))) {
+          while ((Msr.Bits.Dcd == 1) && ((Msr.Bits.Cts == 0) ^ FeaturePcdGet(PcdIsaBusSerialUseHalfHandshake))) {
             gBS->Stall (TIMEOUT_STALL_INTERVAL);
             TimeOut++;
             if (TimeOut > 5) {
@@ -919,7 +919,7 @@ IsaSerialReceiveTransmit (
             Msr.Data = READ_MSR (SerialDevice->IsaIo, SerialDevice->BaseAddress);
           }
 
-          if ((Msr.Bits.Dcd == 0) && ((Msr.Bits.Cts == 1) || FeaturePcdGet(PcdIsaBusSerialUseHalfHandshake))) {
+          if ((Msr.Bits.Dcd == 0) || ((Msr.Bits.Cts == 1) ^ FeaturePcdGet(PcdIsaBusSerialUseHalfHandshake))) {
             IsaSerialFifoRemove (&SerialDevice->Transmit, &Data);
             WRITE_THR (SerialDevice->IsaIo, SerialDevice->BaseAddress, Data);
           }
