@@ -1,6 +1,6 @@
 @REM ## @file
 @REM #
-@REM #  Copyright (c) 2010, Intel Corporation, All rights reserved. <BR>
+@REM #  Copyright (c) 2010 Intel Corporation. All rights reserved.<BR>
 @REM #
 @REM #  This program and the accompanying materials
 @REM #  are licensed and made available under the terms and conditions of the BSD License

@@ -6,7 +6,7 @@
 #  and platform building, so just use a sh file to do post build commands.
 #  Originally, following post building command is for EfiLoader module.
 #
-#  Copyright (c) 2010, Intel Corporation, All rights reserved. <BR>
+#  Copyright (c) 2010 Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
