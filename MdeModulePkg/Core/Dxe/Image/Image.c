@@ -356,7 +356,7 @@ GetPeCoffImageFixLoadingAssignedAddress(
          // relative to top address
          //
          if ((INT64)PcdGet64(PcdLoadModuleAtFixAddressEnable) < 0) {
-         	 ImageContext->ImageAddress = gLoadModuleAtFixAddressConfigurationTable.DxeCodeTopAddress + (INT64)ImageContext->ImageAddress;
+         	 ImageContext->ImageAddress = gLoadModuleAtFixAddressConfigurationTable.DxeCodeTopAddress + (INT64)(INTN)ImageContext->ImageAddress;
          }
          //
          // Check if the memory range is avaliable.
