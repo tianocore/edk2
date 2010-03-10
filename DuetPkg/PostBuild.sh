@@ -1,10 +1,23 @@
 #!/bin/sh
 
+## @file
 #
 #  Currently, Build system does not provide post build mechanism for module 
 #  and platform building, so just use a sh file to do post build commands.
 #  Originally, following post building command is for EfiLoader module.
 #
+#  Copyright (c) 2010, Intel Corporation, All rights reserved. <BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+
 
 export BUILD_DIR=$WORKSPACE/Build/DuetPkg/DEBUG_UNIXGCC
 export BASETOOLS_DIR=$WORKSPACE/Conf/BaseToolsSource/Source/C/bin
