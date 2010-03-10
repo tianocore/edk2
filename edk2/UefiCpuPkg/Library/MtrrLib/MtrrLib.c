@@ -93,6 +93,10 @@ GetVariableMtrrCount (
   VOID
   )
 {
+  if (!IsMtrrSupported ()) {
+    return 0;
+  }
+
   return (UINT32)(AsmReadMsr64 (MTRR_LIB_IA32_MTRR_CAP) & MTRR_LIB_IA32_MTRR_CAP_VCNT_MASK);
 }
 
@@ -107,7 +111,14 @@ GetFirmwareVariableMtrrCount (
   VOID
   )
 {
-  return GetVariableMtrrCount () - RESERVED_FIRMWARE_VARIABLE_MTRR_NUMBER;
+  UINT32  VariableMtrrCount;
+
+  VariableMtrrCount = GetVariableMtrrCount ();
+  if (VariableMtrrCount < RESERVED_FIRMWARE_VARIABLE_MTRR_NUMBER) {
+    return 0;
+  }
+
+  return VariableMtrrCount - RESERVED_FIRMWARE_VARIABLE_MTRR_NUMBER;
 }
 
 /**
@@ -318,6 +329,10 @@ MtrrGetMemoryAttributeInVariableMtrr (
   UINT32  UsedMtrr;
   UINT32  FirmwareVariableMtrrCount;
   UINT32  VariableMtrrEnd;
+
+  if (!IsMtrrSupported ()) {
+    return 0;
+  }
 
   FirmwareVariableMtrrCount = GetFirmwareVariableMtrrCount ();
   VariableMtrrEnd = MTRR_LIB_IA32_VARIABLE_MTRR_BASE + (2 * GetVariableMtrrCount ()) - 1;
@@ -870,6 +885,10 @@ MtrrSetMemoryAttribute (
   UINT32                    FirmwareVariableMtrrCount;
   UINT32                    VariableMtrrEnd;
 
+  if (!IsMtrrSupported ()) {
+    return RETURN_UNSUPPORTED;
+  }
+
   FirmwareVariableMtrrCount = GetFirmwareVariableMtrrCount ();
   VariableMtrrEnd = MTRR_LIB_IA32_VARIABLE_MTRR_BASE + (2 * GetVariableMtrrCount ()) - 1;
 
@@ -1110,6 +1129,10 @@ MtrrGetMemoryAttribute (
   UINT64                  MtrrValidAddressMask;
   UINTN                   VariableMtrrCount;
 
+  if (!IsMtrrSupported ()) {
+    return CacheUncacheable;
+  }
+
   //
   // Check if MTRR is enabled, if not, return UC as attribute
   //
@@ -1190,6 +1213,10 @@ MtrrGetVariableMtrr (
   UINT32  Index;
   UINT32  VariableMtrrCount;
 
+  if (!IsMtrrSupported ()) {
+    return VariableSettings;
+  }
+
   VariableMtrrCount = GetVariableMtrrCount ();
   ASSERT (VariableMtrrCount <= MTRR_NUMBER_OF_VARIABLE_MTRR);
 
@@ -1250,6 +1277,10 @@ MtrrSetVariableMtrr (
 {
   UINTN  Cr4;
 
+  if (!IsMtrrSupported ()) {
+    return VariableSettings;
+  }
+
   Cr4 = PreMtrrChange ();
   MtrrSetVariableMtrrWorker (VariableSettings);
   PostMtrrChange (Cr4);
@@ -1272,6 +1303,10 @@ MtrrGetFixedMtrr (
   )
 {
   UINT32  Index;
+
+  if (!IsMtrrSupported ()) {
+    return FixedSettings;
+  }
 
   for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
       FixedSettings->Mtrr[Index] =
@@ -1319,6 +1354,10 @@ MtrrSetFixedMtrr (
 {
   UINTN  Cr4;
 
+  if (!IsMtrrSupported ()) {
+    return FixedSettings;
+  }
+
   Cr4 = PreMtrrChange ();
   MtrrSetFixedMtrrWorker (FixedSettings);
   PostMtrrChange (Cr4);
@@ -1341,6 +1380,10 @@ MtrrGetAllMtrrs (
   OUT MTRR_SETTINGS                *MtrrSetting
   )
 {
+  if (!IsMtrrSupported ()) {
+    return MtrrSetting;
+  }
+
   //
   // Get fixed MTRRs
   //
@@ -1375,6 +1418,10 @@ MtrrSetAllMtrrs (
   )
 {
   UINTN  Cr4;
+
+  if (!IsMtrrSupported ()) {
+    return MtrrSetting;
+  }
 
   Cr4 = PreMtrrChange ();
 
@@ -1412,6 +1459,10 @@ MtrrDebugPrintAllMtrrs (
       UINTN          Index;
       UINTN          VariableMtrrCount;
 
+      if (!IsMtrrSupported ()) {
+        return;
+      }
+
       MtrrGetAllMtrrs (&MtrrSettings);
       DEBUG((EFI_D_ERROR, "DefaultType = %016lx\n", MtrrSettings.MtrrDefType));
       for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
@@ -1435,3 +1486,39 @@ MtrrDebugPrintAllMtrrs (
   );
 }
 
+/**
+  Checks if MTRR is supported.
+
+  @retval TRUE  MTRR is supported.
+  @retval FALSE MTRR is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+IsMtrrSupported (
+  VOID
+  )
+{
+  UINT32  RegEdx;
+  UINT64  MtrrCap;
+
+  //
+  // Check CPUID(1).EDX[12] for MTRR capability
+  //
+  AsmCpuid (1, NULL, NULL, NULL, &RegEdx);
+  if (BitFieldRead32 (RegEdx, 12, 12) == 0) {
+    return FALSE;
+  }
+
+  //
+  // Check IA32_MTRRCAP.[0..7] for number of variable MTRRs and IA32_MTRRCAP[8] for
+  // fixed MTRRs existence. If number of variable MTRRs is zero, or fixed MTRRs do not
+  // exist, return false.
+  //
+  MtrrCap = AsmReadMsr64 (MTRR_LIB_IA32_MTRR_CAP);
+  if  ((BitFieldRead64 (MtrrCap, 0, 7) == 0) || (BitFieldRead64 (MtrrCap, 8, 8) == 0)) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
