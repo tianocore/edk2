@@ -314,4 +314,16 @@ VOID
 MtrrDebugPrintAllMtrrs (
   );
 
+/**
+  Checks if MTRR is supported.
+
+  @retval TRUE  MTRR is supported.
+  @retval FALSE MTRR is not supported.
+
+**/
+BOOLEAN
+IsMtrrSupported (
+  VOID
+  );
+
 #endif // _MTRR_LIB_H_
