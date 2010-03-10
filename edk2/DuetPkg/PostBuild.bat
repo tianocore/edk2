@@ -1,8 +1,20 @@
-@REM 
-@REM  Currently, Build system does not provide post build mechanism for module 
-@REM  and platform building, so just use a bat file to do post build commands.
-@REM  Originally, following post building command is for EfiLoader module.
-@REM 
+@REM ## @file
+@REM #
+@REM #  Currently, Build system does not provide post build mechanism for module 
+@REM #  and platform building, so just use a bat file to do post build commands.
+@REM #  Originally, following post building command is for EfiLoader module.
+@REM #
+@REM #  Copyright (c) 2010, Intel Corporation, All rights reserved. <BR>
+@REM #
+@REM #  This program and the accompanying materials
+@REM #  are licensed and made available under the terms and conditions of the BSD License
+@REM #  which accompanies this distribution. The full text of the license may be found at
+@REM #  http://opensource.org/licenses/bsd-license.php
+@REM #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+@REM #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+@REM #
+@REM #
+@REM ##
 
 @set BUILD_DIR=%WORKSPACE%\Build\DuetPkg\DEBUG_MYTOOLS
 @set BASETOOLS_DIR=%WORKSPACE_TOOLS_PATH%\Bin\Win32
