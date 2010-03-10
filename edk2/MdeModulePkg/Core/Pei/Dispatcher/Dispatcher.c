@@ -241,6 +241,50 @@ ShadowPeiCore(
 //
 #define MINIMUM_INITIAL_MEMORY_SIZE 0x10000
 /**
+  This function is to test if the memory range described in resource HOB is available or not. 
+  
+  This function should only be invoked when Loading Module at Fixed Address(LMFA) feature is enabled. Some platform may allocate the 
+  memory before PeiLoadFixAddressHook in invoked. so this function is to test if the memory range described by the input resource HOB is
+  available or not.
+
+  @param PrivateData         Pointer to the private data passed in from caller
+  @param ResourceHob         Pointer to a resource HOB which described the memory range described by the input resource HOB
+**/
+BOOLEAN
+PeiLoadFixAddressIsMemoryRangeAvailable (
+  IN PEI_CORE_INSTANCE                  *PrivateData,
+  IN EFI_HOB_RESOURCE_DESCRIPTOR        *ResourceHob
+  )
+{
+	EFI_HOB_MEMORY_ALLOCATION          *MemoryHob;
+	BOOLEAN                             IsAvailable;
+	EFI_PEI_HOB_POINTERS                Hob;
+	
+  IsAvailable = TRUE;
+	if (PrivateData == NULL || ResourceHob == NULL) {
+	  return FALSE;
+	}
+	//
+  // test if the memory range describe in the HOB is already allocated.
+  //
+  for (Hob.Raw = PrivateData->HobList.Raw; !END_OF_HOB_LIST(Hob); Hob.Raw = GET_NEXT_HOB(Hob)) {
+    //                                                              
+    // See if this is a memory allocation HOB                     
+    //
+    if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_MEMORY_ALLOCATION) { 
+      MemoryHob = Hob.MemoryAllocation;
+      if(MemoryHob->AllocDescriptor.MemoryBaseAddress == ResourceHob->PhysicalStart && 
+         MemoryHob->AllocDescriptor.MemoryBaseAddress + MemoryHob->AllocDescriptor.MemoryLength == ResourceHob->PhysicalStart + ResourceHob->ResourceLength) {
+         IsAvailable = FALSE;
+         break;  
+       }
+     }
+  }
+  
+  return IsAvailable;
+       
+}
+/**
   Hook function for Loading Module at Fixed Address feature
   
   This function should only be invoked when Loading Module at Fixed Address(LMFA) feature is enabled. When feature is
@@ -269,6 +313,7 @@ PeiLoadFixAddressHook(
   EFI_PEI_HOB_POINTERS               NextHob;
   EFI_PHYSICAL_ADDRESS               MaxMemoryBaseAddress;
   UINT64                             MaxMemoryLength;
+  EFI_HOB_MEMORY_ALLOCATION          *MemoryHob;
   //
   // Initialize Local Variables
   //
@@ -362,6 +407,61 @@ PeiLoadFixAddressHook(
     } 
   }
   //
+  // Some platform is already allocated pages before the HOB re-org. Here to build dedicated resource HOB to describe
+  //  the allocated memory range
+  //
+  for (Hob.Raw = PrivateData->HobList.Raw; !END_OF_HOB_LIST(Hob); Hob.Raw = GET_NEXT_HOB(Hob)) {
+    //                                                              
+    // See if this is a memory allocation HOB                     
+    //
+    if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_MEMORY_ALLOCATION) {
+      MemoryHob = Hob.MemoryAllocation;
+      for (NextHob.Raw = PrivateData->HobList.Raw; !END_OF_HOB_LIST(NextHob); NextHob.Raw = GET_NEXT_HOB(NextHob)) {
+        //
+        // See if this is a resource descriptor HOB
+        //
+        if (GET_HOB_TYPE (NextHob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+        	NextResourceHob = NextHob.ResourceDescriptor;
+          //
+          // If range described in this hob is not system memory or heigher than MAX_ADDRESS, ignored.
+          //
+          if (NextResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY && NextResourceHob->PhysicalStart + NextResourceHob->ResourceLength > MAX_ADDRESS) {
+            continue;
+          }
+          //
+          // If the range describe in memory allocation HOB  belongs to the memroy range described by the resource hob
+          //          
+          if (MemoryHob->AllocDescriptor.MemoryBaseAddress >= NextResourceHob->PhysicalStart && 
+              MemoryHob->AllocDescriptor.MemoryBaseAddress + MemoryHob->AllocDescriptor.MemoryLength <= NextResourceHob->PhysicalStart + NextResourceHob->ResourceLength) {
+             //
+             // Build seperate resource hob for this allocated range
+             //                     
+             if (MemoryHob->AllocDescriptor.MemoryBaseAddress > NextResourceHob->PhysicalStart) {
+               BuildResourceDescriptorHob (
+                 EFI_RESOURCE_SYSTEM_MEMORY,                       
+                 NextResourceHob->ResourceAttribute,
+                 NextResourceHob->PhysicalStart,                             
+                 (MemoryHob->AllocDescriptor.MemoryBaseAddress - NextResourceHob->PhysicalStart)      
+               );
+             }
+             if (MemoryHob->AllocDescriptor.MemoryBaseAddress + MemoryHob->AllocDescriptor.MemoryLength < NextResourceHob->PhysicalStart + NextResourceHob->ResourceLength) {
+               BuildResourceDescriptorHob (
+                 EFI_RESOURCE_SYSTEM_MEMORY,                       
+                 NextResourceHob->ResourceAttribute,
+                 MemoryHob->AllocDescriptor.MemoryBaseAddress + MemoryHob->AllocDescriptor.MemoryLength,                            
+                 (NextResourceHob->PhysicalStart + NextResourceHob->ResourceLength -(MemoryHob->AllocDescriptor.MemoryBaseAddress + MemoryHob->AllocDescriptor.MemoryLength))    
+               );
+             }
+             NextResourceHob->PhysicalStart = MemoryHob->AllocDescriptor.MemoryBaseAddress;
+             NextResourceHob->ResourceLength = MemoryHob->AllocDescriptor.MemoryLength;
+             break;
+          }
+        }
+      }
+    }
+  }
+
+  //
   // Try to find and validate the TOP address.
   //  
   if ((INT64)PcdGet64(PcdLoadModuleAtFixAddressEnable) > 0 ) {
@@ -396,11 +496,12 @@ PeiLoadFixAddressHook(
             // See if Top address specified by user is valid.
             //
             if (ResourceHob->PhysicalStart + TotalReservedMemorySize < TopLoadingAddress && 
-                (ResourceHob->PhysicalStart + ResourceHob->ResourceLength - MINIMUM_INITIAL_MEMORY_SIZE) >= TopLoadingAddress) {
+                (ResourceHob->PhysicalStart + ResourceHob->ResourceLength - MINIMUM_INITIAL_MEMORY_SIZE) >= TopLoadingAddress && 
+                PeiLoadFixAddressIsMemoryRangeAvailable(PrivateData, ResourceHob)) {
               CurrentResourceHob = ResourceHob; 
               CurrentHob = Hob;
               break;
-            }
+           }
         }
       }  
     }  
@@ -428,7 +529,7 @@ PeiLoadFixAddressHook(
               //
               // See if Top address specified by user is valid.
               //
-              if (ResourceHob->ResourceLength > TotalReservedMemorySize) {
+              if (ResourceHob->ResourceLength > TotalReservedMemorySize && PeiLoadFixAddressIsMemoryRangeAvailable(PrivateData, ResourceHob)) {
                  DEBUG ((EFI_D_INFO, "(0x%lx, 0x%lx)\n",  
                           (ResourceHob->PhysicalStart + TotalReservedMemorySize -MINIMUM_INITIAL_MEMORY_SIZE), 
                           (ResourceHob->PhysicalStart + ResourceHob->ResourceLength -MINIMUM_INITIAL_MEMORY_SIZE) 
@@ -440,7 +541,8 @@ PeiLoadFixAddressHook(
       //
       // Assert here 
       //
-      ASSERT (FALSE);      
+      ASSERT (FALSE);   
+      return;   
     }     
   } else {
     //
@@ -462,7 +564,7 @@ PeiLoadFixAddressHook(
         //
         if (ResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY && 
             ResourceHob->PhysicalStart + ResourceHob->ResourceLength <= MAX_ADDRESS &&
-            ResourceHob->ResourceLength > TotalReservedMemorySize) {
+            ResourceHob->ResourceLength > TotalReservedMemorySize && PeiLoadFixAddressIsMemoryRangeAvailable(PrivateData, ResourceHob)) {
           //
           // See if this is the highest largest system memory region below MaxAddress
           //
@@ -479,7 +581,8 @@ PeiLoadFixAddressHook(
       //
       // Assert here 
       //
-      ASSERT (FALSE);      
+      ASSERT (FALSE);
+      return;  
     } else {
       TopLoadingAddress = CurrentResourceHob->PhysicalStart + CurrentResourceHob->ResourceLength ; 
     }         
@@ -487,10 +590,10 @@ PeiLoadFixAddressHook(
   
   if (CurrentResourceHob != NULL) {
     //
-    // rebuild hob for PEI memmory and reserved memory
+    // rebuild resource HOB for PEI memmory and reserved memory
     //
     BuildResourceDescriptorHob (
-      EFI_RESOURCE_SYSTEM_MEMORY,                       // MemoryType,
+      EFI_RESOURCE_SYSTEM_MEMORY,                       
       (
       EFI_RESOURCE_ATTRIBUTE_PRESENT |
       EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
@@ -500,15 +603,15 @@ PeiLoadFixAddressHook(
       EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
       EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE
       ),
-      (TopLoadingAddress - TotalReservedMemorySize),                             // MemoryBegin
-      TotalReservedMemorySize      // MemoryLength
+      (TopLoadingAddress - TotalReservedMemorySize),                             
+      TotalReservedMemorySize     
     );
     //
-    // rebuild hob for the remain memory if necessary
+    // rebuild resource for the remain memory if necessary
     //
     if (CurrentResourceHob->PhysicalStart < TopLoadingAddress - TotalReservedMemorySize) {
       BuildResourceDescriptorHob (
-        EFI_RESOURCE_SYSTEM_MEMORY,                       // MemoryType,
+        EFI_RESOURCE_SYSTEM_MEMORY,                       
         (
          EFI_RESOURCE_ATTRIBUTE_PRESENT |
          EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
@@ -517,8 +620,8 @@ PeiLoadFixAddressHook(
          EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
          EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE
          ),
-         CurrentResourceHob->PhysicalStart,                             // MemoryBegin
-         (TopLoadingAddress - TotalReservedMemorySize - CurrentResourceHob->PhysicalStart)      // MemoryLength
+         CurrentResourceHob->PhysicalStart,                             
+         (TopLoadingAddress - TotalReservedMemorySize - CurrentResourceHob->PhysicalStart)      
        );
     }
     if (CurrentResourceHob->PhysicalStart + CurrentResourceHob->ResourceLength  > TopLoadingAddress ) {
@@ -802,8 +905,7 @@ PeiDispatcher (
                 //
                 PeiLoadFixAddressHook(Private);
                 //
-                // if Loading Module at Fixed Address is enabled, This is the first invoke to page
-                // allocation for Pei Code range. This memory range should be reserved for loading PEIMs
+                // if Loading Module at Fixed Address is enabled, Allocating memory range for Pei code range.
                 //
                 LoadFixPeiCodeBegin = AllocatePages((UINTN)PcdGet32(PcdLoadFixAddressPeiCodePageNumber));
                 DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: PeiCodeBegin = 0x%lX, PeiCodeTop= 0x%lX\n", (UINT64)(UINTN)LoadFixPeiCodeBegin, (UINT64)((UINTN)LoadFixPeiCodeBegin + PcdGet32(PcdLoadFixAddressPeiCodePageNumber) * EFI_PAGE_SIZE)));
