@@ -85,6 +85,26 @@ SmmControl2Clear (
 }
 
 /**
+  Notification function of EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE.
+
+  This is a notification function registered on EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE event.
+  It convers pointer to new virtual address.
+
+  @param[in]  Event        Event whose notification function is being invoked.
+  @param[in]  Context      Pointer to the notification function's context.
+
+**/
+VOID
+EFIAPI
+SetVirtualAddressNotify (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  EfiConvertPointer (0x0, (VOID **)&mSmmControl);
+}
+
+/**
   Entry Point for this thunk driver.
 
   @param[in] ImageHandle  Image handle of this driver.
@@ -101,6 +121,7 @@ SmmControl2ThunkMain (
   )
 {
   EFI_STATUS               Status;
+  EFI_EVENT                Event;
   EFI_SMM_CONTROL_REGISTER RegisterInfo;
 
   ///
@@ -114,6 +135,20 @@ SmmControl2ThunkMain (
   Status = mSmmControl->GetRegisterInfo (mSmmControl, &RegisterInfo);
   ASSERT_EFI_ERROR (Status);
   mDataPort = RegisterInfo.SmiDataRegister;
+
+  ///
+  /// Create event on SetVirtualAddressMap() to convert mSmmControl from a physical address to a virtual address
+  ///
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  SetVirtualAddressNotify,
+                  NULL,
+                  &gEfiEventVirtualAddressChangeGuid,
+                  &Event
+                  );
+                  
+  ASSERT_EFI_ERROR (Status);
 
   ///
   /// Publish framework SMM Control Protocol
