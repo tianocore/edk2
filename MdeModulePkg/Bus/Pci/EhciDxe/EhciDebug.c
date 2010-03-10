@@ -229,7 +229,7 @@ EhcDumpBuf (
 }
 
 /**
-  Dump the EHCI status registers
+  Dump the EHCI status registers.
 
   @param  Ehc    USB EHCI Host Controller instance
 
