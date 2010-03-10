@@ -17,12 +17,17 @@
 
 #include <PiDxe.h>
 #include <FrameworkSmm.h>
+
+#include <Protocol/SmmControl2.h>
+#include <Protocol/SmmControl.h>
+
+#include <Guid/EventGroup.h>
+
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiDriverEntryPoint.h>
+#include <Library/UefiRuntimeLib.h>
 #include <Library/IoLib.h>
-#include <Protocol/SmmControl2.h>
-#include <Protocol/SmmControl.h>
 
 /**
   Invokes SMI activation from either the preboot or runtime environment.
