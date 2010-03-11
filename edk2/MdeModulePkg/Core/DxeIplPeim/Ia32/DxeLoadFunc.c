@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "DxeIpl.h"
 #include "VirtualMemory.h"
 
-#define IDT_ENTRY_COUNT       33
+#define IDT_ENTRY_COUNT       32
 
 //
 // Global Descriptor Table (GDT)
