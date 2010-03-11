@@ -316,8 +316,16 @@ PrepareFadtTable (
   if (AcpiDescription->PM_TMR_BLK.Address == 0) {
     AcpiDescription->PM_TMR_BLK.Address          = Fadt->PmTmrBlk;
     AcpiDescription->PM_TMR_BLK.AddressSpaceId   = EFI_ACPI_3_0_SYSTEM_IO;
-    AcpiDescription->PM_TMR_BLK.RegisterBitWidth = (UINT8) ((AcpiDescription->TMR_VAL_EXT == 0) ? 24 : 32);
   }
+
+  //
+  // It's possible that the PM_TMR_BLK.RegisterBitWidth is always 32,
+  //  we need to set the correct RegisterBitWidth value according to the TMR_VAL_EXT
+  //  A zero indicates TMR_VAL is implemented as a 24-bit value. 
+  //  A one indicates TMR_VAL is implemented as a 32-bit value
+  //
+  AcpiDescription->PM_TMR_BLK.RegisterBitWidth = (UINT8) ((AcpiDescription->TMR_VAL_EXT == 0) ? 24 : 32);
+  
 
   return ;
 }
