@@ -28,6 +28,25 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <ProcessorBind.h>
 
 //
+// Verify that ProcessorBind.h produced UEFI Data Types that are compliant with 
+// Section 2.3.1 of the UEFI 2.3 Specification.  Generates a divide by zero 
+// error or a zero size array declaration in the preprocessor if the size is 
+// incorrect.  These are declared as "extern" so the space for these arrays will 
+// not be in the modules.
+//
+extern UINT8 _VerifySizeOfBoolean [(sizeof(BOOLEAN) == 1) / (sizeof(BOOLEAN) == 1)];
+extern UINT8 _VerifySizeOfInt8    [(sizeof(INT8)    == 1) / (sizeof(INT8)    == 1)];
+extern UINT8 _VerifySizeOfUint8   [(sizeof(UINT8)   == 1) / (sizeof(UINT8)   == 1)];
+extern UINT8 _VerifySizeOfInt16   [(sizeof(INT16)   == 2) / (sizeof(INT16)   == 2)];
+extern UINT8 _VerifySizeOfUint16  [(sizeof(UINT16)  == 2) / (sizeof(UINT16)  == 2)];
+extern UINT8 _VerifySizeOfInt32   [(sizeof(INT32)   == 4) / (sizeof(INT32)   == 4)];
+extern UINT8 _VerifySizeOfUint32  [(sizeof(UINT32)  == 4) / (sizeof(UINT32)  == 4)];
+extern UINT8 _VerifySizeOfInt64   [(sizeof(INT64)   == 8) / (sizeof(INT64)   == 8)];
+extern UINT8 _VerifySizeOfUint64  [(sizeof(UINT64)  == 8) / (sizeof(UINT64)  == 8)];
+extern UINT8 _VerifySizeOfChar8   [(sizeof(CHAR8)   == 1) / (sizeof(CHAR8)   == 1)];
+extern UINT8 _VerifySizeOfChar16  [(sizeof(CHAR16)  == 2) / (sizeof(CHAR16)  == 2)];
+
+//
 // The Microsoft* C compiler can removed references to unreferenced data items
 //  if the /OPT:REF linker option is used. We defined a macro as this is a 
 //  a non standard extension
