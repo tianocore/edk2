@@ -1,14 +1,14 @@
 /** @file
   Processor or Compiler specific defines and types for Intel Itanium(TM) processors.
 
-  Copyright (c) 2006 - 2010, Intel Corporation<BR>
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved. <BR>
+This program and the accompanying materials are licensed and made available 
+under the terms and conditions of the BSD License which accompanies this
+distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -17,7 +17,7 @@
 
 
 ///
-/// Define the processor type so other code can make processor-based choices
+/// Define the processor type so other code can make processor-based choices.
 ///
 #define MDE_CPU_IPF
 
@@ -112,23 +112,23 @@
   //
 
   ///
-  /// 8-byte unsigned value
+  /// 8-byte unsigned value.
   ///
   typedef unsigned __int64    UINT64;
   ///
-  /// 8-byte signed value
+  /// 8-byte signed value.
   ///
   typedef __int64             INT64;
   ///
-  /// 4-byte unsigned value
+  /// 4-byte unsigned value.
   ///
   typedef unsigned __int32    UINT32;
   ///
-  /// 4-byte signed value
+  /// 4-byte signed value.
   ///
   typedef __int32             INT32;
   ///
-  /// 2-byte unsigned value
+  /// 2-byte unsigned value.
   ///
   typedef unsigned short      UINT16;
   ///
@@ -137,7 +137,7 @@
   ///
   typedef unsigned short      CHAR16;
   ///
-  /// 2-byte signed value
+  /// 2-byte signed value.
   ///
   typedef short               INT16;
   ///
@@ -146,36 +146,36 @@
   ///
   typedef unsigned char       BOOLEAN;
   ///
-  /// 1-byte unsigned value
+  /// 1-byte unsigned value.
   ///
   typedef unsigned char       UINT8;
   ///
-  /// 1-byte Character
+  /// 1-byte Character.
   ///
   typedef char                CHAR8;
   ///
-  /// 1-byte signed value
+  /// 1-byte signed value.
   ///
   typedef char                INT8;
 #else
   ///
-  /// 8-byte unsigned value
+  /// 8-byte unsigned value.
   ///
   typedef unsigned long long  UINT64;
   ///
-  /// 8-byte signed value
+  /// 8-byte signed value.
   ///
   typedef long long           INT64;
   ///
-  /// 4-byte unsigned value
+  /// 4-byte unsigned value.
   ///
   typedef unsigned int        UINT32;
   ///
-  /// 4-byte signed value
+  /// 4-byte signed value.
   ///
   typedef int                 INT32;
   ///
-  /// 2-byte unsigned value
+  /// 2-byte unsigned value.
   ///
   typedef unsigned short      UINT16;
   ///
@@ -184,7 +184,7 @@
   ///
   typedef unsigned short      CHAR16;
   ///
-  /// 2-byte signed value
+  /// 2-byte signed value.
   ///
   typedef short               INT16;
   ///
@@ -193,27 +193,27 @@
   ///
   typedef unsigned char       BOOLEAN;
   ///
-  /// 1-byte unsigned value
+  /// 1-byte unsigned value.
   ///
   typedef unsigned char       UINT8;
   ///
-  /// 1-byte Character
+  /// 1-byte Character.
   ///
   typedef char                CHAR8;
   ///
-  /// 1-byte signed value
+  /// 1-byte signed value.
   ///
   typedef char                INT8;
 #endif
 
 ///
-/// Unsigned value of native width.  (4 bytes on supported 32-bit processor instructions,
-/// 8 bytes on supported 64-bit processor instructions)
+/// Unsigned value of native width.  (4 bytes on supported 32-bit processor instructions;
+/// 8 bytes on supported 64-bit processor instructions.)
 ///
 typedef UINT64  UINTN;
 ///
-/// Signed value of native width.  (4 bytes on supported 32-bit processor instructions,
-/// 8 bytes on supported 64-bit processor instructions)
+/// Signed value of native width.  (4 bytes on supported 32-bit processor instructions;
+/// 8 bytes on supported 64-bit processor instructions.)
 ///
 typedef INT64   INTN;
 
@@ -232,7 +232,7 @@ typedef INT64   INTN;
 #define MAX_2_BITS  0xC000000000000000ULL
 
 ///
-/// Maximum legal Itanium-based address
+/// The maximum legal Itanium-based address
 ///
 #define MAX_ADDRESS   0xFFFFFFFFFFFFFFFFULL
 
@@ -253,7 +253,7 @@ typedef INT64   INTN;
   ///
 #elif defined(_MSC_EXTENSIONS)
   ///
-  /// Microsoft* compiler specific method for EFIAPI calling convension
+  /// Microsoft* compiler-specific method for EFIAPI calling convention.
   /// 
   #define EFIAPI __cdecl
 #else
