@@ -6,12 +6,12 @@
   environment. There are a set of base libraries in the Mde Package that can
   be used to implement base modules.
 
-Copyright (c) 2006 - 2009, Intel Corporation<BR>
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
 Portions copyright (c) 2008-2009 Apple Inc. All rights reserved.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+http://opensource.org/licenses/bsd-license.php.
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -60,8 +60,8 @@ extern UINT8 _VerifySizeOfChar16  [(sizeof(CHAR16)  == 2) / (sizeof(CHAR16)  == 
   #define GLOBAL_REMOVE_IF_UNREFERENCED __declspec(selectany)
 #else
   ///
-  /// Remove global variable from the linked image if there are no references to 
-  /// it after all compiler and linker optimizations have been performed.
+  /// Remove the global variable from the linked image if there are no references 
+  ///  to it after all compiler and linker optimizations have been performed.
   ///
   ///
   #define GLOBAL_REMOVE_IF_UNREFERENCED
@@ -138,17 +138,17 @@ struct _LIST_ENTRY {
 //
 
 ///
-/// Datum is read-only
+/// Datum is read-only.
 ///
 #define CONST     const
 
 ///
-/// Datum is scoped to the current file or function
+/// Datum is scoped to the current file or function.
 ///
 #define STATIC    static
 
 ///
-/// Undeclared type
+/// Undeclared type.
 ///
 #define VOID      void
 
@@ -158,18 +158,18 @@ struct _LIST_ENTRY {
 //
 
 ///
-/// Datum is passed to the function
+/// Datum is passed to the function.
 ///
 #define IN
 
 ///
-/// Datum is returned from the function
+/// Datum is returned from the function.
 ///
 #define OUT
 
 ///
 /// Passing the datum to the function is optional, and a NULL
-/// be passed if the value is not supplied.
+/// is passed if the value is not supplied.
 ///
 #define OPTIONAL
 
@@ -414,9 +414,9 @@ struct _LIST_ENTRY {
 /**
   Return the size of argument that has been aligned to sizeof (UINTN).
 
-  @param  n    The parameter size is to be aligned.
+  @param  n    The parameter size to be aligned.
 
-  @return The aligned size
+  @return The aligned size.
 **/
 #define _INT_SIZE_OF(n) ((sizeof (n) + sizeof (UINTN) - 1) &~(sizeof (UINTN) - 1))
 
@@ -468,14 +468,15 @@ typedef __builtin_va_list VA_LIST;
 typedef CHAR8 *VA_LIST;
 
 /**
-  Retrieves a pointer to the beginning of a variable argument list based on 
+  Retrieves a pointer to the beginning of a variable argument list, based on 
   the name of the parameter that immediately precedes the variable argument list. 
 
-  This function initializes Marker to point to the beginning of the variable argument 
-  list that immediately follows Parameter.  The method for computing the pointer to the 
-  next argument in the argument list is CPU specific following the EFIAPI ABI.
+  This function initializes Marker to point to the beginning of the variable  
+  argument list that immediately follows Parameter.  The method for computing the 
+  pointer to the next argument in the argument list is CPU-specific following the 
+  EFIAPI ABI.
 
-  @param   Marker       VA_LIST used to traverse the list of arguments.
+  @param   Marker       The VA_LIST used to traverse the list of arguments.
   @param   Parameter    The name of the parameter that immediately precedes 
                         the variable argument list.
   
@@ -491,7 +492,7 @@ typedef CHAR8 *VA_LIST;
   This function returns an argument of the type specified by TYPE from the beginning 
   of the variable argument list specified by Marker.  Marker is then updated to point 
   to the next argument in the variable argument list.  The method for computing the 
-  pointer to the next argument in the argument list is CPU specific following the EFIAPI ABI.
+  pointer to the next argument in the argument list is CPU-specific following the EFIAPI ABI.
 
   @param   Marker   VA_LIST used to traverse the list of arguments.
   @param   TYPE     The type of argument to retrieve from the beginning 
@@ -506,7 +507,7 @@ typedef CHAR8 *VA_LIST;
   Terminates the use of a variable argument list.
 
   This function initializes Marker so it can no longer be used with VA_ARG().  
-  After this macro is used, the only way to access the variable argument list again is 
+  After this macro is used, the only way to access the variable argument list is 
   by using VA_START() again.
 
   @param   Marker   VA_LIST used to traverse the list of arguments.
@@ -539,7 +540,7 @@ typedef UINTN  *BASE_LIST;
   to the next argument in the variable argument list.  The method for computing the 
   pointer to the next argument in the argument list is CPU specific following the EFIAPI ABI.
 
-  @param   Marker   Pointer to the beginning of a variable argument list.
+  @param   Marker   The pointer to the beginning of a variable argument list.
   @param   TYPE     The type of argument to retrieve from the beginning 
                     of the variable argument list.
   
@@ -549,7 +550,7 @@ typedef UINTN  *BASE_LIST;
 #define BASE_ARG(Marker, TYPE)   (*(TYPE *) ((Marker += _BASE_INT_SIZE_OF (TYPE)) - _BASE_INT_SIZE_OF (TYPE)))
 
 /**
-  Macro that returns the byte offset of a field in a data structure. 
+  The macro that returns the byte offset of a field in a data structure. 
 
   This function returns the offset, in bytes, of field specified by Field from the 
   beginning of the  data structure specified by TYPE. If TYPE does not contain Field, 
@@ -689,7 +690,7 @@ typedef UINTN RETURN_STATUS;
 /**
   Returns TRUE if a specified RETURN_STATUS code is an error code. 
 
-  This function returns TRUE if StatusCode has the high bit set.  Otherwise FALSE is returned.  
+  This function returns TRUE if StatusCode has the high bit set.  Otherwise, FALSE is returned.  
   
   @param  StatusCode    The status code value to evaluate.
 
@@ -847,7 +848,7 @@ typedef UINTN RETURN_STATUS;
 #define RETURN_CRC_ERROR             ENCODE_ERROR (27)
 
 ///
-/// Beginning or end of media was reached.
+/// The beginning or end of media was reached.
 ///
 #define RETURN_END_OF_MEDIA          ENCODE_ERROR (28)
 

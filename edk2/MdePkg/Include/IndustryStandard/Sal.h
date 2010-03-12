@@ -2,14 +2,14 @@
   Main SAL API's defined in Intel Itanium Processor Family System Abstraction
   Layer Specification Revision 3.2 (December 2003)
 
-  Copyright (c) 2006 - 2008, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
 **/
 
@@ -26,7 +26,7 @@ typedef INTN EFI_SAL_STATUS;
 ///
 #define EFI_SAL_SUCCESS               ((EFI_SAL_STATUS) 0)
 ///
-/// Call completed without error but some information was lost due to overflow. 
+/// Call completed without error, but some information was lost due to overflow. 
 ///
 #define EFI_SAL_OVERFLOW              ((EFI_SAL_STATUS) 1)
 ///
@@ -63,23 +63,23 @@ typedef INTN EFI_SAL_STATUS;
 #define EFI_SAL_NOT_ENOUGH_SCRATCH    ((EFI_SAL_STATUS) - 9)
 
 ///
-/// Return registers from SAL
+/// Return registers from SAL.
 ///
 typedef struct {
   ///
-  /// SAL return status value in r8
+  /// SAL return status value in r8.
   ///
   EFI_SAL_STATUS  Status;
   ///
-  /// SAL returned value in r9
+  /// SAL returned value in r9.
   ///
   UINTN           r9;
   ///
-  /// SAL returned value in r10
+  /// SAL returned value in r10.
   ///
   UINTN           r10;
   ///
-  /// SAL returned value in r11
+  /// SAL returned value in r11.
   ///
   UINTN           r11;
 } SAL_RETURN_REGS;
@@ -96,11 +96,11 @@ typedef struct {
                              0x04XXXXXX to 0xFFFFFFFF - Reserved.
   @param  Arg1               The first parameter of the architected/OEM specific SAL functions.
   @param  Arg2               The second parameter of the architected/OEM specific SAL functions.
-  @param  Arg3               The third parameter passed to the ESAL function based
-  @param  Arg4               The fourth parameter passed to the ESAL function based
-  @param  Arg5               The fifth parameter passed to the ESAL function based
-  @param  Arg6               The sixth parameter passed to the ESAL function
-  @param  Arg7               The seventh parameter passed to the ESAL function based
+  @param  Arg3               The third parameter passed to the ESAL function based.
+  @param  Arg4               The fourth parameter passed to the ESAL function based.
+  @param  Arg5               The fifth parameter passed to the ESAL function based.
+  @param  Arg6               The sixth parameter passed to the ESAL function.
+  @param  Arg7               The seventh parameter passed to the ESAL function based.
 
   @return r8                 Return status: positive number indicates successful,
                              negative number indicates failure.
@@ -201,7 +201,7 @@ SAL_RETURN_REGS
 #define EFI_SAL_SET_INIT_VECTOR         0x1
 #define EFI_SAL_SET_BOOT_RENDEZ_VECTOR  0x2
 ///
-/// Format of length_cs_n argument.
+/// The format of a length_cs_n argument.
 ///
 typedef struct {
   UINT64  Length : 32;
@@ -267,7 +267,7 @@ typedef struct {
 #define EFI_SAL_PCI_COMPATIBLE_ADDRESS         0x0
 #define EFI_SAL_PCI_EXTENDED_REGISTER_ADDRESS  0x1
 ///
-/// Format of PCI Compatible Address
+/// The format of PCI Compatible Address.
 ///
 typedef struct {
   UINT64  Register : 8;
@@ -278,7 +278,7 @@ typedef struct {
   UINT64  Reserved : 32;
 } SAL_PCI_ADDRESS;
 ///
-/// Format of Extended Register Address
+/// The format of Extended Register Address.
 ///
 typedef struct {
   UINT64  Register : 8;
@@ -327,7 +327,7 @@ typedef struct {
   UINT8   Reserved2[40];
 } SAL_UPDATE_PAL_DATA_BLOCK;
 ///
-/// Data structure pointed by parameter param_buf.
+/// Data structure pointed by the parameter param_buf.
 /// It is a 16-byte aligned data structure in memory with a length of 32 bytes
 /// that describes the new firmware. This information is organized in the form
 /// of a linked list with each element describing one firmware component.
@@ -340,12 +340,12 @@ typedef struct _SAL_UPDATE_PAL_INFO_BLOCK {
 } SAL_UPDATE_PAL_INFO_BLOCK;
 
 ///
-/// SAL System Table Definitions
+/// SAL System Table Definitions.
 ///
 #pragma pack(1)
 typedef struct {
   ///
-  /// The ASCII string representation of "SST_" which confirms the presence of the table. 
+  /// The ASCII string representation of "SST_" that confirms the presence of the table. 
   /// 
   UINT32  Signature;
   ///
@@ -355,7 +355,7 @@ typedef struct {
   UINT32  Length;
   ///
   /// The revision number of the Itanium Processor Family System Abstraction Layer
-  /// Specification supported by the SAL implementation in binary coded decimal (BCD) format.
+  /// Specification supported by the SAL implementation, in binary coded decimal (BCD) format.
   ///
   UINT16  SalRevision;
   ///
@@ -417,10 +417,10 @@ typedef struct {
 #define EFI_SAL_ST_AP_WAKEUP_SIZE          16
 
 ///
-/// Format of Entrypoint Descriptor Entry
+/// Format of Entrypoint Descriptor Entry.
 ///
 typedef struct {
-  UINT8   Type;         ///< Type here should be 0
+  UINT8   Type;         ///< Type here should be 0.
   UINT8   Reserved[7];
   UINT64  PalProcEntry;
   UINT64  SalProcEntry;
@@ -429,10 +429,10 @@ typedef struct {
 } SAL_ST_ENTRY_POINT_DESCRIPTOR;
 
 ///
-/// Format of Platform Features Descriptor Entry
+/// Format of Platform Features Descriptor Entry.
 ///
 typedef struct {
-  UINT8 Type;           ///< Type here should be 2
+  UINT8 Type;           ///< Type here should be 2.
   UINT8 PlatformFeatures;
   UINT8 Reserved[14];
 } SAL_ST_PLATFORM_FEATURES;
@@ -445,10 +445,10 @@ typedef struct {
 #define SAL_PLAT_FEAT_PROC_IPI_HINT 0x04
 
 ///
-/// Format of Translation Register Descriptor Entry
+/// Format of Translation Register Descriptor Entry.
 ///
 typedef struct {
-  UINT8   Type;         ///< Type here should be 3
+  UINT8   Type;         ///< Type here should be 3.
   UINT8   TRType;
   UINT8   TRNumber;
   UINT8   Reserved[5];
@@ -464,7 +464,7 @@ typedef struct {
 #define EFI_SAL_ST_TR_USAGE_DATA        01
 
 ///
-/// Definition of Coherence Domain Information
+/// Definition of Coherence Domain Information.
 ///
 typedef struct {
   UINT64  NumberOfProcessors;
@@ -472,27 +472,27 @@ typedef struct {
 } SAL_COHERENCE_DOMAIN_INFO;
            
 ///
-/// Format of Purge Translation Cache Coherence Domain Entry
+/// Format of Purge Translation Cache Coherence Domain Entry.
 ///
 typedef struct {
-  UINT8                     Type;       ///< Type here should be 4
+  UINT8                     Type;       ///< Type here should be 4.
   UINT8                     Reserved[3];
   UINT32                    NumberOfDomains;
   SAL_COHERENCE_DOMAIN_INFO *DomainInformation;
 } SAL_ST_CACHE_COHERENCE_DECRIPTOR;
 
 ///
-/// Format of Application Processor Wake-Up Descriptor Entry
+/// Format of Application Processor Wake-Up Descriptor Entry.
 ///
 typedef struct {
-  UINT8   Type;                   ///< Type here should be 5
+  UINT8   Type;                   ///< Type here should be 5.
   UINT8   WakeUpType;
   UINT8   Reserved[6];
   UINT64  ExternalInterruptVector;
 } SAL_ST_AP_WAKEUP_DECRIPTOR;
 
 ///
-/// Format of Firmware Interface Table (FIT) Entry
+/// Format of Firmware Interface Table (FIT) Entry.
 ///
 typedef struct {
   UINT64  Address;
@@ -532,7 +532,7 @@ typedef struct {
 //
 
 ///
-/// Format of TimeStamp field in Record Header
+/// Format of TimeStamp field in Record Header.
 ///
 typedef struct {
   UINT8 Seconds;
@@ -545,7 +545,7 @@ typedef struct {
   UINT8 Century;
 } SAL_TIME_STAMP;
 ///
-/// Definition of Record Header
+/// Definition of Record Header.
 ///
 typedef struct {
   UINT64          RecordId;
@@ -557,7 +557,7 @@ typedef struct {
   UINT8           OemPlatformId[16];
 } SAL_RECORD_HEADER;
 ///
-/// Definition of Section Header
+/// Definition of Section Header.
 ///
 typedef struct {
   GUID      Guid;
@@ -568,7 +568,7 @@ typedef struct {
 } SAL_SEC_HEADER;
 
 ///
-/// GUID of Processor Machine Check Errors
+/// GUID of Processor Machine Check Errors.
 ///
 #define SAL_PROCESSOR_ERROR_RECORD_INFO \
   { \
@@ -583,7 +583,7 @@ typedef struct {
 #define TARGER_ID_VALID_BIT_MASK    0x8
 #define PRECISE_IP_VALID_BIT_MASK   0x10
 ///
-/// Definition of MOD_ERROR_INFO_STRUCT
+/// Definition of MOD_ERROR_INFO_STRUCT.
 ///
 typedef struct {
   UINT64  InfoValid : 1;
@@ -599,7 +599,7 @@ typedef struct {
   UINT64  Ip;
 } MOD_ERROR_INFO;
 ///
-/// Definition of CPUID_INFO_STRUCT
+/// Definition of CPUID_INFO_STRUCT.
 ///
 typedef struct {
   UINT8 CpuidInfo[40];
@@ -620,7 +620,7 @@ typedef struct {
 #define RR_VALID_BIT_MASK         0x10
 #define FR_VALID_BIT_MASK         0x20
 ///
-/// Definition of PSI_STATIC_STRUCT
+/// Definition of PSI_STATIC_STRUCT.
 ///
 typedef struct {
   UINT64    ValidFieldBits;
@@ -640,7 +640,7 @@ typedef struct {
 #define PROC_STATIC_STRUCT_VALID_BIT_MASK   0x8
 #define CPU_INFO_VALID_BIT_MASK             0x1000000
 ///
-/// Definition of Processor Machine Check Error Record
+/// Definition of Processor Machine Check Error Record.
 ///
 typedef struct {
   SAL_SEC_HEADER    SectionHeader;
@@ -658,7 +658,7 @@ typedef struct {
 } SAL_PROCESSOR_ERROR_RECORD;
 
 ///
-/// GUID of Platform Memory Device Error Info
+/// GUID of Platform Memory Device Error Info.
 ///
 #define SAL_MEMORY_ERROR_RECORD_INFO \
   { \
@@ -685,7 +685,7 @@ typedef struct {
 #define MEMORY_PLATFORM_OEM_ID_VALID_BIT_MASK             0x8000
 #define MEMORY_PLATFORM_OEM_DATA_STRUCT_VALID_BIT_MASK    0x10000
 ///
-/// Definition of Platform Memory Device Error Info Record
+/// Definition of Platform Memory Device Error Info Record.
 ///
 typedef struct {
   SAL_SEC_HEADER  SectionHeader;
@@ -709,7 +709,7 @@ typedef struct {
 } SAL_MEMORY_ERROR_RECORD;
 
 ///
-/// GUID of Platform PCI Bus Error Info
+/// GUID of Platform PCI Bus Error Info.
 ///
 #define SAL_PCI_BUS_ERROR_RECORD_INFO \
   { \
@@ -731,7 +731,7 @@ typedef struct {
 #define PCI_BUS_OEM_DATA_STRUCT_VALID_BIT_MASK  0x400
 
 ///
-/// Designated PCI Bus identifier
+/// Designated PCI Bus identifier.
 ///
 typedef struct {
   UINT8 BusNumber;
@@ -739,7 +739,7 @@ typedef struct {
 } PCI_BUS_ID;
 
 ///
-/// Definition of Platform PCI Bus Error Info Record
+/// Definition of Platform PCI Bus Error Info Record.
 ///
 typedef struct {
   SAL_SEC_HEADER  SectionHeader;
@@ -758,7 +758,7 @@ typedef struct {
 } SAL_PCI_BUS_ERROR_RECORD;
 
 ///
-/// GUID of Platform PCI Component Error Info
+/// GUID of Platform PCI Component Error Info.
 ///
 #define SAL_PCI_COMP_ERROR_RECORD_INFO \
   { \
@@ -774,7 +774,7 @@ typedef struct {
 #define PCI_COMP_REG_DATA_PAIR_VALID_BIT_MASK   0x10
 #define PCI_COMP_OEM_DATA_STRUCT_VALID_BIT_MASK 0x20
 ///
-/// Format of PCI Component Information to identify the device
+/// Format of PCI Component Information to identify the device.
 ///
 typedef struct {
   UINT16  VendorId;
@@ -787,7 +787,7 @@ typedef struct {
   UINT8   Reserved[5];
 } PCI_COMP_INFO;
 ///
-/// Definition of Platform PCI Component Error Info
+/// Definition of Platform PCI Component Error Info.
 ///
 typedef struct {
   SAL_SEC_HEADER  SectionHeader;
@@ -800,7 +800,7 @@ typedef struct {
 } SAL_PCI_COMPONENT_ERROR_RECORD;
 
 ///
-/// Platform SEL Device Error Info
+/// Platform SEL Device Error Info.
 ///
 #define SAL_SEL_DEVICE_ERROR_RECORD_INFO \
   { \
@@ -820,7 +820,7 @@ typedef struct {
 #define SEL_EVENT_DATA2_VALID_BIT_MASK    0x100;
 #define SEL_EVENT_DATA3_VALID_BIT_MASK    0x200;
 ///
-/// Definition of Platform SEL Device Error Info Record
+/// Definition of Platform SEL Device Error Info Record.
 ///
 typedef struct {
   SAL_SEC_HEADER  SectionHeader;
@@ -839,7 +839,7 @@ typedef struct {
 } SAL_SEL_DEVICE_ERROR_RECORD;
 
 ///
-/// GUID of Platform SMBIOS Device Error Info
+/// GUID of Platform SMBIOS Device Error Info.
 ///
 #define SAL_SMBIOS_ERROR_RECORD_INFO \
   { \
@@ -853,7 +853,7 @@ typedef struct {
 #define SMBIOS_TIME_STAMP_VALID_BIT_MASK  0x4
 #define SMBIOS_DATA_VALID_BIT_MASK        0x8
 ///
-/// Definition of Platform SMBIOS Device Error Info Record
+/// Definition of Platform SMBIOS Device Error Info Record.
 ///
 typedef struct {
   SAL_SEC_HEADER  SectionHeader;
@@ -864,7 +864,7 @@ typedef struct {
 } SAL_SMBIOS_DEVICE_ERROR_RECORD;
 
 ///
-/// GUID of Platform Specific Error Info
+/// GUID of Platform Specific Error Info.
 ///
 #define SAL_PLATFORM_ERROR_RECORD_INFO \
   { \
@@ -882,7 +882,7 @@ typedef struct {
 #define PLATFORM_OEM_DATA_STRUCT_VALID_BIT_MASK 0x40
 #define PLATFORM_OEM_DEVICE_PATH_VALID_BIT_MASK 0x80
 ///
-/// Definition of Platform Specific Error Info Record
+/// Definition of Platform Specific Error Info Record.
 ///
 typedef struct {
   SAL_SEC_HEADER  SectionHeader;
@@ -896,7 +896,7 @@ typedef struct {
 } SAL_PLATFORM_SPECIFIC_ERROR_RECORD;
 
 ///
-/// Union of all the possible SAL Error Record Types
+/// Union of all the possible SAL Error Record Types.
 ///
 typedef union {
   SAL_RECORD_HEADER                   *RecordHeader;

@@ -8,11 +8,11 @@
   of size reduction when compiler optimization is disabled. If MDEPKG_NDEBUG is
   defined, then debug and assert related macros wrapped by it are the NULL implementations.
 
-Copyright (c) 2006 - 2010, Intel Corporation<BR>
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -82,8 +82,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   If Format is NULL, then ASSERT().
 
   @param  ErrorLevel  The error level of the debug message.
-  @param  Format      Format string for the debug message to print.
-  @param  ...         Variable argument list whose contents are accessed 
+  @param  Format      The format string for the debug message to print.
+  @param  ...         The variable argument list whose contents are accessed 
                       based on the format string specified by Format.
 
 **/
@@ -112,9 +112,9 @@ DebugPrint (
   If FileName is NULL, then a <FileName> string of "(NULL) Filename" is printed.
   If Description is NULL, then a <Description> string of "(NULL) Description" is printed.
 
-  @param  FileName     Pointer to the name of the source file that generated the assert condition.
+  @param  FileName     The pointer to the name of the source file that generated the assert condition.
   @param  LineNumber   The line number in the source file that generated the assert condition
-  @param  Description  Pointer to the description of the assert condition.
+  @param  Description  The pointer to the description of the assert condition.
 
 **/
 VOID
@@ -135,10 +135,10 @@ DebugAssert (
   If Buffer is NULL, then ASSERT().
   If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
 
-  @param   Buffer  Pointer to the target buffer to be filled with PcdDebugClearMemoryValue.
-  @param   Length  Number of bytes in Buffer to fill with zeros PcdDebugClearMemoryValue. 
+  @param   Buffer  The pointer to the target buffer to be filled with PcdDebugClearMemoryValue.
+  @param   Length  The number of bytes in Buffer to fill with zeros PcdDebugClearMemoryValue. 
 
-  @return  Buffer  Pointer to the target buffer filled with PcdDebugClearMemoryValue.
+  @return  Buffer  The pointer to the target buffer filled with PcdDebugClearMemoryValue.
 
 **/
 VOID *
@@ -153,7 +153,7 @@ DebugClearMemory (
   Returns TRUE if ASSERT() macros are enabled.
 
   This function returns TRUE if the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of 
-  PcdDebugProperyMask is set.  Otherwise FALSE is returned.
+  PcdDebugProperyMask is set.  Otherwise, FALSE is returned.
 
   @retval  TRUE    The DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of PcdDebugProperyMask is set.
   @retval  FALSE   The DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of PcdDebugProperyMask is clear.
@@ -170,7 +170,7 @@ DebugAssertEnabled (
   Returns TRUE if DEBUG() macros are enabled.
 
   This function returns TRUE if the DEBUG_PROPERTY_DEBUG_PRINT_ENABLED bit of 
-  PcdDebugProperyMask is set.  Otherwise FALSE is returned.
+  PcdDebugProperyMask is set.  Otherwise, FALSE is returned.
 
   @retval  TRUE    The DEBUG_PROPERTY_DEBUG_PRINT_ENABLED bit of PcdDebugProperyMask is set.
   @retval  FALSE   The DEBUG_PROPERTY_DEBUG_PRINT_ENABLED bit of PcdDebugProperyMask is clear.
@@ -187,7 +187,7 @@ DebugPrintEnabled (
   Returns TRUE if DEBUG_CODE() macros are enabled.
 
   This function returns TRUE if the DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of 
-  PcdDebugProperyMask is set.  Otherwise FALSE is returned.
+  PcdDebugProperyMask is set.  Otherwise, FALSE is returned.
 
   @retval  TRUE    The DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of PcdDebugProperyMask is set.
   @retval  FALSE   The DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of PcdDebugProperyMask is clear.
@@ -204,7 +204,7 @@ DebugCodeEnabled (
   Returns TRUE if DEBUG_CLEAR_MEMORY() macro is enabled.
 
   This function returns TRUE if the DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED bit of 
-  PcdDebugProperyMask is set.  Otherwise FALSE is returned.
+  PcdDebugProperyMask is set.  Otherwise, FALSE is returned.
 
   @retval  TRUE    The DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED bit of PcdDebugProperyMask is set.
   @retval  FALSE   The DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED bit of PcdDebugProperyMask is clear.
@@ -251,7 +251,7 @@ DebugClearMemoryEnabled (
   DebugAssert() is called passing in the source filename, source line number, 
   and Expression.
 
-  @param  Expression  Boolean expression
+  @param  Expression  Boolean expression.
 
 **/
 #if !defined(MDEPKG_NDEBUG)       
@@ -335,7 +335,7 @@ DebugClearMemoryEnabled (
                   parameter that may be NULL.  If it is NULL, then the entire 
                   handle database is searched.
 
-  @param  Guid    Pointer to a protocol GUID.
+  @param  Guid    The pointer to a protocol GUID.
 
 **/
 #if !defined(MDEPKG_NDEBUG)
@@ -372,7 +372,7 @@ DebugClearMemoryEnabled (
 
 
 /**  
-  Macro that marks the end of debug source code.
+  The macro that marks the end of debug source code.
 
   If the DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of PcdDebugProperyMask is set, 
   then this macro marks the end of source code that is included in a module.  
@@ -384,7 +384,7 @@ DebugClearMemoryEnabled (
 
 
 /**  
-  Macro that declares a section of debug source code.
+  The macro that declares a section of debug source code.
 
   If the DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of PcdDebugProperyMask is set, 
   then the source code specified by Expression is included in a module.  
@@ -398,12 +398,12 @@ DebugClearMemoryEnabled (
 
 
 /**  
-  Macro that calls DebugClearMemory() to clear a buffer to a default value.
+  The macro that calls DebugClearMemory() to clear a buffer to a default value.
 
   If the DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED bit of PcdDebugProperyMask is set, 
   then this macro calls DebugClearMemory() passing in Address and Length.
 
-  @param  Address  Pointer to a buffer.
+  @param  Address  The pointer to a buffer.
   @param  Length   The number of bytes in the buffer to set.
 
 **/
@@ -419,13 +419,13 @@ DebugClearMemoryEnabled (
   Macro that calls DebugAssert() if the containing record does not have a 
   matching signature.  If the signatures matches, then a pointer to the data 
   structure that contains a specified field of that data structure is returned.  
-  This is a light weight method hide information by placing a public data 
+  This is a lightweight method hide information by placing a public data 
   structure inside a larger private data structure and using a pointer to the 
   public data structure to retrieve a pointer to the private data structure.
 
   If MDEPKG_NDEBUG is defined or the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit 
   of PcdDebugProperyMask is clear, then this macro computes the offset, in bytes,
-  of field specified by Field from the beginning of the  data structure specified 
+  of the field specified by Field from the beginning of the data structure specified 
   by TYPE.  This offset is subtracted from Record, and is used to return a pointer 
   to a data structure of the type specified by TYPE.
 
@@ -445,7 +445,7 @@ DebugClearMemoryEnabled (
   If TYPE does not contain a field called Signature, then the module will not 
   compile.
 
-  @param  Record         Pointer to the field specified by Field within a data 
+  @param  Record         The pointer to the field specified by Field within a data 
                          structure of type TYPE.
 
   @param  TYPE           The name of the data structure type to return  This 

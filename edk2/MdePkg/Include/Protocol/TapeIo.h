@@ -2,14 +2,14 @@
   EFI_TAPE_IO_PROTOCOL as defined in the UEFI 2.0.
   Provide services to control and access a tape device.
 
-  Copyright (c) 2006 - 2008, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
 **/
 
@@ -47,8 +47,8 @@ typedef struct _EFI_TAPE_HEADER {
   Reads from the tape.
 
   @param  This       A pointer to the EFI_TAPE_IO_PROTOCOL instance.
-  @param  BufferSize Size of the buffer in bytes pointed to by Buffer.
-  @param  Buffer     Pointer to the buffer for data to be read into.
+  @param  BufferSize The size of the buffer in bytes pointed to by Buffer.
+  @param  Buffer     The pointer to the buffer for data to be read into.
 
   @retval EFI_SUCCESS           Data was successfully transferred from the media.
   @retval EFI_END_OF_FILE       A filemark was encountered which limited the data
@@ -63,7 +63,7 @@ typedef struct _EFI_TAPE_HEADER {
                                 The transfer was aborted since the current position of the
                                 media may be incorrect.
   @retval EFI_INVALID_PARAMETER A NULL Buffer was specified with a non-zero
-                                BufferSize or the device is operating in fixed block
+                                BufferSize, or the device is operating in fixed block
                                 size mode and the BufferSize was not a multiple of
                                 device's fixed block size
   @retval EFI_DEVICE_ERROR      A device error occurred while attempting to transfer data
@@ -83,7 +83,7 @@ EFI_STATUS
 
   @param  This       A pointer to the EFI_TAPE_IO_PROTOCOL instance.
   @param  BufferSize Size of the buffer in bytes pointed to by Buffer.
-  @param  Buffer     Pointer to the buffer for data to be written from.
+  @param  Buffer     The pointer to the buffer for data to be written from.
 
   @retval EFI_SUCCESS           Data was successfully transferred to the media.
   @retval EFI_END_OF_MEDIA      The logical end of media has been reached. Data may have
@@ -99,7 +99,7 @@ EFI_STATUS
   @retval EFI_WRITE_PROTECTED   The media in the device is write-protected. The transfer
                                 was aborted since a write cannot be completed.
   @retval EFI_INVALID_PARAMETER A NULL Buffer was specified with a non-zero
-                                BufferSize or the device is operating in fixed block
+                                BufferSize, or the device is operating in fixed block
                                 size mode and the BufferSize was not a multiple of
                                 device's fixed block size
   @retval EFI_DEVICE_ERROR      A device error occurred while attempting to transfer data

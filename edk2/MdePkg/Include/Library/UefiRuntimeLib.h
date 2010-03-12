@@ -2,11 +2,11 @@
   Provides library functions for each of the UEFI Runtime Services.
   Only available to DXE and UEFI module types.
 
-Copyright (c) 2006 - 2009, Intel Corporation<BR>
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -120,7 +120,7 @@ EfiSetTime (
   @param  Time     The current alarm setting. Type EFI_TIME is defined in the GetTime()
                    function description.
 
-  @retval  EFI_SUCCESS           The alarm settings were returned.
+  @retval  EFI_SUCCESS            The alarm settings were returned.
   @retval  EFI_INVALID_PARAMETER  Enabled is NULL.
   @retval  EFI_INVALID_PARAMETER  Pending is NULL.
   @retval  EFI_INVALID_PARAMETER  Time is NULL.
@@ -442,7 +442,7 @@ EfiSetVirtualAddressMap (
   @param  DebugDisposition   Supplies type information for the pointer being converted.
   @param  ListHead           Head of linked list to convert.
 
-  @retval  EFI_SUCCESS  Success to execute the function.
+  @retval  EFI_SUCCESS  Successfully executed the function.
   @retval  !EFI_SUCCESS Failed to execute the function.
 
 **/
@@ -478,7 +478,7 @@ EfiConvertList (
                                 CapsuleHeaderArray. This parameter is only referenced if
                                 the capsules are defined to persist across system reset.
 
-  @retval EFI_SUCCESS           Valid capsule was passed. If CAPSULE_FLAGS_PERSIT_ACROSS_RESET is not set,
+  @retval EFI_SUCCESS           A valid capsule was passed. If CAPSULE_FLAGS_PERSIT_ACROSS_RESET is not set,
                                 the capsule has been successfully processed by the firmware.
   @retval EFI_INVALID_PARAMETER CapsuleSize is NULL, or an incompatible set of flags were
                                 set in the capsule header.
@@ -524,7 +524,7 @@ EfiUpdateCapsule (
                                 Undefined on input.
   @param  ResetType             Returns the type of reset required for the capsule update.
 
-  @retval EFI_SUCCESS           Valid answer returned.
+  @retval EFI_SUCCESS           A valid answer was returned.
   @retval EFI_INVALID_PARAMETER MaximumCapsuleSize is NULL.
   @retval EFI_UNSUPPORTED       The capsule type is not supported on this platform, and
                                 MaximumCapsuleSize and ResetType are undefined.
@@ -563,11 +563,11 @@ EfiQueryCapsuleCapabilities (
   @param  RemainingVariableStorageSize
                                 Returns the remaining size of the storage space
                                 available for the EFI variables associated with the
-                                attributes specified..
+                                attributes specified.
   @param  MaximumVariableSize   Returns the maximum size of the individual EFI
                                 variables associated with the attributes specified.
 
-  @retval EFI_SUCCESS           Valid answer returned.
+  @retval EFI_SUCCESS           A valid answer was returned.
   @retval EFI_INVALID_PARAMETER An invalid combination of attribute bits was supplied.
   @retval EFI_UNSUPPORTED       EFI_UNSUPPORTED The attribute is not supported on this platform, and the
                                 MaximumVariableStorageSize,

@@ -2,17 +2,17 @@
   The EFI_BIS_PROTOCOL is used to check a digital signature of a data block 
   against a digital certificate for the purpose of an integrity and authorization check.
 
-  Copyright (c) 2006 - 2009, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.        
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.        
 
   @par Revision Reference:          
-  This Protocol is introduced in EFI Specification 1.10     
+  This Protocol is introduced in EFI Specification 1.10.     
 
 **/
 
@@ -51,7 +51,7 @@ typedef UINT32  BIS_CERT_ID;
 /// EFI_BIS_DATA instances obtained from BIS must be freed by calling Free( ).
 ///
 typedef struct {
-  UINT32  Length; ///< Length of Data in 8 bit bytes.
+  UINT32  Length; ///< The length of Data in 8 bit bytes.
   UINT8   *Data;  ///< 32 Bit Flat Address of data.
 } EFI_BIS_DATA;
 
@@ -59,8 +59,8 @@ typedef struct {
 /// EFI_BIS_VERSION type.
 ///
 typedef struct {
-  UINT32  Major;  ///< the major BIS version number.
-  UINT32  Minor;  ///< a minor BIS version number.
+  UINT32  Major;  ///< The major BIS version number.
+  UINT32  Minor;  ///< A minor BIS version number.
 } EFI_BIS_VERSION;
 
 //
@@ -78,12 +78,12 @@ typedef struct {
 typedef struct {
   BIS_CERT_ID CertificateID;  ///< Truncated hash of platform Boot Object
   BIS_ALG_ID  AlgorithmID;    ///< A signature algorithm number.
-  UINT16      KeyLength;      ///< Length of alg. keys in bits.
+  UINT16      KeyLength;      ///< The length of alg. keys in bits.
 } EFI_BIS_SIGNATURE_INFO;
 
 ///
 /// values for EFI_BIS_SIGNATURE_INFO.AlgorithmID.
-/// The exact numeric values come from
+/// The exact numeric values come from the
 ///    "Common Data Security Architecture (CDSA) Specification".
 ///
 #define BIS_ALG_DSA     (41)  // CSSM_ALGID_DSA
@@ -94,7 +94,7 @@ typedef struct {
 #define BIS_CERT_ID_DSA     BIS_ALG_DSA     // CSSM_ALGID_DSA
 #define BIS_CERT_ID_RSA_MD5 BIS_ALG_RSA_MD5 // CSSM_ALGID_MD5_WITH_RSA
 ///
-/// the mask value that gets applied to the truncated hash of a
+/// The mask value that gets applied to the truncated hash of a
 /// platform  Boot Object Authorization Certificate to create the certificateID.
 /// A certificateID must not have any bits set to the value 1 other than bits in
 /// this mask.
@@ -103,7 +103,7 @@ typedef struct {
 
 ///
 /// Macros for dealing with the EFI_BIS_DATA object obtained
-/// from BIS_GetSignatureInfo()
+/// from BIS_GetSignatureInfo().
 /// BIS_GET_SIGINFO_COUNT - tells how many EFI_BIS_SIGNATURE_INFO
 ///  elements are contained in a EFI_BIS_DATA struct pointed to
 ///  by the provided EFI_BIS_DATA*.
@@ -117,7 +117,7 @@ typedef struct {
 #define BIS_GET_SIGINFO_ARRAY(BisDataPtr) ((EFI_BIS_SIGNATURE_INFO *) (BisDataPtr)->Data)
 
 ///
-/// Support old name for backward compatibility
+/// Support an old name for backward compatibility.
 ///
 #define BOOT_OBJECT_AUTHORIZATION_PARMSET_GUIDVALUE \
         BOOT_OBJECT_AUTHORIZATION_PARMSET_GUID
@@ -154,12 +154,12 @@ typedef struct {
                                    found
                                    * A resource limitation was encountered while using a cryptographic software module.
   @retval EFI_INVALID_PARAMETER    The This parameter supplied by the caller is NULL or does not
-                                   reference a valid EFI_BIS_PROTOCOL object, or
-                                   The AppHandle parameter supplied by the caller is NULL or
-                                   an invalid memory reference, or
-                                   The InterfaceVersion parameter supplied by the caller
-                                   is NULL or an invalid memory reference, or
-                                   The TargetAddress parameter supplied by the caller is
+                                   reference a valid EFI_BIS_PROTOCOL object. Or,
+                                   the AppHandle parameter supplied by the caller is NULL or
+                                   an invalid memory reference. Or,
+                                   the InterfaceVersion parameter supplied by the caller
+                                   is NULL or an invalid memory reference. Or,
+                                   the TargetAddress parameter supplied by the caller is
                                    NULL or an invalid memory reference.
                                           
 **/                                       
@@ -203,7 +203,7 @@ EFI_STATUS
                                    of the BIS service.                                                                                           
 
   @retval EFI_SUCCESS              The function completed successfully.
-  @retval EFI_NO_MAPPING           The AppHandle parameter is not or is no longer a valid
+  @retval EFI_NO_MAPPING           The AppHandle parameter is not, or is no longer, a valid
                                    application instance handle associated with the EFI_BIS protocol.                                     
   @retval EFI_OUT_OF_RESOURCES     The function failed due to lack of memory or other resources.                                
   @retval EFI_DEVICE_ERROR         The function encountered an unexpected internal failure while
@@ -301,11 +301,12 @@ EFI_STATUS
   Retrieves a unique token value to be included in the request credential for the next update of any
   parameter in the Boot Object Authorization set                                                    
       
-  @param  AppHandle                An opaque handle that identifies the caller's instance of initialization
-                                   of the BIS service.                                                                                           
-  @param  UpdateToken              The function writes an allocated EFI_BIS_DATA* containing the new
-                                   unique update token value.  The caller must
-                                   eventually free the memory allocated by this function using the function Free().
+  @param  AppHandle                An opaque handle that identifies the caller's 
+                                   instance of initialization of the BIS service.                                                                                           
+  @param  UpdateToken              The function writes an allocated EFI_BIS_DATA* 
+                                   containing the newunique update token value.  
+                                   The caller musteventually free the memory allocated  
+                                   by this function using the function Free().
                                    
   @retval EFI_SUCCESS              The function completed successfully.
   @retval EFI_NO_MAPPING           The AppHandle parameter is not or is no longer a valid
@@ -326,13 +327,14 @@ EFI_STATUS
 /**                                                                 
   Updates one of the configurable parameters of the Boot Object Authorization set.
       
-  @param  AppHandle                An opaque handle that identifies the caller's instance of initialization
-                                   of the BIS service.                                                                                           
-  @param  RequestCredential        This is a Signed Manifest with embedded attributes that carry the details
-                                   of the requested update.                                                 
-  @param  NewUpdateToken           The function writes an allocated EFI_BIS_DATA* containing the new                        
-                                   unique update token value. The caller must
-                                   eventually free the memory allocated by this function using the function Free().
+  @param  AppHandle                An opaque handle that identifies the caller's 
+                                   instance of initialization of the BIS service.                                                                                           
+  @param  RequestCredential        This is a Signed Manifest with embedded attributes 
+                                   that carry the details of the requested update.                                                 
+  @param  NewUpdateToken           The function writes an allocated EFI_BIS_DATA* 
+                                   containing the new unique update token value. 
+                                   The caller must eventually free the memory allocated  
+                                   by this function using the function Free().
                                    
   @retval EFI_SUCCESS              The function completed successfully.                                                
   @retval EFI_NO_MAPPING           The AppHandle parameter is not or is no longer a valid                              

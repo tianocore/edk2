@@ -5,15 +5,14 @@
   If a code construct is defined in the UEFI 2.1 specification it must be included
   by this include file.
 
-  Copyright (c) 2006 - 2010, Intel Corporation<BR>
-  Portions copyright (c) 2008-2009 Apple Inc. All rights reserved.<BR>
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -31,20 +30,20 @@
 ///
 typedef enum {
   ///
-  /// Allocate any available range of pages that satisfies the request
+  /// Allocate any available range of pages that satisfies the request.
   ///
   AllocateAnyPages,
   ///
   /// Allocate any available range of pages whose uppermost address is less than 
-  /// or equal to a specified maximum address
+  /// or equal to a specified maximum address.
   ///
   AllocateMaxAddress,
   ///
-  /// Allocate pages at a specified address
+  /// Allocate pages at a specified address.
   ///
   AllocateAddress,
   ///
-  /// Maximum enumeration value that may be used for bounds checking
+  /// Maximum enumeration value that may be used for bounds checking.
   ///
   MaxAllocateType
 } EFI_ALLOCATE_TYPE;
@@ -56,7 +55,7 @@ typedef enum {
 #define EFI_TIME_IN_DAYLIGHT      0x02
 
 ///
-/// Value definition for EFI_TIME.TimeZone
+/// Value definition for EFI_TIME.TimeZone.
 ///
 #define EFI_UNSPECIFIED_TIMEZONE  0x07FF
 
@@ -80,16 +79,16 @@ typedef enum {
 #define EFI_MEMORY_RUNTIME  0x8000000000000000ULL
 
 ///
-/// Memory descriptor version number
+/// Memory descriptor version number.
 ///
 #define EFI_MEMORY_DESCRIPTOR_VERSION 1
 
 ///
-/// Definition of an EFI memory descriptor
+/// Definition of an EFI memory descriptor.
 ///
 typedef struct {
   ///
-  /// Type of the memory region.  See EFI_MEMORY_TYPE
+  /// Type of the memory region.  See EFI_MEMORY_TYPE.
   ///
   UINT32                Type;
   ///
@@ -120,7 +119,7 @@ typedef struct {
   @param  Type        The type of allocation to perform.
   @param  MemoryType  The type of memory to allocate.
   @param  Pages       The number of contiguous 4 KB pages to allocate.
-  @param  Memory      Pointer to a physical address. On input, the way in which the address is
+  @param  Memory      The pointer to a physical address. On input, the way in which the address is
                       used depends on the value of Type.
 
   @retval EFI_SUCCESS           The requested pages were allocated.
@@ -219,7 +218,7 @@ EFI_STATUS
 /**
   Returns pool memory to the system.
 
-  @param  Buffer                Pointer to the buffer to free.
+  @param  Buffer                The pointer to the buffer to free.
 
   @retval EFI_SUCCESS           The memory was returned to the system.
   @retval EFI_INVALID_PARAMETER Buffer was invalid.
@@ -378,7 +377,7 @@ EFI_STATUS
   Invoke a notification event
 
   @param  Event                 Event whose notification function is being invoked.
-  @param  Context               Pointer to the notification function's context,
+  @param  Context               The pointer to the notification function's context,
                                 which is implementation-dependent.
 
 **/
@@ -394,10 +393,10 @@ VOID
 
   @param  Type                  The type of event to create and its mode and attributes.
   @param  NotifyTpl             The task priority level of event notifications, if needed.
-  @param  NotifyFunction        Pointer to the event's notification function, if any.
-  @param  NotifyContext         Pointer to the notification function's context; corresponds to parameter
+  @param  NotifyFunction        The pointer to the event's notification function, if any.
+  @param  NotifyContext         The pointer to the notification function's context; corresponds to parameter
                                 Context in the notification function.
-  @param  Event                 Pointer to the newly created event if the call succeeds; undefined
+  @param  Event                 The pointer to the newly created event if the call succeeds; undefined
                                 otherwise.
 
   @retval EFI_SUCCESS           The event structure was created.
@@ -420,13 +419,13 @@ EFI_STATUS
 
   @param  Type                  The type of event to create and its mode and attributes.
   @param  NotifyTpl             The task priority level of event notifications,if needed.
-  @param  NotifyFunction        Pointer to the event's notification function, if any.
-  @param  NotifyContext         Pointer to the notification function's context; corresponds to parameter
+  @param  NotifyFunction        The pointer to the event's notification function, if any.
+  @param  NotifyContext         The pointer to the notification function's context; corresponds to parameter
                                 Context in the notification function.
-  @param  EventGroup            Pointer to the unique identifier of the group to which this event belongs.
+  @param  EventGroup            The pointer to the unique identifier of the group to which this event belongs.
                                 If this is NULL, then the function behaves as if the parameters were passed
                                 to CreateEvent.
-  @param  Event                 Pointer to the newly created event if the call succeeds; undefined
+  @param  Event                 The pointer to the newly created event if the call succeeds; undefined
                                 otherwise.
 
   @retval EFI_SUCCESS           The event structure was created.
@@ -450,7 +449,7 @@ EFI_STATUS
 ///
 typedef enum {
   ///
-  /// An event's timer settings is to be cancelled and not trigger time is to be set
+  /// An event's timer settings is to be cancelled and not trigger time is to be set/
   ///
   TimerCancel,
   ///
@@ -506,7 +505,7 @@ EFI_STATUS
 
   @param  NumberOfEvents        The number of events in the Event array.
   @param  Event                 An array of EFI_EVENT.
-  @param  Index                 Pointer to the index of the event which satisfied the wait condition.
+  @param  Index                 The pointer to the index of the event which satisfied the wait condition.
 
   @retval EFI_SUCCESS           The event indicated by Index was signaled.
   @retval EFI_INVALID_PARAMETER 1) NumberOfEvents is 0.
@@ -811,7 +810,7 @@ EFI_STATUS
   @param  SourceBuffer          If not NULL, a pointer to the memory location containing a copy
                                 of the image to be loaded.
   @param  SourceSize            The size in bytes of SourceBuffer. Ignored if SourceBuffer is NULL.
-  @param  ImageHandle           Pointer to the returned image handle that is created when the
+  @param  ImageHandle           The pointer to the returned image handle that is created when the
                                 image is successfully loaded.
 
   @retval EFI_SUCCESS           Image was loaded into memory correctly.
@@ -839,12 +838,12 @@ EFI_STATUS
   Transfers control to a loaded image's entry point.
 
   @param  ImageHandle           Handle of image to be started.
-  @param  ExitDataSize          Pointer to the size, in bytes, of ExitData.
-  @param  ExitData              Pointer to a pointer to a data buffer that includes a Null-terminated
+  @param  ExitDataSize          The pointer to the size, in bytes, of ExitData.
+  @param  ExitData              The pointer to a pointer to a data buffer that includes a Null-terminated
                                 string, optionally followed by additional binary data.
 
   @retval EFI_INVALID_PARAMETER ImageHandle is either an invalid image handle or the image
-                                has already been initialized with StartImage
+                                has already been initialized with StartImage.
   @return Exit code from image
 
 **/
@@ -863,7 +862,7 @@ EFI_STATUS
                                 image on entry.
   @param  ExitStatus            The image's exit code.
   @param  ExitDataSize          The size, in bytes, of ExitData. Ignored if ExitStatus is EFI_SUCCESS.
-  @param  ExitData              Pointer to a data buffer that includes a Null-terminated string,
+  @param  ExitData              The pointer to a data buffer that includes a Null-terminated string,
                                 optionally followed by additional binary data. The string is a 
                                 description that the caller may use to further indicate the reason 
                                 for the image's exit. ExitData is only valid if ExitStatus 
@@ -944,7 +943,7 @@ EFI_STATUS
   @retval EFI_SUCCESS           The timeout has been set.
   @retval EFI_INVALID_PARAMETER The supplied WatchdogCode is invalid.
   @retval EFI_UNSUPPORTED       The system does not have a watchdog timer.
-  @retval EFI_DEVICE_ERROR      The watch dog timer could not be programmed due to a hardware
+  @retval EFI_DEVICE_ERROR      The watchdog timer could not be programmed due to a hardware
                                 error.
 
 **/
@@ -1005,7 +1004,7 @@ VOID
 /**
   Returns a monotonically increasing count for the platform.
 
-  @param  Count                 Pointer to returned value.
+  @param  Count                 The pointer to returned value.
 
   @retval EFI_SUCCESS           The next monotonic count was returned.
   @retval EFI_INVALID_PARAMETER Count is NULL.
@@ -1021,7 +1020,7 @@ EFI_STATUS
 /**
   Returns the next high 32 bits of the platform's monotonic counter.
 
-  @param  HighCount             Pointer to returned value.
+  @param  HighCount             The pointer to returned value.
 
   @retval EFI_SUCCESS           The next high monotonic count was returned.
   @retval EFI_INVALID_PARAMETER HighCount is NULL.
@@ -1060,8 +1059,8 @@ EFI_STATUS
 /**
   Copies the contents of one buffer to another buffer.
 
-  @param  Destination           Pointer to the destination buffer of the memory copy.
-  @param  Source                Pointer to the source buffer of the memory copy.
+  @param  Destination           The pointer to the destination buffer of the memory copy.
+  @param  Source                The pointer to the source buffer of the memory copy.
   @param  Length                Number of bytes to copy from Source to Destination.
 
 **/
@@ -1076,7 +1075,7 @@ VOID
 /**
   The SetMem() function fills a buffer with a specified value.
 
-  @param  Buffer                Pointer to the buffer to fill.
+  @param  Buffer                The pointer to the buffer to fill.
   @param  Size                  Number of bytes in Buffer to fill.
   @param  Value                 Value to fill Buffer with.
 
@@ -1577,7 +1576,7 @@ typedef struct {
 } EFI_CAPSULE_BLOCK_DESCRIPTOR;
 
 ///
-/// EFI Capsule Header
+/// EFI Capsule Header.
 ///
 typedef struct {
   ///
@@ -1732,7 +1731,7 @@ EFI_STATUS
 #define EFI_RUNTIME_SERVICES_REVISION   EFI_2_30_SYSTEM_TABLE_REVISION
 
 ///
-/// EFI Runtime Services Table
+/// EFI Runtime Services Table.
 ///
 typedef struct {
   ///
@@ -1784,7 +1783,7 @@ typedef struct {
 #define EFI_BOOT_SERVICES_REVISION    EFI_2_30_SYSTEM_TABLE_REVISION
 
 ///
-/// EFI Boot Services Table
+/// EFI Boot Services Table.
 ///
 typedef struct {
   ///
@@ -1971,7 +1970,7 @@ typedef struct {
   @param  SystemTable           A pointer to the EFI System Table.
 
   @retval EFI_SUCCESS           The operation completed successfully.
-  @retval Others                Some unexpected error happened.
+  @retval Others                An unexpected error occurred.
 **/
 typedef
 EFI_STATUS
@@ -2040,7 +2039,7 @@ typedef union {
 } EFI_BOOT_KEY_DATA;
 
 ///
-/// EFI Key Option
+/// EFI Key Option.
 ///
 typedef struct {
   ///

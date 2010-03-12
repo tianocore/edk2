@@ -4,14 +4,14 @@
   This protocol is produced by every driver that follows the UEFI Driver Model, 
   and it is the central component that allows drivers and controllers to be managed.
 
-  Copyright (c) 2006 - 2009, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
 **/
 
@@ -19,7 +19,7 @@
 #define __EFI_DRIVER_BINDING_H__
 
 ///
-/// Global ID for the ControllerHandle Driver Protocol
+/// The global ID for the ControllerHandle Driver Protocol.
 ///
 #define EFI_DRIVER_BINDING_PROTOCOL_GUID \
   { \
@@ -42,7 +42,7 @@ typedef struct _EFI_DRIVER_BINDING_PROTOCOL  EFI_DRIVER_BINDING_PROTOCOL;
   device specified by ControllerHandle may already be managed by the same driver or a 
   different driver. This function must match its calls to AllocatePages() with FreePages(), 
   AllocatePool() with FreePool(), and OpenProtocol() with CloseProtocol().  
-  Since ControllerHandle may have been previously started by the same driver, if a protocol is 
+  Because ControllerHandle may have been previously started by the same driver, if a protocol is 
   already in the opened state, then it must not be closed with CloseProtocol(). This is required 
   to guarantee the state of ControllerHandle is not modified by this function.
 
@@ -84,7 +84,7 @@ EFI_STATUS
   The Start() function is designed to be invoked from the EFI boot service ConnectController().
   As a result, much of the error checking on the parameters to Start() has been moved into this 
   common boot service. It is legal to call Start() from other locations, 
-  but the following calling restrictions must be followed or the system behavior will not be deterministic.
+  but the following calling restrictions must be followed, or the system behavior will not be deterministic.
   1. ControllerHandle must be a valid EFI_HANDLE.
   2. If RemainingDevicePath is not NULL, then it must be a pointer to a naturally aligned
      EFI_DEVICE_PATH_PROTOCOL.
@@ -127,7 +127,7 @@ EFI_STATUS
   The Stop() function is designed to be invoked from the EFI boot service DisconnectController(). 
   As a result, much of the error checking on the parameters to Stop() has been moved 
   into this common boot service. It is legal to call Stop() from other locations, 
-  but the following calling restrictions must be followed or the system behavior will not be deterministic.
+  but the following calling restrictions must be followed, or the system behavior will not be deterministic.
   1. ControllerHandle must be a valid EFI_HANDLE that was used on a previous call to this
      same driver's Start() function.
   2. The first NumberOfChildren handles of ChildHandleBuffer must all be a valid

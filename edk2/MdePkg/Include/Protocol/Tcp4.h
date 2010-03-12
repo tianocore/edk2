@@ -4,17 +4,17 @@
   and destroy child of the driver to communicate with other host using TCP protocol.
   The EFI TCPv4 Protocol provides services to send and receive data stream.
 
-  Copyright (c) 2006 - 2010, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
-  This Protocol is introduced in UEFI Specification 2.0
+  This Protocol is introduced in UEFI Specification 2.0.
 
 **/
 
@@ -225,14 +225,14 @@ typedef struct {
 /**
   Get the current operational status.
 
-  @param  This           Pointer to the EFI_TCP4_PROTOCOL instance.
-  @param  Tcp4State      Pointer to the buffer to receive the current TCP state.
-  @param  Tcp4ConfigData Pointer to the buffer to receive the current TCP configuration.
-  @param  Ip4ModeData    Pointer to the buffer to receive the current IPv4 configuration
+  @param  This           The pointer to the EFI_TCP4_PROTOCOL instance.
+  @param  Tcp4State      The pointer to the buffer to receive the current TCP state.
+  @param  Tcp4ConfigData The pointer to the buffer to receive the current TCP configuration.
+  @param  Ip4ModeData    The pointer to the buffer to receive the current IPv4 configuration
                          data used by the TCPv4 instance.
-  @param  MnpConfigData  Pointer to the buffer to receive the current MNP configuration
+  @param  MnpConfigData  The pointer to the buffer to receive the current MNP configuration
                          data used indirectly by the TCPv4 instance.
-  @param  SnpModeData    Pointer to the buffer to receive the current SNP configuration
+  @param  SnpModeData    The pointer to the buffer to receive the current SNP configuration
                          data used indirectly by the TCPv4 instance.
 
   @retval EFI_SUCCESS           The mode data was read.
@@ -255,8 +255,8 @@ EFI_STATUS
 /**
   Initialize or brutally reset the operational parameters for this EFI TCPv4 instance.
 
-  @param  This           Pointer to the EFI_TCP4_PROTOCOL instance.
-  @param  Tcp4ConfigData Pointer to the configure data to configure the instance.
+  @param  This           The pointer to the EFI_TCP4_PROTOCOL instance.
+  @param  Tcp4ConfigData The pointer to the configure data to configure the instance.
 
   @retval EFI_SUCCESS           The operational settings are set, changed, or reset
                                 successfully.
@@ -283,7 +283,7 @@ EFI_STATUS
 /**
   Add or delete a route entry to the route table
 
-  @param  This           Pointer to the EFI_TCP4_PROTOCOL instance.
+  @param  This           The pointer to the EFI_TCP4_PROTOCOL instance.
   @param  DeleteRoute    Set it to TRUE to delete this route from the routing table. Set it to
                          FALSE to add this route to the routing table.
                          DestinationAddress and SubnetMask are used as the
@@ -326,8 +326,8 @@ EFI_STATUS
 /**
   Initiate a nonblocking TCP connection request for an active TCP instance.
 
-  @param  This                  Pointer to the EFI_TCP4_PROTOCOL instance.
-  @param  ConnectionToken       Pointer to the connection token to return when the TCP three
+  @param  This                  The pointer to the EFI_TCP4_PROTOCOL instance.
+  @param  ConnectionToken       The pointer to the connection token to return when the TCP three
                                 way handshake finishes.
 
   @retval EFI_SUCCESS           The connection request is successfully initiated and the state
@@ -355,8 +355,8 @@ EFI_STATUS
 /**
   Listen on the passive instance to accept an incoming connection request. This is a nonblocking operation.
 
-  @param  This        Pointer to the EFI_TCP4_PROTOCOL instance.
-  @param  ListenToken Pointer to the listen token to return when operation finishes.
+  @param  This        The pointer to the EFI_TCP4_PROTOCOL instance.
+  @param  ListenToken The pointer to the listen token to return when operation finishes.
 
   @retval EFI_SUCCESS           The listen token has been queued successfully.
   @retval EFI_NOT_STARTED       This EFI TCPv4 Protocol instance has not been configured.
@@ -383,8 +383,8 @@ EFI_STATUS
 /**
   Queues outgoing data into the transmit queue.
 
-  @param  This  Pointer to the EFI_TCP4_PROTOCOL instance.
-  @param  Token Pointer to the completion token to queue to the transmit queue.
+  @param  This  The pointer to the EFI_TCP4_PROTOCOL instance.
+  @param  Token The pointer to the completion token to queue to the transmit queue.
 
   @retval EFI_SUCCESS             The data has been queued for transmission.
   @retval EFI_NOT_STARTED         This EFI TCPv4 Protocol instance has not been configured.
@@ -422,8 +422,8 @@ EFI_STATUS
 /**
   Places an asynchronous receive request into the receiving queue.
 
-  @param  This  Pointer to the EFI_TCP4_PROTOCOL instance.
-  @param  Token Pointer to a token that is associated with the receive data
+  @param  This  The pointer to the EFI_TCP4_PROTOCOL instance.
+  @param  Token The pointer to a token that is associated with the receive data
                 descriptor.
 
   @retval EFI_SUCCESS           The receive completion token was cached.
@@ -465,8 +465,8 @@ EFI_STATUS
   Disconnecting a TCP connection gracefully or reset a TCP connection. This function is a
   nonblocking operation.
 
-  @param  This       Pointer to the EFI_TCP4_PROTOCOL instance.
-  @param  CloseToken Pointer to the close token to return when operation finishes.
+  @param  This       The pointer to the EFI_TCP4_PROTOCOL instance.
+  @param  CloseToken The pointer to the close token to return when operation finishes.
 
   @retval EFI_SUCCESS           The Close() is called successfully.
   @retval EFI_NOT_STARTED       This EFI TCPv4 Protocol instance has not been configured.
@@ -494,8 +494,8 @@ EFI_STATUS
 /**
   Abort an asynchronous connection, listen, transmission or receive request.
 
-  @param  This  Pointer to the EFI_TCP4_PROTOCOL instance.
-  @param  Token Pointer to a token that has been issued by
+  @param  This  The pointer to the EFI_TCP4_PROTOCOL instance.
+  @param  Token The pointer to a token that has been issued by
                 EFI_TCP4_PROTOCOL.Connect(),
                 EFI_TCP4_PROTOCOL.Accept(),
                 EFI_TCP4_PROTOCOL.Transmit() or
@@ -527,7 +527,7 @@ EFI_STATUS
 /**
   Poll to receive incoming data and transmit outgoing segments.
 
-  @param  This Pointer to the EFI_TCP4_PROTOCOL instance.
+  @param  This The pointer to the EFI_TCP4_PROTOCOL instance.
 
   @retval  EFI_SUCCESS           Incoming or outgoing data was processed.
   @retval  EFI_INVALID_PARAMETER This is NULL.

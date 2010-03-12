@@ -2,14 +2,14 @@
   EFI_MANAGED_NETWORK_SERVICE_BINDING_PROTOCOL as defined in UEFI 2.0.
   EFI_MANAGED_NETWORK_PROTOCOL as defined in UEFI 2.0.
 
-  Copyright (c) 2006 - 2009, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:          
   This Protocol is introduced in UEFI Specification 2.0
@@ -150,9 +150,9 @@ typedef struct {
 /**
   Returns the operational parameters for the current MNP child driver.
 
-  @param  This          Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
-  @param  MnpConfigData Pointer to storage for MNP operational parameters.
-  @param  SnpModeData   Pointer to storage for SNP operational parameters.
+  @param  This          The pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
+  @param  MnpConfigData The pointer to storage for MNP operational parameters.
+  @param  SnpModeData   The pointer to storage for SNP operational parameters.
 
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_INVALID_PARAMETER This is NULL.
@@ -173,8 +173,8 @@ EFI_STATUS
 /**
   Sets or clears the operational parameters for the MNP child driver.
 
-  @param  This          Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
-  @param  MnpConfigData Pointer to configuration data that will be assigned to the MNP
+  @param  This          The pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
+  @param  MnpConfigData The pointer to configuration data that will be assigned to the MNP
                         child driver instance. If NULL, the MNP child driver instance is
                         reset to startup defaults and all pending transmit and receive
                         requests are flushed.
@@ -199,11 +199,11 @@ EFI_STATUS
 /**
   Translates an IP multicast address to a hardware (MAC) multicast address.
 
-  @param  This       Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
+  @param  This       The pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
   @param  Ipv6Flag   Set to TRUE to if IpAddress is an IPv6 multicast address.
                      Set to FALSE if IpAddress is an IPv4 multicast address.
-  @param  IpAddress  Pointer to the multicast IP address (in network byte order) to convert.
-  @param  MacAddress Pointer to the resulting multicast MAC address.
+  @param  IpAddress  The pointer to the multicast IP address (in network byte order) to convert.
+  @param  MacAddress The pointer to the resulting multicast MAC address.
 
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_INVALID_PARAMETER One of the following conditions is TRUE:
@@ -229,10 +229,10 @@ EFI_STATUS
 /**
   Enables and disables receive filters for multicast address.
 
-  @param  This       Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
+  @param  This       The pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
   @param  JoinFlag   Set to TRUE to join this multicast group.
                      Set to FALSE to leave this multicast group.
-  @param  MacAddress Pointer to the multicast MAC group (address) to join or leave.
+  @param  MacAddress The pointer to the multicast MAC group (address) to join or leave.
 
   @retval EFI_SUCCESS           The requested operation completed successfully.
   @retval EFI_INVALID_PARAMETER One or more of the following conditions is TRUE:
@@ -258,8 +258,8 @@ EFI_STATUS
 /**
   Places asynchronous outgoing data packets into the transmit queue.
 
-  @param  This  Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
-  @param  Token Pointer to a token associated with the transmit data descriptor.
+  @param  This  The pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
+  @param  Token The pointer to a token associated with the transmit data descriptor.
 
   @retval EFI_SUCCESS           The transmit completion token was cached.
   @retval EFI_NOT_STARTED       This MNP child driver instance has not been configured.
@@ -281,15 +281,15 @@ EFI_STATUS
 /**
   Places an asynchronous receiving request into the receiving queue.
 
-  @param  This  Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
-  @param  Token Pointer to a token associated with the receive data descriptor.
+  @param  This  The pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
+  @param  Token The pointer to a token associated with the receive data descriptor.
 
   @retval EFI_SUCCESS           The receive completion token was cached.
   @retval EFI_NOT_STARTED       This MNP child driver instance has not been configured.
   @retval EFI_INVALID_PARAMETER One or more of the following conditions is TRUE:
                                 - This is NULL.
                                 - Token is NULL.
-                                - Token.Event is NULL
+                                - Token.Event is NULL.
   @retval EFI_OUT_OF_RESOURCES  The transmit data could not be queued due to a lack of system resources
                                 (usually memory).
   @retval EFI_DEVICE_ERROR      An unexpected system or network error occurred.
@@ -308,8 +308,8 @@ EFI_STATUS
 /**
   Aborts an asynchronous transmit or receive request.
 
-  @param  This  Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
-  @param  Token Pointer to a token that has been issued by
+  @param  This  The pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
+  @param  Token The pointer to a token that has been issued by
                 EFI_MANAGED_NETWORK_PROTOCOL.Transmit() or
                 EFI_MANAGED_NETWORK_PROTOCOL.Receive(). If
                 NULL, all pending tokens are aborted.
@@ -334,7 +334,7 @@ EFI_STATUS
 /**
   Polls for incoming data packets and processes outgoing data packets.
 
-  @param  This Pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
+  @param  This The pointer to the EFI_MANAGED_NETWORK_PROTOCOL instance.
 
   @retval EFI_SUCCESS      Incoming or outgoing data was processed.
   @retval EFI_NOT_STARTED  This MNP child driver instance has not been configured.

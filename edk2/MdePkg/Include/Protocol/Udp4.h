@@ -4,17 +4,17 @@
   The EFI UDPv4 Protocol provides simple packet-oriented services 
   to transmit and receive UDP packets.  
 
-  Copyright (c) 2006 - 2009, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.      
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.      
 
   @par Revision Reference:          
-  This Protocol is introduced in UEFI Specification 2.0       
+  This Protocol is introduced in UEFI Specification 2.0.       
 
 **/
 
@@ -124,11 +124,11 @@ typedef struct {
   optionally to retrieve the operational mode data of underlying networks or
   drivers.
 
-  @param  This           Pointer to the EFI_UDP4_PROTOCOL instance.
-  @param  Udp4ConfigData Pointer to the buffer to receive the current configuration data.
-  @param  Ip4ModeData    Pointer to the EFI IPv4 Protocol mode data structure.
-  @param  MnpConfigData  Pointer to the managed network configuration data structure.
-  @param  SnpModeData    Pointer to the simple network mode data structure.
+  @param  This           The pointer to the EFI_UDP4_PROTOCOL instance.
+  @param  Udp4ConfigData The pointer to the buffer to receive the current configuration data.
+  @param  Ip4ModeData    The pointer to the EFI IPv4 Protocol mode data structure.
+  @param  MnpConfigData  The pointer to the managed network configuration data structure.
+  @param  SnpModeData    The pointer to the simple network mode data structure.
 
   @retval EFI_SUCCESS           The mode data was read.
   @retval EFI_NOT_STARTED       When Udp4ConfigData is queried, no configuration data is
@@ -162,8 +162,8 @@ EFI_STATUS
   With different parameters in UdpConfigData, Configure() can be used to bind
   this instance to specified port.
 
-  @param  This           Pointer to the EFI_UDP4_PROTOCOL instance.
-  @param  Udp4ConfigData Pointer to the buffer to receive the current configuration data.
+  @param  This           The pointer to the EFI_UDP4_PROTOCOL instance.
+  @param  Udp4ConfigData The pointer to the buffer to receive the current configuration data.
 
   @retval EFI_SUCCESS           The configuration settings were set, changed, or reset successfully.
   @retval EFI_NO_MAPPING        When using a default address, configuration (DHCP, BOOTP,
@@ -194,10 +194,10 @@ EFI_STATUS
   filtering. If the JoinFlag is FALSE and the MulticastAddress is NULL, then all
   currently joined groups are left.
 
-  @param  This             Pointer to the EFI_UDP4_PROTOCOL instance.
+  @param  This             The pointer to the EFI_UDP4_PROTOCOL instance.
   @param  JoinFlag         Set to TRUE to join a multicast group. Set to FALSE to leave one
                            or all multicast groups.
-  @param  MulticastAddress Pointer to multicast group address to join or leave.
+  @param  MulticastAddress The pointer to multicast group address to join or leave.
 
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_NOT_STARTED       The EFI UDPv4 Protocol instance has not been started.
@@ -245,7 +245,7 @@ EFI_STATUS
   copies will be updated automatically whenever the IP driver reconfigures its
   instances; as a result, the previous modification to these copies will be lost.
 
-  @param  This           Pointer to the EFI_UDP4_PROTOCOL instance.
+  @param  This           The pointer to the EFI_UDP4_PROTOCOL instance.
   @param  DeleteRoute    Set to TRUE to delete this route from the routing table.
                          Set to FALSE to add this route to the routing table.
   @param  SubnetAddress  The destination network address that needs to be routed.
@@ -284,7 +284,7 @@ EFI_STATUS
   Drivers and applications that are experiencing packet loss should try calling
   the Poll() function more often.
 
-  @param  This Pointer to the EFI_UDP4_PROTOCOL instance.
+  @param  This The pointer to the EFI_UDP4_PROTOCOL instance.
 
   @retval EFI_SUCCESS           Incoming or outgoing data was processed.
   @retval EFI_INVALID_PARAMETER This is NULL.
@@ -310,8 +310,8 @@ EFI_STATUS
   will enable the user to receive the notification and receiving status. That
   notification function is guaranteed to not be re-entered.
 
-  @param  This  Pointer to the EFI_UDP4_PROTOCOL instance.
-  @param  Token Pointer to a token that is associated with the receive data
+  @param  This  The pointer to the EFI_UDP4_PROTOCOL instance.
+  @param  Token The pointer to a token that is associated with the receive data
                 descriptor.
 
   @retval EFI_SUCCESS           The receive completion token was cached.
@@ -344,8 +344,8 @@ EFI_STATUS
   and context for the event will enable the user to receive the notification and
   transmitting status.
 
-  @param  This  Pointer to the EFI_UDP4_PROTOCOL instance.
-  @param  Token Pointer to the completion token that will be placed into the
+  @param  This  The pointer to the EFI_UDP4_PROTOCOL instance.
+  @param  Token The pointer to the completion token that will be placed into the
                 transmit queue.
 
   @retval EFI_SUCCESS           The data has been queued for transmission.
@@ -381,8 +381,8 @@ EFI_STATUS
   the asynchronous operation has completed, this function will not signal the
   token and EFI_NOT_FOUND is returned.
 
-  @param  This  Pointer to the EFI_UDP4_PROTOCOL instance.
-  @param  Token Pointer to a token that has been issued by
+  @param  This  The pointer to the EFI_UDP4_PROTOCOL instance.
+  @param  Token The pointer to a token that has been issued by
                 EFI_UDP4_PROTOCOL.Transmit() or
                 EFI_UDP4_PROTOCOL.Receive().If NULL, all pending
                 tokens are aborted.

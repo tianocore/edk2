@@ -1,14 +1,14 @@
 /** @file
   EFI Guid Partition Table Format Definition.
 
-  Copyright (c) 2006 - 2009, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -21,19 +21,19 @@
 ///
 #define PRIMARY_PART_HEADER_LBA 1
 ///
-/// EFI Partition Table Signature: "EFI PART"
+/// EFI Partition Table Signature: "EFI PART".
 /// 
 #define EFI_PTAB_HEADER_ID      SIGNATURE_64 ('E','F','I',' ','P','A','R','T')
 
 #pragma pack(1)
 
 ///
-/// GPT Partition Table Header
+/// GPT Partition Table Header.
 ///
 typedef struct {
   ///
   /// The table header for the GPT partition Table.
-  /// This header contains EFI_PTAB_HEADER_ID
+  /// This header contains EFI_PTAB_HEADER_ID.
   ///
   EFI_TABLE_HEADER  Header;
   ///
@@ -82,7 +82,7 @@ typedef struct {
 } EFI_PARTITION_TABLE_HEADER;
 
 ///
-/// GPT Partition Entry
+/// GPT Partition Entry.
 ///
 typedef struct {
   ///
@@ -110,7 +110,7 @@ typedef struct {
   ///             partition indicates that deletion or modification of the contents can result in loss of platform
   ///             features or failure for the platform to boot or operate. The system cannot function normally if
   ///             this partition is removed, and it should be considered part of the hardware of the system.
-  ///             Actions such as running diagnostics, system recovery, or even OS install or boot could
+  ///             Actions such as running diagnostics, system recovery, or even OS install or boot, could
   ///             potentially stop working if this partition is removed. Unless OS software or firmware
   ///             recognizes this partition, it should never be removed or modified as the UEFI firmware or
   ///             platform hardware may become non-functional.

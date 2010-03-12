@@ -5,11 +5,11 @@
   These functions should be used in place of coding your own loops to do equivalent common functions. 
   This allows optimized library implementations to help increase performance. 
 
-Copyright (c) 2006 - 2008, Intel Corporation<BR>
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -29,9 +29,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   If Length is greater than (MAX_ADDRESS - DestinationBuffer + 1), then ASSERT().
   If Length is greater than (MAX_ADDRESS - SourceBuffer + 1), then ASSERT().
 
-  @param  DestinationBuffer   Pointer to the destination buffer of the memory copy.
-  @param  SourceBuffer        Pointer to the source buffer of the memory copy.
-  @param  Length              Number of bytes to copy from SourceBuffer to DestinationBuffer.
+  @param  DestinationBuffer   The pointer to the destination buffer of the memory copy.
+  @param  SourceBuffer        The pointer to the source buffer of the memory copy.
+  @param  Length              The number of bytes to copy from SourceBuffer to DestinationBuffer.
 
   @return DestinationBuffer.
 
@@ -51,9 +51,9 @@ CopyMem (
   
   If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
 
-  @param  Buffer    Memory to set.
-  @param  Length    Number of bytes to set.
-  @param  Value     Value with which to fill Length bytes of Buffer.
+  @param  Buffer    The memory to set.
+  @param  Length    The number of bytes to set.
+  @param  Value     The value with which to fill Length bytes of Buffer.
 
   @return Buffer.
 
@@ -78,9 +78,9 @@ SetMem (
   If Buffer is not aligned on a 16-bit boundary, then ASSERT().
   If Length is not aligned on a 16-bit boundary, then ASSERT().
 
-  @param  Buffer  Pointer to the target buffer to fill.
-  @param  Length  Number of bytes in Buffer to fill.
-  @param  Value   Value with which to fill Length bytes of Buffer.
+  @param  Buffer  The pointer to the target buffer to fill.
+  @param  Length  The number of bytes in Buffer to fill.
+  @param  Value   The value with which to fill Length bytes of Buffer.
 
   @return Buffer.
 
@@ -105,9 +105,9 @@ SetMem16 (
   If Buffer is not aligned on a 32-bit boundary, then ASSERT().
   If Length is not aligned on a 32-bit boundary, then ASSERT().
 
-  @param  Buffer  Pointer to the target buffer to fill.
-  @param  Length  Number of bytes in Buffer to fill.
-  @param  Value   Value with which to fill Length bytes of Buffer.
+  @param  Buffer  The pointer to the target buffer to fill.
+  @param  Length  The number of bytes in Buffer to fill.
+  @param  Value   The value with which to fill Length bytes of Buffer.
 
   @return Buffer.
 
@@ -132,9 +132,9 @@ SetMem32 (
   If Buffer is not aligned on a 64-bit boundary, then ASSERT().
   If Length is not aligned on a 64-bit boundary, then ASSERT().
 
-  @param  Buffer  Pointer to the target buffer to fill.
-  @param  Length  Number of bytes in Buffer to fill.
-  @param  Value   Value with which to fill Length bytes of Buffer.
+  @param  Buffer  The pointer to the target buffer to fill.
+  @param  Length  The number of bytes in Buffer to fill.
+  @param  Value   The value with which to fill Length bytes of Buffer.
 
   @return Buffer.
 
@@ -159,9 +159,9 @@ SetMem64 (
   If Buffer is not aligned on a UINTN boundary, then ASSERT().
   If Length is not aligned on a UINTN boundary, then ASSERT().
 
-  @param  Buffer  Pointer to the target buffer to fill.
-  @param  Length  Number of bytes in Buffer to fill.
-  @param  Value   Value with which to fill Length bytes of Buffer.
+  @param  Buffer  The pointer to the target buffer to fill.
+  @param  Length  The number of bytes in Buffer to fill.
+  @param  Value   The value with which to fill Length bytes of Buffer.
 
   @return Buffer.
 
@@ -182,8 +182,8 @@ SetMemN (
   If Length > 0 and Buffer is NULL, then ASSERT().
   If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
 
-  @param  Buffer      Pointer to the target buffer to fill with zeros.
-  @param  Length      Number of bytes in Buffer to fill with zeros.
+  @param  Buffer      The pointer to the target buffer to fill with zeros.
+  @param  Length      The number of bytes in Buffer to fill with zeros.
 
   @return Buffer.
 
@@ -208,9 +208,9 @@ ZeroMem (
   If Length is greater than (MAX_ADDRESS - DestinationBuffer + 1), then ASSERT().
   If Length is greater than (MAX_ADDRESS - SourceBuffer + 1), then ASSERT().
 
-  @param  DestinationBuffer Pointer to the destination buffer to compare.
-  @param  SourceBuffer      Pointer to the source buffer to compare.
-  @param  Length            Number of bytes to compare.
+  @param  DestinationBuffer The pointer to the destination buffer to compare.
+  @param  SourceBuffer      The pointer to the source buffer to compare.
+  @param  Length            The number of bytes to compare.
 
   @return 0                 All Length bytes of the two buffers are identical.
   @retval Non-zero          The first mismatched byte in SourceBuffer subtracted from the first
@@ -237,11 +237,11 @@ CompareMem (
   If Length > 0 and Buffer is NULL, then ASSERT().
   If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
 
-  @param  Buffer      Pointer to the target buffer to scan.
-  @param  Length      Number of bytes in Buffer to scan.
-  @param  Value       Value to search for in the target buffer.
+  @param  Buffer      The pointer to the target buffer to scan.
+  @param  Length      The number of bytes in Buffer to scan.
+  @param  Value       The value to search for in the target buffer.
 
-  @return A pointer to the matching byte in the target buffer or NULL otherwise.
+  @return A pointer to the matching byte in the target buffer, otherwise NULL.
 
 **/
 VOID *
@@ -266,11 +266,11 @@ ScanMem8 (
   If Length is not aligned on a 16-bit boundary, then ASSERT().
   If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
 
-  @param  Buffer      Pointer to the target buffer to scan.
-  @param  Length      Number of bytes in Buffer to scan.
-  @param  Value       Value to search for in the target buffer.
+  @param  Buffer      The pointer to the target buffer to scan.
+  @param  Length      The number of bytes in Buffer to scan.
+  @param  Value       The value to search for in the target buffer.
 
-  @return A pointer to the matching byte in the target buffer or NULL otherwise.
+  @return A pointer to the matching byte in the target buffer, otherwise NULL.
 
 **/
 VOID *
@@ -295,11 +295,11 @@ ScanMem16 (
   If Length is not aligned on a 32-bit boundary, then ASSERT().
   If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
 
-  @param  Buffer      Pointer to the target buffer to scan.
-  @param  Length      Number of bytes in Buffer to scan.
-  @param  Value       Value to search for in the target buffer.
+  @param  Buffer      The pointer to the target buffer to scan.
+  @param  Length      The number of bytes in Buffer to scan.
+  @param  Value       The value to search for in the target buffer.
 
-  @return A pointer to the matching byte in the target buffer or NULL otherwise.
+  @return A pointer to the matching byte in the target buffer, otherwise NULL.
 
 **/
 VOID *
@@ -324,11 +324,11 @@ ScanMem32 (
   If Length is not aligned on a 64-bit boundary, then ASSERT().
   If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
 
-  @param  Buffer      Pointer to the target buffer to scan.
-  @param  Length      Number of bytes in Buffer to scan.
-  @param  Value       Value to search for in the target buffer.
+  @param  Buffer      The pointer to the target buffer to scan.
+  @param  Length      The number of bytes in Buffer to scan.
+  @param  Value       The value to search for in the target buffer.
 
-  @return A pointer to the matching byte in the target buffer or NULL otherwise.
+  @return A pointer to the matching byte in the target buffer, otherwise NULL.
 
 **/
 VOID *
@@ -353,11 +353,11 @@ ScanMem64 (
   If Length is not aligned on a UINTN boundary, then ASSERT().
   If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
 
-  @param  Buffer      Pointer to the target buffer to scan.
-  @param  Length      Number of bytes in Buffer to scan.
-  @param  Value       Value to search for in the target buffer.
+  @param  Buffer      The pointer to the target buffer to scan.
+  @param  Length      The number of bytes in Buffer to scan.
+  @param  Value       The value to search for in the target buffer.
 
-  @return A pointer to the matching byte in the target buffer or NULL otherwise.
+  @return A pointer to the matching byte in the target buffer, otherwise NULL.
 
 **/
 VOID *
@@ -377,8 +377,8 @@ ScanMemN (
   If DestinationGuid is NULL, then ASSERT().
   If SourceGuid is NULL, then ASSERT().
 
-  @param  DestinationGuid   Pointer to the destination GUID.
-  @param  SourceGuid        Pointer to the source GUID.
+  @param  DestinationGuid   The pointer to the destination GUID.
+  @param  SourceGuid        The pointer to the source GUID.
 
   @return DestinationGuid.
 
@@ -428,11 +428,11 @@ CompareGuid (
   If Length is not aligned on a 128-bit boundary, then ASSERT().
   If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
 
-  @param  Buffer  Pointer to the target buffer to scan.
-  @param  Length  Number of bytes in Buffer to scan.
-  @param  Guid    Value to search for in the target buffer.
+  @param  Buffer  The pointer to the target buffer to scan.
+  @param  Length  The number of bytes in Buffer to scan.
+  @param  Guid    The value to search for in the target buffer.
 
-  @return A pointer to the matching Guid in the target buffer or NULL otherwise.
+  @return A pointer to the matching Guid in the target buffer, otherwise NULL.
 
 **/
 VOID *

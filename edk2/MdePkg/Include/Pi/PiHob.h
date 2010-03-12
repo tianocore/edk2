@@ -1,14 +1,14 @@
 /** @file
   HOB related definitions in PI.
 
-  Copyright (c) 2006 - 2009, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                                                          
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
   @par Revision Reference:
   PI Version 1.0
@@ -55,7 +55,7 @@ typedef struct {
 
 
 ///
-/// Value of version ofinEFI_HOB_HANDOFF_INFO_TABLE.
+/// Value of version  in EFI_HOB_HANDOFF_INFO_TABLE.
 /// 
 #define EFI_HOB_HANDOFF_TABLE_VERSION 0x0009
 
@@ -70,7 +70,7 @@ typedef struct {
   EFI_HOB_GENERIC_HEADER  Header;
   ///
   /// The version number pertaining to the PHIT HOB definition.
-  /// This value is 4 bytes in length to provide an 8-byte aligned entry 
+  /// This value is four bytes in length to provide an 8-byte aligned entry 
   /// when it is combined with the 4-byte BootMode.
   ///
   UINT32                  Version;
@@ -166,7 +166,7 @@ typedef struct {
 
 ///
 /// Describes the memory stack that is produced by the HOB producer 
-/// phase and upon which all postmemory-installed executable
+/// phase and upon which all post-memory-installed executable
 /// content in the HOB producer phase is executing.
 /// 
 typedef struct {
@@ -225,7 +225,7 @@ typedef struct {
 } EFI_HOB_MEMORY_ALLOCATION_MODULE;
 
 ///
-/// Resource type 
+/// The resource type.
 /// 
 typedef UINT32 EFI_RESOURCE_TYPE;
 
@@ -242,7 +242,7 @@ typedef UINT32 EFI_RESOURCE_TYPE;
 #define EFI_RESOURCE_MAX_MEMORY_TYPE        0x00000007
 
 ///
-/// type of recount attribute type
+/// A type of recount attribute type.
 /// 
 typedef UINT32 EFI_RESOURCE_ATTRIBUTE_TYPE;
 
@@ -289,7 +289,7 @@ typedef struct {
   ///
   EFI_GUID                    Owner;
   ///
-  /// Resource type enumeration as defined by EFI_RESOURCE_TYPE.
+  /// The resource type enumeration as defined by EFI_RESOURCE_TYPE.
   ///
   EFI_RESOURCE_TYPE           ResourceType;
   ///
@@ -297,11 +297,11 @@ typedef struct {
   ///
   EFI_RESOURCE_ATTRIBUTE_TYPE ResourceAttribute;
   ///
-  /// Physical start address of the resource region. 
+  /// The physical start address of the resource region. 
   ///
   EFI_PHYSICAL_ADDRESS        PhysicalStart;
   ///
-  /// Number of bytes of the resource region.
+  /// The number of bytes of the resource region.
   ///
   UINT64                      ResourceLength;
 } EFI_HOB_RESOURCE_DESCRIPTOR;
@@ -343,7 +343,7 @@ typedef struct {
 } EFI_HOB_FIRMWARE_VOLUME;
 
 ///
-/// Details the location of a firmware volume which was extracted 
+/// Details the location of a firmware volume that was extracted 
 /// from a file within another firmware volume.
 /// 
 typedef struct {
@@ -364,7 +364,7 @@ typedef struct {
   ///
   EFI_GUID                FvName;
   ///
-  /// The name of the firmware file which contained this firmware volume.
+  /// The name of the firmware file that contained this firmware volume.
   ///
   EFI_GUID                FileName;
 } EFI_HOB_FIRMWARE_VOLUME2;
@@ -419,14 +419,14 @@ typedef struct {
   ///
   /// The physical memory-mapped base address of an UEFI capsule. This value is set to
   /// point to the base of the contiguous memory of the UEFI capsule.
-  /// The length of the contiguous memory in bytes
+  /// The length of the contiguous memory in bytes.
   ///
   EFI_PHYSICAL_ADDRESS   BaseAddress;
   UINT64                 Length;
 } EFI_HOB_UEFI_CAPSULE;
 
 ///
-/// Union of all the possible HOB Types
+/// Union of all the possible HOB Types.
 ///
 typedef union {
   EFI_HOB_GENERIC_HEADER              *Header;

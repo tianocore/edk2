@@ -1,14 +1,14 @@
 /** @file
   This file provides control over block-oriented firmware devices.
 
-  Copyright (c) 2006 - 2009, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
   @par Revision Reference: PI
   Version 1.0 and 1.2.
@@ -98,7 +98,7 @@ EFI_STATUS
                   return from GetPhysicalAddress(), contains the
                   base address of the firmware volume.
   
-  @retval EFI_SUCCESS       The firmware volume base address is returned.
+  @retval EFI_SUCCESS       The firmware volume base address was returned.
   
   @retval EFI_NOT_SUPPORTED The firmware volume is not memory mapped.
 
@@ -131,7 +131,7 @@ EFI_STATUS
                         BlockSize.
 
   
-  @retval EFI_SUCCESS             The firmware volume base address is returned.
+  @retval EFI_SUCCESS             The firmware volume base address was returned.
   
   @retval EFI_INVALID_PARAMETER   The requested LBA is out of range.
 
@@ -177,7 +177,7 @@ EFI_STATUS
   @param Buffer   Pointer to a caller-allocated buffer that will
                   be used to hold the data that is read.
 
-  @retval EFI_SUCCESS         The firmware volume was read successfully
+  @retval EFI_SUCCESS         The firmware volume was read successfully,
                               and contents are in Buffer.
   
   @retval EFI_BAD_BUFFER_SIZE Read attempted across an LBA
@@ -214,9 +214,9 @@ EFI_STATUS
   function, or else the result will be unpredictable. This
   unpredictability arises because, for a sticky-write firmware
   volume, a write may negate a bit in the EFI_FVB_ERASE_POLARITY
-  state but cannot flip it back again. In general, before
-  calling the Write() function, the caller should call the
-  EraseBlocks() function first to erase the specified block to
+  state but cannot flip it back again.  Before calling the
+  Write() function,  it is recommended for the caller to first call 
+  the EraseBlocks() function to erase the specified block to
   write. A block erase cycle will transition bits from the
   (NOT)EFI_FVB_ERASE_POLARITY state back to the
   EFI_FVB_ERASE_POLARITY state. Implementations should be
@@ -239,12 +239,12 @@ EFI_STATUS
   
   @param Offset   Offset into the block at which to begin writing.
   
-  @param NumBytes Pointer to a UINTN. At entry, *NumBytes
+  @param NumBytes The pointer to a UINTN. At entry, *NumBytes
                   contains the total size of the buffer. At
                   exit, *NumBytes contains the total number of
                   bytes actually written.
   
-  @param Buffer   Pointer to a caller-allocated buffer that
+  @param Buffer   The pointer to a caller-allocated buffer that
                   contains the source for the write.
   
   @retval EFI_SUCCESS         The firmware volume was written successfully.
@@ -307,7 +307,7 @@ EFI_STATUS
                 and consists of the following:
                 - An EFI_LBA that indicates the starting LBA
                 - A UINTN that indicates the number of blocks to
-                  erase
+                  erase.
 
                 The list is terminated with an
                 EFI_LBA_LIST_TERMINATOR. For example, the
@@ -315,7 +315,7 @@ EFI_STATUS
                 (5-7 and 10-11) are to be erased: EraseBlocks
                 (This, 5, 3, 10, 2, EFI_LBA_LIST_TERMINATOR);
 
-  @retval EFI_SUCCESS The erase request was successfully
+  @retval EFI_SUCCESS The erase request successfully
                       completed.
   
   @retval EFI_ACCESS_DENIED   The firmware volume is in the
@@ -354,7 +354,7 @@ struct _EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL{
   EFI_FVB_WRITE                 Write;
   EFI_FVB_ERASE_BLOCKS          EraseBlocks;
   ///
-  /// Handle of the parent firmware volume.
+  /// The handle of the parent firmware volume.
   ///  
   EFI_HANDLE                    ParentHandle;
 };

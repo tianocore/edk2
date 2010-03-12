@@ -12,11 +12,11 @@
   of size reduction when compiler optimization is disabled. If MDEPKG_NDEBUG is
   defined, then debug and assert related macros wrapped by it are the NULL implementations.
 
-Copyright (c) 2006 - 2010, Intel Corporation<BR>
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -64,9 +64,9 @@ typedef struct {
 
 /**
   Macro that returns the number of 100 ns units for a specified number of microseconds.
-  Useful for managing EFI timer events.
+  This is useful for managing EFI timer events.
 
-  @param  Microseconds           Number of microseconds.
+  @param  Microseconds           The number of microseconds.
 
   @return The number of 100 ns units equivalent to the number of microseconds specified
           by Microseconds.
@@ -76,9 +76,9 @@ typedef struct {
 
 /**
   Macro that returns the number of 100 ns units for a specified number of milliseconds.
-  Useful for managing EFI timer events.
+  This is useful for managing EFI timer events.
 
-  @param  Milliseconds           Number of milliseconds.
+  @param  Milliseconds           The number of milliseconds.
 
   @return The number of 100 ns units equivalent to the number of milliseconds specified
           by Milliseconds.
@@ -88,9 +88,9 @@ typedef struct {
 
 /**
   Macro that returns the number of 100 ns units for a specified number of seconds.
-  Useful for managing EFI timer events.
+  This is useful for managing EFI timer events.
 
-  @param  Seconds                Number of seconds.
+  @param  Seconds                The number of seconds.
 
   @return The number of 100 ns units equivalent to the number of seconds specified
           by Seconds.
@@ -123,8 +123,8 @@ typedef struct {
   If TableGuid is NULL, then ASSERT().
   If Table is NULL, then ASSERT().
 
-  @param  TableGuid       Pointer to table's GUID type..
-  @param  Table           Pointer to the table associated with TableGuid in the EFI System Table.
+  @param  TableGuid       The pointer to table's GUID type..
+  @param  Table           The pointer to the table associated with TableGuid in the EFI System Table.
 
   @retval EFI_SUCCESS     A configuration table matching TableGuid was found.
   @retval EFI_NOT_FOUND   A configuration table matching TableGuid could not be found.
@@ -191,7 +191,7 @@ EfiCreateProtocolNotifyEvent(
   @param  Registration          A pointer to a memory location to receive the registration value.
 
   @retval EFI_SUCCESS           A named event was created.
-  @retval EFI_OUT_OF_RESOURCES  There are not enough resource to create the named event.
+  @retval EFI_OUT_OF_RESOURCES  There are not enough resources to create the named event.
 
 **/
 EFI_STATUS
@@ -211,10 +211,10 @@ EfiNamedEventListen (
   created with EfiNamedEventListen().
   If Name is NULL, then ASSERT().
 
-  @param  Name                  Supplies GUID name of the event.
+  @param  Name                  Supplies the GUID name of the event.
 
   @retval EFI_SUCCESS           A named event was signaled.
-  @retval EFI_OUT_OF_RESOURCES  There are not enough resource to signal the named event.
+  @retval EFI_OUT_OF_RESOURCES  There are not enough resources to signal the named event.
 
 **/
 EFI_STATUS
@@ -252,7 +252,7 @@ EfiGetCurrentTpl (
   If Priority is not a valid TPL value, then ASSERT().
 
   @param  Lock       A pointer to the lock data structure to initialize.
-  @param  Priority   EFI TPL associated with the lock.
+  @param  Priority   The EFI TPL associated with the lock.
 
   @return The lock.
 
@@ -493,7 +493,7 @@ LookupUnicodeString (
                                that matches the language specified by Language.
   @param  Iso639Language       Specifies the supported language code format. If it is TRUE, then
                                Language and SupportedLanguages follow ISO 639-2 language code format.
-                               Otherwise, they follow RFC 4646 language code format.
+                               Otherwise, they follow the RFC 4646 language code format.
 
 
   @retval  EFI_SUCCESS            The Unicode string that matches the language specified by Language
@@ -639,8 +639,8 @@ FreeUnicodeStringTable (
   If Name is NULL, then ASSERT().
   If Guid is NULL, then ASSERT().
 
-  @param[in]  Name  Pointer to a Null-terminated Unicode string.
-  @param[in]  Guid  Pointer to an EFI_GUID structure
+  @param[in]  Name  The pointer to a Null-terminated Unicode string.
+  @param[in]  Guid  The pointer to an EFI_GUID structure.
 
   @retval NULL   The variable could not be retrieved.
   @retval NULL   There are not enough resources available for the variable contents.
@@ -663,7 +663,7 @@ GetVariable (
 
   If Name is NULL, then ASSERT().
 
-  @param[in]  Name  Pointer to a Null-terminated Unicode string.
+  @param[in]  Name  The pointer to a Null-terminated Unicode string.
 
   @retval NULL   The variable could not be retrieved.
   @retval NULL   There are not enough resources available for the variable contents.
@@ -839,8 +839,8 @@ EfiSignalEventLegacyBoot (
 
   @param  LegacyBootEvent   Returns the EFI event returned from gBS->CreateEvent(Ex).
 
-  @retval EFI_SUCCESS       Event was created.
-  @retval Other             Event was not created.
+  @retval EFI_SUCCESS       The event was created.
+  @retval Other             The event was not created.
 
 **/
 EFI_STATUS
@@ -864,8 +864,8 @@ EfiCreateEventLegacyBoot (
   @param  NotifyContext     The content to pass to NotifyFunction when the event is signaled.
   @param  LegacyBootEvent   Returns the EFI event returned from gBS->CreateEvent(Ex).
 
-  @retval EFI_SUCCESS       Event was created.
-  @retval Other             Event was not created.
+  @retval EFI_SUCCESS       The event was created.
+  @retval Other             The event was not created.
 
 **/
 EFI_STATUS
@@ -890,8 +890,8 @@ EfiCreateEventLegacyBootEx (
 
   @param  ReadyToBootEvent   Returns the EFI event returned from gBS->CreateEvent(Ex).
 
-  @retval EFI_SUCCESS       Event was created.
-  @retval Other             Event was not created.
+  @retval EFI_SUCCESS       The event was created.
+  @retval Other             The event was not created.
 
 **/
 EFI_STATUS
@@ -915,8 +915,8 @@ EfiCreateEventReadyToBoot (
   @param  NotifyContext     The content to pass to NotifyFunction when the event is signaled.
   @param  ReadyToBootEvent  Returns the EFI event returned from gBS->CreateEvent(Ex).
 
-  @retval EFI_SUCCESS       Event was created.
-  @retval Other             Event was not created.
+  @retval EFI_SUCCESS       The event was created.
+  @retval Other             The event was not created.
 
 **/
 EFI_STATUS
@@ -940,7 +940,7 @@ EfiCreateEventReadyToBootEx (
   If FvDevicePathNode is NULL, then ASSERT().
   If NameGuid is NULL, then ASSERT().
   
-  @param  FvDevicePathNode  Pointer to a FV device path node to initialize
+  @param  FvDevicePathNode  The pointer to a FV device path node to initialize
   @param  NameGuid          FV file name to use in FvDevicePathNode
 
 **/
@@ -963,7 +963,7 @@ EfiInitializeFwVolDevicepathNode (
   the differences from the caller.
   If FvDevicePathNode is NULL, then ASSERT().
 
-  @param  FvDevicePathNode  Pointer to FV device path to check.
+  @param  FvDevicePathNode  The pointer to FV device path to check.
 
   @retval NULL              FvDevicePathNode is not valid.
   @retval Other             FvDevicePathNode is valid and pointer to NameGuid was returned.
@@ -987,8 +987,8 @@ EfiGetNameGuidFromFwVolDevicePathNode (
   If Format is NULL, then ASSERT().
   If Format is not aligned on a 16-bit boundary, then ASSERT().
 
-  @param Format   Null-terminated Unicode format string.
-  @param ...      Variable argument list whose contents are accessed based 
+  @param Format   A null-terminated Unicode format string.
+  @param ...      The variable argument list whose contents are accessed based 
                   on the format string specified by Format.
   
   @return Number of Unicode characters printed to ConOut.
@@ -1013,8 +1013,8 @@ Print (
   If Format is NULL, then ASSERT().
   If Format is not aligned on a 16-bit boundary, then ASSERT().
 
-  @param Format   Null-terminated Unicode format string.
-  @param ...      Variable argument list whose contents are accessed based 
+  @param Format   A null-terminated Unicode format string.
+  @param ...      The variable argument list whose contents are accessed based 
                   on the format string specified by Format.
   
   @return Number of Unicode characters printed to StdErr.
@@ -1038,8 +1038,8 @@ ErrorPrint (
   PcdUefiLibMaxPrintBufferSize characters are sent to ConOut.
   If Format is NULL, then ASSERT().
 
-  @param Format   Null-terminated ASCII format string.
-  @param ...      Variable argument list whose contents are accessed based 
+  @param Format   A null-terminated ASCII format string.
+  @param ...      The variable argument list whose contents are accessed based 
                   on the format string specified by Format.
   
   @return Number of ASCII characters printed to ConOut.
@@ -1063,8 +1063,8 @@ AsciiPrint (
   PcdUefiLibMaxPrintBufferSize characters are sent to StdErr.
   If Format is NULL, then ASSERT().
 
-  @param Format   Null-terminated ASCII format string.
-  @param ...      Variable argument list whose contents are accessed based 
+  @param Format   A null-terminated ASCII format string.
+  @param ...      The variable argument list whose contents are accessed based 
                   on the format string specified by Format.
   
   @return Number of ASCII characters printed to ConErr.
@@ -1109,7 +1109,7 @@ AsciiErrorPrint (
                        an optional parameter that may be NULL.  If it is NULL, 
                        then the background color of the current ConOut device
                        in the EFI_SYSTEM_TABLE is used.
-  @param  Format       Null-terminated Unicode format string.  See Print Library 
+  @param  Format       A null-terminated Unicode format string.  See Print Library 
                        for the supported format string syntax.
   @param  ...          Variable argument list whose contents are accessed based on 
                        the format string specified by Format.         
@@ -1158,9 +1158,9 @@ PrintXY (
                        an optional parameter that may be NULL.  If it is NULL, 
                        then the background color of the current ConOut device
                        in the EFI_SYSTEM_TABLE is used.
-  @param  Format       Null-terminated ASCII format string.  See Print Library 
+  @param  Format       A null-terminated ASCII format string.  See Print Library 
                        for the supported format string syntax.
-  @param  ...          Variable argument list whose contents are accessed based on 
+  @param  ...          The variable argument list whose contents are accessed based on 
                        the format string specified by Format.         
 
   @return  The number of ASCII characters printed.
@@ -1194,7 +1194,7 @@ AsciiPrintXY (
   @param  DriverBindingHandle  The handle that DriverBinding is to be installed onto.  If this
                                parameter is NULL, then a new handle is created.
 
-  @retval EFI_SUCCESS           The protocol installation is completed successfully.
+  @retval EFI_SUCCESS           The protocol installation completed successfully.
   @retval EFI_OUT_OF_RESOURCES  There was not enough system resources to install the protocol.
   @retval Others                Status from gBS->InstallMultipleProtocolInterfaces().
 
@@ -1231,8 +1231,8 @@ EfiLibInstallDriverBinding (
   @param  DriverConfiguration  A Driver Configuration Protocol instance that this driver is producing.
   @param  DriverDiagnostics    A Driver Diagnostics Protocol instance that this driver is producing.
 
-  @retval EFI_SUCCESS           The protocol installation is completed successfully.
-  @retval EFI_OUT_OF_RESOURCES  There was not enough memory in pool to install all the protocols.
+  @retval EFI_SUCCESS           The protocol installation completed successfully.
+  @retval EFI_OUT_OF_RESOURCES  There was not enough memory in the pool to install all the protocols.
 
 **/
 EFI_STATUS
@@ -1268,7 +1268,7 @@ EfiLibInstallAllDriverProtocols (
   @param  ComponentName        A Component Name Protocol instance that this driver is producing.
   @param  ComponentName2       A Component Name 2 Protocol instance that this driver is producing.
 
-  @retval EFI_SUCCESS           The protocol installation is completed successfully.
+  @retval EFI_SUCCESS           The protocol installation completed successfully.
   @retval EFI_OUT_OF_RESOURCES  There was not enough memory in pool to install all the protocols.
 
 **/
@@ -1309,7 +1309,7 @@ EfiLibInstallDriverBindingComponentName2 (
   @param  DriverDiagnostics     A Driver Diagnostics Protocol instance that this driver is producing.
   @param  DriverDiagnostics2    A Driver Diagnostics Protocol 2 instance that this driver is producing.
 
-  @retval EFI_SUCCESS           The protocol installation is completed successfully.
+  @retval EFI_SUCCESS           The protocol installation completed successfully.
   @retval EFI_OUT_OF_RESOURCES  There was not enough memory in pool to install all the protocols.
 
 **/

@@ -6,14 +6,14 @@
   a single hardware device or a virtual device that is an aggregation
   of multiple physical devices.
 
-  Copyright (c) 2006 - 2008, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
 **/
 
@@ -148,7 +148,7 @@ typedef EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL   SIMPLE_TEXT_OUTPUT_INTERFACE;
 /**
   Reset the text output device hardware and optionaly run diagnostics
 
-  @param  This                 Protocol instance pointer.
+  @param  This                 The protocol instance pointer.
   @param  ExtendedVerification Driver may perform more exhaustive verfication
                                operation of the device during reset.
 
@@ -167,7 +167,7 @@ EFI_STATUS
 /**
   Write a string to the output device.
 
-  @param  This   Protocol instance pointer.
+  @param  This   The protocol instance pointer.
   @param  String The NULL-terminated string to be displayed on the output
                  device(s). All output devices must also support the Unicode
                  drawing character codes defined in this file.
@@ -193,7 +193,7 @@ EFI_STATUS
   Verifies that all characters in a string can be output to the 
   target device.
 
-  @param  This   Protocol instance pointer.
+  @param  This   The protocol instance pointer.
   @param  String The NULL-terminated string to be examined for the output
                  device(s).
 
@@ -214,7 +214,7 @@ EFI_STATUS
   Returns information for an available text mode that the output device(s)
   supports.
 
-  @param  This       Protocol instance pointer.
+  @param  This       The protocol instance pointer.
   @param  ModeNumber The mode number to return information on.
   @param  Columns    Returns the geometry of the text output device for the
                      requested ModeNumber.
@@ -238,7 +238,7 @@ EFI_STATUS
 /**
   Sets the output device(s) to a specified mode.
 
-  @param  This       Protocol instance pointer.
+  @param  This       The protocol instance pointer.
   @param  ModeNumber The mode number to set.
 
   @retval EFI_SUCCESS      The requested text mode was set.
@@ -257,7 +257,7 @@ EFI_STATUS
   Sets the background and foreground colors for the OutputString () and
   ClearScreen () functions.
 
-  @param  This      Protocol instance pointer.
+  @param  This      The protocol instance pointer.
   @param  Attribute The attribute to set. Bits 0..3 are the foreground color, and
                     bits 4..6 are the background color. All other bits are undefined
                     and must be zero. The valid Attributes are defined in this file.
@@ -278,7 +278,7 @@ EFI_STATUS
   Clears the output device(s) display to the currently selected background 
   color.
 
-  @param  This              Protocol instance pointer.
+  @param  This              The protocol instance pointer.
                            
   @retval  EFI_SUCCESS      The operation completed successfully.
   @retval  EFI_DEVICE_ERROR The device had an error and could not complete the request.
@@ -294,7 +294,7 @@ EFI_STATUS
 /**
   Sets the current coordinates of the cursor position
 
-  @param  This        Protocol instance pointer.
+  @param  This        The protocol instance pointer.
   @param  Column      The position to set the cursor to. Must be greater than or
                       equal to zero and less than the number of columns and rows
                       by QueryMode ().
@@ -319,7 +319,7 @@ EFI_STATUS
 /**
   Makes the cursor visible or invisible
 
-  @param  This    Protocol instance pointer.
+  @param  This    The protocol instance pointer.
   @param  Visible If TRUE, the cursor is set to be visible. If FALSE, the cursor is
                   set to be invisible.
 
@@ -356,7 +356,7 @@ typedef struct {
   ///
   INT32   Mode;
   ///
-  /// The current character output attribute
+  /// The current character output attribute.
   ///
   INT32   Attribute;
   ///

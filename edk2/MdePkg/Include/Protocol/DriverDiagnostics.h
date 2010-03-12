@@ -1,14 +1,14 @@
 /** @file
   EFI Driver Diagnostics Protocol
 
-  Copyright (c) 2006 - 2008, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
 **/
 
@@ -16,7 +16,7 @@
 #define __EFI_DRIVER_DIAGNOSTICS_H__
 
 ///
-/// Global ID for the Driver Diagnostics Protocol as defined in EFI 1.1.
+/// The global ID for the Driver Diagnostics Protocol as defined in EFI 1.1.
 ///
 #define EFI_DRIVER_DIAGNOSTICS_PROTOCOL_GUID \
   { \
@@ -74,7 +74,7 @@ typedef enum {
   @retval EFI_SUCCESS           The controller specified by ControllerHandle and
                                 ChildHandle passed the diagnostic.
   @retval EFI_INVALID_PARAMETER ControllerHandle is not a valid EFI_HANDLE.
-  @retval EFI_INVALID_PARAMETER ChildHandle is not NULL and it is not a valid EFI_HANDLE.
+  @retval EFI_INVALID_PARAMETER ChildHandle is not NULL, and it is not a valid EFI_HANDLE.
   @retval EFI_INVALID_PARAMETER Language is NULL.
   @retval EFI_INVALID_PARAMETER ErrorType is NULL.
   @retval EFI_INVALID_PARAMETER BufferType is NULL.

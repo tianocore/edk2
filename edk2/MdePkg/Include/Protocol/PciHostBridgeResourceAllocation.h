@@ -3,18 +3,18 @@
   provides the basic interfaces to abstract a PCI host bridge resource allocation. 
   This protocol is mandatory if the system includes PCI devices.
   
-  Copyright (c) 2007 - 2009, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   This Protocol is defined in UEFI Platform Initialization Specification 1.2 
-  Volume 5: Standards
+  Volume 5: Standards.
   
 **/
 
@@ -28,7 +28,7 @@
 #include <Protocol/PciRootBridgeIo.h>
 
 ///
-/// Global ID for the EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL
+/// Global ID for the EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL.
 ///
 #define EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL_GUID \
   { \
@@ -36,7 +36,7 @@
   }
 
 ///
-/// Forward declaration for EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL
+/// Forward declaration for EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL.
 ///
 typedef struct _EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL;
 
@@ -78,7 +78,7 @@ typedef UINT64 EFI_RESOURCE_ALLOCATION_STATUS;
 #define EFI_RESOURCE_NOT_SATISFIED  0xFFFFFFFFFFFFFFFFULL
 
 ///
-/// This  enum is used to specify the phase of the PCI enumaeration process
+/// This  enum is used to specify the phase of the PCI enumaeration process.
 ///
 typedef enum {
   ///
@@ -167,9 +167,9 @@ typedef enum {
   These are the notifications from the PCI bus driver that it is about to enter a certain phase of the PCI 
   enumeration process.
 
-  @param[in] This    Pointer to the EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL 
+  @param[in] This    The pointer to the EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL 
                      instance.
-  @param[in] Phase   The phase during enumeration
+  @param[in] Phase   The phase during enumeration.
 
   @retval EFI_SUCCESS             The notification was accepted without any errors.
   @retval EFI_INVALID_PARAMETER   The Phase is invalid.
@@ -195,7 +195,7 @@ EFI_STATUS
 /**
   Returns the device handle of the next PCI root bridge that is associated with this host bridge.
 
-  @param[in]     This               Pointer to the EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL 
+  @param[in]     This               The pointer to the EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL 
                                     instance.
   @param[in,out] RootBridgeHandle   Returns the device handle of the next PCI root bridge. On input, it holds the 
                                     RootBridgeHandle that was returned by the most recent call to 
@@ -218,7 +218,7 @@ EFI_STATUS
 /**
   Returns the allocation attributes of a PCI root bridge.
 
-  @param[in]  This               Pointer to the EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL 
+  @param[in]  This               The pointer to the EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL 
                                  instance.
   @param[in]  RootBridgeHandle   The device handle of the PCI root bridge in which the caller is interested.
   @param[out] Attribute          The pointer to attributes of the PCI root bridge.
@@ -239,10 +239,10 @@ EFI_STATUS
 /**
   Sets up the specified PCI root bridge for the bus enumeration process.
 
-  @param[in]  This               Pointer to the EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL 
+  @param[in]  This               The pointer to the EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL 
                                  instance.
   @param[in]  RootBridgeHandle   The PCI root bridge to be set up.
-  @param[out] Configuration      Pointer to the pointer to the PCI bus resource descriptor.
+  @param[out] Configuration      The pointer to the pointer to the PCI bus resource descriptor.
 
   @retval EFI_SUCCESS             The PCI root bridge was set up and the bus range was returned in 
                                   Configuration.
@@ -262,10 +262,10 @@ EFI_STATUS
 /**
   Programs the PCI root bridge hardware so that it decodes the specified PCI bus range.
 
-  @param[in] This               Pointer to the EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL
+  @param[in] This               The pointer to the EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL
                                 instance.  
   @param[in] RootBridgeHandle   The PCI root bridge whose bus range is to be programmed.
-  @param[in] Configuration      The pointer to the PCI bus resource descriptor..
+  @param[in] Configuration      The pointer to the PCI bus resource descriptor.
 
   @retval EFI_SUCCESS             The bus range for the PCI root bridge was programmed.
   @retval EFI_INVALID_PARAMETER   RootBridgeHandle is not a valid root bridge handle.
@@ -294,7 +294,7 @@ EFI_STATUS
 /**
   Submits the I/O and memory resource requirements for the specified PCI root bridge.
 
-  @param[in] This               Pointer to the EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL 
+  @param[in] This               The pointer to the EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL 
                                 instance.
   @param[in] RootBridgeHandle   The PCI root bridge whose I/O and memory resource requirements are being 
                                 submitted.
@@ -326,7 +326,7 @@ EFI_STATUS
 /**
   Returns the proposed resource settings for the specified PCI root bridge.
 
-  @param[in]  This               Pointer to the EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL 
+  @param[in]  This               The pointer to the EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL 
                                  instance.
   @param[in]  RootBridgeHandle   The PCI root bridge handle.
   @param[out] Configuration      The pointer to the pointer to the PCI I/O and memory resource descriptor.
@@ -350,7 +350,7 @@ EFI_STATUS
   stages of the PCI enumeration process that allow the host bridge driver to preinitialize individual 
   PCI controllers before enumeration.
 
-  @param[in]  This                  Pointer to the EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL instance.
+  @param[in]  This                  The pointer to the EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL instance.
   @param[in]  RootBridgeHandle      The associated PCI root bridge handle.
   @param[in]  PciAddress            The address of the PCI device on the PCI bus.
   @param[in]  Phase                 The phase of the PCI device enumeration.

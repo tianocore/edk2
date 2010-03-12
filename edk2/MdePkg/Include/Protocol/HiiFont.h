@@ -1,14 +1,14 @@
 /** @file
   The file provides services to retrieve font information.
   
-  Copyright (c) 2006 - 2009, Intel Corporation
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
 **/
 
@@ -26,7 +26,7 @@ typedef struct _EFI_HII_FONT_PROTOCOL EFI_HII_FONT_PROTOCOL;
 typedef VOID    *EFI_FONT_HANDLE;
 
 ///
-/// EFI_HII_OUT_FLAGS
+/// EFI_HII_OUT_FLAGS.
 /// 
 typedef UINT32  EFI_HII_OUT_FLAGS;
 
@@ -110,7 +110,7 @@ typedef struct _EFI_FONT_DISPLAY_INFO {
 
   This function renders a string to a bitmap or the screen using
   the specified font, color and options. It either draws the
-  string and glyphs on an existing bitmap, allocates a new bitmap
+  string and glyphs on an existing bitmap, allocates a new bitmap,
   or uses the screen. The strings can be clipped or wrapped.
   Optionally, the function also returns the information about each
   row and the character position on that row. If
@@ -119,7 +119,7 @@ typedef struct _EFI_FONT_DISPLAY_INFO {
   outside the bounding box specified by Width and Height are
   ignored. The information in the RowInfoArray only describes
   characters which are at least partially displayed. For the final
-  row, the LineHeight and BaseLine may describe pixels which are
+  row, the LineHeight and BaseLine may describe pixels that are
   outside the limit specified by Height (unless
   EFI_HII_OUT_FLAG_CLIP_CLEAN_Y is specified) even though those
   pixels were not drawn. The LineWidth may describe pixels which
@@ -180,7 +180,7 @@ typedef struct _EFI_FONT_DISPLAY_INFO {
                           containing row information and
                           RowInfoArraySize will be updated to contain
                           the number of elements. This array describes
-                          the characters which were at least partially
+                          the characters that were at least partially
                           drawn and the heights of the rows. It is the
                           caller's responsibility to free this buffer.
 
@@ -236,8 +236,8 @@ EFI_STATUS
   can be drawn transparently or opaquely. The function can also
   return information about each row and each character's
   position on the row. If EFI_HII_OUT_FLAG_CLIP is set, then
-  text will be formatted only based on explicit line breaks and
-  all pixels which would lie outside the bounding box specified
+  text will be formatted based only on explicit line breaks, and
+  all pixels that would lie outside the bounding box specified
   by Width and Height are ignored. The information in the
   RowInfoArray only describes characters which are at least
   partially displayed. For the final row, the LineHeight and
@@ -338,11 +338,11 @@ EFI_STATUS
   @retval EFI_OUT_OF_RESOURCES  Unable to allocate an output
                                 buffer for RowInfoArray or Blt.
 
-  @retval EFI_INVALID_PARAMETER The String or Blt or Height or
+  @retval EFI_INVALID_PARAMETER The String, or Blt, or Height, or
                                 Width was NULL.
   @retval EFI_INVALID_PARAMETER The Blt or PackageList was NULL.
   @retval EFI_INVALID_PARAMETER Flags were invalid combination.
-  @retval EFI_NOT_FOUND         The specified PackageList is not in the Database 
+  @retval EFI_NOT_FOUND         The specified PackageList is not in the Database, 
                                 or the stringid is not in the specified PackageList. 
 
 **/
@@ -370,22 +370,22 @@ EFI_STATUS
 
   @param This       A pointer to the EFI_HII_FONT_PROTOCOL instance.
 
-  @param Char       Character to retrieve.
+  @param Char       The character to retrieve.
 
   @param StringInfo Points to the string font and color
                     information or NULL if the string should use
                     the default system font and color.
 
-  @param Blt        Thus must point to a NULL on entry. A buffer will
+  @param Blt        This must point to a NULL on entry. A buffer will
                     be allocated to hold the output and the pointer
                     updated on exit. It is the caller's responsibility
                     to free this buffer.
 
-  @param Baseline   Number of pixels from the bottom of the bitmap
+  @param Baseline   The number of pixels from the bottom of the bitmap
                     to the baseline.
 
 
-  @retval EFI_SUCCESS             Glyph bitmap created.
+  @retval EFI_SUCCESS             The glyph bitmap created.
 
   @retval EFI_OUT_OF_RESOURCES    Unable to allocate the output buffer Blt.
 
@@ -393,7 +393,7 @@ EFI_STATUS
                                   replaced with the glyph for
                                   Unicode character code 0xFFFD.
 
-  @retval EFI_INVALID_PARAMETER   Blt is NULL or Width is NULL or
+  @retval EFI_INVALID_PARAMETER   Blt is NULL, or Width is NULL, or
                                   Height is NULL
 
 
@@ -424,8 +424,8 @@ EFI_STATUS
                         to NULL if there are no more matching fonts.
 
   @param StringInfoIn   Upon entry, points to the font to return
-                        information about. If NULL, then the information about the system default 
-                        font will be returned.
+                        information about. If NULL, then the information 
+                        about the system default font will be returned.
 
   @param StringInfoOut  Upon return, contains the matching
                         font's information. If NULL, then no

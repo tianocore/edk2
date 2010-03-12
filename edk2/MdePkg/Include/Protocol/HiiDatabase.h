@@ -2,14 +2,14 @@
   The file provides Database manager for HII-related data
   structures.
   
-  Copyright (c) 2006 - 2010, Intel Corporation
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
 **/
 
@@ -24,7 +24,7 @@ typedef struct _EFI_HII_DATABASE_PROTOCOL EFI_HII_DATABASE_PROTOCOL;
 
 
 ///
-/// EFI_HII_DATABASE_NOTIFY_TYPE
+/// EFI_HII_DATABASE_NOTIFY_TYPE.
 /// 
 typedef UINTN   EFI_HII_DATABASE_NOTIFY_TYPE;
 
@@ -98,7 +98,7 @@ EFI_STATUS
                                 resources for the new database
                                 contents.
 
-  @retval EFI_INVALID_PARAMETER PackageList is NULL or Handle is NULL.
+  @retval EFI_INVALID_PARAMETER PackageList is NULL, or Handle is NULL.
 
 **/
 typedef
@@ -212,7 +212,7 @@ EFI_STATUS
                               the length of the handle buffer
                               that is required for the handles found.
 
-  @param Handle               An array of EFI_HII_HANDLE  instances returned.
+  @param Handle               An array of EFI_HII_HANDLE instances returned.
 
   @retval EFI_SUCCESS           The matching handles are outputed successfully.
                                 HandleBufferLength is updated with the actual length.
@@ -222,7 +222,7 @@ EFI_STATUS
                                 handles. HandleBufferLength is
                                 updated with a value that will
                                 enable the data to fit.
-  @retval EFI_NOT_FOUND         No matching handle could not be found in database.
+  @retval EFI_NOT_FOUND         No matching handle could be found in database.
   @retval EFI_INVALID_PARAMETER Handle or HandleBufferLength was NULL.
   @retval EFI_INVALID_PARAMETER PackageType is not a EFI_HII_PACKAGE_TYPE_GUID but
                                 PackageGuid is not NULL, PackageType is a EFI_HII_
@@ -314,7 +314,7 @@ EFI_STATUS
 
   @param NotifyType       Describes the types of notification which
                           this function will be receiving. See
-                          EFI_HII_DATABASE_NOTIFY_TYPE for more a
+                          EFI_HII_DATABASE_NOTIFY_TYPE for a
                           list of types.
 
   @param NotifyHandle     Points to the unique handle assigned to
@@ -354,7 +354,7 @@ EFI_STATUS
   @param NotificationHandle   The handle of the notification
                               function being unregistered.
   
-  @retval EFI_SUCCESS   Unregister the notification Successsfully
+  @retval EFI_SUCCESS   Successsfully unregistered the notification. 
   
   @retval EFI_NOT_FOUND The incoming notification handle does not exist 
                         in the current hii database.
@@ -407,7 +407,7 @@ EFI_STATUS
 /**
    
   This routine retrieves the requested keyboard layout. The layout
-  is a physical description of the keys on a keyboard and the
+  is a physical description of the keys on a keyboard, and the
   character(s) that are associated with a particular set of key
   strokes.
 

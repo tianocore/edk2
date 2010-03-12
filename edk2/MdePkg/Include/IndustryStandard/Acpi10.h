@@ -1,14 +1,14 @@
 /** @file   
   ACPI 1.0b definitions from the ACPI Specification, revision 1.0b
 
-  Copyright (c) 2006 - 2008, Intel Corporation
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 **/
 
 #ifndef _ACPI_1_0_H_
@@ -16,7 +16,7 @@
 
 ///
 /// Common table header, this prefaces all ACPI tables, including FACS, but
-/// excluding the RSD PTR structure
+/// excluding the RSD PTR structure.
 ///
 typedef struct {
   UINT32  Signature;
@@ -25,7 +25,7 @@ typedef struct {
 
 #pragma pack(1)
 ///
-/// Common ACPI description table header.  This structure prefaces most ACPI tables.
+/// The common ACPI description table header.  This structure prefaces most ACPI tables.
 ///
 typedef struct {
   UINT32  Signature;
@@ -54,7 +54,7 @@ typedef struct {
 #define ACPI_ADDRESS_SPACE_TYPE_BUS   0x02
 
 ///
-/// Power Management Timer frequency is fixed at 3.579545MHz
+/// Power Management Timer frequency is fixed at 3.579545MHz.
 ///
 #define ACPI_TIMER_FREQUENCY       3579545
 
@@ -65,7 +65,7 @@ typedef struct {
 
 ///
 /// The commond definition of QWORD, DWORD, and WORD
-/// Address Space Descriptors
+/// Address Space Descriptors.
 ///
 typedef PACKED struct {
   UINT8   Desc;
@@ -83,7 +83,7 @@ typedef PACKED struct {
 #pragma pack()
 
 ///
-/// the End tag identifies an end of resource data.
+/// The End tag identifies an end of resource data.
 ///
 typedef struct {
   UINT8 Desc;
@@ -135,7 +135,7 @@ typedef struct {
 //
 
 ///
-/// Root System Description Pointer Structure
+/// Root System Description Pointer Structure.
 ///
 typedef struct {
   UINT64  Signature;
@@ -152,12 +152,12 @@ typedef struct {
 //
 
 ///
-/// RSDT Revision (as defined in ACPI 1.0b spec.)
+/// RSDT Revision (as defined in ACPI 1.0b specification).
 ///
 #define EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_TABLE_REVISION 0x01
 
 ///
-/// Fixed ACPI Description Table Structure (FADT)
+/// Fixed ACPI Description Table Structure (FADT).
 ///
 typedef struct {
   EFI_ACPI_DESCRIPTION_HEADER Header;
@@ -203,7 +203,7 @@ typedef struct {
 } EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE;
 
 ///
-/// FADT Version (as defined in ACPI 1.0b spec.)
+/// FADT Version (as defined in ACPI 1.0b specification).
 ///
 #define EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE_REVISION  0x01
 
@@ -223,7 +223,7 @@ typedef struct {
 #define EFI_ACPI_1_0_DCK_CAP              BIT9
 
 ///
-/// Firmware ACPI Control Structure
+/// Firmware ACPI Control Structure.
 ///
 typedef struct {
   UINT32  Signature;
@@ -236,14 +236,14 @@ typedef struct {
 } EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE;
 
 ///
-/// Firmware Control Structure Feature Flags
+/// Firmware Control Structure Feature Flags.
 /// All other bits are reserved and must be set to 0.
 ///
 #define EFI_ACPI_1_0_S4BIOS_F             BIT0
 
 ///
 /// Multiple APIC Description Table header definition.  The rest of the table
-/// must be defined in a platform specific manner.
+/// must be defined in a platform-specific manner.
 ///
 typedef struct {
   EFI_ACPI_DESCRIPTION_HEADER Header;
@@ -252,7 +252,7 @@ typedef struct {
 } EFI_ACPI_1_0_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER;
 
 ///
-/// MADT Revision (as defined in ACPI 1.0b spec.)
+/// MADT Revision (as defined in ACPI 1.0b specification).
 ///
 #define EFI_ACPI_1_0_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION 0x01
 
@@ -278,7 +278,7 @@ typedef struct {
 //
 
 ///
-/// Processor Local APIC Structure Definition
+/// Processor Local APIC Structure Definition.
 ///
 typedef struct {
   UINT8   Type;
@@ -294,7 +294,7 @@ typedef struct {
 #define EFI_ACPI_1_0_LOCAL_APIC_ENABLED      BIT0
 
 ///
-/// IO APIC Structure
+/// IO APIC Structure.
 ///
 typedef struct {
   UINT8   Type;
@@ -306,7 +306,7 @@ typedef struct {
 } EFI_ACPI_1_0_IO_APIC_STRUCTURE;
 
 ///
-/// Interrupt Source Override Structure
+/// Interrupt Source Override Structure.
 ///
 typedef struct {
   UINT8   Type;
@@ -318,7 +318,7 @@ typedef struct {
 } EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE;
 
 ///
-/// Non-Maskable Interrupt Source Structure
+/// Non-Maskable Interrupt Source Structure.
 ///
 typedef struct {
   UINT8   Type;
@@ -328,7 +328,7 @@ typedef struct {
 } EFI_ACPI_1_0_NON_MASKABLE_INTERRUPT_SOURCE_STRUCTURE;
 
 ///
-/// Local APIC NMI Structure
+/// Local APIC NMI Structure.
 ///
 typedef struct {
   UINT8   Type;
@@ -353,47 +353,47 @@ typedef struct {
 //
 
 ///
-/// "RSD PTR " Root System Description Pointer
+/// "RSD PTR " Root System Description Pointer.
 ///
 #define EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER_SIGNATURE  SIGNATURE_64('R', 'S', 'D', ' ', 'P', 'T', 'R', ' ')
 
 ///
-/// "APIC" Multiple APIC Description Table
+/// "APIC" Multiple APIC Description Table.
 ///
 #define EFI_ACPI_1_0_APIC_SIGNATURE  SIGNATURE_32('A', 'P', 'I', 'C')
 
 ///
-/// "DSDT" Differentiated System Description Table
+/// "DSDT" Differentiated System Description Table.
 ///
 #define EFI_ACPI_1_0_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE  SIGNATURE_32('D', 'S', 'D', 'T')
 
 ///
-/// "FACS" Firmware ACPI Control Structure
+/// "FACS" Firmware ACPI Control Structure.
 ///
 #define EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE  SIGNATURE_32('F', 'A', 'C', 'S')
 
 ///
-/// "FACP" Fixed ACPI Description Table
+/// "FACP" Fixed ACPI Description Table.
 ///
 #define EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE  SIGNATURE_32('F', 'A', 'C', 'P')
 
 ///
-/// "PSDT" Persistent System Description Table
+/// "PSDT" Persistent System Description Table.
 ///
 #define EFI_ACPI_1_0_PERSISTENT_SYSTEM_DESCRIPTION_TABLE_SIGNATURE  SIGNATURE_32('P', 'S', 'D', 'T')
 
 ///
-/// "RSDT" Root System Description Table
+/// "RSDT" Root System Description Table.
 ///
 #define EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_TABLE_SIGNATURE  SIGNATURE_32('R', 'S', 'D', 'T')
 
 ///
-/// "SBST" Smart Battery Specification Table
+/// "SBST" Smart Battery Specification Table.
 ///
 #define EFI_ACPI_1_0_SMART_BATTERY_SPECIFICATION_TABLE_SIGNATURE  SIGNATURE_32('S', 'B', 'S', 'T')
 
 ///
-/// "SSDT" Secondary System Description Table
+/// "SSDT" Secondary System Description Table.
 ///
 #define EFI_ACPI_1_0_SECONDARY_SYSTEM_DESCRIPTION_TABLE_SIGNATURE  SIGNATURE_32('S', 'S', 'D', 'T')
 
