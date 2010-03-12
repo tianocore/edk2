@@ -140,8 +140,8 @@ DEFINE IPHONE_TOOLS            = /Developer/Platforms/iPhoneOS.platform/Develope
 DEFINE RVCT31_TOOLS_PATH       = c:/Program Files/ARM/RVCT/Programs/3.1/761/win_32-pentium
 DEFINE RVCT31CYGWIN_TOOLS_PATH = /cygdrive/c/Program Files/ARM/RVCT/Programs/3.1/761/win_32-pentium
 
-# Update to the location of the gcc executables
-DEFINE ARMGCC_BIN              = /
+DEFINE SOURCERY_TOOLS        = c:/Program Files/CodeSourcery/Sourcery G++ Lite/bin
+DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G++ Lite/bin
 
 ####################################################################################
 #
@@ -1589,8 +1589,8 @@ DEFINE GCC44_ASM_FLAGS               = DEF(GCC_ASM_FLAGS)
 *_UNIXGCC_*_MAKE_PATH                    = make
 *_UNIXGCC_*_ASL_PATH                     = DEF(UNIX_IASL_BIN)
 
-*_UNIXGCC_IA32_DLINK_FLAGS               = DEF(GCC_IA32_X64_DLINK_FLAGS)
-*_UNIXGCC_X64_DLINK_FLAGS                = DEF(GCC_IA32_X64_DLINK_FLAGS)
+*_UNIXGCC_IA32_DLINK_FLAGS               = DEF(GCC_IA32_X64_DLINK_FLAGS) --image-base=0
+*_UNIXGCC_X64_DLINK_FLAGS                = DEF(GCC_IA32_X64_DLINK_FLAGS) --image-base=0
 *_UNIXGCC_IA32_ASLDLINK_FLAGS            = DEF(GCC_IA32_X64_ASLDLINK_FLAGS)
 *_UNIXGCC_X64_ASLDLINK_FLAGS             = DEF(GCC_IA32_X64_ASLDLINK_FLAGS)
 *_UNIXGCC_*_ASM_FLAGS                    = DEF(GCC_ASM_FLAGS)
@@ -1717,8 +1717,8 @@ DEFINE GCC44_ASM_FLAGS               = DEF(GCC_ASM_FLAGS)
 *_CYGGCC_*_MAKE_PATH             = DEF(MS_VS_BIN)\nmake.exe
 *_CYGGCC_*_ASL_PATH              = DEF(DEFAULT_WIN_ASL_BIN)
 
-*_CYGGCC_IA32_DLINK_FLAGS               = DEF(GCC_IA32_X64_DLINK_FLAGS)
-*_CYGGCC_X64_DLINK_FLAGS                = DEF(GCC_IA32_X64_DLINK_FLAGS)
+*_CYGGCC_IA32_DLINK_FLAGS               = DEF(GCC_IA32_X64_DLINK_FLAGS) --image-base=0
+*_CYGGCC_X64_DLINK_FLAGS                = DEF(GCC_IA32_X64_DLINK_FLAGS) --image-base=0
 *_CYGGCC_IA32_ASLDLINK_FLAGS            = DEF(GCC_IA32_X64_ASLDLINK_FLAGS)
 *_CYGGCC_X64_ASLDLINK_FLAGS             = DEF(GCC_IA32_X64_ASLDLINK_FLAGS)
 *_CYGGCC_*_MAKE_FLAGS                   = /nologo
@@ -1745,10 +1745,11 @@ DEFINE GCC44_ASM_FLAGS               = DEF(GCC_ASM_FLAGS)
 *_CYGGCC_IA32_ASLPP_PATH         = DEF(CYGWIN_BINIA32)gcc
 *_CYGGCC_IA32_ASLDLINK_PATH      = DEF(CYGWIN_BINIA32)ld
 *_CYGGCC_IA32_RC_PATH            = DEF(CYGWIN_BINIA32)objcopy
-*_CYGGCC_IA32_OBJECT_PATH        = DEF(CYGWIN_BINIA32)objcopy
+*_CYGGCC_IA32_OBJCOPY_PATH       = DEF(CYGWIN_BINIA32)objcopy
 
 *_CYGGCC_IA32_CC_FLAGS           = DEF(GCC_IA32_CC_FLAGS)
 *_CYGGCC_IA32_RC_FLAGS           = DEF(GCC_IA32_RC_FLAGS)
+*_CYGGCC_IA32_OBJCOPY_FLAGS      =
 
 ##################
 # X64 definitions
@@ -1764,10 +1765,11 @@ DEFINE GCC44_ASM_FLAGS               = DEF(GCC_ASM_FLAGS)
 *_CYGGCC_X64_ASLPP_PATH          = DEF(CYGWIN_BINX64)gcc
 *_CYGGCC_X64_ASLDLINK_PATH       = DEF(CYGWIN_BINX64)ld
 *_CYGGCC_X64_RC_PATH             = DEF(CYGWIN_BINX64)objcopy
-*_CYGGCC_X64_OBJECT_PATH         = DEF(CYGWIN_BINX64)objcopy
+*_CYGGCC_X64_OBJCOPY_PATH        = DEF(CYGWIN_BINX64)objcopy
 
 *_CYGGCC_X64_CC_FLAGS            = DEF(GCC_X64_CC_FLAGS)
 *_CYGGCC_X64_RC_FLAGS            = DEF(GCC_X64_RC_FLAGS)
+*_CYGGCC_X64_OBJCOPY_FLAGS       =
 
 ##################
 # IPF definitions
@@ -1784,7 +1786,6 @@ DEFINE GCC44_ASM_FLAGS               = DEF(GCC_ASM_FLAGS)
 *_CYGGCC_IPF_OBJCOPY_PATH        = DEF(CYGWIN_BINIPF)objcopy
 *_CYGGCC_IPF_SYMRENAME_PATH      = DEF(CYGWIN_BINIPF)objcopy
 *_CYGGCC_IPF_RC_PATH             = DEF(CYGWIN_BINIPF)objcopy
-*_CYGGCC_IPF_OBJECT_PATH         = DEF(CYGWIN_BINIPF)objcopy
 
 *_CYGGCC_IPF_CC_FLAGS             = DEF(GCC_IPF_CC_FLAGS)
 *_CYGGCC_IPF_DLINK_FLAGS          = DEF(GCC_IPF_DLINK_FLAGS)
@@ -2839,13 +2840,16 @@ RELEASE_RVCT31CYGWIN_ARM_CC_FLAGS  = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM
 
 ####################################################################################
 #
-# ARM GCC (GCC 4.1.1, etc.)
+# ARM GCC (www.codesourcery.com)
 #
 ####################################################################################
 #  ARMGCC         - ARM version of the GCC cross compiler
 
 *_ARMGCC_*_*_FAMILY          = GCC
-*_ARMGCC_*_MAKE_PATH         = make
+*_ARMGCC_*_*_BUILDRULEFAMILY = ARMGCC
+
+*_ARMGCC_*_MAKE_PATH         = DEF(SOURCERY_TOOLS)/cs-make
+*_ARMGCC_*_MAKE_FLAGS        = --no-print-directory
 
 ##################
 # ASL definitions
@@ -2861,24 +2865,24 @@ RELEASE_RVCT31CYGWIN_ARM_CC_FLAGS  = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM
 # ARM definitions
 ##################
 
-*_ARMGCC_ARM_ASLCC_PATH      = DEF(ARMGCC_BIN)/arm-elf-gcc
-*_ARMGCC_ARM_ASLDLINK_PATH   = DEF(ARMGCC_BIN)/arm-elf-ld
-*_ARMGCC_ARM_ASLPP_PATH      = DEF(ARMGCC_BIN)/arm-elf-gcc
+*_ARMGCC_ARM_ASLCC_PATH      = DEF(SOURCERY_TOOLS)/arm-none-eabi-gcc
+*_ARMGCC_ARM_ASLDLINK_PATH   = DEF(SOURCERY_TOOLS)/arm-none-eabi-ld
+*_ARMGCC_ARM_ASLPP_PATH      = DEF(SOURCERY_TOOLS)/arm-none-eabi-gcc
 
-*_ARMGCC_ARM_CC_PATH         = DEF(ARMGCC_BIN)/arm-elf-gcc
-*_ARMGCC_ARM_SLINK_PATH      = DEF(ARMGCC_BIN)/arm-elf-ar
-*_ARMGCC_ARM_DLINK_PATH      = DEF(ARMGCC_BIN)/arm-elf-ld
-*_ARMGCC_ARM_ASM_PATH        = DEF(ARMGCC_BIN)/arm-elf-as
-*_ARMGCC_ARM_PP_PATH         = DEF(ARMGCC_BIN)/arm-elf-gcc
-*_ARMGCC_ARM_VFRPP_PATH      = DEF(ARMGCC_BIN)/arm-elf-gcc
+*_ARMGCC_ARM_CC_PATH         = DEF(SOURCERY_TOOLS)/arm-none-eabi-gcc
+*_ARMGCC_ARM_SLINK_PATH      = DEF(SOURCERY_TOOLS)/arm-none-eabi-ar
+*_ARMGCC_ARM_DLINK_PATH      = DEF(SOURCERY_TOOLS)/arm-none-eabi-ld
+*_ARMGCC_ARM_ASM_PATH        = DEF(SOURCERY_TOOLS)/arm-none-eabi-as
+*_ARMGCC_ARM_PP_PATH         = DEF(SOURCERY_TOOLS)/arm-none-eabi-gcc
+*_ARMGCC_ARM_VFRPP_PATH      = DEF(SOURCERY_TOOLS)/arm-none-eabi-gcc
 
 #
 # Use default values, or override in DSC file
 #
-*_ARMGCC_ARM_ARCHCC_FLAGS    = 
-*_ARMGCC_ARM_ARCHASM_FLAGS   = 
+*_ARMGCC_ARM_ARCHCC_FLAGS    = -march=armv7-a -mthumb 
+*_ARMGCC_ARM_ARCHASM_FLAGS   = -march=armv7-a
 *_ARMGCC_ARM_ARCHDLINK_FLAGS = 
-*_ARMGCC_ARM_PLATFORM_FLAGS  =
+*_ARMGCC_ARM_PLATFORM_FLAGS  = -march=armv7-a
 
   DEBUG_ARMGCC_ARM_ASM_FLAGS   = $(ARCHASM_FLAGS) -mlittle-endian -g
 RELEASE_ARMGCC_ARM_ASM_FLAGS   = $(ARCHASM_FLAGS) -mlittle-endian
@@ -2886,11 +2890,12 @@ RELEASE_ARMGCC_ARM_ASM_FLAGS   = $(ARCHASM_FLAGS) -mlittle-endian
 *_ARMGCC_ARM_PP_FLAGS    = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS)  -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
 *_ARMGCC_ARM_VFRPP_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS)  -x c -E -P -DVFRCOMPILE --include $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h
 
-*_ARMGCC_ARM_MAKE_PATH   = make
-
-*_ARMGCC_ARM_SLINK_FLAGS = -r
-*_ARMGCC_ARM_DLINK_FLAGS =  $(ARCHDLINK_FLAGS) --emit-relocs --oformat=elf32-littlearm -nostdlib -u $(IMAGE_ENTRY_POINT) -e $(IMAGE_ENTRY_POINT) -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
-# --gc-sections
+*_ARMGCC_ARM_SLINK_FLAGS =  -rc
+*_ARMGCC_ARM_DLINK_FLAGS =  $(ARCHDLINK_FLAGS)  --oformat=elf32-littlearm -nostdlib -u $(IMAGE_ENTRY_POINT) -e $(IMAGE_ENTRY_POINT) -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
+#
+# Had to remove --emit-relocs to get compile working. Images don't work correctly (linked at 0, no relocations)
+# --emit-relocs
+#
 
   DEBUG_ARMGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -mfpu=fpa -mlittle-endian -g -O2 -mabi=aapcs -mapcs -fno-short-enums -save-temps -combine -fsigned-char -fshort-wchar -fno-strict-aliasing -ffunction-sections -fdata-sections -Wall -Werror -Wno-missing-braces -fomit-frame-pointer -c -include AutoGen.h
 RELEASE_ARMGCC_ARM_CC_FLAGS = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -mfpu=fpa -mlittle-endian    -O2 -mabi=aapcs -mapcs -fno-short-enums -save-temps -combine -fsigned-char -fshort-wchar -fno-strict-aliasing -ffunction-sections -fdata-sections -Wall -Werror -Wno-missing-braces -fomit-frame-pointer -c -include AutoGen.h

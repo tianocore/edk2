@@ -1090,9 +1090,10 @@ class Build():
 
     ## Collect MAP information of all FVs
     #
-    def _CollectFvMapBuffer (self, MapBuffer, Wa):
+    def _CollectFvMapBuffer (self, MapBuffer, Wa, ModuleList):
         if self.Fdf != '':
             # First get the XIP base address for FV map file.
+            GuidPattern = re.compile("[-a-fA-F0-9]+")
             for FvName in Wa.FdfProfile.FvDict.keys():
                 FvMapBuffer = os.path.join(Wa.FvDir, FvName + '.Fv.map')
                 if not os.path.exists(FvMapBuffer):
@@ -1103,7 +1104,16 @@ class Build():
                 FvMap.readline()
                 FvMap.readline()
                 FvMap.readline()
-                MapBuffer.write(FvMap.read())
+                for Line in FvMap:
+                    MatchGuid = GuidPattern.match(Line)
+                    if MatchGuid != None:
+                        #
+                        # Replace GUID with module name
+                        #
+                        GuidString = MatchGuid.group()
+                        if GuidString.upper() in ModuleList:
+                            Line = Line.replace(GuidString, ModuleList[GuidString.upper()].Name)
+                    MapBuffer.write('%s' % (Line))
                 FvMap.close()
 
     ## Collect MAP information of all modules
@@ -1124,7 +1134,8 @@ class Build():
         IsIpfPlatform = False
         if 'IPF' in self.ArchList:
             IsIpfPlatform = True
-        for Module in ModuleList:
+        for ModuleGuid in ModuleList:
+            Module = ModuleList[ModuleGuid]
             GlobalData.gProcessingFile = "%s [%s, %s, %s]" % (Module.MetaFile, Module.Arch, Module.ToolChain, Module.BuildTarget)
             
             OutputImageFile = ''
@@ -1259,7 +1270,8 @@ class Build():
         #
         SaveFileOnChange(MapFilePath, MapBuffer.getvalue(), False)
         MapBuffer.close()
-        sys.stdout.write ("\nLoad Module At Fix Address Map file saved to %s\n" %(MapFilePath))
+        if self.LoadFixAddress != 0:
+            sys.stdout.write ("\nLoad Module At Fix Address Map file saved to %s\n" %(MapFilePath))
         sys.stdout.flush()
 
     ## Build active platform for different build targets and different tool chains
@@ -1286,7 +1298,7 @@ class Build():
                 self._Build(self.Target, Wa)
                 
                 # Create MAP file when Load Fix Address is enabled.
-                if self.Target in ["", "all", "fds"] and self.LoadFixAddress != 0:
+                if self.Target in ["", "all", "fds"]:
                     for Arch in self.ArchList:
                         #
                         # Check whether the set fix address is above 4G for 32bit image.
@@ -1296,19 +1308,20 @@ class Build():
                     #
                     # Get Module List
                     #
-                    ModuleList = []
+                    ModuleList = {}
                     for Pa in Wa.AutoGenObjectList:
                         for Ma in Pa.ModuleAutoGenList:
                             if Ma == None:
                                 continue
                             if not Ma.IsLibrary:
-                                ModuleList.append (Ma)
+                                ModuleList[Ma.Guid.upper()] = Ma
 
                     MapBuffer = StringIO('')
-                    #
-                    # Rebase module to the preferred memory address before GenFds
-                    #
-                    self._CollectModuleMapBuffer(MapBuffer, ModuleList)
+                    if self.LoadFixAddress != 0:
+                        #
+                        # Rebase module to the preferred memory address before GenFds
+                        #
+                        self._CollectModuleMapBuffer(MapBuffer, ModuleList)
                     if self.Fdf != '':
                         #
                         # create FDS again for the updated EFI image
@@ -1317,7 +1330,7 @@ class Build():
                         #
                         # Create MAP file for all platform FVs after GenFds.
                         #
-                        self._CollectFvMapBuffer(MapBuffer, Wa)
+                        self._CollectFvMapBuffer(MapBuffer, Wa, ModuleList)
                     #
                     # Save MAP buffer into MAP file.
                     #
@@ -1367,7 +1380,7 @@ class Build():
                                 ExtraData=self.ModuleFile
                                 )
                 # Create MAP file when Load Fix Address is enabled.
-                if self.LoadFixAddress != 0 and self.Target == "fds" and self.Fdf != '':
+                if self.Target == "fds" and self.Fdf != '':
                     for Arch in self.ArchList:
                         #
                         # Check whether the set fix address is above 4G for 32bit image.
@@ -1377,27 +1390,28 @@ class Build():
                     #
                     # Get Module List
                     #
-                    ModuleList = []
+                    ModuleList = {}
                     for Pa in Wa.AutoGenObjectList:
                         for Ma in Pa.ModuleAutoGenList:
                             if Ma == None:
                                 continue
                             if not Ma.IsLibrary:
-                                ModuleList.append (Ma)
+                                ModuleList[Ma.Guid.upper()] = Ma
 
                     MapBuffer = StringIO('')
-                    #
-                    # Rebase module to the preferred memory address before GenFds
-                    #
-                    self._CollectModuleMapBuffer(MapBuffer, ModuleList)
-                    #
-                    # create FDS again for the updated EFI image
-                    #
-                    self._Build("fds", Wa)
+                    if self.LoadFixAddress != 0:
+                        #
+                        # Rebase module to the preferred memory address before GenFds
+                        #
+                        self._CollectModuleMapBuffer(MapBuffer, ModuleList)
+                        #
+                        # create FDS again for the updated EFI image
+                        #
+                        self._Build("fds", Wa)
                     #
                     # Create MAP file for all platform FVs after GenFds.
                     #
-                    self._CollectFvMapBuffer(MapBuffer, Wa)
+                    self._CollectFvMapBuffer(MapBuffer, Wa, ModuleList)
                     #
                     # Save MAP buffer into MAP file.
                     #
@@ -1483,7 +1497,7 @@ class Build():
                     EdkLogger.error("build", BUILD_ERROR, "Failed to build module", ExtraData=GlobalData.gBuildingModule)
 
                 # Create MAP file when Load Fix Address is enabled.
-                if self.Target in ["", "all", "fds"] and self.LoadFixAddress != 0:
+                if self.Target in ["", "all", "fds"]:
                     for Arch in self.ArchList:
                         #
                         # Check whether the set fix address is above 4G for 32bit image.
@@ -1493,30 +1507,31 @@ class Build():
                     #
                     # Get Module List
                     #
-                    ModuleList = []
+                    ModuleList = {}
                     for Pa in Wa.AutoGenObjectList:
                         for Ma in Pa.ModuleAutoGenList:
                             if Ma == None:
                                 continue
                             if not Ma.IsLibrary:
-                                ModuleList.append (Ma)
+                                ModuleList[Ma.Guid.upper()] = Ma
                     #
                     # Rebase module to the preferred memory address before GenFds
                     #
                     MapBuffer = StringIO('')
-                    self._CollectModuleMapBuffer(MapBuffer, ModuleList)
+                    if self.LoadFixAddress != 0:
+                        self._CollectModuleMapBuffer(MapBuffer, ModuleList)
 
                 # Generate FD image if there's a FDF file found
                 if self.Fdf != '' and self.Target in ["", "all", "fds"]:
                     LaunchCommand(Wa.BuildCommand + ["fds"], Wa.MakeFileDir)
 
                 # Create MAP file for all platform FV after GenFds
-                if self.Target in ["", "all", "fds"] and self.LoadFixAddress != 0:
+                if self.Target in ["", "all", "fds"]:
                     if self.Fdf != '':
                         #
                         # Create MAP file for all platform FVs after GenFds.
                         #
-                        self._CollectFvMapBuffer(MapBuffer, Wa)
+                        self._CollectFvMapBuffer(MapBuffer, Wa, ModuleList)
                     #
                     # Save MAP buffer into MAP file.
                     #

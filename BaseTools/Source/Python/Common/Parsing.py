@@ -291,17 +291,17 @@ def QueryInfItem(Table, Model, BelongsToItem):
 # @retval truple() A truple structure as (Family, ToolChain, Flag)
 #
 def GetBuildOption(String, File, LineNo = -1):
+    (Family, ToolChain, Flag) = ('', '', '')
     if String.find(TAB_EQUAL_SPLIT) < 0:
         RaiseParserError(String, 'BuildOptions', File, '[<Family>:]<ToolFlag>=Flag', LineNo)
-    (Family, ToolChain, Flag) = ('', '', '')
-    List = GetSplitValueList(String, TAB_EQUAL_SPLIT, MaxSplit = 1)
-    if List[0].find(':') > -1:
-        Family = List[0][ : List[0].find(':')].strip()
-        ToolChain = List[0][List[0].find(':') + 1 : ].strip()
     else:
-        ToolChain = List[0].strip()
-    Flag = List[1].strip()
-
+        List = GetSplitValueList(String, TAB_EQUAL_SPLIT, MaxSplit = 1)
+        if List[0].find(':') > -1:
+            Family = List[0][ : List[0].find(':')].strip()
+            ToolChain = List[0][List[0].find(':') + 1 : ].strip()
+        else:
+            ToolChain = List[0].strip()
+        Flag = List[1].strip()
     return (Family, ToolChain, Flag)
 
 ## Get Library Class
