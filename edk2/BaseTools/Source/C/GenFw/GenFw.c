@@ -24,6 +24,8 @@ Abstract:
 #ifndef __GNUC__
 #include <windows.h>
 #include <io.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #endif
 #include <stdio.h>
 #include <stdlib.h>
@@ -1034,14 +1036,20 @@ WriteSections(
               - (SecOffset - SecShdr->sh_addr);
             break;
           default:
-            Error (NULL, 0, 3000, "Invalid", "%s unhandled section type %x.", mInImageName, (unsigned) ELF_R_TYPE(Rel->r_info));
+            Error (NULL, 0, 3000, "Invalid", "%s unsupported ELF EM_386 relocation 0x%x.", mInImageName, (unsigned) ELF_R_TYPE(Rel->r_info));
           }
         } else if (Ehdr->e_machine == EM_ARM) {
           switch (ELF32_R_TYPE(Rel->r_info)) {
           case R_ARM_RBASE:   // No relocation - no action required
-          case R_ARM_PC24:    // PC-relative relocations don't require modification
-          case R_ARM_XPC25:   // PC-relative relocations don't require modification
+          
+          // Thease are all PC-relative relocations and don't require modification
+          case R_ARM_PC24:    
+          case R_ARM_XPC25:   
+          case R_ARM_THM_PC22:
+          case R_ARM_THM_JUMP19:
+          case R_ARM_CALL:
             break;
+
           case R_ARM_ABS32:
           case R_ARM_RABS32:
             //
@@ -1050,7 +1058,7 @@ WriteSections(
             *(UINT32 *)Targ = *(UINT32 *)Targ - SymShdr->sh_addr + CoffSectionsOffset[Sym->st_shndx];
             break;
           default:
-            Error (NULL, 0, 3000, "Invalid", "%s unhandled section type %x.", mInImageName, (unsigned) ELF32_R_TYPE(Rel->r_info));
+            Error (NULL, 0, 3000, "Invalid", "WriteSections (): %s unsupported ELF EM_ARM relocation 0x%x.", mInImageName, (unsigned) ELF32_R_TYPE(Rel->r_info));
           }
         }
       }
@@ -1124,7 +1132,7 @@ GetPhdrByIndex (
 
 
 VOID
-WriteRelocations(
+WriteRelocations (
   VOID
   )
 {
@@ -1164,13 +1172,18 @@ WriteRelocations(
               EFI_IMAGE_REL_BASED_HIGHLOW);
               break;
             default:
-              Error (NULL, 0, 3000, "Invalid", "%s unhandled section type %x.", mInImageName, (unsigned) ELF_R_TYPE(Rel->r_info));
+              Error (NULL, 0, 3000, "Invalid", "%s unsupported ELF EM_386 relocation 0x%x.", mInImageName, (unsigned) ELF_R_TYPE(Rel->r_info));
             }
           } else if (Ehdr->e_machine == EM_ARM) {
             switch (ELF32_R_TYPE(Rel->r_info)) {
-            case R_ARM_RBASE:
+            case R_ARM_RBASE: // No relocation - no action required
+          
+            // Thease are all PC-relative relocations and don't require modification
             case R_ARM_PC24:
             case R_ARM_XPC25:
+            case R_ARM_THM_PC22:
+            case R_ARM_THM_JUMP19:
+            case R_ARM_CALL:
               break;
             case R_ARM_ABS32:
             case R_ARM_RABS32:
@@ -1180,8 +1193,9 @@ WriteRelocations(
                 EFI_IMAGE_REL_BASED_HIGHLOW
                 );
               break;
-            default:
-              Error (NULL, 0, 3000, "Invalid", "%s unhandled section type %x.", mInImageName, (unsigned) ELF32_R_TYPE(Rel->r_info));
+
+           default:
+              Error (NULL, 0, 3000, "Invalid", "WriteRelocations(): %s unsupported ELF EM_ARM relocation 0x%x.", mInImageName, (unsigned) ELF32_R_TYPE(Rel->r_info));
             }
           } else {
             Error (NULL, 0, 3000, "Not Supported", "This tool does not support relocations for ELF with e_machine %u (processor type).", (unsigned) Ehdr->e_machine);
@@ -1217,6 +1231,9 @@ WriteRelocations(
             case  DT_RELENT:
               RelElementSize = Dyn->d_un.d_val;
               break;
+
+            default:
+              break;
           }
           Dyn++;
         }
@@ -1226,7 +1243,13 @@ WriteRelocations(
 
         for (K = 0; K < RelSize; K += RelElementSize) {
 
-          Rel = (Elf32_Rel *) ((UINT8 *) Ehdr + DynamicSegment->p_offset + RelOffset + K);
+          if (DynamicSegment->p_paddr == 0) {
+            // This seems to be how it works on armcc???? Have the email in to find out?
+            Rel = (Elf32_Rel *) ((UINT8 *) Ehdr + DynamicSegment->p_offset + RelOffset + K);
+          } else {
+            // This is how it reads in the ELF specification
+            Rel = (Elf32_Rel *) ((UINT8 *) Ehdr + RelOffset + K);
+          }
 
           switch (ELF32_R_TYPE (Rel->r_info)) {
           case  R_ARM_RBASE:
@@ -1242,7 +1265,8 @@ WriteRelocations(
             CoffAddFixup (CoffSectionsOffset[ELF32_R_SYM (Rel->r_info)] + (Rel->r_offset - TargetSegment->p_vaddr), EFI_IMAGE_REL_BASED_HIGHLOW);
             break;
           default:
-            Error (NULL, 0, 3000, "Invalid", "%s bad ARM dynamic relocations, unkown type.", mInImageName);
+            Error (NULL, 0, 3000, "Invalid", "%s bad ARM dynamic relocations, unkown type %d.", mInImageName, ELF32_R_TYPE (Rel->r_info));
+            break;
           }
         }
         break;
@@ -1993,6 +2017,9 @@ Returns:
   FILE                             *ReportFile;
   CHAR8                            *ReportFileName;
   UINTN                            FileLen;
+  time_t                           InputFileTime;
+  time_t                           OutputFileTime;
+  struct stat                      Stat_Buf;
 
   SetUtilityName (UTILITY_NAME);
 
@@ -2038,6 +2065,8 @@ Returns:
   HiiSectionHeader       = NULL;
   NewBaseAddress         = 0;
   NegativeAddr           = FALSE;
+  InputFileTime          = 0;
+  OutputFileTime         = 0;
 
   if (argc == 1) {
     Error (NULL, 0, 1001, "Missing options", "No input options.");
@@ -2434,6 +2463,14 @@ Returns:
   if (OutImageName != NULL) {
     fpOut = fopen (OutImageName, "rb");
     if (fpOut != NULL) {
+      //
+      // Get Output file time stamp
+      //
+      fstat(fileno (fpOut), &Stat_Buf);
+      OutputFileTime = Stat_Buf.st_mtime;
+      //
+      // Get Output file data
+      //
       OutputFileLength = _filelength (fileno (fpOut));
       OutputFileBuffer = malloc (OutputFileLength);
       if (OutputFileBuffer == NULL) {
@@ -2460,6 +2497,14 @@ Returns:
     Error (NULL, 0, 0001, "Error opening file", mInImageName);
     goto Finish;
   }
+  //
+  // Get Iutput file time stamp
+  //
+  fstat(fileno (fpIn), &Stat_Buf);
+  InputFileTime = Stat_Buf.st_mtime;
+  //
+  // Get Input file data
+  //
   InputFileLength = _filelength (fileno (fpIn));
   InputFileBuffer = malloc (InputFileLength);
   if (InputFileBuffer == NULL) {
@@ -3467,6 +3512,27 @@ Returns:
     FileLength = FileLength + sizeof (EFI_TE_IMAGE_HEADER);
     memcpy (FileBuffer, &TEImageHeader, sizeof (EFI_TE_IMAGE_HEADER));
     VerboseMsg ("the size of output file is %u bytes", (unsigned) (FileLength));
+  } else {
+
+    //
+    // Following codes are to fix the objcopy's issue:
+    // objcopy in binutil 2.50.18 will set PE image's charactices to "RELOC_STRIPPED" if image has no ".reloc" section
+    // It cause issue for EFI image which has no ".reloc" sections.
+    // Following codes will be removed when objcopy in binutil fix this problem for PE image.
+    //
+    if ((PeHdr->Pe32.FileHeader.Characteristics & EFI_IMAGE_FILE_RELOCS_STRIPPED) != 0) {
+      if (PeHdr->Pe32.OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+        Optional32 = (EFI_IMAGE_OPTIONAL_HEADER32 *)&PeHdr->Pe32.OptionalHeader;
+        if (Optional32->ImageBase == 0) {
+          PeHdr->Pe32.FileHeader.Characteristics &= ~EFI_IMAGE_FILE_RELOCS_STRIPPED;
+        }
+      } else if (PeHdr->Pe32.OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
+        Optional64 = (EFI_IMAGE_OPTIONAL_HEADER64 *)&PeHdr->Pe32.OptionalHeader;
+        if (Optional64->ImageBase == 0) {
+          PeHdr->Pe32.FileHeader.Characteristics &= ~EFI_IMAGE_FILE_RELOCS_STRIPPED;
+        }
+      }
+    }
   }
 
 WriteFile:
@@ -3487,7 +3553,10 @@ WriteFile:
       VerboseMsg ("the size of output file is %u bytes", (unsigned) FileLength);
     }
   } else {
-    if ((FileLength != OutputFileLength) || (memcmp (FileBuffer, OutputFileBuffer, FileLength) != 0)) {
+    if ((OutputFileTime < InputFileTime) || (FileLength != OutputFileLength) || (memcmp (FileBuffer, OutputFileBuffer, FileLength) != 0)) {
+      //
+      // Update File when File is changed or File is old.
+      //
       fpOut = fopen (OutImageName, "wb");
       if (fpOut == NULL) {
         Error (NULL, 0, 0001, "Error opening output file", OutImageName);

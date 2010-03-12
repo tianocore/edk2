@@ -1760,8 +1760,8 @@ class FdfParser(object):
         if not self.__GetNextHexNumber():
             raise Warning("expected Hex byte At Line ", self.FileName, self.CurrentLineNumber)
         
-        if len(self.__Token) > 4:
-            raise Warning("Hex byte(must be 2 digits) too long At Line ", self.FileName, self.CurrentLineNumber)
+        if len(self.__Token) > 18:
+            raise Warning("Hex string can't be converted to a valid UINT64 value", self.FileName, self.CurrentLineNumber)
         
         DataString = self.__Token
         DataString += ","
@@ -1792,8 +1792,8 @@ class FdfParser(object):
             if not self.__GetNextHexNumber():
                 raise Warning("expected Hex byte At Line ", self.FileName, self.CurrentLineNumber)
         
-            if len(self.__Token) > 4:
-                raise Warning("Hex byte(must be 2 digits) too long At Line ", self.FileName, self.CurrentLineNumber)
+            if len(self.__Token) > 18:
+                raise Warning("Hex string can't be converted to a valid UINT64 value", self.FileName, self.CurrentLineNumber)
         
             DataString = self.__Token
             DataString += ","

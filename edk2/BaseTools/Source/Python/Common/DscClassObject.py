@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define each component of DSC file
 #
-# Copyright (c) 2007 ~ 2008, Intel Corporation
+# Copyright (c) 2007 - 2010, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -989,10 +989,14 @@ class Dsc(DscObject):
             #
             elif PreviousIf[2] in (MODEL_META_DATA_CONDITIONAL_STATEMENT_IF, Model):
                 List = PreviousIf[0].split(' ')
-                Value1 = List[0]
-                Value2 = List[1]
-                Value3 = List[2]
-                Value3 = SplitString(Value3)
+                Value1, Value2, Value3 = '', '==', '0'
+                if len(List) == 3:
+                    Value1 = List[0]
+                    Value2 = List[1]
+                    Value3 = List[2]
+                    Value3 = SplitString(Value3)
+                if len(List) == 1:
+                    Value1 = List[0]
                 Model = PreviousIf[2]
                 self.TblDsc.Insert(Model, Value1, Value2, Value3, ArchList, BelongsToItem, self.FileID, PreviousIf[1], StartColumn, EndLine, EndColumn, Enabled)
             #

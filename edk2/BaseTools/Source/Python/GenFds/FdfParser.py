@@ -1787,19 +1787,27 @@ class FdfParser:
         if not self.__GetNextHexNumber():
             raise Warning("expected Hex byte", self.FileName, self.CurrentLineNumber)
 
-        if len(self.__Token) > 4:
-            raise Warning("Hex byte(must be 2 digits) too long", self.FileName, self.CurrentLineNumber)
+        if len(self.__Token) > 18:
+            raise Warning("Hex string can't be converted to a valid UINT64 value", self.FileName, self.CurrentLineNumber)
 
-        DataString = self.__Token
-        DataString += ","
+        # convert hex string value to byte hex string array
+        AllString = self.__Token
+        AllStrLen = len (AllString)
+        DataString = ""
+        while AllStrLen > 4:
+            DataString = DataString + "0x" + AllString[AllStrLen - 2: AllStrLen] + ","
+            AllStrLen  = AllStrLen - 2
+        DataString = DataString + AllString[:AllStrLen] + ","
 
-        while self.__IsToken(","):
-            if not self.__GetNextHexNumber():
-                raise Warning("Invalid Hex number", self.FileName, self.CurrentLineNumber)
-            if len(self.__Token) > 4:
-                raise Warning("Hex byte(must be 2 digits) too long", self.FileName, self.CurrentLineNumber)
-            DataString += self.__Token
-            DataString += ","
+        # byte value array
+        if len (self.__Token) <= 4:
+            while self.__IsToken(","):
+                if not self.__GetNextHexNumber():
+                    raise Warning("Invalid Hex number", self.FileName, self.CurrentLineNumber)
+                if len(self.__Token) > 4:
+                    raise Warning("Hex byte(must be 2 digits) too long", self.FileName, self.CurrentLineNumber)
+                DataString += self.__Token
+                DataString += ","
 
         if not self.__IsToken( "}"):
             raise Warning("expected '}'", self.FileName, self.CurrentLineNumber)
@@ -1819,18 +1827,27 @@ class FdfParser:
             if not self.__GetNextHexNumber():
                 raise Warning("expected Hex byte", self.FileName, self.CurrentLineNumber)
 
-            if len(self.__Token) > 4:
-                raise Warning("Hex byte(must be 2 digits) too long", self.FileName, self.CurrentLineNumber)
+            if len(self.__Token) > 18:
+                raise Warning("Hex string can't be converted to a valid UINT64 value", self.FileName, self.CurrentLineNumber)
 
-            DataString = self.__Token
-            DataString += ","
+            # convert hex string value to byte hex string array
+            AllString = self.__Token
+            AllStrLen = len (AllString)
+            DataString = ""
+            while AllStrLen > 4:
+                DataString = DataString + "0x" + AllString[AllStrLen - 2: AllStrLen] + ","
+                AllStrLen  = AllStrLen - 2
+            DataString = DataString + AllString[:AllStrLen] + ","
 
-            while self.__IsToken(","):
-                self.__GetNextHexNumber()
-                if len(self.__Token) > 4:
-                    raise Warning("Hex byte(must be 2 digits) too long", self.FileName, self.CurrentLineNumber)
-                DataString += self.__Token
-                DataString += ","
+            # byte value array
+            if len (self.__Token) <= 4:
+                while self.__IsToken(","):
+                    if not self.__GetNextHexNumber():
+                        raise Warning("Invalid Hex number", self.FileName, self.CurrentLineNumber)
+                    if len(self.__Token) > 4:
+                        raise Warning("Hex byte(must be 2 digits) too long", self.FileName, self.CurrentLineNumber)
+                    DataString += self.__Token
+                    DataString += ","
 
             if not self.__IsToken( "}"):
                 raise Warning("expected '}'", self.FileName, self.CurrentLineNumber)

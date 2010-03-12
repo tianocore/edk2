@@ -131,6 +131,10 @@
         "$(CC)" $(CC_FLAGS) -o ${dst} $(INC) ${src}
         "$(SYMRENAME)" $(SYMRENAME_FLAGS) ${dst}
 
+    <Command.ARMGCC>
+        "$(CC)" $(CC_FLAGS) -o ${dst} $(INC) ${src}
+
+
 [C-Header-File]
     <InputFile>
         *.h, *.H
@@ -215,7 +219,7 @@
     <Command.RVCT>
         "$(SLINK)" $(SLINK_FLAGS) ${dst} --via $(OBJECT_FILES_LIST)
     
-    <Command.RVCTCYGWIN>
+    <Command.RVCTCYGWIN, Command.ARMGCC>
         # $(OBJECT_FILES_LIST) has wrong paths for cygwin
         "$(SLINK)" $(SLINK_FLAGS) ${dst} $(OBJECT_FILES)
 
@@ -238,6 +242,9 @@
     <Command.GCC>
         "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -\( $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST) -\) $(DLINK2_FLAGS)
         "$(OBJCOPY)" $(OBJCOPY_FLAGS) ${dst}
+
+    <Command.ARMGCC>
+        "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -( $(DLINK_SPATH) $(STATIC_LIBRARY_FILES) -) $(DLINK2_FLAGS)
 
     <Command.RVCT>
         "$(DLINK)" $(DLINK_FLAGS) -o ${dst} $(DLINK_SPATH) --via $(STATIC_LIBRARY_FILES_LIST) $(DLINK2_FLAGS)
@@ -266,6 +273,9 @@
     <Command.GCC>
         "$(DLINK)" $(DLINK_FLAGS) -\( $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST) -\) $(DLINK2_FLAGS)
 
+    <Command.ARMGCC>
+        "$(DLINK)" $(DLINK_FLAGS) -( $(DLINK_SPATH) $(STATIC_LIBRARY_FILES) -) $(DLINK2_FLAGS)
+
     <Command.RVCT>
         "$(DLINK)" $(DLINK_FLAGS) -o ${dst} $(DLINK_SPATH) --via $(STATIC_LIBRARY_FILES_LIST) $(DLINK2_FLAGS)
 
@@ -284,7 +294,7 @@
     <OutputFile>
         $(DEBUG_DIR)(+)$(MODULE_NAME).efi
 
-    <Command.MSFT, Command.INTEL, Command.RVCT>  
+    <Command.MSFT, Command.INTEL, Command.RVCT, Command.ARMGCC>  
         GenFw -e $(MODULE_TYPE) -o ${dst} ${src}
         $(CP) ${dst} $(OUTPUT_DIR)
         $(CP) ${dst} $(BIN_DIR)
