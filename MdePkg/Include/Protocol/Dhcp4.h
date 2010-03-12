@@ -4,17 +4,17 @@
   These protocols are used to collect configuration information for the EFI IPv4 Protocol
   drivers and to provide DHCPv4 server and PXE boot server discovery services.
 
-  Copyright (c) 2006 - 2010, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:          
-  This Protocol is introduced in UEFI Specification 2.0
+  This Protocol was introduced in UEFI Specification 2.0.
 
 **/
 
@@ -64,11 +64,11 @@ typedef struct {
   UINT32            Xid;
   UINT16            Seconds;
   UINT16            Reserved;
-  EFI_IPv4_ADDRESS  ClientAddr;       ///< Client IP address from client
-  EFI_IPv4_ADDRESS  YourAddr;         ///< Client IP address from server
-  EFI_IPv4_ADDRESS  ServerAddr;       ///< IP address of next server in bootstrap
-  EFI_IPv4_ADDRESS  GatewayAddr;      ///< Relay agent IP address
-  UINT8             ClientHwAddr[16]; ///< Client hardware address
+  EFI_IPv4_ADDRESS  ClientAddr;       ///< Client IP address from client.
+  EFI_IPv4_ADDRESS  YourAddr;         ///< Client IP address from server.
+  EFI_IPv4_ADDRESS  ServerAddr;       ///< IP address of next server in bootstrap.
+  EFI_IPv4_ADDRESS  GatewayAddr;      ///< Relay agent IP address.
+  UINT8             ClientHwAddr[16]; ///< Client hardware address.
   CHAR8             ServerName[64];
   CHAR8             BootFileName[128];
 }EFI_DHCP4_HEADER;
@@ -107,11 +107,11 @@ typedef struct {
 
 typedef enum {
   ///
-  /// The EFI DHCPv4 Protocol driver is stopped
+  /// The EFI DHCPv4 Protocol driver is stopped.
   ///
   Dhcp4Stopped        = 0x0,
   ///
-  /// The EFI DHCPv4 Protocol driver is inactive
+  /// The EFI DHCPv4 Protocol driver is inactive.
   ///
   Dhcp4Init           = 0x1,
   ///
@@ -137,7 +137,7 @@ typedef enum {
   ///
   Dhcp4Rebinding      = 0x6,
   ///
-  /// The EFI DHCPv4 Protocol driver is initialized with a previously
+  /// The EFI DHCPv4 Protocol driver was initialized with a previously
   /// allocated or known IP address.
   ///
   Dhcp4InitReboot     = 0x7,
@@ -216,9 +216,9 @@ typedef enum{
   There are three possible returned values, which are described in the following
   table.
 
-  @param  This                  Pointer to the EFI DHCPv4 Protocol instance that is used to
+  @param  This                  The pointer to the EFI DHCPv4 Protocol instance that is used to
                                 configure this callback function.
-  @param  Context               Pointer to the context that is initialized by
+  @param  Context               The pointer to the context that is initialized by
                                 EFI_DHCP4_PROTOCOL.Configure().
   @param  CurrentState          The current operational state of the EFI DHCPv4 Protocol
                                 driver.
@@ -251,25 +251,25 @@ EFI_STATUS
 
 typedef struct {
   ///
-  /// Number of times to try sending a packet during the Dhcp4SendDiscover
+  /// The number of times to try sending a packet during the Dhcp4SendDiscover
   /// event and waiting for a response during the Dhcp4RcvdOffer event.
   /// Set to zero to use the default try counts and timeout values.
   ///
   UINT32                      DiscoverTryCount;
   ///
-  /// Maximum amount of time (in seconds) to wait for returned packets in each 
+  /// The maximum amount of time (in seconds) to wait for returned packets in each 
   /// of the retries. Timeout values of zero will default to a timeout value 
   /// of one second. Set to NULL to use default timeout values.
   ///
   UINT32                      *DiscoverTimeout;
   ///
-  /// Number of times to try sending a packet during the Dhcp4SendRequest event
+  /// The number of times to try sending a packet during the Dhcp4SendRequest event
   /// and waiting for a response during the Dhcp4RcvdAck event before accepting
   /// failure. Set to zero to use the default try counts and timeout values.
   ///
   UINT32                      RequestTryCount;
   ///
-  /// Maximum amount of time (in seconds) to wait for return packets in each of the retries. 
+  /// The maximum amount of time (in seconds) to wait for return packets in each of the retries. 
   /// Timeout values of zero will default to a timeout value of one second. 
   /// Set to NULL to use default timeout values.
   ///
@@ -288,7 +288,7 @@ typedef struct {
   ///
   EFI_DHCP4_CALLBACK          Dhcp4Callback;
   ///
-  /// Pointer to the context that will be passed to Dhcp4Callback when it is called.
+  /// The pointer to the context that will be passed to Dhcp4Callback when it is called.
   ///
   VOID                        *CallbackContext;
   ///
@@ -379,15 +379,15 @@ typedef struct {
   ///
   EFI_EVENT               CompletionEvent;
   ///
-  /// Pointer to the server IP address. This address may be a unicast, multicast, or broadcast address.
+  /// The pointer to the server IP address. This address may be a unicast, multicast, or broadcast address.
   ///
   EFI_IPv4_ADDRESS        RemoteAddress;
   ///
-  /// Server listening port number. If zero, the default server listening port number (67) will be used.
+  /// The server listening port number. If zero, the default server listening port number (67) will be used.
   ///
   UINT16                  RemotePort;
   ///
-  /// Pointer to the gateway address to override the existing setting.
+  /// The pointer to the gateway address to override the existing setting.
   ///
   EFI_IPv4_ADDRESS        GatewayAddress;
   ///
@@ -400,11 +400,11 @@ typedef struct {
   ///
   EFI_DHCP4_LISTEN_POINT  *ListenPoints;
   ///
-  /// Number of seconds to collect responses. Zero is invalid.
+  /// The number of seconds to collect responses. Zero is invalid.
   ///
   UINT32                  TimeoutValue;
   ///
-  /// Pointer to the packet to be transmitted.
+  /// The pointer to the packet to be transmitted.
   ///
   EFI_DHCP4_PACKET        *Packet;
   ///
@@ -412,7 +412,7 @@ typedef struct {
   ///
   UINT32                  ResponseCount;
   ///
-  /// Pointer to the allocated list of received packets.
+  /// The pointer to the allocated list of received packets.
   ///
   EFI_DHCP4_PACKET        *ResponseList;
 } EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN;
@@ -424,8 +424,8 @@ typedef struct {
   The GetModeData() function returns the current operating mode and cached data
   packet for the EFI DHCPv4 Protocol driver.
 
-  @param  This          Pointer to the EFI_DHCP4_PROTOCOL instance.
-  @param  Dhcp4ModeData Pointer to storage for the EFI_DHCP4_MODE_DATA structure.
+  @param  This          The pointer to the EFI_DHCP4_PROTOCOL instance.
+  @param  Dhcp4ModeData The pointer to storage for the EFI_DHCP4_MODE_DATA structure.
 
   @retval EFI_SUCCESS           The mode data was returned.
   @retval EFI_INVALID_PARAMETER This is NULL.
@@ -453,7 +453,7 @@ EFI_STATUS
   When this driver is in the Dhcp4Stopped state, it can transfer into one of the
   following two possible initial states:
   * Dhcp4Init
-  * Dhcp4InitReboot
+  * Dhcp4InitReboot.
   The driver can transfer into these states by calling Configure() with a non-NULL
   Dhcp4CfgData. The driver will transfer into the appropriate state based on the
   supplied client network address in the ClientAddress parameter and DHCP options
@@ -464,8 +464,8 @@ EFI_STATUS
   wants to make it possible for another instance to configure the EFI DHCPv4 Protocol
   driver, it must call this function with Dhcp4CfgData set to NULL.
 
-  @param  This                   Pointer to the EFI_DHCP4_PROTOCOL instance.
-  @param  Dhcp4CfgData           Pointer to the EFI_DHCP4_CONFIG_DATA.
+  @param  This                   The pointer to the EFI_DHCP4_PROTOCOL instance.
+  @param  Dhcp4CfgData           The pointer to the EFI_DHCP4_CONFIG_DATA.
 
   @retval EFI_SUCCESS           The EFI DHCPv4 Protocol driver is now in the Dhcp4Init or
                                 Dhcp4InitReboot state, if the original state of this driver
@@ -511,8 +511,8 @@ EFI_STATUS
   by EFI_DHCP4_PROTOCOL.Configure() will be called and the user can take this
   opportunity to control the process.
   
-  @param  This            Pointer to the EFI_DHCP4_PROTOCOL instance.
-  @param  CompletionEvent If not NULL, indicates the event that will be signaled when the
+  @param  This            The pointer to the EFI_DHCP4_PROTOCOL instance.
+  @param  CompletionEvent If not NULL, it indicates the event that will be signaled when the
                           EFI DHCPv4 Protocol driver is transferred into the
                           Dhcp4Bound state or when the DHCP process is aborted.
                           EFI_DHCP4_PROTOCOL.GetModeData() can be called to
@@ -546,7 +546,7 @@ EFI_STATUS
   Extends the lease time by sending a request packet.
   
   The RenewRebind() function is used to manually extend the lease time when the
-  EFI DHCPv4 Protocol driver is in the Dhcp4Bound state and the lease time has
+  EFI DHCPv4 Protocol driver is in the Dhcp4Bound state, and the lease time has
   not expired yet. This function will send a request packet to the previously
   found server (or to any server when RebindRequest is TRUE) and transfer the
   state into the Dhcp4Renewing state (or Dhcp4Rebinding when RebindingRequest is
@@ -554,10 +554,10 @@ EFI_STATUS
   If no response is received before the try count is exceeded (the RequestTryCount
   field that is specified in EFI_DHCP4_CONFIG_DATA) but before the lease time that
   was issued by the previous server expires, the driver will return to the Dhcp4Bound
-  state and the previous configuration is restored. The outgoing and incoming packets
+  state, and the previous configuration is restored. The outgoing and incoming packets
   can be captured by the EFI_DHCP4_CALLBACK function.
 
-  @param  This            Pointer to the EFI_DHCP4_PROTOCOL instance.
+  @param  This            The pointer to the EFI_DHCP4_PROTOCOL instance.
   @param  RebindRequest   If TRUE, this function broadcasts the request packets and enters
                           the Dhcp4Rebinding state. Otherwise, it sends a unicast
                           request packet and enters the Dhcp4Renewing state.
@@ -599,9 +599,9 @@ EFI_STATUS
     EFI_DHCP4_PROTOCOL.Configure() function to 0.0.0.0 when the driver is in
     Dhcp4InitReboot state
   After a successful call to this function, the EFI DHCPv4 Protocol driver returns
-  to the Dhcp4Init state and any subsequent incoming packets will be discarded silently.
+  to the Dhcp4Init state, and any subsequent incoming packets will be discarded silently.
 
-  @param  This                  Pointer to the EFI_DHCP4_PROTOCOL instance.
+  @param  This                  The pointer to the EFI_DHCP4_PROTOCOL instance.
 
   @retval EFI_SUCCESS           The EFI DHCPv4 Protocol driver is now in the Dhcp4Init phase.
   @retval EFI_INVALID_PARAMETER This is NULL.
@@ -624,7 +624,7 @@ EFI_STATUS
   before DHCP configuration process can be started again. This function can be
   called when the EFI DHCPv4 Protocol driver is in any state.
 
-  @param  This                  Pointer to the EFI_DHCP4_PROTOCOL instance.
+  @param  This                  The pointer to the EFI_DHCP4_PROTOCOL instance.
 
   @retval EFI_SUCCESS           The EFI DHCPv4 Protocol driver is now in the Dhcp4Stopped phase.
   @retval EFI_INVALID_PARAMETER This is NULL.
@@ -644,17 +644,17 @@ EFI_STATUS
   does not change any state of the EFI DHCPv4 Protocol driver and can be used at
   any time.
 
-  @param  This        Pointer to the EFI_DHCP4_PROTOCOL instance.
+  @param  This        The pointer to the EFI_DHCP4_PROTOCOL instance.
   @param  SeedPacket  Initial packet to be used as a base for building new packet.
   @param  DeleteCount Number of opcodes in the DeleteList.
   @param  DeleteList  List of opcodes to be deleted from the seed packet.
                       Ignored if DeleteCount is zero.
   @param  AppendCount Number of entries in the OptionList.
-  @param  AppendList  Pointer to a DHCP option list to be appended to SeedPacket.
+  @param  AppendList  The pointer to a DHCP option list to be appended to SeedPacket.
                       If SeedPacket also contains options in this list, they are
                       replaced by new options (except pad option). Ignored if
                       AppendCount is zero. Type EFI_DHCP4_PACKET_OPTION
-  @param  NewPacket   Pointer to storage for the pointer to the new allocated packet.
+  @param  NewPacket   The pointer to storage for the pointer to the new allocated packet.
                       Use the EFI Boot Service FreePool() on the resulting pointer
                       when done with the packet.
 
@@ -689,10 +689,10 @@ EFI_STATUS
   
   The TransmitReceive() function is used to transmit a DHCP packet and optionally
   wait for the response from servers. This function does not change the state of
-  the EFI DHCPv4 Protocol driver and thus can be used at any time.
+  the EFI DHCPv4 Protocol driver. It can be used at any time because of this.
 
-  @param  This    Pointer to the EFI_DHCP4_PROTOCOL instance.
-  @param  Token   Pointer to the EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN structure.
+  @param  This    The pointer to the EFI_DHCP4_PROTOCOL instance.
+  @param  Token   The pointer to the EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN structure.
 
   @retval EFI_SUCCESS           The packet was successfully queued for transmission.
   @retval EFI_INVALID_PARAMETER One or more of the following conditions is TRUE:
@@ -728,25 +728,25 @@ EFI_STATUS
   If *OptionCount is zero or there isn't enough space for all of them, the number
   of DHCP options in the Packet is returned in OptionCount.
 
-  @param  This             Pointer to the EFI_DHCP4_PROTOCOL instance.
-  @param  Packet           Pointer to packet to be parsed.
+  @param  This             The pointer to the EFI_DHCP4_PROTOCOL instance.
+  @param  Packet           The pointer to packet to be parsed.
   @param  OptionCount      On input, the number of entries in the PacketOptionList.
                            On output, the number of entries that were written into the
                            PacketOptionList.
-  @param  PacketOptionList List of packet option entries to be filled in. End option or pad
+  @param  PacketOptionList A list of packet option entries to be filled in. End option or pad
                            options are not included.
 
   @retval EFI_SUCCESS           The packet was successfully parsed.
   @retval EFI_INVALID_PARAMETER One or more of the following conditions is TRUE:
                                 This is NULL.
-                                Packet is NULL.
-                                Packet is not a well-formed DHCP packet.
+                                The packet is NULL.
+                                The packet is not a well-formed DHCP packet.
                                 OptionCount is NULL.
   @retval EFI_BUFFER_TOO_SMALL  One or more of the following conditions is TRUE:
                                 1) *OptionCount is smaller than the number of options that
                                 were found in the Packet.
                                 2) PacketOptionList is NULL.
-  @retval EFI_OUT_OF_RESOURCE   The packet is failed to parse because of resource shortage.
+  @retval EFI_OUT_OF_RESOURCE   The packet failed to parse because of a resource shortage.
 
 **/
 typedef

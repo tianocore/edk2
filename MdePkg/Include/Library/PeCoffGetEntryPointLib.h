@@ -1,11 +1,11 @@
 /** @file
   Provides a service to retrieve the PE/COFF entry point from a PE/COFF image.
 
-Copyright (c) 2006 - 2010, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                            
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
@@ -25,8 +25,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   If Pe32Data is NULL, then ASSERT().
   If EntryPoint is NULL, then ASSERT().
 
-  @param  Pe32Data                  Pointer to the PE/COFF image that is loaded in system memory.
-  @param  EntryPoint                Pointer to entry point to the PE/COFF image to return.
+  @param  Pe32Data                  The pointer to the PE/COFF image that is loaded in system memory.
+  @param  EntryPoint                The pointer to entry point to the PE/COFF image to return.
 
   @retval RETURN_SUCCESS            EntryPoint was returned.
   @retval RETURN_INVALID_PARAMETER  The entry point could not be found in the PE/COFF image.
@@ -45,7 +45,7 @@ PeCoffLoaderGetEntryPoint (
   Returns the machine type from the PE/COFF image specified by Pe32Data.
   If Pe32Data is NULL, then ASSERT().
 
-  @param  Pe32Data   Pointer to the PE/COFF image that is loaded in system
+  @param  Pe32Data   The pointer to the PE/COFF image that is loaded in system
                      memory.
 
   @return Machine type or zero if not a valid image.
@@ -69,10 +69,10 @@ PeCoffLoaderGetMachineType (
   then NULL is returned.
   If Pe32Data is NULL, then ASSERT().
 
-  @param  Pe32Data   Pointer to the PE/COFF image that is loaded in system
+  @param  Pe32Data   The pointer to the PE/COFF image that is loaded in system
                      memory.
 
-  @return The PDB file name for the PE/COFF image specified by Pe32Data or NULL
+  @return The PDB file name for the PE/COFF image specified by Pe32Data, or NULL
           if it cannot be retrieved.
 
 **/
@@ -89,10 +89,10 @@ PeCoffLoaderGetPdbPointer (
   Returns the size of the PE/COFF header specified by Pe32Data.
   If Pe32Data is NULL, then ASSERT().
 
-  @param  Pe32Data   Pointer to the PE/COFF image that is loaded in system
+  @param  Pe32Data   The pointer to the PE/COFF image that is loaded in system
                      memory.
 
-  @return Size of PE/COFF header in bytes or zero if not a valid image.
+  @return Size of PE/COFF header in bytes, or zero if not a valid image.
 
 **/
 UINT32

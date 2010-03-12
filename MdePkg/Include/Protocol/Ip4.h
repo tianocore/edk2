@@ -4,23 +4,23 @@
   sections:
   - EFI IPv4 Service Binding Protocol
   - EFI IPv4 Variable
-  - EFI IPv4 Protocol
+  - EFI IPv4 Protocol.
   The EFI IPv4 Protocol provides basic network IPv4 packet I/O services,
   which includes support foR a subset of the Internet Control Message 
   Protocol (ICMP) and may include support for the Internet Group Management
   Protocol (IGMP).
   
-  Copyright (c) 2006 - 2009, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.  
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.   
 
   @par Revision Reference:          
-  This Protocol is introduced in UEFI Specification 2.0        
+  This Protocol is introduced in UEFI Specification 2.0.        
 
 **/
 
@@ -269,10 +269,10 @@ typedef struct {
   function is used optionally to retrieve the operational mode data of underlying
   networks or drivers.
 
-  @param  This          Pointer to the EFI_IP4_PROTOCOL instance.
-  @param  Ip4ModeData   Pointer to the EFI IPv4 Protocol mode data structure.
-  @param  MnpConfigData Pointer to the managed network configuration data structure.
-  @param  SnpModeData   Pointer to the simple network mode data structure.
+  @param  This          The pointer to the EFI_IP4_PROTOCOL instance.
+  @param  Ip4ModeData   The pointer to the EFI IPv4 Protocol mode data structure.
+  @param  MnpConfigData The pointer to the managed network configuration data structure.
+  @param  SnpModeData   The pointer to the simple network mode data structure.
 
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_INVALID_PARAMETER This is NULL.
@@ -311,8 +311,8 @@ EFI_STATUS
   requests will be cancelled. Their completion token status will be set to EFI_ABORTED
   and their events will be signaled.
 
-  @param  This         Pointer to the EFI_IP4_PROTOCOL instance.
-  @param  IpConfigData Pointer to the EFI IPv4 Protocol configuration data structure.
+  @param  This         The pointer to the EFI_IP4_PROTOCOL instance.
+  @param  IpConfigData The pointer to the EFI IPv4 Protocol configuration data structure.
 
   @retval EFI_SUCCESS           The driver instance was successfully opened.
   @retval EFI_NO_MAPPING        When using the default address, configuration (DHCP, BOOTP,
@@ -350,9 +350,9 @@ EFI_STATUS
   
   If JoinFlag is FALSE and GroupAddress is NULL, all joined groups will be left.
 
-  @param  This                  Pointer to the EFI_IP4_PROTOCOL instance.
+  @param  This                  The pointer to the EFI_IP4_PROTOCOL instance.
   @param  JoinFlag              Set to TRUE to join the multicast group session and FALSE to leave.
-  @param  GroupAddress          Pointer to the IPv4 multicast address.
+  @param  GroupAddress          The pointer to the IPv4 multicast address.
 
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_INVALID_PARAMETER One or more of the following is TRUE:
@@ -403,7 +403,7 @@ EFI_STATUS
   copies will be updated whenever the EIF IPv4 Protocol driver reconfigures its
   instances. As a result, client modification to the routing table will be lost.
 
-  @param  This                   Pointer to the EFI_IP4_PROTOCOL instance.
+  @param  This                   The pointer to the EFI_IP4_PROTOCOL instance.
   @param  DeleteRoute            Set to TRUE to delete this route from the routing table. Set to
                                  FALSE to add this route to the routing table. SubnetAddress
                                  and SubnetMask are used as the key to each route entry.
@@ -446,8 +446,8 @@ EFI_STATUS
   EFI IPv4 Protocol instance. Whenever the packet in the token is sent out or some
   errors occur, the event in the token will be signaled and the status is updated.
 
-  @param  This  Pointer to the EFI_IP4_PROTOCOL instance.
-  @param  Token Pointer to the transmit token.
+  @param  This  The pointer to the EFI_IP4_PROTOCOL instance.
+  @param  Token The pointer to the transmit token.
 
   @retval  EFI_SUCCESS           The data has been queued for transmission.
   @retval  EFI_NOT_STARTED       This instance has not been started.
@@ -486,8 +486,8 @@ EFI_STATUS
   driver updates the Token.Status and Token.Packet.RxData fields and the Token.Event
   is signaled.
 
-  @param  This  Pointer to the EFI_IP4_PROTOCOL instance.
-  @param  Token Pointer to a token that is associated with the receive data descriptor.
+  @param  This  The pointer to the EFI_IP4_PROTOCOL instance.
+  @param  Token The pointer to a token that is associated with the receive data descriptor.
 
   @retval EFI_SUCCESS           The receive completion token was cached.
   @retval EFI_NOT_STARTED       This EFI IPv4 Protocol instance has not been started.
@@ -524,8 +524,8 @@ EFI_STATUS
   asynchronous operation has completed, this function will not signal the token
   and EFI_NOT_FOUND is returned.
 
-  @param  This  Pointer to the EFI_IP4_PROTOCOL instance.
-  @param  Token Pointer to a token that has been issued by
+  @param  This  The pointer to the EFI_IP4_PROTOCOL instance.
+  @param  Token The pointer to a token that has been issued by
                 EFI_IP4_PROTOCOL.Transmit() or
                 EFI_IP4_PROTOCOL.Receive(). If NULL, all pending
                 tokens are aborted. Type EFI_IP4_COMPLETION_TOKEN is
@@ -564,7 +564,7 @@ EFI_STATUS
   experiencing packet loss should try calling the EFI_IP4_PROTOCOL.Poll() function
   more often.
 
-  @param  This Pointer to the EFI_IP4_PROTOCOL instance.
+  @param  This The pointer to the EFI_IP4_PROTOCOL instance.
 
   @retval  EFI_SUCCESS           Incoming or outgoing data was processed.
   @retval  EFI_NOT_STARTED       This EFI IPv4 Protocol instance has not been started.

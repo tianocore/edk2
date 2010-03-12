@@ -2,13 +2,13 @@
   This file contains just some basic definitions that are needed by drivers
   that dealing with ATA/ATAPI interface.
 
-Copyright (c) 2007 - 2010, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+Copyright (c) 2007 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -19,16 +19,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #pragma pack(1)
 
 ///
-/// ATA5_IDENTIFY_DATA is defined in ATA-5
-/// (This structure is provided here mainly for backward-compatibility support.
-/// Old drivers may reference some field that is marked "obsolete" in 
-/// ATA_IDENTIFY_DATA, which current conforms to ATA-8) 
+/// ATA5_IDENTIFY_DATA is defined in ATA-5.
+/// (This structure is provided mainly for backward-compatibility support.
+/// Old drivers may reference fields that are marked "obsolete" in 
+/// ATA_IDENTIFY_DATA, which currently conforms to ATA-8.) 
 ///
 typedef struct {    
-  UINT16  config;             ///< General Configuration 
-  UINT16  cylinders;          ///< Number of Cylinders 
+  UINT16  config;             ///< General Configuration.
+  UINT16  cylinders;          ///< Number of Cylinders.
   UINT16  reserved_2; 
-  UINT16  heads;              ///< Number of logical heads 
+  UINT16  heads;              ///< Number of logical heads. 
   UINT16  vendor_data1; 
   UINT16  vendor_data2; 
   UINT16  sectors_per_track; 
@@ -77,14 +77,14 @@ typedef struct {
 } ATA5_IDENTIFY_DATA;
 
 ///
-/// ATA_IDENTIFY_DATA is strictly complied with ATA/ATAPI-8 Spec
+/// ATA_IDENTIFY_DATA strictly complies with ATA/ATAPI-8 Spec
 /// to define the data returned by an ATA device upon successful
-/// completion of the ATA IDENTIFY_DEVICE command
+/// completion of the ATA IDENTIFY_DEVICE command.
 ///
 typedef struct {
-  UINT16  config;                                  ///< General Configuration
+  UINT16  config;                                  ///< General Configuration.
   UINT16  obsolete_1;
-  UINT16  specific_config;                         ///< Specific Configuration
+  UINT16  specific_config;                         ///< Specific Configuration.
   UINT16  obsolete_3;
   UINT16  retired_4_5[2]; 
   UINT16  obsolete_6;
@@ -114,7 +114,7 @@ typedef struct {
   UINT16  min_pio_cycle_time_with_flow_control; 
   UINT16  reserved_69_74[6]; 
   UINT16  queue_depth;     
-  UINT16  reserved_76_79[4];                       ///< reserved for Serial ATA
+  UINT16  reserved_76_79[4];                       ///< Reserved for Serial ATA.
   UINT16  major_version_no; 
   UINT16  minor_version_no; 
   UINT16  command_set_supported_82;                ///< word 82
@@ -176,14 +176,14 @@ typedef struct {
 } ATA_IDENTIFY_DATA;
 
 ///
-/// ATAPI_IDENTIFY_DATA is strictly complied with ATA/ATAPI-8 Spec
+/// ATAPI_IDENTIFY_DATA strictly complies with ATA/ATAPI-8 Spec
 /// to define the data returned by an ATAPI device upon successful
-/// completion of the ATA IDENTIFY_PACKET_DEVICE command
+/// completion of the ATA IDENTIFY_PACKET_DEVICE command.
 ///
 typedef struct {
-  UINT16  config;                                  ///< General Configuration
+  UINT16  config;                                  ///< General Configuration.
   UINT16  reserved_1;
-  UINT16  specific_config;                         ///< Specific Configuration
+  UINT16  specific_config;                         ///< Specific Configuration.
   UINT16  reserved_3_9[7];
   CHAR8   SerialNo[20];                            ///< word 10~19
   UINT16  reserved_20_22[3];
@@ -239,14 +239,14 @@ typedef struct {
 
 
 ///
-/// Standard Quiry Data format, defined in SFF-8070i(ATAPI Removable Rewritable Specification)
+/// Standard Quiry Data format, defined in SFF-8070i(ATAPI Removable Rewritable Specification).
 ///
 typedef struct {
   UINT8 peripheral_type;
   UINT8 RMB;
   UINT8 version;
   UINT8 response_data_format;
-  UINT8 addnl_length;     ///< n - 4, Numbers of bytes following this one
+  UINT8 addnl_length;     ///< n - 4, Numbers of bytes following this one.
   UINT8 reserved_5;
   UINT8 reserved_6;
   UINT8 reserved_7;
@@ -256,14 +256,14 @@ typedef struct {
   UINT8 vendor_specific_36_55[55 - 36 + 1];
   UINT8 reserved_56_95[95 - 56 + 1];
   ///
-  /// Vendor specific parameters fields, the sizeof (ATAPI_INQUIRY_DATA) is 254
+  /// Vendor-specific parameters fields. The sizeof (ATAPI_INQUIRY_DATA) is 254
   /// since allocation_length is one byte in ATAPI_INQUIRY_CMD.
   ///
   UINT8 vendor_specific_96_253[253 - 96 + 1];
 } ATAPI_INQUIRY_DATA;
 
 ///
-/// Request Sense Standard Data, defined in SFF-8070i(ATAPI Removable Rewritable Specification)
+/// Request Sense Standard Data, defined in SFF-8070i(ATAPI Removable Rewritable Specification).
 ///
 typedef struct {
   UINT8 error_code : 7;
@@ -291,7 +291,7 @@ typedef struct {
 } ATAPI_REQUEST_SENSE_DATA;
 
 ///
-/// READ CAPACITY Data, defined in SFF-8070i(ATAPI Removable Rewritable Specification)
+/// READ CAPACITY Data, defined in SFF-8070i(ATAPI Removable Rewritable Specification).
 ///
 typedef struct {
   UINT8 LastLba3;
@@ -306,7 +306,7 @@ typedef struct {
 
 ///
 /// Capacity List Header + Current/Maximum Capacity Descriptor,
-/// defined in SFF-8070i(ATAPI Removable Rewritable Specification)
+/// defined in SFF-8070i(ATAPI Removable Rewritable Specification).
 ///
 typedef struct {
   UINT8 reserved_0;
@@ -325,7 +325,7 @@ typedef struct {
 } ATAPI_READ_FORMAT_CAPACITY_DATA;
 
 ///
-/// Test Unit Ready Command, defined in SFF-8070i(ATAPI Removable Rewritable Specification)
+/// Test Unit Ready Command, defined in SFF-8070i(ATAPI Removable Rewritable Specification).
 ///
 typedef struct {
   UINT8 opcode;
@@ -343,7 +343,7 @@ typedef struct {
 } ATAPI_TEST_UNIT_READY_CMD;
 
 ///
-/// INQUIRY Command, defined in SFF-8070i(ATAPI Removable Rewritable Specification)
+/// INQUIRY Command, defined in SFF-8070i(ATAPI Removable Rewritable Specification).
 ///
 typedef struct {
   UINT8 opcode;
@@ -362,7 +362,7 @@ typedef struct {
 } ATAPI_INQUIRY_CMD;
 
 ///
-/// REQUEST SENSE Command, defined in SFF-8070i(ATAPI Removable Rewritable Specification)
+/// REQUEST SENSE Command, defined in SFF-8070i(ATAPI Removable Rewritable Specification).
 ///
 typedef struct {
   UINT8 opcode;
@@ -381,7 +381,7 @@ typedef struct {
 } ATAPI_REQUEST_SENSE_CMD;
 
 ///
-/// READ (10) Command, defined in SFF-8070i(ATAPI Removable Rewritable Specification)
+/// READ (10) Command, defined in SFF-8070i(ATAPI Removable Rewritable Specification).
 ///
 typedef struct {
   UINT8 opcode;
@@ -400,7 +400,7 @@ typedef struct {
 } ATAPI_READ10_CMD;
 
 ///
-/// READ Format Capacity Command, defined in SFF-8070i(ATAPI Removable Rewritable Specification)
+/// READ Format Capacity Command, defined in SFF-8070i(ATAPI Removable Rewritable Specification).
 ///
 typedef struct {
   UINT8 opcode;
@@ -419,7 +419,7 @@ typedef struct {
 } ATAPI_READ_FORMAT_CAP_CMD;
 
 ///
-/// MODE SENSE Command, defined in SFF-8070i(ATAPI Removable Rewritable Specification)
+/// MODE SENSE Command, defined in SFF-8070i(ATAPI Removable Rewritable Specification).
 ///
 typedef struct {
   UINT8 opcode;
@@ -439,8 +439,8 @@ typedef struct {
 } ATAPI_MODE_SENSE_CMD;
 
 ///
-/// ATAPI_PACKET_COMMAND is not defined in ATA specification.
-/// We add it here for the convenience for ATA/ATAPI module writer. 
+/// ATAPI_PACKET_COMMAND is not defined in the ATA specification.
+/// We add it here for the convenience of ATA/ATAPI module writers. 
 ///
 typedef union {
   UINT16                    Data16[6];
@@ -547,13 +547,13 @@ typedef union {
 #define ATA_CMD_WRITE_DMA_EXT         0x35   ///< defined from ATA-6
         
 ///
-/// default content of device control register, disable INT,
+/// Default content of device control register, disable INT,
 /// Bit3 is set to 1 according ATA-1
 ///
 #define ATA_DEFAULT_CTL           (0x0a)  
 ///
-/// default context of Device/Head Register,
-/// Bit7 and Bit5 are set to 1 for back-compatibilities
+/// Default context of Device/Head Register,
+/// Bit7 and Bit5 are set to 1 for back-compatibilities.
 ///
 #define ATA_DEFAULT_CMD           (0xa0)
 
@@ -598,7 +598,7 @@ typedef union {
 #define ATA_ASC_INVALID_FIELD               (0x24)
 #define ATA_ASC_WRITE_PROTECTED             (0x27)
 #define ATA_ASC_MEDIA_CHANGE                (0x28)
-#define ATA_ASC_RESET                       (0x29)  ///< Power On Reset or Bus Reset occurred
+#define ATA_ASC_RESET                       (0x29)  ///< Power On Reset or Bus Reset occurred.
 #define ATA_ASC_ILLEGAL_FIELD               (0x26)
 #define ATA_ASC_NO_MEDIA                    (0x3A)
 #define ATA_ASC_ILLEGAL_MODE_FOR_THIS_TRACK (0x64)
@@ -636,8 +636,8 @@ typedef union {
 //
 // Device Control Register
 //
-#define ATA_CTLREG_SRST  BIT2  ///< Software Reset
-#define ATA_CTLREG_IEN_L BIT1  ///< Interrupt Enable #
+#define ATA_CTLREG_SRST  BIT2  ///< Software Reset.
+#define ATA_CTLREG_IEN_L BIT1  ///< Interrupt Enable #.
 
 #endif
 

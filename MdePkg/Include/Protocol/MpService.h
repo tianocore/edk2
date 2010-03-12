@@ -27,14 +27,14 @@
   APs to help test system memory in parallel with other device initialization.
   Diagnostics applications may also use this protocol for multi-processor.
 
-  Copyright (c) 2006 - 2009, Intel Corporation.<BR>
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at<BR>
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   This Protocol is defined in the UEFI Platform Initialization Specification 1.2, 
@@ -46,7 +46,7 @@
 #define _MP_SERVICE_PROTOCOL_H_
 
 ///
-/// Global ID for the EFI_MP_SERVICES_PROTOCOL
+/// Global ID for the EFI_MP_SERVICES_PROTOCOL.
 ///
 #define EFI_MP_SERVICES_PROTOCOL_GUID \
   { \
@@ -54,7 +54,7 @@
   }
 
 ///
-/// Forward declaration for the EFI_MP_SERVICES_PROTOCOL
+/// Forward declaration for the EFI_MP_SERVICES_PROTOCOL.
 ///
 typedef struct _EFI_MP_SERVICES_PROTOCOL EFI_MP_SERVICES_PROTOCOL;
 
@@ -128,14 +128,14 @@ typedef struct {
   ///  1      0       0     Invalid. The BSP can never be in the disabled state.
   ///  1      0       1     Invalid. The BSP can never be in the disabled state.
   ///  1      1       0     Unhealthy Enabled BSP.
-  ///  1      1       1     Healthy Enabled BSP
+  ///  1      1       1     Healthy Enabled BSP.
   /// </pre>
   ///
   UINT32                     StatusFlag;
   ///
   /// The physical location of the processor, including the physical package number
   /// that identifies the cartridge, the physical core number within package, and 
-  /// logical threadnumber within core.
+  /// logical thread number within core.
   ///
   EFI_CPU_PHYSICAL_LOCATION  Location;
 } EFI_PROCESSOR_INFORMATION;
@@ -146,11 +146,11 @@ typedef struct {
   This service may only be called from the BSP.
 
   This function is used to retrieve the following information:
-    - The number of logical processors that are present in the system
+    - The number of logical processors that are present in the system.
     - The number of enabled logical processors in the system at the instant 
       this call is made.
 
-  Since MP Service Protocol provides services to enable and disable processors 
+  Because MP Service Protocol provides services to enable and disable processors 
   dynamically, the number of enabled logical processors may vary during the 
   course of a boot session.
   
@@ -172,8 +172,8 @@ typedef struct {
   @retval EFI_SUCCESS             The number of logical processors and enabled 
                                   logical processors was retrieved.
   @retval EFI_DEVICE_ERROR        The calling processor is an AP.
-  @retval EFI_INVALID_PARAMETER   NumberOfProcessors is NULL
-  @retval EFI_INVALID_PARAMETER   NumberOfEnabledProcessors is NULL
+  @retval EFI_INVALID_PARAMETER   NumberOfProcessors is NULL.
+  @retval EFI_INVALID_PARAMETER   NumberOfEnabledProcessors is NULL.
 
 **/
 typedef
@@ -302,7 +302,7 @@ EFI_STATUS
                                       BSP requests the function specified by 
                                       Procedure to be started on all the enabled 
                                       APs, and go on executing immediately. If 
-                                      all return from Procedure or TimeoutInMicroSeconds
+                                      all return from Procedure, or TimeoutInMicroSeconds
                                       expires, this event is signaled. The BSP 
                                       can use the CheckEvent() or WaitForEvent() 
                                       services to check the state of event.  Type 
@@ -538,7 +538,7 @@ EFI_STATUS
                                bits are ignored.  If it is NULL, this parameter 
                                is ignored.
 
-  @retval EFI_SUCCESS             The specified AP successfully enabled or disabled.
+  @retval EFI_SUCCESS             The specified AP was enabled or disabled successfully.
   @retval EFI_UNSUPPORTED         Enabling or disabling an AP cannot be completed 
                                   prior to this service returning.
   @retval EFI_UNSUPPORTED         Enabling or disabling an AP is not supported.
@@ -578,7 +578,7 @@ EFI_STATUS
 
   @retval EFI_SUCCESS             The current processor handle number was returned 
                                   in ProcessorNumber.
-  @retval EFI_INVALID_PARAMETER   ProcessorNumber is NULL
+  @retval EFI_INVALID_PARAMETER   ProcessorNumber is NULL.
 
 **/
 typedef
@@ -607,7 +607,7 @@ EFI_STATUS
 /// guarantee that all non-blocking mode requests on all APs have been completed 
 /// before the UEFI event EFI_EVENT_GROUP_READY_TO_BOOT is signaled. Since the 
 /// order that event notification functions in the same event group are executed 
-/// is not deterministic, an event of type EFI_EVENT_GROUP_READY_TO_BOOT can not 
+/// is not deterministic, an event of type EFI_EVENT_GROUP_READY_TO_BOOT cannot 
 /// be used to guarantee that APs have completed their non-blocking mode requests.
 ///
 /// When the UEFI event EFI_EVENT_GROUP_READY_TO_BOOT is signaled, the StartAllAPs() 

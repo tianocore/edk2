@@ -1,17 +1,17 @@
 /** @file
-  EFI Network Interface Identifier Protocol
+  EFI Network Interface Identifier Protocol.
 
-  Copyright (c) 2006 - 2009, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
   @par Revision Reference:          
-  This Protocol is introduced in EFI Specification 1.10
+  This Protocol is introduced in EFI Specification 1.10.
 
 **/
 
@@ -32,7 +32,7 @@
 #define EFI_NETWORK_INTERFACE_IDENTIFIER_INTERFACE_REVISION   EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL_REVISION
 
 ///
-/// Forward reference for pure ANSI compatability
+/// Forward reference for pure ANSI compatability.
 ///
 typedef struct _EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL  EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL;
 
@@ -47,12 +47,12 @@ typedef EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL   EFI_NETWORK_INTERFACE_IDENTI
 ///
 struct _EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL {
   UINT64    Revision;   ///< The revision of the EFI_NETWORK_INTERFACE_IDENTIFIER protocol.
-  UINT64    Id;         ///< Address of the first byte of the identifying structure for this network 
+  UINT64    Id;         ///< The address of the first byte of the identifying structure for this network 
                         ///< interface. This is only valid when the network interface is started 
                         ///< (see Start()). When the network interface is not started, this field is set to zero.
-  UINT64    ImageAddr;  ///< Address of the first byte of the identifying structure for this
+  UINT64    ImageAddr;  ///< The address of the first byte of the identifying structure for this
                         ///< network interface.  This is set to zero if there is no structure.
-  UINT32    ImageSize;  ///< Size of unrelocated network interface image.
+  UINT32    ImageSize;  ///< The size of unrelocated network interface image.
   CHAR8     StringId[4];///< A four-character ASCII string that is sent in the class identifier field of
                         ///< option 60 in DHCP. For a Type of EfiNetworkInterfaceUndi, this field is UNDI.
   UINT8     Type;       ///< Network interface type. This will be set to one of the values 

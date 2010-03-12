@@ -3,14 +3,14 @@
   IFR is primarily consumed by the EFI presentation engine, and produced by EFI
   internal application and drivers as well as all add-in card option-ROM drivers
 
-  Copyright (c) 2006 - 2010, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
   @par Revision Reference:
   These definitions are from UEFI 2.1 and 2.2.
@@ -86,7 +86,7 @@ typedef struct {
 //
 
 ///
-/// Contents of EFI_NARROW_GLYPH.Attributes
+/// Contents of EFI_NARROW_GLYPH.Attributes.
 ///@{
 #define EFI_GLYPH_NON_SPACING                0x01
 #define EFI_GLYPH_WIDE                       0x02
@@ -187,7 +187,7 @@ typedef struct _EFI_HII_GLYPH_INFO {
 } EFI_HII_GLYPH_INFO;
 
 ///
-/// The fixed header consists of a standard record header and
+/// The fixed header consists of a standard record header,
 /// then the character values in this section, the flags
 /// (including the encoding method) and the offsets of the glyph
 /// information, the glyph bitmaps and the character map.
@@ -1274,10 +1274,10 @@ typedef struct _EFI_IFR_TO_BOOLEAN {
 ///
 /// For EFI_IFR_TO_STRING, when converting from
 /// unsigned integers, these flags control the format:
-/// 0 = unsigned decimal
-/// 1 = signed decimal
-/// 2 = hexadecimal (lower-case alpha)
-/// 3 = hexadecimal (upper-case alpha)
+/// 0 = unsigned decimal.
+/// 1 = signed decimal.
+/// 2 = hexadecimal (lower-case alpha).
+/// 3 = hexadecimal (upper-case alpha).
 ///@{
 #define EFI_IFR_STRING_UNSIGNED_DEC      0
 #define EFI_IFR_STRING_SIGNED_DEC        1
@@ -1287,8 +1287,8 @@ typedef struct _EFI_IFR_TO_BOOLEAN {
 
 ///
 /// When converting from a buffer, these flags control the format:
-/// 0 = ASCII
-/// 8 = Unicode
+/// 0 = ASCII.
+/// 8 = Unicode.
 ///@{
 #define EFI_IFR_STRING_ASCII             0
 #define EFI_IFR_STRING_UNICODE           8
@@ -1778,7 +1778,7 @@ typedef struct _EFI_IFR_ANIMATION {
 } EFI_IFR_ANIMATION;
 
 ///
-/// HII animation package header
+/// HII animation package header.
 ///
 typedef struct _EFI_HII_ANIMATION_PACKAGE_HDR {
   ///
@@ -1794,7 +1794,7 @@ typedef struct _EFI_HII_ANIMATION_PACKAGE_HDR {
 
 ///
 /// Animation information is encoded as a series of blocks,
-/// with each block prefixed by a single byte header EFI_HII_ANIMATION_BLOCK
+/// with each block prefixed by a single byte header EFI_HII_ANIMATION_BLOCK.
 ///
 typedef struct _EFI_HII_ANIMATION_BLOCK {
   UINT8  BlockType;
@@ -1802,7 +1802,7 @@ typedef struct _EFI_HII_ANIMATION_BLOCK {
 } EFI_HII_ANIMATION_BLOCK;
 
 ///
-/// Animation block types
+/// Animation block types.
 ///
 #define EFI_HII_AIBT_END                 0x00
 #define EFI_HII_AIBT_OVERLAY_IMAGES      0x10
@@ -1825,11 +1825,11 @@ typedef struct _EFI_HII_ANIMATION_BLOCK {
 
 typedef struct _EFI_HII_AIBT_EXT1_BLOCK  {
   ///
-  /// Standard animation header, where Header.BlockType = EFI_HII_AIBT_EXT1
+  /// Standard animation header, where Header.BlockType = EFI_HII_AIBT_EXT1.
   ///
   EFI_HII_ANIMATION_BLOCK  Header;
   ///
-  /// The block type
+  /// The block type.
   ///
   UINT8                    BlockType2;
   ///
@@ -1840,7 +1840,7 @@ typedef struct _EFI_HII_AIBT_EXT1_BLOCK  {
 
 typedef struct _EFI_HII_AIBT_EXT2_BLOCK {
   ///
-  /// Standard animation header, where Header.BlockType = EFI_HII_AIBT_EXT2
+  /// Standard animation header, where Header.BlockType = EFI_HII_AIBT_EXT2.
   ///
   EFI_HII_ANIMATION_BLOCK  Header;
   ///
@@ -1855,7 +1855,7 @@ typedef struct _EFI_HII_AIBT_EXT2_BLOCK {
 
 typedef struct _EFI_HII_AIBT_EXT4_BLOCK {
   ///
-  /// Standard animation header, where Header.BlockType = EFI_HII_AIBT_EXT4
+  /// Standard animation header, where Header.BlockType = EFI_HII_AIBT_EXT4.
   ///
   EFI_HII_ANIMATION_BLOCK  Header;
   ///

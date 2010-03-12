@@ -1,17 +1,17 @@
 /** @file
-  This file declares PlatfromOpRom protocols which provides the interface between 
+  This file declares PlatfromOpRom protocols that provide the interface between 
   the PCI bus driver/PCI Host Bridge Resource Allocation driver and a platform-specific 
   driver to describe the unique features of a platform. 
   This protocol is optional.
   
-  Copyright (c) 2007 - 2009, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   This Protocol is defined in UEFI Platform Initialization Specification 1.2 
@@ -24,12 +24,12 @@
 
 ///
 /// This file must be included because the EFI_PCI_PLATFORM_PROTOCOL uses
-/// EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PHASE
+/// EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PHASE.
 ///
 #include <Protocol/PciHostBridgeResourceAllocation.h>
 
 ///
-/// Global ID for the EFI_PCI_PLATFORM_PROTOCOL
+/// Global ID for the EFI_PCI_PLATFORM_PROTOCOL.
 ///
 #define EFI_PCI_PLATFORM_PROTOCOL_GUID \
   { \
@@ -37,7 +37,7 @@
   }
 
 ///
-/// Forward declaration for EFI_PCI_PLATFORM_PROTOCOL
+/// Forward declaration for EFI_PCI_PLATFORM_PROTOCOL.
 ///
 typedef struct _EFI_PCI_PLATFORM_PROTOCOL EFI_PCI_PLATFORM_PROTOCOL;
 
@@ -52,7 +52,7 @@ typedef struct _EFI_PCI_PLATFORM_PROTOCOL EFI_PCI_PLATFORM_PROTOCOL;
 ///   - EFI_RESERVE_ISA_IO_ALIAS | EFI_RESERVE_VGA_IO_ALIAS:<BR>
 ///       Sets aside the ISA I/O range and all the aliases during PCI
 ///       enumeration. VGA I/O ranges and aliases are included in ISA alias
-///       ranges. In this scheme, 75 percent of the I/O space remains unused.
+///       ranges. In this scheme, seventy-five percent of the I/O space remains unused.
 ///       By using this selection, the platform indicates that it wants to support
 ///       PCI devices that require the following, at the cost of wasted I/O space:
 ///       ISA range and its aliases
@@ -70,7 +70,7 @@ typedef struct _EFI_PCI_PLATFORM_PROTOCOL EFI_PCI_PLATFORM_PROTOCOL;
 ///       The first device that requests the legacy VGA range will get all the
 ///       legacy VGA range plus its aliased addresses forwarded to it. The first
 ///       device that requests the legacy ISA range will get all the legacy ISA
-///       range plus its aliased addresses forwarded to it.
+///       range, plus its aliased addresses, forwarded to it.
 ///   - EFI_RESERVE_ISA_IO_NO_ALIAS | EFI_RESERVE_VGA_IO_ALIAS:<BR>
 ///       Sets aside the ISA I/O range (0x100 - 0x3FF) during PCI enumeration
 ///       and the aliases of the VGA I/O ranges. By using this selection, the
@@ -125,26 +125,26 @@ typedef UINT32  EFI_PCI_PLATFORM_POLICY;
 #define     EFI_RESERVE_NONE_IO_ALIAS        0x0000
 
 ///
-/// Sets aside ISA I/O range and all aliases
+/// Sets aside ISA I/O range and all aliases:
 ///   - n100..n3FF
 ///   - n500..n7FF
 ///   - n900..nBFF
-///   - nD00..nFFF
+///   - nD00..nFFF.
 ///
 #define     EFI_RESERVE_ISA_IO_ALIAS         0x0001
 
 ///
-/// Sets aside ISA I/O range 0x100-0x3FF
+/// Sets aside ISA I/O range 0x100-0x3FF.
 ///
 #define     EFI_RESERVE_ISA_IO_NO_ALIAS      0x0002
 
 ///
-/// Sets aside VGA I/O ranges and all aliases
+/// Sets aside VGA I/O ranges and all aliases.
 ///
 #define     EFI_RESERVE_VGA_IO_ALIAS         0x0004
 
 ///
-/// Sets aside VGA I/O rangess
+/// Sets aside VGA I/O ranges
 ///
 #define     EFI_RESERVE_VGA_IO_NO_ALIAS      0x0008
 
@@ -200,7 +200,7 @@ typedef EFI_PCI_EXECUTION_PHASE EFI_PCI_CHIPSET_EXECUTION_PHASE;
   it needs to handle those errors on its own because there is no way to surface any
   errors to the caller.
 
-  @param[in] This           Pointer to the EFI_PCI_PLATFORM_PROTOCOL instance.
+  @param[in] This           The pointer to the EFI_PCI_PLATFORM_PROTOCOL instance.
   @param[in] HostBridge     The handle of the host bridge controller.
   @param[in] Phase          The phase of the PCI bus enumeration.
   @param[in] ExecPhase      Defines the execution phase of the PCI chipset driver.
@@ -233,7 +233,7 @@ EFI_STATUS
   needs to handle those errors on its own because there is no way to surface any errors to
   the caller.
 
-  @param[in] This           Pointer to the EFI_PCI_PLATFORM_PROTOCOL instance.
+  @param[in] This           The pointer to the EFI_PCI_PLATFORM_PROTOCOL instance.
   @param[in] HostBridge     The associated PCI host bridge handle.
   @param[in] RootBridge     The associated PCI root bridge handle.
   @param[in] PciAddress     The address of the PCI device on the PCI bus.
@@ -261,7 +261,7 @@ EFI_STATUS
   enumeration. The PCI bus driver and the PCI Host Bridge Resource Allocation Protocol
   driver can call this member function to retrieve the policy.
 
-  @param[in]  This        Pointer to the EFI_PCI_PLATFORM_PROTOCOL instance.
+  @param[in]  This        The pointer to the EFI_PCI_PLATFORM_PROTOCOL instance.
   @param[out] PciPolicy   The platform policy with respect to VGA and ISA aliasing.
 
   @retval EFI_SUCCESS             The function completed successfully.
@@ -288,7 +288,7 @@ EFI_STATUS
   scanning the ROM that is attached to any controller, which allows a platform to specify a ROM
   image that is different from the ROM image on a PCI card.
 
-  @param[in]  This        Pointer to the EFI_PCI_PLATFORM_PROTOCOL instance.
+  @param[in]  This        The pointer to the EFI_PCI_PLATFORM_PROTOCOL instance.
   @param[in]  PciHandle   The handle of the PCI device.
   @param[out] RomImage    If the call succeeds, the pointer to the pointer to the option ROM image.
                           Otherwise, this field is undefined. The memory for RomImage is allocated
@@ -301,7 +301,7 @@ EFI_STATUS
   @retval EFI_SUCCESS            The option ROM was available for this device and loaded into memory.
   @retval EFI_NOT_FOUND          No option ROM was available for this device.
   @retval EFI_OUT_OF_RESOURCES   No memory was available to load the option ROM.
-  @retval EFI_DEVICE_ERROR       An error occurred in getting the option ROM.
+  @retval EFI_DEVICE_ERROR       An error occurred in obtaining the option ROM.
 
 **/
 typedef

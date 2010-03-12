@@ -1,14 +1,14 @@
 /** @file
   This includes some definitions introduced in UEFI that will be used in both PEI and DXE phases.
 
-  Copyright (c) 2006 - 2009, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
 **/
 
@@ -35,7 +35,7 @@ typedef enum {
   ///
   EfiLoaderData,
   ///
-  /// The code portions of a loaded Boot Services Driver
+  /// The code portions of a loaded Boot Services Driver.
   ///
   EfiBootServicesCode,
   ///
@@ -144,7 +144,7 @@ typedef struct {
 /// key associated w/ the public/private 2048-bit RSA key-pair. The
 /// WIN_CERTIFICATE shall be used to describe the signature of the
 /// Variable data *Data. In addition, the signature will also
-/// include the MonotonicCount value to guard against replay attacks
+/// include the MonotonicCount value to guard against replay attacks.
 ///  
 typedef struct {
   ///

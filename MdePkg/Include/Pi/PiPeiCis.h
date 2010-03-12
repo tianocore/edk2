@@ -1,17 +1,18 @@
 /** @file
   PI PEI master include file. This file should match the PI spec.
 
-  Copyright (c) 2006 - 2010, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                            
+                                           
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
   @par Revision Reference:
-  PI Version 1.0
+  PI Version 1.0.
 
 **/
 
@@ -22,22 +23,22 @@
 #include <Pi/PiMultiPhase.h>
 
 ///
-/// Handles of EFI FV.
+/// The handles of EFI FV.
 /// 
 typedef VOID    *EFI_PEI_FV_HANDLE;
 
 ///
-/// Handles of EFI FFS
+/// The handles of EFI FFS.
 /// 
 typedef VOID    *EFI_PEI_FILE_HANDLE;
 
 ///
-/// Declare forward reference data structure for EFI_PEI_SERVICE
+/// Declare the forward reference data structure for EFI_PEI_SERVICE.
 /// 
 typedef struct _EFI_PEI_SERVICES          EFI_PEI_SERVICES;
 
 ///
-/// Declare forward reference data structure for EFI_PEI_NOTIFY_DESCRIPTOR
+/// Declare the forward reference data structure for EFI_PEI_NOTIFY_DESCRIPTOR.
 /// 
 typedef struct _EFI_PEI_NOTIFY_DESCRIPTOR EFI_PEI_NOTIFY_DESCRIPTOR;
 
@@ -116,7 +117,7 @@ typedef struct {
 /// 
 struct _EFI_PEI_NOTIFY_DESCRIPTOR {
   ///
-  /// Details if the type of notification is callback or dispatch.
+  /// Details if the type of notification are callback or dispatch.
   ///
   UINTN                       Flags;
   ///
@@ -155,7 +156,9 @@ typedef union {
   @param  PpiList          A pointer to the list of interfaces that the caller shall install.
 
   @retval EFI_SUCCESS           The interface was successfully installed.
-  @retval EFI_INVALID_PARAMETER The PpiList pointer is NULL or Any of the PEI PPI descriptors in the list do not have the EFI_PEI_PPI_DESCRIPTOR_PPI bit set in the Flags field.
+  @retval EFI_INVALID_PARAMETER The PpiList pointer is NULL or Any of the PEI PPI 
+                                descriptors in the list do not have the 
+                                EFI_PEI_PPI_DESCRIPTOR_PPI bit set in the Flags field.
   @retval EFI_OUT_OF_RESOURCES  There is no additional space in the PPI database.
 
 **/
@@ -225,7 +228,7 @@ EFI_STATUS
   @param  NotifyList       A pointer to the list of notification interfaces that the caller shall install.
 
   @retval EFI_SUCCESS           The interface was successfully installed.
-  @retval EFI_INVALID_PARAMETER The PpiList pointer is NULL or Any of the PEI PPI descriptors in the 
+  @retval EFI_INVALID_PARAMETER The PpiList pointer is NULL, or any of the PEI PPI descriptors in the 
                                 list do not have the EFI_PEI_PPI_DESCRIPTOR_PPI bit set in the Flags field.
   @retval EFI_OUT_OF_RESOURCES  There is no additional space in the PPI database.
 
@@ -243,7 +246,7 @@ EFI_STATUS
   @param  PeiServices      An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param  BootMode         A pointer to contain the value of the boot mode.
 
-  @retval EFI_SUCCESS           The boot mode was returned successfully.
+  @retval EFI_SUCCESS           The boot mode returned successfully.
 
 **/
 typedef
@@ -259,7 +262,7 @@ EFI_STATUS
   @param  PeiServices      An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation
   @param  BootMode         The value of the boot mode to set.
 
-  @retval EFI_SUCCESS           The boot mode was returned successfully.
+  @retval EFI_SUCCESS           The boot mode returned successfully.
 
 **/
 typedef
@@ -287,7 +290,7 @@ EFI_STATUS
   );
 
 /**
-  This service published by the PEI Foundation abstracts the creation of a Hand-Off Block's (HOB's) headers.
+  This service, published by the PEI Foundation, abstracts the creation of a Hand-Off Block's (HOB's) headers.
 
   @param  PeiServices      An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param  Type             The type of HOB to be installed.
@@ -371,7 +374,7 @@ EFI_STATUS
   This service will search within encapsulation sections (compression and GUIDed) as well. It will
   search inside of a GUIDed section or a compressed section, but may not, for example, search a
   GUIDed section inside a GUIDes section.
-  This service will not search within compression sections or GUIDed sections which require
+  This service will not search within compression sections or GUIDed sections that require
   extraction if memory is not present.
 
   @param  PeiServices      An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
@@ -396,7 +399,7 @@ EFI_STATUS
   This function registers the found memory configuration with the PEI Foundation.
 
   @param  PeiServices      An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
-  @param  MemoryBegin      The value of a region of installed memory
+  @param  MemoryBegin      The value of a region of installed memory.
   @param  MemoryLength     The corresponding length of a region of installed memory.
 
   @retval EFI_SUCCESS           The region was successfully installed in a HOB.
@@ -419,12 +422,12 @@ EFI_STATUS
   @param  PeiServices      An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param  MemoryType       The type of memory to allocate.
   @param  Pages            The number of contiguous 4 KB pages to allocate.
-  @param  Memory           Pointer to a physical address. On output, the address is set to the base 
+  @param  Memory           A pointer to a physical address. On output, the address is set to the base 
                            of the page range that was allocated.
 
   @retval EFI_SUCCESS           The memory range was successfully allocated.
   @retval EFI_OUT_OF_RESOURCES  The pages could not be allocated.
-  @retval EFI_INVALID_PARAMETER Type is not equal to EfiLoaderCode, EfiLoaderData, EfiRuntimeServicesCode, 
+  @retval EFI_INVALID_PARAMETER The type is not equal to EfiLoaderCode, EfiLoaderData, EfiRuntimeServicesCode, 
                                 EfiRuntimeServicesData, EfiBootServicesCode, EfiBootServicesData,
                                 EfiACPIReclaimMemory, or EfiACPIMemoryNVS.
 
@@ -461,9 +464,9 @@ EFI_STATUS
 /**
   This service copies the contents of one buffer to another buffer.
 
-  @param  Destination      Pointer to the destination buffer of the memory copy.
-  @param  Source           Pointer to the source buffer of the memory copy
-  @param  Length           Number of bytes to copy from Source to Destination.
+  @param  Destination      The pointer to the destination buffer of the memory copy.
+  @param  Source           The pointer to the source buffer of the memory copy.
+  @param  Length           The number of bytes to copy from Source to Destination.
 
 **/
 typedef
@@ -477,9 +480,9 @@ VOID
 /**
   The service fills a buffer with a specified value.
 
-  @param  Buffer           Pointer to the buffer to fill.
-  @param  Size             Number of bytes in Buffer to fill.
-  @param  Value            Value to fill Buffer with
+  @param  Buffer           The pointer to the buffer to fill.
+  @param  Size             The number of bytes in Buffer to fill.
+  @param  Value            The value to fill Buffer with.
 
 **/
 typedef
@@ -563,8 +566,8 @@ EFI_STATUS
   @param FileHandle     Upon exit, points to the found file's
                         handle or NULL if it could not be found.
 
-  @retval EFI_SUCCESS             File was found.
-  @retval EFI_NOT_FOUND           File was not found.
+  @retval EFI_SUCCESS             The file was found.
+  @retval EFI_NOT_FOUND           The file was not found.
   @retval EFI_INVALID_PARAMETER   VolumeHandle or FileHandle or
                                   FileName was NULL.
 
@@ -578,7 +581,7 @@ EFI_STATUS
   );
 
 ///
-/// Information of FV file.
+/// The information of the FV file.
 ///
 typedef struct {
   ///
@@ -610,17 +613,17 @@ typedef struct {
 
   This function returns information about a specific file,
   including its file name, type, attributes, starting address and
-  size. If the firmware volume is not memory mapped then the
+  size. If the firmware volume is not memory mapped, then the
   Buffer member will be NULL.
 
-  @param FileHandle   Handle of the file.
+  @param FileHandle   The handle of the file.
   @param FileInfo     Upon exit, points to the file's
                       information.
 
-  @retval EFI_SUCCESS             File information returned.
-  @retval EFI_INVALID_PARAMETER   If FileHandle does not
+  @retval EFI_SUCCESS             File information was returned.
+  @retval EFI_INVALID_PARAMETER   FileHandle does not
                                   represent a valid file.
-  @retval EFI_INVALID_PARAMETER   If FileInfo is NULL.
+  @retval EFI_INVALID_PARAMETER   FileInfo is NULL.
   
 **/
 typedef
@@ -631,7 +634,7 @@ EFI_STATUS
   );
 
 ///
-/// Information of FV volume.
+/// The information of the FV volume.
 ///
 typedef struct {
   ///
@@ -668,10 +671,10 @@ typedef struct {
   @param VolumeHandle   Handle of the volume.
   @param VolumeInfo     Upon exit, points to the volume's information.
 
-  @retval EFI_SUCCESS             Volume information returned.
+  @retval EFI_SUCCESS             The volume information returned.
   @retval EFI_INVALID_PARAMETER   If VolumeHandle does not represent a valid volume.
   @retval EFI_INVALID_PARAMETER   If VolumeHandle is NULL.
-  @retval EFI_SUCCESS             Information successfully returned.
+  @retval EFI_SUCCESS             Information was successfully returned.
   @retval EFI_INVALID_PARAMETER   The volume designated by the VolumeHandle is not available.
 
 **/
@@ -719,19 +722,19 @@ EFI_STATUS
 #define PEI_SPECIFICATION_MAJOR_REVISION  1
 #define PEI_SPECIFICATION_MINOR_REVISION  10
 ///
-/// Inconsistent with specification here: 
-/// In PI1.0 spec, PEI_SERVICES_SIGNATURE is defined as 0x5652455320494550. But 
-/// to pass multiple tool chain, it is append a ULL.
+/// Specification inconsistency here: 
+/// In the PI1.0 spec, PEI_SERVICES_SIGNATURE is defined as 0x5652455320494550. But 
+/// to pass a multiple tool chain, it appends an ULL.
 ///
 //
 // PEI Services Table
 //
 #define PEI_SERVICES_SIGNATURE  0x5652455320494550ULL
 ///
-/// Inconsistent with specification here: 
-/// In PI1.0 spec, There is a typo error in PEI_SERVICES_REVISION. In the spec. the defintion is 
+/// Specification inconsistency here: 
+/// In the PI1.0 specification, there is a typo error in PEI_SERVICES_REVISION. In the specification the defintion is 
 /// #define ((PEI_SPECIFICATION_MAJOR_REVISION<<16) |(PEI_SPECIFICATION_MINOR_REVISION))
-/// and it should be as follow:
+/// and it should be as follows:
 ///
 #define PEI_SERVICES_REVISION   ((PEI_SPECIFICATION_MAJOR_REVISION<<16) | (PEI_SPECIFICATION_MINOR_REVISION))
 
@@ -742,7 +745,7 @@ EFI_STATUS
 /// - Allocating both early and permanent memory
 /// - Supporting the Firmware File System (FFS)
 /// - Abstracting the PPI database abstraction
-/// - Creating Hand-Off Blocks (HOBs)
+/// - Creating Hand-Off Blocks (HOBs).
 ///
 struct _EFI_PEI_SERVICES {
   ///
@@ -814,7 +817,7 @@ struct _EFI_PEI_SERVICES {
 
 
 ///
-/// EFI_SEC_PEI_HAND_OFF structure hold information about
+/// EFI_SEC_PEI_HAND_OFF structure holds information about
 /// PEI core's operating environment, such as the size of location of
 /// temporary RAM, the stack location and BFV location.
 /// 
@@ -858,7 +861,7 @@ typedef struct _EFI_SEC_PEI_HAND_OFF {
   VOID    *PeiTemporaryRamBase;
 
   ///
-  /// Size of the available temporary RAM available for 
+  /// The size of the available temporary RAM available for 
   /// use by the PEI Foundation, in bytes.
   /// 
   UINTN   PeiTemporaryRamSize;
@@ -879,7 +882,7 @@ typedef struct _EFI_SEC_PEI_HAND_OFF {
 
 
 /**
-  Entry point of PEI Foundation.
+  The entry point of PEI Foundation.
 
   This function is the entry point for the PEI Foundation, which
   allows the SEC phase to pass information about the stack,

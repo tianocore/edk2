@@ -4,11 +4,11 @@
   This library provides defines, macros, and functions to help create and parse 
   EFI_DEVICE_PATH_PROTOCOL structures.
 
-Copyright (c) 2006 - 2009, Intel Corporation<BR>
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -97,7 +97,8 @@ NextDevicePathNode (
 
 /**
   Determines if a device path node is an end node of a device path.
-  This includes nodes that are the end of a device path instance and nodes that are the end of an entire device path.
+  This includes nodes that are the end of a device path instance and nodes that 
+  are the end of an entire device path.
 
   Determines if the device path node specified by Node is an end node of a device path.  
   This includes nodes that are the end of a device path instance and nodes that are the 
@@ -212,7 +213,7 @@ SetDevicePathEndNode (
 
   @param  DevicePath                 A pointer to a device path data structure.
   
-  @retval 0       If DevicePath is NULL.
+  @retval 0       DevicePath is NULL.
   @retval Others  The size of a device path in bytes.
 
 **/
@@ -234,7 +235,7 @@ GetDevicePathSize (
   
   @param  DevicePath                 A pointer to a device path data structure.
 
-  @retval NULL    If DevicePath is NULL.
+  @retval NULL    DevicePath is NULL.
   @retval Others  A pointer to the duplicated device path.
   
 **/
@@ -291,7 +292,7 @@ AppendDevicePath (
   @param  DevicePath                 A pointer to a device path data structure.
   @param  DevicePathNode             A pointer to a single device path node.
 
-  @retval NULL      If there is not enough memory for the new device path.
+  @retval NULL      There is not enough memory for the new device path.
   @retval Others    A pointer to the new device path if success.
                     A copy of DevicePathNode followed by an end-of-device-path node 
                     if both FirstDevicePath and SecondDevicePath are NULL.
@@ -398,7 +399,7 @@ CreateDeviceNode (
   @param  DevicePath                 A pointer to a device path data structure.
 
   @retval  TRUE                      DevicePath is multi-instance.
-  @retval  FALSE                     DevicePath is not multi-instance or DevicePath is NULL.
+  @retval  FALSE                     DevicePath is not multi-instance, or DevicePath is NULL.
 
 **/
 BOOLEAN

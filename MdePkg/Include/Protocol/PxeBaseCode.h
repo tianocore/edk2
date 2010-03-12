@@ -2,24 +2,24 @@
   EFI PXE Base Code Protocol definitions, which is used to access PXE-compatible 
   devices for network access and network booting.
 
-  Copyright (c) 2006 - 2010, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. 
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. 
 
   @par Revision Reference:          
-  This Protocol is introduced in EFI Specification 1.10            
+  This Protocol is introduced in EFI Specification 1.10.           
 
 **/
 #ifndef __PXE_BASE_CODE_PROTOCOL_H__
 #define __PXE_BASE_CODE_PROTOCOL_H__
 
 ///
-/// PXE Base Code protocol
+/// PXE Base Code protocol.
 ///
 #define EFI_PXE_BASE_CODE_PROTOCOL_GUID \
   { \
@@ -40,7 +40,7 @@ typedef EFI_PXE_BASE_CODE_PROTOCOL  EFI_PXE_BASE_CODE;
 #define DEFAULT_ToS 0
 
 ///
-/// ICMP error format
+/// ICMP error format.
 ///
 typedef struct {
   UINT8   Type;
@@ -59,7 +59,7 @@ typedef struct {
 } EFI_PXE_BASE_CODE_ICMP_ERROR;
 
 ///
-/// TFTP error format
+/// TFTP error format.
 ///
 typedef struct {
   UINT8 ErrorCode;
@@ -67,12 +67,12 @@ typedef struct {
 } EFI_PXE_BASE_CODE_TFTP_ERROR;
 
 ///
-/// IP Receive Filter definitions
+/// IP Receive Filter definitions.
 ///
 #define EFI_PXE_BASE_CODE_MAX_IPCNT 8
 
 ///
-/// IP Receive Filter structure
+/// IP Receive Filter structure.
 ///
 typedef struct {
   UINT8           Filters;
@@ -87,7 +87,7 @@ typedef struct {
 #define EFI_PXE_BASE_CODE_IP_FILTER_PROMISCUOUS_MULTICAST 0x0008
 
 ///
-/// ARP cache entries
+/// ARP cache entries.
 ///
 typedef struct {
   EFI_IP_ADDRESS  IpAddr;
@@ -95,7 +95,7 @@ typedef struct {
 } EFI_PXE_BASE_CODE_ARP_ENTRY;
 
 ///
-/// ARP route table entries
+/// ARP route table entries.
 ///
 typedef struct {
   EFI_IP_ADDRESS  IpAddr;
@@ -184,7 +184,7 @@ typedef struct {
 } EFI_PXE_BASE_CODE_DISCOVER_INFO;
 
 ///
-/// TFTP opcode definitions
+/// TFTP opcode definitions.
 ///
 typedef enum {
   EFI_PXE_BASE_CODE_TFTP_FIRST,
@@ -212,7 +212,7 @@ typedef struct {
 } EFI_PXE_BASE_CODE_MTFTP_INFO;
 
 ///
-/// DHCPV4 Packet structure
+/// DHCPV4 Packet structure.
 ///
 typedef struct {
   UINT8   BootpOpcode;
@@ -243,7 +243,7 @@ typedef struct {
 } EFI_PXE_BASE_CODE_DHCPV6_PACKET;
 
 ///
-/// Packet structure
+/// Packet structure.
 ///
 typedef union {
   UINT8                           Raw[1472];
@@ -258,7 +258,7 @@ typedef union {
 #define EFI_PXE_BASE_CODE_MAX_ROUTE_ENTRIES 8
 
 ///
-/// EFI_PXE_BASE_CODE_MODE
+/// EFI_PXE_BASE_CODE_MODE.
 /// The data values in this structure are read-only and 
 /// are updated by the code that produces the
 /// EFI_PXE_BASE_CODE_PROTOCOL functions.
@@ -352,7 +352,7 @@ typedef struct {
     MakeCallbacksSet to TRUE if the PXE Base Code Callback Protocol is available.
     Set to FALSE if the PXE Base Code Callback Protocol is not available.
     
-  @param  This                  Pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
+  @param  This                  The pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
   @param  UseIpv6               Specifies the type of IP addresses that are to be used during the session
                                 that is being started. Set to TRUE for IPv6 addresses, and FALSE for     
                                 IPv4 addresses.                                                                                                   
@@ -383,7 +383,7 @@ EFI_STATUS
   set to FALSE and EFI_SUCCESS is returned. If the Started field of the EFI_PXE_BASE_CODE_MODE
   structure is already FALSE, then EFI_NOT_STARTED will be returned.
   
-  @param  This                  Pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
+  @param  This                  The pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
  
   @retval EFI_SUCCESS           The PXE Base Code Protocol was stopped.
   @retval EFI_NOT_STARTED       The PXE Base Code Protocol is already in the stopped state.  
@@ -415,7 +415,7 @@ EFI_STATUS
   If the Callback Protocol does not return EFI_PXE_BASE_CODE_CALLBACK_STATUS_CONTINUE,
   then the DHCP sequence will be stopped and EFI_ABORTED will be returned.
     
-  @param  This                  Pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
+  @param  This                  The pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
   @param  SortOffers            TRUE if the offers received should be sorted. Set to FALSE to try the
                                 offers in the order that they are received.                          
  
@@ -461,13 +461,13 @@ EFI_STATUS
   If the Callback Protocol does not return EFI_PXE_BASE_CODE_CALLBACK_STATUS_CONTINUE,
   then the Discovery sequence is stopped and EFI_ABORTED will be returned.
     
-  @param  This                  Pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
+  @param  This                  The pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
   @param  Type                  The type of bootstrap to perform.
-  @param  Layer                 Pointer to the boot server layer number to discover, which must be
+  @param  Layer                 The pointer to the boot server layer number to discover, which must be
                                 PXE_BOOT_LAYER_INITIAL when a new server type is being            
                                 discovered.                                                       
   @param  UseBis                TRUE if Boot Integrity Services are to be used. FALSE otherwise.                                
-  @param  Info                  Pointer to a data structure that contains additional information on the
+  @param  Info                  The pointer to a data structure that contains additional information on the
                                 type of discovery operation that is to be performed.                   
                                   
   @retval EFI_SUCCESS           The Discovery sequence has been completed.
@@ -537,7 +537,7 @@ EFI_STATUS
   entry is itself null-terminated, so that the final information string is terminated
   with two null octets.
     
-  @param  This                  Pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
+  @param  This                  The pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
   @param  Operation             The type of operation to perform.
   @param  BufferPtr             A pointer to the data buffer.                                                                     
   @param  Overwrite             Only used on write file operations. TRUE if a file on a remote server can
@@ -548,7 +548,7 @@ EFI_STATUS
   @param  ServerIp              The TFTP / MTFTP server IP address.
   @param  Filename              A Null-terminated ASCII string that specifies a directory name or a file
                                 name.                                                                   
-  @param  Info                  Pointer to the MTFTP information.
+  @param  Info                  The pointer to the MTFTP information.
   @param  DontUseBuffer         Set to FALSE for normal TFTP and MTFTP read file operation.                       
                                   
   @retval EFI_SUCCESS           The TFTP/MTFTP operation was completed.
@@ -591,7 +591,7 @@ EFI_STATUS
   EFI_ICMP_ERROR will be returned. If the Callback Protocol does not return
   EFI_PXE_BASE_CODE_CALLBACK_STATUS_CONTINUE, then EFI_ABORTED will be returned.
     
-  @param  This                  Pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
+  @param  This                  The pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
   @param  OpFlags               The UDP operation flags. 
   @param  DestIp                The destination IP address.
   @param  DestPort              The destination UDP port number.                                                                         
@@ -635,7 +635,7 @@ EFI_STATUS
 
   This function reads a UDP packet from a network interface. The data contents
   are returned in (the optional HeaderPtr and) BufferPtr, and the size of the
-  buffer received is returned in BufferSize . If the input BufferSize is smaller
+  buffer received is returned in BufferSize. If the input BufferSize is smaller
   than the UDP packet received (less optional HeaderSize), it will be set to the
   required size, and EFI_BUFFER_TOO_SMALL will be returned. In this case, the
   contents of BufferPtr are undefined, and the packet is lost. If a UDP packet is
@@ -646,7 +646,7 @@ EFI_STATUS
   input values, different types of UDP packet receive filtering will be performed.
   The following tables summarize these receive filter operations.
     
-  @param  This                  Pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
+  @param  This                  The pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
   @param  OpFlags               The UDP operation flags. 
   @param  DestIp                The destination IP address.
   @param  DestPort              The destination UDP port number.
@@ -700,15 +700,15 @@ EFI_STATUS
   If an application or driver wishes to preserve the IP receive filter settings,
   it will have to preserve the IP receive filter settings before these calls, and
   use SetIpFilter() to restore them after the calls. If incompatible filtering is
-  requested (for example, PROMISCUOUS with anything else) or if the device does not
+  requested (for example, PROMISCUOUS with anything else), or if the device does not
   support a requested filter setting and it cannot be accommodated in software
   (for example, PROMISCUOUS not supported), EFI_INVALID_PARAMETER will be returned.
   The IPlist field is used to enable IPs other than the StationIP. They may be
   multicast or unicast. If IPcnt is set as well as EFI_PXE_BASE_CODE_IP_FILTER_STATION_IP,
   then both the StationIP and the IPs from the IPlist will be used.
     
-  @param  This                  Pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
-  @param  NewFilter             Pointer to the new set of IP receive filters.
+  @param  This                  The pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
+  @param  NewFilter             The pointer to the new set of IP receive filters.
   
   @retval EFI_SUCCESS           The IP receive filter settings were updated.
   @retval EFI_NOT_STARTED       The PXE Base Code Protocol is in the stopped state.
@@ -738,8 +738,8 @@ EFI_STATUS
   does not return EFI_PXE_BASE_CODE_CALLBACK_STATUS_CONTINUE, then EFI_ABORTED is
   returned.
     
-  @param  This                  Pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
-  @param  IpAddr                Pointer to the IP address that is used to resolve a MAC address.
+  @param  This                  The pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
+  @param  IpAddr                The pointer to the IP address that is used to resolve a MAC address.
   @param  MacAddr               If not NULL, a pointer to the MAC address that was resolved with the
                                 ARP protocol.                                                       
                                   
@@ -774,7 +774,7 @@ EFI_STATUS
   The SetParameters() call must be invoked after a Callback Protocol is installed
   to enable the use of callbacks.
     
-  @param  This                  Pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
+  @param  This                  The pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
   @param  NewAutoArp            If not NULL, a pointer to a value that specifies whether to replace the
                                 current value of AutoARP.                                              
   @param  NewSendGUID           If not NULL, a pointer to a value that specifies whether to replace the
@@ -816,9 +816,9 @@ EFI_STATUS
   Otherwise, this function updates the SubnetMask field of the EFI_PXE_BASE_CODE_MODE
   structure with NewSubnetMask.
     
-  @param  This                  Pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
-  @param  NewStationIp          Pointer to the new IP address to be used by the network device.  
-  @param  NewSubnetMask         Pointer to the new subnet mask to be used by the network device.                                 
+  @param  This                  The pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
+  @param  NewStationIp          The pointer to the new IP address to be used by the network device.  
+  @param  NewSubnetMask         The pointer to the new subnet mask to be used by the network device.                                 
                                   
   @retval EFI_SUCCESS           The new station IP address and/or subnet mask were updated.
   @retval EFI_NOT_STARTED       The PXE Base Code Protocol is in the stopped state.
@@ -839,25 +839,25 @@ EFI_STATUS
   The pointers to the new packets are used to update the contents of the cached
   packets in the EFI_PXE_BASE_CODE_MODE structure.
     
-  @param  This                   Pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
-  @param  NewDhcpDiscoverValid   Pointer to a value that will replace the current
+  @param  This                   The pointer to the EFI_PXE_BASE_CODE_PROTOCOL instance.
+  @param  NewDhcpDiscoverValid   The pointer to a value that will replace the current
                                  DhcpDiscoverValid field.                        
-  @param  NewDhcpAckReceived     Pointer to a value that will replace the current
+  @param  NewDhcpAckReceived     The pointer to a value that will replace the current
                                  DhcpAckReceived field.                          
-  @param  NewProxyOfferReceived  Pointer to a value that will replace the current
+  @param  NewProxyOfferReceived  The pointer to a value that will replace the current
                                  ProxyOfferReceived field.                       
-  @param  NewPxeDiscoverValid    Pointer to a value that will replace the current     
+  @param  NewPxeDiscoverValid    The pointer to a value that will replace the current     
                                  ProxyOfferReceived field.                       
-  @param  NewPxeReplyReceived    Pointer to a value that will replace the current
+  @param  NewPxeReplyReceived    The pointer to a value that will replace the current
                                  PxeReplyReceived field.                         
-  @param  NewPxeBisReplyReceived Pointer to a value that will replace the current
+  @param  NewPxeBisReplyReceived The pointer to a value that will replace the current
                                  PxeBisReplyReceived field.                      
-  @param  NewDhcpDiscover        Pointer to the new cached DHCP Discover packet contents.   
-  @param  NewDhcpAck             Pointer to the new cached DHCP Ack packet contents.
-  @param  NewProxyOffer          Pointer to the new cached Proxy Offer packet contents.
-  @param  NewPxeDiscover         Pointer to the new cached PXE Discover packet contents.
-  @param  NewPxeReply            Pointer to the new cached PXE Reply packet contents.
-  @param  NewPxeBisReply         Pointer to the new cached PXE BIS Reply packet contents.
+  @param  NewDhcpDiscover        The pointer to the new cached DHCP Discover packet contents.   
+  @param  NewDhcpAck             The pointer to the new cached DHCP Ack packet contents.
+  @param  NewProxyOffer          The pointer to the new cached Proxy Offer packet contents.
+  @param  NewPxeDiscover         The pointer to the new cached PXE Discover packet contents.
+  @param  NewPxeReply            The pointer to the new cached PXE Reply packet contents.
+  @param  NewPxeBisReply         The pointer to the new cached PXE BIS Reply packet contents.
                                    
   @retval EFI_SUCCESS            The cached packet contents were updated.
   @retval EFI_NOT_STARTED        The PXE Base Code Protocol is in the stopped state.
@@ -920,7 +920,7 @@ struct _EFI_PXE_BASE_CODE_PROTOCOL {
   EFI_PXE_BASE_CODE_SET_STATION_IP  SetStationIp;
   EFI_PXE_BASE_CODE_SET_PACKETS     SetPackets;
   ///
-  /// Pointer to the EFI_PXE_BASE_CODE_MODE data for this device.
+  /// The pointer to the EFI_PXE_BASE_CODE_MODE data for this device.
   ///
   EFI_PXE_BASE_CODE_MODE            *Mode;
 };

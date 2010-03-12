@@ -3,18 +3,18 @@
   structure prototypes, global variables and constants that
   are needed for porting PXE to EFI.
 
-  Copyright (c) 2006 - 2010, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   32/64-bit PXE specification:
-  alpha-4, 99-Dec-17
+  alpha-4, 99-Dec-17.
 
 **/
 
@@ -30,12 +30,12 @@
     )
 
 ///
-/// UNDI ROM ID and devive ID signature
+/// UNDI ROM ID and devive ID signature.
 ///
 #define PXE_BUSTYPE_PXE PXE_BUSTYPE ('!', 'P', 'X', 'E')
 
 ///
-/// BUS ROM ID signatures
+/// BUS ROM ID signatures.
 ///
 #define PXE_BUSTYPE_PCI     PXE_BUSTYPE ('P', 'C', 'I', 'R')
 #define PXE_BUSTYPE_PC_CARD PXE_BUSTYPE ('P', 'C', 'C', 'R')
@@ -76,7 +76,7 @@ typedef UINT32         PXE_UINT32;
 typedef UINTN          PXE_UINTN;
 
 ///
-/// typedef unsigned long PXE_UINT64;
+/// Typedef unsigned long PXE_UINT64.
 ///
 typedef UINT64      PXE_UINT64;
 
@@ -226,12 +226,12 @@ typedef PXE_UINT16  PXE_OPFLAGS;
 #define PXE_OPFLAGS_RESET_DISABLE_FILTERS     0x0002
 
 ///
-/// UNDI Shutdown
+/// UNDI Shutdown.
 ///
-/// No OpFlags
+/// No OpFlags.
 
 ///
-/// UNDI Interrupt Enables
+/// UNDI Interrupt Enables.
 ///
 ///
 /// Select whether to enable or disable external interrupt signals.
@@ -267,7 +267,7 @@ typedef PXE_UINT16  PXE_OPFLAGS;
 #define PXE_OPFLAGS_INTERRUPT_SOFTWARE  0x0008
 
 ///
-/// UNDI Receive Filters
+/// UNDI Receive Filters.
 ///
 ///
 /// Select whether to enable or disable receive filters.
@@ -315,20 +315,20 @@ typedef PXE_UINT16  PXE_OPFLAGS;
 #define PXE_OPFLAGS_RECEIVE_FILTER_ALL_MULTICAST  0x0010
 
 ///
-/// UNDI Station Address
+/// UNDI Station Address.
 ///
 #define PXE_OPFLAGS_STATION_ADDRESS_READ   0x0000
 #define PXE_OPFLAGS_STATION_ADDRESS_WRITE  0x0000
 #define PXE_OPFLAGS_STATION_ADDRESS_RESET  0x0001
 
 ///
-/// UNDI Statistics
+/// UNDI Statistics.
 ///
 #define PXE_OPFLAGS_STATISTICS_READ   0x0000
 #define PXE_OPFLAGS_STATISTICS_RESET  0x0001
 
 ///
-/// UNDI MCast IP to MAC
+/// UNDI MCast IP to MAC.
 ///
 ///
 /// Identify the type of IP address in the CPB.
@@ -338,7 +338,7 @@ typedef PXE_UINT16  PXE_OPFLAGS;
 #define PXE_OPFLAGS_MCAST_IPV6_TO_MAC       0x0001
 
 ///
-/// UNDI NvData
+/// UNDI NvData.
 ///
 ///
 /// Select the type of non-volatile data operation.
@@ -348,7 +348,7 @@ typedef PXE_UINT16  PXE_OPFLAGS;
 #define PXE_OPFLAGS_NVDATA_WRITE  0x0001
 
 ///
-/// UNDI Get Status
+/// UNDI Get Status.
 ///
 ///
 /// Return current interrupt status.  This will also clear any interrupts
@@ -374,14 +374,14 @@ typedef PXE_UINT16  PXE_OPFLAGS;
 #define PXE_OPFLAGS_GET_MEDIA_STATUS    0x0004
 
 ///
-/// UNDI Fill Header
+/// UNDI Fill Header.
 ///
 #define PXE_OPFLAGS_FILL_HEADER_OPMASK      0x0001
 #define PXE_OPFLAGS_FILL_HEADER_FRAGMENTED  0x0001
 #define PXE_OPFLAGS_FILL_HEADER_WHOLE       0x0000
 
 ///
-/// UNDI Transmit
+/// UNDI Transmit.
 ///
 ///
 /// S/W UNDI only.  Return after the packet has been transmitted.  A
@@ -397,13 +397,13 @@ typedef PXE_UINT16  PXE_OPFLAGS;
 #define PXE_OPFLAGS_TRANSMIT_WHOLE      0x0000
 
 ///
-/// UNDI Receive
+/// UNDI Receive.
 ///
-/// No OpFlags
+/// No OpFlags.
 ///
 
 ///
-/// PXE STATFLAGS
+/// PXE STATFLAGS.
 ///
 typedef PXE_UINT16  PXE_STATFLAGS;
 
@@ -423,7 +423,7 @@ typedef PXE_UINT16  PXE_STATFLAGS;
 #define PXE_STATFLAGS_COMMAND_QUEUED    0x4000
 
 ///
-/// UNDI Get State
+/// UNDI Get State.
 ///
 #define PXE_STATFLAGS_GET_STATE_MASK        0x0003
 #define PXE_STATFLAGS_GET_STATE_INITIALIZED 0x0002
@@ -431,13 +431,13 @@ typedef PXE_UINT16  PXE_STATFLAGS;
 #define PXE_STATFLAGS_GET_STATE_STOPPED     0x0000
 
 ///
-/// UNDI Start
+/// UNDI Start.
 ///
-/// No additional StatFlags
+/// No additional StatFlags.
 ///
 
 ///
-/// UNDI Get Init Info
+/// UNDI Get Init Info.
 ///
 #define PXE_STATFLAGS_CABLE_DETECT_MASK           0x0001
 #define PXE_STATFLAGS_CABLE_DETECT_NOT_SUPPORTED  0x0000
@@ -448,22 +448,22 @@ typedef PXE_UINT16  PXE_STATFLAGS;
 #define PXE_STATFLAGS_GET_STATUS_NO_MEDIA_SUPPORTED      0x0002
 
 ///
-/// UNDI Initialize
+/// UNDI Initialize.
 ///
 #define PXE_STATFLAGS_INITIALIZED_NO_MEDIA  0x0001
 
 ///
-/// UNDI Reset
+/// UNDI Reset.
 ///
 #define PXE_STATFLAGS_RESET_NO_MEDIA  0x0001
 
 ///
-/// UNDI Shutdown
+/// UNDI Shutdown.
 ///
-/// No additional StatFlags
+/// No additional StatFlags.
 
 ///
-/// UNDI Interrupt Enables
+/// UNDI Interrupt Enables.
 ///
 ///
 /// If set, receive interrupts are enabled.
@@ -481,7 +481,7 @@ typedef PXE_UINT16  PXE_STATFLAGS;
 #define PXE_STATFLAGS_INTERRUPT_COMMAND 0x0004
 
 ///
-/// UNDI Receive Filters
+/// UNDI Receive Filters.
 ///
 
 ///
@@ -511,30 +511,30 @@ typedef PXE_UINT16  PXE_STATFLAGS;
 #define PXE_STATFLAGS_RECEIVE_FILTER_ALL_MULTICAST  0x0010
 
 ///
-/// UNDI Station Address
+/// UNDI Station Address.
 ///
-/// No additional StatFlags
-///
-
-///
-/// UNDI Statistics
-///
-/// No additional StatFlags
+/// No additional StatFlags.
 ///
 
 ///
-//// UNDI MCast IP to MAC
+/// UNDI Statistics.
+///
+/// No additional StatFlags.
+///
+
+///
+//// UNDI MCast IP to MAC.
 ////
-//// No additional StatFlags
+//// No additional StatFlags.
 
 ///
-/// UNDI NvData
+/// UNDI NvData.
 ///
-/// No additional StatFlags
+/// No additional StatFlags.
 ///
 
 ///
-/// UNDI Get Status
+/// UNDI Get Status.
 ///
 
 ///
@@ -581,19 +581,19 @@ typedef PXE_UINT16  PXE_STATFLAGS;
 #define PXE_STATFLAGS_GET_STATUS_NO_MEDIA  0x0040
 
 ///
-/// UNDI Fill Header
+/// UNDI Fill Header.
 ///
-/// No additional StatFlags
+/// No additional StatFlags.
 ///
 
 ///
-/// UNDI Transmit
+/// UNDI Transmit.
 ///
 /// No additional StatFlags.
 
 ///
 /// UNDI Receive
-///
+///.
 
 ///
 /// No additional StatFlags.
@@ -715,28 +715,28 @@ typedef UINT16      PXE_MEDIA_PROTOCOL;
 #define PXE_IFTYPE_FIBRE_CHANNEL  0x12
 
 typedef struct s_pxe_hw_undi {
-  PXE_UINT32  Signature;      ///< PXE_ROMID_SIGNATURE
-  PXE_UINT8   Len;            ///< sizeof(PXE_HW_UNDI)
-  PXE_UINT8   Fudge;          ///< makes 8-bit cksum equal zero
-  PXE_UINT8   Rev;            ///< PXE_ROMID_REV
-  PXE_UINT8   IFcnt;          ///< physical connector count
-  PXE_UINT8   MajorVer;       ///< PXE_ROMID_MAJORVER
-  PXE_UINT8   MinorVer;       ///< PXE_ROMID_MINORVER
-  PXE_UINT16  reserved;       ///< zero, not used
-  PXE_UINT32  Implementation; ///< implementation flags
-  ///< reserved             ///< vendor use
-  ///< UINT32 Status;       ///< status port
-  ///< UINT32 Command;      ///< command port
-  ///< UINT64 CDBaddr;      ///< CDB address port
+  PXE_UINT32  Signature;      ///< PXE_ROMID_SIGNATURE.
+  PXE_UINT8   Len;            ///< sizeof(PXE_HW_UNDI).
+  PXE_UINT8   Fudge;          ///< makes 8-bit cksum equal zero.
+  PXE_UINT8   Rev;            ///< PXE_ROMID_REV.
+  PXE_UINT8   IFcnt;          ///< physical connector count.
+  PXE_UINT8   MajorVer;       ///< PXE_ROMID_MAJORVER.
+  PXE_UINT8   MinorVer;       ///< PXE_ROMID_MINORVER.
+  PXE_UINT16  reserved;       ///< zero, not used.
+  PXE_UINT32  Implementation; ///< implementation flags.
+  ///< reserved             ///< vendor use.
+  ///< UINT32 Status;       ///< status port.
+  ///< UINT32 Command;      ///< command port.
+  ///< UINT64 CDBaddr;      ///< CDB address port.
   ///<
 } PXE_HW_UNDI;
 
 ///
-/// Status port bit definitions
+/// Status port bit definitions.
 ///
 
 ///
-/// UNDI operation state
+/// UNDI operation state.
 ///
 #define PXE_HWSTAT_STATE_MASK   0xC0000000
 #define PXE_HWSTAT_BUSY         0xC0000000
@@ -745,12 +745,12 @@ typedef struct s_pxe_hw_undi {
 #define PXE_HWSTAT_STOPPED      0x00000000
 
 ///
-/// If set, last command failed
+/// If set, last command failed.
 ///
 #define PXE_HWSTAT_COMMAND_FAILED 0x20000000
 
 ///
-/// If set, identifies enabled receive filters
+/// If set, identifies enabled receive filters.
 ///
 #define PXE_HWSTAT_PROMISCUOUS_MULTICAST_RX_ENABLED 0x00001000
 #define PXE_HWSTAT_PROMISCUOUS_RX_ENABLED           0x00000800
@@ -759,7 +759,7 @@ typedef struct s_pxe_hw_undi {
 #define PXE_HWSTAT_UNICAST_RX_ENABLED               0x00000100
 
 ///
-/// If set, identifies enabled external interrupts
+/// If set, identifies enabled external interrupts.
 ///
 #define PXE_HWSTAT_SOFTWARE_INT_ENABLED     0x00000080
 #define PXE_HWSTAT_TX_COMPLETE_INT_ENABLED  0x00000040
@@ -767,7 +767,7 @@ typedef struct s_pxe_hw_undi {
 #define PXE_HWSTAT_CMD_COMPLETE_INT_ENABLED 0x00000010
 
 ///
-/// If set, identifies pending interrupts
+/// If set, identifies pending interrupts.
 ///
 #define PXE_HWSTAT_SOFTWARE_INT_PENDING     0x00000008
 #define PXE_HWSTAT_TX_COMPLETE_INT_PENDING  0x00000004
@@ -775,7 +775,7 @@ typedef struct s_pxe_hw_undi {
 #define PXE_HWSTAT_CMD_COMPLETE_INT_PENDING 0x00000001
 
 ///
-/// Command port definitions
+/// Command port definitions.
 ///
 
 ///
@@ -795,7 +795,7 @@ typedef struct s_pxe_hw_undi {
 #define PXE_HWCMD_UNICAST_RX_ENABLE               0x00000100
 
 ///
-/// Use these to enable/disable external interrupts
+/// Use these to enable/disable external interrupts.
 ///
 #define PXE_HWCMD_SOFTWARE_INT_ENABLE     0x00000080
 #define PXE_HWCMD_TX_COMPLETE_INT_ENABLE  0x00000040
@@ -803,7 +803,7 @@ typedef struct s_pxe_hw_undi {
 #define PXE_HWCMD_CMD_COMPLETE_INT_ENABLE 0x00000010
 
 ///
-/// Use these to clear pending external interrupts
+/// Use these to clear pending external interrupts.
 ///
 #define PXE_HWCMD_CLEAR_SOFTWARE_INT      0x00000008
 #define PXE_HWCMD_CLEAR_TX_COMPLETE_INT   0x00000004
@@ -811,19 +811,19 @@ typedef struct s_pxe_hw_undi {
 #define PXE_HWCMD_CLEAR_CMD_COMPLETE_INT  0x00000001
 
 typedef struct s_pxe_sw_undi {
-  PXE_UINT32  Signature;      ///< PXE_ROMID_SIGNATURE
-  PXE_UINT8   Len;            ///< sizeof(PXE_SW_UNDI)
-  PXE_UINT8   Fudge;          ///< makes 8-bit cksum zero
-  PXE_UINT8   Rev;            ///< PXE_ROMID_REV
-  PXE_UINT8   IFcnt;          ///< physical connector count
-  PXE_UINT8   MajorVer;       ///< PXE_ROMID_MAJORVER
-  PXE_UINT8   MinorVer;       ///< PXE_ROMID_MINORVER
-  PXE_UINT16  reserved1;      ///< zero, not used
-  PXE_UINT32  Implementation; ///< Implementation flags
-  PXE_UINT64  EntryPoint;     ///< API entry point
-  PXE_UINT8   reserved2[3];   ///< zero, not used
-  PXE_UINT8   BusCnt;         ///< number of bustypes supported
-  PXE_UINT32  BusType[1];     ///< list of supported bustypes
+  PXE_UINT32  Signature;      ///< PXE_ROMID_SIGNATURE.
+  PXE_UINT8   Len;            ///< sizeof(PXE_SW_UNDI).
+  PXE_UINT8   Fudge;          ///< makes 8-bit cksum zero.
+  PXE_UINT8   Rev;            ///< PXE_ROMID_REV.
+  PXE_UINT8   IFcnt;          ///< physical connector count.
+  PXE_UINT8   MajorVer;       ///< PXE_ROMID_MAJORVER.
+  PXE_UINT8   MinorVer;       ///< PXE_ROMID_MINORVER.
+  PXE_UINT16  reserved1;      ///< zero, not used.
+  PXE_UINT32  Implementation; ///< Implementation flags.
+  PXE_UINT64  EntryPoint;     ///< API entry point.
+  PXE_UINT8   reserved2[3];   ///< zero, not used.
+  PXE_UINT8   BusCnt;         ///< number of bustypes supported.
+  PXE_UINT32  BusType[1];     ///< list of supported bustypes.
 } PXE_SW_UNDI;
 
 typedef union u_pxe_undi {
@@ -832,13 +832,13 @@ typedef union u_pxe_undi {
 } PXE_UNDI;
 
 ///
-/// Signature of !PXE structure
+/// Signature of !PXE structure.
 ///
 #define PXE_ROMID_SIGNATURE PXE_BUSTYPE ('!', 'P', 'X', 'E')
 
 ///
 /// !PXE structure format revision
-///
+///.
 #define PXE_ROMID_REV 0x02
 
 ///
@@ -850,7 +850,7 @@ typedef union u_pxe_undi {
 #define PXE_ROMID_MINORVER    0x01
 
 ///
-/// Implementation flags
+/// Implementation flags.
 ///
 #define PXE_ROMID_IMP_HW_UNDI                             0x80000000
 #define PXE_ROMID_IMP_SW_VIRT_ADDR                        0x40000000
@@ -921,9 +921,9 @@ typedef union pxe_device {
 ///
 /// cpb and db definitions
 ///
-#define MAX_PCI_CONFIG_LEN    64  ///< # of dwords
-#define MAX_EEPROM_LEN        128 ///< # of dwords
-#define MAX_XMIT_BUFFERS      32  ///< recycling Q length for xmit_done
+#define MAX_PCI_CONFIG_LEN    64  ///< # of dwords.
+#define MAX_EEPROM_LEN        128 ///< # of dwords.
+#define MAX_XMIT_BUFFERS      32  ///< recycling Q length for xmit_done.
 #define MAX_MCAST_ADDRESS_CNT 8
 
 typedef struct s_pxe_cpb_start_30 {
@@ -1048,7 +1048,7 @@ typedef struct s_pxe_cpb_start_31 {
   /// used with the DMA, it converts the given virtual address to it's
   /// physical address and write that in the mapped address pointer.
   ///
-  /// This field can be set to zero if there is no mapping service available
+  /// This field can be set to zero if there is no mapping service available.
   ///
   UINT64  Map_Mem;
 
@@ -1056,10 +1056,10 @@ typedef struct s_pxe_cpb_start_31 {
   /// PXE_VOID UnMap_Mem(UINT64 unq_id, UINT64 virtual_addr, UINT32 size,
   ///            UINT32 Direction, UINT64 mapped_addr);
   ///
-  /// UNDI will pass the virtual and mapped addresses of a buffer
-  /// This call will un map the given address
+  /// UNDI will pass the virtual and mapped addresses of a buffer.
+  /// This call will un map the given address.
   ///
-  /// This field can be set to zero if there is no unmapping service available
+  /// This field can be set to zero if there is no unmapping service available.
   ///
   UINT64  UnMap_Mem;
 
@@ -1067,11 +1067,11 @@ typedef struct s_pxe_cpb_start_31 {
   /// PXE_VOID Sync_Mem(UINT64 unq_id, UINT64 virtual,
   ///            UINT32 size, UINT32 Direction, UINT64 mapped_addr);
   ///
-  /// UNDI will pass the virtual and mapped addresses of a buffer
-  /// This call will synchronize the contents of both the virtual and mapped
+  /// UNDI will pass the virtual and mapped addresses of a buffer.
+  /// This call will synchronize the contents of both the virtual and mapped.
   /// buffers for the given Direction.
   ///
-  /// This field can be set to zero if there is no service available
+  /// This field can be set to zero if there is no service available.
   ///
   UINT64  Sync_Mem;
 
@@ -1195,7 +1195,7 @@ typedef struct s_pxe_pci_config_info {
   UINT32  BusType;
 
   ///
-  /// This identifies the PCI network device that this UNDI interface
+  /// This identifies the PCI network device that this UNDI interface.
   /// is bound to.
   ///
   UINT16  Bus;

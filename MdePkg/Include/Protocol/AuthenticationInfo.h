@@ -3,14 +3,14 @@
   This protocol is used on any device handle to obtain authentication information 
   associated with the physical or logical device.
 
-  Copyright (c) 2006 - 2008, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. 
 
 **/
 
@@ -51,19 +51,19 @@ typedef struct {
   AUTH_NODE_HEADER Header;
 
   ///
-  /// RADIUS Server IPv4 or IPv6 Address
+  /// RADIUS Server IPv4 or IPv6 Address.
   ///
-  UINT8            RadiusIpAddr[16];         ///< IPv4 or IPv6 address
+  UINT8            RadiusIpAddr[16];         ///< IPv4 or IPv6 address.
 
   ///
-  /// Reserved for future use
+  /// Reserved for future use.
   ///
   UINT16           Reserved;
 
   ///
-  /// Network Access Server IPv4 or IPv6 Address (OPTIONAL)
+  /// Network Access Server IPv4 or IPv6 Address (OPTIONAL).
   ///
-  UINT8            NasIpAddr[16];            ///< IPv4 or IPv6 address
+  UINT8            NasIpAddr[16];            ///< IPv4 or IPv6 address.
 
   ///
   /// Network Access Server Secret Length in bytes (OPTIONAL)
@@ -71,7 +71,7 @@ typedef struct {
   UINT16           NasSecretLength; 
 
   ///
-  /// Network Access Server Secret (OPTIONAL)
+  /// Network Access Server Secret (OPTIONAL).
   ///
   UINT8            NasSecret[1];
 
@@ -84,7 +84,7 @@ typedef struct {
   ///
   /// UINT8            ChapSecret[];
   ///
-  /// CHAP Initiator Name Length in bytes on offset ChapSecret + ChapSecretLength
+  /// CHAP Initiator Name Length in bytes on offset ChapSecret + ChapSecretLength.
   ///
   /// UINT16           ChapNameLength;
   ///
@@ -98,22 +98,22 @@ typedef struct {
   AUTH_NODE_HEADER Header;
 
   ///
-  /// Reserved for future use
+  /// Reserved for future use.
   ///
   UINT16           Reserved;
 
   ///
-  /// User Secret Length in bytes
+  /// User Secret Length in bytes.
   ///
   UINT16           UserSecretLength;
 
   ///
-  /// User Secret
+  /// User Secret.
   ///
   UINT8            UserSecret[1];
 
   ///
-  /// User Name Length in bytes on offset UserSecret + UserSecretLength
+  /// User Name Length in bytes on offset UserSecret + UserSecretLength.
   ///
   /// UINT16           UserNameLength;
   ///
@@ -143,14 +143,16 @@ typedef struct {
 /**
   Retrieves the authentication information associated with a particular controller handle.
 
-  @param[in]  This                  Pointer to the EFI_AUTHENTICATION_INFO_PROTOCOL
-  @param[in]  ControllerHandle      Handle to the Controller
-  @param[out] Buffer                Pointer to the authentication information.
+  @param[in]  This                  The pointer to the EFI_AUTHENTICATION_INFO_PROTOCOL.
+  @param[in]  ControllerHandle      The handle to the Controller.
+  @param[out] Buffer                The pointer to the authentication information.
 
-  @retval EFI_SUCCESS           Successfully retrieved authentication information for the given ControllerHandle
-  @retval EFI_INVALID_PARAMETER No matching authentication information found for the given ControllerHandle
-  @retval EFI_DEVICE_ERROR      The authentication information could not be retrieved due to a
-                                hardware error.
+  @retval EFI_SUCCESS           Successfully retrieved authentication information 
+                                for the given ControllerHandle.
+  @retval EFI_INVALID_PARAMETER No matching authentication information found for 
+                                the given ControllerHandle.
+  @retval EFI_DEVICE_ERROR      The authentication information could not be retrieved 
+                                due to a hardware error.
 
 **/
 typedef
@@ -164,15 +166,16 @@ EFI_STATUS
 /**
   Set the authentication information for a given controller handle.
 
-  @param[in]  This                 Pointer to the EFI_AUTHENTICATION_INFO_PROTOCOL
-  @param[in]  ControllerHandle     Handle to the Controller
-  @param[in]  Buffer               Pointer to the authentication information.
+  @param[in]  This                 The pointer to the EFI_AUTHENTICATION_INFO_PROTOCOL.
+  @param[in]  ControllerHandle     The handle to the Controller.
+  @param[in]  Buffer               The pointer to the authentication information.
                                 
-  @retval EFI_SUCCESS          Successfully set authentication information for the given ControllerHandle
-  @retval EFI_UNSUPPORTED      If the platform policies do not allow setting of the authentication
-                               information.
-  @retval EFI_DEVICE_ERROR     The authentication information could not be configured due to a
-                               hardware error.
+  @retval EFI_SUCCESS          Successfully set authentication information for the 
+                               given ControllerHandle.
+  @retval EFI_UNSUPPORTED      If the platform policies do not allow setting of 
+                               the authentication information.
+  @retval EFI_DEVICE_ERROR     The authentication information could not be configured 
+                               due to a hardware error.
   @retval EFI_OUT_OF_RESOURCES Not enough storage is available to hold the data.
 
 **/

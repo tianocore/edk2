@@ -4,14 +4,14 @@
   We currently only have one EBC compiler so there may be some Intel compiler
   specific functions in this file.
 
-  Copyright (c) 2006 - 2009, Intel Corporation<BR>                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
 **/
 
@@ -37,19 +37,19 @@ typedef char                  INT8;
 ///
 typedef unsigned char         BOOLEAN;
 ///
-/// 1-byte unsigned value
+/// 1-byte unsigned value.
 ///
 typedef unsigned char         UINT8;
 ///
-/// 1-byte Character
+/// 1-byte Character.
 ///
 typedef char                  CHAR8;
 ///
-/// 2-byte signed value
+/// 2-byte signed value.
 ///
 typedef short                 INT16;
 ///
-/// 2-byte unsigned value
+/// 2-byte unsigned value.
 ///
 typedef unsigned short        UINT16;
 ///
@@ -58,19 +58,19 @@ typedef unsigned short        UINT16;
 ///
 typedef unsigned short        CHAR16;
 ///
-/// 4-byte signed value
+/// 4-byte signed value.
 ///
 typedef int                   INT32;
 ///
-/// 4-byte unsigned value
+/// 4-byte unsigned value.
 ///
 typedef unsigned int          UINT32;
 ///
-/// 8-byte signed value
+/// 8-byte signed value.
 ///
 typedef __int64               INT64;
 ///
-/// 8-byte unsigned value
+/// 8-byte unsigned value.
 ///
 typedef unsigned __int64      UINT64;
 
@@ -81,20 +81,20 @@ typedef unsigned __int64      UINT64;
 ///
 typedef long                  INTN;
 ///
-/// Unsigned value of native width.  (4 bytes on supported 32-bit processor instructions,
+/// The unsigned value of native width.  (4 bytes on supported 32-bit processor instructions;
 /// 8 bytes on supported 64-bit processor instructions)
-/// "long" type scales to the processor native size with EBC compiler
+/// "long" type scales to the processor native size with the EBC compiler.
 ///
 typedef unsigned long         UINTN;
 
 ///
 /// A value of native width with the highest bit set.
-/// Scalable macro to set the most significant bit in a natural number
+/// Scalable macro to set the most significant bit in a natural number.
 ///
 #define MAX_BIT     (1ULL << (sizeof (INTN) * 8 - 1)) 
 ///
 /// A value of native width with the two highest bits set.
-/// Scalable macro to set the most 2 significant bits in a natural number
+/// Scalable macro to set the most 2 significant bits in a natural number.
 ///
 #define MAX_2_BITS  (3ULL << (sizeof (INTN) * 8 - 2))
 

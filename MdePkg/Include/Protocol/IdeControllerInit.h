@@ -13,18 +13,18 @@
   
   A device handle for an IDE controller must contain an EFI_DEVICE_PATH_PROTOCOL.
 
-  Copyright (c) 2007 - 2010, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   This Protocol is defined in UEFI Platform Initialization Specification 1.2 
-  Volume 5: Standards
+  Volume 5: Standards.
   
 **/
 
@@ -34,7 +34,7 @@
 #include <IndustryStandard/Atapi.h>
 
 ///
-/// Global ID for the EFI_IDE_CONTROLLER_INIT_PROTOCOL
+/// Global ID for the EFI_IDE_CONTROLLER_INIT_PROTOCOL.
 ///
 #define EFI_IDE_CONTROLLER_INIT_PROTOCOL_GUID \
   { \
@@ -42,12 +42,12 @@
   }
 
 ///
-/// Forward declaration for EFI_IDE_CONTROLLER_INIT_PROTOCOL
+/// Forward declaration for EFI_IDE_CONTROLLER_INIT_PROTOCOL.
 ///
 typedef struct _EFI_IDE_CONTROLLER_INIT_PROTOCOL  EFI_IDE_CONTROLLER_INIT_PROTOCOL;
 
 ///
-/// The phase of the IDE Controller enumeration
+/// The phase of the IDE Controller enumeration.
 ///
 typedef enum {
   ///
@@ -122,7 +122,7 @@ typedef enum {
 #define  EFI_SATA_GEN2_SPEED  2
 
 ///
-/// EFI_ATA_MODE structure
+/// EFI_ATA_MODE structure.
 ///
 typedef struct {
   BOOLEAN      Valid;   ///< TRUE if Mode is valid.
@@ -150,7 +150,7 @@ typedef struct {
 } EFI_ATA_EXTENDED_MODE;
 
 ///
-/// EFI_ATA_COLLECTIVE_MODE structure
+/// EFI_ATA_COLLECTIVE_MODE structure.
 ///
 typedef struct {
   ///
@@ -164,7 +164,7 @@ typedef struct {
   ///
   /// This field specifies the single word DMA mode. Single word DMA modes are defined
   /// in the ATA/ATAPI specification, versions 1 and 2. Single word DMA support was
-  /// obsoleted in the ATA/ATAPI specification, version 3; therefore, most devices and
+  /// obsoleted in the ATA/ATAPI specification, version 3. Therefore, most devices and
   /// controllers will not support this transfer mode. The ATA/ATAPI specification defines
   /// the enumeration. In other words, a value of 1 in this field means single word DMA
   /// mode 1. The actual meaning of single word DMA mode 1 is governed by the ATA/
@@ -221,7 +221,7 @@ typedef ATAPI_IDENTIFY_DATA EFI_ATAPI_IDENTIFY_DATA;
 #define   EFI_ATAPI_DEVICE_IDENTIFY_DATA  0x8000
 
 ///
-/// EFI_IDENTIFY_DATA structure
+/// EFI_IDENTIFY_DATA structure.
 ///
 typedef union {
   ///
@@ -248,25 +248,25 @@ typedef union {
   For most of today's controllers, MaxDevices will either be 1 or 2. For SATA 
   controllers, this value will always be 1. SATA configurations can contain SATA 
   port multipliers. SATA port multipliers behave like SATA bridges and can support
-  up to 16 devices on the other side. If an SATA port out of the IDE controller 
+  up to 16 devices on the other side. If a SATA port out of the IDE controller 
   is connected to a port multiplier, MaxDevices will be set to the number of SATA 
   devices that the port multiplier supports. Because today's port multipliers 
-  support up to 15 SATA devices, this number can be as large as 15. The IDE bus 
-  driver is required to scan for the presence of port multipliers behind an SATA 
+  support up to fifteen SATA devices, this number can be as large as fifteen. The IDE  
+  bus driver is required to scan for the presence of port multipliers behind an SATA 
   controller and enumerate up to MaxDevices number of devices behind the port 
   multiplier.    
   
   In this context, the devices behind a port multiplier constitute a channel.  
   
-  @param[in]  This         Pointer to the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance.
+  @param[in]  This         The pointer to the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance.
   @param[in]  Channel      Zero-based channel number.
   @param[out] Enabled      TRUE if this channel is enabled.  Disabled channels 
                            are not scanned to see if any devices are present.
   @param[out] MaxDevices   The maximum number of IDE devices that the bus driver
                            can expect on this channel.  For the ATA/ATAPI 
                            specification, version 6, this number will either be 
-                           1 or 2. For Serial ATA (SATA) configurations with a 
-                           port multiplier, this number can be as large as 15.
+                           one or two. For Serial ATA (SATA) configurations with a 
+                           port multiplier, this number can be as large as fifteen.
 
   @retval EFI_SUCCESS             Information was returned without any errors.
   @retval EFI_INVALID_PARAMETER   Channel is invalid (Channel >= ChannelCount).
@@ -292,7 +292,7 @@ EFI_STATUS
   
   More synchronization points may be added as required in the future.  
 
-  @param[in] This      Pointer to the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance.
+  @param[in] This      The pointer to the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance.
   @param[in] Phase     The phase during enumeration.
   @param[in] Channel   Zero-based channel number.
 
@@ -342,7 +342,7 @@ EFI_STATUS
   EFI_IDE_CONTROLLER_INIT_PROTOCOL.SubmitData() can be called only once for a 
   given (Channel, Device) pair.  
     
-  @param[in] This           Pointer to the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance.
+  @param[in] This           A pointer to the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance.
   @param[in] Channel        Zero-based channel number.
   @param[in] Device         Zero-based device number on the Channel.
   @param[in] IdentifyData   The device's response to the ATA IDENTIFY_DEVICE command.
@@ -389,9 +389,9 @@ EFI_STATUS
   may inform the IDE controller driver to not use second-generation (Gen2) speeds 
   for a certain SATA drive.
   
-  @param[in] This       Pointer to the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance.
-  @param[in] Channel    Zero-based channel number.
-  @param[in] Device     Zero-based device number on the Channel.
+  @param[in] This       The pointer to the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance.
+  @param[in] Channel    The zero-based channel number.
+  @param[in] Device     The zero-based device number on the Channel.
   @param[in] BadModes   The modes that the device does not support and that
                         should be disqualified.
 
@@ -431,7 +431,7 @@ EFI_STATUS
     
   The IDE bus driver may collect timing information for various devices in any 
   order. The IDE bus driver is responsible for making sure that all the dependencies
-  are satisfied; for example, the SupportedModes information for device A that 
+  are satisfied. For example, the SupportedModes information for device A that 
   was previously returned may become stale after a call to 
   EFI_IDE_CONTROLLER_INIT_PROTOCOL.DisqualifyMode() for device B.
   
@@ -447,9 +447,9 @@ EFI_STATUS
   also allow the IDE bus driver to stay with the speed that has been negotiated 
   by the physical layer.
   
-  @param[in]  This             Pointer to the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance.
-  @param[in]  Channel          Zero-based channel number.
-  @param[in]  Device           Zero-based device number on the Channel.
+  @param[in]  This             The pointer to the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance.
+  @param[in]  Channel          A zero-based channel number.
+  @param[in]  Device           A zero-based device number on the Channel.
   @param[out] SupportedModes   The optimum modes for the device.
 
   @retval EFI_SUCCESS             SupportedModes was returned.
@@ -545,7 +545,7 @@ struct _EFI_IDE_CONTROLLER_INIT_PROTOCOL {
   
   ///
   /// Set to TRUE if the enumeration group includes all the channels that are
-  /// produced by this controller. FALSE if an enumeration group consists of
+  /// produced by this controller. Set to FALSE if an enumeration group consists of
   /// only one channel.  
   ///
   BOOLEAN                                EnumAll;
@@ -555,7 +555,7 @@ struct _EFI_IDE_CONTROLLER_INIT_PROTOCOL {
   /// (PATA) controllers can support up to two channels. Advanced Host Controller 
   /// Interface (AHCI) Serial ATA (SATA) controllers can support up to 32 channels,
   /// each of which can have up to one device. In the presence of a multiplier, 
-  /// each channel can have 15 devices.
+  /// each channel can have fifteen devices.
   ///
   UINT8                                  ChannelCount;
 };

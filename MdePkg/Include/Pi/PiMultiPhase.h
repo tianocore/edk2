@@ -1,17 +1,17 @@
 /** @file
   Include file matches things in PI for multiple module types.
 
-  Copyright (c) 2006 - 2010, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                                                                    
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
   @par Revision Reference:
-  These elements are defined in UEFI Platform Initialization Specification 1.2 
+  These elements are defined in UEFI Platform Initialization Specification 1.2.
 
 **/
 
@@ -53,21 +53,21 @@
 #define EFI_NOT_AVAILABLE_YET     DXE_ERROR (2)
 
 ///
-/// Success and warning codes reserved for use by PI
-/// Supported 32-bit range is 0x20000000-0x3fffffff
-/// Supported 64-bit range is 0x2000000000000000-0x3fffffffffffffff
+/// Success and warning codes reserved for use by PI.
+/// Supported 32-bit range is 0x20000000-0x3fffffff.
+/// Supported 64-bit range is 0x2000000000000000-0x3fffffffffffffff.
 ///
 #define PI_ENCODE_WARNING(a)                ((MAX_BIT >> 2) | (a))
 
 ///
-/// Error codes reserved for use by PI
-/// Supported 32-bit range is 0xa0000000-0xbfffffff
-/// Supported 64-bit range is 0xa000000000000000-0xbfffffffffffffff
+/// Error codes reserved for use by PI.
+/// Supported 32-bit range is 0xa0000000-0xbfffffff.
+/// Supported 64-bit range is 0xa000000000000000-0xbfffffffffffffff.
 ///
 #define PI_ENCODE_ERROR(a)                  (MAX_BIT | (MAX_BIT >> 2) | (a))
 
 /// 
-/// Return status codes defined in SMM CIS
+/// Return status codes defined in SMM CIS.
 /// 
 #define EFI_INTERRUPT_PENDING               PI_ENCODE_ERROR (0)
 
@@ -80,7 +80,7 @@
 /// and the EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI
 ///
 /// xx00 Image was not signed.
-/// xxx1 Platform security policy override. Assumes same meaning as 0010 (the image was signed, the
+/// xxx1 Platform security policy override. Assumes the same meaning as 0010 (the image was signed, the
 ///      signature was tested, and the signature passed authentication test).
 /// 0010 Image was signed, the signature was tested, and the signature passed authentication test.
 /// 0110 Image was signed and the signature was not tested.
@@ -106,7 +106,7 @@
 #define EFI_NEEDS_ECC_INITIALIZATION    0x00000040
 
 ///
-/// Structure describing a SMRAM region and its accessibility attributes
+/// Structure describing a SMRAM region and its accessibility attributes.
 ///
 typedef struct {
   ///

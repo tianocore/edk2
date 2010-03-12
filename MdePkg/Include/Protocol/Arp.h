@@ -7,17 +7,17 @@
   The EFI ARP Protocol provides services to map IP network
   address to hardware address used by a data link protocol.
   
-  Copyright (c) 2006 - 2009, Intel Corporation.<BR>                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at<BR>        
-  http://opensource.org/licenses/bsd-license.php                                            
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
     
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
   @par Revision Reference:          
-  This Protocol is introduced in UEFI Specification 2.0
+  This Protocol was introduced in UEFI Specification 2.0.
 
 **/
 
@@ -65,12 +65,12 @@ typedef struct {
   UINT16                      SwAddressType;
 
   ///
-  /// Length of the hardware address.
+  /// The length of the hardware address.
   ///
   UINT8                       HwAddressLength;
 
   ///
-  /// Length of the protocol address.
+  /// The length of the protocol address.
   ///
   UINT8                       SwAddressLength;
 } EFI_ARP_FIND_DATA;
@@ -82,12 +82,12 @@ typedef struct {
   UINT16                    SwAddressType;
 
   ///
-  /// Length in bytes of the station's protocol address to register.
+  /// The length in bytes of the station's protocol address to register.
   ///
   UINT8                     SwAddressLength;
 
   ///
-  /// Pointer to the first byte of the protocol address to register. For
+  /// The pointer to the first byte of the protocol address to register. For
   /// example, if SwAddressType is 0x0800 (IP), then
   /// StationAddress points to the first byte of this station's IP
   /// address stored in network byte order.
@@ -128,8 +128,8 @@ typedef struct {
   all the following ARP functions will use this information. Attempting to change 
   the protocol type or station address to a configured ARP instance will result in errors.
 
-  @param  This                   Pointer to the EFI_ARP_PROTOCOL instance.
-  @param  ConfigData             Pointer to the EFI_ARP_CONFIG_DATA structure.
+  @param  This                   The pointer to the EFI_ARP_PROTOCOL instance.
+  @param  ConfigData             The pointer to the EFI_ARP_CONFIG_DATA structure.
 
   @retval EFI_SUCCESS            The new station address was successfully
                                  registered.
@@ -160,7 +160,7 @@ EFI_STATUS
   by the Add() function may be static (will not time out) or dynamic (will time out).
   Default ARP cache timeout values are not covered in most network protocol 
   specifications (although RFC 1122 comes pretty close) and will only be 
-  discussed in general in this specification. The timeout values that are 
+  discussed in general terms in this specification. The timeout values that are 
   used in the EFI Sample Implementation should be used only as a guideline. 
   Final product implementations of the EFI network stack should be tuned for 
   their expected network environments.
@@ -218,16 +218,16 @@ EFI_STATUS
   set to TRUE. If the found ARP cache entry is a permanent entry, it is not 
   affected by Refresh.
   
-  @param  This                   Pointer to the EFI_ARP_PROTOCOL instance.
+  @param  This                   The pointer to the EFI_ARP_PROTOCOL instance.
   @param  BySwAddress            Set to TRUE to look for matching software protocol
                                  addresses. Set to FALSE to look for matching
                                  hardware protocol addresses.
-  @param  AddressBuffer          Pointer to address buffer. Set to NULL to match
-                                 all addresses.
+  @param  AddressBuffer          The pointer to the address buffer. Set to NULL 
+                                 to match all addresses.
   @param  EntryLength            The size of an entry in the entries buffer.
   @param  EntryCount             The number of ARP cache entries that are found by
                                  the specified criteria.
-  @param  Entries                Pointer to the buffer that will receive the ARP
+  @param  Entries                The pointer to the buffer that will receive the ARP
                                  cache entries.
   @param  Refresh                Set to TRUE to refresh the timeout value of the
                                  matching ARP cache entry.
@@ -257,11 +257,11 @@ EFI_STATUS
 /**
   This function removes specified ARP cache entries.
 
-  @param  This                   Pointer to the EFI_ARP_PROTOCOL instance.
+  @param  This                   The pointer to the EFI_ARP_PROTOCOL instance.
   @param  BySwAddress            Set to TRUE to delete matching protocol addresses.
                                  Set to FALSE to delete matching hardware
                                  addresses.
-  @param  AddressBuffer          Pointer to the address buffer that is used as a
+  @param  AddressBuffer          The pointer to the address buffer that is used as a
                                  key to look for the cache entry. Set to NULL to
                                  delete all entries.
 
@@ -283,7 +283,7 @@ EFI_STATUS
   This function delete all dynamic entries from the ARP cache that match the specified
   software protocol type.
 
-  @param  This                   Pointer to the EFI_ARP_PROTOCOL instance.
+  @param  This                   The pointer to the EFI_ARP_PROTOCOL instance.
 
   @retval EFI_SUCCESS            The cache has been flushed.
   @retval EFI_INVALID_PARAMETER  This is NULL.
@@ -301,11 +301,11 @@ EFI_STATUS
   This function tries to resolve the TargetSwAddress and optionally returns a
   TargetHwAddress if it already exists in the ARP cache.
 
-  @param  This                   Pointer to the EFI_ARP_PROTOCOL instance.
-  @param  TargetSwAddress        Pointer to the protocol address to resolve.
-  @param  ResolvedEvent          Pointer to the event that will be signaled when
+  @param  This                   The pointer to the EFI_ARP_PROTOCOL instance.
+  @param  TargetSwAddress        The pointer to the protocol address to resolve.
+  @param  ResolvedEvent          The pointer to the event that will be signaled when
                                  the address is resolved or some error occurs.
-  @param  TargetHwAddress        Pointer to the buffer for the resolved hardware
+  @param  TargetHwAddress        The pointer to the buffer for the resolved hardware
                                  address in network byte order.
 
   @retval EFI_SUCCESS            The data is copied from the ARP cache into the
@@ -338,8 +338,8 @@ EFI_STATUS
   NULL, all the pending asynchronous requests that have been issued by This 
   instance will be cancelled and their corresponding events will be signaled.
   
-  @param  This                   Pointer to the EFI_ARP_PROTOCOL instance.
-  @param  TargetSwAddress        Pointer to the protocol address in previous
+  @param  This                   The pointer to the EFI_ARP_PROTOCOL instance.
+  @param  TargetSwAddress        The pointer to the protocol address in previous
                                  request session.
   @param  ResolvedEvent          Pointer to the event that is used as the
                                  notification event in previous request session.

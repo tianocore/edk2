@@ -6,14 +6,14 @@
   environment and also encapsulates knowledge of at least the 
   location of the Boot Firmware Volume (BFV).
 
-  Copyright (c) 2006 - 2010, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                             
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
   @par Revision Reference:
   This PPI is introduced in PI Version 1.0.
@@ -53,22 +53,22 @@ typedef union {
     ///
     UINT32   Reserved1                :13;
     ///
-    /// A 1-bit field. If set to 1, indicates that virtual
+    /// A 1-bit field. If set to 1, this indicates that virtual
     /// memory features are not available.
     ///
     UINT32   VirtualMemoryUnavailable : 1;
     ///
-    /// A 1-bit field. If set to 1, indicates that IA-32 execution
+    /// A 1-bit field. If set to 1, this indicates that IA-32 execution
     /// is not available.
     ///
     UINT32   Ia32ExecutionUnavailable : 1;
     ///
-    /// A 1-bit field. If set to 1, indicates that the floating
+    /// A 1-bit field. If set to 1, this indicates that the floating
     /// point unit is not available.
     ///
     UINT32   FloatingPointUnavailable : 1;
     ///
-    /// A 1-bit field. If set to 1, indicates miscellaneous
+    /// A 1-bit field. If set to 1, this indicates miscellaneous
     /// functional failure other than vm, ia, or fp.
     /// The test status field provides additional information on
     /// test failures when the State field returns a value of
@@ -113,7 +113,7 @@ typedef struct {
   UINT8  EidMask;
   UINT16 Reserved4;
   ///
-  /// Address to make PAL calls
+  /// Address to make PAL calls.
   ///
   UINT64 PalCallAddress;
   ///
@@ -123,7 +123,7 @@ typedef struct {
   ///
   UINT64 PalSpecialAddress;
   ///
-  /// GR35 from PALE_EXIT state
+  /// GR35 from PALE_EXIT state.
   ///
   UINT64 SelfTestStatus;
   ///
@@ -134,7 +134,7 @@ typedef struct {
 } ITANIUM_HANDOFF_STATUS;
 
 ///
-/// EFI_SEC_PLATFORM_INFORMATION_RECORD
+/// EFI_SEC_PLATFORM_INFORMATION_RECORD.
 ///
 typedef union {
   IA32_HANDOFF_STATUS    IA32HealthFlags;
@@ -150,12 +150,12 @@ typedef union {
   PEI Foundation. As such, if the platform supports the built-in self test (BIST) on IA-32 Intel
   architecture or the PAL-A handoff state for Itanium architecture, this information is encapsulated
   into the data structure abstracted by this service. This information is collected for the boot-strap
-  processor (BSP) on IA-32, and for Itanium architecture, it is available on all processors that execute
+  processor (BSP) on IA-32. For Itanium architecture, it is available on all processors that execute
   the PEI Foundation.
 
-  @param  PeiServices               Pointer to the PEI Services Table.
-  @param  StructureSize             Pointer to the variable describing size of the input buffer.
-  @param  PlatformInformationRecord Pointer to the EFI_SEC_PLATFORM_INFORMATION_RECORD.
+  @param  PeiServices               The pointer to the PEI Services Table.
+  @param  StructureSize             The pointer to the variable describing size of the input buffer.
+  @param  PlatformInformationRecord The pointer to the EFI_SEC_PLATFORM_INFORMATION_RECORD.
 
   @retval EFI_SUCCESS               The data was successfully returned.
   @retval EFI_BUFFER_TOO_SMALL      The buffer was too small. The current buffer size needed to

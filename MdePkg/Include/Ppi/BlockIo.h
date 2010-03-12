@@ -10,18 +10,18 @@
   Block I/O PPIs that are provided by the PEI ATAPI driver and PEI legacy floppy 
   driver are the same, here we define a set of general PPIs for both drivers to use.
   
-  Copyright (c) 2007 - 2009, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+Copyright (c) 2007 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                            
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   This PPI is defined in UEFI Platform Initialization Specification 1.2 Volume 1: 
-  Pre-EFI Initalization Core Interface
+  Pre-EFI Initalization Core Interface.
 
 **/
 
@@ -37,12 +37,12 @@
   }
 
 ///
-/// Forward declaration for EFI_PEI_RECOVERY_BLOCK_IO_PPI
+/// The forward declaration for EFI_PEI_RECOVERY_BLOCK_IO_PPI.
 ///
 typedef struct _EFI_PEI_RECOVERY_BLOCK_IO_PPI  EFI_PEI_RECOVERY_BLOCK_IO_PPI;
 
 ///
-/// All blocks on the recovery device are addressed with a 64-bit Logical Block Address (LBA)
+/// All blocks on the recovery device are addressed with a 64-bit Logical Block Address (LBA).
 ///
 typedef UINT64  EFI_PEI_LBA;
 
@@ -58,13 +58,13 @@ typedef enum {
 } EFI_PEI_BLOCK_DEVICE_TYPE;
 
 ///
-/// Inconsistent with specification here: 
+/// Specification inconsistency here: 
 /// PEI_BLOCK_IO_MEDIA has been changed to EFI_PEI_BLOCK_IO_MEDIA.
 /// Inconsistency exists in UEFI Platform Initialization Specification 1.2 
 /// Volume 1: Pre-EFI Initalization Core Interface, where all referrences to 
 /// this structure name are with the "EFI_" prefix, except for the definition 
 /// which is without "EFI_".  So the name of PEI_BLOCK_IO_MEDIA is taken as the 
-/// exception, and EFI_PEI_BLOCK_IO_MEDIA is used to comply with most part of 
+/// exception, and EFI_PEI_BLOCK_IO_MEDIA is used to comply with most of 
 /// the specification.
 ///
 typedef struct {
@@ -103,7 +103,7 @@ typedef struct {
                                    instance.
   @param[out] NumberBlockDevices   The number of block I/O devices discovered.
 
-  @retval     EFI_SUCCESS          Operation performed successfully.
+  @retval     EFI_SUCCESS          The operation performed successfully.
 
 **/
 typedef
@@ -146,7 +146,7 @@ EFI_STATUS
       order also applies to nested partitions, such as legacy MBR, where the 
       outermost partitions would have precedence in the reporting order. The 
       same logic applies to systems such as IDE that have precedence relationships 
-      like "Master/Slave" or "Primary/Secondary"; the master device should be 
+      like "Master/Slave" or "Primary/Secondary". The master device should be 
       reported first, the slave second.
   
   @retval EFI_SUCCESS        Media information about the specified block device 
@@ -176,7 +176,7 @@ EFI_STATUS
   @param[in]  This          Indicates the EFI_PEI_RECOVERY_BLOCK_IO_PPI instance.
   @param[in]  DeviceIndex   Specifies the block device to which the function wants 
                             to talk. Because the driver that implements Block I/O 
-                            PPIs will manage multiple block devices, the PPIs that 
+                            PPIs will manage multiple block devices, PPIs that 
                             want to talk to a single device must specify the device 
                             index that was assigned during the enumeration process. 
                             This index is a number from one to NumberBlockDevices.

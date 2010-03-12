@@ -1,15 +1,14 @@
 /** @file
   Defines data types and constants introduced in UEFI.
 
-  Copyright (c) 2006 - 2009, Intel Corporation<BR>
-  Portions copyright (c) 2008-2009 Apple Inc. All rights reserved.<BR>
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-  
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -27,7 +26,7 @@
 ///
 typedef GUID                      EFI_GUID;
 ///
-/// Function return status for EFI API
+/// Function return status for EFI API.
 ///
 typedef RETURN_STATUS             EFI_STATUS;
 ///
@@ -91,7 +90,7 @@ typedef struct {
 } EFI_IPv4_ADDRESS;
 
 ///
-/// 16-byte buffer. An IPv6 internet protocol address
+/// 16-byte buffer. An IPv6 internet protocol address.
 ///
 typedef struct {
   UINT8 Addr[16];
@@ -194,27 +193,27 @@ typedef union {
 #define EFI_PAGES_TO_SIZE(a)   ( (a) << EFI_PAGE_SHIFT)
 
 ///
-/// PE32+ Machine type for IA32 UEFI images
+/// PE32+ Machine type for IA32 UEFI images.
 ///
 #define EFI_IMAGE_MACHINE_IA32            0x014C
 
 ///
-/// PE32+ Machine type for IA64 UEFI images
+/// PE32+ Machine type for IA64 UEFI images.
 ///
 #define EFI_IMAGE_MACHINE_IA64            0x0200
 
 ///
-/// PE32+ Machine type for EBC UEFI images
+/// PE32+ Machine type for EBC UEFI images.
 ///
 #define EFI_IMAGE_MACHINE_EBC             0x0EBC
 
 ///
-/// PE32+ Machine type for X64 UEFI images
+/// PE32+ Machine type for X64 UEFI images.
 ///
 #define EFI_IMAGE_MACHINE_X64             0x8664
 
 ///
-/// PE32+ Machine type for ARM mixed ARM and Thumb/Thumb2 images
+/// PE32+ Machine type for ARM mixed ARM and Thumb/Thumb2 images.
 ///
 #define EFI_IMAGE_MACHINE_ARMTHUMB_MIXED  0x01C2
 

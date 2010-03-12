@@ -1,18 +1,18 @@
 /** @file
   StatusCode related definitions in PI.
 
-  Copyright (c) 2009, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+Copyright (c) 2009 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                            
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
   @par Revision Reference:
-  These status codes are defined in UEFI Platform Initialization Specification 1.2 
-  Volume 3: Shared Architectural Elements
+  These status codes are defined in UEFI Platform Initialization Specification 1.2, 
+  Volume 3: Shared Architectural Elements.
 
 **/
 
@@ -25,12 +25,12 @@
 #include <Protocol/DebugSupport.h>
 
 ///
-/// Status Code Type Definition
+/// Status Code Type Definition.
 ///
 typedef UINT32  EFI_STATUS_CODE_TYPE;
 
 ///
-/// A Status Code Type is made up of the code type and severity
+/// A Status Code Type is made up of the code type and severity.
 /// All values masked by EFI_STATUS_CODE_RESERVED_MASK are
 /// reserved for use by this specification.
 ///
@@ -41,7 +41,7 @@ typedef UINT32  EFI_STATUS_CODE_TYPE;
 ///@}
 
 ///
-/// Definition of code types, all other values masked by
+/// Definition of code types. All other values masked by
 /// EFI_STATUS_CODE_TYPE_MASK are reserved for use by
 /// this specification.
 ///
@@ -56,7 +56,7 @@ typedef UINT32  EFI_STATUS_CODE_TYPE;
 /// EFI_STATUS_CODE_SEVERITY_MASK are reserved for use by
 /// this specification.
 /// Uncontained errors are major errors that could not contained
-/// to the specific component that is reporting the error
+/// to the specific component that is reporting the error.
 /// For example, if a memory error was not detected early enough,
 /// the bad data could be consumed by other drivers.
 ///
@@ -68,7 +68,7 @@ typedef UINT32  EFI_STATUS_CODE_TYPE;
 ///@}
 
 ///
-/// Status Code Value Definition
+/// Status Code Value Definition.
 ///
 typedef UINT32 EFI_STATUS_CODE_VALUE;
 
@@ -103,26 +103,26 @@ typedef struct {
 } EFI_STATUS_CODE_DATA;
 
 ///
-/// General partitioning scheme for Progress and Error Codes are
-///   - 0x0000-0x0FFF    Shared by all sub-classes in a given class
-///   - 0x1000-0x7FFF    Subclass Specific
-///   - 0x8000-0xFFFF    OEM specific
+/// General partitioning scheme for Progress and Error Codes are:
+///   - 0x0000-0x0FFF    Shared by all sub-classes in a given class.
+///   - 0x1000-0x7FFF    Subclass Specific.
+///   - 0x8000-0xFFFF    OEM specific.
 ///@{
 #define EFI_SUBCLASS_SPECIFIC 0x1000
 #define EFI_OEM_SPECIFIC      0x8000
 ///@}
 
 ///
-/// Debug Code definitions for all classes and subclass
+/// Debug Code definitions for all classes and subclass.
 /// Only one debug code is defined at this point and should
-/// be used for anything that gets sent to debug stream.
+/// be used for anything that is sent to the debug stream.
 ///
 ///@{
 #define EFI_DC_UNSPECIFIED  0x0
 ///@}
 
 ///
-/// Class definitions
+/// Class definitions.
 /// Values of 4-127 are reserved for future use by this specification.
 /// Values in the range 127-255 are reserved for OEM use.
 ///
@@ -209,42 +209,42 @@ typedef struct {
 //
 
 ///
-/// South Bridge initialization prior to memory detection
+/// South Bridge initialization prior to memory detection.
 ///
 #define EFI_CHIPSET_PC_PEI_CAR_SB_INIT      (EFI_SUBCLASS_SPECIFIC|0x00000000)
 
 ///
-/// North Bridge initialization prior to memory detection
+/// North Bridge initialization prior to memory detection.
 ///
 #define EFI_CHIPSET_PC_PEI_CAR_NB_INIT      (EFI_SUBCLASS_SPECIFIC|0x00000001)
 
 ///
-/// South Bridge initialization after memory detection
+/// South Bridge initialization after memory detection.
 ///
 #define EFI_CHIPSET_PC_PEI_MEM_SB_INIT      (EFI_SUBCLASS_SPECIFIC|0x00000002)
 
 ///
-/// North Bridge initialization after memory detection
+/// North Bridge initialization after memory detection.
 ///
 #define EFI_CHIPSET_PC_PEI_MEM_NB_INIT      (EFI_SUBCLASS_SPECIFIC|0x00000003)
 
 ///
-/// PCI Host Bridge DXE initialization
+/// PCI Host Bridge DXE initialization.
 ///
 #define EFI_CHIPSET_PC_DXE_HB_INIT          (EFI_SUBCLASS_SPECIFIC|0x00000004)
 
 ///
-/// North Bridge DXE initialization
+/// North Bridge DXE initialization.
 ///
 #define EFI_CHIPSET_PC_DXE_NB_INIT          (EFI_SUBCLASS_SPECIFIC|0x00000005)
 
 ///
-/// North Bridge specific SMM initialization in DXE
+/// North Bridge specific SMM initialization in DXE.
 ///
 #define EFI_CHIPSET_PC_DXE_NB_SMM_INIT      (EFI_SUBCLASS_SPECIFIC|0x00000006)
 
 ///
-/// Initialization of the South Bridge specific UEFI Runtime Services
+/// Initialization of the South Bridge specific UEFI Runtime Services.
 ///
 #define EFI_CHIPSET_PC_DXE_SB_RT_INIT       (EFI_SUBCLASS_SPECIFIC|0x00000007)
 
@@ -254,12 +254,12 @@ typedef struct {
 #define EFI_CHIPSET_PC_DXE_SB_INIT          (EFI_SUBCLASS_SPECIFIC|0x00000008)
 
 ///
-/// South Bridge specific SMM initialization in DXE
+/// South Bridge specific SMM initialization in DXE.
 ///
 #define EFI_CHIPSET_PC_DXE_SB_SMM_INIT      (EFI_SUBCLASS_SPECIFIC|0x00000009)
 
 ///
-/// Initialization of the South Bridge devices
+/// Initialization of the South Bridge devices.
 ///
 #define EFI_CHIPSET_PC_DXE_SB_DEVICES_INIT  (EFI_SUBCLASS_SPECIFIC|0x0000000a)
 

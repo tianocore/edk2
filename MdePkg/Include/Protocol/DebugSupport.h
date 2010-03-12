@@ -5,15 +5,14 @@
   The DebugSupport protocol is used by source level debuggers to abstract the
   processor and handle context save and restore operations.
 
-  Copyright (c) 2006 - 2009, Intel Corporation<BR>       
-  Portions copyright (c) 2008-2009 Apple Inc. All rights reserved.<BR>
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
 **/
 
@@ -25,7 +24,7 @@
 typedef struct _EFI_DEBUG_SUPPORT_PROTOCOL EFI_DEBUG_SUPPORT_PROTOCOL;
 
 ///
-/// Debug Support protocol {2755590C-6F3C-42FA-9EA4-A3BA543CDA25}
+/// Debug Support protocol {2755590C-6F3C-42FA-9EA4-A3BA543CDA25}.
 ///
 #define EFI_DEBUG_SUPPORT_PROTOCOL_GUID \
   { \
@@ -39,7 +38,7 @@ typedef struct _EFI_DEBUG_SUPPORT_PROTOCOL EFI_DEBUG_SUPPORT_PROTOCOL;
 typedef INTN  EFI_EXCEPTION_TYPE;
 
 ///
-///  IA-32 processor exception types
+///  IA-32 processor exception types.
 ///
 #define EXCEPT_IA32_DIVIDE_ERROR    0
 #define EXCEPT_IA32_DEBUG           1
@@ -60,8 +59,8 @@ typedef INTN  EFI_EXCEPTION_TYPE;
 #define EXCEPT_IA32_SIMD            19
 
 ///
-/// FXSAVE_STATE
-/// FP / MMX / XMM registers (see fxrstor instruction definition)
+/// FXSAVE_STATE.
+/// FP / MMX / XMM registers (see fxrstor instruction definition).
 ///
 typedef struct {
   UINT16  Fcw;
@@ -94,7 +93,7 @@ typedef struct {
 } EFI_FX_SAVE_STATE_IA32;
 
 ///
-///  IA-32 processor context definition
+///  IA-32 processor context definition.
 ///
 typedef struct {
   UINT32                 ExceptionData;
@@ -133,7 +132,7 @@ typedef struct {
 } EFI_SYSTEM_CONTEXT_IA32;
 
 ///
-///  x64 processor exception types
+///  x64 processor exception types.
 ///
 #define EXCEPT_X64_DIVIDE_ERROR    0
 #define EXCEPT_X64_DEBUG           1
@@ -154,8 +153,8 @@ typedef struct {
 #define EXCEPT_X64_SIMD            19
 
 ///
-/// FXSAVE_STATE
-/// FP / MMX / XMM registers (see fxrstor instruction definition)
+/// FXSAVE_STATE.
+/// FP / MMX / XMM registers (see fxrstor instruction definition).
 ///
 typedef struct {
   UINT16  Fcw;
@@ -188,7 +187,7 @@ typedef struct {
 } EFI_FX_SAVE_STATE_X64;
 
 ///
-///  x64 processor context definition
+///  x64 processor context definition.
 ///
 typedef struct {
   UINT64                ExceptionData;
@@ -236,7 +235,7 @@ typedef struct {
 } EFI_SYSTEM_CONTEXT_X64;
 
 ///
-///  Itanium Processor Family Exception types
+///  Itanium Processor Family Exception types.
 ///
 #define EXCEPT_IPF_VHTP_TRANSLATION       0
 #define EXCEPT_IPF_INSTRUCTION_TLB        1
@@ -281,7 +280,7 @@ typedef struct {
 #define EXCEPT_IPF_IA32_INTERRUPT 47
 
 ///
-///  IPF processor context definition
+///  IPF processor context definition.
 ///
 typedef struct {
   //
@@ -437,26 +436,26 @@ typedef struct {
 } EFI_SYSTEM_CONTEXT_IPF;
 
 ///
-///  EBC processor exception types
+///  EBC processor exception types.
 ///
 #define EXCEPT_EBC_UNDEFINED            0
 #define EXCEPT_EBC_DIVIDE_ERROR         1
 #define EXCEPT_EBC_DEBUG                2
 #define EXCEPT_EBC_BREAKPOINT           3
 #define EXCEPT_EBC_OVERFLOW             4
-#define EXCEPT_EBC_INVALID_OPCODE       5   ///< opcode out of range
+#define EXCEPT_EBC_INVALID_OPCODE       5   ///< Opcode out of range.
 #define EXCEPT_EBC_STACK_FAULT          6
 #define EXCEPT_EBC_ALIGNMENT_CHECK      7
-#define EXCEPT_EBC_INSTRUCTION_ENCODING 8   ///< malformed instruction
-#define EXCEPT_EBC_BAD_BREAK            9   ///< BREAK 0 or undefined BREAK
-#define EXCEPT_EBC_STEP                 10  ///< to support debug stepping
+#define EXCEPT_EBC_INSTRUCTION_ENCODING 8   ///< Malformed instruction.
+#define EXCEPT_EBC_BAD_BREAK            9   ///< BREAK 0 or undefined BREAK.
+#define EXCEPT_EBC_STEP                 10  ///< To support debug stepping.
 ///
 /// For coding convenience, define the maximum valid EBC exception.
 ///
 #define MAX_EBC_EXCEPTION EXCEPT_EBC_STEP
 
 ///
-///  EBC processor context definition
+///  EBC processor context definition.
 ///
 typedef struct {
   UINT64  R0;
@@ -475,7 +474,7 @@ typedef struct {
 
 
 ///
-///  ARM processor exception types
+///  ARM processor exception types.
 ///
 #define EXCEPT_ARM_RESET                    0
 #define EXCEPT_ARM_UNDEFINED_INSTRUCTION    1
@@ -492,7 +491,7 @@ typedef struct {
 #define MAX_ARM_EXCEPTION EXCEPT_ARM_FIQ
 
 ///
-///  ARM processor context definition
+///  ARM processor context definition.
 ///
 typedef struct {
   UINT32  R0;
@@ -519,7 +518,7 @@ typedef struct {
 } EFI_SYSTEM_CONTEXT_ARM;
 
 ///
-/// Universal EFI_SYSTEM_CONTEXT definition
+/// Universal EFI_SYSTEM_CONTEXT definition.
 ///
 typedef union {
   EFI_SYSTEM_CONTEXT_EBC  *SystemContextEbc;
@@ -536,7 +535,7 @@ typedef union {
 /**                                                                 
   Registers and enables an exception callback function for the specified exception.
     
-  @param  ExceptionType         Exception types in EBC, IA-32, x64, or IPF
+  @param  ExceptionType         Exception types in EBC, IA-32, x64, or IPF.
   @param  SystemContext         Exception content.
                                    
 **/

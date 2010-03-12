@@ -1,14 +1,14 @@
 /** @file
   The file provides services to manipulate string data.
   
-  Copyright (c) 2006 - 2010, Intel Corporation
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
 **/
 
@@ -24,12 +24,12 @@ typedef struct _EFI_HII_STRING_PROTOCOL EFI_HII_STRING_PROTOCOL;
 
 /**
   This function adds the string String to the group of strings owned by PackageList, with the
-  specified font information StringFontInfo and returns a new string id.
+  specified font information StringFontInfo, and returns a new string id.
   The new string identifier is guaranteed to be unique within the package list. 
   That new string identifier is reserved for all languages in the package list. 
 
   @param  This                   A pointer to the EFI_HII_STRING_PROTOCOL instance.
-  @param  PackageList            Handle of the package list where this string will
+  @param  PackageList            The handle of the package list where this string will
                                  be added.
   @param  StringId               On return, contains the new strings id, which is
                                  unique within PackageList.
@@ -38,7 +38,7 @@ typedef struct _EFI_HII_STRING_PROTOCOL EFI_HII_STRING_PROTOCOL;
                                  with the passed in  Language field.If LanguageName
                                  is not NULL and the string package header's
                                  LanguageName  associated with a given Language is
-                                 not zero, the LanguageName being passed  in will
+                                 not zero, the LanguageName being passed in will
                                  be ignored.
   @param  String                 Points to the new null-terminated string.
   @param  StringFontInfo         Points to the new string's font information or
@@ -49,7 +49,7 @@ typedef struct _EFI_HII_STRING_PROTOCOL EFI_HII_STRING_PROTOCOL;
   @retval EFI_NOT_FOUND          The specified PackageList could not be found in
                                  database.
   @retval EFI_OUT_OF_RESOURCES   Could not add the string due to lack of resources.
-  @retval EFI_INVALID_PARAMETER  String is NULL or StringId is NULL or Language is NULL.
+  @retval EFI_INVALID_PARAMETER  String is NULL, or StringId is NULL, or Language is NULL.
   @retval EFI_INVALID_PARAMETER  The specified StringFontInfo does not exist in
                                  current database.
 

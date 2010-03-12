@@ -2,14 +2,14 @@
   It is invoked when the PXE Base Code Protocol is about to transmit, has received, 
   or is waiting to receive a packet.
 
-  Copyright (c) 2006 - 2009, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
   @par Revision Reference:          
   This Protocol is introduced in EFI Specification 1.10
@@ -20,7 +20,7 @@
 #define _PXE_BASE_CODE_CALLBACK_H_
 
 ///
-/// Call Back Definitions
+/// Call Back Definitions.
 ///
 #define EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL_GUID \
   { \
@@ -28,28 +28,28 @@
   }
 
 ///
-/// UEFI Revision Number Definition
+/// UEFI Revision Number Definition.
 ///
 #define EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL_REVISION 0x00010000
 
 ///
-/// EFI 1.1 Revision Number defintion
+/// EFI 1.1 Revision Number defintion.
 ///
 #define EFI_PXE_BASE_CODE_CALLBACK_INTERFACE_REVISION  \
         EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL_REVISION
 
 ///
-/// UEFI Protocol name
+/// UEFI Protocol name.
 ///
 typedef struct _EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL  EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL;
 
 ///
-/// EFI1.1 Protocol name
+/// EFI1.1 Protocol name.
 /// 
 typedef EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL   EFI_PXE_BASE_CODE_CALLBACK;
 
 ///
-/// Event type list for PXE Base Code Protocol function
+/// Event type list for PXE Base Code Protocol function.
 ///
 typedef enum {
   EFI_PXE_BASE_CODE_FUNCTION_FIRST,
@@ -64,7 +64,7 @@ typedef enum {
 } EFI_PXE_BASE_CODE_FUNCTION;
 
 ///
-/// Callback status type
+/// Callback status type.
 ///
 typedef enum {
   EFI_PXE_BASE_CODE_CALLBACK_STATUS_FIRST,
@@ -87,7 +87,7 @@ typedef enum {
   The SetParameters() function must be called after a Callback Protocol is installed to enable the
   use of callbacks.
   
-  @param  This                  Pointer to the EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL instance.
+  @param  This                  The pointer to the EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL instance.
   @param  Function              The PXE Base Code Protocol function that is waiting for an event.                                                              
   @param  Received              TRUE if the callback is being invoked due to a receive event. FALSE if
                                 the callback is being invoked due to a transmit event.                
