@@ -17,10 +17,11 @@
 
 #define DEBUG_AGENT_INIT_PREMEM_SEC      1
 #define DEBUG_AGENT_INIT_POSTMEM_SEC     2
-#define DEBUG_AGENT_INIT_DXE             3
+#define DEBUG_AGENT_INIT_DXE_CORE        3
 #define DEBUG_AGENT_INIT_SMM             4
 #define DEBUG_AGENT_INIT_ENTER_SMI       5
 #define DEBUG_AGENT_INIT_EXIT_SMI        6
+#define DEBUG_AGENT_INIT_S3              7
 
 /**
   Initialize debug agent.
