@@ -1,11 +1,12 @@
 /** @file
   Provides functions for language conversion between ISO 639-2 and RFC 4646 styles.
 
-Copyright (c) 2009 - 2010, Intel Corporation<BR>
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+Portions copyright (c) 2008-2009 Apple Inc. All rights reserved.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+http://opensource.org/licenses/bsd-license.php.
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -28,7 +29,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                                representing an RFC 4646 language code containing only
                                either a ISO 639-1 or ISO 639-2 primary language subtag.
                                This string is Null-terminated.
-  @param[in]  Iso639Language   Pointer to a 3-letter ASCII string that represents
+  @param[in]  Iso639Language   The pointer to a 3-letter ASCII string that represents
                                an ISO 639-2 language code. This string is not required
                                to be Null-terminated.
 
@@ -53,8 +54,10 @@ ConvertIso639ToRfc4646 (
   If Iso639Language is NULL, then ASSERT().
 
   @param[out] Iso639Language   Pointers to a buffer large enough for a 3-letter ASCII string
-                               representing an ISO 639-2 language code. The string is Null-terminated.
-  @param[in]  Rfc4646Language  Pointer to a RFC 4646 language code string. This string is terminated
+                               representing an ISO 639-2 language code. The string 
+                               is Null-terminated.
+  @param[in]  Rfc4646Language  The pointer to a RFC 4646 language code string. 
+                               This string is terminated
                                by a NULL or a ';' character.
 
   @retval TRUE                 Language code converted successfully.
@@ -79,8 +82,10 @@ ConvertRfc4646ToIso639 (
   
   @retval NULL                Invalid ISO 639-2 language code found.
   @retval NULL                Out of memory.
-  @return                     Pointer to the allocate buffer containing the Null-terminated converted language codes string.
-                              This string is composed of one or more RFC4646 language codes each of which has only
+  @return                     The pointer to the allocate buffer containing the 
+                              Null-terminated converted language codes string.
+                              This string is composed of one or more RFC4646 
+                              language codes each of which has only
                               ISO 639-1 2-letter primary language subtag.
 
 **/
@@ -97,13 +102,15 @@ ConvertLanguagesIso639ToRfc4646 (
 
   If Rfc4646Languages is NULL, then ASSERT.
 
-  @param[in] Rfc4646Languages  Pointers to a Null-terminated RFC 4646 language codes string containing
-                               one or more RFC 4646 language codes.
+  @param[in] Rfc4646Languages  Pointers to a Null-terminated RFC 4646 language codes 
+                               string containing one or more RFC 4646 language codes.
   
   @retval NULL                 Invalid or unsupported RFC 4646 language code found.
   @retval NULL                 Out of memory.
-  @return                      Pointer to the allocate buffer containing the Null-terminated converted language codes string.
-                               This string is composed of one or more ISO 639-2 language codes.
+  @return                      The pointer to the allocate buffer containing the 
+                               Null-terminated converted language codes string.
+                               This string is composed of one or more ISO 639-2 
+                               language codes.
 
 **/
 CHAR8 *
