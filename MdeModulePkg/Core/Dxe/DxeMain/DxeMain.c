@@ -244,7 +244,7 @@ DxeMain (
   //
   // Initialize Debug Agent to support source level debug in DXE phase
   //
-  InitializeDebugAgent (DEBUG_AGENT_INIT_DXE, HobStart);
+  InitializeDebugAgent (DEBUG_AGENT_INIT_DXE_CORE, HobStart);
 
   //
   // Initialize Memory Services
@@ -684,6 +684,11 @@ CoreExitBootServices (
   // Notify other drivers that we are exiting boot services.
   //
   CoreNotifySignalList (&gEfiEventExitBootServicesGuid);
+
+  //
+  // Disable interrupt of Debug timer.
+  //
+  SaveAndSetDebugTimerInterrupt (FALSE);
 
   //
   // Disable CPU Interrupts
