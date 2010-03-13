@@ -1,13 +1,15 @@
 /** @file
-This PPI is the same as the PPI in the framework PciCfg, with one exception: this PPI does not include a modify API, while the PPI in the framework PciCfg does. 
+This PPI is the same as the PPI in the framework PciCfg, with one exception. 
+Specifically, this PPI does not include a modify API, while the PPI in the framework PciCfg does. 
 
-Copyright (c) 2008 - 2010, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+Copyright (c) 2008 - 2010, Intel Corporation.  All rights reserved<BR>
+Portions copyright (c) 2008-2009 Apple Inc. All rights reserved.<BR>
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
 **/
@@ -23,19 +25,21 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 typedef struct _ECP_PEI_PCI_CFG_PPI ECP_PEI_PCI_CFG_PPI;
 
 /**
-  PCI read and write operation.
+  A PCI read and write operation.
   
-  Writes to or reads from a given location in the PCI configuration space.
+  Writes to, or reads from, a given location in the PCI configuration space.
 
-  @param  PeiServices              An indirect pointer to the PEI Services Table published by the PEI Foundation.
-  @param  This                     Pointer to local data for the interface.
+  @param  PeiServices              An indirect pointer to the PEI Services Table 
+                                   published by the PEI Foundation.
+  @param  This                     The pointer to local data for the interface.
   @param  Width                    The width of the access. Enumerated in bytes.
   @param  Address                  The physical address of the access. The format of
                                    the address is described by EFI_PEI_PCI_CFG_PPI_PCI_ADDRESS.
   @param  Buffer                   A pointer to the buffer of data.
   @retval EFI_SUCCESS              The function completed successfully.
   @retval EFI_DEVICE_ERROR         There was a problem with the transaction.
-  @retval EFI_DEVICE_NOT_READY     The device is not capable of supporting the operation at this time.
+  @retval EFI_DEVICE_NOT_READY     The device is not capable of supporting the 
+                                   operation at this time.
 **/
 typedef
 EFI_STATUS

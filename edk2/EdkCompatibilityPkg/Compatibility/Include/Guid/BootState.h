@@ -1,20 +1,21 @@
 /** @file
-  GUID and Name is used to configure PcdBootState to DynamicHii PCD, which can
-  make EDKII core work with EDK implementation.
+  GUID and Name are used to configure PcdBootState to DynamicHii PCD, which can
+  make EDKII core work with the EDK implementation.
 
-  EDK implementation may depend on this guid variable to check boot state. But 
-  EDKII core uses the dynamic PcdBootState to save boot state. To be compatible to EDK implementation, 
-  BootStateGuid and BootStateName will be used to configure PcdBootState to DynamicHii PCD to
-  save boot state as variable.
+  The EDK implementation may depend on this guid variable to check the boot state.  
+  However, the EDKII core uses a dynamic PcdBootState to save the boot state. To be compatible with EDK implementations, 
+  BootStateGuid and BootStateName are used to configure PcdBootState to DynamicHii PCD to
+  save the boot state as a variable.
   
-  Copyright (c) 2010, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+Copyright (c) 2010, Intel Corporation.  All rights reserved<BR>
+Portions copyright (c) 2008-2009 Apple Inc. All rights reserved.<BR>
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 #ifndef _BOOT_STATE_H_
