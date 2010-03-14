@@ -793,6 +793,7 @@ CreateIfrDataArray (
       break;
 
     case EFI_IFR_TYPE_ACTION:
+    case EFI_IFR_TYPE_UNDEFINED:
       Size = 0;
       break;
       
@@ -852,6 +853,7 @@ CreateIfrDataArray (
         break;
 
       case EFI_IFR_TYPE_ACTION:
+      case EFI_IFR_TYPE_UNDEFINED:
         break;
 
       default:
