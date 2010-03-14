@@ -28,7 +28,7 @@
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/NT32
   SUPPORTED_ARCHITECTURES        = IA32
-  BUILD_TARGETS                  = DEBUG
+  BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = Nt32Pkg/Nt32Pkg.fdf
 
@@ -228,83 +228,20 @@
 ################################################################################
 
 [PcdsFeatureFlag]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText|FALSE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathToText|FALSE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportUefiDecompress|TRUE
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDeprecate|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics|TRUE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollationSupport|TRUE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollation2Support|TRUE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport|TRUE
 
-[PcdsFixedAtBuild.IA32]
-  gEfiNt32PkgTokenSpaceGuid.PcdWinNtMemorySizeForSecMain|L"64!64"|VOID*|12
-  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareVolume|L"..\\Fv\\Nt32.fd"|VOID*|52
-  gEfiNt32PkgTokenSpaceGuid.PcdWinNtBootMode|1
-  gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1000000
-  gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength|1000000
-  gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength|1000000
-  gEfiMdePkgTokenSpaceGuid.PcdSpinLockTimeout|10000000
-  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x0f
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x1f
-  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue|0xAF
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000040
-  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask|0
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPcdCallBackNumberPerPcdEntry|0x08
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress|0x0
+[PcdsFixedAtBuild]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizeNonPopulateCapsule|0x0
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizePopulateCapsule|0x0
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueUncorrectableMemoryError|0x0005100   # EFI_COMPUTING_UNIT_MEMORY | EFI_CU_MEMORY_EC_UNCORRECTABLE3
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleError|0x01040006        # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_CONTROLLER_ERROR
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleReset|0x01040001        # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_PC_RESET
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleInputError|0x01040007   # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_INPUT_ERROR
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueRemoteConsoleOutputError|0x01040008  # EFI_PERIPHERAL_REMOTE_CONSOLE | EFI_P_EC_OUTPUT_ERROR
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueEfiWatchDogTimerExpired|0x00011003
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueMemoryTestStarted|0x00051006
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueSetVirtualAddressMap|0x03101004
-  gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueUncorrectableMemoryError|0x00051003
-  gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|320
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|115200
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits|8
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity|1
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits|1
-  gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|0
-
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000040
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareFdSize|0x2a0000
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x1f
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareVolume|L"..\\Fv\\Nt32.fd"
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareBlockSize|0x10000
-  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageEventLogBase|0x28c000
-  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageEventLogSize|0x2000
-  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashFvRecoveryBase|0x0
-  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashFvRecoverySize|0x280000
-
-  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageVariableBase|0x280000
-  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageFtwSpareBase|0x290000
-  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageFtwWorkingBase|0x28e000
-
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize|0x10000
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize|0x2000
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize|0x00c000
-  gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler|0x10
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported|6
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeimPerFv|32
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x400
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize|0x8000
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x10000
-
-[PcdsFeatureFlag.IA32]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|FALSE
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseOEM|TRUE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode|FALSE
-  gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable|FALSE
-  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable|FALSE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathToText|TRUE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText|TRUE
-  gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|FALSE
-  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable|FALSE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport|TRUE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst|FALSE
-
+  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x0f
 
 ################################################################################
 #
