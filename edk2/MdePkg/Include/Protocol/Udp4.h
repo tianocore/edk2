@@ -168,7 +168,8 @@ EFI_STATUS
   @retval EFI_SUCCESS           The configuration settings were set, changed, or reset successfully.
   @retval EFI_NO_MAPPING        When using a default address, configuration (DHCP, BOOTP,
                                 RARP, etc.) is not finished yet.
-  @retval EFI_INVALID_PARAMETER One or more following conditions are TRUE:
+  @retval EFI_INVALID_PARAMETER This is NULL.
+  @retval EFI_INVALID_PARAMETER UdpConfigData.StationAddress is not a valid unicast IPv4 address.
   @retval EFI_ALREADY_STARTED   The EFI UDPv4 Protocol instance is already started/configured
                                 and must be stopped/reset before it can be reconfigured.
   @retval EFI_ACCESS_DENIED     UdpConfigData. AllowDuplicatePort is FALSE
@@ -318,7 +319,8 @@ EFI_STATUS
   @retval EFI_NOT_STARTED       This EFI UDPv4 Protocol instance has not been started.
   @retval EFI_NO_MAPPING        When using a default address, configuration (DHCP, BOOTP, RARP, etc.)
                                 is not finished yet.
-  @retval EFI_INVALID_PARAMETER One or more of the following conditions is TRUE:
+  @retval EFI_INVALID_PARAMETER This is NULL.
+  @retval EFI_INVALID_PARAMETER UdpConfigData.StationAddress is not a valid unicast IPv4 address.
   @retval EFI_OUT_OF_RESOURCES  The receive completion token could not be queued due to a lack of system
                                 resources (usually memory).
   @retval EFI_DEVICE_ERROR      An unexpected system or network error occurred.

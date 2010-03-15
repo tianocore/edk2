@@ -636,7 +636,8 @@ typedef UINTN  *BASE_LIST;
   Both a and b must be the same numerical types, signed or unsigned.
 
   @param   a        The first operand with any numerical type.
-  @param   b        The second operand. It should be the same any numerical type with a.
+  @param   b        The second operand. Can be any numerical type as long as is 
+                    the same type as a.
   
   @return  Maximum of two operands.
   
