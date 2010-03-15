@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2009, Intel Corporation                                                         
+Copyright (c) 2004 - 2010, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -67,27 +67,28 @@ ProcessLibraryConstructorList (
 //
 #if defined(__EDKII_GLUE_DXE_HOB_LIB__)                     \
     || defined(__EDKII_GLUE_UEFI_BOOT_SERVICES_TABLE_LIB__) \
-    || defined(__EDKII_GLUE_UEFI_DRIVER_MODEL_LIB__)        \
-    || defined(__EDKII_GLUE_EDK_DXE_RUNTIME_DRIVER_LIB__)   \
     || defined(__EDKII_GLUE_DXE_SERVICES_TABLE_LIB__)       \
     || defined(__EDKII_GLUE_DXE_SMBUS_LIB__)                \
     || defined(__EDKII_GLUE_UEFI_RUNTIME_SERVICES_TABLE_LIB__) \
-    || defined(__EDKII_GLUE_DXE_IO_LIB_CPU_IO__)
+    || defined(__EDKII_GLUE_DXE_IO_LIB_CPU_IO__)            \
+    || defined(__EDKII_GLUE_SMM_RUNTIME_DXE_REPORT_STATUS_CODE_LIB__)
   EFI_STATUS  Status;
 #endif
 
 //
 // EdkII Glue Library Constructors: 
 // NOTE: the constructors must be called according to dependency order
+// NOTE: compared with EdkIIGlueDxeDriverEntryPoint.c, the EdkDxeRuntimeDriverLib
+//       and the UefiDriverModelLib are not applicable for SMM Drivers so not listed
+//       here
 //
 // UefiBootServicesTableLib     UefiBootServicesTableLibConstructor()
 // DxeIoLibCpuIo                IoLibConstructor 
-//   EdkDxeRuntimeDriverLib       RuntimeDriverLibConstruct()   
 // DxeHobLib                    HobLibConstructor()
-//   UefiDriverModelLib           UefiDriverModelLibConstructor()
 // DxeSmbusLib                  SmbusLibConstructor()    
 // DxeServicesTableLib          DxeServicesTableLibConstructor()
 // UefiRuntimeServicesTableLib  UefiRuntimeServicesTableLibConstructor() 
+// SmmRuntimeDxeReportStatusCodeLib ReportStatusCodeLibConstruct()
 // check here: check lib usage
 #ifdef __EDKII_GLUE_UEFI_BOOT_SERVICES_TABLE_LIB__
   Status = UefiBootServicesTableLibConstructor (ImageHandle, SystemTable);
@@ -99,24 +100,19 @@ ProcessLibraryConstructorList (
   ASSERT_EFI_ERROR (Status);
 #endif
 
-#ifdef __EDKII_GLUE_EDK_DXE_RUNTIME_DRIVER_LIB__
-  Status = RuntimeDriverLibConstruct (ImageHandle, SystemTable);
-  ASSERT_EFI_ERROR (Status);
-#endif
-
 #ifdef __EDKII_GLUE_UEFI_RUNTIME_SERVICES_TABLE_LIB__
   Status = UefiRuntimeServicesTableLibConstructor (ImageHandle, SystemTable);
-  ASSERT_EFI_ERROR (Status);
-#endif
-
-#ifdef __EDKII_GLUE_UEFI_DRIVER_MODEL_LIB__
-  Status = UefiDriverModelLibConstructor (ImageHandle, SystemTable);
   ASSERT_EFI_ERROR (Status);
 #endif
 
 #ifdef __EDKII_GLUE_DXE_SERVICES_TABLE_LIB__
   Status = DxeServicesTableLibConstructor (ImageHandle, SystemTable);
   ASSERT_EFI_ERROR (Status); 
+#endif
+
+#ifdef __EDKII_GLUE_SMM_RUNTIME_DXE_REPORT_STATUS_CODE_LIB__
+  Status = ReportStatusCodeLibConstruct (ImageHandle, SystemTable);
+  ASSERT_EFI_ERROR (Status);
 #endif
 
 #ifdef __EDKII_GLUE_DXE_HOB_LIB__
@@ -140,6 +136,17 @@ ProcessLibraryDestructorList (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
+#if defined (__EDKII_GLUE_SMM_RUNTIME_DXE_REPORT_STATUS_CODE_LIB__)
+  EFI_STATUS  Status;    
+#endif
+
+//
+// NOTE: the destructors must be called according to dependency order
+//
+#ifdef __EDKII_GLUE_SMM_RUNTIME_DXE_REPORT_STATUS_CODE_LIB__
+  Status = ReportStatusCodeLibDestruct (ImageHandle, SystemTable);
+  ASSERT_EFI_ERROR (Status);
+#endif
 }
 
 EFI_BOOT_SERVICES  *mBS;
