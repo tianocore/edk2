@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2006, Intel Corporation                                                         
+Copyright (c) 2004 - 2010, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -214,6 +214,24 @@ Abstract:
   #define __EDKII_GLUE_DXE_IO_LIB_CPU_IO__
   #endif
 #endif  
+  #ifndef __EDKII_GLUE_BASE_MEMORY_LIB__
+  #define __EDKII_GLUE_BASE_MEMORY_LIB__
+  #endif
+  #ifndef __EDKII_GLUE_UEFI_BOOT_SERVICES_TABLE_LIB__
+  #define __EDKII_GLUE_UEFI_BOOT_SERVICES_TABLE_LIB__
+  #endif
+  #ifndef __EDKII_GLUE_UEFI_RUNTIME_SERVICES_TABLE_LIB__
+  #define __EDKII_GLUE_UEFI_RUNTIME_SERVICES_TABLE_LIB__
+  #endif
+#endif
+
+//
+// SmmRuntimeDxeReportStatusCodeLib - typically used by SMM driver and Runtime driver
+//
+#ifdef __EDKII_GLUE_SMM_RUNTIME_DXE_REPORT_STATUS_CODE_LIB__
+  #ifndef __EDKII_GLUE_BASE_LIB__
+  #define __EDKII_GLUE_BASE_LIB__
+  #endif
   #ifndef __EDKII_GLUE_BASE_MEMORY_LIB__
   #define __EDKII_GLUE_BASE_MEMORY_LIB__
   #endif
@@ -645,6 +663,14 @@ Abstract:
   #error EdkIIGlueDxeReportStatusCodeLib and EdkIIGluePeiReportStatusCodeLib: can only be mutual exclusively used.
 #endif
 
+#if defined(__EDKII_GLUE_SMM_RUNTIME_DXE_REPORT_STATUS_CODE_LIB__) && defined(__EDKII_GLUE_PEI_REPORT_STATUS_CODE_LIB__)
+  #error EdkIIGlueSmmRuntimeDxeReportStatusCodeLib and EdkIIGluePeiReportStatusCodeLib: can only be mutual exclusively used.
+#endif
+
+#if defined(__EDKII_GLUE_DXE_REPORT_STATUS_CODE_LIB__) && defined(__EDKII_GLUE_SMM_RUNTIME_DXE_REPORT_STATUS_CODE_LIB__)
+  #error EdkIIGlueDxeReportStatusCodeLib and EdkIIGlueSmmRuntimeDxeReportStatusCodeLib: can only be mutual exclusively used.
+#endif
+
 #if defined(__EDKII_GLUE_DXE_MEMORY_ALLOCATION_LIB__) && defined(__EDKII_GLUE_PEI_MEMORY_ALLOCATION_LIB__)
   #error EdkIIGlueDxeMemoryAllocationLib and EdkIIGluePeiMemoryAllocationLib: can only be mutual exclusively used.
 #endif
@@ -661,8 +687,12 @@ Abstract:
 // Some instances must be supplied
 //
 #ifdef __EDKII_GLUE_PEI_DXE_DEBUG_LIB_REPORT_STATUS_CODE__
-  #if !defined(__EDKII_GLUE_DXE_REPORT_STATUS_CODE_LIB__) && !defined(__EDKII_GLUE_PEI_REPORT_STATUS_CODE_LIB__)
-    #error You use EdkIIGluePeiDxeDebugLibReportStatusCode, so either EdkIIGlueDxeReportStatusCodeLib or EdkIIGluePeiReportStatusCodeLib must be supplied
+  #if !defined(__EDKII_GLUE_DXE_REPORT_STATUS_CODE_LIB__) \
+      && !defined(__EDKII_GLUE_PEI_REPORT_STATUS_CODE_LIB__) \
+      && !defined(__EDKII_GLUE_SMM_RUNTIME_DXE_REPORT_STATUS_CODE_LIB__)
+    #error You use EdkIIGluePeiDxeDebugLibReportStatusCode, \
+      so either EdkIIGlueDxeReportStatusCodeLib, EdkIIGluePeiReportStatusCodeLib, \
+      or EdkIIGlueSmmRuntimeDxeReportStatusCodeLib must be supplied
   #endif
 #endif
 
@@ -689,6 +719,7 @@ Abstract:
 // DxeIoLibCpuIo                    IoLibConstructor()
 // UefiRuntimeServicesTableLib      UefiRuntimeServicesTableLibConstructor()
 // EdkDxeRuntimeDriverLib           RuntimeDriverLibConstruct()
+// SmmRuntimeDxeReportStatusCodeLib ReportStatusCodeLibConstruct()
 // DxeHobLib                        HobLibConstructor()
 // UefiDriverModelLib               UefiDriverModelLibConstructor()
 // PeiServicesTablePointerLib       PeiServicesTablePointerLibConstructor()
@@ -730,6 +761,15 @@ UefiRuntimeServicesTableLibConstructor (
 EFI_STATUS
 EFIAPI
 RuntimeDriverLibConstruct (
+  IN EFI_HANDLE           ImageHandle,
+  IN EFI_SYSTEM_TABLE     *SystemTable
+  );
+#endif
+
+#ifdef __EDKII_GLUE_SMM_RUNTIME_DXE_REPORT_STATUS_CODE_LIB__
+EFI_STATUS
+EFIAPI
+ReportStatusCodeLibConstruct (
   IN EFI_HANDLE           ImageHandle,
   IN EFI_SYSTEM_TABLE     *SystemTable
   );
@@ -812,12 +852,22 @@ DxeSalLibConstructor (
 // NOTE: the destructors must be called according to dependency order
 //
 // UefiDriverModelLibDestructor    UefiDriverModelLibDestructor()
+// SmmRuntimeDxeReportStatusCodeLib ReportStatusCodeLibDestruct()
 // EdkDxeRuntimeDriverLib          RuntimeDriverLibDeconstruct()
 //
 #ifdef __EDKII_GLUE_UEFI_DRIVER_MODEL_LIB__
 EFI_STATUS
 EFIAPI
 UefiDriverModelLibDestructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  );
+#endif
+
+#ifdef __EDKII_GLUE_SMM_RUNTIME_DXE_REPORT_STATUS_CODE_LIB__
+EFI_STATUS
+EFIAPI
+ReportStatusCodeLibDestruct (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   );
