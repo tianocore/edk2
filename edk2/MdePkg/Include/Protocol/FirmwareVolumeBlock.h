@@ -35,7 +35,7 @@ typedef EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL;
 
 /**
   The GetAttributes() function retrieves the attributes and
-  current settings of the block. Status Codes Returned
+  current settings of the block.
 
   @param This       Indicates the EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL instance.
 
