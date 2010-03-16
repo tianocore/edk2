@@ -14,28 +14,6 @@
 
 ################################################################################
 #
-# FD Section
-# The [FD] Section is made up of the definition statements and a
-# description of what goes into  the Flash Device Image.  Each FD section
-# defines one flash "device" image.  A flash device image may be one of
-# the following: Removable media bootable image (like a boot floppy
-# image,) an Option ROM image (that would be "flashed" into an add-in
-# card,) a System "Flash"  image (that would be burned into a system's
-# flash) or an Update ("Capsule") image that will be used to update and
-# existing system flash.
-#
-################################################################################
-[FD.DuetMainFd]
-BaseAddress   = 0x0 #The base address of the FLASH Device.
-Size          = 0x002a0000                                           #The size in bytes of the FLASH Device
-ErasePolarity = 1
-BlockSize     = 0x10000
-NumBlocks     = 0x2a
-
-0x00000000|0x002a0000
-
-################################################################################
-#
 # FV Section
 #
 # [FV] section is used to define what components or modules are placed within a flash
@@ -45,7 +23,8 @@ NumBlocks     = 0x2a
 #
 ################################################################################
 [FV.DuetEfiMainFv]
-BlockSize          = 0x100000
+BlockSize          = 0x10000
+NumBlocks          = 0x2a
 FvAlignment        = 16         #FV alignment and FV attributes setting.
 ERASE_POLARITY     = 1
 MEMORY_MAPPED      = TRUE
