@@ -214,10 +214,11 @@ MnpSyncSendPacket (
   // Check media status before transmit packet.
   // Note: media status will be updated by periodic timer MediaDetectTimer.
   //
-  if (!Snp->Mode->MediaPresent) {
+  if (Snp->Mode->MediaPresentSupported && !Snp->Mode->MediaPresent) {
     //
     // Media not present, skip packet transmit and report EFI_NO_MEDIA
     //
+    DEBUG ((EFI_D_WARN, "MnpSyncSendPacket: No network cable detected.\n"));
     Status = EFI_NO_MEDIA;
     goto SIGNAL_TOKEN;
   }
