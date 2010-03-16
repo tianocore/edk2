@@ -2,14 +2,14 @@
   ISA I/O Protocol is used by ISA device drivers to perform I/O, MMIO and DMA 
   operations on the ISA controllers they manage.
   
-  Copyright (c) 2006 - 2009, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -27,51 +27,51 @@
   }
 
 ///
-/// Forward declaration for the EFI_ISA_IO_PROTOCOL
+/// Forward declaration for the EFI_ISA_IO_PROTOCOL.
 ///
 typedef struct _EFI_ISA_IO_PROTOCOL EFI_ISA_IO_PROTOCOL;
 
 ///
-/// Width of EFI_ISA_IO_PROTOCOL I/O Port and MMIO operations
+/// Width of EFI_ISA_IO_PROTOCOL I/O Port and MMIO operations.
 ///
 typedef enum {
-  EfiIsaIoWidthUint8 = 0,      ///< 8-bit operation
-  EfiIsaIoWidthUint16,         ///< 16-bit operation
+  EfiIsaIoWidthUint8 = 0,      ///< 8-bit operation.
+  EfiIsaIoWidthUint16,         ///< 16-bit operation.
   EfiIsaIoWidthUint32,         ///< 32-bit operation
   EfiIsaIoWidthReserved,
-  EfiIsaIoWidthFifoUint8,      ///< 8-bit FIFO operation
-  EfiIsaIoWidthFifoUint16,     ///< 16-bit FIFO operation
-  EfiIsaIoWidthFifoUint32,     ///< 32-bit FIFO operation
+  EfiIsaIoWidthFifoUint8,      ///< 8-bit FIFO operation.
+  EfiIsaIoWidthFifoUint16,     ///< 16-bit FIFO operation.
+  EfiIsaIoWidthFifoUint32,     ///< 32-bit FIFO operation.
   EfiIsaIoWidthFifoReserved,
-  EfiIsaIoWidthFillUint8,      ///< 8-bit Fill operation
-  EfiIsaIoWidthFillUint16,     ///< 16-bit Fill operation
-  EfiIsaIoWidthFillUint32,     ///< 32-bit Fill operation
+  EfiIsaIoWidthFillUint8,      ///< 8-bit Fill operation.
+  EfiIsaIoWidthFillUint16,     ///< 16-bit Fill operation.
+  EfiIsaIoWidthFillUint32,     ///< 32-bit Fill operation.
   EfiIsaIoWidthFillReserved,
   EfiIsaIoWidthMaximum
 } EFI_ISA_IO_PROTOCOL_WIDTH;
 
 ///
-/// Attributes for the EFI_ISA_IO_PROTOCOL common DMA buffer allocations
+/// Attributes for the EFI_ISA_IO_PROTOCOL common DMA buffer allocations.
 ///
-#define EFI_ISA_IO_ATTRIBUTE_MEMORY_WRITE_COMBINE  0x080    ///< Map a memory range so write are combined
-#define EFI_ISA_IO_ATTRIBUTE_MEMORY_CACHED         0x800    ///< Map a memory range so all read and write accesses are cached
-#define EFI_ISA_IO_ATTRIBUTE_MEMORY_DISABLE        0x1000   ///< Disable a memory range 
+#define EFI_ISA_IO_ATTRIBUTE_MEMORY_WRITE_COMBINE  0x080    ///< Map a memory range so write are combined.
+#define EFI_ISA_IO_ATTRIBUTE_MEMORY_CACHED         0x800    ///< Map a memory range so all read and write accesses are cached.
+#define EFI_ISA_IO_ATTRIBUTE_MEMORY_DISABLE        0x1000   ///< Disable a memory range.
 
 ///
 /// Channel attribute for EFI_ISA_IO_PROTOCOL slave DMA requests
 ///
-#define EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_SPEED_COMPATIBLE  0x001   ///< Set the speed of the DMA transfer in compatible mode
-#define EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_SPEED_A           0x002   ///< Not supported
-#define EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_SPEED_B           0x004   ///< Not supported
-#define EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_SPEED_C           0x008   ///< Not supported
-#define EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_WIDTH_8           0x010   ///< Request 8-bit DMA transfers.  Only available on channels 0..3
-#define EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_WIDTH_16          0x020   ///< Request 16-bit DMA transfers.  Only available on channels 4..7
-#define EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_SINGLE_MODE       0x040   ///< Request a single DMA transfer
-#define EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_DEMAND_MODE       0x080   ///< Request multiple DMA transfers until TC (Terminal Count) or EOP (End of Process)
-#define EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_AUTO_INITIALIZE   0x100   ///< Automatically reload base and count at the end of the DMA transfer
+#define EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_SPEED_COMPATIBLE  0x001   ///< Set the speed of the DMA transfer in compatible mode.
+#define EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_SPEED_A           0x002   ///< Not supported.
+#define EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_SPEED_B           0x004   ///< Not supported.
+#define EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_SPEED_C           0x008   ///< Not supported.
+#define EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_WIDTH_8           0x010   ///< Request 8-bit DMA transfers.  Only available on channels 0..3.
+#define EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_WIDTH_16          0x020   ///< Request 16-bit DMA transfers.  Only available on channels 4..7.
+#define EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_SINGLE_MODE       0x040   ///< Request a single DMA transfer.
+#define EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_DEMAND_MODE       0x080   ///< Request multiple DMA transfers until TC (Terminal Count) or EOP (End of Process).
+#define EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_AUTO_INITIALIZE   0x100   ///< Automatically reload base and count at the end of the DMA transfer.
 
 ///
-/// The DMA opreration type for EFI_ISA_IO_PROTOCOL DMA requests
+/// The DMA opreration type for EFI_ISA_IO_PROTOCOL DMA requests.
 ///
 typedef enum {
   ///
@@ -128,7 +128,7 @@ EFI_STATUS
   );
 
 ///
-/// Structure of functions for accessing ISA I/O and MMIO space
+/// Structure of functions for accessing ISA I/O and MMIO space.
 ///
 typedef struct {
   ///
@@ -147,9 +147,9 @@ typedef struct {
 
   @param[in] This         A pointer to the EFI_ISA_IO_PROTOCOL instance.
   @param[in] Width        Specifies the width of the MMIO copy operation.
-  @param[in] DestOffset   The offset of the destination in ISA MMIO space
-  @param[in] SrcOffset    The offset of the source in ISA MMIO space
-  @param[in] Count        The number tranfers to perform for this copy operation
+  @param[in] DestOffset   The offset of the destination in ISA MMIO space.
+  @param[in] SrcOffset    The offset of the source in ISA MMIO space.
+  @param[in] Count        The number tranfers to perform for this copy operation.
 
   @retval EFI_SUCCESS             The data was copied sucessfully.
   @retval EFI_UNSUPPORTED         The DestOffset or SrcOffset is not valid for this device.
@@ -237,7 +237,7 @@ EFI_STATUS
   );
 
 /**
-  Unmaps a memory region that was previously mapped with EFI_ISA_IO_PROTOCOL.Map()
+  Unmaps a memory region that was previously mapped with EFI_ISA_IO_PROTOCOL.Map().
 
   The EFI_ISA_IO_PROTOCOL.Map() operation is completed and any corresponding 
   resources are released.  If the operation was EfiIsaIoOperationSlaveWrite 
@@ -270,8 +270,8 @@ EFI_STATUS
 
   @retval EFI_SUCCESS             The requested memory pages were allocated.
   @retval EFI_INVALID_PARAMETER   Type is invalid.
-  @retval EFI_INVALID_PARAMETER   MemoryType is invalid
-  @retval EFI_INVALID_PARAMETER   HostAddress is NULL
+  @retval EFI_INVALID_PARAMETER   MemoryType is invalid.
+  @retval EFI_INVALID_PARAMETER   HostAddress is NULL.
   @retval EFI_UNSUPPORTED         Attributes is unsupported.
   @retval EFI_UNSUPPORTED         The memory range specified by HostAddress, Pages,
                                   and Type is not available for common buffer use.
@@ -290,7 +290,7 @@ EFI_STATUS
   );
 
 /**
-  Frees a common buffer that was allocated with EFI_ISA_IO_PROTOCOL.AllocateBuffer()
+  Frees a common buffer that was allocated with EFI_ISA_IO_PROTOCOL.AllocateBuffer().
 
   @param[in] This          A pointer to the EFI_ISA_IO_PROTOCOL instance.
   @param[in] Pages         The number of pages to free from the previously allocated common buffer.

@@ -2,13 +2,13 @@
   The OEM Badging Protocol defines the interface to get the OEM badging 
   image with the display attribute. This protocol can be produced based on OEM badging images.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -50,16 +50,17 @@ typedef enum {
 
   Load an OEM badge image and return its data and attributes.
 
-  @param This              Pointer to this protocol instance.
+  @param This              The pointer to this protocol instance.
   @param Instance          The visible image instance is found.
-  @param Format            Format of the image. Examples: BMP, JPEG.
-  @param ImageData         Image data for the badge file. Currently only supports the .bmp file format. 
-  @param ImageSize         Size of the image returned.
-  @param Attribute         Display attributes of the image returned.
-  @param CoordinateX       X coordinate of the image.
-  @param CoordinateY       Y coordinate of the image.
+  @param Format            The format of the image. Examples: BMP, JPEG.
+  @param ImageData         The image data for the badge file. Currently only 
+                           supports the .bmp file format. 
+  @param ImageSize         The size of the image returned.
+  @param Attribute         The display attributes of the image returned.
+  @param CoordinateX       The X coordinate of the image.
+  @param CoordinateY       The Y coordinate of the image.
 
-  @retval EFI_SUCCESS      Image has been fetched successfully.
+  @retval EFI_SUCCESS      The image was fetched successfully.
   @retval EFI_NOT_FOUND    The specified image could not be found.
 
 **/
