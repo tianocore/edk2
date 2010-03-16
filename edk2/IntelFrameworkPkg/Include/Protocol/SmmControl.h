@@ -149,7 +149,9 @@ EFI_STATUS
   implementation of EFI_SMM_BASE_PROTOCOL.Communicate() to layer upon this service
   and provide an SMI callback from a general EFI runtime driver.
   This protocol provides an abstraction to the platform hardware that generates an
-  SMI or PMI. There are often I/O ports that, when accessed, will engender the
+  SMI or PMI. There are often I/O ports that, when accessed, will engender the SMI or PMI.
+  Also, this hardware optionally supports the periodic genearation of these signals.
+
 **/
 struct _EFI_SMM_CONTROL_PROTOCOL {
   ///
