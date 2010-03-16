@@ -2,14 +2,14 @@
   This protocol abstracts the 8259 interrupt controller. This includes
   PCI IRQ routing needed to program the PCI Interrupt Line register.
 
-  Copyright (c) 2007, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   This protocol is defined in Framework for EFI Compatibility Support Module spec
@@ -59,12 +59,12 @@ typedef enum {
   the legacy mode mask and the protected mode mask. The base address for the 8259
   is different for legacy and protected mode, so two masks are required.
 
-  @param  This                  Protocol instance pointer.
-  @param  MasterBase            The base vector for the Master PIC in the 8259 controller
-  @param  SlaveBase             The base vector for the Slave PIC in the 8259 controller
+  @param  This                  The protocol instance pointer.
+  @param  MasterBase            The base vector for the Master PIC in the 8259 controller.
+  @param  SlaveBase             The base vector for the Slave PIC in the 8259 controller.
 
-  @retval EFI_SUCCESS           The new bases were programmed
-  @retval EFI_DEVICE_ERROR      A device error occured programming the vector bases
+  @retval EFI_SUCCESS           The new bases were programmed.
+  @retval EFI_DEVICE_ERROR      A device error occured programming the vector bases.
 
 **/
 typedef
@@ -80,14 +80,14 @@ EFI_STATUS
   the legacy mode mask and the protected mode mask. The base address for the 8259
   is different for legacy and protected mode, so two masks are required.
 
-  @param  This                  Protocol instance pointer.
-  @param  LegacyMask            Bit 0 is Irq0 - Bit 15 is Irq15
-  @param  LegacyEdgeLevel       Bit 0 is Irq0 - Bit 15 is Irq15
-  @param  ProtectedMask         Bit 0 is Irq0 - Bit 15 is Irq15
-  @param  ProtectedEdgeLevel    Bit 0 is Irq0 - Bit 15 is Irq15
+  @param  This                  The protocol instance pointer.
+  @param  LegacyMask            Bit 0 is Irq0 - Bit 15 is Irq15.
+  @param  LegacyEdgeLevel       Bit 0 is Irq0 - Bit 15 is Irq15.
+  @param  ProtectedMask         Bit 0 is Irq0 - Bit 15 is Irq15.
+  @param  ProtectedEdgeLevel    Bit 0 is Irq0 - Bit 15 is Irq15.
 
-  @retval EFI_SUCCESS           8259 status returned
-  @retval EFI_DEVICE_ERROR      Error reading 8259
+  @retval EFI_SUCCESS           8259 status returned.
+  @retval EFI_DEVICE_ERROR      Error reading 8259.
 
 **/
 typedef
@@ -106,14 +106,14 @@ EFI_STATUS
   is different for legacy and protected mode, so two masks are required.
   Also set the edge/level masks.
 
-  @param  This                  Protocol instance pointer.
-  @param  LegacyMask            Bit 0 is Irq0 - Bit 15 is Irq15
-  @param  LegacyEdgeLevel       Bit 0 is Irq0 - Bit 15 is Irq15
-  @param  ProtectedMask         Bit 0 is Irq0 - Bit 15 is Irq15
-  @param  ProtectedEdgeLevel    Bit 0 is Irq0 - Bit 15 is Irq15
+  @param  This                  The protocol instance pointer.
+  @param  LegacyMask            Bit 0 is Irq0 - Bit 15 is Irq15.
+  @param  LegacyEdgeLevel       Bit 0 is Irq0 - Bit 15 is Irq15.
+  @param  ProtectedMask         Bit 0 is Irq0 - Bit 15 is Irq15.
+  @param  ProtectedEdgeLevel    Bit 0 is Irq0 - Bit 15 is Irq15.
 
-  @retval EFI_SUCCESS           8259 status returned
-  @retval EFI_DEVICE_ERROR      Error writing 8259
+  @retval EFI_SUCCESS           8259 status returned.
+  @retval EFI_DEVICE_ERROR      Error writing 8259.
 
 **/
 typedef
@@ -135,13 +135,13 @@ EFI_STATUS
   mask for the new mode is Mask, or if Mask does not exist the previously saved
   mask is used.
 
-  @param  This                  Protocol instance pointer.
-  @param  Mode                  Mode of operation. i.e. real mode or protected mode
+  @param  This                  The protocol instance pointer.
+  @param  Mode                  The mode of operation. i.e. the real mode or protected mode.
   @param  Mask                  Optional interupt mask for the new mode.
   @param  EdgeLevel             Optional trigger mask for the new mode.
 
-  @retval EFI_SUCCESS           8259 programmed
-  @retval EFI_DEVICE_ERROR      Error writing to 8259
+  @retval EFI_SUCCESS           8259 programmed.
+  @retval EFI_DEVICE_ERROR      Error writing to 8259.
 
 **/
 typedef
@@ -156,12 +156,12 @@ EFI_STATUS
 /**
   Convert from IRQ to processor interrupt vector number.
 
-  @param  This                  Protocol instance pointer.
-  @param  Irq                   8259 IRQ0 - IRQ15
-  @param  Vector                Processor vector number that matches Irq
+  @param  This                  The protocol instance pointer.
+  @param  Irq                   8259 IRQ0 - IRQ15.
+  @param  Vector                The processor vector number that matches an Irq.
 
-  @retval EFI_SUCCESS           The Vector matching Irq is returned
-  @retval EFI_INVALID_PARAMETER Irq not valid
+  @retval EFI_SUCCESS           The Vector matching Irq is returned.
+  @retval EFI_INVALID_PARAMETER The Irq not valid.
 
 **/
 typedef
@@ -175,12 +175,12 @@ EFI_STATUS
 /**
   Enable Irq by unmasking interrupt in 8259
 
-  @param  This                  Protocol instance pointer.
-  @param  Irq                   8259 IRQ0 - IRQ15
+  @param  This                  The protocol instance pointer.
+  @param  Irq                   8259 IRQ0 - IRQ15.
   @param  LevelTriggered        TRUE if level triggered. FALSE if edge triggered.
 
-  @retval EFI_SUCCESS           Irq enabled on 8259
-  @retval EFI_INVALID_PARAMETER Irq not valid
+  @retval EFI_SUCCESS           The Irq was enabled on 8259.
+  @retval EFI_INVALID_PARAMETER The Irq is not valid.
 
 **/
 typedef
@@ -194,11 +194,11 @@ EFI_STATUS
 /**
   Disable Irq by masking interrupt in 8259
 
-  @param  This                  Protocol instance pointer.
-  @param  Irq                   8259 IRQ0 - IRQ15
+  @param  This                  The protocol instance pointer.
+  @param  Irq                   8259 IRQ0 - IRQ15.
 
-  @retval EFI_SUCCESS           Irq disabled on 8259
-  @retval EFI_INVALID_PARAMETER Irq not valid
+  @retval EFI_SUCCESS           The Irq was disabled on 8259.
+  @retval EFI_INVALID_PARAMETER The Irq is not valid.
 
 **/
 typedef
@@ -214,12 +214,12 @@ EFI_STATUS
   that is programmed into the Interrupt Line (from the PCI config space)
   register.
 
-  @param  This                  Protocol instance pointer.
-  @param  PciHandle             PCI function to return vector for
-  @param  Vector                Vector for fucntion that matches
+  @param  This                  The protocol instance pointer.
+  @param  PciHandle             The PCI function to return the vector for.
+  @param  Vector                The vector for the function it matches.
 
-  @retval EFI_SUCCESS           A valid Vector is returned
-  @retval EFI_INVALID_PARAMETER PciHandle not valid
+  @retval EFI_SUCCESS           A valid Vector was returned.
+  @retval EFI_INVALID_PARAMETER PciHandle not valid.
 
 **/
 typedef
@@ -233,11 +233,11 @@ EFI_STATUS
 /**
   Send an EOI to 8259
 
-  @param  This                  Protocol instance pointer.
-  @param  Irq                   8259 IRQ0 - IRQ15
+  @param  This                  The protocol instance pointer.
+  @param  Irq                   8259 IRQ0 - IRQ15.
 
-  @retval EFI_SUCCESS           EOI successfully sent to 8259
-  @retval EFI_INVALID_PARAMETER Irq not valid
+  @retval EFI_SUCCESS           EOI was successfully sent to 8259.
+  @retval EFI_INVALID_PARAMETER The Irq isnot valid.
 
 **/
 typedef

@@ -1,14 +1,14 @@
 /** @file
   This file declares the PciCfg PPI used to access the PCI configuration space in PEI
 
-  Copyright (c) 2006 - 2009, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
   @par Revision Reference:
   This PPI is defined in PEI CIS
@@ -64,7 +64,7 @@ EFI_STATUS
 
   @param  PeiServices    An indirect pointer to the PEI Services Table
                          published by the PEI Foundation.
-  @param  This           Pointer to local data for the interface.
+  @param  This           The pointer to local data for the interface.
   @param  Width          The width of the access. Enumerated in bytes.
   @param  Address        The physical address of the access.
   @param  SetBits        Value of the bits to set.

@@ -2,14 +2,14 @@
   Include file for definitions in the Intel Platform Innovation Framework for EFI
   System Management Mode Core Interface Specification (SMM CIS) version 0.91.
 
-  Copyright (c) 2007 - 2010, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -30,13 +30,14 @@ typedef struct _EFI_SMM_SYSTEM_TABLE      EFI_SMM_SYSTEM_TABLE;
 #define EFI_SMM_SYSTEM_TABLE_REVISION (0 << 16) | (0x09)
 
 /**
-  Allocates pool memory from SMRAM for IA-32 or runtime memory for
+  Allocates pool memory from SMRAM for IA-32, or runtime memory for
   the Itanium processor family.
 
-  @param  PoolType         The type of pool to allocate. The only supported type is EfiRuntimeServicesData
+  @param  PoolType         The type of pool to allocate. The only supported type 
+                           is EfiRuntimeServicesData.
   @param  Size             The number of bytes to allocate from the pool.
-  @param  Buffer           A pointer to a pointer to the allocated buffer if the call
-                           succeeds; undefined otherwise.
+  @param  Buffer           A pointer to a pointer to the allocated buffer if the 
+                           call succeeds.  Otherwise, undefined.
 
   @retval EFI_SUCCESS           The requested number of bytes was allocated.
   @retval EFI_OUT_OF_RESOURCES  The pool requested could not be allocated.
@@ -56,7 +57,7 @@ EFI_STATUS
 /**
   Returns pool memory to the system.
 
-  @param  Buffer           Pointer to the buffer to free.
+  @param  Buffer           The pointer to the buffer to free.
 
   @retval EFI_SUCCESS           The memory was returned to the system.
   @retval EFI_INVALID_PARAMETER Buffer was invalid.
@@ -75,8 +76,8 @@ EFI_STATUS
   Allocates memory pages from the system.
 
   @param  Type             The type of allocation to perform.
-  @param  MemoryType       The only supported type is EfiRuntimeServicesData
-  @param  NumberofPages    The number of contiguous 4 KB pages to allocate
+  @param  MemoryType       The only supported type is EfiRuntimeServicesData.
+  @param  NumberofPages    The number of contiguous 4 KB pages to allocate.
   @param  Memory           Pointer to a physical address. On input, the way in which
                            the address is used depends on the value of Type. On output, the address
                            is set to the base of the page range that was allocated.
@@ -85,7 +86,7 @@ EFI_STATUS
   @retval EFI_OUT_OF_RESOURCES  The pages requested could not be allocated.
   @retval EFI_NOT_FOUND         The requested pages could not be found.
   @retval EFI_INVALID_PARAMETER Type is not AllocateAnyPages or AllocateMaxAddress
-                                or AllocateAddress. Or MemoryType is in the range EfiMaxMemoryType..0x7FFFFFFF.
+                                or AllocateAddress. Or, MemoryType is in the range EfiMaxMemoryType..0x7FFFFFFF.
   @note  Inconsistent with specification here:
          In the Framework Spec, this definition is named EFI_SMM_ALLOCATE_PAGES.  
          To avoid a naming conflict, the definition here is renamed.
@@ -102,7 +103,7 @@ EFI_STATUS
 /**
   Frees memory pages for the system.
 
-  @param  Memory           The base physical address of the pages to be freed
+  @param  Memory           The base physical address of the pages to be freed.
   @param  NumberOfPages    The number of contiguous 4 KB pages to free.
 
   @retval EFI_SUCCESS           The requested memory pages were freed.
@@ -502,9 +503,9 @@ struct _EFI_SMM_SYSTEM_TABLE {
   // MP service
   //
   
-  ///Inconsistent with specification here:
-  ///  In Framework Spec, this definition does not exist. This method is introduced in PI1.1 spec for 
-  ///  implementation needed.
+  /// Inconsistent with specification here:
+  ///  In Framework Spec, this definition does not exist. This method is introduced in PI1.1 specification for 
+  ///  the implementation needed.
   EFI_SMM_STARTUP_THIS_AP             SmmStartupThisAp;
 
   //

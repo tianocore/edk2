@@ -9,14 +9,14 @@
   Thunk is the code that switches from 32-bit protected environment into the 16-bit real-mode
 	environment. Reverse thunk is the code that does the opposite.
 
-  Copyright (c) 2007 - 2010, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   This protocol is defined in Framework for EFI Compatibility Support Module spec
@@ -98,18 +98,20 @@ typedef struct {
   UINT16                            Compatibility16CallOffset;
   
   ///
-  /// The segment of the entry point within the traditional BIOS for EfiCompatibility to invoke the PnP installation check.
+  /// The segment of the entry point within the traditional BIOS for EfiCompatibility 
+  /// to invoke the PnP installation check.
   ///
   UINT16                            PnPInstallationCheckSegment;
   
   ///
-  /// The Offset of the entry point within the traditional BIOS for EfiCompatibility to invoke the PnP installation check.
+  /// The Offset of the entry point within the traditional BIOS for EfiCompatibility 
+  /// to invoke the PnP installation check.
   ///
   UINT16                            PnPInstallationCheckOffset;
   
   ///
-  /// EFI system resources table. Type EFI_SYSTEM_TABLE is defined in the IntelPlatform Innovation Framework for EFI 
-  /// Driver Execution Environment Core Interface Specification (DXE CIS).
+  /// EFI system resources table. Type EFI_SYSTEM_TABLE is defined in the IntelPlatform 
+  ///Innovation Framework for EFI Driver Execution Environment Core Interface Specification (DXE CIS).
   ///
   UINT32                            EfiSystemTable; 
   
@@ -157,7 +159,8 @@ typedef struct {
   
   ///
   /// The 32-bit physical address where the MP table is stored in the traditional BIOS.
-  /// The EfiCompatibility code will fill in the MpTablePtr value and copy the data to the indicated area.
+  /// The EfiCompatibility code will fill in the MpTablePtr value and copy the data 
+  /// to the indicated area.
   ///
   UINT32                            MpTablePtr;
   
@@ -231,8 +234,9 @@ typedef struct {
 /// Functions provided by the CSM binary which communicate between the EfiCompatibility 
 /// and Compatability16 code.
 ///
-/// Inconsistent with specification here: 
-/// The member's name started with "Compatibility16" [defined in Intel Framework Compatibility Support Module Specification / 0.97 version] 
+/// Inconsistent with the specification here: 
+/// The member's name started with "Compatibility16" [defined in Intel Framework 
+/// Compatibility Support Module Specification / 0.97 version] 
 /// has been changed to "Legacy16" since keeping backward compatible.
 ///
 typedef enum {
@@ -345,15 +349,15 @@ typedef enum {
 /// EFI_DISPATCH_OPROM_TABLE
 ///
 typedef struct {
-  UINT16  PnPInstallationCheckSegment;  ///< Pointer to the PnpInstallationCheck data structure.
-  UINT16  PnPInstallationCheckOffset;   ///< Pointer to the PnpInstallationCheck data structure.
+  UINT16  PnPInstallationCheckSegment;  ///< A pointer to the PnpInstallationCheck data structure.
+  UINT16  PnPInstallationCheckOffset;   ///< A pointer to the PnpInstallationCheck data structure.
   UINT16  OpromSegment;                 ///< The segment where the OpROM was placed. Offset is assumed to be 3.
   UINT8   PciBus;                       ///< The PCI bus.
   UINT8   PciDeviceFunction;            ///< The PCI device * 0x08 | PCI function.
   UINT8   NumberBbsEntries;             ///< The number of valid BBS table entries upon entry and exit. The IBV code may
                                         ///< increase this number, if BBS-compliant devices also hook INTs in order to force the
                                         ///< OpROM BIOS Setup to be executed.
-  VOID    *BbsTablePointer;             ///< Pointer to the BBS table.
+  VOID    *BbsTablePointer;             ///< A pointer to the BBS table.
   UINT16  RuntimeSegment;               ///< The segment where the OpROM can be relocated to. If this value is 0x0000, this
                                         ///< means that the relocation of this run time code is not supported.
                                         ///< Inconsistent with specification here: 
@@ -372,12 +376,12 @@ typedef struct {
   UINT32                            BiosLessThan1MB;
   
   ///
-  /// Starting address of the high memory block.
+  /// The starting address of the high memory block.
   ///
   UINT32                            HiPmmMemory;
   
   ///
-  /// Length of high memory block.
+  /// The length of high memory block.
   ///
   UINT32                            HiPmmMemorySizeInBytes;
   
@@ -417,22 +421,22 @@ typedef struct {
   UINT32                            LowPmmMemory;
   
   ///
-  /// Length of low Memory block.
+  /// The length of low Memory block.
   ///
   UINT32                            LowPmmMemorySizeInBytes;
 } EFI_TO_COMPATIBILITY16_INIT_TABLE;
 
 ///
-/// DEVICE_PRODUCER_SERIAL
+/// DEVICE_PRODUCER_SERIAL.
 ///
 typedef struct {
-  UINT16                            Address;    ///< I/O address assigned to the serial port
+  UINT16                            Address;    ///< I/O address assigned to the serial port.
   UINT8                             Irq;        ///< IRQ assigned to the serial port.
   SERIAL_MODE                       Mode;       ///< Mode of serial port. Values are defined below.
 } DEVICE_PRODUCER_SERIAL;
 
 ///
-/// DEVICE_PRODUCER_SERIAL's modes
+/// DEVICE_PRODUCER_SERIAL's modes.
 ///@{
 #define DEVICE_SERIAL_MODE_NORMAL               0x00
 #define DEVICE_SERIAL_MODE_IRDA                 0x01
@@ -442,17 +446,17 @@ typedef struct {
 ///@)
 
 ///
-/// DEVICE_PRODUCER_PARALLEL
+/// DEVICE_PRODUCER_PARALLEL.
 ///
 typedef struct {
-  UINT16                            Address;  ///< I/O address assigned to the parallel port
+  UINT16                            Address;  ///< I/O address assigned to the parallel port.
   UINT8                             Irq;      ///< IRQ assigned to the parallel port.
   UINT8                             Dma;      ///< DMA assigned to the parallel port.
   PARALLEL_MODE                     Mode;     ///< Mode of the parallel port. Values are defined below.
 } DEVICE_PRODUCER_PARALLEL;
 
 ///
-/// DEVICE_PRODUCER_PARALLEL's modes
+/// DEVICE_PRODUCER_PARALLEL's modes.
 ///@{
 #define DEVICE_PARALLEL_MODE_MODE_OUTPUT_ONLY   0x00
 #define DEVICE_PARALLEL_MODE_MODE_BIDIRECTIONAL 0x01
@@ -464,7 +468,7 @@ typedef struct {
 /// DEVICE_PRODUCER_FLOPPY
 ///
 typedef struct {
-  UINT16                            Address;          ///< I/O address assigned to the floppy
+  UINT16                            Address;          ///< I/O address assigned to the floppy.
   UINT8                             Irq;              ///< IRQ assigned to the floppy.
   UINT8                             Dma;              ///< DMA assigned to the floppy.
   UINT8                             NumberOfFloppy;   ///< Number of floppies in the system.
@@ -534,14 +538,14 @@ typedef struct {
   UINT16                            ControlBaseAddress;
   
   ///
-  /// Bus master address
+  /// Bus master address.
   ///
   UINT16                            BusMasterAddress;
   
   UINT8                             HddIrq;
   
   ///
-  /// Data that identifies the drive data, one per possible attached drive
+  /// Data that identifies the drive data; one per possible attached drive.
   ///
   ATAPI_IDENTIFY                    IdentifyDrive[2];
 } HDD_INFO;
@@ -559,7 +563,7 @@ typedef struct {
 #define HDD_SLAVE_ATAPI_ZIPDISK   0x80
 
 ///
-/// BBS_STATUS_FLAGS
+/// BBS_STATUS_FLAGS;\.
 ///
 typedef struct {
   UINT16                            OldPosition : 4;    ///< Prior priority.
@@ -580,7 +584,7 @@ typedef struct {
 } BBS_STATUS_FLAGS;
 
 ///
-/// BBS_TABLE, device type values & boot priority values
+/// BBS_TABLE, device type values & boot priority values.
 ///
 typedef struct {
   ///
@@ -727,12 +731,12 @@ typedef struct {
   UINT16                            Type : 3;
   
   ///
-  /// Size of "port" in bits. Defined values are below.
+  /// The size of "port" in bits. Defined values are below.
   ///
   UINT16                            PortGranularity : 3;
   
   ///
-  /// Size of data in bits. Defined values are below.
+  /// The size of data in bits. Defined values are below.
   ///
   UINT16                            DataGranularity : 3;
   
@@ -743,14 +747,14 @@ typedef struct {
 } SMM_ATTRIBUTES;
 
 ///
-/// SMM_ATTRIBUTES type values
+/// SMM_ATTRIBUTES type values.
 ///@{
 #define STANDARD_IO       0x00
 #define STANDARD_MEMORY   0x01
 ///@}
 
 ///
-/// SMM_ATTRIBUTES port size constants
+/// SMM_ATTRIBUTES port size constants.
 ///@{
 #define PORT_SIZE_8       0x00
 #define PORT_SIZE_16      0x01
@@ -759,7 +763,7 @@ typedef struct {
 ///@}
 
 ///
-/// SMM_ATTRIBUTES data size constants
+/// SMM_ATTRIBUTES data size constants.
 ///@{
 #define DATA_SIZE_8       0x00
 #define DATA_SIZE_16      0x01
@@ -768,7 +772,7 @@ typedef struct {
 ///@}
 
 ///
-/// SMM_FUNCTION & relating constants
+/// SMM_FUNCTION & relating constants.
 ///
 typedef struct {
   UINT16                            Function : 15;
@@ -776,7 +780,7 @@ typedef struct {
 } SMM_FUNCTION;
 
 ///
-/// SMM_FUNCTION Function constants
+/// SMM_FUNCTION Function constants.
 ///@{
 #define INT15_D042        0x0000
 #define GET_USB_BOOT_INFO 0x0001
@@ -784,7 +788,7 @@ typedef struct {
 ///@}
 
 ///
-/// SMM_FUNCTION Owner constants
+/// SMM_FUNCTION Owner constants.
 ///@{
 #define STANDARD_OWNER    0x0
 #define OEM_OWNER         0x1
@@ -807,12 +811,12 @@ typedef struct {
   SMM_FUNCTION                      SmmFunction;
   
   ///
-  /// SmmPort size depends upon SmmAttributes and ranges from2 bytes to 16 bytes
+  /// SmmPort size depends upon SmmAttributes and ranges from2 bytes to 16 bytes.
   ///
   UINT8                             SmmPort;
   
   ///
-  /// SmmData size depends upon SmmAttributes and ranges from2 bytes to 16 bytes
+  /// SmmData size depends upon SmmAttributes and ranges from2 bytes to 16 bytes.
   ///
   UINT8                             SmmData;
 } SMM_ENTRY;
@@ -905,8 +909,8 @@ typedef struct {
 typedef struct {
   UINT16                            MajorVersion;                 ///< The EfiCompatibility major version number.
   UINT16                            MinorVersion;                 ///< The EfiCompatibility minor version number.
-  UINT32                            AcpiTable;                    ///< Location of the RSDT ACPI table. < 4G range
-  UINT32                            SmbiosTable;                  ///< Location of the SMBIOS table in EFI memory. < 4G range
+  UINT32                            AcpiTable;                    ///< The location of the RSDT ACPI table. < 4G range.
+  UINT32                            SmbiosTable;                  ///< The location of the SMBIOS table in EFI memory. < 4G range.
   UINT32                            SmbiosTableLength;
   //
   // Legacy SIO state
@@ -921,8 +925,8 @@ typedef struct {
   //
   HDD_INFO                          HddInfo[MAX_IDE_CONTROLLER];  ///< Hard disk drive information, including raw Identify Drive data.
   UINT32                            NumberBbsEntries;             ///< Number of entries in the BBS table
-  UINT32                            BbsTable;                     ///< Pointer to the BBS table. Type BBS_TABLE is defined below.
-  UINT32                            SmmTable;                     ///< Pointer to the SMM table. Type SMM_TABLE is defined below.
+  UINT32                            BbsTable;                     ///< A pointer to the BBS table. Type BBS_TABLE is defined below.
+  UINT32                            SmmTable;                     ///< A pointer to the SMM table. Type SMM_TABLE is defined below.
   UINT32                            OsMemoryAbove1Mb;             ///< The amount of usable memory above 1 MB, i.e. E820 type 1 memory. This value can
                                                                   ///< differ from the value in EFI_TO_COMPATIBILITY16_INIT_TABLE as more
                                                                   ///< memory may have been discovered.
@@ -971,12 +975,12 @@ typedef struct {
 typedef struct _EFI_LEGACY_BIOS_PROTOCOL EFI_LEGACY_BIOS_PROTOCOL;
 
 ///
-/// Flags returned by CheckPciRom()
+/// Flags returned by CheckPciRom().
 ///
 #define NO_ROM            0x00
 #define ROM_FOUND         0x01
 #define VALID_LEGACY_ROM  0x02
-#define ROM_WITH_CONFIG   0x04     ///< Not defined in the Framework CSM Specification
+#define ROM_WITH_CONFIG   0x04     ///< Not defined in the Framework CSM Specification.
 
 ///
 /// The following macros do not appear in the Framework CSM Specification and 
@@ -1113,10 +1117,10 @@ typedef union {
   of BiosInt. Regs will contain the 16-bit register context on entry and
   exit.
 
-  @param[in]     This      Protocol instance pointer.
-  @param[in]     BiosInt   Processor interrupt vector to invoke
+  @param[in]     This      The protocol instance pointer.
+  @param[in]     BiosInt   The processor interrupt vector to invoke.
   @param[in,out] Reg       Register contexted passed into (and returned) from thunk to
-                           16-bit mode
+                           16-bit mode.
 
   @retval TRUE                Thunk completed with no BIOS errors in the target code. See Regs for status.  
   @retval FALSE                  There was a BIOS error in the target code.
@@ -1134,13 +1138,13 @@ BOOLEAN
   16-bit register context on entry and exit. Arguments can be passed on
   the Stack argument
 
-  @param[in] This        Protocol instance pointer.
-  @param[in] Segment     Segemnt of 16-bit mode call
-  @param[in] Offset      Offset of 16-bit mdoe call
+  @param[in] This        The protocol instance pointer.
+  @param[in] Segment     The segemnt of 16-bit mode call.
+  @param[in] Offset      The offset of 16-bit mdoe call.
   @param[in] Reg         Register contexted passed into (and returned) from thunk to
-                         16-bit mode
-  @param[in] Stack       Caller allocated stack used to pass arguments
-  @param[in] StackSize   Size of Stack in bytes
+                         16-bit mode.
+  @param[in] Stack       The caller allocated stack used to pass arguments.
+  @param[in] StackSize   The size of Stack in bytes.
 
   @retval FALSE                 Thunk completed with no BIOS errors in the target code.                                See Regs for status.  @retval TRUE                  There was a BIOS error in the target code.
 **/
@@ -1159,17 +1163,17 @@ BOOLEAN
   Test to see if a legacy PCI ROM exists for this device. Optionally return
   the Legacy ROM instance for this PCI device.
 
-  @param[in]  This        Protocol instance pointer.
+  @param[in]  This        The protocol instance pointer.
   @param[in]  PciHandle   The PCI PC-AT OPROM from this devices ROM BAR will be loaded
-  @param[out] RomImage    Return the legacy PCI ROM for this device
-  @param[out] RomSize     Size of ROM Image
+  @param[out] RomImage    Return the legacy PCI ROM for this device.
+  @param[out] RomSize     The size of ROM Image.
   @param[out] Flags       Indicates if ROM found and if PC-AT. Multiple bits can be set as follows:
-                            - 00 = No ROM
-                            - 01 = ROM Found
-                            - 02 = ROM is a valid legacy ROM
+                            - 00 = No ROM.
+                            - 01 = ROM Found.
+                            - 02 = ROM is a valid legacy ROM.
 
-  @retval EFI_SUCCESS       Legacy Option ROM availible for this device
-  @retval EFI_UNSUPPORTED   Legacy Option ROM not supported.
+  @retval EFI_SUCCESS       The Legacy Option ROM availible for this device
+  @retval EFI_UNSUPPORTED   The Legacy Option ROM is not supported.
 
 **/
 typedef
@@ -1187,7 +1191,7 @@ EFI_STATUS
   about how many disks were added by the OPROM and the shadow address and
   size. DiskStart & DiskEnd are INT 13h drive letters. Thus 0x80 is C:
 
-  @param[in]  This               Protocol instance pointer.
+  @param[in]  This               The protocol instance pointer.
   @param[in]  PciHandle          The PCI PC-AT OPROM from this devices ROM BAR will be loaded.
                                  This value is NULL if RomImage is non-NULL. This is the normal
                                  case.
@@ -1199,11 +1203,11 @@ EFI_STATUS
                                    - 00 = No ROM.
                                    - 01 = ROM found.
                                    - 02 = ROM is a valid legacy ROM.
-  @param[out] DiskStart          Disk number of first device hooked by the ROM. If DiskStart
+  @param[out] DiskStart          The disk number of first device hooked by the ROM. If DiskStart
                                  is the same as DiskEnd no disked were hooked.
   @param[out] DiskEnd            disk number of the last device hooked by the ROM.
-  @param[out] RomShadowAddress   Shadow address of PC-AT ROM
-  @param[out] RomShadowSize      Size of RomShadowAddress in bytes
+  @param[out] RomShadowAddress   Shadow address of PC-AT ROM.
+  @param[out] RomShadowSize      Size of RomShadowAddress in bytes.
 
   @retval EFI_SUCCESS             Thunk completed, see Regs for status.
   @retval EFI_INVALID_PARAMETER   PciHandle not found
@@ -1246,10 +1250,10 @@ EFI_STATUS
     manner--meaning that the EFI code is still valid. An ungraceful boot failure causes a reset because the state
     of EFI code is unknown.
 
-  @param[in] This             Protocol instance pointer.
-  @param[in] BootOption       EFI Device Path from BootXXXX variable.
-  @param[in] LoadOptionSize   Size of LoadOption in size.
-  @param[in] LoadOption       LoadOption from BootXXXX variable
+  @param[in] This             The protocol instance pointer.
+  @param[in] BootOption       The EFI Device Path from BootXXXX variable.
+  @param[in] LoadOptionSize   The size of LoadOption in size.
+  @param[in] LoadOption       LThe oadOption from BootXXXX variable.
 
   @retval EFI_DEVICE_ERROR      Failed to boot from any boot device and memory is uncorrupted.                                Note: This function normally does not returns. It will either boot the                                OS or reset the system if memory has been "corrupted" by loading                                a boot sector and passing control to it.
 **/
@@ -1269,11 +1273,11 @@ EFI_STATUS
   keyboard options such as boot with NUM LOCK on/off. This function does not
   touch the keyboard or keyboard LEDs but only the BDA.
 
-  @param[in] This   Protocol instance pointer.
-  @param[in] Leds   Status of current Scroll, Num & Cap lock LEDS
-                      - Bit 0 is Scroll Lock 0 = Not locked
-                      - Bit 1 is Num Lock
-                      - Bit 2 is Caps Lock
+  @param[in] This   The protocol instance pointer.
+  @param[in] Leds   The status of current Scroll, Num & Cap lock LEDS:
+                      - Bit 0 is Scroll Lock 0 = Not locked.
+                      - Bit 1 is Num Lock.
+                      - Bit 2 is Caps Lock.
 
   @retval EFI_SUCCESS   The BDA was updated successfully.
 
@@ -1288,13 +1292,13 @@ EFI_STATUS
 /**
   Retrieve legacy BBS info and assign boot priority.
 
-  @param[in]     This       Protocol instance pointer.
-  @param[out]    HddCount   Number of HDD_INFO structures
-  @param[out]    HddInfo    Onboard IDE controller information
-  @param[out]    BbsCount   Number of BBS_TABLE structures
-  @param[in,out] BbsTable   Point to List of BBS_TABLE
+  @param[in]     This       The protocol instance pointer.
+  @param[out]    HddCount   The number of HDD_INFO structures.
+  @param[out]    HddInfo    Onboard IDE controller information.
+  @param[out]    BbsCount   The number of BBS_TABLE structures.
+  @param[in,out] BbsTable   Points to List of BBS_TABLE.
 
-  @retval EFI_SUCCESS   Tables returned
+  @retval EFI_SUCCESS   Tables were returned.
 
 **/
 typedef
@@ -1311,11 +1315,11 @@ EFI_STATUS
   Assign drive number to legacy HDD drives prior to booting an EFI
   aware OS so the OS can access drives without an EFI driver.
 
-  @param[in]  This       Protocol instance pointer.
-  @param[out] BbsCount   Number of BBS_TABLE structures
-  @param[out] BbsTable   List BBS entries
+  @param[in]  This       The protocol instance pointer.
+  @param[out] BbsCount   The number of BBS_TABLE structures
+  @param[out] BbsTable   List of BBS entries
 
-  @retval EFI_SUCCESS   Drive numbers assigned
+  @retval EFI_SUCCESS   Drive numbers assigned.
 
 **/
 typedef
@@ -1330,12 +1334,12 @@ EFI_STATUS
   To boot from an unconventional device like parties and/or execute
   HDD diagnostics.
 
-  @param[in]  This              Protocol instance pointer.
-  @param[in]  Attributes        How to interpret the other input parameters
+  @param[in]  This              The protocol instance pointer.
+  @param[in]  Attributes        How to interpret the other input parameters.
   @param[in]  BbsEntry          The 0-based index into the BbsTable for the parent
                                 device.
-  @param[in]  BeerData          Pointer to the 128 bytes of ram BEER data.
-  @param[in]  ServiceAreaData   Pointer to the 64 bytes of raw Service Area data. The
+  @param[in]  BeerData          A pointer to the 128 bytes of ram BEER data.
+  @param[in]  ServiceAreaData   A pointer to the 64 bytes of raw Service Area data. The
                                 caller must provide a pointer to the specific Service
                                 Area and not the start all Service Areas.
 
@@ -1355,12 +1359,12 @@ EFI_STATUS
 /**
   Shadow all legacy16 OPROMs that haven't been shadowed.
   Warning: Use this with caution. This routine disconnects all EFI
-  drivers. If used externally then caller must re-connect EFI
+  drivers. If used externally, then  the caller must re-connect EFI
   drivers.
   
-  @param[in]  This   Protocol instance pointer.
+  @param[in]  This   The protocol instance pointer.
   
-  @retval EFI_SUCCESS   OPROMs shadowed
+  @retval EFI_SUCCESS   OPROMs were shadowed.
 
 **/
 typedef
@@ -1372,19 +1376,19 @@ EFI_STATUS
 /**
   Get a region from the LegacyBios for S3 usage.
 
-  @param[in]  This                  Protocol instance pointer.
-  @param[in]  LegacyMemorySize      Size of required region
-  @param[in]  Region                Region to use.
-                                    00 = Either 0xE0000 or 0xF0000 block
-                                      - Bit0 = 1 0xF0000 block
-                                      - Bit1 = 1 0xE0000 block
-  @param[in]  Alignment             Address alignment. Bit mapped. First non-zero
+  @param[in]  This                  The protocol instance pointer.
+  @param[in]  LegacyMemorySize      The size of required region.
+  @param[in]  Region                The region to use.
+                                    00 = Either 0xE0000 or 0xF0000 block.
+                                      - Bit0 = 1 0xF0000 block.
+                                      - Bit1 = 1 0xE0000 block.
+  @param[in]  Alignment             Address alignment. Bit mapped. The first non-zero
                                     bit from right is alignment.
-  @param[out] LegacyMemoryAddress   Region Assigned
+  @param[out] LegacyMemoryAddress   The Region Assigned
 
-  @retval EFI_SUCCESS           Region assigned
+  @retval EFI_SUCCESS           The Region was assigned.
   @retval EFI_ACCESS_DENIED     The function was previously invoked.
-  @retval Other                 Region not assigned
+  @retval Other                 The Region was not assigned.
 
 **/
 typedef
@@ -1400,15 +1404,15 @@ EFI_STATUS
 /**
   Get a region from the LegacyBios for Tiano usage. Can only be invoked once.
 
-  @param[in]  This                        Protocol instance pointer.
-  @param[in]  LegacyMemorySize            Size of data to copy
-  @param[in]  LegacyMemoryAddress         Legacy Region destination address
+  @param[in]  This                        The protocol instance pointer.
+  @param[in]  LegacyMemorySize            The size of data to copy.
+  @param[in]  LegacyMemoryAddress         The Legacy Region destination address.
                                           Note: must be in region assigned by
-                                          LegacyBiosGetLegacyRegion
-  @param[in]  LegacyMemorySourceAddress   Source of the data to copy.
+                                          LegacyBiosGetLegacyRegion.
+  @param[in]  LegacyMemorySourceAddress   The source of the data to copy.
 
-  @retval EFI_SUCCESS           Region assigned
-  @retval EFI_ACCESS_DENIED     Destination outside assigned region
+  @retval EFI_SUCCESS           The Region assigned.
+  @retval EFI_ACCESS_DENIED     Destination was outside an assigned region.
 
 **/
 typedef

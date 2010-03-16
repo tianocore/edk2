@@ -1,18 +1,18 @@
 /** @file
-  DataHubRecord.h includes all data hub sub class GUID definitions.
+  DataHubRecord.h includes all data hub subclass GUID definitions.
 
   This file includes all data hub sub class defitions from 
-  Cache subclass spec 0.9, DataHub SubClass spec 0.9, Memory SubClass Spec 0.9,
-  Processor Subclass spec 0.9, and Misc SubClass spec 0.9.
+  Cache subclass specification 0.9, DataHub SubClass specification 0.9, Memory SubClass Spec 0.9,
+  Processor Subclass specification 0.9, and Misc SubClass specification 0.9.
   
-  Copyright (c) 2007 - 2009, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 #ifndef _DATAHUB_RECORDS_GUID_H_
@@ -51,7 +51,7 @@ extern  EFI_GUID  gEfiMiscSubClassGuid;
 
 ///
 /// Inconsistent with specification here:  
-/// In ProcSubclass spec 0.9, the value is 0x0100.
+/// In ProcSubclass specification 0.9, the value is 0x0100.
 /// Keep it unchanged from the perspective of binary consistency.
 ///
 #define EFI_PROCESSOR_SUBCLASS_VERSION    0x00010000
@@ -146,7 +146,7 @@ typedef struct _FLOOPY_CONN_DEVICE_PATH {
 
 ///
 /// Inconsistent with specification here:  
-/// In MiscSubclass spec 0.9, this data structure and corrsponding fields are NOT defined.
+/// In MiscSubclass specification 0.9, this data structure and corrsponding fields are NOT defined.
 /// It's implementation-specific to simplify the code logic.
 ///
 typedef union _EFI_MISC_PORT_DEVICE_PATH {
@@ -167,7 +167,7 @@ typedef union _EFI_MISC_PORT_DEVICE_PATH {
 /// String Token Definition
 ///
 /// Inconsistent with specification here:  
-/// The macro isn't defined by any spec.
+/// The macro isn't defined by any specification.
 /// Keep it unchanged for backward compatibility.
 ///
 #define EFI_STRING_TOKEN          UINT16
@@ -269,7 +269,7 @@ typedef EFI_EXP_BASE10_DATA        EFI_PROCESSOR_CORE_FREQUENCY_DATA;
 /// that the processor/driver supports automatic frequency selection. 
 ///
 /// Inconsistent with specification here:  
-/// According to MiscSubclass 0.9 spec, it should be a pointer since it refers to a list of frequencies.
+/// According to MiscSubclass 0.9 specification, it should be a pointer since it refers to a list of frequencies.
 ///
 typedef EFI_EXP_BASE10_DATA        *EFI_PROCESSOR_CORE_FREQUENCY_LIST_DATA;
 
@@ -302,7 +302,7 @@ typedef struct {
 
 ///
 /// Inconsistent with specification here:  
-/// The name of third field in ProcSubClass spec0.9 is LogicalProcessorCount.
+/// The name of third field in ProcSubClass specification 0.9 is LogicalProcessorCount.
 /// Keep it unchanged for backward compatibility.
 ///
 typedef struct {
@@ -452,7 +452,7 @@ typedef enum {
   EfiProcessorFamilyUltraSparcIII          = 0x57,
   ///
   /// Inconsistent with specification here:  
-  /// This field in ProcSubClass spec 0.9 is defined as EfiProcessorFamilyUltraSparcIIi.
+  /// This field in ProcSubClass specification 0.9 is defined as EfiProcessorFamilyUltraSparcIIi.
   /// Change it to EfiProcessorFamilyUltraSparcIIIi to avoid build break.
   ///
   EfiProcessorFamilyUltraSparcIIIi         = 0x58,
@@ -494,37 +494,37 @@ typedef enum {
   EfiProcessorFamilyIntelItanium2          = 0xB8,
   ///
   /// Inconsistent with specification here:  
-  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorFamilyIntelPentiumM          = 0xB9,
   ///
   /// Inconsistent with specification here:  
-  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorFamilyIntelCeleronD          = 0xBA,
   ///
   /// Inconsistent with specification here:  
-  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorFamilyIntelPentiumD          = 0xBB,
   ///
   /// Inconsistent with specification here:  
-  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorFamilyIntelPentiumEx         = 0xBC,
   ///
   /// Inconsistent with specification here:  
-  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorFamilyIntelCoreSolo          = 0xBD,  
   ///
   /// Inconsistent with specification here:  
-  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorFamilyReserved               = 0xBE,  
   ///
   /// Inconsistent with specification here:  
-  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorFamilyIntelCore2             = 0xBF,
   EfiProcessorFamilyIBM390                 = 0xC8,
@@ -532,44 +532,44 @@ typedef enum {
   EfiProcessorFamilyG5                     = 0xCA,
   ///
   /// Inconsistent with specification here:  
-  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  /// This field is NOT defined in ProcSubClass specification  0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorFamilyG6                     = 0xCB,
   ///
   /// Inconsistent with specification here:  
-  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorFamilyzArchitectur           = 0xCC,
   ///
   /// Inconsistent with specification here:  
-  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorFamilyViaC7M                 = 0xD2,
   ///
   /// Inconsistent with specification here:  
-  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorFamilyViaC7D                 = 0xD3,
   ///
   /// Inconsistent with specification here:  
-  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorFamilyViaC7                  = 0xD4,
   ///
   /// Inconsistent with specification here:  
-  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorFamilyViaEden                = 0xD5,
   EfiProcessorFamilyi860                   = 0xFA,
   EfiProcessorFamilyi960                   = 0xFB,
   ///
   /// Inconsistent with specification here:  
-  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorFamilyIndicatorFamily2       = 0xFE,
   ///
   /// Inconsistent with specification here:  
-  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorFamilyReserved1              = 0xFF
 } EFI_PROCESSOR_FAMILY_DATA;
@@ -661,22 +661,22 @@ typedef enum {
   EfiProcessorSocket940              = 0x11,
   ///
   /// Inconsistent with specification here:  
-  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorSocket939              = 0x12,
   ///
   /// Inconsistent with specification here:  
-  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorSocketmPGA604          = 0x13,
   ///
   /// Inconsistent with specification here:  
-  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorSocketLGA771           = 0x14,
   ///
   /// Inconsistent with specification here:  
-  /// This field is NOT defined in ProcSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorSocketLGA775           = 0x15
 
@@ -686,7 +686,7 @@ typedef STRING_REF                  EFI_PROCESSOR_SOCKET_NAME_DATA;
 
 ///
 /// Inconsistent with specification here:  
-/// In ProcSubclass spec 0.9, the naming is EFI_PROCESSOR_CACHE_ASSOCIATION_DATA.
+/// In ProcSubclass specification 0.9, the naming is EFI_PROCESSOR_CACHE_ASSOCIATION_DATA.
 /// Keep it unchanged for backward compatibilty.
 ///
 typedef EFI_INTER_LINK_DATA         EFI_CACHE_ASSOCIATION_DATA;
@@ -695,7 +695,7 @@ typedef EFI_INTER_LINK_DATA         EFI_CACHE_ASSOCIATION_DATA;
 /// This data record refers to the health status of the processor. 
 ///
 /// Inconsistent with specification here:  
-/// In ProcSubclass spec 0.9, the naming is EFI_PROCESSOR_HEALTH_STATUS_DATA.
+/// In ProcSubclass specification 0.9, the naming is EFI_PROCESSOR_HEALTH_STATUS_DATA.
 /// Keep it unchanged for backward compatibilty.
 ///
 typedef enum {
@@ -713,8 +713,8 @@ typedef UINTN                       EFI_PROCESSOR_PACKAGE_NUMBER_DATA;
 
 ///
 /// Inconsistent with specification here:
-/// In ProcSubclass spec 0.9, the enumeration type data structure is NOT defined.
-/// The equivalent in spec is 
+/// In ProcSubclass specification 0.9, the enumeration type data structure is NOT defined.
+/// The equivalent in specification is 
 ///      #define EFI_PROCESSOR_FREQUENCY_RECORD_NUMBER           0x00000001
 ///      #define EFI_PROCESSOR_BUS_FREQUENCY_RECORD_NUMBER       0x00000002
 ///      #define EFI_PROCESSOR_VERSION_RECORD_NUMBER             0x00000003
@@ -770,7 +770,7 @@ typedef enum {
 
 ///
 /// Inconsistent with specification here:  
-/// In ProcSubclass spec 0.9, the union type data structure is NOT defined.
+/// In ProcSubclass specification 0.9, the union type data structure is NOT defined.
 /// It's implementation-specific to simplify the code logic.
 ///
 typedef union {
@@ -809,7 +809,7 @@ typedef struct {
 typedef EFI_EXP_BASE2_DATA          EFI_CACHE_SIZE_DATA;
 ///
 /// Inconsistent with specification here:  
-/// In CacheSubclass spec 0.9, the naming is EFI_CACHE_MAXIMUM_SIZE_DATA.
+/// In CacheSubclass specification 0.9, the naming is EFI_CACHE_MAXIMUM_SIZE_DATA.
 /// Keep it unchanged for backward compatibilty.
 ///
 typedef EFI_EXP_BASE2_DATA          EFI_MAXIMUM_CACHE_SIZE_DATA;
@@ -859,8 +859,8 @@ typedef enum {
 
 ///
 /// Inconsistent with specification here:  
-/// In CacheSubclass 0.9 spec. It defines the field type as UINT16.
-/// In fact, it should be UINT32 type since it refers to a 32bit width data.
+/// In CacheSubclass 0.9 specification. It defines the field type as UINT16.
+/// In fact, it should be UINT32 type because it refers to a 32bit width data.
 ///
 typedef struct {
   UINT32                            Level           :3;
@@ -901,8 +901,8 @@ typedef enum {
 
 ///
 /// Inconsistent with specification here:
-/// In CacheSubclass spec 0.9, the enumeration type data structure is NOT defined.
-/// The equivalent in spec is 
+/// In CacheSubclass specification 0.9, the enumeration type data structure is NOT defined.
+/// The equivalent in specification is 
 ///      #define EFI_CACHE_SIZE_RECORD_NUMBER                    0x00000001
 ///      #define EFI_CACHE_MAXIMUM_SIZE_RECORD_NUMBER            0x00000002
 ///      #define EFI_CACHE_SPEED_RECORD_NUMBER                   0x00000003
@@ -930,7 +930,7 @@ typedef enum {
 
 ///
 /// Inconsistent with specification here:  
-/// In CacheSubclass spec0.9, the union type data structure is NOT defined.
+/// In CacheSubclass specification 0.9, the union type data structure is NOT defined.
 /// It's implementation-specific to simplify the code logic.
 ///
 typedef union {
@@ -1097,7 +1097,7 @@ typedef enum _EFI_MEMORY_FORM_FACTOR {
   EfiMemoryFormFactorSrimm                    = 0x0E,
   ///
   /// Inconsistent with specification here:  
-  /// This field is NOT defined in MemSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  /// This field is NOT defined in MemSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiMemoryFormFactorFbDimm                   = 0x0F
 } EFI_MEMORY_FORM_FACTOR;
@@ -1123,12 +1123,12 @@ typedef enum _EFI_MEMORY_ARRAY_TYPE {
   EfiMemoryTypeDdr                            = 0x12,
   ///
   /// Inconsistent with specification here:  
-  /// This field is NOT defined in MemSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  /// This field is NOT defined in MemSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiMemoryTypeDdr2                           = 0x13,
   ///
   /// Inconsistent with specification here:  
-  /// This field is NOT defined in MemSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  /// This field is NOT defined in MemSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiMemoryTypeDdr2FbDimm                     = 0x14
 } EFI_MEMORY_ARRAY_TYPE;
@@ -1159,7 +1159,7 @@ typedef enum {
   EfiMemoryStateDisabled     = 5,
   ///
   /// Inconsistent with specification here:  
-  /// This field is NOT defined in MemSubClass spec0.9. It's introduced for SMBIOS2.6 spec.
+  /// This field is NOT defined in MemSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiMemoryStatePartial      = 6
 } EFI_MEMORY_STATE;
@@ -1240,7 +1240,7 @@ typedef struct {
   /// The memory speed in megahertz (MHz). A value of 0x00 denotes that 
   /// the speed is unknown.
 	/// Inconsistent with specification here:  
-	/// In MemSubclass spec 0.9, the naming is MemoryTypeSpeed.
+	/// In MemSubclass specification 0.9, the naming is MemoryTypeSpeed.
 	/// Keep it unchanged for backward compatibilty.
 	///
   EFI_EXP_BASE10_DATA               MemorySpeed;
@@ -1389,14 +1389,14 @@ typedef struct {
 //
 ///
 /// Inconsistent with specification here:  
-/// In MemSubclass spec 0.9, the following data structures are NOT defined.
+/// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 5.
 ///
 #define EFI_MEMORY_CONTROLLER_INFORMATION_RECORD_NUMBER    0x00000008
 
 ///
 /// Inconsistent with specification here:  
-/// In MemSubclass spec 0.9, the following data structures are NOT defined.
+/// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 5.
 ///
 typedef enum {  
@@ -1412,7 +1412,7 @@ typedef enum {
 
 ///
 /// Inconsistent with specification here:  
-/// In MemSubclass spec 0.9, the following data structures are NOT defined.
+/// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 5.
 ///
 typedef struct {
@@ -1427,7 +1427,7 @@ typedef struct {
 
 ///
 /// Inconsistent with specification here:  
-/// In MemSubclass spec 0.9, the following data structures are NOT defined.
+/// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 5.
 ///
 typedef enum {  
@@ -1442,7 +1442,7 @@ typedef enum {
 
 ///
 /// Inconsistent with specification here:  
-/// In MemSubclass spec 0.9, the following data structures are NOT defined.
+/// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 5.
 ///
 typedef struct {
@@ -1456,7 +1456,7 @@ typedef struct {
 
 ///
 /// Inconsistent with specification here:  
-/// In MemSubclass spec 0.9, the following data structures are NOT defined.
+/// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 5.
 ///
 typedef struct {
@@ -1476,7 +1476,7 @@ typedef struct {
 
 ///
 /// Inconsistent with specification here:  
-/// In MemSubclass spec 0.9, the following data structures are NOT defined.
+/// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 5.
 ///
 typedef struct {
@@ -1491,7 +1491,7 @@ typedef struct {
 /// Use EFI_MEMORY_CONTROLLER_INFORMATION_DATA instead
 ///
 /// Inconsistent with specification here:  
-/// In MemSubclass spec 0.9, the following data structures are NOT defined.
+/// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 5.
 ///
 typedef struct {
@@ -1510,7 +1510,7 @@ typedef struct {
 
 ///
 /// Inconsistent with specification here:  
-/// In MemSubclass spec 0.9, the following data structures are NOT defined.
+/// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 5.
 ///
 typedef struct {
@@ -1531,13 +1531,13 @@ typedef struct {
 /// Memory. Error Information - SMBIOS Type 18
 ///
 /// Inconsistent with specification here:  
-/// In MemSubclass spec 0.9, the following data structures are NOT defined.
+/// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 18.
 ///
 #define EFI_MEMORY_32BIT_ERROR_INFORMATION_RECORD_NUMBER    0x00000009
 ///
 /// Inconsistent with specification here:  
-/// In MemSubclass spec 0.9, the following data structures are NOT defined.
+/// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 18.
 ///
 typedef enum {  
@@ -1558,7 +1558,7 @@ typedef enum {
 } EFI_MEMORY_ERROR_TYPE;
 ///
 /// Inconsistent with specification here:  
-/// In MemSubclass spec 0.9, the following data structures are NOT defined.
+/// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 18.
 ///
 typedef enum {  
@@ -1569,7 +1569,7 @@ typedef enum {
 } EFI_MEMORY_ERROR_GRANULARITY_TYPE;
 ///
 /// Inconsistent with specification here:  
-/// In MemSubclass spec 0.9, the following data structures are NOT defined.
+/// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 18.
 ///
 typedef enum {  
@@ -1581,7 +1581,7 @@ typedef enum {
 } EFI_MEMORY_ERROR_OPERATION_TYPE;
 ///
 /// Inconsistent with specification here:  
-/// In MemSubclass spec 0.9, the following data structures are NOT defined.
+/// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 18.
 ///
 typedef struct {
@@ -1595,17 +1595,17 @@ typedef struct {
 } EFI_MEMORY_32BIT_ERROR_INFORMATION;
 
 ///
-/// Memory. Error Information - SMBIOS Type 33
+/// Memory. Error Information - SMBIOS Type 33.
 ///
 /// Inconsistent with specification here:  
-/// In MemSubclass spec 0.9, the following data structures are NOT defined.
+/// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 33.
 ///
 #define EFI_MEMORY_64BIT_ERROR_INFORMATION_RECORD_NUMBER    0x0000000A
 
 ///
 /// Inconsistent with specification here:  
-/// In MemSubclass spec 0.9, the following data structures are NOT defined.
+/// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 33.
 ///
 typedef struct {
@@ -1620,7 +1620,7 @@ typedef struct {
 
 ///
 /// Inconsistent with specification here:  
-/// In MemSubclass spec 0.9, the following data structures are NOT defined.
+/// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It is implementation-specific to simplify the code logic.
 ///
 typedef union _EFI_MEMORY_SUBCLASS_RECORDS {
@@ -1721,26 +1721,26 @@ typedef struct {
                                     BiosCharacteristics2;
   ///
   /// Inconsistent with specification here:  
-  /// In MiscSubclass spec 0.9, this data structure and corrsponding fields are NOT defined.
-  /// It's introduced for SmBios 2.6 spec type 0.
+  /// In MiscSubclass specification 0.9, this data structure and corrsponding fields are NOT defined.
+  /// It's introduced for SmBios 2.6 specification type 0.
   ///
   UINT8                             BiosMajorRelease;
   ///
   /// Inconsistent with specification here:  
-  /// In MiscSubclass spec 0.9, this data structure and corrsponding fields are NOT defined.
-  /// It's introduced for SmBios 2.6 spec type 0.
+  /// In MiscSubclass specification 0.9, this data structure and corrsponding fields are NOT defined.
+  /// It's introduced for SmBios 2.6 specification type 0.
   ///
   UINT8                             BiosMinorRelease;
   ///
   /// Inconsistent with specification here:  
-  /// In MiscSubclass spec 0.9, this data structure and corrsponding fields are NOT defined.
-  /// It's introduced for SmBios 2.6 spec type 0.
+  /// In MiscSubclass specification 0.9, this data structure and corrsponding fields are NOT defined.
+  /// It's introduced for SmBios 2.6 specification type 0.
   ///
   UINT8                             BiosEmbeddedFirmwareMajorRelease;
   ///
   /// Inconsistent with specification here:  
-  /// In MiscSubclass spec 0.9, this data structure and corrsponding fields are NOT defined.
-  /// It's introduced for SmBios 2.6 spec type 0.
+  /// In MiscSubclass specification 0.9, this data structure and corrsponding fields are NOT defined.
+  /// It's introduced for SmBios 2.6 specification type 0.
   ///
   UINT8                             BiosEmbeddedFirmwareMinorRelease;
 } EFI_MISC_BIOS_VENDOR_DATA;
@@ -1771,14 +1771,14 @@ typedef struct {
   EFI_MISC_SYSTEM_WAKEUP_TYPE       SystemWakeupType;
   ///
   /// Inconsistent with specification here:  
-  /// In MiscSubclass spec 0.9, this data structure and corrsponding fields are NOT defined.
-  /// It's introduced for SmBios 2.6 spec type 1.
+  /// In MiscSubclass specification 0.9, this data structure and corrsponding fields are NOT defined.
+  /// It's introduced for SmBios 2.6 specification type 1.
   ///
   STRING_REF                        SystemSKUNumber;
   ///
   /// Inconsistent with specification here:  
-  /// In MiscSubclass spec 0.9, this data structure and corrsponding fields are NOT defined.
-  /// It's introduced for SmBios 2.6 spec type 1.
+  /// In MiscSubclass specification 0.9, this data structure and corrsponding fields are NOT defined.
+  /// It's introduced for SmBios 2.6 specification type 1.
   ///
   STRING_REF                        SystemFamily;
 } EFI_MISC_SYSTEM_MANUFACTURER_DATA;
@@ -1863,7 +1863,7 @@ typedef enum {
 typedef struct {
   ///
   /// Inconsistent with specification here:  
-  /// In MiscSubclass 0.9 spec, it has a wrong field name "EFI_MISC_CHASSIS_TYPE".
+  /// In MiscSubclass 0.9 specification, it has the incorrect field name "EFI_MISC_CHASSIS_TYPE".
   /// Change it to "ChassisType" to pass build.
   ///
   UINT32                            ChassisType       :16;
@@ -2014,8 +2014,8 @@ typedef struct {
   EFI_MISC_PORT_TYPE                PortType;
   ///
   /// Inconsistent with specification here:  
-  /// In MiscSubclass spec 0.9, the type of this field are defined as EFI_DEVICE_PATH_PROTOCOL,
-  /// which causes the implementation has a little complexity. Keep it unchanged for backward 
+  /// In MiscSubclass specification 0.9, this type of field is defined as EFI_DEVICE_PATH_PROTOCOL,
+  /// which causes the implementation some complexity. Keep it unchanged for backward 
   /// compatibility.
   ///
   EFI_MISC_PORT_DEVICE_PATH         PortPath;
@@ -2044,7 +2044,7 @@ typedef enum {
   EfiSlotTypeAgp                          = 0x0F,
   ///
   /// Inconsistent with specification here:  
-  /// In MiscSubclass spec 0.9, its naming should be EfiSlotTypeAgp2X
+  /// In MiscSubclass specification 0.9, its naming should be EfiSlotTypeAgp2X
   /// rather than EfiSlotTypeApg2X.
   ///
   EfiSlotTypeAgp2X                        = 0x10,
@@ -2058,8 +2058,8 @@ typedef enum {
   EfiSlotTypePC98Card                     = 0xA4,
   ///
   /// Inconsistent with specification here:  
-  /// In MiscSubclass spec 0.9, this field isn't defined.
-  /// It's introduced for SmBios 2.6 spec type 9.
+  /// In MiscSubclass specification 0.9, this field isn't defined.
+  /// It's introduced for SmBios 2.6 specification type 9.
   ///
   EfiSlotTypePciExpress                   = 0xA5
 } EFI_MISC_SLOT_TYPE;
@@ -2139,7 +2139,7 @@ typedef struct {
   STRING_REF                        OnBoardDeviceDescription;
   ///
   /// Inconsistent with specification here:  
-  /// In MiscSubclass spec 0.9, the naming is OnBoardDeviceType.
+  /// In MiscSubclass specification 0.9, the name is OnBoardDeviceType.
   /// Keep it unchanged for backward compatibilty.
   ///
   EFI_MISC_ONBOARD_DEVICE_STATUS    OnBoardDeviceStatus;
@@ -2256,15 +2256,15 @@ typedef struct {
 //
 ///
 /// Inconsistent with specification here:  
-/// In MiscSubclass spec 0.9, the naming is EFI_MISC_BATTERY_LOCATION_RECORD_NUMBER.
+/// In MiscSubclass specification 0.9, the name is EFI_MISC_BATTERY_LOCATION_RECORD_NUMBER.
 /// Keep it unchanged for backward compatibilty.
 ///
 #define EFI_MISC_PORTABLE_BATTERY_RECORD_NUMBER   0x00000010
 
 ///
 /// Inconsistent with specification here:  
-/// In MiscSubclass spec 0.9, the structure name is EFI_MISC_BATTERY_DEVICE_CHEMISTRY.
-/// And all field namings are also different with spec.
+/// In MiscSubclass specification 0.9, the structure name is EFI_MISC_BATTERY_DEVICE_CHEMISTRY.
+/// And all field namings are also different with specification.
 /// Keep it unchanged for backward compatibilty.
 ///
 typedef enum {  
@@ -2280,8 +2280,8 @@ typedef enum {
 
 ///
 /// Inconsistent with specification here:  
-/// In MiscSubclass spec 0.9, the structure name is EFI_MISC_BATTERY_LOCATION_DATA.
-/// And the name and the order of the fields are also different with spec.
+/// In MiscSubclass specification 0.9, the structure name is EFI_MISC_BATTERY_LOCATION_DATA.
+/// Also, the name and the order of the fields vary with specifications.
 /// Keep it unchanged for backward compatibilty.
 ///
 typedef struct {
@@ -2342,9 +2342,9 @@ typedef struct {
 
 ///
 /// Inconsistent with specification here:  
-/// In MiscSubclass spec 0.9, it only mention the possible value of each field in
+/// The MiscSubclass specification 0.9 only mentions the possible value of each field in
 /// EFI_MISC_HARDWARE_SECURITY_SETTINGS. 
-/// It's implementation-specific to simplify the code logic.
+/// It's implementation-specific in order to to simplify the code logic.
 ///
 typedef enum {
   EfiHardwareSecurityStatusDisabled       = 0,
@@ -2520,7 +2520,7 @@ typedef struct {
 
 ///
 /// Inconsistent with specification here:  
-/// In MiscSubclass spec 0.9, the structure name is EFI_MISC_BOOT_INFORMATION_STATUS_TYPE.
+/// In MiscSubclass specification 0.9, the structure name is EFI_MISC_BOOT_INFORMATION_STATUS_TYPE.
 /// Keep it unchanged for backward compatibilty.
 ///
 typedef enum {
@@ -2541,7 +2541,7 @@ typedef enum {
 typedef struct {
   ///
   /// Inconsistent with specification here:  
-  /// In MiscSubclass spec 0.9, the field name is EFI_MISC_BOOT_INFORMATION_STATUS_TYPE.
+  /// In MiscSubclass specification 0.9, the field name is EFI_MISC_BOOT_INFORMATION_STATUS_TYPE.
   /// Keep it unchanged for backward compatibilty.
   ///
   EFI_MISC_BOOT_INFORMATION_STATUS_DATA_TYPE BootInformationStatus;
@@ -2597,8 +2597,8 @@ typedef struct {
   EFI_INTER_LINK_DATA               ManagementDeviceComponentLink;
   ///
   /// Inconsistent with specification here:  
-  /// In MiscSubclass spec 0.9, this field is NOT defined.
-  /// It's introduced for SmBios 2.6 spec type 35.
+  /// In MiscSubclass specification 0.9, this field is NOT defined.
+  /// It's introduced for SmBios 2.6 specification type 35.
   ///
   EFI_INTER_LINK_DATA               ManagementDeviceThresholdLink;
 } EFI_MISC_MANAGEMENT_DEVICE_COMPONENT_DESCRIPTION_DATA;
@@ -2635,7 +2635,7 @@ typedef struct {
 /// System Power supply Record - SMBIOS Type 39
 ///
 /// Inconsistent with specification here:  
-/// In MiscSubclass spec 0.9, the type of all fields are UINT32.
+/// In MiscSubclass specification 0.9, the type of all fields are UINT32.
 /// Keep it unchanged for backward compatibilty.
 ///
 typedef struct {
@@ -2650,7 +2650,7 @@ typedef struct {
 
 ///
 /// Inconsistent with specification here:  
-/// In MiscSubclass spec 0.9, the structure name is EFI_MISC_POWER_SUPPLY_UNIT_GROUP_DATA.
+/// In MiscSubclass specification 0.9, the structure name is EFI_MISC_POWER_SUPPLY_UNIT_GROUP_DATA.
 /// Keep it unchanged for backward compatibilty.
 ///
 typedef struct {
@@ -2675,8 +2675,8 @@ typedef struct {
 /// OEM Data Record - SMBIOS Type 0x80-0xFF
 ///
 /// Inconsistent with specification here:  
-/// In MiscSubclass spec 0.9, the structure name is EFI_SMBIOS_STRUCTURE_HDR.
-/// Due to this structure is commonly used by vendor to construct SmBios type 0x80~0xFF table,
+/// In MiscSubclass specification 0.9, the structure name is EFI_SMBIOS_STRUCTURE_HDR.
+/// Due to this, the structure is commonly used by vendors to construct SmBios type 0x80~0xFF table,
 /// Keep it unchanged for backward compatibilty.
 ///
 typedef struct {
@@ -2688,7 +2688,7 @@ typedef struct {
 typedef struct {
   ///
   /// Inconsistent with specification here:  
-  /// In MiscSubclass spec 0.9, the field name is EFI_SMBIOS_STRUCTURE_HDR.
+  /// In MiscSubclass specification 0.9, the field name is EFI_SMBIOS_STRUCTURE_HDR.
   /// Keep it unchanged for backward compatibilty.
   ///
   SMBIOS_STRUCTURE_HDR              Header;
@@ -2701,15 +2701,15 @@ typedef struct {
 /// Misc. System Event Log  - SMBIOS Type 15
 ///
 /// Inconsistent with specification here:  
-/// In MiscSubclass spec 0.9, the following data structures are NOT defined.
-/// It's introduced for SmBios 2.6 spec type 15.
+/// In MiscSubclass specification 0.9, the following data structures are NOT defined.
+/// It's introduced for SmBios 2.6 specification type 15.
 ///
 #define EFI_MISC_SYSTEM_EVENT_LOG_RECORD_NUMBER    0x00000020
 
 ///
 /// Inconsistent with specification here:  
-/// In MiscSubclass spec 0.9, the following data structures are NOT defined.
-/// It's introduced for SmBios 2.6 spec type 15.
+/// In MiscSubclass specification 0.9, the following data structures are NOT defined.
+/// It's introduced for SmBios 2.6 specification type 15.
 ///
 typedef struct {
   UINT16                            LogAreaLength;
@@ -2740,14 +2740,14 @@ typedef struct {
 /// Management Device Threshold Data Record - SMBIOS Type 36
 ///
 /// Inconsistent with specification here:  
-/// In MiscSubclass spec 0.9, the following data structures are NOT defined.
-/// It's introduced for SmBios 2.6 spec type 36.
+/// In MiscSubclass specification 0.9, the following data structures are NOT defined.
+/// It's introduced for SmBios 2.6 specification type 36.
 ///
 #define EFI_MISC_MANAGEMENT_DEVICE_THRESHOLD_RECORD_NUMBER    0x00000021
 ///
 /// Inconsistent with specification here:  
-/// In MiscSubclass spec 0.9, the following data structures are NOT defined.
-/// It's introduced for SmBios 2.6 spec type 36.
+/// In MiscSubclass specification 0.9, the following data structures are NOT defined.
+/// It's introduced for SmBios 2.6 specification type 36.
 ///
 typedef struct {
   UINT16                            LowerThresNonCritical;
@@ -2790,7 +2790,7 @@ typedef EFI_MISC_ELECTRICAL_CURRENT_PROBE_DESCRIPTION_DATA EFI_MISC_ELECTRICAL_C
 
 ///
 /// Inconsistent with specification here:  
-/// In MemSubclass spec 0.9, the following data structures are NOT defined.
+/// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It is implementation-specific to simplify the code logic.
 ///
 typedef union {
@@ -2832,7 +2832,7 @@ typedef union {
 
 ///
 /// Inconsistent with specification here:  
-/// In MemSubclass spec 0.9, the following data structures are NOT defined.
+/// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It is implementation-specific to simplify the code logic.
 ///
 typedef struct {
@@ -2843,13 +2843,13 @@ typedef struct {
 
 ///
 /// Inconsistent with specification here:  
-/// In DataHubSubclass spec 0.9 page 16, the following symbol is NOT defined.
+/// In DataHubSubclass specification 0.9 page 16, the following symbol is NOT defined.
 /// But value is meaningful, 0 means Reserved.
 ///
 #define EFI_SUBCLASS_INSTANCE_RESERVED       0
 ///
 /// Inconsistent with specification here:  
-/// In DataHubSubclass spec 0.9 page 16, the following symbol is NOT defined.
+/// In DataHubSubclass specification 0.9 page 16, the following symbol is NOT defined.
 /// But value is meaningful, -1 means Not Applicable.
 ///
 #define EFI_SUBCLASS_INSTANCE_NON_APPLICABLE 0xFFFF

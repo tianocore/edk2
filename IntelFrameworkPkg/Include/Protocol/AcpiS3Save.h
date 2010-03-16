@@ -2,14 +2,14 @@
   This protocol is used to prepare all information that is needed for the S3 resume boot path. This
   protocol is not required for all platforms.
   
-  Copyright (c) 2006 - 2009, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   This Protocol is defined in Framework of S3 Resume Boot Path Spec.
@@ -79,9 +79,9 @@ EFI_STATUS
   scope of this specification.
 
   @param  This                  A pointer to the EFI_ACPI_S3_SAVE_PROTOCOL instance.
-  @param  Size   								The returned size of legacy memory below 1MB.
+  @param  Size   		The returned size of legacy memory below 1MB.
 
-  @retval EFI_SUCCESS           Size is successfully returned.
+  @retval EFI_SUCCESS           Size was successfully returned.
   @retval EFI_INVALID_PARAMETER The pointer Size is NULL.
     
 **/
@@ -96,9 +96,9 @@ EFI_STATUS
   The EFI_ACPI_S3_SAVE_PROTOCOL is responsible for preparing all the information that the
   Framework needs to restore the platform's preboot state during an S3 resume boot. This
   information can include the following:
-    - The Framework boot script table, containing all necessary operations to initialize the platform
-    - ACPI table information, such as RSDT, through which the OS waking vector can be located
-    - Range of reserved memory that can be used on the S3 resume boot path
+    - The Framework boot script table, containing all necessary operations to initialize the platform.
+    - ACPI table information, such as RSDT, through which the OS waking vector can be located.
+    - The range of reserved memory that can be used on the S3 resume boot path.
   This protocol can be used after the Framework makes sure that the boot process is complete and
   that no hardware has been left unconfigured. Where to call this protocol to save information is implementation-specific. 
   In the case of an EFI-aware OS, ExitBootServices() can be a choice to provide this hook.

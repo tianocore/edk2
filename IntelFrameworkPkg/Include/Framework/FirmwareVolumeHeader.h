@@ -1,19 +1,19 @@
 /** @file
-  Defines data structure that is the volume header found at the beginning of
+  Defines the data structure that is the volume header found at the beginning of
   all firmware volumes that are either memory mapped or have an
   associated FirmwareVolumeBlock protocol.
 
-  Copyright (c) 2006-2009, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
-  These definitions are from Firmware Volume Block Spec 0.9.
+  These definitions are from the Firmware Volume Block Spec 0.9.
 
 **/
 
@@ -21,7 +21,7 @@
 #define __EFI_FIRMWARE_VOLUME_HEADER_H__
 
 ///
-/// Firmware Volume Block Attributes bit definitions
+/// Firmware Volume Block Attributes bit definitions.
 ///@{
 #define EFI_FVB_READ_DISABLED_CAP   0x00000001
 #define EFI_FVB_READ_ENABLED_CAP    0x00000002
@@ -65,9 +65,9 @@
                                 EFI_FVB_LOCK_CAP \
                               )
 
-/** A parameterized macro defining a boolean expression which tests the state of a particular bit.
+/** A parameterized macro defining a boolean expression that tests the state of a particular bit.
   *
-  * @param FvbAttributes  Indicates test for CLEAR if EFI_FVB_ERASE_POLARITY is 1, else test for SET
+  * @param FvbAttributes  Indicates a test for CLEAR if EFI_FVB_ERASE_POLARITY is 1, else test for SET.
   *
   * @param TestAttributes The set of bits to test.
   *
@@ -79,7 +79,7 @@
       ((FvbAttributes & EFI_FVB_ERASE_POLARITY) ? (((~TestAttributes) & Bit) == Bit) : ((TestAttributes & Bit) == Bit)) \
     )
 
-/// A simple macro defined as the set of all FV Block Attribute bits which indicate status.
+/// A simple macro defined as the set of all FV Block Attribute bits that indicate status.
 #define EFI_FVB_STATUS    (EFI_FVB_READ_STATUS | EFI_FVB_WRITE_STATUS | EFI_FVB_LOCK_STATUS)
 
 #endif  /* __EFI_FIRMWARE_VOLUME_HEADER_H__ */

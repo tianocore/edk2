@@ -4,14 +4,14 @@
   the Legacy BIOS protocol is generic and consumes this protocol.
   A driver that matches the Legacy16 produces this protocol
 
-  Copyright (c) 2007 - 2009  Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   This protocol is defined in Framework for EFI Compatibility Support Module spec
@@ -238,17 +238,17 @@ EfiGetPlatformBinaryOem32Data    = 3,
   ///
   /// The function parameters associated with this mode are:
   ///
-  ///    System ROM image for the platform
+  ///    System ROM image for the platform.
   ///    
-  ///    TableSize Size of Table in bytes
+  ///    TableSize Size of Table in bytes.
   ///    
-  ///    Location Ignored
+  ///    Location Ignored.
   ///    
-  ///    Alignment Ignored
+  ///    Alignment Ignored.
   ///    
-  ///    LegacySegment Ignored
+  ///    LegacySegment Ignored.
   ///    
-  ///    LegacyOffset Ignored
+  ///    LegacyOffset Ignored.
   ///
   /// The return values associated with this mode are:
   ///
@@ -263,17 +263,17 @@ EfiGetPlatformBinaryOem32Data    = 3,
   ///
   /// The function parameters associated with this mode are:
   ///
-  ///    Table System ROM image for the platform
+  ///    Table System ROM image for the platform.
   ///    
-  ///    TableSize Size of Table in bytes
+  ///    TableSize Size of Table in bytes.
   ///    
-  ///    Location Ignored
+  ///    Location Ignored.
   ///    
-  ///    Alignment Ignored
+  ///    Alignment Ignored.
   ///    
-  ///    LegacySegment Ignored
+  ///    LegacySegment Ignored.
   ///    
-  ///    LegacyOffset Ignored
+  ///    LegacyOffset Ignored.
   ///
   /// The return values associated with this mode are:
   ///
@@ -290,7 +290,7 @@ EfiGetPlatformBinaryOem32Data    = 3,
 } EFI_GET_PLATFORM_INFO_MODE;
 
 /**
-  This enum specifies the Mode param values for GetPlatformHandle()
+  This enum specifies the Mode param values for GetPlatformHandle().
 **/
 typedef enum {
   ///
@@ -299,13 +299,13 @@ typedef enum {
   ///
   /// The function parameters associated with this mode are:
   ///
-  ///   Type 0x00
+  ///   Type 0x00.
   ///
   ///   HandleBuffer Buffer of all VGA handles found.
   ///
   ///   HandleCount Number of VGA handles found.
   ///
-  ///   AdditionalData NULL
+  ///   AdditionalData NULL.
   /// 
   EfiGetPlatformVgaHandle       = 0,
   ///
@@ -314,11 +314,11 @@ typedef enum {
   ///
   /// The function parameters associated with this mode are:
   ///
-  ///   Type 0x00
+  ///   Type 0x00.
   ///
   ///   HandleBuffer Buffer of all IDE handles found.
   ///
-  ///   HandleCount Number of IDE handles found
+  ///   HandleCount Number of IDE handles found.
   ///
   ///   AdditionalData Pointer to HddInfo.
   ///     Information about all onboard IDE controllers.
@@ -330,13 +330,13 @@ typedef enum {
   ///
   /// The function parameters associated with this mode are:
   ///
-  ///   Type 0x00
+  ///   Type 0x00.
   ///
   ///   HandleBuffer Buffer of all ISA bus handles found.
   ///
   ///   HandleCount Number of ISA bus handles found.
   ///
-  ///   AdditionalData NULL
+  ///   AdditionalData NULL.
   ///
   EfiGetPlatformIsaBusHandle    = 2,
   ///
@@ -345,20 +345,20 @@ typedef enum {
   ///
   /// The function parameters associated with this mode are:
   ///
-  ///   Type 0x00
+  ///   Type 0x00.
   ///
   ///   HandleBuffer Buffer of all USB handles found.
   ///
   ///   HandleCount Number of USB bus handles found.
   ///
-  ///   AdditionalData NULL
+  ///   AdditionalData NULL.
   ///
   EfiGetPlatformUsbHandle       = 3
 } EFI_GET_PLATFORM_HANDLE_MODE;
 
 /**
-  This enum specifies the Mode param values for PlatformHooks()
-  Note: Any OEM defined hooks start with 0x8000
+  This enum specifies the Mode param values for PlatformHooks().
+  Note: Any OEM defined hooks start with 0x8000.
 **/
 typedef enum {
   ///
@@ -366,15 +366,15 @@ typedef enum {
   ///
   /// The function parameters associated with this mode are:
   ///
-  ///     Type 0
+  ///     Type 0.
   ///
   ///     DeviceHandle Handle of device OpROM is associated with. 
   ///
   ///     ShadowAddress Address where OpROM is shadowed.
   ///
-  ///     Compatibility16Table NULL
+  ///     Compatibility16Table NULL.
   ///
-  ///     AdditionalData NULL
+  ///     AdditionalData NULL.
   ///
   EfiPlatformHookPrepareToScanRom = 0,
   ///
@@ -383,15 +383,15 @@ typedef enum {
   ///
   /// The function parameters associated with this mode are:
   ///
-  ///     Type 0
+  ///     Type 0.
   ///
-  ///     DeviceHandle 0
+  ///     DeviceHandle 0.
   ///
   ///     ShadowAddress First free OpROM area, after other OpROMs have been dispatched..
   ///
   ///     Compatibility16Table Pointer to the Compatability16 Table.
   ///
-  ///       AdditionalData NULL
+  ///       AdditionalData NULL.
   ///
   EfiPlatformHookShadowServiceRoms= 1,
   ///
@@ -400,15 +400,15 @@ typedef enum {
   ///
   /// The function parameters associated with this mode are:
   ///
-  ///       Type 0
+  ///       Type 0.
   ///
   ///       DeviceHandle Handle of device OpROM is associated with. 
   ///
   ///       ShadowAddress Address where OpROM is shadowed.
   ///
-  ///       Compatibility16Table NULL
+  ///       Compatibility16Table NULL.
   ///
-  ///       AdditionalData NULL
+  ///       AdditionalData NULL.
   /// 
   EfiPlatformHookAfterRomInit     = 2
 } EFI_GET_PLATFORM_HOOK_MODE;
@@ -550,7 +550,7 @@ typedef struct {
 /**
   Finds the binary data or other platform information.
 
-  @param  This                  Protocol instance pointer.
+  @param  This                  The protocol instance pointer.
   @param  Mode                  Specifies what data to return. See See EFI_GET_PLATFORM_INFO_MODE enum.
   @param  Table                 Mode specific.  See EFI_GET_PLATFORM_INFO_MODE enum.
   @param  TableSize            	Mode specific.  See EFI_GET_PLATFORM_INFO_MODE enum.
@@ -559,7 +559,7 @@ typedef struct {
   @param  LegacySegment         Mode specific.  See EFI_GET_PLATFORM_INFO_MODE enum.
   @param  LegacyOffset          Mode specific.  See EFI_GET_PLATFORM_INFO_MODE enum.
 
-  @retval EFI_SUCCESS           Data was returned successfully.
+  @retval EFI_SUCCESS           Data returned successfully.
   @retval EFI_UNSUPPORTED       Mode is not supported on the platform.
   @retval EFI_NOT_FOUND         Binary image or table not found.
 
@@ -580,16 +580,16 @@ EFI_STATUS
 /**
   Returns a buffer of handles for the requested subfunction.
 
-  @param  This                  Protocol instance pointer.
+  @param  This                  The protocol instance pointer.
   @param  Mode                  Specifies what handle to return. See EFI_GET_PLATFORM_HANDLE_MODE enum.
   @param  Type                  Mode specific. See EFI_GET_PLATFORM_HANDLE_MODE enum.
   @param  HandleBuffer          Mode specific. See EFI_GET_PLATFORM_HANDLE_MODE enum.
   @param  HandleCount           Mode specific. See EFI_GET_PLATFORM_HANDLE_MODE enum.
   @param  AdditionalData        Mode specific. See EFI_GET_PLATFORM_HANDLE_MODE enum.
 
-  @retval EFI_SUCCESS           Handle is valid
+  @retval EFI_SUCCESS           Handle is valid.
   @retval EFI_UNSUPPORTED       Mode is not supported on the platform.
-  @retval EFI_NOT_FOUND         Handle is not known
+  @retval EFI_NOT_FOUND         Handle is not known.
 
 **/
 typedef
@@ -606,8 +606,8 @@ EFI_STATUS
 /**
   Load and initialize the Legacy BIOS SMM handler.
 
-  @param  This                   Protocol instance pointer.
-  @param  EfiToLegacy16BootTable Pointer to Legacy16 boot table.
+  @param  This                   The protocol instance pointer.
+  @param  EfiToLegacy16BootTable A pointer to Legacy16 boot table.
 
   @retval EFI_SUCCESS           SMM code loaded.
   @retval EFI_DEVICE_ERROR      SMM code failed to load
@@ -624,7 +624,7 @@ EFI_STATUS
   Allows platform to perform any required action after a LegacyBios operation.
   Invokes the specific sub function specified by Mode.
 
-  @param  This                  Protocol instance pointer.
+  @param  This                  The protocol instance pointer.
   @param  Mode                  Specifies what handle to return. See EFI_GET_PLATFORM_HOOK_MODE enum.
   @param  Type                  Mode specific.  See EFI_GET_PLATFORM_HOOK_MODE enum.
   @param  DeviceHandle          Mode specific.  See EFI_GET_PLATFORM_HOOK_MODE enum.
@@ -632,7 +632,7 @@ EFI_STATUS
   @param  Compatibility16Table  Mode specific.  See EFI_GET_PLATFORM_HOOK_MODE enum.
   @param  AdditionalData        Mode specific.  See EFI_GET_PLATFORM_HOOK_MODE enum.
 
-  @retval EFI_SUCCESS           The operation performed successfully, Mode specific.
+  @retval EFI_SUCCESS           The operation performed successfully. Mode specific.
   @retval EFI_UNSUPPORTED       Mode is not supported on the platform.
 
 **/
@@ -651,18 +651,18 @@ EFI_STATUS
 /**
   Returns information associated with PCI IRQ routing.
   This function returns the following information associated with PCI IRQ routing:
-    * An IRQ routing table and number of entries in the table
-    * The $PIR table and its size
-    * A list of PCI IRQs and the priority order to assign them
+    * An IRQ routing table and number of entries in the table.
+    * The $PIR table and its size.
+    * A list of PCI IRQs and the priority order to assign them.
 
-  @param  This                    Protocol instance pointer.
-  @param  RoutingTable            Pointer to PCI IRQ Routing table. 
+  @param  This                    The protocol instance pointer.
+  @param  RoutingTable            The pointer to PCI IRQ Routing table. 
                                   This location is the $PIR table minus the header.
-  @param  RoutingTableEntries     Number of entries in table.
-  @param  LocalPirqTable          $PIR table
-  @param  PirqTableSize           $PIR table size
-  @param  LocalIrqPriorityTable   List of interrupts in priority order to assign
-  @param  IrqPriorityTableEntries Number of entries in priority table
+  @param  RoutingTableEntries     The number of entries in table.
+  @param  LocalPirqTable          $PIR table.
+  @param  PirqTableSize           $PIR table size.
+  @param  LocalIrqPriorityTable   A list of interrupts in priority order to assign.
+  @param  IrqPriorityTableEntries The number of entries in the priority table.
 
   @retval EFI_SUCCESS           Data was successfully returned.
 
@@ -680,16 +680,16 @@ EFI_STATUS
   );
 
 /**
-  Translates the given PIRQ accounting for bridge
+  Translates the given PIRQ accounting for bridge.
   This function translates the given PIRQ back through all buses, if required, 
   and returns the true PIRQ and associated IRQ.
 
-  @param  This                  Protocol instance pointer.
-  @param  PciBus                PCI bus number for this device.
-  @param  PciDevice             PCI device number for this device.
-  @param  PciFunction           PCI function number for this device.
-  @param  Pirq                  Input is PIRQ reported by device, output is true PIRQ.
-  @param  PciIrq                The IRQ already assigned to the PIRQ or the IRQ to be
+  @param  This                  The protocol instance pointer.
+  @param  PciBus                The PCI bus number for this device.
+  @param  PciDevice             The PCI device number for this device.
+  @param  PciFunction           The PCI function number for this device.
+  @param  Pirq                  Input is PIRQ reported by device, and output is true PIRQ.
+  @param  PciIrq                The IRQ already assigned to the PIRQ, or the IRQ to be
                                 assigned to the PIRQ.
 
   @retval EFI_SUCCESS           The PIRQ was translated.
@@ -710,12 +710,12 @@ EFI_STATUS
   Attempt to legacy boot the BootOption. If the EFI contexted has been
   compromised this function will not return.
 
-  @param  This                   Protocol instance pointer.
-  @param  BbsDevicePath          EFI Device Path from BootXXXX variable.
-  @param  BbsTable               Internal BBS table.
-  @param  LoadOptionSize         Size of LoadOption in size.
-  @param  LoadOption             LoadOption from BootXXXX variable
-  @param  EfiToLegacy16BootTable Pointer to BootTable structure
+  @param  This                   The protocol instance pointer.
+  @param  BbsDevicePath          The EFI Device Path from BootXXXX variable.
+  @param  BbsTable               The Internal BBS table.
+  @param  LoadOptionSize         The size of LoadOption in size.
+  @param  LoadOption             The LoadOption from BootXXXX variable
+  @param  EfiToLegacy16BootTable A pointer to BootTable structure
 
   @retval EFI_SUCCESS           Ready to boot.
 

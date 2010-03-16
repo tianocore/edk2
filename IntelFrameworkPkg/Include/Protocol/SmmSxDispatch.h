@@ -1,14 +1,14 @@
 /** @file
   Provides the parent dispatch service for a given Sx-state source generator.
 
-  Copyright (c) 2007 - 2009, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   This Protocol is defined in Framework of EFI SMM Core Interface Spec
@@ -45,13 +45,13 @@ typedef struct {
 /**
   Dispatch function for a Sx state SMI handler.
 
-  @param  DispatchHandle        Handle of this dispatch function.
-  @param  DispatchContext       Pointer to the dispatch function's context.
+  @param  DispatchHandle        The handle of this dispatch function.
+  @param  DispatchContext       The pointer to the dispatch function's context.
                                 The Type and Phase fields are filled in by the Sx dispatch driver
                                 prior to invoking this dispatch function. For this interface,
                                 the Sx driver will call the dispatch function for all Sx type
                                 and phases, so the Sx state handler(s) must check the Type and
-                                Phase field of EFI_SMM_SX_DISPATCH_CONTEXT and act accordingly.
+                                Phase field of EFI_SMM_SX_DISPATCH_CONTEXT, and act accordingly.
 
   @return None
 
@@ -64,11 +64,11 @@ VOID
   );
 
 /**
-  Register a child SMI source dispatch function with a parent SMM driver
+  Register a child SMI source dispatch function with a parent SMM driver.
 
-  @param  This                  Pointer to the EFI_SMM_SX_DISPATCH_PROTOCOL instance.
-  @param  DispatchFunction      Function to install.
-  @param  DispatchContext       Pointer to the dispatch function's context.
+  @param  This                  The pointer to the EFI_SMM_SX_DISPATCH_PROTOCOL instance.
+  @param  DispatchFunction      The function to install.
+  @param  DispatchContext       The pointer to the dispatch function's context.
                                 The caller fills in this context before calling
                                 the register function to indicates to the register
                                 function which Sx state type and phase the caller
@@ -76,8 +76,8 @@ VOID
                                 the Sx driver will call the registered handlers for
                                 all Sx type and phases, so the Sx state handler(s)
                                 must check the Type and Phase field of the Dispatch
-                                context and act accordingly.
-  @param  DispatchHandle        Handle of dispatch function, for interfacing
+                                context, and act accordingly.
+  @param  DispatchHandle        The handle of dispatch function, for interfacing
                                 with the parent Sx state SMM driver.
 
   @retval EFI_SUCCESS           The dispatch function has been successfully
@@ -88,7 +88,7 @@ VOID
   @retval EFI_OUT_OF_RESOURCES  Not enough memory (system or SMM) to manage this
                                 child.
   @retval EFI_INVALID_PARAMETER DispatchContext is invalid. Type & Phase are not
-                                within valid range.
+                                within a valid range.
 
 **/
 typedef
@@ -103,11 +103,11 @@ EFI_STATUS
 /**
   Unregisters an Sx-state service
 
-  @param  This                  Pointer to the EFI_SMM_SX_DISPATCH_PROTOCOL instance.
-  @param  DispatchHandle        Handle of the service to remove.
+  @param  This                  The pointer to the EFI_SMM_SX_DISPATCH_PROTOCOL instance.
+  @param  DispatchHandle        The handle of the service to remove.
 
-  @retval EFI_SUCCESS           The dispatch function has been successfully unregistered and the
-                                SMI source has been disabled if there are no other registered child
+  @retval EFI_SUCCESS           The dispatch function has been successfully unregistered, and the
+                                SMI source has been disabled, if there are no other registered child
                                 dispatch functions for this SMI source.
   @retval EFI_INVALID_PARAMETER Handle is invalid.
 

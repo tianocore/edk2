@@ -2,14 +2,14 @@
   This protocol is used to store or record various boot scripts into boot 
   script tables.
 
-  Copyright (c) 2007 - 2009, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   This protocol defined in the Boot Script Specification, Version 0.91.
@@ -20,7 +20,7 @@
 #define _BOOT_SCRIPT_SAVE_PROTOCOL_H_
 
 ///
-/// S3 Save Protocol GUID
+/// S3 Save Protocol GUID.
 ///
 #define EFI_BOOT_SCRIPT_SAVE_PROTOCOL_GUID \
   { \
@@ -33,13 +33,13 @@ typedef struct _EFI_BOOT_SCRIPT_SAVE_PROTOCOL EFI_BOOT_SCRIPT_SAVE_PROTOCOL;
   Adds a record into a specified Framework boot script table.
 
   @param  This                  A pointer to the EFI_BOOT_SCRIPT_SAVE_PROTOCOL instance.
-  @param  TableName             Name of the script table. Currently, the only meaningful
+  @param  TableName             The name of the script table. Currently, the only meaningful
                                 value is EFI_ACPI_S3_RESUME_SCRIPT_TABLE.
   @param  OpCode                The operation code (opcode) number.
-  @param  ...                   Argument list that is specific to each opcode.
+  @param  ...                   The argument list that is specific to each opcode.
 
   @retval EFI_SUCCESS           The operation succeeded. A record was added into the specified script table.
-  @retval EFI_INVALID_PARAMETER The parameter is illegal or the given boot script is not supported.
+  @retval EFI_INVALID_PARAMETER The parameter is illegal, or the given boot script is not supported.
   @retval EFI_OUT_OF_RESOURCES  There is insufficient memory to store the boot script.
 
 **/
@@ -56,7 +56,7 @@ EFI_STATUS
   Closes the specified script table.
 
   @param  This                  A pointer to the EFI_BOOT_SCRIPT_SAVE_PROTOCOL instance.
-  @param  TableName             Name of the script table.
+  @param  TableName             The name of the script table.
   @param  Address               A pointer to the physical address where the table begins.
 
   @retval EFI_SUCCESS           The table was successfully returned.

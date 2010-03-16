@@ -1,17 +1,17 @@
 /** @file
   This protocol abstracts the PIRQ programming from the generic EFI Compatibility Support Modules (CSMs).
 
-  Copyright (c) 2007 - 2009, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
-  This protocol is defined in Framework for EFI Compatibility Support Module spec
+  This protocol is defined in Framework for the EFI Compatibility Support Module specification.
   Version 0.97.
 
 **/
@@ -30,8 +30,8 @@ typedef struct _EFI_LEGACY_INTERRUPT_PROTOCOL EFI_LEGACY_INTERRUPT_PROTOCOL;
 /**
   Get the number of PIRQs this hardware supports.
 
-  @param  This                  Protocol instance pointer.
-  @param  NumberPirsq           Number of PIRQs that are supported.
+  @param  This                  The protocol instance pointer.
+  @param  NumberPirsq           The number of PIRQs that are supported.
 
   @retval EFI_SUCCESS           The number of PIRQs was returned successfully.
 
@@ -46,12 +46,12 @@ EFI_STATUS
 /**
   Gets the PCI location associated with this protocol.
 
-  @param  This                  Protocol instance pointer.
-  @param  Bus                   PCI Bus
-  @param  Device                PCI Device
-  @param  Function              PCI Function
+  @param  This                  The Protocol instance pointer.
+  @param  Bus                   The PCI Bus.
+  @param  Device                The PCI Device.
+  @param  Function              The PCI Function.
 
-  @retval EFI_SUCCESS           The Bus, Device, and Function were returned successfully
+  @retval EFI_SUCCESS           The Bus, Device, and Function were returned successfully.
 
 **/
 typedef
@@ -66,12 +66,12 @@ EFI_STATUS
 /**
   Read the PIRQ register and return the data
 
-  @param  This                  Protocol instance pointer.
-  @param  PirqNumber            PIRQ register to read
-  @param  PirqData              Data read
+  @param  This                  The protocol instance pointer.
+  @param  PirqNumber            The PIRQ register to read.
+  @param  PirqData              The data read.
 
-  @retval EFI_SUCCESS           Data was read
-  @retval EFI_INVALID_PARAMETER Invalid PIRQ number
+  @retval EFI_SUCCESS           The data was read.
+  @retval EFI_INVALID_PARAMETER Invalid PIRQ number.
 
 **/
 typedef
@@ -85,12 +85,12 @@ EFI_STATUS
 /**
   Write the specified PIRQ register with the given data.
 
-  @param  This                  Protocol instance pointer.
-  @param  PirqNumber            PIRQ register to read.
-  @param  PirqData              Data to write.
+  @param  This                  The protocol instance pointer.
+  @param  PirqNumber            A PIRQ register to read.
+  @param  PirqData              The data to write.
 
-  @retval EFI_SUCCESS           The PIRQ was programmed
-  @retval EFI_INVALID_PARAMETER Invalid PIRQ number
+  @retval EFI_SUCCESS           The PIRQ was programmed.
+  @retval EFI_INVALID_PARAMETER Invalid PIRQ number.
 
 **/
 typedef
@@ -108,7 +108,7 @@ struct _EFI_LEGACY_INTERRUPT_PROTOCOL {
   EFI_LEGACY_INTERRUPT_GET_NUMBER_PIRQS GetNumberPirqs;
 
   ///
-  /// Gets the PCI bus, device, and function that associated with this protocol.
+  /// Gets the PCI bus, device, and function that is associated with this protocol.
   ///
   EFI_LEGACY_INTERRUPT_GET_LOCATION     GetLocation;
 
