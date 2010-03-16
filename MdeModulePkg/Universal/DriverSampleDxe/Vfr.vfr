@@ -424,6 +424,15 @@ formset
               maxsize  = 20,
     endpassword;
 
+    //
+    // Sample use case for IFR Security op-code
+    //
+    grayoutif NOT security (EFI_USER_INFO_ACCESS_SETUP_ADMIN_GUID);
+      text
+        help = STRING_TOKEN(STR_TEXT_SECRUITY_TEST_HELP),
+        text = STRING_TOKEN(STR_TEXT_SECRUITY_TEST_TEXT);
+    endif;
+    
     goto 2,
       prompt = STRING_TOKEN(STR_GOTO_FORM2), //SecondSetupPage  // this too has no end-op and basically it's a jump to a form ONLY
       help   = STRING_TOKEN(STR_GOTO_HELP);
