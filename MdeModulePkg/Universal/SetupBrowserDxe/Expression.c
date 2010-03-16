@@ -1528,7 +1528,7 @@ CheckUserPrivilege (
     RemainSize = UserInfo->InfoSize - sizeof (EFI_USER_INFO);
     AccessControl = (EFI_USER_INFO_ACCESS_CONTROL *)(UserInfo + 1);
     while (RemainSize >= sizeof (EFI_USER_INFO_ACCESS_CONTROL)) {
-      if (RemainSize < AccessControl->Size || AccessControl->Size <= sizeof (EFI_USER_INFO_ACCESS_CONTROL)) {
+      if (RemainSize < AccessControl->Size || AccessControl->Size < sizeof (EFI_USER_INFO_ACCESS_CONTROL)) {
         break;
       }
       if (AccessControl->Type == EFI_USER_INFO_ACCESS_SETUP) {
