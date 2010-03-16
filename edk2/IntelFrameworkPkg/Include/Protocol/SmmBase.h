@@ -19,14 +19,14 @@
   workarounds for the century rollover in CMOS should provide commensurate services throughout
   preboot and OS runtime.
 
-  Copyright (c) 2007 - 2009, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   This Protocol is defined in Framework of EFI SMM Core Interface Spec
@@ -44,7 +44,7 @@
 #include <Protocol/SmmCommunication.h>
 
 ///
-/// Global ID for the EFI_SMM_BASE_PROTOCOL
+/// Global ID for the EFI_SMM_BASE_PROTOCOL.
 ///
 #define EFI_SMM_BASE_PROTOCOL_GUID \
   { \
@@ -52,7 +52,7 @@
   }
 
 ///
-/// Forward declaration for EFI_SMM_BASE_PROTOCOL
+/// Forward declaration for EFI_SMM_BASE_PROTOCOL.
 ///
 typedef struct _EFI_SMM_BASE_PROTOCOL  EFI_SMM_BASE_PROTOCOL;
 
@@ -72,8 +72,10 @@ typedef struct _EFI_SMM_BASE_PROTOCOL  EFI_SMM_BASE_PROTOCOL;
   @param[in]  SmmImageHandle        A handle allocated by the SMM infrastructure code
                                     to uniquely designate a specific DXE SMM driver.
   @param[in]  CommunicationBuffer   A pointer to a collection of data in memory
-                                    that will be conveyed from a non-SMM environment into an SMM environment.
-                                    The buffer must be contiguous and physically mapped, and must be a physical address.
+                                    that will be conveyed from a non-SMM environment 
+                                    into an SMM environment. The buffer must be 
+                                    contiguous and physically mapped, and must be 
+                                    a physical address.
   @param[in]  SourceSize            The size of the CommunicationBuffer.
 
   @return     Status code
@@ -94,13 +96,13 @@ EFI_STATUS
   Register a given driver into SMRAM. This is the equivalent of performing
   the LoadImage/StartImage into System Management Mode.
 
-  @param[in]   This                  Protocol instance pointer.
-  @param[in]   FilePath              Location of the image to be installed as the handler.
-  @param[in]   SourceBuffer          Optional source buffer in case the image file
+  @param[in]   This                  The protocol instance pointer.
+  @param[in]   FilePath              The location of the image to be installed as the handler.
+  @param[in]   SourceBuffer          An optional source buffer in case the image file
                                      is in memory.
-  @param[in]   SourceSize            Size of the source image file, if in memory.
+  @param[in]   SourceSize            The size of the source image file, if in memory.
   @param[out]  ImageHandle           The handle that the base driver uses to decode 
-                                     the handler. Unique among SMM handlers only, 
+                                     the handler. Unique among SMM handlers only; 
                                      not unique across DXE/EFI.
   @param[in]   LegacyIA32Binary      An optional parameter specifying that the associated 
                                      file is a real-mode IA-32 binary.
@@ -108,8 +110,8 @@ EFI_STATUS
   @retval      EFI_SUCCESS           The operation was successful.
   @retval      EFI_OUT_OF_RESOURCES  There were no additional SMRAM resources to load the handler
   @retval      EFI_UNSUPPORTED       This platform does not support 16-bit handlers.
-  @retval      EFI_UNSUPPORTED       Platform is in runtime.
-  @retval      EFI_INVALID_PARAMETER The handlers was not the correct image type
+  @retval      EFI_UNSUPPORTED       The platform is in runtime.
+  @retval      EFI_INVALID_PARAMETER The handlers were not the correct image type.
 
 **/
 typedef
@@ -127,12 +129,12 @@ EFI_STATUS
   Removes a handler from execution within SMRAM.  This is the equivalent of performing
   the UnloadImage in System Management Mode.
 
-  @param[in]  This                  Protocol instance pointer.
+  @param[in]  This                  The protocol instance pointer.
   @param[in]  ImageHandle           The handler to be removed.
 
-  @retval     EFI_SUCCESS           The operation was successful
-  @retval     EFI_INVALID_PARAMETER The handler did not exist
-  @retval     EFI_UNSUPPORTED       Platform is in runtime.
+  @retval     EFI_SUCCESS           The operation was successful.
+  @retval     EFI_INVALID_PARAMETER The handler did not exist.
+  @retval     EFI_UNSUPPORTED       The platform is in runtime.
 
 **/
 typedef
@@ -148,15 +150,15 @@ EFI_STATUS
   EFI service.  The BASE protocol driver is responsible for doing
   any of the copies such that the data lives in boot-service-accessible RAM.
 
-  @param[in]      This                  Protocol instance pointer.
+  @param[in]      This                  The protocol instance pointer.
   @param[in]      ImageHandle           The handle of the registered driver.
-  @param[in,out]  CommunicationBuffer   Pointer to the buffer to convey into SMRAM.
+  @param[in,out]  CommunicationBuffer   The pointer to the buffer to convey into SMRAM.
   @param[in,out]  SourceSize            The size of the data buffer being passed in.
                                         On exit, the size of data being returned.
                                         Zero if the handler does not wish to reply with any data.
 
-  @retval         EFI_SUCCESS           The message was successfully posted
-  @retval         EFI_INVALID_PARAMETER The buffer was NULL
+  @retval         EFI_SUCCESS           The message was successfully posted.
+  @retval         EFI_INVALID_PARAMETER The buffer was NULL.
 
 **/
 typedef
@@ -182,9 +184,9 @@ EFI_STATUS
                                     the floating point register state. If any handler
                                     require this, the state will be saved for all handlers.
 
-  @retval     EFI_SUCCESS           The operation was successful
-  @retval     EFI_OUT_OF_RESOURCES  Not enough space in the dispatch queue
-  @retval     EFI_UNSUPPORTED       Platform is in runtime.
+  @retval     EFI_SUCCESS           The operation was successful.
+  @retval     EFI_OUT_OF_RESOURCES  Not enough space in the dispatch queue.
+  @retval     EFI_UNSUPPORTED       The platform is in runtime.
   @retval     EFI_UNSUPPORTED       The caller is not in SMM.
 
 **/
@@ -216,7 +218,7 @@ EFI_STATUS
 
   @retval      EFI_SUCCESS           The requested number of bytes was allocated.
   @retval      EFI_OUT_OF_RESOURCES  The pool requested could not be allocated.
-  @retval      EFI_UNSUPPORTED       Platform is in runtime.
+  @retval      EFI_UNSUPPORTED       The platform is in runtime.
 
 **/
 typedef
@@ -233,12 +235,12 @@ EFI_STATUS
   On return, the memory's type is EFI SMRAM Memory.  The Buffer that is freed must
   have been allocated by SmmAllocatePool().
 
-  @param[in]  This                  Protocol instance pointer.
-  @param[in]  Buffer                Pointer to the buffer allocation.
+  @param[in]  This                  The protocol instance pointer.
+  @param[in]  Buffer                The pointer to the buffer allocation.
 
   @retval     EFI_SUCCESS           The memory was returned to the system.
-  @retval     EFI_INVALID_PARAMETER Buffer was invalid.
-  @retval     EFI_UNSUPPORTED       Platform is in runtime.
+  @retval     EFI_INVALID_PARAMETER The buffer was invalid.
+  @retval     EFI_UNSUPPORTED       The platform is in runtime.
 
 **/
 typedef
@@ -251,12 +253,12 @@ EFI_STATUS
 /**
   This routine tells caller if execution context is SMM or not.
 
-  @param[in]   This                   Protocol instance pointer.
+  @param[in]   This                   The protocol instance pointer.
   @param[out]  InSmm                  Whether the caller is inside SMM for IA-32
                                       or servicing a PMI for the Itanium processor
                                       family.
 
-  @retval      EFI_SUCCESS            The operation was successful
+  @retval      EFI_SUCCESS            The operation was successful.
   @retval      EFI_INVALID_PARAMETER  InSmm was NULL.
 
 **/
@@ -273,8 +275,8 @@ EFI_STATUS
   location of the SMST in its entry point and then cache it in some driver
   global variable so that the SMST can be invoked in subsequent callbacks.
 
-  @param[in]  This                  Protocol instance pointer.
-  @param[in]  Smst                  Pointer to the SMST.
+  @param[in]  This                  The protocol instance pointer.
+  @param[in]  Smst                  The pointer to the SMST.
 
   @retval     EFI_SUCCESS           The operation was successful
   @retval     EFI_INVALID_PARAMETER Smst was invalid.

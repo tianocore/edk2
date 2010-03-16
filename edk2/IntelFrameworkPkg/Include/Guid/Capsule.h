@@ -1,14 +1,14 @@
 /** @file
   Framework Capule related Definition.
 
-  Copyright (c) 2007 - 2009, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   Capsule Spec Version 0.9
@@ -35,7 +35,7 @@
   }
 
 ///
-/// Bits in the flags field of the capsule header
+/// Bits in the flags field of the capsule header.
 /// This flag is set if the capsule can support setup changes, and cleared if it cannot.
 ///
 #define EFI_CAPSULE_HEADER_FLAG_SETUP 0x00000001
@@ -47,10 +47,10 @@
 // a capsule update.
 //
 typedef struct {
-  UINT64                Length;     ///< length of the data block
-  EFI_PHYSICAL_ADDRESS  Data;       ///< physical address of the data block
-  UINT32                Signature;  ///< CBDS
-  UINT32                CheckSum;   ///< to sum this structure to 0
+  UINT64                Length;     ///< Length of the data block.
+  EFI_PHYSICAL_ADDRESS  Data;       ///< Physical address of the data block.
+  UINT32                Signature;  ///< CBDS.
+  UINT32                CheckSum;   ///< To sum this structure to 0.
 } FRAMEWORK_EFI_CAPSULE_BLOCK_DESCRIPTOR;
 
 typedef struct {
@@ -72,7 +72,7 @@ typedef struct {
   UINT32    HeaderSize;
   ///
   /// A bit-mapped list describing the capsule's attributes. 
-  /// All undefined bits should be written as zero (0)
+  /// All undefined bits should be written as zero (0).
   ///
   UINT32    Flags;
   ///

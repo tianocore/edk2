@@ -2,20 +2,20 @@
   This protocol provides some basic services to support publishing ACPI system tables. The
   services handle many of the more mundane tasks that are required to publish a set of tables. The
   services will:
-  - Generate common tables.
+        - Generate common tables.
 	- Update the table links.
 	- Ensure that tables are properly aligned and use correct types of memory.
 	- Update checksum values and IDs.
 	- Complete the final installation of the tables.
  
-  Copyright (c) 2007, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   This Protocol is defined in Framework ACPI Specification.
@@ -48,9 +48,9 @@ typedef struct _EFI_ACPI_SUPPORT_PROTOCOL EFI_ACPI_SUPPORT_PROTOCOL;
 
   @param  This                  A pointer to the EFI_ACPI_SUPPORT_PROTOCOL instance.
   @param  Index                 The zero-based index of the table to retrieve.
-  @param  Table                 Pointer for returning the table buffer.
+  @param  Table                 The pointer for returning the table buffer.
   @param  Version               Updated with the ACPI versions to which this table belongs.
-  @param  Handle                Pointer for identifying the table.
+  @param  Handle                The pointer for identifying the table.
 
   @retval EFI_SUCCESS           The function completed successfully.
   @retval EFI_NOT_FOUND         The requested index is too large and a table was not found.
@@ -70,11 +70,11 @@ EFI_STATUS
   Used to add, remove, or update ACPI tables.
 
   @param  This                  A pointer to the EFI_ACPI_SUPPORT_PROTOCOL instance.
-  @param  Table                 Pointer to the new table to add or update.
+  @param  Table                 The pointer to the new table to add or update.
   @param  Checksum              If TRUE, indicates that the checksum should be
                                 calculated for this table.
   @param  Version               Indicates to which version(s) of ACPI the table should be added.
-  @param  Handle                Pointer to the handle of the table to remove or update.
+  @param  Handle                The pointer to the handle of the table to remove or update.
 
   @retval EFI_SUCCESS           The function completed successfully.
   @retval EFI_INVALID_PARAMETER *Handle was zero and Table was NULL.
@@ -129,7 +129,7 @@ struct _EFI_ACPI_SUPPORT_PROTOCOL {
   EFI_ACPI_GET_ACPI_TABLE GetAcpiTable;
 
   ///
-  /// Adds, removes, or updates ACPI tables
+  /// Adds, removes, or updates ACPI tables.
   ///
   EFI_ACPI_SET_ACPI_TABLE SetAcpiTable;
 

@@ -3,14 +3,14 @@
   used by resources that want to publish IFR/Font/String data and have it
   collected by the Configuration engine.
 
-  Copyright (c) 2007 - 2010, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   This protocol is defined in Framework for EFI Human Interface Infrastructure
@@ -26,14 +26,14 @@
 //
 #include <Protocol/GraphicsOutput.h>
 ///
-/// In both EDK and EDK II, incompatbile change is done to Framework HII protocol.
-/// This change should cause a change of GUID in both of code and HII spec. But we
-/// update the GUID in code in EDK and EDK II. The 0.92 spec is not updated. This
+/// In both EDK and EDK II, there is an incompatbile change in the Framework HII protocol.
+/// This change should cause a change of GUID in both of code and HII specification. But we
+/// updated the GUID in code in EDK and EDK II. The 0.92 specification is not updated. This
 /// is a known issue.
 ///
 ///
 /// Note that EFI_HII_PROTOCOL_GUID is different from that defined in the Framework HII
-/// 0.92 spec because the spec changed part of HII interfaces but did not update the protocol
+/// 0.92 specification because the specification changed part of HII interfaces but did not update the protocol
 /// GUID.
 ///
 #define EFI_HII_PROTOCOL_GUID \
@@ -51,9 +51,9 @@ typedef UINT32                    RELOFST;
 typedef struct _EFI_HII_PROTOCOL  EFI_HII_PROTOCOL;
 
 ///
-/// Note: Name difference between code and the Framework HII 0.92 spec.
-///       Add FRAMEWORK_ prefix to avoid name confict with EFI_HII_HANDLE defined in the
-///       UEFI 2.1d spec.
+/// Note: Name difference between code and the Framework HII 0.92 specificaiton.
+///       Add FRAMEWORK_ prefix to avoid a name confict with EFI_HII_HANDLE, defined in the
+///       UEFI 2.1d specification.
 ///
 typedef UINT16                    FRAMEWORK_EFI_HII_HANDLE;
 
@@ -91,7 +91,7 @@ typedef struct {
 } EFI_HII_PACK_HEADER;
 
 ///
-/// IFR package structure.
+/// The IFR package structure.
 /// Immediately following the EFI_HII_IFR_PACK structure will be a series of IFR opcodes.
 ///
 typedef struct {
@@ -105,48 +105,48 @@ typedef struct {
   ///
   /// Header of the package.
   ///
-  EFI_HII_PACK_HEADER Header;           ///< Must be filled in
+  EFI_HII_PACK_HEADER Header;           ///< Must be filled in.
   ///
   /// The image handle of the driver to which the package is referring.
   ///
-  EFI_HANDLE          ImageHandle;      ///< Must be filled in
+  EFI_HANDLE          ImageHandle;      ///< Must be filled in.
   ///
   /// The handle of the device that is being described by this package.
   ///
-  EFI_HANDLE          DeviceHandle;     ///< Optional
+  EFI_HANDLE          DeviceHandle;     ///< Optional.
   ///
   /// The handle of the parent of the device that is being described by this package.
   ///
-  EFI_HANDLE          ControllerHandle; ///< Optional
+  EFI_HANDLE          ControllerHandle; ///< Optional.
   ///
   /// The handle that was registered to receive EFI_FORM_CALLBACK_PROTOCOL calls from other drivers.
   ///
-  EFI_HANDLE          CallbackHandle;   ///< Optional
+  EFI_HANDLE          CallbackHandle;   ///< Optional.
   ///
-  /// Note this field is not defined in the Framework HII 0.92 spec.
+  /// Note this field is not defined in the Framework HII 0.92 specificaiton.
   /// Unused. Reserved for source code compatibility.
   ///
-  EFI_HANDLE          COBExportHandle;  ///< Optional
+  EFI_HANDLE          COBExportHandle;  ///< Optional.
 } EFI_HII_HANDLE_PACK;
 
 ///
-/// Variable package structure.
+/// The variable package structure.
 ///
 typedef struct {
   ///
-  /// Header of the package.
+  /// The header of the package.
   ///
   EFI_HII_PACK_HEADER Header;
   ///
-  /// GUID of the EFI variable
+  /// The GUID of the EFI variable.
   ///
   EFI_GUID            VariableGuid;
   ///
-  /// Length in bytes of the EFI variable
+  /// The length in bytes of the EFI variable.
   ///
   UINT32              VariableNameLength;
   ///
-  /// The unique value for this variable
+  /// The unique value for this variable.
   ///
   UINT16              VariableId;
   //
@@ -155,11 +155,11 @@ typedef struct {
 } EFI_HII_VARIABLE_PACK;
 
 ///
-/// Device path package structure.
+/// The device path package structure.
 ///
 typedef struct {
   ///
-  /// Header of the package.
+  /// The header of the package.
   ///
   EFI_HII_PACK_HEADER Header;
   //
@@ -169,7 +169,7 @@ typedef struct {
 
 typedef struct {
   ///
-  /// Unique value that correlates to the original HII handle.
+  /// A unique value that correlates to the original HII handle.
   ///
   FRAMEWORK_EFI_HII_HANDLE  HiiHandle;
   ///
@@ -179,31 +179,31 @@ typedef struct {
   ///
   EFI_GUID                  PackageGuid;
   ///
-  /// Size of the EFI_HII_DATA_TABLE in bytes.
+  /// The size of the EFI_HII_DATA_TABLE in bytes.
   ///
   UINT32                    DataTableSize;
   ///
-  /// Byte offset from the start of this structure to the IFR data.
+  /// The byte offset from the start of this structure to the IFR data.
   /// If the offset value is 0, then no IFR data is enclosed.
   ///
   UINT32                    IfrDataOffset;
   ///
-  /// Byte offset from the start of this structure to the string data.
+  /// The byte offset from the start of this structure to the string data.
   /// If the offset value is 0, then no string data is enclosed.
   ///
   UINT32                    StringDataOffset;
   ///
-  /// Byte offset from the start of this structure to the variable data.
+  /// The byte offset from the start of this structure to the variable data.
   /// If the offset value is 0, then no variable data is enclosed.
   ///
   UINT32                    VariableDataOffset;
   ///
-  /// Byte offset from the start of this structure to the device path data.
+  /// The byte offset from the start of this structure to the device path data.
   /// If the offset value is 0, then no DevicePath data is enclosed.
   ///
   UINT32                    DevicePathOffset;
   ///
-  /// Number of VariableData[] elements in the array.
+  /// The number of VariableData[] elements in the array.
   ///
   UINT32                    NumberOfVariableData;
   ///
@@ -219,7 +219,7 @@ typedef struct {
 } EFI_HII_DATA_TABLE;
 
 ///
-/// Structure defining format for exporting data from the HII Database.
+/// The structure defining the format for exporting data from the HII Database.
 ///
 typedef struct {
   ///
@@ -236,7 +236,7 @@ typedef struct {
 } EFI_HII_EXPORT_TABLE;
 
 ///
-/// Structure used to pass data to update a form or form package
+/// The structure used to pass data to update a form or form package
 /// that has previously been registered with the EFI HII database.
 ///
 typedef struct {
@@ -286,19 +286,19 @@ typedef struct {
 /// string references in forms and in programs.  These tokens are
 /// language agnostic.  When paired with a language pack (directly
 /// or indirectly), the string token resolves into an actual
-/// UNICODE string.  The NumStringPointers determines how many
-/// StringPointers (offset values) there are as well as the total
+/// UNICODE string.  NumStringPointers determines how many
+/// StringPointers (offset values) there are, as well as the total
 /// number of Strings that are defined.
 ///
 typedef struct {
   ///
-  /// Header of the package.
+  /// The header of the package.
   ///
   EFI_HII_PACK_HEADER Header;
   ///
   /// The string containing one or more ISO 639-2 three-character designator(s)
   /// of the language or languages whose translations are contained in this language pack.
-  /// The first designator indicates the primary language while the others are secondary languages.
+  /// The first designator indicates the primary language, while the others are secondary languages.
   ///
   RELOFST             LanguageNameString;
   ///
@@ -327,7 +327,7 @@ typedef struct {
 ///
 typedef struct {
   ///
-  /// Header of the package.
+  /// The header of the package.
   ///
   EFI_HII_PACK_HEADER Header;
   ///
@@ -345,9 +345,9 @@ typedef struct {
 ///
 /// The definition of a specific physical key
 ///
-/// Note: Name difference between code and the Framework HII 0.92 spec.
+/// Note: The name difference between code and the Framework HII 0.92 specification.
 ///       Add FRAMEWORK_ prefix to avoid name confict with EFI_KEY_DESCRIPTOR defined in the
-///       UEFI 2.1d spec.
+///       UEFI 2.1d specification.
 ///
 typedef struct {
   ///
@@ -355,18 +355,18 @@ typedef struct {
   ///
   EFI_KEY Key;
   ///
-  /// Unicode value for the Key.
+  /// The Unicode value for the Key.
   CHAR16  Unicode;
   ///
-  /// Unicode value for the key with the shift key being held down.
+  /// The Unicode value for the key with the shift key being held down.
   ///
   CHAR16  ShiftedUnicode;
   ///
-  /// Unicode value for the key with the Alt-GR being held down.
+  /// The Unicode value for the key with the Alt-GR being held down.
   ///
   CHAR16  AltGrUnicode;
   ///
-  /// Unicode value for the key with the Alt-GR and shift keys being held down.
+  /// The Unicode value for the key with the Alt-GR and shift keys being held down.
   ///
   CHAR16  ShiftedAltGrUnicode;
   ///
@@ -391,7 +391,7 @@ typedef struct {
 ///
 typedef struct {
   ///
-  /// Header of the package.
+  /// The header of the package.
   EFI_HII_PACK_HEADER           Header;
   ///
   /// A pointer to a buffer containing an array of EFI_KEY_DESCRIPTOR entries.
@@ -430,7 +430,7 @@ typedef struct {
 } EFI_HII_PACKAGES;
 
 ///
-/// Packed link list that contains all the discernable defaults of variables
+/// The packed link list that contains all the discernable defaults of variables
 /// for the opcodes that are defined in this Handle's domain of data.
 ///
 typedef struct _EFI_HII_VARIABLE_PACK_LIST {
@@ -473,8 +473,8 @@ EFI_STATUS
   Removes a package from the HII database.
 
   @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
-  @param  Handle                The handle that was registered to the data that is requested
-                                for removal.
+  @param  Handle                The handle that was registered to the data that 
+                                is requested for removal.
 
   @retval EFI_SUCCESS           The data associated with the Handle was removed
                                 from the HII database.
@@ -560,13 +560,15 @@ EFI_STATUS
   @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
   @param  StringToTest          A pointer to a Unicode string.
   @param  FirstMissing          A pointer to an index into the string. On input,
-                                the index of the first character in the StringToTest to examine. On exit,
-                                the index of the first character encountered for which a glyph is unavailable.
-                                If all glyphs in the string are available, the index is the index of the
-                                terminator of the string.
+                                the index of the first character in the StringToTest 
+                                to examine. On exit, the index of the first character 
+                                encountered for which a glyph is unavailable.
+                                If all glyphs in the string are available, the 
+                                index is the index of the terminator of the string.
   @param  GlyphBufferSize       A pointer to a value. On output, if the function
-                                returns EFI_SUCCESS, it contains the amount of memory that is required to
-                                store the string's glyph equivalent.
+                                returns EFI_SUCCESS, it contains the amount of 
+                                memory that is required to store the string's 
+                                glyph equivalent.
 
   @retval EFI_SUCCESS           All glyphs are available. Note that an empty string
                                 always returns this value.
@@ -585,24 +587,28 @@ EFI_STATUS
 /**
   Translates a Unicode character into the corresponding font glyph.
 
-  Note that this function prototype name is different from that in the Framework HII 0.92 spec
-  to avoid name confict with EFI_HII_GET_GLYPH defined in the UEFI 2.1d spec.
+  Note that this function prototype name is different from that in the Framework HII 0.92 specification
+  to avoid name confict with EFI_HII_GET_GLYPH defined in the UEFI 2.1d specification.
 
   @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
   @param  Source                A pointer to a Unicode string.
-  @param  Index                 On input, the offset into the string from which to fetch
-                                the character. On successful completion, the index is updated to the first
-                                character past the character(s) making up the just extracted glyph.
+  @param  Index                 On input, the offset into the string from which to 
+                                fetch the character. On successful completion, the 
+                                index is updated to the first character past the 
+                                character(s) making up the just extracted glyph.
   @param  GlyphBuffer           Pointer to an array where the glyphs corresponding
-                                to the characters in the source may be stored. GlyphBuffer is assumed
-                                to be wide enough to accept a wide glyph character.
+                                to the characters in the source may be stored. 
+                                GlyphBuffer is assumed to be wide enough to accept 
+                                a wide glyph character.
   @param  BitWidth              If EFI_SUCCESS was returned, the UINT16 pointed to by
-                                this value is filled with the length of the glyph in pixels. It is unchanged
-                                if the call was unsuccessful.
+                                this value is filled with the length of the glyph in
+                                pixels. It is unchanged if the call was unsuccessful.
   @param  InternalStatus        The cell pointed to by this parameter must be
-                                initialized to zero prior to invoking the call the first time for any string.
+                                initialized to zero prior to invoking the call the 
+                                first time for any string.
 
-  @retval EFI_SUCCESS           It worked.
+  @retval EFI_SUCCESS           Found the corresponding font glyph for a Unicode 
+                                character. 
   @retval EFI_NOT_FOUND         A glyph for a character was not found.
 
 **/
@@ -633,11 +639,12 @@ EFI_STATUS
   @param  BltBuffer             A pointer to the buffer that contains the data that is
                                 ready to be used by the UGA BLT routines.
 
-  @retval EFI_SUCCESS           It worked.
+  @retval EFI_SUCCESS           Successfully translated a glyph into the required 
+                                format for input to UGA BLT routines.
   @retval EFI_NOT_FOUND         A glyph for a character was not found.
   @note  Inconsistent with specification here:
-         In Framework Spec, HII spec 0.92. The type of 3rd, 4th and 8th parameter is EFI_UGA_PIXEL.
-         Here the definition uses the EFI_GRAPHICS_OUTPUT_BLT_PIXEL, which is defined in UEFI 2.1 spec
+         In Framework Spec, HII specification 0.92. The type of 3rd, 4th and 8th parameter is EFI_UGA_PIXEL.
+         Here the definition uses the EFI_GRAPHICS_OUTPUT_BLT_PIXEL, which is defined in UEFI 2.1 specification.
 **/
 typedef
 EFI_STATUS
@@ -655,17 +662,20 @@ EFI_STATUS
 /**
   Allows a new string to be added to an already existing string package.
 
-  Note that this function prototype name is different from that in the Framework HII 0.92 spec
-  to avoid name confict with EFI_HII_NEW_STRING defined in the UEFI 2.1d spec.
+  Note that this function prototype name is different from that in the Framework HII 0.92 specification
+  to avoid name confict with EFI_HII_NEW_STRING defined in the UEFI 2.1d specification.
 
   @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
-  @param  Pointer               to a NULL-terminated string containing a single ISO 639-2
-                                language identifier, indicating the language in which the string is translated.
-  @param  Handle                The handle of the language pack to which the string is to be added.
-  @param  Reference             The identifier of the string to be added. If the reference
-                                value is zero, then the string will be assigned a new identifier on that
-                                handle for the language specified. Otherwise, the string will be updated
-                                with the NewString Value.
+  @param  Pointer               to a NULL-terminated string containing a single 
+                                ISO 639-2 language identifier, indicating the language 
+                                in which the string is translated.  
+  @param  Handle                The handle of the language pack to which the string 
+                                is to be added.
+  @param  Reference             The identifier of the string to be added. If the 
+                                reference value is zero, then the string will be 
+                                assigned a new identifier on that handle for
+                                the language specified. Otherwise, the string will 
+                                be updated with the NewString Value.
   @param  NewString             The string to be added.
 
   @retval EFI_SUCCESS           The string was effectively registered.
@@ -689,7 +699,8 @@ EFI_STATUS
   @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
   @param  Handle                The handle on which the strings reside.
   @param  LanguageString        A string allocated by GetPrimaryLanguages() that
-                                contains a list of all primary languages registered on the handle.
+                                contains a list of all primary languages registered 
+                                on the handle.
 
   @retval EFI_SUCCESS           LanguageString was correctly returned.
   @retval EFI_INVALID_PARAMETER The Handle was unknown.
@@ -709,10 +720,12 @@ EFI_STATUS
 
   @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
   @param  Handle                The handle on which the strings reside.
-  @param  PrimaryLanguage       Pointer to a NULL-terminated string containing a single
-                                ISO 639-2 language identifier, indicating the primary language.
+  @param  PrimaryLanguage       Pointer to a NULL-terminated string containing a 
+                                single ISO 639-2 language identifier, indicating 
+                                the primary language.
   @param  LanguageString        A string allocated by GetSecondaryLanguages()
-                                containing a list of all secondary languages registered on the handle.
+                                containing a list of all secondary languages 
+                                registered on the handle.
 
   @retval EFI_SUCCESS           LanguageString was correctly returned.
   @retval EFI_INVALID_PARAMETER The Handle was unknown.
@@ -730,19 +743,21 @@ EFI_STATUS
 /**
   Extracts a string from a package already registered with the EFI HII database.
 
-  Note that this function prototype name is different from that in the Framework HII 0.92 spec
-  to avoid name confict with EFI_HII_GET_STRING defined in the UEFI 2.1d spec.
+  Note that this function prototype name is different from that in the Framework HII 0.92 specification
+  to avoid name confict with EFI_HII_GET_STRING defined in the UEFI 2.1d specification.
 
   @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
   @param  Handle                The handle on which the string resides.
   @param  Token                 The string token assigned to the string.
-  @param  Raw                   If TRUE, the string is returned unedited in the internal
-                                storage format. If false, the string returned is edited
-                                by replacing <cr> with <space> and by removing special characters such
-                                as the <wide> prefix.
+  @param  Raw                   If TRUE, the string is returned unedited in the 
+                                internal storage format. If false, the string 
+                                returned is edited by replacing <cr> with <space> 
+                                and by removing special characters such as the
+                                <wide> prefix.
   @param  LanguageString        Pointer to a NULL-terminated string containing a
-                                single ISO 639-2 language identifier, indicating the language to print.
-                                If the LanguageString is empty (starts with a NULL), the default system
+                                single ISO 639-2 language identifier, indicating 
+                                the language to print. If the LanguageString is 
+                                empty (starts with a NULL), the default system
                                 language will be used to determine the language.
   @param  BufferLength          Length of the StringBuffer.
   @param  StringBuffer          The buffer designed to receive the characters in the string.
@@ -771,16 +786,20 @@ EFI_STATUS
   @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
   @param  Handle                The handle on which the string resides.
   @param  Token                 The string token assigned to the string.
-  @param  Index                 On input, the offset into the string where the line is to start.
-                                On output, the index is updated to point to beyond the last character returned
-                                in the call.
+  @param  Index                 On input, the offset into the string where the 
+                                line is to start. On output, the index is updated  
+                                to point beyond the last character returned in 
+                                the call.
   @param  LineWidth             The maximum width of the line in units of narrow glyphs.
-  @param  LanguageString        Pointer to a NULL-terminated string containing a
-                                single ISO 639-2 language identifier, indicating the language to print.
-  @param  BufferLength          Pointer to the length of the StringBuffer.
-  @param  StringBuffer          The buffer designed to receive the characters in the string.
+  @param  LanguageString        The pointer to a NULL-terminated string containing a
+                                single ISO 639-2 language identifier, indicating 
+                                the language to print.
+  @param  BufferLength          The pointer to the length of the StringBuffer.
+  @param  StringBuffer          The buffer designed to receive the characters in 
+                                the string.
 
-  @retval EFI_SUCCESS           StringBuffer filled with characters that will fit on the line.
+  @retval EFI_SUCCESS           StringBuffer filled with characters that will fit 
+                                on the line.
   @retval EFI_NOT_FOUND         The font glyph for at least one of the characters in
                                 the string is not in the font database.
   @retval EFI_BUFFER_TOO_SMALL  The buffer provided was not large enough
@@ -836,16 +855,16 @@ EFI_STATUS
 
   @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
   @param  Handle                The HII handle from which will have default data retrieved.
-  @param  DefaultMask           The mask used to specify some type of default override when extracting
-                                the default image data.
-  @param  VariablePackList      An indirect pointer to the first entry of a link list with
-                                type EFI_HII_VARIABLE_PACK_LIST.
+  @param  DefaultMask           The mask used to specify some type of default 
+                                override when extracting the default image data.
+  @param  VariablePackList      An indirect pointer to the first entry of a link 
+                                list with type EFI_HII_VARIABLE_PACK_LIST.
 
   @retval EFI_SUCCESS           The VariablePackList was populated with the appropriate
                                 default setting data.
   @retval EFI_NOT_FOUND         The IFR does not have any explicit or default map(s).
   @retval EFI_INVALID_PARAMETER The HII database entry associated with Handle
-                                contain invalid data.
+                                contains invalid data.
 
 **/
 typedef
@@ -887,14 +906,15 @@ EFI_STATUS
 /**
   Retrieves the current keyboard layout.
 
-  Note that this function prototype name is different from that in the Framework HII 0.92 spec
-  to avoid name confict with EFI_HII_GET_KEYBOARD_LAYOUT defined in the UEFI 2.1d spec.
+  Note that this function prototype name is different from that in the Framework HII 0.92 specification
+  to avoid name confict with EFI_HII_GET_KEYBOARD_LAYOUT defined in the UEFI 2.1d specification.
 
   @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
   @param  DescriptorCount       A pointer to the number of Descriptor entries being
                                 described in the keyboard layout being retrieved.
-  @param  Descriptor            A pointer to a buffer containing an array of FRAMEWORK_EFI_KEY_DESCRIPTOR
-                                entries. Each entry will reflect the definition of a specific physical key.
+  @param  Descriptor            A pointer to a buffer containing an array of 
+                                FRAMEWORK_EFI_KEY_DESCRIPTOR entries. Each entry 
+                                will reflect the definition of a specific physical key.
 
   @retval EFI_SUCCESS           The keyboard layout was retrieved successfully.
 
@@ -929,7 +949,7 @@ struct _EFI_HII_PROTOCOL {
   EFI_HII_FIND_HANDLES                  FindHandles;
 
   ///
-  /// Export the entire contents of the database to a buffer.
+  /// Exports the entire contents of the database to a buffer.
   ///
   EFI_HII_EXPORT                        ExportDatabase;
 
@@ -972,10 +992,10 @@ struct _EFI_HII_PROTOCOL {
   FRAMEWORK_EFI_HII_GET_STRING          GetString;
 
   ///
-  /// Remove any new strings that were added after the initial string export
+  /// Removes any new strings that were added after the initial string export
   /// for this handle.
   ///
-  /// Note this function is not defined in the Framework HII 0.92 spec.
+  /// Note this function is not defined in the Framework HII 0.92 specification.
   ///
   EFI_HII_RESET_STRINGS                 ResetStrings;
 

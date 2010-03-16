@@ -1,18 +1,18 @@
 /** @file
-  This file declares FindFv PPI used to locate FVs that contain PEIMs in PEI
+  This file declares FindFv PPI, which is used to locate FVs that contain PEIMs in PEI.
 
-  Copyright (c) 2007 - 2009, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   This PPI is defined in PEI CIS
-  Version 0.91
+  Version 0.91.
 
 **/
 
@@ -35,7 +35,7 @@ typedef struct _EFI_PEI_FIND_FV_PPI EFI_PEI_FIND_FV_PPI;
   was passed in FvNumber. Once this function reports a firmware volume
   index/base address pair, that index/address pairing must continue throughout PEI.
 
-  @param  PeiServices    Pointer to the PEI Services Table.
+  @param  PeiServices    The pointer to the PEI Services Table.
   @param  This           Interface pointer that implements the Find FV service.
   @param  FvNumber       The index of the firmware volume to locate.
   @param  FvAddress      The address of the volume to discover.

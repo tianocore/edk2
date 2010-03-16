@@ -1,17 +1,17 @@
 /** @file
   This file provides control over block-oriented firmware devices.
 
-  Copyright (c) 2006 - 2009, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
   @par Revision Reference: 
-  This protocol is defined in framework spec: Firmware Volume Block specification
+  This protocol is defined in framework spec: Firmware Volume Block Specification.
 
 **/
 
@@ -23,7 +23,7 @@
 
 typedef struct _FRAMEWORK_EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL FRAMEWORK_EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL;
 ///
-/// type of EFI FVB attribute per Framework spec
+/// The type of EFI FVB attribute per the Framework specification.
 /// 
 typedef UINT32  EFI_FVB_ATTRIBUTES;
 
@@ -112,17 +112,17 @@ EFI_STATUS
 
   @param Lba            Indicates the block for which to return the size.
 
-  @param BlockSize      Pointer to a caller-allocated UINTN in which
+  @param BlockSize      The pointer to a caller-allocated UINTN in which
                         the size of the block is returned.
 
-  @param NumberOfBlocks Pointer to a caller-allocated UINTN in
+  @param NumberOfBlocks The pointer to a caller-allocated UINTN in
                         which the number of consecutive blocks,
                         starting with Lba, is returned. All
                         blocks in this range have a size of
                         BlockSize.
 
   
-  @retval EFI_SUCCESS             The firmware volume base address is returned.
+  @retval EFI_SUCCESS             The firmware volume base address was returned.
   
   @retval EFI_INVALID_PARAMETER   The requested LBA is out of range.
 
@@ -160,18 +160,18 @@ EFI_STATUS
 
   @param Offset   Offset into the block at which to begin reading.
 
-  @param NumBytes Pointer to a UINTN. At entry, *NumBytes
+  @param NumBytes The pointer to a UINTN. At entry, *NumBytes
                   contains the total size of the buffer. At
                   exit, *NumBytes contains the total number of
                   bytes read.
 
-  @param Buffer   Pointer to a caller-allocated buffer that will
+  @param Buffer   The pointer to a caller-allocated buffer that will
                   be used to hold the data that is read.
 
   @retval EFI_SUCCESS         The firmware volume was read successfully
                               and contents are in Buffer.
   
-  @retval EFI_BAD_BUFFER_SIZE Read attempted across an LBA
+  @retval EFI_BAD_BUFFER_SIZE A read was attempted across an LBA
                               boundary. On output, NumBytes
                               contains the total number of bytes
                               returned in Buffer.
@@ -210,8 +210,8 @@ EFI_STATUS
   EraseBlocks() function first to erase the specified block to
   write. A block erase cycle will transition bits from the
   (NOT)EFI_FVB_ERASE_POLARITY state back to the
-  EFI_FVB_ERASE_POLARITY state. Implementations should be
-  mindful that the firmware volume might be in the WriteDisabled
+  EFI_FVB_ERASE_POLARITY state. Implementors should note 
+  that the firmware volume might be in the WriteDisabled
   state. If it is in this state, the Write() function must
   return the status code EFI_ACCESS_DENIED without modifying the
   contents of the firmware volume. The Write() function must
@@ -230,10 +230,10 @@ EFI_STATUS
   
   @param Offset   Offset into the block at which to begin writing.
   
-  @param NumBytes Pointer to a UINTN. Input: the total size of the buffer.
+  @param NumBytes The pointer to a UINTN. Input: the total size of the buffer.
                   Output: the total number of bytes actually written.
   
-  @param Buffer   Pointer to a caller-allocated buffer that
+  @param Buffer   The pointer to a caller-allocated buffer that
                   contains the source for the write.
   
   @retval EFI_SUCCESS         The firmware volume was written successfully.
@@ -265,7 +265,7 @@ EFI_STATUS
 
 
 ///
-/// EFI_LBA_LIST_TERMINATOR
+/// EFI_LBA_LIST_TERMINATOR.
 ///
 #define FRAMEWORK_EFI_LBA_LIST_TERMINATOR   0xFFFFFFFFFFFFFFFFULL
 
@@ -280,7 +280,7 @@ EFI_STATUS
   volume (it has a larger index than the last block of the
   firmware volume), the EraseBlocks() function must return the
   status code EFI_INVALID_PARAMETER without modifying the contents
-  of the firmware volume. Implementations should be mindful that
+  of the firmware volume. Implementors should note that
   the firmware volume might be in the WriteDisabled state. If it
   is in this state, the EraseBlocks() function must return the
   status code EFI_ACCESS_DENIED without modifying the contents of
@@ -304,7 +304,7 @@ EFI_STATUS
                 (5-7 and 10-11) are to be erased: EraseBlocks
                 (This, 5, 3, 10, 2, EFI_LBA_LIST_TERMINATOR);
 
-  @retval EFI_SUCCESS The erase request was successfully
+  @retval EFI_SUCCESS The erase request successfully
                       completed.
   
   @retval EFI_ACCESS_DENIED   The firmware volume is in the
@@ -343,7 +343,7 @@ struct _FRAMEWORK_EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL {
   FRAMEWORK_EFI_FVB_WRITE                 Write;
   FRAMEWORK_EFI_FVB_ERASE_BLOCKS          EraseBlocks;
   ///
-  /// Handle of the parent firmware volume.
+  /// The handle of the parent firmware volume.
   ///  
   EFI_HANDLE                    ParentHandle;
 };

@@ -2,14 +2,14 @@
   This file declares the SMM CPU Save State protocol, which provides the processor
   save-state information for IA-32 and Itanium processors.
 
-  Copyright (c) 2010, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   This Protocol is defined in Framework of EFI SMM Core Interface Spec
@@ -41,7 +41,7 @@ typedef struct _EFI_SMM_CPU_SAVE_STATE_PROTOCOL  EFI_SMM_CPU_SAVE_STATE_PROTOCOL
 /// union.
 ///
 /// This struct declaration does not exctly match the Framework SMM CIS 0.91 because 
-/// The Framework SMM CIS 0.91 uses ASM_XXX for base types in this structure.  These
+/// the Framework SMM CIS 0.91 uses ASM_XXX for base types in this structure.  These
 /// have been changed to use the base types defined in the UEFI Specification. 
 ///
 typedef struct {
@@ -81,7 +81,7 @@ typedef struct {
 
 ///
 /// This struct declaration does not exctly match the Framework SMM CIS 0.91 because 
-/// The Framework SMM CIS 0.91 uses ASM_XXX for base types in this structure.  These
+/// the Framework SMM CIS 0.91 uses ASM_XXX for base types in this structure.  These
 /// have been changed to use the base types defined in the UEFI Specification. 
 ///
 typedef struct {
@@ -165,7 +165,7 @@ typedef union  {
 ///
 struct _EFI_SMM_CPU_SAVE_STATE_PROTOCOL {
   ///
-  /// Reference to a list of save states
+  /// Reference to a list of save states.
   ///
   EFI_SMM_CPU_STATE  **CpuSaveState;
 };

@@ -5,14 +5,14 @@
   specific drivers that want to export access to custom hardware storage or
   publish IFR that need to call back the original driver.
 
-  Copyright (c) 2006 - 2009, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   This protocol is defined in HII spec 0.92.
@@ -41,46 +41,46 @@ typedef struct _EFI_FORM_CALLBACK_PROTOCOL  EFI_FORM_CALLBACK_PROTOCOL;
 ///  defined in HII specification. These Flags of EFI_IFR_DATA_ENTRY should be defined
 ///  to describe the standard behavior of the browser after the callback.
 ///
-/// If this flag is set, the browser will exit and reset after processing callback results
+/// If this flag is set, the browser will exit and reset after processing callback results.
 ///
 #define RESET_REQUIRED  1 
 ///
-/// If this flag is set, the browser will exit after processing callback results
+/// If this flag is set, the browser will exit after processing callback results.
 ///
 #define EXIT_REQUIRED   2
 ///
-/// If this flag is set, the browser will save the NV data after processing callback results
+/// If this flag is set, the browser will save the NV data after processing callback results.
 ///
 #define SAVE_REQUIRED   4
 ///
-/// If this flag is set, the browser will turn the NV flag on after processing callback results
+/// If this flag is set, the browser will turn the NV flag on after processing callback results.
 ///
 #define NV_CHANGED      8
 ///
-/// If this flag is set, the browser will turn the NV flag off after processing callback results
+/// If this flag is set, the browser will turn the NV flag off after processing callback results.
 ///
 #define NV_NOT_CHANGED  16
 
 #pragma pack(1)
 typedef struct {
   UINT8   OpCode;           ///< Likely a string, numeric, or one-of
-  UINT8   Length;           ///< Length of the EFI_IFR_DATA_ENTRY packet
-  UINT16  Flags;            ///< Flags settings to determine what behavior is desired from the browser after the callback
-  VOID    *Data;            ///< The data in the form based on the op-code type - this is not a pointer to the data, the data follows immediately
+  UINT8   Length;           ///< Length of the EFI_IFR_DATA_ENTRY packet.
+  UINT16  Flags;            ///< Flags settings to determine what behavior is desired from the browser after the callback.
+  VOID    *Data;            ///< The data in the form based on the op-code type. This is not a pointer to the data; the data follows immediately.
   ///
-  /// If the OpCode is a OneOf or Numeric type - Data is a UINT16 value
-  /// If the OpCode is a String type - Data is a CHAR16[x] type
-  /// If the OpCode is a Checkbox type - Data is a UINT8 value
-  /// If the OpCode is a NV Access type - Data is a EFI_IFR_NV_DATA structure
+  /// If the OpCode is a OneOf or Numeric type - Data is a UINT16 value.
+  /// If the OpCode is a String type - Data is a CHAR16[x] type.
+  /// If the OpCode is a Checkbox type - Data is a UINT8 value.
+  /// If the OpCode is a NV Access type - Data is a EFI_IFR_NV_DATA structure.
   ///
 } EFI_IFR_DATA_ENTRY;
 
 typedef struct {
-  VOID                *NvRamMap;  ///< If the flag of the op-code specified retrieval of a copy of the NVRAM map,
+  VOID                *NvRamMap;  ///< If the flag of the op-code specified retrieval of a copy of the NVRAM map.
   //
   // this is a pointer to a buffer copy
   //
-  UINT32              EntryCount; ///< How many EFI_IFR_DATA_ENTRY entries
+  UINT32              EntryCount; ///< Number of EFI_IFR_DATA_ENTRY entries.
   //
   // EFI_IFR_DATA_ENTRY  Data[1];    // The in-line Data entries.
   //
@@ -88,15 +88,15 @@ typedef struct {
 
 
 typedef union {
-  EFI_IFR_DATA_ARRAY  DataArray;  ///< Primarily used by those who call back to their drivers and use HII as a repository
-  EFI_IFR_PACKET      DataPacket; ///< Primarily used by those which do not use HII as a repository
-  CHAR16              String[1];  ///< If returning an error - fill the string with null-terminated contents
+  EFI_IFR_DATA_ARRAY  DataArray;  ///< Primarily used by those that call back to their drivers and use HII as a repository.
+  EFI_IFR_PACKET      DataPacket; ///< Primarily used by those that do not use HII as a repository.
+  CHAR16              String[1];  ///< If returning an error - fill the string with null-terminated contents.
 } EFI_HII_CALLBACK_PACKET;
 
 typedef struct {
   FRAMEWORK_EFI_IFR_OP_HEADER Header;
-  UINT16            QuestionId;   ///< Offset into the map
-  UINT8             StorageWidth; ///< Width of the value
+  UINT16            QuestionId;   ///< Offset into the map.
+  UINT8             StorageWidth; ///< Width of the value.
   //
   // CHAR8             Data[1];      // The Data itself
   //
@@ -143,19 +143,21 @@ EFI_STATUS
 
   @param  This                  A pointer to the EFI_FORM_CALLBACK_PROTOCOL instance.
   @param  VariableName          A NULL-terminated Unicode string that is the
-                                name of the vendor's variable. Each VariableName is unique for each VendorGuid.
+                                name of the vendor's variable. Each VariableName 
+                                is unique for each VendorGuid.  
   @param  VendorGuid            A unique identifier for the vendor.
   @param  Attributes            Attributes bit-mask to set for the variable.
                                 Inconsistent with specification here: 
-                                Attributes data type has been changed from UINT32 * to UINT32,
-                                because the input paramter is not necessary to use pointer date type.
+                                Attributes data type has been changed from 
+                                UINT32 * to UINT32, because the input paramter is 
+                                not necessary to use a pointer date type.
   @param  DataSize              The size in bytes of the Buffer. A size of zero causes
                                 the variable to be deleted.
   @param  Buffer                The buffer containing the contents of the variable.
-  @param  ResetRequired         Returns a value from the driver that abstracts
-                                this information and will enable a system to know if a system reset
-                                is required to achieve the configuration changes being enabled through
-                                this function.
+  @param  ResetRequired         Returns a value from the driver that abstracts this
+                                information and will enable a system to know if a
+                                system reset is required to achieve the configuration
+                                changes being enabled through this function.
 
   @retval EFI_SUCCESS           The firmware has successfully stored the variable and
                                 its data as defined by the Attributes.
@@ -183,10 +185,11 @@ EFI_STATUS
 
   @param  This                  A pointer to the EFI_FORM_CALLBACK_PROTOCOL instance.
   @param  KeyValue              A unique value which is sent to the original exporting
-                                driver so that it can identify the type of data to expect. The format of
-                                the data tends to vary based on the opcode that generated the callback.
+                                driver so that it can identify the type of data 
+                                to expect. The format of the data tends to vary based 
+                                on the opcode that generated the callback.
   @param  Data                  A pointer to the data being sent to the original exporting driver.
-  @param  Packet                A pointer to a packet of information which a driver passes
+  @param  Packet                A pointer to a packet of information that a driver passes
                                 back to the browser.
 
   @return Status Code

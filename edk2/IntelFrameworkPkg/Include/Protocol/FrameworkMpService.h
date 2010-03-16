@@ -33,14 +33,14 @@
   APs to help test system memory in parallel with other device initialization.
   Diagnostics applications may also use this protocol for multi-processor.
 
-  Copyright (c) 1999 - 2010, Intel Corporation.<BR>
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at<BR>
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 1999 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -50,7 +50,7 @@
 #include <FrameworkDxe.h>
 
 ///
-/// Global ID for the FRAMEWORK_EFI_MP_SERVICES_PROTOCOL
+/// Global ID for the FRAMEWORK_EFI_MP_SERVICES_PROTOCOL.
 ///
 #define FRAMEWORK_EFI_MP_SERVICES_PROTOCOL_GUID \
   { \
@@ -58,68 +58,68 @@
   }
 
 ///
-/// Forward declaration for the EFI_MP_SERVICES_PROTOCOL
+/// Forward declaration for the EFI_MP_SERVICES_PROTOCOL.
 ///
 typedef struct _FRAMEWORK_EFI_MP_SERVICES_PROTOCOL FRAMEWORK_EFI_MP_SERVICES_PROTOCOL;
 
 ///
-/// Fixed delivery mode that may be used as the DeliveryMode parameter in SendIpi() 
+/// Fixed delivery mode that may be used as the DeliveryMode parameter in SendIpi().
 ///
 #define DELIVERY_MODE_FIXED           0x0
 
 ///
-/// Lowest priority delivery mode that may be used as the DeliveryMode parameter in SendIpi() 
+/// Lowest priority delivery mode that may be used as the DeliveryMode parameter in SendIpi(). 
 ///
 #define DELIVERY_MODE_LOWEST_PRIORITY 0x1
 
 ///
-/// SMI delivery mode that may be used as the DeliveryMode parameter in SendIpi() 
+/// SMI delivery mode that may be used as the DeliveryMode parameter in SendIpi(). 
 ///
 #define DELIVERY_MODE_SMI             0x2
 
 ///
-/// Remote read delivery mode that may be used as the DeliveryMode parameter in SendIpi() 
+/// Remote read delivery mode that may be used as the DeliveryMode parameter in SendIpi(). 
 ///
 #define DELIVERY_MODE_REMOTE_READ     0x3
 
 ///
-/// NMI delivery mode that may be used as the DeliveryMode parameter in SendIpi() 
+/// NMI delivery mode that may be used as the DeliveryMode parameter in SendIpi(). 
 ///
 #define DELIVERY_MODE_NMI             0x4
 
 ///
-/// INIT delivery mode that may be used as the DeliveryMode parameter in SendIpi() 
+/// INIT delivery mode that may be used as the DeliveryMode parameter in SendIpi(). 
 ///
 #define DELIVERY_MODE_INIT            0x5
 
 ///
-/// Startup IPI delivery mode that may be used as the DeliveryMode parameter in SendIpi() 
+/// Startup IPI delivery mode that may be used as the DeliveryMode parameter in SendIpi().
 ///
 #define DELIVERY_MODE_SIPI            0x6
 
 ///
-/// The DeliveryMode parameter in SendIpi() bust be less than this maximum value
+/// The DeliveryMode parameter in SendIpi() must be less than this maximum value.
 ///
 #define DELIVERY_MODE_MAX             0x7
 
 ///
-/// IPF specific value for the state field of the Self Test State Parameter
+/// IPF specific value for the state field of the Self Test State Parameter.
 ///
 #define EFI_MP_HEALTH_FLAGS_STATUS_HEALTHY                  0x0
 
 ///
-/// IPF specific value for the state field of the Self Test State Parameter
+/// IPF specific value for the state field of the Self Test State Parameter.
 ///
 #define EFI_MP_HEALTH_FLAGS_STATUS_PERFORMANCE_RESTRICTED   0x1
 
 ///
-/// IPF specific value for the state field of the Self Test State Parameter
+/// IPF specific value for the state field of the Self Test State Parameter.
 ///
 #define EFI_MP_HEALTH_FLAGS_STATUS_FUNCTIONALLY_RESTRICTED  0x2
 
 typedef union {
   ///
-  /// Bitfield structure for the IPF Self Test State Parameter 
+  /// Bitfield structure for the IPF Self Test State Parameter. 
   ///
   struct {
     UINT32  Status:2;
@@ -132,7 +132,7 @@ typedef union {
     UINT32  Reserved2:12;
   } Bits;
   ///
-  /// IA32 and X64 BIST data of the processor
+  /// IA32 and X64 BIST data of the processor.
   ///
   UINT32  Uint32;
 } EFI_MP_HEALTH_FLAGS;
@@ -140,10 +140,10 @@ typedef union {
 typedef struct {
   ///
   /// @par IA32, X64:
-  ///   BIST (built-in self test) data of the processor.
+  ///   BIST (built-in self-test) data of the processor.
   ///
   /// @par IPF:
-  ///   Lower 32 bits of self test state parameter. For definition of self test 
+  ///   Lower 32 bits of the self-test state parameter. For definition of self-test 
   ///   state parameter, please refer to Intel(R) Itanium(R) Architecture Software 
   ///   Developer's Manual, Volume 2: System Architecture.
   ///
@@ -159,8 +159,8 @@ typedef struct {
 } EFI_MP_HEALTH;
 
 typedef enum {
-  EfiCpuAP                = 0,  ///< The CPU is an AP (Application Processor)
-  EfiCpuBSP,                    ///< The CPU is the BSP (Boot-Strap Processor)
+  EfiCpuAP                = 0,  ///< The CPU is an AP (Application Processor).
+  EfiCpuBSP,                    ///< The CPU is the BSP (Boot-Strap Processor).
   EfiCpuDesignationMaximum
 } EFI_CPU_DESIGNATION;
 
@@ -235,15 +235,15 @@ typedef struct {
     - Rendezvous interrupt number (IPF-specific)
     - Length of the rendezvous procedure.
 
-  @param[in]  This                   Pointer to the FRAMEWORK_EFI_MP_SERVICES_PROTOCOL
+  @param[in]  This                   The pointer to the FRAMEWORK_EFI_MP_SERVICES_PROTOCOL
                                      instance.
-  @param[out] NumberOfCPUs           Pointer to the total number of logical processors 
+  @param[out] NumberOfCPUs           The pointer to the total number of logical processors 
                                      in the system, including the BSP and disabled 
                                      APs.  If NULL, this parameter is ignored.
   @param[out] MaximumNumberOfCPUs    Pointer to the maximum number of processors 
                                      supported by the system.  If NULL, this 
                                      parameter is ignored.
-  @param[out] NumberOfEnabledCPUs    Pointer to the number of enabled logical 
+  @param[out] NumberOfEnabledCPUs    The pointer to the number of enabled logical 
                                      processors that exist in system, including 
                                      the BSP.  If NULL, this parameter is ignored.
   @param[out] RendezvousIntNumber    This parameter is only meaningful for IPF.
@@ -251,12 +251,12 @@ typedef struct {
                                      If NULL, this parameter is ignored.
                                      - IPF: Pointer to the rendezvous interrupt 
                                      number that is used for AP wake-up.
-  @param[out] RendezvousProcLength   Pointer to the length of rendezvous procedure. 
+  @param[out] RendezvousProcLength   The pointer to the length of rendezvous procedure. 
                                      - IA32, X64: The returned value is 0x1000.  
                                      If NULL, this parameter is ignored.
                                      - IPF: The returned value is zero.
 
-  @retval EFI_SUCCESS   Multiprocessor general information successfully retrieved.
+  @retval EFI_SUCCESS   Multiprocessor general information was successfully retrieved.
 
 **/
 typedef
@@ -281,7 +281,7 @@ EFI_STATUS
   slot numbers is all considered platform-related information and will not be 
   presented here. 
 
-  @param[in]  This                     Pointer to the FRAMEWORK_EFI_MP_SERVICES_PROTOCOL
+  @param[in]  This                     The pointer to the FRAMEWORK_EFI_MP_SERVICES_PROTOCOL
                                        instance.
   @param[in]  ProcessorNumber          The handle number of the processor. The range
                                        is from 0 to the total number of logical 
@@ -296,20 +296,20 @@ EFI_STATUS
                                        If the size of ProcessorContextBuffer is 
                                        sufficient, the value is not changed from 
                                        input.
-  @param[out] ProcessorContextBuffer   Pointer to the buffer where the data of 
+  @param[out] ProcessorContextBuffer   The pointer to the buffer where the data of 
                                        requested processor will be deposited. 
                                        The buffer is allocated by caller. 
 
-  @retval EFI_SUCCESS             Processor information successfully returned.
+  @retval EFI_SUCCESS             Processor information was successfully returned.
   @retval EFI_BUFFER_TOO_SMALL    The size of ProcessorContextBuffer is too small. 
-                                  Value pointed by BufferLength has been updated 
+                                  The value pointed by BufferLength has been updated 
                                   to size in bytes that is needed.
   @retval EFI_INVALID_PARAMETER   IA32, X64:BufferLength is NULL.
   @retval EFI_INVALID_PARAMETER   IA32, X64:ProcessorContextBuffer is NULL.
   @retval EFI_INVALID_PARAMETER   IA32, X64:Processor with the handle specified by 
-                                  ProcessorNumber does not exist
+                                  ProcessorNumber does not exist.
   @retval EFI_NOT_FOUND           IPF: Processor with the handle specified by 
-                                  ProcessorNumber does not exist
+                                  ProcessorNumber does not exist.
 
 **/
 typedef
@@ -333,7 +333,7 @@ EFI_STATUS
   controlled exclusive code. EFI services and protocols may not be called by APs 
   unless otherwise specified.
 
-  @param[in]  This                    Pointer to the FRAMEWORK_EFI_MP_SERVICES_PROTOCOL
+  @param[in]  This                    The pointer to the FRAMEWORK_EFI_MP_SERVICES_PROTOCOL
                                       instance.
   @param[in]  Procedure               A pointer to the function to be run on enabled 
                                       APs of the system. 
@@ -400,7 +400,7 @@ EFI_STATUS
                                       If the value is non-zero, the BSP waits 
                                       until dispatched AP finishes and then 
                                       dispatch the next.
-  @param[in]  ProcedureArgument       Pointer to the optional parameter of the 
+  @param[in]  ProcedureArgument       The pointer to the optional parameter of the 
                                       function specified by Procedure.
   @param[out] FailedCPUList           List of APs that did not finish.
                                       - IA32, X64:
@@ -424,7 +424,7 @@ EFI_STATUS
                                   before the timeout expires.
   @retval EFI_SUCCESS	            IA32, X64: Only 1 logical processor exists 
                                   in system.
-  @retval EFI_INVALID_PARAMETER	  IA32, X64: Procedure is NULL.
+  @retval EFI_INVALID_PARAMETER	    IA32, X64: Procedure is NULL.
   @retval EFI_TIMEOUT	            IA32, X64: The timeout expires before all 
                                   dispatched APs have finished.
   @retval EFI_SUCCESS	            IPF: This function always returns EFI_SUCCESS.
@@ -447,7 +447,7 @@ EFI_STATUS
   the caller. The caller can request the BSP to either wait for the AP or just 
   proceed with the next task.
 
-  @param[in] This                    Pointer to the FRAMEWORK_EFI_MP_SERVICES_PROTOCOL
+  @param[in] This                    The pointer to the FRAMEWORK_EFI_MP_SERVICES_PROTOCOL
                                      instance.
   @param[in] Procedure               A pointer to the function to be run on the 
                                      designated AP. 
@@ -486,7 +486,7 @@ EFI_STATUS
                                      time interval. If the value is zero, the length 
                                      of time interval is 10ms. If the value is 
                                      non-zero, the BSP waits until the AP finishes.
-  @param[in] ProcedureArgument       Pointer to the optional parameter of the 
+  @param[in] ProcedureArgument       The pointer to the optional parameter of the 
                                      function specified by Procedure.
 
   @retval EFI_SUCCESS             Specified AP has finished before the timeout 
@@ -521,7 +521,7 @@ EFI_STATUS
   from where the old one left off.  This call can only be performed by the 
   current BSP.
 
-  @param[in] This              Pointer to the FRAMEWORK_EFI_MP_SERVICES_PROTOCOL
+  @param[in] This              The pointer to the FRAMEWORK_EFI_MP_SERVICES_PROTOCOL
                                instance.
   @param[in] ProcessorNumber   The handle number of AP. The range is from 0 to 
                                the total number of logical processors minus 1. 
@@ -531,7 +531,7 @@ EFI_STATUS
                                enabled AP. Otherwise, it will be disabled.
 
   @retval EFI_SUCCESS             BSP successfully switched.
-  @retval EFI_INVALID_PARAMETER   Processor with the handle specified by 
+  @retval EFI_INVALID_PARAMETER   The processor with the handle specified by 
                                   ProcessorNumber does not exist.
   @retval EFI_INVALID_PARAMETER   ProcessorNumber specifies the BSP.
   @retval EFI_NOT_READY           IA32, X64: Specified AP is busy or disabled.
@@ -552,16 +552,16 @@ EFI_STATUS
   This service sends an IPI to a specified AP. Caller can specify vector number 
   and delivery mode of the interrupt.
 
-  @param[in] This              Pointer to the FRAMEWORK_EFI_MP_SERVICES_PROTOCOL
+  @param[in] This              The pointer to the FRAMEWORK_EFI_MP_SERVICES_PROTOCOL
                                instance.
   @param[in] ProcessorNumber   The handle number of AP. The range is from 0 to 
                                the total number of logical processors minus 1. 
                                The total number of logical processors can be 
                                retrieved by GetGeneralMPInfo().
-  @param[in] VectorNumber      Vector number of the interrupt.
-  @param[in] DeliveryMode      Delivery mode of the interrupt.
+  @param[in] VectorNumber      The vector number of the interrupt.
+  @param[in] DeliveryMode      The delivery mode of the interrupt.
 
-  @retval EFI_SUCCESS             IPI is successfully sent.
+  @retval EFI_SUCCESS             IPI was successfully sent.
   @retval EFI_INVALID_PARAMETER   ProcessorNumber specifies the BSP.
   @retval EFI_INVALID_PARAMETER   IA32, X64: Processor with the handle specified 
                                   by ProcessorNumber does not exist.
@@ -589,7 +589,7 @@ EFI_STATUS
   specify the health status of the AP by Health. It is usually used to update the 
   health status of the processor after some processor test.
 
-  @param[in] This              Pointer to the FRAMEWORK_EFI_MP_SERVICES_PROTOCOL
+  @param[in] This              The pointer to the FRAMEWORK_EFI_MP_SERVICES_PROTOCOL
                                instance.
   @param[in] ProcessorNumber   The handle number of AP. The range is from 0 to 
                                the total number of logical processors minus 1. 
@@ -626,7 +626,7 @@ EFI_STATUS
   processors can be retrieved by GetGeneralMPInfo(). This service may be called 
   from the BSP and APs.
 
-  @param[in]  This              Pointer to the FRAMEWORK_EFI_MP_SERVICES_PROTOCOL
+  @param[in]  This              The pointer to the FRAMEWORK_EFI_MP_SERVICES_PROTOCOL
                                 instance.
   @param[out] ProcessorNumber   A pointer to the handle number of AP. The range is 
                                 from 0 to the total number of logical processors 
@@ -644,7 +644,7 @@ EFI_STATUS
   );
 
 ///
-/// Framework MP Services Protocol structure
+/// Framework MP Services Protocol structure.
 ///
 struct _FRAMEWORK_EFI_MP_SERVICES_PROTOCOL {
   EFI_MP_SERVICES_GET_GENERAL_MP_INFO              GetGeneralMPInfo;

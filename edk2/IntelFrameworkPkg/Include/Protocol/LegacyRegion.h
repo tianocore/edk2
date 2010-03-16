@@ -1,14 +1,14 @@
 /** @file
-  This protocol manages the legacy memory regions between 0xc0000 - 0xfffff
+  This protocol manages the legacy memory regions between 0xc0000 - 0xfffff.
 
-  Copyright (c) 2007 - 2009, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   This protocol is defined in Framework for EFI Compatibility Support Module spec
@@ -31,11 +31,11 @@ typedef struct _EFI_LEGACY_REGION_PROTOCOL EFI_LEGACY_REGION_PROTOCOL;
   Sets hardware to decode or not decode a region.
 
   @param  This                  Indicates the EFI_LEGACY_REGION_PROTOCOL instance
-  @param  Start                 Start of region to decode.
-  @param  Length                Size in bytes of the region.
-  @param  On                    Decode/nondecode flag.
+  @param  Start                 The start of the region to decode.
+  @param  Length                The size in bytes of the region.
+  @param  On                    The decode/nondecode flag.
 
-  @retval EFI_SUCCESS           Decode range successfully changed.
+  @retval EFI_SUCCESS           The decode range successfully changed.
 
 **/
 typedef
@@ -50,9 +50,9 @@ EFI_STATUS
 /**
   Sets a region to read only.
 
-  @param  This                  Indicates the EFI_LEGACY_REGION_PROTOCOL instance
-  @param  Start                 Start of region to lock.
-  @param  Length                Size in bytes of the region.
+  @param  This                  Indicates the EFI_LEGACY_REGION_PROTOCOL instance.
+  @param  Start                 The start of region to lock.
+  @param  Length                The size in bytes of the region.
   @param  Granularity           Lock attribute affects this granularity in bytes.
 
   @retval EFI_SUCCESS           The region was made read only.
@@ -72,8 +72,8 @@ EFI_STATUS
   inadvertently modified.
 
   @param  This                  Indicates the EFI_LEGACY_REGION_PROTOCOL instance
-  @param  Start                 Start of region to lock.
-  @param  Length                Size in bytes of the region.
+  @param  Start                 The start of region to lock.
+  @param  Length                The size in bytes of the region.
   @param  Granularity           Lock attribute affects this granularity in bytes.
 
   @retval EFI_SUCCESS           The region was made read only and flash is locked.
@@ -92,8 +92,8 @@ EFI_STATUS
   Sets a region to read-write.
 
   @param  This                  Indicates the EFI_LEGACY_REGION_PROTOCOL instance
-  @param  Start                 Start of region to lock.
-  @param  Length                Size in bytes of the region.
+  @param  Start                 The start of region to lock.
+  @param  Length                The size in bytes of the region.
   @param  Granularity           Lock attribute affects this granularity in bytes.
 
   @retval EFI_SUCCESS           The region was successfully made read-write.
@@ -113,9 +113,9 @@ EFI_STATUS
   for the traditional BIOS.
 **/
 struct _EFI_LEGACY_REGION_PROTOCOL {
-  EFI_LEGACY_REGION_DECODE    Decode;     ///< Specifies a region for the chipset to decode
+  EFI_LEGACY_REGION_DECODE    Decode;     ///< Specifies a region for the chipset to decode.
   EFI_LEGACY_REGION_LOCK      Lock;       ///< Makes the specified OpROM region read only or locked.
-  EFI_LEGACY_REGION_BOOT_LOCK BootLock;   ///< Sets a region to read only and ensures tat flash is locked from
+  EFI_LEGACY_REGION_BOOT_LOCK BootLock;   ///< Sets a region to read only and ensures tat flash is locked from.
                                           ///< inadvertent modification.
   EFI_LEGACY_REGION_UNLOCK    UnLock;     ///< Makes the specified OpROM region read-write or unlocked.
 };

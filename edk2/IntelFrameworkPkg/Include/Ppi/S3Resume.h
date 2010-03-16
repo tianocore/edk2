@@ -8,7 +8,7 @@
   EFI_ACPI_S3_SAVE_PROTOCOL. This presaved information can then be restored in the S3
   resume boot path using EFI_PEI_S3_RESUME_PPI. Architecturally, the S3 resume PEIM is the
   last PEIM to be dispatched in the S3 resume boot path.
-  Before using this PPI, the caller has to ensure the necessary information for the S3 resume, such as
+  Before using this PPI, the caller must ensure the necessary information for the S3 resume, such as
   the following, is available for the S3 resume boot path:
   - EFI_ACPI_S3_RESUME_SCRIPT_TABLE script table. Type
     EFI_ACPI_S3_RESUME_SCRIPT_TABLE is defined in the Intel Platform Innovation
@@ -17,14 +17,14 @@
   - The reserved memory range to be used for the S3 resume.
   Otherwise, the S3 resume boot path may fail.
   
-  Copyright (c) 2007 - 2009, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   This PPI is defined in Framework for EFI S3 Resume Boot Path spec.
@@ -46,11 +46,11 @@ typedef struct _EFI_PEI_S3_RESUME_PPI   EFI_PEI_S3_RESUME_PPI;
   Restores the platform to its preboot configuration for an S3 resume and
   jumps to the OS waking vector.
 
-  @param  PeiServices    Pointer to the PEI Services Table
+  @param  PeiServices    The pointer to the PEI Services Table
 
   @retval EFI_ABORTED           Execution of the S3 resume boot script table failed.
-  @retval EFI_NOT_FOUND         Some necessary information that is used for
-                                the S3 resume boot path could not be located.
+  @retval EFI_NOT_FOUND         Could not be locate some necessary information that 
+                                is used for the S3 resume boot path d.
 
 **/
 typedef

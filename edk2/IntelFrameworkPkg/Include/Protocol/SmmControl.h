@@ -8,14 +8,14 @@
   event from a platform chipset agent is an optional capability for both IA-32 and Itanium-based
   systems.
 
-  Copyright (c) 2007,2009 Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   This Protocol is defined in Framework of EFI SMM Core Interface Spec
@@ -56,10 +56,10 @@ typedef struct {
   Invokes SMI activation from either the preboot or runtime environment.
 
   @param  This                  The EFI_SMM_CONTROL_PROTOCOL instance.
-  @param  ArgumentBuffer        Optional sized data to pass into the protocol activation.
-  @param  ArgumentBufferSize    Optional size of the data.
-  @param  Periodic              Optional mechanism to periodically repeat activation.
-  @param  ActivationInterval    Optional parameter to repeat at this period one
+  @param  ArgumentBuffer        The optional sized data to pass into the protocol activation.
+  @param  ArgumentBufferSize    The optional size of the data.
+  @param  Periodic              An optional mechanism to periodically repeat activation.
+  @param  ActivationInterval    An optional parameter to repeat at this period one
                                 time or, if the Periodic Boolean is set, periodically.
 
   @retval EFI_SUCCESS           The SMI/PMI has been engendered.
@@ -101,7 +101,7 @@ EFI_STATUS
   Provides information on the source register used to generate the SMI.
 
   @param  This                  The EFI_SMM_CONTROL_PROTOCOL instance.
-  @param  SmiRegister           Pointer to the SMI register description structure
+  @param  SmiRegister           A pointer to the SMI register description structure.
 
   @retval EFI_SUCCESS           The register structure has been returned.
   @retval EFI_DEVICE_ERROR      The source could not be cleared.
@@ -140,9 +140,9 @@ EFI_STATUS
 /**
   This protocol is used to initiate SMI/PMI activations. 
   This protocol could be published by either:
-    - A processor driver to abstract the SMI/PMI IPI
-    - The driver that abstracts the ASIC that is supporting the APM port, such as the ICH in an Intel chipset
-  Because of the possibility of performing SMI or PMI IPI transactions, the ability to generate this
+    - A processor driver to abstract the SMI/PMI IPI.
+    - The driver that abstracts the ASIC that is supporting the APM port, such as the ICH in an Intel chipset.
+  Because of the possibility of performing SMI or PMI IPI transactions, the ability to generate this.
   
   The EFI_SMM_CONTROL_PROTOCOL is used by the platform chipset or processor driver. This
   protocol is usable both in boot services and at runtime. The runtime aspect enables an
