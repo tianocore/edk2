@@ -2,13 +2,13 @@
   Platform BDS library definition. A platform can implement 
   instances to support platform-specific behavior.
 
-Copyright (c) 2008 - 2009, Intel Corporation. <BR>
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+Copyright (c) 2008 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -25,7 +25,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @param  Level         The memory test intensive level.
 
-  @retval EFI_STATUS    Success test all the system memory and update
+  @retval EFI_STATUS    Successfully test all the system memory, and update
                         the memory resource
 
 **/
@@ -37,7 +37,7 @@ EFI_STATUS
 
 /**
   This routine is called to see if there are any capsules we need to process.
-  If the boot mode is not UPDATE, then we do nothing. Otherwise find the
+  If the boot mode is not UPDATE, then we do nothing. Otherwise, find the
   capsule HOBS and produce firmware volumes for them via the DXE service.
   Then call the dispatcher to dispatch drivers from them. Finally, check
   the status of the updates.
@@ -48,10 +48,10 @@ EFI_STATUS
   clear the capsule variable so on the next reset PEI does not see it and
   think there is a capsule available.
 
-  @param BootMode                 the current boot mode
+  @param BootMode                 The current boot mode
 
-  @retval EFI_INVALID_PARAMETER   boot mode is not correct for an update
-  @retval EFI_SUCCESS             There is no error when processing capsule
+  @retval EFI_INVALID_PARAMETER   The boot mode is not correct for an update.
+  @retval EFI_SUCCESS             There is no error when processing a capsule.
 
 **/
 typedef 
@@ -94,10 +94,10 @@ PlatformBdsPolicyBehavior (
 /**
   Hook point for a user-provided function, for after a boot attempt fails. 
 
-  @param  Option                  Pointer to Boot Option that failed to boot.
-  @param  Status                  Status returned from failed boot.
-  @param  ExitData                Exit data returned from failed boot.
-  @param  ExitDataSize            Exit data size returned from failed boot.
+  @param  Option                  A pointer to Boot Option that failed to boot.
+  @param  Status                  The status returned from failed boot.
+  @param  ExitData                The exit data returned from failed boot.
+  @param  ExitDataSize            The exit data size returned from failed boot.
 
 **/
 VOID
@@ -115,7 +115,7 @@ PlatformBdsBootFail (
   interactive mode and stop processing the BootOrder list in this case. This
   is also a platform implementation, and can be customized by an IBV/OEM.
 
-  @param  Option                  Pointer to Boot Option that successfully booted.
+  @param  Option                  A pointer to the Boot Option that successfully booted.
 
 **/
 VOID
@@ -141,10 +141,10 @@ PlatformBdsLockNonUpdatableFlash (
   presses will be ignored until the Password is typed in. The only way to
   disable the password is to type it in to a ConIn device.
 
-  @param  Password        Password used to lock ConIn device.
+  @param  Password        The password used to lock ConIn device.
 
-  @retval EFI_SUCCESS     lock the Console In Spliter virtual handle successfully.
-  @retval EFI_UNSUPPORTED Password not found
+  @retval EFI_SUCCESS     Lock the Console In Spliter virtual handle successfully.
+  @retval EFI_UNSUPPORTED Password not found.
 
 **/
 EFI_STATUS

@@ -1,14 +1,14 @@
 /** @file
   GUID used to identify Data Hub records logged by Status Code Protocol.
   
-  Copyright (c) 2006 - 2009, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-                                                                                            
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                          
+    
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
 **/
 
@@ -16,7 +16,7 @@
 #define __DATA_HUB_STATUS_CODE_RECORD_H__
 
 ///
-/// Global ID used to identify a structure of type DATA_HUB_STATUS_CODE_DATA_RECORD
+/// The Global ID used to identify a structure of type DATA_HUB_STATUS_CODE_DATA_RECORD.
 ///
 #define EFI_DATA_HUB_STATUS_CODE_RECORD_GUID \
   { \
@@ -24,7 +24,7 @@
   }
 
 ///
-/// Data Hub data record that is used to store all the parameters passed into
+/// The Data Hub data record that is used to store all the parameters passed into
 /// the ReportStatusCode() service of the EFI_STATUS_CODE_PROTOCOL.
 ///
 typedef struct {
@@ -41,7 +41,7 @@ typedef struct {
 
   ///
   /// The enumeration of a hardware or software entity within
-  /// the system.  Valid instance numbers start with 1
+  /// the system.  Valid instance numbers start with 1.
   ///
   UINT32                 Instance;
 
@@ -51,7 +51,7 @@ typedef struct {
   EFI_GUID               CallerId;
 
   ///
-  /// Additional status code data
+  /// Additional status code data.
   ///
   EFI_STATUS_CODE_DATA   Data;
 } DATA_HUB_STATUS_CODE_DATA_RECORD;
