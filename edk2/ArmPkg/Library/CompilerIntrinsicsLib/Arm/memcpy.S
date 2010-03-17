@@ -14,10 +14,9 @@
 
 	.text
 	.align 2
-	.globl _memcpy
-_memcpy:
-	@ args = 0, pretend = 0, frame = 0
-	@ frame_needed = 1, uses_anonymous_args = 0
+	.globl ASM_PFX(memcpy)
+
+ASM_PFX(memcpy):
 	stmfd	sp!, {r7, lr}
 	mov	ip, #0
 	add	r7, sp, #0

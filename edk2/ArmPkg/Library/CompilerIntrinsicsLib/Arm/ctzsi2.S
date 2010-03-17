@@ -14,11 +14,9 @@
 
 	.text
 	.align 2
-	.globl ___ctzsi2
-___ctzsi2:
-	@ args = 0, pretend = 0, frame = 0
-	@ frame_needed = 0, uses_anonymous_args = 0
-	@ link register save eliminated.
+	.globl ASM_PFX(__ctzsi2)
+	
+ASM_PFX(__ctzsi2):
 	uxth	r3, r0
 	cmp	r3, #0
 	moveq	ip, #16

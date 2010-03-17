@@ -14,13 +14,10 @@
 
 	.text
 	.align 2
-	.globl ___lshrdi3
-___lshrdi3:
-	@ args = 0, pretend = 0, frame = 0
-	@ frame_needed = 0, uses_anonymous_args = 0
-	@ link register save eliminated.
+	.globl ASM_PFX(__lshrdi3)
+	
+ASM_PFX(__lshrdi3):
 	cmp	r2, #31
-	@ lr needed for prologue
 	bls	L2
 	cmp	r2, #63
 	subls	r2, r2, #32

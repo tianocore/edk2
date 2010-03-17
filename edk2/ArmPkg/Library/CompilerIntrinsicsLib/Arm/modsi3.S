@@ -14,10 +14,9 @@
 
 	.text
 	.align 2
-	.globl ___modsi3
-___modsi3:
-	@ args = 0, pretend = 0, frame = 0
-	@ frame_needed = 1, uses_anonymous_args = 0
+	.globl ASM_PFX(__modsi3)
+
+ASM_PFX(__modsi3):
 	stmfd	sp!, {r4, r5, r7, lr}
 	add	r7, sp, #8
 	mov	r5, r0

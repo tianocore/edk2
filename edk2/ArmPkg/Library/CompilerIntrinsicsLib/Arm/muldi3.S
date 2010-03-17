@@ -14,10 +14,9 @@
 
 	.text
 	.align 2
-	.globl ___muldi3
-___muldi3:
-	@ args = 0, pretend = 0, frame = 8
-	@ frame_needed = 1, uses_anonymous_args = 0
+	.globl ASM_PFX(__muldi3)
+	
+ASM_PFX(__muldi3):
 	stmfd	sp!, {r4, r5, r6, r7, lr}
 	add	r7, sp, #12
 	stmfd	sp!, {r8, r10, r11}

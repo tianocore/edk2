@@ -75,6 +75,22 @@ typedef union {
     };
 } udwords;
 
+// __aeabi_ return values
+typedef struct {
+  UINT64  Quotent;
+  UINT64  Remainder;
+} ulldiv_t;
+
+typedef struct {
+  INT64   Quotent;
+  INT64   Remainder;
+} lldiv_t;
+
+typedef struct {
+  UINT32  Quotent;
+  UINT32  Remainder;
+} uidiv_return;
+
 #if __GNUC__
   #define COUNT_LEADING_ZEROS(_a)   __builtin_clz((_a))
   #define COUNT_TRAILING_ZEROS(_a)  __builtin_ctz((_a))

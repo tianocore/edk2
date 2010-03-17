@@ -14,10 +14,9 @@
 
 	.text
 	.align 2
-	.globl ___divsi3
-___divsi3:
-	@ args = 0, pretend = 0, frame = 0
-	@ frame_needed = 1, uses_anonymous_args = 0
+	.globl ASM_PFX(__divsi3)
+	
+ASM_PFX(__divsi3):
 	eor	r3, r0, r0, asr #31
 	eor	r2, r1, r1, asr #31
 	stmfd	sp!, {r4, r5, r7, lr}
@@ -26,7 +25,7 @@ ___divsi3:
 	mov	r4, r1, asr #31
 	sub	r0, r3, r0, asr #31
 	sub	r1, r2, r1, asr #31
-	bl	___udivsi3
+	bl	ASM_PFX(__udivsi3)
 	eor	r1, r5, r4
 	eor	r0, r0, r1
 	rsb	r0, r1, r0

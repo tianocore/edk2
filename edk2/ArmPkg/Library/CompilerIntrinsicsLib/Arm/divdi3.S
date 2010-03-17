@@ -14,8 +14,9 @@
 
 	.text
 	.align 2
-	.globl ___divdi3
-___divdi3:
+	.globl ASM_PFX(__divdi3)
+	
+ASM_PFX(__divdi3):
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 1, uses_anonymous_args = 0
 	stmfd	sp!, {r4, r5, r7, lr}
@@ -36,7 +37,7 @@ ___divdi3:
 	subs	r0, r0, r10
 	sbc	r1, r1, r11
 	str	ip, [sp, #0]
-	bl	___udivmoddi4
+	bl	ASM_PFX(__udivmoddi4)
 	eor	r2, r10, r4
 	eor	r3, r10, r4
 	eor	r0, r0, r2

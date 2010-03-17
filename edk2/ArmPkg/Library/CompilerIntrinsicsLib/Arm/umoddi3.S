@@ -14,16 +14,15 @@
 
 	.text
 	.align 2
-	.globl ___umoddi3
-___umoddi3:
-	@ args = 0, pretend = 0, frame = 8
-	@ frame_needed = 1, uses_anonymous_args = 0
+	.globl ASM_PFX(__umoddi3)
+	
+ASM_PFX(__umoddi3):
 	stmfd	sp!, {r7, lr}
 	add	r7, sp, #0
 	sub	sp, sp, #16
 	add	ip, sp, #8
 	str	ip, [sp, #0]
-	bl	___udivmoddi4
+	bl	ASM_PFX(__udivmoddi4)
 	ldrd	r0, [sp, #8]
 	sub	sp, r7, #0
 	ldmfd	sp!, {r7, pc}
