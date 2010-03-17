@@ -25,7 +25,6 @@
 [Sources.ARM]
   CpuDxe.c
   CpuDxe.h
-  DebugSupport.c
   Exception.c
 
 #
