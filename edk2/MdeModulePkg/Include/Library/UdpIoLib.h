@@ -2,7 +2,7 @@
   This library is used to share code between UEFI network stack modules.
   It provides the helper routines to access UDP service. It is used by both DHCP and MTFTP.
 
-Copyright (c) 2006 - 2009, Intel Corporation.<BR>
+Copyright (c) 2006 - 2010, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -49,14 +49,14 @@ typedef struct {
 
   This prototype is used by both receive and sending when calling
   UdpIoRecvDatagram() or UdpIoSendDatagram(). When receiving, Netbuf is allocated by the
-  UDP access point and released by the user. When sending, the user allocates the the NetBuf, which is then
-  provided to the callback as a reference.
+  UDP access point and released by the user. When sending, the user allocates the the NetBuf, 
+  which is then provided to the callback as a reference.
 
-  @param[in] Packet       Packet received or sent
-  @param[in] EndPoint     The UDP address pair corresponds to the UDP IO
-  @param[in] IoStatus     Packet receiving or sending status
-  @param[in] Context      User-defined data when calling UdpIoRecvDatagram() or
-                          UdpIoSendDatagram()
+  @param[in] Packet       The packet received or sent.
+  @param[in] EndPoint     The UDP address pair corresponds to the UDP IO.
+  @param[in] IoStatus     The packet receiving or sending status.
+  @param[in] Context      The user-defined data when calling UdpIoRecvDatagram() or
+                          UdpIoSendDatagram().
 **/
 typedef
 VOID
@@ -97,8 +97,8 @@ typedef struct {
 /// This structure is used internally by UdpIo Library.
 ///
 /// Each transmit request is wrapped in an UDP_TX_TOKEN. Upon completion,
-/// the CallBack will be called. There can be several transmit requests. All transmit requests
-/// are linked in a list.
+/// the CallBack will be called. There can be several transmit requests. All transmit 
+/// requests are linked in a list.
 ///
 
 typedef union {
@@ -160,16 +160,16 @@ struct _UDP_IO {
 };
 
 /**
-  Prototype called when UdpIo Library configures a UDP instance.
+  The prototype called when UdpIo Library configures a UDP instance.
 
   The prototype is set and called when creating a UDP_IO in UdpIoCreatePort().
 
-  @param[in] UdpIo         The UDP_IO to configure
-  @param[in] Context       User-defined data when calling UdpIoCreatePort()
+  @param[in] UdpIo         The UDP_IO to configure.
+  @param[in] Context       The user-defined data when calling UdpIoCreatePort().
 
-  @retval EFI_SUCCESS  The configuration succeeded
+  @retval EFI_SUCCESS  The configuration succeeded.
   @retval Others       The UDP_IO fails to configure indicating
-                       UdpIoCreatePort() should fail
+                       UdpIoCreatePort() should fail.
 **/
 typedef
 EFI_STATUS
@@ -181,11 +181,11 @@ EFI_STATUS
 /**
   The select function to decide whether to cancel the UDP_TX_TOKEN.
 
-  @param[in] Token        The UDP_TX_TOKEN to decide whether to cancel
-  @param[in] Context      User-defined data in UdpIoCancelDgrams()
+  @param[in] Token        The UDP_TX_TOKEN to decide whether to cancel.
+  @param[in] Context      User-defined data in UdpIoCancelDgrams().
 
-  @retval TRUE        Cancel the UDP_TX_TOKEN
-  @retval FALSE       Do not cancel this UDP_TX_TOKEN
+  @retval TRUE        Cancel the UDP_TX_TOKEN.
+  @retval FALSE       Do not cancel this UDP_TX_TOKEN.
 
 **/
 typedef
@@ -231,7 +231,7 @@ UdpIoCancelDgrams (
   @param[in]  UdpVersion            The UDP protocol version, UDP4 or UDP6.
   @param[in]  Context               The opaque parameter for the Configure funtion.
 
-  @return Newly-created UDP_IO or NULL if failed.
+  @return The newly-created UDP_IO, or NULL if failed.
 
 **/
 UDP_IO *
@@ -292,7 +292,7 @@ UdpIoCleanIo (
   @param[in]  Context               The opaque parameter passed to CallBack.
 
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource for the packet.
-  @retval EFI_SUCCESS           The packet is successfully delivered to UDP  for
+  @retval EFI_SUCCESS           The packet is successfully delivered to UDP for
                                 transmission.
 
 **/
@@ -338,7 +338,7 @@ UdpIoCancelSentDatagram (
   @retval EFI_ALREADY_STARTED   There is already a pending receive request. Only
                                 one receive request is supported at a time.
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate needed resources.
-  @retval EFI_SUCCESS           The receive request is issued successfully.
+  @retval EFI_SUCCESS           The receive request was issued successfully.
   @retval EFI_UNSUPPORTED       The UDP version in UDP_IO is not supported.
 
 **/

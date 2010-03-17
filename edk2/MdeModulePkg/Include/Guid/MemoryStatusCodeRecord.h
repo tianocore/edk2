@@ -1,14 +1,14 @@
 /** @file
-  GUID used to identify status code records HOB that originate from the PEI status code    
+  GUID used to identify status code records HOB that originate from the PEI status code.    
   
-  Copyright (c) 2006 - 2009, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-                                                                                            
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                            
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
 **/
 
@@ -17,7 +17,7 @@
 
 ///
 /// Global ID used to identify GUIDed HOBs that start with a structure of type 
-/// MEMORY_STATUSCODE_PACKET_HEADER followed by an array of structures of type 
+/// MEMORY_STATUSCODE_PACKET_HEADER, followed by an array of structures of type 
 /// MEMORY_STATUSCODE_RECORD.  These GUIDed HOBs record all the information 
 /// passed into the ReportStatusCode() service of PEI Services Table.
 ///
@@ -42,15 +42,15 @@
 ///
 typedef struct {
   ///
-  /// Index of the packet
+  /// Index of the packet.
   ///
   UINT16  PacketIndex;
   ///
-  /// The number of active records in the packet
+  /// The number of active records in the packet.
   ///
   UINT16  RecordIndex;
   ///
-  /// The maximum number of records that the packet can store
+  /// The maximum number of records that the packet can store.
   ///
   UINT32  MaxRecordsNumber;
 } MEMORY_STATUSCODE_PACKET_HEADER;
@@ -73,7 +73,7 @@ typedef struct {
 
   ///
   /// The enumeration of a hardware or software entity within
-  /// the system. Valid instance numbers start with 1
+  /// the system. Valid instance numbers start with the number 1.
   ///
   UINT32                 Instance;
 } MEMORY_STATUSCODE_RECORD;

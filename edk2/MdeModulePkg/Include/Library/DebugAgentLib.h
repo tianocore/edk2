@@ -1,14 +1,14 @@
 /** @file
   Debug Agent Library provide source-level debug capability.
 
-  Copyright (c) 2010, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+Copyright (c) 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                            
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -28,8 +28,8 @@
 
   This function is used to set up debug enviroment.
 
-  @param[in] InitFlag   Init flag is used to decide initialize process.
-  @param[in] Context    Context needed according to InitFlag, it was optional.
+  @param[in] InitFlag   Init flag is used to decide the initialize process.
+  @param[in] Context    Context needed according to InitFlag; it was optional.
 
 **/
 VOID

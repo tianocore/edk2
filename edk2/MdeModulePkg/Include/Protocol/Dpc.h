@@ -1,14 +1,14 @@
 /** @file
 
-  EFI Deferred Procedure Call Protocol
+  EFI Deferred Procedure Call Protocol.
 
-Copyright (c) 2007 - 2008, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+Copyright (c) 2007 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                            
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -34,7 +34,7 @@ typedef struct _EFI_DPC_PROTOCOL  EFI_DPC_PROTOCOL;
 /**
   Invoke a Deferred Procedure Call.
 
-  @param  DpcContext           Pointer to the Deferred Procedure Call's context,
+  @param  DpcContext           The pointer to the Deferred Procedure Call's context,
                                which is implementation dependent.
 
 **/
@@ -47,10 +47,10 @@ VOID
 /**
   Add a Deferred Procedure Call to the end of the DPC queue.
 
-  @param  This          Protocol instance pointer.
+  @param  This          The protocol instance pointer.
   @param  DpcTpl        The EFI_TPL that the DPC should invoke.
-  @param  DpcProcedure  Pointer to the DPC's function.
-  @param  DpcContext    Pointer to the DPC's context.  Passed to DpcProcedure
+  @param  DpcProcedure  The pointer to the DPC's function.
+  @param  DpcContext    The pointer to the DPC's context.  Passed to DpcProcedure
                         when DpcProcedure is invoked.
 
   @retval EFI_SUCCESS            The DPC was queued.
@@ -73,8 +73,8 @@ EFI_STATUS
   Dispatch the queue of DPCs.  
   
   DPCs with DpcTpl value greater than the current TPL value are queued, and then DPCs
-  with DpcTpl value lower than the current TPL value are queued. All DPCs in the first group (higher DpcTpl values) 
-  are invoked before DPCs in the second group (lower DpcTpl values). 
+  with DpcTpl value lower than the current TPL value are queued. All DPCs in the first 
+  group (higher DpcTpl values) are invoked before DPCs in the second group (lower DpcTpl values). 
 
   @param  This  Protocol instance pointer.
 
@@ -89,7 +89,7 @@ EFI_STATUS
   );
 
 ///
-/// DPC Protocol structure
+/// DPC Protocol structure.
 ///
 struct _EFI_DPC_PROTOCOL {
   EFI_DPC_QUEUE_DPC     QueueDpc;
@@ -97,7 +97,7 @@ struct _EFI_DPC_PROTOCOL {
 };
 
 ///
-/// DPC Protocol GUID variable
+/// DPC Protocol GUID variable.
 ///
 extern EFI_GUID gEfiDpcProtocolGuid;
 

@@ -2,14 +2,14 @@
   The variable data structures are related to EDK II-specific implementation of UEFI variables.
   VariableFormat.h defines variable data headers and variable storage region headers.
 
-  Copyright (c) 2006 - 2008 Intel Corporation. <BR>
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                            
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -23,8 +23,8 @@ extern EFI_GUID gEfiVariableGuid;
 
 ///
 /// Alignment of variable name and data, according to the architecture:
-/// * For IA-32 and Intel(R) 64 architectures: 1
-/// * For IA-64 architecture: 8
+/// * For IA-32 and Intel(R) 64 architectures: 1.
+/// * For IA-64 architecture: 8.
 ///
 #if defined (MDE_CPU_IPF)
 #define ALIGNMENT         8
@@ -42,13 +42,13 @@ extern EFI_GUID gEfiVariableGuid;
 #endif
 
 ///
-/// Alignment of Variable Data Header in Variable Store region
+/// Alignment of Variable Data Header in Variable Store region.
 ///
 #define HEADER_ALIGNMENT  4
 #define HEADER_ALIGN(Header)  (((UINTN) (Header) + HEADER_ALIGNMENT - 1) & (~(HEADER_ALIGNMENT - 1)))
 
 ///
-/// Status of Variable Store Region
+/// Status of Variable Store Region.
 ///
 typedef enum {
   EfiRaw,
@@ -62,13 +62,13 @@ typedef enum {
 #define VARIABLE_STORE_SIGNATURE  EFI_VARIABLE_GUID
 
 ///
-/// Variable Store Header Format and State
+/// Variable Store Header Format and State.
 ///
 #define VARIABLE_STORE_FORMATTED          0x5a
 #define VARIABLE_STORE_HEALTHY            0xfe
 
 ///
-/// Variable Store region header
+/// Variable Store region header.
 ///
 typedef struct {
   ///
@@ -81,11 +81,11 @@ typedef struct {
   ///
   UINT32  Size;
   ///
-  /// variable region format state
+  /// Variable region format state.
   ///
   UINT8   Format;
   ///
-  /// variable region healthy state
+  /// Variable region healthy state.
   ///
   UINT8   State;
   UINT16  Reserved;
@@ -93,41 +93,41 @@ typedef struct {
 } VARIABLE_STORE_HEADER;
 
 ///
-/// Variable data start flag
+/// Variable data start flag.
 ///
 #define VARIABLE_DATA                     0x55AA
 
 ///
-/// Variable State flags
+/// Variable State flags.
 ///
-#define VAR_IN_DELETED_TRANSITION     0xfe  ///< Variable is in obsolete transition
-#define VAR_DELETED                   0xfd  ///< Variable is obsolete
-#define VAR_HEADER_VALID_ONLY         0x7f  ///< Variable header has been valid
-#define VAR_ADDED                     0x3f  ///< Variable has been completely added
+#define VAR_IN_DELETED_TRANSITION     0xfe  ///< Variable is in obsolete transition.
+#define VAR_DELETED                   0xfd  ///< Variable is obsolete.
+#define VAR_HEADER_VALID_ONLY         0x7f  ///< Variable header has been valid.
+#define VAR_ADDED                     0x3f  ///< Variable has been completely added.
 
 ///
-/// Single Variable Data Header Structure
+/// Single Variable Data Header Structure.
 ///
 typedef struct {
   ///
-  /// Variable Data Start Flag
+  /// Variable Data Start Flag.
   ///
   UINT16      StartId;
   ///
-  /// Variable State defined above
+  /// Variable State defined above.
   ///
   UINT8       State;
   UINT8       Reserved;
   ///
-  /// Attributes of variable defined in UEFI spec
+  /// Attributes of variable defined in UEFI specification.
   ///
   UINT32      Attributes;
   ///
-  /// Size of variable null-terminated Unicode string name
+  /// Size of variable null-terminated Unicode string name.
   ///
   UINT32      NameSize;
   ///
-  /// Size of the variable data without this header
+  /// Size of the variable data without this header.
   ///
   UINT32      DataSize;
   ///
@@ -146,15 +146,15 @@ typedef struct _VARIABLE_INFO_ENTRY  VARIABLE_INFO_ENTRY;
 /// This is an optional feature to dump all used variables in shell environment. 
 ///
 struct _VARIABLE_INFO_ENTRY {
-  VARIABLE_INFO_ENTRY *Next;       ///< Pointer to next entry
-  EFI_GUID            VendorGuid;  ///< Guid of Variable 
-  CHAR16              *Name;       ///< Name of Variable 
-  UINT32              Attributes;  ///< Attributes of variable defined in UEFI spec
-  UINT32              ReadCount;   ///< Number of times to read this variable
-  UINT32              WriteCount;  ///< Number of times to write this variable
-  UINT32              DeleteCount; ///< Number of times to delete this variable
-  UINT32              CacheCount;  ///< Number of times that cache hits this variable
-  BOOLEAN             Volatile;    ///< TRUE if volatile, FALSE if non-volatile
+  VARIABLE_INFO_ENTRY *Next;       ///< Pointer to next entry.
+  EFI_GUID            VendorGuid;  ///< Guid of Variable.
+  CHAR16              *Name;       ///< Name of Variable. 
+  UINT32              Attributes;  ///< Attributes of variable defined in UEFI specification.
+  UINT32              ReadCount;   ///< Number of times to read this variable.
+  UINT32              WriteCount;  ///< Number of times to write this variable.
+  UINT32              DeleteCount; ///< Number of times to delete this variable.
+  UINT32              CacheCount;  ///< Number of times that cache hits this variable.
+  BOOLEAN             Volatile;    ///< TRUE if volatile, FALSE if non-volatile.
 };
 
 #endif // _EFI_VARIABLE_H_
