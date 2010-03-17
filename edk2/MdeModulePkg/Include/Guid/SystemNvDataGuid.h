@@ -57,7 +57,6 @@ typedef struct {
   /// Write Queue data.
   /// 
   UINT8                WriteQueue[WriteQueueSize];
-  ///
-} EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER;
+  // } EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER;
 
 #endif
