@@ -33,6 +33,7 @@
  
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
   EdkCompatibilityPkg/EdkCompatibilityPkg.dec
 
@@ -57,6 +58,10 @@
   gEfiSmmCpuSaveStateProtocolGuid        # PROTOCOL ALWAYS_CONSUMED
   gEfiMpServiceProtocolGuid              # PROTOCOL ALWAYS_CONSUMED
   gEfiSmmCpuIo2ProtocolGuid              # PROTOCOL ALWAYS_CONSUMED
-  
+  gEfiLoadPeImageProtocolGuid            # PROTOCOL ALWAYS_CONSUMED
+
 [Depex]
-  gEfiSmmCpuProtocolGuid AND gEfiMpServiceProtocolGuid AND gEfiSmmCpuIo2ProtocolGuid
+  gEfiSmmCpuProtocolGuid AND
+  gEfiMpServiceProtocolGuid AND
+  gEfiSmmCpuIo2ProtocolGuid AND
+  gEfiLoadPeImageProtocolGuid
