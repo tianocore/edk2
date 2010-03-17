@@ -304,7 +304,8 @@ IdentifyAtaDevice (
       // Check lowest alignment of logical blocks within physical block
       //
       if ((IdentifyData->alignment_logic_in_phy_blocks & (BIT14 | BIT15)) == BIT14) {
-        BlockMedia->LowestAlignedLba = (EFI_LBA) (IdentifyData->alignment_logic_in_phy_blocks & 0x3fff);
+        BlockMedia->LowestAlignedLba = (EFI_LBA) (BlockMedia->LogicalBlocksPerPhysicalBlock - (IdentifyData->alignment_logic_in_phy_blocks & 0x3fff)) %
+          BlockMedia->LogicalBlocksPerPhysicalBlock;
       }
     }
     //
