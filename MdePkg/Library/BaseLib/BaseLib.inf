@@ -588,7 +588,7 @@
 [Sources.ARM]
   Arm/InternalSwitchStack.c
   Arm/Unaligned.c
-  Math64.c 
+  Math64.c                   | RVCT 
     
   Arm/SwitchStack.asm        | RVCT
   Arm/SetJumpLongJump.asm    | RVCT
@@ -596,8 +596,9 @@
   Arm/EnableInterrupts.asm   | RVCT
   Arm/GetInterruptsState.asm | RVCT
   Arm/CpuPause.asm           | RVCT
-  Arm/CpuBreakpoint.asm
+  Arm/CpuBreakpoint.asm      | RVCT
  
+  Arm/Math64.S                  | GCC
   Arm/GccInline.c               | GCC
   Arm/EnableInterrupts.S        | GCC
   Arm/DisableInterrupts.S       | GCC
