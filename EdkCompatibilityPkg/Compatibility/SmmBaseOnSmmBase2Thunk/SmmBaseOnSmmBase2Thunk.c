@@ -75,6 +75,7 @@ SmmBaseHelperService (
   UINTN DataSize;
 
   mCommunicationData.FunctionData.Status = EFI_UNSUPPORTED;
+  mCommunicationData.FunctionData.SmmBaseImageHandle = mSmmBaseHandle;
 
   if ((mCommunicationData.FunctionData.Function != SmmBaseFunctionCommunicate) && IsInSmm()) {
     ///
@@ -420,6 +421,8 @@ SmmBaseThunkMain (
 {
   EFI_STATUS  Status;
   EFI_EVENT   Event;
+
+  mSmmBaseHandle = ImageHandle;
 
   //
   // Assume only one instance of SMM Base2 Protocol in the system

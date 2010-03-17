@@ -74,9 +74,10 @@ typedef enum {
 } SMMBASE_FUNCTION;
 
 typedef struct {
-  SMMBASE_FUNCTION               Function;
-  EFI_STATUS                     Status;
-  SMMBASE_FUNCTION_ARGS          Args;
+  SMMBASE_FUNCTION       Function;
+  EFI_STATUS             Status;
+  SMMBASE_FUNCTION_ARGS  Args;
+  EFI_HANDLE             SmmBaseImageHandle;
 } SMMBASE_FUNCTION_DATA;
 
 #pragma pack(1)

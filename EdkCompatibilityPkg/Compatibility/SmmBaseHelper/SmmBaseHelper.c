@@ -31,6 +31,7 @@
 #include <Protocol/LoadedImage.h>
 #include <Protocol/SmmCpuSaveState.h>
 #include <Protocol/MpService.h>
+#include <Protocol/LoadPe32Image.h>
 
 ///
 /// Structure for tracking paired information of registered Framework SMI handler
@@ -59,6 +60,7 @@ typedef struct {
 
 EFI_HANDLE                         mDispatchHandle;
 EFI_SMM_CPU_PROTOCOL               *mSmmCpu;
+EFI_PE32_IMAGE_PROTOCOL            *mLoadPe32Image;
 EFI_GUID                           mEfiSmmCpuIoGuid = EFI_SMM_CPU_IO_GUID;
 EFI_SMM_BASE_HELPER_READY_PROTOCOL *mSmmBaseHelperReady;
 EFI_SMM_SYSTEM_TABLE               *mFrameworkSmst;
@@ -174,6 +176,7 @@ ConstructFrameworkSmst (
 /**
   Load a given Framework SMM driver into SMRAM and invoke its entry point.
 
+  @param[in]   ParentImageHandle     Parent Image Handle.
   @param[in]   FilePath              Location of the image to be installed as the handler.
   @param[in]   SourceBuffer          Optional source buffer in case the image file
                                      is in memory.
@@ -189,148 +192,71 @@ ConstructFrameworkSmst (
 **/
 EFI_STATUS
 LoadImage (
+  IN      EFI_HANDLE                ParentImageHandle,
   IN      EFI_DEVICE_PATH_PROTOCOL  *FilePath,
   IN      VOID                      *SourceBuffer,
   IN      UINTN                     SourceSize,
   OUT     EFI_HANDLE                *ImageHandle
   )
 {
-  EFI_STATUS                    Status;
-  UINTN                         PageCount;
-  EFI_PHYSICAL_ADDRESS          Buffer;
-  PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext;
-  EFI_HANDLE                    PesudoImageHandle;
-  UINTN                         NumHandles;
-  UINTN                         Index;
-  EFI_HANDLE                    *HandleBuffer;
-  EFI_LOADED_IMAGE_PROTOCOL     *LoadedImage;
-  EFI_DEVICE_PATH               *LoadedImageDevicePath;
-  UINTN                         DevicePathSize;
+  EFI_STATUS            Status;
+  UINTN                 PageCount;
+  UINTN                 OrgPageCount;
+  EFI_PHYSICAL_ADDRESS  DstBuffer;
 
   if (FilePath == NULL || ImageHandle == NULL) {    
     return EFI_INVALID_PARAMETER;
   }
 
-  ///
-  /// Assume Framework SMM driver has an image copy in memory before registering itself into SMRAM.
-  /// Currently only supports load Framework SMM driver from existing image copy in memory.
-  /// Load PE32 Image Protocol can be used to support loading Framework SMM driver directly from FV.
-  ///
-  if (SourceBuffer == NULL) {
-    Status = gBS->LocateHandleBuffer (
-                    ByProtocol,
-                    &gEfiLoadedImageDevicePathProtocolGuid,
-                    NULL,
-                    &NumHandles,
-                    &HandleBuffer
-                    );
+  PageCount = 1;
+  do {
+    OrgPageCount = PageCount;
+    DstBuffer = (UINTN)-1;
+    Status = gSmst->SmmAllocatePages (
+                      AllocateMaxAddress,
+                      EfiRuntimeServicesCode,
+                      PageCount,
+                      &DstBuffer
+                      );
     if (EFI_ERROR (Status)) {
-      return EFI_UNSUPPORTED;
+      return Status;
     }
 
-    DevicePathSize = GetDevicePathSize (FilePath);
-
-    for (Index = 0; Index < NumHandles; Index++) {
-      Status = gBS->HandleProtocol (
-                      HandleBuffer[Index],
-                      &gEfiLoadedImageDevicePathProtocolGuid,
-                      (VOID **)&LoadedImageDevicePath
-                      );
-      ASSERT_EFI_ERROR (Status);
-
-      if (GetDevicePathSize (LoadedImageDevicePath) == DevicePathSize &&
-          CompareMem (LoadedImageDevicePath, FilePath, DevicePathSize) == 0) {
-          break;
-      }     
+    Status = mLoadPe32Image->LoadPeImage (
+                               mLoadPe32Image,
+                               ParentImageHandle,
+                               FilePath,
+                               SourceBuffer,
+                               SourceSize,
+                               DstBuffer,
+                               &PageCount,
+                               ImageHandle,
+                               NULL,
+                               EFI_LOAD_PE_IMAGE_ATTRIBUTE_NONE
+                               );
+    if (EFI_ERROR (Status)) {
+      FreePages ((VOID *)(UINTN)DstBuffer, OrgPageCount);
     }
+  } while (Status == EFI_BUFFER_TOO_SMALL);
 
-    if (Index < NumHandles) {
-      Status = gBS->HandleProtocol (
-                      HandleBuffer[Index],
-                      &gEfiLoadedImageProtocolGuid,
-                      (VOID **)&LoadedImage
-                      );
-      ASSERT_EFI_ERROR (Status);
-      
-      SourceBuffer = LoadedImage->ImageBase;
-      gBS->FreePool (HandleBuffer);
-    } else {
-      gBS->FreePool (HandleBuffer);
-      return EFI_UNSUPPORTED;
-    }
-  }
-
-  ImageContext.Handle = SourceBuffer;
-  ImageContext.ImageRead = PeCoffLoaderImageReadFromMemory;
-
-  ///
-  /// Get information about the image being loaded
-  ///
-  Status = PeCoffLoaderGetImageInfo (&ImageContext);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  ///
-  /// Allocate buffer for loading image into SMRAM
-  ///
-  PageCount = (UINTN)EFI_SIZE_TO_PAGES (ImageContext.ImageSize + ImageContext.SectionAlignment);
-  Status = gSmst->SmmAllocatePages (AllocateAnyPages, EfiRuntimeServicesCode, PageCount, &Buffer);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  ImageContext.ImageAddress = (PHYSICAL_ADDRESS)Buffer;
-
-  ///
-  /// Align buffer on section boundry
-  ///
-  ImageContext.ImageAddress += ImageContext.SectionAlignment - 1;
-  ImageContext.ImageAddress &= ~(ImageContext.SectionAlignment - 1);
-
-  ///
-  /// Load the image into SMRAM
-  ///
-  Status = PeCoffLoaderLoadImage (&ImageContext);
-  if (EFI_ERROR (Status)) {
-    goto Error;
-  }
-
-  ///
-  /// Relocate the image in our new buffer
-  ///
-  Status = PeCoffLoaderRelocateImage (&ImageContext);
-  if (EFI_ERROR (Status)) {
-    goto Error;
-  }
-
-  ///
-  /// Flush the instruction cache so the image data are written before we execute it
-  ///
-  InvalidateInstructionCacheRange ((VOID *)(UINTN) ImageContext.ImageAddress, (UINTN) ImageContext.ImageSize);
-
-  ///
-  /// Update MP state in Framework SMST before transferring control to Framework SMM driver entry point
-  /// in case it may invoke AP
-  ///
-  mFrameworkSmst->CurrentlyExecutingCpu = gSmst->CurrentlyExecutingCpu;
-
-  ///
-  /// For Framework SMM, ImageHandle does not have to be a UEFI image handle.  The only requirement is that the 
-  /// ImageHandle is a unique value.  Use image base address as the unique value.
-  ///
-  PesudoImageHandle = (EFI_HANDLE)(UINTN)ImageContext.ImageAddress;
-
-  Status = ((EFI_IMAGE_ENTRY_POINT)(UINTN)ImageContext.EntryPoint) (PesudoImageHandle, gST);
   if (!EFI_ERROR (Status)) {
-    *ImageHandle = PesudoImageHandle;
-    return EFI_SUCCESS;
+    ///
+    /// Update MP state in Framework SMST before transferring control to Framework SMM driver entry point
+    /// in case it may invoke AP
+    ///
+    mFrameworkSmst->CurrentlyExecutingCpu = gSmst->CurrentlyExecutingCpu;
+
+    Status = gBS->StartImage (*ImageHandle, NULL, NULL);
+    if (EFI_ERROR (Status)) {
+      mLoadPe32Image->UnLoadPeImage (mLoadPe32Image, *ImageHandle);
+      *ImageHandle = NULL;
+      FreePages ((VOID *)(UINTN)DstBuffer, PageCount);
+    }
   }
 
-Error:
-  FreePages ((VOID *)(UINTN)Buffer, PageCount);
-  return EFI_SUCCESS;
+  return Status;
 }
+
 
 /** 
   Thunk service of EFI_SMM_BASE_PROTOCOL.Register().
@@ -348,6 +274,7 @@ Register (
     Status = EFI_UNSUPPORTED;
   } else {
     Status = LoadImage (
+               FunctionData->SmmBaseImageHandle,
                FunctionData->Args.Register.FilePath,
                FunctionData->Args.Register.SourceBuffer,
                FunctionData->Args.Register.SourceSize,
@@ -733,6 +660,12 @@ SmmBaseHelperMain (
   /// Locate SMM CPU Protocol which is used later to retrieve/update CPU Save States
   ///
   Status = gSmst->SmmLocateProtocol (&gEfiSmmCpuProtocolGuid, NULL, (VOID **) &mSmmCpu);
+  ASSERT_EFI_ERROR (Status);
+
+  ///
+  /// Locate PE32 Image Protocol which is used later to load Framework SMM driver
+  ///
+  Status = SystemTable->BootServices->LocateProtocol (&gEfiLoadPeImageProtocolGuid, NULL, (VOID **) &mLoadPe32Image);
   ASSERT_EFI_ERROR (Status);
 
   //
