@@ -53,7 +53,7 @@ FillVectors
   cmp     r2, #32
   bne     FillVectors
    
-  /* before we call C code, lets setup the stack pointer in internal RAM*/
+  /* before we call C code, lets setup the stack pointer in internal RAM */
 stack_pointer_setup
 
   //
