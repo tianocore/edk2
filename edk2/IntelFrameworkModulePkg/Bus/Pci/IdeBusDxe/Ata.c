@@ -2563,7 +2563,8 @@ AtaEnableLongPhysicalSector (
       //
       if ((AtaIdentifyData->alignment_logic_in_phy_blocks & 0xc000) == 0x4000) {
         IdeDev->BlkIo.Media->LowestAlignedLba =
-          (EFI_LBA) (AtaIdentifyData->alignment_logic_in_phy_blocks & 0x3fff);
+          (EFI_LBA) (IdeDev->BlkIo.Media->LogicalBlocksPerPhysicalBlock - (AtaIdentifyData->alignment_logic_in_phy_blocks & 0x3fff)) %
+          IdeDev->BlkIo.Media->LogicalBlocksPerPhysicalBlock;
       }
     }
     //
