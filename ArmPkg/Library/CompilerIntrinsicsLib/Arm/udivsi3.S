@@ -14,10 +14,9 @@
 
 	.text
 	.align 2
-	.globl ___udivsi3
-___udivsi3:
-	@ args = 0, pretend = 0, frame = 0
-	@ frame_needed = 1, uses_anonymous_args = 0
+	.globl ASM_PFX(__udivsi3)
+
+ASM_PFX(__udivsi3):
 	cmp	r1, #0
 	cmpne	r0, #0
 	stmfd	sp!, {r4, r5, r7, lr}
@@ -55,3 +54,4 @@ L8:
 L2:
 	mov	r0, #0
 	ldmfd	sp!, {r4, r5, r7, pc}
+

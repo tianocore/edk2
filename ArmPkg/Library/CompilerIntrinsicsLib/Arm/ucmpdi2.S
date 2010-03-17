@@ -14,10 +14,9 @@
 
 	.text
 	.align 2
-	.globl ___ucmpdi2
-___ucmpdi2:
-	@ args = 0, pretend = 0, frame = 0
-	@ frame_needed = 0, uses_anonymous_args = 0
+	.globl ASM_PFX(__ucmpdi2)
+	
+ASM_PFX(__ucmpdi2):
 	stmfd	sp!, {r4, r5, r8, lr}
 	cmp	r1, r3
 	mov	r8, r0

@@ -87,6 +87,8 @@
   Arm/switch16.S   | GCC
   Arm/switch32.S   | GCC
 
+  Arm/sourcery.S   | GCC
+  Arm/uldivmod.c   | GCC
 
 [Packages]
   MdePkg/MdePkg.dec

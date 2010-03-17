@@ -14,10 +14,9 @@
 
 	.text
 	.align 2
-	.globl ___udivmoddi4
-___udivmoddi4:
-	@ args = 8, pretend = 0, frame = 16
-	@ frame_needed = 1, uses_anonymous_args = 0
+	.globl ASM_PFX(__udivmoddi4)
+	
+ASM_PFX(__udivmoddi4):
 	stmfd	sp!, {r4, r5, r6, r7, lr}
 	add	r7, sp, #12
 	stmfd	sp!, {r10, r11}
@@ -35,7 +34,7 @@ ___udivmoddi4:
 	cmp	r6, #0
 	beq	L8
 	mov	r1, r2
-	bl	___umodsi3
+	bl	ASM_PFX(__umodsi3)
 	mov	r1, #0
 	stmia	r6, {r0-r1}
 L8:
@@ -58,14 +57,14 @@ L4:
 	beq	L16
 	mov	r1, r2
 	mov	r0, r11
-	bl	___umodsi3
+	bl	ASM_PFX(__umodsi3)
 	mov	r1, #0
 	stmia	r6, {r0-r1}
 L16:
 	ldr	r1, [sp, #4]
 	mov	r0, r11
 L45:
-	bl	___udivsi3
+	bl	ASM_PFX(__udivsi3)
 L46:
 	mov	r10, r0
 	mov	r11, #0
@@ -77,7 +76,7 @@ L14:
 	beq	L16
 	ldr	r1, [sp, #4]
 	mov	r0, r11
-	bl	___umodsi3
+	bl	ASM_PFX(__umodsi3)
 	mov	r4, r10
 	mov	r5, r0
 	stmia	r6, {r4-r5}

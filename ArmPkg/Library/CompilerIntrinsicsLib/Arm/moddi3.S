@@ -14,10 +14,9 @@
 
 	.text
 	.align 2
-	.globl ___moddi3
-___moddi3:
-	@ args = 0, pretend = 0, frame = 8
-	@ frame_needed = 1, uses_anonymous_args = 0
+	.globl ASM_PFX(__moddi3)
+
+ASM_PFX(__moddi3):
 	stmfd	sp!, {r4, r5, r7, lr}
 	mov	r4, r1, asr #31
 	add	r7, sp, #8
@@ -36,7 +35,7 @@ ___moddi3:
 	subs	r2, r2, r10
 	sbc	r3, r3, r11
 	str	ip, [sp, #0]
-	bl	___udivmoddi4
+	bl	ASM_PFX(__udivmoddi4)
 	ldrd	r0, [sp, #8]
 	eor	r0, r0, r4
 	eor	r1, r1, r4
