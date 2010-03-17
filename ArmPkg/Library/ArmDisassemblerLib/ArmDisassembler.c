@@ -37,11 +37,10 @@ CHAR8 *gCondition[] = {
   "2"
 };
 
-#define COND(_a)  gCondition[(_a) >> 28]
+#define COND(_a)  gCondition[((_a) >> 28)]
 
 CHAR8 *gReg[] = {
   "r0",
-  "r1",
   "r2",
   "r3",
   "r4",
@@ -225,7 +224,7 @@ DisassembleArmInstruction (
     if ((OpCode & 0xfd70f000 ) == 0xf550f000) {
       Index = AsciiSPrint (Buf, Size, "PLD");
     } else {
-      Index = AsciiSPrint (Buf, Size, "%a%a%a%a %a, ", L ? "LDR" : "STR", COND (OpCode), BYTE (B), (!P & W) ? "T":"", gReg[Rd]); 
+      Index = AsciiSPrint (Buf, Size, "%a%a%a%a %a, ", L ? "LDR" : "STR", COND (OpCode), BYTE (B), (!(P) && W) ? "T":"", gReg[Rd]); 
     }
     if (P) {
       if (!I) {
