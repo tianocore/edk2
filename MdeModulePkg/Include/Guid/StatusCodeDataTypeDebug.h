@@ -2,14 +2,14 @@
   This file defines the GUID and data structure used to pass DEBUG() macro 
   information to the Status Code Protocol and Status Code PPI.
 
-  Copyright (c) 2007 - 2009, Intel Corporation
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+Copyright (c) 2007 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                            
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -17,7 +17,7 @@
 #define _STATUS_CODE_DATA_TYPE_DEBUG_H_
 
 ///
-/// Global ID used to identify a structure of type EFI_DEBUG_INFO
+/// The Global ID used to identify a structure of type EFI_DEBUG_INFO.
 ///
 #define EFI_STATUS_CODE_DATA_TYPE_DEBUG_GUID \
   { \
@@ -25,14 +25,14 @@
   }
 
 ///
-/// The maximum size of an EFI_DEBUG_INFO structure
+/// The maximum size of an EFI_DEBUG_INFO structure.
 ///
 #define EFI_STATUS_CODE_DATA_MAX_SIZE 200
 
 ///
 /// This structure contains the ErrorLevel passed into the DEBUG() macro, followed 
 /// by a 96-byte buffer that contains the variable argument list passed to the 
-//  DEBUG() macro that has been converted to a BASE_LIST.  The 96-byte buffer is 
+/// DEBUG() macro that has been converted to a BASE_LIST.  The 96-byte buffer is 
 /// followed by a Null-terminated ASCII string that is the Format string passed 
 /// to the DEBUG() macro.  The maximum size of this structure is defined by 
 /// EFI_STATUS_CODE_DATA_MAX_SIZE.

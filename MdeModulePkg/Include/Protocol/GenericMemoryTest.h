@@ -1,13 +1,13 @@
 /** @file
   This protocol defines the generic memory test interfaces in Dxe phase.
 
-Copyright (c) 2006 - 2009, Intel Corporation. <BR>
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                            
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -21,8 +21,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 typedef struct _EFI_GENERIC_MEMORY_TEST_PROTOCOL  EFI_GENERIC_MEMORY_TEST_PROTOCOL;
 
 ///
-/// Memory test coverage level
-/// Ignore chooses not to test memory, Quick and Sparse test some memory, and Extensive performs a detailed memory test.
+/// Memory test coverage level.
+/// Ignore chooses not to test memory. Quick and Sparse test some memory, and Extensive performs a detailed memory test.
 ///
 typedef enum {
   IGNORE,
@@ -36,7 +36,7 @@ typedef enum {
 /**
   Initialize the generic memory test.
 
-  @param  This                Protocol instance pointer. 
+  @param  This                The protocol instance pointer. 
   @param  Level               The coverage level of the memory test. 
   @param  RequireSoftECCInit  Indicate if the memory need software ECC init. 
 
@@ -56,7 +56,7 @@ EFI_STATUS
 /**
   Perform the memory test.
 
-  @param  This                Protocol instance pointer. 
+  @param  This                The protocol instance pointer. 
   @param  TestedMemorySize    Return the tested extended memory size. 
   @param  TotalMemorySize     Return the whole system physical memory size. 
                               The total memory size does not include memory in a slot with a disabled DIMM.  
@@ -82,7 +82,7 @@ EFI_STATUS
 /**
   Finish the memory test.
 
-  @param  This                Protocol instance pointer. 
+  @param  This                The protocol instance pointer. 
 
   @retval EFI_SUCCESS         Success. All resources used in the memory test are freed.
 
@@ -96,7 +96,7 @@ EFI_STATUS
 /**
   Provides the capability to test the compatible range used by some special drivers.
 
-  @param  This                Protocol instance pointer. 
+  @param  This                The protocol instance pointer. 
   @param  StartAddress        The start address of the compatible memory range that
                               must be below 16M.
   @param  Length              The compatible memory range's length. 

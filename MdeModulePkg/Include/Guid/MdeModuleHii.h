@@ -1,13 +1,13 @@
 /** @file
   EDKII extented HII IFR guid opcodes.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                            
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -20,13 +20,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define NON_BREAKING_CHAR   0xFFF2
 
 ///
-/// State defined for password statemachine 
+/// State defined for password statemachine .
 ///
 #define BROWSER_STATE_VALIDATE_PASSWORD  0
 #define BROWSER_STATE_SET_PASSWORD       1
 
 ///
-/// GUIDed opcodes defined for EDKII implementation
+/// GUIDed opcodes defined for EDKII implementation.
 ///
 #define EFI_IFR_TIANO_GUID \
   { 0xf0b1735, 0x87a0, 0x4193, {0xb2, 0x66, 0x53, 0x8c, 0x38, 0xaf, 0x48, 0xce} }
@@ -43,20 +43,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define EFI_IFR_EXTEND_OP_SUBCLASS    0x4
 
 ///
-/// Label opcode
+/// Label opcode.
 ///
 typedef struct _EFI_IFR_GUID_LABEL {
   EFI_IFR_OP_HEADER   Header;
   ///
-  /// EFI_IFR_TIANO_GUID
+  /// EFI_IFR_TIANO_GUID.
   ///
   EFI_GUID            Guid;
   ///
-  /// EFI_IFR_EXTEND_OP_LABEL
+  /// EFI_IFR_EXTEND_OP_LABEL.
   ///
   UINT8               ExtendOpCode;
   ///
-  /// Label Number
+  /// Label Number.
   ///
   UINT16              Number;
 } EFI_IFR_GUID_LABEL;
@@ -66,37 +66,37 @@ typedef struct _EFI_IFR_GUID_LABEL {
 #define EFI_IFR_BANNER_ALIGN_RIGHT    2
 
 ///
-/// Banner opcode
+/// Banner opcode.
 ///
 typedef struct _EFI_IFR_GUID_BANNER {
   EFI_IFR_OP_HEADER   Header;
   ///
-  /// EFI_IFR_TIANO_GUID
+  /// EFI_IFR_TIANO_GUID.
   ///
   EFI_GUID            Guid;
   ///
   /// EFI_IFR_EXTEND_OP_BANNER
   ///
   UINT8               ExtendOpCode;
-  EFI_STRING_ID       Title;        ///< The string token for the banner title
-  UINT16              LineNumber;   ///< 1-based line number
-  UINT8               Alignment;    ///< left, center, or right-aligned
+  EFI_STRING_ID       Title;        ///< The string token for the banner title.
+  UINT16              LineNumber;   ///< 1-based line number.
+  UINT8               Alignment;    ///< left, center, or right-aligned.
 } EFI_IFR_GUID_BANNER;
 
 ///
-/// Timeout opcode
+/// Timeout opcode.
 ///
 typedef struct _EFI_IFR_GUID_TIMEOUT {
   EFI_IFR_OP_HEADER   Header;
   ///
-  /// EFI_IFR_TIANO_GUID
+  /// EFI_IFR_TIANO_GUID.
   ///
   EFI_GUID            Guid;
   ///
-  /// EFI_IFR_EXTEND_OP_TIMEOUT
+  /// EFI_IFR_EXTEND_OP_TIMEOUT.
   ///
   UINT8               ExtendOpCode;
-  UINT16              TimeOut;       ///< TimeOut Value
+  UINT16              TimeOut;       ///< TimeOut Value.
 } EFI_IFR_GUID_TIMEOUT;
 
 #define EFI_NON_DEVICE_CLASS              0x00
@@ -108,19 +108,19 @@ typedef struct _EFI_IFR_GUID_TIMEOUT {
 #define EFI_OTHER_DEVICE_CLASS            0x20
 
 ///
-/// Device Class opcode
+/// Device Class opcode.
 ///
 typedef struct _EFI_IFR_GUID_CLASS {
   EFI_IFR_OP_HEADER   Header;
   ///
-  /// EFI_IFR_TIANO_GUID
+  /// EFI_IFR_TIANO_GUID.
   ///
   EFI_GUID            Guid;
   ///
-  /// EFI_IFR_EXTEND_OP_CLASS
+  /// EFI_IFR_EXTEND_OP_CLASS.
   ///
   UINT8               ExtendOpCode;
-  UINT16              Class;           ///< Device Class from the above
+  UINT16              Class;           ///< Device Class from the above.
 } EFI_IFR_GUID_CLASS;
 
 #define EFI_SETUP_APPLICATION_SUBCLASS    0x00
@@ -134,14 +134,14 @@ typedef struct _EFI_IFR_GUID_CLASS {
 typedef struct _EFI_IFR_GUID_SUBCLASS {
   EFI_IFR_OP_HEADER   Header;
   ///
-  /// EFI_IFR_TIANO_GUID
+  /// EFI_IFR_TIANO_GUID.
   ///
   EFI_GUID            Guid;
   ///
-  /// EFI_IFR_EXTEND_OP_SUBCLASS
+  /// EFI_IFR_EXTEND_OP_SUBCLASS.
   ///
   UINT8               ExtendOpCode;
-  UINT16              SubClass;      ///< Sub Class type from the above
+  UINT16              SubClass;      ///< Sub Class type from the above.
 } EFI_IFR_GUID_SUBCLASS;
 
 ///
@@ -152,27 +152,27 @@ typedef struct _EFI_IFR_GUID_SUBCLASS {
 
 ///
 /// Two extended opcodes are added, and new extensions can be added here later.
-/// One is for framework OneOf question Option Key value,
-/// Another is for framework vareqval.
+/// One is for framework OneOf question Option Key value;
+/// another is for framework vareqval.
 ///
 #define EFI_IFR_EXTEND_OP_OPTIONKEY   0x0
 #define EFI_IFR_EXTEND_OP_VAREQNAME   0x1
 
 ///
-/// Store the framework vfr option key value
+/// Store the framework vfr option key value.
 ///
 typedef struct _EFI_IFR_GUID_OPTIONKEY {
   EFI_IFR_OP_HEADER   Header;
   ///
-  /// EFI_IFR_FRAMEWORK_GUID
+  /// EFI_IFR_FRAMEWORK_GUID.
   ///
   EFI_GUID            Guid;
   ///
-  /// EFI_IFR_EXTEND_OP_OPTIONKEY
+  /// EFI_IFR_EXTEND_OP_OPTIONKEY.
   ///
   UINT8               ExtendOpCode;
   ///
-  /// OneOf Questiond ID binded by OneOf Option
+  /// OneOf Questiond ID binded by OneOf Option.
   ///
   EFI_QUESTION_ID     QuestionId;
   ///
@@ -186,16 +186,16 @@ typedef struct _EFI_IFR_GUID_OPTIONKEY {
 } EFI_IFR_GUID_OPTIONKEY;
 
 ///
-/// Store the framework vfr vareqval name number
+/// Store the framework vfr vareqval name number.
 ///
 typedef struct _EFI_IFR_GUID_VAREQNAME {
   EFI_IFR_OP_HEADER   Header;
   ///
-  /// EFI_IFR_FRAMEWORK_GUID
+  /// EFI_IFR_FRAMEWORK_GUID.
   ///
   EFI_GUID            Guid;
   ///
-  /// EFI_IFR_EXTEND_OP_VAREQNAME
+  /// EFI_IFR_EXTEND_OP_VAREQNAME.
   ///
   UINT8               ExtendOpCode;
   ///
@@ -204,8 +204,8 @@ typedef struct _EFI_IFR_GUID_VAREQNAME {
   EFI_QUESTION_ID     QuestionId;
   ///
   /// For vareqval (0x100), NameId is 0x100.
-  /// This value will converte to a Unicode String following this rule.
-  ///            sprintf(StringBuffer, "%d", NameId)
+  /// This value will convert to a Unicode String following this rule;
+  ///            sprintf(StringBuffer, "%d", NameId) .
   /// The the Unicode String will be used as a EFI Variable Name.
   ///
   UINT16              NameId;

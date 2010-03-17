@@ -1,16 +1,16 @@
 /** @file
   This file defines performance-related definitions, including the format of:
-  * performance GUID HOB
-  * performance protocol interfaces
+  * performance GUID HOB.
+  * performance protocol interfaces.
   * performance variables.  
 
-Copyright (c) 2009, Intel Corporation. <BR>
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+Copyright (c) 2009 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                            
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -26,17 +26,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 typedef struct {
   EFI_PHYSICAL_ADDRESS  Handle;
-  CHAR8                 Token[PEI_PERFORMANCE_STRING_SIZE];   ///< Measured token string name 
-  CHAR8                 Module[PEI_PERFORMANCE_STRING_SIZE];  ///< Module string name
-  UINT64                StartTimeStamp;                       ///< Start time point
-  UINT64                EndTimeStamp;                         ///< End time point
+  CHAR8                 Token[PEI_PERFORMANCE_STRING_SIZE];   ///< Measured token string name. 
+  CHAR8                 Module[PEI_PERFORMANCE_STRING_SIZE];  ///< Module string name.
+  UINT64                StartTimeStamp;                       ///< Start time point.
+  UINT64                EndTimeStamp;                         ///< End time point.
 } PEI_PERFORMANCE_LOG_ENTRY;
 
 //
 // The header must be aligned at 8 bytes.
 // 
 typedef struct {
-  UINT32                NumberOfEntries;  ///< The number of all performance log entries
+  UINT32                NumberOfEntries;  ///< The number of all performance log entries.
   UINT32                Reserved;
 } PEI_PERFORMANCE_LOG_HEADER;
 
@@ -86,17 +86,17 @@ typedef struct _PERFORMANCE_PROTOCOL PERFORMANCE_PROTOCOL;
 
 typedef struct {
   EFI_PHYSICAL_ADDRESS  Handle;
-  CHAR8                 Token[DXE_PERFORMANCE_STRING_SIZE];  ///< Measured token string name 
-  CHAR8                 Module[DXE_PERFORMANCE_STRING_SIZE]; ///< Module string name
-  UINT64                StartTimeStamp;                      ///< Start time point
-  UINT64                EndTimeStamp;                        ///< End time point
+  CHAR8                 Token[DXE_PERFORMANCE_STRING_SIZE];  ///< Measured token string name. 
+  CHAR8                 Module[DXE_PERFORMANCE_STRING_SIZE]; ///< Module string name.
+  UINT64                StartTimeStamp;                      ///< Start time point.
+  UINT64                EndTimeStamp;                        ///< End time point.
 } GAUGE_DATA_ENTRY;
 
 //
 // The header must be aligned at 8 bytes
 //
 typedef struct {
-  UINT32                NumberOfEntries; ///< The number of all performance gauge entries
+  UINT32                NumberOfEntries; ///< The number of all performance gauge entries.
   UINT32                Reserved;
 } GAUGE_DATA_HEADER;
 
@@ -110,13 +110,13 @@ typedef struct {
   If TimeStamp is zero, the start time in the record is filled in with the value
   read from the current time stamp.
 
-  @param  Handle                  Pointer to environment specific context used
+  @param  Handle                  The pointer to environment specific context used
                                   to identify the component being measured.
-  @param  Token                   Pointer to a Null-terminated ASCII string
+  @param  Token                   The pointer to a Null-terminated ASCII string
                                   that identifies the component being measured.
-  @param  Module                  Pointer to a Null-terminated ASCII string
+  @param  Module                  The pointer to a Null-terminated ASCII string
                                   that identifies the module being measured.
-  @param  TimeStamp               64-bit time stamp.
+  @param  TimeStamp               The 64-bit time stamp.
 
   @retval EFI_SUCCESS             The data was read correctly from the device.
   @retval EFI_OUT_OF_RESOURCES    There are not enough resources to record the measurement.
@@ -136,20 +136,20 @@ EFI_STATUS
   for the first matching record that contains a zero end time and fills in a valid end time.
 
   Searches the performance measurement log from the beginning of the log
-  for the first record that matches Handle, Token, and Module and has an end time value of zero.
+  for the first record that matches Handle, Token, and Module, and has an end time value of zero.
   If the record can not be found then return EFI_NOT_FOUND.
   If the record is found and TimeStamp is not zero,
   then the end time in the record is filled in with the value specified by TimeStamp.
   If the record is found and TimeStamp is zero, then the end time in the matching record
   is filled in with the current time stamp value.
 
-  @param  Handle                  Pointer to environment specific context used
+  @param  Handle                  The pointer to environment specific context used
                                   to identify the component being measured.
-  @param  Token                   Pointer to a Null-terminated ASCII string
+  @param  Token                   The pointer to a Null-terminated ASCII string
                                   that identifies the component being measured.
-  @param  Module                  Pointer to a Null-terminated ASCII string
+  @param  Module                  The pointer to a Null-terminated ASCII string
                                   that identifies the module being measured.
-  @param  TimeStamp               64-bit time stamp.
+  @param  TimeStamp               The 64-bit time stamp.
 
   @retval EFI_SUCCESS             The end of  the measurement was recorded.
   @retval EFI_NOT_FOUND           The specified measurement record could not be found.

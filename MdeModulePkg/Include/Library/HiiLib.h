@@ -1,14 +1,14 @@
 /** @file
   Public include file for the HII Library
 
-  Copyright (c) 2007 - 2010, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+Copyright (c) 2007 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                            
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
 **/
 
@@ -47,7 +47,7 @@
   @param[in]  ...              The variable argument list that contains pointers 
                                to packages terminated by a NULL.
 
-  @retval NULL   A HII Handle has already been registered in the HII Database with
+  @retval NULL   An HII Handle has already been registered in the HII Database with
                  the same PackageListGuid.
   @retval NULL   The HII Handle could not be created.
   @retval NULL   An empty list of packages was passed in.
@@ -131,7 +131,7 @@ HiiSetString (
 /**
   Retrieves a string from a string package in a specific language.  If the language
   is not specified, then a string from a string package in the current platform 
-  language is retrieved.  If the string can not be retrieved using the specified 
+  language is retrieved.  If the string cannot be retrieved using the specified 
   language or the current platform language, then the string is retrieved from 
   the string package in the first language the string package supports.  The 
   returned string is allocated using AllocatePool().  The caller is responsible 
@@ -164,7 +164,7 @@ HiiGetString (
 /**
   Retrieves a string from a string package named by GUID, in the specified language.  
   If the language is not specified, then a string from a string package in the 
-  current platform  language is retrieved.  If the string can not be retrieved 
+  current platform  language is retrieved.  If the string cannot be retrieved 
   using the specified language or the current platform language, then the string 
   is retrieved from the string package in the first language the string package 
   supports.  The returned string is allocated using AllocatePool().  The caller 
@@ -259,19 +259,19 @@ HiiGetSupportedLanguages (
 
     GUID=<HexCh>32&NAME=<Char>NameLength&PATH=<HexChar>DevicePathSize<Null>
 
-  @param[in]  Guid          Pointer to an EFI_GUID that is the routing information
+  @param[in]  Guid          The pointer to an EFI_GUID that is the routing information
                             GUID.  Each of the 16 bytes in Guid is converted to 
                             a 2 Unicode character hexidecimal string.  This is 
                             an optional parameter that may be NULL.
-  @param[in]  Name          Pointer to a Null-terminated Unicode string that is 
+  @param[in]  Name          The pointer to a Null-terminated Unicode string that is 
                             the routing information NAME.  This is an optional 
                             parameter that may be NULL.  Each 16-bit Unicode 
                             character in Name is converted to a 4 character Unicode 
                             hexidecimal string.                        
-  @param[in]  DriverHandle  The driver handle which supports a Device Path Protocol
+  @param[in]  DriverHandle  The driver handle that supports a Device Path Protocol
                             that is the routing information PATH.  Each byte of
                             the Device Path associated with DriverHandle is converted
-                            to a 2 Unicode character hexidecimal string.
+                            to a two (Unicode) character hexidecimal string.
 
   @retval NULL   DriverHandle does not support the Device Path Protocol.
   @retval NULL   DriverHandle does not support the Device Path Protocol.
@@ -295,7 +295,7 @@ HiiConstructConfigHdr (
   
   @param Request    A null-terminated Unicode string in 
                     <MultiConfigRequest> format. It can be NULL.
-                    If it is NULL, all configuration for the
+                    If it is NULL, all configurations for the
                     entirety of the current HII database will be reset.
   @param DefaultId  Specifies the type of defaults to retrieve.
   
@@ -320,8 +320,8 @@ HiiSetToDefaults (
                     If it is NULL, all current configurations for the
                     entirety of the current HII database will be validated.
   
-  @retval TURE    Current configuration is valid.
-  @retval FALSE   Current configuration is invalid.
+  @retval TURE    The current configuration is valid.
+  @retval FALSE   The current configuration is invalid.
 **/
 BOOLEAN
 EFIAPI                               
@@ -335,8 +335,8 @@ HiiValidateSettings (
   If ConfigHdr is NULL, then ASSERT().
 
   @param[in] ConfigHdr  Either <ConfigRequest> or <ConfigResp>.
-  @param[in] Guid       GUID of the storage.
-  @param[in] Name       NAME of the storage.
+  @param[in] Guid       The GUID of the storage.
+  @param[in] Name       The NAME of the storage.
 
   @retval TRUE   Routing information matches <ConfigHdr>.
   @retval FALSE  Routing information does not match <ConfigHdr>.
@@ -354,12 +354,12 @@ HiiIsConfigHdrMatch (
   Retrieves uncommitted data from the Form Browser and converts it to a binary
   buffer.
 
-  @param[in]  VariableGuid  Pointer to an EFI_GUID structure.  This is an optional 
+  @param[in]  VariableGuid  The pointer to an EFI_GUID structure.  This is an optional 
                             parameter that may be NULL.
-  @param[in]  VariableName  Pointer to a Null-terminated Unicode string.  This 
+  @param[in]  VariableName  The pointer to a Null-terminated Unicode string.  This 
                             is an optional parameter that may be NULL.
-  @param[in]  BufferSize    Length in bytes of buffer to hold retrieved data. 
-  @param[out] Buffer        Buffer of data to be updated.
+  @param[in]  BufferSize    The length in bytes of buffer to hold retrieved data. 
+  @param[out] Buffer        The buffer of data to be updated.
 
   @retval FALSE  The uncommitted data could not be retrieved.
   @retval TRUE   The uncommitted data was retrieved.
@@ -379,12 +379,12 @@ HiiGetBrowserData (
 
   If Buffer is NULL, then ASSERT().
 
-  @param[in]  VariableGuid    Pointer to an EFI_GUID structure.  This is an optional
+  @param[in]  VariableGuid    The pointer to an EFI_GUID structure.  This is an optional
                               parameter that may be NULL.
-  @param[in]  VariableName    Pointer to a Null-terminated Unicode string.  This
+  @param[in]  VariableName    The pointer to a Null-terminated Unicode string.  This
                               is an optional parameter that may be NULL.
-  @param[in]  BufferSize      Length, in bytes, of Buffer.
-  @param[in]  Buffer          Buffer of data to commit.
+  @param[in]  BufferSize      The length, in bytes, of Buffer.
+  @param[in]  Buffer          The buffer of data to commit.
   @param[in]  RequestElement  An optional field to specify which part of the
                               buffer data will be send back to Browser. If NULL,
                               the whole buffer of data will be committed to
@@ -415,7 +415,7 @@ HiiSetBrowserData (
   Returns a UINT64 value that contains bitfields for Hour, Minute, and Second.
   The lower 8-bits of Hour are placed in bits 0..7.  The lower 8-bits of Minute 
   are placed in bits 8..15, and the lower 8-bits of Second are placed in bits 
-  16..23.  This format is selected because it can be easily translated to 
+  16..23.  This format was selected because it can be easily translated to 
   an EFI_HII_TIME structure in an EFI_IFR_TYPE_VALUE union.
 
   @param  Hour    The hour value to be encoded.
@@ -431,7 +431,7 @@ HiiSetBrowserData (
   Returns a UINT64 value that contains bit fields for Year, Month, and Day.
   The lower 16-bits of Year are placed in bits 0..15.  The lower 8-bits of Month 
   are placed in bits 16..23, and the lower 8-bits of Day are placed in bits 
-  24..31.  This format is selected because it can be easily translated to 
+  24..31.  This format was selected because it can be easily translated to 
   an EFI_HII_DATE structure in an EFI_IFR_TYPE_VALUE union.
 
   @param  Year   The year value to be encoded.
@@ -464,7 +464,7 @@ HiiAllocateOpCodeHandle (
 
   If OpCodeHandle is NULL, then ASSERT().
 
-  @param[in]  OpCodeHandle   Handle to the buffer of opcodes.
+  @param[in]  OpCodeHandle   The handle to the buffer of opcodes.
 
 **/
 VOID
@@ -479,8 +479,8 @@ HiiFreeOpCodeHandle (
   If OpCodeHandle is NULL, then ASSERT().
   If RawBuffer is NULL, then ASSERT();
 
-  @param[in]  OpCodeHandle   Handle to the buffer of opcodes.
-  @param[in]  RawBuffer      Buffer of opcodes to append.
+  @param[in]  OpCodeHandle   The handle to the buffer of opcodes.
+  @param[in]  RawBuffer      The buffer of opcodes to append.
   @param[in]  RawBufferSize  The size, in bytes, of Buffer.
 
   @retval NULL   There is not enough space left in Buffer to add the opcode.
@@ -519,11 +519,11 @@ HiiCreateEndOpCode (
   If Type is invalid, then ASSERT().
   If Flags is invalid, then ASSERT().
 
-  @param[in]  OpCodeHandle  Handle to the buffer of opcodes.
-  @param[in]  StringId      StringId for the option
-  @param[in]  Flags         Flags for the option
-  @param[in]  Type          Type for the option
-  @param[in]  Value         Value for the option
+  @param[in]  OpCodeHandle  The handle to the buffer of opcodes.
+  @param[in]  StringId      StringId for the option.
+  @param[in]  Flags         The flags for the option.
+  @param[in]  Type          The type for the option.
+  @param[in]  Value         The value for the option.
 
   @retval NULL   There is not enough space left in Buffer to add the opcode.
   @retval Other  A pointer to the created opcode.
@@ -545,10 +545,10 @@ HiiCreateOneOfOptionOpCode (
   If OpCodeHandle is NULL, then ASSERT().
   If Type is invalid, then ASSERT().
 
-  @param[in]  OpCodeHandle  Handle to the buffer of opcodes.
-  @param[in]  DefaultId     DefaultId for the default
-  @param[in]  Type          Type for the default
-  @param[in]  Value         Value for the default
+  @param[in]  OpCodeHandle  The handle to the buffer of opcodes.
+  @param[in]  DefaultId     The DefaultId for the default.
+  @param[in]  Type          The type for the default.
+  @param[in]  Value         The value for the default.
 
   @retval NULL   There is not enough space left in Buffer to add the opcode.
   @retval Other  A pointer to the created opcode.
@@ -570,9 +570,9 @@ HiiCreateDefaultOpCode (
   If Guid is NULL, then ASSERT().
   If OpCodeSize < sizeof (EFI_IFR_GUID), then ASSERT().
 
-  @param[in]  OpCodeHandle  Handle to the buffer of opcodes.
-  @param[in]  Guid          Pointer to EFI_GUID of this guided opcode.
-  @param[in]  GuidOpCode    Pointer to an EFI_IFR_GUID opcode.  This is an 
+  @param[in]  OpCodeHandle  The handle to the buffer of opcodes.
+  @param[in]  Guid          The pointer to EFI_GUID of this guided opcode.
+  @param[in]  GuidOpCode    The pointer to an EFI_IFR_GUID opcode.  This is an 
                             optional parameter that may be NULL.  If this
                             parameter is NULL, then the GUID extension 
                             region of the created opcode is filled with zeros.
@@ -601,12 +601,12 @@ HiiCreateGuidOpCode (
   If OpCodeHandle is NULL, then ASSERT().
   If any reserved bits are set in QuestionFlags, then ASSERT().
 
-  @param[in]  OpCodeHandle  Handle to the buffer of opcodes.
-  @param[in]  QuestionId      Question ID
-  @param[in]  Prompt          String ID for Prompt
-  @param[in]  Help            String ID for Help
-  @param[in]  QuestionFlags   Flags in Question Header
-  @param[in]  QuestionConfig  String ID for configuration
+  @param[in]  OpCodeHandle  The handle to the buffer of opcodes.
+  @param[in]  QuestionId      The Question ID.
+  @param[in]  Prompt          The String ID for Prompt.
+  @param[in]  Help            The String ID for Help.
+  @param[in]  QuestionFlags   The flags in the Question Header.
+  @param[in]  QuestionConfig  The String ID for the configuration.
 
   @retval NULL   There is not enough space left in Buffer to add the opcode.
   @retval Other  A pointer to the created opcode.
@@ -630,10 +630,10 @@ HiiCreateActionOpCode (
   If any reserved bits are set in Flags, then ASSERT().
   If Scope > 1, then ASSERT().
 
-  @param[in]  OpCodeHandle  Handle to the buffer of opcodes.
-  @param[in]  Prompt      String ID for Prompt
-  @param[in]  Help        String ID for Help
-  @param[in]  Flags       Subtitle opcode flags
+  @param[in]  OpCodeHandle  The handle to the buffer of opcodes.
+  @param[in]  Prompt      The string ID for Prompt.
+  @param[in]  Help        The string ID for Help.
+  @param[in]  Flags       The subtitle opcode flags.
   @param[in]  Scope       1 if this opcode is the beginning of a new scope.
                           0 if this opcode is within the current scope.
 
@@ -657,12 +657,12 @@ HiiCreateSubTitleOpCode (
   If OpCodeHandle is NULL, then ASSERT().
   If any reserved bits are set in QuestionFlags, then ASSERT().
 
-  @param[in]  OpCodeHandle   Handle to the buffer of opcodes.
-  @param[in]  FormId         Destination Form ID
-  @param[in]  Prompt         String ID for Prompt
-  @param[in]  Help           String ID for Help
-  @param[in]  QuestionFlags  Flags in Question Header
-  @param[in]  QuestionId     Question ID
+  @param[in]  OpCodeHandle   The handle to the buffer of opcodes.
+  @param[in]  FormId         The Destination Form ID.
+  @param[in]  Prompt         The string ID for Prompt.
+  @param[in]  Help           The string ID for Help.
+  @param[in]  QuestionFlags  The flags in Question Header
+  @param[in]  QuestionId     Question ID.
 
   @retval NULL   There is not enough space left in Buffer to add the opcode.
   @retval Other  A pointer to the created opcode.
@@ -686,15 +686,15 @@ HiiCreateGotoOpCode (
   If any reserved bits are set in QuestionFlags, then ASSERT().
   If any reserved bits are set in CheckBoxFlags, then ASSERT().
 
-  @param[in]  OpCodeHandle          Handle to the buffer of opcodes.
-  @param[in]  QuestionId            Question ID
-  @param[in]  VarStoreId            Storage ID
-  @param[in]  VarOffset             Offset in Storage
-  @param[in]  Prompt                String ID for Prompt
-  @param[in]  Help                  String ID for Help
-  @param[in]  QuestionFlags         Flags in Question Header
-  @param[in]  CheckBoxFlags         Flags for checkbox opcode
-  @param[in]  DefaultsOpCodeHandle  Handle for a buffer of DEFAULT opcodes.  This
+  @param[in]  OpCodeHandle          The handle to the buffer of opcodes.
+  @param[in]  QuestionId            The question ID.
+  @param[in]  VarStoreId            The storage ID.
+  @param[in]  VarOffset             The offset in Storage.
+  @param[in]  Prompt                The string ID for Prompt.
+  @param[in]  Help                  The string ID for Help.
+  @param[in]  QuestionFlags         The flags in Question Header.
+  @param[in]  CheckBoxFlags         The flags for checkbox opcode.
+  @param[in]  DefaultsOpCodeHandle  The handle for a buffer of DEFAULT opcodes.  This
                                     is an optional parameter that may be NULL.
 
   @retval NULL   There is not enough space left in Buffer to add the opcode.
@@ -722,18 +722,18 @@ HiiCreateCheckBoxOpCode (
   If any reserved bits are set in QuestionFlags, then ASSERT().
   If any reserved bits are set in NumericFlags, then ASSERT().
 
-  @param[in]  OpCodeHandle          Handle to the buffer of opcodes.
-  @param[in]  QuestionId            Question ID
-  @param[in]  VarStoreId            Storage ID
-  @param[in]  VarOffset             Offset in Storage
-  @param[in]  Prompt                String ID for Prompt
-  @param[in]  Help                  String ID for Help
-  @param[in]  QuestionFlags         Flags in Question Header
-  @param[in]  NumericFlags          Flags for numeric opcode
-  @param[in]  Minimum               Numeric minimum value
-  @param[in]  Maximum               Numeric maximum value
-  @param[in]  Step                  Numeric step for edit
-  @param[in]  DefaultsOpCodeHandle  Handle for a buffer of DEFAULT opcodes.  This
+  @param[in]  OpCodeHandle          The handle to the buffer of opcodes.
+  @param[in]  QuestionId            The question ID.
+  @param[in]  VarStoreId            The storage ID.
+  @param[in]  VarOffset             The offset in Storage.
+  @param[in]  Prompt                The string ID for Prompt.
+  @param[in]  Help                  The string ID for Help.
+  @param[in]  QuestionFlags         The flags in Question Header.
+  @param[in]  NumericFlags          The flags for a numeric opcode.
+  @param[in]  Minimum               The numeric minimum value.
+  @param[in]  Maximum               The numeric maximum value.
+  @param[in]  Step                  The numeric step for edit.
+  @param[in]  DefaultsOpCodeHandle  The handle for a buffer of DEFAULT opcodes.  This
                                     is an optional parameter that may be NULL.
 
   @retval NULL   There is not enough space left in Buffer to add the opcode.
@@ -764,17 +764,17 @@ HiiCreateNumericOpCode (
   If any reserved bits are set in QuestionFlags, then ASSERT().
   If any reserved bits are set in StringFlags, then ASSERT().
 
-  @param[in]  OpCodeHandle          Handle to the buffer of opcodes.
-  @param[in]  QuestionId            Question ID
-  @param[in]  VarStoreId            Storage ID
-  @param[in]  VarOffset             Offset in Storage
-  @param[in]  Prompt                String ID for Prompt
-  @param[in]  Help                  String ID for Help
-  @param[in]  QuestionFlags         Flags in Question Header
-  @param[in]  StringFlags           Flags for string opcode
-  @param[in]  MinSize               String minimum length
-  @param[in]  MaxSize               String maximum length
-  @param[in]  DefaultsOpCodeHandle  Handle for a buffer of DEFAULT opcodes.  This
+  @param[in]  OpCodeHandle          The handle to the buffer of opcodes.
+  @param[in]  QuestionId            The question ID.
+  @param[in]  VarStoreId            The storage ID.
+  @param[in]  VarOffset             The offset in Storage.
+  @param[in]  Prompt                The string ID for Prompt.
+  @param[in]  Help                  The string ID for Help.
+  @param[in]  QuestionFlags         The flags in Question Header.
+  @param[in]  StringFlags           The flags for a string opcode.
+  @param[in]  MinSize               The string minimum length.
+  @param[in]  MaxSize               The string maximum length.
+  @param[in]  DefaultsOpCodeHandle  The handle for a buffer of DEFAULT opcodes.  This
                                     is an optional parameter that may be NULL.
 
   @retval NULL   There is not enough space left in Buffer to add the opcode.
@@ -804,16 +804,16 @@ HiiCreateStringOpCode (
   If any reserved bits are set in QuestionFlags, then ASSERT().
   If any reserved bits are set in OneOfFlags, then ASSERT().
 
-  @param[in]  OpCodeHandle          Handle to the buffer of opcodes.
-  @param[in]  QuestionId            Question ID
-  @param[in]  VarStoreId            Storage ID
-  @param[in]  VarOffset             Offset in Storage
-  @param[in]  Prompt                String ID for Prompt
-  @param[in]  Help                  String ID for Help
-  @param[in]  QuestionFlags         Flags in Question Header
-  @param[in]  OneOfFlags            Flags for oneof opcode
-  @param[in]  OptionsOpCodeHandle   Handle for a buffer of ONE_OF_OPTION opcodes.
-  @param[in]  DefaultsOpCodeHandle  Handle for a buffer of DEFAULT opcodes.  This
+  @param[in]  OpCodeHandle          The handle to the buffer of opcodes.
+  @param[in]  QuestionId            The question ID.
+  @param[in]  VarStoreId            The storage ID.
+  @param[in]  VarOffset             The offset in Storage.
+  @param[in]  Prompt                The string ID for Prompt.
+  @param[in]  Help                  The string ID for Help.
+  @param[in]  QuestionFlags         The flags in Question Header.
+  @param[in]  OneOfFlags            The flags for a oneof opcode.
+  @param[in]  OptionsOpCodeHandle   The handle for a buffer of ONE_OF_OPTION opcodes.
+  @param[in]  DefaultsOpCodeHandle  The handle for a buffer of DEFAULT opcodes.  This
                                     is an optional parameter that may be NULL.
 
   @retval NULL   There is not enough space left in Buffer to add the opcode.
@@ -842,17 +842,17 @@ HiiCreateOneOfOpCode (
   If any reserved bits are set in QuestionFlags, then ASSERT().
   If any reserved bits are set in OrderedListFlags, then ASSERT().
 
-  @param[in]  OpCodeHandle          Handle to the buffer of opcodes.
-  @param[in]  QuestionId            Question ID
-  @param[in]  VarStoreId            Storage ID
-  @param[in]  VarOffset             Offset in Storage
-  @param[in]  Prompt                String ID for Prompt
-  @param[in]  Help                  String ID for Help
-  @param[in]  QuestionFlags         Flags in Question Header
-  @param[in]  OrderedListFlags      Flags for ordered list opcode
-  @param[in]  DataType              Type for option value
+  @param[in]  OpCodeHandle          The handle to the buffer of opcodes.
+  @param[in]  QuestionId            The question ID.
+  @param[in]  VarStoreId            The storage ID.
+  @param[in]  VarOffset             The offset in Storage.
+  @param[in]  Prompt                The string ID for Prompt.
+  @param[in]  Help                  The string ID for Help.
+  @param[in]  QuestionFlags         The flags in Question Header.
+  @param[in]  OrderedListFlags      The flags for an ordered list opcode.
+  @param[in]  DataType              The type for option value.
   @param[in]  MaxContainers         Maximum count for options in this ordered list
-  @param[in]  OptionsOpCodeHandle   Handle for a buffer of ONE_OF_OPTION opcodes.
+  @param[in]  OptionsOpCodeHandle   The handle for a buffer of ONE_OF_OPTION opcodes.
   @param[in]  DefaultsOpCodeHandle  Handle for a buffer of DEFAULT opcodes.  This
                                     is an optional parameter that may be NULL.
 

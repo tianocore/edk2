@@ -2,10 +2,10 @@
   This library is only intended to be used by UEFI network stack modules.
   It provides basic functions for the UEFI network stack.
 
-Copyright (c) 2005 - 2010, Intel Corporation
+Copyright (c) 2005 - 2010, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
+which accompanies this distribution.  The full text of the license may be found at<BR>
 http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -282,7 +282,7 @@ typedef struct {
                  by the Format string.
 
   @return        The buffer containing the formatted message,
-                 or NULL if failed to allocate memory.
+                 or NULL if memory allocation failed.
 
 **/
 CHAR8 *
@@ -410,8 +410,8 @@ NetIp6IsValidUnicast (
 
   @param[in] Ip6   - Ip6 address, in network order.
 
-  @retval TRUE     - Yes, unspecified
-  @retval FALSE    - No
+  @retval TRUE     - Yes, incoming Ipv6 address is the unspecified address.
+  @retval FALSE    - The incoming Ipv6 address is not the unspecified address
 
 **/
 BOOLEAN
@@ -424,8 +424,8 @@ NetIp6IsUnspecifiedAddr (
 
   @param[in] Ip6   - Ip6 address, in network order.
 
-  @retval TRUE  - Yes, link-local address
-  @retval FALSE - No
+  @retval TRUE  - The incoming Ipv6 address is a link-local address.
+  @retval FALSE - The incoming Ipv6 address is not a link-local address.
 
 **/
 BOOLEAN
@@ -440,8 +440,8 @@ NetIp6IsLinkLocalAddr (
   @param[in] Ip2          - Ip6 address2, in network order.
   @param[in] PrefixLength - The prefix length of the checking net.
 
-  @retval TRUE            - Yes, connected.
-  @retval FALSE           - No.
+  @retval TRUE            - Yes, the Ipv6 address1 and address2 are connected.
+  @retval FALSE           - No the Ipv6 address1 and address2 are not connected.
 
 **/
 BOOLEAN
@@ -452,13 +452,13 @@ NetIp6IsNetEqual (
   );
 
 /**
-  Switches the endianess of an IPv6 address
+  Switches the endianess of an IPv6 address.
 
   This function swaps the bytes in a 128-bit IPv6 address to switch the value
   from little endian to big endian or vice versa. The byte swapped value is
   returned.
 
-  @param  Ip6 Points to an IPv6 address
+  @param  Ip6 Points to an IPv6 address.
 
   @return The byte swapped IPv6 address.
 
@@ -503,10 +503,10 @@ NetGetUint32 (
 /**
   Puts a UINT32 into the byte stream in network byte order.
 
-  Converts a UINT32 from host byte order to network byte order, and then copies it to the
+  Converts a UINT32 from host byte order to network byte order, then copies it to the
   byte stream.
 
-  @param[in, out]  Buf          The buffer to put the UINT32.
+  @param[in, out]  Buf          The buffer in which to put the UINT32.
   @param[in]      Data          The data to put.
 
 **/
@@ -908,8 +908,8 @@ EFI_STATUS
   @param[in]  CallBack              The callback function to call for each item.
   @param[in]  Arg                   The opaque parameter to the callback.
 
-  @retval EFI_SUCCESS            There is no item in the netmap or CallBack for each item
-                                 return EFI_SUCCESS.
+  @retval EFI_SUCCESS            There is no item in the netmap, or CallBack for each item
+                                 returns EFI_SUCCESS.
   @retval Others                 It returns the CallBack's last return value.
 
 **/
@@ -963,7 +963,7 @@ NetLibCreateServiceChild (
   @param[in]   ServiceBindingGuid    The service's Guid.
   @param[in]   ChildHandle           The child to destroy.
 
-  @retval EFI_SUCCESS           The child is successfully destroyed.
+  @retval EFI_SUCCESS           The child was destroyed.
   @retval Others                Failed to destroy the child.
 
 **/
@@ -1051,7 +1051,7 @@ NetLibGetVlanHandle (
   @param[out]  MacAddress       The pointer to store the returned MAC address.
   @param[out]  AddressSize      The length of returned MAC address.
 
-  @retval EFI_SUCCESS           MAC address is returned successfully.
+  @retval EFI_SUCCESS           MAC address was returned successfully.
   @retval Others                Failed to get SNP mode data.
 
 **/
@@ -1073,14 +1073,14 @@ NetLibGetMacAddress (
   Plus one unicode character for the null-terminator.
 
   @param[in]   ServiceHandle         The handle where network service binding protocol is
-                                     installed on.
+                                     installed.
   @param[in]   ImageHandle           The image handle used to act as the agent handle to
                                      get the simple network protocol.
   @param[out]  MacString             The pointer to store the address of the string
                                      representation of  the mac address.
 
-  @retval EFI_SUCCESS           Convert the mac address a unicode string successfully.
-  @retval EFI_OUT_OF_RESOURCES  There are not enough memory resource.
+  @retval EFI_SUCCESS           Converted the mac address a unicode string successfully.
+  @retval EFI_OUT_OF_RESOURCES  There are not enough memory resources.
   @retval Others                Failed to open the simple network protocol.
 
 **/
@@ -1097,26 +1097,26 @@ NetLibGetMacString (
 
   The underlying UNDI driver may or may not support reporting media status from
   GET_STATUS command (PXE_STATFLAGS_GET_STATUS_NO_MEDIA_SUPPORTED). This routine
-  will try to invoke Snp->GetStatus() to get the media status: if media already
-  present, it return directly; if media not present, it will stop SNP and then
-  restart SNP to get the latest media status, this give chance to get the correct
-  media status for old UNDI driver which doesn't support reporting media status
-  from GET_STATUS command.
-  Note: there will be two limitations for current algorithm:
-  1) for UNDI with this capability, in case of cable is not attached, there will
-     be an redundant Stop/Start() process;
-  2) for UNDI without this capability, in case cable is attached in UNDI
-     initialize while unattached latter, NetLibDetectMedia() will report
-     MediaPresent as TRUE, this cause upper layer apps wait for timeout time.
+  will try to invoke Snp->GetStatus() to get the media status. Iif media is already
+  present, it returns directly. If media  isnot present, it will stop SNP and then
+  restart SNP to get the latest media status.  This provides an opportunity to get 
+  the correct media status for old UNDI driver, which doesn't support reporting 
+  media status from GET_STATUS command.
+  Note: there are two limitations for the current algorithm:
+  1) For UNDI with this capability, when the cable is not attached, there will
+     be an redundant Stop/Start() process.
+  2) For UNDI without this capability, when the cable is attached, the UNDI
+     initializes while unattached. Later, NetLibDetectMedia() will report
+     MediaPresent as TRUE, causing upper layer apps to wait for timeout time.
 
   @param[in]   ServiceHandle    The handle where network service binding protocols are
-                                installed on.
+                                installed.
   @param[out]  MediaPresent     The pointer to store the media status.
 
   @retval EFI_SUCCESS           Media detection success.
-  @retval EFI_INVALID_PARAMETER ServiceHandle is not valid network device handle.
-  @retval EFI_UNSUPPORTED       Network device does not support media detection.
-  @retval EFI_DEVICE_ERROR      SNP is in unknown state.
+  @retval EFI_INVALID_PARAMETER ServiceHandle is not a valid network device handle.
+  @retval EFI_UNSUPPORTED       The network device does not support media detection.
+  @retval EFI_DEVICE_ERROR      SNP is in an unknown state.
 
 **/
 EFI_STATUS
@@ -1132,9 +1132,9 @@ NetLibDetectMedia (
   The header type of IPv4 device path node is MESSAGING_DEVICE_PATH.
   The header subtype of IPv4 device path node is MSG_IPv4_DP.
   The length of the IPv4 device path node in bytes is 19.
-  Get other info from parameters to make up the whole IPv4 device path node.
+  Get other information from parameters to make up the whole IPv4 device path node.
 
-  @param[in, out]  Node                  Pointer to the IPv4 device path node.
+  @param[in, out]  Node                  The pointer to the IPv4 device path node.
   @param[in]       Controller            The controller handle.
   @param[in]       LocalIp               The local IPv4 address.
   @param[in]       LocalPort             The local port.
@@ -1163,9 +1163,9 @@ NetLibCreateIPv4DPathNode (
   The header type of IPv6 device path node is MESSAGING_DEVICE_PATH.
   The header subtype of IPv6 device path node is MSG_IPv6_DP.
   The length of the IPv6 device path node in bytes is 43.
-  Get other info from parameters to make up the whole IPv6 device path node.
+  Get other information from parameters to make up the whole IPv6 device path node.
 
-  @param[in, out]  Node                  Pointer to the IPv6 device path node.
+  @param[in, out]  Node                  The pointer to the IPv6 device path node.
   @param[in]       Controller            The controller handle.
   @param[in]       LocalIp               The local IPv6 address.
   @param[in]       LocalPort             The local port.
@@ -1192,13 +1192,13 @@ NetLibCreateIPv6DPathNode (
 
   For example, IP will open an MNP child to transmit/receive
   packets. When MNP is stopped, IP should also be stopped. IP
-  needs to find its own private data which is related the IP's
-  service binding instance that is install on UNDI/SNP handle.
-  Now, the controller is either a MNP or ARP child handle. But
-  IP opens these handle BY_DRIVER, use that info, we can get the
+  needs to find its own private data that is related the IP's
+  service binding instance that is installed on the UNDI/SNP handle.
+  The controller is then either an MNP or an ARP child handle. Note that
+  IP opens these handles using BY_DRIVER. Use that infomation to get the
   UNDI/SNP handle.
 
-  @param[in]  Controller            Then protocol handle to check.
+  @param[in]  Controller            The protocol handle to check.
   @param[in]  ProtocolGuid          The protocol that is related with the handle.
 
   @return The UNDI/SNP handle or NULL for errors.
@@ -1235,8 +1235,8 @@ NetLibDefaultUnload (
   @param[in]      String         The pointer to the Ascii string.
   @param[out]     Ip4Address     The pointer to the converted IPv4 address.
 
-  @retval EFI_SUCCESS            Convert to IPv4 address successfully.
-  @retval EFI_INVALID_PARAMETER  The string is mal-formated or Ip4Address is NULL.
+  @retval EFI_SUCCESS            Converted to an IPv4 address successfully.
+  @retval EFI_INVALID_PARAMETER  The string is malformated, or Ip4Address is NULL.
 
 **/
 EFI_STATUS
@@ -1252,8 +1252,8 @@ NetLibAsciiStrToIp4 (
   @param[in]      String         The pointer to the Ascii string.
   @param[out]     Ip6Address     The pointer to the converted IPv6 address.
 
-  @retval EFI_SUCCESS            Convert to IPv6 address successfully.
-  @retval EFI_INVALID_PARAMETER  The string is mal-formated or Ip6Address is NULL.
+  @retval EFI_SUCCESS            Converted to an IPv6 address successfully.
+  @retval EFI_INVALID_PARAMETER  The string is malformated, or Ip6Address is NULL.
 
 **/
 EFI_STATUS
@@ -1268,9 +1268,9 @@ NetLibAsciiStrToIp6 (
   @param[in]      String         The pointer to the Ascii string.
   @param[out]     Ip4Address     The pointer to the converted IPv4 address.
 
-  @retval EFI_SUCCESS            Convert to IPv4 address successfully.
+  @retval EFI_SUCCESS            Converted to an IPv4 address successfully.
   @retval EFI_INVALID_PARAMETER  The string is mal-formated or Ip4Address is NULL.
-  @retval EFI_OUT_OF_RESOURCES   Fail to perform the operation due to lack of resource.
+  @retval EFI_OUT_OF_RESOURCES   Failed to perform the operation due to lack of resources.
 
 **/
 EFI_STATUS
@@ -1286,9 +1286,9 @@ NetLibStrToIp4 (
   @param[in]      String         The pointer to the Ascii string.
   @param[out]     Ip6Address     The pointer to the converted IPv6 address.
 
-  @retval EFI_SUCCESS            Convert to IPv6 address successfully.
-  @retval EFI_INVALID_PARAMETER  The string is mal-formated or Ip6Address is NULL.
-  @retval EFI_OUT_OF_RESOURCES   Fail to perform the operation due to lack of resource.
+  @retval EFI_SUCCESS            Converted to an IPv6 address successfully.
+  @retval EFI_INVALID_PARAMETER  The string is malformated or Ip6Address is NULL.
+  @retval EFI_OUT_OF_RESOURCES   Failed to perform the operation due to a lack of resources.
 
 **/
 EFI_STATUS
@@ -1306,9 +1306,9 @@ NetLibStrToIp6 (
   @param[out]     Ip6Address     The pointer to the converted IPv6 address.
   @param[out]     PrefixLength   The pointer to the converted prefix length.
 
-  @retval EFI_SUCCESS            Convert to IPv6 address successfully.
-  @retval EFI_INVALID_PARAMETER  The string is mal-formated or Ip6Address is NULL.
-  @retval EFI_OUT_OF_RESOURCES   Fail to perform the operation due to lack of resource.
+  @retval EFI_SUCCESS            Converted to an  IPv6 address successfully.
+  @retval EFI_INVALID_PARAMETER  The string is malformated, or Ip6Address is NULL.
+  @retval EFI_OUT_OF_RESOURCES   Failed to perform the operation due to a lack of resources.
 
 **/
 EFI_STATUS
@@ -1475,8 +1475,8 @@ typedef struct {
 
   @param[in]  Len              The length of the block.
 
-  @return                      Pointer to the allocated NET_BUF, or NULL if the
-                               allocation failed due to resource limit.
+  @return                      The pointer to the allocated NET_BUF, or NULL if the
+                               allocation failed due to resource limitations.
 
 **/
 NET_BUF  *
@@ -1494,7 +1494,7 @@ NetbufAlloc (
   vector by one, and performs the resource free operation when the reference count
   of the net vector is 0.
 
-  @param[in]  Nbuf                  Pointer to the NET_BUF to be freed.
+  @param[in]  Nbuf                  The pointer to the NET_BUF to be freed.
 
 **/
 VOID
@@ -1511,12 +1511,12 @@ NetbufFree (
   also can be used to get the fragment that contains the byte used
   mainly by the library implementation itself.
 
-  @param[in]   Nbuf      Pointer to the net buffer.
+  @param[in]   Nbuf      The pointer to the net buffer.
   @param[in]   Offset    The offset of the byte.
   @param[out]  Index     Index of the NET_BLOCK_OP that contains the byte at
                          Offset.
 
-  @return       Pointer to the Offset'th byte of data in the net buffer, or NULL
+  @return       The pointer to the Offset'th byte of data in the net buffer, or NULL
                 if there is no such data in the net buffer.
 
 **/
@@ -1534,10 +1534,10 @@ NetbufGetByte (
   The reference count of the newly created net buffer is set to 1. The reference
   count of the associated net vector is increased by one.
 
-  @param[in]  Nbuf              Pointer to the net buffer to be cloned.
+  @param[in]  Nbuf              The pointer to the net buffer to be cloned.
 
-  @return                       Pointer to the cloned net buffer, or NULL if the
-                                allocation failed due to resource limit.
+  @return                       The pointer to the cloned net buffer, or NULL if the
+                                allocation failed due to resource limitations.
 
 **/
 NET_BUF *
@@ -1553,13 +1553,13 @@ NetbufClone (
   The duplicated net buffer will allocate its own memory to hold the data of the
   source net buffer.
 
-  @param[in]       Nbuf         Pointer to the net buffer to be duplicated from.
-  @param[in, out]  Duplicate    Pointer to the net buffer to duplicate to, if
-                                NULL a new net buffer is allocated.
-  @param[in]      HeadSpace     Length of the head space to reserve.
+  @param[in]       Nbuf         The pointer to the net buffer to be duplicated from.
+  @param[in, out]  Duplicate    The pointer to the net buffer to duplicate to. If
+                                NULL, a new net buffer is allocated.
+  @param[in]      HeadSpace     The length of the head space to reserve.
 
-  @return                       Pointer to the duplicated net buffer, or NULL if
-                                the allocation failed due to resource limit.
+  @return                       The pointer to the duplicated net buffer, or NULL if
+                                the allocation failed due to resource limitations.
 
 **/
 NET_BUF  *
@@ -1575,16 +1575,16 @@ NetbufDuplicate (
   Offset.
 
   A new NET_BUF structure will be created but the associated data in NET_VECTOR
-  is shared. This function exists to do IP packet fragmentation.
+  is shared. This function exists to perform IP packet fragmentation.
 
-  @param[in]  Nbuf         Pointer to the net buffer to be extracted.
+  @param[in]  Nbuf         The pointer to the net buffer to be extracted.
   @param[in]  Offset       Starting point of the data to be included in the new
                            net buffer.
-  @param[in]  Len          Bytes of data to be included in the new net buffer.
-  @param[in]  HeadSpace    Bytes of head space to reserve for protocol header.
+  @param[in]  Len          The bytes of data to be included in the new net buffer.
+  @param[in]  HeadSpace    The bytes of the head space to reserve for the protocol header.
 
-  @return                  Pointer to the cloned net buffer, or NULL if the
-                           allocation failed due to resource limit.
+  @return                  The pointer to the cloned net buffer, or NULL if the
+                           allocation failed due to resource limitations.
 
 **/
 NET_BUF  *
@@ -1600,11 +1600,11 @@ NetbufGetFragment (
   Reserve some space in the header room of the net buffer.
 
   Upon allocation, all the space is in the tail room of the buffer. Call this
-  function to move some space to the header room. This function is quite limited
+  function to move space to the header room. This function is quite limited
   in that it can only reserve space from the first block of an empty NET_BUF not
-  built from the external. But it should be enough for the network stack.
+  built from the external. However, it should be enough for the network stack.
 
-  @param[in, out]  Nbuf     Pointer to the net buffer.
+  @param[in, out]  Nbuf     The pointer to the net buffer.
   @param[in]       Len      The length of buffer to be reserved from the header.
 
 **/
@@ -1618,13 +1618,13 @@ NetbufReserve (
 /**
   Allocate Len bytes of space from the header or tail of the buffer.
 
-  @param[in, out]  Nbuf       Pointer to the net buffer.
+  @param[in, out]  Nbuf       The pointer to the net buffer.
   @param[in]       Len        The length of the buffer to be allocated.
-  @param[in]       FromHead   The flag to indicate whether reserve the data
+  @param[in]       FromHead   The flag to indicate whether to reserve the data
                               from head (TRUE) or tail (FALSE).
 
-  @return                     Pointer to the first byte of the allocated buffer,
-                              or NULL if there is no sufficient space.
+  @return                     The pointer to the first byte of the allocated buffer,
+                              or NULL, if there is no sufficient space.
 
 **/
 UINT8*
@@ -1636,14 +1636,14 @@ NetbufAllocSpace (
   );
 
 /**
-  Trim Len bytes from the header or tail of the net buffer.
+  Trim Len bytes from the header or the tail of the net buffer.
 
-  @param[in, out]  Nbuf         Pointer to the net buffer.
+  @param[in, out]  Nbuf         The pointer to the net buffer.
   @param[in]       Len          The length of the data to be trimmed.
-  @param[in]      FromHead      The flag to indicate whether trim data from head
-                                (TRUE) or tail (FALSE).
+  @param[in]      FromHead      The flag to indicate whether trim data is from the 
+                                head (TRUE) or the tail (FALSE).
 
-  @return    Length of the actually trimmed data, which may be less
+  @return    The length of the actual trimmed data, which may be less
              than Len if the TotalSize of Nbuf is less than Len.
 
 **/
@@ -1661,9 +1661,9 @@ NetbufTrim (
 
   The Len bytes of data may cross several fragments of the net buffer.
 
-  @param[in]   Nbuf         Pointer to the net buffer.
+  @param[in]   Nbuf         The pointer to the net buffer.
   @param[in]   Offset       The sequence number of the first byte to copy.
-  @param[in]   Len          Length of the data to copy.
+  @param[in]   Len          The length of the data to copy.
   @param[in]   Dest         The destination of the data to copy to.
 
   @return           The length of the actual copied data, or 0 if the offset
@@ -1687,16 +1687,16 @@ NetbufCopy (
   and existing HeadLen bytes of header, but the external blocks are shared by the
   net buffer to avoid data copying.
 
-  @param[in]  ExtFragment           Pointer to the data block.
+  @param[in]  ExtFragment           The pointer to the data block.
   @param[in]  ExtNum                The number of the data blocks.
   @param[in]  HeadSpace             The head space to be reserved.
   @param[in]  HeadLen               The length of the protocol header. The function
                                     pulls this amount of data into a linear block.
-  @param[in]  ExtFree               Pointer to the caller-provided free function.
+  @param[in]  ExtFree               The pointer to the caller-provided free function.
   @param[in]  Arg                   The argument passed to ExtFree when ExtFree is
                                     called.
 
-  @return                  Pointer to the net buffer built from the data blocks,
+  @return                  The pointer to the net buffer built from the data blocks,
                            or NULL if the allocation failed due to resource
                            limit.
 
@@ -1716,13 +1716,13 @@ NetbufFromExt (
   Build a fragment table to contain the fragments in the net buffer. This is the
   opposite operation of the NetbufFromExt.
 
-  @param[in]       Nbuf                  Point to the net buffer.
-  @param[in, out]  ExtFragment           Pointer to the data block.
+  @param[in]       Nbuf                  Points to the net buffer.
+  @param[in, out]  ExtFragment           The pointer to the data block.
   @param[in, out]  ExtNum                The number of the data blocks.
 
   @retval EFI_BUFFER_TOO_SMALL  The number of non-empty blocks is bigger than
                                 ExtNum.
-  @retval EFI_SUCCESS           Fragment table is built successfully.
+  @retval EFI_SUCCESS           The fragment table was built successfully.
 
 **/
 EFI_STATUS
@@ -1736,17 +1736,17 @@ NetbufBuildExt (
 /**
   Build a net buffer from a list of net buffers.
 
-  All the fragments will be collected from the list of NEW_BUF and then a new
+  All the fragments will be collected from the list of NEW_BUF, and then a new
   net buffer will be created through NetbufFromExt.
 
   @param[in]   BufList    A List of the net buffer.
   @param[in]   HeadSpace  The head space to be reserved.
   @param[in]   HeaderLen  The length of the protocol header. The function
                           pulls this amount of data into a linear block.
-  @param[in]   ExtFree    Pointer to the caller provided free function.
+  @param[in]   ExtFree    The pointer to the caller provided free function.
   @param[in]   Arg        The argument passed to ExtFree when ExtFree is called.
 
-  @return                 Pointer to the net buffer built from the list of net
+  @return                 The pointer to the net buffer built from the list of net
                           buffers.
 
 **/
@@ -1763,7 +1763,7 @@ NetbufFromBufList (
 /**
   Free a list of net buffers.
 
-  @param[in, out]  Head              Pointer to the head of linked net buffers.
+  @param[in, out]  Head              The pointer to the head of linked net buffers.
 
 **/
 VOID
@@ -1775,7 +1775,7 @@ NetbufFreeList (
 /**
   Initiate the net buffer queue.
 
-  @param[in, out]  NbufQue   Pointer to the net buffer queue to be initialized.
+  @param[in, out]  NbufQue   The pointer to the net buffer queue to be initialized.
 
 **/
 VOID
@@ -1787,7 +1787,7 @@ NetbufQueInit (
 /**
   Allocate and initialize a net buffer queue.
 
-  @return         Pointer to the allocated net buffer queue, or NULL if the
+  @return         The pointer to the allocated net buffer queue, or NULL if the
                   allocation failed due to resource limit.
 
 **/
@@ -1804,7 +1804,7 @@ NetbufQueAlloc (
   free operation isn't performed until the reference count of the net buffer
   queue is decreased to 0.
 
-  @param[in]  NbufQue               Pointer to the net buffer queue to be freed.
+  @param[in]  NbufQue               The pointer to the net buffer queue to be freed.
 
 **/
 VOID
@@ -1816,9 +1816,9 @@ NetbufQueFree (
 /**
   Remove a net buffer from the head in the specific queue and return it.
 
-  @param[in, out]  NbufQue               Pointer to the net buffer queue.
+  @param[in, out]  NbufQue               The pointer to the net buffer queue.
 
-  @return           Pointer to the net buffer removed from the specific queue,
+  @return           The pointer to the net buffer removed from the specific queue,
                     or NULL if there is no net buffer in the specific queue.
 
 **/
@@ -1831,8 +1831,8 @@ NetbufQueRemove (
 /**
   Append a net buffer to the net buffer queue.
 
-  @param[in, out]  NbufQue            Pointer to the net buffer queue.
-  @param[in, out]  Nbuf               Pointer to the net buffer to be appended.
+  @param[in, out]  NbufQue            The pointer to the net buffer queue.
+  @param[in, out]  Nbuf               The pointer to the net buffer to be appended.
 
 **/
 VOID
@@ -1846,12 +1846,12 @@ NetbufQueAppend (
   Copy Len bytes of data from the net buffer queue at the specific offset to the
   destination memory.
 
-  The copying operation is the same as NetbufCopy but applies to the net buffer
+  The copying operation is the same as NetbufCopy, but applies to the net buffer
   queue instead of the net buffer.
 
-  @param[in]   NbufQue         Pointer to the net buffer queue.
+  @param[in]   NbufQue         The pointer to the net buffer queue.
   @param[in]   Offset          The sequence number of the first byte to copy.
-  @param[in]   Len             Length of the data to copy.
+  @param[in]   Len             The length of the data to copy.
   @param[out]  Dest            The destination of the data to copy to.
 
   @return       The length of the actual copied data, or 0 if the offset
@@ -1874,8 +1874,8 @@ NetbufQueCopy (
   The trimming operation is the same as NetbufTrim but applies to the net buffer
   queue instead of the net buffer.
 
-  @param[in, out]  NbufQue               Pointer to the net buffer queue.
-  @param[in]       Len                   Length of the data to trim.
+  @param[in, out]  NbufQue               The pointer to the net buffer queue.
+  @param[in]       Len                   The length of the data to trim.
 
   @return   The actual length of the data trimmed.
 
@@ -1891,7 +1891,7 @@ NetbufQueTrim (
 /**
   Flush the net buffer queue.
 
-  @param[in, out]  NbufQue               Pointer to the queue to be flushed.
+  @param[in, out]  NbufQue               The pointer to the queue to be flushed.
 
 **/
 VOID
@@ -1903,8 +1903,8 @@ NetbufQueFlush (
 /**
   Compute the checksum for a bulk of data.
 
-  @param[in]   Bulk                  Pointer to the data.
-  @param[in]   Len                   Length of the data, in bytes.
+  @param[in]   Bulk                  The pointer to the data.
+  @param[in]   Len                   The length of the data, in bytes.
 
   @return    The computed checksum.
 
@@ -1935,7 +1935,7 @@ NetAddChecksum (
 /**
   Compute the checksum for a NET_BUF.
 
-  @param[in]   Nbuf                  Pointer to the net buffer.
+  @param[in]   Nbuf                  The pointer to the net buffer.
 
   @return    The computed checksum.
 
@@ -1969,7 +1969,7 @@ NetPseudoHeadChecksum (
   );
 
 /**
-  Compute the checksum for TCP6/UDP6 pseudo header.
+  Compute the checksum for the TCP6/UDP6 pseudo header.
 
   Src and Dst are in network byte order, and Len is in host byte order.
 

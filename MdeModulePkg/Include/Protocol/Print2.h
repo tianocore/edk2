@@ -3,13 +3,13 @@
   This print protocol defines six basic print functions to 
   print the format unicode and ascii string.
 
-Copyright (c) 2006 - 2010, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                            
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -222,7 +222,7 @@ UINTN
   If both COMMA_TYPE and RADIX_HEX are set in Flags, then ASSERT().
   If Width >= MAXIMUM_VALUE_CHARACTERS, then ASSERT()
 
-  @param  Buffer  Pointer to the output buffer for the produced Null-terminated
+  @param  Buffer  The pointer to the output buffer for the produced Null-terminated
                   Unicode string.
   @param  Flags   The bitmask of flags that specify left justification, zero pad, and commas.
   @param  Value   The 64-bit signed value to convert to a string.
@@ -432,7 +432,7 @@ UINTN
   If both COMMA_TYPE and RADIX_HEX are set in Flags, then ASSERT().
   If Width >= MAXIMUM_VALUE_CHARACTERS, then ASSERT()
 
-  @param  Buffer  Pointer to the output buffer for the produced Null-terminated
+  @param  Buffer  The pointer to the output buffer for the produced Null-terminated
                   ASCII string.
   @param  Flags   The bitmask of flags that specify left justification, zero pad, and commas.
   @param  Value   The 64-bit signed value to convert to a string.

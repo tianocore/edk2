@@ -1,15 +1,15 @@
 /** @file
 
   Load Pe32 Image protocol enables loading and unloading EFI images into memory and executing those images.
-  This protocol uses File Device Path to get EFI image.
+  This protocol uses File Device Path to get an EFI image.
 
-Copyright (c) 2006 - 2009, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                            
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -30,7 +30,7 @@ typedef struct _EFI_PE32_IMAGE_PROTOCOL   EFI_PE32_IMAGE_PROTOCOL;
 
   Loads an EFI image into memory and returns a handle to the image with extended parameters.
 
-  @param  This                Pointer to the LoadPe32Image protocol instance
+  @param  This                The pointer to the LoadPe32Image protocol instance
   @param  ParentImageHandle   The caller's image handle.
   @param  FilePath            The specific file path from which the image is loaded.
   @param  SourceBuffer        If not NULL, a pointer to the memory location containing a copy of
@@ -39,8 +39,8 @@ typedef struct _EFI_PE32_IMAGE_PROTOCOL   EFI_PE32_IMAGE_PROTOCOL;
   @param  DstBuffer           The buffer to store the image.
   @param  NumberOfPages       For input, specifies the space size of the image by caller if not NULL.
                               For output, specifies the actual space size needed.
-  @param  ImageHandle         Image handle for output.
-  @param  EntryPoint          Image entry point for output.
+  @param  ImageHandle         The image handle for output.
+  @param  EntryPoint          The image entry point for output.
   @param  Attribute           The bit mask of attributes to set for the load PE image.
 
   @retval EFI_SUCCESS           The image was loaded into memory.
@@ -48,7 +48,7 @@ typedef struct _EFI_PE32_IMAGE_PROTOCOL   EFI_PE32_IMAGE_PROTOCOL;
   @retval EFI_INVALID_PARAMETER One of the parameters has an invalid value.
   @retval EFI_UNSUPPORTED       The image type is not supported, or the device path cannot be
                                 parsed to locate the proper protocol for loading the file.
-  @retval EFI_OUT_OF_RESOURCES  Image was not loaded due to insufficient memory resources.
+  @retval EFI_OUT_OF_RESOURCES  The image was not loaded due to insufficient memory resources.
 **/
 typedef
 EFI_STATUS
@@ -69,12 +69,12 @@ EFI_STATUS
 
   Unload the specified image.
 
-  @param  This             Pointer to the LoadPe32Image protocol instance
+  @param  This             The pointer to the LoadPe32Image protocol instance
   @param  ImageHandle      The specified image handle to be unloaded.
 
   @retval EFI_INVALID_PARAMETER Image handle is NULL.
-  @retval EFI_UNSUPPORTED       Attempt to unload an unsupported image.
-  @retval EFI_SUCCESS           Image is successfully unloaded.
+  @retval EFI_UNSUPPORTED       Attempted to unload an unsupported image.
+  @retval EFI_SUCCESS           The image successfully unloaded.
 
 --*/
 typedef

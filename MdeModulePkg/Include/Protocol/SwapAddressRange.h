@@ -1,16 +1,16 @@
 /** @file
 The EFI_SWAP_ADDRESS_RANGE_PROTOCOL is used to abstract the swap operation of boot block 
-and backup block of FV. This swap is especially needed when updating the boot block of FV. If any 
+and backup block of FV. This swap is especially needed when updating the boot block of FV. If a 
 power failure happens during the boot block update, the swapped backup block (now the boot block) 
 can boot the machine with the old boot block backed up in it. The swap operation is platform dependent, so 
 other protocols such as FTW (Fault Tolerant Write) should use this protocol instead of handling hardware directly.
 
-Copyright (c) 2009 - 2010, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
+Copyright (c) 2009 - 2010, Intel Corporation.  All rights reserved. <BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                            
+
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. 
 
@@ -44,10 +44,10 @@ typedef UINT8 EFI_SWAP_LOCK_CAPABILITY;
   boot block and backup block. 
 
   @param This             Indicates the calling context.  
-  @param BootBlockBase    Base address of current boot block.
-  @param BootBlockSize    Size (in bytes) of current boot block.
-  @param BackupBlockBase  Base address of current backup block.
-  @param BackupBlockSize  Size (in bytes) of current backup block.
+  @param BootBlockBase    The base address of current boot block.
+  @param BootBlockSize    The size (in bytes) of current boot block.
+  @param BackupBlockBase  The base address of current backup block.
+  @param BackupBlockSize  The size (in bytes) of current backup block.
 
   @retval EFI_SUCCESS  The call was successful.
     
@@ -89,7 +89,7 @@ EFI_STATUS
   @param NewSwapState    True to swap real boot block and backup block, False to swap them back.
 
   @retval EFI_SUCCESS  The call was successful.
-  @retval EFI_ABORTED  Set swap state error
+  @retval EFI_ABORTED  Set swap state error.
     
 **/
 typedef
@@ -121,11 +121,12 @@ EFI_STATUS
   );
 
 /**
-  This service returns all lock methods for swap operations that the current platform supports. Could be software lock, hardware lock, or unsupport lock.
+  This service returns all lock methods for swap operations that the current platform 
+  supports. Could be software lock, hardware lock, or unsupport lock.
   Note that software and hardware lock methods can be used simultaneously.
 
   @param This             Indicates the calling context.
-  @param LockCapability   Current lock method for swap operation. 
+  @param LockCapability   The current lock method for swap operations. 
 
   @retval EFI_SUCCESS The call was successful.
     
@@ -140,13 +141,13 @@ EFI_STATUS
 
 
 /**
-  This service is used to acquire or release appointed kind of lock for Swap Address Range operation.
+  This service is used to acquire or release appointed kind of lock for Swap Address Range operations.
 
   Note that software and hardware lock mothod can be used simultaneously.
 
   @param This              Indicates the calling context.
   @param LockCapability    Indicates which lock to acquire or release.
-  @param NewLockState      True to acquire lock, False to release lock.
+  @param NewLockState      True to acquire lock; False to release lock.
 
   @retval EFI_SUCCESS The call was successful.
     

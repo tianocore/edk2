@@ -1,15 +1,15 @@
 /** @file
-Fault Tolerant Write protocol provides boot-time service for fault tolerant 
-write capability for block devices.  The protocol provides for non-volatile 
-storage of the intermediate data and private information a caller would need to 
-recover from a critical fault, such as a power failure.   
+  Fault Tolerant Write protocol provides boot-time service for fault tolerant 
+  write capability for block devices.  The protocol provides for non-volatile 
+  storage of the intermediate data and private information a caller would need to 
+  recover from a critical fault, such as a power failure.   
 
-Copyright (c) 2009 - 2010, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
+Copyright (c) 2009 - 2010, Intel Corporation.  All rights reserved<BR>
+This program and the accompanying materials are licensed and made available under 
+the terms and conditions of the BSD License that accompanies this distribution.  
+The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.                                            
+
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. 
 
@@ -36,7 +36,7 @@ typedef struct _EFI_FAULT_TOLERANT_WRITE_PROTOCOL  EFI_FAULT_TOLERANT_WRITE_PROT
                                updated to indicate the size of the largest block
                                that can be updated.
 
-  @retval EFI_SUCCESS          The function completed successfully
+  @retval EFI_SUCCESS          The function completed successfully.
   @retval EFI_ABORTED          The function could not complete successfully.
 
 **/
@@ -83,7 +83,7 @@ EFI_STATUS
   manner, ensuring at all times that either the original contents or
   the modified contents are available.
 
-  @param  This                 Calling context
+  @param  This                 The calling context.
   @param  Lba                  The logical block address of the target block.
   @param  Offset               The offset within the target block to place the
                                data.
@@ -95,7 +95,7 @@ EFI_STATUS
                                for reading, writing, and erasing the target block.
   @param  Buffer               The data to write.
 
-  @retval EFI_SUCCESS          The function completed successfully
+  @retval EFI_SUCCESS          The function completed successfully.
   @retval EFI_ABORTED          The function could not complete successfully.
   @retval EFI_BAD_BUFFER_SIZE  The write would span a block boundary, which is not
                                a valid action.
@@ -120,11 +120,11 @@ EFI_STATUS
   Restarts a previously interrupted write. The caller must provide the
   block protocol needed to complete the interrupted write.
 
-  @param  This                 Calling context.
-  @param  FvBlockProtocol      The handle of FVB protocol that provides services
+  @param  This                 The calling context.
+  @param  FvBlockProtocol      The handle of FVB protocol that provides services.
                                for reading, writing, and erasing the target block.
 
-  @retval EFI_SUCCESS          The function completed successfully
+  @retval EFI_SUCCESS          The function completed successfully.
   @retval EFI_ABORTED          The function could not complete successfully.
   @retval EFI_ACCESS_DENIED    No pending writes exist.
 
@@ -139,9 +139,9 @@ EFI_STATUS
 /**
   Aborts all previously allocated writes.
 
-  @param  This                 Calling context
+  @param  This                 The calling context.
 
-  @retval EFI_SUCCESS          The function completed successfully
+  @retval EFI_SUCCESS          The function completed successfully.
   @retval EFI_ABORTED          The function could not complete successfully.
   @retval EFI_NOT_FOUND        No allocated writes exist.
 
@@ -154,7 +154,7 @@ EFI_STATUS
 
 /**
   Starts a target block update. This function records information about the write
-  in fault tolerant storage and completes the write in a recoverable
+  in fault-tolerant storage and completes the write in a recoverable
   manner, ensuring at all times that either the original contents or
   the modified contents are available.
 
@@ -172,7 +172,7 @@ EFI_STATUS
   @param  Complete             A Boolean value with TRUE indicating that the write
                                was completed.
 
-  @retval EFI_SUCCESS          The function completed successfully
+  @retval EFI_SUCCESS          The function completed successfully.
   @retval EFI_ABORTED          The function could not complete successfully.
   @retval EFI_NOT_FOUND        No allocated writes exist.
 
