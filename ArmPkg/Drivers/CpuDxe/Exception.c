@@ -81,45 +81,6 @@ RegisterInterruptHandler (
 }
 
 
-/**
-  This function registers and enables the handler specified by InterruptHandler for a processor 
-  interrupt or exception type specified by InterruptType. If InterruptHandler is NULL, then the 
-  handler for the processor interrupt or exception type specified by InterruptType is uninstalled. 
-  The installed handler is called once for each processor interrupt or exception.
-
-  @param  InterruptType    A pointer to the processor's current interrupt state. Set to TRUE if interrupts
-                           are enabled and FALSE if interrupts are disabled.
-  @param  InterruptHandler A pointer to a function of type EFI_CPU_INTERRUPT_HANDLER that is called
-                           when a processor interrupt occurs. If this parameter is NULL, then the handler
-                           will be uninstalled.
-
-  @retval EFI_SUCCESS           The handler for the processor interrupt was successfully installed or uninstalled.
-  @retval EFI_ALREADY_STARTED   InterruptHandler is not NULL, and a handler for InterruptType was
-                                previously installed.
-  @retval EFI_INVALID_PARAMETER InterruptHandler is NULL, and a handler for InterruptType was not
-                                previously installed.
-  @retval EFI_UNSUPPORTED       The interrupt specified by InterruptType is not supported.
-
-**/
-EFI_STATUS
-RegisterDebuggerInterruptHandler (
-  IN EFI_EXCEPTION_TYPE             InterruptType,
-  IN EFI_CPU_INTERRUPT_HANDLER      InterruptHandler
-  )
-{
-  if (InterruptType > MAX_ARM_EXCEPTION) {
-    return EFI_UNSUPPORTED;
-  }
-
-  if ((InterruptHandler != NULL) && (gDebuggerExceptionHandlers[InterruptType] != NULL)) {
-    return EFI_ALREADY_STARTED;
-  }
-
-  gDebuggerExceptionHandlers[InterruptType] = InterruptHandler;
-
-  return EFI_SUCCESS;
-}
-
 
 
 VOID
@@ -129,32 +90,15 @@ CommonCExceptionHandler (
   IN OUT EFI_SYSTEM_CONTEXT           SystemContext
   )
 {
-  BOOLEAN Dispatched = FALSE;
- 
- 
+
   if (ExceptionType <= MAX_ARM_EXCEPTION) {
-    if (gDebuggerExceptionHandlers[ExceptionType]) {
-      //
-      // If DebugSupport hooked the interrupt call the handler. This does not disable 
-      // the normal handler.
-      //
-      gDebuggerExceptionHandlers[ExceptionType] (ExceptionType, SystemContext);
-      Dispatched = TRUE;
-    }
     if (gExceptionHandlers[ExceptionType]) {
       gExceptionHandlers[ExceptionType] (ExceptionType, SystemContext);
-      Dispatched = TRUE;
+      return;
     }
   } else {
     DEBUG ((EFI_D_ERROR, "Unknown exception type %d from %08x\n", ExceptionType, SystemContext.SystemContextArm->PC));
     ASSERT (FALSE);
-  }
-
-  if (Dispatched) {
-    //
-    // We did work so this was an expected ExceptionType
-    //
-    return;
   }
   
   if (ExceptionType == EXCEPT_ARM_SOFTWARE_INTERRUPT) {
@@ -217,20 +161,6 @@ InitializeExceptions (
   // Save existing vector table, in case debugger is already hooked in
   CopyMem ((VOID *)gDebuggerExceptionHandlers, (VOID *)VectorBase, sizeof (gDebuggerExceptionHandlers));
 
-  //
-  // Initialize the C entry points for interrupts
-  //
-  for (Index = 0; Index <= MAX_ARM_EXCEPTION; Index++) {
-    Status = RegisterInterruptHandler (Index, NULL);
-    ASSERT_EFI_ERROR (Status);
-    
-    if (VectorBase[Index] == 0xEAFFFFFE) {
-      // Exception handler contains branch to vector location (jmp $) so no handler
-      // NOTE: This code assumes vectors are ARM and not Thumb code
-      gDebuggerExceptionHandlers[Index] = NULL;
-    }
-  }
-
   // Copy our assembly code into the page that contains the exception vectors. 
   CopyMem ((VOID *)VectorBase, (VOID *)ExceptionHandlersStart, Length);
 
@@ -239,6 +169,21 @@ InitializeExceptions (
   //
   Offset = (UINTN)CommonExceptionEntry - (UINTN)ExceptionHandlersStart;
   *(UINTN *) ((UINT8 *)(UINTN)PcdGet32 (PcdCpuVectorBaseAddress) + Offset) = (UINTN)AsmCommonExceptionEntry;
+
+  //
+  // Initialize the C entry points for interrupts
+  //
+  for (Index = 0; Index <= MAX_ARM_EXCEPTION; Index++) {
+    if ((gDebuggerExceptionHandlers[Index] == 0) || (gDebuggerExceptionHandlers[Index] == (VOID *)(UINTN)0xEAFFFFFE)) {
+      // Exception handler contains branch to vector location (jmp $) so no handler
+      // NOTE: This code assumes vectors are ARM and not Thumb code
+      Status = RegisterInterruptHandler (Index, NULL);
+      ASSERT_EFI_ERROR (Status);
+    } else {
+      // If the debugger has alread hooked put its vector back
+      VectorBase[Index] = (UINT32)(UINTN)gDebuggerExceptionHandlers[Index];
+    }
+  }
 
   // Flush Caches since we updated executable stuff
   InvalidateInstructionCacheRange ((VOID *)PcdGet32(PcdCpuVectorBaseAddress), Length);
