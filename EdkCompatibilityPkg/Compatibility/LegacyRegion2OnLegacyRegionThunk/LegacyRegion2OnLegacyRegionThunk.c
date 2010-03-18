@@ -4,7 +4,7 @@
   Intel's Framework Legacy Region Protocol is replaced by Legacy Region 2 Protocol in PI 1.2.
   This module produces PI Legacy Region 2 Protocol on top of Framework Legacy Region Protocol.
 
-Copyright (c) 2009, Intel Corporation
+Copyright (c) 2009 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -63,6 +63,10 @@ LegacyRegion2Decode (
   IN  BOOLEAN                      *On
   )
 {
+  if ((Start < 0xC0000) || ((Start + Length - 1) > 0xFFFFF)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   ASSERT (Granularity != NULL);
   *Granularity = 0;
 
@@ -103,6 +107,10 @@ LegacyRegion2Lock (
   OUT UINT32                      *Granularity
   )
 {
+  if ((Start < 0xC0000) || ((Start + Length - 1) > 0xFFFFF)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   ASSERT (Granularity != NULL);
 
   return mLegacyRegion->Lock (
@@ -147,14 +155,18 @@ LegacyRegion2BootLock (
   OUT UINT32                              *Granularity
   )
 {
-  ASSERT (Granularity != NULL);
+  if ((Start < 0xC0000) || ((Start + Length - 1) > 0xFFFFF)) {
+    return EFI_INVALID_PARAMETER;
+  }
 
-  return mLegacyRegion->BootLock (
-                          mLegacyRegion,
-                          Start,
-                          Length,
-                          Granularity
-                          );
+  //
+  // PI Legacy Region 2 Protocol and Framework Legacy Region Protocol have different
+  // semantic of BootLock() API, so we cannot thunk to Framework Legacy Region Protocol
+  // to produce the functionality of PI version. In addition, this functionality is
+  // chipset dependent, so here we return EFI_UNSUPPORTED, which is a valid return status
+  // code specified by PI spec.
+  //
+  return EFI_UNSUPPORTED;
 }
 
 /**
@@ -186,6 +198,10 @@ LegacyRegion2Unlock (
   OUT UINT32                       *Granularity
   )
 {
+  if ((Start < 0xC0000) || ((Start + Length - 1) > 0xFFFFF)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   ASSERT (Granularity != NULL);
 
   return mLegacyRegion->UnLock (
@@ -203,7 +219,7 @@ LegacyRegion2Unlock (
   region. Each attribute may have a different granularity and the granularity may not be the same
   for all memory ranges in the legacy region.  
 
-  @param  This[in]              Indicates the EFI_LEGACY_REGION_PROTOCOL instance.
+  @param  This[in]              Indicates the EFI_LEGACY_REGION2_PROTOCOL instance.
   @param  DescriptorCount[out]  The number of region descriptor entries returned in the Descriptor
                                 buffer.
   @param  Descriptor[out]       A pointer to a pointer used to return a buffer where the legacy
@@ -211,8 +227,8 @@ LegacyRegion2Unlock (
                                 DescriptorCount number of region descriptors.  This function will
                                 provide the memory for the buffer.
 
-  @retval EFI_SUCCESS           The region's attributes were successfully modified.
-  @retval EFI_INVALID_PARAMETER If Start or Length describe an address not in the Legacy Region.
+  @retval EFI_SUCCESS           The information structure was returned.
+  @retval EFI_UNSUPPORTED       This function is not supported.
 
 **/
 EFI_STATUS
