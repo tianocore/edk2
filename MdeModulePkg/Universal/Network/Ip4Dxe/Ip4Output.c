@@ -311,11 +311,8 @@ Ip4Output (
   //
   // OK, selected the source and route, fragment the packet then send
   // them. Tag each fragment other than the first one as spawn from it.
-
   //
-  // IPsec payload has been appended, so use IpSb->SnpMode.MaxPacketSize here.
-  //
-  Mtu            = IpSb->SnpMode.MaxPacketSize;
+  Mtu            = IpSb->MaxPacketSize;
   HeadLen        = sizeof (IP4_HEAD) + ((OptLen + 3) & (~0x03));
   Head->Id       = mIp4Id++;
 
