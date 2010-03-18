@@ -1159,6 +1159,13 @@ EmuSetVariable (
   }
 
   //
+  // Not support authenticated variable write yet.
+  //
+  if ((Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) != 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
   //  Make sure if runtime bit is set, boot service bit is set also
   //
   if ((Attributes & (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS)) == EFI_VARIABLE_RUNTIME_ACCESS) {
@@ -1275,6 +1282,11 @@ EmuQueryVariableInfo (
     // Make sure Hw Attribute is set with NV.
     //
     return EFI_INVALID_PARAMETER;
+  } else if ((Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) != 0) {
+    //
+    // Not support authentiated variable write yet.
+    //
+    return EFI_UNSUPPORTED;
   }
 
   AcquireLockOnlyAtBootTime(&Global->VariableServicesLock);
