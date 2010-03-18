@@ -21,8 +21,8 @@
   PLATFORM_GUID                  = 199E24E0-0989-42aa-87F2-611A8C397E72
   PLATFORM_VERSION               = 0.3
   DSC_SPECIFICATION              = 0x00010005
-  OUTPUT_DIRECTORY               = Build/DuetPkg
-  SUPPORTED_ARCHITECTURES        = IA32|X64
+  OUTPUT_DIRECTORY               = Build/DuetPkgIA32
+  SUPPORTED_ARCHITECTURES        = IA32
   BUILD_TARGETS                  = DEBUG
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = DuetPkg/DuetPkg.fdf
