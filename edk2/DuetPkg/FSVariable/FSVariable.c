@@ -1293,6 +1293,13 @@ Returns:
   }
 
   //
+  // Not support authenticated variable write yet.
+  //
+  if ((Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) != 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
   //  Make sure if runtime bit is set, boot service bit is set also
   //
   if ((Attributes & (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS)) == EFI_VARIABLE_RUNTIME_ACCESS) {
@@ -1390,8 +1397,7 @@ Returns:
     // Make sure the Attributes combination is supported by the platform.
     //
     return EFI_UNSUPPORTED;  
-  }  
-  else if ((Attributes & (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS)) == EFI_VARIABLE_RUNTIME_ACCESS) {
+  } else if ((Attributes & (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS)) == EFI_VARIABLE_RUNTIME_ACCESS) {
     //
     // Make sure if runtime bit is set, boot service bit is set also.
     //
@@ -1406,6 +1412,11 @@ Returns:
     // Make sure Hw Attribute is set with NV.
     //
     return EFI_INVALID_PARAMETER;
+  } else if ((Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) != 0) {
+    //
+    // Not support authentiated variable write yet.
+    //
+    return EFI_UNSUPPORTED;
   }
   
   VariableStoreHeader = (VARIABLE_STORE_HEADER *) mGlobal->VariableBase[
