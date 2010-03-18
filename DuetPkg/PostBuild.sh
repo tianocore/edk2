@@ -19,7 +19,6 @@
 
 
 
-export BUILD_DIR=$WORKSPACE/Build/DuetPkg/DEBUG_UNIXGCC
 export BASETOOLS_DIR=$WORKSPACE/Conf/BaseToolsSource/Source/C/bin
 export BOOTSECTOR_BIN_DIR=$WORKSPACE/DuetPkg/BootSector/bin
 export PROCESSOR=""
@@ -45,6 +44,9 @@ case "$1" in
      echo Invalid Architecture string, should be only IA32 or X64
      return 1
 esac
+
+export BUILD_DIR=$WORKSPACE/Build/DuetPkg$PROCESSOR/DEBUG_UNIXGCC
+
 
 #
 # Boot sector module could only be built under IA32 tool chain

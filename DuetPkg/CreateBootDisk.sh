@@ -15,7 +15,7 @@
 ##
 
 # Set up environment at fisrt.
-export BUILD_DIR=$WORKSPACE/Build/DuetPkg/DEBUG_UNIXGCC
+
 export BASETOOLS_DIR=$WORKSPACE/Conf/BaseToolsSource/Source/C/bin
 export BOOTSECTOR_BIN_DIR=$WORKSPACE/DuetPkg/BootSector/bin
 export DISK_LABEL=DUET
@@ -32,6 +32,21 @@ then
 	echo "e.g. : CreateBootDisk floppy /media/floppy0 /dev/fd0 FAT12 IA32"
 	PROCESS_MARK=FALSE
 fi
+
+case "$5" in
+   IA32)
+     export PROCESSOR=IA32
+     ;;
+   X64)
+     export PROCESSOR=X64
+     ;;
+   *)
+     echo Invalid Architecture string, should be only IA32 or X64
+     return 1
+esac
+
+export BUILD_DIR=$WORKSPACE/Build/DuetPkg$PROCESSOR/DEBUG_UNIXGCC
+
 
 export EFI_BOOT_MEDIA=$2
 export EFI_BOOT_DEVICE=$3

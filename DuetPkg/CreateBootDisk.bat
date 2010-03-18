@@ -15,7 +15,6 @@
 @REM Set up environment at fisrt.
 
 @set BASETOOLS_DIR=%WORKSPACE_TOOLS_PATH%\Bin\Win32
-@set BUILD_DIR=%WORKSPACE%\Build\DuetPkg\DEBUG_MYTOOLS
 @set BOOTSECTOR_BIN_DIR=%WORKSPACE%\DuetPkg\BootSector\bin
 @set DISK_LABEL=DUET
 @set PROCESSOR=""
@@ -30,6 +29,8 @@
 @if "%4"=="IA32" set PROCESSOR=IA32
 @if "%4"=="X64" set PROCESSOR=X64
 @if %PROCESSOR%=="" goto WrongArch
+@set BUILD_DIR=%WORKSPACE%\Build\DuetPkg%PROCESSOR%\DEBUG_MYTOOLS
+
 @if "%1"=="floppy" goto CreateFloppy
 @if "%1"=="file" goto CreateFile
 @if "%1"=="usb" goto CreateUsb

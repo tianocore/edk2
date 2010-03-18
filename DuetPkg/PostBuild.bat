@@ -16,7 +16,6 @@
 @REM #
 @REM ##
 
-@set BUILD_DIR=%WORKSPACE%\Build\DuetPkg\DEBUG_MYTOOLS
 @set BASETOOLS_DIR=%WORKSPACE_TOOLS_PATH%\Bin\Win32
 @set BOOTSECTOR_BIN_DIR=%WORKSPACE%\DuetPkg\BootSector\bin
 @set PROCESSOR=""
@@ -25,6 +24,9 @@
 @if "%1"=="IA32" set PROCESSOR=IA32
 @if "%1"=="X64" set PROCESSOR=X64
 @if %PROCESSOR%=="" goto WrongArch
+
+@set BUILD_DIR=%WORKSPACE%\Build\DuetPkg%PROCESSOR%\DEBUG_MYTOOLS
+
 
 @echo Compressing DUETEFIMainFv.FV ...
 @%BASETOOLS_DIR%\LzmaCompress -e -o %BUILD_DIR%\FV\DUETEFIMAINFV.z %BUILD_DIR%\FV\DUETEFIMAINFV.Fv
