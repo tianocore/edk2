@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2005 - 2007, Intel Corporation
+Copyright (c) 2005 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
 distribution. The full text of the license may be found at
@@ -64,8 +64,8 @@ Returns:
   // Acquire the lock.
   // If caller has already acquired the lock, cannot lock it again.
   //
-  if (!FatIsLocked ()) {
-    FatAcquireLock ();
+  Status = FatAcquireLockOrFail ();
+  if (!EFI_ERROR (Status)) {
     LockedByMe = TRUE;
   }
   //
@@ -180,9 +180,9 @@ Returns:
   // means we are in the process of some Fat operation),
   // we can not acquire again.
   //
-  if (!FatIsLocked ()) {
+  Status = FatAcquireLockOrFail ();
+  if (!EFI_ERROR (Status)) {
     LockedByMe = TRUE;
-    FatAcquireLock ();
   }
   //
   // The volume is still being used. Hence, set error flag for all OFiles still in

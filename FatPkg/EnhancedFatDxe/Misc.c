@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2005, Intel Corporation
+Copyright (c) 2005 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
 distribution. The full text of the license may be found at
@@ -140,15 +140,17 @@ Returns:
   EfiAcquireLock (&FatFsLock);
 }
 
-BOOLEAN
-FatIsLocked (
+EFI_STATUS
+FatAcquireLockOrFail (
   VOID
   )
 /*++
 
 Routine Description:
 
-  Get the locking status of the volume.
+  Lock the volume.
+  If the lock is already in the acquired state, then EFI_ACCESS_DENIED is returned.
+  Otherwise, EFI_SUCCESS is returned.
 
 Arguments:
 
@@ -156,12 +158,12 @@ Arguments:
 
 Returns:
 
-  TRUE                  - The volume is locked.
-  FALSE                 - The volume is not locked.
+  EFI_SUCCESS           - The volume is locked.
+  EFI_ACCESS_DENIED     - The volume could not be locked because it is already locked.
 
 --*/
 {
-  return (BOOLEAN) (FatFsLock.Lock);
+  return EfiAcquireLockOrFail (&FatFsLock);
 }
 
 VOID
