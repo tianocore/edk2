@@ -1,6 +1,6 @@
 /** @file
   The driver binding for UEFI PXEBC protocol.
-  
+
 Copyright (c) 2007 - 2009, Intel Corporation.<BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -60,7 +60,7 @@ PxeBcDriverEntryPoint (
   order to make drivers as small as possible, there are a few calling
   restrictions for this service. ConnectController() must
   follow these calling restrictions. If any other agent wishes to call
-  Supported() it must also follow these calling restrictions.  
+  Supported() it must also follow these calling restrictions.
   PxeBc requires DHCP4 and MTFTP4 protocols.
 
   @param  This                Protocol instance pointer.
@@ -260,7 +260,7 @@ PxeBcDriverBindingStart (
   //
   Status = Private->Ip4->GetModeData (Private->Ip4, &Ip4ModeData, NULL, NULL);
   if (EFI_ERROR (Status)) {
-    goto ON_ERROR;  
+    goto ON_ERROR;
   }
 
   Private->Ip4MaxPacketSize = Ip4ModeData.MaxPacketSize;
@@ -320,7 +320,7 @@ PxeBcDriverBindingStart (
   // The UDP instance for EfiPxeBcUdpWrite
   //
   Status = NetLibCreateServiceChild (
-             ControllerHandle, 
+             ControllerHandle,
              This->DriverBindingHandle,
              &gEfiUdp4ServiceBindingProtocolGuid,
              &Private->Udp4WriteChild
@@ -348,7 +348,7 @@ PxeBcDriverBindingStart (
   Private->Udp4CfgData.TypeOfService      = DEFAULT_ToS;
   Private->Udp4CfgData.TimeToLive         = DEFAULT_TTL;
   Private->Udp4CfgData.DoNotFragment      = FALSE;
-  Private->Udp4CfgData.ReceiveTimeout     = 50000;  // 50 milliseconds
+  Private->Udp4CfgData.ReceiveTimeout     = PXEBC_DEFAULT_LIFETIME;
   Private->Udp4CfgData.UseDefaultAddress  = FALSE;
 
   PxeBcInitSeedPacket (&Private->SeedPacket, Private->Udp4Read);
@@ -487,7 +487,7 @@ ON_ERROR:
   restrictions for this service. DisconnectController()
   must follow these calling restrictions. If any other agent wishes
   to call Stop() it must also follow these calling restrictions.
-  
+
   @param  This              Protocol instance pointer.
   @param  ControllerHandle  Handle of device to stop driver on
   @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
@@ -545,7 +545,7 @@ PxeBcDriverBindingStop (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   //
   // Stop functionality of PXE Base Code protocol
   //

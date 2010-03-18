@@ -194,7 +194,7 @@ PxeBcConfigureUdpWriteInstance (
 
   ZeroMem (&Udp4CfgData, sizeof (Udp4CfgData));
 
-  Udp4CfgData.ReceiveTimeout = 1000;
+  Udp4CfgData.ReceiveTimeout = PXEBC_DEFAULT_LIFETIME;
   Udp4CfgData.TypeOfService  = DEFAULT_ToS;
   Udp4CfgData.TimeToLive     = DEFAULT_TTL;
   Udp4CfgData.AllowDuplicatePort = TRUE;
