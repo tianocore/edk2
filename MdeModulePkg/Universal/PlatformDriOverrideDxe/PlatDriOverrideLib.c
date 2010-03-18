@@ -937,7 +937,6 @@ SaveOverridesMapping (
 
   if (IsListEmpty (MappingDataBase)) {
     Status = DeleteOverridesVariables ();
-    ASSERT_EFI_ERROR (Status);
     return EFI_SUCCESS;
   }
 
