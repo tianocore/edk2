@@ -42,6 +42,8 @@ typedef struct {
   EFI_HANDLE                    DispatchHandle;
   EFI_HANDLE                    SmmImageHandle;
   EFI_SMM_CALLBACK_ENTRY_POINT  CallbackAddress;
+  VOID                          *CommunicationBuffer;
+  UINTN                         *SourceSize;
 } CALLBACK_INFO;
 
 typedef struct {
@@ -410,8 +412,8 @@ CallbackThunk (
   ///
   Status = (CallbackInfo->CallbackAddress) (
                             CallbackInfo->SmmImageHandle,
-                            CommBuffer,
-                            CommBufferSize
+                            CallbackInfo->CommunicationBuffer,
+                            CallbackInfo->SourceSize
                             );
   ///
   /// Save CPU Save States in case any of them was modified
@@ -466,7 +468,7 @@ RegisterCallback (
   ///
   /// Allocate buffer for callback thunk information
   ///
-  Buffer = (CALLBACK_INFO *)AllocatePool (sizeof (CALLBACK_INFO));
+  Buffer = (CALLBACK_INFO *)AllocateZeroPool (sizeof (CALLBACK_INFO));
   if (Buffer == NULL) {
     FunctionData->Status = EFI_OUT_OF_RESOURCES;
     return;
@@ -552,14 +554,9 @@ HelperCommunicate (
     CallbackInfo = (CALLBACK_INFO *)Node;
 
     if (FunctionData->Args.Communicate.ImageHandle == CallbackInfo->SmmImageHandle) {
-      ///
-      /// Thunk into original Framwork SMI handler
-      ///
-      (CallbackInfo->CallbackAddress) (
-                       CallbackInfo->SmmImageHandle,
-                       FunctionData->Args.Communicate.CommunicationBuffer,
-                       FunctionData->Args.Communicate.SourceSize
-                       );
+      CallbackInfo->CommunicationBuffer = FunctionData->Args.Communicate.CommunicationBuffer;
+      CallbackInfo->SourceSize          = FunctionData->Args.Communicate.SourceSize;
+
       ///
       /// The message was successfully posted.
       ///
