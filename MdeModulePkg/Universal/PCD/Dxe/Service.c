@@ -740,8 +740,14 @@ SetWorker (
   //
   ASSERT (TokenNumber + 1 < PCD_TOTAL_TOKEN_NUMBER + 1);
 
-  if ((!PtrType) && (*Size != DxePcdGetSize (TokenNumber + 1))) {
-    return EFI_INVALID_PARAMETER;
+  if (PtrType) {
+    if (*Size > DxePcdGetSize (TokenNumber + 1)) {
+      return EFI_INVALID_PARAMETER;
+    }
+  } else {
+    if (*Size != DxePcdGetSize (TokenNumber + 1)) {
+      return EFI_INVALID_PARAMETER;
+    }
   }
 
   //
