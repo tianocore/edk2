@@ -28,6 +28,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @retval EFI_NOT_FOUND If the PCD Entry is not found according to Token Number and GUID space.
   @retval EFI_OUT_OF_RESOURCES If the callback function can't be registered because there is not free
                                 slot left in the CallbackFnTable.
+  @retval EFI_INVALID_PARAMETER If the callback function want to be de-registered can not be found.
 **/
 EFI_STATUS
 PeiRegisterCallBackWorker (
@@ -100,7 +101,7 @@ PeiRegisterCallBackWorker (
     }
   }
 
-  return Register? EFI_OUT_OF_RESOURCES : EFI_NOT_FOUND;
+  return Register? EFI_OUT_OF_RESOURCES : EFI_INVALID_PARAMETER;
 
 }
 
@@ -384,8 +385,14 @@ SetWorker (
 
   LocalTokenNumber = PeiPcdDb->Init.LocalTokenNumberTable[TokenNumber];
 
-  if ((!PtrType) && (PeiPcdGetSize(TokenNumber + 1) != *Size)) {
-    return EFI_INVALID_PARAMETER;
+  if (PtrType) {
+    if (*Size > PeiPcdGetSize (TokenNumber + 1)) {
+      return EFI_INVALID_PARAMETER;
+    }
+  } else {
+    if (*Size != PeiPcdGetSize (TokenNumber + 1)) {
+      return EFI_INVALID_PARAMETER;
+    }
   }
 
   //
