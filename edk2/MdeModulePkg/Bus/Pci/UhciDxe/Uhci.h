@@ -117,8 +117,8 @@ struct _USB_HC_DEV {
   //
   // Schedule data structures
   //
-  UINT32                    *FrameBase;
-  UINT32                    *FrameBasePciMemAddr;
+  UINT32                    *FrameBase; // the buffer pointed by this pointer is used to store pci bus address of the QH descriptor.
+  UINT32                    *FrameBaseHostAddr; // the buffer pointed by this pointer is used to store host memory address of the QH descriptor.
   UHCI_QH_SW                *SyncIntQh;
   UHCI_QH_SW                *CtrlQh;
   UHCI_QH_SW                *BulkQh;

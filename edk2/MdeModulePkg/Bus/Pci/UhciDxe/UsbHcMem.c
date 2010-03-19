@@ -2,7 +2,7 @@
 
   The routine procedure for uhci memory allocate/free.
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -220,6 +220,53 @@ UsbHcAllocMemFromBlock (
   return Block->Buf + (StartByte * 8 + StartBit) * USBHC_MEM_UNIT;
 }
 
+/**
+  Calculate the corresponding pci bus address according to the Mem parameter.
+
+  @param  Pool           The memory pool of the host controller.
+  @param  Mem            The pointer to host memory.
+  @param  Size           The size of the memory region.
+
+  @return the pci memory address
+**/
+EFI_PHYSICAL_ADDRESS
+UsbHcGetPciAddressForHostMem (
+  IN USBHC_MEM_POOL       *Pool,
+  IN VOID                 *Mem,
+  IN UINTN                Size
+  )
+{
+  USBHC_MEM_BLOCK         *Head;
+  USBHC_MEM_BLOCK         *Block;
+  UINTN                   AllocSize;
+  EFI_PHYSICAL_ADDRESS    PhyAddr;
+  UINTN                   Offset;
+
+  Head      = Pool->Head;
+  AllocSize = USBHC_MEM_ROUND (Size);
+
+  if (Mem == NULL) {
+    return 0;
+  }
+
+  for (Block = Head; Block != NULL; Block = Block->Next) {
+    //
+    // scan the memory block list for the memory block that
+    // completely contains the allocated memory.
+    //
+    if ((Block->BufHost <= (UINT8 *) Mem) && (((UINT8 *) Mem + AllocSize) <= (Block->BufHost + Block->BufLen))) {
+      break;
+    }
+  }
+
+  ASSERT ((Block != NULL));
+  //
+  // calculate the pci memory address for host memory address.
+  //
+  Offset = (UINT8 *)Mem - Block->BufHost;
+  PhyAddr = (EFI_PHYSICAL_ADDRESS)(UINTN) (Block->Buf + Offset);
+  return PhyAddr;
+}
 
 /**
   Insert the memory block to the pool's list of the blocks.

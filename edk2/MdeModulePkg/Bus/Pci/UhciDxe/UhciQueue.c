@@ -2,7 +2,7 @@
 
   The UHCI register operation routines.
 
-Copyright (c) 2007 - 2008, Intel Corporation
+Copyright (c) 2007 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -164,22 +164,11 @@ UhciLinkTdToQh (
   IN UHCI_TD_SW           *Td
   )
 {
-  EFI_STATUS            Status;
-  UINTN                 Len;
   EFI_PHYSICAL_ADDRESS  PhyAddr;
-  VOID*                 Map;
 
-  Len    = sizeof (UHCI_TD_HW);
-  Status = Uhc->PciIo->Map (
-                         Uhc->PciIo,
-                         EfiPciIoOperationBusMasterRead,
-                         Td,
-                         &Len,
-                         &PhyAddr,
-                         &Map
-                         );
+  PhyAddr = UsbHcGetPciAddressForHostMem (Uhc->MemPool, Td, sizeof (UHCI_TD_HW));
 
-  ASSERT (!EFI_ERROR (Status) && (Qh != NULL) && (Td != NULL));
+  ASSERT ((Qh != NULL) && (Td != NULL));
 
   Qh->QhHw.VerticalLink = QH_VLINK (PhyAddr, FALSE);
   Qh->TDs               = (VOID *) Td;
@@ -221,22 +210,11 @@ UhciAppendTd (
   IN UHCI_TD_SW     *ThisTd
   )
 {
-  EFI_STATUS            Status;
-  UINTN                 Len;
   EFI_PHYSICAL_ADDRESS  PhyAddr;
-  VOID*                 Map;
 
-  Len    = sizeof (UHCI_TD_HW);
-  Status = Uhc->PciIo->Map (
-                         Uhc->PciIo,
-                         EfiPciIoOperationBusMasterRead,
-                         ThisTd,
-                         &Len,
-                         &PhyAddr,
-                         &Map
-                         );
+  PhyAddr = UsbHcGetPciAddressForHostMem (Uhc->MemPool, ThisTd, sizeof (UHCI_TD_HW));
 
-  ASSERT (!EFI_ERROR (Status) && (PrevTd != NULL) && (ThisTd != NULL));
+  ASSERT ((PrevTd != NULL) && (ThisTd != NULL));
 
   PrevTd->TdHw.NextLink = TD_LINK (PhyAddr, TRUE, FALSE);
   PrevTd->NextTd        = (VOID *) ThisTd;
@@ -324,6 +302,7 @@ UhciCreateTd (
     return NULL;
   }
 
+  Td->TdHw.NextLink = TD_LINK (NULL, FALSE, TRUE);
   Td->NextTd        = NULL;
   Td->Data          = NULL;
   Td->DataLen       = 0;
@@ -428,7 +407,7 @@ UhciCreateDataTd (
   Td->TdHw.ShortPacket  = FALSE;
   Td->TdHw.IsIsoch      = FALSE;
   Td->TdHw.IntOnCpl     = FALSE;
-  Td->TdHw.ErrorCount   = 0X03;
+  Td->TdHw.ErrorCount   = 0x03;
   Td->TdHw.Status       = USBTD_ACTIVE;
   Td->TdHw.LowSpeed     = IsLow ? 1 : 0;
   Td->TdHw.DataToggle   = Toggle & 0x01;
