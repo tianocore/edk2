@@ -202,6 +202,10 @@ SmmBaseCommunicate (
   /// Note this is a runtime interface
   ///
 
+  if (CommunicationBuffer == NULL || BufferSize == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   mCommunicationData.FunctionData.Function = SmmBaseFunctionCommunicate;
   mCommunicationData.FunctionData.Args.Communicate.ImageHandle = ImageHandle;
   mCommunicationData.FunctionData.Args.Communicate.CommunicationBuffer = CommunicationBuffer;
