@@ -27,24 +27,35 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 #include <ProcessorBind.h>
 
+
+/**
+  Verifies the storage size of a given data type.
+  
+  This macro generates a divide by zero error or a zero size array declaration in
+  the preprocessor if the size is incorrect.  These are declared as "extern" so
+  the space for these arrays will not be in the modules.
+
+  @param  TYPE  The date type to determine the size of.
+  @param  Size  The expected size for the TYPE.
+
+**/
+#define VERIFY_SIZE_OF(TYPE, Size) extern UINT8 _VerifySizeof##TYPE[(sizeof(TYPE) == (Size)) / (sizeof(TYPE) == (Size))]
+
 //
 // Verify that ProcessorBind.h produced UEFI Data Types that are compliant with 
-// Section 2.3.1 of the UEFI 2.3 Specification.  Generates a divide by zero 
-// error or a zero size array declaration in the preprocessor if the size is 
-// incorrect.  These are declared as "extern" so the space for these arrays will 
-// not be in the modules.
+// Section 2.3.1 of the UEFI 2.3 Specification.  
 //
-extern UINT8 _VerifySizeOfBoolean [(sizeof(BOOLEAN) == 1) / (sizeof(BOOLEAN) == 1)];
-extern UINT8 _VerifySizeOfInt8    [(sizeof(INT8)    == 1) / (sizeof(INT8)    == 1)];
-extern UINT8 _VerifySizeOfUint8   [(sizeof(UINT8)   == 1) / (sizeof(UINT8)   == 1)];
-extern UINT8 _VerifySizeOfInt16   [(sizeof(INT16)   == 2) / (sizeof(INT16)   == 2)];
-extern UINT8 _VerifySizeOfUint16  [(sizeof(UINT16)  == 2) / (sizeof(UINT16)  == 2)];
-extern UINT8 _VerifySizeOfInt32   [(sizeof(INT32)   == 4) / (sizeof(INT32)   == 4)];
-extern UINT8 _VerifySizeOfUint32  [(sizeof(UINT32)  == 4) / (sizeof(UINT32)  == 4)];
-extern UINT8 _VerifySizeOfInt64   [(sizeof(INT64)   == 8) / (sizeof(INT64)   == 8)];
-extern UINT8 _VerifySizeOfUint64  [(sizeof(UINT64)  == 8) / (sizeof(UINT64)  == 8)];
-extern UINT8 _VerifySizeOfChar8   [(sizeof(CHAR8)   == 1) / (sizeof(CHAR8)   == 1)];
-extern UINT8 _VerifySizeOfChar16  [(sizeof(CHAR16)  == 2) / (sizeof(CHAR16)  == 2)];
+VERIFY_SIZE_OF (BOOLEAN, 1);
+VERIFY_SIZE_OF (INT8, 1);
+VERIFY_SIZE_OF (UINT8, 1);
+VERIFY_SIZE_OF (INT16, 2);
+VERIFY_SIZE_OF (UINT16, 2);
+VERIFY_SIZE_OF (INT32, 4);
+VERIFY_SIZE_OF (UINT32, 4);
+VERIFY_SIZE_OF (INT64, 8);
+VERIFY_SIZE_OF (UINT64, 8);
+VERIFY_SIZE_OF (CHAR8, 1);
+VERIFY_SIZE_OF (CHAR16, 2);
 
 //
 // The Microsoft* C compiler can removed references to unreferenced data items
