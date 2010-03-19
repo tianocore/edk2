@@ -2,7 +2,7 @@
 
   The EHCI register operation routines.
 
-Copyright (c) 2007 - 2009, Intel Corporation
+Copyright (c) 2007 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -38,7 +38,6 @@ UhciInitFrameList (
   UINTN                 Pages;
   UINTN                 Bytes;
   UINTN                 Index;
-  UINTN                 Len;
   EFI_PHYSICAL_ADDRESS  PhyAddr;
 
   //
@@ -77,9 +76,14 @@ UhciInitFrameList (
     goto ON_ERROR;
   }
 
-  Uhc->FrameBase           = (UINT32 *) (UINTN) Buffer; // Cpu memory address
-  Uhc->FrameBasePciMemAddr = (UINT32 *) (UINTN) MappedAddr; // Pci memory address
+  Uhc->FrameBase           = (UINT32 *) (UINTN) Buffer;
   Uhc->FrameMapping        = Mapping;
+
+  //
+  // Tell the Host Controller where the Frame List lies,
+  // by set the Frame List Base Address Register.
+  //
+  UhciSetFrameListBaseAddr (Uhc->PciIo, (VOID *) MappedAddr);
 
   //
   // Allocate the QH used by sync interrupt/control/bulk transfer.
@@ -104,30 +108,11 @@ UhciInitFrameList (
   // Each frame entry is linked to this sequence of QH. These QH
   // will remain on the schedul, never got removed
   //
-  Len    = sizeof (UHCI_QH_HW);
-  Status = Uhc->PciIo->Map (
-                         Uhc->PciIo,
-                         EfiPciIoOperationBusMasterRead,
-                         Uhc->CtrlQh,
-                         &Len,
-                         &PhyAddr,
-                         &Mapping
-                         );
-  ASSERT (!EFI_ERROR (Status));
-
+  PhyAddr = UsbHcGetPciAddressForHostMem (Uhc->MemPool, Uhc->CtrlQh, sizeof (UHCI_QH_HW));
   Uhc->SyncIntQh->QhHw.HorizonLink  = QH_HLINK (PhyAddr, FALSE);
   Uhc->SyncIntQh->NextQh            = Uhc->CtrlQh;
 
-  Status = Uhc->PciIo->Map (
-                         Uhc->PciIo,
-                         EfiPciIoOperationBusMasterRead,
-                         Uhc->BulkQh,
-                         &Len,
-                         &PhyAddr,
-                         &Mapping
-                         );
-  ASSERT (!EFI_ERROR (Status));
-
+  PhyAddr = UsbHcGetPciAddressForHostMem (Uhc->MemPool, Uhc->BulkQh, sizeof (UHCI_QH_HW));
   Uhc->CtrlQh->QhHw.HorizonLink     = QH_HLINK (PhyAddr, FALSE);
   Uhc->CtrlQh->NextQh               = Uhc->BulkQh;
 
@@ -140,27 +125,18 @@ UhciInitFrameList (
 
   Uhc->BulkQh->NextQh               = NULL;
 
-  Len    = sizeof (UHCI_QH_HW);
-  Status = Uhc->PciIo->Map (
-                         Uhc->PciIo,
-                         EfiPciIoOperationBusMasterRead,
-                         Uhc->SyncIntQh,
-                         &Len,
-                         &PhyAddr,
-                         &Mapping
-                         );
-  ASSERT (!EFI_ERROR (Status));
-
-  for (Index = 0; Index < UHCI_FRAME_NUM; Index++) {
-    Uhc->FrameBase[Index] = QH_HLINK (Uhc->SyncIntQh, FALSE);
-    Uhc->FrameBasePciMemAddr[Index] = QH_HLINK (PhyAddr, FALSE);
+  Uhc->FrameBaseHostAddr = AllocateZeroPool (4096);
+  if (Uhc->FrameBaseHostAddr == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ON_ERROR;
   }
 
-  //
-  // Tell the Host Controller where the Frame List lies,
-  // by set the Frame List Base Address Register.
-  //
-  UhciSetFrameListBaseAddr (Uhc->PciIo, (VOID *) (Uhc->FrameBasePciMemAddr));
+  PhyAddr = UsbHcGetPciAddressForHostMem (Uhc->MemPool, Uhc->SyncIntQh, sizeof (UHCI_QH_HW));
+  for (Index = 0; Index < UHCI_FRAME_NUM; Index++) {
+    Uhc->FrameBase[Index] = QH_HLINK (PhyAddr, FALSE);
+    Uhc->FrameBaseHostAddr[Index] = (UINT32)(UINTN)Uhc->SyncIntQh;
+  }
+
   return EFI_SUCCESS;
 
 ON_ERROR:
@@ -205,6 +181,10 @@ UhciDestoryFrameList (
                 (VOID *) Uhc->FrameBase
                 );
 
+  if (Uhc->FrameBaseHostAddr != NULL) {
+    FreePool (Uhc->FrameBaseHostAddr);
+  }
+
   if (Uhc->SyncIntQh != NULL) {
     UsbHcFreeMem (Uhc->MemPool, Uhc->SyncIntQh, sizeof (UHCI_QH_SW));
   }
@@ -218,7 +198,7 @@ UhciDestoryFrameList (
   }
 
   Uhc->FrameBase           = NULL;
-  Uhc->FrameBasePciMemAddr = NULL;
+  Uhc->FrameBaseHostAddr   = NULL;
   Uhc->SyncIntQh           = NULL;
   Uhc->CtrlQh              = NULL;
   Uhc->BulkQh              = NULL;
@@ -274,24 +254,12 @@ UhciLinkQhToFrameList (
   UINTN                   Index;
   UHCI_QH_SW              *Prev;
   UHCI_QH_SW              *Next;
-  UINTN                   Len;
   EFI_PHYSICAL_ADDRESS    PhyAddr;
   EFI_PHYSICAL_ADDRESS    QhPciAddr;
-  VOID*                   Map;
-  EFI_STATUS              Status;
 
   ASSERT ((Uhc->FrameBase != NULL) && (Qh != NULL));
 
-  Len    = sizeof (UHCI_QH_HW);
-  Status = Uhc->PciIo->Map (
-                            Uhc->PciIo,
-                            EfiPciIoOperationBusMasterRead,
-                            Qh,
-                            &Len,
-                            &QhPciAddr,
-                            &Map
-                            );
-  ASSERT (!EFI_ERROR (Status));
+  QhPciAddr = UsbHcGetPciAddressForHostMem (Uhc->MemPool, Qh, sizeof (UHCI_QH_HW));
 
   for (Index = 0; Index < UHCI_FRAME_NUM; Index += Qh->Interval) {
     //
@@ -299,7 +267,7 @@ UhciLinkQhToFrameList (
     // heads on the frame list
     //
     ASSERT (!LINK_TERMINATED (Uhc->FrameBase[Index]));
-    Next  = UHCI_ADDR (Uhc->FrameBase[Index]);
+    Next  = (UHCI_QH_SW*)(UINTN)Uhc->FrameBaseHostAddr[Index];
     Prev  = NULL;
 
     //
@@ -362,24 +330,13 @@ UhciLinkQhToFrameList (
     //
     if (Qh->NextQh == NULL) {
       Qh->NextQh            = Next;
-
-      Len    = sizeof (UHCI_QH_HW);
-      Status = Uhc->PciIo->Map (
-                            Uhc->PciIo,
-                            EfiPciIoOperationBusMasterRead,
-                            Next,
-                            &Len,
-                            &PhyAddr,
-                            &Map
-                            );
-      ASSERT (!EFI_ERROR (Status));
-
+      PhyAddr = UsbHcGetPciAddressForHostMem (Uhc->MemPool, Next, sizeof (UHCI_QH_HW));
       Qh->QhHw.HorizonLink  = QH_HLINK (PhyAddr, FALSE);
     }
 
     if (Prev == NULL) {
-      Uhc->FrameBase[Index]           = QH_HLINK (Qh, FALSE);
-      Uhc->FrameBasePciMemAddr[Index] = QH_HLINK (QhPciAddr, FALSE);
+      Uhc->FrameBase[Index]           = QH_HLINK (QhPciAddr, FALSE);
+      Uhc->FrameBaseHostAddr[Index]   = (UINT32)(UINTN)Qh;
     } else {
       Prev->NextQh            = Qh;
       Prev->QhHw.HorizonLink  = QH_HLINK (QhPciAddr, FALSE);
@@ -415,7 +372,7 @@ UhciUnlinkQhFromFrameList (
     // queue heads on the frame list
     //
     ASSERT (!LINK_TERMINATED (Uhc->FrameBase[Index]));
-    This  = UHCI_ADDR (Uhc->FrameBase[Index]);
+    This  = (UHCI_QH_SW*)(UINTN)Uhc->FrameBaseHostAddr[Index];
     Prev  = NULL;
 
     //
@@ -439,8 +396,8 @@ UhciUnlinkQhFromFrameList (
       //
       // Qh is the first entry in the frame
       //
-      Uhc->FrameBase[Index]           = (UINT32)(UINTN)Qh->NextQh;
-      Uhc->FrameBasePciMemAddr[Index] = Qh->QhHw.HorizonLink;
+      Uhc->FrameBase[Index]           = Qh->QhHw.HorizonLink;
+      Uhc->FrameBaseHostAddr[Index]   = (UINT32)(UINTN)Qh->NextQh;
     } else {
       Prev->NextQh            = Qh->NextQh;
       Prev->QhHw.HorizonLink  = Qh->QhHw.HorizonLink;
@@ -712,7 +669,6 @@ UhciUpdateAsyncReq (
   @param  EndPoint               EndPoint Address.
   @param  DataLen                Data length.
   @param  Interval               Polling Interval when inserted to frame list.
-  @param  Mapping                Mapping value.
   @param  Data                   Data buffer, unmapped.
   @param  Callback               Callback after interrupt transfeer.
   @param  Context                Callback Context passed as function parameter.
@@ -732,7 +688,6 @@ UhciCreateAsyncReq (
   IN UINT8                            EndPoint,
   IN UINTN                            DataLen,
   IN UINTN                            Interval,
-  IN VOID                             *Mapping,
   IN UINT8                            *Data,
   IN EFI_ASYNC_USB_TRANSFER_CALLBACK  Callback,
   IN VOID                             *Context,
@@ -755,7 +710,6 @@ UhciCreateAsyncReq (
   AsyncReq->EndPoint    = EndPoint;
   AsyncReq->DataLen     = DataLen;
   AsyncReq->Interval    = UhciConvertPollRate(Interval);
-  AsyncReq->Mapping     = Mapping;
   AsyncReq->Data        = Data;
   AsyncReq->Callback    = Callback;
   AsyncReq->Context     = Context;
@@ -792,10 +746,6 @@ UhciFreeAsyncReq (
 
   UhciDestoryTds (Uhc, AsyncReq->FirstTd);
   UsbHcFreeMem (Uhc->MemPool, AsyncReq->QhSw, sizeof (UHCI_QH_SW));
-
-  if (AsyncReq->Mapping != NULL) {
-    Uhc->PciIo->Unmap (Uhc->PciIo, AsyncReq->Mapping);
-  }
 
   if (AsyncReq->Data != NULL) {
     UsbHcFreeMem (Uhc->MemPool, AsyncReq->Data, AsyncReq->DataLen);

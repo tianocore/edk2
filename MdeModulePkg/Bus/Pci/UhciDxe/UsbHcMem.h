@@ -141,4 +141,21 @@ UsbHcFreeMem (
   IN VOID                 *Mem,
   IN UINTN                Size
   );
+
+/**
+  Calculate the corresponding pci bus address according to the Mem parameter.
+
+  @param  Pool           The memory pool of the host controller.
+  @param  Mem            The pointer to host memory.
+  @param  Size           The size of the memory region.
+
+  @return the pci memory address
+**/
+EFI_PHYSICAL_ADDRESS
+UsbHcGetPciAddressForHostMem (
+  IN USBHC_MEM_POOL       *Pool,
+  IN VOID                 *Mem,
+  IN UINTN                Size
+  );
+
 #endif

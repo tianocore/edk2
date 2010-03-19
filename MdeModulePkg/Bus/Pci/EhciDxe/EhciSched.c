@@ -904,7 +904,12 @@ EhcUpdateAsyncRequest (
       QtdHw->ErrCnt     = QTD_MAX_ERR;
       QtdHw->CurPage    = 0;
       QtdHw->TotalBytes = (UINT32) Qtd->DataLen;
-      QtdHw->Page[0]    = EHC_LOW_32BIT (Qtd->Data);
+      //
+      // calculate physical address by offset.
+      //
+      PciAddr = (UINTN)Urb->DataPhy + ((UINTN)Qtd->Data - (UINTN)Urb->Data); 
+      QtdHw->Page[0]    = EHC_LOW_32BIT (PciAddr);
+      QtdHw->PageHigh[0]= EHC_HIGH_32BIT (PciAddr);
     }
 
     //

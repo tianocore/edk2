@@ -190,7 +190,6 @@ UhciExecuteTransfer (
   @param  EndPoint               EndPoint Address.
   @param  DataLen                Data length.
   @param  Interval               Polling Interval when inserted to frame list.
-  @param  Mapping                Mapping value.
   @param  Data                   Data buffer, unmapped.
   @param  Callback               Callback after interrupt transfeer.
   @param  Context                Callback Context passed as function parameter.
@@ -210,7 +209,6 @@ UhciCreateAsyncReq (
   IN UINT8                            EndPoint,
   IN UINTN                            DataLen,
   IN UINTN                            Interval,
-  IN VOID                             *Mapping,
   IN UINT8                            *Data,
   IN EFI_ASYNC_USB_TRANSFER_CALLBACK  Callback,
   IN VOID                             *Context,

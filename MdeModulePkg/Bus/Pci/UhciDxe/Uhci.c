@@ -949,7 +949,6 @@ Uhci2AsyncInterruptTransfer (
   EFI_STATUS          Status;
   UINT8               *DataPtr;
   UINT8               *DataPhy;
-  VOID                *DataMap;
   UINT8               PktId;
 
   Uhc       = UHC_FROM_USB2_HC_PROTO (This);
@@ -957,7 +956,6 @@ Uhci2AsyncInterruptTransfer (
   IntTds    = NULL;
   DataPtr   = NULL;
   DataPhy   = NULL;
-  DataMap   = NULL;
 
   IsSlowDevice  = (BOOLEAN) ((EFI_USB_SPEED_LOW == DeviceSpeed) ? TRUE : FALSE);
 
@@ -998,40 +996,30 @@ Uhci2AsyncInterruptTransfer (
     return EFI_DEVICE_ERROR;
   }
 
+  if ((EndPointAddress & 0x80) == 0) {
+    PktId = OUTPUT_PACKET_ID;
+  } else {
+    PktId = INPUT_PACKET_ID;
+  }
+
   //
   // Allocate and map source data buffer for bus master access.
   //
-  DataPtr     = UsbHcAllocateMem (Uhc->MemPool, DataLength);
+  DataPtr = UsbHcAllocateMem (Uhc->MemPool, DataLength);
 
   if (DataPtr == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
+  DataPhy = (UINT8 *)UsbHcGetPciAddressForHostMem (Uhc->MemPool, DataPtr, DataLength);
+
   OldTpl = gBS->RaiseTPL (UHCI_TPL);
-
-  //
-  // Map the user data then create a queue head and
-  // list of TD for it.
-  //
-  Status = UhciMapUserData (
-             Uhc,
-             EfiUsbDataIn,
-             DataPtr,
-             &DataLength,
-             &PktId,
-             &DataPhy,
-             &DataMap
-             );
-
-  if (EFI_ERROR (Status)) {
-    goto FREE_DATA;
-  }
 
   Qh = UhciCreateQh (Uhc, PollingInterval);
 
   if (Qh == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
-    goto UNMAP_DATA;
+    goto FREE_DATA;
   }
 
   IntTds = UhciCreateBulkOrIntTds (
@@ -1066,7 +1054,6 @@ Uhci2AsyncInterruptTransfer (
              EndPointAddress,
              DataLength,
              PollingInterval,
-             DataMap,
              DataPtr,
              CallBackFunction,
              Context,
@@ -1085,11 +1072,8 @@ Uhci2AsyncInterruptTransfer (
 DESTORY_QH:
   UsbHcFreeMem (Uhc->MemPool, Qh, sizeof (UHCI_QH_SW));
 
-UNMAP_DATA:
-  Uhc->PciIo->Unmap (Uhc->PciIo, DataMap);
-
 FREE_DATA:
-  gBS->FreePool (DataPtr);
+  UsbHcFreeMem (Uhc->MemPool, DataPtr, DataLength);
   Uhc->PciIo->Flush (Uhc->PciIo);
 
   gBS->RestoreTPL (OldTpl);
