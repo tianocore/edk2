@@ -138,7 +138,7 @@ class WorkspaceAutoGen(AutoGen):
     #   @param  SkuId                   SKU id from command line
     #
     def _Init(self, WorkspaceDir, ActivePlatform, Target, Toolchain, ArchList, MetaFileDb,
-              BuildConfig, ToolDefinition, FlashDefinitionFile='', Fds=[], Fvs=[], SkuId=''):
+              BuildConfig, ToolDefinition, FlashDefinitionFile='', Fds=[], Fvs=[], SkuId='', UniFlag=None):
         self.MetaFile       = ActivePlatform.MetaFile
         self.WorkspaceDir   = WorkspaceDir
         self.Platform       = ActivePlatform
@@ -146,6 +146,7 @@ class WorkspaceAutoGen(AutoGen):
         self.ToolChain      = Toolchain
         self.ArchList       = ArchList
         self.SkuId          = SkuId
+        self.UniFlag        = UniFlag
 
         self.BuildDatabase  = MetaFileDb
         self.TargetTxt      = BuildConfig
@@ -1191,6 +1192,13 @@ class PlatformAutoGen(AutoGen):
                         BuildOptions[Tool][Attr] = Value[1:]
                     else:
                         BuildOptions[Tool][Attr] += " " + Value
+        if Module.AutoGenVersion < 0x00010005 and self.Workspace.UniFlag != None:
+            #
+            # Override UNI flag only for EDK module.
+            #
+            if 'BUILD' not in BuildOptions:
+                BuildOptions['BUILD'] = {}
+            BuildOptions['BUILD']['FLAGS'] = self.Workspace.UniFlag
         return BuildOptions
 
     Platform            = property(_GetPlatform)

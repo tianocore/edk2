@@ -1,4 +1,4 @@
-# Copyright (c) 2007, Intel Corporation
+# Copyright (c) 2007 - 2010, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -193,7 +193,7 @@ class UniFileClassObject(object):
     # Get Language definition
     #
     def GetLangDef(self, File, Line):
-        Lang = Line.split()
+        Lang = Line.split(u"//")[0].split()
         if len(Lang) != 3:
             try:
                 FileIn = codecs.open(File, mode='rb', encoding='utf-16').read()

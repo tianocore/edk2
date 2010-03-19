@@ -3213,8 +3213,6 @@ Returns:
 
   if (PeHdr->Pe32.OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
     Optional32 = (EFI_IMAGE_OPTIONAL_HEADER32 *)&PeHdr->Pe32.OptionalHeader;
-    Optional32->MajorLinkerVersion          = 0;
-    Optional32->MinorLinkerVersion          = 0;
     Optional32->MajorOperatingSystemVersion = 0;
     Optional32->MinorOperatingSystemVersion = 0;
     Optional32->MajorImageVersion           = 0;
@@ -3307,8 +3305,6 @@ Returns:
     }
   } else if (PeHdr->Pe32.OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
     Optional64 = (EFI_IMAGE_OPTIONAL_HEADER64 *)&PeHdr->Pe32.OptionalHeader;
-    Optional64->MajorLinkerVersion          = 0;
-    Optional64->MinorLinkerVersion          = 0;
     Optional64->MajorOperatingSystemVersion = 0;
     Optional64->MinorOperatingSystemVersion = 0;
     Optional64->MajorImageVersion           = 0;
