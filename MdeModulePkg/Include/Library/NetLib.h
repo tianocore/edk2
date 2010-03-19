@@ -507,7 +507,7 @@ NetGetUint32 (
   byte stream.
 
   @param[in, out]  Buf          The buffer in which to put the UINT32.
-  @param[in]      Data          The data to put.
+  @param[in]       Data         The data to be converted and put into the byte stream.
 
 **/
 VOID
@@ -1097,17 +1097,18 @@ NetLibGetMacString (
 
   The underlying UNDI driver may or may not support reporting media status from
   GET_STATUS command (PXE_STATFLAGS_GET_STATUS_NO_MEDIA_SUPPORTED). This routine
-  will try to invoke Snp->GetStatus() to get the media status. Iif media is already
-  present, it returns directly. If media  isnot present, it will stop SNP and then
-  restart SNP to get the latest media status.  This provides an opportunity to get 
+  will try to invoke Snp->GetStatus() to get the media status. If media is already
+  present, it returns directly. If media is not present, it will stop SNP and then
+  restart SNP to get the latest media status. This provides an opportunity to get 
   the correct media status for old UNDI driver, which doesn't support reporting 
   media status from GET_STATUS command.
   Note: there are two limitations for the current algorithm:
   1) For UNDI with this capability, when the cable is not attached, there will
      be an redundant Stop/Start() process.
-  2) For UNDI without this capability, when the cable is attached, the UNDI
-     initializes while unattached. Later, NetLibDetectMedia() will report
-     MediaPresent as TRUE, causing upper layer apps to wait for timeout time.
+  2) for UNDI without this capability, in case that network cable is attached when
+     Snp->Initialize() is invoked while network cable is unattached later,
+     NetLibDetectMedia() will report MediaPresent as TRUE, causing upper layer
+     apps to wait for timeout time.
 
   @param[in]   ServiceHandle    The handle where network service binding protocols are
                                 installed.
@@ -1868,8 +1869,8 @@ NetbufQueCopy (
   );
 
 /**
-  Trim Len bytes of data from the queue header and release any net buffer
-  that is trimmed wholely.
+  Trim Len bytes of data from the buffer queue and free any net buffer
+  that is completely trimmed.
 
   The trimming operation is the same as NetbufTrim but applies to the net buffer
   queue instead of the net buffer.

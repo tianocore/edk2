@@ -901,7 +901,7 @@ NetGetUint32 (
   byte stream.
 
   @param[in, out]  Buf          The buffer to put the UINT32.
-  @param[in]      Data          The data to put.
+  @param[in]       Data         The data to be converted and put into the byte stream.
 
 **/
 VOID
@@ -2158,9 +2158,10 @@ NetLibGetMacString (
   Note: there will be two limitations for current algorithm:
   1) for UNDI with this capability, in case of cable is not attached, there will
      be an redundant Stop/Start() process;
-  2) for UNDI without this capability, in case cable is attached in UNDI
-     initialize while unattached latter, NetLibDetectMedia() will report
-     MediaPresent as TRUE, this cause upper layer apps wait for timeout time.
+  2) for UNDI without this capability, in case that network cable is attached when
+     Snp->Initialize() is invoked while network cable is unattached later,
+     NetLibDetectMedia() will report MediaPresent as TRUE, causing upper layer
+     apps to wait for timeout time.
 
   @param[in]   ServiceHandle    The handle where network service binding protocols are
                                 installed on.

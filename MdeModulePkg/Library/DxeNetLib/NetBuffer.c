@@ -1556,8 +1556,8 @@ NetbufQueCopy (
 
 
 /**
-  Trim Len bytes of data from the queue header, release any of the net buffer
-  whom is trimmed wholely.
+  Trim Len bytes of data from the buffer queue and free any net buffer
+  that is completely trimmed.
 
   The trimming operation is the same as NetbufTrim but applies to the net buffer
   queue instead of the net buffer.

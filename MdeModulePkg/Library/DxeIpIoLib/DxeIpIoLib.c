@@ -2012,10 +2012,9 @@ IpIoFindSender (
 
   @param[in]   IcmpError             IcmpError Type.
   @param[in]   IpVersion             The version of the IP protocol to use,
-                                     either IPv4 or IPv6.
-  
-  @param[out]  IsHard                Whether it is a hard error.
-  @param[out]  Notify                Whether it need to notify SockError.
+                                     either IPv4 or IPv6. 
+  @param[out]  IsHard                If TRUE, indicates that it is a hard error.
+  @param[out]  Notify                If TRUE, SockError needs to be notified.
 
   @return ICMP Error Status, such as EFI_NETWORK_UNREACHABLE.
 
