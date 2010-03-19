@@ -399,6 +399,8 @@ CallbackThunk (
     }
   }
 
+  mFrameworkSmst->SmmStartupThisAp      = gSmst->SmmStartupThisAp;
+  mFrameworkSmst->NumberOfCpus          = mNumberOfProcessors;
   mFrameworkSmst->CurrentlyExecutingCpu = gSmst->CurrentlyExecutingCpu;
 
   ///
