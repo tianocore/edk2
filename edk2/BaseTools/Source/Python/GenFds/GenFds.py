@@ -263,7 +263,7 @@ def main():
                     "\nPython",
                     CODE_ERROR,
                     "Tools code failure",
-                    ExtraData="Please submit bug report in www.TianoCore.org, attaching following call stack trace!\n",
+                    ExtraData="Please send email to edk2-buildtools-devel@lists.sourceforge.net for help, attaching following call stack trace!\n",
                     RaiseError=False
                     )
         EdkLogger.quiet(traceback.format_exc())

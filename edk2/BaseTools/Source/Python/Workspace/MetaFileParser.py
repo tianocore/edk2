@@ -398,6 +398,9 @@ class InfParser(MetaFileParser):
                             -1,
                             0
                             )
+        if IsFindBlockComment:
+            EdkLogger.error("Parser", FORMAT_INVALID, "Open block comments (starting with /*) are expected to end with */", 
+                            File=self.MetaFile)
         self._Done()
 
     ## Data parser for the format in which there's path
