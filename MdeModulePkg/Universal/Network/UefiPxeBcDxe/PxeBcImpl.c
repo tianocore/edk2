@@ -2231,8 +2231,6 @@ EfiPxeBcSetPackets (
     return EFI_NOT_STARTED;
   }
 
-  Private->FileSize = 0;
-
   if (NewDhcpDiscoverValid != NULL) {
     Mode->DhcpDiscoverValid = *NewDhcpDiscoverValid;
   }
