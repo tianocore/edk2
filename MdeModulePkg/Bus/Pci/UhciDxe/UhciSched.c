@@ -83,7 +83,7 @@ UhciInitFrameList (
   // Tell the Host Controller where the Frame List lies,
   // by set the Frame List Base Address Register.
   //
-  UhciSetFrameListBaseAddr (Uhc->PciIo, (VOID *) MappedAddr);
+  UhciSetFrameListBaseAddr (Uhc->PciIo, (VOID *) (UINTN) MappedAddr);
 
   //
   // Allocate the QH used by sync interrupt/control/bulk transfer.

@@ -1011,7 +1011,7 @@ Uhci2AsyncInterruptTransfer (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  DataPhy = (UINT8 *)UsbHcGetPciAddressForHostMem (Uhc->MemPool, DataPtr, DataLength);
+  DataPhy = (UINT8 *) (UINTN) UsbHcGetPciAddressForHostMem (Uhc->MemPool, DataPtr, DataLength);
 
   OldTpl = gBS->RaiseTPL (UHCI_TPL);
 
