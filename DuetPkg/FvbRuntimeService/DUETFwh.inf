@@ -54,3 +54,5 @@
   gEfiFirmwareVolumeBlockProtocolGuid
   gEfiBlockIoProtocolGuid
 
+[Depex]
+  TRUE
