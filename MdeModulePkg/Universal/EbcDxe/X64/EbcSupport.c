@@ -559,11 +559,11 @@ EbcLLCALLEX (
     IsThunk = 0;
     goto Action;
   }
-  if (*((UINT8 *)FuncAddr + 10) != 0x48)  {
+  if (*((UINT8 *)FuncAddr + 10) != 0x49)  {
     IsThunk = 0;
     goto Action;
   }
-  if (*((UINT8 *)FuncAddr + 11) != 0xB8)  {
+  if (*((UINT8 *)FuncAddr + 11) != 0xBA)  {
     IsThunk = 0;
     goto Action;
   }
