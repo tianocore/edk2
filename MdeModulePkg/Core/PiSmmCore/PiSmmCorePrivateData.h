@@ -93,7 +93,7 @@ typedef struct {
   /// in bytes, into a software SMI handler and for the software SMI handler to pass the 
   /// size, in bytes, of a buffer back to the caller of the SMM Communication Protocol.
   ///
-  UINTN                           *BufferSize;
+  UINTN                           BufferSize;
 
   ///
   /// This field is used by the SMM Communication Protocol to pass the return status from
