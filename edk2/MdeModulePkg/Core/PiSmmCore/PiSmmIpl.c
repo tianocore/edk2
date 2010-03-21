@@ -210,8 +210,8 @@ SMM_CORE_PRIVATE_DATA  mSmmCorePrivateData = {
   FALSE,                              // SmmEntryPointRegistered
   FALSE,                              // InSmm
   NULL,                               // Smst
-  0,                                  // BufferSize
   NULL,                               // CommunicationBuffer
+  0,                                  // BufferSize
   EFI_SUCCESS                         // ReturnStatus
 };
 
@@ -411,6 +411,13 @@ SmmCommunicationCommunicate (
   }
 
   //
+  // CommSize must hold HeaderGuid and MessageLength
+  //
+  if (*CommSize < OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
   // If not already in SMM, then generate a Software SMI
   //
   if (!gSmmCorePrivate->InSmm && gSmmCorePrivate->SmmEntryPointRegistered) {
@@ -418,7 +425,7 @@ SmmCommunicationCommunicate (
     // Put arguments for Software SMI in gSmmCorePrivate
     //
     gSmmCorePrivate->CommunicationBuffer = CommBuffer;
-    gSmmCorePrivate->BufferSize          = CommSize;
+    gSmmCorePrivate->BufferSize          = *CommSize;
 
     //
     // Generate Software SMI
@@ -431,6 +438,7 @@ SmmCommunicationCommunicate (
     //
     // Return status from software SMI 
     //
+    *CommSize = gSmmCorePrivate->BufferSize;
     return gSmmCorePrivate->ReturnStatus;
   }
 
