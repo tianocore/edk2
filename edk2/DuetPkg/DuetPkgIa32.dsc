@@ -23,7 +23,7 @@
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/DuetPkgIA32
   SUPPORTED_ARCHITECTURES        = IA32
-  BUILD_TARGETS                  = DEBUG
+  BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = DuetPkg/DuetPkg.fdf
 
