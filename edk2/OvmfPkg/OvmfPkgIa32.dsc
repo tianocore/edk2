@@ -291,6 +291,7 @@
       TimerLib|OvmfPkg/Library/AcpiTimerLib/AcpiTimerLib.inf
   }
 
+  OvmfPkg/BlockMmioToBlockIoDxe/BlockIo.inf
   OvmfPkg/EmuVariableFvbRuntimeDxe/Fvb.inf {
     <LibraryClasses>
       PlatformFvbLib|OvmfPkg/Library/EmuVariableFvbLib/EmuVariableFvbLib.inf
