@@ -310,7 +310,6 @@ InitializeFrontPage (
   EFI_IFR_GUID_LABEL          *StartLabel;
   EFI_IFR_GUID_LABEL          *EndLabel;
   BOOLEAN                     FirstFlag;
-  EFI_STRING_ID               Temp;
 
   if (InitializeHiiData) {
     //
@@ -425,12 +424,10 @@ InitializeFrontPage (
       GetNextLanguage (&LangCode, Lang);
       OptionCount ++;
     }
-    gFrontPagePrivate.LanguageToken = AllocatePool ((OptionCount + 1) * sizeof (EFI_STRING_ID));
+    gFrontPagePrivate.LanguageToken = AllocatePool (OptionCount * sizeof (EFI_STRING_ID));
     ASSERT (gFrontPagePrivate.LanguageToken != NULL);
     FirstFlag = TRUE;
   }
-
-  Status = gHiiString->NewString (gHiiString, HiiHandle, &Temp, "de-DE", L"Dedede", L"TEST", NULL);
 
   OptionCount = 0;
   LangCode = LanguageString;
