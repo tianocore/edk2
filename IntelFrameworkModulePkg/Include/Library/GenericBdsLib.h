@@ -945,8 +945,24 @@ BdsLibIsValidEFIBootOptDevicePathExt (
 
   @param  DevicePath                      The bootable device Path to check.
 
-  @retval BDS_EFI_MEDIA_HD_BOOT           The given device path contains MEDIA_DEVICE_PATH type device path node.                                           which subtype is MEDIA_HARDDRIVE_DP  @retval BDS_EFI_MEDIA_CDROM_BOOT        If given device path contains MEDIA_DEVICE_PATH type device path node                                          which subtype is MEDIA_CDROM_DP  @retval BDS_EFI_ACPI_FLOPPY_BOOT        If given device path contains ACPI_DEVICE_PATH type device path node                                          which HID is floppy device.  @retval BDS_EFI_MESSAGE_ATAPI_BOOT      If given device path contains MESSAGING_DEVICE_PATH type device path node                                          and its last device path node's subtype is MSG_ATAPI_DP.  @retval BDS_EFI_MESSAGE_SCSI_BOOT       If given device path contains MESSAGING_DEVICE_PATH type device path node                                          and its last device path node's subtype is MSG_SCSI_DP.  @retval BDS_EFI_MESSAGE_USB_DEVICE_BOOT If given device path contains MESSAGING_DEVICE_PATH type device path node                                          and its last device path node's subtype is MSG_USB_DP.  @retval BDS_EFI_MESSAGE_MISC_BOOT       If the device path not contains any media device path node,  and                                          its last device path node point to a message device path node.  @retval BDS_LEGACY_BBS_BOOT             If given device path contains BBS_DEVICE_PATH type device path node.  @retval BDS_EFI_UNSUPPORT               An EFI Removable BlockIO device path not point to a media and message device,   
-**/
+  @retval BDS_EFI_MEDIA_HD_BOOT           The given device path contains MEDIA_DEVICE_PATH type device path node,
+                                          whose subtype is MEDIA_HARDDRIVE_DP.  
+  @retval BDS_EFI_MEDIA_CDROM_BOOT        If given device path contains MEDIA_DEVICE_PATH type device path node, 
+                                          whose subtype is MEDIA_CDROM_DP.  
+  @retval BDS_EFI_ACPI_FLOPPY_BOOT        A given device path contains ACPI_DEVICE_PATH type device path node,                                          
+                                          whose HID is floppy device.  
+  @retval BDS_EFI_MESSAGE_ATAPI_BOOT      A given device path contains MESSAGING_DEVICE_PATH type device path node, 
+                                          and its last device path node's subtype is MSG_ATAPI_DP.  
+  @retval BDS_EFI_MESSAGE_SCSI_BOOT       A given device path contains MESSAGING_DEVICE_PATH type device path node,
+                                          and its last device path node's subtype is MSG_SCSI_DP. 
+  @retval BDS_EFI_MESSAGE_USB_DEVICE_BOOT A given device path contains MESSAGING_DEVICE_PATH type device path node, 
+                                          and its last device path node's subtype is MSG_USB_DP.
+  @retval BDS_EFI_MESSAGE_MISC_BOOT       The device path does not contain any media device path node, and  
+                                          its last device path node points to a message device path node.  
+  @retval BDS_LEGACY_BBS_BOOT             A given device path contains BBS_DEVICE_PATH type device path node. 
+  @retval BDS_EFI_UNSUPPORT               An EFI Removable BlockIO device path does not point to a media and message device.   
+
+  **/
 UINT32
 EFIAPI
 BdsGetBootTypeFromDevicePath (
