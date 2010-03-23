@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006 - 2009, Intel Corporation
+Copyright (c) 2006 - 2010, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -223,9 +223,7 @@ OnSimpleFileSystemInstall (
   NumBytes = Dev->Size;
   Status = File->Write (File, &NumBytes, VAR_DATA_PTR (Dev));
   ASSERT_EFI_ERROR (Status);
-  // KEN: bugbug here if closing file, volume handle will be free,
-  // and system will be hang when accessing volume handle in future.
-  //FileClose (File);
+  FileClose (File);
   DEBUG ((EFI_D_ERROR, "FileStorage: Mapped to file!\n"));
 }
 
