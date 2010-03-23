@@ -109,11 +109,11 @@ ReadOrWriteBlocks (
   //
   // BufferSize must be a multiple of the intrinsic block size of the device.
   //
-  if ((BufferSize % Media->BlockSize) != 0) {
+  if (ModU64x32 (BufferSize, Media->BlockSize) != 0) {
     return EFI_BAD_BUFFER_SIZE;
   }
 
-  TotalBlock = BufferSize / Media->BlockSize;
+  TotalBlock = (UINTN) DivU64x32 (BufferSize, Media->BlockSize);
 
   //
   // Make sure the range to read is valid.
@@ -131,9 +131,9 @@ ReadOrWriteBlocks (
   }
 
   Address = Private->BlockMmio->BaseAddress;
-  Address += Media->BlockSize * Lba;
+  Address += MultU64x32 (Lba, Media->BlockSize);
 
-  Count = BufferSize / 8;
+  Count = BufferSize >> 3;
 
   if (ReadData) {
     CpuAccessFunction = Private->CpuIo->Mem.Read;
