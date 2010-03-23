@@ -361,7 +361,7 @@ def CreateCCodeDB(FileNameList):
             collector = CodeFragmentCollector.CodeFragmentCollector(FullName)
             try:
                 collector.ParseFile()
-            except UnicodeError:
+            except:
                 ParseErrorFileList.append(FullName)
             BaseName = os.path.basename(FullName)
             DirName = os.path.dirname(FullName)

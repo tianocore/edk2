@@ -677,7 +677,7 @@ EFI_STATUS
 WriteMapFile (
   IN OUT FILE                  *FvMapFile,
   IN     CHAR8                 *FileName,
-  IN     EFI_GUID              *FileGuidPtr, 
+  IN     EFI_FFS_FILE_HEADER   *FfsFile, 
   IN     EFI_PHYSICAL_ADDRESS  ImageBaseAddress,
   IN     PE_COFF_LOADER_IMAGE_CONTEXT *pImageContext
   )
@@ -692,7 +692,7 @@ Arguments:
 
   FvMapFile             A pointer to FvMap File
   FileName              Ffs File PathName
-  FileGuidPtr           Guid Value of Ffs file
+  FfsFile               A pointer to Ffs file image.
   ImageBaseAddress      PeImage Base Address.
   pImageContext         Image Context Information.
 
@@ -723,7 +723,6 @@ Returns:
   UINT32                              DataVirtualAddress;
   EFI_PHYSICAL_ADDRESS                LinkTimeBaseAddress;
 
-  
   //
   // Init local variable
   //
@@ -731,7 +730,7 @@ Returns:
   //
   // Print FileGuid to string buffer. 
   //
-  PrintGuidToBuffer (FileGuidPtr, (UINT8 *)FileGuidName, MAX_LINE_LEN, TRUE);
+  PrintGuidToBuffer (&FfsFile->Name, (UINT8 *)FileGuidName, MAX_LINE_LEN, TRUE);
   
   //
   // Construct Map file Name 
@@ -808,7 +807,12 @@ Returns:
     fprintf (FvMapFile, "%s (Fixed Flash Address, ", KeyWord);
     fprintf (FvMapFile, "BaseAddress=0x%010llx, ", (unsigned long long) (ImageBaseAddress + Offset));
   }
-  fprintf (FvMapFile, "EntryPoint=0x%010llx", (unsigned long long) (ImageBaseAddress + AddressOfEntryPoint));
+
+  if (FfsFile->Type != EFI_FV_FILETYPE_SECURITY_CORE && pImageContext->Machine == EFI_IMAGE_MACHINE_IA64) {
+    fprintf (FvMapFile, "EntryPoint=0x%010llx", (unsigned long long) (*(UINT64 *)((UINTN) pImageContext->Handle + (UINTN) AddressOfEntryPoint)));
+  } else {
+    fprintf (FvMapFile, "EntryPoint=0x%010llx", (unsigned long long) (ImageBaseAddress + AddressOfEntryPoint));
+  }
   fprintf (FvMapFile, ")\n"); 
   
   fprintf (FvMapFile, "(GUID=%s", FileGuidName);
@@ -3094,7 +3098,7 @@ Returns:
       PdbPointer = FileName;
     }
 
-    WriteMapFile (FvMapFile, PdbPointer, (EFI_GUID *) FfsFile, NewPe32BaseAddress, &OrigImageContext);
+    WriteMapFile (FvMapFile, PdbPointer, FfsFile, NewPe32BaseAddress, &OrigImageContext);
   }
 
   if (FfsFile->Type != EFI_FV_FILETYPE_SECURITY_CORE &&
@@ -3320,7 +3324,7 @@ Returns:
     WriteMapFile (
       FvMapFile, 
       PdbPointer, 
-      (EFI_GUID *) FfsFile,
+      FfsFile,
       NewPe32BaseAddress, 
       &OrigImageContext
       );
