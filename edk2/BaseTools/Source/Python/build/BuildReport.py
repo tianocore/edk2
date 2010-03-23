@@ -601,7 +601,7 @@ class PcdReport(object):
             FileWrite(File, "Platform Configuration Database Report")
             FileWrite(File, "  *P  - Platform scoped PCD override in DSC file")
             FileWrite(File, "  *F  - Platform scoped PCD override in FDF file")
-            FileWrite(File, "  *M  - Module scoped PCD override in DSC file")
+            FileWrite(File, "  *M  - Module scoped PCD override")
             FileWrite(File, gSectionSep)
         else:
             #
