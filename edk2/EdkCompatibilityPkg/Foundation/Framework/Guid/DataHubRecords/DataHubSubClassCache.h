@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004, Intel Corporation                                                         
+Copyright (c) 2004 - 2010, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -66,15 +66,19 @@ typedef enum {
 } EFI_CACHE_TYPE_DATA;
 
 typedef enum {  
-  EfiCacheAssociativityOther = 1,
-  EfiCacheAssociativityUnknown = 2,
-  EfiCacheAssociativityDirectMapped = 3,
-  EfiCacheAssociativity2Way = 4,
-  EfiCacheAssociativity4Way = 5,
-  EfiCacheAssociativityFully = 6,
-  EfiCacheAssociativity8Way = 7,
-  EfiCacheAssociativity16Way = 8,
-  EfiCacheAssociativity24Way = 9
+  EfiCacheAssociativityOther        = 0x01,
+  EfiCacheAssociativityUnknown      = 0x02,
+  EfiCacheAssociativityDirectMapped = 0x03,
+  EfiCacheAssociativity2Way         = 0x04,
+  EfiCacheAssociativity4Way         = 0x05,
+  EfiCacheAssociativityFully        = 0x06,
+  EfiCacheAssociativity8Way         = 0x07,
+  EfiCacheAssociativity16Way        = 0x08,
+  EfiCacheAssociativity12Way        = 0x09,
+  EfiCacheAssociativity24Way        = 0x0A,
+  EfiCacheAssociativity32Way        = 0x0B,
+  EfiCacheAssociativity48Way        = 0x0C,
+  EfiCacheAssociativity64Way        = 0x0D
 } EFI_CACHE_ASSOCIATIVITY_DATA;
 
 typedef struct {  
