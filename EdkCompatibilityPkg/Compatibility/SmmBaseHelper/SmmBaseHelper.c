@@ -32,6 +32,7 @@
 #include <Protocol/SmmCpuSaveState.h>
 #include <Protocol/MpService.h>
 #include <Protocol/LoadPe32Image.h>
+#include <Protocol/SmmReadyToLock.h>
 
 ///
 /// Structure for tracking paired information of registered Framework SMI handler
@@ -67,6 +68,7 @@ EFI_GUID                           mEfiSmmCpuIoGuid = EFI_SMM_CPU_IO_GUID;
 EFI_SMM_BASE_HELPER_READY_PROTOCOL *mSmmBaseHelperReady;
 EFI_SMM_SYSTEM_TABLE               *mFrameworkSmst;
 UINTN                              mNumberOfProcessors;
+BOOLEAN                            mLocked = FALSE;
 
 LIST_ENTRY mCallbackInfoListHead = INITIALIZE_LIST_HEAD_VARIABLE (mCallbackInfoListHead);
 
@@ -272,7 +274,7 @@ Register (
 {
   EFI_STATUS Status;
 
-  if (FunctionData->Args.Register.LegacyIA32Binary) {
+  if (mLocked || FunctionData->Args.Register.LegacyIA32Binary) {
     Status = EFI_UNSUPPORTED;
   } else {
     Status = LoadImage (
@@ -463,6 +465,11 @@ RegisterCallback (
 {
   CALLBACK_INFO  *Buffer;
 
+  if (mLocked) {
+    FunctionData->Status = EFI_UNSUPPORTED;
+    return;
+  }
+
   ///
   /// Note that MakeLast and FloatingPointSave options are not supported in PI SMM
   ///
@@ -512,11 +519,15 @@ HelperAllocatePool (
   IN OUT SMMBASE_FUNCTION_DATA *FunctionData
   )
 {
-  FunctionData->Status = gSmst->SmmAllocatePool (
-                                  FunctionData->Args.AllocatePool.PoolType,
-                                  FunctionData->Args.AllocatePool.Size,
-                                  FunctionData->Args.AllocatePool.Buffer
-                                  );
+  if (mLocked) {
+    FunctionData->Status =  EFI_UNSUPPORTED;
+  } else {
+    FunctionData->Status = gSmst->SmmAllocatePool (
+                                    FunctionData->Args.AllocatePool.PoolType,
+                                    FunctionData->Args.AllocatePool.Size,
+                                    FunctionData->Args.AllocatePool.Buffer
+                                    );
+  }
 }
 
 /** 
@@ -529,8 +540,12 @@ HelperFreePool (
   IN OUT SMMBASE_FUNCTION_DATA *FunctionData
   )
 {
-  FreePool (FunctionData->Args.FreePool.Buffer);
-  FunctionData->Status = EFI_SUCCESS;
+  if (mLocked) {
+    FunctionData->Status =  EFI_UNSUPPORTED;
+  } else {
+    FreePool (FunctionData->Args.FreePool.Buffer);
+    FunctionData->Status = EFI_SUCCESS;
+  }
 }
 
 /** 
@@ -634,6 +649,29 @@ SmmHandlerEntry (
 }
 
 /**
+  Smm Ready To Lock event notification handler.
+
+  It sets a flag indicating that SMRAM has been locked.
+  
+  @param[in] Protocol   Points to the protocol's unique identifier.
+  @param[in] Interface  Points to the interface instance.
+  @param[in] Handle     The handle on which the interface was installed.
+
+  @retval EFI_SUCCESS   Notification handler runs successfully.
+ **/
+EFI_STATUS
+EFIAPI
+SmmReadyToLockEventNotify (
+  IN CONST EFI_GUID  *Protocol,
+  IN VOID            *Interface,
+  IN EFI_HANDLE      Handle
+  )
+{
+  mLocked = TRUE;
+  return EFI_SUCCESS;
+}
+
+/**
   Entry point function of the SMM Base Helper SMM driver.
 
   @param[in] ImageHandle  The firmware allocated handle for the EFI image.  
@@ -653,6 +691,7 @@ SmmBaseHelperMain (
   EFI_MP_SERVICES_PROTOCOL   *MpServices;
   EFI_HANDLE                 Handle;
   UINTN                      NumberOfEnabledProcessors;
+  VOID                       *Registration;
   
   Handle = NULL;
   ///
@@ -696,6 +735,16 @@ SmmBaseHelperMain (
   mFrameworkSmst = ConstructFrameworkSmst ();
   mSmmBaseHelperReady->FrameworkSmst = mFrameworkSmst;
   mSmmBaseHelperReady->ServiceEntry = SmmHandlerEntry;
+
+  //
+  // Register SMM Ready To Lock Protocol notification
+  //
+  Status = gSmst->SmmRegisterProtocolNotify (
+                    &gEfiSmmReadyToLockProtocolGuid,
+                    SmmReadyToLockEventNotify,
+                    &Registration
+                    );
+  ASSERT_EFI_ERROR (Status);
 
   ///
   /// Register SMM Base Helper services for SMM Base Thunk driver
