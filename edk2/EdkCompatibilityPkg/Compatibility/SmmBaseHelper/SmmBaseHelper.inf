@@ -59,6 +59,7 @@
   gEfiMpServiceProtocolGuid              # PROTOCOL ALWAYS_CONSUMED
   gEfiSmmCpuIo2ProtocolGuid              # PROTOCOL ALWAYS_CONSUMED
   gEfiLoadPeImageProtocolGuid            # PROTOCOL ALWAYS_CONSUMED
+  gEfiSmmReadyToLockProtocolGuid         # PROTOCOL ALWAYS_CONSUMED
 
 [Depex]
   gEfiSmmCpuProtocolGuid AND

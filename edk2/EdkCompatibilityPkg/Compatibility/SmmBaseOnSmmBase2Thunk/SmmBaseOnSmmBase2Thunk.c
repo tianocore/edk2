@@ -44,6 +44,7 @@ EFI_HANDLE                         mSmmBaseHandle = NULL;
 EFI_SMM_BASE2_PROTOCOL             *mSmmBase2 = NULL;
 EFI_SMM_COMMUNICATION_PROTOCOL     *mSmmCommunication = NULL;
 EFI_SMM_BASE_HELPER_READY_PROTOCOL *mSmmBaseHelperReady = NULL;
+BOOLEAN                            mAtRuntime = FALSE;
 
 /**
   Determine if in SMM mode.
@@ -133,7 +134,7 @@ SmmBaseRegister (
   IN      BOOLEAN                   LegacyIA32Binary
   )
 {
-  if (LegacyIA32Binary) {
+  if (mAtRuntime || LegacyIA32Binary) {
     return EFI_UNSUPPORTED;
   }
 
@@ -166,6 +167,10 @@ SmmBaseUnregister (
   IN      EFI_HANDLE                ImageHandle
   )
 {
+  if (mAtRuntime) {
+    return EFI_UNSUPPORTED;
+  }
+
   mCommunicationData.FunctionData.Function = SmmBaseFunctionUnregister;
   mCommunicationData.FunctionData.Args.UnRegister.ImageHandle = ImageHandle;
 
@@ -308,6 +313,10 @@ SmmBaseSmmAllocatePool (
   OUT     VOID                      **Buffer
   )
 {
+  if (mAtRuntime) {
+    return EFI_UNSUPPORTED;
+  }
+
   mCommunicationData.FunctionData.Function = SmmBaseFunctionAllocatePool;
   mCommunicationData.FunctionData.Args.AllocatePool.PoolType = PoolType;
   mCommunicationData.FunctionData.Args.AllocatePool.Size = Size;
@@ -336,6 +345,10 @@ SmmBaseSmmFreePool (
   IN      VOID                      *Buffer
   )
 {
+  if (mAtRuntime) {
+    return EFI_UNSUPPORTED;
+  }
+
   mCommunicationData.FunctionData.Function = SmmBaseFunctionFreePool;
   mCommunicationData.FunctionData.Args.FreePool.Buffer = Buffer;
 
@@ -409,6 +422,24 @@ EFI_SMM_BASE_PROTOCOL  mSmmBase = {
 };
 
 /**
+  Notification function on Exit Boot Services Event.
+
+  This function sets a flag indicating it is in Runtime phase.
+
+  @param  Event        Event whose notification function is being invoked
+  @param  Context      Pointer to the notification function's context
+**/
+VOID
+EFIAPI
+SmmBaseExitBootServicesEventNotify (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  mAtRuntime = TRUE;
+}
+
+/**
   Entry Point for SMM Base Protocol on SMM Base2 Protocol Thunk driver.
 
   @param[in] ImageHandle  Image handle of this driver.
@@ -447,6 +478,19 @@ SmmBaseThunkMain (
   // Locate SMM Base Helper Ready Protocol
   //
   Status = gBS->LocateProtocol (&gEfiSmmBaseHelperReadyProtocolGuid, NULL, (VOID **) &mSmmBaseHelperReady);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Create event notification on Exit Boot Services event.
+  //
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  SmmBaseExitBootServicesEventNotify,
+                  NULL,
+                  &gEfiEventExitBootServicesGuid,
+                  &Event
+                  );
   ASSERT_EFI_ERROR (Status);
 
   //

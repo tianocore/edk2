@@ -44,6 +44,7 @@
 
 [Guids]
   gEfiEventVirtualAddressChangeGuid   # GUID ALWAYS_CONSUMED
+  gEfiEventExitBootServicesGuid       # GUID ALWAYS_CONSUMED
 
 [Protocols]
   gEfiSmmBase2ProtocolGuid            # PROTOCOL ALWAYS_CONSUMED
