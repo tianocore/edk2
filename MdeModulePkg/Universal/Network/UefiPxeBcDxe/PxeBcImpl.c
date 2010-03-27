@@ -2716,7 +2716,9 @@ EfiPxeLoadFile (
     if (Buffer != NULL) {
       AsciiPrint ("PXE-E05: Download buffer is smaller than requested file.\n");
     } else {
-      PxeBc->Stop (PxeBc);
+      //
+      // The functionality of PXE Base Code protocol will not be stopped.
+      //
       return Status;
     }
 
