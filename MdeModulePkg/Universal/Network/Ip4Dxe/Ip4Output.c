@@ -312,7 +312,7 @@ Ip4Output (
   // OK, selected the source and route, fragment the packet then send
   // them. Tag each fragment other than the first one as spawn from it.
   //
-  Mtu            = IpSb->MaxPacketSize;
+  Mtu            = IpSb->MaxPacketSize + sizeof (IP4_HEAD);
   HeadLen        = sizeof (IP4_HEAD) + ((OptLen + 3) & (~0x03));
   Head->Id       = mIp4Id++;
 
