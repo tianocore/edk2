@@ -544,6 +544,7 @@ Returns:
   WIN_NT_EFI_FILE_PRIVATE           *PrivateFile;
   EFI_TPL                           OldTpl;
   CHAR16                            *TempFileName;
+  UINTN                             Size;
 
   if (This == NULL || Root == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -613,10 +614,12 @@ Returns:
   //
   // Find the first file under it
   //
+  Size  = StrSize (PrivateFile->FilePath);
+  Size += StrSize (L"\\*");
   Status = gBS->AllocatePool (
                   EfiBootServicesData,
-                  StrSize (PrivateFile->FilePath) + StrSize (L"\\*"),
-                  &TempFileName
+                  Size,
+                  (VOID **)&TempFileName
                   );
   if (EFI_ERROR (Status)) {
     goto Done;

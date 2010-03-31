@@ -104,4 +104,3 @@ Stall (
   
   return EFI_SUCCESS;
 }
-  

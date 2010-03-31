@@ -70,10 +70,10 @@ MISC_SMBIOS_TABLE_FUNCTION(MiscSystemSlotDesignation)
   SmbiosRecord->Hdr.Length = sizeof (SMBIOS_TABLE_TYPE9);
   SmbiosRecord->Hdr.Handle = 0; 
   SmbiosRecord->SlotDesignation = 1;
-  SmbiosRecord->SlotType = ForType9InputData->SlotType;
-  SmbiosRecord->SlotDataBusWidth = ForType9InputData->SlotDataBusWidth;
-  SmbiosRecord->CurrentUsage = ForType9InputData->SlotUsage;
-  SmbiosRecord->SlotLength = ForType9InputData->SlotLength;
+  SmbiosRecord->SlotType = (UINT8)ForType9InputData->SlotType;
+  SmbiosRecord->SlotDataBusWidth = (UINT8)ForType9InputData->SlotDataBusWidth;
+  SmbiosRecord->CurrentUsage = (UINT8)ForType9InputData->SlotUsage;
+  SmbiosRecord->SlotLength = (UINT8)ForType9InputData->SlotLength;
   SmbiosRecord->SlotID = ForType9InputData->SlotId;
   
   //
