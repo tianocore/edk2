@@ -20,9 +20,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __EFI_SMM_BASE_HELPER_READY_H__
 #define __EFI_SMM_BASE_HELPER_READY_H__
 
-#include <FrameworkSmm.h>
-#include <PiSmm.h>
-
 #define EFI_SMM_BASE_HELPER_READY_PROTOCOL_GUID  \
   { \
     0x910dca07, 0x1f94, 0x4ee7, { 0xaf, 0x2f, 0xff, 0x72, 0xf3, 0x15, 0x43, 0x53 } \
