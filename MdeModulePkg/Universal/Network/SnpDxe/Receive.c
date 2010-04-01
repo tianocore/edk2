@@ -132,6 +132,16 @@ PxeReceive (
     *Protocol = (UINT16) PXE_SWAP_UINT16 (Db->Protocol);
   }
 
+  //
+  // We have received a packet from network interface, which implies that the
+  // network cable should be present. While, some UNDI driver may not report
+  // correct media status during Snp->Initialize(). So, we need ensure
+  // MediaPresent in SNP mode data is set to correct value.
+  //
+  if (Snp->Mode.MediaPresentSupported && !Snp->Mode.MediaPresent) {
+    Snp->Mode.MediaPresent = TRUE;
+  }
+
   return (*BufferSize <= BuffSize) ? EFI_SUCCESS : EFI_BUFFER_TOO_SMALL;
 }
 
