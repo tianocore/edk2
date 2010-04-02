@@ -111,10 +111,21 @@ PageFaultHandlerHook (
   VOID
   );
 
+/**
+  Read CpuSaveStates from PI for Framework use.
+
+  The function reads PI style CpuSaveStates of CpuIndex-th CPU for Framework driver use. If
+  ToRead is specified, the CpuSaveStates will be copied to ToRead, otherwise copied to
+  mFrameworkSmst->CpuSaveState[CpuIndex].
+
+  @param[in]      CpuIndex        The zero-based CPU index.
+  @param[in, out] ToRead          If not NULL, CpuSaveStates will be copied to it.
+
+**/
 VOID
 ReadCpuSaveState (
-  UINTN                   CpuIndex,
-  EFI_SMM_CPU_SAVE_STATE  *ToRead
+  IN     UINTN                   CpuIndex,
+  IN OUT EFI_SMM_CPU_SAVE_STATE  *ToRead
   )
 {
   EFI_STATUS Status;
@@ -156,10 +167,21 @@ ReadCpuSaveState (
   }
 }
 
+/**
+  Write CpuSaveStates from Framework into PI.
+
+  The function writes back CpuSaveStates of CpuIndex-th CPU from PI to Framework. If
+  ToWrite is specified, it contains the CpuSaveStates to write from, otherwise CpuSaveStates
+  to write from mFrameworkSmst->CpuSaveState[CpuIndex].
+
+  @param[in] CpuIndex      The zero-based CPU index.
+  @param[in] ToWrite       If not NULL, CpuSaveStates to write from.
+
+**/
 VOID
 WriteCpuSaveState (
-  UINTN                   CpuIndex,
-  EFI_SMM_CPU_SAVE_STATE  *ToWrite
+  IN UINTN                   CpuIndex,
+  IN EFI_SMM_CPU_SAVE_STATE  *ToWrite
   )
 {
   EFI_STATUS Status;
@@ -184,10 +206,25 @@ WriteCpuSaveState (
   }
 }
 
+/**
+  Read or write a page that contains CpuSaveStates. Read is from PI to Framework.
+  Write is from Framework to PI.
+
+  This function reads or writes a page that contains CpuSaveStates. The page contains Framework
+  CpuSaveStates. On read, it reads PI style CpuSaveStates and fill the page up. On write, it
+  writes back from the page content to PI CpuSaveStates struct.
+  The first Framework CpuSaveStates (for CPU 0) is from mFrameworkSmst->CpuSaveState which is
+  page aligned. Because Framework CpuSaveStates are continuous, we can know which CPUs' SaveStates
+  are in the page start from PageAddress.
+
+  @param[in] PageAddress   The base address for a page.
+  @param[in] IsRead        TRUE for Read, FALSE for Write.
+
+**/
 VOID
 ReadWriteCpuStatePage (
-  UINT64  PageAddress,
-  BOOLEAN IsRead
+  IN UINT64  PageAddress,
+  IN BOOLEAN IsRead
   )
 {
   UINTN          FirstSSIndex;   // Index of first CpuSaveState in the page
@@ -238,6 +275,15 @@ ReadWriteCpuStatePage (
   }
 }
 
+/**
+  The page fault handler that on-demand read PI CpuSaveStates for framework use. If the fault
+  is not targeted to mFrameworkSmst->CpuSaveState range, the function will return FALSE to let
+  PageFaultHandlerHook know it needs to pass the fault over to original page fault handler.
+  
+  @retval TRUE     The page fault is correctly handled.
+  @retval FALSE    The page fault is not handled and is passed through to original handler.
+
+**/
 BOOLEAN
 PageFaultHandler (
   VOID
@@ -272,6 +318,14 @@ PageFaultHandler (
   return IsHandled;
 }
 
+/**
+  Write back the dirty Framework CpuSaveStates to PI.
+  
+  The function scans the page table for dirty pages in mFrameworkSmst->CpuSaveState
+  to write back to PI CpuSaveStates. It is meant to be called on each SmmBaseHelper SMI
+  callback after Framework handler is called.
+
+**/
 VOID
 WriteBackDirtyPages (
   VOID
@@ -292,6 +346,14 @@ WriteBackDirtyPages (
   }
 }
 
+/**
+  Hook IDT with our page fault handler so that the on-demand paging works on page fault.
+  
+  The function hooks the IDT with PageFaultHandlerHook to get on-demand paging work for
+  PI<->Framework CpuSaveStates marshalling. It also saves original handler for pass-through
+  purpose.
+
+**/
 VOID
 HookPageFaultHandler (
   VOID
@@ -311,9 +373,20 @@ HookPageFaultHandler (
   IdtGateDesc[14].Bits.OffsetHigh = (UINT32)(((UINTN)PageFaultHandlerHook >> 16) & ((1 << 16) - 1));
 }
 
+/**
+  Initialize page table for pages contain HookData.
+  
+  The function initialize PDE for 2MB range that contains HookData. If the related PDE points
+  to a 2MB page, a page table will be allocated and initialized for 4KB pages. Otherwise we juse
+  use the original page table.
+
+  @param[in] HookData   Based on which to initialize page table.
+
+  @return    The pointer to a Page Table that points to 4KB pages which contain HookData.
+**/
 UINT64 *
 InitCpuStatePageTable (
-  VOID *HookData
+  IN VOID *HookData
   )
 {
   UINTN  Index;
@@ -355,9 +428,19 @@ InitCpuStatePageTable (
   return PageTable;
 }
 
+/**
+  Mark all the CpuSaveStates as not present.
+  
+  The function marks all CpuSaveStates memory range as not present so that page fault can be triggered
+  on CpuSaveStates access. It is meant to be called on each SmmBaseHelper SMI callback before Framework
+  handler is called.
+
+  @param[in] CpuSaveState   The base of CpuSaveStates.
+
+**/
 VOID
 HookCpuStateMemory (
-  EFI_SMM_CPU_SAVE_STATE *CpuSaveState
+  IN EFI_SMM_CPU_SAVE_STATE *CpuSaveState
   )
 {
   UINT64 Index;
@@ -407,9 +490,16 @@ SmmInstallConfigurationTable (
   return Status;         
 }
 
+/**
+  Initialize all the stuff needed for on-demand paging hooks for PI<->Framework
+  CpuSaveStates marshalling.
+
+  @param[in] FrameworkSmst   Framework SMM system table pointer.
+
+**/
 VOID
 InitHook (
-  EFI_SMM_SYSTEM_TABLE  *FrameworkSmst
+  IN EFI_SMM_SYSTEM_TABLE  *FrameworkSmst
   )
 {
   UINTN                 NumCpuStatePages;

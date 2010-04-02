@@ -12,6 +12,13 @@
 
 **/
 
+/**
+  The dummy handler that does nothing.
+  
+  The function is only used by systems that don't use paging but need
+  build pass.
+
+**/
 VOID
 PageFaultHandlerHook (
   VOID
