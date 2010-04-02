@@ -40,10 +40,10 @@
   #  need change it except some special cases such as when initializing the CSM binary, it should be set to 0xFFFF to 
   #  mask all legacy interrupt. Please restore the original legacy mask value if changing is made for these special case.
   #
-  gPcAtChipsetPkgTokenSpaceGuid.Pcd8259LegacyModeMask|0x00000001|UINT16|0xFFFF
+  gPcAtChipsetPkgTokenSpaceGuid.Pcd8259LegacyModeMask|0xFFFF|UINT16|0x00000001
   
   ## Pcd8259LegacyModeEdgeLevel defines the default edge level for legacy mode's interrrupt controller.
-  gPcAtChipsetPkgTokenSpaceGuid.Pcd8259LegacyModeEdgeLevel|0x00000002|UINT16|0x0000
+  gPcAtChipsetPkgTokenSpaceGuid.Pcd8259LegacyModeEdgeLevel|0x0000|UINT16|0x00000002
   
 [Guids]
   gPcAtChipsetPkgTokenSpaceGuid = { 0x326ae723, 0xae32, 0x4589, { 0x98, 0xb8, 0xca, 0xc2, 0x3c, 0xdc, 0xc1, 0xb1 } }
