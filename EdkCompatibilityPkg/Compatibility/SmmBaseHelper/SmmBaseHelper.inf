@@ -30,6 +30,16 @@
 
 [Sources]
   SmmBaseHelper.c
+
+[Sources.Ia32]
+  PageFaultHandler.c
+  
+[Sources.X64]
+  X64/PageFaultHandler.asm | MSFT
+
+  X64/PageFaultHandler.asm | INTEL
+  
+  X64/PageFaultHandler.S   | GCC
  
 [Packages]
   MdePkg/MdePkg.dec
@@ -46,6 +56,8 @@
   DevicePathLib
   CacheMaintenanceLib
   MemoryAllocationLib
+  SynchronizationLib
+  CpuLib
 
 [Guids]
   gEfiSmmBaseThunkCommunicationGuid

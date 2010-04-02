@@ -25,6 +25,8 @@
 #include <Library/DevicePathLib.h>
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/SynchronizationLib.h>
+#include <Library/CpuLib.h>
 #include <Guid/SmmBaseThunkCommunication.h>
 #include <Protocol/SmmBaseHelperReady.h>
 #include <Protocol/SmmCpu.h>
@@ -69,6 +71,13 @@ EFI_SMM_BASE_HELPER_READY_PROTOCOL *mSmmBaseHelperReady;
 EFI_SMM_SYSTEM_TABLE               *mFrameworkSmst;
 UINTN                              mNumberOfProcessors;
 BOOLEAN                            mLocked = FALSE;
+BOOLEAN                            mPageTableHookEnabled;
+BOOLEAN                            mHookInitialized;
+UINT64                             *mCpuStatePageTable;
+SPIN_LOCK                          mPFLock;
+UINT64                             mPhyMask;
+VOID                               *mOriginalHandler;
+EFI_SMM_CPU_SAVE_STATE             *mShadowSaveState;
 
 LIST_ENTRY mCallbackInfoListHead = INITIALIZE_LIST_HEAD_VARIABLE (mCallbackInfoListHead);
 
@@ -96,6 +105,271 @@ CPU_SAVE_STATE_CONVERSION mCpuSaveStateConvTable[] = {
   {EFI_SMM_SAVE_STATE_REGISTER_CR0      , CPU_SAVE_STATE_GET_OFFSET(CR0)},
   {EFI_SMM_SAVE_STATE_REGISTER_CR3      , CPU_SAVE_STATE_GET_OFFSET(CR3)}
 };
+
+VOID
+PageFaultHandlerHook (
+  VOID
+  );
+
+VOID
+ReadCpuSaveState (
+  UINTN                   CpuIndex,
+  EFI_SMM_CPU_SAVE_STATE  *ToRead
+  )
+{
+  EFI_STATUS Status;
+  UINTN Index;
+  EFI_SMM_CPU_STATE *State;
+  EFI_SMI_CPU_SAVE_STATE *SaveState;
+
+  State = (EFI_SMM_CPU_STATE *)gSmst->CpuSaveState[CpuIndex];
+  if (ToRead != NULL) {
+    SaveState = &ToRead->Ia32SaveState;
+  } else {
+    SaveState = &mFrameworkSmst->CpuSaveState[CpuIndex].Ia32SaveState;
+  }
+
+  if (State->x86.SMMRevId < EFI_SMM_MIN_REV_ID_x64) {
+    SaveState->SMBASE = State->x86.SMBASE;
+    SaveState->SMMRevId = State->x86.SMMRevId;
+    SaveState->IORestart = State->x86.IORestart;
+    SaveState->AutoHALTRestart = State->x86.AutoHALTRestart;
+  } else {
+    SaveState->SMBASE = State->x64.SMBASE;
+    SaveState->SMMRevId = State->x64.SMMRevId;
+    SaveState->IORestart = State->x64.IORestart;
+    SaveState->AutoHALTRestart = State->x64.AutoHALTRestart;
+  }
+
+  for (Index = 0; Index < sizeof (mCpuSaveStateConvTable) / sizeof (CPU_SAVE_STATE_CONVERSION); Index++) {
+    ///
+    /// Try to use SMM CPU Protocol to access CPU save states if possible
+    ///
+    Status = mSmmCpu->ReadSaveState (
+                        mSmmCpu,
+                        (UINTN)sizeof (UINT32),
+                        mCpuSaveStateConvTable[Index].Register,
+                        CpuIndex,
+                        ((UINT8 *)SaveState) + mCpuSaveStateConvTable[Index].Offset
+                        );
+    ASSERT_EFI_ERROR (Status);
+  }
+}
+
+VOID
+WriteCpuSaveState (
+  UINTN                   CpuIndex,
+  EFI_SMM_CPU_SAVE_STATE  *ToWrite
+  )
+{
+  EFI_STATUS Status;
+  UINTN      Index;
+  EFI_SMI_CPU_SAVE_STATE *SaveState;
+
+  if (ToWrite != NULL) {
+    SaveState = &ToWrite->Ia32SaveState;
+  } else {
+    SaveState = &mFrameworkSmst->CpuSaveState[CpuIndex].Ia32SaveState;
+  }
+  
+  for (Index = 0; Index < sizeof (mCpuSaveStateConvTable) / sizeof (CPU_SAVE_STATE_CONVERSION); Index++) {
+    Status = mSmmCpu->WriteSaveState (
+                        mSmmCpu,
+                        (UINTN)sizeof (UINT32),
+                        mCpuSaveStateConvTable[Index].Register,
+                        CpuIndex,
+                        ((UINT8 *)SaveState) + 
+                        mCpuSaveStateConvTable[Index].Offset
+                        );
+  }
+}
+
+VOID
+ReadWriteCpuStatePage (
+  UINT64  PageAddress,
+  BOOLEAN IsRead
+  )
+{
+  UINTN          FirstSSIndex;   // Index of first CpuSaveState in the page
+  UINTN          LastSSIndex;    // Index of last CpuSaveState in the page
+  BOOLEAN        FirstSSAligned; // Whether first CpuSaveState is page-aligned
+  BOOLEAN        LastSSAligned;  // Whether the end of last CpuSaveState is page-aligned
+  UINTN          ClippedSize;
+  UINTN          CpuIndex;
+
+  FirstSSIndex = ((UINTN)PageAddress - (UINTN)mFrameworkSmst->CpuSaveState) / sizeof (EFI_SMM_CPU_SAVE_STATE);
+  FirstSSAligned = TRUE;
+  if (((UINTN)PageAddress - (UINTN)mFrameworkSmst->CpuSaveState) % sizeof (EFI_SMM_CPU_SAVE_STATE) != 0) {
+    FirstSSIndex++;
+    FirstSSAligned = FALSE;
+  }
+  LastSSIndex = ((UINTN)PageAddress + SIZE_4KB - (UINTN)mFrameworkSmst->CpuSaveState - 1) / sizeof (EFI_SMM_CPU_SAVE_STATE);
+  LastSSAligned = TRUE;
+  if (((UINTN)PageAddress + SIZE_4KB - (UINTN)mFrameworkSmst->CpuSaveState) % sizeof (EFI_SMM_CPU_SAVE_STATE) != 0) {
+    LastSSIndex--;
+    LastSSAligned = FALSE;
+  }
+  for (CpuIndex = FirstSSIndex; CpuIndex <= LastSSIndex && CpuIndex < mNumberOfProcessors; CpuIndex++) {
+    if (IsRead) {
+      ReadCpuSaveState (CpuIndex, NULL);
+    } else {
+      WriteCpuSaveState (CpuIndex, NULL);
+    }
+  }
+  if (!FirstSSAligned) {
+    ReadCpuSaveState (FirstSSIndex - 1, mShadowSaveState);
+    ClippedSize = (UINTN)&mFrameworkSmst->CpuSaveState[FirstSSIndex] & (SIZE_4KB - 1);
+    if (IsRead) {
+      CopyMem ((VOID*)(UINTN)PageAddress, (VOID*)((UINTN)(mShadowSaveState + 1) - ClippedSize), ClippedSize);
+    } else {
+      CopyMem ((VOID*)((UINTN)(mShadowSaveState + 1) - ClippedSize), (VOID*)(UINTN)PageAddress, ClippedSize);
+      WriteCpuSaveState (FirstSSIndex - 1, mShadowSaveState);
+    }
+  }
+  if (!LastSSAligned && LastSSIndex + 1 < mNumberOfProcessors) {
+    ReadCpuSaveState (LastSSIndex + 1, mShadowSaveState);
+    ClippedSize = SIZE_4KB - ((UINTN)&mFrameworkSmst->CpuSaveState[LastSSIndex + 1] & (SIZE_4KB - 1));
+    if (IsRead) {
+      CopyMem (&mFrameworkSmst->CpuSaveState[LastSSIndex + 1], mShadowSaveState, ClippedSize);
+    } else {
+      CopyMem (mShadowSaveState, &mFrameworkSmst->CpuSaveState[LastSSIndex + 1], ClippedSize);
+      WriteCpuSaveState (LastSSIndex + 1, mShadowSaveState);
+    }
+  }
+}
+
+BOOLEAN
+PageFaultHandler (
+  VOID
+  )
+{
+  BOOLEAN        IsHandled;
+  UINT64         *PageTable;
+  UINT64         PFAddress;
+  UINTN          NumCpuStatePages;
+  
+  ASSERT (mPageTableHookEnabled);
+  AcquireSpinLock (&mPFLock);
+
+  PageTable = (UINT64*)(UINTN)(AsmReadCr3 () & mPhyMask);
+  PFAddress = AsmReadCr2 ();
+  NumCpuStatePages = EFI_SIZE_TO_PAGES (mNumberOfProcessors * sizeof (EFI_SMM_CPU_SAVE_STATE));
+  IsHandled = FALSE;
+  if (((UINTN)mFrameworkSmst->CpuSaveState & ~(SIZE_2MB-1)) == (PFAddress & ~(SIZE_2MB-1))) {
+    if ((UINTN)mFrameworkSmst->CpuSaveState <= PFAddress &&
+        PFAddress < (UINTN)mFrameworkSmst->CpuSaveState + EFI_PAGES_TO_SIZE (NumCpuStatePages)
+        ) {
+      mCpuStatePageTable[BitFieldRead64 (PFAddress, 12, 20)] |= BIT0 | BIT1; // present and rw
+      CpuFlushTlb ();
+      ReadWriteCpuStatePage (PFAddress & ~(SIZE_4KB-1), TRUE);
+      IsHandled = TRUE;
+    } else {
+      ASSERT (FALSE);
+    }
+  }
+
+  ReleaseSpinLock (&mPFLock);
+  return IsHandled;
+}
+
+VOID
+WriteBackDirtyPages (
+  VOID
+  )
+{
+  UINTN  NumCpuStatePages;
+  UINTN  PTIndex;
+  UINTN  PTStartIndex;
+  UINTN  PTEndIndex;
+
+  NumCpuStatePages = EFI_SIZE_TO_PAGES (mNumberOfProcessors * sizeof (EFI_SMM_CPU_SAVE_STATE));
+  PTStartIndex = (UINTN)BitFieldRead64 ((UINT64)mFrameworkSmst->CpuSaveState, 12, 20);
+  PTEndIndex   = (UINTN)BitFieldRead64 ((UINT64)mFrameworkSmst->CpuSaveState + EFI_PAGES_TO_SIZE(NumCpuStatePages) - 1, 12, 20);
+  for (PTIndex = PTStartIndex; PTIndex <= PTEndIndex; PTIndex++) {
+    if ((mCpuStatePageTable[PTIndex] & (BIT0|BIT6)) == (BIT0|BIT6)) { // present and dirty?
+      ReadWriteCpuStatePage (mCpuStatePageTable[PTIndex] & mPhyMask, FALSE);
+    }
+  }
+}
+
+VOID
+HookPageFaultHandler (
+  VOID
+  )
+{
+  IA32_DESCRIPTOR           Idtr;
+  IA32_IDT_GATE_DESCRIPTOR  *IdtGateDesc;
+  UINT32                    OffsetUpper;
+  
+  InitializeSpinLock (&mPFLock);
+  
+  AsmReadIdtr (&Idtr);
+  IdtGateDesc = (IA32_IDT_GATE_DESCRIPTOR *) Idtr.Base;
+  OffsetUpper = *(UINT32*)((UINT64*)IdtGateDesc + 1);
+  mOriginalHandler = (VOID *)(UINTN)(LShiftU64 (OffsetUpper, 32) + IdtGateDesc[14].Bits.OffsetLow + (IdtGateDesc[14].Bits.OffsetHigh << 16));
+  IdtGateDesc[14].Bits.OffsetLow = (UINT32)((UINTN)PageFaultHandlerHook & ((1 << 16) - 1));
+  IdtGateDesc[14].Bits.OffsetHigh = (UINT32)(((UINTN)PageFaultHandlerHook >> 16) & ((1 << 16) - 1));
+}
+
+UINT64 *
+InitCpuStatePageTable (
+  VOID *HookData
+  )
+{
+  UINTN  Index;
+  UINT64 *PageTable;
+  UINT64 *PDPTE;
+  UINT64 HookAddress;
+  UINT64 PDE;
+  UINT64 Address;
+  
+  //
+  // Initialize physical address mask
+  // NOTE: Physical memory above virtual address limit is not supported !!!
+  //
+  AsmCpuid (0x80000008, (UINT32*)&Index, NULL, NULL, NULL);
+  mPhyMask = LShiftU64 (1, (UINT8)Index) - 1;
+  mPhyMask &= (1ull << 48) - EFI_PAGE_SIZE;
+  
+  HookAddress = (UINT64)(UINTN)HookData;
+  PageTable   = (UINT64 *)(UINTN)(AsmReadCr3 () & mPhyMask);
+  PageTable = (UINT64 *)(UINTN)(PageTable[BitFieldRead64 (HookAddress, 39, 47)] & mPhyMask);
+  PageTable = (UINT64 *)(UINTN)(PageTable[BitFieldRead64 (HookAddress, 30, 38)] & mPhyMask);
+  
+  PDPTE = (UINT64 *)(UINTN)PageTable;
+  PDE = PDPTE[BitFieldRead64 (HookAddress, 21, 29)];
+  ASSERT ((PDE & BIT0) != 0); // Present and 2M Page
+  
+  if ((PDE & BIT7) == 0) { // 4KB Page Directory
+    PageTable = (UINT64 *)(UINTN)(PDE & mPhyMask);
+  } else {
+    ASSERT ((PDE & mPhyMask) == (HookAddress & ~(SIZE_2MB-1))); // 2MB Page Point to HookAddress
+    PageTable = AllocatePages (1);
+    Address = HookAddress & ~(SIZE_2MB-1);
+    for (Index = 0; Index < 512; Index++) {
+      PageTable[Index] = Address | BIT0 | BIT1; // Present and RW
+      Address += SIZE_4KB;
+    }
+    PDPTE[BitFieldRead64 (HookAddress, 21, 29)] = (UINT64)(UINTN)PageTable | BIT0 | BIT1; // Present and RW
+  }
+  return PageTable;
+}
+
+VOID
+HookCpuStateMemory (
+  EFI_SMM_CPU_SAVE_STATE *CpuSaveState
+  )
+{
+  UINT64 Index;
+  UINT64 PTStartIndex;
+  UINT64 PTEndIndex;
+
+  PTStartIndex = BitFieldRead64 ((UINTN)CpuSaveState, 12, 20);
+  PTEndIndex = BitFieldRead64 ((UINTN)CpuSaveState + mNumberOfProcessors * sizeof (EFI_SMM_CPU_SAVE_STATE) - 1, 12, 20);
+  for (Index = PTStartIndex; Index <= PTEndIndex; Index++) {
+    mCpuStatePageTable[Index] &= ~(BIT0|BIT5|BIT6); // not present nor accessed nor dirty
+  }
+}  
 
 /**
   Framework SMST SmmInstallConfigurationTable() Thunk.
@@ -133,6 +407,62 @@ SmmInstallConfigurationTable (
   return Status;         
 }
 
+VOID
+InitHook (
+  EFI_SMM_SYSTEM_TABLE  *FrameworkSmst
+  )
+{
+  UINTN                 NumCpuStatePages;
+  UINTN                 CpuStatePage;
+  UINTN                 Bottom2MPage;
+  UINTN                 Top2MPage;
+  
+  mPageTableHookEnabled = FALSE;
+  NumCpuStatePages = EFI_SIZE_TO_PAGES (mNumberOfProcessors * sizeof (EFI_SMM_CPU_SAVE_STATE));
+  //
+  // Only hook page table for X64 image and less than 2MB needed to hold all CPU Save States
+  //
+  if (EFI_IMAGE_MACHINE_TYPE_SUPPORTED(EFI_IMAGE_MACHINE_X64) && NumCpuStatePages <= EFI_SIZE_TO_PAGES (SIZE_2MB)) {
+    //
+    // Allocate double page size to make sure all CPU Save States are in one 2MB page.
+    //
+    CpuStatePage = (UINTN)AllocatePages (NumCpuStatePages * 2);
+    ASSERT (CpuStatePage != 0);
+    Bottom2MPage = CpuStatePage & ~(SIZE_2MB-1);
+    Top2MPage    = (CpuStatePage + EFI_PAGES_TO_SIZE (NumCpuStatePages * 2) - 1) & ~(SIZE_2MB-1);
+    if (Bottom2MPage == Top2MPage ||
+        CpuStatePage + EFI_PAGES_TO_SIZE (NumCpuStatePages * 2) - Top2MPage >= EFI_PAGES_TO_SIZE (NumCpuStatePages)
+        ) {
+      //
+      // If the allocated 4KB pages are within the same 2MB page or higher portion is larger, use higher portion pages.
+      //
+      FrameworkSmst->CpuSaveState = (EFI_SMM_CPU_SAVE_STATE *)(CpuStatePage + EFI_PAGES_TO_SIZE (NumCpuStatePages));
+      FreePages ((VOID*)CpuStatePage, NumCpuStatePages);
+    } else {
+      FrameworkSmst->CpuSaveState = (EFI_SMM_CPU_SAVE_STATE *)CpuStatePage;
+      FreePages ((VOID*)(CpuStatePage + EFI_PAGES_TO_SIZE (NumCpuStatePages)), NumCpuStatePages);
+    }
+    //
+    // Add temporary working buffer for hooking
+    //
+    mShadowSaveState = (EFI_SMM_CPU_SAVE_STATE*) AllocatePool (sizeof (EFI_SMM_CPU_SAVE_STATE));
+    ASSERT (mShadowSaveState != NULL);
+    //
+    // Allocate and initialize 4KB Page Table for hooking CpuSaveState.
+    // Replace the original 2MB PDE with new 4KB page table.
+    //
+    mCpuStatePageTable = InitCpuStatePageTable (FrameworkSmst->CpuSaveState);
+    //
+    // Mark PTE for CpuSaveState as non-exist.
+    //
+    HookCpuStateMemory (FrameworkSmst->CpuSaveState);
+    HookPageFaultHandler ();
+    CpuFlushTlb ();
+    mPageTableHookEnabled = TRUE;
+  }
+  mHookInitialized = TRUE;
+}
+
 /**
   Construct a Framework SMST based on the PI SMM SMST.
 
@@ -164,6 +494,7 @@ ConstructFrameworkSmst (
   FrameworkSmst->Hdr.Revision = EFI_SMM_SYSTEM_TABLE_REVISION;
   CopyGuid (&FrameworkSmst->EfiSmmCpuIoGuid, &mEfiSmmCpuIoGuid);
 
+  mHookInitialized = FALSE;
   FrameworkSmst->CpuSaveState = (EFI_SMM_CPU_SAVE_STATE *)AllocateZeroPool (mNumberOfProcessors * sizeof (EFI_SMM_CPU_SAVE_STATE));
   ASSERT (FrameworkSmst->CpuSaveState != NULL);
 
@@ -360,44 +691,22 @@ CallbackThunk (
 {
   EFI_STATUS        Status;
   CALLBACK_INFO     *CallbackInfo;
-  UINTN             Index;
   UINTN             CpuIndex;
-  EFI_SMM_CPU_STATE *State;
-  EFI_SMI_CPU_SAVE_STATE *SaveState;
 
   ///
   /// Before transferring the control into the Framework SMI handler, update CPU Save States
   /// and MP states in the Framework SMST.
   ///
 
-  for (CpuIndex = 0; CpuIndex < mNumberOfProcessors; CpuIndex++) {
-    State = (EFI_SMM_CPU_STATE *)gSmst->CpuSaveState[CpuIndex];
-    SaveState = &mFrameworkSmst->CpuSaveState[CpuIndex].Ia32SaveState;
-
-    if (State->x86.SMMRevId < EFI_SMM_MIN_REV_ID_x64) {
-      SaveState->SMBASE = State->x86.SMBASE;
-      SaveState->SMMRevId = State->x86.SMMRevId;
-      SaveState->IORestart = State->x86.IORestart;
-      SaveState->AutoHALTRestart = State->x86.AutoHALTRestart;
-    } else {
-      SaveState->SMBASE = State->x64.SMBASE;
-      SaveState->SMMRevId = State->x64.SMMRevId;
-      SaveState->IORestart = State->x64.IORestart;
-      SaveState->AutoHALTRestart = State->x64.AutoHALTRestart;
-    }
-
-    for (Index = 0; Index < sizeof (mCpuSaveStateConvTable) / sizeof (CPU_SAVE_STATE_CONVERSION); Index++) {
-      ///
-      /// Try to use SMM CPU Protocol to access CPU save states if possible
-      ///
-      Status = mSmmCpu->ReadSaveState (
-                          mSmmCpu,
-                          (UINTN)sizeof (UINT32),
-                          mCpuSaveStateConvTable[Index].Register,
-                          CpuIndex,
-                          ((UINT8 *)SaveState) + mCpuSaveStateConvTable[Index].Offset
-                          );
-      ASSERT_EFI_ERROR (Status);
+  if (!mHookInitialized) {
+    InitHook (mFrameworkSmst);
+  }
+  if (mPageTableHookEnabled) {
+    HookCpuStateMemory (mFrameworkSmst->CpuSaveState);
+    CpuFlushTlb ();
+  } else {
+    for (CpuIndex = 0; CpuIndex < mNumberOfProcessors; CpuIndex++) {
+      ReadCpuSaveState (CpuIndex, NULL);
     }
   }
 
@@ -422,16 +731,11 @@ CallbackThunk (
   ///
   /// Save CPU Save States in case any of them was modified
   ///
-  for (CpuIndex = 0; CpuIndex < mNumberOfProcessors; CpuIndex++) {
-    for (Index = 0; Index < sizeof (mCpuSaveStateConvTable) / sizeof (CPU_SAVE_STATE_CONVERSION); Index++) {
-      Status = mSmmCpu->WriteSaveState (
-                          mSmmCpu,
-                          (UINTN)sizeof (UINT32),
-                          mCpuSaveStateConvTable[Index].Register,
-                          CpuIndex,
-                          ((UINT8 *)&mFrameworkSmst->CpuSaveState[CpuIndex].Ia32SaveState) + 
-                          mCpuSaveStateConvTable[Index].Offset
-                          );
+  if (mPageTableHookEnabled) {
+    WriteBackDirtyPages ();
+  } else {
+    for (CpuIndex = 0; CpuIndex < mNumberOfProcessors; CpuIndex++) {
+      WriteCpuSaveState (CpuIndex, NULL);
     }
   }
 
