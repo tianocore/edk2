@@ -32,8 +32,8 @@
 
 #define MAX_RETRY_COUNT  100
 
-#define HCS               (0x1UL << 30) //Host capacity support/1 = Supporting high capacity
-#define CCS               (0x1UL << 30) //Card capacity status/1 = High capacity card
+#define HCS               BIT30 //Host capacity support/1 = Supporting high capacity
+#define CCS               BIT30 //Card capacity status/1 = High capacity card
 typedef struct {
   UINT32  Reserved0:   7; // 0 
   UINT32  V170_V195:   1; // 1.70V - 1.95V

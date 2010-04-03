@@ -74,10 +74,10 @@
 
 //Nand status register bit definition
 #define NAND_SUCCESS             (0x0UL << 0)
-#define NAND_FAILURE             (0x1UL << 0)
+#define NAND_FAILURE             BIT0
 
 #define NAND_BUSY                (0x0UL << 6)
-#define NAND_READY               (0x1UL << 6)
+#define NAND_READY               BIT6
 
 #define NAND_RESET_STATUS        (0x60UL << 0)
 

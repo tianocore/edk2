@@ -28,11 +28,11 @@
 
 //CONTROL_PBIAS_LITE
 #define CONTROL_PBIAS_LITE    0x48002520
-#define PBIASLITEVMODE0       (0x1UL << 0)
-#define PBIASLITEPWRDNZ0      (0x1UL << 1)
-#define PBIASSPEEDCTRL0       (0x1UL << 2)
-#define PBIASLITEVMODE1       (0x1UL << 8)
-#define PBIASLITEWRDNZ1       (0x1UL << 9)
+#define PBIASLITEVMODE0       BIT0
+#define PBIASLITEPWRDNZ0      BIT1
+#define PBIASSPEEDCTRL0       BIT2
+#define PBIASLITEVMODE1       BIT8
+#define PBIASLITEWRDNZ1       BIT9
 
 #endif // __OMAP3530_H__
 

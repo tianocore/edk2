@@ -28,7 +28,7 @@
 
 //MMC definitions.
 #define VMMC1_DEV_GRP         0x82
-#define DEV_GRP_P1            (0x01UL << 5)
+#define DEV_GRP_P1            BIT5
 
 #define VMMC1_DEDICATED_REG   0x85 
 #define VSEL_1_85V            0x0
@@ -38,9 +38,9 @@
 
 //LEDEN register
 #define LEDEN                 0xEE
-#define LEDAON                (0x1UL << 0)
-#define LEDBON                (0x1UL << 1)
-#define LEDAPWM               (0x1UL << 4)
-#define LEDBPWM               (0x1UL << 5)
+#define LEDAON                BIT0
+#define LEDBON                BIT1
+#define LEDAPWM               BIT4
+#define LEDBPWM               BIT5
 
 #endif //__TPS65950_H__

@@ -38,9 +38,11 @@
 [PcdsFeatureFlag.common]
 
 [PcdsFixedAtBuild.common]
-  gOmap35xxTokenSpaceGuid.PcdBeagleConsoleUart|3|UINT32|0x00000202
-  gOmap35xxTokenSpaceGuid.PcdBeagleGpmcOffset|0x00000000|UINT32|0x00000203
-  gOmap35xxTokenSpaceGuid.PcdBeagleMMCHS1Base|0x00000000|UINT32|0x00000204
-  gOmap35xxTokenSpaceGuid.PcdBeagleArchTimer|3|UINT32|0x00000205
-  gOmap35xxTokenSpaceGuid.PcdBeagleFreeTimer|4|UINT32|0x00000206
+  gOmap35xxTokenSpaceGuid.PcdOmap35xxConsoleUart|3|UINT32|0x00000202
+  gOmap35xxTokenSpaceGuid.PcdOmap35xxGpmcOffset|0x00000000|UINT32|0x00000203
+  gOmap35xxTokenSpaceGuid.PcdOmap35xxMMCHS1Base|0x00000000|UINT32|0x00000204
+  gOmap35xxTokenSpaceGuid.PcdOmap35xxArchTimer|3|UINT32|0x00000205
+  gOmap35xxTokenSpaceGuid.PcdOmap35xxFreeTimer|4|UINT32|0x00000206
+  gOmap35xxTokenSpaceGuid.PcdOmap35xxDebugAgentTimer|5|UINT32|0x00000207
+  gOmap35xxTokenSpaceGuid.PcdDebugAgentTimerFreqNanoSeconds|1|UINT32|0x00000208
   

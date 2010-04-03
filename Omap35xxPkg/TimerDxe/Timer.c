@@ -98,7 +98,7 @@ TimerInterruptHandler (
   MmioWrite32 (TISR, TISR_CLEAR_ALL);  
 
   // Poll interrupt status bits to ensure clearing
-  while ((MmioRead32(TISR) & TISR_ALL_INTERRUPT_MASK) != TISR_NO_INTERRUPTS_PENDING);
+  while ((MmioRead32 (TISR) & TISR_ALL_INTERRUPT_MASK) != TISR_NO_INTERRUPTS_PENDING);
 
   gBS->RestoreTPL (OriginalTPL);
 }
@@ -372,7 +372,7 @@ TimerInitialize (
   ASSERT_EFI_ERROR (Status);
 
   // Set up the timer registers
-  TimerBaseAddress = TimerBase(FixedPcdGet32(PcdBeagleArchTimer));
+  TimerBaseAddress = TimerBase(FixedPcdGet32(PcdOmap35xxArchTimer));
   TISR = TimerBaseAddress + GPTIMER_TISR;
   TCLR = TimerBaseAddress + GPTIMER_TCLR;
   TLDR = TimerBaseAddress + GPTIMER_TLDR;
@@ -384,7 +384,7 @@ TimerInitialize (
   ASSERT_EFI_ERROR (Status);
 
   // Install interrupt handler
-  gVector = InterruptVectorForTimer(FixedPcdGet32(PcdBeagleArchTimer));
+  gVector = InterruptVectorForTimer(FixedPcdGet32(PcdOmap35xxArchTimer));
   Status = gInterrupt->RegisterInterruptSource(gInterrupt, gVector, TimerInterruptHandler);
   ASSERT_EFI_ERROR (Status);
 

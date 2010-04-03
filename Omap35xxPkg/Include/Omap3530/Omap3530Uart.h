@@ -29,25 +29,26 @@
 #define UART_LSR_REG  (0x0014)
 #define UART_MDR1_REG (0x0020)
 
-#define UART_FCR_TX_FIFO_CLEAR          (1UL << 3)
-#define UART_FCR_RX_FIFO_CLEAR          (1UL << 3)
-#define UART_FCR_FIFO_ENABLE            (1UL << 3)
+#define UART_FCR_TX_FIFO_CLEAR          BIT2
+#define UART_FCR_RX_FIFO_CLEAR          BIT1
+#define UART_FCR_FIFO_ENABLE            BIT0
 
-#define UART_LCR_DIV_EN_ENABLE          (1UL << 7)
+#define UART_LCR_DIV_EN_ENABLE          BIT7
 #define UART_LCR_DIV_EN_DISABLE         (0UL << 7)
-#define UART_LCR_CHAR_LENGTH_8          (3UL << 0)
+#define UART_LCR_CHAR_LENGTH_8          (BIT1 | BIT0)
 
-#define UART_MCR_RTS_FORCE_ACTIVE       (1UL << 1)
-#define UART_MCR_DTR_FORCE_ACTIVE       (1UL << 0)
+#define UART_MCR_RTS_FORCE_ACTIVE       BIT1
+#define UART_MCR_DTR_FORCE_ACTIVE       BIT0
 
-#define UART_LSR_TX_FIFO_E_MASK         (1UL << 5)
+#define UART_LSR_TX_FIFO_E_MASK         BIT5
 #define UART_LSR_TX_FIFO_E_NOT_EMPTY    (0UL << 5)
-#define UART_LSR_TX_FIFO_E_EMPTY        (1UL << 5)
-#define UART_LSR_RX_FIFO_E_MASK         (1UL << 0)
-#define UART_LSR_RX_FIFO_E_NOT_EMPTY    (1UL << 0)
+#define UART_LSR_TX_FIFO_E_EMPTY        BIT5
+#define UART_LSR_RX_FIFO_E_MASK         BIT0
+#define UART_LSR_RX_FIFO_E_NOT_EMPTY    BIT0
 #define UART_LSR_RX_FIFO_E_EMPTY        (0UL << 0)
 
-#define UART_MDR1_MODE_SELECT_DISABLE   (7UL << 0)
-#define UART_MDR1_MODE_SELECT_UART_16X  (0UL << 0)
+// BIT2:BIT0
+#define UART_MDR1_MODE_SELECT_DISABLE   (7UL)
+#define UART_MDR1_MODE_SELECT_UART_16X  (0UL)
 
 #endif // __OMAP3530UART_H__

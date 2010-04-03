@@ -57,13 +57,13 @@ NanoSecondDelay (
 
   Delay = (NanoSeconds / PcdGet32(PcdEmbeddedFdPerformanceCounterPeriodInNanoseconds)) + 1;
   
-  TimerCountRegister = TimerBase(PcdGet32(PcdBeagleFreeTimer)) + GPTIMER_TCRR;
+  TimerCountRegister = TimerBase(PcdGet32(PcdOmap35xxFreeTimer)) + GPTIMER_TCRR;
 
-  StartTime = MmioRead32(TimerCountRegister);
+  StartTime = MmioRead32 (TimerCountRegister);
 
   do 
   {
-    CurrentTime = MmioRead32(TimerCountRegister);
+    CurrentTime = MmioRead32 (TimerCountRegister);
     ElapsedTime = CurrentTime - StartTime;
   } while (ElapsedTime < Delay);
 
@@ -78,7 +78,7 @@ GetPerformanceCounter (
   VOID
   )
 { 
-  return (UINT64)MmioRead32(TimerBase(PcdGet32(PcdBeagleFreeTimer)) + GPTIMER_TCRR);
+  return (UINT64)MmioRead32 (TimerBase(PcdGet32(PcdOmap35xxFreeTimer)) + GPTIMER_TCRR);
 }
 
 UINT64
@@ -90,7 +90,7 @@ GetPerformanceCounterProperties (
 {
   if (StartValue != NULL) {
     // Timer starts with the reload value
-    *StartValue = (UINT64)MmioRead32(TimerBase(PcdGet32(PcdBeagleFreeTimer)) + GPTIMER_TLDR);
+    *StartValue = (UINT64)MmioRead32 (TimerBase(PcdGet32(PcdOmap35xxFreeTimer)) + GPTIMER_TLDR);
   }
   
   if (EndValue != NULL) {

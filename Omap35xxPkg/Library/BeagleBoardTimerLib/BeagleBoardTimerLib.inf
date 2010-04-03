@@ -41,5 +41,5 @@
 [Pcd]
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterFreqencyInHz
   gEmbeddedTokenSpaceGuid.PcdEmbeddedFdPerformanceCounterPeriodInNanoseconds
-  gOmap35xxTokenSpaceGuid.PcdBeagleFreeTimer
+  gOmap35xxTokenSpaceGuid.PcdOmap35xxFreeTimer
 

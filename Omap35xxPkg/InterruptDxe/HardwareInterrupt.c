@@ -59,6 +59,8 @@ ExitBootServicesEvent (
   MmioWrite32 (INTCPS_MIR(1), 0xFFFFFFFF);
   MmioWrite32 (INTCPS_MIR(2), 0xFFFFFFFF);
   MmioWrite32 (INTCPS_CONTROL, INTCPS_CONTROL_NEWIRQAGR);
+
+  // Add code here to disable all FIQs as debugger may have turned one on
 }
 
 /**
@@ -201,7 +203,7 @@ GetInterruptSourceState (
   Bank = Source / 32;
   Bit  = 1UL << (Source % 32);
     
-  if ((MmioRead32(INTCPS_MIR(Bank)) & Bit) == Bit) {
+  if ((MmioRead32 (INTCPS_MIR(Bank)) & Bit) == Bit) {
     *InterruptState = FALSE;
   } else {
     *InterruptState = TRUE;

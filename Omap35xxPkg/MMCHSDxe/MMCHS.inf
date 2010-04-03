@@ -45,7 +45,7 @@
   gEmbeddedExternalDeviceProtocolGuid
 
 [Pcd]
-  gOmap35xxTokenSpaceGuid.PcdBeagleMMCHS1Base
+  gOmap35xxTokenSpaceGuid.PcdOmap35xxMMCHS1Base
 
 [depex]
   gEmbeddedExternalDeviceProtocolGuid

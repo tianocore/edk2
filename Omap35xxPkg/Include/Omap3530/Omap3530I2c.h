@@ -19,17 +19,17 @@
 #define I2C1BASE        0x48070000
 
 #define I2C_IE          (I2C1BASE + 0x4)
-#define XRDY_IE         (0x1UL << 4)
-#define RRDY_IE         (0x1UL << 3)
-#define ARDY_IE         (0x1UL << 2)
-#define NACK_IE         (0x1UL << 1)
+#define XRDY_IE         BIT4
+#define RRDY_IE         BIT3
+#define ARDY_IE         BIT2
+#define NACK_IE         BIT1
 
 #define I2C_STAT        (I2C1BASE + 0x8)
-#define BB              (0x1UL << 12)
-#define XRDY            (0x1UL << 4)
-#define RRDY            (0x1UL << 3)
-#define ARDY            (0x1UL << 2)
-#define NACK            (0x1UL << 1)
+#define BB              BIT12
+#define XRDY            BIT4
+#define RRDY            BIT3
+#define ARDY            BIT2
+#define NACK            BIT1
 
 #define I2C_WE          (I2C1BASE + 0xC)
 #define I2C_SYSS        (I2C1BASE + 0x10)
@@ -39,12 +39,12 @@
 #define I2C_SYSC        (I2C1BASE + 0x20)
 
 #define I2C_CON         (I2C1BASE + 0x24)
-#define STT             (0x1UL << 0)
-#define STP             (0x1UL << 1)
-#define XSA             (0x1UL << 8)
-#define TRX             (0x1UL << 9)
-#define MST             (0x1UL << 10)
-#define I2C_EN          (0x1UL << 15)
+#define STT             BIT0
+#define STP             BIT1
+#define XSA             BIT8
+#define TRX             BIT9
+#define MST             BIT10
+#define I2C_EN          BIT15
 
 #define I2C_OA0         (I2C1BASE + 0x28)
 #define I2C_SA          (I2C1BASE + 0x2C)

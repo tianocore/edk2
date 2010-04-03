@@ -42,7 +42,7 @@
   gEfiCpuArchProtocolGuid
 
 [Pcd]
-  gOmap35xxTokenSpaceGuid.PcdBeagleGpmcOffset
+  gOmap35xxTokenSpaceGuid.PcdOmap35xxGpmcOffset
 
 [depex]
   TRUE

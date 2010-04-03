@@ -92,10 +92,10 @@ UpdateMMCHSClkFrequency (
   MmioAndThenOr32(MMCHS_SYSCTL, ~CLKD_MASK, NewCLKD << 6); 
 
   //Poll till Internal Clock Stable
-  while ((MmioRead32(MMCHS_SYSCTL) & ICS_MASK) != ICS);
+  while ((MmioRead32 (MMCHS_SYSCTL) & ICS_MASK) != ICS);
 
   //Set Clock enable to 0x1 to provide the clock to the card
-  MmioOr32(MMCHS_SYSCTL, CEN);
+  MmioOr32 (MMCHS_SYSCTL, CEN);
 }
 
 STATIC
@@ -110,7 +110,7 @@ SendCmd (
   UINTN RetryCount = 0;
 
   //Check if command line is in use or not. Poll till command line is available.
-  while ((MmioRead32(MMCHS_PSTATE) & DATI_MASK) == DATI_NOT_ALLOWED);
+  while ((MmioRead32 (MMCHS_PSTATE) & DATI_MASK) == DATI_NOT_ALLOWED);
 
   //Provide the block size.
   MmioWrite32 (MMCHS_BLK, BLEN_512BYTES);
@@ -133,15 +133,15 @@ SendCmd (
   //Check for the command status.
   while (RetryCount < MAX_RETRY_COUNT) {
     do {
-      MmcStatus = MmioRead32(MMCHS_STAT);
+      MmcStatus = MmioRead32 (MMCHS_STAT);
     } while (MmcStatus == 0);
 
     //Read status of command response
     if ((MmcStatus & ERRI) != 0) {
 
       //Perform soft-reset for mmci_cmd line.
-      MmioOr32(MMCHS_SYSCTL, SRC);
-      while ((MmioRead32(MMCHS_SYSCTL) & SRC));
+      MmioOr32 (MMCHS_SYSCTL, SRC);
+      while ((MmioRead32 (MMCHS_SYSCTL) & SRC));
 
       DEBUG ((EFI_D_INFO, "MmcStatus: %x\n", MmcStatus));
       return EFI_DEVICE_ERROR;
@@ -351,41 +351,41 @@ InitializeMMCHS (
   ASSERT_EFI_ERROR(Status);
   
   //After ramping up voltage, set VDDS stable bit to indicate that voltage level is stable.
-  MmioOr32(CONTROL_PBIAS_LITE, (PBIASLITEVMODE0 | PBIASLITEPWRDNZ0 | PBIASSPEEDCTRL0 | PBIASLITEVMODE1 | PBIASLITEWRDNZ1));
+  MmioOr32 (CONTROL_PBIAS_LITE, (PBIASLITEVMODE0 | PBIASLITEPWRDNZ0 | PBIASSPEEDCTRL0 | PBIASLITEVMODE1 | PBIASLITEWRDNZ1));
 
   //Software reset of the MMCHS host controller.
   MmioWrite32 (MMCHS_SYSCONFIG, SOFTRESET);
   gBS->Stall(1000);
-  while ((MmioRead32(MMCHS_SYSSTATUS) & RESETDONE_MASK) != RESETDONE);
+  while ((MmioRead32 (MMCHS_SYSSTATUS) & RESETDONE_MASK) != RESETDONE);
 
   //Soft reset for all.
   MmioWrite32 (MMCHS_SYSCTL, SRA);
   gBS->Stall(1000);
-  while ((MmioRead32(MMCHS_SYSCTL) & SRA) != 0x0);
+  while ((MmioRead32 (MMCHS_SYSCTL) & SRA) != 0x0);
 
   //Voltage capabilities initialization. Activate VS18 and VS30.
-  MmioOr32(MMCHS_CAPA, (VS30 | VS18));
+  MmioOr32 (MMCHS_CAPA, (VS30 | VS18));
 
   //Wakeup configuration
-  MmioOr32(MMCHS_SYSCONFIG, ENAWAKEUP);
-  MmioOr32(MMCHS_HCTL, IWE);
+  MmioOr32 (MMCHS_SYSCONFIG, ENAWAKEUP);
+  MmioOr32 (MMCHS_HCTL, IWE);
 
   //MMCHS Controller default initialization
-  MmioOr32(MMCHS_CON, (OD | DW8_1_4_BIT | CEATA_OFF));
+  MmioOr32 (MMCHS_CON, (OD | DW8_1_4_BIT | CEATA_OFF));
 
   MmioWrite32 (MMCHS_HCTL, (SDVS_3_0_V | DTW_1_BIT | SDBP_OFF));
 
   //Enable internal clock
-  MmioOr32(MMCHS_SYSCTL, ICE);
+  MmioOr32 (MMCHS_SYSCTL, ICE);
 
   //Set the clock frequency to 80KHz.
   UpdateMMCHSClkFrequency(CLKD_80KHZ);
 
   //Enable SD bus power.
-  MmioOr32(MMCHS_HCTL, (SDBP_ON));
+  MmioOr32 (MMCHS_HCTL, (SDBP_ON));
 
   //Poll till SD bus power bit is set.
-  while ((MmioRead32(MMCHS_HCTL) & SDBP_MASK) != SDBP_ON);
+  while ((MmioRead32 (MMCHS_HCTL) & SDBP_MASK) != SDBP_ON);
 
   return Status;
 }
@@ -407,29 +407,29 @@ PerformCardIdenfication (
     CEB_EN | CCRC_EN | CTO_EN | BRR_EN | BWR_EN | TC_EN | CC_EN));
 
   //Controller INIT procedure start.
-  MmioOr32(MMCHS_CON, INIT);
+  MmioOr32 (MMCHS_CON, INIT);
   MmioWrite32 (MMCHS_CMD, 0x00000000);
-  while (!(MmioRead32(MMCHS_STAT) & CC));
+  while (!(MmioRead32 (MMCHS_STAT) & CC));
 
   //Wait for 1 ms
   gBS->Stall(1000);
 
   //Set CC bit to 0x1 to clear the flag
-  MmioOr32(MMCHS_STAT, CC);
+  MmioOr32 (MMCHS_STAT, CC);
 
   //Retry INIT procedure.
   MmioWrite32 (MMCHS_CMD, 0x00000000);
-  while (!(MmioRead32(MMCHS_STAT) & CC));
+  while (!(MmioRead32 (MMCHS_STAT) & CC));
 
   //End initialization sequence
   MmioAnd32(MMCHS_CON, ~INIT);
 
-  MmioOr32(MMCHS_HCTL, (SDVS_3_0_V | DTW_1_BIT | SDBP_ON));
+  MmioOr32 (MMCHS_HCTL, (SDVS_3_0_V | DTW_1_BIT | SDBP_ON));
 
   //Change clock frequency to 400KHz to fit protocol
   UpdateMMCHSClkFrequency(CLKD_400KHZ);
 
-  MmioOr32(MMCHS_CON, OD);
+  MmioOr32 (MMCHS_CON, OD);
 
   //Send CMD0 command.
   Status = SendCmd(CMD0, CMD0_INT_EN, CmdArgument);
@@ -438,22 +438,22 @@ PerformCardIdenfication (
     return Status;
   }
 
-  DEBUG ((EFI_D_INFO, "CMD0 response: %x\n", MmioRead32(MMCHS_RSP10)));
+  DEBUG ((EFI_D_INFO, "CMD0 response: %x\n", MmioRead32 (MMCHS_RSP10)));
 
   //Send CMD5 command. 
   Status = SendCmd(CMD5, CMD5_INT_EN, CmdArgument);
   if (Status == EFI_SUCCESS) {
     DEBUG ((EFI_D_ERROR, "CMD5 Success. SDIO card. Follow SDIO card specification.\n"));
-    DEBUG ((EFI_D_INFO, "CMD5 response: %x\n", MmioRead32(MMCHS_RSP10)));
+    DEBUG ((EFI_D_INFO, "CMD5 response: %x\n", MmioRead32 (MMCHS_RSP10)));
     //NOTE: Returning unsupported error for now. Need to implement SDIO specification.
     return EFI_UNSUPPORTED; 
   } else {
     DEBUG ((EFI_D_INFO, "CMD5 fails. Not an SDIO card.\n"));
   }
 
-  MmioOr32(MMCHS_SYSCTL, SRC);
+  MmioOr32 (MMCHS_SYSCTL, SRC);
   gBS->Stall(1000);
-  while ((MmioRead32(MMCHS_SYSCTL) & SRC));
+  while ((MmioRead32 (MMCHS_SYSCTL) & SRC));
 
   //Send CMD8 command. (New v2.00 command for Voltage check)
   //Only 2.7V - 3.6V is supported for SD2.0, only SD 2.0 card can pass.
@@ -461,7 +461,7 @@ PerformCardIdenfication (
   CmdArgument = CMD8_ARG;
   Status = SendCmd(CMD8, CMD8_INT_EN, CmdArgument);
   if (Status == EFI_SUCCESS) {
-    Response = MmioRead32(MMCHS_RSP10);
+    Response = MmioRead32 (MMCHS_RSP10);
     DEBUG ((EFI_D_INFO, "CMD8 success. CMD8 response: %x\n", Response));
     if (Response != CmdArgument) {
       return EFI_DEVICE_ERROR;
@@ -472,9 +472,9 @@ PerformCardIdenfication (
     DEBUG ((EFI_D_INFO, "CMD8 fails. Not an SD2.0 card.\n"));
   }
 
-  MmioOr32(MMCHS_SYSCTL, SRC);
+  MmioOr32 (MMCHS_SYSCTL, SRC);
   gBS->Stall(1000);
-  while ((MmioRead32(MMCHS_SYSCTL) & SRC));
+  while ((MmioRead32 (MMCHS_SYSCTL) & SRC));
 
   //Poll till card is busy
   while (RetryCount < MAX_RETRY_COUNT) {
@@ -482,7 +482,7 @@ PerformCardIdenfication (
     CmdArgument = 0;
     Status = SendCmd(CMD55, CMD55_INT_EN, CmdArgument);
     if (Status == EFI_SUCCESS) {
-      DEBUG ((EFI_D_INFO, "CMD55 success. CMD55 response: %x\n", MmioRead32(MMCHS_RSP10)));
+      DEBUG ((EFI_D_INFO, "CMD55 success. CMD55 response: %x\n", MmioRead32 (MMCHS_RSP10)));
       gCardInfo->CardType = SD_CARD;
     } else {
       DEBUG ((EFI_D_INFO, "CMD55 fails.\n"));
@@ -503,7 +503,7 @@ PerformCardIdenfication (
         DEBUG ((EFI_D_INFO, "ACMD41 fails.\n"));
         return Status;
       }
-      ((UINT32 *) &(gCardInfo->OCRData))[0] = MmioRead32(MMCHS_RSP10);
+      ((UINT32 *) &(gCardInfo->OCRData))[0] = MmioRead32 (MMCHS_RSP10);
       DEBUG ((EFI_D_INFO, "SD card detected. ACMD41 OCR: %x\n", ((UINT32 *) &(gCardInfo->OCRData))[0]));
     } else if (gCardInfo->CardType == MMC_CARD) {
       CmdArgument = 0;
@@ -512,7 +512,7 @@ PerformCardIdenfication (
         DEBUG ((EFI_D_INFO, "CMD1 fails.\n"));
         return Status;
       }
-      Response = MmioRead32(MMCHS_RSP10);
+      Response = MmioRead32 (MMCHS_RSP10);
       DEBUG ((EFI_D_INFO, "MMC card detected.. CMD1 response: %x\n", Response));
 
       //NOTE: For now, I am skipping this since I only have an SD card.
@@ -556,10 +556,10 @@ PerformCardIdenfication (
     return Status;
   }
 
-  DEBUG ((EFI_D_INFO, "CMD2 response: %x %x %x %x\n", MmioRead32(MMCHS_RSP10), MmioRead32(MMCHS_RSP32), MmioRead32(MMCHS_RSP54), MmioRead32(MMCHS_RSP76)));
+  DEBUG ((EFI_D_INFO, "CMD2 response: %x %x %x %x\n", MmioRead32 (MMCHS_RSP10), MmioRead32 (MMCHS_RSP32), MmioRead32 (MMCHS_RSP54), MmioRead32 (MMCHS_RSP76)));
 
   //Parse CID register data.
-  ParseCardCIDData(MmioRead32(MMCHS_RSP10), MmioRead32(MMCHS_RSP32), MmioRead32(MMCHS_RSP54), MmioRead32(MMCHS_RSP76));
+  ParseCardCIDData(MmioRead32 (MMCHS_RSP10), MmioRead32 (MMCHS_RSP32), MmioRead32 (MMCHS_RSP54), MmioRead32 (MMCHS_RSP76));
 
   //Read RCA
   CmdArgument = 0;
@@ -570,12 +570,12 @@ PerformCardIdenfication (
   }
 
   //Set RCA for the detected card. RCA is CMD3 response.
-  gCardInfo->RCA = (MmioRead32(MMCHS_RSP10) >> 16);
+  gCardInfo->RCA = (MmioRead32 (MMCHS_RSP10) >> 16);
   DEBUG ((EFI_D_INFO, "CMD3 response: RCA %x\n", gCardInfo->RCA));
 
   //MMC Bus setting change after card identification.
   MmioAnd32(MMCHS_CON, ~OD);
-  MmioOr32(MMCHS_HCTL, SDVS_3_0_V);
+  MmioOr32 (MMCHS_HCTL, SDVS_3_0_V);
   UpdateMMCHSClkFrequency(CLKD_400KHZ); //Set the clock frequency to 400KHz.
 
   return EFI_SUCCESS;
@@ -599,12 +599,12 @@ GetCardSpecificData (
   }
 
   //Populate 128-bit CSD register data.
-  ((UINT32 *)&(gCardInfo->CSDData))[0] = MmioRead32(MMCHS_RSP10);
-  ((UINT32 *)&(gCardInfo->CSDData))[1] = MmioRead32(MMCHS_RSP32);
-  ((UINT32 *)&(gCardInfo->CSDData))[2] = MmioRead32(MMCHS_RSP54);
-  ((UINT32 *)&(gCardInfo->CSDData))[3] = MmioRead32(MMCHS_RSP76);
+  ((UINT32 *)&(gCardInfo->CSDData))[0] = MmioRead32 (MMCHS_RSP10);
+  ((UINT32 *)&(gCardInfo->CSDData))[1] = MmioRead32 (MMCHS_RSP32);
+  ((UINT32 *)&(gCardInfo->CSDData))[2] = MmioRead32 (MMCHS_RSP54);
+  ((UINT32 *)&(gCardInfo->CSDData))[3] = MmioRead32 (MMCHS_RSP76);
 
-  DEBUG ((EFI_D_INFO, "CMD9 response: %x %x %x %x\n", MmioRead32(MMCHS_RSP10), MmioRead32(MMCHS_RSP32), MmioRead32(MMCHS_RSP54), MmioRead32(MMCHS_RSP76)));
+  DEBUG ((EFI_D_INFO, "CMD9 response: %x %x %x %x\n", MmioRead32 (MMCHS_RSP10), MmioRead32 (MMCHS_RSP32), MmioRead32 (MMCHS_RSP54), MmioRead32 (MMCHS_RSP76)));
 
   //Calculate total number of blocks and max. data transfer rate supported by the detected card.
   GetCardConfigurationData();
@@ -660,18 +660,18 @@ ReadBlockData(
   while (RetryCount < MAX_RETRY_COUNT) {
     do {
       //Read Status.
-      MmcStatus = MmioRead32(MMCHS_STAT);
+      MmcStatus = MmioRead32 (MMCHS_STAT);
     } while(MmcStatus == 0);
 
     //Check if Buffer read ready (BRR) bit is set?
     if (MmcStatus & BRR) {
 
       //Clear BRR bit
-      MmioOr32(MMCHS_STAT, BRR);
+      MmioOr32 (MMCHS_STAT, BRR);
 
       //Read block worth of data.
       for (Count = 0; Count < DataSize; Count++) {
-        *DataBuffer++ = MmioRead32(MMCHS_DATA);
+        *DataBuffer++ = MmioRead32 (MMCHS_DATA);
       }
       break;
     }
@@ -702,14 +702,14 @@ WriteBlockData(
   while (RetryCount < MAX_RETRY_COUNT) {
     do {
       //Read Status.
-      MmcStatus = MmioRead32(MMCHS_STAT);
+      MmcStatus = MmioRead32 (MMCHS_STAT);
     } while(MmcStatus == 0);
 
     //Check if Buffer write ready (BWR) bit is set?
     if (MmcStatus & BWR) {
 
       //Clear BWR bit
-      MmioOr32(MMCHS_STAT, BWR);
+      MmioOr32 (MMCHS_STAT, BWR);
 
       //Write block worth of data.
       for (Count = 0; Count < DataSize; Count++) {
@@ -759,7 +759,7 @@ TransferBlockData(
   while (RetryCount < MAX_RETRY_COUNT) {
     //Read Status
     do {
-      MmcStatus = MmioRead32(MMCHS_STAT);
+      MmcStatus = MmioRead32 (MMCHS_STAT);
     } while (MmcStatus == 0);
 
     //Check if Transfer complete (TC) bit is set?
@@ -772,8 +772,8 @@ TransferBlockData(
         //There was an error during the data transfer.
 
         //Set SRD bit to 1 and wait until it return to 0x0.
-        MmioOr32(MMCHS_SYSCTL, SRD);
-        while((MmioRead32(MMCHS_SYSCTL) & SRD) != 0x0);
+        MmioOr32 (MMCHS_SYSCTL, SRD);
+        while((MmioRead32 (MMCHS_SYSCTL) & SRD) != 0x0);
 
         return EFI_DEVICE_ERROR;
       }
@@ -807,7 +807,7 @@ SdReadWrite (
   UINTN      CmdArgument = 0;
 
   //Check if the data lines are not in use.
-  while ((RetryCount++ < MAX_RETRY_COUNT) && ((MmioRead32(MMCHS_PSTATE) & DATI_MASK) != DATI_ALLOWED));
+  while ((RetryCount++ < MAX_RETRY_COUNT) && ((MmioRead32 (MMCHS_PSTATE) & DATI_MASK) != DATI_ALLOWED));
   if (RetryCount == MAX_RETRY_COUNT) {
     return EFI_TIMEOUT;
   }

@@ -52,7 +52,7 @@
 [Pcd.common]
   gEmbeddedTokenSpaceGuid.PcdTimerPeriod
   gEmbeddedTokenSpaceGuid.PcdEmbeddedFdPerformanceCounterPeriodInNanoseconds
-  gOmap35xxTokenSpaceGuid.PcdBeagleArchTimer
+  gOmap35xxTokenSpaceGuid.PcdOmap35xxArchTimer
 
 [Depex]
   gHardwareInterruptProtocolGuid

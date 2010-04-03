@@ -148,15 +148,15 @@
   gArmTokenSpaceGuid.PcdCpuVectorBaseAddress|0x80000000
   gArmTokenSpaceGuid.PcdCpuResetAddress|0x80008000
   
-  gOmap35xxTokenSpaceGuid.PcdBeagleGpmcOffset|0x6E000000
-  gOmap35xxTokenSpaceGuid.PcdBeagleMMCHS1Base|0x4809C000
+  gOmap35xxTokenSpaceGuid.PcdOmap35xxGpmcOffset|0x6E000000
+  gOmap35xxTokenSpaceGuid.PcdOmap35xxMMCHS1Base|0x4809C000
 
   # Console  
-  gOmap35xxTokenSpaceGuid.PcdBeagleConsoleUart|3
+  gOmap35xxTokenSpaceGuid.PcdOmap35xxConsoleUart|3
   
   # Timers
-  gOmap35xxTokenSpaceGuid.PcdBeagleArchTimer|3
-  gOmap35xxTokenSpaceGuid.PcdBeagleFreeTimer|4
+  gOmap35xxTokenSpaceGuid.PcdOmap35xxArchTimer|3
+  gOmap35xxTokenSpaceGuid.PcdOmap35xxFreeTimer|4
   gEmbeddedTokenSpaceGuid.PcdTimerPeriod|100000
   gEmbeddedTokenSpaceGuid.PcdEmbeddedFdPerformanceCounterPeriodInNanoseconds|77
   gEmbeddedTokenSpaceGuid.PcdEmbeddedFdPerformanceCounterFrequencyInHz|13000000

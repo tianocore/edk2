@@ -62,6 +62,41 @@ ConfigureUSBHost (
   EFI_STATUS Status;
   UINT8      Data = 0;
 
+#if 0
+   // Take USB host out of force-standby mode
+ MmioWrite32 (UHH_SYSCONFIG, UHH_SYSCONFIG_MIDLEMODE_NO_STANDBY
+                            | UHH_SYSCONFIG_CLOCKACTIVITY_ON
+                            | UHH_SYSCONFIG_SIDLEMODE_NO_STANDBY
+                            | UHH_SYSCONFIG_ENAWAKEUP_ENABLE
+                            | UHH_SYSCONFIG_AUTOIDLE_ALWAYS_RUN);
+ MmioWrite32 (UHH_HOSTCONFIG, UHH_HOSTCONFIG_P3_CONNECT_STATUS_DISCONNECT
+                             | UHH_HOSTCONFIG_P2_CONNECT_STATUS_DISCONNECT
+                             | UHH_HOSTCONFIG_P1_CONNECT_STATUS_DISCONNECT
+                             | UHH_HOSTCONFIG_ENA_INCR_ALIGN_DISABLE
+                             | UHH_HOSTCONFIG_ENA_INCR16_ENABLE
+                             | UHH_HOSTCONFIG_ENA_INCR8_ENABLE
+                             | UHH_HOSTCONFIG_ENA_INCR4_ENABLE
+                             | UHH_HOSTCONFIG_AUTOPPD_ON_OVERCUR_EN_ON
+                             | UHH_HOSTCONFIG_P1_ULPI_BYPASS_ULPI_MODE);
+
+ // USB reset (GPIO 147 - Port 5 pin 19) output high
+ MmioAnd32(GPIO5_BASE + GPIO_OE, ~BIT19);
+ MmioWrite32 (GPIO5_BASE + GPIO_SETDATAOUT, BIT19);
+
+ // Get the Power IC protocol.
+ Status = gBS->LocateProtocol(&gEmbeddedExternalDeviceProtocolGuid, NULL, (VOID **)&gTPS65950);
+ ASSERT_EFI_ERROR(Status);
+
+ //Enable power to the USB host.
+ Status = gTPS65950->Read(gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID3, LEDEN), 1, &Data);
+ ASSERT_EFI_ERROR(Status);
+
+ //LEDAON & LEDAPWM control the power to the USB host so enable those bits.
+ Data |= (LEDAON | LEDAPWM);
+
+ Status = gTPS65950->Write(gTPS65950, EXTERNAL_DEVICE_REGISTER(I2C_ADDR_GRP_ID3, LEDEN), 1, &Data);
+ ASSERT_EFI_ERROR(Status);
+#else
   // Get the Power IC protocol.
   Status = gBS->LocateProtocol(&gEmbeddedExternalDeviceProtocolGuid, NULL, (VOID **)&gTPS65950);
   ASSERT_EFI_ERROR(Status);
@@ -91,7 +126,6 @@ ConfigureUSBHost (
   // Take USB host out of force-standby mode
   MmioWrite32 (UHH_SYSCONFIG,  UHH_SYSCONFIG_MIDLEMODE_NO_STANDBY
                              | UHH_SYSCONFIG_CLOCKACTIVITY_ON
-                             | UHH_SYSCONFIG_SIDLEMODE_NO_STANDBY
                              | UHH_SYSCONFIG_ENAWAKEUP_ENABLE    
                              | UHH_SYSCONFIG_SOFTRESET
                              );
@@ -110,7 +144,8 @@ ConfigureUSBHost (
 
   // USB reset output high
   MmioWrite32 (GPIO5_BASE + GPIO_SETDATAOUT, BIT19);
-
+  
+#endif
 }
 
 EFI_STATUS
@@ -544,7 +579,7 @@ PciEmulationEntryPoint (
 
   // Find out the capability register length and number of physical ports.
   CapabilityLength = MmioRead8(Private->RootBridge.MemoryStart);
-  PhysicalPorts    = (MmioRead32(Private->RootBridge.MemoryStart + 0x4)) & 0x0000000F;
+  PhysicalPorts    = (MmioRead32 (Private->RootBridge.MemoryStart + 0x4)) & 0x0000000F;
 
   // Calculate the total size of the USB registers.
   Private->RootBridge.MemorySize = CapabilityLength + (HOST_CONTROLLER_OPERATION_REG_SIZE + ((4 * PhysicalPorts) - 1));
@@ -553,7 +588,7 @@ PciEmulationEntryPoint (
   // Port Power Control (PPC) bit in the HCSPARAMS register is already set which indicates
   // host controller implementation includes port power control.
   for (Count = 0; Count < PhysicalPorts; Count++) {
-    MmioOr32((Private->RootBridge.MemoryStart + CapabilityLength + HOST_CONTROLLER_OPERATION_REG_SIZE + 4*Count), 0x00001000);
+    MmioOr32 ((Private->RootBridge.MemoryStart + CapabilityLength + HOST_CONTROLLER_OPERATION_REG_SIZE + 4*Count), 0x00001000);
   }
 
   // Create fake PCI config space.

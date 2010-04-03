@@ -271,7 +271,7 @@ NandCalculateEcc (
 
   for (Index = 0; Index < gNum512BytesChunks; Index++) {
 
-    EccResult = MmioRead32(EccResultRegister);
+    EccResult = MmioRead32 (EccResultRegister);
 
     //Calculate ECC code from 32-bit ECC result value.
     //NOTE: Following calculation is not part of TRM. We got this information 
