@@ -1,7 +1,7 @@
 /** @file
   Processor specific parts of the GDB stub
 
-  Copyright (c) 2008-2009, Apple Inc. All rights reserved.
+  Copyright (c) 2008-2010, Apple Inc. All rights reserved.
   
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -12,33 +12,48 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
-/** @file
-  
-  Copyright (c) 2008, Apple, Inc                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-**/
-
-#include <GdbStubInternal.h>
+#include <GdbDebugAgent.h>
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/PrintLib.h>
+#include <Library/ArmLib.h>
+
+//
+// Externs from the exception handler assembly file
+//
+VOID
+ExceptionHandlersStart (
+  VOID
+  );
+
+VOID
+ExceptionHandlersEnd (
+  VOID
+  );
+
+VOID
+CommonExceptionEntry (
+  VOID
+  );
+
+VOID
+AsmCommonExceptionEntry (
+  VOID
+  );
+
 
 //
 // Array of exception types that need to be hooked by the debugger
 // (efi, gdb) //efi number
 //
 EFI_EXCEPTION_TYPE_ENTRY gExceptionType[] = {
-  { EXCEPT_ARM_SOFTWARE_INTERRUPT,  GDB_SIGTRAP }
-//  { EXCEPT_ARM_UNDEFINED_INSTRUCTION, GDB_SIGTRAP },  
-//  { EXCEPT_ARM_PREFETCH_ABORT,        GDB_SIGTRAP }, 
-//  { EXCEPT_ARM_DATA_ABORT,            GDB_SIGEMT  },  
-//  { EXCEPT_ARM_RESERVED,              GDB_SIGILL  }  
+  { EXCEPT_ARM_SOFTWARE_INTERRUPT,    GDB_SIGTRAP },
+  { EXCEPT_ARM_UNDEFINED_INSTRUCTION, GDB_SIGTRAP },  
+  { EXCEPT_ARM_PREFETCH_ABORT,        GDB_SIGTRAP }, 
+  { EXCEPT_ARM_DATA_ABORT,            GDB_SIGTRAP },    // GDB_SIGEMT
+  { EXCEPT_ARM_RESERVED,              GDB_SIGTRAP },    // GDB_SIGILL
+  { EXCEPT_ARM_FIQ,                   GDB_SIGINT }      // Used for ctrl-c
 };
 
 // Shut up some annoying RVCT warnings
@@ -96,6 +111,7 @@ UINTN gRegisterOffsets[] = {
 #pragma diag_default 1296
 #endif
 
+
 /**
  Return the number of entries in the gExceptionType[]
  
@@ -110,18 +126,6 @@ MaxEfiException (
 }
 
 
-/**
- Return the number of entries in the gRegisters[]
- 
- @retval  UINTN, the number of entries (registers) in the gRegisters[] array.    
- **/
-UINTN
-MaxRegisterCount (
-  VOID
-  )
-{
-  return sizeof (gRegisterOffsets)/sizeof (UINTN);
-}
 
 
 /**
@@ -224,7 +228,7 @@ ReadNthRegister (
   
   RegNumber = AsciiStrHexToUintn (&InBuffer[1]);
   
-  if (RegNumber >= MaxRegisterCount()) {
+  if (RegNumber >= (sizeof (gRegisterOffsets)/sizeof (UINTN))) {
     SendError (GDB_EINVALIDREGNUM); 
     return;
   }
@@ -248,20 +252,18 @@ ReadGeneralRegisters (
   )
 {
   UINTN   Index;
-  CHAR8   *OutBuffer;
+  // a UINT32 takes 8 ascii characters
+  CHAR8   OutBuffer[(sizeof (gRegisterOffsets) * 2) + 1];
   CHAR8   *OutBufPtr;
-  UINTN   RegisterCount = MaxRegisterCount();
   
   // It is not safe to allocate pool here....
-  OutBuffer = AllocatePool((RegisterCount * 8) + 1); // 8 bytes per register in string format plus a null to terminate
   OutBufPtr = OutBuffer;
-  for (Index = 0; Index < RegisterCount; Index++) {
+  for (Index = 0; Index < (sizeof (gRegisterOffsets)/sizeof (UINTN)); Index++) {
     OutBufPtr = BasicReadRegister (SystemContext, Index, OutBufPtr);
   }
   
   *OutBufPtr = '\0';
   SendPacket(OutBuffer);
-  FreePool(OutBuffer);
 }
 
 
@@ -272,8 +274,8 @@ ReadGeneralRegisters (
  @param   InBufPtr          pointer to the output buffer. the new data will be extracted from the input buffer from this point on.
  @retval  the pointer to the next character of the input buffer that can be used
  **/
-CHAR8
-*BasicWriteRegister (
+CHAR8 *
+BasicWriteRegister (
   IN  EFI_SYSTEM_CONTEXT      SystemContext,
   IN  UINTN           RegNumber,
   IN  CHAR8           *InBufPtr
@@ -339,7 +341,7 @@ WriteNthRegister (
   RegNumber = AsciiStrHexToUintn (RegNumBuffer); 
   
   // check if this is a valid Register Number
-  if (RegNumber >= MaxRegisterCount()) {
+  if (RegNumber >= (sizeof (gRegisterOffsets)/sizeof (UINTN))) {
     SendError (GDB_EINVALIDREGNUM); 
     return;
   }
@@ -365,7 +367,7 @@ WriteGeneralRegisters (
   UINTN  i;
   CHAR8  *InBufPtr; /// pointer to the input buffer
   UINTN  MinLength;
-  UINTN  RegisterCount = MaxRegisterCount();
+  UINTN  RegisterCount = (sizeof (gRegisterOffsets)/sizeof (UINTN));
 
   MinLength = (RegisterCount * 8) + 1;  // 'G' plus the registers in ASCII format
   
@@ -386,81 +388,6 @@ WriteGeneralRegisters (
   SendSuccess ();
 }
 
-// What about Thumb?
-// Use SWI 0xdbdbdb as the debug instruction
-#define GDB_ARM_BKPT    0xefdbdbdb
-
-BOOLEAN mSingleStepActive = FALSE;
-UINT32  mSingleStepPC;
-UINT32  mSingleStepData;
-UINTN   mSingleStepDataSize;
-
-typedef struct {
-  LIST_ENTRY  Link;
-  UINT64      Signature;
-  UINT32      Address;
-  UINT32      Instruction;
-} ARM_SOFTWARE_BREAKPOINT;
-
-#define ARM_SOFTWARE_BREAKPOINT_SIGNATURE     SIGNATURE_64('A', 'R', 'M', 'B', 'R', 'K', 'P', 'T')
-#define ARM_SOFTWARE_BREAKPOINT_FROM_LINK(a)  CR(a, ARM_SOFTWARE_BREAKPOINT, Link, ARM_SOFTWARE_BREAKPOINT_SIGNATURE)
-
-LIST_ENTRY  BreakpointList;
-
-/** 
- Insert Single Step in the SystemContext
- 
- @param	SystemContext	Register content at time of the exception
- **/
-VOID
-AddSingleStep (
-  IN EFI_SYSTEM_CONTEXT SystemContext
-  )
-{
-  if (mSingleStepActive) {
-    // Currently don't support nesting
-    return;
-  }
-  mSingleStepActive = TRUE;
-  
-  mSingleStepPC = SystemContext.SystemContextArm->PC;
-
-  mSingleStepDataSize = sizeof (UINT32);
-  mSingleStepData = (*(UINT32 *)mSingleStepPC); 
-  *(UINT32 *)mSingleStepPC = GDB_ARM_BKPT;
-  if (*(UINT32 *)mSingleStepPC != GDB_ARM_BKPT) {
-    // For some reason our breakpoint did not take
-    mSingleStepActive = FALSE;
-  }
-
-  InvalidateInstructionCacheRange((VOID *)mSingleStepPC, mSingleStepDataSize);
-  //DEBUG((EFI_D_ERROR, "AddSingleStep at 0x%08x (was: 0x%08x is:0x%08x)\n", SystemContext.SystemContextArm->PC, mSingleStepData, *(UINT32 *)mSingleStepPC));
-}
-
-  
-/** 
- Remove Single Step in the SystemContext
- 
- @param	SystemContext	Register content at time of the exception
- **/
-VOID
-RemoveSingleStep (
-  IN  EFI_SYSTEM_CONTEXT  SystemContext
-  )
-{
-  if (!mSingleStepActive) {
-    return;
-  }
-  
-  if (mSingleStepDataSize == sizeof (UINT16)) {
-    *(UINT16 *)mSingleStepPC = (UINT16)mSingleStepData;
-  } else {
-    //DEBUG((EFI_D_ERROR, "RemoveSingleStep at 0x%08x (was: 0x%08x is:0x%08x)\n", SystemContext.SystemContextArm->PC, *(UINT32 *)mSingleStepPC, mSingleStepData));
-    *(UINT32 *)mSingleStepPC = mSingleStepData;
-  }
-  InvalidateInstructionCacheRange((VOID *)mSingleStepPC, mSingleStepDataSize);
-  mSingleStepActive = FALSE;
-}
 
 
 
@@ -499,108 +426,6 @@ SingleStep (
   SendNotSupported();
 }
 
-UINTN
-GetBreakpointDataAddress (
-  IN  EFI_SYSTEM_CONTEXT  SystemContext,
-  IN  UINTN               BreakpointNumber
-  )
-{
-  return 0;
-}
-
-UINTN
-GetBreakpointDetected (
-  IN  EFI_SYSTEM_CONTEXT  SystemContext
-  )
-{
-  return 0;
-}
-
-BREAK_TYPE
-GetBreakpointType (
-  IN  EFI_SYSTEM_CONTEXT  SystemContext,
-  IN  UINTN               BreakpointNumber
-  )
-{
-  return NotSupported;
-}
-
-ARM_SOFTWARE_BREAKPOINT *
-SearchBreakpointList (
-  IN  UINT32  Address
-  )
-{
-  LIST_ENTRY              *Current;
-  ARM_SOFTWARE_BREAKPOINT *Breakpoint;
-
-  Current = GetFirstNode(&BreakpointList);
-  while (!IsNull(&BreakpointList, Current)) {
-    Breakpoint = ARM_SOFTWARE_BREAKPOINT_FROM_LINK(Current);
-
-    if (Address == Breakpoint->Address) {
-      return Breakpoint;
-    }
-
-    Current = GetNextNode(&BreakpointList, Current);
-  }
-
-  return NULL;
-}
-
-VOID
-SetBreakpoint (
-  IN UINT32 Address
-  )
-{
-  ARM_SOFTWARE_BREAKPOINT *Breakpoint;
-
-  Breakpoint = SearchBreakpointList(Address);
-
-  if (Breakpoint != NULL) {
-    return;
-  }
-
-  // create and fill breakpoint structure
-  Breakpoint = AllocatePool(sizeof(ARM_SOFTWARE_BREAKPOINT));
-
-  Breakpoint->Signature   = ARM_SOFTWARE_BREAKPOINT_SIGNATURE;
-  Breakpoint->Address     = Address;
-  Breakpoint->Instruction = *(UINT32 *)Address;
-  
-  // Add it to the list
-  InsertTailList(&BreakpointList, &Breakpoint->Link);
-
-  // Insert the software breakpoint
-  *(UINT32 *)Address = GDB_ARM_BKPT;
-  InvalidateInstructionCacheRange((VOID *)Address, 4);
-
-  //DEBUG((EFI_D_ERROR, "SetBreakpoint at 0x%08x (was: 0x%08x is:0x%08x)\n", Address, Breakpoint->Instruction, *(UINT32 *)Address));
-}
-
-VOID
-ClearBreakpoint (
-  IN UINT32 Address
-  )
-{
-  ARM_SOFTWARE_BREAKPOINT *Breakpoint;
-
-  Breakpoint = SearchBreakpointList(Address);
-
-  if (Breakpoint == NULL) {
-    return;
-  }
-
-  // Add it to the list
-  RemoveEntryList(&Breakpoint->Link);
-
-  // Restore the original instruction
-  *(UINT32 *)Address = Breakpoint->Instruction;
-  InvalidateInstructionCacheRange((VOID *)Address, 4);
-
-  //DEBUG((EFI_D_ERROR, "ClearBreakpoint at 0x%08x (was: 0x%08x is:0x%08x)\n", Address, GDB_ARM_BKPT, *(UINT32 *)Address));
-
-  FreePool(Breakpoint);
-}
 
 VOID
 EFIAPI
@@ -609,30 +434,7 @@ InsertBreakPoint (
   IN  CHAR8              *PacketData
   )
 {
-  UINTN Type;
-  UINTN Address;
-  UINTN Length;
-  UINTN ErrorCode;
-
-  ErrorCode = ParseBreakpointPacket(PacketData, &Type, &Address, &Length);
-  if (ErrorCode > 0) {
-    SendError ((UINT8)ErrorCode);
-    return;
-  }
-
-  switch (Type) {
-    case 0:   //Software breakpoint
-      break;
-
-    default  :
-      DEBUG((EFI_D_ERROR, "Insert breakpoint default: %x\n", Type));
-      SendError (GDB_EINVALIDBRKPOINTTYPE);
-      return;
-  }
-
-  SetBreakpoint(Address);
-
-  SendSuccess ();
+  SendNotSupported ();
 }
 
 VOID
@@ -642,74 +444,187 @@ RemoveBreakPoint (
   IN  CHAR8               *PacketData
   )
 {
-  UINTN      Type;
-  UINTN      Address;
-  UINTN      Length;
-  UINTN      ErrorCode;
+  SendNotSupported ();
+}
 
-  //Parse breakpoint packet data
-  ErrorCode = ParseBreakpointPacket (PacketData, &Type, &Address, &Length);
-  if (ErrorCode > 0) {
-    SendError ((UINT8)ErrorCode);
-    return;
+
+/**
+ Send the T signal with the given exception type (in gdb order) and possibly 
+ with n:r pairs related to the watchpoints
+ 
+ @param  SystemContext        Register content at time of the exception
+ @param  GdbExceptionType     GDB exception type
+ **/
+VOID
+ProcessorSendTSignal (
+  IN  EFI_SYSTEM_CONTEXT  SystemContext,
+  IN  UINT8               GdbExceptionType,
+  IN  OUT CHAR8           *TSignalPtr,
+  IN  UINTN               SizeOfBuffer
+  )
+{
+  *TSignalPtr = '\0';
+}
+
+/**
+ Check to see if this exception is related to ctrl-c handling.
+
+ In this scheme we dedicate FIQ to the ctrl-c handler so it is 
+ independent of the rest of the system. 
+ 
+ SaveAndSetDebugTimerInterrupt () can be used to 
+
+ @param ExceptionType     Exception that is being processed
+ @param SystemContext     Register content at time of the exception  
+
+ @return  TRUE  This was a ctrl-c check that did not find a ctrl-c
+ @return  FALSE This was not a ctrl-c check or some one hit ctrl-c
+ **/
+BOOLEAN
+ProcessorControlC ( 
+  IN  EFI_EXCEPTION_TYPE        ExceptionType, 
+  IN OUT EFI_SYSTEM_CONTEXT     SystemContext 
+  )
+{
+  BOOLEAN   Return = TRUE;
+
+  if (ExceptionType != EXCEPT_ARM_FIQ) {
+    // Skip it as it is not related to ctrl-c
+    return FALSE;
   }
 
-  switch (Type) {
-    case 0:   //Software breakpoint
+  while (TRUE) {
+    if (!GdbIsCharAvailable ()) {
+      //
+      // No characters are pending so exit the loop
+      //
+      Return = TRUE;
       break;
+    }
     
-    default:
-      SendError (GDB_EINVALIDBRKPOINTTYPE);
-      return;
+    if (GdbGetChar () == 0x03) {
+      //
+      // We have a ctrl-c so exit and process exception for ctrl-c
+      //
+      Return = FALSE;
+      break;
+    }
   }
 
-  ClearBreakpoint(Address);
+  DebugAgentTimerEndOfInterrupt ();
 
-  SendSuccess ();
+  //  Force an exit from the exception handler as we are done
+  return Return;
+}
+
+
+/**
+  Enable/Disable the interrupt of debug timer and return the interrupt state
+  prior to the operation.
+
+  If EnableStatus is TRUE, enable the interrupt of debug timer.
+  If EnableStatus is FALSE, disable the interrupt of debug timer.
+
+  @param[in] EnableStatus    Enable/Disable.
+
+  @return FALSE always.
+
+**/
+BOOLEAN
+EFIAPI
+SaveAndSetDebugTimerInterrupt (
+  IN BOOLEAN                EnableStatus
+  )
+{
+  BOOLEAN              FiqEnabled;
+
+  FiqEnabled = ArmGetFiqState ();
+
+  if (EnableStatus) {
+    DebugAgentTimerSetPeriod (100);
+    ArmEnableFiq ();
+  } else {
+    DebugAgentTimerSetPeriod (0);
+    ArmDisableFiq ();
+  }
+
+  return FiqEnabled;
 }
 
 VOID
-InitializeProcessor (
-  VOID
-  )
-{
-  // Initialize breakpoint list
-  InitializeListHead(&BreakpointList);
-}
+GdbFPutString (
+  IN CHAR8  *String
+  );
 
-BOOLEAN
-ValidateAddress (
-  IN  VOID  *Address
+/**
+  Initialize debug agent.
+
+  This function is used to set up debug enviroment. It may enable interrupts.
+
+  @param[in] InitFlag   Init flag is used to decide initialize process.
+  @param[in] Context    Context needed according to InitFlag, it was optional.
+
+**/
+VOID
+EFIAPI
+InitializeDebugAgent (
+  IN UINT32                InitFlag,
+  IN VOID                  *Context  OPTIONAL
   )
-{
-  if ((UINT32)Address < 0x80000000) {
-    return FALSE;
-  } else {
-    return TRUE;
+{  
+  UINTN                Offset;
+  UINTN                Length;
+  BOOLEAN              IrqEnabled;
+  BOOLEAN              FiqEnabled;
+  UINT32               *VectorBase;
+
+    
+  //
+  // Disable interrupts
+  //
+  IrqEnabled = ArmGetInterruptState ();
+  ArmDisableInterrupts ();
+
+  //
+  // EFI does not use the FIQ, but a debugger might so we must disable 
+  // as we take over the exception vectors. 
+  //
+  FiqEnabled = ArmGetFiqState ();
+  ArmDisableFiq ();
+
+  //
+  // Copy an implementation of the ARM exception vectors to PcdCpuVectorBaseAddress.
+  //
+  Length = (UINTN)ExceptionHandlersEnd - (UINTN)ExceptionHandlersStart;
+
+  //
+  // Reserve space for the exception handlers
+  //
+  VectorBase = (UINT32 *)(UINTN)PcdGet32 (PcdCpuVectorBaseAddress);
+
+
+  // Copy our assembly code into the page that contains the exception vectors. 
+  CopyMem ((VOID *)VectorBase, (VOID *)ExceptionHandlersStart, Length);
+
+  //
+  // Patch in the common Assembly exception handler
+  //
+  Offset = (UINTN)CommonExceptionEntry - (UINTN)ExceptionHandlersStart;
+  *(UINTN *) (((UINT8 *)VectorBase) + Offset) = (UINTN)AsmCommonExceptionEntry;
+
+  // Flush Caches since we updated executable stuff
+  InvalidateInstructionCacheRange ((VOID *)PcdGet32(PcdCpuVectorBaseAddress), Length);
+
+  DebugAgentTimerIntialize ();
+
+  if (FiqEnabled) {
+    ArmEnableFiq ();
   }
-}
 
-BOOLEAN
-ValidateException (
-  IN  EFI_EXCEPTION_TYPE    ExceptionType, 
-  IN OUT EFI_SYSTEM_CONTEXT SystemContext 
-  )
-{
-  UINT32  ExceptionAddress;
-  UINT32  Instruction;
-  
-  // Is it a debugger SWI?
-  ExceptionAddress = SystemContext.SystemContextArm->PC -= 4;
-  Instruction      = *(UINT32 *)ExceptionAddress;
-  if (Instruction != GDB_ARM_BKPT) {
-    return FALSE;
+  if (IrqEnabled) {
+    ArmEnableInterrupts ();
   }
 
-  // Special for SWI-based exception handling.  SWI sets up the context
-  // to return to the instruction following the SWI instruction - NOT what we want
-  // for a debugger!
-  SystemContext.SystemContextArm->PC = ExceptionAddress;
-
-  return TRUE;
+  return;
 }
 

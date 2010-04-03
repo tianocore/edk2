@@ -1,0 +1,15 @@
+arm-none-eabi-gcc -march=armv7-a -mthumb  t.c -Wl,-nostdlib --emit-relocs
+
+target remote com7
+set debug remote 1 
+set remotetimeout 30
+set remotelogfile log.txt
+add-symbol-file c:/work/edk2/Build/BeagleBoard/DEBUG_ARMGCC/ARM/BeagleBoardPkg/Sec/Sec/DEBUG/BeagleBoardSec.dll 0x80008360 
+
+
+qSupported
+Hg0
+
+Hc-1
+qC
+qAttached

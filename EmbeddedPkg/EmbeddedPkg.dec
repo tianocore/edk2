@@ -40,9 +40,10 @@
   RealTimeClockLib|Include/Library/RealTimeClockLib.h
   EfiResetSystemLib|Include/Library/EfiResetSystemLib.h
   EblCmdLib|Include/Library/EblCmdLib.h
-  EblAddExternalCommandLib|Library/EblAddExternalCommandLib.h
-  EblNetworkLib|Library/EblNetworkLib.h
+  EblAddExternalCommandLib|Include/Library/EblAddExternalCommandLib.h
+  EblNetworkLib|Include/Library/EblNetworkLib.h
   GdbSerialLib|Include/Library/GdbSerialLib.h
+  DebugAgentTimerLib|Include/Library/DebugAgentTimerLib.h
 
 
 [Guids.common]
