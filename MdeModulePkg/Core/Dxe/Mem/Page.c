@@ -1,7 +1,7 @@
 /** @file
   UEFI Memory page management functions.
 
-Copyright (c) 2007 - 2008, Intel Corporation. <BR>
+Copyright (c) 2007 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -829,6 +829,9 @@ CoreConvertPages (
     // Add our new range in
     //
     CoreAddRange (NewType, Start, RangeEnd, Attribute);
+    if (NewType == EfiConventionalMemory) {
+      DEBUG_CLEAR_MEMORY ((VOID *)(UINTN)Start, RangeEnd - Start + 1);
+    }
 
     //
     // Move any map descriptor stack to general pool
@@ -1196,13 +1199,6 @@ CoreFreePages (
 
   if (EFI_ERROR (Status)) {
     goto Done;
-  }
-
-  //
-  // Destroy the contents
-  //
-  if (Memory < MAX_ADDRESS) {
-    DEBUG_CLEAR_MEMORY ((VOID *)(UINTN)Memory, NumberOfPages << EFI_PAGE_SHIFT);
   }
 
 Done:
