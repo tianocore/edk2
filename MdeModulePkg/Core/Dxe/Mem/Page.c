@@ -830,7 +830,7 @@ CoreConvertPages (
     //
     CoreAddRange (NewType, Start, RangeEnd, Attribute);
     if (NewType == EfiConventionalMemory) {
-      DEBUG_CLEAR_MEMORY ((VOID *)(UINTN)Start, RangeEnd - Start + 1);
+      DEBUG_CLEAR_MEMORY ((VOID *)(UINTN) Start, (UINTN) (RangeEnd - Start + 1));
     }
 
     //
