@@ -14,7 +14,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BootSector
-  FILE_GUID                      = A36495C1-C205-414e-B71F-4BE3476D699C
+  FILE_GUID                      = C89D72CE-E21A-4c71-BA79-770EF373D6DA
   MODULE_TYPE                    = USER_DEFINED
   VERSION_STRING                 = 1.0
   CUSTOM_MAKEFILE                = MSFT|Makefile

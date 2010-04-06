@@ -15,7 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = AcpiReset
-  FILE_GUID                      = 6F0198AA-1F1D-426D-AE3E-39AB633FCC28
+  FILE_GUID                      = 928EF6D4-72BC-4686-B57B-1EEB6ABD4F93
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = InitializeReset
