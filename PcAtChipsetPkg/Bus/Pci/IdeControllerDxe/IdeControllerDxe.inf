@@ -16,7 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = IdeController
-  FILE_GUID                      = F3790689-FB90-4479-A2EF-B82A43AFE74D
+  FILE_GUID                      = 99549F44-49BB-4820-B9D2-901329412D67
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = InitializeIdeControllerDriver
