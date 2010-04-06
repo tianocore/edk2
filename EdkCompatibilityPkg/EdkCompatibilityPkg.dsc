@@ -67,6 +67,7 @@ define GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x00020000 -DPI_S
   PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
   CacheMaintenanceLib|MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
+  CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
 
 [LibraryClasses.common.PEIM]
   HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
