@@ -1,34 +1,23 @@
 Intel(R) Platform Innovation Framework for EFI
 EFI Development Kit II (EDK II)
-Root Package 1.00
-2008-05-22
+2010-03-31
 
 Intel is a trademark or registered trademark of Intel Corporation or its
 subsidiaries in the United States and other countries.
 * Other names and brands may be claimed as the property of others.
-Copyright (c) 2007 - 2008, Intel Corporation  All rights reserved.
+Copyright (c) 2007 - 2010, Intel Corporation  All rights reserved.
 
-EDK II packages are in the development phase. They consist of:
+EDK II packages can be checked out from the following SVN address:
+http://edk2.svn.sourceforge.net/svnroot/edk2/trunk/edk2 
 
-  BuildNotes2.txt         - The build notes for this package
-  BaseTools               - Build -specific tools that are designed to help the
-                            developer create and modify drivers and libraries
-  DuetPkg                 - UEFI 2.1.PI 1.0 boot image creation platform
-  EdkShellBinPkg          - Binaries of full shell, minimum shell and commands
-  FatBinPkg               - Binaries built from the FatPkg 
-  IntelFrameworkPkg       - Tiano/Framework Includes and Libraries
-  IntelFrameworkModulePKg - Tiano/Framework Includes and Libraries
-  MdeModulePkg            - UEFI 2.1/PI 1.0 compliant modules
-  MdePkg                  - Industry-standard headers and libraries
-  Nt32Pkg                 - UEFI 2.1/PI 1.0 emulation environment for Windows
-  OptionRomPkg            - UEFI 2.1 peripheral drivers
-  UnixPkg                 - UEFI 2.1/PI 1.0 emulation environment for Unix
+The detailed introduction of these packages can be found in each package
+description file. (The *.dec file under the package directory)
 
 
 -------------------------------------------------------------------------------
 The most recent version of the setup instructions is available on the EDK II
 web-site:
-  https://edk2.tianocore.org/installation.html
+  http://sourceforge.net/apps/mediawiki/tianocore/index.php?title=Step-by-step_instructions
 
 
 -------------------------------------------------------------------------------
@@ -134,7 +123,7 @@ Tools in Python
   long as you have the Python interpreter (version 2.5) installed. The source
   of Python code is locating at:
 
-    https://buildtools.tianocore.org/svn/buildtools/trunk/BaseTools/Source/Python
+    http://edk2-buildtools.svn.sourceforge.net/svnroot/edk2-buildtools/trunk/BaseTools
 
   where:
 
