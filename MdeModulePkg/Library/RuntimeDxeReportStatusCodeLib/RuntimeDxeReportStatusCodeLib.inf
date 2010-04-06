@@ -16,7 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = RuntimeDxeReportStatusCodeLib
-  FILE_GUID                      = D65D9F72-7BCE-4f73-A673-47AF446A1A31
+  FILE_GUID                      = 07D25BBB-F832-41bb-BBA0-612E9F033067
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = ReportStatusCodeLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER

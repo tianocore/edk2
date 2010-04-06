@@ -15,7 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = AcpiTableDxe
-  FILE_GUID                      = 506533a6-e626-4500-b14f-17939c0e5b60
+  FILE_GUID                      = 9622E42C-8E38-4a08-9E8F-54F784652F6B
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
 
