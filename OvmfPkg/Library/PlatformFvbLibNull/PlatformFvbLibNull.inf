@@ -18,7 +18,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PlatformFvbLibNull
-  FILE_GUID                      = 8a6062ed-7140-4a74-b4ea-fe900e79e24b
+  FILE_GUID                      = 79263F9A-1701-4382-98C2-573F3558E6C8
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = PlatformFvbLib|DXE_RUNTIME_DRIVER

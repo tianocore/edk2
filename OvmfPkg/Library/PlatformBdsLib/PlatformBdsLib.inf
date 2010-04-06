@@ -15,7 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PlatformBdsLib
-  FILE_GUID                      = 143B5044-7C1B-4904-9778-EA16F1F3D554
+  FILE_GUID                      = F844172E-9985-44f2-BADE-0DD783462E95
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = PlatformBdsLib|DXE_DRIVER   
