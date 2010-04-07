@@ -1,7 +1,7 @@
 /** @file
   UEFI Memory pool management functions.
 
-Copyright (c) 2006 - 2008, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -128,7 +128,7 @@ LookupPoolHead (
   // MemoryType values in the range 0x80000000..0xFFFFFFFF are reserved for use by UEFI 
   // OS loaders that are provided by operating system vendors
   //
-  if (MemoryType < 0) {
+  if (MemoryType >= (INT32)0x80000000 && MemoryType <= (INT32)0xffffffff) {
 
     for (Link = mPoolHeadList.ForwardLink; Link != &mPoolHeadList; Link = Link->ForwardLink) {
       Pool = CR(Link, POOL, Link, POOL_SIGNATURE);
