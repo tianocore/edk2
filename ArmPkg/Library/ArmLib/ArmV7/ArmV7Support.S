@@ -41,6 +41,7 @@
 .set IC_ON, (0x1<<12)
 
 
+
 ASM_PFX(ArmInvalidateDataCacheEntryByMVA):
   mcr     p15, 0, r0, c7, c6, 1   @invalidate single data cache line       
   dsb
@@ -83,17 +84,8 @@ ASM_PFX(ArmCleanDataCacheEntryBySetWay):
   bx      lr
 
 
-ASM_PFX(ArmDrainWriteBuffer):
-  mcr     p15, 0, r0, c7, c10, 4       @ Drain write buffer for sync
-  dsb
-  isb
-  bx      lr
-  
-
 ASM_PFX(ArmInvalidateInstructionCache):
-  mov     R0,#0
   mcr     p15,0,R0,c7,c5,0      @Invalidate entire instruction cache
-  mov     R0,#0
   dsb
   isb
   bx      LR
@@ -109,16 +101,15 @@ ASM_PFX(ArmEnableMmu):
 ASM_PFX(ArmMmuEnabled):
   mrc     p15,0,R0,c1,c0,0
   and     R0,R0,#1
-  isb
   bx      LR
 
-
 ASM_PFX(ArmDisableMmu):
-  mov     R0,#0
-  mcr     p15,0,R0,c13,c0,0     @FCSE PID register must be cleared before disabling MMU
   mrc     p15,0,R0,c1,c0,0
   bic     R0,R0,#1
   mcr     p15,0,R0,c1,c0,0      @Disable MMU
+
+	mcr 		p15,0,R0,c8,c7,0      @Invalidate TLB
+  mcr     p15,0,R0,c7,c5,6      @Invalidate Branch predictor array
   dsb
   isb
   bx      LR
@@ -225,6 +216,7 @@ L_Skip:
   bgt   Loop1
   
 L_Finished:
+  dsb
   ldmfd SP!, {r4-r12, lr}
   bx    LR
 
@@ -233,6 +225,7 @@ ASM_PFX(ArmDataMemoryBarrier):
   bx      LR
   
 ASM_PFX(ArmDataSyncronizationBarrier):
+ASM_PFX(ArmDrainWriteBuffer):
   dsb
   bx      LR
   

@@ -84,17 +84,8 @@ ArmCleanDataCacheEntryBySetWay
   bx      lr
 
 
-ArmDrainWriteBuffer
-  mcr     p15, 0, r0, c7, c10, 4       ; Drain write buffer for sync
-  dsb
-  isb
-  bx      lr
-
-
 ArmInvalidateInstructionCache
-  mov     R0,#0
   mcr     p15,0,R0,c7,c5,0      ;Invalidate entire instruction cache
-  mov     R0,#0
   dsb
   isb
   bx      LR
@@ -110,15 +101,15 @@ ArmEnableMmu
 ArmMmuEnabled
   mrc     p15,0,R0,c1,c0,0
   and     R0,R0,#1
-  isb
   bx      LR
 
 ArmDisableMmu
-  mov     R0,#0
-  mcr     p15,0,R0,c13,c0,0     ;FCSE PID register must be cleared before disabling MMU
   mrc     p15,0,R0,c1,c0,0
   bic     R0,R0,#1
   mcr     p15,0,R0,c1,c0,0      ;Disable MMU
+
+	mcr 		p15,0,R0,c8,c7,0      ;Invalidate TLB
+  mcr     p15,0,R0,c7,c5,6      ;Invalidate Branch predictor array
   dsb
   isb
   bx      LR
@@ -127,7 +118,7 @@ ArmEnableDataCache
   ldr     R1,=DC_ON
   mrc     p15,0,R0,c1,c0,0      ;Read control register configuration data
   orr     R0,R0,R1              ;Set C bit
-  mcr     p15,0,r0,c1,c0,0      ;Write control register configuration data
+  mcr     p15,0,R0,c1,c0,0      ;Write control register configuration data
   dsb
   isb
   bx      LR
@@ -136,7 +127,7 @@ ArmDisableDataCache
   ldr     R1,=DC_ON
   mrc     p15,0,R0,c1,c0,0      ;Read control register configuration data
   bic     R0,R0,R1              ;Clear C bit
-  mcr     p15,0,r0,c1,c0,0      ;Write control register configuration data
+  mcr     p15,0,R0,c1,c0,0      ;Write control register configuration data
   isb
   bx      LR
 
@@ -144,7 +135,7 @@ ArmEnableInstructionCache
   ldr     R1,=IC_ON
   mrc     p15,0,R0,c1,c0,0      ;Read control register configuration data
   orr     R0,R0,R1              ;Set I bit
-  mcr     p15,0,r0,c1,c0,0      ;Write control register configuration data
+  mcr     p15,0,R0,c1,c0,0      ;Write control register configuration data
   dsb
   isb
   bx      LR
@@ -153,7 +144,7 @@ ArmDisableInstructionCache
   ldr     R1,=IC_ON
   mrc     p15,0,R0,c1,c0,0     ;Read control register configuration data
   BIC     R0,R0,R1             ;Clear I bit.
-  mcr     p15,0,r0,c1,c0,0     ;Write control register configuration data
+  mcr     p15,0,R0,c1,c0,0     ;Write control register configuration data
   isb
   bx      LR
 
@@ -217,6 +208,7 @@ Skip
   bgt   Loop1
   
 Finished
+  dsb
   ldmfd SP!, {r4-r12, lr}
   bx    LR
 
@@ -226,6 +218,7 @@ ArmDataMemoryBarrier
   bx      LR
   
 ArmDataSyncronizationBarrier
+ArmDrainWriteBuffer
   dsb
   bx      LR
   
