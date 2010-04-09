@@ -16,7 +16,7 @@
   never removed. Such design ensures sytem function well during none console
   device situation.
 
-Copyright (c) 2006 - 2009, Intel Corporation. <BR>
+Copyright (c) 2006 - 2010, Intel Corporation. <BR>
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -959,7 +959,7 @@ ConSplitterStart (
   }
 
   //
-  // Create virtual handle and open DeviceGuid on the virtul handle.
+  // Open the Parent Handle for the child.
   //
   Status = gBS->OpenProtocol (
                   ControllerHandle,
@@ -1320,6 +1320,17 @@ ConSplitterStdErrDriverBindingStart (
     // Construct console output devices' private data
     //
     Status = ConSplitterTextOutConstructor (&mStdErr);
+    if (!EFI_ERROR (Status)) {
+      //
+      // Create virtual device handle for StdErr Splitter
+      //
+      Status = gBS->InstallMultipleProtocolInterfaces (
+                      &mStdErr.VirtualHandle,
+                      &gEfiSimpleTextOutProtocolGuid,
+                      &mStdErr.TextOut,
+                      NULL
+                      );
+    }
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -1358,19 +1369,6 @@ ConSplitterStdErrDriverBindingStart (
   }
 
   if (mStdErr.CurrentNumberOfConsoles == 1) {
-    //
-    // Create virtual device handle for StdErr Splitter
-    //
-    Status = gBS->InstallMultipleProtocolInterfaces (
-                    &mStdErr.VirtualHandle,
-                    &gEfiSimpleTextOutProtocolGuid,
-                    &mStdErr.TextOut,
-                    NULL
-                    );
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-
     gST->StandardErrorHandle  = mStdErr.VirtualHandle;
     gST->StdErr               = &mStdErr.TextOut;
     //
@@ -1726,6 +1724,8 @@ ConSplitterStdErrDriverBindingStop (
   }
 
   if (mStdErr.CurrentNumberOfConsoles == 0) {
+    mStdErr.VirtualHandle     = NULL;
+
     gST->StandardErrorHandle  = NULL;
     gST->StdErr               = NULL;
     //
@@ -2651,7 +2651,7 @@ ConSplitterAddGraphicsOutputMode (
         CurrentGraphicsOutputMode->SizeOfInfo = GraphicsOutput->Mode->SizeOfInfo;
         CurrentGraphicsOutputMode->FrameBufferBase = GraphicsOutput->Mode->FrameBufferBase;
         CurrentGraphicsOutputMode->FrameBufferSize = GraphicsOutput->Mode->FrameBufferSize;
-  
+
         //
         // Allocate resource for the private mode buffer
         //
@@ -2912,7 +2912,7 @@ ConsplitterSetConsoleOutMode (
     //
     Status = TextOut->SetMode (TextOut, BaseMode);
     ASSERT(!EFI_ERROR(Status));
-    
+
     PcdSet32 (PcdConOutColumn, 80);
     PcdSet32 (PcdConOutRow, 25);
   }
@@ -3045,10 +3045,10 @@ ConSplitterTextOutAddDevice (
         // if GetMode is successfully and UGA device hasn't been set, set it
         //
         Status = ConSplitterUgaDrawSetMode (
-                    &Private->UgaDraw, 
-                    UgaHorizontalResolution, 
-                    UgaVerticalResolution, 
-                    UgaColorDepth, 
+                    &Private->UgaDraw,
+                    UgaHorizontalResolution,
+                    UgaVerticalResolution,
+                    UgaColorDepth,
                     UgaRefreshRate
                     );
       }
@@ -3057,10 +3057,10 @@ ConSplitterTextOutAddDevice (
       //
       if(EFI_ERROR (Status)) {
         Status = ConSplitterUgaDrawSetMode (
-                    &Private->UgaDraw, 
-                    800, 
-                    600, 
-                    32, 
+                    &Private->UgaDraw,
+                    800,
+                    600,
+                    32,
                     60
                     );
       }
@@ -3688,8 +3688,8 @@ ConSplitterTextInUnregisterKeyNotify (
 
   if (((TEXT_IN_EX_SPLITTER_NOTIFY *) NotificationHandle)->Signature != TEXT_IN_EX_SPLITTER_NOTIFY_SIGNATURE) {
     return EFI_INVALID_PARAMETER;
-  } 
-  
+  }
+
   Private = TEXT_IN_EX_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
 
   //
