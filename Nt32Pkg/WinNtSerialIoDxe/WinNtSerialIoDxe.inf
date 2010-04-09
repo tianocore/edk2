@@ -53,6 +53,7 @@
 
 [Guids]
   gEfiWinNtSerialPortGuid                       # ALWAYS_CONSUMED
+  gEfiUartDevicePathGuid
 
 [Protocols]
   gEfiSerialIoProtocolGuid                      # PROTOCOL BY_START

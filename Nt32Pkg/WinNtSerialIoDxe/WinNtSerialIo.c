@@ -62,6 +62,51 @@ EFI_DRIVER_BINDING_PROTOCOL gWinNtSerialIoDriverBinding = {
 UINT64 mBaudRateCurrentSupport[] = {50, 75, 110, 134, 150, 300, 600, 1200, 1800, 2000, 2400, 3600, 4800, 7200, 9600, 19200, 38400, 57600, 115200, SERIAL_PORT_MAX_BAUD_RATE + 1};
 
 /**
+  Check the device path node whether it's the Flow Control node or not.
+
+  @param[in] FlowControl    The device path node to be checked.
+  
+  @retval TRUE              It's the Flow Control node.
+  @retval FALSE             It's not.
+
+**/
+BOOLEAN
+IsUartFlowControlNode (
+  IN UART_FLOW_CONTROL_DEVICE_PATH *FlowControl
+  )
+{
+  return (BOOLEAN) (
+           (DevicePathType (FlowControl) == MESSAGING_DEVICE_PATH) &&
+           (DevicePathSubType (FlowControl) == MSG_VENDOR_DP) &&
+           (CompareGuid (&FlowControl->Guid, &gEfiUartDevicePathGuid))
+           );
+}
+
+/**
+  Check the device path node whether it contains Flow Control node or not.
+
+  @param[in] DevicePath     The device path to be checked.
+  
+  @retval TRUE              It contains the Flow Control node.
+  @retval FALSE             It doesn't.
+
+**/
+BOOLEAN
+ContainsFlowControl (
+  IN EFI_DEVICE_PATH_PROTOCOL      *DevicePath
+  )
+{
+  while (!IsDevicePathEnd (DevicePath)) {
+    if (IsUartFlowControlNode ((UART_FLOW_CONTROL_DEVICE_PATH *) DevicePath)) {
+      return TRUE;
+    }
+    DevicePath = NextDevicePathNode (DevicePath);
+  }
+
+  return FALSE;
+}
+
+/**
   The user Entry Point for module WinNtSerialIo. The user code starts with this function.
 
   @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
@@ -121,10 +166,15 @@ Returns:
 // TODO:    EFI_SUCCESS - add return value to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
 {
-  EFI_STATUS                Status;
-  EFI_DEVICE_PATH_PROTOCOL  *ParentDevicePath;
-  EFI_WIN_NT_IO_PROTOCOL    *WinNtIo;
-  UART_DEVICE_PATH          *UartNode;
+  EFI_STATUS                          Status;
+  EFI_DEVICE_PATH_PROTOCOL            *ParentDevicePath;
+  EFI_WIN_NT_IO_PROTOCOL              *WinNtIo;
+  UART_DEVICE_PATH                    *UartNode;
+  EFI_DEVICE_PATH_PROTOCOL            *DevicePath;
+  UART_FLOW_CONTROL_DEVICE_PATH       *FlowControlNode;
+  EFI_OPEN_PROTOCOL_INFORMATION_ENTRY *OpenInfoBuffer;
+  UINTN                               EntryCount;
+  UINTN                               Index;
 
   //
   // Check RemainingDevicePath validation
@@ -165,6 +215,17 @@ Returns:
       if ((UartNode->DataBits >= 6) && (UartNode->DataBits <= 8) && (UartNode->StopBits == OneFiveStopBits)) {
         goto Error;
       }
+
+      FlowControlNode = (UART_FLOW_CONTROL_DEVICE_PATH *) NextDevicePathNode (UartNode);
+      if (IsUartFlowControlNode (FlowControlNode)) {
+        //
+        // If the second node is Flow Control Node,
+        //   return error when it request other than hardware flow control.
+        //
+        if ((FlowControlNode->FlowControlMap & ~UART_FLOW_CONTROL_HARDWARE) != 0) {
+          goto Error;
+        }
+      }
     }
   }
 
@@ -180,7 +241,45 @@ Returns:
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
   if (Status == EFI_ALREADY_STARTED) {
-    return EFI_SUCCESS;
+    if (RemainingDevicePath == NULL || IsDevicePathEnd (RemainingDevicePath)) {
+      //
+      // If RemainingDevicePath is NULL or is the End of Device Path Node
+      //
+      return EFI_SUCCESS;
+    }
+    //
+    // When the driver has produced device path with flow control node but RemainingDevicePath only contains UART node,
+    //   return unsupported, and vice versa.
+    //
+    Status = gBS->OpenProtocolInformation (
+                    Handle,
+                    &gEfiWinNtIoProtocolGuid,
+                    &OpenInfoBuffer,
+                    &EntryCount
+                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    for (Index = 0; Index < EntryCount; Index++) {
+      if ((OpenInfoBuffer[Index].Attributes & EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER) != 0) {
+        Status = gBS->OpenProtocol (
+                        OpenInfoBuffer[Index].ControllerHandle,
+                        &gEfiDevicePathProtocolGuid,
+                        (VOID **) &DevicePath,
+                        This->DriverBindingHandle,
+                        Handle,
+                        EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                        );
+        if (!EFI_ERROR (Status) &&
+            (ContainsFlowControl (RemainingDevicePath) ^ ContainsFlowControl (DevicePath))) {
+          Status = EFI_UNSUPPORTED;
+        }
+        break;
+      }
+    }
+    FreePool (OpenInfoBuffer);
+    return Status;
   }
 
   if (EFI_ERROR (Status)) {
@@ -276,19 +375,23 @@ Returns:
   EFI_WIN_NT_IO_PROTOCOL              *WinNtIo;
   WIN_NT_SERIAL_IO_PRIVATE_DATA       *Private;
   HANDLE                              NtHandle;
-  UART_DEVICE_PATH                    Node;
+  UART_DEVICE_PATH                    UartNode;
   EFI_DEVICE_PATH_PROTOCOL            *ParentDevicePath;
   EFI_OPEN_PROTOCOL_INFORMATION_ENTRY *OpenInfoBuffer;
   UINTN                               EntryCount;
   UINTN                               Index;
   EFI_SERIAL_IO_PROTOCOL              *SerialIo;
-  UART_DEVICE_PATH                    *UartNode;
+  UART_DEVICE_PATH                    *Uart;
+  UINT32                              FlowControlMap;
+  UART_FLOW_CONTROL_DEVICE_PATH       *FlowControl;
+  EFI_DEVICE_PATH_PROTOCOL            *TempDevicePath;
+  UINT32                              Control;
 
   Private   = NULL;
   NtHandle  = INVALID_HANDLE_VALUE;
 
   //
-  // Grab the protocols we need
+  // Get the Parent Device Path
   //
   Status = gBS->OpenProtocol (
                   Handle,
@@ -348,7 +451,7 @@ Returns:
 
     Status = EFI_ALREADY_STARTED;
     for (Index = 0; Index < EntryCount; Index++) {
-      if (OpenInfoBuffer[Index].Attributes & EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER) {
+      if ((OpenInfoBuffer[Index].Attributes & EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER) != 0) {
         Status = gBS->OpenProtocol (
                         OpenInfoBuffer[Index].ControllerHandle,
                         &gEfiSerialIoProtocolGuid,
@@ -358,16 +461,34 @@ Returns:
                         EFI_OPEN_PROTOCOL_GET_PROTOCOL
                         );
         if (!EFI_ERROR (Status)) {
-          UartNode = (UART_DEVICE_PATH *) RemainingDevicePath;
+          Uart   = (UART_DEVICE_PATH *) RemainingDevicePath;
           Status = SerialIo->SetAttributes (
-                              SerialIo,
-                              UartNode->BaudRate,
-                              SerialIo->Mode->ReceiveFifoDepth,
-                              SerialIo->Mode->Timeout,
-                              (EFI_PARITY_TYPE)UartNode->Parity,
-                              UartNode->DataBits,
-                              (EFI_STOP_BITS_TYPE)UartNode->StopBits
-                              );
+                               SerialIo,
+                               Uart->BaudRate,
+                               SerialIo->Mode->ReceiveFifoDepth,
+                               SerialIo->Mode->Timeout,
+                               (EFI_PARITY_TYPE) Uart->Parity,
+                               Uart->DataBits,
+                               (EFI_STOP_BITS_TYPE) Uart->StopBits
+                               );
+          FlowControl = (UART_FLOW_CONTROL_DEVICE_PATH *) NextDevicePathNode (Uart);
+          if (!EFI_ERROR (Status) && IsUartFlowControlNode (FlowControl)) {
+            Status = SerialIo->GetControl (SerialIo, &Control);
+            if (!EFI_ERROR (Status)) {
+              if (FlowControl->FlowControlMap == UART_FLOW_CONTROL_HARDWARE) {
+                Control |= EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE;
+              } else {
+                Control &= ~EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE;
+              }
+              //
+              // Clear the bits that are not allowed to pass to SetControl
+              //
+              Control &= (EFI_SERIAL_REQUEST_TO_SEND | EFI_SERIAL_DATA_TERMINAL_READY |
+                          EFI_SERIAL_HARDWARE_LOOPBACK_ENABLE | EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE | 
+                          EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE);
+              Status = SerialIo->SetControl (SerialIo, Control);
+            }
+          }
         }
         break;
       }
@@ -377,16 +498,18 @@ Returns:
     return Status;
   }
 
+  FlowControl    = NULL;
+  FlowControlMap = 0;
   if (RemainingDevicePath == NULL) {
     //
     // Build the device path by appending the UART node to the ParentDevicePath
     // from the WinNtIo handle. The Uart setings are zero here, since
     // SetAttribute() will update them to match the default setings.
     //
-    ZeroMem (&Node, sizeof (UART_DEVICE_PATH));
-    Node.Header.Type     = MESSAGING_DEVICE_PATH;
-    Node.Header.SubType  = MSG_UART_DP;
-    SetDevicePathNodeLength ((EFI_DEVICE_PATH_PROTOCOL *) &Node, sizeof (UART_DEVICE_PATH));
+    ZeroMem (&UartNode, sizeof (UART_DEVICE_PATH));
+    UartNode.Header.Type     = MESSAGING_DEVICE_PATH;
+    UartNode.Header.SubType  = MSG_UART_DP;
+    SetDevicePathNodeLength ((EFI_DEVICE_PATH_PROTOCOL *) &UartNode, sizeof (UART_DEVICE_PATH));
 
   } else if (!IsDevicePathEnd (RemainingDevicePath)) {
     //
@@ -398,7 +521,13 @@ Returns:
     // already checked to make sure the RemainingDevicePath contains settings
     // that we can support.
     //
-    CopyMem (&Node, RemainingDevicePath, sizeof (UART_DEVICE_PATH));
+    CopyMem (&UartNode, RemainingDevicePath, sizeof (UART_DEVICE_PATH));
+    FlowControl = (UART_FLOW_CONTROL_DEVICE_PATH *) NextDevicePathNode (RemainingDevicePath);
+    if (IsUartFlowControlNode (FlowControl)) {
+      FlowControlMap = FlowControl->FlowControlMap;
+    } else {
+      FlowControl    = NULL;
+    }
 
   } else {
     //
@@ -447,12 +576,12 @@ Returns:
 
   Private->SoftwareLoopbackEnable = FALSE;
   Private->HardwareLoopbackEnable = FALSE;
-  Private->HardwareFlowControl    = FALSE;
+  Private->HardwareFlowControl    = (BOOLEAN) (FlowControlMap == UART_FLOW_CONTROL_HARDWARE);
   Private->Fifo.First             = 0;
   Private->Fifo.Last              = 0;
   Private->Fifo.Surplus           = SERIAL_MAX_BUFFER_SIZE;
 
-  CopyMem (&Private->UartDevicePath, &Node, sizeof (UART_DEVICE_PATH));
+  CopyMem (&Private->UartDevicePath, &UartNode, sizeof (UART_DEVICE_PATH));
 
   AddUnicodeString2 (
     "eng",
@@ -488,6 +617,19 @@ Returns:
                           ParentDevicePath,
                           (EFI_DEVICE_PATH_PROTOCOL *) &Private->UartDevicePath
                           );
+  //
+  // Only produce the FlowControl node when remaining device path has it
+  //
+  if (FlowControl != NULL) {
+    TempDevicePath = Private->DevicePath;
+    if (TempDevicePath != NULL) {
+      Private->DevicePath = AppendDevicePathNode (
+                              TempDevicePath,
+                              (EFI_DEVICE_PATH_PROTOCOL *) FlowControl
+                              );
+      FreePool (TempDevicePath);
+    }
+  }
   if (Private->DevicePath == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Error;
@@ -791,7 +933,7 @@ Returns:
   COMMTIMEOUTS                  PortTimeOuts;
   DWORD                         ConvertedTime;
   BOOL                          Result;
-  EFI_DEVICE_PATH_PROTOCOL      *NewDevicePath;
+  UART_DEVICE_PATH              *Uart;
   EFI_TPL                       Tpl;
 
   Private = WIN_NT_SERIAL_IO_PRIVATE_DATA_FROM_THIS (This);
@@ -841,7 +983,7 @@ Returns:
       break;
       }
   }
-  	
+
   if ((ReceiveFifoDepth < 1) || (ReceiveFifoDepth > SERIAL_PORT_MAX_RECEIVE_FIFO_DEPTH)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -976,37 +1118,25 @@ Returns:
   Private->UartDevicePath.Parity    = (UINT8) Parity;
   Private->UartDevicePath.StopBits  = (UINT8) StopBits;
 
-  NewDevicePath = AppendDevicePathNode (
-                    Private->ParentDevicePath,
-                    (EFI_DEVICE_PATH_PROTOCOL *) &Private->UartDevicePath
-                    );
-  if (NewDevicePath == NULL) {
-    gBS->RestoreTPL (Tpl);
-    return EFI_DEVICE_ERROR;
-  }
-
+  Status = EFI_SUCCESS;
   if (Private->Handle != NULL) {
+    Uart = (UART_DEVICE_PATH *) (
+             (UINTN) Private->DevicePath
+             + GetDevicePathSize (Private->ParentDevicePath)
+             - END_DEVICE_PATH_LENGTH
+             );
+    CopyMem (Uart, &Private->UartDevicePath, sizeof (UART_DEVICE_PATH));
     Status = gBS->ReinstallProtocolInterface (
                     Private->Handle,
                     &gEfiDevicePathProtocolGuid,
                     Private->DevicePath,
-                    NewDevicePath
+                    Private->DevicePath
                     );
-    if (EFI_ERROR (Status)) {
-      gBS->RestoreTPL (Tpl);
-      return Status;
-    }
   }
-
-  if (Private->DevicePath != NULL) {
-    FreePool (Private->DevicePath);
-  }
-
-  Private->DevicePath = NewDevicePath;
 
   gBS->RestoreTPL (Tpl);
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 EFI_STATUS
@@ -1038,6 +1168,8 @@ Returns:
   BOOL                          Result;
   DCB                           Dcb;
   EFI_TPL                       Tpl;
+  UART_FLOW_CONTROL_DEVICE_PATH *FlowControl;
+  EFI_STATUS                    Status;
 
   //
   // first determine the parameter is invalid
@@ -1099,9 +1231,32 @@ Returns:
     return EFI_DEVICE_ERROR;
   }
 
+  Status = EFI_SUCCESS;
+  if (Private->Handle != NULL) {
+    FlowControl = (UART_FLOW_CONTROL_DEVICE_PATH *) (
+                    (UINTN) Private->DevicePath
+                    + GetDevicePathSize (Private->ParentDevicePath)
+                    - END_DEVICE_PATH_LENGTH
+                    + sizeof (UART_DEVICE_PATH)
+                    );
+    if (IsUartFlowControlNode (FlowControl) &&
+        ((FlowControl->FlowControlMap == UART_FLOW_CONTROL_HARDWARE) ^ Private->HardwareFlowControl)) {
+      //
+      // Flow Control setting is changed, need to reinstall device path protocol
+      //
+      FlowControl->FlowControlMap = Private->HardwareFlowControl ? UART_FLOW_CONTROL_HARDWARE : 0;
+      Status = gBS->ReinstallProtocolInterface (
+                      Private->Handle,
+                      &gEfiDevicePathProtocolGuid,
+                      Private->DevicePath,
+                      Private->DevicePath
+                      );
+    }
+  }
+
   gBS->RestoreTPL (Tpl);
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 EFI_STATUS
