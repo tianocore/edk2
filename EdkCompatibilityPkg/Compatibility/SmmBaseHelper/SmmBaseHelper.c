@@ -106,6 +106,10 @@ CPU_SAVE_STATE_CONVERSION mCpuSaveStateConvTable[] = {
   {EFI_SMM_SAVE_STATE_REGISTER_CR3      , CPU_SAVE_STATE_GET_OFFSET(CR3)}
 };
 
+/**
+  Page fault handler.
+
+**/
 VOID
 PageFaultHandlerHook (
   VOID
@@ -391,9 +395,9 @@ InitCpuStatePageTable (
 {
   UINTN  Index;
   UINT64 *PageTable;
-  UINT64 *PDPTE;
+  UINT64 *Pdpte;
   UINT64 HookAddress;
-  UINT64 PDE;
+  UINT64 Pde;
   UINT64 Address;
   
   //
@@ -409,21 +413,21 @@ InitCpuStatePageTable (
   PageTable = (UINT64 *)(UINTN)(PageTable[BitFieldRead64 (HookAddress, 39, 47)] & mPhyMask);
   PageTable = (UINT64 *)(UINTN)(PageTable[BitFieldRead64 (HookAddress, 30, 38)] & mPhyMask);
   
-  PDPTE = (UINT64 *)(UINTN)PageTable;
-  PDE = PDPTE[BitFieldRead64 (HookAddress, 21, 29)];
-  ASSERT ((PDE & BIT0) != 0); // Present and 2M Page
+  Pdpte = (UINT64 *)(UINTN)PageTable;
+  Pde = Pdpte[BitFieldRead64 (HookAddress, 21, 29)];
+  ASSERT ((Pde & BIT0) != 0); // Present and 2M Page
   
-  if ((PDE & BIT7) == 0) { // 4KB Page Directory
-    PageTable = (UINT64 *)(UINTN)(PDE & mPhyMask);
+  if ((Pde & BIT7) == 0) { // 4KB Page Directory
+    PageTable = (UINT64 *)(UINTN)(Pde & mPhyMask);
   } else {
-    ASSERT ((PDE & mPhyMask) == (HookAddress & ~(SIZE_2MB-1))); // 2MB Page Point to HookAddress
+    ASSERT ((Pde & mPhyMask) == (HookAddress & ~(SIZE_2MB-1))); // 2MB Page Point to HookAddress
     PageTable = AllocatePages (1);
     Address = HookAddress & ~(SIZE_2MB-1);
     for (Index = 0; Index < 512; Index++) {
       PageTable[Index] = Address | BIT0 | BIT1; // Present and RW
       Address += SIZE_4KB;
     }
-    PDPTE[BitFieldRead64 (HookAddress, 21, 29)] = (UINT64)(UINTN)PageTable | BIT0 | BIT1; // Present and RW
+    Pdpte[BitFieldRead64 (HookAddress, 21, 29)] = (UINT64)(UINTN)PageTable | BIT0 | BIT1; // Present and RW
   }
   return PageTable;
 }
