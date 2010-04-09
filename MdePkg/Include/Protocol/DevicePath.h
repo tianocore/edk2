@@ -687,6 +687,9 @@ typedef struct {
   UINT32                          FlowControlMap;
 } UART_FLOW_CONTROL_DEVICE_PATH;
 
+#define UART_FLOW_CONTROL_HARDWARE         0x00000001
+#define UART_FLOW_CONTROL_XON_XOFF         0x00000010
+
 #define DEVICE_PATH_MESSAGING_SAS                 EFI_SAS_DEVICE_PATH_GUID
 ///
 /// Serial Attached SCSI (SAS) devices.
