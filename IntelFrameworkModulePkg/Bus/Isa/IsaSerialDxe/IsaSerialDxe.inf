@@ -52,6 +52,9 @@
   UefiDriverEntryPoint
   DebugLib
 
+[Guids]
+  gEfiUartDevicePathGuid
+
 [Protocols]
   gEfiIsaIoProtocolGuid                         ## TO_START
   gEfiDevicePathProtocolGuid                    ## TO_START
