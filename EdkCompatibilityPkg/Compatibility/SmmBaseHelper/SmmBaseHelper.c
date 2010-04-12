@@ -341,8 +341,8 @@ WriteBackDirtyPages (
   UINTN  PTEndIndex;
 
   NumCpuStatePages = EFI_SIZE_TO_PAGES (mNumberOfProcessors * sizeof (EFI_SMM_CPU_SAVE_STATE));
-  PTStartIndex = (UINTN)BitFieldRead64 ((UINT64)mFrameworkSmst->CpuSaveState, 12, 20);
-  PTEndIndex   = (UINTN)BitFieldRead64 ((UINT64)mFrameworkSmst->CpuSaveState + EFI_PAGES_TO_SIZE(NumCpuStatePages) - 1, 12, 20);
+  PTStartIndex = (UINTN)BitFieldRead64 ((UINT64) (UINTN) mFrameworkSmst->CpuSaveState, 12, 20);
+  PTEndIndex   = (UINTN)BitFieldRead64 ((UINT64) (UINTN) mFrameworkSmst->CpuSaveState + EFI_PAGES_TO_SIZE(NumCpuStatePages) - 1, 12, 20);
   for (PTIndex = PTStartIndex; PTIndex <= PTEndIndex; PTIndex++) {
     if ((mCpuStatePageTable[PTIndex] & (BIT0|BIT6)) == (BIT0|BIT6)) { // present and dirty?
       ReadWriteCpuStatePage (mCpuStatePageTable[PTIndex] & mPhyMask, FALSE);
