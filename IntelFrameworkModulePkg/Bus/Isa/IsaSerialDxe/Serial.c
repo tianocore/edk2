@@ -195,6 +195,7 @@ SerialControllerDriverSupported (
   EFI_OPEN_PROTOCOL_INFORMATION_ENTRY       *OpenInfoBuffer;
   UINTN                                     EntryCount;
   UINTN                                     Index;
+  BOOLEAN                                   HasFlowControl;
 
   //
   // Check RemainingDevicePath validation
@@ -298,9 +299,11 @@ SerialControllerDriverSupported (
                         Controller,
                         EFI_OPEN_PROTOCOL_GET_PROTOCOL
                         );
-        if (!EFI_ERROR (Status) &&
-            (ContainsFlowControl (RemainingDevicePath) ^ ContainsFlowControl (DevicePath))) {
-          Status = EFI_UNSUPPORTED;
+        if (!EFI_ERROR (Status)) {
+          HasFlowControl = ContainsFlowControl (RemainingDevicePath);
+          if (HasFlowControl ^ ContainsFlowControl (DevicePath)) {
+            Status = EFI_UNSUPPORTED;
+          }
         }
         break;
       }
