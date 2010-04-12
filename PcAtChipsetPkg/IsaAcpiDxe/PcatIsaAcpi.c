@@ -1,14 +1,14 @@
 /** @file
   EFI PCAT ISA ACPI Driver for a Generic PC Platform
 
-  Copyright (c) 2006, 2009, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved. <BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -26,22 +26,20 @@ EFI_DRIVER_BINDING_PROTOCOL gPcatIsaAcpiDriverBinding = {
   NULL
 };
 
+/**
+  the entry point of the PcatIsaAcpi driver.
+
+  @param ImageHandle     Handle for driver image
+  @param SystemTable     Point to EFI_SYSTEM_TABLE
+
+  @return Sucess or not for installing driver binding protocol
+**/
 EFI_STATUS
 EFIAPI
 PcatIsaAcpiDriverEntryPoint (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
-/*++
-  
-  Routine Description:
-    the entry point of the PcatIsaAcpi driver
-  
-  Arguments:
-  
-  Returns:
-    
---*/                
 {
   return EfiLibInstallDriverBindingComponentName2 (
            ImageHandle, 
@@ -53,6 +51,17 @@ PcatIsaAcpiDriverEntryPoint (
            );
 }
 
+/**
+  ControllerDriver Protocol Method
+
+  @param This                 Driver Binding protocol instance pointer.   
+  @param Controller           Handle of device to test.
+  @param RemainingDevicePath  Optional parameter use to pick a specific child
+                              device to start.
+  @retval EFI_SUCCESS         This driver supports this device.
+  @retval other               This driver does not support this device.
+
+**/
 EFI_STATUS
 EFIAPI
 PcatIsaAcpiDriverBindingSupported (
@@ -60,17 +69,6 @@ PcatIsaAcpiDriverBindingSupported (
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
-/*++
-
-Routine Description:
-
-  ControllerDriver Protocol Method
-
-Arguments:
-
-Returns:
-
---*/
 {
   EFI_STATUS           Status;
   EFI_PCI_IO_PROTOCOL  *PciIo;
@@ -131,6 +129,18 @@ Returns:
   return Status;
 }
 
+/**
+  Install EFI_ISA_ACPI_PROTOCOL.
+
+  @param  This                 Driver Binding protocol instance pointer.
+  @param  ControllerHandle     Handle of device to bind driver to.
+  @param  RemainingDevicePath  Optional parameter use to pick a specific child
+                               device to start.
+
+  @retval EFI_SUCCESS          This driver is added to ControllerHandle
+  @retval EFI_ALREADY_STARTED  This driver is already running on ControllerHandle
+  @retval other                This driver does not support this device
+**/
 EFI_STATUS
 EFIAPI
 PcatIsaAcpiDriverBindingStart (
@@ -138,16 +148,6 @@ PcatIsaAcpiDriverBindingStart (
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
-/*++
-
-Routine Description:
-  Install EFI_ISA_ACPI_PROTOCOL
-
-Arguments:
-
-Returns:
-
---*/
 {
   EFI_STATUS           Status;
   EFI_PCI_IO_PROTOCOL  *PciIo;
@@ -246,6 +246,21 @@ Done:
   return EFI_SUCCESS;
 }
 
+
+/**
+  Stop this driver on ControllerHandle. Support stopping any child handles
+  created by this driver.
+
+  @param  This              Protocol instance pointer.
+  @param  ControllerHandle  Handle of device to stop driver on
+  @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
+                            children is zero stop the entire bus driver.
+  @param  ChildHandleBuffer List of Child Handles to Stop.
+
+  @retval EFI_SUCCESS       This driver is removed ControllerHandle
+  @retval other             This driver was not removed from this device
+
+**/
 EFI_STATUS
 EFIAPI
 PcatIsaAcpiDriverBindingStop (
@@ -254,15 +269,6 @@ PcatIsaAcpiDriverBindingStop (
   IN UINTN                        NumberOfChildren,
   IN EFI_HANDLE                   *ChildHandleBuffer
   )
-/*++
-
-  Routine Description:
-
-  Arguments:
-
-  Returns:
-
---*/
 {
   EFI_STATUS             Status;
   EFI_ISA_ACPI_PROTOCOL  *IsaAcpi;

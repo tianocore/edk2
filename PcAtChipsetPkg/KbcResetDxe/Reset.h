@@ -1,7 +1,9 @@
-/*++
+/** @file
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
+  Definitions for reset
+
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved. <BR>
+This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
 http://opensource.org/licenses/bsd-license.php                                            
@@ -9,14 +11,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-  Reset.h
-
-Abstract:
-
-  some definitions for reset
-
---*/
+**/
 
 #ifndef _KBC_RESET_H
 #define _KBC_RESET_H
@@ -30,30 +25,34 @@ Abstract:
 
 #include <Protocol/Reset.h>
 
+/**
+  Initialize the state information for the Reset Architectural Protocol
+
+  @param ImageHandle     Handle of the loaded driver 
+  @param SystemTable     Pointer to the System Table
+
+  @retval EFI_SUCCESS           Thread can be successfully created
+  @retval EFI_OUT_OF_RESOURCES  Cannot allocate protocol data structure
+  @retval EFI_DEVICE_ERROR      Cannot create the timer service
+
+**/
 EFI_STATUS
 EFIAPI
 InitializeReset (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  ImageHandle - TODO: add argument description
-  SystemTable - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 ;
 
+/**
+  Reset the system.
+
+  @param ResetType       warm or cold
+  @param ResetStatus     possible cause of reset
+  @param DataSize        Size of ResetData in bytes
+  @param ResetData       Optional Unicode string
+
+**/
 VOID
 EFIAPI
 KbcResetSystem (
@@ -62,24 +61,6 @@ KbcResetSystem (
   IN UINTN            DataSize,
   IN VOID             *ResetData OPTIONAL
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  ResetType   - TODO: add argument description
-  ResetStatus - TODO: add argument description
-  DataSize    - TODO: add argument description
-  ResetData   - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 ;
 
 #endif
