@@ -87,6 +87,14 @@ RegisterInterruptSource (
     return EFI_UNSUPPORTED;
   } 
   
+  if ((MmioRead32 (INTCPS_ILR(Source)) & INTCPS_ILR_FIQ) == INTCPS_ILR_FIQ) {
+    // This vector has been programmed as FIQ so we can't use it for IRQ
+    // EFI does not use FIQ, but the debugger can use it to check for 
+    // ctrl-c. So this ASSERT means you have a conflict with the debug agent
+    ASSERT (FALSE);
+    return EFI_UNSUPPORTED;
+  }
+  
   if ((Handler == NULL) && (gRegisteredInterruptHandlers[Source] == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -203,7 +211,7 @@ GetInterruptSourceState (
   Bank = Source / 32;
   Bit  = 1UL << (Source % 32);
     
-  if ((MmioRead32 (INTCPS_MIR(Bank)) & Bit) == Bit) {
+  if ((MmioRead32(INTCPS_MIR(Bank)) & Bit) == Bit) {
     *InterruptState = FALSE;
   } else {
     *InterruptState = TRUE;
