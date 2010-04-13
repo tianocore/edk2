@@ -55,6 +55,9 @@
   PrintLib
   SerialPortLib
   ExtractGuidedSectionLib
+  TimerLib
+  PerformanceLib
+  
 
 [Guids]
   gEfiHobMemoryAllocModuleGuid

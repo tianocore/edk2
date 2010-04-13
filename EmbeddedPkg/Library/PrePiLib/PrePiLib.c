@@ -115,7 +115,10 @@ LoadDxeCoreFromFfsFile (
   VOID                    *TopOfStack;
   VOID                    *Hob;
   EFI_FV_FILE_INFO        FvFileInfo;
+  UINT64                  Tick;
 
+  Tick = 0;
+  PERF_START (NULL, "SEC", NULL, 1);
 
   Status = FfsFindSectionData (EFI_SECTION_PE32, FileHandle, &PeCoffImage);
   if (EFI_ERROR  (Status)) {
@@ -140,6 +143,13 @@ LoadDxeCoreFromFfsFile (
   Hob = GetHobList ();
   if (StackSize == 0) {
     // User the current stack
+  
+  
+    if (PerformanceMeasurementEnabled ()) {
+      Tick = GetPerformanceCounter ();
+    }
+    PERF_END (NULL, "SEC", NULL, Tick);
+
     ((DXE_CORE_ENTRY_POINT)(UINTN)EntryPoint) (Hob);
   } else {
     
@@ -161,6 +171,12 @@ LoadDxeCoreFromFfsFile (
     //    
     UpdateStackHob ((EFI_PHYSICAL_ADDRESS)(UINTN) BaseOfStack, StackSize);
     
+
+    if (PerformanceMeasurementEnabled ()) {
+      Tick = GetPerformanceCounter ();
+    }
+    PERF_END (NULL, "SEC", NULL, Tick);
+
     SwitchStack (
       (SWITCH_STACK_ENTRY_POINT)(UINTN)EntryPoint,
       Hob,
