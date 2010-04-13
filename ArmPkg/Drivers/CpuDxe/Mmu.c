@@ -105,7 +105,7 @@ typedef UINT32    ARM_PAGE_TABLE_ENTRY;
 #define ARM_PAGE_TYPE_SMALL           0x2
 #define ARM_PAGE_TYPE_SMALL_XN        0x3
 
-#define SMALL_PAGE_TABLE_ENTRY_COUNT  (ARM_PAGE_DESC_ENTRY_MVA_SIZE / EFI_PAGE_SIZE)
+#define SMALL_PAGE_TABLE_ENTRY_COUNT  (ARM_PAGE_DESC_ENTRY_MVA_SIZE / SIZE_4KB)
 
 
 // Translation Table Base 0 fields
@@ -434,6 +434,8 @@ UpdatePageEntries (
   UINT32        p;
   UINT32        PageTableIndex;
   UINT32        PageTableEntry;
+  UINT32        CurrentPageTableEntry;
+  VOID          *Mva;
 
   volatile ARM_FIRST_LEVEL_DESCRIPTOR   *FirstLevelTable;
   volatile ARM_PAGE_TABLE_ENTRY         *PageTable;
@@ -492,7 +494,7 @@ UpdatePageEntries (
   FirstLevelTable = (ARM_FIRST_LEVEL_DESCRIPTOR *)ArmGetTranslationTableBaseAddress ();
 
   // calculate number of 4KB page table entries to change
-  NumPageEntries = Length/EFI_PAGE_SIZE;
+  NumPageEntries = Length/SIZE_4KB;
   
   // iterate for the number of 4KB pages to change
   Offset = 0;
@@ -525,10 +527,10 @@ UpdatePageEntries (
     ASSERT (PageTableIndex < SMALL_PAGE_TABLE_ENTRY_COUNT);
 
     // get the entry
-    PageTableEntry = PageTable[PageTableIndex];
+    CurrentPageTableEntry = PageTable[PageTableIndex];
 
     // mask off appropriate fields
-    PageTableEntry &= ~EntryMask;
+    PageTableEntry = CurrentPageTableEntry & ~EntryMask;
 
     // mask in new attributes and/or permissions
     PageTableEntry |= EntryValue;
@@ -537,13 +539,22 @@ UpdatePageEntries (
       // Make this virtual address point at a physical page
       PageTableEntry &= ~VirtualMask;
     }
-    
-    // update the entry
-    PageTable[PageTableIndex] = PageTableEntry; 
    
+    if (CurrentPageTableEntry  != PageTableEntry) {
+      Mva = (VOID *)(UINTN)((((UINTN)FirstLevelIdx) << ARM_SECTION_BASE_SHIFT) + (PageTableIndex << ARM_SMALL_PAGE_BASE_SHIFT));
+      if ((CurrentPageTableEntry & ARM_PAGE_C) == ARM_PAGE_C) {
+        // The current section mapping is cacheable so Clean/Invalidate the MVA of the page
+        // Note assumes switch(Attributes), not ARMv7 possibilities
+        WriteBackInvalidateDataCacheRange (Mva, SIZE_4KB);
+      }
+
+      // Only need to update if we are changing the entry  
+      PageTable[PageTableIndex] = PageTableEntry; 
+      ArmUpdateTranslationTableEntry ((VOID *)&PageTable[PageTableIndex], Mva);
+    }
 
     Status = EFI_SUCCESS;
-    Offset += EFI_PAGE_SIZE;
+    Offset += SIZE_4KB;
     
   } // end first level translation table loop
 
@@ -566,8 +577,9 @@ UpdateSectionEntries (
   UINT32        FirstLevelIdx;
   UINT32        NumSections;
   UINT32        i;
+  UINT32        CurrentDescriptor;
   UINT32        Descriptor;
-
+  VOID          *Mva;
   volatile ARM_FIRST_LEVEL_DESCRIPTOR   *FirstLevelTable;
 
   // EntryMask: bitmask of values to change (1 = change this value, 0 = leave alone)
@@ -582,28 +594,28 @@ UpdateSectionEntries (
   switch(Attributes) {
     case EFI_MEMORY_UC:
       // modify cacheability attributes
-      EntryMask |= ARM_SECTION_TEX_MASK | ARM_SECTION_C | ARM_SECTION_B;
+      EntryMask |= ARM_SECTION_CACHEABILITY_MASK;
       // map to strongly ordered
       EntryValue |= 0; // TEX[2:0] = 0, C=0, B=0
       break;
 
     case EFI_MEMORY_WC:
       // modify cacheability attributes
-      EntryMask |= ARM_SECTION_TEX_MASK | ARM_SECTION_C | ARM_SECTION_B;
+      EntryMask |= ARM_SECTION_CACHEABILITY_MASK;
       // map to normal non-cachable
       EntryValue |= (0x1 << ARM_SECTION_TEX_SHIFT); // TEX [2:0]= 001 = 0x2, B=0, C=0
       break;
 
     case EFI_MEMORY_WT:
       // modify cacheability attributes
-      EntryMask |= ARM_SECTION_TEX_MASK | ARM_SECTION_C | ARM_SECTION_B;
+      EntryMask |= ARM_SECTION_CACHEABILITY_MASK;
       // write through with no-allocate
       EntryValue |= ARM_SECTION_C; // TEX [2:0] = 0, C=1, B=0
       break;
 
     case EFI_MEMORY_WB:
       // modify cacheability attributes
-      EntryMask |= ARM_SECTION_TEX_MASK | ARM_SECTION_C | ARM_SECTION_B;
+      EntryMask |= ARM_SECTION_CACHEABILITY_MASK;
       // write back (with allocate)
       EntryValue |= (0x1 << ARM_SECTION_TEX_SHIFT) | ARM_SECTION_C | ARM_SECTION_B; // TEX [2:0] = 001, C=1, B=1
       break;
@@ -635,17 +647,17 @@ UpdateSectionEntries (
   
   // iterate through each descriptor
   for(i=0; i<NumSections; i++) {
-    Descriptor = FirstLevelTable[FirstLevelIdx + i];
+    CurrentDescriptor = FirstLevelTable[FirstLevelIdx + i];
 
     // has this descriptor already been coverted to pages?
-    if ((Descriptor & ARM_DESC_TYPE_MASK) != ARM_DESC_TYPE_PAGE_TABLE ) {
+    if ((CurrentDescriptor & ARM_DESC_TYPE_MASK) != ARM_DESC_TYPE_PAGE_TABLE ) {
       // forward this 1MB range to page table function instead
       Status = UpdatePageEntries ((FirstLevelIdx + i) << ARM_SECTION_BASE_SHIFT, ARM_PAGE_DESC_ENTRY_MVA_SIZE, Attributes, VirtualMask);
     } else {
       // still a section entry
       
       // mask off appropriate fields
-      Descriptor &= ~EntryMask;
+      Descriptor = CurrentDescriptor & ~EntryMask;
 
       // mask in new attributes and/or permissions
       Descriptor |= EntryValue;
@@ -653,7 +665,18 @@ UpdateSectionEntries (
         Descriptor &= ~VirtualMask;
       }
 
-      FirstLevelTable[FirstLevelIdx + i] = Descriptor;
+      if (CurrentDescriptor  != Descriptor) {
+        Mva = (VOID *)(UINTN)(((UINTN)FirstLevelTable) << ARM_SECTION_BASE_SHIFT);
+        if ((CurrentDescriptor & ARM_SECTION_C) == ARM_SECTION_C) {
+          // The current section mapping is cacheable so Clean/Invalidate the MVA of the section
+          // Note assumes switch(Attributes), not ARMv7 possabilities
+          WriteBackInvalidateDataCacheRange (Mva, SIZE_1MB);
+        }
+
+        // Only need to update if we are changing the descriptor  
+        FirstLevelTable[FirstLevelIdx + i] = Descriptor;
+        ArmUpdateTranslationTableEntry ((VOID *)&FirstLevelTable[FirstLevelIdx + i], Mva);
+      }
 
       Status = EFI_SUCCESS;
     }
@@ -720,12 +743,12 @@ ConvertSectionToPages (
   PageTable = (volatile ARM_PAGE_TABLE_ENTRY *)(UINTN)PageTableAddr;
 
   // write the page table entries out
-  for (i=0; i<(ARM_PAGE_DESC_ENTRY_MVA_SIZE/EFI_PAGE_SIZE); i++) {
+  for (i=0; i<(ARM_PAGE_DESC_ENTRY_MVA_SIZE/SIZE_4KB); i++) {
     PageTable[i] = ((BaseAddress + (i << 12)) & ARM_SMALL_PAGE_BASE_MASK) | PageDescriptor;
   }
 
   // flush d-cache so descriptors make it back to uncached memory for subsequent table walks
-  InvalidateDataCacheRange ((VOID *)(UINTN)PageTableAddr, EFI_PAGE_SIZE);
+  WriteBackInvalidateDataCacheRange ((VOID *)(UINTN)PageTableAddr, SIZE_4KB);
 
   // formulate page table entry, Domain=0, NS=0
   PageTableDescriptor = (((UINTN)PageTableAddr) & ARM_PAGE_DESC_BASE_MASK) | ARM_DESC_TYPE_PAGE_TABLE;
@@ -802,9 +825,9 @@ CpuSetMemoryAttributes (
   )
 {
   DEBUG ((EFI_D_PAGE, "SetMemoryAttributes(%lx, %lx, %lx)\n", BaseAddress, Length, Attributes));
-  if ( ((BaseAddress & (EFI_PAGE_SIZE-1)) != 0) || ((Length & (EFI_PAGE_SIZE-1)) != 0)){
-    // minimum granularity is EFI_PAGE_SIZE (4KB on ARM)
-    DEBUG ((EFI_D_PAGE, "SetMemoryAttributes(%lx, %lx, %lx): minimum ganularity is EFI_PAGE_SIZE\n", BaseAddress, Length, Attributes));
+  if ( ((BaseAddress & (SIZE_4KB-1)) != 0) || ((Length & (SIZE_4KB-1)) != 0)){
+    // minimum granularity is SIZE_4KB (4KB on ARM)
+    DEBUG ((EFI_D_PAGE, "SetMemoryAttributes(%lx, %lx, %lx): minimum ganularity is SIZE_4KB\n", BaseAddress, Length, Attributes));
     return EFI_UNSUPPORTED;
   }
   

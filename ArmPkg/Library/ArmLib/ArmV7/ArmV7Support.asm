@@ -114,6 +114,7 @@ ArmDisableMmu
   isb
   bx      LR
 
+
 ArmEnableDataCache
   ldr     R1,=DC_ON
   mrc     p15,0,R0,c1,c0,0      ;Read control register configuration data

@@ -268,7 +268,8 @@ ArmInvalidateTlb (
 VOID
 EFIAPI
 ArmUpdateTranslationTableEntry (
-  IN  UINTN    Mva
+  IN  VOID     *TranslationTableEntry,
+  IN  VOID     *Mva
   );
   
 VOID
@@ -345,4 +346,5 @@ ArmInstructionSynchronizationBarrier (
   VOID
   );
   
+
 #endif // __ARM_LIB__

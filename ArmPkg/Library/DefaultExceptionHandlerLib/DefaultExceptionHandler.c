@@ -299,6 +299,10 @@ DefaultExceptionHandler (
   DEBUG ((EFI_D_ERROR, "\n"));
   ASSERT (FALSE);
   
+  // Clear the error registers that we have already displayed incase some one wants to keep going
+  SystemContext.SystemContextArm->DFSR = 0;
+  SystemContext.SystemContextArm->IFSR = 0;
+
   // If some one is stepping past the exception handler adjust the PC to point to the next instruction 
   SystemContext.SystemContextArm->PC += PcAdjust;
 }

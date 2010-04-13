@@ -254,6 +254,12 @@ CommonCExceptionHandler (
 */
   blx       CommonCExceptionHandler ; Call exception handler
   
+  ldr       R1, [SP, #0x4c]         ; Restore EFI_SYSTEM_CONTEXT_ARM.IFSR
+  mcr       p15, 0, R1, c5, c0, 1   ; Write IFSR
+
+  ldr       R1, [SP, #0x44]         ; sRestore EFI_SYSTEM_CONTEXT_ARM.DFSR
+  mcr       p15, 0, R1, c5, c0, 0   ; Write DFSR
+  
   ldr       R1,[SP,#0x3c]           ; EFI_SYSTEM_CONTEXT_ARM.PC
   str       R1,[SP,#0x58]           ; Store it back to srsfd stack slot so it can be restored 
 
