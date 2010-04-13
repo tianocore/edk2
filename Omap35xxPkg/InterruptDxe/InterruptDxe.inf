@@ -28,7 +28,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = BeagleBoardInterruptDxe
+  BASE_NAME                      = Omap35xxBoardInterruptDxe
   FILE_GUID                      = 23eed05d-1b93-4a1a-8e1b-931d69e37952
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0

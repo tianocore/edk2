@@ -86,9 +86,9 @@
 
 
 [BuildOptions]
-  XCODE:*_*_ARM_ARCHCC_FLAGS     == -arch armv6 -march=armv6
-  XCODE:*_*_ARM_ARCHASM_FLAGS    == -arch armv6
-  XCODE:*_*_ARM_ARCHDLINK_FLAGS  == -arch armv6
+  XCODE:*_*_ARM_ARCHCC_FLAGS     == -arch armv7 -march=armv7
+  XCODE:*_*_ARM_ARCHASM_FLAGS    == -arch armv7
+  XCODE:*_*_ARM_ARCHDLINK_FLAGS  == -arch armv7
 
   RVCT:*_*_ARM_ARCHCC_FLAGS     == --cpu 7-A
   RVCT:*_*_ARM_ARCHASM_FLAGS    == --cpu 7-A
@@ -136,12 +136,6 @@
   gEmbeddedTokenSpaceGuid.PcdPrePiBfvSize|0
   gEmbeddedTokenSpaceGuid.PcdFlashFvMainBase|0
   gEmbeddedTokenSpaceGuid.PcdFlashFvMainSize|0
-
-
-
-#
-# Beagle board Specific PCDs
-#
   gEmbeddedTokenSpaceGuid.PcdPrePiHobBase|0x80001000
   gEmbeddedTokenSpaceGuid.PcdPrePiStackBase|0x87FE0000 # stack at top of memory
   gEmbeddedTokenSpaceGuid.PcdPrePiStackSize|0x20000  # 128K stack
@@ -172,7 +166,7 @@
 #
 ################################################################################
 [Components.common]
-  Omap35xxPkg/Library/BeagleBoardTimerLib/BeagleBoardTimerLib.inf  
+  Omap35xxPkg/Library/Omap35xxTimerLib/Omap35xxTimerLib.inf  
   Omap35xxPkg/Library/OmapLib/OmapLib.inf
   
   Omap35xxPkg/Flash/Flash.inf
