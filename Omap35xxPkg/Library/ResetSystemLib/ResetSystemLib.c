@@ -25,7 +25,6 @@
 #include <Library/DebugLib.h>
 #include <Library/EfiResetSystemLib.h>
 
-#include <Library/BeagleBoardSystemLib.h>
 
 /**
   Resets the entire platform.
