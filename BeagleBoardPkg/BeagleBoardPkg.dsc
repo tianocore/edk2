@@ -46,7 +46,6 @@
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
 
-  BeagleBoardSystemLib|BeagleBoardPkg/Library/BeagleBoardSystemLib/BeagleBoardSystemLib.inf
   EfiResetSystemLib|BeagleBoardPkg/Library/ResetSystemLib/ResetSystemLib.inf
   
   PciLib|MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
@@ -105,7 +104,7 @@
 
   CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
 
-  TimerLib|Omap35xxPkg/Library/BeagleBoardTimerLib/BeagleBoardTimerLib.inf  
+  TimerLib|Omap35xxPkg/Library/Omap35xxTimerLib/Omap35xxTimerLib.inf  
   OmapLib|Omap35xxPkg/Library/OmapLib/OmapLib.inf
   EblNetworkLib|EmbeddedPkg/Library/EblNetworkLib/EblNetworkLib.inf
   
