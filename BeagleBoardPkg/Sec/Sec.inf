@@ -63,8 +63,8 @@
   gEmbeddedTokenSpaceGuid.PcdMemoryBase
   gEmbeddedTokenSpaceGuid.PcdMemorySize
   
-  gOmap35xxTokenSpaceGuid.PcdBeagleConsoleUart
-  gOmap35xxTokenSpaceGuid.PcdBeagleFreeTimer
+  gOmap35xxTokenSpaceGuid.PcdOmap35xxConsoleUart
+  gOmap35xxTokenSpaceGuid.PcdOmap35xxFreeTimer
   
   gArmTokenSpaceGuid.PcdCpuVectorBaseAddress
 

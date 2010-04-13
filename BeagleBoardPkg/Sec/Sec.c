@@ -55,7 +55,7 @@ TimerInit (
   VOID
   )
 {
-  UINTN  Timer            = FixedPcdGet32(PcdBeagleFreeTimer);
+  UINTN  Timer            = FixedPcdGet32(PcdOmap35xxFreeTimer);
   UINT32 TimerBaseAddress = TimerBase(Timer);
 
   // Set source clock for GPT3 & GPT4 to SYS_CLK
@@ -83,7 +83,7 @@ UartInit (
   VOID
   )
 {
-  UINTN   Uart            = FixedPcdGet32(PcdBeagleConsoleUart);
+  UINTN   Uart            = FixedPcdGet32(PcdOmap35xxConsoleUart);
   UINT32  UartBaseAddress = UartBase(Uart);
 
   // Set MODE_SELECT=DISABLE before trying to initialize or modify DLL, DLH registers.
