@@ -77,19 +77,27 @@ DebugAgentTimerIntialize (
   )
 {
   UINT32      TimerBaseAddress;
+  UINT32      TimerNumber;
 
-
-  gVector = InterruptVectorForTimer (PcdGet32(PcdOmap35xxDebugAgentTimer));
+  TimerNumber = PcdGet32(PcdOmap35xxDebugAgentTimer);
+  gVector = InterruptVectorForTimer (TimerNumber);
 
   // Set up the timer registers
-  TimerBaseAddress = TimerBase (PcdGet32(PcdOmap35xxDebugAgentTimer));
+  TimerBaseAddress = TimerBase (TimerNumber);
   gTISR = TimerBaseAddress + GPTIMER_TISR;
   gTCLR = TimerBaseAddress + GPTIMER_TCLR;
   gTLDR = TimerBaseAddress + GPTIMER_TLDR;
   gTCRR = TimerBaseAddress + GPTIMER_TCRR;
   gTIER = TimerBaseAddress + GPTIMER_TIER;
 
-  DisableInterruptSource ();
+  if ((TimerNumber < 2) || (TimerNumber > 9)) {
+    // This code assumes one the General Purpose timers is used
+    // GPT2 - GPT9
+    CpuDeadLoop ();
+  }
+  // Set source clock for GPT2 - GPT9 to SYS_CLK
+  MmioOr32 (CM_CLKSEL_PER, 1 << (TimerNumber - 2)); 
+
 }
   
   
@@ -154,5 +162,5 @@ DebugAgentTimerEndOfInterrupt (
   ArmDataSyncronizationBarrier ();
 
 }
-  
+
   
