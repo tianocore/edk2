@@ -22,23 +22,13 @@
 #include <Library/OmapLib.h>
 #include <Library/ArmLib.h>
 #include <Library/PeCoffGetEntryPointLib.h>
+#include <Library/DebugAgentLib.h>
 
 #include <Ppi/GuidedSectionExtraction.h>
 #include <Guid/LzmaDecompress.h>
 #include <Omap3530/Omap3530.h>
 
 #include "LzmaDecompress.h"
-
-VOID
-EFIAPI 
-_ModuleEntryPoint(
-  VOID
-  );
-
-CHAR8 *
-DeCygwinPathIfNeeded (
-  IN  CHAR8   *Name
-  );
 
 VOID
 PadConfiguration (
@@ -50,6 +40,7 @@ ClockInit (
   VOID
   );
 
+
 VOID
 TimerInit (
   VOID
@@ -59,8 +50,7 @@ TimerInit (
   UINT32 TimerBaseAddress = TimerBase(Timer);
 
   // Set source clock for GPT3 & GPT4 to SYS_CLK
-  MmioOr32(CM_CLKSEL_PER, CM_CLKSEL_PER_CLKSEL_GPT3_SYS 
-                          | CM_CLKSEL_PER_CLKSEL_GPT4_SYS);
+  MmioOr32 (CM_CLKSEL_PER, CM_CLKSEL_PER_CLKSEL_GPT3_SYS | CM_CLKSEL_PER_CLKSEL_GPT4_SYS);
 
   // Set count & reload registers
   MmioWrite32 (TimerBaseAddress + GPTIMER_TCRR, 0x00000000);
@@ -127,52 +117,6 @@ LzmaDecompressLibConstructor (
   VOID
   );
 
-/**
-  If the build is done on cygwin the paths are cygpaths. 
-  /cygdrive/c/tmp.txt vs c:\tmp.txt so we need to convert
-  them to work with RVD commands
-
-  This is just code to help print out RVD symbol load command.
-  If you build with cygwin paths aren't compatible with RVD.
-
-  @param  Name  Path to convert if needed
-
-**/
-CHAR8 *
-SecDeCygwinPathIfNeeded (
-  IN  CHAR8   *Name
-  )
-{
-  CHAR8   *Ptr;
-  UINTN   Index;
-  UINTN   Len;
-  
-  Ptr = AsciiStrStr (Name, "/cygdrive/");
-  if (Ptr == NULL) {
-    return Name;
-  }
-  
-  Len = AsciiStrLen (Ptr);
-  
-  // convert "/cygdrive" to spaces
-  for (Index = 0; Index < 9; Index++) {
-    Ptr[Index] = ' ';
-  }
-
-  // convert /c to c:
-  Ptr[9]  = Ptr[10];
-  Ptr[10] = ':';
-  
-  // switch path seperators
-  for (Index = 11; Index < Len; Index++) {
-    if (Ptr[Index] == '/') {
-      Ptr[Index] = '\\' ;
-    }
-  }
-
-  return Name;
-}
-
 
 VOID
 CEntryPoint (
@@ -209,52 +153,11 @@ CEntryPoint (
 
   // Start talking
   UartInit ();
+ 
+  InitializeDebugAgent (DEBUG_AGENT_INIT_PREMEM_SEC, NULL);
+  SaveAndSetDebugTimerInterrupt (TRUE);
+
   DEBUG ((EFI_D_ERROR, "UART Enabled\n"));
-
-  DEBUG_CODE_BEGIN ();
-    //
-    // On a debug build print out information about the SEC. This is really info about
-    // the PE/COFF file we are currently running from. Useful for loading symbols in a
-    // debugger. Remember our image is really part of the FV.
-    //
-    RETURN_STATUS       Status;
-    EFI_PEI_FV_HANDLE   VolumeHandle;
-    EFI_PEI_FILE_HANDLE FileHandle;
-    VOID                *PeCoffImage;
-    UINT32              Offset;
-    CHAR8               *FilePath;
-    FfsAnyFvFindFirstFile (EFI_FV_FILETYPE_SECURITY_CORE, &VolumeHandle, &FileHandle);
-    Status = FfsFindSectionData (EFI_SECTION_TE, FileHandle, &PeCoffImage);
-    if (EFI_ERROR (Status)) {
-      // Usually is a TE (PI striped down PE/COFF), but could be a full PE/COFF
-      Status = FfsFindSectionData (EFI_SECTION_PE32, FileHandle, &PeCoffImage);
-    }
-    if (!EFI_ERROR (Status)) {
-      Offset = PeCoffGetSizeOfHeaders (PeCoffImage);
-      FilePath = PeCoffLoaderGetPdbPointer (PeCoffImage);
-      if (FilePath != NULL) {
-      
-        // 
-        // In general you should never have to use #ifdef __CC_ARM in the code. It
-        // is hidden in the away in the MdePkg. But here we would like to print differnt things
-        // for different toolchains. 
-        //
-#ifdef __CC_ARM
-        // Print out the command for the RVD debugger to load symbols for this image
-        DEBUG ((EFI_D_ERROR, "load /a /ni /np %a &0x%08x\n", SecDeCygwinPathIfNeeded (FilePath), (CHAR8 *)PeCoffImage + Offset));
-#elif __GNUC__
-        // This may not work correctly if you generate PE/COFF directlyas then the Offset would not be required
-        DEBUG ((EFI_D_ERROR, "add-symbol-file %a 0x%08x\n", FilePath, PeCoffImage + Offset));
-#else
-        DEBUG ((EFI_D_ERROR, "SEC starts at 0x%08x with an entry point at 0x%08x %a\n", PeCoffImage, _ModuleEntryPoint, FilePath));
-#endif
-      }
-    }
-
-   
-  DEBUG_CODE_END ();
-
-
 
   // Start up a free running time so that the timer lib will work
   TimerInit ();

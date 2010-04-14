@@ -37,7 +37,8 @@
   UncachedMemoryAllocationLib|ArmPkg/Library/UncachedMemoryAllocationLib/UncachedMemoryAllocationLib.inf
 !else
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
-  UncachedMemoryAllocationLib|ArmPkg/Library/DebugUncachedMemoryAllocationLib/DebugUncachedMemoryAllocationLib.inf
+  UncachedMemoryAllocationLib|ArmPkg/Library/UncachedMemoryAllocationLib/UncachedMemoryAllocationLib.inf
+#  UncachedMemoryAllocationLib|ArmPkg/Library/DebugUncachedMemoryAllocationLib/DebugUncachedMemoryAllocationLib.inf
 !endif
 
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
@@ -66,7 +67,8 @@
   # the version of RVD I have does not support scipts accessing system memory.
   #
 #  PeCoffExtraActionLib|ArmPkg/Library/RvdPeCoffExtraActionLib/RvdPeCoffExtraActionLib.inf
-  PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
+  PeCoffExtraActionLib|ArmPkg/Library/DebugPeCoffExtraActionLib/DebugPeCoffExtraActionLib.inf
+#  PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
 
   
   CacheMaintenanceLib|ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
@@ -112,6 +114,7 @@
   ArmDisassemblerLib|ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
   DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
 
+  UsbLib|AppleCommonPkg/Library/AppleUsbLib/AppleUsbDxeLib.inf
 
 [LibraryClasses.common.SEC]
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7LibPrePi.inf
@@ -224,7 +227,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength|1000000
   gEfiMdePkgTokenSpaceGuid.PcdSpinLockTimeout|10000000
   gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue|0xAF
-  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask|0
+  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask|1
   gEfiMdePkgTokenSpaceGuid.PcdPostCodePropertyMask|0
   gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|320
 
@@ -254,7 +257,7 @@
 #  DEBUG_EVENT     0x00080000  // Event messages
 #  DEBUG_ERROR     0x80000000  // Error
 
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000004
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
 
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x07
 
@@ -376,6 +379,16 @@
 
   MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
   MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
+
+  AppleCommonPkg/Bus/Pci/EhciDxe/Ehci.inf {
+    <PcdsFixedAtBuild>
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x800fffff
+  }
+  AppleCommonPkg/Bus/Usb/UsbBotDxe/UsbBot.inf
+  AppleCommonPkg/Bus/Usb/UsbCbiDxe/Cbi0/UsbCbi0.inf
+  AppleCommonPkg/Bus/Usb/UsbCbiDxe/Cbi1/UsbCbi1.inf
+  AppleCommonPkg/Bus/Usb/UsbBusDxe/UsbBus.inf
+  AppleCommonPkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorage.inf
 
   #
   # Nand Flash

@@ -48,6 +48,7 @@
   LzmaDecompressLib
   OmapLib
   PeCoffGetEntryPointLib
+  DebugAgentLib
 
 [FeaturePcd]  
   gEmbeddedTokenSpaceGuid.PcdCacheEnable
