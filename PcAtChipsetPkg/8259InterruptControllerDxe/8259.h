@@ -1,14 +1,14 @@
 /** @file
   Driver implementing the Tiano Legacy 8259 Protocol
 
-Copyright (c) 2005 - 2009, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2005 - 2009, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -27,9 +27,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PcdLib.h>
 
 #include <IndustryStandard/Pci.h>
-//
+
 // 8259 Hardware definitions
-//
+
 #define LEGACY_MODE_BASE_VECTOR_MASTER                    0x08
 #define LEGACY_MODE_BASE_VECTOR_SLAVE                     0x70
 
@@ -45,9 +45,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define LEGACY_8259_EOI                                   0x20
 
-//
 // Protocol Function Prototypes
-//
+
+
 EFI_STATUS
 EFIAPI
 Interrupt8259SetVectorBase (
