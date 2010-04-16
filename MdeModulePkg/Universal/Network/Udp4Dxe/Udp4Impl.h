@@ -562,6 +562,7 @@ Udp4ValidateTxToken (
 
 **/
 EFI_STATUS
+EFIAPI
 Udp4TokenExist (
   IN NET_MAP       *Map,
   IN NET_MAP_ITEM  *Item,
@@ -615,6 +616,7 @@ Udp4RemoveToken (
 
 **/
 EFI_STATUS
+EFIAPI
 Udp4LeaveGroup (
   IN OUT NET_MAP       *Map,
   IN     NET_MAP_ITEM  *Item,
@@ -679,6 +681,7 @@ Udp4ReportIcmpError (
 
 **/
 VOID
+EFIAPI
 Udp4NetVectorExtFree (
   VOID  *Context
   );

@@ -114,6 +114,7 @@ Mtftp4DriverBindingSupported (
 
 **/
 EFI_STATUS
+EFIAPI
 Mtftp4ConfigNullUdp (
   IN UDP_IO                 *UdpIo,
   IN VOID                   *Context

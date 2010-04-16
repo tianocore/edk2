@@ -76,6 +76,7 @@ typedef struct _TCP4_PROTO_DATA {
 
 **/
 VOID
+EFIAPI
 Tcp4RxCallback (
   IN EFI_STATUS                       Status,
   IN UINT8                            IcmpErr,

@@ -114,6 +114,7 @@ Dhcp4DriverBindingSupported (
 
 **/
 EFI_STATUS
+EFIAPI
 DhcpConfigUdpIo (
   IN UDP_IO                 *UdpIo,
   IN VOID                   *Context

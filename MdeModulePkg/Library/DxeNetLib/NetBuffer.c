@@ -497,6 +497,7 @@ NetbufSetBlockOp (
 
 **/
 VOID
+EFIAPI
 NetbufGetFragmentFree (
   IN VOID                   *Arg
   )
@@ -1817,6 +1818,7 @@ NetPseudoHeadChecksum (
 
 **/
 UINT16
+EFIAPI
 NetIp6PseudoHeadChecksum (
   IN EFI_IPv6_ADDRESS       *Src,
   IN EFI_IPv6_ADDRESS       *Dst,

@@ -52,6 +52,7 @@ SockProcessSndToken (
   
 **/
 VOID
+EFIAPI
 SockFreeFoo (
   IN EFI_EVENT Event
   )

@@ -335,6 +335,7 @@ Mtftp4WrqHandleOack (
                                 MTFTP session.
 **/
 VOID
+EFIAPI
 Mtftp4WrqInput (
   IN NET_BUF                *UdpPacket,
   IN UDP_END_POINT          *EndPoint,

@@ -365,6 +365,7 @@ Mtftp4SendError (
 
 **/
 VOID
+EFIAPI
 Mtftp4OnPacketSent (
   IN NET_BUF                   *Packet,
   IN UDP_END_POINT             *EndPoint,

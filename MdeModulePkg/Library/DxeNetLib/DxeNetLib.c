@@ -443,6 +443,7 @@ SyslogBuildPacket (
 
 **/
 CHAR8 *
+EFIAPI
 NetDebugASPrint (
   IN CHAR8                  *Format,
   ...
@@ -482,6 +483,7 @@ NetDebugASPrint (
                                 than the mNetDebugLevelMax. Or, it has been sent out.
 **/
 EFI_STATUS
+EFIAPI
 NetDebugOutput (
   IN UINT32                    Level,
   IN UINT8                     *Module,
@@ -676,6 +678,7 @@ NetIp4IsUnicast (
 
 **/
 BOOLEAN
+EFIAPI
 NetIp6IsValidUnicast (
   IN EFI_IPv6_ADDRESS       *Ip6
   )
@@ -712,6 +715,7 @@ NetIp6IsValidUnicast (
 
 **/
 BOOLEAN
+EFIAPI
 NetIp6IsUnspecifiedAddr (
   IN EFI_IPv6_ADDRESS       *Ip6
   )
@@ -737,6 +741,7 @@ NetIp6IsUnspecifiedAddr (
 
 **/
 BOOLEAN
+EFIAPI
 NetIp6IsLinkLocalAddr (
   IN EFI_IPv6_ADDRESS *Ip6
   )
@@ -774,6 +779,7 @@ NetIp6IsLinkLocalAddr (
 
 **/
 BOOLEAN
+EFIAPI
 NetIp6IsNetEqual (
   EFI_IPv6_ADDRESS *Ip1,
   EFI_IPv6_ADDRESS *Ip2,
@@ -823,6 +829,7 @@ NetIp6IsNetEqual (
 
 **/
 EFI_IPv6_ADDRESS *
+EFIAPI
 Ip6Swap128 (
   EFI_IPv6_ADDRESS *Ip6
   )
@@ -2630,6 +2637,7 @@ NetLibGetNicHandle (
 
 **/
 EFI_STATUS
+EFIAPI
 NetLibAsciiStrToIp4 (
   IN CONST CHAR8                 *String,
   OUT      EFI_IPv4_ADDRESS      *Ip4Address
@@ -2696,6 +2704,7 @@ NetLibAsciiStrToIp4 (
 
 **/
 EFI_STATUS
+EFIAPI
 NetLibAsciiStrToIp6 (
   IN CONST CHAR8                 *String,
   OUT      EFI_IPv6_ADDRESS      *Ip6Address
@@ -2839,6 +2848,7 @@ NetLibAsciiStrToIp6 (
 
 **/
 EFI_STATUS
+EFIAPI
 NetLibStrToIp4 (
   IN CONST CHAR16                *String,
   OUT      EFI_IPv4_ADDRESS      *Ip4Address
@@ -2879,6 +2889,7 @@ NetLibStrToIp4 (
 
 **/
 EFI_STATUS
+EFIAPI
 NetLibStrToIp6 (
   IN CONST CHAR16                *String,
   OUT      EFI_IPv6_ADDRESS      *Ip6Address
@@ -2920,6 +2931,7 @@ NetLibStrToIp6 (
 
 **/
 EFI_STATUS
+EFIAPI
 NetLibStrToIp6andPrefix (
   IN CONST CHAR16                *String,
   OUT      EFI_IPv6_ADDRESS      *Ip6Address,

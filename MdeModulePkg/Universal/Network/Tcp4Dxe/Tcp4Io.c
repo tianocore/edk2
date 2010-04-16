@@ -28,6 +28,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 VOID
+EFIAPI
 Tcp4RxCallback (
   IN EFI_STATUS                       Status,
   IN UINT8                            IcmpErr,

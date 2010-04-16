@@ -822,6 +822,7 @@ MnpInitializeInstanceData (
 
 **/
 EFI_STATUS
+EFIAPI
 MnpTokenExist (
   IN NET_MAP         *Map,
   IN NET_MAP_ITEM    *Item,
@@ -861,6 +862,7 @@ MnpTokenExist (
 
 **/
 EFI_STATUS
+EFIAPI
 MnpCancelTokens (
   IN OUT NET_MAP         *Map,
   IN OUT NET_MAP_ITEM    *Item,

@@ -313,6 +313,7 @@ DhcpComputeLease (
 
 **/
 EFI_STATUS
+EFIAPI
 DhcpConfigLeaseIoPort (
   IN UDP_IO                 *UdpIo,
   IN VOID                   *Context
@@ -947,6 +948,7 @@ ON_EXIT:
 
 **/
 VOID
+EFIAPI
 DhcpInput (
   NET_BUF                   *UdpPacket,
   UDP_END_POINT             *EndPoint,
@@ -1100,6 +1102,7 @@ RESTART:
 
 **/
 VOID
+EFIAPI
 DhcpReleasePacket (
   IN VOID                   *Arg
   )
@@ -1118,6 +1121,7 @@ DhcpReleasePacket (
 
 **/
 VOID
+EFIAPI
 DhcpOnPacketSent (
   NET_BUF                   *Packet,
   UDP_END_POINT             *EndPoint,

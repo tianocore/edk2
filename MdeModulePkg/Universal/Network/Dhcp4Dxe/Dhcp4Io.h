@@ -140,6 +140,7 @@ DhcpOnTimerTick (
 
 **/
 VOID
+EFIAPI
 DhcpInput (
   NET_BUF                   *UdpPacket,
   UDP_END_POINT             *EndPoint,
@@ -183,6 +184,7 @@ DhcpCleanLease (
 
 **/
 VOID
+EFIAPI
 DhcpOnPacketSent (
   NET_BUF                   *Packet,
   UDP_END_POINT             *EndPoint,

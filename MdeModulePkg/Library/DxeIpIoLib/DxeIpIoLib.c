@@ -587,6 +587,7 @@ IpIoIcmpHandler (
 
 **/
 VOID
+EFIAPI
 IpIoExtFree (
   IN VOID  *Event
   )

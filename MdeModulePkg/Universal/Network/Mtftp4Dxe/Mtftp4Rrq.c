@@ -26,6 +26,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 VOID
+EFIAPI
 Mtftp4RrqInput (
   IN NET_BUF                *UdpPacket,
   IN UDP_END_POINT          *EndPoint,
@@ -379,6 +380,7 @@ Mtftp4RrqOackValid (
 
 **/
 EFI_STATUS
+EFIAPI
 Mtftp4RrqConfigMcastPort (
   IN UDP_IO                 *McastIo,
   IN VOID                   *Context
@@ -605,6 +607,7 @@ Mtftp4RrqHandleOack (
 
 **/
 VOID
+EFIAPI
 Mtftp4RrqInput (
   IN NET_BUF                *UdpPacket,
   IN UDP_END_POINT          *EndPoint,

@@ -1088,6 +1088,7 @@ ON_ERROR:
 
 **/
 VOID
+EFIAPI
 Ip4RecycleFrame (
   IN VOID                   *Context
   )

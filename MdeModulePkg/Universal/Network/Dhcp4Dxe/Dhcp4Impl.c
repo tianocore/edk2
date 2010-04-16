@@ -1174,6 +1174,7 @@ EfiDhcp4Build (
   @retval other         Other error occurs.
 **/
 EFI_STATUS
+EFIAPI
 Dhcp4InstanceConfigUdpIo (
   IN UDP_IO       *UdpIo,
   IN VOID         *Context
@@ -1251,6 +1252,7 @@ Dhcp4InstanceCreateUdpIo (
 
 **/
 VOID
+EFIAPI
 DhcpDummyExtFree (
   IN VOID                   *Arg
   )
@@ -1270,6 +1272,7 @@ DhcpDummyExtFree (
 
 **/
 VOID
+EFIAPI
 PxeDhcpInput (
   NET_BUF                   *UdpPacket,
   UDP_END_POINT             *EndPoint,

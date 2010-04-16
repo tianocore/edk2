@@ -880,6 +880,7 @@ IScsiUpdateTargetAddress (
   @param[in]  Arg The opaque parameter.
 **/
 VOID
+EFIAPI
 IScsiFreeNbufList (
   VOID *Arg
   )
@@ -896,6 +897,7 @@ IScsiFreeNbufList (
   @param[in]   Arg  The opaque parameter.
 **/
 VOID
+EFIAPI
 IScsiNbufExtFree (
   VOID *Arg
   )

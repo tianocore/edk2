@@ -345,6 +345,7 @@ Ip4TimerTicking (
 
 **/
 EFI_STATUS
+EFIAPI
 Ip4SentPacketTicking (
   IN NET_MAP                *Map,
   IN NET_MAP_ITEM           *Item,
@@ -373,6 +374,7 @@ Ip4SentPacketTicking (
 
 **/
 VOID
+EFIAPI
 Ip4FreeTxToken (
   IN VOID                   *Context
   );

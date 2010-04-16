@@ -130,6 +130,7 @@ UdpIoOnDgramSent (
 
 **/
 VOID
+EFIAPI
 UdpIoRecycleDgram (
   IN VOID                   *Context
   )
@@ -970,6 +971,7 @@ UdpIoSendDatagram (
   @retval FALSE             The packet is not to be cancelled.
 **/
 BOOLEAN
+EFIAPI
 UdpIoCancelSingleDgram (
   IN UDP_TX_TOKEN           *Token,
   IN VOID                   *Context

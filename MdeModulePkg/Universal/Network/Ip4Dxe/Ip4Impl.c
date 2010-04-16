@@ -1599,6 +1599,7 @@ ON_EXIT:
 
 **/
 EFI_STATUS
+EFIAPI
 Ip4TokenExist (
   IN NET_MAP                *Map,
   IN NET_MAP_ITEM           *Item,
@@ -1756,6 +1757,7 @@ Ip4TxTokenValid (
 
 **/
 VOID
+EFIAPI
 Ip4FreeTxToken (
   IN VOID                   *Context
   )
@@ -2144,6 +2146,7 @@ ON_EXIT:
 
 **/
 EFI_STATUS
+EFIAPI
 Ip4CancelTxTokens (
   IN NET_MAP                *Map,
   IN NET_MAP_ITEM           *Item,
@@ -2199,6 +2202,7 @@ Ip4CancelTxTokens (
 
 **/
 EFI_STATUS
+EFIAPI
 Ip4CancelRxTokens (
   IN NET_MAP                *Map,
   IN NET_MAP_ITEM           *Item,
@@ -2441,6 +2445,7 @@ EfiIp4Poll (
 
 **/
 EFI_STATUS
+EFIAPI
 Ip4SentPacketTicking (
   IN NET_MAP                *Map,
   IN NET_MAP_ITEM           *Item,

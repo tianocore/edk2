@@ -57,6 +57,7 @@ MemoryStatusCodeInitializeWorker (
 
 **/
 EFI_STATUS
+EFIAPI
 MemoryStatusCodeReportWorker (
   IN EFI_STATUS_CODE_TYPE               CodeType,
   IN EFI_STATUS_CODE_VALUE              Value,

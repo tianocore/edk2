@@ -181,7 +181,7 @@ typedef struct _EFI_NET_SESSION_DATA {
 **/
 typedef
 VOID
-(*PKT_RCVD_NOTIFY) (
+(EFIAPI *PKT_RCVD_NOTIFY) (
   IN EFI_STATUS           Status, 
   IN UINT8                IcmpErr,
   IN EFI_NET_SESSION_DATA *NetSession,
@@ -201,7 +201,7 @@ VOID
 **/
 typedef
 VOID
-(*PKT_SENT_NOTIFY) (
+(EFIAPI *PKT_SENT_NOTIFY) (
   IN EFI_STATUS  Status,
   IN VOID        *Context,
   IN VOID        *Sender,

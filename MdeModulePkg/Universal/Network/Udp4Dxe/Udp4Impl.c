@@ -64,6 +64,7 @@ Udp4FindInstanceByPort (
 
 **/
 VOID
+EFIAPI
 Udp4DgramSent (
   IN EFI_STATUS  Status,
   IN VOID        *Context,
@@ -84,6 +85,7 @@ Udp4DgramSent (
 
 **/
 VOID
+EFIAPI
 Udp4DgramRcvd (
   IN EFI_STATUS            Status,
   IN UINT8                 IcmpError,
@@ -109,6 +111,7 @@ Udp4DgramRcvd (
 
 **/
 EFI_STATUS
+EFIAPI
 Udp4CancelTokens (
   IN NET_MAP       *Map,
   IN NET_MAP_ITEM  *Item,
@@ -890,6 +893,7 @@ Udp4ValidateTxToken (
 
 **/
 EFI_STATUS
+EFIAPI
 Udp4TokenExist (
   IN NET_MAP       *Map,
   IN NET_MAP_ITEM  *Item,
@@ -990,6 +994,7 @@ Udp4RemoveToken (
 
 **/
 VOID
+EFIAPI
 Udp4DgramSent (
   IN EFI_STATUS  Status,
   IN VOID        *Context,
@@ -1027,6 +1032,7 @@ Udp4DgramSent (
 
 **/
 VOID
+EFIAPI
 Udp4DgramRcvd (
   IN EFI_STATUS            Status,
   IN UINT8                 IcmpError,
@@ -1074,6 +1080,7 @@ Udp4DgramRcvd (
 
 **/
 EFI_STATUS
+EFIAPI
 Udp4LeaveGroup (
   IN OUT NET_MAP       *Map,
   IN     NET_MAP_ITEM  *Item,
@@ -1125,6 +1132,7 @@ Udp4LeaveGroup (
 
 **/
 EFI_STATUS
+EFIAPI
 Udp4CancelTokens (
   IN NET_MAP       *Map,
   IN NET_MAP_ITEM  *Item,
@@ -1881,6 +1889,7 @@ Udp4ReportIcmpError (
 
 **/
 VOID
+EFIAPI
 Udp4NetVectorExtFree (
   VOID  *Context
   )

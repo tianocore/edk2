@@ -188,6 +188,7 @@ Ip4TrimPacket (
 
 **/
 VOID
+EFIAPI
 Ip4OnFreeFragments (
   IN VOID                   *Arg
   )
@@ -437,6 +438,7 @@ DROP:
 
 **/
 VOID
+EFIAPI
 Ip4IpSecFree (
   IN VOID                   *Arg
   )
