@@ -135,6 +135,7 @@ typedef enum {
 
 **/
 UINT32
+EFIAPI
 GetVariableMtrrCount (
   VOID
   );
@@ -146,6 +147,7 @@ GetVariableMtrrCount (
 
 **/
 UINT32
+EFIAPI
 GetFirmwareVariableMtrrCount (
   VOID
   );
@@ -311,6 +313,7 @@ MtrrGetMemoryAttributeInVariableMtrr (
   This function prints all MTRRs for debugging.
 **/
 VOID
+EFIAPI
 MtrrDebugPrintAllMtrrs (
   );
 
@@ -322,6 +325,7 @@ MtrrDebugPrintAllMtrrs (
 
 **/
 BOOLEAN
+EFIAPI
 IsMtrrSupported (
   VOID
   );

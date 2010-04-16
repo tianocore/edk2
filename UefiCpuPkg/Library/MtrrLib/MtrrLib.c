@@ -89,6 +89,7 @@ FIXED_MTRR    MtrrLibFixedMtrrTable[] = {
 
 **/
 UINT32
+EFIAPI
 GetVariableMtrrCount (
   VOID
   )
@@ -107,6 +108,7 @@ GetVariableMtrrCount (
 
 **/
 UINT32
+EFIAPI
 GetFirmwareVariableMtrrCount (
   VOID
   )
