@@ -321,7 +321,7 @@ typedef struct {
 **/
 typedef 
 EFI_STATUS 
-(*EFI_DHCP6_CALLBACK)(
+(EFIAPI *EFI_DHCP6_CALLBACK)(
   IN EFI_DHCP6_PROTOCOL        *This,
   IN VOID                      *Context,
   IN EFI_DHCP6_STATE           CurrentState,
@@ -400,7 +400,7 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(*EFI_DHCP6_INFO_CALLBACK)(
+(EFIAPI *EFI_DHCP6_INFO_CALLBACK)(
   IN EFI_DHCP6_PROTOCOL        *This,
   IN VOID                      *Context,
   IN EFI_DHCP6_PACKET          *Packet
