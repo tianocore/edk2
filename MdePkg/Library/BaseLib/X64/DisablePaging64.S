@@ -43,7 +43,7 @@ ASM_PFX(InternalX86DisablePaging64):
     lea    _mTransitionEnd(%rip), %rax    # rax <- end of transition code
     sub    %rsi, %rax                     # rax <- The size of transition piece code
     add    $4, %rax                       # round rax up to the next 4 byte boundary
-    and    $0x0fffffffc, %rax
+    and    $0xfc, %al
     sub    %rax, %rdi                     # rdi <- use stack to hold transition code 
     mov    %edi, %r10d                    # r10 <- The start address of transicition code below 4G
     push   %rcx                           # save rcx to stack
@@ -78,4 +78,5 @@ L1:
     push   %rsi                           # push Context1
     callq  *%rbx                          # transfer control to EntryPoint
     jmp    .                              # no one should get here
-_mTransitionEnd :
+
+_mTransitionEnd :

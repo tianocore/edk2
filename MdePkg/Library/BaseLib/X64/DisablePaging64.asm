@@ -41,7 +41,7 @@ InternalX86DisablePaging64    PROC
     lea     rax, mTransitionEnd         ; rax <- end of transition code
     sub     rax, rsi                    ; rax <- The size of transition piece code 
     add     rax, 4                      ; Round RAX up to the next 4 byte boundary
-    and     rax, 0fffffffch
+    and     al, 0fch
     sub     rdi, rax                    ; rdi <- Use stack to hold transition code
     mov     r10d, edi                   ; r10 <- The start address of transicition code below 4G
     push    rcx                         ; save rcx to stack
