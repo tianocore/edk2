@@ -3,8 +3,8 @@
   PS/2 Keyboard driver. Routines that interacts with callers,
   conforming to EFI driver model
 
-Copyright (c) 2006 - 2009, Intel Corporation
-All rights reserved. This program and the accompanying materials
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
@@ -337,7 +337,7 @@ KbdControllerDriverStart (
   //
   // Reset the keyboard device
   //
-  Status = ConsoleIn->ConIn.Reset (&ConsoleIn->ConIn, TRUE);
+  Status = ConsoleIn->ConInEx.Reset (&ConsoleIn->ConInEx, TRUE);
   if (EFI_ERROR (Status)) {
     Status      = EFI_DEVICE_ERROR;
     StatusCode  = EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_NOT_DETECTED;
