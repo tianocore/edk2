@@ -27,8 +27,11 @@
 #include <Library/EfiFileLib.h>
 #include <Library/ArmDisassemblerLib.h>
 #include <Library/PeCoffGetEntryPointLib.h>
+#include <Library/PerformanceLib.h>
+#include <Library/TimerLib.h>
 
 #include <Guid/DebugImageInfoTable.h>
+
 #include <Protocol/DebugSupport.h>
 #include <Protocol/LoadedImage.h>
 
@@ -146,6 +149,101 @@ EblDisassembler (
 }
 
 
+CHAR8 *
+ImageHandleToPdbFileName (
+  IN  EFI_HANDLE    Handle
+  )
+{
+  EFI_STATUS                  Status;
+  EFI_LOADED_IMAGE_PROTOCOL   *LoadedImage;
+
+  Status = gBS->HandleProtocol (Handle, &gEfiLoadedImageProtocolGuid, (VOID **)&LoadedImage);
+  if (EFI_ERROR (Status)) {
+    return "";
+  }
+
+  return PeCoffLoaderGetPdbPointer (LoadedImage->ImageBase);
+}
+
+CHAR8 *mTokenList[] = {
+  "SEC",
+  "PEI",
+  "DXE",
+  "BDS",
+  NULL
+};
+
+/**
+  Simple arm disassembler via a library
+
+  Argv[0] - disasm
+  Argv[1] - Address to start disassembling from
+  ARgv[2] - Number of instructions to disassembly (optional)
+
+  @param  Argc   Number of command arguments in Argv
+  @param  Argv   Array of strings that represent the parsed command line. 
+                 Argv[0] is the comamnd name
+
+  @return EFI_SUCCESS
+
+**/
+EFI_STATUS
+EblPerformance (
+  IN UINTN  Argc,
+  IN CHAR8  **Argv
+  )
+{
+  UINTN       Key;
+  CONST VOID  *Handle;
+  CONST CHAR8 *Token, *Module;
+  UINT64      Start, Stop, TimeStamp;
+  UINT64      Delta, TicksPerSecond, Milliseconds, Microseconds;
+  UINTN       Index;
+
+  TicksPerSecond = GetPerformanceCounterProperties (NULL, NULL);
+
+  Key       = 0;
+  do {
+    Key = GetPerformanceMeasurement (Key, (CONST VOID **)&Handle, &Token, &Module, &Start, &Stop);
+    if (Key != 0) {
+      if (AsciiStriCmp ("StartImage:", Token) == 0) {
+        if (Stop == 0) {
+          // The entry for EBL is still running so the stop time will be zero. Skip it
+          AsciiPrint ("   running     %a\n", ImageHandleToPdbFileName ((EFI_HANDLE)Handle));
+        } else {
+          Delta = Stop - Start;
+          Microseconds = DivU64x64Remainder (MultU64x32 (Delta, 1000000), TicksPerSecond, NULL);
+          AsciiPrint ("%10ld us  %a\n", Microseconds, ImageHandleToPdbFileName ((EFI_HANDLE)Handle));
+        }
+      }
+    }
+  } while (Key != 0);
+
+  AsciiPrint ("\n");
+
+  TimeStamp = 0;
+  Key       = 0;
+  do {
+    Key = GetPerformanceMeasurement (Key, (CONST VOID **)&Handle, &Token, &Module, &Start, &Stop);
+    if (Key != 0) {
+      for (Index = 0; mTokenList[Index] != NULL; Index++) {
+        if (AsciiStriCmp (mTokenList[Index], Token) == 0) {
+          Delta = Stop - Start;
+          TimeStamp += Delta;
+          Milliseconds = DivU64x64Remainder (MultU64x32 (Delta, 1000), TicksPerSecond, NULL);
+          AsciiPrint ("%6a %6ld ms\n", Token, Milliseconds);
+          break;
+        }
+      }   
+    }
+  } while (Key != 0);
+
+  AsciiPrint ("Total Time = %ld ms\n\n", DivU64x64Remainder (MultU64x32 (TimeStamp, 1000), TicksPerSecond, NULL));
+
+  return EFI_SUCCESS;
+}
+
+
 GLOBAL_REMOVE_IF_UNREFERENCED const EBL_COMMAND_TABLE mLibCmdTemplate[] =
 {
   {
@@ -153,6 +251,12 @@ GLOBAL_REMOVE_IF_UNREFERENCED const EBL_COMMAND_TABLE mLibCmdTemplate[] =
     " disassemble count instructions",
     NULL,
     EblDisassembler
+  },
+  {
+    "performance",
+    " Display boot performance info",
+    NULL,
+    EblPerformance
   },
   {
     "symboltable [\"format string\"] [PECOFF]",

@@ -28,7 +28,6 @@
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = BeagleBoardPkg/BeagleBoardPkg.fdf
-  DEFINE TARGET_HACK             = DEBUG
 
 
 [LibraryClasses.common]
@@ -146,16 +145,19 @@
   ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
   SecurityManagementLib|MdeModulePkg/Library/DxeSecurityManagementLib/DxeSecurityManagementLib.inf
+  PerformanceLib|MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
 
 
 [LibraryClasses.common.UEFI_APPLICATION]
   ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   UefiDecompressLib|IntelFrameworkModulePkg/Library/BaseUefiTianoCustomDecompressLib/BaseUefiTianoCustomDecompressLib.inf
+  PerformanceLib|MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
 
 [LibraryClasses.common.UEFI_DRIVER]
   ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
   UefiDecompressLib|IntelFrameworkModulePkg/Library/BaseUefiTianoCustomDecompressLib/BaseUefiTianoCustomDecompressLib.inf
   ExtractGuidedSectionLib|MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
+  PerformanceLib|MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -181,8 +183,9 @@
   XCODE:*_*_ARM_ARCHDLINK_FLAGS  == -arch armv7
   XCODE:RELEASE_*_*_CC_FLAGS     = -DMDEPKG_NDEBUG 
 
-  RVCT:*_*_ARM_ARCHCC_FLAGS == --cpu 7-A --thumb
-  RVCT:RELEASE_*_*_CC_FLAGS = -DMDEPKG_NDEBUG 
+  RVCT:*_*_ARM_ARCHCC_FLAGS  == --cpu Cortex-A8 --thumb
+  RVCT:*_*_ARM_ARCHASM_FLAGS == --cpu Cortex-A8 
+  RVCT:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG 
 
 ################################################################################
 #
@@ -304,8 +307,8 @@
   gArmTokenSpaceGuid.PcdCpuResetAddress|0x80008000
   
   gEmbeddedTokenSpaceGuid.PcdTimerPeriod|100000
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedFdPerformanceCounterPeriodInNanoseconds|77
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedFdPerformanceCounterFrequencyInHz|13000000
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterPeriodInNanoseconds|77
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterFrequencyInHz|13000000
   
   #
   # ARM Pcds
@@ -414,10 +417,9 @@
   # Bds
   #
   BeagleBoardPkg/Bds/Bds.inf  
-  
+
   #
-  # Gdb Stub
-  #
-  EmbeddedPkg/GdbStub/GdbStub.inf
-  ArmPkg/Drivers/DebugSupportDxe/DebugSupportDxe.inf
+  # Example Application
+  #  
+  MdeModulePkg/Application/HelloWorld/HelloWorld.inf
 

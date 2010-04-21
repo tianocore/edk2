@@ -34,6 +34,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   ArmPkg/ArmPkg.dec
 
@@ -41,6 +42,8 @@
   BaseLib
   DebugLib
   ArmDisassemblerLib
+  PerformanceLib
+  TimerLib
   
 [Protocols]
  gEfiDebugSupportProtocolGuid
@@ -48,4 +51,3 @@
   
 [Guids]
  gEfiDebugImageInfoTableGuid
- 
