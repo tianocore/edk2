@@ -103,6 +103,7 @@
   MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
   MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   MdePkg/Library/DxeSmbusLib/DxeSmbusLib.inf
+  MdePkg/Library/DxeIoLibCpuIo2/DxeIoLibCpuIo2.inf
 
   MdePkg/Library/DxeRuntimePciExpressLib/DxeRuntimePciExpressLib.inf
 
