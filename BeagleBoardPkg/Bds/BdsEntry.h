@@ -30,6 +30,7 @@
 #include <Library/PcdLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PrintLib.h>
+#include <Library/PerformanceLib.h>
 
 #include <Protocol/Bds.h>
 #include <Protocol/SerialIo.h>

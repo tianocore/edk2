@@ -156,14 +156,26 @@ ImageHandleToPdbFileName (
 {
   EFI_STATUS                  Status;
   EFI_LOADED_IMAGE_PROTOCOL   *LoadedImage;
+  CHAR8                       *Pdb;
+  CHAR8                       *StripLeading;
 
   Status = gBS->HandleProtocol (Handle, &gEfiLoadedImageProtocolGuid, (VOID **)&LoadedImage);
   if (EFI_ERROR (Status)) {
     return "";
   }
 
-  return PeCoffLoaderGetPdbPointer (LoadedImage->ImageBase);
+  Pdb = PeCoffLoaderGetPdbPointer (LoadedImage->ImageBase);
+  StripLeading = AsciiStrStr (Pdb, "\\ARM\\");
+  if (StripLeading == NULL) {
+    StripLeading = AsciiStrStr (Pdb, "/ARM/");
+    if (StripLeading == NULL) {
+      return Pdb;
+    }
+  }
+  // Hopefully we hacked off the unneeded part
+  return (StripLeading + 5);
 }
+
 
 CHAR8 *mTokenList[] = {
   "SEC",

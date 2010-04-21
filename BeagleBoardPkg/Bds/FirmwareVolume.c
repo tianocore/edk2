@@ -141,6 +141,7 @@ LoadPeCoffSectionFromFv (
     
   Status = gBS->LoadImage (TRUE, gImageHandle, DevicePath, NULL, 0, &ImageHandle);
   if (!EFI_ERROR (Status)) {
+    PERF_END (NULL, "BDS", NULL, 0);
     Status = gBS->StartImage (ImageHandle, NULL, NULL);
   }
   

@@ -74,6 +74,10 @@ BdsEntry (
   EFI_DEVICE_PATH_PROTOCOL  *LoadImageDevicePath;
   EFI_DEVICE_PATH_PROTOCOL  *FileSystemDevicePath;
   
+  PERF_END   (NULL, "DXE", NULL, 0);
+  PERF_START (NULL, "BDS", NULL, 0);
+
+
   //
   // Now do the EFI stuff
   //
