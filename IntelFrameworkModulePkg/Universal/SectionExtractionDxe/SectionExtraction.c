@@ -327,7 +327,7 @@ OpenSectionStreamEx (
   )
 {
   FRAMEWORK_SECTION_STREAM_NODE    *NewStream;
-  EFI_TPL                     OldTpl;
+  EFI_TPL                          OldTpl;
   
   //
   // Allocate a new stream
@@ -446,8 +446,8 @@ BOOLEAN
 ChildIsType (
   IN FRAMEWORK_SECTION_STREAM_NODE *Stream,
   IN FRAMEWORK_SECTION_CHILD_NODE  *Child,
-  IN EFI_SECTION_TYPE         SearchType,
-  IN EFI_GUID                 *SectionDefinitionGuid
+  IN EFI_SECTION_TYPE              SearchType,
+  IN EFI_GUID                      *SectionDefinitionGuid
   )
 {
   EFI_GUID_DEFINED_SECTION    *GuidedSection;
@@ -458,7 +458,7 @@ ChildIsType (
   if (Child->Type != SearchType) {
     return FALSE;
   }
-  if (SearchType != EFI_SECTION_GUID_DEFINED) {
+  if ((SearchType != EFI_SECTION_GUID_DEFINED) || (SectionDefinitionGuid == NULL)) {
     return TRUE;
   }
   GuidedSection = (EFI_GUID_DEFINED_SECTION * )(Stream->StreamBuffer + Child->OffsetInStream);
@@ -1155,11 +1155,11 @@ GetSection (
   OUT UINT32                                            *AuthenticationStatus
   )
 {
-  FRAMEWORK_SECTION_STREAM_NODE                              *StreamNode;
+  FRAMEWORK_SECTION_STREAM_NODE                         *StreamNode;
   EFI_TPL                                               OldTpl;
   EFI_STATUS                                            Status;
-  FRAMEWORK_SECTION_CHILD_NODE                               *ChildNode;
-  FRAMEWORK_SECTION_STREAM_NODE                              *ChildStreamNode;
+  FRAMEWORK_SECTION_CHILD_NODE                          *ChildNode;
+  FRAMEWORK_SECTION_STREAM_NODE                         *ChildStreamNode;
   UINTN                                                 CopySize;
   UINT32                                                ExtractedAuthenticationStatus;
   UINTN                                                 Instance;
