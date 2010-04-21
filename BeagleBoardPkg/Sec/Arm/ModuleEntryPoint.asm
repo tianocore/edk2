@@ -39,6 +39,13 @@ _ModuleEntryPoint
   orr     r0, r0, #0x00001000     /* set bit 12 (I) enable I-Cache */
   mcr     p15, 0, r0, c1, c0, 0
  
+  // Enable NEON register in case folks want to use them for optimizations (CopyMem)
+  mrc     p15, 0, r0, c1, c0, 2
+  orr     r0, r0, #0x00f00000   // Enable VPF access (V* instructions)
+  mcr     p15, 0, r0, c1, c0, 2
+  mov     r0, #0x40000000       // Set EN bit in FPEXC
+  msr     FPEXC,r0
+   
   // Set CPU vectors to start of DRAM
   LoadConstantToReg (FixedPcdGet32(PcdCpuVectorBaseAddress) ,r0) // Get vector base
   mcr     p15, 0, r0, c12, c0, 0
