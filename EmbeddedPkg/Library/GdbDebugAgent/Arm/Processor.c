@@ -467,6 +467,33 @@ ProcessorSendTSignal (
 }
 
 /**
+ FIQ state is only changed by FIQ exception. We don't want to take FIQ
+ ticks in the GDB stub. The stub disables FIQ on entry, but this is the 
+ third instruction that executes in the execption handler. Thus we have
+ a crack we need to test for.
+
+ @param PC     PC of execption
+
+ @return  TRUE  We are in the GDB stub exception preamble 
+ @return  FALSE We are not in GDB stub code
+ **/
+BOOLEAN
+InFiqCrack (
+  IN UINT32 PC
+  )
+{
+  UINT32 VectorBase = PcdGet32 (PcdCpuVectorBaseAddress);
+  UINT32 Length     = (UINTN)ExceptionHandlersEnd - (UINTN)ExceptionHandlersStart;
+
+  if ((PC >= VectorBase) && (PC <= (VectorBase + Length))) {
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+
+/**
  Check to see if this exception is related to ctrl-c handling.
 
  In this scheme we dedicate FIQ to the ctrl-c handler so it is 
@@ -486,10 +513,17 @@ ProcessorControlC (
   IN OUT EFI_SYSTEM_CONTEXT     SystemContext 
   )
 {
+  CHAR8     Char;
   BOOLEAN   Return = TRUE;
 
   if (ExceptionType != EXCEPT_ARM_FIQ) {
     // Skip it as it is not related to ctrl-c
+    return FALSE;
+  }
+
+  if (InFiqCrack (SystemContext.SystemContextArm->PC)) {
+    // We are in our own interrupt preable, so skip this tick.
+    // We never want to let gdb see the debug stub running if we can help it
     return FALSE;
   }
 
@@ -502,7 +536,8 @@ ProcessorControlC (
       break;
     }
     
-    if (GdbGetChar () == 0x03) {
+    Char = GdbGetChar ();
+    if (Char == 0x03) {
       //
       // We have a ctrl-c so exit and process exception for ctrl-c
       //
@@ -527,7 +562,8 @@ ProcessorControlC (
 
   @param[in] EnableStatus    Enable/Disable.
 
-  @return FALSE always.
+  @retval TRUE  Debug timer interrupt were enabled on entry to this call.
+  @retval FALSE Debug timer interrupt were disabled on entry to this call.
 
 **/
 BOOLEAN
@@ -541,7 +577,7 @@ SaveAndSetDebugTimerInterrupt (
   FiqEnabled = ArmGetFiqState ();
 
   if (EnableStatus) {
-    DebugAgentTimerSetPeriod (100);
+    DebugAgentTimerSetPeriod (PcdGet32 (PcdGdbTimerPeriodMilliseconds));
     ArmEnableFiq ();
   } else {
     DebugAgentTimerSetPeriod (0);
@@ -550,6 +586,8 @@ SaveAndSetDebugTimerInterrupt (
 
   return FiqEnabled;
 }
+
+
 
 VOID
 GdbFPutString (
@@ -575,21 +613,14 @@ InitializeDebugAgent (
   UINTN                Offset;
   UINTN                Length;
   BOOLEAN              IrqEnabled;
-  BOOLEAN              FiqEnabled;
   UINT32               *VectorBase;
 
-    
+
   //
   // Disable interrupts
   //
   IrqEnabled = ArmGetInterruptState ();
   ArmDisableInterrupts ();
-
-  //
-  // EFI does not use the FIQ, but a debugger might so we must disable 
-  // as we take over the exception vectors. 
-  //
-  FiqEnabled = ArmGetFiqState ();
   ArmDisableFiq ();
 
   //
@@ -615,11 +646,8 @@ InitializeDebugAgent (
   // Flush Caches since we updated executable stuff
   InvalidateInstructionCacheRange ((VOID *)PcdGet32(PcdCpuVectorBaseAddress), Length);
 
+  // setup a timer so gdb can break in via ctrl-c
   DebugAgentTimerIntialize ();
-
-  if (FiqEnabled) {
-    ArmEnableFiq ();
-  }
 
   if (IrqEnabled) {
     ArmEnableInterrupts ();

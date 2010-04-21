@@ -64,6 +64,7 @@
 
 [FixedPcd.common]
   gEmbeddedTokenSpaceGuid.PcdGdbMaxPacketRetryCount
+  gEmbeddedTokenSpaceGuid.PcdGdbTimerPeriodMilliseconds
 
 [FixedPcd.arm]
   gArmTokenSpaceGuid.PcdCpuVectorBaseAddress

@@ -94,7 +94,7 @@ ASM_PFX(Fiq):
 ASM_PFX(UndefinedInstructionEntry):
   sub       LR, LR, #4                @ Only -2 for Thumb, adjust in CommonExceptionEntry
   srsdb     #0x13!                    @ Store return state on SVC stack
-  cps       #0x13                     @ Switch to SVC for common stack
+  cpsid     f,#0x13                   @ Switch to SVC for common stack
   stmfd     SP!,{LR}                  @ Store the link register for the current mode
   sub       SP,SP,#0x20               @ Save space for SP, LR, PC, IFAR - CPSR
   stmfd     SP!,{R0-R12}              @ Store the register state
@@ -106,7 +106,7 @@ ASM_PFX(UndefinedInstructionEntry):
 ASM_PFX(SoftwareInterruptEntry):
   sub       LR, LR, #4                @ Only -2 for Thumb, adjust in CommonExceptionEntry
   srsdb     #0x13!                    @ Store return state on SVC stack
-                                      @ We are already in SVC mode
+  cpsid     f                         @ We are already in SVC mode
   stmfd     SP!,{LR}                  @ Store the link register for the current mode
   sub       SP,SP,#0x20               @ Save space for SP, LR, PC, IFAR - CPSR
   stmfd     SP!,{R0-R12}              @ Store the register state
@@ -118,7 +118,7 @@ ASM_PFX(SoftwareInterruptEntry):
 ASM_PFX(PrefetchAbortEntry):
   sub       LR,LR,#4
   srsdb     #0x13!                    @ Store return state on SVC stack
-  cps       #0x13                     @ Switch to SVC for common stack
+  cpsid     f,#0x13                   @ Switch to SVC for common stack
   stmfd     SP!,{LR}                  @ Store the link register for the current mode
   sub       SP,SP,#0x20               @ Save space for SP, LR, PC, IFAR - CPSR
   stmfd     SP!,{R0-R12}              @ Store the register state
@@ -130,7 +130,7 @@ ASM_PFX(PrefetchAbortEntry):
 ASM_PFX(DataAbortEntry):
   sub       LR,LR,#8
   srsdb     #0x13!                    @ Store return state on SVC stack
-  cps       #0x13                     @ Switch to SVC for common stack
+  cpsid     f,#0x13                   @ Switch to SVC for common stack
   stmfd     SP!,{LR}                  @ Store the link register for the current mode
   sub       SP,SP,#0x20               @ Save space for SP, LR, PC, IFAR - CPSR
   stmfd     SP!,{R0-R12}              @ Store the register state
@@ -141,7 +141,7 @@ ASM_PFX(DataAbortEntry):
 
 ASM_PFX(ReservedExceptionEntry):
   srsdb     #0x13!                    @ Store return state on SVC stack
-  cps       #0x13                     @ Switch to SVC for common stack
+  cpsid     f,#0x13                   @ Switch to SVC for common stack
   stmfd     SP!,{LR}                  @ Store the link register for the current mode
   sub       SP,SP,#0x20               @ Save space for SP, LR, PC, IFAR - CPSR
   stmfd     SP!,{R0-R12}              @ Store the register state
