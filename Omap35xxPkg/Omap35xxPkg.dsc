@@ -152,8 +152,8 @@
   gOmap35xxTokenSpaceGuid.PcdOmap35xxArchTimer|3
   gOmap35xxTokenSpaceGuid.PcdOmap35xxFreeTimer|4
   gEmbeddedTokenSpaceGuid.PcdTimerPeriod|100000
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedFdPerformanceCounterPeriodInNanoseconds|77
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedFdPerformanceCounterFrequencyInHz|13000000
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterPeriodInNanoseconds|77
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterFrequencyInHz|13000000
   
   #
   # ARM Pcds

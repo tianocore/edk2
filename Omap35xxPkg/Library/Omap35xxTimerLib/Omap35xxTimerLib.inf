@@ -39,7 +39,7 @@
   IoLib
 
 [Pcd]
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterFreqencyInHz
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedFdPerformanceCounterPeriodInNanoseconds
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterFrequencyInHz
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterPeriodInNanoseconds
   gOmap35xxTokenSpaceGuid.PcdOmap35xxFreeTimer
 

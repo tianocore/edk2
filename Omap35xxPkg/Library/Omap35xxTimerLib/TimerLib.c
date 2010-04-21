@@ -55,7 +55,7 @@ NanoSecondDelay (
   UINT32  ElapsedTime;
   UINT32  TimerCountRegister;
 
-  Delay = (NanoSeconds / PcdGet32(PcdEmbeddedFdPerformanceCounterPeriodInNanoseconds)) + 1;
+  Delay = (NanoSeconds / PcdGet32(PcdEmbeddedPerformanceCounterPeriodInNanoseconds)) + 1;
   
   TimerCountRegister = TimerBase(PcdGet32(PcdOmap35xxFreeTimer)) + GPTIMER_TCRR;
 
@@ -67,7 +67,7 @@ NanoSecondDelay (
     ElapsedTime = CurrentTime - StartTime;
   } while (ElapsedTime < Delay);
 
-  NanoSeconds = ElapsedTime * PcdGet32(PcdEmbeddedFdPerformanceCounterPeriodInNanoseconds);
+  NanoSeconds = ElapsedTime * PcdGet32(PcdEmbeddedPerformanceCounterPeriodInNanoseconds);
 
   return NanoSeconds;
 }
@@ -98,5 +98,5 @@ GetPerformanceCounterProperties (
     *EndValue = 0xFFFFFFFF;
   }
   
-  return PcdGet64(PcdEmbeddedPerformanceCounterFreqencyInHz);
+  return PcdGet64(PcdEmbeddedPerformanceCounterFrequencyInHz);
 }

@@ -197,7 +197,7 @@ TimerDriverSetTimerPeriod (
     Status = gInterrupt->DisableInterruptSource(gInterrupt, gVector);    
   } else {  
     // Calculate required timer count
-    TimerCount = DivU64x32(TimerPeriod * 100, PcdGet32(PcdEmbeddedFdPerformanceCounterPeriodInNanoseconds));
+    TimerCount = DivU64x32(TimerPeriod * 100, PcdGet32(PcdEmbeddedPerformanceCounterPeriodInNanoseconds));
 
     // Set GPTIMER3 Load register
     LoadValue = (INT32) -TimerCount;
