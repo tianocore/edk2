@@ -471,7 +471,7 @@ ChildIsType (
   if (Child->Type != SearchType) {
     return FALSE;
   }
-  if (SearchType != EFI_SECTION_GUID_DEFINED) {
+  if ((SearchType != EFI_SECTION_GUID_DEFINED) || (SectionDefinitionGuid == NULL)) {
     return TRUE;
   }
   GuidedSection = (EFI_GUID_DEFINED_SECTION * )(Stream->StreamBuffer + Child->OffsetInStream);
