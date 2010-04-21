@@ -113,8 +113,8 @@
   
   gEmbeddedTokenSpaceGuid.PcdEmbeddedFdBaseAddress|0xffff0000|UINT32|0x00000030
   gEmbeddedTokenSpaceGuid.PcdEmbeddedFdSize|0x0000000|UINT32|0x00000031
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterFreqencyInHz|0x0000000|UINT64|0x00000032
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedFdPerformanceCounterPeriodInNanoseconds|0x0000000|UINT32|0x00000033
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterFrequencyInHz|0x0000000|UINT64|0x00000032
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterPeriodInNanoseconds|0x0000000|UINT32|0x00000033
 
 # Shell characteristics
   gEmbeddedTokenSpaceGuid.PcdEmbeddedShellCharacterEcho|TRUE|BOOLEAN|0x00000046
@@ -125,6 +125,7 @@
   gEmbeddedTokenSpaceGuid.PcdGdbStopBits|1|UINT8|0x0000004a
   gEmbeddedTokenSpaceGuid.PcdGdbUartPort|0x3f8|UINT32|0x0000004b
   gEmbeddedTokenSpaceGuid.PcdGdbMaxPacketRetryCount|10000000|UINT32|0x0000004c
+  gEmbeddedTokenSpaceGuid.PcdGdbTimerPeriodMilliseconds|250|UINT32|0x0000004d
   
   
 
