@@ -266,7 +266,6 @@
 
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
-  IntelFrameworkModulePkg/Universal/DataHubDxe/DataHubDxe.inf
   MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
   MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
   PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf

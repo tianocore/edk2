@@ -138,7 +138,6 @@ READ_LOCK_STATUS   = TRUE
 
 APRIORI DXE {
   INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
-  INF  IntelFrameworkModulePkg/Universal/DataHubDxe/DataHubDxe.inf
 }
 
 #
@@ -151,7 +150,6 @@ INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
 
 INF  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
 INF  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
-INF  IntelFrameworkModulePkg/Universal/DataHubDxe/DataHubDxe.inf
 INF  MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
 INF  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
 INF  PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf
