@@ -189,7 +189,6 @@ INF  Nt32Pkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
 INF  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
 INF  Nt32Pkg/FvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
 INF  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
-INF  IntelFrameworkModulePkg/Universal/DataHubDxe/DataHubDxe.inf
 INF  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
 INF  MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
 INF  MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
@@ -198,7 +197,6 @@ INF  Nt32Pkg/WinNtThunkDxe/WinNtThunkDxe.inf
 INF  Nt32Pkg/CpuRuntimeDxe/CpuRuntimeDxe.inf
 INF  IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
 INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
-INF  IntelFrameworkModulePkg/Universal/DataHubStdErrDxe/DataHubStdErrDxe.inf
 INF  Nt32Pkg/MiscSubClassPlatformDxe/MiscSubClassPlatformDxe.inf
 INF  Nt32Pkg/TimerDxe/TimerDxe.inf
 INF  MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe.inf
