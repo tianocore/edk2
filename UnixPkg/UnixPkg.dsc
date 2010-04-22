@@ -287,9 +287,7 @@
   gEfiEdkModulePkgTokenSpaceGuid.PcdStatusCodeUseHardSerial|FALSE
   gEfiEdkModulePkgTokenSpaceGuid.PcdStatusCodeUseEfiSerial|FALSE
   gEfiEdkModulePkgTokenSpaceGuid.PcdStatusCodeUseRuntimeMemory|FALSE
-  gEfiEdkModulePkgTokenSpaceGuid.PcdStatusCodeUseDataHub|FALSE
   gEfiEdkModulePkgTokenSpaceGuid.PcdStatusCodeReplayInSerial|FALSE
-  gEfiEdkModulePkgTokenSpaceGuid.PcdStatusCodeReplayInDataHub|FALSE
   gEfiEdkModulePkgTokenSpaceGuid.PcdStatusCodeReplayInRuntimeMemory|FALSE
   gEfiEdkModulePkgTokenSpaceGuid.PcdStatusCodeReplayInOEM|FALSE
   gEfiEdkModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset|FALSE
