@@ -189,13 +189,11 @@ INF  UnixPkg/ResetRuntimeDxe/Reset.inf
 INF  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
 INF  UnixPkg/FvbServicesRuntimeDxe/UnixFwh.inf
 INF  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
-INF  IntelFrameworkModulePkg/Universal/DataHubDxe/DataHubDxe.inf
 INF  MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
 INF  MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
 INF  UnixPkg/UnixThunkDxe/UnixThunk.inf
 INF  UnixPkg/CpuRuntimeDxe/Cpu.inf
 INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
-INF  IntelFrameworkModulePkg/Universal/DataHubStdErrDxe/DataHubStdErrDxe.inf
 INF  UnixPkg/MiscSubClassPlatformDxe/MiscSubClassDriver.inf
 INF  UnixPkg/TimerDxe/Timer.inf
 INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf

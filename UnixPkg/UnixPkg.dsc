@@ -412,13 +412,11 @@
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
   UnixPkg/FvbServicesRuntimeDxe/UnixFwh.inf
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
-  IntelFrameworkModulePkg/Universal/DataHubDxe/DataHubDxe.inf
   MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
   MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
   UnixPkg/UnixThunkDxe/UnixThunk.inf
   UnixPkg/CpuRuntimeDxe/Cpu.inf
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
-  IntelFrameworkModulePkg/Universal/DataHubStdErrDxe/DataHubStdErrDxe.inf
   UnixPkg/MiscSubClassPlatformDxe/MiscSubClassDriver.inf
   UnixPkg/TimerDxe/Timer.inf
   IntelFrameworkModulePkg/Universal/StatusCode/RuntimeDxe/StatusCodeRuntimeDxe.inf
