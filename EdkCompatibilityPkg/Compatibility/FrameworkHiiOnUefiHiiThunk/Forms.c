@@ -570,6 +570,7 @@ HiiThunkUpdateForm (
     if (Data->DataCount != 0) {
 
       ThunkContext = UefiHiiHandleToThunkContext (Private, UefiHiiHandle);
+      ASSERT (ThunkContext != NULL);
       Status = FwUpdateDataToUefiUpdateData (ThunkContext, Data, StartOpCodeHandle);
       ASSERT_EFI_ERROR (Status);
 

@@ -422,6 +422,7 @@ InitCpuStatePageTable (
   } else {
     ASSERT ((Pde & mPhyMask) == (HookAddress & ~(SIZE_2MB-1))); // 2MB Page Point to HookAddress
     PageTable = AllocatePages (1);
+    ASSERT (PageTable != NULL);
     Address = HookAddress & ~(SIZE_2MB-1);
     for (Index = 0; Index < 512; Index++) {
       PageTable[Index] = Address | BIT0 | BIT1; // Present and RW

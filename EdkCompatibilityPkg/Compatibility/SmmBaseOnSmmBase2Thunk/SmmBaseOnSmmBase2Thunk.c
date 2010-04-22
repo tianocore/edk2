@@ -470,7 +470,7 @@ SmmBaseThunkMain (
   // Assume only one instance of SMM Communication Protocol in the system
   // Locate SMM Communication Protocol
   //
-  gBS->LocateProtocol (&gEfiSmmCommunicationProtocolGuid, NULL, (VOID **) &mSmmCommunication);
+  Status = gBS->LocateProtocol (&gEfiSmmCommunicationProtocolGuid, NULL, (VOID **) &mSmmCommunication);
   ASSERT_EFI_ERROR (Status);
 
   //
