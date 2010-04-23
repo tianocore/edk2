@@ -3,8 +3,8 @@
   ACPI is the primary means of exporting MPS information to the OS. MPS only was
   included to support Itanium-based platform power on. So don't use it if you don't have too.
 
-  Copyright (c) 2006, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
+  Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
   http://opensource.org/licenses/bsd-license.php                                            

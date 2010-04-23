@@ -5,7 +5,7 @@
   provided by a driver and to create and destroy instances of the EFI Hash Protocol 
   so that a multiple drivers can use the underlying hashing services.
 
-Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at

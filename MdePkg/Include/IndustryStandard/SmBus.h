@@ -2,8 +2,8 @@
   This file declares the SMBus definitions defined in SmBus Specifciation V2.0
   and defined in PI1.0 specification volume 5.
 
-  Copyright (c) 2007 - 2008, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
+  Copyright (c) 2007 - 2008, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
   http://opensource.org/licenses/bsd-license.php                                            

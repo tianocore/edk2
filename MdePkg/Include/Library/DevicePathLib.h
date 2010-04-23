@@ -4,7 +4,7 @@
   This library provides defines, macros, and functions to help create and parse 
   EFI_DEVICE_PATH_PROTOCOL structures.
 
-Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at

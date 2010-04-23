@@ -6,9 +6,9 @@
   environment. There are a set of base libraries in the Mde Package that can
   be used to implement base modules.
 
-Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
-Portions copyright (c) 2008-2009 Apple Inc. All rights reserved.<BR>
-All rights reserved. This program and the accompanying materials
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php.

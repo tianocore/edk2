@@ -4,7 +4,7 @@
   These protocols are used to collect configuration information for the EFI IPv4 Protocol
   drivers and to provide DHCPv4 server and PXE boot server discovery services.
 
-Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at

@@ -6,8 +6,8 @@
   images when the current security profile has been changed, such as when the current user profile 
   changes. There can be more than one instance of this protocol installed.
 
-  Copyright (c) 2009, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
+  Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
   http://opensource.org/licenses/bsd-license.php                                            

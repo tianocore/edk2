@@ -5,7 +5,7 @@
   These functions should be used in place of coding your own loops to do equivalent common functions. 
   This allows optimized library implementations to help increase performance. 
 
-Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at

@@ -10,7 +10,7 @@
   Block I/O PPIs that are provided by the PEI ATAPI driver and PEI legacy floppy 
   driver are the same, here we define a set of general PPIs for both drivers to use.
   
-Copyright (c) 2007 - 2010, Intel Corporation.  All rights reserved<BR>
+Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at

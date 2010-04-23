@@ -7,9 +7,9 @@
   Common Object File Format Specification, Revision 8.0 - May 16, 2006. 
   This file also includes some definitions in PI Specification, Revision 1.0.
 
-Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
-Portions copyright (c) 2008-2009 Apple Inc. All rights reserved.<BR>
-All rights reserved. This program and the accompanying materials                          
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
 http://opensource.org/licenses/bsd-license.php.                                           
