@@ -2,8 +2,8 @@
   PCI Library functions that use I/O ports 0xCF8 and 0xCFC to perform
   PCI Configuration cycles. Layers on top of one PCI CF8 Library instance.
 
-  Copyright (c) 2006 - 2008, Intel Corporation<BR>
-  All rights reserved. This program and the accompanying materials
+  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
   http://opensource.org/licenses/bsd-license.php
