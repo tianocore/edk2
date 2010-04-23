@@ -1,0 +1,34 @@
+#/** @file
+# Build description file to generate Shell DP application and
+# Performance Libraries.
+#
+# Copyright (c) 2009-2010, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution.  The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+# **/
+
+[Defines]
+  PACKAGE_NAME                   = PerformancePkg
+  PACKAGE_GUID                   = ce898697-b945-46e2-a26e-5752af565185
+  PACKAGE_VERSION                = 0.1
+  DEC_SPECIFICATION              = 0x00010005
+
+[Includes.common]
+  Include
+
+[Guids.common]
+  ## Performance Package token space guid
+  # Include/Guid/PerformancePkgTokenSpace.h
+  # 669346ef-fdad-4aeb-a608-7def3f2d4621
+  gPerformancePkgTokenSpaceGuid       = { 0x669346ef, 0xFDad, 0x4aeb, { 0x08, 0xa6, 0x21, 0x46, 0x2d, 0x3f, 0xef, 0x7d }}
+
+[PcdsFixedAtBuild.common]
+  ##  The base address of the ACPI registers within the ICH PCI space.
+  #   This space must be 128-byte aligned.
+  gPerformancePkgTokenSpaceGuid.PcdPerfPkgAcpiIoPortBaseAddress|0x400|UINT16|1
