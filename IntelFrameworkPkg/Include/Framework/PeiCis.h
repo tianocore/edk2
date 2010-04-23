@@ -2,7 +2,7 @@
   The Include file for definitions in the Intel Platform Innovation Framework for EFI
   Pre-EFI Initialization Core Interface Specification (PEI CIS) Version 0.91.
 
-Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at

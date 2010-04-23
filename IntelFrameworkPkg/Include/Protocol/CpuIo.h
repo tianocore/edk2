@@ -6,7 +6,7 @@
   It is different from the PI 1.2 CPU I/O 2 Protocol, which is a boot services only protocol
   and may not be used by runtime drivers after ExitBootServices().
 
-Copyright (c) 2007 - 2010, Intel Corporation.  All rights reserved<BR>
+Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at

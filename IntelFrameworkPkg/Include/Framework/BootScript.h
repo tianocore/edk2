@@ -2,7 +2,7 @@
   This file contains the boot script defintions that are shared between the 
   Boot Script Executor PPI and the Boot Script Save Protocol.
 
-Copyright (c) 2009 - 2010, Intel Corporation.  All rights reserved<BR>
+Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at

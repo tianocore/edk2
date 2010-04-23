@@ -7,7 +7,7 @@
   storage. As such, a write command to certain technologies would alter the contents of the entire part,
   making the PEIM execution in the original position not follow the required flow.
 
-Copyright (c) 2006 - 2010, Intel Corporation.  All rights reserved<BR>
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
