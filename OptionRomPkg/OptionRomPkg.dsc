@@ -6,9 +6,9 @@
 # Option ROM image for all CPU architectures, including EBC target.
 # A single driver can support mixes of EFI 1.1, UEFI 2.0 and UEFI 2.1.
 #
-# Copyright (c) 2007 - 2010, Intel Corporation
+# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 #
-# All rights reserved. This program and the accompanying materials
+# This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
