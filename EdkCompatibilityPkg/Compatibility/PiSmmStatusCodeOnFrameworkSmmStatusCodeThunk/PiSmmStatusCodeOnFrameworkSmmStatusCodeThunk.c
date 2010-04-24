@@ -8,7 +8,7 @@
   Note that Framework SMM Status Code Protocol and PI SMM Status Code Protocol have identical protocol
   GUID and interface structure, but they are in different handle databases.
 
-  Copyright (c) 2010, Intel Corporation.  All rights reserved<BR>
+  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under 
   the terms and conditions of the BSD License that accompanies this distribution.  
   The full text of the license may be found at

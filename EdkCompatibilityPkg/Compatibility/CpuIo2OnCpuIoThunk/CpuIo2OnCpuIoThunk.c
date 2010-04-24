@@ -4,8 +4,8 @@
   Intel's Framework CPU I/O Protocol is replaced by CPU I/O 2 Protocol in PI.
   This module produces PI CPU I/O 2 Protocol on top of Framework CPU I/O Protocol.
 
-Copyright (c) 2009 - 2010, Intel Corporation
-All rights reserved. This program and the accompanying materials
+Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
