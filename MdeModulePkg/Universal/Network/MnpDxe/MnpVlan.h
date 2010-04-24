@@ -1,8 +1,8 @@
 /** @file
   Header file to be included by MnpVlan.c.
 
-Copyright (c) 2009, Intel Corporation<BR>
-All rights reserved. This program and the accompanying materials
+Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
 text of the license may be found at<BR>

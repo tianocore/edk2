@@ -1,8 +1,8 @@
 /** @file
   This code implements the IP4Config and NicIp4Config protocols.
 
-Copyright (c) 2006 - 2009, Intel Corporation.<BR>
-All rights reserved. This program and the accompanying materials
+Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
 http://opensource.org/licenses/bsd-license.php
