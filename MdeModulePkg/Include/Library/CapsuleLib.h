@@ -2,7 +2,7 @@
 
   This library class defines a set of interfaces for how to process capsule image updates.
 
-Copyright (c) 2007 - 2010, Intel Corporation.  All rights reserved<BR>
+Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at

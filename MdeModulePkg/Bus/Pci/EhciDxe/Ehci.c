@@ -10,8 +10,8 @@
   This way avoids the control transfer on a shared port between EHCI and companion host
   controller when UHCI gets attached earlier than EHCI and a USB 2.0 device inserts.
 
-Copyright (c) 2006 - 2010, Intel Corporation
-All rights reserved. This program and the accompanying materials
+Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
