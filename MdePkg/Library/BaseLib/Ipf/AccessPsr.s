@@ -1,7 +1,7 @@
 /// @file
 ///  IPF specific Processor Status Register accessing functions
 ///
-/// Copyright (c) 2006 - 2008, Intel Corporation
+/// Copyright (c) 2006 - 2010, Intel Corporation
 /// All rights reserved. This program and the accompanying materials
 /// are licensed and made available under the terms and conditions of the BSD License
 /// which accompanies this distribution.  The full text of the license may be found at
@@ -103,6 +103,7 @@ AsmCpuVirtual::
         and            r28 = r30, r29;;
         cmp.eq         p6, p7 = r30, r28;;
 (p6)    mov            r8 = CpuInVirtualMode;;
+(p6)    br.ret.dpnt    b0;;
 (p7)    cmp.eq         p6, p7 = 0x0, r28;;
 (p6)    mov            r8 = CpuInPhysicalMode;;
 (p7)    mov            r8 = CpuInMixMode;;
