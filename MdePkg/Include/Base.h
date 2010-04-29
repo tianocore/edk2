@@ -454,7 +454,7 @@ struct _LIST_ENTRY {
 
 #define VA_END(Marker)                ((void)0)
 
-#elif defined(__GNUC__)
+#elif defined(__GNUC__) && !defined(NO_BUILTIN_VA_FUNCS)
 //
 // Use GCC built-in macros for variable argument lists.
 //
