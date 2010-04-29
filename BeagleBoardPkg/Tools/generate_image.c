@@ -7,9 +7,9 @@
  are not defined in the OMAP35x manual and you have to use the OMAP34xx manual
  to find the data. 
 
-  Copyright (c) 2008-2010, Apple Inc. All rights reserved.
+  Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
   
-  All rights reserved. This program and the accompanying materials
+  This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
   http://opensource.org/licenses/bsd-license.php
