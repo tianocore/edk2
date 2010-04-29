@@ -389,6 +389,7 @@ UiWaitForSingleEvent (
 
 **/
 VOID
+EFIAPI
 CreateMultiStringPopUp (
   IN  UINTN                       ScreenWidth,
   IN  UINTN                       NumberOfLines,

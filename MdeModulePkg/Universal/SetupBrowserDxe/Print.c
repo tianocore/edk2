@@ -145,6 +145,7 @@ PrintInternal (
 
 **/
 UINTN
+EFIAPI
 ConsolePrint (
   IN CHAR16   *Fmt,
   ...
@@ -206,6 +207,7 @@ PrintChar (
 
 **/
 UINTN
+EFIAPI
 PrintAt (
   IN UINTN     Column,
   IN UINTN     Row,

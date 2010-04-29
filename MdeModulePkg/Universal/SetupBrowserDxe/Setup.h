@@ -633,6 +633,7 @@ PrintChar (
 
 **/
 UINTN
+EFIAPI
 PrintAt (
   IN UINTN     Column,
   IN UINTN     Row,
@@ -800,6 +801,7 @@ CreateSharedPopUp (
 
 **/
 EFI_STATUS
+EFIAPI
 CreateDialog (
   IN  UINTN                       NumberOfLines,
   IN  BOOLEAN                     HotKey,

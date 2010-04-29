@@ -80,6 +80,7 @@ PushU64 (
 
 **/
 UINT64
+EFIAPI
 EbcInterpret (
   UINT64      Arg1,
   ...

@@ -678,6 +678,7 @@ UiAddMenuOption (
 
 **/
 EFI_STATUS
+EFIAPI
 CreateDialog (
   IN  UINTN                       NumberOfLines,
   IN  BOOLEAN                     HotKey,
@@ -978,6 +979,7 @@ CreateSharedPopUp (
 
 **/
 VOID
+EFIAPI
 CreateMultiStringPopUp (
   IN  UINTN                       RequestedWidth,
   IN  UINTN                       NumberOfLines,
