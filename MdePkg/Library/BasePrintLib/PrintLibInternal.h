@@ -102,6 +102,7 @@ BasePrintLibSPrintMarker (
 
 **/
 UINTN
+EFIAPI
 BasePrintLibSPrint (
   OUT CHAR8        *StartOfBuffer,
   IN  UINTN        BufferSize,
