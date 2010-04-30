@@ -28,6 +28,75 @@
 #define DMA4_CSF(_i)  (0x480560a8 + (0x60*(i)))
 #define DMA4_CDE(_i)  (0x480560ac + (0x60*(i)))
 
+// Channel Source Destination parameters
+#define DMA4_CSDP_DATA_TYPE8    0
+#define DMA4_CSDP_DATA_TYPE16   1
+#define DMA4_CSDP_DATA_TYPE32   2
+
+#define DMA4_CSDP_SRC_PACKED      BIT6
+#define DMA4_CSDP_SRC_NONPACKED   0
+
+#define DMA4_CSDP_SRC_BURST_EN    (0x0 << 7)
+#define DMA4_CSDP_SRC_BURST_EN16  (0x1 << 7)
+#define DMA4_CSDP_SRC_BURST_EN32  (0x2 << 7)
+#define DMA4_CSDP_SRC_BURST_EN64  (0x3 << 7)
+
+#define DMA4_CSDP_DST_PACKED      BIT13
+#define DMA4_CSDP_DST_NONPACKED   0
+
+#define DMA4_CSDP_BURST_EN        (0x0 << 14)
+#define DMA4_CSDP_BURST_EN16      (0x1 << 14)
+#define DMA4_CSDP_BURST_EN32      (0x2 << 14)
+#define DMA4_CSDP_BURST_EN64      (0x3 << 14)
+
+#define DMA4_CSDP_WRITE_MODE_NONE_POSTED      (0x0 << 16)  
+#define DMA4_CSDP_WRITE_MODE_POSTED           (0x1 << 16)
+#define DMA4_CSDP_WRITE_MODE_LAST_NON_POSTED  (0x2 << 16)  
+
+#define DMA4_CSDP_DST_ENDIAN_LOCK_LOCK    BIT18
+#define DMA4_CSDP_DST_ENDIAN_LOCK_ADAPT   0
+
+#define DMA4_CSDP_DST_ENDIAN_BIG          BIT19
+#define DMA4_CSDP_DST_ENDIAN_LITTLE       0
+
+#define DMA4_CSDP_SRC_ENDIAN_LOCK_LOCK    BIT20
+#define DMA4_CSDP_SRC_ENDIAN_LOCK_ADAPT   0
+
+#define DMA4_CSDP_SRC_ENDIAN_BIG          BIT21
+#define DMA4_CSDP_SRC_ENDIAN_LITTLE       0
+
+// Channel Control 
+#define DMA4_CCR_SYNCHRO_CONTROL_MASK     0x1f
+
+#define DMA4_CCR_FS_ELEMENT     (0    | 0)
+#define DMA4_CCR_FS_BLOCK       (0    | BIT18)
+#define DMA4_CCR_FS_FRAME       (BIT5 | 0)
+#define DMA4_CCR_FS_PACKET      (BIT5 | BIT18)
+
+#define DMA4_CCR_READ_PRIORITY_HIGH   BIT6
+#define DMA4_CCR_READ_PRIORITY_LOW    0
+
+#define DMA4_CCR_ENABLE               BIT7
+#define DMA4_CCR_DISABLE              0
+
+#define DMA4_CCR_SUSPEND_SENSITIVE_IGNORE BIT8
+#define DMA4_CCR_SUSPEND_SENSITIVE        0
+
+#define DMA4_CCR_RD_ACTIVE                BIT9
+#define DMA4_CCR_WR_ACTIVE                BIT10
+
+#define DMA4_CCR_SRC_AMODE                (0     | 0)
+#define DMA4_CCR_SRC_AMODE_POST_INC       (0     | BIT12)
+#define DMA4_CCR_SRC_AMODE_SINGLE_INDEX   (BIT13 | 0)
+#define DMA4_CCR_SRC_AMODE_DOUBLE_INDEX   (BIT13 | BIT12)
+
+#define DMA4_CCR_DST_AMODE                (0     | 0)
+#define DMA4_CCR_DST_AMODE_POST_INC       (0     | BIT14)
+#define DMA4_CCR_DST_AMODE_SINGLE_INDEX   (BIT15 | 0)
+#define DMA4_CCR_DST_AMODE_DOUBLE_INDEX   (BIT15 | BIT14)
+
+#define DMA4_CCR_CONST_FILL_ENABLE        BIT16
+#define DMA4_CCR_TRANSPARENT_COPY_ENABLE  BIT17
 
 
 #endif 
