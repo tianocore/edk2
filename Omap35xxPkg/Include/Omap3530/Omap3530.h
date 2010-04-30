@@ -25,6 +25,8 @@
 #include "Omap3530I2c.h"
 #include "Omap3530PadConfiguration.h"
 #include "Omap3530Gpmc.h"
+#include "Omap3530Dma.h"
+
 
 //CONTROL_PBIAS_LITE
 #define CONTROL_PBIAS_LITE    0x48002520
