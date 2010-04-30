@@ -280,10 +280,9 @@
 #define WAKEUP_OFFSET        14
 #define WAKEUP_MASK          (0x2UL << WAKEUP_OFFSET)
 
-#define PULLUDDISABLE        (0x0UL << 0)
-#define PULLUDENABLE         BIT0
-#define PULLTYPENOSELECT     (0x0UL << 1)
-#define PULLTYPESELECT       BIT1
+#define PULL_DOWN_SELECTED   ((0x0UL << 1) | BIT0)
+#define PULL_UP_SELECTED     (BIT1 | BIT0)
+#define PULL_DISABLED        (0x0UL << 0)
 
 #define OUTPUT               (0x0UL) //Pin is configured in output only mode.
 #define INPUT                (0x1UL) //Pin is configured in bi-directional mode.

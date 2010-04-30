@@ -36,6 +36,13 @@
 #define VSEL_3_00V            0x2
 #define VSEL_3_15V            0x3
 
+#define TPS65950_GPIO_CTRL    0xaa  //I2C_ADDR_GRP_ID2
+#define CARD_DETECT_ENABLE    (BIT2 | BIT0) // GPIO ON + GPIO CD1 enabled
+
+
+#define GPIODATAIN1           0x98  //I2C_ADDR_GRP_ID2
+#define CARD_DETECT_BIT       BIT0
+
 //LEDEN register
 #define LEDEN                 0xEE
 #define LEDAON                BIT0
