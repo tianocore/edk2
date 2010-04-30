@@ -150,6 +150,8 @@ BdsEntry (
     }
   }
 
+  EfiSignalEventReadyToBoot ();
+
   //Locate handles for SimpleFileSystem protocol
   Status = gBS->LocateHandleBuffer (
                   ByProtocol,
