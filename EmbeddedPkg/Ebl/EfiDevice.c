@@ -111,24 +111,24 @@ EblPrintBlkIoInfo (
           EfiClose (FsFile);
           break;
         }
+        EfiClose (FsFile);
       }
-      EfiClose (FsFile);
     }
   }
 
   // Print out useful Block IO media properties
-  if (File->FsBlockIoMedia.RemovableMedia) {
+  if (File->FsBlockIoMedia->RemovableMedia) {
     AsciiPrint ("Removable ");
   }
-  if (!File->FsBlockIoMedia.MediaPresent) {
-    AsciiPrint ("No Media ");
+  if (!File->FsBlockIoMedia->MediaPresent) {
+    AsciiPrint ("No Media\n");
+  } else {
+    if (File->FsBlockIoMedia->LogicalPartition) {
+      AsciiPrint ("Partition ");
+    }
+    DeviceSize = MultU64x32 (File->FsBlockIoMedia->LastBlock + 1, File->FsBlockIoMedia->BlockSize);
+    AsciiPrint ("Size = 0x%lX\n", DeviceSize);
   }
-  if (File->FsBlockIoMedia.LogicalPartition) {
-    AsciiPrint ("Partition ");
-  }
-  DeviceSize = MultU64x32 (File->FsBlockIoMedia.LastBlock + 1, File->FsBlockIoMedia.BlockSize);
-  AsciiPrint ("Size = 0x%lX\n", DeviceSize);
-
   EfiClose (File);
 }
 

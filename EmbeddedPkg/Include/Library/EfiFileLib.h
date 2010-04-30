@@ -93,7 +93,7 @@ typedef struct {
   EFI_FILE                      *FsFileHandle;    // Information valid for Fs#:
   EFI_FILE_SYSTEM_INFO          *FsInfo;
   EFI_FILE_INFO                 *FsFileInfo;
-  EFI_BLOCK_IO_MEDIA            FsBlockIoMedia;   // Information valid for Fs#: or B#:
+  EFI_BLOCK_IO_MEDIA            *FsBlockIoMedia;  // Information valid for Fs#: or B#:
 
   UINTN                         DiskOffset;       // Information valid for B#:
 

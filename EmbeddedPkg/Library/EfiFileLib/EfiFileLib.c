@@ -143,13 +143,40 @@ EblUpdateDeviceLists (
   EFI_STATUS                        Status;
   UINTN                             Size;
   EFI_SIMPLE_FILE_SYSTEM_PROTOCOL   *Fs;
+  EFI_BLOCK_IO_PROTOCOL             *BlkIo;
   EFI_FILE_HANDLE                   Root;
   UINTN                             Index;
+  BOOLEAN                           Update;
 
   if (mBlkIo != NULL) {
     FreePool (mBlkIo);
   }
   gBS->LocateHandleBuffer (ByProtocol, &gEfiBlockIoProtocolGuid, NULL, &mBlkIoCount, &mBlkIo);
+
+  //
+  // This is a trick to trigger the gBS->ReinstallProtocolInterface () in a removable media 
+  // device to make a filesystem layer on. Probing devices will detect if media has been 
+  // inserted and create 
+  //
+  for (Index =0, Update = FALSE; Index < mBlkIoCount; Index++) {
+    Status = gBS->HandleProtocol (mBlkIo[Index], &gEfiBlockIoProtocolGuid, (VOID **)&BlkIo);
+    if (!EFI_ERROR (Status)) {
+      if (BlkIo->Media->RemovableMedia) {
+        gBS->DisconnectController (mBlkIo[Index], NULL, NULL);
+        gBS->ConnectController (mBlkIo[Index], NULL, NULL, TRUE);
+        Update = TRUE;
+      }
+    }
+  }
+
+  if (Update) {
+    // In case we caused media to be detected that contains a partition (SD Card, ...) rescan
+    if (mBlkIo != NULL) {
+      FreePool (mBlkIo);
+    }
+    gBS->LocateHandleBuffer (ByProtocol, &gEfiBlockIoProtocolGuid, NULL, &mBlkIoCount, &mBlkIo);
+  }
+
 
   if (mFv != NULL) {
     FreePool (mFv);
@@ -406,7 +433,7 @@ EblFileDevicePath (
 
   Status = gBS->HandleProtocol (File->EfiHandle, &gEfiBlockIoProtocolGuid, (VOID **)&BlkIo);
   if (!EFI_ERROR (Status)) {
-    CopyMem (&File->FsBlockIoMedia, BlkIo->Media, sizeof (EFI_BLOCK_IO_MEDIA));
+    File->FsBlockIoMedia = BlkIo->Media;
 
     // If we are not opening the device this will get over written with file info
     File->MaxPosition = MultU64x32 (BlkIo->Media->LastBlock + 1, BlkIo->Media->BlockSize);
@@ -1395,7 +1422,7 @@ EfiRead (
   case EfiOpenBlockIo:
     Status = gBS->HandleProtocol(File->EfiHandle, &gEfiDiskIoProtocolGuid, (VOID **)&DiskIo);
     if (!EFI_ERROR(Status)) {
-      Status = DiskIo->ReadDisk(DiskIo, File->FsBlockIoMedia.MediaId, File->DiskOffset + File->CurrentPosition, *BufferSize, Buffer);
+      Status = DiskIo->ReadDisk(DiskIo, File->FsBlockIoMedia->MediaId, File->DiskOffset + File->CurrentPosition, *BufferSize, Buffer);
     }
     File->CurrentPosition += *BufferSize;
     break;
@@ -1537,7 +1564,7 @@ EfiWrite (
 
     Status = gBS->HandleProtocol (File->EfiHandle, &gEfiDiskIoProtocolGuid, (VOID **)&DiskIo);
     if (!EFI_ERROR(Status)) {
-      Status = DiskIo->WriteDisk (DiskIo, File->FsBlockIoMedia.MediaId, File->DiskOffset + File->CurrentPosition, *BufferSize, Buffer);
+      Status = DiskIo->WriteDisk (DiskIo, File->FsBlockIoMedia->MediaId, File->DiskOffset + File->CurrentPosition, *BufferSize, Buffer);
     }
     File->CurrentPosition += *BufferSize;
     break;
@@ -1608,7 +1635,7 @@ ExpandPath (
   CHAR8   *NewPath;
   CHAR8   *Work, *Start, *End;
   UINTN   StrLen;
-  UINTN   i;
+  INTN    i;
 
   if (Cwd == NULL || Path == NULL) {
     return NULL;
