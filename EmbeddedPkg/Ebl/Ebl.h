@@ -51,6 +51,7 @@
 #include <Library/DevicePathLib.h>
 #include <Library/UefiLib.h>
 #include <Library/EblNetworkLib.h>
+#include <Library/TimerLib.h>
 
 #include <IndustryStandard/Pci.h>
 
