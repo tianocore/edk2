@@ -97,7 +97,6 @@
 
 #define DMA4_CCR_CONST_FILL_ENABLE        BIT16
 #define DMA4_CCR_TRANSPARENT_COPY_ENABLE  BIT17
-
-
+  
 #endif 
 

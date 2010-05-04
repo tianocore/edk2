@@ -616,6 +616,23 @@ PerformCardConfiguration (
     return Status;
   }
 
+  if ((gCardInfo.CardType != UNKNOWN_CARD) && (gCardInfo.CardType != MMC_CARD)) {
+    // We could read SCR register, but SD Card Phys spec stats any SD Card shall
+    // set SCR.SD_BUS_WIDTHS to support 4-bit mode, so why bother?
+ 
+    // Send ACMD6 (application specific commands must be prefixed with CMD55)
+    Status = SendCmd (CMD55, CMD55_INT_EN, CmdArgument);
+    if (!EFI_ERROR (Status)) {
+      // set device into 4-bit data bus mode
+      Status = SendCmd (ACMD6, ACMD6_INT_EN, 0x2);
+      if (!EFI_ERROR (Status)) {
+        // Set host controler into 4-bit mode
+        MmioOr32 (MMCHS_HCTL, DTW_4_BIT);
+        DEBUG ((EFI_D_INFO, "SD Memory Card set to 4-bit mode\n"));
+      }
+    }
+  }
+
   //Send CMD16 to set the block length
   CmdArgument = gCardInfo.BlockSize;
   Status = SendCmd (CMD16, CMD16_INT_EN, CmdArgument);
@@ -875,6 +892,8 @@ DetectCard (
   gMMCHSMedia.MediaPresent = TRUE; 
   gMMCHSMedia.MediaId++; 
   gMediaChange = FALSE;
+
+  DEBUG ((EFI_D_INFO, "SD Card Media Change\n"));
 
   return Status;
 }
@@ -1190,7 +1209,7 @@ MMCHSInitialize (
   Status = gBS->CreateEvent (EVT_TIMER | EVT_NOTIFY_SIGNAL, TPL_CALLBACK, TimerCallback, NULL, &gTimerEvent);
   ASSERT_EFI_ERROR (Status);
  
-  Status = gBS->SetTimer (gTimerEvent, TimerPeriodic, 1000000); // make me a PCD
+  Status = gBS->SetTimer (gTimerEvent, TimerPeriodic, 1000000ULL); // make me a PCD
   ASSERT_EFI_ERROR (Status);
 
   //Publish BlockIO.

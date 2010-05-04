@@ -205,4 +205,7 @@
 #define ACMD41            (INDX(41) | RSP_TYPE_48BITS)
 #define ACMD41_INT_EN     (CERR_EN | CIE_EN | CCRC_EN | CC_EN | CEB_EN | CTO_EN)
 
+#define ACMD6             (INDX(6) | RSP_TYPE_48BITS)
+#define ACMD6_INT_EN      (CERR_EN | CIE_EN | CCRC_EN | CC_EN | CEB_EN | CTO_EN)
+
 #endif //__OMAP3530SDIO_H__
