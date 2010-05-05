@@ -194,7 +194,9 @@ PartitionDriverBindingStart (
   EFI_DEVICE_PATH_PROTOCOL  *ParentDevicePath;
   PARTITION_DETECT_ROUTINE  *Routine;
   BOOLEAN                   MediaPresent;
+  EFI_TPL                   OldTpl;
 
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK); 
   //
   // Check RemainingDevicePath validation
   //
@@ -204,7 +206,8 @@ PartitionDriverBindingStart (
     // if yes, return EFI_SUCCESS
     //
     if (IsDevicePathEnd (RemainingDevicePath)) {
-      return EFI_SUCCESS;
+      Status = EFI_SUCCESS;
+      goto Exit;
     }
   }
 
@@ -217,7 +220,7 @@ PartitionDriverBindingStart (
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Exit;
   }
   //
   // Get the Device Path Protocol on ControllerHandle's handle
@@ -231,7 +234,7 @@ PartitionDriverBindingStart (
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
   if (EFI_ERROR (Status) && Status != EFI_ALREADY_STARTED) {
-    return Status;
+    goto Exit;
   }
 
   Status = gBS->OpenProtocol (
@@ -249,7 +252,7 @@ PartitionDriverBindingStart (
           This->DriverBindingHandle,
           ControllerHandle
           );
-    return Status;
+    goto Exit;
   }
 
   OpenStatus = Status;
@@ -312,6 +315,8 @@ PartitionDriverBindingStart (
           );
   }
 
+Exit:
+  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 

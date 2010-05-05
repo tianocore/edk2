@@ -154,7 +154,9 @@ USBKeyboardDriverBindingStart (
   UINT8                         PollingInterval;
   UINT8                         PacketSize;
   BOOLEAN                       Found;
+  EFI_TPL                       OldTpl;
 
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
   //
   // Open USB I/O Protocol
   //
@@ -167,7 +169,7 @@ USBKeyboardDriverBindingStart (
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto ErrorExit1;
   }
 
   UsbKeyboardDevice = AllocateZeroPool (sizeof (USB_KB_DEV));
@@ -381,6 +383,7 @@ USBKeyboardDriverBindingStart (
     FALSE
     );
 
+  gBS->RestoreTPL (OldTpl);
   return EFI_SUCCESS;
 
 //
@@ -407,6 +410,10 @@ ErrorExit:
          This->DriverBindingHandle,
          Controller
          );
+
+ErrorExit1:
+  gBS->RestoreTPL (OldTpl);
+
   return Status;
 
 }

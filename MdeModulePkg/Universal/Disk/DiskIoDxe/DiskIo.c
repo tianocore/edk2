@@ -125,7 +125,9 @@ DiskIoDriverBindingStart (
 {
   EFI_STATUS            Status;
   DISK_IO_PRIVATE_DATA  *Private;
+  EFI_TPL               OldTpl;
 
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
   Private = NULL;
 
   //
@@ -140,7 +142,7 @@ DiskIoDriverBindingStart (
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto ErrorExit1;
   }
   
   //
@@ -177,6 +179,8 @@ ErrorExit:
           );
   }
 
+ErrorExit1:
+  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 

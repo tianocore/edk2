@@ -149,7 +149,9 @@ USBMouseAbsolutePointerDriverBindingStart (
   UINT8                          PollingInterval;
   UINT8                          PacketSize;
   BOOLEAN                        Found;
+  EFI_TPL                        OldTpl;
 
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
   //
   // Open USB I/O Protocol
   //
@@ -162,7 +164,7 @@ USBMouseAbsolutePointerDriverBindingStart (
                   EFI_OPEN_PROTOCOL_BY_DRIVER                  
                   );
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto ErrorExit1;
   }
   
   UsbMouseAbsolutePointerDevice = AllocateZeroPool (sizeof (USB_MOUSE_ABSOLUTE_POINTER_DEV));
@@ -324,6 +326,7 @@ USBMouseAbsolutePointerDriverBindingStart (
     FALSE
     );
 
+  gBS->RestoreTPL (OldTpl);
   return EFI_SUCCESS;
 
 //
@@ -347,6 +350,9 @@ ErrorExit:
       UsbMouseAbsolutePointerDevice = NULL;
     }
   }
+
+ErrorExit1:
+  gBS->RestoreTPL (OldTpl);
 
   return Status;
 }

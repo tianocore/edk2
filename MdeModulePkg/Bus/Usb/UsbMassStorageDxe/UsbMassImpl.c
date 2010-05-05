@@ -833,7 +833,10 @@ USBMassDriverBindingStart (
   UINT8                         MaxLun;
   EFI_STATUS                    Status;
   EFI_USB_IO_PROTOCOL           *UsbIo; 
-  
+  EFI_TPL                       OldTpl;
+
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+
   Transport = NULL;
   Context   = NULL;
   MaxLun    = 0;
@@ -842,7 +845,7 @@ USBMassDriverBindingStart (
 
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "USBMassDriverBindingStart: UsbMassInitTransport (%r)\n", Status));
-    return Status;
+    goto Exit;
   }
   if (MaxLun == 0) {
     //
@@ -867,7 +870,7 @@ USBMassDriverBindingStart (
   
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "USBMassDriverBindingStart: OpenDevicePathProtocol By Driver (%r)\n", Status));
-      return Status;
+      goto Exit;
     }
 
     Status = gBS->OpenProtocol (
@@ -887,7 +890,7 @@ USBMassDriverBindingStart (
              This->DriverBindingHandle,
              Controller
              );
-      return Status;
+      goto Exit;
     }
 
     //
@@ -911,6 +914,8 @@ USBMassDriverBindingStart (
       DEBUG ((EFI_D_ERROR, "USBMassDriverBindingStart: UsbMassInitMultiLun (%r) with Maxlun=%d\n", Status, MaxLun));
     }
   }
+Exit:
+  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 

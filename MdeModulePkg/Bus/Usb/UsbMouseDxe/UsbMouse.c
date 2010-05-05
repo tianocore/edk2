@@ -149,7 +149,9 @@ USBMouseDriverBindingStart (
   UINT8                       PollingInterval;
   UINT8                       PacketSize;
   BOOLEAN                     Found;
+  EFI_TPL                     OldTpl;
 
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
   //
   // Open USB I/O Protocol
   //
@@ -162,7 +164,7 @@ USBMouseDriverBindingStart (
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto ErrorExit1;
   }
 
   UsbMouseDevice = AllocateZeroPool (sizeof (USB_MOUSE_DEV));
@@ -324,6 +326,8 @@ USBMouseDriverBindingStart (
     FALSE
     );
 
+  gBS->RestoreTPL (OldTpl);
+
   return EFI_SUCCESS;
 
 //
@@ -348,6 +352,8 @@ ErrorExit:
     }
   }
 
+ErrorExit1:
+  gBS->RestoreTPL (OldTpl);
   return Status;
 }
 
