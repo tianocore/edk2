@@ -1,5 +1,5 @@
 /** @file
-  Provide generic extract guided section functions for PEI phase.
+  Provide generic extract guided section functions.
 
   Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
@@ -17,10 +17,9 @@
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/HobLib.h>
 #include <Library/ExtractGuidedSectionLib.h>
 
-#define PEI_EXTRACT_HANDLER_INFO_SIGNATURE SIGNATURE_32 ('P', 'E', 'H', 'I')
+#define EXTRACT_HANDLER_INFO_SIGNATURE SIGNATURE_32 ('E', 'G', 'S', 'I')
 
 typedef struct {
   UINT32                                  Signature;
@@ -28,79 +27,56 @@ typedef struct {
   GUID                                    *ExtractHandlerGuidTable;
   EXTRACT_GUIDED_SECTION_DECODE_HANDLER   *ExtractDecodeHandlerTable;
   EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER *ExtractGetInfoHandlerTable;
-} PEI_EXTRACT_GUIDED_SECTION_HANDLER_INFO;
+} EXTRACT_GUIDED_SECTION_HANDLER_INFO;
 
 /**
-  Build guid hob for the global memory to store the registered guid and Handler list.
-  If GuidHob exists, HandlerInfo will be directly got from Guid hob data.
+  HandlerInfo table address is set by PcdGuidedExtractHandlerTableAddress, which is used to store 
+  the registered guid and Handler list. When it is initialized, it will be directly returned. 
+  Or, HandlerInfo table will be initialized in this function.
 
-  @param[in, out]  InfoPointer   Pointer to pei handler info structure.
+  @param[in, out]  InfoPointer   Pointer to the handler info structure.
 
-  @retval  RETURN_SUCCESS            Build Guid hob for the global memory space to store guid and function tables.
-  @retval  RETURN_OUT_OF_RESOURCES   No enough memory to allocated.
+  @retval  RETURN_SUCCESS            HandlerInfo table can be used to store guid and function tables.
+  @retval  RETURN_OUT_OF_RESOURCES   HandlerInfo table address is not writable.
 **/
 RETURN_STATUS
-PeiGetExtractGuidedSectionHandlerInfo (
-  IN OUT PEI_EXTRACT_GUIDED_SECTION_HANDLER_INFO **InfoPointer
+GetExtractGuidedSectionHandlerInfo (
+  IN OUT EXTRACT_GUIDED_SECTION_HANDLER_INFO **InfoPointer
   )
 {
-  PEI_EXTRACT_GUIDED_SECTION_HANDLER_INFO *HandlerInfo;
-  EFI_PEI_HOB_POINTERS                    Hob;
+  EXTRACT_GUIDED_SECTION_HANDLER_INFO *HandlerInfo;
   
   //
-  // First try to get handler info from guid hob specified by CallerId.
+  // Set the available memory address to handler info.
   //
-  Hob.Raw = GetNextHob (EFI_HOB_TYPE_GUID_EXTENSION, GetHobList ());
-  while (Hob.Raw != NULL) {
-    if (CompareGuid (&(Hob.Guid->Name), &gEfiCallerIdGuid)) {
-      HandlerInfo = (PEI_EXTRACT_GUIDED_SECTION_HANDLER_INFO *) GET_GUID_HOB_DATA (Hob.Guid);
-      if (HandlerInfo->Signature == PEI_EXTRACT_HANDLER_INFO_SIGNATURE) {
-        //
-        // Update Table Pointer when hob start address is changed.
-        //
-        if (HandlerInfo->ExtractHandlerGuidTable != (GUID *) (HandlerInfo + 1)) {
-          HandlerInfo->ExtractHandlerGuidTable    = (GUID *) (HandlerInfo + 1);
-          HandlerInfo->ExtractDecodeHandlerTable  = (EXTRACT_GUIDED_SECTION_DECODE_HANDLER *) (
-                                                      (UINT8 *)HandlerInfo->ExtractHandlerGuidTable + 
-                                                      PcdGet32 (PcdMaximumGuidedExtractHandler) * sizeof (GUID)
-                                                     );
-          HandlerInfo->ExtractGetInfoHandlerTable = (EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER *) (
-                                                      (UINT8 *)HandlerInfo->ExtractDecodeHandlerTable + 
-                                                      PcdGet32 (PcdMaximumGuidedExtractHandler) * 
-                                                      sizeof (EXTRACT_GUIDED_SECTION_DECODE_HANDLER)
-                                                     );
-        }
-        //
-        // Return HandlerInfo pointer.
-        //
-        *InfoPointer = HandlerInfo;
-        return EFI_SUCCESS;
-      }
-    }
-    Hob.Raw = GET_NEXT_HOB (Hob);
-    Hob.Raw = GetNextHob (EFI_HOB_TYPE_GUID_EXTENSION, Hob.Raw);
-  }
-  
+  HandlerInfo = (EXTRACT_GUIDED_SECTION_HANDLER_INFO*)(VOID*)(UINTN) PcdGet64 (PcdGuidedExtractHandlerTableAddress);
+
   //
-  // If Guid Hob is not found, Build CallerId Guid hob to store Handler Info
+  // First check whether the handler info structure is initialized.
   //
-  HandlerInfo = BuildGuidHob (
-                 &gEfiCallerIdGuid, 
-                 sizeof (PEI_EXTRACT_GUIDED_SECTION_HANDLER_INFO) +
-                 PcdGet32 (PcdMaximumGuidedExtractHandler) * 
-                 (sizeof (GUID) + sizeof (EXTRACT_GUIDED_SECTION_DECODE_HANDLER) + sizeof (EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER))
-                );
-  if (HandlerInfo == NULL) {
+  if (HandlerInfo->Signature == EXTRACT_HANDLER_INFO_SIGNATURE) {
     //
-    // No enough resource to build guid hob.
+    // The handler info has been initialized and is returned.
+    //
+    *InfoPointer = HandlerInfo;
+    return RETURN_SUCCESS;
+  }
+
+  //
+  // Try to initialize the handler info structure
+  //
+  HandlerInfo->Signature = EXTRACT_HANDLER_INFO_SIGNATURE;
+  if (HandlerInfo->Signature != EXTRACT_HANDLER_INFO_SIGNATURE) {
+    //
+    // The handler info structure was not writeable because the memory is not ready.
     //
     *InfoPointer = NULL;
-    return EFI_OUT_OF_RESOURCES;
+    return RETURN_OUT_OF_RESOURCES;
   }
+
   //
   // Init HandlerInfo structure
   //
-  HandlerInfo->Signature = PEI_EXTRACT_HANDLER_INFO_SIGNATURE;
   HandlerInfo->NumberOfExtractHandler     = 0;
   HandlerInfo->ExtractHandlerGuidTable    = (GUID *) (HandlerInfo + 1);
   HandlerInfo->ExtractDecodeHandlerTable  = (EXTRACT_GUIDED_SECTION_DECODE_HANDLER *) (
@@ -112,11 +88,8 @@ PeiGetExtractGuidedSectionHandlerInfo (
                                               PcdGet32 (PcdMaximumGuidedExtractHandler) * 
                                               sizeof (EXTRACT_GUIDED_SECTION_DECODE_HANDLER)
                                              );
-  //
-  // return the created HandlerInfo.
-  //
   *InfoPointer = HandlerInfo;
-  return EFI_SUCCESS;
+  return RETURN_SUCCESS;
 }
 
 /**
@@ -139,16 +112,16 @@ ExtractGuidedSectionGetGuidList (
   OUT  GUID  **ExtractHandlerGuidTable
   )
 {
-  EFI_STATUS Status;
-  PEI_EXTRACT_GUIDED_SECTION_HANDLER_INFO *HandlerInfo;
+  RETURN_STATUS                       Status;
+  EXTRACT_GUIDED_SECTION_HANDLER_INFO *HandlerInfo;
 
   ASSERT (ExtractHandlerGuidTable != NULL);
 
   //
   // Get all registered handler information
   //
-  Status = PeiGetExtractGuidedSectionHandlerInfo (&HandlerInfo);
-  if (EFI_ERROR (Status)) {
+  Status = GetExtractGuidedSectionHandlerInfo (&HandlerInfo);
+  if (RETURN_ERROR (Status)) {
     *ExtractHandlerGuidTable = NULL;
     return 0;
   }
@@ -192,9 +165,9 @@ ExtractGuidedSectionRegisterHandlers (
   IN        EXTRACT_GUIDED_SECTION_DECODE_HANDLER    DecodeHandler
   )
 {
-  EFI_STATUS Status;
-  UINT32     Index;
-  PEI_EXTRACT_GUIDED_SECTION_HANDLER_INFO *HandlerInfo;
+  UINT32                              Index;
+  RETURN_STATUS                       Status;
+  EXTRACT_GUIDED_SECTION_HANDLER_INFO *HandlerInfo;
 
   //
   // Check input paramter
@@ -203,13 +176,11 @@ ExtractGuidedSectionRegisterHandlers (
   ASSERT (GetInfoHandler != NULL);
   ASSERT (DecodeHandler != NULL);
 
-
-
   //
   // Get the registered handler information
   //
-  Status = PeiGetExtractGuidedSectionHandlerInfo (&HandlerInfo);
-  if (EFI_ERROR (Status)) {
+  Status = GetExtractGuidedSectionHandlerInfo (&HandlerInfo);
+  if (RETURN_ERROR (Status)) {
     return Status;
   }
 
@@ -287,9 +258,9 @@ ExtractGuidedSectionGetInfo (
   OUT       UINT16  *SectionAttribute   
   )
 {
-  UINT32 Index;
-  EFI_STATUS Status;
-  PEI_EXTRACT_GUIDED_SECTION_HANDLER_INFO *HandlerInfo;
+  UINT32                              Index;
+  RETURN_STATUS                       Status;
+  EXTRACT_GUIDED_SECTION_HANDLER_INFO *HandlerInfo;
   
   //
   // Check input paramter
@@ -302,11 +273,11 @@ ExtractGuidedSectionGetInfo (
   //
   // Get all registered handler information.
   //
-  Status = PeiGetExtractGuidedSectionHandlerInfo (&HandlerInfo);
-  if (EFI_ERROR (Status)) {
+  Status = GetExtractGuidedSectionHandlerInfo (&HandlerInfo);
+  if (RETURN_ERROR (Status)) {
     return Status;
   }
-  
+
   //
   // Search the match registered GetInfo handler for the input guided section.
   //
@@ -374,9 +345,9 @@ ExtractGuidedSectionDecode (
   OUT       UINT32  *AuthenticationStatus  
   )
 {
-  UINT32     Index;
-  EFI_STATUS Status;
-  PEI_EXTRACT_GUIDED_SECTION_HANDLER_INFO *HandlerInfo;
+  UINT32                              Index;
+  RETURN_STATUS                       Status;
+  EXTRACT_GUIDED_SECTION_HANDLER_INFO *HandlerInfo;
   
   //
   // Check input parameter
@@ -388,8 +359,8 @@ ExtractGuidedSectionDecode (
   //
   // Get all registered handler information.
   //  
-  Status = PeiGetExtractGuidedSectionHandlerInfo (&HandlerInfo);
-  if (EFI_ERROR (Status)) {
+  Status = GetExtractGuidedSectionHandlerInfo (&HandlerInfo);
+  if (RETURN_ERROR (Status)) {
     return Status;
   }
 

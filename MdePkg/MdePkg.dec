@@ -1274,6 +1274,10 @@
   # EFI_SOFTWARE_DXE_CORE | EFI_SW_PC_INIT_END
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueDxeDriverEnd|0x3040003|UINT32|0x30001014
 
+  ## This value is used to set the available memory address to store Guided Extract Handlers.
+  #  The required memory space is decided by the value of PcdMaximumGuidedExtractHandler.
+  gEfiMdePkgTokenSpaceGuid.PcdGuidedExtractHandlerTableAddress|0x1000000|UINT64|0x30001015
+
 [PcdsFixedAtBuild.IPF]
   ## The base address of IO port space for IA64 arch
   gEfiMdePkgTokenSpaceGuid.PcdIoBlockBaseAddressForIpf|0x0ffffc000000|UINT64|0x0000000f
