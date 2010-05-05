@@ -19,6 +19,56 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   Searches all the available firmware volumes and returns the first matching FFS section. 
 
+  This function searches all the firmware volumes for FFS files with FV file type specified by FileType
+  The order that the firmware volumes is searched is not deterministic. For each available FV a search 
+  is made for FFS file of type FileType. If the FV contains more than one FFS file with the same FileType, 
+  the FileInstance instance will be the matched FFS file. For each FFS file found a search 
+  is made for FFS sections of type SectionType. If the FFS file contains at least SectionInstance instances 
+  of the FFS section specified by SectionType, then the SectionInstance instance is returned in Buffer. 
+  Buffer is allocated using AllocatePool(), and the size of the allocated buffer is returned in Size. 
+  It is the caller's responsibility to use FreePool() to free the allocated buffer.  
+  See EFI_FIRMWARE_VOLUME2_PROTOCOL.ReadSection() for details on how sections 
+  are retrieved from an FFS file based on SectionType and SectionInstance.
+
+  If SectionType is EFI_SECTION_TE, and the search with an FFS file fails, 
+  the search will be retried with a section type of EFI_SECTION_PE32.
+  This function must be called with a TPL <= TPL_NOTIFY.
+
+  If Buffer is NULL, then ASSERT().
+  If Size is NULL, then ASSERT().
+
+  @param  FileType             Indicates the FV file type to search for within all available FVs.
+  @param  FileInstance         Indicates which file instance within all available FVs specified by FileType.
+                               FileInstance starts from zero.
+  @param  SectionType          Indicates the FFS section type to search for within the FFS file 
+                               specified by FileType with FileInstance.
+  @param  SectionInstance      Indicates which section instance within the FFS file 
+                               specified by FileType with FileInstance to retrieve. SectionInstance starts from zero.
+  @param  Buffer               On output, a pointer to a callee allocated buffer containing the FFS file section that was found.
+                               Is it the caller's responsibility to free this buffer using FreePool().
+  @param  Size                 On output, a pointer to the size, in bytes, of Buffer.
+
+  @retval  EFI_SUCCESS          The specified FFS section was returned.
+  @retval  EFI_NOT_FOUND        The specified FFS section could not be found.
+  @retval  EFI_OUT_OF_RESOURCES There are not enough resources available to retrieve the matching FFS section.
+  @retval  EFI_DEVICE_ERROR     The FFS section could not be retrieves due to a device error.
+  @retval  EFI_ACCESS_DENIED    The FFS section could not be retrieves because the firmware volume that 
+                                contains the matching FFS section does not allow reads.
+**/
+EFI_STATUS
+EFIAPI
+GetSectionFromAnyFvByFileType  (
+  IN  EFI_FV_FILETYPE               FileType,
+  IN  UINTN                         FileInstance,
+  IN  EFI_SECTION_TYPE              SectionType,
+  IN  UINTN                         SectionInstance,
+  OUT VOID                          **Buffer,
+  OUT UINTN                         *Size
+  );
+
+/**
+  Searches all the available firmware volumes and returns the first matching FFS section. 
+
   This function searches all the firmware volumes for FFS files with an FFS filename specified by NameGuid.  
   The order in which the firmware volumes are searched is not deterministic. For each FFS file found, a search 
   is made for FFS sections of type SectionType. If the FFS file contains at least SectionInstance instances 
