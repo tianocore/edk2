@@ -47,6 +47,7 @@
   DxeServicesTableLib
   UefiLib
   UefiRuntimeLib
+  DxeServicesLib
   
 [Protocols]
   gEfiSmmBase2ProtocolGuid                      # PROTOCOL ALWAYS_PRODUCED
@@ -55,7 +56,6 @@
   gEfiSmmConfigurationProtocolGuid              # PROTOCOL ALWAYS_CONSUMED
   gEfiSmmControl2ProtocolGuid                   # PROTOCOL ALWAYS_CONSUMED
   gEfiDxeSmmReadyToLockProtocolGuid             # PROTOCOL ALWAYS_CONSUMED
-  gEfiFirmwareVolume2ProtocolGuid               # PROTOCOL ALWAYS_CONSUMED
   gEfiCpuArchProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
 
 [Guids]

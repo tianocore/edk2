@@ -20,7 +20,6 @@
 #include <Protocol/SmmConfiguration.h>
 #include <Protocol/SmmControl2.h>
 #include <Protocol/DxeSmmReadyToLock.h>
-#include <Protocol/FirmwareVolume2.h>
 
 #include <Guid/EventGroup.h>
 #include <Guid/EventLegacyBios.h>
@@ -34,6 +33,7 @@
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DxeServicesTableLib.h>
+#include <Library/DxeServicesLib.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiRuntimeLib.h>
 #include <Library/PcdLib.h>
@@ -684,81 +684,6 @@ SmmIplSetVirtualAddressNotify (
 }
 
 /**
-  Searches all Firmware Volumes for the first file matching FileType and SectionType and returns the section data.
-
-  @param   FileType                FileType to search for within any of the firmware volumes in the platform.
-  @param   SectionType             SectionType to search for within any of the matching FileTypes in the firmware volumes in the platform.
-  @param   SourceSize              Return the size of the returned section data..
-
-  @retval  != NULL                 Pointer to the allocated buffer containing the section data.
-  @retval  NULL                    Section data was not found.
-
-**/
-VOID *
-GetSectionInAnyFv (
-  IN  EFI_FV_FILETYPE   FileType,
-  IN  EFI_SECTION_TYPE  SectionType,
-  OUT UINTN             *SourceSize
-  )
-{
-  EFI_STATUS                    Status;
-  UINTN                         HandleCount;
-  EFI_HANDLE                    *HandleBuffer;
-  UINTN                         Index;
-  EFI_FIRMWARE_VOLUME2_PROTOCOL *Fv;
-  UINTN                         Key;
-  EFI_GUID                      NameGuid;
-  EFI_FV_FILE_ATTRIBUTES        Attributes;
-  VOID                          *SourceBuffer;
-  UINT32                        AuthenticationStatus;
-
-  HandleBuffer = NULL;
-  Status = gBS->LocateHandleBuffer (
-                  ByProtocol,
-                  &gEfiFirmwareVolume2ProtocolGuid,
-                  NULL,
-                  &HandleCount,
-                  &HandleBuffer
-                  );
-  if (EFI_ERROR (Status)) {
-    return NULL;
-  }
-
-  for (Index = 0; Index < HandleCount; Index++) {
-    Status = gBS->HandleProtocol (
-                    HandleBuffer[Index],
-                    &gEfiFirmwareVolume2ProtocolGuid,
-                    (VOID **)&Fv
-                    );
-    if (EFI_ERROR (Status)) {
-      continue;
-    }
-
-    //
-    // Use Firmware Volume 2 Protocol to search for a file of type FileType
-    //
-    Key = 0;   
-    Status = Fv->GetNextFile (Fv, &Key, &FileType, &NameGuid, &Attributes, SourceSize);
-    if (EFI_ERROR (Status)) {
-      continue;
-    }
-
-    //
-    // Use Firmware Volume 2 Protocol to read a section of type SectionType
-    //
-    SourceBuffer = NULL;
-    Status = Fv->ReadSection (Fv, &NameGuid, SectionType, 0, &SourceBuffer, SourceSize, &AuthenticationStatus);
-    if (!EFI_ERROR (Status)) {
-      FreePool (HandleBuffer);
-      return SourceBuffer;
-    }
-  }  
-
-  FreePool(HandleBuffer);
-  
-  return NULL;
-}
-/**
   Get the fixed loadding address from image header assigned by build tool. This function only be called
   when Loading module at Fixed address feature enabled.
 
@@ -880,9 +805,16 @@ ExecuteSmmCoreFromSmram (
   //
   // Search all Firmware Volumes for a PE/COFF image in a file of type SMM_CORE
   //  
-  SourceBuffer = GetSectionInAnyFv (EFI_FV_FILETYPE_SMM_CORE, EFI_SECTION_PE32, &SourceSize);
-  if (SourceBuffer == NULL) {
-    return EFI_NOT_FOUND;
+  Status = GetSectionFromAnyFvByFileType (
+             EFI_FV_FILETYPE_SMM_CORE, 
+             0,
+             EFI_SECTION_PE32, 
+             0,
+             &SourceBuffer, 
+             &SourceSize
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
   
   //
