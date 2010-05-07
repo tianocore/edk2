@@ -1476,11 +1476,9 @@ EhcExitBootService (
   Ehc = (USB2_HC_DEV *) Context;
 
   //
-  // Stop the Host Controller
+  // Reset the Host Controller
   //
-  EhcHaltHC (Ehc, EHC_GENERIC_TIMEOUT);
-
-  return;
+  EhcResetHC (Ehc, EHC_RESET_TIMEOUT);
 }
 
 

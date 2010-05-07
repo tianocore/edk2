@@ -1588,7 +1588,11 @@ UhcExitBootService (
   //
   UhciStopHc (Uhc, UHC_GENERIC_TIMEOUT);
 
-  return;
+  //
+  // Reset the Host Controller
+  //
+  UhciSetRegBit (Uhc->PciIo, USBCMD_OFFSET, USBCMD_HCRESET);
+  gBS->Stall (UHC_ROOT_PORT_RECOVERY_STALL);
 }
 
 /**
