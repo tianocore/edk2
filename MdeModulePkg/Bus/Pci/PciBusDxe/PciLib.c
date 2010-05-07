@@ -1241,7 +1241,7 @@ PciHostBridgeEnumerator (
       );
 
       FreePool (Configuration);
-      Link = GetNextNode (&RootBridgeList, Link);
+      Link = RemoveEntryList (Link);
       DestroyRootBridge (RootBridgeDev);
     }
 
