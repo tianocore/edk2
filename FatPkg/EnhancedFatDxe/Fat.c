@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2005 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
 distribution. The full text of the license may be found at
@@ -269,10 +269,21 @@ Returns:
   EFI_STATUS            Status;
   EFI_BLOCK_IO_PROTOCOL *BlockIo;
   EFI_DISK_IO_PROTOCOL  *DiskIo;
+  BOOLEAN               LockedByMe;
+
+  LockedByMe = FALSE;
+  //
+  // Acquire the lock.
+  // If caller has already acquired the lock, cannot lock it again.
+  //
+  Status = FatAcquireLockOrFail ();
+  if (!EFI_ERROR (Status)) {
+    LockedByMe = TRUE;
+  }
 
   Status = InitializeUnicodeCollationSupport (This->DriverBindingHandle);
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Exit;
   }
   //
   // Open our required BlockIo and DiskIo
@@ -286,7 +297,7 @@ Returns:
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Exit;
   }
 
   Status = gBS->OpenProtocol (
@@ -298,7 +309,7 @@ Returns:
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Exit;
   }
   //
   // Allocate Volume structure. In FatAllocateVolume(), Resources
@@ -330,6 +341,13 @@ Returns:
     }
   }
 
+Exit:
+  //
+  // Unlock if locked by myself.
+  //
+  if (LockedByMe) {
+    FatReleaseLock ();
+  }
   return Status;
 }
 
