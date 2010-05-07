@@ -20,6 +20,6 @@
 .proc   CpuPause
 .type   CpuPause, @function
 CpuPause::
-        hint                @pause
+        hint.i              @pause
         br.ret.sptk.many    b0
 .endp
