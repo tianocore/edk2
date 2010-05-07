@@ -419,7 +419,7 @@ static int MY_FAST_CALL LzmaDec_DecodeReal(CLzmaDec *p, SizeT limit, const Byte 
           const Byte *lim = dest + curLen;
           dicPos += curLen;
           do
-            *(dest) = (Byte)*(dest + src);
+            *((volatile Byte *)dest) = (Byte)*(dest + src);
           while (++dest != lim);
         }
         else
