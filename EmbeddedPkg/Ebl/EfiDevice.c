@@ -207,13 +207,14 @@ EblDeviceCmd (
   IN CHAR8  **Argv
   )
 {
+  EFI_STATUS    Status;
   UINTN         Index;
   UINTN         CurrentRow;
   UINTN         Max;
   EFI_OPEN_FILE *File;
 
   CurrentRow = 0;
-  
+
   // Need to call here to make sure Device Counts are valid
   EblUpdateDeviceLists ();
 
@@ -227,9 +228,15 @@ EblDeviceCmd (
       if (File != NULL) {
         if (File->FsBlockIoMedia->RemovableMedia) {
           if (File->FsBlockIoMedia->MediaPresent) {
-            gBS->DisconnectController (File->EfiHandle, NULL, NULL);
+            // Probe to see if media is present
+            Status = File->FsBlockIo->ReadBlocks (File->FsBlockIo, File->FsBlockIo->Media->MediaId, (EFI_LBA)0, 0, NULL);
+            if (Status == EFI_NO_MEDIA) {
+              gBS->DisconnectController (File->EfiHandle, NULL, NULL);
+            }
+          } else {
+            // Probe for media insertion and connect partition and filesystem drivers if needed
+            gBS->ConnectController (File->EfiHandle, NULL, NULL, TRUE);
           }
-          gBS->ConnectController (File->EfiHandle, NULL, NULL, TRUE);
         }
         EfiClose (File);
       }

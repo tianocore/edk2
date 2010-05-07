@@ -409,6 +409,7 @@ EblFileDevicePath (
   Status = gBS->HandleProtocol (File->EfiHandle, &gEfiBlockIoProtocolGuid, (VOID **)&BlkIo);
   if (!EFI_ERROR (Status)) {
     File->FsBlockIoMedia = BlkIo->Media;
+    File->FsBlockIo = BlkIo;
 
     // If we are not opening the device this will get over written with file info
     File->MaxPosition = MultU64x32 (BlkIo->Media->LastBlock + 1, BlkIo->Media->BlockSize);
@@ -1731,6 +1732,15 @@ EfiSetCwd (
   if (gCwd == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
+  AsciiStrCpy (gCwd, File->DeviceName);
+  if (File->FileName == NULL) {
+    AsciiStrCat (gCwd, ":\\");
+  } else {
+    AsciiStrCat (gCwd, ":");
+    AsciiStrCat (gCwd, File->FileName);
+  }
+
 
   EfiClose (File);
   if (Path != Cwd) {
