@@ -207,7 +207,6 @@ EblDeviceCmd (
   IN CHAR8  **Argv
   )
 {
-  EFI_STATUS    Status;
   UINTN         Index;
   UINTN         CurrentRow;
   UINTN         Max;
