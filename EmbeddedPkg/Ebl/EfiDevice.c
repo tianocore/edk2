@@ -227,16 +227,10 @@ EblDeviceCmd (
       File = EfiDeviceOpenByType (EfiOpenBlockIo, Index);
       if (File != NULL) {
         if (File->FsBlockIoMedia->RemovableMedia) {
-          if (File->FsBlockIoMedia->MediaPresent) {
-            // Probe to see if media is present
-            Status = File->FsBlockIo->ReadBlocks (File->FsBlockIo, File->FsBlockIo->Media->MediaId, (EFI_LBA)0, 0, NULL);
-            if (Status == EFI_NO_MEDIA) {
-              gBS->DisconnectController (File->EfiHandle, NULL, NULL);
-            }
-          } else {
-            // Probe for media insertion and connect partition and filesystem drivers if needed
-            gBS->ConnectController (File->EfiHandle, NULL, NULL, TRUE);
-          }
+          // Probe to see if media is present (or not) or media changed
+          //  this causes the ReinstallProtocolInterface() to fire in the
+          //  block io driver to update the system about media change events
+          File->FsBlockIo->ReadBlocks (File->FsBlockIo, File->FsBlockIo->Media->MediaId, (EFI_LBA)0, 0, NULL);
         }
         EfiClose (File);
       }
