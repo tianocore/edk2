@@ -106,6 +106,7 @@
 
   TimerLib|Omap35xxPkg/Library/Omap35xxTimerLib/Omap35xxTimerLib.inf  
   OmapLib|Omap35xxPkg/Library/OmapLib/OmapLib.inf
+  OmapDmaLib|Omap35xxPkg/Library/OmapDmaLib/OmapDmaLib.inf
   EblNetworkLib|EmbeddedPkg/Library/EblNetworkLib/EblNetworkLib.inf
   
   GdbSerialLib|Omap35xxPkg/Library/GdbSerialLib/GdbSerialLib.inf
@@ -222,7 +223,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|TRUE
   
 [PcdsFixedAtBuild.common]
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"BeagleEdk2"
+  gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"BeagleEdk2 %a"
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|32
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|0
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1000000
