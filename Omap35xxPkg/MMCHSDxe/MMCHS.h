@@ -15,6 +15,8 @@
 #ifndef _MMCHS_H_
 #define _MMCHS_H_
 
+#include <Uefi.h>
+
 #include <Library/BaseLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
@@ -22,6 +24,8 @@
 #include <Library/PcdLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/OmapLib.h>
+#include <Library/OmapDmaLib.h>
 
 #include <Protocol/EmbeddedExternalDevice.h>
 #include <Protocol/BlockIo.h>

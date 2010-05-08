@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -16,24 +16,29 @@
 #define __OMAPLIB_H__
 
 UINT32 
+EFIAPI
 GpioBase (
   IN  UINTN Port
   );
 
 UINT32 
+EFIAPI
 TimerBase (
   IN  UINTN Timer
   );
 
 UINTN
+EFIAPI
 InterruptVectorForTimer (
   IN  UINTN TImer
   );
 
 UINT32
+EFIAPI
 UartBase (
   IN  UINTN Uart
   );
+
 
 #endif // __OMAPLIB_H__
 

@@ -28,10 +28,9 @@
 #include <Library/PciLib.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Library/UncachedMemoryAllocationLib.h>
+#include <Library/OmapDmaLib.h>
 
 #include <Protocol/EmbeddedExternalDevice.h>
-#include <Protocol/Cpu.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/PciIo.h>
 #include <Protocol/PciRootBridgeIo.h>
@@ -40,7 +39,9 @@
 #include <IndustryStandard/Pci22.h>
 #include <IndustryStandard/Acpi.h>
 
-extern EFI_CPU_ARCH_PROTOCOL  *gCpu;
+#include <Omap3530/Omap3530.h>
+
+
 
 #define EFI_RESOURCE_NONEXISTENT  0xFFFFFFFFFFFFFFFFULL
 #define EFI_RESOURCE_LESS         0xFFFFFFFFFFFFFFFEULL
@@ -99,21 +100,6 @@ typedef union {
 } PTR;
 
 
-typedef struct {
-  EFI_PHYSICAL_ADDRESS                      HostAddress;
-  EFI_PHYSICAL_ADDRESS                      DeviceAddress;
-  UINTN                                     NumberOfBytes;
-  EFI_PCI_IO_PROTOCOL_OPERATION             Operation;
-  
-} MAP_INFO_INSTANCE;
-
-
-typedef struct {
-  EFI_PHYSICAL_ADDRESS                        HostAddress;
-  EFI_PHYSICAL_ADDRESS                        DeviceAddress;
-  UINTN                                       NumberOfBytes;
-  EFI_PCI_IO_PROTOCOL_OPERATION               Operation;
-} PCI_DMA_MAP;
 
 EFI_STATUS
 EFIAPI

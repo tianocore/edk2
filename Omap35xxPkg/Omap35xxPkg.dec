@@ -31,6 +31,16 @@
 [Includes.common]
   Include                        # Root include for the package
 
+[LibraryClasses]
+  ##  @libraryclass  Abstract location of basic OMAP components
+  ##
+  OmapLib|Include/Library/OmapLib.h
+  
+  ##  @libraryclass  Abstract OMAP and ARM DMA, modeled after PCI IO protocol
+  ##
+  OmapDmaLib|Include/Library/OmapDmaLib.h
+
+
 [Guids.common]
   gOmap35xxTokenSpaceGuid    =  { 0x24b09abe, 0x4e47, 0x481c, { 0xa9, 0xad, 0xce, 0xf1, 0x2c, 0x39, 0x23, 0x27} } 
 

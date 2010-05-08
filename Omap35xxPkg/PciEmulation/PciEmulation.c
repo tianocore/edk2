@@ -13,9 +13,7 @@
 **/
 
 #include "PciEmulation.h"
-#include <Omap3530/Omap3530.h>
 
-EFI_CPU_ARCH_PROTOCOL      *gCpu;
 EMBEDDED_EXTERNAL_DEVICE   *gTPS65950;
 
 #define HOST_CONTROLLER_OPERATION_REG_SIZE  0x44
@@ -263,41 +261,18 @@ PciIoMap (
   OUT    VOID                           **Mapping
   )
 {
-  MAP_INFO_INSTANCE     *Map;
-  EFI_STATUS            Status;
+  DMA_MAP_OPERATION   DmaOperation;
 
-  if ( HostAddress == NULL || NumberOfBytes == NULL || 
-       DeviceAddress == NULL || Mapping == NULL ) {
-    
+  if (Operation == EfiPciIoOperationBusMasterRead) {
+    DmaOperation = MapOperationBusMasterRead;
+  } else if (Operation == EfiPciIoOperationBusMasterWrite) {
+    DmaOperation = MapOperationBusMasterWrite;
+  } else if (Operation == EfiPciIoOperationBusMasterCommonBuffer) {
+    DmaOperation = MapOperationBusMasterCommonBuffer;
+  } else {
     return EFI_INVALID_PARAMETER;
   }
-  
-
-  if (Operation >= EfiPciOperationMaximum) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  *DeviceAddress = ConvertToPhysicalAddress (HostAddress);
-
-  // Data cache flush (HostAddress, NumberOfBytes);
-
-  // Remember range so we can flush on the other side
-  Status = gBS->AllocatePool (EfiBootServicesData, sizeof (PCI_DMA_MAP), (VOID **) &Map);
-  if (EFI_ERROR(Status)) {
-    return  EFI_OUT_OF_RESOURCES;
-  }
-  
-  *Mapping = Map;
-
-  Map->HostAddress   = (UINTN)HostAddress;
-  Map->DeviceAddress = *DeviceAddress;
-  Map->NumberOfBytes = *NumberOfBytes;
-  Map->Operation     = Operation;
-
-  // EfiCpuFlushTypeWriteBack, EfiCpuFlushTypeInvalidate
-  gCpu->FlushDataCache (gCpu, (EFI_PHYSICAL_ADDRESS)(UINTN)HostAddress, *NumberOfBytes, EfiCpuFlushTypeWriteBackInvalidate);
-  
-  return EFI_SUCCESS;
+  return DmaMap (DmaOperation, HostAddress, NumberOfBytes, DeviceAddress, Mapping);
 }
 
 EFI_STATUS
@@ -306,24 +281,7 @@ PciIoUnmap (
   IN  VOID                         *Mapping
   )
 {
-  PCI_DMA_MAP *Map;
-  
-  if (Mapping == NULL) {
-    ASSERT (FALSE);
-    return EFI_INVALID_PARAMETER;
-  }
-  
-  Map = (PCI_DMA_MAP *)Mapping;
-  if (Map->Operation == EfiPciOperationBusMasterWrite) {
-    //
-    // Make sure we read buffer from uncached memory and not the cache
-    //
-    gCpu->FlushDataCache (gCpu, Map->HostAddress, Map->NumberOfBytes, EfiCpuFlushTypeInvalidate);
-  } 
-  
-  FreePool (Map);
-
-  return EFI_SUCCESS;
+  return DmaUnmap (Mapping);
 }
 
 EFI_STATUS
@@ -337,28 +295,13 @@ PciIoAllocateBuffer (
   )
 {
   if (Attributes & EFI_PCI_ATTRIBUTE_INVALID_FOR_ALLOCATE_BUFFER) {
+    // Check this
     return EFI_UNSUPPORTED;
   }
 
-  if (HostAddress == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  //
-  // The only valid memory types are EfiBootServicesData and EfiRuntimeServicesData
-  //
-  // We used uncached memory to keep coherency
-  //
-  if (MemoryType == EfiBootServicesData) {
-    *HostAddress = UncachedAllocatePages (Pages);
-  } else if (MemoryType != EfiRuntimeServicesData) {
-    *HostAddress = UncachedAllocateRuntimePages (Pages);
-  } else {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  return EFI_SUCCESS;
+  return DmaAllocateBuffer (MemoryType, Pages, HostAddress);
 }
+
 
 EFI_STATUS
 PciIoFreeBuffer (
@@ -367,12 +310,7 @@ PciIoFreeBuffer (
   IN  VOID                         *HostAddress
   )
 {
-  if (HostAddress == NULL) {
-     return EFI_INVALID_PARAMETER;
-  } 
-  
-  UncachedFreePages (HostAddress, Pages);
-  return EFI_SUCCESS;
+  return DmaFreeBuffer (Pages, HostAddress);
 }
 
 
@@ -508,9 +446,6 @@ PciEmulationEntryPoint (
   UINT8                   PhysicalPorts;
   UINTN                   Count;
 
-  // Get the Cpu protocol for later use
-  Status = gBS->LocateProtocol(&gEfiCpuArchProtocolGuid, NULL, (VOID **)&gCpu);
-  ASSERT_EFI_ERROR(Status);
 
   //Configure USB host for OMAP3530.
   ConfigureUSBHost();

@@ -21,8 +21,6 @@
 
 **/
 
-#include <Uefi.h>
-
 #include "MMCHS.h"
 
 EFI_BLOCK_IO_MEDIA gMMCHSMedia = {
@@ -222,6 +220,9 @@ CalculateCardCLKD (
   UINTN    Frequency = 0;
 
   MaxDataTransferRate = gCardInfo.CSDData.TRAN_SPEED;
+
+  // For SD Cards  we would need to send CMD6 to set
+  // speeds abouve 25MHz. High Speed mode 50 MHz and up
 
   //Calculate Transfer rate unit (Bits 2:0 of TRAN_SPEED)
   switch (MaxDataTransferRate & 0x7) {
@@ -593,9 +594,6 @@ GetCardSpecificData (
   //Calculate total number of blocks and max. data transfer rate supported by the detected card.
   GetCardConfigurationData();
 
-  //Change MMCHS clock frequency to what detected card can support.
-  UpdateMMCHSClkFrequency(gCardInfo.ClockFrequencySelect);
-
   return Status;
 }
 
@@ -640,6 +638,9 @@ PerformCardConfiguration (
     DEBUG ((EFI_D_ERROR, "CMD16 fails. Status: %x\n", Status));
     return Status;
   }
+
+  //Change MMCHS clock frequency to what detected card can support.
+  UpdateMMCHSClkFrequency(gCardInfo.ClockFrequencySelect);
 
   return EFI_SUCCESS;
 }
@@ -729,27 +730,158 @@ WriteBlockData (
   return EFI_SUCCESS;
 }
 
+EFI_STATUS
+DmaBlocks (
+  IN EFI_BLOCK_IO_PROTOCOL        *This,
+  IN  UINTN                       Lba,
+  IN OUT VOID                     *Buffer,
+  IN  UINTN                       BlockCount,
+  IN  OPERATION_TYPE              OperationType
+  )
+{
+  EFI_STATUS            Status;
+  UINTN                 RetryCount = 0;
+  UINTN                 Cmd = 0;
+  UINTN                 CmdInterruptEnable;
+  UINTN                 CmdArgument;
+  VOID                  *BufferMap;
+  EFI_PHYSICAL_ADDRESS	BufferAddress;
+  OMAP_DMA4             Dma4;
+  DMA_MAP_OPERATION     DmaOperation;
+
+
+  //Populate the command information based on the operation type.
+  if (OperationType == READ) {
+    Cmd = CMD18; //Multiple block read
+    CmdInterruptEnable = CMD18_INT_EN;
+    DmaOperation = MapOperationBusMasterCommonBuffer;
+  } else if (OperationType == WRITE) { 
+    Cmd = CMD25; //Multiple block write
+    CmdInterruptEnable = CMD25_INT_EN;
+    DmaOperation = MapOperationBusMasterRead;
+  } else {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // Map passed in buffer for DMA xfer
+  RetryCount = BlockCount * This->Media->BlockSize;
+  Status = DmaMap (DmaOperation, Buffer, &RetryCount, &BufferAddress, &BufferMap);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  #if 0
+  MmioWrite32 (DMA4_CSDP(0), DMA4_CSDP_DATA_TYPE32 | DMA4_CSDP_SRC_BURST_EN64 | DMA4_CSDP_WRITE_MODE_POSTED);
+  MmioWrite32 (DMA4_CEN(0), 0x4096); // Channel Element number
+  MmioWrite32 (DMA4_CFN(0), 0x1);    // Channel Frame number
+  if () {
+    MmioWrite32 (DMA4_CCR(0), X | DMA4_CCR_FS_PACKET | DMA4_CCR_RD_ACTIVE | DMA4_CCR_WR_ACTIVE | DMA4_CCR_DST_AMODE_POST_INC | DMA4_CCR_SEL_SRC_DEST_SYNC_SOURCE);
+    MmioWrite32 (DMA4_CSSA(0), MMCHS_DATA);            // Src is SD Card
+    MmioWrite32 (DMA4_CDSA(0), (UINT32)BufferAddress); // Dst memory
+  } else {
+    MmioWrite32 (DMA4_CCR(0), X | DMA4_CCR_FS_PACKET | DMA4_CCR_RD_ACTIVE | DMA4_CCR_WR_ACTIVE | DMA4_CCR_SRC_AMODE_POST_INC);
+    MmioWrite32 (DMA4_CSSA(0), (UINT32)BufferAddress); // Src memory
+    MmioWrite32 (DMA4_CDSA(0), MMCHS_DATA);            // Dst SD Card
+  }
+  MmioWrite32 (DMA4_CSE(0), 1);
+  MmioWrite32 (DMA4_CSF(0), This->Media->BlockSize);
+  MmioWrite32 (DMA4_CDE(0), 1);
+#endif
+  Dma4.DataType = 0;                      // DMA4_CSDPi[1:0]
+  Dma4.ReadPortAccessType =0;             // DMA4_CSDPi[8:7]
+  Dma4.WritePortAccessType =0;            // DMA4_CSDPi[15:14]
+  Dma4.SourceEndiansim = 0;               // DMA4_CSDPi[21]
+  Dma4.DestinationEndianism = 0;          // DMA4_CSDPi[19]
+  Dma4.WriteMode = 0;                     // DMA4_CSDPi[17:16]
+  Dma4.SourcePacked = 0;                  // DMA4_CSDPi[6]
+  Dma4.DestinationPacked = 0;             // DMA4_CSDPi[13]
+  Dma4.NumberOfElementPerFrame = 0;       // DMA4_CENi
+  Dma4.NumberOfFramePerTransferBlock = 0; // DMA4_CFNi
+  Dma4.SourceStartAddress = 0;            // DMA4_CSSAi
+  Dma4.DestinationStartAddress = 0;       // DMA4_CDSAi
+  Dma4.SourceElementIndex = 0;            // DMA4_CSEi
+  Dma4.SourceFrameIndex = 0;              // DMA4_CSFi
+  Dma4.DestinationElementIndex = 0;       // DMA4_CDEi
+  Dma4.DestinationFrameIndex = 0;         // DMA4_CDFi
+  Dma4.ReadPortAccessMode = 0;            // DMA4_CCRi[13:12]
+  Dma4.WritePortAccessMode = 0;           // DMA4_CCRi[15:14]
+  Dma4.ReadPriority = 0;                  // DMA4_CCRi[6]
+  Dma4.WritePriority = 0;                 // DMA4_CCRi[23]
+  Dma4.ReadRequestNumber = 0;             // DMA4_CCRi[4:0]
+  Dma4.WriteRequestNumber = 0;            // DMA4_CCRi[20:19]
+
+  EnableDmaChannel (2, &Dma4);
+  
+
+  //Set command argument based on the card access mode (Byte mode or Block mode)
+  if (gCardInfo.OCRData.AccessMode & BIT1) {
+    CmdArgument = Lba;
+  } else {
+    CmdArgument = Lba * This->Media->BlockSize;
+  }
+
+  //Send Command.
+  Status = SendCmd (Cmd, CmdInterruptEnable, CmdArgument);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "CMD fails. Status: %x\n", Status));
+    return Status;
+  }
+
+  DisableDmaChannel (2);
+  Status = DmaUnmap (BufferMap);
+
+  return Status;
+}
+
 
 EFI_STATUS
-TransferBlockData (
-  IN  EFI_BLOCK_IO_PROTOCOL       *This,
-  OUT VOID                        *Buffer,
+TransferBlock (
+  IN EFI_BLOCK_IO_PROTOCOL        *This,
+  IN  UINTN                       Lba,
+  IN OUT VOID                     *Buffer,
   IN  OPERATION_TYPE              OperationType
   )
 {
   EFI_STATUS Status;
   UINTN      MmcStatus;
   UINTN      RetryCount = 0;
+  UINTN      Cmd = 0;
+  UINTN      CmdInterruptEnable = 0;
+  UINTN      CmdArgument = 0;
+
+
+  //Populate the command information based on the operation type.
+  if (OperationType == READ) {
+    Cmd = CMD17; //Single block read
+    CmdInterruptEnable = CMD18_INT_EN;
+  } else if (OperationType == WRITE) { 
+    Cmd = CMD24; //Single block write
+    CmdInterruptEnable = CMD24_INT_EN;
+  }
+
+  //Set command argument based on the card access mode (Byte mode or Block mode)
+  if (gCardInfo.OCRData.AccessMode & BIT1) {
+    CmdArgument = Lba;
+  } else {
+    CmdArgument = Lba * This->Media->BlockSize;
+  }
+
+  //Send Command.
+  Status = SendCmd (Cmd, CmdInterruptEnable, CmdArgument);
+  if (EFI_ERROR(Status)) {
+    DEBUG ((EFI_D_ERROR, "CMD fails. Status: %x\n", Status));
+    return Status;
+  }
 
   //Read or Write data.
   if (OperationType == READ) {
-    Status = ReadBlockData(This, Buffer);
+    Status = ReadBlockData (This, Buffer);
     if (EFI_ERROR(Status)) {
       DEBUG((EFI_D_ERROR, "ReadBlockData fails.\n"));
       return Status;
     }
   } else if (OperationType == WRITE) {
-    Status = WriteBlockData(This, Buffer);
+    Status = WriteBlockData (This, Buffer);
     if (EFI_ERROR(Status)) {
       DEBUG((EFI_D_ERROR, "WriteBlockData fails.\n"));
       return Status;
@@ -891,9 +1023,8 @@ DetectCard (
   gMMCHSMedia.ReadOnly     = (MmioRead32 (GPIO1_BASE + GPIO_DATAIN) & BIT23) == BIT23;
   gMMCHSMedia.MediaPresent = TRUE; 
   gMMCHSMedia.MediaId++; 
-  gMediaChange = FALSE;
 
-  DEBUG ((EFI_D_INFO, "SD Card Media Change\n"));
+  DEBUG ((EFI_D_INFO, "SD Card Media Change on Handle 0x%08x\n", gImageHandle));
 
   return Status;
 }
@@ -910,26 +1041,17 @@ SdReadWrite (
 {
   EFI_STATUS Status = EFI_SUCCESS;
   UINTN      RetryCount = 0;
-  UINTN      NumBlocks;
-  UINTN      Cmd = 0;
-  UINTN      CmdInterruptEnable = 0;
-  UINTN      CmdArgument = 0;
+  UINTN      BlockCount;
+  UINTN      BytesToBeTranferedThisPass;
+  UINTN      BytesRemainingToBeTransfered;
   EFI_TPL    OldTpl;
-  BOOLEAN    MediaPresentLastTime;
   BOOLEAN    Update;
 
-  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
-
-
-  if (Buffer == NULL) {
-    Status = EFI_INVALID_PARAMETER;
-    goto Done;
-  }
   
   Update               = FALSE;
-  MediaPresentLastTime = gMMCHSMedia.MediaPresent;
 
   if (gMediaChange) {
+    Update = TRUE;
     Status = DetectCard  ();
     if (EFI_ERROR (Status)) {
       // We detected a removal
@@ -937,8 +1059,6 @@ SdReadWrite (
       gMMCHSMedia.LastBlock    = 0;
       gMMCHSMedia.BlockSize    = 512;  // Should be zero but there is a bug in DiskIo
       gMMCHSMedia.ReadOnly     = FALSE; 
-    } else {
-      Update = TRUE;
     }
     gMediaChange             = FALSE;
   } else if (!gMMCHSMedia.MediaPresent) {
@@ -946,7 +1066,8 @@ SdReadWrite (
     goto Done;
   }
 
-  if ((MediaPresentLastTime != gMMCHSMedia.MediaPresent) || Update) {
+  if (Update) {
+    DEBUG ((EFI_D_INFO, "SD Card ReinstallProtocolInterface ()\n"));
     gBS->ReinstallProtocolInterface (
           gImageHandle,
           &gEfiBlockIoProtocolGuid,
@@ -959,7 +1080,12 @@ SdReadWrite (
     goto Done;
   }
 
-   if (Lba > This->Media->LastBlock) {
+  if (Buffer == NULL) {
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
+  }
+
+  if (Lba > This->Media->LastBlock) {
     Status = EFI_INVALID_PARAMETER;
     goto Done;
   }
@@ -976,54 +1102,42 @@ SdReadWrite (
     goto Done;
   }
 
-  //Populate the command information based on the operation type.
-  if (OperationType == READ) {
-    Cmd = CMD17; //Single block read
-    CmdInterruptEnable = CMD17_INT_EN;
-  } else if (OperationType == WRITE) { 
-    Cmd = CMD24; //Single block write
-    CmdInterruptEnable = CMD24_INT_EN;
-  }
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
-  //Calculate total number of blocks its going to read.
-  NumBlocks = (BufferSize + (This->Media->BlockSize - 1))/This->Media->BlockSize;
+  BytesRemainingToBeTransfered = BufferSize;
+  while (BytesRemainingToBeTransfered > 0) {
 
-  //Set command argument based on the card access mode (Byte mode or Block mode)
-  if (gCardInfo.OCRData.AccessMode & BIT1) {
-    CmdArgument = (UINTN)Lba;
-  } else {
-    CmdArgument = (UINTN)Lba * This->Media->BlockSize;
-  }
-
-  while(NumBlocks) {
-    //Send Command.
-    Status = SendCmd (Cmd, CmdInterruptEnable, CmdArgument);
-    if (EFI_ERROR(Status)) {
-      DEBUG ((EFI_D_ERROR, "CMD fails. Status: %x\n", Status));
-      goto Done;
+    if (gMediaChange) {
+      Status = EFI_NO_MEDIA;
+      DEBUG ((EFI_D_INFO, "SdReadWrite() EFI_NO_MEDIA due to gMediaChange\n"));
+      goto DoneRestoreTPL;
     }
 
-    //Transfer a block worth of data.
-    Status = TransferBlockData(This, Buffer, OperationType);
+    //BytesToBeTranferedThisPass = (BytesToBeTranferedThisPass >= MAX_MMCHS_TRANSFER_SIZE) ? MAX_MMCHS_TRANSFER_SIZE : BytesRemainingToBeTransfered;
+    BytesToBeTranferedThisPass   = This->Media->BlockSize;
+
+    BlockCount = BytesToBeTranferedThisPass/This->Media->BlockSize;
+
+    if (BlockCount > 1) {
+      Status = DmaBlocks (This, Lba, Buffer, BlockCount, OperationType);
+    } else {
+      //Transfer a block worth of data.
+      Status = TransferBlock (This, Lba, Buffer, OperationType);
+    }
+
     if (EFI_ERROR(Status)) {
       DEBUG ((EFI_D_ERROR, "TransferBlockData fails. %x\n", Status));
-      goto Done;
+      goto DoneRestoreTPL;
     }
 
-    //Adjust command argument.
-    if (gCardInfo.OCRData.AccessMode & BIT1) {
-      CmdArgument++; //Increase BlockIndex by one.
-    } else {
-      CmdArgument += This->Media->BlockSize; //Increase BlockIndex by BlockSize
-    }
-
-    //Adjust Buffer.
+    BytesRemainingToBeTransfered -= BytesToBeTranferedThisPass;
+    Lba    += BlockCount;
     Buffer = (UINT8 *)Buffer + This->Media->BlockSize;
-    NumBlocks--;
   }
 
-Done:
+DoneRestoreTPL:
   gBS->RestoreTPL (OldTpl);
+Done:
   return Status;
 }
 
@@ -1205,7 +1319,7 @@ MMCHSInitialize (
   ASSERT_EFI_ERROR(Status);
 
   ZeroMem (&gCardInfo, sizeof (CARD_INFO));
- 
+
   Status = gBS->CreateEvent (EVT_TIMER | EVT_NOTIFY_SIGNAL, TPL_CALLBACK, TimerCallback, NULL, &gTimerEvent);
   ASSERT_EFI_ERROR (Status);
  

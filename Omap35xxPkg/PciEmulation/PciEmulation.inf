@@ -40,19 +40,17 @@
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   UefiRuntimeServicesTableLib
-  UncachedMemoryAllocationLib
   IoLib
+  OmapDmaLib
 
 [Protocols]
   gEfiPciRootBridgeIoProtocolGuid
   gEfiDevicePathProtocolGuid
   gEfiPciHostBridgeResourceAllocationProtocolGuid
-  gEfiCpuArchProtocolGuid
   gEfiPciIoProtocolGuid
   gEmbeddedExternalDeviceProtocolGuid
 
 [Depex]
   gEfiMetronomeArchProtocolGuid AND 
-  gEfiCpuArchProtocolGuid AND
   gEmbeddedExternalDeviceProtocolGuid
   

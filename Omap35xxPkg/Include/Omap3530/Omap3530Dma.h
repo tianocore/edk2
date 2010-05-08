@@ -15,18 +15,24 @@
 #ifndef __OMAP3530DMA_H__
 #define __OMAP3530DMA_H__
 
-#define DMA4_IRQENABLE_L(_i)  (0x48056018 + (0x4*(i)))
 
-#define DMA4_CCR(_i)  (0x48056080 + (0x60*(i)))
-#define DMA4_CICR(_i) (0x48056088 + (0x60*(i)))
-#define DMA4_CSDP(_i) (0x48056090 + (0x60*(i)))
-#define DMA4_CEN(_i)  (0x48056094 + (0x60*(i)))
-#define DMA4_CFN(_i)  (0x48056098 + (0x60*(i)))
-#define DMA4_CSSA(_i) (0x4805609c + (0x60*(i)))
-#define DMA4_CDSA(_i) (0x480560a0 + (0x60*(i)))
-#define DMA4_CSE(_i)  (0x480560a4 + (0x60*(i)))
-#define DMA4_CSF(_i)  (0x480560a8 + (0x60*(i)))
-#define DMA4_CDE(_i)  (0x480560ac + (0x60*(i)))
+#define DMA4_MAX_CHANNEL 31
+
+#define DMA4_IRQENABLE_L(_i)  (0x48056018 + (0x4*(_i)))
+
+#define DMA4_CCR(_i)  (0x48056080 + (0x60*(_i)))
+#define DMA4_CICR(_i) (0x48056088 + (0x60*(_i)))
+#define DMA4_CSDP(_i) (0x48056090 + (0x60*(_i)))
+#define DMA4_CEN(_i)  (0x48056094 + (0x60*(_i)))
+#define DMA4_CFN(_i)  (0x48056098 + (0x60*(_i)))
+#define DMA4_CSSA(_i) (0x4805609c + (0x60*(_i)))
+#define DMA4_CDSA(_i) (0x480560a0 + (0x60*(_i)))
+#define DMA4_CSEI(_i) (0x480560a4 + (0x60*(_i)))
+#define DMA4_CSFI(_i) (0x480560a8 + (0x60*(_i)))
+#define DMA4_CDEI(_i) (0x480560ac + (0x60*(_i)))
+#define DMA4_CDFI(_i) (0x480560b0 + (0x60*(_i)))
+
+#define DMA4_GCR      (0x48056078)
 
 // Channel Source Destination parameters
 #define DMA4_CSDP_DATA_TYPE8    0
@@ -98,5 +104,7 @@
 #define DMA4_CCR_CONST_FILL_ENABLE        BIT16
 #define DMA4_CCR_TRANSPARENT_COPY_ENABLE  BIT17
   
+#define DMA4_CCR_SEL_SRC_DEST_SYNC_SOURCE BIT24
+
 #endif 
 
