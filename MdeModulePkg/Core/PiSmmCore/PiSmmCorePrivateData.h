@@ -25,7 +25,7 @@
 /// Private structure that is used to share information between the SMM IPL and 
 /// the SMM Core.  This structure is allocated from memory of type EfiRuntimeServicesData.
 /// Since runtime memory types are converted to available memory when a legacy boot 
-/// is performed, the SMM Core must access any fields of this structure if a legacy 
+/// is performed, the SMM Core must not access any fields of this structure if a legacy 
 /// boot is performed.  As a result, the SMM IPL must create an event notification 
 /// for the Legacy Boot event and notify the SMM Core that a legacy boot is being 
 /// performed.  The SMM Core can then use this information to filter accesses to 
