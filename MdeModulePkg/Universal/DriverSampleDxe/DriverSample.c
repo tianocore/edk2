@@ -187,7 +187,7 @@ ValidatePassword (
   ASSERT (EncodedPassword != NULL);
   StrnCpy (EncodedPassword, Password, StrLen (Password));
   EncodePassword (EncodedPassword, StrLen (EncodedPassword) * sizeof (CHAR16));
-  if (CompareMem (EncodedPassword, PrivateData->Configuration.WhatIsThePassword2, StrLen (EncodedPassword) * sizeof (CHAR16)) != 0) {
+  if (CompareMem (EncodedPassword, PrivateData->Configuration.WhatIsThePassword2, PasswordMaxSize) != 0) {
     //
     // Old password mismatch, return EFI_NOT_READY to prompt for error message
     //
@@ -355,7 +355,7 @@ LoadNameValueNames (
 
   @retval EFI_SUCCESS            The Results is filled with the requested values.
   @retval EFI_OUT_OF_RESOURCES   Not enough memory to store the results.
-  @retval EFI_INVALID_PARAMETER  Request is NULL, illegal syntax, or unknown name.
+  @retval EFI_INVALID_PARAMETER  Request is illegal syntax, or unknown name.
   @retval EFI_NOT_FOUND          Routing data doesn't match any storage in this
                                  driver.
 

@@ -464,16 +464,20 @@ TheKey2:
             }
 
             if (MenuOption->Sequence == 0) {
+              ASSERT (EraseLen >= 2);
               FormattedNumber[EraseLen - 2] = DATE_SEPARATOR;
             } else if (MenuOption->Sequence == 1) {
+              ASSERT (EraseLen >= 1);
               FormattedNumber[EraseLen - 1] = DATE_SEPARATOR;
             }
           } else if (Question->Operand == EFI_IFR_TIME_OP) {
             UnicodeSPrint (FormattedNumber, 21 * sizeof (CHAR16), L"%02d", (UINT8) EditValue);
 
             if (MenuOption->Sequence == 0) {
+              ASSERT (EraseLen >= 2);
               FormattedNumber[EraseLen - 2] = TIME_SEPARATOR;
             } else if (MenuOption->Sequence == 1) {
+              ASSERT (EraseLen >= 1);
               FormattedNumber[EraseLen - 1] = TIME_SEPARATOR;
             }
           } else {

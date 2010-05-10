@@ -661,7 +661,7 @@ UpdateBindingDriverSelectPage (
   // Switch the item callback key value to its NO. in mDevicePathHandleBuffer
   //
   mSelectedCtrIndex = KeyValue - KEY_VALUE_DEVICE_OFFSET;
-  ASSERT (mSelectedCtrIndex < MAX_CHOICE_NUM);
+  ASSERT (mSelectedCtrIndex >= 0 && mSelectedCtrIndex < MAX_CHOICE_NUM);
 
   mLastSavedDriverImageNum = 0;
 
@@ -1145,7 +1145,7 @@ CommintChanges (
 
   @retval EFI_SUCCESS            The Results is filled with the requested values.
   @retval EFI_OUT_OF_RESOURCES   Not enough memory to store the results.
-  @retval EFI_INVALID_PARAMETER  Request is NULL, illegal syntax, or unknown name.
+  @retval EFI_INVALID_PARAMETER  Request is illegal syntax, or unknown name.
   @retval EFI_NOT_FOUND          Routing data doesn't match any storage in this driver.
 
 **/
