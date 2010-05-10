@@ -1,7 +1,7 @@
 /** @file
   UEFI Decompress Library implementation refer to UEFI specification.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -117,6 +117,7 @@ GetBits (
 
   Creates Huffman Code mapping table for Extra Set, Char&Len Set
   and Position Set according to code length array.
+  If TableBits > 16, then ASSERT ().
 
   @param  Sd        The global scratch data
   @param  NumOfChar Number of symbols in the symbol set
@@ -152,6 +153,11 @@ MakeTable (
   UINT16  WordOfStart;
   UINT16  WordOfCount;
 
+  //
+  // The maximum mapping table width supported by this internal
+  // working function is 16.
+  //
+  ASSERT (TableBits <= 16);
 
   for (Index = 0; Index <= 16; Index++) {
     Count[Index] = 0;
